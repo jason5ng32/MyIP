@@ -116,7 +116,7 @@ function displayIpapiResult(divIndex, data, tableClass) {
                 dataCell.textContent = data.city;
                 break;
             case 4:
-                dataCell.textContent = data.latitude + ', ' + data.longitude;
+                dataCell.innerHTML = data.latitude + ', ' + data.longitude + ' ' + '<a href="https://www.google.com/maps/search/?api=1&query=' + data.latitude + ',' + data.longitude + '" target="_blank" title="Google 地图"><i class="bi bi-geo-fill"></i></a>';
                 break;
             case 5:
                 dataCell.textContent = data.org;
