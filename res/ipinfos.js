@@ -1,4 +1,4 @@
-var ips = []; // 创建一个空数组用于存储 IP 地址 
+var ips = [null, null]; // 创建一个空数组用于存储 IP 地址 
 var alertDisplayed = false;  // 添加一个新的全局变量
 
 function checkConnectivityHandler(id, url) {
@@ -52,7 +52,8 @@ function getIPFromIpapi() {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
             var ip = response.ip;
-            ips.push(ip); // 将获取到的 IP 地址添加到数组中
+            // ips.push(ip); // 将获取到的 IP 地址添加到数组中
+            ips[1] = ip; // 将获取到的 IP 地址添加到数组中
             queryIpapi(1, ip, 'table-success'); // 调用查询 ipapi.co 的函数
         }
     };
@@ -61,6 +62,9 @@ function getIPFromIpapi() {
 }
 
 function getIPFromTaobao() {
+    if(ips[0] === ips[1]){
+        getIPFromIpapi()
+    }
     document.getElementById('result_0').innerHTML = '查询中...'
     var script = document.createElement('script');
     script.src = 'https://www.taobao.com/help/getip.php?callback=ipCallback';
@@ -69,7 +73,8 @@ function getIPFromTaobao() {
 
 function ipCallback(data) {
     var ip = data.ip;
-    ips.push(ip); // 将获取到的 IP 地址添加到数组中
+    // ips.push(ip); // 将获取到的 IP 地址添加到数组中
+    ips[0] = ip; // 将获取到的 IP 地址添加到数组中
     queryIpapi(0, ip, 'table-info'); // 调用查询 ipapi.co 的函数
 }
 
@@ -129,8 +134,11 @@ function displayIpapiResult(divIndex, data, tableClass) {
     // 判断是否需要显示提示信息
     if (ips.length === 2) {
         if (ips[0] === ips[1]) {
-            document.getElementById('result').children[1].style.display = 'none';
-            document.getElementById('result').children[0].children[0].textContent = '你的 IP 信息';
+            document.getElementById('result_x').style.display = 'none';
+            document.getElementById('ipTitle').textContent = '你的 IP 信息';
+        } else {
+            document.getElementById('result_x').style.display = 'block';
+            document.getElementById('ipTitle').textContent = '国内 IP';
         }
         displayAlert(data.country_name === 'China' && ips[0] === ips[1], ips[0] !== ips[1]);
     }
