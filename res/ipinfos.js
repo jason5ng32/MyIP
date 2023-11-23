@@ -25,6 +25,11 @@ function checkGoogleConnectivity() {
     checkConnectivityHandler("googleStatus", "https://www.google.com/images/errors/robot.png?");
 }
 
+// 判断 Cloudflare 连通性
+function checkCloudflareConnectivity() {
+    checkConnectivityHandler("cloudflareStatus", "https://www.cloudflare.com/favicon.ico?");
+}
+
 // 判断 Baidu 连通性
 function checkBaiduConnectivity() {
     checkConnectivityHandler("baiduStatus", "https://www.baidu.com/img/flexible/logo/pc/peak-result.png?");
@@ -179,6 +184,7 @@ function displayAlert(isInChina, isDifferentIP) {
 
 function checkConnectivity(){
     checkGoogleConnectivity();  // 在获取 IP 地址的同时检查 Google 的连通性
+    checkCloudflareConnectivity();  // 在获取 IP 地址的同时检查 Cloudflare 的连通性
     checkBaiduConnectivity();  // 在获取 IP 地址的同时检查 Baidu 的连通性
     checkGithubConnectivity();  // 在获取 IP 地址的同时检查 Github 的连通性
     checkYoutubeConnectivity();  // 在获取 IP 地址的同时检查 Youtube 的连通性
