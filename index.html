@@ -13,15 +13,16 @@
 <script src="res/bootstrap.min.js"></script>
 <script src="res/ipinfos.js"></script>
   <style>
-    .fixed-header-width {
-      width: 20%;
+    body {
+      font-weight: 300;
     }
-    
     h4 {
         padding-bottom: 1.2rem;
         padding-top: 1.2rem;
     }
-
+    .fixed-header-width {
+      width: 20%;
+    }
     .alert{
         position: fixed;
         width: 100vw;
@@ -35,32 +36,60 @@
     <div class="py-5 text-center">
       <h1>IP 状态查看</h1>
     </div>
-    <div class="row">
+    <div>
+      <div class="row align-items-center">
+        <div class="col">
+          <h4>国内 IP</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:getIPFromTaobao()" class="btn btn-primary">刷新</a>
+        </div>
+      </div>
+      <div id="result_0"></div>
     </div>
-    <div id="result"></div>
-    <h4>可用性检测</h4>
-    <table class="table table-dark table-bordered ">
+    <div>
+      <div class="row align-items-center">
+        <div class="col">
+          <h4>国外 IP</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:getIPFromIpapi()" class="btn btn-primary">刷新</a>
+        </div>
+      </div>
+      <div id="result_1"></div>
+    </div>
+    <div>
+      <div class="row align-items-center">
+        <div class="col">
+          <h4>可用性检测</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:checkConnectivity()" class="btn btn-primary">刷新</a>
+        </div>
+      </div>
+    </div>
+    <table class="table table-dark table-bordered shadow">
       <tr>
         <th class="fixed-header-width">服务</th>
         <th>状态</th>
       </tr>
       <tr>
-        <td>Baidu</td>
+        <th>Baidu</th>
         <td id="baiduStatus">检查中...</td>
       </tr>
-        <tr>
-            <td>网易</td>
-            <td id="neteaseStatus">检查中...</td>
       <tr>
-        <td>Github</td>
+        <th>网易</th>
+        <td id="neteaseStatus">检查中...</td>
+      <tr>
+        <th>Github</th>
         <td id="githubStatus">检查中...</td>
       </tr>
       <tr>
-        <td>Youtube</td>
+        <th>Youtube</th>
         <td id="youtubeStatus">检查中...</td>
       </tr>
       <tr>
-        <td>Google</td>
+        <th>Google</th>
         <td id="googleStatus">检查中...</td>
       </tr>
     </table>
