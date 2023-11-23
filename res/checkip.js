@@ -44,39 +44,44 @@ $('#ip-input').on('keypress', function (e) {
 
 
 function queryIP(ip) {
+    $("#error-message").text("正在查询...");
     $.ajax({
         url: `https://ipapi.co/${ip}/json/`,
         success: function (data) {
-            // 清除错误信息
-            $('#error-message').text('');
+            if(data.error){
+                $('#error-message').text(data.reason); // 显示错误信息
+            } else {
+                // 清除错误信息
+                $("#error-message").text("");
+            }
             // 呈现数据到模态框
-            const html = `
+            const html = data.error ? '' : `
                     <table class="table">
                         <tr>
-                            <td>国家</td>
+                            <th>国家</th>
                             <td>
         <span class="flag-icon flag-icon-${data.country_code.toLowerCase()}"></span>
         ${data.country_name}
     </td>
                         </tr>
                         <tr>
-                            <td>地区</td>
+                            <th>地区</th>
                             <td>${data.region}</td>
                         </tr>
                         <tr>
-                            <td>城市</td>
+                            <th>城市</th>
                             <td>${data.city}</td>
                         </tr>
                         <tr>
-                            <td>经纬度</td>
+                            <th>经纬度</th>
                             <td>${data.latitude}, ${data.longitude}</td>
                         </tr>
                         <tr>
-                            <td>ISP</td>
+                            <th>ISP</th>
                             <td>${data.org}</td>
                         </tr>
                         <tr>
-                            <td>AS号</td>
+                            <th>AS号</th>
                             <td>${data.asn}</td>
                         </tr>
                     </table>
