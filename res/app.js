@@ -12,6 +12,7 @@ new Vue({
                 longitude: '',
                 isp: '',
                 asn: '',
+                asnlink: '',
                 source: ''
             },
             {
@@ -24,6 +25,7 @@ new Vue({
                 longitude: '',
                 isp: '',
                 asn: '',
+                asnlink: '',
                 source: ''
             }
         ],
@@ -135,6 +137,9 @@ new Vue({
                 card.longitude = data.longitude || '';
                 card.isp = data.org || '';
                 card.asn = data.asn || '';
+
+                // 构造 AS Number 的链接
+                card.asnlink = `https://radar.cloudflare.com/traffic/${data.asn}`
 
                 // 构造 Google Maps iframe 的 URL
                 card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`;

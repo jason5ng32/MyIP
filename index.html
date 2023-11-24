@@ -81,7 +81,7 @@
                 <li class="list-group-item"><span class="jn-text">🗺️ 经纬度</span>: {{ card.latitude }}, {{ card.longitude
                   }}</li>
                 <li class="list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}</li>
-                <li class="list-group-item"><span class="jn-text">📶 ASN</span>: {{ card.asn }}</li>
+                <li class="list-group-item"><span class="jn-text">📶 ASN</span>:  <a :href="card.asnlink" target="_blank">{{ card.asn }}</a></li>
               </ul>
             </div>
 
