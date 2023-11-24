@@ -261,12 +261,12 @@ new Vue({
                 card.asn = data.asn || '';
 
                 // 构造 AS Number 的链接
-                if (card.asn ==='') {
+                if (card.asn === '') {
                     card.asnlink = false;
                 } else {
                     card.asnlink = `https://radar.cloudflare.com/traffic/${data.asn}`;
                 }
-                
+
 
                 // 构造 Google Maps iframe 的 URL
                 card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`;
@@ -374,12 +374,12 @@ new Vue({
     },
     mounted() {
         this.checkAllConnectivity();
-        // this.getIPFromIpapi();
-        // this.getIPFromTaobao();
         this.getIPFromCloudflare_V4();
         this.getIPFromCloudflare_V6();
         this.getIPFromIpify_V4();
         this.getIPFromIpify_V6();
+        // this.getIPFromIpapi();
+        // this.getIPFromTaobao();
     }
 
 });

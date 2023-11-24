@@ -48,6 +48,10 @@
     .jn-text {
       font-weight: bold;
     }
+
+    .jn-list-group-item {
+      padding: 0.75rem 0.25rem;
+    }
   </style>
 </head>
 
@@ -63,9 +67,9 @@
         <div class="text-info">
           <p>将会从 4 个来源检查 IP 数据，如果当前 IP 栈只有 1 个（v4 或 v6），则没有数据的来源会显示为空。</p>
         </div>
-        <div class="card-deck">
+        <div class="jn-card-deck">
           <div class="row">
-            <div v-for="card in ipDataCards" :key="card.id"  class="col-xl-3 col-lg-4 col-md-6 mb-4">
+            <div v-for="card in ipDataCards" :key="card.id" class="col-xl-3 col-lg-6 col-md-6 mb-4">
               <div class="card jn-card">
                 <div class="card-header jn-ip-title" style="font-weight: bold;">
                   <span>来源: {{ card.source }}</span>
@@ -77,19 +81,24 @@
                 </iframe>
                 <div class="card-body">
                   <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip }}</li>
-                    <li class="list-group-item">
+                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip }}
+                    </li>
+                    <li class="list-group-item jn-list-group-item">
                       <span class="jn-text">🌍 国家</span>: {{
                       card.country_name }}&nbsp;<span v-if="card.country_code"
                         :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
                     </li>
-                    <li class="list-group-item"><span class="jn-text">🏚️ 地区</span>: {{ card.region }}</li>
-                    <li class="list-group-item"><span class="jn-text">🚏 城市</span>: {{ card.city }}</li>
-                    <!-- <li class="list-group-item"><span class="jn-text">🗺️ 经纬度</span>: {{ card.latitude }}, {{ card.longitude
+                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{ card.region
+                      }}</li>
+                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{ card.city }}
+                    </li>
+                    <!-- <li class="list-group-item jn-list-group-item"><span class="jn-text">🗺️ 经纬度</span>: {{ card.latitude }}, {{ card.longitude
                   }}</li> -->
-                    <li class="list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}</li>
-                    <li class="list-group-item"><span class="jn-text">📶 ASN</span>: <a v-if="card.asnlink"
-                        :href="card.asnlink" target="_blank">{{ card.asn }}</a><a v-else>{{ card.asn }}</a></li>
+                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}
+                    </li>
+                    <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
+                        v-if="card.asnlink" :href="card.asnlink" target="_blank">{{ card.asn }}</a><a v-else>{{ card.asn
+                        }}</a></li>
                   </ul>
                 </div>
 
