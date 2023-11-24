@@ -263,13 +263,12 @@ new Vue({
                 // 构造 AS Number 的链接
                 if (card.asn === '') {
                     card.asnlink = false;
+                    card.mapUrl = '';
                 } else {
                     card.asnlink = `https://radar.cloudflare.com/traffic/${data.asn}`;
+                    card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`;
                 }
-
-
-                // 构造 Google Maps iframe 的 URL
-                card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`;
+                
 
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
