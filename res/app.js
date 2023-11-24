@@ -16,7 +16,9 @@ new Vue({
             { id: 'github', name: 'Github', url: 'https://raw.githubusercontent.com/jason5ng32/fulian4/master/background.jpg?', status: '待检测' },
             { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com/favicon.ico?', status: '待检测' }
 
-        ]
+        ],
+        showAlert: false,
+        alertMessage: ''
     },
     methods: {
         getIPFromIpapi() {
@@ -103,19 +105,38 @@ new Vue({
             var img = new Image();
             var timeout = setTimeout(() => {
                 test.status = "不可用";
+                if (test.id === 'google') {
+                    this.showAlert = true;
+                    this.alertStyle = "alert alert-warning";
+                    this.alertMessage = "你当前似乎没有翻墙，部分内容无法显示。";
+                }
             }, 3 * 1000);
 
             img.onload = () => {
                 clearTimeout(timeout);
                 test.status = `可用 ( ${+ new Date() - beginTime} ms )`;
+                if (test.id === 'google') {
+                    this.showAlert = true;
+                    this.alertStyle = "alert alert-success";
+                    this.alertMessage = "你当前已经翻墙，欢迎来到新世界。";
+                }
             };
 
             img.onerror = () => {
                 clearTimeout(timeout);
                 test.status = "不可用";
+                if (test.id === 'google') {
+                    this.showAlert = true;
+                    this.alertStyle = "alert alert-warning";
+                    this.alertMessage = "你当前似乎没有翻墙，部分内容无法显示。";
+                }
             };
 
             img.src = `${test.url}${Date.now()}`;
+            
+            setTimeout(() => {
+                this.showAlert = false;
+            }, 10000);
         },
 
         checkAllConnectivity() {
@@ -124,14 +145,14 @@ new Vue({
             });
         },
         async fetchCloudflareTrace() {
-    try {
-      const response = await fetch('https://cloudflare.com/cdn-cgi/trace');
-      const data = await response.text();
-      console.log('Cloudflare Trace Data:', data);
-    } catch (error) {
-      console.error('Error fetching Cloudflare trace data:', error);
-    }
-  },
+            try {
+                const response = await fetch('https://cloudflare.com/cdn-cgi/trace');
+                const data = await response.text();
+                console.log('Cloudflare Trace Data:', data);
+            } catch (error) {
+                console.error('Error fetching Cloudflare trace data:', error);
+            }
+        },
     },
     mounted() {
         this.checkAllConnectivity();
