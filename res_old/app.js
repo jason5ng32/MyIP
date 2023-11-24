@@ -2,8 +2,8 @@ new Vue({
     el: '#app',
     data: {
         ipDataCards: [
-            { id: 'ipapi', ip: '', country_name: '', region: '', city: '',latitude: '', longitude: '', isp: '', asn: '', mapImage: 'map-placeholder.jpg', source: '' },
-            { id: 'taobao', ip: '', country_name: '', region: '', city: '', latitude: '', longitude: '', isp: '', asn: '', mapImage: 'map-placeholder.jpg', source: '' },
+            { id: 'ipapi', ip: '', country_name: '', region: '', latitude: '', longitude: '', isp: '', asn: '', mapImage: 'map-placeholder.jpg', source: '' },
+            { id: 'taobao', ip: '', country_name: '', region: '', latitude: '', longitude: '', isp: '', asn: '', mapImage: 'map-placeholder.jpg', source: '' },
             // 其他卡片数据...
         ],
         connectivityTests: [
@@ -61,7 +61,6 @@ new Vue({
                 card.country_name = data.country_name || '';
                 card.country_code = data.country || '';
                 card.region = data.region || '';
-                card.city = data.city || '';
                 card.latitude = data.latitude || '';
                 card.longitude = data.longitude || '';
                 card.isp = data.org || '';
@@ -93,7 +92,6 @@ new Vue({
             card.country_name = '';
             card.country_code = '';
             card.region = '';
-            card.city = '';
             card.latitude = '';
             card.longitude = '';
             card.asn = '';

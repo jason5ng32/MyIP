@@ -58,30 +58,30 @@ function queryIP(ip) {
             const html = data.error ? '' : `
                     <table class="table">
                         <tr>
-                            <th>🌍 国家</th>
+                            <th>国家</th>
                             <td>
-        ${data.country_name}&nbsp;
         <span class="flag-icon flag-icon-${data.country_code.toLowerCase()}"></span>
+        ${data.country_name}
     </td>
                         </tr>
                         <tr>
-                            <th>🏚️ 地区</th>
+                            <th>地区</th>
                             <td>${data.region}</td>
                         </tr>
                         <tr>
-                            <th>🚏 城市</th>
+                            <th>城市</th>
                             <td>${data.city}</td>
                         </tr>
                         <tr>
-                            <th>🗺️ 经纬度</th>
+                            <th>经纬度</th>
                             <td>${data.latitude}, ${data.longitude}</td>
                         </tr>
                         <tr>
-                            <th>🏢 ISP</th>
+                            <th>ISP</th>
                             <td>${data.org}</td>
                         </tr>
                         <tr>
-                            <th>📶 ASN</th>
+                            <th>AS号</th>
                             <td>${data.asn}</td>
                         </tr>
                     </table>
