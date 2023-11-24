@@ -65,7 +65,7 @@ new Vue({
                 card.asn = data.asn || '';
 
                 // 构造 Google Maps iframe 的 URL
-                card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&zoom=0&output=embed`;
+                card.mapUrl = `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`;
 
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
