@@ -79,7 +79,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ test.name }}</h5>
                             <p class="card-text"
-                                :class="{'text-info': test.status === '检查中...', 'text-success': test.status.includes('可用'), 'text-danger': test.status === '不可用' || test.status === '检查超时'}"
+                                :class="{'text-info': test.status === '检查中...', 'text-success': test.status.includes('可用'), 'text-danger': test.status === '不可用' || test.status === '超时或不可用'}"
                                 v-html="test.status">
                             </p>
                         </div>

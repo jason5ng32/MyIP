@@ -102,7 +102,7 @@ new Vue({
             test.status = "检查中...";
             var img = new Image();
             var timeout = setTimeout(() => {
-                test.status = "超时或不可用";
+                test.status = "不可用";
             }, 3 * 1000);
 
             img.onload = () => {
