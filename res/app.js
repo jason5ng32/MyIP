@@ -7,14 +7,14 @@ new Vue({
             // 其他卡片数据...
         ],
         connectivityTests: [
-            { id: 'netease', name: 'Netease', url: 'https://s2.music.126.net/style/web2/img/frame/topbar.png?', status: '待检测' },
-            { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/img/flexible/logo/pc/peak-result.png?', status: '待检测' },
-            { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: '待检测' },
-            { id: 'google', name: 'Google', url: 'https://www.google.com/images/errors/robot.png?', status: '待检测' },
-            { id: 'cloudflare', name: 'Cloudflare', url: 'https://www.cloudflare.com/favicon.ico?', status: '待检测' },
-            { id: 'youtube', name: 'Youtube', url: 'https://i.ytimg.com/vi/GYkq9Rgoj8E/hq720.jpg?', status: '待检测' },
-            { id: 'github', name: 'Github', url: 'https://raw.githubusercontent.com/jason5ng32/fulian4/master/background.jpg?', status: '待检测' },
-            { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com/favicon.ico?', status: '待检测' }
+            { id: 'netease', name: 'Netease',icon:'globe-americas', url: 'https://s2.music.126.net/style/web2/img/frame/topbar.png?', status: '待检测' },
+            { id: 'baidu', name: 'Baidu', icon:'globe-americas',url: 'https://www.baidu.com/img/flexible/logo/pc/peak-result.png?', status: '待检测' },
+            { id: 'wechat', name: 'WeChat',  icon:'wechat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: '待检测' },
+            { id: 'google', name: 'Google', icon:'google',url: 'https://www.google.com/images/errors/robot.png?', status: '待检测' },
+            { id: 'cloudflare', name: 'Cloudflare', icon:'cloud-fill',url: 'https://www.cloudflare.com/favicon.ico?', status: '待检测' },
+            { id: 'youtube', name: 'Youtube', icon:'youtube',url: 'https://i.ytimg.com/vi/GYkq9Rgoj8E/hq720.jpg?', status: '待检测' },
+            { id: 'github', name: 'Github', icon:'github',url: 'https://raw.githubusercontent.com/jason5ng32/fulian4/master/background.jpg?', status: '待检测' },
+            { id: 'chatgpt', name: 'ChatGPT', icon:'chat-quote-fill',url: 'https://chat.openai.com/favicon.ico?', status: '待检测' }
 
         ],
         showAlert: false,

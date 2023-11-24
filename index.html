@@ -40,7 +40,7 @@
     }
 
     .jn-container {
-      padding-top: 5pt;
+      padding-top: 2pt;
     }
 
     .jn-text {
@@ -97,10 +97,11 @@
           <button @click="checkAllConnectivity" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
         </div>
         <div class="row">
-          <div v-for="test in connectivityTests" :key="test.id" class="col-md-3 mb-4">
+          <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
             <div class="card jn-card">
               <div class="card-body">
-                <h5 class="card-title">{{ test.name }}</h5>
+                <h5 class="card-title"><i class="bi" :class="'bi-'+test.icon"></i> {{ test.name }}</h5>
+                
                 <p class="card-text"
                   :class="{'text-info': test.status === '检查中...', 'text-success': test.status.includes('可用'), 'text-danger': test.status === '不可用' || test.status === '超时或不可用'}"
                   v-html="test.status">
@@ -114,7 +115,7 @@
     </div>
   </div>
 
-  <button id="ip-btn" class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1000;">IP
+  <button id="ip-btn" class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1000;"><i class="bi bi-search"></i> IP
     查询</button>
   <div id="ip-modal" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-height: 50vh;">
