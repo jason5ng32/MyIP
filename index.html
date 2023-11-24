@@ -52,6 +52,10 @@
     .jn-list-group-item {
       padding: 0.75rem 0.25rem;
     }
+    .jn-opacity {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -69,7 +73,7 @@
         </div>
         <div class="jn-card-deck">
           <div class="row">
-            <div v-for="card in ipDataCards" :key="card.id" class="col-xl-3 col-lg-6 col-md-6 mb-4">
+              <div v-for="card in ipDataCards" :key="card.id" :class="{'jn-opacity': !card.asn, 'col-xl-3': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
               <div class="card jn-card">
                 <div class="card-header jn-ip-title" style="font-weight: bold;">
                   <span>来源: {{ card.source }}</span>
