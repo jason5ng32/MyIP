@@ -78,9 +78,9 @@ new Vue({
             this.clearCardData(card);
 
             // 根据来源重新加载数据
-            if (card.source === 'Taobao') {
+            if (card.source === 'TaoBao') {
                 this.getIPFromTaobao(card);
-            } else if (card.source === 'Ipapi') {
+            } else if (card.source === 'IPAPI.co') {
                 this.getIPFromIpapi(card);
             }
         },
@@ -88,10 +88,12 @@ new Vue({
         clearCardData(card) {
             card.ip = '';
             card.country_name = '';
+            card.country_code = '';
             card.region = '';
             card.latitude = '';
             card.longitude = '';
             card.asn = '';
+            card.isp = '';
             card.mapUrl = '';
         },
 
