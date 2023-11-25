@@ -1,4 +1,13 @@
-完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。如果你看着 `https://ip.skk.moe` 眼馋，那就用这个程序搭建一个属于自己的吧。
+# IP 工具箱
+
+![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
+![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
+![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
+
+在这里体验：[jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
+
+这是一个完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。如果你看着 `https://ip.skk.moe` 眼馋，那就用这个程序搭建一个属于自己的吧。
 
 ## 主要功能
 
