@@ -378,7 +378,7 @@ new Vue({
             card.longitude = '';
             card.asn = '';
             card.isp = '';
-            card.mapUrl = '';
+            card.mapUrl = 'res/defaultMap.jpg';
         },
 
         checkConnectivityHandler(test) {
