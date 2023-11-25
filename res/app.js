@@ -152,7 +152,7 @@ new Vue({
             },
             {
                 id: 'nextcloud',
-                name: 'NextCloud(v6)',
+                name: 'NxtCld(v6)',
                 url: 'stun:stun.nextcloud.com:443',
                 ip: '待检测或无 IPv6 地址'
             },
@@ -188,7 +188,7 @@ new Vue({
             },
             {
                 id: 'stunprotocol',
-                name: 'StunProtocol(v6)',
+                name: 'StnPtc(v6)',
                 url: 'stun:stunserver.stunprotocol.org',
                 ip: '待检测或无 IPv6 地址'
             }
