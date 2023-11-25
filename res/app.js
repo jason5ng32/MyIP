@@ -490,14 +490,15 @@ new Vue({
             try {
                 const servers = { iceServers: [{ urls: stun.url }] };
                 const pc = new RTCPeerConnection(servers);
+                let candidateReceived = false;
 
                 pc.onicecandidate = event => {
                     if (event.candidate) {
+                        candidateReceived = true;
                         const candidate = event.candidate.candidate;
-                        // 匹配 IPv6 和 IPv4 地址
                         const ipMatch = /(\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b)|([0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
                         if (ipMatch) {
-                            stun.ip = ipMatch[0]; // 更新服务器的 IP
+                            stun.ip = ipMatch[0];
                             pc.close();
                         }
                     }
@@ -505,11 +506,23 @@ new Vue({
 
                 pc.createDataChannel("");
                 await pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+                // 设置一个超时计时器
+                await new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (!candidateReceived) {
+                            reject(new Error("连接 STUN 服务器超时"));
+                        } else {
+                            resolve();
+                        }
+                    }, 5000); // 例如设置 5 秒超时
+                });
             } catch (error) {
                 console.error('STUN Server Test Error:', error);
-                stun.ip = '测试出错'; // 设置出错信息
+                stun.ip = '测试超时或出错';
             }
         },
+
 
 
         checkAllWebRTC() {
