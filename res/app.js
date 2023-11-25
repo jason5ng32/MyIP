@@ -151,9 +151,9 @@ new Vue({
                 ip: '待检测'
             },
             {
-                id: 'nextcloud',
-                name: 'NextCloud',
-                url: 'stun:stun.nextcloud.com:443',
+                id: 'google2',
+                name: 'Google 2',
+                url: 'stun:stun4.l.google.com:19302',
                 ip: '待检测'
             },
             {
