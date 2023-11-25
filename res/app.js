@@ -148,49 +148,49 @@ new Vue({
                 id: 'google',
                 name: 'Google',
                 url: 'stun:stun.l.google.com:19302',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
-                id: 'google2',
-                name: 'Google 2',
-                url: 'stun:stun4.l.google.com:19302',
-                ip: '待检测'
+                id: 'nextcloud',
+                name: 'NextCloud',
+                url: 'stun:stun.nextcloud.com:443',
+                ip: '待检测或连接错误'
             },
             {
                 id: 'peerjs',
                 name: 'PeerJS',
                 url: 'stun:us-0.turn.peerjs.com',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'twilio',
                 name: 'Twilio',
                 url: 'stun:global.stun.twilio.com',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'cloudflare',
                 name: 'Cloudflare',
                 url: 'stun:stun.cloudflare.com',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'miwifi',
                 name: 'MiWiFi',
                 url: 'stun:stun.miwifi.com',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'qq',
                 name: 'QQ',
                 url: 'stun:stun.qq.com',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'stunprotocol',
                 name: 'StunProtocol',
                 url: 'stun:stunserver.stunprotocol.org',
-                ip: '待检测'
+                ip: '待检测或连接错误'
             }
         ],
         alertMessage: '',
@@ -519,7 +519,7 @@ new Vue({
                 });
             } catch (error) {
                 console.error('STUN Server Test Error:', error);
-                stun.ip = '测试超时或出错';
+                stun.ip = '测试超时或数据出错';
             }
         },
 
