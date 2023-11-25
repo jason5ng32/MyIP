@@ -17,13 +17,12 @@
 
 如果你在通过代理上网，可以考虑在你的代理配置里，增加下面的规则（请根据你使用的客户端进行修改），这样就可以实现同时查询真实 IP 和代理后的 IP：
 
-    ```
-    # IP Testing
-    IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
-    IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
-    DOMAIN-SUFFIX,ipify.org,Proxy
-    ```
-
+```
+# IP Testing
+IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
+IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
+DOMAIN-SUFFIX,ipify.org,Proxy
+```
 
 ## 额外说明
 
