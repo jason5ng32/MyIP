@@ -4,14 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IP 状态查看</title>
+  <title>查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP </title>
   <!-- 引入 Bootstrap CSS -->
-  <link href="res/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
-  <script src="res/jquery.min.js"></script>
-  <script src="res/popper.min.js"></script>
-  <script src="res/bootstrap.min.js"></script>
   <style>
     .jn-title {
       display: flex;
@@ -32,15 +30,16 @@
       z-index: 9999;
       position: fixed;
       width: 100%;
-      top: 0;
+      bottom: 0;
     }
 
     .jn-card {
       box-shadow: 0 0 10pt #0000001c;
       height: 100%;
     }
+
     .jn-card:hover {
-      border-color: rgb(20 162 184 / 42%);
+      border-color: rgba(20, 184, 108, 0.42);
     }
 
     .jn-container {
@@ -55,122 +54,249 @@
     .jn-list-group-item {
       padding: 0.75rem 0.25rem;
     }
+
     .jn-opacity {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+
+    .jn-map-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .jn-navbar-top {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 9999;
+      border-bottom: 1px solid #0000001c;
+
+    }
+
+    .jn-toast {
+      z-index: 9999;
+      right: 0;
+      top: 0;
+      margin-top: 40pt;
     }
   </style>
 </head>
 
 <body>
+  <!-- 导航栏 -->
+  <nav id="navbar-top" class="navbar bg-body-tertiary px-3 mb-3 jn-navbar-top">
+    <a class="navbar-brand" href="#">IP 状态查看</a>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="#scrollspyHeading1">IP 查看</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#scrollspyHeading2">可用性测试</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#scrollspyHeading3">WebRTC 测试</a>
+      </li>
+    </ul>
+  </nav>
+
   <div id="app">
-    <div v-if="showAlert" class="jn-alert" :class="alertStyle" id="alert">{{ alertMessage }}</div>
+
+    <!-- 翻墙状态通知 -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
+      <div id="toast" class="toast" role="alert" ref="toast" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          {{ alertMessage }}
+        </div>
+      </div>
+    </div>
+
+
     <div class="container mt-5 jn-container">
-      <!-- IP 数据容器 -->
-      <div class="ip-data-section mb-4">
-        <div class="row jn-title">
-          <h2>🛜 IP 数据</h2>
-        </div>
-        <div class="text-info">
-          <p>将会从 4 个来源检查 IP 数据，如果当前 IP 栈只有 1 个（v4 或 v6），则没有数据的来源会显示为空。</p>
-        </div>
-        <div class="jn-card-deck">
-          <div class="row">
-              <div v-for="card in ipDataCards" :key="card.id" :class="{'jn-opacity': !card.asn, 'col-xl-3': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
-              <div class="card jn-card">
-                <div class="card-header jn-ip-title" style="font-weight: bold;">
-                  <span>来源: {{ card.source }}</span>
-                  <button @click="refreshCard(card)" class="btn btn-light">
-                    <i class="bi bi-arrow-clockwise"></i></button>
-                </div>
-                <iframe class="card-img-top" :src="card.mapUrl" width="100%" height="200" frameborder="0"
+      <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
+        data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
+        <!-- IP 数据容器 -->
+        <div class="ip-data-section mb-4">
+          <div class="row jn-title">
+            <h2 id="scrollspyHeading1">🛜 IP 数据</h2>
+          </div>
+          <div class="text-secondary">
+            <p>将会从 4 个来源检查 IP 数据，如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。</p>
+          </div>
+          <div class="jn-card-deck">
+            <div class="row">
+              <div v-for="card in ipDataCards" :key="card.id"
+                :class="{'jn-opacity': !card.asn, 'col-xl-3': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
+                <div class="card jn-card">
+                  <div class="card-header jn-ip-title" style="font-weight: bold;">
+                    <span>来源: {{ card.source }}</span>
+                    <button @click="refreshCard(card)" class="btn btn-light">
+                      <i class="bi bi-arrow-clockwise"></i></button>
+                  </div>
+
+                  <!-- 可选改成 Google Maps 内嵌 iFrame -->
+                  <!-- <iframe class="card-img-top" :src="card.mapUrl" width="100%" height="200" frameborder="0"
                   style="border:0;" allowfullscreen>
-                </iframe>
-                <div class="card-body">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip }}
-                    </li>
-                    <li class="list-group-item jn-list-group-item">
-                      <span class="jn-text">🌍 国家</span>: {{
-                      card.country_name }}&nbsp;<span v-if="card.country_code"
-                        :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
-                    </li>
-                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{ card.region
-                      }}</li>
-                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{ card.city }}
-                    </li>
-                    <!-- <li class="list-group-item jn-list-group-item"><span class="jn-text">🗺️ 经纬度</span>: {{ card.latitude }}, {{ card.longitude
-                  }}</li> -->
-                    <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}
-                    </li>
-                    <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
-                        v-if="card.asnlink" :href="card.asnlink" target="_blank">{{ card.asn }}</a><a v-else>{{ card.asn
-                        }}</a></li>
-                  </ul>
+                </iframe> -->
+
+                  <img :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
+                  <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip
+                        }}
+                      </li>
+                      <li class="list-group-item jn-list-group-item">
+                        <span class="jn-text">🌍 国家</span>: {{
+                        card.country_name }}&nbsp;<span v-if="card.country_code"
+                          :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
+                      </li>
+                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{ card.region
+                        }}</li>
+                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{ card.city }}
+                      </li>
+                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}
+                      </li>
+                      <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
+                          v-if="card.asnlink" :href="card.asnlink" target="_blank">{{ card.asn }}</a><a v-else>{{
+                          card.asn
+                          }}</a></li>
+                    </ul>
+                  </div>
+
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+
+        <!-- 可用性测试容器 -->
+        <div class="availability-test-section mb-4">
+          <div class="jn-title">
+            <h2 id="scrollspyHeading2">🚦 可用性测试</h2>
+            <button @click="checkAllConnectivity" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <div class="text-secondary">
+            <p>通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。</p>
+          </div>
+          <div class="row">
+            <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
+              <div class="card jn-card">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="bi" :class="'bi-'+test.icon"></i> {{ test.name }}</h5>
+
+                  <p class="card-text"
+                    :class="{'text-info': test.status === '检查中...', 'text-success': test.status.includes('可用'), 'text-danger': test.status === '不可用' || test.status === '超时或不可用'}"
+                    v-html="test.status">
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WebRTC 测试 -->
+        <div class="availability-test-section mb-4">
+          <div class="jn-title">
+            <h2 id="scrollspyHeading3">🚥 WebRTC 测试</h2>
+            <button @click="checkAllWebRTC" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <div class="text-secondary">
+            <p>WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。</p>
+          </div>
+          <div class="row">
+            <div v-for="stun in stunServers" :key="stun.id" class="col-6 col-md-3 mb-4">
+              <div class="card jn-card">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
+                  <p class="card-text text-secondary" style="font-size: 10pt;">{{ stun.url }}</p>
+                  <p class="card-text"
+                    :class="{'text-info': stun.ip === '检查中...', 'text-success': stun.ip.includes('.'|':'), 'text-danger': stun.ip === '测试出错'}"
+                    v-html="stun.ip"></p>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
 
-      <!-- 可用性测试容器 -->
-      <div class="availability-test-section mb-4">
-        <div class="row jn-title">
-          <h2>🚦 可用性测试</h2>
-          <button @click="checkAllConnectivity" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
-        </div>
-        <div class="text-info">
-          <p>通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。</p>
-        </div>
-        <div class="row">
-          <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
-            <div class="card jn-card">
+    <!-- 按钮 -->
+    <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"
+      data-bs-toggle="modal" data-bs-target="#IPCheck"><i class="bi bi-search"></i> IP 查询</button>
+
+    <!-- 模态框 -->
+    <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="IPCheck">IP 查询</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+          </div>
+          <div class="modal-body">
+            <input type="text" class="form-control mb-2" placeholder="请输入 IP 地址" v-model="inputIP"
+              @keyup.enter="submitQuery">
+            <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
+            <div v-if="modalQueryResult" class="mt-2">
               <div class="card-body">
-                <h5 class="card-title"><i class="bi" :class="'bi-'+test.icon"></i> {{ test.name }}</h5>
-
-                <p class="card-text"
-                  :class="{'text-info': test.status === '检查中...', 'text-success': test.status.includes('可用'), 'text-danger': test.status === '不可用' || test.status === '超时或不可用'}"
-                  v-html="test.status">
-                </p>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{
+                    modalQueryResult.ip }}
+                  </li>
+                  <li class="list-group-item jn-list-group-item">
+                    <span class="jn-text">🌍 国家</span>: {{
+                    modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
+                      :class="'flag-icon flag-icon-' + modalQueryResult.country_code.toLowerCase()"></span>
+                  </li>
+                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{
+                    modalQueryResult.region
+                    }}</li>
+                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{
+                    modalQueryResult.city }}
+                  </li>
+                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{
+                    modalQueryResult.isp }}
+                  </li>
+                  <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
+                      v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank">{{
+                      modalQueryResult.asn }}</a><a v-else>{{ modalQueryResult.asn
+                      }}</a></li>
+                </ul>
               </div>
+
             </div>
           </div>
-        </div>
-      </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary"
+              :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }" @click="submitQuery"
+              :disabled="!isValidIP(inputIP)">查询</button>
 
-    </div>
-  </div>
+          </div>
 
-  <button id="ip-btn" class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1000;"><i
-      class="bi bi-search"></i> IP
-    查询</button>
-  <div id="ip-modal" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-height: 50vh;">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">IP 查询</h5>
-
-        </div>
-        <div class="modal-body">
-          <input id="ip-input" type="text" class="form-control" placeholder="请输入 IP 地址">
-          <button id="query-btn" class="btn btn-primary mt-2" disabled>查询</button>
-          <div id="error-message" class="text-danger"></div>
-          <div id="result-container" class="mt-3"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
         </div>
       </div>
     </div>
+
   </div>
+
+
   <footer>
     <p class="text-center">90% Code by ChatGPT</p>
   </footer>
 
-  <script src="res/checkip.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
 
   <!-- 引入 Vue.js -->
   <script src="res/vue.js"></script>
