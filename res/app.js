@@ -533,8 +533,12 @@ new Vue({
 
     },
     mounted() {
-        this.checkAllConnectivity();
-        this.checkAllWebRTC();
+        setTimeout(() => {
+            this.checkAllConnectivity();
+        }, 2500); 
+        setTimeout(() => {
+            this.checkAllWebRTC();
+        }, 4000); 
         this.getIPFromCloudflare_V4();
         this.getIPFromCloudflare_V6();
         this.getIPFromIpify_V4();
