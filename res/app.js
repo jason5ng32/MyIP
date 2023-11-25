@@ -152,9 +152,9 @@ new Vue({
             },
             {
                 id: 'nextcloud',
-                name: 'NextCloud',
+                name: 'NextCloud(v6)',
                 url: 'stun:stun.nextcloud.com:443',
-                ip: '待检测或连接错误'
+                ip: '待检测或无 IPv6 地址'
             },
             {
                 id: 'peerjs',
@@ -188,9 +188,9 @@ new Vue({
             },
             {
                 id: 'stunprotocol',
-                name: 'StunProtocol',
+                name: 'StunProtocol(v6)',
                 url: 'stun:stunserver.stunprotocol.org',
-                ip: '待检测或连接错误'
+                ip: '待检测或无 IPv6 地址'
             }
         ],
         alertMessage: '',
