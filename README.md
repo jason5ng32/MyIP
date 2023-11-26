@@ -25,7 +25,7 @@
 
 如果你希望能够显示 IP 所在地的地图，则需要修改 `app.js` ，在 `data` 部分，找到：
 
-```json
+```
 bingMapAPIKEY: '',
 ```
 
