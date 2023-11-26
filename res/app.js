@@ -3,6 +3,36 @@ new Vue({
     data: {
         ipDataCards: [
             {
+                id: 'upai',
+                ip: '',
+                country_name: '',
+                region: '',
+                city: '',
+                latitude: '',
+                longitude: '',
+                isp: '',
+                asn: '',
+                asnlink: '',
+                mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
+                source: 'Upai'
+            },
+            {
+                id: 'taobao',
+                ip: '',
+                country_name: '',
+                region: '',
+                city: '',
+                latitude: '',
+                longitude: '',
+                isp: '',
+                asn: '',
+                asnlink: '',
+                mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
+                source: 'Taobao'
+            },
+            {
                 id: 'cloudflare_v4',
                 ip: '',
                 country_name: '',
@@ -14,6 +44,7 @@ new Vue({
                 asn: '',
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
                 source: 'Cloudflare IPv4'
             },
             {
@@ -28,6 +59,7 @@ new Vue({
                 asn: '',
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
                 source: 'Cloudflare IPv6'
             },
             {
@@ -42,6 +74,7 @@ new Vue({
                 asn: '',
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
                 source: 'IPify IPv4'
             },
             {
@@ -56,34 +89,9 @@ new Vue({
                 asn: '',
                 asnlink: '',
                 mapUrl: 'res/defaultMap.jpg',
+                showMap: false,
                 source: 'IPify IPv6'
             },
-            // {
-            //     id: 'ipapi',
-            //     ip: '',
-            //     country_name: '',
-            //     region: '',
-            //     city: '',
-            //     latitude: '',
-            //     longitude: '',
-            //     isp: '',
-            //     asn: '',
-            //     asnlink: '',
-            //     source: ''
-            // },
-            // {
-            //     id: 'taobao',
-            //     ip: '',
-            //     country_name: '',
-            //     region: '',
-            //     city: '',
-            //     latitude: '',
-            //     longitude: '',
-            //     isp: '',
-            //     asn: '',
-            //     asnlink: '',
-            //     source: ''
-            // },
         ],
         connectivityTests: [
             {
@@ -201,8 +209,46 @@ new Vue({
         // queryError: '',
         modalQueryResult: null,
         modalQueryError: '',
+        isMapShown: false,
     },
     methods: {
+
+        getIPFromUpai() {
+            const unixTime = Date.now();
+            const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
+    
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const ip = data.remote_addr;
+                    this.ipDataCards[0].ip = ip;
+                    this.fetchIPDetails(this.ipDataCards[0], ip);
+                })
+                .catch(error => {
+                    console.error('Error fetching IP from Upai:', error);
+                    this.ipDataCards[0].ip = '获取失败或不存在 IPv4 地址';
+                });
+        },
+
+        getIPFromTaobao() {
+            window.ipCallback = (data) => {
+                var ip = data.ip;
+                this.ipDataCards[1].ip = ip; // 存储获取到的 IP 地址
+                this.ipDataCards[1].source = 'TaoBao';
+                this.fetchIPDetails(this.ipDataCards[1], ip);
+                delete window.ipCallback; // 清理
+            };
+            var script = document.createElement('script');
+            script.src = 'https://www.taobao.com/help/getip.php?callback=ipCallback';
+            document.head.appendChild(script);
+            // 清理
+            document.head.removeChild(script);
+        },
 
         getIPFromCloudflare_V4() {
             fetch('https://1.0.0.1/cdn-cgi/trace')
@@ -212,13 +258,13 @@ new Vue({
                     const ipLine = lines.find(line => line.startsWith('ip='));
                     if (ipLine) {
                         const ip = ipLine.split('=')[1];
-                        this.ipDataCards[0].ip = ip;
-                        this.fetchIPDetails(this.ipDataCards[0], ip);
+                        this.ipDataCards[2].ip = ip;
+                        this.fetchIPDetails(this.ipDataCards[2], ip);
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching IP from Cloudflare:', error);
-                    this.ipDataCards[0].ip = '获取失败或不存在 IPv4 地址';
+                    this.ipDataCards[2].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
 
@@ -230,13 +276,13 @@ new Vue({
                     const ipLine = lines.find(line => line.startsWith('ip='));
                     if (ipLine) {
                         const ip = ipLine.split('=')[1];
-                        this.ipDataCards[1].ip = ip;
-                        this.fetchIPDetails(this.ipDataCards[1], ip);
+                        this.ipDataCards[3].ip = ip;
+                        this.fetchIPDetails(this.ipDataCards[3], ip);
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching IP from Cloudflare:', error);
-                    this.ipDataCards[1].ip = '获取失败或不存在 IPv6 地址';
+                    this.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
         getIPFromIpify_V4() {
@@ -248,12 +294,12 @@ new Vue({
                     return response.json();
                 })
                 .then(data => {
-                    this.ipDataCards[2].ip = data.ip;
-                    this.fetchIPDetails(this.ipDataCards[2], data.ip);
+                    this.ipDataCards[4].ip = data.ip;
+                    this.fetchIPDetails(this.ipDataCards[4], data.ip);
                 })
                 .catch(error => {
                     console.error('Error fetching IPv4 address from ipify:', error);
-                    this.ipDataCards[2].ip = '获取失败或不存在 IPv4 地址';
+                    this.ipDataCards[4].ip = '获取失败或不存在 IPv4 地址';
                 });
         },
         getIPFromIpify_V6() {
@@ -265,14 +311,15 @@ new Vue({
                     return response.json();
                 })
                 .then(data => {
-                    this.ipDataCards[3].ip = data.ip;
-                    this.fetchIPDetails(this.ipDataCards[3], data.ip);
+                    this.ipDataCards[5].ip = data.ip;
+                    this.fetchIPDetails(this.ipDataCards[5], data.ip);
                 })
                 .catch(error => {
                     console.error('Error fetching IPv6 address from ipify:', error);
-                    this.ipDataCards[3].ip = '获取失败或不存在 IPv6 地址';
+                    this.ipDataCards[5].ip = '获取失败或不存在 IPv6 地址';
                 });
         },
+
         //   getIPFromIpapi() {
         //     var xhr = new XMLHttpRequest();
         //     xhr.onreadystatechange = () => {
@@ -286,21 +333,6 @@ new Vue({
         //     };
         //     xhr.open('GET', 'https://ipapi.co/json/', true);
         //     xhr.send();
-        // },
-
-        // getIPFromTaobao() {
-        //     window.ipCallback = (data) => {
-        //         var ip = data.ip;
-        //         this.ipDataCards[5].ip = ip; // 存储获取到的 IP 地址
-        //         this.ipDataCards[5].source = 'TaoBao';
-        //         this.fetchIPDetails(this.ipDataCards[5], ip);
-        //         delete window.ipCallback; // 清理
-        //     };
-        //     var script = document.createElement('script');
-        //     script.src = 'https://www.taobao.com/help/getip.php?callback=ipCallback';
-        //     document.head.appendChild(script);
-        //     // 清理
-        //     document.head.removeChild(script);
         // },
         async fetchIPDetails(card, ip) {
             try {
@@ -357,12 +389,12 @@ new Vue({
                 case 'IPify IPv6':
                     this.getIPFromIpify_V6(card);
                     break;
-                // case 'IPAPI.co':
-                //     this.getIPFromIpapi(card);
-                //     break;
-                // case 'TaoBao':
-                //     this.getIPFromTaobao(card);
-                //     break;
+                case 'Upai':
+                    this.getIPFromUpai(card);
+                    break;
+                case 'TaoBao':
+                    this.getIPFromTaobao(card);
+                    break;
                 default:
                     console.error('未知来源:', card.source);
             }
@@ -379,6 +411,13 @@ new Vue({
             card.asn = '';
             card.isp = '';
             card.mapUrl = 'res/defaultMap.jpg';
+        },
+
+        toggleMaps() {
+            this.isMapShown = !this.isMapShown; // 切换开关状态
+            this.ipDataCards.forEach(card => {
+                card.showMap = this.isMapShown; // 更新每一项的 showMap 值
+            });
         },
 
         checkConnectivityHandler(test) {
@@ -532,6 +571,18 @@ new Vue({
         },
 
     },
+
+    created() {
+        if (localStorage.getItem('isMapShown')) {
+            this.isMapShown = localStorage.getItem('isMapShown') === 'true';
+        }
+    },
+    watch: {
+        isMapShown(newVal) {
+            // 当 isMapShown 改变时，更新本地存储
+            localStorage.setItem('isMapShown', newVal);
+        }
+    },
     mounted() {
         setTimeout(() => {
             this.checkAllConnectivity();
@@ -544,7 +595,8 @@ new Vue({
         this.getIPFromIpify_V4();
         this.getIPFromIpify_V6();
         // this.getIPFromIpapi();
-        // this.getIPFromTaobao();
+        this.getIPFromTaobao();
+        this.getIPFromUpai();
         const modalElement = document.getElementById('IPCheck');
         modalElement.addEventListener('hidden.bs.modal', this.resetModalData);
     }

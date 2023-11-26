@@ -86,9 +86,17 @@
       margin-bottom: 40pt;
       margin-right: 4pt;
     }
+
     footer {
       height: 100pt;
       padding-top: 20pt;
+    }
+
+    .jn-radio {
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+      flex-direction: row;
     }
   </style>
 </head>
@@ -134,7 +142,12 @@
         <!-- IP 数据容器 -->
         <div class="ip-data-section mb-4">
           <div class="row jn-title">
-            <h2 id="scrollspyHeading1">🛜 IP 数据</h2>
+            <h2 id="scrollspyHeading1" class="col-6">🛜 IP 数据</h2>
+            <div class="form-check form-switch col-6 jn-radio">
+              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                @change="toggleMaps" :checked="isMapShown">
+              <label class="form-check-label" for="flexSwitchCheckDefault">{{ isMapShown ? '&nbsp;显示地图' : '&nbsp;隐藏地图' }}</label>
+            </div>
           </div>
           <div class="text-secondary">
             <p>将会从 4 个来源检查 IP 数据，如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。</p>
@@ -142,7 +155,7 @@
           <div class="jn-card-deck">
             <div class="row">
               <div v-for="card in ipDataCards" :key="card.id"
-                :class="{'jn-opacity': !card.asn, 'col-xl-3': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
+                :class="{'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
                 <div class="card jn-card">
                   <div class="card-header jn-ip-title" style="font-weight: bold;">
                     <span>来源: {{ card.source }}</span>
@@ -155,7 +168,7 @@
                   style="border:0;" allowfullscreen>
                 </iframe> -->
 
-                  <img :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
+                  <img v-if="isMapShown" :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
                   <div class="card-body">
                     <ul class="list-group list-group-flush">
                       <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip
