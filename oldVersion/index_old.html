@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>IP 状态查看</title>
+  <link rel="stylesheet" href="res/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="IP 状态查看">
+  <meta name="keywords" content="IP 状态查看">
+  <script src="res/jquery.min.js"></script>
+<script src="res/popper.min.js"></script>
+<script src="res/bootstrap.min.js"></script>
+<script src="res/ipinfos.js"></script>
+  <style>
+    body {
+      font-weight: 300;
+    }
+    h4 {
+        padding-bottom: 1.2rem;
+        padding-top: 1.2rem;
+    }
+    .fixed-header-width {
+      width: 20%;
+    }
+    .alert{
+        position: fixed;
+        width: 100vw;
+    }
+    
+  </style>
+  
+</head>
+<body onload="getIPs()" class="bg-light">
+  <div class="container">
+    <div class="py-5 text-center">
+      <h1>IP 状态查看</h1>
+    </div>
+    <div>
+      <div class="row align-items-center">
+        <div class="col">
+          <h4 id="ipTitle">国内 IP</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:getIPFromTaobao()" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></a>
+        </div>
+      </div>
+      <div id="result_0"></div>
+    </div>
+    <div id="result_x">
+      <div class="row align-items-center">
+        <div class="col">
+          <h4>国外 IP</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:getIPFromIpapi()" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></a>
+        </div>
+      </div>
+      <div id="result_1"></div>
+    </div>
+    <div>
+      <div class="row align-items-center">
+        <div class="col">
+          <h4>可用性检测</h4>
+        </div>
+        <div class="col text-right">
+          <a href="javascript:checkConnectivity()" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></a>
+        </div>
+      </div>
+    </div>
+    <table class="table table-dark table-bordered shadow">
+      <tr>
+        <th class="fixed-header-width">服务</th>
+        <th>状态</th>
+      </tr>
+      <tr>
+        <th>Baidu</th>
+        <td id="baiduStatus">检查中...</td>
+      </tr>
+      <tr>
+        <th>网易</th>
+        <td id="neteaseStatus">检查中...</td>
+      <tr>
+        <th>Github</th>
+        <td id="githubStatus">检查中...</td>
+      </tr>
+      <tr>
+        <th>Youtube</th>
+        <td id="youtubeStatus">检查中...</td>
+      </tr>
+      <tr>
+        <th>Google</th>
+        <td id="googleStatus">检查中...</td>
+      </tr>
+      <tr>
+        <th>Cloudflare</th>
+        <td id="cloudflareStatus">检查中...</td>
+      </tr>
+    </table>
+  </div>
+  <button id="ip-btn" class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 9999;">IP 查询</button>
+  <div id="ip-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-height: 50vh;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">IP 查询</h5>
+          
+        </div>
+        <div class="modal-body">
+          <input id="ip-input" type="text" class="form-control" placeholder="请输入 IP 地址">
+          <button id="query-btn" class="btn btn-primary mt-2" disabled>查询</button>
+          <div id="error-message" class="text-danger"></div>
+          <div id="result-container" class="mt-3"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="container">
+      <p class="text-center">90% Code by ChatGPT</p>    
+  </footer>
+  <script src="res/checkip.js"></script>
+
+</body>
+</html>
