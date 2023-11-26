@@ -1,1 +1,0 @@
-var bingMap = 'Am27Bsy1tM3G4a6CQZ10Sva7FaKgzsg527w_RB1M0TtB288Fnc99KfCmAm3TAFr0';
