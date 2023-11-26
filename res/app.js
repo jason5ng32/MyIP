@@ -238,6 +238,7 @@ new Vue({
         modalQueryResult: null,
         modalQueryError: '',
         isMapShown: false,
+        isDarkMode: false,
     },
     methods: {
 
@@ -700,7 +701,24 @@ new Vue({
             setTimeout(() => {
                 this.fetchLeakTestSfSharkCom(3, 2);
             }, 1000);
-        }
+        },
+        toggleDarkMode() {
+            this.isDarkMode = !this.isDarkMode;
+            this.updateBodyClass();
+        },
+        updateBodyClass() {
+            if (this.isDarkMode) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        },
+        checkSystemDarkMode() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                this.isDarkMode = true;
+                this.updateBodyClass();
+            }
+        },
 
     },
 
@@ -717,6 +735,7 @@ new Vue({
         }
     },
     mounted() {
+        this.checkSystemDarkMode();
         setTimeout(() => {
             this.checkAllConnectivity();
         }, 2500);

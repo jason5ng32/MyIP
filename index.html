@@ -98,37 +98,107 @@
       align-items: stretch;
       flex-direction: row;
     }
+
+    .jn-logo {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: row;
+    }
+
+    .dark-mode {
+      background-color: #212529 !important;
+      color: #e3e3e3 !important;
+      border-color: #757575;
+    }
+
+    .dark-mode::placeholder {
+      color: #e3e3e38e !important;
+    }
+
+    .dark-mode-border {
+      border-color: #a8a8a863;
+      box-shadow: 0 0 10pt #00000038;
+    }
+
+    .dark-mode-title {
+      background-color: #171a1d;
+    }
+
+    .dark-mode-nav {
+      background-color: #171a1d !important;
+      border-color: #a8a8a863 !important;
+      border-color: #757575;
+    }
+
+    .jn-deactive {
+      opacity: 0.5;
+    }
+
+    .active {
+      opacity: 1 !important;
+    }
+
+    .dark-mode-nav-border {
+      border-color: #a8a8a863 !important;
+    }
+
+    .dark-mode-close-button {
+      background-color: white;
+    }
+
+    .dark-mode-refresh {
+      background-color: #141618;
+    }
+    .dark-mode-refresh:hover {
+      background-color: #00000054;
+    }
   </style>
 </head>
 
 <body>
-  <!-- 导航栏 -->
-  <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top">
-    <a class="navbar-brand" href="#"><i class="bi bi-radar"></i> IP 工具箱</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="#scrollspyHeading1">IP 信息</a>
-        <a class="nav-link" href="#scrollspyHeading2">可用性测试</a>
-        <a class="nav-link" href="#scrollspyHeading3">WebRTC 测试</a>
-        <a class="nav-link" href="#scrollspyHeading4">DNS 泄露测试</a>
-      </div>
-    </div>
-  </nav>
-
-
-
   <div id="app">
+    <!-- 导航栏 -->
+    <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
+      :class="{ 'dark-mode-nav': isDarkMode }">
+
+      <div class="jn-logo">
+        <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#"><i class="bi bi-radar"></i> IP 工具箱</a>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" @change="toggleDarkMode"
+            :checked="isDarkMode">
+          <label class="form-check-label" for="darkModeSwitch">
+            <i v-if="isDarkMode" class="bi bi-moon-stars"></i>
+            <i v-else class="bi bi-brightness-high"></i>
+          </label>
+        </div>
+      </div>
+      <button class="navbar-toggler" :class="{ 'bg-light': isDarkMode }" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon bg-transparent "></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+        <div class="navbar-nav ">
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#scrollspyHeading1">IP 信息</a>
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#scrollspyHeading2">可用性测试</a>
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#scrollspyHeading3">WebRTC 测试</a>
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#scrollspyHeading4">DNS 泄露测试</a>
+        </div>
+      </div>
+    </nav>
+
+
+
 
     <!-- 翻墙状态通知 -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
-      <div id="toast" class="toast" role="alert" ref="toast" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
+      <div id="toast" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast" aria-live="assertive"
+        aria-atomic="true">
+        <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
           <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+            data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
           {{ alertMessage }}
@@ -146,9 +216,10 @@
             <h2 id="scrollspyHeading1" class="col-6">🛜 IP 数据</h2>
             <div class="form-check form-switch col-6 jn-radio">
               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-              @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
-            
-              <label class="form-check-label" for="flexSwitchCheckDefault">{{ !bingMapAPIKEY ? '&nbsp;地图不可用' : '&nbsp;地图' }}</label>
+                @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
+
+              <label class="form-check-label" for="flexSwitchCheckDefault">{{ !bingMapAPIKEY ? '&nbsp;地图不可用' :
+                '&nbsp;地图' }}</label>
 
             </div>
           </div>
@@ -159,10 +230,12 @@
             <div class="row">
               <div v-for="card in ipDataCards" :key="card.id"
                 :class="{'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
-                <div class="card jn-card">
-                  <div class="card-header jn-ip-title" style="font-weight: bold;">
+                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                  <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode }"
+                    style="font-weight: bold;">
                     <span>来源: {{ card.source }}</span>
-                    <button @click="refreshCard(card)" class="btn btn-light">
+                    <button @click="refreshCard(card)"
+                      :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
                       <i class="bi bi-arrow-clockwise"></i></button>
                   </div>
 
@@ -174,22 +247,27 @@
                   <img v-if="isMapShown" :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
                   <div class="card-body">
                     <ul class="list-group list-group-flush">
-                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{ card.ip
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">🖥️ IP 地址</span>: {{ card.ip
                         }}
                       </li>
-                      <li class="list-group-item jn-list-group-item">
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                         <span class="jn-text">🌍 国家</span>: {{
                         card.country_name }}&nbsp;<span v-if="card.country_code"
                           :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
                       </li>
-                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{ card.region
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">🏚️ 地区</span>: {{ card.region
                         }}</li>
-                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{ card.city }}
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">🚏 城市</span>: {{ card.city }}
                       </li>
-                      <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">🏢 ISP</span>: {{ card.isp }}
                       </li>
-                      <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
-                          v-if="card.asnlink" :href="card.asnlink" target="_blank">{{ card.asn }}</a><a v-else>{{
+                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                          class="jn-text">📶 ASN</span>: <a v-if="card.asnlink" :href="card.asnlink" target="_blank">{{
+                          card.asn }}</a><a v-else>{{
                           card.asn
                           }}</a></li>
                     </ul>
@@ -206,14 +284,15 @@
         <div class="availability-test-section mb-4">
           <div class="jn-title">
             <h2 id="scrollspyHeading2">🚦 可用性测试</h2>
-            <button @click="checkAllConnectivity" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+            <button @click="checkAllConnectivity" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
+                class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
             <p>通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。</p>
           </div>
           <div class="row">
             <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card">
+              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="card-body">
                   <h5 class="card-title"><i class="bi" :class="'bi-'+test.icon"></i> {{ test.name }}</h5>
 
@@ -231,14 +310,15 @@
         <div class="webrtc-test-section mb-4">
           <div class="jn-title">
             <h2 id="scrollspyHeading3">🚥 WebRTC 测试</h2>
-            <button @click="checkAllWebRTC" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+            <button @click="checkAllWebRTC" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
+                class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
             <p>WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。</p>
           </div>
           <div class="row">
             <div v-for="stun in stunServers" :key="stun.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card">
+              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="card-body">
                   <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
                   <p class="card-text text-secondary" style="font-size: 10pt;">{{ stun.url }}</p>
@@ -256,17 +336,18 @@
         <div class="dnsleak-test-section mb-4">
           <div class="jn-title">
             <h2 id="scrollspyHeading4">🛑 DNS 泄露测试</h2>
-            <button @click="checkAllDNSLeakTest" class="btn btn-light"><i class="bi bi-arrow-clockwise"></i></button>
+            <button @click="checkAllDNSLeakTest" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
+                class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
             <p>DNS 泄露（DNS Leaks）的意思是，当你<strong>挂上 VPN/代理后</strong>，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS
               泄露的风险。</p>
-              <p>泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的
+            <p>泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的
               DNS 进行解析，如果返回的地区数据与你当地的运营商地区相同，则有泄露风险，你可能需要修改你的 VPN/代理设置。</p>
           </div>
           <div class="row">
             <div v-for="leak in leakTest" :key="leak.id" class="col-6 col-md-3 mb-4">
-              <div class="card jn-card">
+              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="card-body">
                   <h5 class="card-title"><i class="bi bi-server"></i> {{ leak.name }}</h5>
                   <p class="card-text text-secondary" style="font-size: 10pt;">DNS 出口：{{ leak.ip }}</p>
@@ -293,38 +374,44 @@
     <!-- 模态框 -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
             <h5 class="modal-title" id="IPCheck">IP 查询</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+              data-bs-dismiss="modal" aria-label="Close"></button>
 
           </div>
-          <div class="modal-body">
-            <input type="text" class="form-control mb-2" placeholder="请输入 IP 地址" v-model="inputIP"
-              @keyup.enter="submitQuery">
+          <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
+            <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }" placeholder="请输入 IP 地址"
+              v-model="inputIP" @keyup.enter="submitQuery">
             <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
             <div v-if="modalQueryResult" class="mt-2">
               <div class="card-body">
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🖥️ IP 地址</span>: {{
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                      class="jn-text">🖥️ IP 地址</span>: {{
                     modalQueryResult.ip }}
                   </li>
-                  <li class="list-group-item jn-list-group-item">
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                     <span class="jn-text">🌍 国家</span>: {{
                     modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
                       :class="'flag-icon flag-icon-' + modalQueryResult.country_code.toLowerCase()"></span>
                   </li>
-                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🏚️ 地区</span>: {{
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                      class="jn-text">🏚️ 地区</span>: {{
                     modalQueryResult.region
                     }}</li>
-                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🚏 城市</span>: {{
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                      class="jn-text">🚏 城市</span>: {{
                     modalQueryResult.city }}
                   </li>
-                  <li class="list-group-item jn-list-group-item"><span class="jn-text">🏢 ISP</span>: {{
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                      class="jn-text">🏢 ISP</span>: {{
                     modalQueryResult.isp }}
                   </li>
-                  <li class="list-group-item jn-list-group-item"><span class="jn-text">📶 ASN</span>: <a
-                      v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank">{{
+                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                      class="jn-text">📶 ASN</span>: <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink"
+                      target="_blank">{{
                       modalQueryResult.asn }}</a><a v-else>{{ modalQueryResult.asn
                       }}</a></li>
                 </ul>
@@ -332,7 +419,7 @@
 
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
             <button type="button" class="btn btn-primary"
               :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }" @click="submitQuery"
               :disabled="!isValidIP(inputIP)">查询</button>
@@ -343,13 +430,15 @@
       </div>
     </div>
 
+    <footer>
+      <p class="text-center">Creators: Jason Ng & ChatGPT <a href="https://github.com/jason5ng32/MyIP" class="link-dark"
+          target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a></p>
+    </footer>
+
   </div>
 
 
-  <footer>
-    <p class="text-center">Creators: Jason Ng & ChatGPT <a href="https://github.com/jason5ng32/MyIP" class="link-dark"
-        target="_blank"><i class="bi bi-github"></i></a></p>
-  </footer>
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -359,6 +448,7 @@
   <!-- 引入 Vue.js -->
   <script src="res/vue.js"></script>
   <script src="res/app.js"></script>
+
 
 
 </body>
