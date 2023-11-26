@@ -236,6 +236,7 @@ new Vue({
         modalQueryResult: null,
         modalQueryError: '',
         isMapShown: false,
+        useIpapico: true,
     },
     methods: {
 
@@ -360,7 +361,8 @@ new Vue({
         //     xhr.open('GET', 'https://ipapi.co/json/', true);
         //     xhr.send();
         // },
-        async fetchIPDetails(card, ip) {
+
+        async fetchIPDetails_ipapico(card, ip) {
             try {
                 const response = await fetch(`https://ipapi.co/${ip}/json/`);
                 const data = await response.json();
@@ -380,7 +382,6 @@ new Vue({
                 // 网上找到的 Bing Map API Key，不知道是谁的，先用着
                 bingMapAPIKEY = 'Am27Bsy1tM3G4a6CQZ10Sva7FaKgzsg527w_RB1M0TtB288Fnc99KfCmAm3TAFr0';
 
-                // 构造 AS Number 的链接
                 if (card.asn === '') {
                     card.asnlink = false;
                     card.mapUrl = '';
@@ -395,10 +396,86 @@ new Vue({
 
             } catch (error) {
                 console.error('获取 IP 详情时出错:', error);
-                // 设置错误信息或保持字段为空
-                card.mapUrl = ''; // 在错误情况下重置地图 URL
+                card.mapUrl = '';
             }
         },
+
+        async fetchIPDetails_ipapicom(card, ip) {
+            try {
+                const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,isp,org,as,asname,query`);
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.reason);
+                }
+                card.ip = ip;
+                card.country_name = data.country || '';
+                card.country_code = data.countryCode || '';
+                card.region = data.regionName || '';
+                card.city = data.city || '';
+                card.latitude = data.lat || '';
+                card.longitude = data.lon || '';
+                card.isp = data.org || data.isp || '';
+                const asnSplit = data.as.split(' ');
+                card.asn = asnSplit[0];
+
+                // 网上找到的 Bing Map API Key，不知道是谁的，先用着
+                bingMapAPIKEY = 'Am27Bsy1tM3G4a6CQZ10Sva7FaKgzsg527w_RB1M0TtB288Fnc99KfCmAm3TAFr0';
+
+                if (card.asn === '') {
+                    card.asnlink = false;
+                    card.mapUrl = '';
+                } else {
+                    card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+                    card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
+
+                    // 可选改成 Google Maps 内嵌 iFrame
+                    // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
+                }
+
+
+            } catch (error) {
+                console.error('获取 IP 详情时出错:', error);
+                card.mapUrl = '';
+            }
+        },
+
+        async fetchIPDetails(card, ip) {
+            // 选择从哪个数据库获取 IP 详情
+            if (this.useIpapico) {
+                return await this.fetchIPDetails_ipapico(card, ip);
+            } else {
+                return await this.fetchIPDetails_ipapicom(card, ip);
+            }
+        },
+
+        checkAllIPs() {
+            // 从所有来源获取 IP 地址
+            setTimeout(() => {
+                this.getIPFromCloudflare_V4();
+                this.getIPFromCloudflare_V6();
+            }, 1000);
+
+            setTimeout(() => {
+                this.getIPFromTaobao();
+                this.getIPFromUpai();
+            }, 100);
+
+            setTimeout(() => {
+                this.getIPFromIpify_V4();
+                this.getIPFromIpify_V6();
+            }, 2000);
+        },
+
+        setIPSource(useIpapico) {
+            // 设置 IP 详情来源并刷新数据
+            this.useIpapico = useIpapico;
+            this.checkAllIPs();
+            this.alertStyle = "text-success";
+            this.alertMessage = "正在从新数据源解析 IP 数据。";
+            this.alertTitle = "请稍等";
+            this.showToast();
+        },
+
         refreshCard(card) {
             // 清空卡片数据
             this.clearCardData(card);
@@ -580,7 +657,7 @@ new Vue({
                         } else {
                             resolve();
                         }
-                    }, 5000); // 例如设置 5 秒超时
+                    }, 5000); 
                 });
             } catch (error) {
                 console.error('STUN Server Test Error:', error);
@@ -595,18 +672,18 @@ new Vue({
         },
 
         generate32DigitString() {
-            const unixTime = Date.now().toString(); // 13 位 Unix 时间戳
-            const fixedString = "jason5ng32"; // 固定字符串
-            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+            const unixTime = Date.now().toString();
+            const fixedString = "jason5ng32";
+            const randomString = Math.random().toString(36).substring(2, 11);
 
-            return unixTime + fixedString + randomString; // 拼接字符串
+            return unixTime + fixedString + randomString;
         },
 
         generate14DigitString() {
-            const fixedString = "jn32"; // 固定字符串
-            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+            const fixedString = "jn32";
+            const randomString = Math.random().toString(36).substring(2, 11);
 
-            return fixedString + randomString; // 拼接字符串
+            return fixedString + randomString;
         },
 
         fetchLeakTestIpApiCom(index) {
@@ -668,6 +745,7 @@ new Vue({
 
 
         checkAllDNSLeakTest() {
+            // 运行所有 DNS 泄漏测试
             setTimeout(() => {
                 this.fetchLeakTestIpApiCom(0);
             }, 100);
@@ -683,19 +761,27 @@ new Vue({
             setTimeout(() => {
                 this.fetchLeakTestSfSharkCom(3, 2);
             }, 1000);
-        }
+        },
 
     },
 
     created() {
+        // 从本地存储中获取设置
         if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
+        };
+        if (localStorage.getItem('useIpapico')) {
+            this.useIpapico = localStorage.getItem('useIpapico') === 'true';
         }
     },
     watch: {
         isMapShown(newVal) {
             // 当 isMapShown 改变时，更新本地存储
             localStorage.setItem('isMapShown', newVal);
+        },
+        useIpapico(newVal) {
+            // 当 useIpapico 改变时，更新本地存储
+            localStorage.setItem('useIpapico', newVal);
         }
     },
     mounted() {
@@ -708,13 +794,10 @@ new Vue({
         setTimeout(() => {
             this.checkAllDNSLeakTest();
         }, 2500);
-        this.getIPFromCloudflare_V4();
-        this.getIPFromCloudflare_V6();
-        this.getIPFromIpify_V4();
-        this.getIPFromIpify_V6();
+
+        this.checkAllIPs();
+
         // this.getIPFromIpapi();
-        this.getIPFromTaobao();
-        this.getIPFromUpai();
         const modalElement = document.getElementById('IPCheck');
         modalElement.addEventListener('hidden.bs.modal', this.resetModalData);
     }

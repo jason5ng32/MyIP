@@ -95,8 +95,15 @@
     .jn-radio {
       display: flex;
       justify-content: flex-end;
-      align-items: stretch;
+      align-items: center;
       flex-direction: row;
+    }
+
+    .jn-select{
+      display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-left: 8pt;
     }
   </style>
 </head>
@@ -143,13 +150,38 @@
         <!-- IP 数据容器 -->
         <div class="ip-data-section mb-4">
           <div class="row jn-title">
-            <h2 id="scrollspyHeading1" class="col-6">🛜 IP 数据</h2>
-            <div class="form-check form-switch col-6 jn-radio">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-                @change="toggleMaps" :checked="isMapShown">
-              <label class="form-check-label" for="flexSwitchCheckDefault">{{ isMapShown ? '&nbsp;已显示地图' : '&nbsp;已隐藏地图'
-                }}</label>
-            </div>
+            <h2 id="scrollspyHeading1" class="col-4">🛜 IP 数据</h2>
+
+            <div class="col-8 jn-radio">
+
+              <div class="form-check form-switch jn-select">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                  @change="toggleMaps" :checked="isMapShown">
+                <label class="form-check-label" for="flexSwitchCheckDefault">{{ isMapShown ? '&nbsp;已显示地图' : '&nbsp;已隐藏地图'
+                  }}</label>
+              </div>
+
+              <div class="dropdown jn-select">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  数据来源
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <a class="dropdown-item" href="#" @click="setIPSource(true)">
+                      <span v-if="useIpapico" class="text-primary">&#10003;</span> IPAPI.co
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" @click="setIPSource(false)">
+                      <span v-if="!useIpapico" class="text-primary">&#10003;</span> IP-API.com
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+
+          </div>
+
           </div>
           <div class="text-secondary">
             <p>将会从 6 个来源检查 IP 数据，如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。</p>
