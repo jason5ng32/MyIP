@@ -147,7 +147,7 @@
             <div class="form-check form-switch col-6 jn-radio">
               <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
                 @change="toggleMaps" :checked="isMapShown">
-              <label class="form-check-label" for="flexSwitchCheckDefault">{{ isMapShown ? '&nbsp;显示地图' : '&nbsp;隐藏地图'
+              <label class="form-check-label" for="flexSwitchCheckDefault">{{ isMapShown ? '&nbsp;已显示地图' : '&nbsp;已隐藏地图'
                 }}</label>
             </div>
           </div>
@@ -259,7 +259,8 @@
           </div>
           <div class="text-secondary">
             <p>DNS 泄露（DNS Leaks）的意思是，当你<strong>挂上 VPN/代理后</strong>，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS
-              泄露的风险。泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的
+              泄露的风险。</p>
+              <p>泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的
               DNS 进行解析，如果返回的地区数据与你当地的运营商地区相同，则有泄露风险，你可能需要修改你的 VPN/代理设置。</p>
           </div>
           <div class="row">
