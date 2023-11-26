@@ -402,7 +402,7 @@ new Vue({
 
         async fetchIPDetails_ipapicom(card, ip) {
             try {
-                const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,isp,org,as,asname,query`);
+                const response = await fetch(`https://llm-app-proud-bread-a400.macify.workers.dev/${ip}?fields=status,message,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,isp,org,as,asname,query`);
                 const data = await response.json();
                 if (data.error) {
                     throw new Error(data.reason);
