@@ -160,9 +160,9 @@ new Vue({
             },
             {
                 id: 'nextcloud',
-                name: 'NxtCld(v6)',
+                name: 'NxtCld',
                 url: 'stun:stun.nextcloud.com:443',
-                ip: '待检测或无 IPv6 地址'
+                ip: '待检测或连接错误'
             },
             {
                 id: 'peerjs',
@@ -196,10 +196,36 @@ new Vue({
             },
             {
                 id: 'stunprotocol',
-                name: 'StnPtc(v6)',
+                name: 'StnPtc',
                 url: 'stun:stunserver.stunprotocol.org',
-                ip: '待检测或无 IPv6 地址'
+                ip: '待检测或连接错误'
             }
+        ],
+        leakTest: [
+            {
+                "id": "ipapi1",
+                "name": "检测 1",
+                "geo": "待检测",
+                "ip": "待检测"
+            },
+            {
+                "id": "ipapi2",
+                "name": "检测 2",
+                "geo": "待检测",
+                "ip": "待检测"
+            },
+            {
+                "id": "sfshark1",
+                "name": "检测 3",
+                "geo": "待检测",
+                "ip": "待检测"
+            },
+            {
+                "id": "sfshark2",
+                "name": "检测 4",
+                "geo": "待检测",
+                "ip": "待检测"
+            },
         ],
         alertMessage: '',
         alertStyle: '',
@@ -216,7 +242,7 @@ new Vue({
         getIPFromUpai() {
             const unixTime = Date.now();
             const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
-    
+
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
@@ -562,13 +588,102 @@ new Vue({
             }
         },
 
-
-
         checkAllWebRTC() {
             this.stunServers.forEach(stun => {
                 this.checkSTUNServer(stun);
             });
         },
+
+        generate32DigitString() {
+            const unixTime = Date.now().toString(); // 13 位 Unix 时间戳
+            const fixedString = "jason5ng32"; // 固定字符串
+            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+
+            return unixTime + fixedString + randomString; // 拼接字符串
+        },
+
+        generate14DigitString() {
+            const fixedString = "jn32"; // 固定字符串
+            const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+
+            return fixedString + randomString; // 拼接字符串
+        },
+
+        fetchLeakTestIpApiCom(index) {
+            const urlString = this.generate32DigitString();
+            const url = `https://${urlString}.edns.ip-api.com/json`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.dns && 'geo' in data.dns && 'ip' in data.dns) {
+                        const geoSplit = data.dns.geo.split(' - ');
+                        this.leakTest[index].geo = geoSplit[0];
+                        this.leakTest[index].ip = data.dns.ip;
+                    } else {
+                        console.error('Unexpected data structure:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching leak test data:', error);
+                    this.leakTest[index].geo = '检查出错';
+                    this.leakTest[index].ip = '检查出错';
+                });
+        },
+
+        fetchLeakTestSfSharkCom(index, key) {
+            const urlString = this.generate14DigitString();
+            const url = `https://${urlString}.ipv4.surfsharkdns.com`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 获取 data 对象中的指定键
+                    const getKey = Object.keys(data)[key];
+                    const keyEntry = data[getKey];
+
+                    if (keyEntry && keyEntry.Country && keyEntry.IP) {
+                        this.leakTest[index].geo = keyEntry.Country;
+                        this.leakTest[index].ip = keyEntry.IP;
+                    } else {
+                        console.error('Unexpected data structure:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching leak test data:', error);
+                    this.leakTest[index].geo = '检查出错';
+                    this.leakTest[index].ip = '检查出错';
+                });
+        },
+
+
+        checkAllDNSLeakTest() {
+            setTimeout(() => {
+                this.fetchLeakTestIpApiCom(0);
+            }, 100);
+
+            setTimeout(() => {
+                this.fetchLeakTestIpApiCom(1);
+            }, 1000);
+
+            setTimeout(() => {
+                this.fetchLeakTestSfSharkCom(2, 1);
+            }, 100);
+
+            setTimeout(() => {
+                this.fetchLeakTestSfSharkCom(3, 2);
+            }, 1000);
+        }
 
     },
 
@@ -586,10 +701,13 @@ new Vue({
     mounted() {
         setTimeout(() => {
             this.checkAllConnectivity();
-        }, 2500); 
+        }, 2500);
         setTimeout(() => {
             this.checkAllWebRTC();
-        }, 4000); 
+        }, 4000);
+        setTimeout(() => {
+            this.checkAllDNSLeakTest();
+        }, 2500);
         this.getIPFromCloudflare_V4();
         this.getIPFromCloudflare_V6();
         this.getIPFromIpify_V4();
