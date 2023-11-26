@@ -2,7 +2,7 @@ new Vue({
     el: '#app',
     data: {
         // 请在此处填写 Bing Maps API Key，申请是免费的
-        bingMapAPIKEY: '',
+        bingMapAPIKEY: bingMap,
         ipDataCards: [
             {
                 id: 'upai',
