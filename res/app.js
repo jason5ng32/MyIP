@@ -761,6 +761,9 @@ new Vue({
             this.checkAllDNSLeakTest();
         }, 2500);
         this.checkAllIPs();
+        setTimeout(() => {
+            this.checkAllConnectivity();
+        }, 6000);
         const modalElement = document.getElementById('IPCheck');
         modalElement.addEventListener('hidden.bs.modal', this.resetModalData);
     }
