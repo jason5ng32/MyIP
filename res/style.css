@@ -1,0 +1,141 @@
+.jn-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+}
+
+.jn-ip-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+.jn-alert {
+    z-index: 9999;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.jn-card {
+    box-shadow: 0 0 10pt #0000001c;
+    height: 100%;
+}
+
+.jn-card:hover {
+    border-color: rgba(20, 184, 108, 0.42);
+}
+
+.jn-container {
+    padding-top: 2pt;
+    max-width: 1400px;
+}
+
+.jn-text {
+    font-weight: bold;
+}
+
+.jn-list-group-item {
+    padding: 0.75rem 0.25rem;
+}
+
+.jn-opacity {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.jn-map-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.jn-navbar-top {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    border-bottom: 1px solid #0000001c;
+
+}
+
+.jn-toast {
+    z-index: 9999;
+    right: 0;
+    bottom: 0;
+    margin-bottom: 40pt;
+    margin-right: 4pt;
+}
+
+footer {
+    height: 100pt;
+    padding-top: 20pt;
+}
+
+.jn-radio {
+    display: flex;
+    justify-content: flex-end;
+    align-items: stretch;
+    flex-direction: row;
+}
+
+.jn-logo {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+}
+
+.dark-mode {
+    background-color: #212529 !important;
+    color: #e3e3e3 !important;
+    border-color: #757575;
+}
+
+.dark-mode::placeholder {
+    color: #e3e3e38e !important;
+}
+
+.dark-mode-border {
+    border-color: #a8a8a863;
+    box-shadow: 0 0 10pt #00000038;
+}
+
+.dark-mode-title {
+    background-color: #171a1d;
+}
+
+.dark-mode-nav {
+    background-color: #171a1d !important;
+    border-color: #a8a8a863 !important;
+    border-color: #757575;
+}
+
+.jn-deactive {
+    opacity: 0.5;
+}
+
+.active {
+    opacity: 1 !important;
+}
+
+.dark-mode-nav-border {
+    border-color: #a8a8a863 !important;
+}
+
+.dark-mode-close-button {
+    background-color: white;
+}
+
+.dark-mode-refresh {
+    background-color: #141618;
+}
+
+.dark-mode-refresh:hover {
+    background-color: #00000054;
+}
