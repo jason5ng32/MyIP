@@ -1,7 +1,16 @@
 .jn-title {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: row;
+    margin-top: 10pt;
+    margin-bottom: 10pt;
+}
+
+.jn-title2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     flex-direction: row;
     margin-top: 10pt;
     margin-bottom: 10pt;
@@ -138,4 +147,11 @@ footer {
 
 .dark-mode-refresh:hover {
     background-color: #00000054;
+}
+
+.mobile-list {
+    border: 0;
+}
+.mobile-h2 {
+    font-size: 1.25rem;
 }

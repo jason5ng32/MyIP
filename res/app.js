@@ -239,6 +239,8 @@ new Vue({
         modalQueryError: '',
         isMapShown: false,
         isDarkMode: false,
+        isMobile: false,
+        isCardsCollapsed: false,
     },
     methods: {
 
@@ -719,6 +721,12 @@ new Vue({
                 this.updateBodyClass();
             }
         },
+        handleResize() {
+            this.isMobile = window.innerWidth < 768; // 设置断点为 768px
+        },
+        toggleCollapse() {
+            this.isCardsCollapsed = !this.isCardsCollapsed;
+        },
 
     },
 
@@ -728,6 +736,13 @@ new Vue({
         } else if (localStorage.getItem('isMapShown')) {
             this.isMapShown = localStorage.getItem('isMapShown') === 'true';
         }
+        this.isMobile = window.innerWidth < 768;
+        this.isCardsCollapsed = this.isMobile;
+        // this.handleResize();
+        window.addEventListener('resize', this.handleResize);
+    },
+    destroyed() {
+        window.removeEventListener('resize', this.handleResize);
     },
     watch: {
         isMapShown(newVal) {

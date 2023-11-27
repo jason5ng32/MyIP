@@ -71,14 +71,25 @@
         data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
         <!-- IP 数据容器 -->
         <div class="ip-data-section mb-4">
-          <div class="row jn-title">
-            <h2 id="scrollspyHeading1" class="col-6">🛜 IP 数据</h2>
-            <div class="form-check form-switch col-6 jn-radio">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-                @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
+          <div class="row" :class="{'jn-title2': !isMobile,'jn-title':isMobile}">
+            <h2 id="scrollspyHeading1" class="col-4" :class="{'mobile-h2' : isMobile }">🛜 IP 数据</h2>
+            <div class="form-check form-switch col-8 jn-radio">
 
-              <label class="form-check-label" for="flexSwitchCheckDefault">{{ !bingMapAPIKEY ? '&nbsp;地图不可用' :
-                '&nbsp;地图' }}</label>
+              <div :class="{'col-5': isMobile }">
+                <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch"
+                  @change="toggleCollapse" :checked="isCardsCollapsed">
+                <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;简约</label>
+              </div>
+
+              <div>
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+                  @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
+
+                <label class="form-check-label" for="flexSwitchCheckDefault">{{ !bingMapAPIKEY ? '&nbsp;地图不可用' :
+                  '&nbsp;地图' }}</label>
+              </div>
+
+
 
             </div>
           </div>
@@ -103,29 +114,31 @@
                   style="border:0;" allowfullscreen>
                 </iframe> -->
 
-                  <img v-if="isMapShown" :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
+                  <img v-if="isMapShown" v-if="!isMobile" :src="card.mapUrl" class="card-img-top jn-map-image" alt="地图">
                   <div class="card-body">
                     <ul class="list-group list-group-flush">
                       <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
                           class="jn-text">🖥️ IP 地址</span>: {{ card.ip
                         }}
                       </li>
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                      <li class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode,'mobile-list': isMobile }">
                         <span class="jn-text">🌍 国家</span>: {{
                         card.country_name }}&nbsp;<span v-if="card.country_code"
                           :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
                       </li>
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                          class="jn-text">🏚️ 地区</span>: {{ card.region
+                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏚️ 地区</span>: {{ card.region
                         }}</li>
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                          class="jn-text">🚏 城市</span>: {{ card.city }}
+                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🚏 城市</span>: {{ card.city }}
                       </li>
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                          class="jn-text">🏢 ISP</span>: {{ card.isp }}
+                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏢 ISP</span>: {{ card.isp }}
                       </li>
-                      <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                          class="jn-text">📶 ASN</span>: <a v-if="card.asnlink" :href="card.asnlink" target="_blank">{{
+                      <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                        :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">📶 ASN</span>: <a v-if="card.asnlink"
+                          :href="card.asnlink" target="_blank">{{
                           card.asn }}</a><a v-else>{{
                           card.asn
                           }}</a></li>
@@ -141,8 +154,8 @@
 
         <!-- 可用性测试容器 -->
         <div class="availability-test-section mb-4">
-          <div class="jn-title">
-            <h2 id="scrollspyHeading2">🚦 可用性测试</h2>
+          <div class="jn-title2">
+            <h2 id="scrollspyHeading2" :class="{'mobile-h2' : isMobile }">🚦 可用性测试</h2>
             <button @click="checkAllConnectivity"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
@@ -168,8 +181,8 @@
 
         <!-- WebRTC 测试 -->
         <div class="webrtc-test-section mb-4">
-          <div class="jn-title">
-            <h2 id="scrollspyHeading3">🚥 WebRTC 测试</h2>
+          <div class="jn-title2">
+            <h2 id="scrollspyHeading3" :class="{'mobile-h2' : isMobile }">🚥 WebRTC 测试</h2>
             <button @click="checkAllWebRTC" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
@@ -194,8 +207,8 @@
 
         <!-- DNS Leak 测试 -->
         <div class="dnsleak-test-section mb-4">
-          <div class="jn-title">
-            <h2 id="scrollspyHeading4">🛑 DNS 泄露测试</h2>
+          <div class="jn-title2">
+            <h2 id="scrollspyHeading4" :class="{'mobile-h2' : isMobile }">🛑 DNS 泄露测试</h2>
             <button @click="checkAllDNSLeakTest"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
