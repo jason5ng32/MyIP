@@ -697,11 +697,11 @@ new Vue({
             }, 1000);
 
             setTimeout(() => {
-                this.fetchLeakTestSfSharkCom(2, 1);
+                this.fetchLeakTestSfSharkCom(2, 0);
             }, 100);
 
             setTimeout(() => {
-                this.fetchLeakTestSfSharkCom(3, 2);
+                this.fetchLeakTestSfSharkCom(3, 0);
             }, 1000);
         },
         toggleDarkMode() {
