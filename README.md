@@ -37,6 +37,10 @@ bingMapAPIKEY: '',
 
 如果你连申请都懒得折腾，也可以考虑使用 Google Maps 的 iframe 嵌入。程序里已经注释了这部分的代码，你可以根据实际的情况进行反注释。不过，使用 iframe 实在有点脏脏的感觉。
 
+如果你不打算增加地图功能，其实也可以在 Vercel 上一键部署：
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+
 ## 高级用法
 
 如果你在通过代理上网，可以考虑在你的代理配置里，增加下面的规则（请根据你使用的客户端进行修改），这样就可以实现同时查询真实 IP 和代理后的 IP：
@@ -51,3 +55,7 @@ DOMAIN-SUFFIX,ipify.org,Proxy
 ## 额外说明
 
 这个程序的 80% 的代码不是我写的，是通过 ChatGPT 写的。大概来回 50 个回合，外加一些细微的手动修改，完成了全部代码。
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=jason5ng32/MyIP&type=Date)](https://star-history.com/#jason5ng32/MyIP&Date)
