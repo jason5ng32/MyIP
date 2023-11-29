@@ -37,7 +37,7 @@ new Vue({
                 Title: "Network Connectivity",
                 Note: "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality.",
                 StatusWait: "Awaiting Test",
-                StatusAvailable: "Available",
+                StatusAvailable: "OK",
                 StatusUnavailable: "Unavailable",
                 StatusTimeout: "Timeout or Unavailable",
                 checking: 'Checking...',
