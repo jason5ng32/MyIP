@@ -1,62 +1,61 @@
-# IP 工具箱
+# IP Toolkit
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
 ![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
 
-在这里体验：[jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
+[🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
 
-备注：体验地址的一些数据可能出不来，是因为最近用的人比较多……（我也实在没想到），自己部署一下就好。
 
-这是一个完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。如果你看着 `https://ip.skk.moe` 眼馋，那就用这个程序搭建一个属于自己的吧。
+Demo: [jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
 
-## 主要功能
-
-1. 看自己的 IP：从多个 IPv4 和 IPv6 来源检测显示本机的 IP
-2. 看 IP 信息：显示所有 IP 的相关信息，包括国家、地区、ASN、地理位置等
-3. 可用性检测：检测一些网站的可用性：Google, Github, Youtube, 网易, 百度等
-4. WebRTC 检测：查看使用 WebRTC 连接时使用的 IP
-5. DNS 泄露检测：查看 DNS 出口信息，以便查看在 VPN/代理的情况下，是否存在 DNS 泄露隐私的风险
-6. 暗黑模式：根据系统设置自动切换暗黑/白天模式，也可以手动切换
-7. 简约模式：为移动版提供的专门模式，缩短页面长度，快速查看最重要的信息
-8. 查任意 IP 信息：可以通过小工具查询任意 IP 的信息
-9. 根据可用性检测结果，返回目前是否可以访问全世界网络的提示
-
-## 如何使用
-
-几乎开箱即用。直接下载所有代码，放到你本地或服务器上就行，没啥额外步骤。
-
-如果你希望能够显示 IP 所在地的地图，则需要修改 `app.js` ，在 `data` 部分，找到：
-
-```
-bingMapAPIKEY: '',
-```
-
-在这里添加你的 Bing Map API Key，添加后，首页的地图按钮就会自动变为可用状态。
-
-申请这个 API 是免费的，一年可以发起 12w 次免费请求，个人玩应该足够用了。如果真要搞大家伙的东西，就自己改一下程序吧，别把 key 放到前端代码里……
-
-如果你连申请都懒得折腾，也可以考虑使用 Google Maps 的 iframe 嵌入。程序里已经注释了这部分的代码，你可以根据实际的情况进行反注释。不过，使用 iframe 实在有点脏脏的感觉。
-
-如果你不打算增加地图功能，其实也可以在 Vercel 上一键部署：
+Notes: Note: Some data on the demo site may not be displayed because it has been used frequently recently... (I didn't expect that either), just deploy it yourself.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 
-## 高级用法
+## Main Features
 
-如果你在通过代理上网，可以考虑在你的代理配置里，增加下面的规则（请根据你使用的客户端进行修改），这样就可以实现同时查询真实 IP 和代理后的 IP：
+1. **View Your IP**: Detects and displays the local IP from multiple IPv4 and IPv6 sources.
+2. **IP Information**: Shows related information for all IPs, including country, region, ASN, geographical location, etc.
+3. **Availability Check**: Tests the accessibility of various websites such as Google, Github, YouTube, NetEase, Baidu, etc.
+4. **WebRTC Detection**: Identifies the IP used when connecting via WebRTC.
+5. **DNS Leak Test**: Reveals DNS exit information to assess the risk of DNS leaks under VPN/proxy use.
+6. **Dark Mode**: Automatically switches between dark/ daylight mode based on system settings, with a manual switch option.
+7. **Minimalist Mode**: A specialized mode for mobile, reducing page length to quickly access the most crucial information.
+8. **Arbitrary IP Information**: Utilize a tool to query information for any IP.
+9. Based on the results of the availability test, provides indications on whether global internet access is currently possible.
 
+## How to Use
+
+It's almost ready to use out of the box. Simply download all the code and place it on your local machine or server, with no extra steps required.
+
+If you want to display a map of the IP's location, you need to modify `app.js`. In the `data` section, find:
+
+```javascript
+bingMapAPIKEY: '',
 ```
+
+Add your Bing Map API Key here. After adding it, the map button on the homepage will automatically become active.
+
+Applying for this API is free, allowing up to 120,000 free requests per year, which should be sufficient for personal use. If you plan to use it for larger projects, consider modifying the program so as not to include the key in the frontend code.
+
+If you're not planning to add map functionality, you can also deploy it with one click on Vercel.
+
+## Advanced Usage
+
+If you are using a proxy to access the internet, consider adding the following rule to your proxy configuration (please modify according to the client you are using). This will allow you to simultaneously query your real IP and the IP after proxying:
+
+```ini
 # IP Testing
 IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
 DOMAIN-SUFFIX,ipify.org,Proxy
 ```
 
-## 额外说明
+## Additional Notes
 
-这个程序的 80% 的代码不是我写的，是通过 ChatGPT 写的。大概来回 50 个回合，外加一些细微的手动修改，完成了全部代码。
+80% of the code for this program was not written by me, but generated through ChatGPT. After about 50 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
 
 ## Star History
 
