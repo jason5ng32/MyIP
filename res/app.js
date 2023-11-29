@@ -927,8 +927,10 @@ new Vue({
         this.checkAllIPs();
         setTimeout(() => {
             this.checkAllConnectivity();
-            this.showToast();
         }, 2500);
+        setTimeout(() => {
+            this.showToast();
+        }, 5500);
         setTimeout(() => {
             this.checkAllWebRTC();
         }, 4000);

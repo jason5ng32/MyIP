@@ -10,41 +10,42 @@
 
 Demo: [jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
 
-Notes: Note: Some data on the demo site may not be displayed because it has been used frequently recently... (I didn't expect that either), just deploy it yourself.
+Notes: Please note that some data on the demo site may not be displayed because it has been accessed frequently recently (I didn't expect that either). To circumvent this, you can deploy the site yourself.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 
 ## Main Features
 
-1. **View Your IP**: Detects and displays the local IP from multiple IPv4 and IPv6 sources.
-2. **IP Information**: Shows related information for all IPs, including country, region, ASN, geographical location, etc.
-3. **Availability Check**: Tests the accessibility of various websites such as Google, Github, YouTube, NetEase, Baidu, etc.
-4. **WebRTC Detection**: Identifies the IP used when connecting via WebRTC.
-5. **DNS Leak Test**: Reveals DNS exit information to assess the risk of DNS leaks under VPN/proxy use.
-6. **Dark Mode**: Automatically switches between dark/ daylight mode based on system settings, with a manual switch option.
-7. **Minimalist Mode**: A specialized mode for mobile, reducing page length to quickly access the most crucial information.
-8. **Arbitrary IP Information**: Utilize a tool to query information for any IP.
-9. Based on the results of the availability test, provides indications on whether global internet access is currently possible.
+1. **View Your IPs**: Detects and displays your local IP, sourcing from multiple IPv4 and IPv6 providers.
+2. **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
+3. **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
+4. **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
+5. **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
+6. **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
+7. **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
+8. **Arbitrary IP Information**: Provides a tool for querying information about any IP address.
+9. Based on availability test results, it indicates whether global internet access is currently feasible.
+10. English and Chinese supported.
 
 ## How to Use
 
-It's almost ready to use out of the box. Simply download all the code and place it on your local machine or server, with no extra steps required.
+The tool is almost ready to use straight out of the box. Just download the entire codebase and deploy it on your local machine or server. No additional setup is required.
 
-If you want to display a map of the IP's location, you need to modify `app.js`. In the `data` section, find:
+To display a map showing the location of an IP, modify app.js. In the data section, locate:
 
 ```javascript
 bingMapAPIKEY: '',
 ```
 
-Add your Bing Map API Key here. After adding it, the map button on the homepage will automatically become active.
+Enter your Bing Map API Key here. Upon doing so, the map functionality on the homepage will activate automatically.
 
-Applying for this API is free, allowing up to 120,000 free requests per year, which should be sufficient for personal use. If you plan to use it for larger projects, consider modifying the program so as not to include the key in the frontend code.
+Applying for this API key is free and includes up to 120,000 requests per year at no cost, adequate for personal use. For larger projects, consider adjusting the program to avoid embedding the key in the frontend code.
 
-If you're not planning to add map functionality, you can also deploy it with one click on Vercel.
+If you don't need map functionality, the program can also be deployed easily with a single click on Vercel.
 
 ## Advanced Usage
 
-If you are using a proxy to access the internet, consider adding the following rule to your proxy configuration (please modify according to the client you are using). This will allow you to simultaneously query your real IP and the IP after proxying:
+If you're using a proxy for internet access, consider adding this rule to your proxy configuration (modify it according to your client). This setup lets you check both your real IP and the IP when using the proxy:
 
 ```ini
 # IP Testing
@@ -55,7 +56,7 @@ DOMAIN-SUFFIX,ipify.org,Proxy
 
 ## Additional Notes
 
-80% of the code for this program was not written by me, but generated through ChatGPT. After about 50 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
+70% of the code for this program was not written by me, but generated through ChatGPT. After about 50 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
 
 ## Star History
 
