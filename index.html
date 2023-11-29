@@ -127,7 +127,7 @@
                         }}
                       </li>
                       <li class="list-group-item jn-list-group-item"
-                        :class="{ 'dark-mode': isDarkMode,'mobile-list': isMobile }">
+                        :class="{ 'dark-mode': isDarkMode,'mobile-list': isMobile && isCardsCollapsed }">
                         <span class="jn-text">🌍 {{currentTexts.ipInfos.Country}}</span>: {{
                         card.country_name }}&nbsp;<span v-if="card.country_code"
                           :class="'flag-icon flag-icon-' + card.country_code.toLowerCase()"></span>
