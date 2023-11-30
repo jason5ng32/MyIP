@@ -1,4 +1,4 @@
-# IP Toolkit
+# MyIP - A Better IP Toolbox
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
