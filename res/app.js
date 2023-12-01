@@ -579,6 +579,7 @@ new Vue({
         card.longitude = "-122.078514";
         card.isp = "Google LLC";
         card.asn = "AS15169";
+        card.mapUrl = "res/defaultMap.jpg";
       });
       this.stunServers.forEach((server) => {
         server.ip = "100.100.200.100";
