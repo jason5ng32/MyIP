@@ -67,6 +67,10 @@ export default {
     Congrats: "恭喜呀！",
     OhNo_Message: "你当前似乎没有翻墙，部分内容无法显示。",
     Congrats_Message: "你当前已经翻墙，欢迎来到新世界。",
+    maskedInfoTitle: "隐藏成功",
+    maskedInfoMessage:"信息已隐藏，现在可以安心截图了。",
+    unmaskedInfoTitle: "取消隐藏",
+    unmaskedInfoMessage:"信息已显示，截图时请注意隐私。",
   },
   page: {
     title:

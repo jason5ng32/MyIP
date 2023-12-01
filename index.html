@@ -243,6 +243,12 @@
       </div>
     </div>
 
+    <!-- Info Mask BTN-->
+    <button v-if="isInfosLoaded" class="btn position-fixed" :class="isInfoMasked ? ' btn-secondary' : 'btn-success'"
+        style="bottom: 66px; right: 20px; z-index: 1050;"
+        @click="toggleInfoMask">
+    <i :class="isInfoMasked ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+</button>
 
     <!-- Search BTN -->
     <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"

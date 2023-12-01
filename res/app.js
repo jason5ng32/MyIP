@@ -24,12 +24,18 @@ new Vue({
     isDarkMode: false,
     isMobile: false,
     isCardsCollapsed: false,
+    isInfoMasked: false,
+    isInfosLoaded: false,
 
     // from contents
     connectivityTests,
+    originconnectivityTests: {},
     ipDataCards,
+    originipDataCards: {},
     stunServers,
+    originstunServers: {},
     leakTest,
+    originleakTest: {},
   },
   methods: {
     getIPFromUpai() {
@@ -540,6 +546,54 @@ new Vue({
         server.ip = this.currentTexts.dnsleaktest.StatusWait;
       });
     },
+    // 信息遮罩
+    toggleInfoMask() {
+      this.isInfoMasked = !this.isInfoMasked;
+      if (this.isInfoMasked) {
+          this.originipDataCards = JSON.parse(JSON.stringify(this.ipDataCards));
+          this.originstunServers = JSON.parse(JSON.stringify(this.stunServers));
+          this.originleakTest = JSON.parse(JSON.stringify(this.leakTest));
+        this.infoMask();
+        this.alertStyle = "text-success";
+        this.alertMessage = this.currentTexts.alert.maskedInfoMessage;
+        this.alertTitle = this.currentTexts.alert.maskedInfoTitle;
+        this.alertToShow = true;
+        this.showToast();
+      } else {
+        this.infoUnmask();
+        this.alertStyle = "text-success";
+        this.alertMessage = this.currentTexts.alert.unmaskedInfoMessage;
+        this.alertTitle = this.currentTexts.alert.unmaskedInfoTitle;
+        this.alertToShow = true;
+        this.showToast();
+      }
+    },
+    infoMask() {
+      this.ipDataCards.forEach((card) => {
+        card.ip = "8.8.8.8";
+        card.country_name = "United States";
+        card.country_code = "US";
+        card.region = "California";
+        card.city = "Mountain View";
+        card.latitude = "37.40599";
+        card.longitude = "-122.078514";
+        card.isp = "Google LLC";
+        card.asn = "AS15169";
+      });
+      this.stunServers.forEach((server) => {
+        server.ip = "100.100.200.100";
+      });
+      this.leakTest.forEach((server) => {
+        server.geo = "United States";
+        server.ip = "12.34.56.78";
+      }
+      );
+    },
+    infoUnmask() {
+      this.ipDataCards = JSON.parse(JSON.stringify(this.originipDataCards));
+      this.stunServers = JSON.parse(JSON.stringify(this.originstunServers));
+      this.leakTest = JSON.parse(JSON.stringify(this.originleakTest));
+    },
   },
 
   created() {
@@ -583,6 +637,9 @@ new Vue({
     setTimeout(() => {
       this.checkAllConnectivity();
     }, 6000);
+    setTimeout(() => {
+      this.isInfosLoaded = true;
+    }, 6500);
     const modalElement = document.getElementById("IPCheck");
     modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
   },
