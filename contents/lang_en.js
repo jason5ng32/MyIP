@@ -48,7 +48,7 @@ export default {
     Title: "DNS Leak Test",
     Note: "A DNS leak means that when you are connected to a VPN/proxy, your domain name resolutions are still done through your local ISP, thus posing a risk of DNS leaks.",
     Note2:
-      "The leak test method involves accessing a newly generated domain name to detect which region's DNS is being used as per your VPN/proxy settings.",
+      "The method to test for DNS leaks involves accessing a newly generated domain name to detect which regional DNS exit you are resolving through. If the endpoint region returned matches your local service provider's region, there is a risk of DNS leakage. In this case, you may need to modify your VPN/proxy settings.",
     Endpoint: "DNS Endpoint",
     EndpointCountry: "Endpoint Region",
     StatusWait: "Awaiting Test",
