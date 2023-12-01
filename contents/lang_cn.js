@@ -46,7 +46,7 @@ export default {
     id: "dnsleaktest",
     Name: "测试",
     Title: "DNS 泄漏测试",
-    Note: "DNS 泄露（DNS Leaks）的意思是，当你挂上 VPN/代理后，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS泄露的风险。",
+    Note: "DNS 泄露（DNS Leaks）的意思是，当你挂上 VPN/代理后，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS 泄露的风险。",
     Note2:
       "泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的 DNS 出口进行解析，如果返回的出口区域和你当地的运营商区域相同，则有 DNS 泄露风险，你可能需要修改 VPN/代理设置。",
     Endpoint: "DNS 出口",
