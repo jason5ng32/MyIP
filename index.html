@@ -94,8 +94,7 @@
                   @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
 
                 <label class="form-check-label" for="flexSwitchCheckDefault">
-                  <i v-if="bingMapAPIKEY" class="bi bi-map-fill"></i>
-                  {{ bingMapAPIKEY ? '' : currentTexts.ipInfos.MapUnavailable }}
+                  <i :class="['bi', bingMapAPIKEY ? 'bi bi-map-fill':'bi bi-map']"></i>
                 </label>
                 <i :class="['bi ', !bingMapAPIKEY ? 'bi-plus-circle-fill':'bi-pencil-square']" data-bs-toggle="modal"
                   data-bs-target="#addBingMapKey"></i>
