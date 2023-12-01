@@ -78,4 +78,12 @@ export default {
     title:
       "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Jason Ng Open Source",
   },
+  addBingMapKey : {
+    Title: "Add Bing Map API Key",
+    Note: "After adding, the map can be displayed in the IP information. The API Key will only be saved in the current browser for the next use, and will not be uploaded to the server.",
+    Placeholder: "Please enter Bing Map API Key",
+    Button: "Save",
+    removeButton: "Remove",
+    Error: "Please enter a valid Bing Map API Key.",
+  }
 };

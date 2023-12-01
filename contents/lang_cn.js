@@ -76,4 +76,12 @@ export default {
     title:
       "查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | Jason Ng 阿禅开源作品",
   },
+  addBingMapKey : {
+    Title: "添加 Bing Map API Key",
+    Note: "添加后，可以在 IP 信息中显示地图。API Key 只会在当前浏览器中保存，方便下次使用，不会上传到服务器。",
+    Placeholder: "请输入 Bing Map API Key",
+    Button: "保存",
+    removeButton: "删除",
+    Error: "请输入有效的 Bing Map API Key。",
+  },
 };

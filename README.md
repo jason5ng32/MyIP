@@ -31,13 +31,16 @@ Notes: Please note that some data on the demo site may not be displayed because 
 
 The tool is almost ready to use straight out of the box. Just download the entire codebase and deploy it on your local machine or server. No additional setup is required.
 
-To display a map showing the location of an IP, modify app.js. In the data section, locate:
+There are 2 ways to display a map showing the location of an IP:
+
+1. Click on the + Add button next to the map display button and fill in the API KEY, then map function will be enabled and always available in current browser.
+2. Or, you can modify `res/app.js`, in the `data` section, locate:
 
 ```javascript
 bingMapAPIKEY: '',
 ```
 
-Enter your Bing Map API Key here. Upon doing so, the map functionality on the homepage will activate automatically.
+Enter your Bing Map API Key here. Upon doing so, the map functionality on the homepage will activate automatically for all users.
 
 Applying for this API key is free and includes up to 120,000 requests per year at no cost, adequate for personal use. For larger projects, consider adjusting the program to avoid embedding the key in the frontend code.
 
