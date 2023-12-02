@@ -57,7 +57,7 @@ export default {
   ipcheck: {
     id: "ipcheck",
     Title: "IP 查询",
-    Placeholder: "请输入有 IP 地址",
+    Placeholder: "请输入 IP 地址",
     Button: "查询",
     Error: "请输入有效的 IPv4 或 IPv6 地址。",
   },
