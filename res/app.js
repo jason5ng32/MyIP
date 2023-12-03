@@ -20,6 +20,7 @@ new Vue({
     inputIP: "",
     inputBingMapAPIKEY: "",
     bingMapAPIKEYError: false,
+    bingMapLanguage: "en",
     modalQueryResult: null,
     modalQueryError: "",
     isMapShown: false,
@@ -28,6 +29,7 @@ new Vue({
     isCardsCollapsed: false,
     isInfoMasked: false,
     isInfosLoaded: false,
+    infoMaskLevel: 0,
 
     // from contents
     connectivityTests,
@@ -164,7 +166,7 @@ new Vue({
           card.mapUrl = "";
         } else {
           card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-          card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
+          card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
 
           // 可选改成 Google Maps 内嵌 iFrame
           // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
@@ -526,8 +528,10 @@ new Vue({
       const browserLanguage = navigator.language || navigator.userLanguage;
       if (browserLanguage.includes("zh")) {
         this.currentLanguage = "cn";
+        this.bingMapLanguage = "zh";
       } else {
         this.currentLanguage = "en";
+        this.bingMapLanguage = "en";
       }
     },
     updatePageTitle(lang) {
@@ -555,61 +559,81 @@ new Vue({
     },
     // 信息遮罩
     toggleInfoMask() {
-      this.isInfoMasked = !this.isInfoMasked;
-      if (this.isInfoMasked) {
+      // this.isInfoMasked = !this.isInfoMasked;
+      if (this.infoMaskLevel === 0) {
         this.originipDataCards = JSON.parse(JSON.stringify(this.ipDataCards));
         this.originstunServers = JSON.parse(JSON.stringify(this.stunServers));
         this.originleakTest = JSON.parse(JSON.stringify(this.leakTest));
+        this.infoMask();
+        this.alertStyle = "text-warning";
+        this.alertMessage = this.currentTexts.alert.maskedInfoMessage_1;
+        this.alertTitle = this.currentTexts.alert.maskedInfoTitle_1;
+        this.alertToShow = true;
+        this.showToast();
+        // this.isInfoMasked = true;
+      } else if (this.infoMaskLevel === 1) {
         this.infoMask();
         this.alertStyle = "text-success";
         this.alertMessage = this.currentTexts.alert.maskedInfoMessage;
         this.alertTitle = this.currentTexts.alert.maskedInfoTitle;
         this.alertToShow = true;
         this.showToast();
+        // this.isInfoMasked = true;
       } else {
         this.infoUnmask();
-        this.alertStyle = "text-success";
+        this.alertStyle = "text-danger";
         this.alertMessage = this.currentTexts.alert.unmaskedInfoMessage;
         this.alertTitle = this.currentTexts.alert.unmaskedInfoTitle;
         this.alertToShow = true;
         this.showToast();
+        // this.isInfoMasked = false;
       }
     },
     infoMask() {
-      this.ipDataCards.forEach((card) => {
-        card.ip = "8.8.8.8";
-        card.country_name = "United States";
-        card.country_code = "US";
-        card.region = "California";
-        card.city = "Mountain View";
-        card.latitude = "37.40599";
-        card.longitude = "-122.078514";
-        card.isp = "Google LLC";
-        card.asn = "AS15169";
-        card.mapUrl = "res/defaultMap.jpg";
-      });
-      this.stunServers.forEach((server) => {
-        server.ip = "100.100.200.100";
-      });
-      this.leakTest.forEach((server) => {
-        server.geo = "United States";
-        server.ip = "12.34.56.78";
+      if (this.infoMaskLevel === 0) {
+        this.ipDataCards.forEach((card) => {
+          card.ip = "8.8.8.8";
+        });
+        this.stunServers.forEach((server) => {
+          server.ip = "100.100.200.100";
+        });
+        this.leakTest.forEach((server) => {
+          server.ip = "12.34.56.78";
+        }
+        );
+        this.infoMaskLevel = 1;
+      } else if (this.infoMaskLevel === 1) {
+        this.ipDataCards.forEach((card) => {
+          card.country_name = "United States";
+          card.country_code = "US";
+          card.region = "California";
+          card.city = "Mountain View";
+          card.latitude = "37.40599";
+          card.longitude = "-122.078514";
+          card.isp = "Google LLC";
+          card.asn = "AS15169";
+          card.mapUrl = "res/defaultMap.jpg";
+        });
+        this.leakTest.forEach((server) => {
+          server.geo = "United States";
+        });
+        this.infoMaskLevel = 2;
       }
-      );
     },
     infoUnmask() {
       this.ipDataCards = JSON.parse(JSON.stringify(this.originipDataCards));
       this.stunServers = JSON.parse(JSON.stringify(this.originstunServers));
       this.leakTest = JSON.parse(JSON.stringify(this.originleakTest));
+      this.infoMaskLevel = 0;
     },
 
+    // Bing Map 相关
     addBingMapKey() {
-
       if (this.isValidKey(this.inputBingMapAPIKEY)) {
         this.bingMapAPIKEY = this.inputBingMapAPIKEY;
         this.ipDataCards.forEach((card) => {
           if (card.latitude && card.longitude) {
-            card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large`;
+            card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
           }
         }
         );
@@ -638,6 +662,20 @@ new Vue({
       const keyPattern = /^[A-Za-z0-9_-]{64}$/;
       return keyPattern.test(key);
     },
+
+    // refreshAll() {
+    //   this.checkAllIPs();
+    //   setTimeout(() => {
+    //     this.checkAllConnectivity();
+    //   }, 2500);
+    //   setTimeout(() => {
+    //     this.checkAllWebRTC();
+    //   }, 4000);
+    //   setTimeout(() => {
+    //     this.checkAllDNSLeakTest();
+    //   }, 2500);
+    // },
+
   },
 
   created() {
@@ -693,7 +731,7 @@ new Vue({
     }, 6000);
     setTimeout(() => {
       this.isInfosLoaded = true;
-    }, 6500);
+    }, 6000);
     const modalElement = document.getElementById("IPCheck");
     modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
     const bingMapAPIKEYElement = document.getElementById("addBingMapKey");

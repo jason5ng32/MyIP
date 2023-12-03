@@ -69,10 +69,13 @@ export default {
       "You seem to be not connected to a VPN/proxy, some content may not be displayed.",
     Congrats_Message:
       "You are now connected to a VPN/proxy, welcome to the new world.",
-      maskedInfoTitle: "Infos masked",
-      maskedInfoMessage:"Information has been masked, you can now safely take screenshots.",
+      maskedInfoTitle_1: "IP masked",
+      maskedInfoMessage_1:"IP information has been masked, please be careful when taking screenshots.",
+      maskedInfoTitle: "All infos masked",
+      maskedInfoMessage:"All information has been masked, you can now safely take screenshots.",
       unmaskedInfoTitle: "Infos Unmasked",
       unmaskedInfoMessage:"Information has been unmasked, please be careful when taking screenshots.",
+
   },
   page: {
     title:
