@@ -497,6 +497,7 @@ new Vue({
     toggleDarkMode() {
       this.isDarkMode = !this.isDarkMode;
       this.updateBodyClass();
+      this.PWAColor();
     },
     updateBodyClass() {
       if (this.isDarkMode) {
@@ -662,6 +663,17 @@ new Vue({
       const keyPattern = /^[A-Za-z0-9_-]{64}$/;
       return keyPattern.test(key);
     },
+    // PWA 颜色
+    PWAColor() {
+      if (this.isDarkMode) {
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#171a1d');
+        document.querySelector('meta[name="background-color"]').setAttribute('content', '#212529');
+      } else {
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f8f9fa');
+        document.querySelector('meta[name="background-color"]').setAttribute('content', '#ffffff');
+      }
+    },
+
   },
 
   created() {
@@ -699,6 +711,7 @@ new Vue({
   mounted() {
     this.updatePageTitle(this.currentLanguage);
     this.checkSystemDarkMode();
+    this.PWAColor();
     this.checkAllIPs();
     setTimeout(() => {
       this.checkAllConnectivity();
