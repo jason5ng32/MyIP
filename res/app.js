@@ -662,20 +662,6 @@ new Vue({
       const keyPattern = /^[A-Za-z0-9_-]{64}$/;
       return keyPattern.test(key);
     },
-
-    // refreshAll() {
-    //   this.checkAllIPs();
-    //   setTimeout(() => {
-    //     this.checkAllConnectivity();
-    //   }, 2500);
-    //   setTimeout(() => {
-    //     this.checkAllWebRTC();
-    //   }, 4000);
-    //   setTimeout(() => {
-    //     this.checkAllDNSLeakTest();
-    //   }, 2500);
-    // },
-
   },
 
   created() {

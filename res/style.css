@@ -62,6 +62,7 @@
     height: 200px;
     object-fit: cover;
     object-position: center;
+    border-radius: 0;
 }
 
 .jn-navbar-top {
