@@ -63,23 +63,25 @@ export default {
   },
   alert: {
     id: "alert",
+    refreshEverythingMessage: "正在刷新所有数据，请等待...",
+    refreshEverythingTitle: "正在刷新",
     OhNo: "糟糕！",
     Congrats: "恭喜呀！",
     OhNo_Message: "你当前似乎没有翻墙，部分内容无法显示。",
     Congrats_Message: "你当前已经翻墙，欢迎来到新世界。",
     maskedInfoTitle_1: "IP 隐藏成功",
-    maskedInfoMessage_1:"IP 信息已隐藏，截图时请注意隐私。",
+    maskedInfoMessage_1: "IP 信息已隐藏，截图时请注意隐私。",
     maskedInfoTitle: "全部隐藏成功",
-    maskedInfoMessage:"所有信息已隐藏，现在可以安心截图了。",
+    maskedInfoMessage: "所有信息已隐藏，现在可以安心截图了。",
     unmaskedInfoTitle: "取消隐藏",
-    unmaskedInfoMessage:"信息已显示，截图时请注意隐私。",
+    unmaskedInfoMessage: "信息已显示，截图时请注意隐私。",
 
   },
   page: {
     title:
       "查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | Jason Ng 阿禅开源作品",
   },
-  addBingMapKey : {
+  addBingMapKey: {
     Title: "添加 Bing Map API Key",
     Note: "添加后，可以在 IP 信息中显示地图。API Key 只会在当前浏览器中保存，方便下次使用，不会上传到服务器。",
     Placeholder: "请输入 Bing Map API Key",

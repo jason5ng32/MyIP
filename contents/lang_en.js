@@ -63,25 +63,27 @@ export default {
   },
   alert: {
     id: "alert",
+    refreshEverythingMessage: "Refreshing all data, please wait...",
+    refreshEverythingTitle: "Refreshing",
     OhNo: "Oh No!",
     Congrats: "Congrats!",
     OhNo_Message:
       "You seem to be not connected to a VPN/proxy, some content may not be displayed.",
     Congrats_Message:
       "You are now connected to a VPN/proxy, welcome to the new world.",
-      maskedInfoTitle_1: "IP masked",
-      maskedInfoMessage_1:"IP information has been masked, please be careful when taking screenshots.",
-      maskedInfoTitle: "All infos masked",
-      maskedInfoMessage:"All information has been masked, you can now safely take screenshots.",
-      unmaskedInfoTitle: "Infos Unmasked",
-      unmaskedInfoMessage:"Information has been unmasked, please be careful when taking screenshots.",
+    maskedInfoTitle_1: "IP masked",
+    maskedInfoMessage_1: "IP information has been masked, please be careful when taking screenshots.",
+    maskedInfoTitle: "All infos masked",
+    maskedInfoMessage: "All information has been masked, you can now safely take screenshots.",
+    unmaskedInfoTitle: "Infos Unmasked",
+    unmaskedInfoMessage: "Information has been unmasked, please be careful when taking screenshots.",
 
   },
   page: {
     title:
       "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Jason Ng Open Source",
   },
-  addBingMapKey : {
+  addBingMapKey: {
     Title: "Add Bing Map API Key",
     Note: "After adding, the map can be displayed in the IP information. The API Key will only be saved in the current browser for the next use, and will not be uploaded to the server.",
     Placeholder: "Please enter Bing Map API Key",

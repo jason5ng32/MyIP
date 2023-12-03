@@ -25,10 +25,9 @@
     <!-- Nav -->
     <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
       :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
-
       <div class="jn-logo">
-
-        <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#"><i class="bi bi-box-seam-fill"></i>
+        <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#" @click="handleLogoClick"><i
+            class="bi bi-box-seam-fill"></i>
           {{currentTexts.nav.Title}}</a>
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" @change="toggleDarkMode"
@@ -178,7 +177,7 @@
         <div class="availability-test-section mb-4">
           <div class="jn-title2">
             <h2 id="scrollspyHeading2" :class="{'mobile-h2' : isMobile }">🚦 {{currentTexts.connectivity.Title}}</h2>
-            <button @click="checkAllConnectivity"
+            <button @click="checkAllConnectivity(0)"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
@@ -262,9 +261,9 @@
     </div>
 
     <!-- Info Mask BTN-->
-    <button v-if="isInfosLoaded" class="btn position-fixed" 
-    :class="infoMaskLevel === 0 ? 'btn-success' : infoMaskLevel === 1 ? 'btn-warning' : 'btn-secondary'" 
-    style="bottom: 66px; right: 20px; z-index: 1050;" @click="toggleInfoMask">  
+    <button v-if="isInfosLoaded" class="btn position-fixed"
+      :class="infoMaskLevel === 0 ? 'btn-success' : infoMaskLevel === 1 ? 'btn-warning' : 'btn-secondary'"
+      style="bottom: 66px; right: 20px; z-index: 1050;" @click="toggleInfoMask">
       <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
     </button>
 

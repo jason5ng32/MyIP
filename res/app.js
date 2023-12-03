@@ -240,13 +240,13 @@ new Vue({
       }, 2000);
     },
 
-    checkConnectivityHandler(test) {
+    checkConnectivityHandler(test, isAlertToShow) {
       const beginTime = +new Date();
       test.status = this.currentTexts.connectivity.checking;
       var img = new Image();
       var timeout = setTimeout(() => {
         test.status = this.currentTexts.connectivity.StatusUnavailable;
-        if (test.id === "google") {
+        if (test.id === "google" && isAlertToShow) {
           this.alertStyle = "text-danger";
           this.alertMessage = this.currentTexts.alert.OhNo_Message;
           this.alertTitle = this.currentTexts.alert.OhNo;
@@ -259,7 +259,7 @@ new Vue({
         test.status =
           this.currentTexts.connectivity.StatusAvailable +
           ` ( ${+new Date() - beginTime} ms )`;
-        if (test.id === "google") {
+        if (test.id === "google" && isAlertToShow) {
           this.alertStyle = "text-success";
           this.alertMessage = this.currentTexts.alert.Congrats_Message;
           this.alertTitle = this.currentTexts.alert.Congrats;
@@ -270,7 +270,7 @@ new Vue({
       img.onerror = () => {
         clearTimeout(timeout);
         test.status = this.currentTexts.connectivit.StatusUnavailable;
-        if (test.id === "google") {
+        if (test.id === "google" && isAlertToShow) {
           this.alertStyle = "text-danger";
           this.alertMessage = this.currentTexts.alert.OhNo_Message;
           this.alertTitle = this.currentTexts.alert.OhNo;
@@ -281,10 +281,15 @@ new Vue({
       img.src = `${test.url}${Date.now()}`;
     },
 
-    checkAllConnectivity() {
+    checkAllConnectivity(isAlertToShow) {
       connectivityTests.forEach((test) => {
-        this.checkConnectivityHandler(test);
+        this.checkConnectivityHandler(test, isAlertToShow);
       });
+      if (isAlertToShow) {
+        setTimeout(() => {
+          this.showToast();
+        }, 3500);
+      }
     },
     showToast() {
       this.$nextTick(() => {
@@ -673,6 +678,31 @@ new Vue({
         document.querySelector('meta[name="background-color"]').setAttribute('content', '#ffffff');
       }
     },
+    // Logo 点击事件
+    handleLogoClick() {
+      if (window.scrollY === 0) {
+        this.refreshEverything();
+        setTimeout(() => {
+          this.alertStyle = "text-success";
+          this.alertMessage = this.currentTexts.alert.refreshEverythingMessage;
+          this.alertTitle = this.currentTexts.alert.refreshEverythingTitle;
+          this.alertToShow = true;
+          this.showToast();
+        }, 500);
+      }
+    },
+    refreshEverything() {
+      this.checkAllIPs();
+      setTimeout(() => {
+        this.checkAllConnectivity(0);
+      }, 2000);
+      setTimeout(() => {
+        this.checkAllWebRTC();
+      }, 4000);
+      setTimeout(() => {
+        this.checkAllDNSLeakTest();
+      }, 3000);
+    }
 
   },
 
@@ -714,11 +744,8 @@ new Vue({
     this.PWAColor();
     this.checkAllIPs();
     setTimeout(() => {
-      this.checkAllConnectivity();
+      this.checkAllConnectivity(1);
     }, 2500);
-    setTimeout(() => {
-      this.showToast();
-    }, 5500);
     setTimeout(() => {
       this.checkAllWebRTC();
     }, 4000);
@@ -726,7 +753,7 @@ new Vue({
       this.checkAllDNSLeakTest();
     }, 2500);
     setTimeout(() => {
-      this.checkAllConnectivity();
+      this.checkAllConnectivity(0);
     }, 6000);
     setTimeout(() => {
       this.isInfosLoaded = true;
