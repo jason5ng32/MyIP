@@ -689,6 +689,7 @@ new Vue({
           this.alertToShow = true;
           this.showToast();
         }, 500);
+        this.infoMaskLevel = 0;
       }
     },
     refreshEverything() {
