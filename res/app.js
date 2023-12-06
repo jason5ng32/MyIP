@@ -268,15 +268,22 @@ new Vue({
     checkAllConnectivity(isAlertToShow) {
       let totalTests = connectivityTests.length;
       let successCount = 0;
+      let completedCount = 0;
 
       const onTestComplete = (isSuccess) => {
-        if (isSuccess) successCount++;
-        if (successCount === totalTests) {
-          // 所有测试成功
-          this.updateConnectivityAlert(true, "success");
-        } else if (connectivityTests.every(test => test.status !== "")) {
-          // 所有测试完成，但有失败的测试
-          this.updateConnectivityAlert(true, "error");
+        if (isSuccess) {
+          successCount++;
+        }
+        completedCount++;
+
+        // 只有当所有测试都完成时才做出最终判断
+        if (completedCount === totalTests) {
+          this.alertToShow = true;
+          if (successCount === totalTests) {
+            this.updateConnectivityAlert(true, "success");
+          } else {
+            this.updateConnectivityAlert(true, "error");
+          }
         }
       };
 
@@ -708,7 +715,7 @@ new Vue({
     refreshEverything() {
       this.checkAllIPs();
       setTimeout(() => {
-        this.checkAllConnectivity(0);
+        this.checkAllConnectivity(false);
       }, 2000);
       setTimeout(() => {
         this.checkAllWebRTC();
@@ -758,7 +765,7 @@ new Vue({
     this.PWAColor();
     this.checkAllIPs();
     setTimeout(() => {
-      this.checkAllConnectivity(1);
+      this.checkAllConnectivity(true);
     }, 2500);
     setTimeout(() => {
       this.checkAllWebRTC();
@@ -767,7 +774,7 @@ new Vue({
       this.checkAllDNSLeakTest();
     }, 2500);
     setTimeout(() => {
-      this.checkAllConnectivity(0);
+      this.checkAllConnectivity(false);
     }, 6000);
     setTimeout(() => {
       this.isInfosLoaded = true;

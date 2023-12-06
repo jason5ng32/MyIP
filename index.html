@@ -13,7 +13,8 @@
   <!--  Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="res/style.css">
@@ -177,7 +178,7 @@
         <div class="availability-test-section mb-4">
           <div class="jn-title2">
             <h2 id="scrollspyHeading2" :class="{'mobile-h2' : isMobile }">🚦 {{currentTexts.connectivity.Title}}</h2>
-            <button @click="checkAllConnectivity(0)"
+            <button @click="checkAllConnectivity(false)"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
