@@ -412,7 +412,7 @@ new Vue({
         await new Promise((resolve, reject) => {
           setTimeout(() => {
             if (!candidateReceived) {
-              reject(new Error("连接 STUN 服务器超时"));
+              reject(new Error("Stun Server Test Timeout"));
             } else {
               resolve();
             }
@@ -420,7 +420,7 @@ new Vue({
         });
       } catch (error) {
         console.error("STUN Server Test Error:", error);
-        stun.ip = "测试超时或数据出错";
+        stun.ip = this.currentTexts.webrtc.StatusError;
       }
     },
 
