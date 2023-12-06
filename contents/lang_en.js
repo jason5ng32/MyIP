@@ -67,10 +67,8 @@ export default {
     refreshEverythingTitle: "Refreshing",
     OhNo: "Oh No!",
     Congrats: "Congrats!",
-    OhNo_Message:
-      "You seem to be not connected to a VPN/proxy, some content may not be displayed.",
-    Congrats_Message:
-      "You are now connected to a VPN/proxy, welcome to the new world.",
+    OhNo_Message: "Connectivity test failed, some websites are not accessible.",
+    Congrats_Message: "All connectivity tests passed, you can access all websites.",
     maskedInfoTitle_1: "IP masked",
     maskedInfoMessage_1: "IP information has been masked, please be careful when taking screenshots.",
     maskedInfoTitle: "All infos masked",

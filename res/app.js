@@ -240,57 +240,70 @@ new Vue({
       }, 2000);
     },
 
-    checkConnectivityHandler(test, isAlertToShow) {
+    checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
       const beginTime = +new Date();
-      test.status = this.currentTexts.connectivity.checking;
+
       var img = new Image();
       var timeout = setTimeout(() => {
         test.status = this.currentTexts.connectivity.StatusUnavailable;
-        if (test.id === "google" && isAlertToShow) {
-          this.alertStyle = "text-danger";
-          this.alertMessage = this.currentTexts.alert.OhNo_Message;
-          this.alertTitle = this.currentTexts.alert.OhNo;
-          this.alertToShow = true;
-        }
+        onTestComplete(false); // 调用回调函数，参数表示测试失败
       }, 3 * 1000);
 
       img.onload = () => {
         clearTimeout(timeout);
-        test.status =
-          this.currentTexts.connectivity.StatusAvailable +
-          ` ( ${+new Date() - beginTime} ms )`;
-        if (test.id === "google" && isAlertToShow) {
-          this.alertStyle = "text-success";
-          this.alertMessage = this.currentTexts.alert.Congrats_Message;
-          this.alertTitle = this.currentTexts.alert.Congrats;
-          this.alertToShow = true;
-        }
+        test.status = this.currentTexts.connectivity.StatusAvailable + ` ( ${+new Date() - beginTime} ms )`;
+        onTestComplete(true); // 调用回调函数，参数表示测试成功
       };
 
       img.onerror = () => {
         clearTimeout(timeout);
-        test.status = this.currentTexts.connectivit.StatusUnavailable;
-        if (test.id === "google" && isAlertToShow) {
-          this.alertStyle = "text-danger";
-          this.alertMessage = this.currentTexts.alert.OhNo_Message;
-          this.alertTitle = this.currentTexts.alert.OhNo;
-          this.alertToShow = true;
-        }
+        test.status = this.currentTexts.connectivity.StatusUnavailable;
+        onTestComplete(false); // 调用回调函数，参数表示测试失败
       };
 
       img.src = `${test.url}${Date.now()}`;
     },
 
+
     checkAllConnectivity(isAlertToShow) {
+      let totalTests = connectivityTests.length;
+      let successCount = 0;
+
+      const onTestComplete = (isSuccess) => {
+        if (isSuccess) successCount++;
+        if (successCount === totalTests) {
+          // 所有测试成功
+          this.updateConnectivityAlert(true, "success");
+        } else if (connectivityTests.every(test => test.status !== "")) {
+          // 所有测试完成，但有失败的测试
+          this.updateConnectivityAlert(true, "error");
+        }
+      };
+
       connectivityTests.forEach((test) => {
-        this.checkConnectivityHandler(test, isAlertToShow);
+        this.checkConnectivityHandler(test, isAlertToShow, onTestComplete);
       });
+
       if (isAlertToShow) {
         setTimeout(() => {
           this.showToast();
         }, 3500);
       }
     },
+
+    updateConnectivityAlert(show, type) {
+      this.alertToShow = show;
+      if (type === "success") {
+        this.alertStyle = "text-success";
+        this.alertMessage = this.currentTexts.alert.Congrats_Message;
+        this.alertTitle = this.currentTexts.alert.Congrats;
+      } else {
+        this.alertStyle = "text-danger";
+        this.alertMessage = this.currentTexts.alert.OhNo_Message;
+        this.alertTitle = this.currentTexts.alert.OhNo;
+      }
+    },
+
     showToast() {
       this.$nextTick(() => {
         const toastEl = this.$refs.toast;
