@@ -80,6 +80,22 @@ export default {
     unmaskedInfoMessage:
       "Information has been unmasked, please be careful when taking screenshots.",
   },
+  shortcutKeys: {
+    id: "shortcutKeys",
+    GoToTop: "Go to Top",
+    GoToBottom: "Go to Bottom",
+    ToggleDarkMode: "Toggle Dark Mode",
+    RefreshEverything: "Refresh Everything",
+    RefreshIPCard: "Refresh IP Card",
+    RefreshConnectivityTests: "Refresh Connectivity Tests",
+    RefreshWebRTC: "Refresh WebRTC Test",
+    RefreshDNSLeakTest: "Refresh DNS Leak Test",
+    ToggleMaps: "Toggle Maps",
+    IPCheck: "IP Check",
+    AddBingMapKey: "Add Bing Map API Key",
+    ToggleInfoMask: "Toggle Info Masking",
+    Help: "Show Shortcut Keys",
+  },
   page: {
     title:
       "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Jason Ng Open Source",

@@ -168,3 +168,10 @@ footer {
 .jn-loading {
     margin-top: 50vh;
 }
+.jn-shortcut-row {
+    margin: 2pt 0 2pt 0;
+    border-bottom: 1px solid;
+}
+.jn-dark-mode-help-border {
+    border-color: #a8a8a863 !important;
+}

@@ -385,11 +385,11 @@
 
           </div>
           <div class="modal-body" :class="{'dark-mode' : isDarkMode }">
-            <div v-for="key in keyMap" :key="key.keys" class="row border-bottom p-1 mb-1">
+            <div v-for="key in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row" :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border': 'border-light-subtle' ]">
               <div class="col">
-                <h5>
-                  {{ key.keys.replace('|',' or ').replace('\\', '') }}
-                </h5>
+                <kbd :class="{ 'text-bg-light':isDarkMode}">
+                  {{ key.keys.replace(/[\\\(\)]/g, '') }}
+                </kbd>
               </div>
               <div class="col-8">{{ key.description }}</div>
             </div>

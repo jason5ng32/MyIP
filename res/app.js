@@ -725,14 +725,6 @@ new Vue({
     handleLogoClick() {
       if (window.scrollY === 0) {
         this.refreshEverything();
-        setTimeout(() => {
-          this.alertStyle = "text-success";
-          this.alertMessage = this.currentTexts.alert.refreshEverythingMessage;
-          this.alertTitle = this.currentTexts.alert.refreshEverythingTitle;
-          this.alertToShow = true;
-          this.showToast();
-        }, 500);
-        this.infoMaskLevel = 0;
       }
     },
     refreshEverything() {
@@ -746,6 +738,14 @@ new Vue({
       setTimeout(() => {
         this.checkAllDNSLeakTest();
       }, 3000);
+      setTimeout(() => {
+        this.alertStyle = "text-success";
+        this.alertMessage = this.currentTexts.alert.refreshEverythingMessage;
+        this.alertTitle = this.currentTexts.alert.refreshEverythingTitle;
+        this.alertToShow = true;
+        this.showToast();
+      }, 500);
+      this.infoMaskLevel = 0;
     },
     hideLoading() {
       var loadingElement = document.getElementById("loading");
@@ -799,7 +799,7 @@ new Vue({
         action() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         },
-        description: "Go To Top",
+        description: this.currentTexts.shortcutKeys.GoToTop,
       },
       {
         keys: "G",
@@ -809,17 +809,17 @@ new Vue({
             behavior: "smooth",
           });
         },
-        description: "Go To Bottom",
+        description: this.currentTexts.shortcutKeys.GoToBottom,
       },
       {
-        keys: "s",
+        keys: "d",
         action: this.toggleDarkMode,
-        description: "Toggle Dark Mode",
+        description: this.currentTexts.shortcutKeys.ToggleDarkMode,
       },
       {
         keys: "rr",
         action: this.refreshEverything,
-        description: "Full-Scale Testing",
+        description: this.currentTexts.shortcutKeys.RefreshEverything,
       },
       {
         keys: "r([1-6])",
@@ -829,7 +829,7 @@ new Vue({
           this.scrollToElement(el, 60);
           this.refreshCard(card);
         },
-        description: "Refresh Cards",
+        description: this.currentTexts.shortcutKeys.RefreshIPCard,
       },
       {
         keys: "rc",
@@ -837,7 +837,7 @@ new Vue({
           this.scrollToElement("scrollspyHeading2", 80);
           this.checkAllConnectivity(false);
         },
-        description: "Refresh Connectivity Tests",
+        description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
       },
       {
         keys: "rw",
@@ -845,7 +845,7 @@ new Vue({
           this.scrollToElement("scrollspyHeading3", 80);
           this.checkAllWebRTC();
         },
-        description: "Refresh WebRTC Tests",
+        description: this.currentTexts.shortcutKeys.RefreshWebRTC,
       },
       {
         keys: "rd",
@@ -853,7 +853,7 @@ new Vue({
           this.scrollToElement("scrollspyHeading4", 80);
           this.checkAllDNSLeakTest();
         },
-        description: "Refresh DNS Leak Tests",
+        description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
       },
       {
         keys: "m",
@@ -865,7 +865,7 @@ new Vue({
             this.openModal("addBingMapKey");
           }
         },
-        description: "Toggle Maps (or Add Bing Map API Key)",
+        description: this.currentTexts.shortcutKeys.ToggleMaps,
       },
       {
         keys: "k",
@@ -873,21 +873,21 @@ new Vue({
           window.scrollTo({ top: 0, behavior: "smooth" });
           this.openModal("addBingMapKey");
         },
-        description: "Add/Edit Bing Map API Key",
+        description: this.currentTexts.shortcutKeys.AddBingMapKey,
       },
       {
         keys: "c",
         action: () => {
           this.openModal("IPCheck");
         },
-        description: "IP Check",
+        description: this.currentTexts.shortcutKeys.IPCheck,
       },
       {
         keys: "h",
         action: () => {
           this.isInfosLoaded && this.toggleInfoMask();
         },
-        description: "Toggle Info Mask",
+        description: this.currentTexts.shortcutKeys.ToggleInfoMask,
       },
 
       // help
@@ -896,7 +896,7 @@ new Vue({
         action: () => {
           this.openModal("helpModal");
         },
-        description: "Show Shortcuts",
+        description: this.currentTexts.shortcutKeys.Help,
       },
     ]);
     this.keyMap = keyMap;

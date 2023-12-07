@@ -76,6 +76,22 @@ export default {
     unmaskedInfoTitle: "取消隐藏",
     unmaskedInfoMessage: "信息已显示，截图时请注意隐私。",
   },
+  shortcutKeys: {
+    id: "shortcutKeys",
+    GoToTop: "回到顶部",
+    GoToBottom: "回到底部",
+    ToggleDarkMode: "切换深色模式",
+    RefreshEverything: "刷新所有数据",
+    RefreshIPCard: "刷新某张 IP 卡片",
+    RefreshConnectivityTests: "刷新连通性测试",
+    RefreshWebRTC: "刷新 WebRTC 测试",
+    RefreshDNSLeakTest: "刷新 DNS 泄漏测试",
+    ToggleMaps: "切换地图显示",
+    IPCheck: "IP 查询",
+    AddBingMapKey: "添加 Bing Map API Key",
+    ToggleInfoMask: "切换信息隐藏",
+    Help: "显示快捷键",
+  },
   page: {
     title:
       "查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | Jason Ng 阿禅开源作品",
