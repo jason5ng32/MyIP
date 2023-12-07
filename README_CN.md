@@ -7,7 +7,7 @@
 
 [🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
 
-在这里体验：[jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
+在这里体验：[https://ipcheck.ing](https://ipcheck.ing)
 
 备注：体验地址的一些数据可能出不来，是因为最近用的人比较多……（我也实在没想到），自己部署一下就好。
 

@@ -8,7 +8,7 @@
 [🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
 
 
-Demo: [jason5ng32.github.io/MyIP](https://jason5ng32.github.io/MyIP/)
+Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
 Notes: Please note that some data on the demo site may not be displayed because it has been accessed frequently recently (I didn't expect that either). To circumvent this, you can deploy the site yourself.
 
