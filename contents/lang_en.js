@@ -68,14 +68,17 @@ export default {
     OhNo: "Oh No!",
     Congrats: "Congrats!",
     OhNo_Message: "Connectivity test failed, some websites are not accessible.",
-    Congrats_Message: "All connectivity tests passed, you can access all websites.",
+    Congrats_Message:
+      "All connectivity tests passed, you can access all websites.",
     maskedInfoTitle_1: "IP masked",
-    maskedInfoMessage_1: "IP information has been masked, please be careful when taking screenshots.",
+    maskedInfoMessage_1:
+      "IP information has been masked, please be careful when taking screenshots.",
     maskedInfoTitle: "All infos masked",
-    maskedInfoMessage: "All information has been masked, you can now safely take screenshots.",
+    maskedInfoMessage:
+      "All information has been masked, you can now safely take screenshots.",
     unmaskedInfoTitle: "Infos Unmasked",
-    unmaskedInfoMessage: "Information has been unmasked, please be careful when taking screenshots.",
-
+    unmaskedInfoMessage:
+      "Information has been unmasked, please be careful when taking screenshots.",
   },
   page: {
     title:
@@ -88,5 +91,8 @@ export default {
     Button: "Save",
     removeButton: "Remove",
     Error: "Please enter a valid Bing Map API Key.",
-  }
+  },
+  helpModal: {
+    Title: "Shortcuts",
+  },
 };

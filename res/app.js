@@ -4,6 +4,7 @@ import connectivityTests from "../contents/connectivityTests.js";
 import stunServers from "../contents/stunServers.js";
 import ipDataCards from "../contents/ipDataCards.js";
 import leakTest from "../contents/leakTest.js";
+import { mappingKeys, keyMap } from "./shortcut.js";
 
 new Vue({
   el: "#app",
@@ -40,6 +41,9 @@ new Vue({
     originstunServers: {},
     leakTest,
     originleakTest: {},
+
+    // keyMap
+    keyMap,
   },
   methods: {
     getIPFromUpai() {
@@ -251,7 +255,9 @@ new Vue({
 
       img.onload = () => {
         clearTimeout(timeout);
-        test.status = this.currentTexts.connectivity.StatusAvailable + ` ( ${+new Date() - beginTime} ms )`;
+        test.status =
+          this.currentTexts.connectivity.StatusAvailable +
+          ` ( ${+new Date() - beginTime} ms )`;
         onTestComplete(true); // 调用回调函数，参数表示测试成功
       };
 
@@ -263,7 +269,6 @@ new Vue({
 
       img.src = `${test.url}${Date.now()}`;
     },
-
 
     checkAllConnectivity(isAlertToShow) {
       let totalTests = connectivityTests.length;
@@ -382,7 +387,6 @@ new Vue({
         this.inputBingMapAPIKEY = "";
       }
       this.bingMapAPIKEYError = false;
-
     },
     async checkSTUNServer(stun) {
       try {
@@ -625,8 +629,7 @@ new Vue({
         });
         this.leakTest.forEach((server) => {
           server.ip = "12.34.56.78";
-        }
-        );
+        });
         this.infoMaskLevel = 1;
       } else if (this.infoMaskLevel === 1) {
         this.ipDataCards.forEach((card) => {
@@ -661,13 +664,8 @@ new Vue({
           if (card.latitude && card.longitude) {
             card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
           }
-        }
-        );
-        const modalElement = document.getElementById('addBingMapKey');
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
+        });
+        this.closeModal("addBingMapKey");
         this.isMapShown = true;
       } else {
         this.bingMapAPIKEYError = true;
@@ -677,11 +675,7 @@ new Vue({
       this.bingMapAPIKEY = "";
       this.inputBingMapAPIKEY = "";
       localStorage.removeItem("bingMapAPIKEY");
-      const modalElement = document.getElementById('addBingMapKey');
-      const modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
+      this.closeModal("addBingMapKey");
       this.isMapShown = false;
     },
     isValidKey(key) {
@@ -691,12 +685,41 @@ new Vue({
     // PWA 颜色
     PWAColor() {
       if (this.isDarkMode) {
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#171a1d');
-        document.querySelector('meta[name="background-color"]').setAttribute('content', '#212529');
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", "#171a1d");
+        document
+          .querySelector('meta[name="background-color"]')
+          .setAttribute("content", "#212529");
       } else {
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f8f9fa');
-        document.querySelector('meta[name="background-color"]').setAttribute('content', '#ffffff');
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", "#f8f9fa");
+        document
+          .querySelector('meta[name="background-color"]')
+          .setAttribute("content", "#ffffff");
       }
+    },
+    // open or close modal
+    openModal(id) {
+      const modalElement = document.getElementById(id);
+      const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.show();
+      }
+    },
+    closeModal(id) {
+      const modalElement = document.getElementById(id);
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    },
+    // scroll to element
+    scrollToElement(el, offset = 0) {
+      const element = typeof el === "string" ? document.getElementById(el) : el;
+      const y = element.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     },
     // Logo 点击事件
     handleLogoClick() {
@@ -725,9 +748,9 @@ new Vue({
       }, 3000);
     },
     hideLoading() {
-      var loadingElement = document.getElementById('loading');
+      var loadingElement = document.getElementById("loading");
       if (loadingElement) {
-        loadingElement.classList.add('hidden');
+        loadingElement.classList.add("hidden");
       }
     },
   },
@@ -770,6 +793,113 @@ new Vue({
     this.PWAColor();
     this.checkAllIPs();
     this.hideLoading();
+    mappingKeys([
+      {
+        keys: "gg",
+        action() {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        },
+        description: "Go To Top",
+      },
+      {
+        keys: "G",
+        action() {
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+          });
+        },
+        description: "Go To Bottom",
+      },
+      {
+        keys: "s",
+        action: this.toggleDarkMode,
+        description: "Toggle Dark Mode",
+      },
+      {
+        keys: "rr",
+        action: this.refreshEverything,
+        description: "Full-Scale Testing",
+      },
+      {
+        keys: "r([1-6])",
+        action: (num) => {
+          const card = this.ipDataCards[num - 1];
+          const [el] = this.$refs[card.id];
+          this.scrollToElement(el, 60);
+          this.refreshCard(card);
+        },
+        description: "Refresh Cards",
+      },
+      {
+        keys: "rc",
+        action: () => {
+          this.scrollToElement("scrollspyHeading2", 80);
+          this.checkAllConnectivity(false);
+        },
+        description: "Refresh Connectivity Tests",
+      },
+      {
+        keys: "rw",
+        action: () => {
+          this.scrollToElement("scrollspyHeading3", 80);
+          this.checkAllWebRTC();
+        },
+        description: "Refresh WebRTC Tests",
+      },
+      {
+        keys: "rd",
+        action: () => {
+          this.scrollToElement("scrollspyHeading4", 80);
+          this.checkAllDNSLeakTest();
+        },
+        description: "Refresh DNS Leak Tests",
+      },
+      {
+        keys: "m",
+        action: () => {
+          if (this.bingMapAPIKEY) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            this.toggleMaps();
+          } else {
+            this.openModal("addBingMapKey");
+          }
+        },
+        description: "Toggle Maps (or Add Bing Map API Key)",
+      },
+      {
+        keys: "k",
+        action: () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          this.openModal("addBingMapKey");
+        },
+        description: "Add/Edit Bing Map API Key",
+      },
+      {
+        keys: "c",
+        action: () => {
+          this.openModal("IPCheck");
+        },
+        description: "IP Check",
+      },
+      {
+        keys: "h",
+        action: () => {
+          this.isInfosLoaded && this.toggleInfoMask();
+        },
+        description: "Toggle Info Mask",
+      },
+
+      // help
+      {
+        keys: "\\?",
+        action: () => {
+          this.openModal("helpModal");
+        },
+        description: "Show Shortcuts",
+      },
+    ]);
+    this.keyMap = keyMap;
     setTimeout(() => {
       this.checkAllConnectivity(true);
     }, 2500);
@@ -788,6 +918,9 @@ new Vue({
     const modalElement = document.getElementById("IPCheck");
     modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
     const bingMapAPIKEYElement = document.getElementById("addBingMapKey");
-    bingMapAPIKEYElement.addEventListener("hidden.bs.modal", this.resetModalData);
+    bingMapAPIKEYElement.addEventListener(
+      "hidden.bs.modal",
+      this.resetModalData
+    );
   },
 });

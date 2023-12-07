@@ -75,7 +75,6 @@ export default {
     maskedInfoMessage: "所有信息已隐藏，现在可以安心截图了。",
     unmaskedInfoTitle: "取消隐藏",
     unmaskedInfoMessage: "信息已显示，截图时请注意隐私。",
-
   },
   page: {
     title:
@@ -88,5 +87,8 @@ export default {
     Button: "保存",
     removeButton: "删除",
     Error: "请输入有效的 Bing Map API Key。",
+  },
+  helpModal: {
+    Title: "快捷键",
   },
 };
