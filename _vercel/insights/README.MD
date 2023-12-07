@@ -1,0 +1,1 @@
+This will enabled Vercel Analytics
