@@ -22,7 +22,15 @@
 </head>
 
 <body>
-  <div id="app">
+
+  <!-- Loading -->
+  <div id="loading" class="d-flex justify-content-center jn-loading">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div id="app" v-cloak>
     <!-- Nav -->
     <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
       :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
@@ -172,7 +180,6 @@
             </div>
           </div>
         </div>
-
 
         <!-- Connectivity -->
         <div class="availability-test-section mb-4">

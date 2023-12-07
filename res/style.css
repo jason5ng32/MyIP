@@ -154,6 +154,17 @@ footer {
 .mobile-list {
     border: 0;
 }
+
 .mobile-h2 {
     font-size: 1.25rem;
+}
+
+[v-cloak] {
+    display: none;
+}
+.hidden {
+    display: none !important;
+}
+.jn-loading {
+    margin-top: 50vh;
 }

@@ -723,8 +723,13 @@ new Vue({
       setTimeout(() => {
         this.checkAllDNSLeakTest();
       }, 3000);
-    }
-
+    },
+    hideLoading() {
+      var loadingElement = document.getElementById('loading');
+      if (loadingElement) {
+        loadingElement.classList.add('hidden');
+      }
+    },
   },
 
   created() {
@@ -764,6 +769,7 @@ new Vue({
     this.checkSystemDarkMode();
     this.PWAColor();
     this.checkAllIPs();
+    this.hideLoading();
     setTimeout(() => {
       this.checkAllConnectivity(true);
     }, 2500);
