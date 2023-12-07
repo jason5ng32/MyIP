@@ -125,7 +125,7 @@
           </div>
           <div class="jn-card-deck">
             <div class="row">
-              <div v-for="card in ipDataCards" :key="card.id"
+              <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
                 :class="{'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true}">
                 <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                   <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode }"
@@ -374,9 +374,35 @@
       </div>
     </div>
 
+    <!-- help modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModal" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
+            <h5 class="modal-title" id="helpModal">{{currentTexts.helpModal.Title}}</h5>
+            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+              data-bs-dismiss="modal" aria-label="Close"></button>
+
+          </div>
+          <div class="modal-body" :class="{'dark-mode' : isDarkMode }">
+            <div v-for="key in keyMap" :key="key.keys" class="row border-bottom p-1 mb-1">
+              <div class="col">
+                <h5>
+                  {{ key.keys.replace('|',' or ').replace('\\', '') }}
+                </h5>
+              </div>
+              <div class="col-8">{{ key.description }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <footer>
       <p class="text-center">Creators: Jason Ng & ChatGPT <a href="https://github.com/jason5ng32/MyIP" class="link-dark"
-          target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a></p>
+          target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
+      </p>
     </footer>
 
   </div>
