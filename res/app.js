@@ -848,7 +848,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.RefreshWebRTC,
       },
       {
-        keys: "rd",
+        keys: "rl",
         action: () => {
           this.scrollToElement("scrollspyHeading4", 80);
           this.checkAllDNSLeakTest();
