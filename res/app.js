@@ -568,6 +568,20 @@ new Vue({
       document.title = this.currentTexts.page.title;
     },
     // 更新语言
+    getLanguageFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const language = urlParams.get('hl');
+      if (language === 'zh' || language === 'cn') {
+        this.currentLanguage = 'cn';
+        this.updateTexts();
+        return true;
+      } else if (language === 'en') {
+        this.currentLanguage = 'en';
+        this.updateTexts();
+        return true;
+      }
+      return false;
+    },
     updateTexts() {
       this.currentTexts = this.currentLanguage === "en" ? textEN : textCN;
     },
@@ -756,7 +770,10 @@ new Vue({
   },
 
   created() {
-    this.checkBrowserLanguage();
+    const isLanguageSet = this.getLanguageFromURL();
+    if (!isLanguageSet) {
+      this.checkBrowserLanguage();
+    }
     this.updateTexts();
     this.langPatch();
     if (localStorage.getItem("bingMapAPIKEY") && this.bingMapAPIKEY === "") {
