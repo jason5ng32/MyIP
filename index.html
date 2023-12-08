@@ -385,7 +385,8 @@
 
           </div>
           <div class="modal-body" :class="{'dark-mode' : isDarkMode }">
-            <div v-for="key in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row" :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border': 'border-light-subtle' ]">
+            <div v-for="key in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row"
+              :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border': 'border-light-subtle' ]">
               <div class="col">
                 <kbd :class="{ 'text-bg-light':isDarkMode}">
                   {{ key.keys.replace(/[\\\(\)]/g, '') }}
@@ -428,13 +429,12 @@
     }
   </script>
 
-  <!-- Vercel Analytics Start -->
+  <!-- Google Analytics Start -->
+  <!-- If you want to use Google Analytics, please do some changes on ga.js file. -->
   <!-- Remove this script if you want to disable analytics -->
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
-  <!-- Vercel Analytics End -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEYKKD81TL"></script>
+  <script src="res/ga.js"></script>
+  <!-- Google Analytics End -->
 
 
 </body>
