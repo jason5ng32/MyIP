@@ -165,13 +165,14 @@ new Vue({
     },
     async fetchIPDetails(cardIndex, ip) {
       const card = this.ipDataCards[cardIndex];
+      card.ip = ip;
       try {
         const response = await fetch(`https://ipapi.co/${ip}/json/`);
         const data = await response.json();
         if (data.error) {
           throw new Error(data.reason);
         }
-        card.ip = ip;
+        
         card.country_name = data.country_name || "";
         card.country_code = data.country || "";
         card.region = data.region || "";
