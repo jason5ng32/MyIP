@@ -311,17 +311,23 @@ new Vue({
     checkAllIPs() {
       // 从所有来源获取 IP 地址
       setTimeout(() => {
-        this.getIPFromCloudflare_V4();
-        this.getIPFromCloudflare_V6();
-      }, 1000);
-      setTimeout(() => {
-        this.getIPFromTaobao();
         this.getIPFromUpai();
       }, 100);
       setTimeout(() => {
+        this.getIPFromTaobao();
+      }, 500);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V4();
+      }, 1000);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V6();
+      }, 1500);
+      setTimeout(() => {
         this.getIPFromIpify_V4();
-        this.getIPFromIpify_V6();
       }, 2000);
+      setTimeout(() => {
+        this.getIPFromIpify_V6();
+      }, 2500);
     },
 
     checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
