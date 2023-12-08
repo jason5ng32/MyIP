@@ -9,15 +9,15 @@ import config from "../res/ga.js";
 
 Vue.config.productionTip = false;
 
-(function() {
+(function () {
   const scriptTag = document.createElement('script');
   scriptTag.async = true;
   scriptTag.src = `https://www.googletagmanager.com/gtag/js?id=${config.GOOGLE_ANALYTICS_ID}`;
   document.head.appendChild(scriptTag);
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function() {
-      window.dataLayer.push(arguments);
+  window.gtag = function () {
+    window.dataLayer.push(arguments);
   };
   window.gtag('js', new Date());
   window.gtag('config', config.GOOGLE_ANALYTICS_ID);
@@ -172,7 +172,7 @@ new Vue({
         if (data.error) {
           throw new Error(data.reason);
         }
-        
+
         card.country_name = data.country_name || "";
         card.country_code = data.country || "";
         card.region = data.region || "";
@@ -194,11 +194,46 @@ new Vue({
           // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
         }
       } catch (error) {
+        await this.fetchIPDetailsBackUp(cardIndex, ip);
+      }
+    },
+
+    async fetchIPDetailsBackUp(cardIndex, ip) {
+      const card = this.ipDataCards[cardIndex];
+      card.ip = ip;
+      try {
+        const response = await fetch(`https://ipapi.macify.workers.dev/json/${ip}`);
+        const data = await response.json();
+        if (data.status !== "success") {
+          throw new Error("IP lookup failed");
+        }
+
+        card.country_name = data.country || "";
+        card.country_code = data.countryCode || "";
+        card.region = data.regionName || "";
+        card.city = data.city || "";
+        card.latitude = data.lat || "";
+        card.longitude = data.lon || "";
+        card.isp = data.isp || "";
+        card.asn = data.as ? data.as.split(' ')[0] : "";
+
+        // 构造 AS Number 的链接
+        if (!card.asn) {
+          card.asnlink = false;
+          card.mapUrl = "";
+        } else {
+          card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
+          card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
+
+          // 可选改成 Google Maps 内嵌 iFrame
+          // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
+        }
+      } catch (error) {
         console.error("Get IP error:", error);
-        // 设置错误信息或保持字段为空
         card.mapUrl = "";
       }
     },
+
     refreshCard(card) {
       // 清空卡片数据
       this.clearCardData(card);
@@ -390,6 +425,39 @@ new Vue({
           mapUrl:
             data.latitude && data.longitude
               ? `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`
+              : "",
+        };
+      } catch (error) {
+        await this.fetchIPForModalBackUp(ip);
+      }
+    },
+    async fetchIPForModalBackUp(ip) {
+      try {
+        const response = await fetch(`https://ipapi.macify.workers.dev/json/${ip}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.status !== "success") {
+          throw new Error("IP lookup failed");
+        }
+
+        this.modalQueryResult = {
+          ip,
+          country_name: data.country || "",
+          country_code: data.countryCode || "",
+          region: data.regionName || "",
+          city: data.city || "",
+          latitude: data.lat || "",
+          longitude: data.lon || "",
+          isp: data.isp || "",
+          asn: data.as ? data.as.split(' ')[0] : "",
+          asnlink: data.as
+            ? `https://radar.cloudflare.com/traffic/${data.as.split(' ')[0]}`
+            : false,
+          mapUrl:
+            data.lat && data.lon
+              ? `https://www.google.com/maps?q=${data.lat},${data.lon}&z=2&output=embed`
               : "",
         };
       } catch (error) {
