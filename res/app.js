@@ -48,6 +48,7 @@ new Vue({
     isInfoMasked: false,
     isInfosLoaded: false,
     infoMaskLevel: 0,
+    ipDataCache: new Map(),
 
     // from contents
     connectivityTests,
@@ -163,9 +164,20 @@ new Vue({
           this.ipDataCards[5].ip = this.currentTexts.ipInfos.IPv6Error;
         });
     },
+
+    // 从 IP 地址获取详细信息
     async fetchIPDetails(cardIndex, ip) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
+
+      // 检查缓存中是否已有该 IP 的数据
+      if (this.ipDataCache.has(ip)) {
+        // 使用缓存的数据填充卡片
+        const cachedData = this.ipDataCache.get(ip);
+        Object.assign(card, cachedData);
+        return;
+      }
+
       try {
         const response = await fetch(`https://ipapi.co/${ip}/json/`);
         const data = await response.json();
@@ -173,27 +185,35 @@ new Vue({
           throw new Error(data.reason);
         }
 
-        card.country_name = data.country_name || "";
-        card.country_code = data.country || "";
-        card.region = data.region || "";
-        card.city = data.city || "";
-        card.latitude = data.latitude || "";
-        card.longitude = data.longitude || "";
-        card.isp = data.org || "";
-        card.asn = data.asn || "";
+        // 构造 AS Number 的链接和地图 URL
+        const asnlink = data.asn
+          ? `https://radar.cloudflare.com/traffic/${data.asn}`
+          : false;
+        const mapUrl =
+          data.latitude && data.longitude
+            ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.latitude},${data.longitude}/5?mapSize=800,640&pp=${data.latitude},${data.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
+            : "";
 
-        // 构造 AS Number 的链接
-        if (card.asn === "") {
-          card.asnlink = false;
-          card.mapUrl = "";
-        } else {
-          card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-          card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
+        // 更新卡片数据
+        const cardData = {
+          country_name: data.country_name || "",
+          country_code: data.country || "",
+          region: data.region || "",
+          city: data.city || "",
+          latitude: data.latitude || "",
+          longitude: data.longitude || "",
+          isp: data.org || "",
+          asn: data.asn || "",
+          asnlink,
+          mapUrl,
+        };
 
-          // 可选改成 Google Maps 内嵌 iFrame
-          // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
-        }
+        Object.assign(card, cardData);
+
+        // 将这次的数据保存到缓存中
+        this.ipDataCache.set(ip, cardData);
       } catch (error) {
+        console.error("Error fetching IP details:", error);
         await this.fetchIPDetailsBackUp(cardIndex, ip);
       }
     },
@@ -201,6 +221,15 @@ new Vue({
     async fetchIPDetailsBackUp(cardIndex, ip) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
+
+      // 检查缓存中是否已有该 IP 的数据
+      if (this.ipDataCache.has(ip)) {
+        // 使用缓存的数据填充卡片
+        const cachedData = this.ipDataCache.get(ip);
+        Object.assign(card, cachedData);
+        return;
+      }
+
       try {
         const response = await fetch(`https://api.ipcheck.ing/json/${ip}`);
         const data = await response.json();
@@ -208,26 +237,29 @@ new Vue({
           throw new Error("IP lookup failed");
         }
 
-        card.country_name = data.country || "";
-        card.country_code = data.countryCode || "";
-        card.region = data.regionName || "";
-        card.city = data.city || "";
-        card.latitude = data.lat || "";
-        card.longitude = data.lon || "";
-        card.isp = data.isp || "";
-        card.asn = data.as ? data.as.split(" ")[0] : "";
+        // 更新卡片数据
+        const cardData = {
+          country_name: data.country || "",
+          country_code: data.countryCode || "",
+          region: data.regionName || "",
+          city: data.city || "",
+          latitude: data.lat || "",
+          longitude: data.lon || "",
+          isp: data.isp || "",
+          asn: data.as ? data.as.split(" ")[0] : "",
+          asnlink: data.as
+            ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}`
+            : false,
+          mapUrl:
+            data.lat && data.lon
+              ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.latitude},${data.longitude}/5?mapSize=800,640&pp=${data.latitude},${data.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
+              : "",
+        };
 
-        // 构造 AS Number 的链接
-        if (!card.asn) {
-          card.asnlink = false;
-          card.mapUrl = "";
-        } else {
-          card.asnlink = `https://radar.cloudflare.com/traffic/${card.asn}`;
-          card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
+        Object.assign(card, cardData);
 
-          // 可选改成 Google Maps 内嵌 iFrame
-          // card.mapUrl = `https://www.google.com/maps?q=${card.latitude},${card.longitude}&z=2&output=embed`;
-        }
+        // 将这次的数据保存到缓存中
+        this.ipDataCache.set(ip, cardData);
       } catch (error) {
         console.error("Get IP error:", error);
         card.mapUrl = "";
@@ -284,17 +316,23 @@ new Vue({
     checkAllIPs() {
       // 从所有来源获取 IP 地址
       setTimeout(() => {
-        this.getIPFromCloudflare_V4();
-        this.getIPFromCloudflare_V6();
-      }, 1000);
-      setTimeout(() => {
-        this.getIPFromTaobao();
         this.getIPFromUpai();
       }, 100);
       setTimeout(() => {
-        this.getIPFromIpify_V4();
-        this.getIPFromIpify_V6();
+        this.getIPFromTaobao();
+      }, 1000);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V4();
       }, 2000);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V6();
+      }, 100);
+      setTimeout(() => {
+        this.getIPFromIpify_V4();
+      }, 4000);
+      setTimeout(() => {
+        this.getIPFromIpify_V6();
+      }, 1000);
     },
 
     checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
