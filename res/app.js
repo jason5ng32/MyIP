@@ -853,6 +853,20 @@ new Vue({
         modalInstance.hide();
       }
     },
+
+    setupModalFocus() {
+      const modals = document.querySelectorAll(".modal");
+      modals.forEach((modal) => {
+        modal.addEventListener("shown.bs.modal", () => {
+          this.$nextTick(() => {
+            const inputElement = modal.querySelector(".form-control");
+            if (inputElement) {
+              inputElement.focus();
+            }
+          });
+        });
+      });
+    },
     // scroll to element
     scrollToElement(el, offset = 0) {
       const element = typeof el === "string" ? document.getElementById(el) : el;
@@ -934,6 +948,7 @@ new Vue({
     this.PWAColor();
     this.checkAllIPs();
     this.hideLoading();
+    this.setupModalFocus();
     mappingKeys(
       {
         keys: "gg",
