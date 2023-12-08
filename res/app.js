@@ -10,7 +10,7 @@ import config from "../res/ga.js";
 Vue.config.productionTip = false;
 
 (function () {
-  const scriptTag = document.createElement('script');
+  const scriptTag = document.createElement("script");
   scriptTag.async = true;
   scriptTag.src = `https://www.googletagmanager.com/gtag/js?id=${config.GOOGLE_ANALYTICS_ID}`;
   document.head.appendChild(scriptTag);
@@ -19,8 +19,8 @@ Vue.config.productionTip = false;
   window.gtag = function () {
     window.dataLayer.push(arguments);
   };
-  window.gtag('js', new Date());
-  window.gtag('config', config.GOOGLE_ANALYTICS_ID);
+  window.gtag("js", new Date());
+  window.gtag("config", config.GOOGLE_ANALYTICS_ID);
 })();
 
 new Vue({
@@ -215,7 +215,7 @@ new Vue({
         card.latitude = data.lat || "";
         card.longitude = data.lon || "";
         card.isp = data.isp || "";
-        card.asn = data.as ? data.as.split(' ')[0] : "";
+        card.asn = data.as ? data.as.split(" ")[0] : "";
 
         // 构造 AS Number 的链接
         if (!card.asn) {
@@ -451,9 +451,9 @@ new Vue({
           latitude: data.lat || "",
           longitude: data.lon || "",
           isp: data.isp || "",
-          asn: data.as ? data.as.split(' ')[0] : "",
+          asn: data.as ? data.as.split(" ")[0] : "",
           asnlink: data.as
-            ? `https://radar.cloudflare.com/traffic/${data.as.split(' ')[0]}`
+            ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}`
             : false,
           mapUrl:
             data.lat && data.lon
@@ -656,13 +656,13 @@ new Vue({
     // 更新语言
     getLanguageFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
-      const language = urlParams.get('hl');
-      if (language === 'zh' || language === 'cn') {
-        this.currentLanguage = 'cn';
+      const language = urlParams.get("hl");
+      if (language === "zh" || language === "cn") {
+        this.currentLanguage = "cn";
         this.updateTexts();
         return true;
-      } else if (language === 'en') {
-        this.currentLanguage = 'en';
+      } else if (language === "en") {
+        this.currentLanguage = "en";
         this.updateTexts();
         return true;
       }
@@ -896,7 +896,7 @@ new Vue({
     this.PWAColor();
     this.checkAllIPs();
     this.hideLoading();
-    mappingKeys([
+    mappingKeys(
       {
         keys: "gg",
         action() {
@@ -926,6 +926,7 @@ new Vue({
       },
       {
         keys: "r([1-6])",
+        type: "regex",
         action: (num) => {
           const card = this.ipDataCards[num - 1];
           const [el] = this.$refs[card.id];
@@ -995,13 +996,13 @@ new Vue({
 
       // help
       {
-        keys: "\\?",
+        keys: "?",
         action: () => {
           this.openModal("helpModal");
         },
         description: this.currentTexts.shortcutKeys.Help,
-      },
-    ]);
+      }
+    );
     this.keyMap = keyMap;
     setTimeout(() => {
       this.checkAllConnectivity(true);
