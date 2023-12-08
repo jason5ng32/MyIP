@@ -5,6 +5,23 @@ import stunServers from "../contents/stunServers.js";
 import ipDataCards from "../contents/ipDataCards.js";
 import leakTest from "../contents/leakTest.js";
 import { mappingKeys, keyMap } from "./shortcut.js";
+import config from "../res/ga.js";
+
+Vue.config.productionTip = false;
+
+(function() {
+  const scriptTag = document.createElement('script');
+  scriptTag.async = true;
+  scriptTag.src = `https://www.googletagmanager.com/gtag/js?id=${config.GOOGLE_ANALYTICS_ID}`;
+  document.head.appendChild(scriptTag);
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function() {
+      window.dataLayer.push(arguments);
+  };
+  window.gtag('js', new Date());
+  window.gtag('config', config.GOOGLE_ANALYTICS_ID);
+})();
 
 new Vue({
   el: "#app",
