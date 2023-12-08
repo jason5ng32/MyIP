@@ -202,7 +202,7 @@ new Vue({
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
       try {
-        const response = await fetch(`https://ipapi.macify.workers.dev/json/${ip}`);
+        const response = await fetch(`https://api.ipcheck.ing/json/${ip}`);
         const data = await response.json();
         if (data.status !== "success") {
           throw new Error("IP lookup failed");
@@ -433,7 +433,7 @@ new Vue({
     },
     async fetchIPForModalBackUp(ip) {
       try {
-        const response = await fetch(`https://ipapi.macify.workers.dev/json/${ip}`);
+        const response = await fetch(`https://api.ipcheck.ing/json/${ip}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
