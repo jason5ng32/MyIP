@@ -294,7 +294,7 @@
                     </div>
                   </div>
                   <div class="row" v-if="speedTestStatus === 'finished'">
-                    <p id="score">📋 {{currentTexts.speedtest.score}}
+                    <p id="score" class="speedtest-p">📋 {{currentTexts.speedtest.score}}
                       {{currentTexts.speedtest.videoStreaming}}
                       <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
                         {{speedTest.streamingScore}}

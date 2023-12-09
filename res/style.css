@@ -97,7 +97,10 @@ footer {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
+    }
+    .speedtest-p {
+        font-size: 12px;
+    }
 }
 
 .jn-radio {
