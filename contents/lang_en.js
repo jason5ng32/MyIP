@@ -108,6 +108,7 @@ export default {
     RefreshConnectivityTests: "Refresh Connectivity Tests",
     RefreshWebRTC: "Refresh WebRTC Test",
     RefreshDNSLeakTest: "Refresh DNS Leak Test",
+    StartSpeedTest: "Start Speed Test",
     ToggleMaps: "Toggle Maps",
     IPCheck: "IP Check",
     AddBingMapKey: "Add Bing Map API Key",

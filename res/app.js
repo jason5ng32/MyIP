@@ -1029,6 +1029,11 @@ new Vue({
 
       triggerSpeedTest();
     },
+    refreshstartSpeedTest() {
+      if (this.speedTestStatus !== "running") {
+        this.startSpeedTest();
+      }
+    },
   },
 
   created() {
@@ -1115,7 +1120,7 @@ new Vue({
       {
         keys: "rc",
         action: () => {
-          this.scrollToElement("scrollspyHeading2", 80);
+          this.scrollToElement("Connectivity", 80);
           this.checkAllConnectivity(false);
         },
         description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
@@ -1123,7 +1128,7 @@ new Vue({
       {
         keys: "rw",
         action: () => {
-          this.scrollToElement("scrollspyHeading3", 80);
+          this.scrollToElement("WebRTC", 80);
           this.checkAllWebRTC();
         },
         description: this.currentTexts.shortcutKeys.RefreshWebRTC,
@@ -1131,10 +1136,18 @@ new Vue({
       {
         keys: "rl",
         action: () => {
-          this.scrollToElement("scrollspyHeading4", 80);
+          this.scrollToElement("DNSLeakTest", 80);
           this.checkAllDNSLeakTest();
         },
         description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
+      },
+      {
+        keys: "s",
+        action: () => {
+          this.scrollToElement("SpeedTest", 80);
+          this.refreshstartSpeedTest();
+        },
+        description: this.currentTexts.shortcutKeys.StartSpeedTest,
       },
       {
         keys: "m",
