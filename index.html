@@ -315,20 +315,20 @@
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Download}}</h5>
                       <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.downloadSpeed}}
-                        M/s</p>
+                        <br/>Mb/s</p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Upload}}</h5>
-                      <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.uploadSpeed}} M/s
+                      <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.uploadSpeed}} <br/>Mb/s
                       </p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Latency}}</h5>
-                      <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.latency}} ms</p>
+                      <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.latency}} <br/>ms</p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Jitter}}</h5>
-                      <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.jitter}} ms</p>
+                      <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.jitter}} <br/>ms</p>
                     </div>
                   </div>
                   <div id="result"></div>
