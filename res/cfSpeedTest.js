@@ -30,6 +30,11 @@ const triggerSpeedTest = () => {
 const resetSpeedTest = () => {
     engine = new SpeedTest({
         autoStart: false,
+        measurements: [
+            { type: 'latency', numPackets: 20 },
+            { type: 'download', bytes: 5e7, count: 4 },
+            { type: 'upload', bytes: 1.5e7, count: 3 }
+        ]
     });
     return engine;
 };

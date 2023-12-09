@@ -1004,8 +1004,11 @@ new Vue({
         // 更新延迟
         if (rawData.latency && rawData.latency.results && rawData.latency.results.timings && rawData.latency.results.timings.length > 0) {
           const latencyTimings = rawData.latency.results.timings;
-          const totalLatency = latencyTimings.reduce((acc, curr) => acc + curr.ping, 0);
-          this.speedTest.latency = parseFloat((totalLatency / latencyTimings.length).toFixed(2));
+          const latestLatency = latencyTimings[latencyTimings.length - 1].ping;
+          const newLatency = parseFloat(latestLatency.toFixed(2));
+          if (newLatency < this.speedTest.latency || this.speedTest.latency === 0) {
+            this.speedTest.latency = newLatency;
+          }
         }
       };
 
