@@ -92,6 +92,12 @@ footer {
     footer {
         height: 140pt;
     }
+    .speedtest-h5 {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 }
 
 .jn-radio {

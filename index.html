@@ -313,22 +313,22 @@
 
                   <div class="row" style="margin-bottom: 10pt;">
                     <div class="col-3 text-center">
-                      <h5>{{currentTexts.speedtest.Download}}</h5>
-                      <p id="download-speed" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.downloadSpeed}}
-                        Mbps</p>
+                      <h5 class="speedtest-h5">{{currentTexts.speedtest.Download}}</h5>
+                      <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.downloadSpeed}}
+                        M/s</p>
                     </div>
                     <div class="col-3 text-center">
-                      <h5>{{currentTexts.speedtest.Upload}}</h5>
-                      <p id="upload-speed" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.uploadSpeed}} Mbps
+                      <h5 class="speedtest-h5">{{currentTexts.speedtest.Upload}}</h5>
+                      <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.uploadSpeed}} M/s
                       </p>
                     </div>
                     <div class="col-3 text-center">
-                      <h5>{{currentTexts.speedtest.Latency}}</h5>
-                      <p id="latency" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.latency}} ms</p>
+                      <h5 class="speedtest-h5">{{currentTexts.speedtest.Latency}}</h5>
+                      <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.latency}} ms</p>
                     </div>
                     <div class="col-3 text-center">
-                      <h5>{{currentTexts.speedtest.Jitter}}</h5>
-                      <p id="jitter" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.jitter}} ms</p>
+                      <h5 class="speedtest-h5">{{currentTexts.speedtest.Jitter}}</h5>
+                      <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.jitter}} ms</p>
                     </div>
                   </div>
                   <div id="result"></div>
