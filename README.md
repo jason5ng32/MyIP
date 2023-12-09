@@ -25,9 +25,10 @@ Notes: Please note that some data on the demo site may not be displayed because 
 7. **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
 8. **Arbitrary IP Information**: Provides a tool for querying information about any IP address.
 9. **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
-10. **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
-11. Based on availability test results, it indicates whether global internet access is currently feasible.
-12. English and Chinese supported.
+10. **Speed Test**：Test your network speed with edge networks.
+11. **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
+12. Based on availability test results, it indicates whether global internet access is currently feasible.
+13. English and Chinese supported.
 
 ## How to Use
 

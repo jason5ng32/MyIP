@@ -6,6 +6,7 @@ export default {
     Connectivity: "网络连通性",
     WebRTC: "WebRTC 测试",
     DNSLeakTest: "DNS 泄漏测试",
+    SpeedTest: "网速测试",
   },
   ipInfos: {
     id: "ipinfos",
@@ -54,6 +55,23 @@ export default {
     StatusWait: "待检测",
     StatusError: "测试出错",
   },
+  speedtest: {
+    id: "speedtest",
+    Title: "网速测试",
+    Note: "将从 Cloudflare 使用边沿网络进行速度测试，时间可能较长。如果你的网络位于中国大陆，数据可能会有较大的偏差。测速结果仅供参考，实际速度会更快。",
+    Download: "下载",
+    Upload: "上传",
+    Latency: "延迟",
+    Jitter: "抖动",
+    Unit: "Mbps",
+    StatusWait: "--",
+    StatusError: "测试出错",
+    videoStreaming: "在线视频：",
+    gaming: " 分，在线游戏：",
+    rtc: " 分，视频会议：",
+    score: "根据网速测试，得出你以下质量分数：",
+    resultNote: " 分。分数仅供参考。",
+  },
   ipcheck: {
     id: "ipcheck",
     Title: "IP 查询",
@@ -86,6 +104,7 @@ export default {
     RefreshConnectivityTests: "刷新连通性测试",
     RefreshWebRTC: "刷新 WebRTC 测试",
     RefreshDNSLeakTest: "刷新 DNS 泄漏测试",
+    StartSpeedTest: "开始网速测试",
     ToggleMaps: "切换地图显示",
     IPCheck: "IP 查询",
     AddBingMapKey: "添加 Bing Map API Key",
@@ -95,7 +114,7 @@ export default {
   },
   page: {
     title:
-      "查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | Jason Ng 阿禅开源作品",
+      "查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | 网速测试 | Jason Ng 阿禅开源作品",
     footerName: "Creators: Jason Ng, Seven Yu & ChatGPT",
     footerLink: "https://github.com/jason5ng32/MyIP",
   },

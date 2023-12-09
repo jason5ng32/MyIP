@@ -4,6 +4,8 @@ import connectivityTests from "../contents/connectivityTests.js";
 import stunServers from "../contents/stunServers.js";
 import ipDataCards from "../contents/ipDataCards.js";
 import leakTest from "../contents/leakTest.js";
+import speedTest from "../contents/speedTest.js";
+import { triggerSpeedTest, resetSpeedTest, engine } from "../res/cfSpeedTest.js";
 import { mappingKeys, keyMap } from "./shortcut.js";
 import config from "../res/ga.js";
 
@@ -49,6 +51,7 @@ new Vue({
     isInfosLoaded: false,
     infoMaskLevel: 0,
     ipDataCache: new Map(),
+    speedTestStatus: "idle",
 
     // from contents
     connectivityTests,
@@ -58,6 +61,7 @@ new Vue({
     stunServers,
     originstunServers: {},
     leakTest,
+    speedTest,
     originleakTest: {},
 
     // keyMap
@@ -905,6 +909,134 @@ new Vue({
         loadingElement.classList.add("hidden");
       }
     },
+
+    // Speed Test
+    updateSpeedTestResults(results) {
+      const summary = results.getSummary();
+
+      this.speedTest.downloadSpeed = parseFloat((summary.download / 1000000).toFixed(2));
+      this.speedTest.uploadSpeed = parseFloat((summary.upload / 1000000).toFixed(2));
+      this.speedTest.latency = parseFloat(summary.latency.toFixed(2));
+      this.speedTest.jitter = parseFloat(summary.jitter.toFixed(2));
+    },
+
+    updateSpeedTestColor(status) {
+      switch (status) {
+        case 'idle':
+          return 'text-secondary';
+        case 'running':
+          return 'text-info';
+        case 'finished':
+          return 'text-success';
+        case 'error':
+          return 'text-danger';
+        default:
+          return '';
+      }
+    },
+
+    startSpeedTest() {
+      const newEngine = resetSpeedTest();
+      newEngine.onRunningChange = running => {
+        this.speedTestStatus = "running";
+        this.speedTest.downloadSpeed = 0;
+        this.speedTest.uploadSpeed = 0;
+        this.speedTest.latency = 0;
+        this.speedTest.jitter = 0;
+      };
+
+      newEngine.onResultsChange = ({ type }) => {
+        const rawData = newEngine.results.raw;
+
+        // 进度条
+        let progress = 0;
+        const progressPerStage = 100 / 3;  // 将总进度平均分配到每个阶段
+
+        if (rawData.download && rawData.download.started) {
+          progress += rawData.download.finished ? progressPerStage : progressPerStage / 2;
+        }
+        if (rawData.upload && rawData.upload.started) {
+          progress += rawData.upload.finished ? progressPerStage : progressPerStage / 2;
+        }
+        if (rawData.latency && rawData.latency.started) {
+          progress += rawData.latency.finished ? progressPerStage : progressPerStage / 2;
+        }
+
+        // 确保进度不超过100%
+        progress = Math.min(progress, 100);
+
+
+        // 更新进度条
+        const progressBar = document.getElementById('speedtest-progress');
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+
+        // 更新下载速度
+        if (rawData.download && rawData.download.results) {
+          const downloadKeys = Object.keys(rawData.download.results);
+          if (downloadKeys.length > 0) {
+            const lastDownloadKey = downloadKeys[downloadKeys.length - 1];
+            const downloadTimings = rawData.download.results[lastDownloadKey].timings;
+            if (downloadTimings.length > 0) {
+              const latestDownload = downloadTimings[downloadTimings.length - 1];
+              const newDownloadSpeed = parseFloat((latestDownload.bps / 1000000).toFixed(2));
+              if (newDownloadSpeed > this.speedTest.downloadSpeed) {
+                this.speedTest.downloadSpeed = newDownloadSpeed;
+              }
+            }
+          }
+        }
+        // 更新上传速度
+        if (rawData.upload && rawData.upload.results) {
+          const uploadKeys = Object.keys(rawData.upload.results);
+          if (uploadKeys.length > 0) {
+            const lastUploadKey = uploadKeys[uploadKeys.length - 1];
+            const uploadTimings = rawData.upload.results[lastUploadKey].timings;
+            if (uploadTimings.length > 0) {
+              const latestUpload = uploadTimings[uploadTimings.length - 1];
+              const newUploadSpeed = parseFloat((latestUpload.bps / 1000000).toFixed(2));
+              if (newUploadSpeed > this.speedTest.uploadSpeed) {
+                this.speedTest.uploadSpeed = newUploadSpeed;
+              }
+            }
+          }
+        }
+        // 更新延迟
+        if (rawData.latency && rawData.latency.results && rawData.latency.results.timings && rawData.latency.results.timings.length > 0) {
+          const latencyTimings = rawData.latency.results.timings;
+          const latestLatency = latencyTimings[latencyTimings.length - 1].ping;
+          const newLatency = parseFloat(latestLatency.toFixed(2));
+          if (newLatency < this.speedTest.latency || this.speedTest.latency === 0) {
+            this.speedTest.latency = newLatency;
+          }
+        }
+      };
+
+      newEngine.onFinish = results => {
+        this.speedTestStatus = "finished";
+        this.updateSpeedTestResults(results);
+        const scores = results.getScores();
+
+        // 更新 Vue 实例的数据属性
+        this.speedTest.streamingScore = scores.streaming.points;
+        this.speedTest.gamingScore = scores.gaming.points;
+        this.speedTest.rtcScore = scores.rtc.points;
+      };
+
+      newEngine.onError = (e) => {
+        if (typeof e === 'string' && !e.includes("ICE")) {
+          this.speedTestStatus = "error";
+        }
+        console.error('Speed Test Error: ', e);
+      };
+
+      triggerSpeedTest();
+    },
+    refreshstartSpeedTest() {
+      if (this.speedTestStatus !== "running") {
+        this.startSpeedTest();
+      }
+    },
   },
 
   created() {
@@ -991,7 +1123,7 @@ new Vue({
       {
         keys: "rc",
         action: () => {
-          this.scrollToElement("scrollspyHeading2", 80);
+          this.scrollToElement("Connectivity", 80);
           this.checkAllConnectivity(false);
         },
         description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
@@ -999,7 +1131,7 @@ new Vue({
       {
         keys: "rw",
         action: () => {
-          this.scrollToElement("scrollspyHeading3", 80);
+          this.scrollToElement("WebRTC", 80);
           this.checkAllWebRTC();
         },
         description: this.currentTexts.shortcutKeys.RefreshWebRTC,
@@ -1007,10 +1139,18 @@ new Vue({
       {
         keys: "rl",
         action: () => {
-          this.scrollToElement("scrollspyHeading4", 80);
+          this.scrollToElement("DNSLeakTest", 80);
           this.checkAllDNSLeakTest();
         },
         description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
+      },
+      {
+        keys: "s",
+        action: () => {
+          this.scrollToElement("SpeedTest", 80);
+          this.refreshstartSpeedTest();
+        },
+        description: this.currentTexts.shortcutKeys.StartSpeedTest,
       },
       {
         keys: "m",

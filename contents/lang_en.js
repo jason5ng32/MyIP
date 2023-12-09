@@ -6,6 +6,7 @@ export default {
     Connectivity: "Connectivity",
     WebRTC: "WebRTC Test",
     DNSLeakTest: "DNS Leak Test",
+    SpeedTest: "Speed Test",
   },
   ipInfos: {
     id: "ipinfos",
@@ -54,6 +55,23 @@ export default {
     StatusWait: "Awaiting Test",
     StatusError: "Test Error",
   },
+  speedtest: {
+    id: "speedtest",
+    Title: "Speed Test",
+    Note: "Speed test will be done via Cloudflare's edge network, which may take a long time. If your network is located in mainland China, the data may be biased. The speed test results are for reference only, the actual speed will be faster.",
+    Download: "Download",
+    Upload: "Upload",
+    Latency: "Latency",
+    Jitter: "Jitter",
+    Unit: "Mbps",
+    StatusWait: "--",
+    StatusError: "Test Error",
+    videoStreaming: "Video Streaming: ",
+    gaming: ", Gaming: ",
+    rtc: ", Video Chatting: ",
+    score: "Based on the speed test, you get the following quality scores:",
+    resultNote: ". The score is for reference only.",
+  },
   ipcheck: {
     id: "ipcheck",
     Title: "IP Check",
@@ -90,6 +108,7 @@ export default {
     RefreshConnectivityTests: "Refresh Connectivity Tests",
     RefreshWebRTC: "Refresh WebRTC Test",
     RefreshDNSLeakTest: "Refresh DNS Leak Test",
+    StartSpeedTest: "Start Speed Test",
     ToggleMaps: "Toggle Maps",
     IPCheck: "IP Check",
     AddBingMapKey: "Add Bing Map API Key",
@@ -99,7 +118,7 @@ export default {
   },
   page: {
     title:
-      "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Jason Ng Open Source",
+      "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Speed Test | Jason Ng Open Source",
     footerName: "Creators: Jason Ng, Seven Yu & ChatGPT",
     footerLink: "https://github.com/jason5ng32/MyIP",
   },
