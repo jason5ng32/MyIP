@@ -95,10 +95,13 @@ export default {
     AddBingMapKey: "Add Bing Map API Key",
     ToggleInfoMask: "Toggle Info Masking",
     Help: "Show Shortcut Keys",
+    HelpNote: "People who use shortcuts are really awesome!",
   },
   page: {
     title:
       "Check My IP Address | Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Jason Ng Open Source",
+    footerName: "Creators: Jason Ng, Seven Yu & ChatGPT",
+    footerLink: "https://github.com/jason5ng32/MyIP",
   },
   addBingMapKey: {
     Title: "Add Bing Map API Key",
