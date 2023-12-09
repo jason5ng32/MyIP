@@ -168,25 +168,43 @@ footer {
 [v-cloak] {
     display: none;
 }
+
 .hidden {
     display: none !important;
 }
+
 .jn-loading {
     margin-top: 50vh;
 }
+
 .jn-shortcut-row {
     margin: 2pt 0 2pt 0;
     border-bottom: 1px solid;
 }
+
 .jn-dark-mode-help-border {
     border-color: #a8a8a863 !important;
 }
+
 .jn-border-bottom-none {
     border-bottom: none !important;
 }
+
 .jn-help-note {
     background: linear-gradient(to right, #e04343, orange, #8d8d22, green, #50c0ae, indigo, violet);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.jn-progress {
+    padding-bottom: 20pt;
+}
+
+.jn-opacity-0 {
+    opacity: 0;
+}
+
+.jn-progress-dark {
+    background-color: #4b4b4b !important;
 }
