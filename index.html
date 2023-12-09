@@ -385,15 +385,16 @@
 
           </div>
           <div class="modal-body" :class="{'dark-mode' : isDarkMode }">
-            <div v-for="key in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row"
-              :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border': 'border-light-subtle' ]">
-              <div class="col">
-                <kbd :class="{ 'text-bg-light':isDarkMode}">
-                  {{ key.keys.replace(/[\\\(\)]/g, '') }}
-                </kbd>
-              </div>
-              <div class="col-8">{{ key.description }}</div>
+            <p class="jn-help-note "><i class="bi bi-hand-thumbs-up-fill"></i> {{currentTexts.shortcutKeys.HelpNote}}</p>
+            <div v-for="(key, index) in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row"
+            :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle', index === keyMap.length - 1 ? 'jn-border-bottom-none' : '' ]">
+            <div class="col">
+              <kbd :class="{ 'text-bg-light': isDarkMode }">
+                {{ key.keys.replace(/[\\\(\)]/g, '') }}
+              </kbd>
             </div>
+            <div class="col-8">{{ key.description }}</div>
+          </div>
           </div>
         </div>
       </div>
@@ -401,7 +402,7 @@
 
 
     <footer>
-      <p class="text-center">Creators: Jason Ng, Seven Yu & ChatGPT <a href="https://github.com/jason5ng32/MyIP" class="link-dark"
+      <p class="text-center">{{currentTexts.page.footerName}} <a :href="currentTexts.page.footerLink" class="link-dark"
           target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
       </p>
     </footer>

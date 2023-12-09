@@ -88,6 +88,12 @@ footer {
     padding-top: 20pt;
 }
 
+@media only screen and (max-width: 768px) {
+    footer {
+        height: 140pt;
+    }
+}
+
 .jn-radio {
     display: flex;
     justify-content: flex-end;
@@ -174,4 +180,13 @@ footer {
 }
 .jn-dark-mode-help-border {
     border-color: #a8a8a863 !important;
+}
+.jn-border-bottom-none {
+    border-bottom: none !important;
+}
+.jn-help-note {
+    background: linear-gradient(to right, #e04343, orange, #8d8d22, green, #50c0ae, indigo, violet);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
