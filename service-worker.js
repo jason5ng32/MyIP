@@ -2,7 +2,7 @@
 const CACHE_NAME = 'v1_cache';
 const urlsToCache = [
     'res/vue.js',
-    'res/defaultMap.jpg',
+    'res/img/defaultMap.jpg',
     'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css',

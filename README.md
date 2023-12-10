@@ -11,8 +11,8 @@
 
 Notes: You can use my demo, but please don't use it for commercial purposes. If you want to use it for commercial purposes, please deploy it yourself.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Main Features
 

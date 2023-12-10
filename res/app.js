@@ -307,7 +307,7 @@ new Vue({
       card.longitude = "";
       card.asn = "";
       card.isp = "";
-      card.mapUrl = "res/defaultMap.jpg";
+      card.mapUrl = "res/img/defaultMap.jpg";
     },
 
     toggleMaps() {
@@ -783,7 +783,7 @@ new Vue({
           card.longitude = "-122.078514";
           card.isp = "Google LLC";
           card.asn = "AS15169";
-          card.mapUrl = "res/defaultMap.jpg";
+          card.mapUrl = "res/img/defaultMap.jpg";
         });
         this.leakTest.forEach((server) => {
           server.geo = "United States";
