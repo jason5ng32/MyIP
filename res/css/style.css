@@ -36,7 +36,23 @@
 }
 
 .jn-card:hover {
+    border-color: #4dc0e461;
+}
+
+.jn-card.keyboard-hover {
     border-color: rgba(20, 184, 108, 0.42);
+}
+
+.jn-card.keyboard-hover::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border: 1px solid rgba(20, 184, 108, 0.42);
+    height: 100%;
+    pointer-events: none;
+    border-radius: 4pt;
 }
 
 .jn-container {
@@ -92,12 +108,14 @@ footer {
     footer {
         height: 140pt;
     }
+
     .speedtest-h5 {
         font-size: 12px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .speedtest-p {
         font-size: 12px;
     }

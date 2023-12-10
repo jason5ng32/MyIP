@@ -111,6 +111,8 @@ export default {
     ToggleInfoMask: "切换信息隐藏",
     Help: "显示快捷键",
     HelpNote: "使用快捷键的人，是喜欢效率的人，你真棒！",
+    GoNext: "下一张卡片",
+    GoPrevious: "上一张卡片",
   },
   page: {
     title:

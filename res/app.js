@@ -6,7 +6,7 @@ import ipDataCards from "../contents/ipDataCards.js";
 import leakTest from "../contents/leakTest.js";
 import speedTest from "../contents/speedTest.js";
 import { triggerSpeedTest, resetSpeedTest, engine } from "../res/cfSpeedTest.js";
-import { mappingKeys, keyMap } from "./shortcut.js";
+import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 import config from "../res/ga.js";
 
 Vue.config.productionTip = false;
@@ -1083,11 +1083,21 @@ new Vue({
     this.setupModalFocus();
     mappingKeys(
       {
-        keys: "gg",
+        keys: "g",
         action() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         },
         description: this.currentTexts.shortcutKeys.GoToTop,
+      },
+      {
+        keys: 'j',
+        action: () => navigateCards('down'),
+        description: this.currentTexts.shortcutKeys.GoNext
+      },
+      {
+        keys: 'k',
+        action: () => navigateCards('up'),
+        description: this.currentTexts.shortcutKeys.GoPrevious
       },
       {
         keys: "G",
@@ -1105,12 +1115,12 @@ new Vue({
         description: this.currentTexts.shortcutKeys.ToggleDarkMode,
       },
       {
-        keys: "rr",
+        keys: "R",
         action: this.refreshEverything,
         description: this.currentTexts.shortcutKeys.RefreshEverything,
       },
       {
-        keys: "r([1-6])",
+        keys: "([1-6])",
         type: "regex",
         action: (num) => {
           const card = this.ipDataCards[num - 1];
@@ -1121,7 +1131,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.RefreshIPCard,
       },
       {
-        keys: "rc",
+        keys: "c",
         action: () => {
           this.scrollToElement("Connectivity", 80);
           this.checkAllConnectivity(false);
@@ -1129,7 +1139,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
       },
       {
-        keys: "rw",
+        keys: "w",
         action: () => {
           this.scrollToElement("WebRTC", 80);
           this.checkAllWebRTC();
@@ -1137,7 +1147,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.RefreshWebRTC,
       },
       {
-        keys: "rl",
+        keys: "l",
         action: () => {
           this.scrollToElement("DNSLeakTest", 80);
           this.checkAllDNSLeakTest();
@@ -1165,7 +1175,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.ToggleMaps,
       },
       {
-        keys: "k",
+        keys: "b",
         action: () => {
           window.scrollTo({ top: 0, behavior: "smooth" });
           this.openModal("addBingMapKey");
@@ -1173,7 +1183,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.AddBingMapKey,
       },
       {
-        keys: "c",
+        keys: "C",
         action: () => {
           this.openModal("IPCheck");
         },

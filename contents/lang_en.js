@@ -115,6 +115,8 @@ export default {
     ToggleInfoMask: "Toggle Info Masking",
     Help: "Show Shortcut Keys",
     HelpNote: "People who use shortcuts are really awesome!",
+    GoNext: "Next Card",
+    GoPrevious: "Previous Card",
   },
   page: {
     title:

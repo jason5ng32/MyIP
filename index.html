@@ -89,7 +89,7 @@
     </div>
 
 
-    <div class="container mt-5 jn-container">
+    <div id="mainpart" class="container mt-5 jn-container">
       <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
         data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
         <!-- IP Infos -->
@@ -314,21 +314,26 @@
                   <div class="row" style="margin-bottom: 10pt;">
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Download}}</h5>
-                      <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.downloadSpeed}}
-                        <br/>Mb/s</p>
+                      <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
+                        {{speedTest.downloadSpeed}}
+                        <br />Mb/s
+                      </p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Upload}}</h5>
-                      <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.uploadSpeed}} <br/>Mb/s
+                      <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
+                        {{speedTest.uploadSpeed}} <br />Mb/s
                       </p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Latency}}</h5>
-                      <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.latency}} <br/>ms</p>
+                      <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
+                        {{speedTest.latency}} <br />ms</p>
                     </div>
                     <div class="col-3 text-center">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Jitter}}</h5>
-                      <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">{{speedTest.jitter}} <br/>ms</p>
+                      <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
+                        {{speedTest.jitter}} <br />ms</p>
                     </div>
                   </div>
                   <div id="result"></div>
@@ -465,7 +470,7 @@
               :class="[ isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle', index === keyMap.length - 1 ? 'jn-border-bottom-none' : '' ]">
               <div class="col">
                 <kbd :class="{ 'text-bg-light': isDarkMode }">
-                  {{ key.keys.replace(/[\\\(\)]/g, '') }}
+                  {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
                 </kbd>
               </div>
               <div class="col-8">{{ key.description }}</div>
