@@ -1,4 +1,4 @@
-# MyIP - A Better IP Toolbox
+# 🧰 MyIP - A Better IP Toolbox
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
@@ -7,30 +7,29 @@
 
 [🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
 
+👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
-Demo: [https://ipcheck.ing](https://ipcheck.ing)
-
-Notes: Please note that some data on the demo site may not be displayed because it has been accessed frequently recently (I didn't expect that either). To circumvent this, you can deploy the site yourself.
+Notes: You can use my demo, but please don't use it for commercial purposes. If you want to use it for commercial purposes, please deploy it yourself.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 
-## Main Features
+## 👀 Main Features
 
-1. **View Your IPs**: Detects and displays your local IP, sourcing from multiple IPv4 and IPv6 providers.
-2. **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
-3. **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
-4. **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
-5. **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
-6. **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
-7. **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
-8. **Arbitrary IP Information**: Provides a tool for querying information about any IP address.
-9. **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
-10. **Speed Test**：Test your network speed with edge networks.
-11. **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
-12. Based on availability test results, it indicates whether global internet access is currently feasible.
-13. English and Chinese supported.
+* 🖥️ **View Your IPs**: Detects and displays your local IP, sourcing from multiple IPv4 and IPv6 providers.
+* 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
+* 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
+* 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
+* 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
+* 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
+* 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
+* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
+* 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
+* 🚀 **Speed Test**：Test your network speed with edge networks.
+* ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
+* 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
+* 🇺🇸🇨🇳 English and Chinese supported.
 
-## How to Use
+## 📕 How to Use
 
 The tool is almost ready to use straight out of the box. Just download the entire codebase and deploy it on your local machine or server. No additional setup is required.
 
@@ -49,7 +48,7 @@ Applying for this API key is free and includes up to 120,000 requests per year a
 
 If you don't need map functionality, the program can also be deployed easily with a single click on Vercel.
 
-## Advanced Usage
+## 👩🏻‍💻 Advanced Usage
 
 If you're using a proxy for internet access, consider adding this rule to your proxy configuration (modify it according to your client). This setup lets you check both your real IP and the IP when using the proxy:
 
@@ -60,10 +59,10 @@ IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
 DOMAIN-SUFFIX,ipify.org,Proxy
 ```
 
-## Additional Notes
+## 😶‍🌫️ Additional Notes
 
 70% of the code for this program was not written by me, but generated through ChatGPT. After about 50 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
 
-## Star History
+## 🌟 Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jason5ng32/MyIP&type=Date)](https://star-history.com/#jason5ng32/MyIP&Date)
