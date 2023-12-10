@@ -11,8 +11,8 @@
 
 备注：你可以直接用我已经搭建好的服务，也可以自行搭建。
 
-[![Deploy with Vercel](/res/vercel.png)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](/res/docker.png)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](/res/vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](/res/docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 这是一个完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。我……只是一个普通的产品经理。
 
