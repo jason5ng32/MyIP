@@ -256,7 +256,7 @@ new Vue({
             : false,
           mapUrl:
             data.lat && data.lon
-              ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.latitude},${data.longitude}/5?mapSize=800,640&pp=${data.latitude},${data.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
+              ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.lat},${data.lon}/5?mapSize=800,640&pp=${data.lat},${data.lon};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
               : "",
         };
 
