@@ -27,3 +27,4 @@ jobs:
       with:
         push: true
         tags: jason5ng32/myip:latest
+        platforms: linux/amd64,linux/arm64
