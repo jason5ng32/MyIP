@@ -69,7 +69,7 @@ export default {
     videoStreaming: "Video Streaming: ",
     gaming: ", Gaming: ",
     rtc: ", Video Chatting: ",
-    score: "Based on the speed test, you get the following quality scores:",
+    score: "Based on the speed test, got the following quality scores:",
     resultNote: ". The score is for reference only.",
   },
   ipcheck: {

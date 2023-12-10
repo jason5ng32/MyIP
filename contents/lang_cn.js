@@ -69,7 +69,7 @@ export default {
     videoStreaming: "在线视频：",
     gaming: " 分，在线游戏：",
     rtc: " 分，视频会议：",
-    score: "根据网速测试，得出你以下质量分数：",
+    score: "根据网速测试，得出以下质量分数：",
     resultNote: " 分。分数仅供参考。",
   },
   ipcheck: {
