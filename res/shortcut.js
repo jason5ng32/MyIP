@@ -30,12 +30,11 @@ const mappingKeys = (...keys) => {
 
 document.addEventListener(
   "keydown",
-  ({ key, target, metaKey, altKey, ctrlKey, shiftKey }) => {
+  ({ key, target, metaKey, altKey, ctrlKey }) => {
     if (target.tagName === "INPUT") return;
-    if (ignoreKeys.includes(key)) return;
-    if (metaKey || altKey || ctrlKey || shiftKey) return;
+    if (metaKey || altKey || ctrlKey) return;
 
-    keyPool += key;
+    keyPool += ignoreKeys.includes(key) ? "" : key;
     timer && clearTimeout(timer);
     timer = setTimeout(() => {
       keyMap.forEach(({ keys, action, type }) => {
