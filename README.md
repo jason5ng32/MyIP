@@ -120,6 +120,3 @@ DOMAIN-SUFFIX,ipify.org,Proxy
 ## 🌟 Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jason5ng32/MyIP&type=Date)](https://star-history.com/#jason5ng32/MyIP&Date)
-
-
-docker run -d -p 8966:3000 -e BING_MAP_API_KEY="Am27Bsy1tM3G4a6CQZ10Sva7FaKgzsg527w_RB1M0TtB288Fnc99KfCmAm3TAFr0" -e ALLOWED_DOMAINS="localhost,myip.cn404.com,ipcheck.ing" myipn
