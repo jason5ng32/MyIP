@@ -195,7 +195,7 @@ new Vue({
           : false;
           const mapUrl =
           data.latitude && data.longitude
-            ? `/api/map/${data.latitude},${data.longitude}/${this.bingMapLanguage}`
+            ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}`
             : "";        
 
         // 更新卡片数据
@@ -256,7 +256,7 @@ new Vue({
             : false,
           mapUrl:
             data.lat && data.lon
-              ? `/api/map/${data.lat},${data.lon}/${this.bingMapLanguage}`
+              ? `/api/map?latitude=${data.lat}&longitude=${data.lon}&language=${this.bingMapLanguage}`
               : "",
         };
 

@@ -15,7 +15,17 @@ module.exports = (req, res) => {
         return res.status(403).json({ error: 'No referer header' });
     }
 
-    const { latitude, longitude, language } = req.query;
+    //妈的，兼容本地和 Vercel 的环境真烦
+    let { latitude, longitude, language } = req.params;
+    if (!latitude || !longitude || !language) {
+        latitude = req.query.latitude;
+        longitude = req.query.longitude;
+        language = req.query.language;
+    }
+    if (!latitude || !longitude || !language) {
+        return res.status(400).json({ error: 'Missing latitude, longitude, or language' });
+    }
+
     const mapSize = '800,640';
     const pp = `${latitude},${longitude};66`;
     const fmt = 'jpeg';
