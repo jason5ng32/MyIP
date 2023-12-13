@@ -84,7 +84,7 @@ Click the 'Deploy to Docker' button at the top to complete the deployment.
 If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
 
 ```bash
-docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" myip
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" --name myip jason5ng32/myip:latest
 ```
 
 ## 👩🏻‍💻 Advanced Usage

@@ -86,7 +86,7 @@ ALLOWED_DOMAINS
 如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
 
 ```bash
-docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" myip
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" --name myip jason5ng32/myip:latest
 ```
 
 ## 👩🏻‍💻 高级用法
