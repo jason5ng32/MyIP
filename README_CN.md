@@ -72,16 +72,24 @@ ALLOWED_DOMAINS="example.com"
 
 点击顶部的部署到 Vercel 按钮，即可完成部署。
 
-如果希望展示地图，则在部署的时候，设置下面 2 个环境变量：
+如果希望展示地图，则在部署的时候，添加下面 2 个环境变量：
 
 ```bash
 BING_MAP_API_KEY
 ALLOWED_DOMAINS
 ```
 
+或者，直接点击下面这个包含了环境变量的安装按钮：
+
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&env=BING_MAP_API_KEY,ALLOWED_DOMAINS)
+
 ### 使用 Docker
 
-点击顶部的部署到 Docker 按钮，即可完成部署。
+点击顶部的部署到 Docker 按钮，即可完成部署，又或者，直接输入下面的命令：
+
+```bash
+docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
+```
 
 如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
 

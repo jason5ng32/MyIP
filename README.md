@@ -32,7 +32,7 @@ Notes: You can use my demo, but please don't use it for commercial purposes. If 
 
 ## 📕 How to Use
 
-3 Ways to Deploy:
+There are 3 Ways to Deploy:
 
 ### Deploying in a Node Environment
 
@@ -77,9 +77,17 @@ BING_MAP_API_KEY
 ALLOWED_DOMAINS
 ```
 
+Or, click this button to deploy with environment variables:
+
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&env=BING_MAP_API_KEY,ALLOWED_DOMAINS)
+
 ### Using Docker
 
-Click the 'Deploy to Docker' button at the top to complete the deployment.
+Click the 'Deploy to Docker' button at the top to complete the deployment. Or, use the following shell:
+
+```bash
+docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
+```
 
 If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
 
