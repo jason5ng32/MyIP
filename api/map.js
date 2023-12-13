@@ -15,13 +15,9 @@ module.exports = (req, res) => {
         return res.status(403).json({ error: 'No referer header' });
     }
 
-    //妈的，兼容本地和 Vercel 的环境真烦
-    let { latitude, longitude, language } = req.params;
-    if (!latitude || !longitude || !language) {
-        latitude = req.query.latitude;
-        longitude = req.query.longitude;
-        language = req.query.language;
-    }
+    // 使用 req.query 获取参数
+    const { latitude, longitude, language } = req.query;
+
     if (!latitude || !longitude || !language) {
         return res.status(400).json({ error: 'Missing latitude, longitude, or language' });
     }
