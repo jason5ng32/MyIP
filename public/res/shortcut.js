@@ -33,10 +33,11 @@ const navigateCards = (direction) => {
   const mainPart = document.getElementById('mainpart');
   const cardBodies = mainPart.querySelectorAll('.jn-card');
   const cards = Array.from(cardBodies);
-  let currentIndex = cards.findIndex(card => card.classList.contains('hover') || card.classList.contains('keyboard-hover'));
+  let currentIndex = cards.findIndex(card => card.getAttribute('data-keyboard-hover') === 'true');
 
   if (currentIndex !== -1) {
     cards[currentIndex].classList.remove('hover', 'keyboard-hover');
+    cards[currentIndex].removeAttribute('data-keyboard-hover');
   } else {
     currentIndex = 0; // 如果没有卡片高亮，则从第一张卡片开始
   }
@@ -49,10 +50,12 @@ const navigateCards = (direction) => {
 
   const currentCard = cards[currentIndex];
   currentCard.classList.add('keyboard-hover');
+  currentCard.setAttribute('data-keyboard-hover', 'true');
 
   const cardTop = currentCard.getBoundingClientRect().top + window.pageYOffset;
   window.scrollTo({ top: cardTop - 60, behavior: 'smooth' });
 };
+
 
 document.addEventListener(
   "keydown",
