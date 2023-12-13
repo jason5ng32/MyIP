@@ -11,8 +11,8 @@
 
 备注：你可以直接用我已经搭建好的服务，也可以自行搭建。
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 这是一个完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。我……只是一个普通的产品经理。
 
@@ -34,24 +34,60 @@
 
 ## 📕 如何使用
 
-几乎开箱即用。直接下载所有代码，放到你本地或服务器上就行，没啥额外步骤。
+3 种部署方式：
 
-如果你希望能够显示 IP 所在地的地图，有 2 个方法：
+### 在 Node 环境部署
 
-1. 在网页中点击地图显示按钮旁边的 + 号，填入 API KEY，这个 KEY 会一直在这个浏览器生效
-2. 或者，直接修改源文件，在 `res/app.js` ，在 `data` 部分，找到：
+1. 克隆代码
+2. 安装：
 
-```javascript
-bingMapAPIKEY: '',
+    ```bash
+    npm install
+    ```
+
+3. 运行：
+
+    ```bash
+    npm start
+    ```
+
+程序会运行在 8966 端口。
+
+如果你想添加 Bing 地图，在启动之前，进行如下修改：
+
+创建环境变量：
+
+```bash
+mv .env.example .env
 ```
 
-在这里添加你的 Bing Map API Key，添加后，首页的地图按钮就会自动变为可用状态，此时，你所有的用户都可以使用地图。
+修改 `.env` 里的 Bing 地图 API Key 以及你的域名（防止滥用）。
 
-申请这个 API 是免费的，一年可以发起 12w 次免费请求，个人玩应该足够用了。如果真要搞大家伙的东西，就自己改一下程序吧，别把 key 放到前端代码里……
+```bash
+BING_MAP_API_KEY="YOU_KEY_HERE"
+ALLOWED_DOMAINS="example.com"
+```
 
-如果你连申请都懒得折腾，也可以考虑使用 Google Maps 的 iframe 嵌入。程序里已经注释了这部分的代码，你可以根据实际的情况进行反注释。不过，使用 iframe 实在有点脏脏的感觉。
+### 使用 Vercel
 
-如果你不打算增加地图功能，其实也可以在 Vercel 上一键部署。
+点击顶部的部署到 Vercel 按钮，即可完成部署。
+
+如果希望展示地图，则在部署的时候，设置下面 2 个环境变量：
+
+```bash
+BING_MAP_API_KEY
+ALLOWED_DOMAINS
+```
+
+### 使用 Docker
+
+点击顶部的部署到 Docker 按钮，即可完成部署。
+
+如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
+
+```bash
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" myip
+```
 
 ## 👩🏻‍💻 高级用法
 

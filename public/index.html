@@ -108,13 +108,11 @@
 
               <div>
                 <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
-                  @change="toggleMaps" :checked="isMapShown" :disabled="!bingMapAPIKEY">
+                  @change="toggleMaps" :checked="isMapShown" :disabled="!isEnvBingMapKey">
 
                 <label class="form-check-label" for="flexSwitchCheckDefault">
-                  <i :class="['bi', bingMapAPIKEY ? 'bi bi-map-fill':'bi bi-map']"></i>
+                  <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill':'bi bi-map']"></i>
                 </label>
-                <i :class="['bi ', !bingMapAPIKEY ? 'bi-plus-circle-fill':'bi-pencil-square']" data-bs-toggle="modal"
-                  data-bs-target="#addBingMapKey"></i>
 
               </div>
 
@@ -412,40 +410,6 @@
             <button type="button" class="btn btn-primary"
               :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }" @click="submitQuery"
               :disabled="!isValidIP(inputIP)">{{currentTexts.ipcheck.Button}}</button>
-
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- BingMap Modal -->
-    <div class="modal fade" id="addBingMapKey" tabindex="-1" aria-labelledby="addBingMapKey" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-          <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-            <h5 class="modal-title" id="addBingMapKey">{{currentTexts.addBingMapKey.Title}}</h5>
-            <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-              data-bs-dismiss="modal" aria-label="Close"></button>
-
-          </div>
-          <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
-            <p class="fw-light">{{ currentTexts.addBingMapKey.Note }}</p>
-            <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-              :placeholder="currentTexts.addBingMapKey.Placeholder" v-model="inputBingMapAPIKEY"
-              @keyup.enter="addBingMapKey">
-            <div v-if="bingMapAPIKEYError" class="text-danger">{{ currentTexts.addBingMapKey.Error }}</div>
-
-
-          </div>
-          <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-            <button v-if="bingMapAPIKEY" type="button" class="btn btn-danger"
-              @click="removeBingMapKey">{{currentTexts.addBingMapKey.removeButton}}</button>
-
-            <button type="button" class="btn btn-primary"
-              :class="{ 'btn-secondary': !isValidKey(inputBingMapAPIKEY), 'btn-primary': isValidKey(inputBingMapAPIKEY) }"
-              @click="addBingMapKey"
-              :disabled="!isValidKey(inputBingMapAPIKEY)">{{currentTexts.addBingMapKey.Button}}</button>
 
           </div>
 

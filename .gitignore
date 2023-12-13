@@ -1,2 +1,5 @@
 .DS_Store
 bingMapAPIKEY
+.env
+node_modules
+package-lock.json

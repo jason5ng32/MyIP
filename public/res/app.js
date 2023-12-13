@@ -28,8 +28,8 @@ Vue.config.productionTip = false;
 new Vue({
   el: "#app",
   data: {
-    // Enter your Bing Maps API key here
-    bingMapAPIKEY: "",
+
+    isEnvBingMapKey: false,
     currentLanguage: "en",
     currentTexts: {},
 
@@ -193,10 +193,10 @@ new Vue({
         const asnlink = data.asn
           ? `https://radar.cloudflare.com/traffic/${data.asn}`
           : false;
-        const mapUrl =
+          const mapUrl =
           data.latitude && data.longitude
-            ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.latitude},${data.longitude}/5?mapSize=800,640&pp=${data.latitude},${data.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
-            : "";
+            ? `/api/map/${data.latitude},${data.longitude}/${this.bingMapLanguage}`
+            : "";        
 
         // 更新卡片数据
         const cardData = {
@@ -256,7 +256,7 @@ new Vue({
             : false,
           mapUrl:
             data.lat && data.lon
-              ? `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${data.lat},${data.lon}/5?mapSize=800,640&pp=${data.lat},${data.lon};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`
+              ? `/api/map/${data.lat},${data.lon}/${this.bingMapLanguage}`
               : "",
         };
 
@@ -506,15 +506,6 @@ new Vue({
         console.error("获取 IP 详情时出错:", error);
         this.modalQueryError = error.message;
       }
-    },
-    resetModalData() {
-      this.inputIP = "";
-      this.modalQueryResult = null;
-      this.modalQueryError = "";
-      if (this.bingMapAPIKEYError) {
-        this.inputBingMapAPIKEY = "";
-      }
-      this.bingMapAPIKEYError = false;
     },
     async checkSTUNServer(stun) {
       try {
@@ -799,31 +790,24 @@ new Vue({
     },
 
     // Bing Map 相关
-    addBingMapKey() {
-      if (this.isValidKey(this.inputBingMapAPIKEY)) {
-        this.bingMapAPIKEY = this.inputBingMapAPIKEY;
-        this.ipDataCards.forEach((card) => {
-          if (card.latitude && card.longitude) {
-            card.mapUrl = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${card.latitude},${card.longitude}/5?mapSize=800,640&pp=${card.latitude},${card.longitude};66&key=${this.bingMapAPIKEY}&fmt=jpeg&dpi=Large&c=${this.bingMapLanguage}`;
+    validateBingMapKey() {
+      fetch('/api/validate-map-key')
+        .then(response => response.json())
+        .then(data => {
+          this.isEnvBingMapKey = data.isValid;
+          if (!this.isEnvBingMapKey) {
+            this.isMapShown = false;
+          } else if (localStorage.getItem("isMapShown")) {
+            this.isMapShown = localStorage.getItem("isMapShown") === "true";
           }
+        })
+        .catch(error => {
+          console.error('Error validating Bing Map Key:', error);
+          this.isEnvBingMapKey = false;
+          this.isMapShown = false;
         });
-        this.closeModal("addBingMapKey");
-        this.isMapShown = true;
-      } else {
-        this.bingMapAPIKEYError = true;
-      }
     },
-    removeBingMapKey() {
-      this.bingMapAPIKEY = "";
-      this.inputBingMapAPIKEY = "";
-      localStorage.removeItem("bingMapAPIKEY");
-      this.closeModal("addBingMapKey");
-      this.isMapShown = false;
-    },
-    isValidKey(key) {
-      const keyPattern = /^[A-Za-z0-9_-]{64}$/;
-      return keyPattern.test(key);
-    },
+    
     // PWA 颜色
     PWAColor() {
       if (this.isDarkMode) {
@@ -1046,18 +1030,7 @@ new Vue({
     }
     this.updateTexts();
     this.langPatch();
-    if (localStorage.getItem("bingMapAPIKEY") && this.bingMapAPIKEY === "") {
-      this.bingMapAPIKEY = localStorage.getItem("bingMapAPIKEY");
-    }
-
-    if (this.bingMapAPIKEY) {
-      this.inputBingMapAPIKEY = this.bingMapAPIKEY;
-    }
-    if (!this.bingMapAPIKEY) {
-      this.isMapShown = false;
-    } else if (localStorage.getItem("isMapShown")) {
-      this.isMapShown = localStorage.getItem("isMapShown") === "true";
-    }
+    this.validateBingMapKey();
     this.isMobile = window.innerWidth < 768;
     this.isCardsCollapsed = this.isMobile;
     // this.handleResize();
@@ -1069,9 +1042,6 @@ new Vue({
   watch: {
     isMapShown(newVal) {
       localStorage.setItem("isMapShown", newVal);
-    },
-    bingMapAPIKEY(newVal) {
-      localStorage.setItem("bingMapAPIKEY", newVal);
     },
   },
   mounted() {
@@ -1165,22 +1135,12 @@ new Vue({
       {
         keys: "m",
         action: () => {
-          if (this.bingMapAPIKEY) {
+          if (this.isEnvBingMapKey) {
             window.scrollTo({ top: 0, behavior: "smooth" });
             this.toggleMaps();
-          } else {
-            this.openModal("addBingMapKey");
           }
         },
         description: this.currentTexts.shortcutKeys.ToggleMaps,
-      },
-      {
-        keys: "b",
-        action: () => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          this.openModal("addBingMapKey");
-        },
-        description: this.currentTexts.shortcutKeys.AddBingMapKey,
       },
       {
         keys: "C",
@@ -1224,10 +1184,5 @@ new Vue({
     }, 6000);
     const modalElement = document.getElementById("IPCheck");
     modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
-    const bingMapAPIKEYElement = document.getElementById("addBingMapKey");
-    bingMapAPIKEYElement.addEventListener(
-      "hidden.bs.modal",
-      this.resetModalData
-    );
   },
 });

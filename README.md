@@ -11,8 +11,8 @@
 
 Notes: You can use my demo, but please don't use it for commercial purposes. If you want to use it for commercial purposes, please deploy it yourself.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Main Features
 
@@ -32,22 +32,60 @@ Notes: You can use my demo, but please don't use it for commercial purposes. If 
 
 ## 📕 How to Use
 
-The tool is almost ready to use straight out of the box. Just download the entire codebase and deploy it on your local machine or server. No additional setup is required.
+3 Ways to Deploy:
 
-There are 2 ways to display a map showing the location of an IP:
+### Deploying in a Node Environment
 
-1. Click on the + Add button next to the map display button and fill in the API KEY, then map function will be enabled and always available in current browser.
-2. Or, you can modify `res/app.js`, in the `data` section, locate:
+1. Clone the code.
+2. Install:
 
-```javascript
-bingMapAPIKEY: '',
+    ```bash
+    npm install
+    ```
+
+3. Run:
+
+    ```bash
+    npm start
+    ```
+
+The program will run on port 8966.
+
+If you want to add Bing Maps, make the following changes before starting:
+
+Create environment variables:
+
+```bash
+mv .env.example .env
 ```
 
-Enter your Bing Map API Key here. Upon doing so, the map functionality on the homepage will activate automatically for all users.
+Modify the Bing Maps API Key and your domain (to prevent abuse) in `.env` .
 
-Applying for this API key is free and includes up to 120,000 requests per year at no cost, adequate for personal use. For larger projects, consider adjusting the program to avoid embedding the key in the frontend code.
+```bash
+BING_MAP_API_KEY="YOU_KEY_HERE"
+ALLOWED_DOMAINS="example.com"
+```
 
-If you don't need map functionality, the program can also be deployed easily with a single click on Vercel.
+### Using Vercel
+
+Click the 'Deploy to Vercel' button at the top to complete the deployment.
+
+If you want to display maps, set the following 2 environment variables during deployment:
+
+```bash
+BING_MAP_API_KEY
+ALLOWED_DOMAINS
+```
+
+### Using Docker
+
+Click the 'Deploy to Docker' button at the top to complete the deployment.
+
+If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
+
+```bash
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" myip
+```
 
 ## 👩🏻‍💻 Advanced Usage
 
@@ -67,3 +105,6 @@ DOMAIN-SUFFIX,ipify.org,Proxy
 ## 🌟 Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=jason5ng32/MyIP&type=Date)](https://star-history.com/#jason5ng32/MyIP&Date)
+
+
+docker run -d -p 8966:3000 -e BING_MAP_API_KEY="Am27Bsy1tM3G4a6CQZ10Sva7FaKgzsg527w_RB1M0TtB288Fnc99KfCmAm3TAFr0" -e ALLOWED_DOMAINS="localhost,myip.cn404.com,ipcheck.ing" myipn
