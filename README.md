@@ -36,18 +36,25 @@ There are 3 Ways to Deploy:
 
 ### Deploying in a Node Environment
 
-1. Clone the code.
-2. Install:
+Make sure you have Node.js installed.
 
-    ```bash
-    npm install
-    ```
+Clone the code:
 
-3. Run:
+```bash
+git clone https://github.com/jason5ng32/MyIP.git
+```
 
-    ```bash
-    npm start
-    ```
+Install:
+
+```bash
+npm install
+```
+
+Run:
+
+```bash
+npm start
+```
 
 The program will run on port 8966.
 

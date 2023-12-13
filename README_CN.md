@@ -38,18 +38,25 @@
 
 ### 在 Node 环境部署
 
-1. 克隆代码
-2. 安装：
+确保你系统里已经有 Node.js 环境。
 
-    ```bash
-    npm install
-    ```
+克隆代码:
 
-3. 运行：
+```bash
+git clone https://github.com/jason5ng32/MyIP.git
+```
 
-    ```bash
-    npm start
-    ```
+安装:
+
+```bash
+npm install
+```
+
+运行:
+
+```bash
+npm start
+```
 
 程序会运行在 8966 端口。
 
