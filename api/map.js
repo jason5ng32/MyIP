@@ -15,7 +15,7 @@ module.exports = (req, res) => {
         return res.status(403).json({ error: 'No referer header' });
     }
 
-    const { latitude, longitude, language } = req.params;
+    const { latitude, longitude, language } = req.query;
     const mapSize = '800,640';
     const pp = `${latitude},${longitude};66`;
     const fmt = 'jpeg';
