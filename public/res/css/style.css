@@ -33,6 +33,7 @@
 .jn-card {
     box-shadow: 0 0 10pt #0000001c;
     height: 100%;
+    border:1px solid #9c9c9c2e;
 }
 
 .jn-card:hover {
