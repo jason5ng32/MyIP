@@ -136,11 +136,6 @@
                       <i class="bi bi-arrow-clockwise"></i></button>
                   </div>
 
-                  <!--  Google Maps iFrame -->
-                  <!-- <iframe class="card-img-top" :src="card.mapUrl" width="100%" height="200" frameborder="0"
-                  style="border:0;" allowfullscreen>
-                </iframe> -->
-
                   <img v-if="isMapShown" v-if="!isMobile" :src="card.mapUrl" class="card-img-top jn-map-image"
                     alt="Map">
                   <div class="card-body">
@@ -148,6 +143,9 @@
                       <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
                           class="jn-text">🖥️ {{currentTexts.ipInfos.IP}}</span>: {{ card.ip
                         }}
+                        <i v-if="isValidIP(card.ip)"
+                          :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                          @click="copyToClipboard(card.ip, card.id)"></i>
                       </li>
                       <li class="list-group-item jn-list-group-item"
                         :class="{ 'dark-mode': isDarkMode,'mobile-list': isMobile && isCardsCollapsed }">

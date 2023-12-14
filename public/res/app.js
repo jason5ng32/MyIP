@@ -52,6 +52,7 @@ new Vue({
     infoMaskLevel: 0,
     ipDataCache: new Map(),
     speedTestStatus: "idle",
+    copiedStatus: {},
 
     // from contents
     connectivityTests,
@@ -193,10 +194,10 @@ new Vue({
         const asnlink = data.asn
           ? `https://radar.cloudflare.com/traffic/${data.asn}`
           : false;
-          const mapUrl =
+        const mapUrl =
           data.latitude && data.longitude
             ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}`
-            : "";        
+            : "";
 
         // 更新卡片数据
         const cardData = {
@@ -807,7 +808,7 @@ new Vue({
           this.isMapShown = false;
         });
     },
-    
+
     // PWA 颜色
     PWAColor() {
       if (this.isDarkMode) {
@@ -1020,6 +1021,21 @@ new Vue({
       if (this.speedTestStatus !== "running") {
         this.startSpeedTest();
       }
+    },
+    // 复制 IP 地址
+    copyToClipboard(ip, id) {
+      navigator.clipboard.writeText(ip).then(() => {
+        this.$set(this.copiedStatus, id, true);
+        // 设置定时器在 5 秒后重置状态
+        setTimeout(() => {
+          this.$set(this.copiedStatus, id, false);
+        }, 5000);
+      }).catch(err => {
+        console.error('Copy error', err);
+      });
+    },
+    isValidIP(ip) {
+      return /^[a-zA-Z0-9:.\/]+$/.test(ip);
     },
   },
 
