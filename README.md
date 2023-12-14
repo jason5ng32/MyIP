@@ -69,8 +69,14 @@ mv .env.example .env
 Modify the Bing Maps API Key and your domain (to prevent abuse) in `.env` .
 
 ```bash
-BING_MAP_API_KEY="YOU_KEY_HERE"
+BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
+```
+
+If you want to use IPInfo.io API, you can also add the following:
+
+```bash
+IPINFO_API_TOKEN="YOUR_TOKEN_HERE"
 ```
 
 ### Using Vercel
@@ -82,6 +88,12 @@ If you want to display maps, set the following 2 environment variables during de
 ```bash
 BING_MAP_API_KEY
 ALLOWED_DOMAINS
+```
+
+If you want to use IPInfo.io API, you can also add the following:
+
+```bash
+IPINFO_API_TOKEN
 ```
 
 Or, click this button to deploy with environment variables:
@@ -99,7 +111,13 @@ docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
 If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
 
 ```bash
-docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" --name myip jason5ng32/myip:latest
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" -e --name myip jason5ng32/myip:latest
+```
+
+If you want to use IPInfo.io API, you can also add the following:
+
+```bash
+docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" IPINFO_API_TOKEN="YOUR_TOKEN_HERE" -e --name myip jason5ng32/myip:latest
 ```
 
 ## 👩🏻‍💻 Advanced Usage
