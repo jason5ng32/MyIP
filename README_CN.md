@@ -113,13 +113,24 @@ docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
 如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
 
 ```bash
-docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" -e --name myip jason5ng32/myip:latest
+docker run -d -p 8966:8966 \
+  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
+  -e ALLOWED_DOMAINS="example.com" \
+  --name myip \
+  jason5ng32/myip:latest
+
 ```
 
 如果你希望同时使用 IPinfo.io 的 API：
 
 ```bash
-docker run -d -p 8966:8966 -e BING_MAP_API_KEY="YOUR_KEY_HERE" -e ALLOWED_DOMAINS="example.com" -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" --name myip jason5ng32/myip:latest
+docker run -d -p 8966:8966 \
+  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
+  -e ALLOWED_DOMAINS="example.com" \
+  -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \
+  --name myip \
+  jason5ng32/myip:latest
+
 ```
 
 ## 👩🏻‍💻 高级用法
