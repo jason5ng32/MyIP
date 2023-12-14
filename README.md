@@ -96,10 +96,6 @@ If you want to use IPInfo.io API, you can also add the following:
 IPINFO_API_TOKEN
 ```
 
-Or, click this button to deploy with environment variables:
-
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&env=BING_MAP_API_KEY,ALLOWED_DOMAINS)
-
 ### Using Docker
 
 Click the 'Deploy to Docker' button at the top to complete the deployment. Or, use the following shell:

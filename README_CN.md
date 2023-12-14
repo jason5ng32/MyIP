@@ -98,10 +98,6 @@ ALLOWED_DOMAINS
 IPINFO_API_TOKEN
 ```
 
-或者，直接点击下面这个包含了环境变量的安装按钮：
-
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&env=BING_MAP_API_KEY,ALLOWED_DOMAINS)
-
 ### 使用 Docker
 
 点击顶部的部署到 Docker 按钮，即可完成部署，又或者，直接输入下面的命令：
