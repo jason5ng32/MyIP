@@ -115,7 +115,7 @@ DOMAIN-SUFFIX,ipify.org,Proxy
 
 ## 😶‍🌫️ Additional Notes
 
-70% of the code for this program was not written by me, but generated through ChatGPT. After about 50 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
+70% of the code for this program was not written by me, but generated through ChatGPT. After about 90 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
 
 ## 🌟 Star History
 
