@@ -170,7 +170,6 @@ new Vue({
         });
     },
 
-    // 从 IP 地址获取详细信息
     async fetchIPDetails(cardIndex, ip) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
@@ -183,93 +182,70 @@ new Vue({
         return;
       }
 
-      try {
-        const response = await fetch(`https://ipapi.co/${ip}/json/`);
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.reason);
+      // 尝试从多个不同的源获取数据
+      const sources = [
+        { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+        { url: `https://api.ipcheck.ing/json/${ip}`, transform: this.transformDataFromIPcheck }
+      ];
+
+      for (const source of sources) {
+        try {
+          const response = await fetch(source.url);
+          const data = await response.json();
+
+          // 根据数据源进行数据转换
+          const cardData = source.transform(data);
+
+          if (cardData) {
+            Object.assign(card, cardData);
+            this.ipDataCache.set(ip, cardData);
+            break;
+          }
+        } catch (error) {
+          console.error("Error fetching IP details:", error);
         }
-
-        // 构造 AS Number 的链接和地图 URL
-        const asnlink = data.asn
-          ? `https://radar.cloudflare.com/traffic/${data.asn}`
-          : false;
-        const mapUrl =
-          data.latitude && data.longitude
-            ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}`
-            : "";
-
-        // 更新卡片数据
-        const cardData = {
-          country_name: data.country_name || "",
-          country_code: data.country || "",
-          region: data.region || "",
-          city: data.city || "",
-          latitude: data.latitude || "",
-          longitude: data.longitude || "",
-          isp: data.org || "",
-          asn: data.asn || "",
-          asnlink,
-          mapUrl,
-        };
-
-        Object.assign(card, cardData);
-
-        // 将这次的数据保存到缓存中
-        this.ipDataCache.set(ip, cardData);
-      } catch (error) {
-        console.error("Error fetching IP details:", error);
-        await this.fetchIPDetailsBackUp(cardIndex, ip);
       }
     },
 
-    async fetchIPDetailsBackUp(cardIndex, ip) {
-      const card = this.ipDataCards[cardIndex];
-      card.ip = ip;
-
-      // 检查缓存中是否已有该 IP 的数据
-      if (this.ipDataCache.has(ip)) {
-        // 使用缓存的数据填充卡片
-        const cachedData = this.ipDataCache.get(ip);
-        Object.assign(card, cachedData);
-        return;
+    transformDataFromIPapi(data) {
+      if (data.error) {
+        throw new Error(data.reason);
       }
 
-      try {
-        const response = await fetch(`https://api.ipcheck.ing/json/${ip}`);
-        const data = await response.json();
-        if (data.status !== "success") {
-          throw new Error("IP lookup failed");
-        }
-
-        // 更新卡片数据
-        const cardData = {
-          country_name: data.country || "",
-          country_code: data.countryCode || "",
-          region: data.regionName || "",
-          city: data.city || "",
-          latitude: data.lat || "",
-          longitude: data.lon || "",
-          isp: data.isp || "",
-          asn: data.as ? data.as.split(" ")[0] : "",
-          asnlink: data.as
-            ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}`
-            : false,
-          mapUrl:
-            data.lat && data.lon
-              ? `/api/map?latitude=${data.lat}&longitude=${data.lon}&language=${this.bingMapLanguage}`
-              : "",
-        };
-
-        Object.assign(card, cardData);
-
-        // 将这次的数据保存到缓存中
-        this.ipDataCache.set(ip, cardData);
-      } catch (error) {
-        console.error("Get IP error:", error);
-        card.mapUrl = "";
-      }
+      return {
+        country_name: data.country_name || "",
+        country_code: data.country || "",
+        region: data.region || "",
+        city: data.city || "",
+        latitude: data.latitude || "",
+        longitude: data.longitude || "",
+        isp: data.org || "",
+        asn: data.asn || "",
+        asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
+        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}` : ""
+      };
     },
+
+    transformDataFromIPcheck(data) {
+      if (data.status !== "success") {
+        throw new Error("IP lookup failed");
+      }
+
+      return {
+        country_name: data.country || "",
+        country_code: data.countryCode || "",
+        region: data.regionName || "",
+        city: data.city || "",
+        latitude: data.lat || "",
+        longitude: data.lon || "",
+        isp: data.isp || "",
+        asn: data.as ? data.as.split(" ")[0] : "",
+        asnlink: data.as ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}` : false,
+        mapUrl: data.lat && data.lon ? `/api/map?latitude=${data.lat}&longitude=${data.lon}&language=${this.bingMapLanguage}` : ""
+      };
+    },
+
 
     refreshCard(card) {
       // 清空卡片数据
@@ -441,73 +417,32 @@ new Vue({
       return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
     },
     async fetchIPForModal(ip) {
-      try {
-        const response = await fetch(`https://ipapi.co/${ip}/json/`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.reason);
-        }
+      const sources = [
+        { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+        { url: `https://api.ipcheck.ing/json/${ip}`, transform: this.transformDataFromIPcheck }
+      ];
 
-        // 更新 modalQueryResult
-        this.modalQueryResult = {
-          ip,
-          country_name: data.country_name || "",
-          country_code: data.country_code || "",
-          region: data.region || "",
-          city: data.city || "",
-          latitude: data.latitude || "",
-          longitude: data.longitude || "",
-          isp: data.org || "",
-          asn: data.asn || "",
-          asnlink: data.asn
-            ? `https://radar.cloudflare.com/traffic/${data.asn}`
-            : false,
-          mapUrl:
-            data.latitude && data.longitude
-              ? `https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=2&output=embed`
-              : "",
-        };
-      } catch (error) {
-        await this.fetchIPForModalBackUp(ip);
+      for (const source of sources) {
+        try {
+          const response = await fetch(source.url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          if (data.error) {
+            throw new Error(data.reason || "IP lookup failed");
+          }
+
+          // 使用对应的转换函数更新 modalQueryResult
+          this.modalQueryResult = source.transform(data);
+          break;
+        } catch (error) {
+          console.error("Error fetching IP details:", error);
+        }
       }
     },
-    async fetchIPForModalBackUp(ip) {
-      try {
-        const response = await fetch(`https://api.ipcheck.ing/json/${ip}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.status !== "success") {
-          throw new Error("IP lookup failed");
-        }
 
-        this.modalQueryResult = {
-          ip,
-          country_name: data.country || "",
-          country_code: data.countryCode || "",
-          region: data.regionName || "",
-          city: data.city || "",
-          latitude: data.lat || "",
-          longitude: data.lon || "",
-          isp: data.isp || "",
-          asn: data.as ? data.as.split(" ")[0] : "",
-          asnlink: data.as
-            ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}`
-            : false,
-          mapUrl:
-            data.lat && data.lon
-              ? `https://www.google.com/maps?q=${data.lat},${data.lon}&z=2&output=embed`
-              : "",
-        };
-      } catch (error) {
-        console.error("获取 IP 详情时出错:", error);
-        this.modalQueryError = error.message;
-      }
-    },
     async checkSTUNServer(stun) {
       try {
         const servers = { iceServers: [{ urls: stun.url }] };

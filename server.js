@@ -3,12 +3,16 @@ const express = require('express');
 const path = require('path');
 const mapHandler = require('./api/map');
 const validateMapKeyHandler = require('./api/validate-map-key');
+const ipinfoHandler = require('./api/ipinfo');
 
 const app = express();
 const port = process.env.PORT || 8966;
 
 // 使用查询参数处理所有地图请求
 app.get('/api/map', mapHandler);
+
+// 使用查询参数处理所有 IP 地址请求
+app.get('/api/ipinfo', ipinfoHandler);
 
 // 设置静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
