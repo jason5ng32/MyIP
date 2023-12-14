@@ -19,7 +19,6 @@
   "homepage": "https://github.com/jason5ng32/MyIP#readme",
   "dependencies": {
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "http-proxy-middleware": "^2.0.6"
+    "express": "^4.18.2"
   }
 }
