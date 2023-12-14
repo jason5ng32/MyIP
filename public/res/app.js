@@ -969,7 +969,7 @@ new Vue({
         console.error('Copy error', err);
       });
     },
-    isValidIP(ip) {
+    isValidIP_Card(ip) {
       return /^[a-zA-Z0-9:.\/]+$/.test(ip);
     },
   },
