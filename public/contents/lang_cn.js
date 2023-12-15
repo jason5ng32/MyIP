@@ -17,7 +17,7 @@ export default {
     Map: "地图",
     MapUnavailable: "地图不可用",
     Source: "来源",
-    IP: "IP 地址",
+    IP: "IP",
     Country: "国家",
     Region: "地区",
     City: "城市",

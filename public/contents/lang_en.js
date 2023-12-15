@@ -17,7 +17,7 @@ export default {
     Map: "Map",
     MapUnavailable: "Map Unavailable",
     Source: "Source",
-    IP: "IP Address",
+    IP: "IP",
     Country: "Country",
     Region: "Region",
     City: "City",

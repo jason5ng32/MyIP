@@ -1,4 +1,5 @@
 const https = require('https');
+const countryCodes = require('./countrycode.json');
 
 module.exports = (req, res) => {
     // 限制只能从指定域名访问
@@ -44,10 +45,9 @@ module.exports = (req, res) => {
 function modifyJson(json) {
     const { ip, city, region, country, loc, org, timezone } = json;
 
-    // 拆分 loc 为 latitude 和 longitude
-    const [latitude, longitude] = loc.split(',').map(Number);
+    const countryName = countryCodes[country] || 'Unknown Country';
 
-    // 从 org 中提取 ASN 和 org 名称
+    const [latitude, longitude] = loc.split(',').map(Number);
     const [asn, ...orgName] = org.split(' ');
     const modifiedOrg = orgName.join(' ');
 
@@ -56,7 +56,7 @@ function modifyJson(json) {
         city,
         region,
         country,
-        country_name: country,
+        country_name: countryName,
         country_code: country,
         latitude,
         longitude,
@@ -64,3 +64,4 @@ function modifyJson(json) {
         org: modifiedOrg
     };
 }
+

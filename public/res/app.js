@@ -46,7 +46,7 @@ new Vue({
     isMapShown: false,
     isDarkMode: false,
     isMobile: false,
-    isCardsCollapsed: false,
+    isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
     isInfoMasked: false,
     isInfosLoaded: false,
     infoMaskLevel: 0,
@@ -316,13 +316,14 @@ new Vue({
       }, 1000);
     },
 
+    // 检查网络连通性
     checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
       const beginTime = +new Date();
 
       var img = new Image();
       var timeout = setTimeout(() => {
         test.status = this.currentTexts.connectivity.StatusUnavailable;
-        onTestComplete(false); // 调用回调函数，参数表示测试失败
+        onTestComplete(false);
       }, 3 * 1000);
 
       img.onload = () => {
@@ -330,13 +331,13 @@ new Vue({
         test.status =
           this.currentTexts.connectivity.StatusAvailable +
           ` ( ${+new Date() - beginTime} ms )`;
-        onTestComplete(true); // 调用回调函数，参数表示测试成功
+        onTestComplete(true);
       };
 
       img.onerror = () => {
         clearTimeout(timeout);
         test.status = this.currentTexts.connectivity.StatusUnavailable;
-        onTestComplete(false); // 调用回调函数，参数表示测试失败
+        onTestComplete(false);
       };
 
       img.src = `${test.url}${Date.now()}`;
@@ -388,6 +389,7 @@ new Vue({
       }
     },
 
+    // 通知气泡
     showToast() {
       this.$nextTick(() => {
         const toastEl = this.$refs.toast;
@@ -399,6 +401,8 @@ new Vue({
         }
       });
     },
+
+    // 查询 IP 信息
     async submitQuery() {
       if (this.isValidIP(this.inputIP)) {
         this.modalQueryError = "";
@@ -443,6 +447,7 @@ new Vue({
       }
     },
 
+    // 检查 WebRTC
     async checkSTUNServer(stun) {
       try {
         const servers = { iceServers: [{ urls: stun.url }] };
@@ -489,19 +494,20 @@ new Vue({
       });
     },
 
+    // DNS 泄漏测试
     generate32DigitString() {
-      const unixTime = Date.now().toString(); // 13 位 Unix 时间戳
-      const fixedString = "jason5ng32"; // 固定字符串
-      const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+      const unixTime = Date.now().toString();
+      const fixedString = "jason5ng32";
+      const randomString = Math.random().toString(36).substring(2, 11);
 
-      return unixTime + fixedString + randomString; // 拼接字符串
+      return unixTime + fixedString + randomString;
     },
 
     generate14DigitString() {
       const fixedString = "jn32"; // 固定字符串
-      const randomString = Math.random().toString(36).substring(2, 11); // 随机 9 位字符串
+      const randomString = Math.random().toString(36).substring(2, 11);
 
-      return fixedString + randomString; // 拼接字符串
+      return fixedString + randomString;
     },
 
     fetchLeakTestIpApiCom(index) {
@@ -543,7 +549,6 @@ new Vue({
           return response.json();
         })
         .then((data) => {
-          // 获取 data 对象中的指定键
           const getKey = Object.keys(data)[key];
           const keyEntry = data[getKey];
 
@@ -578,6 +583,8 @@ new Vue({
         this.fetchLeakTestSfSharkCom(3, 0);
       }, 1000);
     },
+
+    // 黑暗模式
     toggleDarkMode() {
       this.isDarkMode = !this.isDarkMode;
       this.updateBodyClass();
@@ -599,12 +606,16 @@ new Vue({
         this.updateBodyClass();
       }
     },
+
+    // 手机简洁模式
     handleResize() {
-      this.isMobile = window.innerWidth < 768; // 设置断点为 768px
+      this.isMobile = window.innerWidth < 768;
     },
     toggleCollapse() {
       this.isCardsCollapsed = !this.isCardsCollapsed;
     },
+
+    // 更新语言
     toggleLanguage() {
       this.currentLanguage = this.currentLanguage === "en" ? "cn" : "en";
       this.updateTexts();
@@ -622,7 +633,8 @@ new Vue({
     updatePageTitle(lang) {
       document.title = this.currentTexts.page.title;
     },
-    // 更新语言
+
+    // 手动设置语言
     getLanguageFromURL() {
       const urlParams = new URLSearchParams(window.location.search);
       const language = urlParams.get("hl");
@@ -656,9 +668,9 @@ new Vue({
         server.ip = this.currentTexts.dnsleaktest.StatusWait;
       });
     },
+
     // 信息遮罩
     toggleInfoMask() {
-      // this.isInfoMasked = !this.isInfoMasked;
       if (this.infoMaskLevel === 0) {
         this.originipDataCards = JSON.parse(JSON.stringify(this.ipDataCards));
         this.originstunServers = JSON.parse(JSON.stringify(this.stunServers));
@@ -669,7 +681,6 @@ new Vue({
         this.alertTitle = this.currentTexts.alert.maskedInfoTitle_1;
         this.alertToShow = true;
         this.showToast();
-        // this.isInfoMasked = true;
       } else if (this.infoMaskLevel === 1) {
         this.infoMask();
         this.alertStyle = "text-success";
@@ -677,7 +688,6 @@ new Vue({
         this.alertTitle = this.currentTexts.alert.maskedInfoTitle;
         this.alertToShow = true;
         this.showToast();
-        // this.isInfoMasked = true;
       } else {
         this.infoUnmask();
         this.alertStyle = "text-danger";
@@ -685,7 +695,6 @@ new Vue({
         this.alertTitle = this.currentTexts.alert.unmaskedInfoTitle;
         this.alertToShow = true;
         this.showToast();
-        // this.isInfoMasked = false;
       }
     },
     infoMask() {
@@ -762,6 +771,7 @@ new Vue({
           .setAttribute("content", "#ffffff");
       }
     },
+
     // open or close modal
     openModal(id) {
       const modalElement = document.getElementById(id);
@@ -969,9 +979,6 @@ new Vue({
         console.error('Copy error', err);
       });
     },
-    isValidIP_Card(ip) {
-      return /^[a-zA-Z0-9:.\/]+$/.test(ip);
-    },
   },
 
   created() {
@@ -983,8 +990,6 @@ new Vue({
     this.langPatch();
     this.validateBingMapKey();
     this.isMobile = window.innerWidth < 768;
-    this.isCardsCollapsed = this.isMobile;
-    // this.handleResize();
     window.addEventListener("resize", this.handleResize);
   },
   destroyed() {
@@ -992,7 +997,10 @@ new Vue({
   },
   watch: {
     isMapShown(newVal) {
-      localStorage.setItem("isMapShown", newVal);
+      localStorage.setItem("isMapShown", JSON.stringify(newVal));
+    },
+    isCardsCollapsed(newVal) {
+      localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
     },
   },
   mounted() {
