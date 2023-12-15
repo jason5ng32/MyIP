@@ -38,7 +38,6 @@ const navigateCards = (direction) => {
   if (currentIndex !== -1) {
     cards[currentIndex].classList.remove('hover', 'keyboard-hover');
     cards[currentIndex].removeAttribute('data-keyboard-hover');
-    cards[currentIndex].blur();
   } else {
     currentIndex = 0; // 如果没有卡片高亮，则从第一张卡片开始
   }
@@ -52,7 +51,6 @@ const navigateCards = (direction) => {
   const currentCard = cards[currentIndex];
   currentCard.classList.add('keyboard-hover');
   currentCard.setAttribute('data-keyboard-hover', 'true');
-  currentCard.focus();
 
   const cardTop = currentCard.getBoundingClientRect().top + window.pageYOffset;
   window.scrollTo({ top: cardTop - 60, behavior: 'smooth' });
@@ -62,9 +60,15 @@ const navigateCards = (direction) => {
 
 document.addEventListener(
   "keydown",
-  ({ key, target, metaKey, altKey, ctrlKey }) => {
+  (event) => {
+    const { key, target, metaKey, altKey, ctrlKey } = event;
+
     if (target.tagName === "INPUT") return;
     if (metaKey || altKey || ctrlKey) return;
+
+    if (key === 'j' || key === 'k') {
+      event.preventDefault(); // 阻止 'j' 和 'k' 的默认焦点行为
+    }
 
     keyPool += ignoreKeys.includes(key) ? "" : key;
     timer && clearTimeout(timer);
