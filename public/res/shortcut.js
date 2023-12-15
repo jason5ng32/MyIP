@@ -38,6 +38,7 @@ const navigateCards = (direction) => {
   if (currentIndex !== -1) {
     cards[currentIndex].classList.remove('hover', 'keyboard-hover');
     cards[currentIndex].removeAttribute('data-keyboard-hover');
+    cards[currentIndex].blur();
   } else {
     currentIndex = 0; // 如果没有卡片高亮，则从第一张卡片开始
   }
@@ -51,10 +52,12 @@ const navigateCards = (direction) => {
   const currentCard = cards[currentIndex];
   currentCard.classList.add('keyboard-hover');
   currentCard.setAttribute('data-keyboard-hover', 'true');
+  currentCard.focus();
 
   const cardTop = currentCard.getBoundingClientRect().top + window.pageYOffset;
   window.scrollTo({ top: cardTop - 60, behavior: 'smooth' });
 };
+
 
 
 document.addEventListener(
