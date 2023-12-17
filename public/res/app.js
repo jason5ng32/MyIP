@@ -343,7 +343,13 @@ new Vue({
       img.src = `${test.url}${Date.now()}`;
     },
 
-    checkAllConnectivity(isAlertToShow) {
+    checkAllConnectivity(isAlertToShow, isRefresh) {
+
+      if (isRefresh) {
+        connectivityTests.forEach((test) => {
+          test.status = this.currentTexts.connectivity.StatusWait;
+        });
+      }
       let totalTests = connectivityTests.length;
       let successCount = 0;
       let completedCount = 0;
@@ -488,11 +494,15 @@ new Vue({
       }
     },
 
-    checkAllWebRTC() {
-      this.stunServers.forEach((stun) => {
-        this.checkSTUNServer(stun);
+    checkAllWebRTC(isRefresh) {
+      this.stunServers.forEach((server) => {
+        this.checkSTUNServer(server);
+        if (isRefresh) {
+          server.ip = this.currentTexts.webrtc.StatusWait;
+        }
       });
     },
+
 
     // DNS 泄漏测试
     generate32DigitString() {
@@ -566,7 +576,13 @@ new Vue({
         });
     },
 
-    checkAllDNSLeakTest() {
+    checkAllDNSLeakTest(isRefresh) {
+      if (isRefresh) {
+        this.leakTest.forEach((server) => {
+          server.geo = this.currentTexts.dnsleaktest.StatusWait;
+          server.ip = this.currentTexts.dnsleaktest.StatusWait;
+        });
+      }
       setTimeout(() => {
         this.fetchLeakTestIpApiCom(0);
       }, 100);
@@ -816,13 +832,13 @@ new Vue({
     refreshEverything() {
       this.checkAllIPs();
       setTimeout(() => {
-        this.checkAllConnectivity(false);
+        this.checkAllConnectivity(false, true);
       }, 2000);
       setTimeout(() => {
-        this.checkAllWebRTC();
+        this.checkAllWebRTC(true);
       }, 4000);
       setTimeout(() => {
-        this.checkAllDNSLeakTest();
+        this.checkAllDNSLeakTest(true);
       }, 3000);
       setTimeout(() => {
         this.alertStyle = "text-success";
@@ -1039,7 +1055,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.GoToBottom,
       },
       {
-        keys: "d",
+        keys: "D",
         action: this.toggleDarkMode,
         description: this.currentTexts.shortcutKeys.ToggleDarkMode,
       },
@@ -1063,7 +1079,7 @@ new Vue({
         keys: "c",
         action: () => {
           this.scrollToElement("Connectivity", 80);
-          this.checkAllConnectivity(false);
+          this.checkAllConnectivity(false, true);
         },
         description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
       },
@@ -1071,15 +1087,15 @@ new Vue({
         keys: "w",
         action: () => {
           this.scrollToElement("WebRTC", 80);
-          this.checkAllWebRTC();
+          this.checkAllWebRTC(true);
         },
         description: this.currentTexts.shortcutKeys.RefreshWebRTC,
       },
       {
-        keys: "l",
+        keys: "d",
         action: () => {
           this.scrollToElement("DNSLeakTest", 80);
-          this.checkAllDNSLeakTest();
+          this.checkAllDNSLeakTest(true);
         },
         description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
       },
@@ -1102,7 +1118,7 @@ new Vue({
         description: this.currentTexts.shortcutKeys.ToggleMaps,
       },
       {
-        keys: "C",
+        keys: "q",
         action: () => {
           this.openModal("IPCheck");
         },
@@ -1127,16 +1143,16 @@ new Vue({
     );
     this.keyMap = keyMap;
     setTimeout(() => {
-      this.checkAllConnectivity(true);
+      this.checkAllConnectivity(true, false);
     }, 2500);
     setTimeout(() => {
-      this.checkAllWebRTC();
+      this.checkAllWebRTC(false);
     }, 4000);
     setTimeout(() => {
-      this.checkAllDNSLeakTest();
+      this.checkAllDNSLeakTest(false);
     }, 2500);
     setTimeout(() => {
-      this.checkAllConnectivity(false);
+      this.checkAllConnectivity(false, false);
     }, 6000);
     setTimeout(() => {
       this.isInfosLoaded = true;

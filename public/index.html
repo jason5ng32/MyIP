@@ -185,7 +185,7 @@
         <div class="availability-test-section mb-4">
           <div class="jn-title2">
             <h2 id="Connectivity" :class="{'mobile-h2' : isMobile }">🚦 {{currentTexts.connectivity.Title}}</h2>
-            <button @click="checkAllConnectivity(false)"
+            <button @click="checkAllConnectivity(false, true)"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
@@ -212,7 +212,7 @@
         <div class="webrtc-test-section mb-4">
           <div class="jn-title2">
             <h2 id="WebRTC" :class="{'mobile-h2' : isMobile }">🚥 {{currentTexts.webrtc.Title}}</h2>
-            <button @click="checkAllWebRTC" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
+            <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
@@ -238,7 +238,7 @@
         <div class="dnsleak-test-section mb-4">
           <div class="jn-title2">
             <h2 id="DNSLeakTest" :class="{'mobile-h2' : isMobile }">🛑 {{currentTexts.dnsleaktest.Title}}</h2>
-            <button @click="checkAllDNSLeakTest"
+            <button @click="checkAllDNSLeakTest(true)"
               :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>

@@ -1,20 +1,20 @@
 export default [
   {
     id: "google",
-    name: "Google",
+    name: "Google 1",
     url: "stun:stun.l.google.com:19302",
+    ip: "",
+  },
+  {
+    id: "google",
+    name: "Google 2",
+    url: "stun:stun2.l.google.com:19302",
     ip: "",
   },
   {
     id: "nextcloud",
     name: "NxtCld",
     url: "stun:stun.nextcloud.com:443",
-    ip: "",
-  },
-  {
-    id: "peerjs",
-    name: "PeerJS",
-    url: "stun:us-0.turn.peerjs.com",
     ip: "",
   },
   {
