@@ -226,8 +226,12 @@
                   <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
                   <p class="card-text text-secondary" style="font-size: 10pt;">{{ stun.url }}</p>
                   <p class="card-text"
-                    :class="{'text-info': stun.ip === currentTexts.webrtc.StatusWait, 'text-success': stun.ip.includes('.'|':'), 'text-danger': stun.ip === currentTexts.webrtc.StatusError}"
-                    v-html="stun.ip"></p>
+                  :class="{
+                    'text-info': stun.ip === currentTexts.webrtc.StatusWait, 
+                    'text-success': stun.ip.includes('.') || stun.ip.includes(':'), 
+                    'text-danger': stun.ip === currentTexts.webrtc.StatusError
+                  }"
+                  v-html="stun.ip"></p>
                   </p>
                 </div>
               </div>

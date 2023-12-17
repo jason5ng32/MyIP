@@ -496,10 +496,10 @@ new Vue({
 
     checkAllWebRTC(isRefresh) {
       this.stunServers.forEach((server) => {
-        this.checkSTUNServer(server);
         if (isRefresh) {
           server.ip = this.currentTexts.webrtc.StatusWait;
         }
+        this.checkSTUNServer(server);
       });
     },
 
