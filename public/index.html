@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#f8f9fa">
   <meta name="background-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="apple-touch-icon" href="res/img/logo-512.png">
   <title>查看我的 IP 地址 | 查询本机 IP 地址及归属地 | 查看 WebRTC 连接 IP ｜ DNS 泄露检测 | 网速测试 | Jason Ng 阿禅开源作品 </title>
   <!--  Bootstrap CSS -->
@@ -368,7 +369,7 @@
           </div>
           <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
             <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-              :placeholder="currentTexts.ipcheck.Placeholder" v-model="inputIP" @keyup.enter="submitQuery">
+              :placeholder="currentTexts.ipcheck.Placeholder" v-model="inputIP" @keyup.enter="submitQuery" name="inputIP" id="inputIP">
             <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
             <div v-if="modalQueryResult" class="mt-2">
               <div class="card-body">
