@@ -464,10 +464,7 @@ new Vue({
           if (event.candidate) {
             candidateReceived = true;
             const candidate = event.candidate.candidate;
-            const ipMatch =
-              /(\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b)|([0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(
-                candidate
-              );
+            const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
             if (ipMatch) {
               stun.ip = ipMatch[0];
               pc.close();
