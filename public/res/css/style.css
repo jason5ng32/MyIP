@@ -116,10 +116,6 @@ footer {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-    /* .speedtest-p {
-        font-size: 12px;
-    } */
 }
 
 .jn-radio {
@@ -243,4 +239,14 @@ footer {
 
 .jn-speedtest-number {
     font-size: 2em;
+}
+.jn-speedtest-note::before {
+    content: "";
+    border-top: 1px solid #19945a5c;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.speedtest-p {
+    margin-top:10pt;
 }

@@ -286,31 +286,13 @@
             <div class="col-12">
               <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="card-body">
-                  <div class="progress" style="height: 20px; margin: 4pt 0 10pt 0;"
+                  <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
                     :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-success jn-progress"
                       role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                       id="speedtest-progress">
                     </div>
                   </div>
-                  <div class="row" v-if="speedTestStatus === 'finished'">
-                    <p id="score" class="speedtest-p">📋 {{currentTexts.speedtest.score}}
-                      {{currentTexts.speedtest.videoStreaming}}
-                      <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
-                        {{speedTest.streamingScore}}
-                      </span>
-                      {{currentTexts.speedtest.gaming}}
-                      <span :class="speedTest.gamingScore >= 50 ? 'text-success' : 'text-warning'">
-                        {{speedTest.gamingScore}}
-                      </span>
-                      {{currentTexts.speedtest.rtc}}
-                      <span :class="speedTest.rtcScore >= 50 ? 'text-success' : 'text-warning'">
-                        {{speedTest.rtcScore}}
-                      </span>
-                      {{currentTexts.speedtest.resultNote}}
-                    </p>
-                  </div>
-
                   <div class="row" style="margin-bottom: 10pt;">
                     <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Download}}</h5>
@@ -340,6 +322,23 @@
                         <span v-if="speedTestStatus !== 'idle'">ms</span>
                       </p>
                     </div>
+                  </div>
+                  <div class="row jn-speedtest-note text-center" v-if="speedTestStatus === 'finished'">
+                    <p id="score" class="speedtest-p">📋 {{currentTexts.speedtest.score}}
+                      {{currentTexts.speedtest.videoStreaming}}
+                      <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
+                        {{speedTest.streamingScore}}
+                      </span>
+                      {{currentTexts.speedtest.gaming}}
+                      <span :class="speedTest.gamingScore >= 50 ? 'text-success' : 'text-warning'">
+                        {{speedTest.gamingScore}}
+                      </span>
+                      {{currentTexts.speedtest.rtc}}
+                      <span :class="speedTest.rtcScore >= 50 ? 'text-success' : 'text-warning'">
+                        {{speedTest.rtcScore}}
+                      </span>
+                      {{currentTexts.speedtest.resultNote}}
+                    </p>
                   </div>
                   <div id="result"></div>
                 </div>
