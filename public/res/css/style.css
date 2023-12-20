@@ -111,15 +111,15 @@ footer {
     }
 
     .speedtest-h5 {
-        font-size: 12px;
+        /* font-size: 12px; */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .speedtest-p {
+    /* .speedtest-p {
         font-size: 12px;
-    }
+    } */
 }
 
 .jn-radio {
@@ -239,4 +239,8 @@ footer {
 
 *:focus {
     outline: none;
+}
+
+.jn-speedtest-number {
+    font-size: 2em;
 }

@@ -213,7 +213,8 @@
         <div class="webrtc-test-section mb-4">
           <div class="jn-title2">
             <h2 id="WebRTC" :class="{'mobile-h2' : isMobile }">🚥 {{currentTexts.webrtc.Title}}</h2>
-            <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
+            <button @click="checkAllWebRTC(true)"
+              :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
                 class="bi bi-arrow-clockwise"></i></button>
           </div>
           <div class="text-secondary">
@@ -225,13 +226,11 @@
                 <div class="card-body">
                   <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
                   <p class="card-text text-secondary" style="font-size: 10pt;">{{ stun.url }}</p>
-                  <p class="card-text"
-                  :class="{
+                  <p class="card-text" :class="{
                     'text-info': stun.ip === currentTexts.webrtc.StatusWait, 
                     'text-success': stun.ip.includes('.') || stun.ip.includes(':'), 
                     'text-danger': stun.ip === currentTexts.webrtc.StatusError
-                  }"
-                  v-html="stun.ip"></p>
+                  }" v-html="stun.ip"></p>
                   </p>
                 </div>
               </div>
@@ -313,28 +312,33 @@
                   </div>
 
                   <div class="row" style="margin-bottom: 10pt;">
-                    <div class="col-3 text-center">
+                    <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Download}}</h5>
                       <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                        {{speedTest.downloadSpeed}}
-                        <br />Mb/s
+                        <span class="jn-speedtest-number">{{speedTest.downloadSpeed}}</span>
+                        <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
                       </p>
                     </div>
-                    <div class="col-3 text-center">
+                    <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Upload}}</h5>
                       <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                        {{speedTest.uploadSpeed}} <br />Mb/s
+                        <span class="jn-speedtest-number">{{speedTest.uploadSpeed}}</span>
+                        <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
                       </p>
                     </div>
-                    <div class="col-3 text-center">
+                    <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Latency}}</h5>
                       <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                        {{speedTest.latency}} <br />ms</p>
+                        <span class="jn-speedtest-number">{{speedTest.latency}}</span>
+                        <span v-if="speedTestStatus !== 'idle'">ms</span>
+                      </p>
                     </div>
-                    <div class="col-3 text-center">
+                    <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                       <h5 class="speedtest-h5">{{currentTexts.speedtest.Jitter}}</h5>
                       <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                        {{speedTest.jitter}} <br />ms</p>
+                        <span class="jn-speedtest-number">{{speedTest.jitter}}</span>
+                        <span v-if="speedTestStatus !== 'idle'">ms</span>
+                      </p>
                     </div>
                   </div>
                   <div id="result"></div>
@@ -373,7 +377,8 @@
           </div>
           <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
             <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-              :placeholder="currentTexts.ipcheck.Placeholder" v-model="inputIP" @keyup.enter="submitQuery" name="inputIP" id="inputIP">
+              :placeholder="currentTexts.ipcheck.Placeholder" v-model="inputIP" @keyup.enter="submitQuery"
+              name="inputIP" id="inputIP">
             <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
             <div v-if="modalQueryResult" class="mt-2">
               <div class="card-body">
