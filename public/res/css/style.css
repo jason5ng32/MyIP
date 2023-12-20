@@ -240,12 +240,19 @@ footer {
 .jn-speedtest-number {
     font-size: 2em;
 }
-.jn-speedtest-note::before {
+
+.jn-speedtest-note {
+    background-color: #3a93643b;
+    border: 1px solid #1a8754;
+    margin: 0;
+    border-radius: 6pt;
+}
+/* .jn-speedtest-note::before {
     content: "";
     border-top: 1px solid #19945a5c;
     width: 50%;
     margin: 0 auto;
-}
+} */
 
 .speedtest-p {
     margin-top:10pt;
