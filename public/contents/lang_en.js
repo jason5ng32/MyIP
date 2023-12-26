@@ -125,6 +125,9 @@ export default {
     keywords:"MyIP,IP Tool,My IP,IP check,IP lookup,DNS leak test,WebRTC test,Speed test",
     footerName: "Creators: Jason Ng, Seven Yu & ChatGPT",
     footerLink: "https://github.com/jason5ng32/MyIP",
+    copyRightName: "Originally from ",
+    copyRightLink: "https://ipcheck.ing",
+    copyRightLinkName: "IPCheck.ing",
   },
   addBingMapKey: {
     Title: "Add Bing Map API Key",

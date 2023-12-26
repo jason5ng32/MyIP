@@ -53,6 +53,7 @@ new Vue({
     ipDataCache: new Map(),
     speedTestStatus: "idle",
     copiedStatus: {},
+    siteValidate: false,
 
     // from contents
     connectivityTests,
@@ -88,6 +89,7 @@ new Vue({
       fetch('/api/validate-site')
         .then(response => response.json())
         .then(data => {
+          this.siteValidate = data.isIpCheckEnabled;
           if (data.isIpCheckEnabled) {
             this.getIPFromGCR();
           } else {

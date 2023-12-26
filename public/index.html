@@ -12,7 +12,8 @@
   <meta name="background-color" content="#ffffff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="apple-touch-icon" href="res/img/logo-512.png">
-  <title>Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Speed Test | Jason Ng Open Source </title>
+  <title>Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Speed Test | Jason Ng Open
+    Source </title>
   <!--  Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -456,6 +457,11 @@
       <p class="text-center">{{currentTexts.page.footerName}} <a :href="currentTexts.page.footerLink" class="link-dark"
           target="_blank"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
       </p>
+      <p v-if="!siteValidate" class="text-center fs-6 fw-light" style="opacity: 0.5;">
+        {{currentTexts.page.copyRightName}} <a :href="currentTexts.page.copyRightLink" class="link-underline-light"
+          target="_blank"
+          :class="[ isDarkMode? 'dark-mode link-light':'link-dark' ]">{{currentTexts.page.copyRightLinkName}}</a>
+      </p>
     </footer>
 
   </div>
@@ -468,7 +474,6 @@
   <!-- 引入 Vue.js -->
   <script src="res/vue.js"></script>
   <script type="module" src="res/app.js"></script>
-  <!-- <script type="module" src="res/cfSpeedTest.js"></script> -->
 
   <script>
     if ('serviceWorker' in navigator) {
