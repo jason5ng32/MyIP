@@ -629,7 +629,19 @@ new Vue({
       }
     },
     updatePageTitle(lang) {
-      document.title = this.currentTexts.page.title;
+      this.$nextTick(() => {
+        document.title = this.currentTexts.page.title;
+
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', this.currentTexts.page.description);
+        }
+
+        const metaKeywords = document.querySelector('meta[name="keywords"]');
+        if (metaKeywords) {
+          metaKeywords.setAttribute('content', this.currentTexts.page.keywords);
+        }
+      });
     },
 
     // 手动设置语言
