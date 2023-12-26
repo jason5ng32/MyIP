@@ -323,19 +323,19 @@ new Vue({
       // 从所有来源获取 IP 地址
       setTimeout(() => {
         this.getIPFromSpecial();
-      }, 100);
+      }, 500);
       setTimeout(() => {
         this.getIPFromTaobao();
-      }, 1000);
+      }, 500);
       setTimeout(() => {
         this.getIPFromCloudflare_V4();
-      }, 2000);
+      }, 500);
       setTimeout(() => {
         this.getIPFromCloudflare_V6();
       }, 100);
       setTimeout(() => {
         this.getIPFromIpify_V4();
-      }, 4000);
+      }, 1000);
       setTimeout(() => {
         this.getIPFromIpify_V6();
       }, 1000);
@@ -1148,7 +1148,7 @@ new Vue({
     initializeTimedChecks() {
       const initTasks = [
         { action: () => this.checkAllIPs(), delay: 0 },
-        { action: () => this.checkAllConnectivity(true, false), delay: 5000 },
+        { action: () => this.checkAllConnectivity(true, false), delay: 2000 },
         { action: () => this.checkAllWebRTC(false), delay: 4000 },
         { action: () => this.checkAllDNSLeakTest(false), delay: 2500 },
         { action: () => { this.isInfosLoaded = true; }, delay: 6000 },
