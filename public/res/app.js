@@ -396,14 +396,16 @@ new Vue({
         }
       };
 
-      connectivityTests.forEach((test) => {
-        this.checkConnectivityHandler(test, isAlertToShow, onTestComplete);
+      connectivityTests.forEach((test, index) => {
+        setTimeout(() => {
+          this.checkConnectivityHandler(test, isAlertToShow, onTestComplete);
+        }, 50 * index);
       });
 
       if (isAlertToShow) {
         setTimeout(() => {
           this.showToast();
-        }, 3500);
+        }, 4000);
       }
     },
 
