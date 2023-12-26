@@ -186,7 +186,7 @@ new Vue({
       const sources = [
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-        { url: `https://api.ipcheck.ing/json/${ip}`, transform: this.transformDataFromIPcheck }
+        { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi }
       ];
 
       for (const source of sources) {
@@ -224,25 +224,6 @@ new Vue({
         asn: data.asn || "",
         asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}` : ""
-      };
-    },
-
-    transformDataFromIPcheck(data) {
-      if (data.status !== "success") {
-        throw new Error("IP lookup failed");
-      }
-
-      return {
-        country_name: data.country || "",
-        country_code: data.countryCode || "",
-        region: data.regionName || "",
-        city: data.city || "",
-        latitude: data.lat || "",
-        longitude: data.lon || "",
-        isp: data.isp || "",
-        asn: data.as ? data.as.split(" ")[0] : "",
-        asnlink: data.as ? `https://radar.cloudflare.com/traffic/${data.as.split(" ")[0]}` : false,
-        mapUrl: data.lat && data.lon ? `/api/map?latitude=${data.lat}&longitude=${data.lon}&language=${this.bingMapLanguage}` : ""
       };
     },
 
@@ -419,6 +400,10 @@ new Vue({
         this.modalQueryResult = null;
       }
     },
+    setupModalEventListener() {
+      const modalElement = document.getElementById("IPCheck");
+      modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
+    },
     isValidIP(ip) {
       const ipv4Pattern =
         /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
@@ -430,7 +415,7 @@ new Vue({
       const sources = [
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-        { url: `https://api.ipcheck.ing/json/${ip}`, transform: this.transformDataFromIPcheck }
+        { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi }
       ];
 
       for (const source of sources) {
@@ -826,26 +811,6 @@ new Vue({
         this.refreshEverything();
       }
     },
-    refreshEverything() {
-      this.checkAllIPs();
-      setTimeout(() => {
-        this.checkAllConnectivity(false, true);
-      }, 2000);
-      setTimeout(() => {
-        this.checkAllWebRTC(true);
-      }, 4000);
-      setTimeout(() => {
-        this.checkAllDNSLeakTest(true);
-      }, 3000);
-      setTimeout(() => {
-        this.alertStyle = "text-success";
-        this.alertMessage = this.currentTexts.alert.refreshEverythingMessage;
-        this.alertTitle = this.currentTexts.alert.refreshEverythingTitle;
-        this.alertToShow = true;
-        this.showToast();
-      }, 500);
-      this.infoMaskLevel = 0;
-    },
     hideLoading() {
       var loadingElement = document.getElementById("loading");
       if (loadingElement) {
@@ -992,9 +957,175 @@ new Vue({
         console.error('Copy error', err);
       });
     },
+    // 快捷键
+    registerShortcutKeys() {
+      const shortcutConfig = [
+        {
+          keys: "g",
+          action() {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          },
+          description: this.currentTexts.shortcutKeys.GoToTop,
+        },
+        {
+          keys: 'j',
+          action: () => navigateCards('down'),
+          description: this.currentTexts.shortcutKeys.GoNext
+        },
+        {
+          keys: 'k',
+          action: () => navigateCards('up'),
+          description: this.currentTexts.shortcutKeys.GoPrevious
+        },
+        {
+          keys: "G",
+          action() {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          },
+          description: this.currentTexts.shortcutKeys.GoToBottom,
+        },
+        {
+          keys: "D",
+          action: this.toggleDarkMode,
+          description: this.currentTexts.shortcutKeys.ToggleDarkMode,
+        },
+        {
+          keys: "R",
+          action: this.refreshEverything,
+          description: this.currentTexts.shortcutKeys.RefreshEverything,
+        },
+        {
+          keys: "([1-6])",
+          type: "regex",
+          action: (num) => {
+            const card = this.ipDataCards[num - 1];
+            const [el] = this.$refs[card.id];
+            this.scrollToElement(el, 60);
+            this.refreshCard(card);
+          },
+          description: this.currentTexts.shortcutKeys.RefreshIPCard,
+        },
+        {
+          keys: "c",
+          action: () => {
+            this.scrollToElement("Connectivity", 80);
+            this.checkAllConnectivity(false, true);
+          },
+          description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
+        },
+        {
+          keys: "w",
+          action: () => {
+            this.scrollToElement("WebRTC", 80);
+            this.checkAllWebRTC(true);
+          },
+          description: this.currentTexts.shortcutKeys.RefreshWebRTC,
+        },
+        {
+          keys: "d",
+          action: () => {
+            this.scrollToElement("DNSLeakTest", 80);
+            this.checkAllDNSLeakTest(true);
+          },
+          description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
+        },
+        {
+          keys: "s",
+          action: () => {
+            this.scrollToElement("SpeedTest", 80);
+            this.refreshstartSpeedTest();
+          },
+          description: this.currentTexts.shortcutKeys.StartSpeedTest,
+        },
+        {
+          keys: "m",
+          action: () => {
+            if (this.isEnvBingMapKey) {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              this.toggleMaps();
+            }
+          },
+          description: this.currentTexts.shortcutKeys.ToggleMaps,
+        },
+        {
+          keys: "q",
+          action: () => {
+            this.openModal("IPCheck");
+          },
+          description: this.currentTexts.shortcutKeys.IPCheck,
+        },
+        {
+          keys: "h",
+          action: () => {
+            this.isInfosLoaded && this.toggleInfoMask();
+          },
+          description: this.currentTexts.shortcutKeys.ToggleInfoMask,
+        },
+
+        // help
+        {
+          keys: "?",
+          action: () => {
+            this.openModal("helpModal");
+          },
+          description: this.currentTexts.shortcutKeys.Help,
+        },
+      ];
+
+      shortcutConfig.forEach(config => mappingKeys(config));
+    },
+    // 初始化测试
+    scheduleTimedTasks(tasks) {
+      tasks.forEach(task => {
+        setTimeout(() => {
+          task.action();
+          if (task.message) {
+            this.displayAlert(task.message);
+          }
+        }, task.delay);
+      });
+    },
+
+    initializeTimedChecks() {
+      const initTasks = [
+        { action: () => this.checkAllIPs(), delay: 0 },
+        { action: () => this.checkAllConnectivity(true, false), delay: 2500 },
+        { action: () => this.checkAllWebRTC(false), delay: 4000 },
+        { action: () => this.checkAllDNSLeakTest(false), delay: 2500 },
+        { action: () => { this.isInfosLoaded = true; }, delay: 6000 },
+      ];
+      this.scheduleTimedTasks(initTasks);
+    },
+
+    // 通过 logo 点击重新测试
+    refreshEverything() {
+      const refreshTasks = [
+        { action: () => this.checkAllIPs(), delay: 0 },
+        { action: () => this.checkAllConnectivity(false, true), delay: 2000 },
+        { action: () => this.checkAllWebRTC(true), delay: 4000 },
+        { action: () => this.checkAllDNSLeakTest(true), delay: 3000 },
+        { action: () => this.refreshingAlert(), delay: 500 },
+      ];
+      this.scheduleTimedTasks(refreshTasks);
+      this.infoMaskLevel = 0;
+    },
+
+    refreshingAlert() {
+      this.alertStyle = "text-success";
+      this.alertMessage = this.currentTexts.alert.refreshEverythingMessage;
+      this.alertTitle = this.currentTexts.alert.refreshEverythingTitle;
+      this.alertToShow = true;
+      this.showToast();
+    },
   },
 
   created() {
+    this.hideLoading();
+    this.checkSystemDarkMode();
+    this.PWAColor();
     const isLanguageSet = this.getLanguageFromURL();
     if (!isLanguageSet) {
       this.checkBrowserLanguage();
@@ -1005,9 +1136,11 @@ new Vue({
     this.isMobile = window.innerWidth < 768;
     window.addEventListener("resize", this.handleResize);
   },
+
   destroyed() {
     window.removeEventListener("resize", this.handleResize);
   },
+
   watch: {
     isMapShown(newVal) {
       localStorage.setItem("isMapShown", JSON.stringify(newVal));
@@ -1016,145 +1149,14 @@ new Vue({
       localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
     },
   },
+
   mounted() {
     this.updatePageTitle(this.currentLanguage);
-    this.checkSystemDarkMode();
-    this.PWAColor();
-    this.checkAllIPs();
-    this.hideLoading();
+    this.initializeTimedChecks();
     this.setupModalFocus();
-    mappingKeys(
-      {
-        keys: "g",
-        action() {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        },
-        description: this.currentTexts.shortcutKeys.GoToTop,
-      },
-      {
-        keys: 'j',
-        action: () => navigateCards('down'),
-        description: this.currentTexts.shortcutKeys.GoNext
-      },
-      {
-        keys: 'k',
-        action: () => navigateCards('up'),
-        description: this.currentTexts.shortcutKeys.GoPrevious
-      },
-      {
-        keys: "G",
-        action() {
-          window.scrollTo({
-            top: document.body.scrollHeight,
-            behavior: "smooth",
-          });
-        },
-        description: this.currentTexts.shortcutKeys.GoToBottom,
-      },
-      {
-        keys: "D",
-        action: this.toggleDarkMode,
-        description: this.currentTexts.shortcutKeys.ToggleDarkMode,
-      },
-      {
-        keys: "R",
-        action: this.refreshEverything,
-        description: this.currentTexts.shortcutKeys.RefreshEverything,
-      },
-      {
-        keys: "([1-6])",
-        type: "regex",
-        action: (num) => {
-          const card = this.ipDataCards[num - 1];
-          const [el] = this.$refs[card.id];
-          this.scrollToElement(el, 60);
-          this.refreshCard(card);
-        },
-        description: this.currentTexts.shortcutKeys.RefreshIPCard,
-      },
-      {
-        keys: "c",
-        action: () => {
-          this.scrollToElement("Connectivity", 80);
-          this.checkAllConnectivity(false, true);
-        },
-        description: this.currentTexts.shortcutKeys.RefreshConnectivityTests,
-      },
-      {
-        keys: "w",
-        action: () => {
-          this.scrollToElement("WebRTC", 80);
-          this.checkAllWebRTC(true);
-        },
-        description: this.currentTexts.shortcutKeys.RefreshWebRTC,
-      },
-      {
-        keys: "d",
-        action: () => {
-          this.scrollToElement("DNSLeakTest", 80);
-          this.checkAllDNSLeakTest(true);
-        },
-        description: this.currentTexts.shortcutKeys.RefreshDNSLeakTest,
-      },
-      {
-        keys: "s",
-        action: () => {
-          this.scrollToElement("SpeedTest", 80);
-          this.refreshstartSpeedTest();
-        },
-        description: this.currentTexts.shortcutKeys.StartSpeedTest,
-      },
-      {
-        keys: "m",
-        action: () => {
-          if (this.isEnvBingMapKey) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            this.toggleMaps();
-          }
-        },
-        description: this.currentTexts.shortcutKeys.ToggleMaps,
-      },
-      {
-        keys: "q",
-        action: () => {
-          this.openModal("IPCheck");
-        },
-        description: this.currentTexts.shortcutKeys.IPCheck,
-      },
-      {
-        keys: "h",
-        action: () => {
-          this.isInfosLoaded && this.toggleInfoMask();
-        },
-        description: this.currentTexts.shortcutKeys.ToggleInfoMask,
-      },
-
-      // help
-      {
-        keys: "?",
-        action: () => {
-          this.openModal("helpModal");
-        },
-        description: this.currentTexts.shortcutKeys.Help,
-      }
-    );
+    this.registerShortcutKeys();
     this.keyMap = keyMap;
-    setTimeout(() => {
-      this.checkAllConnectivity(true, false);
-    }, 2500);
-    setTimeout(() => {
-      this.checkAllWebRTC(false);
-    }, 4000);
-    setTimeout(() => {
-      this.checkAllDNSLeakTest(false);
-    }, 2500);
-    setTimeout(() => {
-      this.checkAllConnectivity(false, false);
-    }, 6000);
-    setTimeout(() => {
-      this.isInfosLoaded = true;
-    }, 6000);
-    const modalElement = document.getElementById("IPCheck");
-    modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
+    this.setupModalEventListener();
   },
+
 });
