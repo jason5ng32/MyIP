@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const mapHandler = require('./api/map');
 const validateMapKeyHandler = require('./api/validate-map-key');
+const validateSite = require('./api/validate-site');
 const ipinfoHandler = require('./api/ipinfo');
 const ipapicomHandler = require('./api/ipapicom');
 
@@ -19,7 +20,9 @@ app.get('/api/ipapicom', ipapicomHandler);
 // 设置静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 一些判断
 app.all('/api/validate-map-key', validateMapKeyHandler);
+app.all('/api/validate-site', validateSite);
 
 // 启动服务器
 app.listen(port, () => {

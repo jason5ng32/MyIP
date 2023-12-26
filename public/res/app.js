@@ -69,6 +69,33 @@ new Vue({
     keyMap,
   },
   methods: {
+
+    getIPFromTaobao() {
+      window.ipCallback = (data) => {
+        var ip = data.ip;
+        this.ipDataCards[0].source = "TaoBao";
+        this.fetchIPDetails(0, ip);
+        delete window.ipCallback; // 清理
+      };
+      var script = document.createElement("script");
+      script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
+      document.head.appendChild(script);
+      // 清理
+      document.head.removeChild(script);
+    },
+
+    getIPFromSpecial() {
+      fetch('/api/validate-site')
+        .then(response => response.json())
+        .then(data => {
+          if (data.isIpCheckEnabled) {
+            this.getIPFromGCR();
+          } else {
+            this.getIPFromUpai();
+          }
+        });
+    },
+
     getIPFromUpai() {
       const unixTime = Date.now();
       const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
@@ -82,26 +109,38 @@ new Vue({
         })
         .then((data) => {
           const ip = data.remote_addr;
-          this.fetchIPDetails(0, ip);
+          this.ipDataCards[1].source = "Upai"
+          this.fetchIPDetails(1, ip);
         })
         .catch((error) => {
           console.error("Error fetching IP from Upai:", error);
-          this.ipDataCards[0].ip = this.currentTexts.ipInfos.IPv4Error;
+          this.ipDataCards[1].ip = this.currentTexts.ipInfos.IPv4Error;
         });
     },
 
-    getIPFromTaobao() {
-      window.ipCallback = (data) => {
-        var ip = data.ip;
-        this.ipDataCards[1].source = "TaoBao";
-        this.fetchIPDetails(1, ip);
-        delete window.ipCallback; // 清理
-      };
-      var script = document.createElement("script");
-      script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
-      document.head.appendChild(script);
-      // 清理
-      document.head.removeChild(script);
+    getIPFromGCR() {
+      const url = `https://getipfromgoogle.ipcheck.ing/`;
+
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // 从 data.ip 获取第一个逗号前的部分
+          const fullIp = data.ip;
+          const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
+          this.ipDataCards[1].source = "IPCheck.ing";
+          // 使用提取的 IP 地址
+          this.fetchIPDetails(1, ip);
+        })
+
+        .catch((error) => {
+          console.error("Error fetching IP from IPCheck.ing:", error);
+          this.ipDataCards[1].ip = this.currentTexts.ipInfos.IPv4Error;
+        });
     },
 
     getIPFromCloudflare_V4() {
@@ -247,6 +286,9 @@ new Vue({
         case "Upai":
           this.getIPFromUpai(card);
           break;
+        case "IPCheck.ing":
+          this.getIPFromGCR(card);
+          break;
         case "TaoBao":
           this.getIPFromTaobao(card);
           break;
@@ -278,7 +320,7 @@ new Vue({
     checkAllIPs() {
       // 从所有来源获取 IP 地址
       setTimeout(() => {
-        this.getIPFromUpai();
+        this.getIPFromSpecial();
       }, 100);
       setTimeout(() => {
         this.getIPFromTaobao();
