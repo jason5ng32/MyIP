@@ -349,7 +349,7 @@ new Vue({
       var timeout = setTimeout(() => {
         test.status = this.currentTexts.connectivity.StatusUnavailable;
         onTestComplete(false);
-      }, 3 * 1000);
+      }, 3 * 1200);
 
       img.onload = () => {
         clearTimeout(timeout);
@@ -1162,7 +1162,7 @@ new Vue({
         { action: () => this.checkAllIPs(), delay: 0 },
         { action: () => this.checkAllConnectivity(false, true), delay: 2000 },
         { action: () => this.checkAllWebRTC(true), delay: 4000 },
-        { action: () => this.checkAllDNSLeakTest(true), delay: 3000 },
+        { action: () => this.checkAllDNSLeakTest(true), delay: 2500 },
         { action: () => this.refreshingAlert(), delay: 500 },
       ];
       this.scheduleTimedTasks(refreshTasks);
