@@ -1148,7 +1148,7 @@ new Vue({
     initializeTimedChecks() {
       const initTasks = [
         { action: () => this.checkAllIPs(), delay: 0 },
-        { action: () => this.checkAllConnectivity(true, false), delay: 2500 },
+        { action: () => this.checkAllConnectivity(true, false), delay: 5000 },
         { action: () => this.checkAllWebRTC(false), delay: 4000 },
         { action: () => this.checkAllDNSLeakTest(false), delay: 2500 },
         { action: () => { this.isInfosLoaded = true; }, delay: 6000 },
