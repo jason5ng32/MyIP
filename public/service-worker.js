@@ -1,5 +1,5 @@
 // service-worker.js
-const CACHE_NAME = 'v1_cache';
+const CACHE_NAME = 'v3_cache';
 const urlsToCache = [
     'res/vue.js',
     'res/img/defaultMap.jpg',

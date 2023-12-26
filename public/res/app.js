@@ -76,12 +76,11 @@ new Vue({
         var ip = data.ip;
         this.ipDataCards[0].source = "TaoBao";
         this.fetchIPDetails(0, ip);
-        delete window.ipCallback; // 清理
+        delete window.ipCallback;
       };
       var script = document.createElement("script");
       script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
       document.head.appendChild(script);
-      // 清理
       document.head.removeChild(script);
     },
 
@@ -131,17 +130,15 @@ new Vue({
           return response.json();
         })
         .then((data) => {
-          // 从 data.ip 获取第一个逗号前的部分
           const fullIp = data.ip;
           const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
           this.ipDataCards[1].source = "IPCheck.ing";
-          // 使用提取的 IP 地址
           this.fetchIPDetails(1, ip);
         })
 
         .catch((error) => {
           console.error("Error fetching IP from IPCheck.ing:", error);
-          this.ipDataCards[1].ip = this.currentTexts.ipInfos.IPv4Error;
+          this.getIPFromUpai();
         });
     },
 
@@ -542,7 +539,7 @@ new Vue({
     },
 
     generate14DigitString() {
-      const fixedString = "jn32"; // 固定字符串
+      const fixedString = "jn32";
       const randomString = Math.random().toString(36).substring(2, 11);
 
       return fixedString + randomString;
