@@ -3,14 +3,14 @@ export default [
     id: "netease",
     name: "Netease",
     icon: "globe-americas",
-    url: "https://s2.music.126.net/style/web2/img/frame/topbar.png?",
+    url: "https://www.163.com/favicon.ico?",
     status: "",
   },
   {
     id: "baidu",
     name: "Baidu",
     icon: "globe-americas",
-    url: "https://www.baidu.com/img/flexible/logo/pc/peak-result.png?",
+    url: "https://www.baidu.com/favicon.ico?",
     status: "",
   },
   {
