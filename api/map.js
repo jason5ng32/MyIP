@@ -26,9 +26,12 @@ module.exports = (req, res) => {
     const pp = `${latitude},${longitude};66`;
     const fmt = 'jpeg';
     const dpi = 'Large';
-    const apiKey = process.env.BING_MAP_API_KEY;
+    
+    const apiKeys = (process.env.BING_MAP_API_KEY || '').split(',');
+    const apiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 
     const url = `https://dev.virtualearth.net/REST/v1/Imagery/Map/${CanvasMode}/${latitude},${longitude}/5?mapSize=${mapSize}&pp=${pp}&key=${apiKey}&fmt=${fmt}&dpi=${dpi}&c=${language}`;
+
 
     https.get(url, apiRes => {
         apiRes.pipe(res);

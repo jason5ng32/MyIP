@@ -21,6 +21,8 @@
     justify-content: space-between;
     align-items: center;
     flex-direction: row;
+    border: 0;
+    background-color:unset;
 }
 
 .jn-alert {
