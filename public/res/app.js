@@ -30,6 +30,7 @@ new Vue({
   data: {
 
     isEnvBingMapKey: false,
+    BingMapCanvasMode: "CanvasLight",
     currentLanguage: "en",
     currentTexts: {},
 
@@ -261,7 +262,8 @@ new Vue({
         isp: data.org || "",
         asn: data.asn || "",
         asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
-        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}` : ""
+        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
+        mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasDark` : ""
       };
     },
 
@@ -307,6 +309,7 @@ new Vue({
       card.asn = "";
       card.isp = "";
       card.mapUrl = "res/img/defaultMap.jpg";
+      card.mapUrl_dark = "res/img/defaultMap_dark.jpg";
     },
 
     toggleMaps() {
@@ -773,6 +776,7 @@ new Vue({
           card.isp = "Google LLC";
           card.asn = "AS15169";
           card.mapUrl = "res/img/defaultMap.jpg";
+          card.mapUrl_dark = "res/img/defaultMap_dark.jpg";
         });
         this.leakTest.forEach((server) => {
           server.geo = "United States";

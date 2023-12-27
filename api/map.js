@@ -16,7 +16,7 @@ module.exports = (req, res) => {
     }
 
     // 使用 req.query 获取参数
-    const { latitude, longitude, language } = req.query;
+    const { latitude, longitude, language, CanvasMode } = req.query;
 
     if (!latitude || !longitude || !language) {
         return res.status(400).json({ error: 'Missing latitude, longitude, or language' });
@@ -28,7 +28,7 @@ module.exports = (req, res) => {
     const dpi = 'Large';
     const apiKey = process.env.BING_MAP_API_KEY;
 
-    const url = `https://dev.virtualearth.net/REST/v1/Imagery/Map/Road/${latitude},${longitude}/5?mapSize=${mapSize}&pp=${pp}&key=${apiKey}&fmt=${fmt}&dpi=${dpi}&c=${language}`;
+    const url = `https://dev.virtualearth.net/REST/v1/Imagery/Map/${CanvasMode}/${latitude},${longitude}/5?mapSize=${mapSize}&pp=${pp}&key=${apiKey}&fmt=${fmt}&dpi=${dpi}&c=${language}`;
 
     https.get(url, apiRes => {
         apiRes.pipe(res);
