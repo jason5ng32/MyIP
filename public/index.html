@@ -137,9 +137,8 @@
                       :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
                       <i class="bi bi-arrow-clockwise"></i></button>
                   </div>
-
-                  <img v-if="isMapShown && !isMobile" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
-                    class="card-img-top jn-map-image" alt="Map">
+                    <img v-if="isMapShown" v-if="!isMobile" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
+                    alt="Map">
                   <div class="card-body">
                     <ul class="list-group list-group-flush">
                       <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
