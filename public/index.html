@@ -382,10 +382,6 @@
             <div v-if="modalQueryResult" class="mt-2">
               <div class="card-body">
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🖥️ {{currentTexts.ipInfos.IP}}</span>: {{
-                    modalQueryResult.ip }}
-                  </li>
                   <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                     <span class="jn-text">🌍 {{currentTexts.ipInfos.Country}}</span>: {{
                     modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
