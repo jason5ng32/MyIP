@@ -5,6 +5,7 @@ const mapHandler = require('./api/map');
 const validateMapKeyHandler = require('./api/validate-map-key');
 const validateSite = require('./api/validate-site');
 const ipinfoHandler = require('./api/ipinfo');
+const ip2locationioHandler = require('./api/ip2locationio');
 const ipapicomHandler = require('./api/ipapicom');
 
 const app = express();
@@ -15,7 +16,8 @@ app.get('/api/map', mapHandler);
 
 // 使用查询参数处理所有 IP 地址请求
 app.get('/api/ipinfo', ipinfoHandler);
-app.get('/api/ipapicom', ipapicomHandler);
+app.get('/api/ip2locationio', ip2locationioHandler);
+app.get('/api/ipinfo', ipinfoHandler);
 
 // 设置静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));

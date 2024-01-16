@@ -223,6 +223,7 @@ new Vue({
 
       // 尝试从多个不同的源获取数据
       const sources = [
+        { url: `/api/ip2locationio?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
         { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi }
@@ -459,6 +460,7 @@ new Vue({
     },
     async fetchIPForModal(ip) {
       const sources = [
+        { url: `/api/ip2locationio?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
         { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi }

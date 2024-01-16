@@ -73,6 +73,12 @@ BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 ```
 
+If you want to use IP2Location.io API, you can also add the following:
+
+```bash
+IP2LOCATIONIO_API_KEY="YOUR_KEY_HERE"
+```
+
 If you want to use IPInfo.io API, you can also add the following:
 
 ```bash
@@ -88,6 +94,12 @@ If you want to display maps, set the following 2 environment variables during de
 ```bash
 BING_MAP_API_KEY
 ALLOWED_DOMAINS
+```
+
+If you want to use IP2Location.io API, you can also add the following:
+
+```bash
+IP2LOCATIONIO_API_KEY
 ```
 
 If you want to use IPInfo.io API, you can also add the following:
@@ -110,6 +122,18 @@ If you wish to display maps, set the Bing Map API Key and allowed domains during
 docker run -d -p 8966:8966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
+  --name myip \
+  jason5ng32/myip:latest
+
+```
+
+If you want to use IP2Location.io API, you can also add the following:
+
+```bash
+docker run -d -p 8966:8966 \
+  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
+  -e ALLOWED_DOMAINS="example.com" \
+  -e IP2LOCATIONIO_API_KEY="YOUR_KEY_HERE" \
   --name myip \
   jason5ng32/myip:latest
 

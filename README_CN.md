@@ -75,6 +75,12 @@ BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 ```
 
+如果你先使用 IP2Location.io 的 API，可以添加：
+
+```bash
+IP2LOCATIONIO_API_KEY="YOUR_KEY_HERE"
+```
+
 如果你先使用 IPinfo.io 的 API，可以添加：
 
 ```bash
@@ -90,6 +96,12 @@ IPINFO_API_TOKEN="YOUR_TOKEN_HERE"
 ```bash
 BING_MAP_API_KEY
 ALLOWED_DOMAINS
+```
+
+如果你想使用 IP2Location.io 的 API，可以添加：
+
+```bash
+IP2LOCATIONIO_API_KEY
 ```
 
 如果你想使用 IPinfo.io 的 API，可以添加：
@@ -112,6 +124,18 @@ docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
 docker run -d -p 8966:8966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
+  --name myip \
+  jason5ng32/myip:latest
+
+```
+
+如果你希望同时使用 IP2Location.io 的 API：
+
+```bash
+docker run -d -p 8966:8966 \
+  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
+  -e ALLOWED_DOMAINS="example.com" \
+  -e IP2LOCATIONIO_API_KEY="YOUR_KEY_HERE" \
   --name myip \
   jason5ng32/myip:latest
 
