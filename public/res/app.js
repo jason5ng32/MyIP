@@ -66,6 +66,10 @@ new Vue({
     leakTest,
     speedTest,
     originleakTest: {},
+    allIPs: [],
+    selectedIP: null,
+    pingResults: {},
+    pingCheckStatus: "idle",
 
     // keyMap
     keyMap,
@@ -1150,11 +1154,13 @@ new Vue({
 
     initializeTimedChecks() {
       const initTasks = [
+        { action: () => this.initAllIPs(), delay: 0 },
         { action: () => this.checkAllIPs(), delay: 0 },
         { action: () => this.checkAllConnectivity(true, false), delay: 2000 },
         { action: () => this.checkAllWebRTC(false), delay: 4000 },
         { action: () => this.checkAllDNSLeakTest(false), delay: 2500 },
         { action: () => { this.isInfosLoaded = true; }, delay: 6000 },
+        { action: () => this.getAllIPs(), delay: 6000 }
       ];
       this.scheduleTimedTasks(initTasks);
     },
@@ -1162,11 +1168,13 @@ new Vue({
     // 通过 logo 点击重新测试
     refreshEverything() {
       const refreshTasks = [
+        { action: () => this.initAllIPs(), delay: 0 },
         { action: () => this.checkAllIPs(), delay: 0 },
         { action: () => this.checkAllConnectivity(false, true), delay: 2000 },
         { action: () => this.checkAllWebRTC(true), delay: 4000 },
         { action: () => this.checkAllDNSLeakTest(true), delay: 2500 },
         { action: () => this.refreshingAlert(), delay: 500 },
+        { action: () => this.getAllIPs(), delay: 6000 }
       ];
       this.scheduleTimedTasks(refreshTasks);
       this.infoMaskLevel = 0;
@@ -1179,6 +1187,108 @@ new Vue({
       this.alertToShow = true;
       this.showToast();
     },
+
+    // 获取所有的 card 的 IP 地址，去重保存到 this.allIPs，需要确保 card.ip 里的内容不存在空格
+    getAllIPs() {
+      this.ipDataCards.forEach(card => {
+        if (card.ip && !card.ip.includes(' ') && !card.ip.includes(':')) {
+          this.allIPs.push(card.ip);
+        }
+      });
+      this.allIPs = [...new Set(this.allIPs)];
+    },
+    // 初始化 AllIPs 数组
+    initAllIPs() {
+      this.allIPs[0] = this.currentTexts.pingtest.SelectIP;
+      this.selectedIP = this.allIPs[0];
+    },
+    startPingCheck() {
+      // 清空上一次结果
+      this.pingResults = [];
+      // 子函数：发起 ping 请求
+      const sendPingRequest = async () => {
+        this.pingCheckStatus = "running";
+        try {
+          const response = await fetch("https://api.globalping.io/v1/measurements", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              limit: 12,
+              locations: [
+                { country: "HK" },
+                { country: "TW" },
+                { country: "US" },
+                { country: "CA" },
+                { country: "JP" },
+                { country: "SG" },
+                { country: "AU" },
+                { country: "GB" },
+                { country: "DE" },
+                { country: "FR" },
+                { country: "BR" },
+                { country: "IN" },
+              ],
+              target: this.selectedIP, // 使用用户选中的 IP 地址
+              type: "ping",
+              measurementOptions: {
+                packets: 8
+              }
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          return await response.json();
+        } catch (error) {
+          console.error("Error sending ping request:", error);
+        }
+      };
+
+      // 子函数：获取 ping 结果
+      const fetchPingResults = async (id) => {
+        try {
+          const response = await fetch(`https://api.globalping.io/v1/measurements/${id}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          this.processPingResults(data);
+
+          if (data.status === "in-progress") {
+            setTimeout(() => fetchPingResults(id), 1000);
+          } else {
+            this.pingCheckStatus = "finished";
+          }
+        } catch (error) {
+          console.error("Error fetching ping results:", error);
+        }
+      };
+
+      // 执行流程
+      sendPingRequest().then(data => {
+        if (data && data.id) {
+          setTimeout(() => {
+            fetchPingResults(data.id);
+          }, 1000);
+        }
+      });
+    },
+    processPingResults(data) {
+      const cleanedData = data.results
+        .filter(item => item.result.status === "finished") // 只处理状态为 "finished" 的结果
+        .map(item => ({
+          country: item.probe.country,
+          stats: item.result.stats
+        }));
+
+      this.pingResults = cleanedData; // 将处理后的数据保存到一个 Vue 数据属性中
+    },
+
   },
 
   created() {

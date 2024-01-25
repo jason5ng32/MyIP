@@ -68,6 +68,8 @@
             href="#DNSLeakTest">{{currentTexts.nav.DNSLeakTest}}</a>
           <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
             href="#SpeedTest">{{currentTexts.nav.SpeedTest}}</a>
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }"
+            href="#PingTest">{{currentTexts.nav.PingTest}}</a>
         </div>
       </div>
     </nav>
@@ -346,6 +348,90 @@
             </div>
           </div>
         </div>
+
+        <!-- Ping Test -->
+        <div class="ping-test-section mb-4">
+          <div class="jn-title2">
+            <h2 id="PingTest" :class="{'mobile-h2' : isMobile }">🌐 {{currentTexts.pingtest.Title}}</h2>
+
+          </div>
+          <div class="text-secondary">
+            <p>{{currentTexts.pingtest.Note}}</p>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                <div class="card-body">
+                  <!-- Dropdown for IP Selection -->
+                  <div class="row m-3 align-items-center justify-content-center">
+                    <div class="col-auto">
+                      <label for="pingIP" class="col-form-label">{{currentTexts.pingtest.Note2}}</label>
+                    </div>
+                    <div class="col-auto">
+                      <select id="pingIP" class="form-select" v-model="selectedIP"
+                        :class="{'bg-dark text-light': isDarkMode}">
+                        <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
+                      </select>
+                    </div>
+                    <div class="col-auto">
+                      <button class="btn btn-primary" @click="startPingCheck"
+                        :disabled="pingCheckStatus === 'running' || selectedIP === allIPs[0]">
+                        <span v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">Run</span>
+                        <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
+                          aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Result Display -->
+                  <div id="pingresult" v-if="pingResults.length > 0">
+
+                    <div class="table-responsive text-nowrap">
+                      <table class="table" :class="{'table-dark': isDarkMode }">
+
+
+                        <thead>
+                          <tr>
+                            <th scope="col">{{currentTexts.pingtest.Region}}</th>
+                            <th scope="col">{{currentTexts.pingtest.MinDelay}}</th>
+                            <th scope="col">{{currentTexts.pingtest.MaxDelay}}</th>
+                            <th scope="col">{{currentTexts.pingtest.AvgDelay}}</th>
+                            <th scope="col">{{currentTexts.pingtest.TotalPackets}}</th>
+                            <th scope="col">{{currentTexts.pingtest.PacketLoss}}</th>
+                            <th scope="col">{{currentTexts.pingtest.ReceivedPackets}}</th>
+                            <th scope="col">{{currentTexts.pingtest.DroppedPackets}}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="result in pingResults" :key="result.country">
+                            <td>
+                              <span :class="'flag-icon flag-icon-' + result.country.toLowerCase()"></span>
+                              {{ result.country }}
+                            </td>
+                            <td :class="result.stats.min < 100 ? 'text-success' : ''">{{ result.stats.min.toFixed(1) }}
+                            </td>
+                            <td :class="result.stats.max < 100 ? 'text-success' : ''">{{ result.stats.max.toFixed(1) }}
+                            </td>
+                            <td :class="result.stats.avg < 100 ? 'text-success' : ''">{{ result.stats.avg.toFixed(1) }}
+                            </td>
+                            <td>{{ result.stats.total }}</td>
+                            <td>{{ Math.round(result.stats.loss) }}%</td>
+                            <td>{{ result.stats.rcv }}</td>
+                            <td>{{ result.stats.drop }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
 
 

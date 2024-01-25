@@ -26,6 +26,7 @@ Notes: You can use my demo, but please don't use it for commercial purposes. If 
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * 🚀 **Speed Test**：Test your network speed with edge networks.
+* 🌐 **Global Latency Test**: Performe lantency test on servers located in different regions around the world.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
 * 🇺🇸🇨🇳 English and Chinese supported.
