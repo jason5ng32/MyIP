@@ -88,6 +88,7 @@ export default {
     ReceivedPackets: "收到",
     DroppedPackets: "丢失",
     Run: "运行测试",
+    Error: "测试失败，看起来你的 IP 不允许进行 Ping 测试。",
   },
   ipcheck: {
     id: "ipcheck",

@@ -379,7 +379,7 @@
                           <button class="btn btn-primary" @click="startPingCheck"
                             :disabled="pingCheckStatus === 'running' || selectedIP === allIPs[0]">
                             <span
-                              v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">{{currentTexts.pingtest.Run}}</span>
+                              v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' || pingCheckStatus === 'error' ">{{currentTexts.pingtest.Run}}</span>
                             <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
                               aria-hidden="true"></span>
                           </button>
@@ -390,11 +390,8 @@
 
                   <!-- Result Display -->
                   <div id="pingresult" v-if="pingResults.length > 0">
-
                     <div class="table-responsive text-nowrap">
                       <table class="table" :class="{'table-dark': isDarkMode }">
-
-
                         <thead>
                           <tr>
                             <th scope="col">{{currentTexts.pingtest.Region}}</th>
@@ -427,10 +424,12 @@
                         </tbody>
                       </table>
                     </div>
-
-
-
                   </div>
+
+                  <div id="pingresult-error" v-if="pingCheckStatus === 'error'">
+                    <p class="text-center text-danger">{{currentTexts.pingtest.Error}}</p>
+                  </div>
+
                 </div>
               </div>
             </div>

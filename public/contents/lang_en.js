@@ -88,6 +88,7 @@ export default {
     ReceivedPackets: "Received",
     DroppedPackets: "Dropped",
     Run: "Run Test",
+    Error: "Test failed, it looks like your IP is not allowed to perform Ping test.",
   },
   ipcheck: {
     id: "ipcheck",

@@ -1264,7 +1264,12 @@ new Vue({
             setTimeout(() => fetchPingResults(id), 1000);
             tryCount++;
           } else {
-            this.pingCheckStatus = "finished";
+            // 如果 this.pingResults 是空数组，返回错误信息
+            if (this.pingResults.length === 0) {
+              this.pingCheckStatus = "error";
+            } else {
+              this.pingCheckStatus = "finished";
+            }
           }
         } catch (error) {
           console.error("Error fetching ping results:", error);
@@ -1283,6 +1288,7 @@ new Vue({
     processPingResults(data) {
       const cleanedData = data.results
         .filter(item => item.result.status === "finished")
+        .filter(item => item.result.stats.min !== null)
         .map(item => ({
           country: item.probe.country,
           stats: item.result.stats
