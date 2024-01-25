@@ -1205,6 +1205,7 @@ new Vue({
     startPingCheck() {
       // 清空上一次结果
       this.pingResults = [];
+      let tryCount = 0;
       // 子函数：发起 ping 请求
       const sendPingRequest = async () => {
         this.pingCheckStatus = "running";
@@ -1259,8 +1260,9 @@ new Vue({
           const data = await response.json();
           this.processPingResults(data);
 
-          if (data.status === "in-progress") {
+          if (data.status === "in-progress" && tryCount < 4) {
             setTimeout(() => fetchPingResults(id), 1000);
+            tryCount++;
           } else {
             this.pingCheckStatus = "finished";
           }
