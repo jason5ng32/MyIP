@@ -259,3 +259,7 @@ footer {
 .speedtest-p {
     margin-top:10pt;
 }
+
+.jn-ping-form-select {
+    min-width: 140pt;
+}

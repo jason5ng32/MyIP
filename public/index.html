@@ -364,22 +364,27 @@
                 <div class="card-body">
                   <!-- Dropdown for IP Selection -->
                   <div class="row m-3 align-items-center justify-content-center">
-                    <div class="col-auto">
+                    <div class="col-12 col-md-auto">
                       <label for="pingIP" class="col-form-label">{{currentTexts.pingtest.Note2}}</label>
                     </div>
-                    <div class="col-auto">
-                      <select id="pingIP" class="form-select" v-model="selectedIP"
-                        :class="{'bg-dark text-light': isDarkMode}">
-                        <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
-                      </select>
-                    </div>
-                    <div class="col-auto">
-                      <button class="btn btn-primary" @click="startPingCheck"
-                        :disabled="pingCheckStatus === 'running' || selectedIP === allIPs[0]">
-                        <span v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">{{currentTexts.pingtest.Run}}</span>
-                        <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
-                          aria-hidden="true"></span>
-                      </button>
+                    <div class="col-12 col-md-auto mt-2 mt-md-0">
+                      <div class="row justify-content-between">
+                        <div class="col-auto">
+                          <select id="pingIP" class="form-select jn-ping-form-select" v-model="selectedIP"
+                            :class="{'bg-dark text-light': isDarkMode}">
+                            <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
+                          </select>
+                        </div>
+                        <div class="col-auto">
+                          <button class="btn btn-primary" @click="startPingCheck"
+                            :disabled="pingCheckStatus === 'running' || selectedIP === allIPs[0]">
+                            <span
+                              v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">{{currentTexts.pingtest.Run}}</span>
+                            <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
+                              aria-hidden="true"></span>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
