@@ -87,6 +87,7 @@ export default {
     PacketLoss: "Packet Loss",
     ReceivedPackets: "Received",
     DroppedPackets: "Dropped",
+    Run: "Run Test",
   },
   ipcheck: {
     id: "ipcheck",

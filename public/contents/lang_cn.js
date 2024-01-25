@@ -87,6 +87,7 @@ export default {
     PacketLoss: "丢包率",
     ReceivedPackets: "收到",
     DroppedPackets: "丢失",
+    Run: "运行测试",
   },
   ipcheck: {
     id: "ipcheck",

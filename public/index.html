@@ -376,7 +376,7 @@
                     <div class="col-auto">
                       <button class="btn btn-primary" @click="startPingCheck"
                         :disabled="pingCheckStatus === 'running' || selectedIP === allIPs[0]">
-                        <span v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">Run</span>
+                        <span v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' ">{{currentTexts.pingtest.Run}}</span>
                         <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
                           aria-hidden="true"></span>
                       </button>
