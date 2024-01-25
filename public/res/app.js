@@ -1188,7 +1188,7 @@ new Vue({
       this.showToast();
     },
 
-    // 获取所有的 card 的 IP 地址，去重保存到 this.allIPs，需要确保 card.ip 里的内容不存在空格
+    // 获取所有的 card 的 IP 地址
     getAllIPs() {
       this.ipDataCards.forEach(card => {
         if (card.ip && !card.ip.includes(' ') && !card.ip.includes(':')) {
@@ -1280,13 +1280,13 @@ new Vue({
     },
     processPingResults(data) {
       const cleanedData = data.results
-        .filter(item => item.result.status === "finished") // 只处理状态为 "finished" 的结果
+        .filter(item => item.result.status === "finished")
         .map(item => ({
           country: item.probe.country,
           stats: item.result.stats
         }));
 
-      this.pingResults = cleanedData; // 将处理后的数据保存到一个 Vue 数据属性中
+      this.pingResults = cleanedData;
     },
 
   },
