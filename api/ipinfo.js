@@ -22,7 +22,8 @@ module.exports = (req, res) => {
     }
 
     // 构建请求 ipinfo.io 的 URL
-    const token = process.env.IPINFO_API_TOKEN;
+    const tokens = (process.env.IPINFO_API_TOKEN || '').split(',');
+    const token = tokens[Math.floor(Math.random() * tokens.length)];
     const url = `https://ipinfo.io/${ipAddress}?token=${token}`;
 
     https.get(url, apiRes => {
