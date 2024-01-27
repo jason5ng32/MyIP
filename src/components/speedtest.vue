@@ -13,7 +13,7 @@
       <p>{{ $t('speedtest.Note') }}</p>
     </div>
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 mb-3">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"

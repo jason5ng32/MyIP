@@ -7,7 +7,8 @@
     "WebRTC": "WebRTC 测试",
     "DNSLeakTest": "DNS 泄漏测试",
     "SpeedTest": "网速测试",
-    "PingTest": "全球测速"
+    "PingTest": "全球测速",
+    "MTRTest": "MTR 测试"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -87,6 +88,16 @@
     "DroppedPackets": "丢失",
     "Run": "运行测试",
     "Error": "测试失败，看起来你的 IP 不允许进行 Ping 测试。"
+  },
+  "mtrtest": {
+    "id": "mtrtest",
+    "Title": "MTR 测试",
+    "Note": "将从分布在全球不同大洲和地区的服务器，分别对你的 IP 进行 MTR 测试，并获取连接路径。在进行网络检测的时候，MTR 测试结果将非常有用。",
+    "Note2": "目前仅支持 IPv4 地址，请选取你的 IP 地址进行测试",
+    "SelectIP": "选择一个 IP 地址",
+    "Region": "地区",
+    "Run": "运行测试",
+    "Error": "测试失败，看起来你的 IP 不允许进行 MTR 测试。"
   },
   "ipcheck": {
     "id": "ipcheck",

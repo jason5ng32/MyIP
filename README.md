@@ -21,12 +21,13 @@ Notes: You can use my demo, but please don't use it for commercial purposes. If 
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
 * 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
+* 🚀 **Speed Test**：Test your network speed with edge networks.
+* 🌐 **Global Latency Test**: Performe lantency tests on servers located in different regions around the world.
+* 📡 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
 * 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
-* 🚀 **Speed Test**：Test your network speed with edge networks.
-* 🌐 **Global Latency Test**: Performe lantency test on servers located in different regions around the world.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
 * 🇺🇸🇨🇳 English and Chinese supported.

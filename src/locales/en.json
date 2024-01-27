@@ -7,7 +7,8 @@
     "WebRTC": "WebRTC Test",
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
-    "PingTest": "Global Latency"
+    "PingTest": "Global Latency",
+    "MTRTest": "MTR Test"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -87,6 +88,16 @@
     "DroppedPackets": "Dropped",
     "Run": "Run Test",
     "Error": "Test failed, it looks like your IP is not allowed to perform Ping test."
+  },
+  "mtrtest": {
+    "id": "mtrtest",
+    "Title": "MTR Test",
+    "Note": "MTR test will be performed on servers located in different continents and regions around the world to measure the connection path of your IP. MTR test results will be very useful during network diagnostics.",
+    "Note2": "Currently only supports IPv4 addresses, please select your IP address for testing",
+    "SelectIP": "Select an IP Address",
+    "Region": "Region",
+    "Run": "Run Test",
+    "Error": "Test failed, it looks like your IP is not allowed to perform MTR test."
   },
   "ipcheck": {
     "id": "ipcheck",

@@ -9,7 +9,7 @@
       <p>{{ $t('pingtest.Note') }}</p>
     </div>
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 mb-3">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <!-- Dropdown for IP Selection -->

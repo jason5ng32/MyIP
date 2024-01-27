@@ -23,6 +23,7 @@
       <DNSLeaks ref="dnsLeaksRef" />
       <SpeedTest ref="speedTestRef" />
       <GlobalLatency ref="globalLatencyRef" />
+      <MTRtest ref="mtrtestRef" />
       <QueryIP ref="queryIPRef" />
       <HelpModal ref="helpModalRef" />
       <!-- Info Mask BTN-->
@@ -44,6 +45,7 @@ import WebRTC from './components/webrtc.vue'
 import DNSLeaks from './components/dnsleaks.vue'
 import SpeedTest from './components/speedtest.vue'
 import GlobalLatency from './components/globallatency.vue'
+import MTRtest from './components/mtrtest.vue'
 import Footer from './components/footer.vue'
 import QueryIP from './components/queryip.vue'
 import HelpModal from './components/help.vue'
@@ -82,6 +84,7 @@ export default {
     DNSLeaks,
     SpeedTest,
     GlobalLatency,
+    MTRtest,
     Footer,
     QueryIP,
     HelpModal,

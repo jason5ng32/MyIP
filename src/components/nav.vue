@@ -32,6 +32,7 @@
           }}</a>
           <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#PingTest"> {{ $t('nav.PingTest')
           }}</a>
+          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#MTRTest"> {{ $t('nav.MTRTest') }}</a>
         </div>
       </div>
     </nav>
