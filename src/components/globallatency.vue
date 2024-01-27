@@ -250,7 +250,7 @@ export default {
           avgPing: {
             name: this.$t('pingtest.AvgDelay'),
             format: '{0} ms',
-            thresholdMax: 200,
+            thresholdMax: 250,
             thresholdMin: 0
           },
           minPing: {
@@ -298,8 +298,8 @@ export default {
       new svgMap({
         targetElementID: 'svgMap',
         data: mapData,
-        colorMax: '#0AA1D7',
-        colorMin: '#4CAF50',
+        colorMax: '#083923',
+        colorMin: '#22CB80',
         minZoom: 1,
         maxZoom: 1,
         mouseWheelZoomEnabled: false,
