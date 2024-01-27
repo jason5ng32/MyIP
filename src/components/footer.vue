@@ -28,7 +28,6 @@ export default {
     // 监控 siteVal 的变化
     watch(siteVal, (newVal) => {
       siteValidate.value = newVal;
-      console.log('siteValidate: ', siteValidate.value);
     });
 
 

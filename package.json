@@ -4,6 +4,7 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
+    "preinstall": "npm install",
     "dev": "concurrently \"vite\" \"npm run start-server\"",
     "build": "vite build",
     "preview": "vite preview",
