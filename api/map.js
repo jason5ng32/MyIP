@@ -1,6 +1,6 @@
-const https = require('https');
+import { get } from 'https';
 
-module.exports = (req, res) => {
+export default (req, res) => {
     // 限制只能从指定域名访问
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
 
@@ -33,7 +33,7 @@ module.exports = (req, res) => {
     const url = `https://dev.virtualearth.net/REST/v1/Imagery/Map/${CanvasMode}/${latitude},${longitude}/5?mapSize=${mapSize}&pp=${pp}&key=${apiKey}&fmt=${fmt}&dpi=${dpi}&c=${language}`;
 
 
-    https.get(url, apiRes => {
+    get(url, apiRes => {
         apiRes.pipe(res);
     }).on('error', (e) => {
         res.status(500).json({ error: e.message });

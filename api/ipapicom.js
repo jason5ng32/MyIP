@@ -1,6 +1,6 @@
-const http = require('http');
+import { get } from 'http';
 
-module.exports = (req, res) => {
+export default (req, res) => {
     // 限制只能从指定域名访问
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const referer = req.headers.referer;
@@ -23,7 +23,7 @@ module.exports = (req, res) => {
     // 构建请求 ip-api.com 的 URL
     const url = `http://ip-api.com/json/${ipAddress}`;
 
-    http.get(url, apiRes => {
+    get(url, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
@@ -48,7 +48,7 @@ function modifyJsonForIPAPI(json) {
         ip: query,
         city,
         region: regionName,
-        country,
+        country: countryCode,
         country_name: country,
         country_code: countryCode,
         latitude: lat,

@@ -11,8 +11,8 @@
 
 Notes: You can use my demo, but please don't use it for commercial purposes. If you want to use it for commercial purposes, please deploy it yourself.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Main Features
 
@@ -51,13 +51,19 @@ Install:
 npm install
 ```
 
+Build:
+
+```bash
+npm run build
+```
+
 Run:
 
 ```bash
 npm start
 ```
 
-The program will run on port 8966.
+The program will run on port 18966.
 
 If you want to add Bing Maps, make the following changes before starting:
 
@@ -102,13 +108,13 @@ IPINFO_API_TOKEN
 Click the 'Deploy to Docker' button at the top to complete the deployment. Or, use the following shell:
 
 ```bash
-docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
+docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
 If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
 
 ```bash
-docker run -d -p 8966:8966 \
+docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
   --name myip \
@@ -119,7 +125,7 @@ docker run -d -p 8966:8966 \
 If you want to use IPInfo.io API, you can also add the following:
 
 ```bash
-docker run -d -p 8966:8966 \
+docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
   -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \

@@ -1,13 +1,12 @@
 // service-worker.js
-const CACHE_NAME = 'v3_cache';
+const CACHE_NAME = 'v2_cache';
 const urlsToCache = [
-    'res/vue.js',
-    'res/img/defaultMap.jpg',
-    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css',
-
+    'defaultMap.jpg',
+    'defaultMap_dark.jpg',
+    'logo-144.png',
+    'logo-192.png',
+    'logo-256.png',
+    'logo-512.png',
 ];
 
 // 安装 Service Worker 时，缓存文件
@@ -15,7 +14,6 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache');
                 return cache.addAll(urlsToCache);
             })
     );

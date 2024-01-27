@@ -5,21 +5,26 @@
     "description": "IP Toolbox",
     "icons": [
         {
-            "src": "res/img/logo-512.png",
+            "src": "logo-512.png",
             "type": "image/png"
         },
         {
-            "src": "res/img/logo-144.png",
+            "src": "logo-144.png",
             "sizes": "144x144",
             "type": "image/png"
         },
         {
-            "src": "res/img/logo-192.png",
+            "src": "logo-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "res/img/logo-512.png",
+            "src": "logo-256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "logo-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }

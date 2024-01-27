@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="MyIP,IP Tool,My IP,IP check,IP lookup,DNS leak test,WebRTC test,Speed test">
+  <meta name="description"
+    content="A better IP Toolbox. Easy to check what's your IPs, IP informations, check for DNS leaks, examine WebRTC connections, and test website availability">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f8f9fa">
+  <meta name="background-color" content="#ffffff">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="apple-touch-icon" href="/logo-512.png">
+  <title>Check My IP Address and Geolocation | Check WebRTC Connection IP | DNS Leak Test | Speed Test | Jason Ng Open
+    Source </title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="logo.svg">
+
+
+  <style>
+    .jn-spinner {
+      border: 4px solid rgb(12, 144, 34);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border-left-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+
+    .jn-loading {
+      margin-top: 30vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .jn-spinner-text {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .jn-spinner-text p {
+      font-size: 14px;
+      color: #777;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="jn-loading" class="jn-loading">
+    <div class="jn-spinner "></div>
+    <div class="jn-spinner-text">
+      <p>首次加载的时间可能会较长，请等待...</p>
+      <p>It may take a while for the first time, please wait...</p>
+    </div>
+  </div>
+  <div id="app"></div>
+  <script type="module" src="/src/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+        }, function (err) {
+          console.log('ServiceWorker Error: ', err);
+        });
+      });
+    }
+  </script>
+</body>
+
+</html>

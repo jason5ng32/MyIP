@@ -1,14 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const mapHandler = require('./api/map');
-const validateMapKeyHandler = require('./api/validate-map-key');
-const validateSite = require('./api/validate-site');
-const ipinfoHandler = require('./api/ipinfo');
-const ipapicomHandler = require('./api/ipapicom');
+import dotenv from 'dotenv';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import mapHandler from './api/map.js';
+import validateMapKeyHandler from './api/validate-map-key.js';
+import validateSite from './api/validate-site.js';
+import ipinfoHandler from './api/ipinfo.js';
+import ipapicomHandler from './api/ipapicom.js';
+
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8966;
+const port = process.env.PORT || 11966;
 
 // 使用查询参数处理所有地图请求
 app.get('/api/map', mapHandler);
@@ -18,7 +21,9 @@ app.get('/api/ipinfo', ipinfoHandler);
 app.get('/api/ipapicom', ipapicomHandler);
 
 // 设置静态文件服务
-app.use(express.static(path.join(__dirname, 'public')));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, './dist')));
 
 // 一些判断
 app.all('/api/validate-map-key', validateMapKeyHandler);

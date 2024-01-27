@@ -11,8 +11,8 @@
 
 备注：你可以直接用我已经搭建好的服务，也可以自行搭建。
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/res/img/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 这是一个完全开源的 IP 信息查看器，可以查询本机 IP、查询任意 IP、查询国内外网站可用性等。这是我第一次用 Vue.js 练手的项目。我……只是一个普通的产品经理。
 
@@ -53,13 +53,19 @@ git clone https://github.com/jason5ng32/MyIP.git
 npm install
 ```
 
+编译：
+
+```bash
+npm run build
+```
+
 运行:
 
 ```bash
 npm start
 ```
 
-程序会运行在 8966 端口。
+程序会运行在 18966 端口。
 
 如果你想添加 Bing 地图，在启动之前，进行如下修改：
 
@@ -104,13 +110,13 @@ IPINFO_API_TOKEN
 点击顶部的部署到 Docker 按钮，即可完成部署，又或者，直接输入下面的命令：
 
 ```bash
-docker run -d -p 8966:8966 --name myip --restart always jason5ng32/myip:latest
+docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
 如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
 
 ```bash
-docker run -d -p 8966:8966 \
+docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
   --name myip \
@@ -121,7 +127,7 @@ docker run -d -p 8966:8966 \
 如果你希望同时使用 IPinfo.io 的 API：
 
 ```bash
-docker run -d -p 8966:8966 \
+docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
   -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \
