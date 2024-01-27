@@ -54,7 +54,7 @@
                 <div class="tab-pane fade" :class="{ show: index === 0, active: index === 0 }"
                   v-for="(result, index) in mtrResults" :key="'content' + result.country" :id="'tabContent' + index"
                   role="tabpanel">
-                  <div class="card card-body border-0 mt-3" :class="[isDarkMode ? 'bg-secondary text-light' : 'bg-light']">
+                  <div class="card card-body border-0 mt-3" :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
                     <pre>{{ result.rawOutput }}</pre>
                   </div>
                 </div>
