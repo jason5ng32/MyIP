@@ -78,6 +78,8 @@
               </div>
             </div>
 
+            <div id="svgMap"></div>
+
             <div id="pingresult-error" v-if="pingCheckStatus === 'error'">
               <p class="text-center text-danger">{{ $t('pingtest.Error') }}</p>
             </div>
@@ -92,6 +94,8 @@
 <script>
 import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+import svgMap from 'svgmap';
+import 'svgmap/dist/svgMap.min.css';
 
 export default {
   name: 'GlobalLatency',
@@ -153,20 +157,24 @@ export default {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              limit: 12,
+              limit: 16,
               locations: [
                 { country: "HK" },
                 { country: "TW" },
-                { country: "US" },
-                { country: "CA" },
+                { country: "CN" },
                 { country: "JP" },
                 { country: "SG" },
+                { country: "IN" },
+                { country: "RU" },
+                { country: "US" },
+                { country: "CA" },
                 { country: "AU" },
                 { country: "GB" },
                 { country: "DE" },
                 { country: "FR" },
                 { country: "BR" },
-                { country: "IN" },
+                { country: "ZA" },
+                { country: "SA" },
               ],
               target: this.selectedIP, // 使用用户选中的 IP 地址
               type: "ping",
@@ -206,6 +214,7 @@ export default {
               this.pingCheckStatus = "error";
             } else {
               this.pingCheckStatus = "finished";
+              this.drawMap();
             }
           }
         } catch (error) {
@@ -233,6 +242,72 @@ export default {
 
       this.pingResults = cleanedData;
     },
+
+    // 绘制地图
+    drawMap() {
+      const mapData = {
+        data: {
+          avgPing: {
+            name: this.$t('pingtest.AvgDelay'),
+            format: '{0} ms',
+            thresholdMax: 200,
+            thresholdMin: 0
+          },
+          minPing: {
+            name: this.$t('pingtest.MinDelay'),
+            format: '{0} ms',
+          },
+          maxPing: {
+            name: this.$t('pingtest.MaxDelay'),
+            format: '{0} ms',
+          },
+          total: {
+            name: this.$t('pingtest.TotalPackets'),
+            format: '{0}',
+          },
+          loss: {
+            name: this.$t('pingtest.PacketLoss'),
+            format: '{0}%',
+          },
+          rcv: {
+            name: this.$t('pingtest.ReceivedPackets'),
+            format: '{0}',
+          },
+          drop: {
+            name: this.$t('pingtest.DroppedPackets'),
+            format: '{0}',
+          }
+        },
+        applyData: 'avgPing',
+        values: {}
+      };
+
+      this.pingResults.forEach(countryData => {
+        mapData.values[countryData.country] = {
+          avgPing: countryData.stats.avg,
+          minPing: countryData.stats.min,
+          maxPing: countryData.stats.max,
+          total: countryData.stats.total,
+          loss: countryData.stats.loss,
+          rcv: countryData.stats.rcv,
+          drop: countryData.stats.drop
+        };
+      });
+
+      // 创建 svgMap 实例
+      new svgMap({
+        targetElementID: 'svgMap',
+        data: mapData,
+        colorMax: '#0AA1D7',
+        colorMin: '#4CAF50',
+        minZoom: 1,
+        maxZoom: 1,
+        mouseWheelZoomEnabled: false,
+        initialZoom: 1,
+      });
+    }
+
+
   },
 }
 </script>
