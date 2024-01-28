@@ -7,6 +7,7 @@
     </div>
     <div class="text-secondary">
       <p>{{ $t('pingtest.Note') }}</p>
+      <p>{{ $t('pingtest.Note2') }}</p>
     </div>
     <div class="row">
       <div class="col-12 mb-3">
@@ -15,7 +16,7 @@
             <!-- Dropdown for IP Selection -->
             <div class="row mt-3 mb-3 align-items-center justify-content-center">
               <div class="col-12 col-md-auto">
-                <label for="pingIP" class="col-form-label">{{ $t('pingtest.Note2') }}</label>
+                <label for="pingIP" class="col-form-label">{{ $t('pingtest.Note3') }}</label>
               </div>
               <div class="col-12 col-md-auto mt-2 mt-md-0">
                 <div class="row justify-content-between">
@@ -27,7 +28,7 @@
                     </select>
                   </div>
                   <div class="col-auto">
-                    <button class="btn btn-primary" @click="startPingCheck"
+                    <button class="btn btn-success" @click="startPingCheck"
                       :disabled="pingCheckStatus === 'running' || selectedIP === ''">
                       <span
                         v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' || pingCheckStatus === 'error'">{{

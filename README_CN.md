@@ -83,7 +83,7 @@ BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 ```
 
-如果你先使用 IPinfo.io 的 API，可以添加：
+如果你想使用 IPinfo.io 的 API，可以添加：
 
 ```bash
 IPINFO_API_TOKEN="YOUR_TOKEN_HERE"

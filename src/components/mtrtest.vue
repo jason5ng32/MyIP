@@ -7,6 +7,7 @@
     </div>
     <div class="text-secondary">
       <p>{{ $t('mtrtest.Note') }}</p>
+      <p>{{ $t('mtrtest.Note2') }}</p>
     </div>
     <div class="row">
       <div class="col-12 mb-3">
@@ -15,7 +16,7 @@
             <!-- Dropdown for IP Selection -->
             <div class="row mt-3 mb-3 align-items-center justify-content-center">
               <div class="col-12 col-md-auto">
-                <label for="mtrIP" class="col-form-label">{{ $t('mtrtest.Note2') }}</label>
+                <label for="mtrIP" class="col-form-label">{{ $t('mtrtest.Note3') }}</label>
               </div>
               <div class="col-12 col-md-auto mt-2 mt-md-0">
                 <div class="row justify-content-between">
