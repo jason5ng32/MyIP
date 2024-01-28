@@ -163,5 +163,197 @@
   },
   "helpModal": {
     "Title": "快捷键"
+  },
+  "about": {
+    "Title": "关于",
+    "product1": "IPCheck.ing 是一个免费的 IP 工具箱，可以帮助你查看自己的 IP 信息，检测网站的可用性，查看 DNS 出口信息，进行网速测试，全球延迟测试，MTR 测试等。",
+    "product2": "这是一个开源项目，你可以点击页面底部的 GitHub 图标查看源代码。",
+    "product3": "最早的时候，这是我的一个用来学习 Vue.js 和学习如何使用 ChatGPT 写代码的练手项目，后来在 GitHub 上获得的星星数量越来越多，于是我进行了大量的重构和添加了许多非常有用的功能，希望你会喜欢。",
+    "meTitle": "关于我",
+    "me1": "我的名字叫阿禅，通常在网上使用 Jason Ng 作为英文名，我并不是一个专业的程序员，但是我喜欢编程，我喜欢开源，我喜欢分享。",
+    "me2": "在大多数时候，我是一名产品经理、一名博客作者、一个摩托车骑士以及一名极客。",
+    "me3": "你可以在下面的链接里找到我更详细的介绍：",
+    "contactTitle": "联系我",
+    "contact": "如果你有任何问题或建议，请通过邮箱联系我： jason[AT]kenengba.com 。",
+    "personal": "个人网站",
+    "blog": "可能吧博客",
+    "retiremoney": "躺平计算器",
+    "twitter": "Twitter"
+  },
+  "changelog": {
+    "Title": "更新日志",
+    "add": "新增",
+    "improve": "优化",
+    "fix": "修复",
+    "versions": [
+      {
+        "version": "v1.0.0",
+        "date": "Nov 06, 2020",
+        "content": [
+          {
+            "type": "add",
+            "change": "显示用户的 IP 信息"
+          },
+          {
+            "type": "add",
+            "change": "显示代理前后的 IP 信息"
+          },
+          {
+            "type": "add",
+            "change": "检查网站可用性"
+          }
+        ]
+      },
+      {
+        "version": "v2.0.0",
+        "date": "Nov 24, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "使用 Vue2 重构了整个项目"
+          },
+          {
+            "type": "improve",
+            "change": "使用 Bootstrap v5 重构了 UI"
+          }
+        ]
+      },
+      {
+        "version": "v2.1.0",
+        "date": "Nov 25, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加了 WebRTC 测试"
+          },
+          {
+            "type": "improve",
+            "change": "优化了程序的一些逻辑"
+          }
+        ]
+      },
+      {
+        "version": "v2.2.0",
+        "date": "Nov 26, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加了 DNS 泄漏测试"
+          },
+          {
+            "type": "add",
+            "change": "支持在前端显示 Bing 地图"
+          },
+          {
+            "type": "improve",
+            "change": "多个逻辑优化"
+          }
+        ]
+      },
+      {
+        "version": "v2.3.0",
+        "date": "Nov 27, 2023 ",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加了黑暗模式"
+          },
+          {
+            "type": "add",
+            "change": "增加移动版简约模式"
+          },
+          {
+            "type": "improve",
+            "change": "优化了文件结构"
+          }
+        ]
+      },
+      {
+        "version": "v2.4.0",
+        "date": "Dec 1, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "支持英文语言"
+          },
+          {
+            "type": "add",
+            "change": "添加信息遮罩功能"
+          },
+          {
+            "type": "add",
+            "change": "支持 PWA，可以安装到手机和桌面上"
+          }
+        ]
+      },
+      {
+        "version": "v2.5.0",
+        "date": "Dec 20, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "支持快捷键操作"
+          },
+          {
+            "type": "add",
+            "change": "添加网速测试功能"
+          },
+          {
+            "type": "improve",
+            "change": "支持使用 Docker 部署"
+          },
+          {
+            "type": "improve",
+            "change": "支持从多个来源获取 IP 归属地等信息"
+          }
+        ]
+      },
+      {
+        "version": "v2.6.0",
+        "date": "Jan 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "增加全球延迟测试功能"
+          },
+          {
+            "type": "improve",
+            "change": "优化黑暗模式下的地图展示"
+          },
+          {
+            "type": "fix",
+            "change": "修复一些问题"
+          }
+        ]
+      },
+      {
+        "version": "v3.0.0",
+        "date": "Jan 28, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "使用 Vue3 重构了整个项目"
+          },
+          {
+            "type": "improve",
+            "change": "多个性能优化和体验优化"
+          }
+        ]
+      },
+      {
+        "version": "v3.1.0",
+        "date": "Jan 29, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加 MTR 测试功能"
+          },
+          {
+            "type": "add",
+            "change": "添加全球延迟测试地图模式"
+          }
+        ]
+      }
+    ]
   }
 }

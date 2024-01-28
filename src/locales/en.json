@@ -163,5 +163,197 @@
   },
   "helpModal": {
     "Title": "Shortcuts"
+  },
+  "about": {
+    "Title": "About",
+    "product1": "IPCheck.ing is a free IP toolbox that helps you check your IP information, test website availability, examine DNS exit information, perform speed tests, global latency tests, MTR tests, and more.",
+    "product2": "This is an open-source project, and you can view the source code by clicking on the GitHub icon at the bottom of the page.",
+    "product3": "Initially, this was a personal project for me to learn Vue.js and how to write code using ChatGPT. Over time, it gained more stars on GitHub, so I did a lot of refactoring and added many useful features. I hope you will enjoy it.",
+    "meTitle": "About Me",
+    "me1": "My name is Jason Ng, also known as Achán online. I'm not a professional programmer, but I love coding, open-source, and sharing.",
+    "me2": "Most of the time, I work as a product manager, a blogger, a motorcyle rider and a geek.",
+    "me3": "You can find a more detailed introduction about me in the following link:",
+    "contactTitle": "Contact Me",
+    "contact": "If you have any questions or suggestions, please contact me via email: jason[AT]kenengba.com.",
+    "personal": "Personal Website",
+    "blog": "My Blog",
+    "retiremoney": "Future Planner",
+    "twitter": "Twitter"
+  },
+  "changelog": {
+    "Title": "Changelog",
+    "add": "Added",
+    "improve": "Improved",
+    "fix": "Fixed",
+    "versions": [
+      {
+        "version": "v1.0.0",
+        "date": "Nov 06, 2020",
+        "content": [
+          {
+            "type": "add",
+            "change": "Display user's IP information"
+          },
+          {
+            "type": "add",
+            "change": "Display IP information before and after proxy"
+          },
+          {
+            "type": "add",
+            "change": "Check website availability"
+          }
+        ]
+      },
+      {
+        "version": "v2.0.0",
+        "date": "Nov 24, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Refactored the entire project using Vue2"
+          },
+          {
+            "type": "improve",
+            "change": "Refactored UI using Bootstrap v5"
+          }
+        ]
+      },
+      {
+        "version": "v2.1.0",
+        "date": "Nov 25, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added WebRTC test"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized program logic"
+          }
+        ]
+      },
+      {
+        "version": "v2.2.0",
+        "date": "Nov 26, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added DNS leak test"
+          },
+          {
+            "type": "add",
+            "change": "Support displaying Bing maps in the frontend"
+          },
+          {
+            "type": "improve",
+            "change": "Multiple logic optimizations"
+          }
+        ]
+      },
+      {
+        "version": "v2.3.0",
+        "date": "Nov 27, 2023 ",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added dark mode"
+          },
+          {
+            "type": "add",
+            "change": "Added minimalist mode for mobile"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized file structure"
+          }
+        ]
+      },
+      {
+        "version": "v2.4.0",
+        "date": "Dec 1, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added support for English language"
+          },
+          {
+            "type": "add",
+            "change": "Added information masking feature"
+          },
+          {
+            "type": "add",
+            "change": "Support PWA, can be installed on mobile and desktop"
+          }
+        ]
+      },
+      {
+        "version": "v2.5.0",
+        "date": "Dec 20, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added support for keyboard shortcuts"
+          },
+          {
+            "type": "add",
+            "change": "Added website speed test feature"
+          },
+          {
+            "type": "improve",
+            "change": "Support deployment using Docker"
+          },
+          {
+            "type": "improve",
+            "change": "Support retrieving IP geolocation information from multiple sources"
+          }
+        ]
+      },
+      {
+        "version": "v2.6.0",
+        "date": "Jan 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added global latency test feature"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized map display in dark mode"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed some issues"
+          }
+        ]
+      },
+      {
+        "version": "v3.0.0",
+        "date": "Jan 28, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Refactored the entire project using Vue3"
+          },
+          {
+            "type": "improve",
+            "change": "Multiple performance and user experience optimizations"
+          }
+        ]
+      },
+      {
+        "version": "v3.1.0",
+        "date": "Jan 29, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added MTR test feature"
+          },
+          {
+            "type": "add",
+            "change": "Added global latency test map mode"
+          }
+        ]
+      }
+    ]
   }
 }
