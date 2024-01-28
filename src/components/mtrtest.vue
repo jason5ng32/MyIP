@@ -42,21 +42,28 @@
             </div>
 
             <!-- Result Display -->
-            <div id="mtrresult" class="m-3" v-if="mtrResults.length > 0">
-              <ul class="nav nav-underline" role="tablist">
-                <li class="nav-item" v-for="(result, index) in mtrResults" :key="result.country">
-                  <a class="nav-link px-2 fw-medium" :class="[{ active: index === 0 }, isDarkMode ? 'text-light' : 'text-secondary']" data-bs-toggle="tab" :href="'#tabContent' + index"
-                    role="tab">
-                    {{ result.country }} <span :class="'fi fi-' + result.country.toLowerCase()"></span>
-                  </a>
-                </li>
-              </ul>
-              <div class="tab-content">
-                <div class="tab-pane fade" :class="{ show: index === 0, active: index === 0 }"
-                  v-for="(result, index) in mtrResults" :key="'content' + result.country" :id="'tabContent' + index"
-                  role="tabpanel">
-                  <div class="card card-body border-0 mt-3" :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                    <pre>{{ result.rawOutput }}</pre>
+            <div id="mtrresult" v-if="mtrResults.length > 0">
+              <div class="accordion" id="mtrResultsAccordion" :data-bs-theme="isDarkMode ? 'dark' : ''">
+                <div class="accordion-item" v-for="(result, index) in mtrResults" :key="result.country">
+                  <h2 class="accordion-header" :id="'heading' + index">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                      :data-bs-target="'#collapse' + index" :aria-expanded="index === 0 ? 'true' : 'false'"
+                      :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
+                      <span :class="'fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{ result.city }}, {{
+                        result.country }}</strong>
+                      <span v-if="!isMobile">&nbsp;-&nbsp;{{ result.network }}&nbsp;</span>
+                      <span v-if="!isMobile" class="badge rounded-pill"
+                        :class="isDarkMode ? 'text-bg-warning' : 'text-bg-success'">AS{{ result.asn }}</span>
+                    </button>
+                  </h2>
+                  <div :id="'collapse' + index" class="accordion-collapse collapse" :class="{ show: index === 0 }"
+                    :aria-labelledby="'heading' + index">
+                    <div class="accordion-body">
+                      <div class="card card-body border-0 mt-3"
+                        :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
+                        <pre>{{ result.rawOutput }}</pre>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,6 +224,9 @@ export default {
         .filter(item => item.result.rawOutput !== null)
         .map(item => ({
           country: item.probe.country,
+          city: item.probe.city,
+          network: item.probe.network,
+          asn: item.probe.asn,
           rawOutput: item.result.rawOutput,
         }));
 
@@ -228,4 +238,7 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-focus-remove {
+  outline: none;
+}</style>
