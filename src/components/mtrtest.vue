@@ -7,7 +7,7 @@
     </div>
     <div class="text-secondary">
       <p>{{ $t('mtrtest.Note') }}</p>
-      <p>{{ $t('mtrtest.Note2') }}</p>
+      <p v-if="!isMobile">{{ $t('mtrtest.Note2') }}</p>
     </div>
     <div class="row">
       <div class="col-12 mb-3">
