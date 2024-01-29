@@ -108,7 +108,10 @@ export default {
   watch: {
     shouldRefresh(newVal) {
       if (newVal) {
+        this.$refs.navBarRef.loaded = false;
+        this.isInfosLoaded = false;
         this.refreshEverything();
+        this.setInfosLoaded();
       }
     },
     isInfosLoaded(newVal) {
