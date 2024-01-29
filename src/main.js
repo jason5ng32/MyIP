@@ -21,7 +21,7 @@ const analytics = Analytics({
 // 窗口大小变化处理函数
 function handleResize() {
     store.commit('setIsMobile', window.innerWidth < 768);
-  }
+}
 
 // 更新网页标题和元数据的函数
 function updateMeta() {
@@ -42,18 +42,13 @@ function updateMeta() {
 function setLanguageFromURL() {
     const searchParams = new URLSearchParams(window.location.search);
     const browserLanguage = navigator.language || navigator.userLanguage;
-    const langCN = browserLanguage.startsWith('zh');
     const hl = searchParams.get('hl');
-    if (hl && ['en', 'zh'].includes(hl)) {
+    if (hl && ['en', 'zh', 'fr'].includes(hl)) {
         i18n.global.locale = hl;
-        updateMeta(); // 更新网页标题和元数据
-    } else if (langCN) {
-        i18n.global.locale = 'zh';
-        updateMeta(); // 更新网页标题和元数据
     } else {
         i18n.global.locale = 'en';
-        updateMeta(); // 更新网页标题和元数据
     }
+    updateMeta();
 }
 
 // 在应用启动时设置语言
@@ -61,7 +56,7 @@ setLanguageFromURL();
 
 // 监听窗口大小变化
 handleResize();
-window.addEventListener('resize', handleResize); 
+window.addEventListener('resize', handleResize);
 
 // 监听 URL 变化
 window.addEventListener('popstate', setLanguageFromURL);
@@ -71,6 +66,6 @@ analytics.page();
 
 app.use(store);
 app.use(i18n);
-app.config.globalProperties.$isLangCN = i18n.global.locale === 'zh';
+app.config.globalProperties.$Lang = i18n.global.locale;
 app.config.globalProperties.$analytics = analytics;
 app.mount('#app');

@@ -207,7 +207,7 @@ export default {
       isMapShown: false,
       ipDataCache: new Map(),
       copiedStatus: {},
-      bingMapLanguage: this.$isLangCN ? 'zh' : 'en',
+      bingMapLanguage: this.$Lang,
     };
   },
 

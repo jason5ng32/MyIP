@@ -20,6 +20,7 @@
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" href="?hl=zh"><i class="fi fi-cn"></i> 中文</a></li>
           <li><a class="dropdown-item" href="?hl=en"><i class="fi fi-us"></i> English</a></li>
+          <li><a class="dropdown-item" href="?hl=fr"><i class="fi fi-fr"></i> Français</a></li>
         </ul>
       </div>
       <div class="btn-group btn-group-sm " role="group" aria-label="Dark mode switch">
@@ -190,4 +191,5 @@ export default {
   to {
     left: 100%;
   }
-}</style>
+}
+</style>
