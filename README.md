@@ -5,7 +5,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
 
-[🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
+🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) ｜ 🇫🇷 [Français](README_FR.md)
 
 👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
@@ -30,7 +30,7 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
-* 🇺🇸🇨🇳 English and Chinese supported.
+* 🇺🇸 🇨🇳 🇫🇷 English, Chinese, and French support.
 
 ## 📕 How to Use
 

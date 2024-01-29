@@ -5,7 +5,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
 
-[🇺🇸 English](README.md) | [🇨🇳 简体中文](README_CN.md)
+🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) ｜ 🇫🇷 [Français](README_FR.md)
 
 👉 在这里体验：[https://ipcheck.ing](https://ipcheck.ing)
 
@@ -32,7 +32,7 @@
 * 📲 **支持 PWA**：可以添加为手机桌面应用以及电脑里的 Chrome 应用
 * ⌨️ **支持快捷键**：可以随时输入 `?` 查看快捷键菜单
 * 🌍 根据可用性检测结果，返回目前是否可以访问全世界网络的提示
-* 🇺🇸 🇨🇳 支持中文和英文
+* 🇺🇸 🇨🇳 🇫🇷 支持中文、英文、法文
 
 ## 📕 如何使用
 
