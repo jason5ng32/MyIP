@@ -5,7 +5,7 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) ｜ 🇫🇷 [Français](README_FR.md)
+🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇫🇷 [Français](README_FR.md)
 
 👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
