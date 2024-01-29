@@ -111,6 +111,11 @@ export default {
         this.refreshEverything();
       }
     },
+    isInfosLoaded(newVal) {
+      if (newVal) {
+        this.$refs.navBarRef.loaded = true;
+      }
+    },
   },
   created() {
     this.hideLoading();

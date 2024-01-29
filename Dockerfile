@@ -7,7 +7,6 @@ COPY . .
 RUN npm run build
 
 # 第二阶段：运行
-# 基于 Node.js 官方镜像
 FROM node:20-alpine as production-stage
 WORKDIR /app
 COPY --from=build-stage /app/node_modules ./node_modules

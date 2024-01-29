@@ -1,41 +1,60 @@
 <template>
-    <!-- Nav -->
-    <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
-      :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
-      <div class="jn-logo">
-        <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#" @click="handleLogoClick"><i
-            class="bi bi-box-seam-fill"></i>
-          {{ $t('nav.Title') }} </a>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" @change="toggleDarkMode"
-            :checked="isDarkMode">
-          <label class="form-check-label" for="darkModeSwitch">
-            <i v-if="isDarkMode" class="bi bi-moon-stars"></i>
-            <i v-else class="bi bi-brightness-high"></i>
-          </label>
-        </div>
+  <!-- Nav -->
+  <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
+    :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
+    <div class="jn-logo">
+      <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#" @click="handleLogoClick"><i
+          class="bi bi-box-seam-fill"></i>
+        <span class=" fw-bold  "> IP</span>
+        <span class="fw-lighter">Check.</span>
+        <span class="fw-lighter" :class="{
+          'background-animation-dark': !loaded && isDarkMode,
+          'background-animation-light': !loaded && !isDarkMode
+        }">ing</span>
+      </a>
+      <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
+        <button type="button" class="btn btn-sm dropdown-toggle jn-button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          <i class="bi bi-translate"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="?hl=zh"><i class="fi fi-cn"></i> 中文</a></li>
+          <li><a class="dropdown-item" href="?hl=en"><i class="fi fi-us"></i> English</a></li>
+        </ul>
+      </div>
+      <div class="btn-group btn-group-sm " role="group" aria-label="Dark mode switch">
+        <button type="button" class="btn" :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }"
+          @click="toggleDarkMode(false)">
+          <i class="bi bi-brightness-high"></i>
+        </button>
+        <button type="button" class="btn" :class="{ 'btn-outline-secondary': !isDarkMode, 'btn-warning': isDarkMode }"
+          @click="toggleDarkMode(true)">
+          <i class="bi bi-moon-stars"></i>
+        </button>
+      </div>
 
+
+    </div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon bg-transparent "></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+      <div class="navbar-nav ">
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#IPInfo"> {{ $t('nav.IPinfo') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"> {{
+          $t('nav.Connectivity') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"> {{ $t('nav.WebRTC') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"> {{
+          $t('nav.DNSLeakTest') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"> {{ $t('nav.SpeedTest')
+        }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#PingTest"> {{ $t('nav.PingTest')
+        }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#MTRTest"> {{ $t('nav.MTRTest') }}</a>
       </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon bg-transparent "></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        <div class="navbar-nav ">
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#IPInfo"> {{ $t('nav.IPinfo') }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"> {{
-            $t('nav.Connectivity') }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"> {{ $t('nav.WebRTC') }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"> {{
-            $t('nav.DNSLeakTest') }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"> {{ $t('nav.SpeedTest')
-          }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#PingTest"> {{ $t('nav.PingTest')
-          }}</a>
-          <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#MTRTest"> {{ $t('nav.MTRTest') }}</a>
-        </div>
-      </div>
-    </nav>
+    </div>
+  </nav>
 </template>
 
 <script>
@@ -55,6 +74,11 @@ export default {
     };
   },
 
+  data() {
+    return {
+      loaded: false,
+    }
+  },
   methods: {
 
     // 切换暗黑模式
@@ -107,4 +131,63 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-button:hover {
+  border: 0;
+}
+
+.jn-button:active {
+  border: 0;
+}
+
+.jn-button:focus {
+  border: 0;
+}
+
+.jn-button {
+  border: 0;
+}
+
+.background-animation-light {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.background-animation-light::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 10%;
+  background-color: rgb(0, 0, 0);
+  animation: backgroundSlide 1s linear infinite;
+}
+
+.background-animation-dark {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.background-animation-dark::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 10%;
+  background-color: rgb(255, 255, 255);
+  animation: backgroundSlide 1s linear infinite;
+}
+
+@keyframes backgroundSlide {
+  from {
+    left: -100%;
+  }
+
+  to {
+    left: 100%;
+  }
+}</style>

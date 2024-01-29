@@ -6,7 +6,7 @@
       </p>
     </div>
 
-    <div id="about" class="text-center">
+    <div id="about" class="text-center mb-2">
       <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-info' : 'link-dark']"
         data-bs-toggle="offcanvas" href="#About" role="button" aria-controls="About">
         {{ $t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
@@ -14,7 +14,7 @@
     </div>
 
 
-    <div class="offcanvas offcanvas-end mt-5" tabindex="-1" id="About" aria-labelledby="AboutLabel"
+    <div class="offcanvas offcanvas-end mt-5" :class="[isMobile ? ' w-100' :'']" tabindex="-1" id="About" aria-labelledby="AboutLabel"
       :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">

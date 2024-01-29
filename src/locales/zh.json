@@ -1,7 +1,7 @@
 {
   "nav": {
     "id": "nav",
-    "Title": "IP 工具箱",
+    "Title": "IPCheck.ing",
     "IPinfo": "IP 信息",
     "Connectivity": "网络连通性",
     "WebRTC": "WebRTC 测试",
@@ -187,7 +187,7 @@
     "fix": "修复",
     "versions": [
       {
-        "version": "v1.0.0",
+        "version": "v1.0",
         "date": "Nov 06, 2020",
         "content": [
           {
@@ -205,7 +205,7 @@
         ]
       },
       {
-        "version": "v2.0.0",
+        "version": "v2.0",
         "date": "Nov 24, 2023",
         "content": [
           {
@@ -219,7 +219,7 @@
         ]
       },
       {
-        "version": "v2.1.0",
+        "version": "v2.1",
         "date": "Nov 25, 2023",
         "content": [
           {
@@ -233,7 +233,7 @@
         ]
       },
       {
-        "version": "v2.2.0",
+        "version": "v2.2",
         "date": "Nov 26, 2023",
         "content": [
           {
@@ -251,7 +251,7 @@
         ]
       },
       {
-        "version": "v2.3.0",
+        "version": "v2.3",
         "date": "Nov 27, 2023 ",
         "content": [
           {
@@ -269,7 +269,7 @@
         ]
       },
       {
-        "version": "v2.4.0",
+        "version": "v2.4",
         "date": "Dec 1, 2023",
         "content": [
           {
@@ -287,7 +287,7 @@
         ]
       },
       {
-        "version": "v2.5.0",
+        "version": "v2.5",
         "date": "Dec 20, 2023",
         "content": [
           {
@@ -309,48 +309,24 @@
         ]
       },
       {
-        "version": "v2.6.0",
-        "date": "Jan 25, 2024",
+        "version": "v3.0",
+        "date": "Jan 28, 2024",
         "content": [
+          {
+            "type": "add",
+            "change": "使用 Vite + Vue3 重构了整个项目"
+          },
           {
             "type": "add",
             "change": "增加全球延迟测试功能"
           },
           {
-            "type": "improve",
-            "change": "优化黑暗模式下的地图展示"
-          },
-          {
-            "type": "fix",
-            "change": "修复一些问题"
-          }
-        ]
-      },
-      {
-        "version": "v3.0.0",
-        "date": "Jan 28, 2024",
-        "content": [
-          {
             "type": "add",
-            "change": "使用 Vue3 重构了整个项目"
+            "change": "增加 MTR 测试功能"
           },
           {
             "type": "improve",
             "change": "多个性能优化和体验优化"
-          }
-        ]
-      },
-      {
-        "version": "v3.1.0",
-        "date": "Jan 29, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加 MTR 测试功能"
-          },
-          {
-            "type": "add",
-            "change": "添加全球延迟测试地图模式"
           }
         ]
       }
