@@ -45,8 +45,8 @@ function setLanguageFromURL() {
     const hl = searchParams.get('hl');
     if (hl && ['en', 'zh', 'fr'].includes(hl)) {
         i18n.global.locale = hl;
-    } else {
-        i18n.global.locale = 'en';
+    } else if (!hl) {
+        i18n.global.locale = browserLanguage.substring(0, 2);
     }
     updateMeta();
 }
