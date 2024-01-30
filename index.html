@@ -13,9 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="apple-touch-icon" href="/logo-512.png">
   <title>IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source </title>
-  <link rel="manifest" href="manifest.json">
   <link rel="icon" href="logo.svg">
-
 
   <style>
     .jn-spinner {
@@ -66,16 +64,6 @@
   </div>
   <div id="app"></div>
   <script type="module" src="/src/main.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('service-worker.js').then(function (registration) {
-        }, function (err) {
-          console.log('ServiceWorker Error: ', err);
-        });
-      });
-    }
-  </script>
 </body>
 
 </html>
