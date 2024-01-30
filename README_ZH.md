@@ -1,5 +1,7 @@
 # 🧰 IP 工具箱
 
+<img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/logo.svg" width="200">
+
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
 ![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)

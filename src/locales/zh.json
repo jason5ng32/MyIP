@@ -329,6 +329,32 @@
             "change": "多个性能优化和体验优化"
           }
         ]
+      },
+      {
+        "version": "v3.1",
+        "date": "Jan 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "支持新的语言：法语"
+          },
+          {
+            "type": "add",
+            "change": "添加数据加载中的动画"
+          },
+          {
+            "type": "improve",
+            "change": "优化了缓存策略"
+          },
+          {
+            "type": "improve",
+            "change": "调整黑暗模式样式"
+          },
+          {
+            "type": "fix",
+            "change": "修复了一些小问题"
+          }
+        ]
       }
     ]
   }

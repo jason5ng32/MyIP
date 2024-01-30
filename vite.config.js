@@ -14,7 +14,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       },
       manifest: {
         name: 'IPCheck.ing',

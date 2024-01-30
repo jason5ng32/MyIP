@@ -329,7 +329,33 @@
                         "change": "Multiples optimisations de performance et d'expérience utilisateur"
                     }
                 ]
-            }
+            },
+            {
+                    "version": "v3.1",
+                    "date": "Jan 30, 2024",
+                    "content": [
+                        {
+                            "type": "add",
+                            "change": "Ajout de la prise en charge d'une nouvelle langue : français"
+                        },
+                        {
+                            "type": "add",
+                            "change": "Ajout d'une animation de chargement des données"
+                        },
+                        {
+                            "type": "improve",
+                            "change": "Optimisation de la stratégie de cache"
+                        },
+                        {
+                            "type": "improve",
+                            "change": "Ajustement du style du mode sombre"
+                        },
+                        {
+                            "type": "fix",
+                            "change": "Correction de quelques problèmes mineurs"
+                        }
+                    ]
+                }
         ]
     }
 }

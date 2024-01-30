@@ -329,6 +329,32 @@
             "change": "Multiple performance and user experience optimizations"
           }
         ]
+      },
+      {
+        "version": "v3.1",
+        "date": "Jan 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added support for a new language: French"
+          },
+          {
+            "type": "add",
+            "change": "Added loading animation"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized caching strategy"
+          },
+          {
+            "type": "improve",
+            "change": "Adjusted dark mode styles"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed some minor issues"
+          }
+        ]
       }
     ]
   }
