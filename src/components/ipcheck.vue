@@ -2,7 +2,7 @@
     <!-- IP Infos -->
     <div class="ip-data-section mb-4">
       <div class="row" :class="{ 'jn-title2': !isMobile, 'jn-title': isMobile }">
-        <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🕵️
+        <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎
           {{ $t('ipInfos.Title') }}</h2>
         <div class="form-check form-switch col-8 jn-radio">
 
