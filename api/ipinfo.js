@@ -262,7 +262,7 @@ export default async (req, res) => {
             return res.status(403).json({ error: 'Access denied' });
         }
     } else {
-        return res.status(403).json({ error: 'No referer header' });
+        return res.status(403).json({ error: 'What are you doing?' });
     }
 
     // 从请求中获取 IP 地址

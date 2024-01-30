@@ -7,6 +7,7 @@ import validateMapKeyHandler from './api/validate-map-key.js';
 import validateSite from './api/validate-site.js';
 import ipinfoHandler from './api/ipinfo.js';
 import ipapicomHandler from './api/ipapicom.js';
+import keycdnHandler from './api/keycdn.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get('/api/map', mapHandler);
 // 使用查询参数处理所有 IP 地址请求
 app.get('/api/ipinfo', ipinfoHandler);
 app.get('/api/ipapicom', ipapicomHandler);
+app.get('/api/keycdn', keycdnHandler);
 
 // 设置静态文件服务
 const __filename = fileURLToPath(import.meta.url);

@@ -1,4 +1,4 @@
-import { get } from 'http';
+import { get } from 'https';
 
 export default (req, res) => {
     // 限制只能从指定域名访问
@@ -20,16 +20,25 @@ export default (req, res) => {
         return res.status(400).json({ error: 'No IP address provided' });
     }
 
-    // 构建请求 ip-api.com 的 URL
-    const url = `http://ip-api.com/json/${ipAddress}`;
+    // 构建请求 keycdn.com 的 URL
+    const url = new URL(`https://tools.keycdn.com/geo.json?host=${ipAddress}`);
 
-    get(url, apiRes => {
+    // 设置请求选项，包括 User-Agent
+    const options = {
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        headers: {
+            'User-Agent': 'keycdn-tools:' + process.env.KEYCDN_USER_AGENT
+        }
+    };
+
+    get(options, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
             try {
                 const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJsonForIPAPI(originalJson);
+                const modifiedJson = modifyJsonForKeyCDN(originalJson);
                 res.json(modifiedJson);
             } catch (e) {
                 res.status(500).json({ error: 'Error parsing JSON' });
@@ -38,22 +47,21 @@ export default (req, res) => {
     }).on('error', (e) => {
         res.status(500).json({ error: e.message });
     });
-};
+}
 
-function modifyJsonForIPAPI(json) {
-    const { query, country, countryCode, regionName, city, lat, lon, isp, as } = json;
-    const asn = as ? as.split(" ")[0] : '';
+function modifyJsonForKeyCDN(json) {
+    const { data: { geo: { ip, city, region_name, country_name, country_code, latitude, longitude, isp, asn } } } = json;
 
     return {
-        ip: query,
+        ip,
         city,
-        region: regionName,
-        country: countryCode,
-        country_name: country,
-        country_code: countryCode,
-        latitude: lat,
-        longitude: lon,
-        asn,
+        region: region_name,
+        country: country_code,
+        country_name,
+        country_code,
+        latitude,
+        longitude,
+        asn: "AS" + asn,
         org: isp
     };
 }

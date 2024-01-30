@@ -12,7 +12,7 @@ export default (req, res) => {
             return res.status(403).json({ error: 'Access denied' });
         }
     } else {
-        return res.status(403).json({ error: 'No referer header' });
+        return res.status(403).json({ error: 'What are you doing?' });
     }
 
     // 使用 req.query 获取参数

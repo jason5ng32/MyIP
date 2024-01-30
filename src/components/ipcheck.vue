@@ -421,6 +421,7 @@ export default {
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+        { url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
       ];
 
       for (const source of sources) {
