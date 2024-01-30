@@ -3,6 +3,7 @@
   <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <div class="jn-logo">
+
       <a class="navbar-brand" :class="{ 'text-white': isDarkMode }" href="#" @click="handleLogoClick"><i
           class="bi bi-box-seam-fill"></i>
         <span class=" fw-bold  "> IP</span>
@@ -12,6 +13,7 @@
           'background-animation-light': !loaded && !isDarkMode
         }">ing</span>
       </a>
+
       <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
         <button type="button" class="btn btn-sm dropdown-toggle jn-button" data-bs-toggle="dropdown"
           aria-expanded="false">
@@ -23,17 +25,15 @@
           <li><a class="dropdown-item" href="?hl=fr"><i class="fi fi-fr"></i> Français</a></li>
         </ul>
       </div>
-      <div class="btn-group btn-group-sm " role="group" aria-label="Dark mode switch">
-        <button type="button" class="btn" :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }"
-          @click="toggleDarkMode(false)">
-          <i class="bi bi-brightness-high"></i>
-        </button>
-        <button type="button" class="btn" :class="{ 'btn-outline-secondary': !isDarkMode, 'btn-warning': isDarkMode }"
-          @click="toggleDarkMode(true)">
-          <i class="bi bi-moon-stars"></i>
-        </button>
-      </div>
 
+      <div>
+        <input type="checkbox" class="jn-checkbox" id="toggleBtn" v-model="isDarkMode" @click="toggleDarkMode" />
+        <label class="switch" for="toggleBtn">
+          <i class="bi bi-moon-stars text-light"></i>
+          <i class="bi bi-brightness-high text-warning "></i>
+          <div class="ball"></div>
+        </label>
+      </div>
 
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -133,6 +133,41 @@ export default {
 </script>
 
 <style scoped>
+/*==================== Dark Light Button Implementation ====================*/
+.jn-checkbox {
+  display: none;
+}
+
+.switch {
+  background-color: #111;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  position: relative;
+  height: 26px;
+  width: 50px;
+  transform: scale(0.7);
+}
+
+.switch .ball {
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  height: 22px;
+  width: 22px;
+  transform: translateX(0px);
+  transition: transform 0.2s linear;
+}
+
+.jn-checkbox:checked+.switch .ball {
+  transform: translateX(24px);
+}
+
 .jn-button:hover {
   border: 0;
 }
