@@ -35,6 +35,7 @@
     </div>
   </div>
   <Footer />
+  <PWA />
 </template>
 
 <script>
@@ -49,6 +50,7 @@ import MTRtest from './components/mtrtest.vue'
 import Footer from './components/footer.vue'
 import QueryIP from './components/queryip.vue'
 import HelpModal from './components/help.vue'
+import PWA from './components/pwa.vue'
 import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 
 import { ref, computed, watch } from 'vue';
@@ -88,6 +90,7 @@ export default {
     Footer,
     QueryIP,
     HelpModal,
+    PWA,
   },
   name: 'App',
   data() {
