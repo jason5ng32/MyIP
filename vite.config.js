@@ -9,7 +9,13 @@ const apiPort = process.env.PORT || 11966;
 
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'pwa-install'
+        }
+      }
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -25,6 +31,7 @@ export default defineConfig({
         theme_color: '#f8f9fa',
         orientation: "portrait",
         id: 'com.jasonng.myip',
+        description: 'All in one IP Toolbox',
         icons: [
           {
             src: '/logo-192.png',
