@@ -163,6 +163,7 @@ export default {
   height: 26px;
   width: 50px;
   transform: scale(0.7);
+  box-shadow: 0 0 2px white;
 }
 
 .switch .ball {
