@@ -3,9 +3,14 @@
 <img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/logo.svg" width="200">
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
-![GitHub](https://img.shields.io/github/license/jason5ng32/MyIP)
-![GitHub contributors](https://img.shields.io/github/contributors/jason5ng32/MyIP)
-![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/jason5ng32/MyIP)
+![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fipcheck.ing&up_message=online&label=IPCheck.ing)
+![PWA](https://img.shields.io/badge/PWA-Supported-blue)
+![GitHub license](https://img.shields.io/github/license/jason5ng32/MyIP)
+
+![Windows-image](https://img.shields.io/badge/-Windows-blue?logo=windows)
+![MacOS-image](https://img.shields.io/badge/-MacOS-black?logo=apple)
+![Linux-image](https://img.shields.io/badge/-Linux-333?logo=ubuntu)
 
 🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇫🇷 [Français](README_FR.md)
 
