@@ -27,9 +27,9 @@
           <i class="bi bi-translate"></i>
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" @click="changeLanguage('zh')"><i class="fi fi-cn"></i> 中文</a></li>
-          <li><a class="dropdown-item" @click="changeLanguage('en')"><i class="fi fi-us"></i> English</a></li>
-          <li><a class="dropdown-item" @click="changeLanguage('fr')"><i class="fi fi-fr"></i> Français</a></li>
+          <li><a class="dropdown-item" href="?hl=zh"><i class="fi fi-cn"></i> 中文</a></li>
+          <li><a class="dropdown-item" href="?hl=en"><i class="fi fi-us"></i> English</a></li>
+          <li><a class="dropdown-item" href="?hl=fr"><i class="fi fi-fr"></i> Français</a></li>
         </ul>
       </div>
 
@@ -68,7 +68,6 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import { useI18n } from 'vue-i18n';
 
 export default {
   name: 'NavBar',
@@ -89,11 +88,6 @@ export default {
     }
   },
   methods: {
-
-    // 更改 i18n 语言
-    changeLanguage(lang) {
-      this.$i18n.locale = lang;
-    },
 
     // 切换暗黑模式
     toggleDarkMode() {
