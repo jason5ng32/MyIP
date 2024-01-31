@@ -196,7 +196,7 @@ export default {
     this.detectBrowser();
     setTimeout(() => {
       this.showPWA();
-    }, 2000);
+    }, 15000);
   },
 }
 </script>
