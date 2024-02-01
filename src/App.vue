@@ -198,6 +198,7 @@ export default {
 
     // 信息遮罩
     toggleInfoMask() {
+      this.$trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
       if (this.infoMaskLevel === 0) {
         this.originipDataCards = JSON.parse(JSON.stringify(this.$refs.IPCheckRef.ipDataCards));
         this.originstunServers = JSON.parse(JSON.stringify(this.$refs.webRTCRef.stunServers));
@@ -309,39 +310,54 @@ export default {
       const shortcutConfig = [
         {
           keys: "g",
-          action() {
+          action: () => {
             window.scrollTo({ top: 0, behavior: "smooth" });
+            this.$trackEvent('ShortCut', 'ShortCut', 'GoToTop');
           },
           description: this.$t('shortcutKeys.GoToTop'),
         },
         {
           keys: 'j',
-          action: () => navigateCards('down'),
+          action: () => {
+            navigateCards('down'),
+              this.$trackEvent('ShortCut', 'ShortCut', 'GoNext');
+          },
           description: this.$t('shortcutKeys.GoNext'),
         },
         {
           keys: 'k',
-          action: () => navigateCards('up'),
+          action: () => {
+            navigateCards('up'),
+              this.$trackEvent('ShortCut', 'ShortCut', 'GoPrevious');
+          },
           description: this.$t('shortcutKeys.GoPrevious'),
         },
         {
           keys: "G",
-          action() {
+          action: () => {
             window.scrollTo({
               top: document.body.scrollHeight,
               behavior: "smooth",
             });
+            this.$trackEvent('ShortCut', 'ShortCut', 'GoToBottom');
           },
           description: this.$t('shortcutKeys.GoToBottom'),
         },
         {
           keys: "D",
-          action: this.$refs.navBarRef.toggleDarkMode,
+          action: () => {
+            this.$refs.navBarRef.toggleDarkMode,
+              this.$trackEvent('ShortCut', 'ShortCut', 'ToggleDarkMode');
+          },
           description: this.$t('shortcutKeys.ToggleDarkMode'),
         },
         {
           keys: "R",
-          action: this.refreshEverything,
+          action: () => {
+            this.refreshEverything,
+              this.$trackEvent('ShortCut', 'ShortCut', 'RefreshEverything');
+          },
+
           description: this.$t('shortcutKeys.RefreshEverything'),
         },
         {
@@ -351,6 +367,7 @@ export default {
             const card = this.$refs.IPCheckRef.ipDataCards[num - 1];
             this.scrollToElement("IPInfo", 80);
             this.$refs.IPCheckRef.refreshCard(card);
+            this.$trackEvent('ShortCut', 'ShortCut', 'IPCheck');
           },
           description: this.$t('shortcutKeys.RefreshIPCard'),
         },
@@ -359,6 +376,7 @@ export default {
           action: () => {
             this.scrollToElement("Connectivity", 80);
             this.$refs.connectivityRef.checkAllConnectivity(false, true);
+            this.$trackEvent('ShortCut', 'ShortCut', 'Connectivity');
           },
           description: this.$t('shortcutKeys.RefreshConnectivityTests'),
         },
@@ -367,6 +385,7 @@ export default {
           action: () => {
             this.scrollToElement("WebRTC", 80);
             this.$refs.webRTCRef.checkAllWebRTC(true);
+            this.$trackEvent('ShortCut', 'ShortCut', 'WebRTC');
           },
           description: this.$t('shortcutKeys.RefreshWebRTC'),
         },
@@ -375,6 +394,7 @@ export default {
           action: () => {
             this.scrollToElement("DNSLeakTest", 80);
             this.$refs.dnsLeaksRef.checkAllDNSLeakTest(true);
+            this.$trackEvent('ShortCut', 'ShortCut', 'DNSLeakTest');
           },
           description: this.$t('shortcutKeys.RefreshDNSLeakTest'),
         },
@@ -383,6 +403,7 @@ export default {
           action: () => {
             this.scrollToElement("SpeedTest", 80);
             this.$refs.speedTestRef.refreshstartSpeedTest();
+            this.$trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
           },
           description: this.$t('shortcutKeys.StartSpeedTest'),
         },
@@ -392,7 +413,8 @@ export default {
             if (this.$refs.IPCheckRef.isEnvBingMapKey) {
               window.scrollTo({ top: 0, behavior: "smooth" });
               this.$refs.IPCheckRef.toggleMaps();
-            }
+            };
+            this.$trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
           },
           description: this.$t('shortcutKeys.ToggleMaps'),
         },
@@ -400,6 +422,7 @@ export default {
           keys: "q",
           action: () => {
             this.openModal("IPCheck");
+            this.$trackEvent('ShortCut', 'ShortCut', 'QueryIP');
           },
           description: this.$t('shortcutKeys.IPCheck'),
         },
@@ -407,6 +430,7 @@ export default {
           keys: "h",
           action: () => {
             this.isInfosLoaded && this.toggleInfoMask();
+            this.$trackEvent('ShortCut', 'ShortCut', 'ToggleInfoMask');
           },
           description: this.$t('shortcutKeys.ToggleInfoMask'),
         },
@@ -416,6 +440,7 @@ export default {
           keys: "?",
           action: () => {
             this.openModal("helpModal");
+            this.$trackEvent('ShortCut', 'ShortCut', 'Help');
           },
           description: this.$t('shortcutKeys.Help'),
         },

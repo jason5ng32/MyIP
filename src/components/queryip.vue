@@ -1,7 +1,7 @@
 <template>
     <!-- Search BTN -->
     <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;" data-bs-toggle="modal"
-        data-bs-target="#IPCheck"><i class="bi bi-search"></i></button>
+        data-bs-target="#IPCheck" @click="$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');"><i class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">

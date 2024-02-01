@@ -50,6 +50,7 @@ export default {
 
             if (!pwaInstall.isUnderStandaloneMode && !this.isDesktopChrome && !this.isOtherBrowser) {
                 pwaInstall.showDialog(true);
+                this.$trackEvent('PWA', 'PWAPopup', 'Show');
             }
         },
         detectBrowser() {

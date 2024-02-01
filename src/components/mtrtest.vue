@@ -131,6 +131,7 @@ export default {
 
     // 发起 mtr 测试
     startmtrCheck() {
+      this.$trackEvent('Section', 'StartClick', 'MTRTest');
       // 清空上一次结果
       this.mtrResults = [];
       let tryCount = 0;

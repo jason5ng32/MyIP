@@ -8,14 +8,14 @@
 
           <div :class="{ 'col-4': isMobile }">
             <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
-              :checked="!isCardsCollapsed">
+              :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');">
             <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
                 class="bi bi-list-columns-reverse"></i></label>
           </div>
 
           <div>
             <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" @change="toggleMaps"
-              :checked="isMapShown" :disabled="!isEnvBingMapKey">
+              :checked="isMapShown" :disabled="!isEnvBingMapKey" @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
 
             <label class="form-check-label" for="flexSwitchCheckDefault">
               <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']"></i>
@@ -492,24 +492,31 @@ export default {
       switch (card.source) {
         case "Cloudflare IPv4":
           this.getIPFromCloudflare_V4(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'Cloudflare IPv4');
           break;
         case "Cloudflare IPv6":
           this.getIPFromCloudflare_V6(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'Cloudflare IPv6');
           break;
         case "IPify IPv4":
           this.getIPFromIpify_V4(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'IPify IPv4');
           break;
         case "IPify IPv6":
           this.getIPFromIpify_V6(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'IPify IPv6');
           break;
         case "Upai":
           this.getIPFromUpai(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'Upai');
           break;
         case "IPCheck.ing":
           this.getIPFromGCR(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'IPCheck.ing');
           break;
         case "TaoBao":
           this.getIPFromTaobao(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'TaoBao');
           break;
         default:
           console.error("Undefind Source:", card.source);
@@ -535,6 +542,7 @@ export default {
     copyToClipboard(ip, id) {
       navigator.clipboard.writeText(ip).then(() => {
         this.copiedStatus[id] = true;
+        this.$trackEvent('IPCheck', 'CopyClick', 'Copy IP');
         setTimeout(() => {
           this.copiedStatus[id] = false;
         }, 5000);

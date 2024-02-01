@@ -145,6 +145,7 @@ export default {
 
     // 发起 ping 测试
     startPingCheck() {
+      this.$trackEvent('Section', 'StartClick', 'GlobalLatency');
       // 清空上一次结果
       this.pingResults = [];
       let tryCount = 0;

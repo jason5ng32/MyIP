@@ -158,11 +158,12 @@ export default {
 
     // 检查所有 DNS 泄露测试
     checkAllDNSLeakTest(isRefresh) {
+      this.leakTest.forEach((server) => {
+        server.geo = this.$t('dnsleaktest.StatusWait');
+        server.ip = this.$t('dnsleaktest.StatusWait');
+      });
       if (isRefresh) {
-        this.leakTest.forEach((server) => {
-          server.geo = this.$t('dnsleaktest.StatusWait');
-          server.ip = this.$t('dnsleaktest.StatusWait');
-        });
+        this.$trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
       }
       setTimeout(() => {
         this.fetchLeakTestIpApiCom(0);
@@ -183,7 +184,7 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      this.checkAllDNSLeakTest(true);
+      this.checkAllDNSLeakTest(false);
     }, 2500);
   },
 }

@@ -168,6 +168,7 @@ export default {
         this.connectivityTests.forEach((test) => {
           test.status = this.$t('connectivity.StatusWait');
         });
+        this.$trackEvent('Section','RefreshClick', 'Connectivity');
       }
       let totalTests = this.connectivityTests.length;
       let successCount = 0;
