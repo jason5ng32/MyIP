@@ -286,7 +286,10 @@ export default async (req, res) => {
     // 构建请求 ipinfo.io 的 URL
     const tokens = (process.env.IPINFO_API_TOKEN || '').split(',');
     const token = tokens[Math.floor(Math.random() * tokens.length)];
-    const url = `https://ipinfo.io/${ipAddress}?token=${token}`;
+
+    const url_hasToken = `https://ipinfo.io/${ipAddress}?token=${token}`;
+    const url_noToken = `https://ipinfo.io/${ipAddress}`;
+    const url = token ? url_hasToken : url_noToken;
 
     get(url, apiRes => {
         let data = '';
