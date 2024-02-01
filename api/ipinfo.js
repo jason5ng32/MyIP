@@ -251,6 +251,14 @@ async function loadCountryCodes() {
     return countryCodes;
 }
 
+function isValidIP(ip) {
+    const ipv4Pattern =
+        /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv6Pattern =
+        /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
+    return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
+};
+
 export default async (req, res) => {
     // 限制只能从指定域名访问
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
@@ -264,11 +272,15 @@ export default async (req, res) => {
     } else {
         return res.status(403).json({ error: 'What are you doing?' });
     }
-
     // 从请求中获取 IP 地址
     const ipAddress = req.query.ip;
     if (!ipAddress) {
         return res.status(400).json({ error: 'No IP address provided' });
+    }
+
+    // 检查 IP 地址是否合法
+    if (!isValidIP(ipAddress)) {
+        return res.status(400).json({ error: 'Invalid IP address' });
     }
 
     // 构建请求 ipinfo.io 的 URL
