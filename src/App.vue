@@ -105,6 +105,7 @@ export default {
       alertStyle: "",
       alertMessage: "",
       alertTitle: "",
+      trackedSections: new Set(),
     }
   },
 
@@ -453,6 +454,30 @@ export default {
     sendKeyMap() {
       this.$refs.helpModalRef.keyMap = this.keyMap;
     },
+
+    // 滚动到指定元素并记录事件
+    checkSectionsAndTrack() {
+      const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'GlobalLatency', 'PingTest', 'MTRTest'];
+
+      sectionIds.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section && this.isElementInViewport(section) && !this.trackedSections.has(sectionId)) {
+          this.$trackEvent(sectionId, 'JNScroll', sectionId);
+          this.trackedSections.add(sectionId);
+        }
+      });
+    },
+
+    // 判断元素是否在视窗内
+    isElementInViewport(el) {
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      );
+    },
   },
   mounted() {
     this.registerShortcutKeys();
@@ -460,6 +485,10 @@ export default {
     this.keyMap = keyMap;
     this.sendKeyMap();
     this.setInfosLoaded();
+    window.addEventListener('scroll', this.checkSectionsAndTrack);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.checkSectionsAndTrack);
   },
 }
 
