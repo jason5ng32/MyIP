@@ -68,4 +68,12 @@ app.use(store);
 app.use(i18n);
 app.config.globalProperties.$Lang = i18n.global.locale;
 app.config.globalProperties.$analytics = analytics;
+
+app.config.globalProperties.$trackEvent = function (category, action, label) {
+    analytics.track(action, {
+        category: category,
+        label: label,
+    });
+};
+
 app.mount('#app');

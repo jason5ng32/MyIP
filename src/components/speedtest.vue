@@ -168,6 +168,8 @@ export default {
         this.speedTest.jitter = 0;
       };
 
+      this.$trackEvent('Section', 'StartClick', 'SpeedTest');
+
       newEngine.onResultsChange = ({ type }) => {
         const rawData = newEngine.results.raw;
 

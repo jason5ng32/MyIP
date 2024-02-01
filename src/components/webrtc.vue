@@ -144,11 +144,12 @@ export default {
     // 测试所有 STUN 服务器
     checkAllWebRTC(isRefresh) {
       this.stunServers.forEach((server) => {
-        if (isRefresh) {
-          server.ip = this.$t('webrtc.StatusWait');
-        }
+        server.ip = this.$t('webrtc.StatusWait');
         this.checkSTUNServer(server);
       });
+      if (isRefresh) {
+        this.$trackEvent('Section', 'RefreshClick', 'WebRTC');
+      }
     },
   },
   mounted() {
