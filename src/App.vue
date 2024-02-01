@@ -347,7 +347,7 @@ export default {
         {
           keys: "D",
           action: () => {
-            this.$refs.navBarRef.toggleDarkMode,
+            this.$refs.navBarRef.toggleDarkMode(),
               this.$trackEvent('ShortCut', 'ShortCut', 'ToggleDarkMode');
           },
           description: this.$t('shortcutKeys.ToggleDarkMode'),
