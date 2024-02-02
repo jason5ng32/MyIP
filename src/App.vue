@@ -385,7 +385,7 @@ export default {
           keys: "w",
           action: () => {
             this.scrollToElement("WebRTC", 80);
-            this.$refs.webRTCRef.checkAllWebRTC(true);
+            this.$refs.webRTCRef.checkAllWebRTC(false);
             this.$trackEvent('ShortCut', 'ShortCut', 'WebRTC');
           },
           description: this.$t('shortcutKeys.RefreshWebRTC'),
