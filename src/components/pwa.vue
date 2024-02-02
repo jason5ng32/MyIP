@@ -31,6 +31,7 @@ export default {
             isMacSafari: false,
             isIosSafari: false,
             isOtherBrowser: false,
+            isInstalled: true,
         }
     },
     methods: {
@@ -48,9 +49,14 @@ export default {
                 pwaInstall.isAppleDesktopPlatform = false;
             }
 
-            if (!pwaInstall.isUnderStandaloneMode && !this.isDesktopChrome && !this.isOtherBrowser) {
+            if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
                 pwaInstall.showDialog(true);
                 this.$trackEvent('PWA', 'PWAPopup', 'Show');
+                pwaInstall.addEventListener('pwa-install-success-event', (event) => {
+                    if (event.detail.message.includes('success')) {
+                        this.$trackEvent('PWA', 'PWAInstalled', 'Success');
+                    }
+                });
             }
         },
         detectBrowser() {
@@ -76,8 +82,8 @@ export default {
         this.detectBrowser();
         setTimeout(() => {
             this.showPWA();
-        }, 15000);
-    },
+        }, 10000);
+    },   
 }
 </script>
 
