@@ -154,7 +154,7 @@ export default {
   },
   mounted() {
     setTimeout(() => {
-      this.checkAllWebRTC(true);
+      this.checkAllWebRTC(false);
     }, 4000);
   },
 }
