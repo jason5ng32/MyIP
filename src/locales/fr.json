@@ -40,9 +40,16 @@
     "webrtc": {
         "id": "webrtc",
         "Title": "Test WebRTC",
-        "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions.",
+        "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
         "StatusWait": "En attente du test ou erreur de connexion",
-        "StatusError": "Erreur de test"
+        "StatusError": "Erreur de test",
+        "NATType": {
+            "srflx": "Possiblement Port Restricted Cone ou Symmetric NAT",
+            "prflx": "Possiblement Port Restricted Cone NAT",
+            "relay": "Possiblement Symmetric NAT",
+            "host": "Possiblement Full Cone NAT",
+            "unknown": "Type de NAT inconnu"
+        }
     },
     "dnsleaktest": {
         "id": "dnsleaktest",
@@ -331,31 +338,49 @@
                 ]
             },
             {
-                    "version": "v3.1",
-                    "date": "Jan 30, 2024",
-                    "content": [
-                        {
-                            "type": "add",
-                            "change": "Ajout de la prise en charge d'une nouvelle langue : français"
-                        },
-                        {
-                            "type": "add",
-                            "change": "Ajout d'une animation de chargement des données"
-                        },
-                        {
-                            "type": "improve",
-                            "change": "Optimisation de la stratégie de cache"
-                        },
-                        {
-                            "type": "improve",
-                            "change": "Ajustement du style du mode sombre"
-                        },
-                        {
-                            "type": "fix",
-                            "change": "Correction de quelques problèmes mineurs"
-                        }
-                    ]
-                }
+                "version": "v3.1",
+                "date": "Jan 30, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la prise en charge d'une nouvelle langue : français"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout d'une animation de chargement des données"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la stratégie de cache"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Ajustement du style du mode sombre"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Correction de quelques problèmes mineurs"
+                    }
+                ]
+            },
+            {
+                "version": "v3.2",
+                "date": "Feb 3, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la détection du type NAT"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de l'expérience de l'application PWA"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Amélioration de la sécurité du script backend"
+                    }
+                ]
+            }
         ]
     }
 }

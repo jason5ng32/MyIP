@@ -75,14 +75,14 @@ export default {
         {
           id: "netease",
           name: "Netease",
-          icon: "globe-americas",
+          icon: "browser-safari",
           url: "https://www.163.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
         },
         {
           id: "baidu",
           name: "Baidu",
-          icon: "globe-americas",
+          icon: "browser-safari",
           url: "https://www.baidu.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
         },

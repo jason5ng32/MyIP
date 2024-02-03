@@ -40,9 +40,16 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC 测试",
-    "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。",
+    "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
     "StatusWait": "待检测或连接错误",
-    "StatusError": "测试出错"
+    "StatusError": "测试出错",
+    "NATType": {
+      "srflx": "可能是端口限制型或对称型 NAT",
+      "prflx": "可能是端口限制型 NAT",
+      "relay": "可能是对称型 NAT",
+      "host": "可能是全锥型 NAT",
+      "unknown": "未知 NAT 类型"
+    }
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
@@ -353,6 +360,24 @@
           {
             "type": "fix",
             "change": "修复了一些小问题"
+          }
+        ]
+      },
+      {
+        "version": "v3.2",
+        "date": "Feb 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加 NAT 类型检测"
+          },
+          {
+            "type": "improve",
+            "change": "优化 PWA 应用的体验"
+          },
+          {
+            "type": "improve",
+            "change": "提高后端脚本安全性"
           }
         ]
       }
