@@ -21,14 +21,18 @@
               'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
               'text-danger': stun.ip === $t('webrtc.StatusError')
             }">
-              <i class="bi bi-pc-display-horizontal"></i>
+              <i class="bi"
+              :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"
+              ></i>
               {{ stun.ip }}
             </p>
             <div v-if="stun.natType" class="alert" :class="{
               'alert-info': stun.natType === $t('webrtc.StatusWait'),
               'alert-success': stun.natType !== $t('webrtc.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
-              <i class="bi bi-controller"></i> {{ stun.natType }}
+              <i class="bi"
+              :class="[stun.natType === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"
+              ></i> {{ stun.natType }}
             </div>
           </div>
         </div>
