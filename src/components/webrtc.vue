@@ -24,7 +24,10 @@
               <i class="bi bi-geo-alt"></i>
               {{ stun.ip }}
             </p>
-            <div v-if="stun.natType" class="alert alert-success" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <div v-if="stun.natType" class="alert" :class="{
+              'alert-info': stun.natType === $t('webrtc.StatusWait'),
+              'alert-success': stun.natType !== $t('webrtc.StatusWait'),
+            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi bi-controller"></i> {{ stun.natType }}
             </div>
           </div>
