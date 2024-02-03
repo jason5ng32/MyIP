@@ -41,7 +41,8 @@
               <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
                 alt="Map">
 
-              <div class="card-body">
+              <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
+              " class="card-body">
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
                       class="jn-text">🖥️ {{ $t('ipInfos.IP') }}</span>: {{ card.ip
@@ -72,6 +73,14 @@
                     :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">📶
                       {{ $t('ipInfos.ASN') }}</span>: <a v-if="card.asnlink" :href="card.asnlink" target="_blank">{{
                         card.asn }}</a><a v-else>{{ card.asn }}</a></li>
+                </ul>
+              </div>
+              
+              <div v-else class="card-body">
+                <ul class="list-group list-group-flush placeholder-glow">
+                  <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                    <span :class="`placeholder col-${colSize}`"></span>
+                  </li>
                 </ul>
               </div>
 
@@ -105,6 +114,7 @@ export default {
   data() {
     return {
       isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
+      placeholderSizes: [12, 8, 6, 8, 4, 8],
       ipDataCards: [
         {
           id: "taobao",
