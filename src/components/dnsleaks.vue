@@ -16,10 +16,18 @@
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}</h5>
-            <p class="text-success"><i class="bi bi-box-arrow-right"></i> {{ $t('dnsleaktest.Endpoint') }}: {{
-              leak.ip }}</p>
+            <p class="card-text" :class="{
+              'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
+              'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
+            }">
+              <i class="bi bi-box-arrow-right"></i> {{ $t('dnsleaktest.Endpoint') }}: {{
+                leak.ip }}
+            </p>
 
-            <div class="alert alert-success" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <div class="alert" :class="{
+              'alert-info': leak.geo === $t('dnsleaktest.StatusWait'),
+              'alert-success': leak.geo !== $t('dnsleaktest.StatusWait'),
+            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi bi-geo-alt-fill"></i> {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
             </div>
           </div>
