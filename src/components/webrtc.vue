@@ -10,7 +10,7 @@
       <p>{{ $t('webrtc.Note') }}</p>
     </div>
     <div class="row">
-      <div v-for="stun in stunServers" :key="stun.id" class="col-6 col-md-3 mb-4">
+      <div v-for="stun in stunServers" :key="stun.id" class="col-lg-3 col-md-6 col-12 mb-4">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <h5 class="card-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</h5>
@@ -53,21 +53,21 @@ export default {
       stunServers: [
         {
           id: "google",
-          name: "Google 1",
+          name: "Google",
           url: "stun.l.google.com:19302",
           ip: this.$t('webrtc.StatusWait'),
           natType: "",
         },
-        {
-          id: "google",
-          name: "Google 2",
-          url: "stun2.l.google.com:19302",
-          ip: this.$t('webrtc.StatusWait'),
-          natType: "",
-        },
+        // {
+        //   id: "google",
+        //   name: "Google 2",
+        //   url: "stun2.l.google.com:19302",
+        //   ip: this.$t('webrtc.StatusWait'),
+        //   natType: "",
+        // },
         {
           id: "nextcloud",
-          name: "NxtCld",
+          name: "NextCloud",
           url: "stun.nextcloud.com:443",
           ip: this.$t('webrtc.StatusWait'),
           natType: "",
@@ -86,27 +86,27 @@ export default {
           ip: this.$t('webrtc.StatusWait'),
           natType: "",
         },
-        {
-          id: "miwifi",
-          name: "MiWiFi",
-          url: "stun.miwifi.com",
-          ip: this.$t('webrtc.StatusWait'),
-          natType: "",
-        },
-        {
-          id: "qq",
-          name: "QQ",
-          url: "stun.qq.com",
-          ip: this.$t('webrtc.StatusWait'),
-          natType: "",
-        },
-        {
-          id: "stunprotocol",
-          name: "StnPtc",
-          url: "stunserver.stunprotocol.org",
-          ip: this.$t('webrtc.StatusWait'),
-          natType: "",
-        },
+        // {
+        //   id: "miwifi",
+        //   name: "MiWiFi",
+        //   url: "stun.miwifi.com",
+        //   ip: this.$t('webrtc.StatusWait'),
+        //   natType: "",
+        // },
+        // {
+        //   id: "qq",
+        //   name: "QQ",
+        //   url: "stun.qq.com",
+        //   ip: this.$t('webrtc.StatusWait'),
+        //   natType: "",
+        // },
+        // {
+        //   id: "stunprotocol",
+        //   name: "StnPtc",
+        //   url: "stunserver.stunprotocol.org",
+        //   ip: this.$t('webrtc.StatusWait'),
+        //   natType: "",
+        // },
       ],
     }
   },
