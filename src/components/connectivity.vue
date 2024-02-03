@@ -32,9 +32,25 @@
             <div class="card-body">
               <h5 class="card-title"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</h5>
 
-              <p class="card-text"
-                :class="{ 'text-info': test.status === $t('connectivity.StatusWait'), 'text-success': test.status.includes($t('connectivity.StatusAvailable')), 'text-danger': test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout') }"
-                v-html="test.status">
+              <p class="card-text" :class="{
+                'text-info': test.status === $t('connectivity.StatusWait'),
+                'text-success': test.status.includes($t('connectivity.StatusAvailable')) && test.time < 200,
+                'jn-text-warning': test.status.includes($t('connectivity.StatusAvailable')) && test.time >= 200,
+                'text-danger': test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')
+              }">
+                <i v-if="test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')"
+                  class="bi bi-emoji-frown"></i>
+                <i v-else-if="test.status === $t('connectivity.StatusAvailable') && test.time < 200"
+                  class="bi bi-emoji-smile"></i>
+                <i v-else-if="test.status === $t('connectivity.StatusAvailable') && test.time >= 200"
+                  class="bi bi-emoji-expressionless"></i>
+                <i v-else-if="test.time === 0" class="bi bi-hourglass-split"></i>
+                {{ test.status }}
+                <span v-if="test.time !== 0">
+                  : {{ test.time }}
+                  <span> ms</span>
+                </span>
+
               </p>
             </div>
           </div>
@@ -78,6 +94,7 @@ export default {
           icon: "browser-safari",
           url: "https://www.163.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "baidu",
@@ -85,6 +102,7 @@ export default {
           icon: "browser-safari",
           url: "https://www.baidu.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "wechat",
@@ -92,6 +110,7 @@ export default {
           icon: "wechat",
           url: "https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "google",
@@ -99,6 +118,7 @@ export default {
           icon: "google",
           url: "https://www.google.com/images/errors/robot.png?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "cloudflare",
@@ -106,6 +126,7 @@ export default {
           icon: "cloud-fill",
           url: "https://www.cloudflare.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "youtube",
@@ -113,6 +134,7 @@ export default {
           icon: "youtube",
           url: "https://i.ytimg.com/vi/GYkq9Rgoj8E/hq720.jpg?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "github",
@@ -120,6 +142,7 @@ export default {
           icon: "github",
           url: "https://raw.githubusercontent.com/jason5ng32/fulian4/master/background.jpg?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
         {
           id: "chatgpt",
@@ -127,6 +150,7 @@ export default {
           icon: "chat-quote-fill",
           url: "https://chat.openai.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
+          time: 0,
         },
       ],
     };
@@ -146,9 +170,8 @@ export default {
 
       img.onload = () => {
         clearTimeout(timeout);
-        test.status =
-          this.$t('connectivity.StatusAvailable') +
-          ` ( ${+new Date() - beginTime} ms )`;
+        test.status = this.$t('connectivity.StatusAvailable');
+        test.time = new Date() - beginTime;
         onTestComplete(true);
       };
 
@@ -167,8 +190,9 @@ export default {
       if (isRefresh) {
         this.connectivityTests.forEach((test) => {
           test.status = this.$t('connectivity.StatusWait');
+          test.time = 0;
         });
-        this.$trackEvent('Section','RefreshClick', 'Connectivity');
+        this.$trackEvent('Section', 'RefreshClick', 'Connectivity');
       }
       let totalTests = this.connectivityTests.length;
       let successCount = 0;
@@ -241,5 +265,8 @@ export default {
   },
 }
 </script>
-
-<style scoped></style>
+<style scoped>
+.jn-text-warning {
+  color: #c67c14;
+}
+</style>
