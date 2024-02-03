@@ -21,7 +21,7 @@
               'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
               'text-danger': stun.ip === $t('webrtc.StatusError')
             }">
-              <i class="bi bi-geo-alt"></i>
+              <i class="bi bi-pc-display-horizontal"></i>
               {{ stun.ip }}
             </p>
             <div v-if="stun.natType" class="alert" :class="{
