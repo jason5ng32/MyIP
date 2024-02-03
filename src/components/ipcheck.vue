@@ -32,12 +32,13 @@
           <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
             :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
             <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-              <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode }" style="font-weight: bold;">
+              <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }" style="font-weight: bold;">
                 <span>{{ $t('ipInfos.Source') }}: {{ card.source }}</span>
                 <button @click="refreshCard(card)"
                   :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
                   <i class="bi bi-arrow-clockwise"></i></button>
               </div>
+              
               <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
                 alt="Map">
 
@@ -45,7 +46,7 @@
               " class="card-body">
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text">🖥️ {{ $t('ipInfos.IP') }}</span>: {{ card.ip
+                      class="jn-text"><i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }}</span>: {{ card.ip
                       }}
                     <i v-if="isValidIP(card.ip)"
                       :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
@@ -53,24 +54,24 @@
                   </li>
                   <li class="list-group-item jn-list-group-item"
                     :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
-                    <span class="jn-text">🌍 {{ $t('ipInfos.Country') }}</span>: {{
+                    <span class="jn-text"><i class="bi bi-geo-alt-fill"></i> {{ $t('ipInfos.Country') }}</span>: {{
                       card.country_name }}&nbsp;<span v-if="card.country_code"
                       :class="'fi fi-' + card.country_code.toLowerCase()"></span>
                   </li>
                   <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏚️
+                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-houses"></i>
                       {{ $t('ipInfos.Region') }}</span>: {{ card.region
                       }}</li>
                   <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🚏
+                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-sign-turn-right"></i>
                       {{ $t('ipInfos.City') }}</span>: {{ card.city }}
                   </li>
                   <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">🏢
+                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-buildings"></i>
                       {{ $t('ipInfos.ISP') }}</span>: {{ card.isp }}
                   </li>
                   <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text">📶
+                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-reception-4"></i>
                       {{ $t('ipInfos.ASN') }}</span>: <a v-if="card.asnlink" :href="card.asnlink" target="_blank">{{
                         card.asn }}</a><a v-else>{{ card.asn }}</a></li>
                 </ul>
@@ -468,7 +469,7 @@ export default {
         longitude: data.longitude || "",
         isp: data.org || "",
         asn: data.asn || "",
-        asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
+        asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
         mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : ""
       };

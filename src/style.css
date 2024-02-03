@@ -67,9 +67,11 @@
   max-width: 1400px;
 }
 
-.jn-text {
-  font-weight: bold;
-}
+/* .jn-text {
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-color: #1a8754;
+} */
 
 .jn-list-group-item {
   padding: 0.75rem 0.25rem;

@@ -22,24 +22,24 @@
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text">🌍 {{ $t('ipInfos.Country') }}</span>: {{
+                                    <span class="jn-text"><i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.Country') }}</span>: {{
                                         modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
                                         :class="'fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text">🏚️ {{ $t('ipInfos.Region') }}</span>: {{
+                                        class="jn-text"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region') }}</span>: {{
                                             modalQueryResult.region
                                         }}</li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text">🚏 {{ $t('ipInfos.City') }}</span>: {{
+                                        class="jn-text"><i class="bi bi-sign-turn-right"></i> {{ $t('ipInfos.City') }}</span>: {{
                                             modalQueryResult.city }}
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text">🏢 {{ $t('ipInfos.ISP') }}</span>: {{
+                                        class="jn-text"><i class="bi bi-buildings"></i> {{ $t('ipInfos.ISP') }}</span>: {{
                                             modalQueryResult.isp }}
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text">📶 {{ $t('ipInfos.ASN') }}</span>: <a
+                                        class="jn-text"><i class="bi bi-reception-4"></i> {{ $t('ipInfos.ASN') }}</span>: <a
                                         v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank">{{
                                             modalQueryResult.asn }}</a><a v-else>{{ modalQueryResult.asn }}</a></li>
                             </ul>
