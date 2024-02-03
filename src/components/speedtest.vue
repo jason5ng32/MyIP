@@ -18,7 +18,7 @@
           <div class="card-body">
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
               :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
-              <div class="progress-bar progress-bar-striped progress-bar-animated bg-success jn-progress"
+              <div class="progress-bar progress-bar-striped progress-bar-animated jn-progress" :class="[ speedTestStatus === 'finished'? 'bg-success' : 'bg-info']"
                 role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                 id="speedtest-progress">
               </div>

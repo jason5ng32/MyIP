@@ -20,7 +20,9 @@
               'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
               'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
             }">
-              <i class="bi bi-box-arrow-right"></i> {{ $t('dnsleaktest.Endpoint') }}: {{
+              <i class="bi"
+              :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"
+              ></i> {{ $t('dnsleaktest.Endpoint') }}: {{
                 leak.ip }}
             </p>
 
@@ -28,7 +30,9 @@
               'alert-info': leak.geo === $t('dnsleaktest.StatusWait'),
               'alert-success': leak.geo !== $t('dnsleaktest.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
-              <i class="bi bi-geo-alt-fill"></i> {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
+              <i class="bi"
+              :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"
+              ></i> {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
             </div>
           </div>
         </div>
