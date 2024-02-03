@@ -40,9 +40,16 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC Test",
-    "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections.",
+    "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
     "StatusWait": "Awaiting Test or Connection Error",
-    "StatusError": "Test Error"
+    "StatusError": "Test Error",
+    "NATType": {
+      "srflx": "Possibly Port Restricted Cone or Symmetric NAT",
+      "prflx": "Possibly Port Restricted Cone NAT",
+      "relay": "Possibly Symmetric NAT",
+      "host": "Possibly Full Cone NAT",
+      "unknown": "Unknown NAT Type"
+    }
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
@@ -353,6 +360,24 @@
           {
             "type": "fix",
             "change": "Fixed some minor issues"
+          }
+        ]
+      },
+      {
+        "version": "v3.2",
+        "date": "Feb 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added NAT type detection"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized PWA application experience"
+          },
+          {
+            "type": "improve",
+            "change": "Enhanced backend script security"
           }
         ]
       }

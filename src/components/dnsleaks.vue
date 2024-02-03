@@ -15,8 +15,8 @@
       <div v-for="leak in leakTest" :key="leak.id" class="col-6 col-md-3 mb-4">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-server"></i> {{ leak.name }}</h5>
-            <p class="card-text text-secondary" style="font-size: 10pt;">{{ $t('dnsleaktest.Endpoint') }}: {{
+            <h5 class="card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}</h5>
+            <p class="card-text text-secondary" style="font-size: 10pt;"><i class="bi bi-box-arrow-right"></i> {{ $t('dnsleaktest.Endpoint') }}: {{
               leak.ip }}</p>
             <p class="card-text" :class="[
               'text-success',
