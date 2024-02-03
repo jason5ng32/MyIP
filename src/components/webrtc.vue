@@ -20,8 +20,13 @@
               'text-info': stun.ip === $t('webrtc.StatusWait'),
               'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
               'text-danger': stun.ip === $t('webrtc.StatusError')
-            }" v-html="stun.ip"></p>
-            <p class="card-text text-success" v-html="stun.natType"></p>
+            }">
+              <i class="bi bi-geo-alt"></i>
+              {{ stun.ip }}
+            </p>
+            <div v-if="stun.natType" class="alert alert-success" :data-bs-theme="isDarkMode ? 'dark' : ''">
+              <i class="bi bi-controller"></i> {{ stun.natType }}
+            </div>
           </div>
         </div>
       </div>
@@ -56,7 +61,7 @@ export default {
           name: "Google",
           url: "stun.l.google.com:19302",
           ip: this.$t('webrtc.StatusWait'),
-          natType: "",
+          natType: this.$t('webrtc.StatusWait'),
         },
         // {
         //   id: "google",
@@ -70,21 +75,21 @@ export default {
           name: "NextCloud",
           url: "stun.nextcloud.com:443",
           ip: this.$t('webrtc.StatusWait'),
-          natType: "",
+          natType: this.$t('webrtc.StatusWait'),
         },
         {
           id: "twilio",
           name: "Twilio",
           url: "global.stun.twilio.com",
           ip: this.$t('webrtc.StatusWait'),
-          natType: "",
+          natType: this.$t('webrtc.StatusWait'),
         },
         {
           id: "cloudflare",
           name: "Cloudflare",
           url: "stun.cloudflare.com",
           ip: this.$t('webrtc.StatusWait'),
-          natType: "",
+          natType: this.$t('webrtc.StatusWait'),
         },
         // {
         //   id: "miwifi",
@@ -174,7 +179,7 @@ export default {
     checkAllWebRTC(isRefresh) {
       this.stunServers.forEach((server) => {
         server.ip = this.$t('webrtc.StatusWait');
-        server.natType = "";
+        server.natType = this.$t('webrtc.StatusWait');
         this.checkSTUNServer(server);
       });
       if (isRefresh) {
