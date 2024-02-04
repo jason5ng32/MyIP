@@ -22,7 +22,7 @@
         "Country": "Région",
         "Region": "État",
         "City": "Ville",
-        "ISP": "Fournisseur d'accès Internet",
+        "ISP": "ISP",
         "ASN": "ASN",
         "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
         "IPv6Error": "Échec de récupération ou pas d'adresse IPv6"

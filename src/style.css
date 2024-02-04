@@ -67,14 +67,15 @@
   max-width: 1400px;
 }
 
-/* .jn-text {
-    text-decoration-line: underline;
-    text-decoration-style: solid;
-    text-decoration-color: #1a8754;
-} */
+.jn-text {
+height: fit-content;
+}
 
 .jn-list-group-item {
-  padding: 0.75rem 0.25rem;
+  border-bottom: 1px solid rgb(222, 226, 230);
+  padding: 12px 4px 12px 4px;
+  display: flex;
+  margin: 0;
 }
 
 .jn-opacity {

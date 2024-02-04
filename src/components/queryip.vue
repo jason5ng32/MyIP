@@ -1,7 +1,8 @@
 <template>
     <!-- Search BTN -->
     <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;" data-bs-toggle="modal"
-        data-bs-target="#IPCheck" @click="$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');"><i class="bi bi-search"></i></button>
+        data-bs-target="#IPCheck" @click="$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');"><i
+            class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
@@ -22,26 +23,45 @@
                         <div class="card-body">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text"><i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.Country') }}</span>: {{
-                                        modalQueryResult.country_name }}&nbsp;<span v-if="modalQueryResult.country_code"
-                                        :class="'fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
+                                    <span class="jn-text col-auto">
+                                        <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.Country')
+                                        }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">{{ modalQueryResult.country_name }}&nbsp;
+                                        <span v-if="modalQueryResult.country_code"
+                                            :class="'fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
+                                    </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region') }}</span>: {{
-                                            modalQueryResult.region
-                                        }}</li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text"><i class="bi bi-sign-turn-right"></i> {{ $t('ipInfos.City') }}</span>: {{
-                                            modalQueryResult.city }}
+                                        class="jn-text col-auto"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region')
+                                        }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        {{ modalQueryResult.region }}
+                                    </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text"><i class="bi bi-buildings"></i> {{ $t('ipInfos.ISP') }}</span>: {{
-                                            modalQueryResult.isp }}
+                                        class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{ $t('ipInfos.City')
+                                        }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        {{ modalQueryResult.city }}
+                                    </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text"><i class="bi bi-reception-4"></i> {{ $t('ipInfos.ASN') }}</span>: <a
-                                        v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank">{{
-                                            modalQueryResult.asn }}</a><a v-else>{{ modalQueryResult.asn }}</a></li>
+                                        class="jn-text col-auto"><i class="bi bi-buildings"></i> {{ $t('ipInfos.ISP')
+                                        }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        {{ modalQueryResult.isp }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto">
+                                        <i class="bi bi-reception-4"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank"
+                                            class="link-underline-opacity-50 link-underline-opacity-100-hover"
+                                            :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ modalQueryResult.asn
+                                            }}</a>
+                                    </span>
+                                </li>
                             </ul>
                         </div>
 

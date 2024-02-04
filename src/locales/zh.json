@@ -22,7 +22,7 @@
     "Country": "地区",
     "Region": "省份",
     "City": "城市",
-    "ISP": "ISP",
+    "ISP": "网络",
     "ASN": "ASN",
     "IPv4Error": "获取失败或不存在 IPv4 地址",
     "IPv6Error": "获取失败或不存在 IPv6 地址"
