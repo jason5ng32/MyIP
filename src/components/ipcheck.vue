@@ -131,7 +131,7 @@ export default {
           mapUrl: '/defaultMap.jpg',
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
-          source: "Taobao",
+          source: "TaoBao",
         },
         {
           id: "special",
