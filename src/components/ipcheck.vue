@@ -1,95 +1,140 @@
 <template>
-    <!-- IP Infos -->
-    <div class="ip-data-section mb-4">
-      <div class="row" :class="{ 'jn-title2': !isMobile, 'jn-title': isMobile }">
-        <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎
-          {{ $t('ipInfos.Title') }}</h2>
-        <div class="form-check form-switch col-8 jn-radio">
+  <!-- IP Infos -->
+  <div class="ip-data-section mb-4">
+    <div class="row" :class="{ 'jn-title2': !isMobile, 'jn-title': isMobile }">
+      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎
+        {{ $t('ipInfos.Title') }}</h2>
+      <div class="form-check form-switch col-8 jn-radio">
 
-          <div :class="{ 'col-4': isMobile }">
-            <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
-              :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');">
-            <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
-                class="bi bi-list-columns-reverse"></i></label>
-          </div>
-
-          <div>
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" @change="toggleMaps"
-              :checked="isMapShown" :disabled="!isEnvBingMapKey" @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
-
-            <label class="form-check-label" for="flexSwitchCheckDefault">
-              <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']"></i>
-            </label>
-          </div>
-
+        <div :class="{ 'col-4': isMobile }">
+          <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
+            :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');">
+          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
+              class="bi bi-list-columns-reverse"></i></label>
         </div>
-      </div>
-      <div class="text-secondary">
-        <p>{{ $t('ipInfos.Notes') }}</p>
-      </div>
-      <div class="jn-card-deck">
-        <div class="row">
-          <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
-            :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
-            <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-              <div class="card-header jn-ip-title" :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }" style="font-weight: bold;">
-                <span>{{ $t('ipInfos.Source') }}: {{ card.source }}</span>
-                <button @click="refreshCard(card)"
-                  :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
-                  <i class="bi bi-arrow-clockwise"></i></button>
-              </div>
-              
-              <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
-                alt="Map">
 
-              <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
+        <div>
+          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" @change="toggleMaps"
+            :checked="isMapShown" :disabled="!isEnvBingMapKey" @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
+
+          <label class="form-check-label" for="flexSwitchCheckDefault">
+            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']"></i>
+          </label>
+        </div>
+
+      </div>
+    </div>
+    <div class="text-secondary">
+      <p>{{ $t('ipInfos.Notes') }}</p>
+    </div>
+    <div class="jn-card-deck">
+      <div class="row">
+        <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
+          :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
+          <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+            <div class="card-header jn-ip-title"
+              :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }"
+              style="font-weight: bold;">
+              <span>{{ $t('ipInfos.Source') }}: {{ card.source }}</span>
+              <button @click="refreshCard(card)"
+                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
+                <i class="bi bi-arrow-clockwise"></i></button>
+            </div>
+
+            <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
+              alt="Map">
+
+            <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
               " class="card-body">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                      class="jn-text"><i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }}</span>: {{ card.ip
-                      }}
+              <ul class="list-group list-group-flush">
+
+                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text">
+                    <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }}
+                  </span>
+                  <span>
+                    : {{ card.ip }}
                     <i v-if="isValidIP(card.ip)"
                       :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
                       @click="copyToClipboard(card.ip, card.id)"></i>
-                  </li>
-                  <li class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
-                    <span class="jn-text"><i class="bi bi-geo-alt-fill"></i> {{ $t('ipInfos.Country') }}</span>: {{
-                      card.country_name }}&nbsp;<span v-if="card.country_code"
-                      :class="'fi fi-' + card.country_code.toLowerCase()"></span>
-                  </li>
-                  <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-houses"></i>
-                      {{ $t('ipInfos.Region') }}</span>: {{ card.region
-                      }}</li>
-                  <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-sign-turn-right"></i>
-                      {{ $t('ipInfos.City') }}</span>: {{ card.city }}
-                  </li>
-                  <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-buildings"></i>
-                      {{ $t('ipInfos.ISP') }}</span>: {{ card.isp }}
-                  </li>
-                  <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }"><span class="jn-text"><i class="bi bi-reception-4"></i>
-                      {{ $t('ipInfos.ASN') }}</span>: <a v-if="card.asnlink" :href="card.asnlink" target="_blank">{{
-                        card.asn }}</a><a v-else>{{ card.asn }}</a></li>
-                </ul>
-              </div>
-              
-              <div v-else class="card-body">
-                <ul class="list-group list-group-flush placeholder-glow">
-                  <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                    <span :class="`placeholder col-${colSize}`"></span>
-                  </li>
-                </ul>
-              </div>
+                  </span>
+                </li>
 
+                <li class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
+                  <span class="jn-text">
+                    <i class="bi bi-geo-alt-fill"></i> {{ $t('ipInfos.Country') }}
+                  </span>
+                  <span>
+                    : {{ card.country_name }}
+                    <span v-if="card.country_code" :class="'fi fi-' + card.country_code.toLowerCase()"></span>
+                  </span>
+                </li>
+
+                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text">
+                    <i class="bi bi-houses"></i>
+                    {{ $t('ipInfos.Region') }}
+                  </span>
+                  <span>
+                    : {{ card.region }}
+                  </span>
+                </li>
+
+                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text">
+                    <i class="bi bi-sign-turn-right"></i>
+                    {{ $t('ipInfos.City') }}
+                  </span>
+                  <span>
+                    : {{ card.city }}
+                  </span>
+                </li>
+
+                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text">
+                    <i class="bi bi-buildings"></i>
+                    {{ $t('ipInfos.ISP') }}
+                  </span>
+                  <span>
+                    : {{ card.isp }}
+                  </span>
+                </li>
+
+                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text">
+                    <i class="bi bi-reception-4"></i>
+                    {{ $t('ipInfos.ASN') }}
+                  </span>
+                  <span v-if="card.asnlink">
+                    : <a :href="card.asnlink" target="_blank"
+                      class="link-underline-opacity-50 link-underline-opacity-100-hover"
+                      :class="[isDarkMode ? 'link-light' : 'link-dark']">
+                      {{ card.asn }}
+                    </a>
+                  </span>
+                </li>
+              </ul>
             </div>
+
+            <div v-else class="card-body">
+              <ul class="list-group list-group-flush placeholder-glow">
+                <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item"
+                  :class="{ 'dark-mode': isDarkMode }">
+                  <span :class="`placeholder col-${colSize}`"></span>
+                </li>
+              </ul>
+            </div>
+
           </div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
