@@ -104,7 +104,7 @@
                   </span>
                 </li>
 
-                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
+                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
                   :class="{ 'dark-mode': isDarkMode }">
                   <span class="jn-text col-auto">
                     <i class="bi bi-reception-4"></i>
