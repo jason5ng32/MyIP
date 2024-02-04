@@ -67,7 +67,7 @@
                   </span>
                   <span class="col-10 ">
                     {{ card.country_name }}
-                    <span v-if="card.country_code" :class="'fi fi-' + card.country_code.toLowerCase()"></span>
+                    <span v-if="card.country_code" :class="'jn-fl fi fi-' + card.country_code.toLowerCase()"></span>
                   </span>
                 </li>
 
