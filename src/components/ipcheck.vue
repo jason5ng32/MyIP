@@ -48,70 +48,70 @@
               " class="card-body">
               <ul class="list-group list-group-flush">
 
-                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text">
-                    <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }}
+                <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text col-auto">
+                    <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }} :&nbsp;
                   </span>
-                  <span>
-                    : {{ card.ip }}
+                  <span class="col-10 ">
+                    {{ card.ip }}
                     <i v-if="isValidIP(card.ip)"
                       :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
                       @click="copyToClipboard(card.ip, card.id)"></i>
                   </span>
                 </li>
 
-                <li class="list-group-item jn-list-group-item"
+                <li class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
-                  <span class="jn-text">
-                    <i class="bi bi-geo-alt-fill"></i> {{ $t('ipInfos.Country') }}
+                  <span class="jn-text col-auto">
+                    <i class="bi bi-geo-alt-fill"></i> {{ $t('ipInfos.Country') }} :&nbsp;
                   </span>
-                  <span>
-                    : {{ card.country_name }}
+                  <span class="col-10 ">
+                    {{ card.country_name }}
                     <span v-if="card.country_code" :class="'fi fi-' + card.country_code.toLowerCase()"></span>
                   </span>
                 </li>
 
-                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text">
+                  <span class="jn-text col-auto">
                     <i class="bi bi-houses"></i>
-                    {{ $t('ipInfos.Region') }}
+                    {{ $t('ipInfos.Region') }} :&nbsp;
                   </span>
-                  <span>
-                    : {{ card.region }}
+                  <span class="col-10 ">
+                    {{ card.region }}
                   </span>
                 </li>
 
-                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text">
+                  <span class="jn-text col-auto">
                     <i class="bi bi-sign-turn-right"></i>
-                    {{ $t('ipInfos.City') }}
+                    {{ $t('ipInfos.City') }} :&nbsp;
                   </span>
-                  <span>
-                    : {{ card.city }}
+                  <span class="col-10 ">
+                    {{ card.city }}
                   </span>
                 </li>
 
-                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text">
+                  <span class="jn-text col-auto">
                     <i class="bi bi-buildings"></i>
-                    {{ $t('ipInfos.ISP') }}
+                    {{ $t('ipInfos.ISP') }} :&nbsp;
                   </span>
-                  <span>
-                    : {{ card.isp }}
+                  <span class="col-10 ">
+                    {{ card.isp }}
                   </span>
                 </li>
 
-                <li v-show="!isMobile || !isCardsCollapsed" class="list-group-item jn-list-group-item"
+                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text">
+                  <span class="jn-text col-auto">
                     <i class="bi bi-reception-4"></i>
-                    {{ $t('ipInfos.ASN') }}
+                    {{ $t('ipInfos.ASN') }} :&nbsp;
                   </span>
-                  <span v-if="card.asnlink">
-                    : <a :href="card.asnlink" target="_blank"
+                  <span v-if="card.asnlink" class="col-9 ">
+                    <a :href="card.asnlink" target="_blank"
                       class="link-underline-opacity-50 link-underline-opacity-100-hover"
                       :class="[isDarkMode ? 'link-light' : 'link-dark']">
                       {{ card.asn }}
