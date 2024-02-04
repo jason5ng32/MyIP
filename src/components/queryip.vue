@@ -28,7 +28,7 @@
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">{{ modalQueryResult.country_name }}&nbsp;
                                         <span v-if="modalQueryResult.country_code"
-                                            :class="'fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
+                                            :class="'jn-fl fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
                                     </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span

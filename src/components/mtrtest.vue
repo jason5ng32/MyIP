@@ -49,7 +49,7 @@
                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                       :data-bs-target="'#collapse' + index" :aria-expanded="index === 0 ? 'true' : 'false'"
                       :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
-                      <span :class="'fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{ result.city }}, {{
+                      <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{ result.city }}, {{
                         result.country }}</strong>
                       <span v-if="!isMobile">&nbsp;-&nbsp;{{ result.network }}&nbsp;</span>
                       <span v-if="!isMobile" class="badge rounded-pill"

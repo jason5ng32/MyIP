@@ -60,7 +60,7 @@
                   <tbody>
                     <tr v-for="result in pingResults" :key="result.country">
                       <td>
-                        <span :class="'fi fi-' + result.country.toLowerCase()"></span>
+                        <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
                         {{ result.country }}
                       </td>
                       <td :class="result.stats.min < 100 ? 'text-success' : ''">{{ result.stats.min.toFixed(1) }}

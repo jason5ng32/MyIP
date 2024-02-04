@@ -71,6 +71,10 @@
 height: fit-content;
 }
 
+.jn-fl {
+  box-shadow: 0 0 1pt #201f1f70;
+}
+
 .jn-list-group-item {
   border-bottom: 1px solid rgb(222, 226, 230);
   padding: 12px 4px 12px 4px;
