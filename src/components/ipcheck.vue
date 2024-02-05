@@ -527,10 +527,10 @@ export default {
       }, 100);
       setTimeout(() => {
         this.getIPFromIpify_V4();
-      }, 1000);
+      }, 500);
       setTimeout(() => {
         this.getIPFromIpify_V6();
-      }, 1000);
+      }, 100);
     },
 
     // 清空卡片数据
