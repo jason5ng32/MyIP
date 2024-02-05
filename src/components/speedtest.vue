@@ -25,28 +25,28 @@
             </div>
             <div class="row" style="margin-bottom: 10pt;">
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
-                <h5 class="speedtest-h5">{{ $t('speedtest.Download') }}</h5>
+                <p class="speedtest-h5 jn-con-title">{{ $t('speedtest.Download') }}</p>
                 <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
                   <span class="jn-speedtest-number">{{ speedTest.downloadSpeed }}</span>
                   <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
-                <h5 class="speedtest-h5">{{ $t('speedtest.Upload') }}</h5>
+                <p class="speedtest-h5 jn-con-title">{{ $t('speedtest.Upload') }}</p>
                 <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
                   <span class="jn-speedtest-number">{{ speedTest.uploadSpeed }}</span>
                   <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
-                <h5 class="speedtest-h5">{{ $t('speedtest.Latency') }}</h5>
+                <p class="speedtest-h5 jn-con-title">{{ $t('speedtest.Latency') }}</p>
                 <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
                   <span class="jn-speedtest-number">{{ speedTest.latency }}</span>
                   <span v-if="speedTestStatus !== 'idle'">ms</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
-                <h5 class="speedtest-h5">{{ $t('speedtest.Jitter') }}</h5>
+                <p class="speedtest-h5 jn-con-title">{{ $t('speedtest.Jitter') }}</p>
                 <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
                   <span class="jn-speedtest-number">{{ speedTest.jitter }}</span>
                   <span v-if="speedTestStatus !== 'idle'">ms</span>

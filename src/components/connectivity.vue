@@ -30,8 +30,7 @@
         <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
           <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
             <div class="card-body">
-              <h5 class="card-title"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</h5>
-
+              <p class="jn-con-title card-title"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</p>
               <p class="card-text" :class="{
                 'text-info': test.status === $t('connectivity.StatusWait'),
                 'text-success': test.status.includes($t('connectivity.StatusAvailable')) && test.time < 200,
