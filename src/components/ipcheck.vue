@@ -8,17 +8,19 @@
 
         <div :class="{ 'col-4': isMobile }">
           <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
-            :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');">
-          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
-              class="bi bi-list-columns-reverse"></i></label>
+            :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');"
+            aria-label="Toggle Card Display">
+          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i class="bi bi-list-columns-reverse"
+              aria-hidden="true"></i></label>
         </div>
 
         <div>
-          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" @change="toggleMaps"
-            :checked="isMapShown" :disabled="!isEnvBingMapKey" @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
+          <input class="form-check-input" type="checkbox" role="switch" id="toggleMapSwitch" @change="toggleMaps"
+            aria-label="Toggle Map Display" :checked="isMapShown" :disabled="!isEnvBingMapKey"
+            @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
 
-          <label class="form-check-label" for="flexSwitchCheckDefault">
-            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']"></i>
+          <label class="form-check-label" for="toggleMapSwitch">
+            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"></i>
           </label>
         </div>
 
@@ -36,8 +38,8 @@
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }"
               style="font-weight: bold;">
               <span>{{ $t('ipInfos.Source') }}: {{ card.source }}</span>
-              <button @click="refreshCard(card)"
-                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']">
+              <button @click="refreshCard(card)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+                :aria-label="'Refresh' + card.source">
                 <i class="bi bi-arrow-clockwise"></i></button>
             </div>
 
@@ -325,138 +327,127 @@ export default {
     },
 
     // 从特殊源获取 IP 地址
-    getIPFromSpecial() {
-      fetch('/api/validate-site')
-        .then(response => response.json())
-        .then(data => {
-          // 将 data.isIpCheckEnabled 写入到 vuex 的 Global_siteValidate 中
-          this.$store.commit('updateGlobalSiteValidate', data.isIpCheckEnabled);
-
-          if (data.isIpCheckEnabled) {
-            this.getIPFromGCR();
-          } else {
-            this.getIPFromUpai();
-          }
-        });
+    async getIPFromSpecial() {
+      try {
+        const response = await fetch('/api/validate-site');
+        const data = await response.json();
+        // 将 data.isIpCheckEnabled 写入到 vuex 的 Global_siteValidate 中
+        this.$store.commit('updateGlobalSiteValidate', data.isIpCheckEnabled);
+        if (data.isIpCheckEnabled) {
+          await this.getIPFromGCR();
+        } else {
+          await this.getIPFromUpai();
+        }
+      } catch (error) {
+        console.error("Error in getIPFromSpecial:", error);
+      }
     },
 
     // 从 Upai 获取 IP 地址
-    getIPFromUpai() {
-      const unixTime = Date.now();
-      const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
+    async getIPFromUpai() {
+      try {
+        const unixTime = Date.now();
+        const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          const ip = data.remote_addr;
-          this.ipDataCards[1].source = "Upai"
-          this.fetchIPDetails(1, ip);
-        })
-        .catch((error) => {
-          console.error("Error fetching IP from Upai:", error);
-          this.ipDataCards[1].ip = this.$t('ipInfos.IPv4Error');
-        });
+        const data = await response.json();
+        const ip = data.remote_addr;
+        this.ipDataCards[1].source = "Upai";
+        this.fetchIPDetails(1, ip);
+      } catch (error) {
+        console.error("Error fetching IP from Upai:", error);
+        this.ipDataCards[1].ip = this.$t('ipInfos.IPv4Error');
+      }
     },
 
     // 从 GCR 获取 IP 地址
-    getIPFromGCR() {
-      const url = `https://getipfromgoogle.ipcheck.ing/`;
+    async getIPFromGCR() {
+      try {
+        const url = `https://getipfromgoogle.ipcheck.ing/`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          const fullIp = data.ip;
-          const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
-          this.ipDataCards[1].source = "IPCheck.ing";
-          this.fetchIPDetails(1, ip);
-        })
-
-        .catch((error) => {
-          console.error("Error fetching IP from IPCheck.ing:", error);
-          this.getIPFromUpai();
-        });
+        const data = await response.json();
+        const fullIp = data.ip;
+        const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
+        this.ipDataCards[1].source = "IPCheck.ing";
+        this.fetchIPDetails(1, ip);
+      } catch (error) {
+        console.error("Error fetching IP from IPCheck.ing:", error);
+        this.getIPFromUpai(); // 如果发生错误，调用 getIPFromUpai
+      }
     },
 
     // 从 Cloudflare 获取 IPv4 地址
-    getIPFromCloudflare_V4() {
-      fetch("https://1.0.0.1/cdn-cgi/trace")
-        .then((response) => response.text())
-        .then((data) => {
-          const lines = data.split("\n");
-          const ipLine = lines.find((line) => line.startsWith("ip="));
-          if (ipLine) {
-            const ip = ipLine.split("=")[1];
-            this.fetchIPDetails(2, ip);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching IP from Cloudflare:", error);
-          this.ipDataCards[2].ip = this.$t('ipInfos.IPv4Error');
-        });
+    async getIPFromCloudflare_V4() {
+      try {
+        const response = await fetch("https://1.0.0.1/cdn-cgi/trace");
+        const data = await response.text();
+        const lines = data.split("\n");
+        const ipLine = lines.find((line) => line.startsWith("ip="));
+        if (ipLine) {
+          const ip = ipLine.split("=")[1];
+          this.fetchIPDetails(2, ip);
+        }
+      } catch (error) {
+        console.error("Error fetching IP from Cloudflare:", error);
+        this.ipDataCards[2].ip = this.$t('ipInfos.IPv4Error');
+      }
     },
 
     // 从 Cloudflare 获取 IPv6 地址
-    getIPFromCloudflare_V6() {
-      fetch("https://[2606:4700:4700::1111]/cdn-cgi/trace")
-        .then((response) => response.text())
-        .then((data) => {
-          const lines = data.split("\n");
-          const ipLine = lines.find((line) => line.startsWith("ip="));
-          if (ipLine) {
-            const ip = ipLine.split("=")[1];
-            this.fetchIPDetails(3, ip);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching IP from Cloudflare:", error);
-          this.ipDataCards[3].ip = this.$t('ipInfos.IPv6Error');
-        });
+    async getIPFromCloudflare_V6() {
+      try {
+        const response = await fetch("https://[2606:4700:4700::1111]/cdn-cgi/trace");
+        const data = await response.text();
+
+        const lines = data.split("\n");
+        const ipLine = lines.find((line) => line.startsWith("ip="));
+        if (ipLine) {
+          const ip = ipLine.split("=")[1];
+          this.fetchIPDetails(3, ip);
+        }
+      } catch (error) {
+        console.error("Error fetching IP from Cloudflare:", error);
+        this.ipDataCards[3].ip = this.$t('ipInfos.IPv6Error');
+      }
     },
 
     // 从 IPify 获取 IPv4 地址
-    getIPFromIpify_V4() {
-      fetch("https://api4.ipify.org?format=json")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.fetchIPDetails(4, data.ip);
-        })
-        .catch((error) => {
-          console.error("Error fetching IPv4 address from ipify:", error);
-          this.ipDataCards[4].ip = this.$t('ipInfos.IPv4Error');
-        });
+    async getIPFromIpify_V4() {
+      try {
+        const response = await fetch("https://api4.ipify.org?format=json");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        this.fetchIPDetails(4, data.ip);
+      } catch (error) {
+        console.error("Error fetching IPv4 address from ipify:", error);
+        this.ipDataCards[4].ip = this.$t('ipInfos.IPv4Error');
+      }
     },
 
     // 从 IPify 获取 IPv6 地址
-    getIPFromIpify_V6() {
-      fetch("https://api6.ipify.org?format=json")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.fetchIPDetails(5, data.ip);
-        })
-        .catch((error) => {
-          console.error("Error fetching IPv6 address from ipify:", error);
-          this.ipDataCards[5].ip = this.$t('ipInfos.IPv6Error');
-        });
+    async getIPFromIpify_V6() {
+      try {
+        const response = await fetch("https://api6.ipify.org?format=json");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        this.fetchIPDetails(5, data.ip);
+      } catch (error) {
+        console.error("Error fetching IPv6 address from ipify:", error);
+        this.ipDataCards[5].ip = this.$t('ipInfos.IPv6Error');
+      }
     },
 
     // 从 IP 地址获取 IP 详细信息
@@ -521,25 +512,16 @@ export default {
     },
 
     // 检查所有 IP 地址
-    checkAllIPs() {
-      setTimeout(() => {
-        this.getIPFromSpecial();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromTaobao();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromCloudflare_V4();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromCloudflare_V6();
-      }, 100);
-      setTimeout(() => {
-        this.getIPFromIpify_V4();
-      }, 1000);
-      setTimeout(() => {
-        this.getIPFromIpify_V6();
-      }, 1000);
+    async checkAllIPs() {
+      const requests = [
+        this.getIPFromSpecial(),
+        this.getIPFromTaobao(),
+        this.getIPFromCloudflare_V4(),
+        this.getIPFromCloudflare_V6(),
+        this.getIPFromIpify_V4(),
+        this.getIPFromIpify_V6(),
+      ];
+      await Promise.all(requests);
     },
 
     // 清空卡片数据

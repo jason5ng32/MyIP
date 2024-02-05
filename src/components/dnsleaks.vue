@@ -3,9 +3,8 @@
   <div class="dnsleak-test-section mb-4">
     <div class="jn-title2">
       <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ $t('dnsleaktest.Title') }}</h2>
-      <button @click="checkAllDNSLeakTest(true)"
-        :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-          class="bi bi-arrow-clockwise"></i></button>
+      <button @click="checkAllDNSLeakTest(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+        aria-label="Refresh DNS Leak Test"><i class="bi bi-arrow-clockwise"></i></button>
     </div>
     <div class="text-secondary">
       <p>{{ $t('dnsleaktest.Note') }}</p>
@@ -21,8 +20,8 @@
               'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
             }">
               <i class="bi"
-              :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"
-              ></i> {{ $t('dnsleaktest.Endpoint') }}: {{
+                :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"></i>
+              {{ $t('dnsleaktest.Endpoint') }}: {{
                 leak.ip }}
             </p>
 
@@ -31,8 +30,8 @@
               'alert-success': leak.geo !== $t('dnsleaktest.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
-              :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"
-              ></i> {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
+                :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+              {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
             </div>
           </div>
         </div>

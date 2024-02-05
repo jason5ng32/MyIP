@@ -4,7 +4,7 @@
     <div class="jn-title2">
       <h2 id="SpeedTest" :class="{ 'mobile-h2': isMobile }">🚀 {{ $t('speedtest.Title') }}</h2>
       <button @click="startSpeedTest" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-        :disabled="speedTestStatus === 'running'">
+        aria-label="Start Speed Test" :disabled="speedTestStatus === 'running'">
         <i :class="speedTestStatus === 'running' ? 'bi bi-slash-circle' : 'bi bi-caret-right-fill'"></i>
       </button>
 
@@ -18,9 +18,9 @@
           <div class="card-body">
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
               :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
-              <div class="progress-bar progress-bar-striped progress-bar-animated jn-progress" :class="[ speedTestStatus === 'finished'? 'bg-success' : 'bg-info']"
-                role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                id="speedtest-progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated jn-progress"
+                :class="[speedTestStatus === 'finished' ? 'bg-success' : 'bg-info']" role="progressbar" style="width: 0%;"
+                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="speedtest-progress" aria-label="Progress Bar">
               </div>
             </div>
             <div class="row" style="margin-bottom: 10pt;">
@@ -53,7 +53,8 @@
                 </p>
               </div>
             </div>
-            <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''" v-if="speedTestStatus === 'finished'">
+            <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
+              v-if="speedTestStatus === 'finished'">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i> {{ $t('speedtest.score') }}
                 {{ $t('speedtest.videoStreaming') }}
                 <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
