@@ -82,7 +82,7 @@
             <div id="svgMap"></div>
 
             <div id="pingresult-error" v-if="pingCheckStatus === 'error'">
-              <p class="text-center text-danger">{{ $t('pingtest.Error') }}</p>
+              <div class="alert alert-info " :data-bs-theme="isDarkMode ? 'dark' : ''">{{ $t('pingtest.Error') }}</div>
             </div>
 
           </div>
