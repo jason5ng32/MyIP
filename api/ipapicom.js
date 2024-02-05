@@ -34,7 +34,8 @@ export default (req, res) => {
     }
 
     // 构建请求 ip-api.com 的 URL
-    const url = `http://ip-api.com/json/${ipAddress}`;
+    const lang = req.query.lang || 'en';
+    const url = `http://ip-api.com/json/${ipAddress}?fields=66842623&lang=${lang}`;
 
     get(url, apiRes => {
         let data = '';

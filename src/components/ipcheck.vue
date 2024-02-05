@@ -454,6 +454,10 @@ export default {
     async fetchIPDetails(cardIndex, ip) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
+      let lang = this.$Lang;
+      if (lang === 'zh') {
+        lang = 'zh-CN';
+      };
 
       // 检查缓存中是否已有该 IP 的数据
       if (this.ipDataCache.has(ip)) {
@@ -465,8 +469,8 @@ export default {
 
       // 尝试从多个不同的源获取数据
       const sources = [
+        { url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
         { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-        { url: `/api/ipapicom?ip=${ip}`, transform: this.transformDataFromIPapi },
         { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
         { url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
       ];
