@@ -68,7 +68,7 @@ function modifyJsonForKeyCDN(json) {
     return {
         ip,
         city,
-        region: region_name,
+        region: region_name ? region_name : city,
         country: country_code,
         country_name,
         country_code,

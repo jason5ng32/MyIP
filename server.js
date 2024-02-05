@@ -8,6 +8,8 @@ import validateSite from './api/validate-site.js';
 import ipinfoHandler from './api/ipinfo.js';
 import ipapicomHandler from './api/ipapicom.js';
 import keycdnHandler from './api/keycdn.js';
+import maxmindHandler from './api/maxmind.js';
+import ipsbHandler from './api/ipsb.js';
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.get('/api/map', mapHandler);
 app.get('/api/ipinfo', ipinfoHandler);
 app.get('/api/ipapicom', ipapicomHandler);
 app.get('/api/keycdn', keycdnHandler);
+app.get('/api/maxmind', maxmindHandler);
+app.get('/api/ipsb', ipsbHandler);
 
 // 设置静态文件服务
 const __filename = fileURLToPath(import.meta.url);

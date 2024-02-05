@@ -25,7 +25,8 @@
     "ISP": "ISP",
     "ASN": "ASN",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
-    "IPv6Error": "Fetch Failed or No IPv6 Address"
+    "IPv6Error": "Fetch Failed or No IPv6 Address",
+    "SelectSource": "Select IP Geolocation Source"
   },
   "connectivity": {
     "id": "connectivity",
