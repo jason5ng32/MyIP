@@ -21,7 +21,7 @@ export default defineConfig({
       injectRegister: 'auto',
       workbox: {
         globPatterns: [
-          '**/*.{js,css,html}',
+          '**/*.{js,css,html,woff,woff2}',
           '*.{js,css,html,png,svg,jpg,webp}',
         ]
       },
