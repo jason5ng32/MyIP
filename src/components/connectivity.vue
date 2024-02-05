@@ -20,8 +20,8 @@
       <div class="jn-title2">
         <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ $t('connectivity.Title') }}</h2>
         <button @click="checkAllConnectivity(false, true)"
-          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-            class="bi bi-arrow-clockwise"></i></button>
+          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+          aria-label="Refresh Connectivity Test"><i class="bi bi-arrow-clockwise"></i></button>
       </div>
       <div class="text-secondary">
         <p>{{ $t('connectivity.Note') }}</p>
@@ -89,10 +89,10 @@ export default {
       alertMessage: "",
       connectivityTests: [
         {
-          id: "netease",
-          name: "Netease",
-          icon: "browser-safari",
-          url: "https://www.163.com/favicon.ico?",
+          id: "bilibili",
+          name: "Bilibili",
+          icon: "tv-fill",
+          url: "https://www.bilibili.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
         },
@@ -116,7 +116,7 @@ export default {
           id: "google",
           name: "Google",
           icon: "google",
-          url: "https://www.google.com/images/errors/robot.png?",
+          url: "https://www.google.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
         },
@@ -132,7 +132,7 @@ export default {
           id: "youtube",
           name: "Youtube",
           icon: "youtube",
-          url: "https://i.ytimg.com/vi/GYkq9Rgoj8E/hq720.jpg?",
+          url: "https://www.youtube.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
         },
@@ -140,7 +140,7 @@ export default {
           id: "github",
           name: "Github",
           icon: "github",
-          url: "https://raw.githubusercontent.com/jason5ng32/fulian4/master/background.jpg?",
+          url: "https://github.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
         },

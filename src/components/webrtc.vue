@@ -3,8 +3,8 @@
   <div class="webrtc-test-section mb-4">
     <div class="jn-title2">
       <h2 id="WebRTC" :class="{ 'mobile-h2': isMobile }">🚥 {{ $t('webrtc.Title') }}</h2>
-      <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"><i
-          class="bi bi-arrow-clockwise"></i></button>
+      <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+        aria-label="Refresh WebRTC Test"><i class="bi bi-arrow-clockwise"></i></button>
     </div>
     <div class="text-secondary">
       <p>{{ $t('webrtc.Note') }}</p>
@@ -22,8 +22,7 @@
               'text-danger': stun.ip === $t('webrtc.StatusError')
             }">
               <i class="bi"
-              :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"
-              ></i>
+                :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"></i>
               {{ stun.ip }}
             </p>
             <div v-if="stun.natType" class="alert" :class="{
@@ -31,8 +30,8 @@
               'alert-success': stun.natType !== $t('webrtc.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
-              :class="[stun.natType === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"
-              ></i> {{ stun.natType }}
+                :class="[stun.natType === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"></i> {{
+                  stun.natType }}
             </div>
           </div>
         </div>
