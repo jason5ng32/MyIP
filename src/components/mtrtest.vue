@@ -70,7 +70,7 @@
             </div>
 
             <div id="mtrresult-error" v-if="mtrCheckStatus === 'error'">
-              <p class="text-center text-danger">{{ $t('mtrtest.Error') }}</p>
+              <div class="alert alert-info " :data-bs-theme="isDarkMode ? 'dark' : ''">{{ $t('mtrtest.Error') }}</div>
             </div>
 
           </div>
