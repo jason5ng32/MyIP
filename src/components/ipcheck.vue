@@ -512,16 +512,25 @@ export default {
     },
 
     // 检查所有 IP 地址
-    async checkAllIPs() {
-      const requests = [
-        this.getIPFromSpecial(),
-        this.getIPFromTaobao(),
-        this.getIPFromCloudflare_V4(),
-        this.getIPFromCloudflare_V6(),
-        this.getIPFromIpify_V4(),
-        this.getIPFromIpify_V6(),
-      ];
-      await Promise.all(requests);
+    checkAllIPs() {
+      setTimeout(() => {
+        this.getIPFromSpecial();
+      }, 500);
+      setTimeout(() => {
+        this.getIPFromTaobao();
+      }, 500);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V4();
+      }, 500);
+      setTimeout(() => {
+        this.getIPFromCloudflare_V6();
+      }, 100);
+      setTimeout(() => {
+        this.getIPFromIpify_V4();
+      }, 1000);
+      setTimeout(() => {
+        this.getIPFromIpify_V6();
+      }, 1000);
     },
 
     // 清空卡片数据
