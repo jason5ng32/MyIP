@@ -24,13 +24,13 @@
     "flag-icons": "^7.1.0",
     "http-proxy-middleware": "^2.0.6",
     "svgmap": "^2.10.1",
-    "vue": "^3.3.11",
-    "vue-i18n": "^9.9.0",
+    "vue": "^3.4.15",
+    "vue-i18n": "^9.9.1",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.2",
-    "vite": "^5.0.8",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "vite": "^5.0.12",
     "vite-plugin-pwa": "^0.17.5"
   }
 }
