@@ -512,25 +512,13 @@ export default {
     },
 
     // 检查所有 IP 地址
-    checkAllIPs() {
-      setTimeout(() => {
-        this.getIPFromSpecial();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromTaobao();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromCloudflare_V4();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromCloudflare_V6();
-      }, 100);
-      setTimeout(() => {
-        this.getIPFromIpify_V4();
-      }, 500);
-      setTimeout(() => {
-        this.getIPFromIpify_V6();
-      }, 100);
+    async checkAllIPs() {
+      this.getIPFromSpecial();
+      this.getIPFromTaobao();
+      this.getIPFromCloudflare_V4();
+      this.getIPFromCloudflare_V6();
+      this.getIPFromIpify_V4();
+      this.getIPFromIpify_V6();
     },
 
     // 清空卡片数据

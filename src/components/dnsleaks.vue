@@ -14,7 +14,7 @@
       <div v-for="leak in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}</h5>
+            <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}</p>
             <p class="card-text" :class="{
               'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
               'text-success': leak.ip.includes('.') || leak.ip.includes(':'),

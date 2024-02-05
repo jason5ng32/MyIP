@@ -67,6 +67,12 @@
   max-width: 1400px;
 }
 
+.jn-con-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
 .jn-text {
 height: fit-content;
 }
