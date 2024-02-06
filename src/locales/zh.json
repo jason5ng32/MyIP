@@ -381,6 +381,24 @@
             "change": "提高后端脚本安全性"
           }
         ]
+      },
+      {
+        "version": "v3.3",
+        "date": "Feb 6, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "支持使用不同的 IP 地理位置信息源"
+          },
+          {
+            "type": "improve",
+            "change": "优化连接可用性检测的用户体验"
+          },
+          {
+            "type": "improve",
+            "change": "优化 UI 体验"
+          }
+        ]
       }
     ]
   }

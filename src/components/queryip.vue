@@ -92,10 +92,12 @@ export default {
         const store = useStore();
         const isDarkMode = computed(() => store.state.isDarkMode);
         const isMobile = computed(() => store.state.isMobile);
+        const ipGeoSource = computed(() => store.state.ipGeoSource);
 
         return {
             isDarkMode,
-            isMobile
+            isMobile,
+            ipGeoSource
         };
     },
 
@@ -158,23 +160,26 @@ export default {
         },
 
         // 获取 IP 信息
-        async fetchIPForModal(ip, sourceName = null) {
+        async fetchIPForModal(ip, sourceID = null) {
             let lang = this.$Lang;
             if (lang === 'zh') {
                 lang = 'zh-CN';
             };
+
+            sourceID = this.ipGeoSource;
+
             const sources = [
-                { name: "ipinfo", url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-                { name: "ipapicom", url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-                { name: "ipsb", url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
-                { name: "ipapi", url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-                { name: "keycdn", url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
-                { name: "maxmind", url: `/api/maxmind?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+                { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+                { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+                { id: 2, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+                { id: 3, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+                { id: 4, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+                { id: 5, url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
             ];
 
             // 根据指定的源获取数据
             for (const source of sources) {
-                if (sourceName && source.name !== sourceName) {
+                if (sourceID && source.id !== sourceID) {
                     continue;
                 }
                 try {

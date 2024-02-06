@@ -36,13 +36,15 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li v-for="source in sources" :key="source.value">
-              <a class="dropdown-item" :class="{ active: ipGeoSource === source.value }"
-                @click="selectIPGeoSource(source.value)">
+            <li v-for="source in sources" :key="source.id">
+              <a class="dropdown-item" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
+                @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
+                :aria-disabled="!source.enabled">
                 {{ source.text }}
-                <i class="bi bi-check2-circle" v-if="ipGeoSource === source.value"></i>
+                <i class="bi bi-check2-circle" v-if="ipGeoSource === source.id"></i>
               </a>
             </li>
+
           </ul>
         </div>
 
@@ -175,11 +177,12 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-
+    const ipGeoSource = computed(() => store.state.ipGeoSource);
 
     return {
       isDarkMode,
       isMobile,
+      ipGeoSource,
     };
   },
 
@@ -187,14 +190,13 @@ export default {
     return {
       isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
       placeholderSizes: [12, 8, 6, 8, 4, 8],
-      ipGeoSource: 'maxmind',
       sources: [
-        { value: 'maxmind', text: 'MaxMind' },
-        { value: 'ipsb', text: 'IP.SB' },
-        { value: 'ipinfo', text: 'IPinfo.io' },
-        { value: 'ipapicom', text: 'IP-API.com' },
-        { value: 'ipapi', text: 'IPAPI.co' },
-        { value: 'keycdn', text: 'KeyCDN' },
+        { id: 0, text: 'IPCheck.ing', enabled: true },
+        { id: 1, text: 'IP.SB', enabled: true },
+        { id: 2, text: 'IPinfo.io', enabled: true },
+        { id: 3, text: 'IP-API.com', enabled: true },
+        { id: 4, text: 'IPAPI.co', enabled: true },
+        { id: 5, text: 'KeyCDN', enabled: true },
       ],
       ipDataCards: [
         {
@@ -484,7 +486,7 @@ export default {
     },
 
     // 从 IP 地址获取 IP 详细信息
-    async fetchIPDetails(cardIndex, ip, sourceName = null) {
+    async fetchIPDetails(cardIndex, ip, sourceID = null) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
       let lang = this.$Lang;
@@ -502,17 +504,20 @@ export default {
 
       // 不同的源
       const sources = [
-        { name: "maxmind", url: `/api/maxmind?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-        { name: "ipsb", url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
-        { name: "ipinfo", url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-        { name: "ipapicom", url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-        { name: "ipapi", url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-        { name: "keycdn", url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+        { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 2, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 3, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+        { id: 4, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+        { id: 5, url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
       ];
+
+      let OrignalSourceID = sourceID;
+      let retryCount = 0;
 
       // 根据指定的源获取数据
       for (const source of sources) {
-        if (sourceName && source.name !== sourceName) {
+        if (sourceID && source.id !== sourceID) {
           continue;
         }
 
@@ -529,20 +534,31 @@ export default {
             break;
           }
         } catch (error) {
-          console.error("Error fetching IP details:", error);
-          // 失败时改为使用 MaxMind 数据源
-          this.selectIPGeoSource("maxmind");
+          this.sources[OrignalSourceID].enabled = false;
+          if (retryCount < 5) {
+            if (OrignalSourceID === 5) {
+              OrignalSourceID = 0;
+            } else {
+              OrignalSourceID++;
+            }
+
+            this.selectIPGeoSource(OrignalSourceID);
+
+            retryCount++;
+          } else {
+            console.error("Error fetching IP details:", error);
+          }
         }
       }
     },
 
     // 选择 IP 数据源，并保存到本地存储
-    selectIPGeoSource(source) {
-      if (this.ipGeoSource === source) {
+    selectIPGeoSource(sourceID) {
+      if (this.ipGeoSource === sourceID) {
         return;
       }
-      this.ipGeoSource = source;
-      localStorage.setItem("ipGeoSource", source);
+      this.$store.commit('SET_IP_GEO_SOURCE', sourceID);
+      localStorage.setItem("ipGeoSource", parseInt(sourceID));
       // 清空部分数据
       this.ipDataCards.forEach((card) => {
         card.country_name = "";
@@ -562,8 +578,8 @@ export default {
       const interval = setInterval(() => {
         if (index < this.ipDataCards.length) {
           const card = this.ipDataCards[index];
-          if (card.ip) {
-            this.fetchIPDetails(index, card.ip, source);
+          if (this.isValidIP(card.ip)) {
+            this.fetchIPDetails(index, card.ip, sourceID);
           }
           index++;
         } else {
@@ -701,9 +717,6 @@ export default {
     isCardsCollapsed(newVal) {
       localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
     },
-    ipGeoSource(newVal) {
-      localStorage.setItem('ipGeoSource', newVal);
-    },
     ipDataCards: {
       handler(newValue) {
         this.$store.commit('updateGlobalIpDataCards', newValue);
@@ -714,10 +727,11 @@ export default {
 
   mounted() {
     this.checkAllIPs();
+
     // 从本地存储中获取 ipGeoSource
     const ipGeoSource = localStorage.getItem('ipGeoSource');
-    if (ipGeoSource) {
-      this.ipGeoSource = ipGeoSource;
+    if (localStorage.getItem('ipGeoSource')) {
+      this.$store.commit('SET_IP_GEO_SOURCE', parseInt(ipGeoSource));
     }
   },
 }
