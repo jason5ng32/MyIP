@@ -629,7 +629,7 @@ export default {
         } else {
           clearInterval(interval);
         }
-      }, 350);
+      }, 50);
     },
 
     // 清空卡片数据
