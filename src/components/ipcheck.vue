@@ -559,6 +559,7 @@ export default {
       }
       this.$store.commit('SET_IP_GEO_SOURCE', sourceID);
       localStorage.setItem("ipGeoSource", parseInt(sourceID));
+      this.$trackEvent('IPCheck', 'SelectSource', this.sources[sourceID].text);
       // 清空部分数据
       this.ipDataCards.forEach((card) => {
         card.country_name = "";
