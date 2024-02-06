@@ -38,7 +38,7 @@
               <hr class="dropdown-divider">
             </li>
             <li v-for="source in sources" :key="source.id">
-              <span class="dropdown-item" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
+              <span class="dropdown-item jn-select" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
                 @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
                 :aria-disabled="!source.enabled" :aria-label="source.text">
                 {{ source.text }}
@@ -738,4 +738,9 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-select{
+  cursor: pointer;
+  user-select: none;
+}
+</style>
