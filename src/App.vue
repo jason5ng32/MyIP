@@ -18,12 +18,12 @@
     <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
       class="rounded-2" tabindex="0">
       <IPCheck ref="IPCheckRef" />
-      <!-- <Connectivity ref="connectivityRef" />
+      <Connectivity ref="connectivityRef" />
       <WebRTC ref="webRTCRef" />
       <DNSLeaks ref="dnsLeaksRef" />
       <SpeedTest ref="speedTestRef" />
       <GlobalLatency ref="globalLatencyRef" />
-      <MTRtest ref="mtrtestRef" /> -->
+      <MTRtest ref="mtrtestRef" />
       <QueryIP ref="queryIPRef" />
       <HelpModal ref="helpModalRef" />
       <!-- Info Mask BTN-->
