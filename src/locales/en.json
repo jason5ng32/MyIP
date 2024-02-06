@@ -25,7 +25,8 @@
     "ISP": "ISP",
     "ASN": "ASN",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
-    "IPv6Error": "Fetch Failed or No IPv6 Address"
+    "IPv6Error": "Fetch Failed or No IPv6 Address",
+    "SelectSource": "Select IP Geolocation Source"
   },
   "connectivity": {
     "id": "connectivity",
@@ -378,6 +379,24 @@
           {
             "type": "improve",
             "change": "Enhanced backend script security"
+          }
+        ]
+      },
+      {
+        "version": "v3.3",
+        "date": "Feb 6, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added support for using different IP geolocation sources"
+          },
+          {
+            "type": "improve",
+            "change": "Improved user experience for connection availability detection"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized UI experience"
           }
         ]
       }

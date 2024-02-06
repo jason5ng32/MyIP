@@ -25,7 +25,8 @@
         "ISP": "ISP",
         "ASN": "ASN",
         "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
-        "IPv6Error": "Échec de récupération ou pas d'adresse IPv6"
+        "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
+        "SelectSource": "Source de géolocalisation IP"
     },
     "connectivity": {
         "id": "connectivity",
@@ -380,7 +381,25 @@
                         "change": "Amélioration de la sécurité du script backend"
                     }
                 ]
-            }
+            },
+            {
+                    "version": "v3.3",
+                    "date": "Feb 6, 2024",
+                    "content": [
+                        {
+                            "type": "add",
+                            "change": "Prise en charge de l'utilisation de différentes sources d'informations de géolocalisation IP"
+                        },
+                        {
+                            "type": "improve",
+                            "change": "Amélioration de l'expérience utilisateur de la détection de disponibilité de connexion"
+                        },
+                        {
+                            "type": "improve",
+                            "change": "Amélioration de l'expérience utilisateur de l'interface utilisateur"
+                        }
+                    ]
+                }
         ]
     }
 }

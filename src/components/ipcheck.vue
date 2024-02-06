@@ -24,6 +24,32 @@
           </label>
         </div>
 
+        <!-- IP 数据源选择 -->
+        <div class="dropdown">
+          <span class="ms-3" type="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-grid-fill"></i>
+          </span>
+          <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <li class="dropdown-header">
+              {{ $t('ipInfos.SelectSource') }}
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li v-for="source in sources" :key="source.id">
+              <a class="dropdown-item" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
+                @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
+                :aria-disabled="!source.enabled">
+                {{ source.text }}
+                <i class="bi bi-check2-circle" v-if="ipGeoSource === source.id"></i>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+
+
+
       </div>
     </div>
     <div class="text-secondary">
@@ -151,11 +177,12 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-
+    const ipGeoSource = computed(() => store.state.ipGeoSource);
 
     return {
       isDarkMode,
       isMobile,
+      ipGeoSource,
     };
   },
 
@@ -163,6 +190,14 @@ export default {
     return {
       isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
       placeholderSizes: [12, 8, 6, 8, 4, 8],
+      sources: [
+        { id: 0, text: 'IPCheck.ing', enabled: true },
+        { id: 1, text: 'IP.SB', enabled: true },
+        { id: 2, text: 'IPinfo.io', enabled: true },
+        { id: 3, text: 'IP-API.com', enabled: true },
+        { id: 4, text: 'IPAPI.co', enabled: true },
+        { id: 5, text: 'KeyCDN', enabled: true },
+      ],
       ipDataCards: [
         {
           id: "taobao",
@@ -317,7 +352,7 @@ export default {
       window.ipCallback = (data) => {
         var ip = data.ip;
         this.ipDataCards[0].source = "TaoBao";
-        this.fetchIPDetails(0, ip);
+        this.fetchIPDetails(0, ip, this.ipGeoSource);
         delete window.ipCallback;
       };
       var script = document.createElement("script");
@@ -356,7 +391,7 @@ export default {
         const data = await response.json();
         const ip = data.remote_addr;
         this.ipDataCards[1].source = "Upai";
-        this.fetchIPDetails(1, ip);
+        this.fetchIPDetails(1, ip, this.ipGeoSource);
       } catch (error) {
         console.error("Error fetching IP from Upai:", error);
         this.ipDataCards[1].ip = this.$t('ipInfos.IPv4Error');
@@ -376,7 +411,7 @@ export default {
         const fullIp = data.ip;
         const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
         this.ipDataCards[1].source = "IPCheck.ing";
-        this.fetchIPDetails(1, ip);
+        this.fetchIPDetails(1, ip, this.ipGeoSource);
       } catch (error) {
         console.error("Error fetching IP from IPCheck.ing:", error);
         this.getIPFromUpai(); // 如果发生错误，调用 getIPFromUpai
@@ -392,7 +427,7 @@ export default {
         const ipLine = lines.find((line) => line.startsWith("ip="));
         if (ipLine) {
           const ip = ipLine.split("=")[1];
-          this.fetchIPDetails(2, ip);
+          this.fetchIPDetails(2, ip, this.ipGeoSource);
         }
       } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
@@ -410,7 +445,7 @@ export default {
         const ipLine = lines.find((line) => line.startsWith("ip="));
         if (ipLine) {
           const ip = ipLine.split("=")[1];
-          this.fetchIPDetails(3, ip);
+          this.fetchIPDetails(3, ip, this.ipGeoSource);
         }
       } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
@@ -427,7 +462,7 @@ export default {
         }
 
         const data = await response.json();
-        this.fetchIPDetails(4, data.ip);
+        this.fetchIPDetails(4, data.ip, this.ipGeoSource);
       } catch (error) {
         console.error("Error fetching IPv4 address from ipify:", error);
         this.ipDataCards[4].ip = this.$t('ipInfos.IPv4Error');
@@ -443,7 +478,7 @@ export default {
         }
 
         const data = await response.json();
-        this.fetchIPDetails(5, data.ip);
+        this.fetchIPDetails(5, data.ip, this.ipGeoSource);
       } catch (error) {
         console.error("Error fetching IPv6 address from ipify:", error);
         this.ipDataCards[5].ip = this.$t('ipInfos.IPv6Error');
@@ -451,7 +486,7 @@ export default {
     },
 
     // 从 IP 地址获取 IP 详细信息
-    async fetchIPDetails(cardIndex, ip) {
+    async fetchIPDetails(cardIndex, ip, sourceID = null) {
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
       let lang = this.$Lang;
@@ -467,15 +502,25 @@ export default {
         return;
       }
 
-      // 尝试从多个不同的源获取数据
+      // 不同的源
       const sources = [
-        { url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },  
-        { url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-        { url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-        { url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+        { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 2, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+        { id: 3, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+        { id: 4, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+        { id: 5, url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
       ];
 
+      let OrignalSourceID = sourceID;
+      let retryCount = 0;
+
+      // 根据指定的源获取数据
       for (const source of sources) {
+        if (sourceID && source.id !== sourceID) {
+          continue;
+        }
+
         try {
           const response = await fetch(source.url);
           const data = await response.json();
@@ -489,9 +534,58 @@ export default {
             break;
           }
         } catch (error) {
-          console.error("Error fetching IP details:", error);
+          this.sources[OrignalSourceID].enabled = false;
+          if (retryCount < 5) {
+            if (OrignalSourceID === 5) {
+              OrignalSourceID = 0;
+            } else {
+              OrignalSourceID++;
+            }
+
+            this.selectIPGeoSource(OrignalSourceID);
+
+            retryCount++;
+          } else {
+            console.error("Error fetching IP details:", error);
+          }
         }
       }
+    },
+
+    // 选择 IP 数据源，并保存到本地存储
+    selectIPGeoSource(sourceID) {
+      if (this.ipGeoSource === sourceID) {
+        return;
+      }
+      this.$store.commit('SET_IP_GEO_SOURCE', sourceID);
+      localStorage.setItem("ipGeoSource", parseInt(sourceID));
+      // 清空部分数据
+      this.ipDataCards.forEach((card) => {
+        card.country_name = "";
+        card.region = "";
+        card.city = "";
+        card.latitude = "";
+        card.longitude = "";
+        card.isp = "";
+        card.asn = "";
+        card.asnlink = "";
+      });
+
+      this.ipDataCache.clear();
+
+      // 重新获取 IP 数据
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < this.ipDataCards.length) {
+          const card = this.ipDataCards[index];
+          if (this.isValidIP(card.ip)) {
+            this.fetchIPDetails(index, card.ip, sourceID);
+          }
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 350);
     },
 
     // 格式化 IP 数据
@@ -517,12 +611,24 @@ export default {
 
     // 检查所有 IP 地址
     async checkAllIPs() {
-      this.getIPFromSpecial();
-      this.getIPFromTaobao();
-      this.getIPFromCloudflare_V4();
-      this.getIPFromCloudflare_V6();
-      this.getIPFromIpify_V4();
-      this.getIPFromIpify_V6();
+      const ipFunctions = [
+        this.getIPFromSpecial,
+        this.getIPFromTaobao,
+        this.getIPFromCloudflare_V4,
+        this.getIPFromCloudflare_V6,
+        this.getIPFromIpify_V4,
+        this.getIPFromIpify_V6
+      ];
+
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < ipFunctions.length) {
+          ipFunctions[index].call(this);
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 350);
     },
 
     // 清空卡片数据
@@ -621,6 +727,12 @@ export default {
 
   mounted() {
     this.checkAllIPs();
+
+    // 从本地存储中获取 ipGeoSource
+    const ipGeoSource = localStorage.getItem('ipGeoSource');
+    if (localStorage.getItem('ipGeoSource')) {
+      this.$store.commit('SET_IP_GEO_SOURCE', parseInt(ipGeoSource));
+    }
   },
 }
 </script>

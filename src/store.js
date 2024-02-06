@@ -15,6 +15,7 @@ const store = createStore({
       // 全局变量
       shouldRefreshEveryThing: false,
       Global_ipDataCards: [],
+      ipGeoSource: 0,
     };
   },
   mutations: {
@@ -36,6 +37,9 @@ const store = createStore({
     SET_DARK_MODE(state, value) {
       state.isDarkMode = value;
     },
+    SET_IP_GEO_SOURCE(state, value) {
+      state.ipGeoSource = value;
+    }
   },
 
   actions: {

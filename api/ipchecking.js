@@ -8,7 +8,9 @@ function isValidIP(ip) {
     return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
 };
 
+
 export default (req, res) => {
+
     // 限制只能从指定域名访问
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const referer = req.headers.referer;
@@ -33,26 +35,20 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Invalid IP address' });
     }
 
-    // 构建请求 keycdn.com 的 URL
-    const url = new URL(`https://tools.keycdn.com/geo.json?host=${ipAddress}`);
+    const lang = req.query.lang || 'en';
 
-    // 设置请求选项，包括 User-Agent
-    const options = {
-        hostname: url.hostname,
-        path: url.pathname + url.search,
-        headers: {
-            'User-Agent': 'keycdn-tools:' + process.env.KEYCDN_USER_AGENT
-        }
-    };
+    const key = process.env.IPChecking_API_KEY;
 
-    get(options, apiRes => {
+    // 构建请求 IPCheck.ing 的 URL
+    const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
+
+    get(url, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
             try {
                 const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJsonForKeyCDN(originalJson);
-                res.json(modifiedJson);
+                res.json(originalJson);
             } catch (e) {
                 res.status(500).json({ error: 'Error parsing JSON' });
             }
@@ -60,21 +56,4 @@ export default (req, res) => {
     }).on('error', (e) => {
         res.status(500).json({ error: e.message });
     });
-}
-
-function modifyJsonForKeyCDN(json) {
-    const { data: { geo: { ip, city, region_name, country_name, country_code, latitude, longitude, isp, asn } } } = json;
-
-    return {
-        ip,
-        city,
-        region: region_name ? region_name : city,
-        country: country_code,
-        country_name,
-        country_code,
-        latitude,
-        longitude,
-        asn: "AS" + asn,
-        org: isp
-    };
 }
