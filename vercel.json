@@ -1,4 +1,9 @@
 {
     "installCommand": "npm install",
-    "buildCommand": "npm run build"
+    "buildCommand": "npm run build",
+    "functions": {
+        "api/**/*.js": {
+            "includeFiles": ["api/GeoLite2-City.mmdb", "api/GeoLite2-ASN.mmdb"]
+        }
+    }
 }
