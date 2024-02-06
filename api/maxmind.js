@@ -17,8 +17,8 @@ async function initDatabases() {
     // cityLookup = await maxmind.open('./data/GeoLite2-City.mmdb');
     // asnLookup = await maxmind.open('./data/GeoLite2-ASN.mmdb');
 
-    const cityFile = path.join(process.cwd(), 'data', 'GeoLite2-City.mmdb');
-    const asnFile = path.join(process.cwd(), 'data' ,'GeoLite2-ASN.mmdb');
+    const cityFile = path.join(process.cwd(), 'api', 'GeoLite2-City.mmdb');
+    const asnFile = path.join(process.cwd(), 'api' ,'GeoLite2-ASN.mmdb');
 
     cityLookup = await maxmind.open(cityFile);
     asnLookup = await maxmind.open(asnFile);
