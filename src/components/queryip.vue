@@ -9,7 +9,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="IPCheck">{{ $t('ipcheck.Title') }}</h5>
+                    <h5 class="modal-title" id="IPCheckTitle">{{ $t('ipcheck.Title') }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 

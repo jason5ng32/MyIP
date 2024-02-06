@@ -26,7 +26,8 @@
 
         <!-- IP 数据源选择 -->
         <div class="dropdown">
-          <span class="ms-3" type="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false">
+          <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
+            :aria-label="$t('ipInfos.SelectSource')">
             <i class="bi bi-grid-fill"></i>
           </span>
           <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
@@ -39,12 +40,11 @@
             <li v-for="source in sources" :key="source.id">
               <a class="dropdown-item" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
                 @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
-                :aria-disabled="!source.enabled">
+                :aria-disabled="!source.enabled" :aria-label="source.text">
                 {{ source.text }}
                 <i class="bi bi-check2-circle" v-if="ipGeoSource === source.id"></i>
               </a>
             </li>
-
           </ul>
         </div>
 

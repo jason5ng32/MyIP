@@ -356,7 +356,7 @@ export default {
         {
           keys: "R",
           action: () => {
-            this.refreshEverything,
+            this.$store.commit('setRefreshEveryThing', true);
               this.$trackEvent('ShortCut', 'ShortCut', 'RefreshEverything');
           },
 

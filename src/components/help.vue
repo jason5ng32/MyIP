@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="helpModal">{{ $t('helpModal.Title') }}</h5>
+                    <h5 class="modal-title" id="helpModalTitle">{{ $t('helpModal.Title') }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -35,7 +35,7 @@ import { Modal } from 'bootstrap';
 
 export default {
     name: 'HelpModal',
-    
+
     // 引入 Store
     setup() {
         const store = useStore();
