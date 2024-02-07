@@ -39,7 +39,7 @@ const navigateCards = (direction) => {
     cards[currentIndex].classList.remove('hover', 'keyboard-hover');
     cards[currentIndex].removeAttribute('data-keyboard-hover');
   } else {
-    currentIndex = 0; // 如果没有卡片高亮，则从第一张卡片开始
+    currentIndex = -1; // 如果没有卡片高亮，则从第一张卡片开始
   }
 
   if (direction === 'down') {

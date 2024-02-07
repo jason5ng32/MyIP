@@ -75,7 +75,7 @@
               alt="Map">
 
             <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
-              " class="card-body">
+              " class="card-body" :id="'IPInfo-'+(index+1)">
               <ul class="list-group list-group-flush">
 
                 <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
