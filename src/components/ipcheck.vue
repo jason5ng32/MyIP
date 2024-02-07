@@ -57,13 +57,15 @@
     </div>
     <div class="jn-card-deck">
       <div class="row">
-        <div v-for="card in ipDataCards" :key="card.id" :ref="card.id"
+        <div v-for="(card,index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
           <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
             <div class="card-header jn-ip-title"
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }"
               style="font-weight: bold;">
-              <span>{{ $t('ipInfos.Source') }}: {{ card.source }}</span>
+              <span>
+                <i class="bi" :class="'bi-'+(index+1)+'-circle-fill'"></i>
+                {{ $t('ipInfos.Source') }}: {{ card.source }}</span>
               <button @click="refreshCard(card)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
                 :aria-label="'Refresh' + card.source">
                 <i class="bi bi-arrow-clockwise"></i></button>
