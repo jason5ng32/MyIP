@@ -80,7 +80,9 @@
                 <i class="bi bi-pc-display-horizontal"></i>&nbsp;
               </span>
               <span v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))"
-                class="col-10 ">
+                class="col-10"
+                :class="{ 'jn-ip-font': isMobile}"
+                >
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
                   :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
@@ -779,5 +781,8 @@ export default {
   width: 2px;
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
+}
+.jn-ip-font{
+  zoom:0.8;
 }
 </style>
