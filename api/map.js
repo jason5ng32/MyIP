@@ -44,7 +44,7 @@ export default (req, res) => {
     }
 
     const mapSize = '800,640';
-    const pp = `${latitude},${longitude};66`;
+    const pp = `${latitude},${longitude};46`;
     const fmt = 'jpeg';
     const dpi = 'Large';
 
