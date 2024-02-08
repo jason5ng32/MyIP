@@ -81,7 +81,7 @@
               </span>
               <span v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))"
                 class="col-10"
-                :class="{ 'jn-ip-font': isMobile}"
+                :class="{ 'jn-ip-font': ( isMobile && card.ip.length > 32)}"
                 >
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
