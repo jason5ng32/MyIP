@@ -70,7 +70,7 @@
                 :aria-label="'Refresh' + card.source">
                 <i class="bi bi-arrow-clockwise"></i></button>
             </div>
-            <div class="p-3" :class="{
+            <div class="p-3 placeholder-glow " :class="{
               'dark-mode-title': isDarkMode,
               'jn-link2-dark': isDarkMode,
               'bg-light': !isDarkMode,
