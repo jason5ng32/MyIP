@@ -38,7 +38,8 @@
               <hr class="dropdown-divider">
             </li>
             <li v-for="source in sources" :key="source.id">
-              <span class="dropdown-item jn-select" :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
+              <span class="dropdown-item jn-select"
+                :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
                 @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
                 :aria-disabled="!source.enabled" :aria-label="source.text">
                 {{ source.text }}
@@ -57,38 +58,46 @@
     </div>
     <div class="jn-card-deck">
       <div class="row">
-        <div v-for="(card,index) in ipDataCards" :key="card.id" :ref="card.id"
+        <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
           <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-            <div class="card-header jn-ip-title"
-              :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isMapShown && !isDarkMode }"
-              style="font-weight: bold;">
+            <div class="card-header jn-ip-title jn-link1"
+              :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
               <span>
-                <i class="bi" :class="'bi-'+(index+1)+'-circle-fill'"></i>
+                <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
                 {{ $t('ipInfos.Source') }}: {{ card.source }}</span>
               <button @click="refreshCard(card)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
                 :aria-label="'Refresh' + card.source">
                 <i class="bi bi-arrow-clockwise"></i></button>
             </div>
+            <div class="p-3" :class="{
+              'dark-mode-title': isDarkMode,
+              'jn-link2-dark': isDarkMode,
+              'bg-light': !isDarkMode,
+              'jn-link2': !isDarkMode
+            }">
+              <span class="jn-text col-auto">
+                <i class="bi bi-pc-display-horizontal"></i>&nbsp;
+              </span>
+              <span v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))"
+                class="col-10"
+                :class="{ 'jn-ip-font': isMobile}"
+                >
+                {{ card.ip }}&nbsp;
+                <i v-if="isValidIP(card.ip)"
+                  :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                  @click="copyToClipboard(card.ip, card.id)"></i>
+              </span>
+              <span v-else class="placeholder col-10"></span>
+            </div>
 
-            <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="card-img-top jn-map-image"
-              alt="Map">
 
             <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
-              " class="card-body" :id="'IPInfo-'+(index+1)">
-              <ul class="list-group list-group-flush">
+              " class="card-body" :id="'IPInfo-' + (index + 1)">
+              <ul class="list-group list-group-flush" v-if="card.country_name">
 
-                <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.IP') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.ip }}
-                    <i v-if="isValidIP(card.ip)"
-                      :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                      @click="copyToClipboard(card.ip, card.id)"></i>
-                  </span>
-                </li>
+                <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
+                  class="card-img-top jn-map-image" alt="Map">
 
                 <li class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
@@ -191,7 +200,7 @@ export default {
   data() {
     return {
       isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
-      placeholderSizes: [12, 8, 6, 8, 4, 8],
+      placeholderSizes: [12, 8, 6, 8, 4],
       sources: [
         { id: 0, text: 'IPCheck.ing', enabled: true },
         { id: 1, text: 'IP.SB', enabled: true },
@@ -741,8 +750,39 @@ export default {
 </script>
 
 <style scoped>
-.jn-select{
+.jn-select {
   cursor: pointer;
   user-select: none;
+}
+
+.jn-link1 {
+  position: relative;
+}
+
+.jn-link2::before {
+  content: '';
+  position: absolute;
+  top: 34px;
+  left: 24px;
+  transform: translateX(-50%);
+  height: 40px;
+  width: 2px;
+  border-left: 2px dashed #212529;
+  z-index: 1;
+}
+
+.jn-link2-dark::before {
+  content: '';
+  position: absolute;
+  top: 34px;
+  left: 24px;
+  transform: translateX(-50%);
+  height: 40px;
+  width: 2px;
+  border-left: 2px dashed #e3e3e3;
+  z-index: 1;
+}
+.jn-ip-font{
+  zoom:0.8;
 }
 </style>

@@ -367,7 +367,7 @@ export default {
           type: "regex",
           action: (num) => {
             const card = this.$refs.IPCheckRef.ipDataCards[num - 1];
-            this.scrollToElement("IPInfo-" + num, 120);
+            this.scrollToElement("IPInfo-" + num, 180);
             this.$refs.IPCheckRef.refreshCard(card);
             this.$trackEvent('ShortCut', 'ShortCut', 'IPCheck');
           },

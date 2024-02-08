@@ -1,7 +1,7 @@
 <template>
     <!-- Help Modal -->
     <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModal" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
                     <h5 class="modal-title" id="helpModalTitle">{{ $t('helpModal.Title') }}</h5>
@@ -13,15 +13,33 @@
                     <p class="jn-help-note "><i class="bi bi-hand-thumbs-up-fill"></i>
                         {{ $t('shortcutKeys.HelpNote') }}
                     </p>
-                    <div v-for="(key, index) in keyMap" :key="key.keys" class="row p-2 jn-shortcut-row"
-                        :class="[isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle', index === keyMap.length - 1 ? 'jn-border-bottom-none' : '']">
-                        <div class="col">
-                            <kbd :class="{ 'text-bg-light': isDarkMode }">
-                                {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
-                            </kbd>
+                    <div class="row flex-nowrap text-nowrap">
+                        <!-- 左边的列 -->
+                        <div class="col text-nowrap">
+                            <div v-for="(key, index) in splitKeyMap.left" :key="`left-${key.keys}`" class="row p-2"
+                                :class="[isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle']">
+                                <div class="col-auto">
+                                    <kbd :class="{ 'text-bg-light': isDarkMode }">
+                                        {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
+                                    </kbd>
+                                </div>
+                                <div class="col-8">{{ key.description }}</div>
+                            </div>
                         </div>
-                        <div class="col-8">{{ key.description }}</div>
+                        <!-- 右边的列 -->
+                        <div class="col text-nowrap">
+                            <div v-for="(key, index) in splitKeyMap.right" :key="`right-${key.keys}`" class="row p-2"
+                                :class="[isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle']">
+                                <div class="col-auto">
+                                    <kbd :class="{ 'text-bg-light': isDarkMode }">
+                                        {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
+                                    </kbd>
+                                </div>
+                                <div class="col-8">{{ key.description }}</div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -56,7 +74,17 @@ export default {
 
     methods: {
 
-    }
+    },
+    computed: {
+        // 拆分 keyMap 为两个数组
+        splitKeyMap() {
+            const half = Math.ceil(this.keyMap.length / 2);
+            return {
+                left: this.keyMap.slice(0, half),
+                right: this.keyMap.slice(half),
+            };
+        }
+    },
 }
 </script>
 
