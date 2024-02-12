@@ -4,7 +4,7 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"npm run start-server\"",
+    "dev": "concurrently \"vite\" \"nodemon server.js\"",
     "build": "vite build",
     "preview": "vite preview",
     "start-server": "node server.js",
@@ -23,7 +23,7 @@
     "express": "^4.18.2",
     "flag-icons": "^7.1.0",
     "http-proxy-middleware": "^2.0.6",
-    "maxmind": "^4.3.18",
+    "nodemon": "^3.0.3",
     "svgmap": "^2.10.1",
     "vue": "^3.4.15",
     "vue-i18n": "^9.9.1",
