@@ -80,9 +80,7 @@
                 <i class="bi bi-pc-display-horizontal"></i>&nbsp;
               </span>
               <span v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))"
-                class="col-10"
-                :class="{ 'jn-ip-font': ( isMobile && card.ip.length > 32)}"
-                >
+                class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
                   :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
@@ -150,13 +148,33 @@
                     {{ $t('ipInfos.ASN') }} :&nbsp;
                   </span>
                   <span v-if="card.asnlink" class="col-9 ">
-                    <a :href="card.asnlink" target="_blank"
-                      class="link-underline-opacity-50 link-underline-opacity-100-hover"
-                      :class="[isDarkMode ? 'link-light' : 'link-dark']">
-                      {{ card.asn }}
-                    </a>
+                    {{ card.asn }} <i class="bi bi-info-circle" @click="getASNInfo(card.asn, index)"
+                      data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
+                      :aria-controls="'collapseASNInfo-' + index"></i>
                   </span>
                 </li>
+
+                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold " :id="'collapseASNInfo-' + index"
+                  :data-bs-theme="isDarkMode ? 'dark' : ''">
+
+                  <span v-if="asnInfos[card.asn]">
+                    <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ $t('ipInfos.ASNInfo.note') }}</span>
+                    <br />
+                    <template v-for="item in asnInfoItems">
+                      <span class="fw-light">
+                        {{ $t(`ipInfos.ASNInfo.${item.key}`) }}
+                      </span>
+                      {{ item.format(asnInfos[card.asn][item.key]) }}
+                      <br />
+                    </template>
+                  </span>
+
+                  <span v-else>
+                    <span v-for="(colSize, index) in placeholderSizes" :key="index" :class="{ 'dark-mode': isDarkMode }">
+                      <span :class="`placeholder col-${colSize}`"></span>
+                    </span>
+                  </span>
+                </div>
               </ul>
             </div>
 
@@ -199,6 +217,20 @@ export default {
 
   data() {
     return {
+      asnInfos: {},
+      asnInfoItems: [
+        { key: 'asnName', format: value => value },
+        { key: 'asnOrgName', format: value => value },
+        { key: 'estimatedUsers', format: value => parseFloat(value).toLocaleString() },
+        { key: 'IPv4_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'IPv6_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'HTTP_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'HTTPS_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'Desktop_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'Mobile_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'Bot_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+        { key: 'Human_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
+      ],
       isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
       placeholderSizes: [12, 8, 6, 8, 4],
       sources: [
@@ -225,6 +257,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "TaoBao",
+          showASNInfo: false,
         },
         {
           id: "special",
@@ -241,6 +274,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "Special",
+          showASNInfo: false,
         },
         {
           id: "cloudflare_v4",
@@ -257,6 +291,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "Cloudflare IPv4",
+          showASNInfo: false,
         },
         {
           id: "cloudflare_v6",
@@ -273,6 +308,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "Cloudflare IPv6",
+          showASNInfo: false,
         },
         {
           id: "ipify_v4",
@@ -289,6 +325,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "IPify IPv4",
+          showASNInfo: false,
         },
         {
           id: "ipify_v6",
@@ -305,6 +342,7 @@ export default {
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
           source: "IPify IPv6",
+          showASNInfo: false,
         },
       ],
       isEnvBingMapKey: false,
@@ -715,6 +753,27 @@ export default {
       }, 5000);
     },
 
+    // 从后端 API 获取 ASN 信息， /api/asninfo?asn=
+    async getASNInfo(asn, ipDataCardsIndex) {
+      try {
+
+        this.ipDataCards[ipDataCardsIndex].showASNInfo = true;
+        // 如果 asnInfos 中已有该 ASN 的信息，则直接返回
+        if (this.asnInfos[asn]) {
+          return;
+        }
+        asn = asn.replace('AS', '');
+
+        const response = await fetch(`/api/asninfo?asn=${asn}`);
+        const data = await response.json();
+
+        // 将 ASN 信息写入到 asnInfos 中，键为 ASN 号码
+        this.asnInfos['AS' + asn] = data;
+      } catch (error) {
+        console.error("Error fetching ASN info:", error);
+      }
+    },
+
   },
 
   created() {
@@ -782,7 +841,8 @@ export default {
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
 }
-.jn-ip-font{
-  zoom:0.8;
+
+.jn-ip-font {
+  zoom: 0.8;
 }
 </style>

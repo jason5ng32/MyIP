@@ -26,7 +26,21 @@
         "ASN": "ASN",
         "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
         "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
-        "SelectSource": "Source de géolocalisation IP"
+        "SelectSource": "Source de géolocalisation IP",
+        "ASNInfo": {
+            "note": "Données associées à cet ASN :",
+            "asnName": "Nom de l'ASN :",
+            "asnOrgName": "Nom de l'organisation de l'ASN :",
+            "estimatedUsers": "Nombre d'utilisateurs estimé :",
+            "IPv4_Pct": "Pourcentage de trafic IPv4 :",
+            "IPv6_Pct": "Pourcentage de trafic IPv6 :",
+            "HTTP_Pct": "Pourcentage de trafic HTTP :",
+            "HTTPS_Pct": "Pourcentage de trafic HTTPS :",
+            "Desktop_Pct": "Pourcentage d'appareils de bureau :",
+            "Mobile_Pct": "Pourcentage d'appareils mobiles :",
+            "Bot_Pct": "Pourcentage de trafic de robots :",
+            "Human_Pct": "Pourcentage de trafic humain :"
+        }
     },
     "connectivity": {
         "id": "connectivity",
@@ -36,7 +50,8 @@
         "StatusAvailable": "OK",
         "StatusUnavailable": "Non disponible",
         "StatusTimeout": "Délai dépassé",
-        "checking": "Vérification en cours..."
+        "checking": "Vérification en cours...",
+        "minTestTime": "Minimal: "
     },
     "webrtc": {
         "id": "webrtc",
@@ -383,20 +398,34 @@
                 ]
             },
             {
-                    "version": "v3.3",
-                    "date": "Feb 6, 2024",
+                "version": "v3.3",
+                "date": "Feb 6, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Prise en charge de l'utilisation de différentes sources d'informations de géolocalisation IP"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Amélioration de l'expérience utilisateur de la détection de disponibilité de connexion"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Amélioration de l'expérience utilisateur de l'interface utilisateur"
+                    }
+                ]
+            },
+            {
+                    "version": "v3.4",
+                    "date": "Feb 17, 2024",
                     "content": [
                         {
                             "type": "add",
-                            "change": "Prise en charge de l'utilisation de différentes sources d'informations de géolocalisation IP"
+                            "change": "Ajout d'un visualiseur de détails ASN"
                         },
                         {
                             "type": "improve",
-                            "change": "Amélioration de l'expérience utilisateur de la détection de disponibilité de connexion"
-                        },
-                        {
-                            "type": "improve",
-                            "change": "Amélioration de l'expérience utilisateur de l'interface utilisateur"
+                            "change": "Optimisation de l'interface utilisateur pour l'affichage des informations IP"
                         }
                     ]
                 }

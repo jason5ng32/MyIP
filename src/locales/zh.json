@@ -26,7 +26,21 @@
     "ASN": "ASN",
     "IPv4Error": "获取失败或不存在 IPv4 地址",
     "IPv6Error": "获取失败或不存在 IPv6 地址",
-    "SelectSource": "选择 IP 归属地数据来源"
+    "SelectSource": "选择 IP 归属地数据来源",
+    "ASNInfo": {
+      "note": "此 ASN 的相关数据：",
+      "asnName": "ASN 名称：",
+      "asnOrgName": "ASN 组织名称：",
+      "estimatedUsers": "估计用户数：",
+      "IPv4_Pct": "IPv4 流量占比：",
+      "IPv6_Pct": "IPv6 流量占比：",
+      "HTTP_Pct": "HTTP 流量占比：",
+      "HTTPS_Pct": "HTTPS 流量占比：",
+      "Desktop_Pct": "桌面设备占比：",
+      "Mobile_Pct": "移动设备占比：",
+      "Bot_Pct": "机器人流量占比：",
+      "Human_Pct": "人类流量占比："
+    }
   },
   "connectivity": {
     "id": "connectivity",
@@ -36,7 +50,8 @@
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
     "StatusTimeout": "超时或不可用",
-    "checking": "检查中..."
+    "checking": "检查中...",
+    "minTestTime": "最小测试时间："
   },
   "webrtc": {
     "id": "webrtc",
@@ -397,6 +412,20 @@
           {
             "type": "improve",
             "change": "优化 UI 体验"
+          }
+        ]
+      },
+      {
+        "version": "v3.4",
+        "date": "Feb 17, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加 ASN 详细信息查看器"
+          },
+          {
+            "type": "improve",
+            "change": "优化 IP 信息的展示 UI"
           }
         ]
       }
