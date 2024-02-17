@@ -253,6 +253,7 @@ export default {
           card.asn = "AS15169";
           card.mapUrl = '/defaultMap.jpg';
           card.mapUrl_dark = '/defaultMap_dark.jpg';
+          card.showASNInfo = false;
         });
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.geo = "United States";

@@ -217,7 +217,21 @@ export default {
 
   data() {
     return {
-      asnInfos: {},
+      asnInfos: {
+        "AS15169": {
+          "asnName": "Google",
+          "asnOrgName": "GOGL-ARIN",
+          "estimatedUsers": "368891",
+          "IPv4_Pct": "95.35",
+          "IPv6_Pct": "4.65",
+          "HTTP_Pct": "3.16",
+          "HTTPS_Pct": "96.84",
+          "Desktop_Pct": "58.88",
+          "Mobile_Pct": "41.12",
+          "Bot_Pct": "98.46",
+          "Human_Pct": "1.54"
+        }
+      },
       asnInfoItems: [
         { key: 'asnName', format: value => value },
         { key: 'asnOrgName', format: value => value },
@@ -731,6 +745,7 @@ export default {
       card.isp = "";
       card.mapUrl = '/defaultMap.jpg';
       card.mapUrl_dark = '/defaultMap_dark.jpg';
+      card.showASNInfo = false;
     },
 
     // 复制 IP 地址
