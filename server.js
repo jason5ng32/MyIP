@@ -26,7 +26,7 @@ app.get('/api/ipapicom', ipapicomHandler);
 app.get('/api/keycdn', keycdnHandler);
 app.get('/api/ipchecking', ipCheckingHandler);
 app.get('/api/ipsb', ipsbHandler);
-app.get('/api/asninfo', cfHander);
+app.get('/api/cfradar', cfHander);
 
 // 设置静态文件服务
 const __filename = fileURLToPath(import.meta.url);
