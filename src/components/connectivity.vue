@@ -36,7 +36,9 @@
                 'text-success': test.status.includes($t('connectivity.StatusAvailable')) && test.time < 200,
                 'jn-text-warning': test.status.includes($t('connectivity.StatusAvailable')) && test.time >= 200,
                 'text-danger': test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')
-              }">
+              }"
+              :title="$t('connectivity.minTestTime') + test.mintime + ' ms'"
+              >
                 <i v-if="test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')"
                   class="bi bi-emoji-frown"></i>
                 <i v-else-if="test.status === $t('connectivity.StatusAvailable') && test.time < 200"
@@ -49,7 +51,6 @@
                   : {{ test.time }}
                   <span> ms</span>
                 </span>
-
               </p>
             </div>
           </div>
@@ -94,6 +95,7 @@ export default {
           url: "https://www.bilibili.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "baidu",
@@ -102,6 +104,7 @@ export default {
           url: "https://www.baidu.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "wechat",
@@ -110,6 +113,7 @@ export default {
           url: "https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "google",
@@ -118,6 +122,7 @@ export default {
           url: "https://www.google.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "cloudflare",
@@ -126,6 +131,7 @@ export default {
           url: "https://www.cloudflare.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "youtube",
@@ -134,6 +140,7 @@ export default {
           url: "https://www.youtube.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "github",
@@ -142,6 +149,7 @@ export default {
           url: "https://github.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
         {
           id: "chatgpt",
@@ -150,6 +158,7 @@ export default {
           url: "https://chat.openai.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
+          mintime: 0,
         },
       ],
     };
@@ -170,7 +179,16 @@ export default {
       img.onload = () => {
         clearTimeout(timeout);
         test.status = this.$t('connectivity.StatusAvailable');
-        test.time = new Date() - beginTime;
+        let testTime = new Date() - beginTime;
+
+        if (test.mintime === 0) {
+          test.mintime = testTime;
+        } else {
+          test.mintime = Math.min(test.mintime, testTime);
+        }
+
+        test.time = testTime;
+        
         onTestComplete(true);
       };
 

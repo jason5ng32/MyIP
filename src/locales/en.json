@@ -26,7 +26,21 @@
     "ASN": "ASN",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
-    "SelectSource": "Select IP Geolocation Source"
+    "SelectSource": "Select IP Geolocation Source",
+    "ASNInfo": {
+        "note": "Related data for this ASN:",
+        "asnName": "ASN Name:",
+        "asnOrgName": "ASN Organization Name:",
+        "estimatedUsers": "Estimated Users:",
+        "IPv4_Pct": "IPv4 Traffic Percentage:",
+        "IPv6_Pct": "IPv6 Traffic Percentage:",
+        "HTTP_Pct": "HTTP Traffic Percentage:",
+        "HTTPS_Pct": "HTTPS Traffic Percentage:",
+        "Desktop_Pct": "Desktop Device Percentage:",
+        "Mobile_Pct": "Mobile Device Percentage:",
+        "Bot_Pct": "Bot Traffic Percentage:",
+        "Human_Pct": "Human Traffic Percentage:"
+      }
   },
   "connectivity": {
     "id": "connectivity",
@@ -36,7 +50,8 @@
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
     "StatusTimeout": "Timeout or Unavailable",
-    "checking": "Checking..."
+    "checking": "Checking...",
+    "minTestTime": "Min Test Time: "
   },
   "webrtc": {
     "id": "webrtc",
@@ -397,6 +412,20 @@
           {
             "type": "improve",
             "change": "Optimized UI experience"
+          }
+        ]
+      },
+      {
+        "version": "v3.4",
+        "date": "Feb 17, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added ASN details viewer"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized UI for displaying IP information"
           }
         ]
       }
