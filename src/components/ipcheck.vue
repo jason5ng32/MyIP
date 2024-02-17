@@ -764,7 +764,7 @@ export default {
         }
         asn = asn.replace('AS', '');
 
-        const response = await fetch(`/api/asninfo?asn=${asn}`);
+        const response = await fetch(`/api/cfradar?asn=${asn}`);
         const data = await response.json();
 
         // 将 ASN 信息写入到 asnInfos 中，键为 ASN 号码
