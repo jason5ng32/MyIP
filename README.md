@@ -73,43 +73,9 @@ npm start
 
 The program will run on port 18966.
 
-If you want to add Bing Maps, make the following changes before starting:
-
-Create environment variables:
-
-```bash
-mv .env.example .env
-```
-
-Modify the Bing Maps API Key and your domain (to prevent abuse) in `.env` .
-
-```bash
-BING_MAP_API_KEY="YOUR_KEY_HERE"
-ALLOWED_DOMAINS="example.com"
-```
-
-If you want to use IPInfo.io API, you can also add the following:
-
-```bash
-IPINFO_API_TOKEN="YOUR_TOKEN_HERE"
-```
-
 ### Using Vercel
 
 Click the 'Deploy to Vercel' button at the top to complete the deployment.
-
-If you want to display maps, set the following 2 environment variables during deployment:
-
-```bash
-BING_MAP_API_KEY
-ALLOWED_DOMAINS
-```
-
-If you want to use IPInfo.io API, you can also add the following:
-
-```bash
-IPINFO_API_TOKEN
-```
 
 ### Using Docker
 
@@ -119,24 +85,52 @@ Click the 'Deploy to Docker' button at the top to complete the deployment. Or, u
 docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
-If you wish to display maps, set the Bing Map API Key and allowed domains during deployment:
+## 📚 Environment Variable
+
+You can use the program without adding any environment variables, but if you want to use some advanced features, you can add the following environment variables:
+
+| Variable Name | Required | Default Value | Description |
+| --- | --- | --- | --- |
+| `PORT` | No | `18966` | The port on which the program runs |
+| `BING_MAP_API_KEY` | No | `""` | API Key for Bing Maps, used to display the location of the IP on a map |
+| `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
+| `IPChecking_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
+| `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
+| `KEYCDN_USER_AGENT` | No | `""` | User Agent for KeyCDN, used to obtain IP geolocation information through KeyCDN |
+| `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
+
+### Using Environment Variables in a Node Environment
+
+Create environment variables:
 
 ```bash
-docker run -d -p 18966:18966 \
-  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
-  -e ALLOWED_DOMAINS="example.com" \
-  --name myip \
-  jason5ng32/myip:latest
-
+cp .env.example .env
 ```
 
-If you want to use IPInfo.io API, you can also add the following:
+Modify `.env`, and for example, add the following:
+
+```bash
+PORT=18966
+BING_MAP_API_KEY="YOUR_KEY_HERE"
+ALLOWED_DOMAINS="example.com"
+IPChecking_API="YOUR_KEY_HERE"
+```
+
+Then restart the backend service.
+
+### Using Environment Variables in Vercel
+
+Please refer to the content in `.env.example` and add it to the environment variables in Vercel.
+
+### Using Environment Variables in Docker
+
+You can add environment variables when running Docker, for example:
 
 ```bash
 docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \
+  -e IPChecking_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 

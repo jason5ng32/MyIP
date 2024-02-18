@@ -73,43 +73,9 @@ npm start
 
 Le programme s'exécutera sur le port 18966.
 
-Si vous souhaitez ajouter Bing Maps, apportez les modifications suivantes avant de démarrer :
-
-Créez des variables d'environnement :
-
-```bash
-mv .env.example .env
-```
-
-Modifiez la clé de l'API Bing Maps et votre domaine (pour éviter les abus) dans le fichier `.env`.
-
-```bash
-BING_MAP_API_KEY="YOUR_KEY_HERE"
-ALLOWED_DOMAINS="example.com"
-```
-
-Si vous souhaitez utiliser l'API IPInfo.io, vous pouvez également ajouter ce qui suit :
-
-```bash
-IPINFO_API_TOKEN="YOUR_TOKEN_HERE"
-```
-
 ### Using Vercel
 
 Cliquez sur le bouton 'Déployer sur Vercel' en haut pour terminer le déploiement.
-
-Si vous souhaitez afficher des cartes, définissez les 2 variables d'environnement suivantes lors du déploiement :
-
-```bash
-BING_MAP_API_KEY
-ALLOWED_DOMAINS
-```
-
-Si vous souhaitez utiliser l'API IPInfo.io, vous pouvez également ajouter ce qui suit :
-
-```bash
-IPINFO_API_TOKEN
-```
 
 ### Using Docker
 
@@ -119,24 +85,52 @@ Cliquez sur le bouton 'Déployer sur Docker' en haut pour terminer le déploieme
 docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
-Si vous souhaitez afficher des cartes, définissez la clé de l'API Bing Maps et les domaines autorisés lors du déploiement :
+## 📚 Variables d'environnement
+
+Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mais si vous souhaitez utiliser certaines fonctionnalités avancées, vous pouvez ajouter les variables d'environnement suivantes :
+
+| Nom de la variable | Requis | Valeur par défaut | Description |
+| --- | --- | --- | --- |
+| `PORT` | Non | `18966` | Le port sur lequel le programme s'exécute |
+| `BING_MAP_API_KEY` | Non | `""` | Clé API pour Bing Maps, utilisée pour afficher l'emplacement de l'adresse IP sur une carte |
+| `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
+| `IPChecking_API_KEY` | Non | `""` | Clé API pour IPCheck.ing, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
+| `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
+| `KEYCDN_USER_AGENT` | Non | `""` | Agent utilisateur pour KeyCDN, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via KeyCDN |
+| `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
+
+### Utilisation des variables d'environnement dans un environnement Node
+
+Créez les variables d'environnement :
 
 ```bash
-docker run -d -p 18966:18966 \
-  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
-  -e ALLOWED_DOMAINS="example.com" \
-  --name myip \
-  jason5ng32/myip:latest
-
+cp .env.example .env
 ```
 
-Si vous souhaitez utiliser l'API IPInfo.io, vous pouvez également ajouter ce qui suit :
+Modifiez le fichier `.env`, et par exemple, ajoutez ce qui suit :
+
+```bash
+PORT=18966
+BING_MAP_API_KEY="YOUR_KEY_HERE"
+ALLOWED_DOMAINS="example.com"
+IPChecking_API="YOUR_KEY_HERE"
+```
+
+Ensuite, redémarrez le service backend.
+
+### Utilisation des variables d'environnement dans Vercel
+
+Veuillez vous référer au contenu de `.env.example` et ajoutez-le aux variables d'environnement dans Vercel.
+
+### Utilisation des variables d'environnement dans Docker
+
+Vous pouvez ajouter des variables d'environnement lors de l'exécution de Docker, par exemple :
 
 ```bash
 docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \
+  -e IPChecking_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 

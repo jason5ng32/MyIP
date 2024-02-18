@@ -75,43 +75,9 @@ npm start
 
 程序会运行在 18966 端口。
 
-如果你想添加 Bing 地图，在启动之前，进行如下修改：
-
-创建环境变量：
-
-```bash
-mv .env.example .env
-```
-
-修改 `.env` 里的 Bing 地图 API Key 以及你的域名（防止滥用）。
-
-```bash
-BING_MAP_API_KEY="YOUR_KEY_HERE"
-ALLOWED_DOMAINS="example.com"
-```
-
-如果你想使用 IPinfo.io 的 API，可以添加：
-
-```bash
-IPINFO_API_TOKEN="YOUR_TOKEN_HERE"
-```
-
 ### 使用 Vercel
 
 点击顶部的部署到 Vercel 按钮，即可完成部署。
-
-如果希望展示地图，则在部署的时候，添加下面 2 个环境变量：
-
-```bash
-BING_MAP_API_KEY
-ALLOWED_DOMAINS
-```
-
-如果你想使用 IPinfo.io 的 API，可以添加：
-
-```bash
-IPINFO_API_TOKEN
-```
 
 ### 使用 Docker
 
@@ -121,24 +87,52 @@ IPINFO_API_TOKEN
 docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
-如果你希望展示地图，则在部署的时候，设置 Bing Map API Key 和允许的域名：
+## 📚 环境变量
+
+你可以不添加环境变量直接使用，但是如果你想使用一些高级功能，可以添加下面的环境变量：
+
+| 变量名 | 是否必须 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `PORT` | 否 | `18966` | 程序运行的端口 |
+| `BING_MAP_API_KEY` | 否 | `""` | Bing 地图的 API Key，用于展示 IP 所在地的地图 |
+| `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
+| `IPChecking_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用户获取精准的 IP 归属地信息 |
+| `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
+| `KEYCDN_USER_AGENT` | 否 | `""` | KeyCDN 的 User Agent，用于通过 KeyCDN 获取 IP 归属地信息 |
+| `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
+
+### 在 Node 环境里使用环境变量
+
+创建环境变量：
 
 ```bash
-docker run -d -p 18966:18966 \
-  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
-  -e ALLOWED_DOMAINS="example.com" \
-  --name myip \
-  jason5ng32/myip:latest
-
+cp .env.example .env
 ```
 
-如果你希望同时使用 IPinfo.io 的 API：
+修改 `.env` 里的内容，比如：
+
+```bash
+PORT=18966
+BING_MAP_API_KEY="YOUR_KEY_HERE"
+ALLOWED_DOMAINS="example.com"
+IPChecking_API="YOUR_KEY_HERE"
+```
+
+然后重新启动后端服务。
+
+### 在 Vercel 里使用环境变量
+
+请参考 `.env.example` 里的内容，添加到 Vercel 的环境变量里。
+
+### 在 Docker 里使用环境变量
+
+你可以在运行 Docker 的时候，添加环境变量，比如：
 
 ```bash
 docker run -d -p 18966:18966 \
   -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPINFO_API_TOKEN="YOUR_TOKEN_HERE" \
+  -e IPChecking_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 

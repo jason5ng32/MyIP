@@ -28,9 +28,9 @@
     "IPv6Error": "Fetch Failed or No IPv6 Address",
     "SelectSource": "Select IP Geolocation Source",
     "ASNInfo": {
-        "note": "Related data for this ASN:",
-        "asnName": "ASN Name:",
-        "asnOrgName": "ASN Organization Name:",
+        "note": "Related data for this AS:",
+        "asnName": "AS Name:",
+        "asnOrgName": "AS Organization Name:",
         "estimatedUsers": "Estimated Users:",
         "IPv4_Pct": "IPv4 Traffic Percentage:",
         "IPv6_Pct": "IPv6 Traffic Percentage:",
