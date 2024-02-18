@@ -46,7 +46,7 @@
                                     </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto"><i class="bi bi-buildings"></i> {{ $t('ipInfos.ISP')
+                                        class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ $t('ipInfos.ISP')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.isp }}
@@ -54,7 +54,7 @@
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
-                                        <i class="bi bi-reception-4"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
+                                        <i class="bi bi-buildings"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank"
                                             class="link-underline-opacity-50 link-underline-opacity-100-hover"

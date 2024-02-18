@@ -133,7 +133,7 @@
                 <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
                   :class="{ 'dark-mode': isDarkMode }">
                   <span class="jn-text col-auto">
-                    <i class="bi bi-buildings"></i>
+                    <i class="bi bi-ethernet"></i>
                     {{ $t('ipInfos.ISP') }} :&nbsp;
                   </span>
                   <span class="col-10 ">
@@ -144,7 +144,7 @@
                 <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
                   :class="{ 'dark-mode': isDarkMode }">
                   <span class="jn-text col-auto">
-                    <i class="bi bi-reception-4"></i>
+                    <i class="bi bi-buildings"></i>
                     {{ $t('ipInfos.ASN') }} :&nbsp;
                   </span>
                   <span v-if="card.asnlink" class="col-9 ">
@@ -154,9 +154,12 @@
                   </span>
                 </li>
 
-                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold " :id="'collapseASNInfo-' + index"
+                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0" :id="'collapseASNInfo-' + index"
                   :data-bs-theme="isDarkMode ? 'dark' : ''">
 
+                  <!-- 通过将 collapse 的 padding 设置为 0，然后添加一个子 div 设置 padding 的方式，避免 Bootstrap 的 collapse 发生卡顿，很奇怪的 bug -->
+                  
+                <div class="p-3">
                   <span v-if="asnInfos[card.asn]">
                     <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ $t('ipInfos.ASNInfo.note') }}</span>
                     <br />
@@ -175,6 +178,7 @@
                     </span>
                   </span>
                 </div>
+              </div>
               </ul>
             </div>
 
