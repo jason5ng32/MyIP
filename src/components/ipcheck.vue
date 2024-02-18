@@ -60,7 +60,7 @@
       <div class="row">
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
-          <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+          <div class="card jn-ip-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
             <div class="card-header jn-ip-title jn-link1"
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
               <span>
