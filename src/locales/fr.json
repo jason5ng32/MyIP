@@ -28,9 +28,9 @@
         "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
         "SelectSource": "Source de géolocalisation IP",
         "ASNInfo": {
-            "note": "Données associées à cet ASN :",
-            "asnName": "Nom de l'ASN :",
-            "asnOrgName": "Nom de l'organisation de l'ASN :",
+            "note": "Données associées à cet AS :",
+            "asnName": "Nom de l'AS :",
+            "asnOrgName": "Nom de l'organisation de l'AS :",
             "estimatedUsers": "Nombre d'utilisateurs estimé :",
             "IPv4_Pct": "Pourcentage de trafic IPv4 :",
             "IPv6_Pct": "Pourcentage de trafic IPv6 :",

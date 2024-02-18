@@ -28,9 +28,9 @@
     "IPv6Error": "获取失败或不存在 IPv6 地址",
     "SelectSource": "选择 IP 归属地数据来源",
     "ASNInfo": {
-      "note": "此 ASN 的相关数据：",
-      "asnName": "ASN 名称：",
-      "asnOrgName": "ASN 组织名称：",
+      "note": "此 AS 的相关数据：",
+      "asnName": "AS 名称：",
+      "asnOrgName": "AS 组织名称：",
       "estimatedUsers": "估计用户数：",
       "IPv4_Pct": "IPv4 流量占比：",
       "IPv6_Pct": "IPv6 流量占比：",
