@@ -60,7 +60,11 @@
       <div class="row">
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
-          <div class="card jn-ip-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+          <div class="card" :class="{
+            'dark-mode dark-mode-border': isDarkMode,
+            'jn-ip-card': !isMobile,
+            'jn-card': isMobile,
+          }">
             <div class="card-header jn-ip-title jn-link1"
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
               <span>
@@ -154,31 +158,33 @@
                   </span>
                 </li>
 
-                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0" :id="'collapseASNInfo-' + index"
-                  :data-bs-theme="isDarkMode ? 'dark' : ''">
+                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0"
+                  :id="'collapseASNInfo-' + index" :data-bs-theme="isDarkMode ? 'dark' : ''">
 
                   <!-- 通过将 collapse 的 padding 设置为 0，然后添加一个子 div 设置 padding 的方式，避免 Bootstrap 的 collapse 发生卡顿，很奇怪的 bug -->
-                  
-                <div class="p-3">
-                  <span v-if="asnInfos[card.asn]">
-                    <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ $t('ipInfos.ASNInfo.note') }}</span>
-                    <br />
-                    <template v-for="item in asnInfoItems">
-                      <span class="fw-light">
-                        {{ $t(`ipInfos.ASNInfo.${item.key}`) }}
-                      </span>
-                      {{ item.format(asnInfos[card.asn][item.key]) }}
-                      <br />
-                    </template>
-                  </span>
 
-                  <span v-else>
-                    <span v-for="(colSize, index) in placeholderSizes" :key="index" :class="{ 'dark-mode': isDarkMode }">
-                      <span :class="`placeholder col-${colSize}`"></span>
+                  <div class="p-3">
+                    <span v-if="asnInfos[card.asn]">
+                      <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ $t('ipInfos.ASNInfo.note')
+                      }}</span>
+                      <br />
+                      <template v-for="item in asnInfoItems">
+                        <span class="fw-light">
+                          {{ $t(`ipInfos.ASNInfo.${item.key}`) }}
+                        </span>
+                        {{ item.format(asnInfos[card.asn][item.key]) }}
+                        <br />
+                      </template>
                     </span>
-                  </span>
+
+                    <span v-else>
+                      <span v-for="(colSize, index) in placeholderSizes" :key="index"
+                        :class="{ 'dark-mode': isDarkMode }">
+                        <span :class="`placeholder col-${colSize}`"></span>
+                      </span>
+                    </span>
+                  </div>
                 </div>
-              </div>
               </ul>
             </div>
 
