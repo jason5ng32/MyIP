@@ -52,6 +52,33 @@
                                         {{ modalQueryResult.isp }}
                                     </span>
                                 </li>
+
+
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== $t('ipInfos.proxyDetect.type.unknownType')"
+                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                                        class="jn-text col-auto">
+                                        <i class="bi bi-reception-4"></i> {{ $t('ipInfos.type')
+                                        }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        {{ modalQueryResult.type }}
+                                    </span>
+                                </li>
+
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== $t('ipInfos.proxyDetect.unknownProxyType')"
+                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
+                                        class="jn-text col-auto">
+                                        <i class="bi bi-shield-fill-check"></i>
+                                        {{ $t('ipInfos.isProxy') }}</span>&nbsp;:&nbsp;
+                                    <span class="col-10 ">
+                                        {{ modalQueryResult.isProxy }}
+                                        <span
+                                            v-if="modalQueryResult.proxyProtocol !== $t('ipInfos.proxyDetect.unknownProtocol')">
+                                            ( {{ modalQueryResult.proxyProtocol }} )
+                                        </span>
+                                    </span>
+                                </li>
+
+
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
                                         <i class="bi bi-buildings"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
@@ -143,6 +170,42 @@ export default {
             if (data.error) {
                 throw new Error(data.reason);
             }
+
+            if (this.ipGeoSource === 0) {
+
+                const proxyDetect = data.proxyDetect || {};
+
+                const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
+                    proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
+                        this.$t('ipInfos.proxyDetect.unknownProxyType');
+
+                const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
+                    proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
+                        proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
+                            proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+                                proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
+
+                const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
+                    proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
+
+                return {
+                    country_name: data.country_name || "",
+                    country_code: data.country || "",
+                    region: data.region || "",
+                    city: data.city || "",
+                    latitude: data.latitude || "",
+                    longitude: data.longitude || "",
+                    isp: data.org || "",
+                    asn: data.asn || "",
+                    asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
+                    mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
+                    mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : "",
+                    isProxy: isProxy,
+                    type: type,
+                    proxyProtocol: proxyProtocol,
+                };
+            }
+
 
             return {
                 country_name: data.country_name || "",

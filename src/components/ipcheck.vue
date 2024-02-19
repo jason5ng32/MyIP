@@ -145,6 +145,33 @@
                   </span>
                 </li>
 
+                <li
+                  v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.type !== $t('ipInfos.proxyDetect.type.unknownType')"
+                  class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text col-auto">
+                    <i class="bi bi-reception-4"></i>
+                    {{ $t('ipInfos.type') }} :&nbsp;
+                  </span>
+                  <span class="col-10 ">
+                    {{ card.type }}
+                  </span>
+                </li>
+
+                <li
+                  v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.isProxy !== $t('ipInfos.proxyDetect.unknownProxyType')"
+                  class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                  <span class="jn-text col-auto">
+                    <i class="bi bi-shield-fill-check"></i>
+                    {{ $t('ipInfos.isProxy') }} :&nbsp;
+                  </span>
+                  <span class="col-10 ">
+                    {{ card.isProxy }}
+                    <span v-if="card.proxyProtocol !== $t('ipInfos.proxyDetect.unknownProtocol')">
+                      ( {{ card.proxyProtocol }} )
+                    </span>
+                  </span>
+                </li>
+
                 <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
                   :class="{ 'dark-mode': isDarkMode }">
                   <span class="jn-text col-auto">
@@ -154,7 +181,8 @@
                   <span v-if="card.asnlink" class="col-9 ">
                     {{ card.asn }} <i class="bi bi-info-circle" @click="getASNInfo(card.asn, index)"
                       data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                      :aria-controls="'collapseASNInfo-' + index" role="button" :aria-label="'Display AS Info of' + card.asn"></i>
+                      :aria-controls="'collapseASNInfo-' + index" role="button"
+                      :aria-label="'Display AS Info of' + card.asn"></i>
                   </span>
                 </li>
 
@@ -666,6 +694,42 @@ export default {
     transformDataFromIPapi(data) {
       if (data.error) {
         throw new Error(data.reason);
+      }
+
+
+      if (this.ipGeoSource === 0) {
+
+        const proxyDetect = data.proxyDetect || {};
+
+        const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
+          proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
+            this.$t('ipInfos.proxyDetect.unknownProxyType');
+
+        const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
+          proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
+            proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
+              proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+                proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
+
+        const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
+          proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
+
+        return {
+          country_name: data.country_name || "",
+          country_code: data.country || "",
+          region: data.region || "",
+          city: data.city || "",
+          latitude: data.latitude || "",
+          longitude: data.longitude || "",
+          isp: data.org || "",
+          asn: data.asn || "",
+          asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
+          mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
+          mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : "",
+          isProxy: isProxy,
+          type: type,
+          proxyProtocol: proxyProtocol,
+        };
       }
 
       return {

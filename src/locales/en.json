@@ -27,20 +27,35 @@
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
     "SelectSource": "Select IP Geolocation Source",
+    "type": "Type",
+    "isProxy": "Proxy",
     "ASNInfo": {
-        "note": "Related data for this AS:",
-        "asnName": "AS Name:",
-        "asnOrgName": "AS Organization Name:",
-        "estimatedUsers": "Estimated Users:",
-        "IPv4_Pct": "IPv4 Traffic Percentage:",
-        "IPv6_Pct": "IPv6 Traffic Percentage:",
-        "HTTP_Pct": "HTTP Traffic Percentage:",
-        "HTTPS_Pct": "HTTPS Traffic Percentage:",
-        "Desktop_Pct": "Desktop Device Percentage:",
-        "Mobile_Pct": "Mobile Device Percentage:",
-        "Bot_Pct": "Bot Traffic Percentage:",
-        "Human_Pct": "Human Traffic Percentage:"
+      "note": "Related data for this AS:",
+      "asnName": "AS Name:",
+      "asnOrgName": "AS Organization Name:",
+      "estimatedUsers": "Estimated Users:",
+      "IPv4_Pct": "IPv4 Traffic Percentage:",
+      "IPv6_Pct": "IPv6 Traffic Percentage:",
+      "HTTP_Pct": "HTTP Traffic Percentage:",
+      "HTTPS_Pct": "HTTPS Traffic Percentage:",
+      "Desktop_Pct": "Desktop Device Percentage:",
+      "Mobile_Pct": "Mobile Device Percentage:",
+      "Bot_Pct": "Bot Traffic Percentage:",
+      "Human_Pct": "Human Traffic Percentage:"
+    },
+    "proxyDetect": {
+      "yes": "Possibly a proxy or VPN",
+      "no": "Not a proxy or VPN",
+      "unknownProxyType": "Unknown type",
+      "unknownProtocol": "Unknown protocol",
+      "type": {
+        "Residential": "Residential",
+        "Wireless": "Wireless",
+        "Business": "Business",
+        "Hosting": "Hosting",
+        "unknownType": "Unknown Type"
       }
+    }
   },
   "connectivity": {
     "id": "connectivity",
@@ -422,6 +437,10 @@
           {
             "type": "add",
             "change": "Added ASN details viewer"
+          },
+          {
+            "type": "add",
+            "change": "Added proxy detection feature"
           },
           {
             "type": "improve",

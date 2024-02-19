@@ -27,6 +27,8 @@
         "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
         "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
         "SelectSource": "Source de géolocalisation IP",
+        "type": "Type",
+        "isProxy": "Proxy",
         "ASNInfo": {
             "note": "Données associées à cet AS :",
             "asnName": "Nom de l'AS :",
@@ -40,6 +42,19 @@
             "Mobile_Pct": "Pourcentage d'appareils mobiles :",
             "Bot_Pct": "Pourcentage de trafic de robots :",
             "Human_Pct": "Pourcentage de trafic humain :"
+        },
+        "proxyDetect": {
+            "yes": "Possiblement un proxy ou un VPN",
+            "no": "Pas un proxy ou un VPN",
+            "unknownProxyType": "Type inconnu",
+            "unknownProtocol": "Protocole inconnu",
+            "type": {
+                "Residential": "Résidentiel",
+                "Wireless": "Sans fil",
+                "Business": "Entreprise",
+                "Hosting": "Hébergement",
+                "unknownType": "Type inconnu"
+            }
         }
     },
     "connectivity": {
@@ -416,19 +431,23 @@
                 ]
             },
             {
-                    "version": "v3.4",
-                    "date": "Feb 17, 2024",
-                    "content": [
-                        {
-                            "type": "add",
-                            "change": "Ajout d'un visualiseur de détails ASN"
-                        },
-                        {
-                            "type": "improve",
-                            "change": "Optimisation de l'interface utilisateur pour l'affichage des informations IP"
-                        }
-                    ]
-                }
+                "version": "v3.4",
+                "date": "Feb 17, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout d'un visualiseur de détails ASN"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la détection de proxy"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de l'interface utilisateur pour l'affichage des informations IP"
+                    }
+                ]
+            }
         ]
     }
 }
