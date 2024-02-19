@@ -778,10 +778,10 @@ export default {
       }, 5000);
     },
 
-    // 从后端 API 获取 ASN 信息， /api/asninfo?asn=
+    // 从后端 API 获取 ASN 信息
     async getASNInfo(asn, ipDataCardsIndex) {
+      this.$trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
       try {
-
         this.ipDataCards[ipDataCardsIndex].showASNInfo = true;
         // 如果 asnInfos 中已有该 ASN 的信息，则直接返回
         if (this.asnInfos[asn]) {
@@ -791,8 +791,6 @@ export default {
 
         const response = await fetch(`/api/cfradar?asn=${asn}`);
         const data = await response.json();
-
-        // 将 ASN 信息写入到 asnInfos 中，键为 ASN 号码
         this.asnInfos['AS' + asn] = data;
       } catch (error) {
         console.error("Error fetching ASN info:", error);
