@@ -154,7 +154,7 @@
                   <span v-if="card.asnlink" class="col-9 ">
                     {{ card.asn }} <i class="bi bi-info-circle" @click="getASNInfo(card.asn, index)"
                       data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                      :aria-controls="'collapseASNInfo-' + index"></i>
+                      :aria-controls="'collapseASNInfo-' + index" role="button" :aria-label="'Display AS Info of' + card.asn"></i>
                   </span>
                 </li>
 
