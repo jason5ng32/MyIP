@@ -100,7 +100,8 @@
                 <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
                     <button id="sumitQueryButton" type="button" class="btn btn-primary"
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                        @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false">{{
+                        @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false || isChecking === 'running'
+                        ">{{
                             $t('ipcheck.Button') }}</button>
 
                 </div>
@@ -145,6 +146,7 @@ export default {
             reCaptchaStatus: true,
             reCaptchaEnabled: false,
             reCaptchaLoaded: false,
+            isChecking: "idle",
         }
     },
 
@@ -155,6 +157,7 @@ export default {
             if (this.isValidIP(this.inputIP)) {
                 this.modalQueryError = "";
                 this.modalQueryResult = null;
+                this.isChecking = "running";
                 // 如果 reCAPTCHA 已启用，验证令牌
                 switch (this.reCaptchaEnabled) {
                     case true:
@@ -168,12 +171,14 @@ export default {
                                 } else {
                                     this.reCaptchaStatus = false;
                                     this.modalQueryError = this.$t('ipcheck.recaptchaError');
+                                    this.isChecking = "idle";
                                 }
                             });
                         });
                         break;
                     case false:
                         await this.fetchIPForModal(this.inputIP);
+                        this.isChecking = "idle";
                         break;
                 }
             } else {
@@ -348,6 +353,7 @@ export default {
 
                     // 使用对应的转换函数更新 modalQueryResult
                     this.modalQueryResult = source.transform(data);
+                    this.isChecking = "idle";
                     break;
                 } catch (error) {
                     console.error("Error fetching IP details:", error);
