@@ -14,7 +14,7 @@
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
-                <div v-if="reCaptchaLoaded" class="modal-body" :class="{ 'dark-mode': isDarkMode }">
+                <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
                         :placeholder="$t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery" name="inputIP"
                         id="inputIP">
