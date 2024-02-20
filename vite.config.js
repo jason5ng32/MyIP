@@ -59,7 +59,13 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             return 'vendor';
           }
-        }
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name.endsWith('.woff') || assetInfo.name.endsWith('.woff2')) {
+            return 'fonts/[name][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        },
       }
     },
     chunkSizeWarningLimit: 1000,
