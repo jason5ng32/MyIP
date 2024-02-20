@@ -156,6 +156,9 @@
                   </span>
                   <span class="col-10 ">
                     {{ card.type }}
+                    <span v-if="card.proxyOperator !== 'unknown'">
+                      ( {{ card.proxyOperator }} )
+                    </span>
                   </span>
                 </li>
 
@@ -184,7 +187,8 @@
                     {{ card.asn }} <i class="bi bi-info-circle" @click="getASNInfo(card.asn, index)"
                       data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
                       :aria-controls="'collapseASNInfo-' + index" role="button"
-                      :aria-label="'Display AS Info of' + card.asn" v-tooltip="{ title: $t('Tooltips.ShowASNInfo'), placement: 'right' }"></i>
+                      :aria-label="'Display AS Info of' + card.asn"
+                      v-tooltip="{ title: $t('Tooltips.ShowASNInfo'), placement: 'right' }"></i>
                   </span>
                 </li>
 
@@ -716,6 +720,8 @@ export default {
         const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
           proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
 
+        const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
+
         return {
           country_name: data.country_name || "",
           country_code: data.country || "",
@@ -731,6 +737,7 @@ export default {
           isProxy: isProxy,
           type: type,
           proxyProtocol: proxyProtocol,
+          proxyOperator: proxyOperator,
         };
       }
 
