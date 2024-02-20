@@ -26,7 +26,12 @@ export default async (req, res) => {
         return res.status(400).json({ message: 'No reCAPTCHA token provided.' });
     }
 
-    // 检查 reCAPTCHA token 是否合法
+    // 首先检查token是否为字符串
+    if (typeof token !== 'string') {
+        return res.status(400).json({ message: 'Token must be a string.' });
+    }
+
+    // 然后检查字符串长度
     if (token.length < 1000) {
         return res.status(400).json({ message: 'Invalid reCAPTCHA token.' });
     }
