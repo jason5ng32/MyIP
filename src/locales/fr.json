@@ -10,6 +10,20 @@
         "PingTest": "Latence mondiale",
         "MTRTest": "Test MTR"
     },
+    "Tooltips": {
+        "RefreshIPCard": "Actualiser la carte IP",
+        "RefreshConnectivityTests": "Actualiser les tests de connectivité",
+        "RefreshWebRTC": "Actualiser le test WebRTC",
+        "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
+        "StartSpeedTest": "Démarrer le test de vitesse",
+        "ToggleMaps": "Afficher/Masquer les cartes",
+        "SourceSelect": "Sélectionner la source de géolocalisation IP",
+        "ShowASNInfo": "Afficher les détails AS",
+        "CopyIP": "Copier l'adresse IP",
+        "InfoMask": "Masquer les informations IP",
+        "QueryIP": "Interroger l'adresse IP",
+        "GithubLink": "Voir le code source sur GitHub"
+    },
     "ipInfos": {
         "id": "ipinfos",
         "Title": "Infos IP",

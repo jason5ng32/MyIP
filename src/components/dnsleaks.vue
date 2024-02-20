@@ -4,7 +4,8 @@
     <div class="jn-title2">
       <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ $t('dnsleaktest.Title') }}</h2>
       <button @click="checkAllDNSLeakTest(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-        aria-label="Refresh DNS Leak Test"><i class="bi bi-arrow-clockwise"></i></button>
+        aria-label="Refresh DNS Leak Test" v-tooltip="$t('Tooltips.RefreshDNSLeakTest')"><i
+          class="bi bi-arrow-clockwise"></i></button>
     </div>
     <div class="text-secondary">
       <p>{{ $t('dnsleaktest.Note') }}</p>

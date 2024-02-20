@@ -15,12 +15,13 @@
         </div>
 
         <div>
-          <input class="form-check-input" type="checkbox" role="switch" id="toggleMapSwitch" @change="toggleMaps"
+          <input class="form-check-input" type="checkbox" role="button" id="toggleMapSwitch" @change="toggleMaps"
             aria-label="Toggle Map Display" :checked="isMapShown" :disabled="!isEnvBingMapKey"
             @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
 
           <label class="form-check-label" for="toggleMapSwitch">
-            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"></i>
+            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true" role="button"
+              v-tooltip="$t('Tooltips.ToggleMaps')"></i>
           </label>
         </div>
 
@@ -28,7 +29,7 @@
         <div class="dropdown">
           <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
             :aria-label="$t('ipInfos.SelectSource')">
-            <i class="bi bi-grid-fill"></i>
+            <i class="bi bi-grid-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i>
           </span>
           <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li class="dropdown-header">
@@ -71,7 +72,7 @@
                 <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
                 {{ $t('ipInfos.Source') }}: {{ card.source }}</span>
               <button @click="refreshCard(card)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                :aria-label="'Refresh' + card.source">
+                :aria-label="'Refresh' + card.source" v-tooltip="$t('Tooltips.RefreshIPCard')">
                 <i class="bi bi-arrow-clockwise"></i></button>
             </div>
             <div class="p-3 placeholder-glow " :class="{
@@ -88,7 +89,8 @@
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
                   :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                  @click="copyToClipboard(card.ip, card.id)"></i>
+                  @click="copyToClipboard(card.ip, card.id)" role="button"
+                  v-tooltip="{ title: $t('Tooltips.CopyIP'), placement: 'right' }"></i>
               </span>
               <span v-else class="placeholder col-10"></span>
             </div>

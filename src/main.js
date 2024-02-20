@@ -5,6 +5,7 @@ import App from './App.vue'
 import store from './store';
 import Analytics from 'analytics';
 import googleAnalytics from '@analytics/google-analytics';
+import { Tooltip } from 'bootstrap';
 
 const app = createApp(App);
 
@@ -75,5 +76,32 @@ app.config.globalProperties.$trackEvent = function (category, action, label) {
         label: label,
     });
 };
+
+// 注册全局 Tooltip 指令
+app.directive('tooltip', {
+    mounted(el, binding) {
+        // 定义默认配置
+        let options = {
+            placement: 'left',
+            trigger: 'hover focus',
+        }
+
+        // 如果 binding.value 是一个字符串，将其设置为 title
+        // 否则，如果是一个对象，将其与默认配置合并
+        if (typeof binding.value === 'string') {
+            options.title = binding.value
+        } else if (typeof binding.value === 'object') {
+            options = { ...options, ...binding.value } // 合并对象
+        }
+
+        new Tooltip(el, options)
+    },
+    beforeUnmount(el) {
+        const tooltipInstance = Tooltip.getInstance(el)
+        if (tooltipInstance) {
+            tooltipInstance.dispose()
+        }
+    }
+})
 
 app.mount('#app');

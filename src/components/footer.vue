@@ -3,7 +3,8 @@
     <div id="copyleft">
       <p class="text-center">{{ $t('page.footerName') }} <a :href="$t('page.footerLink')" class="link-dark"
           target="_blank" @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github"><i
-            class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
+            class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"
+            v-tooltip="{ title: $t('Tooltips.GithubLink'), placement: 'top' }"></i></a>
       </p>
     </div>
 

@@ -10,6 +10,20 @@
     "PingTest": "Global Latency",
     "MTRTest": "MTR Test"
   },
+  "Tooltips":{
+    "RefreshIPCard": "Refresh IP Card",
+    "RefreshConnectivityTests": "Refresh Connectivity Tests",
+    "RefreshWebRTC": "Refresh WebRTC Test",
+    "RefreshDNSLeakTest": "Refresh DNS Leak Test",
+    "StartSpeedTest": "Start Speed Test",
+    "ToggleMaps": "Show/Hide Maps",
+    "SourceSelect": "Select IP Geolocation Source",
+    "ShowASNInfo": "Show AS Details",
+    "CopyIP": "Copy IP Address",
+    "InfoMask": "Hide IP Information",
+    "QueryIP": "Query IP Address",
+    "GithubLink": "View Source Code on GitHub"
+  },
   "ipInfos": {
     "id": "ipinfos",
     "Title": "IP Infos",
