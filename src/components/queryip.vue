@@ -185,6 +185,9 @@ export default {
 
         // 加载 reCAPTCHA 脚本
         loadRecaptchaScript() {
+            if (this.reCaptchaEnabled === false || this.reCaptchaLoaded === true) {
+                return;
+            }
             // 创建一个 script 元素
             const script = document.createElement('script');
             script.src = `https://www.recaptcha.net/recaptcha/api.js?render=${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`;
