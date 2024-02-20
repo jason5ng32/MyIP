@@ -96,10 +96,12 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `PORT` | 否 | `18966` | 程序运行的端口 |
 | `BING_MAP_API_KEY` | 否 | `""` | Bing 地图的 API Key，用于展示 IP 所在地的地图 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
-| `IPChecking_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用户获取精准的 IP 归属地信息 |
+| `IPChecking_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `KEYCDN_USER_AGENT` | 否 | `""` | KeyCDN 的 User Agent，用于通过 KeyCDN 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
+| `VITE_RECAPTCHA_SITE_KEY` | 否 | `""` | Google reCAPTCHA 的 Site Key，用于在前端显示 reCAPTCHA 验证 |
+| `RECAPTCHA_SECRET_KEY` | 否 | `""` | Google reCAPTCHA 的 Secret Key，用于在后端验证 reCAPTCHA 验证 |
 
 ### 在 Node 环境里使用环境变量
 

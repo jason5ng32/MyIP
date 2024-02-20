@@ -98,6 +98,8 @@ You can use the program without adding any environment variables, but if you wan
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
 | `KEYCDN_USER_AGENT` | No | `""` | User Agent for KeyCDN, used to obtain IP geolocation information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
+| `VITE_RECAPTCHA_SITE_KEY` | No | `""` | Google reCAPTCHA's Site Key, used to display reCAPTCHA verification on the frontend |
+| `RECAPTCHA_SECRET_KEY` | No | `""` | Google reCAPTCHA's Secret Key, used to verify reCAPTCHA verification on the backend |
 
 ### Using Environment Variables in a Node Environment
 
