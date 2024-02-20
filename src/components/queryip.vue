@@ -14,7 +14,7 @@
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
-                <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
+                <div v-if="reCaptchaLoaded" class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
                         :placeholder="$t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery" name="inputIP"
                         id="inputIP">
@@ -144,6 +144,7 @@ export default {
             modalQueryError: "",
             reCaptchaStatus: true,
             reCaptchaEnabled: false,
+            reCaptchaLoaded: false,
         }
     },
 
@@ -190,6 +191,10 @@ export default {
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
+            // 获取加载完成的状态
+            script.onload = () => {
+                this.reCaptchaLoaded = true;
+            };
         },
 
         // 验证 reCAPTCHA 令牌
@@ -211,6 +216,7 @@ export default {
                 this.reCaptchaEnabled = true;
             } else {
                 this.reCaptchaEnabled = false;
+                this.reCaptchaLoaded = true;
             }
         },
 
