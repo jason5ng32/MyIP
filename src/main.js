@@ -80,12 +80,14 @@ app.config.globalProperties.$trackEvent = function (category, action, label) {
 // 注册全局 Tooltip 指令
 app.directive('tooltip', {
     mounted(el, binding) {
-        // 定义默认配置
+        const isMobile = store.state.isMobile
+        if (isMobile) {
+            return
+        }
         let options = {
             placement: 'left',
             trigger: 'hover focus',
         }
-
         // 如果 binding.value 是一个字符串，将其设置为 title
         // 否则，如果是一个对象，将其与默认配置合并
         if (typeof binding.value === 'string') {
