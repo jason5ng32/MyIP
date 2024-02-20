@@ -61,6 +61,9 @@
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.type }}
+                                        <span v-if="modalQueryResult.proxyOperator !== 'unknown'">
+                                            ( {{ modalQueryResult.proxyOperator }} )
+                                        </span>
                                     </span>
                                 </li>
 
@@ -188,6 +191,8 @@ export default {
                 const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
                     proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
 
+                const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
+
                 return {
                     country_name: data.country_name || "",
                     country_code: data.country || "",
@@ -203,6 +208,7 @@ export default {
                     isProxy: isProxy,
                     type: type,
                     proxyProtocol: proxyProtocol,
+                    proxyOperator: proxyOperator,
                 };
             }
 
