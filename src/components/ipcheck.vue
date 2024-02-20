@@ -184,7 +184,7 @@
                     {{ card.asn }} <i class="bi bi-info-circle" @click="getASNInfo(card.asn, index)"
                       data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
                       :aria-controls="'collapseASNInfo-' + index" role="button"
-                      :aria-label="'Display AS Info of' + card.asn"></i>
+                      :aria-label="'Display AS Info of' + card.asn" v-tooltip="{ title: $t('Tooltips.ShowASNInfo'), placement: 'right' }"></i>
                   </span>
                 </li>
 
