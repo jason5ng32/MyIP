@@ -178,7 +178,6 @@ export default {
                         break;
                     case false:
                         await this.fetchIPForModal(this.inputIP);
-                        this.isChecking = "idle";
                         break;
                 }
             } else {
