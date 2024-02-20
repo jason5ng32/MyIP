@@ -4,7 +4,7 @@
     <div class="jn-title2">
       <h2 id="SpeedTest" :class="{ 'mobile-h2': isMobile }">🚀 {{ $t('speedtest.Title') }}</h2>
       <button @click="startSpeedTest" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-        aria-label="Start Speed Test" :disabled="speedTestStatus === 'running'">
+        aria-label="Start Speed Test" :disabled="speedTestStatus === 'running'" v-tooltip="$t('Tooltips.StartSpeedTest')">
         <i :class="speedTestStatus === 'running' ? 'bi bi-slash-circle' : 'bi bi-caret-right-fill'"></i>
       </button>
 

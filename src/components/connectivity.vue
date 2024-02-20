@@ -20,8 +20,8 @@
       <div class="jn-title2">
         <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ $t('connectivity.Title') }}</h2>
         <button @click="checkAllConnectivity(false, true)"
-          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-          aria-label="Refresh Connectivity Test"><i class="bi bi-arrow-clockwise"></i></button>
+          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh Connectivity Test"
+          v-tooltip="$t('Tooltips.RefreshConnectivityTests')"><i class="bi bi-arrow-clockwise"></i></button>
       </div>
       <div class="text-secondary">
         <p>{{ $t('connectivity.Note') }}</p>
@@ -36,9 +36,7 @@
                 'text-success': test.status.includes($t('connectivity.StatusAvailable')) && test.time < 200,
                 'jn-text-warning': test.status.includes($t('connectivity.StatusAvailable')) && test.time >= 200,
                 'text-danger': test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')
-              }"
-              :title="$t('connectivity.minTestTime') + test.mintime + ' ms'"
-              >
+              }" :title="$t('connectivity.minTestTime') + test.mintime + ' ms'">
                 <i v-if="test.status === $t('connectivity.StatusUnavailable') || test.status === $t('connectivity.StatusTimeout')"
                   class="bi bi-emoji-frown"></i>
                 <i v-else-if="test.status === $t('connectivity.StatusAvailable') && test.time < 200"
@@ -188,7 +186,7 @@ export default {
         }
 
         test.time = testTime;
-        
+
         onTestComplete(true);
       };
 

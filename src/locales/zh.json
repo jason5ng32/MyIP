@@ -10,6 +10,20 @@
     "PingTest": "全球延迟",
     "MTRTest": "MTR 测试"
   },
+  "Tooltips":{
+    "RefreshIPCard": "刷新 IP 信息",
+    "RefreshConnectivityTests": "刷新连通性测试",
+    "RefreshWebRTC": "刷新 WebRTC 测试",
+    "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",
+    "StartSpeedTest": "开始网速测试",
+    "ToggleMaps": "打开/关闭地图显示",
+    "SourceSelect": "选择 IP 归属地数据来源",
+    "ShowASNInfo": "显示 AS 详细信息",
+    "CopyIP": "复制 IP 地址",
+    "InfoMask": "隐藏信息",
+    "QueryIP": "查询 IP 信息",
+    "GithubLink": "查看源代码"
+  },
   "ipInfos": {
     "id": "ipinfos",
     "Title": "IP 信息",
