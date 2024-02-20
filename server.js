@@ -11,6 +11,8 @@ import keycdnHandler from './api/keycdn.js';
 import ipCheckingHandler from './api/ipchecking.js';
 import ipsbHandler from './api/ipsb.js';
 import cfHander from './api/cfradar.js';
+import recaptchaHandler from './api/recaptcha.js';
+import validateRecaptchaKey from './api/validate-recaptcha-key.js';
 
 dotenv.config();
 
@@ -27,6 +29,7 @@ app.get('/api/keycdn', keycdnHandler);
 app.get('/api/ipchecking', ipCheckingHandler);
 app.get('/api/ipsb', ipsbHandler);
 app.get('/api/cfradar', cfHander);
+app.get('/api/recaptcha', recaptchaHandler);
 
 // 设置静态文件服务
 const __filename = fileURLToPath(import.meta.url);
@@ -36,6 +39,8 @@ app.use(express.static(path.join(__dirname, './dist')));
 // 一些判断
 app.all('/api/validate-map-key', validateMapKeyHandler);
 app.all('/api/validate-site', validateSite);
+app.all('/api/validate-recaptcha-key', validateRecaptchaKey);
+
 
 // 启动服务器
 app.listen(port, () => {

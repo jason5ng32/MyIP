@@ -1,8 +1,8 @@
 <template>
     <!-- Search BTN -->
     <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;" data-bs-toggle="modal"
-        aria-label="IP Check" data-bs-target="#IPCheck" @click="$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');"
-        v-tooltip="$t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
+        aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP" v-tooltip="$t('Tooltips.QueryIP')"><i
+            class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
@@ -98,10 +98,16 @@
                     </div>
                 </div>
                 <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-                    <button type="button" class="btn btn-primary"
+                    <button id="sumitQueryButton" type="button" class="btn btn-primary"
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                        @click="submitQuery" :disabled="!isValidIP(inputIP)">{{ $t('ipcheck.Button') }}</button>
+                        @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false">{{
+                            $t('ipcheck.Button') }}</button>
 
+                </div>
+                <div v-if="reCaptchaEnabled" class="px-3 pb-3 text-secondary" style="font-size:10px">
+                    This site is protected by reCAPTCHA and the Google
+                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
                 </div>
 
             </div>
@@ -136,21 +142,85 @@ export default {
             inputIP: '',
             modalQueryResult: null,
             modalQueryError: "",
+            reCaptchaStatus: true,
+            reCaptchaEnabled: false,
         }
     },
 
     methods: {
-
         // 查询 IP 信息
         async submitQuery() {
+            // 首先检查输入的 IP 是否有效
             if (this.isValidIP(this.inputIP)) {
                 this.modalQueryError = "";
                 this.modalQueryResult = null;
-                await this.fetchIPForModal(this.inputIP);
+                // 如果 reCAPTCHA 已启用，验证令牌
+                switch (this.reCaptchaEnabled) {
+                    case true:
+                        // 执行 reCAPTCHA 验证
+                        grecaptcha.ready(async () => {
+                            grecaptcha.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: 'submit' }).then(async (token) => {
+                                let recaptchaSuccess = await this.verifyRecaptchaToken(token);
+                                if (recaptchaSuccess) {
+                                    this.reCaptchaStatus = true;
+                                    await this.fetchIPForModal(this.inputIP);
+                                } else {
+                                    this.reCaptchaStatus = false;
+                                    this.modalQueryError = this.$t('ipcheck.recaptchaError');
+                                }
+                            });
+                        });
+                        break;
+                    case false:
+                        await this.fetchIPForModal(this.inputIP);
+                        break;
+                }
             } else {
+                // 如果 IP 无效，设置错误信息
                 this.modalQueryError = this.$t('ipcheck.Error');
                 this.modalQueryResult = null;
             }
+        },
+
+        // 加载 reCAPTCHA 脚本
+        loadRecaptchaScript() {
+            // 创建一个 script 元素
+            const script = document.createElement('script');
+            script.src = `https://www.recaptcha.net/recaptcha/api.js?render=${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        },
+
+        // 验证 reCAPTCHA 令牌
+        async verifyRecaptchaToken(token) {
+            const response = await fetch(`/api/recaptcha?token=${token}`, {
+                method: 'GET',
+            });
+            const data = await response.json();
+            return data.success;
+        },
+
+        // 验证后端是否支持 reCAPTCHA
+        async checkRecaptchaSupport() {
+            const response = await fetch(`/api/validate-recaptcha-key`, {
+                method: 'GET',
+            });
+            const data = await response.json();
+            if (data.isValid) {
+                this.reCaptchaEnabled = true;
+            } else {
+                this.reCaptchaEnabled = false;
+            }
+        },
+
+        // 打开查询 IP 的模态框
+        openQueryIP() {
+            // 如果 reCAPTCHA 脚本尚未加载，加载它
+            if (!window.grecaptcha && this.reCaptchaEnabled) {
+                this.loadRecaptchaScript();
+            }
+            this.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
         },
 
         // 重置 modalQueryResult
@@ -230,6 +300,12 @@ export default {
 
         // 获取 IP 信息
         async fetchIPForModal(ip, sourceID = null) {
+
+            if (this.reCaptchaStatus === false) {
+                this.modalQueryError = this.$t('ipcheck.recaptchaError');
+                return;
+            }
+
             let lang = this.$Lang;
             if (lang === 'zh') {
                 lang = 'zh-CN';
@@ -269,7 +345,10 @@ export default {
                 }
             }
         },
-    }
+    },
+    mounted() {
+        this.checkRecaptchaSupport();
+    },
 }
 </script>
 

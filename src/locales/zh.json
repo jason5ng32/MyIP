@@ -158,7 +158,8 @@
     "Title": "IP 查询",
     "Placeholder": "请输入 IP 地址",
     "Button": "查询",
-    "Error": "请输入有效的 IPv4 或 IPv6 地址。"
+    "Error": "请输入有效的 IPv4 或 IPv6 地址。",
+    "recaptchaError": "你未通过 reCAPTCHA 验证，查询功能已被禁用"
   },
   "alert": {
     "id": "alert",

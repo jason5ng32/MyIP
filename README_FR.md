@@ -98,6 +98,8 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
 | `KEYCDN_USER_AGENT` | Non | `""` | Agent utilisateur pour KeyCDN, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via KeyCDN |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
+| `VITE_RECAPTCHA_SITE_KEY` | Non | `""` | Clé de site reCAPTCHA de Google, utilisée pour afficher la vérification reCAPTCHA sur le frontend |
+| `RECAPTCHA_SECRET_KEY` | Non | `""` | Clé secrète reCAPTCHA de Google, utilisée pour vérifier la vérification reCAPTCHA sur le backend |
 
 ### Utilisation des variables d'environnement dans un environnement Node
 

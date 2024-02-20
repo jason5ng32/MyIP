@@ -285,3 +285,6 @@ footer {
 .jn-ping-form-select {
   min-width: 140pt;
 }
+.grecaptcha-badge { 
+  visibility: hidden;
+}
