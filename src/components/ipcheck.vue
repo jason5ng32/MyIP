@@ -15,12 +15,12 @@
         </div>
 
         <div>
-          <input class="form-check-input" type="checkbox" role="switch" id="toggleMapSwitch" @change="toggleMaps"
+          <input class="form-check-input" type="checkbox" role="button" id="toggleMapSwitch" @change="toggleMaps"
             aria-label="Toggle Map Display" :checked="isMapShown" :disabled="!isEnvBingMapKey"
             @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
 
           <label class="form-check-label" for="toggleMapSwitch">
-            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"></i>
+            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true" role="button"></i>
           </label>
         </div>
 
@@ -88,7 +88,7 @@
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
                   :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                  @click="copyToClipboard(card.ip, card.id)"></i>
+                  @click="copyToClipboard(card.ip, card.id)" role="button"></i>
               </span>
               <span v-else class="placeholder col-10"></span>
             </div>
