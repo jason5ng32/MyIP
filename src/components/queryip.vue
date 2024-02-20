@@ -185,6 +185,7 @@ export default {
                 // 如果 IP 无效，设置错误信息
                 this.modalQueryError = this.$t('ipcheck.Error');
                 this.modalQueryResult = null;
+                this.isChecking = "idle";
             }
         },
 
