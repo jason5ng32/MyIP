@@ -293,8 +293,8 @@ export default {
       placeholderSizes: [12, 8, 6, 8, 4],
       sources: [
         { id: 0, text: 'IPCheck.ing', enabled: true },
-        { id: 1, text: 'IP.SB', enabled: true },
-        { id: 2, text: 'IPinfo.io', enabled: true },
+        { id: 1, text: 'IPinfo.io', enabled: true },
+        { id: 2, text: 'IP.SB', enabled: true },
         { id: 3, text: 'IP-API.com', enabled: true },
         { id: 4, text: 'IPAPI.co', enabled: true },
         { id: 5, text: 'KeyCDN', enabled: true },
