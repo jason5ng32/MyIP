@@ -693,7 +693,7 @@ export default {
         } else {
           clearInterval(interval);
         }
-      }, 350);
+      }, 500);
     },
 
     // 格式化 IP 数据
@@ -775,7 +775,7 @@ export default {
         } else {
           clearInterval(interval);
         }
-      }, 50);
+      }, 500);
     },
 
     // 清空卡片数据
