@@ -4,6 +4,7 @@
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
+![Docker Pulls](https://img.shields.io/docker/pulls/jason5ng32/myip)
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fipcheck.ing&up_message=online&label=IPCheck.ing)
 ![PWA](https://img.shields.io/badge/PWA-Supported-blue)
 ![GitHub license](https://img.shields.io/github/license/jason5ng32/MyIP)
