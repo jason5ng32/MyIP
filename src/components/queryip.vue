@@ -101,15 +101,15 @@
                     <button id="sumitQueryButton" type="button" class="btn btn-primary"
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
                         @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false || isChecking === 'running'
-                        ">{{
-                            $t('ipcheck.Button') }}</button>
+                            ">{{
+        $t('ipcheck.Button') }}</button>
+                    <span v-if="reCaptchaEnabled" class="text-secondary" style="font-size:10px">
+                        This site is protected by reCAPTCHA and the Google
+                        <a href="https://policies.google.com/privacy">Privacy Policy</a> and
+                        <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+                    </span>
+                </div>
 
-                </div>
-                <div v-if="reCaptchaEnabled" class="px-3 pb-3 text-secondary" style="font-size:10px">
-                    This site is protected by reCAPTCHA and the Google
-                    <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                    <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-                </div>
 
             </div>
         </div>
