@@ -301,7 +301,7 @@ export default {
       ],
       ipDataCards: [
         {
-          id: "taobao",
+          id: "cnsource",
           ip: "",
           country_name: "",
           region: "",
@@ -314,7 +314,7 @@ export default {
           mapUrl: '/defaultMap.jpg',
           mapUrl_dark: '/defaultMap_dark.jpg',
           showMap: false,
-          source: "TaoBao",
+          source: "CN Source",
           showASNInfo: false,
         },
         {
@@ -454,18 +454,40 @@ export default {
         });
     },
 
+    // 从中国来源获取 IP 地址
+    getIPfromCNSource() {
+      this.getIPFromIPIP().catch(() => {
+        this.getIPFromTaobao();
+      });
+    },
+
     // 从淘宝获取 IP 地址
     getIPFromTaobao() {
       window.ipCallback = (data) => {
-        var ip = data.ip;
+        let ip = data.ip;
         this.ipDataCards[0].source = "TaoBao";
         this.fetchIPDetails(0, ip);
+
+        document.head.removeChild(script);
         delete window.ipCallback;
       };
-      var script = document.createElement("script");
+      let script = document.createElement("script");
       script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
       document.head.appendChild(script);
-      document.head.removeChild(script);
+    },
+
+    // 从 IPIP.net 获取 IP 地址
+    async getIPFromIPIP() {
+      try {
+        const response = await fetch("https://myip.ipip.net/json");
+        const data = await response.json();
+        const ip = data.data.ip;
+        this.ipDataCards[0].source = "IPIP.net";
+        this.fetchIPDetails(0, ip);
+      } catch (error) {
+        console.error("Error fetching IP from IPIP.net:", error);
+        throw new Error("Failed to fetch IP from IPIP.net");
+      }
     },
 
     // 从特殊源获取 IP 地址
@@ -756,8 +778,8 @@ export default {
     // 检查所有 IP 地址
     async checkAllIPs() {
       const ipFunctions = [
+        this.getIPfromCNSource,
         this.getIPFromSpecial,
-        this.getIPFromTaobao,
         this.getIPFromCloudflare_V4,
         this.getIPFromCloudflare_V6,
         this.getIPFromIpify_V4,
@@ -806,6 +828,10 @@ export default {
         case "TaoBao":
           this.getIPFromTaobao(card);
           this.$trackEvent('IPCheck', 'RefreshClick', 'TaoBao');
+          break;
+        case "IPIP.net":
+          this.getIPFromIPIP(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'IPIP.net');
           break;
         default:
           console.error("Undefind Source:", card.source);
