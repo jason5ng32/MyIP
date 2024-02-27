@@ -330,10 +330,10 @@ export default {
             const sources = [
                 { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
                 { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-                { id: 2, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
-                { id: 3, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-                { id: 4, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-                { id: 5, url: `api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
+                { id: 2, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+                { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+                { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
+                { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
             ];
 
             // 根据指定的源获取数据
