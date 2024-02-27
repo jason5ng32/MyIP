@@ -168,8 +168,8 @@ export default {
     checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
       const beginTime = +new Date();
 
-      var img = new Image();
-      var timeout = setTimeout(() => {
+      let img = new Image();
+      let timeout = setTimeout(() => {
         test.status = this.$t('connectivity.StatusUnavailable');
         onTestComplete(false);
       }, 3 * 1200);

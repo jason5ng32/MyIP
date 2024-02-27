@@ -132,7 +132,7 @@ export default {
 
     // 加载完成后隐藏 loading
     hideLoading() {
-      var loadingElement = document.getElementById("jn-loading");
+      let loadingElement = document.getElementById("jn-loading");
       if (loadingElement) {
         loadingElement.style.display = "none";
       }
