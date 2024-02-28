@@ -299,6 +299,7 @@ export default {
         { id: 4, text: 'KeyCDN', enabled: true },
         { id: 5, text: 'IP.SB', enabled: true },
       ],
+      pendingIPDetailsRequests: new Map(),
       ipDataCards: [
         {
           id: "cnsource",
@@ -622,56 +623,73 @@ export default {
       let lang = this.$Lang;
       if (lang === 'zh') {
         lang = 'zh-CN';
-      };
+      }
 
       // 检查缓存中是否已有该 IP 的数据
       if (this.ipDataCache.has(ip)) {
-        // 使用缓存的数据填充卡片
         const cachedData = this.ipDataCache.get(ip);
         Object.assign(card, cachedData);
         return;
       }
 
-      // 不同的源
-      const sources = [
-        { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-        { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-        { id: 2, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-        { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-        { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
-        { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
-      ];
-
-      let currentSourceIndex = sourceID !== null ? sources.findIndex(source => source.id === sourceID) : 0;
-      let attempts = 0;
-
-      while (attempts < sources.length) {
-        const source = sources[currentSourceIndex];
-
-        try {
-          const response = await fetch(source.url);
-          const data = await response.json();
-
-          // 根据数据源进行数据转换
-          const cardData = source.transform(data);
-
-          if (cardData) {
-            this.$store.commit('SET_IP_GEO_SOURCE', source.id);
-            localStorage.setItem("ipGeoSource", parseInt(source.id));
-            Object.assign(card, cardData);
-            this.ipDataCache.set(ip, cardData);
-            return source.id;
-          }
-        } catch (error) {
-          console.error("Error fetching IP details from source " + source.id + ":", error);
-          this.sources[source.id].enabled = false;
-          currentSourceIndex = (currentSourceIndex + 1) % sources.length;
-          attempts++;
+      // 检查是否有正在进行的查询，如果有，则等待该查询完成
+      if (this.pendingIPDetailsRequests.has(ip)) {
+        console.log("Waiting for pending IP details request to complete for IP: " + ip +" from source: " + this.sources[sourceID].text  );
+        await this.pendingIPDetailsRequests.get(ip);
+        const cachedData = this.ipDataCache.get(ip);
+        if (cachedData) {
+          Object.assign(card, cachedData);
         }
+        return;
       }
 
-      if (attempts >= sources.length) {
-        console.error("All sources failed to fetch IP details for IP: " + ip);
+      const fetchPromise = (async () => {
+        const sources = [
+          { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+          { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
+          { id: 2, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
+          { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
+          { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
+          { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+        ];
+
+        let currentSourceIndex = sourceID !== null ? sources.findIndex(source => source.id === sourceID) : 0;
+        let attempts = 0;
+
+        while (attempts < sources.length) {
+          const source = sources[currentSourceIndex];
+          try {
+            const response = await fetch(source.url);
+            const data = await response.json();
+            const cardData = source.transform(data);
+
+            if (cardData) {
+              this.$store.commit('SET_IP_GEO_SOURCE', source.id);
+              localStorage.setItem("ipGeoSource", source.id.toString());
+              Object.assign(card, cardData);
+              this.ipDataCache.set(ip, cardData);
+              return;
+            }
+          } catch (error) {
+            console.error("Error fetching IP details from source " + source.id + ":", error);
+            currentSourceIndex = (currentSourceIndex + 1) % sources.length;
+            attempts++;
+          }
+        }
+
+        throw new Error("All sources failed to fetch IP details for IP: " + ip);
+      })();
+
+      // 将此 Promise 存储在 pendingIPDetailsRequests 中，以避免重复查询
+      this.pendingIPDetailsRequests.set(ip, fetchPromise);
+
+      try {
+        await fetchPromise;
+      } catch (error) {
+        console.error(error);
+      } finally {
+        // 完成后，从 pendingIPDetailsRequests 中移除
+        this.pendingIPDetailsRequests.delete(ip);
       }
     },
 
