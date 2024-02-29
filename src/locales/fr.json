@@ -27,7 +27,7 @@
     "ipInfos": {
         "id": "ipinfos",
         "Title": "Infos IP",
-        "Notes": "Les données IP seront vérifiées à partir de 6 sources. S'il n'y a qu'une seule pile IP actuellement, les sources sans données s'afficheront comme vides.",
+        "Notes": "Le programme vérifie d'abord votre adresse IP à partir de 6 sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
         "Simple": "Simple",
         "Map": "Carte",
         "MapUnavailable": "Carte non disponible",
