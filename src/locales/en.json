@@ -27,7 +27,7 @@
   "ipInfos": {
     "id": "ipinfos",
     "Title": "IP Infos",
-    "Notes": "IP data will be checked from 6 sources. If there is only 1 IP stack currently, sources without data will show as empty.",
+    "Notes": "The program will first check your IP address from 6 different sources (including IPv4 and IPv6), and then query the corresponding geographical data from the IP geolocation source you selected. If there is only 1 IP stack, the source without data will be displayed as empty.",
     "Simple": "Simple",
     "Map": "Map",
     "MapUnavailable": "Map Unavailable",
