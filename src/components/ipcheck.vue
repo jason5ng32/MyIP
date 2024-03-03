@@ -987,8 +987,4 @@ export default {
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
 }
-
-.jn-ip-font {
-  zoom: 0.8;
-}
 </style>

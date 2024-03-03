@@ -14,7 +14,7 @@
     "ruletest": {
         "Title": "Test de règles",
         "Name": "Test",
-        "Note": "Le test de règles permet de vérifier si le serveur proxy fonctionne correctement. Le principe est de configurer différentes règles de proxy pour les 8 URL différentes d'IPCheck.ing dans votre logiciel de proxy, puis de vérifier si ces règles sont appliquées correctement dans les résultats ci-dessous, avec chaque URL utilisant une ligne de proxy différente (vous devez d'abord configurer les règles dans votre logiciel de proxy en fonction des URL indiquées ci-dessous).",
+        "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy.",
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
         "country": "Région de proxy"

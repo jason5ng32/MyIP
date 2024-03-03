@@ -14,7 +14,7 @@
   "ruletest": {
     "Title": "Rule Test",
     "Name": "Test",
-    "Note": "The rule test is used to check if the proxy server is working properly. The principle is to set different proxy rules for 8 different URLs of IPCheck.ing in the proxy software, and then check in the results below whether these rules are set as you specified, with different proxy routes used for different URLs (you need to first set the rules in the proxy software according to the URLs in the card below).",
+    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software.",
     "StatusWait": "Awaiting Test or Test Error",
     "StatusError": "Test Error",
     "country": "Proxy Country"
