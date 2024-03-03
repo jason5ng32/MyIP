@@ -23,8 +23,8 @@
         'text-danger': stun.ip === $t('webrtc.StatusError')
       }">
               <i class="bi"
-                :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"></i>
-              {{ stun.ip }}
+                :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}</span>
             </p>
             <div v-if="stun.natType" class="alert" :class="{
         'alert-info': stun.natType === $t('webrtc.StatusWait'),

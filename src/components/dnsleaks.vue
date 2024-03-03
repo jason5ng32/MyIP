@@ -12,10 +12,12 @@
       <p>{{ $t('dnsleaktest.Note2') }}</p>
     </div>
     <div class="row">
-      <div v-for="leak in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
+      <div v-for="(leak, index) in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
         <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
-            <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}</p>
+            <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
+              <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
+            </p>
             <p class="card-text" :class="{
         'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
         'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
@@ -32,7 +34,9 @@
       }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
                 :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-              {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}</strong>
+              {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}&nbsp;</strong>
+              <span v-if="leak.geo !== $t('dnsleaktest.StatusWait') && leak.geo !== $t('dnsleaktest.StatusError')"
+                :class="'jn-fl fi fi-' + leak.geo.toLowerCase()"></span>
             </div>
           </div>
         </div>
@@ -44,6 +48,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import countryLookup from 'country-code-lookup';
 
 export default {
   name: 'DNSLeaks',
@@ -65,25 +70,25 @@ export default {
       leakTest: [
         {
           id: "ipapi1",
-          name: this.$t('dnsleaktest.Name') + " 1",
+          name: this.$t('dnsleaktest.Name'),
           geo: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "ipapi2",
-          name: this.$t('dnsleaktest.Name') + " 2",
+          name: this.$t('dnsleaktest.Name'),
           geo: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "sfshark1",
-          name: this.$t('dnsleaktest.Name') + " 3",
+          name: this.$t('dnsleaktest.Name'),
           geo: this.$t('dnsleaktest.StatusWait'),
-          ip: "",
+          ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "sfshark2",
-          name: this.$t('dnsleaktest.Name') + " 4",
+          name: this.$t('dnsleaktest.Name'),
           geo: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
@@ -125,7 +130,7 @@ export default {
         .then((data) => {
           if (data.dns && "geo" in data.dns && "ip" in data.dns) {
             const geoSplit = data.dns.geo.split(" - ");
-            this.leakTest[index].geo = geoSplit[0];
+            this.leakTest[index].geo = countryLookup.byCountry(geoSplit[0]).iso2;
             this.leakTest[index].ip = data.dns.ip;
           } else {
             console.error("Unexpected data structure:", data);
@@ -154,8 +159,8 @@ export default {
           const getKey = Object.keys(data)[key];
           const keyEntry = data[getKey];
 
-          if (keyEntry && keyEntry.Country && keyEntry.IP) {
-            this.leakTest[index].geo = keyEntry.Country;
+          if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
+            this.leakTest[index].geo = keyEntry.CountryCode;
             this.leakTest[index].ip = keyEntry.IP;
           } else {
             console.error("Unexpected data structure:", data);

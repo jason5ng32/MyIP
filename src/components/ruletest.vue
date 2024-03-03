@@ -16,19 +16,23 @@
                 <div v-for="test in ruleTests" :key="test.id" class="col-lg-3 col-md-6 col-12 mb-4">
                     <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                         <div class="card-body">
-                            <p class="jn-con-title card-title"><i class="bi bi-signpost-split-fill"></i> {{
-                    test.name }}</p>
-                            <p class="card-text text-secondary" style="font-size: 10pt;"><i
-                                    class="bi bi-hdd-network-fill"></i> {{
-                    test.url }}</p>
+                            <p class="jn-con-title card-title"><i class="bi bi-signpost-split-fill"></i>
+                                {{ test.name }}
+                                <i class="bi" :class="'bi-' + (test.id) + '-square'"></i>&nbsp;
+                            </p>
+
+                            <p class="card-text text-secondary" style="font-size: 10pt;">
+                                <i class="bi bi-hdd-network-fill"></i>
+                                {{ test.url }}
+                            </p>
                             <p class="card-text" :class="{
                     'text-info': test.ip === $t('ruletest.StatusWait'),
                     'text-success': test.ip.includes('.') || test.ip.includes(':'),
                     'text-danger': test.ip === $t('ruletest.StatusError')
                 }">
                                 <i class="bi"
-                                    :class="[test.ip === $t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"></i>
-                                {{ test.ip }}
+                                    :class="[test.ip === $t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+                                <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
                             <div class="alert" :class="{
                     'alert-info': test.country_code === $t('ruletest.StatusWait'),
@@ -74,67 +78,59 @@ export default {
             ruleTests: [
                 {
                     id: 1,
-                    name: 'PTest - 1',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-1.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 2,
-                    name: 'PTest - 2',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-2.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 3,
-                    name: 'PTest - 3',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-3.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 4,
-                    name: 'PTest - 4',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-4.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 5,
-                    name: 'PTest - 5',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-5.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 6,
-                    name: 'PTest - 6',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-6.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 7,
-                    name: 'PTest - 7',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-7.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
                 {
                     id: 8,
-                    name: 'PTest - 8',
+                    name: this.$t('ruletest.Name'),
                     url: 'ptest-8.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
-                    warp: false,
                 },
             ],
             IPArray: [],
@@ -161,11 +157,9 @@ export default {
                     const country = countryLine.split("=")[1];
                     this.ruleTests[id].country_code = country;
                 }
-                if (warpLine) {
-                    const warp = warpLine.split("=")[1];
-                    this.ruleTests[id].warp = warp === "on";
-                }
             } catch (error) {
+                this.ruleTests[id].ip = this.$t('ruletest.StatusError');
+                this.ruleTests[id].country_code = this.$t('ruletest.StatusError');
                 console.error("Error fetching Data:", error);
             }
         },

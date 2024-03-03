@@ -265,6 +265,10 @@ footer {
   font-size: 2em;
 }
 
+.jn-ip-font {
+  zoom: 0.8;
+}
+
 .jn-speedtest-note {
   background-color: #b2d6c33b;
   border: 1px solid #1a8754;
