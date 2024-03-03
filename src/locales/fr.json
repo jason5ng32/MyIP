@@ -8,7 +8,16 @@
         "DNSLeakTest": "Test de fuite DNS",
         "SpeedTest": "Test de vitesse",
         "PingTest": "Latence mondiale",
-        "MTRTest": "Test MTR"
+        "MTRTest": "Test MTR",
+        "RuleTest": "Test de règles"
+    },
+    "ruletest": {
+        "Title": "Test de règles",
+        "Name": "Test",
+        "Note": "Le test de règles permet de vérifier si le serveur proxy fonctionne correctement. Le principe est de configurer différentes règles de proxy pour les 8 URL différentes d'IPCheck.ing dans votre logiciel de proxy, puis de vérifier si ces règles sont appliquées correctement dans les résultats ci-dessous, avec chaque URL utilisant une ligne de proxy différente (vous devez d'abord configurer les règles dans votre logiciel de proxy en fonction des URL indiquées ci-dessous).",
+        "StatusWait": "En attente du test ou erreur de connexion",
+        "StatusError": "Erreur de test",
+        "country": "Région de proxy"
     },
     "Tooltips": {
         "RefreshIPCard": "Actualiser la carte IP",
@@ -22,7 +31,8 @@
         "CopyIP": "Copier l'adresse IP",
         "InfoMask": "Masquer les informations IP",
         "QueryIP": "Interroger l'adresse IP",
-        "GithubLink": "Voir le code source sur GitHub"
+        "GithubLink": "Voir le code source sur GitHub",
+        "RefreshRuleTests": "Actualiser les tests de règles"
     },
     "ipInfos": {
         "id": "ipinfos",
@@ -194,7 +204,8 @@
         "Help": "Afficher les raccourcis clavier",
         "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
         "GoNext": "Carte suivante",
-        "GoPrevious": "Carte précédente"
+        "GoPrevious": "Carte précédente",
+        "RefreshRuleTests": "Actualiser les tests de règles"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
@@ -460,6 +471,20 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de l'interface utilisateur pour l'affichage des informations IP"
+                    }
+                ]
+            },
+            {
+                "version": "v3.5",
+                "date": "Mar 3, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout du test de règles"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Quelques améliorations"
                     }
                 ]
             }

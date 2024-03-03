@@ -8,9 +8,18 @@
     "DNSLeakTest": "DNS 泄漏测试",
     "SpeedTest": "网速测试",
     "PingTest": "全球延迟",
-    "MTRTest": "MTR 测试"
+    "MTRTest": "MTR 测试",
+    "RuleTest": "规则测试"
   },
-  "Tooltips":{
+  "ruletest": {
+    "Title": "规则测试",
+    "Name": "检测",
+    "Note": "规则测试用于检查代理服务器是否工作正常。原理是，你在代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的代理规则，然后在下面的结果里查看这些规则是否如你设置那样，不同的 URL 使用了不同的代理线路（你需要先在代理软件里按照下方卡片里的 URL 进行规则设置）。",
+    "StatusWait": "待检测或检测错误",
+    "StatusError": "检测出错",
+    "country": "代理地区"
+  },
+  "Tooltips": {
     "RefreshIPCard": "刷新 IP 信息",
     "RefreshConnectivityTests": "刷新连通性测试",
     "RefreshWebRTC": "刷新 WebRTC 测试",
@@ -22,7 +31,8 @@
     "CopyIP": "复制 IP 地址",
     "InfoMask": "隐藏信息",
     "QueryIP": "查询 IP 信息",
-    "GithubLink": "查看源代码"
+    "GithubLink": "查看源代码",
+    "RefreshRuleTests": "刷新规则测试"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -194,7 +204,8 @@
     "Help": "显示快捷键",
     "HelpNote": "使用快捷键的人，是喜欢效率的人，你真棒！",
     "GoNext": "下一张卡片",
-    "GoPrevious": "上一张卡片"
+    "GoPrevious": "上一张卡片",
+    "RefreshRuleTests": "刷新规则测试"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -460,6 +471,20 @@
           {
             "type": "improve",
             "change": "优化 IP 信息的展示 UI"
+          }
+        ]
+      },
+      {
+        "version": "v3.5",
+        "date": "Mar 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加规则测试"
+          },
+          {
+            "type": "improve",
+            "change": "优化了部分逻辑"
           }
         ]
       }

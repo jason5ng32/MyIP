@@ -16,23 +16,23 @@
           <div class="card-body">
             <p class="card-title jn-con-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</p>
             <p class="card-text text-secondary" style="font-size: 10pt;"><i class="bi bi-hdd-network-fill"></i> {{
-              stun.url }}</p>
+        stun.url }}</p>
             <p class="card-text" :class="{
-              'text-info': stun.ip === $t('webrtc.StatusWait'),
-              'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
-              'text-danger': stun.ip === $t('webrtc.StatusError')
-            }">
+        'text-info': stun.ip === $t('webrtc.StatusWait'),
+        'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
+        'text-danger': stun.ip === $t('webrtc.StatusError')
+      }">
               <i class="bi"
                 :class="[stun.ip === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']"></i>
               {{ stun.ip }}
             </p>
             <div v-if="stun.natType" class="alert" :class="{
-              'alert-info': stun.natType === $t('webrtc.StatusWait'),
-              'alert-success': stun.natType !== $t('webrtc.StatusWait'),
-            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+        'alert-info': stun.natType === $t('webrtc.StatusWait'),
+        'alert-success': stun.natType !== $t('webrtc.StatusWait'),
+      }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
                 :class="[stun.natType === $t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"></i> {{
-                  stun.natType }}
+        stun.natType }}
             </div>
           </div>
         </div>
@@ -62,6 +62,7 @@ export default {
 
   data() {
     return {
+      IPArray: [],
       stunServers: [
         {
           id: "google",
@@ -139,6 +140,7 @@ export default {
             const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
             if (ipMatch) {
               stun.ip = ipMatch[0];
+              this.IPArray = [...this.IPArray, stun.ip];
               stun.natType = this.determineNATType(candidate);
               pc.close();
             }
@@ -198,6 +200,14 @@ export default {
     setTimeout(() => {
       this.checkAllWebRTC(false);
     }, 4000);
+  },
+  watch: {
+    IPArray: {
+      handler() {
+        this.$store.commit('updateGlobalIpDataCards', this.IPArray);
+      },
+      deep: true,
+    },
   },
 }
 </script>

@@ -8,9 +8,18 @@
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
     "PingTest": "Global Latency",
-    "MTRTest": "MTR Test"
+    "MTRTest": "MTR Test",
+    "RuleTest": "Rule Test"
   },
-  "Tooltips":{
+  "ruletest": {
+    "Title": "Rule Test",
+    "Name": "Test",
+    "Note": "The rule test is used to check if the proxy server is working properly. The principle is to set different proxy rules for 8 different URLs of IPCheck.ing in the proxy software, and then check in the results below whether these rules are set as you specified, with different proxy routes used for different URLs (you need to first set the rules in the proxy software according to the URLs in the card below).",
+    "StatusWait": "Awaiting Test or Test Error",
+    "StatusError": "Test Error",
+    "country": "Proxy Country"
+  },
+  "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
     "RefreshWebRTC": "Refresh WebRTC Test",
@@ -22,7 +31,8 @@
     "CopyIP": "Copy IP Address",
     "InfoMask": "Hide IP Information",
     "QueryIP": "Query IP Address",
-    "GithubLink": "View Source Code on GitHub"
+    "GithubLink": "View Source Code on GitHub",
+    "RefreshRuleTests": "Refresh Rule Tests"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -194,7 +204,8 @@
     "Help": "Show Shortcut Keys",
     "HelpNote": "People who use shortcuts are really awesome!",
     "GoNext": "Next Card",
-    "GoPrevious": "Previous Card"
+    "GoPrevious": "Previous Card",
+    "RefreshRuleTests": "Refresh Rule Tests"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -460,6 +471,20 @@
           {
             "type": "improve",
             "change": "Optimized UI for displaying IP information"
+          }
+        ]
+      },
+      {
+        "version": "v3.5",
+        "date": "Mar 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added rule test feature"
+          },
+          {
+            "type": "improve",
+            "change": "Some Improvements"
           }
         ]
       }

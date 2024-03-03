@@ -106,25 +106,11 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-    const ipDataCards = computed(() => store.state.Global_ipDataCards);
-    const allIPs = ref([]); // 创建响应式引用
-
-    const getAllIPs = (cards) => {
-      let Global_allIPs = []; // 初始化数组
-      cards.forEach(card => {
-        if (card.ip && !card.ip.includes(' ') && !card.ip.includes(':')) {
-          Global_allIPs.push(card.ip);
-        }
-      });
-      Global_allIPs = [...new Set(Global_allIPs)]; // 去重
-      allIPs.value = Global_allIPs; // 更新 allIPs 响应式引用
-
-    };
-
-    // 监听 ipDataCards 的变化
-    watch(ipDataCards, (newVal) => {
-      getAllIPs(newVal);
+    let allIPs = computed(() => {
+      const _allIPs = store.state.Global_ipDataCards;
+      return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
     });
+
 
     return {
       isDarkMode,

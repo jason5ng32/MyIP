@@ -6,8 +6,8 @@
       aria-live="assertive" aria-atomic="true">
       <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
         <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" data-bs-dismiss="toast"
-          aria-label="Close"></button>
+        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+          data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
         {{ alertMessage }}
@@ -15,12 +15,13 @@
     </div>
   </div>
   <div id="mainpart" class="container mt-5 jn-container">
-    <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true"
-      class="rounded-2" tabindex="0">
+    <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
+      data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
       <IPCheck ref="IPCheckRef" />
       <Connectivity ref="connectivityRef" />
       <WebRTC ref="webRTCRef" />
       <DNSLeaks ref="dnsLeaksRef" />
+      <RuleTest ref="ruleTestRef" />
       <SpeedTest ref="speedTestRef" />
       <GlobalLatency ref="globalLatencyRef" />
       <MTRtest ref="mtrtestRef" />
@@ -52,6 +53,7 @@ import Footer from './components/footer.vue'
 import QueryIP from './components/queryip.vue'
 import HelpModal from './components/help.vue'
 import PWA from './components/pwa.vue'
+import RuleTest from './components/ruletest.vue'
 import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 
 import { ref, computed, watch } from 'vue';
@@ -92,6 +94,7 @@ export default {
     QueryIP,
     HelpModal,
     PWA,
+    RuleTest,
   },
   name: 'App',
   data() {
@@ -102,6 +105,7 @@ export default {
       originipDataCards: [],
       originstunServers: [],
       originleakTest: [],
+      originRuleTests: [],
       alertToShow: false,
       alertStyle: "",
       alertMessage: "",
@@ -205,6 +209,7 @@ export default {
         this.originipDataCards = JSON.parse(JSON.stringify(this.$refs.IPCheckRef.ipDataCards));
         this.originstunServers = JSON.parse(JSON.stringify(this.$refs.webRTCRef.stunServers));
         this.originleakTest = JSON.parse(JSON.stringify(this.$refs.dnsLeaksRef.leakTest));
+        this.originRuleTests = JSON.parse(JSON.stringify(this.$refs.ruleTestRef.ruleTests));
         this.infoMask();
         this.alertStyle = "text-warning";
         this.alertMessage = this.$t('alert.maskedInfoMessage_1');
@@ -240,6 +245,9 @@ export default {
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.ip = "12.34.56.78";
         });
+        this.$refs.ruleTestRef.ruleTests.forEach((test) => {
+          test.ip = "8.8.8.8";
+        });
         this.infoMaskLevel = 1;
       } else if (this.infoMaskLevel === 1) {
         this.$refs.IPCheckRef.ipDataCards.forEach((card) => {
@@ -258,6 +266,9 @@ export default {
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.geo = "United States";
         });
+        this.$refs.ruleTestRef.ruleTests.forEach((test) => {
+          test.country_code = "US";
+        });
         this.infoMaskLevel = 2;
       }
     },
@@ -267,6 +278,7 @@ export default {
       this.$refs.IPCheckRef.ipDataCards = JSON.parse(JSON.stringify(this.originipDataCards));
       this.$refs.webRTCRef.stunServers = JSON.parse(JSON.stringify(this.originstunServers));
       this.$refs.dnsLeaksRef.leakTest = JSON.parse(JSON.stringify(this.originleakTest));
+      this.$refs.ruleTestRef.ruleTests = JSON.parse(JSON.stringify(this.originRuleTests));
       this.infoMaskLevel = 0;
     },
 
@@ -391,6 +403,15 @@ export default {
             this.$trackEvent('ShortCut', 'ShortCut', 'WebRTC');
           },
           description: this.$t('shortcutKeys.RefreshWebRTC'),
+        },
+        {
+          keys: "r",
+          action: () => {
+            this.scrollToElement("RuleTest", 80);
+            this.$refs.ruleTestRef.checkAllRuleTest(true);
+            this.$trackEvent('ShortCut', 'ShortCut', 'WebRTC');
+          },
+          description: this.$t('shortcutKeys.RefreshRuleTests'),
         },
         {
           keys: "d",
