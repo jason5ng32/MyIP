@@ -16,14 +16,14 @@
         <span class=" fw-bold  "> IP</span>
         <span class="fw-lighter">Check.</span>
         <span class="fw-lighter" :class="{
-          'background-animation-dark': !loaded && isDarkMode,
-          'background-animation-light': !loaded && !isDarkMode
-        }">ing</span>
+      'background-animation-dark': !loaded && isDarkMode,
+      'background-animation-light': !loaded && !isDarkMode
+    }">ing</span>
       </a>
 
       <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
-        <button type="button" class="btn btn-sm dropdown-toggle jn-button" data-bs-toggle="dropdown" aria-expanded="false"
-          aria-label="Language Selection">
+        <button type="button" class="btn btn-sm dropdown-toggle jn-button" data-bs-toggle="dropdown"
+          aria-expanded="false" aria-label="Language Selection">
           <i class="bi bi-translate"></i>
         </button>
         <ul class="dropdown-menu">
@@ -54,26 +54,26 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
       <div class="navbar-nav ">
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#IPInfo"
-          @click="$trackEvent('Nav', 'NavClick', 'IPInfo')"> {{ $t('nav.IPinfo') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'IPInfo')"> {{ $t('nav.IPinfo') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"
-          @click="$trackEvent('Nav', 'NavClick', 'Connectivity')"> {{
-            $t('nav.Connectivity') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'Connectivity')"> {{
+      $t('nav.Connectivity') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"
-          @click="$trackEvent('Nav', 'NavClick', 'WebRTC')"> {{ $t('nav.WebRTC') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'WebRTC')"> {{ $t('nav.WebRTC') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
-          @click="$trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
-            $t('nav.DNSLeakTest') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
+      $t('nav.DNSLeakTest') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#RuleTest"
-          @click="$trackEvent('Nav', 'NavClick', 'RuleTest')"> {{ 
-          $t('nav.RuleTest') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'RuleTest')"> {{
+      $t('nav.RuleTest') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
-          @click="$trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
           }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#PingTest"
-          @click="$trackEvent('Nav', 'NavClick', 'PingTest')"> {{ $t('nav.PingTest')
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'PingTest')"> {{ $t('nav.PingTest')
           }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#MTRTest"
-          @click="$trackEvent('Nav', 'NavClick', 'MTRTest')"> {{ $t('nav.MTRTest') }}</a>
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'MTRTest')"> {{ $t('nav.MTRTest') }}</a>
       </div>
     </div>
   </nav>
@@ -109,6 +109,11 @@ export default {
       this.updateBodyClass();
       this.PWAColor();
       this.$trackEvent('Nav', 'ToggleClick', 'DarkMode');
+    },
+
+    // 收起导航栏
+    collapseNav() {
+      document.querySelector('#navbarNavAltMarkup').classList.remove('show');
     },
 
     // 更新 body class

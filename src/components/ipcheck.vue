@@ -20,8 +20,8 @@
             @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
 
           <label class="form-check-label" for="toggleMapSwitch">
-            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true" role="button"
-              v-tooltip="$t('Tooltips.ToggleMaps')"></i>
+            <i :class="['bi', isEnvBingMapKey ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"
+              aria-label="Toggle Map Display" v-tooltip="$t('Tooltips.ToggleMaps')"></i>
           </label>
         </div>
 
@@ -91,7 +91,7 @@
                 <i v-if="isValidIP(card.ip)"
                   :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
                   @click="copyToClipboard(card.ip, card.id)" role="button"
-                  v-tooltip="{ title: $t('Tooltips.CopyIP'), placement: 'right' }"></i>
+                  v-tooltip="{ title: $t('Tooltips.CopyIP'), placement: 'right' }" :aria-label="'Copy' + card.ip"></i>
               </span>
               <span v-else class="placeholder col-10"></span>
             </div>

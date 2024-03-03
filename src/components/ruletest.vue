@@ -40,7 +40,7 @@
                 }" :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <i class="bi"
                                     :class="[test.ip === $t('ruletest.StatusWait') || test.ip === $t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                                {{ $t('ruletest.country') }}: <strong>{{ test.country_code }}&nbsp;</strong>
+                                {{ $t('ruletest.Country') }}: <strong>{{ test.country_code }}&nbsp;</strong>
                                 <span v-if="test.country_code !== $t('ruletest.StatusWait')"
                                     :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
