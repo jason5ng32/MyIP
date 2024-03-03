@@ -30,6 +30,7 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
 * 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
 * 🚀 **Speed Test**：Test your network speed with edge networks.
+* 🚏 **Proxy Rule Testing**: Test the rule settings of proxy software to ensure their correctness.
 * 🌐 **Global Latency Test**: Performe lantency tests on servers located in different regions around the world.
 * 📡 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.

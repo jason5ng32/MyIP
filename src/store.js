@@ -23,7 +23,8 @@ const store = createStore({
       state.isDarkMode = !state.isDarkMode;
     },
     updateGlobalIpDataCards(state, payload) {
-      state.Global_ipDataCards = [...payload];
+      const uniqueIPs = new Set([...state.Global_ipDataCards, ...payload]);
+      state.Global_ipDataCards = Array.from(uniqueIPs);
     },
     updateGlobalSiteValidate(state, payload) {
       state.siteValidate = payload;

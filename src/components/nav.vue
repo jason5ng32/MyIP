@@ -63,6 +63,9 @@
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
           @click="$trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
             $t('nav.DNSLeakTest') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#RuleTest"
+          @click="$trackEvent('Nav', 'NavClick', 'RuleTest')"> {{ 
+          $t('nav.RuleTest') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
           @click="$trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
           }}</a>

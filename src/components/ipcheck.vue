@@ -10,8 +10,8 @@
           <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
             :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');"
             aria-label="Toggle Card Display">
-          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i class="bi bi-list-columns-reverse"
-              aria-hidden="true"></i></label>
+          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
+              class="bi bi-list-columns-reverse" aria-hidden="true"></i></label>
         </div>
 
         <div>
@@ -62,25 +62,26 @@
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
           <div class="card jn-card" :class="{
-            'dark-mode dark-mode-border': isDarkMode,
-            'jn-ip-card1': !isMobile && ipGeoSource === 0,
-            'jn-ip-card2': !isMobile && ipGeoSource !== 0,
-          }">
+      'dark-mode dark-mode-border': isDarkMode,
+      'jn-ip-card1': !isMobile && ipGeoSource === 0,
+      'jn-ip-card2': !isMobile && ipGeoSource !== 0,
+    }">
             <div class="card-header jn-ip-title jn-link1"
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
               <span>
                 <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
                 {{ $t('ipInfos.Source') }}: {{ card.source }}</span>
-              <button @click="refreshCard(card)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+              <button @click="refreshCard(card)"
+                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
                 :aria-label="'Refresh' + card.source" v-tooltip="$t('Tooltips.RefreshIPCard')">
                 <i class="bi bi-arrow-clockwise"></i></button>
             </div>
             <div class="p-3 placeholder-glow " :class="{
-              'dark-mode-title': isDarkMode,
-              'jn-link2-dark': isDarkMode,
-              'bg-light': !isDarkMode,
-              'jn-link2': !isDarkMode
-            }">
+      'dark-mode-title': isDarkMode,
+      'jn-link2-dark': isDarkMode,
+      'bg-light': !isDarkMode,
+      'jn-link2': !isDarkMode
+    }">
               <span class="jn-text col-auto">
                 <i class="bi bi-pc-display-horizontal"></i>&nbsp;
               </span>
@@ -97,7 +98,7 @@
 
 
             <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
-              " class="card-body" :id="'IPInfo-' + (index + 1)">
+      " class="card-body" :id="'IPInfo-' + (index + 1)">
               <ul class="list-group list-group-flush" v-if="card.country_name">
 
                 <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
@@ -200,7 +201,7 @@
                   <div class="p-3">
                     <span v-if="asnInfos[card.asn]">
                       <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ $t('ipInfos.ASNInfo.note')
-                      }}</span>
+                        }}</span>
                       <br />
                       <template v-for="item in asnInfoItems">
                         <span class="fw-light">
@@ -409,6 +410,7 @@ export default {
       ipDataCache: new Map(),
       copiedStatus: {},
       bingMapLanguage: this.$Lang,
+      IPArray: [],
     };
   },
 
@@ -468,6 +470,7 @@ export default {
         let ip = data.ip;
         this.ipDataCards[0].source = "TaoBao";
         this.fetchIPDetails(0, ip);
+        this.IPArray = [...this.IPArray, ip];
 
         document.head.removeChild(script);
         delete window.ipCallback;
@@ -483,6 +486,7 @@ export default {
         const response = await fetch("https://myip.ipip.net/json");
         const data = await response.json();
         const ip = data.data.ip;
+        this.IPArray = [...this.IPArray, ip];
         this.ipDataCards[0].source = "IPIP.net";
         this.fetchIPDetails(0, ip);
       } catch (error) {
@@ -520,6 +524,7 @@ export default {
 
         const data = await response.json();
         const ip = data.remote_addr;
+        this.IPArray = [...this.IPArray, ip];
         this.ipDataCards[1].source = "Upai";
         this.fetchIPDetails(1, ip);
       } catch (error) {
@@ -540,6 +545,7 @@ export default {
         const data = await response.json();
         const fullIp = data.ip;
         const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
+        this.IPArray = [...this.IPArray, ip];
         this.ipDataCards[1].source = "IPCheck.ing";
         this.fetchIPDetails(1, ip);
       } catch (error) {
@@ -557,6 +563,7 @@ export default {
         const ipLine = lines.find((line) => line.startsWith("ip="));
         if (ipLine) {
           const ip = ipLine.split("=")[1];
+          this.IPArray = [...this.IPArray, ip];
           this.fetchIPDetails(2, ip);
         }
       } catch (error) {
@@ -575,6 +582,7 @@ export default {
         const ipLine = lines.find((line) => line.startsWith("ip="));
         if (ipLine) {
           const ip = ipLine.split("=")[1];
+          this.IPArray = [...this.IPArray, ip];
           this.fetchIPDetails(3, ip);
         }
       } catch (error) {
@@ -592,6 +600,7 @@ export default {
         }
 
         const data = await response.json();
+        this.IPArray = [...this.IPArray, data.ip];
         this.fetchIPDetails(4, data.ip);
       } catch (error) {
         console.error("Error fetching IPv4 address from ipify:", error);
@@ -608,6 +617,7 @@ export default {
         }
 
         const data = await response.json();
+        this.IPArray = [...this.IPArray, data.ip];
         this.fetchIPDetails(5, data.ip);
       } catch (error) {
         console.error("Error fetching IPv6 address from ipify:", error);
@@ -634,7 +644,6 @@ export default {
 
       // 检查是否有正在进行的查询，如果有，则等待该查询完成
       if (this.pendingIPDetailsRequests.has(ip)) {
-        console.log("Waiting for pending IP details request to complete for IP: " + ip +" from source: " + this.sources[sourceID].text  );
         await this.pendingIPDetailsRequests.get(ip);
         const cachedData = this.ipDataCache.get(ip);
         if (cachedData) {
@@ -925,9 +934,9 @@ export default {
     isCardsCollapsed(newVal) {
       localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
     },
-    ipDataCards: {
-      handler(newValue) {
-        this.$store.commit('updateGlobalIpDataCards', newValue);
+    IPArray: {
+      handler() {
+        this.$store.commit('updateGlobalIpDataCards', this.IPArray);
       },
       deep: true,
     },
