@@ -40,7 +40,7 @@
                 }" :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <i class="bi"
                                     :class="[test.ip === $t('ruletest.StatusWait') || test.ip === $t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                                {{ $t('ruletest.Country') }}: <strong>{{ test.country_code }}&nbsp;</strong>
+                                {{ $t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
                                 <span v-if="test.country_code !== $t('ruletest.StatusWait')"
                                     :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
@@ -55,6 +55,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import countryLookup from 'country-code-lookup';
 
 
 export default {
@@ -82,6 +83,7 @@ export default {
                     url: 'ptest-1.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 2,
@@ -89,6 +91,7 @@ export default {
                     url: 'ptest-2.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 3,
@@ -96,6 +99,7 @@ export default {
                     url: 'ptest-3.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 4,
@@ -103,6 +107,7 @@ export default {
                     url: 'ptest-4.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 5,
@@ -110,6 +115,7 @@ export default {
                     url: 'ptest-5.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 6,
@@ -117,6 +123,7 @@ export default {
                     url: 'ptest-6.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 7,
@@ -124,6 +131,7 @@ export default {
                     url: 'ptest-7.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
                 {
                     id: 8,
@@ -131,6 +139,7 @@ export default {
                     url: 'ptest-8.ipcheck.ing',
                     ip: this.$t('ruletest.StatusWait'),
                     country_code: this.$t('ruletest.StatusWait'),
+                    country: this.$t('ruletest.StatusWait'),
                 },
             ],
             IPArray: [],
@@ -147,7 +156,6 @@ export default {
                 const lines = data.split("\n");
                 const ipLine = lines.find((line) => line.startsWith("ip="));
                 const countryLine = lines.find((line) => line.startsWith("loc="));
-                const warpLine = lines.find((line) => line.startsWith("warp="));
                 if (ipLine) {
                     const ip = ipLine.split("=")[1];
                     this.ruleTests[id].ip = ip;
@@ -156,10 +164,12 @@ export default {
                 if (countryLine) {
                     const country = countryLine.split("=")[1];
                     this.ruleTests[id].country_code = country;
+                    this.ruleTests[id].country = countryLookup.byIso(country).country;
                 }
             } catch (error) {
                 this.ruleTests[id].ip = this.$t('ruletest.StatusError');
                 this.ruleTests[id].country_code = this.$t('ruletest.StatusError');
+                this.ruleTests[id].country = this.$t('ruletest.StatusError');
                 console.error("Error fetching Data:", error);
             }
         },

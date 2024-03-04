@@ -29,14 +29,14 @@
             </p>
 
             <div class="alert" :class="{
-        'alert-info': leak.geo === $t('dnsleaktest.StatusWait'),
-        'alert-success': leak.geo !== $t('dnsleaktest.StatusWait'),
+        'alert-info': leak.country === $t('dnsleaktest.StatusWait'),
+        'alert-success': leak.country !== $t('dnsleaktest.StatusWait'),
       }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
                 :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-              {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.geo }}&nbsp;</strong>
-              <span v-if="leak.geo !== $t('dnsleaktest.StatusWait') && leak.geo !== $t('dnsleaktest.StatusError')"
-                :class="'jn-fl fi fi-' + leak.geo.toLowerCase()"></span>
+              {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.country }}&nbsp;</strong>
+              <span v-if="leak.country !== $t('dnsleaktest.StatusWait') && leak.country !== $t('dnsleaktest.StatusError')"
+                :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
             </div>
           </div>
         </div>
@@ -71,25 +71,29 @@ export default {
         {
           id: "ipapi1",
           name: this.$t('dnsleaktest.Name'),
-          geo: this.$t('dnsleaktest.StatusWait'),
+          country_code: this.$t('dnsleaktest.StatusWait'),
+          country: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "ipapi2",
           name: this.$t('dnsleaktest.Name'),
-          geo: this.$t('dnsleaktest.StatusWait'),
+          country_code: this.$t('dnsleaktest.StatusWait'),
+          country: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "sfshark1",
           name: this.$t('dnsleaktest.Name'),
-          geo: this.$t('dnsleaktest.StatusWait'),
+          country_code: this.$t('dnsleaktest.StatusWait'),
+          country: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
           id: "sfshark2",
           name: this.$t('dnsleaktest.Name'),
-          geo: this.$t('dnsleaktest.StatusWait'),
+          country_code: this.$t('dnsleaktest.StatusWait'),
+          country: this.$t('dnsleaktest.StatusWait'),
           ip: this.$t('dnsleaktest.StatusWait'),
         },
       ],
@@ -130,7 +134,8 @@ export default {
         .then((data) => {
           if (data.dns && "geo" in data.dns && "ip" in data.dns) {
             const geoSplit = data.dns.geo.split(" - ");
-            this.leakTest[index].geo = countryLookup.byCountry(geoSplit[0]).iso2;
+            this.leakTest[index].country = geoSplit[0];
+            this.leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
             this.leakTest[index].ip = data.dns.ip;
           } else {
             console.error("Unexpected data structure:", data);
@@ -138,7 +143,8 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching leak test data:", error);
-          this.leakTest[index].geo = this.$t('dnsleaktest.StatusError');
+          this.leakTest[index].country = this.$t('dnsleaktest.StatusError');
+          this.leakTest[index].country_code = this.$t('dnsleaktest.StatusError');
           this.leakTest[index].ip = this.$t('dnsleaktest.StatusError');
         });
     },
@@ -160,7 +166,8 @@ export default {
           const keyEntry = data[getKey];
 
           if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
-            this.leakTest[index].geo = keyEntry.CountryCode;
+            this.leakTest[index].country_code = keyEntry.CountryCode;
+            this.leakTest[index].country = keyEntry.Country;
             this.leakTest[index].ip = keyEntry.IP;
           } else {
             console.error("Unexpected data structure:", data);
