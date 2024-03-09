@@ -195,7 +195,7 @@ export default {
             }
             // 创建一个 script 元素
             const script = document.createElement('script');
-            script.src = `https://www.recaptcha.net/recaptcha/api.js?render=${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`;
+            script.src = `https://www.google.com/recaptcha/api.js?render=${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`;
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
