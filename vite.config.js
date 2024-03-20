@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import { CodeInspectorPlugin } from 'code-inspector-plugin';
 
 dotenv.config();
 
@@ -44,6 +45,12 @@ export default defineConfig({
             type: 'image/png',
           },
         ],
+      },
+    }),
+    CodeInspectorPlugin({
+      bundler: 'vite',
+      behavior: {
+        copy: '{file}',
       },
     }),
   ],
