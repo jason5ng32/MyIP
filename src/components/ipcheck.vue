@@ -459,9 +459,9 @@ export default {
 
     // 从中国来源获取 IP 地址
     getIPfromCNSource() {
-      this.getIPFromIPIP().catch(() => {
+      // this.getIPFromIPIP().catch(() => {
         this.getIPFromTaobao();
-      });
+      // });
     },
 
     // 从淘宝获取 IP 地址
