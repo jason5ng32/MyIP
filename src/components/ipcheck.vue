@@ -313,8 +313,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "CN Source",
           showASNInfo: false,
@@ -330,8 +330,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "Special",
           showASNInfo: false,
@@ -347,8 +347,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "Cloudflare IPv4",
           showASNInfo: false,
@@ -364,8 +364,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "Cloudflare IPv6",
           showASNInfo: false,
@@ -381,8 +381,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "IPify IPv4",
           showASNInfo: false,
@@ -398,8 +398,8 @@ export default {
           isp: "",
           asn: "",
           asnlink: "",
-          mapUrl: '/defaultMap.jpg',
-          mapUrl_dark: '/defaultMap_dark.jpg',
+          mapUrl: '/defaultMap.webp',
+          mapUrl_dark: '/defaultMap_dark.webp',
           showMap: false,
           source: "IPify IPv6",
           showASNInfo: false,
@@ -876,8 +876,8 @@ export default {
       card.longitude = "";
       card.asn = "";
       card.isp = "";
-      card.mapUrl = '/defaultMap.jpg';
-      card.mapUrl_dark = '/defaultMap_dark.jpg';
+      card.mapUrl = '/defaultMap.webp';
+      card.mapUrl_dark = '/defaultMap_dark.webp';
       card.showASNInfo = false;
     },
 

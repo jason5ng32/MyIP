@@ -259,8 +259,8 @@ export default {
           card.longitude = "-122.078514";
           card.isp = "Google LLC";
           card.asn = "AS15169";
-          card.mapUrl = '/defaultMap.jpg';
-          card.mapUrl_dark = '/defaultMap_dark.jpg';
+          card.mapUrl = '/defaultMap.webp';
+          card.mapUrl_dark = '/defaultMap_dark.webp';
           card.showASNInfo = false;
         });
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
