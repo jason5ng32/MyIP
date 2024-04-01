@@ -35,14 +35,14 @@ export default defineConfig({
         description: 'All in one IP Toolbox',
         icons: [
           {
-            src: '/logo-192.png',
+            src: '/logo-192.webp',
             sizes: '192x192',
-            type: 'image/png',
+            type: 'image/webp',
           },
           {
-            src: '/logo-512.png',
+            src: '/logo-512.webp',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/webp',
           },
         ],
       },
