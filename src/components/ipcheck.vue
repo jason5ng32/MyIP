@@ -60,7 +60,7 @@
     <div class="jn-card-deck">
       <div class="row">
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
-          :class="{ 'jn-opacity': !card.asn, 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
+          :class="{ 'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error'), 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
           <div class="card jn-card" :class="{
       'dark-mode dark-mode-border': isDarkMode,
       'jn-ip-card1': !isMobile && ipGeoSource === 0,
@@ -85,7 +85,7 @@
               <span class="jn-text col-auto">
                 <i class="bi bi-pc-display-horizontal"></i>&nbsp;
               </span>
-              <span v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))"
+              <span v-if="card.ip"
                 class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
                 {{ card.ip }}&nbsp;
                 <i v-if="isValidIP(card.ip)"
