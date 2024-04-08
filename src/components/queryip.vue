@@ -1,8 +1,8 @@
 <template>
     <!-- Search BTN -->
-    <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;" data-bs-toggle="modal"
-        aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP" v-tooltip="$t('Tooltips.QueryIP')"><i
-            class="bi bi-search"></i></button>
+    <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"
+        data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP"
+        v-tooltip="$t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
@@ -16,8 +16,8 @@
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-                        :placeholder="$t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery" name="inputIP"
-                        id="inputIP">
+                        :placeholder="$t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
+                        name="inputIP" id="inputIP">
                     <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
                     <div v-if="modalQueryResult" class="mt-2">
                         <div class="card-body">
@@ -31,22 +31,23 @@
                                             :class="'jn-fl fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
                                     </span>
                                 </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region')
+                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.region }}
                                     </span>
                                 </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{ $t('ipInfos.City')
+                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
+                                        $t('ipInfos.City')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
                                 </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ $t('ipInfos.ISP')
+                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ $t('ipInfos.ISP')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.isp }}
@@ -55,8 +56,8 @@
 
 
                                 <li v-if="ipGeoSource === 0 && modalQueryResult.type !== $t('ipInfos.proxyDetect.type.unknownType')"
-                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto">
+                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto">
                                         <i class="bi bi-reception-4"></i> {{ $t('ipInfos.type')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
@@ -68,8 +69,8 @@
                                 </li>
 
                                 <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== $t('ipInfos.proxyDetect.unknownProxyType')"
-                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }"><span
-                                        class="jn-text col-auto">
+                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto">
                                         <i class="bi bi-shield-fill-check"></i>
                                         {{ $t('ipInfos.isProxy') }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
@@ -86,7 +87,8 @@
                                     <span class="jn-text col-auto">
                                         <i class="bi bi-buildings"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
-                                        <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank"
+                                        <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink"
+                                            target="_blank"
                                             class="link-underline-opacity-50 link-underline-opacity-100-hover"
                                             :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ modalQueryResult.asn
                                             }}</a>
@@ -102,8 +104,8 @@
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
                         @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false || isChecking === 'running'
                             ">{{
-        $t('ipcheck.Button') }}</button>
-                    <span v-if="reCaptchaEnabled" class="text-secondary" style="font-size:10px">
+                                $t('ipcheck.Button') }}</button>
+                    <span v-if="configs.recaptcha" class="text-secondary" style="font-size:10px">
                         This site is protected by reCAPTCHA and the Google
                         <a href="https://policies.google.com/privacy">Privacy Policy</a> and
                         <a href="https://policies.google.com/terms">Terms of Service</a> apply.
@@ -130,11 +132,13 @@ export default {
         const isDarkMode = computed(() => store.state.isDarkMode);
         const isMobile = computed(() => store.state.isMobile);
         const ipGeoSource = computed(() => store.state.ipGeoSource);
+        const configs = computed(() => store.state.configs);
 
         return {
             isDarkMode,
             isMobile,
-            ipGeoSource
+            ipGeoSource,
+            configs,
         };
     },
 
@@ -144,7 +148,6 @@ export default {
             modalQueryResult: null,
             modalQueryError: "",
             reCaptchaStatus: true,
-            reCaptchaEnabled: false,
             reCaptchaLoaded: false,
             isChecking: "idle",
         }
@@ -159,7 +162,7 @@ export default {
                 this.modalQueryResult = null;
                 this.isChecking = "running";
                 // 如果 reCAPTCHA 已启用，验证令牌
-                switch (this.reCaptchaEnabled) {
+                switch (this.configs.recaptcha) {
                     case true:
                         // 执行 reCAPTCHA 验证
                         grecaptcha.ready(async () => {
@@ -190,7 +193,7 @@ export default {
 
         // 加载 reCAPTCHA 脚本
         loadRecaptchaScript() {
-            if (this.reCaptchaEnabled === false || this.reCaptchaLoaded === true) {
+            if (this.configs.recaptcha === false || this.reCaptchaLoaded === true) {
                 return;
             }
             // 创建一个 script 元素
@@ -214,24 +217,10 @@ export default {
             return data.success;
         },
 
-        // 验证后端是否支持 reCAPTCHA
-        async checkRecaptchaSupport() {
-            const response = await fetch(`/api/validate-recaptcha-key`, {
-                method: 'GET',
-            });
-            const data = await response.json();
-            if (data.isValid) {
-                this.reCaptchaEnabled = true;
-            } else {
-                this.reCaptchaEnabled = false;
-                this.reCaptchaLoaded = true;
-            }
-        },
-
         // 打开查询 IP 的模态框
         openQueryIP() {
             // 如果 reCAPTCHA 脚本尚未加载，加载它
-            if (!window.grecaptcha && this.reCaptchaEnabled) {
+            if (!window.grecaptcha && this.configs.recaptcha) {
                 this.loadRecaptchaScript();
             }
             this.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
@@ -360,9 +349,6 @@ export default {
                 }
             }
         },
-    },
-    mounted() {
-        this.checkRecaptchaSupport();
     },
 }
 </script>
