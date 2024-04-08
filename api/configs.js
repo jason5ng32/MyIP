@@ -17,12 +17,15 @@ export default (req, res) => {
         return res.status(403).json({ error: 'What are you doing?' });
     }
 
+    const hostname = referer ? new URL(referer).hostname : '';
+    const originalSite = hostname === 'ipcheck.ing' || hostname === 'www.ipcheck.ing';
+
     const envConfigs = {
         bingMap: process.env.BING_MAP_API_KEY,
         ipInfo: process.env.IPINFO_API_TOKEN,
         ipChecking: process.env.IPChecking_API_KEY,
         keyCDN: process.env.KEYCDN_USER_AGENT,
-        originalSite: req.headers.referer && (new URL(req.headers.referer).hostname === 'ipcheck.ing' || new URL(req.headers.referer).hostname === 'www.ipcheck.ing'),
+        originalSite,
         cloudFlare: process.env.CLOUDFLARE_API,
         recaptcha: process.env.VITE_RECAPTCHA_SITE_KEY && process.env.RECAPTCHA_SECRET_KEY
     };
