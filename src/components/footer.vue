@@ -88,11 +88,12 @@
 
             <div v-for="(item, idx) in version.content" :key="idx" class="pb-1 ">
               <span v-if="item.type === 'add'" class="badge  rounded-pill bg-success fw-normal ">{{ $t('changelog.add')
-              }}</span>
+                }}</span>
               <span v-else-if="item.type === 'improve'" class="badge rounded-pill bg-info fw-normal">{{
                 $t('changelog.improve') }}</span>
-              <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{ $t('changelog.fix')
-              }}</span>
+              <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{
+                $t('changelog.fix')
+                }}</span>
               <span class="mx-2">{{ item.change }}</span>
             </div>
           </div>
@@ -100,7 +101,7 @@
       </div>
     </div>
 
-    <div id="copyright" v-if="!siteValidate">
+    <div id="copyright" v-if="!configs.originalSite">
       <p class="text-center fs-6 fw-light" style="opacity: 0.5;">
         {{ $t('page.copyRightName') }} <a :href="$t('page.copyRightLink')" class="link-underline-light" target="_blank"
           :class="[isDarkMode ? 'dark-mode link-light' : 'link-dark']">{{ $t('page.copyRightLinkName') }}</a>
@@ -122,19 +123,12 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-    const siteVal = computed(() => store.state.siteValidate);
-    const siteValidate = ref(true);
-
-    // 监控 siteVal 的变化
-    watch(siteVal, (newVal) => {
-      siteValidate.value = newVal;
-    });
-
+    const configs = computed(() => store.state.configs);
 
     return {
       isDarkMode,
       isMobile,
-      siteValidate,
+      configs,
     };
   },
 

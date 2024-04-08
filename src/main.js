@@ -106,4 +106,10 @@ app.directive('tooltip', {
     }
 })
 
-app.mount('#app');
+// 获取环境变量
+store.dispatch('fetchConfigs').then(() => {
+    app.mount('#app');
+}).catch(error => {
+    console.error("Failed to fetch configs:", error);
+    app.mount('#app'); // 即使配置获取失败，也继续挂载应用
+});
