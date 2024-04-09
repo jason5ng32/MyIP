@@ -72,8 +72,16 @@ const dnsResolver = async (req, res) => {
 
     const { hostname } = req.query;
 
+    if (typeof hostname !== 'string') {
+        return res.status(400).send({ error: 'Hostname parameter must be a string' });
+    }
+
     if (!hostname) {
         return res.status(400).send({ error: 'Missing hostname parameter' });
+    }
+
+    if (!hostname.includes('.')) {
+        return res.status(400).send({ error: 'Invalid hostname' });
     }
 
     const dnsPromises = Object.entries(dnsServers).map(([name, ip]) => resolveDns(hostname, name, ip));
