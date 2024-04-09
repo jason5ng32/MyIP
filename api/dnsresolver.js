@@ -76,6 +76,10 @@ const dnsResolver = async (req, res) => {
         return res.status(400).send({ error: 'Missing hostname parameter' });
     }
 
+    if (!hostname.includes('.')) {
+        return res.status(400).send({ error: 'Invalid hostname' });
+    }
+
     const dnsPromises = Object.entries(dnsServers).map(([name, ip]) => resolveDns(hostname, name, ip));
     const dohPromises = Object.entries(dohServers).map(([name, url]) => resolveDoh(hostname, name, url));
 
