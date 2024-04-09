@@ -11,6 +11,7 @@ import ipsbHandler from './api/ipsb.js';
 import cfHander from './api/cfradar.js';
 import recaptchaHandler from './api/recaptcha.js';
 import validateConfigs from './api/configs.js';
+import dnsResolver from './api/dnsresolver.js';
 
 dotenv.config();
 
@@ -26,6 +27,9 @@ app.get('/api/ipchecking', ipCheckingHandler);
 app.get('/api/ipsb', ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/recaptcha', recaptchaHandler);
+
+// DNS Resolver
+app.get('/api/dnsresolver', dnsResolver);
 
 // 使用查询参数处理所有配置请求
 app.get('/api/configs', validateConfigs);
