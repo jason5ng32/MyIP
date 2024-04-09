@@ -13,8 +13,8 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/pingtest')" role="button">
-                        <h3>🌐 {{ $t('pingtest.Title') }}</h3>
-                        <p>{{ $t('advancedtools.PingTestNote') }}</p>
+                        <h3 :class="{ 'mobile-h3': isMobile }">🌐 {{ $t('pingtest.Title') }}</h3>
+                        <p class="opacity-75">{{ $t('advancedtools.PingTestNote') }}</p>
 
                         <div class="go-corner">
                             <div class="go-arrow">
@@ -28,8 +28,8 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/mtrtest')" role="button">
-                        <h3>📡 {{ $t('mtrtest.Title') }}</h3>
-                        <p>{{ $t('advancedtools.MTRTestNote') }}</p>
+                        <h3 :class="{ 'mobile-h3': isMobile }">📡 {{ $t('mtrtest.Title') }}</h3>
+                        <p class="opacity-75">{{ $t('advancedtools.MTRTestNote') }}</p>
 
                         <div class="go-corner">
                             <div class="go-arrow">
@@ -43,8 +43,8 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/ruletest')" role="button">
-                        <h3>🚏 {{ $t('ruletest.Title') }}</h3>
-                        <p>{{ $t('advancedtools.RuleTestNote') }}</p>
+                        <h3 :class="{ 'mobile-h3': isMobile }">🚏 {{ $t('ruletest.Title') }}</h3>
+                        <p class="opacity-75">{{ $t('advancedtools.RuleTestNote') }}</p>
 
                         <div class="go-corner">
                             <div class="go-arrow">
@@ -58,8 +58,8 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/dnsresolver')" role="button">
-                        <h3>🔦 {{ $t('dnsresolver.Title') }}</h3>
-                        <p>{{ $t('advancedtools.DNSResolverNote') }}</p>
+                        <h3 :class="{ 'mobile-h3': isMobile }">🔦 {{ $t('dnsresolver.Title') }}</h3>
+                        <p class="opacity-75">{{ $t('advancedtools.DNSResolverNote') }}</p>
 
                         <div class="go-corner">
                             <div class="go-arrow">

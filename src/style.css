@@ -218,6 +218,10 @@ footer {
   font-size: 1.25rem;
 }
 
+.mobile-h3 {
+  font-size: 1.25rem;
+}
+
 [v-cloak] {
   display: none;
 }
