@@ -63,17 +63,11 @@
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
       $t('nav.DNSLeakTest') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#RuleTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'RuleTest')"> {{
-      $t('nav.RuleTest') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
           }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#PingTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'PingTest')"> {{ $t('nav.PingTest')
-          }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#MTRTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'MTRTest')"> {{ $t('nav.MTRTest') }}</a>
+        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#AdvancedTools"
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
       </div>
     </div>
   </nav>

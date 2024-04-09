@@ -6,6 +6,7 @@ import store from './store';
 import Analytics from 'analytics';
 import googleAnalytics from '@analytics/google-analytics';
 import { Tooltip } from 'bootstrap';
+import router from './router';
 
 const app = createApp(App);
 
@@ -67,6 +68,7 @@ analytics.page();
 
 app.use(store);
 app.use(i18n);
+app.use(router);
 app.config.globalProperties.$Lang = i18n.global.locale;
 app.config.globalProperties.$analytics = analytics;
 

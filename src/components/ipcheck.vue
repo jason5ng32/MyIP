@@ -441,9 +441,9 @@ export default {
 
     // 从中国来源获取 IP 地址
     getIPfromCNSource() {
-      this.getIPFromQQ().catch(() => {
-        this.getIPFromIPIP().catch(() => {
-          this.getIPFromTaobao();
+      this.getIPFromIPIP().catch(() => {
+        this.getIPFromTaobao().catch(() => {
+          this.getIPFromQQ();
         })
       });
     },
@@ -577,7 +577,7 @@ export default {
         this.fetchIPDetails(1, ip);
       } catch (error) {
         console.error("Error fetching IP from Upai:", error);
-        this.ipDataCards[1].ip = this.$t('ipInfos.IPv4Error');
+        this.getIPFromCloudflare_CN(); // 故障转移
       }
     },
 
@@ -598,7 +598,26 @@ export default {
         this.fetchIPDetails(1, ip);
       } catch (error) {
         console.error("Error fetching IP from IPCheck.ing:", error);
-        this.getIPFromUpai(); // 如果发生错误，调用 getIPFromUpai
+        this.getIPFromCloudflare_CN(); // 故障转移
+      }
+    },
+
+    // 从 Cloudflare 中国获取 IP 地址
+    async getIPFromCloudflare_CN() {
+      try {
+        const response = await fetch("https://cf-ns.com/cdn-cgi/trace");
+        const data = await response.text();
+        const lines = data.split("\n");
+        const ipLine = lines.find((line) => line.startsWith("ip="));
+        if (ipLine) {
+          const ip = ipLine.split("=")[1];
+          this.IPArray = [...this.IPArray, ip];
+          this.ipDataCards[1].source = "CF-CN";
+          this.fetchIPDetails(1, ip);
+        }
+      } catch (error) {
+        console.error("Error fetching IP from Cloudflare:", error);
+        this.ipDataCards[1].ip = this.$t('ipInfos.IPv4Error');
       }
     },
 
@@ -911,6 +930,10 @@ export default {
         case "QQ.com":
           this.getIPFromQQ(card);
           this.$trackEvent('IPCheck', 'RefreshClick', 'QQ.com');
+          break;
+        case "CF-CN":
+          this.getIPFromCloudflare_CN(card);
+          this.$trackEvent('IPCheck', 'RefreshClick', 'CF-CN');
           break;
         default:
           console.error("Undefind Source:", card.source);

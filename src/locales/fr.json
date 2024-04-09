@@ -9,7 +9,27 @@
         "SpeedTest": "Test de vitesse",
         "PingTest": "Latence mondiale",
         "MTRTest": "Test MTR",
-        "RuleTest": "Test de règles"
+        "RuleTest": "Test de règles",
+        "AdvancedTools": "Outils avancés"
+    },
+    "advancedtools": {
+        "Title": "Outils avancés",
+        "Note": "Certains outils sont utilisés relativement rarement, mais sont très utiles lors des tests de réseaux.",
+        "PingTestNote": "Test de la valeur Ping mondiale",
+        "MTRTestNote": "Test de route MTR mondial",
+        "DNSResolverNote": "Résolution DNS multi-canal en temps réel",
+        "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy"
+    },
+    "dnsresolver": {
+        "Title": "Résolution DNS",
+        "Note": "Dans certaines régions, pour des raisons politiques ou commerciales, certains opérateurs peuvent contaminer certains noms de domaine, entraînant des résultats incorrects lorsqu'ils sont accédés directement. L'utilisation de vérifications de résolution DNS vous aidera à inspecter les résultats de résolution de noms de domaine auprès de fournisseurs DNS renommés dans le monde entier. Parmi les tests DNS intégrés, certains fournisseurs sont originaires de Chine, dont les résultats de résolution DNS peuvent être contaminés. Veuillez faire preuve de discernement.",
+        "Note2": "Veuillez entrer une URL ou un nom de domaine pour commencer la résolution :",
+        "Placeholder": "URL ou Nom de Domaine",
+        "Run": "Exécuter",
+        "invalidURL": "URL ou Nom de Domaine invalide",
+        "fetchError": "Impossible de récupérer les résultats de résolution",
+        "Provider": "Fournisseur DNS",
+        "Result": "Résultat de la Résolution"
     },
     "ruletest": {
         "Title": "Test de règles",
@@ -485,6 +505,24 @@
                     {
                         "type": "improve",
                         "change": "Quelques améliorations"
+                    }
+                ]
+            },
+            {
+                "version": "v3.6",
+                "date": "Mar 10, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la fonction de résolution DNS"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la structure de la page d'accueil, les fonctionnalités avancées sont désormais repliables"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la logique du programme"
                     }
                 ]
             }

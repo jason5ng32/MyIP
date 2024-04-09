@@ -9,7 +9,27 @@
     "SpeedTest": "网速测试",
     "PingTest": "全球延迟",
     "MTRTest": "MTR 测试",
-    "RuleTest": "分流测试"
+    "RuleTest": "分流测试",
+    "AdvancedTools": "高级工具"
+  },
+  "advancedtools": {
+    "Title": "高级工具",
+    "Note": "一些使用频率相对较低，但在进行网络测试时，非常有用的工具。",
+    "PingTestNote": "全球的 Ping 值测试",
+    "MTRTestNote": "全球的 MTR 路由测试",
+    "DNSResolverNote": "实时多渠道 DNS 解析",
+    "RuleTestNote": "检查代理软件的规则设置"
+  },
+  "dnsresolver": {
+    "Title": "DNS 解析",
+    "Note": "在一些地区，某些运营商可能会因为政治原因或者商业原因，对一些域名进行污染，以至于直接进行访问的时候，无法返回正确的结果。使用 DNS 解析检查，将帮助你从全球各个知名的 DNS 厂商里检查域名的解析结果。在检测内置的 DNS 中，有一部分服务商来自中国，其 DNS 解析的结果可能会受到污染。请注意鉴别。",
+    "Note2": "请输入 URL 或域名，开始进行解析：",
+    "Placeholder": "URL 或域名",
+    "Run": "运行",
+    "invalidURL": "无效的 URL 或域名",
+    "fetchError": "无法获取解析结果",
+    "Provider": "DNS 服务商",
+    "Result": "解析结果"
   },
   "ruletest": {
     "Title": "分流测试",
@@ -485,6 +505,24 @@
           {
             "type": "improve",
             "change": "优化了部分逻辑"
+          }
+        ]
+      },
+      {
+        "version": "v3.6",
+        "date": "Mar 10, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加 DNS 解析功能"
+          },
+          {
+            "type": "improve",
+            "change": "优化主页结构，高级功能折叠展示"
+          },
+          {
+            "type": "improve",
+            "change": "优化了程序逻辑"
           }
         ]
       }
