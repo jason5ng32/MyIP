@@ -19,16 +19,14 @@
                 <label for="pingIP" class="col-form-label">{{ $t('pingtest.Note3') }}</label>
               </div>
               <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <div class="row justify-content-between">
-                  <div class="col-auto">
+                <div class="input-group ">
                     <select id="pingIP" class="form-select jn-ping-form-select" v-model="selectedIP"
                       :class="{ 'bg-dark text-light': isDarkMode }">
                       <option disabled value="">{{ $t('pingtest.SelectIP') }}</option>
                       <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
                     </select>
-                  </div>
-                  <div class="col-auto">
-                    <button class="btn btn-success" @click="startPingCheck"
+                  
+                    <button class="btn btn-primary" @click="startPingCheck"
                       :disabled="pingCheckStatus === 'running' || selectedIP === ''">
                       <span
                         v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' || pingCheckStatus === 'error'">{{
@@ -36,7 +34,6 @@
                       <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
                         aria-hidden="true"></span>
                     </button>
-                  </div>
                 </div>
               </div>
             </div>

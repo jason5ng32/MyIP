@@ -29,7 +29,8 @@
         "invalidURL": "URL ou Nom de Domaine invalide",
         "fetchError": "Impossible de récupérer les résultats de résolution",
         "Provider": "Fournisseur DNS",
-        "Result": "Résultat de la Résolution"
+        "Result": "Résultat de la Résolution",
+        "Record": "Enregistrement"
     },
     "ruletest": {
         "Title": "Test de règles",

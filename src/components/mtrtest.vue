@@ -19,15 +19,13 @@
                 <label for="mtrIP" class="col-form-label">{{ $t('mtrtest.Note3') }}</label>
               </div>
               <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <div class="row justify-content-between">
-                  <div class="col-auto">
+                <div class="input-group ">
                     <select id="mtrIP" class="form-select jn-ping-form-select" v-model="selectedIP"
                       :class="{ 'bg-dark text-light': isDarkMode }">
                       <option disabled value="">{{ $t('mtrtest.SelectIP') }}</option>
                       <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
                     </select>
-                  </div>
-                  <div class="col-auto">
+
                     <button class="btn btn-primary" @click="startmtrCheck"
                       :disabled="mtrCheckStatus === 'running' || selectedIP === ''">
                       <span
@@ -36,7 +34,6 @@
                       <span v-if="mtrCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
                         aria-hidden="true"></span>
                     </button>
-                  </div>
                 </div>
               </div>
             </div>

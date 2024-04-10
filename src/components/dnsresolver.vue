@@ -21,6 +21,19 @@
                                 :placeholder="$t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
                                 name="queryURL" id="queryURL" data-1p-ignore>
 
+                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ queryType }} {{ $t('dnsresolver.Record') }}
+                                <span class="visually-hidden">Choose Type</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li @click="changeType('A')"><span class="dropdown-item" >A</span></li>
+                                <li @click="changeType('AAAA')"><span class="dropdown-item" >AAAA</span></li>
+                                <li @click="changeType('CNAME')"><span class="dropdown-item" >CNAME</span></li>
+                                <li @click="changeType('MX')"><span class="dropdown-item" >MX</span></li>
+                                <li @click="changeType('NS')"><span class="dropdown-item" >NS</span></li>
+                                <li @click="changeType('TXT')"><span class="dropdown-item" >TXT</span></li>
+                            </ul>
                             <button class="btn btn-primary" @click="onSubmit" :disabled="dnsCheckStatus === 'running'">
                                 <span v-if="dnsCheckStatus === 'idle'">{{
                                     $t('dnsresolver.Run') }}</span>
@@ -46,7 +59,7 @@
                                     <tbody>
                                         <tr v-for="(result, index) in combinedResults" :key="index">
                                             <td>{{ result.provider }}</td>
-                                            <td>{{ result.address }}</td>
+                                            <td :class="[result.address === 'N/A' ? 'opacity-50' : ''  ]">{{ result.address }}</td>
                                         </tr>
 
                                     </tbody>
@@ -81,6 +94,7 @@ export default {
     data() {
         return {
             queryURL: '',
+            queryType: 'A',
             dnsCheckStatus: 'idle',
             errorMsg: '',
             combinedResults: null,
@@ -110,22 +124,26 @@ export default {
             return null;
         },
 
+        changeType(type) {
+            this.queryType = type;
+        },
 
         onSubmit() {
             this.$trackEvent('Section', 'StartClick', 'DNSResolver');
             this.errorMsg = '';
             const hostname = this.validateInput(this.queryURL);
+            const type = this.queryType;
             if (hostname) {
-                this.getDNSResults(hostname);
+                this.getDNSResults(hostname,type);
             }
         },
 
         // 获取DNS结果
-        async getDNSResults(hostname) {
+        async getDNSResults(hostname,type) {
             this.combinedResults = [];
             this.dnsCheckStatus = 'running';
             try {
-                const response = await fetch(`/api/dnsresolver?hostname=${hostname}`);
+                const response = await fetch(`/api/dnsresolver?hostname=${hostname}&type=${type}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

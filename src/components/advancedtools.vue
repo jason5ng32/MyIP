@@ -9,77 +9,24 @@
             <p>{{ $t('advancedtools.Note') }}</p>
         </div>
         <div class="row">
-
-            <div class="col-lg-3 col-md-6 col-12 mb-4">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/pingtest')" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">🌐 {{ $t('pingtest.Title') }}</h3>
-                        <p class="opacity-75">{{ $t('advancedtools.PingTestNote') }}</p>
-
+            <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
+                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }" >
+                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
+                        <h3 :class="{ 'mobile-h3': isMobile }">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
+                        <p class="opacity-75">{{ $t(card.noteKey) }}</p>
                         <div class="go-corner">
-                            <div class="go-arrow">
-                                ↓
-                            </div>
+                            <div class="go-arrow">↓</div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-3 col-md-6 col-12 mb-4">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/mtrtest')" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">📡 {{ $t('mtrtest.Title') }}</h3>
-                        <p class="opacity-75">{{ $t('advancedtools.MTRTestNote') }}</p>
-
-                        <div class="go-corner">
-                            <div class="go-arrow">
-                                ↓
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6 col-12 mb-4">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/ruletest')" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">🚏 {{ $t('ruletest.Title') }}</h3>
-                        <p class="opacity-75">{{ $t('advancedtools.RuleTestNote') }}</p>
-
-                        <div class="go-corner">
-                            <div class="go-arrow">
-                                ↓
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6 col-12 mb-4">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas('/dnsresolver')" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">🔦 {{ $t('dnsresolver.Title') }}</h3>
-                        <p class="opacity-75">{{ $t('advancedtools.DNSResolverNote') }}</p>
-
-                        <div class="go-corner">
-                            <div class="go-arrow">
-                                ↓
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? ' h-100' : 'jn-h-80']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
             <div class="offcanvas-header">
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body mb-4"
-            :class="[isMobile ? ' w-100' : 'jn-canvas-width']"
-            >
+            <div class="offcanvas-body mb-4" :class="[isMobile ? ' w-100' : 'jn-canvas-width']">
                 <router-view></router-view>
             </div>
         </div>
@@ -110,14 +57,19 @@ export default {
 
     data() {
         return {
-            
+            cards: [
+                { path: '/pingtest', icon: '🌐', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
+                { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
+                { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
+                { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
+            ]
         }
     },
 
     methods: {
         navigateAndToggleOffcanvas(routePath) {
             this.$router.push(routePath);
-            switch(routePath) {
+            switch (routePath) {
                 case '/pingtest':
                     this.$trackEvent('Nav', 'NavClick', 'PingTest');
                     break;
