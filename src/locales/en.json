@@ -29,7 +29,8 @@
     "invalidURL": "Invalid URL or Domain Name",
     "fetchError": "Unable to fetch resolution results",
     "Provider": "DNS Provider",
-    "Result": "Resolution Result"
+    "Result": "Resolution Result",
+    "Record": "Record"
   },
   "ruletest": {
     "Title": "Rule Test",

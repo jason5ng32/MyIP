@@ -21,33 +21,70 @@ const dnsServers = {
 const dohServers = {
     'Google': 'https://dns.google/resolve?',
     'Cloudflare': 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&',
+    'AdGuard': 'https://dns.adguard.com/resolve?',
     'AliDNS': 'https://dns.alidns.com/resolve?',
 };
 
-const resolveDns = async (hostname, name, server) => {
+const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver();
     resolver.setServers([server]);
     const resolve4Async = promisify(resolver.resolve4.bind(resolver));
+    const resolve6Async = promisify(resolver.resolve6.bind(resolver));
+    const resolveTxtAsync = promisify(resolver.resolveTxt.bind(resolver));
+    const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
+    const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
+    const resolveAnyAsync = promisify(resolver.resolveAny.bind(resolver));
     try {
-        const addresses = await resolve4Async(hostname);
+        let addresses;
+
+        // 根据传入的 type 参数选择不同的解析方法
+        switch (type) {
+            case 'A':
+                addresses = await resolve4Async(hostname);
+                break;
+            case 'AAAA':
+                addresses = await resolve6Async(hostname);
+                break;
+            case 'TXT':
+                addresses = await resolveTxtAsync(hostname);
+                // TXT 记录解析的结果是一个二维数组，这里进行扁平化处理
+                addresses = addresses.flat();
+                break;
+            case 'CNAME':
+                addresses = await resolveCnameAsync(hostname);
+                break;
+            case 'NS':
+                addresses = await resolveNSAsync(hostname);
+                break;
+            default:
+                throw new Error('Unsupported type');
+        }
+
+        if (addresses.length === 0 || addresses === '' || addresses === null) {
+            return { [name]: `N/A` };
+        }
+
         return { [name]: addresses };
     } catch (error) {
         console.log(error.message);
-        return { [name]: `Error: No addresses found` };
+        return { [name]: `N/A` };
     }
 };
 
-const resolveDoh = async (hostname, name, url) => {
+const resolveDoh = async (hostname, type, name, url) => {
     try {
-        const response = await fetch(`${url}name=${hostname}&type=A`, {
+        const response = await fetch(`${url}name=${hostname}&type=${type}`, {
             headers: { 'Accept': 'application/dns-json' }
         });
         const data = await response.json();
-        const addresses = data.Answer ? data.Answer.map(answer => answer.data) : ['Error: No addresses found'];
+        const addresses = data.Answer ? data.Answer.map(answer => answer.data) : ['N/A'];
+        if (addresses.length === 0 || addresses === '' || addresses === null) {
+            return { [name]: `N/A` };
+        }
         return { [name]: addresses };
     } catch (error) {
         console.log(error.message);
-        return { [name]: `Error: No addresses found` };
+        return { [name]: `N/A` };
     }
 };
 
@@ -70,7 +107,7 @@ const dnsResolver = async (req, res) => {
         return res.status(403).json({ error: 'What are you doing?' });
     }
 
-    const { hostname } = req.query;
+    const { hostname, type } = req.query;
 
     if (typeof hostname !== 'string') {
         return res.status(400).send({ error: 'Hostname parameter must be a string' });
@@ -84,8 +121,8 @@ const dnsResolver = async (req, res) => {
         return res.status(400).send({ error: 'Invalid hostname' });
     }
 
-    const dnsPromises = Object.entries(dnsServers).map(([name, ip]) => resolveDns(hostname, name, ip));
-    const dohPromises = Object.entries(dohServers).map(([name, url]) => resolveDoh(hostname, name, url));
+    const dnsPromises = Object.entries(dnsServers).map(([name, ip]) => resolveDns(hostname, type, name, ip));
+    const dohPromises = Object.entries(dohServers).map(([name, url]) => resolveDoh(hostname, type, name, url));
 
     try {
         // 并行执行所有 DNS 和 DoH 查询

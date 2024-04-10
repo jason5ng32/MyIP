@@ -29,7 +29,8 @@
     "invalidURL": "无效的 URL 或域名",
     "fetchError": "无法获取解析结果",
     "Provider": "DNS 服务商",
-    "Result": "解析结果"
+    "Result": "解析结果",
+    "Record": "记录"
   },
   "ruletest": {
     "Title": "分流测试",
