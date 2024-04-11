@@ -35,6 +35,7 @@
 * 🚏 **代理规则测试**：配合代理软件的规则设置，测试规则设置是否正常
 * 🌐 **全球延迟测试**：从分布在全球的多个服务器进行延迟测试，了解你与全球网络的连接速度
 * 📡 **MTR 测试**：从分布在全球的多个服务器进行 MTR 测试，了解你与全球的连接路径
+* 🔦 **DNS 解析器**：从多个渠道对域名进行 DNS 解析，获取实时的解析结果，可用于污染判断
 * 🌗 **暗黑模式**：根据系统设置自动切换暗黑/白天模式，也可以手动切换
 * 📱 **简约模式**：为移动版提供的专门模式，缩短页面长度，快速查看最重要的信息
 * 🔍 **查任意 IP 信息**：可以通过小工具查询任意 IP 的信息
@@ -98,7 +99,7 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `PORT` | 否 | `18966` | 程序运行的端口 |
 | `BING_MAP_API_KEY` | 否 | `""` | Bing 地图的 API Key，用于展示 IP 所在地的地图 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
-| `IPChecking_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
+| `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `KEYCDN_USER_AGENT` | 否 | `""` | 使用 KeyCDN 时的域名，需包含 https 前缀。用于通过 KeyCDN 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |

@@ -37,7 +37,7 @@ export default (req, res) => {
 
     const lang = req.query.lang || 'en';
 
-    const key = process.env.IPChecking_API_KEY;
+    const key = process.env.IPCHECKING_API_KEY;
 
     // 构建请求 IPCheck.ing 的 URL
     const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
