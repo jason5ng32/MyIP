@@ -33,6 +33,7 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 🚏 **Test de règles** : Teste si les paramètres de règles fonctionnent correctement avec le logiciel de proxy.
 * 🌐 **Test de latence mondiale** : Effectue des tests de latence sur des serveurs situés dans différentes régions du monde.
 * 📡 **Test MTR** : Effectue des tests MTR sur des serveurs situés dans différentes régions du monde.
+* 🔦 **Résolveur DNS** : effectue la résolution DNS d'un nom de domaine à partir de plusieurs sources, obtient les résultats de la résolution en temps réel et peut être utilisé pour la détermination de la contamination.
 * 🌗 **Mode sombre** : Bascule automatiquement entre les modes sombre et clair en fonction des paramètres du système, avec une option de basculement manuel.
 * 📱 **Mode minimaliste** : Un mode optimisé pour les mobiles qui réduit la longueur de la page pour un accès rapide aux informations essentielles.
 * 🔍 **Recherche d'informations sur l'adresse IP** : Fournit un outil pour interroger des informations sur n'importe quelle adresse IP.
@@ -98,7 +99,7 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
 | `IPChecking_API_KEY` | Non | `""` | Clé API pour IPCheck.ing, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
 | `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
-| `KEYCDN_USER_AGENT` | Non | `""` | Agent utilisateur pour KeyCDN, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via KeyCDN |
+| `KEYCDN_USER_AGENT` | Non | `""` | Le nom de domaine lorsque vous utilisez KeyCDN, doit contenir le préfixe https. Utilisé pour obtenir des informations sur l'adresse IP via KeyCDN |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 | `VITE_RECAPTCHA_SITE_KEY` | Non | `""` | Clé de site reCAPTCHA de Google, utilisée pour afficher la vérification reCAPTCHA sur le frontend |
 | `RECAPTCHA_SECRET_KEY` | Non | `""` | Clé secrète reCAPTCHA de Google, utilisée pour vérifier la vérification reCAPTCHA sur le backend |

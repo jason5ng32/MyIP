@@ -133,7 +133,7 @@ export default {
         },
         {
           id: "youtube",
-          name: "Youtube",
+          name: "YouTube",
           icon: "youtube",
           url: "https://www.youtube.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
@@ -142,7 +142,7 @@ export default {
         },
         {
           id: "github",
-          name: "Github",
+          name: "GitHub",
           icon: "github",
           url: "https://github.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
