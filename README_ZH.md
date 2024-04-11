@@ -100,7 +100,7 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
 | `IPChecking_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
-| `KEYCDN_USER_AGENT` | 否 | `""` | KeyCDN 的 User Agent，用于通过 KeyCDN 获取 IP 归属地信息 |
+| `KEYCDN_USER_AGENT` | 否 | `""` | 使用 KeyCDN 时的域名，需包含 https 前缀。用于通过 KeyCDN 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `VITE_RECAPTCHA_SITE_KEY` | 否 | `""` | Google reCAPTCHA 的 Site Key，用于在前端显示 reCAPTCHA 验证 |
 | `RECAPTCHA_SECRET_KEY` | 否 | `""` | Google reCAPTCHA 的 Secret Key，用于在后端验证 reCAPTCHA 验证 |

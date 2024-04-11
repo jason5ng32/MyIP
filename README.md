@@ -33,6 +33,7 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 * 🚏 **Proxy Rule Testing**: Test the rule settings of proxy software to ensure their correctness.
 * 🌐 **Global Latency Test**: Performe lantency tests on servers located in different regions around the world.
 * 📡 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
+* 🔦 **DNS Resolver**: Performs DNS resolution of a domain name from multiple sources and obtains real-time resolution results that can be used for contamination determination.
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
 * 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
@@ -98,7 +99,7 @@ You can use the program without adding any environment variables, but if you wan
 | `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
 | `IPChecking_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
-| `KEYCDN_USER_AGENT` | No | `""` | User Agent for KeyCDN, used to obtain IP geolocation information through KeyCDN |
+| `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `VITE_RECAPTCHA_SITE_KEY` | No | `""` | Google reCAPTCHA's Site Key, used to display reCAPTCHA verification on the frontend |
 | `RECAPTCHA_SECRET_KEY` | No | `""` | Google reCAPTCHA's Secret Key, used to verify reCAPTCHA verification on the backend |

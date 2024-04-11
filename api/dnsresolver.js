@@ -33,7 +33,6 @@ const resolveDns = async (hostname, type, name, server) => {
     const resolveTxtAsync = promisify(resolver.resolveTxt.bind(resolver));
     const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
     const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
-    const resolveAnyAsync = promisify(resolver.resolveAny.bind(resolver));
     try {
         let addresses;
 
