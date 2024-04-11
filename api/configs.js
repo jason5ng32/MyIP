@@ -23,7 +23,7 @@ export default (req, res) => {
     const envConfigs = {
         bingMap: process.env.BING_MAP_API_KEY,
         ipInfo: process.env.IPINFO_API_TOKEN,
-        ipChecking: process.env.IPChecking_API_KEY,
+        ipChecking: process.env.IPCHECKING_API_KEY,
         keyCDN: process.env.KEYCDN_USER_AGENT,
         originalSite,
         cloudFlare: process.env.CLOUDFLARE_API,
