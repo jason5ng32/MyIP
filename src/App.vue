@@ -410,6 +410,15 @@ export default {
           description: this.$t('shortcutKeys.StartSpeedTest'),
         },
         {
+          keys: "p",
+          action: () => {
+            this.scrollToElement("SpeedTest", 80);
+            this.$refs.speedTestRef.pauseSpeedTest();
+            this.$trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
+          },
+          description: this.$t('shortcutKeys.PauseSpeedTest'),
+        },
+        {
           keys: "m",
           action: () => {
             if (this.configs.bingMap) {
