@@ -404,19 +404,10 @@ export default {
           keys: "s",
           action: () => {
             this.scrollToElement("SpeedTest", 80);
-            this.$refs.speedTestRef.refreshstartSpeedTest();
+            this.$refs.speedTestRef.speedTestController();
             this.$trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
           },
-          description: this.$t('shortcutKeys.StartSpeedTest'),
-        },
-        {
-          keys: "p",
-          action: () => {
-            this.scrollToElement("SpeedTest", 80);
-            this.$refs.speedTestRef.pauseSpeedTest();
-            this.$trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
-          },
-          description: this.$t('shortcutKeys.PauseSpeedTest'),
+          description: this.$t('shortcutKeys.SpeedTestButton'),
         },
         {
           keys: "m",
