@@ -15,30 +15,27 @@
                         <h3 :class="{ 'mobile-h3': isMobile }">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
                         <p class="opacity-75">{{ $t(card.noteKey) }}</p>
                         <div class="go-corner">
-                            <div class="go-arrow">↓</div>
+                            <div class="go-arrow"><i class="bi bi-chevron-double-down"></i></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
-            :class="[isMobile ? ' h-100' : 'jn-h-80']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header">
-                <div class="input-group justify-content-end">
-                    <button type="button" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                        @click="fullScreen">
-                        <span v-if="!isFullScreen">
-                            <i class="bi bi-arrows-fullscreen"></i>
-                        </span>
-                        <span v-else>
-                            <i class="bi bi-fullscreen-exit"></i>
-                        </span>
-                    </button>
-                    <button type="button" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                        data-bs-dismiss="offcanvas" aria-label="Close"><i class="bi bi-x-lg"></i></button>
-                </div>
+            :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
+            <div class="offcanvas-header justify-content-end">
+                <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
+                    <span v-if="!isFullScreen">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </span>
+                    <span v-else>
+                        <i class="bi bi-fullscreen-exit"></i>
+                    </span>
+                </button>
+
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body mb-4" :class="[isMobile ? ' w-100' : 'jn-canvas-width']">
+            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']">
                 <router-view></router-view>
             </div>
         </div>
@@ -126,13 +123,16 @@ export default {
     z-index: 10000;
 }
 
-.jn-h-80 {
+.jn-h {
     height: 80%;
 }
 
-.jn-h-100 {
-    height: 100%;
-    z-index: 10000;
+.jn-bold {
+    -webkit-text-stroke: 1px;
+}
+
+.jn-bold:hover {
+    opacity: 1 !important;
 }
 
 .jn-canvas-width {
