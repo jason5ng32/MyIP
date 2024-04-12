@@ -35,27 +35,22 @@
                   <option :value="10e6">10 MB</option>
                   <option :value="1e6">1 MB</option>
                 </select>
-                <button @click="startSpeedTest" class="btn-primary btn" aria-label="Start Speed Test"
-                  :disabled="speedTestStatus === 'running'"
-                  v-tooltip="{ title: $t('Tooltips.StartSpeedTest'), placement: 'top' }">
-                  <span v-if="speedTestStatus === 'running'" class="spinner-grow spinner-grow-sm"
-                    aria-hidden="true"></span>
+                <button @click="speedTestController" class="btn-primary btn" aria-label="Start/Pause Speed Test"
+                  v-tooltip="{ title: $t('Tooltips.SpeedTestButton'), placement: 'top' }">
+                  <span v-if="speedTestStatus === 'running'">
+                    <i class="bi bi-pause-fill"></i>
+                  </span>
                   <span v-else><i class="bi bi-caret-right-fill"></i></span>
-                </button>
-                <button @click="pauseSpeedTest()" class="btn-primary btn" aria-label="Pause Speed Test"
-                  :disabled="speedTestStatus !== 'running'"
-                  v-tooltip="{ title: $t('Tooltips.PauseSpeedTest'), placement: 'top' }">
-                  <i class="bi bi-pause-fill"></i>
                 </button>
               </div>
             </div>
 
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
               :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
-              <div class="progress-bar progress-bar-striped progress-bar-animated jn-progress"
-                :class="[speedTestStatus === 'finished' ? 'bg-success' : 'bg-info']" role="progressbar"
-                style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="speedtest-progress"
-                aria-label="Progress Bar">
+              <div class="progress-bar progress-bar-striped jn-progress"
+                :class="[speedTestStatus === 'finished' ? 'bg-success' : 'bg-info progress-bar-animated']"
+                role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                id="speedtest-progress" aria-label="Progress Bar">
               </div>
             </div>
             <div class="row" style="margin-bottom: 10pt;">
@@ -209,6 +204,15 @@ export default {
       return markRaw(engine);
     },
 
+    speedTestController() {
+      if (this.speedTestStatus === 'running') {
+        this.testEngine.pause();
+        this.speedTestStatus = "paused";
+      } else {
+        this.startSpeedTest();
+      }
+    },
+
     // 开始 Speed Test
     startSpeedTest() {
 
@@ -241,14 +245,6 @@ export default {
         this.SpeedChange();
       }
       this.showResult();
-    },
-
-    pauseSpeedTest() {
-      this.testEngine.pause();
-      this.speedTestStatus = "paused";
-      this.speedTest.downloadSpeed = this.SpeedChange().downloadSpeed;
-      this.speedTest.uploadSpeed = this.SpeedChange().uploadSpeed;
-      this.speedTest.latency = this.SpeedChange().latency;
     },
 
     // 修改进度条
@@ -319,12 +315,6 @@ export default {
           this.speedTest.latency = newLatency;
         }
       }
-
-      return {
-        downloadSpeed: this.speedTest.downloadSpeed,
-        uploadSpeed: this.speedTest.uploadSpeed,
-        latency: this.speedTest.latency
-      }
     },
 
 
@@ -363,7 +353,4 @@ export default {
 </script>
 
 <style scoped>
-/* .mobile-test {
-  
-} */
 </style>
