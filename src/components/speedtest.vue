@@ -38,7 +38,9 @@
                 <button @click="startSpeedTest" class="btn-primary btn" aria-label="Start Speed Test"
                   :disabled="speedTestStatus === 'running'"
                   v-tooltip="{ title: $t('Tooltips.StartSpeedTest'), placement: 'top' }">
-                  <i class="bi bi-caret-right-fill"></i>
+                  <span v-if="speedTestStatus === 'running'" class="spinner-grow spinner-grow-sm"
+                    aria-hidden="true"></span>
+                  <span v-else><i class="bi bi-caret-right-fill"></i></span>
                 </button>
                 <button @click="pauseSpeedTest()" class="btn-primary btn" aria-label="Pause Speed Test"
                   :disabled="speedTestStatus !== 'running'"
