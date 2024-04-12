@@ -40,6 +40,9 @@
                   <span v-if="speedTestStatus === 'running'">
                     <i class="bi bi-pause-fill"></i>
                   </span>
+                  <span v-else-if="speedTestStatus === 'finished' || speedTestStatus === 'error'">
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </span>
                   <span v-else><i class="bi bi-caret-right-fill"></i></span>
                 </button>
               </div>
@@ -84,7 +87,7 @@
               </div>
             </div>
             <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
-              v-if="speedTestStatus === 'finished'">
+              v-if="speedTestStatus === 'finished' && hasScores">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i> {{ $t('speedtest.score') }}
                 {{ $t('speedtest.videoStreaming') }}
                 <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
@@ -158,6 +161,7 @@ export default {
         }
       },
       testEngine: null,
+      hasScores: false,
     };
   },
 
@@ -193,6 +197,7 @@ export default {
 
     // 重置 Speed Test
     resetSpeedTest() {
+      this.hasScores = false;
       const engine = new SpeedTestEngine({
         autoStart: false,
         measurements: [
@@ -322,12 +327,15 @@ export default {
       this.testEngine.onFinish = results => {
         this.speedTestStatus = "finished";
         this.updateSpeedTestResults(results);
-        const scores = results.getScores();
+        const scores = results.getScores().streaming ? results.getScores() : '';
 
-        // 更新 Vue 实例的数据属性
-        this.speedTest.streamingScore = scores.streaming.points;
-        this.speedTest.gamingScore = scores.gaming.points;
-        this.speedTest.rtcScore = scores.rtc.points;
+        if (scores) {
+          this.hasScores = true;
+          // 更新 Vue 实例的数据属性
+          this.speedTest.streamingScore = scores.streaming.points;
+          this.speedTest.gamingScore = scores.gaming.points;
+          this.speedTest.rtcScore = scores.rtc.points;
+        }
       };
 
       this.testEngine.onError = (e) => {
@@ -345,5 +353,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
