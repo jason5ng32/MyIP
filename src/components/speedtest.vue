@@ -338,13 +338,6 @@ export default {
       };
     },
 
-    // 刷新 Speed Test
-    refreshstartSpeedTest() {
-      if (this.speedTestStatus !== "running") {
-        this.startSpeedTest();
-      }
-    },
-
   },
 
   mounted() {
