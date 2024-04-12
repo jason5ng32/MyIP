@@ -410,6 +410,42 @@ export default {
           description: this.$t('shortcutKeys.SpeedTestButton'),
         },
         {
+          keys: "l",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/pingtest');
+            this.$trackEvent('Nav', 'NavClick', 'PingTest');
+          },
+          description: this.$t('shortcutKeys.PingTest'),
+        },
+        {
+          keys: "t",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/mtrtest');
+            this.$trackEvent('Nav', 'NavClick', 'MTRTest');
+          },
+          description: this.$t('shortcutKeys.MTRTest'),
+        },
+        {
+          keys: "r",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/ruletest');
+            this.$trackEvent('Nav', 'NavClick', 'RuleTest');
+          },
+          description: this.$t('shortcutKeys.RuleTest'),
+        },
+        {
+          keys: "n",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/dnsresolver');
+            this.$trackEvent('Nav', 'NavClick', 'DNSResolver');
+          },
+          description: this.$t('shortcutKeys.DNSResolver'),
+        },
+        {
           keys: "m",
           action: () => {
             if (this.configs.bingMap) {
