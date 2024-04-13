@@ -16,9 +16,9 @@
         <span class=" fw-bold  "> IP</span>
         <span class="fw-lighter">Check.</span>
         <span class="fw-lighter" :class="{
-      'background-animation-dark': !loaded && isDarkMode,
-      'background-animation-light': !loaded && !isDarkMode
-    }">ing</span>
+          'background-animation-dark': !loaded && isDarkMode,
+          'background-animation-light': !loaded && !isDarkMode
+        }">ing</span>
       </a>
 
       <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
@@ -57,18 +57,33 @@
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'IPInfo')"> {{ $t('nav.IPinfo') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'Connectivity')"> {{
-      $t('nav.Connectivity') }}</a>
+            $t('nav.Connectivity') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'WebRTC')"> {{ $t('nav.WebRTC') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
-      $t('nav.DNSLeakTest') }}</a>
+            $t('nav.DNSLeakTest') }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
           }}</a>
         <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#AdvancedTools"
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
       </div>
+      <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
+        :class="[isDarkMode ? 'btn-outline-light' : 'btn-dark']" target="_blank"
+        @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
+        <div><i class="bi bi-github"></i></div>
+        <div class="row flex-column ">
+          <TransitionGroup name="slide-fade">
+            <span key="default" class="col-12 jn-w" v-if="githubStars === 0">&nbsp;GitHub</span>
+            <span key="stars" class="col-12 jn-w" v-if="githubStars > 0">
+              &nbsp;{{ githubStars }}
+              <i class="bi bi-star-fill" :class="[isDarkMode ? 'redstar' : 'yellowstar']"></i>
+            </span>
+          </TransitionGroup>
+
+        </div>
+      </a>
     </div>
   </nav>
 </template>
@@ -84,18 +99,40 @@ export default {
   setup() {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
+    const isMobile = computed(() => store.state.isMobile);
 
     return {
       isDarkMode,
+      isMobile
     };
   },
 
   data() {
     return {
       loaded: false,
+      githubStars: 0,
     }
   },
   methods: {
+
+    //获取 GitHub stars
+    async getGitHubStars() {
+      const url = `https://api.github.com/repos/jason5ng32/MyIP`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTimeout(() => {
+          this.githubStars = data.stargazers_count;
+        }, 1000);
+      } catch (error) {
+        console.error('Failed to fetch Github data:', error);
+        this.githubStars = 0;
+      }
+    },
 
     // 切换暗黑模式
     toggleDarkMode() {
@@ -150,6 +187,9 @@ export default {
     this.$store.dispatch('checkDarkMode');
     this.updateBodyClass();
     this.PWAColor();
+    setTimeout(() => {
+      this.getGitHubStars();
+    }, 1000)
   },
 }
 </script>
@@ -158,6 +198,44 @@ export default {
 /*==================== Dark Light Button Implementation ====================*/
 .jn-checkbox {
   display: none;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from {
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-30px);
+  opacity: 0;
+}
+
+.jn-fs {
+  font-size: smaller;
+  display: flex;
+  max-height: 25pt;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.jn-w {
+  width: 60pt;
+}
+
+.redstar {
+  color: rgb(253 131 3);
+}
+
+.yellowstar {
+  color: rgb(255 216 0);
 }
 
 .switch {
