@@ -70,7 +70,7 @@
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
       </div>
       <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
-        :class="[isDarkMode ? 'btn-outline-light' : 'btn-dark']" target="_blank"
+        :class="{ 'btn-outline-light' : isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile}" target="_blank"
         @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
         <div><i class="bi bi-github"></i></div>
         <div class="row flex-column ">
