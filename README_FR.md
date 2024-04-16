@@ -1,6 +1,6 @@
 # 🧰 MyIP - Une meilleure boîte à outils IP
 
-<img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github_banner.png">
+<img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/gh_banner.png">
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
