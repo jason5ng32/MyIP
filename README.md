@@ -150,11 +150,16 @@ If you're using a proxy for internet access, consider adding this rule to your p
 IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
 DOMAIN-SUFFIX,ipify.org,Proxy
+# Rule Testing
+DOMAIN,ptest-1.ipcheck.ing,Proxy1
+DOMAIN,ptest-2.ipcheck.ing,Proxy2
+DOMAIN,ptest-3.ipcheck.ing,Proxy3
+DOMAIN,ptest-4.ipcheck.ing,Proxy4
+DOMAIN,ptest-5.ipcheck.ing,Proxy5
+DOMAIN,ptest-6.ipcheck.ing,Proxy6
+DOMAIN,ptest-7.ipcheck.ing,Proxy7
+DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
-
-## 😶‍🌫️ Additional Notes
-
-70% of the code for this program was not written by me, but generated through ChatGPT. After about 90 rounds of back-and-forth and some minor manual adjustments, all the code was completed.
 
 ## 🌟 Star History
 

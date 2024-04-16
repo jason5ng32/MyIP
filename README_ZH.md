@@ -152,11 +152,26 @@ docker run -d -p 18966:18966 \
 IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
 DOMAIN-SUFFIX,ipify.org,Proxy
+# Rule Testing
+DOMAIN,ptest-1.ipcheck.ing,Proxy1
+DOMAIN,ptest-2.ipcheck.ing,Proxy2
+DOMAIN,ptest-3.ipcheck.ing,Proxy3
+DOMAIN,ptest-4.ipcheck.ing,Proxy4
+DOMAIN,ptest-5.ipcheck.ing,Proxy5
+DOMAIN,ptest-6.ipcheck.ing,Proxy6
+DOMAIN,ptest-7.ipcheck.ing,Proxy7
+DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
 
 ## 😶‍🌫️ 额外说明
 
-这个程序的 70% 的代码不是我写的，是通过 ChatGPT 写的。大概来回 90 个回合，外加一些细微的手动修改，完成了全部代码。
+在 V2.0 发布的时候，我曾经说：这个程序的 70% 的代码不是我写的，是通过 ChatGPT 写的。大概来回 90 个回合，外加一些细微的手动修改，完成了全部代码。
+
+当然，程序的架构和 UI 还是需要自己进行设计。
+
+随着 V3.0 及后续的代码发布，ChatGPT 帮助我写代码的比例逐渐下降，估计现在在 40% - 50% 之间。相反，在这个过程中，我从完全不会 JavaScript 和 Vue ，与 AI 结对编程后，我现在已经能看懂大部分的 JS 代码了，并且也已经能手撸一些。
+
+感谢 AI ，给了我这样一个失业产品经理快速学习编程的机会。
 
 ## 🌟 Star History
 
