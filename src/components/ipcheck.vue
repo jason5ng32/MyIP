@@ -748,6 +748,7 @@ export default {
             }
           } catch (error) {
             console.error("Error fetching IP details from source " + source.id + ":", error);
+            this.sources[source.id].enabled = false;
             currentSourceIndex = (currentSourceIndex + 1) % sources.length;
             attempts++;
           }
@@ -1056,5 +1057,8 @@ export default {
   width: 2px;
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
+}
+.dropdown-item.disabled, .dropdown-item:disabled {
+  text-decoration: line-through;
 }
 </style>
