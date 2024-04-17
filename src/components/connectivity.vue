@@ -28,7 +28,7 @@
       </div>
       <div class="row">
         <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
-          <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+          <div class="card jn-card keyboard-shortcut-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
             <div class="card-body">
               <p class="jn-con-title card-title"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</p>
               <p class="card-text" :class="{

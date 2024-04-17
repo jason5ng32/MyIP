@@ -61,7 +61,7 @@
       <div class="row">
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error'), 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
-          <div class="card jn-card" :class="{
+          <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
             'jn-ip-card1': !isMobile && ipGeoSource === 0,
             'jn-ip-card2': !isMobile && ipGeoSource !== 0,

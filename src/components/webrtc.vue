@@ -12,7 +12,7 @@
     </div>
     <div class="row">
       <div v-for="stun in stunServers" :key="stun.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+        <div class="card jn-card keyboard-shortcut-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <p class="card-title jn-con-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</p>
             <p class="card-text text-secondary" style="font-size: 10pt;"><i class="bi bi-hdd-network-fill"></i> {{
