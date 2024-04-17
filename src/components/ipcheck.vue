@@ -61,7 +61,7 @@
       <div class="row">
         <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
           :class="{ 'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error'), 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
-          <div class="card jn-card" :class="{
+          <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
             'jn-ip-card1': !isMobile && ipGeoSource === 0,
             'jn-ip-card2': !isMobile && ipGeoSource !== 0,
@@ -748,6 +748,7 @@ export default {
             }
           } catch (error) {
             console.error("Error fetching IP details from source " + source.id + ":", error);
+            this.sources[source.id].enabled = false;
             currentSourceIndex = (currentSourceIndex + 1) % sources.length;
             attempts++;
           }
@@ -1056,5 +1057,8 @@ export default {
   width: 2px;
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
+}
+.dropdown-item.disabled, .dropdown-item:disabled {
+  text-decoration: line-through;
 }
 </style>

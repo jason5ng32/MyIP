@@ -10,7 +10,7 @@
     </div>
     <div class="row">
       <div class="col-12 mb-3">
-        <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+        <div class="card jn-card keyboard-shortcut-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
 
             <div class="row justify-content-end mt-3 mb-4" :data-bs-theme="isDarkMode ? 'dark' : ''">

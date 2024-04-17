@@ -13,7 +13,7 @@
     </div>
     <div class="row">
       <div v-for="(leak, index) in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+        <div class="card jn-card keyboard-shortcut-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
           <div class="card-body">
             <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
               <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;

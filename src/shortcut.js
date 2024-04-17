@@ -31,7 +31,7 @@ const mappingKeys = (...keys) => {
 // 导航
 const navigateCards = (direction) => {
   const mainPart = document.getElementById('mainpart');
-  const cardBodies = mainPart.querySelectorAll('.jn-card');
+  const cardBodies = mainPart.querySelectorAll('.keyboard-shortcut-card');
   const cards = Array.from(cardBodies);
   let currentIndex = cards.findIndex(card => card.getAttribute('data-keyboard-hover') === 'true');
 
