@@ -1,0 +1,11 @@
+# docker-compose up -d
+version: '3'
+services:
+    myip:
+        container_name: myip
+        image: jason5ng32/myip:latest # my-app: x.x.x
+        stdin_open: true # docker run -i 交互模式
+        tty: true        # docker run -t 终端模式
+        restart: always # 重启策略 / on-failure:5 重启次数5次 / always 一直重启 / unless-stopped 除非停止 / no 从不重启
+        ports:
+            - "18966:18966"
