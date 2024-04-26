@@ -19,6 +19,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 11966;
 
+app.set('trust proxy', true);
+
 const apiLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 60 分钟的窗口
     max: 60,
