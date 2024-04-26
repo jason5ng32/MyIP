@@ -41,7 +41,7 @@
             <!-- Result Display -->
             <div id="pingresult" v-if="pingResults.length > 0">
               <div class="table-responsive text-nowrap">
-                <table class="table" :class="{ 'table-dark': isDarkMode }">
+                <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                   <thead>
                     <tr>
                       <th scope="col">{{ $t('pingtest.Region') }}</th>

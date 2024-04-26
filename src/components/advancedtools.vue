@@ -71,6 +71,7 @@ export default {
                 { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
                 { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
                 { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
+                { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
             ],
             isFullScreen: false,
         }
@@ -91,6 +92,9 @@ export default {
                     break;
                 case '/dnsresolver':
                     this.$trackEvent('Nav', 'NavClick', 'DNSResolver');
+                    break;
+                case '/censorshipcheck':
+                    this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
                     break;
             }
             var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
@@ -129,6 +133,7 @@ export default {
 
 .jn-bold {
     -webkit-text-stroke: 1px;
+    margin-left: -10pt;
 }
 
 .jn-bold:hover {

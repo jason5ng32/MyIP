@@ -12,13 +12,34 @@
         "RuleTest": "Test de règles",
         "AdvancedTools": "Outils avancés"
     },
+    "censorshipcheck": {
+        "Title": "Test de censorship",
+        "Note": "Vérifie la disponibilité des sites cibles dans quatre régions connues pour une censure internet rigoureuse, incluant : la Chine continentale, l'Arabie Saoudite, la Russie, et la Turquie. Des tests sont également réalisés depuis des régions où l'internet est relativement libre, servant de groupe témoin pour la vérification. Certaines régions disposent de dispositions légales claires sur la censure internet, tandis que d'autres sont plus vagues.",
+        "Note2": "Veuillez entrer une URL ou un nom de domaine pour commencer le test de censure :",
+        "Note3": "Un site est considéré comme bloqué uniquement si aucun serveur dans le même pays ne peut y accéder.",
+        "Run": "Lancer le Test",
+        "Placeholder": "URL ou Nom de Domaine",
+        "Country": "Région",
+        "Status": "Statut",
+        "City": "Ville",
+        "Network": "Réseau",
+        "invalidURL": "URL ou Nom de Domaine invalide",
+        "fetchError": "Impossible de récupérer les résultats des tests",
+        "isBlocked": "Ce site semble être bloqué dans certains pays, veuillez vous référer aux résultats des tests ci-dessus pour une détermination finale.",
+        "notBlocked": "Ce site ne semble pas être bloqué, veuillez vous référer aux résultats des tests ci-dessus pour une détermination finale.",
+        "isDown": "Il est difficile de déterminer si ce site est bloqué, car il semble inaccessible de nombreux endroits dans le monde. Si l'adresse que vous avez entrée est correcte, il est possible que le site lui-même rencontre des problèmes et ne soit pas accessible.",
+        "Timeout": "Délai d'Attente du Test",
+        "TestGroup": "Groupe de Test",
+        "ControlGroup": "Groupe Témoin"
+    },
     "advancedtools": {
         "Title": "Outils avancés",
         "Note": "Certains outils sont utilisés relativement rarement, mais sont très utiles lors des tests de réseaux.",
         "PingTestNote": "Test de la valeur Ping mondiale",
         "MTRTestNote": "Test de route MTR mondial",
         "DNSResolverNote": "Résolution DNS multi-canal en temps réel",
-        "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy"
+        "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
+        "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays"
     },
     "dnsresolver": {
         "Title": "Résolution DNS",
@@ -230,7 +251,8 @@
         "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
         "GoNext": "Carte suivante",
         "GoPrevious": "Carte précédente",
-        "RefreshRuleTests": "Actualiser les tests de règles"
+        "RefreshRuleTests": "Actualiser les tests de règles",
+        "CensorshipCheck": "Ouvrir le Test de censorship"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
@@ -528,6 +550,24 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de la logique du programme"
+                    }
+                ]
+            },
+            {
+                "version": "v3.7",
+                "date": "Apr 26, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Fonctionnalité de test de censure ajoutée"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Le test de vitesse réseau permet maintenant de personnaliser la taille des paquets"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de certaines logiques fonctionnelles"
                     }
                 ]
             }

@@ -12,11 +12,20 @@ import cfHander from './api/cfradar.js';
 import recaptchaHandler from './api/recaptcha.js';
 import validateConfigs from './api/configs.js';
 import dnsResolver from './api/dnsresolver.js';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 11966;
+
+const apiLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 60 分钟的窗口
+    max: 60,
+    message: 'Too many requests'
+});
+
+app.use('/api', apiLimiter);
 
 // APIs
 app.get('/api/map', mapHandler);

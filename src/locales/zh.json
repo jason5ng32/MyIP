@@ -12,13 +12,34 @@
     "RuleTest": "分流测试",
     "AdvancedTools": "高级工具"
   },
+  "censorshipcheck": {
+    "Title": "封锁测试",
+    "Note": "检查目标网站在全球互联网审查较为严重的 4 个地区的可用性，包括：中国大陆、沙特阿拉伯、俄罗斯、土耳其。检查时会同时从互联网相对自由的地区进行相同的测试，以作为对照组进行校验。在一些地区，互联网审查有较为明确的法律条文，有些则相对含糊。",
+    "Note2": "请输入 URL 或域名，开始封锁测试：",
+    "Note3": "只有当同一个国家的所有服务器都无法访问时，才会判断为被封锁",
+    "Run": "运行测试",
+    "Placeholder": "URL 或域名",
+    "Country": "地区",
+    "Status": "状态",
+    "City": "城市",
+    "Network": "网络",
+    "invalidURL": "无效的 URL 或域名",
+    "fetchError": "无法获取测试结果",
+    "isBlocked": "这个网站看起来在部分国家被封锁了，请参考上方的测试结果做最终判断。",
+    "notBlocked": "这个网站看起来没有被封锁了，请参考上方的测试结果做最终判断。",
+    "isDown": "无法判断这个网站是否被封锁，因为看起来它在全球许多位置都无法访问。如果你输入的地址是正确的，有可能网站本身出现了问题导致无法访问。",
+    "Timeout": "测试超时",
+    "TestGroup": "测试组",
+    "ControlGroup": "控制组"
+  },
   "advancedtools": {
     "Title": "高级工具",
     "Note": "一些使用频率相对较低，但在进行网络测试时，非常有用的工具。",
     "PingTestNote": "全球的 Ping 值测试",
     "MTRTestNote": "全球的 MTR 路由测试",
     "DNSResolverNote": "实时多渠道 DNS 解析",
-    "RuleTestNote": "检查代理软件的规则设置"
+    "RuleTestNote": "检查代理软件的规则设置",
+    "CensorshipCheck": "检查一个网站在某些国家是否被封锁"
   },
   "dnsresolver": {
     "Title": "DNS 解析",
@@ -230,7 +251,8 @@
     "HelpNote": "使用快捷键的人，是喜欢效率的人，你真棒！",
     "GoNext": "下一张卡片",
     "GoPrevious": "上一张卡片",
-    "RefreshRuleTests": "刷新规则测试"
+    "RefreshRuleTests": "刷新规则测试",
+    "CensorshipCheck": "打开封锁测试面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -528,6 +550,24 @@
           {
             "type": "improve",
             "change": "优化了程序逻辑"
+          }
+        ]
+      },
+      {
+        "version": "v3.7",
+        "date": "Apr 26, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加封锁测试功能"
+          },
+          {
+            "type": "add",
+            "change": "网速测试可以自定义数据包大小"
+          },
+          {
+            "type": "improve",
+            "change": "优化了部分功能逻辑"
           }
         ]
       }

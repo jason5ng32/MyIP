@@ -12,13 +12,34 @@
     "RuleTest": "Rule Test",
     "AdvancedTools": "Advanced Tools"
   },
+  "censorshipcheck": {
+    "Title": "Censorship Check",
+    "Note": "Checks the availability of target websites in four regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, and Turkey. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
+    "Note2": "Please enter a URL or domain name to start the censorship test:",
+    "Note3": "A website is only considered blocked if it cannot be accessed from all servers within the same country.",
+    "Run": "Run Test",
+    "Placeholder": "URL or Domain Name",
+    "Country": "Region",
+    "Status": "Status",
+    "City": "City",
+    "Network": "Network",
+    "invalidURL": "Invalid URL or Domain Name",
+    "fetchError": "Unable to fetch test results",
+    "isBlocked": "This website appears to be blocked in some countries, please refer to the test results above for a final determination.",
+    "notBlocked": "This website does not appear to be blocked, please refer to the test results above for a final determination.",
+    "isDown": "It's unclear whether this website is blocked, as it appears to be inaccessible from many locations worldwide. If the address you entered is correct, it's possible that the website itself is having issues and cannot be accessed.",
+    "Timeout": "Test Timeout",
+    "TestGroup": "Test Group",
+    "ControlGroup": "Control Group"
+  },
   "advancedtools": {
     "Title": "Advanced Tools",
     "Note": "Tools that are used relatively infrequently, but are very useful when performing network testing.",
     "PingTestNote": "Global Ping value test",
     "MTRTestNote": "Global MTR route test",
     "DNSResolverNote": "Real-time multi-channel DNS resolution",
-    "RuleTestNote": "Check the rule settings of proxy software"
+    "RuleTestNote": "Check the rule settings of proxy software",
+    "CensorshipCheck": "Check if a website is blocked in some countries"
   },
   "dnsresolver": {
     "Title": "DNS Resolution",
@@ -230,7 +251,8 @@
     "HelpNote": "People who use shortcuts are really awesome!",
     "GoNext": "Next Card",
     "GoPrevious": "Previous Card",
-    "RefreshRuleTests": "Refresh Rule Tests"
+    "RefreshRuleTests": "Refresh Rule Tests",
+    "CensorshipCheck": "Open Censorship Check panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -528,6 +550,24 @@
           {
             "type": "improve",
             "change": "Optimized program logic"
+          }
+        ]
+      },
+      {
+        "version": "v3.7",
+        "date": "Apr 26, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added censorship test feature"
+          },
+          {
+            "type": "add",
+            "change": "Network speed test now allows custom packet size"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized some functional logic"
           }
         ]
       }

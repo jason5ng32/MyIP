@@ -446,6 +446,15 @@ export default {
           description: this.$t('shortcutKeys.DNSResolver'),
         },
         {
+          keys: "b",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/censorshipcheck');
+            this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+          },
+          description: this.$t('shortcutKeys.CensorshipCheck'),
+        },
+        {
           keys: "m",
           action: () => {
             if (this.configs.bingMap) {
