@@ -1014,6 +1014,7 @@ export default {
   },
 
   mounted() {
+    this.isMapShown = JSON.parse(localStorage.getItem("isMapShown")) || false;
     this.checkAllIPs();
 
     // 从本地存储中获取 ipGeoSource

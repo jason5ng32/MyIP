@@ -14,6 +14,7 @@ import recaptchaHandler from './api/recaptcha.js';
 import validateConfigs from './api/configs.js';
 import dnsResolver from './api/dnsresolver.js';
 import rateLimit from 'express-rate-limit';
+import { slowDown } from 'express-slow-down'
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ const app = express();
 const port = process.env.PORT || 11966;
 const blackListIPLogFilePath = process.env.BLACKLIST_LOG_FILE_PATH || '';
 const rateLimitSet = process.env.RATE_LIMIT || '60';
+const deleyAfter = process.env.DELAY_AFTER || '60';
 
 app.set('trust proxy', 1);
 
@@ -90,7 +92,14 @@ const apiLimiter = rateLimit({
     }
 });
 
+const speedLimiter = slowDown({
+	windowMs: 60 * 60 * 1000,
+	delayAfter: parseInt(deleyAfter, 10),
+	delayMs: (hits) => hits * 400,
+})
+
 app.use('/api', apiLimiter);
+app.use('/api', speedLimiter);
 
 // APIs
 app.get('/api/map', mapHandler);
