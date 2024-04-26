@@ -18,6 +18,7 @@
 
                         <div class="input-group mb-2 mt-2 ">
                             <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
+                            :disabled="dnsCheckStatus === 'running'"
                                 :placeholder="$t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
                                 name="queryURL" id="queryURL" data-1p-ignore>
 
@@ -49,7 +50,7 @@
                         <!-- Results Table -->
                         <div v-if="combinedResults && combinedResults.length">
                             <div class="table-responsive text-nowrap">
-                                <table class="table" :class="{ 'table-dark': isDarkMode }">
+                                <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                                     <thead>
                                         <tr>
                                             <th scope="col">{{ $t('dnsresolver.Provider') }}</th>
@@ -114,7 +115,7 @@ export default {
                 const url = new URL(input);
                 const hostname = url.hostname;
 
-                if (hostname.includes('.')) {
+                if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
                     return hostname;
                 }
             } catch {
