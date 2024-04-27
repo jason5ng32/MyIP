@@ -80,7 +80,7 @@ function logLimitedIP(ip) {
 }
 
 const apiLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
+    windowMs: 20 * 60 * 1000,
     max: parseInt(rateLimitSet, 10),
     message: 'Too Many Requests',
     handler: (req, res, next) => {
