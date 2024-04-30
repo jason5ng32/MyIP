@@ -5,7 +5,8 @@
       <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ $t('dnsleaktest.Title') }}</h2>
       <button @click="checkAllDNSLeakTest(true)"
         :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh DNS Leak Test"
-        v-tooltip="$t('Tooltips.RefreshDNSLeakTest')"><i class="bi bi-arrow-clockwise"></i></button>
+        v-tooltip="$t('Tooltips.RefreshDNSLeakTest')"><i class="bi"
+          :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
     </div>
     <div class="text-secondary">
       <p>{{ $t('dnsleaktest.Note') }}</p>
@@ -19,23 +20,24 @@
               <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
             </p>
             <p class="card-text" :class="{
-        'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
-        'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
-      }">
+              'text-info': leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError'),
+              'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
+            }">
               <i class="bi"
                 :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"></i>
               {{ $t('dnsleaktest.Endpoint') }}: {{
-        leak.ip }}
+                leak.ip }}
             </p>
 
             <div class="alert" :class="{
-        'alert-info': leak.country === $t('dnsleaktest.StatusWait'),
-        'alert-success': leak.country !== $t('dnsleaktest.StatusWait'),
-      }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+              'alert-info': leak.country === $t('dnsleaktest.StatusWait'),
+              'alert-success': leak.country !== $t('dnsleaktest.StatusWait'),
+            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <i class="bi"
                 :class="[leak.ip === $t('dnsleaktest.StatusWait') || leak.ip === $t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
               {{ $t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.country }}&nbsp;</strong>
-              <span v-if="leak.country !== $t('dnsleaktest.StatusWait') && leak.country !== $t('dnsleaktest.StatusError')"
+              <span
+                v-if="leak.country !== $t('dnsleaktest.StatusWait') && leak.country !== $t('dnsleaktest.StatusError')"
                 :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
             </div>
           </div>
@@ -58,15 +60,19 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
+    const userPreferences = computed(() => store.state.userPreferences);
 
     return {
       isDarkMode,
       isMobile,
+      userPreferences,
     };
   },
 
   data() {
     return {
+      autoStart: this.userPreferences.autoStart,
+      isStarted: false,
       leakTest: [
         {
           id: "ipapi1",
@@ -185,6 +191,8 @@ export default {
       this.leakTest.forEach((server) => {
         server.geo = this.$t('dnsleaktest.StatusWait');
         server.ip = this.$t('dnsleaktest.StatusWait');
+        server.country = this.$t('dnsleaktest.StatusWait');
+        server.country_code = this.$t('dnsleaktest.StatusWait');
       });
       if (isRefresh) {
         this.$trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
@@ -204,12 +212,16 @@ export default {
       setTimeout(() => {
         this.fetchLeakTestSfSharkCom(3, 0);
       }, 1000);
+
+      this.isStarted = true;
     },
   },
   mounted() {
-    setTimeout(() => {
-      this.checkAllDNSLeakTest(false);
-    }, 2500);
+    if (this.autoStart) {
+      setTimeout(() => {
+        this.checkAllDNSLeakTest(false);
+      }, 2500);
+    }
   },
 }
 </script>

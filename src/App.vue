@@ -346,14 +346,6 @@ export default {
           description: this.$t('shortcutKeys.GoToBottom'),
         },
         {
-          keys: "D",
-          action: () => {
-            this.$refs.navBarRef.toggleDarkMode(),
-              this.$trackEvent('ShortCut', 'ShortCut', 'ToggleDarkMode');
-          },
-          description: this.$t('shortcutKeys.ToggleDarkMode'),
-        },
-        {
           keys: "R",
           action: () => {
             this.$store.commit('setRefreshEveryThing', true);

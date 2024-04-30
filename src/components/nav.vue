@@ -36,15 +36,12 @@
         </ul>
       </div>
 
-      <div>
-        <input type="checkbox" class="jn-checkbox" aria-label="Toggle Dark Mode" id="toggleBtn" v-model="isDarkMode"
-          @click="toggleDarkMode" />
-        <label class="switch" for="toggleBtn">
-          <i class="bi bi-moon-stars text-light"></i>
-          <i class="bi bi-brightness-high text-warning "></i>
-          <div class="ball"></div>
-        </label>
+
+      <div id="Preferences" class="preferrence-button" @click.prevent="OpenPreferences" role="button">
+        <i class="bi bi-sliders"></i>
       </div>
+
+
 
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -70,8 +67,8 @@
           @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
       </div>
       <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
-        :class="{ 'btn-outline-light' : isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile}" target="_blank"
-        @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
+        :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
+        target="_blank" @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
         <div><i class="bi bi-github"></i></div>
         <div class="row flex-column ">
           <TransitionGroup name="slide-fade">
@@ -86,11 +83,138 @@
       </a>
     </div>
   </nav>
+
+  <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-start h-100 " tabindex="-1"
+    id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel"><i class="bi bi-sliders"></i> 偏好设置</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+      <div class="preferences-tip">这些设置会保存在浏览器，方便下次使用。选定选项后，刷新页面即可生效。</div>
+
+      <div id="Pref_colorScheme">
+        <label class="form-label col-12 preferences-title">颜色方案</label>
+        <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
+          <input type="radio" class="btn-check" name="darkModeAuto" id="darkModeAuto" autocomplete="off" value="auto"
+            v-model="userPreferences.theme" @change="manualChangeTheme('auto')">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'auto' }"
+            for="darkModeAuto">跟随系统</label>
+
+          <input type="radio" class="btn-check" name="darkModeOff" id="darkModeOff" autocomplete="off" value="light"
+            v-model="userPreferences.theme" @change="manualChangeTheme('light')">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'light' }"
+            for="darkModeOff">
+            <span><i class="bi bi-brightness-high "></i> 白天</span>
+          </label>
+
+          <input type="radio" class="btn-check" name="darkModeOn" id="darkModeOn" autocomplete="off" value="dark"
+            v-model="userPreferences.theme" @change="manualChangeTheme('dark')">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'dark' }"
+            for="darkModeOn">
+            <span><i class="bi bi-moon-stars"></i> 黑夜</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="Pref_autoStart">
+        <label class="form-label col-12 preferences-title">自动运行</label>
+        <div class="btn-group col-auto" role="group" aria-label="Auto Start">
+          <input type="radio" class="btn-check" name="autoStartOn" id="autoStartOn" autocomplete="off" value="true"
+            v-model="userPreferences.autoStart" @change="manualChangeAutoStart(true)">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.autoStart }"
+            for="autoStartOn">开启</label>
+
+          <input type="radio" class="btn-check" name="autoStartOff" id="autoStartOff" autocomplete="off" value="false"
+            v-model="userPreferences.autoStart" @change="manualChangeAutoStart(false)">
+          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.autoStart }"
+            for="autoStartOff">关闭</label>
+
+        </div>
+        <div class="preferences-tip">当关闭自动运行后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。</div>
+      </div>
+
+      <div id="Pref_showMap" v-if="configs.bingMap">
+        <label class="form-label col-12 preferences-title">显示地图</label>
+        <div class="btn-group col-auto" role="group" aria-label="Show Map">
+          <input type="radio" class="btn-check" name="showMapOn" id="showMapOn" autocomplete="off" value="true"
+            v-model="userPreferences.showMap" @change="manualChangeShowMap(true)">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.showMap }"
+            for="showMapOn">开启</label>
+
+          <input type="radio" class="btn-check" name="showMapOff" id="showMapOff" autocomplete="off" value="false"
+            v-model="userPreferences.showMap" @change="manualChangeShowMap(false)">
+          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.showMap }"
+            for="showMapOff">关闭</label>
+
+        </div>
+        <div class="preferences-tip">在 IP 信息卡片上显示地图。</div>
+      </div>
+
+      <div id="Pref_simpleMode" v-if="isMobile">
+        <label class="form-label col-12 preferences-title">IP 卡片信息</label>
+        <div class="btn-group col-auto" role="group" aria-label="Simple Mode">
+          <input type="radio" class="btn-check" name="simpleModeOn" id="simpleModeOn" autocomplete="off" value="true"
+            v-model="userPreferences.simpleMode" @change="manualChangeSimpleMode(true)">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.simpleMode }"
+            for="simpleModeOn">简洁</label>
+
+          <input type="radio" class="btn-check" name="simpleModeOff" id="simpleModeOff" autocomplete="off" value="false"
+            v-model="userPreferences.simpleMode" @change="manualChangeSimpleMode(false)">
+          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.simpleMode }"
+            for="simpleModeOff">详情</label>
+
+        </div>
+        <div class="preferences-tip">仅在手机上生效。</div>
+      </div>
+
+      <div id="Pref_connectivityRefresh">
+        <label class="form-label col-12 preferences-title">多次刷新可用性检测</label>
+        <div class="btn-group col-auto" role="group" aria-label="Connectivity Refresh">
+          <input type="radio" class="btn-check" name="connectivityAutoRefreshOn" id="connectivityAutoRefreshOn"
+            autocomplete="off" value="true" v-model="userPreferences.connectivityAutoRefresh"
+            @change="manualChangeConnectivityRefresh(true)">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.connectivityAutoRefresh }"
+            for="connectivityAutoRefreshOn">开启</label>
+
+          <input type="radio" class="btn-check" name="connectivityAutoRefreshOff" id="connectivityAutoRefreshOff"
+            autocomplete="off" value="false" v-model="userPreferences.connectivityAutoRefresh"
+            @change="manualChangeConnectivityRefresh(false)">
+          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.connectivityAutoRefresh }"
+            for="connectivityAutoRefreshOff">关闭</label>
+
+        </div>
+        <div class="preferences-tip">开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。</div>
+      </div>
+
+      <div id="Pref_connectivityShowNoti">
+        <label class="form-label col-12 preferences-title">显示可用性检测结果气泡</label>
+        <div class="btn-group col-auto" role="group" aria-label="Connectivity Show Notification">
+          <input type="radio" class="btn-check" name="connectivityShowNotiOn" id="connectivityShowNotiOn"
+            autocomplete="off" value="true" v-model="userPreferences.popupConnectivityNotifications"
+            @change="manualChangeconnectivityShowNoti(true)">
+          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.popupConnectivityNotifications }"
+            for="connectivityShowNotiOn">开启</label>
+
+          <input type="radio" class="btn-check" name="connectivityShowNotiOff" id="connectivityShowNotiOff"
+            autocomplete="off" value="false" v-model="userPreferences.popupConnectivityNotifications"
+            @change="manualChangeconnectivityShowNoti(false)">
+          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.popupConnectivityNotifications }"
+            for="connectivityShowNotiOff">关闭</label>
+
+        </div>
+        <div class="preferences-tip">开启后，将会在首次检测时以气泡形式提示可用性结果。</div>
+      </div>
+
+    </div>
+  </div>
+
 </template>
 
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { Offcanvas } from 'bootstrap';
 
 export default {
   name: 'NavBar',
@@ -100,10 +224,14 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
+    const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
 
     return {
       isDarkMode,
-      isMobile
+      isMobile,
+      configs,
+      userPreferences,
     };
   },
 
@@ -111,9 +239,32 @@ export default {
     return {
       loaded: false,
       githubStars: 0,
+      prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
     }
   },
   methods: {
+
+    OpenPreferences() {
+      var offcanvas = new Offcanvas(document.getElementById('offcanvasPreferences'));
+      offcanvas.show();
+    },
+
+    setUserPreferences(key, value) {
+      this.$store.commit('UPDATE_PREFERENCE', { key, value });
+    },
+
+    handleThemeChange(event) {
+      this.prefersDarkMode = event.matches;
+      if (this.userPreferences.theme === 'auto') {
+        this.$store.commit('SET_DARK_MODE', this.prefersDarkMode);
+      } else if (this.userPreferences.theme === 'light') {
+        this.$store.commit('SET_DARK_MODE', false);
+      } else if (this.userPreferences.theme === 'dark') {
+        this.$store.commit('SET_DARK_MODE', true);
+      }
+      this.updateBodyClass();
+      this.PWAColor();
+    },
 
     //获取 GitHub stars
     async getGitHubStars() {
@@ -135,11 +286,47 @@ export default {
     },
 
     // 切换暗黑模式
-    toggleDarkMode() {
-      this.$store.commit('toggleDarkMode');
+    manualChangeTheme(value) {
+      switch (value) {
+        case 'light':
+          this.$store.commit('SET_DARK_MODE', false);
+          break;
+        case 'dark':
+          this.$store.commit('SET_DARK_MODE', true);
+          break;
+        case 'auto':
+          this.handleThemeChange({ matches: this.mediaQueryList.matches });
+          break;
+      }
       this.updateBodyClass();
       this.PWAColor();
+      this.setUserPreferences('theme', value);
       this.$trackEvent('Nav', 'ToggleClick', 'DarkMode');
+    },
+
+    manualChangeConnectivityRefresh(value) {
+      this.setUserPreferences('connectivityAutoRefresh', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityRefresh');
+    },
+
+    manualChangeShowMap(value) {
+      this.setUserPreferences('showMap', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
+    },
+
+    manualChangeSimpleMode(value) {
+      this.setUserPreferences('simpleMode', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'SimpleMode');
+    },
+
+    manualChangeAutoStart(value) {
+      this.setUserPreferences('autoStart', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'AutoStart');
+    },
+
+    manualChangeconnectivityShowNoti(value) {
+      this.setUserPreferences('popupConnectivityNotifications', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityShowNoti');
     },
 
     // 收起导航栏
@@ -183,10 +370,20 @@ export default {
       this.$trackEvent('Nav', 'NavClick', 'Logo');
     },
   },
+  created() {
+    this.mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+    this.mediaQueryList.addListener(this.handleThemeChange);
+    this.handleThemeChange({ matches: this.mediaQueryList.matches });
+  },
+  beforeDestroy() {
+    if (this.mediaQueryList) {
+      this.mediaQueryList.removeListener(this.handleThemeChange);
+    }
+  },
   mounted() {
-    this.$store.dispatch('checkDarkMode');
     this.updateBodyClass();
     this.PWAColor();
+    console.log(this.userPreferences);
     setTimeout(() => {
       this.getGitHubStars();
     }, 1000)
@@ -327,5 +524,24 @@ export default {
   to {
     left: 100%;
   }
+}
+
+.preferrence-button {
+  margin-left: 12pt;
+}
+
+.preferences-title {
+  margin-top: 12pt;
+  font-weight: 500;
+}
+
+.preferences-tip {
+  font-size: smaller;
+  opacity: 0.7;
+  margin-top: 3pt;
+}
+
+#offcanvasPreferences {
+  z-index: 10000;
 }
 </style>

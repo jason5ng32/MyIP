@@ -6,25 +6,6 @@
         {{ $t('ipInfos.Title') }}</h2>
       <div class="form-check form-switch col-8 jn-radio">
 
-        <div :class="{ 'col-4': isMobile }">
-          <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
-            :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');"
-            aria-label="Toggle Card Display">
-          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
-              class="bi bi-list-columns-reverse" aria-hidden="true"></i></label>
-        </div>
-
-        <div>
-          <input class="form-check-input" type="checkbox" role="button" id="toggleMapSwitch" @change="toggleMaps"
-            aria-label="Toggle Map Display" :checked="isMapShown" :disabled="!configs.bingMap"
-            @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
-
-          <label class="form-check-label" for="toggleMapSwitch">
-            <i :class="['bi', configs.bingMap ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"
-              aria-label="Toggle Map Display" v-tooltip="$t('Tooltips.ToggleMaps')"></i>
-          </label>
-        </div>
-
         <!-- IP 数据源选择 -->
         <div class="dropdown">
           <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
@@ -253,12 +234,14 @@ export default {
     const isMobile = computed(() => store.state.isMobile);
     const ipGeoSource = computed(() => store.state.ipGeoSource);
     const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
 
     return {
       isDarkMode,
       isMobile,
       ipGeoSource,
       configs,
+      userPreferences,
     };
   },
 
@@ -292,7 +275,6 @@ export default {
         { key: 'Bot_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
         { key: 'Human_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
       ],
-      isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
       placeholderSizes: [12, 8, 6, 8, 4],
       sources: [
         { id: 0, text: 'IPCheck.ing', enabled: true },
@@ -407,7 +389,8 @@ export default {
           showASNInfo: false,
         },
       ],
-      isMapShown: false,
+      isMapShown: this.userPreferences.showMap,
+      isCardsCollapsed: this.userPreferences.simpleMode,
       ipDataCache: new Map(),
       copiedStatus: {},
       bingMapLanguage: this.$Lang,
@@ -424,19 +407,6 @@ export default {
       const ipv6Pattern =
         /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
       return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-    },
-
-    // 切换地图显示
-    toggleMaps() {
-      this.isMapShown = !this.isMapShown;
-      this.ipDataCards.forEach((card) => {
-        card.showMap = this.isMapShown;
-      });
-    },
-
-    // 切换卡片折叠
-    toggleCollapse() {
-      this.isCardsCollapsed = !this.isCardsCollapsed;
     },
 
     // 从中国来源获取 IP 地址
@@ -999,12 +969,14 @@ export default {
   },
 
   watch: {
-    isMapShown(newVal) {
-      localStorage.setItem("isMapShown", JSON.stringify(newVal));
+    userPreferences: {
+      handler() {
+        this.isMapShown = this.userPreferences.showMap;
+        this.isCardsCollapsed = this.userPreferences.simpleMode;
+      },
+      deep: true,
     },
-    isCardsCollapsed(newVal) {
-      localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
-    },
+
     IPArray: {
       handler() {
         this.$store.commit('updateGlobalIpDataCards', this.IPArray);
@@ -1014,7 +986,6 @@ export default {
   },
 
   mounted() {
-    this.isMapShown = JSON.parse(localStorage.getItem("isMapShown")) || false;
     this.checkAllIPs();
 
     // 从本地存储中获取 ipGeoSource
