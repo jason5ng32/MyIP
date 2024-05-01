@@ -18,7 +18,7 @@
       "colorAuto": "Auto",
       "colorLight": "Day",
       "colorDark": "Night",
-      "ipSourcesToCheck": "IP Source To Check",
+      "ipSourcesToCheck": "IP Sources To Check",
       "appSettings": "Program Settings",
       "autoRun": "Auto Run",
       "autoRunTips": "If disabled, the app will only check the local IP and will not run tests automatically.",

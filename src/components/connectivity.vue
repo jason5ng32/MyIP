@@ -19,7 +19,7 @@
     <div class="availability-test-section mb-4">
       <div class="jn-title2">
         <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ $t('connectivity.Title') }}</h2>
-        <button @click="checkAllConnectivity(false, true)"
+        <button @click="checkAllConnectivity(false, true, true)"
           :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
           aria-label="Refresh Connectivity Test" v-tooltip="$t('Tooltips.RefreshConnectivityTests')"><i class="bi"
             :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
@@ -94,6 +94,7 @@ export default {
       isStarted: false,
       counter: 0,
       maxCounts: 5,
+      manualRun: false,
       connectivityTests: [
         {
           id: "bilibili",
@@ -174,9 +175,9 @@ export default {
   methods: {
 
     // 检查网络连通性
-    checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
+    checkConnectivityHandler(test, onTestComplete, isManualRun) {
       const beginTime = +new Date();
-
+      this.manualRun = isManualRun;
       let img = new Image();
       let timeout = setTimeout(() => {
         test.status = this.$t('connectivity.StatusUnavailable');
@@ -194,7 +195,7 @@ export default {
           test.mintime = Math.min(test.mintime, testTime);
         }
 
-        if (this.autoRefresh) {
+        if (this.autoRefresh && !isManualRun) {
           test.time = test.mintime;
         } else {
           test.time = testTime;
@@ -213,7 +214,7 @@ export default {
     },
 
     // 检查所有网络连通性
-    checkAllConnectivity(isAlertToShow, isRefresh) {
+    checkAllConnectivity(isAlertToShow, isRefresh, isManualRun) {
 
       if (isRefresh) {
         this.connectivityTests.forEach((test) => {
@@ -245,7 +246,7 @@ export default {
 
       this.connectivityTests.forEach((test, index) => {
         setTimeout(() => {
-          this.checkConnectivityHandler(test, isAlertToShow, onTestComplete);
+          this.checkConnectivityHandler(test, onTestComplete, isManualRun);
         }, 50 * index);
       });
 
@@ -289,12 +290,12 @@ export default {
 
     handelCheckStart() {
       setTimeout(() => {
-        this.checkAllConnectivity(true, false);
+        this.checkAllConnectivity(true, false, false);
       }, 2000);
       if (this.autoRefresh) {
         this.intervalId = setInterval(() => {
-          if (this.counter < this.maxCounts) {
-            this.checkAllConnectivity(false, false);
+          if (this.counter < this.maxCounts && !this.manualRun) {
+            this.checkAllConnectivity(false, false, false);
             this.counter++;
           } else {
             clearInterval(this.intervalId);

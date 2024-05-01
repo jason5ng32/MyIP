@@ -180,7 +180,7 @@ export default {
     refreshEverything() {
       const refreshTasks = [
         { action: () => this.$refs.IPCheckRef.checkAllIPs(), delay: 0 },
-        { action: () => this.$refs.connectivityRef.checkAllConnectivity(false, true), delay: 2000 },
+        { action: () => this.$refs.connectivityRef.checkAllConnectivity(false, true, true), delay: 2000 },
         { action: () => this.$refs.webRTCRef.checkAllWebRTC(true), delay: 4000 },
         { action: () => this.$refs.dnsLeaksRef.checkAllDNSLeakTest(true), delay: 2500 },
         { action: () => this.refreshingAlert(), delay: 500 },
@@ -374,7 +374,7 @@ export default {
           keys: "c",
           action: () => {
             this.scrollToElement("Connectivity", 80);
-            this.$refs.connectivityRef.checkAllConnectivity(false, true);
+            this.$refs.connectivityRef.checkAllConnectivity(false, true ,true);
             this.$trackEvent('ShortCut', 'ShortCut', 'Connectivity');
           },
           description: this.$t('shortcutKeys.RefreshConnectivityTests'),

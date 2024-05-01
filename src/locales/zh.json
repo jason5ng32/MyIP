@@ -28,7 +28,7 @@
       "simpleModeTips": "减少 IP 卡片显示的内容。仅在手机上生效。",
       "connectivityAutoRefresh": "多次刷新可用性检测",
       "connectivityAutoRefreshTips": "开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。",
-      "popupConnectivityNotifications": "显示可用性检测结果气泡",
+      "popupConnectivityNotifications": "显示可用性检测气泡",
       "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。"
     }
   },
