@@ -17,7 +17,7 @@
     </div>
 
 
-    <div class="offcanvas offcanvas-end mt-5" :class="[isMobile ? ' w-100' : '']" tabindex="-1" id="About"
+    <div class="offcanvas offcanvas-end mt-5 border-0" :class="[isMobile ? ' w-100' : '']" tabindex="-1" id="About"
       aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">

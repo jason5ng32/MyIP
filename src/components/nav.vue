@@ -82,10 +82,10 @@
   </nav>
 
   <!-- Offcanvas Preferences -->
-  <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-start h-100 " tabindex="-1"
-    id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasExampleLabel"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
+  <div :data-bs-theme="isDarkMode ? 'dark' : 'light'" class="offcanvas offcanvas-start h-100 border-0 mt-5"
+    tabindex="-1" id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
+    <div class="offcanvas-header mt-3">
+      <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
         $t('nav.preferences.title') }}</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -244,9 +244,15 @@ export default {
 
     // 打开偏好设置
     OpenPreferences() {
-      var offcanvas = new Offcanvas(document.getElementById('offcanvasPreferences'));
-      offcanvas.show();
+      var offcanvasElement = document.getElementById('offcanvasPreferences');
+      var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+      if (offcanvasElement.classList.contains('show')) {
+        offcanvas.hide();
+      } else {
+        offcanvas.show();
+      }
     },
+
 
     // 保存偏好设置到 Vuex
     setUserPreferences(key, value) {
@@ -402,7 +408,6 @@ export default {
 </script>
 
 <style scoped>
-
 .jn-checkbox {
   display: none;
 }
@@ -556,7 +561,11 @@ export default {
   min-width: 40pt;
 }
 
+.jn-margin {
+  margin-top: 42pt;
+}
+
 #offcanvasPreferences {
-  z-index: 10000;
+  z-index: 1051;
 }
 </style>
