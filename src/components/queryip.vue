@@ -241,52 +241,12 @@ export default {
             return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
         },
 
-        // 转换 IP 信息
+        // 格式化 IP 数据
         transformDataFromIPapi(data) {
             if (data.error) {
                 throw new Error(data.reason);
             }
-
-            if (this.ipGeoSource === 0) {
-
-                const proxyDetect = data.proxyDetect || {};
-
-                const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
-                    proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
-                        this.$t('ipInfos.proxyDetect.unknownProxyType');
-
-                const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
-                    proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
-                        proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-                            proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
-                                proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
-
-                const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
-                    proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
-
-                const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-
-                return {
-                    country_name: data.country_name || "",
-                    country_code: data.country || "",
-                    region: data.region || "",
-                    city: data.city || "",
-                    latitude: data.latitude || "",
-                    longitude: data.longitude || "",
-                    isp: data.org || "",
-                    asn: data.asn || "",
-                    asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
-                    mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
-                    mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : "",
-                    isProxy: isProxy,
-                    type: type,
-                    proxyProtocol: proxyProtocol,
-                    proxyOperator: proxyOperator,
-                };
-            }
-
-
-            return {
+            const baseData = {
                 country_name: data.country_name || "",
                 country_code: data.country || "",
                 region: data.region || "",
@@ -295,10 +255,35 @@ export default {
                 longitude: data.longitude || "",
                 isp: data.org || "",
                 asn: data.asn || "",
-                asnlink: data.asn ? `https://radar.cloudflare.com/traffic/${data.asn}` : false,
+                asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
                 mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
                 mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : ""
             };
+            if (this.ipGeoSource === 0) {
+                const proxyDetails = this.extractProxyDetails(data.proxyDetect);
+                return {
+                    ...baseData,
+                    ...proxyDetails,
+                };
+            }
+            return baseData;
+        },
+
+        // 提取代理信息
+        extractProxyDetails(proxyDetect = {}) {
+            const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
+                proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
+                    this.$t('ipInfos.proxyDetect.unknownProxyType');
+            const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
+                proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
+                    proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
+                        proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+                            proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
+            const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
+                proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
+            const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
+
+            return { isProxy, type, proxyProtocol, proxyOperator };
         },
 
         // 获取 IP 信息

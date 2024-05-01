@@ -707,18 +707,15 @@ export default {
       const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
         proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
           this.$t('ipInfos.proxyDetect.unknownProxyType');
-
       const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
         proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
           proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
             proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
               proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
-
       const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
         proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
-
       const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-
+      
       return { isProxy, type, proxyProtocol, proxyOperator };
     },
 
