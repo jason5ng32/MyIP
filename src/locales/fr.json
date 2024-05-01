@@ -10,7 +10,27 @@
         "PingTest": "Latence mondiale",
         "MTRTest": "Test MTR",
         "RuleTest": "Test de règles",
-        "AdvancedTools": "Outils avancés"
+        "AdvancedTools": "Outils avancés",
+        "preferences": {
+            "title": "Préférences",
+            "preferenceTips": "Les paramètres sont sauvegardés dans votre navigateur pour une utilisation facile. Rafraîchissez la page pour activer les modifications.",
+            "colorScheme": "Schéma de Couleurs",
+            "colorAuto": "Par Défaut Système",
+            "colorLight": "Jour",
+            "colorDark": "Nuit",
+            "ipSourcesToCheck": "Nombre de Sources IP",
+            "appSettings": "Paramètres de l'App",
+            "autoRun": "Exécution Automatique",
+            "autoRunTips": "Si désactivé, l'appli vérifiera seulement l'IP local et n'exécutera pas de tests automatiquement.",
+            "showMap": "Afficher la Carte",
+            "showMapTips": "Affiche une carte sur la carte d'info IP.",
+            "simpleMode": "Mode Simple",
+            "simpleModeTips": "Réduit les informations affichées sur les cartes IP. Effectif uniquement sur les appareils mobiles.",
+            "connectivityAutoRefresh": "Rafraîchissements Multiples de Connectivité",
+            "connectivityAutoRefreshTips": "Activé, l'appli effectue cinq vérifications au démarrage et affiche le délai le plus bas.",
+            "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
+            "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up."
+        }
     },
     "censorshipcheck": {
         "Title": "Test de censorship",
@@ -78,8 +98,9 @@
     },
     "ipInfos": {
         "id": "ipinfos",
+        "database": "Données",
         "Title": "Infos IP",
-        "Notes": "Le programme vérifie d'abord votre adresse IP à partir de 6 sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
+        "Notes": "Le programme vérifie d'abord votre adresse IP à partir des sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
         "Simple": "Simple",
         "Map": "Carte",
         "MapUnavailable": "Carte non disponible",
@@ -568,6 +589,20 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de certaines logiques fonctionnelles"
+                    }
+                ]
+            },
+            {
+                "version": "v3.8",
+                "date": "May 1, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout d'un panneau de réglages pour sauvegarder les préférences localement."
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de certaines logiques fonctionnelles."
                     }
                 ]
             }

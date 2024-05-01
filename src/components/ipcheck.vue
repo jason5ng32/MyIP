@@ -10,7 +10,7 @@
         <div class="dropdown">
           <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
             :aria-label="$t('ipInfos.SelectSource')">
-            <i class="bi bi-grid-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i>
+            <i class="bi bi-database-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i> {{ $t('ipInfos.database') }} <i class="bi bi-caret-down-fill"></i>
           </span>
           <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li class="dropdown-header">
@@ -40,8 +40,9 @@
     </div>
     <div class="jn-card-deck">
       <div class="row">
-        <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
-          :class="{ 'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error'), 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
+        <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
+          'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error')
+        }]">
           <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
             'jn-ip-card1': !isMobile && ipGeoSource === 0,
@@ -391,6 +392,7 @@ export default {
       ],
       isMapShown: this.userPreferences.showMap,
       isCardsCollapsed: this.userPreferences.simpleMode,
+      ipCardsToShow: this.userPreferences.ipCardsToShow,
       ipDataCache: new Map(),
       copiedStatus: {},
       bingMapLanguage: this.$Lang,
@@ -851,9 +853,12 @@ export default {
         this.getIPFromIpify_V6
       ];
 
+      // 限制执行的函数数量为 ipCardsToShow 的长度
+      const maxIndex = this.ipCardsToShow;
+
       let index = 0;
       const interval = setInterval(() => {
-        if (index < ipFunctions.length) {
+        if (index < maxIndex && index < ipFunctions.length) {
           ipFunctions[index].call(this);
           index++;
         } else {
@@ -985,6 +990,18 @@ export default {
     },
   },
 
+  computed: {
+    colClass() {
+      const numCards = this.ipCardsToShow;
+      if (numCards > 0) {
+        // 保证每行不超过三个卡片
+        const colSize = numCards > 3 ? 4 : Math.floor(12 / numCards);
+        return `col-xl-${colSize} col-md-${colSize}  mb-4`;
+      }
+      return 'col-xl-4 col-lg-6 col-md-6 mb-4'; // 默认情况，如果计算出错或没有卡片显示
+    }
+  },
+
   mounted() {
     this.checkAllIPs();
 
@@ -1030,7 +1047,9 @@ export default {
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
 }
-.dropdown-item.disabled, .dropdown-item:disabled {
+
+.dropdown-item.disabled,
+.dropdown-item:disabled {
   text-decoration: line-through;
 }
 </style>

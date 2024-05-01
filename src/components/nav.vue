@@ -36,12 +36,9 @@
         </ul>
       </div>
 
-
-      <div id="Preferences" class="preferrence-button" @click.prevent="OpenPreferences" role="button">
-        <i class="bi bi-sliders"></i>
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button">
+        <i class="bi bi-toggles"></i>
       </div>
-
-
 
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -84,127 +81,128 @@
     </div>
   </nav>
 
+  <!-- Offcanvas Preferences -->
   <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-start h-100 " tabindex="-1"
     id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasExampleLabel"><i class="bi bi-sliders"></i> 偏好设置</h5>
+      <h5 class="offcanvas-title" id="offcanvasExampleLabel"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
+        $t('nav.preferences.title') }}</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body pt-0">
-      <div class="preferences-tip">这些设置会保存在浏览器，方便下次使用。选定选项后，刷新页面即可生效。</div>
+      <div class="preferences-tip">{{ $t('nav.preferences.preferenceTips') }}</div>
 
       <div id="Pref_colorScheme">
-        <label class="form-label col-12 preferences-title">颜色方案</label>
+        <div class="form-label col-12 preferences-title"><i class="bi bi-palette-fill"></i> {{
+          $t('nav.preferences.colorScheme') }}</div>
         <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
           <input type="radio" class="btn-check" name="darkModeAuto" id="darkModeAuto" autocomplete="off" value="auto"
-            v-model="userPreferences.theme" @change="manualChangeTheme('auto')">
+            v-model="userPreferences.theme" @change="prefTheme('auto')">
           <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'auto' }"
-            for="darkModeAuto">跟随系统</label>
+            for="darkModeAuto">{{ $t('nav.preferences.colorAuto') }}</label>
 
           <input type="radio" class="btn-check" name="darkModeOff" id="darkModeOff" autocomplete="off" value="light"
-            v-model="userPreferences.theme" @change="manualChangeTheme('light')">
+            v-model="userPreferences.theme" @change="prefTheme('light')">
           <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'light' }"
             for="darkModeOff">
-            <span><i class="bi bi-brightness-high "></i> 白天</span>
+            <span><i class="bi bi-brightness-high "></i> {{ $t('nav.preferences.colorLight') }}</span>
           </label>
 
           <input type="radio" class="btn-check" name="darkModeOn" id="darkModeOn" autocomplete="off" value="dark"
-            v-model="userPreferences.theme" @change="manualChangeTheme('dark')">
+            v-model="userPreferences.theme" @change="prefTheme('dark')">
           <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'dark' }"
             for="darkModeOn">
-            <span><i class="bi bi-moon-stars"></i> 黑夜</span>
+            <span><i class="bi bi-moon-stars"></i> {{ $t('nav.preferences.colorDark') }}</span>
           </label>
         </div>
       </div>
 
-      <div id="Pref_autoStart">
-        <label class="form-label col-12 preferences-title">自动运行</label>
-        <div class="btn-group col-auto" role="group" aria-label="Auto Start">
-          <input type="radio" class="btn-check" name="autoStartOn" id="autoStartOn" autocomplete="off" value="true"
-            v-model="userPreferences.autoStart" @change="manualChangeAutoStart(true)">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.autoStart }"
-            for="autoStartOn">开启</label>
-
-          <input type="radio" class="btn-check" name="autoStartOff" id="autoStartOff" autocomplete="off" value="false"
-            v-model="userPreferences.autoStart" @change="manualChangeAutoStart(false)">
-          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.autoStart }"
-            for="autoStartOff">关闭</label>
-
+      <div id="Pref_ipCards">
+        <div class="form-label col-12 preferences-title">
+          <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipSourcesToCheck') }}
         </div>
-        <div class="preferences-tip">当关闭自动运行后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。</div>
+        <div class="btn-group col-auto" role="group" aria-label="ipCards">
+          <template v-for="num in [2, 3, 6]">
+            <input v-model="userPreferences.ipCardsToShow" type="radio" class="btn-check" :name="'ipCards_' + num"
+              :id="'ipCards_' + num" autocomplete="off" :value=num @change="prefipCards(num)">
+            <label class="btn btn-outline-primary jn-number"
+              :class="{ 'active': userPreferences.ipCardsToShow === num }" :for="'ipCards_' + num">{{ num }}</label>
+          </template>
+        </div>
       </div>
 
-      <div id="Pref_showMap" v-if="configs.bingMap">
-        <label class="form-label col-12 preferences-title">显示地图</label>
-        <div class="btn-group col-auto" role="group" aria-label="Show Map">
-          <input type="radio" class="btn-check" name="showMapOn" id="showMapOn" autocomplete="off" value="true"
-            v-model="userPreferences.showMap" @change="manualChangeShowMap(true)">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.showMap }"
-            for="showMapOn">开启</label>
+      <div id="Pref_appSettings">
+        <div class="form-label col-12 preferences-title"><i class="bi bi-window-dock"></i> {{
+          $t('nav.preferences.appSettings') }}</div>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="me-auto">
+              <div class="fw-bold"><label class="form-check-label" for="autoStart">{{ $t('nav.preferences.autoRun')
+                  }}</label>
+              </div>
+              <div class="preferences-tip">{{ $t('nav.preferences.autoRunTips') }}</div>
+            </div>
+            <div class="form-check form-switch col-auto ">
+              <input class="form-check-input" type="checkbox" role="switch" id="autoStart"
+                :checked="userPreferences.autoStart" @change="prefAutoStart($event.target.checked)">
+            </div>
+          </li>
 
-          <input type="radio" class="btn-check" name="showMapOff" id="showMapOff" autocomplete="off" value="false"
-            v-model="userPreferences.showMap" @change="manualChangeShowMap(false)">
-          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.showMap }"
-            for="showMapOff">关闭</label>
+          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="configs.bingMap">
+            <div class="me-auto">
+              <div class="fw-bold"><label class="form-check-label" for="showMap">{{ $t('nav.preferences.showMap')
+                  }}</label>
+              </div>
+              <div class="preferences-tip">{{ $t('nav.preferences.showMapTips') }}</div>
+            </div>
+            <div class="form-check form-switch col-auto ">
+              <input class="form-check-input" type="checkbox" role="switch" id="showMap"
+                :checked="userPreferences.showMap" @change="prefShowMap($event.target.checked)">
+            </div>
+          </li>
 
-        </div>
-        <div class="preferences-tip">在 IP 信息卡片上显示地图。</div>
+          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="isMobile">
+            <div class="me-auto">
+              <div class="fw-bold"><label class="form-check-label" for="simpleMode">{{ $t('nav.preferences.simpleMode')
+                  }}</label></div>
+              <div class="preferences-tip">{{ $t('nav.preferences.simpleModeTips') }}</div>
+            </div>
+            <div class="form-check form-switch col-auto ">
+              <input class="form-check-input" type="checkbox" role="switch" id="simpleMode"
+                :checked="userPreferences.simpleMode" @change="prefSimpleMode($event.target.checked)">
+            </div>
+          </li>
+
+          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="userPreferences.autoStart">
+            <div class="me-auto">
+              <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
+                $t('nav.preferences.connectivityAutoRefresh') }}</label></div>
+              <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
+            </div>
+            <div class="form-check form-switch col-auto ">
+              <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityRefresh"
+                :checked="userPreferences.connectivityAutoRefresh"
+                @change="prefConnectivityRefresh($event.target.checked)">
+            </div>
+          </li>
+
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="me-auto">
+              <div class="fw-bold"><label class="form-check-label" for="ConnectivityNotifications">{{
+                $t('nav.preferences.popupConnectivityNotifications') }}</label>
+              </div>
+              <div class="preferences-tip">{{ $t('nav.preferences.popupConnectivityNotificationsTips') }}</div>
+            </div>
+            <div class="form-check form-switch col-auto ">
+              <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityNotifications"
+                :checked="userPreferences.popupConnectivityNotifications"
+                @change="prefconnectivityShowNoti($event.target.checked)">
+            </div>
+          </li>
+
+        </ul>
       </div>
 
-      <div id="Pref_simpleMode" v-if="isMobile">
-        <label class="form-label col-12 preferences-title">IP 卡片信息</label>
-        <div class="btn-group col-auto" role="group" aria-label="Simple Mode">
-          <input type="radio" class="btn-check" name="simpleModeOn" id="simpleModeOn" autocomplete="off" value="true"
-            v-model="userPreferences.simpleMode" @change="manualChangeSimpleMode(true)">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.simpleMode }"
-            for="simpleModeOn">简洁</label>
-
-          <input type="radio" class="btn-check" name="simpleModeOff" id="simpleModeOff" autocomplete="off" value="false"
-            v-model="userPreferences.simpleMode" @change="manualChangeSimpleMode(false)">
-          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.simpleMode }"
-            for="simpleModeOff">详情</label>
-
-        </div>
-        <div class="preferences-tip">仅在手机上生效。</div>
-      </div>
-
-      <div id="Pref_connectivityRefresh">
-        <label class="form-label col-12 preferences-title">多次刷新可用性检测</label>
-        <div class="btn-group col-auto" role="group" aria-label="Connectivity Refresh">
-          <input type="radio" class="btn-check" name="connectivityAutoRefreshOn" id="connectivityAutoRefreshOn"
-            autocomplete="off" value="true" v-model="userPreferences.connectivityAutoRefresh"
-            @change="manualChangeConnectivityRefresh(true)">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.connectivityAutoRefresh }"
-            for="connectivityAutoRefreshOn">开启</label>
-
-          <input type="radio" class="btn-check" name="connectivityAutoRefreshOff" id="connectivityAutoRefreshOff"
-            autocomplete="off" value="false" v-model="userPreferences.connectivityAutoRefresh"
-            @change="manualChangeConnectivityRefresh(false)">
-          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.connectivityAutoRefresh }"
-            for="connectivityAutoRefreshOff">关闭</label>
-
-        </div>
-        <div class="preferences-tip">开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。</div>
-      </div>
-
-      <div id="Pref_connectivityShowNoti">
-        <label class="form-label col-12 preferences-title">显示可用性检测结果气泡</label>
-        <div class="btn-group col-auto" role="group" aria-label="Connectivity Show Notification">
-          <input type="radio" class="btn-check" name="connectivityShowNotiOn" id="connectivityShowNotiOn"
-            autocomplete="off" value="true" v-model="userPreferences.popupConnectivityNotifications"
-            @change="manualChangeconnectivityShowNoti(true)">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.popupConnectivityNotifications }"
-            for="connectivityShowNotiOn">开启</label>
-
-          <input type="radio" class="btn-check" name="connectivityShowNotiOff" id="connectivityShowNotiOff"
-            autocomplete="off" value="false" v-model="userPreferences.popupConnectivityNotifications"
-            @change="manualChangeconnectivityShowNoti(false)">
-          <label class="btn btn-outline-primary" :class="{ 'active': !userPreferences.popupConnectivityNotifications }"
-            for="connectivityShowNotiOff">关闭</label>
-
-        </div>
-        <div class="preferences-tip">开启后，将会在首次检测时以气泡形式提示可用性结果。</div>
-      </div>
 
     </div>
   </div>
@@ -239,20 +237,23 @@ export default {
     return {
       loaded: false,
       githubStars: 0,
-      prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
+      prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
     }
   },
   methods: {
 
+    // 打开偏好设置
     OpenPreferences() {
       var offcanvas = new Offcanvas(document.getElementById('offcanvasPreferences'));
       offcanvas.show();
     },
 
+    // 保存偏好设置到 Vuex
     setUserPreferences(key, value) {
       this.$store.commit('UPDATE_PREFERENCE', { key, value });
     },
 
+    // 主题模式切换
     handleThemeChange(event) {
       this.prefersDarkMode = event.matches;
       if (this.userPreferences.theme === 'auto') {
@@ -285,8 +286,8 @@ export default {
       }
     },
 
-    // 切换暗黑模式
-    manualChangeTheme(value) {
+    // 偏好设置里的一些配置项
+    prefTheme(value) {
       switch (value) {
         case 'light':
           this.$store.commit('SET_DARK_MODE', false);
@@ -304,29 +305,39 @@ export default {
       this.$trackEvent('Nav', 'ToggleClick', 'DarkMode');
     },
 
-    manualChangeConnectivityRefresh(value) {
+    prefConnectivityRefresh(value) {
       this.setUserPreferences('connectivityAutoRefresh', value);
       this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityRefresh');
     },
 
-    manualChangeShowMap(value) {
+    prefShowMap(value) {
       this.setUserPreferences('showMap', value);
       this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
     },
 
-    manualChangeSimpleMode(value) {
+    prefSimpleMode(value) {
       this.setUserPreferences('simpleMode', value);
       this.$trackEvent('Nav', 'ToggleClick', 'SimpleMode');
     },
 
-    manualChangeAutoStart(value) {
+    prefAutoStart(value) {
       this.setUserPreferences('autoStart', value);
       this.$trackEvent('Nav', 'ToggleClick', 'AutoStart');
     },
 
-    manualChangeconnectivityShowNoti(value) {
+    prefconnectivityShowNoti(value) {
       this.setUserPreferences('popupConnectivityNotifications', value);
       this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityShowNoti');
+    },
+
+    prefipCards(value) {
+      this.setUserPreferences('ipCardsToShow', value);
+      this.$trackEvent('Nav', 'ToggleClick', 'IpCards');
+    },
+
+    toggleMaps() {
+      this.setUserPreferences('showMap', !this.userPreferences.showMap);
+      this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
     },
 
     // 收起导航栏
@@ -383,7 +394,6 @@ export default {
   mounted() {
     this.updateBodyClass();
     this.PWAColor();
-    console.log(this.userPreferences);
     setTimeout(() => {
       this.getGitHubStars();
     }, 1000)
@@ -392,7 +402,7 @@ export default {
 </script>
 
 <style scoped>
-/*==================== Dark Light Button Implementation ====================*/
+
 .jn-checkbox {
   display: none;
 }
@@ -526,19 +536,24 @@ export default {
   }
 }
 
-.preferrence-button {
-  margin-left: 12pt;
+.preference-button {
+  margin-left: 8pt;
 }
 
 .preferences-title {
   margin-top: 12pt;
   font-weight: 500;
+  margin-bottom: 12pt;
 }
 
 .preferences-tip {
   font-size: smaller;
   opacity: 0.7;
   margin-top: 3pt;
+}
+
+.jn-number {
+  min-width: 40pt;
 }
 
 #offcanvasPreferences {

@@ -64,6 +64,7 @@ export default {
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
     const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
     const shouldRefreshEveryThing = computed(() => store.state.shouldRefreshEveryThing);
     const shouldRefresh = ref(false);
 
@@ -76,6 +77,7 @@ export default {
       isMobile,
       shouldRefresh,
       configs,
+      userPreferences,
     };
   },
 
@@ -358,6 +360,9 @@ export default {
           keys: "([1-6])",
           type: "regex",
           action: (num) => {
+            if (num > this.userPreferences.ipCardsToShow) {
+              return
+            }
             const card = this.$refs.IPCheckRef.ipDataCards[num - 1];
             this.scrollToElement("IPInfo-" + num, 171);
             this.$refs.IPCheckRef.refreshCard(card);
@@ -451,7 +456,7 @@ export default {
           action: () => {
             if (this.configs.bingMap) {
               window.scrollTo({ top: 0, behavior: "smooth" });
-              this.$refs.IPCheckRef.toggleMaps();
+              this.$refs.navBarRef.toggleMaps();
             };
             this.$trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
           },

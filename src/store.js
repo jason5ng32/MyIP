@@ -58,6 +58,7 @@ const store = createStore({
         autoStart: true,
         hideUnavailableIPStack: false,
         popupConnectivityNotifications: true,
+        ipCardsToShow: 6,
       };
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;
