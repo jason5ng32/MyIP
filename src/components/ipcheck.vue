@@ -10,7 +10,8 @@
         <div class="dropdown">
           <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
             :aria-label="$t('ipInfos.SelectSource')">
-            <i class="bi bi-database-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i> {{ $t('ipInfos.database') }} <i class="bi bi-caret-down-fill"></i>
+            <i class="bi bi-database-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i> {{ $t('ipInfos.database') }} <i
+              class="bi bi-caret-down-fill"></i>
           </span>
           <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li class="dropdown-header">
@@ -30,8 +31,6 @@
             </li>
           </ul>
         </div>
-
-
 
       </div>
     </div>
@@ -247,20 +246,25 @@ export default {
   },
 
   data() {
+    const createDefaultCard = () => ({
+      ip: "",
+      country_name: "",
+      region: "",
+      city: "",
+      latitude: "",
+      longitude: "",
+      isp: "",
+      asn: "",
+      asnlink: "",
+      mapUrl: '/defaultMap.webp',
+      mapUrl_dark: '/defaultMap_dark.webp',
+      showMap: false,
+      showASNInfo: false,
+    });
     return {
       asnInfos: {
         "AS15169": {
-          "asnName": "Google",
-          "asnOrgName": "GOGL-ARIN",
-          "estimatedUsers": "368891",
-          "IPv4_Pct": "95.35",
-          "IPv6_Pct": "4.65",
-          "HTTP_Pct": "3.16",
-          "HTTPS_Pct": "96.84",
-          "Desktop_Pct": "58.88",
-          "Mobile_Pct": "41.12",
-          "Bot_Pct": "98.46",
-          "Human_Pct": "1.54"
+          "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "368891", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
         }
       },
       asnInfoItems: [
@@ -288,106 +292,34 @@ export default {
       pendingIPDetailsRequests: new Map(),
       ipDataCards: [
         {
+          ...createDefaultCard(),
           id: "cnsource",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "CN Source",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "special",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Special",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "cloudflare_v4",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Cloudflare IPv4",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "cloudflare_v6",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Cloudflare IPv6",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "ipify_v4",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "IPify IPv4",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "ipify_v6",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "IPify IPv6",
-          showASNInfo: false,
         },
       ],
       isMapShown: this.userPreferences.showMap,
@@ -414,50 +346,7 @@ export default {
     // 从中国来源获取 IP 地址
     getIPfromCNSource() {
       this.getIPFromIPIP().catch(() => {
-        this.getIPFromTaobao().catch(() => {
-          this.getIPFromQQ();
-        })
-      });
-    },
-
-    // 从淘宝获取 IP 地址
-    getIPFromTaobao() {
-      return new Promise((resolve, reject) => {
-        let script = document.createElement("script");
-        script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
-        document.head.appendChild(script);
-
-        window.ipCallback = (data) => {
-          try {
-            let ip = data.ip;
-            this.ipDataCards[0].source = "TaoBao";
-            this.fetchIPDetails(0, ip);
-            this.IPArray = [...this.IPArray, ip];
-
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            resolve(ip);
-          } catch (error) {
-            console.error("Error processing IP data from Taobao:", error);
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            reject(new Error("Failed to process IP data from Taobao"));
-          }
-        };
-        // 设置超时拒绝 Promise，以防万一请求挂起
-        script.onerror = () => {
-          console.error("Error loading script for IP data from Taobao");
-          document.head.removeChild(script);
-          delete window.ipCallback;
-          reject(new Error("Script loading error for IP data from Taobao"));
-        };
-        setTimeout(() => {
-          if (document.head.contains(script)) {
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            reject(new Error("Request to Taobao timed out"));
-          }
-        }, 2000);
+        this.getIPFromQQ();
       });
     },
 
@@ -788,46 +677,7 @@ export default {
         throw new Error(data.reason);
       }
 
-
-      if (this.ipGeoSource === 0) {
-
-        const proxyDetect = data.proxyDetect || {};
-
-        const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
-          proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
-            this.$t('ipInfos.proxyDetect.unknownProxyType');
-
-        const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
-          proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
-            proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-              proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
-                proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
-
-        const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
-          proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
-
-        const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-
-        return {
-          country_name: data.country_name || "",
-          country_code: data.country || "",
-          region: data.region || "",
-          city: data.city || "",
-          latitude: data.latitude || "",
-          longitude: data.longitude || "",
-          isp: data.org || "",
-          asn: data.asn || "",
-          asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
-          mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
-          mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : "",
-          isProxy: isProxy,
-          type: type,
-          proxyProtocol: proxyProtocol,
-          proxyOperator: proxyOperator,
-        };
-      }
-
-      return {
+      const baseData = {
         country_name: data.country_name || "",
         country_code: data.country || "",
         region: data.region || "",
@@ -840,6 +690,36 @@ export default {
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
         mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : ""
       };
+
+      if (this.ipGeoSource === 0) {
+        const proxyDetails = this.extractProxyDetails(data.proxyDetect);
+        return {
+          ...baseData,
+          ...proxyDetails,
+        };
+      }
+
+      return baseData;
+    },
+
+    // 提取代理信息
+    extractProxyDetails(proxyDetect = {}) {
+      const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
+        proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
+          this.$t('ipInfos.proxyDetect.unknownProxyType');
+
+      const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
+        proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
+          proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
+            proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+              proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
+
+      const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
+        proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
+
+      const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
+
+      return { isProxy, type, proxyProtocol, proxyOperator };
     },
 
     // 检查所有 IP 地址
@@ -894,10 +774,6 @@ export default {
         case "IPCheck.ing":
           this.getIPFromGCR(card);
           this.$trackEvent('IPCheck', 'RefreshClick', 'IPCheck.ing');
-          break;
-        case "TaoBao":
-          this.getIPFromTaobao(card);
-          this.$trackEvent('IPCheck', 'RefreshClick', 'TaoBao');
           break;
         case "IPIP.net":
           this.getIPFromIPIP(card);
