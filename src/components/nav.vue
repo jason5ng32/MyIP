@@ -203,6 +203,8 @@
         </ul>
       </div>
 
+      <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
+      </div>
 
     </div>
   </div>
@@ -563,6 +565,10 @@ export default {
 
 .jn-margin {
   margin-top: 42pt;
+}
+
+.jn-placeholder {
+  height: 20pt;
 }
 
 #offcanvasPreferences {
