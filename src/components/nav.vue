@@ -36,7 +36,8 @@
         </ul>
       </div>
 
-      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button" aria-label="Preferences">
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
+        aria-label="Preferences">
         <i class="bi bi-toggles"></i>
       </div>
 
@@ -292,7 +293,8 @@ export default {
     left: 100%;
   }
 }
+
 .preference-button {
-    margin-left: 8pt;
+  margin-left: 8pt;
 }
 </style>

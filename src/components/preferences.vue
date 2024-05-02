@@ -9,7 +9,7 @@
                 $t('nav.preferences.title') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body pt-0">
+        <div class="offcanvas-body pt-0 m-2">
             <div class="preferences-tip">{{ $t('nav.preferences.preferenceTips') }}</div>
 
             <div id="Pref_colorScheme">
@@ -18,20 +18,30 @@
                 <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
                     <input type="radio" class="btn-check" name="darkModeAuto" id="darkModeAuto" autocomplete="off"
                         value="auto" v-model="userPreferences.theme" @change="prefTheme('auto')">
-                    <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'auto' }"
-                        for="darkModeAuto">{{ $t('nav.preferences.colorAuto') }}</label>
+                    <label class="btn" :class="{
+                        'btn-outline-dark': !isDarkMode,
+                        'btn-outline-light': isDarkMode,
+                        'active fw-bold': userPreferences.theme === 'auto'
+                    }" for="darkModeAuto">{{
+                        $t('nav.preferences.colorAuto') }}</label>
 
                     <input type="radio" class="btn-check" name="darkModeOff" id="darkModeOff" autocomplete="off"
                         value="light" v-model="userPreferences.theme" @change="prefTheme('light')">
-                    <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'light' }"
-                        for="darkModeOff">
+                    <label class="btn" :class="{
+                        'btn-outline-dark': !isDarkMode,
+                        'btn-outline-light': isDarkMode,
+                        'active fw-bold': userPreferences.theme === 'light'
+                    }" for="darkModeOff">
                         <span><i class="bi bi-brightness-high "></i> {{ $t('nav.preferences.colorLight') }}</span>
                     </label>
 
                     <input type="radio" class="btn-check" name="darkModeOn" id="darkModeOn" autocomplete="off"
                         value="dark" v-model="userPreferences.theme" @change="prefTheme('dark')">
-                    <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'dark' }"
-                        for="darkModeOn">
+                    <label class="btn" :class="{
+                        'btn-outline-dark': !isDarkMode,
+                        'btn-outline-light': isDarkMode,
+                        'active fw-bold': userPreferences.theme === 'dark'
+                    }" for="darkModeOn">
                         <span><i class="bi bi-moon-stars"></i> {{ $t('nav.preferences.colorDark') }}</span>
                     </label>
                 </div>
@@ -46,11 +56,37 @@
                         <input v-model="userPreferences.ipCardsToShow" type="radio" class="btn-check"
                             :name="'ipCards_' + num" :id="'ipCards_' + num" autocomplete="off" :value=num
                             @change="prefipCards(num)">
-                        <label class="btn btn-outline-primary jn-number"
-                            :class="{ 'active': userPreferences.ipCardsToShow === num }" :for="'ipCards_' + num">{{ num
+                        <label class="btn jn-number" :class="{
+                            'btn-outline-dark': !isDarkMode,
+                            'btn-outline-light': isDarkMode,
+                            'active fw-bold': userPreferences.ipCardsToShow === num
+                        }" :for="'ipCards_' + num">{{ num
                             }}</label>
                     </template>
                 </div>
+            </div>
+
+            <div id="Pref_ipGeoSource">
+                <div class="form-label col-12 preferences-title">
+                    <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipDB') }}
+                </div>
+                <div class="btn-group-vertical col-auto w-50 mb-2" role="group" aria-label="ipGeoSource">
+                    <template v-for="ipdb in ipDBs">
+                        <input v-model="userPreferences.ipGeoSource" type="radio" class="btn-check"
+                            :name="'ipGeoSource_' + ipdb.text" :id="'ipGeoSource_' + ipdb.id" autocomplete="off"
+                            :value=ipdb.id @change="prefipGeoSource(ipdb.id)">
+                        <label class="btn jn-number text-start" :class="{
+                            'btn-outline-dark': !isDarkMode,
+                            'btn-outline-light': isDarkMode,
+                            'active fw-bold': userPreferences.ipGeoSource === ipdb.id,
+                            'jn-disabled-button': !ipdb.enabled
+                        }" :for="'ipGeoSource_' + ipdb.id" :aria-disabled="!ipdb.enabled" :aria-label="ipdb.text">
+                            <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}&nbsp;</span>
+                            <i class="bi bi-check2-circle" v-if="userPreferences.ipGeoSource === ipdb.id"></i>
+                        </label>
+                    </template>
+                </div>
+                <div class="preferences-tip">{{ $t('nav.preferences.ipDBTips') }}</div>
             </div>
 
             <div id="Pref_appSettings">
@@ -152,12 +188,14 @@ export default {
         const isMobile = computed(() => store.state.isMobile);
         const configs = computed(() => store.state.configs);
         const userPreferences = computed(() => store.state.userPreferences);
+        const ipDBs = computed(() => store.state.ipDBs);
 
         return {
             isDarkMode,
             isMobile,
             configs,
             userPreferences,
+            ipDBs,
         };
     },
 
@@ -237,6 +275,12 @@ export default {
             this.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
         },
 
+        prefipGeoSource(value) {
+            this.setUserPreferences('ipGeoSource', value);
+            this.$trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
+            this.$trackEvent('IPCheck', 'SelectSource', this.ipDBs.find(x => x.id === value).text);
+        },
+
         toggleMaps() {
             this.setUserPreferences('showMap', !this.userPreferences.showMap);
             this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
@@ -312,6 +356,15 @@ export default {
 
 .jn-placeholder {
     height: 20pt;
+}
+
+.jn-disabled-text {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.jn-disabled-button {
+    pointer-events: none;
 }
 
 #offcanvasPreferences {

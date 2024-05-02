@@ -4,35 +4,6 @@
     <div class="row" :class="{ 'jn-title2': !isMobile, 'jn-title': isMobile }">
       <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎
         {{ $t('ipInfos.Title') }}</h2>
-      <div class="form-check form-switch col-8 jn-radio">
-
-        <!-- IP 数据源选择 -->
-        <div class="dropdown">
-          <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
-            :aria-label="$t('ipInfos.SelectSource')">
-            <i class="bi bi-database-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i> {{ $t('ipInfos.database') }} <i
-              class="bi bi-caret-down-fill"></i>
-          </span>
-          <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <li class="dropdown-header">
-              {{ $t('ipInfos.SelectSource') }}
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li v-for="source in sources" :key="source.id">
-              <span class="dropdown-item jn-select"
-                :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
-                @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
-                :aria-disabled="!source.enabled" :aria-label="source.text">
-                {{ source.text }}
-                <i class="bi bi-check2-circle" v-if="ipGeoSource === source.id"></i>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-      </div>
     </div>
     <div class="text-secondary">
       <p>{{ $t('ipInfos.Notes') }}</p>
@@ -232,16 +203,16 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-    const ipGeoSource = computed(() => store.state.ipGeoSource);
     const configs = computed(() => store.state.configs);
     const userPreferences = computed(() => store.state.userPreferences);
+    const sources = computed(() => store.state.ipDBs);
 
     return {
       isDarkMode,
       isMobile,
-      ipGeoSource,
       configs,
       userPreferences,
+      sources,
     };
   },
 
@@ -281,14 +252,6 @@ export default {
         { key: 'Human_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
       ],
       placeholderSizes: [12, 8, 6, 8, 4],
-      sources: [
-        { id: 0, text: 'IPCheck.ing', enabled: true },
-        { id: 1, text: 'IPinfo.io', enabled: true },
-        { id: 2, text: 'IP-API.com', enabled: true },
-        { id: 3, text: 'IPAPI.co', enabled: true },
-        { id: 4, text: 'KeyCDN', enabled: true },
-        { id: 5, text: 'IP.SB', enabled: true },
-      ],
       pendingIPDetailsRequests: new Map(),
       ipDataCards: [
         {
@@ -329,6 +292,8 @@ export default {
       copiedStatus: {},
       bingMapLanguage: this.$Lang,
       IPArray: [],
+      ipGeoSource: this.userPreferences.ipGeoSource,
+      usingSource: this.userPreferences.ipGeoSource,
     };
   },
 
@@ -410,7 +375,6 @@ export default {
         }, 2000);
       });
     },
-
 
     // 从特殊源获取 IP 地址
     async getIPFromSpecial() {
@@ -601,15 +565,16 @@ export default {
             const cardData = source.transform(data);
 
             if (cardData) {
-              this.$store.commit('SET_IP_GEO_SOURCE', source.id);
-              localStorage.setItem("ipGeoSource", source.id.toString());
+              this.ipGeoSource = source.id;
+              this.usingSource = source.id;
+              this.$store.commit('UPDATE_PREFERENCE', { key: 'ipGeoSource', value: source.id });
               Object.assign(card, cardData);
               this.ipDataCache.set(ip, cardData);
               return;
             }
           } catch (error) {
             console.error("Error fetching IP details from source " + source.id + ":", error);
-            this.sources[source.id].enabled = false;
+            this.$store.commit('UPDATE_IPDBS', { id: source.id, enabled: false });
             currentSourceIndex = (currentSourceIndex + 1) % sources.length;
             attempts++;
           }
@@ -632,13 +597,7 @@ export default {
     },
 
     // 选择 IP 数据源，并保存到本地存储
-    selectIPGeoSource(sourceID) {
-      if (this.ipGeoSource === sourceID) {
-        return;
-      }
-      this.$store.commit('SET_IP_GEO_SOURCE', sourceID);
-      localStorage.setItem("ipGeoSource", parseInt(sourceID));
-      this.$trackEvent('IPCheck', 'SelectSource', this.sources[sourceID].text);
+    selectIPGeoSource() {
       // 清空部分数据
       this.ipDataCards.forEach((card) => {
         card.country_name = "";
@@ -654,7 +613,7 @@ export default {
       this.ipDataCache.clear();
 
       // 尝试更新一次，成功后再获取其他 IP 数据
-      let runningSource = this.fetchIPDetails(0, this.ipDataCards[0].ip, sourceID);
+      let runningSource = this.fetchIPDetails(0, this.ipDataCards[0].ip, this.ipGeoSource);
 
       // 重新获取 IP 数据
       let index = 1;
@@ -715,7 +674,7 @@ export default {
       const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
         proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
       const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-      
+
       return { isProxy, type, proxyProtocol, proxyOperator };
     },
 
@@ -847,12 +806,20 @@ export default {
   },
 
   watch: {
-    userPreferences: {
-      handler() {
-        this.isMapShown = this.userPreferences.showMap;
-        this.isCardsCollapsed = this.userPreferences.simpleMode;
+    'userPreferences.ipGeoSource': {
+      handler(newVal, oldVal) {
+        this.ipGeoSource = newVal;
+        if (newVal !== this.usingSource) {
+          this.selectIPGeoSource();
+        }
       },
       deep: true,
+    },
+    'userPreferences.showMap': function (newVal, oldVal) {
+      this.isMapShown = newVal;
+    },
+    'userPreferences.simpleMode': function (newVal, oldVal) {
+      this.isCardsCollapsed = newVal;
     },
 
     IPArray: {
@@ -877,12 +844,6 @@ export default {
 
   mounted() {
     this.checkAllIPs();
-
-    // 从本地存储中获取 ipGeoSource
-    const ipGeoSource = localStorage.getItem('ipGeoSource');
-    if (localStorage.getItem('ipGeoSource')) {
-      this.$store.commit('SET_IP_GEO_SOURCE', parseInt(ipGeoSource));
-    }
   },
 }
 </script>

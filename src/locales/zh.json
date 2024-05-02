@@ -13,7 +13,7 @@
     "AdvancedTools": "高级工具",
     "preferences": {
       "title": "偏好设置",
-      "preferenceTips": "这些设置会保存在浏览器，方便下次使用。选定选项后，刷新页面即可生效。",
+      "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
       "colorScheme": "颜色方案",
       "colorAuto": "跟随系统",
       "colorLight": "白天",
@@ -29,7 +29,9 @@
       "connectivityAutoRefresh": "多次刷新可用性检测",
       "connectivityAutoRefreshTips": "开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。",
       "popupConnectivityNotifications": "显示可用性检测气泡",
-      "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。"
+      "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。",
+      "ipDB": "IP 解析数据源",
+      "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。"
     }
   },
   "censorshipcheck": {

@@ -13,7 +13,7 @@
         "AdvancedTools": "Outils avancés",
         "preferences": {
             "title": "Préférences",
-            "preferenceTips": "Les paramètres sont sauvegardés dans votre navigateur pour une utilisation facile. Rafraîchissez la page pour activer les modifications.",
+            "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",
             "colorScheme": "Schéma de Couleurs",
             "colorAuto": "Par Défaut Système",
             "colorLight": "Jour",
@@ -29,7 +29,9 @@
             "connectivityAutoRefresh": "Rafraîchissements Multiples de Connectivité",
             "connectivityAutoRefreshTips": "Activé, l'appli effectue cinq vérifications au démarrage et affiche le délai le plus bas.",
             "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
-            "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up."
+            "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up.",
+            "ipDB": "Base de données de géolocalisation IP",
+            "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes."
         }
     },
     "censorshipcheck": {

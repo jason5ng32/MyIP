@@ -13,7 +13,7 @@
     "AdvancedTools": "Advanced Tools",
     "preferences": {
       "title": "Preferences",
-      "preferenceTips": "Settings are saved in your browser for easy reuse. Refresh the page to apply changes.",
+      "preferenceTips": "These settings are saved in your browser for easy reuse. Some options require refreshing the page to take effect.",
       "colorScheme": "Color Scheme",
       "colorAuto": "Auto",
       "colorLight": "Day",
@@ -29,7 +29,9 @@
       "connectivityAutoRefresh": "Multiple Connectivity Refreshes",
       "connectivityAutoRefreshTips": "When enabled, the app runs five checks at startup and displays the lowest latency.",
       "popupConnectivityNotifications": "Pop-up Connectivity Alerts",
-      "popupConnectivityNotificationsTips": "When enabled, the initial check's results are shown as a pop-up alert."
+      "popupConnectivityNotificationsTips": "When enabled, the initial check's results are shown as a pop-up alert.",
+      "ipDB": "IP Geolocation Database",
+      "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order."
     }
   },
   "censorshipcheck": {

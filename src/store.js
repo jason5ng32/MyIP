@@ -10,7 +10,6 @@ const store = createStore({
       shouldRefreshEveryThing: false,
       // 数据
       Global_ipDataCards: [],
-      ipGeoSource: 0,
       // 功能
       configs: {},
       userPreferences: {},
@@ -22,6 +21,7 @@ const store = createStore({
         { id: 4, text: 'KeyCDN', enabled: true },
         { id: 5, text: 'IP.SB', enabled: true },
       ],
+      usingSource: 0,
     };
   },
   mutations: {
@@ -38,8 +38,15 @@ const store = createStore({
     SET_DARK_MODE(state, value) {
       state.isDarkMode = value;
     },
-    SET_IP_GEO_SOURCE(state, value) {
-      state.ipGeoSource = value;
+    UPDATE_USING_SOURCE(state, value) {
+      state.usingSource = value;
+    },
+
+    UPDATE_IPDBS(state, { id, enabled }) {
+      const index = state.ipDBs.findIndex(db => db.id === id);
+      if (index !== -1) {
+        state.ipDBs[index] = { ...state.ipDBs[index], enabled: enabled };
+      }
     },
     SET_CONFIGS(state, config) {
       state.configs = config;
@@ -71,7 +78,7 @@ const store = createStore({
       };
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;
-  
+
       if (storedPreferences) {
         const currentPreferences = JSON.parse(storedPreferences);
         preferencesToStore = { ...defaultPreferences, ...currentPreferences };
