@@ -2,7 +2,7 @@
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",
-    "IPinfo": "IP Infos",
+    "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
     "WebRTC": "WebRTC Test",
     "DNSLeakTest": "DNS Leak Test",

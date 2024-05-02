@@ -70,37 +70,31 @@ export default {
   },
 
   data() {
+    const createDefaultCard = () => ({
+          name: this.$t('dnsleaktest.Name'),
+          country_code: this.$t('dnsleaktest.StatusWait'),
+          country: this.$t('dnsleaktest.StatusWait'),
+          ip: this.$t('dnsleaktest.StatusWait'),
+        });
     return {
       autoStart: this.userPreferences.autoStart,
       isStarted: false,
       leakTest: [
         {
+          ...createDefaultCard(),
           id: "ipapi1",
-          name: this.$t('dnsleaktest.Name'),
-          country_code: this.$t('dnsleaktest.StatusWait'),
-          country: this.$t('dnsleaktest.StatusWait'),
-          ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
+          ...createDefaultCard(),
           id: "ipapi2",
-          name: this.$t('dnsleaktest.Name'),
-          country_code: this.$t('dnsleaktest.StatusWait'),
-          country: this.$t('dnsleaktest.StatusWait'),
-          ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
+          ...createDefaultCard(),
           id: "sfshark1",
-          name: this.$t('dnsleaktest.Name'),
-          country_code: this.$t('dnsleaktest.StatusWait'),
-          country: this.$t('dnsleaktest.StatusWait'),
-          ip: this.$t('dnsleaktest.StatusWait'),
         },
         {
+          ...createDefaultCard(),
           id: "sfshark2",
-          name: this.$t('dnsleaktest.Name'),
-          country_code: this.$t('dnsleaktest.StatusWait'),
-          country: this.$t('dnsleaktest.StatusWait'),
-          ip: this.$t('dnsleaktest.StatusWait'),
         },
       ],
     };
@@ -227,5 +221,4 @@ export default {
 </script>
 
 <style scoped>
-/* Your style code goes here */
 </style>

@@ -46,22 +46,12 @@
       <span class="navbar-toggler-icon bg-transparent "></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+      <!-- 导航循环 -->
       <div class="navbar-nav ">
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#IPInfo"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'IPInfo')"> {{ $t('nav.IPinfo') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'Connectivity')"> {{
-            $t('nav.Connectivity') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'WebRTC')"> {{ $t('nav.WebRTC') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
-            $t('nav.DNSLeakTest') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
-          }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#AdvancedTools"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
+        <a v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']" :key="item"
+          class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" :href="`#${item}`"
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', item)">{{
+            $t(`nav.${item}`) }}</a>
       </div>
       <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
         :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
@@ -253,6 +243,8 @@ export default {
       } else {
         offcanvas.show();
       }
+
+      this.$trackEvent('Nav', 'NavClick', 'Preferences');
     },
 
 
@@ -310,37 +302,37 @@ export default {
       this.updateBodyClass();
       this.PWAColor();
       this.setUserPreferences('theme', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'DarkMode');
+      this.$trackEvent('Nav', 'PrefereceClick', 'Theme');
     },
 
     prefConnectivityRefresh(value) {
       this.setUserPreferences('connectivityAutoRefresh', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityRefresh');
+      this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
     },
 
     prefShowMap(value) {
       this.setUserPreferences('showMap', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
+      this.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
     },
 
     prefSimpleMode(value) {
       this.setUserPreferences('simpleMode', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'SimpleMode');
+      this.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
     },
 
     prefAutoStart(value) {
       this.setUserPreferences('autoStart', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'AutoStart');
+      this.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
     },
 
     prefconnectivityShowNoti(value) {
       this.setUserPreferences('popupConnectivityNotifications', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'ConnectivityShowNoti');
+      this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
     },
 
     prefipCards(value) {
       this.setUserPreferences('ipCardsToShow', value);
-      this.$trackEvent('Nav', 'ToggleClick', 'IpCards');
+      this.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
     },
 
     toggleMaps() {
@@ -572,6 +564,6 @@ export default {
 }
 
 #offcanvasPreferences {
-  z-index: 1051;
+  z-index: 1053;
 }
 </style>

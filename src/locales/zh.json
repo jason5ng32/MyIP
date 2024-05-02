@@ -2,7 +2,7 @@
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",
-    "IPinfo": "IP 信息",
+    "IPInfo": "IP 信息",
     "Connectivity": "网络连通性",
     "WebRTC": "WebRTC 测试",
     "DNSLeakTest": "DNS 泄漏测试",

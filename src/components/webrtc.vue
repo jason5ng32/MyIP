@@ -76,13 +76,6 @@ export default {
           ip: this.$t('webrtc.StatusWait'),
           natType: this.$t('webrtc.StatusWait'),
         },
-        // {
-        //   id: "google",
-        //   name: "Google 2",
-        //   url: "stun2.l.google.com:19302",
-        //   ip: this.$t('webrtc.StatusWait'),
-        //   natType: "",
-        // },
         {
           id: "nextcloud",
           name: "NextCloud",
@@ -104,27 +97,6 @@ export default {
           ip: this.$t('webrtc.StatusWait'),
           natType: this.$t('webrtc.StatusWait'),
         },
-        // {
-        //   id: "miwifi",
-        //   name: "MiWiFi",
-        //   url: "stun.miwifi.com",
-        //   ip: this.$t('webrtc.StatusWait'),
-        //   natType: "",
-        // },
-        // {
-        //   id: "qq",
-        //   name: "QQ",
-        //   url: "stun.qq.com",
-        //   ip: this.$t('webrtc.StatusWait'),
-        //   natType: "",
-        // },
-        // {
-        //   id: "stunprotocol",
-        //   name: "StnPtc",
-        //   url: "stunserver.stunprotocol.org",
-        //   ip: this.$t('webrtc.StatusWait'),
-        //   natType: "",
-        // },
       ],
     }
   },
