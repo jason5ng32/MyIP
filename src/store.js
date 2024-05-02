@@ -14,6 +14,14 @@ const store = createStore({
       // 功能
       configs: {},
       userPreferences: {},
+      ipDBs: [
+        { id: 0, text: 'IPCheck.ing', enabled: true },
+        { id: 1, text: 'IPinfo.io', enabled: true },
+        { id: 2, text: 'IP-API.com', enabled: true },
+        { id: 3, text: 'IPAPI.co', enabled: true },
+        { id: 4, text: 'KeyCDN', enabled: true },
+        { id: 5, text: 'IP.SB', enabled: true },
+      ],
     };
   },
   mutations: {
@@ -59,6 +67,7 @@ const store = createStore({
         hideUnavailableIPStack: false,
         popupConnectivityNotifications: true,
         ipCardsToShow: 6,
+        ipGeoSource: 0,
       };
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;

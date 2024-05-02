@@ -1,6 +1,6 @@
 <template>
   <NavBar ref="navBarRef" />
-  <!-- Alerts -->
+  <Preferences ref="preferencesRef" />
   <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
     <div id="toastInfoMask" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast"
       aria-live="assertive" aria-atomic="true">
@@ -50,6 +50,7 @@ import QueryIP from './components/queryip.vue'
 import HelpModal from './components/help.vue'
 import PWA from './components/pwa.vue'
 import AdvancedTools from './components/advancedtools.vue'
+import Preferences from './components/preferences.vue';
 import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 
 import { ref, computed, watch } from 'vue';
@@ -93,6 +94,7 @@ export default {
     HelpModal,
     PWA,
     AdvancedTools,
+    Preferences,
   },
   name: 'App',
   data() {

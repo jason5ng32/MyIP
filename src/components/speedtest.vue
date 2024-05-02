@@ -16,14 +16,14 @@
             <div class="row justify-content-end mt-3 mb-4" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <div class="input-group" :class="[isMobile ? 'w-100' : 'w-50']">
                 <span class="input-group-text"><i class="bi bi-cloud-download"></i></span>
-                <select class="form-select" :class="{ 'jn-ip-font': isMobile }" id="downloadBytes"
+                <select aria-label="Download Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }" id="downloadBytes"
                   :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
                   v-model="packageSize.download.bytes">
                   <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size"
                     :value="size">{{ size / 1e6 }} MB</option>
                 </select>
                 <span class="input-group-text"><i class="bi bi-cloud-upload"></i></span>
-                <select class="form-select" :class="{ 'jn-ip-font': isMobile }" id="uploadBytes"
+                <select aria-label="Upload Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }" id="uploadBytes"
                   :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
                   v-model="packageSize.upload.bytes">
                   <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size"

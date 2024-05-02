@@ -36,7 +36,7 @@
         </ul>
       </div>
 
-      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button">
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button" aria-label="Preferences">
         <i class="bi bi-toggles"></i>
       </div>
 
@@ -71,134 +71,6 @@
     </div>
   </nav>
 
-  <!-- Offcanvas Preferences -->
-  <div :data-bs-theme="isDarkMode ? 'dark' : 'light'" class="offcanvas offcanvas-start h-100 border-0 mt-5"
-    tabindex="-1" id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
-    <div class="offcanvas-header mt-3">
-      <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
-        $t('nav.preferences.title') }}</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body pt-0">
-      <div class="preferences-tip">{{ $t('nav.preferences.preferenceTips') }}</div>
-
-      <div id="Pref_colorScheme">
-        <div class="form-label col-12 preferences-title"><i class="bi bi-palette-fill"></i> {{
-          $t('nav.preferences.colorScheme') }}</div>
-        <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
-          <input type="radio" class="btn-check" name="darkModeAuto" id="darkModeAuto" autocomplete="off" value="auto"
-            v-model="userPreferences.theme" @change="prefTheme('auto')">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'auto' }"
-            for="darkModeAuto">{{ $t('nav.preferences.colorAuto') }}</label>
-
-          <input type="radio" class="btn-check" name="darkModeOff" id="darkModeOff" autocomplete="off" value="light"
-            v-model="userPreferences.theme" @change="prefTheme('light')">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'light' }"
-            for="darkModeOff">
-            <span><i class="bi bi-brightness-high "></i> {{ $t('nav.preferences.colorLight') }}</span>
-          </label>
-
-          <input type="radio" class="btn-check" name="darkModeOn" id="darkModeOn" autocomplete="off" value="dark"
-            v-model="userPreferences.theme" @change="prefTheme('dark')">
-          <label class="btn btn-outline-primary" :class="{ 'active': userPreferences.theme === 'dark' }"
-            for="darkModeOn">
-            <span><i class="bi bi-moon-stars"></i> {{ $t('nav.preferences.colorDark') }}</span>
-          </label>
-        </div>
-      </div>
-
-      <div id="Pref_ipCards">
-        <div class="form-label col-12 preferences-title">
-          <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipSourcesToCheck') }}
-        </div>
-        <div class="btn-group col-auto" role="group" aria-label="ipCards">
-          <template v-for="num in [2, 3, 6]">
-            <input v-model="userPreferences.ipCardsToShow" type="radio" class="btn-check" :name="'ipCards_' + num"
-              :id="'ipCards_' + num" autocomplete="off" :value=num @change="prefipCards(num)">
-            <label class="btn btn-outline-primary jn-number"
-              :class="{ 'active': userPreferences.ipCardsToShow === num }" :for="'ipCards_' + num">{{ num }}</label>
-          </template>
-        </div>
-      </div>
-
-      <div id="Pref_appSettings">
-        <div class="form-label col-12 preferences-title"><i class="bi bi-window-dock"></i> {{
-          $t('nav.preferences.appSettings') }}</div>
-        <ul class="list-group">
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="me-auto">
-              <div class="fw-bold"><label class="form-check-label" for="autoStart">{{ $t('nav.preferences.autoRun')
-                  }}</label>
-              </div>
-              <div class="preferences-tip">{{ $t('nav.preferences.autoRunTips') }}</div>
-            </div>
-            <div class="form-check form-switch col-auto ">
-              <input class="form-check-input" type="checkbox" role="switch" id="autoStart"
-                :checked="userPreferences.autoStart" @change="prefAutoStart($event.target.checked)">
-            </div>
-          </li>
-
-          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="configs.bingMap">
-            <div class="me-auto">
-              <div class="fw-bold"><label class="form-check-label" for="showMap">{{ $t('nav.preferences.showMap')
-                  }}</label>
-              </div>
-              <div class="preferences-tip">{{ $t('nav.preferences.showMapTips') }}</div>
-            </div>
-            <div class="form-check form-switch col-auto ">
-              <input class="form-check-input" type="checkbox" role="switch" id="showMap"
-                :checked="userPreferences.showMap" @change="prefShowMap($event.target.checked)">
-            </div>
-          </li>
-
-          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="isMobile">
-            <div class="me-auto">
-              <div class="fw-bold"><label class="form-check-label" for="simpleMode">{{ $t('nav.preferences.simpleMode')
-                  }}</label></div>
-              <div class="preferences-tip">{{ $t('nav.preferences.simpleModeTips') }}</div>
-            </div>
-            <div class="form-check form-switch col-auto ">
-              <input class="form-check-input" type="checkbox" role="switch" id="simpleMode"
-                :checked="userPreferences.simpleMode" @change="prefSimpleMode($event.target.checked)">
-            </div>
-          </li>
-
-          <li class="list-group-item d-flex justify-content-between align-items-start" v-if="userPreferences.autoStart">
-            <div class="me-auto">
-              <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
-                $t('nav.preferences.connectivityAutoRefresh') }}</label></div>
-              <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
-            </div>
-            <div class="form-check form-switch col-auto ">
-              <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityRefresh"
-                :checked="userPreferences.connectivityAutoRefresh"
-                @change="prefConnectivityRefresh($event.target.checked)">
-            </div>
-          </li>
-
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="me-auto">
-              <div class="fw-bold"><label class="form-check-label" for="ConnectivityNotifications">{{
-                $t('nav.preferences.popupConnectivityNotifications') }}</label>
-              </div>
-              <div class="preferences-tip">{{ $t('nav.preferences.popupConnectivityNotificationsTips') }}</div>
-            </div>
-            <div class="form-check form-switch col-auto ">
-              <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityNotifications"
-                :checked="userPreferences.popupConnectivityNotifications"
-                @change="prefconnectivityShowNoti($event.target.checked)">
-            </div>
-          </li>
-
-        </ul>
-      </div>
-
-      <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
-      </div>
-
-    </div>
-  </div>
-
 </template>
 
 <script>
@@ -229,7 +101,6 @@ export default {
     return {
       loaded: false,
       githubStars: 0,
-      prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
     }
   },
   methods: {
@@ -245,26 +116,6 @@ export default {
       }
 
       this.$trackEvent('Nav', 'NavClick', 'Preferences');
-    },
-
-
-    // 保存偏好设置到 Vuex
-    setUserPreferences(key, value) {
-      this.$store.commit('UPDATE_PREFERENCE', { key, value });
-    },
-
-    // 主题模式切换
-    handleThemeChange(event) {
-      this.prefersDarkMode = event.matches;
-      if (this.userPreferences.theme === 'auto') {
-        this.$store.commit('SET_DARK_MODE', this.prefersDarkMode);
-      } else if (this.userPreferences.theme === 'light') {
-        this.$store.commit('SET_DARK_MODE', false);
-      } else if (this.userPreferences.theme === 'dark') {
-        this.$store.commit('SET_DARK_MODE', true);
-      }
-      this.updateBodyClass();
-      this.PWAColor();
     },
 
     //获取 GitHub stars
@@ -286,92 +137,11 @@ export default {
       }
     },
 
-    // 偏好设置里的一些配置项
-    prefTheme(value) {
-      switch (value) {
-        case 'light':
-          this.$store.commit('SET_DARK_MODE', false);
-          break;
-        case 'dark':
-          this.$store.commit('SET_DARK_MODE', true);
-          break;
-        case 'auto':
-          this.handleThemeChange({ matches: this.mediaQueryList.matches });
-          break;
-      }
-      this.updateBodyClass();
-      this.PWAColor();
-      this.setUserPreferences('theme', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'Theme');
-    },
-
-    prefConnectivityRefresh(value) {
-      this.setUserPreferences('connectivityAutoRefresh', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
-    },
-
-    prefShowMap(value) {
-      this.setUserPreferences('showMap', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
-    },
-
-    prefSimpleMode(value) {
-      this.setUserPreferences('simpleMode', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
-    },
-
-    prefAutoStart(value) {
-      this.setUserPreferences('autoStart', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
-    },
-
-    prefconnectivityShowNoti(value) {
-      this.setUserPreferences('popupConnectivityNotifications', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
-    },
-
-    prefipCards(value) {
-      this.setUserPreferences('ipCardsToShow', value);
-      this.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
-    },
-
-    toggleMaps() {
-      this.setUserPreferences('showMap', !this.userPreferences.showMap);
-      this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
-    },
-
     // 收起导航栏
     collapseNav() {
       document.querySelector('#navbarNavAltMarkup').classList.remove('show');
     },
 
-    // 更新 body class
-    updateBodyClass() {
-      if (this.isDarkMode) {
-        document.body.classList.add("dark-mode");
-      } else {
-        document.body.classList.remove("dark-mode");
-      }
-    },
-
-    // 更新 PWA 颜色
-    PWAColor() {
-      if (this.isDarkMode) {
-        document
-          .querySelector('meta[name="theme-color"]')
-          .setAttribute("content", "#171a1d");
-        document
-          .querySelector('meta[name="background-color"]')
-          .setAttribute("content", "#212529");
-      } else {
-        document
-          .querySelector('meta[name="theme-color"]')
-          .setAttribute("content", "#f8f9fa");
-        document
-          .querySelector('meta[name="background-color"]')
-          .setAttribute("content", "#ffffff");
-      }
-    },
 
     // 点击 Logo 事件处理
     handleLogoClick() {
@@ -381,19 +151,7 @@ export default {
       this.$trackEvent('Nav', 'NavClick', 'Logo');
     },
   },
-  created() {
-    this.mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
-    this.mediaQueryList.addListener(this.handleThemeChange);
-    this.handleThemeChange({ matches: this.mediaQueryList.matches });
-  },
-  beforeDestroy() {
-    if (this.mediaQueryList) {
-      this.mediaQueryList.removeListener(this.handleThemeChange);
-    }
-  },
   mounted() {
-    this.updateBodyClass();
-    this.PWAColor();
     setTimeout(() => {
       this.getGitHubStars();
     }, 1000)
@@ -534,36 +292,7 @@ export default {
     left: 100%;
   }
 }
-
 .preference-button {
-  margin-left: 8pt;
-}
-
-.preferences-title {
-  margin-top: 12pt;
-  font-weight: 500;
-  margin-bottom: 12pt;
-}
-
-.preferences-tip {
-  font-size: smaller;
-  opacity: 0.7;
-  margin-top: 3pt;
-}
-
-.jn-number {
-  min-width: 40pt;
-}
-
-.jn-margin {
-  margin-top: 42pt;
-}
-
-.jn-placeholder {
-  height: 20pt;
-}
-
-#offcanvasPreferences {
-  z-index: 1053;
+    margin-left: 8pt;
 }
 </style>
