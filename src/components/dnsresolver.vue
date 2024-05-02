@@ -23,7 +23,9 @@
                                 name="queryURL" id="queryURL" data-1p-ignore>
 
                             <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-expanded="false"
+                                :disabled="dnsCheckStatus === 'running' || !queryURL"
+                                >
                                 {{ queryType }} {{ $t('dnsresolver.Record') }}
                                 <span class="visually-hidden">Choose Type</span>
                             </button>
@@ -35,7 +37,7 @@
                                 <li @click="changeType('NS')"><span class="dropdown-item" >NS</span></li>
                                 <li @click="changeType('TXT')"><span class="dropdown-item" >TXT</span></li>
                             </ul>
-                            <button class="btn btn-primary" @click="onSubmit" :disabled="dnsCheckStatus === 'running'">
+                            <button class="btn btn-primary" @click="onSubmit" :disabled="dnsCheckStatus === 'running' || !queryURL">
                                 <span v-if="dnsCheckStatus === 'idle'">{{
                                     $t('dnsresolver.Run') }}</span>
                                 <span v-if="dnsCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"

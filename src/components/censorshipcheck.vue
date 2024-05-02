@@ -23,7 +23,7 @@
                                 @keyup.enter="onSubmit" name="queryURL" id="queryURL" data-1p-ignore>
 
                             <button class="btn btn-primary" @click="onSubmit"
-                                :disabled="censorshipCheckStatus === 'running'">
+                                :disabled="censorshipCheckStatus === 'running' || !queryURL">
                                 <span v-if="censorshipCheckStatus !== 'running'">{{
                                     $t('censorshipcheck.Run') }}</span>
                                 <span v-else class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
