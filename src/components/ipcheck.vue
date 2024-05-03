@@ -607,6 +607,10 @@ export default {
         card.isp = "";
         card.asn = "";
         card.asnlink = "";
+        card.isProxy = "";
+        card.type = "";
+        card.proxyProtocol = "";
+        card.proxyOperator = "";
       });
 
       this.ipDataCache.clear();

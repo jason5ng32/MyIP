@@ -257,6 +257,10 @@ export default {
           card.mapUrl = '/defaultMap.webp';
           card.mapUrl_dark = '/defaultMap_dark.webp';
           card.showASNInfo = false;
+          card.isProxy = this.$t('ipInfos.proxyDetect.no');
+          card.type = this.$t('ipInfos.proxyDetect.type.Business');
+          card.proxyProtocol = this.$t('ipInfos.proxyDetect.unknownProtocol');
+          card.proxyOperators = "";
         });
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.geo = "United States";
