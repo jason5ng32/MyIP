@@ -235,7 +235,11 @@ export default {
     infoMask() {
       if (this.infoMaskLevel === 0) {
         this.$refs.IPCheckRef.ipDataCards.forEach((card) => {
+          if(card.id === "cloudflare_v6" || card.id === "ipify_v6") {
+            card.ip = "2001:4860:4860::8888";
+          } else {
           card.ip = "8.8.8.8";
+          }
         });
         this.$refs.webRTCRef.stunServers.forEach((server) => {
           server.ip = "100.100.200.100";
@@ -254,13 +258,14 @@ export default {
           card.longitude = "-122.078514";
           card.isp = "Google LLC";
           card.asn = "AS15169";
+          card.asnlink = "https://radar.cloudflare.com/AS15169",
           card.mapUrl = '/defaultMap.webp';
           card.mapUrl_dark = '/defaultMap_dark.webp';
           card.showASNInfo = false;
           card.isProxy = this.$t('ipInfos.proxyDetect.no');
           card.type = this.$t('ipInfos.proxyDetect.type.Business');
           card.proxyProtocol = this.$t('ipInfos.proxyDetect.unknownProtocol');
-          card.proxyOperators = "";
+          card.proxyOperator = "unknown";
         });
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.geo = "United States";

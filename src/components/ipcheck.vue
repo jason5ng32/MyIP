@@ -47,7 +47,7 @@
             </div>
 
 
-            <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
+            <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error')) || card.ip === '2001:4860:4860::8888'
             " class="card-body" :id="'IPInfo-' + (index + 1)">
               <ul class="list-group list-group-flush" v-if="card.country_name">
 
