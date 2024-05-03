@@ -17,8 +17,8 @@
     </div>
 
 
-    <div class="offcanvas offcanvas-end mt-5 border-0" :class="[isMobile ? ' w-100' : '']" tabindex="-1" id="About"
-      aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
+    <div class="offcanvas offcanvas-end mt-5 border-0 h-100" :class="[isMobile ? ' w-100' : '']" tabindex="-1"
+      id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">
           <button type="button" class="btn" @click="toggleContent('about')"
@@ -93,11 +93,15 @@
                 $t('changelog.improve') }}</span>
               <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{
                 $t('changelog.fix')
-                }}</span>
+              }}</span>
               <span class="mx-2">{{ item.change }}</span>
             </div>
           </div>
         </div>
+
+        <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
+        </div>
+
       </div>
     </div>
 
@@ -152,5 +156,9 @@ export default {
 <style scoped>
 #About {
   z-index: 1051;
+}
+
+.jn-placeholder {
+  height: 20pt;
 }
 </style>

@@ -1,9 +1,8 @@
 <template>
-
-
     <!-- Offcanvas Preferences -->
-    <div :data-bs-theme="isDarkMode ? 'dark' : 'light'" class="offcanvas offcanvas-start h-100 border-0 mt-5"
-        tabindex="-1" id="offcanvasPreferences" aria-labelledby="offcanvasPreferencesLabel">
+    <div :data-bs-theme="isDarkMode ? 'dark' : 'light'" :class="[isMobile ? ' w-100' : '']"
+        class="offcanvas offcanvas-start h-100 border-0 mt-5" tabindex="-1" id="offcanvasPreferences"
+        aria-labelledby="offcanvasPreferencesLabel">
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
                 $t('nav.preferences.title') }}</h5>
