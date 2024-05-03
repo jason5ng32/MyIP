@@ -50,7 +50,7 @@
                 <div class="form-label col-12 preferences-title">
                     <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipSourcesToCheck') }}
                 </div>
-                <div class="btn-group col-auto" role="group" aria-label="ipCards">
+                <div class="btn-group col-auto w-50 mb-2" role="group" aria-label="ipCards">
                     <template v-for="num in [2, 3, 6]">
                         <input v-model="userPreferences.ipCardsToShow" type="radio" class="btn-check"
                             :name="'ipCards_' + num" :id="'ipCards_' + num" autocomplete="off" :value=num
