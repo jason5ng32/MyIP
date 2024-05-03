@@ -276,7 +276,9 @@
         "GoNext": "Carte suivante",
         "GoPrevious": "Carte précédente",
         "RefreshRuleTests": "Actualiser les tests de règles",
-        "CensorshipCheck": "Ouvrir le Test de censorship"
+        "CensorshipCheck": "Ouvrir le Test de censorship",
+        "Preferences": "Ouvrir les Préférences",
+        "About": "Ouvrir À propos"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",

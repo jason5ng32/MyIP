@@ -268,7 +268,7 @@
     "RuleTest": "Open Rule Test panel",
     "DNSResolver": "Open DNS Resolution panel",
     "ToggleMaps": "Toggle Maps",
-    "IPCheck": "IP Check",
+    "IPCheck": "Query IP Address",
     "AddBingMapKey": "Add Bing Map API Key",
     "ToggleInfoMask": "Toggle Info Masking",
     "Help": "Show Shortcut Keys",
@@ -276,7 +276,9 @@
     "GoNext": "Next Card",
     "GoPrevious": "Previous Card",
     "RefreshRuleTests": "Refresh Rule Tests",
-    "CensorshipCheck": "Open Censorship Check panel"
+    "CensorshipCheck": "Open Censorship Check panel",
+    "Preferences": "Open Preferences",
+    "About": "Open About panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -297,7 +299,7 @@
     "Error": "Please enter a valid Bing Map API Key."
   },
   "helpModal": {
-    "Title": "Shortcuts"
+    "Title": "Keyboard Shortcuts"
   },
   "about": {
     "Title": "About",

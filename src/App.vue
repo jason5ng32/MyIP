@@ -34,7 +34,7 @@
       </button>
     </div>
   </div>
-  <Footer />
+  <Footer ref="footerRef" />
   <PWA />
 </template>
 
@@ -380,7 +380,7 @@ export default {
           keys: "c",
           action: () => {
             this.scrollToElement("Connectivity", 80);
-            this.$refs.connectivityRef.checkAllConnectivity(false, true ,true);
+            this.$refs.connectivityRef.checkAllConnectivity(false, true, true);
             this.$trackEvent('ShortCut', 'ShortCut', 'Connectivity');
           },
           description: this.$t('shortcutKeys.RefreshConnectivityTests'),
@@ -485,7 +485,22 @@ export default {
           },
           description: this.$t('shortcutKeys.ToggleInfoMask'),
         },
-
+        {
+          keys: "p",
+          action: () => {
+            this.$refs.navBarRef.OpenPreferences();
+            this.$trackEvent('ShortCut', 'ShortCut', 'Preferences');
+          },
+          description: this.$t('shortcutKeys.Preferences'),
+        },
+        {
+          keys: "a",
+          action: () => {
+            this.$refs.footerRef.openAbout();
+            this.$trackEvent('ShortCut', 'ShortCut', 'About');
+          },
+          description: this.$t('shortcutKeys.About'),
+        },
         // help
         {
           keys: "?",

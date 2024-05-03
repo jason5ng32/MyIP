@@ -10,8 +10,7 @@
 
     <div id="about" class="text-center mb-2">
       <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-info' : 'link-dark']"
-        data-bs-toggle="offcanvas" href="#About" role="button" aria-controls="About"
-        @click="$trackEvent('Footer', 'FooterClick', 'About');">
+        role="button" aria-controls="About" @click.prevent="openAbout">
         {{ $t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
       </a>
     </div>
@@ -93,7 +92,7 @@
                 $t('changelog.improve') }}</span>
               <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{
                 $t('changelog.fix')
-              }}</span>
+                }}</span>
               <span class="mx-2">{{ item.change }}</span>
             </div>
           </div>
@@ -117,6 +116,7 @@
 <script>
 import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+import { Offcanvas } from 'bootstrap';
 import '@khmyznikov/pwa-install';
 
 export default {
@@ -144,6 +144,18 @@ export default {
     }
   },
   methods: {
+    openAbout() {
+      var offcanvasElement = document.getElementById('About');
+      var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+      if (offcanvasElement.classList.contains('show')) {
+        offcanvas.hide();
+      } else {
+        offcanvas.show();
+      }
+
+      this.$trackEvent('Footer', 'FooterClick', 'About');
+
+    },
     toggleContent(contentType) {
       this.showAbout = contentType === 'about';
       this.showChanglog = contentType === 'changlog';
