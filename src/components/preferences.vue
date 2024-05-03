@@ -64,6 +64,7 @@
                             }}</label>
                     </template>
                 </div>
+                <div class="preferences-tip">{{ $t('nav.preferences.ipSourcesToCheckTips') }}</div>
             </div>
 
             <div id="Pref_ipGeoSource">
