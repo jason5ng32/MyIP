@@ -599,15 +599,23 @@
       },
       {
         "version": "v3.8",
-        "date": "May 1, 2024",
+        "date": "May 4, 2024",
         "content": [
           {
-            "type": "add",
-            "change": "Added a settings panel to save preferences locally."
+        "type": "add",
+        "change": "Added preferences panel to save settings locally"
           },
           {
-            "type": "improve",
-            "change": "Optimized some functional logic."
+        "type": "add",
+        "change": "Allow customization of multiple default behaviors on second program launch"
+          },
+          {
+        "type": "improve",
+        "change": "Significantly optimized program logic"
+          },
+          {
+        "type": "fix",
+        "change": "Fixed some minor issues"
           }
         ]
       }

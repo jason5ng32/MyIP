@@ -11,40 +11,32 @@
         <div class="offcanvas-body pt-0 m-2">
             <div class="preferences-tip">{{ $t('nav.preferences.preferenceTips') }}</div>
 
+            <!-- 主题方案 -->
+
             <div id="Pref_colorScheme">
                 <div class="form-label col-12 preferences-title"><i class="bi bi-palette-fill"></i> {{
                     $t('nav.preferences.colorScheme') }}</div>
                 <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
-                    <input type="radio" class="btn-check" name="darkModeAuto" id="darkModeAuto" autocomplete="off"
-                        value="auto" v-model="userPreferences.theme" @change="prefTheme('auto')">
-                    <label class="btn" :class="{
-                        'btn-outline-dark': !isDarkMode,
-                        'btn-outline-light': isDarkMode,
-                        'active fw-bold': userPreferences.theme === 'auto'
-                    }" for="darkModeAuto">{{
-                        $t('nav.preferences.colorAuto') }}</label>
-
-                    <input type="radio" class="btn-check" name="darkModeOff" id="darkModeOff" autocomplete="off"
-                        value="light" v-model="userPreferences.theme" @change="prefTheme('light')">
-                    <label class="btn" :class="{
-                        'btn-outline-dark': !isDarkMode,
-                        'btn-outline-light': isDarkMode,
-                        'active fw-bold': userPreferences.theme === 'light'
-                    }" for="darkModeOff">
-                        <span><i class="bi bi-brightness-high "></i> {{ $t('nav.preferences.colorLight') }}</span>
-                    </label>
-
-                    <input type="radio" class="btn-check" name="darkModeOn" id="darkModeOn" autocomplete="off"
-                        value="dark" v-model="userPreferences.theme" @change="prefTheme('dark')">
-                    <label class="btn" :class="{
-                        'btn-outline-dark': !isDarkMode,
-                        'btn-outline-light': isDarkMode,
-                        'active fw-bold': userPreferences.theme === 'dark'
-                    }" for="darkModeOn">
-                        <span><i class="bi bi-moon-stars"></i> {{ $t('nav.preferences.colorDark') }}</span>
-                    </label>
+                    <template v-for="theme in ['auto', 'light', 'dark']">
+                        <input type="radio" class="btn-check" :name="'darkMode' + theme" :id="'darkMode' + theme"
+                            autocomplete="off" :value="theme" v-model="userPreferences.theme"
+                            @change="prefTheme(theme)">
+                        <label class="btn" :class="{
+                            'btn-outline-dark': !isDarkMode,
+                            'btn-outline-light': isDarkMode,
+                            'active text-bg-primary': userPreferences.theme === theme
+                        }" :for="'darkMode' + theme">
+                            <span v-if="theme === 'light'"><i class="bi bi-brightness-high"></i> {{
+                                $t('nav.preferences.colorLight') }}</span>
+                            <span v-else-if="theme === 'dark'"><i class="bi bi-moon-stars"></i> {{
+                                $t('nav.preferences.colorDark') }}</span>
+                            <span v-else>{{ $t('nav.preferences.colorAuto') }}</span>
+                        </label>
+                    </template>
                 </div>
             </div>
+
+            <!-- IP 源 -->
 
             <div id="Pref_ipCards">
                 <div class="form-label col-12 preferences-title">
@@ -58,13 +50,15 @@
                         <label class="btn jn-number" :class="{
                             'btn-outline-dark': !isDarkMode,
                             'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.ipCardsToShow === num
+                            'active text-bg-primary': userPreferences.ipCardsToShow === num
                         }" :for="'ipCards_' + num">{{ num
                             }}</label>
                     </template>
                 </div>
                 <div class="preferences-tip">{{ $t('nav.preferences.ipSourcesToCheckTips') }}</div>
             </div>
+
+            <!-- IP 地理位置数据库 -->
 
             <div id="Pref_ipGeoSource">
                 <div class="form-label col-12 preferences-title">
@@ -78,7 +72,7 @@
                         <label class="btn jn-number text-start" :class="{
                             'btn-outline-dark': !isDarkMode,
                             'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.ipGeoSource === ipdb.id,
+                            'active text-bg-primary': userPreferences.ipGeoSource === ipdb.id,
                             'jn-disabled-button': !ipdb.enabled
                         }" :for="'ipGeoSource_' + ipdb.id" :aria-disabled="!ipdb.enabled" :aria-label="ipdb.text">
                             <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}&nbsp;</span>
@@ -89,11 +83,14 @@
                 <div class="preferences-tip">{{ $t('nav.preferences.ipDBTips') }}</div>
             </div>
 
+            <!-- 应用设置 -->
+
             <div id="Pref_appSettings">
                 <div class="form-label col-12 preferences-title"><i class="bi bi-window-dock"></i> {{
                     $t('nav.preferences.appSettings') }}</div>
                 <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <li class="list-group-item d-flex justify-content-between align-items-start"
+                        :class="[isDarkMode ? 'border-light' : 'border-dark']">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="autoStart">{{
                                 $t('nav.preferences.autoRun')
@@ -107,7 +104,22 @@
                         </div>
                     </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-start" v-if="configs.bingMap">
+                    <li class="list-group-item d-flex justify-content-between align-items-start"
+                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="userPreferences.autoStart">
+                        <div class="me-auto">
+                            <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
+                                $t('nav.preferences.connectivityAutoRefresh') }}</label></div>
+                            <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
+                        </div>
+                        <div class="form-check form-switch col-auto ">
+                            <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityRefresh"
+                                :checked="userPreferences.connectivityAutoRefresh"
+                                @change="prefConnectivityRefresh($event.target.checked)">
+                        </div>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-start"
+                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="configs.bingMap">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="showMap">{{
                                 $t('nav.preferences.showMap')
@@ -121,7 +133,8 @@
                         </div>
                     </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-start" v-if="isMobile">
+                    <li class="list-group-item d-flex justify-content-between align-items-start"
+                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="isMobile">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="simpleMode">{{
                                 $t('nav.preferences.simpleMode')
@@ -135,20 +148,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-start"
-                        v-if="userPreferences.autoStart">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
-                                $t('nav.preferences.connectivityAutoRefresh') }}</label></div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityRefresh"
-                                :checked="userPreferences.connectivityAutoRefresh"
-                                @change="prefConnectivityRefresh($event.target.checked)">
-                        </div>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        :class="[isDarkMode ? 'border-light' : 'border-dark']">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="ConnectivityNotifications">{{
                                 $t('nav.preferences.popupConnectivityNotifications') }}</label>

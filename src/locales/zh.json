@@ -599,15 +599,23 @@
       },
       {
         "version": "v3.8",
-        "date": "May 1, 2024",
+        "date": "May 4, 2024",
         "content": [
           {
             "type": "add",
             "change": "增加设置面板，可以在本地保存偏好设置"
           },
           {
+            "type": "add",
+            "change": "可以自定义程序在第二次启动时的多个默认行为"
+          },
+          {
             "type": "improve",
-            "change": "优化了部分功能逻辑"
+            "change": "大量优化了程序的逻辑"
+          },
+          {
+            "type": "fix",
+            "change": "修复了一些小问题"
           }
         ]
       }

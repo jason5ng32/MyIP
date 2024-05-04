@@ -599,15 +599,23 @@
             },
             {
                 "version": "v3.8",
-                "date": "May 1, 2024",
+                "date": "May 4, 2024",
                 "content": [
                     {
                         "type": "add",
-                        "change": "Ajout d'un panneau de réglages pour sauvegarder les préférences localement."
+                        "change": "Ajout du panneau de préférences pour enregistrer les paramètres localement"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Permettre la personnalisation de plusieurs comportements par défaut lors du deuxième lancement du programme"
                     },
                     {
                         "type": "improve",
-                        "change": "Optimisation de certaines logiques fonctionnelles."
+                        "change": "Optimisation significative de la logique du programme"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Correction de quelques problèmes mineurs"
                     }
                 ]
             }
