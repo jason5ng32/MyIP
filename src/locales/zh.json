@@ -2,7 +2,7 @@
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",
-    "IPinfo": "IP 信息",
+    "IPInfo": "IP 信息",
     "Connectivity": "网络连通性",
     "WebRTC": "WebRTC 测试",
     "DNSLeakTest": "DNS 泄漏测试",
@@ -10,7 +10,30 @@
     "PingTest": "全球延迟",
     "MTRTest": "MTR 测试",
     "RuleTest": "分流测试",
-    "AdvancedTools": "高级工具"
+    "AdvancedTools": "高级工具",
+    "preferences": {
+      "title": "偏好设置",
+      "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
+      "colorScheme": "颜色方案",
+      "colorAuto": "跟随系统",
+      "colorLight": "白天",
+      "colorDark": "黑夜",
+      "ipSourcesToCheck": "IP 检测服务器数量",
+      "ipSourcesToCheckTips": "选择默认从多少个 IP 检测服务器获取 IP 信息。",
+      "appSettings": "程序设置",
+      "autoRun": "自动运行",
+      "autoRunTips": "关闭后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。",
+      "showMap": "显示地图",
+      "showMapTips": "在 IP 信息卡片上显示地图。",
+      "simpleMode": "简洁模式",
+      "simpleModeTips": "减少 IP 卡片显示的内容。仅在手机上生效。",
+      "connectivityAutoRefresh": "多次刷新可用性检测",
+      "connectivityAutoRefreshTips": "开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。",
+      "popupConnectivityNotifications": "显示可用性检测气泡",
+      "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。",
+      "ipDB": "IP 解析数据源",
+      "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。"
+    }
   },
   "censorshipcheck": {
     "Title": "封锁测试",
@@ -78,8 +101,9 @@
   },
   "ipInfos": {
     "id": "ipinfos",
+    "database": "数据源",
     "Title": "IP 信息",
-    "Notes": "程序会先从 6 个不同的来源（包含 IPv4 和 IPv6）检查你的 IP 地址，然后通过你选择的 IP 地理位置信息源查询对应的地理数据。如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。",
+    "Notes": "程序会先从多个不同的来源（包含 IPv4 和 IPv6）检查你的 IP 地址，然后通过你选择的 IP 地理位置信息源查询对应的地理数据。如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。",
     "Simple": "简约",
     "Map": "地图",
     "MapUnavailable": "地图不可用",
@@ -252,7 +276,9 @@
     "GoNext": "下一张卡片",
     "GoPrevious": "上一张卡片",
     "RefreshRuleTests": "刷新规则测试",
-    "CensorshipCheck": "打开封锁测试面板"
+    "CensorshipCheck": "打开封锁测试面板",
+    "Preferences": "打开偏好设置面板",
+    "About": "打开关于页面"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -568,6 +594,28 @@
           {
             "type": "improve",
             "change": "优化了部分功能逻辑"
+          }
+        ]
+      },
+      {
+        "version": "v3.8",
+        "date": "May 4, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "增加设置面板，可以在本地保存偏好设置"
+          },
+          {
+            "type": "add",
+            "change": "可以自定义程序在第二次启动时的多个默认行为"
+          },
+          {
+            "type": "improve",
+            "change": "大量优化了程序的逻辑"
+          },
+          {
+            "type": "fix",
+            "change": "修复了一些小问题"
           }
         ]
       }

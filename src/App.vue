@@ -1,6 +1,6 @@
 <template>
   <NavBar ref="navBarRef" />
-  <!-- Alerts -->
+  <Preferences ref="preferencesRef" />
   <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
     <div id="toastInfoMask" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast"
       aria-live="assertive" aria-atomic="true">
@@ -34,7 +34,7 @@
       </button>
     </div>
   </div>
-  <Footer />
+  <Footer ref="footerRef" />
   <PWA />
 </template>
 
@@ -50,6 +50,7 @@ import QueryIP from './components/queryip.vue'
 import HelpModal from './components/help.vue'
 import PWA from './components/pwa.vue'
 import AdvancedTools from './components/advancedtools.vue'
+import Preferences from './components/preferences.vue';
 import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 
 import { ref, computed, watch } from 'vue';
@@ -64,6 +65,7 @@ export default {
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
     const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
     const shouldRefreshEveryThing = computed(() => store.state.shouldRefreshEveryThing);
     const shouldRefresh = ref(false);
 
@@ -76,6 +78,7 @@ export default {
       isMobile,
       shouldRefresh,
       configs,
+      userPreferences,
     };
   },
 
@@ -91,6 +94,7 @@ export default {
     HelpModal,
     PWA,
     AdvancedTools,
+    Preferences,
   },
   name: 'App',
   data() {
@@ -178,7 +182,7 @@ export default {
     refreshEverything() {
       const refreshTasks = [
         { action: () => this.$refs.IPCheckRef.checkAllIPs(), delay: 0 },
-        { action: () => this.$refs.connectivityRef.checkAllConnectivity(false, true), delay: 2000 },
+        { action: () => this.$refs.connectivityRef.checkAllConnectivity(false, true, true), delay: 2000 },
         { action: () => this.$refs.webRTCRef.checkAllWebRTC(true), delay: 4000 },
         { action: () => this.$refs.dnsLeaksRef.checkAllDNSLeakTest(true), delay: 2500 },
         { action: () => this.refreshingAlert(), delay: 500 },
@@ -231,7 +235,11 @@ export default {
     infoMask() {
       if (this.infoMaskLevel === 0) {
         this.$refs.IPCheckRef.ipDataCards.forEach((card) => {
+          if(card.id === "cloudflare_v6" || card.id === "ipify_v6") {
+            card.ip = "2001:4860:4860::8888";
+          } else {
           card.ip = "8.8.8.8";
+          }
         });
         this.$refs.webRTCRef.stunServers.forEach((server) => {
           server.ip = "100.100.200.100";
@@ -250,9 +258,14 @@ export default {
           card.longitude = "-122.078514";
           card.isp = "Google LLC";
           card.asn = "AS15169";
+          card.asnlink = "https://radar.cloudflare.com/AS15169",
           card.mapUrl = '/defaultMap.webp';
           card.mapUrl_dark = '/defaultMap_dark.webp';
           card.showASNInfo = false;
+          card.isProxy = this.$t('ipInfos.proxyDetect.no');
+          card.type = this.$t('ipInfos.proxyDetect.type.Business');
+          card.proxyProtocol = this.$t('ipInfos.proxyDetect.unknownProtocol');
+          card.proxyOperator = "unknown";
         });
         this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
           server.geo = "United States";
@@ -346,14 +359,6 @@ export default {
           description: this.$t('shortcutKeys.GoToBottom'),
         },
         {
-          keys: "D",
-          action: () => {
-            this.$refs.navBarRef.toggleDarkMode(),
-              this.$trackEvent('ShortCut', 'ShortCut', 'ToggleDarkMode');
-          },
-          description: this.$t('shortcutKeys.ToggleDarkMode'),
-        },
-        {
           keys: "R",
           action: () => {
             this.$store.commit('setRefreshEveryThing', true);
@@ -366,6 +371,9 @@ export default {
           keys: "([1-6])",
           type: "regex",
           action: (num) => {
+            if (num > this.userPreferences.ipCardsToShow) {
+              return
+            }
             const card = this.$refs.IPCheckRef.ipDataCards[num - 1];
             this.scrollToElement("IPInfo-" + num, 171);
             this.$refs.IPCheckRef.refreshCard(card);
@@ -377,7 +385,7 @@ export default {
           keys: "c",
           action: () => {
             this.scrollToElement("Connectivity", 80);
-            this.$refs.connectivityRef.checkAllConnectivity(false, true);
+            this.$refs.connectivityRef.checkAllConnectivity(false, true, true);
             this.$trackEvent('ShortCut', 'ShortCut', 'Connectivity');
           },
           description: this.$t('shortcutKeys.RefreshConnectivityTests'),
@@ -459,7 +467,7 @@ export default {
           action: () => {
             if (this.configs.bingMap) {
               window.scrollTo({ top: 0, behavior: "smooth" });
-              this.$refs.IPCheckRef.toggleMaps();
+              this.$refs.navBarRef.toggleMaps();
             };
             this.$trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
           },
@@ -482,7 +490,22 @@ export default {
           },
           description: this.$t('shortcutKeys.ToggleInfoMask'),
         },
-
+        {
+          keys: "p",
+          action: () => {
+            this.$refs.navBarRef.OpenPreferences();
+            this.$trackEvent('ShortCut', 'ShortCut', 'Preferences');
+          },
+          description: this.$t('shortcutKeys.Preferences'),
+        },
+        {
+          keys: "a",
+          action: () => {
+            this.$refs.footerRef.openAbout();
+            this.$trackEvent('ShortCut', 'ShortCut', 'About');
+          },
+          description: this.$t('shortcutKeys.About'),
+        },
         // help
         {
           keys: "?",

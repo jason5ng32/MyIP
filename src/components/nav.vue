@@ -36,14 +36,9 @@
         </ul>
       </div>
 
-      <div>
-        <input type="checkbox" class="jn-checkbox" aria-label="Toggle Dark Mode" id="toggleBtn" v-model="isDarkMode"
-          @click="toggleDarkMode" />
-        <label class="switch" for="toggleBtn">
-          <i class="bi bi-moon-stars text-light"></i>
-          <i class="bi bi-brightness-high text-warning "></i>
-          <div class="ball"></div>
-        </label>
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
+        aria-label="Preferences">
+        <i class="bi bi-toggles"></i>
       </div>
 
     </div>
@@ -52,26 +47,16 @@
       <span class="navbar-toggler-icon bg-transparent "></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+      <!-- 导航循环 -->
       <div class="navbar-nav ">
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#IPInfo"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'IPInfo')"> {{ $t('nav.IPinfo') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#Connectivity"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'Connectivity')"> {{
-            $t('nav.Connectivity') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#WebRTC"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'WebRTC')"> {{ $t('nav.WebRTC') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#DNSLeakTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'DNSLeakTest')"> {{
-            $t('nav.DNSLeakTest') }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#SpeedTest"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'SpeedTest')"> {{ $t('nav.SpeedTest')
-          }}</a>
-        <a class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" href="#AdvancedTools"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', 'AdvancedTools')"> {{ $t('nav.AdvancedTools') }}</a>
+        <a v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']" :key="item"
+          class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" :href="`#${item}`"
+          @click="collapseNav(); $trackEvent('Nav', 'NavClick', item)">{{
+            $t(`nav.${item}`) }}</a>
       </div>
       <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
-        :class="{ 'btn-outline-light' : isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile}" target="_blank"
-        @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
+        :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
+        target="_blank" @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
         <div><i class="bi bi-github"></i></div>
         <div class="row flex-column ">
           <TransitionGroup name="slide-fade">
@@ -86,11 +71,13 @@
       </a>
     </div>
   </nav>
+
 </template>
 
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { Offcanvas } from 'bootstrap';
 
 export default {
   name: 'NavBar',
@@ -100,10 +87,14 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
+    const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
 
     return {
       isDarkMode,
-      isMobile
+      isMobile,
+      configs,
+      userPreferences,
     };
   },
 
@@ -114,6 +105,19 @@ export default {
     }
   },
   methods: {
+
+    // 打开偏好设置
+    OpenPreferences() {
+      var offcanvasElement = document.getElementById('offcanvasPreferences');
+      var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+      if (offcanvasElement.classList.contains('show')) {
+        offcanvas.hide();
+      } else {
+        offcanvas.show();
+      }
+
+      this.$trackEvent('Nav', 'NavClick', 'Preferences');
+    },
 
     //获取 GitHub stars
     async getGitHubStars() {
@@ -134,46 +138,11 @@ export default {
       }
     },
 
-    // 切换暗黑模式
-    toggleDarkMode() {
-      this.$store.commit('toggleDarkMode');
-      this.updateBodyClass();
-      this.PWAColor();
-      this.$trackEvent('Nav', 'ToggleClick', 'DarkMode');
-    },
-
     // 收起导航栏
     collapseNav() {
       document.querySelector('#navbarNavAltMarkup').classList.remove('show');
     },
 
-    // 更新 body class
-    updateBodyClass() {
-      if (this.isDarkMode) {
-        document.body.classList.add("dark-mode");
-      } else {
-        document.body.classList.remove("dark-mode");
-      }
-    },
-
-    // 更新 PWA 颜色
-    PWAColor() {
-      if (this.isDarkMode) {
-        document
-          .querySelector('meta[name="theme-color"]')
-          .setAttribute("content", "#171a1d");
-        document
-          .querySelector('meta[name="background-color"]')
-          .setAttribute("content", "#212529");
-      } else {
-        document
-          .querySelector('meta[name="theme-color"]')
-          .setAttribute("content", "#f8f9fa");
-        document
-          .querySelector('meta[name="background-color"]')
-          .setAttribute("content", "#ffffff");
-      }
-    },
 
     // 点击 Logo 事件处理
     handleLogoClick() {
@@ -184,9 +153,6 @@ export default {
     },
   },
   mounted() {
-    this.$store.dispatch('checkDarkMode');
-    this.updateBodyClass();
-    this.PWAColor();
     setTimeout(() => {
       this.getGitHubStars();
     }, 1000)
@@ -195,7 +161,6 @@ export default {
 </script>
 
 <style scoped>
-/*==================== Dark Light Button Implementation ====================*/
 .jn-checkbox {
   display: none;
 }
@@ -327,5 +292,9 @@ export default {
   to {
     left: 100%;
   }
+}
+
+.preference-button {
+  margin-left: 8pt;
 }
 </style>

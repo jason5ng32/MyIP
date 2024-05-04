@@ -26,18 +26,18 @@
                                 {{ test.url }}
                             </p>
                             <p class="card-text" :class="{
-                    'text-info': test.ip === $t('ruletest.StatusWait'),
-                    'text-success': test.ip.includes('.') || test.ip.includes(':'),
-                    'text-danger': test.ip === $t('ruletest.StatusError')
-                }">
+                                'text-info': test.ip === $t('ruletest.StatusWait'),
+                                'text-success': test.ip.includes('.') || test.ip.includes(':'),
+                                'text-danger': test.ip === $t('ruletest.StatusError')
+                            }">
                                 <i class="bi"
                                     :class="[test.ip === $t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
                                 <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
                             <div class="alert" :class="{
-                    'alert-info': test.country_code === $t('ruletest.StatusWait'),
-                    'alert-success': test.country_code !== $t('ruletest.StatusWait'),
-                }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+                                'alert-info': test.country_code === $t('ruletest.StatusWait'),
+                                'alert-success': test.country_code !== $t('ruletest.StatusWait'),
+                            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <i class="bi"
                                     :class="[test.ip === $t('ruletest.StatusWait') || test.ip === $t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
                                 {{ $t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
@@ -74,74 +74,20 @@ export default {
     },
 
     data() {
+        const createDefaultCard = () => ({
+            name: this.$t('ruletest.Name'),
+            ip: this.$t('ruletest.StatusWait'),
+            country_code: this.$t('ruletest.StatusWait'),
+            country: this.$t('ruletest.StatusWait'),
+        });
+        const ruleTests = Array.from({ length: 8 }, (_, index) => ({
+            id: index + 1,
+            url: `ptest-${index + 1}.ipcheck.ing`,
+            ...createDefaultCard(),
+        }));
         return {
             testCount: 8,
-            ruleTests: [
-                {
-                    id: 1,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-1.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 2,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-2.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 3,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-3.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 4,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-4.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 5,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-5.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 6,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-6.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 7,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-7.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-                {
-                    id: 8,
-                    name: this.$t('ruletest.Name'),
-                    url: 'ptest-8.ipcheck.ing',
-                    ip: this.$t('ruletest.StatusWait'),
-                    country_code: this.$t('ruletest.StatusWait'),
-                    country: this.$t('ruletest.StatusWait'),
-                },
-            ],
+            ruleTests,
             IPArray: [],
         };
     },

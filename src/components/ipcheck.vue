@@ -1,66 +1,17 @@
 <template>
   <!-- IP Infos -->
-  <div class="ip-data-section mb-4">
-    <div class="row" :class="{ 'jn-title2': !isMobile, 'jn-title': isMobile }">
-      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎
-        {{ $t('ipInfos.Title') }}</h2>
-      <div class="form-check form-switch col-8 jn-radio">
-
-        <div :class="{ 'col-4': isMobile }">
-          <input v-if="isMobile" class="form-check-input" type="checkbox" id="collapseSwitch" @change="toggleCollapse"
-            :checked="!isCardsCollapsed" @click="$trackEvent('IPCheck', 'ToggleClick', 'Collaspes');"
-            aria-label="Toggle Card Display">
-          <label v-if="isMobile" class="form-check-label" for="collapseSwitch">&nbsp;<i
-              class="bi bi-list-columns-reverse" aria-hidden="true"></i></label>
-        </div>
-
-        <div>
-          <input class="form-check-input" type="checkbox" role="button" id="toggleMapSwitch" @change="toggleMaps"
-            aria-label="Toggle Map Display" :checked="isMapShown" :disabled="!configs.bingMap"
-            @click="$trackEvent('IPCheck', 'ToggleClick', 'ShowMap');">
-
-          <label class="form-check-label" for="toggleMapSwitch">
-            <i :class="['bi', configs.bingMap ? 'bi bi-map-fill' : 'bi bi-map']" aria-hidden="true"
-              aria-label="Toggle Map Display" v-tooltip="$t('Tooltips.ToggleMaps')"></i>
-          </label>
-        </div>
-
-        <!-- IP 数据源选择 -->
-        <div class="dropdown">
-          <span class="ms-3" role="button" id="SelectIPGEOSource" data-bs-toggle="dropdown" aria-expanded="false"
-            :aria-label="$t('ipInfos.SelectSource')">
-            <i class="bi bi-grid-fill" v-tooltip="$t('Tooltips.SourceSelect')"></i>
-          </span>
-          <ul class="dropdown-menu" aria-labelledby="SelectIPGEOSource" :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <li class="dropdown-header">
-              {{ $t('ipInfos.SelectSource') }}
-            </li>
-            <li>
-              <hr class="dropdown-divider">
-            </li>
-            <li v-for="source in sources" :key="source.id">
-              <span class="dropdown-item jn-select"
-                :class="{ active: ipGeoSource === source.id, disabled: !source.enabled }"
-                @click="source.enabled ? selectIPGeoSource(source.id) : null" :disabled="!source.enabled"
-                :aria-disabled="!source.enabled" :aria-label="source.text">
-                {{ source.text }}
-                <i class="bi bi-check2-circle" v-if="ipGeoSource === source.id"></i>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-
-
-      </div>
+  <div class="ip-data-section mb-4 mt-4">
+    <div class="jn-title2">
+      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎 {{ $t('ipInfos.Title') }}</h2>
     </div>
     <div class="text-secondary">
       <p>{{ $t('ipInfos.Notes') }}</p>
     </div>
     <div class="jn-card-deck">
       <div class="row">
-        <div v-for="(card, index) in ipDataCards" :key="card.id" :ref="card.id"
-          :class="{ 'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error'), 'col-xl-4': true, 'col-lg-6': true, 'col-md-6': true, 'mb-4': true }">
+        <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
+          'jn-opacity': !card.ip || card.ip === $t('ipInfos.IPv4Error') || card.ip === $t('ipInfos.IPv6Error')
+        }]">
           <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
             'jn-ip-card1': !isMobile && ipGeoSource === 0,
@@ -96,7 +47,7 @@
             </div>
 
 
-            <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error'))
+            <div v-if="(card.asn) || (card.ip === $t('ipInfos.IPv4Error')) || (card.ip === $t('ipInfos.IPv6Error')) || card.ip === '2001:4860:4860::8888'
             " class="card-body" :id="'IPInfo-' + (index + 1)">
               <ul class="list-group list-group-flush" v-if="card.country_name">
 
@@ -251,32 +202,39 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
-    const ipGeoSource = computed(() => store.state.ipGeoSource);
     const configs = computed(() => store.state.configs);
+    const userPreferences = computed(() => store.state.userPreferences);
+    const sources = computed(() => store.state.ipDBs);
 
     return {
       isDarkMode,
       isMobile,
-      ipGeoSource,
       configs,
+      userPreferences,
+      sources,
     };
   },
 
   data() {
+    const createDefaultCard = () => ({
+      ip: "",
+      country_name: "",
+      region: "",
+      city: "",
+      latitude: "",
+      longitude: "",
+      isp: "",
+      asn: "",
+      asnlink: "",
+      mapUrl: '/defaultMap.webp',
+      mapUrl_dark: '/defaultMap_dark.webp',
+      showMap: false,
+      showASNInfo: false,
+    });
     return {
       asnInfos: {
         "AS15169": {
-          "asnName": "Google",
-          "asnOrgName": "GOGL-ARIN",
-          "estimatedUsers": "368891",
-          "IPv4_Pct": "95.35",
-          "IPv6_Pct": "4.65",
-          "HTTP_Pct": "3.16",
-          "HTTPS_Pct": "96.84",
-          "Desktop_Pct": "58.88",
-          "Mobile_Pct": "41.12",
-          "Bot_Pct": "98.46",
-          "Human_Pct": "1.54"
+          "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "368891", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
         }
       },
       asnInfoItems: [
@@ -292,126 +250,49 @@ export default {
         { key: 'Bot_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
         { key: 'Human_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
       ],
-      isCardsCollapsed: JSON.parse(localStorage.getItem('isCardsCollapsed')) || false,
       placeholderSizes: [12, 8, 6, 8, 4],
-      sources: [
-        { id: 0, text: 'IPCheck.ing', enabled: true },
-        { id: 1, text: 'IPinfo.io', enabled: true },
-        { id: 2, text: 'IP-API.com', enabled: true },
-        { id: 3, text: 'IPAPI.co', enabled: true },
-        { id: 4, text: 'KeyCDN', enabled: true },
-        { id: 5, text: 'IP.SB', enabled: true },
-      ],
       pendingIPDetailsRequests: new Map(),
       ipDataCards: [
         {
+          ...createDefaultCard(),
           id: "cnsource",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "CN Source",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "special",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Special",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "cloudflare_v4",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Cloudflare IPv4",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "cloudflare_v6",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "Cloudflare IPv6",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "ipify_v4",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "IPify IPv4",
-          showASNInfo: false,
         },
         {
+          ...createDefaultCard(),
           id: "ipify_v6",
-          ip: "",
-          country_name: "",
-          region: "",
-          city: "",
-          latitude: "",
-          longitude: "",
-          isp: "",
-          asn: "",
-          asnlink: "",
-          mapUrl: '/defaultMap.webp',
-          mapUrl_dark: '/defaultMap_dark.webp',
-          showMap: false,
           source: "IPify IPv6",
-          showASNInfo: false,
         },
       ],
-      isMapShown: false,
+      isMapShown: this.userPreferences.showMap,
+      isCardsCollapsed: this.userPreferences.simpleMode,
+      ipCardsToShow: this.userPreferences.ipCardsToShow,
       ipDataCache: new Map(),
       copiedStatus: {},
       bingMapLanguage: this.$Lang,
       IPArray: [],
+      ipGeoSource: this.userPreferences.ipGeoSource,
+      usingSource: this.userPreferences.ipGeoSource,
     };
   },
 
@@ -426,66 +307,10 @@ export default {
       return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
     },
 
-    // 切换地图显示
-    toggleMaps() {
-      this.isMapShown = !this.isMapShown;
-      this.ipDataCards.forEach((card) => {
-        card.showMap = this.isMapShown;
-      });
-    },
-
-    // 切换卡片折叠
-    toggleCollapse() {
-      this.isCardsCollapsed = !this.isCardsCollapsed;
-    },
-
     // 从中国来源获取 IP 地址
     getIPfromCNSource() {
       this.getIPFromIPIP().catch(() => {
-        this.getIPFromTaobao().catch(() => {
-          this.getIPFromQQ();
-        })
-      });
-    },
-
-    // 从淘宝获取 IP 地址
-    getIPFromTaobao() {
-      return new Promise((resolve, reject) => {
-        let script = document.createElement("script");
-        script.src = "https://www.taobao.com/help/getip.php?callback=ipCallback";
-        document.head.appendChild(script);
-
-        window.ipCallback = (data) => {
-          try {
-            let ip = data.ip;
-            this.ipDataCards[0].source = "TaoBao";
-            this.fetchIPDetails(0, ip);
-            this.IPArray = [...this.IPArray, ip];
-
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            resolve(ip);
-          } catch (error) {
-            console.error("Error processing IP data from Taobao:", error);
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            reject(new Error("Failed to process IP data from Taobao"));
-          }
-        };
-        // 设置超时拒绝 Promise，以防万一请求挂起
-        script.onerror = () => {
-          console.error("Error loading script for IP data from Taobao");
-          document.head.removeChild(script);
-          delete window.ipCallback;
-          reject(new Error("Script loading error for IP data from Taobao"));
-        };
-        setTimeout(() => {
-          if (document.head.contains(script)) {
-            document.head.removeChild(script);
-            delete window.ipCallback;
-            reject(new Error("Request to Taobao timed out"));
-          }
-        }, 2000);
+        this.getIPFromQQ();
       });
     },
 
@@ -549,7 +374,6 @@ export default {
         }, 2000);
       });
     },
-
 
     // 从特殊源获取 IP 地址
     async getIPFromSpecial() {
@@ -740,15 +564,16 @@ export default {
             const cardData = source.transform(data);
 
             if (cardData) {
-              this.$store.commit('SET_IP_GEO_SOURCE', source.id);
-              localStorage.setItem("ipGeoSource", source.id.toString());
+              this.ipGeoSource = source.id;
+              this.usingSource = source.id;
+              this.$store.commit('UPDATE_PREFERENCE', { key: 'ipGeoSource', value: source.id });
               Object.assign(card, cardData);
               this.ipDataCache.set(ip, cardData);
               return;
             }
           } catch (error) {
             console.error("Error fetching IP details from source " + source.id + ":", error);
-            this.sources[source.id].enabled = false;
+            this.$store.commit('UPDATE_IPDBS', { id: source.id, enabled: false });
             currentSourceIndex = (currentSourceIndex + 1) % sources.length;
             attempts++;
           }
@@ -771,13 +596,7 @@ export default {
     },
 
     // 选择 IP 数据源，并保存到本地存储
-    selectIPGeoSource(sourceID) {
-      if (this.ipGeoSource === sourceID) {
-        return;
-      }
-      this.$store.commit('SET_IP_GEO_SOURCE', sourceID);
-      localStorage.setItem("ipGeoSource", parseInt(sourceID));
-      this.$trackEvent('IPCheck', 'SelectSource', this.sources[sourceID].text);
+    selectIPGeoSource() {
       // 清空部分数据
       this.ipDataCards.forEach((card) => {
         card.country_name = "";
@@ -788,12 +607,16 @@ export default {
         card.isp = "";
         card.asn = "";
         card.asnlink = "";
+        card.isProxy = "";
+        card.type = "";
+        card.proxyProtocol = "";
+        card.proxyOperator = "";
       });
 
       this.ipDataCache.clear();
 
       // 尝试更新一次，成功后再获取其他 IP 数据
-      let runningSource = this.fetchIPDetails(0, this.ipDataCards[0].ip, sourceID);
+      let runningSource = this.fetchIPDetails(0, this.ipDataCards[0].ip, this.ipGeoSource);
 
       // 重新获取 IP 数据
       let index = 1;
@@ -816,46 +639,7 @@ export default {
         throw new Error(data.reason);
       }
 
-
-      if (this.ipGeoSource === 0) {
-
-        const proxyDetect = data.proxyDetect || {};
-
-        const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
-          proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
-            this.$t('ipInfos.proxyDetect.unknownProxyType');
-
-        const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
-          proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
-            proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-              proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
-                proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
-
-        const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
-          proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
-
-        const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-
-        return {
-          country_name: data.country_name || "",
-          country_code: data.country || "",
-          region: data.region || "",
-          city: data.city || "",
-          latitude: data.latitude || "",
-          longitude: data.longitude || "",
-          isp: data.org || "",
-          asn: data.asn || "",
-          asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
-          mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
-          mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : "",
-          isProxy: isProxy,
-          type: type,
-          proxyProtocol: proxyProtocol,
-          proxyOperator: proxyOperator,
-        };
-      }
-
-      return {
+      const baseData = {
         country_name: data.country_name || "",
         country_code: data.country || "",
         region: data.region || "",
@@ -868,6 +652,33 @@ export default {
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
         mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : ""
       };
+
+      if (this.ipGeoSource === 0) {
+        const proxyDetails = this.extractProxyDetails(data.proxyDetect);
+        return {
+          ...baseData,
+          ...proxyDetails,
+        };
+      }
+
+      return baseData;
+    },
+
+    // 提取代理信息
+    extractProxyDetails(proxyDetect = {}) {
+      const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
+        proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
+          this.$t('ipInfos.proxyDetect.unknownProxyType');
+      const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
+        proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
+          proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
+            proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+              proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
+      const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
+        proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
+      const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
+
+      return { isProxy, type, proxyProtocol, proxyOperator };
     },
 
     // 检查所有 IP 地址
@@ -881,9 +692,12 @@ export default {
         this.getIPFromIpify_V6
       ];
 
+      // 限制执行的函数数量为 ipCardsToShow 的长度
+      const maxIndex = this.ipCardsToShow;
+
       let index = 0;
       const interval = setInterval(() => {
-        if (index < ipFunctions.length) {
+        if (index < maxIndex && index < ipFunctions.length) {
           ipFunctions[index].call(this);
           index++;
         } else {
@@ -919,10 +733,6 @@ export default {
         case "IPCheck.ing":
           this.getIPFromGCR(card);
           this.$trackEvent('IPCheck', 'RefreshClick', 'IPCheck.ing');
-          break;
-        case "TaoBao":
-          this.getIPFromTaobao(card);
-          this.$trackEvent('IPCheck', 'RefreshClick', 'TaoBao');
           break;
         case "IPIP.net":
           this.getIPFromIPIP(card);
@@ -999,12 +809,22 @@ export default {
   },
 
   watch: {
-    isMapShown(newVal) {
-      localStorage.setItem("isMapShown", JSON.stringify(newVal));
+    'userPreferences.ipGeoSource': {
+      handler(newVal, oldVal) {
+        this.ipGeoSource = newVal;
+        if (newVal !== this.usingSource) {
+          this.selectIPGeoSource();
+        }
+      },
+      deep: true,
     },
-    isCardsCollapsed(newVal) {
-      localStorage.setItem('isCardsCollapsed', JSON.stringify(newVal));
+    'userPreferences.showMap': function (newVal, oldVal) {
+      this.isMapShown = newVal;
     },
+    'userPreferences.simpleMode': function (newVal, oldVal) {
+      this.isCardsCollapsed = newVal;
+    },
+
     IPArray: {
       handler() {
         this.$store.commit('updateGlobalIpDataCards', this.IPArray);
@@ -1013,15 +833,20 @@ export default {
     },
   },
 
-  mounted() {
-    this.isMapShown = JSON.parse(localStorage.getItem("isMapShown")) || false;
-    this.checkAllIPs();
-
-    // 从本地存储中获取 ipGeoSource
-    const ipGeoSource = localStorage.getItem('ipGeoSource');
-    if (localStorage.getItem('ipGeoSource')) {
-      this.$store.commit('SET_IP_GEO_SOURCE', parseInt(ipGeoSource));
+  computed: {
+    colClass() {
+      const numCards = this.ipCardsToShow;
+      if (numCards > 0) {
+        // 保证每行不超过三个卡片
+        const colSize = numCards > 3 ? 4 : Math.floor(12 / numCards);
+        return `col-xl-${colSize} col-md-${colSize}  mb-4`;
+      }
+      return 'col-xl-4 col-lg-6 col-md-6 mb-4'; // 默认情况，如果计算出错或没有卡片显示
     }
+  },
+
+  mounted() {
+    this.checkAllIPs();
   },
 }
 </script>
@@ -1059,7 +884,9 @@ export default {
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
 }
-.dropdown-item.disabled, .dropdown-item:disabled {
+
+.dropdown-item.disabled,
+.dropdown-item:disabled {
   text-decoration: line-through;
 }
 </style>

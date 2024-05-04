@@ -5,8 +5,8 @@
       aria-atomic="true">
       <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
         <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" data-bs-dismiss="toast"
-          aria-label="Close"></button>
+        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+          data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
       <div class="toast-body">
         {{ alertMessage }}
@@ -19,9 +19,10 @@
     <div class="availability-test-section mb-4">
       <div class="jn-title2">
         <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ $t('connectivity.Title') }}</h2>
-        <button @click="checkAllConnectivity(false, true)"
-          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh Connectivity Test"
-          v-tooltip="$t('Tooltips.RefreshConnectivityTests')"><i class="bi bi-arrow-clockwise"></i></button>
+        <button @click="checkAllConnectivity(false, true, true)"
+          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+          aria-label="Refresh Connectivity Test" v-tooltip="$t('Tooltips.RefreshConnectivityTests')"><i class="bi"
+            :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
       </div>
       <div class="text-secondary">
         <p>{{ $t('connectivity.Note') }}</p>
@@ -72,10 +73,12 @@ export default {
     const store = useStore();
     const isDarkMode = computed(() => store.state.isDarkMode);
     const isMobile = computed(() => store.state.isMobile);
+    const userPreferences = computed(() => store.state.userPreferences);
 
     return {
       isDarkMode,
       isMobile,
+      userPreferences,
     };
   },
 
@@ -85,6 +88,13 @@ export default {
       alertStyle: "",
       alertTitle: "",
       alertMessage: "",
+      autoRefresh: this.userPreferences.connectivityAutoRefresh,
+      autoStart: this.userPreferences.autoStart,
+      autoShowAltert: this.userPreferences.popupConnectivityNotifications,
+      isStarted: false,
+      counter: 0,
+      maxCounts: 5,
+      manualRun: false,
       connectivityTests: [
         {
           id: "bilibili",
@@ -165,9 +175,9 @@ export default {
   methods: {
 
     // 检查网络连通性
-    checkConnectivityHandler(test, isAlertToShow, onTestComplete) {
+    checkConnectivityHandler(test, onTestComplete, isManualRun) {
       const beginTime = +new Date();
-
+      this.manualRun = isManualRun;
       let img = new Image();
       let timeout = setTimeout(() => {
         test.status = this.$t('connectivity.StatusUnavailable');
@@ -185,7 +195,11 @@ export default {
           test.mintime = Math.min(test.mintime, testTime);
         }
 
-        test.time = testTime;
+        if (this.autoRefresh && !isManualRun) {
+          test.time = test.mintime;
+        } else {
+          test.time = testTime;
+        }
 
         onTestComplete(true);
       };
@@ -200,7 +214,7 @@ export default {
     },
 
     // 检查所有网络连通性
-    checkAllConnectivity(isAlertToShow, isRefresh) {
+    checkAllConnectivity(isAlertToShow, isRefresh, isManualRun) {
 
       if (isRefresh) {
         this.connectivityTests.forEach((test) => {
@@ -232,15 +246,17 @@ export default {
 
       this.connectivityTests.forEach((test, index) => {
         setTimeout(() => {
-          this.checkConnectivityHandler(test, isAlertToShow, onTestComplete);
+          this.checkConnectivityHandler(test, onTestComplete, isManualRun);
         }, 50 * index);
       });
 
-      if (isAlertToShow) {
+      if ((isAlertToShow || !this.isStarted) && this.autoShowAltert) {
         setTimeout(() => {
           this.showToast();
         }, 4000);
       }
+
+      this.isStarted = true;
     },
 
     // 更新通知气泡
@@ -271,12 +287,29 @@ export default {
         }
       });
     },
+
+    handelCheckStart() {
+      setTimeout(() => {
+        this.checkAllConnectivity(true, false, false);
+      }, 2000);
+      if (this.autoRefresh) {
+        this.intervalId = setInterval(() => {
+          if (this.counter < this.maxCounts && !this.manualRun) {
+            this.checkAllConnectivity(false, false, false);
+            this.counter++;
+          } else {
+            clearInterval(this.intervalId);
+          }
+        }, 3000);
+      }
+    },
+
   },
 
   mounted() {
-    setTimeout(() => {
-      this.checkAllConnectivity(true, false);
-    }, 2000);
+    if (this.autoStart) {
+      this.handelCheckStart();
+    }
   },
 }
 </script>

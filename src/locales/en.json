@@ -2,7 +2,7 @@
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",
-    "IPinfo": "IP Infos",
+    "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
     "WebRTC": "WebRTC Test",
     "DNSLeakTest": "DNS Leak Test",
@@ -10,7 +10,30 @@
     "PingTest": "Global Latency",
     "MTRTest": "MTR Test",
     "RuleTest": "Rule Test",
-    "AdvancedTools": "Advanced Tools"
+    "AdvancedTools": "Advanced Tools",
+    "preferences": {
+      "title": "Preferences",
+      "preferenceTips": "These settings are saved in your browser for easy reuse. Some options require refreshing the page to take effect.",
+      "colorScheme": "Color Scheme",
+      "colorAuto": "Auto",
+      "colorLight": "Day",
+      "colorDark": "Night",
+      "ipSourcesToCheck": "Servers To Check IPs",
+      "ipSourcesToCheckTips": "Select the number of servers to check your IP address. The more servers you select, the more time it will take to complete the check.",
+      "appSettings": "Program Settings",
+      "autoRun": "Auto Run",
+      "autoRunTips": "If disabled, the app will only check the local IP and will not run tests automatically.",
+      "showMap": "Show Map",
+      "showMapTips": "Displays a map on the IP info card.",
+      "simpleMode": "Simple Mode",
+      "simpleModeTips": "Reduces the information displayed on IP cards. Effective on mobile devices only.",
+      "connectivityAutoRefresh": "Multiple Connectivity Refreshes",
+      "connectivityAutoRefreshTips": "When enabled, the app runs five checks at startup and displays the lowest latency.",
+      "popupConnectivityNotifications": "Pop-up Connectivity Alerts",
+      "popupConnectivityNotificationsTips": "When enabled, the initial check's results are shown as a pop-up alert.",
+      "ipDB": "IP Geolocation Database",
+      "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order."
+    }
   },
   "censorshipcheck": {
     "Title": "Censorship Check",
@@ -78,8 +101,9 @@
   },
   "ipInfos": {
     "id": "ipinfos",
+    "database": "Database",
     "Title": "IP Infos",
-    "Notes": "The program will first check your IP address from 6 different sources (including IPv4 and IPv6), and then query the corresponding geographical data from the IP geolocation source you selected. If there is only 1 IP stack, the source without data will be displayed as empty.",
+    "Notes": "The program will first check your IP address from different sources (including IPv4 and IPv6), and then query the corresponding geographical data from the IP geolocation source you selected. If there is only 1 IP stack, the source without data will be displayed as empty.",
     "Simple": "Simple",
     "Map": "Map",
     "MapUnavailable": "Map Unavailable",
@@ -244,7 +268,7 @@
     "RuleTest": "Open Rule Test panel",
     "DNSResolver": "Open DNS Resolution panel",
     "ToggleMaps": "Toggle Maps",
-    "IPCheck": "IP Check",
+    "IPCheck": "Query IP Address",
     "AddBingMapKey": "Add Bing Map API Key",
     "ToggleInfoMask": "Toggle Info Masking",
     "Help": "Show Shortcut Keys",
@@ -252,7 +276,9 @@
     "GoNext": "Next Card",
     "GoPrevious": "Previous Card",
     "RefreshRuleTests": "Refresh Rule Tests",
-    "CensorshipCheck": "Open Censorship Check panel"
+    "CensorshipCheck": "Open Censorship Check panel",
+    "Preferences": "Open Preferences",
+    "About": "Open About panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -273,7 +299,7 @@
     "Error": "Please enter a valid Bing Map API Key."
   },
   "helpModal": {
-    "Title": "Shortcuts"
+    "Title": "Keyboard Shortcuts"
   },
   "about": {
     "Title": "About",
@@ -568,6 +594,28 @@
           {
             "type": "improve",
             "change": "Optimized some functional logic"
+          }
+        ]
+      },
+      {
+        "version": "v3.8",
+        "date": "May 4, 2024",
+        "content": [
+          {
+        "type": "add",
+        "change": "Added preferences panel to save settings locally"
+          },
+          {
+        "type": "add",
+        "change": "Allow customization of multiple default behaviors on second program launch"
+          },
+          {
+        "type": "improve",
+        "change": "Significantly optimized program logic"
+          },
+          {
+        "type": "fix",
+        "change": "Fixed some minor issues"
           }
         ]
       }

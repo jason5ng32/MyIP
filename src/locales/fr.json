@@ -2,7 +2,7 @@
     "nav": {
         "id": "nav",
         "Title": "IPCheck.ing",
-        "IPinfo": "Infos IP",
+        "IPInfo": "Infos IP",
         "Connectivity": "Connectivité",
         "WebRTC": "Test WebRTC",
         "DNSLeakTest": "Test de fuite DNS",
@@ -10,7 +10,30 @@
         "PingTest": "Latence mondiale",
         "MTRTest": "Test MTR",
         "RuleTest": "Test de règles",
-        "AdvancedTools": "Outils avancés"
+        "AdvancedTools": "Outils avancés",
+        "preferences": {
+            "title": "Préférences",
+            "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",
+            "colorScheme": "Schéma de Couleurs",
+            "colorAuto": "Par Défaut Système",
+            "colorLight": "Jour",
+            "colorDark": "Nuit",
+            "ipSourcesToCheck": "Serveurs pour vérifier les adresses IP",
+            "ipSourcesToCheckTips": "Sélectionnez le nombre de serveurs pour vérifier votre adresse IP. Plus vous en sélectionnez, plus cela prendra de temps pour terminer la vérification.",
+            "appSettings": "Paramètres de l'App",
+            "autoRun": "Exécution Automatique",
+            "autoRunTips": "Si désactivé, l'appli vérifiera seulement l'IP local et n'exécutera pas de tests automatiquement.",
+            "showMap": "Afficher la Carte",
+            "showMapTips": "Affiche une carte sur la carte d'info IP.",
+            "simpleMode": "Mode Simple",
+            "simpleModeTips": "Réduit les informations affichées sur les cartes IP. Effectif uniquement sur les appareils mobiles.",
+            "connectivityAutoRefresh": "Rafraîchissements Multiples de Connectivité",
+            "connectivityAutoRefreshTips": "Activé, l'appli effectue cinq vérifications au démarrage et affiche le délai le plus bas.",
+            "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
+            "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up.",
+            "ipDB": "Base de données de géolocalisation IP",
+            "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes."
+        }
     },
     "censorshipcheck": {
         "Title": "Test de censorship",
@@ -78,8 +101,9 @@
     },
     "ipInfos": {
         "id": "ipinfos",
+        "database": "Données",
         "Title": "Infos IP",
-        "Notes": "Le programme vérifie d'abord votre adresse IP à partir de 6 sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
+        "Notes": "Le programme vérifie d'abord votre adresse IP à partir des sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
         "Simple": "Simple",
         "Map": "Carte",
         "MapUnavailable": "Carte non disponible",
@@ -252,7 +276,9 @@
         "GoNext": "Carte suivante",
         "GoPrevious": "Carte précédente",
         "RefreshRuleTests": "Actualiser les tests de règles",
-        "CensorshipCheck": "Ouvrir le Test de censorship"
+        "CensorshipCheck": "Ouvrir le Test de censorship",
+        "Preferences": "Ouvrir les Préférences",
+        "About": "Ouvrir À propos"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
@@ -568,6 +594,28 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de certaines logiques fonctionnelles"
+                    }
+                ]
+            },
+            {
+                "version": "v3.8",
+                "date": "May 4, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout du panneau de préférences pour enregistrer les paramètres localement"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Permettre la personnalisation de plusieurs comportements par défaut lors du deuxième lancement du programme"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation significative de la logique du programme"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Correction de quelques problèmes mineurs"
                     }
                 ]
             }

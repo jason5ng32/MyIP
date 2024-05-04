@@ -20,7 +20,7 @@
               </div>
               <div class="col-12 col-md-auto mt-2 mt-md-0">
                 <div class="input-group ">
-                    <select id="mtrIP" class="form-select jn-ping-form-select" v-model="selectedIP"
+                    <select id="mtrIP" aria-label="Select IP to MTR" class="form-select jn-ping-form-select" v-model="selectedIP"
                       :class="{ 'bg-dark text-light': isDarkMode }">
                       <option disabled value="">{{ $t('mtrtest.SelectIP') }}</option>
                       <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>

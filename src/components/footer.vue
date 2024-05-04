@@ -10,15 +10,14 @@
 
     <div id="about" class="text-center mb-2">
       <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-info' : 'link-dark']"
-        data-bs-toggle="offcanvas" href="#About" role="button" aria-controls="About"
-        @click="$trackEvent('Footer', 'FooterClick', 'About');">
+        role="button" aria-controls="About" @click.prevent="openAbout">
         {{ $t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
       </a>
     </div>
 
 
-    <div class="offcanvas offcanvas-end mt-5" :class="[isMobile ? ' w-100' : '']" tabindex="-1" id="About"
-      aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
+    <div class="offcanvas offcanvas-end mt-5 border-0 h-100" :class="[isMobile ? ' w-100' : '']" tabindex="-1"
+      id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">
           <button type="button" class="btn" @click="toggleContent('about')"
@@ -98,6 +97,10 @@
             </div>
           </div>
         </div>
+
+        <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
+        </div>
+
       </div>
     </div>
 
@@ -113,6 +116,7 @@
 <script>
 import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+import { Offcanvas } from 'bootstrap';
 import '@khmyznikov/pwa-install';
 
 export default {
@@ -140,6 +144,18 @@ export default {
     }
   },
   methods: {
+    openAbout() {
+      var offcanvasElement = document.getElementById('About');
+      var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+      if (offcanvasElement.classList.contains('show')) {
+        offcanvas.hide();
+      } else {
+        offcanvas.show();
+      }
+
+      this.$trackEvent('Footer', 'FooterClick', 'About');
+
+    },
     toggleContent(contentType) {
       this.showAbout = contentType === 'about';
       this.showChanglog = contentType === 'changlog';
@@ -152,5 +168,9 @@ export default {
 <style scoped>
 #About {
   z-index: 1051;
+}
+
+.jn-placeholder {
+  height: 20pt;
 }
 </style>

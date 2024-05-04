@@ -108,10 +108,13 @@ app.directive('tooltip', {
     }
 })
 
-// 获取环境变量
-store.dispatch('fetchConfigs').then(() => {
+// 获取后端配置和用户偏好
+Promise.all([
+    store.dispatch('loadPreferences'), // 加载用户偏好设置
+    store.dispatch('fetchConfigs')     // 获取后端配置
+]).then(() => {
     app.mount('#app');
 }).catch(error => {
-    console.error("Failed to fetch configs:", error);
-    app.mount('#app'); // 即使配置获取失败，也继续挂载应用
+    console.error("Failed to initialize the app properly:", error);
+    app.mount('#app'); // 即使初始化中存在错误，也继续挂载应用
 });
