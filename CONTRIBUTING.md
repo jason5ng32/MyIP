@@ -64,7 +64,7 @@ Ensure that all tests pass and, if applicable, add new tests for your changes. R
 
 When you're ready to submit your changes:
 
-1. Rebase your branch to the latest main branch.
+1. Rebase your branch to the latest `dev` branch.
 2. Ensure your changes adhere to the coding standards and guidelines.
 3. Submit a pull request with a clear description of your changes.
 

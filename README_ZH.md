@@ -69,7 +69,7 @@ git clone https://github.com/jason5ng32/MyIP.git
 npm install
 ```
 
-编译：
+构建：
 
 ```bash
 npm run build
@@ -85,7 +85,7 @@ npm start
 
 ### 使用 Vercel
 
-点击顶部的部署到 Vercel 按钮，即可完成部署。
+点击顶部的部署到 Vercel 按钮，即可完成部署。需要注意的是，部分功能在 Vercel 上不可用（详见环境变量部分说明）。
 
 ### 使用 Docker
 
