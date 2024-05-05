@@ -25,6 +25,5 @@ dist-ssr
 .env
 .vscode/extensions.json
 
-bingMapAPIKEY
 package-lock.json
 res
