@@ -103,7 +103,7 @@ You can use the program without adding any environment variables, but if you wan
 | `FRONTEND_PORT` | No | `"18966"` | The running port of the frontend part of the program |
 | `SECURITY_RATE_LIMIT` | No | `"0"` | Controls the number of requests an IP can make to the backend server every 60 minutes (set to 0 for no limit) |
 | `SECURITY_DELAY_AFTER` | No | `"0"` | Controls the first X requests from an IP every 20 minutes that are not subject to speed limits, and after X requests, the delay will increase |
-| `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `logs/blacklist-ip.log` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
+| `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `"logs/blacklist-ip.log"` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
 | `BING_MAP_API_KEY` | No | `""` | API Key for Bing Maps, used to display the location of the IP on a map |
 | `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
 | `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
@@ -113,7 +113,9 @@ You can use the program without adding any environment variables, but if you wan
 | `VITE_RECAPTCHA_SITE_KEY` | No | `""` | Google reCAPTCHA's Site Key, used to display reCAPTCHA verification on the frontend |
 | `RECAPTCHA_SECRET_KEY` | No | `""` | Google reCAPTCHA's Secret Key, used to verify reCAPTCHA verification on the backend |
 
-*Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.*
+> [!TIP]
+> Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.*
+>
 
 ### Using Environment Variables in a Node Environment
 
