@@ -16,8 +16,8 @@ const __dirname = path.dirname(__filename);
 
 // API 请求代理到后端服务
 staticApp.use('/api', createProxyMiddleware({ 
-  target: `http://localhost:${backEndPort}`,
-  changeOrigin: true 
+  target: `http://localhost:${backEndPort}/api`,
+  changeOrigin: true
 }));
 
 // 设置静态文件目录
