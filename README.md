@@ -126,8 +126,8 @@ cp .env.example .env
 Modify `.env`, and for example, add the following:
 
 ```bash
-BACKEND_PORT=18966
-FRONTEND_PORT=11966
+BACKEND_PORT=11966
+FRONTEND_PORT=18966
 BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 IPCHECKING_API="YOUR_KEY_HERE"
