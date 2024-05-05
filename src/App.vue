@@ -467,7 +467,7 @@ export default {
           action: () => {
             if (this.configs.bingMap) {
               window.scrollTo({ top: 0, behavior: "smooth" });
-              this.$refs.navBarRef.toggleMaps();
+              this.$refs.preferencesRef.toggleMaps();
             };
             this.$trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
           },

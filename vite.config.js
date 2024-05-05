@@ -56,6 +56,7 @@ export default defineConfig({
     }),
     CodeInspectorPlugin({
       bundler: 'vite',
+      hideDomPathAttr: true,
       behavior: {
         copy: '{file}',
       },

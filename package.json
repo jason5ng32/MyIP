@@ -18,7 +18,7 @@
     "analytics": "^0.8.11",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "code-inspector-plugin": "^0.11.0",
+    "code-inspector-plugin": "^0.13.0",
     "concurrently": "^8.2.2",
     "country-code-lookup": "^0.1.2",
     "dotenv": "^16.4.5",
