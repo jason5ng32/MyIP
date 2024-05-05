@@ -6,7 +6,8 @@ import { CodeInspectorPlugin } from 'code-inspector-plugin';
 
 dotenv.config();
 
-const apiPort = process.env.PORT || 11966;
+const backEndPort = process.env.BACKEND_PORT || 11966;
+const frontEndPort = process.env.FRONTEND_PORT || 18966;
 
 export default defineConfig({
   plugins: [
@@ -85,9 +86,9 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 18966,
+    port: frontEndPort,
     proxy: {
-      '/api': `http://localhost:${apiPort}`
+      '/api': `http://localhost:${backEndPort}`
     }
   }
 })
