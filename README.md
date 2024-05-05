@@ -83,7 +83,7 @@ The program will run on port 18966.
 
 ### Using Vercel
 
-Click the 'Deploy to Vercel' button at the top to complete the deployment.
+Click the 'Deploy to Vercel' button at the top to complete the deployment. Note that some features are not available on Vercel (see the environment variable section for details).
 
 ### Using Docker
 

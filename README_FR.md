@@ -83,7 +83,7 @@ Le programme s'exécutera sur le port 18966.
 
 ### Using Vercel
 
-Cliquez sur le bouton 'Déployer sur Vercel' en haut pour terminer le déploiement.
+Cliquez sur le bouton 'Déployer sur Vercel' en haut pour terminer le déploiement. Veuillez noter que certaines fonctionnalités ne sont pas disponibles sur Vercel (voir la section des variables d'environnement pour plus de détails).
 
 ### Using Docker
 
