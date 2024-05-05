@@ -114,7 +114,7 @@ You can use the program without adding any environment variables, but if you wan
 | `RECAPTCHA_SECRET_KEY` | No | `""` | Google reCAPTCHA's Secret Key, used to verify reCAPTCHA verification on the backend |
 
 > [!TIP]
-> Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.*
+> Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.
 >
 
 ### Using Environment Variables in a Node Environment
