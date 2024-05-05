@@ -19,10 +19,10 @@ import { slowDown } from 'express-slow-down'
 dotenv.config();
 
 const app = express();
-const backEndPort = process.env.BACKEND_PORT || 11966;
+const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
 const blackListIPLogFilePath = process.env.SECURITY_BLACKLIST_LOG_FILE_PATH || 'logs/blacklist-ip.log';
-const rateLimitSet = process.env.SECURITY_RATE_LIMIT || '0';
-const speedLimitSet = process.env.SECURITY_DELAY_AFTER || '0';
+const rateLimitSet = parseInt(process.env.SECURITY_RATE_LIMIT || 0, 10);
+const speedLimitSet = parseInt(process.env.SECURITY_DELAY_AFTER || 0, 10);
 
 app.set('trust proxy', 1);
 
@@ -91,7 +91,7 @@ function logLimitedIP(ip) {
 
 const rateLimiter = rateLimit({
     windowMs: 20 * 60 * 1000,
-    max: parseInt(rateLimitSet, 10),
+    max: rateLimitSet,
     message: 'Too Many Requests',
     handler: (req, res, next) => {
         const ip = getClientIp(req);
@@ -104,20 +104,20 @@ const rateLimiter = rateLimit({
 
 const speedLimiter = slowDown({
 	windowMs: 60 * 60 * 1000,
-	delayAfter: parseInt(speedLimitSet, 10),
+	delayAfter: speedLimitSet,
 	delayMs: (hits) => hits * 400,
 })
 
 // 如果 rateLimitSet 为 0，则不启用限流
-if (parseInt(rateLimitSet, 10) !== 0) {
+if (rateLimitSet !== 0) {
     app.use('/api', rateLimiter);
-    console.log('Rate limiter is enabled');
+    console.log('Rate limiter is enabled, limit:', rateLimitSet, 'requests per 60 minutes');
 }
 
 // 如果 deleyAfter 为 0，则不启用延迟
-if (parseInt(speedLimitSet, 10) !== 0) {
+if (speedLimitSet !== 0) {
     app.use('/api', speedLimiter);
-    console.log('Speed limiter is enabled');
+    console.log('Speed limiter is enabled, slowing down after:', speedLimitSet, 'requests');
 }
 
 

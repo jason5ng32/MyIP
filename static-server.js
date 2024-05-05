@@ -8,8 +8,8 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 dotenv.config();
 
 const staticApp = express();
-const backEndPort = process.env.BACKEND_PORT || 11966;
-const frontEndPort = process.env.FRONTEND_PORT || 18966;
+const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
+const frontEndPort = parseInt(process.env.FRONTEND_PORT || 18966, 10);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

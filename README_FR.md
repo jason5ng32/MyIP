@@ -99,11 +99,11 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 
 | Nom de la variable | Requis | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `BACKEND_PORT` | Non | `11966` | Le port d'exécution de la partie backend du programme |
-| `FRONTEND_PORT` | Non | `18966` | Le port d'exécution de la partie frontend du programme |
-| `SECURITY_RATE_LIMIT` | Non | `0` | Contrôle le nombre de requêtes qu'une adresse IP peut faire au serveur backend toutes les 60 minutes (réglé sur 0 pour aucune limite) |
-| `SECURITY_DELAY_AFTER` | Non | `0` | Contrôle les premières X requêtes d'une adresse IP toutes les 20 minutes qui ne sont pas soumises à des limites de vitesse, et après X requêtes, le délai augmentera |
-| `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `logs/blacklist-ip.log` | Paramètre de chemin. Enregistre la liste des adresses IP qui ont déclenché la limite après que `SECURITY_RATE_LIMIT` soit activé |
+| `BACKEND_PORT` | Non | `"11966"` | Le port d'exécution de la partie backend du programme |
+| `FRONTEND_PORT` | Non | `"18966"` | Le port d'exécution de la partie frontend du programme |
+| `SECURITY_RATE_LIMIT` | Non | `"0"` | Contrôle le nombre de requêtes qu'une adresse IP peut faire au serveur backend toutes les 60 minutes (réglé sur 0 pour aucune limite) |
+| `SECURITY_DELAY_AFTER` | Non | `"0"` | Contrôle les premières X requêtes d'une adresse IP toutes les 20 minutes qui ne sont pas soumises à des limites de vitesse, et après X requêtes, le délai augmentera |
+| `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `"logs/blacklist-ip.log"` | Paramètre de chemin. Enregistre la liste des adresses IP qui ont déclenché la limite après que `SECURITY_RATE_LIMIT` soit activé |
 | `BING_MAP_API_KEY` | Non | `""` | Clé API pour Bing Maps, utilisée pour afficher l'emplacement de l'adresse IP sur une carte |
 | `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
 | `IPCHECKING_API_KEY` | Non | `""` | Clé API pour IPCheck.ing, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
@@ -113,7 +113,9 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `VITE_RECAPTCHA_SITE_KEY` | Non | `""` | Clé de site reCAPTCHA de Google, utilisée pour afficher la vérification reCAPTCHA sur le frontend |
 | `RECAPTCHA_SECRET_KEY` | Non | `""` | Clé secrète reCAPTCHA de Google, utilisée pour vérifier la vérification reCAPTCHA sur le backend |
 
-*Les variables d'environnement commençant par `SECURITY_` ne sont valides que lors du déploiement à l'aide de npm ou de Docker.*
+> [!TIP]
+> Les variables d'environnement commençant par `SECURITY_` ne sont valides que lors du déploiement à l'aide de npm ou de Docker.
+>
 
 ### Utilisation des variables d'environnement dans un environnement Node
 
