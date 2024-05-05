@@ -19,10 +19,10 @@ import { slowDown } from 'express-slow-down'
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 11966;
-const blackListIPLogFilePath = process.env.BLACKLIST_LOG_FILE_PATH || '';
-const rateLimitSet = process.env.RATE_LIMIT || '60';
-const deleyAfter = process.env.DELAY_AFTER || '60';
+const backEndPort = process.env.BACKEND_PORT || 11966;
+const blackListIPLogFilePath = process.env.SECURITY_BLACKLIST_LOG_FILE_PATH || 'logs/blacklist-ip.log';
+const rateLimitSet = process.env.SECURITY_RATE_LIMIT || '0';
+const speedLimitSet = process.env.SECURITY_DELAY_AFTER || '0';
 
 app.set('trust proxy', 1);
 
@@ -42,6 +42,14 @@ function formatDate(timestamp) {
 function logLimitedIP(ip) {
     const logPath = path.join(__dirname, blackListIPLogFilePath);
 
+    // 如果 logs 目录不存在，则创建
+    const logDir = path.dirname(logPath);
+    if (!fs.existsSync(logDir)) {
+        fs.mkdirSync(logDir, { recursive: true });
+        console.log('Created log directory:', logDir);
+    }
+
+    // 读取日志文件，更新 IP 计数，如果文件不存在则创建新的日志文件
     fs.readFile(logPath, 'utf8', (err, data) => {
         if (err && err.code !== 'ENOENT') {
             console.error('Error reading the log file:', err);
@@ -60,6 +68,7 @@ function logLimitedIP(ip) {
                 if (currentIp === ip) {
                     newCount = parseInt(count, 10) + 1;
                     logExists = true;
+                    console.log(`IP ${ip} has been limited ${newCount} times`);
                     return `${ip},${newCount},${timestamp}`;  // Update count but keep the original timestamp
                 }
                 return line;
@@ -69,6 +78,7 @@ function logLimitedIP(ip) {
         if (!logExists) {
             const newLine = `${ip},${newCount},${formatDate(now)}`;
             updatedData += (updatedData ? '\n' : '') + newLine;
+            console.log(`IP ${ip} has been limited for the first time`);
         }
 
         fs.writeFile(logPath, updatedData, 'utf8', err => {
@@ -79,7 +89,7 @@ function logLimitedIP(ip) {
     });
 }
 
-const apiLimiter = rateLimit({
+const rateLimiter = rateLimit({
     windowMs: 20 * 60 * 1000,
     max: parseInt(rateLimitSet, 10),
     message: 'Too Many Requests',
@@ -94,12 +104,22 @@ const apiLimiter = rateLimit({
 
 const speedLimiter = slowDown({
 	windowMs: 60 * 60 * 1000,
-	delayAfter: parseInt(deleyAfter, 10),
+	delayAfter: parseInt(speedLimitSet, 10),
 	delayMs: (hits) => hits * 400,
 })
 
-app.use('/api', apiLimiter);
-app.use('/api', speedLimiter);
+// 如果 rateLimitSet 为 0，则不启用限流
+if (parseInt(rateLimitSet, 10) !== 0) {
+    app.use('/api', rateLimiter);
+    console.log('Rate limiter is enabled');
+}
+
+// 如果 deleyAfter 为 0，则不启用延迟
+if (parseInt(speedLimitSet, 10) !== 0) {
+    app.use('/api', speedLimiter);
+    console.log('Speed limiter is enabled');
+}
+
 
 // APIs
 app.get('/api/map', mapHandler);
@@ -110,8 +130,6 @@ app.get('/api/ipchecking', ipCheckingHandler);
 app.get('/api/ipsb', ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/recaptcha', recaptchaHandler);
-
-// DNS Resolver
 app.get('/api/dnsresolver', dnsResolver);
 
 // 使用查询参数处理所有配置请求
@@ -124,6 +142,6 @@ app.use(express.static(path.join(__dirname, './dist')));
 
 
 // 启动服务器
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+app.listen(backEndPort, () => {
+    console.log(`Server running on http://localhost:${backEndPort}`);
 });

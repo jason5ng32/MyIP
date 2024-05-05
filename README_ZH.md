@@ -101,7 +101,11 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 | 变量名 | 是否必须 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `PORT` | 否 | `18966` | 程序运行的端口 |
+| `BACKEND_PORT` | 否 | `18966` | 程序后端部分的运行端口 |
+| `FRONTEND_PORT` | 否 | `11966` | 程序前端部分的运行端口 |
+| `SECURITY_RATE_LIMIT` | 否 | `0` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
+| `SECURITY_DELAY_AFTER` | 否 | `0` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
+| `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `logs/blacklist-ip.log` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |
 | `BING_MAP_API_KEY` | 否 | `""` | Bing 地图的 API Key，用于展示 IP 所在地的地图 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
 | `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
@@ -110,6 +114,8 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `VITE_RECAPTCHA_SITE_KEY` | 否 | `""` | Google reCAPTCHA 的 Site Key，用于在前端显示 reCAPTCHA 验证 |
 | `RECAPTCHA_SECRET_KEY` | 否 | `""` | Google reCAPTCHA 的 Secret Key，用于在后端验证 reCAPTCHA 验证 |
+
+*以 `SECURITY_` 开头的环境变量仅在使用 npm 或 Docker 部署时有效。*
 
 ### 在 Node 环境里使用环境变量
 
@@ -122,7 +128,8 @@ cp .env.example .env
 修改 `.env` 里的内容，比如：
 
 ```bash
-PORT=18966
+BACKEND_PORT=18966
+FRONTEND_PORT=11966
 BING_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 IPCHECKING_API="YOUR_KEY_HERE"
