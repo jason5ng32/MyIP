@@ -24,7 +24,7 @@
                         <label class="btn" :class="{
                             'btn-outline-dark': !isDarkMode,
                             'btn-outline-light': isDarkMode,
-                            'active text-bg-primary': userPreferences.theme === theme
+                            'active fw-bold': userPreferences.theme === theme
                         }" :for="'darkMode' + theme">
                             <span v-if="theme === 'light'"><i class="bi bi-brightness-high"></i> {{
                                 $t('nav.preferences.colorLight') }}</span>
@@ -50,7 +50,7 @@
                         <label class="btn jn-number" :class="{
                             'btn-outline-dark': !isDarkMode,
                             'btn-outline-light': isDarkMode,
-                            'active text-bg-primary': userPreferences.ipCardsToShow === num
+                            'active fw-bold': userPreferences.ipCardsToShow === num
                         }" :for="'ipCards_' + num">{{ num
                             }}</label>
                     </template>
@@ -72,7 +72,7 @@
                         <label class="btn jn-number text-start" :class="{
                             'btn-outline-dark': !isDarkMode,
                             'btn-outline-light': isDarkMode,
-                            'active text-bg-primary': userPreferences.ipGeoSource === ipdb.id,
+                            'active fw-bold': userPreferences.ipGeoSource === ipdb.id,
                             'jn-disabled-button': !ipdb.enabled
                         }" :for="'ipGeoSource_' + ipdb.id" :aria-disabled="!ipdb.enabled" :aria-label="ipdb.text">
                             <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}&nbsp;</span>
@@ -99,8 +99,9 @@
                             <div class="preferences-tip">{{ $t('nav.preferences.autoRunTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="autoStart"
-                                :checked="userPreferences.autoStart" @change="prefAutoStart($event.target.checked)">
+                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
+                                type="checkbox" role="switch" id="autoStart" :checked="userPreferences.autoStart"
+                                @change="prefAutoStart($event.target.checked)">
                         </div>
                     </li>
 
@@ -112,7 +113,8 @@
                             <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityRefresh"
+                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
+                                type="checkbox" role="switch" id="ConnectivityRefresh"
                                 :checked="userPreferences.connectivityAutoRefresh"
                                 @change="prefConnectivityRefresh($event.target.checked)">
                         </div>
@@ -128,8 +130,9 @@
                             <div class="preferences-tip">{{ $t('nav.preferences.showMapTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="showMap"
-                                :checked="userPreferences.showMap" @change="prefShowMap($event.target.checked)">
+                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
+                                type="checkbox" role="switch" id="showMap" :checked="userPreferences.showMap"
+                                @change="prefShowMap($event.target.checked)">
                         </div>
                     </li>
 
@@ -142,8 +145,9 @@
                             <div class="preferences-tip">{{ $t('nav.preferences.simpleModeTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="simpleMode"
-                                :checked="userPreferences.simpleMode" @change="prefSimpleMode($event.target.checked)">
+                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
+                                type="checkbox" role="switch" id="simpleMode" :checked="userPreferences.simpleMode"
+                                @change="prefSimpleMode($event.target.checked)">
                         </div>
                     </li>
 
@@ -157,7 +161,8 @@
                             </div>
                         </div>
                         <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" type="checkbox" role="switch" id="ConnectivityNotifications"
+                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
+                                type="checkbox" role="switch" id="ConnectivityNotifications"
                                 :checked="userPreferences.popupConnectivityNotifications"
                                 @change="prefconnectivityShowNoti($event.target.checked)">
                         </div>
@@ -369,5 +374,25 @@ export default {
 
 #offcanvasPreferences {
     z-index: 1053;
+}
+
+.jn-check-dark:checked {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23212529'/%3e%3c/svg%3e");
+
+}
+
+.jn-check-dark:focus {
+    border-color: #ffffff;
+}
+
+.jn-check-light:checked {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.jn-check-light:focus {
+    border-color: #212529;
 }
 </style>

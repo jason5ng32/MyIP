@@ -163,7 +163,7 @@ export default {
           id: "chatgpt",
           name: "ChatGPT",
           icon: "chat-quote-fill",
-          url: "https://chat.openai.com/favicon.ico?",
+          url: "https://chatgpt.com/favicon.ico?",
           status: this.$t('connectivity.StatusWait'),
           time: 0,
           mintime: 0,
