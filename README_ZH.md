@@ -101,8 +101,8 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 | 变量名 | 是否必须 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `BACKEND_PORT` | 否 | `18966` | 程序后端部分的运行端口 |
-| `FRONTEND_PORT` | 否 | `11966` | 程序前端部分的运行端口 |
+| `BACKEND_PORT` | 否 | `11966` | 程序后端部分的运行端口 |
+| `FRONTEND_PORT` | 否 | `18966` | 程序前端部分的运行端口 |
 | `SECURITY_RATE_LIMIT` | 否 | `0` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
 | `SECURITY_DELAY_AFTER` | 否 | `0` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `logs/blacklist-ip.log` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |

@@ -143,5 +143,5 @@ app.use(express.static(path.join(__dirname, './dist')));
 
 // 启动服务器
 app.listen(backEndPort, () => {
-    console.log(`Server running on http://localhost:${backEndPort}`);
+    console.log(`Backend server running on http://localhost:${backEndPort}`);
 });

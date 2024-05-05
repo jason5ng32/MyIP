@@ -99,8 +99,8 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 
 | Nom de la variable | Requis | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `BACKEND_PORT` | Non | `18966` | Le port d'exécution de la partie backend du programme |
-| `FRONTEND_PORT` | Non | `11966` | Le port d'exécution de la partie frontend du programme |
+| `BACKEND_PORT` | Non | `11966` | Le port d'exécution de la partie backend du programme |
+| `FRONTEND_PORT` | Non | `18966` | Le port d'exécution de la partie frontend du programme |
 | `SECURITY_RATE_LIMIT` | Non | `0` | Contrôle le nombre de requêtes qu'une adresse IP peut faire au serveur backend toutes les 60 minutes (réglé sur 0 pour aucune limite) |
 | `SECURITY_DELAY_AFTER` | Non | `0` | Contrôle les premières X requêtes d'une adresse IP toutes les 20 minutes qui ne sont pas soumises à des limites de vitesse, et après X requêtes, le délai augmentera |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `logs/blacklist-ip.log` | Paramètre de chemin. Enregistre la liste des adresses IP qui ont déclenché la limite après que `SECURITY_RATE_LIMIT` soit activé |

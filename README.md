@@ -99,8 +99,8 @@ You can use the program without adding any environment variables, but if you wan
 
 | Variable Name | Required | Default Value | Description |
 | --- | --- | --- | --- |
-| `BACKEND_PORT` | No | `18966` | The running port of the backend part of the program |
-| `FRONTEND_PORT` | No | `11966` | The running port of the frontend part of the program |
+| `BACKEND_PORT` | No | `11966` | The running port of the backend part of the program |
+| `FRONTEND_PORT` | No | `18966` | The running port of the frontend part of the program |
 | `SECURITY_RATE_LIMIT` | No | `0` | Controls the number of requests an IP can make to the backend server every 60 minutes (set to 0 for no limit) |
 | `SECURITY_DELAY_AFTER` | No | `0` | Controls the first X requests from an IP every 20 minutes that are not subject to speed limits, and after X requests, the delay will increase |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `logs/blacklist-ip.log` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
