@@ -55,7 +55,7 @@ import { mappingKeys, navigateCards, keyMap } from "./shortcut.js";
 
 import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
-import { Modal, Toast } from 'bootstrap';
+import { Modal, Toast, Offcanvas } from 'bootstrap';
 
 export default {
 
@@ -235,10 +235,10 @@ export default {
     infoMask() {
       if (this.infoMaskLevel === 0) {
         this.$refs.IPCheckRef.ipDataCards.forEach((card) => {
-          if(card.id === "cloudflare_v6" || card.id === "ipify_v6") {
+          if (card.id === "cloudflare_v6" || card.id === "ipify_v6") {
             card.ip = "2001:4860:4860::8888";
           } else {
-          card.ip = "8.8.8.8";
+            card.ip = "8.8.8.8";
           }
         });
         this.$refs.webRTCRef.stunServers.forEach((server) => {
@@ -259,7 +259,7 @@ export default {
           card.isp = "Google LLC";
           card.asn = "AS15169";
           card.asnlink = "https://radar.cloudflare.com/AS15169",
-          card.mapUrl = '/defaultMap.webp';
+            card.mapUrl = '/defaultMap.webp';
           card.mapUrl_dark = '/defaultMap_dark.webp';
           card.showASNInfo = false;
           card.isProxy = this.$t('ipInfos.proxyDetect.no');
@@ -548,6 +548,26 @@ export default {
         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
       );
     },
+
+    // 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
+    listenOffcanvas() {
+      const offcanvasElements = document.querySelectorAll('.offcanvas');
+      offcanvasElements.forEach((element) => {
+        const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
+        element.addEventListener('show.bs.offcanvas', () => {
+          // 关闭所有其他的 offcanvas
+          offcanvasElements.forEach((offcanvas) => {
+            if (offcanvas !== element) {
+              const offcanvasInstance = Offcanvas.getInstance(offcanvas);
+              if (offcanvasInstance) { // 确保实例有效
+                offcanvasInstance.hide();
+              }
+            }
+          });
+        });
+      });
+    },
+
   },
   mounted() {
     this.registerShortcutKeys();
@@ -555,6 +575,7 @@ export default {
     this.keyMap = keyMap;
     this.sendKeyMap();
     this.setInfosLoaded();
+    this.listenOffcanvas();
     window.addEventListener('scroll', this.checkSectionsAndTrack);
   },
   beforeDestroy() {

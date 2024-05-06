@@ -9,7 +9,7 @@
     </div>
 
     <div id="about" class="text-center mb-2">
-      <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-info' : 'link-dark']"
+      <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-light' : 'link-dark']"
         role="button" aria-controls="About" @click.prevent="openAbout">
         {{ $t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
       </a>
@@ -20,13 +20,17 @@
       id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">
-          <button type="button" class="btn" @click="toggleContent('about')"
-            :class="[showAbout ? 'btn-primary' : 'btn-outline-secondary']">{{ $t('about.Title') }}</button>
-          <button type="button" class="btn" @click="toggleContent('changlog')"
-            :class="[showChanglog ? 'btn-primary' : 'btn-outline-secondary']">
-            {{ $t('changelog.Title') }}
-          </button>
-
+          <template v-for="show in ['about', 'changelog']">
+            <input v-model="content" type="radio" class="btn-check" :name="'About_' + show" :id="'About_' + show"
+              autocomplete="off" :value=show @change="toggleContent(show)">
+            <label class="btn jn-number" :class="{
+              'btn-outline-dark': !isDarkMode,
+              'btn-outline-light': isDarkMode,
+              'active fw-bold': show === content
+            }" :for="'About_' + show">
+              {{ $t(show + '.Title') }}
+            </label>
+          </template>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
@@ -77,7 +81,7 @@
           <div v-html="$t('about.contact')" class="mb-3">
           </div>
         </div>
-        <div v-if="showChanglog">
+        <div v-if="showChangelog">
           <div v-for="(version, index) in changelog.slice().reverse()" :key="index" class="mb-4">
             <div class="row align-items-center">
               <div class="col-6 fw-bold fs-5">{{ version.version }}</div>
@@ -92,7 +96,7 @@
                 $t('changelog.improve') }}</span>
               <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{
                 $t('changelog.fix')
-                }}</span>
+              }}</span>
               <span class="mx-2">{{ item.change }}</span>
             </div>
           </div>
@@ -138,8 +142,9 @@ export default {
 
   data() {
     return {
+      content: 'about',
       showAbout: true,
-      showChanglog: false,
+      showChangelog: false,
       changelog: this.$tm('changelog.versions'),
     }
   },
@@ -158,7 +163,8 @@ export default {
     },
     toggleContent(contentType) {
       this.showAbout = contentType === 'about';
-      this.showChanglog = contentType === 'changlog';
+      this.showChangelog = contentType === 'changelog';
+      this.content = contentType;
       this.$refs.offcanvasBody.scrollTop = 0;
     },
   },
