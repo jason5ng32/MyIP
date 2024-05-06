@@ -14,7 +14,8 @@
             </div>
             <div class="row">
                 <div v-for="test in ruleTests" :key="test.id" class="col-lg-3 col-md-6 col-12 mb-4">
-                    <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                    <div class="card jn-card"
+                        :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
                         <div class="card-body">
                             <p class="jn-con-title card-title"><i class="bi bi-signpost-split-fill"></i>
                                 {{ test.name }}

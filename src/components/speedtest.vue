@@ -16,20 +16,22 @@
             <div class="row justify-content-end mt-3 mb-4" :data-bs-theme="isDarkMode ? 'dark' : ''">
               <div class="input-group" :class="[isMobile ? 'w-100' : 'w-50']">
                 <span class="input-group-text"><i class="bi bi-cloud-download"></i></span>
-                <select aria-label="Download Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }" id="downloadBytes"
-                  :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
+                <select aria-label="Download Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }"
+                  id="downloadBytes" :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
                   v-model="packageSize.download.bytes">
-                  <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size"
-                    :value="size">{{ size / 1e6 }} MB</option>
+                  <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB
+                  </option>
                 </select>
                 <span class="input-group-text"><i class="bi bi-cloud-upload"></i></span>
-                <select aria-label="Upload Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }" id="uploadBytes"
-                  :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
+                <select aria-label="Upload Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }"
+                  id="uploadBytes" :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
                   v-model="packageSize.upload.bytes">
-                  <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size"
-                    :value="size">{{ size / 1e6 }} MB</option>
+                  <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB
+                  </option>
                 </select>
-                <button @click="speedTestController" class="btn-primary btn" aria-label="Start/Pause Speed Test"
+                <button @click="speedTestController" class="btn"
+                  :class="[isDarkMode ? 'jn-startbtn-dark' : 'btn-light jn-startbtn']"
+                  aria-label="Start/Pause Speed Test"
                   v-tooltip="{ title: $t('Tooltips.SpeedTestButton'), placement: 'top' }">
                   <span v-if="speedTestStatus === 'running'">
                     <i class="bi bi-pause-fill"></i>
@@ -347,4 +349,26 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-startbtn {
+  background-color: rgb(248, 249, 250);
+  border-color: rgb(222, 226, 230);
+}
+
+.jn-startbtn-dark {
+  background-color: rgb(20, 22, 24);
+  border-color: rgb(73, 80, 87);
+}
+
+.jn-startbtn-dark:hover {
+  color: var(--bs-btn-hover-color);
+  background-color: rgba(0, 0, 0, 0.33);
+}
+
+
+.jn-startbtn:hover {
+  color: var(--bs-btn-hover-color);
+  background-color: var(--bs-btn-hover-bg);
+  border-color: var(--bs-btn-hover-border-color);
+}
+</style>

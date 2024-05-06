@@ -14,7 +14,8 @@
     </div>
     <div class="row">
       <div v-for="(leak, index) in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card keyboard-shortcut-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+        <div class="card jn-card keyboard-shortcut-card"
+          :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
           <div class="card-body">
             <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
               <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
@@ -71,11 +72,11 @@ export default {
 
   data() {
     const createDefaultCard = () => ({
-          name: this.$t('dnsleaktest.Name'),
-          country_code: this.$t('dnsleaktest.StatusWait'),
-          country: this.$t('dnsleaktest.StatusWait'),
-          ip: this.$t('dnsleaktest.StatusWait'),
-        });
+      name: this.$t('dnsleaktest.Name'),
+      country_code: this.$t('dnsleaktest.StatusWait'),
+      country: this.$t('dnsleaktest.StatusWait'),
+      ip: this.$t('dnsleaktest.StatusWait'),
+    });
     return {
       autoStart: this.userPreferences.autoStart,
       isStarted: false,
@@ -220,5 +221,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

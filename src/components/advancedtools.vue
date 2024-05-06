@@ -12,10 +12,10 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
                         <p class="opacity-75">{{ $t(card.noteKey) }}</p>
                         <div class="go-corner">
-                            <div class="go-arrow"><i class="bi bi-chevron-double-down"></i></div>
+                            <div class="go-arrow"><i class="bi bi-chevron-double-up"></i></div>
                         </div>
                     </div>
                 </div>
@@ -165,11 +165,22 @@ export default {
     margin-top: -4px;
     margin-right: -4px;
     color: white;
-    transition: all 0.4s ease;
+    transition: transform 0.4s ease, color 0.6s ease;
+}
+
+@keyframes arrowSlide {
+    from {
+        transform: translateY(6px);
+
+    }
+
+    to {
+        transform: translateY(-6px);
+    }
 }
 
 .jn-adv-card:hover .go-arrow {
-    transform: rotateZ(-180deg);
+    animation: arrowSlide 1s linear infinite;
 }
 
 .jn-adv-card {
