@@ -62,7 +62,19 @@
         "MTRTestNote": "Test de route MTR mondial",
         "DNSResolverNote": "Résolution DNS multi-canal en temps réel",
         "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
-        "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays"
+        "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays",
+        "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP"
+    },
+    "whois": {
+        "Title": "Recherche Whois",
+        "Note": "La recherche Whois est un service utilisé pour récupérer des informations sur l'enregistrement d'un domaine. En entrant un nom de domaine ou une adresse IP, vous pouvez obtenir des informations telles que les détails d'enregistrement du domaine, le registraire, la date d'enregistrement, la date d'expiration, et plus encore. Les informations Whois pour les adresses IP et les noms de domaine peuvent avoir des champs différents. De plus, certains domaines de premier niveau (TLD) moins courants peuvent ne pas avoir d'informations disponibles pour les requêtes Whois.",
+        "Note2": "Veuillez entrer un nom de domaine ou une adresse IP pour démarrer la requête :",
+        "Note3": "Les champs inclus dans les informations Whois ne sont pas normalisés. Voici les informations brutes :",
+        "Placeholder": "Nom de domaine ou IP",
+        "Run": "Rechercher",
+        "invalidURL": "Nom de domaine ou IP invalide",
+        "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
+        "Provider": "Fournisseur d'informations"
     },
     "dnsresolver": {
         "Title": "Résolution DNS",

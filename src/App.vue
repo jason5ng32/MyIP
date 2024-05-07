@@ -463,6 +463,15 @@ export default {
           description: this.$t('shortcutKeys.CensorshipCheck'),
         },
         {
+          keys: "w",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/whois');
+            this.$trackEvent('Nav', 'NavClick', 'Whois');
+          },
+          description: this.$t('shortcutKeys.Whois'),
+        },
+        {
           keys: "m",
           action: () => {
             if (this.configs.bingMap) {

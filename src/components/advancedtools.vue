@@ -72,6 +72,7 @@ export default {
                 { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
                 { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
                 { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
+                { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
             ],
             isFullScreen: false,
         }
@@ -95,6 +96,9 @@ export default {
                     break;
                 case '/censorshipcheck':
                     this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+                    break;
+                case '/whois':
+                    this.$trackEvent('Nav', 'NavClick', 'Whois');
                     break;
             }
             var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));

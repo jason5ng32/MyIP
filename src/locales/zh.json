@@ -62,7 +62,19 @@
     "MTRTestNote": "全球的 MTR 路由测试",
     "DNSResolverNote": "实时多渠道 DNS 解析",
     "RuleTestNote": "检查代理软件的规则设置",
-    "CensorshipCheck": "检查一个网站在某些国家是否被封锁"
+    "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
+    "Whois": "对域名或 IP 进行 Whois 查询"
+  },
+  "whois": {
+    "Title": "Whois 查询",
+    "Note": "Whois 查询是一种用于查询域名注册信息的服务。通过输入域名或 IP 地址，可以查询到域名的注册信息、注册商、注册日期、过期日期等信息。IP 与域名的 Whois 信息字段不完全一致。同时，部分比较小众的域名（TLD）可能无法查询到相关信息。",
+    "Note2": "请输入域名或 IP，开始进行查询：",
+    "Note3": "Whois 信息包含的字段并不统一，以下为原始文本信息",
+    "Placeholder": "域名或 IP",
+    "Run": "查询",
+    "invalidURL": "无效的域名或 IP",
+    "fetchError": "无法获取查询结果或查询结果为空",
+    "Provider": "信息服务商"
   },
   "dnsresolver": {
     "Title": "DNS 解析",
@@ -278,7 +290,8 @@
     "RefreshRuleTests": "刷新规则测试",
     "CensorshipCheck": "打开封锁测试面板",
     "Preferences": "打开偏好设置面板",
-    "About": "打开关于页面"
+    "About": "打开关于页面",
+    "Whois": "打开 Whois 查询面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
