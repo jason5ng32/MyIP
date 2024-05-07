@@ -12,11 +12,11 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">
+                            <i class="bi bi-arrow-up-right-circle"></i> {{ $t(card.titleKey) }}
+                        </h3>
                         <p class="opacity-75">{{ $t(card.noteKey) }}</p>
-                        <div class="go-corner">
-                            <div class="go-arrow"><i class="bi bi-chevron-double-up"></i></div>
-                        </div>
+                        <span :class="[isDarkMode ? 'jn-icon-dark' : 'jn-icon']">{{ card.icon }}</span>
                     </div>
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default {
     data() {
         return {
             cards: [
-                { path: '/pingtest', icon: '🌐', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
+                { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
                 { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
                 { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
                 { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
@@ -147,76 +147,37 @@ export default {
 }
 
 
-.go-corner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    overflow: hidden;
-    top: 0;
-    right: 0;
-    background-color: rgb(13, 110, 253);
-    border-radius: 0 4px 0 32px;
-}
-
-.go-arrow {
-    margin-top: -4px;
-    margin-right: -4px;
-    color: white;
-    transition: transform 0.4s ease, color 0.6s ease;
-}
-
-@keyframes arrowSlide {
-    from {
-        transform: translateY(6px);
-
-    }
-
-    to {
-        transform: translateY(-6px);
-    }
-}
-
-.jn-adv-card:hover .go-arrow {
-    animation: arrowSlide 1s linear infinite;
-}
-
 .jn-adv-card {
     display: block;
     position: relative;
     text-decoration: none;
     z-index: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
-.jn-adv-card:before {
-    content: "";
+.jn-icon {
+    top: 4pt;
+    right: 6pt;
+    font-size: 1.6rem;
     position: absolute;
-    z-index: -1;
-    top: -16px;
-    right: -16px;
-    background: rgb(13, 110, 253);
-    height: 42px;
-    width: 42px;
-    border-radius: 32px;
-    transform: scale(1);
-    transform-origin: 50% 50%;
-    transition: transform 0.25s ease-out;
+    transition: all 0.4s;
 }
 
-.jn-adv-card:hover:before {
-    transform: scale(21);
+.jn-icon-dark {
+    top: 4pt;
+    right: 6pt;
+    font-size: 1.6rem;
+    position: absolute;
+    transition: all 0.4s;
 }
 
-.jn-adv-card:hover p {
-    transition: all 0.3s ease-out;
-    color: #fff;
+.jn-adv-card:hover .jn-icon-dark {
+    transform: translateY(-10pt) scale(1.8);
+    text-shadow: 0 0 10pt #ffffff27;
 }
 
-.jn-adv-card:hover h3 {
-    transition: all 0.3s ease-out;
-    color: #fff;
+.jn-adv-card:hover .jn-icon {
+    transform: translateY(-10pt) scale(1.8);
+    text-shadow: 0 0 10pt #00000060;
 }
 </style>

@@ -35,7 +35,7 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 🛑 **Test de fuite DNS** : Affiche les données de point de terminaison DNS pour évaluer le risque de fuites DNS lors de l'utilisation de VPN ou de proxies.
 * 🚀 **Test de vitesse** : Testez la vitesse de votre réseau avec des réseaux de pointe.
 * 🚏 **Test de règles** : Teste si les paramètres de règles fonctionnent correctement avec le logiciel de proxy.
-* 🌐 **Test de latence mondiale** : Effectue des tests de latence sur des serveurs situés dans différentes régions du monde.
+* ⏱️ **Test de latence mondiale** : Effectue des tests de latence sur des serveurs situés dans différentes régions du monde.
 * 📡 **Test MTR** : Effectue des tests MTR sur des serveurs situés dans différentes régions du monde.
 * 🔦 **Résolveur DNS** : effectue la résolution DNS d'un nom de domaine à partir de plusieurs sources, obtient les résultats de la résolution en temps réel et peut être utilisé pour la détermination de la contamination.
 * 🚧 **Test de Censorship**: Vérifier si un site est bloqué dans certains pays.

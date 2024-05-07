@@ -2,7 +2,7 @@
   <!-- Ping Test -->
   <div class="ping-test-section mb-4">
     <div class="jn-title2">
-      <h2 id="PingTest" :class="{ 'mobile-h2': isMobile }">🌐 {{ $t('pingtest.Title') }}</h2>
+      <h2 id="PingTest" :class="{ 'mobile-h2': isMobile }">⏱️ {{ $t('pingtest.Title') }}</h2>
 
     </div>
     <div class="text-secondary">

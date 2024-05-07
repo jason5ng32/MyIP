@@ -299,9 +299,9 @@ export default {
         // 更新 body class
         updateBodyClass() {
             if (this.isDarkMode) {
-                document.body.classList.add("dark-mode");
+                document.body.classList.add("body-dark-mode");
             } else {
-                document.body.classList.remove("dark-mode");
+                document.body.classList.remove("body-dark-mode");
             }
         },
 

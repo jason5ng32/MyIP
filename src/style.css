@@ -171,13 +171,19 @@ footer {
   border-color: #757575;
 }
 
+.body-dark-mode {
+  background-color: rgb(19, 21, 21) !important;
+  color: #e3e3e3 !important;
+  border-color: #757575;
+}
+
 .dark-mode::placeholder {
   color: #e3e3e38e !important;
 }
 
 .dark-mode-border {
-  border-color: #a8a8a863;
-  box-shadow: 0 0 10pt #00000038;
+  border-color: #89949f57;
+  box-shadow: 0 0 4pt #154b8022;
 }
 
 .dark-mode-title {
@@ -187,7 +193,6 @@ footer {
 .dark-mode-nav {
   background-color: #171a1d !important;
   border-color: #a8a8a863 !important;
-  border-color: #757575;
 }
 
 .jn-deactive {
