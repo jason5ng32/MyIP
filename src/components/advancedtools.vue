@@ -23,7 +23,7 @@
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header justify-content-end jn-offcanvas-header">
+            <div class="offcanvas-header d-flex justify-content-end" :class="[ showTitle ? 'jn-offcanvas-header':'jn-offcanvas-header-noborder']">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -33,8 +33,8 @@
                     </span>
                 </button>
                 <Transition name="slide-fade">
-                    <span v-if="showTitle" class="w-100 fw-bold"
-                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center']">{{ cards[openedCard].icon }}
+                    <span v-if="showTitle" class="fw-medium"
+                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{ cards[openedCard].icon }}
                         {{ $t(cards[openedCard].titleKey) }}</span>
                 </Transition>
 
@@ -215,6 +215,13 @@ export default {
 .jn-offcanvas-header {
     min-height: 40pt;
     border-bottom: 1px solid #ababab3f;
+    transition: all 0.3s ease-out;
+}
+
+.jn-offcanvas-header-noborder {
+    min-height: 40pt;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease-out;
 }
 
 .slide-fade-enter-active {
