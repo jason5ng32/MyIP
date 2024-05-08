@@ -38,7 +38,7 @@
                         <!-- Results Table -->
                         <div v-if="whoisResults && Object.keys(whoisResults).length">
 
-                            <h3 class="fs-6 alert alert-success ">{{ $t('whois.Note3') }}</h3>
+                            <div class="alert alert-success ">{{ $t('whois.Note3') }}</div>
                             <div v-if="type === 'domain'" class="accordion" id="whoisResultAccordion"
                                 :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <div class="accordion-item" v-for="(provider, index) in providers" :key="provider">
@@ -207,18 +207,15 @@ export default {
         },
 
         filterDomainWhoisRawData(text) {
-            // 先移除文本里，每一行开头的连续空格
-            text = text.replace(/^( {1,4})/gm, '');
-            // 移除不必要的其它信息
-            const cutoffIndex = text.indexOf('\nFor more information');
+            text = text.replace(/^( {1,20})/gm, ''); // 先移除文本里，每一行开头的连续空格
+            const cutoffIndex = text.indexOf('\nFor more information'); // 移除不必要的其它信息
             return cutoffIndex !== -1 ? text.substring(0, cutoffIndex) : text;
         },
 
         filterIPWhoisRawData(text) {
-            // 移除所有以 # 开头的行
-            text = text.replace(/^#.*\n/gm, '');
-            // 移除最后一个空行
-            text = text.replace(/\n$/, '');
+            text = text.replace(/^#.*\n/gm, ''); // 移除所有以 # 开头的行
+            text = text.replace(/^\n*/, ''); // 移除开头的所有空行
+            text = text.replace(/\n$/, ''); // 移除最后一个空行
             return text;
         },
     },
