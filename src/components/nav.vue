@@ -108,6 +108,10 @@ export default {
   methods: {
 
     closeAllOffCanvas() {
+      const offcanvasElements = document.querySelectorAll('.offcanvas');
+      if (offcanvasElements.length === 0) {
+        return;
+      }
       document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
         const instance = Offcanvas.getInstance(offcanvas);
         if (instance) {
