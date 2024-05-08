@@ -561,9 +561,15 @@ export default {
     // 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
     listenOffcanvas() {
       const offcanvasElements = document.querySelectorAll('.offcanvas');
+      const navElements = document.getElementById('navbarNavAltMarkup');
+      const navElementsButton = document.querySelector('.navbar-toggler');
       offcanvasElements.forEach((element) => {
         const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
         element.addEventListener('show.bs.offcanvas', () => {
+          // 存在 Offcanvas 时关闭导航栏
+          navElements.classList.remove('show');
+          navElementsButton.setAttribute('aria-expanded', 'false');
+          navElementsButton.classList.add('collapsed');
           // 关闭所有其他的 offcanvas
           offcanvasElements.forEach((offcanvas) => {
             if (offcanvas !== element) {
