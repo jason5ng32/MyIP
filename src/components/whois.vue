@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body mb-3">
+                    <div class="card-body">
                         <div class="col-12 col-md-auto">
                             <label for="queryURLorIP" class="col-form-label">{{ $t('whois.Note2') }}</label>
                         </div>
@@ -47,25 +47,26 @@
                                             :data-bs-target="'#collapse' + index"
                                             :aria-expanded="index === 0 ? 'true' : 'false'"
                                             :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
-                                            <span><i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp; <strong>{{ $t('whois.Provider') }}: {{ provider.toUpperCase()
+                                            <span><i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+                                                <strong>{{ $t('whois.Provider') }} : {{ provider.toUpperCase()
                                                     }}</strong></span>
                                         </button>
                                     </h2>
                                     <div :id="'collapse' + index" class="accordion-collapse collapse"
                                         :class="{ show: index === 0 }" :aria-labelledby="'heading' + index">
-                                        <div class="accordion-body">
+                                        <div class="accordion-body" :class="[isMobile ? ' p-2' : '']">
                                             <div class="card card-body border-0 mt-3"
                                                 :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                                                <pre>{{ whoisResults[providers[index]].__raw }}</pre>
+                                                <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div v-else class="card card-body mt-3"
+                            <div v-else class="card card-body border-0 mt-3"
                                 :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                                <pre>{{ whoisResults.__raw }}</pre>
+                                <pre>{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
                             </div>
 
                         </div>
@@ -203,6 +204,22 @@ export default {
                     }
                 }
             }
+        },
+
+        filterDomainWhoisRawData(text) {
+            // 先移除文本里，每一行开头的连续空格
+            text = text.replace(/^( {1,4})/gm, '');
+            // 移除不必要的其它信息
+            const cutoffIndex = text.indexOf('\nFor more information');
+            return cutoffIndex !== -1 ? text.substring(0, cutoffIndex) : text;
+        },
+
+        filterIPWhoisRawData(text) {
+            // 移除所有以 # 开头的行
+            text = text.replace(/^#.*\n/gm, '');
+            // 移除最后一个空行
+            text = text.replace(/\n$/, '');
+            return text;
         },
     },
 }

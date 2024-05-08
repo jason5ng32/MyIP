@@ -23,7 +23,7 @@
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header justify-content-end">
+            <div class="offcanvas-header justify-content-end jn-offcanvas-header">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -32,10 +32,15 @@
                         <i class="bi bi-fullscreen-exit"></i>
                     </span>
                 </button>
+                <Transition name="slide-fade">
+                    <span v-if="showTitle" class="w-100 fw-bold"
+                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center']">{{ cards[openedCard].icon }}
+                        {{ $t(cards[openedCard].titleKey) }}</span>
+                </Transition>
 
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']">
+            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
                 <router-view></router-view>
             </div>
         </div>
@@ -75,30 +80,46 @@ export default {
                 { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
             ],
             isFullScreen: false,
+            showTitle: false,
+            openedCard: null,
         }
     },
 
     methods: {
+        handleScroll() {
+            const scrollTop = this.$refs.scrollContainer.scrollTop;
+            if (scrollTop > 60) {
+                this.showTitle = true;
+            } else {
+                this.showTitle = false;
+            }
+        },
         navigateAndToggleOffcanvas(routePath) {
             this.$router.push(routePath);
             switch (routePath) {
                 case '/pingtest':
                     this.$trackEvent('Nav', 'NavClick', 'PingTest');
+                    this.openedCard = 0;
                     break;
                 case '/mtrtest':
                     this.$trackEvent('Nav', 'NavClick', 'MTRTest');
+                    this.openedCard = 1;
                     break;
                 case '/ruletest':
                     this.$trackEvent('Nav', 'NavClick', 'RuleTest');
+                    this.openedCard = 2;
                     break;
                 case '/dnsresolver':
                     this.$trackEvent('Nav', 'NavClick', 'DNSResolver');
+                    this.openedCard = 3;
                     break;
                 case '/censorshipcheck':
                     this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+                    this.openedCard = 4;
                     break;
                 case '/whois':
                     this.$trackEvent('Nav', 'NavClick', 'Whois');
+                    this.openedCard = 5;
                     break;
             }
             var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
@@ -122,6 +143,12 @@ export default {
             }
         }
 
+    },
+    mounted() {
+        this.$refs.scrollContainer.addEventListener('scroll', this.handleScroll);
+    },
+    unmounted() {
+        this.$refs.scrollContainer.removeEventListener('scroll', this.handleScroll);
     },
 }
 </script>
@@ -183,5 +210,24 @@ export default {
 .jn-adv-card:hover .jn-icon {
     transform: translateY(-10pt) scale(1.8);
     text-shadow: 0 0 10pt #00000060;
+}
+
+.jn-offcanvas-header {
+    min-height: 40pt;
+    border-bottom: 1px solid #ababab3f;
+}
+
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateY(20px);
+    opacity: 0;
 }
 </style>

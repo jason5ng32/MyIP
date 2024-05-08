@@ -69,7 +69,7 @@
     "Title": "Whois Search",
     "Note": "Whois search is a service used to retrieve domain registration information. By entering a domain name or IP address, you can retrieve information such as the domain's registration details, registrar, registration date, expiration date, and more. The Whois information for IP addresses and domain names may have different fields. Additionally, some less common top-level domains (TLDs) may not have available information for Whois queries.",
     "Note2": "Please enter a domain name or IP address to start the query:",
-    "Note3": "The fields included in the Whois information are not standardized. The following is the raw text information:",
+    "Note3": "Whois information contains various types of fields. The following is the raw text information",
     "Placeholder": "Domain Name or IP",
     "Run": "Query",
     "invalidURL": "Invalid domain name or IP",
@@ -624,6 +624,24 @@
           {
             "type": "improve",
             "change": "Significantly optimized program logic"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed some minor issues"
+          }
+        ]
+      },
+      {
+        "version": "v3.9",
+        "date": "May 8, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added Whois search feature"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized display and animation effects for advanced tools"
           },
           {
             "type": "fix",

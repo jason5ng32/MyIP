@@ -69,7 +69,7 @@
     "Title": "Whois 查询",
     "Note": "Whois 查询是一种用于查询域名注册信息的服务。通过输入域名或 IP 地址，可以查询到域名的注册信息、注册商、注册日期、过期日期等信息。IP 与域名的 Whois 信息字段不完全一致。同时，部分比较小众的域名（TLD）可能无法查询到相关信息。",
     "Note2": "请输入域名或 IP，开始进行查询：",
-    "Note3": "Whois 信息包含的字段并不统一，以下为原始文本信息",
+    "Note3": "Whois 信息包含多种类型的字段，以下为原始文本信息",
     "Placeholder": "域名或 IP",
     "Run": "查询",
     "invalidURL": "无效的域名或 IP",
@@ -625,6 +625,24 @@
           {
             "type": "improve",
             "change": "大量优化了程序的逻辑"
+          },
+          {
+            "type": "fix",
+            "change": "修复了一些小问题"
+          }
+        ]
+      },
+      {
+        "version": "v3.9",
+        "date": "May 8, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "增加 Whois 查询功能"
+          },
+          {
+            "type": "improve",
+            "change": "优化高级功能的展示与动画效果"
           },
           {
             "type": "fix",
