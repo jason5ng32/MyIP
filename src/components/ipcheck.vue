@@ -14,8 +14,8 @@
         }]">
           <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
-            'jn-ip-card1': !isMobile && ipGeoSource === 0,
-            'jn-ip-card2': !isMobile && ipGeoSource !== 0,
+            'jn-ip-card1 jn-hover-card': !isMobile && ipGeoSource === 0,
+            'jn-ip-card2 jn-hover-card': !isMobile && ipGeoSource !== 0,
           }">
             <div class="card-header jn-ip-title jn-link1"
               :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">

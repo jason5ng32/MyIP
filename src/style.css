@@ -1,5 +1,5 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';  
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 @import 'flag-icons/css/flag-icons.min.css';
 
 .jn-title {
@@ -26,7 +26,7 @@
   align-items: center;
   flex-direction: row;
   border: 0;
-  background-color:unset;
+  background-color: unset;
 }
 
 .jn-alert {
@@ -52,8 +52,12 @@
   height: fit-content;
 }
 
-.jn-card:hover {
-  border-color: #4dc0e461;
+.jn-hover-card {
+  transition: all 0.4s;
+}
+
+.jn-hover-card:hover {
+  transform: translateY(-6pt);
 }
 
 .jn-card.keyboard-hover {
@@ -84,7 +88,7 @@
 }
 
 .jn-text {
-height: fit-content;
+  height: fit-content;
 }
 
 .jn-fl {
@@ -136,14 +140,14 @@ footer {
 
 @media only screen and (max-width: 768px) {
   footer {
-      height: 140pt;
+    height: 140pt;
   }
 
   .speedtest-h5 {
-      /* font-size: 12px; */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    /* font-size: 12px; */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -167,13 +171,19 @@ footer {
   border-color: #757575;
 }
 
+.body-dark-mode {
+  background-color: rgb(19, 21, 21) !important;
+  color: #e3e3e3 !important;
+  border-color: #757575;
+}
+
 .dark-mode::placeholder {
   color: #e3e3e38e !important;
 }
 
 .dark-mode-border {
-  border-color: #a8a8a863;
-  box-shadow: 0 0 10pt #00000038;
+  border-color: #89949f57;
+  box-shadow: 0 0 4pt #154b8022;
 }
 
 .dark-mode-title {
@@ -183,7 +193,6 @@ footer {
 .dark-mode-nav {
   background-color: #171a1d !important;
   border-color: #a8a8a863 !important;
-  border-color: #757575;
 }
 
 .jn-deactive {
@@ -279,6 +288,7 @@ footer {
   margin: 0;
   border-radius: 6pt;
 }
+
 /* .jn-speedtest-note::before {
   content: "";
   border-top: 1px solid #19945a5c;
@@ -287,13 +297,14 @@ footer {
 } */
 
 .speedtest-p {
-  margin-top:10pt;
+  margin-top: 10pt;
 }
 
 .jn-ping-form-select {
   min-width: 140pt;
 }
-.grecaptcha-badge { 
+
+.grecaptcha-badge {
   visibility: hidden;
 }
 

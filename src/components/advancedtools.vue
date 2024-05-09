@@ -12,18 +12,18 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="{ 'mobile-h3': isMobile }">{{ card.icon }} {{ $t(card.titleKey) }}</h3>
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">
+                            <i class="bi bi-arrow-up-right-circle"></i> {{ $t(card.titleKey) }}
+                        </h3>
                         <p class="opacity-75">{{ $t(card.noteKey) }}</p>
-                        <div class="go-corner">
-                            <div class="go-arrow"><i class="bi bi-chevron-double-down"></i></div>
-                        </div>
+                        <span :class="[isDarkMode ? 'jn-icon-dark' : 'jn-icon']">{{ card.icon }}</span>
                     </div>
                 </div>
             </div>
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header justify-content-end">
+            <div class="offcanvas-header d-flex justify-content-end" :class="[ showTitle ? 'jn-offcanvas-header':'jn-offcanvas-header-noborder']">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -32,10 +32,15 @@
                         <i class="bi bi-fullscreen-exit"></i>
                     </span>
                 </button>
+                <Transition name="slide-fade">
+                    <span v-if="showTitle" class="fw-medium"
+                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{ cards[openedCard].icon }}
+                        {{ $t(cards[openedCard].titleKey) }}</span>
+                </Transition>
 
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']">
+            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
                 <router-view></router-view>
             </div>
         </div>
@@ -67,34 +72,54 @@ export default {
     data() {
         return {
             cards: [
-                { path: '/pingtest', icon: '🌐', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
+                { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
                 { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
                 { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
                 { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
                 { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
+                { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
             ],
             isFullScreen: false,
+            showTitle: false,
+            openedCard: null,
         }
     },
 
     methods: {
+        handleScroll() {
+            const scrollTop = this.$refs.scrollContainer.scrollTop;
+            if (scrollTop > 60) {
+                this.showTitle = true;
+            } else {
+                this.showTitle = false;
+            }
+        },
         navigateAndToggleOffcanvas(routePath) {
             this.$router.push(routePath);
             switch (routePath) {
                 case '/pingtest':
                     this.$trackEvent('Nav', 'NavClick', 'PingTest');
+                    this.openedCard = 0;
                     break;
                 case '/mtrtest':
                     this.$trackEvent('Nav', 'NavClick', 'MTRTest');
+                    this.openedCard = 1;
                     break;
                 case '/ruletest':
                     this.$trackEvent('Nav', 'NavClick', 'RuleTest');
+                    this.openedCard = 2;
                     break;
                 case '/dnsresolver':
                     this.$trackEvent('Nav', 'NavClick', 'DNSResolver');
+                    this.openedCard = 3;
                     break;
                 case '/censorshipcheck':
                     this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+                    this.openedCard = 4;
+                    break;
+                case '/whois':
+                    this.$trackEvent('Nav', 'NavClick', 'Whois');
+                    this.openedCard = 5;
                     break;
             }
             var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
@@ -118,6 +143,12 @@ export default {
             }
         }
 
+    },
+    mounted() {
+        this.$refs.scrollContainer.addEventListener('scroll', this.handleScroll);
+    },
+    unmounted() {
+        this.$refs.scrollContainer.removeEventListener('scroll', this.handleScroll);
     },
 }
 </script>
@@ -147,65 +178,63 @@ export default {
 }
 
 
-.go-corner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    overflow: hidden;
-    top: 0;
-    right: 0;
-    background-color: rgb(13, 110, 253);
-    border-radius: 0 4px 0 32px;
-}
-
-.go-arrow {
-    margin-top: -4px;
-    margin-right: -4px;
-    color: white;
-    transition: all 0.4s ease;
-}
-
-.jn-adv-card:hover .go-arrow {
-    transform: rotateZ(-180deg);
-}
-
 .jn-adv-card {
     display: block;
     position: relative;
     text-decoration: none;
     z-index: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
-.jn-adv-card:before {
-    content: "";
+.jn-icon {
+    top: 4pt;
+    right: 6pt;
+    font-size: 1.6rem;
     position: absolute;
-    z-index: -1;
-    top: -16px;
-    right: -16px;
-    background: rgb(13, 110, 253);
-    height: 42px;
-    width: 42px;
-    border-radius: 32px;
-    transform: scale(1);
-    transform-origin: 50% 50%;
-    transition: transform 0.25s ease-out;
+    transition: all 0.4s;
 }
 
-.jn-adv-card:hover:before {
-    transform: scale(21);
+.jn-icon-dark {
+    top: 4pt;
+    right: 6pt;
+    font-size: 1.6rem;
+    position: absolute;
+    transition: all 0.4s;
 }
 
-.jn-adv-card:hover p {
+.jn-adv-card:hover .jn-icon-dark {
+    transform: translateY(-10pt) scale(1.8);
+    text-shadow: 0 0 10pt #ffffff27;
+}
+
+.jn-adv-card:hover .jn-icon {
+    transform: translateY(-10pt) scale(1.8);
+    text-shadow: 0 0 10pt #00000060;
+}
+
+.jn-offcanvas-header {
+    min-height: 40pt;
+    border-bottom: 1px solid #ababab3f;
     transition: all 0.3s ease-out;
-    color: #fff;
 }
 
-.jn-adv-card:hover h3 {
+.jn-offcanvas-header-noborder {
+    min-height: 40pt;
+    border-bottom: 1px solid transparent;
     transition: all 0.3s ease-out;
-    color: #fff;
+}
+
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateY(20px);
+    opacity: 0;
 }
 </style>

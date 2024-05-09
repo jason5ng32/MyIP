@@ -15,6 +15,7 @@ import validateConfigs from './api/configs.js';
 import dnsResolver from './api/dnsresolver.js';
 import rateLimit from 'express-rate-limit';
 import { slowDown } from 'express-slow-down'
+import whois from './api/whois.js';
 
 dotenv.config();
 
@@ -131,6 +132,7 @@ app.get('/api/ipsb', ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/recaptcha', recaptchaHandler);
 app.get('/api/dnsresolver', dnsResolver);
+app.get('/api/whois', whois);
 
 // 使用查询参数处理所有配置请求
 app.get('/api/configs', validateConfigs);

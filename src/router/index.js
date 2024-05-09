@@ -6,6 +6,7 @@ const PingTest = () => import('../components/globallatency.vue');
 const RuleTest = () => import('../components/ruletest.vue');
 const DNSResolver = () => import('../components/dnsresolver.vue');
 const CensorshipCheck = () => import('../components/censorshipcheck.vue');
+const Whois = () => import('../components/whois.vue');
 const EmptyComponent = () => import('../components/empty.vue');
 
 const routes = [
@@ -15,6 +16,7 @@ const routes = [
   { path: '/ruletest', component: RuleTest },
   { path: '/dnsresolver', component: DNSResolver },
   { path: '/censorshipcheck', component: CensorshipCheck },
+  { path: '/whois', component: Whois },
 ];
 
 const router = createRouter({

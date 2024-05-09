@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-12 mb-3">
                 <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body mb-3">
+                    <div class="card-body">
                         <div class="col-12 col-md-auto">
                             <label for="queryURL" class="col-form-label">{{ $t('dnsresolver.Note2') }}</label>
                         </div>

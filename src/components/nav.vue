@@ -43,7 +43,8 @@
 
     </div>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"
+      @click="closeAllOffCanvas">
       <span class="navbar-toggler-icon bg-transparent "></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
@@ -105,6 +106,19 @@ export default {
     }
   },
   methods: {
+
+    closeAllOffCanvas() {
+      const offcanvasElements = document.querySelectorAll('.offcanvas');
+      if (offcanvasElements.length === 0) {
+        return;
+      }
+      document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
+        const instance = Offcanvas.getInstance(offcanvas);
+        if (instance) {
+          instance.hide();
+        }
+      });
+    },
 
     // 打开偏好设置
     OpenPreferences() {

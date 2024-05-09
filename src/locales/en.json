@@ -62,7 +62,19 @@
     "MTRTestNote": "Global MTR route test",
     "DNSResolverNote": "Real-time multi-channel DNS resolution",
     "RuleTestNote": "Check the rule settings of proxy software",
-    "CensorshipCheck": "Check if a website is blocked in some countries"
+    "CensorshipCheck": "Check if a website is blocked in some countries",
+    "Whois": "Search for domain/IP registration information"
+  },
+  "whois": {
+    "Title": "Whois Search",
+    "Note": "Whois search is a service used to retrieve domain registration information. By entering a domain name or IP address, you can retrieve information such as the domain's registration details, registrar, registration date, expiration date, and more. The Whois information for IP addresses and domain names may have different fields. Additionally, some less common top-level domains (TLDs) may not have available information for Whois queries.",
+    "Note2": "Please enter a domain name or IP address to start the query:",
+    "Note3": "Whois information contains various types of fields. The following is the raw text information",
+    "Placeholder": "Domain Name or IP",
+    "Run": "Query",
+    "invalidURL": "Invalid domain name or IP",
+    "fetchError": "Unable to fetch query results or query results are empty",
+    "Provider": "Information Provider"
   },
   "dnsresolver": {
     "Title": "DNS Resolution",
@@ -602,20 +614,38 @@
         "date": "May 4, 2024",
         "content": [
           {
-        "type": "add",
-        "change": "Added preferences panel to save settings locally"
+            "type": "add",
+            "change": "Added preferences panel to save settings locally"
           },
           {
-        "type": "add",
-        "change": "Allow customization of multiple default behaviors on second program launch"
+            "type": "add",
+            "change": "Allow customization of multiple default behaviors on second program launch"
           },
           {
-        "type": "improve",
-        "change": "Significantly optimized program logic"
+            "type": "improve",
+            "change": "Significantly optimized program logic"
           },
           {
-        "type": "fix",
-        "change": "Fixed some minor issues"
+            "type": "fix",
+            "change": "Fixed some minor issues"
+          }
+        ]
+      },
+      {
+        "version": "v3.9",
+        "date": "May 8, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added Whois search feature"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized display and animation effects for advanced tools"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed some minor issues"
           }
         ]
       }
