@@ -41,7 +41,7 @@
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
                                         $t('ipInfos.City')
-                                    }}</span>&nbsp;:&nbsp;
+                                        }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
@@ -131,13 +131,13 @@ export default {
         const store = useStore();
         const isDarkMode = computed(() => store.state.isDarkMode);
         const isMobile = computed(() => store.state.isMobile);
-        const ipGeoSource = computed(() => store.state.ipGeoSource);
+        const userPreferences = computed(() => store.state.userPreferences);
         const configs = computed(() => store.state.configs);
 
         return {
             isDarkMode,
             isMobile,
-            ipGeoSource,
+            userPreferences,
             configs,
         };
     },
@@ -150,6 +150,7 @@ export default {
             reCaptchaStatus: true,
             reCaptchaLoaded: false,
             isChecking: "idle",
+            ipGeoSource: this.userPreferences.ipGeoSource,
         }
     },
 
@@ -277,7 +278,7 @@ export default {
             const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
                 proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
                     proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-                        proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+                        proxyDetect.type === 'Hosting' || proxyDetect.type === 'VPN' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
                             proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
             const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
                 proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
@@ -308,6 +309,7 @@ export default {
                 { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
                 { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
                 { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+                { id: 6, url: `/api/ipapiis?ip=${ip}`, transform: this.transformDataFromIPapi },
             ];
 
             // 根据指定的源获取数据
@@ -333,6 +335,14 @@ export default {
                     console.error("Error fetching IP details:", error);
                 }
             }
+        },
+    },
+    watch: {
+        'userPreferences.ipGeoSource': {
+            handler(newVal, oldVal) {
+                this.ipGeoSource = newVal;
+            },
+            deep: true,
         },
     },
 }

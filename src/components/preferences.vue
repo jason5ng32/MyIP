@@ -291,6 +291,16 @@ export default {
             this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
         },
 
+        updateIPDBs() {
+            // 如果 this.configs 是对象且里面存在任意键值对
+            if (this.configs && Object.keys(this.configs).length > 0) {
+                this.$store.commit('UPDATE_IPDBS', { id: 0, enabled: this.configs.ipChecking });
+                this.$store.commit('UPDATE_IPDBS', { id: 1, enabled: this.configs.ipInfo });
+                this.$store.commit('UPDATE_IPDBS', { id: 4, enabled: this.configs.keyCDN });
+                this.$store.commit('UPDATE_IPDBS', { id: 6, enabled: this.configs.ipapiis });
+            }
+        },
+
         // 收起导航栏
         collapseNav() {
             document.querySelector('#navbarNavAltMarkup').classList.remove('show');
@@ -329,6 +339,11 @@ export default {
         this.mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
         this.mediaQueryList.addListener(this.handleThemeChange);
         this.handleThemeChange({ matches: this.mediaQueryList.matches });
+    },
+    mounted() {
+        setTimeout(() => {
+            this.updateIPDBs();
+        }, 4000);
     },
     beforeDestroy() {
         if (this.mediaQueryList) {

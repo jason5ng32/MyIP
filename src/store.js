@@ -20,6 +20,7 @@ const store = createStore({
         { id: 3, text: 'IPAPI.co', enabled: true },
         { id: 4, text: 'KeyCDN', enabled: true },
         { id: 5, text: 'IP.SB', enabled: true },
+        { id: 6, text: 'IPAPI.is', enabled: true },
       ],
       usingSource: 0,
     };

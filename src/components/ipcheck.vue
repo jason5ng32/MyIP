@@ -551,6 +551,7 @@ export default {
           { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
           { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
           { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
+          { id: 6, url: `/api/ipapiis?ip=${ip}`, transform: this.transformDataFromIPapi },
         ];
 
         let currentSourceIndex = sourceID !== null ? sources.findIndex(source => source.id === sourceID) : 0;
@@ -672,7 +673,7 @@ export default {
       const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
         proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
           proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-            proxyDetect.type === 'Hosting' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
+            proxyDetect.type === 'Hosting' || proxyDetect.type === 'VPN' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
               proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
       const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
         proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');

@@ -27,7 +27,8 @@ export default (req, res) => {
         keyCDN: process.env.KEYCDN_USER_AGENT,
         originalSite,
         cloudFlare: process.env.CLOUDFLARE_API,
-        recaptcha: process.env.VITE_RECAPTCHA_SITE_KEY && process.env.RECAPTCHA_SECRET_KEY
+        recaptcha: process.env.VITE_RECAPTCHA_SITE_KEY && process.env.RECAPTCHA_SECRET_KEY,
+        ipapiis: process.env.IPAPIIS_API_KEY,
     };
     let result = {};
     for (const key in envConfigs) {
