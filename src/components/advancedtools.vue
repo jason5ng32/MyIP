@@ -23,7 +23,8 @@
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header d-flex justify-content-end" :class="[ showTitle ? 'jn-offcanvas-header':'jn-offcanvas-header-noborder']">
+            <div class="offcanvas-header d-flex justify-content-end"
+                :class="[showTitle ? 'jn-offcanvas-header' : 'jn-offcanvas-header-noborder']">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -34,7 +35,8 @@
                 </button>
                 <Transition name="slide-fade">
                     <span v-if="showTitle" class="fw-medium"
-                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{ cards[openedCard].icon }}
+                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
+                            cards[openedCard].icon }}
                         {{ $t(cards[openedCard].titleKey) }}</span>
                 </Transition>
 
@@ -61,11 +63,13 @@ export default {
         const store = useStore();
         const isDarkMode = computed(() => store.state.isDarkMode);
         const isMobile = computed(() => store.state.isMobile);
+        const configs = computed(() => store.state.configs);
 
 
         return {
             isDarkMode,
             isMobile,
+            configs,
         };
     },
 
@@ -79,6 +83,7 @@ export default {
                 { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
                 { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
             ],
+            cardInvisibilityTest: { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' },
             isFullScreen: false,
             showTitle: false,
             openedCard: null,
@@ -121,6 +126,10 @@ export default {
                     this.$trackEvent('Nav', 'NavClick', 'Whois');
                     this.openedCard = 5;
                     break;
+                case '/invisibilitytest':
+                    this.$trackEvent('Nav', 'NavClick', 'InvisibilityTest');
+                    this.openedCard = 6;
+                    break;
             }
             var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
             offcanvas.show();
@@ -146,6 +155,14 @@ export default {
     },
     mounted() {
         this.$refs.scrollContainer.addEventListener('scroll', this.handleScroll);
+
+        setTimeout(() => {
+            if (this.configs.originalSite) {
+                this.cards.push(this.cardInvisibilityTest);
+            }
+        }, 2000);
+
+
     },
     unmounted() {
         this.$refs.scrollContainer.removeEventListener('scroll', this.handleScroll);

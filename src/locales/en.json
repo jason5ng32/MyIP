@@ -55,6 +55,81 @@
     "TestGroup": "Test Group",
     "ControlGroup": "Control Group"
   },
+  "invisibilitytest": {
+    "Title": "Invisibility Test",
+    "Note": "When you use a proxy or VPN, do the websites you visit really not know that you are using a proxy? Are you truly invisible? We will use various methods to try to calculate the vulnerabilities in your disguise and find evidence that you are using a proxy. Although some test results may not be completely accurate, this test is still highly informative.",
+    "Note2": "After clicking Run, the system will run a script that usually completes all tests within 10 seconds. During this process, your IP information, browser information, etc. will be collected and analyzed in the background.",
+    "Run": "Run Test",
+    "fetchError": "Unable to fetch test results",
+    "yourIP": "Your main test IP is",
+    "proxyScore": "Proxy Score",
+    "VPNScore": "VPN Score",
+    "isProxy": "You may be using a proxy.",
+    "notProxy": "No evidence of you using a proxy was found.",
+    "isVPN": "You may be using a VPN.",
+    "notVPN": "No evidence of you using a VPN was found.",
+    "itemName": "Test Item",
+    "itemProxyResult": "Test Result",
+    "itemComment": "Analysis",
+    "agreement": "Agree to Information Collection",
+    "blocklist": {
+      "title": "VPN/Proxy Blocklist",
+      "proxy": "Your IP is in the VPN/Proxy blocklist.",
+      "notProxy": "Your IP is not in the VPN/Proxy blocklist."
+    },
+    "headers": {
+      "title": "HTTP Headers",
+      "proxy": "Your HTTP headers contain proxy information, indicating that you may be using a proxy.",
+      "notProxy": "Your HTTP headers do not contain proxy information."
+    },
+    "datacenter": {
+      "title": "Datacenter IP",
+      "proxy": "Your IP is a datacenter IP, which is not typically used by regular users. Detected datacenter: ",
+      "notProxy": "Your IP is not a datacenter IP."
+    },
+    "tcp": {
+      "title": "TCP Fingerprint",
+      "proxy": "The system you are connecting to is different from your computer system, indicating that you may be using a proxy. Although the system's judgment may not be accurate, it is certain that the two systems are different.",
+      "computer": "Your computer system is: ",
+      "server": "The system you are connecting to may be: ",
+      "notProxy": "The system you are connecting to is the same as your computer system."
+    },
+    "timezone": {
+      "title": "Timezone Difference",
+      "proxy": "Your timezone does not match the geolocation timezone of your IP, indicating that you may be using a proxy.",
+      "computer": "Your timezone is: ",
+      "server": "The geolocation timezone of your IP is: ",
+      "notProxy": "Your timezone matches the geolocation timezone of your IP."
+    },
+    "net": {
+      "title": "Network Resolution",
+      "proxy": "Network resolution indicates that you may be using a proxy or VPN.",
+      "notProxy": "No evidence of you using a proxy or VPN was found in network resolution."
+    },
+    "webrtc": {
+      "title": "WebRTC Detection",
+      "proxy": "WebRTC detected multiple IP addresses from different regions, indicating that you may be using a proxy or VPN.",
+      "ipsAre": "The IP addresses are: ",
+      "notProxy": "No evidence of multiple IP addresses from different regions was found in WebRTC detection."
+    },
+    "flow": {
+      "title": "Traffic Analysis",
+      "proxy": "Traffic analysis indicates that you may be using a proxy or VPN.",
+      "notProxy": "No evidence of you using a proxy or VPN was found in traffic analysis."
+    },
+    "latency": {
+      "title": "Latency Analysis",
+      "proxy": "Latency analysis indicates that you may be using a proxy or VPN.",
+      "fromTCP": "TCP latency value: ",
+      "fromWS": "WebSocket latency value: ",
+      "notProxy": "No evidence of you using a proxy or VPN was found in latency analysis."
+    },
+    "highlatency": {
+      "title": "High Latency Analysis",
+      "proxy": "High latency analysis indicates that you may be using a proxy or VPN.",
+      "notProxy": "No evidence of you using a proxy or VPN was found in high latency analysis."
+    }
+  },
   "advancedtools": {
     "Title": "Advanced Tools",
     "Note": "Tools that are used relatively infrequently, but are very useful when performing network testing.",
@@ -63,7 +138,8 @@
     "DNSResolverNote": "Real-time multi-channel DNS resolution",
     "RuleTestNote": "Check the rule settings of proxy software",
     "CensorshipCheck": "Check if a website is blocked in some countries",
-    "Whois": "Search for domain/IP registration information"
+    "Whois": "Search for domain/IP registration information",
+    "InvisibilityTest": "Check if you are using a proxy or VPN"
   },
   "whois": {
     "Title": "Whois Search",
@@ -290,7 +366,8 @@
     "RefreshRuleTests": "Refresh Rule Tests",
     "CensorshipCheck": "Open Censorship Check panel",
     "Preferences": "Open Preferences",
-    "About": "Open About panel"
+    "About": "Open About panel",
+    "InvisibilityTest": "Open Invisibility Test panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",

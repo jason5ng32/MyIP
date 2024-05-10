@@ -35,6 +35,81 @@
       "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。"
     }
   },
+  "invisibilitytest": {
+    "Title": "隐身测试",
+    "Note": "当你挂上代理或 VPN 之后，你访问的网站真的不知道你挂着代理吗？你真的隐身了么？我们会通过多种手段，尝试计算出你伪装后的漏洞，找到你正在使用代理的证据。尽管可能部分测试结果不完全准确，但本测试依然有较高的参考意义。",
+    "Note2": "点击运行后，系统将会运行一个脚本，通常在 10s 内将会完成所有的测试，在这个过程中，你的 IP 信息、浏览器信息等将会被收集并在后台进行分析。",
+    "Run": "运行测试",
+    "fetchError": "无法获取测试结果",
+    "yourIP": "你的主测 IP 是",
+    "proxyScore": "代理分数",
+    "VPNScore": "VPN 分数",
+    "isProxy": "你可能使用了代理。",
+    "notProxy": "未发现你使用了代理。",
+    "isVPN": "你可能使用了 VPN。",
+    "notVPN": "未发现你使用了 VPN。",
+    "itemName": "测试项目",
+    "itemProxyResult": "测试结果",
+    "itemComment": "分析",
+    "agreement": "同意信息收集",
+    "blocklist": {
+      "title": "VPN/代理名单",
+      "proxy": "你的 IP 在 VPN/代理名单中。",
+      "notProxy": "你的 IP 不在 VPN/代理名单中"
+    },
+    "headers": {
+      "title": "HTTP 头信息",
+      "proxy": "你的 HTTP 头信息中包含了代理信息，你可能正在使用代理。",
+      "notProxy": "你的 HTTP 头信息中没有代理信息。"
+    },
+    "datacenter": {
+      "title": "数据中心 IP",
+      "proxy": "你的 IP 是数据中心 IP，普通用户的 IP 通常不会是数据中心。检测到的数据中心是：",
+      "notProxy": "你的 IP 不是数据中心 IP"
+    },
+    "tcp": {
+      "title": "TCP 指纹",
+      "proxy": "你发起连接的系统与你的电脑系统不同，你可能正在使用代理。尽管系统判断不一定准确，但可以肯定两个系统并不相同。",
+      "computer": "你的电脑系统是：",
+      "server": "你发起连接的系统可能是：",
+      "notProxy": "你发起连接的系统与你的电脑系统相同。"
+    },
+    "timezone": {
+      "title": "时区差异",
+      "proxy": "你的时区与你的 IP 地理位置不匹配，你可能正在使用代理。",
+      "computer": "你的时区是：",
+      "server": "你的 IP 地理位置时区是：",
+      "notProxy": "你的时区与你的 IP 地理位置匹配。"
+    },
+    "net": {
+      "title": "网络解析",
+      "proxy": "从网络解析上发现你可能使用了代理或 VPN",
+      "notProxy": "从网络解析上未发现你使用代理或 VPN 的证据。"
+    },
+    "webrtc": {
+      "title": "WebRTC 检测",
+      "proxy": "WebRTC 发现你存在多个不同地区的 IP，你可能使用了代理或 VPN。",
+      "ipsAre": "IP 分别是：",
+      "notProxy": "WebRTC 检测未发现存在多个不同地区的 IP。"
+    },
+    "flow": {
+      "title": "流量分析",
+      "proxy": "流量分析发现你可能使用了代理或 VPN。",
+      "notProxy": "流量分析未发现你使用代理或 VPN 的证据。"
+    },
+    "latency": {
+      "title": "延迟分析",
+      "proxy": "延迟分析发现你可能使用了代理或 VPN。",
+      "fromTCP": "TCP 延迟值：",
+      "fromWS": "WebSocket 延迟值：",
+      "notProxy": "延迟分析未发现你使用代理或 VPN 的证据。"
+    },
+    "highlatency": {
+      "title": "高延迟分析",
+      "proxy": "搞延迟分析发现你可能使用了代理或 VPN。",
+      "notProxy": "高延迟分析未发现你使用代理或 VPN 的证据。"
+    }
+  },
   "censorshipcheck": {
     "Title": "封锁测试",
     "Note": "检查目标网站在全球互联网审查较为严重的 4 个地区的可用性，包括：中国大陆、沙特阿拉伯、俄罗斯、土耳其。检查时会同时从互联网相对自由的地区进行相同的测试，以作为对照组进行校验。在一些地区，互联网审查有较为明确的法律条文，有些则相对含糊。",
@@ -63,7 +138,8 @@
     "DNSResolverNote": "实时多渠道 DNS 解析",
     "RuleTestNote": "检查代理软件的规则设置",
     "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
-    "Whois": "对域名或 IP 进行 Whois 查询"
+    "Whois": "对域名或 IP 进行 Whois 查询",
+    "InvisibilityTest": "猜猜看我是否知道你挂了代理"
   },
   "whois": {
     "Title": "Whois 查询",
@@ -291,7 +367,8 @@
     "CensorshipCheck": "打开封锁测试面板",
     "Preferences": "打开偏好设置面板",
     "About": "打开关于页面",
-    "Whois": "打开 Whois 查询面板"
+    "Whois": "打开 Whois 查询面板",
+    "InvisibilityTest": "打开隐身测试面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",

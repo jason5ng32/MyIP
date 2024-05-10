@@ -7,6 +7,7 @@ const RuleTest = () => import('../components/ruletest.vue');
 const DNSResolver = () => import('../components/dnsresolver.vue');
 const CensorshipCheck = () => import('../components/censorshipcheck.vue');
 const Whois = () => import('../components/whois.vue');
+const InvisibilityTest = () => import('../components/invisibilitytest.vue');
 const EmptyComponent = () => import('../components/empty.vue');
 
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
   { path: '/dnsresolver', component: DNSResolver },
   { path: '/censorshipcheck', component: CensorshipCheck },
   { path: '/whois', component: Whois },
+  { path: '/invisibilitytest', component: InvisibilityTest },
 ];
 
 const router = createRouter({

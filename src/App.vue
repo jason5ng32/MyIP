@@ -526,6 +526,22 @@ export default {
         },
       ];
 
+      const invisibilitytest = [
+        {
+          keys: "i",
+          action: () => {
+            this.scrollToElement("AdvancedTools", 80);
+            this.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/invisibilitytest');
+            this.$trackEvent('Nav', 'NavClick', 'InvisibilityTest');
+          },
+          description: this.$t('shortcutKeys.InvisibilityTest'),
+        },
+      ];
+
+      if (this.configs.originalSite) {
+        shortcutConfig.push(...invisibilitytest);
+      }
+
       shortcutConfig.forEach(config => mappingKeys(config));
     },
 
@@ -585,10 +601,13 @@ export default {
 
   },
   mounted() {
-    this.registerShortcutKeys();
     this.setupModalFocus();
-    this.keyMap = keyMap;
-    this.sendKeyMap();
+    setTimeout(() => {
+      this.registerShortcutKeys();
+      this.keyMap = keyMap;
+      this.sendKeyMap();
+    }, 2000);
+
     this.setInfosLoaded();
     this.listenOffcanvas();
     window.addEventListener('scroll', this.checkSectionsAndTrack);
