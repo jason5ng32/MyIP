@@ -45,10 +45,10 @@
                                 <p>{{ $t('invisibilitytest.yourIP') }}: <strong>{{ testResults.ip }}</strong>.</p>
 
                                 <p><i class="bi bi-lock-fill"></i> {{ $t('invisibilitytest.proxyScore') }}:
-                                    {{ testResults.score.proxy }}/100.
+                                    {{ testResults.score.proxy }}%.
                                 </p>
                                 <p><i class="bi bi-shield-lock-fill"></i> {{ $t('invisibilitytest.VPNScore') }}:
-                                    {{ testResults.score.vpn }}/100.
+                                    {{ testResults.score.vpn }}%.
                                 </p>
 
                                 <span v-if="testResults.score.proxy >= 50">
@@ -191,8 +191,9 @@
                                                     <br />
                                                     {{ $t('invisibilitytest.webrtc.ipsAre') }}
 
-                                                    <span v-for="item in testResults.webrtc.allips" :key="item"><strong>{{ item
-                                                        }}</strong>, </span>
+                                                    <span v-for="item in testResults.webrtc.allips"
+                                                        :key="item"><strong>{{ item
+                                                            }}</strong>, </span>
                                                     <strong>{{ testResults.webrtc.ip }}</strong>
                                                 </span>
                                                 <span v-else>{{ $t('invisibilitytest.webrtc.notProxy') }}</span>
@@ -334,7 +335,6 @@ export default {
             this.testResults = {};
             this.loadScript();
 
-            // 初始调用 getResult 延迟 8 秒
             setTimeout(() => {
                 this.getResult(this.userID, 0);
             }, 6000);
@@ -401,6 +401,9 @@ export default {
             let tcp = {};
             tcp.proxy = data.tests.tcpip_fp ? data.tests.tcpip_fp.is_proxy : false;
             tcp.ipos = data.tests.tcpip_fp ? data.tests.tcpip_fp.info.tcpIpHighestOs : null;
+            if (tcp.ipos === 'Chromium OS' || tcp.ipos === 'Linux') {
+                tcp.ipos = 'Linux-based OS';
+            }
             tcp.clientos = data.tests.tcpip_fp ? data.tests.tcpip_fp.info.userAgentOs : null;
 
             // 时区判断
