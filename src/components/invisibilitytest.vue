@@ -364,13 +364,14 @@ export default {
                     setTimeout(() => {
                         this.getResult(userID, retryCount + 1);
                     }, 4000);
+                    return; // 在这里返回，防止执行下面的代码
                 } else {
                     this.errorMsg = this.$t('invisibilitytest.fetchError');
                 }
             } finally {
                 this.removeScript();
-                this.checkingStatus = 'idle';
             }
+            this.checkingStatus = 'idle';
         },
 
         // 处理测试结果

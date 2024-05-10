@@ -30,8 +30,8 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Invalid ID' });
     }
 
-    const apikey = process.env.INVISIBILITY_TEST_API_KEY;
-    const url = new URL(`https://proxydetect.ipcheck.ing/getinfo/${id}?apikey=${apikey}`);
+    const apikey = process.env.IPCHECKING_API_KEY;
+    const url = new URL(`https://api.ipcheck.ing/getpdresult/${id}?apikey=${apikey}`);
 
     get(url, apiRes => {
         let data = '';
