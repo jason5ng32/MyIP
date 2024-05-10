@@ -486,7 +486,7 @@ export default {
           keys: "q",
           action: () => {
             this.openModal("IPCheck");
-            this.$refs.queryIPRef.loadRecaptchaScript();
+            this.$refs.queryIPRef.openQueryIP();
             this.$trackEvent('ShortCut', 'ShortCut', 'QueryIP');
           },
           description: this.$t('shortcutKeys.IPCheck'),

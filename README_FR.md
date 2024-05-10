@@ -112,8 +112,6 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `IPAPIIS_API_KEY` | Non | `""` | Clé API pour IPAPI.is, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IPAPI.is |
 | `KEYCDN_USER_AGENT` | Non | `""` | Le nom de domaine lorsque vous utilisez KeyCDN, doit contenir le préfixe https. Utilisé pour obtenir des informations sur l'adresse IP via KeyCDN |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
-| `VITE_RECAPTCHA_SITE_KEY` | Non | `""` | Clé de site reCAPTCHA de Google, utilisée pour afficher la vérification reCAPTCHA sur le frontend |
-| `RECAPTCHA_SECRET_KEY` | Non | `""` | Clé secrète reCAPTCHA de Google, utilisée pour vérifier la vérification reCAPTCHA sur le backend |
 
 > [!TIP]
 > Les variables d'environnement commençant par `SECURITY_` ne sont valides que lors du déploiement à l'aide de npm ou de Docker.

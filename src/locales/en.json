@@ -322,8 +322,7 @@
     "Title": "IP Check",
     "Placeholder": "Please enter an IP address",
     "Button": "Check",
-    "Error": "Please enter a valid IPv4 or IPv6 address.",
-    "recaptchaError": "It looks like you are a bot."
+    "Error": "Please enter a valid IPv4 or IPv6 address."
   },
   "alert": {
     "id": "alert",

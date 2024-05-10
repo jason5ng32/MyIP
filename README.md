@@ -112,8 +112,6 @@ You can use the program without adding any environment variables, but if you wan
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
 | `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
-| `VITE_RECAPTCHA_SITE_KEY` | No | `""` | Google reCAPTCHA's Site Key, used to display reCAPTCHA verification on the frontend |
-| `RECAPTCHA_SECRET_KEY` | No | `""` | Google reCAPTCHA's Secret Key, used to verify reCAPTCHA verification on the backend |
 
 > [!TIP]
 > Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.

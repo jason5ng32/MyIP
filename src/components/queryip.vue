@@ -41,7 +41,7 @@
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
                                         $t('ipInfos.City')
-                                        }}</span>&nbsp;:&nbsp;
+                                    }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
@@ -102,14 +102,9 @@
                 <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
                     <button id="sumitQueryButton" type="button" class="btn btn-primary"
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                        @click="submitQuery" :disabled="!isValidIP(inputIP) || reCaptchaStatus === false || isChecking === 'running'
+                        @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
                             ">{{
                                 $t('ipcheck.Button') }}</button>
-                    <span v-if="configs.recaptcha" class="text-secondary" style="font-size:10px">
-                        This site is protected by reCAPTCHA and the Google
-                        <a href="https://policies.google.com/privacy">Privacy Policy</a> and
-                        <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-                    </span>
                 </div>
 
 
@@ -147,8 +142,6 @@ export default {
             inputIP: '',
             modalQueryResult: null,
             modalQueryError: "",
-            reCaptchaStatus: true,
-            reCaptchaLoaded: false,
             isChecking: "idle",
             ipGeoSource: this.userPreferences.ipGeoSource,
         }
@@ -162,28 +155,7 @@ export default {
                 this.modalQueryError = "";
                 this.modalQueryResult = null;
                 this.isChecking = "running";
-                // 如果 reCAPTCHA 已启用，验证令牌
-                switch (this.configs.recaptcha) {
-                    case true:
-                        // 执行 reCAPTCHA 验证
-                        grecaptcha.ready(async () => {
-                            grecaptcha.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: 'submit' }).then(async (token) => {
-                                let recaptchaSuccess = await this.verifyRecaptchaToken(token);
-                                if (recaptchaSuccess) {
-                                    this.reCaptchaStatus = true;
-                                    await this.fetchIPForModal(this.inputIP);
-                                } else {
-                                    this.reCaptchaStatus = false;
-                                    this.modalQueryError = this.$t('ipcheck.recaptchaError');
-                                    this.isChecking = "idle";
-                                }
-                            });
-                        });
-                        break;
-                    case false:
-                        await this.fetchIPForModal(this.inputIP);
-                        break;
-                }
+                await this.fetchIPForModal(this.inputIP);
             } else {
                 // 如果 IP 无效，设置错误信息
                 this.modalQueryError = this.$t('ipcheck.Error');
@@ -192,38 +164,8 @@ export default {
             }
         },
 
-        // 加载 reCAPTCHA 脚本
-        loadRecaptchaScript() {
-            if (this.configs.recaptcha === false || this.reCaptchaLoaded === true) {
-                return;
-            }
-            // 创建一个 script 元素
-            const script = document.createElement('script');
-            script.src = `https://www.google.com/recaptcha/api.js?render=${import.meta.env.VITE_RECAPTCHA_SITE_KEY}`;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
-            // 获取加载完成的状态
-            script.onload = () => {
-                this.reCaptchaLoaded = true;
-            };
-        },
-
-        // 验证 reCAPTCHA 令牌
-        async verifyRecaptchaToken(token) {
-            const response = await fetch(`/api/recaptcha?token=${token}`, {
-                method: 'GET',
-            });
-            const data = await response.json();
-            return data.success;
-        },
-
         // 打开查询 IP 的模态框
         openQueryIP() {
-            // 如果 reCAPTCHA 脚本尚未加载，加载它
-            if (!window.grecaptcha && this.configs.recaptcha) {
-                this.loadRecaptchaScript();
-            }
             this.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
         },
 
@@ -289,11 +231,6 @@ export default {
 
         // 获取 IP 信息
         async fetchIPForModal(ip, sourceID = null) {
-
-            if (this.reCaptchaStatus === false) {
-                this.modalQueryError = this.$t('ipcheck.recaptchaError');
-                return;
-            }
 
             let lang = this.$Lang;
             if (lang === 'zh') {

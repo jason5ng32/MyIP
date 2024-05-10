@@ -322,8 +322,7 @@
         "Title": "Vérification IP",
         "Placeholder": "Veuillez entrer une adresse IP",
         "Button": "Vérifier",
-        "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
-        "recaptchaError": "Il semble que vous êtes un robot."
+        "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide."
     },
     "alert": {
         "id": "alert",
