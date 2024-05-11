@@ -83,11 +83,11 @@
                                             <td class="jn-table-col">{{ $t('invisibilitytest.blocklist.title') }}</td>
                                             <td>
                                                 <i class="bi"
-                                                    :class="(testResults.blocklist.proxy || textResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                                    :class="(testResults.blocklist.proxy || testResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td class="opacity-75">
                                                 <span
-                                                    v-if="(testResults.blocklist.proxy || textResults.blocklist.vpn)">{{
+                                                    v-if="(testResults.blocklist.proxy || testResults.blocklist.vpn)">{{
                                                         $t('invisibilitytest.blocklist.proxy') }}</span>
                                                 <span v-else>{{ $t('invisibilitytest.blocklist.notProxy') }}</span>
                                             </td>
