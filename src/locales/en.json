@@ -71,7 +71,7 @@
     "itemName": "Test Item",
     "itemProxyResult": "Test Result",
     "itemComment": "Analysis",
-    "agreement": "Agree to Information Collection",
+    "agreement": "I agree",
     "blocklist": {
       "title": "VPN/Proxy Blocklist",
       "proxy": "Your IP is in the VPN/Proxy blocklist.",

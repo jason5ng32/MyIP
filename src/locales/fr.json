@@ -51,7 +51,7 @@
         "itemName": "Élément de test",
         "itemProxyResult": "Résultat du test",
         "itemComment": "Analyse",
-        "agreement": "Accepter la collecte d'informations",
+        "agreement": "J'accepte",
         "blocklist": {
             "title": "Liste des VPN/Proxy",
             "proxy": "Votre adresse IP figure dans la liste des VPN/Proxy.",
