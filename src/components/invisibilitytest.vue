@@ -83,11 +83,12 @@
                                             <td class="jn-table-col">{{ $t('invisibilitytest.blocklist.title') }}</td>
                                             <td>
                                                 <i class="bi"
-                                                    :class="testResults.blocklist.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                                    :class="(testResults.blocklist.proxy || textResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td class="opacity-75">
-                                                <span v-if="testResults.blocklist.proxy">{{
-                                                    $t('invisibilitytest.blocklist.proxy') }}</span>
+                                                <span
+                                                    v-if="(testResults.blocklist.proxy || textResults.blocklist.vpn)">{{
+                                                        $t('invisibilitytest.blocklist.proxy') }}</span>
                                                 <span v-else>{{ $t('invisibilitytest.blocklist.notProxy') }}</span>
                                             </td>
                                         </tr>
@@ -111,10 +112,11 @@
                                             <td>{{ $t('invisibilitytest.datacenter.title') }}</td>
                                             <td>
                                                 <i class="bi"
-                                                    :class="testResults.datacenter.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                                    :class="(testResults.datacenter.proxy || testResults.datacenter.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td class="opacity-75">
-                                                <span v-if="testResults.datacenter.proxy">
+                                                <span
+                                                    v-if="(testResults.datacenter.proxy || testResults.datacenter.vpn)">
                                                     {{ $t('invisibilitytest.datacenter.proxy') }}
                                                     <strong>{{ testResults.datacenter.hosting }}</strong>
                                                 </span>
@@ -149,10 +151,10 @@
                                             <td>{{ $t('invisibilitytest.timezone.title') }}</td>
                                             <td>
                                                 <i class="bi"
-                                                    :class="testResults.timezone.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                                    :class="(testResults.timezone.proxy || testResults.timezone.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td class="opacity-75">
-                                                <span v-if="testResults.timezone.proxy">
+                                                <span v-if="(testResults.timezone.proxy || testResults.timezone.vpn)">
                                                     {{ $t('invisibilitytest.timezone.proxy') }}
                                                     <br />
                                                     {{ $t('invisibilitytest.timezone.computer') }}
@@ -354,17 +356,17 @@ export default {
                     console.log(`Data not found, retrying... (${retryCount + 1})`);
                     setTimeout(() => {
                         this.getResult(userID, retryCount + 1);
-                    }, 4000); // 4 秒后重试
+                    }, 4000);
                     return;
                 }
-                this.testResults = this.processResults(data);
+                this.testResults = data;
             } catch (error) {
                 console.error('Error fetching InvisibilityTest results:', error);
                 if (retryCount < 3) {
                     setTimeout(() => {
                         this.getResult(userID, retryCount + 1);
                     }, 4000);
-                    return; // 在这里返回，防止执行下面的代码
+                    return;
                 } else {
                     this.errorMsg = this.$t('invisibilitytest.fetchError');
                 }
@@ -372,92 +374,6 @@ export default {
                 this.removeScript();
             }
             this.checkingStatus = 'idle';
-        },
-
-        // 处理测试结果
-        processResults(data) {
-            let ip = data.ip;
-
-            // 分数
-            let score = {};
-            score.proxy = data.proxy.score ? data.proxy.score : 0;
-            score.vpn = data.vpn.score ? ((data.vpn.score / 55) * 100).toFixed(0) : 0;
-
-            // 是否在黑名单
-            let blocklist = {};
-            blocklist.proxy = data.tests.blocklist ? data.tests.blocklist.is_proxy : false;
-            blocklist.vpn = data.tests.blocklist ? data.tests.blocklist.is_vpn : false;
-
-            // Header 判断
-            let headers = {};
-            headers.proxy = data.tests.headers ? data.tests.headers.is_proxy : false;
-
-            // 数据中心判断
-            let datacenter = {};
-            datacenter.proxy = data.tests.datacenter ? data.tests.datacenter.is_proxy : false;
-            datacenter.vpn = data.tests.datacenter ? data.tests.datacenter.is_vpn : null;
-            datacenter.hosting = data.tests.datacenter ? data.tests.datacenter.info.company.name : null;
-
-            // TCP 指纹判断
-            let tcp = {};
-            tcp.proxy = data.tests.tcpip_fp ? data.tests.tcpip_fp.is_proxy : false;
-            tcp.ipos = data.tests.tcpip_fp ? data.tests.tcpip_fp.info.tcpIpHighestOs : null;
-            if (tcp.ipos === 'Chromium OS' || tcp.ipos === 'Linux') {
-                tcp.ipos = 'Linux-based OS';
-            }
-            tcp.clientos = data.tests.tcpip_fp ? data.tests.tcpip_fp.info.userAgentOs : null;
-
-            // 时区判断
-            let timezone = {};
-            timezone.proxy = data.tests.timezone ? data.tests.timezone.is_proxy : false;
-            timezone.vpn = data.tests.timezone ? data.tests.timezone.is_vpn : null;
-            timezone.iptimezone = data.tests.timezone ? data.tests.timezone.info.ipTimeData.timezone : null;
-            timezone.clienttimezone = data.tests.timezone ? data.tests.timezone.info.clientTimeData.time_zone : null;
-            timezone.delta = data.tests.timezone ? data.tests.timezone.info.isProxyByTimeDelta.delta : null;
-            timezone.isSame = timezone.clienttimezone === timezone.iptimezone ? true : false;
-
-            // 网络解析判断
-            let net = {};
-            net.proxy = data.tests.net ? data.tests.net.is_proxy : false;
-
-            // WebRTC 判断
-            let webrtc = {};
-            webrtc.proxy = data.tests.webrtc ? data.tests.webrtc.is_proxy : false;
-            webrtc.allips = data.tests.webrtc ? data.tests.webrtc.info.allIps ? data.tests.webrtc.info.allIps : null : null;
-
-            // 使用 validateIPv4 过滤 webrtc.allips 数组中的非 IPv4 地址
-            webrtc.allips = webrtc.allips ? webrtc.allips.filter(ip => this.validateIPv4(ip)) : null;
-
-            webrtc.ip = data.tests.webrtc ? data.tests.webrtc.info.ip ? data.tests.webrtc.info.ip : null : null;
-
-            // 流量特征判断
-            let flow = {};
-            flow.proxy = data.tests.flow_pattern ? data.tests.flow_pattern.is_proxy : false;
-
-            // 延迟判断
-            let latency = {};
-            latency.proxy = data.tests.latency ? data.tests.latency.is_proxy : false;
-            latency.tcpTime = data.tests.latency ? data.tests.latency.info.tcpIpStats.min : null;
-            latency.wsTime = data.tests.latency ? data.tests.latency.info.wsLatencyStats.min : null;
-
-            // 高延迟判断
-            let highlatency = {};
-            highlatency.proxy = data.tests.high_latencies ? (data.tests.high_latencies.is_vpn || data.tests.high_latencies.is_proxy) ? true : false : false;
-
-            return {
-                ip,
-                score,
-                blocklist,
-                headers,
-                datacenter,
-                tcp,
-                timezone,
-                net,
-                webrtc,
-                flow,
-                latency,
-                highlatency
-            };
         },
     },
 };
