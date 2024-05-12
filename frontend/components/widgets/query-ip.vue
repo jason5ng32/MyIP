@@ -104,7 +104,7 @@
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
                         @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
                             ">{{
-                                $t('ipcheck.Button') }}</button>
+                        $t('ipcheck.Button') }}</button>
                 </div>
 
 
