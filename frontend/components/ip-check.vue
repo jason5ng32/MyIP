@@ -193,6 +193,8 @@
 <script>
 import { computed } from 'vue';
 import { useMainStore } from '@/store';
+import { isValidIP } from '@/utils/valid-ip.js';
+import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 
 export default {
   name: 'IPCheck',
@@ -300,15 +302,7 @@ export default {
   },
 
   methods: {
-
-    // 检查 IP 地址是否合法
-    isValidIP(ip) {
-      const ipv4Pattern =
-        /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-      const ipv6Pattern =
-        /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
-      return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-    },
+    isValidIP,
 
     // 从中国来源获取 IP 地址
     getIPfromCNSource() {
@@ -547,15 +541,7 @@ export default {
       }
 
       const fetchPromise = (async () => {
-        const sources = [
-          { id: 0, url: `/api/ipchecking?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-          { id: 1, url: `/api/ipinfo?ip=${ip}`, transform: this.transformDataFromIPapi },
-          { id: 2, url: `/api/ipapicom?ip=${ip}&lang=${lang}`, transform: this.transformDataFromIPapi },
-          { id: 3, url: `https://ipapi.co/${ip}/json/`, transform: this.transformDataFromIPapi },
-          { id: 4, url: `/api/keycdn?ip=${ip}`, transform: this.transformDataFromIPapi },
-          { id: 5, url: `/api/ipsb?ip=${ip}`, transform: this.transformDataFromIPapi },
-          { id: 6, url: `/api/ipapiis?ip=${ip}`, transform: this.transformDataFromIPapi },
-        ];
+        const sources = this.store.ipDBs.filter(source => source.enabled);
 
         let currentSourceIndex = sourceID !== null ? sources.findIndex(source => source.id === sourceID) : 0;
         let attempts = 0;
@@ -563,9 +549,10 @@ export default {
         while (attempts < sources.length) {
           const source = sources[currentSourceIndex];
           try {
-            const response = await fetch(source.url);
+            const url = this.store.getDbUrl(source.id, ip, lang);
+            const response = await fetch(url);
             const data = await response.json();
-            const cardData = source.transform(data);
+            const cardData = transformDataFromIPapi(data, source.id, this);
 
             if (cardData) {
               this.ipGeoSource = source.id;
@@ -627,7 +614,7 @@ export default {
       const interval = setInterval(() => {
         if (index < this.ipDataCards.length) {
           const card = this.ipDataCards[index];
-          if (this.isValidIP(card.ip)) {
+          if (isValidIP(card.ip)) {
             this.fetchIPDetails(index, card.ip, parseInt(runningSource));
           }
           index++;
@@ -635,54 +622,6 @@ export default {
           clearInterval(interval);
         }
       }, 500);
-    },
-
-    // 格式化 IP 数据
-    transformDataFromIPapi(data) {
-      if (data.error) {
-        throw new Error(data.reason);
-      }
-
-      const baseData = {
-        country_name: data.country_name || "",
-        country_code: data.country || "",
-        region: data.region || "",
-        city: data.city || "",
-        latitude: data.latitude || "",
-        longitude: data.longitude || "",
-        isp: data.org || "",
-        asn: data.asn || "",
-        asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
-        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=CanvasLight` : "",
-        mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${this.bingMapLanguage}&CanvasMode=RoadDark` : ""
-      };
-
-      if (this.ipGeoSource === 0) {
-        const proxyDetails = this.extractProxyDetails(data.proxyDetect);
-        return {
-          ...baseData,
-          ...proxyDetails,
-        };
-      }
-
-      return baseData;
-    },
-
-    // 提取代理信息
-    extractProxyDetails(proxyDetect = {}) {
-      const isProxy = proxyDetect.proxy === 'yes' ? this.$t('ipInfos.proxyDetect.yes') :
-        proxyDetect.proxy === 'no' ? this.$t('ipInfos.proxyDetect.no') :
-          this.$t('ipInfos.proxyDetect.unknownProxyType');
-      const type = proxyDetect.type === 'Business' ? this.$t('ipInfos.proxyDetect.type.Business') :
-        proxyDetect.type === 'Residential' ? this.$t('ipInfos.proxyDetect.type.Residential') :
-          proxyDetect.type === 'Wireless' ? this.$t('ipInfos.proxyDetect.type.Wireless') :
-            proxyDetect.type === 'Hosting' || proxyDetect.type === 'VPN' ? this.$t('ipInfos.proxyDetect.type.Hosting') :
-              proxyDetect.type ? proxyDetect.type : this.$t('ipInfos.proxyDetect.type.unknownType');
-      const proxyProtocol = proxyDetect.protocol === 'unknown' ? this.$t('ipInfos.proxyDetect.unknownProtocol') :
-        proxyDetect.protocol ? proxyDetect.protocol : this.$t('ipInfos.proxyDetect.unknownProtocol');
-      const proxyOperator = proxyDetect.operator ? proxyDetect.operator : "";
-
-      return { isProxy, type, proxyProtocol, proxyOperator };
     },
 
     // 检查所有 IP 地址
@@ -850,7 +789,7 @@ export default {
   },
 
   mounted() {
-    this.store.setLoadingStatus('ipcheck',true);
+    this.store.setLoadingStatus('ipcheck', true);
   },
 }
 </script>

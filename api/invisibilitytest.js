@@ -1,4 +1,5 @@
 import { get } from 'https';
+import { refererCheck } from './utils/referer-check.js';
 
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
 function isValidUserID(userID) {
@@ -8,16 +9,9 @@ function isValidUserID(userID) {
 export default (req, res) => {
 
     // 限制只能从指定域名访问
-    const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const referer = req.headers.referer;
-
-    if (referer) {
-        const domain = new URL(referer).hostname;
-        if (!allowedDomains.includes(domain)) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-    } else {
-        return res.status(403).json({ error: 'What are you doing?' });
+    if (!refererCheck(referer)) {
+        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
     }
 
     const id = req.query.id;

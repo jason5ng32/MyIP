@@ -299,11 +299,6 @@ export default {
             }
         },
 
-        // 收起导航栏
-        collapseNav() {
-            document.querySelector('#navbarNavAltMarkup').classList.remove('show');
-        },
-
         // 更新 body class
         updateBodyClass() {
             if (this.isDarkMode) {

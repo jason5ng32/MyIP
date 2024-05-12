@@ -26,21 +26,30 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
     },
     ipDBs: [
-      { id: 0, text: 'IPCheck.ing', enabled: true },
-      { id: 1, text: 'IPinfo.io', enabled: true },
-      { id: 2, text: 'IP-API.com', enabled: true },
-      { id: 3, text: 'IPAPI.co', enabled: true },
-      { id: 4, text: 'KeyCDN', enabled: true },
-      { id: 5, text: 'IP.SB', enabled: true },
-      { id: 6, text: 'IPAPI.is', enabled: true },
+      { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
+      { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true },
+      { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true },
+      { id: 3, text: 'IPAPI.co', url: 'https://ipapi.co/{{ip}}/json/', enabled: true },
+      { id: 4, text: 'KeyCDN', url: '/api/keycdn?ip={{ip}}', enabled: true },
+      { id: 5, text: 'IP.SB', url: '/api/ipsb?ip={{ip}}', enabled: true },
+      { id: 6, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true },
     ],
   }),
 
+  getters: {
+    activeSources: (state) => state.ipDBs.filter(db => db.enabled),
+  },
+
   actions: {
+    getDbUrl(id, ip, lang) {
+      const db = this.ipDBs.find(d => d.id === id);
+      if (!db) return null;
+      return db.url.replace('{{ip}}', ip).replace('{{lang}}', lang || 'en');
+    },
     setLoadingStatus(key, value) {
       this.loadingStatus[key] = value;
     },
-    setAlert(alertToShow, alertStyle, alertMessage, alertTitle ) {
+    setAlert(alertToShow, alertStyle, alertMessage, alertTitle) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle };
     },
     updateGlobalIpDataCards(payload) {

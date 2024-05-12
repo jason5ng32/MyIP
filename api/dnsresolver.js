@@ -1,6 +1,7 @@
 // api/dnsresolver.js
 import { Resolver } from 'dns';
 import { promisify } from 'util';
+import { refererCheck } from './utils/referer-check.js';
 
 // 普通 DNS 服务器列表
 const dnsServers = {
@@ -95,15 +96,9 @@ const dnsResolver = async (req, res) => {
     }
 
     // 限制只能从指定域名访问
-    const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const referer = req.headers.referer;
-    if (referer) {
-        const domain = new URL(referer).hostname;
-        if (!allowedDomains.includes(domain)) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-    } else {
-        return res.status(403).json({ error: 'What are you doing?' });
+    if (!refererCheck(referer)) {
+        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
     }
 
     const { hostname, type } = req.query;

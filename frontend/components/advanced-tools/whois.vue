@@ -80,6 +80,7 @@
 <script>
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
+import { isValidIP } from '@/utils/valid-ip.js';
 
 export default {
     name: 'Whois',
@@ -108,6 +109,8 @@ export default {
 
     methods: {
 
+        isValidIP,
+
         // 检查 URL 输入是否有效
         formatURL(domain) {
             // 检查是否包含协议头，若没有则尝试为其添加 http:// 以便进行 URL 格式验证
@@ -128,15 +131,6 @@ export default {
             } catch {
             }
             return false;
-        },
-
-        // 检查 IP 输入是否有效
-        isValidIP(ip) {
-            const ipv4Pattern =
-                /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-            const ipv6Pattern =
-                /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
-            return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
         },
 
         // 检查输入是否有效

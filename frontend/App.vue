@@ -345,7 +345,6 @@ export default {
 
   },
   watch: {
-
     // 监控来自 NavBar 的刷新信号
     shouldRefreshEveryThing(newVal) {
       if (newVal) {
@@ -355,7 +354,6 @@ export default {
         this.setInfosLoaded();
       }
     },
-
     // 给 NavBar 发送加载完成信号
     isInfosLoaded(newVal) {
       if (newVal) {
