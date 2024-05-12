@@ -1,5 +1,5 @@
 <template>
-      <button v-if="isInfosLoaded" class="btn position-fixed"
+    <button v-if="isInfosLoaded" class="btn position-fixed"
         :class="infoMaskLevel === 0 ? 'btn-success' : infoMaskLevel === 1 ? 'btn-warning' : 'btn-secondary'"
         style="bottom: 66px; right: 20px; z-index: 1050;" @click="toggleInfoMask" aria-label="Toggle Info Mask"
         v-tooltip="$t('Tooltips.InfoMask')">
@@ -7,16 +7,14 @@
     </button>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup>
 
-export default {
-    props: {
-        isInfosLoaded: Boolean,
-        infoMaskLevel: Number,
-        toggleInfoMask: Function,
-    },
-};
+const { isInfosLoaded, infoMaskLevel, toggleInfoMask } = defineProps({
+    isInfosLoaded: Boolean,
+    infoMaskLevel: Number,
+    toggleInfoMask: Function,
+});
+
 </script>
 
 <style scoped></style>

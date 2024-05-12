@@ -6,7 +6,7 @@
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
                 $t('nav.preferences.title') }}
-                </h5>
+            </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body pt-0 m-2">
@@ -180,170 +180,132 @@
 
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup>
+import { ref, computed, watch, onMounted, onUnmounted, getCurrentInstance, watchEffect } from 'vue';
 import { useMainStore } from '@/store';
 
-export default {
-    name: 'Preferences',
+const { proxy } = getCurrentInstance();
+const store = useMainStore();
 
-    // 引入 Store
-    setup() {
-    const store = useMainStore();
-    const isDarkMode = computed(() => store.isDarkMode);
-    const isMobile = computed(() => store.isMobile);
-    const configs = computed(() => store.configs);
-    const userPreferences = computed(() => store.userPreferences);
-    const ipDBs = computed(() => store.ipDBs);
+const isDarkMode = computed(() => store.isDarkMode);
+const isMobile = computed(() => store.isMobile);
+const configs = computed(() => store.configs);
+const userPreferences = computed(() => store.userPreferences);
+const ipDBs = computed(() => store.ipDBs);
 
-        return {
-            isDarkMode,
-            isMobile,
-            configs,
-            userPreferences,
-            ipDBs,
-            store,
-        };
-    },
+const prefersDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
+const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
 
-    data() {
-        return {
-            prefersDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
-        }
-    },
-    methods: {
+const handleThemeChange = (event) => {
+    prefersDarkMode.value = event.matches;
+    const theme = userPreferences.value.theme;
+    if (theme === 'auto') {
+        store.setDarkMode(prefersDarkMode.value);
+    } else if (theme === 'light') {
+        store.setDarkMode(false);
+    } else if (theme === 'dark') {
+        store.setDarkMode(true);
+    }
+    updateBodyClass();
+    PWAColor();
+};
 
-        // 主题模式切换
-        handleThemeChange(event) {
-            this.prefersDarkMode = event.matches;
-            if (this.userPreferences.theme === 'auto') {
-                this.store.setDarkMode(this.prefersDarkMode);
-            } else if (this.userPreferences.theme === 'light') {
-                this.store.setDarkMode(false);
-            } else if (this.userPreferences.theme === 'dark') {
-                this.store.setDarkMode(true);
-            } 
-            this.updateBodyClass();
-            this.PWAColor();
-        },
+const updateBodyClass = () => {
+    document.body.classList.toggle("body-dark-mode", isDarkMode.value);
+};
+
+const PWAColor = () => {
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    const backgroundColor = document.querySelector('meta[name="background-color"]');
+    const color = isDarkMode.value ? "#171a1d" : "#f8f9fa";
+    const bgColor = isDarkMode.value ? "#212529" : "#ffffff";
+    themeColor.setAttribute("content", color);
+    backgroundColor.setAttribute("content", bgColor);
+};
+
+const updateIPDBs = () => {
+    if (configs.value && Object.keys(configs.value).length > 0) {
+        store.updateIPDBs({ id: 0, enabled: configs.value.ipChecking });
+        store.updateIPDBs({ id: 1, enabled: configs.value.ipInfo });
+        store.updateIPDBs({ id: 4, enabled: configs.value.keyCDN });
+        store.updateIPDBs({ id: 6, enabled: configs.value.ipapiis });
+    }
+};
+
+const prefTheme = (value) => {
+    switch (value) {
+        case 'light':
+            store.setDarkMode(false);
+            break;
+        case 'dark':
+            store.setDarkMode(true);
+            break;
+        case 'auto':
+            handleThemeChange({ matches: mediaQueryList.matches });
+            break;
+    }
+    updateBodyClass();
+    PWAColor();
+    store.updatePreference('theme', value);
+    proxy.$trackEvent('Nav', 'PreferenceClick', 'Theme');
+};
 
 
-        // 偏好设置里的一些配置项
-        prefTheme(value) {
-            switch (value) {
-                case 'light':
-                    this.store.setDarkMode(false);
-                    break;
-                case 'dark':
-                    this.store.setDarkMode(true);
-                    break;
-                case 'auto':
-                    this.handleThemeChange({ matches: this.mediaQueryList.matches });
-                    break;
-            }
-            this.updateBodyClass();
-            this.PWAColor();
-            this.store.updatePreference('theme', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'Theme');
-        },
 
-        prefConnectivityRefresh(value) {
-            this.store.updatePreference('connectivityAutoRefresh', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
-        },
+const prefConnectivityRefresh = (value) => {
+    store.updatePreference('connectivityAutoRefresh', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
+};
 
-        prefShowMap(value) {
-            this.store.updatePreference('showMap', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
-        },
+const prefShowMap = (value) => {
+    store.updatePreference('showMap', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
+};
 
-        prefSimpleMode(value) {
-            this.store.updatePreference('simpleMode', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
-        },
+const prefSimpleMode = (value) => {
+    store.updatePreference('simpleMode', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
+};
 
-        prefAutoStart(value) {
-            this.store.updatePreference('autoStart', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
-        },
+const prefAutoStart = (value) => {
+    store.updatePreference('autoStart', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
+};
 
-        prefconnectivityShowNoti(value) {
-            this.store.updatePreference('popupConnectivityNotifications', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
-        },
+const prefconnectivityShowNoti = (value) => {
+    store.updatePreference('popupConnectivityNotifications', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
+};
 
-        prefipCards(value) {
-            this.store.updatePreference('ipCardsToShow', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
-        },
+const prefipCards = (value) => {
+    store.updatePreference('ipCardsToShow', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
+};
 
-        prefipGeoSource(value) {
-            this.store.updatePreference('ipGeoSource', value);
-            this.$trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
-            this.$trackEvent('IPCheck', 'SelectSource', this.ipDBs.find(x => x.id === value).text);
-        },
+const prefipGeoSource = (value) => {
+    store.updatePreference('ipGeoSource', value);
+    proxy.$trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
+    proxy.$trackEvent('IPCheck', 'SelectSource', ipDBs.value.find(x => x.id === value).text);
+};
 
-        toggleMaps() {
-            this.store.updatePreference('showMap', !this.userPreferences.showMap);
-            this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
-        },
+const toggleMaps = () => {
+    store.updatePreference('showMap', !userPreferences.value.showMap);
+    proxy.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
+};
 
-        updateIPDBs() {
-            // 如果 this.configs 是对象且里面存在任意键值对
-            if (this.configs && Object.keys(this.configs).length > 0) {
+onMounted(() => {
+    mediaQueryList.addEventListener('change', handleThemeChange);
+    handleThemeChange({ matches: mediaQueryList.matches });
+    setTimeout(updateIPDBs, 4000);
+});
 
-                this.store.updateIPDBs({ id: 0, enabled: this.configs.ipChecking });
-                this.store.updateIPDBs({ id: 1, enabled: this.configs.ipInfo });
-                this.store.updateIPDBs({ id: 4, enabled: this.configs.keyCDN });
-                this.store.updateIPDBs({ id: 6, enabled: this.configs.ipapiis });
-            }
-        },
+onUnmounted(() => {
+    mediaQueryList.removeEventListener('change', handleThemeChange);
+});
 
-        // 更新 body class
-        updateBodyClass() {
-            if (this.isDarkMode) {
-                document.body.classList.add("body-dark-mode");
-            } else {
-                document.body.classList.remove("body-dark-mode");
-            }
-        },
-
-        // 更新 PWA 颜色
-        PWAColor() {
-            if (this.isDarkMode) {
-                document
-                    .querySelector('meta[name="theme-color"]')
-                    .setAttribute("content", "#171a1d");
-                document
-                    .querySelector('meta[name="background-color"]')
-                    .setAttribute("content", "#212529");
-            } else {
-                document
-                    .querySelector('meta[name="theme-color"]')
-                    .setAttribute("content", "#f8f9fa");
-                document
-                    .querySelector('meta[name="background-color"]')
-                    .setAttribute("content", "#ffffff");
-            }
-        },
-
-    },
-    created() {
-        this.mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
-        this.mediaQueryList.addListener(this.handleThemeChange);
-        this.handleThemeChange({ matches: this.mediaQueryList.matches });
-    },
-    mounted() {
-        setTimeout(() => {
-            this.updateIPDBs();
-        }, 4000);
-    },
-    beforeDestroy() {
-        if (this.mediaQueryList) {
-            this.mediaQueryList.removeListener(this.handleThemeChange);
-        }
-    },
-}
+defineExpose({
+    toggleMaps,
+});
 </script>
 
 <style scoped>

@@ -3,87 +3,62 @@
         manifest-url="/manifest.webmanifest"></pwa-install>
 </template>
 
-<script>
-import { computed } from 'vue';
-import { useMainStore } from '@/store';
+<script setup>
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import '@khmyznikov/pwa-install';
-import { detectBrowser , detectOS } from '@/utils/system-detect.js';
-export default {
-    name: 'PWA',
-    
-    // 引入 Store
-    setup() {
-        const store = useMainStore();
-        const isDarkMode = computed(() => store.isDarkMode);
-        const isMobile = computed(() => store.isMobile);
+import { detectBrowser, detectOS } from '@/utils/system-detect.js';
 
-        return {
-            isDarkMode,
-            isMobile,
-        };
-    },
 
-    data() {
-        return {
-            isDesktopChrome: true,
-            isAndroidChrome: false,
-            isMacSafari: false,
-            isIosSafari: false,
-            isOtherBrowser: false,
-        }
-    },
-    methods: {
-        showPWA() {
-            const pwaInstall = document.getElementsByTagName('pwa-install')[0];
+const { proxy } = getCurrentInstance();
 
-            if (this.isIosSafari) {
-                pwaInstall.isAppleMobilePlatform = true;
-                pwaInstall.isAppleDesktopPlatform = false;
-            } else if (this.isMacSafari) {
-                pwaInstall.isAppleMobilePlatform = false;
-                pwaInstall.isAppleDesktopPlatform = true;
-            } else {
-                pwaInstall.isAppleMobilePlatform = false;
-                pwaInstall.isAppleDesktopPlatform = false;
-            }
+// 定义数据
+const isDesktopChrome = ref(true);
+const isAndroidChrome = ref(false);
+const isMacSafari = ref(false);
+const isIosSafari = ref(false);
+const isOtherBrowser = ref(false);
 
-            if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
-                pwaInstall.showDialog(true);
-                this.$trackEvent('PWA', 'PWAPopup', 'Show');
-                pwaInstall.addEventListener('pwa-install-success-event', (event) => {
-                    if (event.detail.message.includes('success')) {
-                        this.$trackEvent('PWA', 'PWAInstalled', 'Success');
-                    }
-                });
-            }
-        },
-        detectBrowser() {
-            const os = detectOS();
-            const browser = detectBrowser();
+// 定义方法
+const getBrowser = () => {
+    const os = detectOS();
+    const browser = detectBrowser();
 
-            const isAndroidChrome = browser.isChrome && os.isAndroid;
-            const isDesktopChrome = browser.isChrome && !os.isAndroid && !os.isIOS;
-            const isMacSafari = os.isMac && browser.isSafari && !browser.isChrome;
-            const isIosSafari = os.isIOS;
+    const androidChrome = browser.isChrome && os.isAndroid;
+    const desktopChrome = browser.isChrome && !os.isAndroid && !os.isIOS;
+    const macSafari = os.isMac && browser.isSafari && !browser.isChrome;
+    const iosSafari = os.isIOS;
 
-            if (!isAndroidChrome && !isDesktopChrome && !isMacSafari && !isIosSafari) {
-                this.isOtherBrowser = true;
-            }
-
-            this.isAndroidChrome = isAndroidChrome;
-            this.isDesktopChrome = isDesktopChrome;
-            this.isMacSafari = isMacSafari;
-            this.isIosSafari = isIosSafari;
-        },
-
-    },
-    mounted() {
-        this.detectBrowser();
-        setTimeout(() => {
-            this.showPWA();
-        }, 10000);
-    },
+    isAndroidChrome.value = androidChrome;
+    isDesktopChrome.value = desktopChrome;
+    isMacSafari.value = macSafari;
+    isIosSafari.value = iosSafari;
+    isOtherBrowser.value = !(androidChrome || desktopChrome || macSafari || iosSafari);
 }
+
+const showPWA = () => {
+    const pwaInstall = document.getElementsByTagName('pwa-install')[0];
+    if (!pwaInstall) return;
+
+    pwaInstall.isAppleMobilePlatform = isIosSafari.value;
+    pwaInstall.isAppleDesktopPlatform = isMacSafari.value;
+
+    if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
+        pwaInstall.showDialog(true);
+        proxy.$trackEvent('PWA', 'PWAPopup', 'Show');
+        pwaInstall.addEventListener('pwa-install-success-event', event => {
+            if (event.detail.message.includes('success')) {
+                proxy.$trackEvent('PWA', 'PWAInstalled', 'Success');
+            }
+        });
+    }
+};
+
+onMounted(() => {
+    getBrowser();
+    setTimeout(() => {
+        showPWA();
+    }, 10000);
+});
 </script>
 
 <style scoped></style>

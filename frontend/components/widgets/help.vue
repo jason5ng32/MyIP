@@ -46,53 +46,40 @@
     </div>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup>
+import { computed, ref } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 
-export default {
-    name: 'HelpModal',
+const store = useMainStore();
+const isDarkMode = computed(() => store.isDarkMode);
 
-    // 引入 Store
-    setup() {
-        const store = useMainStore();
-        const isDarkMode = computed(() => store.isDarkMode);
-        const isMobile = computed(() => store.isMobile);
+// 快捷键映射
+const keyMap = ref([]);
 
-        return {
-            isDarkMode,
-            isMobile
-        };
-    },
+// 打开快捷键模态框
+const openModal = () => {
+    const modalElement = document.getElementById('helpModal');
+    const modalInstance = Modal.getOrCreateInstance(modalElement);
+    if (modalInstance) {
+        modalInstance.show();
+    }
+};
 
-    data() {
-        return {
-            keyMap: [],
-        }
-    },
+// 把快捷键映射分成两列
+const splitKeyMap = computed(() => {
+    const half = Math.ceil(keyMap.value.length / 2);
+    return {
+        left: keyMap.value.slice(0, half),
+        right: keyMap.value.slice(half),
+    };
+});
 
-    methods: {
-        // 打开 Modal
-        openModal() {
-            const modalElement = document.getElementById('helpModal');
-            const modalInstance = Modal.getOrCreateInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.show();
-            }
-        },
-    },
-    computed: {
-        // 拆分 keyMap 为两个数组
-        splitKeyMap() {
-            const half = Math.ceil(this.keyMap.length / 2);
-            return {
-                left: this.keyMap.slice(0, half),
-                right: this.keyMap.slice(half),
-            };
-        }
-    },
-}
+// 暴露给模板的数据
+defineExpose({
+    keyMap,
+    openModal,
+});
 </script>
 
 <style scoped></style>

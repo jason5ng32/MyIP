@@ -41,7 +41,7 @@
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
                                         $t('ipInfos.City')
-                                    }}</span>&nbsp;:&nbsp;
+                                        }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
@@ -113,140 +113,110 @@
     </div>
 </template>
 
-<script>
-import { ref, computed, watch } from 'vue';
+<script setup>
+import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 
-export default {
-    name: 'QueryIP',
+// 引入 Store
+const store = useMainStore();
+const isDarkMode = computed(() => store.isDarkMode);
+const isMobile = computed(() => store.isMobile);
+const configs = computed(() => store.configs);
+const userPreferences = computed(() => store.userPreferences);
+const lang = computed(() => store.lang);
+const inputIP = ref('');
+const modalQueryResult = ref(null);
+const modalQueryError = ref("");
+const isChecking = ref("idle");
+const ipGeoSource = computed(() => userPreferences.value.ipGeoSource);
 
-    // 引入 Store
-    setup() {
-        const store = useMainStore();
-        const isDarkMode = computed(() => store.isDarkMode);
-        const isMobile = computed(() => store.isMobile);
-        const configs = computed(() => store.configs);
-        const userPreferences = computed(() => store.userPreferences);
-        const lang = computed(() => store.lang);
+// 用于全局事件的代理
+const { proxy } = getCurrentInstance();
 
-        return {
-            store,
-            isDarkMode,
-            isMobile,
-            userPreferences,
-            configs,
-            lang,
-        };
-    },
+// 实时变化查询源
+watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
+    ipGeoSource.value = newVal;
+}, { deep: true });
 
-    data() {
-        return {
-            inputIP: '',
-            modalQueryResult: null,
-            modalQueryError: "",
-            isChecking: "idle",
-            ipGeoSource: this.userPreferences.ipGeoSource,
-        }
-    },
+// 查询 IP 信息
+const submitQuery = async () => {
+    if (isValidIP(inputIP.value)) {
+        modalQueryError.value = "";
+        modalQueryResult.value = null;
+        isChecking.value = "running";
+        await fetchIPForModal(inputIP.value);
+    } else {
+        modalQueryError.value = proxy.$t('ipcheck.Error');
+        modalQueryResult.value = null;
+        isChecking.value = "idle";
+    }
+};
 
-    methods: {
+// 打开查询 IP 的模态框
+const openQueryIP = () => {
+    proxy.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
+    openModal();
+};
 
-        isValidIP,
-        // 查询 IP 信息
-        async submitQuery() {
-            // 首先检查输入的 IP 是否有效
-            if (this.isValidIP(this.inputIP)) {
-                this.modalQueryError = "";
-                this.modalQueryResult = null;
-                this.isChecking = "running";
-                await this.fetchIPForModal(this.inputIP);
-            } else {
-                // 如果 IP 无效，设置错误信息
-                this.modalQueryError = this.$t('ipcheck.Error');
-                this.modalQueryResult = null;
-                this.isChecking = "idle";
-            }
-        },
+// 打开 Modal
+const openModal = () => {
+    const modalElement = document.getElementById('IPCheck');
+    const modalInstance = Modal.getOrCreateInstance(modalElement);
+    if (modalInstance) {
+        modalInstance.show();
+        setupModalFocus();
+    }
+};
 
-        // 打开查询 IP 的模态框
-        openQueryIP() {
-            this.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
-            this.openModal();
-        },
-
-        // 打开 Modal
-        openModal() {
-            const modalElement = document.getElementById('IPCheck');
-            const modalInstance = Modal.getOrCreateInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.show();
-                this.setupModalFocus();
-            }
-        },
-
-        // 设置 Modal 的聚焦
-        setupModalFocus() {
-            const modals = document.querySelectorAll(".modal");
-            modals.forEach((modal) => {
-                modal.addEventListener("shown.bs.modal", () => {
-                    this.$nextTick(() => {
-                        const inputElement = modal.querySelector(".form-control");
-                        if (inputElement) {
-                            inputElement.focus();
-                        }
-                    });
-                });
+// 设置 Modal 的聚焦
+const setupModalFocus = () => {
+    const modals = document.querySelectorAll(".modal");
+    modals.forEach((modal) => {
+        modal.addEventListener("shown.bs.modal", () => {
+            nextTick(() => {
+                const inputElement = modal.querySelector(".form-control");
+                if (inputElement) {
+                    inputElement.focus();
+                }
             });
-        },
+        });
+    });
+};
 
-        // 获取 IP 信息
-        async fetchIPForModal(ip, sourceID = null) {
+// 获取 IP 信息
+const fetchIPForModal = async (ip, sourceID = null) => {
+    let selectedLang = lang.value === 'zh' ? 'zh-CN' : lang.value;
+    sourceID = ipGeoSource.value;
+    const sources = store.ipDBs;
 
-            let lang = this.lang;
-            if (lang === 'zh') {
-                lang = 'zh-CN';
-            };
-
-            sourceID = this.ipGeoSource;
-            const sources = this.store.ipDBs;
-
-            // 根据指定的源获取数据
-            for (const source of sources) {
-                if (sourceID && source.id !== sourceID) {
-                    continue;
-                }
-                try {
-                    const url = this.store.getDbUrl(source.id, ip, lang);
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    if (data.error) {
-                        throw new Error(data.reason || "IP lookup failed");
-                    }
-                    // 使用对应的转换函数更新 modalQueryResult
-                    this.modalQueryResult = transformDataFromIPapi(data, source.id, this);
-                    this.isChecking = "idle";
-                    break;
-                } catch (error) {
-                    console.error("Error fetching IP details:", error);
-                }
+    for (const source of sources) {
+        if (sourceID && source.id !== sourceID) continue;
+        try {
+            const url = store.getDbUrl(source.id, ip, selectedLang);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        },
-    },
-    watch: {
-        'userPreferences.ipGeoSource': {
-            handler(newVal, oldVal) {
-                this.ipGeoSource = newVal;
-            },
-            deep: true,
-        },
-    },
-}
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.reason || "IP lookup failed");
+            }
+            modalQueryResult.value = transformDataFromIPapi(data, source.id, proxy);
+            isChecking.value = "idle";
+            break;
+        } catch (error) {
+            console.error("Error fetching IP details:", error);
+        }
+    }
+};
+
+defineExpose({
+    openModal,
+});
 </script>
+
 
 <style scoped></style>
