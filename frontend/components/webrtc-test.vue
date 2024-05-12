@@ -61,6 +61,7 @@ export default {
       isDarkMode,
       isMobile,
       userPreferences,
+      store,
     };
   },
 

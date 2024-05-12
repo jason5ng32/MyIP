@@ -96,6 +96,7 @@ export default {
       isMobile,
       configs,
       userPreferences,
+      store,
     };
   },
 

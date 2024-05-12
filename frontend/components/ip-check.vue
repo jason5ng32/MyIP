@@ -782,7 +782,7 @@ export default {
       });
     },
 
-    // 将 ipDataCards 中的数据写入到 vuex 的 Global_ipDataCards 中
+    // 将 ipDataCards 中的数据写入到 store 中
     updateGlobalIPDataCards() {
       setTimeout(() => {
         this.store.updateGlobalIpDataCards(this.ipDataCards);

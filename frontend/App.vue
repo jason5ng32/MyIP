@@ -68,18 +68,14 @@ export default {
     const configs = computed(() => store.configs);
     const userPreferences = computed(() => store.userPreferences);
     const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
-    const shouldRefresh = ref(false);
-
-    watch(shouldRefreshEveryThing, (newVal) => {
-      shouldRefresh.value = newVal;
-    });
 
     return {
+      store,
       isDarkMode,
       isMobile,
-      shouldRefresh,
       configs,
       userPreferences,
+      shouldRefreshEveryThing,
     };
   },
 
@@ -114,7 +110,7 @@ export default {
   },
 
   watch: {
-    shouldRefresh(newVal) {
+    shouldRefreshEveryThing(newVal) {
       if (newVal) {
         this.$refs.navBarRef.loaded = false;
         this.isInfosLoaded = false;
@@ -185,7 +181,7 @@ export default {
       ];
       this.scheduleTimedTasks(refreshTasks);
       this.infoMaskLevel = 0;
-      this.store.setRefreshEverything(false);
+      this.store.setRefreshEveryThing(false);
     },
 
     // 刷新完成后显示 Toast
