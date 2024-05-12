@@ -1,19 +1,4 @@
 <template>
-  <!-- Alerts -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
-    <div id="toast" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast" aria-live="assertive"
-      aria-atomic="true">
-      <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
-        <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-          data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        {{ alertMessage }}
-      </div>
-    </div>
-  </div>
-
   <div>
     <!-- Connectivity -->
     <div class="availability-test-section mb-4">
@@ -80,6 +65,7 @@ export default {
       isDarkMode,
       isMobile,
       userPreferences,
+      store,
     };
   },
 
@@ -254,7 +240,7 @@ export default {
 
       if ((isAlertToShow || !this.isStarted) && this.autoShowAltert) {
         setTimeout(() => {
-          this.showToast();
+          this.store.setAlert(this.alertToShow, this.alertStyle,this.alertMessage, this.alertTitle);
         }, 4000);
       }
 
@@ -273,21 +259,6 @@ export default {
         this.alertMessage = this.$t('alert.OhNo_Message');
         this.alertTitle = this.$t('alert.OhNo');
       }
-    },
-
-    // 通知气泡
-    showToast(duration = 2000) {
-      this.$nextTick(() => {
-        const toastEl = this.$refs.toast;
-        if (toastEl) {
-          const toast = new Toast(toastEl, {
-            delay: duration
-          });
-          toast.show();
-        } else {
-          console.error("Toast element not found");
-        }
-      });
     },
 
     handelCheckStart() {

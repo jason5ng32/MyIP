@@ -1,19 +1,7 @@
 <template>
   <NavBar ref="navBarRef" />
   <Preferences ref="preferencesRef" />
-  <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
-    <div id="toastInfoMask" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toast"
-      aria-live="assertive" aria-atomic="true">
-      <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
-        <strong class="me-auto" :class="alertStyle">{{ alertTitle }}</strong>
-        <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-          data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        {{ alertMessage }}
-      </div>
-    </div>
-  </div>
+  <Alert />
   <div id="mainpart" class="container mt-5 jn-container">
     <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
       data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
@@ -33,27 +21,36 @@
         <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
       </button>
     </div>
+
   </div>
   <Footer ref="footerRef" />
   <PWA />
 </template>
 
 <script>
-import NavBar from './components/nav.vue'
-import IPCheck from './components/ip-check.vue'
-import Connectivity from './components/connectivity-test.vue'
-import WebRTC from './components/webrtc-test.vue'
-import DNSLeaks from './components/dns-leaks-test.vue'
-import SpeedTest from './components/speed-test.vue'
-import Footer from './components/footer.vue'
-import QueryIP from './components/query-ip.vue'
-import HelpModal from './components/help.vue'
-import PWA from './components/pwa.vue'
-import AdvancedTools from './components/advanced.vue'
-import Preferences from './components/preferences.vue';
-import { mappingKeys, keyMap, ShortcutKeys } from "./utils/shortcut.js";
-import {maskedInfo } from "./utils/masked-info.js";
 
+// Components
+import NavBar from './components/nav.vue';
+import IPCheck from './components/ip-check.vue';
+import Connectivity from './components/connectivity-test.vue';
+import WebRTC from './components/webrtc-test.vue';
+import DNSLeaks from './components/dns-leaks-test.vue';
+import SpeedTest from './components/speed-test.vue';
+import AdvancedTools from './components/advanced.vue';
+import Footer from './components/footer.vue';
+
+// Utils
+import { mappingKeys, keyMap, ShortcutKeys } from "@/utils/shortcut.js";
+import {maskedInfo } from "@/utils/masked-info.js";
+
+// Widgets
+import Preferences from './components/widgets/preferences.vue';
+import QueryIP from './components/widgets/query-ip.vue';
+import HelpModal from './components/widgets/help.vue';
+import PWA from './components/widgets/pwa.vue';
+import Alert from './components/widgets/alert.vue';
+
+// Vue
 import { ref, watch, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal, Toast, Offcanvas } from 'bootstrap';
@@ -92,6 +89,7 @@ export default {
     PWA,
     AdvancedTools,
     Preferences,
+    Alert,
   },
   name: 'App',
   data() {
@@ -137,20 +135,6 @@ export default {
       }
     },
 
-    // 显示 Toast
-    showToast(duration = 2000) {
-      this.$nextTick(() => {
-        const toastEl = this.$refs.toast;
-        if (toastEl) {
-          const toastInfoMask = new Toast(toastEl, {
-            delay: duration
-          });
-          toastInfoMask.show();
-        } else {
-          console.error("Toast element not found");
-        }
-      });
-    },
     // 延迟设置 isInfosLoaded
     setInfosLoaded() {
       setTimeout(() => {
@@ -190,7 +174,7 @@ export default {
       this.alertMessage = this.$t('alert.refreshEverythingMessage');
       this.alertTitle = this.$t('alert.refreshEverythingTitle');
       this.alertToShow = true;
-      this.showToast();
+      this.store.setAlert(this.alertToShow, this.alertStyle,this.alertMessage, this.alertTitle);
     },
 
     // 信息遮罩
@@ -218,7 +202,7 @@ export default {
         this.alertTitle = this.$t('alert.unmaskedInfoTitle');
         this.alertToShow = true;
       }
-      this.showToast();
+      this.store.setAlert(this.alertToShow, this.alertStyle,this.alertMessage, this.alertTitle);
     },
 
     // 信息遮罩内容

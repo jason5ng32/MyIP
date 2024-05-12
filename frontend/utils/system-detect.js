@@ -14,11 +14,11 @@ const detectBrowser = () => {
 const detectOS = () => {
     const platform = window.navigator.platform;
     const userAgent = window.navigator.userAgent;
-    const isMac = platform.startsWith('Mac');
-    const isWindows = platform.startsWith('Win');
+    const isMac = platform.includes('Mac') || userAgent.includes('Mac' || 'Macintosh' || 'MacIntel' || 'MacPPC' || 'Mac68K');
+    const isWindows = platform.startsWith('Win') || userAgent.includes('Windows' || 'Win64' || 'Win32');
     const isLinux = platform.includes('Linux') && !userAgent.includes('Android');
     const isAndroid = userAgent.includes('Android');
-    const isIOS = /iPhone|iPad|iPod/.test(platform);
+    const isIOS = /iPhone|iPod|iOS/.test(platform) || userAgent.includes('iPhone' || 'iPod' || 'iOS');
 
     return { isMac, isWindows, isLinux, isAndroid, isIOS };
 };

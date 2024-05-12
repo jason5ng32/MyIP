@@ -7,16 +7,15 @@
 import { computed } from 'vue';
 import { useMainStore } from '@/store';
 import '@khmyznikov/pwa-install';
-
+import { detectBrowser , detectOS } from '@/utils/system-detect.js';
 export default {
     name: 'PWA',
-
+    
     // 引入 Store
     setup() {
         const store = useMainStore();
         const isDarkMode = computed(() => store.isDarkMode);
         const isMobile = computed(() => store.isMobile);
-
 
         return {
             isDarkMode,
@@ -31,7 +30,6 @@ export default {
             isMacSafari: false,
             isIosSafari: false,
             isOtherBrowser: false,
-            isInstalled: true,
         }
     },
     methods: {
@@ -60,12 +58,13 @@ export default {
             }
         },
         detectBrowser() {
-            const userAgent = navigator.userAgent;
+            const os = detectOS();
+            const browser = detectBrowser();
 
-            const isAndroidChrome = /Chrome/.test(userAgent) && /Android/.test(userAgent);
-            const isDesktopChrome = /Chrome/.test(userAgent) && !/(iPhone|iPad|iPod|Android)/.test(userAgent);
-            const isMacSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent) && navigator.platform.includes('Mac');
-            const isIosSafari = /(iPhone|iPad)/.test(userAgent);
+            const isAndroidChrome = browser.isChrome && os.isAndroid;
+            const isDesktopChrome = browser.isChrome && !os.isAndroid && !os.isIOS;
+            const isMacSafari = os.isMac && browser.isSafari && !browser.isChrome;
+            const isIosSafari = os.isIOS;
 
             if (!isAndroidChrome && !isDesktopChrome && !isMacSafari && !isIosSafari) {
                 this.isOtherBrowser = true;

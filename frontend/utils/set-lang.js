@@ -15,18 +15,23 @@ function updateMeta() {
     }
 }
 
-// 设置语言的函数
-function setLanguageFromURL() {
+// 设置语言的函数，Fallback 顺序：URL 参数 hl -> 浏览器语言 -> 默认语言
+function setLanguage() {
     const searchParams = new URLSearchParams(window.location.search);
     const browserLanguage = navigator.language || navigator.userLanguage;
     const hl = searchParams.get('hl');
     if (hl && ['en', 'zh', 'fr'].includes(hl)) {
         i18n.global.locale = hl;
     } else if (!hl) {
-        i18n.global.locale = browserLanguage.substring(0, 2);
+        const bl = browserLanguage.substring(0, 2);
+        if (['en', 'zh', 'fr'].includes(bl)) {
+            i18n.global.locale = bl;
+        } else {
+            i18n.global.locale = 'en';
+        }
     }
     updateMeta();
     return i18n.global.locale;
 }
 
-export { updateMeta, setLanguageFromURL };
+export { updateMeta, setLanguage };

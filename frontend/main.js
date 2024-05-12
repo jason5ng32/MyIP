@@ -8,7 +8,8 @@ import Analytics from 'analytics';
 import googleAnalytics from '@analytics/google-analytics';
 
 import { Tooltip } from 'bootstrap';
-import { setLanguageFromURL } from './utils/set-meta';
+import { setLanguage } from './utils/set-lang';
+import { detectOS } from './utils/system-detect';
 import './style.css'
 
 const app = createApp(App);
@@ -20,21 +21,26 @@ const store = useMainStore(pinia);
 app.use(i18n);
 app.use(router);
 
-// 窗口大小变化处理函数
-function handleResize() {
-    store.setIsMobile(window.innerWidth < 768);
-}
+//
+// 初始化一系列操作
+//
 
 // 在应用启动时设置语言
-app.config.globalProperties.$Lang = setLanguageFromURL();
+store.lang = setLanguage();
+
+// 检测操作系统
+const os = detectOS();
+
+// 窗口大小变化处理
+function handleResize() {
+    store.setIsMobile(window.innerWidth < 768 || os.isAndroid || os.isIOS );
+}
+handleResize();
 
 // 监听窗口大小变化
-handleResize();
 window.addEventListener('resize', handleResize);
 
-// 监听 URL 变化
-window.addEventListener('popstate', setLanguageFromURL);
-
+// Google Analytics 配置
 const analytics = Analytics({
     app: 'MyIP',
     plugins: [

@@ -128,12 +128,14 @@ export default {
         const isMobile = computed(() => store.isMobile);
         const configs = computed(() => store.configs);
         const userPreferences = computed(() => store.userPreferences);
+        const lang = computed(() => store.lang);
 
         return {
             isDarkMode,
             isMobile,
             userPreferences,
             configs,
+            lang,
         };
     },
 
@@ -232,7 +234,7 @@ export default {
         // 获取 IP 信息
         async fetchIPForModal(ip, sourceID = null) {
 
-            let lang = this.$Lang;
+            let lang = this.lang;
             if (lang === 'zh') {
                 lang = 'zh-CN';
             };

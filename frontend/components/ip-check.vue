@@ -205,6 +205,7 @@ export default {
     const configs = computed(() => store.configs);
     const userPreferences = computed(() => store.userPreferences);
     const sources = computed(() => store.ipDBs);
+    const lang = computed(() => store.lang);
 
     return {
       isDarkMode,
@@ -213,6 +214,7 @@ export default {
       userPreferences,
       sources,
       store,
+      lang,
     };
   },
 
@@ -290,7 +292,7 @@ export default {
       ipCardsToShow: this.userPreferences.ipCardsToShow,
       ipDataCache: new Map(),
       copiedStatus: {},
-      bingMapLanguage: this.$Lang,
+      bingMapLanguage: this.lang,
       IPArray: [],
       ipGeoSource: this.userPreferences.ipGeoSource,
       usingSource: this.userPreferences.ipGeoSource,
@@ -522,7 +524,7 @@ export default {
       sourceID = sourceID || this.ipGeoSource;
       const card = this.ipDataCards[cardIndex];
       card.ip = ip;
-      let lang = this.$Lang;
+      let lang = this.lang;
       if (lang === 'zh') {
         lang = 'zh-CN';
       }

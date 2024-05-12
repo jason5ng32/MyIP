@@ -4,12 +4,19 @@ import { defineStore } from 'pinia';
 export const useMainStore = defineStore('main', {
 
   state: () => ({
+    lang: 'en',
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
     Global_ipDataCards: [],
     configs: {},
     userPreferences: {},
+    alert: {
+      alertToShow: false,
+      alertStyle: "",
+      alertMessage: "",
+      alertTitle: "",
+    },
     ipDBs: [
       { id: 0, text: 'IPCheck.ing', enabled: true },
       { id: 1, text: 'IPinfo.io', enabled: true },
@@ -23,6 +30,9 @@ export const useMainStore = defineStore('main', {
   }),
 
   actions: {
+    setAlert(alertToShow, alertStyle, alertMessage, alertTitle ) {
+      this.alert = { alertToShow, alertStyle, alertMessage, alertTitle };
+    },
     updateGlobalIpDataCards(payload) {
       const uniqueIPs = new Set([...this.Global_ipDataCards, ...payload]);
       this.Global_ipDataCards = Array.from(uniqueIPs);
@@ -68,7 +78,6 @@ export const useMainStore = defineStore('main', {
         ipCardsToShow: 6,
         ipGeoSource: 0,
       };
-      console.log('loading preferences');
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;
 
