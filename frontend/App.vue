@@ -51,23 +51,23 @@ import HelpModal from './components/help.vue'
 import PWA from './components/pwa.vue'
 import AdvancedTools from './components/advanced.vue'
 import Preferences from './components/preferences.vue';
-import { mappingKeys, navigateCards, keyMap, ShortcutKeys } from "./utils/shortcut.js";
+import { mappingKeys, keyMap, ShortcutKeys } from "./utils/shortcut.js";
 import {maskedInfo } from "./utils/masked-info.js";
 
-import { ref, computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { ref, watch, computed } from 'vue';
+import { useMainStore } from '@/store';
 import { Modal, Toast, Offcanvas } from 'bootstrap';
 
 export default {
 
   // 引入 Store
   setup() {
-    const store = useStore();
-    const isDarkMode = computed(() => store.state.isDarkMode);
-    const isMobile = computed(() => store.state.isMobile);
-    const configs = computed(() => store.state.configs);
-    const userPreferences = computed(() => store.state.userPreferences);
-    const shouldRefreshEveryThing = computed(() => store.state.shouldRefreshEveryThing);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
+    const configs = computed(() => store.configs);
+    const userPreferences = computed(() => store.userPreferences);
+    const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
     const shouldRefresh = ref(false);
 
     watch(shouldRefreshEveryThing, (newVal) => {
@@ -141,10 +141,6 @@ export default {
       }
     },
 
-    // 设置 isMobile
-    handleResize() {
-      this.$store.commit('setIsMobile', window.innerWidth < 768);
-    },
     // 显示 Toast
     showToast(duration = 2000) {
       this.$nextTick(() => {
@@ -189,7 +185,7 @@ export default {
       ];
       this.scheduleTimedTasks(refreshTasks);
       this.infoMaskLevel = 0;
-      this.$store.commit('setRefreshEveryThing', false);
+      this.store.setRefreshEverything(false);
     },
 
     // 刷新完成后显示 Toast

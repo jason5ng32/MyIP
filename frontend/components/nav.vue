@@ -77,7 +77,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import { Offcanvas } from 'bootstrap';
 
 export default {
@@ -85,11 +85,11 @@ export default {
 
   // 引入 Store
   setup() {
-    const store = useStore();
-    const isDarkMode = computed(() => store.state.isDarkMode);
-    const isMobile = computed(() => store.state.isMobile);
-    const configs = computed(() => store.state.configs);
-    const userPreferences = computed(() => store.state.userPreferences);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
+    const configs = computed(() => store.configs);
+    const userPreferences = computed(() => store.userPreferences);
 
     return {
       isDarkMode,
@@ -161,7 +161,7 @@ export default {
     // 点击 Logo 事件处理
     handleLogoClick() {
       if (window.scrollY === 0) {
-        this.$store.commit('setRefreshEveryThing', true);
+        this.store.setRefreshEveryThing(true);
       }
       this.$trackEvent('Nav', 'NavClick', 'Logo');
     },

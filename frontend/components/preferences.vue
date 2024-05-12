@@ -5,7 +5,8 @@
         aria-labelledby="offcanvasPreferencesLabel">
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
-                $t('nav.preferences.title') }}</h5>
+                $t('nav.preferences.title') }}
+                </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body pt-0 m-2">
@@ -181,19 +182,19 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 
 export default {
     name: 'Preferences',
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
-        const configs = computed(() => store.state.configs);
-        const userPreferences = computed(() => store.state.userPreferences);
-        const ipDBs = computed(() => store.state.ipDBs);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
+    const configs = computed(() => store.configs);
+    const userPreferences = computed(() => store.userPreferences);
+    const ipDBs = computed(() => store.ipDBs);
 
         return {
             isDarkMode,
@@ -201,6 +202,7 @@ export default {
             configs,
             userPreferences,
             ipDBs,
+            store,
         };
     },
 
@@ -211,21 +213,16 @@ export default {
     },
     methods: {
 
-        // 保存偏好设置到 Vuex
-        setUserPreferences(key, value) {
-            this.$store.commit('UPDATE_PREFERENCE', { key, value });
-        },
-
         // 主题模式切换
         handleThemeChange(event) {
             this.prefersDarkMode = event.matches;
             if (this.userPreferences.theme === 'auto') {
-                this.$store.commit('SET_DARK_MODE', this.prefersDarkMode);
+                this.store.setDarkMode(this.prefersDarkMode);
             } else if (this.userPreferences.theme === 'light') {
-                this.$store.commit('SET_DARK_MODE', false);
+                this.store.setDarkMode(false);
             } else if (this.userPreferences.theme === 'dark') {
-                this.$store.commit('SET_DARK_MODE', true);
-            }
+                this.store.setDarkMode(true);
+            } 
             this.updateBodyClass();
             this.PWAColor();
         },
@@ -235,10 +232,10 @@ export default {
         prefTheme(value) {
             switch (value) {
                 case 'light':
-                    this.$store.commit('SET_DARK_MODE', false);
+                    this.store.setDarkMode(false);
                     break;
                 case 'dark':
-                    this.$store.commit('SET_DARK_MODE', true);
+                    this.store.setDarkMode(true);
                     break;
                 case 'auto':
                     this.handleThemeChange({ matches: this.mediaQueryList.matches });
@@ -246,58 +243,59 @@ export default {
             }
             this.updateBodyClass();
             this.PWAColor();
-            this.setUserPreferences('theme', value);
+            this.store.updatePreference('theme', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'Theme');
         },
 
         prefConnectivityRefresh(value) {
-            this.setUserPreferences('connectivityAutoRefresh', value);
+            this.store.updatePreference('connectivityAutoRefresh', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
         },
 
         prefShowMap(value) {
-            this.setUserPreferences('showMap', value);
+            this.store.updatePreference('showMap', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
         },
 
         prefSimpleMode(value) {
-            this.setUserPreferences('simpleMode', value);
+            this.store.updatePreference('simpleMode', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
         },
 
         prefAutoStart(value) {
-            this.setUserPreferences('autoStart', value);
+            this.store.updatePreference('autoStart', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
         },
 
         prefconnectivityShowNoti(value) {
-            this.setUserPreferences('popupConnectivityNotifications', value);
+            this.store.updatePreference('popupConnectivityNotifications', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
         },
 
         prefipCards(value) {
-            this.setUserPreferences('ipCardsToShow', value);
+            this.store.updatePreference('ipCardsToShow', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
         },
 
         prefipGeoSource(value) {
-            this.setUserPreferences('ipGeoSource', value);
+            this.store.updatePreference('ipGeoSource', value);
             this.$trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
             this.$trackEvent('IPCheck', 'SelectSource', this.ipDBs.find(x => x.id === value).text);
         },
 
         toggleMaps() {
-            this.setUserPreferences('showMap', !this.userPreferences.showMap);
+            this.store.updatePreference('showMap', !this.userPreferences.showMap);
             this.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
         },
 
         updateIPDBs() {
             // 如果 this.configs 是对象且里面存在任意键值对
             if (this.configs && Object.keys(this.configs).length > 0) {
-                this.$store.commit('UPDATE_IPDBS', { id: 0, enabled: this.configs.ipChecking });
-                this.$store.commit('UPDATE_IPDBS', { id: 1, enabled: this.configs.ipInfo });
-                this.$store.commit('UPDATE_IPDBS', { id: 4, enabled: this.configs.keyCDN });
-                this.$store.commit('UPDATE_IPDBS', { id: 6, enabled: this.configs.ipapiis });
+
+                this.store.updateIPDBs({ id: 0, enabled: this.configs.ipChecking });
+                this.store.updateIPDBs({ id: 1, enabled: this.configs.ipInfo });
+                this.store.updateIPDBs({ id: 4, enabled: this.configs.keyCDN });
+                this.store.updateIPDBs({ id: 6, enabled: this.configs.ipapiis });
             }
         },
 

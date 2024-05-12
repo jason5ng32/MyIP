@@ -55,7 +55,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import countryLookup from 'country-code-lookup';
 
 
@@ -64,13 +64,14 @@ export default {
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
+        const store = useMainStore();
+        const isDarkMode = computed(() => store.isDarkMode);
+        const isMobile = computed(() => store.isMobile);
 
         return {
             isDarkMode,
             isMobile,
+            store,
         };
     },
 
@@ -155,7 +156,7 @@ export default {
     watch: {
         IPArray: {
             handler() {
-                this.$store.commit('updateGlobalIpDataCards', this.IPArray);
+                this.store.updateGlobalIpDataCards(this.IPArray);
             },
             deep: true,
         },

@@ -52,7 +52,7 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import { Offcanvas } from 'bootstrap';
 
 export default {
@@ -60,10 +60,10 @@ export default {
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
-        const configs = computed(() => store.state.configs);
+        const store = useMainStore();
+        const isDarkMode = computed(() => store.isDarkMode);
+        const isMobile = computed(() => store.isMobile);
+        const configs = computed(() => store.configs);
 
 
         return {
@@ -176,7 +176,7 @@ export default {
 }
 
 .jn-h {
-    height: 80%;
+    height: 80% !important;
 }
 
 .jn-bold {

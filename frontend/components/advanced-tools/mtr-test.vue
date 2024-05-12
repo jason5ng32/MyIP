@@ -79,18 +79,18 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 
 export default {
   name: 'MTRtest',
 
   // 引入 Store
   setup() {
-    const store = useStore();
-    const isDarkMode = computed(() => store.state.isDarkMode);
-    const isMobile = computed(() => store.state.isMobile);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
     let allIPs = computed(() => {
-      const _allIPs = store.state.Global_ipDataCards;
+      const _allIPs = store.Global_ipDataCards;
       return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
     });
 

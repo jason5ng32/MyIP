@@ -192,19 +192,19 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 
 export default {
   name: 'IPCheck',
 
   // 引入 Store
   setup() {
-    const store = useStore();
-    const isDarkMode = computed(() => store.state.isDarkMode);
-    const isMobile = computed(() => store.state.isMobile);
-    const configs = computed(() => store.state.configs);
-    const userPreferences = computed(() => store.state.userPreferences);
-    const sources = computed(() => store.state.ipDBs);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
+    const configs = computed(() => store.configs);
+    const userPreferences = computed(() => store.userPreferences);
+    const sources = computed(() => store.ipDBs);
 
     return {
       isDarkMode,
@@ -212,6 +212,7 @@ export default {
       configs,
       userPreferences,
       sources,
+      store,
     };
   },
 
@@ -567,14 +568,14 @@ export default {
             if (cardData) {
               this.ipGeoSource = source.id;
               this.usingSource = source.id;
-              this.$store.commit('UPDATE_PREFERENCE', { key: 'ipGeoSource', value: source.id });
+              this.store.updatePreference('ipGeoSource', source.id);
               Object.assign(card, cardData);
               this.ipDataCache.set(ip, cardData);
               return;
             }
           } catch (error) {
             console.error("Error fetching IP details from source " + source.id + ":", error);
-            this.$store.commit('UPDATE_IPDBS', { id: source.id, enabled: false });
+            this.store.updateIPDBs({ id: source.id, enabled: false });
             currentSourceIndex = (currentSourceIndex + 1) % sources.length;
             attempts++;
           }
@@ -784,7 +785,7 @@ export default {
     // 将 ipDataCards 中的数据写入到 vuex 的 Global_ipDataCards 中
     updateGlobalIPDataCards() {
       setTimeout(() => {
-        this.$store.commit('updateGlobalIpDataCards', this.ipDataCards);
+        this.store.updateGlobalIpDataCards(this.ipDataCards);
       }, 5000);
     },
 
@@ -828,7 +829,7 @@ export default {
 
     IPArray: {
       handler() {
-        this.$store.commit('updateGlobalIpDataCards', this.IPArray);
+        this.store.updateGlobalIpDataCards(this.IPArray);
       },
       deep: true,
     },

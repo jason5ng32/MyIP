@@ -5,7 +5,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import '@khmyznikov/pwa-install';
 
 export default {
@@ -13,9 +13,9 @@ export default {
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
+        const store = useMainStore();
+        const isDarkMode = computed(() => store.isDarkMode);
+        const isMobile = computed(() => store.isMobile);
 
 
         return {
@@ -83,7 +83,7 @@ export default {
         setTimeout(() => {
             this.showPWA();
         }, 10000);
-    },   
+    },
 }
 </script>
 

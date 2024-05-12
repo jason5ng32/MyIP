@@ -78,15 +78,15 @@
 
 <script>
 import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 
 export default {
     name: 'DNSResolver',
 
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
+        const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
 
         return {
             isDarkMode,

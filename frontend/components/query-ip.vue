@@ -41,7 +41,7 @@
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
                                         $t('ipInfos.City')
-                                    }}</span>&nbsp;:&nbsp;
+                                        }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
@@ -115,7 +115,7 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 
 export default {
@@ -123,11 +123,11 @@ export default {
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
-        const userPreferences = computed(() => store.state.userPreferences);
-        const configs = computed(() => store.state.configs);
+        const store = useMainStore();
+        const isDarkMode = computed(() => store.isDarkMode);
+        const isMobile = computed(() => store.isMobile);
+        const configs = computed(() => store.configs);
+        const userPreferences = computed(() => store.userPreferences);
 
         return {
             isDarkMode,

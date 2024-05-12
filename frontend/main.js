@@ -1,29 +1,28 @@
 import { createApp } from 'vue'
-import i18n from './i18n';
-import { setLanguageFromURL } from './utils/set-meta';
-import './style.css'
+import { createPinia } from 'pinia';
+import { useMainStore } from './store';
 import App from './App.vue'
-import store from './store';
+import i18n from './i18n';
+import router from './router';
 import Analytics from 'analytics';
 import googleAnalytics from '@analytics/google-analytics';
+
 import { Tooltip } from 'bootstrap';
-import router from './router';
+import { setLanguageFromURL } from './utils/set-meta';
+import './style.css'
 
 const app = createApp(App);
+const pinia = createPinia();
 
-const analytics = Analytics({
-    app: 'MyIP',
-    plugins: [
-        googleAnalytics({
-            measurementIds: ['G-TEYKKD81TL'],
-        })
-    ]
-});
+app.use(pinia);
+const store = useMainStore(pinia); 
 
+app.use(i18n);
+app.use(router);
 
 // 窗口大小变化处理函数
 function handleResize() {
-    store.commit('setIsMobile', window.innerWidth < 768);
+    store.setIsMobile(window.innerWidth < 768);
 }
 
 // 在应用启动时设置语言
@@ -36,12 +35,17 @@ window.addEventListener('resize', handleResize);
 // 监听 URL 变化
 window.addEventListener('popstate', setLanguageFromURL);
 
+const analytics = Analytics({
+    app: 'MyIP',
+    plugins: [
+        googleAnalytics({
+            measurementIds: ['G-TEYKKD81TL'],
+        })
+    ]
+});
+
 // 启动 Google Analytics
 analytics.page();
-
-app.use(store);
-app.use(i18n);
-app.use(router);
 app.config.globalProperties.$analytics = analytics;
 
 app.config.globalProperties.$trackEvent = function (category, action, label) {
@@ -54,7 +58,7 @@ app.config.globalProperties.$trackEvent = function (category, action, label) {
 // 注册全局 Tooltip 指令
 app.directive('tooltip', {
     mounted(el, binding) {
-        const isMobile = store.state.isMobile
+        const isMobile = store.isMobile
         if (isMobile) {
             return
         }
@@ -82,8 +86,8 @@ app.directive('tooltip', {
 
 // 获取后端配置和用户偏好
 Promise.all([
-    store.dispatch('loadPreferences'), // 加载用户偏好设置
-    store.dispatch('fetchConfigs')     // 获取后端配置
+    store.loadPreferences(), // 加载用户偏好设置
+    store.fetchConfigs()      // 获取后端配置
 ]).then(() => {
     app.mount('#app');
 }).catch(error => {

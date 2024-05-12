@@ -48,7 +48,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 
 export default {
@@ -56,9 +56,9 @@ export default {
 
     // 引入 Store
     setup() {
-        const store = useStore();
-        const isDarkMode = computed(() => store.state.isDarkMode);
-        const isMobile = computed(() => store.state.isMobile);
+        const store = useMainStore();
+        const isDarkMode = computed(() => store.isDarkMode);
+        const isMobile = computed(() => store.isMobile);
 
         return {
             isDarkMode,

@@ -1,71 +1,62 @@
 // store.js
-import { createStore } from 'vuex';
+import { defineStore } from 'pinia';
 
-const store = createStore({
-  state() {
-    return {
-      // 开关
-      isDarkMode: false,
-      isMobile: false,
-      shouldRefreshEveryThing: false,
-      // 数据
-      Global_ipDataCards: [],
-      // 功能
-      configs: {},
-      userPreferences: {},
-      ipDBs: [
-        { id: 0, text: 'IPCheck.ing', enabled: true },
-        { id: 1, text: 'IPinfo.io', enabled: true },
-        { id: 2, text: 'IP-API.com', enabled: true },
-        { id: 3, text: 'IPAPI.co', enabled: true },
-        { id: 4, text: 'KeyCDN', enabled: true },
-        { id: 5, text: 'IP.SB', enabled: true },
-        { id: 6, text: 'IPAPI.is', enabled: true },
-      ],
-      usingSource: 0,
-    };
-  },
-  mutations: {
-    updateGlobalIpDataCards(state, payload) {
-      const uniqueIPs = new Set([...state.Global_ipDataCards, ...payload]);
-      state.Global_ipDataCards = Array.from(uniqueIPs);
-    },
-    setIsMobile(state, payload) {
-      state.isMobile = payload;
-    },
-    setRefreshEveryThing(state, payload) {
-      state.shouldRefreshEveryThing = payload;
-    },
-    SET_DARK_MODE(state, value) {
-      state.isDarkMode = value;
-    },
-    UPDATE_USING_SOURCE(state, value) {
-      state.usingSource = value;
-    },
+export const useMainStore = defineStore('main', {
 
-    UPDATE_IPDBS(state, { id, enabled }) {
-      const index = state.ipDBs.findIndex(db => db.id === id);
-      if (index !== -1) {
-        state.ipDBs[index] = { ...state.ipDBs[index], enabled: enabled };
-      }
-    },
-    SET_CONFIGS(state, config) {
-      state.configs = config;
-    },
-    SET_PREFERENCES(state, userPreferences) {
-      state.userPreferences = userPreferences;
-      localStorage.setItem('userPreferences', JSON.stringify(userPreferences));
-    },
-    UPDATE_PREFERENCE(state, { key, value }) {
-      state.userPreferences[key] = value;
-      localStorage.setItem('userPreferences', JSON.stringify(state.userPreferences));
-    }
-  },
+  state: () => ({
+    isDarkMode: false,
+    isMobile: false,
+    shouldRefreshEveryThing: false,
+    Global_ipDataCards: [],
+    configs: {},
+    userPreferences: {},
+    ipDBs: [
+      { id: 0, text: 'IPCheck.ing', enabled: true },
+      { id: 1, text: 'IPinfo.io', enabled: true },
+      { id: 2, text: 'IP-API.com', enabled: true },
+      { id: 3, text: 'IPAPI.co', enabled: true },
+      { id: 4, text: 'KeyCDN', enabled: true },
+      { id: 5, text: 'IP.SB', enabled: true },
+      { id: 6, text: 'IPAPI.is', enabled: true },
+    ],
+    usingSource: 0,
+  }),
 
   actions: {
-
-    // 加载用户偏好
-    loadPreferences({ commit }) {
+    updateGlobalIpDataCards(payload) {
+      const uniqueIPs = new Set([...this.Global_ipDataCards, ...payload]);
+      this.Global_ipDataCards = Array.from(uniqueIPs);
+    },
+    setIsMobile(payload) {
+      this.isMobile = payload;
+    },
+    setRefreshEveryThing(payload) {
+      this.shouldRefreshEveryThing = payload;
+    },
+    setDarkMode(value) {
+      this.isDarkMode = value;
+    },
+    updateUsingSource(value) {
+      this.usingSource = value;
+    },
+    updateIPDBs({ id, enabled }) {
+      const index = this.ipDBs.findIndex(db => db.id === id);
+      if (index !== -1) {
+        this.ipDBs[index].enabled = enabled;
+      }
+    },
+    setConfigs(config) {
+      this.configs = config;
+    },
+    setPreferences(userPreferences) {
+      this.userPreferences = userPreferences;
+      localStorage.setItem('userPreferences', JSON.stringify(userPreferences));
+    },
+    updatePreference(key, value) {
+      this.userPreferences[key] = value;
+      localStorage.setItem('userPreferences', JSON.stringify(this.userPreferences));
+    },
+    loadPreferences() {
       const defaultPreferences = {
         theme: 'auto', // auto, light, dark
         connectivityAutoRefresh: false,
@@ -77,6 +68,7 @@ const store = createStore({
         ipCardsToShow: 6,
         ipGeoSource: 0,
       };
+      console.log('loading preferences');
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;
 
@@ -88,16 +80,9 @@ const store = createStore({
       }
 
       localStorage.setItem('userPreferences', JSON.stringify(preferencesToStore));
-      commit('SET_PREFERENCES', preferencesToStore);
+      this.setPreferences(preferencesToStore);
     },
-
-    // 更新用户偏好
-    updatePreference({ commit }, { key, value }) {
-      commit('UPDATE_PREFERENCE', { key, value });
-    },
-
-    // 获取后端配置
-    fetchConfigs({ commit }) {
+    fetchConfigs() {
       fetch('/api/configs')
         .then(response => {
           if (!response.ok) {
@@ -106,20 +91,9 @@ const store = createStore({
           return response.json();
         })
         .then(data => {
-          commit('SET_CONFIGS', data);
+          this.setConfigs(data);
         })
         .catch(error => console.error('Fetching configs failed: ', error));
-    }
-  },
-
-  getters: {
-    isMobile(state) {
-      return state.isMobile;
     },
-    preferences(state) {
-      return state.userPreferences;
-    }
-  },
+  }
 });
-
-export default store;

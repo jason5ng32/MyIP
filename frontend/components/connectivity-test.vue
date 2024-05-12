@@ -62,7 +62,7 @@
 
 <script>
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { useMainStore } from '@/store';
 import { Toast, } from 'bootstrap';
 
 
@@ -71,10 +71,10 @@ export default {
 
   // 引入 Store
   setup() {
-    const store = useStore();
-    const isDarkMode = computed(() => store.state.isDarkMode);
-    const isMobile = computed(() => store.state.isMobile);
-    const userPreferences = computed(() => store.state.userPreferences);
+    const store = useMainStore();
+    const isDarkMode = computed(() => store.isDarkMode);
+    const isMobile = computed(() => store.isMobile);
+    const userPreferences = computed(() => store.userPreferences);
 
     return {
       isDarkMode,
