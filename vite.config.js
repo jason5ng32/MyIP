@@ -64,7 +64,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': '/src',
+      '@': '/frontend',
     },
   },
   build: {

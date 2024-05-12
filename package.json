@@ -4,12 +4,12 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"nodemon server.js\"",
+    "dev": "concurrently \"vite\" \"nodemon backend-server.js\"",
     "build": "vite build",
     "preview": "vite preview",
-    "start-server": "node server.js",
-    "start-static": "node static-server.js",
-    "start": "concurrently \"npm run start-static\" \"npm run start-server\""
+    "start-backend": "node backend-server.js",
+    "start-frontend": "node frontend-server.js",
+    "start": "concurrently \"npm run start-frontend\" \"npm run start-backend\""
   },
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
