@@ -67,6 +67,7 @@ export default {
       isDarkMode,
       isMobile,
       userPreferences,
+      store,
     };
   },
 
@@ -212,11 +213,7 @@ export default {
     },
   },
   mounted() {
-    if (this.autoStart) {
-      setTimeout(() => {
-        this.checkAllDNSLeakTest(false);
-      }, 2500);
-    }
+    this.store.setLoadingStatus('dnsleaktest', true);
   },
 }
 </script>

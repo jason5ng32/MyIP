@@ -59,6 +59,7 @@ export default {
     const configs = computed(() => store.configs);
     const userPreferences = computed(() => store.userPreferences);
     const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
+    const Status = computed(() => store.loadingStatus);
 
     return {
       store,
@@ -67,6 +68,7 @@ export default {
       configs,
       userPreferences,
       shouldRefreshEveryThing,
+      Status,
     };
   },
 
@@ -99,15 +101,47 @@ export default {
       alertMessage: "",
       alertTitle: "",
       trackedSections: new Set(),
+      autoStart: this.userPreferences.autoStart,
     }
   },
   methods: {
 
+    //
+    // 加载相关
+    //
     // 加载完成后隐藏 loading
     hideLoading() {
       let loadingElement = document.getElementById("jn-loading");
       if (loadingElement) {
         loadingElement.style.display = "none";
+      }
+    },
+
+
+    // 事件控制
+    loadingControl(t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) {
+      const mountedStatus = Object.values(this.Status).every(Boolean);
+      this.setInfosLoaded();
+      if (mountedStatus) {
+        setTimeout(() => {
+          this.$refs.IPCheckRef.checkAllIPs();
+        }, t1);
+        if (this.autoStart) {
+          setTimeout(() => {
+            this.$refs.connectivityRef.handelCheckStart();
+          }, t2);
+          setTimeout(() => {
+            this.$refs.webRTCRef.checkAllWebRTC(false);
+          }, t3);
+          setTimeout(() => {
+            this.$refs.dnsLeaksRef.checkAllDNSLeakTest(false);
+          }, t4);
+        }
+      } else {
+        // 递归检查
+        setTimeout(() => {
+          this.loadingControl();
+        }, 1000);
       }
     },
 
@@ -118,6 +152,9 @@ export default {
       }, 6000);
     },
 
+    //
+    // 刷新相关
+    //
     // 时间任务
     scheduleTimedTasks(tasks) {
       tasks.forEach(task => {
@@ -153,6 +190,9 @@ export default {
       this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
     },
 
+    //
+    // 信息遮罩相关
+    //
     // 信息遮罩
     toggleInfoMask() {
       this.$trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
@@ -218,6 +258,9 @@ export default {
       this.infoMaskLevel = 0;
     },
 
+    //
+    // 快捷键相关
+    //    
     // 滚动到指定元素
     scrollToElement(el, offset = 0) {
       const element = typeof el === "string" ? document.getElementById(el) : el;
@@ -225,7 +268,7 @@ export default {
       window.scrollTo({ top: y, behavior: "smooth" });
     },
 
-    // 快捷键
+    // 快捷键装载
     registerShortcutKeys() {
       const isOriginalSite = this.configs.originalSite;
       const shortcutConfig = ShortcutKeys(this, isOriginalSite);
@@ -237,6 +280,17 @@ export default {
       this.$refs.helpModalRef.keyMap = keyMap;
     },
 
+    // 加载快捷键，稍微延迟，以等待 config 加载完成再注册
+    loadShortcuts() {
+      setTimeout(() => {
+        this.registerShortcutKeys();
+        this.sendKeyMap();
+      }, 2000);
+    },
+
+    //
+    // 统计相关
+    //
     // 滚动到指定元素并记录事件
     checkSectionsAndTrack() {
       const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'GlobalLatency', 'PingTest', 'MTRTest'];
@@ -261,6 +315,9 @@ export default {
       );
     },
 
+    //
+    // 补丁
+    //
     // 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
     listenOffcanvas() {
       const offcanvasElements = document.querySelectorAll('.offcanvas');
@@ -288,6 +345,8 @@ export default {
 
   },
   watch: {
+
+    // 监控来自 NavBar 的刷新信号
     shouldRefreshEveryThing(newVal) {
       if (newVal) {
         this.$refs.navBarRef.loaded = false;
@@ -296,6 +355,8 @@ export default {
         this.setInfosLoaded();
       }
     },
+
+    // 给 NavBar 发送加载完成信号
     isInfosLoaded(newVal) {
       if (newVal) {
         this.$refs.navBarRef.loaded = true;
@@ -306,13 +367,8 @@ export default {
     this.hideLoading();
   },
   mounted() {
-    // this.setupModalFocus();
-    setTimeout(() => {
-      this.registerShortcutKeys();
-      this.sendKeyMap();
-    }, 2000);
-
-    this.setInfosLoaded();
+    this.loadingControl();
+    this.loadShortcuts();
     this.listenOffcanvas();
     window.addEventListener('scroll', this.checkSectionsAndTrack);
   },

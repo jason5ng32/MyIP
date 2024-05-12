@@ -850,7 +850,7 @@ export default {
   },
 
   mounted() {
-    this.checkAllIPs();
+    this.store.setLoadingStatus('ipcheck',true);
   },
 }
 </script>

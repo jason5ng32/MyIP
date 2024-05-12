@@ -5,6 +5,14 @@ export const useMainStore = defineStore('main', {
 
   state: () => ({
     lang: 'en',
+    loadingStatus: {
+      ipcheck: false,
+      connectivity: false,
+      webrtc: false,
+      dnsleaktest: false,
+      speedtest: false,
+      advancedtools: false,
+    },
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
@@ -29,6 +37,9 @@ export const useMainStore = defineStore('main', {
   }),
 
   actions: {
+    setLoadingStatus(key, value) {
+      this.loadingStatus[key] = value;
+    },
     setAlert(alertToShow, alertStyle, alertMessage, alertTitle ) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle };
     },
@@ -50,9 +61,6 @@ export const useMainStore = defineStore('main', {
       if (index !== -1) {
         this.ipDBs[index].enabled = enabled;
       }
-    },
-    setConfigs(config) {
-      this.configs = config;
     },
     setPreferences(userPreferences) {
       this.userPreferences = userPreferences;
@@ -96,7 +104,7 @@ export const useMainStore = defineStore('main', {
           return response.json();
         })
         .then(data => {
-          this.setConfigs(data);
+          this.configs = data;
         })
         .catch(error => console.error('Fetching configs failed: ', error));
     },

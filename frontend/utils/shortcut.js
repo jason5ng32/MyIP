@@ -232,7 +232,7 @@ function ShortcutKeys(vm, isOriginalSite) {
       description: vm.$t('shortcutKeys.CensorshipCheck'),
     },
     {
-      keys: "w",
+      keys: "W",
       action: () => {
         vm.scrollToElement("AdvancedTools", 80);
         vm.$refs.advancedToolsRef.navigateAndToggleOffcanvas('/whois');

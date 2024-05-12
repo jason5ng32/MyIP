@@ -125,6 +125,7 @@ export default {
     const isMobile = computed(() => store.isMobile);
 
     return {
+      store,
       isDarkMode,
       isMobile,
     };
@@ -345,6 +346,7 @@ export default {
   },
 
   mounted() {
+    this.store.setLoadingStatus('speedtest', true);
   }
 }
 </script>

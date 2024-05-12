@@ -280,9 +280,7 @@ export default {
   },
 
   mounted() {
-    if (this.autoStart) {
-      this.handelCheckStart();
-    }
+    this.store.setLoadingStatus('connectivity', true);
   },
 }
 </script>

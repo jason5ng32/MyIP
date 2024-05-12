@@ -177,11 +177,7 @@ export default {
     },
   },
   mounted() {
-    if (this.autoStart) {
-      setTimeout(() => {
-        this.checkAllWebRTC(false);
-      }, 4000);
-    }
+    this.store.setLoadingStatus('webrtc', true);
   },
   watch: {
     IPArray: {

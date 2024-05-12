@@ -67,6 +67,7 @@ export default {
 
 
         return {
+            store,
             isDarkMode,
             isMobile,
             configs,
@@ -91,6 +92,8 @@ export default {
     },
 
     methods: {
+        
+        // 控制标题显示
         handleScroll() {
             const scrollTop = this.$refs.scrollContainer.scrollTop;
             if (scrollTop > 60) {
@@ -99,6 +102,8 @@ export default {
                 this.showTitle = false;
             }
         },
+        
+        // 跳转到指定页面并打开
         navigateAndToggleOffcanvas(routePath) {
             this.$router.push(routePath);
             switch (routePath) {
@@ -135,6 +140,7 @@ export default {
             offcanvas.show();
         },
 
+        // 全屏显示
         fullScreen() {
             const offcanvas = document.getElementById('offcanvasTools');
             if (offcanvas) {
@@ -154,6 +160,8 @@ export default {
 
     },
     mounted() {
+        this.store.setLoadingStatus('advancedtools', true);
+        // 监听滚动事件
         this.$refs.scrollContainer.addEventListener('scroll', this.handleScroll);
 
         setTimeout(() => {
