@@ -254,8 +254,7 @@ function ShortcutKeys(vm, isOriginalSite) {
     {
       keys: "q",
       action: () => {
-        vm.openModal("IPCheck");
-        vm.$refs.queryIPRef.openQueryIP();
+        vm.$refs.queryIPRef.openModal();
         vm.$trackEvent('ShortCut', 'ShortCut', 'QueryIP');
       },
       description: vm.$t('shortcutKeys.IPCheck'),
@@ -288,7 +287,7 @@ function ShortcutKeys(vm, isOriginalSite) {
     {
       keys: "?",
       action: () => {
-        vm.openModal("helpModal");
+        vm.$refs.helpModalRef.openModal();
         vm.$trackEvent('ShortCut', 'ShortCut', 'Help');
       },
       description: vm.$t('shortcutKeys.Help'),

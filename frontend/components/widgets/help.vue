@@ -73,7 +73,14 @@ export default {
     },
 
     methods: {
-
+        // 打开 Modal
+        openModal() {
+            const modalElement = document.getElementById('helpModal');
+            const modalInstance = Modal.getOrCreateInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.show();
+            }
+        },
     },
     computed: {
         // 拆分 keyMap 为两个数组

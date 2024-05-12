@@ -26,7 +26,6 @@ export const useMainStore = defineStore('main', {
       { id: 5, text: 'IP.SB', enabled: true },
       { id: 6, text: 'IPAPI.is', enabled: true },
     ],
-    usingSource: 0,
   }),
 
   actions: {
@@ -45,9 +44,6 @@ export const useMainStore = defineStore('main', {
     },
     setDarkMode(value) {
       this.isDarkMode = value;
-    },
-    updateUsingSource(value) {
-      this.usingSource = value;
     },
     updateIPDBs({ id, enabled }) {
       const index = this.ipDBs.findIndex(db => db.id === id);

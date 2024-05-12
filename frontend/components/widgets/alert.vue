@@ -30,7 +30,7 @@ export default {
             store,
             isDarkMode,
             isMobile,
-            alert
+            alert,
         };
     },
     methods: {
@@ -47,18 +47,17 @@ export default {
         }
     },
     watch: {
-        'alert': {
-            handler(newVal, oldVal) {
-                if (newVal !== oldVal && newVal !== '') {
-                this.showToast();
-            }
+        alert: {
+            handler(newVal) {
+                if (newVal.alertToShow) {
+                    this.showToast();
+                }
             },
             immediate: true,
-            deep: true,
+            deep: true
         }
     }
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

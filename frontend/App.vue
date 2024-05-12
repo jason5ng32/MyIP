@@ -11,18 +11,11 @@
       <DNSLeaks ref="dnsLeaksRef" />
       <SpeedTest ref="speedTestRef" />
       <AdvancedTools ref="advancedToolsRef" />
-      <QueryIP ref="queryIPRef" />
-      <HelpModal ref="helpModalRef" />
-      <!-- Info Mask BTN-->
-      <button v-if="isInfosLoaded" class="btn position-fixed"
-        :class="infoMaskLevel === 0 ? 'btn-success' : infoMaskLevel === 1 ? 'btn-warning' : 'btn-secondary'"
-        style="bottom: 66px; right: 20px; z-index: 1050;" @click="toggleInfoMask" aria-label="Toggle Info Mask"
-        v-tooltip="$t('Tooltips.InfoMask')">
-        <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
-      </button>
     </div>
-
   </div>
+  <InfoMask :isInfosLoaded="isInfosLoaded" :infoMaskLevel="infoMaskLevel" :toggleInfoMask="toggleInfoMask" />
+  <QueryIP ref="queryIPRef" />
+  <HelpModal ref="helpModalRef" />
   <Footer ref="footerRef" />
   <PWA />
 </template>
@@ -41,7 +34,7 @@ import Footer from './components/footer.vue';
 
 // Utils
 import { mappingKeys, keyMap, ShortcutKeys } from "@/utils/shortcut.js";
-import {maskedInfo } from "@/utils/masked-info.js";
+import { maskedInfo } from "@/utils/masked-info.js";
 
 // Widgets
 import Preferences from './components/widgets/preferences.vue';
@@ -49,6 +42,7 @@ import QueryIP from './components/widgets/query-ip.vue';
 import HelpModal from './components/widgets/help.vue';
 import PWA from './components/widgets/pwa.vue';
 import Alert from './components/widgets/alert.vue';
+import InfoMask from './components/widgets/infomask.vue';
 
 // Vue
 import { ref, watch, computed } from 'vue';
@@ -90,6 +84,7 @@ export default {
     AdvancedTools,
     Preferences,
     Alert,
+    InfoMask,
   },
   name: 'App',
   data() {
@@ -105,25 +100,6 @@ export default {
       alertTitle: "",
       trackedSections: new Set(),
     }
-  },
-
-  watch: {
-    shouldRefreshEveryThing(newVal) {
-      if (newVal) {
-        this.$refs.navBarRef.loaded = false;
-        this.isInfosLoaded = false;
-        this.refreshEverything();
-        this.setInfosLoaded();
-      }
-    },
-    isInfosLoaded(newVal) {
-      if (newVal) {
-        this.$refs.navBarRef.loaded = true;
-      }
-    },
-  },
-  created() {
-    this.hideLoading();
   },
   methods: {
 
@@ -174,7 +150,7 @@ export default {
       this.alertMessage = this.$t('alert.refreshEverythingMessage');
       this.alertTitle = this.$t('alert.refreshEverythingTitle');
       this.alertToShow = true;
-      this.store.setAlert(this.alertToShow, this.alertStyle,this.alertMessage, this.alertTitle);
+      this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
     },
 
     // 信息遮罩
@@ -202,7 +178,7 @@ export default {
         this.alertTitle = this.$t('alert.unmaskedInfoTitle');
         this.alertToShow = true;
       }
-      this.store.setAlert(this.alertToShow, this.alertStyle,this.alertMessage, this.alertTitle);
+      this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
     },
 
     // 信息遮罩内容
@@ -240,37 +216,6 @@ export default {
       this.$refs.webRTCRef.stunServers = JSON.parse(JSON.stringify(this.originstunServers));
       this.$refs.dnsLeaksRef.leakTest = JSON.parse(JSON.stringify(this.originleakTest));
       this.infoMaskLevel = 0;
-    },
-
-    // 打开与关闭 Modal
-    openModal(id) {
-      const modalElement = document.getElementById(id);
-      const modalInstance = Modal.getOrCreateInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.show();
-      }
-    },
-    closeModal(id) {
-      const modalElement = document.getElementById(id);
-      const modalInstance = Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
-      }
-    },
-
-    // 设置 Modal 的聚焦
-    setupModalFocus() {
-      const modals = document.querySelectorAll(".modal");
-      modals.forEach((modal) => {
-        modal.addEventListener("shown.bs.modal", () => {
-          this.$nextTick(() => {
-            const inputElement = modal.querySelector(".form-control");
-            if (inputElement) {
-              inputElement.focus();
-            }
-          });
-        });
-      });
     },
 
     // 滚动到指定元素
@@ -342,8 +287,26 @@ export default {
     },
 
   },
+  watch: {
+    shouldRefreshEveryThing(newVal) {
+      if (newVal) {
+        this.$refs.navBarRef.loaded = false;
+        this.isInfosLoaded = false;
+        this.refreshEverything();
+        this.setInfosLoaded();
+      }
+    },
+    isInfosLoaded(newVal) {
+      if (newVal) {
+        this.$refs.navBarRef.loaded = true;
+      }
+    },
+  },
+  created() {
+    this.hideLoading();
+  },
   mounted() {
-    this.setupModalFocus();
+    // this.setupModalFocus();
     setTimeout(() => {
       this.registerShortcutKeys();
       this.sendKeyMap();

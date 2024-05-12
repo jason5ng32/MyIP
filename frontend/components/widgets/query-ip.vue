@@ -41,7 +41,7 @@
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
                                         $t('ipInfos.City')
-                                        }}</span>&nbsp;:&nbsp;
+                                    }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
@@ -169,12 +169,32 @@ export default {
         // 打开查询 IP 的模态框
         openQueryIP() {
             this.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
+            this.openModal();
         },
 
-        // 重置 modalQueryResult
-        setupModalEventListener() {
-            const modalElement = document.getElementById("IPCheck");
-            modalElement.addEventListener("hidden.bs.modal", this.resetModalData);
+        // 打开 Modal
+        openModal() {
+            const modalElement = document.getElementById('IPCheck');
+            const modalInstance = Modal.getOrCreateInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.show();
+                this.setupModalFocus();
+            }
+        },
+
+        // 设置 Modal 的聚焦
+        setupModalFocus() {
+            const modals = document.querySelectorAll(".modal");
+            modals.forEach((modal) => {
+                modal.addEventListener("shown.bs.modal", () => {
+                    this.$nextTick(() => {
+                        const inputElement = modal.querySelector(".form-control");
+                        if (inputElement) {
+                            inputElement.focus();
+                        }
+                    });
+                });
+            });
         },
 
         // 验证 IP 地址合法性
