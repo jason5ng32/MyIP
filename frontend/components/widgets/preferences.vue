@@ -181,7 +181,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, getCurrentInstance, watchEffect } from 'vue';
+import { ref, computed, onMounted, onUnmounted, getCurrentInstance } from 'vue';
 import { useMainStore } from '@/store';
 
 const { proxy } = getCurrentInstance();

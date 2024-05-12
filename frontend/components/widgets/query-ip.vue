@@ -123,8 +123,6 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 // 引入 Store
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
-const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
 const inputIP = ref('');
