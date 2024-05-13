@@ -3,7 +3,15 @@ import { refererCheck } from '../lib/referer-check.js';
 
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
 function isValidUserID(userID) {
-    return userID.length === 28 && /^[a-zA-Z0-9]+$/.test(userID);
+    if (typeof userID !== 'string') {
+        console.error("Invalid type for userID");
+        return false;
+    }
+    if (userID.length !== 28 || !/^[a-zA-Z0-9]+$/.test(userID)) {
+        console.error("Invalid userID format");
+        return false;
+    }
+    return true;
 }
 
 export default (req, res) => {
