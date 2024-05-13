@@ -44,7 +44,7 @@ import InfoMask from './components/widgets/InfoMask.vue';
 import Patch from './components/widgets/Patch.vue';
 
 // Vue
-import { ref, computed, onMounted, reactive, watch, onUnmounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';

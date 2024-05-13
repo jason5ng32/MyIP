@@ -725,6 +725,32 @@
             "change": "Fixed some minor issues"
           }
         ]
+      },
+      {
+        "version": "v4.0",
+        "date": "May 13, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Refactored the entire project using Vue 3's Composition API"
+          },
+          {
+            "type": "add",
+            "change": "Split the frontend into multiple modules to improve maintainability"
+          },
+          {
+            "type": "add",
+            "change": "Added Invisibility Test feature (Beta)"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized backend program dependencies"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized numerous details"
+          }
+        ]
       }
     ]
   }

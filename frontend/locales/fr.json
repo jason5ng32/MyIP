@@ -725,6 +725,32 @@
                         "change": "Correction de quelques problèmes mineurs"
                     }
                 ]
+            },
+            {
+                "version": "v4.0",
+                "date": "May 13, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Refonte complète du projet en utilisant la Composition API de Vue 3"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Découpage du frontend en plusieurs modules pour améliorer la maintenabilité du programme"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la Test d'invisibilité (bêta)"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la structure des dépendances du backend"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de nombreux détails"
+                    }
+                ]
             }
         ]
     }

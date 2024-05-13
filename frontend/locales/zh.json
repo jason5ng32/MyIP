@@ -725,6 +725,32 @@
             "change": "修复了一些小问题"
           }
         ]
+      },
+      {
+        "version": "v4.0",
+        "date": "May 13, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "采用 Vue 3 的 Composition API 重构了整个项目"
+          },
+          {
+            "type": "add",
+            "change": "拆分前端多个模块，提高了程序的可维护性"
+          },
+          {
+            "type": "add",
+            "change": "增加隐身测试功能（Beta）"
+          },
+          {
+            "type": "improve",
+            "change": "优化后端程序的依赖结构"
+          },
+          {
+            "type": "improve",
+            "change": "优化了大量细节"
+          }
+        ]
       }
     ]
   }
