@@ -14,11 +14,6 @@ function isValidUserID(userID) {
     return true;
 }
 
-function isSafeURL(url) {
-    const allowedHost = 'api.ipcheck.ing';
-    return url.hostname === allowedHost;
-}
-
 export default (req, res) => {
 
     // 限制只能从指定域名访问
@@ -38,16 +33,12 @@ export default (req, res) => {
     }
 
     const apikey = process.env.IPCHECKING_API_KEY;
-
+    
     if (!apikey) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
     const url = new URL(`https://api.ipcheck.ing/getpdresult/${id}?apikey=${apikey}`);
-
-    if (!isSafeURL(url)) {
-        return res.status(400).json({ error: 'Unsafe URL detected' });
-    }
 
     get(url, apiRes => {
         let data = '';
