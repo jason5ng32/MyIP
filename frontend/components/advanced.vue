@@ -22,7 +22,7 @@
             </div>
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
-            :class="[isMobile ? 'h-100' : 'jn-h']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
+            :class="[isMobile ? 'h-100' : '']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
             <div class="offcanvas-header d-flex justify-content-end"
                 :class="[showTitle ? 'jn-offcanvas-header' : 'jn-offcanvas-header-noborder']">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
@@ -58,7 +58,7 @@ import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 
-const {t} = useI18n();
+const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
@@ -162,18 +162,22 @@ onMounted(() => {
 });
 
 defineExpose({
-  navigateAndToggleOffcanvas,
+    navigateAndToggleOffcanvas,
 });
 
 </script>
 
 <style scoped>
+.offcanvas.offcanvas-bottom {
+    height: 80%;
+}
+
 #offcanvasTools {
     z-index: 10000;
 }
 
 .jn-h {
-    height: 80% !important;
+    height: 80%;
 }
 
 .jn-bold {
