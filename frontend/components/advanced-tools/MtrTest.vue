@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
