@@ -133,7 +133,7 @@ const inputIP = ref('');
 const modalQueryResult = ref(null);
 const modalQueryError = ref("");
 const isChecking = ref("idle");
-const ipGeoSource = computed(() => userPreferences.value.ipGeoSource);
+const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 
 
 // 实时变化查询源
@@ -204,7 +204,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
             if (data.error) {
                 throw new Error(data.reason || "IP lookup failed");
             }
-            modalQueryResult.value = transformDataFromIPapi(data, source.id, t);
+            modalQueryResult.value = transformDataFromIPapi(data, source.id, t,selectedLang);
             isChecking.value = "idle";
             break;
         } catch (error) {
