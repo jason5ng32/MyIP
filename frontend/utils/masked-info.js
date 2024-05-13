@@ -1,4 +1,4 @@
-function maskedInfo(vm) {
+function maskedInfo(t) {
   const fakecard = {};
 
     fakecard.ipv4 = "8.8.8.8",
@@ -17,9 +17,9 @@ function maskedInfo(vm) {
     fakecard.mapUrl = '/defaultMap.webp';
     fakecard.mapUrl_dark = '/defaultMap_dark.webp';
     fakecard.showASNInfo = false;
-    fakecard.isProxy = vm.$t('ipInfos.proxyDetect.no');
-    fakecard.type = vm.$t('ipInfos.proxyDetect.type.Business');
-    fakecard.proxyProtocol = vm.$t('ipInfos.proxyDetect.unknownProtocol');
+    fakecard.isProxy = t('ipInfos.proxyDetect.no');
+    fakecard.type = t('ipInfos.proxyDetect.type.Business');
+    fakecard.proxyProtocol = t('ipInfos.proxyDetect.unknownProtocol');
     fakecard.proxyOperator = "unknown";
 
   return fakecard;

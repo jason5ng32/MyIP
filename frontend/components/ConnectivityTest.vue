@@ -224,7 +224,7 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
 
   if ((isAlertToShow || !isStarted.value) && autoShowAltert.value) {
     setTimeout(() => {
-      this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
+      store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
     }, 4000);
   }
 

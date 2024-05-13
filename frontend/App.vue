@@ -13,14 +13,15 @@
       <AdvancedTools ref="advancedToolsRef" />
     </div>
   </div>
-  <InfoMask :isInfosLoaded="isInfosLoaded" :infoMaskLevel="infoMaskLevel" :toggleInfoMask="toggleInfoMask" />
+  <InfoMask :isInfosLoaded.value="isInfosLoaded" :infoMaskLevel.value="infoMaskLevel"
+    :toggleInfoMask="toggleInfoMask" />
   <QueryIP ref="queryIPRef" />
   <HelpModal ref="helpModalRef" />
   <Footer ref="footerRef" />
   <PWA />
 </template>
 
-<script>
+<script setup>
 
 // Components
 import NavBar from './components/Nav.vue';
@@ -32,10 +33,6 @@ import SpeedTest from './components/SpeedTest.vue';
 import AdvancedTools from './components/Advanced.vue';
 import Footer from './components/Footer.vue';
 
-// Utils
-import { mappingKeys, keyMap, ShortcutKeys } from "@/utils/shortcut.js";
-import { maskedInfo } from "@/utils/masked-info.js";
-
 // Widgets
 import Preferences from './components/widgets/Preferences.vue';
 import QueryIP from './components/widgets/QueryIP.vue';
@@ -45,335 +42,542 @@ import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
 
 // Vue
-import { ref, watch, computed } from 'vue';
+import { ref, computed, onMounted, reactive, watch, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
 import { Modal, Toast, Offcanvas } from 'bootstrap';
 
-export default {
+// Utils
+import { mappingKeys, keyMap } from "@/utils/shortcut.js";
+import { maskedInfo } from "@/utils/masked-info.js";
 
-  // 引入 Store
-  setup() {
-    const store = useMainStore();
-    const isDarkMode = computed(() => store.isDarkMode);
-    const isMobile = computed(() => store.isMobile);
-    const configs = computed(() => store.configs);
-    const userPreferences = computed(() => store.userPreferences);
-    const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
-    const Status = computed(() => store.loadingStatus);
+const { t } = useI18n();
 
-    return {
-      store,
-      isDarkMode,
-      isMobile,
-      configs,
-      userPreferences,
-      shouldRefreshEveryThing,
-      Status,
-    };
-  },
 
-  components: {
-    NavBar,
-    IPCheck,
-    Connectivity,
-    WebRTC,
-    DNSLeaks,
-    SpeedTest,
-    Footer,
-    QueryIP,
-    HelpModal,
-    PWA,
-    AdvancedTools,
-    Preferences,
-    Alert,
-    InfoMask,
-  },
-  name: 'App',
-  data() {
-    return {
-      infoMaskLevel: 0,
-      isInfosLoaded: false,
-      originipDataCards: [],
-      originstunServers: [],
-      originleakTest: [],
-      alertToShow: false,
-      alertStyle: "",
-      alertMessage: "",
-      alertTitle: "",
-      trackedSections: new Set(),
-      autoStart: this.userPreferences.autoStart,
+// Store
+const store = useMainStore();
+const configs = computed(() => store.configs);
+const userPreferences = computed(() => store.userPreferences);
+const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
+const Status = computed(() => store.loadingStatus);
+
+// Template 里的 Ref
+const navBarRef = ref(null);
+const preferencesRef = ref(null);
+const queryIPRef = ref(null);
+const helpModalRef = ref(null);
+const footerRef = ref(null);
+const speedTestRef = ref(null);
+const advancedToolsRef = ref(null);
+const IPCheckRef = ref(null);
+const connectivityRef = ref(null);
+const webRTCRef = ref(null);
+const dnsLeaksRef = ref(null);
+
+
+// Data
+const infoMaskLevel = ref(0);
+const isInfosLoaded = ref(false);
+const originipDataCards = ref([]);
+const originleakTest = ref([]);
+const originstunServers = ref([]);
+const alertStyle = ref("");
+const alertMessage = ref("");
+const alertTitle = ref("");
+const alertToShow = ref(false);
+let trackedSections = new Set();
+const autoStart = ref(userPreferences.value.autoStart);
+
+//
+// 加载相关
+//
+// 加载完成后隐藏 loading
+const hideLoading = () => {
+  let loadingElement = document.getElementById("jn-loading");
+  if (loadingElement) {
+    loadingElement.style.display = "none";
+  }
+};
+hideLoading();
+
+
+// 事件控制
+const loadingControl = (t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) => {
+  const mountedStatus = Object.values(Status.value).every(Boolean);
+  setInfosLoaded();
+  if (mountedStatus) {
+    setTimeout(() => {
+      IPCheckRef.value.checkAllIPs();
+    }, t1);
+    if (autoStart.value) {
+      setTimeout(() => {
+        connectivityRef.value.handelCheckStart();
+      }, t2);
+      setTimeout(() => {
+        webRTCRef.value.checkAllWebRTC(false);
+      }, t3);
+      setTimeout(() => {
+        dnsLeaksRef.value.checkAllDNSLeakTest(false);
+      }, t4);
     }
-  },
-  methods: {
+  } else {
+    // 递归检查
+    setTimeout(() => {
+      loadingControl();
+    }, 1000);
+  }
+};
 
-    //
-    // 加载相关
-    //
-    // 加载完成后隐藏 loading
-    hideLoading() {
-      let loadingElement = document.getElementById("jn-loading");
-      if (loadingElement) {
-        loadingElement.style.display = "none";
+// 延迟设置 isInfosLoaded.value
+const setInfosLoaded = () => {
+  setTimeout(() => {
+    isInfosLoaded.value = true;
+  }, 6000);
+};
+
+//
+// 刷新相关
+//
+// 时间任务
+const scheduleTimedTasks = (tasks) => {
+  tasks.forEach(task => {
+    setTimeout(() => {
+      task.action();
+      if (task.message) {
+        displayAlert(task.message);
       }
-    },
+    }, task.delay);
+  });
+};
 
+// 刷新所有
+const refreshEverything = () => {
+  const refreshTasks = [
+    { action: () => IPCheckRef.value.checkAllIPs(), delay: 0 },
+    { action: () => connectivityRef.value.checkAllConnectivity(false, true, true), delay: 2000 },
+    { action: () => webRTCRef.value.checkAllWebRTC(true), delay: 4000 },
+    { action: () => dnsLeaksRef.value.checkAllDNSLeakTest(true), delay: 2500 },
+    { action: () => refreshingAlert(), delay: 500 },
+  ];
+  scheduleTimedTasks(refreshTasks);
+  infoMaskLevel.value = 0;
+  store.setRefreshEveryThing(false);
+};
 
-    // 事件控制
-    loadingControl(t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) {
-      const mountedStatus = Object.values(this.Status).every(Boolean);
-      this.setInfosLoaded();
-      if (mountedStatus) {
-        setTimeout(() => {
-          this.$refs.IPCheckRef.checkAllIPs();
-        }, t1);
-        if (this.autoStart) {
-          setTimeout(() => {
-            this.$refs.connectivityRef.handelCheckStart();
-          }, t2);
-          setTimeout(() => {
-            this.$refs.webRTCRef.checkAllWebRTC(false);
-          }, t3);
-          setTimeout(() => {
-            this.$refs.dnsLeaksRef.checkAllDNSLeakTest(false);
-          }, t4);
-        }
+// 刷新完成后显示 Toast
+const refreshingAlert = () => {
+  alertStyle.value = "text-success";
+  alertMessage.value = t('alert.refreshEverythingMessage');
+  alertTitle.value = t('alert.refreshEverythingTitle');
+  alertToShow.value = true;
+  store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
+};
+
+//
+// 信息遮罩相关
+//
+// 信息遮罩
+const toggleInfoMask = () => {
+  trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
+  if (infoMaskLevel.value === 0) {
+    originipDataCards.value = JSON.parse(JSON.stringify(IPCheckRef.value.ipDataCards));
+    originstunServers.value = JSON.parse(JSON.stringify(webRTCRef.value.stunServers));
+    originleakTest.value = JSON.parse(JSON.stringify(dnsLeaksRef.value.leakTest));
+    infoMask();
+    alertStyle.value = "text-warning";
+    alertMessage.value = t('alert.maskedInfoMessage_1');
+    alertTitle.value = t('alert.maskedInfoTitle_1');
+  } else if (infoMaskLevel.value === 1) {
+    infoMask();
+    alertStyle.value = "text-success";
+    alertMessage.value = t('alert.maskedInfoMessage');
+    alertTitle.value = t('alert.maskedInfoTitle');
+  } else {
+    infoUnmask();
+    alertStyle.value = "text-danger";
+    alertMessage.value = t('alert.unmaskedInfoMessage');
+    alertTitle.value = t('alert.unmaskedInfoTitle');
+  }
+  alertToShow.value = true;
+  store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
+};
+
+// 信息遮罩内容
+const infoMask = () => {
+  if (infoMaskLevel.value === 0) {
+    IPCheckRef.value.ipDataCards.forEach((card) => {
+      if (card.id === "cloudflare_v6" || card.id === "ipify_v6") {
+        card.ip = maskedInfo(t).ipv6;
       } else {
-        // 递归检查
-        setTimeout(() => {
-          this.loadingControl();
-        }, 1000);
+        card.ip = maskedInfo(t).ipv4;
       }
-    },
+    });
+    webRTCRef.value.stunServers.forEach((server) => {
+      server.ip = maskedInfo(t).webrtcip;
+    });
+    dnsLeaksRef.value.leakTest.forEach((server) => {
+      server.ip = maskedInfo(t).dnsendpoints;
+    });
+    infoMaskLevel.value = 1;
+  } else if (infoMaskLevel.value === 1) {
+    IPCheckRef.value.ipDataCards.forEach(card => {
+      const maskedInfoData = maskedInfo(t);
+      Object.assign(card, maskedInfoData);
+    });
+    dnsLeaksRef.value.leakTest.forEach((server) => {
+      server.geo = maskedInfo(t).country_name;
+    });
+    infoMaskLevel.value = 2;
+  }
+};
 
-    // 延迟设置 isInfosLoaded
-    setInfosLoaded() {
-      setTimeout(() => {
-        this.isInfosLoaded = true;
-      }, 6000);
-    },
+// 信息遮罩内容还原
+// 信息遮罩内容还原
+const infoUnmask = () => {
+  const newIpDataCards = JSON.parse(JSON.stringify(originipDataCards.value));
+  IPCheckRef.value.ipDataCards.splice(0, IPCheckRef.value.ipDataCards.length, ...newIpDataCards);
 
-    //
-    // 刷新相关
-    //
-    // 时间任务
-    scheduleTimedTasks(tasks) {
-      tasks.forEach(task => {
-        setTimeout(() => {
-          task.action();
-          if (task.message) {
-            this.displayAlert(task.message);
+  const newStunServers = JSON.parse(JSON.stringify(originstunServers.value));
+  webRTCRef.value.stunServers.splice(0, webRTCRef.value.stunServers.length, ...newStunServers);
+
+  const newLeakTests = JSON.parse(JSON.stringify(originleakTest.value));
+  dnsLeaksRef.value.leakTest.splice(0, dnsLeaksRef.value.leakTest.length, ...newLeakTests);
+
+  infoMaskLevel.value = 0;
+};
+
+
+//
+// 快捷键相关
+//    
+// 滚动到指定元素
+const scrollToElement = (el, offset = 0) => {
+  const element = typeof el === "string" ? document.getElementById(el) : el;
+  const y = element.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: y, behavior: "smooth" });
+};
+
+const ShortcutKeys = (isOriginalSite) => {
+  const shortcutConfig = [
+    {
+      keys: "g",
+      action: () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        trackEvent('ShortCut', 'ShortCut', 'GoToTop');
+      },
+      description: t('shortcutKeys.GoToTop'),
+    },
+    {
+      keys: 'j',
+      action: () => {
+        navigateCards('down'),
+          trackEvent('ShortCut', 'ShortCut', 'GoNext');
+      },
+      description: t('shortcutKeys.GoNext'),
+    },
+    {
+      keys: 'k',
+      action: () => {
+        navigateCards('up'),
+          trackEvent('ShortCut', 'ShortCut', 'GoPrevious');
+      },
+      description: t('shortcutKeys.GoPrevious'),
+    },
+    {
+      keys: "G",
+      action: () => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+        trackEvent('ShortCut', 'ShortCut', 'GoToBottom');
+      },
+      description: t('shortcutKeys.GoToBottom'),
+    },
+    {
+      keys: "R",
+      action: () => {
+        store.setRefreshEveryThing(true);
+        trackEvent('ShortCut', 'ShortCut', 'RefreshEverything');
+      },
+
+      description: t('shortcutKeys.RefreshEverything'),
+    },
+    {
+      keys: "([1-6])",
+      type: "regex",
+      action: (num) => {
+        if (num > userPreferences.ipCardsToShow) {
+          return
+        }
+        const card = IPCheckRef.value.ipDataCards[num - 1];
+        scrollToElement("IPInfo-" + num, 171);
+        IPCheckRef.value.refreshCard(card);
+        trackEvent('ShortCut', 'ShortCut', 'IPCheck');
+      },
+      description: t('shortcutKeys.RefreshIPCard'),
+    },
+    {
+      keys: "c",
+      action: () => {
+        scrollToElement("Connectivity", 80);
+        connectivityRef.value.checkAllConnectivity(false, true, true);
+        trackEvent('ShortCut', 'ShortCut', 'Connectivity');
+      },
+      description: t('shortcutKeys.RefreshConnectivityTests'),
+    },
+    {
+      keys: "w",
+      action: () => {
+        scrollToElement("WebRTC", 80);
+        webRTCRef.value.checkAllWebRTC(false);
+        trackEvent('ShortCut', 'ShortCut', 'WebRTC');
+      },
+      description: t('shortcutKeys.RefreshWebRTC'),
+    },
+    {
+      keys: "d",
+      action: () => {
+        scrollToElement("DNSLeakTest", 80);
+        dnsLeaksRef.value.checkAllDNSLeakTest(true);
+        trackEvent('ShortCut', 'ShortCut', 'DNSLeakTest');
+      },
+      description: t('shortcutKeys.RefreshDNSLeakTest'),
+    },
+    {
+      keys: "s",
+      action: () => {
+        scrollToElement("SpeedTest", 80);
+        speedTestRef.value.speedTestController();
+        trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
+      },
+      description: t('shortcutKeys.SpeedTestButton'),
+    },
+    {
+      keys: "l",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/pingtest');
+        trackEvent('Nav', 'NavClick', 'PingTest');
+      },
+      description: t('shortcutKeys.PingTest'),
+    },
+    {
+      keys: "t",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/mtrtest');
+        trackEvent('Nav', 'NavClick', 'MTRTest');
+      },
+      description: t('shortcutKeys.MTRTest'),
+    },
+    {
+      keys: "r",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/ruletest');
+        trackEvent('Nav', 'NavClick', 'RuleTest');
+      },
+      description: t('shortcutKeys.RuleTest'),
+    },
+    {
+      keys: "n",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/dnsresolver');
+        trackEvent('Nav', 'NavClick', 'DNSResolver');
+      },
+      description: t('shortcutKeys.DNSResolver'),
+    },
+    {
+      keys: "b",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/censorshipcheck');
+        trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+      },
+      description: t('shortcutKeys.CensorshipCheck'),
+    },
+    {
+      keys: "W",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/whois');
+        trackEvent('Nav', 'NavClick', 'Whois');
+      },
+      description: t('shortcutKeys.Whois'),
+    },
+    {
+      keys: "m",
+      action: () => {
+        if (configs.bingMap) {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          preferencesRef.value.toggleMaps();
+        };
+        trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
+      },
+      description: t('shortcutKeys.ToggleMaps'),
+    },
+    {
+      keys: "q",
+      action: () => {
+        queryIPRef.value.openModal();
+        trackEvent('ShortCut', 'ShortCut', 'QueryIP');
+      },
+      description: t('shortcutKeys.IPCheck'),
+    },
+    {
+      keys: "h",
+      action: () => {
+        isInfosLoaded && toggleInfoMask();
+        trackEvent('ShortCut', 'ShortCut', 'ToggleInfoMask');
+      },
+      description: t('shortcutKeys.ToggleInfoMask'),
+    },
+    {
+      keys: "p",
+      action: () => {
+        navBarRef.value.OpenPreferences();
+        trackEvent('ShortCut', 'ShortCut', 'Preferences');
+      },
+      description: t('shortcutKeys.Preferences'),
+    },
+    {
+      keys: "a",
+      action: () => {
+        footerRef.value.openAbout();
+        trackEvent('ShortCut', 'ShortCut', 'About');
+      },
+      description: t('shortcutKeys.About'),
+    },
+    // help
+    {
+      keys: "?",
+      action: () => {
+        helpModalRef.value.openModal();
+        trackEvent('ShortCut', 'ShortCut', 'Help');
+      },
+      description: t('shortcutKeys.Help'),
+    },
+  ];
+
+  const invisibilitytest = [
+    {
+      keys: "i",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/invisibilitytest');
+        trackEvent('Nav', 'NavClick', 'InvisibilityTest');
+      },
+      description: t('shortcutKeys.InvisibilityTest'),
+    },
+  ];
+
+  if (isOriginalSite) {
+    shortcutConfig.push(...invisibilitytest);
+  }
+
+  return shortcutConfig;
+};
+
+// 快捷键装载
+const registerShortcutKeys = () => {
+  const isOriginalSite = configs.value.originalSite;
+  const shortcutConfig = ShortcutKeys(isOriginalSite);
+  shortcutConfig.forEach(config => mappingKeys(config));
+};
+
+// 给 helpModal 发送快捷键内容
+const sendKeyMap = () => {
+  helpModalRef.value.keyMap = keyMap;
+};
+
+// 加载快捷键，稍微延迟，以等待 config 加载完成再注册
+const loadShortcuts = () => {
+  setTimeout(() => {
+    registerShortcutKeys();
+    sendKeyMap();
+  }, 2000);
+};
+
+//
+// 统计相关
+//
+// 滚动到指定元素并记录事件
+const checkSectionsAndTrack = () => {
+  const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'GlobalLatency', 'PingTest', 'MTRTest'];
+
+  sectionIds.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section && isElementInViewport(section) && !trackedSections.has(sectionId)) {
+      trackEvent(sectionId, 'JNScroll', sectionId);
+      trackedSections.add(sectionId);
+    }
+  });
+};
+
+// 判断元素是否在视窗内
+const isElementInViewport = (el) => {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+
+//
+// 补丁
+//
+// 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
+const listenOffcanvas = () => {
+  const offcanvasElements = document.querySelectorAll('.offcanvas');
+  const navElements = document.getElementById('navbarNavAltMarkup');
+  const navElementsButton = document.querySelector('.navbar-toggler');
+  offcanvasElements.forEach((element) => {
+    const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
+    element.addEventListener('show.bs.offcanvas', () => {
+      // 存在 Offcanvas 时关闭导航栏
+      navElements.classList.remove('show');
+      navElementsButton.setAttribute('aria-expanded', 'false');
+      navElementsButton.classList.add('collapsed');
+      // 关闭所有其他的 offcanvas
+      offcanvasElements.forEach((offcanvas) => {
+        if (offcanvas !== element) {
+          const offcanvasInstance = Offcanvas.getInstance(offcanvas);
+          if (offcanvasInstance) { // 确保实例有效
+            offcanvasInstance.hide();
           }
-        }, task.delay);
-      });
-    },
-
-    // 刷新所有
-    refreshEverything() {
-      const refreshTasks = [
-        { action: () => this.$refs.IPCheckRef.checkAllIPs(), delay: 0 },
-        { action: () => this.$refs.connectivityRef.checkAllConnectivity(false, true, true), delay: 2000 },
-        { action: () => this.$refs.webRTCRef.checkAllWebRTC(true), delay: 4000 },
-        { action: () => this.$refs.dnsLeaksRef.checkAllDNSLeakTest(true), delay: 2500 },
-        { action: () => this.refreshingAlert(), delay: 500 },
-      ];
-      this.scheduleTimedTasks(refreshTasks);
-      this.infoMaskLevel = 0;
-      this.store.setRefreshEveryThing(false);
-    },
-
-    // 刷新完成后显示 Toast
-    refreshingAlert() {
-      this.alertStyle = "text-success";
-      this.alertMessage = this.$t('alert.refreshEverythingMessage');
-      this.alertTitle = this.$t('alert.refreshEverythingTitle');
-      this.alertToShow = true;
-      this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
-    },
-
-    //
-    // 信息遮罩相关
-    //
-    // 信息遮罩
-    toggleInfoMask() {
-      this.$trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
-      if (this.infoMaskLevel === 0) {
-        this.originipDataCards = JSON.parse(JSON.stringify(this.$refs.IPCheckRef.ipDataCards));
-        this.originstunServers = JSON.parse(JSON.stringify(this.$refs.webRTCRef.stunServers));
-        this.originleakTest = JSON.parse(JSON.stringify(this.$refs.dnsLeaksRef.leakTest));
-        this.infoMask();
-        this.alertStyle = "text-warning";
-        this.alertMessage = this.$t('alert.maskedInfoMessage_1');
-        this.alertTitle = this.$t('alert.maskedInfoTitle_1');
-        this.alertToShow = true;
-      } else if (this.infoMaskLevel === 1) {
-        this.infoMask();
-        this.alertStyle = "text-success";
-        this.alertMessage = this.$t('alert.maskedInfoMessage');
-        this.alertTitle = this.$t('alert.maskedInfoTitle');
-        this.alertToShow = true;
-      } else {
-        this.infoUnmask();
-        this.alertStyle = "text-danger";
-        this.alertMessage = this.$t('alert.unmaskedInfoMessage');
-        this.alertTitle = this.$t('alert.unmaskedInfoTitle');
-        this.alertToShow = true;
-      }
-      this.store.setAlert(this.alertToShow, this.alertStyle, this.alertMessage, this.alertTitle);
-    },
-
-    // 信息遮罩内容
-    infoMask() {
-      if (this.infoMaskLevel === 0) {
-        this.$refs.IPCheckRef.ipDataCards.forEach((card) => {
-          if (card.id === "cloudflare_v6" || card.id === "ipify_v6") {
-            card.ip = maskedInfo(this).ipv6;
-          } else {
-            card.ip = maskedInfo(this).ipv4;
-          }
-        });
-        this.$refs.webRTCRef.stunServers.forEach((server) => {
-          server.ip = maskedInfo(this).webrtcip;
-        });
-        this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
-          server.ip = maskedInfo(this).dnsendpoints;
-        });
-        this.infoMaskLevel = 1;
-      } else if (this.infoMaskLevel === 1) {
-        this.$refs.IPCheckRef.ipDataCards.forEach(card => {
-          const maskedInfoData = maskedInfo(this);
-          Object.assign(card, maskedInfoData);
-        });
-        this.$refs.dnsLeaksRef.leakTest.forEach((server) => {
-          server.geo = maskedInfo(this).country_name;
-        });
-        this.infoMaskLevel = 2;
-      }
-    },
-
-    // 信息遮罩内容还原
-    infoUnmask() {
-      this.$refs.IPCheckRef.ipDataCards = JSON.parse(JSON.stringify(this.originipDataCards));
-      this.$refs.webRTCRef.stunServers = JSON.parse(JSON.stringify(this.originstunServers));
-      this.$refs.dnsLeaksRef.leakTest = JSON.parse(JSON.stringify(this.originleakTest));
-      this.infoMaskLevel = 0;
-    },
-
-    //
-    // 快捷键相关
-    //    
-    // 滚动到指定元素
-    scrollToElement(el, offset = 0) {
-      const element = typeof el === "string" ? document.getElementById(el) : el;
-      const y = element.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-    },
-
-    // 快捷键装载
-    registerShortcutKeys() {
-      const isOriginalSite = this.configs.originalSite;
-      const shortcutConfig = ShortcutKeys(this, isOriginalSite);
-      shortcutConfig.forEach(config => mappingKeys(config));
-    },
-
-    // 给 helpModal 发送快捷键内容
-    sendKeyMap() {
-      this.$refs.helpModalRef.keyMap = keyMap;
-    },
-
-    // 加载快捷键，稍微延迟，以等待 config 加载完成再注册
-    loadShortcuts() {
-      setTimeout(() => {
-        this.registerShortcutKeys();
-        this.sendKeyMap();
-      }, 2000);
-    },
-
-    //
-    // 统计相关
-    //
-    // 滚动到指定元素并记录事件
-    checkSectionsAndTrack() {
-      const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'GlobalLatency', 'PingTest', 'MTRTest'];
-
-      sectionIds.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section && this.isElementInViewport(section) && !this.trackedSections.has(sectionId)) {
-          this.$trackEvent(sectionId, 'JNScroll', sectionId);
-          this.trackedSections.add(sectionId);
         }
       });
-    },
+    });
+  });
+};
 
-    // 判断元素是否在视窗内
-    isElementInViewport(el) {
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-      );
-    },
+watch(shouldRefreshEveryThing, (newVal) => {
+  if (newVal) {
+    navBarRef.value.loaded = false;
+    isInfosLoaded.value = false;
+    refreshEverything();
+    setInfosLoaded();
+  }
+});
 
-    //
-    // 补丁
-    //
-    // 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
-    listenOffcanvas() {
-      const offcanvasElements = document.querySelectorAll('.offcanvas');
-      const navElements = document.getElementById('navbarNavAltMarkup');
-      const navElementsButton = document.querySelector('.navbar-toggler');
-      offcanvasElements.forEach((element) => {
-        const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
-        element.addEventListener('show.bs.offcanvas', () => {
-          // 存在 Offcanvas 时关闭导航栏
-          navElements.classList.remove('show');
-          navElementsButton.setAttribute('aria-expanded', 'false');
-          navElementsButton.classList.add('collapsed');
-          // 关闭所有其他的 offcanvas
-          offcanvasElements.forEach((offcanvas) => {
-            if (offcanvas !== element) {
-              const offcanvasInstance = Offcanvas.getInstance(offcanvas);
-              if (offcanvasInstance) { // 确保实例有效
-                offcanvasInstance.hide();
-              }
-            }
-          });
-        });
-      });
-    },
+watch(isInfosLoaded, (newVal) => {
+  if (newVal) {
+    navBarRef.value.loaded = true;
+  }
+});
 
-  },
-  watch: {
-    // 监控来自 NavBar 的刷新信号
-    shouldRefreshEveryThing(newVal) {
-      if (newVal) {
-        this.$refs.navBarRef.loaded = false;
-        this.isInfosLoaded = false;
-        this.refreshEverything();
-        this.setInfosLoaded();
-      }
-    },
-    // 给 NavBar 发送加载完成信号
-    isInfosLoaded(newVal) {
-      if (newVal) {
-        this.$refs.navBarRef.loaded = true;
-      }
-    },
-  },
-  created() {
-    this.hideLoading();
-  },
-  mounted() {
-    this.loadingControl();
-    this.loadShortcuts();
-    this.listenOffcanvas();
-    window.addEventListener('scroll', this.checkSectionsAndTrack);
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.checkSectionsAndTrack);
-  },
-}
+onMounted(() => {
+  loadingControl();
+  loadShortcuts();
+  listenOffcanvas();
+  window.addEventListener('scroll', checkSectionsAndTrack);
+});
+
 
 </script>
 

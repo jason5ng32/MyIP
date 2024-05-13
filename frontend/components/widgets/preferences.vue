@@ -301,10 +301,6 @@ onMounted(() => {
     setTimeout(updateIPDBs, 4000);
 });
 
-onUnmounted(() => {
-    mediaQueryList.removeEventListener('change', handleThemeChange);
-});
-
 defineExpose({
     toggleMaps,
 });
