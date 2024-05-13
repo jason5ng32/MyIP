@@ -12,8 +12,8 @@ WORKDIR /app
 COPY --from=build-stage /app/node_modules ./node_modules
 COPY --from=build-stage /app/package.json ./
 COPY --from=build-stage /app/dist ./dist
-COPY --from=build-stage /app/server.js ./
-COPY --from=build-stage /app/static-server.js ./
+COPY --from=build-stage /app/backend-server.js ./
+COPY --from=build-stage /app/frontend-server.js ./
 COPY --from=build-stage /app/api ./api
 
 EXPOSE 18966

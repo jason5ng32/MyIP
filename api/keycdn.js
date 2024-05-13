@@ -1,26 +1,14 @@
 import { get } from 'https';
-
-function isValidIP(ip) {
-    const ipv4Pattern =
-        /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    const ipv6Pattern =
-        /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){0,6}([0-9a-fA-F]{1,4})?))$/;
-    return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-};
+import { isValidIP } from '../lib/valid-ip.js';
+import { refererCheck } from '../lib/referer-check.js';
 
 export default (req, res) => {
     // 限制只能从指定域名访问
-    const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const referer = req.headers.referer;
-
-    if (referer) {
-        const domain = new URL(referer).hostname;
-        if (!allowedDomains.includes(domain)) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-    } else {
-        return res.status(403).json({ error: 'What are you doing?' });
+    if (!refererCheck(referer)) {
+        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
     }
+
 
     // 从请求中获取 IP 地址
     const ipAddress = req.query.ip;

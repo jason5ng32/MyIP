@@ -3,7 +3,6 @@ import { isValidIP } from '../lib/valid-ip.js';
 import { refererCheck } from '../lib/referer-check.js';
 
 export default (req, res) => {
-
     // 限制只能从指定域名访问
     const referer = req.headers.referer;
     if (!refererCheck(referer)) {
@@ -22,16 +21,9 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Invalid IP address' });
     }
 
-    const key = process.env.IPCHECKING_API_KEY;
-
-    if (!key) {
-        return res.status(500).json({ error: 'API key is missing' });
-    }
-
-    const lang = req.query.lang || 'en';
-
-    // 构建请求 IPCheck.ing 的 URL
-    const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
+    const keys = (process.env.IPAPIIS_API_KEY).split(',');
+    const key = keys[Math.floor(Math.random() * keys.length)];
+    const url = `https://api.ipapi.is?q=${ipAddress}&key=${key}`;
 
     get(url, apiRes => {
         let data = '';
@@ -39,7 +31,8 @@ export default (req, res) => {
         apiRes.on('end', () => {
             try {
                 const originalJson = JSON.parse(data);
-                res.json(originalJson);
+                const modifiedJson = modifyJsonForIPAPI(originalJson);
+                res.json(modifiedJson);
             } catch (e) {
                 res.status(500).json({ error: 'Error parsing JSON' });
             }
@@ -47,4 +40,24 @@ export default (req, res) => {
     }).on('error', (e) => {
         res.status(500).json({ error: e.message });
     });
+};
+
+function modifyJsonForIPAPI(json) {
+    let asn = json.asn || {};
+    const { ip, location, is_datacenter, is_proxy, is_vpn, is_tor } = json;
+
+    return {
+        ip: ip,
+        city: location.city || 'N/A',
+        region: location.state || 'N/A',
+        country: location.country_code || 'N/A',
+        country_name: location.country || 'N/A',
+        country_code: location.country_code || 'N/A',
+        latitude: location.latitude || 'N/A',
+        longitude: location.longitude || 'N/A',
+        asn: asn.asn === undefined ? 'N/A' : 'AS' + asn.asn,
+        org: asn.org || 'N/A',
+        isHosting: is_datacenter || false,
+        isProxy: is_proxy || is_vpn || is_tor || false
+    };
 }
