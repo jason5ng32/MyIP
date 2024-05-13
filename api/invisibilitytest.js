@@ -33,6 +33,11 @@ export default (req, res) => {
     }
 
     const apikey = process.env.IPCHECKING_API_KEY;
+
+    if (!apikey) {
+        return res.status(500).json({ error: 'API key is missing' });
+    }
+
     const url = new URL(`https://api.ipcheck.ing/getpdresult/${id}?apikey=${apikey}`);
 
     get(url, apiRes => {
