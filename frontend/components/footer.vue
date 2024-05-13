@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, getCurrentInstance, onMounted } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import { useMainStore } from '@/store';
 import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
@@ -134,7 +134,7 @@ const configs = computed(() => store.configs);
 const content = ref('about');
 const showAbout = ref(true);
 const showChangelog = ref(false);
-const changelog = ref(tm('changelog.versions'));
+const changelog = reactive(tm('changelog.versions'));
 
 const openAbout = () => {
   var offcanvasElement = document.getElementById('About');

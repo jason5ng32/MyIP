@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, getCurrentInstance, onUnmounted } from 'vue';
+import { ref, computed, onMounted, reactive, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { Offcanvas } from 'bootstrap';
@@ -68,7 +68,7 @@ const configs = computed(() => store.configs);
 const scrollContainer = ref(null);
 const router = useRouter();
 
-const cards = ref([
+const cards = reactive([
     { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
     { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
     { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
@@ -156,7 +156,7 @@ onMounted(() => {
 
     setTimeout(() => {
         if (configs.value.originalSite) {
-            cards.value.push(cardInvisibilityTest);
+            cards.push(cardInvisibilityTest);
         }
     }, 2000);
 });
