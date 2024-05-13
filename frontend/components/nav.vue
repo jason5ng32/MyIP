@@ -27,11 +27,11 @@
           <i class="bi bi-translate"></i>
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="?hl=zh" @click="$trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
+          <li><a class="dropdown-item" href="?hl=zh" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
                 class="fi fi-cn"></i> 中文</a></li>
-          <li><a class="dropdown-item" href="?hl=en" @click="$trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
+          <li><a class="dropdown-item" href="?hl=en" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
                 class="fi fi-us"></i> English</a></li>
-          <li><a class="dropdown-item" href="?hl=fr" @click="$trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
+          <li><a class="dropdown-item" href="?hl=fr" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
                 class="fi fi-fr"></i> Français</a></li>
         </ul>
       </div>
@@ -52,12 +52,12 @@
       <div class="navbar-nav ">
         <a v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']" :key="item"
           class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" :href="`#${item}`"
-          @click="collapseNav(); $trackEvent('Nav', 'NavClick', item)">{{
-            $t(`nav.${item}`) }}</a>
+          @click="collapseNav(); trackEvent('Nav', 'NavClick', item)">{{
+          t(`nav.${item}`) }}</a>
       </div>
-      <a :href="$t('page.footerLink')" class="btn jn-fs" id="githubStars"
+      <a :href="t('page.footerLink')" class="btn jn-fs" id="githubStars"
         :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
-        target="_blank" @click="$trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
+        target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
         <div><i class="bi bi-github"></i></div>
         <div class="row flex-column ">
           <TransitionGroup name="slide-fade">
@@ -75,104 +75,92 @@
 
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup>
+import { ref, computed, onMounted } from 'vue';
 import { useMainStore } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
 import { Offcanvas } from 'bootstrap';
 
-export default {
-  name: 'NavBar',
+const { t } = useI18n();
 
-  // 引入 Store
-  setup() {
-    const store = useMainStore();
-    const isDarkMode = computed(() => store.isDarkMode);
-    const isMobile = computed(() => store.isMobile);
-    const configs = computed(() => store.configs);
-    const userPreferences = computed(() => store.userPreferences);
+const store = useMainStore();
+const isDarkMode = computed(() => store.isDarkMode);
+const isMobile = computed(() => store.isMobile);
 
-    return {
-      isDarkMode,
-      isMobile,
-      configs,
-      userPreferences,
-      store,
-    };
-  },
+const loaded = ref(false);
+const githubStars = ref(0);
 
-  data() {
-    return {
-      loaded: false,
-      githubStars: 0,
+const closeAllOffCanvas = () => {
+  const offcanvasElements = document.querySelectorAll('.offcanvas');
+  if (offcanvasElements.length === 0) {
+    return;
+  }
+  document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
+    const instance = Offcanvas.getInstance(offcanvas);
+    if (instance) {
+      instance.hide();
     }
-  },
-  methods: {
+  });
+};
 
-    closeAllOffCanvas() {
-      const offcanvasElements = document.querySelectorAll('.offcanvas');
-      if (offcanvasElements.length === 0) {
-        return;
-      }
-      document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
-        const instance = Offcanvas.getInstance(offcanvas);
-        if (instance) {
-          instance.hide();
-        }
-      });
-    },
+// 打开偏好设置
+const OpenPreferences = () => {
+  var offcanvasElement = document.getElementById('offcanvasPreferences');
+  var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+  if (offcanvasElement.classList.contains('show')) {
+    offcanvas.hide();
+  } else {
+    offcanvas.show();
+  }
 
-    // 打开偏好设置
-    OpenPreferences() {
-      var offcanvasElement = document.getElementById('offcanvasPreferences');
-      var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
-      if (offcanvasElement.classList.contains('show')) {
-        offcanvas.hide();
-      } else {
-        offcanvas.show();
-      }
+  trackEvent('Nav', 'NavClick', 'Preferences');
+};
 
-      this.$trackEvent('Nav', 'NavClick', 'Preferences');
-    },
+//获取 GitHub stars
+const getGitHubStars = async () => {
+  const url = `https://api.github.com/repos/jason5ng32/MyIP`;
 
-    //获取 GitHub stars
-    async getGitHubStars() {
-      const url = `https://api.github.com/repos/jason5ng32/MyIP`;
-
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setTimeout(() => {
-          this.githubStars = data.stargazers_count;
-        }, 1000);
-      } catch (error) {
-        console.error('Failed to fetch Github data:', error);
-        this.githubStars = 0;
-      }
-    },
-
-    // 收起导航栏
-    collapseNav() {
-      document.querySelector('#navbarNavAltMarkup').classList.remove('show');
-    },
-
-
-    // 点击 Logo 事件处理
-    handleLogoClick() {
-      if (window.scrollY === 0) {
-        this.store.setRefreshEveryThing(true);
-      }
-      this.$trackEvent('Nav', 'NavClick', 'Logo');
-    },
-  },
-  mounted() {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
     setTimeout(() => {
-      this.getGitHubStars();
-    }, 1000)
-  },
-}
+      githubStars.value = data.stargazers_count;
+    }, 1000);
+  } catch (error) {
+    console.error('Failed to fetch Github data:', error);
+    githubStars.value = 0;
+  }
+};
+
+// 收起导航栏
+const collapseNav = () => {
+  document.querySelector('#navbarNavAltMarkup').classList.remove('show');
+};
+
+
+// 点击 Logo 事件处理
+const handleLogoClick = () => {
+  if (window.scrollY === 0) {
+    store.setRefreshEveryThing(true);
+  }
+  trackEvent('Nav', 'NavClick', 'Logo');
+};
+
+// 开始时获取 GitHub stars
+onMounted(() => {
+  setTimeout(() => {
+    getGitHubStars();
+  }, 1000)
+});
+
+// 暴露给 App.vue 的数据
+defineExpose({
+  loaded,
+});
 </script>
 
 <style scoped>
