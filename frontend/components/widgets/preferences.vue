@@ -5,18 +5,18 @@
         aria-labelledby="offcanvasPreferencesLabel">
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
-                $t('nav.preferences.title') }}
+                t('nav.preferences.title') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body pt-0 m-2">
-            <div class="preferences-tip">{{ $t('nav.preferences.preferenceTips') }}</div>
+            <div class="preferences-tip">{{ t('nav.preferences.preferenceTips') }}</div>
 
             <!-- 主题方案 -->
 
             <div id="Pref_colorScheme">
                 <div class="form-label col-12 preferences-title"><i class="bi bi-palette-fill"></i> {{
-                    $t('nav.preferences.colorScheme') }}</div>
+                    t('nav.preferences.colorScheme') }}</div>
                 <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
                     <template v-for="theme in ['auto', 'light', 'dark']">
                         <input type="radio" class="btn-check" :name="'darkMode' + theme" :id="'darkMode' + theme"
@@ -28,10 +28,10 @@
                             'active fw-bold': userPreferences.theme === theme
                         }" :for="'darkMode' + theme">
                             <span v-if="theme === 'light'"><i class="bi bi-brightness-high"></i> {{
-                                $t('nav.preferences.colorLight') }}</span>
+                                t('nav.preferences.colorLight') }}</span>
                             <span v-else-if="theme === 'dark'"><i class="bi bi-moon-stars"></i> {{
-                                $t('nav.preferences.colorDark') }}</span>
-                            <span v-else>{{ $t('nav.preferences.colorAuto') }}</span>
+                                t('nav.preferences.colorDark') }}</span>
+                            <span v-else>{{ t('nav.preferences.colorAuto') }}</span>
                         </label>
                     </template>
                 </div>
@@ -41,7 +41,7 @@
 
             <div id="Pref_ipCards">
                 <div class="form-label col-12 preferences-title">
-                    <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipSourcesToCheck') }}
+                    <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipSourcesToCheck') }}
                 </div>
                 <div class="btn-group col-auto w-50 mb-2" role="group" aria-label="ipCards">
                     <template v-for="num in [2, 3, 6]">
@@ -56,14 +56,14 @@
                             }}</label>
                     </template>
                 </div>
-                <div class="preferences-tip">{{ $t('nav.preferences.ipSourcesToCheckTips') }}</div>
+                <div class="preferences-tip">{{ t('nav.preferences.ipSourcesToCheckTips') }}</div>
             </div>
 
             <!-- IP 地理位置数据库 -->
 
             <div id="Pref_ipGeoSource">
                 <div class="form-label col-12 preferences-title">
-                    <i class="bi bi-ui-checks-grid"></i> {{ $t('nav.preferences.ipDB') }}
+                    <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipDB') }}
                 </div>
                 <div class="btn-group-vertical col-auto w-50 mb-2" role="group" aria-label="ipGeoSource">
                     <template v-for="ipdb in ipDBs">
@@ -81,23 +81,23 @@
                         </label>
                     </template>
                 </div>
-                <div class="preferences-tip">{{ $t('nav.preferences.ipDBTips') }}</div>
+                <div class="preferences-tip">{{ t('nav.preferences.ipDBTips') }}</div>
             </div>
 
             <!-- 应用设置 -->
 
             <div id="Pref_appSettings">
                 <div class="form-label col-12 preferences-title"><i class="bi bi-window-dock"></i> {{
-                    $t('nav.preferences.appSettings') }}</div>
+                    t('nav.preferences.appSettings') }}</div>
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start"
                         :class="[isDarkMode ? 'border-light' : 'border-dark']">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="autoStart">{{
-                                $t('nav.preferences.autoRun')
+                                t('nav.preferences.autoRun')
                                     }}</label>
                             </div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.autoRunTips') }}</div>
+                            <div class="preferences-tip">{{ t('nav.preferences.autoRunTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
                             <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
@@ -110,8 +110,8 @@
                         :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="userPreferences.autoStart">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
-                                $t('nav.preferences.connectivityAutoRefresh') }}</label></div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.connectivityAutoRefreshTips') }}</div>
+                                t('nav.preferences.connectivityAutoRefresh') }}</label></div>
+                            <div class="preferences-tip">{{ t('nav.preferences.connectivityAutoRefreshTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
                             <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
@@ -125,10 +125,10 @@
                         :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="configs.bingMap">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="showMap">{{
-                                $t('nav.preferences.showMap')
+                                t('nav.preferences.showMap')
                                     }}</label>
                             </div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.showMapTips') }}</div>
+                            <div class="preferences-tip">{{ t('nav.preferences.showMapTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
                             <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
@@ -141,9 +141,9 @@
                         :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="isMobile">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="simpleMode">{{
-                                $t('nav.preferences.simpleMode')
+                                t('nav.preferences.simpleMode')
                                     }}</label></div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.simpleModeTips') }}</div>
+                            <div class="preferences-tip">{{ t('nav.preferences.simpleModeTips') }}</div>
                         </div>
                         <div class="form-check form-switch col-auto ">
                             <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
@@ -156,9 +156,9 @@
                         :class="[isDarkMode ? 'border-light' : 'border-dark']">
                         <div class="me-auto">
                             <div class="fw-bold"><label class="form-check-label" for="ConnectivityNotifications">{{
-                                $t('nav.preferences.popupConnectivityNotifications') }}</label>
+                                t('nav.preferences.popupConnectivityNotifications') }}</label>
                             </div>
-                            <div class="preferences-tip">{{ $t('nav.preferences.popupConnectivityNotificationsTips') }}
+                            <div class="preferences-tip">{{ t('nav.preferences.popupConnectivityNotificationsTips') }}
                             </div>
                         </div>
                         <div class="form-check form-switch col-auto ">
@@ -183,10 +183,12 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, getCurrentInstance } from 'vue';
 import { useMainStore } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
 
-const { proxy } = getCurrentInstance();
+const {t} = useI18n();
+
 const store = useMainStore();
-
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
@@ -247,50 +249,50 @@ const prefTheme = (value) => {
     updateBodyClass();
     PWAColor();
     store.updatePreference('theme', value);
-    proxy.$trackEvent('Nav', 'PreferenceClick', 'Theme');
+    trackEvent('Nav', 'PreferenceClick', 'Theme');
 };
 
 
 
 const prefConnectivityRefresh = (value) => {
     store.updatePreference('connectivityAutoRefresh', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
+    trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
 };
 
 const prefShowMap = (value) => {
     store.updatePreference('showMap', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'ShowMap');
+    trackEvent('Nav', 'PrefereceClick', 'ShowMap');
 };
 
 const prefSimpleMode = (value) => {
     store.updatePreference('simpleMode', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
+    trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
 };
 
 const prefAutoStart = (value) => {
     store.updatePreference('autoStart', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'AutoStart');
+    trackEvent('Nav', 'PrefereceClick', 'AutoStart');
 };
 
 const prefconnectivityShowNoti = (value) => {
     store.updatePreference('popupConnectivityNotifications', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
+    trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
 };
 
 const prefipCards = (value) => {
     store.updatePreference('ipCardsToShow', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'ipCards');
+    trackEvent('Nav', 'PrefereceClick', 'ipCards');
 };
 
 const prefipGeoSource = (value) => {
     store.updatePreference('ipGeoSource', value);
-    proxy.$trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
-    proxy.$trackEvent('IPCheck', 'SelectSource', ipDBs.value.find(x => x.id === value).text);
+    trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
+    trackEvent('IPCheck', 'SelectSource', ipDBs.value.find(x => x.id === value).text);
 };
 
 const toggleMaps = () => {
     store.updatePreference('showMap', !userPreferences.value.showMap);
-    proxy.$trackEvent('Nav', 'ToggleClick', 'ShowMap');
+    trackEvent('Nav', 'ToggleClick', 'ShowMap');
 };
 
 onMounted(() => {

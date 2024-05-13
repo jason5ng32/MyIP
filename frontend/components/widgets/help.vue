@@ -4,14 +4,14 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="helpModalTitle">{{ $t('helpModal.Title') }}</h5>
+                    <h5 class="modal-title" id="helpModalTitle">{{ t('helpModal.Title') }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <p class="jn-help-note "><i class="bi bi-hand-thumbs-up-fill"></i>
-                        {{ $t('shortcutKeys.HelpNote') }}
+                        {{ t('shortcutKeys.HelpNote') }}
                     </p>
                     <div class="row flex-nowrap text-nowrap">
                         <!-- 左边的列 -->
@@ -50,6 +50,9 @@
 import { computed, ref } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
+import { useI18n } from 'vue-i18n';
+
+const {t} = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);

@@ -4,11 +4,9 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './i18n';
 import router from './router';
-import Analytics from 'analytics';
-import googleAnalytics from '@analytics/google-analytics';
+import { analytics } from './utils/use-analytics';
 
 import { Tooltip } from 'bootstrap';
-import { setLanguage } from './utils/set-lang';
 import { detectOS } from './utils/system-detect';
 import './style.css'
 
@@ -26,7 +24,7 @@ app.use(router);
 //
 
 // 在应用启动时设置语言
-store.lang = setLanguage();
+store.lang = i18n.global.locale;
 
 // 检测操作系统
 const os = detectOS();
@@ -40,20 +38,12 @@ handleResize();
 // 监听窗口大小变化
 window.addEventListener('resize', handleResize);
 
-// Google Analytics 配置
-const analytics = Analytics({
-    app: 'MyIP',
-    plugins: [
-        googleAnalytics({
-            measurementIds: ['G-TEYKKD81TL'],
-        })
-    ]
-});
 
 // 启动 Google Analytics
 analytics.page();
 app.config.globalProperties.$analytics = analytics;
 
+// 注册全局事件跟踪函数，改造完程序后移除
 app.config.globalProperties.$trackEvent = function (category, action, label) {
     analytics.track(action, {
         category: category,

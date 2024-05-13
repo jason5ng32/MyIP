@@ -7,9 +7,8 @@
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import '@khmyznikov/pwa-install';
 import { detectBrowser, detectOS } from '@/utils/system-detect.js';
+import { trackEvent } from '@/utils/use-analytics';
 
-
-const { proxy } = getCurrentInstance();
 
 // 定义数据
 const isDesktopChrome = ref(true);
@@ -44,10 +43,10 @@ const showPWA = () => {
 
     if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
         pwaInstall.showDialog(true);
-        proxy.$trackEvent('PWA', 'PWAPopup', 'Show');
+        trackEvent('PWA', 'PWAPopup', 'Show');
         pwaInstall.addEventListener('pwa-install-success-event', event => {
             if (event.detail.message.includes('success')) {
-                proxy.$trackEvent('PWA', 'PWAInstalled', 'Success');
+                trackEvent('PWA', 'PWAInstalled', 'Success');
             }
         });
     }

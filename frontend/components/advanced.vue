@@ -2,20 +2,20 @@
     <!-- Advanced Tools -->
     <div class="advanced-tools-section mb-4">
         <div class="jn-title2">
-            <h2 id="AdvancedTools" :class="{ 'mobile-h2': isMobile }">🧰 {{ $t('advancedtools.Title') }}</h2>
+            <h2 id="AdvancedTools" :class="{ 'mobile-h2': isMobile }">🧰 {{ t('advancedtools.Title') }}</h2>
 
         </div>
         <div class="text-secondary">
-            <p>{{ $t('advancedtools.Note') }}</p>
+            <p>{{ t('advancedtools.Note') }}</p>
         </div>
         <div class="row">
             <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
                         <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">
-                            <i class="bi bi-arrow-up-right-circle"></i> {{ $t(card.titleKey) }}
+                            <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
                         </h3>
-                        <p class="opacity-75">{{ $t(card.noteKey) }}</p>
+                        <p class="opacity-75">{{ t(card.noteKey) }}</p>
                         <span :class="[isDarkMode ? 'jn-icon-dark' : 'jn-icon']">{{ card.icon }}</span>
                     </div>
                 </div>
@@ -36,8 +36,8 @@
                 <Transition name="slide-fade">
                     <span v-if="showTitle" class="fw-medium"
                         :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
-                            cards[openedCard].icon }}
-                        {{ $t(cards[openedCard].titleKey) }}</span>
+                        cards[openedCard].icon }}
+                        {{ t(cards[openedCard].titleKey) }}</span>
                 </Transition>
 
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -50,132 +50,121 @@
 
 </template>
 
-<script>
-import { ref, computed, watch } from 'vue';
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { Offcanvas } from 'bootstrap';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
 
-export default {
-    name: 'AdvancedTools',
+const {t} = useI18n();
 
-    // 引入 Store
-    setup() {
-        const store = useMainStore();
-        const isDarkMode = computed(() => store.isDarkMode);
-        const isMobile = computed(() => store.isMobile);
-        const configs = computed(() => store.configs);
+const store = useMainStore();
+const isDarkMode = computed(() => store.isDarkMode);
+const isMobile = computed(() => store.isMobile);
+const configs = computed(() => store.configs);
+
+const scrollContainer = ref(null);
+const router = useRouter();
+
+const cards = ref([
+    { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
+    { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
+    { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
+    { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
+    { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
+    { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
+]);
+
+const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };
+const isFullScreen = ref(false);
+const showTitle = ref(false);
+const openedCard = ref(null);
 
 
-        return {
-            store,
-            isDarkMode,
-            isMobile,
-            configs,
-        };
-    },
+// 控制标题显示
+const handleScroll = () => {
+    const scrollTop = scrollContainer.value.scrollTop;
+    if (scrollTop > 60) {
+        showTitle.value = true;
+    } else {
+        showTitle.value = false;
+    }
+};
 
-    data() {
-        return {
-            cards: [
-                { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
-                { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
-                { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
-                { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
-                { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
-                { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
-            ],
-            cardInvisibilityTest: { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' },
-            isFullScreen: false,
-            showTitle: false,
-            openedCard: null,
+// 跳转到指定页面并打开
+const navigateAndToggleOffcanvas = (routePath) => {
+    router.push(routePath);
+    switch (routePath) {
+        case '/pingtest':
+            trackEvent('Nav', 'NavClick', 'PingTest');
+            openedCard.value = 0;
+            break;
+        case '/mtrtest':
+            trackEvent('Nav', 'NavClick', 'MTRTest');
+            openedCard.value = 1;
+            break;
+        case '/ruletest':
+            trackEvent('Nav', 'NavClick', 'RuleTest');
+            openedCard.value = 2;
+            break;
+        case '/dnsresolver':
+            trackEvent('Nav', 'NavClick', 'DNSResolver');
+            openedCard.value = 3;
+            break;
+        case '/censorshipcheck':
+            trackEvent('Nav', 'NavClick', 'CensorshipCheck');
+            openedCard.value = 4;
+            break;
+        case '/whois':
+            trackEvent('Nav', 'NavClick', 'Whois');
+            openedCard.value = 5;
+            break;
+        case '/invisibilitytest':
+            trackEvent('Nav', 'NavClick', 'InvisibilityTest');
+            openedCard.value = 6;
+            break;
+    }
+    var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
+    offcanvas.show();
+};
+
+// 全屏显示
+const fullScreen = () => {
+    const offcanvas = document.getElementById('offcanvasTools');
+    if (offcanvas) {
+        offcanvas.style.transition = 'height 0.5s ease-in-out';
+        if (!isFullScreen.value) {
+            offcanvas.style.height = '100%';
+            isFullScreen.value = true;
+        } else {
+            offcanvas.style.height = '80%';
+            isFullScreen.value = false;
         }
-    },
-
-    methods: {
-        
-        // 控制标题显示
-        handleScroll() {
-            const scrollTop = this.$refs.scrollContainer.scrollTop;
-            if (scrollTop > 60) {
-                this.showTitle = true;
-            } else {
-                this.showTitle = false;
-            }
-        },
-        
-        // 跳转到指定页面并打开
-        navigateAndToggleOffcanvas(routePath) {
-            this.$router.push(routePath);
-            switch (routePath) {
-                case '/pingtest':
-                    this.$trackEvent('Nav', 'NavClick', 'PingTest');
-                    this.openedCard = 0;
-                    break;
-                case '/mtrtest':
-                    this.$trackEvent('Nav', 'NavClick', 'MTRTest');
-                    this.openedCard = 1;
-                    break;
-                case '/ruletest':
-                    this.$trackEvent('Nav', 'NavClick', 'RuleTest');
-                    this.openedCard = 2;
-                    break;
-                case '/dnsresolver':
-                    this.$trackEvent('Nav', 'NavClick', 'DNSResolver');
-                    this.openedCard = 3;
-                    break;
-                case '/censorshipcheck':
-                    this.$trackEvent('Nav', 'NavClick', 'CensorshipCheck');
-                    this.openedCard = 4;
-                    break;
-                case '/whois':
-                    this.$trackEvent('Nav', 'NavClick', 'Whois');
-                    this.openedCard = 5;
-                    break;
-                case '/invisibilitytest':
-                    this.$trackEvent('Nav', 'NavClick', 'InvisibilityTest');
-                    this.openedCard = 6;
-                    break;
-            }
-            var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
-            offcanvas.show();
-        },
-
-        // 全屏显示
-        fullScreen() {
-            const offcanvas = document.getElementById('offcanvasTools');
-            if (offcanvas) {
-                offcanvas.style.transition = 'height 0.5s ease-in-out';
-                if (!this.isFullScreen) {
-                    offcanvas.style.height = '100%';
-                    this.isFullScreen = true;
-                } else {
-                    offcanvas.style.height = '80%';
-                    this.isFullScreen = false;
-                }
-                setTimeout(() => {
-                    offcanvas.style.transition = '';
-                }, 500);
-            }
-        }
-
-    },
-    mounted() {
-        this.store.setLoadingStatus('advancedtools', true);
-        // 监听滚动事件
-        this.$refs.scrollContainer.addEventListener('scroll', this.handleScroll);
-
         setTimeout(() => {
-            if (this.configs.originalSite) {
-                this.cards.push(this.cardInvisibilityTest);
-            }
-        }, 2000);
+            offcanvas.style.transition = '';
+        }, 500);
+    }
+};
 
 
-    },
-    unmounted() {
-        this.$refs.scrollContainer.removeEventListener('scroll', this.handleScroll);
-    },
-}
+onMounted(() => {
+    store.setLoadingStatus('advancedtools', true);
+    // 监听滚动事件
+    scrollContainer.value.addEventListener('scroll', handleScroll);
+
+    setTimeout(() => {
+        if (configs.value.originalSite) {
+            cards.value.push(cardInvisibilityTest);
+        }
+    }, 2000);
+});
+
+onUnmounted(() => {
+    scrollContainer.value.removeEventListener('scroll', handleScroll);
+});
+
 </script>
 
 <style scoped>

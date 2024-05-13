@@ -23,26 +23,26 @@
 <script>
 
 // Components
-import NavBar from './components/nav.vue';
-import IPCheck from './components/ip-check.vue';
-import Connectivity from './components/connectivity-test.vue';
-import WebRTC from './components/webrtc-test.vue';
-import DNSLeaks from './components/dns-leaks-test.vue';
-import SpeedTest from './components/speed-test.vue';
-import AdvancedTools from './components/advanced.vue';
-import Footer from './components/footer.vue';
+import NavBar from './components/Nav.vue';
+import IPCheck from './components/IpInfos.vue';
+import Connectivity from './components/ConnectivityTest.vue';
+import WebRTC from './components/WebRtcTest.vue';
+import DNSLeaks from './components/DnsLeaksTest.vue';
+import SpeedTest from './components/SpeedTest.vue';
+import AdvancedTools from './components/Advanced.vue';
+import Footer from './components/Footer.vue';
 
 // Utils
 import { mappingKeys, keyMap, ShortcutKeys } from "@/utils/shortcut.js";
 import { maskedInfo } from "@/utils/masked-info.js";
 
 // Widgets
-import Preferences from './components/widgets/preferences.vue';
-import QueryIP from './components/widgets/query-ip.vue';
-import HelpModal from './components/widgets/help.vue';
-import PWA from './components/widgets/pwa.vue';
-import Alert from './components/widgets/alert.vue';
-import InfoMask from './components/widgets/infomask.vue';
+import Preferences from './components/widgets/Preferences.vue';
+import QueryIP from './components/widgets/QueryIP.vue';
+import HelpModal from './components/widgets/Help.vue';
+import PWA from './components/widgets/PWA.vue';
+import Alert from './components/widgets/Toast.vue';
+import InfoMask from './components/widgets/InfoMask.vue';
 
 // Vue
 import { ref, watch, computed } from 'vue';

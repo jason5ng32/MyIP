@@ -2,21 +2,21 @@
     <!-- Search BTN -->
     <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"
         data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP"
-        v-tooltip="$t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
+        v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="IPCheckTitle">{{ $t('ipcheck.Title') }}</h5>
+                    <h5 class="modal-title" id="IPCheckTitle">{{ t('ipcheck.Title') }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-                        :placeholder="$t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
+                        :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
                         name="inputIP" id="inputIP">
                     <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
                     <div v-if="modalQueryResult" class="mt-2">
@@ -24,7 +24,7 @@
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
-                                        <i class="bi bi-pc-display-horizontal"></i> {{ $t('ipInfos.Country')
+                                        <i class="bi bi-pc-display-horizontal"></i> {{ t('ipInfos.Country')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">{{ modalQueryResult.country_name }}&nbsp;
                                         <span v-if="modalQueryResult.country_code"
@@ -32,7 +32,7 @@
                                     </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto"><i class="bi bi-houses"></i> {{ $t('ipInfos.Region')
+                                    <span class="jn-text col-auto"><i class="bi bi-houses"></i> {{ t('ipInfos.Region')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.region }}
@@ -40,14 +40,14 @@
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
-                                        $t('ipInfos.City')
+                                        t('ipInfos.City')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.city }}
                                     </span>
                                 </li>
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ $t('ipInfos.ISP')
+                                    <span class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ t('ipInfos.ISP')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.isp }}
@@ -55,10 +55,10 @@
                                 </li>
 
 
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== $t('ipInfos.proxyDetect.type.unknownType')"
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== t('ipInfos.proxyDetect.type.unknownType')"
                                     class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
-                                        <i class="bi bi-reception-4"></i> {{ $t('ipInfos.type')
+                                        <i class="bi bi-reception-4"></i> {{ t('ipInfos.type')
                                         }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.type }}
@@ -68,15 +68,15 @@
                                     </span>
                                 </li>
 
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== $t('ipInfos.proxyDetect.unknownProxyType')"
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== t('ipInfos.proxyDetect.unknownProxyType')"
                                     class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
                                         <i class="bi bi-shield-fill-check"></i>
-                                        {{ $t('ipInfos.isProxy') }}</span>&nbsp;:&nbsp;
+                                        {{ t('ipInfos.isProxy') }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         {{ modalQueryResult.isProxy }}
                                         <span
-                                            v-if="modalQueryResult.proxyProtocol !== $t('ipInfos.proxyDetect.unknownProtocol')">
+                                            v-if="modalQueryResult.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
                                             ( {{ modalQueryResult.proxyProtocol }} )
                                         </span>
                                     </span>
@@ -85,7 +85,7 @@
 
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
-                                        <i class="bi bi-buildings"></i> {{ $t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
+                                        <i class="bi bi-buildings"></i> {{ t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
                                     <span class="col-10 ">
                                         <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink"
                                             target="_blank"
@@ -104,7 +104,7 @@
                         :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
                         @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
                             ">{{
-                        $t('ipcheck.Button') }}</button>
+                        t('ipcheck.Button') }}</button>
                 </div>
 
 
@@ -119,6 +119,10 @@ import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
+
+const {t} = useI18n();
 
 // 引入 Store
 const store = useMainStore();
@@ -131,8 +135,6 @@ const modalQueryError = ref("");
 const isChecking = ref("idle");
 const ipGeoSource = computed(() => userPreferences.value.ipGeoSource);
 
-// 用于全局事件的代理
-const { proxy } = getCurrentInstance();
 
 // 实时变化查询源
 watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
@@ -147,7 +149,7 @@ const submitQuery = async () => {
         isChecking.value = "running";
         await fetchIPForModal(inputIP.value);
     } else {
-        modalQueryError.value = proxy.$t('ipcheck.Error');
+        modalQueryError.value = t('ipcheck.Error');
         modalQueryResult.value = null;
         isChecking.value = "idle";
     }
@@ -155,7 +157,7 @@ const submitQuery = async () => {
 
 // 打开查询 IP 的模态框
 const openQueryIP = () => {
-    proxy.$trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
+    trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
     openModal();
 };
 
@@ -202,7 +204,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
             if (data.error) {
                 throw new Error(data.reason || "IP lookup failed");
             }
-            modalQueryResult.value = transformDataFromIPapi(data, source.id, proxy);
+            modalQueryResult.value = transformDataFromIPapi(data, source.id, t);
             isChecking.value = "idle";
             break;
         } catch (error) {
