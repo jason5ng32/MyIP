@@ -193,6 +193,7 @@ onMounted(() => {
 
 defineExpose({
   checkAllDNSLeakTest,
+  leakTest
 });
 </script>
 

@@ -170,6 +170,7 @@ watch(IPArray, () => {
 
 defineExpose({
   checkAllWebRTC,
+  stunServers
 });
 
 </script>
