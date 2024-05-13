@@ -1,5 +1,5 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'bootstrap-icons/font/bootstrap-icons.min.css';
 @import 'flag-icons/css/flag-icons.min.css';
 
 .jn-title {

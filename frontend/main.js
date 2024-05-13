@@ -2,13 +2,13 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia';
 import { useMainStore } from './store';
 import App from './App.vue'
-import i18n from './i18n';
+import i18n from './locales/i18n';
 import router from './router';
 import { analytics } from './utils/use-analytics';
 
 import { Tooltip } from 'bootstrap';
 import { detectOS } from './utils/system-detect';
-import './style.css'
+import './style/style.css'
 
 const app = createApp(App);
 const pinia = createPinia();
