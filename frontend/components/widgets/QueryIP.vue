@@ -204,7 +204,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
             if (data.error) {
                 throw new Error(data.reason || "IP lookup failed");
             }
-            modalQueryResult.value = transformDataFromIPapi(data, source.id, t,selectedLang);
+            modalQueryResult.value = transformDataFromIPapi(data, source.id, t,lang.value);
             isChecking.value = "idle";
             break;
         } catch (error) {

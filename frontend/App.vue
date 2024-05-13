@@ -19,6 +19,7 @@
   <HelpModal ref="helpModalRef" />
   <Footer ref="footerRef" />
   <PWA />
+  <Patch />
 </template>
 
 <script setup>
@@ -40,16 +41,16 @@ import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
+import Patch from './components/widgets/Patch.vue';
 
 // Vue
 import { ref, computed, onMounted, reactive, watch, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Modal, Toast, Offcanvas } from 'bootstrap';
 
 // Utils
-import { mappingKeys, keyMap } from "@/utils/shortcut.js";
+import { mappingKeys, keyMap, navigateCards } from "@/utils/shortcut.js";
 import { maskedInfo } from "@/utils/masked-info.js";
 
 const { t } = useI18n();
@@ -86,7 +87,6 @@ const alertStyle = ref("");
 const alertMessage = ref("");
 const alertTitle = ref("");
 const alertToShow = ref(false);
-let trackedSections = new Set();
 const autoStart = ref(userPreferences.value.autoStart);
 
 //
@@ -232,7 +232,6 @@ const infoMask = () => {
   }
 };
 
-// 信息遮罩内容还原
 // 信息遮罩内容还原
 const infoUnmask = () => {
   const newIpDataCards = JSON.parse(JSON.stringify(originipDataCards.value));
@@ -501,61 +500,6 @@ const loadShortcuts = () => {
   }, 2000);
 };
 
-//
-// 统计相关
-//
-// 滚动到指定元素并记录事件
-const checkSectionsAndTrack = () => {
-  const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'GlobalLatency', 'PingTest', 'MTRTest'];
-
-  sectionIds.forEach(sectionId => {
-    const section = document.getElementById(sectionId);
-    if (section && isElementInViewport(section) && !trackedSections.has(sectionId)) {
-      trackEvent(sectionId, 'JNScroll', sectionId);
-      trackedSections.add(sectionId);
-    }
-  });
-};
-
-// 判断元素是否在视窗内
-const isElementInViewport = (el) => {
-  const rect = el.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-};
-
-//
-// 补丁
-//
-// 监听所有 offcanvas，避免同时打开多个导致浏览器崩溃
-const listenOffcanvas = () => {
-  const offcanvasElements = document.querySelectorAll('.offcanvas');
-  const navElements = document.getElementById('navbarNavAltMarkup');
-  const navElementsButton = document.querySelector('.navbar-toggler');
-  offcanvasElements.forEach((element) => {
-    const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
-    element.addEventListener('show.bs.offcanvas', () => {
-      // 存在 Offcanvas 时关闭导航栏
-      navElements.classList.remove('show');
-      navElementsButton.setAttribute('aria-expanded', 'false');
-      navElementsButton.classList.add('collapsed');
-      // 关闭所有其他的 offcanvas
-      offcanvasElements.forEach((offcanvas) => {
-        if (offcanvas !== element) {
-          const offcanvasInstance = Offcanvas.getInstance(offcanvas);
-          if (offcanvasInstance) { // 确保实例有效
-            offcanvasInstance.hide();
-          }
-        }
-      });
-    });
-  });
-};
-
 watch(shouldRefreshEveryThing, (newVal) => {
   if (newVal) {
     navBarRef.value.loaded = false;
@@ -574,8 +518,6 @@ watch(isInfosLoaded, (newVal) => {
 onMounted(() => {
   loadingControl();
   loadShortcuts();
-  listenOffcanvas();
-  window.addEventListener('scroll', checkSectionsAndTrack);
 });
 
 

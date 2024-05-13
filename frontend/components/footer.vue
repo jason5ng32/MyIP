@@ -157,6 +157,10 @@ const toggleContent = (contentType) => {
   content.value = contentType;
   offcanvasBody.scrollTop = 0;
 };
+
+defineExpose({
+  openAbout
+});
 </script>
 
 <style scoped>

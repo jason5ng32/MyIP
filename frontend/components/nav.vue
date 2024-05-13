@@ -160,6 +160,7 @@ onMounted(() => {
 // 暴露给 App.vue 的数据
 defineExpose({
   loaded,
+  OpenPreferences,
 });
 </script>
 

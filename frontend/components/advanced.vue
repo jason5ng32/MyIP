@@ -161,8 +161,8 @@ onMounted(() => {
     }, 2000);
 });
 
-onUnmounted(() => {
-    scrollContainer.value.removeEventListener('scroll', handleScroll);
+defineExpose({
+  navigateAndToggleOffcanvas,
 });
 
 </script>

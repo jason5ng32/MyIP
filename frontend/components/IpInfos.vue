@@ -555,7 +555,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
         const url = store.getDbUrl(source.id, ip, setLang);
         const response = await fetch(url);
         const data = await response.json();
-        const cardData = transformDataFromIPapi(data, source.id, t,setLang);
+        const cardData = transformDataFromIPapi(data, source.id, t, lang.value);
 
         if (cardData) {
           ipGeoSource.value = source.id;
