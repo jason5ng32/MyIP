@@ -377,7 +377,7 @@ const getIPFromQQ = () => {
 
 // 从特殊源获取 IP 地址
 const getIPFromSpecial = async () => {
-  if (configs.originalSite) {
+  if (configs.value.originalSite) {
     await getIPFromGCR();
   } else {
     await getIPFromUpai();

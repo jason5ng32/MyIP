@@ -1,5 +1,5 @@
 import { get } from 'https';
-import { refererCheck } from './utils/referer-check.js';
+import { refererCheck } from '../lib/referer-check.js';
 
 // 验证请求合法性
 
