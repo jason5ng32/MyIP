@@ -3,14 +3,14 @@
         <!-- RuleTest -->
         <div class="rule-test-section mb-4">
             <div class="jn-title2">
-                <h2 id="RuleTest" :class="{ 'mobile-h2': isMobile }">🚏 {{ $t('ruletest.Title') }}</h2>
+                <h2 id="RuleTest" :class="{ 'mobile-h2': isMobile }">🚏 {{ t('ruletest.Title') }}</h2>
                 <button @click="checkAllRuleTest(true)"
                     :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                    aria-label="Refresh Rule Test" v-tooltip="$t('Tooltips.RefreshRuleTests')"><i
+                    aria-label="Refresh Rule Test" v-tooltip="t('Tooltips.RefreshRuleTests')"><i
                         class="bi bi-arrow-clockwise"></i></button>
             </div>
             <div class="text-secondary">
-                <p>{{ $t('ruletest.Note') }}</p>
+                <p>{{ t('ruletest.Note') }}</p>
             </div>
             <div class="row">
                 <div v-for="test in ruleTests" :key="test.id" class="col-lg-3 col-md-6 col-12 mb-4">
@@ -27,22 +27,22 @@
                                 {{ test.url }}
                             </p>
                             <p class="card-text" :class="{
-                                'text-info': test.ip === $t('ruletest.StatusWait'),
+                                'text-info': test.ip === t('ruletest.StatusWait'),
                                 'text-success': test.ip.includes('.') || test.ip.includes(':'),
-                                'text-danger': test.ip === $t('ruletest.StatusError')
+                                'text-danger': test.ip === t('ruletest.StatusError')
                             }">
                                 <i class="bi"
-                                    :class="[test.ip === $t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+                                    :class="[test.ip === t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
                                 <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
                             <div class="alert" :class="{
-                                'alert-info': test.country_code === $t('ruletest.StatusWait'),
-                                'alert-success': test.country_code !== $t('ruletest.StatusWait'),
+                                'alert-info': test.country_code === t('ruletest.StatusWait'),
+                                'alert-success': test.country_code !== t('ruletest.StatusWait'),
                             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <i class="bi"
-                                    :class="[test.ip === $t('ruletest.StatusWait') || test.ip === $t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                                {{ $t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
-                                <span v-if="test.country_code !== $t('ruletest.StatusWait')"
+                                    :class="[test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                                {{ t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
+                                <span v-if="test.country_code !== t('ruletest.StatusWait')"
                                     :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
                         </div>
@@ -53,115 +53,93 @@
     </div>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 import countryLookup from 'country-code-lookup';
 
+const { t } = useI18n();
 
-export default {
-    name: 'RuleTest',
+const store = useMainStore();
+const isDarkMode = computed(() => store.isDarkMode);
+const isMobile = computed(() => store.isMobile);
 
-    // 引入 Store
-    setup() {
-        const store = useMainStore();
-        const isDarkMode = computed(() => store.isDarkMode);
-        const isMobile = computed(() => store.isMobile);
+const createDefaultCard = () => ({
+    name: t('ruletest.Name'),
+    ip: t('ruletest.StatusWait'),
+    country_code: t('ruletest.StatusWait'),
+    country: t('ruletest.StatusWait'),
+});
 
-        return {
-            isDarkMode,
-            isMobile,
-            store,
-        };
-    },
+const ruleTests = ref(Array.from({ length: 8 }, (_, index) => ({
+    id: index + 1,
+    url: `ptest-${index + 1}.ipcheck.ing`,
+    ...createDefaultCard(),
+})));
 
-    data() {
-        const createDefaultCard = () => ({
-            name: this.$t('ruletest.Name'),
-            ip: this.$t('ruletest.StatusWait'),
-            country_code: this.$t('ruletest.StatusWait'),
-            country: this.$t('ruletest.StatusWait'),
+const IPArray = ref([]);
+const testCount = ref(ruleTests.value.length);
+
+const fetchTrace = async (id, url) => {
+    try {
+        const response = await fetch(`https://${url}/cdn-cgi/trace`);
+        const data = await response.text();
+        const lines = data.split("\n");
+        const ipLine = lines.find((line) => line.startsWith("ip="));
+        const countryLine = lines.find((line) => line.startsWith("loc="));
+        if (ipLine) {
+            const ip = ipLine.split("=")[1];
+            ruleTests.value[id].ip = ip;
+            IPArray.value = [...IPArray.value, ip];
+        }
+        if (countryLine) {
+            const country = countryLine.split("=")[1];
+            ruleTests.value[id].country_code = country;
+            ruleTests.value[id].country = countryLookup.byIso(country).country;
+        }
+    } catch (error) {
+        ruleTests.value[id].ip = t('ruletest.StatusError');
+        ruleTests.value[id].country_code = t('ruletest.StatusError');
+        ruleTests.value[id].country = t('ruletest.StatusError');
+        console.error("Error fetching Data:", error);
+    }
+};
+
+// 检查所有 RuleTest
+const checkAllRuleTest = async (refresh = false) => {
+
+    if (refresh) {
+        ruleTests.value.forEach((test) => {
+            test.ip = t('ruletest.StatusWait');
+            test.country_code = t('ruletest.StatusWait');
         });
-        const ruleTests = Array.from({ length: 8 }, (_, index) => ({
-            id: index + 1,
-            url: `ptest-${index + 1}.ipcheck.ing`,
-            ...createDefaultCard(),
-        }));
-        return {
-            testCount: 8,
-            ruleTests,
-            IPArray: [],
-        };
-    },
+    }
 
-    methods: {
-
-        // 获取 RuleTest 数据
-        async fetchTrace(id, url) {
+    const processTest = async (index) => {
+        if (index < testCount.value) {
             try {
-                const response = await fetch(`https://${url}/cdn-cgi/trace`);
-                const data = await response.text();
-                const lines = data.split("\n");
-                const ipLine = lines.find((line) => line.startsWith("ip="));
-                const countryLine = lines.find((line) => line.startsWith("loc="));
-                if (ipLine) {
-                    const ip = ipLine.split("=")[1];
-                    this.ruleTests[id].ip = ip;
-                    this.IPArray = [...this.IPArray, ip];
-                }
-                if (countryLine) {
-                    const country = countryLine.split("=")[1];
-                    this.ruleTests[id].country_code = country;
-                    this.ruleTests[id].country = countryLookup.byIso(country).country;
-                }
+                await fetchTrace(index, ruleTests.value[index].url);
             } catch (error) {
-                this.ruleTests[id].ip = this.$t('ruletest.StatusError');
-                this.ruleTests[id].country_code = this.$t('ruletest.StatusError');
-                this.ruleTests[id].country = this.$t('ruletest.StatusError');
                 console.error("Error fetching Data:", error);
+            } finally {
+                processTest(index + 1);
             }
-        },
+        }
+    };
 
-        // 检查所有 RuleTest
-        async checkAllRuleTest(refresh = false) {
+    processTest(0);
+};
 
-            if (refresh) {
-                this.ruleTests.forEach((test) => {
-                    test.ip = this.$t('ruletest.StatusWait');
-                    test.country_code = this.$t('ruletest.StatusWait');
-                });
-            }
+onMounted(() => {
+    setTimeout(() => {
+        checkAllRuleTest();
+    }, 1000);
+});
 
-            const processTest = async (index) => {
-                if (index < this.testCount) {
-                    try {
-                        await this.fetchTrace(index, this.ruleTests[index].url);
-                    } catch (error) {
-                        console.error("Error fetching Data:", error);
-                    } finally {
-                        processTest(index + 1);
-                    }
-                }
-            };
-
-            processTest(0);
-        },
-    },
-
-    mounted() {
-        setTimeout(() => {
-            this.checkAllRuleTest();
-        }, 1000);
-    },
-    watch: {
-        IPArray: {
-            handler() {
-                this.store.updateGlobalIpDataCards(this.IPArray);
-            },
-            deep: true,
-        },
-    },
-}
+watch(IPArray, () => {
+    store.updateGlobalIpDataCards(IPArray.value);
+}, { deep: true });
 </script>
 
 <style scoped>
