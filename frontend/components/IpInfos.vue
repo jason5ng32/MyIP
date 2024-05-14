@@ -22,7 +22,7 @@
               <span>
                 <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
                 {{ t('ipInfos.Source') }}: {{ card.source }}</span>
-              <button @click="refreshCard(card)"
+              <button @click="refreshCard(card,index)"
                 :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
                 :aria-label="'Refresh' + card.source" v-tooltip="t('Tooltips.RefreshIPCard')">
                 <i class="bi bi-arrow-clockwise"></i></button>
@@ -198,6 +198,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
+import { getIPFromIPIP, getIPFromUpai, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromGCR, getIPFromIpify_V4, getIPFromIpify_V6 } from '@/utils/getips';
 
 
 const { t } = useI18n();
@@ -209,6 +210,10 @@ const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
+
+// 页面的动态配置
+const isMapShown = computed(() => userPreferences.value.showMap);
+const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
 // 创建样式
 const placeholderSizes = [12, 8, 6, 8, 4];
@@ -283,8 +288,7 @@ const ipDataCards = reactive([
   },
 ]);
 
-const isMapShown = ref(userPreferences.value.showMap);
-const isCardsCollapsed = ref(userPreferences.value.simpleMode);
+// 其它数据
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
 const copiedStatus = ref({});
 const IPArray = ref([]);
@@ -295,212 +299,33 @@ const usingSource = ref(userPreferences.value.ipGeoSource);
 let pendingIPDetailsRequests = new Map();
 let ipDataCache = new Map();
 
+
 // 从中国来源获取 IP 地址
 const getIPfromCNSource = () => {
-  getIPFromIPIP().catch(() => {
-    getIPFromQQ();
-  });
-};
-
-// 从 IPIP.net 获取 IP 地址
-const getIPFromIPIP = async () => {
-  try {
-    const response = await fetch("https://myip.ipip.net/json");
-    const data = await response.json();
-    const ip = data.data.ip;
-    IPArray.value = [...IPArray.value, ip];
-    ipDataCards[0].source = "IPIP.net";
-    fetchIPDetails(0, ip);
-  } catch (error) {
-    console.error("Error fetching IP from IPIP.net:", error);
-    throw new Error("Failed to fetch IP from IPIP.net");
-  }
-};
-
-// 从 QQ Video 获取 IP 地址
-const getIPFromQQ = () => {
-  return new Promise((resolve, reject) => {
-    // 动态创建 script 标签发起 JSONP 请求
-    let script = document.createElement("script");
-    script.src = "https://vv.video.qq.com/checktime?otype=json&callback=ipCallback";
-    document.head.appendChild(script);
-
-    // 设置成功获取数据的回调
-    window.ipCallback = (data) => {
-      try {
-        let ip = data.ip;
-        ipDataCards[0].source = "QQ.com";
-        fetchIPDetails(0, ip);
-        IPArray.value = [...IPArray.value, ip];
-
-        document.head.removeChild(script);
-        delete window.ipCallback;
-        resolve(ip); // 成功获取 IP，解决 Promise
-      } catch (error) {
-        console.error("Error processing IP data from QQ:", error);
-        document.head.removeChild(script);
-        delete window.ipCallback;
-        reject(new Error("Failed to process IP data from QQ"));
-      }
-    };
-
-    // 设置超时拒绝 Promise，以防万一请求挂起
-    script.onerror = () => {
-      console.error("Error loading script for IP data from QQ");
-      document.head.removeChild(script);
-      delete window.ipCallback;
-      reject(new Error("Script loading error for IP data from QQ"));
-    };
-
-    setTimeout(() => {
-      if (document.head.contains(script)) {
-        console.error("Request to QQ timed out");
-        document.head.removeChild(script);
-        delete window.ipCallback;
-        reject(new Error("Request to QQ timed out"));
-      }
-    }, 2000);
-  });
+  fetchIP(0, getIPFromIPIP);
 };
 
 // 从特殊源获取 IP 地址
 const getIPFromSpecial = async () => {
   if (configs.value.originalSite) {
-    await getIPFromGCR();
+    fetchIP(1, getIPFromGCR)
   } else {
-    await getIPFromUpai();
+    fetchIP(1, getIPFromUpai)
   }
 };
 
-// 从 Upai 获取 IP 地址
-const getIPFromUpai = async () => {
-  try {
-    const unixTime = Date.now();
-    const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    const ip = data.remote_addr;
+// 公共获取 IP 地址方法
+const fetchIP = async (cardID, getFromSource) => {
+  const { ip, source } = await getFromSource();
+  if (ip !== null) {
+    ipDataCards[cardID].ip = ip;
+    ipDataCards[cardID].source = source;
     IPArray.value = [...IPArray.value, ip];
-    ipDataCards[1].source = "Upai";
-    fetchIPDetails(1, ip);
-  } catch (error) {
-    console.error("Error fetching IP from Upai:", error);
-    getIPFromCloudflare_CN(); // 故障转移
-  }
-};
-
-// 从 GCR 获取 IP 地址
-const getIPFromGCR = async () => {
-  try {
-    const url = `https://getipfromgoogle.ipcheck.ing/`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    const fullIp = data.ip;
-    const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
-    IPArray.value = [...IPArray.value, ip];
-    ipDataCards[1].source = "IPCheck.ing";
-    fetchIPDetails(1, ip);
-  } catch (error) {
-    console.error("Error fetching IP from IPCheck.ing:", error);
-    getIPFromCloudflare_CN(); // 故障转移
-  }
-};
-
-// 从 Cloudflare 中国获取 IP 地址
-const getIPFromCloudflare_CN = async () => {
-  try {
-    const response = await fetch("https://cf-ns.com/cdn-cgi/trace");
-    const data = await response.text();
-    const lines = data.split("\n");
-    const ipLine = lines.find((line) => line.startsWith("ip="));
-    if (ipLine) {
-      const ip = ipLine.split("=")[1];
-      IPArray.value = [...IPArray.value, ip];
-      ipDataCards[1].source = "CF-CN";
-      fetchIPDetails(1, ip);
-    }
-  } catch (error) {
-    console.error("Error fetching IP from Cloudflare:", error);
-    ipDataCards[1].ip = t('ipInfos.IPv4Error');
-  }
-};
-
-// 从 Cloudflare 获取 IPv4 地址
-const getIPFromCloudflare_V4 = async () => {
-  try {
-    const response = await fetch("https://1.0.0.1/cdn-cgi/trace");
-    const data = await response.text();
-    const lines = data.split("\n");
-    const ipLine = lines.find((line) => line.startsWith("ip="));
-    if (ipLine) {
-      const ip = ipLine.split("=")[1];
-      IPArray.value = [...IPArray.value, ip];
-      fetchIPDetails(2, ip);
-    }
-  } catch (error) {
-    console.error("Error fetching IP from Cloudflare:", error);
-    ipDataCards[2].ip = t('ipInfos.IPv4Error');
-  }
-};
-
-// 从 Cloudflare 获取 IPv6 地址
-const getIPFromCloudflare_V6 = async () => {
-  try {
-    const response = await fetch("https://[2606:4700:4700::1111]/cdn-cgi/trace");
-    const data = await response.text();
-
-    const lines = data.split("\n");
-    const ipLine = lines.find((line) => line.startsWith("ip="));
-    if (ipLine) {
-      const ip = ipLine.split("=")[1];
-      IPArray.value = [...IPArray.value, ip];
-      fetchIPDetails(3, ip);
-    }
-  } catch (error) {
-    console.error("Error fetching IP from Cloudflare:", error);
-    ipDataCards[3].ip = t('ipInfos.IPv6Error');
-  }
-};
-
-// 从 IPify 获取 IPv4 地址
-const getIPFromIpify_V4 = async () => {
-  try {
-    const response = await fetch("https://api4.ipify.org?format=json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    IPArray.value = [...IPArray.value, data.ip];
-    fetchIPDetails(4, data.ip);
-  } catch (error) {
-    console.error("Error fetching IPv4 address from ipify:", error);
-    ipDataCards[4].ip = t('ipInfos.IPv4Error');
-  }
-};
-
-// 从 IPify 获取 IPv6 地址
-const getIPFromIpify_V6 = async () => {
-  try {
-    const response = await fetch("https://api6.ipify.org?format=json");
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = await response.json();
-    IPArray.value = [...IPArray.value, data.ip];
-    fetchIPDetails(5, data.ip);
-  } catch (error) {
-    console.error("Error fetching IPv6 address from ipify:", error);
-    ipDataCards[5].ip = t('ipInfos.IPv6Error');
+    fetchIPDetails(cardID, ip);
+  } else if (cardID === 3 || cardID === 5) {
+    ipDataCards[cardID].ip = t('ipInfos.IPv6Error');
+  } else {
+    ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
   }
 };
 
@@ -577,7 +402,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   }
 };
 
-// 选择 IP 数据源，并保存到本地存储
+// 在重新选择 IP 数据库源时，更新 IP 地理数据
 const selectIPGeoSource = () => {
   // 清空部分数据
   ipDataCards.forEach((card) => {
@@ -615,74 +440,32 @@ const selectIPGeoSource = () => {
   }, 500);
 };
 
-// 检查所有 IP 地址
-const checkAllIPs = async () => {
-  const ipFunctions = [
-    getIPfromCNSource,
-    getIPFromSpecial,
-    getIPFromCloudflare_V4,
-    getIPFromCloudflare_V6,
-    getIPFromIpify_V4,
-    getIPFromIpify_V6
-  ];
-
-  // 限制执行的函数数量为 ipCardsToShow 的长度
-  const maxIndex = ipCardsToShow.value;
-
-  let index = 0;
-  const interval = setInterval(() => {
-    if (index < maxIndex && index < ipFunctions.length) {
-      ipFunctions[index].call(this);
-      index++;
-    } else {
-      clearInterval(interval);
-    }
-  }, 500);
-};
-
-// 清空卡片数据
-const refreshCard = (card) => {
+// 刷新某张卡片
+const refreshCard = (card,index) => {
   clearCardData(card);
-  switch (card.source) {
-    case "Cloudflare IPv4":
-      getIPFromCloudflare_V4(card);
-      trackEvent('IPCheck', 'RefreshClick', 'Cloudflare IPv4');
+  switch (index) {
+    case 0:
+      getIPfromCNSource();
       break;
-    case "Cloudflare IPv6":
-      getIPFromCloudflare_V6(card);
-      trackEvent('IPCheck', 'RefreshClick', 'Cloudflare IPv6');
+    case 1:
+      getIPFromSpecial();
       break;
-    case "IPify IPv4":
-      getIPFromIpify_V4(card);
-      trackEvent('IPCheck', 'RefreshClick', 'IPify IPv4');
+    case 2:
+      fetchIP(2, getIPFromCloudflare_V4);
       break;
-    case "IPify IPv6":
-      getIPFromIpify_V6(card);
-      trackEvent('IPCheck', 'RefreshClick', 'IPify IPv6');
+    case 3:
+      fetchIP(3, getIPFromCloudflare_V6);
       break;
-    case "Upai":
-      getIPFromUpai(card);
-      trackEvent('IPCheck', 'RefreshClick', 'Upai');
+    case 4:
+      fetchIP(4, getIPFromIpify_V4);
       break;
-    case "IPCheck.ing":
-      getIPFromGCR(card);
-      trackEvent('IPCheck', 'RefreshClick', 'IPCheck.ing');
-      break;
-    case "IPIP.net":
-      getIPFromIPIP(card);
-      trackEvent('IPCheck', 'RefreshClick', 'IPIP.net');
-      break;
-    case "QQ.com":
-      getIPFromQQ(card);
-      trackEvent('IPCheck', 'RefreshClick', 'QQ.com');
-      break;
-    case "CF-CN":
-      getIPFromCloudflare_CN(card);
-      trackEvent('IPCheck', 'RefreshClick', 'CF-CN');
+    case 5:
+      fetchIP(5, getIPFromIpify_V6);
       break;
     default:
-      console.error("Undefind Source:", card.source);
+      console.error("Undefind Source:");
   }
+  trackEvent('IPCheck', 'RefreshClick', 'IPInfos');
 };
 
 // 清空卡片数据
@@ -733,6 +516,31 @@ const getASNInfo = async (asn, ipDataCardsIndex) => {
   }
 };
 
+// 检查所有 IP 地址
+const checkAllIPs = async () => {
+  const ipFunctions = [
+    getIPfromCNSource,
+    getIPFromSpecial,
+    () => fetchIP(2, getIPFromCloudflare_V4),
+    () => fetchIP(3, getIPFromCloudflare_V6),
+    () => fetchIP(4, getIPFromIpify_V4),
+    () => fetchIP(5, getIPFromIpify_V6),
+  ];
+
+  // 限制执行的函数数量为 ipCardsToShow 的长度
+  const maxIndex = ipCardsToShow.value;
+
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < maxIndex && index < ipFunctions.length) {
+      ipFunctions[index].call(this);
+      index++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 500);
+};
+
 watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
   ipGeoSource.value = newVal;
   if (newVal !== usingSource.value) {
@@ -740,13 +548,6 @@ watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
   }
 });
 
-watch(() => userPreferences.value.showMap, (newVal, oldVal) => {
-  isMapShown.value = newVal;
-});
-
-watch(() => userPreferences.value.simpleMode, (newVal, oldVal) => {
-  isCardsCollapsed.value = newVal;
-});
 
 watch(IPArray, () => {
   store.updateGlobalIpDataCards(IPArray.value);
