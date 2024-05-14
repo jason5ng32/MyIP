@@ -1,6 +1,6 @@
 import { get } from 'https';
-import { isValidIP } from '../lib/valid-ip.js';
-import { refererCheck } from '../lib/referer-check.js';
+import { isValidIP } from '../common/valid-ip.js';
+import { refererCheck } from '../common/referer-check.js';
 
 export default (req, res) => {
 

@@ -1,7 +1,7 @@
 // api/dnsresolver.js
 import { Resolver } from 'dns';
 import { promisify } from 'util';
-import { refererCheck } from '../lib/referer-check.js';
+import { refererCheck } from '../common/referer-check.js';
 
 // 普通 DNS 服务器列表
 const dnsServers = {

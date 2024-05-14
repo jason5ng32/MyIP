@@ -312,7 +312,7 @@ const ShortcutKeys = (isOriginalSite) => {
         }
         const card = IPCheckRef.value.ipDataCards[num - 1];
         scrollToElement("IPInfo-" + num, 171);
-        IPCheckRef.value.refreshCard(card);
+        IPCheckRef.value.refreshCard(card, num - 1);
         trackEvent('ShortCut', 'ShortCut', 'IPCheck');
       },
       description: t('shortcutKeys.RefreshIPCard'),

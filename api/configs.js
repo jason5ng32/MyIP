@@ -1,4 +1,4 @@
-import { refererCheck } from '../lib/referer-check.js';
+import { refererCheck } from '../common/referer-check.js';
 
 // 验证环境变量是否存在，以进行前端功能的开启和关闭
 export default (req, res) => {
