@@ -1,5 +1,5 @@
 import { get } from 'https';
-import { refererCheck } from '../lib/referer-check.js';
+import { refererCheck } from '../common/referer-check.js';
 
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
 function isValidUserID(userID) {

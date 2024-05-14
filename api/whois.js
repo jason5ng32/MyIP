@@ -1,6 +1,6 @@
 import whoiser from 'whoiser';
-import { isValidIP } from '../lib/valid-ip.js';
-import { refererCheck } from '../lib/referer-check.js';
+import { isValidIP } from '../common/valid-ip.js';
+import { refererCheck } from '../common/referer-check.js';
 
 function isValidDomain(domain) {
     const domainPattern = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;

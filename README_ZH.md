@@ -1,6 +1,6 @@
 # 🧰 IP 工具箱
 
-![IPCheck.ing Banner](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/gh_banner.png)
+![IPCheck.ing Banner](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/gh_banner.png)
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
@@ -23,8 +23,8 @@
 
 备注：你可以直接用我已经搭建好的服务，也可以自行搭建。
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
+[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 这是我第一次用 Vue.js 练手的项目。我……只是一个普通的产品经理。
 

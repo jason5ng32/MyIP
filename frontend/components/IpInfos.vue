@@ -238,8 +238,8 @@ const createDefaultCard = () => ({
   isp: "",
   asn: "",
   asnlink: "",
-  mapUrl: '/defaultMap.webp',
-  mapUrl_dark: '/defaultMap_dark.webp',
+  mapUrl: '/res/defaultMap.webp',
+  mapUrl_dark: '/res/defaultMap_dark.webp',
   showMap: false,
   showASNInfo: false,
 });

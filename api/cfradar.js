@@ -1,6 +1,6 @@
 
 import { parse } from 'dotenv';
-import { refererCheck } from '../lib/referer-check.js';
+import { refererCheck } from '../common/referer-check.js';
 
 // 创建一个用于设置 headers 的通用函数
 function createFetchOptions() {

@@ -14,8 +14,8 @@ function maskedInfo(t) {
     fakecard.isp = "Google LLC";
     fakecard.asn = "AS15169";
     fakecard.asnlink = "https://radar.cloudflare.com/AS15169",
-    fakecard.mapUrl = '/defaultMap.webp';
-    fakecard.mapUrl_dark = '/defaultMap_dark.webp';
+    fakecard.mapUrl = '/res/defaultMap.webp';
+    fakecard.mapUrl_dark = '/res/defaultMap_dark.webp';
     fakecard.showASNInfo = false;
     fakecard.isProxy = t('ipInfos.proxyDetect.no');
     fakecard.type = t('ipInfos.proxyDetect.type.Business');
