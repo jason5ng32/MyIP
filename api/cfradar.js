@@ -1,4 +1,5 @@
 
+import { parse } from 'dotenv';
 import { refererCheck } from '../lib/referer-check.js';
 
 // 创建一个用于设置 headers 的通用函数
@@ -91,6 +92,30 @@ function isValidASN(asn) {
     return /^[0-9]+$/.test(asn);
 };
 
+
+// 格式化输出
+
+function formatData(data) {
+    const { asnName, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
+    const formattedData = {
+        asnName,
+        asnOrgName,
+        estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
+        IPv4_Pct: `${parseFloat(IPv4_Pct).toFixed(2)}%`,
+        IPv6_Pct: `${parseFloat(IPv6_Pct).toFixed(2)}%`,
+        HTTP_Pct: `${parseFloat(HTTP_Pct).toFixed(2)}%`,
+        HTTPS_Pct: `${parseFloat(HTTPS_Pct).toFixed(2)}%`,
+        Desktop_Pct: `${parseFloat(Desktop_Pct).toFixed(2)}%`,
+        Mobile_Pct: `${parseFloat(Mobile_Pct).toFixed(2)}%`,
+        Bot_Pct: `${parseFloat(Bot_Pct).toFixed(2)}%`,
+        Human_Pct: `${parseFloat(Human_Pct).toFixed(2)}%`
+    };
+
+    return formattedData;
+
+}
+
+
 // 导出函数
 export default async (req, res) => {
 
@@ -140,8 +165,9 @@ export default async (req, res) => {
         }
 
         const cleanedResponse = cleanUpResponseData(response);
+        const finalResponse = formatData(cleanedResponse);
 
-        res.json(cleanedResponse);
+        res.json(finalResponse);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });

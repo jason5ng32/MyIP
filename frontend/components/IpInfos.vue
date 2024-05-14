@@ -154,11 +154,11 @@
                       <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ t('ipInfos.ASNInfo.note')
                         }}</span>
                       <br />
-                      <template v-for="item in asnInfoItems">
+                      <template v-for="(item,key) in asnInfos[card.asn]">
                         <span class="fw-light">
-                          {{ t(`ipInfos.ASNInfo.${item.key}`) }}
+                          {{ t(`ipInfos.ASNInfo.${key}`) }}
                         </span>
-                        {{ item.format(asnInfos[card.asn][item.key]) }}
+                        {{ item }}
                         <br />
                       </template>
                     </span>
@@ -247,19 +247,7 @@ const asnInfos = ref({
 });
 
 // ASN 信息项
-const asnInfoItems = reactive([
-  { key: 'asnName', format: value => value },
-  { key: 'asnOrgName', format: value => value },
-  { key: 'estimatedUsers', format: value => parseFloat(value).toLocaleString() },
-  { key: 'IPv4_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'IPv6_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'HTTP_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'HTTPS_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'Desktop_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'Mobile_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'Bot_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-  { key: 'Human_Pct', format: value => `${parseFloat(value).toFixed(2)}%` },
-]);
+const asnInfoItems = reactive([]);
 
 // IP 数据卡片
 const ipDataCards = reactive([
