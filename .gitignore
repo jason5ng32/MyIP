@@ -26,4 +26,4 @@ dist-ssr
 .vscode/extensions.json
 
 package-lock.json
-/res
+localtest
