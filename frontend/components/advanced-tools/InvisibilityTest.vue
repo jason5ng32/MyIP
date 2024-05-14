@@ -278,6 +278,7 @@ const errorMsg = ref('');
 const testResults = ref({});
 const userID = ref('');
 const isAgreed = ref(false);
+const retryCount = ref(0);
 
 // 生成28位字符串
 const generate28DigitString = () => {
@@ -320,12 +321,12 @@ const onSubmit = () => {
     loadScript();
 
     setTimeout(() => {
-        getResult(userID.value, 0);
+        getResult();
     }, 6000);
 };
 
 // 获取测试结果
-const getResult = async (retryCount = 0) => {
+const getResult = async () => {
     try {
         const response = await fetch(`/api/invisibility?id=${userID.value}`);
         if (!response.ok) {
@@ -334,20 +335,19 @@ const getResult = async (retryCount = 0) => {
         const data = await response.json();
 
         // 检查并重试
-        if (data.message === "Data not found" && retryCount < 3) {
-            console.log(`Data not found, retrying... (${retryCount + 1})`);
+        if (data.message === "Data not found" && retryCount.value < 3) {
             setTimeout(() => {
-                getResult(retryCount + 1);
-            }, 4000);
+                getResult();
+            }, 4000, retryCount.value++ );
             return;
         }
         testResults.value = data;
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
-        if (retryCount < 3) {
+        if (retryCount.value < 3) {
             setTimeout(() => {
-                getResult(retryCount + 1);
-            }, 4000);
+                getResult();
+            }, 4000, retryCount.value + 1);
             return;
         } else {
             errorMsg.value = t('invisibilitytest.fetchError');
@@ -356,6 +356,7 @@ const getResult = async (retryCount = 0) => {
         removeScript();
     }
     checkingStatus.value = 'idle';
+    retryCount.value = 0;
 };
 </script>
 
