@@ -3,7 +3,7 @@
     "buildCommand": "npm run build",
     "functions": {
         "backend/api/*": {
-            "runtime": "nodejs20.x"
+            "memory": 1024
         }
     },
     "rewrites": [
