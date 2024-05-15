@@ -49,8 +49,6 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 
 ## 📕 How to Use
 
-There are 2 Ways to deploy:
-
 ### Deploying in a Node Environment
 
 Make sure you have Node.js installed.
@@ -61,16 +59,10 @@ Clone the code:
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-Install:
+Install and build:
 
 ```bash
-npm install
-```
-
-Build:
-
-```bash
-npm run build
+npm install && npm run build
 ```
 
 Run:
@@ -107,10 +99,6 @@ You can use the program without adding any environment variables, but if you wan
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
 | `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
-
-> [!TIP]
-> Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.
->
 
 ### Using Environment Variables in a Node Environment
 

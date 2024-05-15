@@ -51,8 +51,6 @@
 
 ## 📕 如何使用
 
-2 种部署方式：
-
 ### 在 Node 环境部署
 
 确保你系统里已经有 Node.js 环境。
@@ -63,16 +61,10 @@
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-安装:
+安装与编译:
 
 ```bash
-npm install
-```
-
-构建：
-
-```bash
-npm run build
+npm install && npm run build
 ```
 
 运行:
@@ -109,10 +101,6 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `KEYCDN_USER_AGENT` | 否 | `""` | 使用 KeyCDN 时的域名，需包含 https 前缀。用于通过 KeyCDN 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
-
-> [!TIP]
-> 以 `SECURITY_` 开头的环境变量仅在使用 npm 或 Docker 部署时有效。
->
 
 ### 在 Node 环境里使用环境变量
 
