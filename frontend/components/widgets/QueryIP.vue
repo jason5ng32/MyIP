@@ -114,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';

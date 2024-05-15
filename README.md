@@ -23,7 +23,6 @@
 
 Notes: You can use my demo for free, and you can also deploy it yourself.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Main Features
@@ -50,8 +49,6 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 
 ## 📕 How to Use
 
-There are 3 Ways to deploy:
-
 ### Deploying in a Node Environment
 
 Make sure you have Node.js installed.
@@ -62,16 +59,10 @@ Clone the code:
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-Install:
+Install and build:
 
 ```bash
-npm install
-```
-
-Build:
-
-```bash
-npm run build
+npm install && npm run build
 ```
 
 Run:
@@ -81,10 +72,6 @@ npm start
 ```
 
 The program will run on port 18966.
-
-### Using Vercel
-
-Click the 'Deploy to Vercel' button at the top to complete the deployment. Note that some features are not available on Vercel (see the environment variable section for details).
 
 ### Using Docker
 
@@ -113,10 +100,6 @@ You can use the program without adding any environment variables, but if you wan
 | `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 
-> [!TIP]
-> Environment variables starting with `SECURITY_` are only valid when deploying using npm or Docker.
->
-
 ### Using Environment Variables in a Node Environment
 
 Create environment variables:
@@ -136,10 +119,6 @@ IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 Then restart the backend service.
-
-### Using Environment Variables in Vercel
-
-Please refer to the content in `.env.example` and add it to the environment variables in Vercel.
 
 ### Using Environment Variables in Docker
 

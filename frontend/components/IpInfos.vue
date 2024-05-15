@@ -240,19 +240,7 @@ const createDefaultCard = () => ({
   asnlink: "",
   mapUrl: '/res/defaultMap.webp',
   mapUrl_dark: '/res/defaultMap_dark.webp',
-  showMap: false,
-  showASNInfo: false,
 });
-
-// 默认 ASN 信息
-const asnInfos = ref({
-  "AS15169": {
-    "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "368891", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
-  }
-});
-
-// ASN 信息项
-const asnInfoItems = reactive([]);
 
 // IP 数据卡片
 const ipDataCards = reactive([
@@ -288,6 +276,13 @@ const ipDataCards = reactive([
   },
 ]);
 
+// 默认 ASN 信息
+const asnInfos = ref({
+  "AS15169": {
+    "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "368891", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
+  }
+});
+
 // 其它数据
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
 const copiedStatus = ref({});
@@ -298,21 +293,6 @@ const usingSource = ref(userPreferences.value.ipGeoSource);
 // 中间件
 let pendingIPDetailsRequests = new Map();
 let ipDataCache = new Map();
-
-
-// 从中国来源获取 IP 地址
-const getIPfromCNSource = () => {
-  fetchIP(0, getIPFromIPIP);
-};
-
-// 从特殊源获取 IP 地址
-const getIPFromSpecial = async () => {
-  if (configs.value.originalSite) {
-    fetchIP(1, getIPFromGCR)
-  } else {
-    fetchIP(1, getIPFromUpai)
-  }
-};
 
 // 公共获取 IP 地址方法
 const fetchIP = async (cardID, getFromSource) => {
@@ -327,6 +307,31 @@ const fetchIP = async (cardID, getFromSource) => {
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
   }
+};
+
+// 检查所有 IP 地址
+const checkAllIPs = async () => {
+  const ipFunctions = [
+    () => fetchIP(0, getIPFromIPIP),
+    () => fetchIP(1, configs.value.originalSite ? getIPFromGCR : getIPFromUpai),
+    () => fetchIP(2, getIPFromCloudflare_V4),
+    () => fetchIP(3, getIPFromCloudflare_V6),
+    () => fetchIP(4, getIPFromIpify_V4),
+    () => fetchIP(5, getIPFromIpify_V6),
+  ];
+
+  // 限制执行的函数数量为 ipCardsToShow 的长度
+  const maxIndex = ipCardsToShow.value;
+
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < maxIndex && index < ipFunctions.length) {
+      ipFunctions[index].call(this);
+      index++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 500);
 };
 
 // 从 IP 地址获取 IP 详细信息
@@ -406,18 +411,8 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
 const selectIPGeoSource = () => {
   // 清空部分数据
   ipDataCards.forEach((card) => {
-    card.country_name = "";
-    card.region = "";
-    card.city = "";
-    card.latitude = "";
-    card.longitude = "";
-    card.isp = "";
-    card.asn = "";
-    card.asnlink = "";
-    card.isProxy = "";
-    card.type = "";
-    card.proxyProtocol = "";
-    card.proxyOperator = "";
+    const { ip, mapUrl, mapUrl_dark } = card;
+    Object.assign(card, createDefaultCard(), { ip, mapUrl, mapUrl_dark });
   });
 
   ipDataCache.clear();
@@ -441,14 +436,14 @@ const selectIPGeoSource = () => {
 };
 
 // 刷新某张卡片
-const refreshCard = (card,index) => {
+const refreshCard = (card, index) => {
   clearCardData(card);
   switch (index) {
     case 0:
-      getIPfromCNSource();
+      fetchIP(0, getIPFromIPIP);
       break;
     case 1:
-      getIPFromSpecial();
+      fetchIP(1, configs.value.originalSite ? getIPFromGCR : getIPFromUpai);
       break;
     case 2:
       fetchIP(2, getIPFromCloudflare_V4);
@@ -470,18 +465,7 @@ const refreshCard = (card,index) => {
 
 // 清空卡片数据
 const clearCardData = (card) => {
-  card.ip = "";
-  card.country_name = "";
-  card.country_code = "";
-  card.region = "";
-  card.city = "";
-  card.latitude = "";
-  card.longitude = "";
-  card.asn = "";
-  card.isp = "";
-  card.mapUrl = '/defaultMap.webp';
-  card.mapUrl_dark = '/defaultMap_dark.webp';
-  card.showASNInfo = false;
+  Object.assign(card, createDefaultCard());
 };
 
 // 复制 IP 地址
@@ -498,10 +482,9 @@ const copyToClipboard = (ip, id) => {
 };
 
 // 从后端 API 获取 ASN 信息
-const getASNInfo = async (asn, ipDataCardsIndex) => {
+const getASNInfo = async (asn) => {
   trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
   try {
-    ipDataCards[ipDataCardsIndex].showASNInfo = true;
     // 如果 asnInfos 中已有该 ASN 的信息，则直接返回
     if (asnInfos.value[asn]) {
       return;
@@ -514,31 +497,6 @@ const getASNInfo = async (asn, ipDataCardsIndex) => {
   } catch (error) {
     console.error("Error fetching ASN info:", error);
   }
-};
-
-// 检查所有 IP 地址
-const checkAllIPs = async () => {
-  const ipFunctions = [
-    getIPfromCNSource,
-    getIPFromSpecial,
-    () => fetchIP(2, getIPFromCloudflare_V4),
-    () => fetchIP(3, getIPFromCloudflare_V6),
-    () => fetchIP(4, getIPFromIpify_V4),
-    () => fetchIP(5, getIPFromIpify_V6),
-  ];
-
-  // 限制执行的函数数量为 ipCardsToShow 的长度
-  const maxIndex = ipCardsToShow.value;
-
-  let index = 0;
-  const interval = setInterval(() => {
-    if (index < maxIndex && index < ipFunctions.length) {
-      ipFunctions[index].call(this);
-      index++;
-    } else {
-      clearInterval(interval);
-    }
-  }, 500);
 };
 
 watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {

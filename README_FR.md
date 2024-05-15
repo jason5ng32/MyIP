@@ -23,7 +23,6 @@
 
 Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la déployer vous-même.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Principales fonctionnalités
@@ -50,8 +49,6 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 
 ## 📕 Comment utiliser
 
-Il existe 3 façons de déployer :
-
 ### Déploiement dans un environnement Node
 
 Assurez-vous d'avoir Node.js installé.
@@ -62,16 +59,10 @@ Clonez le code :
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-Installer:
+Installer & Construire :
 
 ```bash
-npm install
-```
-
-Construire:
-
-```bash
-npm run build
+npm install && npm run build
 ```
 
 Exécuter:
@@ -81,10 +72,6 @@ npm start
 ```
 
 Le programme s'exécutera sur le port 18966.
-
-### Using Vercel
-
-Cliquez sur le bouton 'Déployer sur Vercel' en haut pour terminer le déploiement. Veuillez noter que certaines fonctionnalités ne sont pas disponibles sur Vercel (voir la section des variables d'environnement pour plus de détails).
 
 ### Using Docker
 
@@ -113,10 +100,6 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `KEYCDN_USER_AGENT` | Non | `""` | Le nom de domaine lorsque vous utilisez KeyCDN, doit contenir le préfixe https. Utilisé pour obtenir des informations sur l'adresse IP via KeyCDN |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 
-> [!TIP]
-> Les variables d'environnement commençant par `SECURITY_` ne sont valides que lors du déploiement à l'aide de npm ou de Docker.
->
-
 ### Utilisation des variables d'environnement dans un environnement Node
 
 Créez les variables d'environnement :
@@ -136,10 +119,6 @@ IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 Ensuite, redémarrez le service backend.
-
-### Utilisation des variables d'environnement dans Vercel
-
-Veuillez vous référer au contenu de `.env.example` et ajoutez-le aux variables d'environnement dans Vercel.
 
 ### Utilisation des variables d'environnement dans Docker
 
