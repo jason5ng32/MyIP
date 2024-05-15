@@ -23,7 +23,6 @@
 
 备注：你可以直接用我已经搭建好的服务，也可以自行搭建。
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 这是我第一次用 Vue.js 练手的项目。我……只是一个普通的产品经理。
@@ -52,7 +51,7 @@
 
 ## 📕 如何使用
 
-3 种部署方式：
+2 种部署方式：
 
 ### 在 Node 环境部署
 
@@ -83,10 +82,6 @@ npm start
 ```
 
 程序会运行在 18966 端口。
-
-### 使用 Vercel
-
-点击顶部的部署到 Vercel 按钮，即可完成部署。需要注意的是，部分功能在 Vercel 上不可用（详见环境变量部分说明）。
 
 ### 使用 Docker
 
@@ -138,10 +133,6 @@ IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 然后重新启动后端服务。
-
-### 在 Vercel 里使用环境变量
-
-请参考 `.env.example` 里的内容，添加到 Vercel 的环境变量里。
 
 ### 在 Docker 里使用环境变量
 

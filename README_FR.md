@@ -23,7 +23,6 @@
 
 Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la déployer vous-même.
 
-[![Deploy with Vercel](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Vercel.svg)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjason5ng32%2FMyIP&project-name=MyIP&repository-name=MyIP)
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Principales fonctionnalités
@@ -82,10 +81,6 @@ npm start
 
 Le programme s'exécutera sur le port 18966.
 
-### Using Vercel
-
-Cliquez sur le bouton 'Déployer sur Vercel' en haut pour terminer le déploiement. Veuillez noter que certaines fonctionnalités ne sont pas disponibles sur Vercel (voir la section des variables d'environnement pour plus de détails).
-
 ### Using Docker
 
 Cliquez sur le bouton 'Déployer sur Docker' en haut pour terminer le déploiement. Ou utilisez le shell suivant :
@@ -136,10 +131,6 @@ IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 Ensuite, redémarrez le service backend.
-
-### Utilisation des variables d'environnement dans Vercel
-
-Veuillez vous référer au contenu de `.env.example` et ajoutez-le aux variables d'environnement dans Vercel.
 
 ### Utilisation des variables d'environnement dans Docker
 
