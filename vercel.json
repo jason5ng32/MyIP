@@ -2,7 +2,7 @@
     "installCommand": "npm install",
     "buildCommand": "npm run build",
     "functions": {
-        "backend/api/*": {
+        "backend/api/*.js": {
             "memory": 1024
         }
     },
