@@ -1,6 +1,17 @@
 {
     "installCommand": "npm install",
     "buildCommand": "npm run build",
+    "functions": {
+        "backend/api/*": {
+            "runtime": "nodejs20.x"
+        }
+    },
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "/backend/api/:path*"
+        }
+    ],
     "headers": [
         {
             "source": "/(.*)",

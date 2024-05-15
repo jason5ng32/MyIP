@@ -3,20 +3,20 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import mapHandler from './api/map.js';
-import ipinfoHandler from './api/ipinfo.js';
-import ipapicomHandler from './api/ipapicom.js';
-import keycdnHandler from './api/keycdn.js';
-import ipCheckingHandler from './api/ipchecking.js';
-import ipsbHandler from './api/ipsb.js';
-import cfHander from './api/cfradar.js';
-import validateConfigs from './api/configs.js';
-import dnsResolver from './api/dnsresolver.js';
+import mapHandler from './backend/api/map.js';
+import ipinfoHandler from './backend/api/ipinfo.js';
+import ipapicomHandler from './backend/api/ipapicom.js';
+import keycdnHandler from './backend/api/keycdn.js';
+import ipCheckingHandler from './backend/api/ipchecking.js';
+import ipsbHandler from './backend/api/ipsb.js';
+import cfHander from './backend/api/cfradar.js';
+import validateConfigs from './backend/api/configs.js';
+import dnsResolver from './backend/api/dnsresolver.js';
 import rateLimit from 'express-rate-limit';
 import { slowDown } from 'express-slow-down'
-import whois from './api/whois.js';
-import ipapiisHandler from './api/ipapiis.js';
-import invisibilitytestHandler from './api/invisibilitytest.js';
+import whois from './backend/api/whois.js';
+import ipapiisHandler from './backend/api/ipapiis.js';
+import invisibilitytestHandler from './backend/api/invisibilitytest.js';
 
 dotenv.config();
 
