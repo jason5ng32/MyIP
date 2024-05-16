@@ -316,7 +316,7 @@ const ShortcutKeys = (isOriginalSite) => {
           return
         }
         const card = IPCheckRef.value.ipDataCards[num - 1];
-        scrollToElement("IPInfo-" + num, 171);
+        scrollToElement("IPInfo-" + num, 300);
         IPCheckRef.value.refreshCard(card, num - 1);
         trackEvent('ShortCut', 'ShortCut', 'IPCheck');
       },
@@ -508,15 +508,12 @@ const loadShortcuts = () => {
 // 监控刷新动作
 watch(shouldRefreshEveryThing, (newVal) => {
   if (newVal) {
-    navBarRef.value.loaded = false;
-    isInfosLoaded.value = false;
     refreshEverything();
   }
 });
 
 // 监控加载状态并传递
 watch(() => store.allHasLoaded, (newValue) => {
-  navBarRef.value.loaded = newValue;
   isInfosLoaded.value = newValue;
   showMaskButton.value = true;
 });
