@@ -92,42 +92,43 @@ const stunServers = reactive([
 
 // 测试 STUN 服务器
 const checkSTUNServer = async (stun) => {
-  try {
-    const servers = { iceServers: [{ urls: 'stun:' + stun.url }] };
-    const pc = new RTCPeerConnection(servers);
-    let candidateReceived = false;
+  return new Promise((resolve, reject) => {
+    try {
+      const servers = { iceServers: [{ urls: 'stun:' + stun.url }] };
+      const pc = new RTCPeerConnection(servers);
+      let candidateReceived = false;
 
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        candidateReceived = true;
-        const candidate = event.candidate.candidate;
-        const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
-        if (ipMatch) {
-          stun.ip = ipMatch[0];
-          IPArray.value = [...IPArray.value, stun.ip];
-          stun.natType = determineNATType(candidate);
-          pc.close();
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          candidateReceived = true;
+          const candidate = event.candidate.candidate;
+          const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
+          if (ipMatch) {
+            stun.ip = ipMatch[0];
+            IPArray.value = [...IPArray.value, stun.ip];
+            stun.natType = determineNATType(candidate);
+            pc.close();
+            resolve();  // 成功时解析 Promise
+          }
         }
-      }
-    };
+      };
 
-    pc.createDataChannel("");
-    await pc.createOffer().then((offer) => pc.setLocalDescription(offer));
+      pc.createDataChannel("");
+      pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-    // 设置一个超时计时器
-    await new Promise((resolve, reject) => {
+      // 设置一个超时计时器来拒绝 Promise
       setTimeout(() => {
         if (!candidateReceived) {
+          pc.close();
           reject(new Error("Stun Server Test Timeout"));
-        } else {
-          resolve();
         }
       }, 5000);
-    });
-  } catch (error) {
-    console.error("STUN Server Test Error:", error);
-    stun.ip = t('webrtc.StatusError');
-  }
+    } catch (error) {
+      console.error("STUN Server Test Error:", error);
+      stun.ip = t('webrtc.StatusError');
+      reject(error);  // 捕获异常时拒绝 Promise
+    }
+  });
 };
 
 // 分析ICE候选信息，推断NAT类型
@@ -149,19 +150,28 @@ const determineNATType = (candidate) => {
 };
 
 // 测试所有 STUN 服务器
-const checkAllWebRTC = (isRefresh) => {
-  stunServers.forEach((server) => {
-    server.ip = t('webrtc.StatusWait');
-    server.natType = t('webrtc.StatusWait');
-    checkSTUNServer(server);
-  });
+const checkAllWebRTC = async (isRefresh) => {
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'WebRTC');
   }
   isStarted.value = true;
+  const promises = stunServers.map((server) => {
+    server.ip = t('webrtc.StatusWait');
+    server.natType = t('webrtc.StatusWait');
+    return checkSTUNServer(server);
+  });
+
+  const allSettledPromise = Promise.allSettled(promises);
+  const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
+
+  return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
+    store.setLoadingStatus('webrtc', true);
+  });
+
 };
+
 onMounted(() => {
-  store.setLoadingStatus('webrtc', true);
+  store.setMountingStatus('webrtc', true);
 });
 
 watch(IPArray, () => {

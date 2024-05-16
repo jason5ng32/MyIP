@@ -98,97 +98,117 @@ const generate14DigitString = () => {
 
 // DNS 泄露测试 1
 const fetchLeakTestIpApiCom = (index) => {
-  const urlString = generate32DigitString();
-  const url = `https://${urlString}.edns.ip-api.com/json`;
+  return new Promise((resolve, reject) => {
+    const urlString = generate32DigitString();
+    const url = `https://${urlString}.edns.ip-api.com/json`;
 
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (data.dns && "geo" in data.dns && "ip" in data.dns) {
-        const geoSplit = data.dns.geo.split(" - ");
-        leakTest[index].country = geoSplit[0];
-        leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
-        leakTest[index].ip = data.dns.ip;
-      } else {
-        console.error("Unexpected data structure:", data);
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching leak test data:", error);
-      leakTest[index].country = t('dnsleaktest.StatusError');
-      leakTest[index].country_code = t('dnsleaktest.StatusError');
-      leakTest[index].ip = t('dnsleaktest.StatusError');
-    });
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.dns && "geo" in data.dns && "ip" in data.dns) {
+          const geoSplit = data.dns.geo.split(" - ");
+          leakTest[index].country = geoSplit[0];
+          leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
+          leakTest[index].ip = data.dns.ip;
+          resolve();
+        } else {
+          console.error("Unexpected data structure:", data);
+          reject(new Error("Unexpected data structure"));
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching leak test data:", error);
+        leakTest[index].country = t('dnsleaktest.StatusError');
+        leakTest[index].country_code = t('dnsleaktest.StatusError');
+        leakTest[index].ip = t('dnsleaktest.StatusError');
+        reject(error);
+      });
+  });
 };
 
 // DNS 泄露测试 2
 const fetchLeakTestSfSharkCom = (index, key) => {
-  const urlString = generate14DigitString();
-  const url = `https://${urlString}.ipv4.surfsharkdns.com`;
+  return new Promise((resolve, reject) => {
+    const urlString = generate14DigitString();
+    const url = `https://${urlString}.ipv4.surfsharkdns.com`;
 
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const getKey = Object.keys(data)[key];
-      const keyEntry = data[getKey];
+    fetch(url)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const getKey = Object.keys(data)[key];
+        const keyEntry = data[getKey];
 
-      if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
-        leakTest[index].country_code = keyEntry.CountryCode;
-        leakTest[index].country = keyEntry.Country;
-        leakTest[index].ip = keyEntry.IP;
-      } else {
-        console.error("Unexpected data structure:", data);
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching leak test data:", error);
-      leakTest[index].geo = t('dnsleaktest.StatusError');
-      leakTest[index].ip = t('dnsleaktest.StatusError');
-    });
+        if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
+          leakTest[index].country_code = keyEntry.CountryCode;
+          leakTest[index].country = keyEntry.Country;
+          leakTest[index].ip = keyEntry.IP;
+          resolve();
+        } else {
+          console.error("Unexpected data structure:", data);
+          reject(new Error("Unexpected data structure"));
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching leak test data:", error);
+        leakTest[index].geo = t('dnsleaktest.StatusError');
+        leakTest[index].ip = t('dnsleaktest.StatusError');
+        reject(error);
+      });
+  });
 };
 
 // 检查所有 DNS 泄露测试
-const checkAllDNSLeakTest = (isRefresh) => {
-  leakTest.forEach((server) => {
-    server.geo = t('dnsleaktest.StatusWait');
-    server.ip = t('dnsleaktest.StatusWait');
-    server.country = t('dnsleaktest.StatusWait');
-    server.country_code = t('dnsleaktest.StatusWait');
-  });
+const checkAllDNSLeakTest = async (isRefresh) => {
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
+    leakTest.forEach((server) => {
+      server.geo = t('dnsleaktest.StatusWait');
+      server.ip = t('dnsleaktest.StatusWait');
+      server.country = t('dnsleaktest.StatusWait');
+      server.country_code = t('dnsleaktest.StatusWait');
+    });
   }
-  setTimeout(() => {
-    fetchLeakTestIpApiCom(0);
-  }, 100);
 
-  setTimeout(() => {
-    fetchLeakTestIpApiCom(1);
-  }, 1000);
+  // 设置延迟请求函数
+  const delayedFetch = (fetchFunction, index, key, delay) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        fetchFunction(index, key).then(resolve).catch(resolve);  // 无论成功或失败都会解决
+      }, delay);
+    });
+  };
 
-  setTimeout(() => {
-    fetchLeakTestSfSharkCom(2, 0);
-  }, 100);
+  // 批量请求
+  const promises = [
+    delayedFetch(fetchLeakTestIpApiCom, 0, null, 100),
+    delayedFetch(fetchLeakTestIpApiCom, 1, null, 1000),
+    delayedFetch(fetchLeakTestSfSharkCom, 2, 0, 100),
+    delayedFetch(fetchLeakTestSfSharkCom, 3, 0, 1000)
+  ];
 
-  setTimeout(() => {
-    fetchLeakTestSfSharkCom(3, 0);
-  }, 1000);
+  // 最长等待 6 秒
+  const allSettledPromise = Promise.allSettled(promises);
+  const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
 
-  isStarted.value = true;
+  // 等待所有请求完成或超时
+  return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
+    store.setLoadingStatus('dnsleaktest', true);
+  });
 };
 
+
 onMounted(() => {
-  store.setLoadingStatus('dnsleaktest', true);
+  store.setMountingStatus('dnsleaktest', true);
 });
 
 defineExpose({

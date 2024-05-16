@@ -13,7 +13,7 @@
       <AdvancedTools ref="advancedToolsRef" />
     </div>
   </div>
-  <InfoMask :isInfosLoaded.value="isInfosLoaded" :infoMaskLevel.value="infoMaskLevel"
+  <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
     :toggleInfoMask="toggleInfoMask" />
   <QueryIP ref="queryIPRef" />
   <HelpModal ref="helpModalRef" />
@@ -61,7 +61,7 @@ const store = useMainStore();
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
-const Status = computed(() => store.loadingStatus);
+const Status = computed(() => store.mountingStatus);
 
 // Template 里的 Ref
 const navBarRef = ref(null);
@@ -88,6 +88,7 @@ const alertMessage = ref("");
 const alertTitle = ref("");
 const alertToShow = ref(false);
 const autoStart = ref(userPreferences.value.autoStart);
+const showMaskButton = ref(false);
 
 //
 // 加载相关
@@ -103,9 +104,8 @@ hideLoading();
 
 
 // 事件控制
-const loadingControl = (t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) => {
+const loadingControl = (t1 = 0, t2 = 2000, t3 = 3000, t4 = 2500) => {
   const mountedStatus = Object.values(Status.value).every(Boolean);
-  setInfosLoaded();
   if (mountedStatus) {
     setTimeout(() => {
       IPCheckRef.value.checkAllIPs();
@@ -120,6 +120,11 @@ const loadingControl = (t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) => {
       setTimeout(() => {
         dnsLeaksRef.value.checkAllDNSLeakTest(false);
       }, t4);
+    } else {
+      // 如果不自动运行，将剩余的加载状态设置为 true
+      store.setLoadingStatus('connectivity', true);
+      store.setLoadingStatus('webrtc', true);
+      store.setLoadingStatus('dnsleaktest', true);
     }
   } else {
     // 递归检查
@@ -127,13 +132,6 @@ const loadingControl = (t1 = 0, t2 = 0, t3 = 4000, t4 = 2500) => {
       loadingControl();
     }, 1000);
   }
-};
-
-// 延迟设置 isInfosLoaded.value
-const setInfosLoaded = () => {
-  setTimeout(() => {
-    isInfosLoaded.value = true;
-  }, 6000);
 };
 
 //
@@ -153,10 +151,17 @@ const scheduleTimedTasks = (tasks) => {
 
 // 刷新所有
 const refreshEverything = () => {
+
+  // 重置加载状态
+  store.setLoadingStatus('connectivity', false);
+  store.setLoadingStatus('webrtc', false);
+  store.setLoadingStatus('dnsleaktest', false);
+  store.setLoadingStatus('ipcheck', false);
+
   const refreshTasks = [
     { action: () => IPCheckRef.value.checkAllIPs(), delay: 0 },
-    { action: () => connectivityRef.value.checkAllConnectivity(false, true, true), delay: 2000 },
-    { action: () => webRTCRef.value.checkAllWebRTC(true), delay: 4000 },
+    { action: () => connectivityRef.value.handelCheckStart(true), delay: 2000 },
+    { action: () => webRTCRef.value.checkAllWebRTC(true), delay: 3000 },
     { action: () => dnsLeaksRef.value.checkAllDNSLeakTest(true), delay: 2500 },
     { action: () => refreshingAlert(), delay: 500 },
   ];
@@ -321,7 +326,7 @@ const ShortcutKeys = (isOriginalSite) => {
       keys: "c",
       action: () => {
         scrollToElement("Connectivity", 80);
-        connectivityRef.value.checkAllConnectivity(false, true, true);
+        connectivityRef.value.handelCheckStart(true);
         trackEvent('ShortCut', 'ShortCut', 'Connectivity');
       },
       description: t('shortcutKeys.RefreshConnectivityTests'),
@@ -500,19 +505,20 @@ const loadShortcuts = () => {
   }, 2000);
 };
 
+// 监控刷新动作
 watch(shouldRefreshEveryThing, (newVal) => {
   if (newVal) {
     navBarRef.value.loaded = false;
     isInfosLoaded.value = false;
     refreshEverything();
-    setInfosLoaded();
   }
 });
 
-watch(isInfosLoaded, (newVal) => {
-  if (newVal) {
-    navBarRef.value.loaded = true;
-  }
+// 监控加载状态并传递
+watch(() => store.allHasLoaded, (newValue) => {
+  navBarRef.value.loaded = newValue;
+  isInfosLoaded.value = newValue;
+  showMaskButton.value = true;
 });
 
 onMounted(() => {

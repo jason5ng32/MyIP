@@ -289,6 +289,7 @@ const copiedStatus = ref({});
 const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
+const fetchStatus = reactive([]);
 
 // 中间件
 let pendingIPDetailsRequests = new Map();
@@ -297,15 +298,35 @@ let ipDataCache = new Map();
 // 公共获取 IP 地址方法
 const fetchIP = async (cardID, getFromSource) => {
   const { ip, source } = await getFromSource();
+  let fetchingStatus = false;
   if (ip !== null) {
     ipDataCards[cardID].ip = ip;
     ipDataCards[cardID].source = source;
     IPArray.value = [...IPArray.value, ip];
-    fetchIPDetails(cardID, ip);
+    await fetchIPDetails(cardID, ip);
   } else if (cardID === 3 || cardID === 5) {
     ipDataCards[cardID].ip = t('ipInfos.IPv6Error');
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
+  }
+  // 总是返回 true，即使获取 IP 失败，以便在 trackFetchStatus 中记录
+  fetchingStatus = true;
+  fetchStatus[cardID] = { [cardID]: fetchingStatus };
+  trackFetchStatus(fetchStatus);
+};
+
+// 上报数据获取状态，并发送到 store
+const trackFetchStatus = (status) => {
+  let allHasFetched = true;
+  for (let i = 0; i < ipCardsToShow.value; i++) {
+    if (status[i] === undefined) {
+      allHasFetched = false;
+    } else {
+      allHasFetched = allHasFetched && status[i][i];
+    }
+  }
+  if (allHasFetched) {
+    store.setLoadingStatus('ipcheck', true);
   }
 };
 
@@ -401,6 +422,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     await fetchPromise;
   } catch (error) {
     console.error(error);
+    throw error;
   } finally {
     // 完成后，从 pendingIPDetailsRequests 中移除
     pendingIPDetailsRequests.delete(ip);
@@ -512,7 +534,7 @@ watch(IPArray, () => {
 });
 
 onMounted(() => {
-  store.setLoadingStatus('ipcheck', true);
+  store.setMountingStatus('ipcheck', true);
 });
 
 defineExpose({

@@ -1,3 +1,5 @@
+import { isValidIP } from '@/utils/valid-ip.js';
+
 // 从 IPify 获取 IPv4 地址
 const getIPFromIpify_V4 = async () => {
     try {
@@ -9,7 +11,18 @@ const getIPFromIpify_V4 = async () => {
         const data = await response.json();
         const ip = data.ip;
         const source = "IPify IPv4";
-        return { ip: ip, source: source };
+        if (isValidIP(ip)) {
+            return {
+                ip: ip,
+                source: source
+            };
+        } else { 
+            console.error("Invalid IP from IPify:", ip);
+            return {
+                ip: null,
+                source: source
+            };
+        }
     } catch (error) {
         console.error("Error fetching IPv4 address from ipify:", error);
         return {

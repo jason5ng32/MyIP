@@ -1,3 +1,5 @@
+import { isValidIP } from '@/utils/valid-ip.js';
+
 // 从 Cloudflare 获取 IPv4 地址
 const getIPFromCloudflare_V4 = async () => {
     try {
@@ -10,7 +12,18 @@ const getIPFromCloudflare_V4 = async () => {
             ip = ipLine.split("=")[1];
         }
         const source = "Cloudflare IPv4";
-        return { ip: ip, source: source };
+        if (isValidIP(ip)) {
+            return {
+                ip: ip,
+                source: source
+            };
+        } else { 
+            console.error("Invalid IP from Cloudflare:", ip);
+            return {
+                ip: null,
+                source: source
+            };
+        }
     } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
         return {

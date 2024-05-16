@@ -1,3 +1,5 @@
+import { isValidIP } from '@/utils/valid-ip.js';
+
 // 从 QQ Video 获取 IP 地址
 const getIPFromQQ = () => {
     return new Promise((resolve, reject) => {
@@ -22,12 +24,17 @@ const getIPFromQQ = () => {
                 let source = "QQ.com";
                 document.head.removeChild(script);
                 delete window.ipCallback;
-                resolve({ ip, source });
+                if (isValidIP(ip)) {
+                    resolve({ ip, source });
+                } else {
+                    console.error("Invalid IP from QQ:", ip);
+                    resolve({ ip: null, source: "QQ.com" });
+                }
             } catch (error) {
                 console.error("Error processing IP data from QQ:", error);
                 document.head.removeChild(script);
                 delete window.ipCallback;
-                resolve({ ip: null, source: "QQ.com"});
+                resolve({ ip: null, source: "QQ.com" });
             }
         };
 
@@ -37,7 +44,7 @@ const getIPFromQQ = () => {
             console.error("Error loading script for IP data from QQ");
             document.head.removeChild(script);
             delete window.ipCallback;
-            resolve({ ip: null, source: "QQ.com"});
+            resolve({ ip: null, source: "QQ.com" });
         };
     });
 };
