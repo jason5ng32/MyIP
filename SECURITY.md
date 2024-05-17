@@ -17,6 +17,7 @@ The security of our project is a top priority. If you discover a security vulner
 ## Security Update Process
 
 Upon receiving a report of a vulnerability, our team will:
+
 - Promptly investigate the issue.
 - Develop a fix and test it thoroughly.
 - Release an updated version that addresses the issue.
