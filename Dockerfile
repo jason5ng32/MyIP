@@ -15,6 +15,7 @@ COPY --from=build-stage /app/dist ./dist
 COPY --from=build-stage /app/backend-server.js ./
 COPY --from=build-stage /app/frontend-server.js ./
 COPY --from=build-stage /app/api ./api
+COPY --from=build-stage /app/common ./common
 
 EXPOSE 18966
 
