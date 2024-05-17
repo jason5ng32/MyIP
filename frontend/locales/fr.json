@@ -371,8 +371,8 @@
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
-        "description": "Une boîte à outils IP améliorée. Facile pour vérifier vos adresses IP, les informations IP, vérifier les fuites DNS, examiner les connexions WebRTC et tester la disponibilité des sites web.",
-        "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse",
+        "description": "Une boîte à outils IP meilleure et open source. Facile à vérifier vos adresses IP, informations IP, vérifier les fuites DNS, examiner les connexions WebRTC, tester la disponibilité des sites web, rechercher des enregistrements DNS, rechercher des informations Whois et tester la latence dans le monde entier.",
+        "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse, Recherche DNS, Recherche Whois, Test de ping, Test de confidentialité",
         "footerName": "Créateurs : Jason Ng, Seven Yu & ChatGPT",
         "footerLink": "https://github.com/jason5ng32/MyIP",
         "copyRightName": "Originalement de ",
