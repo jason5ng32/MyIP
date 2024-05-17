@@ -150,7 +150,7 @@ const fullScreen = () => {
 
 
 onMounted(() => {
-    store.setLoadingStatus('advancedtools', true);
+    store.setMountingStatus('advancedtools', true);
     // 监听滚动事件
     scrollContainer.value.addEventListener('scroll', handleScroll);
 

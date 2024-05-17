@@ -53,7 +53,7 @@ const navigateCards = (direction) => {
   currentCard.setAttribute('data-keyboard-hover', 'true');
 
   const cardTop = currentCard.getBoundingClientRect().top + window.pageYOffset;
-  window.scrollTo({ top: cardTop - 60, behavior: 'smooth' });
+  window.scrollTo({ top: cardTop - 200, behavior: 'smooth' });
 };
 
 

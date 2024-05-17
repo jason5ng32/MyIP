@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -59,6 +59,7 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const userPreferences = computed(() => store.userPreferences);
 
+const alertCrontrol = ref(false);
 const alertToShow = ref(false);
 const alertStyle = ref("");
 const alertTitle = ref("");
@@ -187,53 +188,69 @@ const checkConnectivityHandler = (test, onTestComplete, isManualRun) => {
 
 // 检查所有网络连通性
 const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
-
-  if (isRefresh) {
-    connectivityTests.forEach((test) => {
-      test.status = t('connectivity.StatusWait');
-      test.time = 0;
-    });
-    trackEvent('Section', 'RefreshClick', 'Connectivity');
-  }
-  let totalTests = connectivityTests.length;
-  let successCount = 0;
-  let completedCount = 0;
-
-  const onTestComplete = (isSuccess) => {
-    if (isSuccess) {
-      successCount++;
+  alertToShow.value = isAlertToShow;
+  return new Promise((resolve, reject) => {
+    if (isRefresh) {
+      connectivityTests.forEach((test) => {
+        test.status = t('connectivity.StatusWait');
+        test.time = 0;
+      });
+      trackEvent('Section', 'RefreshClick', 'Connectivity');
     }
-    completedCount++;
 
-    // 只有当所有测试都完成时才做出最终判断
-    if (completedCount === totalTests) {
-      alertToShow.value = true;
-      if (successCount === totalTests) {
-        updateConnectivityAlert(true, "success");
-      } else {
-        updateConnectivityAlert(true, "error");
+    let totalTests = connectivityTests.length;
+    let successCount = 0;
+    let completedCount = 0;
+    let testPromises = [];
+
+    const onTestComplete = (isSuccess) => {
+      if (isSuccess) {
+        successCount++;
       }
-    }
-  };
+      completedCount++;
+    };
 
-  connectivityTests.forEach((test, index) => {
-    setTimeout(() => {
-      checkConnectivityHandler(test, onTestComplete, isManualRun);
-    }, 50 * index);
+    connectivityTests.forEach((test, index) => {
+      let testPromise = new Promise((testResolve, testReject) => {
+        setTimeout(() => {
+          checkConnectivityHandler(test, (isSuccess) => {
+            if (isSuccess) {
+              onTestComplete(true);
+              testResolve();
+            } else {
+              onTestComplete(false);
+              testReject();
+            }
+          }, isManualRun);
+        }, 50 * index);
+      });
+      testPromises.push(testPromise);
+    });
+
+    // 无论如何都会 Resolve
+    Promise.allSettled(testPromises).then(() => {
+      if (successCount === totalTests) {
+        updateConnectivityAlert("success");
+      } else {
+        updateConnectivityAlert("error");
+      }
+      resolve();
+    });
+
+
+    isStarted.value = true;
   });
-
-  if ((isAlertToShow || !isStarted.value) && autoShowAltert.value) {
-    setTimeout(() => {
-      store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
-    }, 4000);
-  }
-
-  isStarted.value = true;
 };
 
+const sendAlert = () => {
+  if ((alertToShow.value || !isStarted.value) && autoShowAltert.value) {
+    store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
+  }
+};
+
+
 // 更新通知气泡
-const updateConnectivityAlert = (show, type) => {
-  alertToShow.value = show;
+const updateConnectivityAlert = (type) => {
   if (type === "success") {
     alertStyle.value = "text-success";
     alertMessage.value = t('alert.Congrats_Message');
@@ -245,14 +262,19 @@ const updateConnectivityAlert = (show, type) => {
   }
 };
 
-const handelCheckStart = () => {
-  setTimeout(() => {
-    checkAllConnectivity(true, false, false);
-  }, 2000);
+// 主控制函数
+const handelCheckStart = async (fromApp = false) => {
+  if (fromApp) {
+    await checkAllConnectivity(false, true, true);
+  } else {
+    await checkAllConnectivity(true, false, false);
+  }
+  // 传递完成状态到 store
+  store.setLoadingStatus('connectivity', true);
   if (autoRefresh.value) {
-    intervalId.value = setInterval(() => {
+    intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
-        checkAllConnectivity(false, false, false);
+        await checkAllConnectivity(false, false, false);
         counter.value++;
       } else {
         clearInterval(intervalId.value);
@@ -262,7 +284,13 @@ const handelCheckStart = () => {
 };
 
 onMounted(() => {
-  store.setLoadingStatus('connectivity', true);
+  store.setMountingStatus('connectivity', true);
+});
+
+watch(() => store.allHasLoaded, (newValue, oldValue) => {
+  if (newValue === true) {
+    sendAlert();
+  }
 });
 
 defineExpose({

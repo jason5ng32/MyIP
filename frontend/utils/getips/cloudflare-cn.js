@@ -1,3 +1,5 @@
+import { isValidIP } from '@/utils/valid-ip.js';
+
 // 从 Cloudflare 中国获取 IP 地址
 const getIPFromCloudflare_CN = async () => {
     try {
@@ -10,7 +12,11 @@ const getIPFromCloudflare_CN = async () => {
             ip = ipLine.split("=")[1];
         }
         const source = "CF-CN";
-        return { ip: ip, source: source };
+        if (isValidIP(ip)) {
+            return { ip: ip, source: source };
+        } else {
+            return { ip: null, source: source };
+        }
     } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
         return {

@@ -222,7 +222,8 @@
       "Human_Pct": "人类流量占比："
     },
     "proxyDetect": {
-      "yes": "可能是代理或 VPN",
+      "yes": "是代理或 VPN",
+      "maybe": "可能是代理或 VPN",
       "no": "不是代理或 VPN",
       "unknownProxyType": "未知类型",
       "unknownProtocol": "未知协议",
@@ -356,7 +357,6 @@
     "DNSResolver": "打开 DNS 解析器面板",
     "ToggleMaps": "切换地图显示",
     "IPCheck": "IP 查询",
-    "AddBingMapKey": "添加 Bing Map API Key",
     "ToggleInfoMask": "切换信息隐藏",
     "Help": "显示快捷键",
     "HelpNote": "使用快捷键的人，是喜欢效率的人，你真棒！",
@@ -378,14 +378,6 @@
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",
     "copyRightLinkName": "IPCheck.ing"
-  },
-  "addBingMapKey": {
-    "Title": "添加 Bing Map API Key",
-    "Note": "添加后，可以在 IP 信息中显示地图。API Key 只会在当前浏览器中保存，方便下次使用，不会上传到服务器。",
-    "Placeholder": "请输入 Bing Map API Key",
-    "Button": "保存",
-    "removeButton": "删除",
-    "Error": "请输入有效的 Bing Map API Key。"
   },
   "helpModal": {
     "Title": "快捷键"

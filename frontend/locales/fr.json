@@ -222,7 +222,8 @@
             "Human_Pct": "Pourcentage de trafic humain :"
         },
         "proxyDetect": {
-            "yes": "Possiblement un proxy ou un VPN",
+            "yes": "Doit être un proxy ou un VPN",
+            "maybe": "Possiblement un proxy ou un VPN",
             "no": "Pas un proxy ou un VPN",
             "unknownProxyType": "Type inconnu",
             "unknownProtocol": "Protocole inconnu",
@@ -356,7 +357,6 @@
         "DNSResolver": "Ouvrir le Résolution DNS",
         "ToggleMaps": "Activer/désactiver les cartes",
         "IPCheck": "Vérification IP",
-        "AddBingMapKey": "Ajouter une clé API Bing Map",
         "ToggleInfoMask": "Activer/désactiver le masquage des informations",
         "Help": "Afficher les raccourcis clavier",
         "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
@@ -378,14 +378,6 @@
         "copyRightName": "Originalement de ",
         "copyRightLink": "https://ipcheck.ing",
         "copyRightLinkName": "IPCheck.ing"
-    },
-    "addBingMapKey": {
-        "Title": "Ajouter une clé API Bing Map",
-        "Note": "Après l'ajout, la carte peut être affichée dans les informations IP. La clé API sera uniquement enregistrée dans le navigateur actuel pour une utilisation ultérieure et ne sera pas téléchargée sur le serveur.",
-        "Placeholder": "Veuillez entrer une clé API Bing Map valide",
-        "Button": "Enregistrer",
-        "removeButton": "Supprimer",
-        "Error": "Veuillez entrer une clé API Bing Map valide."
     },
     "helpModal": {
         "Title": "Raccourcis"

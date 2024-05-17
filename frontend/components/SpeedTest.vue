@@ -333,7 +333,7 @@ const showResult = () => {
 
 // 初始化
 onMounted(() => {
-  store.setLoadingStatus('speedtest', true);
+  store.setMountingStatus('speedtest', true);
 });
 
 // 暴露给父组件的方法

@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -146,6 +146,7 @@ const collapseNav = () => {
 const handleLogoClick = () => {
   if (window.scrollY === 0) {
     store.setRefreshEveryThing(true);
+    // loaded.value = false;
   }
   trackEvent('Nav', 'NavClick', 'Logo');
 };
@@ -157,9 +158,12 @@ onMounted(() => {
   }, 1000)
 });
 
+watch(() => store.allHasLoaded, (newValue) => {
+  loaded.value = newValue;
+});
+
 // 暴露给 App.vue 的数据
 defineExpose({
-  loaded,
   OpenPreferences,
 });
 </script>

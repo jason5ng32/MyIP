@@ -1,4 +1,5 @@
 import { getIPFromCloudflare_CN } from "./cloudflare-cn";
+import { isValidIP } from '@/utils/valid-ip.js';
 
 // 从 GCR 获取 IP 地址
 const getIPFromGCR = async () => {
@@ -13,18 +14,21 @@ const getIPFromGCR = async () => {
     const fullIp = data.ip;
     const ip = fullIp.includes(',') ? fullIp.split(',')[0] : fullIp;
     const source = "IPCheck.ing";
-    return {
-      ip: ip,
-      source: source
-    };
+    if (isValidIP(ip)) {
+      return { ip: ip, source: source };
+    } else {
+      console.error("Invalid IP from IPCheck.ing:", ip);
+    }
   } catch (error) {
     console.error("Error fetching IP from IPCheck.ing:", error);
-    let { ip , source } = await getIPFromCloudflare_CN();
-        return {
-            ip: ip,
-            source: source
-        };
   }
+
+  // 故障时尝试从 Cloudflare 中国获取 IP 地址
+  const { ip, source } = await getIPFromCloudflare_CN();
+  return {
+    ip: ip,
+    source: source
+  };
 };
 
 export { getIPFromGCR };

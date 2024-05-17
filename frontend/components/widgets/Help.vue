@@ -4,7 +4,8 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="helpModalTitle">{{ t('helpModal.Title') }}</h5>
+                    <h5 class="modal-title" id="helpModalTitle"><i class="bi bi-keyboard"></i> {{ t('helpModal.Title')
+                        }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -15,27 +16,33 @@
                     </p>
                     <div class="row flex-nowrap text-nowrap">
                         <!-- 左边的列 -->
-                        <div class="col text-nowrap">
-                            <div v-for="(key, index) in splitKeyMap.left" :key="`left-${key.keys}`" class="row p-2"
+                        <div class="col text-nowrap ">
+                            <div v-for="(key, index) in splitKeyMap.left" :key="`left-${key.keys}`"
+                                class="row p-2 justify-content-between mx-1"
                                 :class="[isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle']">
+                                <div class="col-8">
+                                    {{ key.description }}
+                                </div>
                                 <div class="col-auto">
                                     <kbd :class="{ 'text-bg-light': isDarkMode }">
                                         {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
                                     </kbd>
                                 </div>
-                                <div class="col-8">{{ key.description }}</div>
                             </div>
                         </div>
                         <!-- 右边的列 -->
                         <div class="col text-nowrap">
-                            <div v-for="(key, index) in splitKeyMap.right" :key="`right-${key.keys}`" class="row p-2"
+                            <div v-for="(key, index) in splitKeyMap.right" :key="`right-${key.keys}`"
+                                class="row p-2 justify-content-between mx-1"
                                 :class="[isDarkMode ? 'border-dark-subtle jn-dark-mode-help-border' : 'border-light-subtle']">
+                                <div class="col-8">
+                                    {{ key.description }}
+                                </div>
                                 <div class="col-auto">
                                     <kbd :class="{ 'text-bg-light': isDarkMode }">
                                         {{ key.keys.replace(/[\[\]\\\(\)]/g, '') }}
                                     </kbd>
                                 </div>
-                                <div class="col-8">{{ key.description }}</div>
                             </div>
                         </div>
                     </div>
@@ -52,7 +59,7 @@ import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 
-const {t} = useI18n();
+const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);

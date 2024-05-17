@@ -5,13 +5,19 @@ export const useMainStore = defineStore('main', {
 
   state: () => ({
     lang: 'en',
-    loadingStatus: {
+    mountingStatus: {
       ipcheck: false,
       connectivity: false,
       webrtc: false,
       dnsleaktest: false,
       speedtest: false,
       advancedtools: false,
+    },
+    loadingStatus: {
+      ipcheck: false,
+      connectivity: false,
+      webrtc: false,
+      dnsleaktest: false,
     },
     isDarkMode: false,
     isMobile: false,
@@ -38,6 +44,9 @@ export const useMainStore = defineStore('main', {
 
   getters: {
     activeSources: (state) => state.ipDBs.filter(db => db.enabled),
+    allHasLoaded: (state) => {
+      return Object.values(state.loadingStatus).every(status => status);
+    },
   },
 
   actions: {
@@ -46,6 +55,10 @@ export const useMainStore = defineStore('main', {
       const db = this.ipDBs.find(d => d.id === id);
       if (!db) return null;
       return db.url.replace('{{ip}}', ip).replace('{{lang}}', lang || 'en');
+    },
+    // 从每个组件返回启动状态
+    setMountingStatus(key, value) {
+      this.mountingStatus[key] = value;
     },
     // 从每个组件返回加载状态
     setLoadingStatus(key, value) {

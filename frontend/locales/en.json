@@ -222,7 +222,8 @@
       "Human_Pct": "Human Traffic Percentage:"
     },
     "proxyDetect": {
-      "yes": "Possibly a proxy or VPN",
+      "yes": "Must be a proxy or VPN",
+      "maybe": "Possibly a proxy or VPN",
       "no": "Not a proxy or VPN",
       "unknownProxyType": "Unknown type",
       "unknownProtocol": "Unknown protocol",
@@ -356,7 +357,6 @@
     "DNSResolver": "Open DNS Resolution panel",
     "ToggleMaps": "Toggle Maps",
     "IPCheck": "Query IP Address",
-    "AddBingMapKey": "Add Bing Map API Key",
     "ToggleInfoMask": "Toggle Info Masking",
     "Help": "Show Shortcut Keys",
     "HelpNote": "People who use shortcuts are really awesome!",
@@ -378,14 +378,6 @@
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",
     "copyRightLinkName": "IPCheck.ing"
-  },
-  "addBingMapKey": {
-    "Title": "Add Bing Map API Key",
-    "Note": "After adding, the map can be displayed in the IP information. The API Key will only be saved in the current browser for the next use, and will not be uploaded to the server.",
-    "Placeholder": "Please enter Bing Map API Key",
-    "Button": "Save",
-    "removeButton": "Remove",
-    "Error": "Please enter a valid Bing Map API Key."
   },
   "helpModal": {
     "Title": "Keyboard Shortcuts"
