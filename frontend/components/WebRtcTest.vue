@@ -68,7 +68,7 @@ const stunServers = reactive([
   },
   {
     id: "nextcloud",
-    name: "NextCloud",
+    name: "NextCloud (QUIC)",
     url: "stun.nextcloud.com:443",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
