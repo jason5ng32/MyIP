@@ -1,7 +1,7 @@
 import { get } from 'https';
 import { isValidIP } from '../common/valid-ip.js';
 import { refererCheck } from '../common/referer-check.js';
-import { loadCountryCodes } from '../common/country-codes.js';
+import countryLookup from 'country-code-lookup';
 
 export default async (req, res) => {
     // 限制只能从指定域名访问
@@ -35,10 +35,7 @@ export default async (req, res) => {
         apiRes.on('end', async () => {
             try {
                 const originalJson = JSON.parse(data);
-
-                // 动态导入国家代码
-                const countryCodes = await loadCountryCodes();
-                const modifiedJson = modifyJson(originalJson, countryCodes);
+                const modifiedJson = modifyJson(originalJson);
 
                 res.json(modifiedJson);
             } catch (e) {
@@ -50,10 +47,10 @@ export default async (req, res) => {
     });
 };
 
-function modifyJson(json, countryCodes) {
-    const { ip, city, region, country, loc, org, timezone } = json;
+function modifyJson(json) {
+    const { ip, city, region, country, loc, org } = json;
 
-    const countryName = countryCodes[country] || 'Unknown Country';
+    const countryName = countryLookup.byIso(country).country || 'Unknown Country';
 
     const [latitude, longitude] = loc.split(',').map(Number);
     const [asn, ...orgName] = org.split(' ');
