@@ -169,6 +169,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
 
 // 检查所有 DNS 泄露测试
 const checkAllDNSLeakTest = async (isRefresh) => {
+  isStarted.value = true;
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
     leakTest.forEach((server) => {
