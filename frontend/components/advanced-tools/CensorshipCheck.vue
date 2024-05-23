@@ -56,7 +56,7 @@
                                                 :key="result.country + '-' + result.city + '-' + index">
                                                 <td>
                                                     <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                                                    {{ result.country }}
+                                                    {{ result.country_name }}
                                                 </td>
                                                 <td>
                                                     <i class="bi" :class="{
@@ -96,7 +96,7 @@
                                                 :key="result.country + '-' + result.city + '-' + index">
                                                 <td>
                                                     <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                                                    {{ result.country }}
+                                                    {{ result.country_name }}
                                                 </td>
                                                 <td>
                                                     <i class="bi" :class="{
@@ -162,12 +162,14 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 
 const highRiskCountries = ['CN', 'RU', 'TR', 'SA'];
 const censorshipResults = ref([]);
@@ -313,6 +315,7 @@ const processHttpResults = (data) => {
         .filter(item => item.result.rawOutput !== null)
         .map(item => ({
             country: item.probe.country,
+            country_name: getCountryName(item.probe.country, lang.value),
             city: item.probe.city,
             network: item.probe.network,
             status: item.result.status,

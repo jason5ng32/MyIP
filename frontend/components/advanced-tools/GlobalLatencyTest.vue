@@ -58,7 +58,7 @@
                     <tr v-for="result in pingResults" :key="result.country">
                       <td>
                         <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                        {{ result.country }}
+                        {{ result.country_name }}
                       </td>
                       <td :class="result.stats.min < 100 ? 'text-success' : ''">{{ result.stats.min.toFixed(1) }}
                       </td>
@@ -96,12 +96,14 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import svgMap from 'svgmap';
 import 'svgmap/dist/svgMap.min.css';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 let allIPs = computed(() => {
   const _allIPs = store.Global_ipDataCards;
   return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
@@ -207,6 +209,7 @@ const processpingResults = (data) => {
     .filter(item => item.result.stats.min !== null)
     .map(item => ({
       country: item.probe.country,
+      country_name: getCountryName(item.probe.country, lang.value),
       stats: item.result.stats
     }));
 

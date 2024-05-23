@@ -46,9 +46,9 @@
                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                       :data-bs-target="'#collapse' + index" :aria-expanded="index === 0 ? 'true' : 'false'"
                       :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
-                      <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{ result.city
-                        }}, {{
-                        result.country }}</strong>
+                      <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{
+                        result.country_name }}, {{ result.city
+                        }}</strong>
                       <span v-if="!isMobile">&nbsp;-&nbsp;{{ result.network }}&nbsp;</span>
                       <span v-if="!isMobile" class="badge rounded-pill"
                         :class="isDarkMode ? 'text-bg-warning' : 'text-bg-success'">AS{{ result.asn }}</span>
@@ -83,12 +83,14 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 let allIPs = computed(() => {
   const _allIPs = store.Global_ipDataCards;
   return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
@@ -196,6 +198,7 @@ const processmtrResults = (data) => {
     .filter(item => item.result.rawOutput !== null)
     .map(item => ({
       country: item.probe.country,
+      country_name: getCountryName(item.probe.country, lang.value),
       city: item.probe.city,
       network: item.probe.network,
       asn: item.probe.asn,

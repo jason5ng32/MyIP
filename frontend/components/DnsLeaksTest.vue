@@ -54,6 +54,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import countryLookup from 'country-code-lookup';
+import getCountryName from '@/utils/country-name.js';
 
 
 const { t } = useI18n();
@@ -61,6 +62,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 
 
 const createDefaultCard = () => ({
@@ -112,8 +114,8 @@ const fetchLeakTestIpApiCom = (index) => {
       .then((data) => {
         if (data.dns && "geo" in data.dns && "ip" in data.dns) {
           const geoSplit = data.dns.geo.split(" - ");
-          leakTest[index].country = geoSplit[0];
           leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
+          leakTest[index].country = getCountryName(leakTest[index].country_code, lang.value);
           leakTest[index].ip = data.dns.ip;
           resolve();
         } else {
@@ -150,7 +152,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
 
         if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
           leakTest[index].country_code = keyEntry.CountryCode;
-          leakTest[index].country = keyEntry.Country;
+          leakTest[index].country = getCountryName(keyEntry.CountryCode, lang.value);
           leakTest[index].ip = keyEntry.IP;
           resolve();
         } else {
