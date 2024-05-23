@@ -115,6 +115,15 @@ function formatData(data) {
 
 }
 
+// 过滤不存在的字段
+function filterData(data) {
+    for (const key in data) {
+        if (data[key] === 'NaN' || data[key] === 'NaN%') {
+            delete data[key];
+        }
+    }
+    return data;
+}
 
 // 导出函数
 export default async (req, res) => {
@@ -166,6 +175,7 @@ export default async (req, res) => {
 
         const cleanedResponse = cleanUpResponseData(response);
         const finalResponse = formatData(cleanedResponse);
+        filterData(finalResponse);
 
         res.json(finalResponse);
     } catch (error) {
