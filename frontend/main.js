@@ -4,6 +4,7 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
+import 'bootstrap';
 import { analytics } from './utils/use-analytics';
 
 import { Tooltip } from 'bootstrap';

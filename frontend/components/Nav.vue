@@ -1,6 +1,7 @@
 <template>
   <!-- Nav -->
-  <nav id="navbar-top" class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top"
+  <header class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top ">
+  <nav id="navbar-top" class="container-xxl"
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <div class="jn-logo">
 
@@ -72,7 +73,7 @@
       </a>
     </div>
   </nav>
-
+</header>
 </template>
 
 <script setup>
@@ -304,5 +305,8 @@ defineExpose({
 
 .preference-button {
   margin-left: 8pt;
+}
+.container-xxl {
+  max-width: 1600px;
 }
 </style>
