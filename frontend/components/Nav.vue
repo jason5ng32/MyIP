@@ -1,6 +1,6 @@
 <template>
   <!-- Nav -->
-  <header class="navbar navbar-expand-lg bg-body-tertiary px-3 mb-3 jn-navbar-top "
+  <header class="navbar navbar-expand-lg bg-body-tertiary mb-3 jn-navbar-top "
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <nav id="navbar-top" class="container-xxl">
       <div class="jn-logo">
