@@ -1,5 +1,5 @@
 <template>
-    <div class="toast-container position-fixed bottom-0 end-0 p-3 jn-toast">
+    <div class="toast-container  p-3 jn-toast">
         <div id="toastInfoMask" class="toast" :class="{ 'dark-mode': isDarkMode }" role="alert" ref="toastEl"
             aria-live="assertive" aria-atomic="true">
             <div class="toast-header" :class="{ 'dark-mode-title': isDarkMode }">
@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { Toast } from 'bootstrap';
 
@@ -43,6 +43,35 @@ const showToast = (duration = 2000) => {
         console.error("Toast element not found");
     }
 }
+
+const adjustButtonPosition = () => {
+    const screenWidth = window.innerWidth;
+    const contentWidth = 1600; // 主内容区域的宽度
+    const spaceOnRight = (screenWidth - contentWidth) / 2;
+
+    const button = document.querySelector('.jn-toast');
+    if (screenWidth > 1600) { // 只在屏幕宽度大于1600px时调整
+        button.style.right = `${spaceOnRight + 0}px`; // 保持20px的距离
+    } else {
+        button.style.right = '0'; // 在小屏幕上使用默认位置
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('resize', adjustButtonPosition);
+    adjustButtonPosition();
+});
+
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-toast {
+    position: fixed;
+    z-index: 9999;
+    right: 0;
+    bottom: 0;
+    margin-bottom: 2pt;
+    margin-right: 40pt;
+    max-width: 80vw;
+}
+</style>

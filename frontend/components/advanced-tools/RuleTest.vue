@@ -57,13 +57,14 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import countryLookup from 'country-code-lookup';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
@@ -96,7 +97,7 @@ const fetchTrace = async (id, url) => {
         if (countryLine) {
             const country = countryLine.split("=")[1];
             ruleTests.value[id].country_code = country;
-            ruleTests.value[id].country = countryLookup.byIso(country).country;
+            ruleTests.value[id].country = getCountryName(country, lang.value);
         }
     } catch (error) {
         ruleTests.value[id].ip = t('ruletest.StatusError');

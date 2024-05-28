@@ -1,5 +1,5 @@
 import { getIPFromIPIP } from "./ipipnet";
-import { getIPFromQQ } from "./qqvideo";
+import { getIPFromQQ } from "./qq";
 import { getIPFromUpai } from "./upai";
 import { getIPFromCloudflare_CN } from "./cloudflare-cn";
 import  { getIPFromCloudflare_V4 } from "./cloudflare-v4";

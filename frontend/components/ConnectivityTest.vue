@@ -73,10 +73,10 @@ const manualRun = ref(false);
 const intervalId = ref(3000);
 const connectivityTests = reactive([
   {
-    id: "bilibili",
-    name: "Bilibili",
-    icon: "tv-fill",
-    url: "https://www.bilibili.com/favicon.ico?",
+    id: "taobao",
+    name: "Taobao",
+    icon: "shop",
+    url: "https://www.taobao.com/favicon.ico?",
     status: t('connectivity.StatusWait'),
     time: 0,
     mintime: 0,

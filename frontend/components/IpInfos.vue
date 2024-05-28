@@ -7,7 +7,6 @@
     <div class="text-secondary">
       <p>{{ t('ipInfos.Notes') }}</p>
     </div>
-    <div class="jn-card-deck">
       <div class="row">
         <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
           'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
@@ -187,7 +186,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 

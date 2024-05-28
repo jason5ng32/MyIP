@@ -44,12 +44,10 @@
 
 .jn-ip-card1 {
   min-height: 488px;
-  height: fit-content;
 }
 
 .jn-ip-card2 {
   min-height: 388px;
-  height: fit-content;
 }
 
 .jn-hover-card {
@@ -122,15 +120,6 @@
   z-index: 9999;
   border-bottom: 1px solid #0000001c;
 
-}
-
-.jn-toast {
-  z-index: 9999;
-  right: 0;
-  bottom: 0;
-  margin-bottom: 2pt;
-  margin-right: 40pt;
-  max-width: 80vw;
 }
 
 footer {
