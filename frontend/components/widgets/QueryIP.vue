@@ -1,6 +1,6 @@
 <template>
     <!-- Search BTN -->
-    <button class="btn btn-primary position-fixed" style="bottom: 20px; right: 20px; z-index: 1050;"
+    <button class="btn btn-primary queryip"
         data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP"
         v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
 
@@ -114,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';
@@ -213,10 +213,35 @@ const fetchIPForModal = async (ip, sourceID = null) => {
     }
 };
 
+const adjustButtonPosition = () => {
+    const screenWidth = window.innerWidth;
+    const contentWidth = 1600; // 主内容区域的宽度
+    const spaceOnRight = (screenWidth - contentWidth) / 2;
+
+    const button = document.querySelector('.queryip');
+    if (screenWidth > 1600) { // 只在屏幕宽度大于1600px时调整
+        button.style.right = `${spaceOnRight + 20}px`; // 保持20px的距离
+    } else {
+        button.style.right = '20px'; // 在小屏幕上使用默认位置
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('resize', adjustButtonPosition);
+    adjustButtonPosition();
+});
+
 defineExpose({
     openModal,
 });
 </script>
 
 
-<style scoped></style>
+<style scoped>
+.queryip {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+</style>
