@@ -56,7 +56,7 @@ onMounted(() => {
     getBrowser();
     setTimeout(() => {
         showPWA();
-    }, 10000);
+    }, 30000);
 });
 </script>
 
