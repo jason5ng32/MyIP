@@ -34,6 +34,7 @@ const resolveDns = async (hostname, type, name, server) => {
     const resolveTxtAsync = promisify(resolver.resolveTxt.bind(resolver));
     const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
     const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
+    const resolveMXAsync = promisify(resolver.resolveMx.bind(resolver));
     try {
         let addresses;
 
@@ -55,6 +56,11 @@ const resolveDns = async (hostname, type, name, server) => {
                 break;
             case 'NS':
                 addresses = await resolveNSAsync(hostname);
+                break;
+            case 'MX':
+                addresses = await resolveMXAsync(hostname);
+                addresses = addresses.map(item => `${item.priority} ${item.exchange}.`)
+                .join(', ');
                 break;
             default:
                 throw new Error('Unsupported type');
