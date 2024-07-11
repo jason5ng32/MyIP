@@ -368,6 +368,15 @@ const ShortcutKeys = (isOriginalSite) => {
       description: t('shortcutKeys.PingTest'),
     },
     {
+      keys: "M",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/macchecker');
+        trackEvent('Nav', 'NavClick', 'MacChecker');
+      },
+      description: t('shortcutKeys.MacChecker'),
+    },
+    {
       keys: "t",
       action: () => {
         scrollToElement("AdvancedTools", 80);

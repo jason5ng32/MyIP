@@ -395,7 +395,8 @@
     "Preferences": "打开偏好设置面板",
     "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
-    "InvisibilityTest": "打开隐身测试面板"
+    "InvisibilityTest": "打开隐身测试面板",
+    "MacChecker": "打开物理地址查询面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",

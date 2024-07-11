@@ -395,7 +395,8 @@
         "Preferences": "Ouvrir les Préférences",
         "About": "Ouvrir À propos",
         "Whois": "Ouvrir la Recherche Whois",
-        "InvisibilityTest": "Ouvrir le Test d'invisibilité"
+        "InvisibilityTest": "Ouvrir le Test d'invisibilité",
+        "MacChecker": "Ouvrir le Recherche de MAC"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
