@@ -139,7 +139,35 @@
     "RuleTestNote": "检查代理软件的规则设置",
     "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
     "Whois": "对域名或 IP 进行 Whois 查询",
-    "InvisibilityTest": "猜猜看我是否知道你挂了代理"
+    "InvisibilityTest": "猜猜看我是否知道你挂了代理",
+    "MacChecker": "查询物理地址的归属信息"
+  },
+  "macchecker": {
+    "Title": "MAC 地址查询",
+    "Note": "查询一个物理地址（MAC 地址）所属的制造商、是否单播/多播、是否广域/区域等信息。支持使用完整的 12 位进行查询，也支持前缀查询。当然，你也可以用本查询工具来验证你生成的物理地址是否符合自己的需求。",
+    "Note2": "请输入一个物理地址，开始查询：",
+    "Run": "查询",
+    "Placeholder": "F0:2F:4B:01:0A:AA",
+    "invalidMAC": "无效的物理地址",
+    "fetchError": "无法获取查询结果",
+    "company": "制造商",
+    "macPrefix": "物理地址前缀",
+    "address": "注册地址",
+    "country": "注册国家/地区",
+    "blockStart": "起始区块",
+    "blockEnd": "结束区块",
+    "blockSize": "区块大小",
+    "blockType": "区块类型",
+    "blockRange": "区块范围",
+    "isRand": "随机地址",
+    "isPrivate": "私有数据",
+    "isMulticast": "多播地址",
+    "isUnicast": "单播地址",
+    "isGlobal": "全球地址",
+    "isLocal": "本地地址",
+    "property": "地址属性",
+    "value": "值",
+    "manufacturer": "制造商信息"
   },
   "whois": {
     "Title": "Whois 查询",
@@ -367,7 +395,8 @@
     "Preferences": "打开偏好设置面板",
     "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
-    "InvisibilityTest": "打开隐身测试面板"
+    "InvisibilityTest": "打开隐身测试面板",
+    "MacChecker": "打开物理地址查询面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -741,6 +770,20 @@
           {
             "type": "improve",
             "change": "优化了大量细节"
+          }
+        ]
+      },
+      {
+        "version": "v4.1",
+        "date": "July 11, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加 MAC 地址查询功能"
+          },
+          {
+            "type": "improve",
+            "change": "优化了部分程序细节"
           }
         ]
       }

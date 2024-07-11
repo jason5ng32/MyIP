@@ -1,6 +1,6 @@
 # 🧰 IP 工具箱
 
-<a href="https://trendshift.io/repositories/5332" target="_blank"><img src="https://trendshift.io/api/badge/repositories/5332" alt="jason5ng32%2FMyIP | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/5332" target="_blank"><img src="https://trendshift.io/api/badge/repositories/5332" alt="jason5ng32%2FMyIP | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a> 
 
 ![IPCheck.ing Banner](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/gh_banner.png)
 
@@ -43,6 +43,7 @@
 * 🔦 **DNS 解析器**：从多个渠道对域名进行 DNS 解析，获取实时的解析结果，可用于污染判断
 * 🚧 **封锁测试**：检查特定的网站在部分国家是否被封锁
 * 📓 **Whois 查询**：对域名或 IP 进行 whois 信息查询
+* 📀 **MAC 地址查询**：查询物理地址的归属信息
 * 🌗 **暗黑模式**：根据系统设置自动切换暗黑/白天模式，也可以手动切换
 * 📱 **简约模式**：为移动版提供的专门模式，缩短页面长度，快速查看最重要的信息
 * 🔍 **查任意 IP 信息**：可以通过小工具查询任意 IP 的信息
@@ -103,6 +104,7 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `KEYCDN_USER_AGENT` | 否 | `""` | 使用 KeyCDN 时的域名，需包含 https 前缀。用于通过 KeyCDN 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
+| `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
 
 ### 在 Node 环境里使用环境变量
 

@@ -139,7 +139,35 @@
         "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
         "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays",
         "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP",
-        "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN"
+        "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
+        "MacChecker": "Requête d'informations d'une adresse physique"
+    },
+    "macchecker": {
+        "Title": "Recherche MAC",
+        "Note": "Interroger le fabricant d'une adresse physique (adresse MAC), s'il s'agit d'une adresse unicast/multicast, globale/locale, etc. Prend en charge la requête avec une adresse complète de 12 chiffres ou juste le préfixe. Vous pouvez également utiliser cet outil pour vérifier si l'adresse physique que vous avez générée répond à vos besoins.",
+        "Note2": "Veuillez saisir une adresse physique pour commencer la requête:",
+        "Run": "Interroger",
+        "Placeholder": "F0:2F:4B:01:0A:AA",
+        "invalidMAC": "Adresse physique invalide",
+        "fetchError": "Impossible de récupérer les résultats de la requête",
+        "company": "Fabricant",
+        "macPrefix": "Préfixe d'adresse physique",
+        "address": "Adresse enregistrée",
+        "country": "Pays/région enregistré",
+        "blockStart": "Bloc de départ",
+        "blockEnd": "Bloc de fin",
+        "blockSize": "Taille du bloc",
+        "blockType": "Type de bloc",
+        "blockRange": "Plage du bloc",
+        "isRand": "Adresse aléatoire",
+        "isPrivate": "Données privées",
+        "isMulticast": "Adresse multicast",
+        "isUnicast": "Adresse unicast",
+        "isGlobal": "Adresse mondiale",
+        "isLocal": "Adresse locale",
+        "property": "Propriété de l'adresse",
+        "value": "Valeur",
+        "manufacturer": "Détails du fabricant"
     },
     "whois": {
         "Title": "Recherche Whois",
@@ -367,7 +395,8 @@
         "Preferences": "Ouvrir les Préférences",
         "About": "Ouvrir À propos",
         "Whois": "Ouvrir la Recherche Whois",
-        "InvisibilityTest": "Ouvrir le Test d'invisibilité"
+        "InvisibilityTest": "Ouvrir le Test d'invisibilité",
+        "MacChecker": "Ouvrir le Recherche de MAC"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
@@ -737,6 +766,20 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de la structure des dépendances du backend"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de nombreux détails"
+                    }
+                ]
+            },
+            {
+                "version": "v4.1",
+                "date": "July 11, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la fonction de recherche MAC"
                     },
                     {
                         "type": "improve",
