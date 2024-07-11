@@ -75,7 +75,7 @@ const cards = reactive([
     { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
     { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
     { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
-    { path: '/macchecker', icon: '📀', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker' },
+    { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker' },
 ]);
 
 const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };

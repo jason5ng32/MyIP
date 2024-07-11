@@ -2,7 +2,7 @@
     <!-- MAC Checker -->
     <div class="mac-checker-section mb-4">
         <div class="jn-title2">
-            <h2 id="MacChecker" :class="{ 'mobile-h2': isMobile }">📀 {{ t('macchecker.Title') }}</h2>
+            <h2 id="MacChecker" :class="{ 'mobile-h2': isMobile }">🗄️ {{ t('macchecker.Title') }}</h2>
 
         </div>
         <div class="text-secondary">
