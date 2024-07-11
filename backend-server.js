@@ -17,6 +17,7 @@ import { slowDown } from 'express-slow-down'
 import whois from './api/whois.js';
 import ipapiisHandler from './api/ipapiis.js';
 import invisibilitytestHandler from './api/invisibilitytest.js';
+import macChecker from './api/macchecker.js';
 
 dotenv.config();
 
@@ -135,6 +136,7 @@ app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/whois', whois);
 app.get('/api/ipapiis', ipapiisHandler);
 app.get('/api/invisibility', invisibilitytestHandler);
+app.get('/api/macchecker', macChecker);
 
 // 使用查询参数处理所有配置请求
 app.get('/api/configs', validateConfigs);

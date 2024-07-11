@@ -139,7 +139,35 @@
     "RuleTestNote": "Check the rule settings of proxy software",
     "CensorshipCheck": "Check if a website is blocked in some countries",
     "Whois": "Search for domain/IP registration information",
-    "InvisibilityTest": "Check if you are using a proxy or VPN"
+    "InvisibilityTest": "Check if you are using a proxy or VPN",
+    "MacChecker": "Query information of a physical address"
+  },
+  "macchecker": {
+    "Title": "MAC Lookup",
+    "Note": "Query the manufacturer of a physical address (MAC address), whether it is unicast/multicast, global/local, etc. Supports querying with a complete 12-digit address or just the prefix. You can also use this tool to verify if the physical address you generated meets your needs.",
+    "Note2": "Please enter a physical address to start the query:",
+    "Run": "Query",
+    "Placeholder": "F0:2F:4B:01:0A:AA",
+    "invalidMAC": "Invalid physical address",
+    "fetchError": "Unable to fetch query results",
+    "company": "Manufacturer",
+    "macPrefix": "Physical address prefix",
+    "address": "Registered address",
+    "country": "Registered country/region",
+    "blockStart": "Start block",
+    "blockEnd": "End block",
+    "blockSize": "Block size",
+    "blockType": "Block type",
+    "blockRange": "Block range",
+    "isRand": "Random address",
+    "isPrivate": "Private data",
+    "isMulticast": "Multicast address",
+    "isUnicast": "Unicast address",
+    "isGlobal": "Global address",
+    "isLocal": "Local address",
+    "property": "Address property",
+    "value": "Value",
+    "manufacturer": "Manufacturer details"
   },
   "whois": {
     "Title": "Whois Search",
@@ -737,6 +765,20 @@
           {
             "type": "improve",
             "change": "Optimized backend program dependencies"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized numerous details"
+          }
+        ]
+      },
+      {
+        "version": "v4.1",
+        "date": "July 11, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added MAC address lookup feature"
           },
           {
             "type": "improve",
