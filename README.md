@@ -41,6 +41,7 @@ Notes: You can use my demo for free, and you can also deploy it yourself.
 * 🔦 **DNS Resolver**: Performs DNS resolution of a domain name from multiple sources and obtains real-time resolution results that can be used for contamination determination.
 * 🚧 **Censorship Check**: Check if a website is blocked in some countries.
 * 📓 **Whois Search**: Perform whois information search for domain names or IP addresses
+* 📀 **MAC Lookup**: Query information of a physical address
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
 * 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
