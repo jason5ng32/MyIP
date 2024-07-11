@@ -64,15 +64,15 @@ const modifyData = (data) => {
     data.isLocal = isLocal ? true : false;
     data.isGlobal = !isLocal ? true : false;
     data.isUnicast = !isMulticast ? true : false;
-    data.macPrefix = data.macPrefix? data.macPrefix : 'N/A';
-    data.company = data.company? data.company : 'N/A';
-    data.country = data.country? data.country : 'N/A';
-    data.address = data.address? data.address : 'N/A';
-    data.updated = data.updated? data.updated : 'N/A';
-    data.blockStart = data.blockStart? data.blockStart : 'N/A';
-    data.blockEnd = data.blockEnd? data.blockEnd : 'N/A';
-    data.blockSize = data.blockSize? data.blockSize : 'N/A';
-    data.blockType = data.blockType? data.blockType : 'N/A';
+    data.macPrefix = data.macPrefix ? data.macPrefix.match(/.{1,2}/g).join(':') : 'N/A';
+    data.company = data.company ? data.company : 'N/A';
+    data.country = data.country ? data.country : 'N/A';
+    data.address = data.address ? data.address : 'N/A';
+    data.updated = data.updated ? data.updated : 'N/A';
+    data.blockStart = data.blockStart ? data.blockStart.match(/.{1,2}/g).join(':') : 'N/A';
+    data.blockEnd = data.blockEnd ? data.blockEnd.match(/.{1,2}/g).join(':') : 'N/A';
+    data.blockSize = data.blockSize ? data.blockSize : 'N/A';
+    data.blockType = data.blockType ? data.blockType : 'N/A';
 
     return data;
 }
