@@ -62,6 +62,8 @@ const modifyData = (data) => {
 
     data.isMulticast = isMulticast ? true : false;
     data.isLocal = isLocal ? true : false;
+    data.isGlobal = !isLocal ? true : false;
+    data.isUnicast = !isMulticast ? true : false;
     data.macPrefix = data.macPrefix? data.macPrefix : 'N/A';
     data.company = data.company? data.company : 'N/A';
     data.country = data.country? data.country : 'N/A';

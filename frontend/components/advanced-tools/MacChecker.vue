@@ -41,52 +41,16 @@
                                     <div class="card-body row">
                                         <h3 class="mb-4">{{ t('macchecker.manufacturer') }}</h3>
                                         <div class="col-lg-6 col-md-6 col-12">
-                                            <div class="jn-detail">
+                                            <div class="jn-detail" v-for="item in leftItems" :key="item.key">
                                                 <span>
-                                                    {{ t('macchecker.macPrefix') }}
+                                                    {{ t(`macchecker.${item.key}`) }}
                                                 </span>
                                                 <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.macPrefix }}
+                                                    {{ macCheckResult[item.key] }}
                                                 </span>
                                             </div>
-
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.blockStart') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.blockStart }}
-                                                </span>
-                                            </div>
-
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.blockEnd') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.blockEnd }}
-                                                </span>
-                                            </div>
-
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.blockSize') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.blockSize }}
-                                                </span>
-                                            </div>
-
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.blockType') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.blockType }}
-                                                </span>
-                                            </div>
-
                                         </div>
+
                                         <div class="col-lg-6 col-md-6 col-12">
                                             <div class="jn-detail">
                                                 <span>
@@ -132,52 +96,16 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isRand') }}</td>
+                                                    <tr v-for="item in tableItems" :key="item.key">
+                                                        <td>{{ t(`macchecker.${item.key}`) }}</td>
                                                         <td>
                                                             <i class="bi"
-                                                                :class="macCheckResult.isRand ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isPrivate') }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="macCheckResult.isPrivate ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isMulticast') }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="macCheckResult.isMulticast ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isUnicast') }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="!macCheckResult.isMulticast ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isLocal') }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="macCheckResult.isLocal ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ t('macchecker.isGlobal') }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="!macCheckResult.isLocal ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
+                                                                :class="macCheckResult[item.key] ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -209,6 +137,27 @@ const macCheckResult = ref({});
 const macCheckStatus = ref("idle");
 const queryMAC = ref('');
 const errorMsg = ref('');
+
+const leftItems = computed(() => {
+    return [
+        { key: 'macPrefix' },
+        { key: 'blockStart' },
+        { key: 'blockEnd' },
+        { key: 'blockSize' },
+        { key: 'blockType' }
+    ];
+});
+
+const tableItems = computed(() => {
+    return [
+        { key: 'isRand' },
+        { key: 'isPrivate' },
+        { key: 'isMulticast' },
+        { key: 'isUnicast' },
+        { key: 'isLocal' },
+        { key: 'isGlobal' }
+    ];
+});
 
 // 检查 MAC 是否有效
 const validateInput = (input) => {
@@ -252,7 +201,6 @@ const getMacInfo = async (query) => {
         errorMsg.value = t('macchecker.fetchError');
     }
 };
-
 
 </script>
 
