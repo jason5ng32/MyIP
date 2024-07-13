@@ -103,6 +103,8 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `KEYCDN_USER_AGENT` | Non | `""` | Le nom de domaine lorsque vous utilisez KeyCDN, doit contenir le préfixe https. Utilisé pour obtenir des informations sur l'adresse IP via KeyCDN |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 | `MAC_LOOKUP_API_KEY` | Non | `""` | Clé API pour MAC Lookup, utilisée pour obtenir des informations sur l'adresse MAC via MAC Lookup |
+| `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
+| `VITE_SPEEDTEST_REVERSE_URL` | Non | `""` | URL inversée pour Speedtest, utilisée temporairement pour résoudre le problème CORS |
 
 ### Utilisation des variables d'environnement dans un environnement Node
 
@@ -137,6 +139,21 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 
 ```
+
+## 🚀 Déploiement du proxy inverse de test de vitesse
+
+Ce projet utilise le package npm `@cloudflare/speedtest` pour mesurer les vitesses Internet. Depuis le 11-07-2024, le domaine `speed.cloudflare.com` a mis en place une protection CORS, interdisant les accès inter-domaines, ce qui a rendu la fonctionnalité de test de vitesse inutilisable.
+
+Je pense qu'il s'agit peut-être d'une erreur de configuration temporaire de la part de Cloudflare, car `@cloudflare/speedtest` est un projet open-source officiel. À moins que l'officiel ne le déclare obsolète ou ne cesse de le maintenir, l'accès inter-domaines devrait théoriquement continuer à être autorisé.
+
+Cependant, avant que la correction officielle ne soit appliquée, nous pouvons toujours résoudre ce problème en appliquant un correctif. Ici, un Worker Cloudflare est utilisé comme proxy inverse (théoriquement cela pourrait nuire aux résultats du test de vitesse, mais reste dans des limites acceptables). Les étapes sont les suivantes :
+
+1. Créez un nouveau projet dans le tableau de bord du Worker Cloudflare et copiez tout le code de `cfworker/worker.js` de ce projet.
+2. Modifiez le tableau `allowedDomains` dans le code pour inclure votre propre domaine.
+3. Téléchargez et déployez le code modifié sur votre Worker Cloudflare.
+4. Récupérez l'URL d'accès de votre Worker Cloudflare.
+5. Retournez sur votre serveur et configurez l'URL d'accès de votre Worker CF comme valeur pour la variable d'environnement `VITE_SPEEDTEST_REVERSE_URL`.
+6. Recompilez le projet `MyIP` et redémarrez le service.
 
 ## 👩🏻‍💻 Utilisation avancée
 

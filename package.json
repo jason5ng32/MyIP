@@ -4,6 +4,7 @@
   "version": "3.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "patch-package",
     "dev": "concurrently \"vite\" \"nodemon backend-server.js\"",
     "build": "vite build",
     "preview": "vite preview",
@@ -28,7 +29,9 @@
     "flag-icons": "^7.2.3",
     "http-proxy-middleware": "^3.0.0",
     "nodemon": "^3.1.4",
+    "patch-package": "^8.0.0",
     "pinia": "^2.1.7",
+    "postinstall": "^0.10.3",
     "svgmap": "^2.10.1",
     "vue": "^3.4.29",
     "vue-i18n": "^9.13.1",
