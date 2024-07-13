@@ -33,14 +33,14 @@
     "pinia": "^2.1.7",
     "postinstall": "^0.10.3",
     "svgmap": "^2.10.1",
-    "vue": "^3.4.29",
+    "vue": "^3.4.31",
     "vue-i18n": "^9.13.1",
     "vue-router": "^4.4.0",
     "whoiser": "^1.17.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
-    "vite": "^5.3.1",
+    "vite": "^5.3.3",
     "vite-plugin-pwa": "^0.20.0"
   }
 }
