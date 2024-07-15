@@ -104,7 +104,6 @@ You can use the program without adding any environment variables, but if you wan
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
-| `VITE_SPEEDTEST_REVERSE_URL` | No | `""` | Reverse URL for Speedtest, temporary used for solving the CORS problem  |
 
 ### Using Environment Variables in a Node Environment
 
@@ -139,21 +138,6 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 
 ```
-
-## 🚀 Deploying Speed Test Reverse Proxy
-
-This project uses the `@cloudflare/speedtest` npm package to measure internet speeds. As of 2024-07-11, the domain `speed.cloudflare.com` has implemented CORS protection, prohibiting cross-origin access, which has rendered the speed test functionality unusable.
-
-I believe this might be a temporary configuration error on Cloudflare's part, as `@cloudflare/speedtest` is an official open-source project. Unless officially deprecated or discontinued, cross-origin access should theoretically continue to be allowed.
-
-However, until the official fix is implemented, we can still resolve this issue by patching. Here, a Cloudflare Worker is used as a reverse proxy (theoretically this might impair the speed test results, but it remains within acceptable limits). The steps are as follows:
-
-1. Create a new project in the Cloudflare Worker dashboard, and copy all the code from `cfworker/worker.js` in this project.
-2. Modify the `allowedDomains` array in the code to include your own domain.
-3. Upload and deploy the modified code to your Cloudflare Worker.
-4. Retrieve the access URL of your Cloudflare Worker
-5. Return to your server and set the value of the environment variable `VITE_SPEEDTEST_REVERSE_URL` to the access URL of your CF Worker.
-6. Recompile the `MyIP` project and restart the service.
 
 ## 👩🏻‍💻 Advanced Usage
 

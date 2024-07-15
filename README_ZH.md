@@ -106,7 +106,6 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
 | `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
-| `VITE_SPEEDTEST_REVERSE_URL` | 否 | `""` | Speedtest 的反向代理地址，用于临时解决 Cloudflare 近期出现的 CORS 问题 |
 
 ### 在 Node 环境里使用环境变量
 
@@ -141,21 +140,6 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 
 ```
-
-## 🚀 部署网速测试反向代理
-
-本项目使用了 `@cloudflare/speedtest` 这个 npm 包进行网速测速，大约在 2024-07-11 开始，`speed.cloudflare.com` 这个域名开启了 CORS 保护，不允许跨域访问，这导致网速测试功能无法使用。
-
-我相信这可能是 Cloudflare 的一个临时设置错误，因为 `@cloudflare/speedtest` 是一个官方的开源项目，除非官方明确下架或不再维护，否则理论上应当继续允许跨域访问。
-
-然而，在官方修复这个问题之前，我们依然可以通过打补丁的方式来解决这个问题。这里需要使用 Cloudflare Worker 作为反向代理进行解决（理论上这会让测速效果有所损耗，但因为都是 Cloudflare 的服务器，损耗会在接受的范围）。操作方法如下：
-
-1. 前往 Cloudflare Worker 后台创建一个新项目，并复制本项目 `cfworker/worker.js` 里所有的代码
-2. 修改代码里 `allowedDomains` 数组里的域名为你自己的域名
-3. 将修改后的代码上传并部署到 Cloudflare Worker
-4. 获取你的 Cloudflare Worker 的访问 URL
-5. 回到你的服务端，将 CF Worker 的访问 URL 作为环境变量 `VITE_SPEEDTEST_REVERSE_URL` 的值进行配置
-6. 重新编译 `MyIP` 项目并重启服务
 
 ## 👩🏻‍💻 高级用法
 
