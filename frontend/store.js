@@ -39,6 +39,7 @@ export const useMainStore = defineStore('main', {
       { id: 4, text: 'KeyCDN', url: '/api/keycdn?ip={{ip}}', enabled: true },
       { id: 5, text: 'IP.SB', url: '/api/ipsb?ip={{ip}}', enabled: true },
       { id: 6, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true },
+      { id: 7, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true },
     ],
   }),
 

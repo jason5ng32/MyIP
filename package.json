@@ -27,6 +27,7 @@
     "express-slow-down": "^2.0.3",
     "flag-icons": "^7.2.3",
     "http-proxy-middleware": "^3.0.0",
+    "maxmind": "^4.3.20",
     "nodemon": "^3.1.4",
     "pinia": "^2.1.7",
     "svgmap": "^2.10.1",
