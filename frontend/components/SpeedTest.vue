@@ -86,15 +86,15 @@
               v-if="speedTestStatus === 'finished' && hasScores">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i> {{ t('speedtest.score') }}
                 {{ t('speedtest.videoStreaming') }}
-                <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'text-warning'">
+                <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
                   {{ speedTest.streamingScore }}
                 </span>
                 {{ t('speedtest.gaming') }}
-                <span :class="speedTest.gamingScore >= 50 ? 'text-success' : 'text-warning'">
+                <span :class="speedTest.gamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
                   {{ speedTest.gamingScore }}
                 </span>
                 {{ t('speedtest.rtc') }}
-                <span :class="speedTest.rtcScore >= 50 ? 'text-success' : 'text-warning'">
+                <span :class="speedTest.rtcScore >= 50 ? 'text-success' : 'jn-text-warning'">
                   {{ speedTest.rtcScore }}
                 </span>
                 {{ t('speedtest.resultNote') }}
@@ -364,5 +364,9 @@ defineExpose({
   color: var(--bs-btn-hover-color);
   background-color: var(--bs-btn-hover-bg);
   border-color: var(--bs-btn-hover-border-color);
+}
+.jn-text-warning {
+  --bs-text-opacity: 1;
+  color: #c67c14;
 }
 </style>

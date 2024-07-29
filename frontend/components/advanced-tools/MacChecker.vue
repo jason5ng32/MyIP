@@ -37,7 +37,7 @@
 
                         <div id="macCheckResult" class="row" v-if="macCheckResult.success">
                             <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                                     <div class="card-body row">
                                         <h3 class="mb-4">{{ t('macchecker.manufacturer') }}</h3>
                                         <div class="col-lg-6 col-md-6 col-12">
@@ -84,7 +84,7 @@
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-12 mb-4">
-                                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode}">
+                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode}">
                                     <div class="card-body">
                                         <h3 class="mb-4">{{ t('macchecker.property') }}</h3>
                                         <div class="table-responsive text-nowrap">
@@ -162,8 +162,9 @@ const tableItems = computed(() => {
 // 检查 MAC 是否有效
 const validateInput = (input) => {
     if (!input) return null;
-    // 清理所有的分隔符
-    const normalizedInput = input.replace(/[:-]/g, '');
+    // 清理所有的分隔符和空格
+    const normalizedInput = input.replace(/[:-]/g, '')
+        .replace(/\s+/g, '');
     // 检查长度和格式
     if (normalizedInput.length < 6 || normalizedInput.length > 12 || !/^[0-9A-Fa-f]+$/.test(normalizedInput)) {
         errorMsg.value = t('macchecker.invalidMAC');
