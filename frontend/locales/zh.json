@@ -273,7 +273,8 @@
     "StatusUnavailable": "不可用",
     "StatusTimeout": "超时或不可用",
     "checking": "检查中...",
-    "minTestTime": "最小测试时间："
+    "minTestTime": "最小测试时间：",
+    "RefreshThisTest": "刷新此测试"
   },
   "webrtc": {
     "id": "webrtc",

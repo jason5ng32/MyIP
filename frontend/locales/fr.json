@@ -273,7 +273,8 @@
         "StatusUnavailable": "Non disponible",
         "StatusTimeout": "Délai dépassé",
         "checking": "Vérification en cours...",
-        "minTestTime": "Minimal: "
+        "minTestTime": "Minimal: ",
+        "RefreshThisTest": "Rafraîchir ce test"
     },
     "webrtc": {
         "id": "webrtc",

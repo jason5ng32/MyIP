@@ -273,7 +273,8 @@
     "StatusUnavailable": "Unavailable",
     "StatusTimeout": "Timeout or Unavailable",
     "checking": "Checking...",
-    "minTestTime": "Min Test Time: "
+    "minTestTime": "Min Test Time: ",
+    "RefreshThisTest": "Refresh This Test"
   },
   "webrtc": {
     "id": "webrtc",
