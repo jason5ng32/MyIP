@@ -28,6 +28,17 @@ export default defineConfig({
         ],
         runtimeCaching: [
           {
+            urlPattern: /\/(sw\.js|registerSW\.js|manifest\.webmanifest)$/, // sw 文件
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'critical-assets',
+              expiration: {
+                maxEntries: 3,
+                maxAgeSeconds: 4 * 60 * 60, // 4 小时
+              },
+            },
+          },
+          {
             urlPattern: /\.(?:png|jpg|jpeg|svg|webp|woff|woff2)$/, // 图片文件
             handler: 'CacheFirst',
             options: {
