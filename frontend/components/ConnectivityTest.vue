@@ -17,7 +17,7 @@
           <div class="card jn-card keyboard-shortcut-card"
             :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
             <div class="card-body">
-              <p class="jn-con-title card-title"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</p>
+              <p class="jn-con-title card-title"  @click.prevent="checkConnectivityHandler(test, onTestComplete, true)" :title="t('connectivity.RefreshThisTest')"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}</p>
               <p class="card-text" :class="{
                 'text-info': test.status === t('connectivity.StatusWait'),
                 'text-success': test.status.includes(t('connectivity.StatusAvailable')) && test.time < 200,
@@ -147,13 +147,13 @@ const connectivityTests = reactive([
 ]);
 
 // 检查网络连通性
-const checkConnectivityHandler = (test, onTestComplete, isManualRun) => {
+const checkConnectivityHandler = (test, onTestComplete = () => {}, isManualRun) => {
   const beginTime = +new Date();
   manualRun.value = isManualRun;
   let img = new Image();
   let timeout = setTimeout(() => {
     test.status = t('connectivity.StatusUnavailable');
-    onTestComplete(false);
+      onTestComplete(false);
   }, 3 * 1200);
 
   img.onload = () => {
@@ -172,7 +172,6 @@ const checkConnectivityHandler = (test, onTestComplete, isManualRun) => {
     } else {
       test.time = testTime;
     }
-
     onTestComplete(true);
   };
 

@@ -85,11 +85,12 @@
                                                 <i class="bi"
                                                     :class="(testResults.blocklist.proxy || testResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span
+                                            <td>
+                                                <span class="opacity-75"
                                                     v-if="(testResults.blocklist.proxy || testResults.blocklist.vpn)">{{
                                                     t('invisibilitytest.blocklist.proxy') }}</span>
-                                                <span v-else>{{ t('invisibilitytest.blocklist.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.blocklist.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -100,10 +101,11 @@
                                                 <i class="bi"
                                                     :class="testResults.headers.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.headers.proxy">{{
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.headers.proxy">{{
                                                     t('invisibilitytest.headers.proxy') }}</span>
-                                                <span v-else>{{ t('invisibilitytest.headers.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.headers.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -114,13 +116,14 @@
                                                 <i class="bi"
                                                     :class="(testResults.datacenter.proxy || testResults.datacenter.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span
+                                            <td>
+                                                <span class="opacity-75"
                                                     v-if="(testResults.datacenter.proxy || testResults.datacenter.vpn)">
                                                     {{ t('invisibilitytest.datacenter.proxy') }}
                                                     <strong>{{ testResults.datacenter.hosting }}</strong>
                                                 </span>
-                                                <span v-else>{{ t('invisibilitytest.datacenter.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.datacenter.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -131,8 +134,8 @@
                                                 <i class="bi"
                                                     :class="testResults.tcp.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.tcp.proxy">
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.tcp.proxy">
                                                     {{ t('invisibilitytest.tcp.proxy') }}
                                                     <br />
                                                     {{ t('invisibilitytest.tcp.computer') }}
@@ -142,7 +145,8 @@
                                                     <strong>{{ testResults.tcp.ipos }}</strong>
 
                                                 </span>
-                                                <span v-else>{{ t('invisibilitytest.tcp.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.tcp.notProxy')
+                                                    }}</span>
                                             </td>
                                         </tr>
 
@@ -153,8 +157,9 @@
                                                 <i class="bi"
                                                     :class="(testResults.timezone.proxy || testResults.timezone.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="(testResults.timezone.proxy || testResults.timezone.vpn)">
+                                            <td>
+                                                <span class="opacity-75"
+                                                    v-if="(testResults.timezone.proxy || testResults.timezone.vpn)">
                                                     {{ t('invisibilitytest.timezone.proxy') }}
                                                     <br />
                                                     {{ t('invisibilitytest.timezone.computer') }}
@@ -162,7 +167,8 @@
                                                     {{ t('invisibilitytest.timezone.server') }}
                                                     <strong>{{ testResults.timezone.iptimezone }}</strong>
                                                 </span>
-                                                <span v-else>{{ t('invisibilitytest.timezone.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.timezone.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -173,10 +179,12 @@
                                                 <i class="bi"
                                                     :class="testResults.net.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.net.proxy">{{ t('invisibilitytest.net.proxy')
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.net.proxy">{{
+                                                    t('invisibilitytest.net.proxy')
                                                     }}</span>
-                                                <span v-else>{{ t('invisibilitytest.net.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.net.notProxy')
+                                                    }}</span>
                                             </td>
                                         </tr>
 
@@ -187,8 +195,8 @@
                                                 <i class="bi"
                                                     :class="testResults.webrtc.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.webrtc.proxy">
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.webrtc.proxy">
                                                     {{ t('invisibilitytest.webrtc.proxy') }}
                                                     <br />
                                                     {{ t('invisibilitytest.webrtc.ipsAre') }}
@@ -198,7 +206,8 @@
                                                             }}</strong>, </span>
                                                     <strong>{{ testResults.webrtc.ip }}</strong>
                                                 </span>
-                                                <span v-else>{{ t('invisibilitytest.webrtc.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.webrtc.notProxy')
+                                                    }}</span>
                                             </td>
                                         </tr>
 
@@ -209,10 +218,12 @@
                                                 <i class="bi"
                                                     :class="testResults.flow.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.flow.proxy">{{ t('invisibilitytest.flow.proxy')
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.flow.proxy">{{
+                                                    t('invisibilitytest.flow.proxy')
                                                     }}</span>
-                                                <span v-else>{{ t('invisibilitytest.flow.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.flow.notProxy')
+                                                    }}</span>
                                             </td>
                                         </tr>
 
@@ -223,8 +234,8 @@
                                                 <i class="bi"
                                                     :class="testResults.latency.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.latency.proxy">
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.latency.proxy">
                                                     {{ t('invisibilitytest.latency.proxy') }}
                                                     <br />
                                                     {{ t('invisibilitytest.latency.fromTCP') }}
@@ -233,7 +244,8 @@
                                                     {{ t('invisibilitytest.latency.fromWS') }}
                                                     <strong>{{ testResults.latency.wsTime }}ms</strong>
                                                 </span>
-                                                <span v-else>{{ t('invisibilitytest.latency.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.latency.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -244,10 +256,11 @@
                                                 <i class="bi"
                                                     :class="testResults.highlatency.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
-                                            <td class="opacity-75">
-                                                <span v-if="testResults.highlatency.proxy">{{
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.highlatency.proxy">{{
                                                     t('invisibilitytest.highlatency.proxy') }}</span>
-                                                <span v-else>{{ t('invisibilitytest.highlatency.notProxy') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.highlatency.notProxy') }}</span>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -338,7 +351,7 @@ const getResult = async () => {
         if (data.message === "Data not found" && retryCount.value < 3) {
             setTimeout(() => {
                 getResult();
-            }, 4000, retryCount.value++ );
+            }, 4000, retryCount.value++);
             return;
         }
         testResults.value = data;

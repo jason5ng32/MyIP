@@ -65,9 +65,9 @@
                                                     {{ t('macchecker.country') }}
                                                 </span>
                                                 <span class="jn-con-title card-title mt-1">
-                                                    {{ getCountryName(macCheckResult.country, lang) }}
                                                     <span
                                                         :class="'jn-fl fi fi-' + macCheckResult.country.toLowerCase()"></span>
+                                                    {{ getCountryName(macCheckResult.country, lang) }}
                                                 </span>
                                             </div>
                                             <div class="jn-detail">

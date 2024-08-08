@@ -67,9 +67,9 @@ const stunServers = reactive([
     natType: t('webrtc.StatusWait'),
   },
   {
-    id: "nextcloud",
-    name: "NextCloud (QUIC)",
-    url: "stun.nextcloud.com:443",
+    id: "blackberry",
+    name: "BlackBerry",
+    url: "stun.voip.blackberry.com:3478",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
   },
