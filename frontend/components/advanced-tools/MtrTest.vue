@@ -92,7 +92,7 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 let allIPs = computed(() => {
-  const _allIPs = store.Global_ipDataCards;
+  const _allIPs = store.allIPs;
   return _allIPs.filter(ip => ip && !ip.includes(' '));
 });
 
