@@ -106,7 +106,7 @@ const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 let allIPs = computed(() => {
   const _allIPs = store.Global_ipDataCards;
-  return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
+  return _allIPs.filter(ip => ip && !ip.includes(' '));
 });
 
 const selectedIP = ref('');
@@ -118,6 +118,7 @@ const startPingCheck = () => {
   trackEvent('Section', 'StartClick', 'GlobalLatency');
   // 清空上一次结果
   pingResults.value = [];
+  cleanMap();
   let tryCount = 0;
   // 子函数：发起 ping 请求
   const sendPingRequest = async () => {
@@ -279,6 +280,11 @@ const drawMap = () => {
     initialZoom: 1,
   });
 }
+
+// 清除地图数据
+const cleanMap = () => { 
+  document.getElementById('svgMap').innerHTML = '';
+};
 
 </script>
 

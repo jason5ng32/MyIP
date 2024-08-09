@@ -93,7 +93,7 @@ const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 let allIPs = computed(() => {
   const _allIPs = store.Global_ipDataCards;
-  return _allIPs.filter(ip => ip && !ip.includes(' ') && !ip.includes(':'));
+  return _allIPs.filter(ip => ip && !ip.includes(' '));
 });
 
 const selectedIP = ref('');
