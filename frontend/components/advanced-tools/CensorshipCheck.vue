@@ -265,7 +265,8 @@ const startHttpCheck = () => {
             return await response.json();
         } catch (error) {
             console.error("Error sending HTTP request:", error);
-            errorMsg.value = t('censorshipcheck.fetchError');
+            censorshipCheckStatus.value = "error";
+            errorMsg.value = t('censorshipcheck.invalidURL');
         }
     };
 
@@ -295,6 +296,8 @@ const startHttpCheck = () => {
             }
         } catch (error) {
             console.error("Error fetching HTTP results:", error);
+            censorshipCheckStatus.value = "error";
+            errorMsg.value = t('censorshipcheck.fetchError');
         }
     };
 
