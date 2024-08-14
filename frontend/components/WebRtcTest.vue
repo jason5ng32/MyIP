@@ -175,7 +175,7 @@ onMounted(() => {
 });
 
 watch(IPArray, () => {
-  store.updateGlobalIpDataCards(IPArray.value);
+  store.updateAllIPs(IPArray.value);
 }, { deep: true });
 
 defineExpose({

@@ -22,7 +22,7 @@ export const useMainStore = defineStore('main', {
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
-    Global_ipDataCards: [],
+    allIPs: [],
     configs: {},
     userPreferences: {},
     alert: {
@@ -70,9 +70,9 @@ export const useMainStore = defineStore('main', {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle };
     },
     // 从不同的组件收集合并 IP 数据
-    updateGlobalIpDataCards(payload) {
-      const uniqueIPs = new Set([...this.Global_ipDataCards, ...payload]);
-      this.Global_ipDataCards = Array.from(uniqueIPs);
+    updateAllIPs(payload) {
+      const uniqueIPs = new Set([...this.allIPs, ...payload]);
+      this.allIPs = Array.from(uniqueIPs);
     },
     // 设置移动模式
     setIsMobile(payload) {

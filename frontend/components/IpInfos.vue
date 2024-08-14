@@ -528,7 +528,7 @@ watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
 
 
 watch(IPArray, () => {
-  store.updateGlobalIpDataCards(IPArray.value);
+  store.updateAllIPs(IPArray.value);
 });
 
 onMounted(() => {
