@@ -15,11 +15,11 @@
               id="Logo"></path>
           </svg>
           <span class=" fw-bold  "> IP</span>
-          <span class="fw-lighter">Check.</span>
+          <span class="fw-lighter">Tool.</span>
           <span class="fw-lighter" :class="{
           'background-animation-dark': !loaded && isDarkMode,
           'background-animation-light': !loaded && !isDarkMode
-        }">ing</span>
+        }">uk</span>
         </a>
 
         <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
@@ -56,21 +56,6 @@
             @click="collapseNav(); trackEvent('Nav', 'NavClick', item)">{{
             t(`nav.${item}`) }}</a>
         </div>
-        <a :href="t('page.footerLink')" class="btn jn-fs" id="githubStars"
-          :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
-          target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
-          <div><i class="bi bi-github"></i></div>
-          <div class="row flex-column ">
-            <TransitionGroup name="slide-fade">
-              <span key="default" class="col-12 jn-w" v-if="githubStars === 0">&nbsp;GitHub</span>
-              <span key="stars" class="col-12 jn-w" v-if="githubStars > 0">
-                &nbsp;{{ githubStars }}
-                <i class="bi bi-star-fill" :class="[isDarkMode ? 'redstar' : 'yellowstar']"></i>
-              </span>
-            </TransitionGroup>
-
-          </div>
-        </a>
       </div>
     </nav>
   </header>
@@ -90,7 +75,6 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const loaded = ref(false);
-const githubStars = ref(0);
 
 const closeAllOffCanvas = () => {
   const offcanvasElements = document.querySelectorAll('.offcanvas');
@@ -118,24 +102,7 @@ const OpenPreferences = () => {
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
-//获取 GitHub stars
-const getGitHubStars = async () => {
-  const url = `https://api.github.com/repos/jason5ng32/MyIP`;
 
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    setTimeout(() => {
-      githubStars.value = data.stargazers_count;
-    }, 1000);
-  } catch (error) {
-    console.error('Failed to fetch Github data:', error);
-    githubStars.value = 0;
-  }
-};
 
 // 收起导航栏
 const collapseNav = () => {
@@ -152,12 +119,6 @@ const handleLogoClick = () => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// 开始时获取 GitHub stars
-onMounted(() => {
-  setTimeout(() => {
-    getGitHubStars();
-  }, 1000)
-});
 
 watch(() => store.allHasLoaded, (newValue) => {
   loaded.value = newValue;
