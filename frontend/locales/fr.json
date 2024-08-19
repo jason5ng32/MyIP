@@ -1,7 +1,7 @@
 {
     "nav": {
         "id": "nav",
-        "Title": "IPCheck.ing",
+        "Title": "IPTool.uk",
         "IPInfo": "Infos IP",
         "Connectivity": "Connectivité",
         "WebRTC": "Test WebRTC",
@@ -195,7 +195,7 @@
     "ruletest": {
         "Title": "Test de règles",
         "Name": "Test",
-        "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy.",
+        "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPTool.uk dans votre logiciel proxy.",
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
         "Country": "Région de proxy"
@@ -322,7 +322,7 @@
         "id": "pingtest",
         "Title": "Test de latence mondiale",
         "Note": "Le test de ping est un outil réseau utilisé pour mesurer le temps aller-retour des paquets de données de votre appareil vers des cibles spécifiques (dans ce cas, nos serveurs situés sur différents continents et régions). Il s'agit d'une mesure clé pour évaluer les performances du réseau.",
-        "Note2": "Dans ce processus, IPCheck.ing envoie de petits paquets de données depuis des serveurs du monde entier vers votre adresse IP et mesure le temps qu'il faut à ces paquets pour voyager du serveur à votre appareil et vice versa. Grâce à ces tests de ping depuis différentes localisations géographiques, vous pouvez obtenir une vue complète de la vitesse et de la stabilité de la connexion de votre appareil au réseau mondial.",
+        "Note2": "Dans ce processus, IPTool.uk envoie de petits paquets de données depuis des serveurs du monde entier vers votre adresse IP et mesure le temps qu'il faut à ces paquets pour voyager du serveur à votre appareil et vice versa. Grâce à ces tests de ping depuis différentes localisations géographiques, vous pouvez obtenir une vue complète de la vitesse et de la stabilité de la connexion de votre appareil au réseau mondial.",
         "Note3": "Veuillez sélectionner votre adresse IP pour le test.",
         "SelectIP": "Choisissez un IP",
         "Region": "Région",
@@ -400,21 +400,21 @@
         "MacChecker": "Ouvrir le Recherche de MAC"
     },
     "page": {
-        "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
+        "title": "IPTool.uk - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
         "description": "Une boîte à outils IP meilleure et open source. Facile à vérifier vos adresses IP, informations IP, vérifier les fuites DNS, examiner les connexions WebRTC, tester la disponibilité des sites web, rechercher des enregistrements DNS, rechercher des informations Whois et tester la latence dans le monde entier.",
         "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse, Recherche DNS, Recherche Whois, Test de ping, Test de confidentialité",
         "footerName": "Créateurs : Jason Ng, Seven Yu & ChatGPT",
         "footerLink": "https://github.com/jason5ng32/MyIP",
         "copyRightName": "Originalement de ",
-        "copyRightLink": "https://ipcheck.ing",
-        "copyRightLinkName": "IPCheck.ing"
+        "copyRightLink": "https://IPTool.uk",
+        "copyRightLinkName": "IPTool.uk"
     },
     "helpModal": {
         "Title": "Raccourcis"
     },
     "about": {
         "Title": "À propos",
-        "product1": "IPCheck.ing est une boîte à outils IP gratuite qui vous aide à vérifier vos informations IP, tester la disponibilité des sites web, examiner les informations de sortie DNS, effectuer des tests de vitesse, des tests de latence mondiale, des tests MTR, et plus encore.",
+        "product1": "IPTool.uk est une boîte à outils IP gratuite qui vous aide à vérifier vos informations IP, tester la disponibilité des sites web, examiner les informations de sortie DNS, effectuer des tests de vitesse, des tests de latence mondiale, des tests MTR, et plus encore.",
         "product2": "Il s'agit d'un projet open-source, et vous pouvez consulter le code source en cliquant sur l'icône GitHub en bas de la page.",
         "product3": "Au départ, il s'agissait d'un projet personnel pour moi afin d'apprendre Vue.js et comment écrire du code en utilisant ChatGPT. Au fil du temps, il a gagné en popularité sur GitHub, j'ai donc effectué beaucoup de refactoring et ajouté de nombreuses fonctionnalités utiles. J'espère que vous l'apprécierez.",
         "meTitle": "À propos de moi",

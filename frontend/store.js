@@ -32,7 +32,7 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
     },
     ipDBs: [
-      { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
+      { id: 0, text: 'IPTool.uk', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
       { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true },
       { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true },
       { id: 3, text: 'IPAPI.co', url: 'https://ipapi.co/{{ip}}/json/', enabled: true },
