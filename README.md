@@ -4,7 +4,6 @@
 
 Notes: You can use my demo for free, and you can also deploy it yourself.
 
-[![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
 ## 👀 Main Features
 
