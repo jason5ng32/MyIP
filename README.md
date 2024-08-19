@@ -1,27 +1,6 @@
 # 🧰 MyIP - A Better IP Toolbox
 
-<a href="https://trendshift.io/repositories/5332" target="_blank"><img src="https://trendshift.io/api/badge/repositories/5332" alt="jason5ng32%2FMyIP | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-
-![IPCheck.ing Banner](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/gh_banner.png)
-
-![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
-![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
-![Docker Pulls](https://img.shields.io/docker/pulls/jason5ng32/myip)
-![GitHub license](https://img.shields.io/github/license/jason5ng32/MyIP)
-
-![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
-![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
-
-![PWA](https://img.shields.io/badge/PWA-Supported-blue)
-![Windows-image](https://img.shields.io/badge/-Windows-blue?logo=windows)
-![MacOS-image](https://img.shields.io/badge/-MacOS-black?logo=apple)
-![Linux-image](https://img.shields.io/badge/-Linux-333?logo=ubuntu)
-
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fipcheck.ing&up_message=online&label=IPCheck.ing 'IPCheck.ing')](https://ipcheck.ing)
-
 🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇫🇷 [Français](README_FR.md)
-
-👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
 Notes: You can use my demo for free, and you can also deploy it yourself.
 
@@ -59,7 +38,7 @@ Make sure you have Node.js installed.
 Clone the code:
 
 ```bash
-git clone https://github.com/jason5ng32/MyIP.git
+git clone https://github.com/yanwo/MyIP.git
 ```
 
 Install and build:
@@ -81,7 +60,7 @@ The program will run on port 18966.
 Click the 'Deploy to Docker' button at the top to complete the deployment. Or, use the following shell:
 
 ```bash
-docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+docker run -d -p 18966:18966 --name myip --restart always yanwo/myip:latest
 ```
 
 ## 📚 Environment Variable
@@ -158,7 +137,3 @@ DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=jason5ng32/MyIP&type=Date)](https://star-history.com/#jason5ng32/MyIP&Date)
