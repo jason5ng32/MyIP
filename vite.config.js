@@ -74,8 +74,8 @@ export default defineConfig({
         ]
       },
       manifest: {
-        name: 'IPCheck.ing',
-        short_name: 'IPCheck.ing',
+        name: 'IPTool.uk',
+        short_name: 'IPTool.uk',
         theme_color: '#f8f9fa',
         orientation: "portrait",
         id: 'com.jasonng.myip',
