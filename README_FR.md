@@ -1,23 +1,22 @@
 # 🧰 MyIP - Une meilleure boîte à outils IP
 
-<a href="https://trendshift.io/repositories/5332" target="_blank"><img src="https://trendshift.io/api/badge/repositories/5332" alt="jason5ng32%2FMyIP | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<div align="center">
 
 ![IPCheck.ing Banner](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/gh_banner.png)
+
+<a href="https://trendshift.io/repositories/5332" target="_blank"><img src="https://trendshift.io/api/badge/repositories/5332" alt="jason5ng32%2FMyIP | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
+[![Mentioned in Awesome Self Hosted](https://awesome.re/mentioned-badge.svg)](https://github.com/awesome-selfhosted/awesome-selfhosted)
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/jason5ng32/MyIP)
 ![GitHub forks](https://img.shields.io/github/forks/jason5ng32/myip)
 ![Docker Pulls](https://img.shields.io/docker/pulls/jason5ng32/myip)
-![GitHub license](https://img.shields.io/github/license/jason5ng32/MyIP)
+
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fipcheck.ing&up_message=online&label=IPCheck.ing 'IPCheck.ing')](https://ipcheck.ing)
+![PWA](https://img.shields.io/badge/PWA-Supported-blue)
 
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
-
-![PWA](https://img.shields.io/badge/PWA-Supported-blue)
-![Windows-image](https://img.shields.io/badge/-Windows-blue?logo=windows)
-![MacOS-image](https://img.shields.io/badge/-MacOS-black?logo=apple)
-![Linux-image](https://img.shields.io/badge/-Linux-333?logo=ubuntu)
-
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fipcheck.ing&up_message=online&label=IPCheck.ing 'IPCheck.ing')](https://ipcheck.ing)
 
 🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇫🇷 [Français](README_FR.md)
 
@@ -26,6 +25,8 @@
 Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la déployer vous-même.
 
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
+
+</div>
 
 ## 👀 Principales fonctionnalités
 
@@ -157,6 +158,16 @@ DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
+
+## 😶‍🌫️ Explications supplémentaires
+
+Lors de la sortie de la version 2.0, j'avais dit que 70% du code de ce programme n'était pas de moi, mais écrit par ChatGPT. Après environ 90 interactions, plus quelques ajustements manuels mineurs, tout le code a été complété.
+
+Bien sûr, l'architecture et l'UI nécessitaient toujours ma propre conception.
+
+Avec la sortie de la version 3.0 et des versions ultérieures, la proportion de code écrit avec l'aide de ChatGPT a progressivement diminué, maintenant estimée entre 40% et 50%. Au contraire, dans ce processus, je suis passé de ne rien savoir sur JavaScript et Vue à pouvoir comprendre la plupart des codes JS, et maintenant je peux même en écrire moi-même.
+
+Merci à l'IA, qui m'a donné, à moi, un chef de produit au chômage, une opportunité rapide d'apprendre la programmation.
 
 ## 🌟 Historique des étoiles
 
