@@ -146,8 +146,10 @@ Si vous utilisez un proxy pour accéder à Internet, envisagez d'ajouter cette r
 
 ```ini
 # Test d'adresse IP
-IP-CIDR,1.0.0.1/32,DIRECT,no-resolve
-IP-CIDR6,2606:4700:4700::1111/128,DIRECT,no-resolve
+IP-CIDR,1.0.0.1/32,Proxy,no-resolve
+IP-CIDR6,2606:4700:4700::1111/128,Proxy,no-resolve
+DOMAIN,4.ipcheck.ing,DIRECT
+DOMAIN,6.ipcheck.ing,DIRECT
 # Rule Testing
 DOMAIN,ptest-1.ipcheck.ing,Proxy1
 DOMAIN,ptest-2.ipcheck.ing,Proxy2
