@@ -1,5 +1,4 @@
-// import { getIPFromQQ } from "./qqvideo";
-import { getIPFromAliCDN } from "./alicdn";
+import { getIPFromUpai } from "./upai";
 import { isValidIP } from '@/utils/valid-ip.js';
 
 // 从 IPIP.net 获取 IP 地址
@@ -21,7 +20,7 @@ const getIPFromIPIP = async () => {
         console.error("Error fetching IP from IPIP.net:", error);
     }
     // 故障时尝试从 AliCDN 获取 IP 地址
-    const { ip, source } = await getIPFromAliCDN();
+    const { ip, source } = await getIPFromUpai();
     return {
         ip: ip,
         source: source

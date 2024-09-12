@@ -25,6 +25,7 @@ const getIPFromCloudflare_V6 = async () => {
             };
         }
     } catch (error) {
+        console.error("Error fetching IP from Cloudflare:", error);
         return { 
             ip: null, 
             source: "Cloudflare IPv6" 
