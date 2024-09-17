@@ -196,7 +196,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
-import { getIPFromIPIP, getIPFromUpai, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromGCR, getIPFromIpify_V4, getIPFromIpify_V6 } from '@/utils/getips';
+import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 
 
 const { t } = useI18n();
@@ -249,11 +249,6 @@ const ipDataCards = reactive([
   },
   {
     ...createDefaultCard(),
-    id: "special",
-    source: "Special",
-  },
-  {
-    ...createDefaultCard(),
     id: "cloudflare_v4",
     source: "Cloudflare IPv4",
   },
@@ -264,20 +259,25 @@ const ipDataCards = reactive([
   },
   {
     ...createDefaultCard(),
-    id: "ipify_v4",
-    source: "IPify IPv4",
+    id: "ipchecking_v64",
+    source: "IPCheck.ing IPv6/4",
   },
   {
     ...createDefaultCard(),
-    id: "ipify_v6",
-    source: "IPify IPv6",
+    id: "ipchecking_v4",
+    source: "IPCheck.ing IPv4",
+  },
+  {
+    ...createDefaultCard(),
+    id: "ipchecking_v6",
+    source: "IPCheck.ing IPv6",
   },
 ]);
 
 // 默认 ASN 信息
 const asnInfos = ref({
-  "AS15169": {
-    "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "368891", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
+  "AS888888": {
+    "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "888888", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
   }
 });
 
@@ -332,11 +332,11 @@ const trackFetchStatus = (status) => {
 const checkAllIPs = async () => {
   const ipFunctions = [
     () => fetchIP(0, getIPFromIPIP),
-    () => fetchIP(1, configs.value.originalSite ? getIPFromGCR : getIPFromUpai),
-    () => fetchIP(2, getIPFromCloudflare_V4),
-    () => fetchIP(3, getIPFromCloudflare_V6),
-    () => fetchIP(4, getIPFromIpify_V4),
-    () => fetchIP(5, getIPFromIpify_V6),
+    () => fetchIP(1, getIPFromCloudflare_V4),
+    () => fetchIP(2, getIPFromCloudflare_V6),
+    () => fetchIP(3, getIPFromIPChecking64),
+    () => fetchIP(4, getIPFromIPChecking4),
+    () => fetchIP(5, getIPFromIPChecking6),
   ];
 
   // 限制执行的函数数量为 ipCardsToShow 的长度
@@ -463,19 +463,19 @@ const refreshCard = (card, index) => {
       fetchIP(0, getIPFromIPIP);
       break;
     case 1:
-      fetchIP(1, configs.value.originalSite ? getIPFromGCR : getIPFromUpai);
+      fetchIP(1, getIPFromCloudflare_V4);
       break;
     case 2:
-      fetchIP(2, getIPFromCloudflare_V4);
+      fetchIP(2, getIPFromCloudflare_V6);
       break;
     case 3:
-      fetchIP(3, getIPFromCloudflare_V6);
-      break;
+      fetchIP(3, getIPFromIPChecking64);
+      break;      
     case 4:
-      fetchIP(4, getIPFromIpify_V4);
+      fetchIP(4, getIPFromIPChecking4);
       break;
     case 5:
-      fetchIP(5, getIPFromIpify_V6);
+      fetchIP(5, getIPFromIPChecking6);
       break;
     default:
       console.error("Undefind Source:");

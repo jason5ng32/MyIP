@@ -94,7 +94,7 @@
 }
 
 .jn-list-group-item {
-  border-bottom: 1px solid rgb(222, 226, 230);
+  border-bottom: 1px dashed rgb(222, 226, 230);
   padding: 12px 4px 12px 4px;
   display: flex;
   margin: 0;
