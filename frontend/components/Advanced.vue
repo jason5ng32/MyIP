@@ -76,6 +76,7 @@ const cards = reactive([
     { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
     { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
     { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker' },
+    { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo' },
 ]);
 
 const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };
@@ -126,9 +127,13 @@ const navigateAndToggleOffcanvas = (routePath) => {
             trackEvent('Nav', 'NavClick', 'MacChecker');
             openedCard.value = 6;
             break;
+        case '/browserinfo':
+            trackEvent('Nav', 'NavClick', 'BrowserInfo');
+            openedCard.value = 7;
+            break;
         case '/invisibilitytest':
             trackEvent('Nav', 'NavClick', 'InvisibilityTest');
-            openedCard.value = 7;
+            openedCard.value = 8;
             break;
     }
     var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));

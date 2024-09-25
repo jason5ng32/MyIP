@@ -302,7 +302,7 @@ const fetchIP = async (cardID, getFromSource) => {
     ipDataCards[cardID].source = source;
     IPArray.value = [...IPArray.value, ip];
     await fetchIPDetails(cardID, ip);
-  } else if (cardID === 3 || cardID === 5) {
+  } else if (cardID === 2 || cardID === 5) {
     ipDataCards[cardID].ip = t('ipInfos.IPv6Error');
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');

@@ -9,6 +9,7 @@ const CensorshipCheck = () => import('../components/advanced-tools/CensorshipChe
 const Whois = () => import('../components/advanced-tools/Whois.vue');
 const InvisibilityTest = () => import('../components/advanced-tools/InvisibilityTest.vue');
 const MacChecker = () => import('../components/advanced-tools/MacChecker.vue');
+const BrowserInfo = () => import('../components/advanced-tools/BrowserInfo.vue');
 const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
 
 const routes = [
@@ -21,6 +22,7 @@ const routes = [
   { path: '/whois', component: Whois },
   { path: '/invisibilitytest', component: InvisibilityTest },
   { path: '/macchecker', component: MacChecker },
+  { path: '/browserinfo', component: BrowserInfo },
 ];
 
 const router = createRouter({

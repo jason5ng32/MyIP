@@ -404,13 +404,22 @@ const ShortcutKeys = (isOriginalSite) => {
       description: t('shortcutKeys.DNSResolver'),
     },
     {
-      keys: "b",
+      keys: "C",
       action: () => {
         scrollToElement("AdvancedTools", 80);
         advancedToolsRef.value.navigateAndToggleOffcanvas('/censorshipcheck');
         trackEvent('Nav', 'NavClick', 'CensorshipCheck');
       },
       description: t('shortcutKeys.CensorshipCheck'),
+    },
+    {
+      keys: "b",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/browserinfo');
+        trackEvent('Nav', 'NavClick', 'BrowserInfo');
+      },
+      description: t('shortcutKeys.BrowserInfo'),
     },
     {
       keys: "W",
