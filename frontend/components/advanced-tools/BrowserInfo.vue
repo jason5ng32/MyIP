@@ -177,7 +177,6 @@ const { t } = useI18n();
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
-const lang = computed(() => store.lang);
 
 const fingerprint = ref('');
 const excludeOptions = ref({
