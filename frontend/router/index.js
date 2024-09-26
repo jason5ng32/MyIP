@@ -1,4 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { Offcanvas } from 'bootstrap';
+import { useMainStore } from '@/store';
 
 // 路由组件的懒加载
 const MTRTest = () => import('../components/advanced-tools/MtrTest.vue');
@@ -14,20 +16,42 @@ const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
 
 const routes = [
   { path: '/', component: EmptyComponent },
-  { path: '/mtrtest', component: MTRTest },
   { path: '/pingtest', component: PingTest },
+  { path: '/mtrtest', component: MTRTest },
   { path: '/ruletest', component: RuleTest },
   { path: '/dnsresolver', component: DNSResolver },
   { path: '/censorshipcheck', component: CensorshipCheck },
   { path: '/whois', component: Whois },
-  { path: '/invisibilitytest', component: InvisibilityTest },
   { path: '/macchecker', component: MacChecker },
   { path: '/browserinfo', component: BrowserInfo },
+  { path: '/invisibilitytest', component: InvisibilityTest },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
+const setOpenedCard = (currentPath) => {
+  for (let i = 0; i < routes.length; i++) {
+    if (currentPath === routes[i].path) {
+      return i - 1;
+    }
+  }
+};
+
+// 检查是否为需要触发 offcanvas 的路由
+router.afterEach((to, from) => {
+  const store = useMainStore();
+  store.setCurrentPath(to.path, setOpenedCard(to.path));
+  if (to.path !== '/') {
+    const offcanvasElement = document.getElementById('offcanvasTools');
+    if (offcanvasElement) {
+      const bsOffcanvas = new Offcanvas(offcanvasElement);
+      bsOffcanvas.show();
+    }
+  }
+});
+
 
 export default router;

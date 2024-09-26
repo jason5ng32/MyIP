@@ -443,7 +443,8 @@
     "Whois": "Open Whois Search panel",
     "InvisibilityTest": "Open Invisibility Test panel",
     "MacChecker": "Open MAC lookup panel",
-    "BrowserInfo": "Open Browser Info panel"
+    "BrowserInfo": "Open Browser Info panel",
+    "fullScreenAdvancedTools": "Full Screen Advanced Tools"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",

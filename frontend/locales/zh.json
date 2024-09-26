@@ -443,7 +443,8 @@
     "Whois": "打开 Whois 查询面板",
     "InvisibilityTest": "打开隐身测试面板",
     "MacChecker": "打开物理地址查询面板",
-    "BrowserInfo": "打开浏览器信息面板"
+    "BrowserInfo": "打开浏览器信息面板",
+    "fullScreenAdvancedTools": "全屏展开高级工具面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",

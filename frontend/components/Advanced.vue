@@ -12,7 +12,7 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']" class="jn-adv-title">
                             <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
                         </h3>
                         <p class="opacity-75">{{ t(card.noteKey) }}</p>
@@ -82,8 +82,7 @@ const cards = reactive([
 const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };
 const isFullScreen = ref(false);
 const showTitle = ref(false);
-const openedCard = ref(null);
-
+const openedCard = computed(() => store.currentPath.id);
 
 // 控制标题显示
 const handleScroll = () => {
@@ -101,43 +100,32 @@ const navigateAndToggleOffcanvas = (routePath) => {
     switch (routePath) {
         case '/pingtest':
             trackEvent('Nav', 'NavClick', 'PingTest');
-            openedCard.value = 0;
             break;
         case '/mtrtest':
             trackEvent('Nav', 'NavClick', 'MTRTest');
-            openedCard.value = 1;
             break;
         case '/ruletest':
             trackEvent('Nav', 'NavClick', 'RuleTest');
-            openedCard.value = 2;
             break;
         case '/dnsresolver':
             trackEvent('Nav', 'NavClick', 'DNSResolver');
-            openedCard.value = 3;
             break;
         case '/censorshipcheck':
             trackEvent('Nav', 'NavClick', 'CensorshipCheck');
-            openedCard.value = 4;
             break;
         case '/whois':
             trackEvent('Nav', 'NavClick', 'Whois');
-            openedCard.value = 5;
             break;
         case '/macchecker':
             trackEvent('Nav', 'NavClick', 'MacChecker');
-            openedCard.value = 6;
             break;
         case '/browserinfo':
             trackEvent('Nav', 'NavClick', 'BrowserInfo');
-            openedCard.value = 7;
             break;
         case '/invisibilitytest':
             trackEvent('Nav', 'NavClick', 'InvisibilityTest');
-            openedCard.value = 8;
             break;
     }
-    var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
-    offcanvas.show();
 };
 
 // 全屏显示
@@ -172,7 +160,7 @@ onMounted(() => {
 });
 
 defineExpose({
-    navigateAndToggleOffcanvas,
+    navigateAndToggleOffcanvas, fullScreen
 });
 
 </script>
@@ -238,6 +226,10 @@ defineExpose({
 .jn-adv-card:hover .jn-icon {
     transform: translateY(-10pt) scale(1.8);
     text-shadow: 0 0 10pt #00000060;
+}
+
+.jn-adv-title {
+    width: 85%;
 }
 
 .jn-offcanvas-header {

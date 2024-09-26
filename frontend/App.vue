@@ -62,6 +62,7 @@ const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
 const Status = computed(() => store.mountingStatus);
+const openedCard = computed(() => store.currentPath.id);
 
 // Template 里的 Ref
 const navBarRef = ref(null);
@@ -429,6 +430,19 @@ const ShortcutKeys = (isOriginalSite) => {
         trackEvent('Nav', 'NavClick', 'Whois');
       },
       description: t('shortcutKeys.Whois'),
+    },
+    {
+      keys: "f",
+      action: () => {
+        if (openedCard !== 0) {
+          advancedToolsRef.value.fullScreen();
+          trackEvent('ShortCut', 'ShortCut', 'FullScreen');
+        }
+        else {
+          return
+        }
+      },
+      description: t('shortcutKeys.fullScreenAdvancedTools'),
     },
     {
       keys: "m",
