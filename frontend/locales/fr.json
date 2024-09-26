@@ -243,7 +243,8 @@
         "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy.",
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
-        "Country": "Région de proxy"
+        "Country": "Région de proxy",
+        "RefreshAll": "Actualiser tout"
     },
     "Tooltips": {
         "RefreshIPCard": "Actualiser la carte IP",

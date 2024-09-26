@@ -243,7 +243,8 @@
     "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。",
     "StatusWait": "待检测",
     "StatusError": "检测出错",
-    "Country": "代理地区"
+    "Country": "代理地区",
+    "RefreshAll": "刷新所有"
   },
   "Tooltips": {
     "RefreshIPCard": "刷新 IP 信息",

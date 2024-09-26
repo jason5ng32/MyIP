@@ -243,7 +243,8 @@
     "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software.",
     "StatusWait": "Awaiting Test or Test Error",
     "StatusError": "Test Error",
-    "Country": "Proxy region"
+    "Country": "Proxy region",
+    "RefreshAll": "Refresh All"
   },
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",

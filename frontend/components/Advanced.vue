@@ -23,8 +23,7 @@
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : '']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header d-flex justify-content-end"
-                :class="[showTitle ? 'jn-offcanvas-header' : 'jn-offcanvas-header-noborder']">
+            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -33,14 +32,13 @@
                         <i class="bi bi-fullscreen-exit"></i>
                     </span>
                 </button>
-                <Transition name="slide-fade">
-                    <span v-if="showTitle" class="fw-medium"
-                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
-                        cards[openedCard].icon }}
-                        {{ t(cards[openedCard].titleKey) }}</span>
-                </Transition>
+                <span v-if="openedCard >= 0" class="fw-medium"
+                    :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
+                    cards[openedCard].icon }}
+                    {{ t(cards[openedCard].titleKey) }}</span>
 
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+                    @click="resetNavigatorURL()"></button>
             </div>
             <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
                 <router-view></router-view>
@@ -81,51 +79,14 @@ const cards = reactive([
 
 const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };
 const isFullScreen = ref(false);
-const showTitle = ref(false);
 const openedCard = computed(() => store.currentPath.id);
-
-// 控制标题显示
-const handleScroll = () => {
-    const scrollTop = scrollContainer.value.scrollTop;
-    if (scrollTop > 60) {
-        showTitle.value = true;
-    } else {
-        showTitle.value = false;
-    }
-};
 
 // 跳转到指定页面并打开
 const navigateAndToggleOffcanvas = (routePath) => {
     router.push(routePath);
-    switch (routePath) {
-        case '/pingtest':
-            trackEvent('Nav', 'NavClick', 'PingTest');
-            break;
-        case '/mtrtest':
-            trackEvent('Nav', 'NavClick', 'MTRTest');
-            break;
-        case '/ruletest':
-            trackEvent('Nav', 'NavClick', 'RuleTest');
-            break;
-        case '/dnsresolver':
-            trackEvent('Nav', 'NavClick', 'DNSResolver');
-            break;
-        case '/censorshipcheck':
-            trackEvent('Nav', 'NavClick', 'CensorshipCheck');
-            break;
-        case '/whois':
-            trackEvent('Nav', 'NavClick', 'Whois');
-            break;
-        case '/macchecker':
-            trackEvent('Nav', 'NavClick', 'MacChecker');
-            break;
-        case '/browserinfo':
-            trackEvent('Nav', 'NavClick', 'BrowserInfo');
-            break;
-        case '/invisibilitytest':
-            trackEvent('Nav', 'NavClick', 'InvisibilityTest');
-            break;
-    }
+    let capitalizedRoutePath = routePath.replace('/', '');
+    capitalizedRoutePath = capitalizedRoutePath.charAt(0).toUpperCase() + capitalizedRoutePath.slice(1);
+    trackEvent('Nav', 'NavClick', capitalizedRoutePath);
 };
 
 // 全屏显示
@@ -146,12 +107,14 @@ const fullScreen = () => {
     }
 };
 
+// 将浏览器地址重置
+const resetNavigatorURL = () => {
+    router.push('/');
+}
+
 
 onMounted(() => {
     store.setMountingStatus('advancedtools', true);
-    // 监听滚动事件
-    scrollContainer.value.addEventListener('scroll', handleScroll);
-
     setTimeout(() => {
         if (configs.value.originalSite) {
             cards.push(cardInvisibilityTest);

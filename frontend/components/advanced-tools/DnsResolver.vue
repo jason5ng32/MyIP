@@ -1,9 +1,6 @@
 <template>
     <!-- DNS Resolver -->
-    <div class="dns-resolver-section mb-4">
-        <div class="jn-title2">
-            <h2 id="DNSResolver" :class="{ 'mobile-h2': isMobile }">🔦 {{ t('dnsresolver.Title') }}</h2>
-        </div>
+    <div class="dns-resolver-section my-4">
         <div class="text-secondary">
             <p>{{ t('dnsresolver.Note') }}</p>
         </div>

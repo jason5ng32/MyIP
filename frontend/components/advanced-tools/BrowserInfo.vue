@@ -1,9 +1,6 @@
 <template>
     <!-- Browser Info -->
-    <div class="browser-info-section mb-4">
-        <div class="jn-title2">
-            <h2 id="BrowserInfo" :class="{ 'mobile-h2': isMobile }">🖥️ {{ t('browserinfo.Title') }}</h2>
-        </div>
+    <div class="browser-info-section my-4">
         <div class="text-secondary">
             <p>{{ t('browserinfo.Note') }}</p>
             <p>{{ t('browserinfo.Note2') }}</p>
