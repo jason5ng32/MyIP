@@ -16,6 +16,7 @@
   <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
     :toggleInfoMask="toggleInfoMask" />
   <QueryIP ref="queryIPRef" />
+  <Shell ref="shellRef" />
   <HelpModal ref="helpModalRef" />
   <Footer ref="footerRef" />
   <PWA />
@@ -37,6 +38,7 @@ import Footer from './components/Footer.vue';
 // Widgets
 import Preferences from './components/widgets/Preferences.vue';
 import QueryIP from './components/widgets/QueryIP.vue';
+import Shell from './components/widgets/Shell.vue';
 import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
@@ -76,6 +78,7 @@ const IPCheckRef = ref(null);
 const connectivityRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
+const shellRef = ref(null);
 
 
 // Data
@@ -486,6 +489,14 @@ const ShortcutKeys = (isOriginalSite) => {
         trackEvent('ShortCut', 'ShortCut', 'About');
       },
       description: t('shortcutKeys.About'),
+    },
+    {
+      keys: "x",
+      action: () => {
+        shellRef.value.openModal();
+        trackEvent('ShortCut', 'ShortCut', 'Shell');
+      },
+      description: t('shortcutKeys.Shell'),
     },
     // help
     {

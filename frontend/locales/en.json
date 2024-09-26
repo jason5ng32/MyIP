@@ -35,6 +35,16 @@
       "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order."
     }
   },
+  "shell": {
+    "Title": "Command Line API",
+    "Note1": "Hey, you've found this hidden interface",
+    "Note2_1": "You can, in the terminal, via",
+    "Note2_2": "command, get the IP address of this machine",
+    "Note3": "is an optional path, adding it will obtain the geographical information of the IP",
+    "getIPv4": "Get local machine's IPv4 address",
+    "getIPv6": "Get local machine's IPv6 address",
+    "get6and4": "Get the preferred network exit IP address of the local machine"
+  },
   "browserinfo": {
     "Title": "Browser Information",
     "Note": "This page displays two types of browser information: basic information derived from the browser's User Agent, and a browser fingerprint calculated through various data metrics. Browser fingerprints are akin to the fingerprints on your palm; the more information your browser exposes, the higher your uniqueness to websites, making you more easily trackable. Sometimes, even switching to incognito mode or changing browsers may not alter your fingerprint.",
@@ -445,7 +455,8 @@
     "InvisibilityTest": "Open Invisibility Test panel",
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
-    "fullScreenAdvancedTools": "Full Screen Advanced Tools"
+    "fullScreenAdvancedTools": "Full Screen Advanced Tools",
+    "Shell": "Mystery feature"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
