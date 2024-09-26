@@ -14,9 +14,12 @@
                     <div class="card-body">
                         <div id="browserInfoResult" class="row" v-if="checkingStatus === 'finished'">
                             <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                                <div class="h-100" :class="{ 
+                                    'dark-mode dark-mode-border': isDarkMode,
+                                    'card': !isMobile
+                                    }">
 
-                                    <div class="card-body row">
+                                    <div class="card-body row" :class="[isMobile ? 'p-1 border-1 border-bottom' : '']">
                                         <h3 class="mb-4">{{ t('browserinfo.browser.Infos') }} <i
                                                 class="bi bi-person-workspace"></i></h3>
                                         <div class="jn-ua-box w-100">
@@ -115,12 +118,16 @@
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-12 mb-4">
-                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode}">
-                                    <div class="card-body">
+                                <div class="h-100" :class="{ 
+                                    'dark-mode dark-mode-border': isDarkMode,
+                                    'card': !isMobile
+                                    }">
+                                    <div class="card-body" :class="[isMobile ? 'p-1' : '']">
                                         <h3 class="mb-4">{{ t('browserinfo.fingerprint.Infos') }} <i
                                                 class="bi bi-fingerprint"></i></h3>
                                         <div class="jn-ua-box w-100">
-                                            <div class="alert alert-primary jn-ua-box">
+                                            <div :class="[isMobile ? 'jn-fp-box-mobile' : '']"
+                                            class="alert alert-primary jn-ua-box">
                                                 <span class="mb-1 badge text-bg-primary">{{
                                                     t('browserinfo.fingerprint.fingerprint') }}</span>
                                                 <span class="jn-code-font ">{{ fingerprint }}</span>
@@ -139,8 +146,8 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="alert alert-light opacity-75" role="alert">
-                                            {{ t('browserinfo.fingerprint.browserTips') }}
+                                        <div class="alert alert-light opacity-75 mt-4" role="alert">
+                                            <i class="bi bi-info-circle"></i> {{ t('browserinfo.fingerprint.browserTips') }}
                                         </div>
 
                                     </div>
@@ -330,6 +337,10 @@ watch(excludeOptions, (newVal, oldVal) => {
 .jn-code-font {
     font-family: "IntelOne Mono", "Courier New", "Courier", "monospace";
     font-weight: 400;
+}
+
+.jn-fp-box-mobile {
+    min-height: 80pt;
 }
 
 .jn-detail {
