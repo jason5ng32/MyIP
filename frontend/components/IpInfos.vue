@@ -295,7 +295,7 @@ let ipDataCache = new Map();
 
 // 公共获取 IP 地址方法
 const fetchIP = async (cardID, getFromSource) => {
-  const { ip, source } = await getFromSource();
+  const { ip, source } = await getFromSource(!configs.value.originalSite);
   let fetchingStatus = false;
   if (ip !== null) {
     ipDataCards[cardID].ip = ip;

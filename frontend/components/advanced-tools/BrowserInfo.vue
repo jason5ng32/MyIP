@@ -274,7 +274,7 @@ const getFingerPrint = async () => {
     fingerprint.value = t('browserinfo.calculating');
     try {
         let excludes = await getExcludeOptions();
-        await setFingerPrintOption('exclude', excludes);
+        setFingerPrintOption('exclude', excludes);
         const getFP = await calFingerPrint();
         fingerprint.value = getFP;
     } catch (error) {
