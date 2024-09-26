@@ -42,6 +42,16 @@ const setOpenedCard = (currentPath) => {
 
 // 检查是否为需要触发 offcanvas 的路由
 router.afterEach((to, from) => {
+  // 如果 to.path 不匹配 routes，隐藏可能存在的 offcanvas
+  if (!routes.find(route => route.path === to.path)) {
+    const offcanvasElement = document.getElementById('offcanvasTools');
+    if (offcanvasElement) {
+      const bsOffcanvas = Offcanvas.getInstance(offcanvasElement);
+      bsOffcanvas.hide();
+    }
+    return;
+  }
+
   const store = useMainStore();
   store.setCurrentPath(to.path, setOpenedCard(to.path));
   if (to.path !== '/') {
