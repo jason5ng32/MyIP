@@ -29,7 +29,7 @@ const getIPFromIPChecking64 = async (originalSite) => {
 
 const getFromJson = async () => {
     try {
-        const response = await fetch("https://6and4.ipcheck.ing");
+        const response = await fetch("https://64.ipcheck.ing");
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
@@ -45,7 +45,7 @@ const getFromJson = async () => {
 
 const getFromTrace = async () => {
     try {
-        const response = await fetch("https://6and4.ipcheck.ing/cdn-cgi/trace");
+        const response = await fetch("https://64.ipcheck.ing/cdn-cgi/trace");
         const data = await response.text();
         const lines = data.split("\n");
         const ipLine = lines.find((line) => line.startsWith("ip="));
