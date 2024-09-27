@@ -35,6 +35,60 @@
       "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。"
     }
   },
+  "shell": {
+    "Title": "命令行 API",
+    "Note1": "哟，你发现了这个藏起来的接口",
+    "Note2_1": "你可以在终端里，通过",
+    "Note2_2": "命令获取本机的 IP 地址",
+    "Note3": "是可选路径，添加后可获取到 IP 的地理信息",
+    "getIPv4": "获取本机 IPv4 地址",
+    "getIPv6": "获取本机 IPv6 地址",
+    "get6and4": "获取本机优先网络出口的 IP 地址"
+  },
+  "browserinfo": {
+    "Title": "浏览器信息",
+    "Note": "本页面展示两类浏览器信息：浏览器 User Agent 解析出来的基本信息，以及通过多项数据计算出来的浏览器指纹。浏览器指纹就像手掌的掌纹，当浏览器的信息暴露越多，你被网站识别的唯一性越高，也就是说，你越容易被网站跟踪到。有些时候，即使你切换到隐私模式，甚至更换浏览器，指纹可能也不会发生变化。",
+    "Note2": "浏览器指纹的计算的方法是多种多样的，不同的技术方案算法和结果不完全一致，我们在这里采用一种相对简单的方法进行计算。",
+    "browser": {
+      "Infos": "浏览器信息",
+      "browserName": "浏览器名称",
+      "browserVersion": "版本",
+      "engineName": "引擎",
+      "engineVersion": "版本",
+      "osName": "系统",
+      "osVersion": "版本",
+      "deviceModel": "型号",
+      "deviceVendor": "制造商",
+      "cpuArchitecture": "CPU 架构",
+      "gpu": "GPU",
+      "cpuCores": "CPU 核心数",
+      "language": "语言代码",
+      "cookieEnabled": "是否启用 Cookie",
+      "cookieEnabledTrue": "是",
+      "cookieEnabledFalse": "否"
+    },
+    "fingerprint": {
+      "Infos": "指纹信息",
+      "fingerprint": "指纹编码",
+      "changeOption": "你可以尝试变更用于计算浏览器指纹的数据，观察指纹的变化（记得打开隐私模式对照查看）。",
+      "browserTips": "有些浏览器（比如 Safari）为了保护用户不被跟踪，即使勾选相同的数据，每次计算都可能会得到不同的指纹值。"
+    },
+    "options": {
+      "audio": "音频",
+      "canvas": "画布",
+      "fonts": "字体",
+      "hardware": "硬件",
+      "locales": "语言",
+      "permissions": "权限",
+      "plugins": "插件",
+      "screen": "屏幕",
+      "system": "浏览器版本",
+      "webgl": "WebGL",
+      "math": "运算"
+    },
+    "calError": "浏览器信息计算失败，请刷新重试。",
+    "calculating": "计算中..."
+  },
   "invisibilitytest": {
     "Title": "隐身测试",
     "Note": "当你挂上代理或 VPN 之后，你访问的网站真的不知道你挂着代理吗？你真的隐身了么？我们会通过多种手段，尝试计算出你伪装后的漏洞，找到你正在使用代理的证据。尽管可能部分测试结果不完全准确，但本测试依然有较高的参考意义。",
@@ -140,7 +194,8 @@
     "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
     "Whois": "对域名或 IP 进行 Whois 查询",
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
-    "MacChecker": "查询物理地址的归属信息"
+    "MacChecker": "查询物理地址的归属信息",
+    "BrowserInfo": "检阅浏览器信息和指纹"
   },
   "macchecker": {
     "Title": "MAC 地址查询",
@@ -198,7 +253,8 @@
     "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。",
     "StatusWait": "待检测",
     "StatusError": "检测出错",
-    "Country": "代理地区"
+    "Country": "代理地区",
+    "RefreshAll": "刷新所有"
   },
   "Tooltips": {
     "RefreshIPCard": "刷新 IP 信息",
@@ -397,7 +453,10 @@
     "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
     "InvisibilityTest": "打开隐身测试面板",
-    "MacChecker": "打开物理地址查询面板"
+    "MacChecker": "打开物理地址查询面板",
+    "BrowserInfo": "打开浏览器信息面板",
+    "fullScreenAdvancedTools": "全屏展开高级工具面板",
+    "Shell": "神秘功能"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -785,6 +844,24 @@
           {
             "type": "improve",
             "change": "优化了部分程序细节"
+          }
+        ]
+      },
+      {
+        "version": "v4.2",
+        "date": "Sept 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加浏览器信息查询功能"
+          },
+          {
+            "type": "add",
+            "change": "添加 MaxMind 地理数据库"
+          },
+          {
+            "type": "improve",
+            "change": "多处体验优化"
           }
         ]
       }

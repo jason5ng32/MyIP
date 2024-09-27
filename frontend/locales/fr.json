@@ -35,6 +35,60 @@
             "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes."
         }
     },
+    "shell": {
+        "Title": "API de ligne de commande",
+        "Note1": "Hé, tu as trouvé cette interface cachée",
+        "Note2_1": "Tu peux, dans le terminal, via",
+        "Note2_2": "commande, obtenir l'adresse IP de cette machine",
+        "Note3": "est un chemin optionnel, son ajout permettra d'obtenir les informations géographiques de l'IP",
+        "getIPv4": "Obtenir l'adresse IPv4 de la machine locale",
+        "getIPv6": "Obtenir l'adresse IPv6 de la machine locale",
+        "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale"
+    },
+    "browserinfo": {
+        "Title": "Informations du Navigateur",
+        "Note": "Cette page affiche deux types d'informations sur le navigateur : les informations de base extraites de l'agent utilisateur du navigateur et une empreinte numérique du navigateur calculée à travers diverses métriques de données. Les empreintes numériques du navigateur sont similaires aux empreintes palmaires ; plus votre navigateur expose d'informations, plus votre unicité sur les sites web est élevée, ce qui vous rend plus facilement traçable. Parfois, même en passant en mode privé ou en changeant de navigateur, l'empreinte peut ne pas changer.",
+        "Note2": "Les méthodes de calcul des empreintes numériques des navigateurs sont variées, et différentes approches techniques peuvent conduire à des résultats incohérents. Ici, nous utilisons une méthode relativement simple pour le calcul.",
+        "browser": {
+            "Infos": "Informations du Navigateur",
+            "browserName": "Nom du Navigateur",
+            "browserVersion": "Version",
+            "engineName": "Moteur",
+            "engineVersion": "Version",
+            "osName": "Système d'Exploitation",
+            "osVersion": "Version",
+            "deviceModel": "Modèle",
+            "deviceVendor": "Fabricant",
+            "cpuArchitecture": "Architecture CPU",
+            "gpu": "GPU",
+            "cpuCores": "Cœurs CPU",
+            "language": "Code Langue",
+            "cookieEnabled": "Cookies Activés",
+            "cookieEnabledTrue": "Oui",
+            "cookieEnabledFalse": "Non"
+        },
+        "fingerprint": {
+            "Infos": "Informations sur l'Empreinte",
+            "fingerprint": "Code d'Empreinte",
+            "changeOption": "Vous pouvez essayer de modifier les données utilisées pour calculer l'empreinte du navigateur afin d'observer les variations (n'oubliez pas de vérifier en mode privé).",
+            "browserTips": "Certains navigateurs, comme Safari, protègent les utilisateurs contre le pistage en générant des valeurs d'empreinte différentes à chaque calcul, même lorsque les mêmes données sont sélectionnées."
+        },
+        "options": {
+            "audio": "Audio",
+            "canvas": "Canvas",
+            "fonts": "Polices",
+            "hardware": "Matériel",
+            "locales": "Langues",
+            "permissions": "Permissions",
+            "plugins": "Plugins",
+            "screen": "Écran",
+            "system": "Version du Navigateur",
+            "webgl": "WebGL",
+            "math": "Mathématiques"
+        },
+        "calError": "Échec du calcul des informations du navigateur, veuillez rafraîchir et réessayer.",
+        "calculating": "Calcul en cours..."
+    },
     "invisibilitytest": {
         "Title": "Test d'invisibilité",
         "Note": "Lorsque vous utilisez un proxy ou un VPN, les sites que vous visitez ne savent-ils vraiment pas que vous utilisez un proxy ? Êtes-vous réellement invisible ? Nous utiliserons plusieurs méthodes pour essayer de détecter les failles de votre anonymat et trouver des preuves de l'utilisation d'un proxy. Bien que certains résultats de test puissent ne pas être entièrement précis, ce test reste très instructif.",
@@ -140,7 +194,8 @@
         "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays",
         "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP",
         "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
-        "MacChecker": "Requête d'informations d'une adresse physique"
+        "MacChecker": "Requête d'informations d'une adresse physique",
+        "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale"
     },
     "macchecker": {
         "Title": "Recherche MAC",
@@ -198,7 +253,8 @@
         "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy.",
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
-        "Country": "Région de proxy"
+        "Country": "Région de proxy",
+        "RefreshAll": "Actualiser tout"
     },
     "Tooltips": {
         "RefreshIPCard": "Actualiser la carte IP",
@@ -386,7 +442,7 @@
         "DNSResolver": "Ouvrir le Résolution DNS",
         "ToggleMaps": "Activer/désactiver les cartes",
         "IPCheck": "Vérification IP",
-        "ToggleInfoMask": "Activer/désactiver le masquage des informations",
+        "ToggleInfoMask": "Masquer/Démasquer les informations",
         "Help": "Afficher les raccourcis clavier",
         "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
         "GoNext": "Carte suivante",
@@ -397,7 +453,10 @@
         "About": "Ouvrir À propos",
         "Whois": "Ouvrir la Recherche Whois",
         "InvisibilityTest": "Ouvrir le Test d'invisibilité",
-        "MacChecker": "Ouvrir le Recherche de MAC"
+        "MacChecker": "Ouvrir le Recherche de MAC",
+        "BrowserInfo": "Ouvrir l'Info du navigateur",
+        "fullScreenAdvancedTools": "Outils avancés en plein écran",
+        "Shell": "Le mystère en vedette"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
@@ -785,6 +844,24 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de nombreux détails"
+                    }
+                ]
+            },
+            {
+                "version": "v4.2",
+                "date": "Sept 25, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la fonction de requête d'informations du navigateur"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la base de données géographique MaxMind"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Améliorations multiples de l'expérience"
                     }
                 ]
             }

@@ -1,10 +1,6 @@
 <template>
   <!-- Ping Test -->
-  <div class="ping-test-section mb-4">
-    <div class="jn-title2">
-      <h2 id="PingTest" :class="{ 'mobile-h2': isMobile }">⏱️ {{ t('pingtest.Title') }}</h2>
-
-    </div>
+  <div class="ping-test-section my-4">
     <div class="text-secondary">
       <p>{{ t('pingtest.Note') }}</p>
       <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>

@@ -5,6 +5,7 @@ export const useMainStore = defineStore('main', {
 
   state: () => ({
     lang: 'en',
+    currentPath: {},
     mountingStatus: {
       ipcheck: false,
       connectivity: false,
@@ -51,6 +52,10 @@ export const useMainStore = defineStore('main', {
   },
 
   actions: {
+    // 设置当前 route 路径
+    setCurrentPath(path, id) {
+      this.currentPath = { path: path, id: id };
+    },
     // 获取数据库的URL
     getDbUrl(id, ip, lang) {
       const db = this.ipDBs.find(d => d.id === id);

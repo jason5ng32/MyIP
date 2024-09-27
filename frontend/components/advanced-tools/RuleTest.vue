@@ -1,14 +1,7 @@
 <template>
     <div>
         <!-- RuleTest -->
-        <div class="rule-test-section mb-4">
-            <div class="jn-title2">
-                <h2 id="RuleTest" :class="{ 'mobile-h2': isMobile }">🚏 {{ t('ruletest.Title') }}</h2>
-                <button @click="checkAllRuleTest(true)"
-                    :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                    aria-label="Refresh Rule Test" v-tooltip="t('Tooltips.RefreshRuleTests')"><i
-                        class="bi bi-arrow-clockwise"></i></button>
-            </div>
+        <div class="rule-test-section my-4">
             <div class="text-secondary">
                 <p>{{ t('ruletest.Note') }}</p>
             </div>
@@ -48,7 +41,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="flex justify-content-center col-12" :class="[
+                    isMobile ? '' : 'text-center mt-4',
+                ]">
+                    <button class="btn" :class="[
+                    finishAll? 'btn-success' : 'btn-info',
+                    isMobile ? 'w-100' : 'w-25'
+                    ]" :disabled="!finishAll" @click="checkAllRuleTest(true)">
+                        <span v-if="finishAll"><i class="bi bi-arrow-clockwise"></i> {{t('ruletest.RefreshAll')}}</span>
+                        <span v-else class="spinner-grow spinner-grow-sm bg-white" aria-hidden="true"></span>
+                    </button>
+                </div>
             </div>
+
+
+
         </div>
     </div>
 </template>
@@ -81,6 +88,7 @@ const ruleTests = ref(Array.from({ length: 8 }, (_, index) => ({
 
 const IPArray = ref([]);
 const testCount = ref(ruleTests.value.length);
+const finishAll = ref(false);
 
 const fetchTrace = async (id, url) => {
     try {
@@ -109,7 +117,7 @@ const fetchTrace = async (id, url) => {
 
 // 检查所有 RuleTest
 const checkAllRuleTest = async (refresh = false) => {
-
+    finishAll.value = false;
     if (refresh) {
         ruleTests.value.forEach((test) => {
             test.ip = t('ruletest.StatusWait');
@@ -125,9 +133,13 @@ const checkAllRuleTest = async (refresh = false) => {
                 console.error("Error fetching Data:", error);
             } finally {
                 processTest(index + 1);
+                if (index === testCount.value - 1) {
+                    finishAll.value = true;
+                }
             }
         }
     };
+
 
     processTest(0);
 };

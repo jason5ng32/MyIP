@@ -1,9 +1,6 @@
 <template>
     <!-- InvisibilityTest Resolver -->
-    <div class="invisibilitytest-section mb-4">
-        <div class="jn-title2">
-            <h2 id="InvisibilityTest" :class="{ 'mobile-h2': isMobile }">🫣 {{ t('invisibilitytest.Title') }}</h2>
-        </div>
+    <div class="invisibilitytest-section my-4">
         <div class="text-secondary">
             <p>{{ t('invisibilitytest.Note') }}</p>
         </div>

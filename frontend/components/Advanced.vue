@@ -9,10 +9,11 @@
             <p>{{ t('advancedtools.Note') }}</p>
         </div>
         <div class="row">
-            <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards" :key="index">
+            <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards.filter(card => card.enabled)"
+                :key="index">
                 <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']">
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']" class="jn-adv-title">
                             <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
                         </h3>
                         <p class="opacity-75">{{ t(card.noteKey) }}</p>
@@ -23,8 +24,7 @@
         </div>
         <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
             :class="[isMobile ? 'h-100' : '']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header d-flex justify-content-end"
-                :class="[showTitle ? 'jn-offcanvas-header' : 'jn-offcanvas-header-noborder']">
+            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -33,14 +33,13 @@
                         <i class="bi bi-fullscreen-exit"></i>
                     </span>
                 </button>
-                <Transition name="slide-fade">
-                    <span v-if="showTitle" class="fw-medium"
-                        :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
-                        cards[openedCard].icon }}
-                        {{ t(cards[openedCard].titleKey) }}</span>
-                </Transition>
+                <span v-if="openedCard >= 0" class="fw-medium"
+                    :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
+                    cards[openedCard].icon }}
+                    {{ t(cards[openedCard].titleKey) }}</span>
 
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+                    @click="resetNavigatorURL()"></button>
             </div>
             <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
                 <router-view></router-view>
@@ -69,70 +68,26 @@ const scrollContainer = ref(null);
 const router = useRouter();
 
 const cards = reactive([
-    { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote' },
-    { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote' },
-    { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote' },
-    { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote' },
-    { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck' },
-    { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois' },
-    { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker' },
+    { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', enabled: true },
+    { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', enabled: true },
+    { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', enabled: true },
+    { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', enabled: true },
+    { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', enabled: true },
+    { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', enabled: true },
+    { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
+    { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', enabled: true },
+    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false }
 ]);
 
-const cardInvisibilityTest = { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest' };
 const isFullScreen = ref(false);
-const showTitle = ref(false);
-const openedCard = ref(null);
-
-
-// 控制标题显示
-const handleScroll = () => {
-    const scrollTop = scrollContainer.value.scrollTop;
-    if (scrollTop > 60) {
-        showTitle.value = true;
-    } else {
-        showTitle.value = false;
-    }
-};
+const openedCard = computed(() => store.currentPath.id);
 
 // 跳转到指定页面并打开
 const navigateAndToggleOffcanvas = (routePath) => {
     router.push(routePath);
-    switch (routePath) {
-        case '/pingtest':
-            trackEvent('Nav', 'NavClick', 'PingTest');
-            openedCard.value = 0;
-            break;
-        case '/mtrtest':
-            trackEvent('Nav', 'NavClick', 'MTRTest');
-            openedCard.value = 1;
-            break;
-        case '/ruletest':
-            trackEvent('Nav', 'NavClick', 'RuleTest');
-            openedCard.value = 2;
-            break;
-        case '/dnsresolver':
-            trackEvent('Nav', 'NavClick', 'DNSResolver');
-            openedCard.value = 3;
-            break;
-        case '/censorshipcheck':
-            trackEvent('Nav', 'NavClick', 'CensorshipCheck');
-            openedCard.value = 4;
-            break;
-        case '/whois':
-            trackEvent('Nav', 'NavClick', 'Whois');
-            openedCard.value = 5;
-            break;
-        case '/macchecker':
-            trackEvent('Nav', 'NavClick', 'MacChecker');
-            openedCard.value = 6;
-            break;
-        case '/invisibilitytest':
-            trackEvent('Nav', 'NavClick', 'InvisibilityTest');
-            openedCard.value = 7;
-            break;
-    }
-    var offcanvas = new Offcanvas(document.getElementById('offcanvasTools'));
-    offcanvas.show();
+    let capitalizedRoutePath = routePath.replace('/', '');
+    capitalizedRoutePath = capitalizedRoutePath.charAt(0).toUpperCase() + capitalizedRoutePath.slice(1);
+    trackEvent('Nav', 'NavClick', capitalizedRoutePath);
 };
 
 // 全屏显示
@@ -153,21 +108,23 @@ const fullScreen = () => {
     }
 };
 
+// 将浏览器地址重置
+const resetNavigatorURL = () => {
+    router.push('/');
+}
+
 
 onMounted(() => {
     store.setMountingStatus('advancedtools', true);
-    // 监听滚动事件
-    scrollContainer.value.addEventListener('scroll', handleScroll);
-
     setTimeout(() => {
         if (configs.value.originalSite) {
-            cards.push(cardInvisibilityTest);
+            cards.find(x => x.path === '/invisibilitytest').enabled = true;
         }
-    }, 2000);
+    }, 1500);
 });
 
 defineExpose({
-    navigateAndToggleOffcanvas,
+    navigateAndToggleOffcanvas, fullScreen
 });
 
 </script>
@@ -233,6 +190,10 @@ defineExpose({
 .jn-adv-card:hover .jn-icon {
     transform: translateY(-10pt) scale(1.8);
     text-shadow: 0 0 10pt #00000060;
+}
+
+.jn-adv-title {
+    width: 85%;
 }
 
 .jn-offcanvas-header {

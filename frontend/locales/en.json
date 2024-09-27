@@ -35,6 +35,60 @@
       "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order."
     }
   },
+  "shell": {
+    "Title": "Command Line API",
+    "Note1": "Hey, you've found this hidden interface",
+    "Note2_1": "You can, in the terminal, via",
+    "Note2_2": "command, get the IP address of this machine",
+    "Note3": "is an optional path, adding it will obtain the geographical information of the IP",
+    "getIPv4": "Get local machine's IPv4 address",
+    "getIPv6": "Get local machine's IPv6 address",
+    "get6and4": "Get the preferred network exit IP address of the local machine"
+  },
+  "browserinfo": {
+    "Title": "Browser Information",
+    "Note": "This page displays two types of browser information: basic information derived from the browser's User Agent, and a browser fingerprint calculated through various data metrics. Browser fingerprints are akin to the fingerprints on your palm; the more information your browser exposes, the higher your uniqueness to websites, making you more easily trackable. Sometimes, even switching to incognito mode or changing browsers may not alter your fingerprint.",
+    "Note2": "The methods for calculating browser fingerprints are diverse, and different technical approaches may lead to inconsistent results. Here, we use a relatively simple method for calculation.",
+    "browser": {
+      "Infos": "Browser Information",
+      "browserName": "Browser Name",
+      "browserVersion": "Version",
+      "engineName": "Engine",
+      "engineVersion": "Version",
+      "osName": "Operating System",
+      "osVersion": "Version",
+      "deviceModel": "Model",
+      "deviceVendor": "Manufacturer",
+      "cpuArchitecture": "CPU Architecture",
+      "gpu": "GPU",
+      "cpuCores": "CPU Cores",
+      "language": "Language Code",
+      "cookieEnabled": "Cookies Enabled",
+      "cookieEnabledTrue": "Yes",
+      "cookieEnabledFalse": "No"
+    },
+    "fingerprint": {
+      "Infos": "Fingerprint Information",
+      "fingerprint": "Fingerprint Code",
+      "changeOption": "You can try changing the data used to calculate the browser fingerprint to observe variations (remember to compare it in incognito mode).",
+      "browserTips": "Some browsers, such as Safari, protect users from tracking by generating different fingerprint values each time, even when the same data is selected."
+    },
+    "options": {
+      "audio": "Audio",
+      "canvas": "Canvas",
+      "fonts": "Fonts",
+      "hardware": "Hardware",
+      "locales": "Languages",
+      "permissions": "Permissions",
+      "plugins": "Plugins",
+      "screen": "Screen",
+      "system": "Browser Version",
+      "webgl": "WebGL",
+      "math": "Math"
+    },
+    "calError": "Failed to calculate browser information, please refresh and try again.",
+    "calculating": "Calculating..."
+  },
   "censorshipcheck": {
     "Title": "Censorship Check",
     "Note": "Checks the availability of target websites in four regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, and Turkey. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
@@ -140,7 +194,8 @@
     "CensorshipCheck": "Check if a website is blocked in some countries",
     "Whois": "Search for domain/IP registration information",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
-    "MacChecker": "Query information of a physical address"
+    "MacChecker": "Query information of a physical address",
+    "BrowserInfo": "Check browser information and fingerprint"
   },
   "macchecker": {
     "Title": "MAC Lookup",
@@ -198,7 +253,8 @@
     "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software.",
     "StatusWait": "Awaiting Test or Test Error",
     "StatusError": "Test Error",
-    "Country": "Proxy region"
+    "Country": "Proxy region",
+    "RefreshAll": "Refresh All"
   },
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
@@ -397,7 +453,10 @@
     "About": "Open About panel",
     "Whois": "Open Whois Search panel",
     "InvisibilityTest": "Open Invisibility Test panel",
-    "MacChecker": "Open MAC lookup panel"
+    "MacChecker": "Open MAC lookup panel",
+    "BrowserInfo": "Open Browser Info panel",
+    "fullScreenAdvancedTools": "Full Screen Advanced Tools",
+    "Shell": "Mystery feature"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -785,6 +844,24 @@
           {
             "type": "improve",
             "change": "Optimized numerous details"
+          }
+        ]
+      },
+      {
+        "version": "v4.2",
+        "date": "Sept 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added browser information query feature"
+          },
+          {
+            "type": "add",
+            "change": "Added MaxMind GeoIP database"
+          },
+          {
+            "type": "improve",
+            "change": "Multiple experience enhancements"
           }
         ]
       }

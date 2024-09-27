@@ -1,9 +1,6 @@
 <template>
     <!-- Whois Resolver -->
-    <div class="whois-section mb-4">
-        <div class="jn-title2">
-            <h2 id="Whois" :class="{ 'mobile-h2': isMobile }">📓 {{ t('whois.Title') }}</h2>
-        </div>
+    <div class="whois-section my-4">
         <div class="text-secondary">
             <p>{{ t('whois.Note') }}</p>
         </div>
