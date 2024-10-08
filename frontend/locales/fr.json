@@ -339,11 +339,11 @@
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
         "NATType": {
-            "srflx": "Possiblement Port Restricted Cone ou Symmetric NAT",
-            "prflx": "Possiblement Port Restricted Cone NAT",
-            "relay": "Possiblement Symmetric NAT",
-            "host": "Possiblement Full Cone NAT",
-            "unknown": "Type de NAT inconnu"
+            "srflx": "Port Restricted Cone ou Symmetric",
+            "prflx": "Port Restricted Cone",
+            "relay": "Symmetric",
+            "host": "Full Cone",
+            "unknown": "Type de inconnu"
         }
     },
     "dnsleaktest": {

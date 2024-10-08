@@ -26,15 +26,28 @@
             }">
               <i class="bi"
                 :class="[stun.ip === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
-              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}</span>
+              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}
+              </span>
+
             </p>
-            <div v-if="stun.natType" class="alert" :class="{
+            <div v-if="stun.natType" class="alert d-flex flex-column" :class="{
               'alert-info': stun.natType === t('webrtc.StatusWait'),
               'alert-success': stun.natType !== t('webrtc.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
-              <i class="bi"
-                :class="[stun.natType === t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"></i> {{
-              stun.natType }}
+              <span>
+                <i class="bi"
+                  :class="[stun.natType === t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"></i> NAT:
+                {{
+                stun.natType }}
+              </span>
+
+              <span class="mt-2" v-show="stun.country_code && stun.country">
+                <i class="bi bi-geo-alt-fill"></i>
+                {{ t('ipInfos.Country') }}: <strong>{{ stun.country }}&nbsp;</strong>
+                <span :class="'jn-fl fi fi-' + stun.country_code"></span>
+              </span>
+
+
             </div>
           </div>
         </div>
@@ -48,12 +61,15 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 
 
 const isStarted = ref(false);
@@ -98,17 +114,28 @@ const checkSTUNServer = async (stun) => {
       const pc = new RTCPeerConnection(servers);
       let candidateReceived = false;
 
-      pc.onicecandidate = (event) => {
+      // 分别获取 STUN 服务器的 IP 地址和 NAT 类型
+      pc.onicecandidate = async (event) => {
         if (event.candidate) {
           candidateReceived = true;
           const candidate = event.candidate.candidate;
           const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
           if (ipMatch) {
             stun.ip = ipMatch[0];
+            try {
+              let countryInfo = await fetchCountryCode(stun.ip);
+              stun.country_code = countryInfo[0];
+              stun.country = countryInfo[1];
+            } catch (error) {
+              console.error("Error fetching country code:", error);
+              reject(error);
+              pc.close();
+              return;
+            }
             IPArray.value = [...IPArray.value, stun.ip];
             stun.natType = determineNATType(candidate);
             pc.close();
-            resolve();  // 成功时解析 Promise
+            resolve();
           }
         }
       };
@@ -126,10 +153,11 @@ const checkSTUNServer = async (stun) => {
     } catch (error) {
       console.error("STUN Server Test Error:", error);
       stun.ip = t('webrtc.StatusError');
-      reject(error);  // 捕获异常时拒绝 Promise
+      reject(error);
     }
   });
 };
+
 
 // 分析ICE候选信息，推断NAT类型
 const determineNATType = (candidate) => {
@@ -149,6 +177,31 @@ const determineNATType = (candidate) => {
   }
 };
 
+// 通过 Maxmind 获取 IP 地区归属
+const fetchCountryCode = async (ip) => {
+  let setLang = lang.value;
+  if (setLang === 'zh') {
+    setLang = 'zh-CN';
+  }
+  const source = store.ipDBs.find(source => source.text === "MaxMind");
+
+  try {
+    const url = store.getDbUrl(source.id, ip, setLang);
+    const response = await fetch(url);
+    const data = await response.json();
+    const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
+
+    if (ipData) {
+      let country_code = ipData.country_code.toLowerCase();
+      let country = getCountryName(ipData.country_code, lang.value);
+      return [country_code, country];
+    }
+  } catch (error) {
+    console.error("Error fetching IP country code", error);
+  }
+}
+
+
 // 测试所有 STUN 服务器
 const checkAllWebRTC = async (isRefresh) => {
   if (isRefresh) {
@@ -158,6 +211,8 @@ const checkAllWebRTC = async (isRefresh) => {
   const promises = stunServers.map((server) => {
     server.ip = t('webrtc.StatusWait');
     server.natType = t('webrtc.StatusWait');
+    server.country = '';
+    server.country_code = '';
     return checkSTUNServer(server);
   });
 
