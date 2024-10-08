@@ -41,10 +41,12 @@
                 stun.natType }}
               </span>
 
-              <span class="mt-2" v-show="stun.country_code && stun.country">
-                <i class="bi bi-geo-alt-fill"></i>
-                {{ t('ipInfos.Country') }}: <strong>{{ stun.country }}&nbsp;</strong>
-                <span :class="'jn-fl fi fi-' + stun.country_code"></span>
+              <span class="mt-2">
+                <i class="bi"
+                  :class="[stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                {{ t('ipInfos.Country') }}: <span :class="[ stun.country !== t('webrtc.StatusWait') ? 'fw-bold':'']">{{
+                  stun.country }}&nbsp;</span>
+                <span v-show="stun.country_code" :class="'jn-fl fi fi-' + stun.country_code"></span>
               </span>
 
 
@@ -81,6 +83,8 @@ const stunServers = reactive([
     url: "stun.l.google.com:19302",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
+    country: t('webrtc.StatusWait'),
+    country_code: '',
   },
   {
     id: "blackberry",
@@ -88,6 +92,8 @@ const stunServers = reactive([
     url: "stun.voip.blackberry.com:3478",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
+    country: t('webrtc.StatusWait'),
+    country_code: '',
   },
   {
     id: "twilio",
@@ -95,6 +101,8 @@ const stunServers = reactive([
     url: "global.stun.twilio.com",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
+    country: t('webrtc.StatusWait'),
+    country_code: '',
   },
   {
     id: "cloudflare",
@@ -102,6 +110,8 @@ const stunServers = reactive([
     url: "stun.cloudflare.com",
     ip: t('webrtc.StatusWait'),
     natType: t('webrtc.StatusWait'),
+    country: t('webrtc.StatusWait'),
+    country_code: '',
   },
 ]);
 
@@ -211,7 +221,7 @@ const checkAllWebRTC = async (isRefresh) => {
   const promises = stunServers.map((server) => {
     server.ip = t('webrtc.StatusWait');
     server.natType = t('webrtc.StatusWait');
-    server.country = '';
+    server.country = t('webrtc.StatusWait');
     server.country_code = '';
     return checkSTUNServer(server);
   });

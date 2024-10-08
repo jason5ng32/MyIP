@@ -35,18 +35,19 @@
               'alert-success': leak.country !== t('dnsleaktest.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
 
-              <span v-show="leak.org" class="jn-org">
-                <i class="bi bi-geo-alt-fill"></i>
+              <span class="jn-org">
+                <i class="bi"
+                  :class="[leak.org === t('dnsleaktest.StatusWait') || leak.org === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
                 {{ t('ipInfos.ISP') }}: <span :title="leak.org">{{ leak.org }}</span>
               </span>
 
               <span class="mt-2">
                 <i class="bi"
                   :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                {{ t('ipInfos.Country') }}: <strong>{{ leak.country }}&nbsp;</strong>
-                <span
-                  v-if="leak.country !== t('dnsleaktest.StatusWait') && leak.country !== t('dnsleaktest.StatusError')"
-                  :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
+                {{ t('ipInfos.Country') }}: <span
+                  :class="[ leak.country !== t('dnsleaktest.StatusWait') ? 'fw-bold':'']">{{ leak.country
+                  }}&nbsp;</span>
+                <span v-show="leak.country_code" :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
               </span>
             </div>
           </div>
@@ -76,9 +77,10 @@ const lang = computed(() => store.lang);
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),
-  country_code: t('dnsleaktest.StatusWait'),
+  country_code: '',
   country: t('dnsleaktest.StatusWait'),
   ip: t('dnsleaktest.StatusWait'),
+  org: t('dnsleaktest.StatusWait'),
 });
 
 const leakTest = reactive([
@@ -192,7 +194,8 @@ const checkAllDNSLeakTest = async (isRefresh) => {
       server.geo = t('dnsleaktest.StatusWait');
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
-      server.country_code = t('dnsleaktest.StatusWait');
+      server.country_code = '';
+      server.org = t('dnsleaktest.StatusWait');
     });
   }
 
