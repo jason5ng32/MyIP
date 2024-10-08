@@ -339,11 +339,11 @@
     "StatusWait": "待检测或连接错误",
     "StatusError": "测试出错",
     "NATType": {
-      "srflx": "可能是端口限制型或对称型 NAT",
-      "prflx": "可能是端口限制型 NAT",
-      "relay": "可能是对称型 NAT",
-      "host": "可能是全锥型 NAT",
-      "unknown": "未知 NAT 类型"
+      "srflx": "端口限制型或对称型",
+      "prflx": "端口限制型",
+      "relay": "对称型",
+      "host": "全锥型",
+      "unknown": "未知类型"
     }
   },
   "dnsleaktest": {

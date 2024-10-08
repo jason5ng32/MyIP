@@ -30,15 +30,25 @@
               leak.ip }}
             </p>
 
-            <div class="alert" :class="{
+            <div class="alert d-flex flex-column" :class="{
               'alert-info': leak.country === t('dnsleaktest.StatusWait'),
               'alert-success': leak.country !== t('dnsleaktest.StatusWait'),
             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
-              <i class="bi"
-                :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-              {{ t('dnsleaktest.EndpointCountry') }}: <strong>{{ leak.country }}&nbsp;</strong>
-              <span v-if="leak.country !== t('dnsleaktest.StatusWait') && leak.country !== t('dnsleaktest.StatusError')"
-                :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
+
+              <span class="jn-org">
+                <i class="bi"
+                  :class="[leak.org === t('dnsleaktest.StatusWait') || leak.org === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                {{ t('ipInfos.ISP') }}: <span :title="leak.org">{{ leak.org }}</span>
+              </span>
+
+              <span class="mt-2">
+                <i class="bi"
+                  :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                {{ t('ipInfos.Country') }}: <span
+                  :class="[ leak.country !== t('dnsleaktest.StatusWait') ? 'fw-bold':'']">{{ leak.country
+                  }}&nbsp;</span>
+                <span v-show="leak.country_code" :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
+              </span>
             </div>
           </div>
         </div>
@@ -67,9 +77,10 @@ const lang = computed(() => store.lang);
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),
-  country_code: t('dnsleaktest.StatusWait'),
+  country_code: '',
   country: t('dnsleaktest.StatusWait'),
   ip: t('dnsleaktest.StatusWait'),
+  org: t('dnsleaktest.StatusWait'),
 });
 
 const leakTest = reactive([
@@ -116,6 +127,7 @@ const fetchLeakTestIpApiCom = (index) => {
           const geoSplit = data.dns.geo.split(" - ");
           leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
           leakTest[index].country = getCountryName(leakTest[index].country_code, lang.value);
+          leakTest[index].org = geoSplit[1] || '';
           leakTest[index].ip = data.dns.ip;
           resolve();
         } else {
@@ -126,8 +138,9 @@ const fetchLeakTestIpApiCom = (index) => {
       .catch((error) => {
         console.error("Error fetching leak test data:", error);
         leakTest[index].country = t('dnsleaktest.StatusError');
-        leakTest[index].country_code = t('dnsleaktest.StatusError');
         leakTest[index].ip = t('dnsleaktest.StatusError');
+        leakTest[index].country_code = '';
+        leakTest[index].org = '';
         reject(error);
       });
   });
@@ -153,6 +166,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
         if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
           leakTest[index].country_code = keyEntry.CountryCode;
           leakTest[index].country = getCountryName(keyEntry.CountryCode, lang.value);
+          leakTest[index].org = keyEntry.ISP || '';
           leakTest[index].ip = keyEntry.IP;
           resolve();
         } else {
@@ -162,8 +176,10 @@ const fetchLeakTestSfSharkCom = (index, key) => {
       })
       .catch((error) => {
         console.error("Error fetching leak test data:", error);
-        leakTest[index].geo = t('dnsleaktest.StatusError');
         leakTest[index].ip = t('dnsleaktest.StatusError');
+        leakTest[index].country = t('dnsleaktest.StatusError');
+        leakTest[index].country_code = '';
+        leakTest[index].org = '';
         reject(error);
       });
   });
@@ -178,7 +194,8 @@ const checkAllDNSLeakTest = async (isRefresh) => {
       server.geo = t('dnsleaktest.StatusWait');
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
-      server.country_code = t('dnsleaktest.StatusWait');
+      server.country_code = '';
+      server.org = t('dnsleaktest.StatusWait');
     });
   }
 
@@ -220,4 +237,10 @@ defineExpose({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.jn-org {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
