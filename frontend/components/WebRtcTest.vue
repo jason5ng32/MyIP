@@ -203,7 +203,10 @@ const fetchCountryCode = async (ip) => {
 
     if (ipData) {
       let country_code = ipData.country_code.toLowerCase();
-      let country = getCountryName(ipData.country_code, lang.value);
+      let country = ipData.country_code || 'N/A';
+      if (country !== 'N/A') {
+        country = getCountryName(ipData.country_code, lang.value); 
+      }
       return [country_code, country];
     }
   } catch (error) {
