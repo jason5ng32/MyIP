@@ -14,17 +14,17 @@
   "dependencies": {
     "@analytics/google-analytics": "^1.0.7",
     "@cloudflare/speedtest": "^1.3.0",
-    "@khmyznikov/pwa-install": "^0.4.5",
+    "@khmyznikov/pwa-install": "^0.4.8",
     "@thumbmarkjs/thumbmarkjs": "^0.16.0",
     "analytics": "^0.8.14",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "code-inspector-plugin": "^0.16.1",
+    "code-inspector-plugin": "^0.17.3",
     "concurrently": "^9.0.1",
     "country-code-lookup": "^0.1.3",
-    "detect-gpu": "^5.0.51",
+    "detect-gpu": "^5.0.53",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0",
+    "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "express-slow-down": "^2.0.3",
     "flag-icons": "^7.2.3",
@@ -34,14 +34,14 @@
     "pinia": "^2.2.4",
     "svgmap": "^2.11.1",
     "ua-parser-js": "^1.0.39",
-    "vue": "^3.5.11",
+    "vue": "^3.5.12",
     "vue-i18n": "^10.0.4",
     "vue-router": "^4.4.5",
     "whoiser": "^1.18.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
-    "vite": "^5.4.8",
+    "vite": "^5.4.10",
     "vite-plugin-pwa": "^0.20.5" 
   }
 }

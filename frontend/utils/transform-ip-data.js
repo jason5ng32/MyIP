@@ -6,7 +6,7 @@ function transformDataFromIPapi(data, ipGeoSource, t, bingMapLanguage) {
 
     const baseData = {
         country_name: data.country_name || "",
-        country_code: data.country || "",
+        country_code: data.country === 'N/A' ? '' : data.country,
         region: data.region || "",
         city: data.city || "",
         latitude: data.latitude || "",
