@@ -29,13 +29,14 @@
                                 <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
                             <div class="alert" :class="{
-                                'alert-info': test.country_code === t('ruletest.StatusWait'),
-                                'alert-success': test.country_code !== t('ruletest.StatusWait'),
+                                'alert-info': test.country === t('ruletest.StatusWait'),
+                                'alert-danger': test.country === t('ruletest.StatusError'),
+                                'alert-success': test.country !== t('ruletest.StatusWait') && test.country !== t('ruletest.StatusError'),
                             }" :data-bs-theme="isDarkMode ? 'dark' : ''">
                                 <i class="bi"
                                     :class="[test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
                                 {{ t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
-                                <span v-if="test.country_code !== t('ruletest.StatusWait')"
+                                <span v-show="test.country_code"
                                     :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
                         </div>
@@ -76,7 +77,7 @@ const lang = computed(() => store.lang);
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
     ip: t('ruletest.StatusWait'),
-    country_code: t('ruletest.StatusWait'),
+    country_code: '',
     country: t('ruletest.StatusWait'),
 });
 
@@ -109,7 +110,7 @@ const fetchTrace = async (id, url) => {
         }
     } catch (error) {
         ruleTests.value[id].ip = t('ruletest.StatusError');
-        ruleTests.value[id].country_code = t('ruletest.StatusError');
+        ruleTests.value[id].country_code = '';
         ruleTests.value[id].country = t('ruletest.StatusError');
         console.error("Error fetching Data:", error);
     }
@@ -121,7 +122,8 @@ const checkAllRuleTest = async (refresh = false) => {
     if (refresh) {
         ruleTests.value.forEach((test) => {
             test.ip = t('ruletest.StatusWait');
-            test.country_code = t('ruletest.StatusWait');
+            test.country = t('ruletest.StatusWait');
+            test.country_code = '';
         });
     }
 
