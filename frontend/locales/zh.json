@@ -37,13 +37,14 @@
   },
   "shell": {
     "Title": "命令行 API",
-    "Note1": "哟，你发现了这个藏起来的接口",
+    "Note1": "哟，原来你也喜欢用终端？",
     "Note2_1": "你可以在终端里，通过",
     "Note2_2": "命令获取本机的 IP 地址",
     "Note3": "是可选路径，添加后可获取到 IP 的地理信息",
     "getIPv4": "获取本机 IPv4 地址",
     "getIPv6": "获取本机 IPv6 地址",
-    "get6and4": "获取本机优先网络出口的 IP 地址"
+    "get6and4": "获取本机优先网络出口的 IP 地址",
+    "notAvailable": "此功能暂未开放，敬请期待"
   },
   "browserinfo": {
     "Title": "浏览器信息",
@@ -269,7 +270,8 @@
     "InfoMask": "隐藏信息",
     "QueryIP": "查询 IP 信息",
     "GithubLink": "查看源代码",
-    "RefreshRuleTests": "刷新规则测试"
+    "RefreshRuleTests": "刷新规则测试",
+    "Shell": "命令行 API"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -456,7 +458,7 @@
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",
-    "Shell": "神秘功能"
+    "Shell": "命令行 API"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",

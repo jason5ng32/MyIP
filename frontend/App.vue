@@ -15,8 +15,8 @@
   </div>
   <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
     :toggleInfoMask="toggleInfoMask" />
+  <Shell v-if="curlDomainsHadSet" ref="shellRef" />
   <QueryIP ref="queryIPRef" />
-  <Shell ref="shellRef" />
   <HelpModal ref="helpModalRef" />
   <Footer ref="footerRef" />
   <PWA />
@@ -65,6 +65,7 @@ const userPreferences = computed(() => store.userPreferences);
 const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
 const Status = computed(() => store.mountingStatus);
 const openedCard = computed(() => store.currentPath.id);
+const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
 // Template 里的 Ref
 const navBarRef = ref(null);
@@ -490,14 +491,6 @@ const ShortcutKeys = (isOriginalSite) => {
       },
       description: t('shortcutKeys.About'),
     },
-    {
-      keys: "x",
-      action: () => {
-        shellRef.value.openModal();
-        trackEvent('ShortCut', 'ShortCut', 'Shell');
-      },
-      description: t('shortcutKeys.Shell'),
-    },
     // help
     {
       keys: "?",
@@ -521,8 +514,23 @@ const ShortcutKeys = (isOriginalSite) => {
     },
   ];
 
+  const curlAPI = [
+    {
+      keys: "x",
+      action: () => {
+        shellRef.value.openModal();
+        trackEvent('ShortCut', 'ShortCut', 'Shell');
+      },
+      description: t('shortcutKeys.Shell'),
+    },
+  ]
+
   if (isOriginalSite) {
     shortcutConfig.push(...invisibilitytest);
+  }
+
+  if (curlDomainsHadSet.value) {
+    shortcutConfig.push(...curlAPI);
   }
 
   return shortcutConfig;
