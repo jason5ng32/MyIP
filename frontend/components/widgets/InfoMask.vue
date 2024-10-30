@@ -3,7 +3,7 @@
         'btn-success': infoMaskLevel === 0,
         'btn-warning': infoMaskLevel === 1,
         'btn-secondary': infoMaskLevel === 2,
-        'infomask-no-curl': !curlDomainsHadSet
+        'infomask-no-curl': !curlDomainsHadSet || isMobile
     }" @click="toggleInfoMask" aria-label="Toggle Info Mask" v-tooltip="t('Tooltips.InfoMask')">
         <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
     </button>
