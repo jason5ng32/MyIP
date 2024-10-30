@@ -464,7 +464,6 @@
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
     "description": "好用和开源的全能 IP 工具箱。轻松查看你的 IP 地址，IP 信息，检查 DNS 泄露，检查 WebRTC 连接，测试网站可用性，查找 DNS 记录，查找 Whois 信息，测试全球延迟测试等。",
     "keywords": "我的IP,IP工具,我的IP,IP查询,DNS泄漏测试,WebRTC测试,网速测试,DNS查询,Whois查询, Ping测试, 隐私测试",
-    "footerName": "Creators: Jason Ng, Seven Yu & ChatGPT",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",
@@ -488,6 +487,10 @@
     "blog": "可能吧博客",
     "retiremoney": "躺平计算器",
     "twitter": "Twitter"
+  },
+  "specialthanks": {
+    "Title": "特别鸣谢",
+    "Note1": "这个项目之所以能够完成，少不了一些热心的人和组织的支持和帮助，以及给予灵感或开放的代码人们。非常感谢他们："
   },
   "changelog": {
     "Title": "更新日志",
@@ -864,6 +867,24 @@
           {
             "type": "improve",
             "change": "多处体验优化"
+          }
+        ]
+      },
+      {
+        "version": "v4.3",
+        "date": "Oct 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加命令行 API 功能"
+          },
+          {
+            "type": "improve",
+            "change": "WebRTC 测试可以展示地区信息"
+          },
+          {
+            "type": "improve",
+            "change": "DNS 泄露测试可以展示地区信息"
           }
         ]
       }
