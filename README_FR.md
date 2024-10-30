@@ -105,6 +105,11 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 | `MAC_LOOKUP_API_KEY` | Non | `""` | Clé API pour MAC Lookup, utilisée pour obtenir des informations sur l'adresse MAC via MAC Lookup |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
+| `VITE_CURL_IPV4_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv4 pour l'API CURL |
+| `VITE_CURL_IPV6_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv6 pour l'API CURL |
+| `VITE_CURL_IPV64_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine à pile double pour l'API CURL |
+
+Il est à noter que si l'une quelconque des variables d'environnement de la série CURL est manquante, l'API CURL ne sera pas activée.
 
 ### Utilisation des variables d'environnement dans un environnement Node
 

@@ -37,13 +37,14 @@
   },
   "shell": {
     "Title": "Command Line API",
-    "Note1": "Hey, you've found this hidden interface",
-    "Note2_1": "You can, in the terminal, via",
-    "Note2_2": "command, get the IP address of this machine",
+    "Note1": "Hey, turns out you also like using the terminal?",
+    "Note2_1": "You can use",
+    "Note2_2": "command, get the IP address of your machine in terminal",
     "Note3": "is an optional path, adding it will obtain the geographical information of the IP",
     "getIPv4": "Get local machine's IPv4 address",
     "getIPv6": "Get local machine's IPv6 address",
-    "get6and4": "Get the preferred network exit IP address of the local machine"
+    "get6and4": "Get the preferred network exit IP address of the local machine",
+    "notAvailable": "This feature is not available yet"
   },
   "browserinfo": {
     "Title": "Browser Information",
@@ -269,7 +270,8 @@
     "InfoMask": "Hide IP Information",
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub",
-    "RefreshRuleTests": "Refresh Rule Tests"
+    "RefreshRuleTests": "Refresh Rule Tests",
+    "Shell": "Command Line API"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -456,13 +458,12 @@
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",
-    "Shell": "Mystery feature"
+    "Shell": "Command Line API"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
     "description": "A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.",
     "keywords": "MyIP,IP Tool,My IP,IP check,IP lookup,DNS leak test,WebRTC test,Speed test,DNS lookup,Whois lookup, Ping test, privacy test",
-    "footerName": "Creators: Jason Ng, Seven Yu & ChatGPT",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",
@@ -486,6 +487,10 @@
     "blog": "My Blog",
     "retiremoney": "Future Planner",
     "twitter": "Twitter"
+  },
+  "specialthanks": {
+    "Title": "Special Thanks",
+    "Note1": "This project could not have been completed without the support and help from some enthusiastic individuals and organizations, as well as those who provided inspiration or open-sourced their code. Many thanks to them:"
   },
   "changelog": {
     "Title": "Changelog",
@@ -862,6 +867,24 @@
           {
             "type": "improve",
             "change": "Multiple experience enhancements"
+          }
+        ]
+      },
+      {
+        "version": "v4.3",
+        "date": "Oct 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added command line API feature"
+          },
+          {
+            "type": "improve",
+            "change": "WebRTC test can now display regional information"
+          },
+          {
+            "type": "improve",
+            "change": "DNS leak test can now display regional information"
           }
         ]
       }

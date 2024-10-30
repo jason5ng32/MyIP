@@ -37,13 +37,14 @@
     },
     "shell": {
         "Title": "API de ligne de commande",
-        "Note1": "Hé, tu as trouvé cette interface cachée",
+        "Note1": "Eh bien, il s'avère que toi aussi tu aimes utiliser le terminal ?",
         "Note2_1": "Tu peux, dans le terminal, via",
         "Note2_2": "commande, obtenir l'adresse IP de cette machine",
         "Note3": "est un chemin optionnel, son ajout permettra d'obtenir les informations géographiques de l'IP",
         "getIPv4": "Obtenir l'adresse IPv4 de la machine locale",
         "getIPv6": "Obtenir l'adresse IPv6 de la machine locale",
-        "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale"
+        "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale",
+        "notAvailable": "Cette fonctionnalité n'est pas encore disponible"
     },
     "browserinfo": {
         "Title": "Informations du Navigateur",
@@ -269,7 +270,8 @@
         "InfoMask": "Masquer les informations IP",
         "QueryIP": "Interroger l'adresse IP",
         "GithubLink": "Voir le code source sur GitHub",
-        "RefreshRuleTests": "Actualiser les tests de règles"
+        "RefreshRuleTests": "Actualiser les tests de règles",
+        "Shell": "Ouvrir le shell"
     },
     "ipInfos": {
         "id": "ipinfos",
@@ -456,13 +458,12 @@
         "MacChecker": "Ouvrir le Recherche de MAC",
         "BrowserInfo": "Ouvrir l'Info du navigateur",
         "fullScreenAdvancedTools": "Outils avancés en plein écran",
-        "Shell": "Le mystère en vedette"
+        "Shell": "Ouvrir le Shell"
     },
     "page": {
         "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
         "description": "Une boîte à outils IP meilleure et open source. Facile à vérifier vos adresses IP, informations IP, vérifier les fuites DNS, examiner les connexions WebRTC, tester la disponibilité des sites web, rechercher des enregistrements DNS, rechercher des informations Whois et tester la latence dans le monde entier.",
         "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse, Recherche DNS, Recherche Whois, Test de ping, Test de confidentialité",
-        "footerName": "Créateurs : Jason Ng, Seven Yu & ChatGPT",
         "footerLink": "https://github.com/jason5ng32/MyIP",
         "copyRightName": "Originalement de ",
         "copyRightLink": "https://ipcheck.ing",
@@ -486,6 +487,10 @@
         "blog": "Mon blog",
         "retiremoney": "Planificateur futur",
         "twitter": "Twitter"
+    },
+    "specialthanks": {
+        "Title": "Remerciements Spéciaux",
+        "Note1": "Ce projet n'aurait pas pu être achevé sans le soutien et l'aide de certaines personnes et organisations enthousiastes, ainsi que de ceux qui ont fourni l'inspiration ou partagé leur code en open-source. Un grand merci à eux :"
     },
     "changelog": {
         "Title": "Modifs",
@@ -862,6 +867,24 @@
                     {
                         "type": "improve",
                         "change": "Améliorations multiples de l'expérience"
+                    }
+                ]
+            },
+            {
+                "version": "v4.3",
+                "date": "Oct 30, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la fonctionnalité API en ligne de commande"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Le test WebRTC peut maintenant afficher des informations régionales"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Le test de fuite DNS peut maintenant afficher des informations régionales"
                     }
                 ]
             }

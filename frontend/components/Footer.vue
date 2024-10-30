@@ -1,9 +1,9 @@
 <template>
   <footer>
     <div id="copyleft">
-      <p class="text-center">{{ t('page.footerName') }} <a :href="t('page.footerLink')" class="link-dark"
-          target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github"><i
-            class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"
+      <p class="text-center"><span>Created by Jason Ng with love</span> <a :href="t('page.footerLink')"
+          class="link-dark" target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');"
+          aria-label="Github"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"
             v-tooltip="{ title: t('Tooltips.GithubLink'), placement: 'top' }"></i></a>
       </p>
     </div>
@@ -20,7 +20,7 @@
       id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
       <div class="offcanvas-header mt-3">
         <div class="btn-group" role="group">
-          <template v-for="show in ['about', 'changelog']">
+          <template v-for="show in ['about', 'changelog', 'specialthanks']">
             <input v-model="content" type="radio" class="btn-check" :name="'About_' + show" :id="'About_' + show"
               autocomplete="off" :value=show @change="toggleContent(show)">
             <label class="btn jn-number" :class="{
@@ -101,6 +101,21 @@
             </div>
           </div>
         </div>
+        <div v-if="showSpecialThanks">
+          <div class="mb-3">
+            <p>
+              {{ t('specialthanks.Note1') }}
+            </p>
+          </div>
+
+          <div v-for="(item, index) in thanksList" :key="index" class="mb-3 fst-italic">
+            <i class="bi bi-emoji-smile-fill "></i> {{ item.name }}
+            <a v-if="item.link" :class="[isDarkMode ? 'link-light' : 'link-dark']" :href="item.link" target="_blank">
+              <i class="bi bi-arrow-up-right-square"></i>
+            </a>
+          </div>
+
+        </div>
 
         <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
         </div>
@@ -124,7 +139,7 @@ import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 
-const {t,tm} = useI18n();
+const { t, tm } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
@@ -134,7 +149,39 @@ const configs = computed(() => store.configs);
 const content = ref('about');
 const showAbout = ref(true);
 const showChangelog = ref(false);
+const showSpecialThanks = ref(false);
 const changelog = reactive(tm('changelog.versions'));
+
+const thanksList = [
+  {
+    name: 'Setilis Hu',
+    link: ''
+  },
+  {
+    name: 'Seven Yu',
+    link: 'https://github.com/dofy'
+  },
+  {
+    name: 'Nikolai Tschacher',
+    link: 'https://incolumitas.com/pages/about/'
+  },
+  {
+    name: 'Project Alexandria (Cloudflare)',
+    link: 'https://www.cloudflare.com/lp/project-alexandria/'
+  },
+  {
+    name: 'Cloudflare Speedtest',
+    link: 'https://github.com/cloudflare/speedtest'
+  },
+  {
+    name: 'Globalping by jsDelivr',
+    link: 'https://globalping.io/'
+  },
+  {
+    name: 'ChatGPT',
+    link: 'https://chatgpt.com/'
+  }
+]
 
 const openAbout = () => {
   var offcanvasElement = document.getElementById('About');
@@ -154,6 +201,7 @@ const offcanvasBody = ref(null);
 const toggleContent = (contentType) => {
   showAbout.value = contentType === 'about';
   showChangelog.value = contentType === 'changelog';
+  showSpecialThanks.value = contentType === 'specialthanks';
   content.value = contentType;
   offcanvasBody.scrollTop = 0;
 };
@@ -170,5 +218,9 @@ defineExpose({
 
 .jn-placeholder {
   height: 20pt;
+}
+
+.jn-heart-color {
+  color: red;
 }
 </style>

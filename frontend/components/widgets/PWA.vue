@@ -34,6 +34,12 @@ const getBrowser = () => {
     isOtherBrowser.value = !(androidChrome || desktopChrome || macSafari || iosSafari);
 }
 
+const popupCount = () => {
+    let currentCount = localStorage.getItem('pwaPopupCount') || 0;
+    currentCount = parseInt(currentCount, 10);
+    return currentCount;
+}
+
 const showPWA = () => {
     const pwaInstall = document.getElementsByTagName('pwa-install')[0];
     if (!pwaInstall) return;
@@ -43,6 +49,8 @@ const showPWA = () => {
 
     if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
         pwaInstall.showDialog(true);
+        const totalPopupCount = popupCount() + 1;
+        localStorage.setItem('pwaPopupCount', totalPopupCount);
         trackEvent('PWA', 'PWAPopup', 'Show');
         pwaInstall.addEventListener('pwa-install-success-event', event => {
             if (event.detail.message.includes('success')) {
@@ -54,9 +62,11 @@ const showPWA = () => {
 
 onMounted(() => {
     getBrowser();
-    setTimeout(() => {
-        showPWA();
-    }, 30000);
+    if (popupCount() < 2) {
+        setTimeout(() => {
+            showPWA();
+        }, 30000);
+    }
 });
 </script>
 

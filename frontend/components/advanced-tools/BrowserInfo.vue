@@ -13,11 +13,7 @@
                         <Transition name="slide-fade" mode="out-in">
                             <div id="browserInfoResult" class="row" v-if="checkingStatus === 'finished'">
                                 <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                    <div class="h-100" :class="{ 
-                                    'dark-mode dark-mode-border': isDarkMode,
-                                    'card': !isMobile
-                                    }">
-
+                                    <div class="h-100">
                                         <div class="card-body row"
                                             :class="[isMobile ? 'p-1 border-1 border-bottom' : '']">
                                             <h3 class="mb-4">{{ t('browserinfo.browser.Infos') }} <i

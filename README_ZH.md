@@ -105,6 +105,11 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
 | `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
+| `VITE_CURL_IPV4_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv4 域名 |
+| `VITE_CURL_IPV6_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv6 域名 |
+| `VITE_CURL_IPV64_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的双网络栈域名 |
+
+需要注意的是，如果 CURL 系列的环境变量任意一个缺失，都不会启用 CURL API。
 
 ### 在 Node 环境里使用环境变量
 
