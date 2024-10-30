@@ -71,6 +71,9 @@ const openModal = () => {
 };
 
 const adjustButtonPosition = () => {
+    if (isMobile.value || !curlDomainsHadSet.value) {
+        return;
+    }
     const screenWidth = window.innerWidth;
     const contentWidth = 1600; // 主内容区域的宽度
     const spaceOnRight = (screenWidth - contentWidth) / 2;
