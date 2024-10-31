@@ -3,6 +3,8 @@ name: Docker Build and Push
 on:
   push:
     branches: [ main ]
+  release:
+    types: [published]
 
 jobs:
   build-and-push:
@@ -31,11 +33,22 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # 从 release 事件获取版本号和日志
+    - name: Get the version and release notes
+      id: get_version
+      run: |
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        RELEASE_NOTES=$(gh release view ${{ env.RELEASE_VERSION }} --json body -q .body)
+        echo "RELEASE_NOTES=${RELEASE_NOTES}" >> $GITHUB_ENV
+
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v5
       with:
         push: true
         tags: |
-          jason5ng32/myip:latest
-          ghcr.io/${{ github.repository_owner }}/myip:latest
+          jason5ng32/myip:${{ env.RELEASE_VERSION }}
+          ghcr.io/${{ github.repository_owner }}/myip:${{ env.RELEASE_VERSION }}
+        labels: |
+          org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
+          org.opencontainers.image.description=${{ env.RELEASE_NOTES }}
         platforms: linux/amd64,linux/arm64
