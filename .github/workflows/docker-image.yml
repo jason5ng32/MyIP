@@ -37,8 +37,8 @@ jobs:
     - name: Get the version and release notes
       if: github.event_name == 'release'
       run: |
-        echo "RELEASE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-        echo "RELEASE_NOTES=${{ github.event.release.body }}" >> $GITHUB_ENV
+        printf "RELEASE_VERSION=%s\n" "${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+        printf "RELEASE_NOTES<<EOF\n%s\nEOF\n" "${{ github.event.release.body }}" >> $GITHUB_ENV
 
     - name: Set version for manual dispatch
       if: github.event_name == 'workflow_dispatch'
