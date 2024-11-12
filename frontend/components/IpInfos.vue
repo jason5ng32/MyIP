@@ -7,185 +7,192 @@
     <div class="text-secondary">
       <p>{{ t('ipInfos.Notes') }}</p>
     </div>
-      <div class="row">
-        <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
+    <div class="row">
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
           'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
         }]">
-          <div class="card jn-card keyboard-shortcut-card" :class="{
+        <div class="card jn-card keyboard-shortcut-card" :class="{
             'dark-mode dark-mode-border': isDarkMode,
             'jn-ip-card1 jn-hover-card': !isMobile && ipGeoSource === 0,
             'jn-ip-card2 jn-hover-card': !isMobile && ipGeoSource !== 0,
           }">
-            <div class="card-header jn-ip-title jn-link1"
-              :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
-              <span>
-                <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
-                {{ t('ipInfos.Source') }}: {{ card.source }}</span>
-              <button @click="refreshCard(card,index)"
-                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                :aria-label="'Refresh' + card.source" v-tooltip="t('Tooltips.RefreshIPCard')">
-                <i class="bi bi-arrow-clockwise"></i></button>
-            </div>
-            <div class="p-3 placeholder-glow " :class="{
+          <div class="card-header jn-ip-title jn-link1"
+            :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
+            <span>
+              <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+              {{ t('ipInfos.Source') }}: {{ card.source }}</span>
+            <button @click="refreshCard(card,index)"
+              :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+              :aria-label="'Refresh' + card.source" v-tooltip="t('Tooltips.RefreshIPCard')">
+              <i class="bi bi-arrow-clockwise"></i></button>
+          </div>
+          <div class="p-3 placeholder-glow " :class="{
               'dark-mode-title': isDarkMode,
               'jn-link2-dark': isDarkMode,
               'bg-light': !isDarkMode,
               'jn-link2': !isDarkMode
             }">
-              <span class="jn-text col-auto">
-                <i class="bi bi-pc-display-horizontal"></i>&nbsp;
-              </span>
-              <span v-if="card.ip" class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
-                {{ card.ip }}&nbsp;
-                <i v-if="isValidIP(card.ip)"
-                  :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                  @click="copyToClipboard(card.ip, card.id)" role="button"
-                  v-tooltip="{ title: t('Tooltips.CopyIP'), placement: 'right' }" :aria-label="'Copy' + card.ip"></i>
-              </span>
-              <span v-else class="placeholder col-10"></span>
-            </div>
-
-
-            <div v-if="(card.asn) || (card.ip === t('ipInfos.IPv4Error')) || (card.ip === t('ipInfos.IPv6Error')) || card.ip === '2001:4860:4860::8888'
-            " class="card-body" :id="'IPInfo-' + (index + 1)">
-              <ul class="list-group list-group-flush" v-if="card.country_name">
-
-                <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
-                  class="card-img-top jn-map-image" alt="Map">
-
-                <li class="jn-list-group-item"
-                  :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-geo-alt-fill"></i> {{ t('ipInfos.Country') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.country_name }}
-                    <span v-if="card.country_code" :class="'jn-fl fi fi-' + card.country_code.toLowerCase()"></span>
-                  </span>
-                </li>
-
-                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
-                  :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-houses"></i>
-                    {{ t('ipInfos.Region') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.region }}
-                  </span>
-                </li>
-
-                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
-                  :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-sign-turn-right"></i>
-                    {{ t('ipInfos.City') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.city }}
-                  </span>
-                </li>
-
-                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
-                  :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-ethernet"></i>
-                    {{ t('ipInfos.ISP') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.isp }}
-                  </span>
-                </li>
-
-                <li
-                  v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.type !== t('ipInfos.proxyDetect.type.unknownType')"
-                  class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-reception-4"></i>
-                    {{ t('ipInfos.type') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.type }}
-                    <span v-if="card.proxyOperator !== 'unknown'">
-                      ( {{ card.proxyOperator }} )
-                    </span>
-                  </span>
-                </li>
-
-                <li
-                  v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.isProxy !== t('ipInfos.proxyDetect.unknownProxyType')"
-                  class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-shield-fill-check"></i>
-                    {{ t('ipInfos.isProxy') }} :&nbsp;
-                  </span>
-                  <span class="col-10 ">
-                    {{ card.isProxy }}
-                    <span v-if="card.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
-                      ( {{ card.proxyProtocol }} )
-                    </span>
-                  </span>
-                </li>
-
-                <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
-                  :class="{ 'dark-mode': isDarkMode }">
-                  <span class="jn-text col-auto">
-                    <i class="bi bi-buildings"></i>
-                    {{ t('ipInfos.ASN') }} :&nbsp;
-                  </span>
-                  <span v-if="card.asnlink" class="col-9 ">
-                    {{ card.asn }} <i v-if="configs.cloudFlare" class="bi bi-info-circle"
-                      @click="getASNInfo(card.asn, index)" data-bs-toggle="collapse"
-                      :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                      :aria-controls="'collapseASNInfo-' + index" role="button"
-                      :aria-label="'Display AS Info of' + card.asn"
-                      v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }"></i>
-                  </span>
-                </li>
-
-                <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0"
-                  :id="'collapseASNInfo-' + index" :data-bs-theme="isDarkMode ? 'dark' : ''">
-
-                  <!-- 通过将 collapse 的 padding 设置为 0，然后添加一个子 div 设置 padding 的方式，避免 Bootstrap 的 collapse 发生卡顿，很奇怪的 bug -->
-
-                  <div class="p-3">
-                    <span v-if="asnInfos[card.asn]">
-                      <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ t('ipInfos.ASNInfo.note')
-                        }}</span>
-                      <br />
-                      <template v-for="(item,key) in asnInfos[card.asn]">
-                        <span class="fw-light">
-                          {{ t(`ipInfos.ASNInfo.${key}`) }}
-                        </span>
-                        {{ item }}
-                        <br />
-                      </template>
-                    </span>
-
-                    <span v-else>
-                      <span v-for="(colSize, index) in placeholderSizes" :key="index"
-                        :class="{ 'dark-mode': isDarkMode }">
-                        <span :class="`placeholder col-${colSize}`"></span>
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </ul>
-            </div>
-
-            <div v-else class="card-body">
-              <ul class="list-group list-group-flush placeholder-glow">
-                <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item"
-                  :class="{ 'dark-mode': isDarkMode }">
-                  <span :class="`placeholder col-${colSize}`"></span>
-                </li>
-              </ul>
-            </div>
-
+            <span class="jn-text col-auto">
+              <i class="bi bi-pc-display-horizontal"></i>&nbsp;
+            </span>
+            <span v-if="card.ip" class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
+              {{ card.ip }}&nbsp;
+              <i v-if="isValidIP(card.ip)"
+                :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                @click="copyToClipboard(card.ip, card.id)" role="button"
+                v-tooltip="{ title: t('Tooltips.CopyIP'), placement: 'right' }" :aria-label="'Copy' + card.ip"></i>
+            </span>
+            <span v-else class="placeholder col-10"></span>
           </div>
+
+
+          <div v-if="(card.asn) || card.ip === '2001:4860:4860::8888'
+            " class="card-body" :id="'IPInfo-' + (index + 1)">
+            <ul class="list-group list-group-flush" v-if="card.country_name">
+
+              <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
+                class="card-img-top jn-map-image" alt="Map">
+
+              <li class="jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-geo-alt-fill"></i> {{ t('ipInfos.Country') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.country_name }}
+                  <span v-if="card.country_code" :class="'jn-fl fi fi-' + card.country_code.toLowerCase()"></span>
+                </span>
+              </li>
+
+              <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-houses"></i>
+                  {{ t('ipInfos.Region') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.region }}
+                </span>
+              </li>
+
+              <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-sign-turn-right"></i>
+                  {{ t('ipInfos.City') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.city }}
+                </span>
+              </li>
+
+              <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-ethernet"></i>
+                  {{ t('ipInfos.ISP') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.isp }}
+                </span>
+              </li>
+
+              <li
+                v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.type !== t('ipInfos.proxyDetect.type.unknownType')"
+                class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-reception-4"></i>
+                  {{ t('ipInfos.type') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.type }}
+                  <span v-if="card.proxyOperator !== 'unknown'">
+                    ( {{ card.proxyOperator }} )
+                  </span>
+                </span>
+              </li>
+
+              <li
+                v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0 && card.isProxy !== t('ipInfos.proxyDetect.unknownProxyType')"
+                class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-shield-fill-check"></i>
+                  {{ t('ipInfos.isProxy') }} :&nbsp;
+                </span>
+                <span class="col-10 ">
+                  {{ card.isProxy }}
+                  <span v-if="card.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
+                    ( {{ card.proxyProtocol }} )
+                  </span>
+                </span>
+              </li>
+
+              <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-buildings"></i>
+                  {{ t('ipInfos.ASN') }} :&nbsp;
+                </span>
+                <span v-if="card.asnlink" class="col-9 ">
+                  {{ card.asn }} <i v-if="configs.cloudFlare" class="bi bi-info-circle"
+                    @click="getASNInfo(card.asn, index)" data-bs-toggle="collapse"
+                    :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
+                    :aria-controls="'collapseASNInfo-' + index" role="button"
+                    :aria-label="'Display AS Info of' + card.asn"
+                    v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }"></i>
+                </span>
+              </li>
+
+              <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0"
+                :id="'collapseASNInfo-' + index" :data-bs-theme="isDarkMode ? 'dark' : ''">
+
+                <!-- 通过将 collapse 的 padding 设置为 0，然后添加一个子 div 设置 padding 的方式，避免 Bootstrap 的 collapse 发生卡顿，很奇怪的 bug -->
+
+                <div class="p-3">
+                  <span v-if="asnInfos[card.asn]">
+                    <i class="bi bi-info-circle-fill"></i> <span class="fw-light">{{ t('ipInfos.ASNInfo.note')
+                      }}</span>
+                    <br />
+                    <template v-for="(item,key) in asnInfos[card.asn]">
+                      <span class="fw-light">
+                        {{ t(`ipInfos.ASNInfo.${key}`) }}
+                      </span>
+                      {{ item }}
+                      <br />
+                    </template>
+                  </span>
+
+                  <span v-else>
+                    <span v-for="(colSize, index) in placeholderSizes" :key="index"
+                      :class="{ 'dark-mode': isDarkMode }">
+                      <span :class="`placeholder col-${colSize}`"></span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </ul>
+          </div>
+
+          <div v-else-if="(card.ip === t('ipInfos.IPv4Error')) || (card.ip === t('ipInfos.IPv6Error'))"
+            class="card-body  jn-ip-error">
+            <div>
+              <IPErrorIcon />
+            </div>
+          </div>
+
+          <div v-else class="card-body">
+            <ul class="list-group list-group-flush placeholder-glow">
+              <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span :class="`placeholder col-${colSize}`"></span>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 
@@ -200,6 +207,9 @@ import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFro
 
 
 const { t } = useI18n();
+
+// 导入 IP 错误图标
+import IPErrorIcon from './svgicons/IPError.vue';
 
 // Store
 const store = useMainStore();
@@ -470,7 +480,7 @@ const refreshCard = (card, index) => {
       break;
     case 3:
       fetchIP(3, getIPFromIPChecking64);
-      break;      
+      break;
     case 4:
       fetchIP(4, getIPFromIPChecking4);
       break;
@@ -575,6 +585,13 @@ defineExpose({
   width: 2px;
   border-left: 2px dashed #e3e3e3;
   z-index: 1;
+}
+
+.jn-ip-error {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
 }
 
 .dropdown-item.disabled,
