@@ -1012,7 +1012,7 @@ const countryList =
         {
             "abbr": "GB",
             "zh": "英国",
-            "en": "United Kiongdom",
+            "en": "United Kingdom",
             "fr": "Royaume-Uni"
         },
         {

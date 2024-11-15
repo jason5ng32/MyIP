@@ -34,7 +34,7 @@ If you're new to the project, consider:
 
 ### Reporting Bugs
 
-Please follow the bug report template provided in [BUG_REPORT_TEMPLATE.md](BUG_REPORT_TEMPLATE.md). Include terminal and console logs for a comprehensive report.
+Please follow the bug report template provided in [BUG_REPORT_TEMPLATE.md](.github/ISSUE_TEMPLATE/bug_report.md). Include terminal and console logs for a comprehensive report.
 
 ### Feature Requests
 
