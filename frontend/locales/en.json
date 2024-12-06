@@ -889,6 +889,24 @@
             "change": "DNS leak test can now display regional information"
           }
         ]
+      },
+      {
+        "version": "v4.4",
+        "date": "Dec 7, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Language preferences"
+          },
+          {
+            "type": "improve",
+            "change": "Map provider changed to Google"
+          },
+          {
+            "type": "improve",
+            "change": "Other general optimizations"
+          }
+        ]
       }
     ]
   }

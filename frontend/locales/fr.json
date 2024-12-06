@@ -889,6 +889,24 @@
                         "change": "Le test de fuite DNS peut maintenant afficher des informations régionales"
                     }
                 ]
+            },
+            {
+                "version": "v4.4",
+                "date": "Dec 7, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Préférences de langue"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Fournisseur de carte changé en Google"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Autres optimisations générales"
+                    }
+                ]
             }
         ]
     }
