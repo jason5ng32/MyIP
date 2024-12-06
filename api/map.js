@@ -57,7 +57,7 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Missing latitude, longitude, or language' });
     }
 
-    const mapSize = '600x300';
+    const mapSize = '500x400';
     const fmt = 'jpg';
     const scale = 2;
     const zoom = 4;
