@@ -7,17 +7,25 @@ import fr from './fr.json';
 
 
 const messages = { en, zh, fr };
+const supportedLanguages = Object.keys(messages);
 
+// 设置语言
 function setLanguage() {
   let locale = 'en';
+  let storedPreferences = localStorage.getItem('userPreferences');
+  storedPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
+  if (supportedLanguages.includes(storedPreferences.lang)) {
+    locale = storedPreferences.lang;
+    return locale;
+  }
   const searchParams = new URLSearchParams(window.location.search);
   const browserLanguage = navigator.language || navigator.userLanguage;
   const hl = searchParams.get('hl');
-  if (hl && ['en', 'zh', 'fr'].includes(hl)) {
+  if (hl && supportedLanguages.includes(hl)) {
     locale = hl;
   } else if (!hl) {
       const bl = browserLanguage.substring(0, 2);
-      if (['en', 'zh', 'fr'].includes(bl)) {
+      if (supportedLanguages.includes(bl)) {
         locale = bl;
       } else {
         locale = 'en';
