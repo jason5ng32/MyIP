@@ -60,7 +60,7 @@ export default (req, res) => {
     const mapSize = '500x400';
     const fmt = 'jpg';
     const scale = 2;
-    const zoom = 4;
+    const zoom = 2;
 
     const apiKeys = (process.env.GOOGLE_MAP_API_KEY || '').split(',');
     const apiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
