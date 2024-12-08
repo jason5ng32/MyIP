@@ -96,7 +96,7 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `SECURITY_RATE_LIMIT` | 否 | `"0"` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
 | `SECURITY_DELAY_AFTER` | 否 | `"0"` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `"logs/blacklist-ip.log"` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |
-| `BING_MAP_API_KEY` | 否 | `""` | Bing 地图的 API Key，用于展示 IP 所在地的地图 |
+| `GOOGLE_MAP_API_KEY=` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
 | `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
@@ -124,7 +124,7 @@ cp .env.example .env
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
-BING_MAP_API_KEY="YOUR_KEY_HERE"
+GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
 IPCHECKING_API="YOUR_KEY_HERE"
 ```
@@ -137,7 +137,7 @@ IPCHECKING_API="YOUR_KEY_HERE"
 
 ```bash
 docker run -d -p 18966:18966 \
-  -e BING_MAP_API_KEY="YOUR_KEY_HERE" \
+  -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
   -e IPCHECKING_API="YOUR_TOKEN_HERE" \
   --name myip \

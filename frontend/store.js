@@ -128,6 +128,7 @@ export const useMainStore = defineStore('main', {
         popupConnectivityNotifications: true,
         ipCardsToShow: 6,
         ipGeoSource: 0,
+        lang: 'auto',
       };
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;

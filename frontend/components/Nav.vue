@@ -16,21 +16,6 @@
         }">ing</span>
         </a>
 
-        <div class="btn-group mx-1" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
-          <button type="button" class="btn btn-sm dropdown-toggle jn-button" data-bs-toggle="dropdown"
-            aria-expanded="false" aria-label="Language Selection">
-            <i class="bi bi-translate"></i>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="?hl=zh" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
-                  class="fi fi-cn"></i> 中文</a></li>
-            <li><a class="dropdown-item" href="?hl=en" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
-                  class="fi fi-us"></i> English</a></li>
-            <li><a class="dropdown-item" href="?hl=fr" @click="trackEvent('Nav', 'ToggleClick', 'LanguageChange')"><i
-                  class="fi fi-fr"></i> Français</a></li>
-          </ul>
-        </div>
-
         <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
           aria-label="Preferences">
           <i class="bi bi-toggles"></i>

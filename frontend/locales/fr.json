@@ -15,7 +15,7 @@
             "title": "Préférences",
             "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",
             "colorScheme": "Schéma de Couleurs",
-            "colorAuto": "Par Défaut Système",
+            "systemAuto": "Système",
             "colorLight": "Jour",
             "colorDark": "Nuit",
             "ipSourcesToCheck": "Serveurs pour vérifier les adresses IP",
@@ -32,7 +32,9 @@
             "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
             "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up.",
             "ipDB": "Base de données de géolocalisation IP",
-            "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes."
+            "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes.",
+            "language": "Paramètres de langue",
+            "languageTips": "Rafraîchissement du navigateur pour prendre effet."
         }
     },
     "shell": {
@@ -885,6 +887,24 @@
                     {
                         "type": "improve",
                         "change": "Le test de fuite DNS peut maintenant afficher des informations régionales"
+                    }
+                ]
+            },
+            {
+                "version": "v4.4",
+                "date": "Dec 7, 2024",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Préférences de langue"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Fournisseur de carte changé en Google"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Autres optimisations générales"
                     }
                 ]
             }

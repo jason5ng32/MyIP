@@ -451,7 +451,7 @@ const ShortcutKeys = (isOriginalSite) => {
     {
       keys: "m",
       action: () => {
-        if (configs.value.bingMap) {
+        if (configs.value.map) {
           window.scrollTo({ top: 0, behavior: "smooth" });
           preferencesRef.value.toggleMaps();
         };

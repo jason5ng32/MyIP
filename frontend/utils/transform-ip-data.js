@@ -1,5 +1,5 @@
 // 解析IP数据
-function transformDataFromIPapi(data, ipGeoSource, t, bingMapLanguage) {
+function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
     if (data.error) {
         throw new Error(data.reason);
     }
@@ -14,8 +14,8 @@ function transformDataFromIPapi(data, ipGeoSource, t, bingMapLanguage) {
         isp: data.org || "",
         asn: data.asn || "",
         asnlink: data.asn ? `https://radar.cloudflare.com/${data.asn}` : false,
-        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${bingMapLanguage}&CanvasMode=CanvasLight` : "",
-        mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${bingMapLanguage}&CanvasMode=RoadDark` : ""
+        mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}` : "",
+        mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}&CanvasMode=Dark` : ""
     };
 
     if (ipGeoSource === 0) {

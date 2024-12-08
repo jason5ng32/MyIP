@@ -15,7 +15,7 @@
       "title": "偏好设置",
       "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
       "colorScheme": "颜色方案",
-      "colorAuto": "跟随系统",
+      "systemAuto": "跟随系统",
       "colorLight": "白天",
       "colorDark": "黑夜",
       "ipSourcesToCheck": "IP 检测服务器数量",
@@ -32,7 +32,9 @@
       "popupConnectivityNotifications": "显示可用性检测气泡",
       "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。",
       "ipDB": "IP 解析数据源",
-      "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。"
+      "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。",
+      "language": "语言设置",
+      "languageTips": "刷新浏览器后生效。"
     }
   },
   "shell": {
@@ -885,6 +887,24 @@
           {
             "type": "improve",
             "change": "DNS 泄露测试可以展示地区信息"
+          }
+        ]
+      },
+      {
+        "version": "v4.4",
+        "date": "Dec 7, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "语言偏好设置"
+          },
+          {
+            "type": "improve",
+            "change": "地图展示供应商变更为 Google"
+          },
+          {
+            "type": "improve",
+            "change": "其它常规优化"
           }
         ]
       }

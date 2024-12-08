@@ -15,7 +15,7 @@
       "title": "Preferences",
       "preferenceTips": "These settings are saved in your browser for easy reuse. Some options require refreshing the page to take effect.",
       "colorScheme": "Color Scheme",
-      "colorAuto": "Auto",
+      "systemAuto": "Auto",
       "colorLight": "Day",
       "colorDark": "Night",
       "ipSourcesToCheck": "Servers To Check IPs",
@@ -32,7 +32,9 @@
       "popupConnectivityNotifications": "Pop-up Connectivity Alerts",
       "popupConnectivityNotificationsTips": "When enabled, the initial check's results are shown as a pop-up alert.",
       "ipDB": "IP Geolocation Database",
-      "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order."
+      "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order.",
+      "language": "Language Setting",
+      "languageTips": "Refreshing the browser will take effect."
     }
   },
   "shell": {
@@ -885,6 +887,24 @@
           {
             "type": "improve",
             "change": "DNS leak test can now display regional information"
+          }
+        ]
+      },
+      {
+        "version": "v4.4",
+        "date": "Dec 7, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Language preferences"
+          },
+          {
+            "type": "improve",
+            "change": "Map provider changed to Google"
+          },
+          {
+            "type": "improve",
+            "change": "Other general optimizations"
           }
         ]
       }
