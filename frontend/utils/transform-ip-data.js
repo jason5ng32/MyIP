@@ -33,10 +33,11 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 function extractProxyDetails(proxyDetect = {}, t) {
     const isProxy = determineIsProxy(proxyDetect, t);
     const type = determineType(proxyDetect, t);
+    const qualityScore = proxyDetect.risk === 'unknown' ? 'unknown' : (100 - proxyDetect.risk);
     const proxyProtocol = determineProtocol(proxyDetect, t);
     const proxyOperator = proxyDetect.operator || "";
 
-    return { isProxy, type, proxyProtocol, proxyOperator };
+    return { isProxy, type, qualityScore, proxyProtocol, proxyOperator };
 }
 
 // 判断是否代理

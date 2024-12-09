@@ -19,6 +19,7 @@ function maskedInfo(t) {
     fakecard.showASNInfo = false;
     fakecard.isProxy = t('ipInfos.proxyDetect.no');
     fakecard.type = t('ipInfos.proxyDetect.type.Business');
+    fakecard.qualityScore = 100;
     fakecard.proxyProtocol = t('ipInfos.proxyDetect.unknownProtocol');
     fakecard.proxyOperator = "unknown";
 

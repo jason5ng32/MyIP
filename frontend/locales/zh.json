@@ -295,6 +295,8 @@
     "SelectSource": "选择 IP 归属地数据来源",
     "type": "类型",
     "isProxy": "代理",
+    "qualityScore": "IP 质量分",
+    "qualityScoreUnknown": "未知分数",
     "ASNInfo": {
       "note": "此 AS 的相关数据：",
       "asnName": "AS 名称：",

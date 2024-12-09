@@ -295,6 +295,8 @@
         "SelectSource": "Source de géolocalisation IP",
         "type": "Type",
         "isProxy": "Proxy",
+        "qualityScore": "Qualité IP",
+        "qualityScoreUnknown": "Score inconnu",
         "ASNInfo": {
             "note": "Données associées à cet AS :",
             "asnName": "Nom de l'AS :",

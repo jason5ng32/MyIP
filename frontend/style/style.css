@@ -43,7 +43,7 @@
 }
 
 .jn-ip-card1 {
-  min-height: 488px;
+  min-height: 538px;
 }
 
 .jn-ip-card2 {
@@ -266,6 +266,12 @@ footer {
 
 .jn-ip-font {
   zoom: 0.8;
+}
+
+.jn-risk-score {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .jn-speedtest-note {

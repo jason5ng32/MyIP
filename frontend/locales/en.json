@@ -295,6 +295,8 @@
     "SelectSource": "Select IP Geolocation Source",
     "type": "Type",
     "isProxy": "Proxy",
+    "qualityScore": "IP Quality",
+    "qualityScoreUnknown": "Score Unknown",
     "ASNInfo": {
       "note": "Related data for this AS:",
       "asnName": "AS Name:",
