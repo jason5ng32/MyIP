@@ -178,6 +178,10 @@ const thanksList = [
     link: 'https://globalping.io/'
   },
   {
+    name: 'ProxyCheck.io',
+    link: 'https://proxycheck.io/'
+  }
+  {
     name: 'ChatGPT',
     link: 'https://chatgpt.com/'
   }
