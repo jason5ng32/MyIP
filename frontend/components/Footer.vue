@@ -180,7 +180,7 @@ const thanksList = [
   {
     name: 'ProxyCheck.io',
     link: 'https://proxycheck.io/'
-  }
+  },
   {
     name: 'ChatGPT',
     link: 'https://chatgpt.com/'
