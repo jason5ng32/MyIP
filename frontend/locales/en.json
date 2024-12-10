@@ -273,7 +273,8 @@
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub",
     "RefreshRuleTests": "Refresh Rule Tests",
-    "Shell": "Command Line API"
+    "Shell": "Command Line API",
+    "qualityScoreExplain": "The IP quality score is calculated based on multiple weighted factors, including the type of IP, whether it is a proxy/VPN, and the number of recent attack events detected from this IP. A higher score indicates better IP quality, reducing the likelihood of being blocked by risk control on some websites."
   },
   "ipInfos": {
     "id": "ipinfos",
