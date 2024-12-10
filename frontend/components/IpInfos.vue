@@ -146,7 +146,7 @@
                   <span v-if="card.qualityScore === 'unknown'">
                     {{ t('ipInfos.qualityScoreUnknown') }}
                   </span>
-                  <span v-else>{{ card.qualityScore }}% <i v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
+                  <span v-else>{{ card.qualityScore }}% <i v-if="!isMobile" v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
                 </span>
 
               </li>
