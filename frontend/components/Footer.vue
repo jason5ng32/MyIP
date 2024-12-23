@@ -182,6 +182,10 @@ const thanksList = [
     link: 'https://proxycheck.io/'
   },
   {
+    name: 'Digital Defense',
+    link: 'https://digital-defense.io/'
+  },
+  {
     name: 'ChatGPT',
     link: 'https://chatgpt.com/'
   }

@@ -391,6 +391,15 @@ const ShortcutKeys = (isOriginalSite) => {
       description: t('shortcutKeys.MTRTest'),
     },
     {
+      keys: "S",
+      action: () => {
+        scrollToElement("AdvancedTools", 80);
+        advancedToolsRef.value.navigateAndToggleOffcanvas('/securitychecklist');
+        trackEvent('Nav', 'NavClick', 'SecurityChecklist');
+      },
+      description: t('shortcutKeys.SecurityChecklist'),
+    },
+    {
       keys: "r",
       action: () => {
         scrollToElement("AdvancedTools", 80);

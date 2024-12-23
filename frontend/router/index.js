@@ -12,6 +12,7 @@ const Whois = () => import('../components/advanced-tools/Whois.vue');
 const InvisibilityTest = () => import('../components/advanced-tools/InvisibilityTest.vue');
 const MacChecker = () => import('../components/advanced-tools/MacChecker.vue');
 const BrowserInfo = () => import('../components/advanced-tools/BrowserInfo.vue');
+const Checklist = () => import('../components/advanced-tools/SecurityChecklist.vue');
 const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
 
 const routes = [
@@ -24,6 +25,7 @@ const routes = [
   { path: '/whois', component: Whois },
   { path: '/macchecker', component: MacChecker },
   { path: '/browserinfo', component: BrowserInfo },
+  { path: '/securitychecklist', component: Checklist },
   { path: '/invisibilitytest', component: InvisibilityTest },
 ];
 

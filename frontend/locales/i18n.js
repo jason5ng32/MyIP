@@ -5,6 +5,23 @@ import en from './en.json';
 import zh from './zh.json';
 import fr from './fr.json';
 
+// 动态加载 security-checklist 语言文件
+async function loadSecurityChecklistMessages(language) {
+  const module = await import(`./security-checklist/${language}.json`);
+  return module.default;
+}
+
+// 合并 security-checklist 到语言文件
+async function mergeMessages() {
+  for (const lang of Object.keys(messages)) {
+    const checklistMessages = await loadSecurityChecklistMessages(lang);
+    messages[lang] = {
+      ...messages[lang],
+      securitychecklistdata: checklistMessages 
+    };
+  }
+}
+
 
 const messages = { en, zh, fr };
 const supportedLanguages = Object.keys(messages);
@@ -55,5 +72,9 @@ function updateMeta() {
   }
 }
 
-updateMeta();
+(async () => {
+  await mergeMessages();
+  updateMeta();
+})();
+
 export default i18n;
