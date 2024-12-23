@@ -22,7 +22,7 @@
                             {{ t('securitychecklist.alert-checked') }} {{ countItems({ action: 'checked', category:
                             'all' }) }} {{ t('securitychecklist.Items') }},
                             {{ countItems({ action: 'ignored', category: 'all' }) }} {{ t('securitychecklist.Items')
-                            }}{{ t('securitychecklist.alert-ignored') }}，{{ countItems({ action:
+                            }}{{ t('securitychecklist.alert-ignored') }}, {{ countItems({ action:
                             'total', category: 'all' }) - countItems({ action: 'checked', category: 'all' }) -
                             countItems({ action: 'ignored', category: 'all' }) }} {{
                             t('securitychecklist.alert-unchecked') }}
@@ -35,14 +35,12 @@
                                     <span class="fs-6 flex-shrink-1">{{ fullList[item].title }}</span>&nbsp;&nbsp;
                                     <span class="progress-stacked flex-grow-1">
                                         <div class="progress" role="progressbar" aria-label="Segment One"
-                                            aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"
                                             :style="'width: '+ countItems({ action: 'checked', category: item }) / countItems({ action: 'total', category: item }) * 100 + '%'">
                                             <div class="progress-bar bg-success"> {{ t('securitychecklist.Checked') }}
                                             </div>
                                         </div>
 
                                         <div class="progress" role="progressbar" aria-label="Segment two"
-                                            aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"
                                             :style="'width: '+ countItems({ action: 'ignored', category: item }) / countItems({ action: 'total', category: item }) * 100 + '%'">
                                             <div class="progress-bar bg-info"> {{ t('securitychecklist.Ignored') }}
                                             </div>
@@ -154,7 +152,7 @@
                             <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                                 <thead>
                                     <tr>
-                                        <th scope="col">{{ t('securitychecklist.Items') }}</th>
+                                        <th scope="col">{{ t('securitychecklist.Item') }}</th>
                                         <th scope="col">{{ t('securitychecklist.Priority') }}</th>
                                         <th scope="col">{{ t('securitychecklist.Ignore') }}</th>
                                     </tr>
