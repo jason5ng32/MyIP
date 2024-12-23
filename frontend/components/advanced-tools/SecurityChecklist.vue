@@ -158,13 +158,14 @@
                                     </tr>
                                 </thead>
                                 <tbody v-for="(item, index) in listToShow.checklist" :key="index">
-                                    <tr class="jn-tr " :class="{ 
+                                    <tr :class="{ 
                                         'text-decoration-line-through opacity-50': item.ignored
                                         }">
                                         <td :class="{ 
                                             'jn-checked-item-light': item.checked,
                                             'jn-checked-item-dark': item.checked && isDarkMode
-                                            }" class="col-12 jn-row">
+                                            }" class="col-12">
+                                            <div class="jn-row">
                                             <span @click="checkItem(item)" class="jn-cursor">
                                                 <i class="bi fs-5"
                                                     :class="item.checked ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
@@ -178,6 +179,7 @@
                                                     :aria-label="'Display Info of ' + item.point">
                                                 </i>
                                             </span>
+                                        </div>
                                         </td>
                                         <td :class="{ 
                                             'jn-checked-item-light': item.checked,
@@ -203,7 +205,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class="p-0 ">
+                                        <td colspan="4" class="border-0 p-0 ">
                                             <div class="collapse lh-lg p-1" :id="'collapseChecklistInfo-' + index"
                                                 :data-bs-theme="isDarkMode ? 'dark' : ''">
                                                 <div class="p-3 ">
@@ -439,9 +441,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.jn-focus-remove {
-    outline: none;
-}
 
 .jn-info {
     word-wrap: break-word;
@@ -475,29 +474,19 @@ onMounted(() => {
     cursor: pointer;
 }
 
-th {
-    border-style: double;
-}
-
 td {
 
-    border: none;
-}
-
-.jn-tr {
     border-style: dashed;
-    border-bottom-width: 0.5pt !important;
+    border-bottom-width: 1pt !important;
     border-color: #969696;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
 }
 
 .jn-checklist-card {
     min-height: 1200pt;
 }
-
-.jn-zoom {
-    zoom: 1.4;
-}
-
 .jn-bi-font {
     font-size: 18pt;
     height: 18pt;
@@ -513,7 +502,4 @@ td {
     margin-bottom: 5pt;
 }
 
-.jn-circle {
-    height: fit-content;
-}
 </style>
