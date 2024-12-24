@@ -372,24 +372,4 @@ defineExpose({
 #offcanvasPreferences {
     z-index: 1053;
 }
-
-.jn-check-dark:checked {
-    background-color: #ffffff;
-    border-color: #ffffff;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23212529'/%3e%3c/svg%3e");
-
-}
-
-.jn-check-dark:focus {
-    border-color: #ffffff;
-}
-
-.jn-check-light:checked {
-    background-color: #212529;
-    border-color: #212529;
-}
-
-.jn-check-light:focus {
-    border-color: #212529;
-}
 </style>

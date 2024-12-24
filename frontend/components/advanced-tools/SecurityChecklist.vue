@@ -3,7 +3,7 @@
     <div class="security-checklist-section my-4">
         <div class="text-secondary">
             <p>{{ t('securitychecklist.Note') }}</p>
-            <p v-if="!isMobile">{{ t('securitychecklist.Note2') }}</p>
+            <p>{{ t('securitychecklist.Note2') }}</p>
         </div>
 
         <div class="row">
@@ -82,7 +82,10 @@
 
         <div class="row">
             <div class="col-lg-4 col-md-4 col-12 mb-3 jn-height">
-                <div class="card jn-card mb-2" :class="{ 'dark-mode dark-mode-border': isDarkMode }"
+                <div class="card jn-card mb-2" :class="{ 
+                    'dark-mode dark-mode-border': isDarkMode,
+                    'jn-checklist-cat-card': item === currentList
+                     }"
                     v-for="(item, index) in categories">
                     <div class="card-body p-1">
 
@@ -120,7 +123,7 @@
                     <div class="card-body">
                         <h2> <i class="bi" :class="fullList[currentList].icon"></i> {{fullList[currentList].title}}</h2>
                         <p>{{fullList[currentList].description}}
-                            <i class="bi bi-info-circle" data-bs-toggle="collapse"
+                            <i v-if="fullList[currentList].intro" class="bi bi-info-circle" data-bs-toggle="collapse"
                                 :data-bs-target="'#collapseCategoryIntro'" aria-expanded="false"
                                 :aria-controls="'collapseCategoryIntro'" role="button"
                                 :aria-label="'Display Info of ' + fullList[currentList].title">
@@ -128,7 +131,7 @@
                         </p>
                         <div class="collapse lh-lg p-1" :id="'collapseCategoryIntro'"
                             :data-bs-theme="isDarkMode ? 'dark' : ''">
-                            <span class="opacity-75">
+                            <span class="opacity-75 fs-7">
                                 <vue-markdown :source="fullList[currentList].intro" />
                             </span>
                         </div>
@@ -158,9 +161,7 @@
                                     </tr>
                                 </thead>
                                 <tbody v-for="(item, index) in listToShow.checklist" :key="index">
-                                    <tr :class="{ 
-                                        'text-decoration-line-through opacity-50': item.ignored
-                                        }">
+                                    <tr >
                                         <td :class="{ 
                                             'jn-checked-item-light': item.checked,
                                             'jn-checked-item-dark': item.checked && isDarkMode
@@ -171,10 +172,12 @@
                                                         'bi-check-circle-fill text-success jn-cursor': item.checked,
                                                         'bi-pause-circle text-secondary': item.ignored,
                                                         'bi-circle jn-cursor': !item.checked && !item.ignored
-                                                    }"></i>
+                                                    }"></i>&nbsp;
                                                 </span>
-                                                <span>
-                                                    &nbsp;{{ item.point }}
+                                                <span :class="{ 
+                                        'text-decoration-line-through opacity-50': item.ignored
+                                        }">
+                                                    {{ item.point }}
                                                     <i class="bi bi-info-circle" data-bs-toggle="collapse"
                                                         :data-bs-target="'#collapseChecklistInfo-' + index"
                                                         aria-expanded="false"
@@ -202,17 +205,18 @@
                                             'jn-checked-item-dark': item.checked && isDarkMode
                                             }" @click="ignoreItem(item)">
                                             <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']" type="checkbox" role="switch"
                                                     :checked="item.ignored">
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td colspan="4" class="border-0 p-0 ">
-                                            <div class="collapse lh-lg p-1" :id="'collapseChecklistInfo-' + index"
+                                            <div class="collapse lh-lg p-1"
+                                            :class="[isMobile ? 'jn-vw-m' : 'jn-vw']" :id="'collapseChecklistInfo-' + index"
                                                 :data-bs-theme="isDarkMode ? 'dark' : ''">
                                                 <div class="p-3 ">
-                                                    <span class="jn-info opacity-75">
+                                                    <span class="jn-info fs-7 opacity-75">
                                                         <vue-markdown :source="item.details" />
                                                     </span>
                                                 </div>
@@ -492,5 +496,18 @@ onMounted(() => {
     align-content: center;
     align-items: center;
     margin-bottom: 5pt;
+}
+
+.jn-vw-m {
+    max-width: 85vw;
+}
+
+.jn-vw {
+    max-width: 576pt;
+}
+
+.jn-checklist-cat-card {
+    position: relative;
+    border: 1px solid #198754;
 }
 </style>
