@@ -61,7 +61,8 @@
     "ShowAll":"显示所有",
     "ShowUnchecked":"显示未检查",
     "ShowIgnored":"显示已忽略",
-    "ShowChecked":"显示已检查"
+    "ShowChecked":"显示已检查",
+    "Loading":"加载中..."
   },
   "shell": {
     "Title": "命令行 API",

@@ -7,7 +7,7 @@
         </div>
 
         <!-- 数据面板 -->
-        <div class="row">
+        <div v-if="fullList" class="row">
             <div class="col-12 mb-3">
                 <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body">
@@ -80,8 +80,22 @@
                 </div>
             </div>
         </div>
+        <div v-else class="row">
+            <div class="col-12 mb-3">
+                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+                    <div class="card-body">
+                        <div class="jn-placeholder ">
+                            <span>
+                                <span class="spinner-grow spinner-grow-sm text-success" aria-hidden="true"></span>
+                                <span class="text-success">&nbsp;{{ t('securitychecklist.Loading') }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- 检查清单区域 -->
-        <div class="row">
+        <div v-if="fullList" class="row">
             <!-- 检查清单分类列表 -->
             <div class="col-lg-4 col-md-4 col-12 mb-3 jn-height">
                 <div class="card jn-card mb-2" :class="{ 
@@ -271,7 +285,7 @@ import VueMarkdown from 'vue-markdown-render'
 
 const { t, tm } = useI18n();
 
-const securityChecklist = reactive(tm('securitychecklistdata'));
+const securityChecklist = ref(tm('securitychecklistdata'));
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
@@ -314,14 +328,14 @@ const initSecurityList = (securityChecklist) => {
     // 首先加载本地 slugs
     loadLocalSlugs();
 
-    const transformedObject = ref({});
+    const transformedObject = {};
     // 遍历并重组对象
     securityChecklist.forEach(item => {
         if (!categories.value.includes(item.slug)) {
             categories.value.push(item.slug);
         }
 
-        transformedObject.value[item.slug] = {
+        transformedObject[item.slug] = {
             title: item.title,
             description: item.description,
             icon: item.icon,
@@ -346,13 +360,10 @@ const initSecurityList = (securityChecklist) => {
 
     // 更新本地存储
     setLocalSlugs();
-
     return transformedObject;
 };
 
-// 初始化
-const fullList = reactive(initSecurityList(securityChecklist));
-
+const fullList = ref(null);
 
 // 重置
 const resetAllslugs = () => {
@@ -362,7 +373,7 @@ const resetAllslugs = () => {
     }
 
     setLocalSlugs();
-    fullList.value = initSecurityList(securityChecklist);
+    fullList.value = initSecurityList(securityChecklist.value); // 4. 使用 securityChecklist.value
     listToShow.value = fullList.value[currentList.value];
     filterList.value = listToShow.value.checklist;
     filterTag.value = 'all';
@@ -472,6 +483,7 @@ const checkedItems = computed(() => countItems({ action: 'checked', category: 'a
 const ignoredItems = computed(() => countItems({ action: 'ignored', category: 'all' }));
 const uncheckedItems = computed(() => totalItems.value - checkedItems.value - ignoredItems.value);
 
+// 便利调用百分比
 const getProgressStyle = (category) => {
     return (action) => {
         return `width: ${countItems({ action, category }) / countItems({ action: 'total', category }) * 100}%`;
@@ -479,7 +491,10 @@ const getProgressStyle = (category) => {
 };
 
 onMounted(() => {
-    changeList('authentication', false);
+    fullList.value = initSecurityList(securityChecklist.value);
+    setTimeout(() => {
+        changeList('authentication', false);
+    }, 300);
 });
 
 </script>

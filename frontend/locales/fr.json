@@ -61,7 +61,8 @@
         "ShowAll": "Afficher tout",
         "ShowUnchecked": "Afficher les éléments non cochés",
         "ShowIgnored": "Afficher les éléments ignorés",
-        "ShowChecked": "Afficher les éléments cochés"
+        "ShowChecked": "Afficher les éléments cochés",
+        "Loading": "Chargement..."
     },
     "shell": {
         "Title": "API de ligne de commande",
