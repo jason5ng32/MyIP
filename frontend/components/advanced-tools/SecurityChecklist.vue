@@ -11,7 +11,7 @@
                 <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                     <div class="card-body">
                         <div class="jn-title2 mb-3">
-                            <h3>{{ t('securitychecklist.Progress') }}</h3>
+                            <h3><i class="bi bi-card-checklist"></i> {{ t('securitychecklist.Progress') }}</h3>
                             <button @click="resetAllslugs()"
                                 :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
                                 aria-label="Reset Security Checklist"><i class="bi bi-arrow-clockwise"></i></button>
@@ -166,20 +166,23 @@
                                             'jn-checked-item-dark': item.checked && isDarkMode
                                             }" class="col-12">
                                             <div class="jn-row">
-                                            <span @click="checkItem(item)" class="jn-cursor">
-                                                <i class="bi fs-5"
-                                                    :class="item.checked ? 'bi-check-circle-fill text-success' : 'bi-circle'"></i>
-                                            </span>
-                                            <span>
-                                                &nbsp;{{ item.point }}
-                                                <i class="bi bi-info-circle" data-bs-toggle="collapse"
-                                                    :data-bs-target="'#collapseChecklistInfo-' + index"
-                                                    aria-expanded="false"
-                                                    :aria-controls="'collapseChecklistInfo-' + index" role="button"
-                                                    :aria-label="'Display Info of ' + item.point">
-                                                </i>
-                                            </span>
-                                        </div>
+                                                <span @click="checkItem(item)">
+                                                    <i class="bi fs-5" :class="{
+                                                        'bi-check-circle-fill text-success jn-cursor': item.checked,
+                                                        'bi-pause-circle text-secondary': item.ignored,
+                                                        'bi-circle jn-cursor': !item.checked && !item.ignored
+                                                    }"></i>
+                                                </span>
+                                                <span>
+                                                    &nbsp;{{ item.point }}
+                                                    <i class="bi bi-info-circle" data-bs-toggle="collapse"
+                                                        :data-bs-target="'#collapseChecklistInfo-' + index"
+                                                        aria-expanded="false"
+                                                        :aria-controls="'collapseChecklistInfo-' + index" role="button"
+                                                        :aria-label="'Display Info of ' + item.point">
+                                                    </i>
+                                                </span>
+                                            </div>
                                         </td>
                                         <td :class="{ 
                                             'jn-checked-item-light': item.checked,
@@ -441,7 +444,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .jn-info {
     word-wrap: break-word;
     white-space: normal;
@@ -466,7 +468,6 @@ onMounted(() => {
 .jn-row {
     display: flex;
     align-items: center;
-    min-width: 400pt;
 }
 
 .jn-btn {
@@ -474,19 +475,10 @@ onMounted(() => {
     cursor: pointer;
 }
 
-td {
-
-    border-style: dashed;
-    border-bottom-width: 1pt !important;
-    border-color: #969696;
-    border-left: 0;
-    border-right: 0;
-    border-top: 0;
-}
-
 .jn-checklist-card {
-    min-height: 1200pt;
+    min-height: 900pt;
 }
+
 .jn-bi-font {
     font-size: 18pt;
     height: 18pt;
@@ -501,5 +493,4 @@ td {
     align-items: center;
     margin-bottom: 5pt;
 }
-
 </style>
