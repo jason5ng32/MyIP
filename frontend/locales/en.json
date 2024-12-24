@@ -56,7 +56,12 @@
     "Basic": "Basic",
     "Optional": "Optional",
     "Essential": "Essential",
-    "Advanced": "Advanced"
+    "Advanced": "Advanced",
+    "Reset":"Reset Checklist",
+    "ShowAll":"Show All",
+    "ShowUnchecked":"Show Unchecked",
+    "ShowIgnored":"Show Ignored",
+    "ShowChecked":"Show Checked"
   },
   "shell": {
     "Title": "Command Line API",

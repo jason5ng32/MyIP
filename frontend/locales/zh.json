@@ -56,7 +56,12 @@
     "Basic":"基础",
     "Optional":"可选",
     "Essential":"必要",
-    "Advanced":"高级"
+    "Advanced":"高级",
+    "Reset":"重置",
+    "ShowAll":"显示所有",
+    "ShowUnchecked":"显示未检查",
+    "ShowIgnored":"显示已忽略",
+    "ShowChecked":"显示已检查"
   },
   "shell": {
     "Title": "命令行 API",
