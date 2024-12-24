@@ -113,10 +113,9 @@
                                 countItems({ action: 'checked', category: item }) }}/{{ countItems({ action:
                                 'total', category: item }) -
                                 countItems({ action: 'ignored', category: item }) }})
-
                             </span>
                             <span class="jn-bi-font"
-                                v-if=" countItems({ action: 'percentage', category: item }) === '100' ">
+                                v-if=" countItems({ action: 'percentage', category: item }) === 100 ">
                                 <i class=" bi bi-check-circle-fill text-success"></i>
                             </span>
                             <span v-else>
@@ -461,7 +460,8 @@ const countItems = ({ action, category, priority }) => {
             const total = items.length;
             const ignored = items.filter(item => item.ignored).length;
             const checked = items.filter(item => item.checked).length;
-            return (total - ignored) === 0 ? '100' : ((checked / (total - ignored)) * 100).toFixed(0);
+            const denominator = total - ignored;
+            return denominator === 0 ? 100 : Math.round((checked / denominator) * 100);
         },
     };
 
