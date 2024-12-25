@@ -37,6 +37,33 @@
       "languageTips": "Refreshing the browser will take effect."
     }
   },
+  "securitychecklist": {
+    "Title": "Security Checklist",
+    "Note": "This is a very comprehensive cybersecurity checklist covering aspects such as password security, browsing security, and mobile device security. In the current environment, information leaks can lead to significant losses, thus it is necessary to ensure that we protect our privacy and enhance the security of our access while connected to the internet.",
+    "Note2": "This list contains many items; you do not need to check everything at once. Progress will be saved in the browser, and you can return at any time to continue the checks.",
+    "Progress": "Check Progress",
+    "Item": "Item",
+    "Items": "Item(s) ",
+    "Priority": "Priority",
+    "Ignore": "Ignore",
+    "alert-total": "The security check has a total of",
+    "alert-checked": "You have completed",
+    "alert-ignored": "Ignored",
+    "alert-unchecked": "Unchecked.",
+    "Checked": "Checked",
+    "Ignored": "Ignored",
+    "Unchecked": "Unchecked",
+    "Basic": "Basic",
+    "Optional": "Optional",
+    "Essential": "Essential",
+    "Advanced": "Advanced",
+    "Reset":"Reset Checklist",
+    "ShowAll":"Show All",
+    "ShowUnchecked":"Show Unchecked",
+    "ShowIgnored":"Show Ignored",
+    "ShowChecked":"Show Checked",
+    "Loading":"Loading..."
+  },
   "shell": {
     "Title": "Command Line API",
     "Note1": "Hey, turns out you also like using the terminal?",
@@ -198,7 +225,8 @@
     "Whois": "Search for domain/IP registration information",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
-    "BrowserInfo": "Check browser information and fingerprint"
+    "BrowserInfo": "Check browser information and fingerprint",
+    "SecurityChecklist": "Guide to securing your digital life"
   },
   "macchecker": {
     "Title": "MAC Lookup",
@@ -273,7 +301,8 @@
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub",
     "RefreshRuleTests": "Refresh Rule Tests",
-    "Shell": "Command Line API"
+    "Shell": "Command Line API",
+    "qualityScoreExplain": "The IP quality score is calculated based on multiple weighted factors, including the type of IP, whether it is a proxy/VPN, and the number of recent attack events detected from this IP. A higher score indicates better IP quality, reducing the likelihood of being blocked by risk control on some websites."
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -295,6 +324,8 @@
     "SelectSource": "Select IP Geolocation Source",
     "type": "Type",
     "isProxy": "Proxy",
+    "qualityScore": "IP Quality",
+    "qualityScoreUnknown": "Score Unknown",
     "ASNInfo": {
       "note": "Related data for this AS:",
       "asnName": "AS Name:",
@@ -460,7 +491,8 @@
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",
-    "Shell": "Command Line API"
+    "Shell": "Command Line API",
+    "SecurityChecklist": "Open Security Checklist panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
@@ -901,6 +933,20 @@
           {
             "type": "improve",
             "change": "Map provider changed to Google"
+          },
+          {
+            "type": "improve",
+            "change": "Other general optimizations"
+          }
+        ]
+      },
+      {
+        "version": "v4.5",
+        "date": "Dec 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Add Security Checklist"
           },
           {
             "type": "improve",

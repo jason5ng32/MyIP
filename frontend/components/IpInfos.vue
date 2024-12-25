@@ -127,6 +127,30 @@
                 </span>
               </li>
 
+              <li v-show="(!isMobile || !isCardsCollapsed) && ipGeoSource === 0" class="jn-list-group-item"
+                :class="{ 'dark-mode': isDarkMode }">
+                <span class="jn-text col-auto">
+                  <i class="bi bi-speedometer"></i>
+                  {{ t('ipInfos.qualityScore') }} :&nbsp;
+                </span>
+
+                <span v-if="card.qualityScore !== 'unknown'" class="col-3 jn-risk-score ">
+                  <span class="progress border" :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
+                    role="progressbar" aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
+                      :style='"width:" + card.qualityScore +"%"'></span>
+                  </span>
+                </span>
+
+                <span class="ps-2">
+                  <span v-if="card.qualityScore === 'unknown'">
+                    {{ t('ipInfos.qualityScoreUnknown') }}
+                  </span>
+                  <span v-else>{{ card.qualityScore }}% <i v-if="!isMobile" v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
+                </span>
+
+              </li>
+
               <li v-show="!isMobile || !isCardsCollapsed" class="jn-list-group-item border-0"
                 :class="{ 'dark-mode': isDarkMode }">
                 <span class="jn-text col-auto">

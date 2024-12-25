@@ -1,0 +1,1658 @@
+[
+    {
+        "title": "身份验证",
+        "slug": "authentication",
+        "description": "保护您的在线账户登录凭据",
+        "icon": "bi-key-fill",
+        "intro": "根据 [Verizon 的这份报告](http://www.verizonenterprise.com/resources/reports/rp_dbir-2016-executive-summary_xg_en.pdf)，大多数已报告的数据泄露是由于使用弱、默认或被盗密码造成的。请使用长而强且唯一的密码，将它们存储在安全的密码管理器中，启用双因素身份验证，关注数据泄露情况，并在登录账户时小心谨慎。",
+        "checklist": [
+            {
+                "point": "使用强密码",
+                "priority": "Essential",
+                "details": "如果您的密码太短，或包含字典单词、地点或名字，那么它很容易被暴力破解或被人猜中。创建强密码的最简单方法是使其足够长（12 个字符以上）——可以考虑使用由多个单词组成的“密码短语”。或者，使用密码生成器生成长且随机的强密码。可以试用 [HowSecureIsMyPassword.net](https://howsecureismypassword.net)，了解常见密码被破解的速度。阅读更多关于创建强密码的信息：[securityinabox.org](https://securityinabox.org/en/passwords/passwords-and-2fa/)",
+                "slug": "authentication-use-a-strong-password"
+            },
+            {
+                "point": "不要重复使用密码",
+                "priority": "Essential",
+                "details": "如果有人重复使用密码，并且他们拥有账户的某个网站遭遇泄露，那么犯罪分子可以轻松地非法访问他们的其他账户。这通常通过大规模自动登录请求实现，这被称为凭证填充。不幸的是，这种情况非常普遍，但防范起来很简单——为您的每个在线账户使用不同的密码。",
+                "slug": "authentication-don-t-reuse-passwords"
+            },
+            {
+                "point": "使用安全的密码管理器",
+                "priority": "Essential",
+                "details": "对大多数人来说，记住数百个强且唯一的密码几乎是不可能的。密码管理器是一种生成、存储和自动填写登录凭据的应用程序。您所有的密码都将加密并通过一个主密码保护（您必须记住这个主密码，而且它需要非常强）。大多数密码管理器都有浏览器扩展和移动应用程序，因此无论您使用何种设备，都可以自动填写密码。一个全面的选择是 [Bitwarden](https://awesome-privacy.xyz/essentials/password-managers/bitwarden)，或者查看 [推荐的密码管理器](https://awesome-privacy.xyz/essentials/password-managers)。",
+                "slug": "authentication-use-a-secure-password-manager"
+            },
+            {
+                "point": "避免分享密码",
+                "priority": "Essential",
+                "details": "尽管有时您可能需要与他人共享账户访问权限，但通常应避免这样做，因为这会增加账户被入侵的风险。如果确实需要共享密码，例如在团队中共享账户的情况下，应该通过密码管理器内置的功能来完成共享。",
+                "slug": "authentication-avoid-sharing-passwords"
+            },
+            {
+                "point": "启用双因素身份验证",
+                "priority": "Essential",
+                "details": "双因素身份验证（2FA）要求您提供您知道的东西（密码）和您拥有的东西（如手机上的代码）才能登录。这意味着即使有人获取了您的密码（例如通过网络钓鱼、恶意软件或数据泄露），他们仍然无法登录您的账户。启用非常简单，下载 [验证器应用](https://github.com/Lissy93/awesome-privacy#2-factor-authentication) 到您的手机，然后进入账户安全设置并按照步骤启用 2FA。下次您在新设备上登录时，将需要输入手机应用中显示的代码（无需联网，代码通常每 30 秒更换一次）。",
+                "slug": "authentication-enable-2-factor-authentication"
+            },
+            {
+                "point": "安全保存备份代码",
+                "priority": "Essential",
+                "details": "启用多因素身份验证时，通常会提供一些代码供您在 2FA 方法丢失、损坏或不可用时使用。将这些代码保存在安全的地方以防丢失或未经授权的访问。可以将其存储在纸上或磁盘上的安全位置（例如离线存储或加密文件/驱动器中）。不要将这些存储在密码管理器中，因为 2FA 来源和密码应分开保管。",
+                "slug": "authentication-keep-backup-codes-safe"
+            },
+            {
+                "point": "订阅数据泄露提醒",
+                "priority": "Optional",
+                "details": "当网站发生重大数据泄露时，泄露的数据通常会在互联网上传播。一些网站会收集这些泄露的记录，并允许您通过电子邮件地址搜索是否出现在它们的列表中。[Firefox Monitor](https://monitor.firefox.com)、[Have I been pwned](https://haveibeenpwned.com) 和 [DeHashed](https://dehashed.com) 提供监控功能，如果您的电子邮件地址出现在新数据集中，他们会通知您。尽早知道这类情况非常有用，您可以及时更改受影响账户的密码。[Have I been pwned](https://awesome-privacy.xyz/security-tools/online-tools/have-i-been-pwned) 还提供域范围通知，如果您使用别名进行[匿名转发](https://github.com/Lissy93/awesome-privacy#anonymous-mail-forwarding)，可以接收与整个域下的电子邮件地址相关的提醒。",
+                "slug": "authentication-sign-up-for-breach-alerts"
+            },
+            {
+                "point": "保护您的密码/ PIN",
+                "priority": "Optional",
+                "details": "在公共场所输入密码时，请确保不在监控摄像头的直视范围内，并确保没有人能够看到您的屏幕。输入时遮挡您的密码或 PIN 码，并避免在屏幕上显示任何明文密码。",
+                "slug": "authentication-shield-your-password-pin"
+            },
+            {
+                "point": "定期更新关键密码",
+                "priority": "Optional",
+                "details": "数据库泄露和漏洞是常见现象，可能有多个密码已在线泄露。偶尔更新关键账户的密码有助于减少风险。但是，只要您的所有密码都足够长、强且唯一，就无需频繁更改——每年更新一次即可。强制组织内部定期更改密码已被[不再推荐](https://duo.com/decipher/microsoft-will-no-longer-recommend-forcing-periodic-password-changes)，因为这会导致员工选择较弱的密码。",
+                "slug": "authentication-update-critical-passwords-periodically"
+            },
+            {
+                "point": "不要在浏览器中保存密码",
+                "priority": "Optional",
+                "details": "大多数现代浏览器会在您登录网站时提示保存您的凭据。不要允许这样做，因为这些数据并不总是加密的，这可能导致其他人获得对您账户的访问权限。相反，使用专用密码管理器存储（和自动填写）您的密码。",
+                "slug": "authentication-dont-save-your-password-in-browsers"
+            },
+            {
+                "point": "避免在他人设备上登录",
+                "priority": "Optional",
+                "details": "尽量避免在他人的电脑上登录，因为您无法保证其系统是安全的。尤其要小心使用公共设备，因为这些设备更容易感染恶意软件和被跟踪。在他人设备上登录尤其危险，尤其是涉及关键账户（如在线银行账户）时。如果必须使用他人的设备，请确保您使用的是私人/无痕浏览会话（使用 Ctrl+Shift+N 或 Cmd+Shift+N）。这样可以请求浏览器不保存您的凭据、Cookie 和浏览历史记录。",
+                "slug": "authentication-avoid-logging-in-on-someone-elses-device"
+            },
+            {
+                "point": "避免设置密码提示",
+                "priority": "Optional",
+                "details": "某些网站允许您设置密码提示。提示答案往往容易被猜到。如果密码提示是强制性的，请使用随机答案并记录在密码管理器中（例如 `第一所学校的名字: 6D-02-8B-!a-E8-8F-81`）。",
+                "slug": "authentication-avoid-password-hints"
+            },
+            {
+                "point": "不要真实回答在线安全问题",
+                "priority": "Optional",
+                "details": "如果网站要求回答安全问题（如出生地、母亲的娘家姓或第一辆车等），不要提供真实答案。黑客可以通过网络或社会工程轻松获取这些信息。相反，请创建虚构的答案，并将其存储在密码管理器中。使用真实单词比随机字符更好，[详见此处](https://news.ycombinator.com/item?id=29244870)。",
+                "slug": "authentication-never-answer-online-security-questions-truthfully"
+            },
+            {
+                "point": "不要使用 4 位数 PIN",
+                "priority": "Optional",
+                "details": "不要使用短 PIN 解锁智能手机或电脑。相反，使用文本密码或更长的 PIN。数字密码容易被破解（4 位数 PIN 只有 10,000 种组合，而 4 位字符的字母数字代码则有 740 万种组合）。",
+                "slug": "authentication-dont-use-a-4-digit-pin"
+            },
+            {
+                "point": "避免使用短信进行双因素认证",
+                "priority": "Optional",
+                "details": "启用多因素认证时，如果支持，选择基于应用程序的代码或硬件令牌。短信容易受到许多常见威胁，如 [SIM 卡交换](https://www.maketecheasier.com/sim-card-hijacking) 和 [拦截](https://secure-voice.com/ss7_attacks)。此外，您的电话号码的存储安全性及其他用途没有保障。从实际角度来看，短信仅在您有信号时有效，并且可能会很慢。如果网站或服务要求使用短信进行恢复，请考虑购买一个仅用于账户恢复的预付费电话号码。",
+                "slug": "authentication-avoid-using-sms-for-2fa"
+            },
+            {
+                "point": "避免使用密码管理器生成 OTP",
+                "priority": "Advanced",
+                "details": "许多密码管理器可以生成双因素认证（2FA）代码。但最好不要使用您的主要密码管理器作为 2FA 验证器，因为如果被入侵，它将成为单点故障。相反，请在手机或笔记本电脑上使用专用[验证器应用](https://github.com/Lissy93/awesome-privacy#2-factor-authentication)。",
+                "slug": "authentication-avoid-using-your-pm-to-generate-otps"
+            },
+            {
+                "point": "避免使用人脸解锁",
+                "priority": "Advanced",
+                "details": "大多数手机和笔记本电脑提供面部识别身份验证功能，使用相机将您的面部快照与存储的哈希值进行比较。尽管非常方便，但有许多方式可以[欺骗它](https://www.forbes.com/sites/jvchamary/2017/09/18/security-apple-face-id-iphone-x/)并获取设备访问权限，如通过数字照片和监控视频重建。与密码不同，您的面部照片很可能已经存在于互联网上，并被监控摄像头记录。",
+                "slug": "authentication-avoid-face-unlock"
+            },
+            {
+                "point": "警惕键盘记录器",
+                "priority": "Advanced",
+                "details": "硬件[键盘记录器](https://en.wikipedia.org/wiki/Hardware_keylogger)是一种物理设备，插在键盘与 USB 接口之间，拦截所有按键操作，有时会将数据传输到远程服务器。这使黑客可以访问所有输入的信息，包括密码。最好的保护方法是，当您的电脑无人值守后，检查 USB 连接。此外，键盘记录器可能被植入键盘内部，因此要注意键盘外壳是否有被篡改的迹象，并考虑自带键盘工作。在虚拟键盘上输入、从剪贴板粘贴或通过密码管理器自动填写的数据无法被硬件键盘记录器拦截。",
+                "slug": "authentication-watch-out-for-keyloggers"
+            },
+            {
+                "point": "考虑使用硬件令牌",
+                "priority": "Advanced",
+                "details": "U2F/FIDO2 安全密钥是一种 USB（或 NFC）设备，在登录在线服务时插入以验证您的身份，而无需输入来自验证器的 OTP。[SoloKey](https://solokeys.com) 和 [NitroKey](https://www.nitrokey.com) 是此类密钥的例子。它们带来了许多安全优势，因为浏览器直接与设备通信，不会被欺骗关于哪个主机请求身份验证，因为会检查 TLS 证书。[这篇文章](https://security.stackexchange.com/a/71704)很好地解释了使用 FIDO U2F 令牌的安全性。当然，将物理密钥存放在安全的地方或随身携带非常重要。一些在线账户允许启用多种 2FA 方法。",
+                "slug": "authentication-consider-a-hardware-token"
+            },
+            {
+                "point": "考虑使用离线密码管理器",
+                "priority": "Advanced",
+                "details": "为了增强安全性，加密的离线密码管理器可以让您完全控制您的数据。[KeePass](https://awesome-privacy.xyz/essentials/password-managers/keepass) 是一个受欢迎的选择，拥有许多[插件](https://keepass.info/plugins.html)和社区分支，提供额外的兼容性和功能。流行的客户端包括：[KeePassXC](https://keepassxc.org)（桌面）、[KeePassDX](https://www.keepassdx.com)（Android）和 [StrongBox](https://apps.apple.com/us/app/strongbox-password-safe/id897283731)（iOS）。缺点是对于某些人可能稍微不那么方便，并且需要您自行备份并安全存储。",
+                "slug": "authentication-consider-offline-password-manager"
+            },
+            {
+                "point": "考虑不同的用户名",
+                "priority": "Advanced",
+                "details": "为每个账户设置不同的密码是一个良好的开端，但如果您还使用唯一的用户名、电子邮件或电话号码登录，那么对于试图未经授权访问的人来说将更加困难。多个电子邮件的最简单方法是使用自动生成的匿名邮件转发别名。这意味着 [任何内容]@yourdomain.com 都会到达您的收件箱，从而允许您为每个账户使用不同的电子邮件（参见 [邮件别名提供商](https://github.com/Lissy93/awesome-privacy#anonymous-mail-forwarding)）。用户名更简单，因为您可以使用密码管理器生成、存储并自动填写这些信息。虚拟电话号码可以通过您的 VOIP 提供商生成。",
+                "slug": "authentication-consider-different-usernames"
+            }
+        ]
+    },
+    {
+        "title": "网页浏览",
+        "slug": "web-browsing",
+        "description": "避免在线跟踪、审查和数据收集",
+        "icon": "bi-browser-safari",
+        "intro": "互联网上的大多数网站都会使用某种形式的跟踪，通常是为了深入了解用户的行为和偏好。这些数据可能非常详细，因此对企业、政府和知识产权窃贼来说非常有价值。数据泄露和泄漏很常见，而对用户的网络活动进行去匿名化通常是一项微不足道的任务。\n\n有两种主要的跟踪方法：有状态（基于 cookie）和无状态（基于指纹）。Cookie 是存储在浏览器中的一小段信息，具有用于识别您的唯一 ID。浏览器指纹是一种高度准确的方法，可以识别和跟踪用户在网上任何地方的行踪。收集的信息非常全面，通常包括浏览器详细信息、操作系统、屏幕分辨率、支持的字体、插件、时区、语言和字体偏好，甚至硬件配置。\n\n本节概述了您可以采取的步骤，以更好地保护自己免受威胁，最大程度地减少在线跟踪并提高隐私性。",
+        "checklist": [
+            {
+                "point": "确保网站合法",
+                "priority": "Basic",
+                "details": "这听起来可能很明显，但是当您登录任何在线帐户时，请仔细检查 URL 是否正确。将常用网站存储在书签中是确保 URL 易于查找的好方法。访问新网站时，请查找可能不安全的常见迹象：浏览器警告、重定向、站点垃圾邮件和弹出窗口。如果您不确定，您还可以使用以下工具检查网站：[Virus Total](https://awesome-privacy.xyz/security-tools/online-tools/virus-total)、[IsLegitSite](https://www.islegitsite.com)、[Google 安全浏览状态](https://transparencyreport.google.com/safe-browsing/search)。",
+                "slug": "web-browsing-ensure-website-is-legitimate"
+            },
+            {
+                "point": "提防浏览器恶意软件",
+                "priority": "Basic",
+                "details": "您的系统或浏览器可能会受到间谍软件、挖矿程序、浏览器劫持程序、恶意重定向、广告软件等的侵害。通常情况下，您只需忽略弹出窗口、警惕您点击的内容，如果浏览器警告您网站可能是恶意的，则不要继续访问该网站，这样就可以保持安全。浏览器恶意软件的常见迹象包括：默认搜索引擎或主页已被修改、工具栏、陌生的扩展程序或图标、广告明显增多、错误和页面加载速度比平时慢得多。Heimdal 的这些文章解释了[浏览器恶意软件的迹象](https://heimdalsecurity.com/blog/warning-signs-operating-system-infected-malware)，[浏览器如何被感染](https://heimdalsecurity.com/blog/practical-online-protection-where-malware-hides)以及[如何删除浏览器恶意软件](https://heimdalsecurity.com/blog/malware-removal)。",
+                "slug": "web-browsing-watch-out-for-browser-malware"
+            },
+            {
+                "point": "屏蔽广告",
+                "priority": "Essential",
+                "details": "使用广告拦截器可以通过阻止广告实施的跟踪器来帮助提高您的隐私性。[uBlock Origin](https://awesome-privacy.xyz/networking/ad-blockers/ublock-origin) 是由 Raymond Hill 开发的一个非常高效的开源浏览器插件。当第三方广告显示在网页上时，它们有能力跟踪您，收集有关您和您的习惯的个人信息，然后可以将其出售或用于向您展示更有针对性的广告，并且某些广告纯粹是恶意的或虚假的。屏蔽广告还可以使页面加载更快，使用更少的数据并提供更整洁的体验。",
+                "slug": "web-browsing-block-ads"
+            },
+            {
+                "point": "使用尊重隐私的浏览器",
+                "priority": "Essential",
+                "details": "[Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox)（进行一些调整）和 [Brave](https://awesome-privacy.xyz/essentials/browsers/brave-browser) 是安全、尊重隐私的浏览器。两者都是快速、开源、用户友好且可在所有主要操作系统上使用的。您的浏览器可以访问您在网上执行的所有操作，因此如果可能，请避免使用 Google Chrome、Edge 和 Safari，因为（如果没有正确的配置）所有这三个浏览器都会收集使用数据、回传信息并允许侵入式跟踪。Firefox 需要进行一些更改才能实现最佳安全性，例如 - [arkenfox](https://github.com/arkenfox/user.js/wiki) 或 [12byte](https://12bytes.org/firefox-configuration-guide-for-privacy-freaks-and-performance-buffs/) 的 user.js 配置。查看更多：[隐私浏览器](https://github.com/Lissy93/awesome-privacy#browsers)。",
+                "slug": "web-browsing-use-a-privacy-respecting-browser"
+            },
+            {
+                "point": "使用私密搜索引擎",
+                "priority": "Essential",
+                "details": "使用保护隐私、非跟踪的搜索引擎，将降低您的搜索词被记录或被用来对付您的风险。考虑使用 [DuckDuckGo](https://awesome-privacy.xyz/essentials/search-engines/duckduckgo) 或 [Qwant](https://awesome-privacy.xyz/essentials/search-engines/qwant)。Google 实施了一些[极其侵入性的](https://hackernoon.com/data-privacy-concerns-with-google-b946f2b7afea)跟踪政策，并且有显示[有偏见的搜索结果](https://www.businessinsider.com/evidence-that-google-search-results-are-biased-2014-10)的历史。因此，Google 以及 Bing、百度、Yahoo 和 Yandex 与任何希望保护其隐私的人都不兼容。建议将您的[浏览器默认搜索](https://duckduckgo.com/install)更新为尊重隐私的搜索引擎。",
+                "slug": "web-browsing-use-a-private-search-engine"
+            },
+            {
+                "point": "删除不必要的浏览器插件",
+                "priority": "Essential",
+                "details": "扩展程序能够查看、记录或修改您在浏览器中执行的任何操作，并且某些看似无害的浏览器应用程序具有恶意意图。网站可以看到您安装了哪些扩展程序，并可能使用它来增强您的指纹，以更准确地识别/跟踪您。在安装之前，[Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox) 和 Chrome 网上应用店都允许您查看扩展程序需要哪些权限/访问权限。查看评论。仅安装您真正需要的扩展程序，并删除您已有一段时间未使用的扩展程序。",
+                "slug": "web-browsing-remove-unnecessary-browser-addons"
+            },
+            {
+                "point": "保持浏览器最新",
+                "priority": "Essential",
+                "details": "浏览器漏洞不断被[发现](https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword=browser)和修补，因此保持最新状态以避免零日漏洞利用非常重要。您可以在[此处查看您正在使用的浏览器版本](https://www.whatismybrowser.com/)，或按照[本指南](https://www.whatismybrowser.com/guides/how-to-update-your-browser/)获取有关如何更新的说明。某些浏览器会自动更新到最新的稳定版本。",
+                "slug": "web-browsing-keep-browser-up-to-date"
+            },
+            {
+                "point": "检查 HTTPS",
+                "priority": "Essential",
+                "details": "如果您在非 HTTPS 网站上输入信息，则这些数据将以未加密的形式传输，因此可以被任何拦截它的人读取。不要在非 HTTPS 网站上输入任何数据，但也不要让绿色挂锁给您带来虚假的安全感，仅仅因为网站具有 SSL 证书并不意味着它是合法或值得信赖的。[HTTPS-Everywhere](https://www.eff.org/https-everywhere)（由 [EFF](https://www.eff.org/) 开发）曾经是一个浏览器扩展程序/插件，可在网站上自动启用 HTTPS，但截至 2022 年，它已被弃用。在他们的[声明文章](https://www.eff.org/)中，EFF 解释说，大多数浏览器现在都集成了此类保护。此外，它还提供了有关如何启用其 HTTPS 安全保护的 [Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox)、Chrome、Edge 和 Safari 浏览器的说明。",
+                "slug": "web-browsing-check-for-https"
+            },
+            {
+                "point": "使用 DNS-over-HTTPS",
+                "priority": "Essential",
+                "details": "传统的 DNS 以明文形式发出请求，每个人都可以看到。它允许通过中间人攻击窃听和操纵 DNS 数据。而 DNS-over-HTTPS 通过 HTTPS 协议执行 DNS 解析，这意味着您和您的 DNS 解析器之间的数据是加密的。一个流行的选择是 [CloudFlare](https://awesome-privacy.xyz/networking/dns-providers/cloudflare) 的 [1.1.1.1](https://awesome-privacy.xyz/security-tools/mobile-apps/1.1.1.1)，或比较提供商 - 在浏览器中启用很简单。请注意，DoH 也有其自身的问题，主要是阻止网络过滤。",
+                "slug": "web-browsing-use-dns-over-https"
+            },
+            {
+                "point": "多会话容器",
+                "priority": "Essential",
+                "details": "隔离对于保持浏览的不同方面分开非常重要。例如，对工作、常规浏览、社交媒体、在线购物等使用不同的配置文件将减少数据代理可以链接回您的关联数量。一种选择是使用专为此目的设计的 [Firefox 容器](https://awesome-privacy.xyz/security-tools/browser-extensions/firefox-multi-account-containers)。或者，您可以对不同的任务使用不同的浏览器（[Brave](https://awesome-privacy.xyz/essentials/browsers/brave-browser)、[Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox)、[Tor](https://awesome-privacy.xyz/networking/mix-networks/tor) 等）。",
+                "slug": "web-browsing-multi-session-containers"
+            },
+            {
+                "point": "使用隐身模式",
+                "priority": "Essential",
+                "details": "使用他人的机器时，请确保您处于隐私/隐身会话中。这将防止保存浏览器历史记录、Cookie 和某些数据，但这并非万无一失 - 您仍然可以被跟踪。",
+                "slug": "web-browsing-use-incognito"
+            },
+            {
+                "point": "了解您的浏览器指纹",
+                "priority": "Essential",
+                "details": "浏览器指纹是一种非常准确的跟踪方法，网站会根据您的设备信息识别您的身份。您可以在 amiunique.org 上查看您的指纹 - 目的是尽可能地不唯一。",
+                "slug": "web-browsing-understand-your-browser-fingerprint"
+            },
+            {
+                "point": "管理 Cookie",
+                "priority": "Essential",
+                "details": "定期清除 Cookie 是您可以采取的一项措施，可以帮助减少网站跟踪您。Cookie 还可能存储您的会话令牌，如果该令牌被捕获，将允许某人无需凭据即可访问您的帐户。为了减轻这种情况，您应该经常清除 Cookie。",
+                "slug": "web-browsing-manage-cookies"
+            },
+            {
+                "point": "阻止第三方 Cookie",
+                "priority": "Essential",
+                "details": "第三方 Cookie 是由您正在访问的网站以外的网站放置在您的设备上的。这会带来隐私风险，因为第三方实体可以从您当前的会话中收集数据。本指南介绍了如何禁用第三方 Cookie，您可以在此处查看以确保其有效。",
+                "slug": "web-browsing-block-third-party-cookies"
+            },
+            {
+                "point": "阻止第三方跟踪器",
+                "priority": "Essential",
+                "details": "阻止跟踪器将有助于阻止网站、广告商、分析等在后台跟踪您。[Privacy Badger](https://awesome-privacy.xyz/security-tools/browser-extensions/privacy-badger)、[DuckDuckGo Privacy Essentials](https://awesome-privacy.xyz/security-tools/browser-extensions/privacy-essentials)、[uBlock Origin](https://awesome-privacy.xyz/networking/ad-blockers/ublock-origin) 和 uMatrix（Advanced）都是非常有效的开源跟踪器拦截器，可用于所有主流浏览器。",
+                "slug": "web-browsing-block-third-party-trackers"
+            },
+            {
+                "point": "注意重定向",
+                "priority": "Optional",
+                "details": "虽然某些重定向是无害的，但其他重定向（例如未经验证的重定向）被用于网络钓鱼攻击，它可以使恶意链接看起来合法。如果您不确定重定向 URL，您可以使用 RedirectDetective 等工具检查它转发到的位置。",
+                "slug": "web-browsing-beware-of-redirects"
+            },
+            {
+                "point": "不要登录您的浏览器",
+                "priority": "Optional",
+                "details": "许多浏览器允许您登录，以便在设备之间同步历史记录、书签和其他浏览数据。然而，这不仅允许进一步的数据收集，而且还通过提供另一种途径让恶意行为者获取个人信息来增加攻击面。",
+                "slug": "web-browsing-do-not-sign-into-your-browser"
+            },
+            {
+                "point": "禁止预测服务",
+                "priority": "Optional",
+                "details": "某些浏览器允许预测服务，您可以在其中接收实时搜索结果或 URL 自动填充。如果启用了此功能，则每次按键时都会将数据发送到 Google（或您的默认搜索引擎），而不是在您按 Enter 键时。",
+                "slug": "web-browsing-disallow-prediction-services"
+            },
+            {
+                "point": "避免使用谷歌网页翻译",
+                "priority": "Optional",
+                "details": "当您访问以外语编写的网页时，系统可能会提示您安装谷歌翻译扩展程序。请注意，谷歌会收集所有数据（包括输入字段）以及当前用户的详细信息。而是使用与您的浏览器无关的翻译服务。",
+                "slug": "web-browsing-avoid-g-translate-for-webpages"
+            },
+            {
+                "point": "禁用网页通知",
+                "priority": "Optional",
+                "details": "浏览器推送通知是犯罪分子鼓励您点击其链接的常用方法，因为欺骗来源很容易。请注意这一点，有关禁用浏览器通知的说明，请参阅这篇文章。",
+                "slug": "web-browsing-disable-web-notifications"
+            },
+            {
+                "point": "禁用自动下载",
+                "priority": "Optional",
+                "details": "路过式下载是将有害文件放到用户设备上的常用方法。可以通过禁用自动文件下载来缓解这种情况，并警惕提示您意外下载文件的网站。",
+                "slug": "web-browsing-disable-automatic-downloads"
+            },
+            {
+                "point": "禁止访问传感器",
+                "priority": "Optional",
+                "details": "移动网站可以在不询问的情况下利用您的设备传感器。如果您曾经向浏览器授予这些权限，则所有网站都能够使用这些功能，而无需许可或通知。",
+                "slug": "web-browsing-disallow-access-to-sensors"
+            },
+            {
+                "point": "禁止定位",
+                "priority": "Optional",
+                "details": "定位服务允许网站请求您的物理位置以改善您的体验。这应该在设置中禁用。请注意，还有其他方法可以确定您的大致位置。",
+                "slug": "web-browsing-disallow-location"
+            },
+            {
+                "point": "禁止访问摄像头/麦克风",
+                "priority": "Optional",
+                "details": "检查浏览器设置以确保没有网站被授予访问网络摄像头或麦克风的权限。使用物理保护措施（例如网络摄像头盖和麦克风阻断器）也可能是有益的。",
+                "slug": "web-browsing-disallow-camera-microphone-access"
+            },
+            {
+                "point": "禁用浏览器密码保存",
+                "priority": "Optional",
+                "details": "不要允许您的浏览器存储用户名和密码。这些可以很容易地被查看或访问。而是使用密码管理器。",
+                "slug": "web-browsing-disable-browser-password-saves"
+            },
+            {
+                "point": "禁用浏览器自动填充",
+                "priority": "Optional",
+                "details": "对任何机密或个人详细信息关闭自动填充功能。如果您的浏览器以任何方式受到损害，此功能可能有害。相反，请考虑使用密码管理器的“备注”功能。",
+                "slug": "web-browsing-disable-browser-autofill"
+            },
+            {
+                "point": "防止数据外泄攻击",
+                "priority": "Optional",
+                "details": "CSS Exfiltrate 攻击是一种仅使用纯 CSS 就可以获取凭据和其他敏感详细信息的方法。您可以使用 [CSS Exfil Protection](https://awesome-privacy.xyz/security-tools/browser-extensions/css-exfil-protection) 插件保持安全。",
+                "slug": "web-browsing-protect-from-exfil-attack"
+            },
+            {
+                "point": "停用 ActiveX",
+                "priority": "Optional",
+                "details": "ActiveX 是一个内置于 Microsoft IE 并默认启用的浏览器扩展 API。它现在不常用，但由于它赋予插件密切的访问权限，并且可能很危险，因此您应该禁用它。",
+                "slug": "web-browsing-deactivate-activex"
+            },
+            {
+                "point": "禁用 WebRTC",
+                "priority": "Optional",
+                "details": "WebRTC 允许直接从浏览器进行高质量的音频/视频通信和点对点文件共享。但是它可能会造成隐私泄露。要了解更多信息，请查看本指南。",
+                "slug": "web-browsing-disable-webrtc"
+            },
+            {
+                "point": "欺骗 HTML5 Canvas 签名",
+                "priority": "Optional",
+                "details": "Canvas 指纹识别允许网站非常准确地识别和跟踪用户。您可以使用 Canvas-Fingerprint-Blocker 扩展程序来欺骗您的指纹或使用 [Tor](https://awesome-privacy.xyz/networking/mix-networks/tor)。",
+                "slug": "web-browsing-spoof-html5-canvas-sig"
+            },
+            {
+                "point": "欺骗用户代理",
+                "priority": "Optional",
+                "details": "用户代理告诉网站您正在使用的设备、浏览器和版本。定期切换用户代理是您可以采取的一小步，以变得不那么独特。",
+                "slug": "web-browsing-spoof-user-agent"
+            },
+            {
+                "point": "忽略 DNT",
+                "priority": "Optional",
+                "details": "启用“请勿跟踪”的影响非常有限，因为许多网站不尊重或遵循此功能。由于它很少被使用，它也可能会添加到您的签名中，使您更加独特。",
+                "slug": "web-browsing-disregard-dnt"
+            },
+            {
+                "point": "防止 HSTS 跟踪",
+                "priority": "Optional",
+                "details": "HSTS 旨在帮助保护网站安全，但由于它允许站点运营商植入超级 Cookie，因此引发了隐私问题。可以通过在基于 Chromium 的浏览器中访问 chrome://net-internals/#hsts 来禁用它。",
+                "slug": "web-browsing-prevent-hsts-tracking"
+            },
+            {
+                "point": "防止自动浏览器连接",
+                "priority": "Optional",
+                "details": "即使您不使用浏览器，它也可能会回传信息以报告使用活动、分析和诊断。您可能希望禁用其中的一些功能，这可以通过设置来完成。",
+                "slug": "web-browsing-prevent-automatic-browser-connections"
+            },
+            {
+                "point": "启用第一方隔离",
+                "priority": "Optional",
+                "details": "[第一方隔离](https://awesome-privacy.xyz/security-tools/browser-extensions/first-party-isolation)意味着所有标识符源和浏览器状态都使用 URL 栏域名进行限定，这可以大大减少跟踪。",
+                "slug": "web-browsing-enable-1st-party-isolation"
+            },
+            {
+                "point": "从 URL 中剥离跟踪参数",
+                "priority": "Advanced",
+                "details": "网站通常会将额外的 GET 参数附加到您单击的 URL 上，以识别来源/引荐来源等信息。您可以手动清理，或使用 [ClearURLs](https://awesome-privacy.xyz/security-tools/browser-extensions/clearurls) 等扩展程序自动从 URL 中剥离跟踪数据。",
+                "slug": "web-browsing-strip-tracking-params-from-urls"
+            },
+            {
+                "point": "首次启动安全性",
+                "priority": "Advanced",
+                "details": "安装 Web 浏览器后，在您第一次启动它（在配置其隐私设置之前）时，大多数浏览器都会回传信息。因此，在安装浏览器后，您应该首先禁用您的互联网连接，然后在重新启用您的互联网连接之前配置隐私选项。",
+                "slug": "web-browsing-first-launch-security"
+            },
+            {
+                "point": "使用 Tor 浏览器",
+                "priority": "Advanced",
+                "details": "[Tor](https://awesome-privacy.xyz/networking/mix-networks/tor) 项目提供了一个浏览器，该浏览器通过多个节点加密和路由您的流量，从而保护用户免受拦截和跟踪。主要缺点是速度和用户体验。",
+                "slug": "web-browsing-use-the-tor-browser"
+            },
+            {
+                "point": "禁用 JavaScript",
+                "priority": "Advanced",
+                "details": "许多现代 Web 应用程序都是基于 JavaScript 的，因此禁用它会大大降低您的浏览体验。但是，如果您真的想全力以赴，那么它确实会减少您的攻击面。",
+                "slug": "web-browsing-disable-javascript"
+            }
+        ]
+    },
+    {
+        "title": "电子邮件",
+        "slug": "email",
+        "description": "保护您在线帐户的入口",
+        "icon": "bi-envelope-fill",
+        "intro": "自从第一封电子邮件发送至今已近 50 年，它仍然是我们日常生活中非常重要的一部分，并且在不久的将来仍将如此。因此，考虑到我们对电子邮件的信任程度，这种基础设施从根本上来说是不安全的，这令人惊讶。电子邮件相关的欺诈行为[正在上升](https://www.csoonline.com/article/3247670/email/email-security-in-2018.html)，如果不采取基本措施，您可能会面临风险。\n\n如果黑客获得了访问您电子邮件的权限，则为您的其他帐户（通过密码重置）受到威胁提供了一个入口，因此电子邮件安全对于您的数字安全至关重要。\n\n提供“免费”电子邮件服务的大公司在尊重用户隐私方面没有良好的声誉：Gmail 被发现给予[第三方完全访问](https://www.wsj.com/articles/techs-dirty-secret-the-app-developers-sifting-through-your-gmail-1530544442)用户电子邮件的权限，并且还[跟踪您的所有购买行为](https://www.cnbc.com/2019/05/17/google-gmail-tracks-purchase-history-how-to-delete-it.html)。雅虎还被发现实时扫描电子邮件[以供美国监视机构使用](http://news.trust.org/item/20161004170601-99f8c) 广告商[被授予访问权限](https://thenextweb.com/insider/2018/08/29/both-yahoo-and-aol-are-scanning-customer-emails-to-attract-advertisers)雅虎和 AOL 用户邮件，以“通过获取上下文购买信号和过去的购买来识别和细分潜在客户”。",
+        "checklist": [
+            {
+                "point": "拥有多个电子邮件地址",
+                "priority": "Essential",
+                "details": "考虑将不同的电子邮件地址用于安全关键通信和诸如新闻通讯之类的普通邮件。这种隔离可以减少数据泄露造成的损害，还可以更容易地恢复被盗帐户。",
+                "slug": "email-have-more-than-one-email-address"
+            },
+            {
+                "point": "保持电子邮件地址私密",
+                "priority": "Essential",
+                "details": "不要公开分享您的主要电子邮件地址，因为邮件地址通常是大多数网络钓鱼攻击的起点。",
+                "slug": "email-keep-email-address-private"
+            },
+            {
+                "point": "确保您的帐户安全",
+                "priority": "Essential",
+                "details": "使用一个长而独特的密码，启用双因素认证并在登录时小心谨慎。您的电子邮件帐户为攻击者提供了一个进入您所有其他在线帐户的简单入口。",
+                "slug": "email-keep-your-account-secure"
+            },
+            {
+                "point": "禁用远程内容的自动加载",
+                "priority": "Essential",
+                "details": "电子邮件可以包含远程内容，例如图像或样式表，通常是从服务器自动加载的。您应该禁用此功能，因为它会暴露您的 IP 地址和设备信息，并且通常用于跟踪。有关更多信息，请参阅[这篇文章](https://www.theverge.com/2019/7/3/20680903/email-pixel-trackers-how-to-stop-images-automatic-download)。",
+                "slug": "email-disable-automatic-loading-of-remote-content"
+            },
+            {
+                "point": "使用纯文本",
+                "priority": "Optional",
+                "details": "互联网上有两种主要类型的电子邮件：纯文本和 HTML。出于隐私和安全考虑，强烈建议使用前者，因为 HTML 邮件通常在链接和内嵌图像中包含标识符，这些标识符可以收集使用情况和个人数据。还存在许多针对您的邮件客户端的 HTML 解析器的远程代码执行风险，如果您使用纯文本，则无法利用这些风险。有关更多信息以及您的邮件提供商的设置说明，请参阅 [UsePlaintext.email](https://useplaintext.email/)。",
+                "slug": "email-use-plaintext"
+            },
+            {
+                "point": "不要将第三方应用程序连接到您的电子邮件帐户",
+                "priority": "Optional",
+                "details": "如果您授予第三方应用程序或插件对您的收件箱的完全访问权限，它们实际上可以不受限制地访问您的所有电子邮件及其内容，这将带来重大的安全和隐私风险。",
+                "slug": "email-dont-connect-third-party-apps-to-your-email-account"
+            },
+            {
+                "point": "不要通过电子邮件共享敏感数据",
+                "priority": "Optional",
+                "details": "电子邮件很容易被拦截。此外，您无法确定收件人的环境有多安全。因此，除非加密，否则电子邮件不能被认为是安全的，不能用于交换机密信息。",
+                "slug": "email-don-t-share-sensitive-data-via-email"
+            },
+            {
+                "point": "考虑切换到安全的邮件提供商",
+                "priority": "Optional",
+                "details": "安全且信誉良好的电子邮件提供商，例如 [Forward Email](https://awesome-privacy.xyz/communication/encrypted-email/forward-email)、[ProtonMail](https://awesome-privacy.xyz/communication/mail-forwarding/protonmail) 和 [Tutanota](https://awesome-privacy.xyz/communication/encrypted-email/tuta) 允许端到端加密、完全隐私以及更多以安全为中心的功能。与典型的电子邮件提供商不同，除了您之外，任何人都无法读取您的邮箱，因为所有邮件都是加密的。",
+                "slug": "email-consider-switching-to-a-secure-mail-provider"
+            },
+            {
+                "point": "子地址",
+                "priority": "Optional",
+                "details": "别名的一种替代方法是子地址，其中在邮件传递期间省略 `+` 符号之后的任何内容。这使您能够跟踪谁共享/泄露了您的电子邮件地址，但与别名不同，它无法防止您的真实地址被泄露。",
+                "slug": "email-subaddressing"
+            },
+            {
+                "point": "使用自定义域名",
+                "priority": "Advanced",
+                "details": "使用自定义域名意味着您不依赖于您的邮件提供商分配的地址。因此，您将来可以轻松切换提供商，并且无需担心服务被终止。",
+                "slug": "email-use-a-custom-domain"
+            },
+            {
+                "point": "与客户端同步以进行备份",
+                "priority": "Advanced",
+                "details": "为了避免在计划外事件（例如中断或帐户锁定）期间暂时或永久无法访问您的电子邮件，Thunderbird 可以通过 IMAP 同步/备份来自多个帐户的邮件并将其存储在您的主设备上。",
+                "slug": "email-sync-with-a-client-for-backup"
+            },
+            {
+                "point": "小心邮件签名",
+                "priority": "Advanced",
+                "details": "您不知道您的邮件收件人的电子邮件环境有多安全。有几个扩展程序会自动抓取邮件，并根据电子邮件签名创建详细的联系信息数据库。",
+                "slug": "email-be-careful-with-mail-signatures"
+            },
+            {
+                "point": "小心自动回复",
+                "priority": "Advanced",
+                "details": "外出自动回复对于通知人们回复会有延迟非常有用，但人们经常透露太多信息 - 这些信息可用于社会工程和有针对性的攻击。",
+                "slug": "email-be-careful-with-auto-replies"
+            },
+            {
+                "point": "选择正确的邮件协议",
+                "priority": "Advanced",
+                "details": "不要使用过时的协议（低于 IMAPv4 或 POPv3），两者都有已知的漏洞和过时的安全性。",
+                "slug": "email-choose-the-right-mail-protocol"
+            },
+            {
+                "point": "自托管",
+                "priority": "Advanced",
+                "details": "不建议非Advanced用户自行托管邮件服务器，因为正确保护它至关重要，但需要强大的网络知识。",
+                "slug": "email-self-hosting"
+            },
+            {
+                "point": "始终使用 TLS 端口",
+                "priority": "Advanced",
+                "details": "POP3、IMAP 和 SMTP 的 SSL 选项作为标准 TCP/IP 端口。它们易于使用且得到广泛支持，因此应始终使用它们而不是纯文本电子邮件端口。",
+                "slug": "email-always-use-tls-ports"
+            },
+            {
+                "point": "DNS 可用性",
+                "priority": "Advanced",
+                "details": "对于自托管邮件服务器，为了防止 DNS 问题影响可用性 - 使用至少 2 个 MX 记录，并在主 MX 记录失败时使用辅助和第三个 MX 记录进行冗余。",
+                "slug": "email-dns-availability"
+            },
+            {
+                "point": "防止 DDoS 和暴力破解攻击",
+                "priority": "Advanced",
+                "details": "对于自托管邮件服务器（特别是 SMTP），限制您的同时连接总数和最大连接速率，以减少尝试的机器人攻击的影响。",
+                "slug": "email-prevent-ddos-and-brute-force-attacks"
+            },
+            {
+                "point": "使用智能密钥",
+                "priority": "Advanced",
+                "details": "OpenPGP 不支持前向保密，这意味着如果您或收件人的私钥被盗，则以前使用该私钥加密的所有邮件都将被泄露。因此，您应该非常小心地保护您的私钥。一种方法是使用 USB 智能密钥对邮件进行签名或解密，这样您就可以在私钥不离开 USB 设备的情况下执行此操作。",
+                "slug": "email-use-smart-key"
+            },
+            {
+                "point": "使用别名/匿名转发",
+                "priority": "Advanced",
+                "details": "电子邮件别名允许将邮件发送到 [anything]@my-domain.com 并且仍然进入您的主收件箱。实际上允许您为您注册的每个服务使用不同的唯一电子邮件地址。这意味着如果您开始收到垃圾邮件，您可以阻止该别名并确定哪个公司泄露了您的电子邮件地址。",
+                "slug": "email-use-aliasing--anonymous-forwarding"
+            },
+            {
+                "point": "维护 IP 黑名单",
+                "priority": "Advanced",
+                "details": "对于自托管邮件服务器，您可以通过维护最新的本地 IP 黑名单和垃圾邮件 URI 实时阻止列表来过滤掉恶意超链接，从而改进垃圾邮件过滤器并加强安全性。",
+                "slug": "email-maintain-ip-blacklist"
+            }
+        ]
+    },
+    {
+        "title": "即时通讯",
+        "slug": "messaging",
+        "description": "确保您的通信私密和安全",
+        "icon": "bi-chat-dots-fill",
+        "intro": "",
+        "checklist": [
+            {
+                "point": "仅使用完全端到端加密的消息传递工具",
+                "priority": "Essential",
+                "details": "端到端加密是一种通信系统，消息在您的设备上加密，直到到达预期接收者才解密。这确保了任何拦截流量的行为者都无法读取消息内容，也无法访问存储数据的中央服务器的任何人读取消息内容。",
+                "slug": "messaging-only-use-fully-end-to-end-encrypted-messengers"
+            },
+            {
+                "point": "仅使用开源消息传递平台",
+                "priority": "Essential",
+                "details": "如果代码是开源的，那么任何有资格的人都可以独立检查和审核代码，以确保没有后门、漏洞或其他安全问题。",
+                "slug": "messaging-use-only-open-source-messaging-platforms"
+            },
+            {
+                "point": "使用“值得信赖”的消息传递平台",
+                "priority": "Essential",
+                "details": "在选择加密消息应用程序时，请确保它是完全开源的、稳定的、积极维护的，并且最好由信誉良好的开发人员支持。",
+                "slug": "messaging-use-a--trustworthy--messaging-platform"
+            },
+            {
+                "point": "检查安全设置",
+                "priority": "Essential",
+                "details": "启用安全设置，包括联系人验证、安全通知和加密。禁用可选的非安全功能，例如已读回执、上次在线时间和正在输入通知。",
+                "slug": "messaging-check-security-settings"
+            },
+            {
+                "point": "确保您的收件人环境安全",
+                "priority": "Essential",
+                "details": "您的对话的安全性只能与最薄弱的环节一样安全。通常，渗透通信渠道的最简单方法是针对保护最少的个人或节点。",
+                "slug": "messaging-ensure-your-recipients-environment-is-secure"
+            },
+            {
+                "point": "禁用云服务",
+                "priority": "Essential",
+                "details": "一些移动消息应用程序提供网络或桌面配套。这不仅增加了攻击面，而且还与几个关键的安全问题有关，因此应尽可能避免。",
+                "slug": "messaging-disable-cloud-services"
+            },
+            {
+                "point": "安全群聊",
+                "priority": "Essential",
+                "details": "随着群组中参与者的增加，攻击面也会增加，被入侵的风险呈指数级增长。定期检查所有参与者是否合法。",
+                "slug": "messaging-secure-group-chats"
+            },
+            {
+                "point": "为通信创造安全的环境",
+                "priority": "Essential",
+                "details": "您的数字通信可能会在多个阶段被监控或拦截。这包括：您或您参与者的设备、您的 ISP、国家网关或政府日志记录、消息传递提供商、服务器。",
+                "slug": "messaging-create-a-safe-environment-for-communication"
+            },
+            {
+                "point": "商定沟通计划",
+                "priority": "Optional",
+                "details": "在某些情况下，制定沟通计划可能是值得的。这应该包括安全地相互联系的主要和备用方法。",
+                "slug": "messaging-agree-on-a-communication-plan"
+            },
+            {
+                "point": "从媒体中剥离元数据",
+                "priority": "Optional",
+                "details": "元数据是“关于数据的数据”或附加到文件或事务的其他信息。当您发送照片、录音、视频或文档时，您可能会泄露比您预期更多的信息。",
+                "slug": "messaging-strip-meta-data-from-media"
+            },
+            {
+                "point": "去除 URL 的危险性",
+                "priority": "Optional",
+                "details": "通过各种服务发送链接可能会无意中暴露您的个人信息。这是因为，当生成缩略图或预览时，它发生在客户端。",
+                "slug": "messaging-defang-urls"
+            },
+            {
+                "point": "验证您的收件人",
+                "priority": "Optional",
+                "details": "始终确保您正在与预期的收件人交谈，并且他们没有受到损害。一种方法是使用支持联系人验证的应用程序。",
+                "slug": "messaging-verify-your-recipient"
+            },
+            {
+                "point": "启用临时消息",
+                "priority": "Optional",
+                "details": "自毁消息是一项功能，可让您的消息在设定的时间后自动删除。这意味着如果您的设备丢失、被盗或被没收，对手将只能访问最近的通信。",
+                "slug": "messaging-enable-ephemeral-messages"
+            },
+            {
+                "point": "避免短信",
+                "priority": "Optional",
+                "details": "短信可能很方便，但它不安全。它容易受到拦截、SIM 卡交换、操纵和恶意软件等威胁。",
+                "slug": "messaging-avoid-sms"
+            },
+            {
+                "point": "注意跟踪器",
+                "priority": "Optional",
+                "details": "警惕带有跟踪器的消息传递应用程序，因为它们收集的详细使用统计数据通常非常具有侵入性，有时会泄露您的身份以及您原本不打算共享的个人信息。",
+                "slug": "messaging-watch-out-for-trackers"
+            },
+            {
+                "point": "考虑管辖权",
+                "priority": "Advanced",
+                "details": "还应考虑组织所在地和数据托管地的管辖权。",
+                "slug": "messaging-consider-jurisdiction"
+            },
+            {
+                "point": "使用匿名平台",
+                "priority": "Advanced",
+                "details": "如果您认为自己可能成为目标，则应选择一个不需要电话号码或任何其他个人身份信息即可注册或使用的匿名消息传递平台。",
+                "slug": "messaging-use-an-anonymous-platform"
+            },
+            {
+                "point": "确保支持前向保密",
+                "priority": "Advanced",
+                "details": "选择一个实现前向保密的平台。这是您的应用程序为每条消息生成新加密密钥的地方。",
+                "slug": "messaging-ensure-forward-secrecy-is-supported"
+            },
+            {
+                "point": "考虑去中心化平台",
+                "priority": "Advanced",
+                "details": "如果所有数据都通过中央提供商流动，您必须信任他们处理您的数据和元数据。您无法验证正在运行的系统是否没有后门。",
+                "slug": "messaging-consider-a-decentralized-platform"
+            }
+        ]
+    },
+    {
+        "title": "社交媒体",
+        "slug": "social-media",
+        "description": "最小化使用在线社区的风险",
+        "icon": "bi-people-fill",
+        "intro": "自互联网发明以来，在线社区就已存在，它为世界各地的人们提供了联系、交流和分享的机会。虽然这些网络是促进社交互动和将人们聚集在一起的好方法，但它们也有黑暗的一面 - 存在一些严重的[社交网络服务隐私问题](https://en.wikipedia.org/wiki/Privacy_concerns_with_social_networking_services)，而且这些社交网站归私营公司所有，它们通过收集个人数据并将这些数据出售（通常是出售给第三方广告商）来赚钱。\n保护您的帐户，锁定您的隐私设置，但要知道，即使这样做之后，所有有意和无意上传的数据实际上都是公开的。如果可能，请避免使用传统的社交媒体网络。\n",
+        "checklist": [
+            {
+                "point": "保护您的帐户",
+                "priority": "Essential",
+                "details": "社交媒体个人资料经常被盗或被接管。为了保护您的帐户：请使用唯一且强度高的密码，并启用双重身份验证。",
+                "slug": "social-media-secure-your-account"
+            },
+            {
+                "point": "检查隐私设置",
+                "priority": "Essential",
+                "details": "大多数社交网络都允许您控制您的隐私设置。确保您对当前公开的数据以及向谁公开感到满意。",
+                "slug": "social-media-check-privacy-settings"
+            },
+            {
+                "point": "将所有互动视为公开",
+                "priority": "Essential",
+                "details": "在许多社交网络中，仍然有多种方法可以查看用户的“私人”内容。因此，在上传、发布或评论任何内容之前，请考虑“如果这是完全公开的，我会介意吗？”",
+                "slug": "social-media-think-of-all-interactions-as-public"
+            },
+            {
+                "point": "将所有互动视为永久性的",
+                "priority": "Essential",
+                "details": "几乎每个帖子、评论、照片等都不断地被无数第三方服务备份，这些服务存档这些数据并使其可索引且几乎永久公开。",
+                "slug": "social-media-think-of-all-interactions-as-permanent"
+            },
+            {
+                "point": "不要透露太多",
+                "priority": "Essential",
+                "details": "个人资料信息为黑客创造了一个信息金矿，这种数据可以帮助他们个性化网络钓鱼诈骗。避免分享太多细节（出生日期、家乡、学校等）。",
+                "slug": "social-media-don-t-reveal-too-much"
+            },
+            {
+                "point": "小心您上传的内容",
+                "priority": "Essential",
+                "details": "状态更新、评论、签到和媒体可能会无意中泄露比您预期更多的信息。这与照片和视频尤其相关，因为它们可能会显示背景中的内容。",
+                "slug": "social-media-be-careful-what-you-upload"
+            },
+            {
+                "point": "不要分享电子邮件或电话号码",
+                "priority": "Essential",
+                "details": "发布您的真实电子邮件地址或手机号码，会让黑客、网络喷子和垃圾邮件发送者有更多弹药来对付您，还可能允许将单独的别名、个人资料或数据点连接起来。",
+                "slug": "social-media-don-t-share-email-or-phone-number"
+            },
+            {
+                "point": "不要授予不必要的权限",
+                "priority": "Essential",
+                "details": "默认情况下，许多流行的社交网络应用程序会请求访问您的联系人、通话记录、位置、消息历史记录等的权限。如果它们不需要此访问权限，请不要授予它。",
+                "slug": "social-media-don-t-grant-unnecessary-permissions"
+            },
+            {
+                "point": "小心第三方集成",
+                "priority": "Essential",
+                "details": "避免使用社交网络登录来注册帐户，撤销对您不再使用的社交应用的访问权限。",
+                "slug": "social-media-be-careful-of-3rd-party-integrations"
+            },
+            {
+                "point": "避免在现场发布地理数据",
+                "priority": "Essential",
+                "details": "如果您计划共享任何显示位置的内容，请等到您离开该位置后再分享。当您在旅行、在餐厅、校园、酒店/度假村、公共建筑或机场时，这一点尤其重要。",
+                "slug": "social-media-avoid-publishing-geo-data-while-still-onsite"
+            },
+            {
+                "point": "上传媒体前删除元数据",
+                "priority": "Optional",
+                "details": "大多数智能手机和某些相机会自动将一组全面的附加数据（称为 EXIF 数据）附加到每张照片上。上传前删除此数据。",
+                "slug": "social-media-remove-metadata-before-uploading-media"
+            },
+            {
+                "point": "实施图像隐藏",
+                "priority": "Advanced",
+                "details": "像 Fawkes 这样的工具可以非常巧妙地、轻微地改变照片中面部的结构，这种方式是人类无法察觉的，但会阻止面部识别系统识别给定的面部。",
+                "slug": "social-media-implement-image-cloaking"
+            },
+            {
+                "point": "考虑在家庭附近欺骗 GPS",
+                "priority": "Advanced",
+                "details": "即使您自己从不使用社交媒体，总会有其他人不如您谨慎，并且可能会泄露您的位置。",
+                "slug": "social-media-consider-spoofing-gps-in-home-vicinity"
+            },
+            {
+                "point": "考虑虚假信息",
+                "priority": "Advanced",
+                "details": "如果您只想阅读，并且不打算发布太多内容 - 请考虑使用别名和虚假的联系方式。",
+                "slug": "social-media-consider-false-information"
+            },
+            {
+                "point": "没有任何社交媒体帐户",
+                "priority": "Advanced",
+                "details": "社交媒体从根本上来说是不私密的，因此为了最大程度地保护在线安全和隐私，请避免使用任何主流社交网络。",
+                "slug": "social-media-dont-have-any-social-media-accounts"
+            }
+        ]
+    },
+    {
+        "title": "网络设备",
+        "slug": "networks",
+        "description": "保护您的网络流量",
+        "icon": "bi-shield-shaded",
+        "intro": "本节介绍如何将您的设备安全地连接到互联网，包括配置您的路由器和设置 VPN。\n",
+        "checklist": [
+            {
+                "point": "使用 VPN",
+                "priority": "Essential",
+                "details": "使用信誉良好的付费 VPN。这可以帮助保护您访问的网站免受记录您的真实 IP 的侵害，减少您的 ISP 可以收集的数据量，并增强公共 WiFi 的保护。",
+                "slug": "networks-use-a-vpn"
+            },
+            {
+                "point": "更改您的路由器密码",
+                "priority": "Essential",
+                "details": "获得新路由器后，请更改密码。默认的路由器密码是公开的，这意味着附近的任何人都可以连接。",
+                "slug": "networks-change-your-router-password"
+            },
+            {
+                "point": "使用 WPA2 和强密码",
+                "priority": "Essential",
+                "details": "有不同的身份验证协议用于连接 WiFi。目前，最安全的选项是 WPA2 和 WPA3（在较新的路由器上）。",
+                "slug": "networks-use-wpa2-and-a-strong-password"
+            },
+            {
+                "point": "保持路由器固件最新",
+                "priority": "Essential",
+                "details": "制造商发布固件更新来修复安全漏洞、实施新标准，有时还会添加功能或提高路由器的性能。",
+                "slug": "networks-keep-router-firmware-up-to-date"
+            },
+            {
+                "point": "实施网络范围的 VPN",
+                "priority": "Optional",
+                "details": "如果您在路由器、防火墙或家庭服务器上配置 VPN，则所有设备的流量都将通过它进行加密和路由，而无需单独的 VPN 应用程序。",
+                "slug": "networks-implement-a-network-wide-vpn"
+            },
+            {
+                "point": "防止 DNS 泄漏",
+                "priority": "Optional",
+                "details": "使用 VPN 时，仅使用 VPN 提供商或安全服务的 DNS 服务器非常重要。",
+                "slug": "networks-protect-against-dns-leaks"
+            },
+            {
+                "point": "使用安全的 VPN 协议",
+                "priority": "Optional",
+                "details": "OpenVPN 和 WireGuard 是开源、轻量级且安全的隧道协议。避免使用 PPTP 或 SSTP。",
+                "slug": "networks-use-a-secure-vpn-protocol"
+            },
+            {
+                "point": "安全 DNS",
+                "priority": "Optional",
+                "details": "使用 DNS-over-HTTPS，它通过 HTTPS 协议执行 DNS 解析，从而加密您和 DNS 解析器之间的数据。",
+                "slug": "networks-secure-dns"
+            },
+            {
+                "point": "避免使用 ISP 提供的免费路由器",
+                "priority": "Optional",
+                "details": "通常，它们是在中国廉价批量生产的，具有不安全的专有固件，这些固件不会定期接收安全更新。",
+                "slug": "networks-avoid-the-free-router-from-your-isp"
+            },
+            {
+                "point": "白名单 MAC 地址",
+                "priority": "Optional",
+                "details": "您可以在路由器设置中将 MAC 地址列入白名单，从而禁止任何未知设备立即连接到您的网络，即使它们知道您的凭据。",
+                "slug": "networks-whitelist-mac-addresses"
+            },
+            {
+                "point": "更改路由器的本地 IP 地址",
+                "priority": "Optional",
+                "details": "Web 浏览器中的恶意脚本有可能利用跨站点脚本漏洞，访问已知易受攻击的路由器在其本地 IP 地址并篡改它们。",
+                "slug": "networks-change-the-routers-local-ip-address"
+            },
+            {
+                "point": "不要在 SSID 中泄露个人信息",
+                "priority": "Optional",
+                "details": "您应该更新您的网络名称，选择一个不会识别您的 SSID，不包括您的公寓号码/地址，并且不指定设备品牌/型号。",
+                "slug": "networks-don-t-reveal-personal-info-in-ssid"
+            },
+            {
+                "point": "选择退出路由器列表",
+                "priority": "Optional",
+                "details": "WiFi SSID 被扫描、记录，然后在各种网站上发布，这对某些人来说是一个严重的隐私问题。",
+                "slug": "networks-opt-out-router-listings"
+            },
+            {
+                "point": "隐藏您的 SSID",
+                "priority": "Optional",
+                "details": "您的路由器的服务集标识符只是网络名称。如果它不可见，它可能会受到较少的滥用。",
+                "slug": "networks-hide-your-ssid"
+            },
+            {
+                "point": "禁用 WPS",
+                "priority": "Optional",
+                "details": "Wi-Fi 保护设置提供了一种更简单的连接方法，无需输入冗长的 WiFi 密码，但 WPS 引入了一系列重大的安全问题。",
+                "slug": "networks-disable-wps"
+            },
+            {
+                "point": "禁用 UPnP",
+                "priority": "Optional",
+                "details": "通用即插即用允许应用程序在您的路由器上自动转发端口，但它有很长的严重安全问题历史。",
+                "slug": "networks-disable-upnp"
+            },
+            {
+                "point": "为访客使用访客网络",
+                "priority": "Optional",
+                "details": "不要授予访问者访问您的主 WiFi 网络的权限，因为这使他们能够与网络上的其他设备进行交互。",
+                "slug": "networks-use-a-guest-network-for-guests"
+            },
+            {
+                "point": "更改您的路由器的默认 IP",
+                "priority": "Optional",
+                "details": "修改路由器管理面板的默认 IP 地址将使针对本地 IP 地址的恶意脚本更加困难。",
+                "slug": "networks-change-your-router-s-default-ip"
+            },
+            {
+                "point": "终止路由器上未使用的进程和服务",
+                "priority": "Optional",
+                "details": "诸如 Telnet 和 SSH 之类的提供对设备的命令行访问的服务永远不应该暴露在互联网上，并且还应该在本地网络上禁用，除非它们确实需要。",
+                "slug": "networks-kill-unused-processes-and-services-on-your-router"
+            },
+            {
+                "point": "不要有打开的端口",
+                "priority": "Optional",
+                "details": "关闭路由器上不需要的任何打开的端口。打开的端口为黑客提供了一个简单的入口。",
+                "slug": "networks-don-t-have-open-ports"
+            },
+            {
+                "point": "禁用未使用的远程访问协议",
+                "priority": "Optional",
+                "details": "当启用 PING、Telnet、SSH、UPnP 和 HNAP 等协议时，它们允许从世界任何地方探测您的路由器。",
+                "slug": "networks-disable-unused-remote-access-protocols"
+            },
+            {
+                "point": "禁用基于云的管理",
+                "priority": "Optional",
+                "details": "您应该极其小心地对待路由器的管理面板，因为如果攻击者能够获得访问权限，则可能会造成相当大的损害。",
+                "slug": "networks-disable-cloud-based-management"
+            },
+            {
+                "point": "正确管理范围",
+                "priority": "Optional",
+                "details": "通常希望将路由器的范围推到最大，但如果您居住在较小的公寓中，当您的 WiFi 网络可以在街道对面被接收时，您的攻击面就会增加。",
+                "slug": "networks-manage-range-correctly"
+            },
+            {
+                "point": "通过 Tor 路由所有流量",
+                "priority": "Advanced",
+                "details": "VPN 有其弱点。为了提高安全性，请通过 [Tor](https://awesome-privacy.xyz/networking/mix-networks/tor) 网络路由您的所有互联网流量。",
+                "slug": "networks-route-all-traffic-through-tor"
+            },
+            {
+                "point": "在所有设备上禁用 WiFi",
+                "priority": "Advanced",
+                "details": "即使连接到安全的 WiFi 网络也会增加您的攻击面。禁用您的家庭 WiFi 并通过以太网连接每个设备。",
+                "slug": "networks-disable-wifi-on-all-devices"
+            }
+        ]
+    },
+    {
+        "title": "移动设备",
+        "slug": "mobile-devices",
+        "description": "减少对手机、智能手机和平板电脑的侵入性跟踪",
+        "icon": "bi-phone-fill",
+        "intro": "智能手机彻底改变了生活的许多方面，并将世界带到我们的指尖。对于我们许多人来说，智能手机是我们沟通、娱乐和获取知识的主要手段。但是，虽然它们将便利性提升到了一个全新的水平，但在屏幕背后却发生了一些丑陋的事情。\n地理跟踪被用来追踪我们的一举一动，我们几乎无法控制谁拥有这些数据 - 您的手机甚至能够[在没有 GPS 的情况下跟踪您的位置](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371)。多年来，出现了许多报告，概述了您的手机[麦克风可以窃听](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html)的方式，以及[摄像头可以监视您](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6) - 所有这些都无需您的知情或同意。然后是恶意应用程序、缺乏安全补丁以及潜在/可能的后门。\n使用智能手机会产生大量关于您的数据 - 从您有意共享的信息到从您的行为中默默生成的数据。看到谷歌、微软、苹果和 Facebook 对我们的了解程度，这可能很可怕 - 有时他们比我们最亲密的家人了解得更多。很难理解您的数据将揭示什么，尤其是与其他数据结合使用时。\n这些数据被用于[不仅仅是广告](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - 更多时候，它被用来为人们的财务、保险和就业进行评级。定向广告甚至可以用于细粒度监控（参见 [ADINT](https://adint.cs.washington.edu)）\n我们更多人担心[政府如何使用收集和使用我们的智能手机数据](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/)，这是理所当然的，联邦机构经常[向谷歌](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/)、[Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/)、苹果、微软、亚马逊和其他科技公司索取我们的数据。有时会批量提出请求，返回某个地理围栏内每个人的详细信息，[通常是针对无辜的人](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html)。这还不包括世界各地的情报机构可以不受阻碍地访问的所有互联网流量。\n",
+        "checklist": [
+            {
+                "point": "加密您的设备",
+                "priority": "Essential",
+                "details": "为了保护您的数据免受物理访问，请使用文件加密。这意味着如果您的设备丢失或被盗，任何人都无法访问您的数据。",
+                "slug": "mobile-devices-encrypt-your-device"
+            },
+            {
+                "point": "关闭未使用的连接功能",
+                "priority": "Essential",
+                "details": "当您不使用 WiFi、蓝牙、NFC 等时，请关闭这些功能。有几种常见的威胁会利用这些功能。",
+                "slug": "mobile-devices-turn-off-connectivity-features-that-arent-being-used"
+            },
+            {
+                "point": "将应用程序数量保持在最低限度",
+                "priority": "Essential",
+                "details": "卸载您不需要或不经常使用的应用程序。由于应用程序经常在后台运行，会降低您的设备速度，还会收集数据。",
+                "slug": "mobile-devices-keep-app-count-to-a-minimum"
+            },
+            {
+                "point": "应用程序权限",
+                "priority": "Essential",
+                "details": "不要授予应用程序不需要的权限。对于 Android，[Bouncer](https://awesome-privacy.xyz/security-tools/mobile-apps/bouncer) 是一款允许您授予临时/一次性权限的应用程序。",
+                "slug": "mobile-devices-app-permissions"
+            },
+            {
+                "point": "仅从官方来源安装应用程序",
+                "priority": "Essential",
+                "details": "Apple App Store 和 Google Play Store 上的应用程序经过扫描和加密签名，因此不太可能是恶意的。",
+                "slug": "mobile-devices-only-install-apps-from-official-source"
+            },
+            {
+                "point": "设置移动运营商 PIN",
+                "priority": "Essential",
+                "details": "SIM 卡劫持是指黑客能够将您的手机号码转移到他们的 SIM 卡上。防止这种情况发生的最简单方法是通过您的移动提供商设置 PIN。",
+                "slug": "mobile-devices-set-up-a-mobile-carrier-pin"
+            },
+            {
+                "point": "小心手机充电威胁",
+                "priority": "Optional",
+                "details": "Juice Jacking 是指黑客使用公共充电站通过受感染的 USB 端口在您的智能手机或平板电脑上安装恶意软件。",
+                "slug": "mobile-devices-be-careful-of-phone-charging-threats"
+            },
+            {
+                "point": "选择退出来电显示列表",
+                "priority": "Optional",
+                "details": "为了保护您的详细信息隐私，您可以从 TrueCaller、CallApp、SyncMe 和 Hiya 等来电显示应用程序中取消列出您的号码。",
+                "slug": "mobile-devices-opt-out-of-caller-id-listings"
+            },
+            {
+                "point": "使用离线地图",
+                "priority": "Optional",
+                "details": "考虑使用离线地图应用程序，例如 OsmAnd 或 Organic Maps，以减少地图应用程序的数据泄露。",
+                "slug": "mobile-devices-use-offline-maps"
+            },
+            {
+                "point": "选择退出个性化广告",
+                "priority": "Optional",
+                "details": "您可以通过选择不查看个性化广告来稍微减少收集的数据量。",
+                "slug": "mobile-devices-opt-out-of-personalized-ads"
+            },
+            {
+                "point": "在太多次登录尝试后擦除",
+                "priority": "Optional",
+                "details": "为了防止攻击者暴力破解您的 PIN，请将您的设备设置为在太多次失败的登录尝试后擦除。",
+                "slug": "mobile-devices-erase-after-too-many-login-attempts"
+            },
+            {
+                "point": "监控跟踪器",
+                "priority": "Optional",
+                "details": "[εxodus](https://awesome-privacy.xyz/security-tools/online-tools/εxodus) 是一项很棒的服务，可让您搜索任何应用程序并查看其中嵌入了哪些跟踪器。",
+                "slug": "mobile-devices-monitor-trackers"
+            },
+            {
+                "point": "使用移动防火墙",
+                "priority": "Optional",
+                "details": "为了防止应用程序泄露隐私敏感数据，您可以安装防火墙应用程序。",
+                "slug": "mobile-devices-use-a-mobile-firewall"
+            },
+            {
+                "point": "减少后台活动",
+                "priority": "Optional",
+                "details": "对于 Android，SuperFreeze 可以完全冻结每个应用程序的所有后台活动。",
+                "slug": "mobile-devices-reduce-background-activity"
+            },
+            {
+                "point": "沙盒移动应用程序",
+                "priority": "Optional",
+                "details": "使用沙盒环境 [Island](https://awesome-privacy.xyz/security-tools/mobile-apps/island) 防止需要大量权限的应用程序访问您的私人数据。",
+                "slug": "mobile-devices-sandbox-mobile-apps"
+            },
+            {
+                "point": "避免自定义虚拟键盘",
+                "priority": "Optional",
+                "details": "建议坚持使用设备的库存键盘。如果您选择使用第三方键盘应用程序，请确保它是信誉良好的。",
+                "slug": "mobile-devices-avoid-custom-virtual-keyboards"
+            },
+            {
+                "point": "定期重启设备",
+                "priority": "Optional",
+                "details": "每周至少重启一次手机将清除内存中缓存的应用程序状态，并且重启后可能会运行得更流畅。",
+                "slug": "mobile-devices-restart-device-regularly"
+            },
+            {
+                "point": "避免短信",
+                "priority": "Optional",
+                "details": "短信不应用于接收双重身份验证代码或进行通信，而应使用加密的消息传递应用程序，例如 [Signal](https://awesome-privacy.xyz/communication/encrypted-messaging/signal)。",
+                "slug": "mobile-devices-avoid-sms"
+            },
+            {
+                "point": "将您的号码保密",
+                "priority": "Optional",
+                "details": "[MySudo](https://awesome-privacy.xyz/finance/virtual-credit-cards/mysudo) 允许您为不同的人或群组创建和使用虚拟电话号码。这非常适合隔离。",
+                "slug": "mobile-devices-keep-your-number-private"
+            },
+            {
+                "point": "注意跟踪软件",
+                "priority": "Optional",
+                "details": "跟踪软件是由您认识的人直接安装到您的设备上的恶意软件。摆脱它的最佳方法是通过恢复出厂设置。",
+                "slug": "mobile-devices-watch-out-for-stalkerware"
+            },
+            {
+                "point": "优先使用浏览器，而不是专用应用程序",
+                "priority": "Optional",
+                "details": "如果可能，请考虑使用安全浏览器访问网站，而不是安装专用应用程序。",
+                "slug": "mobile-devices-favor-the-browser-over-dedicated-app"
+            },
+            {
+                "point": "Tor 流量",
+                "priority": "Advanced",
+                "details": "[Orbot](https://awesome-privacy.xyz/security-tools/mobile-apps/orbot) 提供系统范围的 Tor 连接，这将有助于保护您免受监视和公共 WiFi 威胁。",
+                "slug": "mobile-devices-tor-traffic"
+            },
+            {
+                "point": "考虑运行自定义 ROM (Android)",
+                "priority": "Advanced",
+                "details": "如果您担心您的设备制造商收集了太多个人信息，请考虑使用注重隐私的自定义 ROM。",
+                "slug": "mobile-devices-consider-running-a-custom-rom-android"
+            }
+        ]
+    },
+    {
+        "title": "个人电脑",
+        "slug": "personal-computers",
+        "description": "保护您的 PC 操作系统、数据和活动",
+        "icon": "bi-laptop-fill",
+        "intro": "尽管 Windows 和 OS X 易于使用且方便，但它们都远非安全。您的操作系统提供了硬件和应用程序之间的接口，因此如果受到威胁，可能会产生不利影响。\n",
+        "checklist": [
+            {
+                "point": "保持您的系统最新",
+                "priority": "Essential",
+                "details": "系统更新包含针对安全问题的修复/补丁，提高性能，有时还会添加新功能。在出现提示时安装新更新。",
+                "slug": "personal-computers-keep-your-system-up-to-date"
+            },
+            {
+                "point": "加密您的设备",
+                "priority": "Essential",
+                "details": "在 Windows 上使用 BitLocker，在 MacOS 上使用 FileVault，或在 Linux 上使用 LUKS 来启用全盘加密。如果您的计算机丢失或被盗，这将防止未经授权的访问。",
+                "slug": "personal-computers-encrypt-your-device"
+            },
+            {
+                "point": "备份重要数据",
+                "priority": "Essential",
+                "details": "维护加密备份可防止因勒索软件、盗窃或损坏而造成损失。考虑将 [Cryptomator](https://awesome-privacy.xyz/security-tools/mobile-apps/cryptomator) 用于云文件，或将 [VeraCrypt](https://awesome-privacy.xyz/essentials/file-encryption/veracrypt) 用于 USB 驱动器。",
+                "slug": "personal-computers-backup-important-data"
+            },
+            {
+                "point": "小心将 USB 设备插入您的计算机",
+                "priority": "Essential",
+                "details": "USB 设备可能构成严重威胁。考虑使用 CIRCLean 制作 USB 清理器以安全地检查 USB 设备。",
+                "slug": "personal-computers-be-careful-plugging-usb-devices-into-your-computer"
+            },
+            {
+                "point": "在空闲时激活屏幕锁定",
+                "priority": "Essential",
+                "details": "离开时锁定您的计算机，并将其设置为在从屏幕保护程序或睡眠状态恢复时需要密码，以防止未经授权的访问。",
+                "slug": "personal-computers-activate-screen-lock-when-idle"
+            },
+            {
+                "point": "禁用 Cortana 或 Siri",
+                "priority": "Essential",
+                "details": "语音控制助手可能会由于发送回的数据进行处理而产生隐私问题。禁用或限制它们的侦听功能。",
+                "slug": "personal-computers-disable-cortana-or-siri"
+            },
+            {
+                "point": "查看您已安装的应用程序",
+                "priority": "Essential",
+                "details": "将已安装的应用程序保持在最低限度，以减少暴露于漏洞的风险，并定期清除应用程序缓存。",
+                "slug": "personal-computers-review-your-installed-apps"
+            },
+            {
+                "point": "管理权限",
+                "priority": "Essential",
+                "details": "控制哪些应用程序有权访问您的位置、摄像头、麦克风、联系人和其他敏感信息。",
+                "slug": "personal-computers-manage-permissions"
+            },
+            {
+                "point": "禁止将使用数据发送到云端",
+                "priority": "Essential",
+                "details": "限制发送到云端的使用信息或反馈量，以保护您的隐私。",
+                "slug": "personal-computers-disallow-usage-data-from-being-sent-to-the-cloud"
+            },
+            {
+                "point": "避免快速解锁",
+                "priority": "Essential",
+                "details": "使用强密码而不是生物识别或短 PIN 来解锁您的计算机，以增强安全性。",
+                "slug": "personal-computers-avoid-quick-unlock"
+            },
+            {
+                "point": "关闭计算机，而不是待机",
+                "priority": "Essential",
+                "details": "在不使用设备时将其关闭，尤其是在您的磁盘已加密的情况下，以确保数据安全。",
+                "slug": "personal-computers-power-off-computer-instead-of-standby"
+            },
+            {
+                "point": "不要将您的 PC 与您的 Microsoft 或 Apple 帐户关联",
+                "priority": "Optional",
+                "details": "仅使用本地帐户来防止数据同步和泄露。避免使用会损害隐私的同步服务。",
+                "slug": "personal-computers-don-t-link-your-pc-with-your-microsoft-or-apple-account"
+            },
+            {
+                "point": "检查启用了哪些共享服务",
+                "priority": "Optional",
+                "details": "禁用您不使用的网络共享功能，以关闭通往常见威胁的网关。",
+                "slug": "personal-computers-check-which-sharing-services-are-enabled"
+            },
+            {
+                "point": "不要将 Root/管理员帐户用于非管理任务",
+                "priority": "Optional",
+                "details": "使用非特权用户帐户执行日常任务，并且仅提升权限以进行管理更改，以减轻漏洞。",
+                "slug": "personal-computers-don-t-use-rootadmin-account-for-non-admin-tasks"
+            },
+            {
+                "point": "遮挡网络摄像头 + 麦克风",
+                "priority": "Optional",
+                "details": "在不使用时盖住您的网络摄像头，并考虑阻止未经授权的录音以保护隐私。",
+                "slug": "personal-computers-block-webcam--microphone"
+            },
+            {
+                "point": "使用隐私过滤器",
+                "priority": "Optional",
+                "details": "在公共场所使用屏幕隐私过滤器以防止肩窥并保护敏感信息。",
+                "slug": "personal-computers-use-a-privacy-filter"
+            },
+            {
+                "point": "物理保护设备",
+                "priority": "Optional",
+                "details": "在公共场所使用 Kensington 锁来保护您的笔记本电脑，并考虑使用端口锁来防止未经授权的物理访问。",
+                "slug": "personal-computers-physically-secure-device"
+            },
+            {
+                "point": "不要从您的 PC 为设备充电",
+                "priority": "Optional",
+                "details": "使用移动电源或交流墙壁充电器而不是您的 PC，以避免与 USB 连接相关的安全风险。",
+                "slug": "personal-computers-don-t-charge-devices-from-your-pc"
+            },
+            {
+                "point": "在 Wi-Fi 上随机化您的硬件地址",
+                "priority": "Optional",
+                "details": "修改或随机化您的 MAC 地址，以防止跨不同 WiFi 网络进行跟踪。",
+                "slug": "personal-computers-randomize-your-hardware-address-on-wi-fi"
+            },
+            {
+                "point": "使用防火墙",
+                "priority": "Optional",
+                "details": "安装防火墙应用程序以监控和阻止某些应用程序进行不必要的互联网访问，从而防止远程访问攻击和隐私泄露。",
+                "slug": "personal-computers-use-a-firewall"
+            },
+            {
+                "point": "防止软件键盘记录器",
+                "priority": "Optional",
+                "details": "使用击键加密工具来防止软件键盘记录器记录您的击键。",
+                "slug": "personal-computers-protect-against-software-keyloggers"
+            },
+            {
+                "point": "检查键盘连接",
+                "priority": "Optional",
+                "details": "使用公共或不熟悉的计算机时，通过检查键盘连接来警惕硬件键盘记录器。",
+                "slug": "personal-computers-check-keyboard-connection"
+            },
+            {
+                "point": "防止击键注入攻击",
+                "priority": "Optional",
+                "details": "离开时锁定您的 PC，并考虑使用 USBGuard 或类似工具来防止击键注入攻击。",
+                "slug": "personal-computers-prevent-keystroke-injection-attacks"
+            },
+            {
+                "point": "不要使用商业“免费”杀毒软件",
+                "priority": "Optional",
+                "details": "依靠内置的安全工具，并避免使用免费的杀毒软件应用程序，因为它们可能会侵犯隐私和收集数据。",
+                "slug": "personal-computers-don-t-use-commercial--free--anti-virus"
+            },
+            {
+                "point": "定期检查 Rootkit",
+                "priority": "Advanced",
+                "details": "定期检查 rootkit 以检测和减轻完全系统控制威胁，使用 [chkrootkit](https://awesome-privacy.xyz/operating-systems/linux-defenses/chkrootkit) 等工具。",
+                "slug": "personal-computers-periodically-check-for-rootkits"
+            },
+            {
+                "point": "BIOS 启动密码",
+                "priority": "Advanced",
+                "details": "启用 BIOS 或 UEFI 密码以在启动期间添加额外的安全层，但要注意其局限性。",
+                "slug": "personal-computers-bios-boot-password"
+            },
+            {
+                "point": "使用注重安全的操作系统",
+                "priority": "Advanced",
+                "details": "考虑切换到 Linux 或注重安全的发行版，如 QubeOS 或 [Tails](https://awesome-privacy.xyz/operating-systems/desktop-operating-systems/tails)，以增强隐私和安全性。",
+                "slug": "personal-computers-use-a-security-focused-operating-system"
+            },
+            {
+                "point": "利用虚拟机",
+                "priority": "Advanced",
+                "details": "对有风险的活动或测试可疑软件使用虚拟机，以将潜在威胁与您的主系统隔离开来。",
+                "slug": "personal-computers-make-use-of-vms"
+            },
+            {
+                "point": "隔离",
+                "priority": "Advanced",
+                "details": "尽可能将不同的程序和数据源彼此隔离，以限制潜在的泄露范围。",
+                "slug": "personal-computers-compartmentalize"
+            },
+            {
+                "point": "禁用不需要的功能 (Windows)",
+                "priority": "Advanced",
+                "details": "禁用在后台运行的不必要的 Windows“功能”和服务，以减少数据收集和资源使用。",
+                "slug": "personal-computers-disable-undesired-features-windows"
+            },
+            {
+                "point": "安全启动",
+                "priority": "Advanced",
+                "details": "确保启用安全启动以防止恶意软件替换您的引导加载程序和其他关键软件。",
+                "slug": "personal-computers-secure-boot"
+            },
+            {
+                "point": "安全的 SSH 访问",
+                "priority": "Advanced",
+                "details": "采取措施保护 SSH 访问免受攻击，方法是更改默认端口、使用 SSH 密钥和配置防火墙。",
+                "slug": "personal-computers-secure-ssh-access"
+            },
+            {
+                "point": "关闭未使用的打开端口",
+                "priority": "Advanced",
+                "details": "关闭不需要的侦听外部端口的服务，以防止远程利用并提高安全性。",
+                "slug": "personal-computers-close-un-used-open-ports"
+            },
+            {
+                "point": "实施强制访问控制",
+                "priority": "Advanced",
+                "details": "限制特权访问，以限制在系统受到威胁时可能造成的损害。",
+                "slug": "personal-computers-implement-mandatory-access-control"
+            },
+            {
+                "point": "使用金丝雀令牌",
+                "priority": "Advanced",
+                "details": "部署金丝雀令牌以更快地检测对您的文件或电子邮件的未经授权的访问，并收集有关入侵者的信息。",
+                "slug": "personal-computers-use-canary-tokens"
+            }
+        ]
+    },
+    {
+        "title": "智能家居",
+        "slug": "smart-home",
+        "description": "使用物联网设备而不损害您的隐私",
+        "icon": "bi-house-add-fill",
+        "intro": "家庭助手（例如 Google Home、Alexa 和 Siri）和其他互联网连接设备收集大量个人数据（包括语音样本、位置数据、家庭详细信息和所有交互的日志）。由于您对收集的内容、存储方式以及用途的控制有限，因此很难向任何关心隐私和安全的人推荐任何消费者智能家居产品。\n安全与隐私：市场上有许多智能设备声称可以提高您家庭的安全性，同时使用起来简单方便（例如智能防盗警报器、互联网安全摄像头、智能锁和远程访问门铃等等）。这些设备可能看起来使安全性更容易，但在隐私方面需要权衡：因为它们收集大量个人数据，并且让您无法控制如何存储或使用这些数据。这些设备的安全性也值得怀疑，因为其中许多设备可以（并且正在）被黑客入侵，从而使入侵者能够以最小的努力绕过检测。\n最尊重隐私的选择是不在您的家中使用“智能”互联网连接设备，并且不依赖需要互联网连接的安全设备。但如果您这样做，在购买之前充分了解任何给定产品的风险非常重要。然后调整设置以提高隐私和安全性。以下清单将帮助您减轻与互联网连接的家庭设备相关的风险。",
+        "checklist": [
+            {
+                "point": "重命名设备以不指定品牌/型号",
+                "priority": "Essential",
+                "details": "将默认设备名称更改为通用名称，以通过模糊品牌或型号信息来防止有针对性的攻击。",
+                "slug": "smart-home-rename-devices-to-not-specify-brandmodel"
+            },
+            {
+                "point": "在不使用时禁用麦克风和摄像头",
+                "priority": "Essential",
+                "details": "使用硬件开关关闭智能设备上的麦克风和摄像头，以防止意外录音或有针对性的访问。",
+                "slug": "smart-home-disable-microphone-and-camera-when-not-in-use"
+            },
+            {
+                "point": "了解收集、存储和传输哪些数据",
+                "priority": "Essential",
+                "details": "在购买前研究并确保对智能家居设备的数据处理做法感到满意，避免使用与第三方共享数据的设备。",
+                "slug": "smart-home-understand-what-data-is-collected-stored-and-transmitted"
+            },
+            {
+                "point": "设置隐私设置，并选择不与第三方共享数据",
+                "priority": "Essential",
+                "details": "调整应用程序设置以实现最严格的隐私控制，并在可能的情况下选择不与第三方共享数据。",
+                "slug": "smart-home-set-privacy-settings-and-opt-out-of-sharing-data-with-third-parties"
+            },
+            {
+                "point": "不要将您的智能家居设备链接到您的真实身份",
+                "priority": "Essential",
+                "details": "使用匿名用户名和密码，避免通过社交媒体或其他第三方服务注册/登录以维护隐私。",
+                "slug": "smart-home-don-t-link-your-smart-home-devices-to-your-real-identity"
+            },
+            {
+                "point": "保持固件最新",
+                "priority": "Essential",
+                "details": "定期更新智能设备固件以应用安全补丁和增强功能。",
+                "slug": "smart-home-keep-firmware-up-to-date"
+            },
+            {
+                "point": "保护您的网络",
+                "priority": "Essential",
+                "details": "保护您的家庭 WiFi 和网络以防止未经授权访问智能设备。",
+                "slug": "smart-home-protect-your-network"
+            },
+            {
+                "point": "警惕可穿戴设备",
+                "priority": "Optional",
+                "details": "考虑可穿戴设备广泛的数据收集能力及其对隐私的影响。",
+                "slug": "smart-home-be-wary-of-wearables"
+            },
+            {
+                "point": "不要将您家的关键基础设施连接到互联网",
+                "priority": "Optional",
+                "details": "由于黑客可能会进行远程访问，因此评估互联网连接的恒温器、警报器和探测器的风险。",
+                "slug": "smart-home-don-t-connect-your-home-s-critical-infrastructure-to-the-internet"
+            },
+            {
+                "point": "减轻 Alexa/Google Home 风险",
+                "priority": "Optional",
+                "details": "考虑以隐私为中心的替代方案，例如 [Mycroft](https://awesome-privacy.xyz/smart-home-and-iot/voice-assistants/mycroft) 或使用 Project Alias 来防止语音激活助手进行空闲侦听。",
+                "slug": "smart-home-mitigate-alexa-google-home-risks"
+            },
+            {
+                "point": "密切监控您的家庭网络",
+                "priority": "Optional",
+                "details": "使用 FingBox 等工具或路由器功能来监控异常网络活动。",
+                "slug": "smart-home-monitor-your-home-network-closely"
+            },
+            {
+                "point": "在可能的情况下拒绝互联网访问",
+                "priority": "Advanced",
+                "details": "使用防火墙阻止不需要互联网访问的设备的互联网访问，将操作限制在本地网络使用。",
+                "slug": "smart-home-deny-internet-access-where-possible"
+            },
+            {
+                "point": "评估风险",
+                "priority": "Advanced",
+                "details": "考虑对所有家庭成员的隐私影响，并调整设备设置以确保安全和隐私，例如在特定时间禁用设备。",
+                "slug": "smart-home-assess-risks"
+            }
+        ]
+    },
+    {
+        "title": "个人财务",
+        "slug": "personal-finance",
+        "description": "保护您的资金、金融账户和交易",
+        "icon": "bi-currency-exchange",
+        "intro": "信用卡欺诈是最常见的身份盗窃形式（[仅在 2017 年美国就有 133,015 起报告](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)），总损失达 9.05 亿美元，比上一年增加了 26%。每人损失的中位数为 429 美元（2017 年）。采取基本步骤保护自己免受侵害比以往任何时候都更重要。\n关于信用卡的注意事项：信用卡采用技术手段来检测和阻止某些欺诈性交易。主要的支付处理商通过挖掘其持卡人的大量数据来实现这一点，以便深入了解每个人的消费习惯。这些数据用于识别欺诈，但也出售给其他数据代理商。因此，信用卡有利于安全性，但不利于数据隐私。",
+        "checklist": [
+            {
+                "point": "注册欺诈警报和信用监控",
+                "priority": "Essential",
+                "details": "通过 Experian、TransUnion 或 Equifax 启用欺诈警报和信用监控，以便在出现可疑活动时收到警报。",
+                "slug": "personal-finance-sign-up-for-fraud-alerts-and-credit-monitoring"
+            },
+            {
+                "point": "申请信用冻结",
+                "priority": "Essential",
+                "details": "通过 Experian、TransUnion 和 Equifax 冻结您的信用，以防止未经授权的信用查询。",
+                "slug": "personal-finance-apply-a-credit-freeze"
+            },
+            {
+                "point": "使用虚拟卡",
+                "priority": "Optional",
+                "details": "利用虚拟卡号进行在线交易以保护您的真实银行详细信息。[Privacy.com](https://awesome-privacy.xyz/finance/virtual-credit-cards/privacy.com) 和 [MySudo](https://awesome-privacy.xyz/finance/virtual-credit-cards/mysudo) 等服务提供此类功能。",
+                "slug": "personal-finance-use-virtual-cards"
+            },
+            {
+                "point": "使用现金进行本地交易",
+                "priority": "Optional",
+                "details": "使用[现金](https://awesome-privacy.xyz/finance/other-payment-methods/cash)支付本地和日常购物，以避免机构进行财务分析。",
+                "slug": "personal-finance-use-cash-for-local-transactions"
+            },
+            {
+                "point": "使用加密货币进行在线交易",
+                "priority": "Optional",
+                "details": "选择注重隐私的加密货币（如 [Monero](https://awesome-privacy.xyz/finance/cryptocurrencies/monero)）进行在线交易以保持匿名性。明智地使用加密货币以确保隐私。",
+                "slug": "personal-finance-use-cryptocurrency-for-online-transactions"
+            },
+            {
+                "point": "安全地存储加密货币",
+                "priority": "Advanced",
+                "details": "使用离线钱包生成、[Trezor](https://awesome-privacy.xyz/finance/crypto-wallets/trezor) 或 [ColdCard](https://awesome-privacy.xyz/finance/crypto-wallets/coldcard) 等硬件钱包安全地存储加密货币，或考虑使用 [CryptoSteel](https://awesome-privacy.xyz/finance/crypto-wallets/cryptosteel) 等长期存储解决方案。",
+                "slug": "personal-finance-store-crypto-securely"
+            },
+            {
+                "point": "匿名购买加密货币",
+                "priority": "Advanced",
+                "details": "通过 [LocalBitcoins](https://awesome-privacy.xyz/finance/crypto-exchanges/localbitcoins)、[Bisq](https://awesome-privacy.xyz/finance/crypto-exchanges/bisq) 或比特币 ATM 等服务购买加密货币，而无需链接到您的身份。",
+                "slug": "personal-finance-buy-crypto-anonymously"
+            },
+            {
+                "point": "混淆/混合币",
+                "priority": "Advanced",
+                "details": "在将比特币转换为货币之前，使用比特币混合器或 CoinJoin 来模糊交易轨迹。",
+                "slug": "personal-finance-tumble-mix-coins"
+            },
+            {
+                "point": "在线购物时使用别名详细信息",
+                "priority": "Advanced",
+                "details": "对于在线购买，请考虑使用别名详细信息、转发电子邮件地址、VOIP 号码和安全的送货方式来保护您的身份。",
+                "slug": "personal-finance-use-an-alias-details-for-online-shopping"
+            },
+            {
+                "point": "使用备用送货地址",
+                "priority": "Advanced",
+                "details": "选择送货到非个人地址，例如邮政信箱、转寄地址或本地取货地点，以避免将购买直接链接到您。",
+                "slug": "personal-finance-use-alternate-delivery-address"
+            }
+        ]
+    },
+    {
+        "title": "人为因素",
+        "slug": "human-aspect",
+        "description": "避免社会工程学安全风险",
+        "icon": "bi-person-bounding-box",
+        "intro": "许多数据泄露、黑客攻击和攻击都是由人为错误引起的。以下列表包含您应该采取的步骤，以减少发生在您身上的风险。其中许多是常识，但值得注意。",
+        "checklist": [
+            {
+                "point": "验证收件人",
+                "priority": "Essential",
+                "details": "电子邮件很容易被伪造。验证发件人的真实性，特别是对于敏感操作，并优先手动输入 URL，而不是单击电子邮件中的链接。",
+                "slug": "human-aspect-verify-recipients"
+            },
+            {
+                "point": "不要相信您的弹出通知",
+                "priority": "Essential",
+                "details": "恶意行为者可以部署虚假的弹出窗口。在弹出窗口上输入任何信息之前，请务必检查 URL。",
+                "slug": "human-aspect-don-t-trust-your-popup-notifications"
+            },
+            {
+                "point": "切勿让设备无人看管",
+                "priority": "Essential",
+                "details": "即使使用强密码，无人看管的设备也可能被盗用。对丢失的设备使用加密和远程擦除功能，如“查找我的手机”。",
+                "slug": "human-aspect-never-leave-device-unattended"
+            },
+            {
+                "point": "防止摄像头劫持",
+                "priority": "Essential",
+                "details": "使用摄像头盖和麦克风阻断器来防止摄像头劫持。在不使用或讨论敏感问题时，将家庭助理静音。",
+                "slug": "human-aspect-prevent-camfecting"
+            },
+            {
+                "point": "防止肩窥",
+                "priority": "Essential",
+                "details": "在笔记本电脑和手机上使用隐私屏幕，以防止他人在公共场所阅读您的屏幕。",
+                "slug": "human-aspect-stay-protected-from-shoulder-surfers"
+            },
+            {
+                "point": "了解网络钓鱼攻击",
+                "priority": "Essential",
+                "details": "警惕网络钓鱼攻击。验证 URL、收到的消息的上下文，并采用良好的安全做法，例如使用 2FA 且不重复使用密码。",
+                "slug": "human-aspect-educate-yourself-about-phishing-attacks"
+            },
+            {
+                "point": "注意跟踪软件",
+                "priority": "Essential",
+                "details": "请注意熟人安装的用于监视的跟踪软件。注意异常的电池使用情况等迹象，如果怀疑，请执行恢复出厂设置。",
+                "slug": "human-aspect-watch-out-for-stalkerware"
+            },
+            {
+                "point": "从可信来源安装信誉良好的软件",
+                "priority": "Essential",
+                "details": "仅从合法来源下载软件，并在安装前使用 [Virus Total](https://awesome-privacy.xyz/security-tools/online-tools/virus-total) 等工具检查文件。",
+                "slug": "human-aspect-install-reputable-software-from-trusted-sources"
+            },
+            {
+                "point": "安全地存储个人数据",
+                "priority": "Essential",
+                "details": "确保设备上或云中的所有个人数据都已加密，以防止未经授权的访问。",
+                "slug": "human-aspect-store-personal-data-securely"
+            },
+            {
+                "point": "对文件中的个人详细信息进行模糊处理",
+                "priority": "Essential",
+                "details": "共享文档时，使用不透明矩形对个人详细信息进行模糊处理，以防止信息泄露。",
+                "slug": "human-aspect-obscure-personal-details-from-documents"
+            },
+            {
+                "point": "不要仅仅因为网站是“HTTPS”就认为它是安全的",
+                "priority": "Essential",
+                "details": "HTTPS 并不保证网站的合法性。验证 URL 并谨慎处理个人数据。",
+                "slug": "human-aspect-do-not-assume-a-site-is-secure-just-because-it-is-https"
+            },
+            {
+                "point": "在线支付时使用虚拟卡",
+                "priority": "Optional",
+                "details": "使用虚拟卡进行在线支付，以保护您的银行详细信息并限制交易风险。",
+                "slug": "human-aspect-use-virtual-cards-when-paying-online"
+            },
+            {
+                "point": "审查应用程序权限",
+                "priority": "Optional",
+                "details": "定期审查和管理应用程序权限，以确保没有不必要的对敏感设备功能的访问。",
+                "slug": "human-aspect-review-application-permissions"
+            },
+            {
+                "point": "选择退出公开列表",
+                "priority": "Optional",
+                "details": "将您自己从公共数据库和营销列表中删除，以减少不必要的联系和潜在风险。",
+                "slug": "human-aspect-opt-out-of-public-lists"
+            },
+            {
+                "point": "选择退出数据服务时，切勿提供额外的个人身份信息",
+                "priority": "Optional",
+                "details": "选择退出数据服务时，请勿提供额外的个人信息，以避免进一步的数据收集。",
+                "slug": "human-aspect-never-provide-additional-pii-when-opting-out"
+            },
+            {
+                "point": "选择退出数据共享",
+                "priority": "Optional",
+                "details": "许多应用程序和服务默认为数据共享设置。选择退出以保护您的数据不被与第三方共享。",
+                "slug": "human-aspect-opt-out-of-data-sharing"
+            },
+            {
+                "point": "审查和更新社交媒体隐私",
+                "priority": "Optional",
+                "details": "定期检查和更新您的社交媒体设置，因为频繁的条款更新可能会影响您的隐私设置。",
+                "slug": "human-aspect-review-and-update-social-media-privacy"
+            },
+            {
+                "point": "隔离",
+                "priority": "Advanced",
+                "details": "将数字活动的不同区域分开，以限制发生泄露时的数据暴露。",
+                "slug": "human-aspect-compartmentalize"
+            },
+            {
+                "point": "WhoIs 隐私保护",
+                "priority": "Advanced",
+                "details": "对域名注册使用 WhoIs 隐私保护，以保护您的个人信息免遭公开搜索。",
+                "slug": "human-aspect-whois-privacy-guard"
+            },
+            {
+                "point": "使用转寄地址",
+                "priority": "Advanced",
+                "details": "对邮件使用邮政信箱或转寄地址，以防止公司知道您的真实地址，从而增加一层隐私保护。",
+                "slug": "human-aspect-use-a-forwarding-address"
+            },
+            {
+                "point": "使用匿名支付方式",
+                "priority": "Advanced",
+                "details": "选择匿名支付方式（如加密货币），以避免在线输入可识别信息。",
+                "slug": "human-aspect-use-anonymous-payment-methods"
+            }
+        ]
+    },
+    {
+        "title": "物理安全",
+        "slug": "physical-security",
+        "description": "采取措施防止现实生活中的安全事件",
+        "icon": "bi-file-earmark-break-fill",
+        "intro": "公共记录通常包括敏感的个人数据（全名、出生日期、电话号码、电子邮件、地址、种族等），并且是从各种来源收集的（人口普查记录、出生/死亡/结婚证书、选民登记、营销信息、客户数据库、机动车记录、专业/商业执照以及所有法庭文件的完整详细信息）。这些敏感的个人信息[易于合法访问](https://www.consumerreports.org/consumerist/its-creepy-but-not-illegal-for-this-website-to-provide-all-your-public-info-to-anyone/)，这引发了一些[严重的隐私问题](https://privacyrights.org/resources/public-records-internet-privacy-dilemma)（身份盗窃、人身安全风险/跟踪者、名誉损害、档案社会）\n\n闭路电视是公司、个人和政府跟踪您行踪的主要方式之一。在英国伦敦，平均每人每天被摄像头拍到约 500 次。这个网络正在不断发展，在世界许多城市，面部识别技术正在推广，这意味着国家可以实时了解镜头中居民的身份。\n如果有人能够实际损害您、您的设备和您的数据，那么强大的身份验证、加密设备、修补软件和匿名网页浏览可能没什么用。本节概述了一些物理安全的基本方法。",
+        "checklist": [
+            {
+                "point": "销毁敏感文件",
+                "priority": "Essential",
+                "details": "在处置敏感文件之前将其粉碎或涂黑，以防止身份盗窃并维护机密性。\n",
+                "slug": "physical-security-destroy-sensitive-documents"
+            },
+            {
+                "point": "选择退出公共记录",
+                "priority": "Essential",
+                "details": "使用 Michael Bazzell 的个人数据删除工作簿等指南，联系人员搜索网站以选择退出显示个人信息的列表。\n",
+                "slug": "physical-security-opt-out-of-public-records"
+            },
+            {
+                "point": "给文件加水印",
+                "priority": "Essential",
+                "details": "在个人文件的数字副本上添加带有收件人姓名和日期的水印，以追踪泄露源。\n",
+                "slug": "physical-security-watermark-documents"
+            },
+            {
+                "point": "不要在来电中透露信息",
+                "priority": "Essential",
+                "details": "仅在您发起的通话中共享个人数据，并验证收件人的电话号码。\n",
+                "slug": "physical-security-don-t-reveal-info-on-inbound-calls"
+            },
+            {
+                "point": "保持警惕",
+                "priority": "Essential",
+                "details": "注意您的周围环境并在新环境中评估潜在风险。",
+                "slug": "physical-security-stay-alert"
+            },
+            {
+                "point": "保护周边",
+                "priority": "Essential",
+                "details": "确保存储个人信息设备的场所的物理安全，最大限度地减少外部访问并使用入侵检测系统。",
+                "slug": "physical-security-secure-perimeter"
+            },
+            {
+                "point": "物理保护设备",
+                "priority": "Essential",
+                "details": "对设备使用 Kensington 锁、网络摄像头盖和隐私屏幕等物理安全措施。",
+                "slug": "physical-security-physically-secure-devices"
+            },
+            {
+                "point": "将设备放在视线之外",
+                "priority": "Essential",
+                "details": "防止从外部看到设备，以减轻激光和盗窃带来的风险。",
+                "slug": "physical-security-keep-devices-out-of-direct-sight"
+            },
+            {
+                "point": "保护您的 PIN",
+                "priority": "Essential",
+                "details": "在输入 PIN 时遮挡，防止旁观者和摄像头看到，并在使用后清洁触摸屏。",
+                "slug": "physical-security-protect-your-pin"
+            },
+            {
+                "point": "检查提款机读卡器",
+                "priority": "Essential",
+                "details": "在使用前检查 ATM 和公共设备是否存在盗刷装置和篡改迹象。",
+                "slug": "physical-security-check-for-skimmers"
+            },
+            {
+                "point": "保护您的家庭住址",
+                "priority": "Optional",
+                "details": "使用备用地点、转寄地址和匿名支付方式来保护您的家庭住址。",
+                "slug": "physical-security-protect-your-home-address"
+            },
+            {
+                "point": "使用 PIN，而不是生物识别",
+                "priority": "Advanced",
+                "details": "在可能发生强制解锁设备的法律情况下，优先使用 PIN 而不是生物识别技术来保护设备安全。",
+                "slug": "physical-security-use-a-pin-not-biometrics"
+            },
+            {
+                "point": "减少闭路电视曝光",
+                "priority": "Advanced",
+                "details": "佩戴伪装并选择摄像头较少的路线以避免监视。",
+                "slug": "physical-security-reduce-exposure-to-cctv"
+            },
+            {
+                "point": "防面部识别服装",
+                "priority": "Advanced",
+                "details": "穿着带有可欺骗面部识别技术的图案的服装。",
+                "slug": "physical-security-anti-facial-recognition-clothing"
+            },
+            {
+                "point": "减少夜视曝光",
+                "priority": "Advanced",
+                "details": "使用红外光源或反光眼镜来阻挡夜视摄像头。",
+                "slug": "physical-security-reduce-night-vision-exposure"
+            },
+            {
+                "point": "保护您的 DNA",
+                "priority": "Advanced",
+                "details": "避免与基因检测网站共享 DNA，并注意不要留下 DNA 痕迹。",
+                "slug": "physical-security-protect-your-dna"
+            }
+        ]
+    }
+]

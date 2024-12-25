@@ -37,6 +37,33 @@
       "languageTips": "刷新浏览器后生效。"
     }
   },
+  "securitychecklist": {
+    "Title": "安全检查清单",
+    "Note": "这是一份非常全面的网络安全检查清单，涵盖密码安全、浏览安全、移动设备安全等方面的内容。在当前环境下，信息泄露可能会导致重大的损失，因此，确保我们在连接互联网的时候，我们尽可能地保护自己的隐私、提高访问的安全性是很有必要的。",
+    "Note2": "这个清单罗列的内容非常多，你不一定要一次性检查完，进度会在浏览器里保存，你可以随时返回继续检查。",
+    "Progress": "检查进度",
+    "Item": "项目",
+    "Items": "个项目",
+    "Priority": "级别",
+    "Ignore": "忽略",
+    "alert-total":"安全检查一共有",
+    "alert-checked":"你已经完成了",
+    "alert-ignored":"被忽略",
+    "alert-unchecked":"个未进行检查。",
+    "Checked": "已检查",
+    "Ignored": "已忽略",
+    "Unchecked": "未检查",
+    "Basic":"基础",
+    "Optional":"可选",
+    "Essential":"必要",
+    "Advanced":"高级",
+    "Reset":"重置",
+    "ShowAll":"显示所有",
+    "ShowUnchecked":"显示未检查",
+    "ShowIgnored":"显示已忽略",
+    "ShowChecked":"显示已检查",
+    "Loading":"加载中..."
+  },
   "shell": {
     "Title": "命令行 API",
     "Note1": "哟，原来你也喜欢用终端？",
@@ -198,7 +225,8 @@
     "Whois": "对域名或 IP 进行 Whois 查询",
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
     "MacChecker": "查询物理地址的归属信息",
-    "BrowserInfo": "检阅浏览器信息和指纹"
+    "BrowserInfo": "检阅浏览器信息和指纹",
+    "SecurityChecklist": "全面的数字生活安全检查清单"
   },
   "macchecker": {
     "Title": "MAC 地址查询",
@@ -273,7 +301,8 @@
     "QueryIP": "查询 IP 信息",
     "GithubLink": "查看源代码",
     "RefreshRuleTests": "刷新规则测试",
-    "Shell": "命令行 API"
+    "Shell": "命令行 API",
+    "qualityScoreExplain": "IP 质量分根据多个因素加权计算出来，包含了 IP 的类型、是否属于代理/VPN 和近期监测到来自该 IP 的攻击事件数量等。分数越高，意味着该 IP 的质量越好，在一些网站里，这个 IP 被风控阻断的概率就越低。"
   },
   "ipInfos": {
     "id": "ipinfos",
@@ -295,6 +324,8 @@
     "SelectSource": "选择 IP 归属地数据来源",
     "type": "类型",
     "isProxy": "代理",
+    "qualityScore": "IP 质量分",
+    "qualityScoreUnknown": "未知分数",
     "ASNInfo": {
       "note": "此 AS 的相关数据：",
       "asnName": "AS 名称：",
@@ -460,7 +491,8 @@
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",
-    "Shell": "命令行 API"
+    "Shell": "命令行 API",
+    "SecurityChecklist": "打开安全检查清单"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址 - 查询本机 IP 地址及归属地 - 查看 WebRTC 连接 IP - DNS 泄露检测 - 网速测试 - Jason Ng 阿禅开源作品",
@@ -901,6 +933,20 @@
           {
             "type": "improve",
             "change": "地图展示供应商变更为 Google"
+          },
+          {
+            "type": "improve",
+            "change": "其它常规优化"
+          }
+        ]
+      },
+      {
+        "version": "v4.5",
+        "date": "Dec 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "添加安全检查清单"
           },
           {
             "type": "improve",

@@ -1,8 +1,7 @@
 <template>
     <!-- Search BTN -->
-    <button class="btn btn-primary queryip"
-        data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck" @click="openQueryIP"
-        v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
+    <button class="btn btn-primary queryip" data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck"
+        @click="openQueryIP" v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
 
     <!-- Search Modal -->
     <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck" aria-hidden="true">
@@ -82,6 +81,32 @@
                                     </span>
                                 </li>
 
+                                <li v-if="ipGeoSource === 0" class="jn-list-group-item"
+                                    :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto">
+                                        <i class="bi bi-speedometer"></i>
+                                        {{ t('ipInfos.qualityScore') }} :&nbsp;
+                                    </span>
+
+                                    <span v-if="modalQueryResult.qualityScore !== 'unknown'"
+                                        class="col-3 jn-risk-score ">
+                                        <span class="progress border"
+                                            :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
+                                            role="progressbar" aria-label="Quality Score" aria-valuenow="0"
+                                            aria-valuemin="0" aria-valuemax="100">
+                                            <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
+                                                :style='"width:" + modalQueryResult.qualityScore +"%"'></span>
+                                        </span>
+                                    </span>
+
+                                    <span class="ps-2">
+                                        <span v-if="modalQueryResult.qualityScore === 'unknown'">
+                                            {{ t('ipInfos.qualityScoreUnknown') }}
+                                        </span>
+                                        <span v-else>{{ modalQueryResult.qualityScore }}%</span>
+                                    </span>
+
+                                </li>
 
                                 <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
@@ -122,7 +147,7 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 
-const {t} = useI18n();
+const { t } = useI18n();
 
 // 引入 Store
 const store = useMainStore();
@@ -204,7 +229,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
             if (data.error) {
                 throw new Error(data.reason || "IP lookup failed");
             }
-            modalQueryResult.value = transformDataFromIPapi(data, source.id, t,lang.value);
+            modalQueryResult.value = transformDataFromIPapi(data, source.id, t, lang.value);
             isChecking.value = "idle";
             break;
         } catch (error) {
