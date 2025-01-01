@@ -30,7 +30,8 @@ Feel free to bookmark the demo or deploy your own.
 
 ## 👀 Main Features
 
-* 🖥️ **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
+* 🛜 **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
+* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address. 
 * 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
@@ -43,9 +44,13 @@ Feel free to bookmark the demo or deploy your own.
 * 🚧 **Censorship Check**: Check if a website is blocked in some countries.
 * 📓 **Whois Search**: Perform whois information search for domain names or IP addresses
 * 📀 **MAC Lookup**: Query information of a physical address
+* 🖥️ **Browser Fingerprints**：Multiple ways to caculate your browser fingerprint
+* 📋 **Cybersecurity Checklist**：A comprehensive cybersecurity checklist with a total of 258 items
+
+## 💪 Also
+
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
 * 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
-* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
