@@ -30,7 +30,8 @@ Feel free to bookmark the demo or deploy your own.
 
 ## 👀 Main Features
 
-* 🖥️ **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
+* 🛜 **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
+* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address. 
 * 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
@@ -43,9 +44,13 @@ Feel free to bookmark the demo or deploy your own.
 * 🚧 **Censorship Check**: Check if a website is blocked in some countries.
 * 📓 **Whois Search**: Perform whois information search for domain names or IP addresses
 * 📀 **MAC Lookup**: Query information of a physical address
+* 🖥️ **Browser fingerprints**：Multiple ways to caculate your browser fingerprint
+* 📋 **Cybersecurity checklist**：A comprehensive cybersecurity checklist with a total of 258 items
+
+## 💪 Also
+
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
 * 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
-* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
@@ -89,25 +94,30 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 You can use the program without adding any environment variables, but if you want to use some advanced features, you can add the following environment variables:
 
-| Variable Name | Required | Default Value | Description |
-| --- | --- | --- | --- |
-| `BACKEND_PORT` | No | `"11966"` | The running port of the backend part of the program |
-| `FRONTEND_PORT` | No | `"18966"` | The running port of the frontend part of the program |
-| `SECURITY_RATE_LIMIT` | No | `"0"` | Controls the number of requests an IP can make to the backend server every 60 minutes (set to 0 for no limit) |
-| `SECURITY_DELAY_AFTER` | No | `"0"` | Controls the first X requests from an IP every 20 minutes that are not subject to speed limits, and after X requests, the delay will increase |
-| `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `"logs/blacklist-ip.log"` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
-| `GOOGLE_MAP_API_KEY=` | No | `""` | API Key for Google Maps, used to display the location of the IP on a map |
-| `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
-| `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
-| `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
-| `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
-| `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
-| `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
-| `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
-| `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
-| `VITE_CURL_IPV4_DOMAIN` | No | `""` | Provides the IPv4 domain for the CURL API to users |
-| `VITE_CURL_IPV6_DOMAIN` | No | `""` | Provides the IPv6 domain for the CURL API to users |
-| `VITE_CURL_IPV64_DOMAIN` | No | `""` | Provides the dual-stack domain for the CURL API to users |
+<table>
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>Required</th>
+      <th>Default Value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="white-space: nowrap;"><code>BACKEND_PORT</code></td>
+      <td style="white-space: nowrap;">No</td>
+      <td style="white-space: nowrap;"><code>"11966"</code></td>
+      <td style="white-space: nowrap;">The running port of the backend part of the program</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>FRONTEND_PORT</code></td>
+      <td style="white-space: nowrap;">No</td>
+      <td style="white-space: nowrap;"><code>"18966"</code></td>
+      <td style="white-space: nowrap;">The running port of the frontend part of the program</td>
+    </tr>
+    </tbody>
+</table>
 
 Note that if any of the CURL series environment variables are missing, the CURL API will not be enabled.
 
