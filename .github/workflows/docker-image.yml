@@ -40,6 +40,11 @@ jobs:
         printf "RELEASE_VERSION=%s\n" "${{ github.event.release.tag_name }}" >> $GITHUB_ENV
         printf "RELEASE_NOTES<<EOF\n%s\nEOF\n" "${{ github.event.release.body }}" >> $GITHUB_ENV
 
+    - name: Clean RELEASE_NOTES
+      run: |
+        export CLEAN_RELEASE_NOTES=$(echo "${{ env.RELEASE_NOTES }}" | sed '/^\s*$/d')
+        echo "RELEASE_NOTES=${CLEAN_RELEASE_NOTES}" >> $GITHUB_ENV
+
     - name: Set version for manual dispatch
       if: github.event_name == 'workflow_dispatch'
       run: |

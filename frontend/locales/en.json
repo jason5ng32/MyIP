@@ -57,12 +57,12 @@
     "Optional": "Optional",
     "Essential": "Essential",
     "Advanced": "Advanced",
-    "Reset":"Reset Checklist",
-    "ShowAll":"Show All",
-    "ShowUnchecked":"Show Unchecked",
-    "ShowIgnored":"Show Ignored",
-    "ShowChecked":"Show Checked",
-    "Loading":"Loading..."
+    "Reset": "Reset Checklist",
+    "ShowAll": "Show All",
+    "ShowUnchecked": "Show Unchecked",
+    "ShowIgnored": "Show Ignored",
+    "ShowChecked": "Show Checked",
+    "Loading": "Loading..."
   },
   "shell": {
     "Title": "Command Line API",
@@ -407,7 +407,10 @@
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
     "score": "Based on the speed test, got the following quality scores:",
-    "resultNote": ". The score is for reference only."
+    "resultNote": ". The score is for reference only.",
+    "connectionFrom": "Finished speed test from your IP: ",
+    "connectionTo": " to test server:",
+    "connectionEnd": " ."
   },
   "pingtest": {
     "id": "pingtest",
