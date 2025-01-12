@@ -4,7 +4,7 @@
         aria-label="Shell" data-bs-target="#Shell" @click="openModal" v-tooltip="t('Tooltips.Shell')"><i
             class="bi bi-terminal"></i></button>
     <!-- Shell Modal -->
-    <div class="modal fade" id="Shell" tabindex="-1" aria-labelledby="Shell">
+    <div class="modal fade" id="Shell" tabindex="-1" aria-labelledby="Shell" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
