@@ -408,7 +408,7 @@
     "rtc": ", Video Chatting: ",
     "score": "Based on the speed test, got the following quality scores:",
     "resultNote": ". The score is for reference only.",
-    "connectionFrom": "Finished speed test from your IP: ",
+    "connectionFrom": "Finished speed test from your machine, IP: ",
     "connectionTo": " to test server:",
     "connectionEnd": " ."
   },
