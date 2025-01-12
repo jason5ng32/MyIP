@@ -44,6 +44,25 @@
               </div>
             </div>
 
+            <Transition name="slide-fade">
+              <div class="d-flex align-items-center align-content-center justify-content-end pb-2"
+                :data-bs-theme="isDarkMode ? 'dark' : ''" v-if="speedTestStatus !== 'idle' && connectionData.colo">
+                <div>
+                  <i class="bi bi-person-arms-up"></i>
+                  {{connectionData.country}}
+                  <span v-if="connectionData.country" :class="'jn-fl fi fi-' + connectionData.loc.toLowerCase()"></span>
+                </div>
+                <div class=" mx-2">
+                  <i class="bi bi-arrow-left-right"></i>
+                </div>
+                <div>
+                  <i class="bi bi-globe"></i>
+                  {{connectionData.colo}},&nbsp;
+                  {{connectionData.coloCountry}} <span v-if="connectionData.coloCountry"
+                    :class="'jn-fl fi fi-' + connectionData.coloCountryCode.toLowerCase()"></span>
+                </div>
+              </div>
+            </Transition>
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
               :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
               <div class="progress-bar progress-bar-striped jn-progress"
@@ -84,7 +103,17 @@
             </div>
             <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
               v-if="speedTestStatus === 'finished' && hasScores">
-              <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i> {{ t('speedtest.score') }}
+              <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i>&nbsp;
+                <span v-if="connectionData.colo">
+                  {{ t('speedtest.connectionFrom') }}
+                  {{ connectionData.ip }} ( {{ connectionData.country }} )
+                  {{ t('speedtest.connectionTo') }}
+                  {{ connectionData.colo }}
+                  ( {{ connectionData.coloCity }}
+                  , {{ connectionData.coloCountry }} )
+                  {{ t('speedtest.connectionEnd') }}
+                </span>
+                {{ t('speedtest.score') }}
                 {{ t('speedtest.videoStreaming') }}
                 <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
                   {{ speedTest.streamingScore }}
@@ -113,6 +142,9 @@ import { ref, computed, onMounted, reactive, markRaw } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { isValidIP } from '@/utils/valid-ip.js';
+import getCountryName from '@/utils/country-name.js';
+import getColoCountry from '@/utils/speedtest-colos.js';
 // 引入 SpeedTest
 import SpeedTestEngine from '@cloudflare/speedtest';
 
@@ -121,6 +153,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const lang = computed(() => store.lang);
 
 const speedTest = reactive({
   id: "speedTest",
@@ -147,6 +180,40 @@ const packageSize = reactive({
   }
 });
 
+const connectionData = ref({
+  ip: "",
+  colo: "",
+  loc: "",
+  country: "",
+  coloCountry: "",
+  coloCountryCode: "",
+  coloCity: ""
+});
+
+const getIPFromSpeedTest = async () => {
+  try {
+    const response = await fetch("https://speed.cloudflare.com/cdn-cgi/trace");
+    const data = await response.text();
+    const lines = data.split("\n");
+
+    const ip = lines.find((line) => line.startsWith("ip="))?.split("=")[1];
+    const colo = lines.find((line) => line.startsWith("colo="))?.split("=")[1];
+    const loc = lines.find((line) => line.startsWith("loc="))?.split("=")[1];
+
+    if (isValidIP(ip)) {
+      const country = getCountryName(loc, lang.value) || '';
+      const coloCountryCode = getColoCountry(colo).country || '';
+      const coloCity = getColoCountry(colo).city || '';
+      const coloCountry = getCountryName(coloCountryCode, lang.value) || '';
+      return { ip, colo, loc, country, coloCountry, coloCountryCode, coloCity };
+    } else {
+      console.error("Invalid IP from SpeedTest Server:", ip);
+    }
+  } catch (error) {
+    console.error("Error fetching IP from SpeedTest Server:", error);
+  }
+};
+
 // 定义 Speed Test 引擎
 let testEngine;
 
@@ -166,12 +233,15 @@ const resetSpeedTest = () => {
 };
 
 // Speed Test 引擎
-const speedTestController = () => {
+const speedTestController = async () => {
   if (speedTestStatus.value === 'running') {
     testEngine.pause();
     speedTestStatus.value = "paused";
   } else {
     startSpeedTest();
+    if (!connectionData.value.ip) {
+      connectionData.value = await getIPFromSpeedTest();
+    }
   }
 };
 
@@ -365,8 +435,23 @@ defineExpose({
   background-color: var(--bs-btn-hover-bg);
   border-color: var(--bs-btn-hover-border-color);
 }
+
 .jn-text-warning {
   --bs-text-opacity: 1;
   color: #c67c14;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>
