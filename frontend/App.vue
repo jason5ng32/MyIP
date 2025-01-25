@@ -15,9 +15,9 @@
   </div>
   <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
     :toggleInfoMask="toggleInfoMask" />
-  <Shell v-if="curlDomainsHadSet" ref="shellRef" />
   <QueryIP ref="queryIPRef" />
   <HelpModal ref="helpModalRef" />
+  <Additional ref="additionalRef" />
   <Footer ref="footerRef" />
   <PWA />
   <Patch />
@@ -33,12 +33,12 @@ import WebRTC from './components/WebRtcTest.vue';
 import DNSLeaks from './components/DnsLeaksTest.vue';
 import SpeedTest from './components/SpeedTest.vue';
 import AdvancedTools from './components/Advanced.vue';
+import Additional from './components/Additional.vue';
 import Footer from './components/Footer.vue';
 
 // Widgets
 import Preferences from './components/widgets/Preferences.vue';
 import QueryIP from './components/widgets/QueryIP.vue';
-import Shell from './components/widgets/Shell.vue';
 import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
@@ -65,13 +65,13 @@ const userPreferences = computed(() => store.userPreferences);
 const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
 const Status = computed(() => store.mountingStatus);
 const openedCard = computed(() => store.currentPath.id);
-const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
 // Template 里的 Ref
 const navBarRef = ref(null);
 const preferencesRef = ref(null);
 const queryIPRef = ref(null);
 const helpModalRef = ref(null);
+const additionalRef = ref(null);
 const footerRef = ref(null);
 const speedTestRef = ref(null);
 const advancedToolsRef = ref(null);
@@ -79,7 +79,6 @@ const IPCheckRef = ref(null);
 const connectivityRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
-const shellRef = ref(null);
 
 
 // Data
@@ -500,6 +499,14 @@ const ShortcutKeys = (isOriginalSite) => {
       },
       description: t('shortcutKeys.About'),
     },
+    {
+      keys: "x",
+      action: () => {
+        additionalRef.value.openCurlModal();
+        trackEvent('ShortCut', 'ShortCut', 'Shell');
+      },
+      description: t('shortcutKeys.Shell'),
+    },
     // help
     {
       keys: "?",
@@ -523,23 +530,8 @@ const ShortcutKeys = (isOriginalSite) => {
     },
   ];
 
-  const curlAPI = [
-    {
-      keys: "x",
-      action: () => {
-        shellRef.value.openModal();
-        trackEvent('ShortCut', 'ShortCut', 'Shell');
-      },
-      description: t('shortcutKeys.Shell'),
-    },
-  ]
-
   if (isOriginalSite) {
     shortcutConfig.push(...invisibilitytest);
-  }
-
-  if (curlDomainsHadSet.value) {
-    shortcutConfig.push(...curlAPI);
   }
 
   return shortcutConfig;
