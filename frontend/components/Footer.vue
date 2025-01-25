@@ -9,8 +9,8 @@
     </div>
 
     <div id="about" class="text-center mb-2">
-      <a class="link link-underline-offset link-underline-opacity-0 jn-heart-color"
-        role="button" aria-controls="Sponsor" href="https://github.com/sponsors/jason5ng32" target="_blank">
+      <a class="link link-underline-offset link-underline-opacity-0 jn-heart-color" role="button"
+        aria-controls="Sponsor" href="https://github.com/sponsors/jason5ng32" target="_blank">
         {{ t('about.Sponsor') }} 💖
       </a>&nbsp;&nbsp;
       <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-light' : 'link-dark']"
@@ -232,7 +232,7 @@ defineExpose({
 }
 
 .jn-heart-color {
-  color:#d63384;
+  color: #d63384;
   text-decoration: none;
 }
 </style>

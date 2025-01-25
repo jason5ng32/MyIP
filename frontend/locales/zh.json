@@ -64,7 +64,7 @@
     "ShowChecked": "显示已检查",
     "Loading": "加载中..."
   },
-  "shell": {
+  "curl": {
     "Title": "命令行 API",
     "Note1": "哟，原来你也喜欢用终端？",
     "Note2_1": "你可以在终端里，通过",
@@ -301,7 +301,6 @@
     "QueryIP": "查询 IP 信息",
     "GithubLink": "查看源代码",
     "RefreshRuleTests": "刷新规则测试",
-    "Shell": "命令行 API",
     "qualityScoreExplain": "IP 质量分根据多个因素加权计算出来，包含了 IP 的类型、是否属于代理/VPN 和近期监测到来自该 IP 的攻击事件数量等。分数越高，意味着该 IP 的质量越好，在一些网站里，这个 IP 被风控阻断的概率就越低。"
   },
   "ipInfos": {
@@ -494,7 +493,7 @@
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",
-    "Shell": "命令行 API",
+    "Curl": "命令行 API",
     "SecurityChecklist": "打开安全检查清单"
   },
   "page": {

@@ -64,7 +64,7 @@
         "ShowChecked": "Afficher les éléments cochés",
         "Loading": "Chargement..."
     },
-    "shell": {
+    "curl": {
         "Title": "API de ligne de commande",
         "Note1": "Eh bien, il s'avère que toi aussi tu aimes utiliser le terminal ?",
         "Note2_1": "Tu peux, dans le terminal, via",
@@ -301,7 +301,6 @@
         "QueryIP": "Interroger l'adresse IP",
         "GithubLink": "Voir le code source sur GitHub",
         "RefreshRuleTests": "Actualiser les tests de règles",
-        "Shell": "Ouvrir le shell",
         "qualityScoreExplain": "Le score de qualité IP est calculé sur la base de plusieurs facteurs pondérés, incluant le type d'IP, si c'est un proxy/VPN, et le nombre d'événements d'attaque récemment détectés provenant de cette IP. Un score plus élevé indique une meilleure qualité de l'IP, réduisant la probabilité d'être bloqué par le contrôle de risques sur certains sites."
     },
     "ipInfos": {
@@ -494,7 +493,7 @@
         "MacChecker": "Ouvrir le Recherche de MAC",
         "BrowserInfo": "Ouvrir l'Info du navigateur",
         "fullScreenAdvancedTools": "Outils avancés en plein écran",
-        "Shell": "Ouvrir le Shell",
+        "Curl": "Ouvrir le Shell",
         "SecurityChecklist": "Ouvrir la Liste de sécurité"
     },
     "page": {

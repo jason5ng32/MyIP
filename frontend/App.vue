@@ -503,9 +503,9 @@ const ShortcutKeys = (isOriginalSite) => {
       keys: "x",
       action: () => {
         additionalRef.value.openCurlModal();
-        trackEvent('ShortCut', 'ShortCut', 'Shell');
+        trackEvent('ShortCut', 'ShortCut', 'Curl');
       },
-      description: t('shortcutKeys.Shell'),
+      description: t('shortcutKeys.Curl'),
     },
     // help
     {
