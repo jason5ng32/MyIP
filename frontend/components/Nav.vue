@@ -50,7 +50,34 @@
 
           </div>
         </a>
+              <!-- Sign In -->
+      <div id="signin" class="d-flex align-items-center ms-2">
+        <div v-if="!store.user">
+          <button class="btn jn-fs" :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }"
+            @click="store.signInWithGoogle" :title="t('user.SignInWithGoogle')">
+            <i class="bi bi-google"></i> &nbsp;{{ t('user.SignIn') }}
+          </button>
+        </div>
+
+        <div v-else class="dropdown">
+          <button class="btn dropdown-toggle d-flex align-items-center flex-row jn-fs"
+            :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
+            data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false">
+            <span class="jn-avatar">
+              <img :src="store.user.photoURL" alt="User Avatar" class="avatar" :title="store.user.displayName">
+            </span>
+            <span v-if="!isMobile">
+              &nbsp;{{store.user.displayName}}
+            </span>
+          </button>
+          <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <li><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.Benefits') }}</a></li>
+            <li><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut') }}</a></li>
+          </ul>
+        </div>
       </div>
+      </div>
+    
     </nav>
   </header>
 </template>
@@ -291,5 +318,13 @@ defineExpose({
 
 .container-xxl {
   max-width: 1600px;
+}
+
+.jn-avatar {
+  display: flex;
+  width: 18pt;
+  height: 18pt;
+  overflow: hidden;
+  border-radius: 50%;
 }
 </style>

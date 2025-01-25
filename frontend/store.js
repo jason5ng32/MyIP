@@ -1,10 +1,13 @@
 // store.js
 import { defineStore } from 'pinia';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from './firebase-init.js';
 
 export const useMainStore = defineStore('main', {
 
   state: () => ({
     lang: 'en',
+    user: null,
     currentPath: {},
     mountingStatus: {
       ipcheck: false,
@@ -156,6 +159,37 @@ export const useMainStore = defineStore('main', {
           this.configs = data;
         })
         .catch(error => console.error('Fetching configs failed: ', error));
+    },
+    // 通过 Google 登录
+    async signInWithGoogle() {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        this.user = result.user;
+        // 登录成功后刷新浏览器
+        window.location.reload();
+      } catch (error) {
+        console.error("Google sign-in failed:", error);
+      }
+    },
+    // 退出登录
+    async signOut() {
+      try {
+        await firebaseSignOut(auth);
+        this.user = null;
+      } catch (error) {
+        console.error("Sign out failed:", error);
+      }
+    },
+    // 初始化 Auth 监听
+    initializeAuthListener() {
+      return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          this.user = currentUser;
+          unsubscribe(); // 获取到用户状态后立即取消订阅
+          resolve();
+        });
+      });
     },
   }
 });

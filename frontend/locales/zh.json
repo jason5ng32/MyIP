@@ -1,4 +1,11 @@
 {
+  "user": {
+    "SignIn": "登录",
+    "SignInWithGoogle": "使用 Google 登录",
+    "SignOut": "登出",
+    "SignInToView": "登录后查看",
+    "Benefits":"用户权益"
+  },
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",

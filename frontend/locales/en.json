@@ -1,4 +1,11 @@
 {
+  "user": {
+    "SignIn": "Sign In",
+    "SignInWithGoogle": "Sign In with Google",
+    "SignOut": "Sign Out",
+    "SignInToView": "Sign In to View",
+    "Benefits":"User Benefits"
+  },
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",

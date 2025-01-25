@@ -28,6 +28,8 @@
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "express-slow-down": "^2.0.3",
+    "firebase": "^11.2.0",
+    "firebase-admin": "^13.0.2",
     "flag-icons": "^7.3.2",
     "http-proxy-middleware": "^3.0.3",
     "maxmind": "^4.3.23",

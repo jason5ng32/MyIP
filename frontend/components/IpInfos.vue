@@ -104,11 +104,15 @@
                   <i class="bi bi-reception-4"></i>
                   {{ t('ipInfos.type') }} :&nbsp;
                 </span>
-                <span class="col-10 ">
+                <span v-if="card.type !=='sign_in_required'" class="col-10 ">
                   {{ card.type }}
                   <span v-if="card.proxyOperator !== 'unknown'">
                     ( {{ card.proxyOperator }} )
                   </span>
+                </span>
+
+                <span v-else class="col-10 text-secondary">
+                  {{ t('user.SignInToView') }}
                 </span>
               </li>
 
@@ -119,11 +123,14 @@
                   <i class="bi bi-shield-fill-check"></i>
                   {{ t('ipInfos.isProxy') }} :&nbsp;
                 </span>
-                <span class="col-10 ">
+                <span v-if="card.isProxy !=='sign_in_required'" class="col-10 ">
                   {{ card.isProxy }}
                   <span v-if="card.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
                     ( {{ card.proxyProtocol }} )
                   </span>
+                </span>
+                <span v-else class="col-10 text-secondary">
+                  {{ t('user.SignInToView') }}
                 </span>
               </li>
 
@@ -134,19 +141,26 @@
                   {{ t('ipInfos.qualityScore') }} :&nbsp;
                 </span>
 
-                <span v-if="card.qualityScore !== 'unknown'" class="col-3 jn-risk-score ">
+                <span v-if="card.qualityScore !== 'unknown' && card.qualityScore !== 'sign_in_required'"
+                  class="col-3 jn-risk-score ">
                   <span class="progress border" :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
-                    role="progressbar" aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    role="progressbar" aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0"
+                    aria-valuemax="100">
                     <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
                       :style='"width:" + card.qualityScore +"%"'></span>
                   </span>
                 </span>
 
-                <span class="ps-2">
+                <span v-if="card.qualityScore !== 'sign_in_required'" class="ps-2">
                   <span v-if="card.qualityScore === 'unknown'">
                     {{ t('ipInfos.qualityScoreUnknown') }}
                   </span>
-                  <span v-else>{{ card.qualityScore }}% <i v-if="!isMobile" v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
+                  <span v-else>{{ card.qualityScore }}% <i v-if="!isMobile"
+                      v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
+                </span>
+
+                <span v-if="card.qualityScore === 'sign_in_required'" class="col-10 text-secondary">
+                  {{ t('user.SignInToView') }}
                 </span>
 
               </li>
@@ -228,6 +242,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
+import { authenticatedFetch } from '@/utils/authenticated-fetch';
 
 
 const { t } = useI18n();
@@ -424,8 +439,8 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
       const source = sources[currentSourceIndex];
       try {
         const url = store.getDbUrl(source.id, ip, setLang);
-        const response = await fetch(url);
-        const data = await response.json();
+        const response = await authenticatedFetch(url);
+        const data = await response;
         const cardData = transformDataFromIPapi(data, source.id, t, lang.value);
 
         if (cardData) {

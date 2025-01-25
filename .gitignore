@@ -27,3 +27,4 @@ dist-ssr
 
 package-lock.json
 localtest
+api/firebase.json

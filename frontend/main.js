@@ -83,6 +83,7 @@ app.directive('tooltip', {
 
 // 获取后端配置和用户偏好
 Promise.all([
+    store.initializeAuthListener(),
     store.loadPreferences(), // 加载用户偏好设置
     store.fetchConfigs()      // 获取后端配置
 ]).then(() => {
