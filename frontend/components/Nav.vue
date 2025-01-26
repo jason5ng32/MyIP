@@ -70,6 +70,8 @@
           <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
+            <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGithub"><i
+                  class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</a></li>
             <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut')
                 }}</a></li>
             <li>

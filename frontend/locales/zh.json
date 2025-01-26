@@ -2,6 +2,7 @@
   "user": {
     "SignIn": "登录/注册",
     "SignInWithGoogle": "使用 Google 登录",
+    "SignInWithGithub": "使用 GitHub 登录",
     "SignOut": "登出",
     "SignInToView": "登录后查看",
     "Benefits": {

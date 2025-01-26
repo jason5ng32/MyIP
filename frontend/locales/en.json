@@ -2,6 +2,7 @@
   "user": {
     "SignIn": "Sign In",
     "SignInWithGoogle": "Sign In with Google",
+    "SignInWithGithub": "Sign In with GitHub",
     "SignOut": "Sign Out",
     "SignInToView": "Sign In to View",
     "Benefits": {

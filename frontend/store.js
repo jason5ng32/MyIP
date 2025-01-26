@@ -1,6 +1,6 @@
 // store.js
 import { defineStore } from 'pinia';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from './firebase-init.js';
 
 export const useMainStore = defineStore('main', {
@@ -175,6 +175,21 @@ export const useMainStore = defineStore('main', {
         window.location.reload();
       } catch (error) {
         console.error("Google sign-in failed:", error);
+      }
+    },
+
+
+    // 通过 GitHub 登录
+    async signInWithGithub() {
+      const provider = new GithubAuthProvider();
+      provider.addScope('user:email');
+      try {
+        const result = await signInWithPopup(auth, provider);
+        this.user = result.user;
+        // 登录成功后刷新浏览器
+        window.location.reload();
+      } catch (error) {
+        console.error("GitHub sign-in failed:", error);
       }
     },
     // 退出登录
