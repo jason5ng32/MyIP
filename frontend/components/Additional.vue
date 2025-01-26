@@ -1,6 +1,6 @@
 <template>
     <!-- Curl Modal -->
-    <div class="modal fade" id="Curl" tabindex="-1" aria-labelledby="Curl" aria-hidden="false">
+    <div class="modal fade" id="Curl" tabindex="-1" aria-labelledby="Curl">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">

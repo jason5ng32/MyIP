@@ -86,7 +86,7 @@
   </header>
 
   <!-- User Benefits Modal -->
-  <div class="modal fade" id="Benefits" tabindex="-1" aria-labelledby="Benefits" aria-hidden="false">
+  <div class="modal fade" id="Benefits" tabindex="-1" aria-labelledby="Benefits">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
         <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
