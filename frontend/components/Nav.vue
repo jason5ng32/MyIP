@@ -23,9 +23,10 @@
       </div>
 
       <!-- Menu Bar, Expand on PC -->
-      <div class="offcanvas offcanvas-bottom" :class="[isMobile ? 'h-50' : '']" tabindex="-1" id="offcanvasNavbar"
-        aria-labelledby="offcanvasNavbarLabel">
+      <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom"
+        :class="[isMobile ? 'h-50' : '']" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
+          <h5 class="offcanvas-title">{{t('nav.Navigation')}}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body" :class="[!isMobile ? 'd-flex align-items-center' : '']">
@@ -39,7 +40,8 @@
               {{ t(`nav.${item}`) }}
             </a>
           </div>
-          <a :href="t('page.footerLink')" target="_blank" class="d-flex align-items-center">
+          <a :class="[isMobile ? 'mt-2':'']" :href="t('page.footerLink')" target="_blank"
+            class="d-flex align-items-center">
             <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
           </a>
         </div>
