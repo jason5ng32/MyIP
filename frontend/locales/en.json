@@ -4,7 +4,16 @@
     "SignInWithGoogle": "Sign In with Google",
     "SignOut": "Sign Out",
     "SignInToView": "Sign In to View",
-    "Benefits":"User Benefits"
+    "Benefits": {
+    "Title": "User Benefits",
+    "Benefit": "Benefit",
+    "Note1": "As an open-source product, your use of IPCheck.ing is free of charge.",
+    "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
+    "Benifit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
+    "Benifit2": "You can use the invisibilitytest more frequently.",
+    "Benifit3": "You will trigger Cloudflare's access restrictions less often.",
+    "FootNote": "More benefits are being developed..."
+  }
   },
   "nav": {
     "id": "nav",

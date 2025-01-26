@@ -111,7 +111,7 @@
                   </span>
                 </span>
 
-                <span v-else class="col-10 text-secondary">
+                <span v-else class="col-8 text-secondary">
                   {{ t('user.SignInToView') }}
                 </span>
               </li>
@@ -129,7 +129,7 @@
                     ( {{ card.proxyProtocol }} )
                   </span>
                 </span>
-                <span v-else class="col-10 text-secondary">
+                <span v-else class="col-8 text-secondary">
                   {{ t('user.SignInToView') }}
                 </span>
               </li>
@@ -159,7 +159,7 @@
                       v-tooltip="t('Tooltips.qualityScoreExplain')" class="bi bi-question-circle"></i></span>
                 </span>
 
-                <span v-if="card.qualityScore === 'sign_in_required'" class="col-10 text-secondary">
+                <span v-if="card.qualityScore === 'sign_in_required'" class="col-8 text-secondary">
                   {{ t('user.SignInToView') }}
                 </span>
 
@@ -440,8 +440,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
       try {
         const url = store.getDbUrl(source.id, ip, setLang);
         const response = await authenticatedFetch(url);
-        const data = await response;
-        const cardData = transformDataFromIPapi(data, source.id, t, lang.value);
+        const cardData = transformDataFromIPapi(response, source.id, t, lang.value);
 
         if (cardData) {
           ipGeoSource.value = source.id;

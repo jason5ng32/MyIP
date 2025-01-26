@@ -3,83 +3,132 @@
   <header class="navbar navbar-expand-lg bg-body-tertiary mb-3 jn-navbar-top "
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <nav id="navbar-top" class="container-xxl">
-      <div class="jn-logo">
+      <button class="navbar-toggler jn-hamburger-button" type="button" data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon bg-transparent"></span>
+      </button>
 
+      <div class="jn-logo">
         <a class="navbar-brand d-flex align-items-center align-content-center" :class="{ 'text-white': isDarkMode }"
           href="#" @click="handleLogoClick">
           <brandIcon />
           <span class=" fw-bold  "> IP</span>
           <span class="fw-lighter">Check.</span>
           <span class="fw-lighter" :class="{
-          'background-animation-dark': !loaded && isDarkMode,
-          'background-animation-light': !loaded && !isDarkMode
-        }">ing</span>
+              'background-animation-dark': !loaded && isDarkMode,
+              'background-animation-light': !loaded && !isDarkMode
+            }">ing
+          </span>
         </a>
-
-        <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
-          aria-label="Preferences">
-          <i class="bi bi-toggles"></i>
-        </div>
-
       </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"
-        @click="closeAllOffCanvas">
-        <span class="navbar-toggler-icon bg-transparent "></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        <!-- 导航循环 -->
-        <div class="navbar-nav ">
-          <a v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
-            :key="item" class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" :href="`#${item}`"
-            @click="collapseNav(); trackEvent('Nav', 'NavClick', item)">{{
-            t(`nav.${item}`) }}</a>
-        </div>
-        <a :href="t('page.footerLink')" class="btn jn-fs" id="githubStars"
-          :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
-          target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
-          <div><i class="bi bi-github"></i></div>
-          <div class="row flex-column ">
-            <TransitionGroup name="slide-fade">
-              <span key="default" class="col-12 jn-w" v-if="githubStars === 0">&nbsp;GitHub</span>
-              <span key="stars" class="col-12 jn-w" v-if="githubStars > 0">
-                &nbsp;{{ githubStars }}
-                <i class="bi bi-star-fill" :class="[isDarkMode ? 'redstar' : 'yellowstar']"></i>
-              </span>
-            </TransitionGroup>
 
+      <!-- Menu Bar, Expand on PC -->
+      <div class="offcanvas offcanvas-bottom" :class="[isMobile ? 'h-50' : '']" tabindex="-1" id="offcanvasNavbar"
+        aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" :class="[!isMobile ? 'd-flex align-items-center' : '']">
+          <div class="navbar-nav">
+            <a type="button"
+              v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
+              :key="item" class="nav-link" :class="{ 
+                'text-white': item === currentSection && isDarkMode,
+                'text-dark': item === currentSection && !isDarkMode,
+                }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item)">
+              {{ t(`nav.${item}`) }}
+            </a>
           </div>
-        </a>
-              <!-- Sign In -->
-      <div id="signin" class="d-flex align-items-center ms-2">
-        <div v-if="!store.user">
-          <button class="btn jn-fs" :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }"
-            @click="store.signInWithGoogle" :title="t('user.SignInWithGoogle')">
-            <i class="bi bi-google"></i> &nbsp;{{ t('user.SignIn') }}
-          </button>
+          <a :href="t('page.footerLink')" target="_blank" class="d-flex align-items-center">
+            <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
+          </a>
         </div>
+      </div>
 
-        <div v-else class="dropdown">
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
+        aria-label="Preferences">
+        <i class="bi bi-toggles"></i>
+      </div>
+
+      <!-- Sign In -->
+      <div id="signin" class="d-flex align-items-center ms-2">
+
+        <div class="dropstart">
           <button class="btn dropdown-toggle d-flex align-items-center flex-row jn-fs"
             :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
             data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false">
-            <span class="jn-avatar">
+            <span v-if="!store.user">
+              {{ t('user.SignIn') }}
+            </span>
+            <span v-if="store.user" class="jn-avatar">
               <img :src="store.user.photoURL" alt="User Avatar" class="avatar" :title="store.user.displayName">
             </span>
-            <span v-if="!isMobile">
+            <span v-if="store.user && !isMobile">
               &nbsp;{{store.user.displayName}}
             </span>
           </button>
           <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <li><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.Benefits') }}</a></li>
-            <li><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut') }}</a></li>
+            <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
+                  class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
+            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut')
+                }}</a></li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+            <li><a type="button" class="dropdown-item" @click="openUserBenefits"><i class="bi bi-award-fill"></i> {{
+                t('user.Benefits.Title') }}</a></li>
           </ul>
         </div>
       </div>
-      </div>
-    
     </nav>
   </header>
+
+  <!-- User Benefits Modal -->
+  <div class="modal fade" id="Benefits" tabindex="-1" aria-labelledby="Benefits" aria-hidden="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
+        <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
+          <h5 class="modal-title" id="BenefitsTitle"><i class="bi bi-award-fill"></i> {{ t('user.Benefits.Title') }}
+          </h5>
+          <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
+            data-bs-dismiss="modal" aria-label="Close"></button>
+
+        </div>
+        <div class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
+          <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
+          <p class="opacity-75">{{ t('user.Benefits.Note2') }}</p>
+          <div class="table-responsive text-nowrap">
+            <table class="table" :class="{ 'table-dark': isDarkMode }">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">{{ t('user.Benefits.Benefit') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>{{ t('user.Benefits.Benifit1') }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">2</th>
+                  <td>{{ t('user.Benefits.Benifit2') }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">3</th>
+                  <td>{{ t('user.Benefits.Benifit3') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="opacity-75">{{ t('user.Benefits.FootNote') }}</p>
+        </div>
+        <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup>
@@ -87,7 +136,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Offcanvas } from 'bootstrap';
+import { Offcanvas, Modal } from 'bootstrap';
 
 const { t } = useI18n();
 
@@ -99,25 +148,13 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const loaded = ref(false);
-const githubStars = ref(0);
 
-const closeAllOffCanvas = () => {
-  const offcanvasElements = document.querySelectorAll('.offcanvas');
-  if (offcanvasElements.length === 0) {
-    return;
-  }
-  document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
-    const instance = Offcanvas.getInstance(offcanvas);
-    if (instance) {
-      instance.hide();
-    }
-  });
-};
+const currentSection = computed(() => store.currentSection);
 
 // 打开偏好设置
 const OpenPreferences = () => {
-  var offcanvasElement = document.getElementById('offcanvasPreferences');
-  var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+  const offcanvasElement = document.getElementById('offcanvasPreferences');
+  let offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
   if (offcanvasElement.classList.contains('show')) {
     offcanvas.hide();
   } else {
@@ -127,30 +164,16 @@ const OpenPreferences = () => {
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
-//获取 GitHub stars
-const getGitHubStars = async () => {
-  const url = `https://api.github.com/repos/jason5ng32/MyIP`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    setTimeout(() => {
-      githubStars.value = data.stargazers_count;
-    }, 1000);
-  } catch (error) {
-    console.error('Failed to fetch Github data:', error);
-    githubStars.value = 0;
+// 打开 Modal
+const openUserBenefits = () => {
+  const modalElement = document.getElementById('Benefits');
+  const modalInstance = Modal.getOrCreateInstance(modalElement);
+  if (modalInstance) {
+    modalInstance.show();
   }
-};
 
-// 收起导航栏
-const collapseNav = () => {
-  document.querySelector('#navbarNavAltMarkup').classList.remove('show');
+  trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
-
 
 // 点击 Logo 事件处理
 const handleLogoClick = () => {
@@ -161,12 +184,12 @@ const handleLogoClick = () => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// 开始时获取 GitHub stars
-onMounted(() => {
-  setTimeout(() => {
-    getGitHubStars();
-  }, 1000)
-});
+// 菜单栏滚动
+const scrollToSection = (el, offset = 70) => {
+  const element = typeof el === "string" ? document.getElementById(el) : el;
+  const y = element.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: y, behavior: "smooth" });
+}
 
 watch(() => store.allHasLoaded, (newValue) => {
   loaded.value = newValue;
@@ -179,28 +202,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.jn-checkbox {
-  display: none;
-}
-
-.slide-fade-enter-active {
-  transition: all 0.3s ease-in-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from {
-  transform: translateY(30px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateY(-30px);
-  opacity: 0;
-}
-
 .jn-fs {
   font-size: smaller;
   display: flex;
@@ -211,105 +212,6 @@ defineExpose({
 
 .jn-w {
   width: 60pt;
-}
-
-.redstar {
-  color: rgb(253 131 3);
-}
-
-.yellowstar {
-  color: rgb(255 216 0);
-}
-
-.switch {
-  background-color: #111;
-  border-radius: 50px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px;
-  position: relative;
-  height: 26px;
-  width: 50px;
-  transform: scale(0.7);
-  box-shadow: 0 0 2px white;
-}
-
-.switch .ball {
-  background-color: #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  height: 22px;
-  width: 22px;
-  transform: translateX(0px);
-  transition: transform 0.2s linear;
-}
-
-.jn-checkbox:checked+.switch .ball {
-  transform: translateX(24px);
-}
-
-.jn-button:hover {
-  border: 0;
-}
-
-.jn-button:active {
-  border: 0;
-}
-
-.jn-button:focus {
-  border: 0;
-}
-
-.jn-button {
-  border: 0;
-}
-
-.background-animation-light {
-  position: relative;
-  overflow: hidden;
-  display: inline-flex;
-}
-
-.background-animation-light::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: -100%;
-  width: 100%;
-  height: 10%;
-  background-color: rgb(0, 0, 0);
-  animation: backgroundSlide 1s linear infinite;
-}
-
-.background-animation-dark {
-  position: relative;
-  overflow: hidden;
-  display: inline-flex;
-}
-
-.background-animation-dark::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: -100%;
-  width: 100%;
-  height: 10%;
-  background-color: rgb(255, 255, 255);
-  animation: backgroundSlide 1s linear infinite;
-}
-
-@keyframes backgroundSlide {
-  from {
-    left: -100%;
-  }
-
-  to {
-    left: 100%;
-  }
 }
 
 .preference-button {
@@ -326,5 +228,26 @@ defineExpose({
   height: 18pt;
   overflow: hidden;
   border-radius: 50%;
+}
+
+/* 大屏幕上隐藏汉堡包按钮 */
+@media (min-width: 992px) {
+  .jn-hamburger-button {
+    display: none;
+  }
+
+  #offcanvasNavbar {
+    display: flex;
+  }
+
+  .offcanvas.offcanvas-bottom {
+    height: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .offcanvas-header {
+    display: none;
+  }
 }
 </style>

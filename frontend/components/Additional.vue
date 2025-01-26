@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="CurlTitle">{{ t('curl.Title') }}</h5>
+                    <h5 class="modal-title" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}</h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -46,7 +46,7 @@
             </div>
 
             <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <img type="button" data-bs-toggle="modal" aria-label="Curl" data-bs-target="#Curl" @click="openModal"
+                <img type="button" data-bs-toggle="modal" @click="openCurlModal"
                     src="/additional/curl.webp" alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']"
                     :height="[isMobile ? '39' : '65']">
             </div>

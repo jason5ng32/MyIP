@@ -40,6 +40,7 @@ export const useMainStore = defineStore('main', {
       alertMessage: "",
       alertTitle: "",
     },
+    currentSection: 'IPInfo',
     ipDBs: [
       { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
       { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true },
@@ -159,6 +160,10 @@ export const useMainStore = defineStore('main', {
           this.configs = data;
         })
         .catch(error => console.error('Fetching configs failed: ', error));
+    },
+    // Change Section
+    changeSection(section) {
+      this.currentSection = section;
     },
     // 通过 Google 登录
     async signInWithGoogle() {

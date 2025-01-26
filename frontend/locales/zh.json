@@ -1,10 +1,19 @@
 {
   "user": {
-    "SignIn": "登录",
+    "SignIn": "登录/注册",
     "SignInWithGoogle": "使用 Google 登录",
     "SignOut": "登出",
     "SignInToView": "登录后查看",
-    "Benefits":"用户权益"
+    "Benefits": {
+      "Title": "用户权益",
+      "Benefit": "权益",
+      "Note1": "作为一个开源产品，你使用 IPCheck.ing 的过程是免费的。",
+      "Note2": "但是，为了避免滥用，我们会限制一些功能。当你登录后，你将得到以下权益：",
+      "Benifit1": "当你使用 IPCheck.ing 作为 IP 数据解析源时，完整显示所有字段",
+      "Benifit2": "可以高频使用隐身测试",
+      "Benifit3": "更少地触发 Cloudflare 的访问限制",
+      "FootNote": "更多权益陆续开发中..."
+    }
   },
   "nav": {
     "id": "nav",
