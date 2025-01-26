@@ -39,9 +39,6 @@ handleResize();
 // 监听窗口大小变化
 window.addEventListener('resize', handleResize);
 
-// 检查 Firebase 登录环境变量是否存在
-const isFireBaseSet = import.meta.env.VITE_FIREBASE_API_KEY && import.meta.env.VITE_FIREBASE_AUTH_DOMAIN && import.meta.env.VITE_FIREBASE_PROJECT_ID;
-
 // 启动 Google Analytics
 analytics.page();
 app.config.globalProperties.$analytics = analytics;
@@ -83,9 +80,12 @@ app.directive('tooltip', {
     }
 })
 
+// 检查 Firebase 环境
+store.checkFirebaseEnv();
+
 // 获取后端配置和用户偏好
 Promise.all([
-    isFireBaseSet ? store.initializeAuthListener() : Promise.resolve(),
+    store.isFireBaseSet ? store.initializeAuthListener() : Promise.resolve(),
     store.loadPreferences(), // 加载用户偏好设置
     store.fetchConfigs()      // 获取后端配置
 ]).then(() => {

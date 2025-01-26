@@ -51,7 +51,7 @@
       </div>
 
       <!-- Sign In -->
-      <div id="signin" class="d-flex align-items-center ms-2">
+      <div v-if="isFireBaseSet" id="signin" class="d-flex align-items-center ms-2">
 
         <div class="dropstart">
           <button class="btn dropdown-toggle d-flex align-items-center flex-row jn-fs"
@@ -70,8 +70,6 @@
           <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
-            <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGithub"><i
-                  class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</a></li>
             <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut')
                 }}</a></li>
             <li>
@@ -152,6 +150,7 @@ const isMobile = computed(() => store.isMobile);
 const loaded = ref(false);
 
 const currentSection = computed(() => store.currentSection);
+const isFireBaseSet = computed(() => store.isFireBaseSet);
 
 // 打开偏好设置
 const OpenPreferences = () => {

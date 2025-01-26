@@ -22,6 +22,7 @@ export const useMainStore = defineStore('main', {
       ipv6Domain: import.meta.env.VITE_CURL_IPV6_DOMAIN,
       ipv64Domain: import.meta.env.VITE_CURL_IPV64_DOMAIN,
     },
+    isFireBaseSet: false,
     loadingStatus: {
       ipcheck: false,
       connectivity: false,
@@ -165,6 +166,15 @@ export const useMainStore = defineStore('main', {
     changeSection(section) {
       this.currentSection = section;
     },
+    // 检查 Firebase 环境
+    checkFirebaseEnv() {
+      const envConfigs = {
+        key: import.meta.env.VITE_FIREBASE_API_KEY,
+        domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        project: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    }
+      this.isFireBaseSet = !!envConfigs.key && !!envConfigs.domain && !!envConfigs.project;
+    },
     // 通过 Google 登录
     async signInWithGoogle() {
       const provider = new GoogleAuthProvider();
@@ -177,8 +187,6 @@ export const useMainStore = defineStore('main', {
         console.error("Google sign-in failed:", error);
       }
     },
-
-
     // 通过 GitHub 登录
     async signInWithGithub() {
       const provider = new GithubAuthProvider();

@@ -1,7 +1,5 @@
-import { get } from 'https';
 import { isValidIP } from '../common/valid-ip.js';
 import { refererCheck } from '../common/referer-check.js';
-import verifyToken from '../common/verify-token.js';
 
 export default async (req, res) => {
 
@@ -10,10 +8,6 @@ export default async (req, res) => {
     if (!refererCheck(referer)) {
         return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
     }
-
-    // 验证用户 Token
-    const { isValid, email } = await verifyToken(req);
-    const isValidUser = isValid;
 
     // 从请求中获取 IP 地址
     const ipAddress = req.query.ip;
@@ -34,39 +28,24 @@ export default async (req, res) => {
 
     const lang = req.query.lang || 'en';
 
-    // 构建请求 IPCheck.ing 的 URL
-    const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}&email=${email}`);
+    // 构建请求
+    const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            try {
-                const originalJson = JSON.parse(data);
-                if (isValidUser) {
-                    res.json(originalJson);
-                } else {
-                    const modifiedJson = modifyJsonForIPChecking(originalJson);
-                    res.json(modifiedJson);
-                }
-
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
+    try {
+        const apiResponse = await fetch(url, {
+            headers: {
+                ...req.headers,
             }
         });
-    }).on('error', (e) => {
-        res.status(500).json({ error: e.message });
-    });
-}
 
-// 修改返回的数据
-function modifyJsonForIPChecking(json) {
-    const modifiedJson = JSON.parse(JSON.stringify(json));
-    if (modifiedJson.proxyDetect) {
-        for (const key in modifiedJson.proxyDetect) {
-            modifiedJson.proxyDetect[key] = "sign_in_required";
+        if (!apiResponse.ok) {
+            throw new Error(`API responded with status: ${apiResponse.status}`);
         }
-    }
 
-    return modifiedJson;
+        const data = await apiResponse.json();
+        res.json(data);
+    } catch (error) {
+        console.error("Error during API request:", error);
+        res.status(500).json({ error: error.message });
+    }
 }

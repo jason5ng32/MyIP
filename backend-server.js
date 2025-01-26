@@ -19,14 +19,8 @@ import ipapiisHandler from './api/ipapiis.js';
 import invisibilitytestHandler from './api/invisibilitytest.js';
 import macChecker from './api/macchecker.js';
 import maxmindHandler from './api/maxmind.js';
-import admin from 'firebase-admin';
 
 dotenv.config();
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
