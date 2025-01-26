@@ -40,7 +40,7 @@
               {{ t(`nav.${item}`) }}
             </a>
           </div>
-          <a :class="[isMobile ? 'mt-2':'']" :href="t('page.footerLink')" target="_blank"
+          <a :class="[isMobile ? 'mt-2':'ms-2']" :href="t('page.footerLink')" target="_blank"
             class="d-flex align-items-center">
             <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
           </a>
@@ -72,7 +72,7 @@
           <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
-            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut">{{ t('user.SignOut')
+            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
                 }}</a></li>
             <li>
               <hr class="dropdown-divider" />
