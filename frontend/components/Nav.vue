@@ -72,7 +72,8 @@
           <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
-            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
+            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i
+                  class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
                 }}</a></li>
             <li>
               <hr class="dropdown-divider" />
@@ -251,6 +252,51 @@ defineExpose({
 
   .offcanvas-header {
     display: none;
+  }
+}
+
+/* Logo 上的加载动画 */
+.background-animation-light {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.background-animation-light::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 10%;
+  background-color: rgb(0, 0, 0);
+  animation: backgroundSlide 1s linear infinite;
+}
+
+.background-animation-dark {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.background-animation-dark::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 10%;
+  background-color: rgb(255, 255, 255);
+  animation: backgroundSlide 1s linear infinite;
+}
+
+@keyframes backgroundSlide {
+  from {
+    left: -100%;
+  }
+
+  to {
+    left: 100%;
   }
 }
 </style>
