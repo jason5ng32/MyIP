@@ -178,6 +178,7 @@ export const useMainStore = defineStore('main', {
     // 通过 Google 登录
     async signInWithGoogle() {
       const provider = new GoogleAuthProvider();
+      provider.addScope('email');
       try {
         const result = await signInWithPopup(auth, provider);
         this.user = result.user;
