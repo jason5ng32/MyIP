@@ -1,4 +1,4 @@
-// backend/middleware/verifyToken.js
+// 验证登录令牌
 import admin from 'firebase-admin';
 
 async function verifyToken(req) {
