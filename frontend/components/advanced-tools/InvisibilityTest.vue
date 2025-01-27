@@ -353,7 +353,7 @@ const getResult = async () => {
             setTimeout(() => {
                 getResult();
                 retryCount.value++
-            }, 4000);
+            }, 8000);
             return;
         }
         testResults.value = data;
@@ -374,7 +374,7 @@ const getResult = async () => {
             setTimeout(() => {
                 getResult();
                 retryCount.value++
-            }, 4000);
+            }, 8000);
             return;
         } else {
             errorMsg.value = t('invisibilitytest.fetchError');
