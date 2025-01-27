@@ -58,7 +58,8 @@
         <div class="dropdown">
           <button class="btn dropdown-toggle d-flex align-items-center flex-row "
             :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
-            data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false">
+            data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false"
+            @click="getUserInfo">
             <span v-if="!store.user">
               {{ t('user.SignIn') }}
             </span>
@@ -70,18 +71,39 @@
             </span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <li v-if="store.user" class="dropdown-header d-flex flex-column">
+              <span>{{ t('user.Fields.User') }} : {{store.user.displayName}}</span>
+              <span>{{ t('user.Fields.CreatedAt') }} : {{ unixToDateTime(store.user.metadata.createdAt) }}</span>
+              <span>{{ t('user.Fields.Level') }} :&nbsp;
+                <span v-if="userInfoFetched">{{ t('user.Level.' + userInfo.userLevel)}}</span>
+                <span v-else>{{ t('user.Fields.Fetching') }}</span>
+              </span>
+              <span>{{ t('user.Fields.FunctionUses') }} :&nbsp;
+                <span v-if="userInfoFetched">{{ userInfo.functionUses.total }}
+                  {{ t('user.Fields.Times') }}
+                </span>
+                <span v-else>{{ t('user.Fields.Fetching') }}</span>
+              </span>
+            </li>
+            <li v-if="store.user">
+              <hr class="dropdown-divider" />
+            </li>
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGithub"><i
                   class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</a></li>
-            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i
-                  class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
-                }}</a></li>
-            <li>
+            <li v-if="!store.user">
               <hr class="dropdown-divider" />
             </li>
             <li><a type="button" class="dropdown-item" @click="openUserBenefits"><i class="bi bi-award-fill"></i> {{
                 t('user.Benefits.Title') }}</a></li>
+            <li v-if="store.user">
+              <hr class="dropdown-divider" />
+            </li>
+            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i
+                  class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
+                }}</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -142,6 +164,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Offcanvas, Modal } from 'bootstrap';
+import { authenticatedFetch } from '@/utils/authenticated-fetch';
 
 const { t } = useI18n();
 
@@ -157,6 +180,9 @@ const loaded = ref(false);
 const currentSection = computed(() => store.currentSection);
 const isFireBaseSet = computed(() => store.isFireBaseSet);
 
+const userInfo = ref({});
+const userInfoFetched = ref(false);
+
 // 打开偏好设置
 const OpenPreferences = () => {
   const offcanvasElement = document.getElementById('offcanvasPreferences');
@@ -168,17 +194,6 @@ const OpenPreferences = () => {
   }
 
   trackEvent('Nav', 'NavClick', 'Preferences');
-};
-
-// 打开 Modal
-const openUserBenefits = () => {
-  const modalElement = document.getElementById('Benefits');
-  const modalInstance = Modal.getOrCreateInstance(modalElement);
-  if (modalInstance) {
-    modalInstance.show();
-  }
-
-  trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
 
 // 点击 Logo 事件处理
@@ -196,6 +211,48 @@ const scrollToSection = (el, offset = 70) => {
   const y = element.getBoundingClientRect().top + window.scrollY - offset;
   window.scrollTo({ top: y, behavior: "smooth" });
 }
+
+// 转换 Unix 时间
+const unixToDateTime = (timestamp) => {
+  timestamp = Number(timestamp);
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  const date = new Date(timestamp);
+  return date.toLocaleString(undefined, options);
+}
+
+// 打开 Modal
+const openUserBenefits = () => {
+  const modalElement = document.getElementById('Benefits');
+  const modalInstance = Modal.getOrCreateInstance(modalElement);
+  if (modalInstance) {
+    modalInstance.show();
+  }
+
+  trackEvent('Nav', 'NavClick', 'UserBenefits');
+};
+
+// 获取用户统计信息
+const getUserInfo = async () => {
+  if (userInfoFetched.value) {
+    return;
+  }
+  if (!store.user) {
+    return;
+  }
+  try {
+    const response = await authenticatedFetch(`/api/getuserinfo`);
+    const data = response;
+    userInfo.value = data;
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+  }
+
+  userInfoFetched.value = true;
+};
 
 watch(() => store.allHasLoaded, (newValue) => {
   loaded.value = newValue;

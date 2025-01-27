@@ -7,6 +7,22 @@
         "SignInToView": "Connectez-vous pour voir",
         "SignInToUse": "Connectez-vous pour utiliser",
         "InvalidUserToken": "Token utilisateur non valide",
+        "Fields": {
+            "User": "Utilisateur",
+            "CreatedAt": "Créé Le",
+            "LastLogin": "Dernière Connexion",
+            "Level": "Niveau d'Utilisateur",
+            "FunctionUses": "Utilisation des Avancées",
+            "Times": "Fois",
+            "Fetching": "Recherche..."
+        },
+        "Level": {
+            "Standard": "Utilisateur Standard",
+            "Premium": "Utilisateur Premium",
+            "Owner": "Administrateur",
+            "Developer": "Développeur",
+            "HonoraryMember": "Membre Honoraire"
+        },
         "Benefits": {
             "Title": "Avantages Utilisateurs",
             "Benefit": "Avantage",

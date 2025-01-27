@@ -7,6 +7,22 @@
     "SignInToView": "登录后查看",
     "SignInToUse": "请登录后使用",
     "InvalidUserToken": "无效的用户 Token",
+    "Fields": {
+      "User": "用户",
+      "CreatedAt": "创建于",
+      "LastLogin": "最后登录",
+      "Level": "用户等级",
+      "FunctionUses": "高级功能使用",
+      "Times": "次",
+      "Fetching": "获取中..."
+    },
+    "Level": {
+      "Standard": "标准用户",
+      "Premium": "高级用户",
+      "Owner": "管理员",
+      "Developer": "开发者",
+      "HonoraryMember": "荣誉用户"
+    },
     "Benefits": {
       "Title": "用户权益",
       "Benefit": "权益",
