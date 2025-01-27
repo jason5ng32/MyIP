@@ -478,7 +478,9 @@
     "maskedInfoTitle": "全部隐藏成功",
     "maskedInfoMessage": "所有信息已隐藏，现在可以安心截图了。",
     "unmaskedInfoTitle": "取消隐藏",
-    "unmaskedInfoMessage": "信息已显示，截图时请注意隐私。"
+    "unmaskedInfoMessage": "信息已显示，截图时请注意隐私。",
+    "SignInFailed": "登录失败",
+    "SignInFailedReason": "原因"
   },
   "shortcutKeys": {
     "id": "shortcutKeys",

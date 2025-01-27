@@ -478,7 +478,9 @@
         "maskedInfoTitle": "Toutes les infos masquées",
         "maskedInfoMessage": "Toutes les informations ont été masquées, vous pouvez maintenant prendre des captures d'écran en toute sécurité.",
         "unmaskedInfoTitle": "Infos démasquées",
-        "unmaskedInfoMessage": "Les informations ont été démasquées, veuillez faire attention lorsque vous prenez des captures d'écran."
+        "unmaskedInfoMessage": "Les informations ont été démasquées, veuillez faire attention lorsque vous prenez des captures d'écran.",
+        "SignInFailed": "Echec de connexion",
+        "SignInFailedReason": "Raison"
     },
     "shortcutKeys": {
         "id": "shortcutKeys",

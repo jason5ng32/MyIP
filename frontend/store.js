@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia';
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from './firebase-init.js';
+import i18n from './locales/i18n';
+const { t } = i18n.global;
 
 export const useMainStore = defineStore('main', {
 
@@ -172,7 +174,7 @@ export const useMainStore = defineStore('main', {
         key: import.meta.env.VITE_FIREBASE_API_KEY,
         domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
         project: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    }
+      }
       this.isFireBaseSet = !!envConfigs.key && !!envConfigs.domain && !!envConfigs.project;
     },
     // 通过 Google 登录
@@ -185,6 +187,7 @@ export const useMainStore = defineStore('main', {
         // 登录成功后刷新浏览器
         window.location.reload();
       } catch (error) {
+        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ':' + error, alertTitle: t('alert.SignInFailed') };
         console.error("Google sign-in failed:", error);
       }
     },
@@ -198,6 +201,7 @@ export const useMainStore = defineStore('main', {
         // 登录成功后刷新浏览器
         window.location.reload();
       } catch (error) {
+        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ':' + error, alertTitle: t('alert.SignInFailed') };
         console.error("GitHub sign-in failed:", error);
       }
     },
