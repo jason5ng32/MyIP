@@ -187,7 +187,7 @@ export const useMainStore = defineStore('main', {
         // 登录成功后刷新浏览器
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ':' + error, alertTitle: t('alert.SignInFailed') };
+        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
         console.error("Google sign-in failed:", error);
       }
     },
@@ -201,7 +201,7 @@ export const useMainStore = defineStore('main', {
         // 登录成功后刷新浏览器
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ':' + error, alertTitle: t('alert.SignInFailed') };
+        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
         console.error("GitHub sign-in failed:", error);
       }
     },

@@ -15,11 +15,23 @@ export async function authenticatedFetch(url) {
         options.headers.Authorization = `Bearer ${idToken}`;
     }
 
-    const response = await fetch(url, options);
+    try {
+        const response = await fetch(url, options);
 
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            let errorDetail = '';
+            try {
+                // 获得具体的错误信息
+                const errorData = await response.json();
+                errorDetail = errorData.message || JSON.stringify(errorData);
+            } catch {
+                errorDetail = response.statusText;
+            }
+            throw new Error(`HTTP error! Status: ${response.status} - ${errorDetail}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        throw new Error(`Fetch failed: ${error.message}`);
     }
-
-    return response.json();
 }
