@@ -55,7 +55,7 @@
       <!-- Sign In -->
       <div v-if="isFireBaseSet" id="signin" class="d-flex align-items-center ms-2">
 
-        <div class="dropstart">
+        <div class="dropdown">
           <button class="btn dropdown-toggle d-flex align-items-center flex-row jn-fs"
             :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
             data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false">
@@ -69,7 +69,7 @@
               &nbsp;{{store.user.displayName}}
             </span>
           </button>
-          <ul class="dropdown-menu" :data-bs-theme="isDarkMode ? 'dark' : ''">
+          <ul class="dropdown-menu dropdown-menu-end" :data-bs-theme="isDarkMode ? 'dark' : ''">
             <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
                   class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
             <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i
