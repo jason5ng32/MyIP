@@ -60,22 +60,28 @@
             :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
             data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false"
             @click="getUserInfo">
-            <span v-if="!store.user">
+            <span v-if="!isSignedIn">
               {{ t('user.SignIn') }}
             </span>
-            <span v-if="store.user" class="jn-avatar">
-              <img :src="store.user.photoURL" alt="User Avatar" class="avatar" :title="store.user.displayName">
+            <span v-if="isSignedIn" class="jn-avatar">
+              <img :src="userPhotoURL" alt="User Avatar" class="avatar" :title="userName">
             </span>
-            <span v-if="store.user && !isMobile">
-              &nbsp;{{store.user.displayName}}
+            <span v-if="isSignedIn && !isMobile">
+              &nbsp;{{userName}}
             </span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end" :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <li v-if="store.user" class="dropdown-header d-flex flex-column">
-              <span>{{ t('user.Fields.User') }} : {{store.user.displayName}}</span>
-              <span>{{ t('user.Fields.CreatedAt') }} : {{ unixToDateTime(store.user.metadata.createdAt) }}</span>
-              <span>{{ t('user.Fields.Level') }} :&nbsp;
-                <span v-if="userInfoFetched">{{ t('user.Level.' + userInfo.userLevel)}}</span>
+            <li v-if="isSignedIn" class="dropdown-header d-flex flex-column">
+              <span>{{ t('user.Fields.User') }} : {{ userName }}</span>
+              <span>{{ t('user.Fields.CreatedAt') }} : {{ userCreatedAt }}</span>
+              <span class="d-flex align-items-center">{{ t('user.Fields.Level') }} :&nbsp;
+                <span v-if="userInfoFetched" class="badge" :class="{
+                  'text-bg-secondary': userInfo.userLevel === 'Standard',
+                  'text-bg-primary': userInfo.userLevel === 'Premium',
+                  'text-bg-dark': userInfo.userLevel === 'Owner',
+                  'text-bg-success': userInfo.userLevel === 'Developer',
+                  'text-bg-warning': userInfo.userLevel === 'HonoraryMember',
+                }">{{ t('user.Level.' + userInfo.userLevel)}}</span>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
               <span>{{ t('user.Fields.FunctionUses') }} :&nbsp;
@@ -85,24 +91,25 @@
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
             </li>
-            <li v-if="store.user">
+            <li v-if="isSignedIn">
               <hr class="dropdown-divider" />
             </li>
-            <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
-                  class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</a></li>
-            <li v-if="!store.user"><a type="button" class="dropdown-item" @click="store.signInWithGithub"><i
-                  class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</a></li>
-            <li v-if="!store.user">
+            <li v-if="!isSignedIn"><button type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
+                  class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</button></li>
+            <li v-if="!isSignedIn"><button type="button" class="dropdown-item" @click="store.signInWithGithub"><i
+                  class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</button></li>
+            <li v-if="!isSignedIn">
               <hr class="dropdown-divider" />
             </li>
-            <li><a type="button" class="dropdown-item" @click="openUserBenefits"><i class="bi bi-award-fill"></i> {{
-                t('user.Benefits.Title') }}</a></li>
-            <li v-if="store.user">
+            <li><button type="button" class="dropdown-item" @click="openUserBenefits"><i class="bi bi-award-fill"></i>
+                {{
+                t('user.Benefits.Title') }}</button></li>
+            <li v-if="isSignedIn">
               <hr class="dropdown-divider" />
             </li>
-            <li v-if="store.user"><a type="button" class="dropdown-item" @click="store.signOut"><i
+            <li v-if="isSignedIn"><button type="button" class="dropdown-item" @click="store.signOut"><i
                   class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
-                }}</a>
+                }}</button>
             </li>
           </ul>
         </div>
@@ -180,6 +187,13 @@ const loaded = ref(false);
 const currentSection = computed(() => store.currentSection);
 const isFireBaseSet = computed(() => store.isFireBaseSet);
 
+// 本地用户信息
+const isSignedIn = computed(() => !!store.user);
+const userName = computed(() => store.user?.displayName);
+const userPhotoURL = computed(() => store.user?.photoURL);
+const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
+
+// 远程用户信息
 const userInfo = ref({});
 const userInfoFetched = ref(false);
 

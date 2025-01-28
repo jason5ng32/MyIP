@@ -37,7 +37,8 @@ export default async (req, res) => {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const url = new URL(`https://api.ipcheck.ing/getpdresult/${id}?apikey=${apikey}`);
+    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
+    const url = new URL(`${apiEndpoint}/getpdresult/${id}?apikey=${apikey}`);
 
     try {
         const apiResponse = await fetch(url, {

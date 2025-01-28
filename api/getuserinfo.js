@@ -15,7 +15,8 @@ export default async (req, res) => {
     }
 
     // 构建请求
-    const url = new URL(`https://api.ipcheck.ing/userinfo?key=${key}`);
+    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
+    const url = new URL(`${apiEndpoint}/userinfo?key=${key}`);
 
     try {
         const apiResponse = await fetch(url, {

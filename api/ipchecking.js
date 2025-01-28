@@ -26,10 +26,10 @@ export default async (req, res) => {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const lang = req.query.lang || 'en';
-
     // 构建请求
-    const url = new URL(`https://api.ipcheck.ing/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
+    const lang = req.query.lang || 'en';
+    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
+    const url = new URL(`${apiEndpoint}/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
 
     try {
         const apiResponse = await fetch(url, {
