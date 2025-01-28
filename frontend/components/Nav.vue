@@ -131,7 +131,7 @@
         <div class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
           <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
           <p class="opacity-75">{{ t('user.Benefits.Note2') }}</p>
-          <div class="table-responsive text-nowrap">
+          <div class="table-responsive">
             <table class="table" :class="{ 'table-dark': isDarkMode }">
               <thead>
                 <tr>
