@@ -146,7 +146,7 @@ const updateUserAchievement = async (achievementName) => {
 
 // 监听程序装载完毕后加载用户信息
 watch(() => store.allHasLoaded, (newVal, oldVal) => {
-    if (newVal) {
+    if (newVal && !remoteUserInfoFetched.value && isSignedIn.value) {
         getUserInfo();
     }
 });
