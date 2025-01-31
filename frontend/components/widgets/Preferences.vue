@@ -220,6 +220,7 @@ const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const prefersDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
 const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
@@ -285,6 +286,9 @@ const prefLanguage = (value) => {
 
 const prefConnectivityRefresh = (value) => {
     store.updatePreference('connectivityAutoRefresh', value);
+    if (isSignedIn.value && !store.userAchievements.ResourceHog.achieved) {
+        store.setTriggerUpdateAchievements('ResourceHog');
+    }
     trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
 };
 
@@ -301,6 +305,9 @@ const prefSimpleMode = (value) => {
 const prefAutoStart = (value) => {
     store.updatePreference('autoStart', value);
     trackEvent('Nav', 'PrefereceClick', 'AutoStart');
+    if (isSignedIn.value && !value && !store.userAchievements.EnergySaver.achieved) {
+        store.setTriggerUpdateAchievements('EnergySaver');
+    }
 };
 
 const prefconnectivityShowNoti = (value) => {

@@ -67,7 +67,7 @@ onMounted(() => {
 <style scoped>
 .jn-toast {
     position: fixed;
-    z-index: 9999;
+    z-index: 10001;
     right: 0;
     bottom: 0;
     margin-bottom: 2pt;

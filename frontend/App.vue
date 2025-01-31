@@ -1,5 +1,7 @@
 <template>
   <NavBar ref="navBarRef" />
+  <User ref="userRef" />
+  <Achievements ref="achivementsRef" />
   <Preferences ref="preferencesRef" />
   <Alert />
   <div id="mainpart" class="container mt-5 jn-container">
@@ -35,6 +37,8 @@ import SpeedTest from './components/SpeedTest.vue';
 import AdvancedTools from './components/Advanced.vue';
 import Additional from './components/Additional.vue';
 import Footer from './components/Footer.vue';
+import User from './components/User.vue';
+import Achievements from './components/Achievements.vue';
 
 // Widgets
 import Preferences from './components/widgets/Preferences.vue';
@@ -65,6 +69,7 @@ const userPreferences = computed(() => store.userPreferences);
 const shouldRefreshEveryThing = computed(() => store.shouldRefreshEveryThing);
 const Status = computed(() => store.mountingStatus);
 const openedCard = computed(() => store.currentPath.id);
+const isSignedIn = computed(() => store.isSignedIn);
 
 // Template 里的 Ref
 const navBarRef = ref(null);
@@ -513,6 +518,9 @@ const ShortcutKeys = (isOriginalSite) => {
       action: () => {
         helpModalRef.value.openModal();
         trackEvent('ShortCut', 'ShortCut', 'Help');
+        if (isSignedIn.value && !store.userAchievements.CleverTrickery.achieved) {
+          store.setTriggerUpdateAchievements('CleverTrickery');
+        }
       },
       description: t('shortcutKeys.Help'),
     },

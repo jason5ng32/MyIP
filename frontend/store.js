@@ -10,6 +10,34 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     lang: 'en',
     user: null,
+    isSignedIn: false,
+    triggerAchievements: false,
+    triggerUserBenefits: false,
+    triggerRemoteUserInfo: false,
+    triggerUpdateAchievements: false,
+    achivementToUpdate: '',
+    userAchievements: {
+      'IAmHuman': { name: 'IAmHuman', achieved: false, img: 'achievements/iamhuman.webp', showDetails: false, achievedTime: null },
+      'BarelyEnough': { name: 'BarelyEnough', achieved: false, img: '/achievements/barelyenough.webp', showDetails: false, achievedTime: null },
+      'RapidPace': { name: 'RapidPace', achieved: false, img: '/achievements/rapidpace.webp', showDetails: false, achievedTime: null },
+      'TorrentFlow': { name: 'TorrentFlow', achieved: false, img: '/achievements/torrentflow.webp', showDetails: false, achievedTime: null },
+      'SteadyGoing': { name: 'SteadyGoing', achieved: false, img: '/achievements/steadygoing.webp', showDetails: false, achievedTime: null },
+      'TooFastTooSimple': { name: 'TooFastTooSimple', achieved: false, img: '/achievements/toofasttoosimple.webp', showDetails: false, achievedTime: null },
+      'SwiftAscent': { name: 'SwiftAscent', achieved: false, img: '/achievements/swiftascent.webp', showDetails: false, achievedTime: null },
+      'SurfaceCheck': { name: 'SurfaceCheck', achieved: false, img: '/achievements/surfacecheck.webp', showDetails: false, achievedTime: null },
+      'HalfwayThere': { name: 'HalfwayThere', achieved: false, img: '/achievements/halfwaythere.webp', showDetails: false, achievedTime: null },
+      'FullySecured': { name: 'FullySecured', achieved: false, img: '/achievements/fullysecured.webp', showDetails: false, achievedTime: null },
+      'JustInCase': { name: 'JustInCase', achieved: false, img: '/achievements/justincase.webp', showDetails: false, achievedTime: null },
+      'HiddenWell': { name: 'HiddenWell', achieved: false, img: '/achievements/hiddenwell.webp', showDetails: false, achievedTime: null },
+      'SlipUp': { name: 'SlipUp', achieved: false, img: '/achievements/slipup.webp', showDetails: false, achievedTime: null },
+      'CleverTrickery': { name: 'CleverTrickery', achieved: false, img: '/achievements/clevertrickery.webp', showDetails: false, achievedTime: null },
+      'EnergySaver': { name: 'EnergySaver', achieved: false, img: '/achievements/energysaver.webp', showDetails: false, achievedTime: null },
+      'ResourceHog': { name: 'ResourceHog', achieved: false, img: '/achievements/resourcehog.webp', showDetails: false, achievedTime: null },
+      'MakingBigNews': { name: 'MakingBigNews', achieved: false, img: '/achievements/makingbignews.webp', showDetails: false, achievedTime: null },
+      'GenerousDonor': { name: 'GenerousDonor', achieved: false, img: '/achievements/generousdonor.webp', showDetails: false, achievedTime: null },
+    },
+    remoteUserInfo: {},
+    remoteUserInfoFetched: false,
     currentPath: {},
     mountingStatus: {
       ipcheck: false,
@@ -210,6 +238,7 @@ export const useMainStore = defineStore('main', {
       try {
         await firebaseSignOut(auth);
         this.user = null;
+        this.isSignedIn = false;
       } catch (error) {
         console.error("Sign out failed:", error);
       }
@@ -219,10 +248,32 @@ export const useMainStore = defineStore('main', {
       return new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           this.user = currentUser;
+          if (currentUser) {
+            this.isSignedIn = true;
+          }
           unsubscribe(); // 获取到用户状态后立即取消订阅
           resolve();
         });
       });
     },
+    // 触发打开成就
+    setTriggerAchievements(value) {
+      this.triggerAchievements = value;
+    },
+    // 触发打开用户权益
+    setTriggerUserBenefits(value) {
+      this.triggerUserBenefits = value;
+    },
+    // 触发远程获取用户信息
+    setTriggerRemoteUserInfo(value) {
+      if (value) {
+        this.triggerRemoteUserInfo = value;
+      }
+    },
+    // 触发更新成就
+    setTriggerUpdateAchievements(achivement) {
+      this.triggerUpdateAchievements = true;
+      this.achivementToUpdate = achivement;
+    }
   }
 });

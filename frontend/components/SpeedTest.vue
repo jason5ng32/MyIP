@@ -154,6 +154,7 @@ const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const speedTest = reactive({
   id: "speedTest",
@@ -391,6 +392,9 @@ const showResult = () => {
       speedTest.gamingScore = scores.gaming.points;
       speedTest.rtcScore = scores.rtc.points;
     }
+    if (isSignedIn.value) {
+      updateAchievement();
+    }
   };
 
   testEngine.onError = (e) => {
@@ -399,6 +403,51 @@ const showResult = () => {
     }
     console.error('Speed Test Error: ', e);
   };
+};
+
+// 更新成就 
+
+const updateAchievement = () => {
+  if (speedTestStatus.value !== "finished") {
+    return;
+  }
+
+  const achievementsToUpdate = [];
+
+  // 检查成就条件
+  if (!store.userAchievements.BarelyEnough.achieved && speedTest.downloadSpeed >= 100) {
+    achievementsToUpdate.push('BarelyEnough');
+  }
+  if (!store.userAchievements.RapidPace.achieved && speedTest.downloadSpeed >= 500) {
+    achievementsToUpdate.push('RapidPace');
+  }
+  if (!store.userAchievements.TorrentFlow.achieved && speedTest.downloadSpeed >= 1000) {
+    achievementsToUpdate.push('TorrentFlow');
+  }
+  if (!store.userAchievements.SteadyGoing.achieved && speedTest.uploadSpeed >= 50) {
+    achievementsToUpdate.push('SteadyGoing');
+  }
+  if (!store.userAchievements.TooFastTooSimple.achieved && speedTest.uploadSpeed >= 200) {
+    achievementsToUpdate.push('TooFastTooSimple');
+  }
+  if (!store.userAchievements.SwiftAscent.achieved && speedTest.uploadSpeed >= 1000) {
+    achievementsToUpdate.push('SwiftAscent');
+  }
+
+  // 分批提交
+  function triggerAchievementsWithDelay() {
+    if (achievementsToUpdate.length === 0) {
+      return;
+    }
+    const achievement = achievementsToUpdate.shift();
+    store.setTriggerUpdateAchievements(achievement);
+
+    if (achievementsToUpdate.length > 0) {
+      setTimeout(triggerAchievementsWithDelay, 2000);
+    }
+  }
+
+  triggerAchievementsWithDelay();
 };
 
 // 初始化

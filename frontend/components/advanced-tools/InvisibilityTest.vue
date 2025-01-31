@@ -289,6 +289,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');
@@ -336,7 +337,10 @@ const onSubmit = () => {
     errorMsg.value = '';
     testResults.value = {};
     loadScript();
-
+    // 获得成就
+    if (isSignedIn.value && !store.userAchievements.JustInCase.achieved) {
+        store.setTriggerUpdateAchievements('JustInCase');
+    }
     setTimeout(() => {
         getResult();
     }, 6000);
@@ -357,6 +361,18 @@ const getResult = async () => {
             return;
         }
         testResults.value = data;
+
+        // 计算成就
+        let proxyScore = Math.floor(testResults.value.score.proxy);
+        let vpnScore = Math.floor(testResults.value.score.vpn);
+        if (isSignedIn.value && !store.userAchievements.HiddenWell.achieved && proxyScore === 0 && vpnScore === 0) {
+            store.setTriggerUpdateAchievements('HiddenWell');
+        }
+
+        if (isSignedIn.value && !store.userAchievements.SlipUp.achieved && (proxyScore > 50 || vpnScore > 50)) {
+            store.setTriggerUpdateAchievements('SlipUp');
+        }
+
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
 

@@ -20,6 +20,7 @@ import invisibilitytestHandler from './api/invisibilitytest.js';
 import macChecker from './api/macchecker.js';
 import maxmindHandler from './api/maxmind.js';
 import getuserinfo from './api/getuserinfo.js';
+import updateuserachievement from './api/updateuserachievement.js';
 
 dotenv.config();
 
@@ -125,6 +126,7 @@ if (speedLimitSet !== 0) {
     console.log('Speed limiter is enabled, slowing down after:', speedLimitSet, 'requests');
 }
 
+app.use(express.json());
 
 // APIs
 app.get('/api/map', mapHandler);
@@ -141,6 +143,7 @@ app.get('/api/invisibility', invisibilitytestHandler);
 app.get('/api/macchecker', macChecker);
 app.get('/api/maxmind', maxmindHandler);
 app.get('/api/getuserinfo', getuserinfo);
+app.put('/api/updateuserachievement', updateuserachievement);
 
 // 使用查询参数处理所有配置请求
 app.get('/api/configs', validateConfigs);

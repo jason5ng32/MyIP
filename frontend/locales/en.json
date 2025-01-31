@@ -7,6 +7,7 @@
     "SignInToView": "Sign In to View",
     "SignInToUse": "Please sign in to use",
     "InvalidUserToken": "Invalid User Token",
+    "MyAchievements": "My Achievements",
     "Fields": {
       "User": "User",
       "CreatedAt": "Created At",
@@ -30,8 +31,95 @@
       "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
       "Benifit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
       "Benifit2": "You can use the invisibility test.",
-      "Benifit3": "Reduces access restrictions on some features.",
+      "Benifit3": "You can view your own achievement badges",
+      "Benifit4": "Reduces access restrictions on some features.",
       "FootNote": "More benefits are being developed..."
+    },
+    "Achievements": {
+      "Title": "Achievements",
+      "Note": "While using IPCheck.ing, you may trigger some achievements. Here you can see all your achievements.",
+      "Get": "Obtained",
+      "GetCount": "Obtained Achievements",
+      "NotGet": "Not Yet",
+      "NotGetCount": "Not Yet Achievements",
+      "FooterNote": "Sometimes, there may be some time-limited achievements.",
+      "Congrats": "🎉 Congratulations",
+      "CongratsMessage": "You have achieved a new accomplishment!",
+      "NewAchievementIs": "The new achievement is:",
+      "Type": {
+        "IAmHuman": {
+          "Title": "I Am Human",
+          "Meet": "Use IPCheck.ing after logging in"
+        },
+        "BarelyEnough": {
+          "Title": "Barely Enough",
+          "Meet": "Download speed exceeds 100Mb/s"
+        },
+        "RapidPace": {
+          "Title": "Rapid Pace",
+          "Meet": "Download speed exceeds 500Mb/s"
+        },
+        "TorrentFlow": {
+          "Title": "Torrent Flow",
+          "Meet": "Download speed exceeds 1000Mb/s"
+        },
+        "SteadyGoing": {
+          "Title": "Steady Going",
+          "Meet": "Upload speed exceeds 50Mb/s"
+        },
+        "TooFastTooSimple": {
+          "Title": "Too Fast Too Simple",
+          "Meet": "Upload speed exceeds 200Mb/s"
+        },
+        "SwiftAscent": {
+          "Title": "Swift Ascent",
+          "Meet": "Upload speed exceeds 1000Mb/s"
+        },
+        "SurfaceCheck": {
+          "Title": "Surface Check",
+          "Meet": "Complete a security checklist item"
+        },
+        "HalfwayThere": {
+          "Title": "Halfway There",
+          "Meet": "Complete 50% of the security checklist"
+        },
+        "FullySecured": {
+          "Title": "Fully Secured",
+          "Meet": "Complete the entire security checklist"
+        },
+        "JustInCase": {
+          "Title": "Just In Case",
+          "Meet": "Complete a stealth test"
+        },
+        "HiddenWell": {
+          "Title": "Hidden Well",
+          "Meet": "Proxy and VPN probability are both 0 in the stealth test"
+        },
+        "SlipUp": {
+          "Title": "Slip Up",
+          "Meet": "Proxy or VPN probability is greater than 50% in the stealth test"
+        },
+        "CleverTrickery": {
+          "Title": "Clever Trickery",
+          "Meet": "Viewed all keyboard shortcuts"
+        },
+        "EnergySaver": {
+          "Title": "Energy Saver",
+          "Meet": "Set the program not to run automatically"
+        },
+        "ResourceHog": {
+          "Title": "Resource Hog",
+          "Meet": "Set multiple refreshes for availability"
+        },
+        "MakingBigNews": {
+          "Title": "Making Big News",
+          "Meet": "Advanced function calls exceed 1000 times"
+        },
+        "GenerousDonor": {
+          "Title": "Generous Donor",
+          "Meet": "Donated to the IPCheck.ing project"
+        }
+      }
     }
   },
   "nav": {
@@ -988,6 +1076,28 @@
           {
             "type": "add",
             "change": "Add Security Checklist"
+          },
+          {
+            "type": "improve",
+            "change": "Other general optimizations"
+          }
+        ]
+      },
+      {
+        "version": "v5.0",
+        "date": "Jan 31, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "Add user system"
+          },
+          {
+            "type": "add",
+            "change": "Add user achievement system"
+          },
+          {
+            "type": "add",
+            "change": "Add Lite version"
           },
           {
             "type": "improve",

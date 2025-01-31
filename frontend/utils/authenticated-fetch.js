@@ -1,10 +1,13 @@
 import { useMainStore } from '../store';
 
-export async function authenticatedFetch(url) {
+export async function authenticatedFetch(url, method = 'GET', body = null) {
     const store = useMainStore();
     const options = {
-        method: 'GET',
-        headers: {}
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : null, // 如果提供了 body，则将其转换为 JSON 字符串
     };
 
     // 检查 URL 是否是需要认证的代理 API

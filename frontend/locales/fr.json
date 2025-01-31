@@ -7,6 +7,7 @@
         "SignInToView": "Connectez-vous pour voir",
         "SignInToUse": "Connectez-vous pour utiliser",
         "InvalidUserToken": "Token utilisateur non valide",
+        "MyAchievements": "Succès",
         "Fields": {
             "User": "Utilisateur",
             "CreatedAt": "Créé Le",
@@ -30,8 +31,95 @@
             "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
             "Benifit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement.",
             "Benifit2": "Peut utiliser le test d'invisibilité.",
-            "Benifit3": "Réduit les restrictions d'accès à certaines fonctionnalités.",
+            "Benifit3": "Peut voir les badges de réussite qu'il a obtenus",
+            "Benifit4": "Réduit les restrictions d'accès à certaines fonctionnalités.",
             "FootNote": "D'autres avantages sont en cours de développement..."
+        },
+        "Achievements": {
+            "Title": "Succès",
+            "Note": "En utilisant IPCheck.ing, vous pouvez déclencher certains succès. Ici, vous pouvez voir tous vos succès.",
+            "Get": "obtenus",
+            "GetCount": "Succès obtenus:",
+            "NotGet": "non obtenus",
+            "NotGetCount": "Succès non obtenus",
+            "FooterNote": "Parfois, il peut y avoir des succès limités dans le temps.",
+            "Congrats": "🎉 Félicitations",
+            "CongratsMessage": "Vous avez obtenu un nouvel accomplissement !",
+            "NewAchievementIs": "Le nouvel accomplissement est :",
+            "Type": {
+                "IAmHuman": {
+                    "Title": "Je suis humain",
+                    "Meet": "Utiliser IPCheck.ing après s'être connecté"
+                },
+                "BarelyEnough": {
+                    "Title": "Tout juste suffisant",
+                    "Meet": "Vitesse de téléchargement supérieure à 100 Mb/s"
+                },
+                "RapidPace": {
+                    "Title": "Allure rapide",
+                    "Meet": "Vitesse de téléchargement supérieure à 500 Mb/s"
+                },
+                "TorrentFlow": {
+                    "Title": "Flux torrentiel",
+                    "Meet": "Vitesse de téléchargement supérieure à 1000 Mb/s"
+                },
+                "SteadyGoing": {
+                    "Title": "Débit constant",
+                    "Meet": "Vitesse d'envoi supérieure à 50 Mb/s"
+                },
+                "TooFastTooSimple": {
+                    "Title": "Trop rapide, trop simple",
+                    "Meet": "Vitesse d'envoi supérieure à 200 Mb/s"
+                },
+                "SwiftAscent": {
+                    "Title": "Ascension rapide",
+                    "Meet": "Vitesse d'envoi supérieure à 1000 Mb/s"
+                },
+                "SurfaceCheck": {
+                    "Title": "Vérification superficielle",
+                    "Meet": "Terminer un élément de la liste de contrôle de sécurité"
+                },
+                "HalfwayThere": {
+                    "Title": "À mi-chemin",
+                    "Meet": "Terminer 50 % de la liste de contrôle de sécurité"
+                },
+                "FullySecured": {
+                    "Title": "Sécurisé à 100%",
+                    "Meet": "Terminer toute la liste de contrôle de sécurité"
+                },
+                "JustInCase": {
+                    "Title": "Au cas où",
+                    "Meet": "Effectuer un test de furtivité"
+                },
+                "HiddenWell": {
+                    "Title": "Bien caché",
+                    "Meet": "La probabilité de proxy et de VPN est de 0 dans le test de furtivité"
+                },
+                "SlipUp": {
+                    "Title": "Gaffe",
+                    "Meet": "La probabilité de proxy ou de VPN est supérieure à 50 % dans le test de furtivité"
+                },
+                "CleverTrickery": {
+                    "Title": "Ruse ingénieuse",
+                    "Meet": "Avoir consulté tous les raccourcis clavier"
+                },
+                "EnergySaver": {
+                    "Title": "Économe en énergie",
+                    "Meet": "Configurer le programme pour qu'il ne s'exécute pas automatiquement"
+                },
+                "ResourceHog": {
+                    "Title": "Gourmand en ressources",
+                    "Meet": "Configurer plusieurs rafraîchissements pour la disponibilité"
+                },
+                "MakingBigNews": {
+                    "Title": "Faire les gros titres",
+                    "Meet": "Les appels de fonctions avancées dépassent 1000 fois"
+                },
+                "GenerousDonor": {
+                    "Title": "Généreux donateur",
+                    "Meet": "Avoir fait un don au projet IPCheck.ing"
+                }
+            }
         }
     },
     "nav": {
@@ -988,6 +1076,28 @@
                     {
                         "type": "add",
                         "change": "Liste de vérification de sécurité"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Autres optimisations générales"
+                    }
+                ]
+            },
+            {
+                "version": "v5.0",
+                "date": "Jan 31, 2025",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la système d'utilisateur"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la système de réussite utilisateur"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la version Lite"
                     },
                     {
                         "type": "improve",

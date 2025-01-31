@@ -75,21 +75,26 @@
               <span>{{ t('user.Fields.User') }} : {{ userName }}</span>
               <span>{{ t('user.Fields.CreatedAt') }} : {{ userCreatedAt }}</span>
               <span class="d-flex align-items-center">{{ t('user.Fields.Level') }} :&nbsp;
-                <span v-if="userInfoFetched" class="badge" :class="{
-                  'text-bg-secondary': userInfo.userLevel === 'Standard',
-                  'text-bg-primary': userInfo.userLevel === 'Premium',
-                  'text-bg-dark': userInfo.userLevel === 'Owner',
-                  'text-bg-success': userInfo.userLevel === 'Developer',
-                  'text-bg-warning': userInfo.userLevel === 'HonoraryMember',
-                }">{{ t('user.Level.' + userInfo.userLevel)}}</span>
+                <span v-if="remoteUserInfoFetched" class="badge" :class="{
+                  'text-bg-secondary': remoteUserInfo.userLevel === 'Standard',
+                  'text-bg-primary': remoteUserInfo.userLevel === 'Premium',
+                  'text-bg-dark': remoteUserInfo.userLevel === 'Owner' && !isDarkMode,
+                  'text-bg-light': remoteUserInfo.userLevel === 'Owner' && isDarkMode,
+                  'text-bg-success': remoteUserInfo.userLevel === 'Developer',
+                  'text-bg-warning': remoteUserInfo.userLevel === 'HonoraryMember',
+                }">{{ t('user.Level.' + remoteUserInfo.userLevel)}}</span>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
               <span>{{ t('user.Fields.FunctionUses') }} :&nbsp;
-                <span v-if="userInfoFetched">{{ userInfo.functionUses.total }}
+                <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }}
                   {{ t('user.Fields.Times') }}
                 </span>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
+            </li>
+            <li v-if="isSignedIn">
+              <button type="button" class="dropdown-item" @click="store.setTriggerAchievements(true)"><i
+                  class="bi bi-award-fill"></i> {{t('user.MyAchievements')}} </button>
             </li>
             <li v-if="isSignedIn">
               <hr class="dropdown-divider" />
@@ -101,7 +106,8 @@
             <li v-if="!isSignedIn">
               <hr class="dropdown-divider" />
             </li>
-            <li><button type="button" class="dropdown-item" @click="openUserBenefits"><i class="bi bi-award-fill"></i>
+            <li><button type="button" class="dropdown-item" @click="store.setTriggerUserBenefits(true)"><i
+                  class="bi bi-person-hearts"></i>
                 {{
                 t('user.Benefits.Title') }}</button></li>
             <li v-if="isSignedIn">
@@ -117,85 +123,52 @@
     </nav>
   </header>
 
-  <!-- User Benefits Modal -->
-  <div class="modal fade" id="Benefits" tabindex="-1" aria-labelledby="Benefits">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-        <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-          <h5 class="modal-title" id="BenefitsTitle"><i class="bi bi-award-fill"></i> {{ t('user.Benefits.Title') }}
-          </h5>
-          <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-            data-bs-dismiss="modal" aria-label="Close"></button>
-
-        </div>
-        <div class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
-          <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
-          <p class="opacity-75">{{ t('user.Benefits.Note2') }}</p>
-          <div class="table-responsive">
-            <table class="table" :class="{ 'table-dark': isDarkMode }">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">{{ t('user.Benefits.Benefit') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">1</th>
-                  <td>{{ t('user.Benefits.Benifit1') }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>{{ t('user.Benefits.Benifit2') }}</td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td>{{ t('user.Benefits.Benifit3') }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="opacity-75">{{ t('user.Benefits.FootNote') }}</p>
-        </div>
-        <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-        </div>
-      </div>
-    </div>
-  </div>
-
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Offcanvas, Modal } from 'bootstrap';
-import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { Offcanvas } from 'bootstrap';
+import unixToDateTime from '@/utils/timestamp-to-date';
 
 const { t } = useI18n();
 
 // 导入 Logo 图标
 import brandIcon from './svgicons/Brand.vue';
 
+// 基础数据
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const loaded = ref(false);
 
+// 导航
 const currentSection = computed(() => store.currentSection);
+
+// 判断是否启用 Firebase
 const isFireBaseSet = computed(() => store.isFireBaseSet);
 
 // 本地用户信息
-const isSignedIn = computed(() => !!store.user);
+const isSignedIn = computed(() => store.isSignedIn);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
 const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
 
 // 远程用户信息
-const userInfo = ref({});
-const userInfoFetched = ref(false);
+const remoteUserInfo = computed(() => store.remoteUserInfo);
+const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+
+// 触发远程获取用户信息
+const getUserInfo = async () => {
+  if (remoteUserInfoFetched.value || !isSignedIn.value) {
+    return;
+  }
+  // 触发远程获取用户信息
+  store.setTriggerRemoteUserInfo(true);
+}
 
 // 打开偏好设置
 const OpenPreferences = () => {
@@ -225,48 +198,6 @@ const scrollToSection = (el, offset = 70) => {
   const y = element.getBoundingClientRect().top + window.scrollY - offset;
   window.scrollTo({ top: y, behavior: "smooth" });
 }
-
-// 转换 Unix 时间
-const unixToDateTime = (timestamp) => {
-  timestamp = Number(timestamp);
-  const options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  };
-  const date = new Date(timestamp);
-  return date.toLocaleString(undefined, options);
-}
-
-// 打开 Modal
-const openUserBenefits = () => {
-  const modalElement = document.getElementById('Benefits');
-  const modalInstance = Modal.getOrCreateInstance(modalElement);
-  if (modalInstance) {
-    modalInstance.show();
-  }
-
-  trackEvent('Nav', 'NavClick', 'UserBenefits');
-};
-
-// 获取用户统计信息
-const getUserInfo = async () => {
-  if (userInfoFetched.value) {
-    return;
-  }
-  if (!store.user) {
-    return;
-  }
-  try {
-    const response = await authenticatedFetch(`/api/getuserinfo`);
-    const data = response;
-    userInfo.value = data;
-  } catch (error) {
-    console.error('Error fetching user info:', error);
-  }
-
-  userInfoFetched.value = true;
-};
 
 watch(() => store.allHasLoaded, (newValue) => {
   loaded.value = newValue;

@@ -109,6 +109,7 @@ You can use the program without adding any environment variables, but if you wan
 | `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
+| `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
 | `VITE_CURL_IPV4_DOMAIN` | No | `""` | Provides the IPv4 domain for the CURL API to users |
 | `VITE_CURL_IPV6_DOMAIN` | No | `""` | Provides the IPv6 domain for the CURL API to users |
