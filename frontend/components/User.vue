@@ -83,7 +83,7 @@ const openUserBenefits = () => {
 
 // 获取用户统计信息
 const getUserInfo = async () => {
-    if (remoteUserInfoFetched.value || !isSignedIn) {
+    if (remoteUserInfoFetched.value || !isSignedIn.value) {
         return;
     }
     try {
@@ -146,7 +146,7 @@ const updateUserAchievement = async (achievementName) => {
 
 // 监听程序装载完毕后加载用户信息
 watch(() => store.allHasLoaded, (newVal, oldVal) => {
-    if (newVal && !remoteUserInfoFetched.value && isSignedIn.value) {
+    if (newVal) {
         getUserInfo();
     }
 });
