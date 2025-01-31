@@ -25,7 +25,7 @@ export default async (req, res) => {
 
     // 构建请求
     const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    const url = new URL(`${apiEndpoint}/updateuserachivements?key=${key}`);
+    const url = new URL(`${apiEndpoint}/updateuserachievements?key=${key}`);
 
     try {
         const apiResponse = await fetch(url, {

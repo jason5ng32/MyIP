@@ -65,7 +65,7 @@ const triggerRemoteUserInfo = computed(() => store.triggerRemoteUserInfo);
 
 // 更新用户成就
 const triggerUpdateAchievements = computed(() => store.triggerUpdateAchievements);
-const achivementToUpdate = computed(() => store.achivementToUpdate);
+const achievementToUpdate = computed(() => store.achievementToUpdate);
 const isUpdateAchievementsSuccess = ref(false);
 
 // 打开 Modal
@@ -137,7 +137,7 @@ const updateUserAchievement = async (achievementName) => {
 
     // 更新远程数据
     try {
-        await authenticatedFetch(`/api/updateuserachievement`, 'PUT', { achivement: achievementName });
+        await authenticatedFetch(`/api/updateuserachievement`, 'PUT', { achievement: achievementName });
         isUpdateAchievementsSuccess.value = true;
     } catch (error) {
         if (retryCount >= maxRetries) {
@@ -164,7 +164,7 @@ watch(() => triggerRemoteUserInfo.value, (newVal, oldVal) => {
 // 监听更新用户成就
 watch(() => triggerUpdateAchievements.value, (newVal, oldVal) => {
     if (newVal) {
-        updateUserAchievement(achivementToUpdate.value);
+        updateUserAchievement(achievementToUpdate.value);
         store.triggerUpdateAchievements = false;
     }
 })

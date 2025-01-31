@@ -1,7 +1,7 @@
 <template>
   <NavBar ref="navBarRef" />
   <User ref="userRef" />
-  <Achievements ref="achivementsRef" />
+  <Achievements ref="achievementsRef" />
   <Preferences ref="preferencesRef" />
   <Alert />
   <div id="mainpart" class="container mt-5 jn-container">

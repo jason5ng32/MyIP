@@ -15,7 +15,7 @@ export const useMainStore = defineStore('main', {
     triggerUserBenefits: false,
     triggerRemoteUserInfo: false,
     triggerUpdateAchievements: false,
-    achivementToUpdate: '',
+    achievementToUpdate: '',
     userAchievements: {
       'IAmHuman': { name: 'IAmHuman', achieved: false, img: 'achievements/iamhuman.webp', showDetails: false, achievedTime: null },
       'BarelyEnough': { name: 'BarelyEnough', achieved: false, img: '/achievements/barelyenough.webp', showDetails: false, achievedTime: null },
@@ -271,9 +271,9 @@ export const useMainStore = defineStore('main', {
       }
     },
     // 触发更新成就
-    setTriggerUpdateAchievements(achivement) {
+    setTriggerUpdateAchievements(achievement) {
       this.triggerUpdateAchievements = true;
-      this.achivementToUpdate = achivement;
+      this.achievementToUpdate = achievement;
     }
   }
 });
