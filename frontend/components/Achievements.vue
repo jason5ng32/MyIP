@@ -1,8 +1,8 @@
 <template>
 
-    <div v-if="isSignedIn" :data-bs-theme="isDarkMode ? 'dark' : 'light'" :class="[isMobile ? ' w-100' : 'jn-acvm-offcanvas']"
-        class="offcanvas offcanvas-start h-100 border-0 mt-5" tabindex="-1" id="Achievements"
-        aria-labelledby="AchievementsLabel">
+    <div v-if="isSignedIn" :data-bs-theme="isDarkMode ? 'dark' : 'light'"
+        :class="[isMobile ? ' w-100' : 'jn-acvm-offcanvas']" class="offcanvas offcanvas-start h-100 border-0 mt-5"
+        tabindex="-1" id="Achievements" aria-labelledby="AchievementsLabel">
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-award-fill"></i> {{
                 t('user.Achievements.Title') }}
@@ -101,7 +101,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal, Offcanvas } from 'bootstrap';
+import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
@@ -121,7 +121,6 @@ const userAchievements = computed(() => store.userAchievements);
 const achievedCount = computed(() => {
     return Object.values(userAchievements.value).filter(achievement => achievement.achieved).length;
 });
-
 const notAchievedCount = computed(() => {
     return Object.values(userAchievements.value).filter(achievement => !achievement.achieved).length;
 });
@@ -135,6 +134,7 @@ const convertTime = (timestamp) => {
     return unixToDateTime(timestamp);
 }
 
+// 打开成就面板
 const openAchievements = () => {
     const offcanvasElement = document.getElementById('Achievements');
     let offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
@@ -162,6 +162,7 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
     if (newVal) {
         openAchievements();
     }
+    // 获取一次用户信息，以防没有
     if (!remoteUserInfoFetched.value) {
         store.setTriggerRemoteUserInfo(true);
     }
@@ -173,9 +174,11 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
 #Achievements {
     z-index: 1053;
 }
+
 .jn-acvm-offcanvas {
     min-width: 600pt;
 }
+
 .jn-slide-in {
     animation: slide-in 0.2s ease-in forwards;
 }

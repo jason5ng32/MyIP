@@ -166,7 +166,7 @@ const getUserInfo = async () => {
   if (remoteUserInfoFetched.value || !isSignedIn.value) {
     return;
   }
-  // 触发远程获取用户信息
+  // 获取一次用户信息，以防没有
   store.setTriggerRemoteUserInfo(true);
 }
 

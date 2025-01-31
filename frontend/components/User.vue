@@ -128,9 +128,6 @@ const updateLocalAchievementStatus = (achievementName) => {
 // 更新成就
 const updateUserAchievement = async (achievementName) => {
     isUpdateAchievementsSuccess.value = false;
-    if (!remoteUserInfoFetched.value) {
-        await getUserInfo();
-    }
     updateLocalAchievementStatus(achievementName);
     // 发送通知
     store.setAlert(true, "text-success", t('user.Achievements.CongratsMessage') + t('user.Achievements.NewAchievementIs') + t('user.Achievements.Type.' + achievementName + '.Title'), t('user.Achievements.Congrats'));
@@ -146,6 +143,13 @@ const updateUserAchievement = async (achievementName) => {
         console.error('Error updating user achievement', error);
     }
 }
+
+// 监听程序装载完毕后加载用户信息
+watch(() => store.allHasLoaded, (newVal, oldVal) => {
+    if (newVal) {
+        getUserInfo();
+    }
+});
 
 // 监听触发用户权益
 watch(() => triggerUserBenefits.value, (newVal, oldVal) => {
