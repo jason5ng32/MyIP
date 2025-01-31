@@ -130,7 +130,7 @@ const updateUserAchievement = async (achievementName) => {
     isUpdateAchievementsSuccess.value = false;
     updateLocalAchievementStatus(achievementName);
     // 发送通知
-    store.setAlert(true, "text-success", t('user.Achievements.CongratsMessage') + t('user.Achievements.NewAchievementIs') + t('user.Achievements.Type.' + achievementName + '.Title'), t('user.Achievements.Congrats'));
+    store.setAlert(true, "text-success", t('user.Achievements.CongratsMessage') + t('user.Achievements.NewAchievementIs') + t('user.Achievements.Type.' + achievementName + '.Title'), t('user.Achievements.Congrats'), 5000);
 
     // 更新远程数据
     try {

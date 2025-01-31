@@ -70,6 +70,7 @@ export const useMainStore = defineStore('main', {
       alertStyle: "",
       alertMessage: "",
       alertTitle: "",
+      alertDuration: 2000,
     },
     currentSection: 'IPInfo',
     ipDBs: [
@@ -114,8 +115,8 @@ export const useMainStore = defineStore('main', {
       this.loadingStatus[key] = value;
     },
     // 设置 Toast
-    setAlert(alertToShow, alertStyle, alertMessage, alertTitle) {
-      this.alert = { alertToShow, alertStyle, alertMessage, alertTitle };
+    setAlert(alertToShow, alertStyle, alertMessage, alertTitle, alertDuration) {
+      this.alert = { alertToShow, alertStyle, alertMessage, alertTitle, alertDuration };
     },
     // 从不同的组件收集合并 IP 数据
     updateAllIPs(payload) {

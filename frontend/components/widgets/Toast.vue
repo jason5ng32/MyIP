@@ -33,7 +33,8 @@ watch(alert, (newVal) => {
 }, { immediate: true, deep: true });
 
 // 显示 Toast
-const showToast = (duration = 2000) => {
+const showToast = () => {
+    let duration = alert.value.alertDuration || 2000;
     if (toastEl.value) {
         const toastInfoMask = new Toast(toastEl.value, {
             delay: duration
