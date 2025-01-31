@@ -170,6 +170,9 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
 </script>
 
 <style scoped>
+#Achievements {
+    z-index: 1053;
+}
 .jn-acvm-offcanvas {
     min-width: 600pt;
 }
