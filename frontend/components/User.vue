@@ -25,7 +25,7 @@
                             <tbody>
                                 <tr v-for="n in 4" :key="n">
                                     <th scope="row">{{ n }}</th>
-                                    <td>{{ t('user.Benefits.Benifit' + n) }}</td>
+                                    <td>{{ t('user.Benefits.Benefit' + n) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -129,17 +129,16 @@ const updateLocalAchievementStatus = (achievementName) => {
 const updateUserAchievement = async (achievementName) => {
     isUpdateAchievementsSuccess.value = false;
     updateLocalAchievementStatus(achievementName);
+    
     // 发送通知
-    store.setAlert(true, "text-success", t('user.Achievements.CongratsMessage') + t('user.Achievements.NewAchievementIs') + t('user.Achievements.Type.' + achievementName + '.Title'), t('user.Achievements.Congrats'), 5000);
+    const message = t('user.Achievements.CongratsMessage') + t('user.Achievements.NewAchievementIs') + t('user.Achievements.Type.' + achievementName + '.Title');
+    store.setAlert(true, "text-success", message, t('user.Achievements.Congrats'), 5000);
 
     // 更新远程数据
     try {
         await authenticatedFetch(`/api/updateuserachievement`, 'PUT', { achievement: achievementName });
         isUpdateAchievementsSuccess.value = true;
     } catch (error) {
-        if (retryCount >= maxRetries) {
-            console.error('Error updating user achievement, retrying...', error);
-        }
         console.error('Error updating user achievement', error);
     }
 }

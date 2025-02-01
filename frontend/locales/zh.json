@@ -29,10 +29,10 @@
       "Benefit": "权益",
       "Note1": "作为一个开源产品，你使用 IPCheck.ing 的过程是免费的。",
       "Note2": "但是，为了避免滥用，我们会限制一些功能。当你登录后，你将得到以下权益：",
-      "Benifit1": "当你使用 IPCheck.ing 作为 IP 数据解析源时，完整显示所有字段",
-      "Benifit2": "可以使用隐身测试",
-      "Benifit3": "可以看到自己获得的成就勋章",
-      "Benifit4": "减少部分功能的访问限制",
+      "Benefit1": "当你使用 IPCheck.ing 作为 IP 数据解析源时，完整显示所有字段",
+      "Benefit2": "可以使用隐身测试",
+      "Benefit3": "可以看到自己获得的成就勋章",
+      "Benefit4": "减少部分功能的访问限制",
       "FootNote": "更多权益陆续开发中..."
     },
     "Achievements": {
