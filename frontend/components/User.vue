@@ -100,23 +100,24 @@ const getUserInfo = async () => {
 
 // 通过远程数据初始化本地成就数据，寻找相同的键值进行更新
 const initUserAchievements = () => {
-    if (remoteUserInfo.value) {
-        for (const key in remoteUserInfo.value.achievements) {
-            if (store.userAchievements[key]) {
-                store.userAchievements[key].achieved = remoteUserInfo.value.achievements[key].achieved;
-                store.userAchievements[key].achievedTime = remoteUserInfo.value.achievements[key].achievedTime;
-            }
+    if (!remoteUserInfo.value) return;
+    
+    const { achievements, functionUses } = remoteUserInfo.value;
+    Object.entries(achievements).forEach(([key, value]) => {
+        if (store.userAchievements[key]) {
+            store.userAchievements[key].achieved = value.achieved;
+            store.userAchievements[key].achievedTime = value.achievedTime;
+        }
+    });
+
+    if (isSignedIn.value) {
+        if (!store.userAchievements.IAmHuman.achieved) {
+            store.setTriggerUpdateAchievements('IAmHuman');
+        }
+        if (!store.userAchievements.MakingBigNews.achieved && functionUses.total > 1000) {
+            store.setTriggerUpdateAchievements('MakingBigNews');
         }
     }
-
-    if (isSignedIn.value && !store.userAchievements.IAmHuman.achieved) {
-        store.setTriggerUpdateAchievements('IAmHuman');
-    }
-
-    if (isSignedIn.value && !store.userAchievements.MakingBigNews.achieved && remoteUserInfo.value.functionUses.total > 1000) {
-        store.setTriggerUpdateAchievements('MakingBigNews');
-    }
-
 }
 
 // 本地更新成就

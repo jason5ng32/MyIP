@@ -14,7 +14,8 @@ export default (req, res) => {
     }
 
     const hostname = referer ? new URL(referer).hostname : '';
-    const originalSite = hostname === 'ipcheck.ing' || hostname === 'www.ipcheck.ing' || hostname === 'localtest.ipcheck.ing';
+    const allowedHostnames = ['ipcheck.ing', 'www.ipcheck.ing', 'localtest.ipcheck.ing'];
+    const originalSite = allowedHostnames.includes(hostname);
 
     const envConfigs = {
         map: process.env.GOOGLE_MAP_API_KEY,

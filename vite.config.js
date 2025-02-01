@@ -122,7 +122,7 @@ export default defineConfig({
           }
         },
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith('.woff') || assetInfo.name.endsWith('.woff2')) {
+          if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {
             return 'fonts/[name][extname]';
           }
           return 'assets/[name]-[hash][extname]';

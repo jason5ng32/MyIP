@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="isSignedIn" :data-bs-theme="isDarkMode ? 'dark' : 'light'"
-        :class="[isMobile ? ' w-100' : 'jn-acvm-offcanvas']" class="offcanvas offcanvas-start h-100 border-0 mt-5"
+        :class="[isMobile ? ' w-100' : 'jn-achievements-offcanvas']" class="offcanvas offcanvas-start h-100 border-0 mt-5"
         tabindex="-1" id="Achievements" aria-labelledby="AchievementsLabel">
         <div class="offcanvas-header mt-3">
             <h5 class="offcanvas-title"><i class="bi bi-award-fill"></i> {{
@@ -38,15 +38,15 @@
                             <div class="col-lg-3 col-md-6 col-6 my-2"
                                 v-for="(achievement,key) in Object.values(userAchievements).filter(achievement => achievement.achieved)"
                                 :key="key">
-                                <div class="card jn-card jn-acvm-card " :class="{ ' jn-acvm-card-dark': isDarkMode }">
+                                <div class="card jn-card jn-achievements-card " :class="{ ' jn-achievements-card-dark': isDarkMode }">
                                     <div type="button"
                                         class="card-body d-flex flex-column align-items-center justify-content-around"
                                         :title="t(`user.Achievements.Type.${achievement.name}.Meet`)"
                                         @click="flipCard(achievement.name)">
                                         <img v-if="!achievement.showDetails" :src="achievement.img"
-                                            class="jn-slide-in  jn-acvm-img" height="120pt" width="120pt" />
+                                            class="jn-slide-in jn-achievements-img" height="120pt" width="120pt" />
                                         <h3 v-if="!achievement.showDetails" :class="{ 'text-light': isDarkMode }"
-                                            class="text-secondary fs-6 mt-2 text-center jn-slide-in jn-acvm-h3">
+                                            class="text-secondary fs-6 mt-2 text-center jn-slide-in jn-achievements-h3">
                                             {{ t(`user.Achievements.Type.${achievement.name}.Title`) }}
                                         </h3>
                                         <div v-if="achievement.showDetails"
@@ -74,12 +74,12 @@
                             <div class="col-lg-3 col-md-6 col-6 my-4 opacity-50"
                                 v-for="(achievement,key) in Object.values(userAchievements).filter(achievement => !achievement.achieved)"
                                 :key="key">
-                                <div class="card jn-card jn-acvm-card" :class="{ ' jn-acvm-card-dark': isDarkMode }">
+                                <div class="card jn-card jn-achievements-card" :class="{ ' jn-achievements-card-dark': isDarkMode }">
                                     <div class="card-body d-flex flex-column align-items-center justify-content-center jn-mosaic"
                                         @click="flipCard(achievement.name)">
-                                        <img :src="achievement.img" class="jn-slide-in jn-blur jn-acvm-img"
+                                        <img :src="achievement.img" class="jn-slide-in jn-blur jn-achievements-img"
                                             height="120pt" width="120pt" />
-                                        <h3 class="text-secondary fs-6 mt-2 text-center jn-blur jn-acvm-h3"
+                                        <h3 class="text-secondary fs-6 mt-2 text-center jn-blur jn-achievements-h3"
                                             :class="{ 'text-light': isDarkMode }">
                                             {{ t(`user.Achievements.Type.${achievement.name}.Title`) }}
                                         </h3>
@@ -175,7 +175,7 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
     z-index: 1053;
 }
 
-.jn-acvm-offcanvas {
+.jn-achievements-offcanvas {
     min-width: 600pt;
 }
 
@@ -196,7 +196,7 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
 }
 
 
-.jn-acvm-card {
+.jn-achievements-card {
     position: relative;
     min-height: 170pt;
     border: 3px solid transparent;
@@ -206,15 +206,15 @@ watch(() => triggerAchievements.value, (newVal, oldVal) => {
 
 }
 
-.jn-acvm-img {
+.jn-achievements-img {
     object-fit: contain;
 }
 
-.jn-acvm-h3 {
+.jn-achievements-h3 {
     min-height: 2pt;
 }
 
-.jn-acvm-card-dark {
+.jn-achievements-card-dark {
     position: relative;
     min-height: 170pt;
     border: 3px solid transparent;
