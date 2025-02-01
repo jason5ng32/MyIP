@@ -4,7 +4,7 @@
         <div class="p-3">
             <span v-if="asnInfos[asn]">
                 <i class="bi bi-info-circle-fill"></i>
-                <span class="fw-light">{{ t('ipInfos.ASNInfo.note') }}</span>
+                <span class="fw-light">&nbsp;{{ t('ipInfos.ASNInfo.note') }}</span>
                 <br />
                 <template v-for="(item,key) in asnInfos[asn]">
                     <span class="fw-light">
