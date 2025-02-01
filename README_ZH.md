@@ -157,7 +157,7 @@ docker run -d -p 18966:18966 \
 
 ```ini
 # IP Testing
-IP-CIDR,1.0.0.1/32,Proxy,no-resolve
+IP-CIDR,1.0.0.2/32,Proxy,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,Proxy,no-resolve
 DOMAIN,4.ipcheck.ing,DIRECT
 DOMAIN,6.ipcheck.ing,DIRECT
