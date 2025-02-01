@@ -40,10 +40,10 @@
                                     <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                                         <thead>
                                             <tr>
-                                                <th scope="col">{{ t('censorshipcheck.Country') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.Status') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.City') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.Network') }}</th>
+                                                <template v-for="header in ['Country', 'Status', 'City', 'Network']"
+                                                    :key="header">
+                                                    <th scope="col">{{ t('censorshipcheck.' + header) }}</th>
+                                                </template>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -80,10 +80,10 @@
                                     <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                                         <thead>
                                             <tr>
-                                                <th scope="col">{{ t('censorshipcheck.Country') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.Status') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.City') }}</th>
-                                                <th scope="col">{{ t('censorshipcheck.Network') }}</th>
+                                                <template v-for="header in ['Country', 'Status', 'City', 'Network']"
+                                                    :key="header">
+                                                    <th scope="col">{{ t('censorshipcheck.' + header) }}</th>
+                                                </template>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -166,7 +166,7 @@ const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
-
+const isSignedIn = computed(() => store.isSignedIn);
 const highRiskCountries = ['CN', 'RU', 'TR', 'SA'];
 const censorshipResults = ref([]);
 const censorshipCheckStatus = ref("idle");
@@ -358,34 +358,47 @@ const correctResult = () => {
 
 // 计算结果
 const calResult = (testResults) => {
-
+    // 重置状态
     blockedCountries.value = [];
+    isBlocked.value = false;
+    isDown.value = false;
 
-    // 遍历高风险国家，检查每个国家的所有测试结果
-    highRiskCountries.forEach(country => {
-        const resultsForCountry = testResults.filter(result => result.country === country);
+    // 判断测试结果是否失败的函数
+    const isFailedResult = result => result.status === 'failed' && result.headers === '';
 
-        // 检查是否所有结果都标记为 failed 且 headers 为空，如果是，将这个国家添加到封锁国家列表
-        if (resultsForCountry.every(result => result.status === 'failed' && result.headers === '')) {
-            blockedCountries.value.push(country);
-        }
+    // 检查高风险国家
+    const blockedHighRiskCountries = highRiskCountries.filter(country => {
+        const countryResults = testResults.filter(result => result.country === country);
+        return countryResults.length > 0 && countryResults.every(isFailedResult);
     });
 
-    // 获取非高风险国家的测试结果
+    // 检查非高风险国家状态
     const otherResults = testResults.filter(result => !highRiskCountries.includes(result.country));
-    const failedOtherResults = otherResults.filter(result => result.status === 'failed' && result.headers === '');
+    const failedOtherResultsCount = otherResults.filter(isFailedResult).length;
+    const failureRate = otherResults.length ? failedOtherResultsCount / otherResults.length : 0;
 
-    // 检查非高风险国家的失败率是否超过一半
-    if (failedOtherResults.length > otherResults.length / 2) {
-        // 如果是，这可能是网站自身的问题
-        blockedCountries.value = [];
-        isBlocked.value = false;
+    // 判断网站状态
+    if (failureRate > 0.5) {
+        // 超过一半非高风险国家失败，可能是网站问题
         isDown.value = true;
     } else {
-        isBlocked.value = blockedCountries.value.length > 0;
+        // 否则更新被封锁国家列表
+        blockedCountries.value = blockedHighRiskCountries;
+        isBlocked.value = blockedHighRiskCountries.length > 0;
     }
-    blockedCountries.value = blockedCountries.value;
+    if (isSignedIn.value) {
+        checkAchievements();
+    }
 };
+
+// 检查是否达成成就
+const checkAchievements = () => {
+    if (isBlocked.value) {
+        if (!store.userAchievements.ItIsOpen.achieved) {
+            store.setTriggerUpdateAchievements('ItIsOpen');
+        }
+    }
+}
 
 // 一些动画效果
 const beforeEnter = (el) => {

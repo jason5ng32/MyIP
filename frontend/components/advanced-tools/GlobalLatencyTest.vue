@@ -40,14 +40,16 @@
                 <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                   <thead>
                     <tr>
-                      <th scope="col">{{ t('pingtest.Region') }}</th>
-                      <th scope="col">{{ t('pingtest.MinDelay') }}</th>
-                      <th scope="col">{{ t('pingtest.MaxDelay') }}</th>
-                      <th scope="col">{{ t('pingtest.AvgDelay') }}</th>
-                      <th scope="col">{{ t('pingtest.TotalPackets') }}</th>
-                      <th scope="col">{{ t('pingtest.PacketLoss') }}</th>
-                      <th scope="col">{{ t('pingtest.ReceivedPackets') }}</th>
-                      <th scope="col">{{ t('pingtest.DroppedPackets') }}</th>
+                      <th scope="col" v-for="header in [
+                        'Region',
+                        'MinDelay',
+                        'MaxDelay', 
+                        'AvgDelay',
+                        'TotalPackets',
+                        'PacketLoss',
+                        'ReceivedPackets',
+                        'DroppedPackets'
+                      ]" :key="header">{{ t('pingtest.' + header) }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -56,11 +58,9 @@
                         <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
                         {{ result.country_name }}
                       </td>
-                      <td :class="result.stats.min < 100 ? 'text-success' : ''">{{ result.stats.min.toFixed(1) }}
-                      </td>
-                      <td :class="result.stats.max < 100 ? 'text-success' : ''">{{ result.stats.max.toFixed(1) }}
-                      </td>
-                      <td :class="result.stats.avg < 100 ? 'text-success' : ''">{{ result.stats.avg.toFixed(1) }}
+                      <td v-for="stat in ['min', 'max', 'avg']" :key="stat"
+                          :class="result.stats[stat] < 100 ? 'text-success' : ''">
+                          {{ result.stats[stat].toFixed(1) }}
                       </td>
                       <td>{{ result.stats.total }}</td>
                       <td>{{ Math.round(result.stats.loss) }}%</td>

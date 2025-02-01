@@ -92,31 +92,37 @@
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
             </li>
-            <li v-if="isSignedIn">
-              <button type="button" class="dropdown-item" @click="store.setTriggerAchievements(true)"><i
-                  class="bi bi-award-fill"></i> {{t('user.MyAchievements')}} </button>
-            </li>
-            <li v-if="isSignedIn">
-              <hr class="dropdown-divider" />
-            </li>
-            <li v-if="!isSignedIn"><button type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
-                  class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</button></li>
-            <li v-if="!isSignedIn"><button type="button" class="dropdown-item" @click="store.signInWithGithub"><i
-                  class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</button></li>
-            <li v-if="!isSignedIn">
-              <hr class="dropdown-divider" />
-            </li>
+            <template v-if="isSignedIn">
+              <li>
+                <button type="button" class="dropdown-item" @click="store.setTriggerAchievements(true)"><i
+                    class="bi bi-award-fill"></i> {{t('user.MyAchievements')}} </button>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+            </template>
+            <template v-if="!isSignedIn">
+              <li><button type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
+                    class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</button></li>
+              <li><button type="button" class="dropdown-item" @click="store.signInWithGithub"><i
+                    class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</button></li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+            </template>
             <li><button type="button" class="dropdown-item" @click="store.setTriggerUserBenefits(true)"><i
                   class="bi bi-person-hearts"></i>
                 {{
                 t('user.Benefits.Title') }}</button></li>
-            <li v-if="isSignedIn">
-              <hr class="dropdown-divider" />
-            </li>
-            <li v-if="isSignedIn"><button type="button" class="dropdown-item" @click="store.signOut"><i
-                  class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
-                }}</button>
-            </li>
+            <template v-if="isSignedIn">
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li><button type="button" class="dropdown-item" @click="store.signOut"><i
+                    class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
+                  }}</button>
+              </li>
+            </template>
           </ul>
         </div>
       </div>

@@ -170,10 +170,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
 import { UAParser } from 'ua-parser-js';
 import { getFingerprint as calFingerPrint, setOption as setFingerPrintOption } from '@thumbmarkjs/thumbmarkjs';
 import { getGPUTier } from 'detect-gpu';
@@ -203,7 +202,6 @@ const checkingStatus = ref('idle');
 const copiedStatus = ref(false);
 
 const userAgent = ref('');
-const fullFPDatas = ref();
 const gpu = ref('');
 const otherInfos = ref({});
 
@@ -282,10 +280,13 @@ const getFingerPrint = async () => {
 // 获取全部
 const getAll = async () => {
     try {
-        await getUA();
-        await getFingerPrint();
-        await getGPU();
-        await getOtherBrowserInfo();
+        checkingStatus.value = 'running';
+        await Promise.all([
+            getUA(),
+            getFingerPrint(),
+            getGPU(),
+            getOtherBrowserInfo()
+        ]);
         checkingStatus.value = 'finished';
     } catch (error) {
         console.error('Error during checks:', error);
@@ -295,15 +296,16 @@ const getAll = async () => {
 }
 
 // 复制
-const copyToClipboard = (ua) => {
-    navigator.clipboard.writeText(ua).then(() => {
+const copyToClipboard = async (ua) => {
+    try {
+        await navigator.clipboard.writeText(ua);
         copiedStatus.value = true;
         setTimeout(() => {
             copiedStatus.value = false;
         }, 5000);
-    }).catch(err => {
-        console.error('Copy error', err);
-    });
+    } catch (err) {
+        console.error('Copy error:', err);
+    }
 };
 
 onMounted(() => {

@@ -118,6 +118,18 @@
                 "GenerousDonor": {
                     "Title": "Généreux donateur",
                     "Meet": "Avoir fait un don au projet IPCheck.ing"
+                },
+                "ItIsOpen": {
+                    "Title": "C'est ouvert",
+                    "Meet": "Le test de censure a trouvé un site bloqué"
+                },
+                "CuriousCat": {
+                    "Title": "Chat curieux",
+                    "Meet": "Rechercher les informations de IPCheck.ing dans la recherche Whois"
+                },
+                "CrossingTheWall": {
+                    "Title": "Huit personnes traversent la muraille",
+                    "Meet": "Toutes les 8 adresses IP de test sont différentes dans le test de règles"
                 }
             }
         }
@@ -1101,7 +1113,7 @@
                     },
                     {
                         "type": "improve",
-                        "change": "Autres optimisations générales"
+                        "change": "Optimisation de la performance du code"
                     }
                 ]
             }

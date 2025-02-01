@@ -118,6 +118,18 @@
         "GenerousDonor": {
           "Title": "Generous Donor",
           "Meet": "Donated to the IPCheck.ing project"
+        },
+        "ItIsOpen": {
+          "Title": "It Is Open",
+          "Meet": "Found a blocked website in the Censorship Check"
+        },
+        "CuriousCat": {
+          "Title": "Curious Cat",
+          "Meet": "Query IPCheck.ing information in the Whois Search"
+        },
+        "CrossingTheWall": {
+          "Title": "Crossing The Wall",
+          "Meet": "All 8 test IPs are different in the Rule Test"
         }
       }
     }
@@ -1101,7 +1113,7 @@
           },
           {
             "type": "improve",
-            "change": "Other general optimizations"
+            "change": "Code efficiency optimization"
           }
         ]
       }

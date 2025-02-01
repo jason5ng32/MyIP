@@ -40,26 +40,14 @@
       <div class="offcanvas-body" ref="offcanvasBody">
         <div v-if="showAbout">
           <div class="mb-3">
-            <p>
-              {{ t('about.product1') }}
-            </p>
-            <p>
-              {{ t('about.product2') }}
-            </p>
-            <p>
-              {{ t('about.product3') }}
+            <p v-for="i in 3" :key="i">
+              {{ t(`about.product${i}`) }}
             </p>
           </div>
           <h5>{{ t('about.meTitle') }}</h5>
           <div class="mb-3">
-            <p>
-              {{ t('about.me1') }}
-            </p>
-            <p>
-              {{ t('about.me2') }}
-            </p>
-            <p>
-              {{ t('about.me3') }}
+            <p v-for="i in 3" :key="i">
+              {{ t(`about.me${i}`) }}
             </p>
           </div>
           <div class="mb-3 mx-2">

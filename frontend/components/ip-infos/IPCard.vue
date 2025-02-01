@@ -191,9 +191,9 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n';
-import IPErrorIcon from '../svgicons/IPError.vue';
 import { isValidIP } from '@/utils/valid-ip.js';
 import ASNInfo from './ASNInfo.vue';
+import IPErrorIcon from '../svgicons/IPError.vue';
 import { trackEvent } from '@/utils/use-analytics';
 
 const { t } = useI18n();
@@ -243,6 +243,7 @@ const props = defineProps({
     }
 });
 
+// 定义事件
 const emit = defineEmits(['refresh-card', 'get-asn-info']);
 
 // 复制 IP 地址

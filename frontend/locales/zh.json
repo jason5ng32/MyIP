@@ -118,6 +118,18 @@
         "GenerousDonor": {
           "Title": "慷慨解囊",
           "Meet": "给 IPCheck.ing 项目捐赠过"
+        },
+        "ItIsOpen": {
+          "Title": "是开放的",
+          "Meet": "在封锁测试中，查询到了一个被封锁的网站"
+        },
+        "CuriousCat": {
+          "Title": "好奇的猫",
+          "Meet": "在 Whois 查询中，查询了 IPCheck.ing 的信息"
+        },
+        "CrossingTheWall": {
+          "Title": "八仙过墙",
+          "Meet": "在规则测试中，8 个测试的 IP 全部不相同"
         }
       }
     }
@@ -1101,7 +1113,7 @@
           },
           {
             "type": "improve",
-            "change": "其它常规优化"
+            "change": "代码效率优化"
           }
         ]
       }
