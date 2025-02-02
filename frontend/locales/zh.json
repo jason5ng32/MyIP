@@ -1112,6 +1112,10 @@
             "change": "新增 Lite 版本"
           },
           {
+            "type": "add",
+            "change": "网速测试可以看到数据变化图表"
+          },
+          {
             "type": "improve",
             "change": "代码效率优化"
           }

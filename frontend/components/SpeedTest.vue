@@ -105,6 +105,35 @@
                 </p>
               </div>
             </div>
+
+            <div id="result"></div>
+
+            <!-- 在结果区域上方添加图表 -->
+            <div class="speed-charts-container mb-4 jn-slide-in" v-show="state.speedTest.status !== 'idle'">
+              <div class="row">
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="downloadChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="uploadChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="latencyChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="jitterChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
               v-if="state.speedTest.status === 'finished' && state.speedTest.hasScores">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i>&nbsp;
@@ -133,7 +162,6 @@
                 {{ t('speedtest.resultNote') }}
               </p>
             </div>
-            <div id="result"></div>
           </div>
         </div>
       </div>
@@ -142,7 +170,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted, markRaw } from 'vue';
+import { reactive, computed, onMounted, markRaw, ref, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -150,6 +178,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/utils/country-name.js';
 import getColoCountry from '@/utils/speedtest-colos.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
+import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -187,10 +216,21 @@ const state = reactive({
     package: {
       download: { bytes: 50e6, count: 4 },
       upload: { bytes: 15e6, count: 4 },
-      latency: { count: 20 }
+      latency: { count: 30 }
     }
   }
 });
+
+const {
+  downloadChart,
+  uploadChart,
+  latencyChart,
+  jitterChart,
+  updateCharts,
+  initStartingPoints,
+  destroyCharts,
+  resetChartData
+} = useSpeedTestCharts(t);
 
 // 连接数据处理
 const connectionMethods = {
@@ -286,32 +326,80 @@ const engineMethods = {
   },
 
   updateSpeedInRealTime() {
-    const rawData = testEngine.results.raw;
-    if (rawData.download?.results) {
-      const downloadKeys = Object.keys(rawData.download.results);
-      if (downloadKeys.length > 0) {
-        const lastDownloadKey = downloadKeys[downloadKeys.length - 1];
-        const downloadTimings = rawData.download.results[lastDownloadKey].timings;
-        if (downloadTimings.length > 0) {
-          state.speedTest.downloadSpeed = parseFloat((downloadTimings[downloadTimings.length - 1].bps / 1000000).toFixed(2));
+    try {
+      const rawData = testEngine?.results?.raw;
+      if (!rawData) return;
+
+      // 处理延迟数据和计算抖动
+      if (rawData.latency?.started) {
+        if (rawData.latency?.results?.timings?.length > 0) {
+          const latencyTimings = rawData.latency.results.timings;
+          state.speedTest.latency = parseFloat(latencyTimings[latencyTimings.length - 1].ping.toFixed(2));
+
+          if (latencyTimings.length >= 2) {
+            const differences = [];
+            for (let i = 1; i < latencyTimings.length; i++) {
+              differences.push(Math.abs(latencyTimings[i].ping - latencyTimings[i - 1].ping));
+            }
+
+            const mean = differences.reduce((a, b) => a + b, 0) / differences.length;
+            const variance = differences.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / differences.length;
+            state.speedTest.jitter = parseFloat(Math.sqrt(variance).toFixed(2));
+          }
         }
       }
-    }
 
-    if (rawData.upload?.results) {
-      const uploadKeys = Object.keys(rawData.upload.results);
-      if (uploadKeys.length > 0) {
-        const lastUploadKey = uploadKeys[uploadKeys.length - 1];
-        const uploadTimings = rawData.upload.results[lastUploadKey].timings;
-        if (uploadTimings.length > 0) {
-          state.speedTest.uploadSpeed = parseFloat((uploadTimings[uploadTimings.length - 1].bps / 1000000).toFixed(2));
+      // 处理下载速度
+      if (rawData.download?.started) {
+        if (rawData.download.current?.timings?.length > 0) {
+          const timings = rawData.download.current.timings;
+          state.speedTest.downloadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
+        } else if (rawData.download?.results) {
+          const downloadKeys = Object.keys(rawData.download.results);
+          if (downloadKeys.length > 0) {
+            const lastDownloadKey = downloadKeys[downloadKeys.length - 1];
+            const downloadTimings = rawData.download.results[lastDownloadKey].timings;
+            if (downloadTimings?.length > 0) {
+              const latestTiming = downloadTimings[downloadTimings.length - 1];
+              state.speedTest.downloadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
+            }
+          }
+        } else {
+          state.speedTest.downloadSpeed = 0;
         }
       }
-    }
 
-    if (rawData.latency?.results?.timings?.length > 0) {
-      const latencyTimings = rawData.latency.results.timings;
-      state.speedTest.latency = parseFloat(latencyTimings[latencyTimings.length - 1].ping.toFixed(2));
+      // 处理上传速度
+      if (rawData.upload?.started) {
+        if (rawData.upload.current?.timings?.length > 0) {
+          const timings = rawData.upload.current.timings;
+          state.speedTest.uploadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
+        } else if (rawData.upload?.results) {
+          const uploadKeys = Object.keys(rawData.upload.results);
+          if (uploadKeys.length > 0) {
+            const lastUploadKey = uploadKeys[uploadKeys.length - 1];
+            const uploadTimings = rawData.upload.results[lastUploadKey].timings;
+            if (uploadTimings?.length > 0) {
+              const latestTiming = uploadTimings[uploadTimings.length - 1];
+              state.speedTest.uploadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
+            }
+          }
+        } else {
+          state.speedTest.uploadSpeed = 0;
+        }
+      }
+
+      // 更新完状态后立即更新图表
+      updateCharts(
+        state.speedTest.downloadSpeed,
+        state.speedTest.uploadSpeed,
+        state.speedTest.latency,
+        state.speedTest.jitter,
+        rawData
+      );
+
+    } catch (error) {
+      console.error('Error in updateSpeedInRealTime:', error);
     }
   },
 
@@ -418,38 +506,59 @@ const setupTestEngine = async () => {
 };
 
 const speedTestController = async () => {
-  if (state.speedTest.status === 'running') {
-    testEngine.pause();
-    state.speedTest.status = "paused";
-    return;
-  }
+  try {
+    if (state.speedTest.status === 'running') {
+      testEngine.pause();
+      state.speedTest.status = "paused";
+      return;
+    }
 
-  if (state.speedTest.status === 'paused') {
+    if (state.speedTest.status === 'paused') {
+      testEngine.play();
+      return;
+    }
+
+    // 重置图表数据
+    resetChartData();
+    destroyCharts();
+
+    // 初始化图表并设置起始点
+    await initStartingPoints();  // 直接使用 initStartingPoints，它会处理初始化
+
+    Object.assign(state.speedTest, {
+      downloadSpeed: 0,
+      uploadSpeed: 0,
+      latency: 0,
+      jitter: 0,
+      streamingScore: "-",
+      gamingScore: "-",
+      rtcScore: "-",
+      hasScores: false
+    });
+
+    testEngine = engineMethods.reset();
+    if (!testEngine) {
+      console.error('Failed to initialize test engine');
+      return;
+    }
+
+    await setupTestEngine();
+    trackEvent('Section', 'StartClick', 'SpeedTest');
     testEngine.play();
-    return;
+  } catch (error) {
+    console.error('Error in speedTestController:', error);
+    state.speedTest.status = "error";
   }
-
-  Object.assign(state.speedTest, {
-    downloadSpeed: 0,
-    uploadSpeed: 0,
-    latency: 0,
-    jitter: 0,
-    streamingScore: "-",
-    gamingScore: "-",
-    rtcScore: "-",
-    hasScores: false
-  });
-
-  testEngine = engineMethods.reset();
-  await setupTestEngine();
-
-  trackEvent('Section', 'StartClick', 'SpeedTest');
-  testEngine.play();
 };
 
 // 生命周期
 onMounted(() => {
   store.setMountingStatus('speedtest', true);
+});
+
+// 清理
+onUnmounted(() => {
+  destroyCharts();
 });
 
 // 暴露方法
@@ -498,5 +607,46 @@ defineExpose({
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+
+.speed-charts-container {
+  margin: 20px 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 150px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+  .chart-wrapper {
+    height: 100px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+  .chart-wrapper {
+    height: 100px;
+    margin-bottom: 25px;
+  }
+}
+
+.jn-slide-in {
+  animation: slide-in 0.2s ease-in forwards;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>

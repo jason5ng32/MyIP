@@ -19,6 +19,7 @@
     "analytics": "^0.8.16",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.7",
     "circle-progress.vue": "^3.3.0",
     "code-inspector-plugin": "^0.19.2",
     "concurrently": "^9.1.2",

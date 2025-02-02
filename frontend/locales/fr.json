@@ -1112,6 +1112,10 @@
                         "change": "Ajout de la version Lite"
                     },
                     {
+                        "type": "add",
+                        "change": "Le test de vitesse peut maintenant afficher des graphiques de données"
+                    },
+                    {
                         "type": "improve",
                         "change": "Optimisation de la performance du code"
                     }

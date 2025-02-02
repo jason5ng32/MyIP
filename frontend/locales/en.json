@@ -1112,6 +1112,10 @@
             "change": "Add Lite version"
           },
           {
+            "type": "add",
+            "change": "Speed test can now display data change charts"
+          },
+          {
             "type": "improve",
             "change": "Code efficiency optimization"
           }
