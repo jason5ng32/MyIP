@@ -173,9 +173,6 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { UAParser } from 'ua-parser-js';
-import { getFingerprint as calFingerPrint, setOption as setFingerPrintOption } from '@thumbmarkjs/thumbmarkjs';
-import { getGPUTier } from 'detect-gpu';
 
 const { t } = useI18n();
 
@@ -208,6 +205,7 @@ const otherInfos = ref({});
 // 获取 GPU 信息
 const getGPU = async () => {
     try {
+        const { getGPUTier } = await import('detect-gpu');
         const gpuTier = await getGPUTier();
         if (gpuTier && gpuTier.gpu) {
             gpu.value = gpuTier.gpu.toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase());
@@ -223,6 +221,7 @@ const getGPU = async () => {
 // 获取 UA
 const getUA = async () => {
     try {
+        const { UAParser } = await import('ua-parser-js');
         const parser = new UAParser();
         parser.setUA(parser.getUA());
         userAgent.value = parser.getResult();
@@ -268,8 +267,9 @@ const getFingerPrint = async () => {
     fingerprint.value = t('browserinfo.calculating');
     try {
         let excludes = await getExcludeOptions();
-        setFingerPrintOption('exclude', excludes);
-        const getFP = await calFingerPrint();
+        const { getFingerprint, setOption } = await import('@thumbmarkjs/thumbmarkjs');
+        setOption('exclude', excludes);
+        const getFP = await getFingerprint();
         fingerprint.value = getFP;
     } catch (error) {
         console.error('Error getting fingerprint:', error);

@@ -59,8 +59,8 @@
                         {{ result.country_name }}
                       </td>
                       <td v-for="stat in ['min', 'max', 'avg']" :key="stat"
-                          :class="result.stats[stat] < 100 ? 'text-success' : ''">
-                          {{ result.stats[stat].toFixed(1) }}
+                        :class="result.stats[stat] < 100 ? 'text-success' : ''">
+                        {{ result.stats[stat].toFixed(1) }}
                       </td>
                       <td>{{ result.stats.total }}</td>
                       <td>{{ Math.round(result.stats.loss) }}%</td>
@@ -90,8 +90,6 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import svgMap from 'svgmap';
-import 'svgmap/dist/svgMap.min.css';
 import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
@@ -214,7 +212,11 @@ const processpingResults = (data) => {
 };
 
 // 绘制地图
-const drawMap = () => {
+const drawMap = async () => {
+  // 动态导入 svgMap 和其样式
+  const svgMapModule = await import('svgmap');
+  await import('svgmap/dist/svgMap.min.css');
+
   const mapData = {
     data: {
       avgPing: {
@@ -264,8 +266,8 @@ const drawMap = () => {
     };
   });
 
-  // 创建 svgMap 实例
-  new svgMap({
+  // 使用动态导入的 svgMap
+  new svgMapModule.default({
     targetElementID: 'svgMap',
     data: mapData,
     colorMax: '#083923',
@@ -278,7 +280,7 @@ const drawMap = () => {
 }
 
 // 清除地图数据
-const cleanMap = () => { 
+const cleanMap = () => {
   document.getElementById('svgMap').innerHTML = '';
 };
 

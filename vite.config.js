@@ -116,10 +116,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'vue-i18n'],
+          'chart': ['chart.js/auto'],
+          'speedtest': ['@cloudflare/speedtest']
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {

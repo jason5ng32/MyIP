@@ -1,5 +1,79 @@
 import { ref, reactive } from 'vue';
 
+// 将 Chart.js 相关的配置抽离出来
+const getChartConfig = (t) => ({
+    download: {
+        type: 'line',
+        options: (gradient) => ({
+            data: {
+                labels: [],
+                datasets: [{
+                    label: t('speedtest.Download'),
+                    data: [],
+                    borderColor: '#0dcaf0',
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.3
+                }]
+            }
+        })
+    },
+    upload: {
+        type: 'line',
+        options: (gradient) => ({
+            data: {
+                labels: [],
+                datasets: [{
+                    label: t('speedtest.Upload'),
+                    data: [],
+                    borderColor: '#20c997',
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.3
+                }]
+            }
+        })
+    },
+    latency: {
+        type: 'scatter',
+        options: {
+            data: {
+                labels: [],
+                datasets: [{
+                    label: t('speedtest.Latency'),
+                    data: [],
+                    backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                    borderColor: '#ffc107',
+                    borderWidth: 1,
+                    pointRadius: 3,
+                    pointHoverRadius: 3,
+                    showLine: false,
+                    pointStyle: 'circle'
+                }]
+            }
+        }
+    },
+    jitter: {
+        type: 'scatter',
+        options: {
+            data: {
+                labels: [],
+                datasets: [{
+                    label: t('speedtest.Jitter'),
+                    data: [],
+                    backgroundColor: 'rgba(214, 51, 132, 0.8)',
+                    borderColor: '#d63384',
+                    borderWidth: 1,
+                    pointRadius: 3,
+                    pointHoverRadius: 3,
+                    showLine: false,
+                    pointStyle: 'circle'
+                }]
+            }
+        }
+    }
+});
+
 export default function useSpeedTestCharts(t) {
     // 图表引用
     const downloadChart = ref(null);
@@ -40,13 +114,6 @@ export default function useSpeedTestCharts(t) {
             data: []
         }
     });
-
-    // 动态导入 Chart.js
-    const loadChart = async () => {
-        const { Chart, registerables } = await import('chart.js/auto');
-        Chart.register(...registerables);
-        return Chart;
-    };
 
     // 图表通用配置
     const getLineChartOptions = (yAxisLabel) => ({
@@ -92,100 +159,55 @@ export default function useSpeedTestCharts(t) {
         }
     });
 
-    // 初始化图表
+    // 修改 initCharts 方法
     const initCharts = async () => {
-        const Chart = await loadChart();
+        // 动态导入 Chart.js
+        const { Chart, registerables } = await import('chart.js/auto');
+        Chart.register(...registerables);
 
-        // 下载速度图表
+        const config = getChartConfig(t);
+
+        // 初始化每个图表
         if (downloadChart.value) {
-            const downloadCtx = downloadChart.value.getContext('2d');
-            const downloadGradient = downloadCtx.createLinearGradient(0, 0, 0, 200);
-            downloadGradient.addColorStop(0, 'rgba(32, 201, 151, 0.6)');
-            downloadGradient.addColorStop(1, 'rgba(32, 201, 151, 0)');
+            const ctx = downloadChart.value.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(13, 202, 240, 0.6)');
+            gradient.addColorStop(1, 'rgba(13, 202, 240, 0)');
 
-            charts.download = new Chart(downloadCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: t('speedtest.Download'),
-                        data: [],
-                        borderColor: '#20c997',
-                        backgroundColor: downloadGradient,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
+            charts.download = new Chart(ctx, {
+                type: config.download.type,
+                ...config.download.options(gradient),
                 options: getLineChartOptions(t('speedtest.Download') + ' (Mb/s)')
             });
         }
 
-        // 上传速度图表
         if (uploadChart.value) {
-            const uploadCtx = uploadChart.value.getContext('2d');
-            const uploadGradient = uploadCtx.createLinearGradient(0, 0, 0, 200);
-            uploadGradient.addColorStop(0, 'rgba(13, 202, 240, 0.6)');
-            uploadGradient.addColorStop(1, 'rgba(13, 202, 240, 0)');
+            const ctx = uploadChart.value.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(32, 201, 151, 0.6)');
+            gradient.addColorStop(1, 'rgba(32, 201, 151, 0)');
 
-            charts.upload = new Chart(uploadCtx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: t('speedtest.Upload'),
-                        data: [],
-                        borderColor: '#0dcaf0',
-                        backgroundColor: uploadGradient,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
+            charts.upload = new Chart(ctx, {
+                type: config.upload.type,
+                ...config.upload.options(gradient),
                 options: getLineChartOptions(t('speedtest.Upload') + ' (Mb/s)')
             });
         }
 
-        // 延迟图表
         if (latencyChart.value) {
-            const latencyCtx = latencyChart.value.getContext('2d');
-            charts.latency = new Chart(latencyCtx, {
-                type: 'scatter',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: t('speedtest.Latency'),
-                        data: [],
-                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                        borderColor: '#ffc107',
-                        borderWidth: 1,
-                        pointRadius: 3,
-                        pointHoverRadius: 3,
-                        showLine: false,
-                        pointStyle: 'circle'
-                    }]
-                },
+            const ctx = latencyChart.value.getContext('2d');
+            charts.latency = new Chart(ctx, {
+                type: config.latency.type,
+                ...config.latency.options,
                 options: getLineChartOptions(t('speedtest.Latency') + ' (ms)')
             });
         }
 
-        // 抖动图表
         if (jitterChart.value) {
-            const jitterCtx = jitterChart.value.getContext('2d');
-            charts.jitter = new Chart(jitterCtx, {
-                type: 'scatter',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: t('speedtest.Jitter'),
-                        data: [],
-                        backgroundColor: 'rgba(214, 51, 132, 0.8)',
-                        borderColor: '#d63384',
-                        borderWidth: 1,
-                        pointRadius: 3,
-                        pointHoverRadius: 3,
-                        showLine: false,
-                        pointStyle: 'circle'
-                    }]
-                },
+            const ctx = jitterChart.value.getContext('2d');
+            charts.jitter = new Chart(ctx, {
+                type: config.jitter.type,
+                ...config.jitter.options,
                 options: getLineChartOptions(t('speedtest.Jitter') + ' (ms)')
             });
         }
