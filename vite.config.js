@@ -119,7 +119,9 @@ export default defineConfig({
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'vue-i18n'],
           'chart': ['chart.js/auto'],
-          'speedtest': ['@cloudflare/speedtest']
+          'speedtest': ['@cloudflare/speedtest'],
+          'svgmap': ['svgmap'],
+          'thumbmarkjs': ['@thumbmarkjs/thumbmarkjs']
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {
