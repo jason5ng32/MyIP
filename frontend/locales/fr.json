@@ -542,10 +542,15 @@
         "gaming": ", Jeu : ",
         "rtc": ", Chat vidéo : ",
         "score": "Sur la base du test de vitesse, voici les scores de qualité suivants :",
-        "resultNote": ". Le score est donné à titre indicatif seulement.",
+        "resultNote": ".",
         "connectionFrom": "Test de vitesse terminé depuis votre machine, IP: ",
         "connectionTo": " vers le serveur de test:",
-        "connectionEnd": " ."
+        "connectionEnd": " .",
+        "quality": {
+            "Good": "Bon",
+            "Medium": "Moyen",
+            "Bad": "Mauvais"
+        }
     },
     "pingtest": {
         "id": "pingtest",

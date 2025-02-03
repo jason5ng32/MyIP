@@ -542,10 +542,15 @@
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
     "score": "Based on the speed test, got the following quality scores:",
-    "resultNote": ". The score is for reference only.",
+    "resultNote": ".",
     "connectionFrom": "Finished speed test from your machine, IP: ",
     "connectionTo": " to test server:",
-    "connectionEnd": " ."
+    "connectionEnd": " .",
+    "quality": {
+      "Good": "Good",
+      "Medium": "Medium",
+      "Bad": "Bad"
+    }
   },
   "pingtest": {
     "id": "pingtest",

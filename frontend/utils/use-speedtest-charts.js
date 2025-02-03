@@ -133,16 +133,29 @@ export default function useSpeedTestCharts(t) {
                 title: {
                     display: true,
                     text: yAxisLabel
+                },
+                grid: {
+                    display: false
+                },
+                border: {
+                    color: '#666666'
+                },
+                ticks: {
+                    color: '#666666'
                 }
             },
             x: {
                 min: 0,
                 display: true,
                 grid: {
-                    display: true
+                    display: false
+                },
+                border: {
+                    color: '#666666'
                 },
                 ticks: {
-                    display: false
+                    display: false,
+                    color: '#666666'
                 }
             }
         },
@@ -159,7 +172,7 @@ export default function useSpeedTestCharts(t) {
         }
     });
 
-    // 修改 initCharts 方法
+    // 初始化图表
     const initCharts = async () => {
         // 动态导入 Chart.js
         const { Chart, registerables } = await import('chart.js/auto');

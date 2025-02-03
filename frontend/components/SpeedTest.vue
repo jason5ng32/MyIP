@@ -134,7 +134,7 @@
               </div>
             </div>
 
-            <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
+            <div class="row alert alert-success m-1 p-2 jn-slide-in" :data-bs-theme="isDarkMode ? 'dark' : ''"
               v-if="state.speedTest.status === 'finished' && state.speedTest.hasScores">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i>&nbsp;
                 <span v-if="state.connection.colo">
@@ -148,16 +148,19 @@
                 </span>
                 {{ t('speedtest.score') }}
                 {{ t('speedtest.videoStreaming') }}
-                <span :class="state.speedTest.streamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ state.speedTest.streamingScore }}
+                <span
+                  :class="state.speedTest.streamingScore >= 50 ? 'text-success' : state.speedTest.streamingScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.streamingQuality) }}
                 </span>
                 {{ t('speedtest.gaming') }}
-                <span :class="state.speedTest.gamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ state.speedTest.gamingScore }}
+                <span
+                  :class="state.speedTest.gamingScore >= 50 ? 'text-success' : state.speedTest.gamingScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
                 </span>
                 {{ t('speedtest.rtc') }}
-                <span :class="state.speedTest.rtcScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ state.speedTest.rtcScore }}
+                <span
+                  :class="state.speedTest.rtcScore >= 50 ? 'text-success' : state.speedTest.rtcScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
                 </span>
                 {{ t('speedtest.resultNote') }}
               </p>
@@ -170,13 +173,12 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted, markRaw, ref, onUnmounted } from 'vue';
+import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/utils/country-name.js';
-import getColoCountry from '@/utils/speedtest-colos.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 
@@ -198,8 +200,11 @@ const state = reactive({
     latency: "-",
     jitter: "-",
     streamingScore: "-",
+    streamingQuality: "-",
     gamingScore: "-",
+    gamingQuality: "-",
     rtcScore: "-",
+    rtcQuality: "-",
     status: 'idle',
     hasScores: false
   },
@@ -247,6 +252,9 @@ const connectionMethods = {
       if (!isValidIP(ip)) {
         throw new Error("Invalid IP from SpeedTest Server");
       }
+
+      // 动态导入 getColoCountry
+      const { default: getColoCountry } = await import('@/utils/speedtest-colos.js');
 
       return {
         ip,
@@ -490,6 +498,10 @@ const setupTestEngine = async () => {
       state.speedTest.streamingScore = scores.streaming.points;
       state.speedTest.gamingScore = scores.gaming.points;
       state.speedTest.rtcScore = scores.rtc.points;
+      // 根据 Score 分数来判断 Quality 质量
+      state.speedTest.streamingQuality = scores.streaming.points >= 50 ? 'Good' : scores.streaming.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.gamingQuality = scores.gaming.points >= 50 ? 'Good' : scores.gaming.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.rtcQuality = scores.rtc.points >= 50 ? 'Good' : scores.rtc.points >= 10 ? 'Medium' : 'Bad';
     }
 
     if (isSignedIn.value) {
@@ -523,7 +535,7 @@ const speedTestController = async () => {
     destroyCharts();
 
     // 初始化图表并设置起始点
-    await initStartingPoints();  // 直接使用 initStartingPoints，它会处理初始化
+    await initStartingPoints();
 
     Object.assign(state.speedTest, {
       downloadSpeed: 0,
@@ -610,27 +622,27 @@ defineExpose({
 }
 
 .speed-charts-container {
-  margin: 20px 0;
+  margin: 20pt 0;
 }
 
 .chart-wrapper {
   position: relative;
-  height: 150px;
+  height: 130pt;
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 15pt;
 }
 
 @media (max-width: 768px) {
   .chart-wrapper {
-    height: 100px;
-    margin-bottom: 20px;
+    height: 100pt;
+    margin-bottom: 20pt;
   }
 }
 
 @media (min-width: 769px) and (max-width: 991px) {
   .chart-wrapper {
-    height: 100px;
-    margin-bottom: 25px;
+    height: 100pt;
+    margin-bottom: 25pt;
   }
 }
 
