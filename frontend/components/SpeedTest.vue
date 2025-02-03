@@ -286,6 +286,12 @@ const engineMethods = {
       gamingScore: "-",
       rtcScore: "-"
     });
+
+    // 清理之前的引擎实例的事件监听
+    if (testEngine) {
+      testEngine = null;
+    }
+
     return markRaw(new SpeedTestEngine({
       autoStart: false,
       measurements: [
@@ -334,10 +340,14 @@ const engineMethods = {
   },
 
   updateSpeedInRealTime() {
+    // 如果测试已结束，不再更新
+    if (state.speedTest.status === 'finished' || state.speedTest.status === 'error') {
+      return;
+    }
+
     try {
       const rawData = testEngine?.results?.raw;
       if (!rawData) return;
-
       // 处理延迟数据和计算抖动
       if (rawData.latency?.started) {
         if (rawData.latency?.results?.timings?.length > 0) {
@@ -489,7 +499,15 @@ const setupTestEngine = async () => {
   };
 
   testEngine.onFinish = results => {
+    // 先更新状态，防止后续更新
     state.speedTest.status = "finished";
+
+    // 清理事件监听
+    testEngine.onRunningChange = null;
+    testEngine.onResultsChange = null;
+    testEngine.onError = null;
+
+    // 最后一次更新结果
     engineMethods.updateResults(results);
 
     const scores = results.getScores();
@@ -503,6 +521,9 @@ const setupTestEngine = async () => {
       state.speedTest.gamingQuality = scores.gaming.points >= 50 ? 'Good' : scores.gaming.points >= 10 ? 'Medium' : 'Bad';
       state.speedTest.rtcQuality = scores.rtc.points >= 50 ? 'Good' : scores.rtc.points >= 10 ? 'Medium' : 'Bad';
     }
+
+    // 清理引擎实例
+    testEngine = null;
 
     if (isSignedIn.value) {
       achievementHandler.checkAndUpdate();
@@ -570,6 +591,9 @@ onMounted(() => {
 
 // 清理
 onUnmounted(() => {
+  if (testEngine) {
+    testEngine = null;
+  }
   destroyCharts();
 });
 
