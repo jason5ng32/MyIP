@@ -17,12 +17,12 @@
                             <div class="input-group-text">
                                 <input class="form-check-input mt-0" type="checkbox" value=""
                                     aria-label="Checkbox for Collecting datas" name="collectingDatas"
-                                    id="collectingDatas" v-model="isAgreed">
+                                    id="collectingDatas" v-model="isAgreed" :disabled="!store.user">
                                 <label for="collectingDatas">&nbsp;{{ t('invisibilitytest.agreement') }}</label>
                             </div>
 
                             <button class="btn btn-primary" @click="onSubmit"
-                                :disabled="checkingStatus === 'running' || !isAgreed">
+                                :disabled="checkingStatus === 'running' || !isAgreed || !store.user">
                                 <span v-if="checkingStatus === 'idle'">{{
                                     t('invisibilitytest.Run') }}</span>
                                 <span v-if="checkingStatus === 'running'" class="spinner-grow spinner-grow-sm"
@@ -31,13 +31,18 @@
 
                         </div>
 
+                        <div v-if="!store.user" class="text-success mb-2 mt-3">
+                            {{ t('user.SignInToUse') }}
+                        </div>
+
                         <div class="jn-placeholder">
                             <p v-if="errorMsg" class="text-danger">{{ errorMsg }}</p>
                         </div>
 
                         <!-- Results Table -->
                         <Transition name="jn-it-slide-fade">
-                            <div class="alert alert-success" role="alert" v-if="Object.keys(testResults).length > 0">
+                            <div class="alert alert-success" role="alert"
+                                v-if="Object.keys(testResults).length > 0 && store.user">
 
                                 <p>{{ t('invisibilitytest.yourIP') }}: <strong>{{ testResults.ip }}</strong>.</p>
 
@@ -64,7 +69,8 @@
                             </div>
                         </Transition>
                         <Transition name="slide-fade">
-                            <div class="table-responsive text-nowrap" v-if="Object.keys(testResults).length > 0">
+                            <div class="table-responsive text-nowrap"
+                                v-if="Object.keys(testResults).length > 0 && store.user">
                                 <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
                                     <thead>
                                         <tr>
@@ -276,12 +282,14 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { authenticatedFetch } from '@/utils/authenticated-fetch';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');
@@ -329,7 +337,10 @@ const onSubmit = () => {
     errorMsg.value = '';
     testResults.value = {};
     loadScript();
-
+    // 获得成就
+    if (isSignedIn.value && !store.userAchievements.JustInCase.achieved) {
+        store.setTriggerUpdateAchievements('JustInCase');
+    }
     setTimeout(() => {
         getResult();
     }, 6000);
@@ -338,26 +349,48 @@ const onSubmit = () => {
 // 获取测试结果
 const getResult = async () => {
     try {
-        const response = await fetch(`/api/invisibility?id=${userID.value}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const response = await authenticatedFetch(`/api/invisibility?id=${userID.value}`);
+        const data = response;
 
         // 检查并重试
         if (data.message === "Data not found" && retryCount.value < 3) {
             setTimeout(() => {
                 getResult();
-            }, 4000, retryCount.value++);
+                retryCount.value++
+            }, 8000);
             return;
         }
         testResults.value = data;
+
+        // 计算成就
+        let proxyScore = Math.floor(testResults.value.score.proxy);
+        let vpnScore = Math.floor(testResults.value.score.vpn);
+        if (isSignedIn.value && !store.userAchievements.HiddenWell.achieved && proxyScore === 0 && vpnScore === 0) {
+            store.setTriggerUpdateAchievements('HiddenWell');
+        }
+
+        if (isSignedIn.value && !store.userAchievements.SlipUp.achieved && (proxyScore > 50 || vpnScore > 50)) {
+            store.setTriggerUpdateAchievements('SlipUp');
+        }
+
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
+
+        // Token 过期
+        if (error.message.includes('Invalid token')) {
+            errorMsg.value = t('user.InvalidUserToken');
+            return;
+        }
+        // 未登录
+        if (error.message.includes('Sign in required')) {
+            errorMsg.value = t('user.SignInToUse');
+            return;
+        }
         if (retryCount.value < 3) {
             setTimeout(() => {
                 getResult();
-            }, 4000, retryCount.value + 1);
+                retryCount.value++
+            }, 8000);
             return;
         } else {
             errorMsg.value = t('invisibilitytest.fetchError');

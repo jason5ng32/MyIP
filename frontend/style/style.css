@@ -221,6 +221,10 @@ footer {
   font-size: 1.25rem;
 }
 
+.mobile-h6 {
+  font-size: 0.8rem;
+}
+
 [v-cloak] {
   display: none;
 }
@@ -297,7 +301,7 @@ footer {
 }
 
 .svgMap-tooltip {
-  z-index: 100000 !important;
+  z-index: 10001 !important;
 }
 .fs-7 {
   font-size: 0.9rem !important;

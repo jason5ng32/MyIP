@@ -1,7 +1,143 @@
 {
+    "user": {
+        "SignIn": "Connexion",
+        "SignInWithGoogle": "Connexion avec Google",
+        "SignInWithGithub": "Connexion avec GitHub",
+        "SignOut": "Déconnexion",
+        "SignInToView": "Connectez-vous pour voir",
+        "SignInToUse": "Connectez-vous pour utiliser",
+        "InvalidUserToken": "Token utilisateur non valide",
+        "MyAchievements": "Succès",
+        "Fields": {
+            "User": "Utilisateur",
+            "CreatedAt": "Créé Le",
+            "LastLogin": "Dernière Connexion",
+            "Level": "Niveau d'Utilisateur",
+            "FunctionUses": "Utilisation des Avancées",
+            "Times": "Fois",
+            "Fetching": "Recherche..."
+        },
+        "Level": {
+            "Standard": "Utilisateur Standard",
+            "Premium": "Utilisateur Premium",
+            "Owner": "Administrateur",
+            "Developer": "Développeur",
+            "HonoraryMember": "Membre Honoraire"
+        },
+        "Benefits": {
+            "Title": "Avantages Utilisateurs",
+            "Benefit": "Avantage",
+            "Note1": "En tant que produit open-source, l'utilisation de IPCheck.ing est gratuite.",
+            "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
+            "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement.",
+            "Benefit2": "Peut utiliser le test d'invisibilité.",
+            "Benefit3": "Peut voir les badges de réussite qu'il a obtenus",
+            "Benefit4": "Réduit les restrictions d'accès à certaines fonctionnalités.",
+            "FootNote": "D'autres avantages sont en cours de développement..."
+        },
+        "Achievements": {
+            "Title": "Succès",
+            "Note": "En utilisant IPCheck.ing, vous pouvez déclencher certains succès. Ici, vous pouvez voir tous vos succès.",
+            "Get": "obtenus",
+            "GetCount": "Succès obtenus:",
+            "NotGet": "non obtenus",
+            "NotGetCount": "Succès non obtenus",
+            "FooterNote": "Parfois, il peut y avoir des succès limités dans le temps.",
+            "Congrats": "🎉 Félicitations",
+            "CongratsMessage": "Vous avez obtenu un nouvel accomplissement !",
+            "NewAchievementIs": "Le nouvel accomplissement est :",
+            "Type": {
+                "IAmHuman": {
+                    "Title": "Je suis humain",
+                    "Meet": "Utiliser IPCheck.ing après s'être connecté"
+                },
+                "BarelyEnough": {
+                    "Title": "Tout juste suffisant",
+                    "Meet": "Vitesse de téléchargement supérieure à 100 Mb/s"
+                },
+                "RapidPace": {
+                    "Title": "Allure rapide",
+                    "Meet": "Vitesse de téléchargement supérieure à 500 Mb/s"
+                },
+                "TorrentFlow": {
+                    "Title": "Flux torrentiel",
+                    "Meet": "Vitesse de téléchargement supérieure à 1000 Mb/s"
+                },
+                "SteadyGoing": {
+                    "Title": "Débit constant",
+                    "Meet": "Vitesse d'envoi supérieure à 50 Mb/s"
+                },
+                "TooFastTooSimple": {
+                    "Title": "Trop rapide, trop simple",
+                    "Meet": "Vitesse d'envoi supérieure à 200 Mb/s"
+                },
+                "SwiftAscent": {
+                    "Title": "Ascension rapide",
+                    "Meet": "Vitesse d'envoi supérieure à 1000 Mb/s"
+                },
+                "SurfaceCheck": {
+                    "Title": "Vérification superficielle",
+                    "Meet": "Terminer un élément de la liste de contrôle de sécurité"
+                },
+                "HalfwayThere": {
+                    "Title": "À mi-chemin",
+                    "Meet": "Terminer 50 % de la liste de contrôle de sécurité"
+                },
+                "FullySecured": {
+                    "Title": "Sécurisé à 100%",
+                    "Meet": "Terminer toute la liste de contrôle de sécurité"
+                },
+                "JustInCase": {
+                    "Title": "Au cas où",
+                    "Meet": "Effectuer un test de furtivité"
+                },
+                "HiddenWell": {
+                    "Title": "Bien caché",
+                    "Meet": "La probabilité de proxy et de VPN est de 0 dans le test de furtivité"
+                },
+                "SlipUp": {
+                    "Title": "Gaffe",
+                    "Meet": "La probabilité de proxy ou de VPN est supérieure à 50 % dans le test de furtivité"
+                },
+                "CleverTrickery": {
+                    "Title": "Ruse ingénieuse",
+                    "Meet": "Avoir consulté tous les raccourcis clavier"
+                },
+                "EnergySaver": {
+                    "Title": "Économe en énergie",
+                    "Meet": "Configurer le programme pour qu'il ne s'exécute pas automatiquement"
+                },
+                "ResourceHog": {
+                    "Title": "Gourmand en ressources",
+                    "Meet": "Configurer plusieurs rafraîchissements pour la disponibilité"
+                },
+                "MakingBigNews": {
+                    "Title": "Faire les gros titres",
+                    "Meet": "Les appels de fonctions avancées dépassent 1000 fois"
+                },
+                "GenerousDonor": {
+                    "Title": "Généreux donateur",
+                    "Meet": "Avoir fait un don au projet IPCheck.ing"
+                },
+                "ItIsOpen": {
+                    "Title": "C'est ouvert",
+                    "Meet": "Le test de censure a trouvé un site bloqué"
+                },
+                "CuriousCat": {
+                    "Title": "Chat curieux",
+                    "Meet": "Rechercher les informations de IPCheck.ing dans la recherche Whois"
+                },
+                "CrossingTheWall": {
+                    "Title": "Huit personnes traversent la muraille",
+                    "Meet": "Toutes les 8 adresses IP de test sont différentes dans le test de règles"
+                }
+            }
+        }
+    },
     "nav": {
         "id": "nav",
         "Title": "IPCheck.ing",
+        "Navigation": "Navigation",
         "IPInfo": "Infos IP",
         "Connectivity": "Connectivité",
         "WebRTC": "Test WebRTC",
@@ -64,7 +200,7 @@
         "ShowChecked": "Afficher les éléments cochés",
         "Loading": "Chargement..."
     },
-    "shell": {
+    "curl": {
         "Title": "API de ligne de commande",
         "Note1": "Eh bien, il s'avère que toi aussi tu aimes utiliser le terminal ?",
         "Note2_1": "Tu peux, dans le terminal, via",
@@ -301,7 +437,6 @@
         "QueryIP": "Interroger l'adresse IP",
         "GithubLink": "Voir le code source sur GitHub",
         "RefreshRuleTests": "Actualiser les tests de règles",
-        "Shell": "Ouvrir le shell",
         "qualityScoreExplain": "Le score de qualité IP est calculé sur la base de plusieurs facteurs pondérés, incluant le type d'IP, si c'est un proxy/VPN, et le nombre d'événements d'attaque récemment détectés provenant de cette IP. Un score plus élevé indique une meilleure qualité de l'IP, réduisant la probabilité d'être bloqué par le contrôle de risques sur certains sites."
     },
     "ipInfos": {
@@ -407,10 +542,15 @@
         "gaming": ", Jeu : ",
         "rtc": ", Chat vidéo : ",
         "score": "Sur la base du test de vitesse, voici les scores de qualité suivants :",
-        "resultNote": ". Le score est donné à titre indicatif seulement.",
-        "connectionFrom": "Test de vitesse terminé depuis votre IP: ",
+        "resultNote": ".",
+        "connectionFrom": "Test de vitesse terminé depuis votre machine, IP: ",
         "connectionTo": " vers le serveur de test:",
-        "connectionEnd": " ."
+        "connectionEnd": " .",
+        "quality": {
+            "Good": "Bon",
+            "Medium": "Moyen",
+            "Bad": "Mauvais"
+        }
     },
     "pingtest": {
         "id": "pingtest",
@@ -461,7 +601,9 @@
         "maskedInfoTitle": "Toutes les infos masquées",
         "maskedInfoMessage": "Toutes les informations ont été masquées, vous pouvez maintenant prendre des captures d'écran en toute sécurité.",
         "unmaskedInfoTitle": "Infos démasquées",
-        "unmaskedInfoMessage": "Les informations ont été démasquées, veuillez faire attention lorsque vous prenez des captures d'écran."
+        "unmaskedInfoMessage": "Les informations ont été démasquées, veuillez faire attention lorsque vous prenez des captures d'écran.",
+        "SignInFailed": "Echec de connexion",
+        "SignInFailedReason": "Raison"
     },
     "shortcutKeys": {
         "id": "shortcutKeys",
@@ -494,7 +636,7 @@
         "MacChecker": "Ouvrir le Recherche de MAC",
         "BrowserInfo": "Ouvrir l'Info du navigateur",
         "fullScreenAdvancedTools": "Outils avancés en plein écran",
-        "Shell": "Ouvrir le Shell",
+        "Curl": "Ouvrir le Shell",
         "SecurityChecklist": "Ouvrir la Liste de sécurité"
     },
     "page": {
@@ -955,6 +1097,32 @@
                     {
                         "type": "improve",
                         "change": "Autres optimisations générales"
+                    }
+                ]
+            },
+            {
+                "version": "v5.0",
+                "date": "Jan 31, 2025",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Ajout de la système d'utilisateur"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la système de réussite utilisateur"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la version Lite"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Le test de vitesse peut maintenant afficher des graphiques de données"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la performance du code"
                     }
                 ]
             }

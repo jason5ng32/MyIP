@@ -73,6 +73,7 @@ const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
@@ -137,6 +138,9 @@ const checkAllRuleTest = async (refresh = false) => {
                 processTest(index + 1);
                 if (index === testCount.value - 1) {
                     finishAll.value = true;
+                    if (isSignedIn.value) {
+                        checkAchievements();
+                    }
                 }
             }
         }
@@ -145,6 +149,17 @@ const checkAllRuleTest = async (refresh = false) => {
 
     processTest(0);
 };
+
+// 检查是否达成成就
+const checkAchievements = () => {
+    const allIPs = ruleTests.value.map((test) => test.ip);
+    const uniqueIPs = [...new Set(allIPs)];
+    if (uniqueIPs.length === 8) {
+        if (!store.userAchievements.CrossingTheWall.achieved) {
+            store.setTriggerUpdateAchievements('CrossingTheWall');
+        }
+    }
+}
 
 onMounted(() => {
     setTimeout(() => {

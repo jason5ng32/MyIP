@@ -9,8 +9,8 @@
     </div>
 
     <div id="about" class="text-center mb-2">
-      <a class="link link-underline-offset link-underline-opacity-0 jn-heart-color"
-        role="button" aria-controls="Sponsor" href="https://github.com/sponsors/jason5ng32" target="_blank">
+      <a class="link link-underline-offset link-underline-opacity-0 jn-heart-color" role="button"
+        aria-controls="Sponsor" href="https://github.com/sponsors/jason5ng32" target="_blank">
         {{ t('about.Sponsor') }} 💖
       </a>&nbsp;&nbsp;
       <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-light' : 'link-dark']"
@@ -40,26 +40,14 @@
       <div class="offcanvas-body" ref="offcanvasBody">
         <div v-if="showAbout">
           <div class="mb-3">
-            <p>
-              {{ t('about.product1') }}
-            </p>
-            <p>
-              {{ t('about.product2') }}
-            </p>
-            <p>
-              {{ t('about.product3') }}
+            <p v-for="i in 3" :key="i">
+              {{ t(`about.product${i}`) }}
             </p>
           </div>
           <h5>{{ t('about.meTitle') }}</h5>
           <div class="mb-3">
-            <p>
-              {{ t('about.me1') }}
-            </p>
-            <p>
-              {{ t('about.me2') }}
-            </p>
-            <p>
-              {{ t('about.me3') }}
+            <p v-for="i in 3" :key="i">
+              {{ t(`about.me${i}`) }}
             </p>
           </div>
           <div class="mb-3 mx-2">
@@ -232,7 +220,7 @@ defineExpose({
 }
 
 .jn-heart-color {
-  color:#d63384;
+  color: #d63384;
   text-decoration: none;
 }
 </style>

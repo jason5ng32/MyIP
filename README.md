@@ -106,9 +106,10 @@ You can use the program without adding any environment variables, but if you wan
 | `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
-| `KEYCDN_USER_AGENT` | No | `""` | The domain name when using KeyCDN, must contain https prefix. Used to obtain IP address information through KeyCDN |
+| `IP2LOCATION_API_KEY` | No | `""` | API Key for IP2Location.io, used to obtain IP geolocation information through IP2Location.io |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
+| `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
 | `VITE_CURL_IPV4_DOMAIN` | No | `""` | Provides the IPv4 domain for the CURL API to users |
 | `VITE_CURL_IPV6_DOMAIN` | No | `""` | Provides the IPv6 domain for the CURL API to users |
@@ -156,7 +157,7 @@ If you're using a proxy for internet access, consider adding this rule to your p
 
 ```ini
 # IP Testing
-IP-CIDR,1.0.0.1/32,Proxy,no-resolve
+IP-CIDR,1.0.0.2/32,Proxy,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,Proxy,no-resolve
 DOMAIN,4.ipcheck.ing,DIRECT
 DOMAIN,6.ipcheck.ing,DIRECT

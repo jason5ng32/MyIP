@@ -17,15 +17,17 @@
               <div class="input-group" :class="[isMobile ? 'w-100' : 'w-50']">
                 <span class="input-group-text"><i class="bi bi-cloud-download"></i></span>
                 <select aria-label="Download Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }"
-                  id="downloadBytes" :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
-                  v-model="packageSize.download.bytes">
+                  id="downloadBytes"
+                  :disabled="state.speedTest.status === 'running' || state.speedTest.status === 'paused'"
+                  v-model="state.config.package.download.bytes">
                   <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB
                   </option>
                 </select>
                 <span class="input-group-text"><i class="bi bi-cloud-upload"></i></span>
                 <select aria-label="Upload Bytes" class="form-select" :class="{ 'jn-ip-font': isMobile }"
-                  id="uploadBytes" :disabled="speedTestStatus === 'running' || speedTestStatus === 'paused'"
-                  v-model="packageSize.upload.bytes">
+                  id="uploadBytes"
+                  :disabled="state.speedTest.status === 'running' || state.speedTest.status === 'paused'"
+                  v-model="state.config.package.upload.bytes">
                   <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB
                   </option>
                 </select>
@@ -33,10 +35,10 @@
                   :class="[isDarkMode ? 'jn-startbtn-dark' : 'btn-light jn-startbtn']"
                   aria-label="Start/Pause Speed Test"
                   v-tooltip="{ title: t('Tooltips.SpeedTestButton'), placement: 'top' }">
-                  <span v-if="speedTestStatus === 'running'">
+                  <span v-if="state.speedTest.status === 'running'">
                     <i class="bi bi-pause-fill"></i>
                   </span>
-                  <span v-else-if="speedTestStatus === 'finished' || speedTestStatus === 'error'">
+                  <span v-else-if="state.speedTest.status === 'finished' || state.speedTest.status === 'error'">
                     <i class="bi bi-arrow-clockwise"></i>
                   </span>
                   <span v-else><i class="bi bi-caret-right-fill"></i></span>
@@ -46,27 +48,29 @@
 
             <Transition name="slide-fade">
               <div class="d-flex align-items-center align-content-center justify-content-end pb-2"
-                :data-bs-theme="isDarkMode ? 'dark' : ''" v-if="speedTestStatus !== 'idle' && connectionData.colo">
+                :data-bs-theme="isDarkMode ? 'dark' : ''"
+                v-if="state.speedTest.status !== 'idle' && state.connection.colo">
                 <div>
                   <i class="bi bi-person-arms-up"></i>
-                  {{connectionData.country}}
-                  <span v-if="connectionData.country" :class="'jn-fl fi fi-' + connectionData.loc.toLowerCase()"></span>
+                  {{state.connection.country}}
+                  <span v-if="state.connection.country"
+                    :class="'jn-fl fi fi-' + state.connection.loc.toLowerCase()"></span>
                 </div>
                 <div class=" mx-2">
                   <i class="bi bi-arrow-left-right"></i>
                 </div>
                 <div>
                   <i class="bi bi-globe"></i>
-                  {{connectionData.colo}},&nbsp;
-                  {{connectionData.coloCountry}} <span v-if="connectionData.coloCountry"
-                    :class="'jn-fl fi fi-' + connectionData.coloCountryCode.toLowerCase()"></span>
+                  {{state.connection.colo}},&nbsp;
+                  {{state.connection.coloCountry}} <span v-if="state.connection.coloCountry"
+                    :class="'jn-fl fi fi-' + state.connection.coloCountryCode.toLowerCase()"></span>
                 </div>
               </div>
             </Transition>
             <div class="progress" style="height: 20px; margin: 4pt 0 20pt 0;"
-              :class="{ 'jn-opacity-0': speedTestStatus == 'idle', 'jn-progress-dark': isDarkMode }">
+              :class="{ 'jn-opacity-0': state.speedTest.status == 'idle', 'jn-progress-dark': isDarkMode }">
               <div class="progress-bar progress-bar-striped jn-progress"
-                :class="[speedTestStatus === 'finished' ? 'bg-success' : 'bg-info progress-bar-animated']"
+                :class="[state.speedTest.status === 'finished' ? 'bg-success' : 'bg-info progress-bar-animated']"
                 role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                 id="speedtest-progress" aria-label="Progress Bar">
               </div>
@@ -74,62 +78,93 @@
             <div class="row" style="margin-bottom: 10pt;">
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                 <p class="speedtest-h5 jn-con-title">{{ t('speedtest.Download') }}</p>
-                <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                  <span class="jn-speedtest-number">{{ speedTest.downloadSpeed }}</span>
-                  <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
+                <p id="download-speed" class="speedtest-h5" :class="updateSpeedTestColor(state.speedTest.status)">
+                  <span class="jn-speedtest-number">{{ state.speedTest.downloadSpeed }}</span>
+                  <span v-if="state.speedTest.status !== 'idle'">Mb/s</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                 <p class="speedtest-h5 jn-con-title">{{ t('speedtest.Upload') }}</p>
-                <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                  <span class="jn-speedtest-number">{{ speedTest.uploadSpeed }}</span>
-                  <span v-if="speedTestStatus !== 'idle'">Mb/s</span>
+                <p id="upload-speed" class="speedtest-h5" :class="updateSpeedTestColor(state.speedTest.status)">
+                  <span class="jn-speedtest-number">{{ state.speedTest.uploadSpeed }}</span>
+                  <span v-if="state.speedTest.status !== 'idle'">Mb/s</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                 <p class="speedtest-h5 jn-con-title">{{ t('speedtest.Latency') }}</p>
-                <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                  <span class="jn-speedtest-number">{{ speedTest.latency }}</span>
-                  <span v-if="speedTestStatus !== 'idle'">ms</span>
+                <p id="latency" class="speedtest-h5" :class="updateSpeedTestColor(state.speedTest.status)">
+                  <span class="jn-speedtest-number">{{ state.speedTest.latency }}</span>
+                  <span v-if="state.speedTest.status !== 'idle'">ms</span>
                 </p>
               </div>
               <div :class="['text-center', isMobile ? 'col-6' : 'col-3']">
                 <p class="speedtest-h5 jn-con-title">{{ t('speedtest.Jitter') }}</p>
-                <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(speedTestStatus)">
-                  <span class="jn-speedtest-number">{{ speedTest.jitter }}</span>
-                  <span v-if="speedTestStatus !== 'idle'">ms</span>
+                <p id="jitter" class="speedtest-h5" :class="updateSpeedTestColor(state.speedTest.status)">
+                  <span class="jn-speedtest-number">{{ state.speedTest.jitter }}</span>
+                  <span v-if="state.speedTest.status !== 'idle'">ms</span>
                 </p>
               </div>
             </div>
-            <div class="row alert alert-success m-1 p-2 " :data-bs-theme="isDarkMode ? 'dark' : ''"
-              v-if="speedTestStatus === 'finished' && hasScores">
+
+            <div id="result"></div>
+
+            <!-- 在结果区域上方添加图表 -->
+            <div class="speed-charts-container mb-4 jn-slide-in" v-show="state.speedTest.status !== 'idle'">
+              <div class="row">
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="downloadChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="uploadChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="latencyChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="chart-wrapper">
+                    <canvas ref="jitterChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row alert alert-success m-1 p-2 jn-slide-in" :data-bs-theme="isDarkMode ? 'dark' : ''"
+              v-if="state.speedTest.status === 'finished' && state.speedTest.hasScores">
               <p id="score" class="speedtest-p"><i class="bi bi-calendar2-check"></i>&nbsp;
-                <span v-if="connectionData.colo">
+                <span v-if="state.connection.colo">
                   {{ t('speedtest.connectionFrom') }}
-                  {{ connectionData.ip }} ( {{ connectionData.country }} )
+                  {{ state.connection.ip }} ( {{ state.connection.country }} )
                   {{ t('speedtest.connectionTo') }}
-                  {{ connectionData.colo }}
-                  ( {{ connectionData.coloCity }}
-                  , {{ connectionData.coloCountry }} )
+                  {{ state.connection.colo }}
+                  ( {{ state.connection.coloCity }}
+                  , {{ state.connection.coloCountry }} )
                   {{ t('speedtest.connectionEnd') }}
                 </span>
                 {{ t('speedtest.score') }}
                 {{ t('speedtest.videoStreaming') }}
-                <span :class="speedTest.streamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ speedTest.streamingScore }}
+                <span
+                  :class="state.speedTest.streamingScore >= 50 ? 'text-success' : state.speedTest.streamingScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.streamingQuality) }}
                 </span>
                 {{ t('speedtest.gaming') }}
-                <span :class="speedTest.gamingScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ speedTest.gamingScore }}
+                <span
+                  :class="state.speedTest.gamingScore >= 50 ? 'text-success' : state.speedTest.gamingScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
                 </span>
                 {{ t('speedtest.rtc') }}
-                <span :class="speedTest.rtcScore >= 50 ? 'text-success' : 'jn-text-warning'">
-                  {{ speedTest.rtcScore }}
+                <span
+                  :class="state.speedTest.rtcScore >= 50 ? 'text-success' : state.speedTest.rtcScore >= 10 ? 'jn-text-warning' : 'text-danger'">
+                  {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
                 </span>
                 {{ t('speedtest.resultNote') }}
               </p>
             </div>
-            <div id="result"></div>
           </div>
         </div>
       </div>
@@ -138,279 +173,434 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, markRaw } from 'vue';
+import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/utils/country-name.js';
-import getColoCountry from '@/utils/speedtest-colos.js';
-// 引入 SpeedTest
 import SpeedTestEngine from '@cloudflare/speedtest';
+import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 
 const { t } = useI18n();
-
 const store = useMainStore();
+
+// 计算属性
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
+const isSignedIn = computed(() => store.isSignedIn);
 
-const speedTest = reactive({
-  id: "speedTest",
-  downloadSpeed: "-",
-  uploadSpeed: "-",
-  latency: "-",
-  jitter: "-",
-  streamingScore: "-",
-  gamingScore: "-",
-  rtcScore: "-",
-});
-const speedTestStatus = ref('idle');
-const packageSize = reactive({
-  download: {
-    bytes: 50e6,
-    count: 4,
+// 状态管理
+const state = reactive({
+  speedTest: {
+    id: "speedTest",
+    downloadSpeed: "-",
+    uploadSpeed: "-",
+    latency: "-",
+    jitter: "-",
+    streamingScore: "-",
+    streamingQuality: "-",
+    gamingScore: "-",
+    gamingQuality: "-",
+    rtcScore: "-",
+    rtcQuality: "-",
+    status: 'idle',
+    hasScores: false
   },
-  upload: {
-    bytes: 15e6,
-    count: 4,
+  connection: {
+    ip: "",
+    colo: "",
+    loc: "",
+    country: "",
+    coloCountry: "",
+    coloCountryCode: "",
+    coloCity: ""
   },
-  latency: {
-    count: 20,
+  config: {
+    package: {
+      download: { bytes: 50e6, count: 4 },
+      upload: { bytes: 15e6, count: 4 },
+      latency: { count: 30 }
+    }
   }
 });
 
-const connectionData = ref({
-  ip: "",
-  colo: "",
-  loc: "",
-  country: "",
-  coloCountry: "",
-  coloCountryCode: "",
-  coloCity: ""
-});
+const {
+  downloadChart,
+  uploadChart,
+  latencyChart,
+  jitterChart,
+  updateCharts,
+  initStartingPoints,
+  destroyCharts,
+  resetChartData
+} = useSpeedTestCharts(t);
 
-const getIPFromSpeedTest = async () => {
-  try {
-    const response = await fetch("https://speed.cloudflare.com/cdn-cgi/trace");
-    const data = await response.text();
-    const lines = data.split("\n");
+// 连接数据处理
+const connectionMethods = {
+  async getIPFromSpeedTest() {
+    try {
+      const response = await fetch("https://speed.cloudflare.com/cdn-cgi/trace");
+      const data = await response.text();
+      const lines = data.split("\n");
 
-    const ip = lines.find((line) => line.startsWith("ip="))?.split("=")[1];
-    const colo = lines.find((line) => line.startsWith("colo="))?.split("=")[1];
-    const loc = lines.find((line) => line.startsWith("loc="))?.split("=")[1];
+      const ip = lines.find(line => line.startsWith("ip="))?.split("=")[1];
+      const colo = lines.find(line => line.startsWith("colo="))?.split("=")[1];
+      const loc = lines.find(line => line.startsWith("loc="))?.split("=")[1];
 
-    if (isValidIP(ip)) {
-      const country = getCountryName(loc, lang.value) || '';
-      const coloCountryCode = getColoCountry(colo).country || '';
-      const coloCity = getColoCountry(colo).city || '';
-      const coloCountry = getCountryName(coloCountryCode, lang.value) || '';
-      return { ip, colo, loc, country, coloCountry, coloCountryCode, coloCity };
-    } else {
-      console.error("Invalid IP from SpeedTest Server:", ip);
+      if (!isValidIP(ip)) {
+        throw new Error("Invalid IP from SpeedTest Server");
+      }
+
+      // 动态导入 getColoCountry
+      const { default: getColoCountry } = await import('@/utils/speedtest-colos.js');
+
+      return {
+        ip,
+        colo,
+        loc,
+        country: getCountryName(loc, lang.value) || '',
+        coloCountryCode: getColoCountry(colo).country || '',
+        coloCity: getColoCountry(colo).city || '',
+        coloCountry: getCountryName(getColoCountry(colo).country, lang.value) || ''
+      };
+    } catch (error) {
+      console.error("Error fetching IP from SpeedTest Server:", error);
+      return null;
     }
-  } catch (error) {
-    console.error("Error fetching IP from SpeedTest Server:", error);
   }
 };
 
-// 定义 Speed Test 引擎
+// 测试引擎方法
 let testEngine;
+const engineMethods = {
+  reset() {
+    state.speedTest.hasScores = false;
+    Object.assign(state.speedTest, {
+      downloadSpeed: 0,
+      uploadSpeed: 0,
+      latency: 0,
+      jitter: 0,
+      streamingScore: "-",
+      gamingScore: "-",
+      rtcScore: "-"
+    });
 
-// 重置 Speed Test
-const hasScores = ref(false);
-const resetSpeedTest = () => {
-  hasScores.value = false;
-  const engine = new SpeedTestEngine({
-    autoStart: false,
-    measurements: [
-      { type: 'latency', numPackets: packageSize.latency.count },
-      { type: 'download', bytes: packageSize.download.bytes, count: packageSize.download.count },
-      { type: 'upload', bytes: packageSize.upload.bytes, count: packageSize.upload.count }
-    ]
-  });
-  return markRaw(engine);
-};
-
-// Speed Test 引擎
-const speedTestController = async () => {
-  if (speedTestStatus.value === 'running') {
-    testEngine.pause();
-    speedTestStatus.value = "paused";
-  } else {
-    startSpeedTest();
-    if (!connectionData.value.ip) {
-      connectionData.value = await getIPFromSpeedTest();
+    // 清理之前的引擎实例的事件监听
+    if (testEngine) {
+      testEngine = null;
     }
-  }
-};
 
-// 开始 Speed Test
-const startSpeedTest = () => {
+    return markRaw(new SpeedTestEngine({
+      autoStart: false,
+      measurements: [
+        { type: 'latency', numPackets: state.config.package.latency.count },
+        { type: 'download', bytes: state.config.package.download.bytes, count: state.config.package.download.count },
+        { type: 'upload', bytes: state.config.package.upload.bytes, count: state.config.package.upload.count }
+      ]
+    }));
+  },
 
-  // 暂停继续
-  if (speedTestStatus.value === 'paused') {
-    testEngine.play();
-    return;
-  }
+  updateResults(results) {
+    const summary = results.getSummary();
+    Object.assign(state.speedTest, {
+      downloadSpeed: parseFloat((summary.download / 1000000).toFixed(2)),
+      uploadSpeed: parseFloat((summary.upload / 1000000).toFixed(2)),
+      latency: parseFloat(summary.latency.toFixed(2)),
+      jitter: parseFloat(summary.jitter.toFixed(2))
+    });
+  },
 
-  // 初始化
-  testEngine = resetSpeedTest();
+  updateProgress() {
+    const rawData = testEngine.results.raw;
+    const progressPerStage = 100 / 3;
+    let progress = 0;
 
-  // 仅在初始化时定义数据
-  if (!testEngine.isRunning) {
-    speedTest.downloadSpeed = 0;
-    speedTest.uploadSpeed = 0;
-    speedTest.latency = 0;
-    speedTest.jitter = 0;
-  }
+    if (rawData.download?.started) {
+      progress += rawData.download.finished ? progressPerStage : progressPerStage / 2;
+    }
+    if (rawData.upload?.started) {
+      progress += rawData.upload.finished ? progressPerStage : progressPerStage / 2;
+    }
+    if (rawData.latency?.started) {
+      progress += rawData.latency.finished ? progressPerStage : progressPerStage / 2;
+    }
 
-  testEngine.onRunningChange = running => {
-    speedTestStatus.value = "running";
-  };
+    progress = Math.min(progress, 100);
+    this.updateProgressBar(progress);
+  },
 
-  trackEvent('Section', 'StartClick', 'SpeedTest');
-  testEngine.play();
+  updateProgressBar(progress) {
+    const progressBar = document.getElementById('speedtest-progress');
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`;
+      progressBar.setAttribute('aria-valuenow', progress);
+    }
+  },
 
-  testEngine.onResultsChange = ({ type }) => {
-    progressBarChange();
-    SpeedChange();
-  }
-  showResult();
-};
+  updateSpeedInRealTime() {
+    // 如果测试已结束，不再更新
+    if (state.speedTest.status === 'finished' || state.speedTest.status === 'error') {
+      return;
+    }
 
-// 更新 Speed Test 结果
-const updateSpeedTestResults = (results) => {
-  const summary = results.getSummary();
+    try {
+      const rawData = testEngine?.results?.raw;
+      if (!rawData) return;
+      // 处理延迟数据和计算抖动
+      if (rawData.latency?.started) {
+        if (rawData.latency?.results?.timings?.length > 0) {
+          const latencyTimings = rawData.latency.results.timings;
+          state.speedTest.latency = parseFloat(latencyTimings[latencyTimings.length - 1].ping.toFixed(2));
 
-  speedTest.downloadSpeed = parseFloat((summary.download / 1000000).toFixed(2));
-  speedTest.uploadSpeed = parseFloat((summary.upload / 1000000).toFixed(2));
-  speedTest.latency = parseFloat(summary.latency.toFixed(2));
-  speedTest.jitter = parseFloat(summary.jitter.toFixed(2));
-};
+          if (latencyTimings.length >= 2) {
+            const differences = [];
+            for (let i = 1; i < latencyTimings.length; i++) {
+              differences.push(Math.abs(latencyTimings[i].ping - latencyTimings[i - 1].ping));
+            }
 
-// 更新 Speed Test 进度条颜色
-const updateSpeedTestColor = (status) => {
-  switch (status) {
-    case 'idle':
-      return 'text-secondary';
-    case 'running':
-      return 'text-info';
-    case 'paused':
-      return 'text-info';
-    case 'finished':
-      return 'text-success';
-    case 'error':
-      return 'text-danger';
-    default:
-      return '';
-  }
-};
-
-// 修改进度条
-const progressBarChange = () => {
-  const rawData = testEngine.results.raw;
-  // 进度条
-  let progress = 0;
-  const progressPerStage = 100 / 3;  // 将总进度平均分配到每个阶段
-
-  if (rawData.download && rawData.download.started) {
-    progress += rawData.download.finished ? progressPerStage : progressPerStage / 2;
-  }
-  if (rawData.upload && rawData.upload.started) {
-    progress += rawData.upload.finished ? progressPerStage : progressPerStage / 2;
-  }
-  if (rawData.latency && rawData.latency.started) {
-    progress += rawData.latency.finished ? progressPerStage : progressPerStage / 2;
-  }
-
-  // 确保进度不超过100%
-  progress = Math.min(progress, 100);
-
-  // 更新进度条
-  const progressBar = document.getElementById('speedtest-progress');
-  progressBar.style.width = `${progress}%`;
-  progressBar.setAttribute('aria-valuenow', progress);
-};
-
-const SpeedChange = () => {
-  const rawData = testEngine.results.raw;
-
-  // 更新下载速度
-  if (rawData.download && rawData.download.results) {
-    const downloadKeys = Object.keys(rawData.download.results);
-    if (downloadKeys.length > 0) {
-      const lastDownloadKey = downloadKeys[downloadKeys.length - 1];
-      const downloadTimings = rawData.download.results[lastDownloadKey].timings;
-      if (downloadTimings.length > 0) {
-        const latestDownload = downloadTimings[downloadTimings.length - 1];
-        const newDownloadSpeed = parseFloat((latestDownload.bps / 1000000).toFixed(2));
-        if (newDownloadSpeed > speedTest.downloadSpeed) {
-          speedTest.downloadSpeed = newDownloadSpeed;
+            const mean = differences.reduce((a, b) => a + b, 0) / differences.length;
+            const variance = differences.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / differences.length;
+            state.speedTest.jitter = parseFloat(Math.sqrt(variance).toFixed(2));
+          }
         }
       }
-    }
-  }
-  // 更新上传速度
-  if (rawData.upload && rawData.upload.results) {
-    const uploadKeys = Object.keys(rawData.upload.results);
-    if (uploadKeys.length > 0) {
-      const lastUploadKey = uploadKeys[uploadKeys.length - 1];
-      const uploadTimings = rawData.upload.results[lastUploadKey].timings;
-      if (uploadTimings.length > 0) {
-        const latestUpload = uploadTimings[uploadTimings.length - 1];
-        const newUploadSpeed = parseFloat((latestUpload.bps / 1000000).toFixed(2));
-        if (newUploadSpeed > speedTest.uploadSpeed) {
-          speedTest.uploadSpeed = newUploadSpeed;
+
+      // 处理下载速度
+      if (rawData.download?.started) {
+        if (rawData.download.current?.timings?.length > 0) {
+          const timings = rawData.download.current.timings;
+          state.speedTest.downloadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
+        } else if (rawData.download?.results) {
+          const downloadKeys = Object.keys(rawData.download.results);
+          if (downloadKeys.length > 0) {
+            const lastDownloadKey = downloadKeys[downloadKeys.length - 1];
+            const downloadTimings = rawData.download.results[lastDownloadKey].timings;
+            if (downloadTimings?.length > 0) {
+              const latestTiming = downloadTimings[downloadTimings.length - 1];
+              state.speedTest.downloadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
+            }
+          }
+        } else {
+          state.speedTest.downloadSpeed = 0;
         }
       }
+
+      // 处理上传速度
+      if (rawData.upload?.started) {
+        if (rawData.upload.current?.timings?.length > 0) {
+          const timings = rawData.upload.current.timings;
+          state.speedTest.uploadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
+        } else if (rawData.upload?.results) {
+          const uploadKeys = Object.keys(rawData.upload.results);
+          if (uploadKeys.length > 0) {
+            const lastUploadKey = uploadKeys[uploadKeys.length - 1];
+            const uploadTimings = rawData.upload.results[lastUploadKey].timings;
+            if (uploadTimings?.length > 0) {
+              const latestTiming = uploadTimings[uploadTimings.length - 1];
+              state.speedTest.uploadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
+            }
+          }
+        } else {
+          state.speedTest.uploadSpeed = 0;
+        }
+      }
+
+      // 更新完状态后立即更新图表
+      updateCharts(
+        state.speedTest.downloadSpeed,
+        state.speedTest.uploadSpeed,
+        state.speedTest.latency,
+        state.speedTest.jitter,
+        rawData
+      );
+
+    } catch (error) {
+      console.error('Error in updateSpeedInRealTime:', error);
     }
-  }
-  // 更新延迟
-  if (rawData.latency && rawData.latency.results && rawData.latency.results.timings && rawData.latency.results.timings.length > 0) {
+  },
+
+  updateLatency(rawData) {
+    if (!rawData.latency?.results?.timings?.length) return;
     const latencyTimings = rawData.latency.results.timings;
     const latestLatency = latencyTimings[latencyTimings.length - 1].ping;
     const newLatency = parseFloat(latestLatency.toFixed(2));
-    if (newLatency < speedTest.latency || speedTest.latency === 0) {
-      speedTest.latency = newLatency;
+    if (newLatency < state.speedTest.latency || state.speedTest.latency === 0) {
+      state.speedTest.latency = newLatency;
     }
   }
 };
 
-// 显示结果
-const showResult = () => {
-  testEngine.onFinish = results => {
-    speedTestStatus.value = "finished";
-    updateSpeedTestResults(results);
-    const scores = results.getScores().streaming ? results.getScores() : '';
+// 成就处理
+const achievementHandler = {
+  checkAndUpdate() {
+    if (state.speedTest.status !== "finished") return;
 
-    if (scores) {
-      hasScores.value = true;
-      // 更新 Vue 实例的数据属性
-      speedTest.streamingScore = scores.streaming.points;
-      speedTest.gamingScore = scores.gaming.points;
-      speedTest.rtcScore = scores.rtc.points;
+    const achievements = this.getQualifiedAchievements();
+    this.triggerAchievementsWithDelay(achievements);
+  },
+
+  getQualifiedAchievements() {
+    const { downloadSpeed, uploadSpeed } = state.speedTest;
+    const achievements = [];
+
+    if (downloadSpeed >= 100) achievements.push('BarelyEnough');
+    if (downloadSpeed >= 500) achievements.push('RapidPace');
+    if (downloadSpeed >= 1000) achievements.push('TorrentFlow');
+    if (uploadSpeed >= 50) achievements.push('SteadyGoing');
+    if (uploadSpeed >= 200) achievements.push('TooFastTooSimple');
+    if (uploadSpeed >= 1000) achievements.push('SwiftAscent');
+
+    return achievements.filter(achievement =>
+      !store.userAchievements[achievement].achieved);
+  },
+
+  triggerAchievementsWithDelay(achievements, delay = 2000) {
+    if (!achievements.length) return;
+
+    const achievement = achievements.shift();
+    store.setTriggerUpdateAchievements(achievement);
+
+    if (achievements.length) {
+      setTimeout(() => this.triggerAchievementsWithDelay(achievements, delay), delay);
+    }
+  }
+};
+
+// 将方法直接暴露给模板使用
+const updateSpeedTestColor = (status) => {
+  const colorMap = {
+    idle: 'text-secondary',
+    running: 'text-info',
+    paused: 'text-info',
+    finished: 'text-success',
+    error: 'text-danger'
+  };
+  return colorMap[status] || '';
+};
+
+// 测试控制方法
+const setupTestEngine = async () => {
+  if (!state.connection.ip) {
+    const connectionData = await connectionMethods.getIPFromSpeedTest();
+    if (connectionData) {
+      Object.assign(state.connection, connectionData);
+    }
+  }
+
+  testEngine.onRunningChange = () => {
+    state.speedTest.status = "running";
+  };
+
+  testEngine.onResultsChange = () => {
+    engineMethods.updateProgress();
+    engineMethods.updateSpeedInRealTime();
+  };
+
+  testEngine.onFinish = results => {
+    // 先更新状态，防止后续更新
+    state.speedTest.status = "finished";
+
+    // 清理事件监听
+    testEngine.onRunningChange = null;
+    testEngine.onResultsChange = null;
+    testEngine.onError = null;
+
+    // 最后一次更新结果
+    engineMethods.updateResults(results);
+
+    const scores = results.getScores();
+    if (scores?.streaming) {
+      state.speedTest.hasScores = true;
+      state.speedTest.streamingScore = scores.streaming.points;
+      state.speedTest.gamingScore = scores.gaming.points;
+      state.speedTest.rtcScore = scores.rtc.points;
+      // 根据 Score 分数来判断 Quality 质量
+      state.speedTest.streamingQuality = scores.streaming.points >= 50 ? 'Good' : scores.streaming.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.gamingQuality = scores.gaming.points >= 50 ? 'Good' : scores.gaming.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.rtcQuality = scores.rtc.points >= 50 ? 'Good' : scores.rtc.points >= 10 ? 'Medium' : 'Bad';
+    }
+
+    // 清理引擎实例
+    testEngine = null;
+
+    if (isSignedIn.value) {
+      achievementHandler.checkAndUpdate();
     }
   };
 
   testEngine.onError = (e) => {
     if (typeof e === 'string' && !e.includes("ICE")) {
-      speedTestStatus.value = "error";
+      state.speedTest.status = "error";
     }
     console.error('Speed Test Error: ', e);
   };
 };
 
-// 初始化
+const speedTestController = async () => {
+  try {
+    if (state.speedTest.status === 'running') {
+      testEngine.pause();
+      state.speedTest.status = "paused";
+      return;
+    }
+
+    if (state.speedTest.status === 'paused') {
+      testEngine.play();
+      return;
+    }
+
+    // 重置图表数据
+    resetChartData();
+    destroyCharts();
+
+    // 初始化图表并设置起始点
+    await initStartingPoints();
+
+    Object.assign(state.speedTest, {
+      downloadSpeed: 0,
+      uploadSpeed: 0,
+      latency: 0,
+      jitter: 0,
+      streamingScore: "-",
+      gamingScore: "-",
+      rtcScore: "-",
+      hasScores: false
+    });
+
+    testEngine = engineMethods.reset();
+    if (!testEngine) {
+      console.error('Failed to initialize test engine');
+      return;
+    }
+
+    await setupTestEngine();
+    trackEvent('Section', 'StartClick', 'SpeedTest');
+    testEngine.play();
+  } catch (error) {
+    console.error('Error in speedTestController:', error);
+    state.speedTest.status = "error";
+  }
+};
+
+// 生命周期
 onMounted(() => {
   store.setMountingStatus('speedtest', true);
 });
 
-// 暴露给父组件的方法
+// 清理
+onUnmounted(() => {
+  if (testEngine) {
+    testEngine = null;
+  }
+  destroyCharts();
+});
+
+// 暴露方法
 defineExpose({
   speedTestController
 });
-
 </script>
 
 <style scoped>
@@ -453,5 +643,46 @@ defineExpose({
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+
+.speed-charts-container {
+  margin: 20pt 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 130pt;
+  width: 100%;
+  margin-bottom: 15pt;
+}
+
+@media (max-width: 768px) {
+  .chart-wrapper {
+    height: 100pt;
+    margin-bottom: 20pt;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+  .chart-wrapper {
+    height: 100pt;
+    margin-bottom: 25pt;
+  }
+}
+
+.jn-slide-in {
+  animation: slide-in 0.2s ease-in forwards;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>

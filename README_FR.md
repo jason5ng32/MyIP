@@ -106,9 +106,10 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `IPCHECKING_API_KEY` | Non | `""` | Clé API pour IPCheck.ing, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
 | `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
 | `IPAPIIS_API_KEY` | Non | `""` | Clé API pour IPAPI.is, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IPAPI.is |
-| `KEYCDN_USER_AGENT` | Non | `""` | Le nom de domaine lorsque vous utilisez KeyCDN, doit contenir le préfixe https. Utilisé pour obtenir des informations sur l'adresse IP via KeyCDN |
+| `IP2LOCATION_API_KEY` | Non | `""` | Clé API pour IP2Location.io, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IP2Location.io |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 | `MAC_LOOKUP_API_KEY` | Non | `""` | Clé API pour MAC Lookup, utilisée pour obtenir des informations sur l'adresse MAC via MAC Lookup |
+| `IPCHECKING_API_ENDPOINT` | **Oui** | `""` | URL de l'API IPCheck.ing |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
 | `VITE_CURL_IPV4_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv4 pour l'API CURL |
 | `VITE_CURL_IPV6_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv6 pour l'API CURL |
@@ -156,7 +157,7 @@ Si vous utilisez un proxy pour accéder à Internet, envisagez d'ajouter cette r
 
 ```ini
 # Test d'adresse IP
-IP-CIDR,1.0.0.1/32,Proxy,no-resolve
+IP-CIDR,1.0.0.2/32,Proxy,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,Proxy,no-resolve
 DOMAIN,4.ipcheck.ing,DIRECT
 DOMAIN,6.ipcheck.ing,DIRECT

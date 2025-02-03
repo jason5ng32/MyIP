@@ -3,22 +3,29 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import mapHandler from './api/map.js';
-import ipinfoHandler from './api/ipinfo.js';
-import ipapicomHandler from './api/ipapicom.js';
-import keycdnHandler from './api/keycdn.js';
-import ipCheckingHandler from './api/ipchecking.js';
-import ipsbHandler from './api/ipsb.js';
-import cfHander from './api/cfradar.js';
-import validateConfigs from './api/configs.js';
-import dnsResolver from './api/dnsresolver.js';
-import rateLimit from 'express-rate-limit';
 import { slowDown } from 'express-slow-down'
-import whois from './api/whois.js';
-import ipapiisHandler from './api/ipapiis.js';
-import invisibilitytestHandler from './api/invisibilitytest.js';
-import macChecker from './api/macchecker.js';
+import rateLimit from 'express-rate-limit';
+
+// Backend APIs
+import mapHandler from './api/google-map.js';
+// IP Info
+import ipinfoHandler from './api/ipinfo-io.js';
+import ipapicomHandler from './api/ipapi-com.js';
+import ipCheckingHandler from './api/ipcheck-ing.js';
+import ipapiisHandler from './api/ipapi-is.js';
+import ip2locationHandler from './api/ip2location-io.js';
+import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
+// Others
+import cfHander from './api/cf-radar.js';
+import dnsResolver from './api/dns-resolver.js';
+import getWhois from './api/get-whois.js';
+import invisibilitytestHandler from './api/invisibility-test.js';
+import macChecker from './api/mac-checker.js';
+// User
+import validateConfigs from './api/configs.js';
+import getUserinfo from './api/get-user-info.js';
+import updateUserAchievement from './api/update-user-achievement.js';
 
 dotenv.config();
 
@@ -124,21 +131,24 @@ if (speedLimitSet !== 0) {
     console.log('Speed limiter is enabled, slowing down after:', speedLimitSet, 'requests');
 }
 
+app.use(express.json());
 
 // APIs
 app.get('/api/map', mapHandler);
 app.get('/api/ipinfo', ipinfoHandler);
 app.get('/api/ipapicom', ipapicomHandler);
-app.get('/api/keycdn', keycdnHandler);
 app.get('/api/ipchecking', ipCheckingHandler);
 app.get('/api/ipsb', ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/dnsresolver', dnsResolver);
-app.get('/api/whois', whois);
+app.get('/api/whois', getWhois);
 app.get('/api/ipapiis', ipapiisHandler);
+app.get('/api/ip2location', ip2locationHandler);
 app.get('/api/invisibility', invisibilitytestHandler);
 app.get('/api/macchecker', macChecker);
 app.get('/api/maxmind', maxmindHandler);
+app.get('/api/getuserinfo', getUserinfo);
+app.put('/api/updateuserachievement', updateUserAchievement);
 
 // 使用查询参数处理所有配置请求
 app.get('/api/configs', validateConfigs);

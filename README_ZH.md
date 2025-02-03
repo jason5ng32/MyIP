@@ -106,9 +106,10 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
-| `KEYCDN_USER_AGENT` | 否 | `""` | 使用 KeyCDN 时的域名，需包含 https 前缀。用于通过 KeyCDN 获取 IP 归属地信息 |
+| `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
+| `IPCHECKING_API_ENDPOINT` | **是** | `""` | IPCheck.ing 的 API 端点 URL |
 | `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
 | `VITE_CURL_IPV4_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv4 域名 |
 | `VITE_CURL_IPV6_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv6 域名 |
@@ -156,7 +157,7 @@ docker run -d -p 18966:18966 \
 
 ```ini
 # IP Testing
-IP-CIDR,1.0.0.1/32,Proxy,no-resolve
+IP-CIDR,1.0.0.2/32,Proxy,no-resolve
 IP-CIDR6,2606:4700:4700::1111/128,Proxy,no-resolve
 DOMAIN,4.ipcheck.ing,DIRECT
 DOMAIN,6.ipcheck.ing,DIRECT

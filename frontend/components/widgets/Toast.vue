@@ -33,7 +33,8 @@ watch(alert, (newVal) => {
 }, { immediate: true, deep: true });
 
 // 显示 Toast
-const showToast = (duration = 2000) => {
+const showToast = () => {
+    let duration = alert.value.alertDuration || 2000;
     if (toastEl.value) {
         const toastInfoMask = new Toast(toastEl.value, {
             delay: duration
@@ -67,7 +68,7 @@ onMounted(() => {
 <style scoped>
 .jn-toast {
     position: fixed;
-    z-index: 9999;
+    z-index: 10001;
     right: 0;
     bottom: 0;
     margin-bottom: 2pt;

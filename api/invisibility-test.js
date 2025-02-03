@@ -1,4 +1,3 @@
-import { get } from 'https';
 import { refererCheck } from '../common/referer-check.js';
 
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
@@ -14,7 +13,7 @@ function isValidUserID(userID) {
     return true;
 }
 
-export default (req, res) => {
+export default async (req, res) => {
 
     // 限制只能从指定域名访问
     const referer = req.headers.referer;
@@ -33,25 +32,38 @@ export default (req, res) => {
     }
 
     const apikey = process.env.IPCHECKING_API_KEY;
-    
+
     if (!apikey) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const url = new URL(`https://api.ipcheck.ing/getpdresult/${id}?apikey=${apikey}`);
+    const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
+    const url = new URL(`${apiEndpoint}/getpdresult/${id}?apikey=${apikey}`);
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            try {
-                const result = JSON.parse(data);
-                res.json(result);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
+    try {
+        const apiResponse = await fetch(url, {
+            headers: {
+                ...req.headers,
             }
         });
-    }).on('error', (e) => {
-        res.status(500).json({ error: e.message });
-    });
+
+        // 捕捉上游错误
+        if (!apiResponse.ok) {
+            let errorDetail = '';
+            try {
+                const errorData = await apiResponse.json();
+                errorDetail = errorData.message || JSON.stringify(errorData);
+            } catch {
+                errorDetail = apiResponse.statusText;
+            }
+            throw new Error(`API responded with status: ${apiResponse.status} - ${errorDetail}`);
+        }
+
+        const data = await apiResponse.json();
+        res.json(data);
+    } catch (error) {
+        console.error("Error during API request:", error);
+        res.status(500).json({ error: error.message });
+    }
+
 };

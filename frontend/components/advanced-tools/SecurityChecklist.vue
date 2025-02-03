@@ -290,6 +290,7 @@ const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
+const isSignedIn = computed(() => store.isSignedIn);
 
 const categories = ref([]);
 const currentList = ref('authentication');
@@ -446,6 +447,10 @@ const checkItem = (item) => {
     if (item.ignored) return;
     item.checked = !item.checked;
     item.checked ? updateSlugs(item.slug, 'checked') : updateSlugs(item.slug, '');
+    if (isSignedIn.value) {
+        updateAchievement();
+    }
+
 };
 
 // 计数器
@@ -488,6 +493,17 @@ const getProgressStyle = (category) => {
     return (action) => {
         return `width: ${countItems({ action, category }) / countItems({ action: 'total', category }) * 100}%`;
     };
+};
+
+// 更新成就
+const updateAchievement = () => {
+    if (!store.userAchievements.SurfaceCheck.achieved && checkedItems.value) {
+        store.setTriggerUpdateAchievements('SurfaceCheck');
+    } else if (!store.userAchievements.HalfwayThere.achieved && checkedItems.value / totalItems.value > 0.5) {
+        store.setTriggerUpdateAchievements('HalfwayThere');
+    } else if (!store.userAchievements.FullySecured.achieved && checkedItems.value === totalItems.value) {
+        store.setTriggerUpdateAchievements('FullySecured');
+    }
 };
 
 onMounted(() => {

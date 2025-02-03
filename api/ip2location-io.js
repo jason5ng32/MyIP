@@ -21,25 +21,17 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Invalid IP address' });
     }
 
-    // 构建请求 keycdn.com 的 URL
-    const url = new URL(`https://tools.keycdn.com/geo.json?host=${ipAddress}`);
+    const keys = (process.env.IP2LOCATION_API_KEY).split(',');
+    const key = keys[Math.floor(Math.random() * keys.length)];
+    const url = `https://api.ip2location.io/?ip=${ipAddress}&key=${key}`;
 
-    // 设置请求选项，包括 User-Agent
-    const options = {
-        hostname: url.hostname,
-        path: url.pathname + url.search,
-        headers: {
-            'User-Agent': 'keycdn-tools:' + process.env.KEYCDN_USER_AGENT
-        }
-    };
-
-    get(options, apiRes => {
+    get(url, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
             try {
                 const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJsonForKeyCDN(originalJson);
+                const modifiedJson = modifyJsonForIPAPI(originalJson);
                 res.json(modifiedJson);
             } catch (e) {
                 res.status(500).json({ error: 'Error parsing JSON' });
@@ -48,21 +40,22 @@ export default (req, res) => {
     }).on('error', (e) => {
         res.status(500).json({ error: e.message });
     });
-}
+};
 
-function modifyJsonForKeyCDN(json) {
-    const { data: { geo: { ip, city, region_name, country_name, country_code, latitude, longitude, isp, asn } } } = json;
+function modifyJsonForIPAPI(json) {
+    let asn = json.asn || {};
+    const { ip, country_code, country_name, region_name, city_name, latitude, longitude, as } = json;
 
     return {
-        ip,
-        city,
-        region: region_name ? region_name : city,
-        country: country_code,
-        country_name,
-        country_code,
-        latitude,
-        longitude,
-        asn: "AS" + asn,
-        org: isp
+        ip: ip,
+        city: city_name || 'N/A',
+        region: region_name || 'N/A',
+        country: country_code || 'N/A',
+        country_name: country_name || 'N/A',
+        country_code: country_code || 'N/A',
+        latitude: latitude || 'N/A',
+        longitude: longitude || 'N/A',
+        asn: asn === undefined || asn === null ? 'N/A' : 'AS' + asn,
+        org: as || 'N/A',
     };
 }

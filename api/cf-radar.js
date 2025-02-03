@@ -1,4 +1,3 @@
-
 import { parse } from 'dotenv';
 import { refererCheck } from '../common/referer-check.js';
 
@@ -12,15 +11,19 @@ function createFetchOptions() {
     };
 }
 
+// 通用的 fetch 请求函数
+async function fetchFromCloudflare(endpoint) {
+    const url = `https://api.cloudflare.com/client/v4${endpoint}`;
+    const headers = createFetchOptions().headers;
+    const options = { headers };
+    const response = await fetch(url, options);
+    return response.json();
+}
+
 // ASN 信息
 async function getASNInfo(asn) {
     try {
-        const url = `https://api.cloudflare.com/client/v4/radar/entities/asns/${asn}`;
-        const headers = createFetchOptions().headers;
-        const options = { headers };
-        const response = await fetch(url, options);
-        const json = await response.json();
-        return json;
+        return await fetchFromCloudflare(`/radar/entities/asns/${asn}`);
     } catch (error) {
         console.error(error);
         throw new Error('Failed to fetch ASN info');
@@ -30,12 +33,7 @@ async function getASNInfo(asn) {
 // IP 版本分布
 async function getASNIPVersion(asn) {
     try {
-        const url = `https://api.cloudflare.com/client/v4/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`;
-        const headers = createFetchOptions().headers;
-        const options = { headers };
-        const response = await fetch(url, options);
-        const json = await response.json();
-        return json;
+        return await fetchFromCloudflare(`/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`);
     } catch (error) {
         console.error(error);
         throw new Error('Failed to fetch ASN IP version');
@@ -45,12 +43,7 @@ async function getASNIPVersion(asn) {
 // HTTP 协议分布
 async function getASNHTTPProtocol(asn) {
     try {
-        const url = `https://api.cloudflare.com/client/v4/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`;
-        const headers = createFetchOptions().headers;
-        const options = { headers };
-        const response = await fetch(url, options);
-        const json = await response.json();
-        return json;
+        return await fetchFromCloudflare(`/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`);
     } catch (error) {
         console.error(error);
         throw new Error('Failed to fetch ASN HTTP protocol');
@@ -60,12 +53,7 @@ async function getASNHTTPProtocol(asn) {
 // 设备分布
 async function getASNDeviceType(asn) {
     try {
-        const url = `https://api.cloudflare.com/client/v4/radar/http/summary/device_type?asn=${asn}&dateRange=7d`;
-        const headers = createFetchOptions().headers;
-        const options = { headers };
-        const response = await fetch(url, options);
-        const json = await response.json();
-        return json;
+        return await fetchFromCloudflare(`/radar/http/summary/device_type?asn=${asn}&dateRange=7d`);
     } catch (error) {
         console.error(error);
         throw new Error('Failed to fetch ASN device type');
@@ -75,23 +63,34 @@ async function getASNDeviceType(asn) {
 // 机器人分布
 async function getASNBotType(asn) {
     try {
-        const url = `https://api.cloudflare.com/client/v4/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`;
-        const headers = createFetchOptions().headers;
-        const options = { headers };
-        const response = await fetch(url, options);
-        const json = await response.json();
-        return json;
+        return await fetchFromCloudflare(`/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`);
     } catch (error) {
         console.error(error);
         throw new Error('Failed to fetch ASN bot type');
     }
 };
 
+// 使用 Promise.all 进行并行请求
+async function getAllASNData(asn) {
+    try {
+        const [asnInfo, ipVersion, httpProtocol, deviceType, botType] = await Promise.all([
+            getASNInfo(asn),
+            getASNIPVersion(asn),
+            getASNHTTPProtocol(asn),
+            getASNDeviceType(asn),
+            getASNBotType(asn)
+        ]);
+        return { asnInfo, ipVersion, httpProtocol, deviceType, botType };
+    } catch (error) {
+        console.error(error);
+        throw new Error('Failed to fetch all ASN data');
+    }
+}
+
 // 验证 asn 是否合法
 function isValidASN(asn) {
     return /^[0-9]+$/.test(asn);
 };
-
 
 // 格式化输出
 
@@ -143,37 +142,26 @@ export default async (req, res) => {
     }
 
     try {
-        const results = await Promise.allSettled([
-            getASNInfo(asn),
-            getASNIPVersion(asn),
-            getASNHTTPProtocol(asn),
-            getASNDeviceType(asn),
-            getASNBotType(asn)
-        ]);
-
-        // 直接转换每个结果，如果状态是 'fulfilled' 则返回值，否则返回一个包含错误信息的对象
-        const response = results.map(result => {
-            return result.status === 'fulfilled' ? result.value : { error: 'Failed to fetch data' };
-        });
+        const { asnInfo, ipVersion, httpProtocol, deviceType, botType } = await getAllASNData(asn);
 
         // 清洗数据
         function cleanUpResponseData(data) {
             return {
-                asnName: data[0]?.result?.asn?.name,
-                asnOrgName: data[0]?.result?.asn?.orgName,
-                estimatedUsers: data[0]?.result?.asn?.estimatedUsers?.estimatedUsers,
-                IPv4_Pct: data[1]?.result?.summary_0?.IPv4,
-                IPv6_Pct: data[1]?.result?.summary_0?.IPv6,
-                HTTP_Pct: data[2]?.result?.summary_0?.http,
-                HTTPS_Pct: data[2]?.result?.summary_0?.https,
-                Desktop_Pct: data[3]?.result?.summary_0?.desktop,
-                Mobile_Pct: data[3]?.result?.summary_0?.mobile,
-                Bot_Pct: data[4]?.result?.summary_0?.bot,
-                Human_Pct: data[4]?.result?.summary_0?.human
+                asnName: data.asnInfo.result.asn.name,
+                asnOrgName: data.asnInfo.result.asn.orgName,
+                estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
+                IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
+                IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
+                HTTP_Pct: data.httpProtocol.result.summary_0.http,
+                HTTPS_Pct: data.httpProtocol.result.summary_0.https,
+                Desktop_Pct: data.deviceType.result.summary_0.desktop,
+                Mobile_Pct: data.deviceType.result.summary_0.mobile,
+                Bot_Pct: data.botType.result.summary_0.bot,
+                Human_Pct: data.botType.result.summary_0.human
             };
         }
 
-        const cleanedResponse = cleanUpResponseData(response);
+        const cleanedResponse = cleanUpResponseData({ asnInfo, ipVersion, httpProtocol, deviceType, botType });
         const finalResponse = formatData(cleanedResponse);
         filterData(finalResponse);
 

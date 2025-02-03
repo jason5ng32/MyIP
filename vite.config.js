@@ -99,7 +99,7 @@ export default defineConfig({
           },
         ],
       },
-    }),    
+    }),
     CodeInspectorPlugin({
       bundler: 'vite',
       hideDomPathAttr: true,
@@ -116,20 +116,47 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
+        manualChunks: {
+          'vendor': ['vue', 'vue-router', 'vue-i18n'],
+          'chart': ['chart.js/auto'],
+          'speedtest': ['@cloudflare/speedtest'],
+          'svgmap': ['svgmap'],
+          'browser-detect': ['@thumbmarkjs/thumbmarkjs', 'detect-gpu', 'ua-parser-js'],
+          'utils-getips': [
+            '@/utils/getips/index',
+            '@/utils/valid-ip',
+            '@/utils/transform-ip-data',
+            '@/utils/masked-info'
+          ],
+          'utils-data': [
+            '@/utils/country-name',
+            '@/utils/speedtest-colos'
+          ],
+          'utils-auth': [
+            '@/utils/authenticated-fetch'
+          ],
+          'utils-analytics': [
+            '@/utils/use-analytics'
+          ]
         },
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name.endsWith('.woff') || assetInfo.name.endsWith('.woff2')) {
+          if (assetInfo.fileName && (assetInfo.fileName.endsWith('.woff') || assetInfo.fileName.endsWith('.woff2'))) {
             return 'fonts/[name][extname]';
           }
           return 'assets/[name]-[hash][extname]';
         },
+        chunkFileNames: (chunkInfo) => {
+          const prefix = chunkInfo.name.startsWith('utils-') ? 'utils/' : '';
+          return `assets/${prefix}[name].[hash].js`;
+        }
       }
     },
     chunkSizeWarningLimit: 1000,
+    splitChunks: {
+      chunks: 'all',
+      minSize: 20000,
+      maxSize: 500000,
+    }
   },
   server: {
     host: '0.0.0.0',

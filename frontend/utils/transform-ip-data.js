@@ -33,7 +33,7 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 function extractProxyDetails(proxyDetect = {}, t) {
     const isProxy = determineIsProxy(proxyDetect, t);
     const type = determineType(proxyDetect, t);
-    const qualityScore = proxyDetect.risk === 'unknown' ? 'unknown' : (100 - proxyDetect.risk);
+    const qualityScore = proxyDetect.risk === 'unknown' ? 'unknown' : proxyDetect.risk === 'sign_in_required'? 'sign_in_required' : (100 - proxyDetect.risk);
     const proxyProtocol = determineProtocol(proxyDetect, t);
     const proxyOperator = proxyDetect.operator || "";
 
@@ -48,6 +48,8 @@ function determineIsProxy(proxyDetect, t) {
         return t('ipInfos.proxyDetect.maybe');
     } else if (proxyDetect.proxy === 'no') {
         return t('ipInfos.proxyDetect.no');
+    } else if (proxyDetect.proxy === 'sign_in_required') {
+        return 'sign_in_required';
     } else {
         return t('ipInfos.proxyDetect.unknownProxyType');
     }

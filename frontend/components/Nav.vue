@@ -3,94 +3,183 @@
   <header class="navbar navbar-expand-lg bg-body-tertiary mb-3 jn-navbar-top "
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <nav id="navbar-top" class="container-xxl">
-      <div class="jn-logo">
+      <button class="navbar-toggler jn-hamburger-button" type="button" data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <span class="navbar-toggler-icon bg-transparent"></span>
+      </button>
 
+      <div class="jn-logo">
         <a class="navbar-brand d-flex align-items-center align-content-center" :class="{ 'text-white': isDarkMode }"
           href="#" @click="handleLogoClick">
           <brandIcon />
           <span class=" fw-bold  "> IP</span>
           <span class="fw-lighter">Check.</span>
           <span class="fw-lighter" :class="{
-          'background-animation-dark': !loaded && isDarkMode,
-          'background-animation-light': !loaded && !isDarkMode
-        }">ing</span>
+              'background-animation-dark': !loaded && isDarkMode,
+              'background-animation-light': !loaded && !isDarkMode
+            }">ing
+          </span>
         </a>
-
-        <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
-          aria-label="Preferences">
-          <i class="bi bi-toggles"></i>
-        </div>
-
       </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"
-        @click="closeAllOffCanvas">
-        <span class="navbar-toggler-icon bg-transparent "></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
-        <!-- 导航循环 -->
-        <div class="navbar-nav ">
-          <a v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
-            :key="item" class="nav-link" :class="{ 'text-white jn-deactive': isDarkMode }" :href="`#${item}`"
-            @click="collapseNav(); trackEvent('Nav', 'NavClick', item)">{{
-            t(`nav.${item}`) }}</a>
-        </div>
-        <a :href="t('page.footerLink')" class="btn jn-fs" id="githubStars"
-          :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode, 'mt-2': isMobile, 'ms-2': !isMobile }"
-          target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
-          <div><i class="bi bi-github"></i></div>
-          <div class="row flex-column ">
-            <TransitionGroup name="slide-fade">
-              <span key="default" class="col-12 jn-w" v-if="githubStars === 0">&nbsp;GitHub</span>
-              <span key="stars" class="col-12 jn-w" v-if="githubStars > 0">
-                &nbsp;{{ githubStars }}
-                <i class="bi bi-star-fill" :class="[isDarkMode ? 'redstar' : 'yellowstar']"></i>
-              </span>
-            </TransitionGroup>
 
+      <!-- Menu Bar, Expand on PC -->
+      <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom"
+        :class="[isMobile ? 'h-50' : '']" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">{{t('nav.Navigation')}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" :class="[!isMobile ? 'd-flex align-items-center' : '']">
+          <div class="navbar-nav">
+            <a type="button"
+              v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
+              :key="item" class="nav-link" :class="{ 
+                'text-white': item === currentSection && isDarkMode,
+                'text-dark': item === currentSection && !isDarkMode,
+                }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item)">
+              {{ t(`nav.${item}`) }}
+            </a>
           </div>
-        </a>
+          <a :class="[isMobile ? 'mt-2':'ms-2']" :href="t('page.footerLink')" target="_blank"
+            class="d-flex align-items-center">
+            <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
+          </a>
+        </div>
+      </div>
+
+      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
+        aria-label="Preferences">
+        <i class="bi bi-toggles"></i>
+      </div>
+
+      <!-- Sign In -->
+      <div v-if="isFireBaseSet" id="signin" class="d-flex align-items-center ms-2">
+
+        <div class="dropdown">
+          <button class="btn dropdown-toggle d-flex align-items-center flex-row "
+            :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
+            data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false"
+            @click="getUserInfo">
+            <span v-if="!isSignedIn">
+              {{ t('user.SignIn') }}
+            </span>
+            <span v-if="isSignedIn" class="jn-avatar">
+              <img :src="userPhotoURL" alt="User Avatar" class="avatar" :title="userName">
+            </span>
+            <span v-if="isSignedIn && !isMobile">
+              &nbsp;{{userName}}
+            </span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <li v-if="isSignedIn" class="dropdown-header d-flex flex-column">
+              <span>{{ t('user.Fields.User') }} : {{ userName }}</span>
+              <span>{{ t('user.Fields.CreatedAt') }} : {{ userCreatedAt }}</span>
+              <span class="d-flex align-items-center">{{ t('user.Fields.Level') }} :&nbsp;
+                <span v-if="remoteUserInfoFetched" class="badge" :class="{
+                  'text-bg-secondary': remoteUserInfo.userLevel === 'Standard',
+                  'text-bg-primary': remoteUserInfo.userLevel === 'Premium',
+                  'text-bg-dark': remoteUserInfo.userLevel === 'Owner' && !isDarkMode,
+                  'text-bg-light': remoteUserInfo.userLevel === 'Owner' && isDarkMode,
+                  'text-bg-success': remoteUserInfo.userLevel === 'Developer',
+                  'text-bg-warning': remoteUserInfo.userLevel === 'HonoraryMember',
+                }">{{ t('user.Level.' + remoteUserInfo.userLevel)}}</span>
+                <span v-else>{{ t('user.Fields.Fetching') }}</span>
+              </span>
+              <span>{{ t('user.Fields.FunctionUses') }} :&nbsp;
+                <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }}
+                  {{ t('user.Fields.Times') }}
+                </span>
+                <span v-else>{{ t('user.Fields.Fetching') }}</span>
+              </span>
+            </li>
+            <template v-if="isSignedIn">
+              <li>
+                <button type="button" class="dropdown-item" @click="store.setTriggerAchievements(true)"><i
+                    class="bi bi-award-fill"></i> {{t('user.MyAchievements')}} </button>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+            </template>
+            <template v-if="!isSignedIn">
+              <li><button type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
+                    class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</button></li>
+              <li><button type="button" class="dropdown-item" @click="store.signInWithGithub"><i
+                    class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</button></li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+            </template>
+            <li><button type="button" class="dropdown-item" @click="store.setTriggerUserBenefits(true)"><i
+                  class="bi bi-person-hearts"></i>
+                {{
+                t('user.Benefits.Title') }}</button></li>
+            <template v-if="isSignedIn">
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li><button type="button" class="dropdown-item" @click="store.signOut"><i
+                    class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
+                  }}</button>
+              </li>
+            </template>
+          </ul>
+        </div>
       </div>
     </nav>
   </header>
+
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Offcanvas } from 'bootstrap';
+import unixToDateTime from '@/utils/timestamp-to-date';
 
 const { t } = useI18n();
 
 // 导入 Logo 图标
 import brandIcon from './svgicons/Brand.vue';
 
+// 基础数据
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const loaded = ref(false);
-const githubStars = ref(0);
 
-const closeAllOffCanvas = () => {
-  const offcanvasElements = document.querySelectorAll('.offcanvas');
-  if (offcanvasElements.length === 0) {
+// 导航
+const currentSection = computed(() => store.currentSection);
+
+// 判断是否启用 Firebase
+const isFireBaseSet = computed(() => store.isFireBaseSet);
+
+// 本地用户信息
+const isSignedIn = computed(() => store.isSignedIn);
+const userName = computed(() => store.user?.displayName);
+const userPhotoURL = computed(() => store.user?.photoURL);
+const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
+
+// 远程用户信息
+const remoteUserInfo = computed(() => store.remoteUserInfo);
+const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+
+// 触发远程获取用户信息
+const getUserInfo = async () => {
+  if (remoteUserInfoFetched.value || !isSignedIn.value) {
     return;
   }
-  document.querySelectorAll('.offcanvas').forEach((offcanvas) => {
-    const instance = Offcanvas.getInstance(offcanvas);
-    if (instance) {
-      instance.hide();
-    }
-  });
-};
+  // 获取一次用户信息，以防没有
+  store.setTriggerRemoteUserInfo(true);
+}
 
 // 打开偏好设置
 const OpenPreferences = () => {
-  var offcanvasElement = document.getElementById('offcanvasPreferences');
-  var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
+  const offcanvasElement = document.getElementById('offcanvasPreferences');
+  let offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
   if (offcanvasElement.classList.contains('show')) {
     offcanvas.hide();
   } else {
@@ -99,31 +188,6 @@ const OpenPreferences = () => {
 
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
-
-//获取 GitHub stars
-const getGitHubStars = async () => {
-  const url = `https://api.github.com/repos/jason5ng32/MyIP`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    setTimeout(() => {
-      githubStars.value = data.stargazers_count;
-    }, 1000);
-  } catch (error) {
-    console.error('Failed to fetch Github data:', error);
-    githubStars.value = 0;
-  }
-};
-
-// 收起导航栏
-const collapseNav = () => {
-  document.querySelector('#navbarNavAltMarkup').classList.remove('show');
-};
-
 
 // 点击 Logo 事件处理
 const handleLogoClick = () => {
@@ -134,12 +198,12 @@ const handleLogoClick = () => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// 开始时获取 GitHub stars
-onMounted(() => {
-  setTimeout(() => {
-    getGitHubStars();
-  }, 1000)
-});
+// 菜单栏滚动
+const scrollToSection = (el, offset = 70) => {
+  const element = typeof el === "string" ? document.getElementById(el) : el;
+  const y = element.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: y, behavior: "smooth" });
+}
 
 watch(() => store.allHasLoaded, (newValue) => {
   loaded.value = newValue;
@@ -152,28 +216,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.jn-checkbox {
-  display: none;
-}
-
-.slide-fade-enter-active {
-  transition: all 0.3s ease-in-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from {
-  transform: translateY(30px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateY(-30px);
-  opacity: 0;
-}
-
 .jn-fs {
   font-size: smaller;
   display: flex;
@@ -186,61 +228,44 @@ defineExpose({
   width: 60pt;
 }
 
-.redstar {
-  color: rgb(253 131 3);
+.preference-button {
+  margin-left: 8pt;
 }
 
-.yellowstar {
-  color: rgb(255 216 0);
+.container-xxl {
+  max-width: 1600px;
 }
 
-.switch {
-  background-color: #111;
-  border-radius: 50px;
-  cursor: pointer;
+.jn-avatar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 5px;
-  position: relative;
-  height: 26px;
-  width: 50px;
-  transform: scale(0.7);
-  box-shadow: 0 0 2px white;
-}
-
-.switch .ball {
-  background-color: #fff;
+  width: 18pt;
+  height: 18pt;
+  overflow: hidden;
   border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  height: 22px;
-  width: 22px;
-  transform: translateX(0px);
-  transition: transform 0.2s linear;
 }
 
-.jn-checkbox:checked+.switch .ball {
-  transform: translateX(24px);
+/* 大屏幕上隐藏汉堡包按钮 */
+@media (min-width: 992px) {
+  .jn-hamburger-button {
+    display: none;
+  }
+
+  #offcanvasNavbar {
+    display: flex;
+  }
+
+  .offcanvas.offcanvas-bottom {
+    height: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .offcanvas-header {
+    display: none;
+  }
 }
 
-.jn-button:hover {
-  border: 0;
-}
-
-.jn-button:active {
-  border: 0;
-}
-
-.jn-button:focus {
-  border: 0;
-}
-
-.jn-button {
-  border: 0;
-}
-
+/* Logo 上的加载动画 */
 .background-animation-light {
   position: relative;
   overflow: hidden;
@@ -283,13 +308,5 @@ defineExpose({
   to {
     left: 100%;
   }
-}
-
-.preference-button {
-  margin-left: 8pt;
-}
-
-.container-xxl {
-  max-width: 1600px;
 }
 </style>

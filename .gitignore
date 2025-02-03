@@ -27,3 +27,5 @@ dist-ssr
 
 package-lock.json
 localtest
+
+.VSCodeCounter

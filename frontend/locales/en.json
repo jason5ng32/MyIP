@@ -1,7 +1,143 @@
 {
+  "user": {
+    "SignIn": "Sign In",
+    "SignInWithGoogle": "Sign In with Google",
+    "SignInWithGithub": "Sign In with GitHub",
+    "SignOut": "Sign Out",
+    "SignInToView": "Sign In to View",
+    "SignInToUse": "Please sign in to use",
+    "InvalidUserToken": "Invalid User Token",
+    "MyAchievements": "My Achievements",
+    "Fields": {
+      "User": "User",
+      "CreatedAt": "Created At",
+      "LastLogin": "Last Login",
+      "Level": "User Level",
+      "FunctionUses": "Advanced Usage",
+      "Times": "Times",
+      "Fetching": "Fetching..."
+    },
+    "Level": {
+      "Standard": "Standard User",
+      "Premium": "Premium User",
+      "Owner": "Administrator",
+      "Developer": "Developer",
+      "HonoraryMember": "Honorary Member"
+    },
+    "Benefits": {
+      "Title": "User Benefits",
+      "Benefit": "Benefit",
+      "Note1": "As an open-source product, your use of IPCheck.ing is free of charge.",
+      "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
+      "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
+      "Benefit2": "You can use the invisibility test.",
+      "Benefit3": "You can view your own achievement badges",
+      "Benefit4": "Reduces access restrictions on some features.",
+      "FootNote": "More benefits are being developed..."
+    },
+    "Achievements": {
+      "Title": "Achievements",
+      "Note": "While using IPCheck.ing, you may trigger some achievements. Here you can see all your achievements.",
+      "Get": "Obtained",
+      "GetCount": "Obtained Achievements",
+      "NotGet": "Not Yet",
+      "NotGetCount": "Not Yet Achievements",
+      "FooterNote": "Sometimes, there may be some time-limited achievements.",
+      "Congrats": "🎉 Congratulations",
+      "CongratsMessage": "You have achieved a new accomplishment!",
+      "NewAchievementIs": "The new achievement is:",
+      "Type": {
+        "IAmHuman": {
+          "Title": "I Am Human",
+          "Meet": "Use IPCheck.ing after logging in"
+        },
+        "BarelyEnough": {
+          "Title": "Barely Enough",
+          "Meet": "Download speed exceeds 100Mb/s"
+        },
+        "RapidPace": {
+          "Title": "Rapid Pace",
+          "Meet": "Download speed exceeds 500Mb/s"
+        },
+        "TorrentFlow": {
+          "Title": "Torrent Flow",
+          "Meet": "Download speed exceeds 1000Mb/s"
+        },
+        "SteadyGoing": {
+          "Title": "Steady Going",
+          "Meet": "Upload speed exceeds 50Mb/s"
+        },
+        "TooFastTooSimple": {
+          "Title": "Too Fast Too Simple",
+          "Meet": "Upload speed exceeds 200Mb/s"
+        },
+        "SwiftAscent": {
+          "Title": "Swift Ascent",
+          "Meet": "Upload speed exceeds 1000Mb/s"
+        },
+        "SurfaceCheck": {
+          "Title": "Surface Check",
+          "Meet": "Complete a security checklist item"
+        },
+        "HalfwayThere": {
+          "Title": "Halfway There",
+          "Meet": "Complete 50% of the security checklist"
+        },
+        "FullySecured": {
+          "Title": "Fully Secured",
+          "Meet": "Complete the entire security checklist"
+        },
+        "JustInCase": {
+          "Title": "Just In Case",
+          "Meet": "Complete a stealth test"
+        },
+        "HiddenWell": {
+          "Title": "Hidden Well",
+          "Meet": "Proxy and VPN probability are both 0 in the stealth test"
+        },
+        "SlipUp": {
+          "Title": "Slip Up",
+          "Meet": "Proxy or VPN probability is greater than 50% in the stealth test"
+        },
+        "CleverTrickery": {
+          "Title": "Clever Trickery",
+          "Meet": "Viewed all keyboard shortcuts"
+        },
+        "EnergySaver": {
+          "Title": "Energy Saver",
+          "Meet": "Set the program not to run automatically"
+        },
+        "ResourceHog": {
+          "Title": "Resource Hog",
+          "Meet": "Set multiple refreshes for availability"
+        },
+        "MakingBigNews": {
+          "Title": "Making Big News",
+          "Meet": "Advanced function calls exceed 1000 times"
+        },
+        "GenerousDonor": {
+          "Title": "Generous Donor",
+          "Meet": "Donated to the IPCheck.ing project"
+        },
+        "ItIsOpen": {
+          "Title": "It Is Open",
+          "Meet": "Found a blocked website in the Censorship Check"
+        },
+        "CuriousCat": {
+          "Title": "Curious Cat",
+          "Meet": "Query IPCheck.ing information in the Whois Search"
+        },
+        "CrossingTheWall": {
+          "Title": "Crossing The Wall",
+          "Meet": "All 8 test IPs are different in the Rule Test"
+        }
+      }
+    }
+  },
   "nav": {
     "id": "nav",
     "Title": "IPCheck.ing",
+    "Navigation": "Navigation",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
     "WebRTC": "WebRTC Test",
@@ -64,7 +200,7 @@
     "ShowChecked": "Show Checked",
     "Loading": "Loading..."
   },
-  "shell": {
+  "curl": {
     "Title": "Command Line API",
     "Note1": "Hey, turns out you also like using the terminal?",
     "Note2_1": "You can use",
@@ -301,7 +437,6 @@
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub",
     "RefreshRuleTests": "Refresh Rule Tests",
-    "Shell": "Command Line API",
     "qualityScoreExplain": "The IP quality score is calculated based on multiple weighted factors, including the type of IP, whether it is a proxy/VPN, and the number of recent attack events detected from this IP. A higher score indicates better IP quality, reducing the likelihood of being blocked by risk control on some websites."
   },
   "ipInfos": {
@@ -407,10 +542,15 @@
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
     "score": "Based on the speed test, got the following quality scores:",
-    "resultNote": ". The score is for reference only.",
-    "connectionFrom": "Finished speed test from your IP: ",
+    "resultNote": ".",
+    "connectionFrom": "Finished speed test from your machine, IP: ",
     "connectionTo": " to test server:",
-    "connectionEnd": " ."
+    "connectionEnd": " .",
+    "quality": {
+      "Good": "Good",
+      "Medium": "Medium",
+      "Bad": "Bad"
+    }
   },
   "pingtest": {
     "id": "pingtest",
@@ -461,7 +601,9 @@
     "maskedInfoTitle": "All infos masked",
     "maskedInfoMessage": "All information has been masked, you can now safely take screenshots.",
     "unmaskedInfoTitle": "Infos Unmasked",
-    "unmaskedInfoMessage": "Information has been unmasked, please be careful when taking screenshots."
+    "unmaskedInfoMessage": "Information has been unmasked, please be careful when taking screenshots.",
+    "SignInFailed": "Sign In Failed",
+    "SignInFailedReason": "Reason"
   },
   "shortcutKeys": {
     "id": "shortcutKeys",
@@ -494,7 +636,7 @@
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",
-    "Shell": "Command Line API",
+    "Curl": "Command Line API",
     "SecurityChecklist": "Open Security Checklist panel"
   },
   "page": {
@@ -955,6 +1097,32 @@
           {
             "type": "improve",
             "change": "Other general optimizations"
+          }
+        ]
+      },
+      {
+        "version": "v5.0",
+        "date": "Jan 31, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "Add user system"
+          },
+          {
+            "type": "add",
+            "change": "Add user achievement system"
+          },
+          {
+            "type": "add",
+            "change": "Add Lite version"
+          },
+          {
+            "type": "add",
+            "change": "Speed test can now display data change charts"
+          },
+          {
+            "type": "improve",
+            "change": "Code efficiency optimization"
           }
         ]
       }

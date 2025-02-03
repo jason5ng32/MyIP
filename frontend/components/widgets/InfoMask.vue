@@ -2,8 +2,7 @@
     <button v-show="showMaskButton" class="btn infomask" :class="{
         'btn-success': infoMaskLevel === 0,
         'btn-warning': infoMaskLevel === 1,
-        'btn-secondary': infoMaskLevel === 2,
-        'infomask-no-curl': !curlDomainsHadSet || isMobile
+        'btn-secondary': infoMaskLevel === 2
     }" @click="toggleInfoMask" aria-label="Toggle Info Mask" v-tooltip="t('Tooltips.InfoMask')">
         <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
     </button>
@@ -19,7 +18,6 @@ const { t } = useI18n();
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
-const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
 const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     showMaskButton: Boolean,
@@ -51,12 +49,8 @@ onMounted(() => {
 <style scoped>
 .infomask {
     position: fixed;
-    bottom: 112px;
+    bottom: 66px;
     right: 20px;
     z-index: 1050;
-}
-
-.infomask-no-curl {
-    bottom: 66px;
 }
 </style>
