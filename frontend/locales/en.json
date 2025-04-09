@@ -293,61 +293,78 @@
     "itemComment": "Analysis",
     "agreement": "I agree",
     "blocklist": {
-      "title": "VPN/Proxy Blocklist",
-      "proxy": "Your IP is in the VPN/Proxy blocklist.",
-      "notProxy": "Your IP is not in the VPN/Proxy blocklist."
+      "proxy": {
+        "title": "Proxy List",
+        "positive": "Your IP is in the Proxy list.",
+        "negative": "Your IP is not in the Proxy list."
+      },
+      "vpn": {
+        "title": "VPN List",
+        "positive": "Your IP is in the VPN list.",
+        "negative": "Your IP is not in the VPN list."
+      },
+      "vpnExitNode": {
+        "title": "VPN Exit Node List",
+        "positive": "Your IP is in the VPN exit node list.",
+        "negative": "Your IP is not in the VPN exit node list."
+      }
     },
     "headers": {
       "title": "HTTP Headers",
-      "proxy": "Your HTTP headers contain proxy information, indicating that you may be using a proxy.",
-      "notProxy": "Your HTTP headers do not contain proxy information."
+      "positive": "Your HTTP headers contain proxy information, indicating that you may be using a proxy.",
+      "negative": "Your HTTP headers do not contain proxy information."
     },
     "datacenter": {
       "title": "Datacenter IP",
-      "proxy": "Your IP is a datacenter IP, which is not typically used by regular users. Detected datacenter: ",
-      "notProxy": "Your IP is not a datacenter IP."
+      "positive": "Your IP is a datacenter IP, which is not typically used by regular users.",
+      "negative": "Your IP is not a datacenter IP."
     },
     "tcp": {
       "title": "TCP Fingerprint",
-      "proxy": "The system you are connecting to is different from your computer system, indicating that you may be using a proxy. Although the system's judgment may not be accurate, it is certain that the two systems are different.",
+      "positive": "The system you are connecting to is different from your computer system, indicating that you may be using a proxy. Although the system's judgment may not be accurate, it is certain that the two systems are different.",
       "computer": "Your computer system is: ",
       "server": "The system you are connecting to may be: ",
-      "notProxy": "The system you are connecting to is the same as your computer system."
+      "negative": "The system you are connecting to is the same as your computer system."
     },
     "timezone": {
       "title": "Timezone Difference",
-      "proxy": "Your timezone does not match the geolocation timezone of your IP, indicating that you may be using a proxy.",
+      "positive": "Your timezone does not match the geolocation timezone of your IP, indicating that you may be using a proxy.",
       "computer": "Your timezone is: ",
       "server": "The geolocation timezone of your IP is: ",
-      "notProxy": "Your timezone matches the geolocation timezone of your IP."
+      "negative": "Your timezone matches the geolocation timezone of your IP."
     },
     "net": {
-      "title": "Network Resolution",
-      "proxy": "Network resolution indicates that you may be using a proxy or VPN.",
-      "notProxy": "No evidence of you using a proxy or VPN was found in network resolution."
+      "title": "Network Behavior",
+      "positive": "Based on the client network behavior, it is found that you may be using a proxy or VPN.",
+      "negative": "Based on the client network behavior, it is found that you are not using a proxy or VPN."
     },
     "webrtc": {
       "title": "WebRTC Detection",
-      "proxy": "WebRTC detected multiple IP addresses from different regions, indicating that you may be using a proxy or VPN.",
+      "positive": "WebRTC detected multiple IP addresses from different regions, indicating that you may be using a proxy or VPN.",
       "ipsAre": "The IP addresses are: ",
-      "notProxy": "No evidence of multiple IP addresses from different regions was found in WebRTC detection."
+      "negative": "No evidence of multiple IP addresses from different regions was found in WebRTC detection."
     },
     "flow": {
-      "title": "Traffic Analysis",
-      "proxy": "Traffic analysis indicates that you may be using a proxy or VPN.",
-      "notProxy": "No evidence of you using a proxy or VPN was found in traffic analysis."
+      "title": "Traffic Characteristics",
+      "positive": "Based on the TCP/IP traffic characteristics, it is found that you may be using a proxy or VPN.",
+      "negative": "Based on the TCP/IP traffic characteristics, it is found that you are not using a proxy or VPN."
     },
-    "latency": {
-      "title": "Latency Analysis",
-      "proxy": "Latency analysis indicates that you may be using a proxy or VPN.",
+    "latencyVSWS": {
+      "title": "TCP vs WebSocket Latency",
+      "positive": "The difference between TCP and WebSocket latency is large, indicating that you may be using a proxy or VPN.",
       "fromTCP": "TCP latency value: ",
       "fromWS": "WebSocket latency value: ",
-      "notProxy": "No evidence of you using a proxy or VPN was found in latency analysis."
+      "negative": "The difference between TCP and WebSocket latency is not large, indicating that you may not be using a proxy or VPN."
+    },
+    "latencyVSPing": {
+      "title": "TCP vs Ping Latency",
+      "positive": "TCP latency and Ping difference is large, indicating that you may be using a proxy or VPN.",
+      "negative": "TCP latency and Ping difference is not large, indicating that you may not be using a proxy or VPN."
     },
     "highlatency": {
       "title": "High Latency Analysis",
-      "proxy": "High latency analysis indicates that you may be using a proxy or VPN.",
-      "notProxy": "No evidence of you using a proxy or VPN was found in high latency analysis."
+      "positive": "High latency analysis indicates that you may be using a proxy or VPN.",
+      "negative": "No evidence of you using a proxy or VPN was found in high latency analysis."
     }
   },
   "advancedtools": {

@@ -80,23 +80,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
-                                        <!--IP 黑名单-->
-                                        <tr>
-                                            <td class="jn-table-col">{{ t('invisibilitytest.blocklist.title') }}</td>
-                                            <td>
-                                                <i class="bi"
-                                                    :class="(testResults.blocklist.proxy || testResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
-                                            </td>
-                                            <td>
-                                                <span class="opacity-75"
-                                                    v-if="(testResults.blocklist.proxy || testResults.blocklist.vpn)">{{
-                                                    t('invisibilitytest.blocklist.proxy') }}</span>
-                                                <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.blocklist.notProxy') }}</span>
-                                            </td>
-                                        </tr>
-
                                         <!--Header 判断-->
                                         <tr>
                                             <td>{{ t('invisibilitytest.headers.title') }}</td>
@@ -106,9 +89,9 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.headers.proxy">{{
-                                                    t('invisibilitytest.headers.proxy') }}</span>
+                                                    t('invisibilitytest.headers.positive') }}</span>
                                                 <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.headers.notProxy') }}</span>
+                                                    t('invisibilitytest.headers.negative') }}</span>
                                             </td>
                                         </tr>
 
@@ -117,16 +100,65 @@
                                             <td>{{ t('invisibilitytest.datacenter.title') }}</td>
                                             <td>
                                                 <i class="bi"
-                                                    :class="(testResults.datacenter.proxy || testResults.datacenter.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                                    :class="(testResults.datacenter.is_datacenter) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td>
                                                 <span class="opacity-75"
-                                                    v-if="(testResults.datacenter.proxy || testResults.datacenter.vpn)">
-                                                    {{ t('invisibilitytest.datacenter.proxy') }}
-                                                    <strong>{{ testResults.datacenter.hosting }}</strong>
+                                                    v-if="(testResults.datacenter.is_datacenter)">
+                                                    {{ t('invisibilitytest.datacenter.positive') }}
                                                 </span>
                                                 <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.datacenter.notProxy') }}</span>
+                                                    t('invisibilitytest.datacenter.negative') }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!--IP 黑名单-->
+
+                                        <!--IP 是否在代理黑名单-->
+                                        <tr>
+                                            <td class="jn-table-col">{{ t('invisibilitytest.blocklist.proxy.title') }}
+                                            </td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="(testResults.blocklist.proxy ) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="(testResults.blocklist.proxy)">{{
+                                                    t('invisibilitytest.blocklist.proxy.positive') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.blocklist.proxy.negative') }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!--IP 是否在 VPN 黑名单-->
+                                        <tr>
+                                            <td class="jn-table-col">{{ t('invisibilitytest.blocklist.vpn.title') }}
+                                            </td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="(testResults.blocklist.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="(testResults.blocklist.vpn)">{{
+                                                    t('invisibilitytest.blocklist.vpn.positive') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.blocklist.vpn.negative') }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!--IP 是否在 VPN 出口节点黑名单-->
+                                        <tr>
+                                            <td class="jn-table-col">{{
+                                                t('invisibilitytest.blocklist.vpnExitNode.title') }}</td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="(testResults.blocklist.vpnExitNode) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="(testResults.blocklist.vpnExitNode)">{{
+                                                    t('invisibilitytest.blocklist.vpnExitNode.positive') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.blocklist.vpnExitNode.negative') }}</span>
                                             </td>
                                         </tr>
 
@@ -139,7 +171,7 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.tcp.proxy">
-                                                    {{ t('invisibilitytest.tcp.proxy') }}
+                                                    {{ t('invisibilitytest.tcp.positive') }}
                                                     <br />
                                                     {{ t('invisibilitytest.tcp.computer') }}
                                                     <strong>{{ testResults.tcp.clientos }}</strong>.
@@ -148,8 +180,52 @@
                                                     <strong>{{ testResults.tcp.ipos }}</strong>
 
                                                 </span>
-                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.tcp.notProxy')
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.tcp.negative')
                                                     }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Latency vs Ping Test -->
+                                        <tr>
+                                            <td>{{ t('invisibilitytest.latencyVSPing.title') }}</td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="testResults.latency_vs_ping.vpn ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.latency_vs_ping.vpn">
+                                                    {{ t('invisibilitytest.latencyVSPing.positive') }}
+                                                    <br />
+                                                    {{ t('invisibilitytest.latencyVSPing.fromTCP') }}
+                                                    <strong>{{ testResults.latency_vs_ping.tcpTime }}ms</strong>,
+
+                                                    {{ t('invisibilitytest.latencyVSPing.fromPing') }}
+                                                    <strong>{{ testResults.latency_vs_ping.pingTime }}ms</strong>
+                                                </span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.latencyVSPing.negative') }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!-- TCP vs WebSocket 延迟 -->
+                                        <tr>
+                                            <td>{{ t('invisibilitytest.latencyVSWS.title') }}</td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="testResults.latency_vs_ws.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="testResults.latency_vs_ws.proxy">
+                                                    {{ t('invisibilitytest.latencyVSWS.positive') }}
+                                                    <br />
+                                                    {{ t('invisibilitytest.latencyVSWS.fromTCP') }}
+                                                    <strong>{{ testResults.latency_vs_ws.tcpTime }}ms</strong>,
+
+                                                    {{ t('invisibilitytest.latencyVSWS.fromWS') }}
+                                                    <strong>{{ testResults.latency_vs_ws.wsTime }}ms</strong>
+                                                </span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.latencyVSWS.negative') }}</span>
                                             </td>
                                         </tr>
 
@@ -163,7 +239,7 @@
                                             <td>
                                                 <span class="opacity-75"
                                                     v-if="(testResults.timezone.proxy || testResults.timezone.vpn)">
-                                                    {{ t('invisibilitytest.timezone.proxy') }}
+                                                    {{ t('invisibilitytest.timezone.positive') }}
                                                     <br />
                                                     {{ t('invisibilitytest.timezone.computer') }}
                                                     <strong>{{ testResults.timezone.clienttimezone }}</strong>.
@@ -171,7 +247,7 @@
                                                     <strong>{{ testResults.timezone.iptimezone }}</strong>
                                                 </span>
                                                 <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.timezone.notProxy') }}</span>
+                                                    t('invisibilitytest.timezone.negative') }}</span>
                                             </td>
                                         </tr>
 
@@ -184,9 +260,9 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.net.proxy">{{
-                                                    t('invisibilitytest.net.proxy')
+                                                    t('invisibilitytest.net.positive')
                                                     }}</span>
-                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.net.notProxy')
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.net.negative')
                                                     }}</span>
                                             </td>
                                         </tr>
@@ -200,7 +276,7 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.webrtc.proxy">
-                                                    {{ t('invisibilitytest.webrtc.proxy') }}
+                                                    {{ t('invisibilitytest.webrtc.positive') }}
                                                     <br />
                                                     {{ t('invisibilitytest.webrtc.ipsAre') }}
 
@@ -209,7 +285,7 @@
                                                             }}</strong>, </span>
                                                     <strong>{{ testResults.webrtc.ip }}</strong>
                                                 </span>
-                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.webrtc.notProxy')
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.webrtc.negative')
                                                     }}</span>
                                             </td>
                                         </tr>
@@ -223,32 +299,10 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.flow.proxy">{{
-                                                    t('invisibilitytest.flow.proxy')
+                                                    t('invisibilitytest.flow.positive')
                                                     }}</span>
-                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.flow.notProxy')
+                                                <span class="opacity-75" v-else>{{ t('invisibilitytest.flow.negative')
                                                     }}</span>
-                                            </td>
-                                        </tr>
-
-                                        <!-- 延迟分析 -->
-                                        <tr>
-                                            <td>{{ t('invisibilitytest.latency.title') }}</td>
-                                            <td>
-                                                <i class="bi"
-                                                    :class="testResults.latency.proxy ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
-                                            </td>
-                                            <td>
-                                                <span class="opacity-75" v-if="testResults.latency.proxy">
-                                                    {{ t('invisibilitytest.latency.proxy') }}
-                                                    <br />
-                                                    {{ t('invisibilitytest.latency.fromTCP') }}
-                                                    <strong>{{ testResults.latency.tcpTime }}ms</strong>,
-
-                                                    {{ t('invisibilitytest.latency.fromWS') }}
-                                                    <strong>{{ testResults.latency.wsTime }}ms</strong>
-                                                </span>
-                                                <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.latency.notProxy') }}</span>
                                             </td>
                                         </tr>
 
@@ -261,9 +315,9 @@
                                             </td>
                                             <td>
                                                 <span class="opacity-75" v-if="testResults.highlatency.proxy">{{
-                                                    t('invisibilitytest.highlatency.proxy') }}</span>
+                                                    t('invisibilitytest.highlatency.positive') }}</span>
                                                 <span class="opacity-75" v-else>{{
-                                                    t('invisibilitytest.highlatency.notProxy') }}</span>
+                                                    t('invisibilitytest.highlatency.negative') }}</span>
                                             </td>
                                         </tr>
                                     </tbody>

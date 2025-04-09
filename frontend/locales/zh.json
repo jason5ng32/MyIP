@@ -273,61 +273,80 @@
     "itemComment": "分析",
     "agreement": "同意信息收集",
     "blocklist": {
-      "title": "VPN/代理名单",
-      "proxy": "你的 IP 在 VPN/代理名单中。",
-      "notProxy": "你的 IP 不在 VPN/代理名单中"
+      "proxy": {
+        "title": "代理名单",
+        "positive": "你的 IP 在代理名单中。",
+        "negative": "你的 IP 不在代理名单中。"
+      },
+      "vpn": {
+        "title": "VPN 名单",
+        "positive": "你的 IP 在 VPN 名单中。",
+        "negative": "你的 IP 不在 VPN 名单中。"
+      },
+      "vpnExitNode": {
+        "title": "VPN 出口节点",
+        "positive": "你的 IP 在 VPN 出口节点名单中。",
+        "negative": "你的 IP 不在 VPN 出口节点名单中。"
+      }
     },
     "headers": {
       "title": "HTTP 头信息",
-      "proxy": "你的 HTTP 头信息中包含了代理信息，你可能正在使用代理。",
-      "notProxy": "你的 HTTP 头信息中没有代理信息。"
+      "positive": "你的 HTTP 头信息中包含了代理信息，你可能正在使用代理。",
+      "negative": "你的 HTTP 头信息中没有代理信息。"
     },
     "datacenter": {
       "title": "数据中心 IP",
-      "proxy": "你的 IP 是数据中心 IP，普通用户的 IP 通常不会是数据中心。检测到的数据中心是：",
-      "notProxy": "你的 IP 不是数据中心 IP"
+      "positive": "你的 IP 是数据中心 IP，普通用户的 IP 通常不会是数据中心。",
+      "negative": "你的 IP 不是数据中心 IP。"
     },
     "tcp": {
       "title": "TCP 指纹",
-      "proxy": "你发起连接的系统与你的电脑系统不同，你可能正在使用代理。尽管系统判断不一定准确，但可以肯定两个系统并不相同。",
+      "positive": "你发起连接的系统与你的电脑系统不同，你可能正在使用代理。尽管系统判断不一定准确，但可以肯定两个系统并不相同。",
       "computer": "你的电脑系统是：",
       "server": "你发起连接的系统可能是：",
-      "notProxy": "你发起连接的系统与你的电脑系统相同。"
+      "negative": "你发起连接的系统与你的电脑系统相同。"
     },
     "timezone": {
       "title": "时区差异",
-      "proxy": "你的时区与你的 IP 地理位置不匹配，你可能正在使用代理。",
+      "positive": "你的时区与你的 IP 地理位置不匹配，你可能正在使用代理。",
       "computer": "你的时区是：",
       "server": "你的 IP 地理位置时区是：",
-      "notProxy": "你的时区与你的 IP 地理位置匹配。"
+      "negative": "你的时区与你的 IP 地理位置匹配。"
     },
     "net": {
-      "title": "网络解析",
-      "proxy": "从网络解析上发现你可能使用了代理或 VPN",
-      "notProxy": "从网络解析上未发现你使用代理或 VPN 的证据。"
+      "title": "网络行为",
+      "positive": "从客户端网络行为上发现你可能使用了代理或 VPN",
+      "negative": "从客户端网络行为上未发现你使用代理或 VPN 的证据。"
     },
     "webrtc": {
       "title": "WebRTC 检测",
-      "proxy": "WebRTC 发现你存在多个不同地区的 IP，你可能使用了代理或 VPN。",
+      "positive": "WebRTC 发现你存在多个不同地区的 IP，你可能使用了代理或 VPN。",
       "ipsAre": "IP 分别是：",
-      "notProxy": "WebRTC 检测未发现存在多个不同地区的 IP。"
+      "negative": "WebRTC 检测未发现存在多个不同地区的 IP。"
     },
     "flow": {
-      "title": "流量分析",
-      "proxy": "流量分析发现你可能使用了代理或 VPN。",
-      "notProxy": "流量分析未发现你使用代理或 VPN 的证据。"
+      "title": "流量特征",
+      "positive": "TCP/IP 流量特征发现你可能使用了代理或 VPN。",
+      "negative": "TCP/IP 流量特征未发现你使用代理或 VPN 的证据。"
     },
-    "latency": {
-      "title": "延迟分析",
-      "proxy": "延迟分析发现你可能使用了代理或 VPN。",
+    "latencyVSWS": {
+      "title": "TCP vs WebSocket 延迟",
+      "positive": "TCP 延迟与 WebSocket 延迟差值较大，看起来你使用了代理或 VPN。",
       "fromTCP": "TCP 延迟值：",
       "fromWS": "WebSocket 延迟值：",
-      "notProxy": "延迟分析未发现你使用代理或 VPN 的证据。"
+      "negative": "TCP 延迟与 WebSocket 延迟差值不大，没有明显的使用了代理或 VPN 的证据。"
+    },
+    "latencyVSPing": {
+      "title": "TCP vs Ping 延迟",
+      "negative": "TCP 延迟与 Ping 差值不大，没有明显的使用了 VPN 的证据。",
+      "fromTCP": "TCP 延迟值：",
+      "fromPing": "Ping 延迟值：",
+      "positive": "TCP 延迟与 Ping 差值较大，看起来你使用了 VPN。"
     },
     "highlatency": {
       "title": "高延迟分析",
-      "proxy": "搞延迟分析发现你可能使用了代理或 VPN。",
-      "notProxy": "高延迟分析未发现你使用代理或 VPN 的证据。"
+      "positive": "高延迟分析发现你可能使用了代理或 VPN。",
+      "negative": "高延迟分析未发现你使用代理或 VPN 的证据。"
     }
   },
   "censorshipcheck": {
