@@ -273,61 +273,78 @@
         "itemComment": "Analyse",
         "agreement": "J'accepte",
         "blocklist": {
-            "title": "Liste des VPN/Proxy",
-            "proxy": "Votre adresse IP figure dans la liste des VPN/Proxy.",
-            "notProxy": "Votre adresse IP ne figure pas dans la liste des VPN/Proxy."
+            "proxy": {
+                "title": "Liste de Proxys",
+                "positive": "Votre IP est dans la liste des proxys.",
+                "negative": "Votre IP n'est pas dans la liste des proxys."
+            },
+            "vpn": {
+                "title": "Liste de VPNs",
+                "positive": "Votre IP est dans la liste des VPNs.",
+                "negative": "Votre IP n'est pas dans la liste des VPNs."
+            },
+            "vpnExitNode": {
+                "title": "Liste des Noeuds de Sortie VPN",
+                "positive": "Votre IP est dans la liste des nœuds de sortie VPN.",
+                "negative": "Votre IP n'est pas dans la liste des nœuds de sortie VPN."
+            }
         },
         "headers": {
-            "title": "Informations d'en-tête HTTP",
-            "proxy": "Vos informations d'en-tête HTTP contiennent des informations de proxy, vous utilisez probablement un proxy.",
-            "notProxy": "Aucune information de proxy n'a été trouvée dans vos informations d'en-tête HTTP."
+            "title": "En-têtes HTTP",
+            "positive": "Vos en-têtes HTTP contiennent des informations de proxy, indiquant que vous utilisez peut-être un proxy.",
+            "negative": "Vos en-têtes HTTP ne contiennent pas d'informations de proxy."
         },
         "datacenter": {
-            "title": "IP de centre de données",
-            "proxy": "Votre adresse IP est une adresse IP de centre de données, les utilisateurs normaux n'ont généralement pas d'adresse IP de centre de données. Le centre de données détecté est :",
-            "notProxy": "Votre adresse IP n'est pas une adresse IP de centre de données."
+            "title": "IP de Centre de Données",
+            "positive": "Votre IP est une IP de centre de données, ce qui n'est généralement pas utilisé par les utilisateurs réguliers.",
+            "negative": "Votre IP n'est pas une IP de centre de données."
         },
         "tcp": {
-            "title": "Empreinte TCP",
-            "proxy": "Le système à partir duquel vous établissez la connexion est différent de votre système informatique, vous utilisez probablement un proxy. Bien que la détection du système ne soit pas toujours précise, il est certain que les deux systèmes sont différents.",
-            "computer": "Votre système informatique est :",
-            "server": "Le système à partir duquel vous établissez la connexion est probablement :",
-            "notProxy": "Le système à partir duquel vous établissez la connexion est identique à votre système informatique."
+            "title": "Empreinte Digitale TCP",
+            "positive": "Le système auquel vous vous connectez est différent de votre système informatique, indiquant que vous utilisez peut-être un proxy. Bien que le jugement du système puisse ne pas être précis, il est certain que les deux systèmes sont différents.",
+            "computer": "Votre système informatique est : ",
+            "server": "Le système auquel vous vous connectez pourrait être : ",
+            "negative": "Le système auquel vous vous connectez est le même que votre système informatique."
         },
         "timezone": {
-            "title": "Différence de fuseau horaire",
-            "proxy": "Votre fuseau horaire ne correspond pas à l'emplacement géographique de votre adresse IP, vous utilisez probablement un proxy.",
-            "computer": "Votre fuseau horaire est :",
-            "server": "Le fuseau horaire de l'emplacement géographique de votre adresse IP est :",
-            "notProxy": "Votre fuseau horaire correspond à l'emplacement géographique de votre adresse IP."
+            "title": "Différence de Fuseau Horaire",
+            "positive": "Votre fuseau horaire ne correspond pas au fuseau horaire de géolocalisation de votre IP, indiquant que vous utilisez peut-être un proxy.",
+            "computer": "Votre fuseau horaire est : ",
+            "server": "Le fuseau horaire de géolocalisation de votre IP est : ",
+            "negative": "Votre fuseau horaire correspond au fuseau horaire de géolocalisation de votre IP."
         },
         "net": {
-            "title": "Analyse de la résolution DNS",
-            "proxy": "L'analyse de la résolution DNS indique que vous utilisez probablement un proxy ou un VPN.",
-            "notProxy": "Aucune preuve d'utilisation d'un proxy ou d'un VPN n'a été trouvée dans l'analyse de la résolution DNS."
+            "title": "Comportement Réseau",
+            "positive": "D'après le comportement du réseau client, il a été constaté que vous utilisez peut-être un proxy ou un VPN.",
+            "negative": "D'après le comportement du réseau client, il a été constaté que vous n'utilisez pas de proxy ou de VPN."
         },
         "webrtc": {
             "title": "Détection WebRTC",
-            "proxy": "WebRTC a détecté plusieurs adresses IP provenant de différentes régions, vous utilisez probablement un proxy ou un VPN.",
-            "ipsAre": "Les adresses IP sont respectivement :",
-            "notProxy": "Aucune adresse IP provenant de différentes régions n'a été détectée par WebRTC."
+            "positive": "WebRTC a détecté plusieurs adresses IP provenant de régions différentes, indiquant que vous utilisez peut-être un proxy ou un VPN.",
+            "ipsAre": "Les adresses IP sont : ",
+            "negative": "Aucune preuve de multiples adresses IP provenant de régions différentes n'a été trouvée lors de la détection WebRTC."
         },
         "flow": {
-            "title": "Analyse du trafic",
-            "proxy": "L'analyse du trafic indique que vous utilisez probablement un proxy ou un VPN.",
-            "notProxy": "Aucune preuve d'utilisation d'un proxy ou d'un VPN n'a été trouvée dans l'analyse du trafic."
+            "title": "Caractéristiques du Trafic",
+            "positive": "D'après les caractéristiques du trafic TCP/IP, il a été constaté que vous utilisez peut-être un proxy ou un VPN.",
+            "negative": "D'après les caractéristiques du trafic TCP/IP, il a été constaté que vous n'utilisez pas de proxy ou de VPN."
         },
-        "latency": {
-            "title": "Analyse de la latence",
-            "proxy": "L'analyse de la latence indique que vous utilisez probablement un proxy ou un VPN.",
-            "fromTCP": "Valeur de latence TCP :",
-            "fromWS": "Valeur de latence WebSocket :",
-            "notProxy": "Aucune preuve d'utilisation d'un proxy ou d'un VPN n'a été trouvée dans l'analyse de la latence."
+        "latencyVSWS": {
+            "title": "Latence TCP vs WebSocket",
+            "positive": "La différence entre la latence TCP et WebSocket est importante, indiquant que vous utilisez peut-être un proxy ou un VPN.",
+            "fromTCP": "Valeur de latence TCP : ",
+            "fromWS": "Valeur de latence WebSocket : ",
+            "negative": "La différence entre la latence TCP et WebSocket n'est pas importante, indiquant que vous n'utilisez peut-être pas de proxy ou de VPN."
+        },
+        "latencyVSPing": {
+            "title": "Latence TCP vs Ping",
+            "positive": "La différence entre la latence TCP et le Ping est importante, indiquant que vous utilisez peut-être un proxy ou un VPN.",
+            "negative": "La différence entre la latence TCP et le Ping n'est pas importante, indiquant que vous n'utilisez peut-être pas de proxy ou de VPN."
         },
         "highlatency": {
-            "title": "Analyse de la latence élevée",
-            "proxy": "L'analyse de la latence élevée indique que vous utilisez probablement un proxy ou un VPN.",
-            "notProxy": "Aucune preuve d'utilisation d'un proxy ou d'un VPN n'a été trouvée dans l'analyse de la latence élevée."
+            "title": "Analyse de Haute Latence",
+            "positive": "L'analyse de haute latence indique que vous utilisez peut-être un proxy ou un VPN.",
+            "negative": "Aucune preuve de votre utilisation d'un proxy ou d'un VPN n'a été trouvée lors de l'analyse de haute latence."
         }
     },
     "censorshipcheck": {
