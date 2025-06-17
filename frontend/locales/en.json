@@ -482,6 +482,7 @@
       "note": "Related data for this AS:",
       "asnName": "AS Name:",
       "asnOrgName": "AS Organization Name:",
+      "asnCountryCode": "AS Country Code:",
       "estimatedUsers": "Estimated Users:",
       "IPv4_Pct": "IPv4 Traffic Percentage:",
       "IPv6_Pct": "IPv6 Traffic Percentage:",

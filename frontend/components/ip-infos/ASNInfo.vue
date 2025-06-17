@@ -10,7 +10,13 @@
                     <span class="fw-light">
                         {{ t(`ipInfos.ASNInfo.${key}`) }}
                     </span>
-                    {{ item }}
+                    <span v-if="key === 'asnCountryCode'">
+                        {{ getCountryName(item, lang) }}
+                        <span :class="'jn-fl fi fi-' + item.toLowerCase()"></span>
+                    </span>
+                    <span v-else>
+                        {{ item }}
+                    </span>
                     <br />
                 </template>
             </span>
@@ -25,8 +31,14 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n';
+import { useMainStore } from '@/store';
+import { computed } from 'vue';
+import getCountryName from '@/utils/country-name.js';
 
 const { t } = useI18n();
+const store = useMainStore();
+const lang = computed(() => store.lang);
+
 
 const placeholderSizes = [12, 8, 6, 8, 4];
 

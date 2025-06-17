@@ -482,6 +482,7 @@
             "note": "Données associées à cet AS :",
             "asnName": "Nom de l'AS :",
             "asnOrgName": "Nom de l'organisation de l'AS :",
+            "asnCountryCode": "Région de l'AS :",
             "estimatedUsers": "Nombre d'utilisateurs estimé :",
             "IPv4_Pct": "Pourcentage de trafic IPv4 :",
             "IPv6_Pct": "Pourcentage de trafic IPv6 :",

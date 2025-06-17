@@ -15,7 +15,7 @@
     "@analytics/google-analytics": "^1.1.0",
     "@cloudflare/speedtest": "^1.5.1",
     "@khmyznikov/pwa-install": "^0.5.6",
-    "@thumbmarkjs/thumbmarkjs": "^0.20.2",
+    "@thumbmarkjs/thumbmarkjs": "^0.20.3",
     "analytics": "^0.8.16",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",

@@ -484,6 +484,7 @@
       "note": "此 AS 的相关数据：",
       "asnName": "AS 名称：",
       "asnOrgName": "AS 组织名称：",
+      "asnCountryCode": "AS 地区：",
       "estimatedUsers": "估计用户数：",
       "IPv4_Pct": "IPv4 流量占比：",
       "IPv6_Pct": "IPv6 流量占比：",
