@@ -484,6 +484,7 @@
       "note": "此 AS 的相关数据：",
       "asnName": "AS 名称：",
       "asnOrgName": "AS 组织名称：",
+      "asnCountryCode": "AS 地区：",
       "estimatedUsers": "估计用户数：",
       "IPv4_Pct": "IPv4 流量占比：",
       "IPv6_Pct": "IPv6 流量占比：",
@@ -492,7 +493,8 @@
       "Desktop_Pct": "桌面设备占比：",
       "Mobile_Pct": "移动设备占比：",
       "Bot_Pct": "机器人流量占比：",
-      "Human_Pct": "人类流量占比："
+      "Human_Pct": "人类流量占比：",
+      "moreData": "更多数据："
     },
     "proxyDetect": {
       "yes": "是代理或 VPN",

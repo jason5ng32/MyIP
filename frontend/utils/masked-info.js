@@ -13,7 +13,7 @@ function maskedInfo(t) {
     fakecard.longitude = "-122.078514";
     fakecard.isp = "Google LLC";
     fakecard.asn = "AS888888";
-    fakecard.asnlink = "https://radar.cloudflare.com/AS15169",
+    fakecard.asnlink = "https://bgp.tools/as/AS15169",
     fakecard.mapUrl = '/res/defaultMap.webp';
     fakecard.mapUrl_dark = '/res/defaultMap_dark.webp';
     fakecard.showASNInfo = false;

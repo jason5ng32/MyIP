@@ -95,9 +95,10 @@ function isValidASN(asn) {
 // 格式化输出
 
 function formatData(data) {
-    const { asnName, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
     const formattedData = {
         asnName,
+        asnCountryCode,
         asnOrgName,
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
         IPv4_Pct: `${parseFloat(IPv4_Pct).toFixed(2)}%`,
@@ -148,6 +149,7 @@ export default async (req, res) => {
         function cleanUpResponseData(data) {
             return {
                 asnName: data.asnInfo.result.asn.name,
+                asnCountryCode: data.asnInfo.result.asn.country,
                 asnOrgName: data.asnInfo.result.asn.orgName,
                 estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
                 IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
