@@ -160,6 +160,7 @@
                                             class="link-underline-opacity-50 link-underline-opacity-100-hover"
                                             :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ modalQueryResult.asn
                                             }}</a>
+                                            <span v-else-if="modalQueryResult.asn">{{ modalQueryResult.asn }}</span>
                                     </span>
                                 </li>
                             </ul>

@@ -186,6 +186,7 @@
                                 v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }">
                             </i>
                         </span>
+                        <span v-else-if="card.asn">{{ card.asn }}</span>
                     </li>
                 </template>
 

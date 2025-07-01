@@ -13,7 +13,7 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
         longitude: data.longitude || "",
         isp: data.org || "",
         asn: data.asn || "",
-        asnlink: data.asn ? `https://bgp.tools/as/${data.asn}` : false,
+        asnlink: data.asn ? data.asn.startsWith('AS') ? `https://bgp.tools/as/${data.asn}` : false : false,
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}` : "",
         mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}&CanvasMode=Dark` : ""
     };
