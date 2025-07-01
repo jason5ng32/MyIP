@@ -14,9 +14,18 @@
 
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
-                    <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-                        :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
-                        name="inputIP" id="inputIP">
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
+                            :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
+                            name="inputIP" id="inputIP">
+                        <button id="sumitQueryButton" type="button" class="btn btn-primary"
+                            :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
+                            @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
+                            ">{{
+                            t('ipcheck.Button') }}</button>
+                    </div>
+
                     <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
                     <div v-if="modalQueryResult" class="mt-2">
                         <div class="card-body">
@@ -157,13 +166,6 @@
                         </div>
 
                     </div>
-                </div>
-                <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-                    <button id="sumitQueryButton" type="button" class="btn btn-primary"
-                        :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                        @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
-                            ">{{
-                        t('ipcheck.Button') }}</button>
                 </div>
 
 
