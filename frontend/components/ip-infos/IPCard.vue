@@ -83,7 +83,7 @@
                         </span>
                     </li>
 
-                    <li v-show=" ipGeoSource === 0 && card.type !== t('ipInfos.proxyDetect.type.unknownType')"
+                    <li v-show=" ipGeoSource === 0 && card.type !== t('ipInfos.advancedData.type.unknownType')"
                         class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                         <span class="jn-text col-auto">
                             <i class="bi bi-reception-4"></i>
@@ -101,7 +101,8 @@
                         </span>
                     </li>
 
-                    <li v-show="ipGeoSource === 0 && card.isProxy !== t('ipInfos.proxyDetect.unknownProxyType')"
+
+                    <li v-show="ipGeoSource === 0 && card.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
                         class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                         <span class="jn-text col-auto">
                             <i class="bi bi-shield-fill-check"></i>
@@ -109,7 +110,7 @@
                         </span>
                         <span v-if="card.isProxy !=='sign_in_required'" class="col-10 ">
                             {{ card.isProxy }}
-                            <span v-if="card.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
+                            <span v-if="card.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')">
                                 ( {{ card.proxyProtocol }} )
                             </span>
                         </span>
@@ -118,6 +119,28 @@
                         </span>
                     </li>
 
+                    <li v-show=" ipGeoSource === 0" class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
+                        <span class="jn-text col-auto">
+                            <i class="bi bi-house-check"></i>
+                            {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;
+                        </span>
+                        <span v-if="card.isNativeIP !=='sign_in_required'" class="col-10 ">
+                            <span v-if="card.isNativeIP === true">
+                                <i class="bi bi-check-circle-fill"></i>
+                                {{t('ipInfos.advancedData.NativeIPYes')}}
+                            </span>
+                            <span v-else>
+                                <i class="bi bi-x-circle"></i>
+                                {{t('ipInfos.advancedData.NativeIPNo')}}
+                            </span>
+                        </span>
+
+                        <span v-else class="col-8 text-secondary">
+                            {{ t('user.SignInToView') }}
+                        </span>
+                    </li>
+
+
                     <li v-show="ipGeoSource === 0" class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                         <span class="jn-text col-auto">
                             <i class="bi bi-speedometer"></i>
@@ -125,7 +148,7 @@
                         </span>
 
                         <span v-if="card.qualityScore !== 'unknown' && card.qualityScore !== 'sign_in_required'"
-                            class="col-3 jn-risk-score ">
+                            class="col-3 jn-ip-score ">
                             <span class="progress border" :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
                                 role="progressbar" aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0"
                                 aria-valuemax="100">

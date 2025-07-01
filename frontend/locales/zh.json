@@ -496,19 +496,22 @@
       "Human_Pct": "人类流量占比：",
       "moreData": "更多数据："
     },
-    "proxyDetect": {
-      "yes": "是代理或 VPN",
-      "maybe": "可能是代理或 VPN",
-      "no": "不是代理或 VPN",
-      "unknownProxyType": "未知类型",
-      "unknownProtocol": "未知协议",
+    "advancedData": {
+      "proxyYes": "是代理或 VPN",
+      "proxyMaybe": "可能是代理或 VPN",
+      "proxyNo": "不是代理或 VPN",
+      "proxyUnknown": "未知类型",
+      "proxyUnknownProtocol": "未知协议",
       "type": {
         "Residential": "住宅线路",
         "Wireless": "无线网络",
         "Business": "商业线路",
         "Hosting": "数据中心",
         "unknownType": "未知类型"
-      }
+      },
+      "Nativeness": "原生性",
+      "NativeIPYes": "是原生 IP",
+      "NativeIPNo": "不是原生 IP"
     }
   },
   "connectivity": {

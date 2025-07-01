@@ -43,7 +43,7 @@
 }
 
 .jn-ip-card1 {
-  min-height: 538px;
+  min-height: 588px;
 }
 
 .jn-ip-card2 {
@@ -272,7 +272,7 @@ footer {
   zoom: 0.8;
 }
 
-.jn-risk-score {
+.jn-ip-score {
   display: flex;
   justify-content: center;
   flex-direction: column;
