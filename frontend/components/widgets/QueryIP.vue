@@ -14,9 +14,18 @@
 
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
-                    <input type="text" class="form-control mb-2" :class="{ 'dark-mode': isDarkMode }"
-                        :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
-                        name="inputIP" id="inputIP">
+
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
+                            :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
+                            name="inputIP" id="inputIP">
+                        <button id="sumitQueryButton" type="button" class="btn btn-primary"
+                            :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
+                            @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
+                            ">{{
+                            t('ipcheck.Button') }}</button>
+                    </div>
+
                     <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
                     <div v-if="modalQueryResult" class="mt-2">
                         <div class="card-body">
@@ -54,7 +63,7 @@
                                 </li>
 
 
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== t('ipInfos.proxyDetect.type.unknownType')"
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== t('ipInfos.advancedData.type.unknownType')"
                                     class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
                                         <i class="bi bi-reception-4"></i> {{ t('ipInfos.type')
@@ -71,7 +80,7 @@
                                     </span>
                                 </li>
 
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== t('ipInfos.proxyDetect.unknownProxyType')"
+                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
                                     class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
                                         <i class="bi bi-shield-fill-check"></i>
@@ -79,7 +88,7 @@
                                     <span v-if="modalQueryResult.isProxy !=='sign_in_required'" class="col-10 ">
                                         {{ modalQueryResult.isProxy }}
                                         <span
-                                            v-if="modalQueryResult.proxyProtocol !== t('ipInfos.proxyDetect.unknownProtocol')">
+                                            v-if="modalQueryResult.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')">
                                             ( {{ modalQueryResult.proxyProtocol }} )
                                         </span>
                                     </span>
@@ -91,13 +100,36 @@
                                 <li v-if="ipGeoSource === 0" class="jn-list-group-item"
                                     :class="{ 'dark-mode': isDarkMode }">
                                     <span class="jn-text col-auto">
+                                        <i class="bi bi-house-check"></i>
+                                        {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;
+                                    </span>
+                                    <span v-if="modalQueryResult.isNativeIP !=='sign_in_required'" class="col-10 ">
+                                        <span v-if="modalQueryResult.isNativeIP === true">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            {{t('ipInfos.advancedData.NativeIPYes')}}
+                                        </span>
+                                        <span v-else>
+                                            <i class="bi bi-x-circle"></i>
+                                            {{t('ipInfos.advancedData.NativeIPNo')}}
+                                        </span>
+                                    </span>
+
+                                    <span v-else class="col-8 text-secondary">
+                                        {{ t('user.SignInToView') }}
+                                    </span>
+                                </li>
+
+
+                                <li v-if="ipGeoSource === 0" class="jn-list-group-item"
+                                    :class="{ 'dark-mode': isDarkMode }">
+                                    <span class="jn-text col-auto">
                                         <i class="bi bi-speedometer"></i>
                                         {{ t('ipInfos.qualityScore') }} :&nbsp;
                                     </span>
 
                                     <span
                                         v-if="modalQueryResult.qualityScore !== 'unknown' && modalQueryResult.qualityScore !== 'sign_in_required'"
-                                        class="col-3 jn-risk-score ">
+                                        class="col-3 jn-ip-score ">
                                         <span class="progress border"
                                             :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
                                             role="progressbar" aria-label="Quality Score" aria-valuenow="0"
@@ -128,19 +160,13 @@
                                             class="link-underline-opacity-50 link-underline-opacity-100-hover"
                                             :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ modalQueryResult.asn
                                             }}</a>
+                                            <span v-else-if="modalQueryResult.asn">{{ modalQueryResult.asn }}</span>
                                     </span>
                                 </li>
                             </ul>
                         </div>
 
                     </div>
-                </div>
-                <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-                    <button id="sumitQueryButton" type="button" class="btn btn-primary"
-                        :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                        @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
-                            ">{{
-                        t('ipcheck.Button') }}</button>
                 </div>
 
 

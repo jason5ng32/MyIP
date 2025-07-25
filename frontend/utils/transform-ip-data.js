@@ -13,16 +13,16 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
         longitude: data.longitude || "",
         isp: data.org || "",
         asn: data.asn || "",
-        asnlink: data.asn ? `https://bgp.tools/as/${data.asn}` : false,
+        asnlink: data.asn ? data.asn.startsWith('AS') ? `https://bgp.tools/as/${data.asn}` : false : false,
         mapUrl: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}` : "",
         mapUrl_dark: data.latitude && data.longitude ? `/api/map?latitude=${data.latitude}&longitude=${data.longitude}&language=${mapLanguage}&CanvasMode=Dark` : ""
     };
 
     if (ipGeoSource === 0) {
-        const proxyDetails = extractProxyDetails(data.proxyDetect, t);
+        const advancedData = extractAdvancedData(data.advancedData, t);
         return {
             ...baseData,
-            ...proxyDetails,
+            ...advancedData,
         };
     }
 
@@ -30,58 +30,60 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 };
 
 // 解析代理数据
-function extractProxyDetails(proxyDetect = {}, t) {
-    const isProxy = determineIsProxy(proxyDetect, t);
-    const type = determineType(proxyDetect, t);
-    const qualityScore = proxyDetect.risk === 'unknown' ? 'unknown' : proxyDetect.risk === 'sign_in_required'? 'sign_in_required' : (100 - proxyDetect.risk);
-    const proxyProtocol = determineProtocol(proxyDetect, t);
-    const proxyOperator = proxyDetect.operator || "";
+function extractAdvancedData(advancedData = {}, t) {
+    const isProxy = determineIsProxy(advancedData, t);
+    const type = determineType(advancedData, t);
+    const qualityScore = advancedData.score === 'sign_in_required' ? 'sign_in_required' : advancedData.score;
+    const proxyProtocol = determineProtocol(advancedData, t);
+    const proxyOperator = advancedData.proxyProvider || "";
+    const isNativeIP = advancedData.tags === 'sign_in_required' ? 'sign_in_required' : advancedData.tags.isNative;
 
-    return { isProxy, type, qualityScore, proxyProtocol, proxyOperator };
+    return { isProxy, type, qualityScore, proxyProtocol, proxyOperator, isNativeIP };
 }
 
 // 判断是否代理
-function determineIsProxy(proxyDetect, t) {
-    if (proxyDetect.proxy === 'yes' && proxyDetect.protocol !== 'unknown') {
-        return t('ipInfos.proxyDetect.yes');
-    } else if (proxyDetect.proxy === 'yes') {
-        return t('ipInfos.proxyDetect.maybe');
-    } else if (proxyDetect.proxy === 'no') {
-        return t('ipInfos.proxyDetect.no');
-    } else if (proxyDetect.proxy === 'sign_in_required') {
+function determineIsProxy(advancedData, t) {
+
+    if (advancedData.tags === 'sign_in_required') {
         return 'sign_in_required';
+    } else if (advancedData.tags.isProxyOrVPN && advancedData.proxyProtocol !== 'unknown') {
+        return t('ipInfos.advancedData.proxyYes');
+    } else if (advancedData.tags.isProxyOrVPN) {
+        return t('ipInfos.advancedData.proxyMaybe');
+    } else if (!advancedData.tags.isProxyOrVPN) {
+        return t('ipInfos.advancedData.proxyNo');
     } else {
-        return t('ipInfos.proxyDetect.unknownProxyType');
+        return t('ipInfos.advancedData.proxyUnknown');
     }
 }
 
 // 判断代理类型
-function determineType(proxyDetect, t) {
-    switch (proxyDetect.type) {
+function determineType(advancedData, t) {
+    switch (advancedData.operatorType) {
         case 'Business':
-            return t('ipInfos.proxyDetect.type.Business');
+            return t('ipInfos.advancedData.type.Business');
         case 'Residential':
-            return t('ipInfos.proxyDetect.type.Residential');
+            return t('ipInfos.advancedData.type.Residential');
         case 'Wireless':
-            return t('ipInfos.proxyDetect.type.Wireless');
+            return t('ipInfos.advancedData.type.Wireless');
         case 'Hosting':
-            return t('ipInfos.proxyDetect.type.Hosting');
+            return t('ipInfos.advancedData.type.Hosting');
         case 'VPN':
-            if (proxyDetect.protocol === 'unknown') {
-                return t('ipInfos.proxyDetect.type.Hosting');
+            if (advancedData.proxyProtocol === 'unknown') {
+                return t('ipInfos.advancedData.type.Hosting');
             }
         default:
-            return proxyDetect.type || t('ipInfos.proxyDetect.type.unknownType');
+            return advancedData.operatorType || t('ipInfos.advancedData.type.unknownType');
     }
 }
 
 // 判断代理协议
-function determineProtocol(proxyDetect, t) {
-    if (proxyDetect.protocol === 'unknown' || !proxyDetect.protocol) {
-        return t('ipInfos.proxyDetect.unknownProtocol');
+function determineProtocol(advancedData, t) {
+    if (advancedData.proxyProtocol === 'unknown' || !advancedData.proxyProtocol) {
+        return t('ipInfos.advancedData.proxyUnknownProtocol');
     } else {
-        return proxyDetect.protocol;
+        return advancedData.proxyProtocol;
     }
 }
 
-export { transformDataFromIPapi, extractProxyDetails };
+export { transformDataFromIPapi, extractAdvancedData };

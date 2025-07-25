@@ -494,19 +494,22 @@
       "Human_Pct": "Human Traffic Percentage : ",
       "moreData": "More Data : "
     },
-    "proxyDetect": {
-      "yes": "Must be a proxy or VPN",
-      "maybe": "Possibly a proxy or VPN",
-      "no": "Not a proxy or VPN",
-      "unknownProxyType": "Unknown type",
-      "unknownProtocol": "Unknown protocol",
+    "advancedData": {
+      "proxyYes": "Must be a proxy or VPN",
+      "proxyMaybe": "Possibly a proxy or VPN",
+      "proxyNo": "Not a proxy or VPN",
+      "proxyUnknown": "Unknown type",
+      "proxyUnknownProtocol": "Unknown protocol",
       "type": {
         "Residential": "Residential",
         "Wireless": "Wireless",
         "Business": "Business",
         "Hosting": "Hosting",
         "unknownType": "Unknown Type"
-      }
+      },
+      "Nativeness": "Nativeness",
+      "NativeIPYes": "It's a native IP",
+      "NativeIPNo": "Not a native IP"
     }
   },
   "connectivity": {

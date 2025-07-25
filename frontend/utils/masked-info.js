@@ -17,10 +17,11 @@ function maskedInfo(t) {
     fakecard.mapUrl = '/res/defaultMap.webp';
     fakecard.mapUrl_dark = '/res/defaultMap_dark.webp';
     fakecard.showASNInfo = false;
-    fakecard.isProxy = t('ipInfos.proxyDetect.no');
-    fakecard.type = t('ipInfos.proxyDetect.type.Business');
+    fakecard.isProxy = t('ipInfos.advancedData.proxyNo');
+    fakecard.type = t('ipInfos.advancedData.type.Business');
+    fakecard.isNativeIP = true;
     fakecard.qualityScore = 100;
-    fakecard.proxyProtocol = t('ipInfos.proxyDetect.unknownProtocol');
+    fakecard.proxyProtocol = t('ipInfos.advancedData.proxyUnknownProtocol');
     fakecard.proxyOperator = "unknown";
 
   return fakecard;
