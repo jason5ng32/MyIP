@@ -397,7 +397,7 @@ const onSubmit = () => {
     }
     setTimeout(() => {
         getResult();
-    }, 6000);
+    }, 10000);
 };
 
 // 获取测试结果
@@ -411,7 +411,7 @@ const getResult = async () => {
             setTimeout(() => {
                 getResult();
                 retryCount.value++
-            }, 8000);
+            }, 10000);
             return;
         }
         testResults.value = data;
