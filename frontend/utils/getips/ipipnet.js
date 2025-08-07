@@ -19,7 +19,7 @@ const getIPFromIPIP = async () => {
     } catch (error) {
         console.error("Error fetching IP from IPIP.net:", error);
     }
-    // 故障时尝试从 AliCDN 获取 IP 地址
+    // 故障时尝试从 Upai 获取 IP 地址
     const { ip, source } = await getIPFromUpai();
     return {
         ip: ip,
