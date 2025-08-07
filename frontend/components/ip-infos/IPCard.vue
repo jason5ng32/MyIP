@@ -21,7 +21,7 @@
             'jn-link2': !isDarkMode
             }">
             <span class="jn-text col-auto">
-                <i class="bi bi-phone"></i>&nbsp;
+                <i class="bi bi-pc-display-horizontal"></i>&nbsp;
             </span>
             <span v-if="card.ip" class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
                 {{ card.ip }}&nbsp;
