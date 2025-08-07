@@ -76,21 +76,6 @@ const createDefaultCard = () => ({
 const ipDataCards = reactive([
   {
     ...createDefaultCard(),
-    id: "cnsource",
-    source: "CN Source",
-  },
-  {
-    ...createDefaultCard(),
-    id: "cloudflare_v4",
-    source: "Cloudflare IPv4",
-  },
-  {
-    ...createDefaultCard(),
-    id: "cloudflare_v6",
-    source: "Cloudflare IPv6",
-  },
-  {
-    ...createDefaultCard(),
     id: "ipchecking_v64",
     source: "IPCheck.ing IPv6/4",
   },
@@ -103,6 +88,21 @@ const ipDataCards = reactive([
     ...createDefaultCard(),
     id: "ipchecking_v6",
     source: "IPCheck.ing IPv6",
+  },
+  {
+    ...createDefaultCard(),
+    id: "cnsource",
+    source: "CN Source",
+  },
+  {
+    ...createDefaultCard(),
+    id: "cloudflare_v4",
+    source: "Cloudflare IPv4",
+  },
+  {
+    ...createDefaultCard(),
+    id: "cloudflare_v6",
+    source: "Cloudflare IPv6",
   },
 ]);
 
@@ -163,12 +163,12 @@ const trackFetchStatus = (status) => {
 // 检查所有 IP 地址
 const checkAllIPs = async () => {
   const ipFunctions = [
-    () => fetchIP(0, getIPFromIPIP),
-    () => fetchIP(1, getIPFromCloudflare_V4),
-    () => fetchIP(2, getIPFromCloudflare_V6),
-    () => fetchIP(3, getIPFromIPChecking64),
-    () => fetchIP(4, getIPFromIPChecking4),
-    () => fetchIP(5, getIPFromIPChecking6),
+    () => fetchIP(0, getIPFromIPChecking64),
+    () => fetchIP(1, getIPFromIPChecking4),
+    () => fetchIP(2, getIPFromIPChecking6),
+    () => fetchIP(3, getIPFromIPIP),
+    () => fetchIP(4, getIPFromCloudflare_V4),
+    () => fetchIP(5, getIPFromCloudflare_V6),
   ];
 
   // 限制执行的函数数量为 ipCardsToShow 的长度
@@ -291,22 +291,22 @@ const refreshCard = (card, index) => {
   clearCardData(card);
   switch (index) {
     case 0:
-      fetchIP(0, getIPFromIPIP);
+      fetchIP(0, getIPFromIPChecking64);
       break;
     case 1:
-      fetchIP(1, getIPFromCloudflare_V4);
+      fetchIP(1, getIPFromIPChecking4);
       break;
     case 2:
-      fetchIP(2, getIPFromCloudflare_V6);
+      fetchIP(2, getIPFromIPChecking6);
       break;
     case 3:
-      fetchIP(3, getIPFromIPChecking64);
+      fetchIP(3, getIPFromIPIP);
       break;
     case 4:
-      fetchIP(4, getIPFromIPChecking4);
+      fetchIP(4, getIPFromCloudflare_V4);
       break;
     case 5:
-      fetchIP(5, getIPFromIPChecking6);
+      fetchIP(5, getIPFromCloudflare_V6);
       break;
     default:
       console.error("Undefind Source:");
