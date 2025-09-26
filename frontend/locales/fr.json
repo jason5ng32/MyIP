@@ -206,6 +206,7 @@
         "Note2_1": "Tu peux, dans le terminal, via",
         "Note2_2": "commande, obtenir l'adresse IP de cette machine",
         "Note3": "est un chemin optionnel, son ajout permettra d'obtenir les informations géographiques de l'IP",
+        "Note4": "est votre clé API IPCheck.ing",
         "getIPv4": "Obtenir l'adresse IPv4 de la machine locale",
         "getIPv6": "Obtenir l'adresse IPv6 de la machine locale",
         "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale",
