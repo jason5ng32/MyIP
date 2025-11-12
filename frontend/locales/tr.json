@@ -1,0 +1,1153 @@
+{
+  "user": {
+    "SignIn": "Giriş Yap",
+    "SignInWithGoogle": "Google ile Giriş Yap",
+    "SignInWithGithub": "GitHub ile Giriş Yap",
+    "SignOut": "Çıkış Yap",
+    "SignInToView": "Görüntülemek için Giriş Yapın",
+    "SignInToUse": "Kullanmak için lütfen giriş yapın",
+    "InvalidUserToken": "Geçersiz Kullanıcı Token'ı",
+    "MyAchievements": "Başarılarım",
+    "Fields": {
+      "User": "Kullanıcı",
+      "CreatedAt": "Oluşturulma Tarihi",
+      "LastLogin": "Son Giriş",
+      "Level": "Kullanıcı Seviyesi",
+      "FunctionUses": "Gelişmiş Kullanım",
+      "Times": "Kez",
+      "Fetching": "Alınıyor..."
+    },
+    "Level": {
+      "Standard": "Standart Kullanıcı",
+      "Premium": "Premium Kullanıcı",
+      "Owner": "Yönetici",
+      "Developer": "Geliştirici",
+      "HonoraryMember": "Onur Üyesi"
+    },
+    "Benefits": {
+      "Title": "Kullanıcı Avantajları",
+      "Benefit": "Avantaj",
+      "Note1": "Açık kaynaklı bir ürün olarak, IPCheck.ing'i kullanımınız ücretsizdir.",
+      "Note2": "Ancak, kötüye kullanımı önlemek için bazı özellikleri sınırlıyoruz. Giriş yaparak aşağıdaki avantajları elde edeceksiniz:",
+      "Benefit1": "IPCheck.ing'i IP veri kaynağı olarak kullandığınızda, tüm alanlar tam olarak görüntülenir.",
+      "Benefit2": "Görünmezlik testini kullanabilirsiniz.",
+      "Benefit3": "Kendi başarı rozetlerinizi görüntüleyebilirsiniz",
+      "Benefit4": "Bazı özelliklerdeki erişim kısıtlamalarını azaltır.",
+      "FootNote": "Daha fazla avantaj geliştirilmektedir..."
+    },
+    "Achievements": {
+      "Title": "Başarılar",
+      "Note": "IPCheck.ing'i kullanırken bazı başarıları tetikleyebilirsiniz. Burada tüm başarılarınızı görebilirsiniz.",
+      "Get": "Kazanılan",
+      "GetCount": "Kazanılan Başarılar",
+      "NotGet": "Henüz Değil",
+      "NotGetCount": "Kazanılmamış Başarılar",
+      "FooterNote": "Bazen, süresi sınırlı bazı başarılar olabilir.",
+      "Congrats": "🎉 Tebrikler",
+      "CongratsMessage": "Yeni bir başarı elde ettiniz!",
+      "NewAchievementIs": "Yeni başarı:",
+      "Type": {
+        "IAmHuman": {
+          "Title": "Ben İnsanım",
+          "Meet": "IPCheck.ing'i giriş yaptıktan sonra kullanın"
+        },
+        "BarelyEnough": {
+          "Title": "Kıt Kanaat",
+          "Meet": "İndirme hızı 100Mb/s'yi aşıyor"
+        },
+        "RapidPace": {
+          "Title": "Yüksek Hız",
+          "Meet": "İndirme hızı 500Mb/s'yi aşıyor"
+        },
+        "TorrentFlow": {
+          "Title": "Torrent Akışı",
+          "Meet": "İndirme hızı 1000Mb/s'yi aşıyor"
+        },
+        "SteadyGoing": {
+          "Title": "İstikrarlı Gidiş",
+          "Meet": "Yükleme hızı 50Mb/s'yi aşıyor"
+        },
+        "TooFastTooSimple": {
+          "Title": "Çok Hızlı Çok Basit",
+          "Meet": "Yükleme hızı 200Mb/s'yi aşıyor"
+        },
+        "SwiftAscent": {
+          "Title": "Hızlı Yükseliş",
+          "Meet": "Yükleme hızı 1000Mb/s'yi aşıyor"
+        },
+        "SurfaceCheck": {
+          "Title": "Yüzeysel Kontrol",
+          "Meet": "Bir güvenlik kontrol listesi maddesini tamamlayın"
+        },
+        "HalfwayThere": {
+          "Title": "Yolun Yarısı",
+          "Meet": "Güvenlik kontrol listesinin %50'sini tamamlayın"
+        },
+        "FullySecured": {
+          "Title": "Tamamen Güvende",
+          "Meet": "Tüm güvenlik kontrol listesini tamamlayın"
+        },
+        "JustInCase": {
+          "Title": "Ne Olur Ne Olmaz",
+          "Meet": "Bir gizlilik testi tamamlayın"
+        },
+        "HiddenWell": {
+          "Title": "İyi Gizlenmiş",
+          "Meet": "Gizlilik testinde proxy ve VPN olasılığı her ikisi de 0"
+        },
+        "SlipUp": {
+          "Title": "Açık Vermek",
+          "Meet": "Gizlilik testinde proxy veya VPN olasılığı %50'den fazla"
+        },
+        "CleverTrickery": {
+          "Title": "Akıllıca Numara",
+          "Meet": "Tüm klavye kısayollarını görüntüledi"
+        },
+        "EnergySaver": {
+          "Title": "Enerji Tasarrufu",
+          "Meet": "Programı otomatik olarak çalışmayacak şekilde ayarlayın"
+        },
+        "ResourceHog": {
+          "Title": "Kaynak Tüketici",
+          "Meet": "Kullanılabilirlik için birden fazla yenileme ayarlayın"
+        },
+        "MakingBigNews": {
+          "Title": "Gündem Yaratmak",
+          "Meet": "Gelişmiş fonksiyon çağrıları 1000'i aşıyor"
+        },
+        "GenerousDonor": {
+          "Title": "Cömert Bağışçı",
+          "Meet": "IPCheck.ing projesine bağış yaptı"
+        },
+        "ItIsOpen": {
+          "Title": "İşte Açık",
+          "Meet": "Sansür Kontrolü'nde engellenmiş bir web sitesi bulundu"
+        },
+        "CuriousCat": {
+          "Title": "Meraklı Kedi",
+          "Meet": "Whois Araması'nda IPCheck.ing bilgilerini sorgulayın"
+        },
+        "CrossingTheWall": {
+          "Title": "Duvarı Aşmak",
+          "Meet": "Kural Testi'nde 8 test IP'sinin tümü farklı"
+        }
+      }
+    }
+  },
+  "nav": {
+    "id": "nav",
+    "Title": "IPCheck.ing",
+    "Navigation": "Navigasyon",
+    "IPInfo": "IP Bilgileri",
+    "Connectivity": "Bağlantı",
+    "WebRTC": "WebRTC Testi",
+    "DNSLeakTest": "DNS Sızıntı Testi",
+    "SpeedTest": "Hız Testi",
+    "PingTest": "Global Gecikme",
+    "MTRTest": "MTR Testi",
+    "RuleTest": "Kural Testi",
+    "AdvancedTools": "Gelişmiş Araçlar",
+    "preferences": {
+      "title": "Tercihler",
+      "preferenceTips": "Bu ayarlar, kolay yeniden kullanım için tarayıcınıza kaydedilir. Bazı seçeneklerin etkili olması için sayfanın yenilenmesi gerekir.",
+      "colorScheme": "Renk Şeması",
+      "systemAuto": "Otomatik",
+      "colorLight": "Gündüz",
+      "colorDark": "Gece",
+      "ipSourcesToCheck": "IP'leri Kontrol Edecek Sunucular",
+      "ipSourcesToCheckTips": "IP adresinizi kontrol etmek için sunucu sayısını seçin. Ne kadar çok sunucu seçerseniz, kontrolün tamamlanması o kadar uzun sürer.",
+      "appSettings": "Program Ayarları",
+      "autoRun": "Otomatik Çalıştır",
+      "autoRunTips": "Devre dışı bırakılırsa, uygulama yalnızca yerel IP'yi kontrol eder ve testleri otomatik olarak çalıştırmaz.",
+      "showMap": "Haritayı Göster",
+      "showMapTips": "IP bilgi kartında bir harita görüntüler.",
+      "simpleMode": "Basit Mod",
+      "simpleModeTips": "IP kartlarında görüntülenen bilgiyi azaltır. Yalnızca mobil cihazlarda etkilidir.",
+      "connectivityAutoRefresh": "Çoklu Bağlantı Yenilemeleri",
+      "connectivityAutoRefreshTips": "Etkinleştirildiğinde, uygulama başlangıçta beş kontrol çalıştırır ve en düşük gecikmeyi görüntüler.",
+      "popupConnectivityNotifications": "Açılır Bağlantı Uyarıları",
+      "popupConnectivityNotificationsTips": "Etkinleştirildiğinde, ilk kontrolün sonuçları açılır bir uyarı olarak gösterilir.",
+      "ipDB": "IP Coğrafi Konum Veritabanı",
+      "ipDBTips": "Kullanılacak varsayılan IP coğrafi konum kaynağını seçebilirsiniz. Seçilen kaynak kullanılamıyorsa, sistem sırayla sonraki kaynakları kullanacaktır.",
+      "language": "Dil Ayarı",
+      "languageTips": "Tarayıcıyı yenilemek etkili olacaktır."
+    }
+  },
+  "securitychecklist": {
+    "Title": "Güvenlik Kontrol Listesi",
+    "Note": "Bu, şifre güvenliği, tarama güvenliği ve mobil cihaz güvenliği gibi konuları kapsayan çok kapsamlı bir siber güvenlik kontrol listesidir. Mevcut ortamda, bilgi sızıntıları önemli kayıplara yol açabilir, bu nedenle internete bağlıyken gizliliğimizi koruduğumuzdan ve erişim güvenliğimizi artırdığımızdan emin olmalıyız.",
+    "Note2": "Bu liste birçok madde içerir; her şeyi bir kerede kontrol etmeniz gerekmez. İlerleme tarayıcıya kaydedilecek ve istediğiniz zaman kontrollere devam etmek için geri dönebilirsiniz.",
+    "Progress": "Kontrol İlerlemesi",
+    "Item": "Madde",
+    "Items": "Madde(ler) ",
+    "Priority": "Öncelik",
+    "Ignore": "Yoksay",
+    "alert-total": "Güvenlik kontrolünde toplam",
+    "alert-checked": "Tamamladınız",
+    "alert-ignored": "Yoksayılan",
+    "alert-unchecked": "İşaretlenmemiş.",
+    "Checked": "İşaretli",
+    "Ignored": "Yoksayılan",
+    "Unchecked": "İşaretlenmemiş",
+    "Basic": "Temel",
+    "Optional": "İsteğe Bağlı",
+    "Essential": "Gerekli",
+    "Advanced": "Gelişmiş",
+    "Reset": "Kontrol Listesini Sıfırla",
+    "ShowAll": "Tümünü Göster",
+    "ShowUnchecked": "İşaretlenmemişleri Göster",
+    "ShowIgnored": "Yoksayılanları Göster",
+    "ShowChecked": "İşaretlileri Göster",
+    "Loading": "Yükleniyor..."
+  },
+  "curl": {
+    "Title": "Komut Satırı API'si",
+    "Note1": "Hey, görünüşe göre siz de terminal kullanmayı seviyorsunuz?",
+    "Note2_1": "kullanabilirsiniz",
+    "Note2_2": "komutuyla, makinenizin IP adresini terminalde alın",
+    "Note3": "isteğe bağlı bir yoldur, eklenmesi IP'nin coğrafi bilgilerini alacaktır",
+    "Note4": "lütfen IPCheck.ing API anahtarınızı kullanın",
+    "getIPv4": "Yerel makinenin IPv4 adresini alın",
+    "getIPv6": "Yerel makinenin IPv6 adresini alın",
+    "get6and4": "Yerel makinenin tercih edilen ağ çıkış IP adresini alın",
+    "notAvailable": "Bu özellik henüz mevcut değil"
+  },
+  "browserinfo": {
+    "Title": "Tarayıcı Bilgileri",
+    "Note": "Bu sayfa iki tür tarayıcı bilgisi görüntüler: tarayıcının Kullanıcı Aracısından (User Agent) türetilen temel bilgiler ve çeşitli veri ölçümleri aracılığıyla hesaplanan bir tarayıcı parmak izi. Tarayıcı parmak izleri, avucunuzdaki parmak izlerine benzer; tarayıcınız ne kadar çok bilgi açığa çıkarırsa, web siteleri için benzersizliğiniz o kadar artar ve daha kolay izlenebilir hale gelirsiniz. Bazen, gizli moda geçmek veya tarayıcı değiştirmek bile parmak izinizi değiştirmeyebilir.",
+    "Note2": "Tarayıcı parmak izlerini hesaplama yöntemleri çeşitlidir ve farklı teknik yaklaşımlar tutarsız sonuçlara yol açabilir. Burada, hesaplama için nispeten basit bir yöntem kullanıyoruz.",
+    "browser": {
+      "Infos": "Tarayıcı Bilgileri",
+      "browserName": "Tarayıcı Adı",
+      "browserVersion": "Sürüm",
+      "engineName": "Motor",
+      "engineVersion": "Sürüm",
+      "osName": "İşletim Sistemi",
+      "osVersion": "Sürüm",
+      "deviceModel": "Model",
+      "deviceVendor": "Üretici",
+      "cpuArchitecture": "CPU Mimarisi",
+      "gpu": "GPU",
+      "cpuCores": "CPU Çekirdekleri",
+      "language": "Dil Kodu",
+      "cookieEnabled": "Çerezler Etkin",
+      "cookieEnabledTrue": "Evet",
+      "cookieEnabledFalse": "Hayır"
+    },
+    "fingerprint": {
+      "Infos": "Parmak İzi Bilgileri",
+      "fingerprint": "Parmak İzi Kodu",
+      "changeOption": "Değişimleri gözlemlemek için tarayıcı parmak izini hesaplamak için kullanılan verileri değiştirmeyi deneyebilirsiniz (gizli modda karşılaştırmayı unutmayın).",
+      "browserTips": "Safari gibi bazı tarayıcılar, aynı veriler seçildiğinde bile her seferinde farklı parmak izi değerleri üreterek kullanıcıları izlenmekten korur."
+    },
+    "options": {
+      "audio": "Ses",
+      "canvas": "Canvas",
+      "fonts": "Yazı Tipleri",
+      "hardware": "Donanım",
+      "locales": "Diller",
+      "permissions": "İzinler",
+      "plugins": "Eklentiler",
+      "screen": "Ekran",
+      "system": "Tarayıcı Sürümü",
+      "webgl": "WebGL",
+      "math": "Matematik"
+    },
+    "calError": "Tarayıcı bilgileri hesaplanamadı, lütfen yenileyip tekrar deneyin.",
+    "calculating": "Hesaplanıyor..."
+  },
+  "censorshipcheck": {
+    "Title": "Sansür Kontrolü",
+    "Note": "Çin Anakarası, Suudi Arabistan, Rusya ve Türkiye dahil olmak üzere sıkı internet sansürüyle bilinen dört bölgede hedef web sitelerinin kullanılabilirliğini kontrol eder. Testler ayrıca doğrulama için bir kontrol grubu olarak nispeten özgür internete sahip bölgelerden de yapılır. Bazı bölgelerde internet sansürü için net yasal hükümler varken, diğerleri daha belirsizdir.",
+    "Note2": "Sansür testini başlatmak için lütfen bir URL veya alan adı girin:",
+    "Note3": "Bir web sitesi, yalnızca aynı ülke içindeki tüm sunuculardan erişilemiyorsa engellenmiş sayılır.",
+    "Run": "Testi Çalıştır",
+    "Placeholder": "URL veya Alan Adı",
+    "Country": "Bölge",
+    "Status": "Durum",
+    "City": "Şehir",
+    "Network": "Ağ",
+    "invalidURL": "Geçersiz URL veya Alan Adı",
+    "fetchError": "Test sonuçları alınamadı",
+    "isBlocked": "Bu web sitesi bazı ülkelerde engellenmiş görünüyor, nihai bir karar için lütfen yukarıdaki test sonuçlarına bakın.",
+    "notBlocked": "Bu web sitesi engellenmiş görünmüyor, nihai bir karar için lütfen yukarıdaki test sonuçlarına bakın.",
+    "isDown": "Bu web sitesinin engellenip engellenmediği belirsiz, çünkü dünya çapında birçok yerden erişilemez görünüyor. Girdiğiniz adres doğruysa, web sitesinin kendisinde sorunlar olması ve erişilememesi mümkündür.",
+    "Timeout": "Test Zaman Aşımı",
+    "TestGroup": "Test Grubu",
+    "ControlGroup": "Kontrol Grubu"
+  },
+  "invisibilitytest": {
+    "Title": "Görünmezlik Testi",
+    "Note": "Bir proxy veya VPN kullandığınızda, ziyaret ettiğiniz web siteleri gerçekten bir proxy kullandığınızı bilmiyor mu? Gerçekten görünmez misiniz? Kılığınızdaki açıkları hesaplamak ve bir proxy kullandığınıza dair kanıt bulmak için çeşitli yöntemler kullanacağız. Bazı test sonuçları tamamen doğru olmasa da, bu test yine de oldukça bilgilendiricidir.",
+    "Note2": "Çalıştır'a tıkladıktan sonra, sistem genellikle tüm testleri 10 saniye içinde tamamlayan bir komut dosyası çalıştıracaktır. Bu süreçte IP bilgileriniz, tarayıcı bilgileriniz vb. toplanacak ve arka planda analiz edilecektir.",
+    "Run": "Testi Çalıştır",
+    "fetchError": "Test sonuçları alınamadı",
+    "yourIP": "Ana test IP'niz",
+    "proxyScore": "Proxy Yüzdesi",
+    "VPNScore": "VPN Yüzdesi",
+    "isProxy": "Proxy kullanıyor olabilirsiniz.",
+    "notProxy": "Proxy kullandığınıza dair bir kanıt bulunamadı.",
+    "isVPN": "VPN kullanıyor olabilirsiniz.",
+    "notVPN": "VPN kullandığınıza dair bir kanıt bulunamadı.",
+    "itemName": "Test Öğesi",
+    "itemProxyResult": "Test Sonucu",
+    "itemComment": "Analiz",
+    "agreement": "Kabul ediyorum",
+    "blocklist": {
+      "proxy": {
+        "title": "Proxy Listesi",
+        "positive": "IP'niz Proxy listesinde.",
+        "negative": "IP'niz Proxy listesinde değil."
+      },
+      "vpn": {
+        "title": "VPN Listesi",
+        "positive": "IP'niz VPN listesinde.",
+        "negative": "IP'niz VPN listesinde değil."
+      },
+      "vpnExitNode": {
+        "title": "VPN Çıkış Düğümü Listesi",
+        "positive": "IP'niz VPN çıkış düğümü listesinde.",
+        "negative": "IP'niz VPN çıkış düğümü listesinde değil."
+      }
+    },
+    "headers": {
+      "title": "HTTP Başlıkları",
+      "positive": "HTTP başlıklarınız proxy bilgisi içeriyor, bu da bir proxy kullanıyor olabileceğinizi gösterir.",
+      "negative": "HTTP başlıklarınız proxy bilgisi içermiyor."
+    },
+    "datacenter": {
+      "title": "Veri Merkezi IP'si",
+      "positive": "IP'niz bir veri merkezi IP'si, bu genellikle normal kullanıcılar tarafından kullanılmaz.",
+      "negative": "IP'niz bir veri merkezi IP'si değil."
+    },
+    "tcp": {
+      "title": "TCP Parmak İzi",
+      "positive": "Bağlandığınız sistem, bilgisayar sisteminizden farklı, bu da bir proxy kullanıyor olabileceğinizi gösterir. Sistemin yargısı doğru olmasa da, iki sistemin farklı olduğu kesindir.",
+      "computer": "Bilgisayar sisteminiz: ",
+      "server": "Bağlandığınız sistem şu olabilir: ",
+      "negative": "Bağlandığınız sistem, bilgisayar sisteminizle aynı."
+    },
+    "timezone": {
+      "title": "Saat Dilimi Farkı",
+      "positive": "Saat diliminiz, IP'nizin coğrafi konum saat dilimiyle eşleşmiyor, bu da bir proxy kullanıyor olabileceğinizi gösterir.",
+      "computer": "Sizin saat diliminiz: ",
+      "server": "IP'nizin coğrafi konum saat dilimi: ",
+      "negative": "Saat diliminiz, IP'nizin coğrafi konum saat dilimiyle eşleşiyor."
+    },
+    "net": {
+      "title": "Ağ Davranışı",
+      "positive": "İstemci ağ davranışına dayanarak, bir proxy veya VPN kullanıyor olabileceğiniz bulundu.",
+      "negative": "İstemci ağ davranışına dayanarak, bir proxy veya VPN kullanmadığınız bulundu."
+    },
+    "webrtc": {
+      "title": "WebRTC Tespiti",
+      "positive": "WebRTC, farklı bölgelerden birden fazla IP adresi tespit etti, bu da bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "ipsAre": "IP adresleri şunlardır: ",
+      "negative": "WebRTC tespitinde farklı bölgelerden birden fazla IP adresine dair bir kanıt bulunamadı."
+    },
+    "flow": {
+      "title": "Trafik Özellikleri",
+      "positive": "TCP/IP trafik özelliklerine dayanarak, bir proxy veya VPN kullanıyor olabileceğiniz bulundu.",
+      "negative": "TCP/IP trafik özelliklerine dayanarak, bir proxy veya VPN kullanmadığınız bulundu."
+    },
+    "latencyVSWS": {
+      "title": "TCP vs WebSocket Gecikmesi",
+      "positive": "TCP ve WebSocket gecikmesi arasındaki fark büyük, bu da bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "fromTCP": "TCP gecikme değeri: ",
+      "fromWS": "WebSocket gecikme değeri: ",
+      "negative": "TCP ve WebSocket gecikmesi arasındaki fark büyük değil, bu da bir proxy veya VPN kullanmıyor olabileceğinizi gösterir."
+    },
+    "latencyVSPing": {
+      "title": "TCP vs Ping Gecikmesi",
+      "positive": "TCP gecikmesi ve Ping farkı büyük, bu da bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "negative": "TCP gecikmesi ve Ping farkı büyük değil, bu da bir proxy veya VPN kullanmıyor olabileceğinizi gösterir."
+    },
+    "highlatency": {
+      "title": "Yüksek Gecikme Analizi",
+      "positive": "Yüksek gecikme analizi, bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "negative": "Yüksek gecikme analizinde bir proxy veya VPN kullandığınıza dair bir kanıt bulunamadı."
+    }
+  },
+  "advancedtools": {
+    "Title": "Gelişmiş Araçlar",
+    "Note": "Nispeten seyrek kullanılan ancak ağ testi yaparken çok faydalı olan araçlar.",
+    "PingTestNote": "Global Ping değeri testi",
+    "MTRTestNote": "Global MTR rota testi",
+    "DNSResolverNote": "Gerçek zamanlı çok kanallı DNS çözümlemesi",
+    "RuleTestNote": "Proxy yazılımının kural ayarlarını kontrol edin",
+    "CensorshipCheck": "Bir web sitesinin bazı ülkelerde engellenip engellenmediğini kontrol edin",
+    "Whois": "Alan adı/IP kayıt bilgilerini arayın",
+    "InvisibilityTest": "Proxy veya VPN kullanıp kullanmadığınızı kontrol edin",
+    "MacChecker": "Bir fiziksel adresin bilgilerini sorgulayın",
+    "BrowserInfo": "Tarayıcı bilgilerini ve parmak izini kontrol edin",
+    "SecurityChecklist": "Dijital yaşamınızı güvence altına alma rehberi"
+  },
+  "macchecker": {
+    "Title": "MAC Arama",
+    "Note": "Bir fiziksel adresin (MAC adresi) üreticisini, tekli/çoklu yayın (unicast/multicast), global/yerel olup olmadığını vb. sorgulayın. Tam 12 haneli adresle veya sadece önekle sorgulamayı destekler. Bu aracı, oluşturduğunuz fiziksel adresin ihtiyaçlarınızı karşılayıp karşılamadığını doğrulamak için de kullanabilirsiniz.",
+    "Note2": "Sorgulamayı başlatmak için lütfen bir fiziksel adres girin:",
+    "Run": "Sorgula",
+    "Placeholder": "F0:2F:4B:01:0A:AA",
+    "invalidMAC": "Geçersiz fiziksel adres",
+    "fetchError": "Sorgu sonuçları alınamadı",
+    "company": "Üretici",
+    "macPrefix": "Fiziksel adres öneki",
+    "address": "Kayıtlı adres",
+    "country": "Kayıtlı ülke/bölge",
+    "blockStart": "Başlangıç bloğu",
+    "blockEnd": "Bitiş bloğu",
+    "blockSize": "Blok boyutu",
+    "blockType": "Blok türü",
+    "blockRange": "Blok aralığı",
+    "isRand": "Rastgele adres",
+    "isPrivate": "Özel veri",
+    "isMulticast": "Çoklu yayın adresi",
+    "isUnicast": "Tekli yayın adresi",
+    "isGlobal": "Global adres",
+    "isLocal": "Yerel adres",
+    "property": "Adres özelliği",
+    "value": "Değer",
+    "manufacturer": "Üretici detayları"
+  },
+  "whois": {
+    "Title": "Whois Araması",
+    "Note": "Whois araması, alan adı kayıt bilgilerini almak için kullanılan bir hizmettir. Bir alan adı veya IP adresi girerek, alan adının kayıt detayları, kayıt operatörü, kayıt tarihi, sona erme tarihi ve daha fazlası gibi bilgileri alabilirsiniz. IP adresleri ve alan adları için Whois bilgileri farklı alanlara sahip olabilir. Ayrıca, bazı daha az yaygın üst düzey alan adları (TLD'ler) Whois sorguları için mevcut bilgilere sahip olmayabilir.",
+    "Note2": "Sorgulamayı başlatmak için lütfen bir alan adı veya IP adresi girin:",
+    "Note3": "Whois bilgileri çeşitli türde alanlar içerir. Aşağıda ham metin bilgisi bulunmaktadır",
+    "Placeholder": "Alan Adı veya IP",
+    "Run": "Sorgula",
+    "invalidURL": "Geçersiz alan adı veya IP",
+    "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
+  },
+  "dnsresolver": {
+    "Title": "DNS Çözümlemesi",
+    "Note": "Bazı bölgelerde, politik veya ticari nedenlerle, bazı operatörler belirli alan adlarını kirletebilir, bu da doğrudan erişildiğinde yanlış sonuçlara yol açar. DNS çözümlemesi kontrollerini kullanmak, dünyanın dört bir yanındaki iyi bilinen DNS sağlayıcılarından alan adlarının çözümleme sonuçlarını incelemenize yardımcı olacaktır. Dahili DNS testleri arasında, bazı sağlayıcılar Çin'dendir ve DNS çözümleme sonuçları kirletilmiş olabilir. Lütfen ayırt edici olun.",
+    "Note2": "Çözümlemeyi başlatmak için lütfen bir URL veya alan adı girin:",
+    "Placeholder": "URL veya Alan Adı",
+    "Run": "Çalıştır",
+    "invalidURL": "Geçersiz URL veya Alan Adı",
+    "fetchError": "Çözümleme sonuçları alınamadı",
+    "Provider": "DNS Sağlayıcısı",
+    "Result": "Çözümleme Sonucu",
+    "Record": "Kayıt"
+  },
+  "ruletest": {
+    "Title": "Kural Testi",
+    "Name": "Test",
+    "Note": "Kural testi, proxy yazılımının alan adı tabanlı kurallarının doğru ayarlanıp ayarlanmadığını belirlemek için kullanılır. Testi yapmadan önce, aşağıdaki karta başvurmanız ve proxy yazılımınızda IPCheck.ing'in 8 farklı URL'si için farklı alan adı tabanlı yönlendirme kuralları ayarlamanız gerekir.",
+    "StatusWait": "Test Bekleniyor veya Test Hatası",
+    "StatusError": "Test Hatası",
+    "Country": "Proxy bölgesi",
+    "RefreshAll": "Tümünü Yenile"
+  },
+  "Tooltips": {
+    "RefreshIPCard": "IP Kartını Yenile",
+    "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
+    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
+    "SpeedTestButton": "Hız Testini Başlat/Duraklat",
+    "ToggleMaps": "Haritaları Göster/Gizle",
+    "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
+    "ShowASNInfo": "AS Detaylarını Göster",
+    "CopyIP": "IP Adresini Kopyala",
+    "InfoMask": "IP Bilgilerini Gizle",
+    "QueryIP": "IP Adresini Sorgula",
+    "GithubLink": "Kaynak Kodunu GitHub'da Görüntüle",
+    "RefreshRuleTests": "Kural Testlerini Yenile",
+    "qualityScoreExplain": "IP kalite puanı, IP'nin türü, proxy/VPN olup olmadığı ve bu IP'den son zamanlarda tespit edilen saldırı olaylarının sayısı dahil olmak üzere birden fazla ağırlıklı faktöre göre hesaplanır. Daha yüksek bir puan, daha iyi IP kalitesi anlamına gelir ve bazı web sitelerinde risk kontrolü tarafından engellenme olasılığını azaltır."
+  },
+  "ipInfos": {
+    "id": "ipinfos",
+    "database": "Veritabanı",
+    "Title": "IP Bilgileri",
+    "Notes": "Program önce IP adresinizi farklı kaynaklardan (IPv4 ve IPv6 dahil) kontrol edecek ve ardından seçtiğiniz IP coğrafi konum kaynağından ilgili coğrafi verileri sorgulayacaktır. Yalnızca 1 IP yığını varsa, verisi olmayan kaynak boş olarak görüntülenecektir.",
+    "Simple": "Basit",
+    "Map": "Harita",
+    "MapUnavailable": "Harita Kullanılamıyor",
+    "Source": "IP Kaynağı",
+    "IP": "IP",
+    "Country": "Bölge",
+    "Region": "Eyalet",
+    "City": "Şehir",
+    "ISP": "İnternet Servis Sağlayıcı",
+    "ASN": "ASN",
+    "IPv4Error": "Alım Başarısız veya IPv4 Adresi Yok",
+    "IPv6Error": "Alım Başarısız veya IPv6 Adresi Yok",
+    "SelectSource": "IP Coğrafi Konum Kaynağını Seç",
+    "type": "Tür",
+    "isProxy": "Proxy",
+    "qualityScore": "IP Kalitesi",
+    "qualityScoreUnknown": "Puan Bilinmiyor",
+    "ASNInfo": {
+      "note": "Bu AS için ilgili veriler : ",
+      "asnName": "AS Adı : ",
+      "asnOrgName": "AS Organizasyon Adı : ",
+      "asnCountryCode": "AS Ülke Kodu : ",
+      "estimatedUsers": "Tahmini Kullanıcılar : ",
+      "IPv4_Pct": "IPv4 Trafik Yüzdesi : ",
+      "IPv6_Pct": "IPv6 Trafik Yüzdesi : ",
+      "HTTP_Pct": "HTTP Trafik Yüzdesi : ",
+      "HTTPS_Pct": "HTTPS Trafik Yüzdesi : ",
+      "Desktop_Pct": "Masaüstü Cihaz Yüzdesi : ",
+      "Mobile_Pct": "Mobil Cihaz Yüzdesi : ",
+      "Bot_Pct": "Bot Trafik Yüzdesi : ",
+      "Human_Pct": "İnsan Trafik Yüzdesi : ",
+      "moreData": "Daha Fazla Veri : "
+    },
+    "advancedData": {
+      "proxyYes": "Kesinlikle bir proxy veya VPN",
+      "proxyMaybe": "Muhtemelen bir proxy veya VPN",
+      "proxyNo": "Proxy veya VPN değil",
+      "proxyUnknown": "Bilinmeyen tür",
+      "proxyUnknownProtocol": "Bilinmeyen protokol",
+      "type": {
+        "Residential": "Konut",
+        "Wireless": "Kablosuz",
+        "Business": "İş",
+        "Hosting": "Barındırma",
+        "unknownType": "Bilinmeyen Tür"
+      },
+      "Nativeness": "Yerellik",
+      "NativeIPYes": "Bu yerel bir IP",
+      "NativeIPNo": "Yerel bir IP değil"
+    }
+  },
+  "connectivity": {
+    "id": "connectivity",
+    "Title": "Ağ Bağlantısı",
+    "Note": "Test, ilgili web sitelerinden küçük resimler yüklenerek yapılır. Gecikme değerleri yalnızca referans amaçlıdır ve gerçekte daha küçük olacaktır.",
+    "StatusWait": "Test Bekleniyor",
+    "StatusAvailable": "Tamam",
+    "StatusUnavailable": "Kullanılamıyor",
+    "StatusTimeout": "Zaman Aşımı veya Kullanılamıyor",
+    "checking": "Kontrol ediliyor...",
+    "minTestTime": "Min Test Süresi: ",
+    "RefreshThisTest": "Bu Testi Yenile"
+  },
+  "webrtc": {
+    "id": "webrtc",
+    "Title": "WebRTC Testi",
+    "Note": "WebRTC genellikle doğrudan UDP üzerinden bağlantı kurar. Test gerçek IP'nizi döndürürse, bu, proxy ayarlarınızın bu bağlantıları kapsamadığı anlamına gelir. WebRTC'ye bağlanırken kullandığınız IP'yi tespit etmenin yanı sıra, NAT türünüzü de tespit ediyoruz. Ancak, NAT türü tespiti %100 doğru değildir ve yalnızca referans amaçlıdır.",
+    "StatusWait": "Test Bekleniyor veya Bağlantı Hatası",
+    "StatusError": "Test Hatası",
+    "NATType": {
+      "srflx": "Port Kısıtlı Koni veya Simetrik",
+      "prflx": "Port Kısıtlı Koni",
+      "relay": "Simetrik",
+      "host": "Tam Koni",
+      "unknown": "Bilinmeyen Tür"
+    }
+  },
+  "dnsleaktest": {
+    "id": "dnsleaktest",
+    "Name": "Test",
+    "Title": "DNS Sızıntı Testi",
+    "Note": "DNS sızıntısı, bir VPN/proxy'ye bağlıyken alan adı çözümlemelerinizin hala yerel İSS'niz aracılığıyla yapılması anlamına gelir, bu da DNS sızıntısı riski oluşturur.",
+    "Note2": "DNS sızıntılarını test etme yöntemi, hangi bölgesel DNS çıkışı üzerinden çözümleme yaptığınızı tespit etmek için yeni oluşturulmuş bir alan adına erişmeyi içerir. Dönen uç nokta bölgesi, yerel hizmet sağlayıcınızın bölgesiyle eşleşirse, DNS sızıntısı riski vardır. Bu durumda, VPN/proxy ayarlarınızı değiştirmeniz gerekebilir.",
+    "Endpoint": "DNS Uç Noktası",
+    "EndpointCountry": "Uç Nokta Bölgesi",
+    "StatusWait": "Test Bekleniyor",
+    "StatusError": "Test Hatası"
+  },
+  "speedtest": {
+    "id": "speedtest",
+    "Title": "Hız Testi",
+    "Note": "Hız testi Cloudflare'in uç ağı (edge network) üzerinden yapılacaktır, bu da uzun sürebilir. Ağınız anakara Çin'de bulunuyorsa, veriler yanlı olabilir. Hız testi sonuçları yalnızca referans amaçlıdır, gerçek hız daha hızlı olacaktır. İndirme ve yükleme testleri için paket boyutunu seçebilirsiniz. Varsayılan olarak, hız testi 4 tur paket yüklemesi ve indirmesi yapacaktır, lütfen veri kullanımına dikkat edin.",
+    "Download": "İndirme",
+    "Upload": "Yükleme",
+    "Latency": "Gecikme",
+    "Jitter": "Jitter",
+    "Unit": "Mbps",
+    "StatusWait": "--",
+    "StatusError": "Test Hatası",
+    "videoStreaming": "Video Akışı: ",
+    "gaming": ", Oyun: ",
+    "rtc": ", Görüntülü Sohbet: ",
+    "score": "Hız testine dayanarak, aşağıdaki kalite puanları alındı:",
+    "resultNote": ".",
+    "connectionFrom": "Makinenizden hız testi tamamlandı, IP: ",
+    "connectionTo": " test sunucusuna:",
+    "connectionEnd": " .",
+    "quality": {
+      "Good": "İyi",
+      "Medium": "Orta",
+      "Bad": "Kötü"
+    }
+  },
+  "pingtest": {
+    "id": "pingtest",
+    "Title": "Global Gecikme Testi",
+    "Note": "Ping testi, veri paketlerinin cihazınızdan belirli hedeflere (bu durumda, farklı kıtalarda ve bölgelerde bulunan sunucularımıza) gidiş-dönüş süresini ölçmek için kullanılan bir ağ aracıdır. Ağ performansını değerlendirmek için önemli bir metriktir.",
+    "Note2": "Bu süreçte, IPCheck.ing dünyanın dört bir yanındaki sunuculardan IP adresinize küçük veri paketleri gönderir ve bu paketlerin sunucudan cihazınıza gidip geri dönmesi için geçen süreyi ölçer. Farklı coğrafi konumlardan yapılan bu Ping testleri aracılığıyla, cihazınızın küresel ağa bağlantısının hızı ve kararlılığı hakkında kapsamlı bir görüş edinebilirsiniz.",
+    "Note3": "Lütfen test için IP adresinizi seçin.",
+    "SelectIP": "Bir IP Adresi Seçin",
+    "Region": "Bölge",
+    "MinDelay": "Min Gecikme (ms)",
+    "MaxDelay": "Maks Gecikme (ms)",
+    "AvgDelay": "Ort Gecikme (ms)",
+    "TotalPackets": "Toplam Paket",
+    "PacketLoss": "Paket Kaybı",
+    "ReceivedPackets": "Alınan",
+    "DroppedPackets": "Düşen",
+    "Run": "Testi Çalıştır",
+    "Error": "Test başarısız oldu, görünüşe göre IP'nizin Ping testi yapmasına izin verilmiyor."
+  },
+  "mtrtest": {
+    "id": "mtrtest",
+    "Title": "MTR Testi",
+    "Note": "MTR (My Traceroute) testi, dünyanın farklı kıtalarında ve bölgelerinde bulunan sunuculardan IP adresinize ayrıntılı rota takibi yapar. MTR, ağ bağlantılarının kalitesini ve performansını gerçek zamanlı olarak teşhis etmek için geleneksel traceroute ve ping komutlarının işlevselliğini birleştirir.",
+    "Note2": "Bu süreç, çeşitli coğrafi konumlardan ağ ortamınıza giden tüm yolu kapsar ve her atlama (hop) için gecikme ve paket kaybı hakkında bilgi sağlar. İster yönlendirme yolundaki tıkanıklık, ister belirli bir düğümdeki gecikme sorunları veya iletim sırasındaki paket kaybı olsun, MTR testi kritik teşhis bilgileri sağlar.",
+    "Note3": "Lütfen test için IP adresinizi seçin.",
+    "SelectIP": "Bir IP Adresi Seçin",
+    "Region": "Bölge",
+    "Run": "Testi Çalıştır",
+    "Error": "Test başarısız oldu, görünüşe göre IP'nizin MTR testi yapmasına izin verilmiyor."
+  },
+  "ipcheck": {
+    "id": "ipcheck",
+    "Title": "IP Kontrolü",
+    "Placeholder": "Lütfen bir IP adresi girin",
+    "Button": "Kontrol Et",
+    "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin."
+  },
+  "alert": {
+    "id": "alert",
+    "refreshEverythingMessage": "Tüm veriler yenileniyor, lütfen bekleyin...",
+    "refreshEverythingTitle": "Yenileniyor",
+    "OhNo": "Eyvah!",
+    "Congrats": "Tebrikler!",
+    "OhNo_Message": "Bağlantı testi başarısız oldu, bazı web sitelerine erişilemiyor.",
+    "Congrats_Message": "Tüm bağlantı testleri geçti, tüm web sitelerine erişebilirsiniz.",
+    "maskedInfoTitle_1": "IP gizlendi",
+    "maskedInfoMessage_1": "IP bilgileri gizlendi, lütfen ekran görüntüsü alırken dikkatli olun.",
+    "maskedInfoTitle": "Tüm bilgiler gizlendi",
+    "maskedInfoMessage": "Tüm bilgiler gizlendi, şimdi güvenle ekran görüntüsü alabilirsiniz.",
+    "unmaskedInfoTitle": "Bilgiler gösterildi",
+    "unmaskedInfoMessage": "Bilgiler gösterildi, lütfen ekran görüntüsü alırken dikkatli olun.",
+    "SignInFailed": "Giriş Başarısız",
+    "SignInFailedReason": "Neden"
+  },
+  "shortcutKeys": {
+    "id": "shortcutKeys",
+    "GoToTop": "En Üste Git",
+    "GoToBottom": "En Alta Git",
+    "ToggleDarkMode": "Karanlık Modu Değiştir",
+    "RefreshEverything": "Her Şeyi Yenile",
+    "RefreshIPCard": "IP Kartını Yenile",
+    "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
+    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
+    "SpeedTestButton": "Hız Testini Başlat/Duraklat",
+    "PingTest": "Global Gecikme Testi panelini aç",
+    "MTRTest": "MTR Testi panelini aç",
+    "RuleTest": "Kural Testi panelini aç",
+    "DNSResolver": "DNS Çözümlemesi panelini aç",
+    "ToggleMaps": "Haritaları Değiştir",
+    "IPCheck": "IP Adresini Sorgula",
+    "ToggleInfoMask": "Bilgi Gizlemeyi Değiştir",
+    "Help": "Klavye Kısayollarını Göster",
+    "HelpNote": "Kısayolları kullanan insanlar gerçekten harika!",
+    "GoNext": "Sonraki Kart",
+    "GoPrevious": "Önceki Kart",
+    "RefreshRuleTests": "Kural Testlerini Yenile",
+    "CensorshipCheck": "Sansür Kontrolü panelini aç",
+    "Preferences": "Tercihleri Aç",
+    "About": "Hakkında panelini aç",
+    "Whois": "Whois Araması panelini aç",
+    "InvisibilityTest": "Görünmezlik Testi panelini aç",
+    "MacChecker": "MAC arama panelini aç",
+    "BrowserInfo": "Tarayıcı Bilgileri panelini aç",
+    "fullScreenAdvancedTools": "Tam Ekran Gelişmiş Araçlar",
+    "Curl": "Komut Satırı API'si",
+    "SecurityChecklist": "Güvenlik Kontrol Listesi panelini aç"
+  },
+  "page": {
+    "title": "IPCheck.ing - IP Adresimi ve Coğrafi Konumumu Kontrol Et - WebRTC Bağlantı IP'sini Kontrol Et - DNS Sızıntı Testi - Hız Testi - Jason Ng Açık Kaynak",
+    "description": "Daha iyi ve açık kaynaklı bir IP Araç Kutusu. IP'lerinizin ne olduğunu, IP bilgilerini, DNS sızıntılarını kontrol etmek, WebRTC bağlantılarını incelemek, web sitesi kullanılabilirliğini test etmek, DNS kaydını aramak, Whois'i aramak ve dünyanın dört bir yanından gecikmeyi test etmek kolaydır.",
+    "keywords": "IPim, IP Aracı, IP Adresim, IP kontrol, IP arama, DNS sızıntı testi, WebRTC testi, Hız testi, DNS arama, Whois arama, Ping testi, gizlilik testi",
+    "footerLink": "https://github.com/jason5ng32/MyIP",
+    "copyRightName": "Orijinal Kaynak ",
+    "copyRightLink": "https://ipcheck.ing",
+    "copyRightLinkName": "IPCheck.ing"
+  },
+  "helpModal": {
+    "Title": "Klavye Kısayolları"
+  },
+  "about": {
+    "Title": "Hakkında",
+    "product1": "IPCheck.ing, IP bilgilerinizi kontrol etmenize, web sitesi kullanılabilirliğini test etmenize, DNS çıkış bilgilerini incelemenize, hız testleri, global gecikme testleri, MTR testleri ve daha fazlasını yapmanıza yardımcı olan ücretsiz bir IP araç kutusudur.",
+    "product2": "Bu açık kaynaklı bir projedir ve kaynak kodunu sayfanın altındaki GitHub simgesine tıklayarak görüntüleyebilirsiniz.",
+    "product3": "Başlangıçta bu, Vue.js öğrenmem ve ChatGPT kullanarak nasıl kod yazacağımı öğrenmem için kişisel bir projeydi. Zamanla GitHub'da daha fazla yıldız kazandı, bu yüzden çok fazla yeniden düzenleme yaptım ve birçok faydalı özellik ekledim. Umarım beğenirsiniz.",
+    "meTitle": "Hakkımda",
+    "me1": "Benim adım Jason Ng, internette Achán olarak da bilinirim. Profesyonel bir programcı değilim ama kodlamayı, açık kaynağı ve paylaşmayı seviyorum.",
+    "me2": "Çoğu zaman bir ürün yöneticisi, blog yazarı, motosiklet sürücüsü ve bir 'geek' olarak çalışıyorum.",
+    "me3": "Hakkımda daha detaylı bir tanıtımı aşağıdaki linkte bulabilirsiniz:",
+    "contactTitle": "Bana Ulaşın",
+    "contact": "Herhangi bir sorunuz veya öneriniz varsa, lütfen benimle e-posta yoluyla iletişime geçin: jason[AT]kenengba.com.",
+    "personal": "Kişisel Web Sitesi",
+    "blog": "Blogum",
+    "retiremoney": "Gelecek Planlayıcısı",
+    "twitter": "Twitter",
+    "Sponsor": "Sponsor"
+  },
+  "specialthanks": {
+    "Title": "Özel Teşekkürler",
+    "Note1": "Bu proje, bazı hevesli bireylerin ve kuruluşların desteği ve yardımı olmadan, ayrıca ilham veren veya kodlarını açık kaynak olarak paylaşanlar olmadan tamamlanamazdı. Onlara çok teşekkürler:"
+  },
+  "changelog": {
+    "Title": "Değişiklik Günlüğü",
+    "add": "Eklendi",
+    "improve": "Geliştirildi",
+    "fix": "Düzeltildi",
+    "versions": [
+      {
+        "version": "v1.0",
+        "date": "Kas 06, 2020",
+        "content": [
+          {
+            "type": "add",
+            "change": "Kullanıcının IP bilgilerini görüntüleme"
+          },
+          {
+            "type": "add",
+            "change": "Proxy öncesi ve sonrası IP bilgilerini görüntüleme"
+          },
+          {
+            "type": "add",
+            "change": "Web sitesi kullanılabilirliğini kontrol etme"
+          }
+        ]
+      },
+      {
+        "version": "v2.0",
+        "date": "Kas 24, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Tüm proje Vue2 kullanılarak yeniden yazıldı"
+          },
+          {
+            "type": "improve",
+            "change": "UI Bootstrap v5 kullanılarak yeniden düzenlendi"
+          }
+        ]
+      },
+      {
+        "version": "v2.1",
+        "date": "Kas 25, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "WebRTC testi eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Program mantığı optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v2.2",
+        "date": "Kas 26, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "DNS sızıntı testi eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Ön yüzde Bing haritalarını görüntüleme desteği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Çoklu mantık optimizasyonları"
+          }
+        ]
+      },
+      {
+        "version": "v2.3",
+        "date": "Kas 27, 2023 ",
+        "content": [
+          {
+            "type": "add",
+            "change": "Karanlık mod eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Mobil için minimalist mod eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Dosya yapısı optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v2.4",
+        "date": "Ara 1, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "İngilizce dil desteği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Bilgi gizleme özelliği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "PWA desteği, mobil ve masaüstüne kurulabilir"
+          }
+        ]
+      },
+      {
+        "version": "v2.5",
+        "date": "Ara 20, 2023",
+        "content": [
+          {
+            "type": "add",
+            "change": "Klavye kısayolları desteği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Web sitesi hız testi özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Docker kullanarak dağıtım desteği"
+          },
+          {
+            "type": "improve",
+            "change": "Birden fazla kaynaktan IP coğrafi konum bilgisi alma desteği"
+          }
+        ]
+      },
+      {
+        "version": "v3.0",
+        "date": "Oca 28, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Tüm proje Vite + Vue3 kullanılarak yeniden yazıldı"
+          },
+          {
+            "type": "add",
+            "change": "Global gecikme testi özelliği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "MTR testi özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Çoklu performans ve kullanıcı deneyimi optimizasyonları"
+          }
+        ]
+      },
+      {
+        "version": "v3.1",
+        "date": "Oca 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Yeni bir dil desteği eklendi: Fransızca"
+          },
+          {
+            "type": "add",
+            "change": "Yükleme animasyonu eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Önbellekleme stratejisi optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "Karanlık mod stilleri ayarlandı"
+          },
+          {
+            "type": "fix",
+            "change": "Bazı küçük sorunlar düzeltildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.2",
+        "date": "Şub 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "NAT türü tespiti eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "PWA uygulama deneyimi optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "Arka uç komut dosyası güvenliği artırıldı"
+          }
+        ]
+      },
+      {
+        "version": "v3.3",
+        "date": "Şub 6, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Farklı IP coğrafi konum kaynaklarını kullanma desteği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Bağlantı kullanılabilirlik tespiti için kullanıcı deneyimi iyileştirildi"
+          },
+          {
+            "type": "improve",
+            "change": "UI deneyimi optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.4",
+        "date": "Şub 17, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "ASN detayları görüntüleyici eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Proxy tespiti özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "IP bilgilerini görüntüleme arayüzü optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.5",
+        "date": "Mar 3, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Kural testi özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Bazı İyileştirmeler"
+          }
+        ]
+      },
+      {
+        "version": "v3.6",
+        "date": "Mar 10, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "DNS çözümlemesi özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Ana sayfa yapısı optimize edildi, gelişmiş özellikler artık daraltılabilir"
+          },
+          {
+            "type": "improve",
+            "change": "Program mantığı optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.7",
+        "date": "Nis 26, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Sansür testi özelliği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Ağ hız testi artık özel paket boyutuna izin veriyor"
+          },
+          {
+            "type": "improve",
+            "change": "Bazı fonksiyonel mantıklar optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.8",
+        "date": "May 4, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Ayarları yerel olarak kaydetmek için tercihler paneli eklendi"
+          },
+          {
+            "type": "add",
+            "change": "İkinci program açılışında birden fazla varsayılan davranışı özelleştirmeye izin ver"
+          },
+          {
+            "type": "improve",
+            "change": "Program mantığı önemli ölçüde optimize edildi"
+          },
+          {
+            "type": "fix",
+            "change": "Bazı küçük sorunlar düzeltildi"
+          }
+        ]
+      },
+      {
+        "version": "v3.9",
+        "date": "May 8, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Whois arama özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Gelişmiş araçlar için görüntüleme ve animasyon efektleri optimize edildi"
+          },
+          {
+            "type": "fix",
+            "change": "Bazı küçük sorunlar düzeltildi"
+          }
+        ]
+      },
+      {
+        "version": "v4.0",
+        "date": "May 13, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Tüm proje Vue 3'ün Composition API'si kullanılarak yeniden yazıldı"
+          },
+          {
+            "type": "add",
+            "change": "Bakım kolaylığını artırmak için ön yüz birden fazla modüle bölündü"
+          },
+          {
+            "type": "add",
+            "change": "Görünmezlik Testi özelliği eklendi (Beta)"
+          },
+          {
+            "type": "improve",
+            "change": "Arka uç program bağımlılıkları optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "Çok sayıda detay optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v4.1",
+        "date": "Tem 11, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "MAC adresi arama özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Çok sayıda detay optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v4.2",
+        "date": "Eyl 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Tarayıcı bilgisi sorgulama özelliği eklendi"
+          },
+          {
+            "type": "add",
+            "change": "MaxMind GeoIP veritabanı eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Çoklu deneyim geliştirmeleri"
+          }
+        ]
+      },
+      {
+        "version": "v4.3",
+        "date": "Eki 30, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Komut satırı API özelliği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "WebRTC testi artık bölgesel bilgileri görüntüleyebiliyor"
+          },
+          {
+            "type": "improve",
+            "change": "DNS sızıntı testi artık bölgesel bilgileri görüntüleyebiliyor"
+          }
+        ]
+      },
+      {
+        "version": "v4.4",
+        "date": "Ara 7, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Dil tercihleri"
+          },
+          {
+            "type": "improve",
+            "change": "Harita sağlayıcısı Google olarak değiştirildi"
+          },
+          {
+            "type": "improve",
+            "change": "Diğer genel optimizasyonlar"
+          }
+        ]
+      },
+      {
+        "version": "v4.5",
+        "date": "Ara 25, 2024",
+        "content": [
+          {
+            "type": "add",
+            "change": "Güvenlik Kontrol Listesi Eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Diğer genel optimizasyonlar"
+          }
+        ]
+      },
+      {
+        "version": "v5.0",
+        "date": "Oca 31, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "Kullanıcı sistemi eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Kullanıcı başarı sistemi eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Lite sürümü eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Hız testi artık veri değişim grafiklerini görüntüleyebiliyor"
+          },
+          {
+            "type": "improve",
+            "change": "Kod verimliliği optimizasyonu"
+          }
+        ]
+      }
+    ]
+  }
+}
