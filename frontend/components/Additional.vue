@@ -4,7 +4,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
                 <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}</h5>
+                    <h5 class="modal-title" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}
+                    </h5>
                     <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -14,13 +15,14 @@
                         <span class="jn-comment"><span class="text-secondary">{{t('curl.Note1')}}</span></span>
                         <span class="jn-comment"><span class="text-secondary">{{t('curl.Note2_1')}} <span class="text-success">curl</span> {{t('curl.Note2_2')}}</span></span>
                         <span class="text-secondary jn-comment"><span class="text-success">geo</span> {{t('curl.Note3')}}</span>
+                        <span class="text-secondary jn-comment"><span class="text-success">YOUR_API_KEY</span> {{t('curl.Note4')}}</span>
                         <span>&nbsp;</span>
                         <span class="jn-comment"><span class="text-secondary">{{t('curl.getIPv4')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv4Domain}}<span class="text-success">/geo</span></span></span>
+                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv4Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
                         <span class="jn-comment"><span class="text-secondary">{{t('curl.getIPv6')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv6Domain}}<span class="text-success">/geo</span></span></span>
+                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv6Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
                         <span class="jn-comment"><span class="text-secondary">{{t('curl.get6and4')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv64Domain}}<span class="text-success">/geo</span></span></span>
+                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv64Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
                     </code>
                 </div>
                 <div v-else class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
@@ -46,9 +48,8 @@
             </div>
 
             <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <img type="button" data-bs-toggle="modal" @click="openCurlModal"
-                    src="/additional/curl.webp" alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']"
-                    :height="[isMobile ? '39' : '65']">
+                <img type="button" data-bs-toggle="modal" @click="openCurlModal" src="/additional/curl.webp"
+                    alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']" :height="[isMobile ? '39' : '65']">
             </div>
 
             <div :class="[isMobile ? 'mx-1' : 'mx-3']">
