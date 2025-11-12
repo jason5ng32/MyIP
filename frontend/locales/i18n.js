@@ -4,12 +4,14 @@ import { createI18n } from 'vue-i18n';
 import en from './en.json';
 import zh from './zh.json';
 import fr from './fr.json';
+import tr from './tr.json';
 import enSecurity from './security-checklist/en.json';
 import zhSecurity from './security-checklist/zh.json';
 import frSecurity from './security-checklist/fr.json';
+import trSecurity from './security-checklist/tr.json';
 
 
-const messages = { en, zh, fr };
+const messages = { en, zh, fr, tr };
 const supportedLanguages = Object.keys(messages);
 
 // 引入安全检查清单
@@ -17,6 +19,7 @@ function mergeMessagesSync() {
   messages.en = { ...messages.en, securitychecklistdata: enSecurity };
   messages.zh = { ...messages.zh, securitychecklistdata: zhSecurity };
   messages.fr = { ...messages.fr, securitychecklistdata: frSecurity };
+  messages.tr = { ...messages.tr, securitychecklistdata: trSecurity };
 }
 
 // 设置语言
