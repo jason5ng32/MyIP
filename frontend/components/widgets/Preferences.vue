@@ -18,7 +18,7 @@
                 <div class="form-label col-12 preferences-title"><i class="bi bi-translate"></i> {{
                     t('nav.preferences.language') }}</div>
                 <div class="btn-group-vertical col-auto w-50 mb-2" role="group" aria-label="Color Scheme">
-                    <template v-for="lang in ['auto','zh', 'en', 'fr']">
+                    <template v-for="lang in ['auto','zh', 'en', 'fr','tr']">
                         <input type="radio" class="btn-check" :name="'language' + lang" :id="'language' + lang"
                             autocomplete="off" :value="lang" v-model="userPreferences.lang"
                             @change="prefLanguage(lang)">
@@ -30,6 +30,7 @@
                             <span v-if="lang === 'zh'"><i class="fi fi-cn"></i> 中文&nbsp;</span>
                             <span v-else-if="lang === 'en'"><i class="fi fi-us"></i> English&nbsp;</span>
                             <span v-else-if="lang === 'fr'"><i class="fi fi-fr"></i> Français&nbsp;</span>
+                            <span v-else-if="lang === 'tr'"><i class="fi fi-tr"></i> Türkçe&nbsp;</span>
                             <span v-else>{{ t('nav.preferences.systemAuto') }}&nbsp;</span>
                             <i class="bi bi-check2-circle" v-if="userPreferences.lang === lang"></i>
                         </label>

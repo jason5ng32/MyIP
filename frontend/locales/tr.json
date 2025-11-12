@@ -206,6 +206,7 @@
     "Note2_1": "kullanabilirsiniz",
     "Note2_2": "komutuyla, makinenizin IP adresini terminalde alın",
     "Note3": "isteğe bağlı bir yoldur, eklenmesi IP'nin coğrafi bilgilerini alacaktır",
+    "Note4": "lütfen IPCheck.ing API anahtarınızı kullanın",
     "getIPv4": "Yerel makinenin IPv4 adresini alın",
     "getIPv6": "Yerel makinenin IPv6 adresini alın",
     "get6and4": "Yerel makinenin tercih edilen ağ çıkış IP adresini alın",
