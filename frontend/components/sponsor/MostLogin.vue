@@ -29,9 +29,9 @@ const selectSponsorPicture = computed(() => {
   }
 
   if (isMobile.value) {
-    device = 'mo';
+    device = 'mobile';
   } else {
-    device = 'pc';
+    device = 'desktop';
   }
 
   return `${basePath}${picLang}_${device}.png`;
