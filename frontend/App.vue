@@ -9,6 +9,7 @@
       data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
       <IPCheck ref="IPCheckRef" />
       <MostLogin ref="mostLoginRef" />
+      <ThorData ref="thorDataRef" />
       <Connectivity ref="connectivityRef" />
       <WebRTC ref="webRTCRef" />
       <DNSLeaks ref="dnsLeaksRef" />
@@ -32,6 +33,7 @@
 import NavBar from './components/Nav.vue';
 import IPCheck from './components/IpInfos.vue';
 import MostLogin from './components/sponsor/MostLogin.vue';
+import ThorData from './components/sponsor/ThorData.vue';
 import Connectivity from './components/ConnectivityTest.vue';
 import WebRTC from './components/WebRtcTest.vue';
 import DNSLeaks from './components/DnsLeaksTest.vue';
@@ -84,6 +86,7 @@ const speedTestRef = ref(null);
 const advancedToolsRef = ref(null);
 const IPCheckRef = ref(null);
 const mostLoginRef = ref(null);
+const thorDataRef = ref(null);
 const connectivityRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
