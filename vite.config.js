@@ -23,8 +23,8 @@ export default defineConfig({
       injectRegister: 'auto',
       workbox: {
         globPatterns: [
-          '**/*.{js,css,html,woff,woff2}',
-          '*.{js,css,html,png,svg,jpg,webp}',
+          '**/*.{js,css,woff,woff2}',
+          '*.{js,css,png,svg,jpg,webp}',
         ],
         runtimeCaching: [
           {
@@ -60,17 +60,6 @@ export default defineConfig({
               },
             },
           },
-          {
-            urlPattern: /\/$/, // HTML
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'html',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 3 * 24 * 60 * 60, // 3 天
-              },
-            },
-          }
         ]
       },
       manifest: {
