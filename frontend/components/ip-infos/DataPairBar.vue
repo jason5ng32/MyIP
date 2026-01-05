@@ -10,14 +10,18 @@
         </div>
 
         <!-- 文字标签 -->
-        <div class="labels-container">
-            <span class="fw-normal fs-7">
-                {{ t('ipInfos.ASNInfo.' + leftLabel) }}
-                {{ leftValue }}%
+        <div class="labels-container fs-7">
+            <span class="d-flex align-items-center">
+                <span class="fw-light badge rounded-pill border me-1"
+                    :class="isDarkMode ? 'text-bg-dark' : 'text-bg-light'">{{ t('ipInfos.ASNInfo.' + leftLabel)
+                    }}</span>
+                <span class="fw-bold">{{ leftValue }}%</span>
             </span>
-            <span class="fw-normal fs-7">
-                {{ t('ipInfos.ASNInfo.' + rightLabel) }}
-                {{ rightValue }}%
+            <span class="d-flex align-items-center">
+                <span class="fw-light badge rounded-pill border me-1"
+                    :class="isDarkMode ? 'text-bg-dark' : 'text-bg-light'">{{ t('ipInfos.ASNInfo.' + rightLabel)
+                    }}</span>
+                <span class="fw-bold">{{ rightValue }}%</span>
             </span>
         </div>
     </div>
@@ -54,7 +58,7 @@ const { t } = useI18n();
 
 <style scoped>
 .data-pair-bar-wrapper {
-    margin: 10px 0;
+    margin: 14px 0;
 }
 
 .bar-left {
@@ -81,7 +85,7 @@ const { t } = useI18n();
 .labels-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 6px;
+    margin-top: 2px;
 }
 
 .label-item {
