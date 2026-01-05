@@ -195,4 +195,4 @@ As a open source project, I'm very grateful to the following sponsors for their 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://cf-assets.www.cloudflare.com/zkvhlag99gkb/69RwBidpiEHCDZ9rFVVk7T/092507edbed698420b89658e5a6d5105/CF_logo_stacked_blktype.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" height="60px" /></a>
 
 
-<a href="https://dashboard.thordata.com/register?invitation_code=XS193IM5"><img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/thordata/thordata_en.png" alt="ThorData" title="ThorData" height="60px" /></a>
+<a href="https://dashboard.thordata.com/register?invitation_code=XS193IM5"><img src="https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/thordata/thordata_en.jpg" alt="ThorData" title="ThorData" height="140px" /></a>

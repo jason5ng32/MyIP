@@ -148,10 +148,10 @@
                         </span>
 
                         <span v-if="card.qualityScore !== 'unknown' && card.qualityScore !== 'sign_in_required'"
-                            class="col-3 jn-ip-score ">
-                            <span class="progress border" :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
-                                role="progressbar" aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0"
-                                aria-valuemax="100">
+                            class="col-5 jn-ip-score ">
+                            <span class="progress border jn-ip-score-progress"
+                                :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']" role="progressbar"
+                                aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
                                     :style='"width:" + card.qualityScore +"%"'></span>
                             </span>
@@ -161,7 +161,7 @@
                             <span v-if="card.qualityScore === 'unknown'">
                                 {{ t('ipInfos.qualityScoreUnknown') }}
                             </span>
-                            <span v-else>{{ card.qualityScore }}% <i v-if="!isMobile"
+                            <span v-else>{{ card.qualityScore }}/100 <i v-if="!isMobile"
                                     v-tooltip="t('Tooltips.qualityScoreExplain')"
                                     class="bi bi-question-circle"></i></span>
                         </span>
@@ -177,11 +177,14 @@
                             <i class="bi bi-buildings"></i>
                             {{ t('ipInfos.ASN') }} :&nbsp;
                         </span>
+                        <!-- 确保图表在最右侧-->
                         <span v-if="card.asnlink" class="col-9">
                             {{ card.asn }}
-                            <i v-if="configs.cloudFlare" class="bi bi-info-circle" @click="getASNInfo(card.asn)"
-                                data-bs-toggle="collapse" :data-bs-target="'#' + 'collapseASNInfo-' + index"
-                                aria-expanded="false" :aria-controls="'collapseASNInfo-' + index" role="button"
+                            <i v-if="configs.cloudFlare" class="bi"
+                                :class="collapseStates[index] ? 'bi-caret-up-square' : 'bi-caret-down-square'"
+                                @click="toggleASNCollapse(card.asn, index)" data-bs-toggle="collapse"
+                                :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
+                                :aria-controls="'collapseASNInfo-' + index" role="button"
                                 :aria-label="'Display AS Info of' + card.asn"
                                 v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }">
                             </i>
@@ -214,6 +217,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isValidIP } from '@/utils/valid-ip.js';
 import ASNInfo from './ASNInfo.vue';
@@ -223,6 +227,9 @@ import { trackEvent } from '@/utils/use-analytics';
 const { t } = useI18n();
 
 const placeholderSizes = [12, 8, 6, 8, 4];
+
+// 追踪每个卡片的 collapse 状态
+const collapseStates = ref({});
 
 const props = defineProps({
     card: {
@@ -282,6 +289,17 @@ const copyToClipboard = (ip, id) => {
     });
 };
 
+// 切换 ASN collapse 并获取信息
+const toggleASNCollapse = async (asn, index) => {
+    // 切换状态
+    collapseStates.value[index] = !collapseStates.value[index];
+
+    // 如果是打开状态，获取 ASN 信息
+    if (collapseStates.value[index]) {
+        await getASNInfo(asn);
+    }
+};
+
 // 从后端 API 获取 ASN 信息
 const getASNInfo = async (asn) => {
     trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
@@ -335,5 +353,10 @@ const getASNInfo = async (asn) => {
     justify-content: space-evenly;
     align-items: center;
     flex-direction: column;
+}
+
+.jn-ip-score-progress {
+    height: 16px;
+    border-radius: 8px;
 }
 </style>

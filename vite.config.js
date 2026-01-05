@@ -26,7 +26,23 @@ export default defineConfig({
           '**/*.{js,css,woff,woff2}',
           '*.{js,css,png,svg,jpg,webp}',
         ],
+        navigateFallback: null, // 禁用默认 navigateFallback，使用自定义 HTML 缓存策略
         runtimeCaching: [
+          {
+            urlPattern: ({ request, url }) => {
+              // 匹配 HTML 文档请求（导航请求）
+              return request.mode === 'navigate' || url.pathname.endsWith('.html');
+            },
+            handler: 'NetworkFirst', // 优先从网络获取最新版本
+            options: {
+              cacheName: 'html-cache',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60, // 1 小时，较短的缓存时间
+              },
+              networkTimeoutSeconds: 3, // 3秒网络超时后使用缓存
+            },
+          },
           {
             urlPattern: /\/(sw\.js|registerSW\.js|manifest\.webmanifest)$/, // sw 文件
             handler: 'NetworkFirst',
