@@ -1,4 +1,5 @@
 import { isValidIP } from '@/utils/valid-ip.js';
+import { getIPFromMyExternalIP_V4 } from "./myexternalip-v4";
 
 // 从 Cloudflare 获取 IPv4 地址
 const getIPFromCloudflare_V4 = async () => {
@@ -26,11 +27,13 @@ const getIPFromCloudflare_V4 = async () => {
         }
     } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
-        return {
-            ip: null,
-            source: "Cloudflare IPv4"
-        };
     }
+    // 故障转移
+    const { ip, source } = await getIPFromMyExternalIP_V4();
+    return {
+        ip: ip,
+        source: source
+    };
 };
 
 export { getIPFromCloudflare_V4 };
