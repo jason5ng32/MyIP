@@ -310,6 +310,11 @@
         "negative": "IP'niz VPN çıkış düğümü listesinde değil."
       }
     },
+    "tor": {
+      "title": "TOR Çıkış Düğümü",
+      "positive": "IP'niz TOR çıkış düğümü listesinde.",
+      "negative": "IP'niz TOR çıkış düğümü listesinde değil."
+    },
     "headers": {
       "title": "HTTP Başlıkları",
       "positive": "HTTP başlıklarınız proxy bilgisi içeriyor, bu da bir proxy kullanıyor olabileceğinizi gösterir.",

@@ -310,6 +310,11 @@
         "negative": "Your IP is not in the VPN exit node list."
       }
     },
+    "tor": {
+      "title": "TOR Exit Node",
+      "positive": "Your IP is in the TOR exit node list.",
+      "negative": "Your IP is not in the TOR exit node list."
+    },
     "headers": {
       "title": "HTTP Headers",
       "positive": "Your HTTP headers contain proxy information, indicating that you may be using a proxy.",

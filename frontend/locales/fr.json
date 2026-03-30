@@ -290,6 +290,11 @@
                 "negative": "Votre IP n'est pas dans la liste des nœuds de sortie VPN."
             }
         },
+        "tor": {
+            "title": "Noeud de Sortie TOR",
+            "positive": "Votre IP est dans la liste des noeuds de sortie TOR.",
+            "negative": "Votre IP n'est pas dans la liste des noeuds de sortie TOR."
+        },
         "headers": {
             "title": "En-têtes HTTP",
             "positive": "Vos en-têtes HTTP contiennent des informations de proxy, indiquant que vous utilisez peut-être un proxy.",

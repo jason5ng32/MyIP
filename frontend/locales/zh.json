@@ -290,6 +290,11 @@
         "negative": "你的 IP 不在 VPN 出口节点名单中。"
       }
     },
+    "tor": {
+      "title": "TOR 出口节点",
+      "positive": "你的 IP 在 TOR 出口节点中。",
+      "negative": "你的 IP 不在 TOR 出口名单中。"
+    },
     "headers": {
       "title": "HTTP 头信息",
       "positive": "你的 HTTP 头信息中包含了代理信息，你可能正在使用代理。",

@@ -103,8 +103,7 @@
                                                     :class="(testResults.datacenter.is_datacenter) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
                                             </td>
                                             <td>
-                                                <span class="opacity-75"
-                                                    v-if="(testResults.datacenter.is_datacenter)">
+                                                <span class="opacity-75" v-if="(testResults.datacenter.is_datacenter)">
                                                     {{ t('invisibilitytest.datacenter.positive') }}
                                                 </span>
                                                 <span class="opacity-75" v-else>{{
@@ -159,6 +158,22 @@
                                                     t('invisibilitytest.blocklist.vpnExitNode.positive') }}</span>
                                                 <span class="opacity-75" v-else>{{
                                                     t('invisibilitytest.blocklist.vpnExitNode.negative') }}</span>
+                                            </td>
+                                        </tr>
+
+                                        <!--IP 是否在 TOR 黑名单-->
+                                        <tr>
+                                            <td class="jn-table-col">{{
+                                                t('invisibilitytest.tor.title') }}</td>
+                                            <td>
+                                                <i class="bi"
+                                                    :class="(testResults.tor_detection.proxy || testResults.tor_detection.vpn) ? 'bi-x-circle-fill text-danger' : 'bi-check-circle-fill text-success'"></i>
+                                            </td>
+                                            <td>
+                                                <span class="opacity-75" v-if="(testResults.tor_detection.proxy || testResults.tor_detection.vpn)">{{
+                                                    t('invisibilitytest.tor.positive') }}</span>
+                                                <span class="opacity-75" v-else>{{
+                                                    t('invisibilitytest.tor.negative') }}</span>
                                             </td>
                                         </tr>
 
@@ -407,7 +422,7 @@ const getResult = async () => {
         const data = response;
 
         // 检查并重试
-        if (data.message === "Data not found" && retryCount.value < 3) {
+        if ((data.message === "Data not found" || data.status === "pending") && retryCount.value < 3) {
             setTimeout(() => {
                 getResult();
                 retryCount.value++
