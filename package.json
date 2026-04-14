@@ -21,7 +21,6 @@
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
     "circle-progress.vue": "^3.4.1",
-    "code-inspector-plugin": "^1.5.1",
     "concurrently": "^9.2.1",
     "country-code-lookup": "^0.1.5",
     "detect-gpu": "^5.0.70",
@@ -33,7 +32,6 @@
     "flag-icons": "^7.5.0",
     "http-proxy-middleware": "^3.0.5",
     "maxmind": "^5.0.6",
-    "nodemon": "^3.1.14",
     "pinia": "^3.0.4",
     "svgmap": "2.19.3",
     "tar": "^7.5.13",
@@ -47,6 +45,8 @@
   "devDependencies": {
     "@serwist/vite": "^9.5.7",
     "@vitejs/plugin-vue": "^6.0.6",
+    "code-inspector-plugin": "^1.5.1",
+    "nodemon": "^3.1.14",
     "serwist": "^9.5.7",
     "vite": "^8.0.8"
   }
