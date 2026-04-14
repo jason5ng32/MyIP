@@ -1,0 +1,30 @@
+{
+  "name": "IPCheck.ing",
+  "short_name": "IPCheck.ing",
+  "description": "All in one IP Toolbox",
+  "id": "com.jasonng.myip",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#f8f9fa",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logos/logo-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logos/ios-logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logos/ios-logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

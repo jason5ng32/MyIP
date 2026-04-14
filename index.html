@@ -12,6 +12,7 @@
   <meta name="theme-color" content="#f8f9fa">
   <meta name="background-color" content="#ffffff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="logos/ios-logo-512.png">
   <title>IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test -
     Ping/MTR Test - Jason Ng Open Source </title>
@@ -19,6 +20,12 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <script>
+    window.ipcheckInstallPromptEvent = null;
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      window.ipcheckInstallPromptEvent = event;
+    });
+
     setTimeout(() => {
       document.getElementById('waiting-too-long').innerHTML = `
         <p>Waiting too long? Try to use <a href="https://lite.ipcheck.ing/">IPCheck.ing Lite</a>.<p>
