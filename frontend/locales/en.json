@@ -1157,7 +1157,21 @@
       },
       {
         "version": "v5.1",
-        "date": "Apr 14, 2026",
+        "date": "Nov 12, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "Added support for Turkish language"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized code efficiency"
+          }
+        ]
+      },
+      {
+        "version": "v5.2",
+        "date": "Jan 05, 2026",
         "content": [
           {
             "type": "add",
@@ -1165,15 +1179,21 @@
           },
           {
             "type": "add",
-            "change": "MaxMind GeoIP database auto-update"
+            "change": "Added IP quality score display"
           },
           {
-            "type": "add",
-            "change": "IP quality score display"
-          },
+            "type": "improve",
+            "change": "Optimized code efficiency"
+          }
+        ]
+      },
+      {
+        "version": "v5.3",
+        "date": "Apr 14, 2026",
+        "content": [
           {
             "type": "add",
-            "change": "Added support for Turkish language"
+            "change": "Added MaxMind GeoIP database auto-update"
           },
           {
             "type": "improve",
@@ -1181,11 +1201,7 @@
           },
           {
             "type": "improve",
-            "change": "Optimized IP query logic"
-          },
-          {
-            "type": "improve",
-            "change": "Code efficiency optimization, build speed greatly improved"
+            "change": "Significantly improved build speed"
           }
         ]
       }
