@@ -29,3 +29,8 @@ package-lock.json
 localtest
 
 .VSCodeCounter
+
+common/maxmind-db/.maxmind-update-*.json
+common/maxmind-db/.maxmind-update.lock
+common/maxmind-db/*.bak
+common/maxmind-db/*.next

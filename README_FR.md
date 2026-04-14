@@ -107,6 +107,9 @@ Vous pouvez utiliser le programme sans ajouter de variables d'environnement, mai
 | `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
 | `IPAPIIS_API_KEY` | Non | `""` | Clé API pour IPAPI.is, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IPAPI.is |
 | `IP2LOCATION_API_KEY` | Non | `""` | Clé API pour IP2Location.io, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IP2Location.io |
+| `MAXMIND_ACCOUNT_ID` | Non | `""` | ID de compte MaxMind utilisé avec `MAXMIND_LICENSE_KEY` pour télécharger les bases GeoLite2 |
+| `MAXMIND_LICENSE_KEY` | Non | `""` | Clé de licence MaxMind utilisée pour télécharger les bases GeoLite2 |
+| `MAXMIND_AUTO_UPDATE` | Non | `"false"` | Définissez sur `"true"` pour activer les mises à jour automatiques des bases GeoLite2 lorsque les identifiants MaxMind sont configurés |
 | `CLOUDFLARE_API` | Non | `""` | Clé API pour Cloudflare, utilisée pour obtenir des informations sur le système AS via Cloudflare |
 | `MAC_LOOKUP_API_KEY` | Non | `""` | Clé API pour MAC Lookup, utilisée pour obtenir des informations sur l'adresse MAC via MAC Lookup |
 | `IPCHECKING_API_ENDPOINT` | **Oui** | `""` | URL de l'API IPCheck.ing |

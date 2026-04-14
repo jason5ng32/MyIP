@@ -46,6 +46,7 @@ const showPWA = () => {
 
     pwaInstall.isAppleMobilePlatform = isIosSafari.value;
     pwaInstall.isAppleDesktopPlatform = isMacSafari.value;
+    pwaInstall.externalPromptEvent = window.ipcheckInstallPromptEvent || pwaInstall.externalPromptEvent;
 
     if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
         pwaInstall.showDialog(true);
@@ -62,6 +63,17 @@ const showPWA = () => {
 
 onMounted(() => {
     getBrowser();
+    const pwaInstall = document.getElementsByTagName('pwa-install')[0];
+    if (pwaInstall && window.ipcheckInstallPromptEvent) {
+        pwaInstall.externalPromptEvent = window.ipcheckInstallPromptEvent;
+    }
+
+    window.addEventListener('beforeinstallprompt', event => {
+        if (pwaInstall) {
+            pwaInstall.externalPromptEvent = event;
+        }
+    });
+
     if (popupCount() < 2) {
         setTimeout(() => {
             showPWA();

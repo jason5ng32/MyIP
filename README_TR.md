@@ -107,6 +107,9 @@ Programı ortam değişkeni eklemeden kullanabilirsiniz, ancak bazı gelişmiş 
 | `IPINFO_API_TOKEN` | Hayır | `""` | IPInfo.io API token'ı, IP konum bilgisi almak için |
 | `IPAPIIS_API_KEY` | Hayır | `""` | IPAPI.is API anahtarı, IP konum bilgisi almak için |
 | `IP2LOCATION_API_KEY` | Hayır | `""` | IP2Location.io API anahtarı, IP konum bilgisi almak için |
+| `MAXMIND_ACCOUNT_ID` | Hayır | `""` | GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile kullanılan MaxMind hesap ID'si |
+| `MAXMIND_LICENSE_KEY` | Hayır | `""` | GeoLite2 veritabanlarını indirmek için kullanılan MaxMind lisans anahtarı |
+| `MAXMIND_AUTO_UPDATE` | Hayır | `"false"` | MaxMind kimlik bilgileri yapılandırıldığında otomatik GeoLite2 veritabanı güncellemelerini etkinleştirmek için `"true"` yapın |
 | `CLOUDFLARE_API` | Hayır | `""` | Cloudflare API anahtarı, AS sistemi bilgisi almak için |
 | `MAC_LOOKUP_API_KEY` | Hayır | `""` | MAC Lookup API anahtarı, MAC adresi bilgisi almak için |
 | `IPCHECKING_API_ENDPOINT` | **Evet** | `""` | IPCheck.ing API uç noktası |

@@ -107,6 +107,9 @@ You can use the program without adding any environment variables, but if you wan
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
 | `IP2LOCATION_API_KEY` | No | `""` | API Key for IP2Location.io, used to obtain IP geolocation information through IP2Location.io |
+| `MAXMIND_ACCOUNT_ID` | No | `""` | MaxMind account ID used with `MAXMIND_LICENSE_KEY` to download GeoLite2 databases |
+| `MAXMIND_LICENSE_KEY` | No | `""` | MaxMind license key used to download GeoLite2 databases |
+| `MAXMIND_AUTO_UPDATE` | No | `"false"` | Set to `"true"` to enable automatic GeoLite2 database updates when MaxMind credentials are configured |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
 | `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |

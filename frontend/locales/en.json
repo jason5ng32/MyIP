@@ -310,6 +310,11 @@
         "negative": "Your IP is not in the VPN exit node list."
       }
     },
+    "tor": {
+      "title": "TOR Exit Node",
+      "positive": "Your IP is in the TOR exit node list.",
+      "negative": "Your IP is not in the TOR exit node list."
+    },
     "headers": {
       "title": "HTTP Headers",
       "positive": "Your HTTP headers contain proxy information, indicating that you may be using a proxy.",
@@ -1147,6 +1152,40 @@
           {
             "type": "improve",
             "change": "Code efficiency optimization"
+          }
+        ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "Enhanced ASN information richness"
+          },
+          {
+            "type": "add",
+            "change": "MaxMind GeoIP database auto-update"
+          },
+          {
+            "type": "add",
+            "change": "IP quality score display"
+          },
+          {
+            "type": "add",
+            "change": "Added support for Turkish language"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized caching strategy"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized IP query logic"
+          },
+          {
+            "type": "improve",
+            "change": "Code efficiency optimization, build speed greatly improved"
           }
         ]
       }

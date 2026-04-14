@@ -310,6 +310,11 @@
         "negative": "IP'niz VPN çıkış düğümü listesinde değil."
       }
     },
+    "tor": {
+      "title": "TOR Çıkış Düğümü",
+      "positive": "IP'niz TOR çıkış düğümü listesinde.",
+      "negative": "IP'niz TOR çıkış düğümü listesinde değil."
+    },
     "headers": {
       "title": "HTTP Başlıkları",
       "positive": "HTTP başlıklarınız proxy bilgisi içeriyor, bu da bir proxy kullanıyor olabileceğinizi gösterir.",
@@ -1146,6 +1151,40 @@
           {
             "type": "improve",
             "change": "Kod verimliliği optimizasyonu"
+          }
+        ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "ASN bilgilerinin zenginliği artırıldı"
+          },
+          {
+            "type": "add",
+            "change": "MaxMind GeoIP veritabanı otomatik güncelleme"
+          },
+          {
+            "type": "add",
+            "change": "IP kalite puanı görüntüleme"
+          },
+          {
+            "type": "add",
+            "change": "Türkçe dil desteği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Önbellek stratejisi optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "IP sorgulama mantığı optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "Kod verimliliği optimize edildi, yapı hızı büyük ölçüde artırıldı"
           }
         ]
       }

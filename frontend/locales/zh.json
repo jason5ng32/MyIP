@@ -290,6 +290,11 @@
         "negative": "你的 IP 不在 VPN 出口节点名单中。"
       }
     },
+    "tor": {
+      "title": "TOR 出口节点",
+      "positive": "你的 IP 在 TOR 出口节点中。",
+      "negative": "你的 IP 不在 TOR 出口名单中。"
+    },
     "headers": {
       "title": "HTTP 头信息",
       "positive": "你的 HTTP 头信息中包含了代理信息，你可能正在使用代理。",
@@ -1149,6 +1154,40 @@
           {
             "type": "improve",
             "change": "代码效率优化"
+          }
+        ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "提升 ASN 信息的丰富性"
+          },
+          {
+            "type": "add",
+            "change": "MaxMind 地理数据库自动更新"
+          },
+          {
+            "type": "add",
+            "change": "IP 质量分数显示"
+          },
+          {
+            "type": "add",
+            "change": "支持土耳其语"
+          },
+          {
+            "type": "improve",
+            "change": "优化缓存策略"
+          },
+          {
+            "type": "improve",
+            "change": "优化 IP 查询的逻辑"
+          },
+          {
+            "type": "improve",
+            "change": "代码效率优化，构建速度大大提高"
           }
         ]
       }

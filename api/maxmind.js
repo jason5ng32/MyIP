@@ -1,16 +1,6 @@
-import maxmind from 'maxmind';
 import { isValidIP } from '../common/valid-ip.js';
 import { refererCheck } from '../common/referer-check.js';
-
-let cityLookup, asnLookup;
-
-// 异步初始化数据库
-async function initDatabases() {
-    cityLookup = await maxmind.open('./common/maxmind-db/GeoLite2-City.mmdb');
-    asnLookup = await maxmind.open('./common/maxmind-db/GeoLite2-ASN.mmdb');
-}
-
-initDatabases();
+import { lookupMaxMind } from '../common/maxmind-service.js';
 
 export default (req, res) => {
 
@@ -31,31 +21,12 @@ export default (req, res) => {
     }
 
     // 获取请求语言
-    const lang = req.query.lang === 'zh-CN' || req.query.lang === 'en' || req.query.lang === 'fr' ? req.query.lang : 'en';
+    const supportedLanguages = ['zh-CN', 'en', 'fr', 'tr'];
+    const lang = supportedLanguages.includes(req.query.lang) ? req.query.lang : 'en';
 
     try {
-        const city = cityLookup.get(ip);
-        const asn = asnLookup.get(ip);
-        let result = modifyJson(ip, lang, city, asn);
-        res.json(result);
+        res.json(lookupMaxMind(ip, lang));
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        res.status(e.statusCode || 500).json({ error: e.message });
     }
 }
-
-function modifyJson(ip, lang, city, asn) {
-    city = city || {};
-    asn = asn || {};
-    return {
-        ip,
-        city: city.city ? city.city.names[lang] || city.city.names.en : "N/A",
-        region: city.subdivisions ? city.subdivisions[0].names[lang] || city.subdivisions[0].names.en : "N/A",
-        country: city.country ? city.country.iso_code : "N/A",
-        country_name: city.country ? city.country.names[lang] : "N/A",
-        country_code: city.country ? city.country.iso_code : "N/A",
-        latitude: city.location ? city.location.latitude : "N/A",
-        longitude: city.location ? city.location.longitude : "N/A",
-        asn: asn.autonomous_system_number ? "AS" + asn.autonomous_system_number : "N/A",
-        org: asn.autonomous_system_organization ? asn.autonomous_system_organization : "N/A"
-    };
-};

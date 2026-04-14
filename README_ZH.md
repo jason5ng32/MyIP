@@ -107,6 +107,9 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
+| `MAXMIND_ACCOUNT_ID` | 否 | `""` | MaxMind 账号 ID，和 `MAXMIND_LICENSE_KEY` 一起用于下载 GeoLite2 数据库 |
+| `MAXMIND_LICENSE_KEY` | 否 | `""` | MaxMind License Key，用于下载 GeoLite2 数据库 |
+| `MAXMIND_AUTO_UPDATE` | 否 | `"false"` | 设置为 `"true"` 且已配置 MaxMind 凭证时，自动定期更新 GeoLite2 数据库 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
 | `IPCHECKING_API_ENDPOINT` | **是** | `""` | IPCheck.ing 的 API 端点 URL |

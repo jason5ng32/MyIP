@@ -290,6 +290,11 @@
                 "negative": "Votre IP n'est pas dans la liste des nœuds de sortie VPN."
             }
         },
+        "tor": {
+            "title": "Noeud de Sortie TOR",
+            "positive": "Votre IP est dans la liste des noeuds de sortie TOR.",
+            "negative": "Votre IP n'est pas dans la liste des noeuds de sortie TOR."
+        },
         "headers": {
             "title": "En-têtes HTTP",
             "positive": "Vos en-têtes HTTP contiennent des informations de proxy, indiquant que vous utilisez peut-être un proxy.",
@@ -1147,6 +1152,40 @@
                     {
                         "type": "improve",
                         "change": "Optimisation de la performance du code"
+                    }
+                ]
+            },
+            {
+                "version": "v5.1",
+                "date": "Apr 14, 2026",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Amélioration de la richesse des informations ASN"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Mise à jour automatique de la base de données GeoIP MaxMind"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Visualisation de la qualité de l'IP"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Support pour la langue turque"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la stratégie de cache"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la logique de requête IP"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la performance du code, la vitesse de construction a été considérablement améliorée"
                     }
                 ]
             }
