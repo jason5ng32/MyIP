@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"nodemon backend-server.js\"",
     "build": "vite build",
+    "test": "node --test tests/*.test.js",
+    "check": "npm run test && npm run build",
     "preview": "vite preview",
     "start-backend": "node backend-server.js",
     "start-frontend": "node frontend-server.js",
