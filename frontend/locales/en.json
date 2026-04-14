@@ -1165,15 +1165,11 @@
           },
           {
             "type": "add",
-            "change": "Added achievement system"
+            "change": "MaxMind GeoIP database auto-update"
           },
           {
             "type": "add",
-            "change": "Added MaxMind GeoIP database auto-update feature"
-          },
-          {
-            "type": "add",
-            "change": "Added IP quality score display"
+            "change": "IP quality score display"
           },
           {
             "type": "add",

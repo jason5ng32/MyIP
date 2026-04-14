@@ -1164,15 +1164,11 @@
           },
           {
             "type": "add",
-            "change": "Başarı sistemi eklendi"
+            "change": "MaxMind GeoIP veritabanı otomatik güncelleme"
           },
           {
             "type": "add",
-            "change": "MaxMind GeoIP veritabanı otomatik güncelleme özelliği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "IP kalite puanı görüntüleme eklendi"
+            "change": "IP kalite puanı görüntüleme"
           },
           {
             "type": "add",

@@ -1165,19 +1165,15 @@
                     },
                     {
                         "type": "add",
-                        "change": "Ajout du système de récompenses"
+                        "change": "Mise à jour automatique de la base de données GeoIP MaxMind"
                     },
                     {
                         "type": "add",
-                        "change": "Ajout de la mise à jour automatique de la base de données GeoIP MaxMind"
+                        "change": "Visualisation de la qualité de l'IP"
                     },
                     {
                         "type": "add",
-                        "change": "Ajout de la visualisation de la qualité de l'IP"
-                    },
-                    {
-                        "type": "add",
-                        "change": "Ajout du support pour la langue turque"
+                        "change": "Support pour la langue turque"
                     },
                     {
                         "type": "improve",
