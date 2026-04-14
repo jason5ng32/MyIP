@@ -134,8 +134,12 @@ export const useMainStore = defineStore('main', {
       this.shouldRefreshEveryThing = payload;
     },
     // 设置黑暗模式
+    // 同步 .dark class 到 <html>，让 Tailwind 的 dark: 变体生效（refactor/01）
     setDarkMode(value) {
       this.isDarkMode = value;
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.toggle('dark', !!value);
+      }
     },
     // 设置 IP 数据库的使能状态
     updateIPDBs({ id, enabled }) {

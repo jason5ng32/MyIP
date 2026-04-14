@@ -1,6 +1,7 @@
 import dotenv, { parse } from 'dotenv';
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import { serwist } from '@serwist/vite'
 import { CodeInspectorPlugin } from 'code-inspector-plugin';
 
@@ -74,6 +75,7 @@ export default defineConfig({
         }
       }
     }),
+    tailwindcss(),
     serwist({
       swSrc: 'frontend/sw.js',
       swDest: 'sw.js',
