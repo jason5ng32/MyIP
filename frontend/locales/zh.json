@@ -1159,7 +1159,21 @@
       },
       {
         "version": "v5.1",
-        "date": "Apr 14, 2026",
+        "date": "Nov 12, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "支持土耳其语"
+          },
+          {
+            "type": "improve",
+            "change": "代码效率优化"
+          }
+        ]
+      },
+      {
+        "version": "v5.2",
+        "date": "Jan 05, 2026",
         "content": [
           {
             "type": "add",
@@ -1167,15 +1181,21 @@
           },
           {
             "type": "add",
-            "change": "MaxMind 地理数据库自动更新"
-          },
-          {
-            "type": "add",
             "change": "IP 质量分数显示"
           },
           {
+            "type": "improve",
+            "change": "代码效率优化"
+          }
+        ]
+      },
+      {
+        "version": "v5.3",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
             "type": "add",
-            "change": "支持土耳其语"
+            "change": "MaxMind 地理数据库自动更新"
           },
           {
             "type": "improve",
@@ -1183,11 +1203,7 @@
           },
           {
             "type": "improve",
-            "change": "优化 IP 查询的逻辑"
-          },
-          {
-            "type": "improve",
-            "change": "代码效率优化，构建速度大大提高"
+            "change": "大大提升构建速度"
           }
         ]
       }

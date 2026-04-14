@@ -1156,7 +1156,21 @@
       },
       {
         "version": "v5.1",
-        "date": "Apr 14, 2026",
+        "date": "Nov 12, 2025",
+        "content": [
+          {
+            "type": "add",
+            "change": "Türkçe dil desteği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Kod verimliliği optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v5.2",
+        "date": "Jan 05, 2026",
         "content": [
           {
             "type": "add",
@@ -1164,23 +1178,25 @@
           },
           {
             "type": "add",
-            "change": "MaxMind GeoIP veritabanı otomatik güncelleme"
-          },
-          {
-            "type": "add",
             "change": "IP kalite puanı görüntüleme"
           },
           {
+            "type": "improve",
+            "change": "Kod verimliliği optimize edildi"
+          }
+        ]
+      },
+      {
+        "version": "v5.3",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
             "type": "add",
-            "change": "Türkçe dil desteği eklendi"
+            "change": "MaxMind GeoIP veritabanı otomatik güncelleme"
           },
           {
             "type": "improve",
             "change": "Önbellek stratejisi optimize edildi"
-          },
-          {
-            "type": "improve",
-            "change": "IP sorgulama mantığı optimize edildi"
           },
           {
             "type": "improve",
