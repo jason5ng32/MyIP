@@ -1165,6 +1165,14 @@
                     },
                     {
                         "type": "add",
+                        "change": "Ajout du système de récompenses"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la mise à jour automatique de la base de données GeoIP MaxMind"
+                    },
+                    {
+                        "type": "add",
                         "change": "Ajout de la visualisation de la qualité de l'IP"
                     },
                     {

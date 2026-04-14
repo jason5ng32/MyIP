@@ -1167,6 +1167,14 @@
           },
           {
             "type": "add",
+            "change": "增加成就系统"
+          },
+          {
+            "type": "add",
+            "change": "增加 MaxMind 地理数据库自动更新功能"
+          },
+          {
+            "type": "add",
             "change": "增加 IP 质量分数显示"
           },
           {
