@@ -1156,6 +1156,36 @@
             "change": "代码效率优化"
           }
         ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "提升 ASN 信息的丰富性"
+          },
+          {
+            "type": "add",
+            "change": "增加 IP 质量分数显示"
+          },
+          {
+            "type": "add",
+            "change": "支持土耳其语"
+          },
+          {
+            "type": "improve",
+            "change": "优化缓存策略"
+          },
+          {
+            "type": "improve",
+            "change": "优化 IP 查询的逻辑"
+          },
+          {
+            "type": "improve",
+            "change": "代码效率优化，构建速度大大提高"
+          }
+        ]
       }
     ]
   }

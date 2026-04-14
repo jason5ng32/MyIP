@@ -1153,6 +1153,36 @@
             "change": "Kod verimliliği optimizasyonu"
           }
         ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "ASN bilgilerinin zenginliği artırıldı"
+          },
+          {
+            "type": "add",
+            "change": "IP kalite puanı görüntüleme eklendi"
+          },
+          {
+            "type": "add",
+            "change": "Türkçe dil desteği eklendi"
+          },
+          {
+            "type": "improve",
+            "change": "Önbellek stratejisi optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "IP sorgulama mantığı optimize edildi"
+          },
+          {
+            "type": "improve",
+            "change": "Kod verimliliği optimize edildi, yapı hızı büyük ölçüde artırıldı"
+          }
+        ]
       }
     ]
   }

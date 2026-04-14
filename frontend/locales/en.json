@@ -1154,6 +1154,36 @@
             "change": "Code efficiency optimization"
           }
         ]
+      },
+      {
+        "version": "v5.1",
+        "date": "Apr 14, 2026",
+        "content": [
+          {
+            "type": "add",
+            "change": "Enhanced ASN information richness"
+          },
+          {
+            "type": "add",
+            "change": "Added IP quality score display"
+          },
+          {
+            "type": "add",
+            "change": "Added support for Turkish language"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized caching strategy"
+          },
+          {
+            "type": "improve",
+            "change": "Optimized IP query logic"
+          },
+          {
+            "type": "improve",
+            "change": "Code efficiency optimization, build speed greatly improved"
+          }
+        ]
       }
     ]
   }

@@ -1154,6 +1154,36 @@
                         "change": "Optimisation de la performance du code"
                     }
                 ]
+            },
+            {
+                "version": "v5.1",
+                "date": "Apr 14, 2026",
+                "content": [
+                    {
+                        "type": "add",
+                        "change": "Amélioration de la richesse des informations ASN"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout de la visualisation de la qualité de l'IP"
+                    },
+                    {
+                        "type": "add",
+                        "change": "Ajout du support pour la langue turque"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la stratégie de cache"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la logique de requête IP"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Optimisation de la performance du code, la vitesse de construction a été considérablement améliorée"
+                    }
+                ]
             }
         ]
     }
