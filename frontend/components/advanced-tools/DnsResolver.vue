@@ -18,18 +18,22 @@
                                 :disabled="dnsCheckStatus === 'running'" :placeholder="t('dnsresolver.Placeholder')"
                                 v-model="queryURL" @keyup.enter="onSubmit" name="queryURL" id="queryURL" data-1p-ignore>
 
-                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false"
-                                :disabled="dnsCheckStatus === 'running' || !queryURL">
-                                {{ queryType }} {{ t('dnsresolver.Record') }}
-                                <span class="visually-hidden">Choose Type</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li v-for="type in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT']" :key="type"
-                                    @click="changeType(type)">
-                                    <span class="dropdown-item">{{ type }}</span>
-                                </li>
-                            </ul>
+                            <!-- refactor/01：Bootstrap dropdown → shadcn-vue DropdownMenu -->
+                            <DropdownMenu>
+                                <DropdownMenuTrigger as-child>
+                                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                                        :disabled="dnsCheckStatus === 'running' || !queryURL">
+                                        {{ queryType }} {{ t('dnsresolver.Record') }}
+                                        <span class="visually-hidden">Choose Type</span>
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem v-for="type in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT']"
+                                        :key="type" @select="changeType(type)">
+                                        {{ type }}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                             <button class="btn btn-primary" @click="onSubmit"
                                 :disabled="dnsCheckStatus === 'running' || !queryURL">
                                 <span v-if="dnsCheckStatus === 'idle'">{{
@@ -76,6 +80,12 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 const { t } = useI18n();
 

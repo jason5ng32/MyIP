@@ -6,8 +6,8 @@
     <Preferences ref="preferencesRef" />
     <Alert />
     <div id="mainpart" class="container mt-5 jn-container">
-      <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
-        data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
+      <!-- refactor/01：Bootstrap scrollspy 移除，Patch.vue 的 checkSectionsAndTrack 已经在做同样的事 -->
+      <div class="rounded-2" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />
         <WebRTC ref="webRTCRef" />

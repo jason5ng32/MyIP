@@ -18,23 +18,13 @@
                 <p class="opacity-75">{{ t('user.Achievements.Note') }}</p>
                 <p class="opacity-75 mt-3">{{ t('user.Achievements.FooterNote') }}</p>
 
-                <ul class="nav nav-tabs" id="AchievementsList" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-                            data-bs-target="#get-tab-pane" type="button" role="tab" aria-controls="get-tab-pane"
-                            aria-selected="true">{{
-                            t('user.Achievements.Get') }}</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="not-get-tab" data-bs-toggle="tab"
-                            data-bs-target="#not-get-tab-pane" type="button" role="tab" aria-controls="not-get-tab-pane"
-                            aria-selected="false">{{ t('user.Achievements.NotGet')
-                            }}</button>
-                    </li>
-                </ul>
-                <div class="tab-content my-4 mx-1" id="AchievementsListContent">
-                    <div class="tab-pane fade show active" id="get-tab-pane" role="tabpanel" aria-labelledby="get-tab"
-                        tabindex="0">
+                <!-- refactor/01：Bootstrap nav-tabs → shadcn-vue Tabs -->
+                <Tabs default-value="get">
+                    <TabsList>
+                        <TabsTrigger value="get">{{ t('user.Achievements.Get') }}</TabsTrigger>
+                        <TabsTrigger value="notGet">{{ t('user.Achievements.NotGet') }}</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="get" class="my-4 mx-1">
                         <span :data-bs-theme="isDarkMode ? 'dark' : ''" class="alert alert-success d-flex"> <i
                                 class="bi bi-check-circle"></i>&nbsp; {{t('user.Achievements.GetCount')}}: {{
                             achievedCount }}</span>
@@ -68,9 +58,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="not-get-tab-pane" role="tabpanel" aria-labelledby="not-get-tab"
-                        tabindex="0">
+                    </TabsContent>
+                    <TabsContent value="notGet" class="my-4 mx-1">
                         <span :data-bs-theme="isDarkMode ? 'dark' : ''" class="alert alert-warning d-flex"> <i
                                 class="bi bi-x-circle"></i>&nbsp; {{t('user.Achievements.NotGetCount')}}: {{
                             notAchievedCount }}</span>
@@ -91,8 +80,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </TabsContent>
+                </Tabs>
             </div>
         </div>
 
@@ -110,6 +99,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 const { t } = useI18n();

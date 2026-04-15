@@ -74,26 +74,27 @@
         <i class="bi bi-toggles"></i>
       </div>
 
-      <!-- Sign In -->
+      <!-- Sign In (refactor/01: Bootstrap dropdown → shadcn-vue DropdownMenu) -->
       <div v-if="isFireBaseSet" id="signin" class="d-flex align-items-center ms-2">
 
-        <div class="dropdown">
-          <button class="btn dropdown-toggle d-flex align-items-center flex-row "
-            :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
-            data-bs-toggle="dropdown" :data-bs-theme="isDarkMode ? 'dark' : ''" aria-expanded="false"
-            @click="getUserInfo">
-            <span v-if="!isSignedIn">
-              {{ t('user.SignIn') }}
-            </span>
-            <span v-if="isSignedIn" class="jn-avatar">
-              <img :src="userPhotoURL" alt="User Avatar" class="avatar" :title="userName">
-            </span>
-            <span v-if="isSignedIn && !isMobile">
-              &nbsp;{{userName}}
-            </span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <li v-if="isSignedIn" class="dropdown-header d-flex flex-column">
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <button class="btn dropdown-toggle d-flex align-items-center flex-row "
+              :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
+              :data-bs-theme="isDarkMode ? 'dark' : ''" @click="getUserInfo">
+              <span v-if="!isSignedIn">
+                {{ t('user.SignIn') }}
+              </span>
+              <span v-if="isSignedIn" class="jn-avatar">
+                <img :src="userPhotoURL" alt="User Avatar" class="avatar" :title="userName">
+              </span>
+              <span v-if="isSignedIn && !isMobile">
+                &nbsp;{{userName}}
+              </span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <DropdownMenuLabel v-if="isSignedIn" class="d-flex flex-column">
               <span>{{ t('user.Fields.User') }} : {{ userName }}</span>
               <span>{{ t('user.Fields.CreatedAt') }} : {{ userCreatedAt }}</span>
               <span class="d-flex align-items-center">{{ t('user.Fields.Level') }} :&nbsp;
@@ -113,40 +114,33 @@
                 </span>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
-            </li>
+            </DropdownMenuLabel>
             <template v-if="isSignedIn">
-              <li>
-                <button type="button" class="dropdown-item" @click="store.setTriggerAchievements(true)"><i
-                    class="bi bi-award-fill"></i> {{t('user.MyAchievements')}} </button>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
+              <DropdownMenuItem @select="store.setTriggerAchievements(true)">
+                <i class="bi bi-award-fill"></i>&nbsp;{{t('user.MyAchievements')}}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
             </template>
             <template v-if="!isSignedIn">
-              <li><button type="button" class="dropdown-item" @click="store.signInWithGoogle"><i
-                    class="bi bi-google"></i> {{ t('user.SignInWithGoogle') }}</button></li>
-              <li><button type="button" class="dropdown-item" @click="store.signInWithGithub"><i
-                    class="bi bi-github"></i> {{ t('user.SignInWithGithub') }}</button></li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
+              <DropdownMenuItem @select="store.signInWithGoogle">
+                <i class="bi bi-google"></i>&nbsp;{{ t('user.SignInWithGoogle') }}
+              </DropdownMenuItem>
+              <DropdownMenuItem @select="store.signInWithGithub">
+                <i class="bi bi-github"></i>&nbsp;{{ t('user.SignInWithGithub') }}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
             </template>
-            <li><button type="button" class="dropdown-item" @click="store.setTriggerUserBenefits(true)"><i
-                  class="bi bi-person-hearts"></i>
-                {{
-                t('user.Benefits.Title') }}</button></li>
+            <DropdownMenuItem @select="store.setTriggerUserBenefits(true)">
+              <i class="bi bi-person-hearts"></i>&nbsp;{{ t('user.Benefits.Title') }}
+            </DropdownMenuItem>
             <template v-if="isSignedIn">
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              <li><button type="button" class="dropdown-item" @click="store.signOut"><i
-                    class="bi bi-box-arrow-right"></i> {{ t('user.SignOut')
-                  }}</button>
-              </li>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem @select="store.signOut">
+                <i class="bi bi-box-arrow-right"></i>&nbsp;{{ t('user.SignOut') }}
+              </DropdownMenuItem>
             </template>
-          </ul>
-        </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </nav>
   </header>
@@ -160,6 +154,14 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
