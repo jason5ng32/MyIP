@@ -3,6 +3,11 @@ import { defineStore } from 'pinia';
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from './firebase-init.js';
 import i18n from './locales/i18n';
+// refactor/04：静态数据从 data/ 模块读取，不再在 state() 内硬编码
+import { createInitialAchievementsState } from './data/achievements.js';
+import { createInitialIpDBs, buildDbUrl } from './data/ip-databases.js';
+import { createDefaultPreferences } from './data/default-preferences.js';
+import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 const { t } = i18n.global;
 
 export const useMainStore = defineStore('main', {
@@ -16,40 +21,12 @@ export const useMainStore = defineStore('main', {
     triggerRemoteUserInfo: false,
     triggerUpdateAchievements: false,
     achievementToUpdate: '',
-    userAchievements: {
-      'IAmHuman': { name: 'IAmHuman', achieved: false, img: 'achievements/iamhuman.webp', showDetails: false, achievedTime: null },
-      'BarelyEnough': { name: 'BarelyEnough', achieved: false, img: '/achievements/barelyenough.webp', showDetails: false, achievedTime: null },
-      'RapidPace': { name: 'RapidPace', achieved: false, img: '/achievements/rapidpace.webp', showDetails: false, achievedTime: null },
-      'TorrentFlow': { name: 'TorrentFlow', achieved: false, img: '/achievements/torrentflow.webp', showDetails: false, achievedTime: null },
-      'SteadyGoing': { name: 'SteadyGoing', achieved: false, img: '/achievements/steadygoing.webp', showDetails: false, achievedTime: null },
-      'TooFastTooSimple': { name: 'TooFastTooSimple', achieved: false, img: '/achievements/toofasttoosimple.webp', showDetails: false, achievedTime: null },
-      'SwiftAscent': { name: 'SwiftAscent', achieved: false, img: '/achievements/swiftascent.webp', showDetails: false, achievedTime: null },
-      'SurfaceCheck': { name: 'SurfaceCheck', achieved: false, img: '/achievements/surfacecheck.webp', showDetails: false, achievedTime: null },
-      'HalfwayThere': { name: 'HalfwayThere', achieved: false, img: '/achievements/halfwaythere.webp', showDetails: false, achievedTime: null },
-      'FullySecured': { name: 'FullySecured', achieved: false, img: '/achievements/fullysecured.webp', showDetails: false, achievedTime: null },
-      'JustInCase': { name: 'JustInCase', achieved: false, img: '/achievements/justincase.webp', showDetails: false, achievedTime: null },
-      'HiddenWell': { name: 'HiddenWell', achieved: false, img: '/achievements/hiddenwell.webp', showDetails: false, achievedTime: null },
-      'SlipUp': { name: 'SlipUp', achieved: false, img: '/achievements/slipup.webp', showDetails: false, achievedTime: null },
-      'CleverTrickery': { name: 'CleverTrickery', achieved: false, img: '/achievements/clevertrickery.webp', showDetails: false, achievedTime: null },
-      'EnergySaver': { name: 'EnergySaver', achieved: false, img: '/achievements/energysaver.webp', showDetails: false, achievedTime: null },
-      'ResourceHog': { name: 'ResourceHog', achieved: false, img: '/achievements/resourcehog.webp', showDetails: false, achievedTime: null },
-      'MakingBigNews': { name: 'MakingBigNews', achieved: false, img: '/achievements/makingbignews.webp', showDetails: false, achievedTime: null },
-      'GenerousDonor': { name: 'GenerousDonor', achieved: false, img: '/achievements/generousdonor.webp', showDetails: false, achievedTime: null },
-      'ItIsOpen': { name: 'ItIsOpen', achieved: false, img: '/achievements/itisopen.webp', showDetails: false, achievedTime: null },
-      'CuriousCat': { name: 'CuriousCat', achieved: false, img: '/achievements/curiouscat.webp', showDetails: false, achievedTime: null },
-      'CrossingTheWall': { name: 'CrossingTheWall', achieved: false, img: '/achievements/crossingthewall.webp', showDetails: false, achievedTime: null },
-    },
+    // 成就定义在 data/achievements.js；state 通过工厂生成新对象，避免实例间共享引用
+    userAchievements: createInitialAchievementsState(),
     remoteUserInfo: {},
     remoteUserInfoFetched: false,
     currentPath: {},
-    mountingStatus: {
-      ipcheck: false,
-      connectivity: false,
-      webrtc: false,
-      dnsleaktest: false,
-      speedtest: false,
-      advancedtools: false,
-    },
+    mountingStatus: createMountingStatus(),
     curl: {
       ipv4Domain: import.meta.env.VITE_CURL_IPV4_DOMAIN,
       ipv6Domain: import.meta.env.VITE_CURL_IPV6_DOMAIN,
@@ -59,12 +36,7 @@ export const useMainStore = defineStore('main', {
     // refactor/01 阶段 B：单字段协调所有 Sheet 开关，天然互斥
     // 取值：'preferences' | 'navMenu' | 'achievements' | 'about' | 'tools' | null
     openSheet: null,
-    loadingStatus: {
-      ipcheck: false,
-      connectivity: false,
-      webrtc: false,
-      dnsleaktest: false,
-    },
+    loadingStatus: createLoadingStatus(),
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
@@ -78,16 +50,8 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
       alertDuration: 2000,
     },
-    currentSection: 'IPInfo',
-    ipDBs: [
-      { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
-      { id: 1, text: 'IPinfo.io', url: '/api/ipinfo?ip={{ip}}', enabled: true },
-      { id: 2, text: 'IP-API.com', url: '/api/ipapicom?ip={{ip}}&lang={{lang}}', enabled: true },
-      { id: 3, text: 'IPAPI.is', url: '/api/ipapiis?ip={{ip}}', enabled: true },
-      { id: 4, text: 'IP2Location.io', url: '/api/ip2location?ip={{ip}}', enabled: true },
-      { id: 5, text: 'IP.sb', url: '/api/ipsb?ip={{ip}}', enabled: true },
-      { id: 6, text: 'MaxMind', url: '/api/maxmind?ip={{ip}}&lang={{lang}}', enabled: true },
-    ],
+    currentSection: DEFAULT_SECTION,
+    ipDBs: createInitialIpDBs(),
   }),
 
   getters: {
@@ -105,11 +69,10 @@ export const useMainStore = defineStore('main', {
     setCurrentPath(path, id) {
       this.currentPath = { path: path, id: id };
     },
-    // 获取数据库的URL
+    // 获取数据库的 URL（URL 模板替换逻辑已抽到 data/ip-databases.js 的 buildDbUrl 纯函数）
     getDbUrl(id, ip, lang) {
       const db = this.ipDBs.find(d => d.id === id);
-      if (!db) return null;
-      return db.url.replace('{{ip}}', ip).replace('{{lang}}', lang || 'en');
+      return buildDbUrl(db, ip, lang);
     },
     // 从每个组件返回启动状态
     setMountingStatus(key, value) {
@@ -170,18 +133,7 @@ export const useMainStore = defineStore('main', {
     },
     // 从本地存储加载用户偏好设置
     loadPreferences() {
-      const defaultPreferences = {
-        theme: 'auto', // auto, light, dark
-        connectivityAutoRefresh: false,
-        showMap: false,
-        simpleMode: false,
-        autoStart: true,
-        hideUnavailableIPStack: false,
-        popupConnectivityNotifications: true,
-        ipCardsToShow: 6,
-        ipGeoSource: 0,
-        lang: 'auto',
-      };
+      const defaultPreferences = createDefaultPreferences();
       const storedPreferences = localStorage.getItem('userPreferences');
       let preferencesToStore;
 

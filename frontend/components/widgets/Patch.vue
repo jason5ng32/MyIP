@@ -8,6 +8,7 @@
 import { onMounted } from 'vue';
 import { trackEvent } from '@/utils/use-analytics';
 import { useMainStore } from '@/store';
+import { SECTION_IDS } from '@/data/sections';
 
 const store = useMainStore();
 
@@ -16,10 +17,9 @@ let trackedSections = new Set();
 //
 // 统计相关
 //
-// 滚动到指定元素并记录事件
+// 滚动到指定元素并记录事件（refactor/04：SECTION_IDS 从 data/sections.js 共享）
 const checkSectionsAndTrack = () => {
-    const sectionIds = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools'];
-    const firstVisibleSectionId = firstElementInViewport(sectionIds);
+    const firstVisibleSectionId = firstElementInViewport(SECTION_IDS);
 
     // 捕捉第一个可见的元素
     if (firstVisibleSectionId) {
@@ -27,7 +27,7 @@ const checkSectionsAndTrack = () => {
     }
 
     // 统计访问过的元素
-    sectionIds.forEach(sectionId => {
+    SECTION_IDS.forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section && isElementFullyInViewport(section) && !trackedSections.has(sectionId)) {
             trackEvent(sectionId, 'JNScroll', sectionId);
