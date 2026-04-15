@@ -1,17 +1,20 @@
 <template>
-    <button v-show="showMaskButton" class="btn infomask" :class="{
-        'btn-success': infoMaskLevel === 0,
-        'btn-warning': infoMaskLevel === 1,
-        'btn-secondary': infoMaskLevel === 2
-    }" @click="toggleInfoMask" aria-label="Toggle Info Mask" v-tooltip="t('Tooltips.InfoMask')">
-        <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
-    </button>
+    <JnTooltip :text="t('Tooltips.InfoMask')" side="left">
+        <button v-show="showMaskButton" class="btn infomask" :class="{
+            'btn-success': infoMaskLevel === 0,
+            'btn-warning': infoMaskLevel === 1,
+            'btn-secondary': infoMaskLevel === 2
+        }" @click="toggleInfoMask" aria-label="Toggle Info Mask">
+            <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
+        </button>
+    </JnTooltip>
 </template>
 
 <script setup>
 import { onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 const { t } = useI18n();
 

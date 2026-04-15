@@ -31,18 +31,19 @@
                   <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB
                   </option>
                 </select>
-                <button @click="speedTestController" class="btn"
-                  :class="[isDarkMode ? 'jn-startbtn-dark' : 'btn-light jn-startbtn']"
-                  aria-label="Start/Pause Speed Test"
-                  v-tooltip="{ title: t('Tooltips.SpeedTestButton'), placement: 'top' }">
-                  <span v-if="state.speedTest.status === 'running'">
-                    <i class="bi bi-pause-fill"></i>
-                  </span>
-                  <span v-else-if="state.speedTest.status === 'finished' || state.speedTest.status === 'error'">
-                    <i class="bi bi-arrow-clockwise"></i>
-                  </span>
-                  <span v-else><i class="bi bi-caret-right-fill"></i></span>
-                </button>
+                <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
+                  <button @click="speedTestController" class="btn"
+                    :class="[isDarkMode ? 'jn-startbtn-dark' : 'btn-light jn-startbtn']"
+                    aria-label="Start/Pause Speed Test">
+                    <span v-if="state.speedTest.status === 'running'">
+                      <i class="bi bi-pause-fill"></i>
+                    </span>
+                    <span v-else-if="state.speedTest.status === 'finished' || state.speedTest.status === 'error'">
+                      <i class="bi bi-arrow-clockwise"></i>
+                    </span>
+                    <span v-else><i class="bi bi-caret-right-fill"></i></span>
+                  </button>
+                </JnTooltip>
               </div>
             </div>
 
@@ -181,6 +182,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/utils/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 const { t } = useI18n();
 const store = useMainStore();

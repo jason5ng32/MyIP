@@ -1,7 +1,9 @@
 <template>
     <!-- Search BTN -->
-    <button class="btn btn-primary queryip" aria-label="IP Check"
-        @click="openQueryIP" v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
+    <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
+        <button class="btn btn-primary queryip" aria-label="IP Check"
+            @click="openQueryIP"><i class="bi bi-search"></i></button>
+    </JnTooltip>
 
     <!-- Search Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
     <Dialog :open="isOpen" @update:open="onOpenChange">
@@ -185,6 +187,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 const { t } = useI18n();
 

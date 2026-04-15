@@ -1,28 +1,30 @@
 <template>
-  <NavBar ref="navBarRef" />
-  <User ref="userRef" />
-  <Achievements ref="achievementsRef" />
-  <Preferences ref="preferencesRef" />
-  <Alert />
-  <div id="mainpart" class="container mt-5 jn-container">
-    <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
-      data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
-      <IPCheck ref="IPCheckRef" />
-      <Connectivity ref="connectivityRef" />
-      <WebRTC ref="webRTCRef" />
-      <DNSLeaks ref="dnsLeaksRef" />
-      <SpeedTest ref="speedTestRef" />
-      <AdvancedTools ref="advancedToolsRef" />
+  <TooltipProvider :delay-duration="150">
+    <NavBar ref="navBarRef" />
+    <User ref="userRef" />
+    <Achievements ref="achievementsRef" />
+    <Preferences ref="preferencesRef" />
+    <Alert />
+    <div id="mainpart" class="container mt-5 jn-container">
+      <div data-bs-spy="scroll" data-bs-target="#navbar-top" data-bs-root-margin="0px 0px -40%"
+        data-bs-smooth-scroll="true" class="rounded-2" tabindex="0">
+        <IPCheck ref="IPCheckRef" />
+        <Connectivity ref="connectivityRef" />
+        <WebRTC ref="webRTCRef" />
+        <DNSLeaks ref="dnsLeaksRef" />
+        <SpeedTest ref="speedTestRef" />
+        <AdvancedTools ref="advancedToolsRef" />
+      </div>
     </div>
-  </div>
-  <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
-    :toggleInfoMask="toggleInfoMask" />
-  <QueryIP ref="queryIPRef" />
-  <HelpModal ref="helpModalRef" />
-  <Additional ref="additionalRef" />
-  <Footer ref="footerRef" />
-  <PWA />
-  <Patch />
+    <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
+      :toggleInfoMask="toggleInfoMask" />
+    <QueryIP ref="queryIPRef" />
+    <HelpModal ref="helpModalRef" />
+    <Additional ref="additionalRef" />
+    <Footer ref="footerRef" />
+    <PWA />
+    <Patch />
+  </TooltipProvider>
 </template>
 
 <script setup>
@@ -48,6 +50,9 @@ import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
 import Patch from './components/widgets/Patch.vue';
+
+// UI
+import { TooltipProvider } from './components/ui/tooltip';
 
 // Vue
 import { ref, computed, onMounted, watch } from 'vue';

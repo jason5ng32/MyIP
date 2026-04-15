@@ -3,10 +3,12 @@
   <div class="webrtc-test-section mb-4">
     <div class="jn-title2">
       <h2 id="WebRTC" :class="{ 'mobile-h2': isMobile }">🚥 {{ t('webrtc.Title') }}</h2>
-      <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-        aria-label="Refresh WebRTC Test" v-tooltip="t('Tooltips.RefreshWebRTC')">
-        <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
-      </button>
+      <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
+        <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+          aria-label="Refresh WebRTC Test">
+          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+        </button>
+      </JnTooltip>
     </div>
     <div class="text-secondary">
       <p>{{ t('webrtc.Note') }}</p>
@@ -65,6 +67,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/utils/country-name.js';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 const { t } = useI18n();
 

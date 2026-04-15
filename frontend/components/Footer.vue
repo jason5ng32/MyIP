@@ -1,10 +1,12 @@
 <template>
   <footer>
     <div id="copyleft">
-      <p class="text-center"><span>Created by Jason Ng with love</span> <a :href="t('page.footerLink')"
-          class="link-dark" target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');"
-          aria-label="Github"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"
-            v-tooltip="{ title: t('Tooltips.GithubLink'), placement: 'top' }"></i></a>
+      <p class="text-center"><span>Created by Jason Ng with love</span>
+        <JnTooltip :text="t('Tooltips.GithubLink')" side="top">
+          <a :href="t('page.footerLink')" class="link-dark" target="_blank"
+            @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github"><i
+              class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"></i></a>
+        </JnTooltip>
       </p>
     </div>
 
@@ -135,6 +137,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { JnTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 const { t, tm } = useI18n();

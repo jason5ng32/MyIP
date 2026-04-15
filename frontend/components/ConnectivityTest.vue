@@ -3,10 +3,11 @@
   <div class="availability-test-section mb-4">
     <div class="jn-title2">
       <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ t('connectivity.Title') }}</h2>
-      <button @click="checkAllConnectivity(false, true, true)"
-        :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh Connectivity Test"
-        v-tooltip="t('Tooltips.RefreshConnectivityTests')"><i class="bi"
-          :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+      <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
+        <button @click="checkAllConnectivity(false, true, true)"
+          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh Connectivity Test"><i class="bi"
+            :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+      </JnTooltip>
     </div>
     <div class="text-secondary">
       <p>{{ t('connectivity.Note') }}</p>
@@ -50,6 +51,7 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 
 const { t } = useI18n();

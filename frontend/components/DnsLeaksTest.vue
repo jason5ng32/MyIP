@@ -3,10 +3,11 @@
   <div class="dnsleak-test-section mb-4">
     <div class="jn-title2">
       <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ t('dnsleaktest.Title') }}</h2>
-      <button @click="checkAllDNSLeakTest(true)"
-        :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh DNS Leak Test"
-        v-tooltip="t('Tooltips.RefreshDNSLeakTest')"><i class="bi"
-          :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+      <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
+        <button @click="checkAllDNSLeakTest(true)"
+          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh DNS Leak Test"><i class="bi"
+            :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+      </JnTooltip>
     </div>
     <div class="text-secondary">
       <p>{{ t('dnsleaktest.Note') }}</p>
@@ -64,6 +65,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import countryLookup from 'country-code-lookup';
+import { JnTooltip } from '@/components/ui/tooltip';
 import getCountryName from '@/utils/country-name.js';
 
 

@@ -23,7 +23,14 @@
 > 共 13 处 `import ... from 'bootstrap'`，每替一处都直接简化代码。
 
 - [x] **Toast** → shadcn `sonner`（vue-sonner）：`components/widgets/Toast.vue`（保持 `store.setAlert()` 外部 API 不变）
-- [x] **Tooltip**：删除 `main.js` 里原 `app.directive('tooltip', ...)` + `import { Tooltip } from 'bootstrap'`。新建 `frontend/directives/tooltip.js`（轻量自实现：teleport 到 body 的 fixed 定位节点，hover/focus 显示，placement 支持 top/bottom/left/right），`main.js` 注册新指令。11 处 `v-tooltip` 调用点 API 完全兼容、无需改动。
+- [x] **Tooltip** → shadcn-vue `Tooltip`（基于 reka-ui）：
+  - 初版保留 `v-tooltip` 指令（自实现 DOM 方案）失败：tooltip 在实际页面上完全不显示，问题与项目历史上 Bootstrap Tooltip 也需要特殊处理一致。删除。
+  - 最终方案：
+    - 新建 `components/ui/tooltip/`（Tooltip / TooltipTrigger / TooltipContent / TooltipProvider + 便利组件 `JnTooltip`）
+    - `App.vue` 根层包 `<TooltipProvider>`，所有子 tooltip 共享 provider
+    - 11 处 `v-tooltip` 调用点全部替换为 `<JnTooltip :text :side>` 包裹，`store.isMobile` 时自动跳过（与旧行为一致）
+    - 删除 `main.js` 的 `import { Tooltip } from 'bootstrap'` + 指令注册
+    - `frontend/directives/` 目录已删除
 - [x] **Modal** → shadcn `Dialog`：
   - [x] `components/widgets/Help.vue`（`openModal()` 对外 API 保留）
   - [x] `components/widgets/QueryIP.vue`（开启时自动 focus 输入框）
@@ -55,6 +62,7 @@
 >   - `components/advanced-tools/SecurityChecklist.vue`
 >   - `components/advanced-tools/MtrTest.vue`
 >   - `components/ip-infos/IPCard.vue`
+>   - **已知问题（阶段 B 结束时观察到）**：Bootstrap Collapse 动画仍能展开，但展开后内容立刻变成空白。怀疑原因：Tailwind Preflight 或 `tw-animate-css` 的规则与 Bootstrap 的 `.collapsing` / `.collapse.show` 状态样式发生干扰；或 `data-[state=closed]:animate-out` 这类属性选择器以不当方式匹配到了 collapse 元素。阶段 C 直接换成 `Collapsible` 即可消除，不必在阶段 B 单独修复。
 > - **Tab** (`data-bs-toggle="tab"`) → shadcn-vue `Tabs`
 >   - `components/Achievements.vue`
 >   - `components/Footer.vue`（About 的三栏切换，当前是 radio input 实现，若保留原样可跳过）

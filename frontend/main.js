@@ -12,7 +12,6 @@ import 'bootstrap';
 import { analytics } from './utils/use-analytics';
 import { registerServiceWorker } from './utils/register-service-worker';
 
-import { tooltip } from './directives/tooltip';
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
 
@@ -56,9 +55,6 @@ app.config.globalProperties.$trackEvent = function (category, action, label) {
         label: label,
     });
 };
-
-// 注册全局 v-tooltip 指令（refactor/01 阶段 B：原 Bootstrap Tooltip → 自实现轻量 tooltip）
-app.directive('tooltip', tooltip);
 
 // 检查 Firebase 环境
 store.checkFirebaseEnv();

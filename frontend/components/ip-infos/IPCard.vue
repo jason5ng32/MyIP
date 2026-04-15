@@ -9,10 +9,12 @@
             <span>
                 <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
                 {{ t('ipInfos.Source') }}: {{ card.source }}</span>
-            <button @click="$emit('refresh-card', card, index)"
-                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                :aria-label="'Refresh' + card.source" v-tooltip="t('Tooltips.RefreshIPCard')">
-                <i class="bi bi-arrow-clockwise"></i></button>
+            <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
+                <button @click="$emit('refresh-card', card, index)"
+                    :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
+                    :aria-label="'Refresh' + card.source">
+                    <i class="bi bi-arrow-clockwise"></i></button>
+            </JnTooltip>
         </div>
         <div class="p-3 placeholder-glow " :class="{
             'dark-mode-title': isDarkMode,
@@ -25,10 +27,11 @@
             </span>
             <span v-if="card.ip" class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
                 {{ card.ip }}&nbsp;
-                <i v-if="isValidIP(card.ip)"
-                    :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                    @click="copyToClipboard(card.ip, card.id)" role="button"
-                    v-tooltip="{ title: t('Tooltips.CopyIP'), placement: 'right' }" :aria-label="'Copy' + card.ip"></i>
+                <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="right">
+                    <i :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                        @click="copyToClipboard(card.ip, card.id)" role="button"
+                        :aria-label="'Copy' + card.ip"></i>
+                </JnTooltip>
             </span>
             <span v-else class="placeholder col-10"></span>
         </div>
@@ -161,9 +164,11 @@
                             <span v-if="card.qualityScore === 'unknown'">
                                 {{ t('ipInfos.qualityScoreUnknown') }}
                             </span>
-                            <span v-else>{{ card.qualityScore }}/100 <i v-if="!isMobile"
-                                    v-tooltip="t('Tooltips.qualityScoreExplain')"
-                                    class="bi bi-question-circle"></i></span>
+                            <span v-else>{{ card.qualityScore }}/100
+                                <JnTooltip v-if="!isMobile" :text="t('Tooltips.qualityScoreExplain')" side="top">
+                                    <i class="bi bi-question-circle"></i>
+                                </JnTooltip>
+                            </span>
                         </span>
 
                         <span v-if="card.qualityScore === 'sign_in_required'" class="col-8 text-secondary">
@@ -180,14 +185,15 @@
                         <!-- 确保图表在最右侧-->
                         <span v-if="card.asnlink" class="col-9">
                             {{ card.asn }}
-                            <i v-if="configs.cloudFlare" class="bi"
-                                :class="collapseStates[index] ? 'bi-caret-up-square' : 'bi-caret-down-square'"
-                                @click="toggleASNCollapse(card.asn, index)" data-bs-toggle="collapse"
-                                :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                                :aria-controls="'collapseASNInfo-' + index" role="button"
-                                :aria-label="'Display AS Info of' + card.asn"
-                                v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }">
-                            </i>
+                            <JnTooltip v-if="configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="right">
+                                <i class="bi"
+                                    :class="collapseStates[index] ? 'bi-caret-up-square' : 'bi-caret-down-square'"
+                                    @click="toggleASNCollapse(card.asn, index)" data-bs-toggle="collapse"
+                                    :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
+                                    :aria-controls="'collapseASNInfo-' + index" role="button"
+                                    :aria-label="'Display AS Info of' + card.asn">
+                                </i>
+                            </JnTooltip>
                         </span>
                         <span v-else-if="card.asn">{{ card.asn }}</span>
                     </li>
@@ -223,6 +229,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import ASNInfo from './ASNInfo.vue';
 import IPErrorIcon from '../svgicons/IPError.vue';
 import { trackEvent } from '@/utils/use-analytics';
+import { JnTooltip } from '@/components/ui/tooltip';
 
 const { t } = useI18n();
 
