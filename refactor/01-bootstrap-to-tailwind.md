@@ -2,7 +2,7 @@
 
 **目标**：彻底移除 Bootstrap，UI 层完全迁移到 Tailwind v4 + shadcn-vue，bootstrap-icons 替换为 lucide-vue-next。最终 `package.json` 不再依赖 `bootstrap` / `bootstrap-icons`。
 
-**状态**：🟢 进行中（阶段 A 已完成）
+**状态**：🟢 进行中（阶段 A + B 已完成；B 保留了 `import 'bootstrap'` 用于 Dropdown/Collapse/Tab/ScrollSpy 这四类剩余部件，会在阶段 C 收尾）
 
 **影响范围**：30+ Vue 文件、router/index.js 中的 DOM 操作、main.js 中的全局 tooltip 指令、style/style.css。
 
@@ -23,12 +23,13 @@
 > 共 13 处 `import ... from 'bootstrap'`，每替一处都直接简化代码。
 
 - [x] **Toast** → shadcn `sonner`（vue-sonner）：`components/widgets/Toast.vue`（保持 `store.setAlert()` 外部 API 不变）
-- [ ] **Tooltip** → shadcn `Tooltip`：删除 `main.js` 里的 `app.directive('tooltip', ...)`，组件内改用 `<Tooltip>` 包裹
-- [ ] **Modal** → shadcn `Dialog`：
-  - [ ] `components/widgets/Help.vue`
-  - [ ] `components/widgets/QueryIP.vue`
-  - [ ] `components/User.vue`
-  - [ ] `components/Additional.vue`
+- [x] **Tooltip**：删除 `main.js` 里原 `app.directive('tooltip', ...)` + `import { Tooltip } from 'bootstrap'`。新建 `frontend/directives/tooltip.js`（轻量自实现：teleport 到 body 的 fixed 定位节点，hover/focus 显示，placement 支持 top/bottom/left/right），`main.js` 注册新指令。11 处 `v-tooltip` 调用点 API 完全兼容、无需改动。
+- [x] **Modal** → shadcn `Dialog`：
+  - [x] `components/widgets/Help.vue`（`openModal()` 对外 API 保留）
+  - [x] `components/widgets/QueryIP.vue`（开启时自动 focus 输入框）
+  - [x] `components/User.vue`
+  - [x] `components/Additional.vue`
+  - [x] 新增 `components/ui/dialog/`（Dialog / DialogContent / DialogClose）
 - [x] **Offcanvas** → shadcn `Sheet`（完整迁移，含 store 协调 + router 清理 + Patch.vue 互斥逻辑移除）：
   - [x] `components/Nav.vue`（移动端 Sheet + 桌面端 inline + OpenPreferences 改用 store）
   - [x] `components/Achievements.vue`
@@ -40,9 +41,25 @@
   - [x] 新增 `store.openSheet` 单字段 + `setOpenSheet` / `toggleSheet` actions
   - [x] 安装 `tw-animate-css` 支持 Tailwind v4 的 animate-in/out 工具类
 - [x] **删除 `router/index.js` 里对 `document.getElementById('offcanvasTools')` 的命令式操作**，改为 store 状态驱动 Sheet 开合
-- [ ] 删除 `main.js` 里的 `import 'bootstrap'`
+- [ ] ~~删除 `main.js` 里的 `import 'bootstrap'`~~ **推迟到阶段 C**：仓库中仍有 Dropdown / Collapse / Tab / ScrollSpy 四类 Bootstrap JS 小部件通过 `data-bs-toggle="dropdown|collapse|tab"` 和 `data-bs-spy="scroll"` 驱动（Nav.vue, DnsResolver.vue, Whois.vue, SecurityChecklist.vue, MtrTest.vue, IPCard.vue, Achievements.vue, App.vue）。这些会在阶段 C 视觉层重写时一并换成 shadcn-vue 对应组件（DropdownMenu / Collapsible / Tabs / 手写 scrollspy），届时再删除 `import 'bootstrap'` 和 bootstrap CSS。
 
 ## 阶段 C — 视觉层批量重写
+
+> **前置**：阶段 B 遗留的 4 类 Bootstrap JS 小部件必须在阶段 C 里清掉，才能最终删除 `import 'bootstrap'`：
+>
+> - **Dropdown** (`data-bs-toggle="dropdown"`) → shadcn-vue `DropdownMenu`
+>   - `components/Nav.vue`（用户菜单）
+>   - `components/advanced-tools/DnsResolver.vue`
+> - **Collapse** (`data-bs-toggle="collapse"`) → shadcn-vue `Collapsible` 或 `Accordion`
+>   - `components/advanced-tools/Whois.vue`
+>   - `components/advanced-tools/SecurityChecklist.vue`
+>   - `components/advanced-tools/MtrTest.vue`
+>   - `components/ip-infos/IPCard.vue`
+> - **Tab** (`data-bs-toggle="tab"`) → shadcn-vue `Tabs`
+>   - `components/Achievements.vue`
+>   - `components/Footer.vue`（About 的三栏切换，当前是 radio input 实现，若保留原样可跳过）
+> - **ScrollSpy** (`data-bs-spy="scroll"`) → 手写 IntersectionObserver 或去掉（`store.currentSection` 已被 Patch.vue 以滚动监听驱动，可能不再需要 scrollspy）
+>   - `App.vue`
 
 按以下顺序，每个组件做完后单独 commit：
 

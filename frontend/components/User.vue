@@ -1,15 +1,17 @@
 <template>
-    <!-- User Benefits Modal -->
-    <div class="modal fade" id="Benefits" tabindex="-1" aria-labelledby="Benefits">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+    <!-- User Benefits Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
+    <Dialog :open="isOpen" @update:open="isOpen = $event">
+        <DialogContent
+            :title="t('user.Benefits.Title')"
+            class="max-w-2xl"
+            :data-bs-theme="isDarkMode ? 'dark' : ''"
+        >
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="BenefitsTitle"><i class="bi bi-person-hearts"></i> {{
+                <div class="modal-header d-flex align-items-center justify-content-between" :class="{ 'dark-mode-border': isDarkMode }">
+                    <h5 class="modal-title m-0" id="BenefitsTitle"><i class="bi bi-person-hearts"></i> {{
                         t('user.Benefits.Title') }}
                     </h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-
+                    <DialogClose class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" />
                 </div>
                 <div class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
                     <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
@@ -35,8 +37,8 @@
                 <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
                 </div>
             </div>
-        </div>
-    </div>
+        </DialogContent>
+    </Dialog>
 
 </template>
 
@@ -45,8 +47,8 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Modal } from 'bootstrap';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 
 const { t } = useI18n();
 
@@ -68,16 +70,13 @@ const triggerUpdateAchievements = computed(() => store.triggerUpdateAchievements
 const achievementToUpdate = computed(() => store.achievementToUpdate);
 const isUpdateAchievementsSuccess = ref(false);
 
-// 打开 Modal
+// Dialog 开关
+const isOpen = ref(false);
+
+// 打开 Dialog
 const openUserBenefits = () => {
-    const modalElement = document.getElementById('Benefits');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-    }
-
+    isOpen.value = true;
     store.triggerUserBenefits = false;
-
     trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
 

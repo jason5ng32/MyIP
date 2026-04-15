@@ -1,14 +1,15 @@
 <template>
-    <!-- Curl Modal -->
-    <div class="modal fade" id="Curl" tabindex="-1" aria-labelledby="Curl">
-        <div class="modal-dialog modal-dialog-centered">
+    <!-- Curl Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
+    <Dialog :open="isOpen" @update:open="isOpen = $event">
+        <DialogContent
+            :title="t('curl.Title')"
+            :data-bs-theme="isDarkMode ? 'dark' : ''"
+        >
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}
+                <div class="modal-header d-flex align-items-center justify-content-between" :class="{ 'dark-mode-border': isDarkMode }">
+                    <h5 class="modal-title m-0" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}
                     </h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-
+                    <DialogClose class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" />
                 </div>
                 <div v-if="curlDomainsHadSet" class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
                     <code class="row flex justify-content-center">
@@ -33,8 +34,8 @@
                 <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
                 </div>
             </div>
-        </div>
-    </div>
+        </DialogContent>
+    </Dialog>
 
     <!-- Additional Tools -->
     <div class="container text-center jn-add">
@@ -48,7 +49,7 @@
             </div>
 
             <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <img type="button" data-bs-toggle="modal" @click="openCurlModal" src="/additional/curl.webp"
+                <img type="button" @click="openCurlModal" src="/additional/curl.webp"
                     alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']" :height="[isMobile ? '39' : '65']">
             </div>
 
@@ -64,11 +65,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 
 const { t } = useI18n();
 
@@ -84,14 +85,10 @@ const ipv64Domain = computed(() => store.curl.ipv64Domain);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
 
-// 打开 Modal
+// Dialog 开关（对外 API 保持 openCurlModal()）
+const isOpen = ref(false);
 const openCurlModal = () => {
-    const modalElement = document.getElementById('Curl');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-    }
-
+    isOpen.value = true;
     trackEvent('Additional', 'AdditionalClick', 'Curl');
 };
 

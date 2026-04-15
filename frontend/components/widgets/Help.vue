@@ -1,14 +1,16 @@
 <template>
-    <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModal" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <!-- Help Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
+    <Dialog :open="isOpen" @update:open="isOpen = $event">
+        <DialogContent
+            :title="t('helpModal.Title')"
+            class="max-w-2xl"
+            :data-bs-theme="isDarkMode ? 'dark' : ''"
+        >
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="helpModalTitle"><i class="bi bi-keyboard"></i> {{ t('helpModal.Title')
+                <div class="modal-header d-flex align-items-center justify-content-between" :class="{ 'dark-mode-border': isDarkMode }">
+                    <h5 class="modal-title m-0" id="helpModalTitle"><i class="bi bi-keyboard"></i> {{ t('helpModal.Title')
                         }}</h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-
+                    <DialogClose class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" />
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
                     <p class="jn-help-note "><i class="bi bi-hand-thumbs-up-fill"></i>
@@ -49,15 +51,15 @@
 
                 </div>
             </div>
-        </div>
-    </div>
+        </DialogContent>
+    </Dialog>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 
 const { t } = useI18n();
 
@@ -67,13 +69,10 @@ const isDarkMode = computed(() => store.isDarkMode);
 // 快捷键映射
 const keyMap = ref([]);
 
-// 打开快捷键模态框
+// Dialog 开关（对外 API 保持 openModal()）
+const isOpen = ref(false);
 const openModal = () => {
-    const modalElement = document.getElementById('helpModal');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-    }
+    isOpen.value = true;
 };
 
 // 把快捷键映射分成两列

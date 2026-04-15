@@ -4,11 +4,15 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
+// refactor/01：Modal / Offcanvas / Toast / Tooltip 已替换为 shadcn-vue，
+// 但 Dropdown / Collapse / Tab / ScrollSpy 仍在各组件用 data-bs-toggle 驱动，
+// 所以暂时保留 `import 'bootstrap'` 以维持它们的行为。这些部件会在阶段 C
+// 视觉层重写时一并迁移，届时该 import 与 bootstrap CSS 一起删除。
 import 'bootstrap';
 import { analytics } from './utils/use-analytics';
 import { registerServiceWorker } from './utils/register-service-worker';
 
-import { Tooltip } from 'bootstrap';
+import { tooltip } from './directives/tooltip';
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
 
@@ -53,34 +57,8 @@ app.config.globalProperties.$trackEvent = function (category, action, label) {
     });
 };
 
-// 注册全局 Tooltip 指令
-app.directive('tooltip', {
-    mounted(el, binding) {
-        const isMobile = store.isMobile
-        if (isMobile) {
-            return
-        }
-        let options = {
-            placement: 'left',
-            trigger: 'hover focus',
-        }
-        // 如果 binding.value 是一个字符串，将其设置为 title
-        // 否则，如果是一个对象，将其与默认配置合并
-        if (typeof binding.value === 'string') {
-            options.title = binding.value
-        } else if (typeof binding.value === 'object') {
-            options = { ...options, ...binding.value } // 合并对象
-        }
-
-        new Tooltip(el, options)
-    },
-    beforeUnmount(el) {
-        const tooltipInstance = Tooltip.getInstance(el)
-        if (tooltipInstance) {
-            tooltipInstance.dispose()
-        }
-    }
-})
+// 注册全局 v-tooltip 指令（refactor/01 阶段 B：原 Bootstrap Tooltip → 自实现轻量 tooltip）
+app.directive('tooltip', tooltip);
 
 // 检查 Firebase 环境
 store.checkFirebaseEnv();

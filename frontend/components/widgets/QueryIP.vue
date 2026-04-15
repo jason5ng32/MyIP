@@ -1,17 +1,18 @@
 <template>
     <!-- Search BTN -->
-    <button class="btn btn-primary queryip" data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck"
+    <button class="btn btn-primary queryip" aria-label="IP Check"
         @click="openQueryIP" v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
 
-    <!-- Search Modal -->
-    <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck">
-        <div class="modal-dialog modal-dialog-centered">
+    <!-- Search Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
+    <Dialog :open="isOpen" @update:open="onOpenChange">
+        <DialogContent
+            :title="t('ipcheck.Title')"
+            :data-bs-theme="isDarkMode ? 'dark' : ''"
+        >
             <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="IPCheckTitle">{{ t('ipcheck.Title') }}</h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-
+                <div class="modal-header d-flex align-items-center justify-content-between" :class="{ 'dark-mode-border': isDarkMode }">
+                    <h5 class="modal-title m-0" id="IPCheckTitle">{{ t('ipcheck.Title') }}</h5>
+                    <DialogClose class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" />
                 </div>
                 <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
 
@@ -171,19 +172,19 @@
 
 
             </div>
-        </div>
-    </div>
+        </DialogContent>
+    </Dialog>
 </template>
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 
 const { t } = useI18n();
 
@@ -218,35 +219,27 @@ const submitQuery = async () => {
     }
 };
 
+// Dialog 开关 + 打开时自动聚焦输入框（refactor/01）
+const isOpen = ref(false);
+const onOpenChange = (val) => {
+    isOpen.value = val;
+    if (val) {
+        nextTick(() => {
+            const inputElement = document.getElementById('inputIP');
+            if (inputElement) inputElement.focus();
+        });
+    }
+};
+
 // 打开查询 IP 的模态框
 const openQueryIP = () => {
     trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
     openModal();
 };
 
-// 打开 Modal
+// 打开 Dialog（对外 API 保持 openModal()）
 const openModal = () => {
-    const modalElement = document.getElementById('IPCheck');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-        setupModalFocus();
-    }
-};
-
-// 设置 Modal 的聚焦
-const setupModalFocus = () => {
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach((modal) => {
-        modal.addEventListener("shown.bs.modal", () => {
-            nextTick(() => {
-                const inputElement = modal.querySelector(".form-control");
-                if (inputElement) {
-                    inputElement.focus();
-                }
-            });
-        });
-    });
+    onOpenChange(true);
 };
 
 // 获取 IP 信息
