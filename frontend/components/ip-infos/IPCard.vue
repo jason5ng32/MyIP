@@ -187,10 +187,9 @@
                             {{ card.asn }}
                             <JnTooltip v-if="configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="right">
                                 <i class="bi"
-                                    :class="collapseStates[index] ? 'bi-caret-up-square' : 'bi-caret-down-square'"
-                                    @click="toggleASNCollapse(card.asn, index)" data-bs-toggle="collapse"
-                                    :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                                    :aria-controls="'collapseASNInfo-' + index" role="button"
+                                    :class="isAsnOpen ? 'bi-caret-up-square' : 'bi-caret-down-square'"
+                                    @click="toggleASNCollapse(card.asn)"
+                                    :aria-expanded="isAsnOpen" role="button"
                                     :aria-label="'Display AS Info of' + card.asn">
                                 </i>
                             </JnTooltip>
@@ -199,7 +198,12 @@
                     </li>
                 </template>
 
-                <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="card.asn" :asnInfos="asnInfos" />
+                <!-- refactor/01 阶段 C：Bootstrap collapse → shadcn-vue Collapsible -->
+                <Collapsible :open="isAsnOpen" @update:open="isAsnOpen = $event">
+                    <CollapsibleContent>
+                        <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="card.asn" :asnInfos="asnInfos" />
+                    </CollapsibleContent>
+                </Collapsible>
             </ul>
         </div>
 
@@ -230,13 +234,14 @@ import ASNInfo from './ASNInfo.vue';
 import IPErrorIcon from '../svgicons/IPError.vue';
 import { trackEvent } from '@/utils/use-analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 
 const { t } = useI18n();
 
 const placeholderSizes = [12, 8, 6, 8, 4];
 
-// 追踪每个卡片的 collapse 状态
-const collapseStates = ref({});
+// 当前卡片的 ASN Collapsible 开关（refactor/01）
+const isAsnOpen = ref(false);
 
 const props = defineProps({
     card: {
@@ -296,13 +301,10 @@ const copyToClipboard = (ip, id) => {
     });
 };
 
-// 切换 ASN collapse 并获取信息
-const toggleASNCollapse = async (asn, index) => {
-    // 切换状态
-    collapseStates.value[index] = !collapseStates.value[index];
-
-    // 如果是打开状态，获取 ASN 信息
-    if (collapseStates.value[index]) {
+// 切换 ASN Collapsible 并获取信息（refactor/01：Bootstrap collapse → Collapsible）
+const toggleASNCollapse = async (asn) => {
+    isAsnOpen.value = !isAsnOpen.value;
+    if (isAsnOpen.value) {
         await getASNInfo(asn);
     }
 };

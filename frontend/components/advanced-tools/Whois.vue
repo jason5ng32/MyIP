@@ -36,30 +36,24 @@
                         <div v-if="whoisResults && Object.keys(whoisResults).length">
 
                             <div class="alert alert-success ">{{ t('whois.Note3') }}</div>
-                            <div v-if="type === 'domain'" class="accordion" id="whoisResultAccordion"
+                            <!-- refactor/01：Bootstrap accordion → shadcn-vue Accordion（单选模式，默认展开第一项） -->
+                            <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0"
                                 :data-bs-theme="isDarkMode ? 'dark' : ''">
-                                <div class="accordion-item" v-for="(provider, index) in providers" :key="provider">
-                                    <h2 class="accordion-header" :id="'heading' + index">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            :data-bs-target="'#collapse' + index"
-                                            :aria-expanded="index === 0 ? 'true' : 'false'"
-                                            :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
-                                            <span><i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
-                                                <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase()
-                                                    }}</strong></span>
-                                        </button>
-                                    </h2>
-                                    <div :id="'collapse' + index" class="accordion-collapse collapse"
-                                        :class="{ show: index === 0 }" :aria-labelledby="'heading' + index">
-                                        <div class="accordion-body" :class="[isMobile ? ' p-2' : '']">
-                                            <div class="card card-body border-0 mt-3"
-                                                :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                                                <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
-                                            </div>
+                                <AccordionItem v-for="(provider, index) in providers" :key="provider"
+                                    :value="String(index)">
+                                    <AccordionTrigger>
+                                        <span><i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+                                            <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase()
+                                                }}</strong></span>
+                                    </AccordionTrigger>
+                                    <AccordionContent :class="[isMobile ? 'p-2' : '']">
+                                        <div class="card card-body border-0 mt-3"
+                                            :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
+                                            <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
 
                             <div v-else class="card card-body border-0 mt-3"
                                 :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
@@ -80,6 +74,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const { t } = useI18n();
 

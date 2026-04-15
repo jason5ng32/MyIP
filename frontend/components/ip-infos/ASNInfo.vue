@@ -1,5 +1,6 @@
 <template>
-    <div class="collapse alert alert-light placeholder-glow lh-lg fw-bold p-0" :id="'collapseASNInfo-' + index"
+    <!-- refactor/01：原 .collapse 类已移除，展开收起由父级 CollapsibleContent 控制 -->
+    <div class="alert alert-light placeholder-glow lh-lg fw-bold p-0"
         :data-bs-theme="isDarkMode ? 'dark' : ''">
         <div class="p-3">
             <span v-if="asnInfos[asn]">

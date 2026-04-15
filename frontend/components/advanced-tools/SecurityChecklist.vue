@@ -137,19 +137,22 @@
                     <div class="card-body">
                         <!-- 检查清单分类描述 -->
                         <h2> <i class="bi" :class="fullList[currentList].icon"></i> {{fullList[currentList].title}}</h2>
-                        <p>{{fullList[currentList].description}}
-                            <i v-if="fullList[currentList].intro" class="bi bi-info-circle" data-bs-toggle="collapse"
-                                :data-bs-target="'#collapseCategoryIntro'" aria-expanded="false"
-                                :aria-controls="'collapseCategoryIntro'" role="button"
-                                :aria-label="'Display Info of ' + fullList[currentList].title">
-                            </i>
-                        </p>
-                        <div class="collapse lh-lg p-1" :id="'collapseCategoryIntro'"
-                            :data-bs-theme="isDarkMode ? 'dark' : ''">
-                            <span class="opacity-75 fs-7">
-                                <vue-markdown :source="fullList[currentList].intro" />
-                            </span>
-                        </div>
+                        <!-- refactor/01：Bootstrap collapse → shadcn-vue Collapsible（分类介绍） -->
+                        <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
+                            <p>{{fullList[currentList].description}}
+                                <CollapsibleTrigger v-if="fullList[currentList].intro" as-child>
+                                    <i class="bi bi-info-circle"
+                                        :aria-expanded="isCategoryIntroOpen" role="button"
+                                        :aria-label="'Display Info of ' + fullList[currentList].title">
+                                    </i>
+                                </CollapsibleTrigger>
+                            </p>
+                            <CollapsibleContent class="lh-lg p-1" :data-bs-theme="isDarkMode ? 'dark' : ''">
+                                <span class="opacity-75 fs-7">
+                                    <vue-markdown :source="fullList[currentList].intro" />
+                                </span>
+                            </CollapsibleContent>
+                        </Collapsible>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="progress flex-grow-1" role="progressbar"
                                 :aria-label="'Progress for ' + fullList[currentList].title" aria-valuemin="0"
@@ -217,10 +220,9 @@
                                         'text-decoration-line-through opacity-50': item.ignored
                                         }">
                                                     {{ item.point }}
-                                                    <i class="bi bi-info-circle" data-bs-toggle="collapse"
-                                                        :data-bs-target="'#collapseChecklistInfo-' + index"
-                                                        aria-expanded="false"
-                                                        :aria-controls="'collapseChecklistInfo-' + index" role="button"
+                                                    <i class="bi bi-info-circle"
+                                                        @click="toggleChecklistInfo(index)"
+                                                        :aria-expanded="!!checklistInfoOpen[index]" role="button"
                                                         :aria-label="'Display Info of ' + item.point">
                                                     </i>
                                                 </span>
@@ -250,10 +252,10 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr v-show="checklistInfoOpen[index]">
                                         <td colspan="4" class="border-0 p-0 ">
-                                            <div class="collapse lh-lg p-1" :class="[isMobile ? 'jn-vw-m' : 'jn-vw']"
-                                                :id="'collapseChecklistInfo-' + index"
+                                            <!-- refactor/01：Bootstrap collapse 拆开——checklist 的表格结构不适合 Collapsible 包裹，用 v-show 配合 openStates 字典 -->
+                                            <div class="lh-lg p-1" :class="[isMobile ? 'jn-vw-m' : 'jn-vw']"
                                                 :data-bs-theme="isDarkMode ? 'dark' : ''">
                                                 <div class="p-3 ">
                                                     <span class="jn-info fs-7 opacity-75">
@@ -280,7 +282,17 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { CircleProgressBar } from 'circle-progress.vue';
-import VueMarkdown from 'vue-markdown-render'
+import VueMarkdown from 'vue-markdown-render';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+
+// refactor/01 阶段 C：两处 Bootstrap collapse 迁移
+// 1) 分类介绍的 Collapsible（单个）
+const isCategoryIntroOpen = ref(false);
+// 2) 每条 checklist item 的 info 展开（多个，按 index 索引）
+const checklistInfoOpen = ref({});
+const toggleChecklistInfo = (index) => {
+    checklistInfoOpen.value[index] = !checklistInfoOpen.value[index];
+};
 
 const { t, tm } = useI18n();
 

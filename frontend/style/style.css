@@ -81,6 +81,38 @@
 }
 /* === 基建 end === */
 
+/* refactor/01 阶段 C：reka-ui Collapsible / Accordion 展开收起动画
+   CollapsibleContent 会挂出 CSS 变量 --reka-collapsible-content-height
+   AccordionContent   会挂出 CSS 变量 --reka-accordion-content-height */
+@keyframes jn-collapsible-down {
+  from { height: 0; }
+  to { height: var(--reka-collapsible-content-height); }
+}
+@keyframes jn-collapsible-up {
+  from { height: var(--reka-collapsible-content-height); }
+  to { height: 0; }
+}
+@keyframes jn-accordion-down {
+  from { height: 0; }
+  to { height: var(--reka-accordion-content-height); }
+}
+@keyframes jn-accordion-up {
+  from { height: var(--reka-accordion-content-height); }
+  to { height: 0; }
+}
+.jn-collapsible-content[data-state='open'] {
+  animation: jn-collapsible-down 200ms ease-out;
+}
+.jn-collapsible-content[data-state='closed'] {
+  animation: jn-collapsible-up 200ms ease-out;
+}
+.jn-accordion-content[data-state='open'] {
+  animation: jn-accordion-down 200ms ease-out;
+}
+.jn-accordion-content[data-state='closed'] {
+  animation: jn-accordion-up 200ms ease-out;
+}
+
 .jn-title {
   display: flex;
   justify-content: space-between;

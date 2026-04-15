@@ -36,31 +36,26 @@
 
             <!-- Result Display -->
             <div id="mtrresult" v-if="mtrResults.length > 0">
-              <div class="accordion" id="mtrResults.valueAccordion" :data-bs-theme="isDarkMode ? 'dark' : ''">
-                <div class="accordion-item" v-for="(result, index) in mtrResults" :key="result.country">
-                  <h2 class="accordion-header" :id="'heading' + index">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                      :data-bs-target="'#collapse' + index" :aria-expanded="index === 0 ? 'true' : 'false'"
-                      :aria-controls="'collapse' + index" :class="{ collapsed: index !== 0 }">
+              <!-- refactor/01：Bootstrap accordion → shadcn-vue Accordion（默认展开第一项） -->
+              <Accordion type="single" collapsible default-value="0" :data-bs-theme="isDarkMode ? 'dark' : ''">
+                <AccordionItem v-for="(result, index) in mtrResults" :key="result.country" :value="String(index)">
+                  <AccordionTrigger>
+                    <span>
                       <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>&nbsp;<strong>{{
-                        result.country_name }}, {{ result.city
-                        }}</strong>
+                        result.country_name }}, {{ result.city }}</strong>
                       <span v-if="!isMobile">&nbsp;-&nbsp;{{ result.network }}&nbsp;</span>
                       <span v-if="!isMobile" class="badge rounded-pill"
                         :class="isDarkMode ? 'text-bg-warning' : 'text-bg-success'">AS{{ result.asn }}</span>
-                    </button>
-                  </h2>
-                  <div :id="'collapse' + index" class="accordion-collapse collapse" :class="{ show: index === 0 }"
-                    :aria-labelledby="'heading' + index">
-                    <div class="accordion-body">
-                      <div class="card card-body border-0 mt-3"
-                        :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                        <pre>{{ result.rawOutput }}</pre>
-                      </div>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div class="card card-body border-0 mt-3"
+                      :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
+                      <pre>{{ result.rawOutput }}</pre>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
 
             <div id="mtrresult-error" v-if="mtrCheckStatus === 'error'">
@@ -80,6 +75,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const { t } = useI18n();
 
