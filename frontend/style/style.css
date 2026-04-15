@@ -1,10 +1,12 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
+/* refactor/01 阶段 C commit 3/3：bootstrap CSS 由 ./bootstrap-compat.css 接管（@apply Tailwind 工具类实现）
+   bootstrap-icons 字体暂保留：.bi bi-* 数百处调用，未来单独迁到 lucide-vue-next */
 @import 'bootstrap-icons/font/bootstrap-icons.min.css';
 @import 'flag-icons/css/flag-icons.min.css';
 
-/* === Tailwind v4 + shadcn-vue 基建（重构进行中 — 见 refactor/01） === */
+/* === Tailwind v4 + shadcn-vue 基建（refactor/01） === */
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import './bootstrap-compat.css';
 
 /* 暗色模式：用 .dark class 触发（由 store.isDarkMode 同步到 <html>） */
 @custom-variant dark (&:where(.dark, .dark *));

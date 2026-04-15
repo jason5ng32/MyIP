@@ -4,11 +4,9 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
-// refactor/01：Modal / Offcanvas / Toast / Tooltip 已替换为 shadcn-vue，
-// 但 Dropdown / Collapse / Tab / ScrollSpy 仍在各组件用 data-bs-toggle 驱动，
-// 所以暂时保留 `import 'bootstrap'` 以维持它们的行为。这些部件会在阶段 C
-// 视觉层重写时一并迁移，届时该 import 与 bootstrap CSS 一起删除。
-import 'bootstrap';
+// refactor/01 阶段 C commit 3/3：bootstrap JS 彻底移除
+// Modal / Offcanvas / Toast / Tooltip / Dropdown / Collapse / Accordion / Tab / ScrollSpy
+// 全部已迁移到 shadcn-vue 或等价实现，bootstrap JS 不再需要
 import { analytics } from './utils/use-analytics';
 import { registerServiceWorker } from './utils/register-service-worker';
 
