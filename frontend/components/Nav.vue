@@ -3,8 +3,8 @@
   <header class="navbar navbar-expand-lg bg-body-tertiary mb-3 jn-navbar-top "
     :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
     <nav id="navbar-top" class="container-xxl">
-      <button class="navbar-toggler jn-hamburger-button" type="button" data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+      <button class="navbar-toggler jn-hamburger-button" type="button"
+        @click="store.toggleSheet('navMenu')" aria-controls="offcanvasNavbar">
         <span class="navbar-toggler-icon bg-transparent"></span>
       </button>
 
@@ -22,30 +22,52 @@
         </a>
       </div>
 
-      <!-- Menu Bar, Expand on PC -->
-      <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom"
-        :class="[isMobile ? 'h-50' : '']" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title">{{t('nav.Navigation')}}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body" :class="[!isMobile ? 'd-flex align-items-center' : '']">
-          <div class="navbar-nav">
-            <a type="button"
-              v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
-              :key="item" class="nav-link" :class="{ 
-                'text-white': item === currentSection && isDarkMode,
-                'text-dark': item === currentSection && !isDarkMode,
-                }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item)">
-              {{ t(`nav.${item}`) }}
-            </a>
-          </div>
-          <a :class="[isMobile ? 'mt-2':'ms-2']" :href="t('page.footerLink')" target="_blank"
-            class="d-flex align-items-center">
-            <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
+      <!-- 桌面端：直接渲染菜单（原 CSS hack 不再需要） -->
+      <div v-if="!isMobile" :data-bs-theme="isDarkMode ? 'dark' : ''" class="d-flex align-items-center">
+        <div class="navbar-nav d-flex flex-row">
+          <a type="button"
+            v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
+            :key="item" class="nav-link" :class="{
+              'text-white': item === currentSection && isDarkMode,
+              'text-dark': item === currentSection && !isDarkMode,
+              }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item)">
+            {{ t(`nav.${item}`) }}
           </a>
         </div>
+        <a class="ms-2 d-flex align-items-center" :href="t('page.footerLink')" target="_blank">
+          <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
+        </a>
       </div>
+
+      <!-- 移动端：Sheet 菜单 -->
+      <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
+        <SheetContent
+          side="bottom"
+          :title="t('nav.Navigation')"
+          :class="cn('h-1/2 overflow-y-auto pt-3', isDarkMode ? 'dark' : '')"
+          :data-bs-theme="isDarkMode ? 'dark' : ''"
+        >
+          <div class="offcanvas-header d-flex align-items-center justify-content-between px-3">
+            <h5 class="offcanvas-title m-0">{{t('nav.Navigation')}}</h5>
+            <SheetClose class="btn-close" />
+          </div>
+          <div class="offcanvas-body">
+            <div class="navbar-nav">
+              <a type="button"
+                v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
+                :key="item" class="nav-link" :class="{
+                  'text-white': item === currentSection && isDarkMode,
+                  'text-dark': item === currentSection && !isDarkMode,
+                  }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
+                {{ t(`nav.${item}`) }}
+              </a>
+            </div>
+            <a class="mt-2 d-flex align-items-center" :href="t('page.footerLink')" target="_blank">
+              <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
+            </a>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
         aria-label="Preferences">
@@ -136,8 +158,9 @@ import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Offcanvas } from 'bootstrap';
 import unixToDateTime from '@/utils/timestamp-to-date';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
 
@@ -176,16 +199,15 @@ const getUserInfo = async () => {
   store.setTriggerRemoteUserInfo(true);
 }
 
-// 打开偏好设置
-const OpenPreferences = () => {
-  const offcanvasElement = document.getElementById('offcanvasPreferences');
-  let offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
-  if (offcanvasElement.classList.contains('show')) {
-    offcanvas.hide();
-  } else {
-    offcanvas.show();
-  }
+// 移动端导航菜单 Sheet 开关（refactor/01）
+const isNavMenuOpen = computed(() => store.openSheet === 'navMenu');
+const onNavMenuChange = (val) => {
+  store.setOpenSheet(val ? 'navMenu' : null);
+};
 
+// 打开偏好设置（通过 store 驱动 Preferences.vue 里的 Sheet）
+const OpenPreferences = () => {
+  store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
@@ -244,23 +266,9 @@ defineExpose({
   border-radius: 50%;
 }
 
-/* 大屏幕上隐藏汉堡包按钮 */
+/* 大屏幕上隐藏汉堡包按钮（桌面端菜单由 v-if="!isMobile" 直接渲染，refactor/01） */
 @media (min-width: 992px) {
   .jn-hamburger-button {
-    display: none;
-  }
-
-  #offcanvasNavbar {
-    display: flex;
-  }
-
-  .offcanvas.offcanvas-bottom {
-    height: auto !important;
-    transform: none !important;
-    visibility: visible !important;
-  }
-
-  .offcanvas-header {
     display: none;
   }
 }

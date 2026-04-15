@@ -1,13 +1,17 @@
 <template>
-    <!-- Offcanvas Preferences -->
-    <div :data-bs-theme="isDarkMode ? 'dark' : 'light'" :class="[isMobile ? ' w-100' : '']"
-        class="offcanvas offcanvas-start h-100 border-0 mt-5" tabindex="-1" id="offcanvasPreferences"
-        aria-labelledby="offcanvasPreferencesLabel">
-        <div class="offcanvas-header mt-3">
-            <h5 class="offcanvas-title"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
+    <!-- Sheet Preferences (refactor/01: 旧 offcanvas → shadcn-vue Sheet) -->
+    <Sheet :open="isOpen" @update:open="onOpenChange">
+        <SheetContent
+            side="left"
+            :title="t('nav.preferences.title')"
+            :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[400px] max-w-[400px]')"
+            :data-bs-theme="isDarkMode ? 'dark' : 'light'"
+        >
+        <div class="offcanvas-header mt-3 d-flex align-items-center justify-content-between px-3">
+            <h5 class="offcanvas-title m-0"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
                 t('nav.preferences.title') }}
             </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <SheetClose class="btn-close" />
         </div>
         <div class="offcanvas-body pt-0 m-2">
             <div class="preferences-tip">{{ t('nav.preferences.preferenceTips') }}</div>
@@ -203,7 +207,8 @@
             </div>
 
         </div>
-    </div>
+        </SheetContent>
+    </Sheet>
 
 </template>
 
@@ -212,6 +217,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
 
@@ -222,6 +229,12 @@ const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 const isSignedIn = computed(() => store.isSignedIn);
+
+// Sheet 开关：与 store.openSheet 双向绑定（refactor/01）
+const isOpen = computed(() => store.openSheet === 'preferences');
+const onOpenChange = (val) => {
+    store.setOpenSheet(val ? 'preferences' : null);
+};
 
 const prefersDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
 const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');

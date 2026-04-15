@@ -22,9 +22,14 @@
                 </div>
             </div>
         </div>
-        <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
-            :class="[isMobile ? 'h-100' : '']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header">
+        <Sheet :open="isOpen" @update:open="onOpenChange">
+            <SheetContent
+                side="bottom"
+                :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
+                :class="cn('overflow-y-auto pt-0 jn-tools-sheet', isMobile ? 'h-full' : (isFullScreen ? 'h-full' : 'h-[80%]'))"
+                :data-bs-theme="isDarkMode ? 'dark' : ''"
+            >
+            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header px-3">
                 <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
                     <span v-if="!isFullScreen">
                         <i class="bi bi-arrows-fullscreen"></i>
@@ -38,13 +43,13 @@
                     cards[openedCard].icon }}
                     {{ t(cards[openedCard].titleKey) }}</span>
 
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
-                    @click="resetNavigatorURL()"></button>
+                <SheetClose class="btn-close" @click="resetNavigatorURL()" />
             </div>
             <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
                 <router-view></router-view>
             </div>
-        </div>
+            </SheetContent>
+        </Sheet>
     </div>
 
 </template>
@@ -53,9 +58,10 @@
 import { ref, computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
-import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
 
@@ -83,7 +89,22 @@ const cards = reactive([
 const isFullScreen = ref(false);
 const openedCard = computed(() => store.currentPath.id);
 
-// 跳转到指定页面并打开
+// Sheet 开关与 store.openSheet 双向绑定（refactor/01）
+const isOpen = computed(() => store.openSheet === 'tools');
+const onOpenChange = (val) => {
+    // 关闭时同步把 router 回到 '/'，与原 resetNavigatorURL 行为保持一致
+    if (!val) {
+        store.setOpenSheet(null);
+        if (router.currentRoute.value.path !== '/') {
+            router.push('/');
+        }
+        isFullScreen.value = false;
+    } else {
+        store.setOpenSheet('tools');
+    }
+};
+
+// 跳转到指定页面并打开（开关由 router/index.js afterEach 驱动，通过 store.setOpenSheet）
 const navigateAndToggleOffcanvas = (routePath) => {
     router.push(routePath);
     let capitalizedRoutePath = routePath.replace('/', '');
@@ -91,22 +112,9 @@ const navigateAndToggleOffcanvas = (routePath) => {
     trackEvent('Nav', 'NavClick', capitalizedRoutePath);
 };
 
-// 全屏显示
+// 全屏显示：仅切换 ref，高度由 SheetContent 的 class 响应式计算
 const fullScreen = () => {
-    const offcanvas = document.getElementById('offcanvasTools');
-    if (offcanvas) {
-        offcanvas.style.transition = 'height 0.5s ease-in-out';
-        if (!isFullScreen.value) {
-            offcanvas.style.height = '100%';
-            isFullScreen.value = true;
-        } else {
-            offcanvas.style.height = '80%';
-            isFullScreen.value = false;
-        }
-        setTimeout(() => {
-            offcanvas.style.transition = '';
-        }, 500);
-    }
+    isFullScreen.value = !isFullScreen.value;
 };
 
 // 将浏览器地址重置
@@ -131,14 +139,7 @@ defineExpose({
 </script>
 
 <style scoped>
-.offcanvas.offcanvas-bottom {
-    height: 80%;
-}
-
-#offcanvasTools {
-    z-index: 10000;
-}
-
+/* refactor/01：原 #offcanvasTools 与 .offcanvas-bottom 规则已由 SheetContent 的 side="bottom" + h-[80%]/h-full class 取代 */
 .jn-h {
     height: 80%;
 }

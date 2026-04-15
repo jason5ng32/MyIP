@@ -1,13 +1,17 @@
 <template>
 
-    <div v-if="isSignedIn" :data-bs-theme="isDarkMode ? 'dark' : 'light'"
-        :class="[isMobile ? ' w-100' : 'jn-achievements-offcanvas']" class="offcanvas offcanvas-start h-100 border-0 mt-5"
-        tabindex="-1" id="Achievements" aria-labelledby="AchievementsLabel">
-        <div class="offcanvas-header mt-3">
-            <h5 class="offcanvas-title"><i class="bi bi-award-fill"></i> {{
+    <Sheet v-if="isSignedIn" :open="isOpen" @update:open="onOpenChange">
+        <SheetContent
+            side="left"
+            :title="t('user.Achievements.Title')"
+            :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[600pt] max-w-[80vw]')"
+            :data-bs-theme="isDarkMode ? 'dark' : 'light'"
+        >
+        <div class="offcanvas-header mt-3 d-flex align-items-center justify-content-between px-3">
+            <h5 class="offcanvas-title m-0"><i class="bi bi-award-fill"></i> {{
                 t('user.Achievements.Title') }}
             </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <SheetClose class="btn-close" />
         </div>
         <div class="offcanvas-body pt-0">
             <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="modal-body m-2">
@@ -95,16 +99,18 @@
         <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
         </div>
 
-    </div>
+        </SheetContent>
+    </Sheet>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useMainStore } from '@/store';
-import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
 
@@ -134,16 +140,15 @@ const convertTime = (timestamp) => {
     return unixToDateTime(timestamp);
 }
 
-// 打开成就面板
-const openAchievements = () => {
-    const offcanvasElement = document.getElementById('Achievements');
-    let offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
-    if (offcanvasElement.classList.contains('show')) {
-        offcanvas.hide();
-    } else {
-        offcanvas.show();
-    }
+// Sheet 开关与 store.openSheet 双向绑定（refactor/01）
+const isOpen = computed(() => store.openSheet === 'achievements');
+const onOpenChange = (val) => {
+    store.setOpenSheet(val ? 'achievements' : null);
+};
 
+// 打开成就面板（外部触发：通过 store.triggerAchievements）
+const openAchievements = () => {
+    store.toggleSheet('achievements');
     // 重置
     store.setTriggerAchievements(false);
     trackEvent('Nav', 'NavClick', 'Achievements');

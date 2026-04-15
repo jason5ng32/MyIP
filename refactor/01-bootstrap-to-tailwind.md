@@ -29,13 +29,17 @@
   - [ ] `components/widgets/QueryIP.vue`
   - [ ] `components/User.vue`
   - [ ] `components/Additional.vue`
-- [ ] **Offcanvas** → shadcn `Sheet`：
-  - [ ] `components/Nav.vue`
-  - [ ] `components/Achievements.vue`
-  - [ ] `components/Footer.vue`
-  - [ ] `components/Advanced.vue`
-  - [ ] `components/widgets/Patch.vue`
-- [ ] **删除 `router/index.js` 里对 `document.getElementById('offcanvasTools')` 的命令式操作**，改为 store 状态驱动 Sheet 开合
+- [x] **Offcanvas** → shadcn `Sheet`（完整迁移，含 store 协调 + router 清理 + Patch.vue 互斥逻辑移除）：
+  - [x] `components/Nav.vue`（移动端 Sheet + 桌面端 inline + OpenPreferences 改用 store）
+  - [x] `components/Achievements.vue`
+  - [x] `components/Footer.vue`
+  - [x] `components/Advanced.vue`（fullscreen 改为响应式 class）
+  - [x] `components/widgets/Preferences.vue`（新增，原本只被 Nav.vue 通过 DOM 控制）
+  - [x] `components/widgets/Patch.vue`（listenOffcanvas 整个移除，互斥由 `store.openSheet` 单字段天然保证）
+  - [x] 新增 `components/ui/sheet/`（Sheet / SheetContent / SheetClose）
+  - [x] 新增 `store.openSheet` 单字段 + `setOpenSheet` / `toggleSheet` actions
+  - [x] 安装 `tw-animate-css` 支持 Tailwind v4 的 animate-in/out 工具类
+- [x] **删除 `router/index.js` 里对 `document.getElementById('offcanvasTools')` 的命令式操作**，改为 store 状态驱动 Sheet 开合
 - [ ] 删除 `main.js` 里的 `import 'bootstrap'`
 
 ## 阶段 C — 视觉层批量重写

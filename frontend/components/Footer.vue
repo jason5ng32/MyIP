@@ -19,9 +19,14 @@
       </a>
     </div>
 
-    <div class="offcanvas offcanvas-end mt-5 border-0 h-100" :class="[isMobile ? ' w-100' : '']" tabindex="-1"
-      id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
-      <div class="offcanvas-header mt-3">
+    <Sheet :open="isOpen" @update:open="onOpenChange">
+      <SheetContent
+        side="right"
+        :title="t('about.Title')"
+        :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]')"
+        :data-bs-theme="isDarkMode ? 'dark' : 'light'"
+      >
+      <div class="offcanvas-header mt-3 d-flex align-items-center justify-content-between px-3">
         <div class="btn-group" role="group">
           <template v-for="show in ['about', 'changelog', 'specialthanks']">
             <input v-model="content" type="radio" class="btn-check" :name="'About_' + show" :id="'About_' + show"
@@ -35,7 +40,7 @@
             </label>
           </template>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <SheetClose class="btn-close" />
       </div>
       <div class="offcanvas-body" ref="offcanvasBody">
         <div v-if="showAbout">
@@ -112,7 +117,8 @@
         </div>
 
       </div>
-    </div>
+      </SheetContent>
+    </Sheet>
 
     <div id="copyright" v-if="!configs.originalSite">
       <p class="text-center fs-6 fw-light" style="opacity: 0.5;">
@@ -126,9 +132,10 @@
 <script setup>
 import { ref, computed, reactive } from 'vue';
 import { useMainStore } from '@/store';
-import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const { t, tm } = useI18n();
 
@@ -182,17 +189,15 @@ const thanksList = [
   }
 ]
 
+// Sheet 开关与 store.openSheet 双向绑定（refactor/01）
+const isOpen = computed(() => store.openSheet === 'about');
+const onOpenChange = (val) => {
+  store.setOpenSheet(val ? 'about' : null);
+};
+
 const openAbout = () => {
-  var offcanvasElement = document.getElementById('About');
-  var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
-  if (offcanvasElement.classList.contains('show')) {
-    offcanvas.hide();
-  } else {
-    offcanvas.show();
-  }
-
+  store.toggleSheet('about');
   trackEvent('Footer', 'FooterClick', 'About');
-
 };
 
 const offcanvasBody = ref(null);

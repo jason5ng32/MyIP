@@ -56,6 +56,9 @@ export const useMainStore = defineStore('main', {
       ipv64Domain: import.meta.env.VITE_CURL_IPV64_DOMAIN,
     },
     isFireBaseSet: false,
+    // refactor/01 阶段 B：单字段协调所有 Sheet 开关，天然互斥
+    // 取值：'preferences' | 'navMenu' | 'achievements' | 'about' | 'tools' | null
+    openSheet: null,
     loadingStatus: {
       ipcheck: false,
       connectivity: false,
@@ -132,6 +135,13 @@ export const useMainStore = defineStore('main', {
     // App.vue 和 Nav.vue 的通信辅助函数
     setRefreshEveryThing(payload) {
       this.shouldRefreshEveryThing = payload;
+    },
+    // refactor/01 阶段 B：Sheet 开关协调
+    setOpenSheet(name) {
+      this.openSheet = name; // 传 null 关闭所有
+    },
+    toggleSheet(name) {
+      this.openSheet = (this.openSheet === name) ? null : name;
     },
     // 设置黑暗模式
     // 同步 .dark class 到 <html>，让 Tailwind 的 dark: 变体生效（refactor/01）

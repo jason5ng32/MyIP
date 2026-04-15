@@ -4,6 +4,7 @@
 
 /* === Tailwind v4 + shadcn-vue 基建（重构进行中 — 见 refactor/01） === */
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 /* 暗色模式：用 .dark class 触发（由 store.isDarkMode 同步到 <html>） */
 @custom-variant dark (&:where(.dark, .dark *));

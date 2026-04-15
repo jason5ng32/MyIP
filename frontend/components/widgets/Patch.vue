@@ -2,32 +2,16 @@
 </template>
 
 <script setup>
+// refactor/01：原 listenOffcanvas() 的"同一时刻只开一个 offcanvas"互斥逻辑
+// 已被 store.openSheet 单字段天然取代（同一时间只能是一个值）。
+// 本组件现在只保留 section 访问统计与当前 section 追踪。
 import { onMounted } from 'vue';
 import { trackEvent } from '@/utils/use-analytics';
-import { Offcanvas } from 'bootstrap';
 import { useMainStore } from '@/store';
 
 const store = useMainStore();
 
 let trackedSections = new Set();
-
-const listenOffcanvas = () => {
-    const offcanvasElements = document.querySelectorAll('.offcanvas');
-    offcanvasElements.forEach((element) => {
-        const instance = Offcanvas.getOrCreateInstance(element); // 确保实例创建成功
-        element.addEventListener('show.bs.offcanvas', () => {
-            // 关闭所有其他的 offcanvas
-            offcanvasElements.forEach((offcanvas) => {
-                if (offcanvas !== element) {
-                    const offcanvasInstance = Offcanvas.getInstance(offcanvas);
-                    if (offcanvasInstance) { // 确保实例有效
-                        offcanvasInstance.hide();
-                    }
-                }
-            });
-        });
-    });
-};
 
 //
 // 统计相关
@@ -82,7 +66,6 @@ const firstElementInViewport = (elementIds) => {
 };
 
 onMounted(() => {
-    listenOffcanvas();
     window.addEventListener('scroll', checkSectionsAndTrack);
 });
 </script>
