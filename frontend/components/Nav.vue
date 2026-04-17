@@ -23,27 +23,25 @@
         </a>
       </div>
 
-      <!-- 中：桌面 nav 链接（左对齐，紧挨品牌） -->
+      <!-- 中：桌面 nav 链接 + GitHub 星数徽章（左对齐，紧挨品牌） -->
       <div v-if="!isMobile" class="flex items-center gap-0.5">
         <a v-for="item in navItems" :key="item" href="#"
           :class="navLinkClass(item)"
           @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
           {{ t(`nav.${item}`) }}
         </a>
+        <a :href="t('page.footerLink')" target="_blank" rel="noopener"
+          class="ml-2 inline-flex items-center hover:opacity-80 transition-opacity"
+          aria-label="View source on GitHub">
+          <img src="https://img.shields.io/github/stars/jason5ng32/MyIP"
+            alt="GitHub stars" class="h-5">
+        </a>
       </div>
 
       <!-- 右：动作区（ml-auto 推到最右） -->
       <div class="ml-auto flex items-center gap-2">
-        <!-- GitHub star 徽章：shields.io 能显示实时星数，设计上保留 -->
-        <JnTooltip :text="t('Tooltips.GithubLink')">
-          <a :href="t('page.footerLink')" target="_blank" rel="noopener"
-            aria-label="View source on GitHub"
-            class="hidden sm:inline-flex items-center h-8 rounded-md hover:opacity-80 transition-opacity">
-            <img src="https://img.shields.io/github/stars/jason5ng32/MyIP"
-              alt="GitHub stars" class="h-5" referrerpolicy="no-referrer">
-          </a>
-        </JnTooltip>
-        <Button variant="ghost" size="icon" class="size-8 sm:hidden" as-child>
+        <!-- 移动端：GitHub icon -->
+        <Button v-if="isMobile" variant="ghost" size="icon" class="size-8" as-child>
           <a :href="t('page.footerLink')" target="_blank" rel="noopener"
             aria-label="View source on GitHub">
             <Github />
@@ -77,40 +75,26 @@
             </Button>
           </DropdownMenuTrigger>
 
-          <!-- 整个下拉内：[&_svg]:size-4 统一锁定 lucide 图标 16px，和 text-sm (14px) 协调；
-               item 加 gap-2 让 icon/text 有呼吸感 -->
-          <DropdownMenuContent align="end" class="w-64 [&_[role=menuitem]]:gap-2 [&_[role=menuitem]_svg]:size-4 [&_[role=menuitem]_svg]:shrink-0">
-            <!-- 已登录：顶部 profile 卡 -->
+          <DropdownMenuContent align="end" class="w-56">
+            <!-- 已登录：用 DropdownMenuLabel 承载用户身份信息 -->
             <template v-if="isSignedIn">
-              <div class="px-2 pt-2 pb-3">
-                <div class="flex items-center gap-3">
-                  <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
-                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover" referrerpolicy="no-referrer">
+              <DropdownMenuLabel class="font-normal">
+                <div class="flex flex-col space-y-1">
+                  <span class="text-sm font-semibold leading-none">{{ userName }}</span>
+                  <span class="text-xs leading-none text-muted-foreground">
+                    <Badge v-if="remoteUserInfoFetched" :class="levelBadgeClass" class="border-transparent">
+                      {{ t('user.Level.' + remoteUserInfo.userLevel) }}
+                    </Badge>
+                    <span v-else>{{ t('user.Fields.Fetching') }}</span>
                   </span>
-                  <div class="flex min-w-0 flex-1 flex-col gap-1">
-                    <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
-                    <span v-if="remoteUserInfoFetched">
-                      <Badge :class="levelBadgeClass" class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
-                        {{ t('user.Level.' + remoteUserInfo.userLevel) }}
-                      </Badge>
-                    </span>
-                    <span v-else class="text-xs text-neutral-500">{{ t('user.Fields.Fetching') }}</span>
-                  </div>
                 </div>
-                <dl class="mt-3 space-y-1 text-xs">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-neutral-500 dark:text-neutral-400">{{ t('user.Fields.CreatedAt') }}</dt>
-                    <dd class="text-neutral-900 dark:text-neutral-200 font-medium">{{ userCreatedAt }}</dd>
-                  </div>
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-neutral-500 dark:text-neutral-400">{{ t('user.Fields.FunctionUses') }}</dt>
-                    <dd class="text-neutral-900 dark:text-neutral-200 font-medium">
-                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
-                      <span v-else class="text-neutral-500">{{ t('user.Fields.Fetching') }}</span>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
+              </DropdownMenuLabel>
+              <DropdownMenuLabel class="font-normal text-xs text-muted-foreground pt-0">
+                <div>{{ t('user.Fields.CreatedAt') }}: {{ userCreatedAt }}</div>
+                <div v-if="remoteUserInfoFetched">
+                  {{ t('user.Fields.FunctionUses') }}: {{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}
+                </div>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem @select="store.setTriggerAchievements(true)">
                 <Award />
@@ -187,6 +171,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
