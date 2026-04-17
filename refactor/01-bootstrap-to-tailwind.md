@@ -129,7 +129,7 @@
 - [x] `components/advanced-tools/CensorshipCheck.vue` — input/button、两列 table (test/control group) 用 Tailwind；`.alert alert-info/danger/success` 最终结果条 → Tailwind 色块条件分支
 - [x] `components/advanced-tools/MtrTest.vue` — IP Select + Run Button；Accordion 已在 phase C.1 迁移过，这里只清 class；AS 徽章 → shadcn `<Badge>` + 色彩覆盖
 - [x] `components/advanced-tools/SecurityChecklist.vue` — 最复杂组件：进度条、分类卡列表、filter ToggleGroup（替 btn-group radio hack）、checklist table + 优先级 Badge + Switch（替 form-check-input）；`.alert alert-success` 统计条 + `.progress progress-stacked` 多段进度 → Tailwind
-- [ ] `components/advanced-tools/InvisibilityTest.vue`
+- [x] `components/advanced-tools/InvisibilityTest.vue` — agreement checkbox + 运行按钮；score 总结 alert；14 行表格结果，全部改 Tailwind
 - [ ] `components/Advanced.vue`
 - [ ] `components/SpeedTest.vue`
 - [ ] `components/ip-infos/DataPairBar.vue`
