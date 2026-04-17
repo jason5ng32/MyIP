@@ -11,6 +11,8 @@ export const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // "run action" 专用蓝：QueryIP / 未来可能的"开始测试"类触发按钮走这个
+        action: "bg-action text-action-foreground shadow hover:bg-action/90",
       },
       size: {
         default: "h-9 px-4 py-2",

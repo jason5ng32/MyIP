@@ -66,6 +66,8 @@
   --success-foreground: oklch(0.985 0 0);
   --warning: oklch(0.769 0.188 70.08);        /* amber-500 */
   --warning-foreground: oklch(0.145 0 0);
+  --action: oklch(0.623 0.214 259.815);       /* blue-500 —— "run action" 专用 */
+  --action-foreground: oklch(0.985 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -96,6 +98,8 @@
   --success-foreground: oklch(0.145 0 0);
   --warning: oklch(0.828 0.189 84.429);       /* amber-400 */
   --warning-foreground: oklch(0.145 0 0);
+  --action: oklch(0.707 0.165 254.624);       /* blue-400 */
+  --action-foreground: oklch(0.145 0 0);
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
@@ -124,6 +128,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

@@ -1,8 +1,8 @@
 <template>
-    <!-- 悬浮查询按钮（右下固定） -->
+    <!-- 悬浮查询按钮（右下固定）—— "run action" 蓝 -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
-        <Button size="icon" type="button" aria-label="IP Check"
-            class="fixed bottom-5 z-[1050] rounded-full shadow-lg"
+        <Button size="icon" variant="action" type="button" aria-label="IP Check"
+            class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer"
             :style="positionStyle"
             @click="openQueryIP">
             <Search class="size-4" />
@@ -21,7 +21,7 @@
                     <Input type="text" id="inputIP" name="inputIP"
                         :placeholder="t('ipcheck.Placeholder')"
                         v-model="inputIP" @keyup.enter="submitQuery" />
-                    <Button id="sumitQueryButton" type="button"
+                    <Button id="sumitQueryButton" type="button" variant="action"
                         :disabled="!isValidIP(inputIP) || isChecking === 'running'"
                         @click="submitQuery">
                         {{ t('ipcheck.Button') }}
