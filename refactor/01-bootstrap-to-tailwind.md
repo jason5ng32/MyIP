@@ -119,8 +119,8 @@
 - [x] `components/ConnectivityTest.vue` — refresh 按钮用 `<Button size="icon" variant="outline">`；`.row`/`.col-6 col-md-3` → `flex flex-wrap -mx-2` + `w-1/2 md:w-1/4 px-2`；`.card` 改为 Tailwind；`text-info/success/warning/danger` 映射到 `text-sky/green/yellow/red-600`（保留 `.jn-text-warning` 自定义色）
 - [x] `components/DnsLeaksTest.vue` — 相同模式：Button + flex/wrap grid + `.alert alert-info/success` → Tailwind 配色块 + dark: 变体
 - [x] `components/WebRtcTest.vue` — 与 Connectivity/DnsLeaks 同模式
-- [ ] `components/advanced-tools/Empty.vue`
-- [ ] `components/advanced-tools/BrowserInfo.vue`
+- [x] `components/advanced-tools/Empty.vue` — 无工作：只是空 div
+- [x] `components/advanced-tools/BrowserInfo.vue` — row/col → flex/w-_；`.alert` → Tailwind 色块；`.badge text-bg-*` → shadcn `<Badge>` + 色彩覆盖；`.form-check form-switch` → shadcn `<Switch>`；`.spinner-grow` → `animate-pulse` 圆点；新增 `components/ui/switch/`
 - [ ] `components/advanced-tools/MacChecker.vue`
 - [ ] `components/advanced-tools/RuleTest.vue`
 - [ ] `components/advanced-tools/DnsResolver.vue`

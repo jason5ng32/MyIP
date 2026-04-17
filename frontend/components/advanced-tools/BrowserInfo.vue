@@ -1,168 +1,135 @@
 <template>
     <!-- Browser Info -->
     <div class="browser-info-section my-4">
-        <div class="text-secondary">
+        <div class="text-neutral-500">
             <p>{{ t('browserinfo.Note') }}</p>
             <p>{{ t('browserinfo.Note2') }}</p>
         </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-
-                    <div class="card-body">
-                        <Transition name="slide-fade" mode="out-in">
-                            <div id="browserInfoResult" class="row" v-if="checkingStatus === 'finished'">
-                                <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                    <div class="h-100">
-                                        <div class="card-body row"
-                                            :class="[isMobile ? 'p-1 border-1 border-bottom' : '']">
-                                            <h3 class="mb-4">{{ t('browserinfo.browser.Infos') }} <i
-                                                    class="bi bi-person-workspace"></i></h3>
-                                            <div class="jn-ua-box w-100">
-                                                <div class="alert alert-success jn-ua-box">
-                                                    <span class="mb-1 badge text-bg-success">User Agent</span>
-                                                    <span><span class="jn-code-font ">{{ userAgent.ua }}</span> <i
-                                                            :class="copiedStatus ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                                                            @click="copyToClipboard(userAgent.ua)" role="button"
-                                                            aria-label="Copy UA"></i></span>
-                                                </div>
+        <div class="mb-3">
+            <div class="jn-card rounded-lg border bg-card text-card-foreground">
+                <div class="p-4">
+                    <Transition name="slide-fade" mode="out-in">
+                        <div id="browserInfoResult" class="flex flex-wrap -mx-2" v-if="checkingStatus === 'finished'">
+                            <div class="w-full md:w-2/3 px-2 mb-4">
+                                <div class="h-full">
+                                    <div class="flex flex-wrap" :class="[isMobile ? 'p-1 border-b' : '']">
+                                        <h3 class="mb-4 w-full text-xl font-semibold">
+                                            {{ t('browserinfo.browser.Infos') }}
+                                            <i class="bi bi-person-workspace"></i>
+                                        </h3>
+                                        <div class="w-full">
+                                            <div class="flex flex-col w-full px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
+                                                <Badge class="w-fit mb-1 bg-green-600 text-white border-transparent">User Agent</Badge>
+                                                <span>
+                                                    <span class="jn-code-font">{{ userAgent.ua }}</span>
+                                                    <i :class="copiedStatus ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                                                        @click="copyToClipboard(userAgent.ua)" role="button"
+                                                        aria-label="Copy UA"></i>
+                                                </span>
                                             </div>
+                                        </div>
 
-                                            <div class="col-lg-6 col-md-6 col-12">
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.browserName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.browser.name }} {{ userAgent.browser.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.engineName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.engine.name }} {{ userAgent.engine.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.osName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.os.name }} {{ userAgent.os.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.language') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.browserLanguage }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cookieEnabled') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.cookieEnabled?
-                                                        t('browserinfo.browser.cookieEnabledTrue'):t('browserinfo.browser.cookieEnabledFalse')
-                                                        }}
-                                                    </span>
-                                                </div>
+                                        <div class="w-full md:w-1/2 mt-3">
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.browserName') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ userAgent.browser.name }} {{ userAgent.browser.version }}
+                                                </span>
                                             </div>
-
-                                            <div class="col-lg-6 col-md-6 col-12">
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.deviceVendor') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.device.vendor }} {{ userAgent.device.model }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cpuArchitecture') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.device.cpu ? userAgent.device.cpu.architecture :
-                                                        'N/A'
-                                                        }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.gpu') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ gpu }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cpuCores') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.cpucores }}
-                                                    </span>
-                                                </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.engineName') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ userAgent.engine.name }} {{ userAgent.engine.version }}
+                                                </span>
                                             </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.osName') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ userAgent.os.name }} {{ userAgent.os.version }}
+                                                </span>
+                                            </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.language') }}</span>
+                                                <span class="jn-con-title mt-1">{{ otherInfos.browserLanguage }}</span>
+                                            </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.cookieEnabled') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ otherInfos.cookieEnabled ? t('browserinfo.browser.cookieEnabledTrue') : t('browserinfo.browser.cookieEnabledFalse') }}
+                                                </span>
+                                            </div>
+                                        </div>
 
+                                        <div class="w-full md:w-1/2 mt-3">
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.deviceVendor') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ userAgent.device.vendor }} {{ userAgent.device.model }}
+                                                </span>
+                                            </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.cpuArchitecture') }}</span>
+                                                <span class="jn-con-title mt-1">
+                                                    {{ userAgent.device.cpu ? userAgent.device.cpu.architecture : 'N/A' }}
+                                                </span>
+                                            </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.gpu') }}</span>
+                                                <span class="jn-con-title mt-1">{{ gpu }}</span>
+                                            </div>
+                                            <div class="jn-detail">
+                                                <span>{{ t('browserinfo.browser.cpuCores') }}</span>
+                                                <span class="jn-con-title mt-1">{{ otherInfos.cpucores }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-4 col-md-4 col-12 mb-4">
-                                    <div class="h-100" :class="{ 
-                                    'dark-mode dark-mode-border': isDarkMode,
-                                    'card': !isMobile
-                                    }">
-                                        <div class="card-body" :class="[isMobile ? 'p-1' : '']">
-                                            <h3 class="mb-4">{{ t('browserinfo.fingerprint.Infos') }} <i
-                                                    class="bi bi-fingerprint"></i></h3>
-                                            <div class="jn-ua-box w-100">
-                                                <div :class="[isMobile ? 'jn-fp-box-mobile' : '']"
-                                                    class="alert alert-primary jn-ua-box">
-                                                    <span class="mb-1 badge text-bg-primary">{{
-                                                        t('browserinfo.fingerprint.fingerprint') }}</span>
-                                                    <span class="jn-code-font ">{{ fingerprint }}</span>
-                                                </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <div class="h-full" :class="{ 'rounded-lg border bg-card text-card-foreground': !isMobile }">
+                                    <div :class="[isMobile ? 'p-1' : 'p-4']">
+                                        <h3 class="mb-4 text-xl font-semibold">
+                                            {{ t('browserinfo.fingerprint.Infos') }}
+                                            <i class="bi bi-fingerprint"></i>
+                                        </h3>
+                                        <div class="w-full">
+                                            <div class="flex flex-col w-full px-3 py-2 rounded-md border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200"
+                                                :class="[isMobile ? 'jn-fp-box-mobile' : '']">
+                                                <Badge class="w-fit mb-1 bg-blue-600 text-white border-transparent">
+                                                    {{ t('browserinfo.fingerprint.fingerprint') }}
+                                                </Badge>
+                                                <span class="jn-code-font break-all">{{ fingerprint }}</span>
                                             </div>
+                                        </div>
 
-                                            <p>{{ t('browserinfo.fingerprint.changeOption') }}</p>
+                                        <p class="mt-3">{{ t('browserinfo.fingerprint.changeOption') }}</p>
 
-                                            <div class="row g-1 m-1">
-                                                <div v-for="(value, key) in excludeOptions" :key="key"
-                                                    class="form-check form-switch col-6">
-                                                    <input class="form-check-input" type="checkbox" :id="key"
-                                                        v-model="excludeOptions[key]" />
-                                                    <label class="form-check-label" :for="key">
-                                                        {{ t(`browserinfo.options.${key}`) }}
-                                                    </label>
-                                                </div>
+                                        <div class="flex flex-wrap gap-1 m-1">
+                                            <div v-for="(value, key) in excludeOptions" :key="key"
+                                                class="flex items-center gap-2 w-1/2 py-1">
+                                                <Switch :id="key" v-model="excludeOptions[key]" />
+                                                <label :for="key" class="cursor-pointer select-none">
+                                                    {{ t(`browserinfo.options.${key}`) }}
+                                                </label>
                                             </div>
-                                            <div class="alert alert-light opacity-75 mt-4" role="alert">
-                                                <i class="bi bi-info-circle"></i> {{
-                                                t('browserinfo.fingerprint.browserTips') }}
-                                            </div>
-
+                                        </div>
+                                        <div class="px-3 py-2 rounded-md border bg-neutral-50 border-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 opacity-75 mt-4" role="alert">
+                                            <i class="bi bi-info-circle"></i>
+                                            {{ t('browserinfo.fingerprint.browserTips') }}
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-                            <div v-else class="jn-placeholder ">
-                                <span v-if="checkingStatus === 'running'">
-                                    <span class="spinner-grow spinner-grow-sm text-success" aria-hidden="true"></span>
-                                    <span class="text-success">&nbsp;{{ t('browserinfo.calculating') }}</span>
-                                </span>
-                                <p v-if="checkingStatus === 'error'" class="text-danger">{{ errorMsg }}</p>
-                            </div>
-                        </Transition>
-                    </div>
-
+                        </div>
+                        <div v-else class="jn-placeholder">
+                            <span v-if="checkingStatus === 'running'">
+                                <span class="inline-block h-3 w-3 rounded-full bg-green-600 animate-pulse" aria-hidden="true"></span>
+                                <span class="text-green-600">&nbsp;{{ t('browserinfo.calculating') }}</span>
+                            </span>
+                            <p v-if="checkingStatus === 'error'" class="text-red-600">{{ errorMsg }}</p>
+                        </div>
+                    </Transition>
                 </div>
             </div>
         </div>
@@ -173,11 +140,12 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const fingerprint = ref('');
@@ -316,25 +284,14 @@ onMounted(() => {
 });
 
 // 监控排除选项
-watch(excludeOptions, (newVal, oldVal) => {
+watch(excludeOptions, () => {
     getFingerPrint();
 }, { immediate: true, deep: true });
-
 </script>
 
 <style scoped>
 .jn-placeholder {
     height: 16pt;
-}
-
-.jn-ua-box {
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-}
-
-.jn-ua-box .badge {
-    width: fit-content;
 }
 
 .jn-code-font {
