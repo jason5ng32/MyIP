@@ -10,13 +10,13 @@
                     <p class="jn-comment"><span class="text-muted-foreground">{{ t('curl.Note1') }}</span></p>
                     <p class="jn-comment">
                         <span class="text-muted-foreground">{{ t('curl.Note2_1') }}
-                            <span class="text-success">curl</span> {{ t('curl.Note2_2') }}</span>
+                            <Badge variant="outline" class="text-success">curl</Badge> {{ t('curl.Note2_2') }}</span>
                     </p>
                     <p class="jn-comment">
-                        <span class="text-muted-foreground"><span class="text-success">geo</span> {{ t('curl.Note3') }}</span>
+                        <span class="text-muted-foreground"><Badge variant="outline" class="text-success">geo</Badge> {{ t('curl.Note3') }}</span>
                     </p>
                     <p class="jn-comment">
-                        <span class="text-muted-foreground"><span class="text-success">YOUR_API_KEY</span> {{ t('curl.Note4') }}</span>
+                        <span class="text-muted-foreground"><Badge variant="outline" class="text-success">YOUR_API_KEY</Badge> {{ t('curl.Note4') }}</span>
                     </p>
                 </div>
 
@@ -79,6 +79,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Terminal } from 'lucide-vue-next';
+import { Badge } from '@/components/ui/badge';
 
 const { t } = useI18n();
 
