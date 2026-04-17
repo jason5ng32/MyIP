@@ -20,7 +20,7 @@
 
     <!-- 卡片网格：现代设计用 CSS Grid 而不是负 margin flex -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
+      <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card"
         @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
         :title="t('connectivity.RefreshThisTest')">
         <CardContent class="p-4">
