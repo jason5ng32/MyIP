@@ -1,32 +1,22 @@
 <template>
-    <div class="my-3">
-        <!-- 进度条 -->
-        <div class="flex h-4 w-full overflow-hidden rounded-lg border"
-            :class="[isDarkMode ? 'border-neutral-100 bg-neutral-900' : 'border-neutral-500']"
-            role="progressbar" :aria-label="`${leftLabel} ${leftValue}% vs ${rightLabel} ${rightValue}%`">
-            <div class="h-full transition-all"
-                :class="[isDarkMode ? 'bg-neutral-100' : 'bg-neutral-500']"
-                :style="{ width: leftValue + '%' }"></div>
-            <div class="h-full transition-all"
-                :class="[isDarkMode ? 'bg-neutral-500' : 'bg-neutral-100']"
-                :style="{ width: rightValue + '%' }"></div>
+    <!-- 左右双值 bar：用 foreground / muted-foreground 形成对比，自动适配明暗模式 -->
+    <div>
+        <div class="flex h-2 w-full overflow-hidden rounded-full border border-border"
+            role="progressbar"
+            :aria-label="`${leftLabel} ${leftValue}% vs ${rightLabel} ${rightValue}%`">
+            <div class="h-full bg-foreground transition-all" :style="{ width: leftValue + '%' }"></div>
+            <div class="h-full bg-muted-foreground/40 transition-all" :style="{ width: rightValue + '%' }"></div>
         </div>
-
-        <!-- 文字标签 -->
-        <div class="flex justify-between mt-0.5 text-sm">
-            <span class="flex items-center">
-                <Badge class="font-light rounded-full mr-1"
-                    :class="isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
-                    {{ t('ipInfos.ASNInfo.' + leftLabel) }}
-                </Badge>
-                <span class="font-bold">{{ leftValue }}%</span>
+        <div class="flex justify-between mt-1 text-xs">
+            <span class="flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-foreground"></span>
+                <span class="text-muted-foreground">{{ t('ipInfos.ASNInfo.' + leftLabel) }}</span>
+                <span class="font-medium tabular-nums">{{ leftValue }}%</span>
             </span>
-            <span class="flex items-center">
-                <Badge class="font-light rounded-full mr-1"
-                    :class="isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
-                    {{ t('ipInfos.ASNInfo.' + rightLabel) }}
-                </Badge>
-                <span class="font-bold">{{ rightValue }}%</span>
+            <span class="flex items-center gap-1.5">
+                <span class="font-medium tabular-nums">{{ rightValue }}%</span>
+                <span class="text-muted-foreground">{{ t('ipInfos.ASNInfo.' + rightLabel) }}</span>
+                <span class="size-2 rounded-full bg-muted-foreground/40"></span>
             </span>
         </div>
     </div>
@@ -34,14 +24,12 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n';
-import { Badge } from '@/components/ui/badge';
 
 defineProps({
     leftLabel: { type: String, required: true },
     leftValue: { type: Number, required: true },
     rightLabel: { type: String, required: true },
     rightValue: { type: Number, required: true },
-    isDarkMode: { type: Boolean, required: true }
 });
 
 const { t } = useI18n();

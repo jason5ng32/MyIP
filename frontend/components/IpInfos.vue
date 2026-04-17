@@ -1,23 +1,27 @@
 <template>
-  <!-- IP Infos -->
-  <div class="ip-data-section mb-4 mt-4">
-    <div class="jn-title2">
-      <h2 id="IPInfo" :class="{ 'mobile-h2': isMobile }">🔎 {{ t('ipInfos.Title') }}</h2>
-    </div>
-    <div class="text-neutral-500">
-      <p>{{ t('ipInfos.Notes') }}</p>
-    </div>
-    <div class="flex flex-wrap -mx-2">
+  <!-- IP Infos — 与其他重构过的模块一致的 section + header 结构 -->
+  <section class="ip-data-section mb-10 mt-4">
+    <header class="mb-3">
+      <h2 id="IPInfo" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+        🔎 {{ t('ipInfos.Title') }}
+      </h2>
+      <p class="my-3 text-base text-muted-foreground">{{ t('ipInfos.Notes') }}</p>
+    </header>
+
+    <!-- 卡片网格：CSS grid 自适应列数；items-stretch 让同行卡片自然等高，
+         不再需要 jn-ip-card1/2 的 min-height hack -->
+    <div class="grid gap-4 items-stretch"
+      :class="gridColsClass">
       <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
-        :class="[colClass, {
-          'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
-        }]">
-        <IPCard :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile" :ipGeoSource="ipGeoSource"
-          :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus" :configs="configs"
-          :asnInfos="asnInfos" @refresh-card="refreshCard" />
+        class="flex"
+        :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
+        <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
+          :ipGeoSource="ipGeoSource" :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed"
+          :copiedStatus="copiedStatus" :configs="configs" :asnInfos="asnInfos"
+          @refresh-card="refreshCard" />
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 
@@ -47,17 +51,13 @@ const lang = computed(() => store.lang);
 const isMapShown = computed(() => userPreferences.value.showMap);
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
-// 创建样式 —— Tailwind 等价栅格：
-// numCards = 1 → w-full;  2 → md:w-1/2;  3 → md:w-1/3;  >3 → md:w-1/3 xl:w-1/3 (每行最多 3 张)
-const colClass = computed(() => {
-  const numCards = ipCardsToShow.value;
-  const baseMap = {
-    1: 'md:w-full xl:w-full',
-    2: 'md:w-1/2 xl:w-1/2',
-    3: 'md:w-1/3 xl:w-1/3',
-  };
-  const clsForWide = baseMap[numCards] || 'md:w-1/3 xl:w-1/3';
-  return `w-full ${clsForWide} px-2 mb-4`;
+// 卡片网格列数：基于 ipCardsToShow 动态选 tailwind grid-cols class
+// 1 张 → 单列；2 张 → md 起 2 列；3+ 张 → md 2 列、lg 3 列（避免每张过窄）
+const gridColsClass = computed(() => {
+  const n = ipCardsToShow.value;
+  if (n <= 1) return 'grid-cols-1';
+  if (n === 2) return 'grid-cols-1 md:grid-cols-2';
+  return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 });
 
 // 默认卡片数据
