@@ -24,6 +24,7 @@
                     <Button id="sumitQueryButton" type="button" variant="action"
                         :disabled="!isValidIP(inputIP) || isChecking === 'running'"
                         @click="submitQuery">
+                        <Spinner v-if="isChecking === 'running'" />
                         {{ t('ipcheck.Button') }}
                     </Button>
                 </InputGroup>
@@ -180,6 +181,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputGroup } from '@/components/ui/input-group';
 import { Progress } from '@/components/ui/progress';
+import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import {
     Building2,
