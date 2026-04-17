@@ -3,21 +3,20 @@
     <div class="advanced-tools-section mb-4">
         <div class="jn-title2">
             <h2 id="AdvancedTools" :class="{ 'mobile-h2': isMobile }">🧰 {{ t('advancedtools.Title') }}</h2>
-
         </div>
-        <div class="text-secondary">
+        <div class="text-neutral-500">
             <p>{{ t('advancedtools.Note') }}</p>
         </div>
-        <div class="row">
-            <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards.filter(card => card.enabled)"
-                :key="index">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']" class="jn-adv-title">
+        <div class="flex flex-wrap -mx-2">
+            <div class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4"
+                v-for="(card, index) in cards.filter(card => card.enabled)" :key="index">
+                <div class="jn-adv-card rounded-lg border bg-card text-card-foreground">
+                    <div class="p-4 cursor-pointer" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
+                        <h3 :class="[isMobile ? 'mobile-h3' : 'text-xl']" class="jn-adv-title font-semibold">
                             <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
                         </h3>
                         <p class="opacity-75">{{ t(card.noteKey) }}</p>
-                        <span :class="[isDarkMode ? 'jn-icon-dark' : 'jn-icon']">{{ card.icon }}</span>
+                        <span class="jn-icon">{{ card.icon }}</span>
                     </div>
                 </div>
             </div>
@@ -27,31 +26,30 @@
                 side="bottom"
                 :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
                 :class="cn('overflow-y-auto pt-0 jn-tools-sheet', isMobile ? 'h-full' : (isFullScreen ? 'h-full' : 'h-[80%]'))"
-                :data-bs-theme="isDarkMode ? 'dark' : ''"
             >
-            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header px-3">
-                <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
-                    <span v-if="!isFullScreen">
-                        <i class="bi bi-arrows-fullscreen"></i>
-                    </span>
-                    <span v-else>
-                        <i class="bi bi-fullscreen-exit"></i>
-                    </span>
-                </button>
-                <span v-if="openedCard >= 0" class="fw-medium"
-                    :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
-                    cards[openedCard].icon }}
-                    {{ t(cards[openedCard].titleKey) }}</span>
+                <div class="flex justify-end items-center jn-offcanvas-header px-3">
+                    <button v-if="!isMobile" type="button" class="opacity-50 jn-bold cursor-pointer"
+                        @click="fullScreen">
+                        <span v-if="!isFullScreen">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </span>
+                        <span v-else>
+                            <i class="bi bi-fullscreen-exit"></i>
+                        </span>
+                    </button>
+                    <span v-if="openedCard >= 0" class="font-medium"
+                        :class="[isMobile ? 'mobile-h2 text-left' : 'text-lg text-center ms-auto']">{{
+                            cards[openedCard].icon }}
+                        {{ t(cards[openedCard].titleKey) }}</span>
 
-                <SheetClose class="btn-close" @click="resetNavigatorURL()" />
-            </div>
-            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
-                <router-view></router-view>
-            </div>
+                    <SheetClose @click="resetNavigatorURL()" />
+                </div>
+                <div class="pt-0" :class="[isMobile ? 'w-full' : 'jn-canvas-width']" ref="scrollContainer">
+                    <router-view></router-view>
+                </div>
             </SheetContent>
         </Sheet>
     </div>
-
 </template>
 
 <script setup>
@@ -176,22 +174,13 @@ defineExpose({
     transition: all 0.4s;
 }
 
-.jn-icon-dark {
-    top: 4pt;
-    right: 6pt;
-    font-size: 1.6rem;
-    position: absolute;
-    transition: all 0.4s;
-}
-
-.jn-adv-card:hover .jn-icon-dark {
-    transform: translateY(-10pt) scale(1.8);
-    text-shadow: 0 0 10pt #ffffff27;
-}
-
 .jn-adv-card:hover .jn-icon {
     transform: translateY(-10pt) scale(1.8);
     text-shadow: 0 0 10pt #00000060;
+}
+
+:global(.dark) .jn-adv-card:hover .jn-icon {
+    text-shadow: 0 0 10pt #ffffff27;
 }
 
 .jn-adv-title {

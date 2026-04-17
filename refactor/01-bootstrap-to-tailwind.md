@@ -130,7 +130,7 @@
 - [x] `components/advanced-tools/MtrTest.vue` — IP Select + Run Button；Accordion 已在 phase C.1 迁移过，这里只清 class；AS 徽章 → shadcn `<Badge>` + 色彩覆盖
 - [x] `components/advanced-tools/SecurityChecklist.vue` — 最复杂组件：进度条、分类卡列表、filter ToggleGroup（替 btn-group radio hack）、checklist table + 优先级 Badge + Switch（替 form-check-input）；`.alert alert-success` 统计条 + `.progress progress-stacked` 多段进度 → Tailwind
 - [x] `components/advanced-tools/InvisibilityTest.vue` — agreement checkbox + 运行按钮；score 总结 alert；14 行表格结果，全部改 Tailwind
-- [ ] `components/Advanced.vue`
+- [x] `components/Advanced.vue` — 工具入口卡片网格 + Sheet 头部 + 全屏切换按钮，全部改 Tailwind；`.jn-icon-dark` 合并到 `:global(.dark) .jn-icon` 选择器
 - [ ] `components/SpeedTest.vue`
 - [ ] `components/ip-infos/DataPairBar.vue`
 - [ ] `components/ip-infos/ASNInfo.vue`
