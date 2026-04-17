@@ -60,7 +60,7 @@
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
             <!-- 未登录：用 outline 与 GitHub 视觉权重一致，不喧宾夺主 -->
-            <Button v-if="!isSignedIn" variant="outline" size="sm" @click="getUserInfo" class="h-8 gap-1.5">
+            <Button v-if="!isSignedIn"  size="sm" @click="getUserInfo" class="h-8 gap-1.5">
               <span>{{ t('user.SignIn') }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
@@ -70,31 +70,43 @@
                 <img :src="userPhotoURL" :alt="userName" :title="userName"
                   class="size-full object-cover" referrerpolicy="no-referrer">
               </span>
-              <span v-if="!isMobile" class="text-sm font-medium max-w-[10rem] truncate">{{ userName }}</span>
+              <span v-if="!isMobile" class="text-sm font-medium max-w-40 truncate">{{ userName }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" class="w-56">
-            <!-- 已登录：用 DropdownMenuLabel 承载用户身份信息 -->
+          <DropdownMenuContent align="end" class="w-56 border-neutral-200 dark:border-neutral-700 shadow-md">
+            <!-- 已登录：用户信息卡（头像 + 名字 + Level Badge + 元信息） -->
             <template v-if="isSignedIn">
-              <DropdownMenuLabel class="font-normal">
-                <div class="flex flex-col space-y-1">
-                  <span class="text-sm font-semibold leading-none">{{ userName }}</span>
-                  <span class="text-xs leading-none text-muted-foreground">
-                    <Badge v-if="remoteUserInfoFetched" :class="levelBadgeClass" class="border-transparent">
-                      {{ t('user.Level.' + remoteUserInfo.userLevel) }}
-                    </Badge>
-                    <span v-else>{{ t('user.Fields.Fetching') }}</span>
+              <div class="px-2 pt-2 pb-3">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
+                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover" referrerpolicy="no-referrer">
                   </span>
+                  <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
+                    <span v-if="remoteUserInfoFetched">
+                      <Badge :class="levelBadgeClass" class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
+                        {{ t('user.Level.' + remoteUserInfo.userLevel) }}
+                      </Badge>
+                    </span>
+                    <span v-else class="text-xs text-muted-foreground">{{ t('user.Fields.Fetching') }}</span>
+                  </div>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuLabel class="font-normal text-xs text-muted-foreground pt-0">
-                <div>{{ t('user.Fields.CreatedAt') }}: {{ userCreatedAt }}</div>
-                <div v-if="remoteUserInfoFetched">
-                  {{ t('user.Fields.FunctionUses') }}: {{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}
-                </div>
-              </DropdownMenuLabel>
+                <dl class="mt-3 space-y-1 text-xs">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <dt class="text-muted-foreground">{{ t('user.Fields.CreatedAt') }}</dt>
+                    <dd class="font-medium">{{ userCreatedAt }}</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-2">
+                    <dt class="text-muted-foreground">{{ t('user.Fields.FunctionUses') }}</dt>
+                    <dd class="font-medium">
+                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
+                      <span v-else class="text-muted-foreground">{{ t('user.Fields.Fetching') }}</span>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem @select="store.setTriggerAchievements(true)">
                 <Award />
@@ -171,7 +183,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
