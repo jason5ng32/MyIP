@@ -34,20 +34,22 @@
           </div>
           </div>
 
-          <!-- 端点状态行：解析成功时才显示 "DNS Endpoint: 1.2.3.4"，
-               等待/错误态直接显示状态文字，省掉无意义的 label 前缀 -->
-          <div class="flex items-start gap-1.5 text-base mb-3">
-            <span class="relative flex shrink-0 mt-[0.5em]">
+          <!-- 端点状态行：超长 IPv6 通过字号降级保持单行显示；
+               resolved 时整行（label + IP）一起缩放，保持视觉节奏一致 -->
+          <div class="flex items-center gap-1.5 mb-3 min-w-0">
+            <span class="relative flex shrink-0">
               <span v-if="toneOf(leak) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <span class="break-all">
+            <span class="whitespace-nowrap truncate min-w-0"
+              :class="fitOneLineClass(endpointLineText(leak))"
+              :title="leak.ip">
               <template v-if="isResolved(leak)">
                 <span class="text-muted-foreground">{{ t('dnsleaktest.Endpoint') }}:</span>
                 <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
               </template>
-              <span v-else :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+              <span v-else class="text-base" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
             </span>
           </div>
 
@@ -123,6 +125,19 @@ const isFieldPending = (value) => {
 };
 // 整张卡是否已经解析出了真实 endpoint（不在 wait/fail 态）
 const isResolved = (leak) => toneOf(leak) === 'ok-fast';
+
+// IP 字号降级：IPv4 ≤15 字符保持 base；短压缩 IPv6 降到 sm；完整 IPv6（最长 39 字符）再降到 xs
+// 保证单行显示全，不因 IPv6 换行或截断
+const fitOneLineClass = (text) => {
+  const len = typeof text === 'string' ? text.length : 0;
+  if (len <= 15) return 'text-base';
+  if (len <= 26) return 'text-sm';
+  return 'text-xs';
+};
+// resolved 时总文本 = label + ': ' + ip；用它来判断整行字号，让 label 跟 IP 一起缩
+const endpointLineText = (leak) => isResolved(leak)
+  ? `${t('dnsleaktest.Endpoint')}: ${leak.ip}`
+  : leak.ip;
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),

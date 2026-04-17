@@ -10,8 +10,7 @@
         <p class="my-3 text-base text-muted-foreground">{{ t('webrtc.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0"
-          @click="checkAllWebRTC(true)"
+        <Button size="icon" variant="outline" class="shrink-0" @click="checkAllWebRTC(true)"
           aria-label="Refresh WebRTC Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>
@@ -34,14 +33,15 @@
             {{ stun.url }}
           </p>
 
-          <!-- IP 行（多行时 dot 顶端对齐，IPv6 / 长状态文案自然换行） -->
-          <div class="flex items-start gap-1.5 text-base mb-3">
-            <span class="relative flex shrink-0 mt-[0.5em]">
+          <!-- IP 行：超长 IPv6 通过字号降级保持单行显示，不再换行 -->
+          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
+            <span class="relative flex shrink-0">
               <span v-if="toneOf(stun) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
-            <span class="font-mono break-all" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
+            <span class="font-mono whitespace-nowrap truncate min-w-0"
+              :class="[fitOneLineClass(stun.ip), textClass(toneOf(stun))]" :title="stun.ip">{{ stun.ip }}</span>
           </div>
 
           <!-- NAT + Country 子块：dt 配图标做视觉锚点；
@@ -64,9 +64,7 @@
               </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(stun.country)">
-                  <Icon v-if="stun.country_code"
-                    :icon="'circle-flags:' + stun.country_code"
-                    class="shrink-0 size-4" />
+                  <Icon v-if="stun.country_code" :icon="'circle-flags:' + stun.country_code" class="shrink-0 size-4" />
                   <span class="wrap-break-word">{{ stun.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
@@ -101,10 +99,10 @@ const { dotClass, textClass } = useStatusTone();
 const isStarted = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
-  { id: 'google',     name: 'Google',     url: 'stun.l.google.com:19302',       ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'google', name: 'Google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
   { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
-  { id: 'twilio',     name: 'Twilio',     url: 'global.stun.twilio.com',        ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
-  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com',           ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'twilio', name: 'Twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
 ]);
 
 // 业务状态 → 4 档 tone
@@ -119,6 +117,15 @@ const toneOf = (stun) => {
 // 这些字段可能独立失败（比如 IP 成功但国家查询失败），所以按字段判断
 const isFieldPending = (value) => {
   return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
+};
+
+// IP 字号降级：IPv4 ≤15 字符保持 base；短压缩 IPv6 降到 sm；完整 IPv6（最长 39 字符）再降到 xs
+// 保证单行显示全，不因 IPv6 换行或截断
+const fitOneLineClass = (text) => {
+  const len = typeof text === 'string' ? text.length : 0;
+  if (len <= 15) return 'text-base';
+  if (len <= 26) return 'text-sm';
+  return 'text-xs';
 };
 
 // 测试 STUN 服务器
@@ -184,7 +191,7 @@ const checkSTUNServer = async (stun) => {
 const determineNATType = (candidate) => {
   const parts = candidate.split(' ');
   const type = parts[7];
-  if (type === 'host')  return t('webrtc.NATType.host');
+  if (type === 'host') return t('webrtc.NATType.host');
   if (type === 'srflx') return t('webrtc.NATType.srflx');
   if (type === 'prflx') return t('webrtc.NATType.prflx');
   if (type === 'relay') return t('webrtc.NATType.relay');
