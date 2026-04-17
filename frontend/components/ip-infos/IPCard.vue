@@ -69,21 +69,21 @@
                                 <House class="size-3.5" />
                                 <span>{{ t('ipInfos.Region') }}</span>
                             </dt>
-                            <dd class="font-normal break-words">{{ card.region || '—' }}</dd>
+                            <dd class="font-normal wrap-break-word">{{ card.region || '—' }}</dd>
                         </div>
                         <div>
                             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                                 <CornerUpRight class="size-3.5" />
                                 <span>{{ t('ipInfos.City') }}</span>
                             </dt>
-                            <dd class="font-normal break-words">{{ card.city || '—' }}</dd>
+                            <dd class="font-normal wrap-break-word">{{ card.city || '—' }}</dd>
                         </div>
                         <div class="col-span-2">
                             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                                 <EthernetPort class="size-3.5" />
                                 <span>{{ t('ipInfos.ISP') }}</span>
                             </dt>
-                            <dd class="font-normal break-words">{{ card.isp || '—' }}</dd>
+                            <dd class="font-normal wrap-break-word">{{ card.isp || '—' }}</dd>
                         </div>
                     </template>
                 </dl>
@@ -213,7 +213,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
 import ASNInfo from './ASNInfo.vue';
 import IPErrorIcon from '../svgicons/IPError.vue';
@@ -246,7 +245,6 @@ import {
 } from 'lucide-vue-next';
 
 const { t } = useI18n();
-const store = useMainStore();
 
 const placeholderSizes = [12, 8, 6, 8, 4];
 const isAsnOpen = ref(false);

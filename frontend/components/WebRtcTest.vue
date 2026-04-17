@@ -52,7 +52,7 @@
                 <Network class="size-3.5" />
                 <span>NAT</span>
               </dt>
-              <dd class="font-medium break-words">
+              <dd class="font-medium wrap-break-word">
                 <span v-if="!isFieldPending(stun.natType)">{{ stun.natType }}</span>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>

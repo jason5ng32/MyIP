@@ -61,7 +61,7 @@
                 <Building2 class="size-3.5" />
                 <span>{{ t('ipInfos.ISP') }}</span>
               </dt>
-              <dd class="font-medium break-words" :title="leak.org">
+              <dd class="font-medium wrap-break-word" :title="leak.org">
                 <span v-if="!isFieldPending(leak.org)">{{ leak.org }}</span>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
