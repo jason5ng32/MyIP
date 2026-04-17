@@ -100,6 +100,8 @@
 
 **shadcn-vue 优先原则（01 阶段 C.2 专用，但原则通用）：** 动手写任何 `<button>` / `<div>` / `<input>` / 表单元素 / 弹层 / 列表结构之前，先在 `frontend/components/ui/` 下查有没有现成 shadcn-vue 组件（Button / Card / Alert / Badge / Input / Select / Checkbox / Switch / Progress / Dialog / Sheet / Tooltip / DropdownMenu / Tabs / Accordion / Collapsible / Sonner …）。缺变体不是理由：`:class` 叠加足以覆盖绝大多数状态色需求，`as-child` 可以让触发器挂到自定义元素上。**只有在 shadcn 没有对应形状/行为时才自己写 Tailwind。** 曾因忽视这条在 C.2 首个组件上被用户纠正过，详见 `.learnings/LEARNINGS.md` 的 LRN-20260417-001。
 
+**过渡期样式干扰原则（C.2 进行中生效）：** Bootstrap CSS 在完整移除前，会对新迁移的 shadcn 组件产生样式干扰（例如 Bootstrap Preflight 的 `button{border-radius:0}`、Bootstrap 的 `.shadow{...!important}` 会压制 Tailwind 对应的 utility）。**这些差异是过渡态的天然结果，不应该去 workaround**（不写 `!important`、不加 scoped 覆盖 CSS、不调 cascade layer 顺序）。最终 `@import 'bootstrap/dist/css/bootstrap.min.css'` 删除后，这些差异会**自动消失**。C.2 期间判断视觉差异的标准不是"跟当前的 Bootstrap 版本一致"，而是"跟 shadcn-vue 的目标原生样式一致"。详见 `.learnings/LEARNINGS.md` 的 LRN-20260417-002。
+
 ---
 
 ## 开发命令
