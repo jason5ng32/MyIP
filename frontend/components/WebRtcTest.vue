@@ -44,12 +44,12 @@
             <span class="font-mono break-all" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
           </div>
 
-          <!-- NAT + Country 子块：stacked 排版，label 一行、value 一行，天然支持长文本 -->
+          <!-- NAT + Country 子块：wait / fail 时文字走 muted，避免重复放大错误信息
+               （状态灯已经传达错误，子块里只是辅助信息） -->
           <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="text-xs text-muted-foreground mb-0.5">NAT</dt>
-              <dd class="font-medium break-words"
-                :class="{ 'text-muted-foreground font-normal': stun.natType === t('webrtc.StatusWait') }">
+              <dd class="font-medium break-words" :class="mutedWhenNotOk(stun.natType)">
                 {{ stun.natType }}
               </dd>
             </div>
@@ -57,10 +57,7 @@
               <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
-                <span class="break-words"
-                  :class="{ 'text-muted-foreground font-normal': stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') }">
-                  {{ stun.country }}
-                </span>
+                <span class="break-words" :class="mutedWhenNotOk(stun.country)">{{ stun.country }}</span>
               </dd>
             </div>
           </dl>
@@ -105,6 +102,13 @@ const toneOf = (stun) => {
   return 'wait';
 };
 
+// dl 子块里单个字段的 muted 条件：值等于 wait 或 error 标签时就 muted
+// （字段可能独立失败，比如 IP 成功但国家查询失败）
+const mutedWhenNotOk = (value) => {
+  const isPending = value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
+  return isPending ? 'text-muted-foreground font-normal' : '';
+};
+
 // 测试 STUN 服务器
 const checkSTUNServer = async (stun) => {
   return new Promise((resolve, reject) => {
@@ -126,6 +130,7 @@ const checkSTUNServer = async (stun) => {
               stun.country = countryInfo[1];
             } catch (error) {
               console.error('Error fetching country code:', error);
+              stun.country = t('webrtc.StatusError');
               reject(error);
               pc.close();
               return;
@@ -141,8 +146,14 @@ const checkSTUNServer = async (stun) => {
       pc.createDataChannel('');
       pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
+      // STUN 超时（5s 未收到候选）：把 ip / natType / country 都标记为连接错误，
+      // 这样状态灯能正确变红；如果不改 ip，它会一直停在 Awaiting Test，
+      // 视觉上永远无法区分"还没测"和"测失败了"
       setTimeout(() => {
         if (!candidateReceived) {
+          stun.ip = t('webrtc.StatusError');
+          stun.natType = t('webrtc.StatusError');
+          stun.country = t('webrtc.StatusError');
           pc.close();
           reject(new Error('Stun Server Test Timeout'));
         }
@@ -150,6 +161,8 @@ const checkSTUNServer = async (stun) => {
     } catch (error) {
       console.error('STUN Server Test Error:', error);
       stun.ip = t('webrtc.StatusError');
+      stun.natType = t('webrtc.StatusError');
+      stun.country = t('webrtc.StatusError');
       reject(error);
     }
   });

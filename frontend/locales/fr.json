@@ -535,8 +535,8 @@
         "id": "webrtc",
         "Title": "Test WebRTC",
         "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
-        "StatusWait": "En attente du test ou erreur de connexion",
-        "StatusError": "Erreur de test",
+        "StatusWait": "En attente du test",
+        "StatusError": "Erreur de connexion",
         "NATType": {
             "srflx": "Port Restricted Cone ou Symmetric",
             "prflx": "Port Restricted Cone",
