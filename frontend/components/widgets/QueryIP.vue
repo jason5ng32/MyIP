@@ -15,19 +15,18 @@
             <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
             <div class="space-y-4">
-                <!-- 输入 + 查询按钮（border-collapse 拼接） -->
-                <div class="flex">
+                <!-- Input Group：整条输入条由 group 承担 border / rounded / focus-ring，
+                     内部 Input / Button 的独立样式被 group 扁平化，不再需要 rounded-r-none / -ml-px 拼接 -->
+                <InputGroup>
                     <Input type="text" id="inputIP" name="inputIP"
-                        class="rounded-r-none"
                         :placeholder="t('ipcheck.Placeholder')"
                         v-model="inputIP" @keyup.enter="submitQuery" />
                     <Button id="sumitQueryButton" type="button"
-                        class="rounded-l-none -ml-px shrink-0"
                         :disabled="!isValidIP(inputIP) || isChecking === 'running'"
                         @click="submitQuery">
                         {{ t('ipcheck.Button') }}
                     </Button>
-                </div>
+                </InputGroup>
 
                 <!-- 错误提示 -->
                 <p v-if="modalQueryError" class="text-sm text-destructive">{{ modalQueryError }}</p>
@@ -179,6 +178,7 @@ import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
 import { Progress } from '@/components/ui/progress';
 import { Icon } from '@iconify/vue';
 import {
