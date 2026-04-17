@@ -116,7 +116,7 @@
 - [x] `components/widgets/Help.vue` — 两列快捷键表，`.row`/`.col`/`.col-8`/`.col-auto` → `flex` + `flex-1` + `shrink-0`；`<kbd>` 样式直接内联，替代 `.text-bg-light` + Bootstrap 默认 kbd 样式
 - [x] `components/widgets/QueryIP.vue` — 浮动搜索按钮换 `<Button size="icon">` + 响应式 right-position；`.form-control` → `<Input>`；结果 `.list-group` → plain `<ul>` + Tailwind；`.progress`/`.progress-bar` → `<Progress>`；新增 `components/ui/{input,progress}/`
 - [x] `components/User.vue` — Benefits Dialog：`.modal-content/header/body/footer` / `.table`/`.table-dark`/`.table-responsive` 改为 Tailwind table；dark-mode 全用 `dark:` 变体；移除 unused `isDarkMode` / `isMobile` computed
-- [ ] `components/ConnectivityTest.vue`
+- [x] `components/ConnectivityTest.vue` — refresh 按钮用 `<Button size="icon" variant="outline">`；`.row`/`.col-6 col-md-3` → `flex flex-wrap -mx-2` + `w-1/2 md:w-1/4 px-2`；`.card` 改为 Tailwind；`text-info/success/warning/danger` 映射到 `text-sky/green/yellow/red-600`（保留 `.jn-text-warning` 自定义色）
 - [ ] `components/DnsLeaksTest.vue`
 - [ ] `components/WebRtcTest.vue`
 - [ ] `components/advanced-tools/Empty.vue`

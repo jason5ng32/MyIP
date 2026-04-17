@@ -4,27 +4,30 @@
     <div class="jn-title2">
       <h2 id="Connectivity" :class="{ 'mobile-h2': isMobile }">🚦 {{ t('connectivity.Title') }}</h2>
       <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
-        <button @click="checkAllConnectivity(false, true, true)"
-          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh Connectivity Test"><i class="bi"
-            :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+        <Button size="icon" variant="outline"
+          @click="checkAllConnectivity(false, true, true)"
+          aria-label="Refresh Connectivity Test">
+          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+        </Button>
       </JnTooltip>
     </div>
-    <div class="text-secondary">
+    <div class="text-neutral-500">
       <p>{{ t('connectivity.Note') }}</p>
     </div>
-    <div class="row">
-      <div v-for="test in connectivityTests" :key="test.id" class="col-6 col-md-3 mb-4">
-        <div class="card jn-card keyboard-shortcut-card"
-          :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-          <div class="card-body">
-            <p class="jn-con-title card-title" @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
-              :title="t('connectivity.RefreshThisTest')"><i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}
+    <div class="flex flex-wrap -mx-2">
+      <div v-for="test in connectivityTests" :key="test.id" class="w-1/2 md:w-1/4 px-2 mb-4">
+        <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground"
+          :class="{ 'jn-hover-card': !isMobile }">
+          <div class="p-4">
+            <p class="jn-con-title mb-2" @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
+              :title="t('connectivity.RefreshThisTest')">
+              <i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}
             </p>
-            <p class="card-text" :class="{
-                'text-info': test.status === t('connectivity.StatusWait'),
-                'text-success': test.status.includes(t('connectivity.StatusAvailable')) && test.time < 200,
+            <p :class="{
+                'text-sky-600': test.status === t('connectivity.StatusWait'),
+                'text-green-600': test.status.includes(t('connectivity.StatusAvailable')) && test.time < 200,
                 'jn-text-warning': test.status.includes(t('connectivity.StatusAvailable')) && test.time >= 200,
-                'text-danger': test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')
+                'text-red-600': test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')
               }" :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
               <i v-if="test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')"
                 class="bi bi-emoji-frown"></i>
@@ -52,6 +55,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
 
 const { t } = useI18n();
