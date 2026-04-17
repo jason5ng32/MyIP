@@ -1,83 +1,80 @@
 <template>
   <!-- Ping Test -->
   <div class="ping-test-section my-4">
-    <div class="text-secondary">
+    <div class="text-neutral-500">
       <p>{{ t('pingtest.Note') }}</p>
       <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>
     </div>
-    <div class="row">
-      <div class="col-12 mb-3">
-        <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-          <div class="card-body">
-            <!-- Dropdown for IP Selection -->
-            <div class="row mt-3 mb-3 align-items-center justify-content-center">
-              <div class="col-12 col-md-auto">
-                <label for="pingIP" class="col-form-label">{{ t('pingtest.Note3') }}</label>
-              </div>
-              <div class="col-12 col-md-auto mt-2 mt-md-0">
-                <div class="input-group ">
-                  <select id="pingIP" aria-label="Select IP to Ping" class="form-select jn-ping-form-select"
-                    v-model="selectedIP" :class="{ 'bg-dark text-light': isDarkMode }">
-                    <option disabled value="">{{ t('pingtest.SelectIP') }}</option>
-                    <option v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</option>
-                  </select>
-
-                  <button class="btn btn-primary" @click="startPingCheck"
-                    :disabled="pingCheckStatus === 'running' || selectedIP === ''">
-                    <span
-                      v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' || pingCheckStatus === 'error'">{{
-                      t('pingtest.Run') }}</span>
-                    <span v-if="pingCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
-                      aria-hidden="true"></span>
-                  </button>
-                </div>
-              </div>
+    <div class="mb-3">
+      <div class="jn-card rounded-lg border bg-card text-card-foreground">
+        <div class="p-4">
+          <!-- IP Selection -->
+          <div class="flex flex-wrap items-center justify-center mt-3 mb-3 gap-2">
+            <div>
+              <label for="pingIP" class="inline-block">{{ t('pingtest.Note3') }}</label>
             </div>
-
-            <!-- Result Display -->
-            <div id="pingresult" v-if="pingResults.length > 0">
-              <div class="table-responsive text-nowrap">
-                <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
-                  <thead>
-                    <tr>
-                      <th scope="col" v-for="header in [
-                        'Region',
-                        'MinDelay',
-                        'MaxDelay', 
-                        'AvgDelay',
-                        'TotalPackets',
-                        'PacketLoss',
-                        'ReceivedPackets',
-                        'DroppedPackets'
-                      ]" :key="header">{{ t('pingtest.' + header) }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="result in pingResults" :key="result.country">
-                      <td>
-                        <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                        {{ result.country_name }}
-                      </td>
-                      <td v-for="stat in ['min', 'max', 'avg']" :key="stat"
-                        :class="result.stats[stat] < 100 ? 'text-success' : ''">
-                        {{ result.stats[stat].toFixed(1) }}
-                      </td>
-                      <td>{{ result.stats.total }}</td>
-                      <td>{{ Math.round(result.stats.loss) }}%</td>
-                      <td>{{ result.stats.rcv }}</td>
-                      <td>{{ result.stats.drop }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="flex">
+              <Select v-model="selectedIP">
+                <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="w-56 rounded-r-none">
+                  <SelectValue :placeholder="t('pingtest.SelectIP')" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="ip in allIPs" :key="ip" :value="ip">
+                    {{ ip }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <Button class="rounded-l-none -ml-px bg-blue-600 hover:bg-blue-700 text-white"
+                @click="startPingCheck"
+                :disabled="pingCheckStatus === 'running' || selectedIP === ''">
+                <span v-if="pingCheckStatus === 'idle' || pingCheckStatus === 'finished' || pingCheckStatus === 'error'">
+                  {{ t('pingtest.Run') }}
+                </span>
+                <span v-if="pingCheckStatus === 'running'"
+                  class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
+              </Button>
             </div>
+          </div>
 
-            <div id="svgMap"></div>
-
-            <div id="pingresult-error" v-if="pingCheckStatus === 'error'">
-              <div class="alert alert-info " :data-bs-theme="isDarkMode ? 'dark' : ''">{{ t('pingtest.Error') }}</div>
+          <!-- Result Display -->
+          <div id="pingresult" v-if="pingResults.length > 0">
+            <div class="overflow-x-auto whitespace-nowrap">
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                    <th scope="col" class="text-left p-2" v-for="header in [
+                      'Region', 'MinDelay', 'MaxDelay', 'AvgDelay',
+                      'TotalPackets', 'PacketLoss', 'ReceivedPackets', 'DroppedPackets'
+                    ]" :key="header">{{ t('pingtest.' + header) }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="result in pingResults" :key="result.country"
+                    class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                    <td class="p-2">
+                      <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
+                      {{ result.country_name }}
+                    </td>
+                    <td class="p-2" v-for="stat in ['min', 'max', 'avg']" :key="stat"
+                      :class="result.stats[stat] < 100 ? 'text-green-600' : ''">
+                      {{ result.stats[stat].toFixed(1) }}
+                    </td>
+                    <td class="p-2">{{ result.stats.total }}</td>
+                    <td class="p-2">{{ Math.round(result.stats.loss) }}%</td>
+                    <td class="p-2">{{ result.stats.rcv }}</td>
+                    <td class="p-2">{{ result.stats.drop }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+          </div>
 
+          <div id="svgMap"></div>
+
+          <div id="pingresult-error" v-if="pingCheckStatus === 'error'">
+            <div class="px-3 py-2 rounded-md border bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200">
+              {{ t('pingtest.Error') }}
+            </div>
           </div>
         </div>
       </div>
@@ -91,11 +88,12 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 let allIPs = computed(() => {
@@ -107,67 +105,42 @@ const selectedIP = ref('');
 const pingResults = ref([]);
 const pingCheckStatus = ref("idle");
 
-// 发起 ping 测试
 const startPingCheck = () => {
   trackEvent('Section', 'StartClick', 'GlobalLatency');
-  // 清空上一次结果
   pingResults.value = [];
   cleanMap();
   let tryCount = 0;
-  // 子函数：发起 ping 请求
   const sendPingRequest = async () => {
     pingCheckStatus.value = "running";
     try {
       const response = await fetch("https://api.globalping.io/v1/measurements", {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           limit: 16,
           locations: [
-            { country: "HK" },
-            { country: "TW" },
-            { country: "CN" },
-            { country: "JP" },
-            { country: "SG" },
-            { country: "IN" },
-            { country: "RU" },
-            { country: "US" },
-            { country: "CA" },
-            { country: "AU" },
-            { country: "GB" },
-            { country: "DE" },
-            { country: "FR" },
-            { country: "BR" },
-            { country: "ZA" },
-            { country: "SA" },
+            { country: "HK" }, { country: "TW" }, { country: "CN" }, { country: "JP" },
+            { country: "SG" }, { country: "IN" }, { country: "RU" }, { country: "US" },
+            { country: "CA" }, { country: "AU" }, { country: "GB" }, { country: "DE" },
+            { country: "FR" }, { country: "BR" }, { country: "ZA" }, { country: "SA" },
           ],
-          target: selectedIP.value, // 使用用户选中的 IP 地址
+          target: selectedIP.value,
           type: "ping",
-          measurementOptions: {
-            packets: 8
-          }
+          measurementOptions: { packets: 8 }
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       return await response.json();
     } catch (error) {
       console.error("Error sending ping request:", error);
     }
   };
 
-  // 子函数：获取 ping 结果
   const fetchpingResults = async (id) => {
     try {
       const response = await fetch(`https://api.globalping.io/v1/measurements/${id}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
       processpingResults(data);
@@ -176,7 +149,6 @@ const startPingCheck = () => {
         setTimeout(() => fetchpingResults(id), 1000);
         tryCount++;
       } else {
-        // 如果 pingResults.value 是空数组，返回错误信息
         if (pingResults.value.length === 0) {
           pingCheckStatus.value = "error";
         } else {
@@ -189,7 +161,6 @@ const startPingCheck = () => {
     }
   };
 
-  // 执行流程
   sendPingRequest().then(data => {
     if (data && data.id) {
       setTimeout(() => {
@@ -198,6 +169,7 @@ const startPingCheck = () => {
     }
   });
 };
+
 const processpingResults = (data) => {
   const cleanedData = data.results
     .filter(item => item.result.status === "finished")
@@ -211,44 +183,19 @@ const processpingResults = (data) => {
   pingResults.value = cleanedData;
 };
 
-// 绘制地图
 const drawMap = async () => {
-  // 动态导入 svgMap 和其样式
   const svgMapModule = await import('svgmap');
   await import('svgmap/style.min');
 
   const mapData = {
     data: {
-      avgPing: {
-        name: t('pingtest.AvgDelay'),
-        format: '{0} ms',
-        thresholdMax: 250,
-        thresholdMin: 0
-      },
-      minPing: {
-        name: t('pingtest.MinDelay'),
-        format: '{0} ms',
-      },
-      maxPing: {
-        name: t('pingtest.MaxDelay'),
-        format: '{0} ms',
-      },
-      total: {
-        name: t('pingtest.TotalPackets'),
-        format: '{0}',
-      },
-      loss: {
-        name: t('pingtest.PacketLoss'),
-        format: '{0}%',
-      },
-      rcv: {
-        name: t('pingtest.ReceivedPackets'),
-        format: '{0}',
-      },
-      drop: {
-        name: t('pingtest.DroppedPackets'),
-        format: '{0}',
-      }
+      avgPing: { name: t('pingtest.AvgDelay'), format: '{0} ms', thresholdMax: 250, thresholdMin: 0 },
+      minPing: { name: t('pingtest.MinDelay'), format: '{0} ms' },
+      maxPing: { name: t('pingtest.MaxDelay'), format: '{0} ms' },
+      total: { name: t('pingtest.TotalPackets'), format: '{0}' },
+      loss: { name: t('pingtest.PacketLoss'), format: '{0}%' },
+      rcv: { name: t('pingtest.ReceivedPackets'), format: '{0}' },
+      drop: { name: t('pingtest.DroppedPackets'), format: '{0}' }
     },
     applyData: 'avgPing',
     values: {}
@@ -266,7 +213,6 @@ const drawMap = async () => {
     };
   });
 
-  // 使用动态导入的 svgMap
   new svgMapModule.default({
     targetElementID: 'svgMap',
     data: mapData,
@@ -277,13 +223,9 @@ const drawMap = async () => {
     mouseWheelZoomEnabled: false,
     initialZoom: 1,
   });
-}
+};
 
-// 清除地图数据
 const cleanMap = () => {
   document.getElementById('svgMap').innerHTML = '';
 };
-
 </script>
-
-<style scoped></style>

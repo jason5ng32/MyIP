@@ -125,7 +125,7 @@
 - [x] `components/advanced-tools/RuleTest.vue` — 卡片网格 + .alert 色块 + RefreshAll 按钮全部改 Tailwind + shadcn Button
 - [x] `components/advanced-tools/DnsResolver.vue` — input-group 三段 (Input + Type Dropdown + Run) 用 shadcn；table 改 Tailwind
 - [x] `components/advanced-tools/Whois.vue` — input + Button；`.alert-success` → Tailwind 色块；raw 数据预览 `.card card-body bg-light/bg-black` → Tailwind
-- [ ] `components/advanced-tools/GlobalLatencyTest.vue`
+- [x] `components/advanced-tools/GlobalLatencyTest.vue` — `.form-select` → shadcn `<Select>`（新增 `components/ui/select/`）；table 改 Tailwind
 - [ ] `components/advanced-tools/CensorshipCheck.vue`
 - [ ] `components/advanced-tools/MtrTest.vue`
 - [ ] `components/advanced-tools/SecurityChecklist.vue`
