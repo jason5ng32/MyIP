@@ -134,7 +134,7 @@
 - [ ] `components/SpeedTest.vue`
 - [x] `components/ip-infos/DataPairBar.vue` — .progress + .progress-bar 双色条 → Tailwind flex + 两个 div；label badges → shadcn Badge；fw-light/fw-bold → font-light/bold
 - [x] `components/ip-infos/ASNInfo.vue` — .alert alert-light → Tailwind 色块；.badge text-bg-* → shadcn Badge；.placeholder col-N → inline width% 骨架
-- [ ] `components/ip-infos/IPCard.vue`
+- [x] `components/ip-infos/IPCard.vue` — 完整改写：卡片结构、IP 信息列表、质量进度条用 shadcn `<Progress>`、刷新按钮 Button；placeholder-glow 改 animate-pulse；保留 `.jn-link2` / `.jn-link2-dark` 虚线连接线
 - [ ] `components/IpInfos.vue`
 - [ ] `components/Nav.vue`（含暗色模式样式收敛）
 - [ ] `components/Achievements.vue`
