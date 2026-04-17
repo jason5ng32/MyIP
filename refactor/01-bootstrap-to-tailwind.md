@@ -132,8 +132,8 @@
 - [x] `components/advanced-tools/InvisibilityTest.vue` — agreement checkbox + 运行按钮；score 总结 alert；14 行表格结果，全部改 Tailwind
 - [x] `components/Advanced.vue` — 工具入口卡片网格 + Sheet 头部 + 全屏切换按钮，全部改 Tailwind；`.jn-icon-dark` 合并到 `:global(.dark) .jn-icon` 选择器
 - [ ] `components/SpeedTest.vue`
-- [ ] `components/ip-infos/DataPairBar.vue`
-- [ ] `components/ip-infos/ASNInfo.vue`
+- [x] `components/ip-infos/DataPairBar.vue` — .progress + .progress-bar 双色条 → Tailwind flex + 两个 div；label badges → shadcn Badge；fw-light/fw-bold → font-light/bold
+- [x] `components/ip-infos/ASNInfo.vue` — .alert alert-light → Tailwind 色块；.badge text-bg-* → shadcn Badge；.placeholder col-N → inline width% 骨架
 - [ ] `components/ip-infos/IPCard.vue`
 - [ ] `components/IpInfos.vue`
 - [ ] `components/Nav.vue`（含暗色模式样式收敛）

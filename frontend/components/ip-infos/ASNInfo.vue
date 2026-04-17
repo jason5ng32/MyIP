@@ -1,16 +1,15 @@
 <template>
     <!-- refactor/01：原 .collapse 类已移除，展开收起由父级 CollapsibleContent 控制 -->
-    <div class="alert alert-light placeholder-glow lh-lg fw-bold p-0"
-        :data-bs-theme="isDarkMode ? 'dark' : ''">
+    <div class="rounded-md border bg-neutral-50 border-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 leading-relaxed font-bold p-0">
         <div class="p-3">
             <span v-if="asnInfos[asn]">
                 <i class="bi bi-info-circle-fill"></i>
-                <span class="fw-light">&nbsp;{{ t('ipInfos.ASNInfo.note') }}</span>
+                <span class="font-light">&nbsp;{{ t('ipInfos.ASNInfo.note') }}</span>
                 <br />
 
                 <!-- 基本信息 -->
                 <template v-for="(item, key) in basicInfo" :key="key">
-                    <span class="fw-light">
+                    <span class="font-light">
                         {{ t(`ipInfos.ASNInfo.${key}`) }}
                     </span>
                     <span v-if="key === 'asnCountryCode'">
@@ -25,35 +24,35 @@
 
                 <!-- 成对数据可视化 -->
                 <div class="data-pairs-section">
-                    <label class="fw-light">{{ t('ipInfos.ASNInfo.trafficPercentage') }}</label>
+                    <label class="font-light">{{ t('ipInfos.ASNInfo.trafficPercentage') }}</label>
                     <DataPairBar v-for="pair in pairDataList" :key="pair.leftLabel" :leftLabel="pair.leftLabel"
                         :leftValue="pair.leftValue" :rightLabel="pair.rightLabel" :rightValue="pair.rightValue"
                         :isDarkMode="isDarkMode" />
                 </div>
 
-                <div class="fw-light d-flex mt-3">
-                    <span class="fw-light">
-                        {{ t('ipInfos.ASNInfo.moreData') }}
-                    </span>
+                <div class="font-light flex mt-3">
+                    <span class="font-light">{{ t('ipInfos.ASNInfo.moreData') }}</span>
                     <span>
-                        <a class="text-decoration-none px-2" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`"
+                        <a class="no-underline px-2" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`"
                             target="_blank" title="BGP.Tools">
-                            <span class="badge" :class="!isDarkMode ? 'text-bg-dark' : 'text-bg-light'"><i
-                                    class="bi bi-database-fill"></i> BGPTools </span>
+                            <Badge :class="!isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
+                                <i class="bi bi-database-fill"></i>&nbsp;BGPTools
+                            </Badge>
                         </a>
                     </span>
                     <span>
-                        <a class="text-decoration-none" :href="`https://radar.cloudflare.com/${asn}`" target="_blank"
+                        <a class="no-underline" :href="`https://radar.cloudflare.com/${asn}`" target="_blank"
                             title="Cloudflare Radar">
-                            <span class="badge" :class="!isDarkMode ? 'text-bg-dark' : 'text-bg-light'"><i
-                                    class="bi bi-database-fill"></i> CF Radar </span>
+                            <Badge :class="!isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
+                                <i class="bi bi-database-fill"></i>&nbsp;CF Radar
+                            </Badge>
                         </a>
                     </span>
                 </div>
             </span>
-            <span v-else>
-                <span v-for="(colSize, index) in placeholderSizes" :key="index" :class="{ 'dark-mode': isDarkMode }">
-                    <span :class="`placeholder col-${colSize}`"></span>
+            <span v-else class="animate-pulse">
+                <span v-for="(colSize, index) in placeholderSizes" :key="index" class="block my-2"
+                    :style="`width: ${(colSize / 12) * 100}%; height: 1em; background-color: currentColor; opacity: 0.2; border-radius: 4px;`">
                 </span>
             </span>
         </div>
@@ -66,6 +65,7 @@ import { useMainStore } from '@/store';
 import { computed } from 'vue';
 import getCountryName from '@/utils/country-name.js';
 import DataPairBar from './DataPairBar.vue';
+import { Badge } from '@/components/ui/badge';
 
 const { t } = useI18n();
 const store = useMainStore();
