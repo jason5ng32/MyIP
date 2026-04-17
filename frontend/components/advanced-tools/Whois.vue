@@ -1,64 +1,59 @@
 <template>
-    <!-- Whois Resolver -->
-    <div class="whois-section my-4">
-        <div class="text-neutral-500">
-            <p>{{ t('whois.Note') }}</p>
+    <div class="whois-section my-4 space-y-4">
+        <!-- 顶部说明 -->
+        <p class="text-sm text-muted-foreground">{{ t('whois.Note') }}</p>
+
+        <!-- 输入区 -->
+        <div class="space-y-2">
+            <label for="queryURLorIP" class="text-sm font-medium block">{{ t('whois.Note2') }}</label>
+            <InputGroup>
+                <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore
+                    :disabled="whoisCheckStatus === 'running'"
+                    :placeholder="t('whois.Placeholder')"
+                    v-model="queryURLorIP" @keyup.enter="onSubmit" />
+                <Button variant="action"
+                    :disabled="whoisCheckStatus === 'running' || !queryURLorIP"
+                    @click="onSubmit">
+                    <Spinner v-if="whoisCheckStatus === 'running'" />
+                    {{ t('whois.Run') }}
+                </Button>
+            </InputGroup>
+            <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
-        <div class="mb-3">
-            <div class="jn-card rounded-lg border bg-card text-card-foreground">
-                <div class="p-4">
-                    <div>
-                        <label for="queryURLorIP" class="inline-block">{{ t('whois.Note2') }}</label>
-                    </div>
 
-                    <div class="flex mb-2 mt-2">
-                        <Input type="text" class="rounded-r-none"
-                            :disabled="whoisCheckStatus === 'running'"
-                            :placeholder="t('whois.Placeholder')"
-                            v-model="queryURLorIP" @keyup.enter="onSubmit"
-                            name="queryURLorIP" id="queryURLorIP" data-1p-ignore />
-                        <Button class="rounded-l-none -ml-px bg-blue-600 hover:bg-blue-700 text-white"
-                            @click="onSubmit"
-                            :disabled="whoisCheckStatus === 'running' || !queryURLorIP">
-                            <span v-if="whoisCheckStatus === 'idle'">{{ t('whois.Run') }}</span>
-                            <span v-if="whoisCheckStatus === 'running'"
-                                class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
-                        </Button>
-                    </div>
+        <!-- 结果区 -->
+        <div v-if="whoisResults && Object.keys(whoisResults).length" class="space-y-3">
+            <!-- 顶部成功提示条 -->
+            <div class="flex items-start gap-2 p-3 rounded-md border border-success/30 bg-success/10 text-sm text-success">
+                <Info class="size-4 mt-0.5 shrink-0" />
+                <span class="leading-relaxed">{{ t('whois.Note3') }}</span>
+            </div>
 
-                    <div class="jn-placeholder">
-                        <p v-if="errorMsg" class="text-red-600">{{ errorMsg }}</p>
-                    </div>
-
-                    <!-- Results -->
-                    <div v-if="whoisResults && Object.keys(whoisResults).length">
-                        <div class="px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
-                            {{ t('whois.Note3') }}
+            <!-- domain 类型：多 provider Accordion -->
+            <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0" class="space-y-2">
+                <AccordionItem v-for="(provider, index) in providers" :key="provider" :value="String(index)"
+                    class="rounded-lg border bg-card px-4">
+                    <AccordionTrigger class="hover:no-underline">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span
+                                class="shrink-0 inline-flex size-5 items-center justify-center rounded-full bg-foreground text-background text-xs font-semibold">
+                                {{ index + 1 }}
+                            </span>
+                            <span class="text-sm text-muted-foreground">{{ t('whois.Provider') }}:</span>
+                            <span class="text-sm font-semibold truncate">{{ provider.toUpperCase() }}</span>
                         </div>
-                        <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0">
-                            <AccordionItem v-for="(provider, index) in providers" :key="provider"
-                                :value="String(index)">
-                                <AccordionTrigger>
-                                    <span>
-                                        <span class="inline-flex size-[1em] items-center justify-center rounded-full bg-neutral-700 text-white text-[0.7em] font-semibold align-[-0.125em] dark:bg-neutral-300 dark:text-neutral-900">{{ index + 1 }}</span>&nbsp;
-                                        <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase() }}</strong>
-                                    </span>
-                                </AccordionTrigger>
-                                <AccordionContent :class="[isMobile ? 'p-2' : '']">
-                                    <div class="border-0 mt-3 p-4 rounded"
-                                        :class="[isDarkMode ? 'bg-black text-neutral-100' : 'bg-neutral-100']">
-                                        <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <pre
+                            class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
 
-                        <div v-else class="border-0 mt-3 p-4 rounded"
-                            :class="[isDarkMode ? 'bg-black text-neutral-100' : 'bg-neutral-100']">
-                            <pre>{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
-                        </div>
-                    </div>
-                </div>
+            <!-- ip 类型：单块 raw 输出 -->
+            <div v-else>
+                <pre
+                    class="p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
             </div>
         </div>
     </div>
@@ -72,13 +67,14 @@ import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { Info } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 const isSignedIn = computed(() => store.isSignedIn);
 
 const queryURLorIP = ref('');
@@ -89,19 +85,14 @@ const type = ref('');
 const whoisResults = ref({});
 
 const formatURL = (domain) => {
-    if (!domain.match(/^https?:\/\//)) {
-        domain = 'http://' + domain;
-    }
+    if (!domain.match(/^https?:\/\//)) domain = 'http://' + domain;
     try {
         const url = new URL(domain);
         const hostname = url.hostname;
         const parts = hostname.split('.');
         const mainDomain = parts.slice(-2).join('.');
-        if (mainDomain.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
-            return mainDomain;
-        }
-    } catch {
-    }
+        if (mainDomain.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return mainDomain;
+    } catch { /* noop */ }
     return false;
 };
 
@@ -124,25 +115,19 @@ const onSubmit = () => {
     providers.value = [];
     whoisResults.value = {};
     const query = validInput(queryURLorIP.value);
-    if (query) {
-        getWhoisResults(query);
-    }
+    if (query) getWhoisResults(query);
 };
 
 const getWhoisResults = async (query) => {
     whoisCheckStatus.value = 'running';
     try {
         const response = await fetch(`/api/whois?q=${query}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         getProviders(data);
         if (type.value === 'domain' && providers.value.length >= 1) {
             whoisResults.value = data;
-            if (isSignedIn.value && query.toLowerCase().includes('ipcheck.ing')) {
-                checkAchievements();
-            }
+            if (isSignedIn.value && query.toLowerCase().includes('ipcheck.ing')) checkAchievements();
             errorMsg.value = '';
         } else if (type.value === 'ip' && data.__raw) {
             whoisResults.value = data;
@@ -160,11 +145,9 @@ const getWhoisResults = async (query) => {
 
 const getProviders = (data) => {
     if (type.value === 'domain') {
-        for (const [key, value] of Object.entries(data)) {
+        for (const [key] of Object.entries(data)) {
             if (key.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
-                if (data[key].__raw) {
-                    providers.value.push(key);
-                }
+                if (data[key].__raw) providers.value.push(key);
             }
         }
     }
@@ -189,9 +172,3 @@ const checkAchievements = () => {
     }
 };
 </script>
-
-<style scoped>
-.jn-placeholder {
-    height: 16pt;
-}
-</style>
