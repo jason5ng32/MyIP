@@ -121,7 +121,7 @@
 - [x] `components/WebRtcTest.vue` — 与 Connectivity/DnsLeaks 同模式
 - [x] `components/advanced-tools/Empty.vue` — 无工作：只是空 div
 - [x] `components/advanced-tools/BrowserInfo.vue` — row/col → flex/w-_；`.alert` → Tailwind 色块；`.badge text-bg-*` → shadcn `<Badge>` + 色彩覆盖；`.form-check form-switch` → shadcn `<Switch>`；`.spinner-grow` → `animate-pulse` 圆点；新增 `components/ui/switch/`
-- [ ] `components/advanced-tools/MacChecker.vue`
+- [x] `components/advanced-tools/MacChecker.vue` — `.input-group` → flex + Input + Button；table 用 Tailwind；result card 结构改 Tailwind flex grid；text-success/secondary 图标色映射
 - [ ] `components/advanced-tools/RuleTest.vue`
 - [ ] `components/advanced-tools/DnsResolver.vue`
 - [ ] `components/advanced-tools/Whois.vue`
