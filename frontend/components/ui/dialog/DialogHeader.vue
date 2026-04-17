@@ -20,7 +20,7 @@ defineProps({
 
 <template>
   <header
-    :class="cn('flex items-center justify-between gap-2 pb-3 border-b shrink-0', $props.class)"
+    :class="cn('flex items-center justify-between gap-2 pb-3 border-b shrink-0 mb-3', $props.class)"
   >
     <DialogTitle as-child>
       <h2 class="flex items-center gap-2 text-base font-semibold m-0">

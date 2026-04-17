@@ -23,12 +23,12 @@
                 <!-- Language —————————————————————————————— -->
                 <section id="Pref_language">
                     <SectionTitle :icon="Languages">{{ t('nav.preferences.language') }}</SectionTitle>
-                    <Select :model-value="userPreferences.lang"
-                        @update:model-value="(v) => v && prefLanguage(v)">
+                    <Select :model-value="userPreferences.lang" @update:model-value="(v) => v && prefLanguage(v)">
                         <SelectTrigger class="w-full shadow-none">
                             <SelectValue>
                                 <span class="inline-flex items-center gap-2">
-                                    <Icon v-if="currentLang.flag" :icon="'circle-flags:' + currentLang.flag" class="size-4 shrink-0" />
+                                    <Icon v-if="currentLang.flag" :icon="'circle-flags:' + currentLang.flag"
+                                        class="size-4 shrink-0" />
                                     <Globe v-else class="size-4 text-muted-foreground shrink-0" />
                                     {{ currentLang.label }}
                                 </span>
@@ -37,7 +37,8 @@
                         <SelectContent>
                             <SelectItem v-for="lang in langOptions" :key="lang.value" :value="lang.value">
                                 <span class="inline-flex items-center gap-2">
-                                    <Icon v-if="lang.flag" :icon="'circle-flags:' + lang.flag" class="size-4 shrink-0" />
+                                    <Icon v-if="lang.flag" :icon="'circle-flags:' + lang.flag"
+                                        class="size-4 shrink-0" />
                                     <Globe v-else class="size-4 text-muted-foreground shrink-0" />
                                     {{ lang.label }}
                                 </span>
@@ -52,7 +53,8 @@
                     <SectionTitle :icon="Palette">{{ t('nav.preferences.colorScheme') }}</SectionTitle>
                     <ToggleGroup :model-value="userPreferences.theme" type="single" class="w-full"
                         @update:model-value="(v) => v && prefTheme(v)">
-                        <ToggleGroupItem v-for="opt in themeOptions" :key="opt.value" :value="opt.value" class="flex-1 gap-1.5">
+                        <ToggleGroupItem v-for="opt in themeOptions" :key="opt.value" :value="opt.value"
+                            class="flex-1 gap-1.5">
                             <component :is="opt.icon" class="size-4" />
                             {{ opt.label }}
                         </ToggleGroupItem>
@@ -80,9 +82,9 @@
                             <SelectValue>{{ currentIpDB?.text || '—' }}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem v-for="ipdb in ipDBs" :key="ipdb.id" :value="String(ipdb.id)" :disabled="!ipdb.enabled">
+                            <SelectItem v-for="ipdb in ipDBs" :key="ipdb.id" :value="String(ipdb.id)"
+                                :disabled="!ipdb.enabled" :class="{ 'line-through cursor-not-allowed': !ipdb.enabled }">
                                 {{ ipdb.text }}
-                                <span v-if="!ipdb.enabled" class="ml-1 text-xs text-muted-foreground">(unavailable)</span>
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -96,8 +98,8 @@
                          面板内统一走"border + bg-card"的扁平容器，所有控件同海拔 -->
                     <div class="rounded-lg border bg-card divide-y">
                         <PrefRow id="autoStart" :label="t('nav.preferences.autoRun')"
-                            :tip="t('nav.preferences.autoRunTips')"
-                            :model-value="userPreferences.autoStart" @update:model-value="prefAutoStart" />
+                            :tip="t('nav.preferences.autoRunTips')" :model-value="userPreferences.autoStart"
+                            @update:model-value="prefAutoStart" />
 
                         <PrefRow v-if="userPreferences.autoStart" id="ConnectivityRefresh"
                             :label="t('nav.preferences.connectivityAutoRefresh')"
@@ -105,15 +107,13 @@
                             :model-value="userPreferences.connectivityAutoRefresh"
                             @update:model-value="prefConnectivityRefresh" />
 
-                        <PrefRow v-if="configs.map" id="showMap"
-                            :label="t('nav.preferences.showMap')"
-                            :tip="t('nav.preferences.showMapTips')"
-                            :model-value="userPreferences.showMap" @update:model-value="prefShowMap" />
+                        <PrefRow v-if="configs.map" id="showMap" :label="t('nav.preferences.showMap')"
+                            :tip="t('nav.preferences.showMapTips')" :model-value="userPreferences.showMap"
+                            @update:model-value="prefShowMap" />
 
-                        <PrefRow v-if="isMobile" id="simpleMode"
-                            :label="t('nav.preferences.simpleMode')"
-                            :tip="t('nav.preferences.simpleModeTips')"
-                            :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
+                        <PrefRow v-if="isMobile" id="simpleMode" :label="t('nav.preferences.simpleMode')"
+                            :tip="t('nav.preferences.simpleModeTips')" :model-value="userPreferences.simpleMode"
+                            @update:model-value="prefSimpleMode" />
 
                         <PrefRow id="ConnectivityNotifications"
                             :label="t('nav.preferences.popupConnectivityNotifications')"

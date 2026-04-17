@@ -16,14 +16,14 @@
     <!-- 第二行：Sponsor / About 入口 —————————————— -->
     <div class="flex items-center justify-center gap-2 mb-3">
       <!-- Sponsor 用 arbitrary value 直接表达粉色：Button ghost 的 hover:text-accent-foreground
-           会覆盖普通 class，必须用 hover:text-[#d63384] 强表达，配合 cn/tw-merge 才会生效 -->
-      <Button variant="link" size="sm" as-child
+          会覆盖普通 class，必须用 hover:text-[#d63384] 强表达，配合 cn/tw-merge 才会生效 -->
+      <Button variant="link" size="default" as-child
         class="text-[#d63384] hover:text-[#d63384]">
         <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener">
           {{ t('about.Sponsor') }} 💖
         </a>
       </Button>
-      <Button variant="ghost" size="sm" @click="openAbout" class="cursor-pointer">
+      <Button variant="ghost" size="default" @click="openAbout" class="cursor-pointer">
         {{ t('about.Title') }}
         <ArrowLeftCircle class="size-3.5" />
       </Button>

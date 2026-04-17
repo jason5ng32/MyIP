@@ -87,7 +87,7 @@
                     </table>
                 </div>
                 <!-- 地图容器（svgmap 库渲染到这里） -->
-                <div id="svgMap" class="m-4"></div>
+                <div id="svgMap" class="m-3"></div>
             </CardContent>
         </Card>
 

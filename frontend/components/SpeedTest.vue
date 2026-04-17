@@ -24,7 +24,7 @@
             <Select :model-value="String(state.config.package.download.bytes)"
               @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto cursor-pointer">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -41,7 +41,7 @@
             <Select :model-value="String(state.config.package.upload.bytes)"
               @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto cursor-pointer">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
