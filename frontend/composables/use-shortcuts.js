@@ -16,8 +16,8 @@
 //   - 所有滚动 + 导航动作统一用 scrollToElement + advancedToolsRef.navigateAndToggleOffcanvas
 //   - `h` 键的 infoMask 切换会在 isInfosLoaded 为 true 时才执行
 
-import { trackEvent } from '@/utils/use-analytics';
-import { mappingKeys, keyMap, navigateCards } from '@/utils/shortcut.js';
+import { trackEvent } from '../utils/use-analytics.js';
+import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from './use-scroll-to.js';
 
 function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSignedIn }) {

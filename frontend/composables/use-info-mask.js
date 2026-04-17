@@ -12,8 +12,8 @@
 //   - isInfosLoaded: ref<boolean> — 同步自 store.allHasLoaded，供 shortcut 判断
 
 import { ref, watch } from 'vue';
-import { trackEvent } from '@/utils/use-analytics';
-import { maskedInfo } from '@/utils/masked-info.js';
+import { trackEvent } from '../utils/use-analytics.js';
+import { maskedInfo } from '../utils/masked-info.js';
 
 export function useInfoMask({ refs, store, t }) {
     const infoMaskLevel = ref(0);

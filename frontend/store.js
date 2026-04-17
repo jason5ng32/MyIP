@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { getAuth, GoogleAuthProvider, GithubAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from './firebase-init.js';
-import i18n from './locales/i18n';
+import i18n from './locales/i18n.js';
 // refactor/04：静态数据从 data/ 模块读取，不再在 state() 内硬编码
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl } from './data/ip-databases.js';
@@ -28,9 +28,9 @@ export const useMainStore = defineStore('main', {
     currentPath: {},
     mountingStatus: createMountingStatus(),
     curl: {
-      ipv4Domain: import.meta.env.VITE_CURL_IPV4_DOMAIN,
-      ipv6Domain: import.meta.env.VITE_CURL_IPV6_DOMAIN,
-      ipv64Domain: import.meta.env.VITE_CURL_IPV64_DOMAIN,
+      ipv4Domain: import.meta.env?.VITE_CURL_IPV4_DOMAIN,
+      ipv6Domain: import.meta.env?.VITE_CURL_IPV6_DOMAIN,
+      ipv64Domain: import.meta.env?.VITE_CURL_IPV64_DOMAIN,
     },
     isFireBaseSet: false,
     // refactor/01 阶段 B：单字段协调所有 Sheet 开关，天然互斥
@@ -167,10 +167,11 @@ export const useMainStore = defineStore('main', {
     },
     // 检查 Firebase 环境
     checkFirebaseEnv() {
+      const env = import.meta.env ?? {};
       const envConfigs = {
-        key: import.meta.env.VITE_FIREBASE_API_KEY,
-        domain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-        project: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        key: env.VITE_FIREBASE_API_KEY,
+        domain: env.VITE_FIREBASE_AUTH_DOMAIN,
+        project: env.VITE_FIREBASE_PROJECT_ID,
       }
       this.isFireBaseSet = !!envConfigs.key && !!envConfigs.domain && !!envConfigs.project;
     },
