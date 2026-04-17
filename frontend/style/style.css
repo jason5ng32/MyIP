@@ -1,5 +1,6 @@
-/* refactor/01 stage D+E 完成：Bootstrap + bootstrap-icons 全部移除，图标改用 lucide-vue-next */
-@import 'flag-icons/css/flag-icons.min.css';
+/* refactor/01 stage D+E 完成：Bootstrap + bootstrap-icons 全部移除，图标改用 lucide-vue-next
+   refactor/02 收尾：flag-icons 也全部迁到 circle-flags（@iconify-json/circle-flags），
+   不再需要 flag-icons 包的 CSS */
 
 /* === Tailwind v4 + shadcn-vue 基建 === */
 @import 'tailwindcss';

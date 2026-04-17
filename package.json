@@ -31,7 +31,6 @@
     "express-rate-limit": "^8.3.2",
     "express-slow-down": "^3.1.0",
     "firebase": "^12.12.0",
-    "flag-icons": "^7.5.0",
     "http-proxy-middleware": "^3.0.5",
     "lucide-vue-next": "^1.0.0",
     "maxmind": "^5.0.6",
