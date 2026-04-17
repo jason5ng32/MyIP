@@ -11,24 +11,36 @@
 
     <Card class="keyboard-shortcut-card jn-card">
       <CardContent class="p-4 md:p-6">
-        <!-- 控制区：下载大小 / 上传大小 / 开始按钮 -->
-        <div class="flex flex-wrap items-center justify-end gap-3 mb-5">
-          <label class="inline-flex items-center gap-2 text-sm">
-            <CloudDownload class="size-4 text-muted-foreground" />
-            <select aria-label="Download Bytes" v-model="state.config.package.download.bytes"
-              :disabled="isRunning || isPaused"
-              class="h-9 rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50">
-              <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB</option>
-            </select>
-          </label>
-          <label class="inline-flex items-center gap-2 text-sm">
-            <CloudUpload class="size-4 text-muted-foreground" />
-            <select aria-label="Upload Bytes" v-model="state.config.package.upload.bytes"
-              :disabled="isRunning || isPaused"
-              class="h-9 rounded-md border border-input bg-background px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50">
-              <option v-for="size in [100e6, 50e6, 15e6, 10e6, 1e6]" :key="size" :value="size">{{ size / 1e6 }} MB</option>
-            </select>
-          </label>
+        <!-- 控制区：下载大小 / 上传大小 / 开始按钮
+             用 ToggleGroup 把 5 档大小平铺出来，一眼看全，单击切换
+             （ToggleGroup value 是 string，用 String()/Number() 在边界处转换） -->
+        <div class="flex flex-col gap-3 mb-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+          <div class="flex items-center gap-2">
+            <CloudDownload class="size-4 text-muted-foreground shrink-0" aria-label="Download Bytes" />
+            <ToggleGroup type="single"
+              :model-value="String(state.config.package.download.bytes)"
+              @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
+              :disabled="isRunning || isPaused">
+              <ToggleGroupItem v-for="size in sizeOptions" :key="size" :value="String(size)"
+                class="h-8 px-2.5 text-xs">
+                {{ size / 1e6 }}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <span class="text-xs text-muted-foreground">MB</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <CloudUpload class="size-4 text-muted-foreground shrink-0" aria-label="Upload Bytes" />
+            <ToggleGroup type="single"
+              :model-value="String(state.config.package.upload.bytes)"
+              @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
+              :disabled="isRunning || isPaused">
+              <ToggleGroupItem v-for="size in sizeOptions" :key="size" :value="String(size)"
+                class="h-8 px-2.5 text-xs">
+                {{ size / 1e6 }}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <span class="text-xs text-muted-foreground">MB</span>
+          </div>
           <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
             <Button size="icon" variant="outline"
               @click="speedTestController" aria-label="Start/Pause Speed Test">
@@ -59,12 +71,13 @@
           </div>
         </Transition>
 
-        <!-- 进度条：空闲态隐藏；完成态绿色，其它状态 primary -->
+        <!-- 进度条：空闲态隐藏；indicator 色跟随状态（sky / green / red），
+             与顶部的 WebRTC wait 色统一 -->
         <Progress
           v-show="state.speedTest.status !== 'idle'"
           :model-value="state.speedTest.progress"
           class="mb-6"
-          :class="isFinished ? '[&>*]:bg-green-500' : ''" />
+          :class="progressIndicatorClass" />
 
         <!-- 4 个指标 tile：现代仪表盘风，大数字 + 小标签 -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -136,6 +149,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
   ArrowLeftRight, CalendarCheck2, ChevronRight, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
@@ -180,6 +194,9 @@ const {
   updateCharts, initStartingPoints, destroyCharts, resetChartData,
 } = useSpeedTestCharts(t);
 
+// 可选的测速大小档位（bytes），用于 ToggleGroup
+const sizeOptions = [1e6, 10e6, 15e6, 50e6, 100e6];
+
 // --- 派生状态 ----------------------------------------------------------
 
 const isRunning  = computed(() => state.speedTest.status === 'running');
@@ -194,11 +211,20 @@ const ctaIcon = computed(() => {
   return ChevronRight;
 });
 
-// 数字颜色：运行中 sky、完成 green、错误 red、其余 默认
+// 数字 + 进度条颜色：统一到 -500 家族，和 WebRTC / DnsLeak 的状态灯色对齐
+// 运行中 sky（= wait tone）、完成 green（= ok-fast tone）、错误 red（= fail tone）
 const metricColorClass = computed(() => {
-  if (isRunning.value || isPaused.value) return 'text-sky-600 dark:text-sky-400';
-  if (isFinished.value) return 'text-green-600 dark:text-green-400';
-  if (isError.value) return 'text-red-600 dark:text-red-400';
+  if (isRunning.value || isPaused.value) return 'text-sky-500 dark:text-sky-400';
+  if (isFinished.value) return 'text-green-500 dark:text-green-400';
+  if (isError.value) return 'text-red-500 dark:text-red-400';
+  return '';
+});
+// Progress 内部 indicator 色（Progress.vue 默认 bg-primary = 黑）；
+// 通过 [&>*]:bg-* 子选择器覆盖到对应 tone
+const progressIndicatorClass = computed(() => {
+  if (isFinished.value) return '[&>*]:bg-green-500';
+  if (isError.value)    return '[&>*]:bg-red-500';
+  if (isRunning.value || isPaused.value) return '[&>*]:bg-sky-500';
   return '';
 });
 
