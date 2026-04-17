@@ -29,7 +29,7 @@
                 <!-- Hero IP 区 -->
                 <div class="px-4 py-3 flex items-center gap-2 min-w-0">
                     <Monitor class="size-5 text-muted-foreground shrink-0" />
-                    <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0"
+                    <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0 min-h-5"
                         :class="heroIpSizeClass(card.ip)" :title="card.ip">{{ card.ip }}</span>
                     <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="left">
                         <button type="button"
@@ -277,8 +277,8 @@ const isErrorState = computed(() =>
 // ≤15 (IPv4) → 2xl；16-26 (压缩 IPv6) → xl；>26 (完整 IPv6) → base
 const heroIpSizeClass = (ip) => {
     const len = typeof ip === 'string' ? ip.length : 0;
-    if (len <= 15) return 'text-2xl';
-    if (len <= 26) return 'text-xl';
+    if (len <= 15) return 'text-xl';
+    if (len <= 26) return 'text-lg';
     return 'text-sm';
 };
 
