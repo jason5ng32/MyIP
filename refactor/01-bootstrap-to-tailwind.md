@@ -113,7 +113,7 @@
 - [x] `components/Footer.vue` — ToggleGroup（3 选一 radio 按钮组）+ Badge（changelog 条目类型）+ Separator（`<hr>`）+ 大量 link/text 颜色由 Bootstrap `link-*` / `text-*` 改为 Tailwind 直接表达；`showAbout/changelog/specialthanks` 三个 boolean 合并为单个 `content` ref + v-if；顺手修了原 `offcanvasBody.scrollTop = 0` 对 ref 对象直接操作的 bug（正确写法是 `sheetBody.value.scrollTop`）；新增 `components/ui/{badge,toggle-group,separator}/`
 - [x] `components/Additional.vue` — 移除 `.container`/`.row`/`d-flex`/`.modal-*`/`.dark-mode-*` 等 Bootstrap class，改为 Tailwind；Curl dialog 内部结构用 Tailwind 表达；保留 `.jn-curl` / `.jn-comment` 自定义类（非 Bootstrap）
 - [ ] `components/svgicons/*`（纯 SVG，可能无工作）
-- [ ] `components/widgets/Help.vue`
+- [x] `components/widgets/Help.vue` — 两列快捷键表，`.row`/`.col`/`.col-8`/`.col-auto` → `flex` + `flex-1` + `shrink-0`；`<kbd>` 样式直接内联，替代 `.text-bg-light` + Bootstrap 默认 kbd 样式
 - [ ] `components/widgets/QueryIP.vue`
 - [ ] `components/User.vue`
 - [ ] `components/ConnectivityTest.vue`
