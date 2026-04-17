@@ -19,6 +19,11 @@ defineProps({
   // snap 点（数组，0~1 之间或 px 字符串）；不传则自由高度
   snapPoints: { type: Array, default: undefined },
   activeSnapPoint: { type: [Number, String], default: undefined },
+  // vaul 默认整个 drawer body 都可以按下拖拽，为了不跟文字选择冲突，
+  // 桌面下还强制注入 user-select:none（见 style.css 里的覆盖）。
+  // 我们项目里 drawer 是长内容阅读场景，默认 true——只有顶部把手能拖，
+  // 正文不响应拖拽，配合 CSS 覆盖就能正常选中文字。
+  handleOnly: { type: Boolean, default: true },
 });
 defineEmits(['update:open', 'update:activeSnapPoint']);
 </script>
@@ -33,6 +38,7 @@ defineEmits(['update:open', 'update:activeSnapPoint']);
     :dismissible="dismissible"
     :snap-points="snapPoints"
     :active-snap-point="activeSnapPoint"
+    :handle-only="handleOnly"
     @update:open="$emit('update:open', $event)"
     @update:active-snap-point="$emit('update:activeSnapPoint', $event)"
   >
