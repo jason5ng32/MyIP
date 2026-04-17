@@ -484,6 +484,7 @@
     "isProxy": "Proxy",
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
+    "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",

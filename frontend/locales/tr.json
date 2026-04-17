@@ -483,6 +483,7 @@
     "isProxy": "Proxy",
     "qualityScore": "IP Kalitesi",
     "qualityScoreUnknown": "Puan Bilinmiyor",
+    "advancedUnlockCta": "Kötüye kullanımı önlemek için, bu alanları görüntülemek için giriş yapın",
     "ASNInfo": {
       "trafficPercentage": "Trafik Yüzdesi : ",
       "note": "Bu AS için ilgili veriler : ",

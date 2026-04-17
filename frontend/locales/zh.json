@@ -486,6 +486,7 @@
     "isProxy": "代理",
     "qualityScore": "IP 质量分",
     "qualityScoreUnknown": "未知分数",
+    "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",
