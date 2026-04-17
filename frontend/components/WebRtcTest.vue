@@ -4,54 +4,48 @@
     <div class="jn-title2">
       <h2 id="WebRTC" :class="{ 'mobile-h2': isMobile }">🚥 {{ t('webrtc.Title') }}</h2>
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
-        <button @click="checkAllWebRTC(true)" :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-          aria-label="Refresh WebRTC Test">
+        <Button size="icon" variant="outline"
+          @click="checkAllWebRTC(true)" aria-label="Refresh WebRTC Test">
           <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
-        </button>
+        </Button>
       </JnTooltip>
     </div>
-    <div class="text-secondary">
+    <div class="text-neutral-500">
       <p>{{ t('webrtc.Note') }}</p>
     </div>
-    <div class="row">
-      <div v-for="stun in stunServers" :key="stun.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card keyboard-shortcut-card"
-          :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-          <div class="card-body">
-            <p class="card-title jn-con-title"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</p>
-            <p class="card-text text-secondary" style="font-size: 10pt;"><i class="bi bi-hdd-network-fill"></i> {{
-              stun.url }}</p>
-            <p class="card-text" :class="{
-              'text-info': stun.ip === t('webrtc.StatusWait'),
-              'text-success': stun.ip.includes('.') || stun.ip.includes(':'),
-              'text-danger': stun.ip === t('webrtc.StatusError')
-            }">
-              <i class="bi"
-                :class="[stun.ip === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
-              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}
-              </span>
-
+    <div class="flex flex-wrap -mx-2">
+      <div v-for="stun in stunServers" :key="stun.id" class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
+        <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground"
+          :class="{ 'jn-hover-card': !isMobile }">
+          <div class="p-4">
+            <p class="jn-con-title mb-1"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</p>
+            <p class="text-neutral-500 mb-2" style="font-size: 10pt;">
+              <i class="bi bi-hdd-network-fill"></i> {{ stun.url }}
             </p>
-            <div v-if="stun.natType" class="alert d-flex flex-column" :class="{
-              'alert-info': stun.natType === t('webrtc.StatusWait'),
-              'alert-success': stun.natType !== t('webrtc.StatusWait'),
-            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <p class="mb-2" :class="{
+              'text-sky-600': stun.ip === t('webrtc.StatusWait'),
+              'text-green-600': stun.ip.includes('.') || stun.ip.includes(':'),
+              'text-red-600': stun.ip === t('webrtc.StatusError')
+            }">
+              <i class="bi" :class="[stun.ip === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}</span>
+            </p>
+            <div v-if="stun.natType" class="flex flex-col px-3 py-2 rounded-md border"
+              :class="stun.natType === t('webrtc.StatusWait')
+                ? 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200'
+                : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'">
               <span>
-                <i class="bi"
-                  :class="[stun.natType === t('webrtc.StatusWait') ? 'bi-hourglass-split' : ' bi-controller']"></i> NAT:
-                {{
-                stun.natType }}
+                <i class="bi" :class="[stun.natType === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-controller']"></i>
+                NAT: {{ stun.natType }}
               </span>
 
               <span class="mt-2">
                 <i class="bi"
                   :class="[stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                {{ t('ipInfos.Country') }}: <span :class="[ stun.country !== t('webrtc.StatusWait') ? 'fw-bold':'']">{{
-                  stun.country }}&nbsp;</span>
+                {{ t('ipInfos.Country') }}:
+                <span :class="[stun.country !== t('webrtc.StatusWait') ? 'font-bold' : '']">{{ stun.country }}&nbsp;</span>
                 <span v-show="stun.country_code" :class="'jn-fl fi fi-' + stun.country_code"></span>
               </span>
-
-
             </div>
           </div>
         </div>
@@ -68,6 +62,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/utils/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
 

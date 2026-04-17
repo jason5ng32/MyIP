@@ -118,7 +118,7 @@
 - [x] `components/User.vue` — Benefits Dialog：`.modal-content/header/body/footer` / `.table`/`.table-dark`/`.table-responsive` 改为 Tailwind table；dark-mode 全用 `dark:` 变体；移除 unused `isDarkMode` / `isMobile` computed
 - [x] `components/ConnectivityTest.vue` — refresh 按钮用 `<Button size="icon" variant="outline">`；`.row`/`.col-6 col-md-3` → `flex flex-wrap -mx-2` + `w-1/2 md:w-1/4 px-2`；`.card` 改为 Tailwind；`text-info/success/warning/danger` 映射到 `text-sky/green/yellow/red-600`（保留 `.jn-text-warning` 自定义色）
 - [x] `components/DnsLeaksTest.vue` — 相同模式：Button + flex/wrap grid + `.alert alert-info/success` → Tailwind 配色块 + dark: 变体
-- [ ] `components/WebRtcTest.vue`
+- [x] `components/WebRtcTest.vue` — 与 Connectivity/DnsLeaks 同模式
 - [ ] `components/advanced-tools/Empty.vue`
 - [ ] `components/advanced-tools/BrowserInfo.vue`
 - [ ] `components/advanced-tools/MacChecker.vue`
