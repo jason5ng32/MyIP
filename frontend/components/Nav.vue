@@ -75,7 +75,7 @@
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" class="w-56 border-neutral-200 dark:border-neutral-700 shadow-md">
+          <DropdownMenuContent align="end" class="w-56 shadow-md">
             <!-- 已登录：用户信息卡（头像 + 名字 + Level Badge + 元信息） -->
             <template v-if="isSignedIn">
               <div class="px-2 pt-2 pb-3">

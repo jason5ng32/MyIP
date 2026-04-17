@@ -11,8 +11,7 @@
         <p class="mt-1 text-sm text-muted-foreground">{{ t('connectivity.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0"
-          @click="checkAllConnectivity(false, true, true)"
+        <Button size="icon" variant="outline" class="shrink-0" @click="checkAllConnectivity(false, true, true)"
           aria-label="Refresh Connectivity Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>
@@ -21,9 +20,7 @@
 
     <!-- 卡片网格：现代设计用 CSS Grid 而不是负 margin flex -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <Card v-for="test in connectivityTests" :key="test.id"
-        class="keyboard-shortcut-card cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md
-               data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
+      <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
         @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
         :title="t('connectivity.RefreshThisTest')">
         <CardContent class="p-4">
@@ -96,14 +93,14 @@ const manualRun = ref(false);
 const intervalId = ref(3000);
 
 const connectivityTests = reactive([
-  { id: 'taobao',     name: 'Taobao',     icon: 'shop',             url: 'https://www.taobao.com/favicon.ico?',        status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'baidu',      name: 'Baidu',      icon: 'browser-safari',   url: 'https://www.baidu.com/favicon.ico?',         status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'wechat',     name: 'WeChat',     icon: 'wechat',           url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'google',     name: 'Google',     icon: 'google',           url: 'https://www.google.com/favicon.ico?',        status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'cloud-fill',       url: 'https://www.cloudflare.com/favicon.ico?',    status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'youtube',    name: 'YouTube',    icon: 'youtube',          url: 'https://www.youtube.com/favicon.ico?',       status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'github',     name: 'GitHub',     icon: 'github',           url: 'https://github.com/favicon.ico?',            status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'chatgpt',    name: 'ChatGPT',    icon: 'chat-quote-fill',  url: 'https://chatgpt.com/favicon.ico?',           status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'taobao', name: 'Taobao', icon: 'shop', url: 'https://www.taobao.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'baidu', name: 'Baidu', icon: 'browser-safari', url: 'https://www.baidu.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'wechat', name: 'WeChat', icon: 'wechat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'google', name: 'Google', icon: 'google', url: 'https://www.google.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'cloudflare', name: 'Cloudflare', icon: 'cloud-fill', url: 'https://www.cloudflare.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'youtube', name: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'github', name: 'GitHub', icon: 'github', url: 'https://github.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'chatgpt', name: 'ChatGPT', icon: 'chat-quote-fill', url: 'https://chatgpt.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
 ]);
 
 // 状态语义：把 (status, time) 映射到 wait / ok-fast / ok-slow / fail 四档
@@ -119,18 +116,18 @@ const statusOf = (test) => {
 
 // 指示灯色 + 文字色：按状态档次映射 Tailwind class
 const dotColorMap = {
-  'wait':    'bg-sky-500',
+  'wait': 'bg-sky-500',
   'ok-fast': 'bg-green-500',
   'ok-slow': 'bg-amber-500',
-  'fail':    'bg-red-500',
+  'fail': 'bg-red-500',
 };
 const textColorMap = {
-  'wait':    'text-muted-foreground',
+  'wait': 'text-muted-foreground',
   'ok-fast': 'text-green-600 dark:text-green-400',
   'ok-slow': 'text-amber-600 dark:text-amber-400',
-  'fail':    'text-red-600 dark:text-red-400',
+  'fail': 'text-red-600 dark:text-red-400',
 };
-const dotClass  = (test) => dotColorMap[statusOf(test)];
+const dotClass = (test) => dotColorMap[statusOf(test)];
 const textClass = (test) => textColorMap[statusOf(test)];
 
 // 检查单个连通性

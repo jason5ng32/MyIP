@@ -14,6 +14,16 @@
   h5 { font-size: 1.25rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
   h6 { font-size: 1rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
   p  { margin-bottom: 1rem; }
+
+  /* shadcn-vue + Tailwind v4 必需的一条补丁：
+     Tailwind v4 里裸 `border` utility 的颜色回落到 currentColor（黑/白），
+     不再像 v3 那样默认 gray-200。shadcn-vue 组件（Card / DropdownMenuContent /
+     Dialog 等）class 列表里都是裸 `border`，没加颜色，会吃到 text 色变成
+     "黑边框"。把默认 border color 绑回设计 token --border 恢复预期行为。
+     参考：https://ui.shadcn.com/docs/tailwind-v4 */
+  *, ::before, ::after {
+    border-color: var(--border);
+  }
 }
 
 /* 暗色模式：用 .dark class 触发（由 store.isDarkMode 同步到 <html>） */
