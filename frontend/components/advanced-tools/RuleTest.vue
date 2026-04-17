@@ -2,61 +2,61 @@
     <div>
         <!-- RuleTest -->
         <div class="rule-test-section my-4">
-            <div class="text-secondary">
+            <div class="text-neutral-500">
                 <p>{{ t('ruletest.Note') }}</p>
             </div>
-            <div class="row">
-                <div v-for="test in ruleTests" :key="test.id" class="col-lg-3 col-md-6 col-12 mb-4">
-                    <div class="card jn-card"
-                        :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-                        <div class="card-body">
-                            <p class="jn-con-title card-title"><i class="bi bi-signpost-split-fill"></i>
+            <div class="flex flex-wrap -mx-2">
+                <div v-for="test in ruleTests" :key="test.id" class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
+                    <div class="jn-card rounded-lg border bg-card text-card-foreground"
+                        :class="{ 'jn-hover-card': !isMobile }">
+                        <div class="p-4">
+                            <p class="jn-con-title mb-1">
+                                <i class="bi bi-signpost-split-fill"></i>
                                 {{ test.name }}
                                 <i class="bi" :class="'bi-' + (test.id) + '-square'"></i>&nbsp;
                             </p>
 
-                            <p class="card-text text-secondary" style="font-size: 10pt;">
+                            <p class="text-neutral-500 mb-2" style="font-size: 10pt;">
                                 <i class="bi bi-hdd-network-fill"></i>
                                 {{ test.url }}
                             </p>
-                            <p class="card-text" :class="{
-                                'text-info': test.ip === t('ruletest.StatusWait'),
-                                'text-success': test.ip.includes('.') || test.ip.includes(':'),
-                                'text-danger': test.ip === t('ruletest.StatusError')
+                            <p class="mb-2" :class="{
+                                'text-sky-600': test.ip === t('ruletest.StatusWait'),
+                                'text-green-600': test.ip.includes('.') || test.ip.includes(':'),
+                                'text-red-600': test.ip === t('ruletest.StatusError')
                             }">
                                 <i class="bi"
                                     :class="[test.ip === t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
                                 <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
-                            <div class="alert" :class="{
-                                'alert-info': test.country === t('ruletest.StatusWait'),
-                                'alert-danger': test.country === t('ruletest.StatusError'),
-                                'alert-success': test.country !== t('ruletest.StatusWait') && test.country !== t('ruletest.StatusError'),
-                            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+                            <div class="px-3 py-2 rounded-md border"
+                                :class="[
+                                    test.country === t('ruletest.StatusWait')
+                                        ? 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200'
+                                        : test.country === t('ruletest.StatusError')
+                                            ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+                                            : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+                                ]">
                                 <i class="bi"
                                     :class="[test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
                                 {{ t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
-                                <span v-show="test.country_code"
-                                    :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
+                                <span v-show="test.country_code" :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="flex justify-content-center col-12" :class="[
-                    isMobile ? '' : 'text-center mt-4',
-                ]">
-                    <button class="btn" :class="[
-                    finishAll? 'btn-success' : 'btn-info',
-                    isMobile ? 'w-100' : 'w-25'
-                    ]" :disabled="!finishAll" @click="checkAllRuleTest(true)">
+                <div class="w-full flex justify-center" :class="[isMobile ? '' : 'mt-4']">
+                    <Button
+                        :class="[
+                            finishAll ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-sky-600 hover:bg-sky-700 text-white',
+                            isMobile ? 'w-full' : 'w-1/4'
+                        ]"
+                        :disabled="!finishAll" @click="checkAllRuleTest(true)">
                         <span v-if="finishAll"><i class="bi bi-arrow-clockwise"></i> {{t('ruletest.RefreshAll')}}</span>
-                        <span v-else class="spinner-grow spinner-grow-sm bg-white" aria-hidden="true"></span>
-                    </button>
+                        <span v-else class="inline-block h-3 w-3 rounded-full bg-white animate-pulse" aria-hidden="true"></span>
+                    </Button>
                 </div>
             </div>
-
-
-
         </div>
     </div>
 </template>
@@ -66,11 +66,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import getCountryName from '@/utils/country-name.js';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
@@ -117,7 +117,6 @@ const fetchTrace = async (id, url) => {
     }
 };
 
-// 检查所有 RuleTest
 const checkAllRuleTest = async (refresh = false) => {
     finishAll.value = false;
     if (refresh) {
@@ -146,11 +145,9 @@ const checkAllRuleTest = async (refresh = false) => {
         }
     };
 
-
     processTest(0);
 };
 
-// 检查是否达成成就
 const checkAchievements = () => {
     const allIPs = ruleTests.value.map((test) => test.ip);
     const uniqueIPs = [...new Set(allIPs)];
@@ -159,7 +156,7 @@ const checkAchievements = () => {
             store.setTriggerUpdateAchievements('CrossingTheWall');
         }
     }
-}
+};
 
 onMounted(() => {
     setTimeout(() => {
@@ -171,9 +168,3 @@ watch(IPArray, () => {
     store.updateAllIPs(IPArray.value);
 }, { deep: true });
 </script>
-
-<style scoped>
-.jn-text-warning {
-    color: #c67c14;
-}
-</style>
