@@ -1,5 +1,5 @@
 <template>
-    <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground overflow-hidden" :class="{
+    <div class="jn-card keyboard-shortcut-card relative rounded-lg border bg-card text-card-foreground overflow-hidden" :class="{
             'jn-ip-card1 jn-hover-card': !isMobile && ipGeoSource === 0,
             'jn-ip-card2 jn-hover-card': !isMobile && ipGeoSource !== 0,
         }">
