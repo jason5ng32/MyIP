@@ -33,7 +33,8 @@
             <span class="text-xs font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
           </div>
 
-          <!-- 端点 IP 行（多行时 dot 顶端对齐，IPv6 / 长状态文案自然换行） -->
+          <!-- 端点状态行：解析成功时才显示 "DNS Endpoint: 1.2.3.4"，
+               等待/错误态直接显示状态文字，省掉无意义的 label 前缀 -->
           <div class="flex items-start gap-1.5 text-base mb-3">
             <span class="relative flex shrink-0 mt-[0.5em]">
               <span v-if="toneOf(leak) === 'wait'"
@@ -41,29 +42,32 @@
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
             <span class="break-all">
-              <span class="text-muted-foreground">{{ t('dnsleaktest.Endpoint') }}:</span>
-              <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+              <template v-if="isResolved(leak)">
+                <span class="text-muted-foreground">{{ t('dnsleaktest.Endpoint') }}:</span>
+                <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+              </template>
+              <span v-else :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
             </span>
           </div>
 
-          <!-- ISP + Country 子块：stacked 排版，长文本自然换行不挤压卡片宽度 -->
+          <!-- ISP + Country 子块：等待/错误态字段显示 —，不复述状态文字 -->
           <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.ISP') }}</dt>
-              <dd class="font-medium break-words" :title="leak.org"
-                :class="{ 'text-muted-foreground font-normal': toneOf(leak) === 'wait' || toneOf(leak) === 'fail' }">
-                {{ leak.org }}
+              <dd class="font-medium break-words" :title="leak.org">
+                <span v-if="!isFieldPending(leak.org)">{{ leak.org }}</span>
+                <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
             <div>
               <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
-                <span v-if="leak.country_code"
-                  :class="'fi fi-' + leak.country_code.toLowerCase()" class="shrink-0"></span>
-                <span class="break-words"
-                  :class="{ 'text-muted-foreground font-normal': toneOf(leak) === 'wait' || toneOf(leak) === 'fail' }">
-                  {{ leak.country }}
-                </span>
+                <template v-if="!isFieldPending(leak.country)">
+                  <span v-if="leak.country_code"
+                    :class="'fi fi-' + leak.country_code.toLowerCase()" class="shrink-0"></span>
+                  <span class="break-words">{{ leak.country }}</span>
+                </template>
+                <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
           </dl>
@@ -102,6 +106,13 @@ const toneOf = (leak) => {
   if (leak.ip.includes('.') || leak.ip.includes(':')) return 'ok-fast';
   return 'wait';
 };
+
+// dl 子块里单个字段是否处于"无数据"态（等待/错误/空）
+const isFieldPending = (value) => {
+  return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
+};
+// 整张卡是否已经解析出了真实 endpoint（不在 wait/fail 态）
+const isResolved = (leak) => toneOf(leak) === 'ok-fast';
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),

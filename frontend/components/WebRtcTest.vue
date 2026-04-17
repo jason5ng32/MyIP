@@ -44,20 +44,24 @@
             <span class="font-mono break-all" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
           </div>
 
-          <!-- NAT + Country 子块：wait / fail 时文字走 muted，避免重复放大错误信息
-               （状态灯已经传达错误，子块里只是辅助信息） -->
+          <!-- NAT + Country 子块：等待/错误时统一显示一个长横杠 —，
+               避免 Awaiting Test / Connection Error 在状态灯下方再复述一遍 -->
           <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="text-xs text-muted-foreground mb-0.5">NAT</dt>
-              <dd class="font-medium break-words" :class="mutedWhenNotOk(stun.natType)">
-                {{ stun.natType }}
+              <dd class="font-medium break-words">
+                <span v-if="!isFieldPending(stun.natType)">{{ stun.natType }}</span>
+                <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
             <div>
               <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
-                <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
-                <span class="break-words" :class="mutedWhenNotOk(stun.country)">{{ stun.country }}</span>
+                <template v-if="!isFieldPending(stun.country)">
+                  <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
+                  <span class="break-words">{{ stun.country }}</span>
+                </template>
+                <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
           </dl>
@@ -102,11 +106,10 @@ const toneOf = (stun) => {
   return 'wait';
 };
 
-// dl 子块里单个字段的 muted 条件：值等于 wait 或 error 标签时就 muted
-// （字段可能独立失败，比如 IP 成功但国家查询失败）
-const mutedWhenNotOk = (value) => {
-  const isPending = value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
-  return isPending ? 'text-muted-foreground font-normal' : '';
+// dl 子块里单个字段是否处于"无数据"态（等待/错误）
+// 这些字段可能独立失败（比如 IP 成功但国家查询失败），所以按字段判断
+const isFieldPending = (value) => {
+  return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
 };
 
 // 测试 STUN 服务器
