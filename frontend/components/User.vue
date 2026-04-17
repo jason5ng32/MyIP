@@ -4,7 +4,7 @@
         <DialogContent :title="t('user.Benefits.Title')" class="max-w-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-700">
                 <h5 class="m-0 text-lg font-semibold" id="BenefitsTitle">
-                    <i class="bi bi-person-hearts"></i> {{ t('user.Benefits.Title') }}
+                    <HeartHandshake class="inline size-[1em] align-[-0.125em]" /> {{ t('user.Benefits.Title') }}
                 </h5>
                 <DialogClose />
             </div>
@@ -40,6 +40,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { HeartHandshake } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

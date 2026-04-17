@@ -7,7 +7,7 @@
         <Button size="icon" variant="outline"
           @click="checkAllConnectivity(false, true, true)"
           aria-label="Refresh Connectivity Test">
-          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+          <component :is="isStarted ? RotateCw : ChevronRight" class="inline size-[1em] align-[-0.125em]" />
         </Button>
       </JnTooltip>
     </div>
@@ -21,7 +21,7 @@
           <div class="p-4">
             <p class="jn-con-title mb-2" @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
               :title="t('connectivity.RefreshThisTest')">
-              <i class="bi" :class="'bi-' + test.icon"></i> {{ test.name }}
+              <component :is="getConnectivityIcon(test.icon)" class="inline size-[1em] align-[-0.125em]" /> {{ test.name }}
             </p>
             <p :class="{
                 'text-sky-600': test.status === t('connectivity.StatusWait'),
@@ -29,13 +29,13 @@
                 'jn-text-warning': test.status.includes(t('connectivity.StatusAvailable')) && test.time >= 200,
                 'text-red-600': test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')
               }" :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
-              <i v-if="test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')"
-                class="bi bi-emoji-frown"></i>
-              <i v-else-if="test.status === t('connectivity.StatusAvailable') && test.time < 200"
-                class="bi bi-emoji-smile"></i>
-              <i v-else-if="test.status === t('connectivity.StatusAvailable') && test.time >= 200"
-                class="bi bi-emoji-expressionless"></i>
-              <i v-else-if="test.time === 0" class="bi bi-hourglass-split"></i>
+              <Frown v-if="test.status === t('connectivity.StatusUnavailable') || test.status === t('connectivity.StatusTimeout')"
+                class="inline size-[1em] align-[-0.125em]" />
+              <Smile v-else-if="test.status === t('connectivity.StatusAvailable') && test.time < 200"
+                class="inline size-[1em] align-[-0.125em]" />
+              <Meh v-else-if="test.status === t('connectivity.StatusAvailable') && test.time >= 200"
+                class="inline size-[1em] align-[-0.125em]" />
+              <Hourglass v-else-if="test.time === 0" class="inline size-[1em] align-[-0.125em]" />
               {{ test.status }}
               <span v-if="test.time !== 0">
                 : {{ test.time }}
@@ -56,6 +56,35 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import {
+  ChevronRight,
+  Chrome,
+  Cloud,
+  Frown,
+  Github,
+  Hourglass,
+  Meh,
+  MessageCircle,
+  MessageSquareQuote,
+  RotateCw,
+  Smile,
+  Store,
+  Youtube,
+  Compass,
+} from 'lucide-vue-next';
+
+// 连通性测试项目使用的图标映射（原 bi-* 名称 → lucide 组件）
+const connectivityIconMap = {
+  'shop': Store,
+  'browser-safari': Compass,
+  'wechat': MessageCircle,
+  'google': Chrome,
+  'cloud-fill': Cloud,
+  'youtube': Youtube,
+  'github': Github,
+  'chat-quote-fill': MessageSquareQuote,
+};
+const getConnectivityIcon = (name) => connectivityIconMap[name] || Compass;
 
 
 const { t } = useI18n();

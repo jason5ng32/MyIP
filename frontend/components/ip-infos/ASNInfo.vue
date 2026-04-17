@@ -3,7 +3,7 @@
     <div class="rounded-md border bg-neutral-50 border-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 leading-relaxed font-bold p-0">
         <div class="p-3">
             <span v-if="asnInfos[asn]">
-                <i class="bi bi-info-circle-fill"></i>
+                <Info class="inline size-[1em] align-[-0.125em]" />
                 <span class="font-light">&nbsp;{{ t('ipInfos.ASNInfo.note') }}</span>
                 <br />
 
@@ -36,7 +36,7 @@
                         <a class="no-underline px-2" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`"
                             target="_blank" title="BGP.Tools">
                             <Badge :class="!isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
-                                <i class="bi bi-database-fill"></i>&nbsp;BGPTools
+                                <Database class="inline size-[1em] align-[-0.125em]" />&nbsp;BGPTools
                             </Badge>
                         </a>
                     </span>
@@ -44,7 +44,7 @@
                         <a class="no-underline" :href="`https://radar.cloudflare.com/${asn}`" target="_blank"
                             title="Cloudflare Radar">
                             <Badge :class="!isDarkMode ? 'bg-neutral-900 text-white border-transparent' : 'bg-neutral-100 text-neutral-900 border-transparent'">
-                                <i class="bi bi-database-fill"></i>&nbsp;CF Radar
+                                <Database class="inline size-[1em] align-[-0.125em]" />&nbsp;CF Radar
                             </Badge>
                         </a>
                     </span>
@@ -66,6 +66,7 @@ import { computed } from 'vue';
 import getCountryName from '@/utils/country-name.js';
 import DataPairBar from './DataPairBar.vue';
 import { Badge } from '@/components/ui/badge';
+import { Database, Info } from 'lucide-vue-next';
 
 const { t } = useI18n();
 const store = useMainStore();

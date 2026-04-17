@@ -79,8 +79,9 @@
                                                     class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                                     <td class="p-2">{{ t(`macchecker.${item.key}`) }}</td>
                                                     <td class="p-2">
-                                                        <i class="bi"
-                                                            :class="macCheckResult[item.key] ? 'bi-check-circle-fill text-green-600' : 'bi-x-circle-fill text-neutral-500'"></i>
+                                                        <component :is="macCheckResult[item.key] ? CircleCheck : CircleX"
+                                                            class="inline size-[1em] align-[-0.125em]"
+                                                            :class="macCheckResult[item.key] ? 'text-green-600' : 'text-neutral-500'" />
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -102,6 +103,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
+import { CircleCheck, CircleX } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 

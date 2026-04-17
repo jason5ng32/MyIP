@@ -15,16 +15,17 @@
                                     <div class="flex flex-wrap" :class="[isMobile ? 'p-1 border-b' : '']">
                                         <h3 class="mb-4 w-full text-xl font-semibold">
                                             {{ t('browserinfo.browser.Infos') }}
-                                            <i class="bi bi-person-workspace"></i>
+                                            <BriefcaseBusiness class="inline size-[1em] align-[-0.125em]" />
                                         </h3>
                                         <div class="w-full">
                                             <div class="flex flex-col w-full px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
                                                 <Badge class="w-fit mb-1 bg-green-600 text-white border-transparent">User Agent</Badge>
                                                 <span>
                                                     <span class="jn-code-font">{{ userAgent.ua }}</span>
-                                                    <i :class="copiedStatus ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                                                    <component :is="copiedStatus ? ClipboardCheck : ClipboardPlus"
+                                                        class="inline size-[1em] align-[-0.125em]"
                                                         @click="copyToClipboard(userAgent.ua)" role="button"
-                                                        aria-label="Copy UA"></i>
+                                                        aria-label="Copy UA" />
                                                 </span>
                                             </div>
                                         </div>
@@ -91,7 +92,7 @@
                                     <div :class="[isMobile ? 'p-1' : 'p-4']">
                                         <h3 class="mb-4 text-xl font-semibold">
                                             {{ t('browserinfo.fingerprint.Infos') }}
-                                            <i class="bi bi-fingerprint"></i>
+                                            <Fingerprint class="inline size-[1em] align-[-0.125em]" />
                                         </h3>
                                         <div class="w-full">
                                             <div class="flex flex-col w-full px-3 py-2 rounded-md border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-200"
@@ -115,7 +116,7 @@
                                             </div>
                                         </div>
                                         <div class="px-3 py-2 rounded-md border bg-neutral-50 border-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 opacity-75 mt-4" role="alert">
-                                            <i class="bi bi-info-circle"></i>
+                                            <Info class="inline size-[1em] align-[-0.125em]" />
                                             {{ t('browserinfo.fingerprint.browserTips') }}
                                         </div>
                                     </div>
@@ -142,6 +143,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { BriefcaseBusiness, ClipboardCheck, ClipboardPlus, Fingerprint, Info } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

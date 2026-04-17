@@ -7,7 +7,7 @@
           <a :href="t('page.footerLink')" target="_blank"
             class="ml-1 inline-flex items-center no-underline text-neutral-900 hover:text-neutral-700 dark:text-neutral-100 dark:hover:text-neutral-300"
             @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
-            <i class="bi bi-github"></i>
+            <Github class="inline size-[1em] align-[-0.125em]" />
           </a>
         </JnTooltip>
       </p>
@@ -21,7 +21,7 @@
       <span class="mx-1"></span>
       <a role="button" aria-controls="About" @click.prevent="openAbout"
         class="cursor-pointer no-underline hover:underline text-neutral-900 dark:text-neutral-100">
-        {{ t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
+        {{ t('about.Title') }} <ArrowLeftCircle class="inline size-[1em] align-[-0.125em]" />
       </a>
     </div>
 
@@ -56,25 +56,25 @@
               <p>
                 <a href="https://wujiaxian.com"
                   class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <i class="bi bi-browser-safari"></i> {{ t('about.personal') }}
+                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.personal') }}
                 </a>
               </p>
               <p>
                 <a href="https://kenengba.com"
                   class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <i class="bi bi-browser-safari"></i> {{ t('about.blog') }}
+                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.blog') }}
                 </a>
               </p>
               <p>
                 <a href="https://retire.money"
                   class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <i class="bi bi-browser-safari"></i> {{ t('about.retiremoney') }}
+                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.retiremoney') }}
                 </a>
               </p>
               <p>
                 <a href="https://twitter.com/jason5ng32"
                   class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <i class="bi bi-browser-safari"></i> {{ t('about.twitter') }}
+                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.twitter') }}
                 </a>
               </p>
             </div>
@@ -114,10 +114,10 @@
             </div>
 
             <div v-for="(item, index) in thanksList" :key="index" class="mb-3 italic">
-              <i class="bi bi-emoji-smile-fill "></i> {{ item.name }}
+              <Smile class="inline size-[1em] align-[-0.125em]" /> {{ item.name }}
               <a v-if="item.link" :href="item.link" target="_blank"
                 class="ml-1 no-underline text-neutral-900 hover:underline dark:text-neutral-100">
-                <i class="bi bi-arrow-up-right-square"></i>
+                <SquareArrowOutUpRight class="inline size-[1em] align-[-0.125em]" />
               </a>
             </div>
           </div>
@@ -155,6 +155,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { ArrowLeftCircle, Compass, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
 
 const { t, tm } = useI18n();
 

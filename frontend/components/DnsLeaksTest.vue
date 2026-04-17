@@ -7,7 +7,7 @@
         <Button size="icon" variant="outline"
           @click="checkAllDNSLeakTest(true)"
           aria-label="Refresh DNS Leak Test">
-          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+          <component :is="isStarted ? RotateCw : ChevronRight" class="inline size-[1em] align-[-0.125em]" />
         </Button>
       </JnTooltip>
     </div>
@@ -21,15 +21,15 @@
           :class="{ 'jn-hover-card': !isMobile }">
           <div class="p-4">
             <p class="jn-con-title mb-2">
-              <i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
-              <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
+              <HeartPulse class="inline size-[1em] align-[-0.125em]" /> {{ leak.name }}
+              <span class="inline-flex items-center justify-center w-[1.2em] h-[1.2em] text-[0.7em] font-semibold border rounded align-[-0.1em]">{{ index + 1 }}</span>&nbsp;
             </p>
             <p :class="{
               'text-sky-600': leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError'),
               'text-green-600': leak.ip.includes('.') || leak.ip.includes(':'),
             }">
-              <i class="bi"
-                :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"></i>
+              <component :is="leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? Hourglass : LogOut"
+                class="inline size-[1em] align-[-0.125em]" />
               {{ t('dnsleaktest.Endpoint') }}: {{ leak.ip }}
             </p>
 
@@ -39,14 +39,14 @@
                 : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'">
 
               <span class="jn-org">
-                <i class="bi"
-                  :class="[leak.org === t('dnsleaktest.StatusWait') || leak.org === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                <component :is="leak.org === t('dnsleaktest.StatusWait') || leak.org === t('dnsleaktest.StatusError') ? Hourglass : MapPin"
+                  class="inline size-[1em] align-[-0.125em]" />
                 {{ t('ipInfos.ISP') }}: <span :title="leak.org">{{ leak.org }}</span>
               </span>
 
               <span class="mt-2">
-                <i class="bi"
-                  :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                <component :is="leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? Hourglass : MapPin"
+                  class="inline size-[1em] align-[-0.125em]" />
                 {{ t('ipInfos.Country') }}:
                 <span :class="[leak.country !== t('dnsleaktest.StatusWait') ? 'font-bold' : '']">{{ leak.country }}&nbsp;</span>
                 <span v-show="leak.country_code" :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
@@ -69,6 +69,7 @@ import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import getCountryName from '@/utils/country-name.js';
+import { ChevronRight, HeartPulse, Hourglass, LogOut, MapPin, RotateCw } from 'lucide-vue-next';
 
 
 const { t } = useI18n();

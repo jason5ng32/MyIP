@@ -11,11 +11,11 @@
             <div class="jn-card rounded-lg border bg-card text-card-foreground">
                 <div class="p-4">
                     <div class="jn-title2 mb-3">
-                        <h3 class="text-xl font-semibold"><i class="bi bi-card-checklist"></i> {{ t('securitychecklist.Progress') }}</h3>
+                        <h3 class="text-xl font-semibold"><ClipboardList class="inline size-[1em] align-[-0.125em]" /> {{ t('securitychecklist.Progress') }}</h3>
                         <JnTooltip :text="t('securitychecklist.Reset')" side="left">
                             <Button size="icon" variant="outline"
                                 @click="resetAllslugs()" aria-label="Reset Security Checklist">
-                                <i class="bi bi-arrow-clockwise"></i>
+                                <RotateCw class="inline size-[1em] align-[-0.125em]" />
                             </Button>
                         </JnTooltip>
                     </div>
@@ -94,12 +94,12 @@
                             class="jn-btn flex justify-between items-center text-start"
                             :class="{ 'text-green-600 font-bold': item === currentList }">
                             <span :class="[isMobile ? 'mobile-h3' : 'text-base']">
-                                <i class="bi" :class="fullList[item].icon"></i> {{ fullList[item].title }}&nbsp;({{
+                                <component :is="getChecklistIcon(fullList[item].icon)" class="inline size-[1em] align-[-0.125em]" /> {{ fullList[item].title }}&nbsp;({{
                                     countItems({ action: 'checked', category: item }) }}/{{
                                     countItems({ action: 'total', category: item }) - countItems({ action: 'ignored', category: item }) }})
                             </span>
                             <span class="jn-bi-font" v-if="countItems({ action: 'percentage', category: item }) === 100">
-                                <i class="bi bi-check-circle-fill text-green-600"></i>
+                                <CircleCheck class="inline size-[1em] align-[-0.125em] text-green-600" />
                             </span>
                             <span v-else>
                                 <CircleProgressBar
@@ -118,15 +118,14 @@
                 <div class="jn-card rounded-lg border bg-card text-card-foreground">
                     <div class="p-4">
                         <h2 class="text-2xl font-semibold">
-                            <i class="bi" :class="fullList[currentList].icon"></i> {{ fullList[currentList].title }}
+                            <component :is="getChecklistIcon(fullList[currentList].icon)" class="inline size-[1em] align-[-0.125em]" /> {{ fullList[currentList].title }}
                         </h2>
                         <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
                             <p>{{ fullList[currentList].description }}
                                 <CollapsibleTrigger v-if="fullList[currentList].intro" as-child>
-                                    <i class="bi bi-info-circle"
+                                    <Info class="inline size-[1em] align-[-0.125em] cursor-pointer"
                                         :aria-expanded="isCategoryIntroOpen" role="button"
-                                        :aria-label="'Display Info of ' + fullList[currentList].title">
-                                    </i>
+                                        :aria-label="'Display Info of ' + fullList[currentList].title" />
                                 </CollapsibleTrigger>
                             </p>
                             <CollapsibleContent class="leading-relaxed p-1">
@@ -154,16 +153,16 @@
                         <div class="my-3 flex justify-start">
                             <ToggleGroup v-model="filterTag" type="single" @update:model-value="(v) => v && filterChecklist(v)">
                                 <ToggleGroupItem value="all" :aria-label="t('securitychecklist.ShowAll')">
-                                    <i class="bi bi-list-check"></i>
+                                    <ListChecks class="inline size-[1em] align-[-0.125em]" />
                                 </ToggleGroupItem>
                                 <ToggleGroupItem value="unchecked" :aria-label="t('securitychecklist.ShowUnchecked')">
-                                    <i class="bi bi-circle"></i>
+                                    <Circle class="inline size-[1em] align-[-0.125em]" />
                                 </ToggleGroupItem>
                                 <ToggleGroupItem value="checked" :aria-label="t('securitychecklist.ShowChecked')">
-                                    <i class="bi bi-check-circle"></i>
+                                    <CircleCheck class="inline size-[1em] align-[-0.125em]" />
                                 </ToggleGroupItem>
                                 <ToggleGroupItem value="ignored" :aria-label="t('securitychecklist.ShowIgnored')">
-                                    <i class="bi bi-pause-circle"></i>
+                                    <CirclePause class="inline size-[1em] align-[-0.125em]" />
                                 </ToggleGroupItem>
                             </ToggleGroup>
                         </div>
@@ -186,19 +185,19 @@
                                         }">
                                             <div class="flex items-center">
                                                 <span @click="checkItem(item)">
-                                                    <i class="bi text-lg cursor-pointer" :class="{
-                                                        'bi-check-circle-fill text-green-600': item.checked,
-                                                        'bi-pause-circle text-neutral-500': item.ignored,
-                                                        'bi-circle': !item.checked && !item.ignored
-                                                    }"></i>&nbsp;
+                                                    <component :is="item.checked ? CircleCheck : item.ignored ? CirclePause : Circle"
+                                                        class="inline size-[1em] align-[-0.125em] text-lg cursor-pointer"
+                                                        :class="{
+                                                            'text-green-600': item.checked,
+                                                            'text-neutral-500': item.ignored,
+                                                        }" />&nbsp;
                                                 </span>
                                                 <span :class="{ 'line-through opacity-50': item.ignored }">
                                                     {{ item.point }}
-                                                    <i class="bi bi-info-circle cursor-pointer"
+                                                    <Info class="inline size-[1em] align-[-0.125em] cursor-pointer"
                                                         @click="toggleChecklistInfo(index)"
                                                         :aria-expanded="!!checklistInfoOpen[index]" role="button"
-                                                        :aria-label="'Display Info of ' + item.point">
-                                                    </i>
+                                                        :aria-label="'Display Info of ' + item.point" />
                                                 </span>
                                             </div>
                                         </td>
@@ -256,6 +255,44 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import {
+    Banknote,
+    Circle,
+    CircleCheck,
+    CirclePause,
+    ClipboardList,
+    Compass,
+    FileWarning,
+    HousePlus,
+    Info,
+    KeyRound,
+    Laptop,
+    ListChecks,
+    Mail,
+    MessageCircle,
+    RotateCw,
+    ScanFace,
+    ShieldHalf,
+    Smartphone,
+    Users,
+} from 'lucide-vue-next';
+
+// 安全检查分类图标映射（i18n 数据中存储为 bi-xxx 字符串，映射到 lucide 组件）
+const checklistIconMap = {
+    'bi-key-fill': KeyRound,
+    'bi-browser-safari': Compass,
+    'bi-envelope-fill': Mail,
+    'bi-chat-dots-fill': MessageCircle,
+    'bi-people-fill': Users,
+    'bi-shield-shaded': ShieldHalf,
+    'bi-phone-fill': Smartphone,
+    'bi-laptop-fill': Laptop,
+    'bi-house-add-fill': HousePlus,
+    'bi-currency-exchange': Banknote,
+    'bi-person-bounding-box': ScanFace,
+    'bi-file-earmark-break-fill': FileWarning,
+};
+const getChecklistIcon = (name) => checklistIconMap[name] || Info;
 
 // refactor/01 阶段 C：两处 Bootstrap collapse 迁移
 const isCategoryIntroOpen = ref(false);

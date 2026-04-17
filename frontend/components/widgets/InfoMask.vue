@@ -8,7 +8,7 @@
             :style="positionStyle"
             aria-label="Toggle Info Mask"
             @click="toggleInfoMask">
-            <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
+            <component :is="infoMaskLevel === 0 ? Eye : EyeOff" :size="16" />
         </Button>
     </JnTooltip>
 </template>
@@ -19,6 +19,7 @@
 // 背景色由 :class 响应 infoMaskLevel 覆盖 default 变体的 bg-primary。
 import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { Eye, EyeOff } from 'lucide-vue-next';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 

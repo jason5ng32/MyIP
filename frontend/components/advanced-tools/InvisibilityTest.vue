@@ -42,9 +42,9 @@
                             role="alert" v-if="Object.keys(testResults).length > 0 && store.user">
 
                             <p>{{ t('invisibilitytest.yourIP') }}: <strong>{{ testResults.ip }}</strong>.</p>
-                            <p><i class="bi bi-lock-fill"></i> {{ t('invisibilitytest.proxyScore') }}:
+                            <p><Lock class="inline size-[1em] align-[-0.125em]" /> {{ t('invisibilitytest.proxyScore') }}:
                                 {{ testResults.score.proxy }}%.</p>
-                            <p><i class="bi bi-shield-lock-fill"></i> {{ t('invisibilitytest.VPNScore') }}:
+                            <p><Shield class="inline size-[1em] align-[-0.125em]" /> {{ t('invisibilitytest.VPNScore') }}:
                                 {{ testResults.score.vpn }}%.</p>
 
                             <span v-if="testResults.score.proxy >= 50">
@@ -73,7 +73,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.headers.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.headers.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.headers.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.headers.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.headers.proxy">{{ t('invisibilitytest.headers.positive') }}</span>
@@ -84,7 +84,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.datacenter.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.datacenter.is_datacenter ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.datacenter.is_datacenter) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.datacenter.is_datacenter) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.datacenter.is_datacenter">{{ t('invisibilitytest.datacenter.positive') }}</span>
@@ -95,7 +95,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2 jn-table-col">{{ t('invisibilitytest.blocklist.proxy.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.blocklist.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.blocklist.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.blocklist.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.blocklist.proxy">{{ t('invisibilitytest.blocklist.proxy.positive') }}</span>
@@ -106,7 +106,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2 jn-table-col">{{ t('invisibilitytest.blocklist.vpn.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.blocklist.vpn ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.blocklist.vpn) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.blocklist.vpn) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.blocklist.vpn">{{ t('invisibilitytest.blocklist.vpn.positive') }}</span>
@@ -117,7 +117,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2 jn-table-col">{{ t('invisibilitytest.blocklist.vpnExitNode.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.blocklist.vpnExitNode ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.blocklist.vpnExitNode) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.blocklist.vpnExitNode) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.blocklist.vpnExitNode">{{ t('invisibilitytest.blocklist.vpnExitNode.positive') }}</span>
@@ -128,7 +128,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2 jn-table-col">{{ t('invisibilitytest.tor.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="(testResults.tor_detection.proxy || testResults.tor_detection.vpn) ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="((testResults.tor_detection.proxy || testResults.tor_detection.vpn)) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="((testResults.tor_detection.proxy || testResults.tor_detection.vpn)) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.tor_detection.proxy || testResults.tor_detection.vpn">{{ t('invisibilitytest.tor.positive') }}</span>
@@ -139,7 +139,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.tcp.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.tcp.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.tcp.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.tcp.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.tcp.proxy">
@@ -157,7 +157,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.latencyVSPing.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.latency_vs_ping.vpn ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.latency_vs_ping.vpn) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.latency_vs_ping.vpn) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.latency_vs_ping.vpn">
@@ -175,7 +175,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.latencyVSWS.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.latency_vs_ws.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.latency_vs_ws.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.latency_vs_ws.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.latency_vs_ws.proxy">
@@ -193,7 +193,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.timezone.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="(testResults.timezone.proxy || testResults.timezone.vpn) ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="((testResults.timezone.proxy || testResults.timezone.vpn)) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="((testResults.timezone.proxy || testResults.timezone.vpn)) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.timezone.proxy || testResults.timezone.vpn">
@@ -211,7 +211,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.net.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.net.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.net.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.net.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.net.proxy">{{ t('invisibilitytest.net.positive') }}</span>
@@ -222,7 +222,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.webrtc.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.webrtc.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.webrtc.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.webrtc.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.webrtc.proxy">
@@ -239,7 +239,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.flow.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.flow.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.flow.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.flow.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.flow.proxy">{{ t('invisibilitytest.flow.positive') }}</span>
@@ -250,7 +250,7 @@
                                     <tr class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                                         <td class="p-2">{{ t('invisibilitytest.highlatency.title') }}</td>
                                         <td class="p-2">
-                                            <i class="bi" :class="testResults.highlatency.proxy ? 'bi-x-circle-fill text-red-600' : 'bi-check-circle-fill text-green-600'"></i>
+                                            <component :is="(testResults.highlatency.proxy) ? CircleX : CircleCheck" class="inline size-[1em] align-[-0.125em]" :class="(testResults.highlatency.proxy) ? 'text-red-600' : 'text-green-600'" />
                                         </td>
                                         <td class="p-2">
                                             <span class="opacity-75" v-if="testResults.highlatency.proxy">{{ t('invisibilitytest.highlatency.positive') }}</span>
@@ -274,6 +274,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Button } from '@/components/ui/button';
+import { CircleCheck, CircleX, Lock, Shield } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

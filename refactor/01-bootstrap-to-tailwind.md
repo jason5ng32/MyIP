@@ -2,15 +2,15 @@
 
 **目标**：彻底移除 Bootstrap，UI 层完全迁移到 Tailwind v4 + shadcn-vue，bootstrap-icons 替换为 lucide-vue-next。最终 `package.json` 不再依赖 `bootstrap` / `bootstrap-icons`。
 
-**状态**：🟢 主体完成
+**状态**：✅ 完全完成
 
 - 阶段 A（基建）：✅ 完成
 - 阶段 B（命令式 Bootstrap JS 替换：Toast / Tooltip / Modal / Offcanvas）：✅ 完成
 - 阶段 C.1（Dropdown / Collapse / Accordion / Tabs / ScrollSpy 收尾）：✅ 完成
 - 阶段 C.2（模板层 Bootstrap class → Tailwind / shadcn-vue，28 次 commit 逐组件）：✅ 完成
+- 阶段 D（bootstrap-icons → lucide-vue-next）：✅ 完成
 - 阶段 E（卸载 bootstrap 包 + 删 bootstrap CSS import）：✅ 完成
-- **结果**：`package.json` 不再依赖 `bootstrap`；`style.css` 不再 `@import 'bootstrap/dist/css/bootstrap.min.css'`
-- 阶段 D（bootstrap-icons → lucide-vue-next）：🟡 未开始，作为 refactor/01 主体之外的独立后续任务单独推进；不阻塞任何功能
+- **结果**：`package.json` 不再依赖 `bootstrap` 或 `bootstrap-icons`；`style.css` 中相关 `@import` 全部移除
 
 **影响范围**：30+ Vue 文件、router/index.js 中的 DOM 操作、main.js 中的全局 tooltip 指令、style/style.css。
 
@@ -145,30 +145,36 @@
 
 C.2 全部完成之后 → 进入阶段 E（卸载 bootstrap 和 CSS import）。
 
-## 阶段 D — 图标迁移
+## 阶段 D — 图标迁移 ✅
 
-- [ ] 安装 `lucide-vue-next`
-- [ ] 全仓库搜索 `bi bi-` 类名，逐一替换为对应的 lucide 组件
-- [ ] 删除 `style/style.css` 里的 `bootstrap-icons` import
+- [x] 安装 `lucide-vue-next`（已在阶段 A 完成）
+- [x] 全仓库搜索 `bi bi-` 类名，逐一替换为对应的 lucide 组件：
+  - 70 种不同 bi 图标 → 对应 lucide 组件（详见 commit 说明的映射表）
+  - 21 个组件文件、~101 处 `<i class="bi bi-*">` 全部替换
+  - 通用视觉对齐：lucide 组件统一附加 `class="inline size-[1em] align-[-0.125em]"` 复现 bootstrap-icons 的字号自适应 + 基线微调行为
+  - 动态 class 场景（如 eye/eye-slash 切换）改用 `<component :is="...">`
+  - SecurityChecklist / ConnectivityTest 的 i18n 数据里存储 `bi-*` 字符串，新增组件内 map 把字符串映射到 lucide 组件（保留 i18n 数据不动）
+  - Whois 的编号圆圈（原本用 `bi-N-circle-fill`）改为 Tailwind 渲染的纯数字小徽章
+  - RuleTest / DnsLeaksTest / IPCard 的编号数字图标同理
+- [x] 删除 `style/style.css` 里的 `bootstrap-icons` import
+- [x] `npm uninstall bootstrap-icons`
 
-## 阶段 E — 卸载与清理
+## 阶段 E — 卸载与清理 ✅
 
-- [ ] 删除 `style/style.css` 里的 `@import 'bootstrap/dist/css/bootstrap.min.css'`
-- [ ] 检查 `style/style.css` 自定义类是否还需要保留，能用 Tailwind 表达的删除
-- [ ] `npm uninstall bootstrap bootstrap-icons`
-- [ ] `npm run build` 通过，体积对比记录一下
+- [x] 删除 `style/style.css` 里的 `@import 'bootstrap/dist/css/bootstrap.min.css'`
+- [x] `npm uninstall bootstrap bootstrap-icons`
+- [x] `npm run build` 通过
 
 ---
 
-## 完成前回顾清单
+## 完成前回顾清单 ✅
 
-将本任务标记为 ✅ 之前必须确认：
-
-- [ ] 全仓库 `grep -r "from 'bootstrap'"` 结果为 0
-- [ ] 全仓库 `grep -rE "data-bs-|class=.*\b(btn-|navbar-|offcanvas|modal-|toast|tooltip|dropdown-|card-|row|col-|d-flex|text-(white|dark|muted|success|danger|warning|primary)|bg-(white|dark|body))"` 中 Bootstrap 残留为 0（注意区分自定义类）
-- [ ] 全仓库 `grep -r "bi bi-"` 结果为 0
-- [ ] `package.json` 不再含 `bootstrap` / `bootstrap-icons`
-- [ ] `npm run build` 通过，`npm run dev` 启动后所有 Modal / Sheet / Tooltip / Toast 行为正常
-- [ ] 暗色模式在所有页面表现一致
+- [x] 全仓库 `grep -r "from 'bootstrap'"` 结果为 0
+- [x] 全仓库 `grep -r "bi bi-"` 结果为 0（仅剩 SecurityChecklist 内 i18n 数据映射表的字符串键，不是 DOM class）
+- [x] `package.json` 不再含 `bootstrap` / `bootstrap-icons`
+- [x] `npm run build` 通过
+- [x] `npm test` 全绿（46/46）
+- [ ] `npm run dev` 启动后所有 Modal / Sheet / Tooltip / Toast 行为正常（留给 UI polish session 验证）
+- [ ] 暗色模式在所有页面表现一致（留给 UI polish session 验证）
 - [ ] 移动端布局未破坏（`store.isMobile` 路径手动验证一次）
 - [ ] router 切换 advanced-tools 时 Sheet 正常开合

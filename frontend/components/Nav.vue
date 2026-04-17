@@ -69,7 +69,7 @@
 
       <div id="Preferences" class="preference-button ml-2 cursor-pointer" @click.prevent="OpenPreferences" role="button"
         aria-label="Preferences">
-        <i class="bi bi-toggles"></i>
+        <SlidersHorizontal class="inline size-[1em] align-[-0.125em]" />
       </div>
 
       <!-- Sign In -->
@@ -113,26 +113,26 @@
             </DropdownMenuLabel>
             <template v-if="isSignedIn">
               <DropdownMenuItem @select="store.setTriggerAchievements(true)">
-                <i class="bi bi-award-fill"></i>&nbsp;{{ t('user.MyAchievements') }}
+                <Award class="inline size-[1em] align-[-0.125em]" />&nbsp;{{ t('user.MyAchievements') }}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </template>
             <template v-if="!isSignedIn">
               <DropdownMenuItem @select="store.signInWithGoogle">
-                <i class="bi bi-google"></i>&nbsp;{{ t('user.SignInWithGoogle') }}
+                <Chrome class="inline size-[1em] align-[-0.125em]" />&nbsp;{{ t('user.SignInWithGoogle') }}
               </DropdownMenuItem>
               <DropdownMenuItem @select="store.signInWithGithub">
-                <i class="bi bi-github"></i>&nbsp;{{ t('user.SignInWithGithub') }}
+                <Github class="inline size-[1em] align-[-0.125em]" />&nbsp;{{ t('user.SignInWithGithub') }}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </template>
             <DropdownMenuItem @select="store.setTriggerUserBenefits(true)">
-              <i class="bi bi-person-hearts"></i>&nbsp;{{ t('user.Benefits.Title') }}
+              <HeartHandshake class="inline size-[1em] align-[-0.125em]" />&nbsp;{{ t('user.Benefits.Title') }}
             </DropdownMenuItem>
             <template v-if="isSignedIn">
               <DropdownMenuSeparator />
               <DropdownMenuItem @select="store.signOut">
-                <i class="bi bi-box-arrow-right"></i>&nbsp;{{ t('user.SignOut') }}
+                <LogOut class="inline size-[1em] align-[-0.125em]" />&nbsp;{{ t('user.SignOut') }}
               </DropdownMenuItem>
             </template>
           </DropdownMenuContent>
@@ -159,6 +159,7 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { Award, Chrome, Github, HeartHandshake, LogOut, SlidersHorizontal } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

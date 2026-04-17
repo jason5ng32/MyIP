@@ -11,13 +11,13 @@
                         :class="{ 'jn-hover-card': !isMobile }">
                         <div class="p-4">
                             <p class="jn-con-title mb-1">
-                                <i class="bi bi-signpost-split-fill"></i>
+                                <SignpostBig class="inline size-[1em] align-[-0.125em]" />
                                 {{ test.name }}
-                                <i class="bi" :class="'bi-' + (test.id) + '-square'"></i>&nbsp;
+                                <span class="inline-flex items-center justify-center w-[1.2em] h-[1.2em] text-[0.7em] font-semibold border rounded align-[-0.1em]">{{ test.id }}</span>&nbsp;
                             </p>
 
                             <p class="text-neutral-500 mb-2" style="font-size: 10pt;">
-                                <i class="bi bi-hdd-network-fill"></i>
+                                <Server class="inline size-[1em] align-[-0.125em]" />
                                 {{ test.url }}
                             </p>
                             <p class="mb-2" :class="{
@@ -25,8 +25,8 @@
                                 'text-green-600': test.ip.includes('.') || test.ip.includes(':'),
                                 'text-red-600': test.ip === t('ruletest.StatusError')
                             }">
-                                <i class="bi"
-                                    :class="[test.ip === t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+                                <component :is="test.ip === t('ruletest.StatusWait') ? Hourglass : Monitor"
+                                    class="inline size-[1em] align-[-0.125em]" />&nbsp;
                                 <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
                             </p>
                             <div class="px-3 py-2 rounded-md border"
@@ -37,8 +37,8 @@
                                             ? 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
                                             : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
                                 ]">
-                                <i class="bi"
-                                    :class="[test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                                <component :is="test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? Hourglass : MapPin"
+                                    class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
                                 <span v-show="test.country_code" :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
                             </div>
@@ -52,7 +52,7 @@
                             isMobile ? 'w-full' : 'w-1/4'
                         ]"
                         :disabled="!finishAll" @click="checkAllRuleTest(true)">
-                        <span v-if="finishAll"><i class="bi bi-arrow-clockwise"></i> {{t('ruletest.RefreshAll')}}</span>
+                        <span v-if="finishAll"><RotateCw class="inline size-[1em] align-[-0.125em]" /> {{t('ruletest.RefreshAll')}}</span>
                         <span v-else class="inline-block h-3 w-3 rounded-full bg-white animate-pulse" aria-hidden="true"></span>
                     </Button>
                 </div>
@@ -67,6 +67,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import getCountryName from '@/utils/country-name.js';
 import { Button } from '@/components/ui/button';
+import { Hourglass, MapPin, Monitor, RotateCw, Server, SignpostBig } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

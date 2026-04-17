@@ -4,13 +4,13 @@
         <DialogContent :title="t('helpModal.Title')" class="max-w-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-700">
                 <h5 class="m-0 text-lg font-semibold">
-                    <i class="bi bi-keyboard"></i> {{ t('helpModal.Title') }}
+                    <Keyboard class="inline size-[1em] align-[-0.125em]" /> {{ t('helpModal.Title') }}
                 </h5>
                 <DialogClose />
             </div>
             <div class="pt-3">
                 <p class="mb-3">
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                    <ThumbsUp class="inline size-[1em] align-[-0.125em]" />
                     {{ t('shortcutKeys.HelpNote') }}
                 </p>
                 <div class="flex flex-nowrap whitespace-nowrap gap-2">
@@ -53,6 +53,7 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Keyboard, ThumbsUp } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -40,7 +40,7 @@
                                 :value="String(index)">
                                 <AccordionTrigger>
                                     <span>
-                                        <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+                                        <span class="inline-flex size-[1em] items-center justify-center rounded-full bg-neutral-700 text-white text-[0.7em] font-semibold align-[-0.125em] dark:bg-neutral-300 dark:text-neutral-900">{{ index + 1 }}</span>&nbsp;
                                         <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase() }}</strong>
                                     </span>
                                 </AccordionTrigger>

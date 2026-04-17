@@ -14,7 +14,7 @@
           <div class="flex justify-end mt-3 mb-4">
             <div class="flex items-stretch" :class="[isMobile ? 'w-full' : 'w-1/2']">
               <span class="flex items-center px-3 border border-input rounded-l-md bg-neutral-50 dark:bg-neutral-800">
-                <i class="bi bi-cloud-download"></i>
+                <CloudDownload class="inline size-[1em] align-[-0.125em]" />
               </span>
               <select aria-label="Download Bytes" id="downloadBytes"
                 class="flex h-9 items-center justify-between rounded-none border border-input bg-transparent px-3 py-2 text-sm -ml-px"
@@ -26,7 +26,7 @@
                 </option>
               </select>
               <span class="flex items-center px-3 border border-input -ml-px bg-neutral-50 dark:bg-neutral-800">
-                <i class="bi bi-cloud-upload"></i>
+                <CloudUpload class="inline size-[1em] align-[-0.125em]" />
               </span>
               <select aria-label="Upload Bytes" id="uploadBytes"
                 class="flex h-9 items-center justify-between rounded-none border border-input bg-transparent px-3 py-2 text-sm -ml-px"
@@ -43,12 +43,12 @@
                   @click="speedTestController"
                   aria-label="Start/Pause Speed Test">
                   <span v-if="state.speedTest.status === 'running'">
-                    <i class="bi bi-pause-fill"></i>
+                    <Pause class="inline size-[1em] align-[-0.125em]" />
                   </span>
                   <span v-else-if="state.speedTest.status === 'finished' || state.speedTest.status === 'error'">
-                    <i class="bi bi-arrow-clockwise"></i>
+                    <RotateCw class="inline size-[1em] align-[-0.125em]" />
                   </span>
-                  <span v-else><i class="bi bi-caret-right-fill"></i></span>
+                  <span v-else><ChevronRight class="inline size-[1em] align-[-0.125em]" /></span>
                 </Button>
               </JnTooltip>
             </div>
@@ -58,13 +58,13 @@
             <div class="flex items-center justify-end pb-2"
               v-if="state.speedTest.status !== 'idle' && state.connection.colo">
               <div>
-                <i class="bi bi-person-arms-up"></i>
+                <PersonStanding class="inline size-[1em] align-[-0.125em]" />
                 {{ state.connection.country }}
                 <span v-if="state.connection.country" :class="'jn-fl fi fi-' + state.connection.loc.toLowerCase()"></span>
               </div>
-              <div class="mx-2"><i class="bi bi-arrow-left-right"></i></div>
+              <div class="mx-2"><ArrowLeftRight class="inline size-[1em] align-[-0.125em]" /></div>
               <div>
-                <i class="bi bi-globe"></i>
+                <Globe class="inline size-[1em] align-[-0.125em]" />
                 {{ state.connection.colo }},&nbsp;
                 {{ state.connection.coloCountry }}
                 <span v-if="state.connection.coloCountry"
@@ -136,7 +136,7 @@
           <div class="m-1 p-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200 jn-slide-in"
             v-if="state.speedTest.status === 'finished' && state.speedTest.hasScores">
             <p id="score" class="speedtest-p">
-              <i class="bi bi-calendar2-check"></i>&nbsp;
+              <CalendarCheck2 class="inline size-[1em] align-[-0.125em]" />&nbsp;
               <span v-if="state.connection.colo">
                 {{ t('speedtest.connectionFrom') }}
                 {{ state.connection.ip }} ( {{ state.connection.country }} )
@@ -178,6 +178,17 @@ import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import {
+  ArrowLeftRight,
+  CalendarCheck2,
+  ChevronRight,
+  CloudDownload,
+  CloudUpload,
+  Globe,
+  Pause,
+  PersonStanding,
+  RotateCw,
+} from 'lucide-vue-next';
 
 const { t } = useI18n();
 const store = useMainStore();

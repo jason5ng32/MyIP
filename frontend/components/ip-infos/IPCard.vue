@@ -5,14 +5,14 @@
         }">
         <div class="flex items-center justify-between px-3 py-2 font-bold jn-link1 bg-neutral-50 dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
             <span>
-                <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+                <span class="inline-flex items-center justify-center w-[1.2em] h-[1.2em] text-[0.7em] font-semibold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 rounded-full align-[-0.1em]">{{ index + 1 }}</span>&nbsp;
                 {{ t('ipInfos.Source') }}: {{ card.source }}
             </span>
             <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
                 <Button size="icon" variant="outline"
                     @click="$emit('refresh-card', card, index)"
                     :aria-label="'Refresh' + card.source">
-                    <i class="bi bi-arrow-clockwise"></i>
+                    <RotateCw class="inline size-[1em] align-[-0.125em]" />
                 </Button>
             </JnTooltip>
         </div>
@@ -21,14 +21,15 @@
             'jn-link2': !isDarkMode
             }">
             <span class="shrink-0">
-                <i class="bi bi-pc-display-horizontal"></i>&nbsp;
+                <Monitor class="inline size-[1em] align-[-0.125em]" />&nbsp;
             </span>
             <span v-if="card.ip" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
                 {{ card.ip }}&nbsp;
                 <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="right">
-                    <i :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
+                    <component :is="copiedStatus[card.id] ? ClipboardCheck : ClipboardPlus"
+                        class="inline size-[1em] align-[-0.125em]"
                         @click="copyToClipboard(card.ip, card.id)" role="button"
-                        :aria-label="'Copy' + card.ip"></i>
+                        :aria-label="'Copy' + card.ip" />
                 </JnTooltip>
             </span>
             <span v-else class="inline-block h-4 w-4/5 bg-neutral-300 dark:bg-neutral-700 rounded animate-pulse"></span>
@@ -44,7 +45,7 @@
                 <li class="jn-list-group-item flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700"
                     :class="{ 'mobile-list': isMobile && isCardsCollapsed }">
                     <span class="shrink-0 mr-2">
-                        <i class="bi bi-geo-alt-fill"></i> {{ t('ipInfos.Country') }} :&nbsp;
+                        <MapPin class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.Country') }} :&nbsp;
                     </span>
                     <span class="flex-1">
                         {{ card.country_name }}
@@ -54,21 +55,21 @@
 
                 <template v-if="!isMobile || !isCardsCollapsed">
                     <li class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-houses"></i> {{ t('ipInfos.Region') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><House class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.Region') }} :&nbsp;</span>
                         <span class="flex-1">{{ card.region }}</span>
                     </li>
                     <li class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-sign-turn-right"></i> {{ t('ipInfos.City') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><CornerUpRight class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.City') }} :&nbsp;</span>
                         <span class="flex-1">{{ card.city }}</span>
                     </li>
                     <li class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-ethernet"></i> {{ t('ipInfos.ISP') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><EthernetPort class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.ISP') }} :&nbsp;</span>
                         <span class="flex-1">{{ card.isp }}</span>
                     </li>
 
                     <li v-show="ipGeoSource === 0 && card.type !== t('ipInfos.advancedData.type.unknownType')"
                         class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-reception-4"></i> {{ t('ipInfos.type') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><SignalHigh class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.type') }} :&nbsp;</span>
                         <span v-if="card.type !== 'sign_in_required'" class="flex-1">
                             {{ card.type }}
                             <span v-if="card.proxyOperator !== 'unknown'">( {{ card.proxyOperator }} )</span>
@@ -78,7 +79,7 @@
 
                     <li v-show="ipGeoSource === 0 && card.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
                         class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-shield-fill-check"></i> {{ t('ipInfos.isProxy') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><ShieldCheck class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.isProxy') }} :&nbsp;</span>
                         <span v-if="card.isProxy !== 'sign_in_required'" class="flex-1">
                             {{ card.isProxy }}
                             <span v-if="card.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')">
@@ -89,14 +90,14 @@
                     </li>
 
                     <li v-show="ipGeoSource === 0" class="flex items-start py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-house-check"></i> {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><House class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;</span>
                         <span v-if="card.isNativeIP !== 'sign_in_required'" class="flex-1">
                             <span v-if="card.isNativeIP === true">
-                                <i class="bi bi-check-circle-fill"></i>
+                                <CircleCheck class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ipInfos.advancedData.NativeIPYes') }}
                             </span>
                             <span v-else>
-                                <i class="bi bi-x-circle"></i>
+                                <CircleX class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ipInfos.advancedData.NativeIPNo') }}
                             </span>
                         </span>
@@ -104,7 +105,7 @@
                     </li>
 
                     <li v-show="ipGeoSource === 0" class="flex items-center py-2 border-b border-dashed border-neutral-300 dark:border-neutral-700">
-                        <span class="shrink-0 mr-2"><i class="bi bi-speedometer"></i> {{ t('ipInfos.qualityScore') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><Gauge class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.qualityScore') }} :&nbsp;</span>
                         <span v-if="card.qualityScore !== 'unknown' && card.qualityScore !== 'sign_in_required'"
                             class="w-20">
                             <Progress :model-value="Number(card.qualityScore) || 0" class="jn-ip-score-progress" />
@@ -114,7 +115,7 @@
                             <span v-else>
                                 {{ card.qualityScore }}/100
                                 <JnTooltip v-if="!isMobile" :text="t('Tooltips.qualityScoreExplain')" side="top">
-                                    <i class="bi bi-question-circle"></i>
+                                    <CircleHelp class="inline size-[1em] align-[-0.125em]" />
                                 </JnTooltip>
                             </span>
                         </span>
@@ -124,16 +125,15 @@
                     </li>
 
                     <li class="flex items-start py-2">
-                        <span class="shrink-0 mr-2"><i class="bi bi-buildings"></i> {{ t('ipInfos.ASN') }} :&nbsp;</span>
+                        <span class="shrink-0 mr-2"><Building2 class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.ASN') }} :&nbsp;</span>
                         <span v-if="card.asnlink" class="flex-1">
                             {{ card.asn }}
                             <JnTooltip v-if="configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="right">
-                                <i class="bi cursor-pointer"
-                                    :class="isAsnOpen ? 'bi-caret-up-square' : 'bi-caret-down-square'"
+                                <component :is="isAsnOpen ? ChevronUp : ChevronDown"
+                                    class="inline size-[1em] align-[-0.125em] cursor-pointer"
                                     @click="toggleASNCollapse(card.asn)"
                                     :aria-expanded="isAsnOpen" role="button"
-                                    :aria-label="'Display AS Info of' + card.asn">
-                                </i>
+                                    :aria-label="'Display AS Info of' + card.asn" />
                             </JnTooltip>
                         </span>
                         <span v-else-if="card.asn">{{ card.asn }}</span>
@@ -178,6 +178,25 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import {
+    Building2,
+    ChevronDown,
+    ChevronUp,
+    CircleCheck,
+    CircleHelp,
+    CircleX,
+    ClipboardCheck,
+    ClipboardPlus,
+    CornerUpRight,
+    EthernetPort,
+    Gauge,
+    House,
+    MapPin,
+    Monitor,
+    RotateCw,
+    ShieldCheck,
+    SignalHigh,
+} from 'lucide-vue-next';
 
 const { t } = useI18n();
 

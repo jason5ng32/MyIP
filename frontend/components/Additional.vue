@@ -4,7 +4,7 @@
         <DialogContent :title="t('curl.Title')">
             <div class="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-700">
                 <h5 class="m-0 text-lg font-semibold">
-                    <i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}
+                    <Terminal class="inline size-[1em] align-[-0.125em]" /> {{ t('curl.Title') }}
                 </h5>
                 <DialogClose />
             </div>
@@ -65,6 +65,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Terminal } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -13,7 +13,7 @@
                 <div class="jn-adv-card rounded-lg border bg-card text-card-foreground">
                     <div class="p-4 cursor-pointer" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
                         <h3 :class="[isMobile ? 'mobile-h3' : 'text-xl']" class="jn-adv-title font-semibold">
-                            <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
+                            <CircleArrowOutUpRight class="inline size-[1em] align-[-0.125em]" /> {{ t(card.titleKey) }}
                         </h3>
                         <p class="opacity-75">{{ t(card.noteKey) }}</p>
                         <span class="jn-icon">{{ card.icon }}</span>
@@ -31,10 +31,10 @@
                     <button v-if="!isMobile" type="button" class="opacity-50 jn-bold cursor-pointer"
                         @click="fullScreen">
                         <span v-if="!isFullScreen">
-                            <i class="bi bi-arrows-fullscreen"></i>
+                            <Maximize class="inline size-[1em] align-[-0.125em]" />
                         </span>
                         <span v-else>
-                            <i class="bi bi-fullscreen-exit"></i>
+                            <Minimize class="inline size-[1em] align-[-0.125em]" />
                         </span>
                     </button>
                     <span v-if="openedCard >= 0" class="font-medium"
@@ -60,6 +60,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { CircleArrowOutUpRight, Maximize, Minimize } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

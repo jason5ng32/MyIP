@@ -6,7 +6,7 @@
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
         <Button size="icon" variant="outline"
           @click="checkAllWebRTC(true)" aria-label="Refresh WebRTC Test">
-          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+          <component :is="isStarted ? RotateCw : ChevronRight" class="inline size-[1em] align-[-0.125em]" />
         </Button>
       </JnTooltip>
     </div>
@@ -18,16 +18,16 @@
         <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground"
           :class="{ 'jn-hover-card': !isMobile }">
           <div class="p-4">
-            <p class="jn-con-title mb-1"><i class="bi bi-sign-merge-left-fill"></i> {{ stun.name }}</p>
+            <p class="jn-con-title mb-1"><Merge class="inline size-[1em] align-[-0.125em]" /> {{ stun.name }}</p>
             <p class="text-neutral-500 mb-2" style="font-size: 10pt;">
-              <i class="bi bi-hdd-network-fill"></i> {{ stun.url }}
+              <Server class="inline size-[1em] align-[-0.125em]" /> {{ stun.url }}
             </p>
             <p class="mb-2" :class="{
               'text-sky-600': stun.ip === t('webrtc.StatusWait'),
               'text-green-600': stun.ip.includes('.') || stun.ip.includes(':'),
               'text-red-600': stun.ip === t('webrtc.StatusError')
             }">
-              <i class="bi" :class="[stun.ip === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
+              <component :is="stun.ip === t('webrtc.StatusWait') ? Hourglass : Monitor" class="inline size-[1em] align-[-0.125em]" />&nbsp;
               <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}</span>
             </p>
             <div v-if="stun.natType" class="flex flex-col px-3 py-2 rounded-md border"
@@ -35,13 +35,13 @@
                 ? 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200'
                 : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'">
               <span>
-                <i class="bi" :class="[stun.natType === t('webrtc.StatusWait') ? 'bi-hourglass-split' : 'bi-controller']"></i>
+                <component :is="stun.natType === t('webrtc.StatusWait') ? Hourglass : Gamepad2" class="inline size-[1em] align-[-0.125em]" />
                 NAT: {{ stun.natType }}
               </span>
 
               <span class="mt-2">
-                <i class="bi"
-                  :class="[stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
+                <component :is="stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') ? Hourglass : MapPin"
+                  class="inline size-[1em] align-[-0.125em]" />
                 {{ t('ipInfos.Country') }}:
                 <span :class="[stun.country !== t('webrtc.StatusWait') ? 'font-bold' : '']">{{ stun.country }}&nbsp;</span>
                 <span v-show="stun.country_code" :class="'jn-fl fi fi-' + stun.country_code"></span>
@@ -63,6 +63,7 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/utils/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { ChevronRight, Gamepad2, Hourglass, MapPin, Merge, Monitor, RotateCw, Server } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -17,7 +17,6 @@
     "@cloudflare/speedtest": "^1.8.1",
     "@khmyznikov/pwa-install": "^0.6.3",
     "@thumbmarkjs/thumbmarkjs": "^1.7.7",
-    "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
     "circle-progress.vue": "^3.4.1",
     "class-variance-authority": "^0.7.1",

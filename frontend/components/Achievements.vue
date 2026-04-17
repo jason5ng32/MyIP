@@ -7,7 +7,7 @@
         >
             <div class="mt-3 flex items-center justify-between px-3 pb-3 border-b border-neutral-200 dark:border-neutral-700">
                 <h5 class="m-0 text-lg font-semibold">
-                    <i class="bi bi-award-fill"></i> {{ t('user.Achievements.Title') }}
+                    <Award class="inline size-[1em] align-[-0.125em]" /> {{ t('user.Achievements.Title') }}
                 </h5>
                 <SheetClose />
             </div>
@@ -22,7 +22,7 @@
                     </TabsList>
                     <TabsContent value="get" class="my-4 mx-1">
                         <span class="flex items-center px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
-                            <i class="bi bi-check-circle"></i>&nbsp;
+                            <CircleCheck class="inline size-[1em] align-[-0.125em]" />&nbsp;
                             {{ t('user.Achievements.GetCount') }}: {{ achievedCount }}
                         </span>
                         <div class="flex flex-wrap -mx-2">
@@ -56,7 +56,7 @@
                     </TabsContent>
                     <TabsContent value="notGet" class="my-4 mx-1">
                         <span class="flex items-center px-3 py-2 rounded-md border bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-200">
-                            <i class="bi bi-x-circle"></i>&nbsp;
+                            <CircleX class="inline size-[1em] align-[-0.125em]" />&nbsp;
                             {{ t('user.Achievements.NotGetCount') }}: {{ notAchievedCount }}
                         </span>
                         <div class="flex flex-wrap -mx-2">
@@ -93,6 +93,7 @@ import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { Award, CircleCheck, CircleX } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -8,7 +8,7 @@
             :style="positionStyle"
             aria-label="IP Check"
             @click="openQueryIP">
-            <i class="bi bi-search"></i>
+            <Search class="inline size-[1em] align-[-0.125em]" />
         </Button>
     </JnTooltip>
 
@@ -37,7 +37,7 @@
                     <ul class="flex flex-col">
                         <li class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-pc-display-horizontal"></i> {{ t('ipInfos.Country') }}
+                                <Monitor class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.Country') }}
                             </span>&nbsp;:&nbsp;
                             <span class="flex-1">{{ modalQueryResult.country_name }}&nbsp;
                                 <span v-if="modalQueryResult.country_code"
@@ -45,22 +45,22 @@
                             </span>
                         </li>
                         <li class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
-                            <span class="shrink-0 mr-2"><i class="bi bi-houses"></i> {{ t('ipInfos.Region') }}</span>&nbsp;:&nbsp;
+                            <span class="shrink-0 mr-2"><House class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.Region') }}</span>&nbsp;:&nbsp;
                             <span class="flex-1">{{ modalQueryResult.region }}</span>
                         </li>
                         <li class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
-                            <span class="shrink-0 mr-2"><i class="bi bi-sign-turn-right"></i> {{ t('ipInfos.City') }}</span>&nbsp;:&nbsp;
+                            <span class="shrink-0 mr-2"><CornerUpRight class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.City') }}</span>&nbsp;:&nbsp;
                             <span class="flex-1">{{ modalQueryResult.city }}</span>
                         </li>
                         <li class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
-                            <span class="shrink-0 mr-2"><i class="bi bi-ethernet"></i> {{ t('ipInfos.ISP') }}</span>&nbsp;:&nbsp;
+                            <span class="shrink-0 mr-2"><EthernetPort class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.ISP') }}</span>&nbsp;:&nbsp;
                             <span class="flex-1">{{ modalQueryResult.isp }}</span>
                         </li>
 
                         <li v-if="ipGeoSource === 0 && modalQueryResult.type !== t('ipInfos.advancedData.type.unknownType')"
                             class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-reception-4"></i> {{ t('ipInfos.type') }}
+                                <SignalHigh class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.type') }}
                             </span>&nbsp;:&nbsp;
                             <span v-if="modalQueryResult.type !=='sign_in_required'" class="flex-1">
                                 {{ modalQueryResult.type }}
@@ -74,7 +74,7 @@
                         <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
                             class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-shield-fill-check"></i>
+                                <ShieldCheck class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ipInfos.isProxy') }}
                             </span>&nbsp;:&nbsp;
                             <span v-if="modalQueryResult.isProxy !=='sign_in_required'" class="flex-1">
@@ -88,16 +88,16 @@
 
                         <li v-if="ipGeoSource === 0" class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-house-check"></i>
+                                <House class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;
                             </span>
                             <span v-if="modalQueryResult.isNativeIP !=='sign_in_required'" class="flex-1">
                                 <span v-if="modalQueryResult.isNativeIP === true">
-                                    <i class="bi bi-check-circle-fill"></i>
+                                    <CircleCheck class="inline size-[1em] align-[-0.125em]" />
                                     {{t('ipInfos.advancedData.NativeIPYes')}}
                                 </span>
                                 <span v-else>
-                                    <i class="bi bi-x-circle"></i>
+                                    <CircleX class="inline size-[1em] align-[-0.125em]" />
                                     {{t('ipInfos.advancedData.NativeIPNo')}}
                                 </span>
                             </span>
@@ -106,7 +106,7 @@
 
                         <li v-if="ipGeoSource === 0" class="flex items-center py-2 border-b border-neutral-200 dark:border-neutral-700">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-speedometer"></i>
+                                <Gauge class="inline size-[1em] align-[-0.125em]" />
                                 {{ t('ipInfos.qualityScore') }} :&nbsp;
                             </span>
                             <span v-if="modalQueryResult.qualityScore !== 'unknown' && modalQueryResult.qualityScore !== 'sign_in_required'"
@@ -126,7 +126,7 @@
 
                         <li class="flex items-center py-2">
                             <span class="shrink-0 mr-2">
-                                <i class="bi bi-buildings"></i> {{ t('ipInfos.ASN') }}
+                                <Building2 class="inline size-[1em] align-[-0.125em]" /> {{ t('ipInfos.ASN') }}
                             </span>&nbsp;:&nbsp;
                             <span class="flex-1">
                                 <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank"
@@ -155,6 +155,19 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import {
+    Building2,
+    CircleCheck,
+    CircleX,
+    CornerUpRight,
+    EthernetPort,
+    Gauge,
+    House,
+    Monitor,
+    Search,
+    ShieldCheck,
+    SignalHigh,
+} from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -52,10 +52,10 @@
                                                 {{ result.country_name }}
                                             </td>
                                             <td class="p-2">
-                                                <i class="bi" :class="{
-                                                    'bi-x-circle-fill text-red-600': result.status === 'failed',
-                                                    'bi-check-circle-fill text-green-600': result.status === 'finished',
-                                                }"></i>
+                                                <component v-if="result.status === 'failed' || result.status === 'finished'"
+                                                    :is="result.status === 'failed' ? CircleX : CircleCheck"
+                                                    class="inline size-[1em] align-[-0.125em]"
+                                                    :class="result.status === 'failed' ? 'text-red-600' : 'text-green-600'" />
                                                 <span v-if="result.status === 'in-progress'"
                                                     class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
                                             </td>
@@ -89,10 +89,10 @@
                                                 {{ result.country_name }}
                                             </td>
                                             <td class="p-2">
-                                                <i class="bi" :class="{
-                                                    'bi-x-circle-fill text-red-600': result.status === 'failed',
-                                                    'bi-check-circle-fill text-green-600': result.status === 'finished',
-                                                }"></i>
+                                                <component v-if="result.status === 'failed' || result.status === 'finished'"
+                                                    :is="result.status === 'failed' ? CircleX : CircleCheck"
+                                                    class="inline size-[1em] align-[-0.125em]"
+                                                    :class="result.status === 'failed' ? 'text-red-600' : 'text-green-600'" />
                                                 <span v-if="result.status === 'in-progress'"
                                                     class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
                                             </td>
@@ -114,16 +114,16 @@
                                     'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200': !isBlocked && !isDown
                                 }">
                                 <span v-if="isBlocked">
-                                    <i class="bi bi-emoji-frown"></i>
+                                    <Frown class="inline size-[1em] align-[-0.125em]" />
                                     {{ t('censorshipcheck.isBlocked') }}
                                 </span>
                                 <span v-else>
                                     <span v-if="!isDown">
-                                        <i class="bi bi-emoji-smile"></i>
+                                        <Smile class="inline size-[1em] align-[-0.125em]" />
                                         {{ t('censorshipcheck.notBlocked') }}
                                     </span>
                                     <span v-else>
-                                        <i class="bi bi-emoji-expressionless"></i>
+                                        <Meh class="inline size-[1em] align-[-0.125em]" />
                                         {{ t('censorshipcheck.isDown') }}
                                     </span>
                                 </span>
@@ -145,6 +145,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { CircleCheck, CircleX, Frown, Meh, Smile } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
