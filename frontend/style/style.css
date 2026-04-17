@@ -98,8 +98,10 @@
   --success-foreground: oklch(0.145 0 0);
   --warning: oklch(0.828 0.189 84.429);       /* amber-400 */
   --warning-foreground: oklch(0.145 0 0);
-  --action: oklch(0.707 0.165 254.624);       /* blue-400 */
-  --action-foreground: oklch(0.145 0 0);
+  /* action 不跟 info/success/warning 走"暗模式提亮"的套路——它是 filled 按钮的
+     品牌色（"点这里触发"），两种模式下保持相同的 blue-500 + 白字，视觉识别一致 */
+  --action: oklch(0.623 0.214 259.815);       /* blue-500（跟 light mode 保持一致） */
+  --action-foreground: oklch(0.985 0 0);      /* 白色文字 */
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
