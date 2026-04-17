@@ -131,7 +131,7 @@
 - [x] `components/advanced-tools/SecurityChecklist.vue` — 最复杂组件：进度条、分类卡列表、filter ToggleGroup（替 btn-group radio hack）、checklist table + 优先级 Badge + Switch（替 form-check-input）；`.alert alert-success` 统计条 + `.progress progress-stacked` 多段进度 → Tailwind
 - [x] `components/advanced-tools/InvisibilityTest.vue` — agreement checkbox + 运行按钮；score 总结 alert；14 行表格结果，全部改 Tailwind
 - [x] `components/Advanced.vue` — 工具入口卡片网格 + Sheet 头部 + 全屏切换按钮，全部改 Tailwind；`.jn-icon-dark` 合并到 `:global(.dark) .jn-icon` 选择器
-- [ ] `components/SpeedTest.vue`
+- [x] `components/SpeedTest.vue` — input-group（2 个 size select + 开始按钮）+ 4 列测试结果 + 4 chart canvas 网格；`.progress.progress-bar-striped.progress-bar-animated` → Tailwind bar；`.alert.alert-success` 结果条 → 绿色块；分数颜色映射。Select 两处保留 native `<select>` 因为需要 number 值而 shadcn Select 是 string（适度用规则 2）
 - [x] `components/ip-infos/DataPairBar.vue` — .progress + .progress-bar 双色条 → Tailwind flex + 两个 div；label badges → shadcn Badge；fw-light/fw-bold → font-light/bold
 - [x] `components/ip-infos/ASNInfo.vue` — .alert alert-light → Tailwind 色块；.badge text-bg-* → shadcn Badge；.placeholder col-N → inline width% 骨架
 - [x] `components/ip-infos/IPCard.vue` — 完整改写：卡片结构、IP 信息列表、质量进度条用 shadcn `<Progress>`、刷新按钮 Button；placeholder-glow 改 animate-pulse；保留 `.jn-link2` / `.jn-link2-dark` 虚线连接线
