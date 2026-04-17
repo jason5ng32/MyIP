@@ -2,7 +2,7 @@
 //
 // 这组 ID 在多处被使用：
 //   - store.mountingStatus / loadingStatus 的 key 集合
-//   - Patch.vue 的 scroll 监听与 `store.changeSection()`
+//   - composables/use-section-tracking.js 的 scroll 监听与 `store.changeSection()`
 //   - App.vue 快捷键滚动目标
 //   - Nav.vue 顶部导航项循环
 //

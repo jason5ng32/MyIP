@@ -22,7 +22,6 @@
     <Additional ref="additionalRef" />
     <Footer ref="footerRef" />
     <PWA />
-    <Patch />
   </TooltipProvider>
 </template>
 
@@ -53,7 +52,6 @@ import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
-import Patch from './components/widgets/Patch.vue';
 
 // UI
 import { TooltipProvider } from './components/ui/tooltip';
@@ -67,6 +65,7 @@ import { useI18n } from 'vue-i18n';
 import { useInfoMask } from '@/composables/use-info-mask.js';
 import { useRefreshOrchestrator } from '@/composables/use-refresh-orchestrator.js';
 import { useShortcuts } from '@/composables/use-shortcuts.js';
+import { useSectionTracking } from '@/composables/use-section-tracking.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -120,6 +119,9 @@ const { loadShortcuts } = useShortcuts({
     },
     store, t, configs, userPreferences, isSignedIn,
 });
+
+// 滚动监听 + section 追踪（原 widgets/Patch.vue 里的逻辑）
+useSectionTracking();
 
 onMounted(() => {
     loadingControl();
