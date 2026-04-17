@@ -109,6 +109,12 @@ import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Info } from 'lucide-vue-next';
 
+// svgmap CSS：静态 side-effect import。原本在 drawMap() 里 await import('svgmap/style.min')
+// 动态引入 —— dev 下能跑，build 下 Rollup 把 CSS chunk 当 JS 模块去解 export 导致
+// 'svg_map_min_exports is not defined' 运行时错误。
+// 这个组件本身走 router 懒加载，CSS 会跟着组件 chunk 一起按需加载，不影响首屏。
+import 'svgmap/style.min';
+
 const { t } = useI18n();
 
 const store = useMainStore();
@@ -217,7 +223,6 @@ const processpingResults = (data) => {
 
 const drawMap = async () => {
     const svgMapModule = await import('svgmap');
-    await import('svgmap/style.min');
 
     const mapData = {
         data: {
