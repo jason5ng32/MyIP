@@ -127,7 +127,7 @@
 - [x] `components/advanced-tools/Whois.vue` — input + Button；`.alert-success` → Tailwind 色块；raw 数据预览 `.card card-body bg-light/bg-black` → Tailwind
 - [x] `components/advanced-tools/GlobalLatencyTest.vue` — `.form-select` → shadcn `<Select>`（新增 `components/ui/select/`）；table 改 Tailwind
 - [x] `components/advanced-tools/CensorshipCheck.vue` — input/button、两列 table (test/control group) 用 Tailwind；`.alert alert-info/danger/success` 最终结果条 → Tailwind 色块条件分支
-- [ ] `components/advanced-tools/MtrTest.vue`
+- [x] `components/advanced-tools/MtrTest.vue` — IP Select + Run Button；Accordion 已在 phase C.1 迁移过，这里只清 class；AS 徽章 → shadcn `<Badge>` + 色彩覆盖
 - [ ] `components/advanced-tools/SecurityChecklist.vue`
 - [ ] `components/advanced-tools/InvisibilityTest.vue`
 - [ ] `components/Advanced.vue`
