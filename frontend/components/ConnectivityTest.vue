@@ -26,7 +26,7 @@
         <CardContent class="p-4">
           <!-- 顶部：品牌图标 + 服务名 -->
           <div class="flex items-center gap-2 mb-3">
-            <component :is="getConnectivityIcon(test.icon)" class="size-6 text-muted-foreground" />
+            <component :is="test.icon" class="size-6 text-muted-foreground" />
             <span class="text-base font-medium truncate">{{ test.name }}</span>
           </div>
           <!-- 底部：状态指示灯 + 文字 + 延迟（mono 等宽数字右对齐） -->
@@ -66,18 +66,8 @@ import {
   MessageSquareQuote, RotateCw, Smile, Store, Youtube,
 } from 'lucide-vue-next';
 
-// 连通性测试的品牌图标映射（i18n 里还是 bi-* 名字）
-const connectivityIconMap = {
-  'shop': Store,
-  'browser-safari': Compass,
-  'wechat': MessageCircle,
-  'google': Chrome,
-  'cloud-fill': Cloud,
-  'youtube': Youtube,
-  'github': Github,
-  'chat-quote-fill': MessageSquareQuote,
-};
-const getConnectivityIcon = (name) => connectivityIconMap[name] || Compass;
+// 品牌图标直接在 connectivityTests 数据里用 lucide 组件，不再走
+// "bi-xxx 字符串 → map → lucide" 间接层
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -96,14 +86,14 @@ const manualRun = ref(false);
 const intervalId = ref(3000);
 
 const connectivityTests = reactive([
-  { id: 'taobao', name: 'Taobao', icon: 'shop', url: 'https://www.taobao.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'baidu', name: 'Baidu', icon: 'browser-safari', url: 'https://www.baidu.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'wechat', name: 'WeChat', icon: 'wechat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'google', name: 'Google', icon: 'google', url: 'https://www.google.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'cloud-fill', url: 'https://www.cloudflare.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'youtube', name: 'YouTube', icon: 'youtube', url: 'https://www.youtube.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'github', name: 'GitHub', icon: 'github', url: 'https://github.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'chatgpt', name: 'ChatGPT', icon: 'chat-quote-fill', url: 'https://chatgpt.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'taobao',     name: 'Taobao',     icon: Store,              url: 'https://www.taobao.com/favicon.ico?',                        status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'baidu',      name: 'Baidu',      icon: Compass,            url: 'https://www.baidu.com/favicon.ico?',                         status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'wechat',     name: 'WeChat',     icon: MessageCircle,      url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?',    status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'google',     name: 'Google',     icon: Chrome,             url: 'https://www.google.com/favicon.ico?',                        status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud,              url: 'https://www.cloudflare.com/favicon.ico?',                    status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'youtube',    name: 'YouTube',    icon: Youtube,            url: 'https://www.youtube.com/favicon.ico?',                       status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'github',     name: 'GitHub',     icon: Github,             url: 'https://github.com/favicon.ico?',                            status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'chatgpt',    name: 'ChatGPT',    icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico?',                           status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
 ]);
 
 // 业务状态 → 4 档 tone（wait / ok-fast / ok-slow / fail）

@@ -102,7 +102,7 @@
                             ? 'bg-success/10 border-success/40 text-success font-medium'
                             : 'bg-card border-border hover:bg-muted/50'">
                         <span class="flex items-center gap-2 min-w-0">
-                            <component :is="getChecklistIcon(fullList[item].icon)" class="size-4 shrink-0" />
+                            <component :is="getChecklistIcon(item)" class="size-4 shrink-0" />
                             <span class="truncate">{{ fullList[item].title }}</span>
                         </span>
                         <span class="shrink-0 flex items-center gap-1.5">
@@ -126,7 +126,7 @@
                             <!-- 分类标题 + 描述 + 可展开 intro -->
                             <header>
                                 <h2 class="flex items-center gap-2 text-xl font-semibold tracking-tight m-0 mb-2">
-                                    <component :is="getChecklistIcon(fullList[currentList].icon)"
+                                    <component :is="getChecklistIcon(currentList)"
                                         class="size-5 text-muted-foreground" />
                                     {{ fullList[currentList].title }}
                                 </h2>
@@ -282,22 +282,23 @@ import {
     Users,
 } from 'lucide-vue-next';
 
-// 安全检查分类图标映射（i18n 数据中存 bi-xxx 字符串，映射到 lucide 组件）
+// 安全检查分类图标映射：直接以 slug 为 key（slug 本身就是语义化的分类名），
+// 不再需要在 i18n JSON 里挂 "icon": "bi-xxx" 字符串
 const checklistIconMap = {
-    'bi-key-fill': KeyRound,
-    'bi-browser-safari': Compass,
-    'bi-envelope-fill': Mail,
-    'bi-chat-dots-fill': MessageCircle,
-    'bi-people-fill': Users,
-    'bi-shield-shaded': ShieldHalf,
-    'bi-phone-fill': Smartphone,
-    'bi-laptop-fill': Laptop,
-    'bi-house-add-fill': HousePlus,
-    'bi-currency-exchange': Banknote,
-    'bi-person-bounding-box': ScanFace,
-    'bi-file-earmark-break-fill': FileWarning,
+    'authentication':     KeyRound,
+    'web-browsing':       Compass,
+    'email':              Mail,
+    'messaging':          MessageCircle,
+    'social-media':       Users,
+    'networks':           ShieldHalf,
+    'mobile-devices':     Smartphone,
+    'personal-computers': Laptop,
+    'smart-home':         HousePlus,
+    'personal-finance':   Banknote,
+    'human-aspect':       ScanFace,
+    'physical-security':  FileWarning,
 };
-const getChecklistIcon = (name) => checklistIconMap[name] || Info;
+const getChecklistIcon = (slug) => checklistIconMap[slug] || Info;
 
 const isCategoryIntroOpen = ref(false);
 const checklistInfoOpen = ref({});
@@ -370,7 +371,6 @@ const initSecurityList = (securityChecklist) => {
         transformedObject[item.slug] = {
             title: item.title,
             description: item.description,
-            icon: item.icon,
             intro: item.intro,
             checklist: item.checklist.map(checkItem => {
                 const checkItemSlug = checkItem.slug;
