@@ -1,178 +1,165 @@
 <template>
-    <!-- Censorship Check -->
-    <div class="mtr-test-section my-4">
-        <div class="text-neutral-500">
-            <p>{{ t('censorshipcheck.Note') }}</p>
+    <div class="censorship-check-section my-4 space-y-4">
+        <!-- 顶部说明 -->
+        <p class="text-sm text-muted-foreground leading-relaxed">{{ t('censorshipcheck.Note') }}</p>
+
+        <!-- 输入区 -->
+        <div class="space-y-2">
+            <label for="queryURL" class="text-sm font-medium block">{{ t('censorshipcheck.Note2') }}</label>
+            <InputGroup>
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
+                    :disabled="censorshipCheckStatus === 'running'"
+                    :placeholder="t('censorshipcheck.Placeholder')"
+                    v-model="queryURL" @keyup.enter="onSubmit" />
+                <Button variant="action"
+                    :disabled="censorshipCheckStatus === 'running' || !queryURL"
+                    @click="onSubmit">
+                    <Spinner v-if="censorshipCheckStatus === 'running'" />
+                    {{ t('censorshipcheck.Run') }}
+                </Button>
+            </InputGroup>
+            <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
-        <div class="mb-3">
-            <div class="jn-card rounded-lg border bg-card text-card-foreground">
-                <div class="p-4">
-                    <div>
-                        <label for="queryURL" class="inline-block">{{ t('censorshipcheck.Note2') }}</label>
-                    </div>
 
-                    <div class="flex mb-2 mt-2">
-                        <Input type="text" class="rounded-r-none"
-                            :disabled="censorshipCheckStatus === 'running'"
-                            :placeholder="t('censorshipcheck.Placeholder')"
-                            v-model="queryURL" @keyup.enter="onSubmit"
-                            name="queryURL" id="queryURL" data-1p-ignore />
-                        <Button class="rounded-l-none -ml-px bg-blue-600 hover:bg-blue-700 text-white"
-                            @click="onSubmit"
-                            :disabled="censorshipCheckStatus === 'running' || !queryURL">
-                            <span v-if="censorshipCheckStatus !== 'running'">{{ t('censorshipcheck.Run') }}</span>
-                            <span v-else class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
-                        </Button>
-                    </div>
-                    <div class="jn-placeholder">
-                        <p v-if="errorMsg" class="text-red-600">{{ errorMsg }}</p>
-                    </div>
+        <!-- 结果双表 -->
+        <div v-if="censorshipResults.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Test Group（高风险国） -->
+            <Card>
+                <CardContent class="p-0">
+                    <header class="flex items-center gap-2 px-4 py-3 border-b">
+                        <ShieldAlert class="size-4 text-warning" />
+                        <h3 class="text-sm font-semibold m-0">{{ t('censorshipcheck.TestGroup') }}</h3>
+                    </header>
+                    <CensorshipTable :rows="testGroupResults" />
+                </CardContent>
+            </Card>
 
-                    <!-- Result Display -->
-                    <div id="censorshipresult" class="flex flex-wrap -mx-2" v-if="censorshipResults.length > 0">
-                        <div class="w-full md:w-1/2 px-2">
-                            <h3 class="text-xl px-3 py-2 rounded-md border bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200">
-                                {{ t('censorshipcheck.TestGroup') }}
-                            </h3>
-                            <div class="overflow-x-auto whitespace-nowrap">
-                                <table class="w-full border-collapse">
-                                    <thead>
-                                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                            <template v-for="header in ['Country', 'Status', 'City', 'Network']" :key="header">
-                                                <th scope="col" class="text-left p-2">{{ t('censorshipcheck.' + header) }}</th>
-                                            </template>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(result, index) in censorshipResults.filter(r => highRiskCountries.includes(r.country))"
-                                            :key="result.country + '-' + result.city + '-' + index"
-                                            class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                            <td class="p-2">
-                                                <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                                                {{ result.country_name }}
-                                            </td>
-                                            <td class="p-2">
-                                                <component v-if="result.status === 'failed' || result.status === 'finished'"
-                                                    :is="result.status === 'failed' ? CircleX : CircleCheck"
-                                                    class="inline size-[1em] align-[-0.125em]"
-                                                    :class="result.status === 'failed' ? 'text-red-600' : 'text-green-600'" />
-                                                <span v-if="result.status === 'in-progress'"
-                                                    class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
-                                            </td>
-                                            <td class="p-2">{{ result.city }}</td>
-                                            <td class="p-2">{{ result.network }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <!-- Control Group（对照国） -->
+            <Card>
+                <CardContent class="p-0">
+                    <header class="flex items-center gap-2 px-4 py-3 border-b">
+                        <Shield class="size-4 text-success" />
+                        <h3 class="text-sm font-semibold m-0">{{ t('censorshipcheck.ControlGroup') }}</h3>
+                    </header>
+                    <CensorshipTable :rows="controlGroupResults" />
+                </CardContent>
+            </Card>
+        </div>
 
-                        <div class="w-full md:w-1/2 px-2">
-                            <h3 class="text-xl px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
-                                {{ t('censorshipcheck.ControlGroup') }}
-                            </h3>
-                            <div class="overflow-x-auto whitespace-nowrap">
-                                <table class="w-full border-collapse">
-                                    <thead>
-                                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                            <template v-for="header in ['Country', 'Status', 'City', 'Network']" :key="header">
-                                                <th scope="col" class="text-left p-2">{{ t('censorshipcheck.' + header) }}</th>
-                                            </template>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(result, index) in censorshipResults.filter(r => !highRiskCountries.includes(r.country))"
-                                            :key="result.country + '-' + result.city + '-' + index"
-                                            class="border-b border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                            <td class="p-2">
-                                                <span :class="'jn-fl fi fi-' + result.country.toLowerCase()"></span>
-                                                {{ result.country_name }}
-                                            </td>
-                                            <td class="p-2">
-                                                <component v-if="result.status === 'failed' || result.status === 'finished'"
-                                                    :is="result.status === 'failed' ? CircleX : CircleCheck"
-                                                    class="inline size-[1em] align-[-0.125em]"
-                                                    :class="result.status === 'failed' ? 'text-red-600' : 'text-green-600'" />
-                                                <span v-if="result.status === 'in-progress'"
-                                                    class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
-                                            </td>
-                                            <td class="p-2">{{ result.city }}</td>
-                                            <td class="p-2">{{ result.network }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <transition @before-enter="beforeEnter" @enter="enter" @leave="leave">
-                        <div v-if="censorshipCheckStatus === 'finished'">
-                            <div class="px-3 py-2 rounded-md border mt-3"
-                                :class="{
-                                    'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200': isDown,
-                                    'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200': isBlocked,
-                                    'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200': !isBlocked && !isDown
-                                }">
-                                <span v-if="isBlocked">
-                                    <Frown class="inline size-[1em] align-[-0.125em]" />
-                                    {{ t('censorshipcheck.isBlocked') }}
-                                </span>
-                                <span v-else>
-                                    <span v-if="!isDown">
-                                        <Smile class="inline size-[1em] align-[-0.125em]" />
-                                        {{ t('censorshipcheck.notBlocked') }}
-                                    </span>
-                                    <span v-else>
-                                        <Meh class="inline size-[1em] align-[-0.125em]" />
-                                        {{ t('censorshipcheck.isDown') }}
-                                    </span>
-                                </span>
-                                <span class="opacity-75 italic">( {{ t('censorshipcheck.Note3') }} )</span>
-                            </div>
-                        </div>
-                    </transition>
+        <!-- 底部结论 banner（3 态：isBlocked / isDown / notBlocked）—— 带 fade-slide 入场 -->
+        <Transition name="fade-slide">
+            <div v-if="censorshipCheckStatus === 'finished'"
+                class="flex items-start gap-2 p-3 rounded-md border text-sm"
+                :class="bannerClass">
+                <component :is="bannerIcon" class="size-4 mt-0.5 shrink-0" />
+                <div class="leading-relaxed">
+                    {{ bannerText }}
+                    <span class="opacity-70 italic">( {{ t('censorshipcheck.Note3') }} )</span>
                 </div>
             </div>
-        </div>
+        </Transition>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
 import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
-import { CircleCheck, CircleX, Frown, Meh, Smile } from 'lucide-vue-next';
+import { Card, CardContent } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { Icon } from '@iconify/vue';
+import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
+
 const highRiskCountries = ['CN', 'RU', 'TR', 'SA'];
 const censorshipResults = ref([]);
-const censorshipCheckStatus = ref("idle");
+const censorshipCheckStatus = ref('idle');
 const isBlocked = ref(false);
 const isDown = ref(false);
 const blockedCountries = ref([]);
 const queryURL = ref('');
 const errorMsg = ref('');
 
+// 过滤后的分组结果，用 computed 避免模板里两次调用 .filter
+const testGroupResults = computed(() =>
+    censorshipResults.value.filter(r => highRiskCountries.includes(r.country))
+);
+const controlGroupResults = computed(() =>
+    censorshipResults.value.filter(r => !highRiskCountries.includes(r.country))
+);
+
+// 结论 banner 3 态
+const bannerClass = computed(() => {
+    if (isBlocked.value) return 'border-destructive/30 bg-destructive/10 text-destructive';
+    if (isDown.value) return 'border-warning/30 bg-warning/10 text-warning';
+    return 'border-success/30 bg-success/10 text-success';
+});
+const bannerIcon = computed(() => {
+    if (isBlocked.value) return Frown;
+    if (isDown.value) return Meh;
+    return Smile;
+});
+const bannerText = computed(() => {
+    if (isBlocked.value) return t('censorshipcheck.isBlocked');
+    if (isDown.value) return t('censorshipcheck.isDown');
+    return t('censorshipcheck.notBlocked');
+});
+
+// ——— 双表共享的行渲染：用内联 functional 组件避免模板重复 ———
+const CensorshipTable = (props) => h('div', { class: 'overflow-x-auto' },
+    h('table', { class: 'w-full text-sm' }, [
+        h('thead', {},
+            h('tr', { class: 'border-b' },
+                ['Country', 'Status', 'City', 'Network'].map(key =>
+                    h('th', {
+                        scope: 'col',
+                        class: 'text-left px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide',
+                    }, t('censorshipcheck.' + key))
+                )
+            )
+        ),
+        h('tbody', { class: 'divide-y' },
+            props.rows.map((result, idx) => h('tr', {
+                key: result.country + '-' + result.city + '-' + idx,
+                class: 'hover:bg-muted/50 transition-colors',
+            }, [
+                h('td', { class: 'px-3 py-2 whitespace-nowrap' }, h('div', { class: 'flex items-center gap-1.5' }, [
+                    h(Icon, { icon: 'circle-flags:' + result.country.toLowerCase(), class: 'shrink-0 size-4' }),
+                    h('span', {}, result.country_name),
+                ])),
+                h('td', { class: 'px-3 py-2' }, renderStatus(result.status)),
+                h('td', { class: 'px-3 py-2 text-muted-foreground' }, result.city),
+                h('td', { class: 'px-3 py-2 text-muted-foreground truncate max-w-[160px]', title: result.network }, result.network),
+            ]))
+        ),
+    ])
+);
+CensorshipTable.props = ['rows'];
+
+// 状态图标渲染：finished → 成功勾；failed → 失败叉；in-progress → Spinner
+const renderStatus = (status) => {
+    if (status === 'finished') return h(CircleCheck, { class: 'size-4 text-success' });
+    if (status === 'failed') return h(CircleX, { class: 'size-4 text-destructive' });
+    return h(Spinner, { class: 'size-4 text-info' });
+};
+
 const validateInput = (input) => {
-    if (!input.match(/^https?:\/\//)) {
-        input = 'http://' + input;
-    }
+    if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
         const hostname = url.hostname;
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
-            return hostname;
-        }
-    } catch {
-    }
+        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+    } catch { /* noop */ }
     errorMsg.value = t('censorshipcheck.invalidURL');
     return null;
 };
@@ -181,14 +168,12 @@ const onSubmit = () => {
     trackEvent('Section', 'StartClick', 'CensorshipCheck');
     errorMsg.value = '';
     censorshipResults.value = [];
-    censorshipCheckStatus.value = "idle";
+    censorshipCheckStatus.value = 'idle';
     isBlocked.value = false;
     isDown.value = false;
     blockedCountries.value = [];
     const hostname = validateInput(queryURL.value);
-    if (hostname) {
-        startHttpCheck(hostname);
-    }
+    if (hostname) startHttpCheck(hostname);
 };
 
 const startHttpCheck = () => {
@@ -196,34 +181,35 @@ const startHttpCheck = () => {
     const hostname = validateInput(queryURL.value);
     if (!hostname) return;
     let tryCount = 0;
+
     const sendHttpRequest = async () => {
-        censorshipCheckStatus.value = "running";
+        censorshipCheckStatus.value = 'running';
         try {
-            const response = await fetch("https://api.globalping.io/v1/measurements", {
+            const response = await fetch('https://api.globalping.io/v1/measurements', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     locations: [
-                        { country: "CN", limit: 2 }, { country: "RU", limit: 2 },
-                        { country: "TR", limit: 2 }, { country: "SA", limit: 2 },
-                        { country: "JP" }, { country: "US" }, { country: "CA" }, { country: "IT" },
-                        { country: "FI" }, { country: "AU" }, { country: "FR" }, { country: "DE" },
+                        { country: 'CN', limit: 2 }, { country: 'RU', limit: 2 },
+                        { country: 'TR', limit: 2 }, { country: 'SA', limit: 2 },
+                        { country: 'JP' }, { country: 'US' }, { country: 'CA' }, { country: 'IT' },
+                        { country: 'FI' }, { country: 'AU' }, { country: 'FR' }, { country: 'DE' },
                     ],
                     target: hostname,
-                    type: "http",
+                    type: 'http',
                     measurementOptions: {
-                        request: { host: hostname, path: "/", method: "HEAD" },
+                        request: { host: hostname, path: '/', method: 'HEAD' },
                         port: 443,
-                        protocol: "HTTPS"
-                    }
-                })
+                        protocol: 'HTTPS',
+                    },
+                }),
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         } catch (error) {
-            console.error("Error sending HTTP request:", error);
-            censorshipCheckStatus.value = "error";
+            console.error('Error sending HTTP request:', error);
+            censorshipCheckStatus.value = 'error';
             errorMsg.value = t('censorshipcheck.invalidURL');
         }
     };
@@ -236,36 +222,34 @@ const startHttpCheck = () => {
             const data = await response.json();
             processHttpResults(data);
 
-            if (data.status === "in-progress" && tryCount < 5) {
+            if (data.status === 'in-progress' && tryCount < 5) {
                 setTimeout(() => fetchHttpResults(id), 3000);
                 tryCount++;
             } else {
                 if (censorshipResults.value.length === 0) {
-                    censorshipCheckStatus.value = "error";
+                    censorshipCheckStatus.value = 'error';
                     errorMsg.value = t('censorshipcheck.fetchError');
                 } else {
                     correctResult();
                     calResult(censorshipResults.value);
-                    censorshipCheckStatus.value = "finished";
+                    censorshipCheckStatus.value = 'finished';
                 }
             }
         } catch (error) {
-            console.error("Error fetching HTTP results:", error);
-            censorshipCheckStatus.value = "error";
+            console.error('Error fetching HTTP results:', error);
+            censorshipCheckStatus.value = 'error';
             errorMsg.value = t('censorshipcheck.fetchError');
         }
     };
 
     sendHttpRequest().then(data => {
-        if (data && data.id) {
-            setTimeout(() => { fetchHttpResults(data.id); }, 3000);
-        }
+        if (data && data.id) setTimeout(() => fetchHttpResults(data.id), 3000);
     });
 };
 
 const processHttpResults = (data) => {
-    const cleanedData = data.results
-        .filter(item => item.result.status === "finished" || item.result.status === "failed" || item.result.status === "in-progress")
+    censorshipResults.value = data.results
+        .filter(item => ['finished', 'failed', 'in-progress'].includes(item.result.status))
         .filter(item => item.result.rawOutput !== null)
         .map(item => ({
             country: item.probe.country,
@@ -275,24 +259,17 @@ const processHttpResults = (data) => {
             status: item.result.status,
             headers: item.result.rawHeaders ? 'OK' : '',
         }));
-
-    censorshipResults.value = cleanedData;
 };
 
 const correctResult = () => {
     censorshipResults.value.forEach(result => {
-        if (result.status === 'in-progress') {
-            result.status = 'failed';
-        }
+        if (result.status === 'in-progress') result.status = 'failed';
     });
 
     censorshipResults.value = [...censorshipResults.value.sort((a, b) => {
         const priorityIndexA = highRiskCountries.indexOf(a.country);
         const priorityIndexB = highRiskCountries.indexOf(b.country);
-
-        if (priorityIndexA !== -1 && priorityIndexB !== -1) {
-            return priorityIndexA - priorityIndexB;
-        }
+        if (priorityIndexA !== -1 && priorityIndexB !== -1) return priorityIndexA - priorityIndexB;
         if (priorityIndexA !== -1) return -1;
         if (priorityIndexB !== -1) return 1;
         return a.country.localeCompare(b.country);
@@ -321,32 +298,28 @@ const calResult = (testResults) => {
         blockedCountries.value = blockedHighRiskCountries;
         isBlocked.value = blockedHighRiskCountries.length > 0;
     }
-    if (isSignedIn.value) {
-        checkAchievements();
-    }
+    if (isSignedIn.value) checkAchievements();
 };
 
 const checkAchievements = () => {
-    if (isBlocked.value) {
-        if (!store.userAchievements.ItIsOpen.achieved) {
-            store.setTriggerUpdateAchievements('ItIsOpen');
-        }
+    if (isBlocked.value && !store.userAchievements.ItIsOpen.achieved) {
+        store.setTriggerUpdateAchievements('ItIsOpen');
     }
-};
-
-const beforeEnter = (el) => { el.style.height = '0'; };
-const enter = (el, done) => {
-    el.style.height = 'fit-content';
-    el.addEventListener('transitionend', done);
-};
-const leave = (el, done) => {
-    el.style.height = '0';
-    el.addEventListener('transitionend', done);
 };
 </script>
 
 <style scoped>
-.jn-placeholder {
-    height: 16pt;
+.fade-slide-enter-active {
+    transition: all 0.3s ease-out;
+}
+.fade-slide-leave-active {
+    transition: all 0.2s ease-out;
+}
+.fade-slide-enter-from {
+    transform: translateY(10px);
+    opacity: 0;
+}
+.fade-slide-leave-to {
+    opacity: 0;
 }
 </style>
