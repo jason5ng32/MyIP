@@ -10,7 +10,7 @@
 
 | # | 文件 | 主题 | 状态 |
 |---|---|---|---|
-| 01 | [01-bootstrap-to-tailwind.md](./01-bootstrap-to-tailwind.md) | Bootstrap → Tailwind + shadcn-vue（彻底替换） | 🟢 进行中（Bootstrap JS 已全部移除；Bootstrap CSS 仍保留，等 C.2 模板逐组件改写完成后再卸载） |
+| 01 | [01-bootstrap-to-tailwind.md](./01-bootstrap-to-tailwind.md) | Bootstrap → Tailwind + shadcn-vue（彻底替换） | ✅ 主体完成（bootstrap 包已卸载、CSS 导入已删除、28 个组件逐个 rewrite；bootstrap-icons 列为 phase D 后续） |
 | 02 | [02-app-vue-split.md](./02-app-vue-split.md) | App.vue 上帝组件拆分 | 🟡 未开始 |
 | 03 | [03-add-tests.md](./03-add-tests.md) | 增加单元测试（Node `node --test`） | 🟢 进行中（基建+部分用例已完成于 dev） |
 | 04 | [04-store-hardcoded.md](./04-store-hardcoded.md) | store.js 硬编码数据治理 | ✅ 已完成 |

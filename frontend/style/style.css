@@ -1,8 +1,11 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
+/* refactor/01 stage E: Bootstrap CSS removed. All components have been
+   rewritten to use Tailwind + shadcn-vue directly (commits in phase C.2).
+   bootstrap-icons CSS kept — .bi bi-* is used hundreds of places and will
+   migrate to lucide-vue-next in phase D. */
 @import 'bootstrap-icons/font/bootstrap-icons.min.css';
 @import 'flag-icons/css/flag-icons.min.css';
 
-/* === Tailwind v4 + shadcn-vue 基建（重构进行中 — 见 refactor/01） === */
+/* === Tailwind v4 + shadcn-vue 基建 === */
 @import 'tailwindcss';
 @import 'tw-animate-css';
 

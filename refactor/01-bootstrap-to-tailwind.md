@@ -2,14 +2,15 @@
 
 **目标**：彻底移除 Bootstrap，UI 层完全迁移到 Tailwind v4 + shadcn-vue，bootstrap-icons 替换为 lucide-vue-next。最终 `package.json` 不再依赖 `bootstrap` / `bootstrap-icons`。
 
-**状态**：🟢 进行中
+**状态**：🟢 主体完成
 
 - 阶段 A（基建）：✅ 完成
 - 阶段 B（命令式 Bootstrap JS 替换：Toast / Tooltip / Modal / Offcanvas）：✅ 完成
-- 阶段 C 的"JS 部件收尾"部分（Dropdown / Collapse / Accordion / Tabs / ScrollSpy 换成 shadcn-vue 或删除）：✅ 完成
-- **结果**：Bootstrap JS 已完全不需要；`import 'bootstrap'` 已从 `main.js` 删除；`bootstrap` 包保留在 `package.json`（因为 `bootstrap.min.css` 仍然作为视觉层的地基被加载）
-- 阶段 C 的"视觉层改写"部分：⏸️ 暂停。曾尝试用 `@apply` compat shim 一次性代替 Bootstrap CSS（commit 254b081），造成大面积视觉回归，已 revert（commit 3c28014）。后续正确做法：**逐组件改写模板 class**，每个组件一个 commit、一次视觉验证，不再引入 shim 层
-- 阶段 D（bootstrap-icons → lucide）和阶段 E（最终卸载）：🟡 未开始，不阻塞当前功能
+- 阶段 C.1（Dropdown / Collapse / Accordion / Tabs / ScrollSpy 收尾）：✅ 完成
+- 阶段 C.2（模板层 Bootstrap class → Tailwind / shadcn-vue，28 次 commit 逐组件）：✅ 完成
+- 阶段 E（卸载 bootstrap 包 + 删 bootstrap CSS import）：✅ 完成
+- **结果**：`package.json` 不再依赖 `bootstrap`；`style.css` 不再 `@import 'bootstrap/dist/css/bootstrap.min.css'`
+- 阶段 D（bootstrap-icons → lucide-vue-next）：🟡 未开始，作为 refactor/01 主体之外的独立后续任务单独推进；不阻塞任何功能
 
 **影响范围**：30+ Vue 文件、router/index.js 中的 DOM 操作、main.js 中的全局 tooltip 指令、style/style.css。
 
