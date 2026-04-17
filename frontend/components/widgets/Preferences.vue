@@ -1,163 +1,154 @@
 <template>
+    <!-- Preferences 面板：左侧 Sheet 滑入；分 5 个 section（Language / Theme / IP Sources / IP DB / App Settings） -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
-        <SheetContent
-            side="left"
-            :title="t('nav.preferences.title')"
-            :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[400px] max-w-[400px]')">
-            <div class="mt-3 flex items-center justify-between px-3 pb-3 border-b border-neutral-200 dark:border-neutral-700">
-                <h5 class="m-0 text-lg font-semibold">
-                    <SlidersHorizontal class="inline size-[1em] align-[-0.125em]" />&nbsp;&nbsp;{{ t('nav.preferences.title') }}
-                </h5>
-                <SheetClose />
-            </div>
-            <div class="pt-0 m-2">
-                <div class="preferences-tip">{{ t('nav.preferences.preferenceTips') }}</div>
+        <SheetContent side="left" :title="t('nav.preferences.title')"
+            :class="cn('flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[420px] max-w-[420px]')">
+            <!-- Header -->
+            <header class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
+                <h2 class="flex items-center gap-2 text-base font-semibold m-0">
+                    <SlidersHorizontal class="size-4 text-muted-foreground" />
+                    {{ t('nav.preferences.title') }}
+                </h2>
+                <SheetClose
+                    class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
+            </header>
 
-                <!-- 语言设置 -->
-                <div id="Pref_language">
-                    <div class="preferences-title"><Languages class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.language') }}</div>
-                    <ToggleGroup :model-value="userPreferences.lang" type="single" class="flex-col w-1/2 gap-0 mb-2"
+            <!-- 内容（独立滚动） -->
+            <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+                <!-- 顶部提示 -->
+                <p class="text-xs text-muted-foreground leading-relaxed">
+                    {{ t('nav.preferences.preferenceTips') }}
+                </p>
+
+                <!-- Language —————————————————————————————— -->
+                <section id="Pref_language">
+                    <SectionTitle :icon="Languages">{{ t('nav.preferences.language') }}</SectionTitle>
+                    <Select :model-value="userPreferences.lang"
                         @update:model-value="(v) => v && prefLanguage(v)">
-                        <ToggleGroupItem v-for="lang in ['auto', 'zh', 'en', 'fr', 'tr']" :key="lang" :value="lang"
-                            class="justify-start w-full">
-                            <span v-if="lang === 'zh'"><i class="fi fi-cn"></i> 中文</span>
-                            <span v-else-if="lang === 'en'"><i class="fi fi-us"></i> English</span>
-                            <span v-else-if="lang === 'fr'"><i class="fi fi-fr"></i> Français</span>
-                            <span v-else-if="lang === 'tr'"><i class="fi fi-tr"></i> Türkçe</span>
-                            <span v-else>{{ t('nav.preferences.systemAuto') }}</span>
-                            <CircleCheck class="inline size-[1em] align-[-0.125em] ml-2" v-if="userPreferences.lang === lang" />
-                        </ToggleGroupItem>
-                    </ToggleGroup>
-                    <div class="preferences-tip">{{ t('nav.preferences.languageTips') }}</div>
-                </div>
+                        <SelectTrigger class="w-full shadow-none">
+                            <SelectValue>
+                                <span class="inline-flex items-center gap-2">
+                                    <Icon v-if="currentLang.flag" :icon="'circle-flags:' + currentLang.flag" class="size-4 shrink-0" />
+                                    <Globe v-else class="size-4 text-muted-foreground shrink-0" />
+                                    {{ currentLang.label }}
+                                </span>
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="lang in langOptions" :key="lang.value" :value="lang.value">
+                                <span class="inline-flex items-center gap-2">
+                                    <Icon v-if="lang.flag" :icon="'circle-flags:' + lang.flag" class="size-4 shrink-0" />
+                                    <Globe v-else class="size-4 text-muted-foreground shrink-0" />
+                                    {{ lang.label }}
+                                </span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <SectionTip>{{ t('nav.preferences.languageTips') }}</SectionTip>
+                </section>
 
-                <!-- 主题方案 -->
-                <div id="Pref_colorScheme">
-                    <div class="preferences-title"><Palette class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.colorScheme') }}</div>
-                    <ToggleGroup :model-value="userPreferences.theme" type="single"
+                <!-- Color Scheme ———————————————————————————— -->
+                <section id="Pref_colorScheme">
+                    <SectionTitle :icon="Palette">{{ t('nav.preferences.colorScheme') }}</SectionTitle>
+                    <ToggleGroup :model-value="userPreferences.theme" type="single" class="w-full"
                         @update:model-value="(v) => v && prefTheme(v)">
-                        <ToggleGroupItem v-for="theme in ['auto', 'light', 'dark']" :key="theme" :value="theme">
-                            <span v-if="theme === 'light'"><Sun class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.colorLight') }}</span>
-                            <span v-else-if="theme === 'dark'"><Moon class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.colorDark') }}</span>
-                            <span v-else>{{ t('nav.preferences.systemAuto') }}</span>
+                        <ToggleGroupItem v-for="opt in themeOptions" :key="opt.value" :value="opt.value" class="flex-1 gap-1.5">
+                            <component :is="opt.icon" class="size-4" />
+                            {{ opt.label }}
                         </ToggleGroupItem>
                     </ToggleGroup>
-                </div>
+                </section>
 
-                <!-- IP 源 -->
-                <div id="Pref_ipCards">
-                    <div class="preferences-title">
-                        <LayoutGrid class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.ipSourcesToCheck') }}
-                    </div>
-                    <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-1/2 mb-2"
+                <!-- IP Sources Count ————————————————————————— -->
+                <section id="Pref_ipCards">
+                    <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
+                    <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-full"
                         @update:model-value="(v) => v && prefipCards(Number(v))">
-                        <ToggleGroupItem v-for="num in [3, 6]" :key="num" :value="String(num)">
+                        <ToggleGroupItem v-for="num in [3, 6]" :key="num" :value="String(num)" class="flex-1">
                             {{ num }}
                         </ToggleGroupItem>
                     </ToggleGroup>
-                    <div class="preferences-tip">{{ t('nav.preferences.ipSourcesToCheckTips') }}</div>
-                </div>
+                    <SectionTip>{{ t('nav.preferences.ipSourcesToCheckTips') }}</SectionTip>
+                </section>
 
-                <!-- IP 地理位置数据库 -->
-                <div id="Pref_ipGeoSource">
-                    <div class="preferences-title">
-                        <LayoutGrid class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.ipDB') }}
+                <!-- IP Geo DB ——————————————————————————————— -->
+                <section id="Pref_ipGeoSource">
+                    <SectionTitle :icon="Database">{{ t('nav.preferences.ipDB') }}</SectionTitle>
+                    <Select :model-value="String(userPreferences.ipGeoSource)"
+                        @update:model-value="(v) => v != null && prefipGeoSource(Number(v))">
+                        <SelectTrigger class="w-full shadow-none">
+                            <SelectValue>{{ currentIpDB?.text || '—' }}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="ipdb in ipDBs" :key="ipdb.id" :value="String(ipdb.id)" :disabled="!ipdb.enabled">
+                                {{ ipdb.text }}
+                                <span v-if="!ipdb.enabled" class="ml-1 text-xs text-muted-foreground">(unavailable)</span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <SectionTip>{{ t('nav.preferences.ipDBTips') }}</SectionTip>
+                </section>
+
+                <!-- App Settings ———————————————————————————— -->
+                <section id="Pref_appSettings">
+                    <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
+                    <!-- 不用 <Card>：Card 默认带 jn-card 阴影，跟 Select / ToggleGroup 的扁平对比会凹凸不平
+                         面板内统一走"border + bg-card"的扁平容器，所有控件同海拔 -->
+                    <div class="rounded-lg border bg-card divide-y">
+                        <PrefRow id="autoStart" :label="t('nav.preferences.autoRun')"
+                            :tip="t('nav.preferences.autoRunTips')"
+                            :model-value="userPreferences.autoStart" @update:model-value="prefAutoStart" />
+
+                        <PrefRow v-if="userPreferences.autoStart" id="ConnectivityRefresh"
+                            :label="t('nav.preferences.connectivityAutoRefresh')"
+                            :tip="t('nav.preferences.connectivityAutoRefreshTips')"
+                            :model-value="userPreferences.connectivityAutoRefresh"
+                            @update:model-value="prefConnectivityRefresh" />
+
+                        <PrefRow v-if="configs.map" id="showMap"
+                            :label="t('nav.preferences.showMap')"
+                            :tip="t('nav.preferences.showMapTips')"
+                            :model-value="userPreferences.showMap" @update:model-value="prefShowMap" />
+
+                        <PrefRow v-if="isMobile" id="simpleMode"
+                            :label="t('nav.preferences.simpleMode')"
+                            :tip="t('nav.preferences.simpleModeTips')"
+                            :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
+
+                        <PrefRow id="ConnectivityNotifications"
+                            :label="t('nav.preferences.popupConnectivityNotifications')"
+                            :tip="t('nav.preferences.popupConnectivityNotificationsTips')"
+                            :model-value="userPreferences.popupConnectivityNotifications"
+                            @update:model-value="prefconnectivityShowNoti" />
                     </div>
-                    <ToggleGroup :model-value="String(userPreferences.ipGeoSource)" type="single" class="flex-col w-1/2 gap-0 mb-2"
-                        @update:model-value="(v) => v !== null && v !== undefined && prefipGeoSource(Number(v))">
-                        <ToggleGroupItem v-for="ipdb in ipDBs" :key="ipdb.id" :value="String(ipdb.id)"
-                            :disabled="!ipdb.enabled"
-                            class="justify-start w-full">
-                            <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}</span>
-                            <CircleCheck class="inline size-[1em] align-[-0.125em] ml-2" v-if="userPreferences.ipGeoSource === ipdb.id" />
-                        </ToggleGroupItem>
-                    </ToggleGroup>
-                    <div class="preferences-tip">{{ t('nav.preferences.ipDBTips') }}</div>
-                </div>
-
-                <!-- 应用设置 -->
-                <div id="Pref_appSettings">
-                    <div class="preferences-title"><AppWindow class="inline size-[1em] align-[-0.125em]" /> {{ t('nav.preferences.appSettings') }}</div>
-                    <ul class="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
-                        <li class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
-                            <div class="flex-1 mr-2">
-                                <div class="font-bold">
-                                    <label for="autoStart">{{ t('nav.preferences.autoRun') }}</label>
-                                </div>
-                                <div class="preferences-tip">{{ t('nav.preferences.autoRunTips') }}</div>
-                            </div>
-                            <Switch id="autoStart" :model-value="userPreferences.autoStart"
-                                @update:model-value="(v) => prefAutoStart(v)" />
-                        </li>
-
-                        <li v-if="userPreferences.autoStart"
-                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
-                            <div class="flex-1 mr-2">
-                                <div class="font-bold">
-                                    <label for="ConnectivityRefresh">{{ t('nav.preferences.connectivityAutoRefresh') }}</label>
-                                </div>
-                                <div class="preferences-tip">{{ t('nav.preferences.connectivityAutoRefreshTips') }}</div>
-                            </div>
-                            <Switch id="ConnectivityRefresh" :model-value="userPreferences.connectivityAutoRefresh"
-                                @update:model-value="(v) => prefConnectivityRefresh(v)" />
-                        </li>
-
-                        <li v-if="configs.map"
-                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
-                            <div class="flex-1 mr-2">
-                                <div class="font-bold">
-                                    <label for="showMap">{{ t('nav.preferences.showMap') }}</label>
-                                </div>
-                                <div class="preferences-tip">{{ t('nav.preferences.showMapTips') }}</div>
-                            </div>
-                            <Switch id="showMap" :model-value="userPreferences.showMap"
-                                @update:model-value="(v) => prefShowMap(v)" />
-                        </li>
-
-                        <li v-if="isMobile"
-                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
-                            <div class="flex-1 mr-2">
-                                <div class="font-bold">
-                                    <label for="simpleMode">{{ t('nav.preferences.simpleMode') }}</label>
-                                </div>
-                                <div class="preferences-tip">{{ t('nav.preferences.simpleModeTips') }}</div>
-                            </div>
-                            <Switch id="simpleMode" :model-value="userPreferences.simpleMode"
-                                @update:model-value="(v) => prefSimpleMode(v)" />
-                        </li>
-
-                        <li class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
-                            <div class="flex-1 mr-2">
-                                <div class="font-bold">
-                                    <label for="ConnectivityNotifications">{{ t('nav.preferences.popupConnectivityNotifications') }}</label>
-                                </div>
-                                <div class="preferences-tip">{{ t('nav.preferences.popupConnectivityNotificationsTips') }}</div>
-                            </div>
-                            <Switch id="ConnectivityNotifications" :model-value="userPreferences.popupConnectivityNotifications"
-                                @update:model-value="(v) => prefconnectivityShowNoti(v)" />
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="h-6 mb-5"></div>
+                </section>
             </div>
         </SheetContent>
     </Sheet>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+// refactor/02：Preferences 全部走 shadcn primitive + 语义色 token
+// - 5+ 选项的语言/数据库切到 Select 下拉，遵守"5 档以上不平铺"的偏好
+// - Theme（3 档）/ IP Sources（2 档）保留 ToggleGroup
+// - App Settings 用 Card + 内部抽出 PrefRow，每行就一行声明（标签 / 描述 / Switch）
+// - SectionTitle / SectionTip 为本组件抽两个 inline functional 子组件，避免在每个 section 重复样式
+import { ref, computed, onMounted, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/vue';
 import {
     AppWindow,
-    CircleCheck,
+    Database,
+    Globe,
     Languages,
+    LaptopMinimal,
     LayoutGrid,
     Moon,
     Palette,
@@ -181,34 +172,55 @@ const onOpenChange = (val) => {
     store.setOpenSheet(val ? 'preferences' : null);
 };
 
+// 语言选项（数据驱动；flag 走 circle-flags ISO code）
+const langOptions = [
+    { value: 'auto', label: t('nav.preferences.systemAuto'), flag: '' },
+    { value: 'zh', label: '中文', flag: 'cn' },
+    { value: 'en', label: 'English', flag: 'us' },
+    { value: 'fr', label: 'Français', flag: 'fr' },
+    { value: 'tr', label: 'Türkçe', flag: 'tr' },
+];
+const currentLang = computed(() =>
+    langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]
+);
+
+// 主题选项（3 档：light / dark / auto）
+const themeOptions = [
+    { value: 'light', label: t('nav.preferences.colorLight'), icon: Sun },
+    { value: 'dark', label: t('nav.preferences.colorDark'), icon: Moon },
+    { value: 'auto', label: t('nav.preferences.systemAuto'), icon: LaptopMinimal },
+];
+
+// 当前选中的 IP DB（用于 SelectValue 显示）
+const currentIpDB = computed(() =>
+    ipDBs.value.find(db => db.id === userPreferences.value.ipGeoSource)
+);
+
+// 主题切换需要协调 darkMode + body class + PWA meta
 const prefersDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
 const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
 
 const handleThemeChange = (event) => {
     prefersDarkMode.value = event.matches;
     const theme = userPreferences.value.theme;
-    if (theme === 'auto') {
-        store.setDarkMode(prefersDarkMode.value);
-    } else if (theme === 'light') {
-        store.setDarkMode(false);
-    } else if (theme === 'dark') {
-        store.setDarkMode(true);
-    }
+    if (theme === 'auto') store.setDarkMode(prefersDarkMode.value);
+    else if (theme === 'light') store.setDarkMode(false);
+    else if (theme === 'dark') store.setDarkMode(true);
     updateBodyClass();
     PWAColor();
 };
 
 const updateBodyClass = () => {
-    document.body.classList.toggle("body-dark-mode", isDarkMode.value);
+    document.body.classList.toggle('body-dark-mode', isDarkMode.value);
 };
 
 const PWAColor = () => {
     const themeColor = document.querySelector('meta[name="theme-color"]');
     const backgroundColor = document.querySelector('meta[name="background-color"]');
-    const color = isDarkMode.value ? "#171a1d" : "#f8f9fa";
-    const bgColor = isDarkMode.value ? "#212529" : "#ffffff";
-    themeColor.setAttribute("content", color);
-    backgroundColor.setAttribute("content", bgColor);
+    const color = isDarkMode.value ? '#171a1d' : '#f8f9fa';
+    const bgColor = isDarkMode.value ? '#212529' : '#ffffff';
+    themeColor.setAttribute('content', color);
+    backgroundColor.setAttribute('content', bgColor);
 };
 
 const updateIPDBs = () => {
@@ -222,15 +234,9 @@ const updateIPDBs = () => {
 
 const prefTheme = (value) => {
     switch (value) {
-        case 'light':
-            store.setDarkMode(false);
-            break;
-        case 'dark':
-            store.setDarkMode(true);
-            break;
-        case 'auto':
-            handleThemeChange({ matches: mediaQueryList.matches });
-            break;
+        case 'light': store.setDarkMode(false); break;
+        case 'dark': store.setDarkMode(true); break;
+        case 'auto': handleThemeChange({ matches: mediaQueryList.matches }); break;
     }
     updateBodyClass();
     PWAColor();
@@ -299,23 +305,37 @@ onMounted(() => {
 defineExpose({
     toggleMaps,
 });
+
+// ——— 内联 functional 子组件：减少模板里重复的 section title / tip / Switch row 样式 ———
+
+// section 标题：lucide icon + 文字，统一节奏
+const SectionTitle = (props, { slots }) =>
+    h('h3', { class: 'flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2' }, [
+        props.icon ? h(props.icon, { class: 'size-3.5' }) : null,
+        slots.default?.(),
+    ]);
+SectionTitle.props = ['icon'];
+
+// section 提示文字：放在控件下方
+const SectionTip = (props, { slots }) =>
+    h('p', { class: 'mt-2 text-xs text-muted-foreground leading-relaxed' }, slots.default?.());
+
+// App Settings 里的开关行：label + tip 在左，Switch 在右
+const PrefRow = (props, { emit }) =>
+    h('div', { class: 'flex items-start justify-between gap-3 p-3' }, [
+        h('div', { class: 'flex-1 min-w-0' }, [
+            h('label', {
+                for: props.id,
+                class: 'text-sm font-medium cursor-pointer select-none',
+            }, props.label),
+            h('p', { class: 'mt-0.5 text-xs text-muted-foreground leading-relaxed' }, props.tip),
+        ]),
+        h(Switch, {
+            id: props.id,
+            modelValue: props.modelValue,
+            'onUpdate:modelValue': (v) => emit('update:modelValue', v),
+        }),
+    ]);
+PrefRow.props = ['id', 'label', 'tip', 'modelValue'];
+PrefRow.emits = ['update:modelValue'];
 </script>
-
-<style scoped>
-.preferences-title {
-    margin-top: 12pt;
-    font-weight: 500;
-    margin-bottom: 12pt;
-}
-
-.preferences-tip {
-    font-size: smaller;
-    opacity: 0.7;
-    margin-top: 3pt;
-}
-
-.jn-disabled-text {
-    opacity: 0.5;
-    text-decoration: line-through;
-}
-</style>
