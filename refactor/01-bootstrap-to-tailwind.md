@@ -123,7 +123,7 @@
 - [x] `components/advanced-tools/BrowserInfo.vue` — row/col → flex/w-_；`.alert` → Tailwind 色块；`.badge text-bg-*` → shadcn `<Badge>` + 色彩覆盖；`.form-check form-switch` → shadcn `<Switch>`；`.spinner-grow` → `animate-pulse` 圆点；新增 `components/ui/switch/`
 - [x] `components/advanced-tools/MacChecker.vue` — `.input-group` → flex + Input + Button；table 用 Tailwind；result card 结构改 Tailwind flex grid；text-success/secondary 图标色映射
 - [x] `components/advanced-tools/RuleTest.vue` — 卡片网格 + .alert 色块 + RefreshAll 按钮全部改 Tailwind + shadcn Button
-- [ ] `components/advanced-tools/DnsResolver.vue`
+- [x] `components/advanced-tools/DnsResolver.vue` — input-group 三段 (Input + Type Dropdown + Run) 用 shadcn；table 改 Tailwind
 - [ ] `components/advanced-tools/Whois.vue`
 - [ ] `components/advanced-tools/GlobalLatencyTest.vue`
 - [ ] `components/advanced-tools/CensorshipCheck.vue`
