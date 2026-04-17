@@ -20,18 +20,18 @@
 
     <!-- 卡片网格：现代设计用 CSS Grid 而不是负 margin flex -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
+      <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
         @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
         :title="t('connectivity.RefreshThisTest')">
         <CardContent class="p-4">
           <!-- 顶部：品牌图标 + 服务名 -->
           <div class="flex items-center gap-2 mb-3">
-            <component :is="getConnectivityIcon(test.icon)" class="size-4 text-muted-foreground" />
-            <span class="text-sm font-medium truncate">{{ test.name }}</span>
+            <component :is="getConnectivityIcon(test.icon)" class="size-6 text-muted-foreground" />
+            <span class="text-base font-medium truncate">{{ test.name }}</span>
           </div>
           <!-- 底部：状态指示灯 + 文字 + 延迟（mono 等宽数字右对齐） -->
           <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-xs min-w-0">
+            <span class="flex items-center gap-1.5 text-base min-w-0">
               <span class="relative flex shrink-0">
                 <span v-if="statusOf(test) === 'wait'"
                   class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
@@ -39,9 +39,9 @@
               </span>
               <span :class="textClass(test)" class="truncate">{{ test.status }}</span>
             </span>
-            <span v-if="test.time !== 0" class="text-xs font-mono tabular-nums text-muted-foreground"
+            <span v-if="test.time !== 0" class="text-base font-mono tabular-nums text-muted-foreground"
               :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
-              {{ test.time }}<span class="ml-0.5 text-[10px]">ms</span>
+              {{ test.time }}<span class="ml-0.5 text-sm">ms</span>
             </span>
           </div>
         </CardContent>
