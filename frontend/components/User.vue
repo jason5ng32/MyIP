@@ -1,45 +1,36 @@
 <template>
-    <!-- User Benefits Dialog (refactor/01: 旧 Bootstrap Modal → shadcn-vue Dialog) -->
+    <!-- User Benefits Dialog -->
     <Dialog :open="isOpen" @update:open="isOpen = $event">
-        <DialogContent
-            :title="t('user.Benefits.Title')"
-            class="max-w-2xl"
-            :data-bs-theme="isDarkMode ? 'dark' : ''"
-        >
-            <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header d-flex align-items-center justify-content-between" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title m-0" id="BenefitsTitle"><i class="bi bi-person-hearts"></i> {{
-                        t('user.Benefits.Title') }}
-                    </h5>
-                    <DialogClose class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }" />
+        <DialogContent :title="t('user.Benefits.Title')" class="max-w-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-700">
+                <h5 class="m-0 text-lg font-semibold" id="BenefitsTitle">
+                    <i class="bi bi-person-hearts"></i> {{ t('user.Benefits.Title') }}
+                </h5>
+                <DialogClose />
+            </div>
+            <div class="pt-3 m-2">
+                <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
+                <p class="opacity-75">{{ t('user.Benefits.Note2') }}</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                                <th scope="col" class="text-left p-2">#</th>
+                                <th scope="col" class="text-left p-2">{{ t('user.Benefits.Benefit') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="n in 4" :key="n" class="border-b border-neutral-200 dark:border-neutral-700">
+                                <th scope="row" class="text-left p-2 font-semibold">{{ n }}</th>
+                                <td class="p-2">{{ t('user.Benefits.Benefit' + n) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
-                    <p class="opacity-75">{{ t('user.Benefits.Note1') }}</p>
-                    <p class="opacity-75">{{ t('user.Benefits.Note2') }}</p>
-                    <div class="table-responsive">
-                        <table class="table" :class="{ 'table-dark': isDarkMode }">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">{{ t('user.Benefits.Benefit') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="n in 4" :key="n">
-                                    <th scope="row">{{ n }}</th>
-                                    <td>{{ t('user.Benefits.Benefit' + n) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="opacity-75">{{ t('user.Benefits.FootNote') }}</p>
-                </div>
-                <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
-                </div>
+                <p class="opacity-75 mt-3">{{ t('user.Benefits.FootNote') }}</p>
             </div>
         </DialogContent>
     </Dialog>
-
 </template>
 
 <script setup>
@@ -53,8 +44,6 @@ import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 
 // 远程用户信息
 const isSignedIn = computed(() => store.isSignedIn);

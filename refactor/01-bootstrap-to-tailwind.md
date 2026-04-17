@@ -115,7 +115,7 @@
 - [ ] `components/svgicons/*`（纯 SVG，可能无工作）
 - [x] `components/widgets/Help.vue` — 两列快捷键表，`.row`/`.col`/`.col-8`/`.col-auto` → `flex` + `flex-1` + `shrink-0`；`<kbd>` 样式直接内联，替代 `.text-bg-light` + Bootstrap 默认 kbd 样式
 - [x] `components/widgets/QueryIP.vue` — 浮动搜索按钮换 `<Button size="icon">` + 响应式 right-position；`.form-control` → `<Input>`；结果 `.list-group` → plain `<ul>` + Tailwind；`.progress`/`.progress-bar` → `<Progress>`；新增 `components/ui/{input,progress}/`
-- [ ] `components/User.vue`
+- [x] `components/User.vue` — Benefits Dialog：`.modal-content/header/body/footer` / `.table`/`.table-dark`/`.table-responsive` 改为 Tailwind table；dark-mode 全用 `dark:` 变体；移除 unused `isDarkMode` / `isMobile` computed
 - [ ] `components/ConnectivityTest.vue`
 - [ ] `components/DnsLeaksTest.vue`
 - [ ] `components/WebRtcTest.vue`
