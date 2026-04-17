@@ -98,6 +98,8 @@
 
 **勾选完成项前的纪律：** 每个子任务标记 `[x]` 之前，必须重新扫一遍当前计划文件相关代码，确认没有遗漏的引用、未迁移的同类调用、漏掉的边界场景。详见 `refactor/README.md` 里的"完成纪律"一节。
 
+**shadcn-vue 优先原则（01 阶段 C.2 专用，但原则通用）：** 动手写任何 `<button>` / `<div>` / `<input>` / 表单元素 / 弹层 / 列表结构之前，先在 `frontend/components/ui/` 下查有没有现成 shadcn-vue 组件（Button / Card / Alert / Badge / Input / Select / Checkbox / Switch / Progress / Dialog / Sheet / Tooltip / DropdownMenu / Tabs / Accordion / Collapsible / Sonner …）。缺变体不是理由：`:class` 叠加足以覆盖绝大多数状态色需求，`as-child` 可以让触发器挂到自定义元素上。**只有在 shadcn 没有对应形状/行为时才自己写 Tailwind。** 曾因忽视这条在 C.2 首个组件上被用户纠正过，详见 `.learnings/LEARNINGS.md` 的 LRN-20260417-001。
+
 ---
 
 ## 开发命令

@@ -75,21 +75,38 @@
 - [x] **ScrollSpy** (`data-bs-spy="scroll"`) → 删除（Patch.vue 的 `checkSectionsAndTrack` 已经在做同样的事，scrollspy 是冗余）
   - [x] `App.vue`
 
-### C.2（暂停，待重新启动）— 模板层 Bootstrap class → Tailwind/shadcn-vue
+### C.2 — 模板层 Bootstrap class → Tailwind/shadcn-vue（进行中）
 
 **教训**：曾在 commit 254b081 尝试"一次性写 @apply compat shim 替代整份 bootstrap.min.css"的偷懒做法，导致大面积视觉回归（~168 个 class 的 shim 映射值对不上 Bootstrap 精确色/间距，加上 Tailwind Preflight 干扰），已于 commit 3c28014 revert。
 
-**后续正确做法**：每个组件单独一个 commit。
+**迁移约定**（C.2 每个 commit 都遵守）：
 
-- 先从视觉最简单的组件开始（例如 Footer / widgets/InfoMask）
-- 每次打开一个组件，把其模板中的 `.btn / .card / .row / .col-* / .d-flex / .text-* / .bg-*` 等 Bootstrap class 直接改成 Tailwind 工具类表达 + shadcn-vue 现有原子组件
-- 改完后人眼对比改动前后视觉差异，保证可接受再 commit
-- 不引入任何 compat 中介层
+1. **能用 shadcn-vue 现成组件就用**：`<Button>` 替 `.btn`，`<Card>` 替 `.card`，`<Alert>` 替 `.alert`，`<Badge>` 替 `.badge`，`<Input>` 替 `.form-control`，`<Select>` 替 `.form-select`，`<Checkbox>` / `<Switch>` 替 `.form-check-input`，`<Progress>` 替 `.progress`，`<Separator>` / `<Table>` / `<Skeleton>` / `<Avatar>` 等同理。用到时如果 `frontend/components/ui/` 下还没有，**先把它们从 shadcn-vue 源抄进来再用**（保持 copy-in 风格）
+2. **shadcn 没有或视觉差距太大时才自己写 Tailwind**：例如状态驱动的多色按钮（success / warning / danger 同时存在）、浮动触发器这种特殊用法
+3. **不引入任何 compat 中介层**：不写 `.btn { @apply ... }` 这种；所有样式直接在模板 class 里用 Tailwind 表达
+4. **一次一个组件**：单 commit、改完人眼对比视觉再提交
+5. **色彩映射**（粗略参考，实际以视觉对比为准）：
+   - `text-success` / `bg-success` → `text-green-600` / `bg-green-600`
+   - `text-warning` / `bg-warning` → `text-yellow-600` / `bg-yellow-500`
+   - `text-danger` / `bg-danger` → `text-red-600` / `bg-red-600`
+   - `text-info` / `bg-info` → `text-sky-600` / `bg-sky-500`
+   - `text-secondary` / `bg-secondary` → `text-neutral-500` / `bg-neutral-500`
+   - `bg-dark` → `bg-neutral-900`, `bg-light` → `bg-neutral-100`
+   - `text-muted` → `text-neutral-500`
+6. **间距 / 布局 class 大多 Tailwind 原生可用**：`mb-3` / `mt-5` / `px-3` / `py-2` / `text-center` / `flex-1` 等名字相同，直接保留即可
+7. **要改名的布局 class**：
+   - `d-flex` → `flex`
+   - `d-none` → `hidden`
+   - `align-items-center` → `items-center`
+   - `justify-content-between` → `justify-between`
+   - `flex-column` → `flex-col`
+   - `w-100` / `h-100` → `w-full` / `h-full`
+8. **暗色模式**：用 Tailwind 的 `dark:` 变体，不再用 `:class="{ 'dark-mode-*': isDarkMode }"` 模式（store.isDarkMode 已经通过 `setDarkMode` 同步到 `<html>.dark`）
 - 所有组件 C.2 都改完之后，`style.css` 里的 bootstrap CSS import 才能删，bootstrap 包才能卸载
 
 建议顺序（按视觉复杂度从低到高）：
 
-- [ ] `components/widgets/InfoMask.vue`
+- [x] `components/widgets/InfoMask.vue` — state-driven 三色按钮改为内联 Tailwind；`.infomask` CSS 移除，浮动定位靠 `fixed bottom-[66px] right-5 z-[1050]`；`document.querySelector('.infomask')` → template ref
 - [ ] `components/widgets/PWA.vue`
 - [ ] `components/widgets/Patch.vue`（无模板，可能无工作）
 - [ ] `components/Footer.vue`
