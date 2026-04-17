@@ -251,9 +251,18 @@ const OpenPreferences = () => {
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
-// Logo 点击：页面顶端时触发全量刷新
-const handleLogoClick = () => {
-  if (window.scrollY === 0) store.setRefreshEveryThing(true);
+// Logo 点击：
+//   - 页面中间 → 平滑滚到顶
+//   - 已在顶端 → 触发全量刷新
+// 注意：<a href="#"> 的原生行为是瞬间跳到顶，不是平滑滚动。
+// 这里阻止默认行为，改用 window.scrollTo + smooth 保证动画效果。
+const handleLogoClick = (e) => {
+  if (window.scrollY === 0) {
+    store.setRefreshEveryThing(true);
+  } else {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
