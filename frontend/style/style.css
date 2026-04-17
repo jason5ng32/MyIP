@@ -211,11 +211,16 @@
   border: 1px solid #9c9c9c2e;
 }
 
-/* 注意：原来这里有 .jn-card.keyboard-hover + .jn-card.keyboard-hover::after 两条
-   Bootstrap 时代用 ::after 画绿框的老规则，已删除。
-   现在键盘高亮统一走 Tailwind 的 data-[keyboard-hover=true]:ring-2 ring-green-500/50。
-   留着的话 ::after 的 position:absolute 在 shadcn Card（没 relative）上会回落到 <html>
-   的 initial containing block，画出一条文档级别的绿色长线。*/
+/* 键盘导航高亮：用 outline 替代原来的 ::after。
+   outline 不占布局、不需要 position:relative 锚定、不会和 .jn-card 自带的
+   box-shadow 冲突，也不会像 position:absolute 的 ::after 那样在没有定位祖先时
+   回落到 <html> 的 initial containing block 画出文档级长线。*/
+.jn-card.keyboard-hover {
+  border-color: rgba(20, 184, 108, 0.5);
+  outline: 2px solid rgba(20, 184, 108, 0.5);
+  outline-offset: -1px;
+  border-radius: var(--radius);
+}
 
 .jn-container {
   padding-top: 2pt;
