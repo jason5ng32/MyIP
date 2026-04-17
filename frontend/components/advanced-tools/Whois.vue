@@ -1,65 +1,61 @@
 <template>
     <!-- Whois Resolver -->
     <div class="whois-section my-4">
-        <div class="text-secondary">
+        <div class="text-neutral-500">
             <p>{{ t('whois.Note') }}</p>
         </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <div class="col-12 col-md-auto">
-                            <label for="queryURLorIP" class="col-form-label">{{ t('whois.Note2') }}</label>
+        <div class="mb-3">
+            <div class="jn-card rounded-lg border bg-card text-card-foreground">
+                <div class="p-4">
+                    <div>
+                        <label for="queryURLorIP" class="inline-block">{{ t('whois.Note2') }}</label>
+                    </div>
+
+                    <div class="flex mb-2 mt-2">
+                        <Input type="text" class="rounded-r-none"
+                            :disabled="whoisCheckStatus === 'running'"
+                            :placeholder="t('whois.Placeholder')"
+                            v-model="queryURLorIP" @keyup.enter="onSubmit"
+                            name="queryURLorIP" id="queryURLorIP" data-1p-ignore />
+                        <Button class="rounded-l-none -ml-px bg-blue-600 hover:bg-blue-700 text-white"
+                            @click="onSubmit"
+                            :disabled="whoisCheckStatus === 'running' || !queryURLorIP">
+                            <span v-if="whoisCheckStatus === 'idle'">{{ t('whois.Run') }}</span>
+                            <span v-if="whoisCheckStatus === 'running'"
+                                class="inline-block h-3 w-3 rounded-full bg-current animate-pulse" aria-hidden="true"></span>
+                        </Button>
+                    </div>
+
+                    <div class="jn-placeholder">
+                        <p v-if="errorMsg" class="text-red-600">{{ errorMsg }}</p>
+                    </div>
+
+                    <!-- Results -->
+                    <div v-if="whoisResults && Object.keys(whoisResults).length">
+                        <div class="px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200">
+                            {{ t('whois.Note3') }}
                         </div>
+                        <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0">
+                            <AccordionItem v-for="(provider, index) in providers" :key="provider"
+                                :value="String(index)">
+                                <AccordionTrigger>
+                                    <span>
+                                        <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
+                                        <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase() }}</strong>
+                                    </span>
+                                </AccordionTrigger>
+                                <AccordionContent :class="[isMobile ? 'p-2' : '']">
+                                    <div class="border-0 mt-3 p-4 rounded"
+                                        :class="[isDarkMode ? 'bg-black text-neutral-100' : 'bg-neutral-100']">
+                                        <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
 
-                        <div class="input-group mb-2 mt-2 ">
-                            <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
-                                :disabled="whoisCheckStatus === 'running'" :placeholder="t('whois.Placeholder')"
-                                v-model="queryURLorIP" @keyup.enter="onSubmit" name="queryURLorIP" id="queryURLorIP"
-                                data-1p-ignore>
-
-                            <button class="btn btn-primary" @click="onSubmit"
-                                :disabled="whoisCheckStatus === 'running' || !queryURLorIP">
-                                <span v-if="whoisCheckStatus === 'idle'">{{
-                                    t('whois.Run') }}</span>
-                                <span v-if="whoisCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
-                                    aria-hidden="true"></span>
-                            </button>
-
-                        </div>
-
-                        <div class="jn-placeholder">
-                            <p v-if="errorMsg" class="text-danger">{{ errorMsg }}</p>
-                        </div>
-
-                        <!-- Results Table -->
-                        <div v-if="whoisResults && Object.keys(whoisResults).length">
-
-                            <div class="alert alert-success ">{{ t('whois.Note3') }}</div>
-                            <!-- refactor/01：Bootstrap accordion → shadcn-vue Accordion（单选模式，默认展开第一项） -->
-                            <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0"
-                                :data-bs-theme="isDarkMode ? 'dark' : ''">
-                                <AccordionItem v-for="(provider, index) in providers" :key="provider"
-                                    :value="String(index)">
-                                    <AccordionTrigger>
-                                        <span><i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
-                                            <strong>{{ t('whois.Provider') }} : {{ provider.toUpperCase()
-                                                }}</strong></span>
-                                    </AccordionTrigger>
-                                    <AccordionContent :class="[isMobile ? 'p-2' : '']">
-                                        <div class="card card-body border-0 mt-3"
-                                            :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                                            <pre>{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-
-                            <div v-else class="card card-body border-0 mt-3"
-                                :class="[isDarkMode ? 'bg-black text-light' : 'bg-light']">
-                                <pre>{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
-                            </div>
-
+                        <div v-else class="border-0 mt-3 p-4 rounded"
+                            :class="[isDarkMode ? 'bg-black text-neutral-100' : 'bg-neutral-100']">
+                            <pre>{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
                         </div>
                     </div>
                 </div>
@@ -75,6 +71,8 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
 
@@ -90,20 +88,15 @@ const providers = ref([]);
 const type = ref('');
 const whoisResults = ref({});
 
-// 检查 URL 输入是否有效
 const formatURL = (domain) => {
-    // 检查是否包含协议头，若没有则尝试为其添加 http:// 以便进行 URL 格式验证
     if (!domain.match(/^https?:\/\//)) {
         domain = 'http://' + domain;
     }
-
     try {
         const url = new URL(domain);
         const hostname = url.hostname;
-
         const parts = hostname.split('.');
         const mainDomain = parts.slice(-2).join('.');
-
         if (mainDomain.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
             return mainDomain;
         }
@@ -112,9 +105,7 @@ const formatURL = (domain) => {
     return false;
 };
 
-// 检查输入是否有效
 const validInput = (input) => {
-
     if (formatURL(input)) {
         type.value = 'domain';
         return formatURL(input);
@@ -124,10 +115,9 @@ const validInput = (input) => {
     } else {
         errorMsg.value = t('whois.invalidURL');
         return false;
-    };
+    }
 };
 
-// 提交查询
 const onSubmit = () => {
     trackEvent('Section', 'StartClick', 'Whois');
     errorMsg.value = '';
@@ -139,7 +129,6 @@ const onSubmit = () => {
     }
 };
 
-// 获取 Whois 结果
 const getWhoisResults = async (query) => {
     whoisCheckStatus.value = 'running';
     try {
@@ -151,7 +140,6 @@ const getWhoisResults = async (query) => {
         getProviders(data);
         if (type.value === 'domain' && providers.value.length >= 1) {
             whoisResults.value = data;
-            // 成就检查
             if (isSignedIn.value && query.toLowerCase().includes('ipcheck.ing')) {
                 checkAchievements();
             }
@@ -170,7 +158,6 @@ const getWhoisResults = async (query) => {
     }
 };
 
-// 获取 Whois 服务商
 const getProviders = (data) => {
     if (type.value === 'domain') {
         for (const [key, value] of Object.entries(data)) {
@@ -184,25 +171,23 @@ const getProviders = (data) => {
 };
 
 const filterDomainWhoisRawData = (text) => {
-    text = text.replace(/^( {1,20})/gm, ''); // 先移除文本里，每一行开头的连续空格
-    const cutoffIndex = text.indexOf('\nFor more information'); // 移除不必要的其它信息
+    text = text.replace(/^( {1,20})/gm, '');
+    const cutoffIndex = text.indexOf('\nFor more information');
     return cutoffIndex !== -1 ? text.substring(0, cutoffIndex) : text;
 };
 
 const filterIPWhoisRawData = (text) => {
-    text = text.replace(/^#.*\n/gm, ''); // 移除所有以 # 开头的行
-    text = text.replace(/^\n*/, ''); // 移除开头的所有空行
-    text = text.replace(/\n$/, ''); // 移除最后一个空行
+    text = text.replace(/^#.*\n/gm, '');
+    text = text.replace(/^\n*/, '');
+    text = text.replace(/\n$/, '');
     return text;
 };
 
-// 检查是否达成成就
 const checkAchievements = () => {
     if (!store.userAchievements.CuriousCat.achieved) {
         store.setTriggerUpdateAchievements('CuriousCat');
     }
-}
-
+};
 </script>
 
 <style scoped>
