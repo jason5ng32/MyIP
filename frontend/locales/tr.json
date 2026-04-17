@@ -1204,6 +1204,72 @@
             "change": "Kod verimliliği optimize edildi, yapı hızı büyük ölçüde artırıldı"
           }
         ]
+      },
+      {
+        "version": "v6.0",
+        "date": "17 Nisan 2026",
+        "content": [
+          {
+            "type": "improve",
+            "change": "Tam arayüz yenileme: Bootstrap'ten Tailwind CSS v4 + shadcn-vue'ye taşındı"
+          },
+          {
+            "type": "improve",
+            "change": "Tüm ülke bayrakları artık yuvarlak simgeler olarak görüntüleniyor"
+          },
+          {
+            "type": "improve",
+            "change": "Otomatik açık / koyu mod uyumuyla birleşik tasarım token'ları"
+          },
+          {
+            "type": "improve",
+            "change": "Bağlantı / WebRTC / DNS Sızıntısı / Kural Testi kartları modern durum göstergeleriyle yeniden tasarlandı"
+          },
+          {
+            "type": "improve",
+            "change": "IP Bilgileri kartları yeniden tasarlandı: kopyalama düğmeli öne çıkan IP gösterimi, daha temiz meta veri ızgarası, giriş yapmış kullanıcılar için etiketli gelişmiş veri"
+          },
+          {
+            "type": "improve",
+            "change": "Gelişmiş Araçlar paneli sürükle-kapat ve isteğe bağlı tam ekran ile alt çekmeceye dönüştürüldü"
+          },
+          {
+            "type": "improve",
+            "change": "Tüm gelişmiş araçlar (MTR / Ping / Kural / DNS / Whois / MAC / Tarayıcı Bilgisi / Görünmezlik / Sansür / Güvenlik Kontrol Listesi) yeniden tasarlandı"
+          },
+          {
+            "type": "improve",
+            "change": "Sorgu düğmeleri artık yürütme sırasında yükleniyor göstergesi gösteriyor; devre dışı durumu net şekilde belirtildi"
+          },
+          {
+            "type": "improve",
+            "change": "Uzun IPv6 adresleri tek satıra sığmak için otomatik olarak yazı tipini küçültüyor (artık satır kaymıyor)"
+          },
+          {
+            "type": "improve",
+            "change": "Tercihler, Hakkında, Değişiklik Günlüğü, Başarılar panelleri yeniden tasarlandı"
+          },
+          {
+            "type": "improve",
+            "change": "Bağlantı kartlarında gecikmeye duyarlı emoji yüzler (gülümseme / nötr / surat)"
+          },
+          {
+            "type": "improve",
+            "change": "Paket boyutu yaklaşık 420KB azaltıldı"
+          },
+          {
+            "type": "fix",
+            "change": "Gelişmiş Araçlar çekmecesi içindeki metin artık seçilebilir"
+          },
+          {
+            "type": "fix",
+            "change": "J/K klavye navigasyonu kullanılırken oluşan hayalet yeşil çizgi hatası düzeltildi"
+          },
+          {
+            "type": "fix",
+            "change": "Prodüksiyon derlemesinde Ping Testi açıldığında oluşan çalışma zamanı hatası düzeltildi"
+          }
+        ]
       }
     ]
   }

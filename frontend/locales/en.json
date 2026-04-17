@@ -1205,6 +1205,72 @@
             "change": "Significantly improved build speed"
           }
         ]
+      },
+      {
+        "version": "v6.0",
+        "date": "Apr 17, 2026",
+        "content": [
+          {
+            "type": "improve",
+            "change": "Complete UI overhaul: migrated from Bootstrap to Tailwind CSS v4 + shadcn-vue"
+          },
+          {
+            "type": "improve",
+            "change": "All country flags now displayed as circular icons"
+          },
+          {
+            "type": "improve",
+            "change": "Unified design tokens with automatic light/dark mode adaptation"
+          },
+          {
+            "type": "improve",
+            "change": "Network Connectivity / WebRTC / DNS Leak / Rule Test cards redesigned with modern status indicators"
+          },
+          {
+            "type": "improve",
+            "change": "IP Infos cards redesigned: hero IP display with copy, cleaner metadata grid, labeled advanced data for signed-in users"
+          },
+          {
+            "type": "improve",
+            "change": "Advanced Tools panel switched to bottom drawer with drag-to-close and optional fullscreen"
+          },
+          {
+            "type": "improve",
+            "change": "All advanced tools (MTR / Ping / Rule / DNS / Whois / MAC / Browser Info / Invisibility / Censorship / Security Checklist) redesigned"
+          },
+          {
+            "type": "improve",
+            "change": "Query buttons now show a loading spinner during execution; disabled state clearly indicated"
+          },
+          {
+            "type": "improve",
+            "change": "Long IPv6 addresses auto-shrink font to fit in one line (no more wrapping)"
+          },
+          {
+            "type": "improve",
+            "change": "Preferences, About, Changelog, Achievements panels redesigned"
+          },
+          {
+            "type": "improve",
+            "change": "Latency-aware emoji faces in Network Connectivity cards (smile / neutral / frown)"
+          },
+          {
+            "type": "improve",
+            "change": "Reduced bundle size by ~420KB"
+          },
+          {
+            "type": "fix",
+            "change": "Text inside Advanced Tools drawer can now be selected"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed a ghost green line bug when using J/K keyboard navigation"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed runtime error when opening Ping Test in production build"
+          }
+        ]
       }
     ]
   }
