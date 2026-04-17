@@ -1,7 +1,7 @@
 <template>
   <!-- Nav — refactor/UI: 粘顶 + backdrop-blur，现代 shadcn-vue 视觉 -->
   <header
-    class="sticky top-0 z-40 w-full border-b border-neutral-200/70 dark:border-neutral-800/70 bg-neutral-50/80 dark:bg-neutral-900/80 supports-[backdrop-filter:blur(0px)]:bg-neutral-50/60 supports-[backdrop-filter:blur(0px)]:dark:bg-neutral-900/60 backdrop-blur">
+    class="sticky top-0 z-40 w-full border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur">
     <nav id="navbar-top"
       class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
@@ -13,7 +13,7 @@
           <Menu />
         </Button>
         <a href="#" @click="handleLogoClick"
-          class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-neutral-900 no-underline hover:opacity-80 transition-opacity dark:text-white">
+          class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity">
           <brandIcon />
           <span class="tracking-tight">
             <span class="font-bold">IP</span><span class="font-extralight">Check.</span><span
@@ -147,7 +147,7 @@
     <!-- 移动端导航抽屉 -->
     <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
       <SheetContent side="left" class="w-72 p-0" :title="t('nav.Navigation')">
-        <div class="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+        <div class="flex items-center justify-between border-b px-4 py-3">
           <h5 class="m-0 text-base font-semibold">{{ t('nav.Navigation') }}</h5>
           <SheetClose />
         </div>
@@ -158,7 +158,7 @@
             {{ t(`nav.${item}`) }}
           </a>
           <a :href="t('page.footerLink')" target="_blank" rel="noopener"
-            class="mt-3 inline-flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+            class="mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted">
             <Github class="size-4" />
             <span>Star on GitHub</span>
           </a>
@@ -207,8 +207,8 @@ const navItems = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest'
 const navLinkClass = (item, { block = false } = {}) => {
   const base = 'rounded-md px-3 py-1.5 text-sm font-medium no-underline cursor-pointer transition-colors';
   const state = item === currentSection.value
-    ? 'bg-neutral-200/70 text-neutral-900 dark:bg-neutral-800 dark:text-white'
-    : 'text-neutral-600 hover:bg-neutral-200/50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-white';
+    ? 'bg-accent text-accent-foreground'
+    : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground';
   return [base, state, block ? 'block' : ''].filter(Boolean).join(' ');
 };
 
@@ -221,16 +221,16 @@ const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.created
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 
-// Level Badge 配色：原来是模板里硬编码 5 分支，抽到 computed 里更整洁
+// Level Badge 配色：映射到语义 token，保持各等级色彩区分
 const levelBadgeClass = computed(() => {
   const level = remoteUserInfo.value?.userLevel;
   switch (level) {
-    case 'Premium':        return 'bg-blue-600 text-white';
-    case 'Owner':          return 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900';
-    case 'Developer':      return 'bg-green-600 text-white';
-    case 'HonoraryMember': return 'bg-yellow-500 text-neutral-900';
+    case 'Premium':        return 'bg-action text-action-foreground';   // 蓝（付费 / 触发识别色）
+    case 'Owner':          return 'bg-foreground text-background';      // 最深色（管理员）
+    case 'Developer':      return 'bg-success text-success-foreground'; // 绿
+    case 'HonoraryMember': return 'bg-warning text-warning-foreground'; // 黄
     case 'Standard':
-    default:               return 'bg-neutral-500 text-white';
+    default:               return 'bg-muted-foreground text-background'; // 灰
   }
 });
 
