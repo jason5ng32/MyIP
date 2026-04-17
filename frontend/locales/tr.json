@@ -439,7 +439,7 @@
   "ruletest": {
     "Title": "Kural Testi",
     "Name": "Test",
-    "Note": "Kural testi, proxy yazılımının alan adı tabanlı kurallarının doğru ayarlanıp ayarlanmadığını belirlemek için kullanılır. Testi yapmadan önce, aşağıdaki karta başvurmanız ve proxy yazılımınızda IPCheck.ing'in 8 farklı URL'si için farklı alan adı tabanlı yönlendirme kuralları ayarlamanız gerekir.",
+    "Note": "Kural testi, proxy yazılımının alan adı tabanlı kurallarının doğru ayarlanıp ayarlanmadığını belirlemek için kullanılır. Testi yapmadan önce, aşağıdaki karta başvurmanız ve proxy yazılımınızda IPCheck.ing'in 8 farklı URL'si için farklı alan adı tabanlı yönlendirme kuralları ayarlamanız gerekir. Genellikle, kuralları ayarlamak için DOMAIN, ptest-3.ipcheck.ing, POLICY gibi formatlar kullanılabilir. Bu formatlar, kullandığınız proxy yazılımına göre farklılık gösterebilir.",
     "StatusWait": "Test Bekleniyor veya Test Hatası",
     "StatusError": "Test Hatası",
     "Country": "Proxy bölgesi",
