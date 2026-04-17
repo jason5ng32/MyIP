@@ -4,37 +4,39 @@
     <div class="jn-title2">
       <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ t('dnsleaktest.Title') }}</h2>
       <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
-        <button @click="checkAllDNSLeakTest(true)"
-          :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh DNS Leak Test"><i class="bi"
-            :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
+        <Button size="icon" variant="outline"
+          @click="checkAllDNSLeakTest(true)"
+          aria-label="Refresh DNS Leak Test">
+          <i class="bi" :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i>
+        </Button>
       </JnTooltip>
     </div>
-    <div class="text-secondary">
+    <div class="text-neutral-500">
       <p>{{ t('dnsleaktest.Note') }}</p>
       <p>{{ t('dnsleaktest.Note2') }}</p>
     </div>
-    <div class="row">
-      <div v-for="(leak, index) in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card keyboard-shortcut-card"
-          :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-          <div class="card-body">
-            <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
+    <div class="flex flex-wrap -mx-2">
+      <div v-for="(leak, index) in leakTest" :key="leak.id" class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
+        <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground"
+          :class="{ 'jn-hover-card': !isMobile }">
+          <div class="p-4">
+            <p class="jn-con-title mb-2">
+              <i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
               <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
             </p>
-            <p class="card-text" :class="{
-              'text-info': leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError'),
-              'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
+            <p :class="{
+              'text-sky-600': leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError'),
+              'text-green-600': leak.ip.includes('.') || leak.ip.includes(':'),
             }">
               <i class="bi"
                 :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"></i>
-              {{ t('dnsleaktest.Endpoint') }}: {{
-              leak.ip }}
+              {{ t('dnsleaktest.Endpoint') }}: {{ leak.ip }}
             </p>
 
-            <div class="alert d-flex flex-column" :class="{
-              'alert-info': leak.country === t('dnsleaktest.StatusWait'),
-              'alert-success': leak.country !== t('dnsleaktest.StatusWait'),
-            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+            <div class="flex flex-col px-3 py-2 rounded-md border"
+              :class="leak.country === t('dnsleaktest.StatusWait')
+                ? 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200'
+                : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'">
 
               <span class="jn-org">
                 <i class="bi"
@@ -45,9 +47,8 @@
               <span class="mt-2">
                 <i class="bi"
                   :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                {{ t('ipInfos.Country') }}: <span
-                  :class="[ leak.country !== t('dnsleaktest.StatusWait') ? 'fw-bold':'']">{{ leak.country
-                  }}&nbsp;</span>
+                {{ t('ipInfos.Country') }}:
+                <span :class="[leak.country !== t('dnsleaktest.StatusWait') ? 'font-bold' : '']">{{ leak.country }}&nbsp;</span>
                 <span v-show="leak.country_code" :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
               </span>
             </div>
@@ -66,6 +67,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 import getCountryName from '@/utils/country-name.js';
 
 
