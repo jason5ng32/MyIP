@@ -10,7 +10,7 @@
         <p class="my-3 text-base text-muted-foreground">{{ t('webrtc.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0" @click="checkAllWebRTC(true)"
+        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
           aria-label="Refresh WebRTC Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>

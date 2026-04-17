@@ -11,7 +11,7 @@
         <p class="my-3 text-base text-muted-foreground">{{ t('connectivity.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0" @click="checkAllConnectivity(false, true, true)"
+        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllConnectivity(false, true, true)"
           aria-label="Refresh Connectivity Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>

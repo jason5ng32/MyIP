@@ -11,7 +11,7 @@
         <p class="my-3 text-base text-muted-foreground">{{ t('dnsleaktest.Note2') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0"
+        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer"
           @click="checkAllDNSLeakTest(true)"
           aria-label="Refresh DNS Leak Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
