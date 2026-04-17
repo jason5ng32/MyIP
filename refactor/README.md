@@ -12,7 +12,7 @@
 |---|---|---|---|
 | 01 | [01-bootstrap-to-tailwind.md](./01-bootstrap-to-tailwind.md) | Bootstrap → Tailwind + shadcn-vue（彻底替换） | ✅ 完成（bootstrap 与 bootstrap-icons 均已卸载，图标迁移到 lucide-vue-next） |
 | 02 | [02-app-vue-split.md](./02-app-vue-split.md) | App.vue 上帝组件拆分 | ✅ 完成（App.vue 594 → 130 行，4 个 composables 拆出） |
-| 03 | [03-add-tests.md](./03-add-tests.md) | 增加单元测试（Node `node --test`） | 🟢 进行中（基建+部分用例已完成于 dev） |
+| 03 | [03-add-tests.md](./03-add-tests.md) | 增加单元测试（Node `node --test`） | 🟢 阶段 A utils 纯函数补齐完成（92 个测试，46 新增）；阶段 B/C/D/E 仍待办 |
 | 04 | [04-store-hardcoded.md](./04-store-hardcoded.md) | store.js 硬编码数据治理 | ✅ 已完成 |
 
 状态图例：🟡 未开始 / 🟢 进行中 / ✅ 已完成 / ⚪ 已取消

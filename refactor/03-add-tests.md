@@ -24,13 +24,13 @@
 
 ### 阶段 A — utils 纯函数补齐
 
-- [ ] `frontend/utils/transform-ip-data.js` — 各类 raw 输入到统一卡片数据的映射 / 边界
-- [ ] `frontend/utils/masked-info.js` — 遮罩输出格式（mock i18n t 函数）
-- [ ] `frontend/utils/country-name.js` — 国家代码 → 名称映射 + 兜底
-- [ ] `frontend/utils/timestamp-to-date.js` — 时区与格式
-- [ ] `frontend/utils/system-detect.js` — UA 模拟测试 OS / Mobile 判定
-- [ ] `frontend/utils/speedtest-colos.js` — 数据查询函数
-- [ ] `frontend/utils/shortcut.js` — `mappingKeys` / `navigateCards` 行为（注意：依赖 DOM，可能需要轻量 mock 或拆纯函数后再测）
+- [x] `frontend/utils/transform-ip-data.js` — 各类 raw 输入到统一卡片数据的映射 / 边界
+- [x] `frontend/utils/masked-info.js` — 遮罩输出格式（mock i18n t 函数）
+- [x] `frontend/utils/country-name.js` — 国家代码 → 名称映射 + 兜底
+- [x] `frontend/utils/timestamp-to-date.js` — 时区与格式
+- [x] `frontend/utils/system-detect.js` — UA 模拟测试 OS / Mobile 判定
+- [x] `frontend/utils/speedtest-colos.js` — 数据查询函数
+- [ ] `frontend/utils/shortcut.js` — 跳过：模块加载时 `document.addEventListener('keydown', ...)` 有副作用，且 `navigateCards` 操作 DOM 高度依赖 CSS class/ref，Node 环境测成本高于收益。替代方案：02 拆分后 composables 里的 shortcut 编排行为走阶段 C 的 composable 测（更贴近真实使用）
 
 ### 阶段 B — API smoke 扩展
 
