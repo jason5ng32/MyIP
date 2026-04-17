@@ -2,15 +2,16 @@
   <!-- IP Infos -->
   <div class="ip-data-section mb-4 mt-4">
     <div class="jn-title2">
-      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎 {{ t('ipInfos.Title') }}</h2>
+      <h2 id="IPInfo" :class="{ 'mobile-h2': isMobile }">🔎 {{ t('ipInfos.Title') }}</h2>
     </div>
-    <div class="text-secondary">
+    <div class="text-neutral-500">
       <p>{{ t('ipInfos.Notes') }}</p>
     </div>
-    <div class="row">
-      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
-        'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
-      }]">
+    <div class="flex flex-wrap -mx-2">
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
+        :class="[colClass, {
+          'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
+        }]">
         <IPCard :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile" :ipGeoSource="ipGeoSource"
           :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus" :configs="configs"
           :asnInfos="asnInfos" @refresh-card="refreshCard" />
@@ -46,15 +47,17 @@ const lang = computed(() => store.lang);
 const isMapShown = computed(() => userPreferences.value.showMap);
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
-// 创建样式
+// 创建样式 —— Tailwind 等价栅格：
+// numCards = 1 → w-full;  2 → md:w-1/2;  3 → md:w-1/3;  >3 → md:w-1/3 xl:w-1/3 (每行最多 3 张)
 const colClass = computed(() => {
   const numCards = ipCardsToShow.value;
-  if (numCards > 0) {
-    // 保证每行不超过三个卡片
-    const colSize = numCards > 3 ? 4 : Math.floor(12 / numCards);
-    return `col-xl-${colSize} col-md-${colSize}  mb-4`;
-  }
-  return 'col-xl-4 col-lg-6 col-md-6 mb-4'; // 默认情况
+  const baseMap = {
+    1: 'md:w-full xl:w-full',
+    2: 'md:w-1/2 xl:w-1/2',
+    3: 'md:w-1/3 xl:w-1/3',
+  };
+  const clsForWide = baseMap[numCards] || 'md:w-1/3 xl:w-1/3';
+  return `w-full ${clsForWide} px-2 mb-4`;
 });
 
 // 默认卡片数据

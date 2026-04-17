@@ -135,7 +135,7 @@
 - [x] `components/ip-infos/DataPairBar.vue` — .progress + .progress-bar 双色条 → Tailwind flex + 两个 div；label badges → shadcn Badge；fw-light/fw-bold → font-light/bold
 - [x] `components/ip-infos/ASNInfo.vue` — .alert alert-light → Tailwind 色块；.badge text-bg-* → shadcn Badge；.placeholder col-N → inline width% 骨架
 - [x] `components/ip-infos/IPCard.vue` — 完整改写：卡片结构、IP 信息列表、质量进度条用 shadcn `<Progress>`、刷新按钮 Button；placeholder-glow 改 animate-pulse；保留 `.jn-link2` / `.jn-link2-dark` 虚线连接线
-- [ ] `components/IpInfos.vue`
+- [x] `components/IpInfos.vue` — 把 row + `col-xl-*`/`col-md-*` 动态栅格换成 `flex flex-wrap -mx-2` + Tailwind 条件 w-_ 映射（1/2/3/4+ 张卡片分别对应 full/1-2/1-3/1-3）
 - [ ] `components/Nav.vue`（含暗色模式样式收敛）
 - [ ] `components/Achievements.vue`
 - [ ] `components/widgets/Preferences.vue`
