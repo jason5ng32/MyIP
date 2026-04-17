@@ -1,161 +1,160 @@
 <template>
-  <footer>
-    <div id="copyleft">
-      <p class="text-center">
-        <span>Created by Jason Ng with love</span>
-        <JnTooltip :text="t('Tooltips.GithubLink')" side="top">
-          <a :href="t('page.footerLink')" target="_blank"
-            class="ml-1 inline-flex items-center no-underline text-neutral-900 hover:text-neutral-700 dark:text-neutral-100 dark:hover:text-neutral-300"
-            @click="trackEvent('Footer', 'FooterClick', 'Github');" aria-label="Github">
-            <Github class="inline size-[1em] align-[-0.125em]" />
+  <footer class="mt-10 pb-6 text-sm text-muted-foreground">
+    <!-- 第一行：作者 + Github —————————————————— -->
+    <div class="flex items-center justify-center gap-1.5 mb-3">
+      <span>Created by Jason Ng with love</span>
+      <JnTooltip :text="t('Tooltips.GithubLink')" side="top">
+        <Button variant="ghost" size="icon" as-child class="size-6 text-foreground/70 hover:text-foreground">
+          <a :href="t('page.footerLink')" target="_blank" rel="noopener" aria-label="Github"
+            @click="trackEvent('Footer', 'FooterClick', 'Github')">
+            <Github />
           </a>
-        </JnTooltip>
-      </p>
+        </Button>
+      </JnTooltip>
     </div>
 
-    <div id="about" class="text-center mb-2">
-      <a class="jn-heart-color no-underline" aria-controls="Sponsor"
-        href="https://github.com/sponsors/jason5ng32" target="_blank">
-        {{ t('about.Sponsor') }} 💖
-      </a>
-      <span class="mx-1"></span>
-      <a role="button" aria-controls="About" @click.prevent="openAbout"
-        class="cursor-pointer no-underline hover:underline text-neutral-900 dark:text-neutral-100">
-        {{ t('about.Title') }} <ArrowLeftCircle class="inline size-[1em] align-[-0.125em]" />
-      </a>
+    <!-- 第二行：Sponsor / About 入口 —————————————— -->
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <!-- Sponsor 用 arbitrary value 直接表达粉色：Button ghost 的 hover:text-accent-foreground
+           会覆盖普通 class，必须用 hover:text-[#d63384] 强表达，配合 cn/tw-merge 才会生效 -->
+      <Button variant="link" size="sm" as-child
+        class="text-[#d63384] hover:text-[#d63384]">
+        <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener">
+          {{ t('about.Sponsor') }} 💖
+        </a>
+      </Button>
+      <Button variant="ghost" size="sm" @click="openAbout" class="cursor-pointer">
+        {{ t('about.Title') }}
+        <ArrowLeftCircle class="size-3.5" />
+      </Button>
     </div>
 
+    <!-- 第三行：版权（可选） —————————————————— -->
+    <p v-if="!configs.originalSite" class="text-center text-xs opacity-70">
+      {{ t('page.copyRightName') }}
+      <a :href="t('page.copyRightLink')" target="_blank" rel="noopener"
+        class="text-foreground/80 hover:text-foreground hover:underline">
+        {{ t('page.copyRightLinkName') }}
+      </a>
+    </p>
+
+    <!-- About Sheet（右侧滑入：阅读型侧栏更适合长文本浏览） -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
-      <SheetContent
-        side="right"
-        :title="t('about.Title')"
-        :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]')"
-      >
-        <div class="mt-3 flex items-center justify-between px-3">
-          <ToggleGroup v-model="content" type="single">
-            <ToggleGroupItem v-for="show in ['about', 'changelog', 'specialthanks']" :key="show" :value="show">
-              {{ t(show + '.Title') }}
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <SheetClose />
-        </div>
-        <div class="p-4" ref="sheetBody">
-          <div v-if="content === 'about'">
-            <div class="mb-3">
-              <p v-for="i in 3" :key="i">
-                {{ t(`about.product${i}`) }}
-              </p>
-            </div>
-            <h5>{{ t('about.meTitle') }}</h5>
-            <div class="mb-3">
-              <p v-for="i in 3" :key="i">
-                {{ t(`about.me${i}`) }}
-              </p>
-            </div>
-            <div class="mb-3 mx-2">
-              <p>
-                <a href="https://wujiaxian.com"
-                  class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.personal') }}
-                </a>
-              </p>
-              <p>
-                <a href="https://kenengba.com"
-                  class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.blog') }}
-                </a>
-              </p>
-              <p>
-                <a href="https://retire.money"
-                  class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.retiremoney') }}
-                </a>
-              </p>
-              <p>
-                <a href="https://twitter.com/jason5ng32"
-                  class="text-green-600 hover:text-green-700 no-underline" target="_blank">
-                  <Compass class="inline size-[1em] align-[-0.125em]" /> {{ t('about.twitter') }}
-                </a>
-              </p>
-            </div>
-            <h5>{{ t('about.contactTitle') }}</h5>
-            <div v-html="t('about.contact')" class="mb-3"></div>
+      <SheetContent side="right" :title="t('about.Title')"
+        :class="cn('flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]')">
+        <!-- Tabs 包住整个 Sheet 内容：TabsList 留在 header，TabsContent 进 body 滚动区 -->
+        <Tabs v-model="content" class="flex flex-col h-full">
+          <!-- 顶部：tabs + 关闭 -->
+          <div class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
+            <TabsList>
+              <TabsTrigger v-for="tab in tabs" :key="tab" :value="tab">
+                {{ t(tab + '.Title') }}
+              </TabsTrigger>
+            </TabsList>
+            <SheetClose
+              class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
           </div>
 
-          <div v-if="content === 'changelog'">
-            <div v-for="(version, index) in changelog.slice().reverse()" :key="index" class="mb-4">
-              <div class="flex items-center">
-                <div class="w-1/2 font-bold text-lg">{{ version.version }}</div>
-                <div class="w-1/2 flex flex-row-reverse text-neutral-500">{{ version.date }}</div>
-              </div>
-              <Separator class="my-2" />
+          <!-- 内容区（独立滚动） -->
+          <div class="flex-1 overflow-y-auto px-5 py-5" ref="sheetBody">
+            <!-- About ———————————————————————————— -->
+            <TabsContent value="about" class="space-y-6 mt-0">
+              <section class="space-y-2">
+                <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
+                  {{ t(`about.product${i}`) }}
+                </p>
+              </section>
 
-              <div v-for="(item, idx) in version.content" :key="idx" class="pb-1 flex items-center gap-2">
-                <Badge v-if="item.type === 'add'"
-                  class="rounded-full bg-green-600 text-white font-normal border-transparent">
-                  {{ t('changelog.add') }}
-                </Badge>
-                <Badge v-else-if="item.type === 'improve'"
-                  class="rounded-full bg-sky-500 text-white font-normal border-transparent">
-                  {{ t('changelog.improve') }}
-                </Badge>
-                <Badge v-else-if="item.type === 'fix'"
-                  class="rounded-full bg-red-600 text-white font-normal border-transparent">
-                  {{ t('changelog.fix') }}
-                </Badge>
-                <span>{{ item.change }}</span>
-              </div>
-            </div>
+              <section>
+                <h3 class="text-base font-semibold mb-2">{{ t('about.meTitle') }}</h3>
+                <div class="space-y-2 mb-3">
+                  <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
+                    {{ t(`about.me${i}`) }}
+                  </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Button v-for="link in personalLinks" :key="link.href"
+                    variant="outline" size="sm" as-child class="justify-start">
+                    <a :href="link.href" target="_blank" rel="noopener">
+                      <Compass />
+                      <span class="flex-1 text-left">{{ t(link.labelKey) }}</span>
+                      <ExternalLink class="opacity-50" />
+                    </a>
+                  </Button>
+                </div>
+              </section>
+
+              <section>
+                <h3 class="text-base font-semibold mb-2">{{ t('about.contactTitle') }}</h3>
+                <div class="text-sm leading-relaxed text-foreground/85" v-html="t('about.contact')"></div>
+              </section>
+            </TabsContent>
+
+            <!-- Changelog ———————————————————————— -->
+            <TabsContent value="changelog" class="space-y-6 mt-0">
+              <section v-for="(version, vi) in changelog.slice().reverse()" :key="vi">
+                <header class="flex items-baseline justify-between mb-2">
+                  <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ version.date }}</span>
+                </header>
+                <Separator class="mb-3" />
+                <ul class="space-y-2">
+                  <li v-for="(item, idx) in version.content" :key="idx" class="flex items-start gap-2 text-sm">
+                    <!-- Badge 去 shadow：changelog 的条目 Badge 是标签色块，不需要阴影抢戏 -->
+                    <Badge :class="changelogBadgeClass(item.type)"
+                      class="shrink-0 !shadow-none rounded-full font-normal mt-0.5 min-w-16 justify-center">
+                      {{ t('changelog.' + item.type) }}
+                    </Badge>
+                    <span class="leading-relaxed">{{ item.change }}</span>
+                  </li>
+                </ul>
+              </section>
+            </TabsContent>
+
+            <!-- Special Thanks ———————————————————— -->
+            <TabsContent value="specialthanks" class="space-y-4 mt-0">
+              <p class="text-sm text-muted-foreground leading-relaxed">{{ t('specialthanks.Note1') }}</p>
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 list-none p-0">
+                <li v-for="(item, idx) in thanksList" :key="idx">
+                  <Button v-if="item.link" variant="outline" size="sm" as-child class="w-full justify-start">
+                    <a :href="item.link" target="_blank" rel="noopener">
+                      <Smile />
+                      <span class="flex-1 text-left truncate">{{ item.name }}</span>
+                      <SquareArrowOutUpRight class="opacity-50" />
+                    </a>
+                  </Button>
+                  <div v-else
+                    class="flex items-center gap-2 h-8 px-3 text-sm rounded-md border bg-card text-foreground/80">
+                    <Smile class="size-4 text-muted-foreground shrink-0" />
+                    <span class="truncate">{{ item.name }}</span>
+                  </div>
+                </li>
+              </ul>
+            </TabsContent>
           </div>
-
-          <div v-if="content === 'specialthanks'">
-            <div class="mb-3">
-              <p>{{ t('specialthanks.Note1') }}</p>
-            </div>
-
-            <div v-for="(item, index) in thanksList" :key="index" class="mb-3 italic">
-              <Smile class="inline size-[1em] align-[-0.125em]" /> {{ item.name }}
-              <a v-if="item.link" :href="item.link" target="_blank"
-                class="ml-1 no-underline text-neutral-900 hover:underline dark:text-neutral-100">
-                <SquareArrowOutUpRight class="inline size-[1em] align-[-0.125em]" />
-              </a>
-            </div>
-          </div>
-
-          <div class="h-6"></div>
-        </div>
+        </Tabs>
       </SheetContent>
     </Sheet>
-
-    <div id="copyright" v-if="!configs.originalSite">
-      <p class="text-center text-base font-light opacity-50">
-        {{ t('page.copyRightName') }}
-        <a :href="t('page.copyRightLink')" target="_blank"
-          class="no-underline hover:underline text-neutral-900 dark:text-neutral-100">
-          {{ t('page.copyRightLinkName') }}
-        </a>
-      </p>
-    </div>
   </footer>
 </template>
 
 <script setup>
-// refactor/01 阶段 C.2：Footer 模板从 Bootstrap class 改为 Tailwind + shadcn-vue
-// - nav-tabs 风格的 about/changelog/thanks 三选一 → ToggleGroup
-// - 版本列表的 <hr> → Separator
-// - changelog 类型 badge → shadcn Badge + 颜色覆盖
-// - 原 toggleContent + 三个布尔值改为单 content ref + v-if，简化
+// refactor/02：Footer 全部走 shadcn primitive
+// - 链接/按钮一律 <Button>（ghost / outline / link 变体）
+// - About 弹窗用 Sheet（右侧滑入），内部 tab 用 Tabs / TabsList / TabsTrigger / TabsContent
+// - Changelog Badge 取消阴影
 import { ref, computed, reactive, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { ArrowLeftCircle, Compass, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
+import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
 
 const { t, tm } = useI18n();
 
@@ -163,9 +162,17 @@ const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 
+const tabs = ['about', 'changelog', 'specialthanks'];
 const content = ref('about');
 const changelog = reactive(tm('changelog.versions'));
 const sheetBody = ref(null);
+
+const personalLinks = [
+  { href: 'https://wujiaxian.com', labelKey: 'about.personal' },
+  { href: 'https://kenengba.com', labelKey: 'about.blog' },
+  { href: 'https://retire.money', labelKey: 'about.retiremoney' },
+  { href: 'https://twitter.com/jason5ng32', labelKey: 'about.twitter' },
+];
 
 const thanksList = [
   { name: 'Setilis Hu', link: '' },
@@ -179,6 +186,14 @@ const thanksList = [
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
 ];
 
+// changelog 类型 → 语义色 token：add → success；improve → info；fix → destructive
+const changelogBadgeClass = (type) => {
+  if (type === 'add') return 'bg-success text-success-foreground border-transparent';
+  if (type === 'improve') return 'bg-info text-info-foreground border-transparent';
+  if (type === 'fix') return 'bg-destructive text-destructive-foreground border-transparent';
+  return '';
+};
+
 // Sheet 开关与 store.openSheet 双向绑定（refactor/01）
 const isOpen = computed(() => store.openSheet === 'about');
 const onOpenChange = (val) => {
@@ -190,7 +205,6 @@ const openAbout = () => {
   trackEvent('Footer', 'FooterClick', 'About');
 };
 
-// 切换内容时重置滚动位置到顶部（修了原代码 offcanvasBody.scrollTop 直接操作 ref 对象的 bug）
 watch(content, () => {
   nextTick(() => {
     if (sheetBody.value) sheetBody.value.scrollTop = 0;
@@ -201,9 +215,3 @@ defineExpose({
   openAbout,
 });
 </script>
-
-<style scoped>
-.jn-heart-color {
-  color: #d63384;
-}
-</style>
