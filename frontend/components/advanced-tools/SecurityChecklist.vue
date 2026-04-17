@@ -1,145 +1,127 @@
 <template>
     <!-- security checklist -->
     <div class="security-checklist-section my-4">
-        <div class="text-secondary">
+        <div class="text-neutral-500">
             <p>{{ t('securitychecklist.Note') }}</p>
             <p>{{ t('securitychecklist.Note2') }}</p>
         </div>
 
         <!-- 数据面板 -->
-        <div v-if="fullList" class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <div class="jn-title2 mb-3">
-                            <h3><i class="bi bi-card-checklist"></i> {{ t('securitychecklist.Progress') }}</h3>
-                            <button :title="t('securitychecklist.Reset')" @click="resetAllslugs()"
-                                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                                aria-label="Reset Security Checklist"><i class="bi bi-arrow-clockwise"></i></button>
-                        </div>
-                        <!-- 数据统计 -->
-                        <div class="alert alert-success">
-                            {{ t('securitychecklist.alert-total') }} {{ totalItems }} {{ t('securitychecklist.Items')
-                            }},
-                            {{ t('securitychecklist.alert-checked') }} {{ checkedItems }} {{
-                            t('securitychecklist.Items') }},
-                            {{ ignoredItems }} {{ t('securitychecklist.Items') }}{{ t('securitychecklist.alert-ignored')
-                            }},
-                            {{ uncheckedItems }} {{ t('securitychecklist.alert-unchecked') }}
-                            <br />
-                        </div>
-                        <div class="row justify-content-around">
-                            <!-- 整体进度条 -->
-                            <div class="col-lg-8 col-md-8 col-12" :class="isMobile ? 'mb-3' : ''">
-                                <div class="jn-checklist-progress d-flex justify-content-between align-items-center"
-                                    v-for="item in categories" :key="item">
-                                    <span class="fs-6 flex-shrink-1">{{ fullList[item].title }}</span>&nbsp;&nbsp;
-                                    <span class="progress-stacked flex-grow-1">
-                                        <div class="progress" role="progre  ssbar" aria-label="Segment One"
-                                            :style="getProgressStyle(item)('checked')">
-                                            <div class="progress-bar bg-success"> {{ t('securitychecklist.Checked') }}
-                                            </div>
-                                        </div>
-
-                                        <div class="progress" role="progressbar" aria-label="Segment two"
-                                            :style="getProgressStyle(item)('ignored')">
-                                            <div class="progress-bar bg-info"> {{ t('securitychecklist.Ignored') }}
-                                            </div>
-                                        </div>
-                                    </span>
-                                </div>
-
-                            </div>
-                            <!-- 按级别分的饼图 -->
-                            <div class="col-lg-4 col-md-4 col-12 row">
-                                <div class="col-6" v-for="item in priorities" :key="item">
-                                    <div
-                                        v-if=" countItems({ action: 'total', category: 'all', priority: item }) - countItems({ action: 'ignored', category: 'all', priority: item }) !== 0">
-                                        <CircleProgressBar
-                                            :value="countItems({ action: 'checked', category: 'all', priority: item }) "
-                                            :max="countItems({ action: 'total', category: 'all', priority: item }) - countItems({ action: 'ignored', category: 'all', priority: item })"
-                                            :colorFilled="'#198754'" :colorUnfilled="'#198754'"
-                                            :colorBack="isDarkMode ? '#343a40':'#e9ecef'" :size="'110pt'"
-                                            :percentage=true :strokeWidth="'10pt'">
-                                            {{t('securitychecklist.'+ item)}}<br />
-                                        </CircleProgressBar>
-                                    </div>
-                                    <div v-else>
-                                        <CircleProgressBar :value="1" :max="1" :colorFilled="'#0dcaf0'"
-                                            :colorUnfilled="'#198754'" :colorBack="isDarkMode ? '#343a40':'#e9ecef'"
-                                            :size="'110pt'" :strokeWidth="'10pt'">
-                                            {{t('securitychecklist.'+ item)}}<br />{{ t('securitychecklist.Ignored') }}
-                                        </CircleProgressBar>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
+        <div v-if="fullList" class="mb-3">
+            <div class="jn-card rounded-lg border bg-card text-card-foreground">
+                <div class="p-4">
+                    <div class="jn-title2 mb-3">
+                        <h3 class="text-xl font-semibold"><i class="bi bi-card-checklist"></i> {{ t('securitychecklist.Progress') }}</h3>
+                        <JnTooltip :text="t('securitychecklist.Reset')" side="left">
+                            <Button size="icon" variant="outline"
+                                @click="resetAllslugs()" aria-label="Reset Security Checklist">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </Button>
+                        </JnTooltip>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div v-else class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <div class="jn-placeholder ">
-                            <span>
-                                <span class="spinner-grow spinner-grow-sm text-success" aria-hidden="true"></span>
-                                <span class="text-success">&nbsp;{{ t('securitychecklist.Loading') }}</span>
-                            </span>
+                    <!-- 数据统计 -->
+                    <div class="px-3 py-2 rounded-md border bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200 mb-3">
+                        {{ t('securitychecklist.alert-total') }} {{ totalItems }} {{ t('securitychecklist.Items') }},
+                        {{ t('securitychecklist.alert-checked') }} {{ checkedItems }} {{ t('securitychecklist.Items') }},
+                        {{ ignoredItems }} {{ t('securitychecklist.Items') }}{{ t('securitychecklist.alert-ignored') }},
+                        {{ uncheckedItems }} {{ t('securitychecklist.alert-unchecked') }}
+                        <br />
+                    </div>
+                    <div class="flex flex-wrap justify-around">
+                        <!-- 整体进度条 -->
+                        <div class="w-full md:w-2/3" :class="isMobile ? 'mb-3' : ''">
+                            <div class="jn-checklist-progress flex justify-between items-center mb-1"
+                                v-for="item in categories" :key="item">
+                                <span class="text-base shrink">{{ fullList[item].title }}</span>&nbsp;&nbsp;
+                                <span class="flex h-2 grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700">
+                                    <div class="h-full bg-green-600"
+                                        :style="getProgressStyle(item)('checked')"
+                                        :title="t('securitychecklist.Checked')"></div>
+                                    <div class="h-full bg-sky-500"
+                                        :style="getProgressStyle(item)('ignored')"
+                                        :title="t('securitychecklist.Ignored')"></div>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- 按级别分的饼图 -->
+                        <div class="w-full md:w-1/3 flex flex-wrap">
+                            <div class="w-1/2" v-for="item in priorities" :key="item">
+                                <div v-if="countItems({ action: 'total', category: 'all', priority: item }) - countItems({ action: 'ignored', category: 'all', priority: item }) !== 0">
+                                    <CircleProgressBar
+                                        :value="countItems({ action: 'checked', category: 'all', priority: item })"
+                                        :max="countItems({ action: 'total', category: 'all', priority: item }) - countItems({ action: 'ignored', category: 'all', priority: item })"
+                                        :colorFilled="'#198754'" :colorUnfilled="'#198754'"
+                                        :colorBack="isDarkMode ? '#343a40' : '#e9ecef'" :size="'110pt'"
+                                        :percentage="true" :strokeWidth="'10pt'">
+                                        {{ t('securitychecklist.' + item) }}<br />
+                                    </CircleProgressBar>
+                                </div>
+                                <div v-else>
+                                    <CircleProgressBar :value="1" :max="1" :colorFilled="'#0dcaf0'"
+                                        :colorUnfilled="'#198754'" :colorBack="isDarkMode ? '#343a40' : '#e9ecef'"
+                                        :size="'110pt'" :strokeWidth="'10pt'">
+                                        {{ t('securitychecklist.' + item) }}<br />{{ t('securitychecklist.Ignored') }}
+                                    </CircleProgressBar>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div v-else class="mb-3">
+            <div class="jn-card rounded-lg border bg-card text-card-foreground">
+                <div class="p-4">
+                    <div class="jn-placeholder">
+                        <span>
+                            <span class="inline-block h-3 w-3 rounded-full bg-green-600 animate-pulse" aria-hidden="true"></span>
+                            <span class="text-green-600">&nbsp;{{ t('securitychecklist.Loading') }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 检查清单区域 -->
-        <div v-if="fullList" class="row">
+        <div v-if="fullList" class="flex flex-wrap -mx-2">
             <!-- 检查清单分类列表 -->
-            <div class="col-lg-4 col-md-4 col-12 mb-3 jn-height">
-                <div class="card jn-card mb-2" :class="{ 
-                    'dark-mode dark-mode-border': isDarkMode,
-                    'jn-checklist-cat-card': item === currentList
-                    }" v-for="(item, index) in categories">
-                    <div class="card-body p-1">
-
-                        <div @click="changeList(item,true)"
-                            class="col-12 jn-btn d-flex justify-content-between align-items-center text-start" :class="{
-                            'text-success fw-bold': item === currentList,
-                        }">
-                            <span :class="[isMobile ? 'mobile-h3' : 'fs-6']" class="jn-adv-title">
-                                <i class="bi" :class="fullList[item].icon"></i> {{fullList[item].title}}&nbsp;({{
-                                countItems({ action: 'checked', category: item }) }}/{{ countItems({ action:
-                                'total', category: item }) -
-                                countItems({ action: 'ignored', category: item }) }})
+            <div class="w-full md:w-1/3 px-2 mb-3 jn-height">
+                <div class="jn-card rounded-lg border bg-card text-card-foreground mb-2"
+                    :class="{ 'jn-checklist-cat-card': item === currentList }"
+                    v-for="(item, index) in categories" :key="item">
+                    <div class="p-1">
+                        <div @click="changeList(item, true)"
+                            class="jn-btn flex justify-between items-center text-start"
+                            :class="{ 'text-green-600 font-bold': item === currentList }">
+                            <span :class="[isMobile ? 'mobile-h3' : 'text-base']">
+                                <i class="bi" :class="fullList[item].icon"></i> {{ fullList[item].title }}&nbsp;({{
+                                    countItems({ action: 'checked', category: item }) }}/{{
+                                    countItems({ action: 'total', category: item }) - countItems({ action: 'ignored', category: item }) }})
                             </span>
-                            <span class="jn-bi-font"
-                                v-if=" countItems({ action: 'percentage', category: item }) === 100 ">
-                                <i class=" bi bi-check-circle-fill text-success"></i>
+                            <span class="jn-bi-font" v-if="countItems({ action: 'percentage', category: item }) === 100">
+                                <i class="bi bi-check-circle-fill text-green-600"></i>
                             </span>
                             <span v-else>
-                                <CircleProgressBar :value="countItems({ action: 'checked', category: item }) " :max="countItems({ action:
-                                'total', category: item }) -
-                                countItems({ action: 'ignored', category: item })" :size="'18pt'"
+                                <CircleProgressBar
+                                    :value="countItems({ action: 'checked', category: item })"
+                                    :max="countItems({ action: 'total', category: item }) - countItems({ action: 'ignored', category: item })"
+                                    :size="'18pt'"
                                     :colorFilled="'#0dcaf0'" :colorUnfilled="'#198754'"
-                                    :colorBack="isDarkMode ? '#343a40':'#e9ecef'" :strokeWidth="'10pt'" />
+                                    :colorBack="isDarkMode ? '#343a40' : '#e9ecef'" :strokeWidth="'10pt'" />
                             </span>
-
                         </div>
-
                     </div>
                 </div>
             </div>
             <!-- 检查清单分类详情 -->
-            <div id="checklist" class="col-lg-8 col-md-8 col-12 mb-3 jn-checklist-card">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <!-- 检查清单分类描述 -->
-                        <h2> <i class="bi" :class="fullList[currentList].icon"></i> {{fullList[currentList].title}}</h2>
-                        <!-- refactor/01：Bootstrap collapse → shadcn-vue Collapsible（分类介绍） -->
+            <div id="checklist" class="w-full md:w-2/3 px-2 mb-3 jn-checklist-card">
+                <div class="jn-card rounded-lg border bg-card text-card-foreground">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-semibold">
+                            <i class="bi" :class="fullList[currentList].icon"></i> {{ fullList[currentList].title }}
+                        </h2>
                         <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
-                            <p>{{fullList[currentList].description}}
+                            <p>{{ fullList[currentList].description }}
                                 <CollapsibleTrigger v-if="fullList[currentList].intro" as-child>
                                     <i class="bi bi-info-circle"
                                         :aria-expanded="isCategoryIntroOpen" role="button"
@@ -147,80 +129,72 @@
                                     </i>
                                 </CollapsibleTrigger>
                             </p>
-                            <CollapsibleContent class="lh-lg p-1" :data-bs-theme="isDarkMode ? 'dark' : ''">
-                                <span class="opacity-75 fs-7">
+                            <CollapsibleContent class="leading-relaxed p-1">
+                                <span class="opacity-75 text-sm">
                                     <vue-markdown :source="fullList[currentList].intro" />
                                 </span>
                             </CollapsibleContent>
                         </Collapsible>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="progress flex-grow-1" role="progressbar"
-                                :aria-label="'Progress for ' + fullList[currentList].title" aria-valuemin="0"
-                                aria-valuemax="100">
-                                <div class="progress-bar bg-success"
+                        <div class="flex justify-between items-center">
+                            <div class="flex-grow h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden"
+                                role="progressbar"
+                                :aria-label="'Progress for ' + fullList[currentList].title"
+                                aria-valuemin="0" aria-valuemax="100">
+                                <div class="h-full bg-green-600 transition-all"
                                     :style="'width: ' + countItems({ action: 'percentage', category: currentList }) + '%;'">
                                 </div>
                             </div>
-                            <div class="my-2 ms-3 opacity-75 flex-shrink-1">
-                                {{ countItems({ action: 'checked', category: currentList }) }}/{{ countItems({ action:
-                                'total', category: currentList }) -
-                                countItems({ action: 'ignored', category: currentList }) }}
-                                ( {{ t('securitychecklist.Ignored') }}: {{ countItems({ action: 'ignored', category:
-                                currentList }) }})
+                            <div class="my-2 ms-3 opacity-75 shrink">
+                                {{ countItems({ action: 'checked', category: currentList }) }}/{{
+                                    countItems({ action: 'total', category: currentList }) - countItems({ action: 'ignored', category: currentList }) }}
+                                ( {{ t('securitychecklist.Ignored') }}: {{ countItems({ action: 'ignored', category: currentList }) }})
                             </div>
                         </div>
-                        <!-- 检查清单完成度切换按钮 -->
-                        <div class="row my-3 justify-content-start">
-
-                            <div class="btn-group col-3" role="group" aria-label="Checklist Filter">
-                                <button :title="t('securitychecklist.ShowAll')" type="button"
-                                    class="btn btn-outline-secondary"
-                                    :class="{ 'btn-secondary text-white': filterTag === 'all' }"
-                                    @click="filterChecklist('all')"><i class="bi bi-list-check"></i></button>
-                                <button :title="t('securitychecklist.ShowUnchecked')" type="button"
-                                    class="btn btn-outline-secondary"
-                                    :class="{ 'btn-secondary text-white': filterTag === 'unchecked' }"
-                                    @click="filterChecklist('unchecked')"><i class="bi bi-circle"></i></button>
-                                <button :title="t('securitychecklist.ShowChecked')" type="button"
-                                    class="btn btn-outline-secondary"
-                                    :class="{ 'btn-secondary text-white': filterTag === 'checked' }"
-                                    @click="filterChecklist('checked')"><i class="bi bi-check-circle"></i></button>
-                                <button :title="t('securitychecklist.ShowIgnored')" type="button"
-                                    class="btn btn-outline-secondary"
-                                    :class="{ 'btn-secondary text-white': filterTag === 'ignored' }"
-                                    @click="filterChecklist('ignored')"><i class="bi bi-pause-circle"></i></button>
-                            </div>
+                        <!-- Filter toggles -->
+                        <div class="my-3 flex justify-start">
+                            <ToggleGroup v-model="filterTag" type="single" @update:model-value="(v) => v && filterChecklist(v)">
+                                <ToggleGroupItem value="all" :aria-label="t('securitychecklist.ShowAll')">
+                                    <i class="bi bi-list-check"></i>
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="unchecked" :aria-label="t('securitychecklist.ShowUnchecked')">
+                                    <i class="bi bi-circle"></i>
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="checked" :aria-label="t('securitychecklist.ShowChecked')">
+                                    <i class="bi bi-check-circle"></i>
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="ignored" :aria-label="t('securitychecklist.ShowIgnored')">
+                                    <i class="bi bi-pause-circle"></i>
+                                </ToggleGroupItem>
+                            </ToggleGroup>
                         </div>
 
-                        <!-- 检查清单表格 -->
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
+                        <!-- Checklist table -->
+                        <div class="overflow-x-auto whitespace-nowrap">
+                            <table class="w-full border-collapse">
                                 <thead>
-                                    <tr>
-                                        <th scope="col">{{ t('securitychecklist.Item') }}</th>
-                                        <th scope="col">{{ t('securitychecklist.Priority') }}</th>
-                                        <th scope="col">{{ t('securitychecklist.Ignore') }}</th>
+                                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                                        <th scope="col" class="text-left p-2">{{ t('securitychecklist.Item') }}</th>
+                                        <th scope="col" class="text-left p-2">{{ t('securitychecklist.Priority') }}</th>
+                                        <th scope="col" class="text-left p-2">{{ t('securitychecklist.Ignore') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody v-for="(item, index) in filterList" :key="item">
                                     <tr>
-                                        <td :class="{ 
+                                        <td class="p-2" :class="{
                                             'jn-checked-item-light': item.checked,
                                             'jn-checked-item-dark': item.checked && isDarkMode
-                                            }" class="col-12">
-                                            <div class="jn-row">
+                                        }">
+                                            <div class="flex items-center">
                                                 <span @click="checkItem(item)">
-                                                    <i class="bi fs-5" :class="{
-                                                        'bi-check-circle-fill text-success jn-cursor': item.checked,
-                                                        'bi-pause-circle text-secondary': item.ignored,
-                                                        'bi-circle jn-cursor': !item.checked && !item.ignored
+                                                    <i class="bi text-lg cursor-pointer" :class="{
+                                                        'bi-check-circle-fill text-green-600': item.checked,
+                                                        'bi-pause-circle text-neutral-500': item.ignored,
+                                                        'bi-circle': !item.checked && !item.ignored
                                                     }"></i>&nbsp;
                                                 </span>
-                                                <span :class="{ 
-                                        'text-decoration-line-through opacity-50': item.ignored
-                                        }">
+                                                <span :class="{ 'line-through opacity-50': item.ignored }">
                                                     {{ item.point }}
-                                                    <i class="bi bi-info-circle"
+                                                    <i class="bi bi-info-circle cursor-pointer"
                                                         @click="toggleChecklistInfo(index)"
                                                         :aria-expanded="!!checklistInfoOpen[index]" role="button"
                                                         :aria-label="'Display Info of ' + item.point">
@@ -228,37 +202,31 @@
                                                 </span>
                                             </div>
                                         </td>
-                                        <td :class="{ 
+                                        <td class="p-2" :class="{
                                             'jn-checked-item-light': item.checked,
                                             'jn-checked-item-dark': item.checked && isDarkMode
+                                        }">
+                                            <Badge class="rounded-full font-normal" :class="{
+                                                'bg-neutral-900 text-white border-transparent': item.priority === 'Advanced',
+                                                'bg-sky-500 text-white border-transparent': item.priority === 'Optional',
+                                                'bg-green-600 text-white border-transparent': item.priority === 'Essential',
+                                                'bg-blue-600 text-white border-transparent': item.priority === 'Basic'
                                             }">
-                                            <span class="badge rounded-pill fw-light" :class="{
-                                                    'bg-dark': item.priority === 'Advanced',
-                                                    'bg-info': item.priority === 'Optional',
-                                                    'bg-success': item.priority === 'Essential',
-                                                    'bg-primary': item.priority === 'Basic'
-                                                }">
                                                 {{ t('securitychecklist.' + item.priority) }}
-                                            </span>
+                                            </Badge>
                                         </td>
-                                        <td :class="{ 
+                                        <td class="p-2" :class="{
                                             'jn-checked-item-light': item.checked,
                                             'jn-checked-item-dark': item.checked && isDarkMode
-                                            }" @click="ignoreItem(item)">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input"
-                                                    :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                                    type="checkbox" role="switch" :checked="item.ignored">
-                                            </div>
+                                        }">
+                                            <Switch :model-value="item.ignored" @update:model-value="() => ignoreItem(item)" />
                                         </td>
                                     </tr>
                                     <tr v-show="checklistInfoOpen[index]">
-                                        <td colspan="4" class="border-0 p-0 ">
-                                            <!-- refactor/01：Bootstrap collapse 拆开——checklist 的表格结构不适合 Collapsible 包裹，用 v-show 配合 openStates 字典 -->
-                                            <div class="lh-lg p-1" :class="[isMobile ? 'jn-vw-m' : 'jn-vw']"
-                                                :data-bs-theme="isDarkMode ? 'dark' : ''">
-                                                <div class="p-3 ">
-                                                    <span class="jn-info fs-7 opacity-75">
+                                        <td colspan="4" class="border-0 p-0">
+                                            <div class="leading-relaxed p-1" :class="[isMobile ? 'jn-vw-m' : 'jn-vw']">
+                                                <div class="p-3">
+                                                    <span class="jn-info text-sm opacity-75">
                                                         <vue-markdown :source="item.details" />
                                                     </span>
                                                 </div>
@@ -272,7 +240,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -284,11 +251,14 @@ import { trackEvent } from '@/utils/use-analytics';
 import { CircleProgressBar } from 'circle-progress.vue';
 import VueMarkdown from 'vue-markdown-render';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 // refactor/01 阶段 C：两处 Bootstrap collapse 迁移
-// 1) 分类介绍的 Collapsible（单个）
 const isCategoryIntroOpen = ref(false);
-// 2) 每条 checklist item 的 info 展开（多个，按 index 索引）
 const checklistInfoOpen = ref({});
 const toggleChecklistInfo = (index) => {
     checklistInfoOpen.value[index] = !checklistInfoOpen.value[index];
@@ -308,17 +278,11 @@ const categories = ref([]);
 const currentList = ref('authentication');
 const slugs = ref({});
 
-const priorities = [
-    'Basic',
-    'Optional',
-    'Essential',
-    'Advanced'
-]
+const priorities = ['Basic', 'Optional', 'Essential', 'Advanced'];
 
-// 本地存储
 const setLocalSlugs = () => {
     localStorage.setItem('securityChecklistSlugs', JSON.stringify(slugs.value));
-}
+};
 
 const loadLocalSlugs = () => {
     const storedSlugs = localStorage.getItem('securityChecklistSlugs');
@@ -333,20 +297,15 @@ const loadLocalSlugs = () => {
 const updateSlugs = (slug, value) => {
     slugs.value[slug] = value;
     setLocalSlugs();
-}
+};
 
-// 初始化列表
 const initSecurityList = (securityChecklist) => {
-    // 首先加载本地 slugs
     loadLocalSlugs();
-
     const transformedObject = {};
-    // 遍历并重组对象
     securityChecklist.forEach(item => {
         if (!categories.value.includes(item.slug)) {
             categories.value.push(item.slug);
         }
-
         transformedObject[item.slug] = {
             title: item.title,
             description: item.description,
@@ -354,12 +313,9 @@ const initSecurityList = (securityChecklist) => {
             intro: item.intro,
             checklist: item.checklist.map(checkItem => {
                 const checkItemSlug = checkItem.slug;
-
-                // 检查本地 slugs 是否已包含此 slug，若没有，则添加
                 if (slugs.value[checkItemSlug] === undefined) {
                     slugs.value[checkItemSlug] = '';
                 }
-
                 return {
                     ...checkItem,
                     checked: slugs.value[checkItemSlug] === 'checked',
@@ -369,29 +325,24 @@ const initSecurityList = (securityChecklist) => {
             }),
         };
     });
-
-    // 更新本地存储
     setLocalSlugs();
     return transformedObject;
 };
 
 const fullList = ref(null);
 
-// 重置
 const resetAllslugs = () => {
     trackEvent('SecurityChecklist', 'SecurityChecklist', 'Reset');
     for (const slug in slugs.value) {
         slugs.value[slug] = '';
     }
-
     setLocalSlugs();
-    fullList.value = initSecurityList(securityChecklist.value); // 4. 使用 securityChecklist.value
+    fullList.value = initSecurityList(securityChecklist.value);
     listToShow.value = fullList.value[currentList.value];
     filterList.value = listToShow.value.checklist;
     filterTag.value = 'all';
-}
+};
 
-// 切换列表
 const filterList = ref({});
 const listToShow = ref([]);
 const filterTag = ref('all');
@@ -409,7 +360,6 @@ const changeList = (listName, shouldScroll = true) => {
     }
 };
 
-
 const filterChecklist = (filter) => {
     if (filter === 'all') {
         filterList.value = listToShow.value.checklist;
@@ -424,37 +374,29 @@ const filterChecklist = (filter) => {
         filterList.value = listToShow.value.checklist.filter(item => !item.checked && !item.ignored);
         filterTag.value = 'unchecked';
     }
+};
 
-}
-
-// 滚动 Offcanvas 的特定位置
 const scrollToElementInOffcanvas = (el, offset = 0) => {
     const element = typeof el === "string" ? document.getElementById(el) : el;
     if (element) {
-        let scrollContainer = element.closest('.offcanvas-body');
-        if (!scrollContainer) {
-            scrollContainer = window;
-        }
+        let scrollContainer = element.closest('[data-state]') || window;
         const elementRect = element.getBoundingClientRect();
-        const scrollContainerRect = scrollContainer.getBoundingClientRect();
-        const y = elementRect.top - scrollContainerRect.top + scrollContainer.scrollTop - offset;
         if (scrollContainer === window) {
-            window.scrollTo({ top: y, behavior: "smooth" });
+            window.scrollTo({ top: elementRect.top + window.scrollY - offset, behavior: "smooth" });
         } else {
+            const scrollContainerRect = scrollContainer.getBoundingClientRect();
+            const y = elementRect.top - scrollContainerRect.top + scrollContainer.scrollTop - offset;
             scrollContainer.scrollTo({ top: y, behavior: "smooth" });
         }
     }
 };
 
-
-// 忽略某一项
 const ignoreItem = (item) => {
     item.ignored = !item.ignored;
     item.checked = false;
     item.ignored ? updateSlugs(item.slug, 'ignored') : updateSlugs(item.slug, '');
 };
 
-// 打勾某一项
 const checkItem = (item) => {
     if (item.ignored) return;
     item.checked = !item.checked;
@@ -462,13 +404,10 @@ const checkItem = (item) => {
     if (isSignedIn.value) {
         updateAchievement();
     }
-
 };
 
-// 计数器
 const countItems = ({ action, category, priority }) => {
-    const categories = category === 'all' ? Object.keys(fullList.value) : [category];
-
+    const categoriesArr = category === 'all' ? Object.keys(fullList.value) : [category];
     const actionMap = {
         total: (items) => items.length,
         ignored: (items) => items.filter(item => item.ignored).length,
@@ -481,33 +420,25 @@ const countItems = ({ action, category, priority }) => {
             return denominator === 0 ? 100 : Math.round((checked / denominator) * 100);
         },
     };
-
-    return categories.reduce((sum, cat) => {
+    return categoriesArr.reduce((sum, cat) => {
         const checklist = fullList.value[cat]?.checklist;
         if (!checklist) return sum;
-
-        const filteredItems = priority
-            ? checklist.filter(item => item.priority === priority)
-            : checklist;
-
+        const filteredItems = priority ? checklist.filter(item => item.priority === priority) : checklist;
         return sum + (actionMap[action] || (() => 0))(filteredItems);
     }, 0);
-}
+};
 
-// 便利调用
 const totalItems = computed(() => countItems({ action: 'total', category: 'all' }));
 const checkedItems = computed(() => countItems({ action: 'checked', category: 'all' }));
 const ignoredItems = computed(() => countItems({ action: 'ignored', category: 'all' }));
 const uncheckedItems = computed(() => totalItems.value - checkedItems.value - ignoredItems.value);
 
-// 便利调用百分比
 const getProgressStyle = (category) => {
     return (action) => {
         return `width: ${countItems({ action, category }) / countItems({ action: 'total', category }) * 100}%`;
     };
 };
 
-// 更新成就
 const updateAchievement = () => {
     if (!store.userAchievements.SurfaceCheck.achieved && checkedItems.value) {
         store.setTriggerUpdateAchievements('SurfaceCheck');
@@ -524,7 +455,6 @@ onMounted(() => {
         changeList('authentication', false);
     }, 300);
 });
-
 </script>
 
 <style scoped>
@@ -537,21 +467,12 @@ onMounted(() => {
     height: fit-content;
 }
 
-.jn-cursor:hover {
-    cursor: pointer;
-}
-
 .jn-checked-item-light {
     background-color: #d1e7dd;
 }
 
 .jn-checked-item-dark {
     background-color: #042f1b !important;
-}
-
-.jn-row {
-    display: flex;
-    align-items: center;
 }
 
 .jn-btn {
@@ -571,10 +492,6 @@ onMounted(() => {
 }
 
 .jn-checklist-progress {
-    display: flex;
-    flex-direction: row;
-    align-content: center;
-    align-items: center;
     margin-bottom: 5pt;
 }
 
