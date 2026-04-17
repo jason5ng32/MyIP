@@ -33,11 +33,11 @@
           <div class="flex items-center justify-between gap-2">
             <span class="flex items-center gap-1.5 text-base min-w-0">
               <span class="relative flex shrink-0">
-                <span v-if="statusOf(test) === 'wait'"
+                <span v-if="toneOf(test) === 'wait'"
                   class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
-                <span class="relative inline-flex size-2 rounded-full" :class="dotClass(test)"></span>
+                <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
               </span>
-              <span :class="textClass(test)" class="truncate">{{ test.status }}</span>
+              <span :class="textClass(toneOf(test))" class="truncate">{{ test.status }}</span>
             </span>
             <span v-if="test.time !== 0" class="text-base font-mono tabular-nums text-muted-foreground"
               :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
@@ -58,6 +58,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useStatusTone } from '@/composables/use-status-tone.js';
 import {
   ChevronRight, Chrome, Cloud, Compass, Github, MessageCircle,
   MessageSquareQuote, RotateCw, Store, Youtube,
@@ -103,8 +104,8 @@ const connectivityTests = reactive([
   { id: 'chatgpt', name: 'ChatGPT', icon: 'chat-quote-fill', url: 'https://chatgpt.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
 ]);
 
-// 状态语义：把 (status, time) 映射到 wait / ok-fast / ok-slow / fail 四档
-const statusOf = (test) => {
+// 业务状态 → 4 档 tone（wait / ok-fast / ok-slow / fail）
+const toneOf = (test) => {
   const waitLabel = t('connectivity.StatusWait');
   const okLabel = t('connectivity.StatusAvailable');
   const unavailableLabels = [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')];
@@ -113,22 +114,7 @@ const statusOf = (test) => {
   if (test.status.includes(okLabel)) return test.time < 200 ? 'ok-fast' : 'ok-slow';
   return 'wait';
 };
-
-// 指示灯色 + 文字色：按状态档次映射 Tailwind class
-const dotColorMap = {
-  'wait': 'bg-sky-500',
-  'ok-fast': 'bg-green-500',
-  'ok-slow': 'bg-amber-500',
-  'fail': 'bg-red-500',
-};
-const textColorMap = {
-  'wait': 'text-muted-foreground',
-  'ok-fast': 'text-green-600 dark:text-green-400',
-  'ok-slow': 'text-amber-600 dark:text-amber-400',
-  'fail': 'text-red-600 dark:text-red-400',
-};
-const dotClass = (test) => dotColorMap[statusOf(test)];
-const textClass = (test) => textColorMap[statusOf(test)];
+const { dotClass, textClass } = useStatusTone();
 
 // 检查单个连通性
 const checkConnectivityHandler = (test, onTestComplete = () => { }, isManualRun) => {

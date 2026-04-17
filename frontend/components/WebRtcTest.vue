@@ -1,57 +1,73 @@
 <template>
-  <!-- WebRTC Test -->
-  <div class="webrtc-test-section mb-4">
-    <div class="jn-title2">
-      <h2 id="WebRTC" :class="{ 'mobile-h2': isMobile }">🚥 {{ t('webrtc.Title') }}</h2>
+  <!-- WebRTC Test — 与 Connectivity 一致的 service-status-card 结构 -->
+  <section class="mb-10">
+    <!-- 章节头 -->
+    <header class="flex items-start justify-between gap-4 mb-3">
+      <div class="flex-1 min-w-0">
+        <h2 id="WebRTC" class="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+          🚥 {{ t('webrtc.Title') }}
+        </h2>
+        <p class="mt-1 text-sm text-muted-foreground">{{ t('webrtc.Note') }}</p>
+      </div>
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
-        <Button size="icon" variant="outline"
-          @click="checkAllWebRTC(true)" aria-label="Refresh WebRTC Test">
-          <component :is="isStarted ? RotateCw : ChevronRight" class="inline size-[1em] align-[-0.125em]" />
+        <Button size="icon" variant="outline" class="shrink-0"
+          @click="checkAllWebRTC(true)"
+          aria-label="Refresh WebRTC Test">
+          <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>
       </JnTooltip>
-    </div>
-    <div class="text-neutral-500">
-      <p>{{ t('webrtc.Note') }}</p>
-    </div>
-    <div class="flex flex-wrap -mx-2">
-      <div v-for="stun in stunServers" :key="stun.id" class="w-full md:w-1/2 lg:w-1/4 px-2 mb-4">
-        <div class="jn-card keyboard-shortcut-card rounded-lg border bg-card text-card-foreground"
-          :class="{ 'jn-hover-card': !isMobile }">
-          <div class="p-4">
-            <p class="jn-con-title mb-1"><Merge class="inline size-[1em] align-[-0.125em]" /> {{ stun.name }}</p>
-            <p class="text-neutral-500 mb-2" style="font-size: 10pt;">
-              <Server class="inline size-[1em] align-[-0.125em]" /> {{ stun.url }}
-            </p>
-            <p class="mb-2" :class="{
-              'text-sky-600': stun.ip === t('webrtc.StatusWait'),
-              'text-green-600': stun.ip.includes('.') || stun.ip.includes(':'),
-              'text-red-600': stun.ip === t('webrtc.StatusError')
-            }">
-              <component :is="stun.ip === t('webrtc.StatusWait') ? Hourglass : Monitor" class="inline size-[1em] align-[-0.125em]" />&nbsp;
-              <span :class="{ 'jn-ip-font': stun.ip.length > 32 }"> {{ stun.ip }}</span>
-            </p>
-            <div v-if="stun.natType" class="flex flex-col px-3 py-2 rounded-md border"
-              :class="stun.natType === t('webrtc.StatusWait')
-                ? 'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-950 dark:border-sky-800 dark:text-sky-200'
-                : 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'">
-              <span>
-                <component :is="stun.natType === t('webrtc.StatusWait') ? Hourglass : Gamepad2" class="inline size-[1em] align-[-0.125em]" />
-                NAT: {{ stun.natType }}
-              </span>
+    </header>
 
-              <span class="mt-2">
-                <component :is="stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') ? Hourglass : MapPin"
-                  class="inline size-[1em] align-[-0.125em]" />
-                {{ t('ipInfos.Country') }}:
-                <span :class="[stun.country !== t('webrtc.StatusWait') ? 'font-bold' : '']">{{ stun.country }}&nbsp;</span>
-                <span v-show="stun.country_code" :class="'jn-fl fi fi-' + stun.country_code"></span>
-              </span>
-            </div>
+    <!-- 卡片网格 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <Card v-for="stun in stunServers" :key="stun.id"
+        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4">
+          <!-- 顶部：服务商 icon + 名字 -->
+          <div class="flex items-center gap-2 mb-1">
+            <Merge class="size-6 text-muted-foreground shrink-0" />
+            <span class="text-base font-medium truncate">{{ stun.name }}</span>
           </div>
-        </div>
-      </div>
+
+          <!-- STUN URL（次要信息） -->
+          <p class="text-xs font-mono text-muted-foreground mb-3 truncate" :title="stun.url">
+            {{ stun.url }}
+          </p>
+
+          <!-- IP 行 -->
+          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
+            <span class="relative flex shrink-0">
+              <span v-if="toneOf(stun) === 'wait'"
+                class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
+              <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
+            </span>
+            <span class="truncate font-mono" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
+          </div>
+
+          <!-- NAT + Country 子块 -->
+          <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-1.5 text-sm">
+            <div class="flex items-baseline justify-between gap-2 min-w-0">
+              <dt class="text-muted-foreground shrink-0">NAT</dt>
+              <dd class="truncate text-right font-medium"
+                :class="{ 'text-muted-foreground': stun.natType === t('webrtc.StatusWait') }">
+                {{ stun.natType }}
+              </dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-2 min-w-0">
+              <dt class="text-muted-foreground shrink-0">{{ t('ipInfos.Country') }}</dt>
+              <dd class="flex items-center gap-1.5 min-w-0 font-medium">
+                <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
+                <span class="truncate"
+                  :class="{ 'text-muted-foreground': stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') }">
+                  {{ stun.country }}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -63,57 +79,31 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/utils/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Gamepad2, Hourglass, MapPin, Merge, Monitor, RotateCw, Server } from 'lucide-vue-next';
+import { Card, CardContent } from '@/components/ui/card';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import { ChevronRight, Merge, RotateCw } from 'lucide-vue-next';
 
 const { t } = useI18n();
-
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
-
+const { dotClass, textClass } = useStatusTone();
 
 const isStarted = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
-  {
-    id: "google",
-    name: "Google",
-    url: "stun.l.google.com:19302",
-    ip: t('webrtc.StatusWait'),
-    natType: t('webrtc.StatusWait'),
-    country: t('webrtc.StatusWait'),
-    country_code: '',
-  },
-  {
-    id: "blackberry",
-    name: "BlackBerry",
-    url: "stun.voip.blackberry.com:3478",
-    ip: t('webrtc.StatusWait'),
-    natType: t('webrtc.StatusWait'),
-    country: t('webrtc.StatusWait'),
-    country_code: '',
-  },
-  {
-    id: "twilio",
-    name: "Twilio",
-    url: "global.stun.twilio.com",
-    ip: t('webrtc.StatusWait'),
-    natType: t('webrtc.StatusWait'),
-    country: t('webrtc.StatusWait'),
-    country_code: '',
-  },
-  {
-    id: "cloudflare",
-    name: "Cloudflare",
-    url: "stun.cloudflare.com",
-    ip: t('webrtc.StatusWait'),
-    natType: t('webrtc.StatusWait'),
-    country: t('webrtc.StatusWait'),
-    country_code: '',
-  },
+  { id: 'google',     name: 'Google',     url: 'stun.l.google.com:19302',       ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'twilio',     name: 'Twilio',     url: 'global.stun.twilio.com',        ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com',           ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
 ]);
 
+// 业务状态 → 4 档 tone
+const toneOf = (stun) => {
+  if (stun.ip === t('webrtc.StatusWait')) return 'wait';
+  if (stun.ip === t('webrtc.StatusError')) return 'fail';
+  if (stun.ip.includes('.') || stun.ip.includes(':')) return 'ok-fast';
+  return 'wait';
+};
 
 // 测试 STUN 服务器
 const checkSTUNServer = async (stun) => {
@@ -123,7 +113,6 @@ const checkSTUNServer = async (stun) => {
       const pc = new RTCPeerConnection(servers);
       let candidateReceived = false;
 
-      // 分别获取 STUN 服务器的 IP 地址和 NAT 类型
       pc.onicecandidate = async (event) => {
         if (event.candidate) {
           candidateReceived = true;
@@ -132,11 +121,11 @@ const checkSTUNServer = async (stun) => {
           if (ipMatch) {
             stun.ip = ipMatch[0];
             try {
-              let countryInfo = await fetchCountryCode(stun.ip);
+              const countryInfo = await fetchCountryCode(stun.ip);
               stun.country_code = countryInfo[0];
               stun.country = countryInfo[1];
             } catch (error) {
-              console.error("Error fetching country code:", error);
+              console.error('Error fetching country code:', error);
               reject(error);
               pc.close();
               return;
@@ -149,76 +138,59 @@ const checkSTUNServer = async (stun) => {
         }
       };
 
-      pc.createDataChannel("");
+      pc.createDataChannel('');
       pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-      // 设置一个超时计时器来拒绝 Promise
       setTimeout(() => {
         if (!candidateReceived) {
           pc.close();
-          reject(new Error("Stun Server Test Timeout"));
+          reject(new Error('Stun Server Test Timeout'));
         }
       }, 5000);
     } catch (error) {
-      console.error("STUN Server Test Error:", error);
+      console.error('STUN Server Test Error:', error);
       stun.ip = t('webrtc.StatusError');
       reject(error);
     }
   });
 };
 
-
-// 分析ICE候选信息，推断NAT类型
+// 分析 ICE 候选信息，推断 NAT 类型
 const determineNATType = (candidate) => {
   const parts = candidate.split(' ');
   const type = parts[7];
-
-  if (type === 'host') {
-    return t('webrtc.NATType.host');
-  } else if (type === 'srflx') {
-    return t('webrtc.NATType.srflx');
-  } else if (type === 'prflx') {
-    return t('webrtc.NATType.prflx');
-  } else if (type === 'relay') {
-    return t('webrtc.NATType.relay');
-  } else {
-    return t('webrtc.NATType.unknown');
-  }
+  if (type === 'host')  return t('webrtc.NATType.host');
+  if (type === 'srflx') return t('webrtc.NATType.srflx');
+  if (type === 'prflx') return t('webrtc.NATType.prflx');
+  if (type === 'relay') return t('webrtc.NATType.relay');
+  return t('webrtc.NATType.unknown');
 };
 
 // 通过 Maxmind 获取 IP 地区归属
 const fetchCountryCode = async (ip) => {
   let setLang = lang.value;
-  if (setLang === 'zh') {
-    setLang = 'zh-CN';
-  }
-  const source = store.ipDBs.find(source => source.text === "MaxMind");
+  if (setLang === 'zh') setLang = 'zh-CN';
+  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
 
   try {
     const url = store.getDbUrl(source.id, ip, setLang);
     const response = await fetch(url);
     const data = await response.json();
     const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
-
     if (ipData) {
-      let country_code = ipData.country_code.toLowerCase();
+      const country_code = ipData.country_code.toLowerCase();
       let country = ipData.country_code || 'N/A';
-      if (country !== 'N/A') {
-        country = getCountryName(ipData.country_code, lang.value); 
-      }
+      if (country !== 'N/A') country = getCountryName(ipData.country_code, lang.value);
       return [country_code, country];
     }
   } catch (error) {
-    console.error("Error fetching IP country code", error);
+    console.error('Error fetching IP country code', error);
   }
-}
-
+};
 
 // 测试所有 STUN 服务器
 const checkAllWebRTC = async (isRefresh) => {
-  if (isRefresh) {
-    trackEvent('Section', 'RefreshClick', 'WebRTC');
-  }
+  if (isRefresh) trackEvent('Section', 'RefreshClick', 'WebRTC');
   isStarted.value = true;
   const promises = stunServers.map((server) => {
     server.ip = t('webrtc.StatusWait');
@@ -230,11 +202,9 @@ const checkAllWebRTC = async (isRefresh) => {
 
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
-
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
     store.setLoadingStatus('webrtc', true);
   });
-
 };
 
 onMounted(() => {
@@ -247,9 +217,6 @@ watch(IPArray, () => {
 
 defineExpose({
   checkAllWebRTC,
-  stunServers
+  stunServers,
 });
-
 </script>
-
-<style scoped></style>
