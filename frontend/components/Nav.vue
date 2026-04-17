@@ -23,29 +23,25 @@
         </a>
       </div>
 
-      <!-- 中：桌面 nav 链接 -->
-      <div v-if="!isMobile" class="flex flex-1 items-center justify-center">
-        <div class="flex items-center gap-0.5">
-          <a v-for="item in navItems" :key="item" href="#"
-            :class="navLinkClass(item)"
-            @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
-            {{ t(`nav.${item}`) }}
-          </a>
-        </div>
+      <!-- 中：桌面 nav 链接（左对齐，紧挨品牌） -->
+      <div v-if="!isMobile" class="flex items-center gap-0.5">
+        <a v-for="item in navItems" :key="item" href="#"
+          :class="navLinkClass(item)"
+          @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
+          {{ t(`nav.${item}`) }}
+        </a>
       </div>
-      <div v-else class="flex-1"></div>
 
-      <!-- 右：动作区 -->
-      <div class="flex items-center gap-1.5">
-        <!-- GitHub -->
+      <!-- 右：动作区（ml-auto 推到最右） -->
+      <div class="ml-auto flex items-center gap-2">
+        <!-- GitHub star 徽章：shields.io 能显示实时星数，设计上保留 -->
         <JnTooltip :text="t('Tooltips.GithubLink')">
-          <Button variant="outline" size="sm" as-child class="hidden sm:inline-flex gap-1.5">
-            <a :href="t('page.footerLink')" target="_blank" rel="noopener"
-              aria-label="View source on GitHub">
-              <Github />
-              <span class="text-xs">Star</span>
-            </a>
-          </Button>
+          <a :href="t('page.footerLink')" target="_blank" rel="noopener"
+            aria-label="View source on GitHub"
+            class="hidden sm:inline-flex items-center h-8 rounded-md hover:opacity-80 transition-opacity">
+            <img src="https://img.shields.io/github/stars/jason5ng32/MyIP"
+              alt="GitHub stars" class="h-5" referrerpolicy="no-referrer">
+          </a>
         </JnTooltip>
         <Button variant="ghost" size="icon" class="size-8 sm:hidden" as-child>
           <a :href="t('page.footerLink')" target="_blank" rel="noopener"
@@ -65,48 +61,54 @@
         <!-- Sign In / User 下拉 -->
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="gap-1">
+            <!-- 未登录：用 outline 与 GitHub 视觉权重一致，不喧宾夺主 -->
+            <Button v-if="!isSignedIn" variant="outline" size="sm" @click="getUserInfo" class="h-8 gap-1.5">
               <span>{{ t('user.SignIn') }}</span>
-              <ChevronDown class="opacity-70" />
+              <ChevronDown class="opacity-60" />
             </Button>
             <Button v-else variant="ghost" size="sm" @click="getUserInfo"
-              class="gap-1.5 px-2 h-8"
-              aria-label="User menu">
-              <span class="inline-flex size-6 overflow-hidden rounded-full ring-1 ring-neutral-300 dark:ring-neutral-600">
+              class="h-8 gap-1.5 px-1.5" aria-label="User menu">
+              <span class="inline-flex size-6 overflow-hidden rounded-full">
                 <img :src="userPhotoURL" :alt="userName" :title="userName"
                   class="size-full object-cover" referrerpolicy="no-referrer">
               </span>
               <span v-if="!isMobile" class="text-sm font-medium max-w-[10rem] truncate">{{ userName }}</span>
-              <ChevronDown class="opacity-70" />
+              <ChevronDown class="opacity-60" />
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" class="w-64">
-            <!-- 已登录时顶部信息卡 -->
+          <!-- 整个下拉内：[&_svg]:size-4 统一锁定 lucide 图标 16px，和 text-sm (14px) 协调；
+               item 加 gap-2 让 icon/text 有呼吸感 -->
+          <DropdownMenuContent align="end" class="w-64 [&_[role=menuitem]]:gap-2 [&_[role=menuitem]_svg]:size-4 [&_[role=menuitem]_svg]:shrink-0">
+            <!-- 已登录：顶部 profile 卡 -->
             <template v-if="isSignedIn">
-              <div class="px-2 py-2">
-                <div class="flex items-center gap-2.5">
-                  <span class="inline-flex size-10 overflow-hidden rounded-full ring-1 ring-neutral-300 dark:ring-neutral-600">
+              <div class="px-2 pt-2 pb-3">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
                     <img :src="userPhotoURL" :alt="userName" class="size-full object-cover" referrerpolicy="no-referrer">
                   </span>
-                  <div class="flex min-w-0 flex-1 flex-col">
-                    <span class="truncate text-sm font-semibold">{{ userName }}</span>
+                  <div class="flex min-w-0 flex-1 flex-col gap-1">
+                    <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
                     <span v-if="remoteUserInfoFetched">
-                      <Badge :class="levelBadgeClass" class="border-transparent text-xs">
+                      <Badge :class="levelBadgeClass" class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
                         {{ t('user.Level.' + remoteUserInfo.userLevel) }}
                       </Badge>
                     </span>
                     <span v-else class="text-xs text-neutral-500">{{ t('user.Fields.Fetching') }}</span>
                   </div>
                 </div>
-                <dl class="mt-3 grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-xs text-neutral-600 dark:text-neutral-400">
-                  <dt>{{ t('user.Fields.CreatedAt') }}</dt>
-                  <dd class="text-neutral-900 dark:text-neutral-100">{{ userCreatedAt }}</dd>
-                  <dt>{{ t('user.Fields.FunctionUses') }}</dt>
-                  <dd class="text-neutral-900 dark:text-neutral-100">
-                    <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
-                    <span v-else>{{ t('user.Fields.Fetching') }}</span>
-                  </dd>
+                <dl class="mt-3 space-y-1 text-xs">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <dt class="text-neutral-500 dark:text-neutral-400">{{ t('user.Fields.CreatedAt') }}</dt>
+                    <dd class="text-neutral-900 dark:text-neutral-200 font-medium">{{ userCreatedAt }}</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-2">
+                    <dt class="text-neutral-500 dark:text-neutral-400">{{ t('user.Fields.FunctionUses') }}</dt>
+                    <dd class="text-neutral-900 dark:text-neutral-200 font-medium">
+                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
+                      <span v-else class="text-neutral-500">{{ t('user.Fields.Fetching') }}</span>
+                    </dd>
+                  </div>
                 </dl>
               </div>
               <DropdownMenuSeparator />
@@ -116,7 +118,7 @@
               </DropdownMenuItem>
             </template>
 
-            <!-- 未登录时的登录入口 -->
+            <!-- 未登录：登录入口 -->
             <template v-else>
               <DropdownMenuItem @select="store.signInWithGoogle">
                 <Chrome />
