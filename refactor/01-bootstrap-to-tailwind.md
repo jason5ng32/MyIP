@@ -106,10 +106,11 @@
 
 建议顺序（按视觉复杂度从低到高）：
 
-- [x] `components/widgets/InfoMask.vue` — state-driven 三色按钮改为内联 Tailwind；`.infomask` CSS 移除，浮动定位靠 `fixed bottom-[66px] right-5 z-[1050]`；`document.querySelector('.infomask')` → template ref
-- [ ] `components/widgets/PWA.vue`
-- [ ] `components/widgets/Patch.vue`（无模板，可能无工作）
-- [ ] `components/Footer.vue`
+- [x] `components/widgets/InfoMask.vue` — 用 shadcn `<Button size="icon">` + 状态色 :class 覆盖；浮动定位改 Tailwind；`document.querySelector` → ref；resize listener 补了 cleanup
+- [x] `components/widgets/PWA.vue` — 无工作：模板只有 `<pwa-install>` 第三方 custom element，零 Bootstrap class
+- [x] `components/widgets/Patch.vue` — 无工作：模板空
+- [x] `components/svgicons/Brand.vue` / `IPError.vue` — 无工作：纯 SVG，仅 `me-1` 一处 Tailwind v4 原生兼容
+- [x] `components/Footer.vue` — ToggleGroup（3 选一 radio 按钮组）+ Badge（changelog 条目类型）+ Separator（`<hr>`）+ 大量 link/text 颜色由 Bootstrap `link-*` / `text-*` 改为 Tailwind 直接表达；`showAbout/changelog/specialthanks` 三个 boolean 合并为单个 `content` ref + v-if；顺手修了原 `offcanvasBody.scrollTop = 0` 对 ref 对象直接操作的 bug（正确写法是 `sheetBody.value.scrollTop`）；新增 `components/ui/{badge,toggle-group,separator}/`
 - [ ] `components/Additional.vue`
 - [ ] `components/svgicons/*`（纯 SVG，可能无工作）
 - [ ] `components/widgets/Help.vue`
