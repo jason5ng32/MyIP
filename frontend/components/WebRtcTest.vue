@@ -44,21 +44,29 @@
             <span class="font-mono break-all" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
           </div>
 
-          <!-- NAT + Country 子块：等待/错误时统一显示一个长横杠 —，
-               避免 Awaiting Test / Connection Error 在状态灯下方再复述一遍 -->
+          <!-- NAT + Country 子块：dt 配图标做视觉锚点；
+               等待/错误态统一显示 —，不复述顶部状态文字 -->
           <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
-              <dt class="text-xs text-muted-foreground mb-0.5">NAT</dt>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <Network class="size-3.5" />
+                <span>NAT</span>
+              </dt>
               <dd class="font-medium break-words">
                 <span v-if="!isFieldPending(stun.natType)">{{ stun.natType }}</span>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
             <div>
-              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <MapPin class="size-3.5" />
+                <span>{{ t('ipInfos.Country') }}</span>
+              </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(stun.country)">
-                  <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
+                  <span v-if="stun.country_code"
+                    :class="'fi fi-' + stun.country_code + ' fis'"
+                    class="shrink-0 size-4 rounded-full"></span>
                   <span class="break-words">{{ stun.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
@@ -82,7 +90,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { ChevronRight, Merge, RotateCw } from 'lucide-vue-next';
+import { ChevronRight, MapPin, Merge, Network, RotateCw } from 'lucide-vue-next';
 
 const { t } = useI18n();
 const store = useMainStore();

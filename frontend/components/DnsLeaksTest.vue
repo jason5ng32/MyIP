@@ -29,8 +29,9 @@
             <div class="flex items-center gap-2 min-w-0">
               <HeartPulse class="size-6 text-muted-foreground shrink-0" />
               <span class="text-base font-medium truncate">{{ leak.name }}</span>
-            </div>
-            <span class="text-xs font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
+            
+            <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
+          </div>
           </div>
 
           <!-- 端点状态行：解析成功时才显示 "DNS Endpoint: 1.2.3.4"，
@@ -50,21 +51,29 @@
             </span>
           </div>
 
-          <!-- ISP + Country 子块：等待/错误态字段显示 —，不复述状态文字 -->
+          <!-- ISP + Country 子块：dt 配图标做视觉锚点；
+               等待/错误态字段显示 —，不复述状态文字 -->
           <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
-              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.ISP') }}</dt>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <Building2 class="size-3.5" />
+                <span>{{ t('ipInfos.ISP') }}</span>
+              </dt>
               <dd class="font-medium break-words" :title="leak.org">
                 <span v-if="!isFieldPending(leak.org)">{{ leak.org }}</span>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
             <div>
-              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <MapPin class="size-3.5" />
+                <span>{{ t('ipInfos.Country') }}</span>
+              </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(leak.country)">
                   <span v-if="leak.country_code"
-                    :class="'fi fi-' + leak.country_code.toLowerCase()" class="shrink-0"></span>
+                    :class="'fi fi-' + leak.country_code.toLowerCase() + ' fis'"
+                    class="shrink-0 size-4 rounded-full"></span>
                   <span class="break-words">{{ leak.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
@@ -89,7 +98,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/utils/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { ChevronRight, HeartPulse, RotateCw } from 'lucide-vue-next';
+import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 
 
 const { t } = useI18n();
