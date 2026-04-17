@@ -30,35 +30,35 @@
           </div>
 
           <!-- STUN URL（次要信息） -->
-          <p class="text-xs font-mono text-muted-foreground mb-3 truncate" :title="stun.url">
+          <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="stun.url">
             {{ stun.url }}
           </p>
 
-          <!-- IP 行 -->
-          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
-            <span class="relative flex shrink-0">
+          <!-- IP 行（多行时 dot 顶端对齐，IPv6 / 长状态文案自然换行） -->
+          <div class="flex items-start gap-1.5 text-base mb-3">
+            <span class="relative flex shrink-0 mt-[0.5em]">
               <span v-if="toneOf(stun) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
-            <span class="truncate font-mono" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
+            <span class="font-mono break-all" :class="textClass(toneOf(stun))">{{ stun.ip }}</span>
           </div>
 
-          <!-- NAT + Country 子块 -->
-          <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-1.5 text-sm">
-            <div class="flex items-baseline justify-between gap-2 min-w-0">
-              <dt class="text-muted-foreground shrink-0">NAT</dt>
-              <dd class="truncate text-right font-medium"
-                :class="{ 'text-muted-foreground': stun.natType === t('webrtc.StatusWait') }">
+          <!-- NAT + Country 子块：stacked 排版，label 一行、value 一行，天然支持长文本 -->
+          <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
+            <div>
+              <dt class="text-xs text-muted-foreground mb-0.5">NAT</dt>
+              <dd class="font-medium break-words"
+                :class="{ 'text-muted-foreground font-normal': stun.natType === t('webrtc.StatusWait') }">
                 {{ stun.natType }}
               </dd>
             </div>
-            <div class="flex items-baseline justify-between gap-2 min-w-0">
-              <dt class="text-muted-foreground shrink-0">{{ t('ipInfos.Country') }}</dt>
-              <dd class="flex items-center gap-1.5 min-w-0 font-medium">
+            <div>
+              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
+              <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <span v-if="stun.country_code" :class="'fi fi-' + stun.country_code" class="shrink-0"></span>
-                <span class="truncate"
-                  :class="{ 'text-muted-foreground': stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') }">
+                <span class="break-words"
+                  :class="{ 'text-muted-foreground font-normal': stun.country === t('webrtc.StatusWait') || stun.country === t('webrtc.StatusError') }">
                   {{ stun.country }}
                 </span>
               </dd>

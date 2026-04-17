@@ -33,33 +33,35 @@
             <span class="text-xs font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
           </div>
 
-          <!-- 端点 IP 行 -->
-          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
-            <span class="relative flex shrink-0">
+          <!-- 端点 IP 行（多行时 dot 顶端对齐，IPv6 / 长状态文案自然换行） -->
+          <div class="flex items-start gap-1.5 text-base mb-3">
+            <span class="relative flex shrink-0 mt-[0.5em]">
               <span v-if="toneOf(leak) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <span class="text-muted-foreground shrink-0">{{ t('dnsleaktest.Endpoint') }}:</span>
-            <span class="truncate font-mono" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+            <span class="break-all">
+              <span class="text-muted-foreground">{{ t('dnsleaktest.Endpoint') }}:</span>
+              <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+            </span>
           </div>
 
-          <!-- ISP + Country 子块 -->
-          <dl class="rounded-md bg-muted/50 p-3 space-y-1.5 text-sm">
-            <div class="flex items-baseline justify-between gap-2 min-w-0">
-              <dt class="text-muted-foreground shrink-0">{{ t('ipInfos.ISP') }}</dt>
-              <dd class="truncate text-right font-medium" :title="leak.org">
-                <span v-if="toneOf(leak) === 'wait' || toneOf(leak) === 'fail'"
-                  class="text-muted-foreground">{{ leak.org }}</span>
-                <span v-else>{{ leak.org }}</span>
+          <!-- ISP + Country 子块：stacked 排版，长文本自然换行不挤压卡片宽度 -->
+          <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
+            <div>
+              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.ISP') }}</dt>
+              <dd class="font-medium break-words" :title="leak.org"
+                :class="{ 'text-muted-foreground font-normal': toneOf(leak) === 'wait' || toneOf(leak) === 'fail' }">
+                {{ leak.org }}
               </dd>
             </div>
-            <div class="flex items-baseline justify-between gap-2 min-w-0">
-              <dt class="text-muted-foreground shrink-0">{{ t('ipInfos.Country') }}</dt>
-              <dd class="flex items-center gap-1.5 min-w-0 font-medium">
+            <div>
+              <dt class="text-xs text-muted-foreground mb-0.5">{{ t('ipInfos.Country') }}</dt>
+              <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <span v-if="leak.country_code"
                   :class="'fi fi-' + leak.country_code.toLowerCase()" class="shrink-0"></span>
-                <span class="truncate" :class="{ 'text-muted-foreground': toneOf(leak) === 'wait' || toneOf(leak) === 'fail' }">
+                <span class="break-words"
+                  :class="{ 'text-muted-foreground font-normal': toneOf(leak) === 'wait' || toneOf(leak) === 'fail' }">
                   {{ leak.country }}
                 </span>
               </dd>
