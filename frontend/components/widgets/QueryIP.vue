@@ -4,7 +4,7 @@
         <Button
             size="icon"
             type="button"
-            class="fixed bottom-5 z-[1050] bg-blue-600 text-white hover:bg-blue-700"
+            class="fixed bottom-5 z-1050 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
             :style="positionStyle"
             aria-label="IP Check"
             @click="openQueryIP">

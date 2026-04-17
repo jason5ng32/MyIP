@@ -1,5 +1,7 @@
 <template>
-    <Sonner />
+    <Sonner 
+    position="bottom-left"
+    />
 </template>
 
 <script setup>

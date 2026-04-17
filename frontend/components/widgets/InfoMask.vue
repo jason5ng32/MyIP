@@ -3,7 +3,7 @@
         <Button v-show="showMaskButton"
             size="icon"
             type="button"
-            class="fixed bottom-[66px] z-[1050]"
+            class="fixed bottom-[66px] z-1050 cursor-pointer"
             :class="stateClasses"
             :style="positionStyle"
             aria-label="Toggle Info Mask"
@@ -33,9 +33,9 @@ const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
 
 // 三态颜色 —— 对照旧版 btn-success / btn-warning / btn-secondary
 const stateClasses = computed(() => ({
-    'bg-green-600 text-white hover:bg-green-700': infoMaskLevel === 0,
-    'bg-yellow-500 text-neutral-900 hover:bg-yellow-600': infoMaskLevel === 1,
-    'bg-neutral-500 text-white hover:bg-neutral-600': infoMaskLevel === 2,
+    'bg-success text-success-foreground hover:bg-success/80': infoMaskLevel === 0,
+    'bg-warning text-warning-foreground hover:bg-warning/80': infoMaskLevel === 1,
+    'bg-secondary text-secondary-foreground hover:bg-secondary/80': infoMaskLevel === 2,
 }));
 
 // 超宽屏（>1600px）时对齐到内容区右侧（max-width 1600px），否则贴右 20px

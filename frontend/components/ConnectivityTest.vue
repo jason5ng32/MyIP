@@ -5,10 +5,10 @@
     <!-- 章节头：标题 + 说明 + 刷新按钮 -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
-        <h2 id="Connectivity" class="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+        <h2 id="Connectivity" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
           🚦 {{ t('connectivity.Title') }}
         </h2>
-        <p class="mt-1 text-sm text-muted-foreground">{{ t('connectivity.Note') }}</p>
+        <p class="my-3 text-base text-muted-foreground">{{ t('connectivity.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
         <Button size="icon" variant="outline" class="shrink-0" @click="checkAllConnectivity(false, true, true)"

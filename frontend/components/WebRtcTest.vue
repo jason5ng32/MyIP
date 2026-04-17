@@ -4,10 +4,10 @@
     <!-- 章节头 -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
-        <h2 id="WebRTC" class="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+        <h2 id="WebRTC" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
           🚥 {{ t('webrtc.Title') }}
         </h2>
-        <p class="mt-1 text-sm text-muted-foreground">{{ t('webrtc.Note') }}</p>
+        <p class="my-3 text-base text-muted-foreground">{{ t('webrtc.Note') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
         <Button size="icon" variant="outline" class="shrink-0"
@@ -67,7 +67,7 @@
                   <Icon v-if="stun.country_code"
                     :icon="'circle-flags:' + stun.country_code"
                     class="shrink-0 size-4" />
-                  <span class="break-words">{{ stun.country }}</span>
+                  <span class="wrap-break-word">{{ stun.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>

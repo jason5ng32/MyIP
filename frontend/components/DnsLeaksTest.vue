@@ -4,11 +4,11 @@
     <!-- 章节头 -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
-        <h2 id="DNSLeakTest" class="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+        <h2 id="DNSLeakTest" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
           🛑 {{ t('dnsleaktest.Title') }}
         </h2>
-        <p class="mt-1 text-sm text-muted-foreground">{{ t('dnsleaktest.Note') }}</p>
-        <p class="text-sm text-muted-foreground">{{ t('dnsleaktest.Note2') }}</p>
+        <p class="my-3 text-base text-muted-foreground">{{ t('dnsleaktest.Note') }}</p>
+        <p class="my-3 text-base text-muted-foreground">{{ t('dnsleaktest.Note2') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
         <Button size="icon" variant="outline" class="shrink-0"
@@ -74,7 +74,7 @@
                   <Icon v-if="leak.country_code"
                     :icon="'circle-flags:' + leak.country_code.toLowerCase()"
                     class="shrink-0 size-4" />
-                  <span class="break-words">{{ leak.country }}</span>
+                  <span class="wrap-break-word">{{ leak.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>

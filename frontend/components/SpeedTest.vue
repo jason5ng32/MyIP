@@ -3,10 +3,10 @@
   <section class="mb-10">
     <!-- 章节头（无右侧刷新按钮；Start/Pause 是主 CTA，放在卡片内顶部工具栏） -->
     <header class="mb-3">
-      <h2 id="SpeedTest" class="text-xl md:text-2xl font-semibold tracking-tight leading-tight">
+      <h2 id="SpeedTest" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🚀 {{ t('speedtest.Title') }}
       </h2>
-      <p class="mt-1 text-sm text-muted-foreground">{{ t('speedtest.Note') }}</p>
+      <p class="my-3 text-base text-muted-foreground">{{ t('speedtest.Note') }}</p>
     </header>
 
     <Card class="keyboard-shortcut-card jn-card">
@@ -17,15 +17,14 @@
         <div class="flex justify-end mb-5">
           <div class="inline-flex items-stretch">
             <!-- Download addon -->
-            <span class="flex items-center px-3 border border-input rounded-l-md bg-muted"
-              aria-label="Download Bytes">
+            <span class="flex items-center px-3 border border-input rounded-l-md bg-muted" aria-label="Download Bytes">
               <CloudDownload class="size-4 text-muted-foreground" />
             </span>
             <!-- Download select -->
             <Select :model-value="String(state.config.package.download.bytes)"
               @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -35,15 +34,14 @@
               </SelectContent>
             </Select>
             <!-- Upload addon -->
-            <span class="flex items-center px-3 border border-input border-l-0 bg-muted"
-              aria-label="Upload Bytes">
+            <span class="flex items-center px-3 border border-input border-l-0 bg-muted" aria-label="Upload Bytes">
               <CloudUpload class="size-4 text-muted-foreground" />
             </span>
             <!-- Upload select -->
             <Select :model-value="String(state.config.package.upload.bytes)"
               @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -54,7 +52,7 @@
             </Select>
             <!-- Start/Pause/Restart button -->
             <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
-              <Button size="icon" variant="outline" class="rounded-l-none border-l-0"
+              <Button size="icon" variant="outline" class="rounded-l-none border-l-0 shadow-none cursor-pointer"
                 @click="speedTestController" aria-label="Start/Pause Speed Test">
                 <component :is="ctaIcon" />
               </Button>
@@ -62,36 +60,40 @@
           </div>
         </div>
 
-        <!-- 连接信息行（测试启动后出现） -->
-        <Transition name="slide-fade">
-          <div v-if="state.speedTest.status !== 'idle' && state.connection.colo"
-            class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm mb-3">
-            <span class="inline-flex items-center gap-1.5">
-              <PersonStanding class="size-4 text-muted-foreground" />
-              {{ state.connection.country }}
-              <Icon v-if="state.connection.country" :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
-                class="size-4" />
-            </span>
-            <ArrowLeftRight class="size-4 text-muted-foreground" />
-            <span class="inline-flex items-center gap-1.5">
-              <Globe class="size-4 text-muted-foreground" />
-              {{ state.connection.colo }}, {{ state.connection.coloCountry }}
-              <Icon v-if="state.connection.coloCountry"
-                :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()" class="size-4" />
-            </span>
-          </div>
-        </Transition>
+        <!-- 连接信息行：外层 min-h-6 + mb-3 始终占位，内容 Transition 进出，
+             避免从 idle 切到 running 时页面往下晃 -->
+        <div class="min-h-6 mb-3">
+          <Transition name="slide-fade">
+            <div v-if="state.speedTest.status !== 'idle' && state.connection.colo"
+              class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm">
+              <span class="inline-flex items-center gap-1.5">
+                <PersonStanding class="size-4 text-muted-foreground" />
+                {{ state.connection.country }}
+                <Icon v-if="state.connection.country" :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
+                  class="size-4" />
+              </span>
+              <ArrowLeftRight class="size-4 text-muted-foreground" />
+              <span class="inline-flex items-center gap-1.5">
+                <Globe class="size-4 text-muted-foreground" />
+                {{ state.connection.colo }}, {{ state.connection.coloCountry }}
+                <Icon v-if="state.connection.coloCountry"
+                  :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()" class="size-4" />
+              </span>
+            </div>
+          </Transition>
+        </div>
 
-        <!-- 进度条：空闲态隐藏；indicator 色跟随状态（sky / green / red），
-             与顶部的 WebRTC wait 色统一 -->
-        <Progress v-show="state.speedTest.status !== 'idle'" :model-value="state.speedTest.progress" class="mb-6"
-          :class="progressIndicatorClass" />
+        <!-- 进度条：始终渲染占位（h-2 + mb-6 保留空间），idle 态 invisible，
+             避免从 idle 切到 running 时 metrics 被往下推 -->
+        <Progress :model-value="state.speedTest.progress"
+          class="mb-6"
+          :class="[progressIndicatorClass, state.speedTest.status === 'idle' ? 'invisible' : '']" />
 
         <!-- 4 个指标 tile：现代仪表盘风，大数字 + 小标签 -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div v-for="m in metrics" :key="m.key" class="text-center">
-            <p class="text-xs uppercase tracking-wider text-muted-foreground mb-1">{{ m.label }}</p>
-            <p class="text-2xl md:text-3xl font-semibold tabular-nums" :class="metricColorClass">
+            <p class="text-lg uppercase tracking-wider text-primary font-semibold mb-1">{{ m.label }}</p>
+            <p class="text-2xl md:text-3xl font-mono font-light tabular-nums" :class="metricColorClass">
               <span>{{ state.speedTest[m.key] }}</span>
               <span v-if="state.speedTest.status !== 'idle'" class="ml-1 text-sm font-normal text-muted-foreground">{{
                 m.unit }}</span>

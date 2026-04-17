@@ -62,7 +62,7 @@
   /* 项目自定义语义色（light mode，取 Tailwind *-500 对应 oklch 值）*/
   --info: oklch(0.685 0.169 237.323);         /* sky-500 */
   --info-foreground: oklch(0.985 0 0);
-  --success: oklch(0.723 0.219 149.579);      /* green-500 */
+  --success: oklch(0.63 0.17 149);      /* green-500 */
   --success-foreground: oklch(0.985 0 0);
   --warning: oklch(0.769 0.188 70.08);        /* amber-500 */
   --warning-foreground: oklch(0.145 0 0);
