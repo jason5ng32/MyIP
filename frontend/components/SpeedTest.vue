@@ -85,8 +85,7 @@
 
         <!-- 进度条：始终渲染占位（h-2 + mb-6 保留空间），idle 态 invisible，
              避免从 idle 切到 running 时 metrics 被往下推 -->
-        <Progress :model-value="state.speedTest.progress"
-          class="mb-6"
+        <Progress :model-value="state.speedTest.progress" class="mb-6"
           :class="[progressIndicatorClass, state.speedTest.status === 'idle' ? 'invisible' : '']" />
 
         <!-- 4 个指标 tile：现代仪表盘风，大数字 + 小标签 -->
@@ -114,14 +113,13 @@
         </div>
 
         <!-- 结果块：连接摘要 + 质量 badge + 说明
-             注意：浅色 success 面板背景保留 green-50/200 这种 Tailwind 原生色
-             （语义 token 目前只含 solid 色，没定义 *-subtle 浅色变体；图标 / 质量
-             badge 已用 text-success / text-warning 等 token）-->
+             浅色 success 面板改用 bg-success/10 + border-success/30 + text-success，
+             跟项目里其他 success 提示条（Whois "Note3"、InvisibilityTest summary 等）节奏一致 -->
         <div v-if="isFinished && state.speedTest.hasScores"
-          class="jn-slide-in rounded-md border border-green-200 bg-green-50 p-4 dark:bg-green-950/30 dark:border-green-900">
+          class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
           <div class="flex items-start gap-2 mb-3">
             <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
-            <span class="text-base text-green-900 dark:text-green-100" v-if="state.connection.colo">
+            <span class="text-base text-success" v-if="state.connection.colo">
               {{ t('speedtest.connectionFrom') }}
               <span class="font-mono">{{ state.connection.ip }}</span>
               ( {{ state.connection.country }} )
@@ -129,7 +127,7 @@
               {{ state.connection.colo }}
               ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
               {{ t('speedtest.connectionEnd') }}
-
+              {{ t('speedtest.score') }}
               {{ t('speedtest.videoStreaming') }}
               <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
                 state.speedTest.streamingQuality) }}</span>
