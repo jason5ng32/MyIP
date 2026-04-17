@@ -71,9 +71,9 @@
               </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(leak.country)">
-                  <span v-if="leak.country_code"
-                    :class="'fi fi-' + leak.country_code.toLowerCase() + ' fis'"
-                    class="shrink-0 size-4 rounded-full"></span>
+                  <Icon v-if="leak.country_code"
+                    :icon="'circle-flags:' + leak.country_code.toLowerCase()"
+                    class="shrink-0 size-4" />
                   <span class="break-words">{{ leak.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
@@ -99,6 +99,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/utils/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { Icon } from '@iconify/vue';
 
 
 const { t } = useI18n();

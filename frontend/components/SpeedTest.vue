@@ -44,14 +44,17 @@
             <span class="inline-flex items-center gap-1.5">
               <PersonStanding class="size-4 text-muted-foreground" />
               {{ state.connection.country }}
-              <span v-if="state.connection.country" :class="'fi fi-' + state.connection.loc.toLowerCase()"></span>
+              <Icon v-if="state.connection.country"
+                :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
+                class="size-4" />
             </span>
             <ArrowLeftRight class="size-4 text-muted-foreground" />
             <span class="inline-flex items-center gap-1.5">
               <Globe class="size-4 text-muted-foreground" />
               {{ state.connection.colo }}, {{ state.connection.coloCountry }}
-              <span v-if="state.connection.coloCountry"
-                :class="'fi fi-' + state.connection.coloCountryCode.toLowerCase()"></span>
+              <Icon v-if="state.connection.coloCountry"
+                :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()"
+                class="size-4" />
             </span>
           </div>
         </Transition>
@@ -137,6 +140,7 @@ import {
   ArrowLeftRight, CalendarCheck2, ChevronRight, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
 } from 'lucide-vue-next';
+import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
