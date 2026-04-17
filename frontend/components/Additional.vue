@@ -2,83 +2,93 @@
     <!-- Curl Dialog -->
     <Dialog :open="isOpen" @update:open="isOpen = $event">
         <DialogContent :title="t('curl.Title')">
-            <div class="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-700">
-                <h5 class="m-0 text-lg font-semibold">
-                    <Terminal class="inline size-[1em] align-[-0.125em]" /> {{ t('curl.Title') }}
-                </h5>
-                <DialogClose />
+            <DialogHeader :icon="Terminal" :title="t('curl.Title')" />
+
+            <div v-if="curlDomainsHadSet" class="space-y-3">
+                <!-- 说明（// 注释风格，用 muted-foreground 跟暗色终端语义区分） -->
+                <div class="space-y-1 text-xs font-mono">
+                    <p class="jn-comment"><span class="text-muted-foreground">{{ t('curl.Note1') }}</span></p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground">{{ t('curl.Note2_1') }}
+                            <span class="text-success">curl</span> {{ t('curl.Note2_2') }}</span>
+                    </p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground"><span class="text-success">geo</span> {{ t('curl.Note3') }}</span>
+                    </p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground"><span class="text-success">YOUR_API_KEY</span> {{ t('curl.Note4') }}</span>
+                    </p>
+                </div>
+
+                <!-- 3 个 curl 命令块：保留终端美学（黑底 + 绿/黄语义色） -->
+                <div class="space-y-3">
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv4') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv4Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv6') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv6Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.get6and4') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv64Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
+                </div>
             </div>
-            <div v-if="curlDomainsHadSet" class="m-2">
-                <code class="flex flex-col items-start gap-1">
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.Note1')}}</span></span>
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.Note2_1')}} <span class="text-green-600">curl</span> {{t('curl.Note2_2')}}</span></span>
-                    <span class="jn-comment"><span class="text-neutral-500"><span class="text-green-600">geo</span> {{t('curl.Note3')}}</span></span>
-                    <span class="jn-comment"><span class="text-neutral-500"><span class="text-green-600">YOUR_API_KEY</span> {{t('curl.Note4')}}</span></span>
-                    <span>&nbsp;</span>
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.getIPv4')}}</span></span>
-                    <span class="jn-curl bg-black p-3 m-2 rounded-md">curl <span class="text-neutral-100">{{ipv4Domain}}<span class="text-green-600">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</span></span>
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.getIPv6')}}</span></span>
-                    <span class="jn-curl bg-black p-3 m-2 rounded-md">curl <span class="text-neutral-100">{{ipv6Domain}}<span class="text-green-600">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</span></span>
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.get6and4')}}</span></span>
-                    <span class="jn-curl bg-black p-3 m-2 rounded-md">curl <span class="text-neutral-100">{{ipv64Domain}}<span class="text-green-600">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</span></span>
-                </code>
-            </div>
-            <div v-else class="m-2">
-                <code class="flex justify-center">
-                    <span class="jn-comment"><span class="text-neutral-500">{{t('curl.notAvailable')}}</span></span>
-                </code>
+            <div v-else class="py-6 text-center">
+                <p class="text-sm text-muted-foreground">{{ t('curl.notAvailable') }}</p>
             </div>
         </DialogContent>
     </Dialog>
 
-    <!-- Additional Tools -->
-    <div class="mx-auto text-center jn-add max-w-[98%]">
-        <div id="morefromipchecking" class="flex justify-center">
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <a href="https://www.raycast.com/jason5ng32/ipcheck-ing" target="_blank"
-                    @click="trackEvent('Additional', 'AdditionalClick', 'Raycast');">
-                    <img src="/additional/raycast.webp" alt="IPCheck.ing on Raycast" :width="[isMobile ? '108' : '180']"
-                        :height="[isMobile ? '39' : '65']">
-                </a>
-            </div>
+    <!-- Additional Tools：外部产品链接条 -->
+    <div class="mx-auto text-center max-w-[98%]">
+        <div id="morefromipchecking" class="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
+            <a href="https://www.raycast.com/jason5ng32/ipcheck-ing" target="_blank" rel="noopener"
+                @click="trackEvent('Additional', 'AdditionalClick', 'Raycast')">
+                <img src="/additional/raycast.webp" alt="IPCheck.ing on Raycast"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </a>
 
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <img type="button" @click="openCurlModal" src="/additional/curl.webp" class="cursor-pointer"
-                    alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']" :height="[isMobile ? '39' : '65']">
-            </div>
+            <button type="button" @click="openCurlModal"
+                aria-label="IPCheck.ing for Curl"
+                class="cursor-pointer bg-transparent border-0 p-0">
+                <img src="/additional/curl.webp" alt="IPCheck.ing for Curl"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </button>
 
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <a href="https://lite.ipcheck.ing" target="_blank"
-                    @click="trackEvent('Additional', 'AdditionalClick', 'Lite');">
-                    <img src="/additional/lite.webp" alt="IPCheck.ing lite" :width="[isMobile ? '108' : '180']"
-                        :height="[isMobile ? '39' : '65']">
-                </a>
-            </div>
+            <a href="https://lite.ipcheck.ing" target="_blank" rel="noopener"
+                @click="trackEvent('Additional', 'AdditionalClick', 'Lite')">
+                <img src="/additional/lite.webp" alt="IPCheck.ing lite"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </a>
         </div>
     </div>
 </template>
 
 <script setup>
-// refactor/01 阶段 C.2：Additional 模板从 Bootstrap class 改为 Tailwind
+// refactor/02：Additional 切到 DialogHeader + 语义色
+// - 终端美学（黑底 + 绿/黄色码）刻意保留：这是命令行语义的 convention，不走主题 token
+// - 注释色 text-neutral-500 → text-muted-foreground，跟主题走
+// - 外部产品链接条：class 数组绑定改 Tailwind 响应式 class (w-[108px] sm:w-[180px])
+// - Curl 点击触发改成 <button>（image 元素不该有 type="button"）
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Terminal } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isMobile = computed(() => store.isMobile);
 
-// 获取 CURL 请求域名
 const ipv4Domain = computed(() => store.curl.ipv4Domain);
 const ipv6Domain = computed(() => store.curl.ipv6Domain);
 const ipv64Domain = computed(() => store.curl.ipv64Domain);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
-// Dialog 开关（对外 API 保持 openCurlModal()）
 const isOpen = ref(false);
 const openCurlModal = () => {
     isOpen.value = true;
@@ -86,27 +96,24 @@ const openCurlModal = () => {
 };
 
 defineExpose({
-    openCurlModal
+    openCurlModal,
 });
 </script>
 
 <style scoped>
+/* $ 和 // 前缀：用 var() 让颜色跟主题 muted-foreground；原版 #6c757d 是 Bootstrap 硬编码 */
 .jn-curl::before {
     content: '$ ';
-    color: #6c757d;
+    color: var(--muted-foreground);
     font-weight: 500;
-    margin-right: 0.5rem;
-}
-
-.jn-comment {
-    margin-left: 26pt;
-    white-space: break-spaces;
+    margin-right: 0.25rem;
+    opacity: 0.7;
 }
 
 .jn-comment::before {
     content: '// ';
-    color: #6c757d;
+    color: var(--muted-foreground);
     font-weight: 500;
-    margin-left: -20pt;
+    opacity: 0.7;
 }
 </style>
