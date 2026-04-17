@@ -32,11 +32,13 @@
           <!-- 底部：状态指示灯 + 文字 + 延迟（mono 等宽数字右对齐） -->
           <div class="flex items-center justify-between gap-2">
             <span class="flex items-center gap-1.5 text-base min-w-0">
-              <span class="relative flex shrink-0">
-                <span v-if="toneOf(test) === 'wait'"
-                  class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
+              <!-- 状态指示：wait 态用 ping 动画的彩色圆点；结果态用表情脸替代（Frown / Smile / Meh） -->
+              <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
+                <span class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
               </span>
+              <component v-else-if="statusFaceIcon(test)" :is="statusFaceIcon(test)"
+                class="size-4 shrink-0" :class="textClass(toneOf(test))" />
               <span :class="textClass(toneOf(test))" class="truncate">{{ test.status }}</span>
             </span>
             <span v-if="test.time !== 0" class="text-base font-mono tabular-nums text-muted-foreground"
@@ -60,8 +62,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import {
-  ChevronRight, Chrome, Cloud, Compass, Github, MessageCircle,
-  MessageSquareQuote, RotateCw, Store, Youtube,
+  ChevronRight, Chrome, Cloud, Compass, Frown, Github, Meh, MessageCircle,
+  MessageSquareQuote, RotateCw, Smile, Store, Youtube,
 } from 'lucide-vue-next';
 
 // 连通性测试的品牌图标映射（i18n 里还是 bi-* 名字）
@@ -115,6 +117,17 @@ const toneOf = (test) => {
   return 'wait';
 };
 const { dotClass, textClass } = useStatusTone();
+
+// 表情图标映射 —— 迁自原版 bi-emoji-{frown,smile,expressionless}
+// 不可达/超时 → Frown；可达且 <200ms → Smile；可达且 ≥200ms → Meh
+// wait 态不展示脸（状态灯的 ping 动画已经表达"在等"）
+const statusFaceIcon = (test) => {
+  const unavailableLabels = [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')];
+  const okLabel = t('connectivity.StatusAvailable');
+  if (unavailableLabels.includes(test.status)) return Frown;
+  if (test.status.includes(okLabel)) return test.time < 200 ? Smile : Meh;
+  return null;
+};
 
 // 检查单个连通性
 const checkConnectivityHandler = (test, onTestComplete = () => { }, isManualRun) => {
