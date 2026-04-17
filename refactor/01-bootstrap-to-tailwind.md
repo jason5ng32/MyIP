@@ -2,7 +2,7 @@
 
 **目标**：彻底移除 Bootstrap，UI 层完全迁移到 Tailwind v4 + shadcn-vue，bootstrap-icons 替换为 lucide-vue-next。最终 `package.json` 不再依赖 `bootstrap` / `bootstrap-icons`。
 
-**状态**：🟢 进行中（阶段 A + B + C 的 Bootstrap 去除部分已完成。`bootstrap` 已卸载，`import 'bootstrap'` 已删除；剩余：`bootstrap-icons` 字体图标迁移到 lucide 是一个独立的大工程，单独推进。长期：模板里的 Bootstrap class 名由 `bootstrap-compat.css`（@apply Tailwind）接管，可以逐组件用 Tailwind 直接改写，但不是阻塞项。）
+**状态**：🟢 进行中（阶段 A + B 已完成；B 保留了 `import 'bootstrap'` 用于 Dropdown/Collapse/Tab/ScrollSpy 这四类剩余部件，会在阶段 C 收尾）
 
 **影响范围**：30+ Vue 文件、router/index.js 中的 DOM 操作、main.js 中的全局 tooltip 指令、style/style.css。
 
@@ -95,13 +95,10 @@
 
 ## 阶段 E — 卸载与清理
 
-- [x] 删除 `style/style.css` 里的 `@import 'bootstrap/dist/css/bootstrap.min.css'`
-- [x] 新建 `style/bootstrap-compat.css` —— 用 Tailwind `@apply` 实现 168 个 Bootstrap 语义类，templates 无需重写即可继续工作
-- [x] `npm uninstall bootstrap`（package.json 不再依赖 bootstrap）
-- [x] `main.js` 删除 `import 'bootstrap'`
-- [x] `npm run build` 通过；主 chunk 从 ~463 KB 降到 ~355 KB（省下 ~108 KB，-23%）
-- [ ] **未完成**：`npm uninstall bootstrap-icons` —— `.bi bi-*` 字体图标仍有数百处使用，要统一换成 lucide-vue-next 是独立的大工程，单独推进
-- [ ] **可选后续**：逐组件把模板里的 `.btn / .card / .row / .col-* / .text-*` 等 Bootstrap class 直接改成 Tailwind 工具类，最终删除 `bootstrap-compat.css` 和整个 shim 层。非阻塞项。
+- [ ] 删除 `style/style.css` 里的 `@import 'bootstrap/dist/css/bootstrap.min.css'`
+- [ ] 检查 `style/style.css` 自定义类是否还需要保留，能用 Tailwind 表达的删除
+- [ ] `npm uninstall bootstrap bootstrap-icons`
+- [ ] `npm run build` 通过，体积对比记录一下
 
 ---
 
