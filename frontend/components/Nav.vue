@@ -1,123 +1,119 @@
 <template>
   <!-- Nav -->
-  <header class="navbar navbar-expand-lg bg-body-tertiary mb-3 jn-navbar-top "
-    :class="{ 'dark-mode-nav navbar-dark bg-dark': isDarkMode }">
-    <nav id="navbar-top" class="container-xxl">
-      <button class="navbar-toggler jn-hamburger-button" type="button"
-        @click="store.toggleSheet('navMenu')" aria-controls="offcanvasNavbar">
-        <span class="navbar-toggler-icon bg-transparent"></span>
+  <header class="mb-3 jn-navbar-top bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <nav id="navbar-top" class="mx-auto w-full max-w-[1600px] flex flex-wrap items-center justify-between py-2 px-3">
+      <button class="jn-hamburger-button p-1 border border-neutral-300 dark:border-neutral-600 rounded bg-transparent cursor-pointer"
+        type="button" @click="store.toggleSheet('navMenu')" aria-controls="offcanvasNavbar">
+        <span class="inline-block w-6 h-6 jn-hamburger-icon"></span>
       </button>
 
-      <div class="jn-logo">
-        <a class="navbar-brand d-flex align-items-center align-content-center" :class="{ 'text-white': isDarkMode }"
+      <div class="jn-logo flex items-center">
+        <a class="inline-flex items-center mr-4 text-lg font-semibold no-underline text-neutral-900 dark:text-white"
           href="#" @click="handleLogoClick">
           <brandIcon />
-          <span class=" fw-bold  "> IP</span>
-          <span class="fw-lighter">Check.</span>
-          <span class="fw-lighter" :class="{
+          <span class="font-bold">IP</span>
+          <span class="font-extralight">Check.</span>
+          <span class="font-extralight" :class="{
               'background-animation-dark': !loaded && isDarkMode,
               'background-animation-light': !loaded && !isDarkMode
-            }">ing
-          </span>
+            }">ing</span>
         </a>
       </div>
 
-      <!-- 桌面端：直接渲染菜单（原 CSS hack 不再需要） -->
-      <div v-if="!isMobile" :data-bs-theme="isDarkMode ? 'dark' : ''" class="d-flex align-items-center">
-        <div class="navbar-nav d-flex flex-row">
+      <!-- 桌面端：直接渲染菜单 -->
+      <div v-if="!isMobile" class="flex items-center">
+        <div class="flex flex-row list-none m-0 p-0">
           <a type="button"
             v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
-            :key="item" class="nav-link" :class="{
-              'text-white': item === currentSection && isDarkMode,
-              'text-dark': item === currentSection && !isDarkMode,
-              }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item)">
+            :key="item"
+            class="block px-3 py-2 no-underline cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white"
+            :class="{
+              'text-neutral-900 dark:text-white font-semibold': item === currentSection,
+            }"
+            @click="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
             {{ t(`nav.${item}`) }}
           </a>
         </div>
-        <a class="ms-2 d-flex align-items-center" :href="t('page.footerLink')" target="_blank">
+        <a class="ms-2 flex items-center" :href="t('page.footerLink')" target="_blank">
           <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
         </a>
       </div>
 
       <!-- 移动端：Sheet 菜单 -->
       <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
-        <SheetContent
-          side="bottom"
-          :title="t('nav.Navigation')"
-          :class="cn('h-1/2 overflow-y-auto pt-3', isDarkMode ? 'dark' : '')"
-          :data-bs-theme="isDarkMode ? 'dark' : ''"
-        >
-          <div class="offcanvas-header d-flex align-items-center justify-content-between px-3">
-            <h5 class="offcanvas-title m-0">{{t('nav.Navigation')}}</h5>
-            <SheetClose class="btn-close" />
+        <SheetContent side="bottom" :title="t('nav.Navigation')"
+          :class="cn('h-1/2 overflow-y-auto pt-3')">
+          <div class="flex items-center justify-between px-3 pb-3 border-b border-neutral-200 dark:border-neutral-700">
+            <h5 class="m-0 text-lg font-semibold">{{ t('nav.Navigation') }}</h5>
+            <SheetClose />
           </div>
-          <div class="offcanvas-body">
-            <div class="navbar-nav">
+          <div class="p-4">
+            <div class="flex flex-col">
               <a type="button"
                 v-for="item in ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools']"
-                :key="item" class="nav-link" :class="{
-                  'text-white': item === currentSection && isDarkMode,
-                  'text-dark': item === currentSection && !isDarkMode,
-                  }" @click="scrollToSection(item) ; trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
+                :key="item"
+                class="block px-3 py-2 no-underline cursor-pointer text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white"
+                :class="{
+                  'text-neutral-900 dark:text-white font-semibold': item === currentSection,
+                }"
+                @click="scrollToSection(item); trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
                 {{ t(`nav.${item}`) }}
               </a>
             </div>
-            <a class="mt-2 d-flex align-items-center" :href="t('page.footerLink')" target="_blank">
+            <a class="mt-2 flex items-center" :href="t('page.footerLink')" target="_blank">
               <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" />
             </a>
           </div>
         </SheetContent>
       </Sheet>
 
-      <div id="Preferences" class="preference-button" @click.prevent="OpenPreferences" role="button"
+      <div id="Preferences" class="preference-button ml-2 cursor-pointer" @click.prevent="OpenPreferences" role="button"
         aria-label="Preferences">
         <i class="bi bi-toggles"></i>
       </div>
 
-      <!-- Sign In (refactor/01: Bootstrap dropdown → shadcn-vue DropdownMenu) -->
-      <div v-if="isFireBaseSet" id="signin" class="d-flex align-items-center ms-2">
-
+      <!-- Sign In -->
+      <div v-if="isFireBaseSet" id="signin" class="flex items-center ms-2">
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <button class="btn dropdown-toggle d-flex align-items-center flex-row "
-              :class="{ 'btn-outline-light': isDarkMode, 'btn-dark': !isDarkMode }" type="button"
-              :data-bs-theme="isDarkMode ? 'dark' : ''" @click="getUserInfo">
-              <span v-if="!isSignedIn">
-                {{ t('user.SignIn') }}
-              </span>
+            <button type="button" @click="getUserInfo"
+              class="inline-flex items-center px-3 py-1.5 rounded-md border text-sm font-medium transition-colors cursor-pointer"
+              :class="isDarkMode
+                ? 'border-neutral-100 text-neutral-100 bg-transparent hover:bg-neutral-100 hover:text-neutral-900'
+                : 'bg-neutral-900 text-white border-neutral-900 hover:bg-neutral-800'">
+              <span v-if="!isSignedIn">{{ t('user.SignIn') }}</span>
               <span v-if="isSignedIn" class="jn-avatar">
                 <img :src="userPhotoURL" alt="User Avatar" class="avatar" :title="userName">
               </span>
-              <span v-if="isSignedIn && !isMobile">
-                &nbsp;{{userName}}
-              </span>
+              <span v-if="isSignedIn && !isMobile">&nbsp;{{ userName }}</span>
+              <span class="inline-block ml-1 border-t-[0.3em] border-x-[0.3em] border-x-transparent" aria-hidden="true"></span>
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent :data-bs-theme="isDarkMode ? 'dark' : ''">
-            <DropdownMenuLabel v-if="isSignedIn" class="d-flex flex-column">
+          <DropdownMenuContent>
+            <DropdownMenuLabel v-if="isSignedIn" class="flex flex-col">
               <span>{{ t('user.Fields.User') }} : {{ userName }}</span>
               <span>{{ t('user.Fields.CreatedAt') }} : {{ userCreatedAt }}</span>
-              <span class="d-flex align-items-center">{{ t('user.Fields.Level') }} :&nbsp;
-                <span v-if="remoteUserInfoFetched" class="badge" :class="{
-                  'text-bg-secondary': remoteUserInfo.userLevel === 'Standard',
-                  'text-bg-primary': remoteUserInfo.userLevel === 'Premium',
-                  'text-bg-dark': remoteUserInfo.userLevel === 'Owner' && !isDarkMode,
-                  'text-bg-light': remoteUserInfo.userLevel === 'Owner' && isDarkMode,
-                  'text-bg-success': remoteUserInfo.userLevel === 'Developer',
-                  'text-bg-warning': remoteUserInfo.userLevel === 'HonoraryMember',
-                }">{{ t('user.Level.' + remoteUserInfo.userLevel)}}</span>
+              <span class="flex items-center">{{ t('user.Fields.Level') }} :&nbsp;
+                <Badge v-if="remoteUserInfoFetched"
+                  :class="{
+                    'bg-neutral-500 text-white border-transparent': remoteUserInfo.userLevel === 'Standard',
+                    'bg-blue-600 text-white border-transparent': remoteUserInfo.userLevel === 'Premium',
+                    'bg-neutral-900 text-white border-transparent dark:bg-neutral-100 dark:text-neutral-900': remoteUserInfo.userLevel === 'Owner',
+                    'bg-green-600 text-white border-transparent': remoteUserInfo.userLevel === 'Developer',
+                    'bg-yellow-500 text-neutral-900 border-transparent': remoteUserInfo.userLevel === 'HonoraryMember',
+                  }">
+                  {{ t('user.Level.' + remoteUserInfo.userLevel) }}
+                </Badge>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
               <span>{{ t('user.Fields.FunctionUses') }} :&nbsp;
-                <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }}
-                  {{ t('user.Fields.Times') }}
-                </span>
+                <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
                 <span v-else>{{ t('user.Fields.Fetching') }}</span>
               </span>
             </DropdownMenuLabel>
             <template v-if="isSignedIn">
               <DropdownMenuItem @select="store.setTriggerAchievements(true)">
-                <i class="bi bi-award-fill"></i>&nbsp;{{t('user.MyAchievements')}}
+                <i class="bi bi-award-fill"></i>&nbsp;{{ t('user.MyAchievements') }}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </template>
@@ -144,7 +140,6 @@
       </div>
     </nav>
   </header>
-
 </template>
 
 <script setup>
@@ -154,6 +149,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -273,6 +269,14 @@ defineExpose({
   .jn-hamburger-button {
     display: none;
   }
+}
+
+/* refactor/01 C.2：汉堡包图标（原 navbar-toggler-icon 背景图） */
+.jn-hamburger-icon {
+  background: center/100% no-repeat url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2833, 37, 41, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+:global(.dark) .jn-hamburger-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 /* Logo 上的加载动画 */
