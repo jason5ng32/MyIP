@@ -1,215 +1,148 @@
 <template>
-    <!-- Sheet Preferences (refactor/01: 旧 offcanvas → shadcn-vue Sheet) -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent
             side="left"
             :title="t('nav.preferences.title')"
-            :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[400px] max-w-[400px]')"
-            :data-bs-theme="isDarkMode ? 'dark' : 'light'"
-        >
-        <div class="offcanvas-header mt-3 d-flex align-items-center justify-content-between px-3">
-            <h5 class="offcanvas-title m-0"><i class="bi bi-toggles"></i>&nbsp;&nbsp;{{
-                t('nav.preferences.title') }}
-            </h5>
-            <SheetClose class="btn-close" />
-        </div>
-        <div class="offcanvas-body pt-0 m-2">
-            <div class="preferences-tip">{{ t('nav.preferences.preferenceTips') }}</div>
-
-            <!-- 语言设置 -->
-
-            <div id="Pref_language">
-                <div class="form-label col-12 preferences-title"><i class="bi bi-translate"></i> {{
-                    t('nav.preferences.language') }}</div>
-                <div class="btn-group-vertical col-auto w-50 mb-2" role="group" aria-label="Color Scheme">
-                    <template v-for="lang in ['auto','zh', 'en', 'fr','tr']">
-                        <input type="radio" class="btn-check" :name="'language' + lang" :id="'language' + lang"
-                            autocomplete="off" :value="lang" v-model="userPreferences.lang"
-                            @change="prefLanguage(lang)">
-                        <label class="btn jn-number text-start" :class="{
-                            'btn-outline-dark': !isDarkMode,
-                            'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.lang === lang
-                        }" :for="'language' + lang">
-                            <span v-if="lang === 'zh'"><i class="fi fi-cn"></i> 中文&nbsp;</span>
-                            <span v-else-if="lang === 'en'"><i class="fi fi-us"></i> English&nbsp;</span>
-                            <span v-else-if="lang === 'fr'"><i class="fi fi-fr"></i> Français&nbsp;</span>
-                            <span v-else-if="lang === 'tr'"><i class="fi fi-tr"></i> Türkçe&nbsp;</span>
-                            <span v-else>{{ t('nav.preferences.systemAuto') }}&nbsp;</span>
-                            <i class="bi bi-check2-circle" v-if="userPreferences.lang === lang"></i>
-                        </label>
-                    </template>
-                </div>
-                <div class="preferences-tip">{{ t('nav.preferences.languageTips') }}</div>
+            :class="cn('overflow-y-auto pt-3', isMobile ? 'w-full max-w-full' : 'w-[400px] max-w-[400px]')">
+            <div class="mt-3 flex items-center justify-between px-3 pb-3 border-b border-neutral-200 dark:border-neutral-700">
+                <h5 class="m-0 text-lg font-semibold">
+                    <i class="bi bi-toggles"></i>&nbsp;&nbsp;{{ t('nav.preferences.title') }}
+                </h5>
+                <SheetClose />
             </div>
+            <div class="pt-0 m-2">
+                <div class="preferences-tip">{{ t('nav.preferences.preferenceTips') }}</div>
 
-            <!-- 主题方案 -->
-
-            <div id="Pref_colorScheme">
-                <div class="form-label col-12 preferences-title"><i class="bi bi-palette-fill"></i> {{
-                    t('nav.preferences.colorScheme') }}</div>
-                <div class="btn-group col-auto" role="group" aria-label="Color Scheme">
-                    <template v-for="theme in ['auto', 'light', 'dark']">
-                        <input type="radio" class="btn-check" :name="'darkMode' + theme" :id="'darkMode' + theme"
-                            autocomplete="off" :value="theme" v-model="userPreferences.theme"
-                            @change="prefTheme(theme)">
-                        <label class="btn" :class="{
-                            'btn-outline-dark': !isDarkMode,
-                            'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.theme === theme
-                        }" :for="'darkMode' + theme">
-                            <span v-if="theme === 'light'"><i class="bi bi-brightness-high"></i> {{
-                                t('nav.preferences.colorLight') }}</span>
-                            <span v-else-if="theme === 'dark'"><i class="bi bi-moon-stars"></i> {{
-                                t('nav.preferences.colorDark') }}</span>
+                <!-- 语言设置 -->
+                <div id="Pref_language">
+                    <div class="preferences-title"><i class="bi bi-translate"></i> {{ t('nav.preferences.language') }}</div>
+                    <ToggleGroup :model-value="userPreferences.lang" type="single" class="flex-col w-1/2 gap-0 mb-2"
+                        @update:model-value="(v) => v && prefLanguage(v)">
+                        <ToggleGroupItem v-for="lang in ['auto', 'zh', 'en', 'fr', 'tr']" :key="lang" :value="lang"
+                            class="justify-start w-full">
+                            <span v-if="lang === 'zh'"><i class="fi fi-cn"></i> 中文</span>
+                            <span v-else-if="lang === 'en'"><i class="fi fi-us"></i> English</span>
+                            <span v-else-if="lang === 'fr'"><i class="fi fi-fr"></i> Français</span>
+                            <span v-else-if="lang === 'tr'"><i class="fi fi-tr"></i> Türkçe</span>
                             <span v-else>{{ t('nav.preferences.systemAuto') }}</span>
-                        </label>
-                    </template>
+                            <i class="bi bi-check2-circle ml-2" v-if="userPreferences.lang === lang"></i>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                    <div class="preferences-tip">{{ t('nav.preferences.languageTips') }}</div>
                 </div>
-            </div>
 
-            <!-- IP 源 -->
-
-            <div id="Pref_ipCards">
-                <div class="form-label col-12 preferences-title">
-                    <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipSourcesToCheck') }}
+                <!-- 主题方案 -->
+                <div id="Pref_colorScheme">
+                    <div class="preferences-title"><i class="bi bi-palette-fill"></i> {{ t('nav.preferences.colorScheme') }}</div>
+                    <ToggleGroup :model-value="userPreferences.theme" type="single"
+                        @update:model-value="(v) => v && prefTheme(v)">
+                        <ToggleGroupItem v-for="theme in ['auto', 'light', 'dark']" :key="theme" :value="theme">
+                            <span v-if="theme === 'light'"><i class="bi bi-brightness-high"></i> {{ t('nav.preferences.colorLight') }}</span>
+                            <span v-else-if="theme === 'dark'"><i class="bi bi-moon-stars"></i> {{ t('nav.preferences.colorDark') }}</span>
+                            <span v-else>{{ t('nav.preferences.systemAuto') }}</span>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
-                <div class="btn-group col-auto w-50 mb-2" role="group" aria-label="ipCards">
-                    <template v-for="num in [3, 6]">
-                        <input v-model="userPreferences.ipCardsToShow" type="radio" class="btn-check"
-                            :name="'ipCards_' + num" :id="'ipCards_' + num" autocomplete="off" :value=num
-                            @change="prefipCards(num)">
-                        <label class="btn jn-number" :class="{
-                            'btn-outline-dark': !isDarkMode,
-                            'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.ipCardsToShow === num
-                        }" :for="'ipCards_' + num">{{ num
-                            }}</label>
-                    </template>
+
+                <!-- IP 源 -->
+                <div id="Pref_ipCards">
+                    <div class="preferences-title">
+                        <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipSourcesToCheck') }}
+                    </div>
+                    <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-1/2 mb-2"
+                        @update:model-value="(v) => v && prefipCards(Number(v))">
+                        <ToggleGroupItem v-for="num in [3, 6]" :key="num" :value="String(num)">
+                            {{ num }}
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                    <div class="preferences-tip">{{ t('nav.preferences.ipSourcesToCheckTips') }}</div>
                 </div>
-                <div class="preferences-tip">{{ t('nav.preferences.ipSourcesToCheckTips') }}</div>
-            </div>
 
-            <!-- IP 地理位置数据库 -->
-
-            <div id="Pref_ipGeoSource">
-                <div class="form-label col-12 preferences-title">
-                    <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipDB') }}
+                <!-- IP 地理位置数据库 -->
+                <div id="Pref_ipGeoSource">
+                    <div class="preferences-title">
+                        <i class="bi bi-ui-checks-grid"></i> {{ t('nav.preferences.ipDB') }}
+                    </div>
+                    <ToggleGroup :model-value="String(userPreferences.ipGeoSource)" type="single" class="flex-col w-1/2 gap-0 mb-2"
+                        @update:model-value="(v) => v !== null && v !== undefined && prefipGeoSource(Number(v))">
+                        <ToggleGroupItem v-for="ipdb in ipDBs" :key="ipdb.id" :value="String(ipdb.id)"
+                            :disabled="!ipdb.enabled"
+                            class="justify-start w-full">
+                            <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}</span>
+                            <i class="bi bi-check2-circle ml-2" v-if="userPreferences.ipGeoSource === ipdb.id"></i>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                    <div class="preferences-tip">{{ t('nav.preferences.ipDBTips') }}</div>
                 </div>
-                <div class="btn-group-vertical col-auto w-50 mb-2" role="group" aria-label="ipGeoSource">
-                    <template v-for="ipdb in ipDBs">
-                        <input v-model="userPreferences.ipGeoSource" type="radio" class="btn-check"
-                            :name="'ipGeoSource_' + ipdb.text" :id="'ipGeoSource_' + ipdb.id" autocomplete="off"
-                            :value=ipdb.id @change="prefipGeoSource(ipdb.id)">
-                        <label class="btn jn-number text-start" :class="{
-                            'btn-outline-dark': !isDarkMode,
-                            'btn-outline-light': isDarkMode,
-                            'active fw-bold': userPreferences.ipGeoSource === ipdb.id,
-                            'jn-disabled-button': !ipdb.enabled
-                        }" :for="'ipGeoSource_' + ipdb.id" :aria-disabled="!ipdb.enabled" :aria-label="ipdb.text">
-                            <span :class="[ipdb.enabled ? '' : 'jn-disabled-text']">{{ ipdb.text }}&nbsp;</span>
-                            <i class="bi bi-check2-circle" v-if="userPreferences.ipGeoSource === ipdb.id"></i>
-                        </label>
-                    </template>
-                </div>
-                <div class="preferences-tip">{{ t('nav.preferences.ipDBTips') }}</div>
-            </div>
 
-            <!-- 应用设置 -->
-
-            <div id="Pref_appSettings">
-                <div class="form-label col-12 preferences-title"><i class="bi bi-window-dock"></i> {{
-                    t('nav.preferences.appSettings') }}</div>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                        :class="[isDarkMode ? 'border-light' : 'border-dark']">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="autoStart">{{
-                                    t('nav.preferences.autoRun')
-                                    }}</label>
+                <!-- 应用设置 -->
+                <div id="Pref_appSettings">
+                    <div class="preferences-title"><i class="bi bi-window-dock"></i> {{ t('nav.preferences.appSettings') }}</div>
+                    <ul class="flex flex-col border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
+                        <li class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                            <div class="flex-1 mr-2">
+                                <div class="font-bold">
+                                    <label for="autoStart">{{ t('nav.preferences.autoRun') }}</label>
+                                </div>
+                                <div class="preferences-tip">{{ t('nav.preferences.autoRunTips') }}</div>
                             </div>
-                            <div class="preferences-tip">{{ t('nav.preferences.autoRunTips') }}</div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                type="checkbox" role="switch" id="autoStart" :checked="userPreferences.autoStart"
-                                @change="prefAutoStart($event.target.checked)">
-                        </div>
-                    </li>
+                            <Switch id="autoStart" :model-value="userPreferences.autoStart"
+                                @update:model-value="(v) => prefAutoStart(v)" />
+                        </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="userPreferences.autoStart">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="ConnectivityRefresh">{{
-                                    t('nav.preferences.connectivityAutoRefresh') }}</label></div>
-                            <div class="preferences-tip">{{ t('nav.preferences.connectivityAutoRefreshTips') }}</div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                type="checkbox" role="switch" id="ConnectivityRefresh"
-                                :checked="userPreferences.connectivityAutoRefresh"
-                                @change="prefConnectivityRefresh($event.target.checked)">
-                        </div>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="configs.map">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="showMap">{{
-                                    t('nav.preferences.showMap')
-                                    }}</label>
+                        <li v-if="userPreferences.autoStart"
+                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                            <div class="flex-1 mr-2">
+                                <div class="font-bold">
+                                    <label for="ConnectivityRefresh">{{ t('nav.preferences.connectivityAutoRefresh') }}</label>
+                                </div>
+                                <div class="preferences-tip">{{ t('nav.preferences.connectivityAutoRefreshTips') }}</div>
                             </div>
-                            <div class="preferences-tip">{{ t('nav.preferences.showMapTips') }}</div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                type="checkbox" role="switch" id="showMap" :checked="userPreferences.showMap"
-                                @change="prefShowMap($event.target.checked)">
-                        </div>
-                    </li>
+                            <Switch id="ConnectivityRefresh" :model-value="userPreferences.connectivityAutoRefresh"
+                                @update:model-value="(v) => prefConnectivityRefresh(v)" />
+                        </li>
 
-                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                        :class="[isDarkMode ? 'border-light' : 'border-dark']" v-if="isMobile">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="simpleMode">{{
-                                    t('nav.preferences.simpleMode')
-                                    }}</label></div>
-                            <div class="preferences-tip">{{ t('nav.preferences.simpleModeTips') }}</div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                type="checkbox" role="switch" id="simpleMode" :checked="userPreferences.simpleMode"
-                                @change="prefSimpleMode($event.target.checked)">
-                        </div>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-start"
-                        :class="[isDarkMode ? 'border-light' : 'border-dark']">
-                        <div class="me-auto">
-                            <div class="fw-bold"><label class="form-check-label" for="ConnectivityNotifications">{{
-                                    t('nav.preferences.popupConnectivityNotifications') }}</label>
+                        <li v-if="configs.map"
+                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                            <div class="flex-1 mr-2">
+                                <div class="font-bold">
+                                    <label for="showMap">{{ t('nav.preferences.showMap') }}</label>
+                                </div>
+                                <div class="preferences-tip">{{ t('nav.preferences.showMapTips') }}</div>
                             </div>
-                            <div class="preferences-tip">{{ t('nav.preferences.popupConnectivityNotificationsTips') }}
-                            </div>
-                        </div>
-                        <div class="form-check form-switch col-auto ">
-                            <input class="form-check-input" :class="[isDarkMode ? 'jn-check-dark' : 'jn-check-light']"
-                                type="checkbox" role="switch" id="ConnectivityNotifications"
-                                :checked="userPreferences.popupConnectivityNotifications"
-                                @change="prefconnectivityShowNoti($event.target.checked)">
-                        </div>
-                    </li>
+                            <Switch id="showMap" :model-value="userPreferences.showMap"
+                                @update:model-value="(v) => prefShowMap(v)" />
+                        </li>
 
-                </ul>
+                        <li v-if="isMobile"
+                            class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                            <div class="flex-1 mr-2">
+                                <div class="font-bold">
+                                    <label for="simpleMode">{{ t('nav.preferences.simpleMode') }}</label>
+                                </div>
+                                <div class="preferences-tip">{{ t('nav.preferences.simpleModeTips') }}</div>
+                            </div>
+                            <Switch id="simpleMode" :model-value="userPreferences.simpleMode"
+                                @update:model-value="(v) => prefSimpleMode(v)" />
+                        </li>
+
+                        <li class="flex items-start justify-between p-3 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                            <div class="flex-1 mr-2">
+                                <div class="font-bold">
+                                    <label for="ConnectivityNotifications">{{ t('nav.preferences.popupConnectivityNotifications') }}</label>
+                                </div>
+                                <div class="preferences-tip">{{ t('nav.preferences.popupConnectivityNotificationsTips') }}</div>
+                            </div>
+                            <Switch id="ConnectivityNotifications" :model-value="userPreferences.popupConnectivityNotifications"
+                                @update:model-value="(v) => prefconnectivityShowNoti(v)" />
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="h-6 mb-5"></div>
             </div>
-
-            <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
-            </div>
-
-        </div>
         </SheetContent>
     </Sheet>
-
 </template>
 
 <script setup>
@@ -218,6 +151,8 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 const { t } = useI18n();
@@ -369,28 +304,8 @@ defineExpose({
     margin-top: 3pt;
 }
 
-.jn-number {
-    min-width: 40pt;
-}
-
-.jn-margin {
-    margin-top: 42pt;
-}
-
-.jn-placeholder {
-    height: 20pt;
-}
-
 .jn-disabled-text {
     opacity: 0.5;
     text-decoration: line-through;
-}
-
-.jn-disabled-button {
-    pointer-events: none;
-}
-
-#offcanvasPreferences {
-    z-index: 1053;
 }
 </style>

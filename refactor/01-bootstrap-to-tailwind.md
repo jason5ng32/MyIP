@@ -138,8 +138,8 @@
 - [x] `components/IpInfos.vue` — 把 row + `col-xl-*`/`col-md-*` 动态栅格换成 `flex flex-wrap -mx-2` + Tailwind 条件 w-_ 映射（1/2/3/4+ 张卡片分别对应 full/1-2/1-3/1-3）
 - [x] `components/Nav.vue` — `.navbar`/`.navbar-expand-lg`/`.container-xxl`/`.bg-body-tertiary`/`.dark-mode-nav`/`.navbar-brand`/`.navbar-toggler-icon`/`.nav-link`/`.btn-outline-light`/`.btn-dark`/`.dropdown-toggle`/`.badge text-bg-*` 全部替换为 Tailwind + dark: 变体；汉堡包图标保留 SVG data URI，移到 `jn-hamburger-icon` scoped class + `:global(.dark)` dark 变体
 - [x] `components/Achievements.vue` — Sheet header + Tabs；成就卡片 grid；`.alert alert-success/warning` → Tailwind 色块；成就卡片 .jn-achievements-card-dark 合并为 `:global(.dark) .jn-achievements-card`；`.text-secondary` + conditional 'text-light' 合并为 `text-neutral-500 dark:text-neutral-100`
-- [ ] `components/widgets/Preferences.vue`
-- [ ] `components/widgets/Toast.vue`（应该已经是纯 sonner，无模板）
+- [x] `components/widgets/Preferences.vue` — 全部 btn-group radio 模式 → `<ToggleGroup>`；所有 form-check-input/form-switch → shadcn `<Switch>`；`.list-group.list-group-item` → Tailwind flex 列表；移除所有 `.dark-mode-*` / `.btn-outline-dark/light` / `.form-check-input jn-check-dark/light` 条件类
+- [x] `components/widgets/Toast.vue` — 无工作：已在阶段 B 完成（sonner，仅包装 `<Sonner />`，无模板 Bootstrap class）
 - [ ] `App.vue` 模板部分（注意：App.vue 大改要协调 02 任务）
 
 C.2 全部完成之后 → 进入阶段 E（卸载 bootstrap 和 CSS import）。
