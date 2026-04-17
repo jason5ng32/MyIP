@@ -36,7 +36,7 @@
 
           <!-- 端点状态行：超长 IPv6 通过字号降级保持单行显示；
                resolved 时整行（label + IP）一起缩放，保持视觉节奏一致 -->
-          <div class="flex items-center gap-1.5 mb-3 min-w-0">
+          <div class="flex items-center gap-1.5 mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(leak) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>

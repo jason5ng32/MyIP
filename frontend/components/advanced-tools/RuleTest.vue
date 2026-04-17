@@ -13,8 +13,9 @@
                         <div class="flex items-center gap-2 min-w-0">
                             <SignpostBig class="size-6 text-muted-foreground shrink-0" />
                             <span class="text-base font-medium truncate">{{ test.name }}</span>
+                            <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
                         </div>
-                        <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
+
                     </div>
 
                     <!-- URL（次要信息） -->
@@ -23,7 +24,7 @@
                     </p>
 
                     <!-- IP 行：状态灯 + IP（长 IPv6 字号降级） -->
-                    <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
+                    <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
                         <span class="relative flex shrink-0">
                             <span v-if="toneOf(test) === 'wait'"
                                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>

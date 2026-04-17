@@ -34,7 +34,7 @@
           </p>
 
           <!-- IP 行：超长 IPv6 通过字号降级保持单行显示，不再换行 -->
-          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0">
+          <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(stun) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
