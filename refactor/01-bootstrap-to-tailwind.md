@@ -2,7 +2,14 @@
 
 **目标**：彻底移除 Bootstrap，UI 层完全迁移到 Tailwind v4 + shadcn-vue，bootstrap-icons 替换为 lucide-vue-next。最终 `package.json` 不再依赖 `bootstrap` / `bootstrap-icons`。
 
-**状态**：🟢 进行中（阶段 A + B 已完成；B 保留了 `import 'bootstrap'` 用于 Dropdown/Collapse/Tab/ScrollSpy 这四类剩余部件，会在阶段 C 收尾）
+**状态**：🟢 进行中
+
+- 阶段 A（基建）：✅ 完成
+- 阶段 B（命令式 Bootstrap JS 替换：Toast / Tooltip / Modal / Offcanvas）：✅ 完成
+- 阶段 C 的"JS 部件收尾"部分（Dropdown / Collapse / Accordion / Tabs / ScrollSpy 换成 shadcn-vue 或删除）：✅ 完成
+- **结果**：Bootstrap JS 已完全不需要；`import 'bootstrap'` 已从 `main.js` 删除；`bootstrap` 包保留在 `package.json`（因为 `bootstrap.min.css` 仍然作为视觉层的地基被加载）
+- 阶段 C 的"视觉层改写"部分：⏸️ 暂停。曾尝试用 `@apply` compat shim 一次性代替 Bootstrap CSS（commit 254b081），造成大面积视觉回归，已 revert（commit 3c28014）。后续正确做法：**逐组件改写模板 class**，每个组件一个 commit、一次视觉验证，不再引入 shim 层
+- 阶段 D（bootstrap-icons → lucide）和阶段 E（最终卸载）：🟡 未开始，不阻塞当前功能
 
 **影响范围**：30+ Vue 文件、router/index.js 中的 DOM 操作、main.js 中的全局 tooltip 指令、style/style.css。
 
@@ -48,44 +55,76 @@
   - [x] 新增 `store.openSheet` 单字段 + `setOpenSheet` / `toggleSheet` actions
   - [x] 安装 `tw-animate-css` 支持 Tailwind v4 的 animate-in/out 工具类
 - [x] **删除 `router/index.js` 里对 `document.getElementById('offcanvasTools')` 的命令式操作**，改为 store 状态驱动 Sheet 开合
-- [ ] ~~删除 `main.js` 里的 `import 'bootstrap'`~~ **推迟到阶段 C**：仓库中仍有 Dropdown / Collapse / Tab / ScrollSpy 四类 Bootstrap JS 小部件通过 `data-bs-toggle="dropdown|collapse|tab"` 和 `data-bs-spy="scroll"` 驱动（Nav.vue, DnsResolver.vue, Whois.vue, SecurityChecklist.vue, MtrTest.vue, IPCard.vue, Achievements.vue, App.vue）。这些会在阶段 C 视觉层重写时一并换成 shadcn-vue 对应组件（DropdownMenu / Collapsible / Tabs / 手写 scrollspy），届时再删除 `import 'bootstrap'` 和 bootstrap CSS。
+- [x] 删除 `main.js` 里的 `import 'bootstrap'`（所有 Bootstrap JS 部件已迁完，JS 是死代码，安全删除；Bootstrap CSS 仍通过 `style.css` 加载）
 
 ## 阶段 C — 视觉层批量重写
 
-> **前置**：阶段 B 遗留的 4 类 Bootstrap JS 小部件必须在阶段 C 里清掉，才能最终删除 `import 'bootstrap'`：
->
-> - **Dropdown** (`data-bs-toggle="dropdown"`) → shadcn-vue `DropdownMenu`
->   - `components/Nav.vue`（用户菜单）
->   - `components/advanced-tools/DnsResolver.vue`
-> - **Collapse** (`data-bs-toggle="collapse"`) → shadcn-vue `Collapsible` 或 `Accordion`
->   - `components/advanced-tools/Whois.vue`
->   - `components/advanced-tools/SecurityChecklist.vue`
->   - `components/advanced-tools/MtrTest.vue`
->   - `components/ip-infos/IPCard.vue`
->   - **已知问题（阶段 B 结束时观察到）**：Bootstrap Collapse 动画仍能展开，但展开后内容立刻变成空白。怀疑原因：Tailwind Preflight 或 `tw-animate-css` 的规则与 Bootstrap 的 `.collapsing` / `.collapse.show` 状态样式发生干扰；或 `data-[state=closed]:animate-out` 这类属性选择器以不当方式匹配到了 collapse 元素。阶段 C 直接换成 `Collapsible` 即可消除，不必在阶段 B 单独修复。
-> - **Tab** (`data-bs-toggle="tab"`) → shadcn-vue `Tabs`
->   - `components/Achievements.vue`
->   - `components/Footer.vue`（About 的三栏切换，当前是 radio input 实现，若保留原样可跳过）
-> - **ScrollSpy** (`data-bs-spy="scroll"`) → 手写 IntersectionObserver 或去掉（`store.currentSection` 已被 Patch.vue 以滚动监听驱动，可能不再需要 scrollspy）
->   - `App.vue`
+### C.1（已完成）— 清掉 4 类剩余的 Bootstrap JS 部件 ✅
 
-按以下顺序，每个组件做完后单独 commit：
+- [x] **Dropdown** (`data-bs-toggle="dropdown"`) → shadcn-vue `DropdownMenu`
+  - [x] `components/Nav.vue`（用户菜单）
+  - [x] `components/advanced-tools/DnsResolver.vue`
+- [x] **Collapse / Accordion** (`data-bs-toggle="collapse"`) → shadcn-vue `Collapsible` 或 `Accordion`（新建 `components/ui/collapsible/` + `components/ui/accordion/`）
+  - [x] `components/advanced-tools/Whois.vue`（Accordion 单选，默认展开第一项）
+  - [x] `components/advanced-tools/SecurityChecklist.vue`（两处：分类 intro = Collapsible；每项 info = v-show 字典，因为 table row 结构不适合 Collapsible 包裹）
+  - [x] `components/advanced-tools/MtrTest.vue`（Accordion 单选）
+  - [x] `components/ip-infos/IPCard.vue`（ASN info = Collapsible；简化 per-card 状态为单 ref）
+  - [x] 连带修了 Bootstrap Collapse 展开后内容变空白的 bug
+- [x] **Tab** (`data-bs-toggle="tab"`) → shadcn-vue `Tabs`
+  - [x] `components/Achievements.vue`（Get / NotGet 切换）
+- [x] **ScrollSpy** (`data-bs-spy="scroll"`) → 删除（Patch.vue 的 `checkSectionsAndTrack` 已经在做同样的事，scrollspy 是冗余）
+  - [x] `App.vue`
 
-- [ ] `components/Nav.vue`（含暗色模式样式收敛）
-- [ ] `components/IpInfos.vue` + `components/ip-infos/` 子组件（IPCard / ASNInfo / DataPairBar）
-- [ ] `components/ConnectivityTest.vue`
-- [ ] `components/WebRtcTest.vue`
-- [ ] `components/DnsLeaksTest.vue`
-- [ ] `components/SpeedTest.vue`
-- [ ] `components/Advanced.vue`
-- [ ] `components/advanced-tools/` 全部 11 个组件
-- [ ] `components/Achievements.vue`
-- [ ] `components/Additional.vue`
-- [ ] `components/Footer.vue`
-- [ ] `components/widgets/Preferences.vue`
+### C.2（暂停，待重新启动）— 模板层 Bootstrap class → Tailwind/shadcn-vue
+
+**教训**：曾在 commit 254b081 尝试"一次性写 @apply compat shim 替代整份 bootstrap.min.css"的偷懒做法，导致大面积视觉回归（~168 个 class 的 shim 映射值对不上 Bootstrap 精确色/间距，加上 Tailwind Preflight 干扰），已于 commit 3c28014 revert。
+
+**后续正确做法**：每个组件单独一个 commit。
+
+- 先从视觉最简单的组件开始（例如 Footer / widgets/InfoMask）
+- 每次打开一个组件，把其模板中的 `.btn / .card / .row / .col-* / .d-flex / .text-* / .bg-*` 等 Bootstrap class 直接改成 Tailwind 工具类表达 + shadcn-vue 现有原子组件
+- 改完后人眼对比改动前后视觉差异，保证可接受再 commit
+- 不引入任何 compat 中介层
+- 所有组件 C.2 都改完之后，`style.css` 里的 bootstrap CSS import 才能删，bootstrap 包才能卸载
+
+建议顺序（按视觉复杂度从低到高）：
+
 - [ ] `components/widgets/InfoMask.vue`
 - [ ] `components/widgets/PWA.vue`
+- [ ] `components/widgets/Patch.vue`（无模板，可能无工作）
+- [ ] `components/Footer.vue`
+- [ ] `components/Additional.vue`
+- [ ] `components/svgicons/*`（纯 SVG，可能无工作）
+- [ ] `components/widgets/Help.vue`
+- [ ] `components/widgets/QueryIP.vue`
+- [ ] `components/User.vue`
+- [ ] `components/ConnectivityTest.vue`
+- [ ] `components/DnsLeaksTest.vue`
+- [ ] `components/WebRtcTest.vue`
+- [ ] `components/advanced-tools/Empty.vue`
+- [ ] `components/advanced-tools/BrowserInfo.vue`
+- [ ] `components/advanced-tools/MacChecker.vue`
+- [ ] `components/advanced-tools/RuleTest.vue`
+- [ ] `components/advanced-tools/DnsResolver.vue`
+- [ ] `components/advanced-tools/Whois.vue`
+- [ ] `components/advanced-tools/GlobalLatencyTest.vue`
+- [ ] `components/advanced-tools/CensorshipCheck.vue`
+- [ ] `components/advanced-tools/MtrTest.vue`
+- [ ] `components/advanced-tools/SecurityChecklist.vue`
+- [ ] `components/advanced-tools/InvisibilityTest.vue`
+- [ ] `components/Advanced.vue`
+- [ ] `components/SpeedTest.vue`
+- [ ] `components/ip-infos/DataPairBar.vue`
+- [ ] `components/ip-infos/ASNInfo.vue`
+- [ ] `components/ip-infos/IPCard.vue`
+- [ ] `components/IpInfos.vue`
+- [ ] `components/Nav.vue`（含暗色模式样式收敛）
+- [ ] `components/Achievements.vue`
+- [ ] `components/widgets/Preferences.vue`
+- [ ] `components/widgets/Toast.vue`（应该已经是纯 sonner，无模板）
 - [ ] `App.vue` 模板部分（注意：App.vue 大改要协调 02 任务）
+
+C.2 全部完成之后 → 进入阶段 E（卸载 bootstrap 和 CSS import）。
 
 ## 阶段 D — 图标迁移
 

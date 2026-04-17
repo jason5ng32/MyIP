@@ -4,11 +4,11 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
-// refactor/01：Modal / Offcanvas / Toast / Tooltip 已替换为 shadcn-vue，
-// 但 Dropdown / Collapse / Tab / ScrollSpy 仍在各组件用 data-bs-toggle 驱动，
-// 所以暂时保留 `import 'bootstrap'` 以维持它们的行为。这些部件会在阶段 C
-// 视觉层重写时一并迁移，届时该 import 与 bootstrap CSS 一起删除。
-import 'bootstrap';
+// refactor/01：所有 Bootstrap JS 部件（Modal / Offcanvas / Toast / Tooltip /
+// Dropdown / Collapse / Accordion / Tab / ScrollSpy）均已迁移到 shadcn-vue
+// 或等价实现，bootstrap 的 JS 不再需要。Bootstrap 的 CSS 仍通过 style.css
+// 的 @import 加载，为模板里的 .btn / .card / .row 等 class 提供样式，
+// 直到未来逐组件改写为 Tailwind 直接表达时才会删除 @import。
 import { analytics } from './utils/use-analytics';
 import { registerServiceWorker } from './utils/register-service-worker';
 
