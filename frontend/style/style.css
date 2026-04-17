@@ -1,6 +1,196 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.min.css';
-@import 'flag-icons/css/flag-icons.min.css';
+/* refactor/01 stage D+E 完成：Bootstrap + bootstrap-icons 全部移除，图标改用 lucide-vue-next
+   refactor/02 收尾：flag-icons 也全部迁到 circle-flags（@iconify-json/circle-flags），
+   不再需要 flag-icons 包的 CSS */
+
+/* === Tailwind v4 + shadcn-vue 基建 === */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* refactor/01 C.2 收尾：Tailwind Preflight 清空了 h1-h6/p 的默认排版，恢复项目需要的基础排版 */
+@layer base {
+  h1 { font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h2 { font-size: 2rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h3 { font-size: 1.75rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h4 { font-size: 1.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h5 { font-size: 1.25rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h6 { font-size: 1rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  p  { margin-bottom: 1rem; }
+
+  /* shadcn-vue + Tailwind v4 必需的一条补丁：
+     Tailwind v4 里裸 `border` utility 的颜色回落到 currentColor（黑/白），
+     不再像 v3 那样默认 gray-200。shadcn-vue 组件（Card / DropdownMenuContent /
+     Dialog 等）class 列表里都是裸 `border`，没加颜色，会吃到 text 色变成
+     "黑边框"。把默认 border color 绑回设计 token --border 恢复预期行为。
+     参考：https://ui.shadcn.com/docs/tailwind-v4 */
+  *, ::before, ::after {
+    border-color: var(--border);
+  }
+}
+
+/* 暗色模式：用 .dark class 触发（由 store.isDarkMode 同步到 <html>） */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 设计 tokens — shadcn-vue 标准 CSS 变量 + 项目自定义语义色
+   ---------------------------------------------------------
+   自定义 token 规则：
+   - info     = 信息/进行中/等待（配合 animate-ping 状态灯）   ≈ sky-500
+   - success  = 成功/OK-fast                                    ≈ green-500
+   - warning  = 警告/OK-slow                                    ≈ amber-500
+   - destructive 继续用 shadcn 原生，对应 fail / error          ≈ red-500
+
+   每个语义色都带 foreground 配对，用在 bg-* 上时文字色自动正确
+   （amber 亮色所以 foreground 是深色；sky / green / red 深色所以
+   foreground 是白）。明暗模式通过 :root / .dark 独立定义，用 token
+   的地方不需要再写 dark: 变体。
+*/
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* 项目自定义语义色（light mode，取 Tailwind *-500 对应 oklch 值）*/
+  --info: oklch(0.685 0.169 237.323);         /* sky-500 */
+  --info-foreground: oklch(0.985 0 0);
+  --success: oklch(0.63 0.17 149);      /* green-500 */
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.769 0.188 70.08);        /* amber-500 */
+  --warning-foreground: oklch(0.145 0 0);
+  --action: oklch(0.623 0.214 259.815);       /* blue-500 —— "run action" 专用 */
+  --action-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* dark mode 下略提亮（对应 Tailwind *-400，暗背景下可读性更好）*/
+  --info: oklch(0.746 0.16 232.661);          /* sky-400 */
+  --info-foreground: oklch(0.145 0 0);
+  --success: oklch(0.792 0.209 151.711);      /* green-400 */
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.828 0.189 84.429);       /* amber-400 */
+  --warning-foreground: oklch(0.145 0 0);
+  /* action 不跟 info/success/warning 走"暗模式提亮"的套路——它是 filled 按钮的
+     品牌色（"点这里触发"），两种模式下保持相同的 blue-500 + 白字，视觉识别一致 */
+  --action: oklch(0.623 0.214 259.815);       /* blue-500（跟 light mode 保持一致） */
+  --action-foreground: oklch(0.985 0 0);      /* 白色文字 */
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.15);
+  --ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+/* vaul 默认给 [data-vaul-drawer] 注入了
+     @media (hover:hover) and (pointer:fine) { user-select: none }
+   原意是避免拖拽手势跟文字选择冲突。我们在 Drawer 组件里把 handleOnly 默认
+   设成 true（只有把手可拖拽，正文不再响应拖拽），所以这个限制就是 bug 了——
+   用户在桌面下想选中 drawer 里的文字会选不中。
+   两个坑：
+   1. vaul 的 <style> 是在 JS 里 document.head.appendChild 的，source order 比
+      style.css 晚；同 specificity 时后者胜 → 必须用 !important 强制
+   2. user-select: auto 在父级是 none 时会被解析回 none（MDN 规则）→ 必须用
+      显式的 text；而且要显式覆盖后代元素，不能依赖继承 */
+@media (hover: hover) and (pointer: fine) {
+  [data-vaul-drawer],
+  [data-vaul-drawer] * {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+}
+
+/* === 基建 end === */
+
+/* refactor/01 阶段 C：reka-ui Collapsible / Accordion 展开收起动画
+   CollapsibleContent 会挂出 CSS 变量 --reka-collapsible-content-height
+   AccordionContent   会挂出 CSS 变量 --reka-accordion-content-height */
+@keyframes jn-collapsible-down {
+  from { height: 0; }
+  to { height: var(--reka-collapsible-content-height); }
+}
+@keyframes jn-collapsible-up {
+  from { height: var(--reka-collapsible-content-height); }
+  to { height: 0; }
+}
+@keyframes jn-accordion-down {
+  from { height: 0; }
+  to { height: var(--reka-accordion-content-height); }
+}
+@keyframes jn-accordion-up {
+  from { height: var(--reka-accordion-content-height); }
+  to { height: 0; }
+}
+.jn-collapsible-content[data-state='open'] {
+  animation: jn-collapsible-down 200ms ease-out;
+}
+.jn-collapsible-content[data-state='closed'] {
+  animation: jn-collapsible-up 200ms ease-out;
+}
+.jn-accordion-content[data-state='open'] {
+  animation: jn-accordion-down 200ms ease-out;
+}
+.jn-accordion-content[data-state='closed'] {
+  animation: jn-accordion-up 200ms ease-out;
+}
 
 .jn-title {
   display: flex;
@@ -42,36 +232,15 @@
   border: 1px solid #9c9c9c2e;
 }
 
-.jn-ip-card1 {
-  min-height: 588px;
-}
-
-.jn-ip-card2 {
-  min-height: 388px;
-}
-
-.jn-hover-card {
-  transition: all 0.4s;
-}
-
-.jn-hover-card:hover {
-  transform: translateY(-6pt);
-}
-
+/* 键盘导航高亮：用 outline 替代原来的 ::after。
+   outline 不占布局、不需要 position:relative 锚定、不会和 .jn-card 自带的
+   box-shadow 冲突，也不会像 position:absolute 的 ::after 那样在没有定位祖先时
+   回落到 <html> 的 initial containing block 画出文档级长线。*/
 .jn-card.keyboard-hover {
-  border-color: rgba(20, 184, 108, 0.42);
-}
-
-.jn-card.keyboard-hover::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  border: 1px solid rgba(20, 184, 108, 0.42);
-  height: 100%;
-  pointer-events: none;
-  border-radius: 4pt;
+  border-color: rgba(20, 184, 108, 0.5);
+  outline: 2px solid rgba(20, 184, 108, 0.5);
+  outline-offset: -1px;
+  border-radius: var(--radius);
 }
 
 .jn-container {
@@ -98,20 +267,6 @@
   padding: 12px 4px 12px 4px;
   display: flex;
   margin: 0;
-}
-
-.jn-opacity {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.jn-map-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 0;
-  overflow: hidden;
 }
 
 .jn-navbar-top {
@@ -266,10 +421,6 @@ footer {
 
 .jn-speedtest-number {
   font-size: 2em;
-}
-
-.jn-ip-font {
-  zoom: 0.8;
 }
 
 .jn-ip-score {

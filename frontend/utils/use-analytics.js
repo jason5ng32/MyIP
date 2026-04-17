@@ -1,5 +1,7 @@
 // 引入 Google Analytics 配置
-const MEASUREMENT_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID || '';
+// import.meta.env 只在 Vite 下存在；Node / 测试环境访问 .env 会得到 undefined，
+// 因此用可选链兜底，避免模块顶层求值时抛 TypeError。
+const MEASUREMENT_ID = import.meta.env?.VITE_GOOGLE_ANALYTICS_ID || '';
 
 // 全局状态
 let scriptInjected = false;

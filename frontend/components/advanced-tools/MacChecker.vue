@@ -1,117 +1,84 @@
 <template>
-    <!-- MAC Checker -->
-    <div class="mac-checker-section my-4">
-        <div class="text-secondary">
-            <p>{{ t('macchecker.Note') }}</p>
+    <div class="mac-checker-section my-4 space-y-4">
+        <!-- 顶部说明 -->
+        <p class="text-sm text-muted-foreground">{{ t('macchecker.Note') }}</p>
+
+        <!-- 输入区：label + InputGroup -->
+        <div class="space-y-2">
+            <label for="queryMAC" class="text-sm font-medium">{{ t('macchecker.Note2') }}</label>
+            <InputGroup>
+                <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore
+                    :disabled="macCheckStatus === 'running'"
+                    :placeholder="t('macchecker.Placeholder')"
+                    v-model="queryMAC" @keyup.enter="onSubmit" />
+                <Button variant="action"
+                    :disabled="macCheckStatus === 'running' || !queryMAC"
+                    @click="onSubmit">
+                    <Spinner v-if="macCheckStatus === 'running'" />
+                    {{ t('macchecker.Run') }}
+                </Button>
+            </InputGroup>
+            <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <div class="col-12 col-md-auto">
-                            <label for="queryMAC" class="col-form-label">{{ t('macchecker.Note2') }}</label>
-                        </div>
 
-                        <div class="input-group mb-2 mt-2 ">
-                            <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
-                                :disabled="macCheckStatus === 'running'" :placeholder="t('macchecker.Placeholder')"
-                                v-model="queryMAC" @keyup.enter="onSubmit" name="queryMAC" id="queryMAC" data-1p-ignore>
+        <!-- 结果区 -->
+        <Card v-if="macCheckResult.success" id="macCheckResult">
+            <CardContent class="p-4 md:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Manufacturer 详情 -->
+                    <section class="md:col-span-2 space-y-4">
+                        <header class="flex items-center gap-2">
+                            <Factory class="size-5 text-muted-foreground" />
+                            <h3 class="text-lg font-semibold tracking-tight m-0">
+                                {{ t('macchecker.manufacturer') }}
+                            </h3>
+                        </header>
 
-                            <button class="btn btn-primary" @click="onSubmit"
-                                :disabled="macCheckStatus === 'running' || !queryMAC">
-                                <span v-if="macCheckStatus !== 'running'">{{
-                                    t('macchecker.Run') }}</span>
-                                <span v-else class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
-                            </button>
-
-                        </div>
-                        <div class="jn-placeholder">
-                            <p v-if="errorMsg" class="text-danger">{{ errorMsg }}</p>
-                        </div>
-
-                        <!-- Result Display -->
-
-                        <div id="macCheckResult" class="row" v-if="macCheckResult.success">
-                            <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                                    <div class="card-body row">
-                                        <h3 class="mb-4">{{ t('macchecker.manufacturer') }}</h3>
-                                        <div class="col-lg-6 col-md-6 col-12">
-                                            <div class="jn-detail" v-for="item in leftItems" :key="item.key">
-                                                <span>
-                                                    {{ t(`macchecker.${item.key}`) }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult[item.key] }}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-6 col-md-6 col-12">
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.company') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.company }}
-                                                </span>
-                                            </div>
-                                            <div v-if="macCheckResult.country !== 'N/A'" class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.country') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    <span
-                                                        :class="'jn-fl fi fi-' + macCheckResult.country.toLowerCase()"></span>
-                                                    {{ getCountryName(macCheckResult.country, lang) }}
-                                                </span>
-                                            </div>
-                                            <div class="jn-detail">
-                                                <span>
-                                                    {{ t('macchecker.address') }}
-                                                </span>
-                                                <span class="jn-con-title card-title mt-1">
-                                                    {{ macCheckResult.address }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                            <div v-for="item in leftItems" :key="item.key">
+                                <dt class="text-sm text-muted-foreground mb-0.5">{{ t(`macchecker.${item.key}`) }}</dt>
+                                <dd class="text-base font-medium wrap-break-word font-mono">{{ macCheckResult[item.key] }}</dd>
                             </div>
 
-                            <div class="col-lg-4 col-md-4 col-12 mb-4">
-                                <div class="card h-100" :class="{ 'dark-mode dark-mode-border': isDarkMode}">
-                                    <div class="card-body">
-                                        <h3 class="mb-4">{{ t('macchecker.property') }}</h3>
-                                        <div class="table-responsive text-nowrap">
-                                            <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">{{ t('macchecker.property') }}</th>
-                                                        <th scope="col">{{ t('macchecker.value') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="item in tableItems" :key="item.key">
-                                                        <td>{{ t(`macchecker.${item.key}`) }}</td>
-                                                        <td>
-                                                            <i class="bi"
-                                                                :class="macCheckResult[item.key] ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-secondary'"></i>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div>
+                                <dt class="text-sm text-muted-foreground mb-0.5">{{ t('macchecker.company') }}</dt>
+                                <dd class="text-base font-medium wrap-break-word">{{ macCheckResult.company }}</dd>
                             </div>
+                            <div v-if="macCheckResult.country !== 'N/A'">
+                                <dt class="text-sm text-muted-foreground mb-0.5">{{ t('macchecker.country') }}</dt>
+                                <dd class="text-base font-medium flex items-center gap-1.5 flex-wrap">
+                                    <Icon :icon="'circle-flags:' + macCheckResult.country.toLowerCase()"
+                                        class="shrink-0 size-4" />
+                                    <span class="wrap-break-word">{{ getCountryName(macCheckResult.country, lang) }}</span>
+                                </dd>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <dt class="text-sm text-muted-foreground mb-0.5">{{ t('macchecker.address') }}</dt>
+                                <dd class="text-base font-medium wrap-break-word">{{ macCheckResult.address }}</dd>
+                            </div>
+                        </dl>
+                    </section>
 
+                    <!-- Property 列表 -->
+                    <section class="space-y-4">
+                        <header class="flex items-center gap-2">
+                            <ListChecks class="size-5 text-muted-foreground" />
+                            <h3 class="text-lg font-semibold tracking-tight m-0">{{ t('macchecker.property') }}</h3>
+                        </header>
+
+                        <div class="rounded-lg border bg-card divide-y">
+                            <div v-for="item in tableItems" :key="item.key"
+                                class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                                <span>{{ t(`macchecker.${item.key}`) }}</span>
+                                <component :is="macCheckResult[item.key] ? CircleCheck : CircleX"
+                                    class="size-4 shrink-0"
+                                    :class="macCheckResult[item.key] ? 'text-success' : 'text-muted-foreground/50'" />
+                            </div>
                         </div>
-
-                    </div>
+                    </section>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     </div>
 </template>
 
@@ -121,74 +88,64 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/utils/country-name.js';
+import { CircleCheck, CircleX, Factory, ListChecks } from 'lucide-vue-next';
+import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 
 const macCheckResult = ref({});
-const macCheckStatus = ref("idle");
+const macCheckStatus = ref('idle');
 const queryMAC = ref('');
 const errorMsg = ref('');
 
-const leftItems = computed(() => {
-    return [
-        { key: 'macPrefix' },
-        { key: 'blockStart' },
-        { key: 'blockEnd' },
-        { key: 'blockSize' },
-        { key: 'blockType' }
-    ];
-});
+const leftItems = computed(() => [
+    { key: 'macPrefix' },
+    { key: 'blockStart' },
+    { key: 'blockEnd' },
+    { key: 'blockSize' },
+    { key: 'blockType' },
+]);
 
-const tableItems = computed(() => {
-    return [
-        { key: 'isRand' },
-        { key: 'isPrivate' },
-        { key: 'isMulticast' },
-        { key: 'isUnicast' },
-        { key: 'isLocal' },
-        { key: 'isGlobal' }
-    ];
-});
+const tableItems = computed(() => [
+    { key: 'isRand' },
+    { key: 'isPrivate' },
+    { key: 'isMulticast' },
+    { key: 'isUnicast' },
+    { key: 'isLocal' },
+    { key: 'isGlobal' },
+]);
 
-// 检查 MAC 是否有效
 const validateInput = (input) => {
     if (!input) return null;
-    // 清理所有的分隔符和空格
-    const normalizedInput = input.replace(/[:-]/g, '')
-        .replace(/\s+/g, '');
-    // 检查长度和格式
+    const normalizedInput = input.replace(/[:-]/g, '').replace(/\s+/g, '');
     if (normalizedInput.length < 6 || normalizedInput.length > 12 || !/^[0-9A-Fa-f]+$/.test(normalizedInput)) {
         errorMsg.value = t('macchecker.invalidMAC');
         return null;
     }
-
     return normalizedInput;
 };
 
-// 提交查询
 const onSubmit = () => {
     trackEvent('Section', 'StartClick', 'MACChecker');
     errorMsg.value = '';
     macCheckResult.value = {};
     const query = validateInput(queryMAC.value);
-    if (query) {
-        getMacInfo(query);
-    }
+    if (query) getMacInfo(query);
 };
 
-// 获取 MAC 信息
 const getMacInfo = async (query) => {
     macCheckStatus.value = 'running';
     try {
         const response = await fetch(`/api/macchecker?mac=${query}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         macCheckResult.value = data;
         macCheckStatus.value = 'idle';
@@ -198,20 +155,4 @@ const getMacInfo = async (query) => {
         errorMsg.value = t('macchecker.fetchError');
     }
 };
-
 </script>
-
-<style scoped>
-.jn-placeholder {
-    height: 16pt;
-}
-
-.jn-detail {
-    display: flex;
-    flex-direction: column;
-    align-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 10pt;
-}
-</style>

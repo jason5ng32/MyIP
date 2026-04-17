@@ -1,22 +1,27 @@
 <template>
-  <!-- IP Infos -->
-  <div class="ip-data-section mb-4 mt-4">
-    <div class="jn-title2">
-      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎 {{ t('ipInfos.Title') }}</h2>
-    </div>
-    <div class="text-secondary">
-      <p>{{ t('ipInfos.Notes') }}</p>
-    </div>
-    <div class="row">
-      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
-        'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
-      }]">
-        <IPCard :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile" :ipGeoSource="ipGeoSource"
-          :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus" :configs="configs"
-          :asnInfos="asnInfos" @refresh-card="refreshCard" />
+  <!-- IP Infos — 与其他重构过的模块一致的 section + header 结构 -->
+  <section class="ip-data-section mb-10 mt-4">
+    <header class="mb-3">
+      <h2 id="IPInfo" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+        🔎 {{ t('ipInfos.Title') }}
+      </h2>
+      <p class="my-3 text-base text-muted-foreground">{{ t('ipInfos.Notes') }}</p>
+    </header>
+
+    <!-- 卡片网格：CSS grid 自适应列数；items-stretch 让同行卡片自然等高，
+         不再需要 jn-ip-card1/2 的 min-height hack -->
+    <div class="grid gap-4 items-stretch"
+      :class="gridColsClass">
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
+        class="flex"
+        :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
+        <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
+          :ipGeoSource="ipGeoSource" :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed"
+          :copiedStatus="copiedStatus" :configs="configs" :asnInfos="asnInfos"
+          @refresh-card="refreshCard" />
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 
@@ -46,15 +51,13 @@ const lang = computed(() => store.lang);
 const isMapShown = computed(() => userPreferences.value.showMap);
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
-// 创建样式
-const colClass = computed(() => {
-  const numCards = ipCardsToShow.value;
-  if (numCards > 0) {
-    // 保证每行不超过三个卡片
-    const colSize = numCards > 3 ? 4 : Math.floor(12 / numCards);
-    return `col-xl-${colSize} col-md-${colSize}  mb-4`;
-  }
-  return 'col-xl-4 col-lg-6 col-md-6 mb-4'; // 默认情况
+// 卡片网格列数：基于 ipCardsToShow 动态选 tailwind grid-cols class
+// 1 张 → 单列；2 张 → md 起 2 列；3+ 张 → md 2 列、lg 3 列（避免每张过窄）
+const gridColsClass = computed(() => {
+  const n = ipCardsToShow.value;
+  if (n <= 1) return 'grid-cols-1';
+  if (n === 2) return 'grid-cols-1 md:grid-cols-2';
+  return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
 });
 
 // 默认卡片数据

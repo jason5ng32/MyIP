@@ -1,88 +1,85 @@
 <template>
-    <!-- DNS Resolver -->
-    <div class="dns-resolver-section my-4">
-        <div class="text-secondary">
-            <p>{{ t('dnsresolver.Note') }}</p>
-        </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body">
-                        <div class="col-12 col-md-auto">
-                            <label for="queryURL" class="col-form-label">{{ t('dnsresolver.Note2') }}</label>
-                        </div>
+    <div class="dns-resolver-section my-4 space-y-4">
+        <!-- 顶部说明 -->
+        <p class="text-sm text-muted-foreground">{{ t('dnsresolver.Note') }}</p>
 
+        <!-- 输入区 -->
+        <div class="space-y-3">
+            <label for="queryURL" class="text-sm font-medium block">{{ t('dnsresolver.Note2') }}</label>
 
-                        <div class="input-group mb-2 mt-2 ">
-                            <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
-                                :disabled="dnsCheckStatus === 'running'" :placeholder="t('dnsresolver.Placeholder')"
-                                v-model="queryURL" @keyup.enter="onSubmit" name="queryURL" id="queryURL" data-1p-ignore>
-
-                            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false"
-                                :disabled="dnsCheckStatus === 'running' || !queryURL">
-                                {{ queryType }} {{ t('dnsresolver.Record') }}
-                                <span class="visually-hidden">Choose Type</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li v-for="type in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT']" :key="type"
-                                    @click="changeType(type)">
-                                    <span class="dropdown-item">{{ type }}</span>
-                                </li>
-                            </ul>
-                            <button class="btn btn-primary" @click="onSubmit"
-                                :disabled="dnsCheckStatus === 'running' || !queryURL">
-                                <span v-if="dnsCheckStatus === 'idle'">{{
-                                    t('dnsresolver.Run') }}</span>
-                                <span v-if="dnsCheckStatus === 'running'" class="spinner-grow spinner-grow-sm"
-                                    aria-hidden="true"></span>
-                            </button>
-
-                        </div>
-                        <div class="jn-placeholder">
-                            <p v-if="errorMsg" class="text-danger">{{ errorMsg }}</p>
-                        </div>
-
-                        <!-- Results Table -->
-                        <div v-if="combinedResults && combinedResults.length">
-                            <div class="table-responsive text-nowrap">
-                                <table class="table table-hover" :class="{ 'table-dark': isDarkMode }">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">{{ t('dnsresolver.Provider') }}</th>
-                                            <th scope="col">{{ t('dnsresolver.Result') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(result, index) in combinedResults" :key="index">
-                                            <td>{{ result.provider }}</td>
-                                            <td :class="[result.address === 'N/A' ? 'opacity-50' : ''  ]">{{
-                                                result.address }}</td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- 记录类型选择器：6 档 → ToggleGroup 横向 -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
+                <ToggleGroup :model-value="queryType" type="single"
+                    @update:model-value="(v) => v && changeType(v)">
+                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type" class="h-8 px-3">
+                        {{ type }}
+                    </ToggleGroupItem>
+                </ToggleGroup>
             </div>
+
+            <!-- Input + Run：InputGroup 拼接 -->
+            <InputGroup>
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
+                    :disabled="dnsCheckStatus === 'running'"
+                    :placeholder="t('dnsresolver.Placeholder')"
+                    v-model="queryURL" @keyup.enter="onSubmit" />
+                <Button variant="action"
+                    :disabled="dnsCheckStatus === 'running' || !queryURL"
+                    @click="onSubmit">
+                    <Spinner v-if="dnsCheckStatus === 'running'" />
+                    {{ t('dnsresolver.Run') }}
+                </Button>
+            </InputGroup>
+            <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
+
+        <!-- 结果表 -->
+        <Card v-if="combinedResults && combinedResults.length">
+            <CardContent class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b">
+                                <th scope="col"
+                                    class="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                    {{ t('dnsresolver.Provider') }}
+                                </th>
+                                <th scope="col"
+                                    class="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                    {{ t('dnsresolver.Result') }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr v-for="(result, index) in combinedResults" :key="index"
+                                class="hover:bg-muted/50 transition-colors">
+                                <td class="px-4 py-2.5 whitespace-nowrap font-medium">{{ result.provider }}</td>
+                                <td class="px-4 py-2.5 font-mono wrap-break-word"
+                                    :class="result.address === 'N/A' ? 'text-muted-foreground/60' : ''">
+                                    {{ result.address }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </CardContent>
+        </Card>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useMainStore } from '@/store';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Spinner } from '@/components/ui/spinner';
 
 const { t } = useI18n();
-
-const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
-
 
 const queryURL = ref('');
 const queryType = ref('A');
@@ -90,23 +87,15 @@ const dnsCheckStatus = ref('idle');
 const errorMsg = ref('');
 const combinedResults = ref([]);
 
-// 检查 URL 输入是否有效
-const validateInput = (input) => {
-    // 检查是否包含协议头，若没有则尝试为其添加 http:// 以便进行 URL 格式验证
-    if (!input.match(/^https?:\/\//)) {
-        input = 'http://' + input;
-    }
+const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'];
 
+const validateInput = (input) => {
+    if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
         const hostname = url.hostname;
-
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) {
-            return hostname;
-        }
-    } catch {
-    }
-
+        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+    } catch { /* noop */ }
     errorMsg.value = t('dnsresolver.invalidURL');
     return null;
 };
@@ -120,20 +109,15 @@ const onSubmit = () => {
     errorMsg.value = '';
     const hostname = validateInput(queryURL.value);
     const type = queryType.value;
-    if (hostname) {
-        getDNSResults(hostname, type);
-    }
+    if (hostname) getDNSResults(hostname, type);
 };
 
-// 获取DNS结果
 const getDNSResults = async (hostname, type) => {
     combinedResults.value = [];
     dnsCheckStatus.value = 'running';
     try {
         const response = await fetch(`/api/dnsresolver?hostname=${hostname}&type=${type}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         processResults(data);
         dnsCheckStatus.value = 'idle';
@@ -146,24 +130,13 @@ const getDNSResults = async (hostname, type) => {
 };
 
 const processResults = (data) => {
-    const processEntries = (entries, type) => entries.map(entry => {
+    const processEntries = (entries, kind) => entries.map(entry => {
         const provider = Object.keys(entry)[0];
         const address = Array.isArray(entry[provider]) ? entry[provider].join(', ') : entry[provider];
-        return { provider: `${provider} (${type})`, address };
+        return { provider: `${provider} (${kind})`, address };
     });
 
-    if (data.result_dns) {
-        combinedResults.value.push(...processEntries(data.result_dns, 'DNS'));
-    }
-    if (data.result_doh) {
-        combinedResults.value.push(...processEntries(data.result_doh, 'DoH 🔒'));
-    }
+    if (data.result_dns) combinedResults.value.push(...processEntries(data.result_dns, 'DNS'));
+    if (data.result_doh) combinedResults.value.push(...processEntries(data.result_doh, 'DoH 🔒'));
 };
-
 </script>
-
-<style scoped>
-.jn-placeholder {
-    height: 16pt;
-}
-</style>

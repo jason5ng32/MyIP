@@ -1,362 +1,358 @@
 <template>
-    <div class="card jn-card keyboard-shortcut-card" :class="{
-            'dark-mode dark-mode-border': isDarkMode,
-            'jn-ip-card1 jn-hover-card': !isMobile && ipGeoSource === 0,
-            'jn-ip-card2 jn-hover-card': !isMobile && ipGeoSource !== 0,
-        }">
-        <div class="card-header jn-ip-title jn-link1"
-            :class="{ 'dark-mode-title': isDarkMode, 'bg-light': !isDarkMode }" style="font-weight: bold;">
-            <span>
-                <i class="bi" :class="'bi-' + (index + 1) + '-circle-fill'"></i>&nbsp;
-                {{ t('ipInfos.Source') }}: {{ card.source }}</span>
-            <button @click="$emit('refresh-card', card, index)"
-                :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']"
-                :aria-label="'Refresh' + card.source" v-tooltip="t('Tooltips.RefreshIPCard')">
-                <i class="bi bi-arrow-clockwise"></i></button>
-        </div>
-        <div class="p-3 placeholder-glow " :class="{
-            'dark-mode-title': isDarkMode,
-            'jn-link2-dark': isDarkMode,
-            'bg-light': !isDarkMode,
-            'jn-link2': !isDarkMode
-            }">
-            <span class="jn-text col-auto">
-                <i class="bi bi-pc-display-horizontal"></i>&nbsp;
-            </span>
-            <span v-if="card.ip" class="col-10" :class="{ 'jn-ip-font': (isMobile && card.ip.length > 32) }">
-                {{ card.ip }}&nbsp;
-                <i v-if="isValidIP(card.ip)"
-                    :class="copiedStatus[card.id] ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                    @click="copyToClipboard(card.ip, card.id)" role="button"
-                    v-tooltip="{ title: t('Tooltips.CopyIP'), placement: 'right' }" :aria-label="'Copy' + card.ip"></i>
-            </span>
-            <span v-else class="placeholder col-10"></span>
+    <!-- IP 信息卡 — shadcn Card 架构，三个可能的主体：正常 / 错误 / 加载 -->
+    <Card
+        class="keyboard-shortcut-card jn-card flex flex-col h-full overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <!-- 卡头：数字徽章 + 来源 + 刷新 -->
+        <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b">
+            <div class="flex items-center gap-2 min-w-0">
+                <span
+                    class="inline-flex items-center justify-center size-5 rounded-full bg-foreground text-background text-xs font-semibold shrink-0">
+                    {{ index + 1 }}
+                </span>
+                <span class="text-sm font-medium truncate">
+                    <span class="text-muted-foreground">{{ t('ipInfos.Source') }}:</span>
+                    {{ card.source }}
+                </span>
+            </div>
+            <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
+                <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
+                    @click="$emit('refresh-card', card, index)" :aria-label="'Refresh ' + card.source">
+                    <RotateCw class="size-4" />
+                </Button>
+            </JnTooltip>
         </div>
 
+        <!-- 主体分三态：正常 / 错误 / 加载 -->
+        <div class="flex-1 flex flex-col">
+            <!-- 正常态：IP + 可选 Map + 元数据 + (IPCheck.ing 源独有的) 高级数据 + ASN -->
+            <template v-if="hasData">
+                <!-- Hero IP 区 -->
+                <div class="px-4 py-3 flex items-center gap-2 min-w-0">
+                    <Monitor class="size-5 text-muted-foreground shrink-0" />
+                    <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0 min-h-5"
+                        :class="heroIpSizeClass(card.ip)" :title="card.ip">{{ card.ip }}</span>
+                    <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="left">
+                        <button type="button"
+                            class="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                            @click="copyToClipboard(card.ip, card.id)" :aria-label="'Copy ' + card.ip">
+                            <component :is="copiedStatus[card.id] ? ClipboardCheck : ClipboardPlus" class="size-4" />
+                        </button>
+                    </JnTooltip>
+                </div>
 
-        <div v-if="(card.asn) || card.ip === '2001:4860:4860::8888'
-            " class="card-body" :id="'IPInfo-' + (index + 1)">
-            <ul class="list-group list-group-flush" v-if="card.country_name">
+                <!-- Map（用户 preference 控制） -->
+                <div v-if="isMapShown && card.country_name"
+                    class="mx-4 mb-3 rounded-md overflow-hidden border bg-muted">
+                    <img :src="isDarkMode ? card.mapUrl_dark : card.mapUrl" class="w-full aspect-2/1 object-cover"
+                        alt="Map">
+                </div>
 
-                <img v-if="isMapShown" :src="isDarkMode ? card.mapUrl_dark : card.mapUrl"
-                    class="card-img-top jn-map-image" alt="Map">
+                <!-- 元数据网格：Country / Region / City / ISP -->
+                <dl v-if="card.country_name" class="px-4 pb-3 grid grid-cols-2 gap-x-3 gap-y-3 text-sm"
+                    :class="{ 'grid-cols-1!': isMobile && isCardsCollapsed }">
+                    <div>
+                        <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                            <MapPin class="size-3.5" />
+                            <span>{{ t('ipInfos.Country') }}</span>
+                        </dt>
+                        <dd class="font-normal flex items-center gap-1.5 flex-wrap">
+                            <Icon v-if="card.country_code" :icon="'circle-flags:' + card.country_code.toLowerCase()"
+                                class="shrink-0 size-4" />
+                            <span class="wrap-break-word">{{ card.country_name }}</span>
+                        </dd>
+                    </div>
 
-                <li class="jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode, 'mobile-list': isMobile && isCardsCollapsed }">
-                    <span class="jn-text col-auto">
-                        <i class="bi bi-geo-alt-fill"></i> {{ t('ipInfos.Country') }} :&nbsp;
-                    </span>
-                    <span class="col-10 ">
-                        {{ card.country_name }}
-                        <span v-if="card.country_code" :class="'jn-fl fi fi-' + card.country_code.toLowerCase()"></span>
-                    </span>
-                </li>
+                    <!-- 非 collapsed 模式下显示其它元数据 -->
+                    <template v-if="!isMobile || !isCardsCollapsed">
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <House class="size-3.5" />
+                                <span>{{ t('ipInfos.Region') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ card.region || '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <CornerUpRight class="size-3.5" />
+                                <span>{{ t('ipInfos.City') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ card.city || '—' }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <EthernetPort class="size-3.5" />
+                                <span>{{ t('ipInfos.ISP') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ card.isp || '—' }}</dd>
+                        </div>
+                    </template>
+                </dl>
 
-                <template v-if="!isMobile || !isCardsCollapsed">
-                    <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-houses"></i>
-                            {{ t('ipInfos.Region') }} :&nbsp;
-                        </span>
-                        <span class="col-10 ">
-                            {{ card.region }}
-                        </span>
-                    </li>
+                <!-- 高级数据块（仅 IPCheck.ing 源展示）：
+                    - 已登录：纯文本值，不对"是否代理/是否原生"做颜色评判；只有质量分保留语义色
+                    - 未登录：4 个字段压成 2×2 紧凑网格 + 单行 CTA 提示免费登录即可解锁 -->
+                <div v-if="!isMobile || !isCardsCollapsed" v-show="showAdvancedBlock"
+                    class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
-                    <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-sign-turn-right"></i>
-                            {{ t('ipInfos.City') }} :&nbsp;
-                        </span>
-                        <span class="col-10 ">
-                            {{ card.city }}
-                        </span>
-                    </li>
-
-                    <li class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-ethernet"></i>
-                            {{ t('ipInfos.ISP') }} :&nbsp;
-                        </span>
-                        <span class="col-10 ">
-                            {{ card.isp }}
-                        </span>
-                    </li>
-
-                    <li v-show=" ipGeoSource === 0 && card.type !== t('ipInfos.advancedData.type.unknownType')"
-                        class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-reception-4"></i>
-                            {{ t('ipInfos.type') }} :&nbsp;
-                        </span>
-                        <span v-if="card.type !=='sign_in_required'" class="col-10 ">
-                            {{ card.type }}
-                            <span v-if="card.proxyOperator !== 'unknown'">
-                                ( {{ card.proxyOperator }} )
+                    <!-- 未登录态 ———————————————————————————————————— -->
+                    <template v-if="allAdvancedLocked">
+                        <!-- CTA：单行 + Sign In 按钮；点击打开 Benefits 弹窗集中展示好处和登录入口 -->
+                        <span
+                            class="w-full flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground transition-colors group">
+                            <span class="flex items-center gap-1.5 min-w-0">
+                                <Lock class="size-3.5 shrink-0" />
+                                <span class="truncate">{{ t('ipInfos.advancedUnlockCta') }}</span>
                             </span>
                         </span>
 
-                        <span v-else class="col-8 text-secondary">
-                            {{ t('user.SignInToView') }}
-                        </span>
-                    </li>
+                        <!-- 2×2 紧凑字段菜单：纯预览，让用户知道登录后能看到什么 -->
+                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <div v-for="f in lockedFieldList" :key="f.key"
+                                class="flex items-center gap-1.5 text-muted-foreground">
+                                <component :is="f.icon" class="size-3.5 shrink-0" />
+                                <span class="text-xs truncate">{{ f.label }}</span>
+                                <span class="ml-auto text-muted-foreground/60">***</span>
+                            </div>
+                        </dl>
+                    </template>
 
+                    <!-- 已登录态 ———————————————————————————————————— -->
+                    <!-- 纯文本值排版：label 在前，值在后，不做颜色评判（只有 Quality 保留进度条语义色） -->
+                    <dl v-else class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm items-center">
+                        <template v-if="showTypeBadge">
+                            <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <SignalHigh class="size-3.5" />{{ t('ipInfos.type') }}
+                            </dt>
+                            <dd class="font-normal">{{ card.type }}</dd>
+                        </template>
 
-                    <li v-show="ipGeoSource === 0 && card.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
-                        class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-shield-fill-check"></i>
-                            {{ t('ipInfos.isProxy') }} :&nbsp;
-                        </span>
-                        <span v-if="card.isProxy !=='sign_in_required'" class="col-10 ">
-                            {{ card.isProxy }}
-                            <span v-if="card.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')">
-                                ( {{ card.proxyProtocol }} )
-                            </span>
-                        </span>
-                        <span v-else class="col-8 text-secondary">
-                            {{ t('user.SignInToView') }}
-                        </span>
-                    </li>
+                        <template v-if="showProxyBadge">
+                            <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <ShieldCheck class="size-3.5" />{{ t('ipInfos.isProxy') }}
+                            </dt>
+                            <dd class="font-normal">
+                                {{ card.isProxy }}<span
+                                    v-if="card.proxyProtocol && card.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')"
+                                    class="text-muted-foreground font-normal"> · {{ card.proxyProtocol }}</span>
+                            </dd>
+                        </template>
 
-                    <li v-show=" ipGeoSource === 0" class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-house-check"></i>
-                            {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;
-                        </span>
-                        <span v-if="card.isNativeIP !=='sign_in_required'" class="col-10 ">
-                            <span v-if="card.isNativeIP === true">
-                                <i class="bi bi-check-circle-fill"></i>
-                                {{t('ipInfos.advancedData.NativeIPYes')}}
-                            </span>
-                            <span v-else>
-                                <i class="bi bi-x-circle"></i>
-                                {{t('ipInfos.advancedData.NativeIPNo')}}
-                            </span>
-                        </span>
+                        <template v-if="showNativeBadge">
+                            <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <House class="size-3.5" />{{ t('ipInfos.advancedData.Nativeness') }}
+                            </dt>
+                            <dd class="font-normal flex items-center gap-1">
+                                <component :is="card.isNativeIP === true ? CircleCheck : CircleX"
+                                    class="size-3.5 text-muted-foreground" />
+                                {{ card.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
+                                t('ipInfos.advancedData.NativeIPNo') }}
+                            </dd>
+                        </template>
 
-                        <span v-else class="col-8 text-secondary">
-                            {{ t('user.SignInToView') }}
-                        </span>
-                    </li>
+                        <template v-if="showQualityScore">
+                            <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <Gauge class="size-3.5" />{{ t('ipInfos.qualityScore') }}
+                            </dt>
+                            <dd>
+                                <span v-if="card.qualityScore === 'unknown'" class="text-sm text-muted-foreground">
+                                    {{ t('ipInfos.qualityScoreUnknown') }}
+                                </span>
+                                <div v-else class="flex items-center gap-2">
+                                    <Progress :model-value="Number(card.qualityScore) || 0" class="h-2 flex-1 min-w-12"
+                                        :indicator-class="qualityTone === 'ok-fast' ? 'bg-success' : qualityTone === 'ok-slow' ? 'bg-warning' : 'bg-destructive'" />
+                                    <span class="text-sm font-normal tabular-nums shrink-0">{{ card.qualityScore
+                                        }}/100</span>
+                                </div>
+                            </dd>
+                        </template>
+                    </dl>
+                </div>
 
+                <!-- ASN 行 + 展开 -->
+                <div v-if="card.asn && (!isMobile || !isCardsCollapsed)" class="px-4 py-3 border-t mt-auto">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0 text-sm">
+                            <Building2 class="size-4 text-muted-foreground shrink-0" />
+                            <span class="text-xs text-muted-foreground shrink-0">{{ t('ipInfos.ASN') }}</span>
+                            <span class="font-mono font-normal truncate">{{ card.asn }}</span>
+                        </div>
+                        <JnTooltip v-if="card.asnlink && configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')"
+                            side="left">
+                            <button type="button"
+                                class="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                                @click="toggleASNCollapse(card.asn)" :aria-expanded="isAsnOpen"
+                                :aria-label="'Display AS Info of ' + card.asn">
+                                <component :is="isAsnOpen ? ChevronUp : ChevronDown" class="size-4" />
+                            </button>
+                        </JnTooltip>
+                    </div>
+                    <Collapsible :open="isAsnOpen" @update:open="isAsnOpen = $event">
+                        <CollapsibleContent class="pt-3">
+                            <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="card.asn" :asnInfos="asnInfos" />
+                        </CollapsibleContent>
+                    </Collapsible>
+                </div>
+            </template>
 
-                    <li v-show="ipGeoSource === 0" class="jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-speedometer"></i>
-                            {{ t('ipInfos.qualityScore') }} :&nbsp;
-                        </span>
-
-                        <span v-if="card.qualityScore !== 'unknown' && card.qualityScore !== 'sign_in_required'"
-                            class="col-5 jn-ip-score ">
-                            <span class="progress border jn-ip-score-progress"
-                                :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']" role="progressbar"
-                                aria-label="Quality Score" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
-                                    :style='"width:" + card.qualityScore +"%"'></span>
-                            </span>
-                        </span>
-
-                        <span v-if="card.qualityScore !== 'sign_in_required'" class="ps-2">
-                            <span v-if="card.qualityScore === 'unknown'">
-                                {{ t('ipInfos.qualityScoreUnknown') }}
-                            </span>
-                            <span v-else>{{ card.qualityScore }}/100 <i v-if="!isMobile"
-                                    v-tooltip="t('Tooltips.qualityScoreExplain')"
-                                    class="bi bi-question-circle"></i></span>
-                        </span>
-
-                        <span v-if="card.qualityScore === 'sign_in_required'" class="col-8 text-secondary">
-                            {{ t('user.SignInToView') }}
-                        </span>
-
-                    </li>
-
-                    <li class="jn-list-group-item border-0" :class="{ 'dark-mode': isDarkMode }">
-                        <span class="jn-text col-auto">
-                            <i class="bi bi-buildings"></i>
-                            {{ t('ipInfos.ASN') }} :&nbsp;
-                        </span>
-                        <!-- 确保图表在最右侧-->
-                        <span v-if="card.asnlink" class="col-9">
-                            {{ card.asn }}
-                            <i v-if="configs.cloudFlare" class="bi"
-                                :class="collapseStates[index] ? 'bi-caret-up-square' : 'bi-caret-down-square'"
-                                @click="toggleASNCollapse(card.asn, index)" data-bs-toggle="collapse"
-                                :data-bs-target="'#' + 'collapseASNInfo-' + index" aria-expanded="false"
-                                :aria-controls="'collapseASNInfo-' + index" role="button"
-                                :aria-label="'Display AS Info of' + card.asn"
-                                v-tooltip="{ title: t('Tooltips.ShowASNInfo'), placement: 'right' }">
-                            </i>
-                        </span>
-                        <span v-else-if="card.asn">{{ card.asn }}</span>
-                    </li>
-                </template>
-
-                <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="card.asn" :asnInfos="asnInfos" />
-            </ul>
-        </div>
-
-        <div v-else-if="(card.ip === t('ipInfos.IPv4Error')) || (card.ip === t('ipInfos.IPv6Error'))"
-            class="card-body  jn-ip-error">
-            <div>
+            <!-- 错误态 -->
+            <div v-else-if="isErrorState"
+                class="flex-1 flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
                 <IPErrorIcon />
+                <p class="text-sm text-destructive font-medium">{{ card.ip }}</p>
+            </div>
+
+            <!-- 加载态：skeleton rows -->
+            <div v-else class="flex-1 px-4 py-3 space-y-3">
+                <div v-for="(w, i) in placeholderSizes" :key="i" class="h-4 bg-muted rounded animate-pulse"
+                    :style="`width: ${(w / 12) * 100}%`"></div>
             </div>
         </div>
-
-        <div v-else class="card-body">
-            <ul class="list-group list-group-flush placeholder-glow">
-                <li v-for="(colSize, index) in placeholderSizes" :key="index" class="list-group-item jn-list-group-item"
-                    :class="{ 'dark-mode': isDarkMode }">
-                    <span :class="`placeholder col-${colSize}`"></span>
-                </li>
-            </ul>
-        </div>
-
-    </div>
+    </Card>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isValidIP } from '@/utils/valid-ip.js';
 import ASNInfo from './ASNInfo.vue';
 import IPErrorIcon from '../svgicons/IPError.vue';
 import { trackEvent } from '@/utils/use-analytics';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card';
+import { Icon } from '@iconify/vue';
+import {
+    Building2,
+    ChevronDown,
+    ChevronUp,
+    CircleCheck,
+    CircleHelp,
+    CircleX,
+    ClipboardCheck,
+    ClipboardPlus,
+    CornerUpRight,
+    EthernetPort,
+    Gauge,
+    House,
+    Lock,
+    MapPin,
+    Monitor,
+    RotateCw,
+    ShieldCheck,
+    SignalHigh,
+} from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const placeholderSizes = [12, 8, 6, 8, 4];
-
-// 追踪每个卡片的 collapse 状态
-const collapseStates = ref({});
+const isAsnOpen = ref(false);
 
 const props = defineProps({
-    card: {
-        type: Object,
-        required: true
-    },
-    index: {
-        type: Number,
-        required: true
-    },
-    isDarkMode: {
-        type: Boolean,
-        required: true
-    },
-    isMobile: {
-        type: Boolean,
-        required: true
-    },
-    ipGeoSource: {
-        type: Number,
-        required: true
-    },
-    isMapShown: {
-        type: Boolean,
-        required: true
-    },
-    isCardsCollapsed: {
-        type: Boolean,
-        required: true
-    },
-    copiedStatus: {
-        type: Object,
-        required: true
-    },
-    configs: {
-        type: Object,
-        required: true
-    },
-    asnInfos: {
-        type: Object,
-        required: true
-    }
+    card: { type: Object, required: true },
+    index: { type: Number, required: true },
+    isDarkMode: { type: Boolean, required: true },
+    isMobile: { type: Boolean, required: true },
+    ipGeoSource: { type: Number, required: true },
+    isMapShown: { type: Boolean, required: true },
+    isCardsCollapsed: { type: Boolean, required: true },
+    copiedStatus: { type: Object, required: true },
+    configs: { type: Object, required: true },
+    asnInfos: { type: Object, required: true }
 });
 
-// 定义事件
 const emit = defineEmits(['refresh-card', 'get-asn-info']);
 
-// 复制 IP 地址
+// 三态判定：有数据（正常）/ 错误 / 加载
+// 原版是 `(card.asn) || card.ip === '2001:4860:4860::8888'`，后者是 masked-info 在 signed-out 时兜底的假 IP
+const hasData = computed(() =>
+    Boolean(props.card.asn) || props.card.ip === '2001:4860:4860::8888'
+);
+const isErrorState = computed(() =>
+    props.card.ip === t('ipInfos.IPv4Error') || props.card.ip === t('ipInfos.IPv6Error')
+);
+
+// Hero IP 字号降级：hero 区字号比 WebRTC/DnsLeak 里的 IP 行大一档
+// ≤15 (IPv4) → 2xl；16-26 (压缩 IPv6) → xl；>26 (完整 IPv6) → base
+const heroIpSizeClass = (ip) => {
+    const len = typeof ip === 'string' ? ip.length : 0;
+    if (len <= 15) return 'text-xl';
+    if (len <= 26) return 'text-lg';
+    return 'text-sm';
+};
+
+// 高级数据块显示条件：仅 IPCheck.ing 源（ipGeoSource === 0）
+const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && hasData.value);
+
+// 所有高级字段都 sign_in_required → 只显示一条登录提示，比原先"每行都挂 Sign In"简洁很多
+const allAdvancedLocked = computed(() =>
+    props.card.type === 'sign_in_required' &&
+    props.card.isProxy === 'sign_in_required' &&
+    props.card.isNativeIP === 'sign_in_required' &&
+    props.card.qualityScore === 'sign_in_required'
+);
+
+// 单个 Badge 显示条件
+const showTypeBadge = computed(() =>
+    props.card.type && props.card.type !== 'sign_in_required'
+    && props.card.type !== t('ipInfos.advancedData.type.unknownType')
+);
+const showProxyBadge = computed(() =>
+    props.card.isProxy && props.card.isProxy !== 'sign_in_required'
+    && props.card.isProxy !== t('ipInfos.advancedData.proxyUnknown')
+);
+const showNativeBadge = computed(() =>
+    props.card.isNativeIP !== undefined && props.card.isNativeIP !== 'sign_in_required'
+);
+
+// 未登录态的 4 字段菜单：让用户看到登录能解锁的是哪些字段
+// 用 shallow-ref 风格的纯对象数组（lucide 组件直接作为值），循环渲染
+const lockedFieldList = computed(() => [
+    { key: 'type', icon: SignalHigh, label: t('ipInfos.type') },
+    { key: 'proxy', icon: ShieldCheck, label: t('ipInfos.isProxy') },
+    { key: 'native', icon: House, label: t('ipInfos.advancedData.Nativeness') },
+    { key: 'quality', icon: Gauge, label: t('ipInfos.qualityScore') },
+]);
+
+// Quality Score：≥80 ok-fast；50-80 ok-slow；<50 fail —— 复用已有 4 档 tone 语义
+const qualityTone = computed(() => {
+    const n = Number(props.card.qualityScore);
+    if (isNaN(n)) return 'wait';
+    if (n >= 80) return 'ok-fast';
+    if (n >= 50) return 'ok-slow';
+    return 'fail';
+});
+const showQualityScore = computed(() =>
+    props.card.qualityScore !== undefined && props.card.qualityScore !== 'sign_in_required'
+);
+
 const copyToClipboard = (ip, id) => {
     navigator.clipboard.writeText(ip).then(() => {
         props.copiedStatus[id] = true;
-        setTimeout(() => {
-            props.copiedStatus[id] = false;
-        }, 5000);
+        setTimeout(() => { props.copiedStatus[id] = false; }, 5000);
     }).catch(err => {
         console.error('Copy error', err);
     });
 };
 
-// 切换 ASN collapse 并获取信息
-const toggleASNCollapse = async (asn, index) => {
-    // 切换状态
-    collapseStates.value[index] = !collapseStates.value[index];
-
-    // 如果是打开状态，获取 ASN 信息
-    if (collapseStates.value[index]) {
+const toggleASNCollapse = async (asn) => {
+    isAsnOpen.value = !isAsnOpen.value;
+    if (isAsnOpen.value) {
         await getASNInfo(asn);
     }
 };
 
-// 从后端 API 获取 ASN 信息
 const getASNInfo = async (asn) => {
     trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
     try {
-        // 如果 asnInfos 中已有该 ASN 的信息，则直接返回
-        if (props.asnInfos[asn]) {
-            return;
-        }
+        if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-
         const response = await fetch(`/api/cfradar?asn=${asn}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {
-        console.error("Error fetching ASN info:", error);
+        console.error('Error fetching ASN info:', error);
     }
 };
 </script>
-
-<style scoped>
-.jn-link1 {
-    position: relative;
-}
-
-.jn-link2::before {
-    content: '';
-    position: absolute;
-    top: 34px;
-    left: 24px;
-    transform: translateX(-50%);
-    height: 40px;
-    width: 2px;
-    border-left: 2px dashed #212529;
-    z-index: 1;
-}
-
-.jn-link2-dark::before {
-    content: '';
-    position: absolute;
-    top: 34px;
-    left: 24px;
-    transform: translateX(-50%);
-    height: 40px;
-    width: 2px;
-    border-left: 2px dashed #e3e3e3;
-    z-index: 1;
-}
-
-.jn-ip-error {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    flex-direction: column;
-}
-
-.jn-ip-score-progress {
-    height: 16px;
-    border-radius: 8px;
-}
-</style>

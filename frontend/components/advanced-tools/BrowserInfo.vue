@@ -1,171 +1,100 @@
 <template>
-    <!-- Browser Info -->
-    <div class="browser-info-section my-4">
-        <div class="text-secondary">
+    <div class="browser-info-section my-4 space-y-4">
+        <!-- 顶部说明 -->
+        <div class="text-sm text-muted-foreground space-y-1.5">
             <p>{{ t('browserinfo.Note') }}</p>
             <p>{{ t('browserinfo.Note2') }}</p>
         </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <div class="card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
 
-                    <div class="card-body">
-                        <Transition name="slide-fade" mode="out-in">
-                            <div id="browserInfoResult" class="row" v-if="checkingStatus === 'finished'">
-                                <div class="col-lg-8 col-md-8 col-12 mb-4">
-                                    <div class="h-100">
-                                        <div class="card-body row"
-                                            :class="[isMobile ? 'p-1 border-1 border-bottom' : '']">
-                                            <h3 class="mb-4">{{ t('browserinfo.browser.Infos') }} <i
-                                                    class="bi bi-person-workspace"></i></h3>
-                                            <div class="jn-ua-box w-100">
-                                                <div class="alert alert-success jn-ua-box">
-                                                    <span class="mb-1 badge text-bg-success">User Agent</span>
-                                                    <span><span class="jn-code-font ">{{ userAgent.ua }}</span> <i
-                                                            :class="copiedStatus ? 'bi bi-clipboard-check-fill' : 'bi bi-clipboard-plus'"
-                                                            @click="copyToClipboard(userAgent.ua)" role="button"
-                                                            aria-label="Copy UA"></i></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6 col-md-6 col-12">
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.browserName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.browser.name }} {{ userAgent.browser.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.engineName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.engine.name }} {{ userAgent.engine.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.osName') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.os.name }} {{ userAgent.os.version }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.language') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.browserLanguage }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cookieEnabled') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.cookieEnabled?
-                                                        t('browserinfo.browser.cookieEnabledTrue'):t('browserinfo.browser.cookieEnabledFalse')
-                                                        }}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6 col-md-6 col-12">
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.deviceVendor') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.device.vendor }} {{ userAgent.device.model }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cpuArchitecture') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ userAgent.device.cpu ? userAgent.device.cpu.architecture :
-                                                        'N/A'
-                                                        }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.gpu') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ gpu }}
-                                                    </span>
-                                                </div>
-                                                <div class="jn-detail">
-                                                    <span>
-                                                        {{ t('browserinfo.browser.cpuCores') }}
-                                                    </span>
-                                                    <span class="jn-con-title card-title mt-1">
-                                                        {{ otherInfos.cpucores }}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4 col-12 mb-4">
-                                    <div class="h-100" :class="{ 
-                                    'dark-mode dark-mode-border': isDarkMode,
-                                    'card': !isMobile
-                                    }">
-                                        <div class="card-body" :class="[isMobile ? 'p-1' : '']">
-                                            <h3 class="mb-4">{{ t('browserinfo.fingerprint.Infos') }} <i
-                                                    class="bi bi-fingerprint"></i></h3>
-                                            <div class="jn-ua-box w-100">
-                                                <div :class="[isMobile ? 'jn-fp-box-mobile' : '']"
-                                                    class="alert alert-primary jn-ua-box">
-                                                    <span class="mb-1 badge text-bg-primary">{{
-                                                        t('browserinfo.fingerprint.fingerprint') }}</span>
-                                                    <span class="jn-code-font ">{{ fingerprint }}</span>
-                                                </div>
-                                            </div>
-
-                                            <p>{{ t('browserinfo.fingerprint.changeOption') }}</p>
-
-                                            <div class="row g-1 m-1">
-                                                <div v-for="(value, key) in excludeOptions" :key="key"
-                                                    class="form-check form-switch col-6">
-                                                    <input class="form-check-input" type="checkbox" :id="key"
-                                                        v-model="excludeOptions[key]" />
-                                                    <label class="form-check-label" :for="key">
-                                                        {{ t(`browserinfo.options.${key}`) }}
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="alert alert-light opacity-75 mt-4" role="alert">
-                                                <i class="bi bi-info-circle"></i> {{
-                                                t('browserinfo.fingerprint.browserTips') }}
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div v-else class="jn-placeholder ">
-                                <span v-if="checkingStatus === 'running'">
-                                    <span class="spinner-grow spinner-grow-sm text-success" aria-hidden="true"></span>
-                                    <span class="text-success">&nbsp;{{ t('browserinfo.calculating') }}</span>
-                                </span>
-                                <p v-if="checkingStatus === 'error'" class="text-danger">{{ errorMsg }}</p>
-                            </div>
-                        </Transition>
-                    </div>
-
-                </div>
+        <Transition name="slide-fade" mode="out-in">
+            <!-- 加载 / 错误态 -->
+            <div v-if="checkingStatus !== 'finished'"
+                class="flex items-center justify-center gap-2 py-8 text-sm">
+                <template v-if="checkingStatus === 'running'">
+                    <Spinner class="text-info" />
+                    <span class="text-muted-foreground">{{ t('browserinfo.calculating') }}</span>
+                </template>
+                <p v-else-if="checkingStatus === 'error'" class="text-destructive">{{ errorMsg }}</p>
             </div>
-        </div>
+
+            <!-- 结果态：外层 Card 包住，内部左 2/3 Browser + 右 1/3 Fingerprint -->
+            <Card v-else id="browserInfoResult">
+                <CardContent class="p-4 md:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Browser 区 -->
+                        <section class="md:col-span-2 space-y-4">
+                            <header class="flex items-center gap-2">
+                                <BriefcaseBusiness class="size-5 text-muted-foreground" />
+                                <h3 class="text-lg font-semibold tracking-tight m-0">
+                                    {{ t('browserinfo.browser.Infos') }}
+                                </h3>
+                            </header>
+
+                            <!-- UA hero 块 —— success 色系强调 -->
+                            <div class="rounded-lg border border-success/30 bg-success/10 p-3 space-y-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <Badge class="bg-success text-success-foreground border-transparent font-normal">
+                                        User Agent
+                                    </Badge>
+                                    <Button variant="ghost" size="icon" class="size-7 -mr-1 cursor-pointer hover:bg-transparent"
+                                        @click="copyToClipboard(userAgent.ua)"
+                                        aria-label="Copy UA">
+                                        <component :is="copiedStatus ? ClipboardCheck : ClipboardPlus" />
+                                    </Button>
+                                </div>
+                                <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>
+                            </div>
+
+                            <!-- 字段 dl 网格 -->
+                            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                                <div v-for="f in browserFields" :key="f.label">
+                                    <dt class="text-sm text-muted-foreground mb-0.5">{{ f.label }}</dt>
+                                    <dd class="text-base font-medium wrap-break-word">{{ f.value || '—' }}</dd>
+                                </div>
+                            </dl>
+                        </section>
+
+                        <!-- Fingerprint 区 -->
+                        <section class="space-y-4">
+                            <header class="flex items-center gap-2">
+                                <Fingerprint class="size-5 text-muted-foreground" />
+                                <h3 class="text-lg font-semibold tracking-tight m-0">
+                                    {{ t('browserinfo.fingerprint.Infos') }}
+                                </h3>
+                            </header>
+
+                            <!-- Fingerprint hero 块 —— info 色系强调（跟 UA 区分） -->
+                            <div class="rounded-lg border border-info/30 bg-info/10 p-3 space-y-2">
+                                <Badge class="bg-info text-info-foreground border-transparent font-normal">
+                                    {{ t('browserinfo.fingerprint.fingerprint') }}
+                                </Badge>
+                                <p class="font-mono text-sm wrap-break-word">{{ fingerprint }}</p>
+                            </div>
+
+                            <!-- Exclude options -->
+                            <div>
+                                <p class="text-sm mb-2">{{ t('browserinfo.fingerprint.changeOption') }}</p>
+                                <div class="rounded-lg border bg-card divide-y">
+                                    <div v-for="(_, key) in excludeOptions" :key="key"
+                                        class="flex items-center justify-between gap-2 px-3 py-2">
+                                        <label :for="key" class="text-sm cursor-pointer select-none">
+                                            {{ t(`browserinfo.options.${key}`) }}
+                                        </label>
+                                        <Switch :id="key" v-model="excludeOptions[key]" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 提示 -->
+                            <div class="flex items-start gap-2 p-3 rounded-md bg-muted/50 text-xs text-muted-foreground">
+                                <Info class="size-3.5 mt-0.5 shrink-0" />
+                                <span class="leading-relaxed">{{ t('browserinfo.fingerprint.browserTips') }}</span>
+                            </div>
+                        </section>
+                    </div>
+                </CardContent>
+            </Card>
+        </Transition>
     </div>
 </template>
 
@@ -173,11 +102,16 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Spinner } from '@/components/ui/spinner';
+import { BriefcaseBusiness, ClipboardCheck, ClipboardPlus, Fingerprint, Info } from 'lucide-vue-next';
+import { Card, CardContent } from '@/components/ui/card';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 
 const fingerprint = ref('');
@@ -202,23 +136,37 @@ const userAgent = ref('');
 const gpu = ref('');
 const otherInfos = ref({});
 
-// 获取 GPU 信息
+// 浏览器字段：数据驱动，避免模板重复 8 段 jn-detail
+const browserFields = computed(() => {
+    if (!userAgent.value || !userAgent.value.browser) return [];
+    return [
+        { label: t('browserinfo.browser.browserName'),    value: `${userAgent.value.browser.name || ''} ${userAgent.value.browser.version || ''}`.trim() },
+        { label: t('browserinfo.browser.deviceVendor'),   value: `${userAgent.value.device.vendor || ''} ${userAgent.value.device.model || ''}`.trim() },
+        { label: t('browserinfo.browser.engineName'),     value: `${userAgent.value.engine.name || ''} ${userAgent.value.engine.version || ''}`.trim() },
+        { label: t('browserinfo.browser.cpuArchitecture'), value: userAgent.value.device.cpu ? userAgent.value.device.cpu.architecture : 'N/A' },
+        { label: t('browserinfo.browser.osName'),         value: `${userAgent.value.os.name || ''} ${userAgent.value.os.version || ''}`.trim() },
+        { label: t('browserinfo.browser.gpu'),            value: gpu.value },
+        { label: t('browserinfo.browser.language'),       value: otherInfos.value.browserLanguage },
+        { label: t('browserinfo.browser.cpuCores'),       value: otherInfos.value.cpucores },
+        { label: t('browserinfo.browser.cookieEnabled'),  value: otherInfos.value.cookieEnabled
+            ? t('browserinfo.browser.cookieEnabledTrue')
+            : t('browserinfo.browser.cookieEnabledFalse') },
+    ];
+});
+
 const getGPU = async () => {
     try {
         const { getGPUTier } = await import('detect-gpu');
         const gpuTier = await getGPUTier();
-        if (gpuTier && gpuTier.gpu) {
-            gpu.value = gpuTier.gpu.toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase());
-        } else {
-            gpu.value = 'N/A';
-        }
+        gpu.value = gpuTier && gpuTier.gpu
+            ? gpuTier.gpu.toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase())
+            : 'N/A';
     } catch (error) {
         console.error('Error getting GPU info:', error);
         throw error;
     }
-}
+};
 
-// 获取 UA
 const getUA = async () => {
     try {
         const { UAParser } = await import('ua-parser-js');
@@ -231,7 +179,6 @@ const getUA = async () => {
     }
 };
 
-// 获取其他信息
 const getOtherBrowserInfo = async () => {
     try {
         otherInfos.value.browserLanguage = navigator.language;
@@ -243,26 +190,20 @@ const getOtherBrowserInfo = async () => {
     }
 };
 
-// 获取指纹计算的排除选项
 const getExcludeOptions = async () => {
     const results = [];
     const checkOptions = (options, prefix = '') => {
         for (const key in options) {
             const value = options[key];
             const fullPath = prefix ? `${prefix}.${key}` : key;
-            if (typeof value === 'object') {
-                checkOptions(value, fullPath);
-            } else if (!value) {
-                results.push(fullPath);
-            }
+            if (typeof value === 'object') checkOptions(value, fullPath);
+            else if (!value) results.push(fullPath);
         }
     };
-
     checkOptions(excludeOptions.value);
     return results;
 };
 
-// 获取指纹
 const getFingerPrint = async () => {
     fingerprint.value = t('browserinfo.calculating');
     try {
@@ -277,32 +218,23 @@ const getFingerPrint = async () => {
     }
 };
 
-// 获取全部
 const getAll = async () => {
     try {
         checkingStatus.value = 'running';
-        await Promise.all([
-            getUA(),
-            getFingerPrint(),
-            getGPU(),
-            getOtherBrowserInfo()
-        ]);
+        await Promise.all([getUA(), getFingerPrint(), getGPU(), getOtherBrowserInfo()]);
         checkingStatus.value = 'finished';
     } catch (error) {
         console.error('Error during checks:', error);
         checkingStatus.value = 'error';
         errorMsg.value = t('browserinfo.calError');
     }
-}
+};
 
-// 复制
 const copyToClipboard = async (ua) => {
     try {
         await navigator.clipboard.writeText(ua);
         copiedStatus.value = true;
-        setTimeout(() => {
-            copiedStatus.value = false;
-        }, 5000);
+        setTimeout(() => { copiedStatus.value = false; }, 5000);
     } catch (err) {
         console.error('Copy error:', err);
     }
@@ -310,65 +242,22 @@ const copyToClipboard = async (ua) => {
 
 onMounted(() => {
     checkingStatus.value = 'running';
-    setTimeout(() => {
-        getAll();
-    }, 1000);
+    setTimeout(() => { getAll(); }, 1000);
 });
 
-// 监控排除选项
-watch(excludeOptions, (newVal, oldVal) => {
-    getFingerPrint();
-}, { immediate: true, deep: true });
-
+watch(excludeOptions, () => { getFingerPrint(); }, { immediate: true, deep: true });
 </script>
 
 <style scoped>
-.jn-placeholder {
-    height: 16pt;
-}
-
-.jn-ua-box {
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-}
-
-.jn-ua-box .badge {
-    width: fit-content;
-}
-
-.jn-code-font {
-    font-family: "IntelOne Mono", "Courier New", "Courier", "monospace";
-    font-weight: 400;
-}
-
-.jn-fp-box-mobile {
-    min-height: 80pt;
-}
-
-.slide-fade-enter-active {
-    transition: all 0.3s ease-out;
-}
-
+.slide-fade-enter-active,
 .slide-fade-leave-active {
     transition: all 0.3s ease-out;
 }
-
 .slide-fade-enter-from {
     transform: translateY(60px);
     opacity: 0;
 }
-
 .slide-fade-leave-to {
     opacity: 0;
-}
-
-.jn-detail {
-    display: flex;
-    flex-direction: column;
-    align-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 10pt;
 }
 </style>

@@ -3,7 +3,6 @@
         "title": "Authentication",
         "slug": "authentication",
         "description": "Securing your online account login credentials",
-        "icon": "bi-key-fill",
         "intro": "Most reported data breaches are caused by the use of weak, default or stolen passwords (according to [this Verizon report](http://www.verizonenterprise.com/resources/reports/rp_dbir-2016-executive-summary_xg_en.pdf)). Use long, strong and unique passwords, manage them in a secure password manager, enable 2-factor authentication, keep on top of breaches and take care while logging into your accounts.",
         "checklist": [
             {
@@ -138,7 +137,6 @@
         "title": "Web Browsing",
         "slug": "web-browsing",
         "description": "Avoiding tracking, censorship, and data collection online",
-        "icon": "bi-browser-safari",
         "intro": "Most websites on the internet will use some form of tracking, often to gain insight into their users behaviour and preferences. This data can be incredibly detailed, and so is extremely valuable to corporations, governments and intellectual property thieves. Data breaches and leaks are common, and deanonymizing users web activity is often a trivial task.\n\nThere are two primary methods of tracking; stateful (cookie-based), and stateless (fingerprint-based). Cookies are small pieces of information, stored in your browser with a unique ID that is used to identify you. Browser fingerprinting is a highly accurate way to identify and track users wherever they go online. The information collected is quite comprehensive, and often includes browser details, OS, screen resolution, supported fonts, plugins, time zone, language and font preferences, and even hardware configurations.\n\nThis section outlines the steps you can take, to be better protected from threats, minimise online tracking and improve privacy.",
         "checklist": [
             {
@@ -381,7 +379,6 @@
         "title": "Email",
         "slug": "email",
         "description": "Protecting the gateway to your online accounts",
-        "icon": "bi-envelope-fill",
         "intro": "Nearly 50 years since the first email was sent, it's still very much a big part of our day-to-day life, and will continue to be for the near future. So considering how much trust we put in them, it's surprising how fundamentally insecure this infrastructure is. Email-related fraud [is on the up](https://www.csoonline.com/article/3247670/email/email-security-in-2018.html), and without taking basic measures you could be at risk.\n\nIf a hacker gets access to your emails, it provides a gateway for your other accounts to be compromised (through password resets), therefore email security is paramount for your digital safety.\n\nThe big companies providing \"free\" email service, don't have a good reputation for respecting users privacy: Gmail was caught giving [third parties full access](https://www.wsj.com/articles/techs-dirty-secret-the-app-developers-sifting-through-your-gmail-1530544442) to user emails and also [tracking all of your purchases](https://www.cnbc.com/2019/05/17/google-gmail-tracks-purchase-history-how-to-delete-it.html). Yahoo was also caught scanning emails in real-time [for US surveillance agencies](http://news.trust.org/item/20161004170601-99f8c) Advertisers [were granted access](https://thenextweb.com/insider/2018/08/29/both-yahoo-and-aol-are-scanning-customer-emails-to-attract-advertisers) to Yahoo and AOL users messages to “identify and segment potential customers by picking up on contextual buying signals, and past purchases.”",
         "checklist": [
             {
@@ -516,7 +513,6 @@
         "title": "Messaging",
         "slug": "messaging",
         "description": "Keeping your communications private and secure",
-        "icon": "bi-chat-dots-fill",
         "intro": "",
         "checklist": [
             {
@@ -639,7 +635,6 @@
         "title": "Social Media",
         "slug": "social-media",
         "description": "Minimizing the risks associated with using online communities",
-        "icon": "bi-people-fill",
         "intro": "Online communities have existed since the invention of the internet, and give people around the world the opportunity to connect, communicate and share. Although these networks are a great way to promote social interaction and bring people together, that have a dark side - there are some serious [Privacy Concerns with Social Networking Services](https://en.wikipedia.org/wiki/Privacy_concerns_with_social_networking_services), and these social networking sites are owned by private corporations, and that they make their money by collecting data about individuals and selling that data on, often to third party advertisers.\nSecure your account, lock down your privacy settings, but know that even after doing so, all data intentionally and non-intentionally uploaded is effectively public. If possible, avoid using conventional social media networks.\n",
         "checklist": [
             {
@@ -738,7 +733,6 @@
         "title": "Networks",
         "slug": "networks",
         "description": "Safeguarding your network traffic",
-        "icon": "bi-shield-shaded",
         "intro": "This section covers how you connect your devices to the internet securely, including configuring your router and setting up a VPN.\n",
         "checklist": [
             {
@@ -897,7 +891,6 @@
         "title": "Mobile Devices",
         "slug": "mobile-devices",
         "description": "Reduce invasive tracking for cells, smartphones and tablets",
-        "icon": "bi-phone-fill",
         "intro": "Smart phones have revolutionized so many aspects of life and brought the world to our fingertips. For many of us, smart phones are our primary means of communication, entertainment and access to knowledge. But while they've brought convenience to whole new level, there's some ugly things going on behind the screen.\nGeo-tracking is used to trace our every move, and we have little control over who has this data- your phone is even able to [track your location without GPS](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371). Over the years numerous reports that surfaced, outlining ways in which your phone's [mic can eavesdrop](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html), and the [camera can watch you](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6)- all without your knowledge or consent. And then there's the malicious apps, lack of security patches and potential/ likely backdoors.\nUsing a smart phone generates a lot of data about you- from information you intentionally share, to data silently generated from your actions. It can be scary to see what Google, Microsoft, Apple and Facebook know about us- sometimes they know more than our closest family. It's hard to comprehend what your data will reveal, especially in conjunction with other data.\nThis data is used for [far more than just advertising](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - more often it's used to rate people for finance, insurance and employment. Targeted ads can even be used for fine-grained surveillance (see [ADINT](https://adint.cs.washington.edu))\nMore of us are concerned about how [governments use collect and use our smart phone data](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/), and rightly so, federal agencies often [request our data from Google](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/), [Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/), Apple, Microsoft, Amazon, and other tech companies. Sometimes requests are made in bulk, returning detailed information on everybody within a certain geo-fence, [often for innocent people](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html). And this doesn't include all of the internet traffic that intelligence agencies around the world have unhindered access to.\n",
         "checklist": [
             {
@@ -1044,7 +1037,6 @@
         "title": "Personal Computers",
         "slug": "personal-computers",
         "description": "Securing your PC's operating system, data & activity",
-        "icon": "bi-laptop-fill",
         "intro": "Although Windows and OS X are easy to use and convenient, they both are far from secure. Your OS provides the interface between hardware and your applications, so if compromised can have detrimental effects.\n",
         "checklist": [
             {
@@ -1263,7 +1255,6 @@
         "title": "Smart Home",
         "slug": "smart-home",
         "description": "Using IoT devices without compromising your privacy",
-        "icon": "bi-house-add-fill",
         "intro": "Home assistants (such as Google Home, Alexa and Siri) and other internet connected devices collect large amounts of personal data (including voice samples, location data, home details and logs of all interactions). Since you have limited control on what is being collected, how it's stored, and what it will be used for, this makes it hard to recommend any consumer smart-home products to anyone who cares about privacy and security.\nSecurity vs Privacy: There are many smart devices on the market that claim to increase the security of your home while being easy and convenient to use (Such as Smart Burglar Alarms, Internet Security Cameras, Smart Locks and Remote access Doorbells to name a few). These devices may appear to make security easier, but there is a trade-off in terms of privacy: as they collect large amounts of personal data, and leave you without control over how this is stored or used. The security of these devices is also questionable, since many of them can be (and are being) hacked, allowing an intruder to bypass detection with minimum effort.\nThe most privacy-respecting option, would be to not use \"smart\" internet-connected devices in your home, and not to rely on a security device that requires an internet connection. But if you do, it is important to fully understand the risks of any given product, before buying it. Then adjust settings to increase privacy and security. The following checklist will help mitigate the risks associated with internet-connected home devices.",
         "checklist": [
             {
@@ -1350,7 +1341,6 @@
         "title": "Personal Finance",
         "slug": "personal-finance",
         "description": "Protecting your funds, financial accounts and transactions",
-        "icon": "bi-currency-exchange",
         "intro": "Credit card fraud is the most common form of identity theft (with [133,015 reports in the US in 2017 alone](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)), and a total loss of $905 million, which was a 26% increase from the previous year. The with a median amount lost per person was $429 in 2017. It's more important than ever to take basic steps to protect yourself from falling victim\nNote about credit cards: Credit cards have technological methods in place to detect and stop some fraudulent transactions. Major payment processors implement this, by mining huge amounts of data from their card holders, in order to know a great deal about each persons spending habits. This data is used to identify fraud, but is also sold onto other data brokers. Credit cards are therefore good for security, but terrible for data privacy.",
         "checklist": [
             {
@@ -1419,7 +1409,6 @@
         "title": "Human Aspect",
         "slug": "human-aspect",
         "description": "Avoiding social engineering security risks",
-        "icon": "bi-person-bounding-box",
         "intro": "Many data breaches, hacks and attacks are caused by human error. The following list contains steps you should take, to reduce the risk of this happening to you. Many of them are common sense, but it's worth takin note of.",
         "checklist": [
             {
@@ -1554,7 +1543,6 @@
         "title": "Physical Security",
         "slug": "physical-security",
         "description": "Taking measures to prevent IRL security incidents",
-        "icon": "bi-file-earmark-break-fill",
         "intro": "Public records often include sensitive personal data (full name, date of birth, phone number, email, address, ethnicity etc), and are gathered from a range of sources (census records, birth/ death/ marriage certificates, voter registrants, marketing information, customer databases, motor vehicle records, professional/ business licenses and all court files in full detail). This sensitive personal information is [easy and legal to access](https://www.consumerreports.org/consumerist/its-creepy-but-not-illegal-for-this-website-to-provide-all-your-public-info-to-anyone/), which raises some [serious privacy concerns](https://privacyrights.org/resources/public-records-internet-privacy-dilemma) (identity theft, personal safety risks/ stalkers, destruction of reputations, dossier society)\n\nCCTV is one of the major ways that the corporations, individuals and the government tracks your movements. In London, UK the average person is caught on camera about 500 times per day. This network is continuing to grow, and in many cities around the world, facial recognition is being rolled out, meaning the state can know the identity of residents on the footage in real-time.\nStrong authentication, encrypted devices, patched software and anonymous web browsing may be of little use if someone is able to physically compromise you, your devices and your data. This section outlines some basic methods for physical security",
         "checklist": [
             {

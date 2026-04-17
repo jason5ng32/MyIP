@@ -440,7 +440,7 @@
   "ruletest": {
     "Title": "Rule Test",
     "Name": "Test",
-    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software.",
+    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software. Usually, the rule settings may use a format like: DOMAIN, ptest-3.ipcheck.ing, POLICY. The specific format may vary depending on the proxy software you are using.",
     "StatusWait": "Awaiting Test or Test Error",
     "StatusError": "Test Error",
     "Country": "Proxy region",
@@ -484,6 +484,7 @@
     "isProxy": "Proxy",
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
+    "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
@@ -535,8 +536,8 @@
     "id": "webrtc",
     "Title": "WebRTC Test",
     "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
-    "StatusWait": "Awaiting Test or Connection Error",
-    "StatusError": "Test Error",
+    "StatusWait": "Awaiting Test",
+    "StatusError": "Connection Error",
     "NATType": {
       "srflx": "Port Restricted Cone or Symmetric",
       "prflx": "Port Restricted Cone",
@@ -1202,6 +1203,72 @@
           {
             "type": "improve",
             "change": "Significantly improved build speed"
+          }
+        ]
+      },
+      {
+        "version": "v6.0",
+        "date": "Apr 17, 2026",
+        "content": [
+          {
+            "type": "improve",
+            "change": "Complete UI overhaul: migrated from Bootstrap to Tailwind CSS v4 + shadcn-vue"
+          },
+          {
+            "type": "improve",
+            "change": "All country flags now displayed as circular icons"
+          },
+          {
+            "type": "improve",
+            "change": "Unified design tokens with automatic light/dark mode adaptation"
+          },
+          {
+            "type": "improve",
+            "change": "Network Connectivity / WebRTC / DNS Leak / Rule Test cards redesigned with modern status indicators"
+          },
+          {
+            "type": "improve",
+            "change": "IP Infos cards redesigned: hero IP display with copy, cleaner metadata grid, labeled advanced data for signed-in users"
+          },
+          {
+            "type": "improve",
+            "change": "Advanced Tools panel switched to bottom drawer with drag-to-close and optional fullscreen"
+          },
+          {
+            "type": "improve",
+            "change": "All advanced tools (MTR / Ping / Rule / DNS / Whois / MAC / Browser Info / Invisibility / Censorship / Security Checklist) redesigned"
+          },
+          {
+            "type": "improve",
+            "change": "Query buttons now show a loading spinner during execution; disabled state clearly indicated"
+          },
+          {
+            "type": "improve",
+            "change": "Long IPv6 addresses auto-shrink font to fit in one line (no more wrapping)"
+          },
+          {
+            "type": "improve",
+            "change": "Preferences, About, Changelog, Achievements panels redesigned"
+          },
+          {
+            "type": "improve",
+            "change": "Latency-aware emoji faces in Network Connectivity cards (smile / neutral / frown)"
+          },
+          {
+            "type": "improve",
+            "change": "Reduced bundle size by ~420KB"
+          },
+          {
+            "type": "fix",
+            "change": "Text inside Advanced Tools drawer can now be selected"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed a ghost green line bug when using J/K keyboard navigation"
+          },
+          {
+            "type": "fix",
+            "change": "Fixed runtime error when opening Ping Test in production build"
           }
         ]
       }

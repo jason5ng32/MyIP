@@ -440,7 +440,7 @@
     "ruletest": {
         "Title": "Test de règles",
         "Name": "Test",
-        "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy.",
+        "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy. Généralement, les paramètres de règles peuvent utiliser un format comme : DOMAIN, ptest-3.ipcheck.ing, POLICY. Le format spécifique peut varier en fonction du logiciel proxy que vous utilisez.",
         "StatusWait": "En attente du test ou erreur de connexion",
         "StatusError": "Erreur de test",
         "Country": "Région de proxy",
@@ -484,6 +484,7 @@
         "isProxy": "Proxy",
         "qualityScore": "Qualité IP",
         "qualityScoreUnknown": "Score inconnu",
+        "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
         "ASNInfo": {
             "trafficPercentage": "Pourcentage de trafic : ",
             "note": "Données associées à cet AS : ",
@@ -535,8 +536,8 @@
         "id": "webrtc",
         "Title": "Test WebRTC",
         "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
-        "StatusWait": "En attente du test ou erreur de connexion",
-        "StatusError": "Erreur de test",
+        "StatusWait": "En attente du test",
+        "StatusError": "Erreur de connexion",
         "NATType": {
             "srflx": "Port Restricted Cone ou Symmetric",
             "prflx": "Port Restricted Cone",
@@ -1202,6 +1203,72 @@
                     {
                         "type": "improve",
                         "change": "Amélioration significative de la vitesse de construction"
+                    }
+                ]
+            },
+            {
+                "version": "v6.0",
+                "date": "17 avril 2026",
+                "content": [
+                    {
+                        "type": "improve",
+                        "change": "Refonte complète de l'interface : migration de Bootstrap vers Tailwind CSS v4 + shadcn-vue"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Tous les drapeaux affichés désormais sous forme d'icônes circulaires"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Tokens de design unifiés avec adaptation automatique au mode clair / sombre"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Cartes Connectivité / WebRTC / Fuite DNS / Test de règles redessinées avec indicateurs de statut modernes"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Cartes Infos IP redessinées : affichage IP proéminent avec bouton copier, grille de métadonnées plus propre, données avancées étiquetées pour les utilisateurs connectés"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Panneau Outils Avancés converti en tiroir inférieur avec fermeture par glissement et plein écran optionnel"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Tous les outils avancés (MTR / Ping / Règles / DNS / Whois / MAC / Infos Navigateur / Invisibilité / Censure / Checklist de Sécurité) redessinés"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Les boutons de requête affichent désormais un spinner pendant l'exécution ; état désactivé clairement indiqué"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Les adresses IPv6 longues réduisent automatiquement la police pour tenir sur une ligne (plus de retour à la ligne)"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Panneaux Préférences, À propos, Journal des modifications, Succès redessinés"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Émojis sensibles à la latence dans les cartes de connectivité (sourire / neutre / froncement)"
+                    },
+                    {
+                        "type": "improve",
+                        "change": "Taille du bundle réduite d'environ 420 Ko"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Le texte dans le tiroir Outils Avancés peut désormais être sélectionné"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Correction d'un bug de ligne verte fantôme lors de la navigation clavier J/K"
+                    },
+                    {
+                        "type": "fix",
+                        "change": "Correction d'une erreur d'exécution à l'ouverture du test Ping en build de production"
                     }
                 ]
             }

@@ -1,255 +1,250 @@
 <template>
-    <!-- Search BTN -->
-    <button class="btn btn-primary queryip" data-bs-toggle="modal" aria-label="IP Check" data-bs-target="#IPCheck"
-        @click="openQueryIP" v-tooltip="t('Tooltips.QueryIP')"><i class="bi bi-search"></i></button>
+    <!-- 悬浮查询按钮（右下固定）—— "run action" 蓝 -->
+    <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
+        <Button size="icon" variant="action" type="button" aria-label="IP Check"
+            class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer"
+            :style="positionStyle"
+            @click="openQueryIP">
+            <Search class="size-4" />
+        </Button>
+    </JnTooltip>
 
-    <!-- Search Modal -->
-    <div class="modal fade" id="IPCheck" tabindex="-1" aria-labelledby="IPCheck">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="IPCheckTitle">{{ t('ipcheck.Title') }}</h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- 查询 Dialog -->
+    <Dialog :open="isOpen" @update:open="onOpenChange">
+        <DialogContent :title="t('ipcheck.Title')" class="max-w-xl">
+            <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
-                </div>
-                <div class="modal-body" :class="{ 'dark-mode': isDarkMode }">
+            <div class="space-y-4">
+                <!-- Input Group：整条输入条由 group 承担 border / rounded / focus-ring，
+                     内部 Input / Button 的独立样式被 group 扁平化，不再需要 rounded-r-none / -ml-px 拼接 -->
+                <InputGroup>
+                    <Input type="text" id="inputIP" name="inputIP"
+                        :placeholder="t('ipcheck.Placeholder')"
+                        v-model="inputIP" @keyup.enter="submitQuery" />
+                    <Button id="sumitQueryButton" type="button" variant="action"
+                        :disabled="!isValidIP(inputIP) || isChecking === 'running'"
+                        @click="submitQuery">
+                        <Spinner v-if="isChecking === 'running'" />
+                        {{ t('ipcheck.Button') }}
+                    </Button>
+                </InputGroup>
 
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" :class="{ 'dark-mode': isDarkMode }"
-                            :placeholder="t('ipcheck.Placeholder')" v-model="inputIP" @keyup.enter="submitQuery"
-                            name="inputIP" id="inputIP">
-                        <button id="sumitQueryButton" type="button" class="btn btn-primary"
-                            :class="{ 'btn-secondary': !isValidIP(inputIP), 'btn-primary': isValidIP(inputIP) }"
-                            @click="submitQuery" :disabled="!isValidIP(inputIP) || isChecking === 'running'
-                            ">{{
-                            t('ipcheck.Button') }}</button>
+                <!-- 错误提示 -->
+                <p v-if="modalQueryError" class="text-sm text-destructive">{{ modalQueryError }}</p>
+
+                <!-- 查询结果（复用 IPCard 视觉语言） -->
+                <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
+                    <!-- Hero IP 区 -->
+                    <div class="px-4 py-3 flex items-center gap-2 min-w-0 border-b">
+                        <Monitor class="size-5 text-muted-foreground shrink-0" />
+                        <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0"
+                            :class="heroIpSizeClass(inputIP)" :title="inputIP">{{ inputIP }}</span>
                     </div>
 
-                    <div v-if="modalQueryError" class="text-danger">{{ modalQueryError }}</div>
-                    <div v-if="modalQueryResult" class="mt-2">
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-pc-display-horizontal"></i> {{ t('ipInfos.Country')
-                                        }}</span>&nbsp;:&nbsp;
-                                    <span class="col-10 ">{{ modalQueryResult.country_name }}&nbsp;
-                                        <span v-if="modalQueryResult.country_code"
-                                            :class="'jn-fl fi fi-' + modalQueryResult.country_code.toLowerCase()"></span>
-                                    </span>
-                                </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto"><i class="bi bi-houses"></i> {{ t('ipInfos.Region')
-                                        }}</span>&nbsp;:&nbsp;
-                                    <span class="col-10 ">
-                                        {{ modalQueryResult.region }}
-                                    </span>
-                                </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto"><i class="bi bi-sign-turn-right"></i> {{
-                                        t('ipInfos.City')
-                                        }}</span>&nbsp;:&nbsp;
-                                    <span class="col-10 ">
-                                        {{ modalQueryResult.city }}
-                                    </span>
-                                </li>
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto"><i class="bi bi-ethernet"></i> {{ t('ipInfos.ISP')
-                                        }}</span>&nbsp;:&nbsp;
-                                    <span class="col-10 ">
-                                        {{ modalQueryResult.isp }}
-                                    </span>
-                                </li>
-
-
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.type !== t('ipInfos.advancedData.type.unknownType')"
-                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-reception-4"></i> {{ t('ipInfos.type')
-                                        }}</span>&nbsp;:&nbsp;
-                                    <span v-if="modalQueryResult.type !=='sign_in_required'" class="col-10 ">
-                                        {{ modalQueryResult.type }}
-                                        <span v-if="modalQueryResult.proxyOperator !== 'unknown'">
-                                            ( {{ modalQueryResult.proxyOperator }} )
-                                        </span>
-                                    </span>
-
-                                    <span v-else class="col-8 text-secondary">
-                                        {{ t('user.SignInToView') }}
-                                    </span>
-                                </li>
-
-                                <li v-if="ipGeoSource === 0 && modalQueryResult.isProxy !== t('ipInfos.advancedData.proxyUnknown')"
-                                    class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-shield-fill-check"></i>
-                                        {{ t('ipInfos.isProxy') }}</span>&nbsp;:&nbsp;
-                                    <span v-if="modalQueryResult.isProxy !=='sign_in_required'" class="col-10 ">
-                                        {{ modalQueryResult.isProxy }}
-                                        <span
-                                            v-if="modalQueryResult.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')">
-                                            ( {{ modalQueryResult.proxyProtocol }} )
-                                        </span>
-                                    </span>
-                                    <span v-else class="col-8 text-secondary">
-                                        {{ t('user.SignInToView') }}
-                                    </span>
-                                </li>
-
-                                <li v-if="ipGeoSource === 0" class="jn-list-group-item"
-                                    :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-house-check"></i>
-                                        {{ t('ipInfos.advancedData.Nativeness') }} :&nbsp;
-                                    </span>
-                                    <span v-if="modalQueryResult.isNativeIP !=='sign_in_required'" class="col-10 ">
-                                        <span v-if="modalQueryResult.isNativeIP === true">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                            {{t('ipInfos.advancedData.NativeIPYes')}}
-                                        </span>
-                                        <span v-else>
-                                            <i class="bi bi-x-circle"></i>
-                                            {{t('ipInfos.advancedData.NativeIPNo')}}
-                                        </span>
-                                    </span>
-
-                                    <span v-else class="col-8 text-secondary">
-                                        {{ t('user.SignInToView') }}
-                                    </span>
-                                </li>
-
-
-                                <li v-if="ipGeoSource === 0" class="jn-list-group-item"
-                                    :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-speedometer"></i>
-                                        {{ t('ipInfos.qualityScore') }} :&nbsp;
-                                    </span>
-
-                                    <span
-                                        v-if="modalQueryResult.qualityScore !== 'unknown' && modalQueryResult.qualityScore !== 'sign_in_required'"
-                                        class="col-3 jn-ip-score ">
-                                        <span class="progress border"
-                                            :class="[isDarkMode ? 'border-light bg-dark' : 'border-dark']"
-                                            role="progressbar" aria-label="Quality Score" aria-valuenow="0"
-                                            aria-valuemin="0" aria-valuemax="100">
-                                            <span class="progress-bar" :class="[isDarkMode ? 'bg-light' : 'bg-dark']"
-                                                :style='"width:" + modalQueryResult.qualityScore +"%"'></span>
-                                        </span>
-                                    </span>
-
-                                    <span v-if="modalQueryResult.qualityScore !== 'sign_in_required'" class="ps-2">
-                                        <span v-if="modalQueryResult.qualityScore === 'unknown'">
-                                            {{ t('ipInfos.qualityScoreUnknown') }}
-                                        </span>
-                                        <span v-else>{{ modalQueryResult.qualityScore }}%</span>
-                                    </span>
-                                    <span v-if="modalQueryResult.qualityScore === 'sign_in_required'"
-                                        class="col-8 text-secondary">
-                                        {{ t('user.SignInToView') }}
-                                    </span>
-                                </li>
-
-                                <li class="list-group-item jn-list-group-item" :class="{ 'dark-mode': isDarkMode }">
-                                    <span class="jn-text col-auto">
-                                        <i class="bi bi-buildings"></i> {{ t('ipInfos.ASN') }}</span>&nbsp;:&nbsp;
-                                    <span class="col-10 ">
-                                        <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink"
-                                            target="_blank"
-                                            class="link-underline-opacity-50 link-underline-opacity-100-hover"
-                                            :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ modalQueryResult.asn
-                                            }}</a>
-                                            <span v-else-if="modalQueryResult.asn">{{ modalQueryResult.asn }}</span>
-                                    </span>
-                                </li>
-                            </ul>
+                    <!-- 元数据 2 列 dl -->
+                    <dl class="px-4 py-3 grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <MapPin class="size-3.5" />
+                                <span>{{ t('ipInfos.Country') }}</span>
+                            </dt>
+                            <dd class="font-normal flex items-center gap-1.5 flex-wrap">
+                                <Icon v-if="modalQueryResult.country_code"
+                                    :icon="'circle-flags:' + modalQueryResult.country_code.toLowerCase()"
+                                    class="shrink-0 size-4" />
+                                <span class="wrap-break-word">{{ modalQueryResult.country_name || '—' }}</span>
+                            </dd>
                         </div>
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <House class="size-3.5" />
+                                <span>{{ t('ipInfos.Region') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ modalQueryResult.region || '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <CornerUpRight class="size-3.5" />
+                                <span>{{ t('ipInfos.City') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ modalQueryResult.city || '—' }}</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <EthernetPort class="size-3.5" />
+                                <span>{{ t('ipInfos.ISP') }}</span>
+                            </dt>
+                            <dd class="font-normal wrap-break-word">{{ modalQueryResult.isp || '—' }}</dd>
+                        </div>
+                    </dl>
 
+                    <!-- 高级数据（仅 IPCheck.ing 源）—— 完全跟 IPCard 规则一致 -->
+                    <div v-show="showAdvancedBlock" class="px-4 py-3 border-t space-y-2.5">
+                        <!-- 未登录态：Lock 提示 + 2×2 字段菜单 -->
+                        <template v-if="allAdvancedLocked">
+                            <div
+                                class="w-full flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground">
+                                <Lock class="size-3.5 shrink-0" />
+                                <span class="truncate">{{ t('ipInfos.advancedUnlockCta') }}</span>
+                            </div>
+                            <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                <div v-for="f in lockedFieldList" :key="f.key"
+                                    class="flex items-center gap-1.5 text-muted-foreground">
+                                    <component :is="f.icon" class="size-3.5 shrink-0" />
+                                    <span class="text-xs truncate">{{ f.label }}</span>
+                                    <span class="ml-auto text-muted-foreground/60">***</span>
+                                </div>
+                            </dl>
+                        </template>
+
+                        <!-- 已登录态：label + 纯文本值 -->
+                        <dl v-else class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm items-center">
+                            <template v-if="showType">
+                                <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <SignalHigh class="size-3.5" />{{ t('ipInfos.type') }}
+                                </dt>
+                                <dd class="font-normal">{{ modalQueryResult.type }}</dd>
+                            </template>
+
+                            <template v-if="showProxy">
+                                <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <ShieldCheck class="size-3.5" />{{ t('ipInfos.isProxy') }}
+                                </dt>
+                                <dd class="font-normal">
+                                    {{ modalQueryResult.isProxy }}<span
+                                        v-if="modalQueryResult.proxyProtocol && modalQueryResult.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')"
+                                        class="text-muted-foreground font-normal"> · {{ modalQueryResult.proxyProtocol }}</span>
+                                </dd>
+                            </template>
+
+                            <template v-if="showNative">
+                                <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <House class="size-3.5" />{{ t('ipInfos.advancedData.Nativeness') }}
+                                </dt>
+                                <dd class="font-normal flex items-center gap-1">
+                                    <component :is="modalQueryResult.isNativeIP === true ? CircleCheck : CircleX"
+                                        class="size-3.5 text-muted-foreground" />
+                                    {{ modalQueryResult.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') : t('ipInfos.advancedData.NativeIPNo') }}
+                                </dd>
+                            </template>
+
+                            <template v-if="showQualityScore">
+                                <dt class="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    <Gauge class="size-3.5" />{{ t('ipInfos.qualityScore') }}
+                                </dt>
+                                <dd>
+                                    <span v-if="modalQueryResult.qualityScore === 'unknown'" class="text-sm text-muted-foreground">
+                                        {{ t('ipInfos.qualityScoreUnknown') }}
+                                    </span>
+                                    <div v-else class="flex items-center gap-2">
+                                        <Progress :model-value="Number(modalQueryResult.qualityScore) || 0"
+                                            class="h-2 flex-1 min-w-12"
+                                            :indicator-class="qualityTone === 'ok-fast' ? 'bg-success' : qualityTone === 'ok-slow' ? 'bg-warning' : 'bg-destructive'" />
+                                        <span class="text-sm font-medium tabular-nums shrink-0">{{ modalQueryResult.qualityScore }}/100</span>
+                                    </div>
+                                </dd>
+                            </template>
+                        </dl>
+                    </div>
+
+                    <!-- ASN 行 -->
+                    <div v-if="modalQueryResult.asn" class="px-4 py-3 border-t flex items-center gap-2 text-sm">
+                        <Building2 class="size-4 text-muted-foreground shrink-0" />
+                        <span class="text-xs text-muted-foreground shrink-0">{{ t('ipInfos.ASN') }}</span>
+                        <a v-if="modalQueryResult.asnlink" :href="modalQueryResult.asnlink" target="_blank" rel="noopener"
+                            class="font-mono font-medium truncate hover:underline">{{ modalQueryResult.asn }}</a>
+                        <span v-else class="font-mono font-medium truncate">{{ modalQueryResult.asn }}</span>
                     </div>
                 </div>
-
-
             </div>
-        </div>
-    </div>
+        </DialogContent>
+    </Dialog>
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
+// refactor/02：QueryIP 视觉完全对齐 IPCard
+// - 模板用 DialogHeader primitive，不再手写 header
+// - 结果面板复用 IPCard 的 hero IP + 2 列 dl + 高级数据 + ASN 结构
+// - 高级数据 Type/Proxy/Native 纯文本不评判色，Quality Score 保留语义色
+// - sign_in_required 走跟 IPCard 一样的 Lock CTA + 2×2 字段菜单
+// - 国旗 .fi → circle-flags
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal } from 'bootstrap';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { InputGroup } from '@/components/ui/input-group';
+import { Progress } from '@/components/ui/progress';
+import { Spinner } from '@/components/ui/spinner';
+import { Icon } from '@iconify/vue';
+import {
+    Building2,
+    CircleCheck,
+    CircleX,
+    CornerUpRight,
+    EthernetPort,
+    Gauge,
+    House,
+    Lock,
+    MapPin,
+    Monitor,
+    Search,
+    ShieldCheck,
+    SignalHigh,
+} from 'lucide-vue-next';
 
 const { t } = useI18n();
 
-// 引入 Store
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
 const inputIP = ref('');
 const modalQueryResult = ref(null);
-const modalQueryError = ref("");
-const isChecking = ref("idle");
+const modalQueryError = ref('');
+const isChecking = ref('idle');
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 
-
-// 实时变化查询源
-watch(() => userPreferences.value.ipGeoSource, (newVal, oldVal) => {
+watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
 }, { deep: true });
 
-// 查询 IP 信息
 const submitQuery = async () => {
     if (isValidIP(inputIP.value)) {
-        modalQueryError.value = "";
+        modalQueryError.value = '';
         modalQueryResult.value = null;
-        isChecking.value = "running";
+        isChecking.value = 'running';
         await fetchIPForModal(inputIP.value);
     } else {
         modalQueryError.value = t('ipcheck.Error');
         modalQueryResult.value = null;
-        isChecking.value = "idle";
+        isChecking.value = 'idle';
     }
 };
 
-// 打开查询 IP 的模态框
+const isOpen = ref(false);
+const onOpenChange = (val) => {
+    isOpen.value = val;
+    if (val) {
+        nextTick(() => {
+            const inputElement = document.getElementById('inputIP');
+            if (inputElement) inputElement.focus();
+        });
+    }
+};
+
 const openQueryIP = () => {
     trackEvent('SideButtons', 'ToggleClick', 'QueryIP');
     openModal();
 };
 
-// 打开 Modal
-const openModal = () => {
-    const modalElement = document.getElementById('IPCheck');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-        setupModalFocus();
-    }
-};
+const openModal = () => onOpenChange(true);
 
-// 设置 Modal 的聚焦
-const setupModalFocus = () => {
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach((modal) => {
-        modal.addEventListener("shown.bs.modal", () => {
-            nextTick(() => {
-                const inputElement = modal.querySelector(".form-control");
-                if (inputElement) {
-                    inputElement.focus();
-                }
-            });
-        });
-    });
-};
-
-// 获取 IP 信息
 const fetchIPForModal = async (ip, sourceID = null) => {
     let selectedLang = lang.value === 'zh' ? 'zh-CN' : lang.value;
     sourceID = ipGeoSource.value;
@@ -261,43 +256,75 @@ const fetchIPForModal = async (ip, sourceID = null) => {
             const url = store.getDbUrl(source.id, ip, selectedLang);
             const response = await authenticatedFetch(url);
             modalQueryResult.value = transformDataFromIPapi(response, source.id, t, lang.value);
-            isChecking.value = "idle";
+            isChecking.value = 'idle';
             break;
         } catch (error) {
-            console.error("Error fetching IP details:", error);
+            console.error('Error fetching IP details:', error);
         }
     }
 };
 
-const adjustButtonPosition = () => {
-    const screenWidth = window.innerWidth;
-    const contentWidth = 1600; // 主内容区域的宽度
-    const spaceOnRight = (screenWidth - contentWidth) / 2;
+// ——— Hero IP 字号降级（跟 IPCard 一套逻辑） ———
+const heroIpSizeClass = (ip) => {
+    const len = typeof ip === 'string' ? ip.length : 0;
+    if (len <= 15) return 'text-2xl';
+    if (len <= 26) return 'text-xl';
+    return 'text-base';
+};
 
-    const button = document.querySelector('.queryip');
-    if (screenWidth > 1600) { // 只在屏幕宽度大于1600px时调整
-        button.style.right = `${spaceOnRight + 20}px`; // 保持20px的距离
-    } else {
-        button.style.right = '20px'; // 在小屏幕上使用默认位置
+// ——— 高级数据展示条件（跟 IPCard 一致） ———
+const result = computed(() => modalQueryResult.value || {});
+const showAdvancedBlock = computed(() => ipGeoSource.value === 0 && modalQueryResult.value);
+const allAdvancedLocked = computed(() =>
+    result.value.type === 'sign_in_required' &&
+    result.value.isProxy === 'sign_in_required' &&
+    result.value.isNativeIP === 'sign_in_required' &&
+    result.value.qualityScore === 'sign_in_required'
+);
+const showType = computed(() =>
+    result.value.type && result.value.type !== 'sign_in_required'
+    && result.value.type !== t('ipInfos.advancedData.type.unknownType')
+);
+const showProxy = computed(() =>
+    result.value.isProxy && result.value.isProxy !== 'sign_in_required'
+    && result.value.isProxy !== t('ipInfos.advancedData.proxyUnknown')
+);
+const showNative = computed(() =>
+    result.value.isNativeIP !== undefined && result.value.isNativeIP !== 'sign_in_required'
+);
+const showQualityScore = computed(() =>
+    result.value.qualityScore !== undefined && result.value.qualityScore !== 'sign_in_required'
+);
+
+// 未登录的字段菜单
+const lockedFieldList = computed(() => [
+    { key: 'type',    icon: SignalHigh,  label: t('ipInfos.type') },
+    { key: 'proxy',   icon: ShieldCheck, label: t('ipInfos.isProxy') },
+    { key: 'native',  icon: House,       label: t('ipInfos.advancedData.Nativeness') },
+    { key: 'quality', icon: Gauge,       label: t('ipInfos.qualityScore') },
+]);
+
+// Quality Score tone
+const qualityTone = computed(() => {
+    const n = Number(result.value.qualityScore);
+    if (isNaN(n)) return 'wait';
+    if (n >= 80) return 'ok-fast';
+    if (n >= 50) return 'ok-slow';
+    return 'fail';
+});
+
+// ——— 悬浮按钮定位（超宽屏时对齐到内容区右侧） ———
+const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
+const positionStyle = computed(() => {
+    if (screenWidth.value > 1600) {
+        const spaceOnRight = (screenWidth.value - 1600) / 2;
+        return { right: `${spaceOnRight + 20}px` };
     }
-}
-
-onMounted(() => {
-    window.addEventListener('resize', adjustButtonPosition);
-    adjustButtonPosition();
+    return { right: '20px' };
 });
+const handleResize = () => { screenWidth.value = window.innerWidth; };
+onMounted(() => window.addEventListener('resize', handleResize));
+onBeforeUnmount(() => window.removeEventListener('resize', handleResize));
 
-defineExpose({
-    openModal,
-});
+defineExpose({ openModal });
 </script>
-
-
-<style scoped>
-.queryip {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1050;
-}
-</style>

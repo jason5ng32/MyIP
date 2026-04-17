@@ -442,7 +442,7 @@
   "ruletest": {
     "Title": "分流测试",
     "Name": "检测",
-    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。",
+    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。通常，设置规则可能会使用类似于：DOMAIN, ptest-3.ipcheck.ing, POLICY 这样的写法，具体写法不同的代理软件可能会有所不同。",
     "StatusWait": "待检测",
     "StatusError": "检测出错",
     "Country": "代理地区",
@@ -486,6 +486,7 @@
     "isProxy": "代理",
     "qualityScore": "IP 质量分",
     "qualityScoreUnknown": "未知分数",
+    "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",
@@ -537,8 +538,8 @@
     "id": "webrtc",
     "Title": "WebRTC 测试",
     "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
-    "StatusWait": "待检测或连接错误",
-    "StatusError": "测试出错",
+    "StatusWait": "待检测",
+    "StatusError": "连接错误",
     "NATType": {
       "srflx": "端口限制型或对称型",
       "prflx": "端口限制型",
@@ -1204,6 +1205,72 @@
           {
             "type": "improve",
             "change": "大大提升构建速度"
+          }
+        ]
+      },
+      {
+        "version": "v6.0",
+        "date": "2026 年 4 月 17 日",
+        "content": [
+          {
+            "type": "improve",
+            "change": "全站 UI 翻新：从 Bootstrap 迁移到 Tailwind CSS v4 + shadcn-vue"
+          },
+          {
+            "type": "improve",
+            "change": "所有国旗改用圆形图标显示"
+          },
+          {
+            "type": "improve",
+            "change": "统一设计 token，自动适配白天 / 黑夜模式"
+          },
+          {
+            "type": "improve",
+            "change": "网络连通性 / WebRTC / DNS 泄漏 / 分流测试卡片重新设计，带现代化状态指示"
+          },
+          {
+            "type": "improve",
+            "change": "IP 信息卡片重新设计：大号 IP 显示带复制按钮、更清爽的字段网格、登录用户可见的高级数据带标签展示"
+          },
+          {
+            "type": "improve",
+            "change": "高级工具面板改为底部抽屉，支持拖拽关闭和全屏切换"
+          },
+          {
+            "type": "improve",
+            "change": "所有高级工具（MTR / Ping / 分流 / DNS / Whois / MAC / 浏览器信息 / 隐身测试 / 封锁测试 / 安全检查清单）全部重新设计"
+          },
+          {
+            "type": "improve",
+            "change": "查询按钮执行时显示加载动画，禁用态也有明确视觉提示"
+          },
+          {
+            "type": "improve",
+            "change": "长 IPv6 地址自动缩小字号保持单行显示（不再折行）"
+          },
+          {
+            "type": "improve",
+            "change": "偏好设置、关于、更新日志、成就面板重新设计"
+          },
+          {
+            "type": "improve",
+            "change": "网络连通性卡片根据延迟显示不同表情（笑脸 / 面无表情 / 哭脸）"
+          },
+          {
+            "type": "improve",
+            "change": "打包体积减少约 420KB"
+          },
+          {
+            "type": "fix",
+            "change": "修复高级工具抽屉内文字无法选中的问题"
+          },
+          {
+            "type": "fix",
+            "change": "修复使用 J/K 键盘导航时出现的幽灵绿线 bug"
+          },
+          {
+            "type": "fix",
+            "change": "修复生产环境下打开 Ping 测试时的运行时报错"
           }
         ]
       }

@@ -3,7 +3,6 @@
         "title": "身份验证",
         "slug": "authentication",
         "description": "保护您的在线账户登录凭据",
-        "icon": "bi-key-fill",
         "intro": "根据 [Verizon 的这份报告](http://www.verizonenterprise.com/resources/reports/rp_dbir-2016-executive-summary_xg_en.pdf)，大多数已报告的数据泄露是由于使用弱、默认或被盗密码造成的。请使用长而强且唯一的密码，将它们存储在安全的密码管理器中，启用双因素身份验证，关注数据泄露情况，并在登录账户时小心谨慎。",
         "checklist": [
             {
@@ -138,7 +137,6 @@
         "title": "网页浏览",
         "slug": "web-browsing",
         "description": "避免在线跟踪、审查和数据收集",
-        "icon": "bi-browser-safari",
         "intro": "互联网上的大多数网站都会使用某种形式的跟踪，通常是为了深入了解用户的行为和偏好。这些数据可能非常详细，因此对企业、政府和知识产权窃贼来说非常有价值。数据泄露和泄漏很常见，而对用户的网络活动进行去匿名化通常是一项微不足道的任务。\n\n有两种主要的跟踪方法：有状态（基于 cookie）和无状态（基于指纹）。Cookie 是存储在浏览器中的一小段信息，具有用于识别您的唯一 ID。浏览器指纹是一种高度准确的方法，可以识别和跟踪用户在网上任何地方的行踪。收集的信息非常全面，通常包括浏览器详细信息、操作系统、屏幕分辨率、支持的字体、插件、时区、语言和字体偏好，甚至硬件配置。\n\n本节概述了您可以采取的步骤，以更好地保护自己免受威胁，最大程度地减少在线跟踪并提高隐私性。",
         "checklist": [
             {
@@ -381,7 +379,6 @@
         "title": "电子邮件",
         "slug": "email",
         "description": "保护您在线帐户的入口",
-        "icon": "bi-envelope-fill",
         "intro": "自从第一封电子邮件发送至今已近 50 年，它仍然是我们日常生活中非常重要的一部分，并且在不久的将来仍将如此。因此，考虑到我们对电子邮件的信任程度，这种基础设施从根本上来说是不安全的，这令人惊讶。电子邮件相关的欺诈行为[正在上升](https://www.csoonline.com/article/3247670/email/email-security-in-2018.html)，如果不采取基本措施，您可能会面临风险。\n\n如果黑客获得了访问您电子邮件的权限，则为您的其他帐户（通过密码重置）受到威胁提供了一个入口，因此电子邮件安全对于您的数字安全至关重要。\n\n提供“免费”电子邮件服务的大公司在尊重用户隐私方面没有良好的声誉：Gmail 被发现给予[第三方完全访问](https://www.wsj.com/articles/techs-dirty-secret-the-app-developers-sifting-through-your-gmail-1530544442)用户电子邮件的权限，并且还[跟踪您的所有购买行为](https://www.cnbc.com/2019/05/17/google-gmail-tracks-purchase-history-how-to-delete-it.html)。雅虎还被发现实时扫描电子邮件[以供美国监视机构使用](http://news.trust.org/item/20161004170601-99f8c) 广告商[被授予访问权限](https://thenextweb.com/insider/2018/08/29/both-yahoo-and-aol-are-scanning-customer-emails-to-attract-advertisers)雅虎和 AOL 用户邮件，以“通过获取上下文购买信号和过去的购买来识别和细分潜在客户”。",
         "checklist": [
             {
@@ -516,7 +513,6 @@
         "title": "即时通讯",
         "slug": "messaging",
         "description": "确保您的通信私密和安全",
-        "icon": "bi-chat-dots-fill",
         "intro": "",
         "checklist": [
             {
@@ -639,7 +635,6 @@
         "title": "社交媒体",
         "slug": "social-media",
         "description": "最小化使用在线社区的风险",
-        "icon": "bi-people-fill",
         "intro": "自互联网发明以来，在线社区就已存在，它为世界各地的人们提供了联系、交流和分享的机会。虽然这些网络是促进社交互动和将人们聚集在一起的好方法，但它们也有黑暗的一面 - 存在一些严重的[社交网络服务隐私问题](https://en.wikipedia.org/wiki/Privacy_concerns_with_social_networking_services)，而且这些社交网站归私营公司所有，它们通过收集个人数据并将这些数据出售（通常是出售给第三方广告商）来赚钱。\n保护您的帐户，锁定您的隐私设置，但要知道，即使这样做之后，所有有意和无意上传的数据实际上都是公开的。如果可能，请避免使用传统的社交媒体网络。\n",
         "checklist": [
             {
@@ -738,7 +733,6 @@
         "title": "网络设备",
         "slug": "networks",
         "description": "保护您的网络流量",
-        "icon": "bi-shield-shaded",
         "intro": "本节介绍如何将您的设备安全地连接到互联网，包括配置您的路由器和设置 VPN。\n",
         "checklist": [
             {
@@ -897,7 +891,6 @@
         "title": "移动设备",
         "slug": "mobile-devices",
         "description": "减少对手机、智能手机和平板电脑的侵入性跟踪",
-        "icon": "bi-phone-fill",
         "intro": "智能手机彻底改变了生活的许多方面，并将世界带到我们的指尖。对于我们许多人来说，智能手机是我们沟通、娱乐和获取知识的主要手段。但是，虽然它们将便利性提升到了一个全新的水平，但在屏幕背后却发生了一些丑陋的事情。\n地理跟踪被用来追踪我们的一举一动，我们几乎无法控制谁拥有这些数据 - 您的手机甚至能够[在没有 GPS 的情况下跟踪您的位置](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371)。多年来，出现了许多报告，概述了您的手机[麦克风可以窃听](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html)的方式，以及[摄像头可以监视您](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6) - 所有这些都无需您的知情或同意。然后是恶意应用程序、缺乏安全补丁以及潜在/可能的后门。\n使用智能手机会产生大量关于您的数据 - 从您有意共享的信息到从您的行为中默默生成的数据。看到谷歌、微软、苹果和 Facebook 对我们的了解程度，这可能很可怕 - 有时他们比我们最亲密的家人了解得更多。很难理解您的数据将揭示什么，尤其是与其他数据结合使用时。\n这些数据被用于[不仅仅是广告](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - 更多时候，它被用来为人们的财务、保险和就业进行评级。定向广告甚至可以用于细粒度监控（参见 [ADINT](https://adint.cs.washington.edu)）\n我们更多人担心[政府如何使用收集和使用我们的智能手机数据](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/)，这是理所当然的，联邦机构经常[向谷歌](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/)、[Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/)、苹果、微软、亚马逊和其他科技公司索取我们的数据。有时会批量提出请求，返回某个地理围栏内每个人的详细信息，[通常是针对无辜的人](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html)。这还不包括世界各地的情报机构可以不受阻碍地访问的所有互联网流量。\n",
         "checklist": [
             {
@@ -1044,7 +1037,6 @@
         "title": "个人电脑",
         "slug": "personal-computers",
         "description": "保护您的 PC 操作系统、数据和活动",
-        "icon": "bi-laptop-fill",
         "intro": "尽管 Windows 和 OS X 易于使用且方便，但它们都远非安全。您的操作系统提供了硬件和应用程序之间的接口，因此如果受到威胁，可能会产生不利影响。\n",
         "checklist": [
             {
@@ -1263,7 +1255,6 @@
         "title": "智能家居",
         "slug": "smart-home",
         "description": "使用物联网设备而不损害您的隐私",
-        "icon": "bi-house-add-fill",
         "intro": "家庭助手（例如 Google Home、Alexa 和 Siri）和其他互联网连接设备收集大量个人数据（包括语音样本、位置数据、家庭详细信息和所有交互的日志）。由于您对收集的内容、存储方式以及用途的控制有限，因此很难向任何关心隐私和安全的人推荐任何消费者智能家居产品。\n安全与隐私：市场上有许多智能设备声称可以提高您家庭的安全性，同时使用起来简单方便（例如智能防盗警报器、互联网安全摄像头、智能锁和远程访问门铃等等）。这些设备可能看起来使安全性更容易，但在隐私方面需要权衡：因为它们收集大量个人数据，并且让您无法控制如何存储或使用这些数据。这些设备的安全性也值得怀疑，因为其中许多设备可以（并且正在）被黑客入侵，从而使入侵者能够以最小的努力绕过检测。\n最尊重隐私的选择是不在您的家中使用“智能”互联网连接设备，并且不依赖需要互联网连接的安全设备。但如果您这样做，在购买之前充分了解任何给定产品的风险非常重要。然后调整设置以提高隐私和安全性。以下清单将帮助您减轻与互联网连接的家庭设备相关的风险。",
         "checklist": [
             {
@@ -1350,7 +1341,6 @@
         "title": "个人财务",
         "slug": "personal-finance",
         "description": "保护您的资金、金融账户和交易",
-        "icon": "bi-currency-exchange",
         "intro": "信用卡欺诈是最常见的身份盗窃形式（[仅在 2017 年美国就有 133,015 起报告](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)），总损失达 9.05 亿美元，比上一年增加了 26%。每人损失的中位数为 429 美元（2017 年）。采取基本步骤保护自己免受侵害比以往任何时候都更重要。\n关于信用卡的注意事项：信用卡采用技术手段来检测和阻止某些欺诈性交易。主要的支付处理商通过挖掘其持卡人的大量数据来实现这一点，以便深入了解每个人的消费习惯。这些数据用于识别欺诈，但也出售给其他数据代理商。因此，信用卡有利于安全性，但不利于数据隐私。",
         "checklist": [
             {
@@ -1419,7 +1409,6 @@
         "title": "人为因素",
         "slug": "human-aspect",
         "description": "避免社会工程学安全风险",
-        "icon": "bi-person-bounding-box",
         "intro": "许多数据泄露、黑客攻击和攻击都是由人为错误引起的。以下列表包含您应该采取的步骤，以减少发生在您身上的风险。其中许多是常识，但值得注意。",
         "checklist": [
             {
@@ -1554,7 +1543,6 @@
         "title": "物理安全",
         "slug": "physical-security",
         "description": "采取措施防止现实生活中的安全事件",
-        "icon": "bi-file-earmark-break-fill",
         "intro": "公共记录通常包括敏感的个人数据（全名、出生日期、电话号码、电子邮件、地址、种族等），并且是从各种来源收集的（人口普查记录、出生/死亡/结婚证书、选民登记、营销信息、客户数据库、机动车记录、专业/商业执照以及所有法庭文件的完整详细信息）。这些敏感的个人信息[易于合法访问](https://www.consumerreports.org/consumerist/its-creepy-but-not-illegal-for-this-website-to-provide-all-your-public-info-to-anyone/)，这引发了一些[严重的隐私问题](https://privacyrights.org/resources/public-records-internet-privacy-dilemma)（身份盗窃、人身安全风险/跟踪者、名誉损害、档案社会）\n\n闭路电视是公司、个人和政府跟踪您行踪的主要方式之一。在英国伦敦，平均每人每天被摄像头拍到约 500 次。这个网络正在不断发展，在世界许多城市，面部识别技术正在推广，这意味着国家可以实时了解镜头中居民的身份。\n如果有人能够实际损害您、您的设备和您的数据，那么强大的身份验证、加密设备、修补软件和匿名网页浏览可能没什么用。本节概述了一些物理安全的基本方法。",
         "checklist": [
             {
