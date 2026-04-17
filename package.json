@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@cloudflare/speedtest": "^1.8.1",
+    "@iconify-json/circle-flags": "^1.2.10",
+    "@iconify/vue": "^5.0.0",
     "@khmyznikov/pwa-install": "^0.6.3",
     "@thumbmarkjs/thumbmarkjs": "^1.7.7",
     "chart.js": "^4.5.1",

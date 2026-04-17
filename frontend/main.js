@@ -15,6 +15,14 @@ import { registerServiceWorker } from './utils/register-service-worker';
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
 
+// iconify circle-flags 集合离线注册：
+// - 动态 import 让 Vite 把这份 500KB 的 JSON 分块，不进主 bundle
+// - Promise then 异步注册；首屏渲染时国旗可能瞬间空着，~100ms 后出现
+// - 注册完后 <Icon icon="circle-flags:xx" /> 即可用，不依赖 iconify CDN
+import('@iconify-json/circle-flags/icons.json').then(({ default: flags }) => {
+    import('@iconify/vue').then(({ addCollection }) => addCollection(flags));
+});
+
 const app = createApp(App);
 const pinia = createPinia();
 

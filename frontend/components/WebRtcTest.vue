@@ -64,9 +64,9 @@
               </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(stun.country)">
-                  <span v-if="stun.country_code"
-                    :class="'fi fi-' + stun.country_code + ' fis'"
-                    class="shrink-0 size-4 rounded-full"></span>
+                  <Icon v-if="stun.country_code"
+                    :icon="'circle-flags:' + stun.country_code"
+                    class="shrink-0 size-4" />
                   <span class="break-words">{{ stun.country }}</span>
                 </template>
                 <span v-else class="text-muted-foreground font-normal">—</span>
@@ -91,6 +91,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { ChevronRight, MapPin, Merge, Network, RotateCw } from 'lucide-vue-next';
+import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
