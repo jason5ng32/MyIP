@@ -140,7 +140,7 @@
 - [x] `components/Achievements.vue` — Sheet header + Tabs；成就卡片 grid；`.alert alert-success/warning` → Tailwind 色块；成就卡片 .jn-achievements-card-dark 合并为 `:global(.dark) .jn-achievements-card`；`.text-secondary` + conditional 'text-light' 合并为 `text-neutral-500 dark:text-neutral-100`
 - [x] `components/widgets/Preferences.vue` — 全部 btn-group radio 模式 → `<ToggleGroup>`；所有 form-check-input/form-switch → shadcn `<Switch>`；`.list-group.list-group-item` → Tailwind flex 列表；移除所有 `.dark-mode-*` / `.btn-outline-dark/light` / `.form-check-input jn-check-dark/light` 条件类
 - [x] `components/widgets/Toast.vue` — 无工作：已在阶段 B 完成（sonner，仅包装 `<Sonner />`，无模板 Bootstrap class）
-- [ ] `App.vue` 模板部分（注意：App.vue 大改要协调 02 任务）
+- [x] `App.vue` 模板部分 — `.container mt-5` → `mx-auto w-full px-4 mt-5`（保留 .jn-container 的 max-width 自定义）；`.rounded-2` → `.rounded-md`。App.vue 脚本大改部分归到 refactor/02 单独做
 
 C.2 全部完成之后 → 进入阶段 E（卸载 bootstrap 和 CSS import）。
 

@@ -5,9 +5,9 @@
     <Achievements ref="achievementsRef" />
     <Preferences ref="preferencesRef" />
     <Alert />
-    <div id="mainpart" class="container mt-5 jn-container">
+    <div id="mainpart" class="mx-auto w-full px-4 mt-5 jn-container">
       <!-- refactor/01：Bootstrap scrollspy 移除，Patch.vue 的 checkSectionsAndTrack 已经在做同样的事 -->
-      <div class="rounded-2" tabindex="0">
+      <div class="rounded-md" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />
         <WebRTC ref="webRTCRef" />
