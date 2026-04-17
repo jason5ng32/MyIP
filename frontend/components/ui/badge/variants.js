@@ -12,6 +12,7 @@ export const badgeVariants = cva(
         secondary: 'border-transparent bg-secondary text-secondary-foreground',
         destructive: 'border-transparent bg-destructive text-destructive-foreground shadow',
         outline: 'text-foreground',
+        success: 'border-transparent bg-success text-success-foreground shadow',
       },
     },
     defaultVariants: { variant: 'default' },
