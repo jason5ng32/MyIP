@@ -41,7 +41,7 @@
         <!-- 工具详情 Drawer（替代原 Sheet）：vaul 自带拖拽关闭 + body scale -->
         <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
             <DrawerContent :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
-                :class="cn('jn-tools-drawer overflow-hidden', isMobile ? 'h-full' : (isFullScreen ? 'h-full' : 'h-[85vh]'))">
+                :class="cn('jn-tools-drawer overflow-hidden', isMobile ? 'h-full' : (isFullScreen ? 'h-full rounded-none' : 'h-[85vh]'))">
                 <!-- Drawer 内部 header：全屏切换 + 标题 + 关闭 -->
                 <div class="flex items-center gap-2 px-4 pt-1 pb-3 jn-drawer-header shrink-0">
                     <button v-if="!isMobile" type="button"
