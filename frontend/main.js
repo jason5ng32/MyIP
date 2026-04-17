@@ -45,16 +45,7 @@ window.addEventListener('resize', handleResize);
 
 // 启动 Google Analytics
 analytics.page();
-app.config.globalProperties.$analytics = analytics;
 registerServiceWorker();
-
-// 注册全局事件跟踪函数，改造完程序后移除
-app.config.globalProperties.$trackEvent = function (category, action, label) {
-    analytics.track(action, {
-        category: category,
-        label: label,
-    });
-};
 
 // 检查 Firebase 环境
 store.checkFirebaseEnv();
