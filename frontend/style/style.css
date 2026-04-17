@@ -29,7 +29,19 @@
 /* 暗色模式：用 .dark class 触发（由 store.isDarkMode 同步到 <html>） */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 设计 tokens — shadcn-vue 标准 CSS 变量 */
+/* 设计 tokens — shadcn-vue 标准 CSS 变量 + 项目自定义语义色
+   ---------------------------------------------------------
+   自定义 token 规则：
+   - info     = 信息/进行中/等待（配合 animate-ping 状态灯）   ≈ sky-500
+   - success  = 成功/OK-fast                                    ≈ green-500
+   - warning  = 警告/OK-slow                                    ≈ amber-500
+   - destructive 继续用 shadcn 原生，对应 fail / error          ≈ red-500
+
+   每个语义色都带 foreground 配对，用在 bg-* 上时文字色自动正确
+   （amber 亮色所以 foreground 是深色；sky / green / red 深色所以
+   foreground 是白）。明暗模式通过 :root / .dark 独立定义，用 token
+   的地方不需要再写 dark: 变体。
+*/
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -47,6 +59,13 @@
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
+  /* 项目自定义语义色（light mode，取 Tailwind *-500 对应 oklch 值）*/
+  --info: oklch(0.685 0.169 237.323);         /* sky-500 */
+  --info-foreground: oklch(0.985 0 0);
+  --success: oklch(0.723 0.219 149.579);      /* green-500 */
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.769 0.188 70.08);        /* amber-500 */
+  --warning-foreground: oklch(0.145 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -70,6 +89,13 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
+  /* dark mode 下略提亮（对应 Tailwind *-400，暗背景下可读性更好）*/
+  --info: oklch(0.746 0.16 232.661);          /* sky-400 */
+  --info-foreground: oklch(0.145 0 0);
+  --success: oklch(0.792 0.209 151.711);      /* green-400 */
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.828 0.189 84.429);       /* amber-400 */
+  --warning-foreground: oklch(0.145 0 0);
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
@@ -92,6 +118,12 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

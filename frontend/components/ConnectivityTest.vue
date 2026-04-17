@@ -34,7 +34,7 @@
             <span class="flex items-center gap-1.5 text-base min-w-0">
               <span class="relative flex shrink-0">
                 <span v-if="toneOf(test) === 'wait'"
-                  class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
+                  class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
               </span>
               <span :class="textClass(toneOf(test))" class="truncate">{{ test.status }}</span>

@@ -39,7 +39,7 @@
           <div class="flex items-start gap-1.5 text-base mb-3">
             <span class="relative flex shrink-0 mt-[0.5em]">
               <span v-if="toneOf(leak) === 'wait'"
-                class="absolute inline-flex size-2 rounded-full bg-sky-400 opacity-75 animate-ping"></span>
+                class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
             <span class="break-all">

@@ -11,42 +11,55 @@
 
     <Card class="keyboard-shortcut-card jn-card">
       <CardContent class="p-4 md:p-6">
-        <!-- 控制区：下载大小 / 上传大小 / 开始按钮
-             用 ToggleGroup 把 5 档大小平铺出来，一眼看全，单击切换
-             （ToggleGroup value 是 string，用 String()/Number() 在边界处转换） -->
-        <div class="flex flex-col gap-3 mb-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-          <div class="flex items-center gap-2">
-            <CloudDownload class="size-4 text-muted-foreground shrink-0" aria-label="Download Bytes" />
-            <ToggleGroup type="single"
-              :model-value="String(state.config.package.download.bytes)"
+        <!-- 控制区：input-group 拼接（下载图标 + 下载 Select + 上传图标 + 上传 Select + Start Button）
+             Select 的 value 是 string，边界处 String()/Number() 转换；
+             视觉上用 -ml-px 让相邻边框重叠成一条连续的线，形成 "button group" -->
+        <div class="flex justify-end mb-5">
+          <div class="inline-flex items-stretch">
+            <!-- Download addon -->
+            <span class="flex items-center px-3 border border-input rounded-l-md bg-muted"
+              aria-label="Download Bytes">
+              <CloudDownload class="size-4 text-muted-foreground" />
+            </span>
+            <!-- Download select -->
+            <Select :model-value="String(state.config.package.download.bytes)"
               @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <ToggleGroupItem v-for="size in sizeOptions" :key="size" :value="String(size)"
-                class="h-8 px-2.5 text-xs">
-                {{ size / 1e6 }}
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <span class="text-xs text-muted-foreground">MB</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <CloudUpload class="size-4 text-muted-foreground shrink-0" aria-label="Upload Bytes" />
-            <ToggleGroup type="single"
-              :model-value="String(state.config.package.upload.bytes)"
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
+                  {{ size / 1e6 }} MB
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <!-- Upload addon -->
+            <span class="flex items-center px-3 border border-input border-l-0 bg-muted"
+              aria-label="Upload Bytes">
+              <CloudUpload class="size-4 text-muted-foreground" />
+            </span>
+            <!-- Upload select -->
+            <Select :model-value="String(state.config.package.upload.bytes)"
               @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <ToggleGroupItem v-for="size in sizeOptions" :key="size" :value="String(size)"
-                class="h-8 px-2.5 text-xs">
-                {{ size / 1e6 }}
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <span class="text-xs text-muted-foreground">MB</span>
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
+                  {{ size / 1e6 }} MB
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <!-- Start/Pause/Restart button -->
+            <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
+              <Button size="icon" variant="outline" class="rounded-l-none border-l-0"
+                @click="speedTestController" aria-label="Start/Pause Speed Test">
+                <component :is="ctaIcon" />
+              </Button>
+            </JnTooltip>
           </div>
-          <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
-            <Button size="icon" variant="outline"
-              @click="speedTestController" aria-label="Start/Pause Speed Test">
-              <component :is="ctaIcon" />
-            </Button>
-          </JnTooltip>
         </div>
 
         <!-- 连接信息行（测试启动后出现） -->
@@ -56,8 +69,7 @@
             <span class="inline-flex items-center gap-1.5">
               <PersonStanding class="size-4 text-muted-foreground" />
               {{ state.connection.country }}
-              <Icon v-if="state.connection.country"
-                :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
+              <Icon v-if="state.connection.country" :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
                 class="size-4" />
             </span>
             <ArrowLeftRight class="size-4 text-muted-foreground" />
@@ -65,18 +77,14 @@
               <Globe class="size-4 text-muted-foreground" />
               {{ state.connection.colo }}, {{ state.connection.coloCountry }}
               <Icon v-if="state.connection.coloCountry"
-                :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()"
-                class="size-4" />
+                :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()" class="size-4" />
             </span>
           </div>
         </Transition>
 
         <!-- 进度条：空闲态隐藏；indicator 色跟随状态（sky / green / red），
              与顶部的 WebRTC wait 色统一 -->
-        <Progress
-          v-show="state.speedTest.status !== 'idle'"
-          :model-value="state.speedTest.progress"
-          class="mb-6"
+        <Progress v-show="state.speedTest.status !== 'idle'" :model-value="state.speedTest.progress" class="mb-6"
           :class="progressIndicatorClass" />
 
         <!-- 4 个指标 tile：现代仪表盘风，大数字 + 小标签 -->
@@ -85,7 +93,8 @@
             <p class="text-xs uppercase tracking-wider text-muted-foreground mb-1">{{ m.label }}</p>
             <p class="text-2xl md:text-3xl font-semibold tabular-nums" :class="metricColorClass">
               <span>{{ state.speedTest[m.key] }}</span>
-              <span v-if="state.speedTest.status !== 'idle'" class="ml-1 text-sm font-normal text-muted-foreground">{{ m.unit }}</span>
+              <span v-if="state.speedTest.status !== 'idle'" class="ml-1 text-sm font-normal text-muted-foreground">{{
+                m.unit }}</span>
             </p>
           </div>
         </div>
@@ -102,12 +111,15 @@
           </div>
         </div>
 
-        <!-- 结果块：连接摘要 + 质量 badge + 说明 -->
+        <!-- 结果块：连接摘要 + 质量 badge + 说明
+             注意：浅色 success 面板背景保留 green-50/200 这种 Tailwind 原生色
+             （语义 token 目前只含 solid 色，没定义 *-subtle 浅色变体；图标 / 质量
+             badge 已用 text-success / text-warning 等 token）-->
         <div v-if="isFinished && state.speedTest.hasScores"
           class="jn-slide-in rounded-md border border-green-200 bg-green-50 p-4 dark:bg-green-950/30 dark:border-green-900">
           <div class="flex items-start gap-2 mb-3">
-            <CalendarCheck2 class="size-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-            <p class="text-sm text-green-900 dark:text-green-100" v-if="state.connection.colo">
+            <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
+            <span class="text-base text-green-900 dark:text-green-100" v-if="state.connection.colo">
               {{ t('speedtest.connectionFrom') }}
               <span class="font-mono">{{ state.connection.ip }}</span>
               ( {{ state.connection.country }} )
@@ -115,20 +127,20 @@
               {{ state.connection.colo }}
               ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
               {{ t('speedtest.connectionEnd') }}
-            </p>
+
+              {{ t('speedtest.videoStreaming') }}
+              <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
+                state.speedTest.streamingQuality) }}</span>
+              {{ t('speedtest.gaming') }}
+              <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
+                {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
+              </span>
+              {{ t('speedtest.rtc') }}
+              <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
+                {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
+              </span>
+            </span>
           </div>
-          <div class="flex flex-wrap gap-2 mb-3">
-            <Badge :class="qualityBadgeClass(state.speedTest.streamingScore)" class="border-transparent text-xs">
-              {{ t('speedtest.videoStreaming') }}: {{ t('speedtest.quality.' + state.speedTest.streamingQuality) }}
-            </Badge>
-            <Badge :class="qualityBadgeClass(state.speedTest.gamingScore)" class="border-transparent text-xs">
-              {{ t('speedtest.gaming') }}: {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
-            </Badge>
-            <Badge :class="qualityBadgeClass(state.speedTest.rtcScore)" class="border-transparent text-xs">
-              {{ t('speedtest.rtc') }}: {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
-            </Badge>
-          </div>
-          <p class="text-xs text-muted-foreground">{{ t('speedtest.resultNote') }}</p>
         </div>
       </CardContent>
     </Card>
@@ -149,7 +161,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   ArrowLeftRight, CalendarCheck2, ChevronRight, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
@@ -199,10 +211,10 @@ const sizeOptions = [1e6, 10e6, 15e6, 50e6, 100e6];
 
 // --- 派生状态 ----------------------------------------------------------
 
-const isRunning  = computed(() => state.speedTest.status === 'running');
-const isPaused   = computed(() => state.speedTest.status === 'paused');
+const isRunning = computed(() => state.speedTest.status === 'running');
+const isPaused = computed(() => state.speedTest.status === 'paused');
 const isFinished = computed(() => state.speedTest.status === 'finished');
-const isError    = computed(() => state.speedTest.status === 'error');
+const isError = computed(() => state.speedTest.status === 'error');
 
 // CTA 图标：running=暂停、finished/error=重试、其余=开始
 const ctaIcon = computed(() => {
@@ -211,37 +223,37 @@ const ctaIcon = computed(() => {
   return ChevronRight;
 });
 
-// 数字 + 进度条颜色：统一到 -500 家族，和 WebRTC / DnsLeak 的状态灯色对齐
-// 运行中 sky（= wait tone）、完成 green（= ok-fast tone）、错误 red（= fail tone）
+// 数字 + 进度条颜色：走 style.css 语义 token，运行中 info / 完成 success /
+// 错误 destructive。token 本身明暗模式已配好，不需要再写 dark: 变体
 const metricColorClass = computed(() => {
-  if (isRunning.value || isPaused.value) return 'text-sky-500 dark:text-sky-400';
-  if (isFinished.value) return 'text-green-500 dark:text-green-400';
-  if (isError.value) return 'text-red-500 dark:text-red-400';
+  if (isRunning.value || isPaused.value) return 'text-info';
+  if (isFinished.value) return 'text-success';
+  if (isError.value) return 'text-destructive';
   return '';
 });
 // Progress 内部 indicator 色（Progress.vue 默认 bg-primary = 黑）；
 // 通过 [&>*]:bg-* 子选择器覆盖到对应 tone
 const progressIndicatorClass = computed(() => {
-  if (isFinished.value) return '[&>*]:bg-green-500';
-  if (isError.value)    return '[&>*]:bg-red-500';
-  if (isRunning.value || isPaused.value) return '[&>*]:bg-sky-500';
+  if (isFinished.value) return '[&>*]:bg-success';
+  if (isError.value) return '[&>*]:bg-destructive';
+  if (isRunning.value || isPaused.value) return '[&>*]:bg-info';
   return '';
 });
 
 // 4 个指标元数据，模板里 v-for 去掉重复
 const metrics = computed(() => [
   { key: 'downloadSpeed', label: t('speedtest.Download'), unit: 'Mb/s' },
-  { key: 'uploadSpeed',   label: t('speedtest.Upload'),   unit: 'Mb/s' },
-  { key: 'latency',       label: t('speedtest.Latency'),  unit: 'ms'   },
-  { key: 'jitter',        label: t('speedtest.Jitter'),   unit: 'ms'   },
+  { key: 'uploadSpeed', label: t('speedtest.Upload'), unit: 'Mb/s' },
+  { key: 'latency', label: t('speedtest.Latency'), unit: 'ms' },
+  { key: 'jitter', label: t('speedtest.Jitter'), unit: 'ms' },
 ]);
 
-// quality → Badge 配色（>=50 green, >=10 amber, else red）
+// quality → Badge 配色（>=50 success, >=10 warning, else destructive）
 const qualityBadgeClass = (score) => {
-  if (score === '-' || score === undefined) return 'bg-neutral-500 text-white';
-  if (score >= 50) return 'bg-green-600 text-white';
-  if (score >= 10) return 'bg-amber-500 text-neutral-900';
-  return 'bg-red-600 text-white';
+  if (score === '-' || score === undefined) return 'text-muted-foreground';
+  if (score >= 50) return 'text-success';
+  if (score >= 10) return 'text-warning';
+  return 'text-destructive';
 };
 
 // --- 连接数据 ----------------------------------------------------------
@@ -301,9 +313,9 @@ const engineMethods = {
     const summary = results.getSummary();
     Object.assign(state.speedTest, {
       downloadSpeed: parseFloat((summary.download / 1000000).toFixed(2)),
-      uploadSpeed:   parseFloat((summary.upload   / 1000000).toFixed(2)),
-      latency:       parseFloat(summary.latency.toFixed(2)),
-      jitter:        parseFloat(summary.jitter.toFixed(2)),
+      uploadSpeed: parseFloat((summary.upload / 1000000).toFixed(2)),
+      latency: parseFloat(summary.latency.toFixed(2)),
+      jitter: parseFloat(summary.jitter.toFixed(2)),
     });
   },
 
@@ -312,8 +324,8 @@ const engineMethods = {
     const perStage = 100 / 3;
     let progress = 0;
     if (rawData.download?.started) progress += rawData.download.finished ? perStage : perStage / 2;
-    if (rawData.upload?.started)   progress += rawData.upload.finished   ? perStage : perStage / 2;
-    if (rawData.latency?.started)  progress += rawData.latency.finished  ? perStage : perStage / 2;
+    if (rawData.upload?.started) progress += rawData.upload.finished ? perStage : perStage / 2;
+    if (rawData.latency?.started) progress += rawData.latency.finished ? perStage : perStage / 2;
     state.speedTest.progress = Math.min(progress, 100);
   },
 
@@ -413,12 +425,12 @@ const achievementHandler = {
   getQualifiedAchievements() {
     const { downloadSpeed, uploadSpeed } = state.speedTest;
     const achievements = [];
-    if (downloadSpeed >= 100)  achievements.push('BarelyEnough');
-    if (downloadSpeed >= 500)  achievements.push('RapidPace');
+    if (downloadSpeed >= 100) achievements.push('BarelyEnough');
+    if (downloadSpeed >= 500) achievements.push('RapidPace');
     if (downloadSpeed >= 1000) achievements.push('TorrentFlow');
-    if (uploadSpeed >= 50)     achievements.push('SteadyGoing');
-    if (uploadSpeed >= 200)    achievements.push('TooFastTooSimple');
-    if (uploadSpeed >= 1000)   achievements.push('SwiftAscent');
+    if (uploadSpeed >= 50) achievements.push('SteadyGoing');
+    if (uploadSpeed >= 200) achievements.push('TooFastTooSimple');
+    if (uploadSpeed >= 1000) achievements.push('SwiftAscent');
     return achievements.filter((a) => !store.userAchievements[a].achieved);
   },
 
@@ -460,8 +472,8 @@ const setupTestEngine = async () => {
       state.speedTest.gamingScore = scores.gaming.points;
       state.speedTest.rtcScore = scores.rtc.points;
       state.speedTest.streamingQuality = scores.streaming.points >= 50 ? 'Good' : scores.streaming.points >= 10 ? 'Medium' : 'Bad';
-      state.speedTest.gamingQuality    = scores.gaming.points    >= 50 ? 'Good' : scores.gaming.points    >= 10 ? 'Medium' : 'Bad';
-      state.speedTest.rtcQuality       = scores.rtc.points       >= 50 ? 'Good' : scores.rtc.points       >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.gamingQuality = scores.gaming.points >= 50 ? 'Good' : scores.gaming.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.rtcQuality = scores.rtc.points >= 50 ? 'Good' : scores.rtc.points >= 10 ? 'Medium' : 'Bad';
     }
 
     testEngine = null;
@@ -522,9 +534,11 @@ defineExpose({ speedTestController });
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }
+
 .slide-fade-leave-active {
   transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
+
 .slide-fade-enter-from,
 .slide-fade-leave-to {
   transform: translateX(20px);
@@ -535,25 +549,42 @@ defineExpose({ speedTestController });
 .speed-charts-container {
   margin: 20pt 0;
 }
+
 .chart-wrapper {
   position: relative;
   height: 130pt;
   width: 100%;
   margin-bottom: 15pt;
 }
+
 @media (max-width: 768px) {
-  .chart-wrapper { height: 100pt; margin-bottom: 20pt; }
+  .chart-wrapper {
+    height: 100pt;
+    margin-bottom: 20pt;
+  }
 }
+
 @media (min-width: 769px) and (max-width: 991px) {
-  .chart-wrapper { height: 100pt; margin-bottom: 25pt; }
+  .chart-wrapper {
+    height: 100pt;
+    margin-bottom: 25pt;
+  }
 }
 
 /* 测试启动 / 完成时的滑入动画 */
 .jn-slide-in {
   animation: jn-slide-in 0.2s ease-in forwards;
 }
+
 @keyframes jn-slide-in {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 </style>
