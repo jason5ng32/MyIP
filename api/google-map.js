@@ -57,7 +57,10 @@ export default (req, res) => {
         return res.status(400).json({ error: 'Missing latitude, longitude, or language' });
     }
 
-    const mapSize = '500x400';
+    // Size targets the Dialog-based map viewer: aspect-2/1 at up to ~768px wide.
+    // Standard Static Maps plan caps each dimension at 640, so 640x320 + scale=2
+    // yields a 1280x640 effective image — sharp when downscaled into the Dialog.
+    const mapSize = '640x320';
     const fmt = 'jpg';
     const scale = 2;
     const zoom = 3;
