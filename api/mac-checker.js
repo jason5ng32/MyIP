@@ -1,5 +1,4 @@
 import { get } from 'https';
-import { refererCheck } from '../common/referer-check.js';
 
 // A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
 // strings let the upstream API receive partial prefixes and return
@@ -10,12 +9,6 @@ const isValidMAC = (address) => {
 }
 
 export default async (req, res) => {
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     // 从请求中获取 IP 地址
     let macAddress = req.query.mac;
     if (!macAddress) {

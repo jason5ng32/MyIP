@@ -1,15 +1,7 @@
 import { isValidIP } from '../common/valid-ip.js';
-import { refererCheck } from '../common/referer-check.js';
 import { lookupMaxMind } from '../common/maxmind-service.js';
 
 export default (req, res) => {
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const ip = req.query.ip;
     if (!ip) {
         return res.status(400).json({ error: 'No IP address provided' });

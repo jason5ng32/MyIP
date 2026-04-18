@@ -1,5 +1,3 @@
-import { refererCheck } from '../common/referer-check.js';
-
 // 创建一个用于设置 headers 的通用函数
 function createFetchOptions() {
     return {
@@ -145,13 +143,6 @@ function filterData(data) {
 
 // 导出函数
 export default async (req, res) => {
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const asn = req.query.asn;
     if (!asn) {
         return res.status(400).json({ error: 'No ASN provided' });

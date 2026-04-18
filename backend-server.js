@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
+import { requireReferer } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -146,6 +147,10 @@ if (speedLimitSet !== 0) {
 }
 
 app.use(express.json());
+
+// Global referer gate for all /api/* routes. Handlers no longer repeat this
+// check individually — see common/guards.js.
+app.use('/api', requireReferer);
 
 // APIs
 app.get('/api/map', mapHandler);

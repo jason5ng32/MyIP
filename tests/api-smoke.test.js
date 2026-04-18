@@ -81,14 +81,8 @@ describe('configs API smoke tests', () => {
     assert.deepEqual(res.body, { message: 'Method Not Allowed' });
   });
 
-  it('rejects requests without a referer', () => {
-    const res = createResponse();
-
-    configsHandler(createRequest({ referer: undefined }), res);
-
-    assert.equal(res.statusCode, 403);
-    assert.deepEqual(res.body, { error: 'What are you doing?' });
-  });
+  // Referer rejection is now enforced by requireReferer middleware
+  // (mounted globally on /api in backend-server.js). See tests/guards.test.js.
 
   it('returns boolean config flags for localhost requests', () => {
     const res = createResponse();
@@ -104,14 +98,7 @@ describe('configs API smoke tests', () => {
 });
 
 describe('map API smoke tests', () => {
-  it('rejects requests without a referer', () => {
-    const res = createResponse();
-
-    googleMapHandler(createRequest({ referer: undefined }), res);
-
-    assert.equal(res.statusCode, 403);
-    assert.deepEqual(res.body, { error: 'What are you doing?' });
-  });
+  // Referer rejection moved to requireReferer middleware (see tests/guards.test.js).
 
   it('rejects invalid map parameters without calling the external map API', () => {
     const res = createResponse();
@@ -126,14 +113,7 @@ describe('map API smoke tests', () => {
 });
 
 describe('MaxMind API smoke tests', () => {
-  it('rejects requests without a referer', () => {
-    const res = createResponse();
-
-    maxmindHandler(createRequest({ referer: undefined }), res);
-
-    assert.equal(res.statusCode, 403);
-    assert.deepEqual(res.body, { error: 'What are you doing?' });
-  });
+  // Referer rejection moved to requireReferer middleware (see tests/guards.test.js).
 
   it('rejects missing and invalid IP parameters before database lookup', () => {
     const missingIpResponse = createResponse();
@@ -159,14 +139,7 @@ describe('DNS resolver API smoke tests', () => {
     assert.deepEqual(res.body, { message: 'Method Not Allowed' });
   });
 
-  it('rejects requests without a referer', async () => {
-    const res = createResponse();
-
-    await dnsResolverHandler(createRequest({ referer: undefined }), res);
-
-    assert.equal(res.statusCode, 403);
-    assert.deepEqual(res.body, { error: 'What are you doing?' });
-  });
+  // Referer rejection moved to requireReferer middleware (see tests/guards.test.js).
 
   it('rejects invalid hostnames before DNS lookup', async () => {
     const missingHostnameResponse = createResponse();

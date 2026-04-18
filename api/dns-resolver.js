@@ -1,7 +1,6 @@
 // api/dnsresolver.js
 import { Resolver } from 'dns';
 import { promisify } from 'util';
-import { refererCheck } from '../common/referer-check.js';
 
 // 普通 DNS 服务器列表
 const dnsServers = {
@@ -96,15 +95,10 @@ const resolveDoh = async (hostname, type, name, url) => {
 
 const dnsResolver = async (req, res) => {
 
-    // 限制请求方法
+    // 限制请求方法 — defensive; app.get() in backend-server.js already gates method,
+    // but a dedicated smoke test asserts this 405 branch directly against the handler.
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
-    }
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
     }
 
     const { hostname, type } = req.query;

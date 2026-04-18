@@ -1,18 +1,15 @@
-import { refererCheck } from '../common/referer-check.js';
-
 // 验证环境变量是否存在，以进行前端功能的开启和关闭
 export default (req, res) => {
-    // 限制请求方法
+    // defensive; app.get() in backend-server.js already gates method, but a
+    // dedicated smoke test asserts this branch directly against the handler.
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    // 限制只能从指定域名访问
+    // Referer has already been validated by requireReferer middleware. Here we
+    // just read it to classify whether the caller is the canonical ipcheck.ing
+    // deployment ("originalSite") or someone self-hosting a fork.
     const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const hostname = referer ? new URL(referer).hostname : '';
     const allowedHostnames = ['ipcheck.ing', 'www.ipcheck.ing', 'localtest.ipcheck.ing'];
     const originalSite = allowedHostnames.includes(hostname);

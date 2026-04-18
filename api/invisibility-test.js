@@ -1,5 +1,3 @@
-import { refererCheck } from '../common/referer-check.js';
-
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
 function isValidUserID(userID) {
     if (typeof userID !== 'string') {
@@ -14,13 +12,6 @@ function isValidUserID(userID) {
 }
 
 export default async (req, res) => {
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const id = req.query.id;
     if (!id) {
         return res.status(400).json({ error: 'No ID provided' });

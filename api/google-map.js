@@ -1,5 +1,4 @@
 import { get } from 'https';
-import { refererCheck } from '../common/referer-check.js';
 
 // 验证请求合法性
 function isValidRequest(req) {
@@ -39,12 +38,6 @@ const styles = {
 };
 
 export default (req, res) => {
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     // 检查请求是否合法
     if (!isValidRequest(req)) {
         return res.status(400).json({ error: 'Invalid request' });

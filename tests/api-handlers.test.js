@@ -62,41 +62,11 @@ afterEach(() => {
   }
 });
 
-// -- 通用 referer-rejection 参数化测试 -----------------------------------
-
-const refererRejectedHandlers = [
-  ['get-user-info', getUserInfoHandler],
-  ['get-whois', getWhoisHandler],
-  ['cf-radar', cfRadarHandler],
-  ['invisibility-test', invisibilityHandler],
-  ['mac-checker', macCheckerHandler],
-  ['update-user-achievement', updateAchievementHandler],
-  ['ip-sb', ipSbHandler],
-  ['ipapi-com', ipapiComHandler],
-  ['ipapi-is', ipapiIsHandler],
-  ['ipcheck-ing', ipcheckIngHandler],
-  ['ipinfo-io', ipinfoIoHandler],
-  ['ip2location-io', ip2locationHandler],
-];
-
-describe('All IP/whois/radar/achievement handlers reject missing referer with 403', () => {
-  for (const [name, handler] of refererRejectedHandlers) {
-    it(`${name} responds 403 when referer header is absent`, async () => {
-      const res = createResponse();
-      await handler(createRequest({ referer: undefined }), res);
-      assert.equal(res.statusCode, 403);
-      assert.deepEqual(res.body, { error: 'What are you doing?' });
-    });
-
-    it(`${name} responds 403 when referer is from an unknown domain`, async () => {
-      process.env.ALLOWED_DOMAINS = '';
-      const res = createResponse();
-      await handler(createRequest({ referer: 'https://evil.example/' }), res);
-      assert.equal(res.statusCode, 403);
-      assert.deepEqual(res.body, { error: 'Access denied' });
-    });
-  }
-});
+// Per-handler referer rejection tests have been removed. Referer validation
+// is now enforced globally by requireReferer middleware (mounted on /api in
+// backend-server.js). tests/guards.test.js covers the middleware itself; the
+// handler-level assertions here would pass through when called directly,
+// since handlers no longer carry their own referer check.
 
 // -- 逐 handler 参数校验 ---------------------------------------------------
 
