@@ -1,4 +1,4 @@
-import { fetchUpstream } from '../common/fetch-upstream.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
 // 通用的 fetch 请求函数
 async function fetchFromCloudflare(endpoint) {

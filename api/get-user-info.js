@@ -1,4 +1,4 @@
-import { fetchUpstream } from '../common/fetch-upstream.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
 export default async (req, res) => {
     const key = process.env.IPCHECKING_API_KEY;

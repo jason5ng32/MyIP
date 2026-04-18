@@ -1,4 +1,4 @@
-import { fetchUpstream } from '../common/fetch-upstream.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
 export default async (req, res) => {
     // defensive; app.put() in backend-server.js already gates method

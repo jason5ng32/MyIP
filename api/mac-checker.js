@@ -1,4 +1,4 @@
-import { fetchUpstream } from '../common/fetch-upstream.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
 // A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
 // strings let the upstream API receive partial prefixes and return

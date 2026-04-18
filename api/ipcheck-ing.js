@@ -1,4 +1,4 @@
-import { fetchUpstream } from '../common/fetch-upstream.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
 export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
