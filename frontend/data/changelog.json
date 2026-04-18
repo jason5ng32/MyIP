@@ -1,0 +1,1061 @@
+[
+  {
+    "version": "v1.0",
+    "date": "Nov 06, 2020",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Display user's IP information",
+          "zh": "显示用户的 IP 信息",
+          "fr": "Affichage des informations IP de l'utilisateur",
+          "tr": "Kullanıcının IP bilgilerini görüntüleme"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Display IP information before and after proxy",
+          "zh": "显示代理前后的 IP 信息",
+          "fr": "Affichage des informations IP avant et après le proxy",
+          "tr": "Proxy öncesi ve sonrası IP bilgilerini görüntüleme"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Check website availability",
+          "zh": "检查网站可用性",
+          "fr": "Vérification de la disponibilité des sites web",
+          "tr": "Web sitesi kullanılabilirliğini kontrol etme"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.0",
+    "date": "Nov 24, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Refactored the entire project using Vue2",
+          "zh": "使用 Vue2 重构了整个项目",
+          "fr": "Refonte complète du projet en utilisant Vue2",
+          "tr": "Tüm proje Vue2 kullanılarak yeniden yazıldı"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Refactored UI using Bootstrap v5",
+          "zh": "使用 Bootstrap v5 重构了 UI",
+          "fr": "Refonte de l'interface utilisateur en utilisant Bootstrap v5",
+          "tr": "UI Bootstrap v5 kullanılarak yeniden düzenlendi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.1",
+    "date": "Nov 25, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added WebRTC test",
+          "zh": "添加了 WebRTC 测试",
+          "fr": "Ajout du test WebRTC",
+          "tr": "WebRTC testi eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized program logic",
+          "zh": "优化了程序的一些逻辑",
+          "fr": "Optimisation de la logique du programme",
+          "tr": "Program mantığı optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.2",
+    "date": "Nov 26, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added DNS leak test",
+          "zh": "添加了 DNS 泄漏测试",
+          "fr": "Ajout du test de fuite DNS",
+          "tr": "DNS sızıntı testi eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Support displaying Bing maps in the frontend",
+          "zh": "支持在前端显示 Bing 地图",
+          "fr": "Prise en charge de l'affichage des cartes Bing dans l'interface",
+          "tr": "Ön yüzde Bing haritalarını görüntüleme desteği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Multiple logic optimizations",
+          "zh": "多个逻辑优化",
+          "fr": "Multiples optimisations de la logique",
+          "tr": "Çoklu mantık optimizasyonları"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.3",
+    "date": "Nov 27, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added dark mode",
+          "zh": "添加了黑暗模式",
+          "fr": "Ajout du mode sombre",
+          "tr": "Karanlık mod eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added minimalist mode for mobile",
+          "zh": "增加移动版简约模式",
+          "fr": "Ajout du mode minimaliste pour mobile",
+          "tr": "Mobil için minimalist mod eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized file structure",
+          "zh": "优化了文件结构",
+          "fr": "Optimisation de la structure des fichiers",
+          "tr": "Dosya yapısı optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.4",
+    "date": "Dec 1, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added support for English language",
+          "zh": "支持英文语言",
+          "fr": "Prise en charge de la langue anglaise",
+          "tr": "İngilizce dil desteği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added information masking feature",
+          "zh": "添加信息遮罩功能",
+          "fr": "Ajout de la fonctionnalité de masquage des informations",
+          "tr": "Bilgi gizleme özelliği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Support PWA, can be installed on mobile and desktop",
+          "zh": "支持 PWA，可以安装到手机和桌面上",
+          "fr": "Prise en charge de PWA, peut être installé sur mobile et ordinateur de bureau",
+          "tr": "PWA desteği, mobil ve masaüstüne kurulabilir"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v2.5",
+    "date": "Dec 20, 2023",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added support for keyboard shortcuts",
+          "zh": "支持快捷键操作",
+          "fr": "Prise en charge des raccourcis clavier",
+          "tr": "Klavye kısayolları desteği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added website speed test feature",
+          "zh": "添加网速测试功能",
+          "fr": "Ajout de la fonctionnalité de test de vitesse des sites web",
+          "tr": "Web sitesi hız testi özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Support deployment using Docker",
+          "zh": "支持使用 Docker 部署",
+          "fr": "Prise en charge du déploiement à l'aide de Docker",
+          "tr": "Docker kullanarak dağıtım desteği"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Support retrieving IP geolocation information from multiple sources",
+          "zh": "支持从多个来源获取 IP 归属地等信息",
+          "fr": "Prise en charge de la récupération des informations de géolocalisation IP à partir de plusieurs sources",
+          "tr": "Birden fazla kaynaktan IP coğrafi konum bilgisi alma desteği"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.0",
+    "date": "Jan 28, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Refactored the entire project using Vite + Vue3",
+          "zh": "使用 Vite + Vue3 重构了整个项目",
+          "fr": "Refonte complète du projet en utilisant Vite + Vue3",
+          "tr": "Tüm proje Vite + Vue3 kullanılarak yeniden yazıldı"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added global latency test feature",
+          "zh": "增加全球延迟测试功能",
+          "fr": "Ajout de la fonctionnalité de test de latence mondiale",
+          "tr": "Global gecikme testi özelliği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added MTR test feature",
+          "zh": "增加 MTR 测试功能",
+          "fr": "Ajout de la fonctionnalité de test MTR",
+          "tr": "MTR testi özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Multiple performance and user experience optimizations",
+          "zh": "多个性能优化和体验优化",
+          "fr": "Multiples optimisations de performance et d'expérience utilisateur",
+          "tr": "Çoklu performans ve kullanıcı deneyimi optimizasyonları"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.1",
+    "date": "Jan 30, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added support for a new language: French",
+          "zh": "支持新的语言：法语",
+          "fr": "Ajout de la prise en charge d'une nouvelle langue : français",
+          "tr": "Yeni bir dil desteği eklendi: Fransızca"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added loading animation",
+          "zh": "添加数据加载中的动画",
+          "fr": "Ajout d'une animation de chargement des données",
+          "tr": "Yükleme animasyonu eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized caching strategy",
+          "zh": "优化了缓存策略",
+          "fr": "Optimisation de la stratégie de cache",
+          "tr": "Önbellekleme stratejisi optimize edildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Adjusted dark mode styles",
+          "zh": "调整黑暗模式样式",
+          "fr": "Ajustement du style du mode sombre",
+          "tr": "Karanlık mod stilleri ayarlandı"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some minor issues",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de quelques problèmes mineurs",
+          "tr": "Bazı küçük sorunlar düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.2",
+    "date": "Feb 3, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added NAT type detection",
+          "zh": "添加 NAT 类型检测",
+          "fr": "Ajout de la détection du type NAT",
+          "tr": "NAT türü tespiti eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized PWA application experience",
+          "zh": "优化 PWA 应用的体验",
+          "fr": "Optimisation de l'expérience de l'application PWA",
+          "tr": "PWA uygulama deneyimi optimize edildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Enhanced backend script security",
+          "zh": "提高后端脚本安全性",
+          "fr": "Amélioration de la sécurité du script backend",
+          "tr": "Arka uç komut dosyası güvenliği artırıldı"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.3",
+    "date": "Feb 6, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added support for using different IP geolocation sources",
+          "zh": "支持使用不同的 IP 地理位置信息源",
+          "fr": "Prise en charge de l'utilisation de différentes sources d'informations de géolocalisation IP",
+          "tr": "Farklı IP coğrafi konum kaynaklarını kullanma desteği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved user experience for connection availability detection",
+          "zh": "优化连接可用性检测的用户体验",
+          "fr": "Amélioration de l'expérience utilisateur de la détection de disponibilité de connexion",
+          "tr": "Bağlantı kullanılabilirlik tespiti için kullanıcı deneyimi iyileştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized UI experience",
+          "zh": "优化 UI 体验",
+          "fr": "Amélioration de l'expérience utilisateur de l'interface utilisateur",
+          "tr": "UI deneyimi optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.4",
+    "date": "Feb 17, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added ASN details viewer",
+          "zh": "添加 ASN 详细信息查看器",
+          "fr": "Ajout d'un visualiseur de détails ASN",
+          "tr": "ASN detayları görüntüleyici eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added proxy detection feature",
+          "zh": "添加 IP 地址是否为代理的判断",
+          "fr": "Ajout de la détection de proxy",
+          "tr": "Proxy tespiti özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized UI for displaying IP information",
+          "zh": "优化 IP 信息的展示 UI",
+          "fr": "Optimisation de l'interface utilisateur pour l'affichage des informations IP",
+          "tr": "IP bilgilerini görüntüleme arayüzü optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.5",
+    "date": "Mar 3, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added rule test feature",
+          "zh": "添加规则测试",
+          "fr": "Ajout du test de règles",
+          "tr": "Kural testi özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Some Improvements",
+          "zh": "优化了部分逻辑",
+          "fr": "Quelques améliorations",
+          "tr": "Bazı İyileştirmeler"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.6",
+    "date": "Mar 10, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added DNS resolution feature",
+          "zh": "添加 DNS 解析功能",
+          "fr": "Ajout de la fonction de résolution DNS",
+          "tr": "DNS çözümlemesi özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized home page structure, advanced features are now collapsible",
+          "zh": "优化主页结构，高级功能折叠展示",
+          "fr": "Optimisation de la structure de la page d'accueil, les fonctionnalités avancées sont désormais repliables",
+          "tr": "Ana sayfa yapısı optimize edildi, gelişmiş özellikler artık daraltılabilir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized program logic",
+          "zh": "优化了程序逻辑",
+          "fr": "Optimisation de la logique du programme",
+          "tr": "Program mantığı optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.7",
+    "date": "Apr 26, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added censorship test feature",
+          "zh": "添加封锁测试功能",
+          "fr": "Fonctionnalité de test de censure ajoutée",
+          "tr": "Sansür testi özelliği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Network speed test now allows custom packet size",
+          "zh": "网速测试可以自定义数据包大小",
+          "fr": "Le test de vitesse réseau permet maintenant de personnaliser la taille des paquets",
+          "tr": "Ağ hız testi artık özel paket boyutuna izin veriyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized some functional logic",
+          "zh": "优化了部分功能逻辑",
+          "fr": "Optimisation de certaines logiques fonctionnelles",
+          "tr": "Bazı fonksiyonel mantıklar optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.8",
+    "date": "May 4, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added preferences panel to save settings locally",
+          "zh": "增加设置面板，可以在本地保存偏好设置",
+          "fr": "Ajout du panneau de préférences pour enregistrer les paramètres localement",
+          "tr": "Ayarları yerel olarak kaydetmek için tercihler paneli eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Allow customization of multiple default behaviors on second program launch",
+          "zh": "可以自定义程序在第二次启动时的多个默认行为",
+          "fr": "Permettre la personnalisation de plusieurs comportements par défaut lors du deuxième lancement du programme",
+          "tr": "İkinci program açılışında birden fazla varsayılan davranışı özelleştirmeye izin ver"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Significantly optimized program logic",
+          "zh": "大量优化了程序的逻辑",
+          "fr": "Optimisation significative de la logique du programme",
+          "tr": "Program mantığı önemli ölçüde optimize edildi"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some minor issues",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de quelques problèmes mineurs",
+          "tr": "Bazı küçük sorunlar düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v3.9",
+    "date": "May 8, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Whois search feature",
+          "zh": "增加 Whois 查询功能",
+          "fr": "Ajout de la fonction de recherche Whois",
+          "tr": "Whois arama özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized display and animation effects for advanced tools",
+          "zh": "优化高级功能的展示与动画效果",
+          "fr": "Optimisation de l'affichage et des effets d'animation pour les outils avancés",
+          "tr": "Gelişmiş araçlar için görüntüleme ve animasyon efektleri optimize edildi"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some minor issues",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de quelques problèmes mineurs",
+          "tr": "Bazı küçük sorunlar düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.0",
+    "date": "May 13, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Refactored the entire project using Vue 3's Composition API",
+          "zh": "采用 Vue 3 的 Composition API 重构了整个项目",
+          "fr": "Refonte complète du projet en utilisant la Composition API de Vue 3",
+          "tr": "Tüm proje Vue 3'ün Composition API'si kullanılarak yeniden yazıldı"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Split the frontend into multiple modules to improve maintainability",
+          "zh": "拆分前端多个模块，提高了程序的可维护性",
+          "fr": "Découpage du frontend en plusieurs modules pour améliorer la maintenabilité du programme",
+          "tr": "Bakım kolaylığını artırmak için ön yüz birden fazla modüle bölündü"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Invisibility Test feature (Beta)",
+          "zh": "增加隐身测试功能（Beta）",
+          "fr": "Ajout de la Test d'invisibilité (bêta)",
+          "tr": "Görünmezlik Testi özelliği eklendi (Beta)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized backend program dependencies",
+          "zh": "优化后端程序的依赖结构",
+          "fr": "Optimisation de la structure des dépendances du backend",
+          "tr": "Arka uç program bağımlılıkları optimize edildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized numerous details",
+          "zh": "优化了大量细节",
+          "fr": "Optimisation de nombreux détails",
+          "tr": "Çok sayıda detay optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.1",
+    "date": "July 11, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added MAC address lookup feature",
+          "zh": "添加 MAC 地址查询功能",
+          "fr": "Ajout de la fonction de recherche MAC",
+          "tr": "MAC adresi arama özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized numerous details",
+          "zh": "优化了部分程序细节",
+          "fr": "Optimisation de nombreux détails",
+          "tr": "Çok sayıda detay optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.2",
+    "date": "Sept 25, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added browser information query feature",
+          "zh": "添加浏览器信息查询功能",
+          "fr": "Ajout de la fonction de requête d'informations du navigateur",
+          "tr": "Tarayıcı bilgisi sorgulama özelliği eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added MaxMind GeoIP database",
+          "zh": "添加 MaxMind 地理数据库",
+          "fr": "Ajout de la base de données géographique MaxMind",
+          "tr": "MaxMind GeoIP veritabanı eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Multiple experience enhancements",
+          "zh": "多处体验优化",
+          "fr": "Améliorations multiples de l'expérience",
+          "tr": "Çoklu deneyim geliştirmeleri"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.3",
+    "date": "Oct 30, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added command line API feature",
+          "zh": "添加命令行 API 功能",
+          "fr": "Ajout de la fonctionnalité API en ligne de commande",
+          "tr": "Komut satırı API özelliği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "WebRTC test can now display regional information",
+          "zh": "WebRTC 测试可以展示地区信息",
+          "fr": "Le test WebRTC peut maintenant afficher des informations régionales",
+          "tr": "WebRTC testi artık bölgesel bilgileri görüntüleyebiliyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "DNS leak test can now display regional information",
+          "zh": "DNS 泄露测试可以展示地区信息",
+          "fr": "Le test de fuite DNS peut maintenant afficher des informations régionales",
+          "tr": "DNS sızıntı testi artık bölgesel bilgileri görüntüleyebiliyor"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.4",
+    "date": "Dec 7, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Language preferences",
+          "zh": "语言偏好设置",
+          "fr": "Préférences de langue",
+          "tr": "Dil tercihleri"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Map provider changed to Google",
+          "zh": "地图展示供应商变更为 Google",
+          "fr": "Fournisseur de carte changé en Google",
+          "tr": "Harita sağlayıcısı Google olarak değiştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Other general optimizations",
+          "zh": "其它常规优化",
+          "fr": "Autres optimisations générales",
+          "tr": "Diğer genel optimizasyonlar"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v4.5",
+    "date": "Dec 25, 2024",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Add Security Checklist",
+          "zh": "添加安全检查清单",
+          "fr": "Liste de vérification de sécurité",
+          "tr": "Güvenlik Kontrol Listesi Eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Other general optimizations",
+          "zh": "其它常规优化",
+          "fr": "Autres optimisations générales",
+          "tr": "Diğer genel optimizasyonlar"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v5.0",
+    "date": "Jan 31, 2025",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Add user system",
+          "zh": "新增用户系统",
+          "fr": "Ajout de la système d'utilisateur",
+          "tr": "Kullanıcı sistemi eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Add user achievement system",
+          "zh": "新增用户成就系统",
+          "fr": "Ajout de la système de réussite utilisateur",
+          "tr": "Kullanıcı başarı sistemi eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Add Lite version",
+          "zh": "新增 Lite 版本",
+          "fr": "Ajout de la version Lite",
+          "tr": "Lite sürümü eklendi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Speed test can now display data change charts",
+          "zh": "网速测试可以看到数据变化图表",
+          "fr": "Le test de vitesse peut maintenant afficher des graphiques de données",
+          "tr": "Hız testi artık veri değişim grafiklerini görüntüleyebiliyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Code efficiency optimization",
+          "zh": "代码效率优化",
+          "fr": "Optimisation de la performance du code",
+          "tr": "Kod verimliliği optimizasyonu"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v5.1",
+    "date": "Nov 12, 2025",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added support for Turkish language",
+          "zh": "支持土耳其语",
+          "fr": "Ajout de la prise en charge de la langue turque",
+          "tr": "Türkçe dil desteği eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized code efficiency",
+          "zh": "代码效率优化",
+          "fr": "Optimisation de l'efficacité du code",
+          "tr": "Kod verimliliği optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v5.2",
+    "date": "Jan 05, 2026",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Enhanced ASN information richness",
+          "zh": "提升 ASN 信息的丰富性",
+          "fr": "Amélioration de la richesse des informations ASN",
+          "tr": "ASN bilgilerinin zenginliği artırıldı"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added IP quality score display",
+          "zh": "IP 质量分数显示",
+          "fr": "Affichage de la qualité IP",
+          "tr": "IP kalite puanı görüntüleme"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized code efficiency",
+          "zh": "代码效率优化",
+          "fr": "Optimisation de l'efficacité du code",
+          "tr": "Kod verimliliği optimize edildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v5.3",
+    "date": "Apr 14, 2026",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added MaxMind GeoIP database auto-update",
+          "zh": "MaxMind 地理数据库自动更新",
+          "fr": "Mise à jour automatique de la base de données géographique MaxMind",
+          "tr": "MaxMind GeoIP veritabanı otomatik güncelleme"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized caching strategy",
+          "zh": "优化缓存策略",
+          "fr": "Optimisation de la stratégie de cache",
+          "tr": "Önbellek stratejisi optimize edildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Significantly improved build speed",
+          "zh": "大大提升构建速度",
+          "fr": "Amélioration significative de la vitesse de construction",
+          "tr": "Kod verimliliği optimize edildi, yapı hızı büyük ölçüde artırıldı"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v6.0",
+    "date": "Apr 17, 2026",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Complete UI overhaul: migrated from Bootstrap to Tailwind CSS v4 + shadcn-vue",
+          "zh": "全站 UI 翻新：从 Bootstrap 迁移到 Tailwind CSS v4 + shadcn-vue",
+          "fr": "Refonte complète de l'interface : migration de Bootstrap vers Tailwind CSS v4 + shadcn-vue",
+          "tr": "Tam arayüz yenileme: Bootstrap'ten Tailwind CSS v4 + shadcn-vue'ye taşındı"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "All country flags now displayed as circular icons",
+          "zh": "所有国旗改用圆形图标显示",
+          "fr": "Tous les drapeaux affichés désormais sous forme d'icônes circulaires",
+          "tr": "Tüm ülke bayrakları artık yuvarlak simgeler olarak görüntüleniyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Unified design tokens with automatic light/dark mode adaptation",
+          "zh": "统一设计 token，自动适配白天 / 黑夜模式",
+          "fr": "Tokens de design unifiés avec adaptation automatique au mode clair / sombre",
+          "tr": "Otomatik açık / koyu mod uyumuyla birleşik tasarım token'ları"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Network Connectivity / WebRTC / DNS Leak / Rule Test cards redesigned with modern status indicators",
+          "zh": "网络连通性 / WebRTC / DNS 泄漏 / 分流测试卡片重新设计，带现代化状态指示",
+          "fr": "Cartes Connectivité / WebRTC / Fuite DNS / Test de règles redessinées avec indicateurs de statut modernes",
+          "tr": "Bağlantı / WebRTC / DNS Sızıntısı / Kural Testi kartları modern durum göstergeleriyle yeniden tasarlandı"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP Infos cards redesigned: hero IP display with copy, cleaner metadata grid, labeled advanced data for signed-in users",
+          "zh": "IP 信息卡片重新设计：大号 IP 显示带复制按钮、更清爽的字段网格、登录用户可见的高级数据带标签展示",
+          "fr": "Cartes Infos IP redessinées : affichage IP proéminent avec bouton copier, grille de métadonnées plus propre, données avancées étiquetées pour les utilisateurs connectés",
+          "tr": "IP Bilgileri kartları yeniden tasarlandı: kopyalama düğmeli öne çıkan IP gösterimi, daha temiz meta veri ızgarası, giriş yapmış kullanıcılar için etiketli gelişmiş veri"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools panel switched to bottom drawer with drag-to-close and optional fullscreen",
+          "zh": "高级工具面板改为底部抽屉，支持拖拽关闭和全屏切换",
+          "fr": "Panneau Outils Avancés converti en tiroir inférieur avec fermeture par glissement et plein écran optionnel",
+          "tr": "Gelişmiş Araçlar paneli sürükle-kapat ve isteğe bağlı tam ekran ile alt çekmeceye dönüştürüldü"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "All advanced tools (MTR / Ping / Rule / DNS / Whois / MAC / Browser Info / Invisibility / Censorship / Security Checklist) redesigned",
+          "zh": "所有高级工具（MTR / Ping / 分流 / DNS / Whois / MAC / 浏览器信息 / 隐身测试 / 封锁测试 / 安全检查清单）全部重新设计",
+          "fr": "Tous les outils avancés (MTR / Ping / Règles / DNS / Whois / MAC / Infos Navigateur / Invisibilité / Censure / Checklist de Sécurité) redessinés",
+          "tr": "Tüm gelişmiş araçlar (MTR / Ping / Kural / DNS / Whois / MAC / Tarayıcı Bilgisi / Görünmezlik / Sansür / Güvenlik Kontrol Listesi) yeniden tasarlandı"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Query buttons now show a loading spinner during execution; disabled state clearly indicated",
+          "zh": "查询按钮执行时显示加载动画，禁用态也有明确视觉提示",
+          "fr": "Les boutons de requête affichent désormais un spinner pendant l'exécution ; état désactivé clairement indiqué",
+          "tr": "Sorgu düğmeleri artık yürütme sırasında yükleniyor göstergesi gösteriyor; devre dışı durumu net şekilde belirtildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Long IPv6 addresses auto-shrink font to fit in one line (no more wrapping)",
+          "zh": "长 IPv6 地址自动缩小字号保持单行显示（不再折行）",
+          "fr": "Les adresses IPv6 longues réduisent automatiquement la police pour tenir sur une ligne (plus de retour à la ligne)",
+          "tr": "Uzun IPv6 adresleri tek satıra sığmak için otomatik olarak yazı tipini küçültüyor (artık satır kaymıyor)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Preferences, About, Changelog, Achievements panels redesigned",
+          "zh": "偏好设置、关于、更新日志、成就面板重新设计",
+          "fr": "Panneaux Préférences, À propos, Journal des modifications, Succès redessinés",
+          "tr": "Tercihler, Hakkında, Değişiklik Günlüğü, Başarılar panelleri yeniden tasarlandı"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Latency-aware emoji faces in Network Connectivity cards (smile / neutral / frown)",
+          "zh": "网络连通性卡片根据延迟显示不同表情（笑脸 / 面无表情 / 哭脸）",
+          "fr": "Émojis sensibles à la latence dans les cartes de connectivité (sourire / neutre / froncement)",
+          "tr": "Bağlantı kartlarında gecikmeye duyarlı emoji yüzler (gülümseme / nötr / surat)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reduced bundle size by ~420KB",
+          "zh": "打包体积减少约 420KB",
+          "fr": "Taille du bundle réduite d'environ 420 Ko",
+          "tr": "Paket boyutu yaklaşık 420KB azaltıldı"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Text inside Advanced Tools drawer can now be selected",
+          "zh": "修复高级工具抽屉内文字无法选中的问题",
+          "fr": "Le texte dans le tiroir Outils Avancés peut désormais être sélectionné",
+          "tr": "Gelişmiş Araçlar çekmecesi içindeki metin artık seçilebilir"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed a ghost green line bug when using J/K keyboard navigation",
+          "zh": "修复使用 J/K 键盘导航时出现的幽灵绿线 bug",
+          "fr": "Correction d'un bug de ligne verte fantôme lors de la navigation clavier J/K",
+          "tr": "J/K klavye navigasyonu kullanılırken oluşan hayalet yeşil çizgi hatası düzeltildi"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed runtime error when opening Ping Test in production build",
+          "zh": "修复生产环境下打开 Ping 测试时的运行时报错",
+          "fr": "Correction d'une erreur d'exécution à l'ouverture du test Ping en build de production",
+          "tr": "Prodüksiyon derlemesinde Ping Testi açıldığında oluşan çalışma zamanı hatası düzeltildi"
+        }
+      }
+    ]
+  }
+]

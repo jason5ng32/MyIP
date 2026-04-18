@@ -91,8 +91,10 @@
             </TabsContent>
 
             <!-- Changelog ———————————————————————— -->
+            <!-- Data lives in frontend/data/changelog.json (shared version / date, per-lang change text).
+                 Badge labels and the section title stay in locale files as UI chrome. -->
             <TabsContent value="changelog" class="space-y-6 mt-0">
-              <section v-for="(version, vi) in changelog.slice().reverse()" :key="vi">
+              <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
                   <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
                   <span class="text-xs text-muted-foreground tabular-nums">{{ version.date }}</span>
@@ -105,7 +107,7 @@
                       class="shrink-0 !shadow-none rounded-full font-normal mt-0.5 min-w-16 justify-center">
                       {{ t('changelog.' + item.type) }}
                     </Badge>
-                    <span class="leading-relaxed">{{ item.change }}</span>
+                    <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
                   </li>
                 </ul>
               </section>
@@ -143,9 +145,10 @@
 // - 链接/按钮一律 <Button>（ghost / outline / link 变体）
 // - About 弹窗用 Sheet（右侧滑入），内部 tab 用 Tabs / TabsList / TabsTrigger / TabsContent
 // - Changelog Badge 取消阴影
-import { ref, computed, reactive, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
+import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/use-analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -155,7 +158,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
 
-const { t, tm } = useI18n();
+const { t, locale } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
@@ -163,7 +166,8 @@ const configs = computed(() => store.configs);
 
 const tabs = ['about', 'changelog', 'specialthanks'];
 const content = ref('about');
-const changelog = reactive(tm('changelog.versions'));
+// Static data from JSON — reverse once via computed so the template stays tidy.
+const changelogReversed = computed(() => changelogData.slice().reverse());
 const sheetBody = ref(null);
 
 const personalLinks = [
