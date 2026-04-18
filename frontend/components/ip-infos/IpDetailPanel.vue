@@ -1,0 +1,309 @@
+<template>
+    <!-- Multi-root template on purpose: Metadata / Advanced / ASN render as direct siblings of
+         the consumer's Hero IP inside a flex-col, so ASN's `mt-auto` pushes to the card bottom.
+         Side-effect: `class` / `style` don't auto-fall through — don't write
+         `<IpDetailPanel class="..."/>`, the class goes nowhere. Style via the children's own classes. -->
+
+    <!-- Metadata grid: 2 cols on mobile, 3 cols on PC for Country / Region / City.
+         ISP takes its own row (col-span-3) so long provider names have room to breathe. -->
+    <dl v-if="data.country_name"
+        class="px-4 pb-3 grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-3 text-sm items-start"
+        :class="{ 'grid-cols-1!': collapsed }">
+        <div>
+            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <MapPin class="size-3.5" />
+                <span>{{ t('ipInfos.Country') }}</span>
+            </dt>
+            <dd class="font-normal flex items-center gap-1.5 flex-wrap">
+                <Icon v-if="data.country_code"
+                    :icon="'circle-flags:' + data.country_code.toLowerCase()"
+                    class="shrink-0 size-4" />
+                <span class="wrap-break-word">{{ data.country_name }}</span>
+            </dd>
+        </div>
+
+        <!-- Region / City / ISP only rendered when not in collapsed mode. -->
+        <template v-if="!collapsed">
+            <div>
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <House class="size-3.5" />
+                    <span>{{ t('ipInfos.Region') }}</span>
+                </dt>
+                <dd class="font-normal wrap-break-word">{{ data.region || '—' }}</dd>
+            </div>
+            <div>
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <CornerUpRight class="size-3.5" />
+                    <span>{{ t('ipInfos.City') }}</span>
+                </dt>
+                <dd class="font-normal flex items-center gap-1 flex-wrap">
+                    <span class="wrap-break-word">{{ data.city || '—' }}</span>
+                    <JnTooltip v-if="canShowMap" :text="t('Tooltips.ViewOnMap')" side="left">
+                        <button type="button"
+                            class="shrink-0 -my-0.5 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                            @click="openMapDialog" :aria-label="'View ' + data.ip + ' on map'">
+                            <Map class="size-3.5" />
+                        </button>
+                    </JnTooltip>
+                </dd>
+            </div>
+            <div class="col-span-2 md:col-span-3">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <EthernetPort class="size-3.5" />
+                    <span>{{ t('ipInfos.ISP') }}</span>
+                </dt>
+                <dd class="font-normal wrap-break-word">{{ data.isp || '—' }}</dd>
+            </div>
+        </template>
+    </dl>
+
+    <!-- Advanced block (IPCheck.ing source only): locked CTA for signed-out, label-value grid for signed-in. -->
+    <div v-if="!collapsed" v-show="showAdvancedBlock"
+        class="px-4 pb-3 border-t pt-3 space-y-2.5">
+
+        <!-- Signed-out: single CTA banner + 4-field preview grid with *** values. -->
+        <template v-if="allAdvancedLocked">
+            <span
+                class="w-full flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground transition-colors group">
+                <span class="flex items-center gap-1.5 min-w-0">
+                    <Lock class="size-3.5 shrink-0" />
+                    <span class="truncate">{{ t('ipInfos.advancedUnlockCta') }}</span>
+                </span>
+            </span>
+
+            <dl class="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-3 text-sm items-start">
+                <div v-for="f in lockedFieldList" :key="f.key">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <component :is="f.icon" class="size-3.5" />
+                        <span>{{ f.label }}</span>
+                    </dt>
+                    <dd class="font-normal text-muted-foreground/60">***</dd>
+                </div>
+            </dl>
+        </template>
+
+        <!-- Signed-in: same vertical "label on top, value below" rhythm as the metadata grid. -->
+        <dl v-else class="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-3 text-sm items-start">
+            <div v-if="showTypeBadge">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <SignalHigh class="size-3.5" />
+                    <span>{{ t('ipInfos.type') }}</span>
+                </dt>
+                <dd class="font-normal wrap-break-word">{{ data.type }}</dd>
+            </div>
+
+            <div v-if="showProxyBadge">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <ShieldCheck class="size-3.5" />
+                    <span>{{ t('ipInfos.isProxy') }}</span>
+                </dt>
+                <dd class="font-normal wrap-break-word">
+                    {{ data.isProxy }}<span
+                        v-if="data.proxyProtocol && data.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')"
+                        class="text-muted-foreground font-normal"> · {{ data.proxyProtocol }}</span>
+                </dd>
+            </div>
+
+            <div v-if="showNativeBadge">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <House class="size-3.5" />
+                    <span>{{ t('ipInfos.advancedData.Nativeness') }}</span>
+                </dt>
+                <dd class="font-normal flex items-center gap-1 wrap-break-word">
+                    <component :is="data.isNativeIP === true ? CircleCheck : CircleX"
+                        class="size-3.5 text-muted-foreground shrink-0" />
+                    <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
+                        t('ipInfos.advancedData.NativeIPNo') }}</span>
+                </dd>
+            </div>
+
+            <div v-if="showQualityScore">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <Gauge class="size-3.5" />
+                    <span>{{ t('ipInfos.qualityScore') }}</span>
+                </dt>
+                <dd>
+                    <span v-if="data.qualityScore === 'unknown'" class="font-normal text-muted-foreground">
+                        {{ t('ipInfos.qualityScoreUnknown') }}
+                    </span>
+                    <div v-else class="flex items-center gap-2">
+                        <Progress :model-value="Number(data.qualityScore) || 0" class="h-2 flex-1 min-w-12"
+                            :indicator-class="qualityTone === 'ok-fast' ? 'bg-success' : qualityTone === 'ok-slow' ? 'bg-warning' : 'bg-destructive'" />
+                        <span class="text-sm font-normal tabular-nums shrink-0">{{ data.qualityScore }}/100</span>
+                    </div>
+                </dd>
+            </div>
+        </dl>
+    </div>
+
+    <!-- ASN row + expandable ASNInfo. mt-auto on IPCard flex-col pushes this to card bottom. -->
+    <div v-if="data.asn && !collapsed" class="px-4 py-3 border-t mt-auto">
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0 text-sm">
+                <Building2 class="size-4 text-muted-foreground shrink-0" />
+                <span class="text-xs text-muted-foreground shrink-0">{{ t('ipInfos.ASN') }}</span>
+                <span class="font-mono font-normal truncate">{{ data.asn }}</span>
+            </div>
+            <JnTooltip v-if="data.asnlink && configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="left">
+                <button type="button"
+                    class="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    @click="toggleASNCollapse(data.asn)" :aria-expanded="isAsnOpen"
+                    :aria-label="'Display AS Info of ' + data.asn">
+                    <component :is="isAsnOpen ? ChevronUp : ChevronDown" class="size-4" />
+                </button>
+            </JnTooltip>
+        </div>
+        <Collapsible :open="isAsnOpen" @update:open="isAsnOpen = $event">
+            <CollapsibleContent class="pt-3">
+                <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="data.asn" :asnInfos="asnInfos" />
+            </CollapsibleContent>
+        </Collapsible>
+    </div>
+
+    <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
+    <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
+        <DialogContent :title="data.ip" class="max-w-3xl">
+            <DialogHeader>
+                <template #title>
+                    <span class="flex items-center gap-2 min-w-0">
+                        <Icon v-if="data.country_code"
+                            :icon="'circle-flags:' + data.country_code.toLowerCase()"
+                            class="size-4 shrink-0" />
+                        <span class="truncate">{{ data.country_name }}<template v-if="data.city"> · {{ data.city
+                                }}</template></span>
+                        <span class="font-mono text-sm text-muted-foreground shrink-0">{{ data.ip }}</span>
+                    </span>
+                </template>
+            </DialogHeader>
+            <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
+                class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
+        </DialogContent>
+    </Dialog>
+</template>
+
+<script setup>
+// Shared display panel for IP info: Metadata grid + Advanced block + ASN row + optional Map Dialog.
+// Used by IPCard (homepage card grid) and QueryIP (manual IP lookup dialog).
+// Hero IP is NOT part of this panel — consumers render their own hero row since affordances
+// (copy button, etc.) differ.
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { trackEvent } from '@/utils/use-analytics';
+import ASNInfo from './ASNInfo.vue';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Icon } from '@iconify/vue';
+import {
+    Building2,
+    ChevronDown,
+    ChevronUp,
+    CircleCheck,
+    CircleX,
+    CornerUpRight,
+    EthernetPort,
+    Gauge,
+    House,
+    Lock,
+    Map,
+    MapPin,
+    ShieldCheck,
+    SignalHigh,
+} from 'lucide-vue-next';
+
+const { t } = useI18n();
+
+const props = defineProps({
+    data: { type: Object, required: true },
+    ipGeoSource: { type: Number, required: true },
+    asnInfos: { type: Object, required: true },
+    configs: { type: Object, required: true },
+    isDarkMode: { type: Boolean, required: true },
+    // ASNInfo requires an index; homepage cards pass their grid index, QueryIP has nothing meaningful.
+    index: { type: Number, default: 0 },
+    // IPCard on mobile with simpleMode enables this to hide everything but Country + hide ASN.
+    collapsed: { type: Boolean, default: false },
+    // IPCard opts in to show the Map button (in the City cell) + the Map Dialog.
+    // QueryIP opts out — the parent is already a Dialog, stacking dialogs is confusing.
+    enableMap: { type: Boolean, default: false },
+});
+
+const isAsnOpen = ref(false);
+const isMapDialogOpen = ref(false);
+
+// Advanced block only surfaces for the IPCheck.ing source (ipGeoSource === 0).
+const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && Boolean(props.data));
+
+// Map button is gated on the deployment having a Google Maps key (configs.map) + location data.
+// enableMap is the consumer-level opt-in.
+const canShowMap = computed(() =>
+    props.enableMap && Boolean(props.configs.map) && Boolean(props.data.country_name)
+);
+
+// If every advanced field is masked behind login → show the single CTA + preview grid instead
+// of rendering four individual "sign in to unlock" rows.
+const allAdvancedLocked = computed(() =>
+    props.data.type === 'sign_in_required' &&
+    props.data.isProxy === 'sign_in_required' &&
+    props.data.isNativeIP === 'sign_in_required' &&
+    props.data.qualityScore === 'sign_in_required'
+);
+
+const showTypeBadge = computed(() =>
+    props.data.type && props.data.type !== 'sign_in_required'
+    && props.data.type !== t('ipInfos.advancedData.type.unknownType')
+);
+const showProxyBadge = computed(() =>
+    props.data.isProxy && props.data.isProxy !== 'sign_in_required'
+    && props.data.isProxy !== t('ipInfos.advancedData.proxyUnknown')
+);
+const showNativeBadge = computed(() =>
+    props.data.isNativeIP !== undefined && props.data.isNativeIP !== 'sign_in_required'
+);
+const showQualityScore = computed(() =>
+    props.data.qualityScore !== undefined && props.data.qualityScore !== 'sign_in_required'
+);
+
+// Locked field preview: the 4 advanced fields shown as "label + ***" for signed-out users.
+const lockedFieldList = computed(() => [
+    { key: 'type', icon: SignalHigh, label: t('ipInfos.type') },
+    { key: 'proxy', icon: ShieldCheck, label: t('ipInfos.isProxy') },
+    { key: 'native', icon: House, label: t('ipInfos.advancedData.Nativeness') },
+    { key: 'quality', icon: Gauge, label: t('ipInfos.qualityScore') },
+]);
+
+// Quality Score color tiers — reuse the same 4-tone semantic as use-status-tone.
+const qualityTone = computed(() => {
+    const n = Number(props.data.qualityScore);
+    if (isNaN(n)) return 'wait';
+    if (n >= 80) return 'ok-fast';
+    if (n >= 50) return 'ok-slow';
+    return 'fail';
+});
+
+const openMapDialog = () => {
+    isMapDialogOpen.value = true;
+    trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
+};
+
+const toggleASNCollapse = async (asn) => {
+    isAsnOpen.value = !isAsnOpen.value;
+    if (isAsnOpen.value) {
+        await getASNInfo(asn);
+    }
+};
+
+const getASNInfo = async (asn) => {
+    trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
+    try {
+        if (props.asnInfos[asn]) return;
+        asn = asn.replace('AS', '');
+        const response = await fetch(`/api/cfradar?asn=${asn}`);
+        const data = await response.json();
+        props.asnInfos['AS' + asn] = data;
+    } catch (error) {
+        console.error('Error fetching ASN info:', error);
+    }
+};
+</script>

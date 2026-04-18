@@ -6,12 +6,11 @@
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
   connectivityAutoRefresh: false,
-  showMap: false,
   simpleMode: false,
   autoStart: true,
   hideUnavailableIPStack: false,
   popupConnectivityNotifications: true,
-  ipCardsToShow: 6,
+  ipCardsToShow: 2,
   ipGeoSource: 0,
   lang: 'auto', // auto | zh | en | fr | tr
 });

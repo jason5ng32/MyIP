@@ -15,12 +15,11 @@ describe('DEFAULT_PREFERENCES', () => {
     assert.deepEqual(DEFAULT_PREFERENCES, {
       theme: 'auto',
       connectivityAutoRefresh: false,
-      showMap: false,
       simpleMode: false,
       autoStart: true,
       hideUnavailableIPStack: false,
       popupConnectivityNotifications: true,
-      ipCardsToShow: 6,
+      ipCardsToShow: 2,
       ipGeoSource: 0,
       lang: 'auto',
     });

@@ -148,17 +148,6 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             description: t('shortcutKeys.fullScreenAdvancedTools'),
         },
         {
-            keys: 'm',
-            action: () => {
-                if (configs.value.map) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    preferencesRef.value.toggleMaps();
-                }
-                trackEvent('ShortCut', 'ShortCut', 'ToggleMaps');
-            },
-            description: t('shortcutKeys.ToggleMaps'),
-        },
-        {
             keys: 'q',
             action: () => { queryIPRef.value.openModal(); trackEvent('ShortCut', 'ShortCut', 'QueryIP'); },
             description: t('shortcutKeys.IPCheck'),

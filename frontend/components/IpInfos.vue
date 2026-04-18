@@ -8,15 +8,14 @@
       <p class="my-3 text-base text-muted-foreground">{{ t('ipInfos.Notes') }}</p>
     </header>
 
-    <!-- 卡片网格：CSS grid 自适应列数；items-stretch 让同行卡片自然等高，
-         不再需要 jn-ip-card1/2 的 min-height hack -->
-    <div class="grid gap-4 items-stretch"
-      :class="gridColsClass">
+    <!-- Card grid: 1 col on mobile, always 2 cols on PC (md+). Card counts
+         (2 / 4 / 6) are all even, so the last row always fills. -->
+    <div class="grid gap-4 items-stretch grid-cols-1 md:grid-cols-2">
       <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
         class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed"
+          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed"
           :copiedStatus="copiedStatus" :configs="configs" :asnInfos="asnInfos"
           @refresh-card="refreshCard" />
       </div>
@@ -48,17 +47,7 @@ const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
 
 // 页面的动态配置
-const isMapShown = computed(() => userPreferences.value.showMap);
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
-
-// 卡片网格列数：基于 ipCardsToShow 动态选 tailwind grid-cols class
-// 1 张 → 单列；2 张 → md 起 2 列；3+ 张 → md 2 列、lg 3 列（避免每张过窄）
-const gridColsClass = computed(() => {
-  const n = ipCardsToShow.value;
-  if (n <= 1) return 'grid-cols-1';
-  if (n === 2) return 'grid-cols-1 md:grid-cols-2';
-  return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-});
 
 // 默认卡片数据
 const createDefaultCard = () => ({
@@ -76,12 +65,9 @@ const createDefaultCard = () => ({
 });
 
 // IP 数据卡片
+// Order: v4, v6, CF-v4, CF-v6, CN, v64
+// First 2 / 4 / 6 slice is meaningful at every count the user can pick.
 const ipDataCards = reactive([
-  {
-    ...createDefaultCard(),
-    id: "ipchecking_v64",
-    source: "IPCheck.ing IPv6/4",
-  },
   {
     ...createDefaultCard(),
     id: "ipchecking_v4",
@@ -94,11 +80,6 @@ const ipDataCards = reactive([
   },
   {
     ...createDefaultCard(),
-    id: "cnsource",
-    source: "CN Source",
-  },
-  {
-    ...createDefaultCard(),
     id: "cloudflare_v4",
     source: "Cloudflare IPv4",
   },
@@ -106,6 +87,16 @@ const ipDataCards = reactive([
     ...createDefaultCard(),
     id: "cloudflare_v6",
     source: "Cloudflare IPv6",
+  },
+  {
+    ...createDefaultCard(),
+    id: "cnsource",
+    source: "CN Source",
+  },
+  {
+    ...createDefaultCard(),
+    id: "ipchecking_v64",
+    source: "IPCheck.ing IPv6/4",
   },
 ]);
 
@@ -137,7 +128,8 @@ const fetchIP = async (cardID, getFromSource) => {
     ipDataCards[cardID].source = source;
     IPArray.value = [...IPArray.value, ip];
     await fetchIPDetails(cardID, ip);
-  } else if (cardID === 2 || cardID === 5) {
+  } else if (cardID === 1 || cardID === 3) {
+    // v6 cards in the new order: ipchecking_v6 (1), cloudflare_v6 (3)
     ipDataCards[cardID].ip = t('ipInfos.IPv6Error');
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
@@ -166,12 +158,12 @@ const trackFetchStatus = (status) => {
 // 检查所有 IP 地址
 const checkAllIPs = async () => {
   const ipFunctions = [
-    () => fetchIP(0, getIPFromIPChecking64),
-    () => fetchIP(1, getIPFromIPChecking4),
-    () => fetchIP(2, getIPFromIPChecking6),
-    () => fetchIP(3, getIPFromIPIP),
-    () => fetchIP(4, getIPFromCloudflare_V4),
-    () => fetchIP(5, getIPFromCloudflare_V6),
+    () => fetchIP(0, getIPFromIPChecking4),
+    () => fetchIP(1, getIPFromIPChecking6),
+    () => fetchIP(2, getIPFromCloudflare_V4),
+    () => fetchIP(3, getIPFromCloudflare_V6),
+    () => fetchIP(4, getIPFromIPIP),
+    () => fetchIP(5, getIPFromIPChecking64),
   ];
 
   // 限制执行的函数数量为 ipCardsToShow 的长度
@@ -294,22 +286,22 @@ const refreshCard = (card, index) => {
   clearCardData(card);
   switch (index) {
     case 0:
-      fetchIP(0, getIPFromIPChecking64);
+      fetchIP(0, getIPFromIPChecking4);
       break;
     case 1:
-      fetchIP(1, getIPFromIPChecking4);
+      fetchIP(1, getIPFromIPChecking6);
       break;
     case 2:
-      fetchIP(2, getIPFromIPChecking6);
+      fetchIP(2, getIPFromCloudflare_V4);
       break;
     case 3:
-      fetchIP(3, getIPFromIPIP);
+      fetchIP(3, getIPFromCloudflare_V6);
       break;
     case 4:
-      fetchIP(4, getIPFromCloudflare_V4);
+      fetchIP(4, getIPFromIPIP);
       break;
     case 5:
-      fetchIP(5, getIPFromCloudflare_V6);
+      fetchIP(5, getIPFromIPChecking64);
       break;
     default:
       console.error("Undefind Source:");

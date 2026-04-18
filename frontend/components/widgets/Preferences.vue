@@ -66,7 +66,7 @@
                     <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
                     <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-full"
                         @update:model-value="(v) => v && prefipCards(Number(v))">
-                        <ToggleGroupItem v-for="num in [3, 6]" :key="num" :value="String(num)" class="flex-1">
+                        <ToggleGroupItem v-for="num in [2, 4, 6]" :key="num" :value="String(num)" class="flex-1">
                             {{ num }}
                         </ToggleGroupItem>
                     </ToggleGroup>
@@ -106,10 +106,6 @@
                             :tip="t('nav.preferences.connectivityAutoRefreshTips')"
                             :model-value="userPreferences.connectivityAutoRefresh"
                             @update:model-value="prefConnectivityRefresh" />
-
-                        <PrefRow v-if="configs.map" id="showMap" :label="t('nav.preferences.showMap')"
-                            :tip="t('nav.preferences.showMapTips')" :model-value="userPreferences.showMap"
-                            @update:model-value="prefShowMap" />
 
                         <PrefRow v-if="isMobile" id="simpleMode" :label="t('nav.preferences.simpleMode')"
                             :tip="t('nav.preferences.simpleModeTips')" :model-value="userPreferences.simpleMode"
@@ -256,11 +252,6 @@ const prefConnectivityRefresh = (value) => {
     trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
 };
 
-const prefShowMap = (value) => {
-    store.updatePreference('showMap', value);
-    trackEvent('Nav', 'PrefereceClick', 'ShowMap');
-};
-
 const prefSimpleMode = (value) => {
     store.updatePreference('simpleMode', value);
     trackEvent('Nav', 'PrefereceClick', 'SimpleMode');
@@ -290,19 +281,10 @@ const prefipGeoSource = (value) => {
     trackEvent('IPCheck', 'SelectSource', ipDBs.value.find(x => x.id === value).text);
 };
 
-const toggleMaps = () => {
-    store.updatePreference('showMap', !userPreferences.value.showMap);
-    trackEvent('Nav', 'ToggleClick', 'ShowMap');
-};
-
 onMounted(() => {
     mediaQueryList.addEventListener('change', handleThemeChange);
     handleThemeChange({ matches: mediaQueryList.matches });
     setTimeout(updateIPDBs, 4000);
-});
-
-defineExpose({
-    toggleMaps,
 });
 
 // ——— 内联 functional 子组件：减少模板里重复的 section title / tip / Switch row 样式 ———

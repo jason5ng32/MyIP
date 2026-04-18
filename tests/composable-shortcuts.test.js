@@ -36,7 +36,6 @@ function makeStoreStub() {
 
 function makeRefs() {
   const calls = {
-    prefsToggleMaps: 0,
     queryOpen: 0,
     helpOpen: 0,
     additionalCurl: 0,
@@ -60,7 +59,7 @@ function makeRefs() {
   return {
     refs: {
       navBarRef:         ref({ OpenPreferences: () => { calls.navPrefs += 1; } }),
-      preferencesRef:    ref({ toggleMaps: () => { calls.prefsToggleMaps += 1; } }),
+      preferencesRef:    ref({}),
       queryIPRef:        ref({ openModal: () => { calls.queryOpen += 1; } }),
       helpModalRef:      ref({ openModal: () => { calls.helpOpen += 1; }, keyMap: null }),
       additionalRef:     ref({ openCurlModal: () => { calls.additionalCurl += 1; } }),
@@ -111,11 +110,11 @@ function loadAndGetKeyMap({ originalSite = false, isSignedIn = false } = {}) {
 }
 
 describe('useShortcuts()', () => {
-  it('loadShortcuts() registers a keymap of 27+ entries on a non-original site', () => {
+  it('loadShortcuts() registers a keymap of 26+ entries on a non-original site', () => {
     const { keyMap } = loadAndGetKeyMap({ originalSite: false });
-    // 27 base entries (no invisibility); keyMap is append-only globally so ≥ 27
+    // 26 base entries (no invisibility); keyMap is append-only globally so ≥ 26
     const distinctKeys = new Set(keyMap.map((e) => e.keys));
-    assert.ok(distinctKeys.size >= 27, `expected ≥27 distinct shortcut keys, got ${distinctKeys.size}`);
+    assert.ok(distinctKeys.size >= 26, `expected ≥26 distinct shortcut keys, got ${distinctKeys.size}`);
     assert.ok(distinctKeys.has('R'));
     assert.ok(distinctKeys.has('?'));
     assert.ok(distinctKeys.has('g'));
