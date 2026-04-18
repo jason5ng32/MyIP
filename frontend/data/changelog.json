@@ -919,7 +919,7 @@
   },
   {
     "version": "v6.0",
-    "date": "Apr 17, 2026",
+    "date": "Apr 18, 2026",
     "content": [
       {
         "type": "improve",
@@ -1054,6 +1054,96 @@
           "zh": "修复生产环境下打开 Ping 测试时的运行时报错",
           "fr": "Correction d'une erreur d'exécution à l'ouverture du test Ping en build de production",
           "tr": "Prodüksiyon derlemesinde Ping Testi açıldığında oluşan çalışma zamanı hatası düzeltildi"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "On-demand Map Dialog — click the map icon next to City to open a larger location view (replaces the inline map banner)",
+          "zh": "按需打开的 Map Dialog —— 点击 City 旁的地图图标即可打开放大的位置视图（替代原来的内嵌地图条）",
+          "fr": "Boîte de dialogue Carte à la demande — cliquez sur l'icône de carte à côté de Ville pour ouvrir une vue agrandie (remplace la bannière de carte en ligne)",
+          "tr": "İsteğe bağlı Harita iletişim kutusu — Şehir alanının yanındaki harita simgesine tıklayarak büyütülmüş konum görünümünü açın (satır içi harita banner'ının yerine geçer)"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "IP source count options adjusted to 2 / 4 / 6 (previously 3 / 6); rows always fill evenly on PC",
+          "zh": "IP 检测服务器数量选项调整为 2 / 4 / 6（原为 3 / 6），PC 端每行铺满不留空位",
+          "fr": "Les options de nombre de sources IP sont ajustées à 2 / 4 / 6 (auparavant 3 / 6) ; les rangées se remplissent toujours uniformément sur PC",
+          "tr": "IP kaynak sayısı seçenekleri 2 / 4 / 6 olarak ayarlandı (önceden 3 / 6); PC'de satırlar her zaman eşit doluyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP Infos cards always display 2 per row on desktop for consistent density",
+          "zh": "桌面端 IP 信息卡片固定每行 2 张,保持一致的信息密度",
+          "fr": "Les cartes Infos IP affichent toujours 2 par rangée sur ordinateur pour une densité cohérente",
+          "tr": "IP Bilgileri kartları tutarlı yoğunluk için masaüstünde her satırda 2 tane gösterir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP card metadata refined: Country / Region / City share one row, ISP gets its own row",
+          "zh": "IP 卡片元数据微调:Country / Region / City 共享一行,ISP 独占一行",
+          "fr": "Métadonnées de carte IP affinées : Pays / Région / Ville partagent une ligne, le FAI a sa propre ligne",
+          "tr": "IP kart meta verileri iyileştirildi: Ülke / Bölge / Şehir bir satırı paylaşır, ISS kendi satırına sahiptir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced data block (Type / Proxy / Nativeness / Quality) switched to a 2×2 label-on-top grid to match the metadata rhythm",
+          "zh": "高级数据块(Type / Proxy / Nativeness / Quality)改为 2×2 标签在上的排版,与元数据节奏对齐",
+          "fr": "Le bloc de données avancées (Type / Proxy / Nativité / Qualité) passe à une grille 2×2 avec étiquette en haut pour correspondre au rythme des métadonnées",
+          "tr": "Gelişmiş veri bloğu (Tür / Proxy / Yerlilik / Kalite), meta veri ritmiyle eşleşmesi için etiket üstte 2×2 ızgaraya geçti"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "ASN expansion now available in the Query IP dialog (previously homepage cards only)",
+          "zh": "Query IP 对话框现在也支持展开 ASN 详情(之前只有主页卡片支持)",
+          "fr": "L'expansion ASN est désormais disponible dans la boîte de dialogue Requête IP (auparavant uniquement sur les cartes de la page d'accueil)",
+          "tr": "ASN genişletme artık Sorgu IP iletişim kutusunda da kullanılabilir (önceden yalnızca ana sayfa kartlarında)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Map Dialog uses higher-resolution Google Maps images (1280×640 effective)",
+          "zh": "Map Dialog 使用更高分辨率的 Google 地图图片(实际 1280×640)",
+          "fr": "La boîte de dialogue Carte utilise des images Google Maps à plus haute résolution (1280×640 effectifs)",
+          "tr": "Harita iletişim kutusu daha yüksek çözünürlüklü Google Maps görüntüleri kullanır (etkili 1280×640)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Backend calls to upstream IP / ASN / map providers now time out at 8s; no more hung connections when a provider is slow",
+          "zh": "后端对上游 IP / ASN / 地图服务的调用现在 8 秒超时,不会再因为上游慢而挂起连接",
+          "fr": "Les appels backend vers les fournisseurs IP / ASN / cartes en amont expirent désormais à 8s ; plus de connexions bloquées quand un fournisseur est lent",
+          "tr": "Yukarı akış IP / ASN / harita sağlayıcılarına yapılan arka uç çağrıları artık 8s'de zaman aşımına uğrar; bir sağlayıcı yavaş olduğunda artık askıda bağlantı yok"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "IP cards no longer stay loading for 30+ seconds when IPv6 is disabled; errors now surface within 10s",
+          "zh": "IPv6 被禁用时,IP 卡片不再卡在 loading 30 秒以上,错误会在 10 秒内显示",
+          "fr": "Les cartes IP ne restent plus en chargement pendant plus de 30 secondes lorsque IPv6 est désactivé ; les erreurs apparaissent maintenant en moins de 10s",
+          "tr": "IPv6 devre dışıyken IP kartları artık 30+ saniye yükleme durumunda kalmıyor; hatalar 10s içinde görünür"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Mobile dialogs have proper horizontal margins and visible rounded corners at every screen size",
+          "zh": "移动端 Dialog 在所有屏幕尺寸下都有合适的左右边距和可见的圆角",
+          "fr": "Les boîtes de dialogue mobiles ont des marges horizontales appropriées et des coins arrondis visibles à toutes les tailles d'écran",
+          "tr": "Mobil iletişim kutuları her ekran boyutunda uygun yatay kenar boşluklarına ve görünür yuvarlatılmış köşelere sahiptir"
         }
       }
     ]
