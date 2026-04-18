@@ -1,4 +1,4 @@
-# 第一阶段：构建
+# Build stage
 FROM node:24-alpine AS build-stage
 WORKDIR /app
 COPY package*.json ./
@@ -6,7 +6,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# 第二阶段：运行
+# Production stage
 FROM node:24-alpine AS production-stage
 WORKDIR /app
 COPY --from=build-stage /app/node_modules ./node_modules
@@ -19,5 +19,5 @@ COPY --from=build-stage /app/common ./common
 
 EXPOSE 18966
 
-# 启动应用
+# Start application
 CMD ["npm", "start"]
