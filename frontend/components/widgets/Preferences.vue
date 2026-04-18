@@ -2,7 +2,7 @@
     <!-- Preferences 面板：左侧 Sheet 滑入；分 5 个 section（Language / Theme / IP Sources / IP DB / App Settings） -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('nav.preferences.title')"
-            :class="cn('flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[420px] max-w-[420px]')">
+            :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[420px] max-w-[420px]']">
             <!-- Header -->
             <header class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
                 <h2 class="flex items-center gap-2 text-base font-semibold m-0">
@@ -141,7 +141,6 @@ import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/vue';
 import {
     AppWindow,

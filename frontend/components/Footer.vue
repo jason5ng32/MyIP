@@ -41,7 +41,7 @@
     <!-- About Sheet（右侧滑入：阅读型侧栏更适合长文本浏览） -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
       <SheetContent side="right" :title="t('about.Title')"
-        :class="cn('flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]')">
+        :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]']">
         <!-- Tabs 包住整个 Sheet 内容：TabsList 留在 header，TabsContent 进 body 滚动区 -->
         <Tabs v-model="content" class="flex flex-col h-full">
           <!-- 顶部：tabs + 关闭 -->
@@ -153,7 +153,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
 
 const { t, tm } = useI18n();

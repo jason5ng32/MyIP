@@ -3,7 +3,7 @@
          保留原版的"渐变边框"（金/橙/青）作为成就视觉签名 -->
     <Sheet v-if="isSignedIn" :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('user.Achievements.Title')"
-            :class="cn('flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[640px] max-w-[80vw]')">
+            :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[640px] max-w-[80vw]']">
             <!-- Header -->
             <header class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
                 <h2 class="flex items-center gap-2 text-base font-semibold m-0">
@@ -117,7 +117,6 @@ import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
 import { Award, CircleCheck, CircleX } from 'lucide-vue-next';
 
 const { t } = useI18n();
