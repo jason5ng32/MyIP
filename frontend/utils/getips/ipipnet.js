@@ -1,10 +1,11 @@
 import { getIPFromUpai } from "./upai";
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
 // 从 IPIP.net 获取 IP 地址
 const getIPFromIPIP = async () => {
     try {
-        const response = await fetch("https://myip.ipip.net/json");
+        const response = await fetchWithTimeout("https://myip.ipip.net/json");
         const data = await response.json();
         const ip = data.data.ip;
         const source = "IPIP.net";

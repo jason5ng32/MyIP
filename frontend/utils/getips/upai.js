@@ -1,12 +1,13 @@
 import { getIPFromCloudflare_CN } from "./cloudflare-cn";
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
 // 从 Upai 获取 IP 地址
 const getIPFromUpai = async () => {
     try {
         const unixTime = Date.now();
         const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url);
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }

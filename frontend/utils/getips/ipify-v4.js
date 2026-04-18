@@ -1,9 +1,10 @@
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
 // 从 IPify 获取 IPv4 地址
 const getIPFromIpify_V4 = async () => {
     try {
-        const response = await fetch("https://api4.ipify.org?format=json");
+        const response = await fetchWithTimeout("https://api4.ipify.org?format=json");
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
