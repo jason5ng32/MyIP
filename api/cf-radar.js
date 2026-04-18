@@ -1,4 +1,3 @@
-import { parse } from 'dotenv';
 import { refererCheck } from '../common/referer-check.js';
 
 // 创建一个用于设置 headers 的通用函数
@@ -92,6 +91,25 @@ function isValidASN(asn) {
     return /^[0-9]+$/.test(asn);
 };
 
+// 清洗 Cloudflare Radar 返回的数据到统一字段名。
+// Hoisted to module scope — was redefined inside the handler on every request.
+function cleanUpResponseData(data) {
+    return {
+        asnName: data.asnInfo.result.asn.name,
+        asnCountryCode: data.asnInfo.result.asn.country,
+        asnOrgName: data.asnInfo.result.asn.orgName,
+        estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
+        IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
+        IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
+        HTTP_Pct: data.httpProtocol.result.summary_0.http,
+        HTTPS_Pct: data.httpProtocol.result.summary_0.https,
+        Desktop_Pct: data.deviceType.result.summary_0.desktop,
+        Mobile_Pct: data.deviceType.result.summary_0.mobile,
+        Bot_Pct: data.botType.result.summary_0.bot,
+        Human_Pct: data.botType.result.summary_0.human
+    };
+}
+
 // 格式化输出
 
 function formatData(data) {
@@ -144,24 +162,6 @@ export default async (req, res) => {
 
     try {
         const { asnInfo, ipVersion, httpProtocol, deviceType, botType } = await getAllASNData(asn);
-
-        // 清洗数据
-        function cleanUpResponseData(data) {
-            return {
-                asnName: data.asnInfo.result.asn.name,
-                asnCountryCode: data.asnInfo.result.asn.country,
-                asnOrgName: data.asnInfo.result.asn.orgName,
-                estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
-                IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
-                IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
-                HTTP_Pct: data.httpProtocol.result.summary_0.http,
-                HTTPS_Pct: data.httpProtocol.result.summary_0.https,
-                Desktop_Pct: data.deviceType.result.summary_0.desktop,
-                Mobile_Pct: data.deviceType.result.summary_0.mobile,
-                Bot_Pct: data.botType.result.summary_0.bot,
-                Human_Pct: data.botType.result.summary_0.human
-            };
-        }
 
         const cleanedResponse = cleanUpResponseData({ asnInfo, ipVersion, httpProtocol, deviceType, botType });
         const finalResponse = formatData(cleanedResponse);

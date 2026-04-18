@@ -1,9 +1,12 @@
 import { get } from 'https';
 import { refererCheck } from '../common/referer-check.js';
 
+// A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
+// strings let the upstream API receive partial prefixes and return
+// undefined behavior; tighten to exactly 12 hex chars.
 const isValidMAC = (address) => {
     const normalizedAddress = address.replace(/[:-]/g, '');
-    return normalizedAddress.length >= 6 && normalizedAddress.length <= 12 && /^[0-9A-Fa-f]+$/.test(normalizedAddress);
+    return normalizedAddress.length === 12 && /^[0-9A-Fa-f]+$/.test(normalizedAddress);
 }
 
 export default async (req, res) => {

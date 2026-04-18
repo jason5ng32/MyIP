@@ -1,5 +1,6 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// dotenv.config() is called once in backend-server.js before any handler
+// imports this module, so process.env.ALLOWED_DOMAINS is already populated.
+// Avoid the duplicate call to keep this a pure, fast function.
 
 function refererCheck(referer) {
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
