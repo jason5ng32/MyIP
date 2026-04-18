@@ -5,7 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
-import { requireReferer } from './common/guards.js';
+import { requireReferer, requireValidIP } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -152,20 +152,21 @@ app.use(express.json());
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
 
-// APIs
+// APIs. Routes that validate an `?ip=` param attach requireValidIP() so the
+// handler body no longer repeats the check.
 app.get('/api/map', mapHandler);
-app.get('/api/ipinfo', ipinfoHandler);
-app.get('/api/ipapicom', ipapicomHandler);
-app.get('/api/ipchecking', ipCheckingHandler);
-app.get('/api/ipsb', ipsbHandler);
+app.get('/api/ipinfo', requireValidIP(), ipinfoHandler);
+app.get('/api/ipapicom', requireValidIP(), ipapicomHandler);
+app.get('/api/ipchecking', requireValidIP(), ipCheckingHandler);
+app.get('/api/ipsb', requireValidIP(), ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/whois', getWhois);
-app.get('/api/ipapiis', ipapiisHandler);
-app.get('/api/ip2location', ip2locationHandler);
+app.get('/api/ipapiis', requireValidIP(), ipapiisHandler);
+app.get('/api/ip2location', requireValidIP(), ip2locationHandler);
 app.get('/api/invisibility', invisibilitytestHandler);
 app.get('/api/macchecker', macChecker);
-app.get('/api/maxmind', maxmindHandler);
+app.get('/api/maxmind', requireValidIP(), maxmindHandler);
 app.get('/api/getuserinfo', getUserinfo);
 app.put('/api/updateuserachievement', updateUserAchievement);
 

@@ -113,20 +113,8 @@ describe('map API smoke tests', () => {
 });
 
 describe('MaxMind API smoke tests', () => {
-  // Referer rejection moved to requireReferer middleware (see tests/guards.test.js).
-
-  it('rejects missing and invalid IP parameters before database lookup', () => {
-    const missingIpResponse = createResponse();
-    const invalidIpResponse = createResponse();
-
-    maxmindHandler(createRequest(), missingIpResponse);
-    maxmindHandler(createRequest({ query: { ip: '2001:::8888' } }), invalidIpResponse);
-
-    assert.equal(missingIpResponse.statusCode, 400);
-    assert.deepEqual(missingIpResponse.body, { error: 'No IP address provided' });
-    assert.equal(invalidIpResponse.statusCode, 400);
-    assert.deepEqual(invalidIpResponse.body, { error: 'Invalid IP address' });
-  });
+  // Referer and IP validation moved to guards middleware; see tests/guards.test.js.
+  // The MaxMind handler itself now assumes both have been validated upstream.
 });
 
 describe('DNS resolver API smoke tests', () => {

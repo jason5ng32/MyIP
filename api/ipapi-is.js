@@ -1,17 +1,8 @@
 import { get } from 'https';
-import { isValidIP } from '../common/valid-ip.js';
 
 export default (req, res) => {
-    // 从请求中获取 IP 地址
+    // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
-    if (!ipAddress) {
-        return res.status(400).json({ error: 'No IP address provided' });
-    }
-
-    // 检查 IP 地址是否合法
-    if (!isValidIP(ipAddress)) {
-        return res.status(400).json({ error: 'Invalid IP address' });
-    }
 
     const keys = (process.env.IPAPIIS_API_KEY).split(',');
     const key = keys[Math.floor(Math.random() * keys.length)];

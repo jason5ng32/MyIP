@@ -180,19 +180,8 @@ describe('get-user-info handler', () => {
 });
 
 describe('ipcheck-ing handler', () => {
-  it('rejects missing ?ip', async () => {
-    const res = createResponse();
-    await ipcheckIngHandler(createRequest(), res);
-    assert.equal(res.statusCode, 400);
-    assert.deepEqual(res.body, { error: 'No IP address provided' });
-  });
-
-  it('rejects malformed IP', async () => {
-    const res = createResponse();
-    await ipcheckIngHandler(createRequest({ query: { ip: '2001:::8888' } }), res);
-    assert.equal(res.statusCode, 400);
-    assert.deepEqual(res.body, { error: 'Invalid IP address' });
-  });
+  // Missing / malformed ?ip rejection moved to requireValidIP middleware
+  // (see tests/guards.test.js). The handler itself no longer checks.
 
   it('reports missing API key after IP passes validation', async () => {
     delete process.env.IPCHECKING_API_KEY;
@@ -203,52 +192,9 @@ describe('ipcheck-ing handler', () => {
   });
 });
 
-// 4 个纯外部 IP 源 handler 共用的参数校验：无 ip / 非法 ip
-const ipSourceHandlers = [
-  ['ip-sb', ipSbHandler],
-  ['ipapi-com', ipapiComHandler],
-  ['ipinfo-io', ipinfoIoHandler],
-];
-
-describe('external IP-source handlers — parameter validation', () => {
-  for (const [name, handler] of ipSourceHandlers) {
-    it(`${name} rejects missing ?ip`, async () => {
-      const res = createResponse();
-      await handler(createRequest(), res);
-      assert.equal(res.statusCode, 400);
-      assert.deepEqual(res.body, { error: 'No IP address provided' });
-    });
-
-    it(`${name} rejects malformed ip`, async () => {
-      const res = createResponse();
-      await handler(createRequest({ query: { ip: '2001:::8888' } }), res);
-      assert.equal(res.statusCode, 400);
-      assert.deepEqual(res.body, { error: 'Invalid IP address' });
-    });
-  }
-});
-
-describe('ipapi-is / ip2location-io handlers — parameter validation', () => {
-  // 这两个 handler 在 IP 校验通过后会读取 process.env.*_API_KEY.split(',')，
-  // 没配 key 的情况下 .split 会抛 TypeError —— 所以我们只测 IP 预校验路径。
-  const handlers = [['ipapi-is', ipapiIsHandler], ['ip2location-io', ip2locationHandler]];
-
-  for (const [name, handler] of handlers) {
-    it(`${name} rejects missing ?ip`, async () => {
-      const res = createResponse();
-      await handler(createRequest(), res);
-      assert.equal(res.statusCode, 400);
-      assert.deepEqual(res.body, { error: 'No IP address provided' });
-    });
-
-    it(`${name} rejects malformed ip`, async () => {
-      const res = createResponse();
-      await handler(createRequest({ query: { ip: '2001:::8888' } }), res);
-      assert.equal(res.statusCode, 400);
-      assert.deepEqual(res.body, { error: 'Invalid IP address' });
-    });
-  }
-});
+// The parametrized "rejects missing ?ip / rejects malformed ip" suites
+// across ip-sb / ipapi-com / ipinfo-io / ipapi-is / ip2location-io are all
+// covered by tests/guards.test.js at the middleware layer now.
 
 // -- dns-resolver 补充分支 -------------------------------------------------
 

@@ -1,16 +1,8 @@
-import { isValidIP } from '../common/valid-ip.js';
 import { lookupMaxMind } from '../common/maxmind-service.js';
 
 export default (req, res) => {
+    // IP presence + validity guaranteed by requireValidIP middleware.
     const ip = req.query.ip;
-    if (!ip) {
-        return res.status(400).json({ error: 'No IP address provided' });
-    }
-
-    // 检查 IP 地址是否合法
-    if (!isValidIP(ip)) {
-        return res.status(400).json({ error: 'Invalid IP address' });
-    }
 
     // 获取请求语言
     const supportedLanguages = ['zh-CN', 'en', 'fr', 'tr'];

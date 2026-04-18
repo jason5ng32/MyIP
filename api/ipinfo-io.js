@@ -1,18 +1,9 @@
 import { get } from 'https';
-import { isValidIP } from '../common/valid-ip.js';
 import countryLookup from 'country-code-lookup';
 
 export default async (req, res) => {
-    // 从请求中获取 IP 地址
+    // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
-    if (!ipAddress) {
-        return res.status(400).json({ error: 'No IP address provided' });
-    }
-
-    // 检查 IP 地址是否合法
-    if (!isValidIP(ipAddress)) {
-        return res.status(400).json({ error: 'Invalid IP address' });
-    }
 
     // 构建请求 ipinfo.io 的 URL
     const tokens = (process.env.IPINFO_API_TOKEN || '').split(',');
