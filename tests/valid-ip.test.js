@@ -1,3 +1,8 @@
+// Validates the shared IP parser. frontend/utils/valid-ip.js is a thin
+// re-export of common/valid-ip.js; we import both paths and assert they
+// agree, which catches any regression where the re-export breaks (e.g.
+// someone duplicates the implementation again).
+
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 

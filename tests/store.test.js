@@ -1,14 +1,13 @@
-// refactor/03 stage D — Pinia 主 store 的关键 action / getter 契约测试
+// Contract tests for the Pinia main store — key actions and getters.
 //
-// store.js 的顶层依赖（i18n.js / firebase-init.js / import.meta.env.VITE_*）
-// 在 Node 测试环境下通过以下手段满足：
-//   1. store.js 里 `./locales/i18n` 补上 .js 后缀，JSON import 加上 `with { type: 'json' }`
-//   2. import.meta.env 访问一律用可选链
-//   3. 测试在 import 前注入最小 localStorage / window / document 桩
-//
-// 以上都是纯 portability / SSR-safety 修正，不改变 Vite 下的运行时行为。
+// store.js has top-level dependencies (locales/i18n, firebase-init.js,
+// import.meta.env.VITE_*) that don't exist in the Node test environment.
+// The store source already uses explicit `.js` suffixes and reads
+// import.meta.env via optional chaining so it imports cleanly here; we
+// just need to inject minimal localStorage / window / document stubs
+// BEFORE the store import (see below).
 
-// ---- 全局桩（必须在 import store 之前注入）----
+// ---- globalThis stubs (must be installed before importing store) ----
 globalThis.localStorage = {
   _data: {},
   getItem(k) { return this._data[k] ?? null; },

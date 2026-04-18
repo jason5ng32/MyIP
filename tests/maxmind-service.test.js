@@ -1,8 +1,8 @@
-// refactor/03 stage E — common/maxmind-service 契约测试
+// Contract tests for common/maxmind-service.
 //
-// 注意：仓库内实际存在 GeoLite2-ASN.mmdb + GeoLite2-City.mmdb，
-// 所以我们可以真正 openMaxMindReaders() / reloadMaxMindDatabases() 来验证
-// 端到端行为，而不是 mock fs。
+// The repo ships real GeoLite2-ASN.mmdb + GeoLite2-City.mmdb binaries, so we
+// exercise openMaxMindReaders() / reloadMaxMindDatabases() against the actual
+// database files end-to-end rather than mocking fs.
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
