@@ -48,7 +48,7 @@
             <div v-else-if="isErrorState"
                 class="flex-1 flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
                 <IPErrorIcon />
-                <p class="text-sm text-destructive font-medium">{{ card.ip }}</p>
+                <p class="text-sm text-primary font-medium">{{ card.ip }}</p>
             </div>
 
             <!-- 加载态：skeleton rows -->
