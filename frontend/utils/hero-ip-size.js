@@ -4,6 +4,6 @@
 // and IPv6 cards feel balanced side by side.
 export function heroIpSizeClass(ip) {
     const len = typeof ip === 'string' ? ip.length : 0;
-    if (len >= 15) return 'text-sm md:text-xl';
+    if (len >= 25) return 'text-sm md:text-xl';
     return 'text-xl';
 }
