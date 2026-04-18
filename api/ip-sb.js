@@ -1,26 +1,18 @@
-import { get } from 'https';
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
-export default (req, res) => {
+export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
 
-    const url = new URL(`https://api.ip.sb/geoip/${ipAddress}`);
+    const url = `https://api.ip.sb/geoip/${ipAddress}`;
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            try {
-                const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJsonForIPSB(originalJson);
-                res.json(modifiedJson);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    }).on('error', (e) => {
+    try {
+        const apiRes = await fetchUpstream(url);
+        const json = await apiRes.json();
+        res.json(modifyJsonForIPSB(json));
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };
 
 function modifyJsonForIPSB(json) {

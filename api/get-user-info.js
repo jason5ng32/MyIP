@@ -1,3 +1,5 @@
+import { fetchUpstream } from '../common/fetch-upstream.js';
+
 export default async (req, res) => {
     const key = process.env.IPCHECKING_API_KEY;
 
@@ -10,7 +12,7 @@ export default async (req, res) => {
     const url = new URL(`${apiEndpoint}/userinfo?key=${key}`);
 
     try {
-        const apiResponse = await fetch(url, {
+        const apiResponse = await fetchUpstream(url, {
             headers: {
                 ...req.headers,
             }

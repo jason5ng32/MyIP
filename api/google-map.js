@@ -1,4 +1,5 @@
-import { get } from 'https';
+import { Readable } from 'node:stream';
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
 // 验证请求合法性
 function isValidRequest(req) {
@@ -37,7 +38,7 @@ const styles = {
     ]
 };
 
-export default (req, res) => {
+export default async (req, res) => {
     // 检查请求是否合法
     if (!isValidRequest(req)) {
         return res.status(400).json({ error: 'Invalid request' });
@@ -68,9 +69,17 @@ export default (req, res) => {
 
     const url = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&markers=color:blue%7C${latitude},${longitude}&scale=${scale}&zoom=${zoom}&maptype=roadmap&language=${language}&format=${fmt}&size=${mapSize}&style=${styleParam}&key=${apiKey}`;
 
-    get(url, apiRes => {
-        apiRes.pipe(res);
-    }).on('error', (e) => {
+    // Unlike the JSON handlers, the Static Maps response is a binary JPEG
+    // and must be passed through to the client. Convert the WHATWG ReadableStream
+    // from fetch into a Node Readable and pipe it at the Express response.
+    try {
+        const apiRes = await fetchUpstream(url);
+        if (!apiRes.ok) {
+            return res.status(apiRes.status).json({ error: `Upstream map API returned ${apiRes.status}` });
+        }
+        res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'image/jpeg');
+        Readable.fromWeb(apiRes.body).pipe(res);
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };

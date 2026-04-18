@@ -1,3 +1,5 @@
+import { fetchUpstream } from '../common/fetch-upstream.js';
+
 export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
@@ -14,7 +16,7 @@ export default async (req, res) => {
     const url = new URL(`${apiEndpoint}/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
 
     try {
-        const apiResponse = await fetch(url, {
+        const apiResponse = await fetchUpstream(url, {
             headers: {
                 ...req.headers,
             }

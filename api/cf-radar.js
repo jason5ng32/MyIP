@@ -1,19 +1,14 @@
-// 创建一个用于设置 headers 的通用函数
-function createFetchOptions() {
-    return {
-        headers: {
-            'Authorization': `Bearer ${process.env.CLOUDFLARE_API}`,
-            'Content-Type': 'application/json'
-        }
-    };
-}
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
 // 通用的 fetch 请求函数
 async function fetchFromCloudflare(endpoint) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
-    const headers = createFetchOptions().headers;
-    const options = { headers };
-    const response = await fetch(url, options);
+    const response = await fetchUpstream(url, {
+        headers: {
+            'Authorization': `Bearer ${process.env.CLOUDFLARE_API}`,
+            'Content-Type': 'application/json',
+        },
+    });
     return response.json();
 }
 

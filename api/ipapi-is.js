@@ -1,6 +1,6 @@
-import { get } from 'https';
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
-export default (req, res) => {
+export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
 
@@ -8,21 +8,13 @@ export default (req, res) => {
     const key = keys[Math.floor(Math.random() * keys.length)];
     const url = `https://api.ipapi.is?q=${ipAddress}&key=${key}`;
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            try {
-                const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJsonForIPAPI(originalJson);
-                res.json(modifiedJson);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    }).on('error', (e) => {
+    try {
+        const apiRes = await fetchUpstream(url);
+        const json = await apiRes.json();
+        res.json(modifyJsonForIPAPI(json));
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };
 
 function modifyJsonForIPAPI(json) {

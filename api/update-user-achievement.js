@@ -1,3 +1,5 @@
+import { fetchUpstream } from '../common/fetch-upstream.js';
+
 export default async (req, res) => {
     // defensive; app.put() in backend-server.js already gates method
     if (req.method !== 'PUT') {
@@ -20,7 +22,7 @@ export default async (req, res) => {
     const url = new URL(`${apiEndpoint}/updateuserachievements?key=${key}`);
 
     try {
-        const apiResponse = await fetch(url, {
+        const apiResponse = await fetchUpstream(url, {
             method: 'PUT',
             headers: {
                 ...req.headers,

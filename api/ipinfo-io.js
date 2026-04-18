@@ -1,5 +1,5 @@
-import { get } from 'https';
 import countryLookup from 'country-code-lookup';
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
 export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
@@ -13,22 +13,13 @@ export default async (req, res) => {
     const url_noToken = `https://ipinfo.io/${ipAddress}`;
     const url = token ? url_hasToken : url_noToken;
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', async () => {
-            try {
-                const originalJson = JSON.parse(data);
-                const modifiedJson = modifyJson(originalJson);
-
-                res.json(modifiedJson);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    }).on('error', (e) => {
+    try {
+        const apiRes = await fetchUpstream(url);
+        const json = await apiRes.json();
+        res.json(modifyJson(json));
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };
 
 function modifyJson(json) {

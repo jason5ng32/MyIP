@@ -1,3 +1,5 @@
+import { fetchUpstream } from '../common/fetch-upstream.js';
+
 // 如果长度不等于 28 且不是字母与数字的组合，则返回 false
 function isValidUserID(userID) {
     if (typeof userID !== 'string') {
@@ -32,7 +34,7 @@ export default async (req, res) => {
     const url = new URL(`${apiEndpoint}/getpdresult/${id}?apikey=${apikey}`);
 
     try {
-        const apiResponse = await fetch(url, {
+        const apiResponse = await fetchUpstream(url, {
             headers: {
                 ...req.headers,
             }

@@ -1,4 +1,4 @@
-import { get } from 'https';
+import { fetchUpstream } from '../common/fetch-upstream.js';
 
 // A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
 // strings let the upstream API receive partial prefixes and return
@@ -29,24 +29,16 @@ export default async (req, res) => {
     const url_noToken = `https://api.maclookup.app/v2/macs/${macAddress}`;
     const url = token ? url_hasToken : url_noToken;
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', async () => {
-            try {
-                const originalJson = JSON.parse(data);
-                if (originalJson.success !== true) {
-                    return res.json({ success: false, error: originalJson.error || 'Data not found' });
-                }
-                const finalData = modifyData(originalJson);
-                res.json(finalData);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    }).on('error', (e) => {
+    try {
+        const apiRes = await fetchUpstream(url);
+        const json = await apiRes.json();
+        if (json.success !== true) {
+            return res.json({ success: false, error: json.error || 'Data not found' });
+        }
+        res.json(modifyData(json));
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };
 
 
