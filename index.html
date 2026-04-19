@@ -18,6 +18,32 @@
   <link rel="icon" href="/logos/logo.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
+  <!-- Seed the `.dark` class on <html> BEFORE first paint.
+       Reads the user's stored theme preference from localStorage (key
+       `userPreferences`, field `theme`, values: "auto" / "light" / "dark"),
+       falling back to the OS `prefers-color-scheme` when on "auto" or when
+       there's no stored preference yet. Runs synchronously — must come before
+       the inline <style> block below and before the Vue bundle loads, so the
+       boot screen and the eventually-mounted app agree on the theme from
+       frame 1. Preferences.vue owns the class after mount via
+       `store.setDarkMode`. -->
+  <script>
+    (function () {
+      try {
+        var stored = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+        var theme = stored.theme || 'auto';
+        var isDark =
+          theme === 'dark' ||
+          (theme === 'auto' &&
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) document.documentElement.classList.add('dark');
+      } catch (e) {
+        /* localStorage / JSON parse disabled — fall through, defaults to light. */
+      }
+    })();
+  </script>
+
   <style>
     *,
     *::before,
@@ -44,11 +70,15 @@
       color: #0a0a0a;
     }
 
-    @media (prefers-color-scheme: dark) {
-      html {
-        background: #0a0a0a;
-        color: #fafafa;
-      }
+    /* Dark mode is gated strictly on the `.dark` class — *never* on
+       `prefers-color-scheme` alone — so this inline CSS never fights with
+       Tailwind's dark variant or with Preferences.vue's explicit light/dark
+       selection. The `.dark` class is seeded by the script block below
+       before first paint, so boot-screen rendering already reflects the
+       right theme without a flash. */
+    html.dark {
+      background: #0a0a0a;
+      color: #fafafa;
     }
 
     /* Boot screen — shown until App.vue's setup hides it

@@ -92,28 +92,54 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 ## 📚 环境变量
 
-你可以不添加环境变量直接使用，但是如果你想使用一些高级功能，可以添加下面的环境变量：
+下表中标记为 **是** 的变量必须配置，后端才能正常工作。其中 MaxMind 相关的三项尤其重要——填写环境变量之前请先阅读下面的 MaxMind 配置说明。
+
+### MaxMind 数据库（必须配置）
+
+MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进行 IP 地理位置查询、ASN / 组织归属查询，以及全站各处（IP 卡片、WebRTC ICE candidate 等）的国家/地区标识。MaxMind 配置是后端完整运行的前提。
+
+由于 MaxMind GeoLite2 协议不允许再分发，`.mmdb` 文件**没有被包含在本仓库里**，你需要自己准备。有两种做法：
+
+**方案 A —— 自动下载（推荐，Docker 部署必选）**
+
+1. 去 [maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup) 注册一个免费账号。
+2. 在账号的 "Manage License Keys" 页面生成一个 License Key。
+3. 配置这三个环境变量：
+   ```bash
+   MAXMIND_ACCOUNT_ID="your-account-id"
+   MAXMIND_LICENSE_KEY="your-license-key"
+   MAXMIND_AUTO_UPDATE="true"
+   ```
+4. 启动后端。首次启动后约 60 秒内，程序会自动下载两个数据库，之后每 24 小时自动检查更新。
+
+> ⚠️ **Docker 部署必须使用方案 A。** 一个全新的容器里 `common/maxmind-db/` 目录是空的——如果不配置这三个变量，后端虽然能起来，但 MaxMind 相关的 IP 查询源和 WebRTC 国家标识将无法工作，并且每次启动日志里都会刷出 `MaxMind API will return 503...` 的报错。
+
+**方案 B —— 手动放置（离线 / 非 Docker 场景）**
+
+从你的 MaxMind 账号下载 `GeoLite2-City.mmdb` 和 `GeoLite2-ASN.mmdb`，在启动后端前手动放入 `common/maxmind-db/` 目录。这种情况下 `MAXMIND_AUTO_UPDATE` 可以保持 `"false"`，但每次 MaxMind 发布新版本时你需要自己手动更新文件。
+
+### 环境变量一览
 
 | 变量名 | 是否必须 | 默认值 | 说明 |
 | --- | --- | --- | --- |
+| `IPCHECKING_API_ENDPOINT` | **是** | `""` | IPCheck.ing 的 API 端点 URL |
+| `MAXMIND_ACCOUNT_ID` | **是** | `""` | MaxMind 账号 ID，和 `MAXMIND_LICENSE_KEY` 一起用于下载 GeoLite2 数据库。详见上方 MaxMind 配置说明。 |
+| `MAXMIND_LICENSE_KEY` | **是** | `""` | MaxMind License Key，和 `MAXMIND_ACCOUNT_ID` 配合使用。详见上方 MaxMind 配置说明。 |
+| `MAXMIND_AUTO_UPDATE` | **是** | `"false"` | 设置为 `"true"` 时，程序会在启动后 60 秒左右自动下载 GeoLite2 数据库，之后每 24 小时刷新一次。**Docker 部署必须设置为 `"true"`。** 只有当你已经手动放置了 `.mmdb` 文件时，才能保持为 `"false"`。 |
+| `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
 | `BACKEND_PORT` | 否 | `"11966"` | 程序后端部分的运行端口 |
 | `FRONTEND_PORT` | 否 | `"18966"` | 程序前端部分的运行端口 |
 | `SECURITY_RATE_LIMIT` | 否 | `"0"` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
 | `SECURITY_DELAY_AFTER` | 否 | `"0"` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `"logs/blacklist-ip.log"` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |
-| `GOOGLE_MAP_API_KEY=` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
+| `GOOGLE_MAP_API_KEY` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
 | `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
-| `MAXMIND_ACCOUNT_ID` | 否 | `""` | MaxMind 账号 ID，和 `MAXMIND_LICENSE_KEY` 一起用于下载 GeoLite2 数据库 |
-| `MAXMIND_LICENSE_KEY` | 否 | `""` | MaxMind License Key，用于下载 GeoLite2 数据库 |
-| `MAXMIND_AUTO_UPDATE` | 否 | `"false"` | 设置为 `"true"` 且已配置 MaxMind 凭证时，自动定期更新 GeoLite2 数据库 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
-| `IPCHECKING_API_ENDPOINT` | **是** | `""` | IPCheck.ing 的 API 端点 URL |
-| `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
 | `VITE_CURL_IPV4_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv4 域名 |
 | `VITE_CURL_IPV6_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv6 域名 |
 | `VITE_CURL_IPV64_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的双网络栈域名 |
@@ -133,9 +159,12 @@ cp .env.example .env
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
+IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
+MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
+MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
+MAXMIND_AUTO_UPDATE="true"
 GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
-IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 然后重新启动后端服务。
@@ -146,9 +175,12 @@ IPCHECKING_API="YOUR_KEY_HERE"
 
 ```bash
 docker run -d -p 18966:18966 \
+  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
+  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
+  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
+  -e MAXMIND_AUTO_UPDATE="true" \
   -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPCHECKING_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 
@@ -177,11 +209,11 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 ## 😶‍🌫️ 额外说明
 
-在 V2.0 发布的时候，我曾经说：这个程序的 70% 的代码不是我写的，是通过 ChatGPT 写的。大概来回 90 个回合，外加一些细微的手动修改，完成了全部代码。
+在 V2.0 发布的时候，我曾经说：这个程序的 70% 的代码不是我写的，是通过 AI 写的。大概来回 90 个回合，外加一些细微的手动修改，完成了全部代码。
 
 当然，程序的架构和 UI 还是需要自己进行设计。
 
-随着 V3.0 及后续的代码发布，ChatGPT 帮助我写代码的比例逐渐下降，估计现在在 40% - 50% 之间。相反，在这个过程中，我从完全不会 JavaScript 和 Vue ，与 AI 结对编程后，我现在已经能看懂大部分的 JS 代码了，并且也已经能手撸一些。
+随着 V3.0 及后续的代码发布，AI 帮助我写代码的比例逐渐下降，估计现在在 40% - 50% 之间。相反，在这个过程中，我从完全不会 JavaScript 和 Vue ，与 AI 结对编程后，我现在已经能看懂大部分的 JS 代码了，并且也已经能手撸一些。
 
 感谢 AI ，给了我这样一个失业产品经理快速学习编程的机会。
 
