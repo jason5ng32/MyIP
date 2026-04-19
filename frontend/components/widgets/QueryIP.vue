@@ -2,8 +2,7 @@
     <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
-            class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer"
-            :style="positionStyle"
+            class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
             @click="openQueryIP">
             <Search class="size-4" />
         </Button>
@@ -11,22 +10,23 @@
 
     <!-- Query Dialog -->
     <Dialog :open="isOpen" @update:open="onOpenChange">
-        <DialogContent :title="t('ipcheck.Title')" class="max-w-xl">
+        <DialogContent :title="t('ipcheck.Title')" class="max-w-xl min-h-[200px]">
             <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
             <div class="space-y-4">
                 <!-- Input Group -->
-                <InputGroup>
-                    <Input type="text" id="inputIP" name="inputIP"
-                        :placeholder="t('ipcheck.Placeholder')"
+                <div class="flex items-center gap-2">
+                    <Input type="text" id="inputIP" name="inputIP" :placeholder="t('ipcheck.Placeholder')"
                         v-model="inputIP" @keyup.enter="submitQuery" />
                     <Button id="sumitQueryButton" type="button" variant="action"
-                        :disabled="!isValidIP(inputIP) || isChecking === 'running'"
-                        @click="submitQuery">
+                        :disabled="!isValidIP(inputIP) || isChecking === 'running'" @click="submitQuery"
+                        class="cursor-pointer">
                         <Spinner v-if="isChecking === 'running'" />
-                        {{ t('ipcheck.Button') }}
+                        <template v-else>
+                            <Search class="size-4 shrink-0" />
+                        </template>
                     </Button>
-                </InputGroup>
+                </div>
 
                 <!-- Error message -->
                 <p v-if="modalQueryError" class="text-sm text-destructive">{{ modalQueryError }}</p>
@@ -65,7 +65,6 @@ import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { InputGroup } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
 import { Monitor, Search } from 'lucide-vue-next';

@@ -6,7 +6,7 @@
         <!-- Input area -->
         <div class="space-y-2">
             <label for="queryURL" class="text-sm font-medium block">{{ t('censorshipcheck.Note2') }}</label>
-            <InputGroup>
+            <div class="flex items-center gap-2">
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
                     :disabled="censorshipCheckStatus === 'running'"
                     :placeholder="t('censorshipcheck.Placeholder')"
@@ -15,9 +15,11 @@
                     :disabled="censorshipCheckStatus === 'running' || !queryURL"
                     @click="onSubmit">
                     <Spinner v-if="censorshipCheckStatus === 'running'" />
-                    {{ t('censorshipcheck.Run') }}
+                    <template v-else>
+                        <Play class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
@@ -68,12 +70,11 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
-import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

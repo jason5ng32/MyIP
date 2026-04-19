@@ -9,8 +9,8 @@
         <!-- Input area: IP selection + Run button -->
         <div class="space-y-2">
             <label for="mtrIP" class="text-sm font-medium block">{{ t('mtrtest.Note3') }}</label>
-            <InputGroup>
-                <Select v-model="selectedIP">
+            <div class="flex items-center gap-2">
+                <Select v-model="selectedIP" :disabled="mtrCheckStatus === 'running'">
                     <SelectTrigger id="mtrIP" aria-label="Select IP to MTR" class="flex-1">
                         <SelectValue :placeholder="t('mtrtest.SelectIP')" />
                     </SelectTrigger>
@@ -20,11 +20,13 @@
                 </Select>
                 <Button variant="action"
                     :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
-                    @click="startmtrCheck">
+                    @click="startmtrCheck" class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
-                    {{ t('mtrtest.Run') }}
+                    <template v-else>
+                        <Play class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
         </div>
 
         <!-- Error message -->
@@ -70,10 +72,9 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { InputGroup } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info } from 'lucide-vue-next';
+import { Info,Play } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

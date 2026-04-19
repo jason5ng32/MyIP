@@ -258,7 +258,6 @@
     "Title": "Test d'invisibilité",
     "Note": "Lorsque vous utilisez un proxy ou un VPN, les sites que vous visitez ne savent-ils vraiment pas que vous utilisez un proxy ? Êtes-vous réellement invisible ? Nous utiliserons plusieurs méthodes pour essayer de détecter les failles de votre anonymat et trouver des preuves de l'utilisation d'un proxy. Bien que certains résultats de test puissent ne pas être entièrement précis, ce test reste très instructif.",
     "Note2": "Après avoir cliqué sur Exécuter, le système exécutera un script qui terminera généralement tous les tests en moins de 10 secondes. Pendant ce processus, vos informations IP, les informations de votre navigateur, etc. seront collectées et analysées en arrière-plan.",
-    "Run": "Exécuter le test",
     "fetchError": "Impossible de récupérer les résultats du test",
     "yourIP": "Votre adresse IP principale est",
     "scoreProxy": "Pourcentage de proxy",
@@ -356,7 +355,6 @@
     "Note": "Vérifie la disponibilité des sites cibles dans quatre régions connues pour une censure internet rigoureuse, incluant : la Chine continentale, l'Arabie Saoudite, la Russie, et la Turquie. Des tests sont également réalisés depuis des régions où l'internet est relativement libre, servant de groupe témoin pour la vérification. Certaines régions disposent de dispositions légales claires sur la censure internet, tandis que d'autres sont plus vagues.",
     "Note2": "Veuillez entrer une URL ou un nom de domaine pour commencer le test de censure :",
     "Note3": "Un site est considéré comme bloqué uniquement si aucun serveur dans le même pays ne peut y accéder.",
-    "Run": "Lancer le Test",
     "Placeholder": "URL ou Nom de Domaine",
     "Country": "Région",
     "Status": "Statut",
@@ -389,7 +387,6 @@
     "Title": "Recherche MAC",
     "Note": "Interroger le fabricant d'une adresse physique (adresse MAC), s'il s'agit d'une adresse unicast/multicast, globale/locale, etc. Prend en charge la requête avec une adresse complète de 12 chiffres ou juste le préfixe. Vous pouvez également utiliser cet outil pour vérifier si l'adresse physique que vous avez générée répond à vos besoins.",
     "Note2": "Veuillez saisir une adresse physique pour commencer la requête:",
-    "Run": "Interroger",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "Adresse physique invalide",
     "fetchError": "Impossible de récupérer les résultats de la requête",
@@ -418,7 +415,6 @@
     "Note2": "Veuillez entrer un nom de domaine ou une adresse IP pour démarrer la requête :",
     "Note3": "Whois informations contient plusieurs types de champs, voici le texte brut original",
     "Placeholder": "Nom de domaine ou IP",
-    "Run": "Rechercher",
     "invalidURL": "Nom de domaine ou IP invalide",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
@@ -428,7 +424,6 @@
     "Note": "Dans certaines régions, pour des raisons politiques ou commerciales, certains opérateurs peuvent contaminer certains noms de domaine, entraînant des résultats incorrects lorsqu'ils sont accédés directement. L'utilisation de vérifications de résolution DNS vous aidera à inspecter les résultats de résolution de noms de domaine auprès de fournisseurs DNS renommés dans le monde entier. Parmi les tests DNS intégrés, certains fournisseurs sont originaires de Chine, dont les résultats de résolution DNS peuvent être contaminés. Veuillez faire preuve de discernement.",
     "Note2": "Veuillez entrer une URL ou un nom de domaine pour commencer la résolution :",
     "Placeholder": "URL ou Nom de Domaine",
-    "Run": "Exécuter",
     "invalidURL": "URL ou Nom de Domaine invalide",
     "fetchError": "Impossible de récupérer les résultats de résolution",
     "Provider": "Fournisseur DNS",
@@ -595,7 +590,6 @@
     "PacketLoss": "Perte de paquets",
     "ReceivedPackets": "Reçus",
     "DroppedPackets": "Perdus",
-    "Run": "Démarrez",
     "Error": "Échec du test, il semble que votre IP ne soit pas autorisée à effectuer le test de ping."
   },
   "mtrtest": {
@@ -606,14 +600,12 @@
     "Note3": "Veuillez sélectionner votre adresse IP pour le test.",
     "SelectIP": "Choisissez un IP",
     "Region": "Région",
-    "Run": "Démarrez",
     "Error": "Échec du test, il semble que votre IP ne soit pas autorisée à effectuer le test MTR."
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "Vérification IP",
     "Placeholder": "Veuillez entrer une adresse IP",
-    "Button": "Vérifier",
     "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide."
   },
   "alert": {

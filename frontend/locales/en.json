@@ -259,7 +259,6 @@
     "Note": "Checks the availability of target websites in four regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, and Turkey. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
     "Note2": "Please enter a URL or domain name to start the censorship test:",
     "Note3": "A website is only considered blocked if it cannot be accessed from all servers within the same country.",
-    "Run": "Run Test",
     "Placeholder": "URL or Domain Name",
     "Country": "Region",
     "Status": "Status",
@@ -278,7 +277,6 @@
     "Title": "Invisibility Test",
     "Note": "When you use a proxy or VPN, do the websites you visit really not know that you are using a proxy? Are you truly invisible? We will use various methods to try to calculate the vulnerabilities in your disguise and find evidence that you are using a proxy. Although some test results may not be completely accurate, this test is still highly informative.",
     "Note2": "After clicking Run, the system will run a script that usually completes all tests within 10 seconds. During this process, your IP information, browser information, etc. will be collected and analyzed in the background.",
-    "Run": "Run Test",
     "fetchError": "Unable to fetch test results",
     "yourIP": "Your main test IP is",
     "proxyScore": "Proxy Percentage",
@@ -389,7 +387,6 @@
     "Title": "MAC Lookup",
     "Note": "Query the manufacturer of a physical address (MAC address), whether it is unicast/multicast, global/local, etc. Supports querying with a complete 12-digit address or just the prefix. You can also use this tool to verify if the physical address you generated meets your needs.",
     "Note2": "Please enter a physical address to start the query:",
-    "Run": "Query",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "Invalid physical address",
     "fetchError": "Unable to fetch query results",
@@ -418,7 +415,6 @@
     "Note2": "Please enter a domain name or IP address to start the query:",
     "Note3": "Whois information contains various types of fields. The following is the raw text information",
     "Placeholder": "Domain Name or IP",
-    "Run": "Query",
     "invalidURL": "Invalid domain name or IP",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
@@ -428,7 +424,6 @@
     "Note": "In some regions, due to political or commercial reasons, some operators may contaminate certain domain names, resulting in incorrect results when accessed directly. Using DNS resolution checks will help you inspect the resolution results of domain names from well-known DNS providers around the world. Among the built-in DNS tests, some providers are from China, whose DNS resolution results may be contaminated. Please be discerning.",
     "Note2": "Please enter a URL or domain name to start resolution:",
     "Placeholder": "URL or Domain Name",
-    "Run": "Run",
     "invalidURL": "Invalid URL or Domain Name",
     "fetchError": "Unable to fetch resolution results",
     "Provider": "DNS Provider",
@@ -595,7 +590,6 @@
     "PacketLoss": "Packet Loss",
     "ReceivedPackets": "Received",
     "DroppedPackets": "Dropped",
-    "Run": "Run Test",
     "Error": "Test failed, it looks like your IP is not allowed to perform Ping test."
   },
   "mtrtest": {
@@ -606,14 +600,12 @@
     "Note3": "Please select your IP address for testing.",
     "SelectIP": "Select an IP Address",
     "Region": "Region",
-    "Run": "Run Test",
     "Error": "Test failed, it looks like your IP is not allowed to perform MTR test."
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Check",
     "Placeholder": "Please enter an IP address",
-    "Button": "Check",
     "Error": "Please enter a valid IPv4 or IPv6 address."
   },
   "alert": {

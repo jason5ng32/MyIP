@@ -19,18 +19,20 @@
             </div>
 
             <!-- Input + Run -->
-            <InputGroup>
+            <div class="flex items-center gap-2">
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
                     :disabled="dnsCheckStatus === 'running'"
                     :placeholder="t('dnsresolver.Placeholder')"
                     v-model="queryURL" @keyup.enter="onSubmit" />
                 <Button variant="action"
                     :disabled="dnsCheckStatus === 'running' || !queryURL"
-                    @click="onSubmit">
+                    @click="onSubmit" class="cursor-pointer">
                     <Spinner v-if="dnsCheckStatus === 'running'" />
-                    {{ t('dnsresolver.Run') }}
+                    <template v-else>
+                        <Play class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
@@ -73,11 +75,11 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Input } from '@/components/ui/input';
-import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
+import { Play } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

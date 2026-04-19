@@ -6,18 +6,20 @@
         <!-- Input area -->
         <div class="space-y-2">
             <label for="queryURLorIP" class="text-sm font-medium block">{{ t('whois.Note2') }}</label>
-            <InputGroup>
+            <div class="flex items-center gap-2">
                 <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore
                     :disabled="whoisCheckStatus === 'running'"
                     :placeholder="t('whois.Placeholder')"
                     v-model="queryURLorIP" @keyup.enter="onSubmit" />
                 <Button variant="action"
                     :disabled="whoisCheckStatus === 'running' || !queryURLorIP"
-                    @click="onSubmit">
+                    @click="onSubmit" class="cursor-pointer">
                     <Spinner v-if="whoisCheckStatus === 'running'" />
-                    {{ t('whois.Run') }}
+                    <template v-else>
+                        <Search class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
@@ -67,10 +69,9 @@ import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
-import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { Info } from 'lucide-vue-next';
+import { Info, Search } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

@@ -6,18 +6,20 @@
         <!-- Input area: label + InputGroup -->
         <div class="space-y-2">
             <label for="queryMAC" class="text-sm font-medium">{{ t('macchecker.Note2') }}</label>
-            <InputGroup>
+            <div class="flex items-center gap-2">
                 <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore
                     :disabled="macCheckStatus === 'running'"
                     :placeholder="t('macchecker.Placeholder')"
                     v-model="queryMAC" @keyup.enter="onSubmit" />
                 <Button variant="action"
                     :disabled="macCheckStatus === 'running' || !queryMAC"
-                    @click="onSubmit">
+                    @click="onSubmit" class="cursor-pointer">
                     <Spinner v-if="macCheckStatus === 'running'" />
-                    {{ t('macchecker.Run') }}
+                    <template v-else>
+                        <Search class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
@@ -90,11 +92,11 @@ import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/data/country-name.js';
 import { CircleCheck, CircleX, Factory, ListChecks } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
-import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
+import { Search } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

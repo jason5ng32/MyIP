@@ -9,8 +9,8 @@
         <!-- Input area: IP selection + Run -->
         <div class="space-y-2">
             <label for="pingIP" class="text-sm font-medium block">{{ t('pingtest.Note3') }}</label>
-            <InputGroup>
-                <Select v-model="selectedIP">
+            <div class="flex items-center gap-2">
+                <Select v-model="selectedIP" :disabled="pingCheckStatus === 'running'">
                     <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1">
                         <SelectValue :placeholder="t('pingtest.SelectIP')" />
                     </SelectTrigger>
@@ -19,11 +19,13 @@
                     </SelectContent>
                 </Select>
                 <Button variant="action" :disabled="pingCheckStatus === 'running' || selectedIP === ''"
-                    @click="startPingCheck">
+                    @click="startPingCheck" class="cursor-pointer">
                     <Spinner v-if="pingCheckStatus === 'running'" />
-                    {{ t('pingtest.Run') }}
+                    <template v-else>
+                        <Play class="size-4 shrink-0" />
+                    </template>
                 </Button>
-            </InputGroup>
+            </div>
         </div>
 
         <!-- Error Message -->
@@ -104,10 +106,9 @@ import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { InputGroup } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info } from 'lucide-vue-next';
+import { Info,Play } from 'lucide-vue-next';
 
 // svgmap CSS：静态 side-effect import。原本在 drawMap() 里 await import('svgmap/style.min')
 // 动态引入 —— dev 下能跑，build 下 Rollup 把 CSS chunk 当 JS 模块去解 export 导致

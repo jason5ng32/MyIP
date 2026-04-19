@@ -18,10 +18,12 @@
                         v-model="isAgreed" :disabled="!store.user" />
                     <span>{{ t('invisibilitytest.agreement') }}</span>
                 </label>
-                <Button variant="action" class="rounded-l-none"
+                <Button variant="action" class="rounded-l-none cursor-pointer"
                     :disabled="checkingStatus === 'running' || !isAgreed || !store.user" @click="onSubmit">
                     <Spinner v-if="checkingStatus === 'running'" />
-                    {{ t('invisibilitytest.Run') }}
+                    <template v-else>
+                        <Play class="size-4 shrink-0" />
+                    </template>
                 </Button>
             </div>
 
@@ -168,7 +170,7 @@ import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { CircleCheck, CircleX, Info, ListChecks, Lock, Shield } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Info, ListChecks, Lock, Shield, Play } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

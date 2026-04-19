@@ -259,7 +259,6 @@
     "Note": "Çin Anakarası, Suudi Arabistan, Rusya ve Türkiye dahil olmak üzere sıkı internet sansürüyle bilinen dört bölgede hedef web sitelerinin kullanılabilirliğini kontrol eder. Testler ayrıca doğrulama için bir kontrol grubu olarak nispeten özgür internete sahip bölgelerden de yapılır. Bazı bölgelerde internet sansürü için net yasal hükümler varken, diğerleri daha belirsizdir.",
     "Note2": "Sansür testini başlatmak için lütfen bir URL veya alan adı girin:",
     "Note3": "Bir web sitesi, yalnızca aynı ülke içindeki tüm sunuculardan erişilemiyorsa engellenmiş sayılır.",
-    "Run": "Testi Çalıştır",
     "Placeholder": "URL veya Alan Adı",
     "Country": "Bölge",
     "Status": "Durum",
@@ -278,7 +277,6 @@
     "Title": "Görünmezlik Testi",
     "Note": "Bir proxy veya VPN kullandığınızda, ziyaret ettiğiniz web siteleri gerçekten bir proxy kullandığınızı bilmiyor mu? Gerçekten görünmez misiniz? Kılığınızdaki açıkları hesaplamak ve bir proxy kullandığınıza dair kanıt bulmak için çeşitli yöntemler kullanacağız. Bazı test sonuçları tamamen doğru olmasa da, bu test yine de oldukça bilgilendiricidir.",
     "Note2": "Çalıştır'a tıkladıktan sonra, sistem genellikle tüm testleri 10 saniye içinde tamamlayan bir komut dosyası çalıştıracaktır. Bu süreçte IP bilgileriniz, tarayıcı bilgileriniz vb. toplanacak ve arka planda analiz edilecektir.",
-    "Run": "Testi Çalıştır",
     "fetchError": "Test sonuçları alınamadı",
     "yourIP": "Ana test IP'niz",
     "proxyScore": "Proxy Yüzdesi",
@@ -389,7 +387,6 @@
     "Title": "MAC Arama",
     "Note": "Bir fiziksel adresin (MAC adresi) üreticisini, tekli/çoklu yayın (unicast/multicast), global/yerel olup olmadığını vb. sorgulayın. Tam 12 haneli adresle veya sadece önekle sorgulamayı destekler. Bu aracı, oluşturduğunuz fiziksel adresin ihtiyaçlarınızı karşılayıp karşılamadığını doğrulamak için de kullanabilirsiniz.",
     "Note2": "Sorgulamayı başlatmak için lütfen bir fiziksel adres girin:",
-    "Run": "Sorgula",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "Geçersiz fiziksel adres",
     "fetchError": "Sorgu sonuçları alınamadı",
@@ -418,7 +415,6 @@
     "Note2": "Sorgulamayı başlatmak için lütfen bir alan adı veya IP adresi girin:",
     "Note3": "Whois bilgileri çeşitli türde alanlar içerir. Aşağıda ham metin bilgisi bulunmaktadır",
     "Placeholder": "Alan Adı veya IP",
-    "Run": "Sorgula",
     "invalidURL": "Geçersiz alan adı veya IP",
     "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
   },
@@ -427,7 +423,6 @@
     "Note": "Bazı bölgelerde, politik veya ticari nedenlerle, bazı operatörler belirli alan adlarını kirletebilir, bu da doğrudan erişildiğinde yanlış sonuçlara yol açar. DNS çözümlemesi kontrollerini kullanmak, dünyanın dört bir yanındaki iyi bilinen DNS sağlayıcılarından alan adlarının çözümleme sonuçlarını incelemenize yardımcı olacaktır. Dahili DNS testleri arasında, bazı sağlayıcılar Çin'dendir ve DNS çözümleme sonuçları kirletilmiş olabilir. Lütfen ayırt edici olun.",
     "Note2": "Çözümlemeyi başlatmak için lütfen bir URL veya alan adı girin:",
     "Placeholder": "URL veya Alan Adı",
-    "Run": "Çalıştır",
     "invalidURL": "Geçersiz URL veya Alan Adı",
     "fetchError": "Çözümleme sonuçları alınamadı",
     "Provider": "DNS Sağlayıcısı",
@@ -594,7 +589,6 @@
     "PacketLoss": "Paket Kaybı",
     "ReceivedPackets": "Alınan",
     "DroppedPackets": "Düşen",
-    "Run": "Testi Çalıştır",
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin Ping testi yapmasına izin verilmiyor."
   },
   "mtrtest": {
@@ -605,14 +599,12 @@
     "Note3": "Lütfen test için IP adresinizi seçin.",
     "SelectIP": "Bir IP Adresi Seçin",
     "Region": "Bölge",
-    "Run": "Testi Çalıştır",
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin MTR testi yapmasına izin verilmiyor."
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Kontrolü",
     "Placeholder": "Lütfen bir IP adresi girin",
-    "Button": "Kontrol Et",
     "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin."
   },
   "alert": {
