@@ -19,7 +19,7 @@ describe('DEFAULT_PREFERENCES', () => {
       autoStart: true,
       hideUnavailableIPStack: false,
       popupConnectivityNotifications: true,
-      ipCardsToShow: 2,
+      ipCardsToShow: 4,
       ipGeoSource: 0,
       lang: 'auto',
     });
