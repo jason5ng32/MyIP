@@ -17,7 +17,7 @@
                 <!-- Input Group -->
                 <div class="flex items-center gap-2">
                     <Input type="text" id="inputIP" name="inputIP" :placeholder="t('ipcheck.Placeholder')"
-                        v-model="inputIP" @keyup.enter="submitQuery" />
+                        v-model="inputIP" @keyup.enter="submitQuery" :aria-invalid="modalQueryError !== ''" />
                     <Button id="sumitQueryButton" type="button" variant="action"
                         :disabled="!isValidIP(inputIP) || isChecking === 'running'" @click="submitQuery"
                         class="cursor-pointer">

@@ -23,7 +23,7 @@
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
                     :disabled="dnsCheckStatus === 'running'"
                     :placeholder="t('dnsresolver.Placeholder')"
-                    v-model="queryURL" @keyup.enter="onSubmit" />
+                    v-model="queryURL" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
                     :disabled="dnsCheckStatus === 'running' || !queryURL"
                     @click="onSubmit" class="cursor-pointer">

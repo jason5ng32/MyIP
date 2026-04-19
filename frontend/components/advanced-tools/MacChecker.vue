@@ -10,7 +10,7 @@
                 <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore
                     :disabled="macCheckStatus === 'running'"
                     :placeholder="t('macchecker.Placeholder')"
-                    v-model="queryMAC" @keyup.enter="onSubmit" />
+                    v-model="queryMAC" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
                     :disabled="macCheckStatus === 'running' || !queryMAC"
                     @click="onSubmit" class="cursor-pointer">

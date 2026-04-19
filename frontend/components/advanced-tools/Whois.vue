@@ -10,7 +10,7 @@
                 <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore
                     :disabled="whoisCheckStatus === 'running'"
                     :placeholder="t('whois.Placeholder')"
-                    v-model="queryURLorIP" @keyup.enter="onSubmit" />
+                    v-model="queryURLorIP" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
                     :disabled="whoisCheckStatus === 'running' || !queryURLorIP"
                     @click="onSubmit" class="cursor-pointer">
