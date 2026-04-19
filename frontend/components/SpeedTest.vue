@@ -3,7 +3,8 @@
   <section class="mb-10">
     <!-- Header -->
     <header class="mb-3">
-      <h2 id="SpeedTest" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+      <h2 id="SpeedTest"
+        class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🚀 {{ t('speedtest.Title') }}
       </h2>
       <p class="my-3 text-base text-muted-foreground">{{ t('speedtest.Note') }}</p>
@@ -111,28 +112,32 @@
         <!-- Result Block -->
         <div v-if="isFinished && state.speedTest.hasScores"
           class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
-          <div class="flex items-start gap-2 mb-3">
+          <div class="flex items-start gap-2">
             <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
-            <span class="text-base text-success" v-if="state.connection.colo">
-              {{ t('speedtest.connectionFrom') }}
-              <span class="font-mono">{{ state.connection.ip }}</span>
-              ( {{ state.connection.country }} )
-              {{ t('speedtest.connectionTo') }}
-              {{ state.connection.colo }}
-              ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
-              {{ t('speedtest.connectionEnd') }}
-              {{ t('speedtest.score') }}
-              {{ t('speedtest.videoStreaming') }}
-              <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
-                state.speedTest.streamingQuality) }}</span>
-              {{ t('speedtest.gaming') }}
-              <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
-                {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
-              </span>
-              {{ t('speedtest.rtc') }}
-              <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
-                {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
-              </span>
+            <span class="text-base text-success break-all" v-if="state.connection.colo">
+              <p class="mb-2">
+                {{ t('speedtest.connectionFrom') }}
+                <span class="font-mono">{{ state.connection.ip }}</span>
+                ( {{ state.connection.country }} )
+                {{ t('speedtest.connectionTo') }}
+                {{ state.connection.colo }}
+                ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
+                {{ t('speedtest.connectionEnd') }}
+              </p>
+              <p class="mb-2">
+                {{ t('speedtest.score') }}
+                {{ t('speedtest.videoStreaming') }}
+                <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
+                  state.speedTest.streamingQuality) }}</span>
+                {{ t('speedtest.gaming') }}
+                <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
+                  {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
+                </span>
+                {{ t('speedtest.rtc') }}
+                <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
+                  {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
+                </span>
+              </p>
             </span>
           </div>
         </div>
