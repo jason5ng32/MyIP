@@ -122,7 +122,6 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 
 | Değişken Adı | Zorunlu | Varsayılan Değer | Açıklama |
 | --- | --- | --- | --- |
-| `IPCHECKING_API_ENDPOINT` | **Evet** | `""` | IPCheck.ing API uç noktası |
 | `MAXMIND_ACCOUNT_ID` | **Evet** | `""` | MaxMind hesap ID'si, GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_LICENSE_KEY` | **Evet** | `""` | MaxMind lisans anahtarı, `MAXMIND_ACCOUNT_ID` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_AUTO_UPDATE` | **Evet** | `"false"` | `"true"` yapıldığında GeoLite2 veritabanları başlatmadan yaklaşık 60 saniye sonra otomatik olarak indirilir ve her 24 saatte bir yenilenir. **Docker için zorunlu.** Yalnızca `.mmdb` dosyalarını manuel olarak yerleştirdiyseniz `"false"` olarak kalabilir. |
@@ -134,7 +133,8 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Hayır | `"logs/blacklist-ip.log"` | Yol ayarı. SECURITY_RATE_LIMIT etkinleştirildiğinde limit tetikleyen IP'leri kaydeder |
 | `ALLOWED_DOMAINS` | Hayır | `""` | Erişime izin verilen alan adları, virgülle ayrılmış; backend API kötüye kullanımını önlemek için kullanılır |
 | `GOOGLE_MAP_API_KEY` | Hayır | `""` | IP'nin konumunu haritada göstermek için Google Maps API Anahtarı |
-| `IPCHECKING_API_KEY` | Hayır | `""` | IPCheck.ing API anahtarı, doğru IP konum bilgisi almak için |
+| `IPCHECKING_API_ENDPOINT` | Hayır | `""` | IPCheck.ing veritabanı API uç noktası, doğru IP konum bilgisi almak için |
+| `IPCHECKING_API_KEY` | Hayır | `""` | IPCheck.ing veritabanı API anahtarı, doğru IP konum bilgisi almak için |
 | `IPINFO_API_TOKEN` | Hayır | `""` | IPInfo.io API token'ı, IP konum bilgisi almak için |
 | `IPAPIIS_API_KEY` | Hayır | `""` | IPAPI.is API anahtarı, IP konum bilgisi almak için |
 | `IP2LOCATION_API_KEY` | Hayır | `""` | IP2Location.io API anahtarı, IP konum bilgisi almak için |
@@ -159,7 +159,6 @@ cp .env.example .env
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
-IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
 MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
 MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
 MAXMIND_AUTO_UPDATE="true"
@@ -175,7 +174,6 @@ Docker çalıştırırken ortam değişkenleri ekleyebilirsiniz, örneğin:
 
 ```bash
 docker run -d -p 18966:18966 \
-  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \

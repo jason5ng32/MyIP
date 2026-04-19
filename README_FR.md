@@ -122,7 +122,6 @@ Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte Ma
 
 | Nom de la variable | Requis | Valeur par défaut | Description |
 | --- | --- | --- | --- |
-| `IPCHECKING_API_ENDPOINT` | **Oui** | `""` | URL de l'API IPCheck.ing |
 | `MAXMIND_ACCOUNT_ID` | **Oui** | `""` | ID de compte MaxMind, associé à `MAXMIND_LICENSE_KEY` pour télécharger les bases GeoLite2. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_LICENSE_KEY` | **Oui** | `""` | Clé de licence MaxMind, associée à `MAXMIND_ACCOUNT_ID`. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_AUTO_UPDATE` | **Oui** | `"false"` | Définissez sur `"true"` pour télécharger automatiquement les bases GeoLite2 environ 60 s après le démarrage et les rafraîchir toutes les 24 h. **Obligatoire pour Docker.** Peut rester à `"false"` uniquement si vous avez pré-déposé les fichiers `.mmdb` manuellement. |
@@ -134,6 +133,7 @@ Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte Ma
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `"logs/blacklist-ip.log"` | Paramètre de chemin. Enregistre la liste des adresses IP qui ont déclenché la limite après que `SECURITY_RATE_LIMIT` soit activé |
 | `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
 | `GOOGLE_MAP_API_KEY` | Non | `""` | Clé API pour Google Maps, utilisée pour afficher l'emplacement de l'adresse IP sur une carte |
+| `IPCHECKING_API_ENDPOINT` | Non | `""` | endpoint de l'API pour IPCheck.ing database, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
 | `IPCHECKING_API_KEY` | Non | `""` | Clé API pour IPCheck.ing, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |
 | `IPINFO_API_TOKEN` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
 | `IPAPIIS_API_KEY` | Non | `""` | Clé API pour IPAPI.is, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IPAPI.is |
@@ -159,7 +159,6 @@ Modifiez le fichier `.env`, et par exemple, ajoutez ce qui suit :
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
-IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
 MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
 MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
 MAXMIND_AUTO_UPDATE="true"
@@ -175,7 +174,6 @@ Vous pouvez ajouter des variables d'environnement lors de l'exécution de Docker
 
 ```bash
 docker run -d -p 18966:18966 \
-  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \

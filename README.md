@@ -122,7 +122,6 @@ Download `GeoLite2-City.mmdb` and `GeoLite2-ASN.mmdb` from your MaxMind account 
 
 | Variable Name | Required | Default Value | Description |
 | --- | --- | --- | --- |
-| `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |
 | `MAXMIND_ACCOUNT_ID` | **Yes** | `""` | MaxMind account ID, paired with `MAXMIND_LICENSE_KEY` to download GeoLite2 databases. See the MaxMind section above. |
 | `MAXMIND_LICENSE_KEY` | **Yes** | `""` | MaxMind license key, paired with `MAXMIND_ACCOUNT_ID`. See the MaxMind section above. |
 | `MAXMIND_AUTO_UPDATE` | **Yes** | `"false"` | Set to `"true"` to auto-download GeoLite2 databases ~60s after startup and refresh every 24h. **Required for Docker.** Can stay `"false"` only if you've pre-seeded the `.mmdb` files manually. |
@@ -134,7 +133,8 @@ Download `GeoLite2-City.mmdb` and `GeoLite2-ASN.mmdb` from your MaxMind account 
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `"logs/blacklist-ip.log"` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
 | `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
 | `GOOGLE_MAP_API_KEY` | No | `""` | API Key for Google Maps, used to display the location of the IP on a map |
-| `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
+| `IPCHECKING_API_ENDPOINT` | No | `""` | API endpoint for IPCheck.ing database, used to obtain accurate IP geolocation information |
+| `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing database, used to obtain accurate IP geolocation information |
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
 | `IP2LOCATION_API_KEY` | No | `""` | API Key for IP2Location.io, used to obtain IP geolocation information through IP2Location.io |
@@ -159,7 +159,6 @@ Modify `.env`, and for example, add the following:
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
-IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
 MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
 MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
 MAXMIND_AUTO_UPDATE="true"
@@ -175,7 +174,6 @@ You can add environment variables when running Docker, for example:
 
 ```bash
 docker run -d -p 18966:18966 \
-  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \
