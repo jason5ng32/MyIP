@@ -919,231 +919,67 @@
   },
   {
     "version": "v6.0",
-    "date": "Apr 18, 2026",
+    "date": "Apr 19, 2026",
     "content": [
       {
-        "type": "improve",
+        "type": "add",
         "change": {
-          "en": "Complete UI overhaul: migrated from Bootstrap to Tailwind CSS v4 + shadcn-vue",
-          "zh": "全站 UI 翻新：从 Bootstrap 迁移到 Tailwind CSS v4 + shadcn-vue",
-          "fr": "Refonte complète de l'interface : migration de Bootstrap vers Tailwind CSS v4 + shadcn-vue",
-          "tr": "Tam arayüz yenileme: Bootstrap'ten Tailwind CSS v4 + shadcn-vue'ye taşındı"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "All country flags now displayed as circular icons",
-          "zh": "所有国旗改用圆形图标显示",
-          "fr": "Tous les drapeaux affichés désormais sous forme d'icônes circulaires",
-          "tr": "Tüm ülke bayrakları artık yuvarlak simgeler olarak görüntüleniyor"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Unified design tokens with automatic light/dark mode adaptation",
-          "zh": "统一设计 token，自动适配白天 / 黑夜模式",
-          "fr": "Tokens de design unifiés avec adaptation automatique au mode clair / sombre",
-          "tr": "Otomatik açık / koyu mod uyumuyla birleşik tasarım token'ları"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Network Connectivity / WebRTC / DNS Leak / Rule Test cards redesigned with modern status indicators",
-          "zh": "网络连通性 / WebRTC / DNS 泄漏 / 分流测试卡片重新设计，带现代化状态指示",
-          "fr": "Cartes Connectivité / WebRTC / Fuite DNS / Test de règles redessinées avec indicateurs de statut modernes",
-          "tr": "Bağlantı / WebRTC / DNS Sızıntısı / Kural Testi kartları modern durum göstergeleriyle yeniden tasarlandı"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "IP Infos cards redesigned: hero IP display with copy, cleaner metadata grid, labeled advanced data for signed-in users",
-          "zh": "IP 信息卡片重新设计：大号 IP 显示带复制按钮、更清爽的字段网格、登录用户可见的高级数据带标签展示",
-          "fr": "Cartes Infos IP redessinées : affichage IP proéminent avec bouton copier, grille de métadonnées plus propre, données avancées étiquetées pour les utilisateurs connectés",
-          "tr": "IP Bilgileri kartları yeniden tasarlandı: kopyalama düğmeli öne çıkan IP gösterimi, daha temiz meta veri ızgarası, giriş yapmış kullanıcılar için etiketli gelişmiş veri"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Advanced Tools panel switched to bottom drawer with drag-to-close and optional fullscreen",
-          "zh": "高级工具面板改为底部抽屉，支持拖拽关闭和全屏切换",
-          "fr": "Panneau Outils Avancés converti en tiroir inférieur avec fermeture par glissement et plein écran optionnel",
-          "tr": "Gelişmiş Araçlar paneli sürükle-kapat ve isteğe bağlı tam ekran ile alt çekmeceye dönüştürüldü"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "All advanced tools (MTR / Ping / Rule / DNS / Whois / MAC / Browser Info / Invisibility / Censorship / Security Checklist) redesigned",
-          "zh": "所有高级工具（MTR / Ping / 分流 / DNS / Whois / MAC / 浏览器信息 / 隐身测试 / 封锁测试 / 安全检查清单）全部重新设计",
-          "fr": "Tous les outils avancés (MTR / Ping / Règles / DNS / Whois / MAC / Infos Navigateur / Invisibilité / Censure / Checklist de Sécurité) redessinés",
-          "tr": "Tüm gelişmiş araçlar (MTR / Ping / Kural / DNS / Whois / MAC / Tarayıcı Bilgisi / Görünmezlik / Sansür / Güvenlik Kontrol Listesi) yeniden tasarlandı"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Query buttons now show a loading spinner during execution; disabled state clearly indicated",
-          "zh": "查询按钮执行时显示加载动画，禁用态也有明确视觉提示",
-          "fr": "Les boutons de requête affichent désormais un spinner pendant l'exécution ; état désactivé clairement indiqué",
-          "tr": "Sorgu düğmeleri artık yürütme sırasında yükleniyor göstergesi gösteriyor; devre dışı durumu net şekilde belirtildi"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Long IPv6 addresses auto-shrink font to fit in one line (no more wrapping)",
-          "zh": "长 IPv6 地址自动缩小字号保持单行显示（不再折行）",
-          "fr": "Les adresses IPv6 longues réduisent automatiquement la police pour tenir sur une ligne (plus de retour à la ligne)",
-          "tr": "Uzun IPv6 adresleri tek satıra sığmak için otomatik olarak yazı tipini küçültüyor (artık satır kaymıyor)"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Preferences, About, Changelog, Achievements panels redesigned",
-          "zh": "偏好设置、关于、更新日志、成就面板重新设计",
-          "fr": "Panneaux Préférences, À propos, Journal des modifications, Succès redessinés",
-          "tr": "Tercihler, Hakkında, Değişiklik Günlüğü, Başarılar panelleri yeniden tasarlandı"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Latency-aware emoji faces in Network Connectivity cards (smile / neutral / frown)",
-          "zh": "网络连通性卡片根据延迟显示不同表情（笑脸 / 面无表情 / 哭脸）",
-          "fr": "Émojis sensibles à la latence dans les cartes de connectivité (sourire / neutre / froncement)",
-          "tr": "Bağlantı kartlarında gecikmeye duyarlı emoji yüzler (gülümseme / nötr / surat)"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Reduced bundle size by ~420KB",
-          "zh": "打包体积减少约 420KB",
-          "fr": "Taille du bundle réduite d'environ 420 Ko",
-          "tr": "Paket boyutu yaklaşık 420KB azaltıldı"
-        }
-      },
-      {
-        "type": "fix",
-        "change": {
-          "en": "Text inside Advanced Tools drawer can now be selected",
-          "zh": "修复高级工具抽屉内文字无法选中的问题",
-          "fr": "Le texte dans le tiroir Outils Avancés peut désormais être sélectionné",
-          "tr": "Gelişmiş Araçlar çekmecesi içindeki metin artık seçilebilir"
-        }
-      },
-      {
-        "type": "fix",
-        "change": {
-          "en": "Fixed a ghost green line bug when using J/K keyboard navigation",
-          "zh": "修复使用 J/K 键盘导航时出现的幽灵绿线 bug",
-          "fr": "Correction d'un bug de ligne verte fantôme lors de la navigation clavier J/K",
-          "tr": "J/K klavye navigasyonu kullanılırken oluşan hayalet yeşil çizgi hatası düzeltildi"
-        }
-      },
-      {
-        "type": "fix",
-        "change": {
-          "en": "Fixed runtime error when opening Ping Test in production build",
-          "zh": "修复生产环境下打开 Ping 测试时的运行时报错",
-          "fr": "Correction d'une erreur d'exécution à l'ouverture du test Ping en build de production",
-          "tr": "Prodüksiyon derlemesinde Ping Testi açıldığında oluşan çalışma zamanı hatası düzeltildi"
+          "zh": "使用 Shadcn UI + Tailwind CSS 重构了整个项目"
         }
       },
       {
         "type": "add",
         "change": {
-          "en": "On-demand Map Dialog — click the map icon next to City to open a larger location view (replaces the inline map banner)",
-          "zh": "按需打开的 Map Dialog —— 点击 City 旁的地图图标即可打开放大的位置视图（替代原来的内嵌地图条）",
-          "fr": "Boîte de dialogue Carte à la demande — cliquez sur l'icône de carte à côté de Ville pour ouvrir une vue agrandie (remplace la bannière de carte en ligne)",
-          "tr": "İsteğe bağlı Harita iletişim kutusu — Şehir alanının yanındaki harita simgesine tıklayarak büyütülmüş konum görünümünü açın (satır içi harita banner'ının yerine geçer)"
+          "zh": "通过多个 Agents.md 提升 AI 开发友好性"
         }
       },
       {
         "type": "add",
         "change": {
-          "en": "IP source count options adjusted to 2 / 4 / 6 (previously 3 / 6); rows always fill evenly on PC",
-          "zh": "IP 检测服务器数量选项调整为 2 / 4 / 6（原为 3 / 6），PC 端每行铺满不留空位",
-          "fr": "Les options de nombre de sources IP sont ajustées à 2 / 4 / 6 (auparavant 3 / 6) ; les rangées se remplissent toujours uniformément sur PC",
-          "tr": "IP kaynak sayısı seçenekleri 2 / 4 / 6 olarak ayarlandı (önceden 3 / 6); PC'de satırlar her zaman eşit doluyor"
+          "zh": "增加自动测试功能，提升程序健壮性"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "IP Infos cards always display 2 per row on desktop for consistent density",
-          "zh": "桌面端 IP 信息卡片固定每行 2 张,保持一致的信息密度",
-          "fr": "Les cartes Infos IP affichent toujours 2 par rangée sur ordinateur pour une densité cohérente",
-          "tr": "IP Bilgileri kartları tutarlı yoğunluk için masaüstünde her satırda 2 tane gösterir"
+          "zh": "更加组件化的设计，更方便维护和扩展"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "IP card metadata refined: Country / Region / City share one row, ISP gets its own row",
-          "zh": "IP 卡片元数据微调:Country / Region / City 共享一行,ISP 独占一行",
-          "fr": "Métadonnées de carte IP affinées : Pays / Région / Ville partagent une ligne, le FAI a sa propre ligne",
-          "tr": "IP kart meta verileri iyileştirildi: Ülke / Bölge / Şehir bir satırı paylaşır, ISS kendi satırına sahiptir"
+          "zh": "重新设计程序目录结构，使其更加清晰易懂"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "Advanced data block (Type / Proxy / Nativeness / Quality) switched to a 2×2 label-on-top grid to match the metadata rhythm",
-          "zh": "高级数据块(Type / Proxy / Nativeness / Quality)改为 2×2 标签在上的排版,与元数据节奏对齐",
-          "fr": "Le bloc de données avancées (Type / Proxy / Nativité / Qualité) passe à une grille 2×2 avec étiquette en haut pour correspondre au rythme des métadonnées",
-          "tr": "Gelişmiş veri bloğu (Tür / Proxy / Yerlilik / Kalite), meta veri ritmiyle eşleşmesi için etiket üstte 2×2 ızgaraya geçti"
+          "en": "New modern UI design ",
+          "zh": "所有页面全部重新设计，更具现代化美感"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "ASN expansion now available in the Query IP dialog (previously homepage cards only)",
-          "zh": "Query IP 对话框现在也支持展开 ASN 详情(之前只有主页卡片支持)",
-          "fr": "L'expansion ASN est désormais disponible dans la boîte de dialogue Requête IP (auparavant uniquement sur les cartes de la page d'accueil)",
-          "tr": "ASN genişletme artık Sorgu IP iletişim kutusunda da kullanılabilir (önceden yalnızca ana sayfa kartlarında)"
+          "zh": "提升程序打包速度，减少打包体积"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "Map Dialog uses higher-resolution Google Maps images (1280×640 effective)",
-          "zh": "Map Dialog 使用更高分辨率的 Google 地图图片(实际 1280×640)",
-          "fr": "La boîte de dialogue Carte utilise des images Google Maps à plus haute résolution (1280×640 effectifs)",
-          "tr": "Harita iletişim kutusu daha yüksek çözünürlüklü Google Maps görüntüleri kullanır (etkili 1280×640)"
+          "zh": "后端程序大量简化，提升程序性能"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "Backend calls to upstream IP / ASN / map providers now time out at 8s; no more hung connections when a provider is slow",
-          "zh": "后端对上游 IP / ASN / 地图服务的调用现在 8 秒超时,不会再因为上游慢而挂起连接",
-          "fr": "Les appels backend vers les fournisseurs IP / ASN / cartes en amont expirent désormais à 8s ; plus de connexions bloquées quand un fournisseur est lent",
-          "tr": "Yukarı akış IP / ASN / harita sağlayıcılarına yapılan arka uç çağrıları artık 8s'de zaman aşımına uğrar; bir sağlayıcı yavaş olduğunda artık askıda bağlantı yok"
+          "zh": "优化程序里所有的注释，使其更加清晰易懂"
         }
       },
       {
         "type": "fix",
         "change": {
-          "en": "IP cards no longer stay loading for 30+ seconds when IPv6 is disabled; errors now surface within 10s",
-          "zh": "IPv6 被禁用时,IP 卡片不再卡在 loading 30 秒以上,错误会在 10 秒内显示",
-          "fr": "Les cartes IP ne restent plus en chargement pendant plus de 30 secondes lorsque IPv6 est désactivé ; les erreurs apparaissent maintenant en moins de 10s",
-          "tr": "IPv6 devre dışıyken IP kartları artık 30+ saniye yükleme durumunda kalmıyor; hatalar 10s içinde görünür"
-        }
-      },
-      {
-        "type": "fix",
-        "change": {
-          "en": "Mobile dialogs have proper horizontal margins and visible rounded corners at every screen size",
-          "zh": "移动端 Dialog 在所有屏幕尺寸下都有合适的左右边距和可见的圆角",
-          "fr": "Les boîtes de dialogue mobiles ont des marges horizontales appropriées et des coins arrondis visibles à toutes les tailles d'écran",
-          "tr": "Mobil iletişim kutuları her ekran boyutunda uygun yatay kenar boşluklarına ve görünür yuvarlatılmış köşelere sahiptir"
+          "zh": "修复了多个 Bug，提升了程序稳定性"
         }
       }
     ]
