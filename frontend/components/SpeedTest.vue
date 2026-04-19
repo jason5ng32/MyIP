@@ -3,7 +3,7 @@
   <section class="mb-10">
     <!-- Header -->
     <header class="mb-3">
-      <h2 id="SpeedTest" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+      <h2 id="SpeedTest" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🚀 {{ t('speedtest.Title') }}
       </h2>
       <p class="my-3 text-base text-muted-foreground">{{ t('speedtest.Note') }}</p>

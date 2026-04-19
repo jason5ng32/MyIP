@@ -1,23 +1,24 @@
 <template>
   <!-- IP Infos -->
   <section class="ip-data-section mb-10 mt-2">
-    <header class="mb-3">
-      <h2 id="IPInfo" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+    <header class="mb-2 flex flex-col items-start justify-between gap-4">
+      <h2 id="IPInfo"
+        class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🔎 {{ t('ipInfos.Title') }}
       </h2>
-      <p class="my-3 text-base text-muted-foreground">{{ t('ipInfos.Notes') }}</p>
+      <div class="text-base text-muted-foreground">
+        <p>{{ t('ipInfos.Notes') }}</p>
+      </div>
     </header>
 
     <!-- Card grid: 1 col on mobile, always 2 cols on PC (md+). Card counts
          (2 / 4 / 6) are all even, so the last row always fills. -->
     <div class="grid gap-4 items-stretch grid-cols-1 md:grid-cols-2">
-      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
-        class="flex"
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed"
-          :copiedStatus="copiedStatus" :configs="configs" :asnInfos="asnInfos"
-          @refresh-card="refreshCard" />
+          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
+          :configs="configs" :asnInfos="asnInfos" @refresh-card="refreshCard" />
       </div>
     </div>
   </section>
@@ -339,5 +340,4 @@ defineExpose({
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

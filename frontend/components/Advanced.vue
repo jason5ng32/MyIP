@@ -3,7 +3,7 @@
     <section class="advanced-tools-section mb-10">
         <!-- Header -->
         <header class="mb-3">
-            <h2 id="AdvancedTools" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+            <h2 id="AdvancedTools" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
                 🧰 {{ t('advancedtools.Title') }}
             </h2>
             <p class="my-3 text-base text-muted-foreground">{{ t('advancedtools.Note') }}</p>

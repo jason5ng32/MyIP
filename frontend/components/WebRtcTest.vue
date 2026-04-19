@@ -1,19 +1,22 @@
 <template>
   <section class="mb-10">
     <!-- Header -->
-    <header class="flex items-start justify-between gap-4 mb-3">
-      <div class="flex-1 min-w-0">
-        <h2 id="WebRTC" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+    <header class="mb-2 flex flex-col items-start justify-between gap-4">
+      <div class="flex flex-row items-center justify-between gap-4 w-full">
+        <h2 id="WebRTC"
+          class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
           🚥 {{ t('webrtc.Title') }}
         </h2>
-        <p class="my-3 text-base text-muted-foreground">{{ t('webrtc.Note') }}</p>
+        <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
+          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
+            aria-label="Refresh WebRTC Test">
+            <component :is="isStarted ? RotateCw : ChevronRight" />
+          </Button>
+        </JnTooltip>
       </div>
-      <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
-          aria-label="Refresh WebRTC Test">
-          <component :is="isStarted ? RotateCw : ChevronRight" />
-        </Button>
-      </JnTooltip>
+      <div class="text-base text-muted-foreground">
+        <p>{{ t('webrtc.Note') }}</p>
+      </div>
     </header>
 
     <!-- Card grid -->
