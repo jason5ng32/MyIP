@@ -26,7 +26,7 @@
         <CardContent class="p-4">
           <!-- Top: service provider icon + name -->
           <div class="flex items-center gap-2 mb-1">
-            <PhoneCall class="size-6 text-muted-foreground shrink-0" />
+            <Flower class="size-6 text-muted-foreground shrink-0" />
             <span class="text-base font-medium truncate">{{ stun.name }}</span>
           </div>
 
@@ -89,7 +89,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { ChevronRight, MapPin, PhoneCall, Network, RotateCw } from 'lucide-vue-next';
+import { ChevronRight, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
