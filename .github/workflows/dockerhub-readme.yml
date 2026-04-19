@@ -24,6 +24,12 @@ jobs:
   sync:
     name: Push README to Docker Hub
     runs-on: ubuntu-latest
+    # DOCKER_HUB_USERNAME / DOCKER_HUB_ACCESS_TOKEN live on the `production`
+    # environment (same as docker-image.yml). Environment-scoped secrets are
+    # only visible to jobs that opt into that environment — without this line
+    # the action sees an empty `username` and fails with "Required input
+    # 'username' is missing.".
+    environment: production
 
     steps:
       - name: Checkout
