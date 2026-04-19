@@ -2,7 +2,7 @@
     <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
-            class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
+            class="fixed bottom-6 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
             @click="openQueryIP">
             <Search class="size-4" />
         </Button>
