@@ -65,14 +65,13 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 21 primitives copied in:
+Located at `frontend/components/ui/`. 22 primitives copied in:
 
-`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `tabs` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
-Three are project-specific, not in stock shadcn-vue:
+Two are project-specific, not in stock shadcn-vue:
 
 - **`ButtonGroup`** — visual container for stitching buttons together.
-- **`InputGroup`** — flattens `Input + Button` (or `Input + Select`) into a single bordered control via `[&>input] / [&>button]` passthrough selectors. The group itself carries border / ring / shadow. Use this whenever an input is paired with a trigger button — never hand-roll `rounded-r-none / -ml-px`.
 - **`Spinner`** — lucide `Loader2` + `animate-spin` + `role="status"`.
 
 ### Design tokens
@@ -113,16 +112,22 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
 </Button>
 ```
 
-**Input with trigger** — `InputGroup` flattens the pair. `SelectTrigger` renders as a button, so `Select` can swap in for `Input` with no extra work.
+**Input with trigger** — a plain flex row keeps the input next to a compact icon trigger. This is the convention across QueryIP, MacChecker, Whois, DnsResolver, MtrTest, GlobalLatencyTest, CensorshipCheck, and InvisibilityTest. The trigger Button is an icon (usually lucide `Search`) rather than a labeled button — that keeps width predictable and avoids per-tool i18n for the action label.
 
 ```vue
-<InputGroup>
-  <Input v-model="q" placeholder="..." />
-  <Button variant="action" :disabled="running" @click="run">
-    <Spinner v-if="running" /> Run
+<div class="flex items-center gap-2">
+  <Input v-model="q" :placeholder="t('…')" @keyup.enter="run" />
+  <Button variant="action" :disabled="!isValidQ(q) || running"
+    @click="run" class="cursor-pointer">
+    <Spinner v-if="running" />
+    <template v-else>
+      <Search class="size-4 shrink-0" />
+    </template>
   </Button>
-</InputGroup>
+</div>
 ```
+
+The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGroupAddon` / `InputGroupButton` / `InputGroupText` / `InputGroupTextarea` sub-parts) is available if you need a genuinely merged border / ring around a composite input — but the current convention above is what every consumer uses today.
 
 **Status card** — homepage status cards (Connectivity / WebRTC / DnsLeak / IPCard / RuleTest) use:
 

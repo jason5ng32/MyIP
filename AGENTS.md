@@ -32,7 +32,7 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 | Auth | Firebase Auth (optional, env-gated) |
 | PWA | Serwist |
 | Tests | Node built-in test runner (`node --test`) |
-| Runtime libs | chart.js · svgmap · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · circle-progress.vue |
+| Runtime libs | chart.js · svgmap · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · circle-progress.vue · @vueuse/core (used by shadcn-vue primitives) |
 
 ## Commands
 
