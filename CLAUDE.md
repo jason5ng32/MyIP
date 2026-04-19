@@ -1,16 +1,11 @@
 # CLAUDE.md
 
-> This file is automatically read by Claude Code at session start.
+Authoritative project instructions: @AGENTS.md
 
-**Read [AGENTS.md](./AGENTS.md) for everything.**
+Claude-specific additions below; on conflict, AGENTS.md wins.
 
-It is the single source of truth for this project:
+## Claude-specific
 
-- Tech stack (what's in / what's out — no Bootstrap, no flag-icons, no TypeScript)
-- Directory layout
-- UI infrastructure: shadcn-vue primitives in `frontend/components/ui/`, design tokens, semantic color system
-- Code conventions: JavaScript only, Composition API, `variant="action" + <Spinner />` for trigger buttons, `<InputGroup>` for input + button combos, semantic tokens over `dark:` variants, etc.
-- Commit discipline (do not commit without explicit user approval)
-- "Do not" list
-
-Nothing project-specific belongs here — put it in AGENTS.md so Codex / any other agent reading AGENTS.md stays in sync.
+None at the moment. This file exists so Claude Code auto-loads AGENTS.md at
+session start; additional Claude-only guidance goes here if it ever diverges
+from what all contributors should follow.
