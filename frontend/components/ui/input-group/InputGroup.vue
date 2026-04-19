@@ -1,35 +1,39 @@
 <script setup>
-// shadcn-vue Input Group：把 Input + Button（或 Input + addon）拼成一个
-// 视觉一体的输入条。wrapper 自己承担 border / rounded / shadow / focus-ring，
-// 用 [&>*] 透穿选择器把内部 <input> / <button> 的独立边框/阴影/ring 扁平化。
-//
-// 用法：
-//   <InputGroup>
-//     <Input v-model="q" placeholder="..." />
-//     <Button :disabled="..." @click="...">Go</Button>
-//   </InputGroup>
-//
-// 需要分隔线时：<InputGroup class="[&>*:not(:first-child)]:border-l [&>*:not(:first-child)]:border-input" />
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
-defineProps({
-  class: { type: [String, Array, Object], default: undefined },
+const props = defineProps({
+  class: {
+    type: [Boolean, null, String, Object, Array],
+    required: false,
+    skipCheck: true,
+  },
 });
 </script>
 
 <template>
   <div
-    :class="cn(
-      'flex items-stretch w-full rounded-md border border-input bg-background shadow-sm overflow-hidden transition-colors',
-      'focus-within:ring-1 focus-within:ring-ring',
-      // 扁平化所有 input / button 子元素：取消它们各自的 border / shadow / ring / rounded，
-      // 让整个 group 看起来是一个整体
-      '[&>input]:border-0 [&>input]:shadow-none [&>input]:rounded-none [&>input]:bg-transparent',
-      '[&>input]:focus-visible:ring-0 [&>input]:focus-visible:outline-none',
-      '[&>button]:border-0 [&>button]:shadow-none [&>button]:rounded-none',
-      '[&>button]:focus-visible:ring-0 [&>button]:focus-visible:outline-none',
-      $props.class,
-    )"
+    data-slot="input-group"
+    role="group"
+    :class="
+      cn(
+        'group/input-group border-input dark:bg-input/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none',
+        'h-9 min-w-0 has-[>textarea]:h-auto',
+
+        // Variants based on alignment.
+        'has-[>[data-align=inline-start]]:[&>input]:pl-2',
+        'has-[>[data-align=inline-end]]:[&>input]:pr-2',
+        'has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>[data-align=block-start]]:[&>input]:pb-3',
+        'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-end]]:[&>input]:pt-3',
+
+        // Focus state.
+        'has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot=input-group-control]:focus-visible]:ring-[3px]',
+
+        // Error state.
+        'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+
+        props.class,
+      )
+    "
   >
     <slot />
   </div>
