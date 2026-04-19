@@ -66,7 +66,7 @@ import { ref, computed, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import getCountryName from '@/utils/country-name.js';
+import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
 import { InputGroup } from '@/components/ui/input-group';
 import { Button } from '@/components/ui/button';

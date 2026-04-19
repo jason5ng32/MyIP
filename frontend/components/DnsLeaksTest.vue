@@ -95,7 +95,7 @@ import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import getCountryName from '@/utils/country-name.js';
+import getCountryName from '@/data/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';

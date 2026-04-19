@@ -147,7 +147,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
-import getCountryName from '@/utils/country-name.js';
+import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -263,7 +263,7 @@ const connectionMethods = {
 
       if (!isValidIP(ip)) throw new Error('Invalid IP from SpeedTest Server');
 
-      const { default: getColoCountry } = await import('@/utils/speedtest-colos.js');
+      const { default: getColoCountry } = await import('@/data/speedtest-colos.js');
 
       return {
         ip, colo, loc,

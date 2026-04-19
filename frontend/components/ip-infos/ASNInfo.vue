@@ -63,7 +63,7 @@
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { computed } from 'vue';
-import getCountryName from '@/utils/country-name.js';
+import getCountryName from '@/data/country-name.js';
 import DataPairBar from './DataPairBar.vue';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/vue';

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import getColoCountry from '../frontend/utils/speedtest-colos.js';
+import getColoCountry from '../frontend/data/speedtest-colos.js';
 
 describe('getColoCountry(abbr)', () => {
   it('returns country + city for a known Cloudflare PoP', () => {
