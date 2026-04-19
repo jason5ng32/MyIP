@@ -523,7 +523,22 @@
     "StatusTimeout": "Timeout or Unavailable",
     "checking": "Checking...",
     "minTestTime": "Min Test Time: ",
-    "RefreshThisTest": "Refresh This Test"
+    "RefreshThisTest": "Refresh This Test",
+    "addCustom": {
+      "AddCard": "Add Test",
+      "Title": "Add a custom test",
+      "Hint": "We test by loading the site's favicon over HTTPS. Some sites may not be reachable this way. Custom tests are saved locally in your browser.",
+      "NameLabel": "Name",
+      "NamePlaceholder": "e.g. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "e.g. wikipedia.org",
+      "Add": "Add",
+      "Remove": "Remove test",
+      "NameRequired": "Please enter a name.",
+      "UrlRequired": "Please enter a URL.",
+      "InvalidUrl": "That doesn't look like a valid URL.",
+      "LimitReached": "You've reached the 10 custom tests limit."
+    }
   },
   "webrtc": {
     "id": "webrtc",

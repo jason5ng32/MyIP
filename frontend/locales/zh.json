@@ -525,7 +525,22 @@
     "StatusTimeout": "超时或不可用",
     "checking": "检查中...",
     "minTestTime": "最小测试时间：",
-    "RefreshThisTest": "刷新此测试"
+    "RefreshThisTest": "刷新此测试",
+    "addCustom": {
+      "AddCard": "添加测试",
+      "Title": "添加自定义测试",
+      "Hint": "通过 HTTPS 加载站点 favicon 进行测试，部分站点可能无法以这种方式测试。自定义测试会保存在浏览器本地。",
+      "NameLabel": "名称",
+      "NamePlaceholder": "例如：维基百科",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "例如：wikipedia.org",
+      "Add": "添加",
+      "Remove": "移除测试",
+      "NameRequired": "请输入名称",
+      "UrlRequired": "请输入 URL",
+      "InvalidUrl": "这看起来不是一个有效的 URL",
+      "LimitReached": "自定义测试已达到 10 个上限"
+    }
   },
   "webrtc": {
     "id": "webrtc",

@@ -22,6 +22,7 @@ describe('DEFAULT_PREFERENCES', () => {
       ipCardsToShow: 4,
       ipGeoSource: 0,
       lang: 'auto',
+      customConnectivityTargets: [],
     });
   });
 });

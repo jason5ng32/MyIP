@@ -523,7 +523,22 @@
     "StatusTimeout": "Délai dépassé",
     "checking": "Vérification en cours...",
     "minTestTime": "Minimal: ",
-    "RefreshThisTest": "Rafraîchir ce test"
+    "RefreshThisTest": "Rafraîchir ce test",
+    "addCustom": {
+      "AddCard": "Ajouter un test",
+      "Title": "Ajouter un test personnalisé",
+      "Hint": "Le test est effectué en chargeant le favicon du site en HTTPS. Certains sites peuvent ne pas être testables de cette manière. Les tests personnalisés sont enregistrés localement dans votre navigateur.",
+      "NameLabel": "Nom",
+      "NamePlaceholder": "ex. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "ex. wikipedia.org",
+      "Add": "Ajouter",
+      "Remove": "Retirer le test",
+      "NameRequired": "Veuillez saisir un nom.",
+      "UrlRequired": "Veuillez saisir une URL.",
+      "InvalidUrl": "Cela ne ressemble pas à une URL valide.",
+      "LimitReached": "Limite de 10 tests personnalisés atteinte."
+    }
   },
   "webrtc": {
     "id": "webrtc",

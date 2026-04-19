@@ -522,7 +522,22 @@
     "StatusTimeout": "Zaman Aşımı veya Kullanılamıyor",
     "checking": "Kontrol ediliyor...",
     "minTestTime": "Min Test Süresi: ",
-    "RefreshThisTest": "Bu Testi Yenile"
+    "RefreshThisTest": "Bu Testi Yenile",
+    "addCustom": {
+      "AddCard": "Test Ekle",
+      "Title": "Özel test ekle",
+      "Hint": "Test, sitenin favicon'u HTTPS üzerinden yüklenerek yapılır. Bazı siteler bu şekilde test edilemeyebilir. Özel testler tarayıcınızda kaydedilir.",
+      "NameLabel": "Ad",
+      "NamePlaceholder": "Örn. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "Örn. wikipedia.org",
+      "Add": "Ekle",
+      "Remove": "Testi kaldır",
+      "NameRequired": "Lütfen bir ad girin.",
+      "UrlRequired": "Lütfen bir URL girin.",
+      "InvalidUrl": "Bu geçerli bir URL gibi görünmüyor.",
+      "LimitReached": "10 özel test sınırına ulaşıldı."
+    }
   },
   "webrtc": {
     "id": "webrtc",
