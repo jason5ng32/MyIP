@@ -34,7 +34,9 @@
                         <button type="button"
                             class="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                             @click="copyToClipboard(card.ip, card.id)" :aria-label="'Copy ' + card.ip">
-                            <component :is="copiedStatus[card.id] ? ClipboardCheck : ClipboardPlus" class="size-4" />
+                            <component :is="copiedStatus[card.id] ? CopyCheck : Copy" class="size-4"
+                            :class="copiedStatus[card.id] ? 'text-success' : ''"
+                            />
                         </button>
                     </JnTooltip>
                 </div>
@@ -71,8 +73,8 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
-    ClipboardCheck,
-    ClipboardPlus,
+    CopyCheck,
+    Copy,
     Monitor,
     RotateCw,
 } from 'lucide-vue-next';

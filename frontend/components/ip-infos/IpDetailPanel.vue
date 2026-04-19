@@ -162,7 +162,7 @@
 
     <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
     <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
-        <DialogContent :title="data.ip" class="max-w-3xl">
+        <DialogContent :title="data.ip" class="max-w-2xl">
             <DialogHeader>
                 <template #title>
                     <span class="flex items-center gap-2 min-w-0">
