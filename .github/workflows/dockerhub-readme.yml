@@ -15,8 +15,6 @@ on:
       - '.github/workflows/dockerhub-readme.yml'
   workflow_dispatch:
 
-# Least-privilege GITHUB_TOKEN: the job only needs to read the repo; the
-# Docker Hub write happens through the separately scoped access token secret.
 permissions:
   contents: read
 
@@ -24,11 +22,6 @@ jobs:
   sync:
     name: Push README to Docker Hub
     runs-on: ubuntu-latest
-    # DOCKER_HUB_USERNAME / DOCKER_HUB_ACCESS_TOKEN live on the `production`
-    # environment (same as docker-image.yml). Environment-scoped secrets are
-    # only visible to jobs that opt into that environment — without this line
-    # the action sees an empty `username` and fails with "Required input
-    # 'username' is missing.".
     environment: production
 
     steps:
@@ -39,10 +32,6 @@ jobs:
         uses: peter-evans/dockerhub-description@v5
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          # DOCKER_HUB_ACCESS_TOKEN must have the "Read, Write, Delete" scope
-          # for this endpoint. The token used for image pushes might only
-          # carry "Read, Write" — if this step 403s, generate a new PAT with
-          # the wider scope on Docker Hub and replace the secret.
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           repository: jason5ng32/myip
           readme-filepath: ./README.md
