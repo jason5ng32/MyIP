@@ -1,13 +1,14 @@
 <template>
     <div class="mac-checker-section my-4 space-y-4">
         <!-- Top note -->
-        <p class="text-sm text-muted-foreground">{{ t('macchecker.Note') }}</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">{{ t('macchecker.Note') }}</p>
 
         <!-- Input area: label + Input + icon trigger -->
         <div class="space-y-2">
-            <label for="queryMAC" class="text-sm font-medium">{{ t('macchecker.Note2') }}</label>
+            <Label for="queryMAC">{{ t('macchecker.Note2') }}</Label>
             <div class="flex items-center gap-2">
                 <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="macCheckStatus === 'running'"
                     :placeholder="t('macchecker.Placeholder')"
                     v-model="queryMAC" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
@@ -96,6 +97,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 

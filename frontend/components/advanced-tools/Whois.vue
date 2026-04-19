@@ -1,13 +1,14 @@
 <template>
     <div class="whois-section my-4 space-y-4">
         <!-- Top note -->
-        <p class="text-sm text-muted-foreground">{{ t('whois.Note') }}</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">{{ t('whois.Note') }}</p>
 
         <!-- Input area -->
         <div class="space-y-2">
-            <label for="queryURLorIP" class="text-sm font-medium block">{{ t('whois.Note2') }}</label>
+            <Label for="queryURLorIP">{{ t('whois.Note2') }}</Label>
             <div class="flex items-center gap-2">
                 <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="whoisCheckStatus === 'running'"
                     :placeholder="t('whois.Placeholder')"
                     v-model="queryURLorIP" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
@@ -72,6 +73,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Info, Search } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 

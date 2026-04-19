@@ -5,7 +5,7 @@
 
         <!-- Input area -->
         <div class="space-y-2">
-            <label for="queryURL" class="text-sm font-medium block">{{ t('censorshipcheck.Note2') }}</label>
+                <Label for="queryURL">{{ t('censorshipcheck.Note2') }}</Label>
             <div class="flex items-center gap-2">
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
                     :disabled="censorshipCheckStatus === 'running'"
@@ -75,6 +75,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 

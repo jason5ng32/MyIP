@@ -5,7 +5,7 @@
 
         <!-- Input area -->
         <div class="space-y-3">
-            <label for="queryURL" class="text-sm font-medium block">{{ t('dnsresolver.Note2') }}</label>
+            <Label for="queryURL">{{ t('dnsresolver.Note2') }}</Label>
 
             <!-- Record type selector: 6 options → ToggleGroup horizontally -->
             <div class="flex flex-wrap items-center gap-2">
@@ -80,6 +80,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Play } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 
