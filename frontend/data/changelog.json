@@ -1020,10 +1020,10 @@
       {
         "type": "add",
         "change": {
-          "en": "Network Connectivity now accepts user-added test targets (up to 9, saved locally in your browser)",
-          "zh": "网络连通性支持添加自定义测试站点（最多 9 个，保存在浏览器本地）",
-          "fr": "La Connectivité réseau accepte désormais des cibles de test personnalisées (jusqu'à 9, enregistrées localement dans votre navigateur)",
-          "tr": "Ağ Bağlantısı artık kullanıcı tarafından eklenen test hedeflerini kabul ediyor (en fazla 9, tarayıcınızda yerel olarak saklanır)"
+          "en": "Network Connectivity now accepts user-added test targets",
+          "zh": "网络连通性支持添加自定义测试站点",
+          "fr": "La Connectivité réseau accepte désormais des cibles de test personnalisées",
+          "tr": "Ağ Bağlantısı artık kullanıcı tarafından eklenen test hedeflerini kabul ediyor"
         }
       },
       {
