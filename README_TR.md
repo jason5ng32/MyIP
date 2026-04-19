@@ -92,28 +92,54 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 ## 📚 Ortam Değişkenleri
 
-Programı ortam değişkeni eklemeden kullanabilirsiniz, ancak bazı gelişmiş özellikler için aşağıdaki değişkenleri ekleyebilirsiniz:
+Aşağıda **Evet** olarak işaretlenen değişkenler, backend'in düzgün çalışması için mutlaka ayarlanmalıdır. Özellikle MaxMind kimlik bilgileri gereklidir — tabloyu doldurmadan önce aşağıdaki MaxMind yapılandırma notlarını okuyun.
+
+### MaxMind Veritabanları (zorunlu)
+
+MyIP, IP coğrafi konumu, ASN / kuruluş araması ve uygulama genelinde görünen ülke kodu rozetleri (IP kartları, WebRTC ICE adayları vb.) için MaxMind'in ücretsiz **GeoLite2** veritabanlarına (City + ASN) güvenir. Backend'in tam bir deneyim sunması için çalışan bir MaxMind kurulumu zorunludur.
+
+MaxMind'in GeoLite2 lisansı yeniden dağıtıma izin vermediği için `.mmdb` dosyaları **bu depoda yer almıyor**. Kendiniz sağlamanız gerekir. İki yol vardır:
+
+**Seçenek A — Otomatik (önerilir, Docker için zorunlu)**
+
+1. [maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup) adresinden ücretsiz bir hesap oluşturun.
+2. Hesabınızın "Manage License Keys" sayfasından bir lisans anahtarı oluşturun.
+3. Şu üç ortam değişkenini ayarlayın:
+   ```bash
+   MAXMIND_ACCOUNT_ID="your-account-id"
+   MAXMIND_LICENSE_KEY="your-license-key"
+   MAXMIND_AUTO_UPDATE="true"
+   ```
+4. Backend'i başlatın. İlk başlatmadan yaklaşık 60 saniye sonra updater her iki veritabanını da indirir. Sonrasında her 24 saatte bir otomatik olarak yenilenir.
+
+> ⚠️ **Docker dağıtımları Seçenek A'yı kullanmak zorundadır.** Yeni bir konteyner boş bir `common/maxmind-db/` dizini ile gelir — yukarıdaki üç değişken ayarlanmadan backend başlar, ancak MaxMind tabanlı IP kaynağı ve WebRTC ülke rozetleri çalışmaz ve her başlatma logunda `MaxMind API will return 503...` hatasını görürsünüz.
+
+**Seçenek B — Manuel (izole / Docker dışı ortamlar için)**
+
+MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını indirin ve backend'i başlatmadan önce `common/maxmind-db/` dizinine bırakın. Bu durumda `MAXMIND_AUTO_UPDATE` `"false"` olarak kalabilir, ancak MaxMind yeni sürümler yayınladıkça dosyaları manuel olarak yenilemeniz gerekir.
+
+### Ortam değişkenleri listesi
 
 | Değişken Adı | Zorunlu | Varsayılan Değer | Açıklama |
 | --- | --- | --- | --- |
+| `IPCHECKING_API_ENDPOINT` | **Evet** | `""` | IPCheck.ing API uç noktası |
+| `MAXMIND_ACCOUNT_ID` | **Evet** | `""` | MaxMind hesap ID'si, GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
+| `MAXMIND_LICENSE_KEY` | **Evet** | `""` | MaxMind lisans anahtarı, `MAXMIND_ACCOUNT_ID` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
+| `MAXMIND_AUTO_UPDATE` | **Evet** | `"false"` | `"true"` yapıldığında GeoLite2 veritabanları başlatmadan yaklaşık 60 saniye sonra otomatik olarak indirilir ve her 24 saatte bir yenilenir. **Docker için zorunlu.** Yalnızca `.mmdb` dosyalarını manuel olarak yerleştirdiyseniz `"false"` olarak kalabilir. |
+| `VITE_GOOGLE_ANALYTICS_ID` | **Evet** | `""` | Google Analytics ID, kullanıcı davranışını izlemek için |
 | `BACKEND_PORT` | Hayır | `"11966"` | Backend kısmının çalıştığı port |
 | `FRONTEND_PORT` | Hayır | `"18966"` | Frontend kısmının çalıştığı port |
 | `SECURITY_RATE_LIMIT` | Hayır | `"0"` | Bir IP'nin backend sunucusuna 60 dakikada yapabileceği istek sayısını kontrol eder (sınır yok için 0) |
 | `SECURITY_DELAY_AFTER` | Hayır | `"0"` | 20 dakikada bir IP'den gelen ilk X isteğin hız sınırına tabi olmadığını kontrol eder; X'ten sonra gecikme artar |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Hayır | `"logs/blacklist-ip.log"` | Yol ayarı. SECURITY_RATE_LIMIT etkinleştirildiğinde limit tetikleyen IP'leri kaydeder |
-| `GOOGLE_MAP_API_KEY=` | Hayır | `""` | IP'nin konumunu haritada göstermek için Google Maps API Anahtarı |
 | `ALLOWED_DOMAINS` | Hayır | `""` | Erişime izin verilen alan adları, virgülle ayrılmış; backend API kötüye kullanımını önlemek için kullanılır |
+| `GOOGLE_MAP_API_KEY` | Hayır | `""` | IP'nin konumunu haritada göstermek için Google Maps API Anahtarı |
 | `IPCHECKING_API_KEY` | Hayır | `""` | IPCheck.ing API anahtarı, doğru IP konum bilgisi almak için |
 | `IPINFO_API_TOKEN` | Hayır | `""` | IPInfo.io API token'ı, IP konum bilgisi almak için |
 | `IPAPIIS_API_KEY` | Hayır | `""` | IPAPI.is API anahtarı, IP konum bilgisi almak için |
 | `IP2LOCATION_API_KEY` | Hayır | `""` | IP2Location.io API anahtarı, IP konum bilgisi almak için |
-| `MAXMIND_ACCOUNT_ID` | Hayır | `""` | GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile kullanılan MaxMind hesap ID'si |
-| `MAXMIND_LICENSE_KEY` | Hayır | `""` | GeoLite2 veritabanlarını indirmek için kullanılan MaxMind lisans anahtarı |
-| `MAXMIND_AUTO_UPDATE` | Hayır | `"false"` | MaxMind kimlik bilgileri yapılandırıldığında otomatik GeoLite2 veritabanı güncellemelerini etkinleştirmek için `"true"` yapın |
 | `CLOUDFLARE_API` | Hayır | `""` | Cloudflare API anahtarı, AS sistemi bilgisi almak için |
 | `MAC_LOOKUP_API_KEY` | Hayır | `""` | MAC Lookup API anahtarı, MAC adresi bilgisi almak için |
-| `IPCHECKING_API_ENDPOINT` | **Evet** | `""` | IPCheck.ing API uç noktası |
-| `VITE_GOOGLE_ANALYTICS_ID` | **Evet** | `""` | Google Analytics ID, kullanıcı davranışını izlemek için |
 | `VITE_CURL_IPV4_DOMAIN` | Hayır | `""` | Kullanıcılara CURL API için IPv4 domain sağlar |
 | `VITE_CURL_IPV6_DOMAIN` | Hayır | `""` | Kullanıcılara CURL API için IPv6 domain sağlar |
 | `VITE_CURL_IPV64_DOMAIN` | Hayır | `""` | Kullanıcılara CURL API için dual-stack domain sağlar |
@@ -133,9 +159,12 @@ cp .env.example .env
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
+IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
+MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
+MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
+MAXMIND_AUTO_UPDATE="true"
 GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
-IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 Ardından backend servisini yeniden başlatın.
@@ -146,9 +175,12 @@ Docker çalıştırırken ortam değişkenleri ekleyebilirsiniz, örneğin:
 
 ```bash
 docker run -d -p 18966:18966 \
+  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
+  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
+  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
+  -e MAXMIND_AUTO_UPDATE="true" \
   -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPCHECKING_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 ```
@@ -176,11 +208,11 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 ## 😶‍🌫️ Ek Notlar
 
-Sürüm 2.0 yayımlandığında, bu programın kodunun %70'inin ChatGPT tarafından yazıldığını söylemiştim. Yaklaşık 90 etkileşim ve bazı küçük manuel düzeltmeler sonrasında, tüm kod tabanı tamamlandı.
+Sürüm 2.0 yayımlandığında, bu programın kodunun %70'inin AI tarafından yazıldığını söylemiştim. Yaklaşık 90 etkileşim ve bazı küçük manuel düzeltmeler sonrasında, tüm kod tabanı tamamlandı.
 
 Elbette, mimari ve kullanıcı arayüzü hâlâ benim tasarımım oldu.
 
-Sürüm 3.0 ve sonrasıyla birlikte ChatGPT yardımıyla yazılan kod oranı giderek azaldı; şimdi tahmini %40–50 aralığında. Bu süreçte JavaScript ve Vue hakkında hiç bilgim yokken, çoğu JS kodunu anlayacak seviyeye geldim ve artık biraz da yazabiliyorum.
+Sürüm 3.0 ve sonrasıyla birlikte AI yardımıyla yazılan kod oranı giderek azaldı; şimdi tahmini %40–50 aralığında. Bu süreçte JavaScript ve Vue hakkında hiç bilgim yokken, çoğu JS kodunu anlayacak seviyeye geldim ve artık biraz da yazabiliyorum.
 
 Yapay zekâ sayesinde, işsiz bir ürün yöneticisi olarak programlamayı hızlıca öğrenme imkânı buldum.
 

@@ -92,28 +92,54 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 ## 📚 Environment Variable
 
-You can use the program without adding any environment variables, but if you want to use some advanced features, you can add the following environment variables:
+Variables marked **Yes** below must be set for the backend to function correctly. The MaxMind credentials in particular are required — read the setup notes in the next subsection before filling in the table.
+
+### MaxMind Databases (Required)
+
+MyIP relies on the free **GeoLite2** databases from MaxMind (City + ASN) for IP geolocation, ASN / organization lookup, and the country-code badges that appear throughout the app (IP cards, WebRTC ICE candidates, and more). A working MaxMind setup is required for the backend to serve a complete experience.
+
+The `.mmdb` files are **not checked into this repository** because MaxMind's GeoLite2 license does not allow redistribution. You need to provide them yourself. There are two paths:
+
+**Option A — Automatic (recommended, required for Docker)**
+
+1. Create a free account at [maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup).
+2. Generate a license key from your account's "Manage License Keys" page.
+3. Set these three environment variables:
+   ```bash
+   MAXMIND_ACCOUNT_ID="your-account-id"
+   MAXMIND_LICENSE_KEY="your-license-key"
+   MAXMIND_AUTO_UPDATE="true"
+   ```
+4. Start the backend. Within about 60 seconds of the first startup, the updater will download both databases. They are then refreshed every 24 hours automatically.
+
+> ⚠️ **Docker deployers must use Option A.** A fresh container ships with an empty `common/maxmind-db/` directory — without the three variables above the backend starts, but the MaxMind-powered IP source and WebRTC country badges will not work, and you'll see `MaxMind API will return 503...` in the logs on every boot.
+
+**Option B — Manual (for air-gapped or non-Docker setups)**
+
+Download `GeoLite2-City.mmdb` and `GeoLite2-ASN.mmdb` from your MaxMind account and drop them into `common/maxmind-db/` before starting the backend. With this approach `MAXMIND_AUTO_UPDATE` can stay `"false"`, but you'll need to refresh the files manually as MaxMind publishes new versions.
+
+### Environment variables list
 
 | Variable Name | Required | Default Value | Description |
 | --- | --- | --- | --- |
+| `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |
+| `MAXMIND_ACCOUNT_ID` | **Yes** | `""` | MaxMind account ID, paired with `MAXMIND_LICENSE_KEY` to download GeoLite2 databases. See the MaxMind section above. |
+| `MAXMIND_LICENSE_KEY` | **Yes** | `""` | MaxMind license key, paired with `MAXMIND_ACCOUNT_ID`. See the MaxMind section above. |
+| `MAXMIND_AUTO_UPDATE` | **Yes** | `"false"` | Set to `"true"` to auto-download GeoLite2 databases ~60s after startup and refresh every 24h. **Required for Docker.** Can stay `"false"` only if you've pre-seeded the `.mmdb` files manually. |
+| `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
 | `BACKEND_PORT` | No | `"11966"` | The running port of the backend part of the program |
 | `FRONTEND_PORT` | No | `"18966"` | The running port of the frontend part of the program |
 | `SECURITY_RATE_LIMIT` | No | `"0"` | Controls the number of requests an IP can make to the backend server every 60 minutes (set to 0 for no limit) |
 | `SECURITY_DELAY_AFTER` | No | `"0"` | Controls the first X requests from an IP every 20 minutes that are not subject to speed limits, and after X requests, the delay will increase |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `"logs/blacklist-ip.log"` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
-| `GOOGLE_MAP_API_KEY=` | No | `""` | API Key for Google Maps, used to display the location of the IP on a map |
 | `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
+| `GOOGLE_MAP_API_KEY` | No | `""` | API Key for Google Maps, used to display the location of the IP on a map |
 | `IPCHECKING_API_KEY` | No | `""` | API Key for IPCheck.ing, used to obtain accurate IP geolocation information |
 | `IPINFO_API_TOKEN` | No | `""` | API Token for IPInfo.io, used to obtain IP geolocation information through IPInfo.io |
 | `IPAPIIS_API_KEY` | No | `""` | API Key for IPAPI.is, used to obtain IP geolocation information through IPAPI.is |
 | `IP2LOCATION_API_KEY` | No | `""` | API Key for IP2Location.io, used to obtain IP geolocation information through IP2Location.io |
-| `MAXMIND_ACCOUNT_ID` | No | `""` | MaxMind account ID used with `MAXMIND_LICENSE_KEY` to download GeoLite2 databases |
-| `MAXMIND_LICENSE_KEY` | No | `""` | MaxMind license key used to download GeoLite2 databases |
-| `MAXMIND_AUTO_UPDATE` | No | `"false"` | Set to `"true"` to enable automatic GeoLite2 database updates when MaxMind credentials are configured |
 | `CLOUDFLARE_API` | No | `""` | API Key for Cloudflare, used to obtain AS system information through Cloudflare |
 | `MAC_LOOKUP_API_KEY` | No | `""` | API Key for MAC Lookup, used to obtain MAC address information |
-| `IPCHECKING_API_ENDPOINT` | **Yes** | `""` | IPCheck.ing API endpoint |
-| `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
 | `VITE_CURL_IPV4_DOMAIN` | No | `""` | Provides the IPv4 domain for the CURL API to users |
 | `VITE_CURL_IPV6_DOMAIN` | No | `""` | Provides the IPv6 domain for the CURL API to users |
 | `VITE_CURL_IPV64_DOMAIN` | No | `""` | Provides the dual-stack domain for the CURL API to users |
@@ -133,9 +159,12 @@ Modify `.env`, and for example, add the following:
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
+IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
+MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
+MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
+MAXMIND_AUTO_UPDATE="true"
 GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
 ALLOWED_DOMAINS="example.com"
-IPCHECKING_API="YOUR_KEY_HERE"
 ```
 
 Then restart the backend service.
@@ -146,9 +175,12 @@ You can add environment variables when running Docker, for example:
 
 ```bash
 docker run -d -p 18966:18966 \
+  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
+  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
+  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
+  -e MAXMIND_AUTO_UPDATE="true" \
   -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
   -e ALLOWED_DOMAINS="example.com" \
-  -e IPCHECKING_API="YOUR_TOKEN_HERE" \
   --name myip \
   jason5ng32/myip:latest
 
@@ -177,11 +209,11 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 ## 😶‍🌫️ Additional Notes
 
-When version 2.0 was released, I said that 70% of the code for this program was not written by me, but by ChatGPT. After about 90 interactions, plus some minor manual adjustments, the entire codebase was completed.
+When version 2.0 was released, I said that 70% of the code for this program was not written by me, but by AI. After about 90 interactions, plus some minor manual adjustments, the entire codebase was completed.
 
 Of course, the architecture and UI still required my own design.
 
-With the release of version 3.0 and subsequent versions, the proportion of code written with the help of ChatGPT has gradually decreased, now estimated to be between 40% and 50%. On the contrary, in this process, I went from having no knowledge of JavaScript and Vue to being able to understand most of the JS code, and I can now write some on my own.
+With the release of version 3.0 and subsequent versions, the proportion of code written with the help of AI has gradually decreased, now estimated to be between 40% and 50%. On the contrary, in this process, I went from having no knowledge of JavaScript and Vue to being able to understand most of the JS code, and I can now write some on my own.
 
 Thanks to AI, it has given me, an unemployed product manager, a rapid opportunity to learn programming.
 
