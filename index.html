@@ -52,15 +52,21 @@
     }
 
     /* Boot screen — shown until App.vue's setup hides it
-       (see `frontend/App.vue`: `document.getElementById('jn-loading')`). */
+       (see `frontend/App.vue`: `document.getElementById('jn-loading')`).
+
+       Anchored to the upper third of the viewport rather than dead-center
+       because phones eat ~50-60px at the top with their status bar / notch,
+       which pushed "centered" content visually low. 15vh top padding + flex
+       top alignment puts the logo around ~1/6 to 1/5 from the top on phone
+       and desktop alike. */
     .jn-loading {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 16px;
-      padding: 24px;
+      padding: 25vh 24px 24px;
       text-align: center;
     }
 
