@@ -3,7 +3,6 @@
         "title": "Authentification",
         "slug": "authentication",
         "description": "Sécuriser les identifiants de connexion de votre compte en ligne",
-        "icon": "bi-key-fill",
         "intro": "La plupart des violations de données signalées sont causées par l'utilisation de mots de passe faibles, par défaut ou volés (selon [ce rapport Verizon](http://www.verizonenterprise.com/resources/reports/rp_dbir-2016-executive-summary_xg_en.pdf)). Utilisez des mots de passe longs, forts et uniques, gérez-les dans un gestionnaire de mots de passe sécurisé, activez l'authentification à 2 facteurs, restez au courant des violations et faites attention lorsque vous vous connectez à vos comptes.",
         "checklist": [
             {
@@ -138,7 +137,6 @@
         "title": "Navigation Web",
         "slug": "web-browsing",
         "description": "Éviter le suivi, la censure et la collecte de données en ligne",
-        "icon": "bi-browser-safari",
         "intro": "La plupart des sites Web sur Internet utilisent une forme de suivi, souvent pour obtenir un aperçu du comportement et des préférences de leurs utilisateurs. Ces données peuvent être incroyablement détaillées et sont donc extrêmement précieuses pour les entreprises, les gouvernements et les voleurs de propriété intellectuelle. Les violations de données et les fuites sont courantes, et la désanonymisation de l'activité Web des utilisateurs est souvent une tâche triviale.\n\nIl existe deux principales méthodes de suivi : avec état (basée sur les cookies) et sans état (basée sur l'empreinte digitale). Les cookies sont de petits éléments d'information, stockés dans votre navigateur avec un identifiant unique qui est utilisé pour vous identifier. L'empreinte digitale du navigateur est un moyen très précis d'identifier et de suivre les utilisateurs où qu'ils aillent en ligne. Les informations collectées sont assez complètes et incluent souvent les détails du navigateur, le système d'exploitation, la résolution de l'écran, les polices prises en charge, les plugins, le fuseau horaire, la langue et les préférences de police, et même les configurations matérielles.\n\nCette section décrit les étapes que vous pouvez suivre pour être mieux protégé contre les menaces, minimiser le suivi en ligne et améliorer la confidentialité.",
         "checklist": [
             {
@@ -381,7 +379,6 @@
         "title": "Email",
         "slug": "email",
         "description": "Protéger la passerelle vers vos comptes en ligne",
-        "icon": "bi-envelope-fill",
         "intro": "Près de 50 ans après l'envoi du premier e-mail, il occupe toujours une place importante dans notre vie quotidienne et continuera de l'être dans un avenir proche. Donc, compte tenu de la confiance que nous leur accordons, il est surprenant de constater à quel point cette infrastructure est fondamentalement non sécurisée. La fraude liée aux e-mails [est en augmentation](https://www.csoonline.com/article/3247670/email/email-security-in-2018.html), et sans prendre de mesures de base, vous pourriez être en danger.\n\nSi un pirate informatique accède à vos e-mails, cela lui donne une passerelle pour compromettre vos autres comptes (par le biais de réinitialisations de mot de passe). Par conséquent, la sécurité des e-mails est primordiale pour votre sécurité numérique.\n\nLes grandes entreprises qui fournissent un service de messagerie \"gratuit\" n'ont pas une bonne réputation en matière de respect de la vie privée des utilisateurs : Gmail a été surpris en train de donner [un accès complet à des tiers](https://www.wsj.com/articles/techs-dirty-secret-the-app-developers-sifting-through-your-gmail-1530544442) aux e-mails des utilisateurs et de [suivre tous vos achats](https://www.cnbc.com/2019/05/17/google-gmail-tracks-purchase-history-how-to-delete-it.html). Yahoo a également été surpris en train d'analyser les e-mails en temps réel [pour les agences de surveillance américaines](http://news.trust.org/item/20161004170601-99f8c). Les annonceurs [ont eu accès](https://thenextweb.com/insider/2018/08/29/both-yahoo-and-aol-are-scanning-customer-emails-to-attract-advertisers) aux messages des utilisateurs de Yahoo et d'AOL pour « identifier et segmenter les clients potentiels en repérant les signaux d'achat contextuels et les achats passés. »",
         "checklist": [
             {
@@ -516,7 +513,6 @@
         "title": "Messagerie",
         "slug": "messaging",
         "description": "Garder vos communications privées et sécurisées",
-        "icon": "bi-chat-dots-fill",
         "intro": "",
         "checklist": [
             {
@@ -639,7 +635,6 @@
         "title": "Médias sociaux",
         "slug": "social-media",
         "description": "Minimiser les risques associés à l'utilisation des communautés en ligne",
-        "icon": "bi-people-fill",
         "intro": "Les communautés en ligne existent depuis l'invention d'Internet et donnent aux gens du monde entier la possibilité de se connecter, de communiquer et de partager. Bien que ces réseaux soient un excellent moyen de promouvoir l'interaction sociale et de rassembler les gens, ils ont un côté sombre - il existe de sérieuses [préoccupations en matière de confidentialité avec les services de réseaux sociaux](https://en.wikipedia.org/wiki/Privacy_concerns_with_social_networking_services), et ces sites de réseaux sociaux appartiennent à des sociétés privées, et qu'ils gagnent leur argent en collectant des données sur les individus et en vendant ces données, souvent à des annonceurs tiers.\nSécurisez votre compte, verrouillez vos paramètres de confidentialité, mais sachez que même après l'avoir fait, toutes les données téléchargées intentionnellement et non intentionnellement sont effectivement publiques. Si possible, évitez d'utiliser les réseaux de médias sociaux conventionnels.\n",
         "checklist": [
             {
@@ -738,7 +733,6 @@
         "title": "Réseaux",
         "slug": "networks",
         "description": "Protéger votre trafic réseau",
-        "icon": "bi-shield-shaded",
         "intro": "Cette section couvre la manière de connecter vos appareils à Internet en toute sécurité, y compris la configuration de votre routeur et la mise en place d'un VPN.\n",
         "checklist": [
             {
@@ -897,7 +891,6 @@
         "title": "Appareils Mobiles",
         "slug": "mobile-devices",
         "description": "Réduire le suivi invasif pour les téléphones portables, les smartphones et les tablettes",
-        "icon": "bi-phone-fill",
         "intro": "Les smartphones ont révolutionné de nombreux aspects de la vie et ont mis le monde à portée de main. Pour beaucoup d'entre nous, les smartphones sont notre principal moyen de communication, de divertissement et d'accès à la connaissance. Mais s'ils ont apporté un niveau de commodité inégalé, il y a des choses laides qui se passent derrière l'écran.\nLe géotracking est utilisé pour tracer chacun de nos mouvements, et nous avons peu de contrôle sur qui a ces données - votre téléphone est même capable de [suivre votre position sans GPS](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371). Au fil des ans, de nombreux rapports ont fait surface, décrivant les façons dont le [micro de votre téléphone peut écouter](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html), et la [caméra peut vous regarder](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6) - le tout à votre insu et sans votre consentement. Et puis il y a les applications malveillantes, le manque de correctifs de sécurité et les portes dérobées potentielles/probables.\nL'utilisation d'un smartphone génère beaucoup de données vous concernant - des informations que vous partagez intentionnellement aux données générées silencieusement par vos actions. Il peut être effrayant de voir ce que Google, Microsoft, Apple et Facebook savent de nous - parfois ils en savent plus que notre famille la plus proche. Il est difficile de comprendre ce que vos données révéleront, surtout en conjonction avec d'autres données.\nCes données sont utilisées pour [bien plus que de la simple publicité](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - le plus souvent, elles sont utilisées pour évaluer les gens pour la finance, l'assurance et l'emploi. Les publicités ciblées peuvent même être utilisées pour une surveillance fine (voir [ADINT](https://adint.cs.washington.edu))\nNous sommes de plus en plus nombreux à nous préoccuper de la manière dont [les gouvernements utilisent, collectent et utilisent les données de nos smartphones](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/), et à juste titre, les agences fédérales [demandent souvent nos données à Google](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/), [Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/), Apple, Microsoft, Amazon et d'autres entreprises technologiques. Parfois, les demandes sont faites en masse, renvoyant des informations détaillées sur tout le monde dans une certaine zone géographique, [souvent pour des personnes innocentes](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html). Et cela n'inclut pas tout le trafic Internet auquel les agences de renseignement du monde entier ont un accès illimité.\n",
         "checklist": [
             {
@@ -1044,7 +1037,6 @@
         "title": "Ordinateurs personnels",
         "slug": "personal-computers",
         "description": "Sécurisation du système d'exploitation, des données et de l'activité de votre PC",
-        "icon": "bi-laptop-fill",
         "intro": "Bien que Windows et OS X soient faciles à utiliser et pratiques, ils sont loin d'être sécurisés. Votre système d'exploitation fournit l'interface entre le matériel et vos applications, donc s'il est compromis, cela peut avoir des effets néfastes.\n",
         "checklist": [
             {
@@ -1263,7 +1255,6 @@
         "title": "Maison intelligente",
         "slug": "smart-home",
         "description": "Utiliser les appareils IoT sans compromettre votre vie privée",
-        "icon": "bi-house-add-fill",
         "intro": "Les assistants domestiques (tels que Google Home, Alexa et Siri) et autres appareils connectés à Internet collectent de grandes quantités de données personnelles (y compris des échantillons de voix, des données de localisation, des détails sur la maison et des journaux de toutes les interactions). Étant donné que vous avez un contrôle limité sur ce qui est collecté, comment il est stocké et à quoi il servira, il est difficile de recommander des produits de domotique grand public à quiconque se soucie de la confidentialité et de la sécurité.\nSécurité vs Confidentialité : Il existe de nombreux appareils intelligents sur le marché qui prétendent augmenter la sécurité de votre maison tout en étant faciles et pratiques à utiliser (tels que les alarmes anti-intrusion intelligentes, les caméras de sécurité Internet, les serrures intelligentes et les sonnettes d'accès à distance pour n'en nommer que quelques-uns). Ces appareils peuvent sembler faciliter la sécurité, mais il y a un compromis en termes de confidentialité : comme ils collectent de grandes quantités de données personnelles, et vous laissent sans contrôle sur la façon dont elles sont stockées ou utilisées. La sécurité de ces appareils est également discutable, car beaucoup d'entre eux peuvent être (et sont) piratés, permettant à un intrus de contourner la détection avec un minimum d'effort.\nL'option la plus respectueuse de la vie privée serait de ne pas utiliser d'appareils \"intelligents\" connectés à Internet dans votre maison, et de ne pas compter sur un appareil de sécurité qui nécessite une connexion Internet. Mais si vous le faites, il est important de bien comprendre les risques de tout produit donné, avant de l'acheter. Ajustez ensuite les paramètres pour augmenter la confidentialité et la sécurité. La liste de contrôle suivante vous aidera à atténuer les risques associés aux appareils domestiques connectés à Internet.",
         "checklist": [
             {
@@ -1350,7 +1341,6 @@
         "title": "Finances personnelles",
         "slug": "personal-finance",
         "description": "Protéger vos fonds, vos comptes financiers et vos transactions",
-        "icon": "bi-currency-exchange",
         "intro": "La fraude à la carte de crédit est la forme la plus courante de vol d'identité (avec [133 015 signalements aux États-Unis en 2017 seulement](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)), et une perte totale de 905 millions de dollars, ce qui représente une augmentation de 26 % par rapport à l'année précédente. Le montant médian perdu par personne était de 429 $ en 2017. Il est plus important que jamais de prendre des mesures de base pour vous protéger contre les victimes.\nRemarque sur les cartes de crédit : les cartes de crédit disposent de méthodes technologiques pour détecter et arrêter certaines transactions frauduleuses. Les principaux processeurs de paiement mettent cela en œuvre, en exploitant d'énormes quantités de données de leurs titulaires de cartes, afin de connaître en détail les habitudes de dépenses de chaque personne. Ces données sont utilisées pour identifier la fraude, mais sont également vendues à d'autres courtiers en données. Les cartes de crédit sont donc bonnes pour la sécurité, mais terribles pour la confidentialité des données.",
         "checklist": [
             {
@@ -1419,7 +1409,6 @@
         "title": "Aspect Humain",
         "slug": "human-aspect",
         "description": "Éviter les risques de sécurité liés à l'ingénierie sociale",
-        "icon": "bi-person-bounding-box",
         "intro": "De nombreuses violations de données, piratages et attaques sont causés par une erreur humaine. La liste suivante contient les étapes que vous devriez suivre pour réduire le risque que cela ne vous arrive. Beaucoup d'entre elles relèvent du bon sens, mais il est important d'en prendre note.",
         "checklist": [
             {
@@ -1554,7 +1543,6 @@
         "title": "Sécurité physique",
         "slug": "physical-security",
         "description": "Prendre des mesures pour prévenir les incidents de sécurité IRL",
-        "icon": "bi-file-earmark-break-fill",
         "intro": "Les registres publics comprennent souvent des données personnelles sensibles (nom complet, date de naissance, numéro de téléphone, e-mail, adresse, origine ethnique, etc.) et sont recueillies à partir de diverses sources (registres de recensement, certificats de naissance/décès/mariage, registres d'électeurs, informations marketing, bases de données clients, registres de véhicules à moteur, permis professionnels/commerciaux et tous les dossiers judiciaires en détail). Ces informations personnelles sensibles sont [faciles et légales d'accès](https://www.consumerreports.org/consumerist/its-creepy-but-not-illegal-for-this-website-to-provide-all-your-public-info-to-anyone/), ce qui soulève de [sérieuses préoccupations en matière de confidentialité](https://privacyrights.org/resources/public-records-internet-privacy-dilemma) (vol d'identité, risques pour la sécurité personnelle/harceleurs, destruction de réputations, société de dossiers).\n\nLa vidéosurveillance est l'un des principaux moyens par lesquels les entreprises, les particuliers et le gouvernement suivent vos mouvements. À Londres, au Royaume-Uni, une personne moyenne est filmée environ 500 fois par jour. Ce réseau continue de croître, et dans de nombreuses villes du monde, la reconnaissance faciale est en cours de déploiement, ce qui signifie que l'État peut connaître l'identité des résidents sur les images en temps réel.\nUne authentification forte, des appareils chiffrés, des logiciels corrigés et une navigation Web anonyme peuvent être de peu d'utilité si quelqu'un est capable de vous compromettre physiquement, vous, vos appareils et vos données. Cette section décrit certaines méthodes de base pour la sécurité physique.",
         "checklist": [
             {

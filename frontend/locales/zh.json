@@ -159,8 +159,6 @@
       "appSettings": "程序设置",
       "autoRun": "自动运行",
       "autoRunTips": "关闭后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。",
-      "showMap": "显示地图",
-      "showMapTips": "在 IP 信息卡片上显示地图。",
       "simpleMode": "简洁模式",
       "simpleModeTips": "减少 IP 卡片显示的内容。仅在手机上生效。",
       "connectivityAutoRefresh": "多次刷新可用性检测",
@@ -260,7 +258,6 @@
     "Title": "隐身测试",
     "Note": "当你挂上代理或 VPN 之后，你访问的网站真的不知道你挂着代理吗？你真的隐身了么？我们会通过多种手段，尝试计算出你伪装后的漏洞，找到你正在使用代理的证据。尽管可能部分测试结果不完全准确，但本测试依然有较高的参考意义。",
     "Note2": "点击运行后，系统将会运行一个脚本，通常在 10s 内将会完成所有的测试，在这个过程中，你的 IP 信息、浏览器信息等将会被收集并在后台进行分析。",
-    "Run": "运行测试",
     "fetchError": "无法获取测试结果",
     "yourIP": "你的主测 IP 是",
     "proxyScore": "代理概率",
@@ -360,7 +357,6 @@
     "Note": "检查目标网站在全球互联网审查较为严重的 4 个地区的可用性，包括：中国大陆、沙特阿拉伯、俄罗斯、土耳其。检查时会同时从互联网相对自由的地区进行相同的测试，以作为对照组进行校验。在一些地区，互联网审查有较为明确的法律条文，有些则相对含糊。",
     "Note2": "请输入 URL 或域名，开始封锁测试：",
     "Note3": "只有当同一个国家的所有服务器都无法访问时，才会判断为被封锁",
-    "Run": "运行测试",
     "Placeholder": "URL 或域名",
     "Country": "地区",
     "Status": "状态",
@@ -393,7 +389,6 @@
     "Title": "MAC 地址查询",
     "Note": "查询一个物理地址（MAC 地址）所属的制造商、是否单播/多播、是否广域/区域等信息。支持使用完整的 12 位进行查询，也支持前缀查询。当然，你也可以用本查询工具来验证你生成的物理地址是否符合自己的需求。",
     "Note2": "请输入一个物理地址，开始查询：",
-    "Run": "查询",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "无效的物理地址",
     "fetchError": "无法获取查询结果",
@@ -422,7 +417,6 @@
     "Note2": "请输入域名或 IP，开始进行查询：",
     "Note3": "Whois 信息包含多种类型的字段，以下为原始文本信息",
     "Placeholder": "域名或 IP",
-    "Run": "查询",
     "invalidURL": "无效的域名或 IP",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"
@@ -432,7 +426,6 @@
     "Note": "在一些地区，某些运营商可能会因为政治原因或者商业原因，对一些域名进行污染，以至于直接进行访问的时候，无法返回正确的结果。使用 DNS 解析检查，将帮助你从全球各个知名的 DNS 厂商里检查域名的解析结果。在检测内置的 DNS 中，有一部分服务商来自中国，其 DNS 解析的结果可能会受到污染。请注意鉴别。",
     "Note2": "请输入 URL 或域名，开始进行解析：",
     "Placeholder": "URL 或域名",
-    "Run": "解析",
     "invalidURL": "无效的 URL 或域名",
     "fetchError": "无法获取解析结果",
     "Provider": "DNS 服务商",
@@ -442,7 +435,7 @@
   "ruletest": {
     "Title": "分流测试",
     "Name": "检测",
-    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。",
+    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。通常，设置规则可能会使用类似于：DOMAIN, ptest-3.ipcheck.ing, POLICY 这样的写法，具体写法不同的代理软件可能会有所不同。",
     "StatusWait": "待检测",
     "StatusError": "检测出错",
     "Country": "代理地区",
@@ -454,10 +447,10 @@
     "RefreshWebRTC": "刷新 WebRTC 测试",
     "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",
     "SpeedTestButton": "开始/暂停网速测试",
-    "ToggleMaps": "打开/关闭地图显示",
     "SourceSelect": "选择 IP 归属地数据来源",
     "ShowASNInfo": "显示 AS 详细信息",
     "CopyIP": "复制 IP 地址",
+    "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
     "QueryIP": "查询 IP 信息",
     "GithubLink": "查看源代码",
@@ -486,6 +479,7 @@
     "isProxy": "代理",
     "qualityScore": "IP 质量分",
     "qualityScoreUnknown": "未知分数",
+    "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",
@@ -537,8 +531,8 @@
     "id": "webrtc",
     "Title": "WebRTC 测试",
     "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
-    "StatusWait": "待检测或连接错误",
-    "StatusError": "测试出错",
+    "StatusWait": "待检测",
+    "StatusError": "连接错误",
     "NATType": {
       "srflx": "端口限制型或对称型",
       "prflx": "端口限制型",
@@ -549,11 +543,10 @@
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
-    "Name": "检测",
+    "Name": "DNS 出口检测",
     "Title": "DNS 泄漏测试",
     "Note": "DNS 泄露（DNS Leaks）的意思是，当你挂上 VPN/代理后，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS 泄露的风险。",
     "Note2": "泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的 DNS 出口进行解析，如果返回的出口区域和你当地的运营商区域相同，则有 DNS 泄露风险，你可能需要修改 VPN/代理设置。",
-    "Endpoint": "DNS 出口",
     "EndpointCountry": "出口地区",
     "StatusWait": "待检测",
     "StatusError": "测试出错"
@@ -598,7 +591,6 @@
     "PacketLoss": "丢包率",
     "ReceivedPackets": "收到",
     "DroppedPackets": "丢失",
-    "Run": "运行测试",
     "Error": "测试失败，看起来你的 IP 不允许进行 Ping 测试。"
   },
   "mtrtest": {
@@ -609,14 +601,12 @@
     "Note3": "请选取你的 IP 地址进行测试：",
     "SelectIP": "选择一个 IP 地址",
     "Region": "地区",
-    "Run": "运行测试",
     "Error": "测试失败，看起来你的 IP 不允许进行 MTR 测试。"
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP 查询",
     "Placeholder": "请输入 IP 地址",
-    "Button": "查询",
     "Error": "请输入有效的 IPv4 或 IPv6 地址。"
   },
   "alert": {
@@ -651,13 +641,13 @@
     "MTRTest": "打开全球路由测试面板",
     "RuleTest": "打开规则测试面板",
     "DNSResolver": "打开 DNS 解析器面板",
-    "ToggleMaps": "切换地图显示",
     "IPCheck": "IP 查询",
     "ToggleInfoMask": "切换信息隐藏",
     "Help": "显示快捷键",
     "HelpNote": "使用快捷键的人，是喜欢效率的人，你真棒！",
     "GoNext": "下一张卡片",
     "GoPrevious": "上一张卡片",
+    "OpenHighlightedTool": "打开选中的高级工具",
     "RefreshRuleTests": "刷新规则测试",
     "CensorshipCheck": "打开封锁测试面板",
     "Preferences": "打开偏好设置面板",
@@ -686,13 +676,13 @@
     "Title": "关于",
     "product1": "IPCheck.ing 是一个免费的 IP 工具箱，可以帮助你查看自己的 IP 信息，检测网站的可用性，查看 DNS 出口信息，进行网速测试，全球延迟测试，MTR 测试等。",
     "product2": "这是一个开源项目，你可以点击页面底部的 GitHub 图标查看源代码。",
-    "product3": "最早的时候，这是我的一个用来学习 Vue.js 和学习如何使用 ChatGPT 写代码的练手项目，后来在 GitHub 上获得的星星数量越来越多，于是我进行了大量的重构和添加了许多非常有用的功能，希望你会喜欢。",
+    "product3": "最早的时候，这是我的一个用来学习 Vue.js 和学习如何使用 AI 写代码的练手项目，后来在 GitHub 上获得的星星数量越来越多，于是我进行了大量的重构和添加了许多非常有用的功能，希望你会喜欢。",
     "meTitle": "关于我",
     "me1": "我的名字叫阿禅，通常在网上使用 Jason Ng 作为英文名，我并不是一个专业的程序员，但是我喜欢编程，我喜欢开源，我喜欢分享。",
     "me2": "在大多数时候，我是一名产品经理、一名博客作者、一个摩托车骑士以及一名极客。",
     "me3": "你可以在下面的链接里找到我更详细的介绍：",
     "contactTitle": "联系我",
-    "contact": "如果你有任何问题或建议，请通过邮箱联系我： jason[AT]kenengba.com 。",
+    "contact": "如果你有任何问题或建议，请通过邮箱联系我： jason[AT]kenengba.com",
     "personal": "个人网站",
     "blog": "可能吧博客",
     "retiremoney": "躺平计算器",
@@ -707,506 +697,6 @@
     "Title": "更新日志",
     "add": "新增",
     "improve": "优化",
-    "fix": "修复",
-    "versions": [
-      {
-        "version": "v1.0",
-        "date": "Nov 06, 2020",
-        "content": [
-          {
-            "type": "add",
-            "change": "显示用户的 IP 信息"
-          },
-          {
-            "type": "add",
-            "change": "显示代理前后的 IP 信息"
-          },
-          {
-            "type": "add",
-            "change": "检查网站可用性"
-          }
-        ]
-      },
-      {
-        "version": "v2.0",
-        "date": "Nov 24, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "使用 Vue2 重构了整个项目"
-          },
-          {
-            "type": "improve",
-            "change": "使用 Bootstrap v5 重构了 UI"
-          }
-        ]
-      },
-      {
-        "version": "v2.1",
-        "date": "Nov 25, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加了 WebRTC 测试"
-          },
-          {
-            "type": "improve",
-            "change": "优化了程序的一些逻辑"
-          }
-        ]
-      },
-      {
-        "version": "v2.2",
-        "date": "Nov 26, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加了 DNS 泄漏测试"
-          },
-          {
-            "type": "add",
-            "change": "支持在前端显示 Bing 地图"
-          },
-          {
-            "type": "improve",
-            "change": "多个逻辑优化"
-          }
-        ]
-      },
-      {
-        "version": "v2.3",
-        "date": "Nov 27, 2023 ",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加了黑暗模式"
-          },
-          {
-            "type": "add",
-            "change": "增加移动版简约模式"
-          },
-          {
-            "type": "improve",
-            "change": "优化了文件结构"
-          }
-        ]
-      },
-      {
-        "version": "v2.4",
-        "date": "Dec 1, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "支持英文语言"
-          },
-          {
-            "type": "add",
-            "change": "添加信息遮罩功能"
-          },
-          {
-            "type": "add",
-            "change": "支持 PWA，可以安装到手机和桌面上"
-          }
-        ]
-      },
-      {
-        "version": "v2.5",
-        "date": "Dec 20, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "支持快捷键操作"
-          },
-          {
-            "type": "add",
-            "change": "添加网速测试功能"
-          },
-          {
-            "type": "improve",
-            "change": "支持使用 Docker 部署"
-          },
-          {
-            "type": "improve",
-            "change": "支持从多个来源获取 IP 归属地等信息"
-          }
-        ]
-      },
-      {
-        "version": "v3.0",
-        "date": "Jan 28, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "使用 Vite + Vue3 重构了整个项目"
-          },
-          {
-            "type": "add",
-            "change": "增加全球延迟测试功能"
-          },
-          {
-            "type": "add",
-            "change": "增加 MTR 测试功能"
-          },
-          {
-            "type": "improve",
-            "change": "多个性能优化和体验优化"
-          }
-        ]
-      },
-      {
-        "version": "v3.1",
-        "date": "Jan 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "支持新的语言：法语"
-          },
-          {
-            "type": "add",
-            "change": "添加数据加载中的动画"
-          },
-          {
-            "type": "improve",
-            "change": "优化了缓存策略"
-          },
-          {
-            "type": "improve",
-            "change": "调整黑暗模式样式"
-          },
-          {
-            "type": "fix",
-            "change": "修复了一些小问题"
-          }
-        ]
-      },
-      {
-        "version": "v3.2",
-        "date": "Feb 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加 NAT 类型检测"
-          },
-          {
-            "type": "improve",
-            "change": "优化 PWA 应用的体验"
-          },
-          {
-            "type": "improve",
-            "change": "提高后端脚本安全性"
-          }
-        ]
-      },
-      {
-        "version": "v3.3",
-        "date": "Feb 6, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "支持使用不同的 IP 地理位置信息源"
-          },
-          {
-            "type": "improve",
-            "change": "优化连接可用性检测的用户体验"
-          },
-          {
-            "type": "improve",
-            "change": "优化 UI 体验"
-          }
-        ]
-      },
-      {
-        "version": "v3.4",
-        "date": "Feb 17, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加 ASN 详细信息查看器"
-          },
-          {
-            "type": "add",
-            "change": "添加 IP 地址是否为代理的判断"
-          },
-          {
-            "type": "improve",
-            "change": "优化 IP 信息的展示 UI"
-          }
-        ]
-      },
-      {
-        "version": "v3.5",
-        "date": "Mar 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加规则测试"
-          },
-          {
-            "type": "improve",
-            "change": "优化了部分逻辑"
-          }
-        ]
-      },
-      {
-        "version": "v3.6",
-        "date": "Mar 10, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加 DNS 解析功能"
-          },
-          {
-            "type": "improve",
-            "change": "优化主页结构，高级功能折叠展示"
-          },
-          {
-            "type": "improve",
-            "change": "优化了程序逻辑"
-          }
-        ]
-      },
-      {
-        "version": "v3.7",
-        "date": "Apr 26, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加封锁测试功能"
-          },
-          {
-            "type": "add",
-            "change": "网速测试可以自定义数据包大小"
-          },
-          {
-            "type": "improve",
-            "change": "优化了部分功能逻辑"
-          }
-        ]
-      },
-      {
-        "version": "v3.8",
-        "date": "May 4, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "增加设置面板，可以在本地保存偏好设置"
-          },
-          {
-            "type": "add",
-            "change": "可以自定义程序在第二次启动时的多个默认行为"
-          },
-          {
-            "type": "improve",
-            "change": "大量优化了程序的逻辑"
-          },
-          {
-            "type": "fix",
-            "change": "修复了一些小问题"
-          }
-        ]
-      },
-      {
-        "version": "v3.9",
-        "date": "May 8, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "增加 Whois 查询功能"
-          },
-          {
-            "type": "improve",
-            "change": "优化高级功能的展示与动画效果"
-          },
-          {
-            "type": "fix",
-            "change": "修复了一些小问题"
-          }
-        ]
-      },
-      {
-        "version": "v4.0",
-        "date": "May 13, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "采用 Vue 3 的 Composition API 重构了整个项目"
-          },
-          {
-            "type": "add",
-            "change": "拆分前端多个模块，提高了程序的可维护性"
-          },
-          {
-            "type": "add",
-            "change": "增加隐身测试功能（Beta）"
-          },
-          {
-            "type": "improve",
-            "change": "优化后端程序的依赖结构"
-          },
-          {
-            "type": "improve",
-            "change": "优化了大量细节"
-          }
-        ]
-      },
-      {
-        "version": "v4.1",
-        "date": "July 11, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加 MAC 地址查询功能"
-          },
-          {
-            "type": "improve",
-            "change": "优化了部分程序细节"
-          }
-        ]
-      },
-      {
-        "version": "v4.2",
-        "date": "Sept 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加浏览器信息查询功能"
-          },
-          {
-            "type": "add",
-            "change": "添加 MaxMind 地理数据库"
-          },
-          {
-            "type": "improve",
-            "change": "多处体验优化"
-          }
-        ]
-      },
-      {
-        "version": "v4.3",
-        "date": "Oct 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加命令行 API 功能"
-          },
-          {
-            "type": "improve",
-            "change": "WebRTC 测试可以展示地区信息"
-          },
-          {
-            "type": "improve",
-            "change": "DNS 泄露测试可以展示地区信息"
-          }
-        ]
-      },
-      {
-        "version": "v4.4",
-        "date": "Dec 7, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "语言偏好设置"
-          },
-          {
-            "type": "improve",
-            "change": "地图展示供应商变更为 Google"
-          },
-          {
-            "type": "improve",
-            "change": "其它常规优化"
-          }
-        ]
-      },
-      {
-        "version": "v4.5",
-        "date": "Dec 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "添加安全检查清单"
-          },
-          {
-            "type": "improve",
-            "change": "其它常规优化"
-          }
-        ]
-      },
-      {
-        "version": "v5.0",
-        "date": "Jan 31, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "新增用户系统"
-          },
-          {
-            "type": "add",
-            "change": "新增用户成就系统"
-          },
-          {
-            "type": "add",
-            "change": "新增 Lite 版本"
-          },
-          {
-            "type": "add",
-            "change": "网速测试可以看到数据变化图表"
-          },
-          {
-            "type": "improve",
-            "change": "代码效率优化"
-          }
-        ]
-      },
-      {
-        "version": "v5.1",
-        "date": "Nov 12, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "支持土耳其语"
-          },
-          {
-            "type": "improve",
-            "change": "代码效率优化"
-          }
-        ]
-      },
-      {
-        "version": "v5.2",
-        "date": "Jan 05, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "提升 ASN 信息的丰富性"
-          },
-          {
-            "type": "add",
-            "change": "IP 质量分数显示"
-          },
-          {
-            "type": "improve",
-            "change": "代码效率优化"
-          }
-        ]
-      },
-      {
-        "version": "v5.3",
-        "date": "Apr 14, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "MaxMind 地理数据库自动更新"
-          },
-          {
-            "type": "improve",
-            "change": "优化缓存策略"
-          },
-          {
-            "type": "improve",
-            "change": "大大提升构建速度"
-          }
-        ]
-      }
-    ]
+    "fix": "修复"
   }
 }

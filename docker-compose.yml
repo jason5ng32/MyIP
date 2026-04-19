@@ -4,8 +4,8 @@ services:
     myip:
         container_name: myip
         image: jason5ng32/myip:latest # my-app: x.x.x
-        stdin_open: true # docker run -i 交互模式
-        tty: true        # docker run -t 终端模式
-        restart: always # 重启策略 / on-failure:5 重启次数5次 / always 一直重启 / unless-stopped 除非停止 / no 从不重启
+        stdin_open: true # docker run -i interactive mode
+        tty: true        # docker run -t terminal mode
+        restart: always # restart policy / on-failure:5 restart 5 times / always restart forever / unless-stopped unless stopped / no never restart
         ports:
             - "18966:18966"

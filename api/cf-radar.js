@@ -1,26 +1,18 @@
-import { parse } from 'dotenv';
-import { refererCheck } from '../common/referer-check.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
-// 创建一个用于设置 headers 的通用函数
-function createFetchOptions() {
-    return {
-        headers: {
-            'Authorization': `Bearer ${process.env.CLOUDFLARE_API}`,
-            'Content-Type': 'application/json'
-        }
-    };
-}
-
-// 通用的 fetch 请求函数
+// Common fetch request function
 async function fetchFromCloudflare(endpoint) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
-    const headers = createFetchOptions().headers;
-    const options = { headers };
-    const response = await fetch(url, options);
+    const response = await fetchUpstream(url, {
+        headers: {
+            'Authorization': `Bearer ${process.env.CLOUDFLARE_API}`,
+            'Content-Type': 'application/json',
+        },
+    });
     return response.json();
 }
 
-// ASN 信息
+// ASN information
 async function getASNInfo(asn) {
     try {
         return await fetchFromCloudflare(`/radar/entities/asns/${asn}`);
@@ -30,7 +22,7 @@ async function getASNInfo(asn) {
     }
 };
 
-// IP 版本分布
+// IP version distribution
 async function getASNIPVersion(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`);
@@ -40,7 +32,7 @@ async function getASNIPVersion(asn) {
     }
 };
 
-// HTTP 协议分布
+// HTTP protocol distribution
 async function getASNHTTPProtocol(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`);
@@ -50,7 +42,7 @@ async function getASNHTTPProtocol(asn) {
     }
 };
 
-// 设备分布
+// Device distribution
 async function getASNDeviceType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/device_type?asn=${asn}&dateRange=7d`);
@@ -60,7 +52,7 @@ async function getASNDeviceType(asn) {
     }
 };
 
-// 机器人分布
+// Bot distribution
 async function getASNBotType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`);
@@ -70,7 +62,7 @@ async function getASNBotType(asn) {
     }
 };
 
-// 使用 Promise.all 进行并行请求
+// Use Promise.all to make parallel requests
 async function getAllASNData(asn) {
     try {
         const [asnInfo, ipVersion, httpProtocol, deviceType, botType] = await Promise.all([
@@ -87,12 +79,31 @@ async function getAllASNData(asn) {
     }
 }
 
-// 验证 asn 是否合法
+// Validate asn is valid
 function isValidASN(asn) {
     return /^[0-9]+$/.test(asn);
 };
 
-// 格式化输出
+// Clean up Cloudflare Radar return data to uniform field names.
+// Hoisted to module scope — was redefined inside the handler on every request.
+function cleanUpResponseData(data) {
+    return {
+        asnName: data.asnInfo.result.asn.name,
+        asnCountryCode: data.asnInfo.result.asn.country,
+        asnOrgName: data.asnInfo.result.asn.orgName,
+        estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
+        IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
+        IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
+        HTTP_Pct: data.httpProtocol.result.summary_0.http,
+        HTTPS_Pct: data.httpProtocol.result.summary_0.https,
+        Desktop_Pct: data.deviceType.result.summary_0.desktop,
+        Mobile_Pct: data.deviceType.result.summary_0.mobile,
+        Bot_Pct: data.botType.result.summary_0.bot,
+        Human_Pct: data.botType.result.summary_0.human
+    };
+}
+
+// Format output
 
 function formatData(data) {
     const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
@@ -115,7 +126,7 @@ function formatData(data) {
 
 }
 
-// 过滤不存在的字段
+// Filter out non-existent fields
 function filterData(data) {
     for (const key in data) {
         if (data[key] === 'NaN' || data[key] === 'NaN%') {
@@ -125,15 +136,8 @@ function filterData(data) {
     return data;
 }
 
-// 导出函数
+// Export function
 export default async (req, res) => {
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const asn = req.query.asn;
     if (!asn) {
         return res.status(400).json({ error: 'No ASN provided' });
@@ -144,24 +148,6 @@ export default async (req, res) => {
 
     try {
         const { asnInfo, ipVersion, httpProtocol, deviceType, botType } = await getAllASNData(asn);
-
-        // 清洗数据
-        function cleanUpResponseData(data) {
-            return {
-                asnName: data.asnInfo.result.asn.name,
-                asnCountryCode: data.asnInfo.result.asn.country,
-                asnOrgName: data.asnInfo.result.asn.orgName,
-                estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
-                IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
-                IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
-                HTTP_Pct: data.httpProtocol.result.summary_0.http,
-                HTTPS_Pct: data.httpProtocol.result.summary_0.https,
-                Desktop_Pct: data.deviceType.result.summary_0.desktop,
-                Mobile_Pct: data.deviceType.result.summary_0.mobile,
-                Bot_Pct: data.botType.result.summary_0.bot,
-                Human_Pct: data.botType.result.summary_0.human
-            };
-        }
 
         const cleanedResponse = cleanUpResponseData({ asnInfo, ipVersion, httpProtocol, deviceType, botType });
         const finalResponse = formatData(cleanedResponse);

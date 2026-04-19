@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+# Least-privilege GITHUB_TOKEN: tests + build only need to read the repo.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Test + Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          # Intentionally no `cache: npm` — that requires a package-lock.json, and this
+          # repo gitignores the lockfile by design. `npm install` below runs cold every
+          # run; dependency install on this project takes ~30s, which is acceptable
+          # versus the drift risk of committing a lockfile we don't otherwise use.
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build

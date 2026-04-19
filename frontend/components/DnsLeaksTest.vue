@@ -1,60 +1,90 @@
 <template>
-  <!-- DNS Leaks Test -->
-  <div class="dnsleak-test-section mb-4">
-    <div class="jn-title2">
-      <h2 id="DNSLeakTest" :class="{ 'mobile-h2': isMobile }">🛑 {{ t('dnsleaktest.Title') }}</h2>
-      <button @click="checkAllDNSLeakTest(true)"
-        :class="['btn', isDarkMode ? 'btn-dark dark-mode-refresh' : 'btn-light']" aria-label="Refresh DNS Leak Test"
-        v-tooltip="t('Tooltips.RefreshDNSLeakTest')"><i class="bi"
-          :class="[isStarted ? 'bi-arrow-clockwise' : 'bi-caret-right-fill']"></i></button>
-    </div>
-    <div class="text-secondary">
-      <p>{{ t('dnsleaktest.Note') }}</p>
-      <p>{{ t('dnsleaktest.Note2') }}</p>
-    </div>
-    <div class="row">
-      <div v-for="(leak, index) in leakTest" :key="leak.id" class="col-lg-3 col-md-6 col-12 mb-4">
-        <div class="card jn-card keyboard-shortcut-card"
-          :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-          <div class="card-body">
-            <p class="jn-con-title card-title"><i class="bi bi-heart-pulse-fill"></i> {{ leak.name }}
-              <i class="bi" :class="'bi-' + (index + 1) + '-square'"></i>&nbsp;
-            </p>
-            <p class="card-text" :class="{
-              'text-info': leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError'),
-              'text-success': leak.ip.includes('.') || leak.ip.includes(':'),
-            }">
-              <i class="bi"
-                :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-box-arrow-right']"></i>
-              {{ t('dnsleaktest.Endpoint') }}: {{
-              leak.ip }}
-            </p>
+  <!-- DNS Leak Test -->
+  <section class="mb-10">
+    <!-- Header -->
+    <header class="mb-2 flex flex-col items-start justify-between gap-4">
+      <div class="flex flex-row items-center justify-between gap-4 w-full">
+        <h2 id="DNSLeakTest"
+          class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+          <span class="shrink-0 leading-none" aria-hidden="true">🛑</span>
+          <span class="min-w-0">{{ t('dnsleaktest.Title') }}</span>
+        </h2>
+        <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
+        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
+          aria-label="Refresh DNS Leak Test">
+          <component :is="isStarted ? RotateCw : ChevronRight" />
+        </Button>
+      </JnTooltip>
+      </div>
+      <div class="text-base text-muted-foreground">
+        <p>{{ t('dnsleaktest.Note') }}</p>
+        <p>{{ t('dnsleaktest.Note2') }}</p>
+      </div>
+    </header>
 
-            <div class="alert d-flex flex-column" :class="{
-              'alert-info': leak.country === t('dnsleaktest.StatusWait'),
-              'alert-success': leak.country !== t('dnsleaktest.StatusWait'),
-            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
+    <!-- Card grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <Card v-for="(leak, index) in leakTest" :key="leak.id"
+        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4">
+          <!-- Top: heartbeat icon + name + index -->
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2 min-w-0">
+              <HeartPulse class="size-6 text-muted-foreground shrink-0" />
+              <span class="text-base font-medium truncate">{{ leak.name }}</span>
 
-              <span class="jn-org">
-                <i class="bi"
-                  :class="[leak.org === t('dnsleaktest.StatusWait') || leak.org === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                {{ t('ipInfos.ISP') }}: <span :title="leak.org">{{ leak.org }}</span>
-              </span>
-
-              <span class="mt-2">
-                <i class="bi"
-                  :class="[leak.ip === t('dnsleaktest.StatusWait') || leak.ip === t('dnsleaktest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                {{ t('ipInfos.Country') }}: <span
-                  :class="[ leak.country !== t('dnsleaktest.StatusWait') ? 'fw-bold':'']">{{ leak.country
-                  }}&nbsp;</span>
-                <span v-show="leak.country_code" :class="'jn-fl fi fi-' + leak.country_code.toLowerCase()"></span>
-              </span>
+              <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
             </div>
           </div>
-        </div>
-      </div>
+
+          <!-- Endpoint status row: long IPv6 downgraded by font size to keep single line display -->
+          <div class="flex items-center gap-1.5 mb-3 min-w-0 min-h-6">
+            <span class="relative flex shrink-0">
+              <span v-if="toneOf(leak) === 'wait'"
+                class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
+              <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
+            </span>
+            <span class="whitespace-nowrap truncate min-w-0" :class="fitOneLineClass(leak.ip)" :title="leak.ip">
+              <template v-if="isResolved(leak)">
+                <span class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{ leak.ip
+                  }}</span>
+              </template>
+              <span v-else class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{
+                leak.ip }}</span>
+            </span>
+          </div>
+
+          <!-- ISP + Country sub-block -->
+          <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
+            <div>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <EthernetPort class="size-3.5" />
+                <span>{{ t('ipInfos.ISP') }}</span>
+              </dt>
+              <dd class="font-medium wrap-break-word" :title="leak.org">
+                <span v-if="!isFieldPending(leak.org)">{{ leak.org }}</span>
+                <span v-else class="text-muted-foreground font-normal">—</span>
+              </dd>
+            </div>
+            <div>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <MapPin class="size-3.5" />
+                <span>{{ t('dnsleaktest.EndpointCountry') }}</span>
+              </dt>
+              <dd class="font-medium flex items-center gap-1.5 flex-wrap">
+                <template v-if="!isFieldPending(leak.country)">
+                  <Icon v-if="leak.country_code" :icon="'circle-flags:' + leak.country_code.toLowerCase()"
+                    class="shrink-0 size-4" />
+                  <span class="wrap-break-word">{{ leak.country }}</span>
+                </template>
+                <span v-else class="text-muted-foreground font-normal">—</span>
+              </dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
     </div>
-  </div>
+  </section>
 </template>
 
 
@@ -64,16 +94,45 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import countryLookup from 'country-code-lookup';
-import getCountryName from '@/utils/country-name.js';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import getCountryName from '@/data/country-name.js';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import { EthernetPort, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { Icon } from '@iconify/vue';
 
 
 const { t } = useI18n();
-
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
+const isStarted = ref(false);
 
+const { dotClass, textClass } = useStatusTone();
+
+// Business status → 4 tone levels
+const toneOf = (leak) => {
+  if (leak.ip === t('dnsleaktest.StatusWait')) return 'wait';
+  if (leak.ip === t('dnsleaktest.StatusError')) return 'fail';
+  if (leak.ip.includes('.') || leak.ip.includes(':')) return 'ok-fast';
+  return 'wait';
+};
+
+
+// Status
+const isFieldPending = (value) => {
+  return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
+};
+
+const isResolved = (leak) => toneOf(leak) === 'ok-fast';
+
+// Ensure full line display, without line breaks due to IPv6
+const fitOneLineClass = (text) => {
+  const len = typeof text === 'string' ? text.length : 0;
+  if (len <= 15) return 'text-base';
+  if (len <= 26) return 'text-sm';
+  return 'text-sm md:text-xs';
+};
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),
@@ -84,32 +143,28 @@ const createDefaultCard = () => ({
 });
 
 const leakTest = reactive([
-  { ...createDefaultCard(), id: "ipapi1" },
-  { ...createDefaultCard(), id: "ipapi2" },
-  { ...createDefaultCard(), id: "sfshark1" },
-  { ...createDefaultCard(), id: "sfshark2" },
+  { ...createDefaultCard(), id: 'ipapi1' },
+  { ...createDefaultCard(), id: 'ipapi2' },
+  { ...createDefaultCard(), id: 'sfshark1' },
+  { ...createDefaultCard(), id: 'sfshark2' },
 ]);
 
-const isStarted = ref(false);
-
-// 生成 32 位随机字符串
+// Generate 32-digit random string
 const generate32DigitString = () => {
   const unixTime = Date.now().toString();
-  const fixedString = "jason5ng32";
+  const fixedString = 'jason5ng32';
   const randomString = Math.random().toString(36).substring(2, 11);
-
   return unixTime + fixedString + randomString;
 };
 
-// 生成 14 位随机字符串
+// Generate 14-digit random string
 const generate14DigitString = () => {
-  const fixedString = "jn32";
+  const fixedString = 'jn32';
   const randomString = Math.random().toString(36).substring(2, 11);
-
   return fixedString + randomString;
 };
 
-// DNS 泄露测试 1
+// DNS leak test 1
 const fetchLeakTestIpApiCom = (index) => {
   return new Promise((resolve, reject) => {
     const urlString = generate32DigitString();
@@ -117,26 +172,24 @@ const fetchLeakTestIpApiCom = (index) => {
 
     fetch(url)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
       })
       .then((data) => {
-        if (data.dns && "geo" in data.dns && "ip" in data.dns) {
-          const geoSplit = data.dns.geo.split(" - ");
+        if (data.dns && 'geo' in data.dns && 'ip' in data.dns) {
+          const geoSplit = data.dns.geo.split(' - ');
           leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
           leakTest[index].country = getCountryName(leakTest[index].country_code, lang.value);
           leakTest[index].org = geoSplit[1] || '';
           leakTest[index].ip = data.dns.ip;
           resolve();
         } else {
-          console.error("Unexpected data structure:", data);
-          reject(new Error("Unexpected data structure"));
+          console.error('Unexpected data structure:', data);
+          reject(new Error('Unexpected data structure'));
         }
       })
       .catch((error) => {
-        console.error("Error fetching leak test data:", error);
+        console.error('Error fetching leak test data:', error);
         leakTest[index].country = t('dnsleaktest.StatusError');
         leakTest[index].ip = t('dnsleaktest.StatusError');
         leakTest[index].country_code = '';
@@ -146,7 +199,7 @@ const fetchLeakTestIpApiCom = (index) => {
   });
 };
 
-// DNS 泄露测试 2
+// DNS leak test 2
 const fetchLeakTestSfSharkCom = (index, key) => {
   return new Promise((resolve, reject) => {
     const urlString = generate14DigitString();
@@ -154,9 +207,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
 
     fetch(url)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
       })
       .then((data) => {
@@ -170,12 +221,12 @@ const fetchLeakTestSfSharkCom = (index, key) => {
           leakTest[index].ip = keyEntry.IP;
           resolve();
         } else {
-          console.error("Unexpected data structure:", data);
-          reject(new Error("Unexpected data structure"));
+          console.error('Unexpected data structure:', data);
+          reject(new Error('Unexpected data structure'));
         }
       })
       .catch((error) => {
-        console.error("Error fetching leak test data:", error);
+        console.error('Error fetching leak test data:', error);
         leakTest[index].ip = t('dnsleaktest.StatusError');
         leakTest[index].country = t('dnsleaktest.StatusError');
         leakTest[index].country_code = '';
@@ -185,7 +236,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
   });
 };
 
-// 检查所有 DNS 泄露测试
+// Check all
 const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
   if (isRefresh) {
@@ -199,33 +250,26 @@ const checkAllDNSLeakTest = async (isRefresh) => {
     });
   }
 
-  // 设置延迟请求函数
-  const delayedFetch = (fetchFunction, index, key, delay) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        fetchFunction(index, key).then(resolve).catch(resolve);  // 无论成功或失败都会解决
-      }, delay);
-    });
-  };
+  const delayedFetch = (fetchFunction, index, key, delay) => new Promise((resolve) => {
+    setTimeout(() => {
+      fetchFunction(index, key).then(resolve).catch(resolve);
+    }, delay);
+  });
 
-  // 批量请求
   const promises = [
     delayedFetch(fetchLeakTestIpApiCom, 0, null, 100),
     delayedFetch(fetchLeakTestIpApiCom, 1, null, 1000),
     delayedFetch(fetchLeakTestSfSharkCom, 2, 0, 100),
-    delayedFetch(fetchLeakTestSfSharkCom, 3, 0, 1000)
+    delayedFetch(fetchLeakTestSfSharkCom, 3, 0, 1000),
   ];
 
-  // 最长等待 6 秒
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
 
-  // 等待所有请求完成或超时
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
     store.setLoadingStatus('dnsleaktest', true);
   });
 };
-
 
 onMounted(() => {
   store.setMountingStatus('dnsleaktest', true);
@@ -233,14 +277,6 @@ onMounted(() => {
 
 defineExpose({
   checkAllDNSLeakTest,
-  leakTest
+  leakTest,
 });
 </script>
-
-<style scoped>
-.jn-org {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>

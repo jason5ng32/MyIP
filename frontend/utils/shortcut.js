@@ -28,7 +28,7 @@ const mappingKeys = (...keys) => {
   keyMap = [...keyMap, ...keys];
 };
 
-// 导航
+// Navigation
 const navigateCards = (direction) => {
   const mainPart = document.getElementById('mainpart');
   const cardBodies = mainPart.querySelectorAll('.keyboard-shortcut-card');
@@ -39,7 +39,7 @@ const navigateCards = (direction) => {
     cards[currentIndex].classList.remove('hover', 'keyboard-hover');
     cards[currentIndex].removeAttribute('data-keyboard-hover');
   } else {
-    currentIndex = -1; // 如果没有卡片高亮，则从第一张卡片开始
+    currentIndex = -1; // If no card is highlighted, start from the first card
   }
 
   if (direction === 'down') {
@@ -67,7 +67,7 @@ document.addEventListener(
     if (metaKey || altKey || ctrlKey) return;
 
     if (key === 'j' || key === 'k') {
-      event.preventDefault(); // 阻止 'j' 和 'k' 的默认焦点行为
+      event.preventDefault(); // Prevent default focus behavior of 'j' and 'k'
     }
 
     keyPool += ignoreKeys.includes(key) ? "" : key;

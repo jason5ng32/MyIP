@@ -54,7 +54,7 @@ Feel free to bookmark the demo or deploy your own.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
-* 🇺🇸 🇨🇳 🇫🇷 English, Chinese, and French support.
+* 🇺🇸 🇨🇳 🇫🇷 🇹🇷 English, Chinese, French, and Turkish support.
 
 ## 📕 How to Use
 

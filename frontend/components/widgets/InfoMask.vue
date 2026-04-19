@@ -1,23 +1,26 @@
 <template>
-    <button v-show="showMaskButton" class="btn infomask" :class="{
-        'btn-success': infoMaskLevel === 0,
-        'btn-warning': infoMaskLevel === 1,
-        'btn-secondary': infoMaskLevel === 2
-    }" @click="toggleInfoMask" aria-label="Toggle Info Mask" v-tooltip="t('Tooltips.InfoMask')">
-        <i :class="infoMaskLevel === 0 ? 'bi bi-eye' : 'bi bi-eye-slash'"></i>
-    </button>
+    <JnTooltip :text="t('Tooltips.InfoMask')" side="left">
+        <Button v-show="showMaskButton"
+            size="icon"
+            type="button"
+            class="fixed bottom-[66px] z-1050 rounded-full shadow-lg cursor-pointer"
+            :class="stateClasses"
+            :style="positionStyle"
+            aria-label="Toggle Info Mask"
+            @click="toggleInfoMask">
+            <component :is="infoMaskLevel === 0 ? Eye : EyeOff" :size="16" />
+        </Button>
+    </JnTooltip>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useMainStore } from '@/store';
+import { Eye, EyeOff } from 'lucide-vue-next';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
-
-const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 
 const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     showMaskButton: Boolean,
@@ -25,32 +28,24 @@ const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     toggleInfoMask: Function,
 });
 
-const adjustButtonPosition = () => {
-    const screenWidth = window.innerWidth;
-    const contentWidth = 1600; // 主内容区域的宽度
-    const spaceOnRight = (screenWidth - contentWidth) / 2;
+// Three state colors
+const stateClasses = computed(() => ({
+    'bg-success text-success-foreground hover:bg-success/80': infoMaskLevel === 0,
+    'bg-warning text-warning-foreground hover:bg-warning/80': infoMaskLevel === 1,
+    'bg-secondary text-secondary-foreground hover:bg-secondary/80': infoMaskLevel === 2,
+}));
 
-    const button = document.querySelector('.infomask');
-    if (screenWidth > 1600) { // 只在屏幕宽度大于1600px时调整
-        button.style.right = `${spaceOnRight + 20}px`; // 保持20px的距离
-    } else {
-        button.style.right = '20px'; // 在小屏幕上使用默认位置
+// Wide screen (>1600px) align to content area right (max-width 1600px), otherwise stick right 20px
+const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
+const positionStyle = computed(() => {
+    if (screenWidth.value > 1600) {
+        const spaceOnRight = (screenWidth.value - 1600) / 2;
+        return { right: `${spaceOnRight + 20}px` };
     }
-}
-
-onMounted(() => {
-    window.addEventListener('resize', adjustButtonPosition);
-    adjustButtonPosition();
+    return { right: '20px' };
 });
+const handleResize = () => { screenWidth.value = window.innerWidth; };
 
-
+onMounted(() => { window.addEventListener('resize', handleResize); });
+onBeforeUnmount(() => { window.removeEventListener('resize', handleResize); });
 </script>
-
-<style scoped>
-.infomask {
-    position: fixed;
-    bottom: 66px;
-    right: 20px;
-    z-index: 1050;
-}
-</style>

@@ -1,19 +1,15 @@
-import { get } from 'https';
-import { refererCheck } from '../common/referer-check.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
+// A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
+// strings let the upstream API receive partial prefixes and return
+// undefined behavior; tighten to exactly 12 hex chars.
 const isValidMAC = (address) => {
     const normalizedAddress = address.replace(/[:-]/g, '');
-    return normalizedAddress.length >= 6 && normalizedAddress.length <= 12 && /^[0-9A-Fa-f]+$/.test(normalizedAddress);
+    return normalizedAddress.length === 12 && /^[0-9A-Fa-f]+$/.test(normalizedAddress);
 }
 
 export default async (req, res) => {
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
-    // 从请求中获取 IP 地址
+    // Get IP address from request
     let macAddress = req.query.mac;
     if (!macAddress) {
         return res.status(400).json({ error: 'No MAC address provided' });
@@ -21,7 +17,7 @@ export default async (req, res) => {
         macAddress = macAddress.replace(/:/g, '').replace(/-/g, '');
     }
 
-    // 检查 IP 地址是否合法
+    // Check if address is valid
     if (!isValidMAC(macAddress)) {
         return res.status(400).json({ error: 'Invalid MAC address' });
     }
@@ -33,29 +29,21 @@ export default async (req, res) => {
     const url_noToken = `https://api.maclookup.app/v2/macs/${macAddress}`;
     const url = token ? url_hasToken : url_noToken;
 
-    get(url, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', async () => {
-            try {
-                const originalJson = JSON.parse(data);
-                if (originalJson.success !== true) {
-                    return res.json({ success: false, error: originalJson.error || 'Data not found' });
-                }
-                const finalData = modifyData(originalJson);
-                res.json(finalData);
-            } catch (e) {
-                res.status(500).json({ error: 'Error parsing JSON' });
-            }
-        });
-    }).on('error', (e) => {
+    try {
+        const apiRes = await fetchUpstream(url);
+        const json = await apiRes.json();
+        if (json.success !== true) {
+            return res.json({ success: false, error: json.error || 'Data not found' });
+        }
+        res.json(modifyData(json));
+    } catch (e) {
         res.status(500).json({ error: e.message });
-    });
+    }
 };
 
 
 const modifyData = (data) => {
-    // 检查单播/多播以及本地/全球地址
+    // Check if address is unicast/multicast and local/global
     const firstByte = parseInt(data.macPrefix.substring(0, 2), 16);
     const isMulticast = (firstByte & 0x01) === 0x01;
     const isLocal = (firstByte & 0x02) === 0x02;

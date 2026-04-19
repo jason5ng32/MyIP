@@ -10,14 +10,14 @@ import { detectBrowser, detectOS } from '@/utils/system-detect.js';
 import { trackEvent } from '@/utils/use-analytics';
 
 
-// 定义数据
+// Define data
 const isDesktopChrome = ref(true);
 const isAndroidChrome = ref(false);
 const isMacSafari = ref(false);
 const isIosSafari = ref(false);
 const isOtherBrowser = ref(false);
 
-// 定义方法
+// Define methods
 const getBrowser = () => {
     const os = detectOS();
     const browser = detectBrowser();

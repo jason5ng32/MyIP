@@ -1,6 +1,6 @@
-import { refererCheck } from '../common/referer-check.js';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
-// 如果长度不等于 28 且不是字母与数字的组合，则返回 false
+// If length is not 28 and is not a combination of letters and numbers, return false
 function isValidUserID(userID) {
     if (typeof userID !== 'string') {
         console.error("Invalid type for userID");
@@ -14,19 +14,12 @@ function isValidUserID(userID) {
 }
 
 export default async (req, res) => {
-
-    // 限制只能从指定域名访问
-    const referer = req.headers.referer;
-    if (!refererCheck(referer)) {
-        return res.status(403).json({ error: referer ? 'Access denied' : 'What are you doing?' });
-    }
-
     const id = req.query.id;
     if (!id) {
         return res.status(400).json({ error: 'No ID provided' });
     }
 
-    // 检查 IP 地址是否合法
+    // Check if address is valid
     if (!isValidUserID(id)) {
         return res.status(400).json({ error: 'Invalid ID' });
     }
@@ -41,13 +34,13 @@ export default async (req, res) => {
     const url = new URL(`${apiEndpoint}/getpdresult/${id}?apikey=${apikey}`);
 
     try {
-        const apiResponse = await fetch(url, {
+        const apiResponse = await fetchUpstream(url, {
             headers: {
                 ...req.headers,
             }
         });
 
-        // 捕捉上游错误
+        // Catch upstream error
         if (!apiResponse.ok) {
             let errorDetail = '';
             try {

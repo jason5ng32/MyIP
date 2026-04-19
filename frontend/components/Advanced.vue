@@ -1,66 +1,82 @@
 <template>
     <!-- Advanced Tools -->
-    <div class="advanced-tools-section mb-4">
-        <div class="jn-title2">
-            <h2 id="AdvancedTools" :class="{ 'mobile-h2': isMobile }">🧰 {{ t('advancedtools.Title') }}</h2>
+    <section class="advanced-tools-section mb-10">
+        <!-- Header -->
+        <header class="mb-3">
+            <h2 id="AdvancedTools" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+                🧰 {{ t('advancedtools.Title') }}
+            </h2>
+            <p class="my-3 text-base text-muted-foreground">{{ t('advancedtools.Note') }}</p>
+        </header>
 
+        <!-- Card grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <Card v-for="(card, index) in enabledCards" :key="index"
+                :data-adv-path="card.path"
+                class="keyboard-shortcut-card jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
+                role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
+                @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
+                @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
+                <CardContent class="p-4">
+                    <h3 class="text-xl md:text-2xl font-medium text-primary mb-2 pr-10">
+                        <PanelBottomOpen
+                            class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
+                        {{ t(card.titleKey) }}
+                    </h3>
+                    <!-- Description -->
+                    <p class="text-base text-muted-foreground line-clamp-2 min-h-10">
+                        {{ t(card.noteKey) }}
+                    </p>
+                    <!-- Top right emoji -->
+                    <span class="jn-emoji" aria-hidden="true">{{ card.icon }}</span>
+                </CardContent>
+            </Card>
         </div>
-        <div class="text-secondary">
-            <p>{{ t('advancedtools.Note') }}</p>
-        </div>
-        <div class="row">
-            <div class="col-lg-3 col-md-6 col-12 mb-4" v-for="(card, index) in cards.filter(card => card.enabled)"
-                :key="index">
-                <div class="jn-adv-card card jn-card" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                    <div class="card-body" @click.prevent="navigateAndToggleOffcanvas(card.path)" role="button">
-                        <h3 :class="[isMobile ? 'mobile-h3' : 'fs-4']" class="jn-adv-title">
-                            <i class="bi bi-arrow-up-right-circle"></i> {{ t(card.titleKey) }}
-                        </h3>
-                        <p class="opacity-75">{{ t(card.noteKey) }}</p>
-                        <span :class="[isDarkMode ? 'jn-icon-dark' : 'jn-icon']">{{ card.icon }}</span>
+
+        <!-- Tool details Drawer -->
+        <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
+            <DrawerContent :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
+                :class="['jn-tools-drawer overflow-hidden', (isMobile || isFullScreen) ? 'h-full rounded-none' : 'h-[85vh]']">
+                <!-- Drawer internal header -->
+                <div class="flex items-center gap-2 px-4 pt-1 pb-3 jn-drawer-header shrink-0">
+                    <button v-if="!isMobile" type="button"
+                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        @click="fullScreen" :aria-label="isFullScreen ? 'Exit full screen' : 'Full screen'">
+                        <Maximize v-if="!isFullScreen" class="size-4" />
+                        <Minimize v-else class="size-4" />
+                    </button>
+                    <span v-if="openedCard >= 0" class="flex-1 text-base md:text-lg font-medium truncate"
+                        :class="isMobile ? 'text-left' : 'text-center'">
+                        <span class="mr-1">{{ cards[openedCard].icon }}</span>{{ t(cards[openedCard].titleKey) }}
+                    </span>
+                    <span v-else class="flex-1" />
+                    <DrawerClose @click="resetNavigatorURL()"
+                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
+                </div>
+                <!-- Content area (scrollable) -->
+                <div class="flex-1 overflow-y-auto px-1 md:px-2 pb-6" ref="scrollContainer">
+                    <div :class="isMobile ? 'w-full px-3' : 'jn-canvas-width px-6'">
+                        <router-view></router-view>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div :data-bs-theme="isDarkMode ? 'dark' : ''" class="offcanvas offcanvas-bottom" tabindex="-1"
-            :class="[isMobile ? 'h-100' : '']" id="offcanvasTools" aria-labelledby="offcanvasToolsLabel">
-            <div class="offcanvas-header d-flex justify-content-end jn-offcanvas-header">
-                <button v-if="!isMobile" type="button" class="btn opacity-50 jn-bold" @click="fullScreen">
-                    <span v-if="!isFullScreen">
-                        <i class="bi bi-arrows-fullscreen"></i>
-                    </span>
-                    <span v-else>
-                        <i class="bi bi-fullscreen-exit"></i>
-                    </span>
-                </button>
-                <span v-if="openedCard >= 0" class="fw-medium"
-                    :class="[isMobile ? 'mobile-h2 text-left' : 'fs-5 text-center ms-auto']">{{
-                    cards[openedCard].icon }}
-                    {{ t(cards[openedCard].titleKey) }}</span>
-
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
-                    @click="resetNavigatorURL()"></button>
-            </div>
-            <div class="offcanvas-body pt-0" :class="[isMobile ? ' w-100' : 'jn-canvas-width']" ref="scrollContainer">
-                <router-view></router-view>
-            </div>
-        </div>
-    </div>
-
+            </DrawerContent>
+        </Drawer>
+    </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
-import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
+import { Card, CardContent } from '@/components/ui/card';
+import { CircleArrowOutUpRight, Maximize, Minimize, PanelBottomOpen } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 
@@ -80,10 +96,28 @@ const cards = reactive([
     { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false }
 ]);
 
+const enabledCards = computed(() => cards.filter(c => c.enabled));
+
 const isFullScreen = ref(false);
 const openedCard = computed(() => store.currentPath.id);
 
-// 跳转到指定页面并打开
+// Drawer toggle and store.openSheet bidirectional binding
+const isOpen = computed(() => store.openSheet === 'tools');
+const onOpenChange = (val) => {
+    // When closed, go back to '/'
+    if (!val) {
+        store.setOpenSheet(null);
+        if (router.currentRoute.value.path !== '/') {
+            router.push('/');
+        }
+        isFullScreen.value = false;
+    } else {
+        store.setOpenSheet('tools');
+    }
+};
+
+// Navigate to specified page
+// Toggle driven by router/index.js afterEach and store.setOpenSheet
 const navigateAndToggleOffcanvas = (routePath) => {
     router.push(routePath);
     let capitalizedRoutePath = routePath.replace('/', '');
@@ -91,29 +125,14 @@ const navigateAndToggleOffcanvas = (routePath) => {
     trackEvent('Nav', 'NavClick', capitalizedRoutePath);
 };
 
-// 全屏显示
+// Full screen toggle: height determined by DrawerContent's class
 const fullScreen = () => {
-    const offcanvas = document.getElementById('offcanvasTools');
-    if (offcanvas) {
-        offcanvas.style.transition = 'height 0.5s ease-in-out';
-        if (!isFullScreen.value) {
-            offcanvas.style.height = '100%';
-            isFullScreen.value = true;
-        } else {
-            offcanvas.style.height = '80%';
-            isFullScreen.value = false;
-        }
-        setTimeout(() => {
-            offcanvas.style.transition = '';
-        }, 500);
-    }
+    isFullScreen.value = !isFullScreen.value;
 };
 
-// 将浏览器地址重置
 const resetNavigatorURL = () => {
     router.push('/');
-}
-
+};
 
 onMounted(() => {
     store.setMountingStatus('advancedtools', true);
@@ -131,95 +150,46 @@ defineExpose({
 </script>
 
 <style scoped>
-.offcanvas.offcanvas-bottom {
-    height: 80%;
+.jn-emoji {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: transform 0.4s ease, text-shadow 0.4s ease;
+    pointer-events: none;
 }
 
-#offcanvasTools {
-    z-index: 10000;
+.jn-adv-card:hover .jn-emoji {
+    transform: translateY(-10pt) scale(1.8);
+    text-shadow: 0 0 10pt rgb(0 0 0 / 0.38);
 }
 
-.jn-h {
-    height: 80%;
+:global(.dark) .jn-adv-card:hover .jn-emoji {
+    text-shadow: 0 0 10pt rgb(255 255 255 / 0.15);
 }
 
-.jn-bold {
-    -webkit-text-stroke: 1px;
-    margin-left: -10pt;
-}
-
-.jn-bold:hover {
-    opacity: 1 !important;
-}
-
+/* Drawer content area width (desktop) */
 .jn-canvas-width {
     width: fit-content;
     margin: auto;
     max-width: 1400px;
 }
 
-
-.jn-adv-card {
-    display: block;
-    position: relative;
-    text-decoration: none;
-    z-index: 0;
-    overflow: visible;
+.jn-drawer-header {
+    border-bottom: 1px solid var(--border);
 }
 
-.jn-icon {
-    top: 4pt;
-    right: 6pt;
-    font-size: 1.6rem;
-    position: absolute;
-    transition: all 0.4s;
+/* Drawer root container needs flex-col, so that the header is fixed + content scrollable */
+.jn-tools-drawer {
+    display: flex;
+    flex-direction: column;
 }
 
-.jn-icon-dark {
-    top: 4pt;
-    right: 6pt;
-    font-size: 1.6rem;
-    position: absolute;
-    transition: all 0.4s;
-}
-
-.jn-adv-card:hover .jn-icon-dark {
-    transform: translateY(-10pt) scale(1.8);
-    text-shadow: 0 0 10pt #ffffff27;
-}
-
-.jn-adv-card:hover .jn-icon {
-    transform: translateY(-10pt) scale(1.8);
-    text-shadow: 0 0 10pt #00000060;
-}
-
-.jn-adv-title {
-    width: 85%;
-}
-
-.jn-offcanvas-header {
-    min-height: 40pt;
-    border-bottom: 1px solid #ababab3f;
-    transition: all 0.3s ease-out;
-}
-
-.jn-offcanvas-header-noborder {
-    min-height: 40pt;
-    border-bottom: 1px solid transparent;
-    transition: all 0.3s ease-out;
-}
-
-.slide-fade-enter-active {
-    transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-    transition: all 0.3s ease-out;
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-    transform: translateY(20px);
-    opacity: 0;
+/* Full screen toggle height transition */
+:global(.jn-tools-drawer) {
+    transition:
+        transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+        height 0.3s cubic-bezier(0.32, 0.72, 0, 1) !important;
 }
 </style>

@@ -159,8 +159,6 @@
       "appSettings": "Program Ayarları",
       "autoRun": "Otomatik Çalıştır",
       "autoRunTips": "Devre dışı bırakılırsa, uygulama yalnızca yerel IP'yi kontrol eder ve testleri otomatik olarak çalıştırmaz.",
-      "showMap": "Haritayı Göster",
-      "showMapTips": "IP bilgi kartında bir harita görüntüler.",
       "simpleMode": "Basit Mod",
       "simpleModeTips": "IP kartlarında görüntülenen bilgiyi azaltır. Yalnızca mobil cihazlarda etkilidir.",
       "connectivityAutoRefresh": "Çoklu Bağlantı Yenilemeleri",
@@ -261,7 +259,6 @@
     "Note": "Çin Anakarası, Suudi Arabistan, Rusya ve Türkiye dahil olmak üzere sıkı internet sansürüyle bilinen dört bölgede hedef web sitelerinin kullanılabilirliğini kontrol eder. Testler ayrıca doğrulama için bir kontrol grubu olarak nispeten özgür internete sahip bölgelerden de yapılır. Bazı bölgelerde internet sansürü için net yasal hükümler varken, diğerleri daha belirsizdir.",
     "Note2": "Sansür testini başlatmak için lütfen bir URL veya alan adı girin:",
     "Note3": "Bir web sitesi, yalnızca aynı ülke içindeki tüm sunuculardan erişilemiyorsa engellenmiş sayılır.",
-    "Run": "Testi Çalıştır",
     "Placeholder": "URL veya Alan Adı",
     "Country": "Bölge",
     "Status": "Durum",
@@ -280,7 +277,6 @@
     "Title": "Görünmezlik Testi",
     "Note": "Bir proxy veya VPN kullandığınızda, ziyaret ettiğiniz web siteleri gerçekten bir proxy kullandığınızı bilmiyor mu? Gerçekten görünmez misiniz? Kılığınızdaki açıkları hesaplamak ve bir proxy kullandığınıza dair kanıt bulmak için çeşitli yöntemler kullanacağız. Bazı test sonuçları tamamen doğru olmasa da, bu test yine de oldukça bilgilendiricidir.",
     "Note2": "Çalıştır'a tıkladıktan sonra, sistem genellikle tüm testleri 10 saniye içinde tamamlayan bir komut dosyası çalıştıracaktır. Bu süreçte IP bilgileriniz, tarayıcı bilgileriniz vb. toplanacak ve arka planda analiz edilecektir.",
-    "Run": "Testi Çalıştır",
     "fetchError": "Test sonuçları alınamadı",
     "yourIP": "Ana test IP'niz",
     "proxyScore": "Proxy Yüzdesi",
@@ -391,7 +387,6 @@
     "Title": "MAC Arama",
     "Note": "Bir fiziksel adresin (MAC adresi) üreticisini, tekli/çoklu yayın (unicast/multicast), global/yerel olup olmadığını vb. sorgulayın. Tam 12 haneli adresle veya sadece önekle sorgulamayı destekler. Bu aracı, oluşturduğunuz fiziksel adresin ihtiyaçlarınızı karşılayıp karşılamadığını doğrulamak için de kullanabilirsiniz.",
     "Note2": "Sorgulamayı başlatmak için lütfen bir fiziksel adres girin:",
-    "Run": "Sorgula",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "Geçersiz fiziksel adres",
     "fetchError": "Sorgu sonuçları alınamadı",
@@ -420,7 +415,6 @@
     "Note2": "Sorgulamayı başlatmak için lütfen bir alan adı veya IP adresi girin:",
     "Note3": "Whois bilgileri çeşitli türde alanlar içerir. Aşağıda ham metin bilgisi bulunmaktadır",
     "Placeholder": "Alan Adı veya IP",
-    "Run": "Sorgula",
     "invalidURL": "Geçersiz alan adı veya IP",
     "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
   },
@@ -429,7 +423,6 @@
     "Note": "Bazı bölgelerde, politik veya ticari nedenlerle, bazı operatörler belirli alan adlarını kirletebilir, bu da doğrudan erişildiğinde yanlış sonuçlara yol açar. DNS çözümlemesi kontrollerini kullanmak, dünyanın dört bir yanındaki iyi bilinen DNS sağlayıcılarından alan adlarının çözümleme sonuçlarını incelemenize yardımcı olacaktır. Dahili DNS testleri arasında, bazı sağlayıcılar Çin'dendir ve DNS çözümleme sonuçları kirletilmiş olabilir. Lütfen ayırt edici olun.",
     "Note2": "Çözümlemeyi başlatmak için lütfen bir URL veya alan adı girin:",
     "Placeholder": "URL veya Alan Adı",
-    "Run": "Çalıştır",
     "invalidURL": "Geçersiz URL veya Alan Adı",
     "fetchError": "Çözümleme sonuçları alınamadı",
     "Provider": "DNS Sağlayıcısı",
@@ -439,7 +432,7 @@
   "ruletest": {
     "Title": "Kural Testi",
     "Name": "Test",
-    "Note": "Kural testi, proxy yazılımının alan adı tabanlı kurallarının doğru ayarlanıp ayarlanmadığını belirlemek için kullanılır. Testi yapmadan önce, aşağıdaki karta başvurmanız ve proxy yazılımınızda IPCheck.ing'in 8 farklı URL'si için farklı alan adı tabanlı yönlendirme kuralları ayarlamanız gerekir.",
+    "Note": "Kural testi, proxy yazılımının alan adı tabanlı kurallarının doğru ayarlanıp ayarlanmadığını belirlemek için kullanılır. Testi yapmadan önce, aşağıdaki karta başvurmanız ve proxy yazılımınızda IPCheck.ing'in 8 farklı URL'si için farklı alan adı tabanlı yönlendirme kuralları ayarlamanız gerekir. Genellikle, kuralları ayarlamak için DOMAIN, ptest-3.ipcheck.ing, POLICY gibi formatlar kullanılabilir. Bu formatlar, kullandığınız proxy yazılımına göre farklılık gösterebilir.",
     "StatusWait": "Test Bekleniyor veya Test Hatası",
     "StatusError": "Test Hatası",
     "Country": "Proxy bölgesi",
@@ -451,10 +444,10 @@
     "RefreshWebRTC": "WebRTC Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
-    "ToggleMaps": "Haritaları Göster/Gizle",
     "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
     "ShowASNInfo": "AS Detaylarını Göster",
     "CopyIP": "IP Adresini Kopyala",
+    "ViewOnMap": "Konumu haritada görüntüle",
     "InfoMask": "IP Bilgilerini Gizle",
     "QueryIP": "IP Adresini Sorgula",
     "GithubLink": "Kaynak Kodunu GitHub'da Görüntüle",
@@ -483,6 +476,7 @@
     "isProxy": "Proxy",
     "qualityScore": "IP Kalitesi",
     "qualityScoreUnknown": "Puan Bilinmiyor",
+    "advancedUnlockCta": "Kötüye kullanımı önlemek için, bu alanları görüntülemek için giriş yapın",
     "ASNInfo": {
       "trafficPercentage": "Trafik Yüzdesi : ",
       "note": "Bu AS için ilgili veriler : ",
@@ -534,8 +528,8 @@
     "id": "webrtc",
     "Title": "WebRTC Testi",
     "Note": "WebRTC genellikle doğrudan UDP üzerinden bağlantı kurar. Test gerçek IP'nizi döndürürse, bu, proxy ayarlarınızın bu bağlantıları kapsamadığı anlamına gelir. WebRTC'ye bağlanırken kullandığınız IP'yi tespit etmenin yanı sıra, NAT türünüzü de tespit ediyoruz. Ancak, NAT türü tespiti %100 doğru değildir ve yalnızca referans amaçlıdır.",
-    "StatusWait": "Test Bekleniyor veya Bağlantı Hatası",
-    "StatusError": "Test Hatası",
+    "StatusWait": "Test Bekleniyor",
+    "StatusError": "Bağlantı Hatası",
     "NATType": {
       "srflx": "Port Kısıtlı Koni veya Simetrik",
       "prflx": "Port Kısıtlı Koni",
@@ -546,11 +540,10 @@
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
-    "Name": "Test",
+    "Name": "DNS Uç Noktası Testi",
     "Title": "DNS Sızıntı Testi",
     "Note": "DNS sızıntısı, bir VPN/proxy'ye bağlıyken alan adı çözümlemelerinizin hala yerel İSS'niz aracılığıyla yapılması anlamına gelir, bu da DNS sızıntısı riski oluşturur.",
     "Note2": "DNS sızıntılarını test etme yöntemi, hangi bölgesel DNS çıkışı üzerinden çözümleme yaptığınızı tespit etmek için yeni oluşturulmuş bir alan adına erişmeyi içerir. Dönen uç nokta bölgesi, yerel hizmet sağlayıcınızın bölgesiyle eşleşirse, DNS sızıntısı riski vardır. Bu durumda, VPN/proxy ayarlarınızı değiştirmeniz gerekebilir.",
-    "Endpoint": "DNS Uç Noktası",
     "EndpointCountry": "Uç Nokta Bölgesi",
     "StatusWait": "Test Bekleniyor",
     "StatusError": "Test Hatası"
@@ -595,7 +588,6 @@
     "PacketLoss": "Paket Kaybı",
     "ReceivedPackets": "Alınan",
     "DroppedPackets": "Düşen",
-    "Run": "Testi Çalıştır",
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin Ping testi yapmasına izin verilmiyor."
   },
   "mtrtest": {
@@ -606,14 +598,12 @@
     "Note3": "Lütfen test için IP adresinizi seçin.",
     "SelectIP": "Bir IP Adresi Seçin",
     "Region": "Bölge",
-    "Run": "Testi Çalıştır",
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin MTR testi yapmasına izin verilmiyor."
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Kontrolü",
     "Placeholder": "Lütfen bir IP adresi girin",
-    "Button": "Kontrol Et",
     "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin."
   },
   "alert": {
@@ -648,13 +638,13 @@
     "MTRTest": "MTR Testi panelini aç",
     "RuleTest": "Kural Testi panelini aç",
     "DNSResolver": "DNS Çözümlemesi panelini aç",
-    "ToggleMaps": "Haritaları Değiştir",
     "IPCheck": "IP Adresini Sorgula",
     "ToggleInfoMask": "Bilgi Gizlemeyi Değiştir",
     "Help": "Klavye Kısayollarını Göster",
     "HelpNote": "Kısayolları kullanan insanlar gerçekten harika!",
     "GoNext": "Sonraki Kart",
     "GoPrevious": "Önceki Kart",
+    "OpenHighlightedTool": "Seçili Gelişmiş Aracı Aç",
     "RefreshRuleTests": "Kural Testlerini Yenile",
     "CensorshipCheck": "Sansür Kontrolü panelini aç",
     "Preferences": "Tercihleri Aç",
@@ -683,7 +673,7 @@
     "Title": "Hakkında",
     "product1": "IPCheck.ing, IP bilgilerinizi kontrol etmenize, web sitesi kullanılabilirliğini test etmenize, DNS çıkış bilgilerini incelemenize, hız testleri, global gecikme testleri, MTR testleri ve daha fazlasını yapmanıza yardımcı olan ücretsiz bir IP araç kutusudur.",
     "product2": "Bu açık kaynaklı bir projedir ve kaynak kodunu sayfanın altındaki GitHub simgesine tıklayarak görüntüleyebilirsiniz.",
-    "product3": "Başlangıçta bu, Vue.js öğrenmem ve ChatGPT kullanarak nasıl kod yazacağımı öğrenmem için kişisel bir projeydi. Zamanla GitHub'da daha fazla yıldız kazandı, bu yüzden çok fazla yeniden düzenleme yaptım ve birçok faydalı özellik ekledim. Umarım beğenirsiniz.",
+    "product3": "Başlangıçta bu, Vue.js öğrenmem ve AI kullanarak nasıl kod yazacağımı öğrenmem için kişisel bir projeydi. Zamanla GitHub'da daha fazla yıldız kazandı, bu yüzden çok fazla yeniden düzenleme yaptım ve birçok faydalı özellik ekledim. Umarım beğenirsiniz.",
     "meTitle": "Hakkımda",
     "me1": "Benim adım Jason Ng, internette Achán olarak da bilinirim. Profesyonel bir programcı değilim ama kodlamayı, açık kaynağı ve paylaşmayı seviyorum.",
     "me2": "Çoğu zaman bir ürün yöneticisi, blog yazarı, motosiklet sürücüsü ve bir 'geek' olarak çalışıyorum.",
@@ -704,506 +694,6 @@
     "Title": "Değişiklik Günlüğü",
     "add": "Eklendi",
     "improve": "Geliştirildi",
-    "fix": "Düzeltildi",
-    "versions": [
-      {
-        "version": "v1.0",
-        "date": "Kas 06, 2020",
-        "content": [
-          {
-            "type": "add",
-            "change": "Kullanıcının IP bilgilerini görüntüleme"
-          },
-          {
-            "type": "add",
-            "change": "Proxy öncesi ve sonrası IP bilgilerini görüntüleme"
-          },
-          {
-            "type": "add",
-            "change": "Web sitesi kullanılabilirliğini kontrol etme"
-          }
-        ]
-      },
-      {
-        "version": "v2.0",
-        "date": "Kas 24, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Tüm proje Vue2 kullanılarak yeniden yazıldı"
-          },
-          {
-            "type": "improve",
-            "change": "UI Bootstrap v5 kullanılarak yeniden düzenlendi"
-          }
-        ]
-      },
-      {
-        "version": "v2.1",
-        "date": "Kas 25, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "WebRTC testi eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Program mantığı optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v2.2",
-        "date": "Kas 26, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "DNS sızıntı testi eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Ön yüzde Bing haritalarını görüntüleme desteği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Çoklu mantık optimizasyonları"
-          }
-        ]
-      },
-      {
-        "version": "v2.3",
-        "date": "Kas 27, 2023 ",
-        "content": [
-          {
-            "type": "add",
-            "change": "Karanlık mod eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Mobil için minimalist mod eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Dosya yapısı optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v2.4",
-        "date": "Ara 1, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "İngilizce dil desteği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Bilgi gizleme özelliği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "PWA desteği, mobil ve masaüstüne kurulabilir"
-          }
-        ]
-      },
-      {
-        "version": "v2.5",
-        "date": "Ara 20, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Klavye kısayolları desteği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Web sitesi hız testi özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Docker kullanarak dağıtım desteği"
-          },
-          {
-            "type": "improve",
-            "change": "Birden fazla kaynaktan IP coğrafi konum bilgisi alma desteği"
-          }
-        ]
-      },
-      {
-        "version": "v3.0",
-        "date": "Oca 28, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Tüm proje Vite + Vue3 kullanılarak yeniden yazıldı"
-          },
-          {
-            "type": "add",
-            "change": "Global gecikme testi özelliği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "MTR testi özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Çoklu performans ve kullanıcı deneyimi optimizasyonları"
-          }
-        ]
-      },
-      {
-        "version": "v3.1",
-        "date": "Oca 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Yeni bir dil desteği eklendi: Fransızca"
-          },
-          {
-            "type": "add",
-            "change": "Yükleme animasyonu eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Önbellekleme stratejisi optimize edildi"
-          },
-          {
-            "type": "improve",
-            "change": "Karanlık mod stilleri ayarlandı"
-          },
-          {
-            "type": "fix",
-            "change": "Bazı küçük sorunlar düzeltildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.2",
-        "date": "Şub 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "NAT türü tespiti eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "PWA uygulama deneyimi optimize edildi"
-          },
-          {
-            "type": "improve",
-            "change": "Arka uç komut dosyası güvenliği artırıldı"
-          }
-        ]
-      },
-      {
-        "version": "v3.3",
-        "date": "Şub 6, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Farklı IP coğrafi konum kaynaklarını kullanma desteği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Bağlantı kullanılabilirlik tespiti için kullanıcı deneyimi iyileştirildi"
-          },
-          {
-            "type": "improve",
-            "change": "UI deneyimi optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.4",
-        "date": "Şub 17, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "ASN detayları görüntüleyici eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Proxy tespiti özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "IP bilgilerini görüntüleme arayüzü optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.5",
-        "date": "Mar 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Kural testi özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Bazı İyileştirmeler"
-          }
-        ]
-      },
-      {
-        "version": "v3.6",
-        "date": "Mar 10, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "DNS çözümlemesi özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Ana sayfa yapısı optimize edildi, gelişmiş özellikler artık daraltılabilir"
-          },
-          {
-            "type": "improve",
-            "change": "Program mantığı optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.7",
-        "date": "Nis 26, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Sansür testi özelliği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Ağ hız testi artık özel paket boyutuna izin veriyor"
-          },
-          {
-            "type": "improve",
-            "change": "Bazı fonksiyonel mantıklar optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.8",
-        "date": "May 4, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Ayarları yerel olarak kaydetmek için tercihler paneli eklendi"
-          },
-          {
-            "type": "add",
-            "change": "İkinci program açılışında birden fazla varsayılan davranışı özelleştirmeye izin ver"
-          },
-          {
-            "type": "improve",
-            "change": "Program mantığı önemli ölçüde optimize edildi"
-          },
-          {
-            "type": "fix",
-            "change": "Bazı küçük sorunlar düzeltildi"
-          }
-        ]
-      },
-      {
-        "version": "v3.9",
-        "date": "May 8, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Whois arama özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Gelişmiş araçlar için görüntüleme ve animasyon efektleri optimize edildi"
-          },
-          {
-            "type": "fix",
-            "change": "Bazı küçük sorunlar düzeltildi"
-          }
-        ]
-      },
-      {
-        "version": "v4.0",
-        "date": "May 13, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Tüm proje Vue 3'ün Composition API'si kullanılarak yeniden yazıldı"
-          },
-          {
-            "type": "add",
-            "change": "Bakım kolaylığını artırmak için ön yüz birden fazla modüle bölündü"
-          },
-          {
-            "type": "add",
-            "change": "Görünmezlik Testi özelliği eklendi (Beta)"
-          },
-          {
-            "type": "improve",
-            "change": "Arka uç program bağımlılıkları optimize edildi"
-          },
-          {
-            "type": "improve",
-            "change": "Çok sayıda detay optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v4.1",
-        "date": "Tem 11, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "MAC adresi arama özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Çok sayıda detay optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v4.2",
-        "date": "Eyl 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Tarayıcı bilgisi sorgulama özelliği eklendi"
-          },
-          {
-            "type": "add",
-            "change": "MaxMind GeoIP veritabanı eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Çoklu deneyim geliştirmeleri"
-          }
-        ]
-      },
-      {
-        "version": "v4.3",
-        "date": "Eki 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Komut satırı API özelliği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "WebRTC testi artık bölgesel bilgileri görüntüleyebiliyor"
-          },
-          {
-            "type": "improve",
-            "change": "DNS sızıntı testi artık bölgesel bilgileri görüntüleyebiliyor"
-          }
-        ]
-      },
-      {
-        "version": "v4.4",
-        "date": "Ara 7, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Dil tercihleri"
-          },
-          {
-            "type": "improve",
-            "change": "Harita sağlayıcısı Google olarak değiştirildi"
-          },
-          {
-            "type": "improve",
-            "change": "Diğer genel optimizasyonlar"
-          }
-        ]
-      },
-      {
-        "version": "v4.5",
-        "date": "Ara 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Güvenlik Kontrol Listesi Eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Diğer genel optimizasyonlar"
-          }
-        ]
-      },
-      {
-        "version": "v5.0",
-        "date": "Oca 31, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "Kullanıcı sistemi eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Kullanıcı başarı sistemi eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Lite sürümü eklendi"
-          },
-          {
-            "type": "add",
-            "change": "Hız testi artık veri değişim grafiklerini görüntüleyebiliyor"
-          },
-          {
-            "type": "improve",
-            "change": "Kod verimliliği optimizasyonu"
-          }
-        ]
-      },
-      {
-        "version": "v5.1",
-        "date": "Nov 12, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "Türkçe dil desteği eklendi"
-          },
-          {
-            "type": "improve",
-            "change": "Kod verimliliği optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v5.2",
-        "date": "Jan 05, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "ASN bilgilerinin zenginliği artırıldı"
-          },
-          {
-            "type": "add",
-            "change": "IP kalite puanı görüntüleme"
-          },
-          {
-            "type": "improve",
-            "change": "Kod verimliliği optimize edildi"
-          }
-        ]
-      },
-      {
-        "version": "v5.3",
-        "date": "Apr 14, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "MaxMind GeoIP veritabanı otomatik güncelleme"
-          },
-          {
-            "type": "improve",
-            "change": "Önbellek stratejisi optimize edildi"
-          },
-          {
-            "type": "improve",
-            "change": "Kod verimliliği optimize edildi, yapı hızı büyük ölçüde artırıldı"
-          }
-        ]
-      }
-    ]
+    "fix": "Düzeltildi"
   }
 }

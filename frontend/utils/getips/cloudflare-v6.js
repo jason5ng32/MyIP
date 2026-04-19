@@ -1,10 +1,11 @@
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { getIPFromMyExternalIP_V6 } from "./myexternalip-v6";
 
-// 从 Cloudflare 获取 IPv6 地址
+// Get IPv6 address from Cloudflare
 const getIPFromCloudflare_V6 = async () => {
     try {
-        const response = await fetch("https://[2606:4700:4700::1111]/cdn-cgi/trace");
+        const response = await fetchWithTimeout("https://[2606:4700:4700::1111]/cdn-cgi/trace");
         const data = await response.text();
         const lines = data.split("\n");
         const ipLine = lines.find((line) => line.startsWith("ip="));
@@ -28,7 +29,7 @@ const getIPFromCloudflare_V6 = async () => {
     } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
     }
-    // 故障转移
+    // Fallback
     const { ip, source } = await getIPFromMyExternalIP_V6();
     return {
         ip: ip,

@@ -1,128 +1,114 @@
 <template>
-    <!-- Curl Modal -->
-    <div class="modal fade" id="Curl" tabindex="-1" aria-labelledby="Curl">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" :class="{ 'dark-mode dark-mode-border': isDarkMode }">
-                <div class="modal-header" :class="{ 'dark-mode-border': isDarkMode }">
-                    <h5 class="modal-title" id="CurlTitle"><i class="bi bi-terminal-fill"></i> {{ t('curl.Title') }}
-                    </h5>
-                    <button type="button" class="btn-close" :class="{ 'dark-mode-close-button': isDarkMode }"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Curl Dialog -->
+    <Dialog :open="isOpen" @update:open="isOpen = $event">
+        <DialogContent :title="t('curl.Title')">
+            <DialogHeader :icon="Terminal" :title="t('curl.Title')" />
 
+            <div v-if="curlDomainsHadSet" class="space-y-3">
+                <!-- Description -->
+                <div class="space-y-1 text-xs font-mono">
+                    <p class="jn-comment"><span class="text-muted-foreground">{{ t('curl.Note1') }}</span></p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground">{{ t('curl.Note2_1') }}
+                            <Badge variant="outline" class="text-success">curl</Badge> {{ t('curl.Note2_2') }}</span>
+                    </p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground"><Badge variant="outline" class="text-success">geo</Badge> {{ t('curl.Note3') }}</span>
+                    </p>
+                    <p class="jn-comment">
+                        <span class="text-muted-foreground"><Badge variant="outline" class="text-success">YOUR_API_KEY</Badge> {{ t('curl.Note4') }}</span>
+                    </p>
                 </div>
-                <div v-if="curlDomainsHadSet" class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
-                    <code class="row flex justify-content-center">
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.Note1')}}</span></span>
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.Note2_1')}} <span class="text-success">curl</span> {{t('curl.Note2_2')}}</span></span>
-                        <span class="text-secondary jn-comment"><span class="text-success">geo</span> {{t('curl.Note3')}}</span>
-                        <span class="text-secondary jn-comment"><span class="text-success">YOUR_API_KEY</span> {{t('curl.Note4')}}</span>
-                        <span>&nbsp;</span>
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.getIPv4')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv4Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.getIPv6')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv6Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.get6and4')}}</span></span>
-                        <span class="jn-curl bg-black p-3 m-2 rounded-3">curl <span class="text-light">{{ipv64Domain}}<span class="text-success">/geo</span> -H 'x-key: <span class="text-warning">YOUR_API_KEY</span>'</span></span>
-                    </code>
-                </div>
-                <div v-else class="modal-body m-2" :class="{ 'dark-mode': isDarkMode }">
-                    <code class="row flex justify-content-center">
-                        <span class="jn-comment"><span class="text-secondary">{{t('curl.notAvailable')}}</span></span>
-                        </code>
-                </div>
-                <div class="modal-footer" :class="{ 'dark-mode-border': isDarkMode }">
+
+                <!-- 3 curl command blocks -->
+                <div class="space-y-3">
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv4') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv4Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv6') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv6Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
+                    <div>
+                        <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.get6and4') }}</p>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv64Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Additional Tools -->
-    <div class="container text-center jn-add">
-        <div id="morefromipchecking" class="d-flex justify-content-center">
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <a href="https://www.raycast.com/jason5ng32/ipcheck-ing" target="_blank"
-                    @click="trackEvent('Additional', 'AdditionalClick', 'Raycast');">
-                    <img src="/additional/raycast.webp" alt="IPCheck.ing on Raycast" :width="[isMobile ? '108' : '180']"
-                        :height="[isMobile ? '39' : '65']">
-                </a>
+            <div v-else class="py-6 text-center">
+                <p class="text-sm text-muted-foreground">{{ t('curl.notAvailable') }}</p>
             </div>
+        </DialogContent>
+    </Dialog>
 
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <img type="button" data-bs-toggle="modal" @click="openCurlModal" src="/additional/curl.webp"
-                    alt="IPCheck.ing for Curl" :width="[isMobile ? '108' : '180']" :height="[isMobile ? '39' : '65']">
-            </div>
+    <!-- Additional Tools: external product link bar -->
+    <div class="mx-auto text-center max-w-[98%]">
+        <div id="morefromipchecking" class="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
+            <a href="https://www.raycast.com/jason5ng32/ipcheck-ing" target="_blank" rel="noopener"
+                @click="trackEvent('Additional', 'AdditionalClick', 'Raycast')">
+                <img src="/additional/raycast.webp" alt="IPCheck.ing on Raycast"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </a>
 
-            <div :class="[isMobile ? 'mx-1' : 'mx-3']">
-                <a href="https://lite.ipcheck.ing" target="_blank"
-                    @click="trackEvent('Additional', 'AdditionalClick', 'Lite');">
-                    <img src="/additional/lite.webp" alt="IPCheck.ing lite" :width="[isMobile ? '108' : '180']"
-                        :height="[isMobile ? '39' : '65']">
-                </a>
-            </div>
+            <button type="button" @click="openCurlModal"
+                aria-label="IPCheck.ing for Curl"
+                class="cursor-pointer bg-transparent border-0 p-0">
+                <img src="/additional/curl.webp" alt="IPCheck.ing for Curl"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </button>
+
+            <a href="https://lite.ipcheck.ing" target="_blank" rel="noopener"
+                @click="trackEvent('Additional', 'AdditionalClick', 'Lite')">
+                <img src="/additional/lite.webp" alt="IPCheck.ing lite"
+                    class="w-[108px] sm:w-[180px] h-auto">
+            </a>
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
-import { Modal } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Terminal } from 'lucide-vue-next';
+import { Badge } from '@/components/ui/badge';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
-const configs = computed(() => store.configs);
 
-// 获取 CURL 请求域名
 const ipv4Domain = computed(() => store.curl.ipv4Domain);
 const ipv6Domain = computed(() => store.curl.ipv6Domain);
 const ipv64Domain = computed(() => store.curl.ipv64Domain);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 
-
-// 打开 Modal
+const isOpen = ref(false);
 const openCurlModal = () => {
-    const modalElement = document.getElementById('Curl');
-    const modalInstance = Modal.getOrCreateInstance(modalElement);
-    if (modalInstance) {
-        modalInstance.show();
-    }
-
+    isOpen.value = true;
     trackEvent('Additional', 'AdditionalClick', 'Curl');
 };
 
-
 defineExpose({
-    openCurlModal
+    openCurlModal,
 });
 </script>
 
 <style scoped>
-.jn-add {
-    max-width: 98%;
-    overflow: scroll;
-}
-
 .jn-curl::before {
     content: '$ ';
-    color: #6c757d;
+    color: var(--muted-foreground);
     font-weight: 500;
-    margin-right: 0.5rem;
-}
-
-.jn-comment {
-    margin-left: 26pt;
-    white-space: break-spaces;
+    margin-right: 0.25rem;
+    opacity: 0.7;
 }
 
 .jn-comment::before {
     content: '// ';
-    color: #6c757d;
+    color: var(--muted-foreground);
     font-weight: 500;
-    margin-left: -20pt;
+    opacity: 0.7;
 }
 </style>

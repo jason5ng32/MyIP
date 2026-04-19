@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.claude
 
 node_modules
 dist
@@ -34,3 +35,5 @@ common/maxmind-db/.maxmind-update-*.json
 common/maxmind-db/.maxmind-update.lock
 common/maxmind-db/*.bak
 common/maxmind-db/*.next
+common/maxmind-db/*.mmdb
+.learnings/

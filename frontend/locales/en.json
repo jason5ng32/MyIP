@@ -159,8 +159,6 @@
       "appSettings": "Program Settings",
       "autoRun": "Auto Run",
       "autoRunTips": "If disabled, the app will only check the local IP and will not run tests automatically.",
-      "showMap": "Show Map",
-      "showMapTips": "Displays a map on the IP info card.",
       "simpleMode": "Simple Mode",
       "simpleModeTips": "Reduces the information displayed on IP cards. Effective on mobile devices only.",
       "connectivityAutoRefresh": "Multiple Connectivity Refreshes",
@@ -261,7 +259,6 @@
     "Note": "Checks the availability of target websites in four regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, and Turkey. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
     "Note2": "Please enter a URL or domain name to start the censorship test:",
     "Note3": "A website is only considered blocked if it cannot be accessed from all servers within the same country.",
-    "Run": "Run Test",
     "Placeholder": "URL or Domain Name",
     "Country": "Region",
     "Status": "Status",
@@ -280,7 +277,6 @@
     "Title": "Invisibility Test",
     "Note": "When you use a proxy or VPN, do the websites you visit really not know that you are using a proxy? Are you truly invisible? We will use various methods to try to calculate the vulnerabilities in your disguise and find evidence that you are using a proxy. Although some test results may not be completely accurate, this test is still highly informative.",
     "Note2": "After clicking Run, the system will run a script that usually completes all tests within 10 seconds. During this process, your IP information, browser information, etc. will be collected and analyzed in the background.",
-    "Run": "Run Test",
     "fetchError": "Unable to fetch test results",
     "yourIP": "Your main test IP is",
     "proxyScore": "Proxy Percentage",
@@ -391,7 +387,6 @@
     "Title": "MAC Lookup",
     "Note": "Query the manufacturer of a physical address (MAC address), whether it is unicast/multicast, global/local, etc. Supports querying with a complete 12-digit address or just the prefix. You can also use this tool to verify if the physical address you generated meets your needs.",
     "Note2": "Please enter a physical address to start the query:",
-    "Run": "Query",
     "Placeholder": "F0:2F:4B:01:0A:AA",
     "invalidMAC": "Invalid physical address",
     "fetchError": "Unable to fetch query results",
@@ -420,7 +415,6 @@
     "Note2": "Please enter a domain name or IP address to start the query:",
     "Note3": "Whois information contains various types of fields. The following is the raw text information",
     "Placeholder": "Domain Name or IP",
-    "Run": "Query",
     "invalidURL": "Invalid domain name or IP",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
@@ -430,7 +424,6 @@
     "Note": "In some regions, due to political or commercial reasons, some operators may contaminate certain domain names, resulting in incorrect results when accessed directly. Using DNS resolution checks will help you inspect the resolution results of domain names from well-known DNS providers around the world. Among the built-in DNS tests, some providers are from China, whose DNS resolution results may be contaminated. Please be discerning.",
     "Note2": "Please enter a URL or domain name to start resolution:",
     "Placeholder": "URL or Domain Name",
-    "Run": "Run",
     "invalidURL": "Invalid URL or Domain Name",
     "fetchError": "Unable to fetch resolution results",
     "Provider": "DNS Provider",
@@ -440,7 +433,7 @@
   "ruletest": {
     "Title": "Rule Test",
     "Name": "Test",
-    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software.",
+    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software. Usually, the rule settings may use a format like: DOMAIN, ptest-3.ipcheck.ing, POLICY. The specific format may vary depending on the proxy software you are using.",
     "StatusWait": "Awaiting Test or Test Error",
     "StatusError": "Test Error",
     "Country": "Proxy region",
@@ -452,10 +445,10 @@
     "RefreshWebRTC": "Refresh WebRTC Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
-    "ToggleMaps": "Show/Hide Maps",
     "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
     "CopyIP": "Copy IP Address",
+    "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub",
@@ -484,6 +477,7 @@
     "isProxy": "Proxy",
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
+    "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
@@ -535,8 +529,8 @@
     "id": "webrtc",
     "Title": "WebRTC Test",
     "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
-    "StatusWait": "Awaiting Test or Connection Error",
-    "StatusError": "Test Error",
+    "StatusWait": "Awaiting Test",
+    "StatusError": "Connection Error",
     "NATType": {
       "srflx": "Port Restricted Cone or Symmetric",
       "prflx": "Port Restricted Cone",
@@ -547,11 +541,10 @@
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
-    "Name": "Test",
+    "Name": "DNS Endpoint Test",
     "Title": "DNS Leak Test",
     "Note": "A DNS leak means that when you are connected to a VPN/proxy, your domain name resolutions are still done through your local ISP, thus posing a risk of DNS leaks.",
     "Note2": "The method to test for DNS leaks involves accessing a newly generated domain name to detect which regional DNS exit you are resolving through. If the endpoint region returned matches your local service provider's region, there is a risk of DNS leakage. In this case, you may need to modify your VPN/proxy settings.",
-    "Endpoint": "DNS Endpoint",
     "EndpointCountry": "Endpoint Region",
     "StatusWait": "Awaiting Test",
     "StatusError": "Test Error"
@@ -596,7 +589,6 @@
     "PacketLoss": "Packet Loss",
     "ReceivedPackets": "Received",
     "DroppedPackets": "Dropped",
-    "Run": "Run Test",
     "Error": "Test failed, it looks like your IP is not allowed to perform Ping test."
   },
   "mtrtest": {
@@ -607,14 +599,12 @@
     "Note3": "Please select your IP address for testing.",
     "SelectIP": "Select an IP Address",
     "Region": "Region",
-    "Run": "Run Test",
     "Error": "Test failed, it looks like your IP is not allowed to perform MTR test."
   },
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Check",
     "Placeholder": "Please enter an IP address",
-    "Button": "Check",
     "Error": "Please enter a valid IPv4 or IPv6 address."
   },
   "alert": {
@@ -649,13 +639,13 @@
     "MTRTest": "Open MTR Test panel",
     "RuleTest": "Open Rule Test panel",
     "DNSResolver": "Open DNS Resolution panel",
-    "ToggleMaps": "Toggle Maps",
     "IPCheck": "Query IP Address",
     "ToggleInfoMask": "Toggle Info Masking",
     "Help": "Show Shortcut Keys",
     "HelpNote": "People who use shortcuts are really awesome!",
     "GoNext": "Next Card",
     "GoPrevious": "Previous Card",
+    "OpenHighlightedTool": "Open Highlighted Advanced Tool",
     "RefreshRuleTests": "Refresh Rule Tests",
     "CensorshipCheck": "Open Censorship Check panel",
     "Preferences": "Open Preferences",
@@ -671,7 +661,7 @@
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
     "description": "A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.",
-    "keywords": "MyIP,IP Tool,My IP,IP check,IP lookup,DNS leak test,WebRTC test,Speed test,DNS lookup,Whois lookup, Ping test, privacy test",
+    "keywords": "MyIP, IP tool, IP check, IP lookup, DNS leak test, WebRTC test, speed test, DNS lookup, WHOIS lookup, ping test, privacy test",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",
@@ -684,7 +674,7 @@
     "Title": "About",
     "product1": "IPCheck.ing is a free IP toolbox that helps you check your IP information, test website availability, examine DNS exit information, perform speed tests, global latency tests, MTR tests, and more.",
     "product2": "This is an open-source project, and you can view the source code by clicking on the GitHub icon at the bottom of the page.",
-    "product3": "Initially, this was a personal project for me to learn Vue.js and how to write code using ChatGPT. Over time, it gained more stars on GitHub, so I did a lot of refactoring and added many useful features. I hope you will enjoy it.",
+    "product3": "Initially, this was a personal project for me to learn Vue.js and how to write code using AI. Over time, it gained more stars on GitHub, so I did a lot of refactoring and added many useful features. I hope you will enjoy it.",
     "meTitle": "About Me",
     "me1": "My name is Jason Ng, also known as Achán online. I'm not a professional programmer, but I love coding, open-source, and sharing.",
     "me2": "Most of the time, I work as a product manager, a blogger, a motorcyle rider and a geek.",
@@ -705,506 +695,6 @@
     "Title": "Changelog",
     "add": "Added",
     "improve": "Improved",
-    "fix": "Fixed",
-    "versions": [
-      {
-        "version": "v1.0",
-        "date": "Nov 06, 2020",
-        "content": [
-          {
-            "type": "add",
-            "change": "Display user's IP information"
-          },
-          {
-            "type": "add",
-            "change": "Display IP information before and after proxy"
-          },
-          {
-            "type": "add",
-            "change": "Check website availability"
-          }
-        ]
-      },
-      {
-        "version": "v2.0",
-        "date": "Nov 24, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Refactored the entire project using Vue2"
-          },
-          {
-            "type": "improve",
-            "change": "Refactored UI using Bootstrap v5"
-          }
-        ]
-      },
-      {
-        "version": "v2.1",
-        "date": "Nov 25, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added WebRTC test"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized program logic"
-          }
-        ]
-      },
-      {
-        "version": "v2.2",
-        "date": "Nov 26, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added DNS leak test"
-          },
-          {
-            "type": "add",
-            "change": "Support displaying Bing maps in the frontend"
-          },
-          {
-            "type": "improve",
-            "change": "Multiple logic optimizations"
-          }
-        ]
-      },
-      {
-        "version": "v2.3",
-        "date": "Nov 27, 2023 ",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added dark mode"
-          },
-          {
-            "type": "add",
-            "change": "Added minimalist mode for mobile"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized file structure"
-          }
-        ]
-      },
-      {
-        "version": "v2.4",
-        "date": "Dec 1, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added support for English language"
-          },
-          {
-            "type": "add",
-            "change": "Added information masking feature"
-          },
-          {
-            "type": "add",
-            "change": "Support PWA, can be installed on mobile and desktop"
-          }
-        ]
-      },
-      {
-        "version": "v2.5",
-        "date": "Dec 20, 2023",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added support for keyboard shortcuts"
-          },
-          {
-            "type": "add",
-            "change": "Added website speed test feature"
-          },
-          {
-            "type": "improve",
-            "change": "Support deployment using Docker"
-          },
-          {
-            "type": "improve",
-            "change": "Support retrieving IP geolocation information from multiple sources"
-          }
-        ]
-      },
-      {
-        "version": "v3.0",
-        "date": "Jan 28, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Refactored the entire project using Vite + Vue3"
-          },
-          {
-            "type": "add",
-            "change": "Added global latency test feature"
-          },
-          {
-            "type": "add",
-            "change": "Added MTR test feature"
-          },
-          {
-            "type": "improve",
-            "change": "Multiple performance and user experience optimizations"
-          }
-        ]
-      },
-      {
-        "version": "v3.1",
-        "date": "Jan 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added support for a new language: French"
-          },
-          {
-            "type": "add",
-            "change": "Added loading animation"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized caching strategy"
-          },
-          {
-            "type": "improve",
-            "change": "Adjusted dark mode styles"
-          },
-          {
-            "type": "fix",
-            "change": "Fixed some minor issues"
-          }
-        ]
-      },
-      {
-        "version": "v3.2",
-        "date": "Feb 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added NAT type detection"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized PWA application experience"
-          },
-          {
-            "type": "improve",
-            "change": "Enhanced backend script security"
-          }
-        ]
-      },
-      {
-        "version": "v3.3",
-        "date": "Feb 6, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added support for using different IP geolocation sources"
-          },
-          {
-            "type": "improve",
-            "change": "Improved user experience for connection availability detection"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized UI experience"
-          }
-        ]
-      },
-      {
-        "version": "v3.4",
-        "date": "Feb 17, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added ASN details viewer"
-          },
-          {
-            "type": "add",
-            "change": "Added proxy detection feature"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized UI for displaying IP information"
-          }
-        ]
-      },
-      {
-        "version": "v3.5",
-        "date": "Mar 3, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added rule test feature"
-          },
-          {
-            "type": "improve",
-            "change": "Some Improvements"
-          }
-        ]
-      },
-      {
-        "version": "v3.6",
-        "date": "Mar 10, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added DNS resolution feature"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized home page structure, advanced features are now collapsible"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized program logic"
-          }
-        ]
-      },
-      {
-        "version": "v3.7",
-        "date": "Apr 26, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added censorship test feature"
-          },
-          {
-            "type": "add",
-            "change": "Network speed test now allows custom packet size"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized some functional logic"
-          }
-        ]
-      },
-      {
-        "version": "v3.8",
-        "date": "May 4, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added preferences panel to save settings locally"
-          },
-          {
-            "type": "add",
-            "change": "Allow customization of multiple default behaviors on second program launch"
-          },
-          {
-            "type": "improve",
-            "change": "Significantly optimized program logic"
-          },
-          {
-            "type": "fix",
-            "change": "Fixed some minor issues"
-          }
-        ]
-      },
-      {
-        "version": "v3.9",
-        "date": "May 8, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added Whois search feature"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized display and animation effects for advanced tools"
-          },
-          {
-            "type": "fix",
-            "change": "Fixed some minor issues"
-          }
-        ]
-      },
-      {
-        "version": "v4.0",
-        "date": "May 13, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Refactored the entire project using Vue 3's Composition API"
-          },
-          {
-            "type": "add",
-            "change": "Split the frontend into multiple modules to improve maintainability"
-          },
-          {
-            "type": "add",
-            "change": "Added Invisibility Test feature (Beta)"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized backend program dependencies"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized numerous details"
-          }
-        ]
-      },
-      {
-        "version": "v4.1",
-        "date": "July 11, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added MAC address lookup feature"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized numerous details"
-          }
-        ]
-      },
-      {
-        "version": "v4.2",
-        "date": "Sept 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added browser information query feature"
-          },
-          {
-            "type": "add",
-            "change": "Added MaxMind GeoIP database"
-          },
-          {
-            "type": "improve",
-            "change": "Multiple experience enhancements"
-          }
-        ]
-      },
-      {
-        "version": "v4.3",
-        "date": "Oct 30, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added command line API feature"
-          },
-          {
-            "type": "improve",
-            "change": "WebRTC test can now display regional information"
-          },
-          {
-            "type": "improve",
-            "change": "DNS leak test can now display regional information"
-          }
-        ]
-      },
-      {
-        "version": "v4.4",
-        "date": "Dec 7, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Language preferences"
-          },
-          {
-            "type": "improve",
-            "change": "Map provider changed to Google"
-          },
-          {
-            "type": "improve",
-            "change": "Other general optimizations"
-          }
-        ]
-      },
-      {
-        "version": "v4.5",
-        "date": "Dec 25, 2024",
-        "content": [
-          {
-            "type": "add",
-            "change": "Add Security Checklist"
-          },
-          {
-            "type": "improve",
-            "change": "Other general optimizations"
-          }
-        ]
-      },
-      {
-        "version": "v5.0",
-        "date": "Jan 31, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "Add user system"
-          },
-          {
-            "type": "add",
-            "change": "Add user achievement system"
-          },
-          {
-            "type": "add",
-            "change": "Add Lite version"
-          },
-          {
-            "type": "add",
-            "change": "Speed test can now display data change charts"
-          },
-          {
-            "type": "improve",
-            "change": "Code efficiency optimization"
-          }
-        ]
-      },
-      {
-        "version": "v5.1",
-        "date": "Nov 12, 2025",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added support for Turkish language"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized code efficiency"
-          }
-        ]
-      },
-      {
-        "version": "v5.2",
-        "date": "Jan 05, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "Enhanced ASN information richness"
-          },
-          {
-            "type": "add",
-            "change": "Added IP quality score display"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized code efficiency"
-          }
-        ]
-      },
-      {
-        "version": "v5.3",
-        "date": "Apr 14, 2026",
-        "content": [
-          {
-            "type": "add",
-            "change": "Added MaxMind GeoIP database auto-update"
-          },
-          {
-            "type": "improve",
-            "change": "Optimized caching strategy"
-          },
-          {
-            "type": "improve",
-            "change": "Significantly improved build speed"
-          }
-        ]
-      }
-    ]
+    "fix": "Fixed"
   }
 }

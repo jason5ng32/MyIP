@@ -1,226 +1,216 @@
 <template>
-  <footer>
-    <div id="copyleft">
-      <p class="text-center"><span>Created by Jason Ng with love</span> <a :href="t('page.footerLink')"
-          class="link-dark" target="_blank" @click="trackEvent('Footer', 'FooterClick', 'Github');"
-          aria-label="Github"><i class="bi bi-github" :class="{ 'dark-mode': isDarkMode }"
-            v-tooltip="{ title: t('Tooltips.GithubLink'), placement: 'top' }"></i></a>
-      </p>
+  <footer class="mt-10 pb-6 text-sm text-muted-foreground">
+    <!-- Author + Github -->
+    <div class="flex items-center justify-center gap-1.5 mb-3">
+      <span>Created by Jason Ng with love</span>
+      <JnTooltip :text="t('Tooltips.GithubLink')" side="top">
+        <Button variant="ghost" size="icon" as-child class="size-6 text-foreground/70 hover:text-foreground">
+          <a :href="t('page.footerLink')" target="_blank" rel="noopener" aria-label="Github"
+            @click="trackEvent('Footer', 'FooterClick', 'Github')">
+            <Github />
+          </a>
+        </Button>
+      </JnTooltip>
     </div>
 
-    <div id="about" class="text-center mb-2">
-      <a class="link link-underline-offset link-underline-opacity-0 jn-heart-color" role="button"
-        aria-controls="Sponsor" href="https://github.com/sponsors/jason5ng32" target="_blank">
-        {{ t('about.Sponsor') }} 💖
-      </a>&nbsp;&nbsp;
-      <a class="link link-underline-offset link-underline-opacity-0" :class="[isDarkMode ? 'link-light' : 'link-dark']"
-        role="button" aria-controls="About" @click.prevent="openAbout">
-        {{ t('about.Title') }} <i class="bi bi-arrow-left-circle-fill"></i>
+    <!-- Sponsor / About entry -->
+    <div class="flex items-center justify-center gap-2 mb-3">
+      <Button variant="link" size="default" as-child class="text-[#d63384] hover:text-[#d63384]">
+        <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener">
+          {{ t('about.Sponsor') }} 💖
+        </a>
+      </Button>
+      <Button variant="ghost" size="default" @click="openAbout" class="cursor-pointer">
+        {{ t('about.Title') }}
+        <ArrowLeftCircle class="size-3.5" />
+      </Button>
+    </div>
+
+    <!-- Copyright -->
+    <p v-if="!configs.originalSite" class="text-center text-xs opacity-70">
+      {{ t('page.copyRightName') }}
+      <a :href="t('page.copyRightLink')" target="_blank" rel="noopener"
+        class="text-foreground/80 hover:text-foreground hover:underline">
+        {{ t('page.copyRightLinkName') }}
       </a>
-    </div>
+    </p>
 
-    <div class="offcanvas offcanvas-end mt-5 border-0 h-100" :class="[isMobile ? ' w-100' : '']" tabindex="-1"
-      id="About" aria-labelledby="AboutLabel" :data-bs-theme="isDarkMode ? 'dark' : 'light'">
-      <div class="offcanvas-header mt-3">
-        <div class="btn-group" role="group">
-          <template v-for="show in ['about', 'changelog', 'specialthanks']">
-            <input v-model="content" type="radio" class="btn-check" :name="'About_' + show" :id="'About_' + show"
-              autocomplete="off" :value=show @change="toggleContent(show)">
-            <label class="btn jn-number" :class="{
-              'btn-outline-dark': !isDarkMode,
-              'btn-outline-light': isDarkMode,
-              'active fw-bold': show === content
-            }" :for="'About_' + show">
-              {{ t(show + '.Title') }}
-            </label>
-          </template>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body" ref="offcanvasBody">
-        <div v-if="showAbout">
-          <div class="mb-3">
-            <p v-for="i in 3" :key="i">
-              {{ t(`about.product${i}`) }}
-            </p>
-          </div>
-          <h5>{{ t('about.meTitle') }}</h5>
-          <div class="mb-3">
-            <p v-for="i in 3" :key="i">
-              {{ t(`about.me${i}`) }}
-            </p>
-          </div>
-          <div class="mb-3 mx-2">
-            <p>
-              <a href="https://wujiaxian.com" class="link-success link-underline-opacity-0" target="_blank"><i
-                  class="bi bi-browser-safari"></i> {{ t('about.personal') }}</a>
-            </p>
-            <p>
-              <a href="https://kenengba.com" class="link-success link-underline-opacity-0" target="_blank"><i
-                  class="bi bi-browser-safari"></i> {{ t('about.blog') }}</a>
-            </p>
-            <p>
-              <a href="https://retire.money" class="link-success link-underline-opacity-0" target="_blank"><i
-                  class="bi bi-browser-safari"></i> {{ t('about.retiremoney') }}</a>
-            </p>
-            <p>
-              <a href="https://twitter.com/jason5ng32" class="link-success link-underline-opacity-0" target="_blank"><i
-                  class="bi bi-browser-safari"></i> {{ t('about.twitter') }}</a>
-            </p>
-          </div>
-          <h5>{{ t('about.contactTitle') }}</h5>
-          <div v-html="t('about.contact')" class="mb-3">
-          </div>
-        </div>
-        <div v-if="showChangelog">
-          <div v-for="(version, index) in changelog.slice().reverse()" :key="index" class="mb-4">
-            <div class="row align-items-center">
-              <div class="col-6 fw-bold fs-5">{{ version.version }}</div>
-              <div class="col-6 row flex-row-reverse text-secondary">{{ version.date }}</div>
-            </div>
-            <hr>
-
-            <div v-for="(item, idx) in version.content" :key="idx" class="pb-1 ">
-              <span v-if="item.type === 'add'" class="badge  rounded-pill bg-success fw-normal ">{{ t('changelog.add')
-                }}</span>
-              <span v-else-if="item.type === 'improve'" class="badge rounded-pill bg-info fw-normal">{{
-                t('changelog.improve') }}</span>
-              <span v-else-if="item.type === 'fix'" class="badge  rounded-pill bg-danger fw-normal">{{
-                t('changelog.fix')
-                }}</span>
-              <span class="mx-2">{{ item.change }}</span>
-            </div>
-          </div>
-        </div>
-        <div v-if="showSpecialThanks">
-          <div class="mb-3">
-            <p>
-              {{ t('specialthanks.Note1') }}
-            </p>
+    <!-- About Sheet -->
+    <Sheet :open="isOpen" @update:open="onOpenChange">
+      <SheetContent side="right" :title="t('about.Title')"
+        :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]']">
+        <Tabs v-model="content" class="flex flex-col h-full">
+          <!-- Top: tabs + close -->
+          <div class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
+            <TabsList>
+              <TabsTrigger v-for="tab in tabs" :key="tab" :value="tab">
+                {{ t(tab + '.Title') }}
+              </TabsTrigger>
+            </TabsList>
+            <SheetClose
+              class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
           </div>
 
-          <div v-for="(item, index) in thanksList" :key="index" class="mb-3 fst-italic">
-            <i class="bi bi-emoji-smile-fill "></i> {{ item.name }}
-            <a v-if="item.link" :class="[isDarkMode ? 'link-light' : 'link-dark']" :href="item.link" target="_blank">
-              <i class="bi bi-arrow-up-right-square"></i>
-            </a>
+          <!-- Content area (independent scrolling) -->
+          <div class="flex-1 overflow-y-auto px-5 py-5" ref="sheetBody">
+            <!-- About -->
+            <TabsContent value="about" class="space-y-6 mt-0">
+              <section class="space-y-2">
+                <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
+                  {{ t(`about.product${i}`) }}
+                </p>
+              </section>
+
+              <section>
+                <h3 class="text-base font-semibold mb-2">{{ t('about.meTitle') }}</h3>
+                <div class="space-y-2 mb-3">
+                  <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
+                    {{ t(`about.me${i}`) }}
+                  </p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Button v-for="link in personalLinks" :key="link.href" variant="outline" size="sm" as-child
+                    class="justify-start">
+                    <a :href="link.href" target="_blank" rel="noopener">
+                      <Compass />
+                      <span class="flex-1 text-left">{{ t(link.labelKey) }}</span>
+                      <ExternalLink class="opacity-50" />
+                    </a>
+                  </Button>
+                </div>
+              </section>
+
+              <section>
+                <h3 class="text-base font-semibold mb-2">{{ t('about.contactTitle') }}</h3>
+                <div class="text-sm leading-relaxed text-foreground/85" v-html="t('about.contact')"></div>
+              </section>
+            </TabsContent>
+
+            <!-- Changelog -->
+            <!-- Data lives in frontend/data/changelog.json (shared version / date, per-lang change text).
+                Badge labels and the section title stay in locale files as UI chrome. -->
+            <TabsContent value="changelog" class="space-y-6 mt-0">
+              <section v-for="(version, vi) in changelogReversed" :key="vi">
+                <header class="flex items-baseline justify-between mb-2">
+                  <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ version.date }}</span>
+                </header>
+                <Separator class="mb-3" />
+                <ul class="space-y-2">
+                  <li v-for="(item, idx) in version.content" :key="idx" class="flex items-start gap-2 text-sm">
+                    <Badge :class="changelogBadgeClass(item.type)"
+                      class="shrink-0 shadow-none! rounded-full justify-center text-secondary p-1" 
+                      :title="t('changelog.' + item.type)"
+                      >
+                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-4" />
+                      <CirclePlus v-if="item.type === 'add'" class="size-4" />
+                      <BugOff v-if="item.type === 'fix'" class="size-4" />
+                    </Badge>
+                    <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
+                  </li>
+                </ul>
+              </section>
+            </TabsContent>
+
+            <!-- Special Thanks -->
+            <TabsContent value="specialthanks" class="space-y-4 mt-0">
+              <p class="text-sm text-muted-foreground leading-relaxed">{{ t('specialthanks.Note1') }}</p>
+              <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 list-none p-0">
+                <li v-for="(item, idx) in thanksList" :key="idx">
+                  <Button v-if="item.link" variant="outline" size="sm" as-child class="w-full justify-start">
+                    <a :href="item.link" target="_blank" rel="noopener">
+                      <Smile />
+                      <span class="flex-1 text-left truncate">{{ item.name }}</span>
+                      <SquareArrowOutUpRight class="opacity-50" />
+                    </a>
+                  </Button>
+                  <div v-else
+                    class="flex items-center gap-2 h-8 px-3 text-sm rounded-md border bg-card text-foreground/80">
+                    <Smile class="size-4 text-muted-foreground shrink-0" />
+                    <span class="truncate">{{ item.name }}</span>
+                  </div>
+                </li>
+              </ul>
+            </TabsContent>
           </div>
-
-        </div>
-
-        <div id="offcanvasPlaceholder mb-5" class="jn-placeholder mb-5">
-        </div>
-
-      </div>
-    </div>
-
-    <div id="copyright" v-if="!configs.originalSite">
-      <p class="text-center fs-6 fw-light" style="opacity: 0.5;">
-        {{ t('page.copyRightName') }} <a :href="t('page.copyRightLink')" class="link-underline-light" target="_blank"
-          :class="[isDarkMode ? 'link-light' : 'link-dark']">{{ t('page.copyRightLinkName') }}</a>
-      </p>
-    </div>
+        </Tabs>
+      </SheetContent>
+    </Sheet>
   </footer>
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
-import { Offcanvas } from 'bootstrap';
 import { useI18n } from 'vue-i18n';
+import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/use-analytics';
+import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from 'lucide-vue-next';
 
-const { t, tm } = useI18n();
+const { t, locale } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 
+const tabs = ['about', 'changelog', 'specialthanks'];
 const content = ref('about');
-const showAbout = ref(true);
-const showChangelog = ref(false);
-const showSpecialThanks = ref(false);
-const changelog = reactive(tm('changelog.versions'));
+// Static data from JSON — reverse once via computed so the template stays tidy.
+const changelogReversed = computed(() => changelogData.slice().reverse());
+const sheetBody = ref(null);
+
+const personalLinks = [
+  { href: 'https://wujiaxian.com', labelKey: 'about.personal' },
+  { href: 'https://kenengba.com', labelKey: 'about.blog' },
+  { href: 'https://retire.money', labelKey: 'about.retiremoney' },
+  { href: 'https://twitter.com/jason5ng32', labelKey: 'about.twitter' },
+];
 
 const thanksList = [
-  {
-    name: 'Setilis Hu',
-    link: ''
-  },
-  {
-    name: 'Seven Yu',
-    link: 'https://github.com/dofy'
-  },
-  {
-    name: 'Nikolai Tschacher',
-    link: 'https://incolumitas.com/pages/about/'
-  },
-  {
-    name: 'Project Alexandria (Cloudflare)',
-    link: 'https://www.cloudflare.com/lp/project-alexandria/'
-  },
-  {
-    name: 'Cloudflare Speedtest',
-    link: 'https://github.com/cloudflare/speedtest'
-  },
-  {
-    name: 'Globalping by jsDelivr',
-    link: 'https://globalping.io/'
-  },
-  {
-    name: 'ProxyCheck.io',
-    link: 'https://proxycheck.io/'
-  },
-  {
-    name: 'Digital Defense',
-    link: 'https://digital-defense.io/'
-  },
-  {
-    name: 'ChatGPT',
-    link: 'https://chatgpt.com/'
-  }
-]
+  { name: 'Setilis Hu', link: '' },
+  { name: 'Seven Yu', link: 'https://github.com/dofy' },
+  { name: 'Nikolai Tschacher', link: 'https://incolumitas.com/pages/about/' },
+  { name: 'Project Alexandria (Cloudflare)', link: 'https://www.cloudflare.com/lp/project-alexandria/' },
+  { name: 'Cloudflare Speedtest', link: 'https://github.com/cloudflare/speedtest' },
+  { name: 'Globalping by jsDelivr', link: 'https://globalping.io/' },
+  { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
+  { name: 'Digital Defense', link: 'https://digital-defense.io/' },
+  { name: 'ChatGPT', link: 'https://chatgpt.com/' },
+  { name: 'Claude', link: 'https://claude.ai/' },
+];
+
+// changelog type → semantic color token: add → success; improve → info; fix → destructive
+const changelogBadgeClass = (type) => {
+  if (type === 'add') return 'bg-success ';
+  if (type === 'improve') return 'bg-info ';
+  if (type === 'fix') return 'bg-destructive ';
+  return '';
+};
+
+// Sheet toggle and store.openSheet bidirectional binding
+const isOpen = computed(() => store.openSheet === 'about');
+const onOpenChange = (val) => {
+  store.setOpenSheet(val ? 'about' : null);
+};
 
 const openAbout = () => {
-  var offcanvasElement = document.getElementById('About');
-  var offcanvas = Offcanvas.getInstance(offcanvasElement) || new Offcanvas(offcanvasElement);
-  if (offcanvasElement.classList.contains('show')) {
-    offcanvas.hide();
-  } else {
-    offcanvas.show();
-  }
-
+  store.toggleSheet('about');
   trackEvent('Footer', 'FooterClick', 'About');
-
 };
 
-const offcanvasBody = ref(null);
-
-const toggleContent = (contentType) => {
-  showAbout.value = contentType === 'about';
-  showChangelog.value = contentType === 'changelog';
-  showSpecialThanks.value = contentType === 'specialthanks';
-  content.value = contentType;
-  offcanvasBody.scrollTop = 0;
-};
+watch(content, () => {
+  nextTick(() => {
+    if (sheetBody.value) sheetBody.value.scrollTop = 0;
+  });
+});
 
 defineExpose({
-  openAbout
+  openAbout,
 });
 </script>
-
-<style scoped>
-#About {
-  z-index: 1051;
-}
-
-.jn-placeholder {
-  height: 20pt;
-}
-
-.jn-heart-color {
-  color: #d63384;
-  text-decoration: none;
-}
-</style>

@@ -1,9 +1,10 @@
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 MyExternalIP 获取 IPv4 地址
+// Get IPv4 address from MyExternalIP
 const getIPFromMyExternalIP_V4 = async () => {
     try {
-        const response = await fetch("https://ipv4.myexternalip.com/json");
+        const response = await fetchWithTimeout("https://ipv4.myexternalip.com/json");
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }

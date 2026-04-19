@@ -1,62 +1,71 @@
 <template>
-    <div>
-        <!-- RuleTest -->
-        <div class="rule-test-section my-4">
-            <div class="text-secondary">
-                <p>{{ t('ruletest.Note') }}</p>
-            </div>
-            <div class="row">
-                <div v-for="test in ruleTests" :key="test.id" class="col-lg-3 col-md-6 col-12 mb-4">
-                    <div class="card jn-card"
-                        :class="{ 'dark-mode dark-mode-border': isDarkMode, 'jn-hover-card': !isMobile }">
-                        <div class="card-body">
-                            <p class="jn-con-title card-title"><i class="bi bi-signpost-split-fill"></i>
-                                {{ test.name }}
-                                <i class="bi" :class="'bi-' + (test.id) + '-square'"></i>&nbsp;
-                            </p>
+    <div class="rule-test-section my-4 space-y-4">
+        <!-- Top note -->
+        <p class="text-sm text-muted-foreground">{{ t('ruletest.Note') }}</p>
 
-                            <p class="card-text text-secondary" style="font-size: 10pt;">
-                                <i class="bi bi-hdd-network-fill"></i>
-                                {{ test.url }}
-                            </p>
-                            <p class="card-text" :class="{
-                                'text-info': test.ip === t('ruletest.StatusWait'),
-                                'text-success': test.ip.includes('.') || test.ip.includes(':'),
-                                'text-danger': test.ip === t('ruletest.StatusError')
-                            }">
-                                <i class="bi"
-                                    :class="[test.ip === t('ruletest.StatusWait') ? 'bi-hourglass-split' : 'bi-pc-display-horizontal']">&nbsp;</i>
-                                <span :class="{ 'jn-ip-font': test.ip.length > 32 }">{{ test.ip }}</span>
-                            </p>
-                            <div class="alert" :class="{
-                                'alert-info': test.country === t('ruletest.StatusWait'),
-                                'alert-danger': test.country === t('ruletest.StatusError'),
-                                'alert-success': test.country !== t('ruletest.StatusWait') && test.country !== t('ruletest.StatusError'),
-                            }" :data-bs-theme="isDarkMode ? 'dark' : ''">
-                                <i class="bi"
-                                    :class="[test.ip === t('ruletest.StatusWait') || test.ip === t('ruletest.StatusError') ? 'bi-hourglass-split' : 'bi-geo-alt-fill']"></i>
-                                {{ t('ruletest.Country') }}: <strong>{{ test.country }}&nbsp;</strong>
-                                <span v-show="test.country_code"
-                                    :class="'jn-fl fi fi-' + test.country_code.toLowerCase()"></span>
-                            </div>
+        <!-- Card grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card v-for="test in ruleTests" :key="test.id"
+                class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
+                <CardContent class="p-4">
+                    <!-- Top: icon + name + #id -->
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <Waypoints class="size-6 text-muted-foreground shrink-0" />
+                            <span class="text-base font-medium truncate">{{ test.name }}</span>
+                            <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
                         </div>
+
                     </div>
-                </div>
-                <div class="flex justify-content-center col-12" :class="[
-                    isMobile ? '' : 'text-center mt-4',
-                ]">
-                    <button class="btn" :class="[
-                    finishAll? 'btn-success' : 'btn-info',
-                    isMobile ? 'w-100' : 'w-25'
-                    ]" :disabled="!finishAll" @click="checkAllRuleTest(true)">
-                        <span v-if="finishAll"><i class="bi bi-arrow-clockwise"></i> {{t('ruletest.RefreshAll')}}</span>
-                        <span v-else class="spinner-grow spinner-grow-sm bg-white" aria-hidden="true"></span>
-                    </button>
-                </div>
-            </div>
 
+                    <!-- URL (secondary information) -->
+                    <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="test.url">
+                        {{ test.url }}
+                    </p>
 
+                    <!-- IP row: status light + IP (long IPv6 font downgrade) -->
+                    <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
+                        <span class="relative flex shrink-0">
+                            <span v-if="toneOf(test) === 'wait'"
+                                class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
+                            <span class="relative inline-flex size-2 rounded-full"
+                                :class="dotClass(toneOf(test))"></span>
+                        </span>
+                        <span class="font-mono whitespace-nowrap truncate min-w-0"
+                            :class="[fitOneLineClass(test.ip), textClass(toneOf(test))]" :title="test.ip">{{ test.ip
+                            }}</span>
+                    </div>
 
+                    <!-- Country sub-block -->
+                    <dl class="rounded-md bg-muted/50 p-3 text-sm">
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <MapPin class="size-3.5" />
+                                <span>{{ t('ruletest.Country') }}</span>
+                            </dt>
+                            <dd class="font-medium flex items-center gap-1.5 flex-wrap">
+                                <template v-if="!isFieldPending(test.country)">
+                                    <Icon v-if="test.country_code"
+                                        :icon="'circle-flags:' + test.country_code.toLowerCase()"
+                                        class="shrink-0 size-4" />
+                                    <span class="wrap-break-word">{{ test.country }}</span>
+                                </template>
+                                <span v-else class="text-muted-foreground font-normal">—</span>
+                            </dd>
+                        </div>
+                    </dl>
+                </CardContent>
+            </Card>
+        </div>
+
+        <!-- Bottom RefreshAll button (action color + Spinner standard) -->
+        <div class="flex justify-center pt-2">
+            <Button variant="action" :disabled="!finishAll" class="cursor-pointer"
+                :class="[isMobile ? 'w-full' : 'w-64']" @click="checkAllRuleTest(true)">
+                <Spinner v-if="!finishAll" />
+                <RotateCw v-else />
+                {{ t('ruletest.RefreshAll') }}
+            </Button>
         </div>
     </div>
 </template>
@@ -65,15 +74,21 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import getCountryName from '@/utils/country-name.js';
+import getCountryName from '@/data/country-name.js';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import { Icon } from '@iconify/vue';
+import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
+const { dotClass, textClass } = useStatusTone();
 
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
@@ -92,20 +107,40 @@ const IPArray = ref([]);
 const testCount = ref(ruleTests.value.length);
 const finishAll = ref(false);
 
+// Business status → 4 tone levels
+const toneOf = (test) => {
+    if (test.ip === t('ruletest.StatusWait')) return 'wait';
+    if (test.ip === t('ruletest.StatusError')) return 'fail';
+    if (test.ip.includes('.') || test.ip.includes(':')) return 'ok-fast';
+    return 'wait';
+};
+
+const isFieldPending = (value) => {
+    return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
+};
+
+// IP font downgrade: IPv4 ≤15 base; short compressed IPv6 ≤26 sm; full IPv6 xs
+const fitOneLineClass = (text) => {
+    const len = typeof text === 'string' ? text.length : 0;
+    if (len <= 15) return 'text-base';
+    if (len <= 26) return 'text-sm';
+    return 'text-sm md:text-xs';
+};
+
 const fetchTrace = async (id, url) => {
     try {
         const response = await fetch(`https://${url}/cdn-cgi/trace`);
         const data = await response.text();
-        const lines = data.split("\n");
-        const ipLine = lines.find((line) => line.startsWith("ip="));
-        const countryLine = lines.find((line) => line.startsWith("loc="));
+        const lines = data.split('\n');
+        const ipLine = lines.find((line) => line.startsWith('ip='));
+        const countryLine = lines.find((line) => line.startsWith('loc='));
         if (ipLine) {
-            const ip = ipLine.split("=")[1];
+            const ip = ipLine.split('=')[1];
             ruleTests.value[id].ip = ip;
             IPArray.value = [...IPArray.value, ip];
         }
         if (countryLine) {
-            const country = countryLine.split("=")[1];
+            const country = countryLine.split('=')[1];
             ruleTests.value[id].country_code = country;
             ruleTests.value[id].country = getCountryName(country, lang.value);
         }
@@ -113,11 +148,10 @@ const fetchTrace = async (id, url) => {
         ruleTests.value[id].ip = t('ruletest.StatusError');
         ruleTests.value[id].country_code = '';
         ruleTests.value[id].country = t('ruletest.StatusError');
-        console.error("Error fetching Data:", error);
+        console.error('Error fetching Data:', error);
     }
 };
 
-// 检查所有 RuleTest
 const checkAllRuleTest = async (refresh = false) => {
     finishAll.value = false;
     if (refresh) {
@@ -133,47 +167,33 @@ const checkAllRuleTest = async (refresh = false) => {
             try {
                 await fetchTrace(index, ruleTests.value[index].url);
             } catch (error) {
-                console.error("Error fetching Data:", error);
+                console.error('Error fetching Data:', error);
             } finally {
                 processTest(index + 1);
                 if (index === testCount.value - 1) {
                     finishAll.value = true;
-                    if (isSignedIn.value) {
-                        checkAchievements();
-                    }
+                    if (isSignedIn.value) checkAchievements();
                 }
             }
         }
     };
 
-
     processTest(0);
 };
 
-// 检查是否达成成就
 const checkAchievements = () => {
     const allIPs = ruleTests.value.map((test) => test.ip);
     const uniqueIPs = [...new Set(allIPs)];
-    if (uniqueIPs.length === 8) {
-        if (!store.userAchievements.CrossingTheWall.achieved) {
-            store.setTriggerUpdateAchievements('CrossingTheWall');
-        }
+    if (uniqueIPs.length === 8 && !store.userAchievements.CrossingTheWall.achieved) {
+        store.setTriggerUpdateAchievements('CrossingTheWall');
     }
-}
+};
 
 onMounted(() => {
-    setTimeout(() => {
-        checkAllRuleTest();
-    }, 1000);
+    setTimeout(() => { checkAllRuleTest(); }, 1000);
 });
 
 watch(IPArray, () => {
     store.updateAllIPs(IPArray.value);
 }, { deep: true });
 </script>
-
-<style scoped>
-.jn-text-warning {
-    color: #c67c14;
-}
-</style>

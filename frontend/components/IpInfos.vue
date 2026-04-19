@@ -1,22 +1,27 @@
 <template>
   <!-- IP Infos -->
-  <div class="ip-data-section mb-4 mt-4">
-    <div class="jn-title2">
-      <h2 id="IPInfo" class="col-4" :class="{ 'mobile-h2': isMobile }">🔎 {{ t('ipInfos.Title') }}</h2>
-    </div>
-    <div class="text-secondary">
-      <p>{{ t('ipInfos.Notes') }}</p>
-    </div>
-    <div class="row">
-      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" :class="[colClass, {
-        'jn-opacity': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error')
-      }]">
-        <IPCard :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile" :ipGeoSource="ipGeoSource"
-          :isMapShown="isMapShown" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus" :configs="configs"
-          :asnInfos="asnInfos" @refresh-card="refreshCard" />
+  <section class="ip-data-section mb-10 mt-2">
+    <header class="mb-2 flex flex-col items-start justify-between gap-4">
+      <h2 id="IPInfo"
+        class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+        🔎 {{ t('ipInfos.Title') }}
+      </h2>
+      <div class="text-base text-muted-foreground">
+        <p>{{ t('ipInfos.Notes') }}</p>
+      </div>
+    </header>
+
+    <!-- Card grid: 1 col on mobile, always 2 cols on PC (md+). Card counts
+         (2 / 4 / 6) are all even, so the last row always fills. -->
+    <div class="grid gap-4 items-stretch grid-cols-1 md:grid-cols-2">
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" class="flex"
+        :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
+        <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
+          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
+          :configs="configs" :asnInfos="asnInfos" @refresh-card="refreshCard" />
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 
@@ -42,22 +47,10 @@ const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
 
-// 页面的动态配置
-const isMapShown = computed(() => userPreferences.value.showMap);
+// Dynamic configuration of the page
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
-// 创建样式
-const colClass = computed(() => {
-  const numCards = ipCardsToShow.value;
-  if (numCards > 0) {
-    // 保证每行不超过三个卡片
-    const colSize = numCards > 3 ? 4 : Math.floor(12 / numCards);
-    return `col-xl-${colSize} col-md-${colSize}  mb-4`;
-  }
-  return 'col-xl-4 col-lg-6 col-md-6 mb-4'; // 默认情况
-});
-
-// 默认卡片数据
+// Default card data
 const createDefaultCard = () => ({
   ip: "",
   country_name: "",
@@ -72,13 +65,10 @@ const createDefaultCard = () => ({
   mapUrl_dark: '/res/defaultMap_dark.webp',
 });
 
-// IP 数据卡片
+// IP data cards
+// Order: v4, v6, CF-v4, CF-v6, CN, v64
+// First 2 / 4 / 6 slice is meaningful at every count the user can pick.
 const ipDataCards = reactive([
-  {
-    ...createDefaultCard(),
-    id: "ipchecking_v64",
-    source: "IPCheck.ing IPv6/4",
-  },
   {
     ...createDefaultCard(),
     id: "ipchecking_v4",
@@ -91,11 +81,6 @@ const ipDataCards = reactive([
   },
   {
     ...createDefaultCard(),
-    id: "cnsource",
-    source: "CN Source",
-  },
-  {
-    ...createDefaultCard(),
     id: "cloudflare_v4",
     source: "Cloudflare IPv4",
   },
@@ -104,16 +89,26 @@ const ipDataCards = reactive([
     id: "cloudflare_v6",
     source: "Cloudflare IPv6",
   },
+  {
+    ...createDefaultCard(),
+    id: "cnsource",
+    source: "CN Source",
+  },
+  {
+    ...createDefaultCard(),
+    id: "ipchecking_v64",
+    source: "IPCheck.ing IPv6/4",
+  },
 ]);
 
-// 默认 ASN 信息
+// Default ASN information
 const asnInfos = ref({
   "AS888888": {
     "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "888888", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
   }
 });
 
-// 其它数据
+// Other data
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
 const copiedStatus = ref({});
 const IPArray = ref([]);
@@ -121,11 +116,11 @@ const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
 
-// 中间件
+// Middleware
 let pendingIPDetailsRequests = new Map();
 let ipDataCache = new Map();
 
-// 公共获取 IP 地址方法
+// Shared method to get IP address
 const fetchIP = async (cardID, getFromSource) => {
   const { ip, source } = await getFromSource(configs.value.originalSite);
   let fetchingStatus = false;
@@ -134,18 +129,20 @@ const fetchIP = async (cardID, getFromSource) => {
     ipDataCards[cardID].source = source;
     IPArray.value = [...IPArray.value, ip];
     await fetchIPDetails(cardID, ip);
-  } else if (cardID === 2 || cardID === 5) {
+  } else if (cardID === 1 || cardID === 3) {
+    // v6 cards in the new order: ipchecking_v6 (1), cloudflare_v6 (3)
     ipDataCards[cardID].ip = t('ipInfos.IPv6Error');
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
   }
-  // 总是返回 true，即使获取 IP 失败，以便在 trackFetchStatus 中记录
+  // Always return true, even if fetching IP fails
+  // for tracking fetch status
   fetchingStatus = true;
   fetchStatus[cardID] = { [cardID]: fetchingStatus };
   trackFetchStatus(fetchStatus);
 };
 
-// 上报数据获取状态，并发送到 store
+// Report data fetch status, and send to store
 const trackFetchStatus = (status) => {
   let allHasFetched = true;
   for (let i = 0; i < ipCardsToShow.value; i++) {
@@ -160,18 +157,18 @@ const trackFetchStatus = (status) => {
   }
 };
 
-// 检查所有 IP 地址
+// Check all IP addresses
 const checkAllIPs = async () => {
   const ipFunctions = [
-    () => fetchIP(0, getIPFromIPChecking64),
-    () => fetchIP(1, getIPFromIPChecking4),
-    () => fetchIP(2, getIPFromIPChecking6),
-    () => fetchIP(3, getIPFromIPIP),
-    () => fetchIP(4, getIPFromCloudflare_V4),
-    () => fetchIP(5, getIPFromCloudflare_V6),
+    () => fetchIP(0, getIPFromIPChecking4),
+    () => fetchIP(1, getIPFromIPChecking6),
+    () => fetchIP(2, getIPFromCloudflare_V4),
+    () => fetchIP(3, getIPFromCloudflare_V6),
+    () => fetchIP(4, getIPFromIPIP),
+    () => fetchIP(5, getIPFromIPChecking64),
   ];
 
-  // 限制执行的函数数量为 ipCardsToShow 的长度
+  // Limit the number of functions to execute to the length of ipCardsToShow
   const maxIndex = ipCardsToShow.value;
 
   let index = 0;
@@ -185,7 +182,7 @@ const checkAllIPs = async () => {
   }, 500);
 };
 
-// 从 IP 地址获取 IP 详细信息
+// Get IP details from IP address
 const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   sourceID = sourceID || ipGeoSource.value;
   const card = ipDataCards[cardIndex];
@@ -195,14 +192,14 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     setLang = 'zh-CN';
   }
 
-  // 检查缓存中是否已有该 IP 的数据
+  // Check if the IP data is already in the cache
   if (ipDataCache.has(ip)) {
     const cachedData = ipDataCache.get(ip);
     Object.assign(card, cachedData);
     return;
   }
 
-  // 检查是否有正在进行的查询，如果有，则等待该查询完成
+  // Check if there is a query in progress, if so, wait for it to complete
   if (pendingIPDetailsRequests.has(ip)) {
     await pendingIPDetailsRequests.get(ip);
     const cachedData = ipDataCache.get(ip);
@@ -244,7 +241,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     throw new Error("All sources failed to fetch IP details for IP: " + ip);
   })();
 
-  // 将此 Promise 存储在 pendingIPDetailsRequests 中，以避免重复查询
+  // Store this Promise in pendingIPDetailsRequests to avoid duplicate queries
   pendingIPDetailsRequests.set(ip, fetchPromise);
 
   try {
@@ -253,14 +250,14 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     console.error(error);
     throw error;
   } finally {
-    // 完成后，从 pendingIPDetailsRequests 中移除
+    // After completion, remove from pendingIPDetailsRequests
     pendingIPDetailsRequests.delete(ip);
   }
 };
 
-// 在重新选择 IP 数据库源时，更新 IP 地理数据
+// When the IP database source is reselected, update the IP geographic data
 const selectIPGeoSource = () => {
-  // 清空部分数据
+  // Clear partial data
   ipDataCards.forEach((card) => {
     const { ip, mapUrl, mapUrl_dark } = card;
     Object.assign(card, createDefaultCard(), { ip, mapUrl, mapUrl_dark });
@@ -268,10 +265,10 @@ const selectIPGeoSource = () => {
 
   ipDataCache.clear();
 
-  // 尝试更新一次，成功后再获取其他 IP 数据
+  // Try to update once, then get other IP data
   let runningSource = fetchIPDetails(0, ipDataCards[0].ip, ipGeoSource.value);
 
-  // 重新获取 IP 数据
+  // Re-fetch IP data
   let index = 1;
   const interval = setInterval(() => {
     if (index < ipDataCards.length) {
@@ -286,27 +283,27 @@ const selectIPGeoSource = () => {
   }, 500);
 };
 
-// 刷新某张卡片
+// Refresh a card
 const refreshCard = (card, index) => {
   clearCardData(card);
   switch (index) {
     case 0:
-      fetchIP(0, getIPFromIPChecking64);
+      fetchIP(0, getIPFromIPChecking4);
       break;
     case 1:
-      fetchIP(1, getIPFromIPChecking4);
+      fetchIP(1, getIPFromIPChecking6);
       break;
     case 2:
-      fetchIP(2, getIPFromIPChecking6);
+      fetchIP(2, getIPFromCloudflare_V4);
       break;
     case 3:
-      fetchIP(3, getIPFromIPIP);
+      fetchIP(3, getIPFromCloudflare_V6);
       break;
     case 4:
-      fetchIP(4, getIPFromCloudflare_V4);
+      fetchIP(4, getIPFromIPIP);
       break;
     case 5:
-      fetchIP(5, getIPFromCloudflare_V6);
+      fetchIP(5, getIPFromIPChecking64);
       break;
     default:
       console.error("Undefind Source:");
@@ -314,7 +311,7 @@ const refreshCard = (card, index) => {
   trackEvent('IPCheck', 'RefreshClick', 'IPInfos');
 };
 
-// 清空卡片数据
+// Clear card data
 const clearCardData = (card) => {
   Object.assign(card, createDefaultCard());
 };
@@ -343,5 +340,4 @@ defineExpose({
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

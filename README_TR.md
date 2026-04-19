@@ -54,7 +54,7 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 * 📲 **PWA Desteği**：Telefonunuza masaüstü uygulaması olarak veya bilgisayarınızda Chrome uygulaması olarak eklenebilir.
 * ⌨️ **Klavye Kısayolları**: Tüm işlevler için kısayolları destekler; kısayol listesini görmek için `?` tuşuna basın.
 * 🌍 Erişilebilirlik test sonuçlarına göre küresel internet erişiminin şu an mümkün olup olmadığını gösterir.
-* 🇺🇸 🇨🇳 🇫🇷 İngilizce, Çince ve Fransızca desteği.
+* 🇺🇸 🇨🇳 🇫🇷 🇹🇷 İngilizce, Çince, Fransızca ve Türkçe desteği.
 
 ## 📕 Nasıl Kullanılır
 

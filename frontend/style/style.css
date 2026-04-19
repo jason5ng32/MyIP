@@ -1,6 +1,183 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.min.css';
-@import 'flag-icons/css/flag-icons.min.css';
+/* === Tailwind v4 + shadcn-vue === */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* Base styles */
+@layer base {
+  h1 { font-size: 2.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h2 { font-size: 2rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h3 { font-size: 1.75rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h4 { font-size: 1.5rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h5 { font-size: 1.25rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  h6 { font-size: 1rem; font-weight: 500; line-height: 1.2; margin-bottom: 0.5rem; }
+  p  { margin-bottom: 1rem; }
+
+  /* Required patch for shadcn-vue + Tailwind v4:
+    In Tailwind v4, the `border` utility color falls back to currentColor (black/white),
+    unlike v3 which defaults to gray-200. shadcn-vue components (Card / DropdownMenuContent /
+    Dialog, etc.) have bare `border` classes without color, which will inherit text color and
+    become "black borders". Bind the default border color back to design token --border to
+    restore expected behavior.
+    Reference: https://ui.shadcn.com/docs/tailwind-v4 */
+  *, ::before, ::after {
+    border-color: var(--border);
+  }
+}
+
+/* Dark mode: triggered by .dark class (synchronized from store.isDarkMode to <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens — shadcn-vue standard CSS variables + project custom semantic colors
+  ---------------------------------------------------------
+  Custom token rules:
+  - info     = information/in-progress/waiting (paired with animate-ping status light) ≈ sky-500
+  - success  = success/OK-fast                                            ≈ green-500
+  - warning  = warning/OK-slow                                            ≈ amber-500
+  - destructive continue using shadcn primitives, corresponding to fail / error ≈ red-500
+
+  Each semantic color has a foreground pair, which automatically corrects the text color when used in bg-* ≈ amber-500 (foreground is dark because amber is light; sky / green / red are dark, so foreground is white). The light/dark mode is defined independently by :root / .dark, and tokens do not need to write dark: variants.
+*/
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* Project custom semantic colors (light mode, corresponding to Tailwind *-500 oklch values) */
+  --info: oklch(0.685 0.169 237.323);         /* sky-500 */
+  --info-foreground: oklch(0.985 0 0);
+  --success: oklch(0.63 0.17 149);      /* green-500 */
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.769 0.188 70.08);        /* amber-500 */
+  --warning-foreground: oklch(0.145 0 0);
+  --action: oklch(0.623 0.214 259.815);       /* blue-500 —— for "run action" */
+  --action-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  /* dark mode slightly brightened (corresponding to Tailwind *-400, better readability in dark background) */
+  --info: oklch(0.746 0.16 232.661);          /* sky-400 */
+  --info-foreground: oklch(0.145 0 0);
+  --success: oklch(0.792 0.209 151.711);      /* green-400 */
+  --success-foreground: oklch(0.145 0 0);
+  --warning: oklch(0.828 0.189 84.429);       /* amber-400 */
+  --warning-foreground: oklch(0.145 0 0);
+  --action: oklch(0.623 0.214 259.815);       /* blue-500 (same as light mode) */
+  --action-foreground: oklch(0.985 0 0);      /* white text */
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.15);
+  --ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+/* vaul default injects @media (hover:hover) and (pointer:fine) { user-select: none }
+   into [data-vaul-drawer] to avoid conflict between drag gestures and text selection.
+   We set handleOnly to true by default in the Drawer component (only the handle can be dragged, and the main content does not respond to dragging), so this restriction is a bug → users want to select text in the drawer on desktop but cannot.
+   Two pitfalls:
+   1. vaul's <style> is appended to document.head in JS, so its source order is later than style.css; when specificity is the same, the latter wins → it must be forced with !important
+   2. user-select: auto is parsed as none when the parent is none (MDN rule) → it must be explicitly set to text; and it must be explicitly overridden on descendants, not relying on inheritance */
+   @media (hover: hover) and (pointer: fine) {
+    [data-vaul-drawer],
+    [data-vaul-drawer] * {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
+  }
+
+/* === Base end === */
+
+/* === Custom CSS === */
+
+@keyframes jn-collapsible-down {
+  from { height: 0; }
+  to { height: var(--reka-collapsible-content-height); }
+}
+@keyframes jn-collapsible-up {
+  from { height: var(--reka-collapsible-content-height); }
+  to { height: 0; }
+}
+@keyframes jn-accordion-down {
+  from { height: 0; }
+  to { height: var(--reka-accordion-content-height); }
+}
+@keyframes jn-accordion-up {
+  from { height: var(--reka-accordion-content-height); }
+  to { height: 0; }
+}
+.jn-collapsible-content[data-state='open'] {
+  animation: jn-collapsible-down 200ms ease-out;
+}
+.jn-collapsible-content[data-state='closed'] {
+  animation: jn-collapsible-up 200ms ease-out;
+}
+.jn-accordion-content[data-state='open'] {
+  animation: jn-accordion-down 200ms ease-out;
+}
+.jn-accordion-content[data-state='closed'] {
+  animation: jn-accordion-up 200ms ease-out;
+}
 
 .jn-title {
   display: flex;
@@ -42,36 +219,11 @@
   border: 1px solid #9c9c9c2e;
 }
 
-.jn-ip-card1 {
-  min-height: 588px;
-}
-
-.jn-ip-card2 {
-  min-height: 388px;
-}
-
-.jn-hover-card {
-  transition: all 0.4s;
-}
-
-.jn-hover-card:hover {
-  transform: translateY(-6pt);
-}
-
 .jn-card.keyboard-hover {
-  border-color: rgba(20, 184, 108, 0.42);
-}
-
-.jn-card.keyboard-hover::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  border: 1px solid rgba(20, 184, 108, 0.42);
-  height: 100%;
-  pointer-events: none;
-  border-radius: 4pt;
+  border-color: rgba(20, 184, 108, 0.5);
+  outline: 2px solid rgba(20, 184, 108, 0.5);
+  outline-offset: -1px;
+  border-radius: var(--radius);
 }
 
 .jn-container {
@@ -98,20 +250,6 @@
   padding: 12px 4px 12px 4px;
   display: flex;
   margin: 0;
-}
-
-.jn-opacity {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.jn-map-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 0;
-  overflow: hidden;
 }
 
 .jn-navbar-top {
@@ -266,10 +404,6 @@ footer {
 
 .jn-speedtest-number {
   font-size: 2em;
-}
-
-.jn-ip-font {
-  zoom: 0.8;
 }
 
 .jn-ip-score {

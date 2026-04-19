@@ -1,4 +1,4 @@
-// 转换 Unix 时间
+// Convert Unix timestamp to date time
 const unixToDateTime = (timestamp) => {
     timestamp = Number(timestamp);
     const options = {

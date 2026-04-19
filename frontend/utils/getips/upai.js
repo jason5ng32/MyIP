@@ -1,12 +1,12 @@
-import { getIPFromCloudflare_CN } from "./cloudflare-cn";
 import { isValidIP } from '@/utils/valid-ip.js';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 Upai 获取 IP 地址
+// Get IP address from Upai
 const getIPFromUpai = async () => {
     try {
         const unixTime = Date.now();
         const url = `https://pubstatic.b0.upaiyun.com/?_upnode&t=${unixTime}`;
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url);
         if (!response.ok) {
             throw new Error("Network response was not ok");
         }
@@ -22,13 +22,6 @@ const getIPFromUpai = async () => {
     } catch (error) {
         console.error("Error fetching IP from Upai:", error);
     }
-
-    // 故障时尝试从 Cloudflare 中国获取 IP 地址
-    const { ip, source } = await getIPFromCloudflare_CN();
-    return {
-        ip: ip,
-        source: source
-    };
 };
 
 export { getIPFromUpai };
