@@ -55,7 +55,7 @@
                 </div>
                 <!-- Content area (scrollable) -->
                 <div class="flex-1 overflow-y-auto px-1 md:px-2 pb-6" ref="scrollContainer">
-                    <div :class="isMobile ? 'w-full' : 'jn-canvas-width'">
+                    <div :class="isMobile ? 'w-full px-3' : 'jn-canvas-width px-6'">
                         <router-view></router-view>
                     </div>
                 </div>

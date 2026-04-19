@@ -5,7 +5,7 @@
     <Achievements ref="achievementsRef" />
     <Preferences ref="preferencesRef" />
     <Alert />
-    <div id="mainpart" class="mx-auto w-full px-4 mt-5 jn-container">
+    <div id="mainpart" class="mx-auto w-full px-4 jn-container">
       <div class="rounded-md" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />

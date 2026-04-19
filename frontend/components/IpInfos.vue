@@ -1,6 +1,6 @@
 <template>
   <!-- IP Infos -->
-  <section class="ip-data-section mb-10 mt-4">
+  <section class="ip-data-section mb-10 mt-2">
     <header class="mb-3">
       <h2 id="IPInfo" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🔎 {{ t('ipInfos.Title') }}
