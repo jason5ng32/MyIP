@@ -43,7 +43,7 @@
                         <thead>
                             <tr class="border-b">
                                 <th scope="col" v-for="header in headers" :key="header.key"
-                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide"
+                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide min-w-20 text-nowrap"
                                     :class="header.align === 'right' ? 'text-right' : 'text-left'">
                                     {{ t('pingtest.' + header.key) }}
                                 </th>
