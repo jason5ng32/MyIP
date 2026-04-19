@@ -1012,5 +1012,47 @@
         }
       }
     ]
+  },
+  {
+    "version": "v6.1.0",
+    "date": "Apr 20, 2026",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Network Connectivity now accepts user-added test targets (up to 9, saved locally in your browser)",
+          "zh": "网络连通性支持添加自定义测试站点（最多 9 个，保存在浏览器本地）",
+          "fr": "La Connectivité réseau accepte désormais des cibles de test personnalisées (jusqu'à 9, enregistrées localement dans votre navigateur)",
+          "tr": "Ağ Bağlantısı artık kullanıcı tarafından eklenen test hedeflerini kabul ediyor (en fazla 9, tarayıcınızda yerel olarak saklanır)"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Notifications (toasts) moved back to the bottom-right corner, clearing the floating action buttons",
+          "zh": "通知（Toast）回归屏幕右下角，自动避让悬浮按钮组",
+          "fr": "Les notifications reviennent dans le coin inférieur droit, en contournant les boutons flottants",
+          "tr": "Bildirimler sağ alt köşeye geri taşındı, yüzen eylem düğmelerinin etrafından dolaşıyor"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Auto theme mode now follows the OS light/dark switch instantly",
+          "zh": "修复自动主题模式下跟随系统切换时不立即生效的问题",
+          "fr": "Le mode thème automatique suit désormais instantanément le changement clair/sombre du système",
+          "tr": "Otomatik tema modu artık işletim sisteminin açık/koyu geçişini anında takip ediyor"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Removed the brief visual flicker on first page load",
+          "zh": "修复页面首次加载时的短暂视觉抖动",
+          "fr": "Suppression du bref scintillement visuel au premier chargement de la page",
+          "tr": "Sayfanın ilk yüklenmesindeki kısa görsel titreme giderildi"
+        }
+      }
+    ]
   }
 ]
