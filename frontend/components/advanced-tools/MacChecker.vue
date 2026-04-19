@@ -3,7 +3,7 @@
         <!-- Top note -->
         <p class="text-sm text-muted-foreground">{{ t('macchecker.Note') }}</p>
 
-        <!-- Input area: label + InputGroup -->
+        <!-- Input area: label + Input + icon trigger -->
         <div class="space-y-2">
             <label for="queryMAC" class="text-sm font-medium">{{ t('macchecker.Note2') }}</label>
             <div class="flex items-center gap-2">
@@ -90,13 +90,12 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import getCountryName from '@/data/country-name.js';
-import { CircleCheck, CircleX, Factory, ListChecks } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Factory, ListChecks, Search } from 'lucide-vue-next';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Search } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
