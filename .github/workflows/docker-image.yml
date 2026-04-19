@@ -9,6 +9,15 @@ on:
         description: 'Version tag'
         required: true
 
+# Least-privilege GITHUB_TOKEN:
+# - contents: read  → checkout the source
+# - packages: write → push the built image to ghcr.io/${owner}/myip
+# Docker Hub push uses DOCKER_HUB_ACCESS_TOKEN (a repo secret), not GITHUB_TOKEN,
+# so no extra scopes are needed for that half of the job.
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest

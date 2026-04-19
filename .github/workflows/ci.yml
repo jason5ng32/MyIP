@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, dev]
 
+# Least-privilege GITHUB_TOKEN: tests + build only need to read the repo.
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Test + Build
