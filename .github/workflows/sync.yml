@@ -13,15 +13,11 @@ jobs:
     name: Sync latest commits from upstream repo
     runs-on: ubuntu-latest
     if: ${{ github.event.repository.fork }}
-    # Opt every JavaScript action in this job into the Node 24 runner ahead of
-    # the 2026-06-02 default flip (see ci.yml for the full rationale).
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
     steps:
       # step 1: checkout target repo
       - name: Checkout target repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # step 2: sync upstream changes
       - name: Sync upstream changes
