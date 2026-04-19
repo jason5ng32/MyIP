@@ -924,62 +924,91 @@
       {
         "type": "add",
         "change": {
-          "zh": "使用 Shadcn UI + Tailwind CSS 重构了整个项目"
+          "en": "Refactored the entire project with Shadcn UI + Tailwind CSS",
+          "zh": "使用 Shadcn UI + Tailwind CSS 重构了整个项目",
+          "fr": "Refonte complète du projet avec Shadcn UI + Tailwind CSS",
+          "tr": "Tüm proje Shadcn UI + Tailwind CSS ile yeniden yazıldı"
         }
       },
       {
         "type": "add",
         "change": {
-          "zh": "通过多个 Agents.md 提升 AI 开发友好性"
+          "en": "Improved AI-development friendliness via multiple Agents.md files",
+          "zh": "通过多个 Agents.md 提升 AI 开发友好性",
+          "fr": "Amélioration de la compatibilité avec le développement assisté par IA grâce à plusieurs fichiers Agents.md",
+          "tr": "Birden çok Agents.md dosyasıyla AI geliştirme dostluğu iyileştirildi"
         }
       },
       {
         "type": "add",
         "change": {
-          "zh": "增加自动测试功能，提升程序健壮性"
+          "en": "Added automated tests to improve robustness",
+          "zh": "增加自动测试功能，提升程序健壮性",
+          "fr": "Ajout de tests automatisés pour améliorer la robustesse",
+          "tr": "Sağlamlığı artırmak için otomatik testler eklendi"
         }
       },
       {
         "type": "improve",
         "change": {
-          "zh": "更加组件化的设计，更方便维护和扩展"
+          "en": "More component-oriented design, easier to maintain and extend",
+          "zh": "更加组件化的设计，更方便维护和扩展",
+          "fr": "Conception davantage orientée composants, plus facile à maintenir et à étendre",
+          "tr": "Bakımı ve genişletmesi daha kolay, daha bileşen odaklı tasarım"
         }
       },
       {
         "type": "improve",
         "change": {
-          "zh": "重新设计程序目录结构，使其更加清晰易懂"
+          "en": "Reorganized the project directory structure for better clarity",
+          "zh": "重新设计程序目录结构，使其更加清晰易懂",
+          "fr": "Réorganisation de la structure des répertoires du projet pour plus de clarté",
+          "tr": "Daha net ve anlaşılır olması için proje dizin yapısı yeniden düzenlendi"
         }
       },
       {
         "type": "improve",
         "change": {
-          "en": "New modern UI design ",
-          "zh": "所有页面全部重新设计，更具现代化美感"
+          "en": "All pages redesigned with a more modern look and feel",
+          "zh": "所有页面全部重新设计，更具现代化美感",
+          "fr": "Toutes les pages redessinées avec une esthétique plus moderne",
+          "tr": "Tüm sayfalar daha modern bir görünümle yeniden tasarlandı"
         }
       },
       {
         "type": "improve",
         "change": {
-          "zh": "提升程序打包速度，减少打包体积"
+          "en": "Faster build times and smaller bundle size",
+          "zh": "提升程序打包速度，减少打包体积",
+          "fr": "Temps de compilation plus rapides et taille de bundle réduite",
+          "tr": "Daha hızlı derleme süreleri ve daha küçük paket boyutu"
         }
       },
       {
         "type": "improve",
         "change": {
-          "zh": "后端程序大量简化，提升程序性能"
+          "en": "Significantly simplified the backend to improve performance",
+          "zh": "后端程序大量简化，提升程序性能",
+          "fr": "Backend largement simplifié pour améliorer les performances",
+          "tr": "Performansı artırmak için arka uç önemli ölçüde basitleştirildi"
         }
       },
       {
         "type": "improve",
         "change": {
-          "zh": "优化程序里所有的注释，使其更加清晰易懂"
+          "en": "Polished comments across the codebase for better readability",
+          "zh": "优化程序里所有的注释，使其更加清晰易懂",
+          "fr": "Commentaires affinés dans tout le code source pour une meilleure lisibilité",
+          "tr": "Daha iyi okunabilirlik için kod tabanındaki tüm yorumlar iyileştirildi"
         }
       },
       {
         "type": "fix",
         "change": {
-          "zh": "修复了多个 Bug，提升了程序稳定性"
+          "en": "Fixed multiple bugs and improved overall stability",
+          "zh": "修复了多个 Bug，提升了程序稳定性",
+          "fr": "Correction de plusieurs bugs et amélioration de la stabilité globale",
+          "tr": "Birden fazla hata düzeltildi ve genel kararlılık iyileştirildi"
         }
       }
     ]
