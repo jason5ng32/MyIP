@@ -1,8 +1,8 @@
 <template>
-    <!-- IP 信息卡 — shadcn Card 架构，三个可能的主体：正常 / 错误 / 加载 -->
+    <!-- IP Info Card -->
     <Card
         class="keyboard-shortcut-card jn-card flex flex-col h-full overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <!-- 卡头：数字徽章 + 来源 + 刷新 -->
+        <!-- Card header: number badge + source + refresh -->
         <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b">
             <div class="flex items-center gap-2 min-w-0">
                 <span
@@ -22,10 +22,10 @@
             </JnTooltip>
         </div>
 
-        <!-- 主体分三态：正常 / 错误 / 加载 -->
+        <!-- Main body in three states: normal / error / loading -->
         <div class="flex-1 flex flex-col">
             <template v-if="hasData">
-                <!-- Hero IP 区（带 Copy 按钮；Map 触发在 IpDetailPanel 内的 City 单元里） -->
+                <!-- Hero IP area  -->
                 <div class="px-4 py-3 flex items-center gap-2 min-w-0">
                     <Monitor class="size-5 text-muted-foreground shrink-0" />
                     <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0 min-h-5"
@@ -44,14 +44,14 @@
                     :enable-map="true" />
             </template>
 
-            <!-- 错误态 -->
+            <!-- Error state -->
             <div v-else-if="isErrorState"
                 class="flex-1 flex flex-col items-center justify-center gap-3 px-4 py-8 text-center">
                 <IPErrorIcon />
                 <p class="text-sm text-primary font-medium">{{ card.ip }}</p>
             </div>
 
-            <!-- 加载态：skeleton rows -->
+            <!-- Loading state: skeleton rows -->
             <div v-else class="flex-1 px-4 py-3 space-y-3">
                 <div v-for="(w, i) in placeholderSizes" :key="i" class="h-4 bg-muted rounded animate-pulse"
                     :style="`width: ${(w / 12) * 100}%`"></div>
@@ -95,8 +95,7 @@ const props = defineProps({
 
 defineEmits(['refresh-card']);
 
-// 三态判定：有数据（正常）/ 错误 / 加载
-// 原版是 `(card.asn) || card.ip === '2001:4860:4860::8888'`，后者是 masked-info 在 signed-out 时兜底的假 IP
+// Three state check: has data (normal) / error / loading
 const hasData = computed(() =>
     Boolean(props.card.asn) || props.card.ip === '2001:4860:4860::8888'
 );

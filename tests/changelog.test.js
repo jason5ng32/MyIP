@@ -1,3 +1,6 @@
+// Test changelog.json format and content
+// Verifies the format and content of changelog.json
+// In case forgetting to update all locales, this test will fail.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import fs from 'node:fs';

@@ -1,5 +1,5 @@
 <template>
-  <!-- IP Infos — 与其他重构过的模块一致的 section + header 结构 -->
+  <!-- IP Infos -->
   <section class="ip-data-section mb-10 mt-4">
     <header class="mb-3">
       <h2 id="IPInfo" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
@@ -46,10 +46,10 @@ const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
 
-// 页面的动态配置
+// Dynamic configuration of the page
 const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
 
-// 默认卡片数据
+// Default card data
 const createDefaultCard = () => ({
   ip: "",
   country_name: "",
@@ -64,7 +64,7 @@ const createDefaultCard = () => ({
   mapUrl_dark: '/res/defaultMap_dark.webp',
 });
 
-// IP 数据卡片
+// IP data cards
 // Order: v4, v6, CF-v4, CF-v6, CN, v64
 // First 2 / 4 / 6 slice is meaningful at every count the user can pick.
 const ipDataCards = reactive([
@@ -100,14 +100,14 @@ const ipDataCards = reactive([
   },
 ]);
 
-// 默认 ASN 信息
+// Default ASN information
 const asnInfos = ref({
   "AS888888": {
     "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "888888", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
   }
 });
 
-// 其它数据
+// Other data
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
 const copiedStatus = ref({});
 const IPArray = ref([]);
@@ -115,11 +115,11 @@ const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
 
-// 中间件
+// Middleware
 let pendingIPDetailsRequests = new Map();
 let ipDataCache = new Map();
 
-// 公共获取 IP 地址方法
+// Shared method to get IP address
 const fetchIP = async (cardID, getFromSource) => {
   const { ip, source } = await getFromSource(configs.value.originalSite);
   let fetchingStatus = false;
@@ -134,13 +134,14 @@ const fetchIP = async (cardID, getFromSource) => {
   } else {
     ipDataCards[cardID].ip = t('ipInfos.IPv4Error');
   }
-  // 总是返回 true，即使获取 IP 失败，以便在 trackFetchStatus 中记录
+  // Always return true, even if fetching IP fails
+  // for tracking fetch status
   fetchingStatus = true;
   fetchStatus[cardID] = { [cardID]: fetchingStatus };
   trackFetchStatus(fetchStatus);
 };
 
-// 上报数据获取状态，并发送到 store
+// Report data fetch status, and send to store
 const trackFetchStatus = (status) => {
   let allHasFetched = true;
   for (let i = 0; i < ipCardsToShow.value; i++) {
@@ -155,7 +156,7 @@ const trackFetchStatus = (status) => {
   }
 };
 
-// 检查所有 IP 地址
+// Check all IP addresses
 const checkAllIPs = async () => {
   const ipFunctions = [
     () => fetchIP(0, getIPFromIPChecking4),
@@ -166,7 +167,7 @@ const checkAllIPs = async () => {
     () => fetchIP(5, getIPFromIPChecking64),
   ];
 
-  // 限制执行的函数数量为 ipCardsToShow 的长度
+  // Limit the number of functions to execute to the length of ipCardsToShow
   const maxIndex = ipCardsToShow.value;
 
   let index = 0;
@@ -180,7 +181,7 @@ const checkAllIPs = async () => {
   }, 500);
 };
 
-// 从 IP 地址获取 IP 详细信息
+// Get IP details from IP address
 const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   sourceID = sourceID || ipGeoSource.value;
   const card = ipDataCards[cardIndex];
@@ -190,14 +191,14 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     setLang = 'zh-CN';
   }
 
-  // 检查缓存中是否已有该 IP 的数据
+  // Check if the IP data is already in the cache
   if (ipDataCache.has(ip)) {
     const cachedData = ipDataCache.get(ip);
     Object.assign(card, cachedData);
     return;
   }
 
-  // 检查是否有正在进行的查询，如果有，则等待该查询完成
+  // Check if there is a query in progress, if so, wait for it to complete
   if (pendingIPDetailsRequests.has(ip)) {
     await pendingIPDetailsRequests.get(ip);
     const cachedData = ipDataCache.get(ip);
@@ -239,7 +240,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     throw new Error("All sources failed to fetch IP details for IP: " + ip);
   })();
 
-  // 将此 Promise 存储在 pendingIPDetailsRequests 中，以避免重复查询
+  // Store this Promise in pendingIPDetailsRequests to avoid duplicate queries
   pendingIPDetailsRequests.set(ip, fetchPromise);
 
   try {
@@ -248,14 +249,14 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
     console.error(error);
     throw error;
   } finally {
-    // 完成后，从 pendingIPDetailsRequests 中移除
+    // After completion, remove from pendingIPDetailsRequests
     pendingIPDetailsRequests.delete(ip);
   }
 };
 
-// 在重新选择 IP 数据库源时，更新 IP 地理数据
+// When the IP database source is reselected, update the IP geographic data
 const selectIPGeoSource = () => {
-  // 清空部分数据
+  // Clear partial data
   ipDataCards.forEach((card) => {
     const { ip, mapUrl, mapUrl_dark } = card;
     Object.assign(card, createDefaultCard(), { ip, mapUrl, mapUrl_dark });
@@ -263,10 +264,10 @@ const selectIPGeoSource = () => {
 
   ipDataCache.clear();
 
-  // 尝试更新一次，成功后再获取其他 IP 数据
+  // Try to update once, then get other IP data
   let runningSource = fetchIPDetails(0, ipDataCards[0].ip, ipGeoSource.value);
 
-  // 重新获取 IP 数据
+  // Re-fetch IP data
   let index = 1;
   const interval = setInterval(() => {
     if (index < ipDataCards.length) {
@@ -281,7 +282,7 @@ const selectIPGeoSource = () => {
   }, 500);
 };
 
-// 刷新某张卡片
+// Refresh a card
 const refreshCard = (card, index) => {
   clearCardData(card);
   switch (index) {
@@ -309,7 +310,7 @@ const refreshCard = (card, index) => {
   trackEvent('IPCheck', 'RefreshClick', 'IPInfos');
 };
 
-// 清空卡片数据
+// Clear card data
 const clearCardData = (card) => {
   Object.assign(card, createDefaultCard());
 };

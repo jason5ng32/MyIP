@@ -1,7 +1,7 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 IPCheck.ing 获取 IPv6/4 地址
+// Get IPv6/4 address from IPCheck.ing
 const getIPFromIPChecking64 = async (originalSite) => {
     try {
         let ip;

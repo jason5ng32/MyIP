@@ -20,7 +20,7 @@ import {
   lookupMaxMind,
 } from '../common/maxmind-service.js';
 
-// 仓库里应该带 maxmind 数据库文件；如果 CI 上没有就跳过相关测试
+// The repo should ship maxmind database files; if not on CI, skip related tests
 const cityPath = path.join(MAXMIND_DB_DIR, MAXMIND_CITY_DB);
 const asnPath = path.join(MAXMIND_DB_DIR, MAXMIND_ASN_DB);
 const dbsAvailable = fs.existsSync(cityPath) && fs.existsSync(asnPath);
@@ -40,11 +40,11 @@ describe('maxmind-service — path + ready contract', () => {
   });
 
   it('lookupMaxMind throws 503-tagged error when readers are not ready', () => {
-    // reloadMaxMindDatabases 的测试 before 钩子会把 readers 装上；
-    // 本用例放在 before 钩子之前（describe 顶层 it 按声明顺序执行）
-    // 所以在首次 before 钩子跑之前就能命中 not-ready 路径。
-    // 如果 DB 不存在仓库里，isMaxMindReady()===false，正好走这条路径。
-    if (isMaxMindReady()) return; // 已 ready 就跳过
+    // reloadMaxMindDatabases test before hook will install readers;
+    // this test is placed before the before hook (describe top-level it runs in declaration order)
+    // so this test can hit the not-ready path before the first before hook runs.
+    // if DB is not in the repo, isMaxMindReady()===false, this test will hit the not-ready path.
+    if (isMaxMindReady()) return; // already ready, skip
     try {
       lookupMaxMind('1.1.1.1');
       assert.fail('should have thrown');
@@ -76,7 +76,7 @@ describe('maxmind-service — end-to-end with real DB (skipped if files missing)
   it('lookupMaxMind returns the expected stable shape for a known public IP', () => {
     if (!dbsAvailable) return;
     const result = lookupMaxMind('8.8.8.8', 'en');
-    // Only assert the shape — actual values depend on the DB version shipped
+    // Only assert the shape — actual values depend on the shipped DB version
     const expectedKeys = [
       'ip', 'city', 'region', 'country', 'country_name', 'country_code',
       'latitude', 'longitude', 'asn', 'org',
@@ -85,7 +85,7 @@ describe('maxmind-service — end-to-end with real DB (skipped if files missing)
       assert.ok(k in result, `missing key: ${k}`);
     }
     assert.equal(result.ip, '8.8.8.8');
-    // 8.8.8.8 is Google (AS15169); DB may use either AS prefix
+    // 8.8.8.8 is Google (AS15169); DB may use either AS prefix (AS15169 or AS15169-1)
     assert.match(String(result.asn), /^AS\d+$/);
   });
 

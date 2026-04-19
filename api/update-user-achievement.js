@@ -17,7 +17,7 @@ export default async (req, res) => {
         return res.status(400).json({ error: 'Achievement name is required' });
     }
 
-    // 构建请求
+    // Build request
     const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
     const url = new URL(`${apiEndpoint}/updateuserachievements?key=${key}`);
 

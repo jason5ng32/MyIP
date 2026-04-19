@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 let auth;
-// import.meta.env 只在 Vite 下存在；Node / 测试环境可能没有，用可选链兜底
+// import.meta.env only exists in Vite; Node / test environment may not have it, use optional chaining to fallback
 const env = import.meta.env ?? {};
 const firebaseConfig = {
     apiKey: env.VITE_FIREBASE_API_KEY,

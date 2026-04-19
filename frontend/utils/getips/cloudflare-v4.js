@@ -2,7 +2,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { getIPFromMyExternalIP_V4 } from "./myexternalip-v4";
 
-// 从 Cloudflare 获取 IPv4 地址
+// Get IPv4 address from Cloudflare
 const getIPFromCloudflare_V4 = async () => {
     try {
         const response = await fetchWithTimeout("https://1.0.0.1/cdn-cgi/trace");
@@ -29,7 +29,7 @@ const getIPFromCloudflare_V4 = async () => {
     } catch (error) {
         console.error("Error fetching IP from Cloudflare:", error);
     }
-    // 故障转移
+    // Fallback
     const { ip, source } = await getIPFromMyExternalIP_V4();
     return {
         ip: ip,

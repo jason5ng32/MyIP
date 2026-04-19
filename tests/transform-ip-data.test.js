@@ -6,7 +6,7 @@ import {
   extractAdvancedData,
 } from '../frontend/utils/transform-ip-data.js';
 
-// i18n 桩：返回带前缀的 key，便于断言是走了 t(...) 而不是硬编码
+// simple i18n translation stub: return key with prefix for assertions, to verify template references rather than hardcoded translation text
 const t = (key) => `<${key}>`;
 
 const basicRaw = {

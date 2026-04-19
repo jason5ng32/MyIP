@@ -1263,7 +1263,7 @@ const countryList =
         }
     ];
 
-// 导出
+
 export default function getCountryName(abbr, lang) {
     const country = countryList.find(item => item.abbr === abbr);
     return country ? country[lang] : '';

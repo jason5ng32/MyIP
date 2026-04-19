@@ -2,7 +2,7 @@
 import { Resolver } from 'dns';
 import { promisify } from 'util';
 
-// 普通 DNS 服务器列表
+// Normal DNS server list
 const dnsServers = {
     'Google': '8.8.8.8',
     'Cloudflare': '1.1.1.1',
@@ -17,7 +17,7 @@ const dnsServers = {
     'China Unicom': '123.123.123.123',
 };
 
-// DNS-over-HTTPS 服务列表
+// DNS-over-HTTPS server list
 const dohServers = {
     'Google': 'https://dns.google/resolve?',
     'Cloudflare': 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&',
@@ -37,7 +37,7 @@ const resolveDns = async (hostname, type, name, server) => {
     try {
         let addresses;
 
-        // 根据传入的 type 参数选择不同的解析方法
+        // Select different parsing methods based on the type parameter
         switch (type) {
             case 'A':
                 addresses = await resolve4Async(hostname);
@@ -47,7 +47,7 @@ const resolveDns = async (hostname, type, name, server) => {
                 break;
             case 'TXT':
                 addresses = await resolveTxtAsync(hostname);
-                // TXT 记录解析的结果是一个二维数组，这里进行扁平化处理
+                // TXT record parsing results is a two-dimensional array, here we flatten the result
                 addresses = addresses.flat();
                 break;
             case 'CNAME':
@@ -95,7 +95,7 @@ const resolveDoh = async (hostname, type, name, url) => {
 
 const dnsResolver = async (req, res) => {
 
-    // 限制请求方法 — defensive; app.get() in backend-server.js already gates method,
+    // Limit request method — defensive; app.get() in backend-server.js already gates method,
     // but a dedicated smoke test asserts this 405 branch directly against the handler.
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
@@ -119,7 +119,7 @@ const dnsResolver = async (req, res) => {
     const dohPromises = Object.entries(dohServers).map(([name, url]) => resolveDoh(hostname, type, name, url));
 
     try {
-        // 并行执行所有 DNS 和 DoH 查询
+        // Execute all DNS and DoH queries in parallel
 
         const result_dns = await Promise.all(dnsPromises);
         const result_doh = await Promise.all(dohPromises);

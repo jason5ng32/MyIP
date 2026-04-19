@@ -1,7 +1,7 @@
 <template>
-  <!-- Speed Test — refactor/UI round 2：整体对齐 Connectivity 的 shadcn Card 美学 -->
+  <!-- Speed Test -->
   <section class="mb-10">
-    <!-- 章节头（无右侧刷新按钮；Start/Pause 是主 CTA，放在卡片内顶部工具栏） -->
+    <!-- Header -->
     <header class="mb-3">
       <h2 id="SpeedTest" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🚀 {{ t('speedtest.Title') }}
@@ -11,9 +11,7 @@
 
     <Card class="keyboard-shortcut-card jn-card">
       <CardContent class="p-4 md:p-6">
-        <!-- 控制区：input-group 拼接（下载图标 + 下载 Select + 上传图标 + 上传 Select + Start Button）
-             Select 的 value 是 string，边界处 String()/Number() 转换；
-             视觉上用 -ml-px 让相邻边框重叠成一条连续的线，形成 "button group" -->
+        <!-- Control Area -->
         <div class="flex justify-end mb-5">
           <div class="inline-flex items-stretch">
             <!-- Download addon -->
@@ -60,8 +58,7 @@
           </div>
         </div>
 
-        <!-- 连接信息行：外层 min-h-6 + mb-3 始终占位，内容 Transition 进出，
-             避免从 idle 切到 running 时页面往下晃 -->
+        <!-- Connection Information -->
         <div class="min-h-6 mb-3">
           <Transition name="slide-fade">
             <div v-if="state.speedTest.status !== 'idle' && state.connection.colo"
@@ -83,12 +80,11 @@
           </Transition>
         </div>
 
-        <!-- 进度条：始终渲染占位（h-2 + mb-6 保留空间），idle 态 invisible，
-             避免从 idle 切到 running 时 metrics 被往下推 -->
+        <!-- Progress Bar -->
         <Progress :model-value="state.speedTest.progress" class="mb-6"
           :class="[progressIndicatorClass, state.speedTest.status === 'idle' ? 'invisible' : '']" />
 
-        <!-- 4 个指标 tile：现代仪表盘风，大数字 + 小标签 -->
+        <!-- 4 Metrics Tiles -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div v-for="m in metrics" :key="m.key" class="text-center">
             <p class="text-lg uppercase tracking-wider text-primary font-semibold mb-1">{{ m.label }}</p>
@@ -102,7 +98,7 @@
 
         <div id="result"></div>
 
-        <!-- 图表区域：测试启动后渐显，保持 Chart.js canvas -->
+        <!-- Charts Area -->
         <div v-show="state.speedTest.status !== 'idle'" class="speed-charts-container jn-slide-in">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             <div class="chart-wrapper"><canvas ref="downloadChart"></canvas></div>
@@ -112,9 +108,7 @@
           </div>
         </div>
 
-        <!-- 结果块：连接摘要 + 质量 badge + 说明
-             浅色 success 面板改用 bg-success/10 + border-success/30 + text-success，
-             跟项目里其他 success 提示条（Whois "Note3"、InvisibilityTest summary 等）节奏一致 -->
+        <!-- Result Block -->
         <div v-if="isFinished && state.speedTest.hasScores"
           class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
           <div class="flex items-start gap-2 mb-3">
@@ -173,7 +167,7 @@ const store = useMainStore();
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
 
-// 状态管理
+// State Management
 const state = reactive({
   speedTest: {
     id: 'speedTest',
@@ -206,33 +200,32 @@ const {
   updateCharts, initStartingPoints, destroyCharts, resetChartData,
 } = useSpeedTestCharts(t);
 
-// 可选的测速大小档位（bytes），用于 ToggleGroup
+// Optional speed test sizes (bytes) for ToggleGroup
 const sizeOptions = [1e6, 10e6, 15e6, 50e6, 100e6];
 
-// --- 派生状态 ----------------------------------------------------------
+// --- Derived State ----------------------------------------------------------
 
 const isRunning = computed(() => state.speedTest.status === 'running');
 const isPaused = computed(() => state.speedTest.status === 'paused');
 const isFinished = computed(() => state.speedTest.status === 'finished');
 const isError = computed(() => state.speedTest.status === 'error');
 
-// CTA 图标：running=暂停、finished/error=重试、其余=开始
+// CTA Icon: running=Pause, finished/error=Retry, otherwise=Start
 const ctaIcon = computed(() => {
   if (isRunning.value) return Pause;
   if (isFinished.value || isError.value) return RotateCw;
   return ChevronRight;
 });
 
-// 数字 + 进度条颜色：走 style.css 语义 token，运行中 info / 完成 success /
-// 错误 destructive。token 本身明暗模式已配好，不需要再写 dark: 变体
+
+// Color Class for Metrics
 const metricColorClass = computed(() => {
   if (isRunning.value || isPaused.value) return 'text-info';
   if (isFinished.value) return 'text-success';
   if (isError.value) return 'text-destructive';
   return '';
 });
-// Progress 内部 indicator 色（Progress.vue 默认 bg-primary = 黑）；
-// 通过 [&>*]:bg-* 子选择器覆盖到对应 tone
+
 const progressIndicatorClass = computed(() => {
   if (isFinished.value) return '[&>*]:bg-success';
   if (isError.value) return '[&>*]:bg-destructive';
@@ -240,7 +233,7 @@ const progressIndicatorClass = computed(() => {
   return '';
 });
 
-// 4 个指标元数据，模板里 v-for 去掉重复
+// 4 Metrics Metadata
 const metrics = computed(() => [
   { key: 'downloadSpeed', label: t('speedtest.Download'), unit: 'Mb/s' },
   { key: 'uploadSpeed', label: t('speedtest.Upload'), unit: 'Mb/s' },
@@ -248,7 +241,7 @@ const metrics = computed(() => [
   { key: 'jitter', label: t('speedtest.Jitter'), unit: 'ms' },
 ]);
 
-// quality → Badge 配色（>=50 success, >=10 warning, else destructive）
+// Quality Badge Color: >=50 success, >=10 warning, else destructive
 const qualityBadgeClass = (score) => {
   if (score === '-' || score === undefined) return 'text-muted-foreground';
   if (score >= 50) return 'text-success';
@@ -256,7 +249,7 @@ const qualityBadgeClass = (score) => {
   return 'text-destructive';
 };
 
-// --- 连接数据 ----------------------------------------------------------
+// --- Connection Data ----------------------------------------------------------
 
 const connectionMethods = {
   async getIPFromSpeedTest() {
@@ -286,7 +279,7 @@ const connectionMethods = {
   },
 };
 
-// --- 测试引擎 ----------------------------------------------------------
+// --- Test Engine ----------------------------------------------------------
 
 let testEngine;
 const engineMethods = {
@@ -413,7 +406,7 @@ const engineMethods = {
   },
 };
 
-// --- 成就 --------------------------------------------------------------
+// --- Achievements --------------------------------------------------------------
 
 const achievementHandler = {
   checkAndUpdate() {
@@ -444,7 +437,7 @@ const achievementHandler = {
   },
 };
 
-// --- 测试控制 ----------------------------------------------------------
+// --- Test Control ----------------------------------------------------------
 
 const setupTestEngine = async () => {
   if (!state.connection.ip) {
@@ -521,7 +514,7 @@ const speedTestController = async () => {
   }
 };
 
-// --- 生命周期 ----------------------------------------------------------
+// --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('speedtest', true); });
 onUnmounted(() => { if (testEngine) testEngine = null; destroyCharts(); });
@@ -530,7 +523,7 @@ defineExpose({ speedTestController });
 </script>
 
 <style scoped>
-/* Vue transition：连接信息行的淡入淡出滑动 */
+/* Vue transition: Connection information line fade-in/out slide */
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -545,7 +538,7 @@ defineExpose({ speedTestController });
   opacity: 0;
 }
 
-/* 图表区域容器：Chart.js canvas 需要父容器有明确高度 */
+/* Charts container: Chart.js canvas needs a parent container with a clear height */
 .speed-charts-container {
   margin: 20pt 0;
 }
@@ -571,7 +564,7 @@ defineExpose({ speedTestController });
   }
 }
 
-/* 测试启动 / 完成时的滑入动画 */
+/* Test start / finish slide-in animation */
 .jn-slide-in {
   animation: jn-slide-in 0.2s ease-in forwards;
 }

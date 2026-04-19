@@ -1,7 +1,7 @@
 <template>
-    <!-- Advanced Tools — 与 Connectivity / WebRTC 等模块一致的 header + card grid 结构 -->
+    <!-- Advanced Tools -->
     <section class="advanced-tools-section mb-10">
-        <!-- 章节头 -->
+        <!-- Header -->
         <header class="mb-3">
             <h2 id="AdvancedTools" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
                 🧰 {{ t('advancedtools.Title') }}
@@ -9,40 +9,34 @@
             <p class="my-3 text-base text-muted-foreground">{{ t('advancedtools.Note') }}</p>
         </header>
 
-        <!-- 工具卡片网格 -->
+        <!-- Card grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <!-- 不加 keyboard-shortcut-card：快捷键导航只用于主页状态卡片，
-                 高级工具是"打开子页"的 tile，键盘导航语义不一致 -->
             <Card v-for="(card, index) in enabledCards" :key="index"
                 class="jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5"
                 role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
                 @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
                 @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
                 <CardContent class="p-4">
-                    <!-- 标题行：icon 走 inline + baseline 对齐
-                         CircleArrowOutUpRight 的 arrow 往右上伸，它的视觉中心不在 viewBox 几何中心，
-                         用 flex items-center 对齐盒子时肉眼会看到 icon 比文字偏高。
-                         inline 模式下 size 跟字号绑定 + vertical-align 微调，字号变化也能自适应 -->
                     <h3 class="text-xl md:text-2xl font-medium text-primary mb-2 pr-10">
                         <CircleArrowOutUpRight
                             class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
                         {{ t(card.titleKey) }}
                     </h3>
-                    <!-- 描述 -->
+                    <!-- Description -->
                     <p class="text-base text-muted-foreground line-clamp-2 min-h-10">
                         {{ t(card.noteKey) }}
                     </p>
-                    <!-- 右上角 emoji（保留 MyIP 的玩味特征：hover 放大上浮） -->
+                    <!-- Top right emoji -->
                     <span class="jn-emoji" aria-hidden="true">{{ card.icon }}</span>
                 </CardContent>
             </Card>
         </div>
 
-        <!-- 工具详情 Drawer（替代原 Sheet）：vaul 自带拖拽关闭 + body scale -->
+        <!-- Tool details Drawer -->
         <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
             <DrawerContent :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
                 :class="['jn-tools-drawer overflow-hidden', (isMobile || isFullScreen) ? 'h-full rounded-none' : 'h-[85vh]']">
-                <!-- Drawer 内部 header：全屏切换 + 标题 + 关闭 -->
+                <!-- Drawer internal header -->
                 <div class="flex items-center gap-2 px-4 pt-1 pb-3 jn-drawer-header shrink-0">
                     <button v-if="!isMobile" type="button"
                         class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -58,7 +52,7 @@
                     <DrawerClose @click="resetNavigatorURL()"
                         class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
                 </div>
-                <!-- 内容区（可滚动） -->
+                <!-- Content area (scrollable) -->
                 <div class="flex-1 overflow-y-auto px-1 md:px-2 pb-6" ref="scrollContainer">
                     <div :class="isMobile ? 'w-full' : 'jn-canvas-width'">
                         <router-view></router-view>
@@ -106,10 +100,10 @@ const enabledCards = computed(() => cards.filter(c => c.enabled));
 const isFullScreen = ref(false);
 const openedCard = computed(() => store.currentPath.id);
 
-// Drawer 开关与 store.openSheet 双向绑定（沿用 refactor/01 的 openSheet 语义）
+// Drawer toggle and store.openSheet bidirectional binding
 const isOpen = computed(() => store.openSheet === 'tools');
 const onOpenChange = (val) => {
-    // 关闭时把 router 回到 '/'，与原 resetNavigatorURL 行为保持一致
+    // When closed, go back to '/'
     if (!val) {
         store.setOpenSheet(null);
         if (router.currentRoute.value.path !== '/') {
@@ -121,7 +115,8 @@ const onOpenChange = (val) => {
     }
 };
 
-// 跳转到指定页面（开关由 router/index.js afterEach 驱动 store.setOpenSheet）
+// Navigate to specified page
+// Toggle driven by router/index.js afterEach and store.setOpenSheet
 const navigateAndToggleOffcanvas = (routePath) => {
     router.push(routePath);
     let capitalizedRoutePath = routePath.replace('/', '');
@@ -129,7 +124,7 @@ const navigateAndToggleOffcanvas = (routePath) => {
     trackEvent('Nav', 'NavClick', capitalizedRoutePath);
 };
 
-// 全屏切换：高度由 DrawerContent 的 class 响应式决定
+// Full screen toggle: height determined by DrawerContent's class
 const fullScreen = () => {
     isFullScreen.value = !isFullScreen.value;
 };
@@ -154,7 +149,6 @@ defineExpose({
 </script>
 
 <style scoped>
-/* 右上角 emoji：保留 MyIP 原有的 hover 放大上浮玩味特征 */
 .jn-emoji {
     position: absolute;
     top: 0.5rem;
@@ -174,7 +168,7 @@ defineExpose({
     text-shadow: 0 0 10pt rgb(255 255 255 / 0.15);
 }
 
-/* Drawer 内容区宽度（桌面） */
+/* Drawer content area width (desktop) */
 .jn-canvas-width {
     width: fit-content;
     margin: auto;
@@ -185,16 +179,13 @@ defineExpose({
     border-bottom: 1px solid var(--border);
 }
 
-/* Drawer 根容器需要 flex-col，让 header 固定 + 内容滚动 */
+/* Drawer root container needs flex-col, so that the header is fixed + content scrollable */
 .jn-tools-drawer {
     display: flex;
     flex-direction: column;
 }
 
-/* 全屏切换的 height 过渡 —— 必须满足两个条件：
-   1) 用 :global 透穿 scoped 边界：class 最终落在 vaul+reka-ui 嵌套组件的根 DOM 上
-   2) 同时声明 transform —— 否则会覆盖 vaul 自己的 transition:transform 0.5s，
-      破坏打开/拖拽的滑动动画 */
+/* Full screen toggle height transition */
 :global(.jn-tools-drawer) {
     transition:
         transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),

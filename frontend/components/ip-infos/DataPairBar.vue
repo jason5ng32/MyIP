@@ -1,5 +1,5 @@
 <template>
-    <!-- 左右双值 bar：用 foreground / muted-foreground 形成对比，自动适配明暗模式 -->
+    <!-- Left/right value bar: use foreground / muted-foreground for contrast, automatically adapt to dark/light mode -->
     <div>
         <div class="flex h-2 w-full overflow-hidden rounded-full border border-border"
             role="progressbar"

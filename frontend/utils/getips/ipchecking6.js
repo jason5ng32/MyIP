@@ -2,7 +2,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { getIPFromIpify_V6 } from "./ipify-v6";
 
-// 从 IPCheck.ing 获取 IPv6 地址
+// Get IPv6 address from IPCheck.ing
 const getIPFromIPChecking6 = async (originalSite) => {
     try {
         let ip;
@@ -23,7 +23,7 @@ const getIPFromIPChecking6 = async (originalSite) => {
     } catch (error) {
         console.error("Error fetching IP from IPCheck.ing IPv6:", error);
     }
-    // 故障转移
+    // Fallback
     const { ip, source } = await getIPFromIpify_V6();
     return {
         ip: ip,

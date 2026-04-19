@@ -1,13 +1,13 @@
 <template>
     <div class="dns-resolver-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <p class="text-sm text-muted-foreground">{{ t('dnsresolver.Note') }}</p>
 
-        <!-- 输入区 -->
+        <!-- Input area -->
         <div class="space-y-3">
             <label for="queryURL" class="text-sm font-medium block">{{ t('dnsresolver.Note2') }}</label>
 
-            <!-- 记录类型选择器：6 档 → ToggleGroup 横向 -->
+            <!-- Record type selector: 6 options → ToggleGroup horizontally -->
             <div class="flex flex-wrap items-center gap-2">
                 <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
                 <ToggleGroup :model-value="queryType" type="single"
@@ -18,7 +18,7 @@
                 </ToggleGroup>
             </div>
 
-            <!-- Input + Run：InputGroup 拼接 -->
+            <!-- Input + Run -->
             <InputGroup>
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
                     :disabled="dnsCheckStatus === 'running'"
@@ -34,7 +34,7 @@
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
-        <!-- 结果表 -->
+        <!-- Result table -->
         <Card v-if="combinedResults && combinedResults.length">
             <CardContent class="p-0">
                 <div class="overflow-x-auto">

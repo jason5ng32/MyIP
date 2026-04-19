@@ -3,7 +3,7 @@ import { describe, it, after } from 'node:test';
 
 import { scrollToElement } from '../frontend/composables/use-scroll-to.js';
 
-// 注入最小 DOM 桩，模块本身不访问 globalThis，函数调用时才读
+// inject minimal DOM stub, module itself does not access globalThis, reads only when function is called
 let scrollTarget = null;
 globalThis.window = {
   scrollY: 100,

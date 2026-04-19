@@ -1,12 +1,12 @@
 <template>
     <div class="ping-test-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="text-sm text-muted-foreground space-y-1.5">
             <p>{{ t('pingtest.Note') }}</p>
             <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>
         </div>
 
-        <!-- 输入区：IP 选择 + Run -->
+        <!-- Input area: IP selection + Run -->
         <div class="space-y-2">
             <label for="pingIP" class="text-sm font-medium block">{{ t('pingtest.Note3') }}</label>
             <InputGroup>
@@ -26,14 +26,14 @@
             </InputGroup>
         </div>
 
-        <!-- 错误提示 -->
+        <!-- Error Message -->
         <div v-if="pingCheckStatus === 'error'"
             class="flex items-start gap-2 p-3 rounded-md border border-info/30 bg-info/10 text-sm text-info">
             <Info class="size-4 mt-0.5 shrink-0" />
             <span class="leading-relaxed">{{ t('pingtest.Error') }}</span>
         </div>
 
-        <!-- 结果表 -->
+        <!-- Result table -->
         <Card v-if="pingResults.length > 0">
             <CardContent class="p-0">
                 <div class="overflow-x-auto">
@@ -86,7 +86,7 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- 地图容器（svgmap 库渲染到这里） -->
+                <!-- Map container (svgmap library renders here) -->
                 <div id="svgMap" class="m-3"></div>
             </CardContent>
         </Card>
@@ -129,7 +129,7 @@ const selectedIP = ref('');
 const pingResults = ref([]);
 const pingCheckStatus = ref('idle');
 
-// 表头配置：Region 左对齐，所有数字右对齐（tabular-nums 对齐小数点更整齐）
+// Header configuration: Region left aligned, all numbers right aligned (tabular-nums aligns decimal points more neatly)
 const headers = [
     { key: 'Region', align: 'left' },
     { key: 'MinDelay', align: 'right' },
@@ -141,7 +141,7 @@ const headers = [
     { key: 'DroppedPackets', align: 'right' },
 ];
 
-// 延迟着色：<100ms 绿（ok-fast），100-250ms 中性，>250ms 黄警告
+// Delay coloring: <100ms green (ok-fast), 100-250ms neutral, >250ms yellow warning
 const latencyToneClass = (ms) => {
     if (ms < 100) return 'text-success';
     if (ms < 250) return '';

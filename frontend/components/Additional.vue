@@ -5,7 +5,7 @@
             <DialogHeader :icon="Terminal" :title="t('curl.Title')" />
 
             <div v-if="curlDomainsHadSet" class="space-y-3">
-                <!-- 说明（// 注释风格，用 muted-foreground 跟暗色终端语义区分） -->
+                <!-- Description -->
                 <div class="space-y-1 text-xs font-mono">
                     <p class="jn-comment"><span class="text-muted-foreground">{{ t('curl.Note1') }}</span></p>
                     <p class="jn-comment">
@@ -20,7 +20,7 @@
                     </p>
                 </div>
 
-                <!-- 3 个 curl 命令块：保留终端美学（黑底 + 绿/黄语义色） -->
+                <!-- 3 curl command blocks -->
                 <div class="space-y-3">
                     <div>
                         <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv4') }}</p>
@@ -42,7 +42,7 @@
         </DialogContent>
     </Dialog>
 
-    <!-- Additional Tools：外部产品链接条 -->
+    <!-- Additional Tools: external product link bar -->
     <div class="mx-auto text-center max-w-[98%]">
         <div id="morefromipchecking" class="flex justify-center items-center gap-2 sm:gap-4 flex-wrap">
             <a href="https://www.raycast.com/jason5ng32/ipcheck-ing" target="_blank" rel="noopener"
@@ -68,11 +68,6 @@
 </template>
 
 <script setup>
-// refactor/02：Additional 切到 DialogHeader + 语义色
-// - 终端美学（黑底 + 绿/黄色码）刻意保留：这是命令行语义的 convention，不走主题 token
-// - 注释色 text-neutral-500 → text-muted-foreground，跟主题走
-// - 外部产品链接条：class 数组绑定改 Tailwind 响应式 class (w-[108px] sm:w-[180px])
-// - Curl 点击触发改成 <button>（image 元素不该有 type="button"）
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -102,7 +97,6 @@ defineExpose({
 </script>
 
 <style scoped>
-/* $ 和 // 前缀：用 var() 让颜色跟主题 muted-foreground；原版 #6c757d 是 Bootstrap 硬编码 */
 .jn-curl::before {
     content: '$ ';
     color: var(--muted-foreground);

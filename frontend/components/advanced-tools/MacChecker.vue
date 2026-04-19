@@ -1,9 +1,9 @@
 <template>
     <div class="mac-checker-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <p class="text-sm text-muted-foreground">{{ t('macchecker.Note') }}</p>
 
-        <!-- 输入区：label + InputGroup -->
+        <!-- Input area: label + InputGroup -->
         <div class="space-y-2">
             <label for="queryMAC" class="text-sm font-medium">{{ t('macchecker.Note2') }}</label>
             <InputGroup>
@@ -21,11 +21,11 @@
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
-        <!-- 结果区 -->
+        <!-- Result area -->
         <Card v-if="macCheckResult.success" id="macCheckResult">
             <CardContent class="p-4 md:p-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Manufacturer 详情 -->
+                    <!-- Manufacturer details -->
                     <section class="md:col-span-2 space-y-4">
                         <header class="flex items-center gap-2">
                             <Factory class="size-5 text-muted-foreground" />
@@ -59,7 +59,7 @@
                         </dl>
                     </section>
 
-                    <!-- Property 列表 -->
+                    <!-- Property list -->
                     <section class="space-y-4">
                         <header class="flex items-center gap-2">
                             <ListChecks class="size-5 text-muted-foreground" />

@@ -1,12 +1,11 @@
-// 页面主要 section ID（refactor/04）
+// Main section IDs for the page
 //
-// 这组 ID 在多处被使用：
-//   - store.mountingStatus / loadingStatus 的 key 集合
-//   - composables/use-section-tracking.js 的 scroll 监听与 `store.changeSection()`
-//   - App.vue 快捷键滚动目标
-//   - Nav.vue 顶部导航项循环
+// This set of IDs is used in multiple places:
+//   - store.mountingStatus / loadingStatus key set
+//   - composables/use-section-tracking.js scroll monitoring and `store.changeSection()`
+//   - App.vue shortcut scroll targets
+//   - Nav.vue top navigation item loop
 //
-// 以前每个消费方各自硬编码，容易漂移。统一到这里作为唯一真相源。
 
 export const SECTION_IDS = [
   'IPInfo',
@@ -19,7 +18,7 @@ export const SECTION_IDS = [
 
 export const DEFAULT_SECTION = 'IPInfo';
 
-// store.mountingStatus key 映射（小写 snake-ish 形式，与历史命名兼容）
+// store.mountingStatus key mapping (lowercase snake-ish format, compatible with historical naming)
 const MOUNTING_KEYS = [
   'ipcheck',
   'connectivity',
@@ -29,7 +28,7 @@ const MOUNTING_KEYS = [
   'advancedtools',
 ];
 
-// store.loadingStatus key 映射（是 mounting 的子集：不含 speedtest / advancedtools）
+// store.loadingStatus key mapping (subset of mounting: without speedtest / advancedtools)
 const LOADING_KEYS = [
   'ipcheck',
   'connectivity',
@@ -44,12 +43,12 @@ function createStatusObject(keys) {
   }, {});
 }
 
-/** 返回一份全新的 mountingStatus 初始对象 */
+/** Returns a fresh mountingStatus initial object */
 export function createMountingStatus() {
   return createStatusObject(MOUNTING_KEYS);
 }
 
-/** 返回一份全新的 loadingStatus 初始对象 */
+/** Returns a fresh loadingStatus initial object */
 export function createLoadingStatus() {
   return createStatusObject(LOADING_KEYS);
 }

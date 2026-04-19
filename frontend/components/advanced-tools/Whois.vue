@@ -1,9 +1,9 @@
 <template>
     <div class="whois-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <p class="text-sm text-muted-foreground">{{ t('whois.Note') }}</p>
 
-        <!-- 输入区 -->
+        <!-- Input area -->
         <div class="space-y-2">
             <label for="queryURLorIP" class="text-sm font-medium block">{{ t('whois.Note2') }}</label>
             <InputGroup>
@@ -21,15 +21,15 @@
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
-        <!-- 结果区 -->
+        <!-- Result area -->
         <div v-if="whoisResults && Object.keys(whoisResults).length" class="space-y-3">
-            <!-- 顶部成功提示条 -->
+            <!-- Top success prompt bar -->
             <div class="flex items-start gap-2 p-3 rounded-md border border-success/30 bg-success/10 text-sm text-success">
                 <Info class="size-4 mt-0.5 shrink-0" />
                 <span class="leading-relaxed">{{ t('whois.Note3') }}</span>
             </div>
 
-            <!-- domain 类型：多 provider Accordion -->
+            <!-- domain type: multiple provider Accordion -->
             <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0" class="space-y-2">
                 <AccordionItem v-for="(provider, index) in providers" :key="provider" :value="String(index)"
                     class="rounded-lg border bg-card px-4">
@@ -50,7 +50,7 @@
                 </AccordionItem>
             </Accordion>
 
-            <!-- ip 类型：单块 raw 输出 -->
+            <!-- ip type: single block raw output -->
             <div v-else>
                 <pre
                     class="p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>

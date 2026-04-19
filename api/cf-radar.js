@@ -1,6 +1,6 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
-// 通用的 fetch 请求函数
+// Common fetch request function
 async function fetchFromCloudflare(endpoint) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
     const response = await fetchUpstream(url, {
@@ -12,7 +12,7 @@ async function fetchFromCloudflare(endpoint) {
     return response.json();
 }
 
-// ASN 信息
+// ASN information
 async function getASNInfo(asn) {
     try {
         return await fetchFromCloudflare(`/radar/entities/asns/${asn}`);
@@ -22,7 +22,7 @@ async function getASNInfo(asn) {
     }
 };
 
-// IP 版本分布
+// IP version distribution
 async function getASNIPVersion(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`);
@@ -32,7 +32,7 @@ async function getASNIPVersion(asn) {
     }
 };
 
-// HTTP 协议分布
+// HTTP protocol distribution
 async function getASNHTTPProtocol(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`);
@@ -42,7 +42,7 @@ async function getASNHTTPProtocol(asn) {
     }
 };
 
-// 设备分布
+// Device distribution
 async function getASNDeviceType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/device_type?asn=${asn}&dateRange=7d`);
@@ -52,7 +52,7 @@ async function getASNDeviceType(asn) {
     }
 };
 
-// 机器人分布
+// Bot distribution
 async function getASNBotType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`);
@@ -62,7 +62,7 @@ async function getASNBotType(asn) {
     }
 };
 
-// 使用 Promise.all 进行并行请求
+// Use Promise.all to make parallel requests
 async function getAllASNData(asn) {
     try {
         const [asnInfo, ipVersion, httpProtocol, deviceType, botType] = await Promise.all([
@@ -79,12 +79,12 @@ async function getAllASNData(asn) {
     }
 }
 
-// 验证 asn 是否合法
+// Validate asn is valid
 function isValidASN(asn) {
     return /^[0-9]+$/.test(asn);
 };
 
-// 清洗 Cloudflare Radar 返回的数据到统一字段名。
+// Clean up Cloudflare Radar return data to uniform field names.
 // Hoisted to module scope — was redefined inside the handler on every request.
 function cleanUpResponseData(data) {
     return {
@@ -103,7 +103,7 @@ function cleanUpResponseData(data) {
     };
 }
 
-// 格式化输出
+// Format output
 
 function formatData(data) {
     const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
@@ -126,7 +126,7 @@ function formatData(data) {
 
 }
 
-// 过滤不存在的字段
+// Filter out non-existent fields
 function filterData(data) {
     for (const key in data) {
         if (data[key] === 'NaN' || data[key] === 'NaN%') {
@@ -136,7 +136,7 @@ function filterData(data) {
     return data;
 }
 
-// 导出函数
+// Export function
 export default async (req, res) => {
     const asn = req.query.asn;
     if (!asn) {

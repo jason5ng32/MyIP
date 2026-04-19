@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import { maskedInfo } from '../frontend/utils/masked-info.js';
 
-// 简单 i18n 翻译桩：直接返回 key，便于断言模板引用而非硬编码翻译文本
+// simple i18n translation stub: return key for assertions, to verify template references rather than hardcoded translation text
 const t = (key) => `<${key}>`;
 
 describe('maskedInfo(t)', () => {

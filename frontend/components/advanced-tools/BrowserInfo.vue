@@ -1,13 +1,13 @@
 <template>
     <div class="browser-info-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="text-sm text-muted-foreground space-y-1.5">
             <p>{{ t('browserinfo.Note') }}</p>
             <p>{{ t('browserinfo.Note2') }}</p>
         </div>
 
         <Transition name="slide-fade" mode="out-in">
-            <!-- 加载 / 错误态 -->
+            <!-- Loading / error state -->
             <div v-if="checkingStatus !== 'finished'"
                 class="flex items-center justify-center gap-2 py-8 text-sm">
                 <template v-if="checkingStatus === 'running'">
@@ -17,11 +17,11 @@
                 <p v-else-if="checkingStatus === 'error'" class="text-destructive">{{ errorMsg }}</p>
             </div>
 
-            <!-- 结果态：外层 Card 包住，内部左 2/3 Browser + 右 1/3 Fingerprint -->
+            <!-- Result state: outer Card wraps, internal left 2/3 Browser + right 1/3 Fingerprint -->
             <Card v-else id="browserInfoResult">
                 <CardContent class="p-4 md:p-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Browser 区 -->
+                        <!-- Browser area -->
                         <section class="md:col-span-2 space-y-4">
                             <header class="flex items-center gap-2">
                                 <BriefcaseBusiness class="size-5 text-muted-foreground" />
@@ -30,7 +30,7 @@
                                 </h3>
                             </header>
 
-                            <!-- UA hero 块 —— success 色系强调 -->
+                            <!-- UA hero block —— success color emphasis -->
                             <div class="rounded-lg border border-success/30 bg-success/10 p-3 space-y-2">
                                 <div class="flex items-center justify-between gap-2">
                                     <Badge class="bg-success text-success-foreground border-transparent font-normal">
@@ -45,7 +45,7 @@
                                 <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>
                             </div>
 
-                            <!-- 字段 dl 网格 -->
+                            <!-- Field dl grid -->
                             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                                 <div v-for="f in browserFields" :key="f.label">
                                     <dt class="text-sm text-muted-foreground mb-0.5">{{ f.label }}</dt>
@@ -54,7 +54,7 @@
                             </dl>
                         </section>
 
-                        <!-- Fingerprint 区 -->
+                        <!-- Fingerprint area -->
                         <section class="space-y-4">
                             <header class="flex items-center gap-2">
                                 <Fingerprint class="size-5 text-muted-foreground" />
@@ -63,7 +63,7 @@
                                 </h3>
                             </header>
 
-                            <!-- Fingerprint hero 块 —— info 色系强调（跟 UA 区分） -->
+                            <!-- Fingerprint hero block —— info color emphasis (different from UA) -->
                             <div class="rounded-lg border border-info/30 bg-info/10 p-3 space-y-2">
                                 <Badge class="bg-info text-info-foreground border-transparent font-normal">
                                     {{ t('browserinfo.fingerprint.fingerprint') }}
@@ -71,7 +71,7 @@
                                 <p class="font-mono text-sm wrap-break-word">{{ fingerprint }}</p>
                             </div>
 
-                            <!-- Exclude options -->
+                            <!-- Exclude options list -->
                             <div>
                                 <p class="text-sm mb-2">{{ t('browserinfo.fingerprint.changeOption') }}</p>
                                 <div class="rounded-lg border bg-card divide-y">
@@ -85,7 +85,7 @@
                                 </div>
                             </div>
 
-                            <!-- 提示 -->
+                            <!-- Hint -->
                             <div class="flex items-start gap-2 p-3 rounded-md bg-muted/50 text-xs text-muted-foreground">
                                 <Info class="size-3.5 mt-0.5 shrink-0" />
                                 <span class="leading-relaxed">{{ t('browserinfo.fingerprint.browserTips') }}</span>
@@ -136,7 +136,7 @@ const userAgent = ref('');
 const gpu = ref('');
 const otherInfos = ref({});
 
-// 浏览器字段：数据驱动，避免模板重复 8 段 jn-detail
+// Browser fields: data-driven, avoid template repetition of 8 jn-detail sections
 const browserFields = computed(() => {
     if (!userAgent.value || !userAgent.value.browser) return [];
     return [

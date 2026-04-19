@@ -1,4 +1,4 @@
-// 验证环境变量是否存在，以进行前端功能的开启和关闭
+// Validate environment variables exist to enable/disable frontend features
 export default (req, res) => {
     // defensive; app.get() in backend-server.js already gates method, but a
     // dedicated smoke test asserts this branch directly against the handler.
@@ -11,7 +11,7 @@ export default (req, res) => {
     // deployment ("originalSite") or someone self-hosting a fork.
     const referer = req.headers.referer;
     const hostname = referer ? new URL(referer).hostname : '';
-    const allowedHostnames = ['ipcheck.ing', 'www.ipcheck.ing', 'localtest.ipcheck.ing'];
+    const allowedHostnames = ['ipcheck.ing', 'www.ipcheck.ing', 'localtest.ipcheck.ing', 'dev.ipcheck.ing', 'test.ipcheck.ing'];
     const originalSite = allowedHostnames.includes(hostname);
 
     const envConfigs = {

@@ -1,6 +1,6 @@
 <template>
   <footer class="mt-10 pb-6 text-sm text-muted-foreground">
-    <!-- 第一行：作者 + Github —————————————————— -->
+    <!-- Author + Github -->
     <div class="flex items-center justify-center gap-1.5 mb-3">
       <span>Created by Jason Ng with love</span>
       <JnTooltip :text="t('Tooltips.GithubLink')" side="top">
@@ -13,12 +13,9 @@
       </JnTooltip>
     </div>
 
-    <!-- 第二行：Sponsor / About 入口 —————————————— -->
+    <!-- Sponsor / About entry -->
     <div class="flex items-center justify-center gap-2 mb-3">
-      <!-- Sponsor 用 arbitrary value 直接表达粉色：Button ghost 的 hover:text-accent-foreground
-          会覆盖普通 class，必须用 hover:text-[#d63384] 强表达，配合 cn/tw-merge 才会生效 -->
-      <Button variant="link" size="default" as-child
-        class="text-[#d63384] hover:text-[#d63384]">
+      <Button variant="link" size="default" as-child class="text-[#d63384] hover:text-[#d63384]">
         <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener">
           {{ t('about.Sponsor') }} 💖
         </a>
@@ -29,7 +26,7 @@
       </Button>
     </div>
 
-    <!-- 第三行：版权（可选） —————————————————— -->
+    <!-- Copyright -->
     <p v-if="!configs.originalSite" class="text-center text-xs opacity-70">
       {{ t('page.copyRightName') }}
       <a :href="t('page.copyRightLink')" target="_blank" rel="noopener"
@@ -38,13 +35,12 @@
       </a>
     </p>
 
-    <!-- About Sheet（右侧滑入：阅读型侧栏更适合长文本浏览） -->
+    <!-- About Sheet -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
       <SheetContent side="right" :title="t('about.Title')"
         :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]']">
-        <!-- Tabs 包住整个 Sheet 内容：TabsList 留在 header，TabsContent 进 body 滚动区 -->
         <Tabs v-model="content" class="flex flex-col h-full">
-          <!-- 顶部：tabs + 关闭 -->
+          <!-- Top: tabs + close -->
           <div class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
             <TabsList>
               <TabsTrigger v-for="tab in tabs" :key="tab" :value="tab">
@@ -55,9 +51,9 @@
               class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
           </div>
 
-          <!-- 内容区（独立滚动） -->
+          <!-- Content area (independent scrolling) -->
           <div class="flex-1 overflow-y-auto px-5 py-5" ref="sheetBody">
-            <!-- About ———————————————————————————— -->
+            <!-- About -->
             <TabsContent value="about" class="space-y-6 mt-0">
               <section class="space-y-2">
                 <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
@@ -73,8 +69,8 @@
                   </p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Button v-for="link in personalLinks" :key="link.href"
-                    variant="outline" size="sm" as-child class="justify-start">
+                  <Button v-for="link in personalLinks" :key="link.href" variant="outline" size="sm" as-child
+                    class="justify-start">
                     <a :href="link.href" target="_blank" rel="noopener">
                       <Compass />
                       <span class="flex-1 text-left">{{ t(link.labelKey) }}</span>
@@ -90,9 +86,9 @@
               </section>
             </TabsContent>
 
-            <!-- Changelog ———————————————————————— -->
+            <!-- Changelog -->
             <!-- Data lives in frontend/data/changelog.json (shared version / date, per-lang change text).
-                 Badge labels and the section title stay in locale files as UI chrome. -->
+                Badge labels and the section title stay in locale files as UI chrome. -->
             <TabsContent value="changelog" class="space-y-6 mt-0">
               <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
@@ -102,9 +98,8 @@
                 <Separator class="mb-3" />
                 <ul class="space-y-2">
                   <li v-for="(item, idx) in version.content" :key="idx" class="flex items-start gap-2 text-sm">
-                    <!-- Badge 去 shadow：changelog 的条目 Badge 是标签色块，不需要阴影抢戏 -->
                     <Badge :class="changelogBadgeClass(item.type)"
-                      class="shrink-0 !shadow-none rounded-full font-normal mt-0.5 min-w-16 justify-center">
+                      class="shrink-0 shadow-none! rounded-full font-normal mt-0.5 min-w-16 justify-center">
                       {{ t('changelog.' + item.type) }}
                     </Badge>
                     <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
@@ -113,7 +108,7 @@
               </section>
             </TabsContent>
 
-            <!-- Special Thanks ———————————————————— -->
+            <!-- Special Thanks -->
             <TabsContent value="specialthanks" class="space-y-4 mt-0">
               <p class="text-sm text-muted-foreground leading-relaxed">{{ t('specialthanks.Note1') }}</p>
               <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 list-none p-0">
@@ -141,10 +136,6 @@
 </template>
 
 <script setup>
-// refactor/02：Footer 全部走 shadcn primitive
-// - 链接/按钮一律 <Button>（ghost / outline / link 变体）
-// - About 弹窗用 Sheet（右侧滑入），内部 tab 用 Tabs / TabsList / TabsTrigger / TabsContent
-// - Changelog Badge 取消阴影
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -189,7 +180,7 @@ const thanksList = [
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
 ];
 
-// changelog 类型 → 语义色 token：add → success；improve → info；fix → destructive
+// changelog type → semantic color token: add → success; improve → info; fix → destructive
 const changelogBadgeClass = (type) => {
   if (type === 'add') return 'bg-success text-success-foreground border-transparent';
   if (type === 'improve') return 'bg-info text-info-foreground border-transparent';
@@ -197,7 +188,7 @@ const changelogBadgeClass = (type) => {
   return '';
 };
 
-// Sheet 开关与 store.openSheet 双向绑定（refactor/01）
+// Sheet toggle and store.openSheet bidirectional binding
 const isOpen = computed(() => store.openSheet === 'about');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'about' : null);

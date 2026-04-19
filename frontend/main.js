@@ -4,21 +4,13 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
-// refactor/01：所有 Bootstrap JS 部件（Modal / Offcanvas / Toast / Tooltip /
-// Dropdown / Collapse / Accordion / Tab / ScrollSpy）均已迁移到 shadcn-vue
-// 或等价实现，bootstrap 的 JS 不再需要。Bootstrap 的 CSS 仍通过 style.css
-// 的 @import 加载，为模板里的 .btn / .card / .row 等 class 提供样式，
-// 直到未来逐组件改写为 Tailwind 直接表达时才会删除 @import。
 import { analytics } from './utils/use-analytics';
 import { registerServiceWorker } from './utils/register-service-worker';
 
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
 
-// iconify circle-flags 集合离线注册：
-// - 动态 import 让 Vite 把这份 500KB 的 JSON 分块，不进主 bundle
-// - Promise then 异步注册；首屏渲染时国旗可能瞬间空着，~100ms 后出现
-// - 注册完后 <Icon icon="circle-flags:xx" /> 即可用，不依赖 iconify CDN
+// Dynamic import of circle-flags collection
 import('@iconify-json/circle-flags/icons.json').then(({ default: flags }) => {
     import('@iconify/vue').then(({ addCollection }) => addCollection(flags));
 });
@@ -33,39 +25,39 @@ app.use(i18n);
 app.use(router);
 
 //
-// 初始化一系列操作
+// Initialize a series of operations
 //
 
-// 在应用启动时设置语言
+// Set language when app starts
 store.lang = i18n.global.locale;
 
-// 检测操作系统
+// Detect operating system
 const os = detectOS();
 
-// 窗口大小变化处理
+// Handle window size change
 function handleResize() {
     store.setIsMobile(window.innerWidth < 768 || os.isAndroid || os.isIOS );
 }
 handleResize();
 
-// 监听窗口大小变化
+// Listen to window size change
 window.addEventListener('resize', handleResize);
 
-// 启动 Google Analytics
+// Start Google Analytics
 analytics.page();
 registerServiceWorker();
 
-// 检查 Firebase 环境
+// Check Firebase environment
 store.checkFirebaseEnv();
 
-// 获取后端配置和用户偏好
+// Fetch backend configs and user preferences
 Promise.all([
     store.isFireBaseSet ? store.initializeAuthListener() : Promise.resolve(),
-    store.loadPreferences(), // 加载用户偏好设置
-    store.fetchConfigs()      // 获取后端配置
+    store.loadPreferences(), // Load user preferences
+    store.fetchConfigs()      // Fetch backend configs
 ]).then(() => {
     app.mount('#app');
 }).catch(error => {
     console.error("Failed to initialize the app properly:", error);
-    app.mount('#app'); // 即使初始化中存在错误，也继续挂载应用
+    app.mount('#app'); // Even if there is an error during initialization, continue to mount the application
 });

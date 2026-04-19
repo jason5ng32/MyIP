@@ -3,7 +3,7 @@ import { describe, it, afterEach, beforeEach } from 'node:test';
 
 import { refererCheck } from '../common/referer-check.js';
 
-// 每条用例前备份 ALLOWED_DOMAINS，用完恢复
+// backup ALLOWED_DOMAINS before each test, restore after each test
 let backup;
 beforeEach(() => { backup = process.env.ALLOWED_DOMAINS; });
 afterEach(() => {

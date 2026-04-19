@@ -7,10 +7,10 @@ export async function authenticatedFetch(url, method = 'GET', body = null) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: body ? JSON.stringify(body) : null, // 如果提供了 body，则将其转换为 JSON 字符串
+        body: body ? JSON.stringify(body) : null, // If body is provided, convert it to a JSON string
     };
 
-    // 检查 URL 是否是需要认证的代理 API
+    // Check if the URL is a proxy API that needs authentication
     const isProxyApi = url.startsWith('/api/');
 
     if (isProxyApi && store.user) {
@@ -24,7 +24,7 @@ export async function authenticatedFetch(url, method = 'GET', body = null) {
         if (!response.ok) {
             let errorDetail = '';
             try {
-                // 获得具体的错误信息
+                // Get specific error information
                 const errorData = await response.json();
                 errorDetail = errorData.message || JSON.stringify(errorData);
             } catch {

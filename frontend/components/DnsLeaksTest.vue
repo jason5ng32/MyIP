@@ -1,7 +1,7 @@
 <template>
-  <!-- DNS Leak Test — 与 Connectivity 一致的 service-status-card 结构 -->
+  <!-- DNS Leak Test -->
   <section class="mb-10">
-    <!-- 章节头 -->
+    <!-- Header -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
         <h2 id="DNSLeakTest" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
@@ -19,12 +19,12 @@
       </JnTooltip>
     </header>
 
-    <!-- 卡片网格 -->
+    <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card v-for="(leak, index) in leakTest" :key="leak.id"
         class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
         <CardContent class="p-4">
-          <!-- 顶部：心跳图标 + 名字 + 序号 -->
+          <!-- Top: heartbeat icon + name + index -->
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2 min-w-0">
               <HeartPulse class="size-6 text-muted-foreground shrink-0" />
@@ -34,8 +34,7 @@
           </div>
           </div>
 
-          <!-- 端点状态行：超长 IPv6 通过字号降级保持单行显示；
-               resolved 时整行（label + IP）一起缩放，保持视觉节奏一致 -->
+          <!-- Endpoint status row: long IPv6 downgraded by font size to keep single line display -->
           <div class="flex items-center gap-1.5 mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(leak) === 'wait'"
@@ -46,15 +45,13 @@
               :class="fitOneLineClass(endpointLineText(leak))"
               :title="leak.ip">
               <template v-if="isResolved(leak)">
-                <span class="text-muted-foreground">{{ t('dnsleaktest.Endpoint') }}:</span>
-                <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+                <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ t('dnsleaktest.Endpoint') }}: {{ leak.ip }}</span>
               </template>
               <span v-else class="text-base" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
             </span>
           </div>
 
-          <!-- ISP + Country 子块：dt 配图标做视觉锚点；
-               等待/错误态字段显示 —，不复述状态文字 -->
+          <!-- ISP + Country sub-block -->
           <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -111,7 +108,7 @@ const isStarted = ref(false);
 
 const { dotClass, textClass } = useStatusTone();
 
-// 业务状态 → 4 档 tone
+// Business status → 4 tone levels
 const toneOf = (leak) => {
   if (leak.ip === t('dnsleaktest.StatusWait')) return 'wait';
   if (leak.ip === t('dnsleaktest.StatusError')) return 'fail';
@@ -119,22 +116,22 @@ const toneOf = (leak) => {
   return 'wait';
 };
 
-// dl 子块里单个字段是否处于"无数据"态（等待/错误/空）
+
+// Status
 const isFieldPending = (value) => {
   return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
 };
-// 整张卡是否已经解析出了真实 endpoint（不在 wait/fail 态）
+
 const isResolved = (leak) => toneOf(leak) === 'ok-fast';
 
-// IP 字号降级：IPv4 ≤15 字符保持 base；短压缩 IPv6 降到 sm；完整 IPv6（最长 39 字符）再降到 xs
-// 保证单行显示全，不因 IPv6 换行或截断
+// Ensure full line display, without line breaks due to IPv6
 const fitOneLineClass = (text) => {
   const len = typeof text === 'string' ? text.length : 0;
   if (len <= 15) return 'text-base';
   if (len <= 26) return 'text-sm';
   return 'text-xs';
 };
-// resolved 时总文本 = label + ': ' + ip；用它来判断整行字号，让 label 跟 IP 一起缩
+// When resolved, the total text = label + ': ' + ip; use it to determine the font size of the entire line, so that the label and IP scale together
 const endpointLineText = (leak) => isResolved(leak)
   ? `${t('dnsleaktest.Endpoint')}: ${leak.ip}`
   : leak.ip;
@@ -154,7 +151,7 @@ const leakTest = reactive([
   { ...createDefaultCard(), id: 'sfshark2' },
 ]);
 
-// 生成 32 位随机字符串
+// Generate 32-digit random string
 const generate32DigitString = () => {
   const unixTime = Date.now().toString();
   const fixedString = 'jason5ng32';
@@ -162,14 +159,14 @@ const generate32DigitString = () => {
   return unixTime + fixedString + randomString;
 };
 
-// 生成 14 位随机字符串
+// Generate 14-digit random string
 const generate14DigitString = () => {
   const fixedString = 'jn32';
   const randomString = Math.random().toString(36).substring(2, 11);
   return fixedString + randomString;
 };
 
-// DNS 泄露测试 1
+// DNS leak test 1
 const fetchLeakTestIpApiCom = (index) => {
   return new Promise((resolve, reject) => {
     const urlString = generate32DigitString();
@@ -204,7 +201,7 @@ const fetchLeakTestIpApiCom = (index) => {
   });
 };
 
-// DNS 泄露测试 2
+// DNS leak test 2
 const fetchLeakTestSfSharkCom = (index, key) => {
   return new Promise((resolve, reject) => {
     const urlString = generate14DigitString();
@@ -241,7 +238,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
   });
 };
 
-// 检查所有
+// Check all
 const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
   if (isRefresh) {

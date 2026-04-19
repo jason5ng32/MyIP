@@ -1,9 +1,6 @@
-// 滚动跟踪：页面 scroll 时
-//   1) 捕捉第一个部分可见的 section，写入 store.changeSection()（供 Nav 高亮用）
-//   2) 各 section 首次完全进入视窗时发一次 JNScroll 事件（仅触发一次，去重）
-//
-// 原实现在 widgets/Patch.vue 里——空 template 的 Vue 组件纯粹用来挂 onMounted 副作用，
-// 角色严重错配。抽成 composable，调用侧在 setup() 里用一次即可。
+// Scroll tracking: when page scrolls
+//   1) capture the first partially visible section, write to store.changeSection() (for Nav highlighting)
+//   2) send one JNScroll event when each section first fully enters the viewport (only once, deduplicated)
 
 import { onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';

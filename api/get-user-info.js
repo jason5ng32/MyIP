@@ -7,7 +7,7 @@ export default async (req, res) => {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    // 构建请求
+    // Build request
     const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
     const url = new URL(`${apiEndpoint}/userinfo?key=${key}`);
 

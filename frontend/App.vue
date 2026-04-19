@@ -26,12 +26,6 @@
 </template>
 
 <script setup>
-// refactor/02：原 590 行上帝组件拆成 composables（frontend/composables/）：
-//   - use-info-mask.js         信息遮罩 3 级切换
-//   - use-refresh-orchestrator 刷新 + 初次加载时序
-//   - use-shortcuts            键盘快捷键
-//   - use-scroll-to            平滑滚动小工具
-
 // Components
 import NavBar from './components/Nav.vue';
 import IPCheck from './components/IpInfos.vue';
@@ -90,18 +84,18 @@ const connectivityRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
 
-// 隐藏首屏 loading 遮罩
+// Hide loading mask on first screen
 const loadingElement = document.getElementById('jn-loading');
 if (loadingElement) loadingElement.style.display = 'none';
 
-// 信息遮罩
+// Info mask
 const { infoMaskLevel, isInfosLoaded, showMaskButton, toggleInfoMask } = useInfoMask({
     refs: { IPCheckRef, webRTCRef, dnsLeaksRef },
     store,
     t,
 });
 
-// 刷新 / 初次加载时序
+// Refresh / initial load sequence
 const { loadingControl } = useRefreshOrchestrator({
     refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef },
     store,
@@ -110,7 +104,7 @@ const { loadingControl } = useRefreshOrchestrator({
     infoMaskLevel,
 });
 
-// 快捷键
+// Shortcuts
 const { loadShortcuts } = useShortcuts({
     refs: {
         navBarRef, preferencesRef, queryIPRef, helpModalRef, additionalRef, footerRef,
@@ -120,7 +114,7 @@ const { loadShortcuts } = useShortcuts({
     store, t, configs, userPreferences, isSignedIn,
 });
 
-// 滚动监听 + section 追踪（原 widgets/Patch.vue 里的逻辑）
+// Scroll monitoring + section tracking (logic from widgets/Patch.vue)
 useSectionTracking();
 
 onMounted(() => {

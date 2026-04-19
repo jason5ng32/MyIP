@@ -1,22 +1,22 @@
 <template>
     <div class="security-checklist-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="text-sm text-muted-foreground space-y-1.5 leading-relaxed">
             <p>{{ t('securitychecklist.Note') }}</p>
             <p>{{ t('securitychecklist.Note2') }}</p>
         </div>
 
-        <!-- 加载态 -->
+        <!-- Loading state -->
         <div v-if="!fullList" class="flex items-center justify-center gap-2 py-8 text-sm">
             <Spinner class="text-info" />
             <span class="text-muted-foreground">{{ t('securitychecklist.Loading') }}</span>
         </div>
 
         <template v-else>
-            <!-- 顶部进度面板 -->
+            <!-- Top progress panel -->
             <Card>
                 <CardContent class="p-4 md:p-6 space-y-4">
-                    <!-- 标题栏 -->
+                    <!-- Title bar -->
                     <header class="flex items-center justify-between gap-2">
                         <h3 class="flex items-center gap-2 text-base font-semibold m-0">
                             <ClipboardList class="size-4 text-muted-foreground" />
@@ -30,7 +30,7 @@
                         </JnTooltip>
                     </header>
 
-                    <!-- 统计数字：4 组 stat blocks 代替一行长句子 -->
+                    <!-- Statistical numbers -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <div class="flex flex-col items-start p-3 rounded-md bg-muted/50">
                             <span class="text-xs text-muted-foreground">{{ t('securitychecklist.alert-total') }}</span>
@@ -50,12 +50,12 @@
                         </div>
                     </div>
 
-                    <!-- 左 2/3 分类进度条 + 右 1/3 优先级圆形图 -->
+                    <!-- Left 2/3 category progress bar + right 1/3 priority circular chart -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- 各分类进度条 stacked（checked + ignored 两段） -->
+                        <!-- Each category progress bar stacked (checked + ignored two segments) -->
                         <div class="md:col-span-2 space-y-2">
                             <div v-for="item in categories" :key="item" class="flex items-center gap-3 text-sm">
-                                <span class="shrink-0 text-foreground/85 min-w-[5rem] truncate">{{ fullList[item].title
+                                <span class="shrink-0 text-foreground/85 min-w-20 truncate">{{ fullList[item].title
                                     }}</span>
                                 <span class="flex h-2 flex-1 overflow-hidden rounded-full bg-muted" role="progressbar">
                                     <div class="h-full bg-success transition-all"
@@ -68,7 +68,7 @@
                             </div>
                         </div>
 
-                        <!-- 按优先级分的 4 个圆形进度 -->
+                        <!-- 4 circular progress by priority -->
                         <div class="grid grid-cols-2 gap-2">
                             <div v-for="item in priorities" :key="item" class="flex justify-center">
                                 <CircleProgressBar v-if="priorityDenom(item) !== 0"
@@ -92,9 +92,9 @@
                 </CardContent>
             </Card>
 
-            <!-- 主体：左分类导航 + 右详情 -->
+            <!-- Main body: left category navigation + right details -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- 左 1/3：分类导航 -->
+                <!-- Left 1/3: category navigation -->
                 <nav class="space-y-1.5">
                     <button v-for="item in categories" :key="item" type="button" @click="changeList(item, true)"
                         class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-md text-sm text-left transition-colors border cursor-pointer"
@@ -106,7 +106,7 @@
                             <span class="truncate">{{ fullList[item].title }}</span>
                         </span>
                         <span class="shrink-0 flex items-center gap-1.5">
-                            <!-- 右侧：完成百分百显示 ✓，否则显示 checked/total -->
+                            <!-- Right: completed 100% display ✓, otherwise display checked/total -->
                             <CircleCheck v-if="countItems({ action: 'percentage', category: item }) === 100"
                                 class="size-4 text-success" />
                             <span v-else class="text-xs tabular-nums text-muted-foreground">
@@ -119,11 +119,11 @@
                     </button>
                 </nav>
 
-                <!-- 右 2/3：当前分类详情 -->
+                <!-- Right 2/3: current category details -->
                 <div id="checklist" class="md:col-span-2">
                     <Card>
                         <CardContent class="p-4 md:p-6 space-y-4">
-                            <!-- 分类标题 + 描述 + 可展开 intro -->
+                            <!-- Category title + description + expandable intro -->
                             <header>
                                 <h2 class="flex items-center gap-2 text-xl font-semibold tracking-tight m-0 mb-2">
                                     <component :is="getChecklistIcon(currentList)"
@@ -151,7 +151,7 @@
                                 </Collapsible>
                             </header>
 
-                            <!-- 分类进度条 + 计数 -->
+                            <!-- Category progress bar + count -->
                             <div class="flex items-center gap-3">
                                 <span class="flex h-2 flex-1 overflow-hidden rounded-full bg-muted" role="progressbar"
                                     :aria-label="'Progress for ' + fullList[currentList].title">
@@ -168,7 +168,7 @@
                                 </span>
                             </div>
 
-                            <!-- 过滤 Toggle -->
+                            <!-- Filter Toggle -->
                             <div class="flex justify-start">
                                 <ToggleGroup v-model="filterTag" type="single"
                                     @update:model-value="(v) => v && filterChecklist(v)">
@@ -188,12 +188,12 @@
                                 </ToggleGroup>
                             </div>
 
-                            <!-- 条目列表：divide-y 列表替代 table -->
+                            <!-- Item list -->
                             <ul class="rounded-lg border bg-card divide-y list-none p-0 m-0">
                                 <li v-for="(item, index) in filterList" :key="item.slug" class="transition-colors"
                                     :class="item.checked ? 'bg-success/10' : 'hover:bg-muted/30'">
                                     <div class="flex items-start gap-3 px-3 py-2.5">
-                                        <!-- 状态切换按钮 -->
+                                        <!-- Status switch button -->
                                         <button type="button" @click="checkItem(item)"
                                             class="shrink-0 mt-0.5 text-muted-foreground  cursor-pointer"
                                             :class="{ 'text-success': item.checked, 'text-muted-foreground/60 cursor-not-allowed': item.ignored }"
@@ -203,7 +203,7 @@
                                                 class="size-5" />
                                         </button>
 
-                                        <!-- 条目名 + Info 展开 -->
+                                        <!-- Item name + Info expand -->
                                         <div class="flex-1 min-w-0 text-sm">
                                             <div class="flex items-center gap-1.5"
                                                 :class="{ 'line-through opacity-50': item.ignored }">
@@ -217,19 +217,19 @@
                                             </div>
                                         </div>
 
-                                        <!-- 优先级 Badge -->
+                                        <!-- Priority Badge -->
                                         <Badge class="shrink-0 rounded-full font-normal shadow-none"
                                             :class="priorityBadgeClass(item.priority)">
                                             {{ t('securitychecklist.' + item.priority) }}
                                         </Badge>
 
-                                        <!-- 忽略 Switch -->
+                                        <!-- Ignore Switch -->
                                         <Switch class="shrink-0" :model-value="item.ignored"
                                             @update:model-value="() => ignoreItem(item)"
                                             :aria-label="t('securitychecklist.Ignore')" />
                                     </div>
 
-                                    <!-- Info 详情展开 -->
+                                    <!-- Info details expand -->
                                     <div v-show="checklistInfoOpen[index]" class="px-3 pb-3 pt-1">
                                         <div class="p-3 rounded-md text-xs text-muted-foreground leading-relaxed">
                                             <vue-markdown :source="item.details" />
@@ -282,21 +282,20 @@ import {
     Users,
 } from 'lucide-vue-next';
 
-// 安全检查分类图标映射：直接以 slug 为 key（slug 本身就是语义化的分类名），
-// 不再需要在 i18n JSON 里挂 "icon": "bi-xxx" 字符串
+// Security checklist icon mapping: directly use slug as key (slug itself is a semantic category name)
 const checklistIconMap = {
-    'authentication':     KeyRound,
-    'web-browsing':       Compass,
-    'email':              Mail,
-    'messaging':          MessageCircle,
-    'social-media':       Users,
-    'networks':           ShieldHalf,
-    'mobile-devices':     Smartphone,
+    'authentication': KeyRound,
+    'web-browsing': Compass,
+    'email': Mail,
+    'messaging': MessageCircle,
+    'social-media': Users,
+    'networks': ShieldHalf,
+    'mobile-devices': Smartphone,
     'personal-computers': Laptop,
-    'smart-home':         HousePlus,
-    'personal-finance':   Banknote,
-    'human-aspect':       ScanFace,
-    'physical-security':  FileWarning,
+    'smart-home': HousePlus,
+    'personal-finance': Banknote,
+    'human-aspect': ScanFace,
+    'physical-security': FileWarning,
 };
 const getChecklistIcon = (slug) => checklistIconMap[slug] || Info;
 
@@ -320,8 +319,8 @@ const slugs = ref({});
 
 const priorities = ['Basic', 'Optional', 'Essential', 'Advanced'];
 
-// 优先级 Badge 颜色：Basic → action（蓝）；Essential → success（绿）；
-// Optional → info（天）；Advanced → secondary（中性）
+// Priority Badge color: Basic → action (blue); Essential → success (green);
+// Optional → info (sky); Advanced → secondary (neutral);
 const priorityBadgeClass = (priority) => {
     const map = {
         Basic: 'bg-action text-action-foreground border-transparent',
@@ -332,20 +331,20 @@ const priorityBadgeClass = (priority) => {
     return map[priority] || '';
 };
 
-// CircleProgressBar 的配色 —— 第三方库吃 hex 字符串，跟语义色意图保持一致：
-// filled 用 green-500、info（未完成态）用 sky-500，背景在明暗下各有中性值
+// CircleProgressBar color: third-party library takes hex string, keep semantic color intention consistent:
+// filled use green-500, info (incomplete state) use sky-500, background has neutral value in light/dark mode
 const progressColors = computed(() => ({
     filled: '#22c55e', // green-500
     info: '#0ea5e9', // sky-500
     back: isDarkMode.value ? '#262626' : '#e5e5e5', // neutral-800 / neutral-200
 }));
 
-// 按优先级的分母（总项 - ignored）
+// Denominator by priority (total items - ignored)
 const priorityDenom = (priority) =>
     countItems({ action: 'total', category: 'all', priority }) -
     countItems({ action: 'ignored', category: 'all', priority });
 
-// ——— 本地持久化 ———
+// Local persistence
 const setLocalSlugs = () => {
     localStorage.setItem('securityChecklistSlugs', JSON.stringify(slugs.value));
 };
@@ -414,11 +413,11 @@ const changeList = (listName, shouldScroll = true) => {
         if (previousList !== currentList.value) {
             trackEvent('SecurityChecklist', 'SecurityChecklist', 'ChangeList');
         }
-        // 用 scrollIntoView({ block: 'nearest' }) 让浏览器自己判断是否要滚：
-        // - 桌面端导航和详情并排可见 → no-op
-        // - 移动端纵向堆叠 → 自动滚到详情
-        // 原来的 scrollToElementInOffcanvas 用 .closest('[data-state]') 找容器
-        // 会错误匹配到 DrawerContent 根（overflow:hidden 不可滚动），导致滚动异常
+        // Use scrollIntoView({ block: 'nearest' }) to let the browser decide whether to scroll:
+        // - Desktop navigation and details side by side visible → no-op
+        // - Mobile vertical stack → automatically scroll to details
+        // The original scrollToElementInOffcanvas uses .closest('[data-state]') to find the container,
+        // which will incorrectly match the DrawerContent root (overflow:hidden cannot be scrolled), causing scroll exceptions
         nextTick(() => {
             const el = document.getElementById('checklist');
             el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });

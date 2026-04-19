@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 
-// 验证请求合法性
+// Validate request legitimacy
 function isValidRequest(req) {
     const isLatitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.latitude);
     const isLongitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.longitude);
@@ -14,7 +14,7 @@ function isValidRequest(req) {
     }
 }
 
-// 定义白天模式和黑暗模式样式字符串
+// Define day and night mode style strings
 const styles = {
     Dark: [
         "feature:all|element:geometry.fill|color:0x242f3e",
@@ -39,12 +39,12 @@ const styles = {
 };
 
 export default async (req, res) => {
-    // 检查请求是否合法
+    // Check if request is legitimate
     if (!isValidRequest(req)) {
         return res.status(400).json({ error: 'Invalid request' });
     }
 
-    // 使用 req.query 获取参数
+    // Use req.query to get parameters
     const { latitude, longitude, language, CanvasMode } = req.query;
 
     if (!latitude || !longitude || !language) {

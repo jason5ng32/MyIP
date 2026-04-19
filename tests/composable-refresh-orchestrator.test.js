@@ -38,7 +38,7 @@ function makeRefs() {
 describe('useRefreshOrchestrator()', () => {
   let realSetTimeout;
   beforeEach(() => {
-    // 直接同步化 setTimeout：忽略 delay 立刻执行，方便断言顺序
+    // synchronize setTimeout immediately: ignore delay, for assertion order
     realSetTimeout = globalThis.setTimeout;
     globalThis.setTimeout = (fn) => { fn(); return 0; };
   });
@@ -116,11 +116,11 @@ describe('useRefreshOrchestrator()', () => {
   it('loadingControl: not all mounted → re-schedules itself until ready', () => {
     let attemptCount = 0;
     const scheduled = [];
-    // 自定义 setTimeout 记录递归次数，首次不执行，第二次才切换 mountingStatus
+    // custom setTimeout to record recursion count, first time does not execute, second time switches mountingStatus
     globalThis.setTimeout = (fn, delay) => {
       attemptCount += 1;
       scheduled.push(delay);
-      if (attemptCount < 3) return 0; // 第 1、2 次跳过
+      if (attemptCount < 3) return 0; // first and second time skip
       fn();
       return 0;
     };
@@ -136,8 +136,8 @@ describe('useRefreshOrchestrator()', () => {
 
     const { loadingControl } = useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
 
-    // run first attempt (mounted = false) → 安排 1s 后重试
+    // run first attempt (mounted = false) → schedule retry 1s later
     loadingControl();
-    assert.ok(scheduled.includes(1000), '应看到 1000ms 的递归重试 delay');
+    assert.ok(scheduled.includes(1000), 'should see 1000ms recursive retry delay');
   });
 });

@@ -1,5 +1,4 @@
-// shadcn-vue cn() 帮助函数：合并 class，处理 Tailwind 冲突
-// 见 refactor/01
+// Shadcn-vue cn() helper function: merge classes, handle Tailwind conflicts
 
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';

@@ -1,5 +1,5 @@
 <template>
-    <!-- Preferences 面板：左侧 Sheet 滑入；分 5 个 section（Language / Theme / IP Sources / IP DB / App Settings） -->
+    <!-- Preferences panel -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('nav.preferences.title')"
             :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[420px] max-w-[420px]']">
@@ -13,14 +13,14 @@
                     class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
             </header>
 
-            <!-- 内容（独立滚动） -->
+            <!-- Content (scrollable) -->
             <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
-                <!-- 顶部提示 -->
+                <!-- Top note -->
                 <p class="text-xs text-muted-foreground leading-relaxed">
                     {{ t('nav.preferences.preferenceTips') }}
                 </p>
 
-                <!-- Language —————————————————————————————— -->
+                <!-- Language -->
                 <section id="Pref_language">
                     <SectionTitle :icon="Languages">{{ t('nav.preferences.language') }}</SectionTitle>
                     <Select :model-value="userPreferences.lang" @update:model-value="(v) => v && prefLanguage(v)">
@@ -48,7 +48,7 @@
                     <SectionTip>{{ t('nav.preferences.languageTips') }}</SectionTip>
                 </section>
 
-                <!-- Color Scheme ———————————————————————————— -->
+                <!-- Color Scheme -->
                 <section id="Pref_colorScheme">
                     <SectionTitle :icon="Palette">{{ t('nav.preferences.colorScheme') }}</SectionTitle>
                     <ToggleGroup :model-value="userPreferences.theme" type="single" class="w-full"
@@ -61,7 +61,7 @@
                     </ToggleGroup>
                 </section>
 
-                <!-- IP Sources Count ————————————————————————— -->
+                <!-- IP Sources Count -->
                 <section id="Pref_ipCards">
                     <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
                     <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-full"
@@ -73,7 +73,7 @@
                     <SectionTip>{{ t('nav.preferences.ipSourcesToCheckTips') }}</SectionTip>
                 </section>
 
-                <!-- IP Geo DB ——————————————————————————————— -->
+                <!-- IP Geo DB -->
                 <section id="Pref_ipGeoSource">
                     <SectionTitle :icon="Database">{{ t('nav.preferences.ipDB') }}</SectionTitle>
                     <Select :model-value="String(userPreferences.ipGeoSource)"
@@ -91,11 +91,9 @@
                     <SectionTip>{{ t('nav.preferences.ipDBTips') }}</SectionTip>
                 </section>
 
-                <!-- App Settings ———————————————————————————— -->
+                <!-- App Settings -->
                 <section id="Pref_appSettings">
                     <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
-                    <!-- 不用 <Card>：Card 默认带 jn-card 阴影，跟 Select / ToggleGroup 的扁平对比会凹凸不平
-                         面板内统一走"border + bg-card"的扁平容器，所有控件同海拔 -->
                     <div class="rounded-lg border bg-card divide-y">
                         <PrefRow id="autoStart" :label="t('nav.preferences.autoRun')"
                             :tip="t('nav.preferences.autoRunTips')" :model-value="userPreferences.autoStart"
@@ -124,11 +122,6 @@
 </template>
 
 <script setup>
-// refactor/02：Preferences 全部走 shadcn primitive + 语义色 token
-// - 5+ 选项的语言/数据库切到 Select 下拉，遵守"5 档以上不平铺"的偏好
-// - Theme（3 档）/ IP Sources（2 档）保留 ToggleGroup
-// - App Settings 用 Card + 内部抽出 PrefRow，每行就一行声明（标签 / 描述 / Switch）
-// - SectionTitle / SectionTip 为本组件抽两个 inline functional 子组件，避免在每个 section 重复样式
 import { ref, computed, onMounted, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -161,13 +154,12 @@ const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 const isSignedIn = computed(() => store.isSignedIn);
 
-// Sheet 开关：与 store.openSheet 双向绑定（refactor/01）
 const isOpen = computed(() => store.openSheet === 'preferences');
 const onOpenChange = (val) => {
     store.setOpenSheet(val ? 'preferences' : null);
 };
 
-// 语言选项（数据驱动；flag 走 circle-flags ISO code）
+// Language options (data driven; flag use circle-flags ISO code)
 const langOptions = [
     { value: 'auto', label: t('nav.preferences.systemAuto'), flag: '' },
     { value: 'zh', label: '中文', flag: 'cn' },
@@ -179,19 +171,19 @@ const currentLang = computed(() =>
     langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]
 );
 
-// 主题选项（3 档：light / dark / auto）
+// Theme options (3 options: light / dark / auto)
 const themeOptions = [
     { value: 'light', label: t('nav.preferences.colorLight'), icon: Sun },
     { value: 'dark', label: t('nav.preferences.colorDark'), icon: Moon },
     { value: 'auto', label: t('nav.preferences.systemAuto'), icon: LaptopMinimal },
 ];
 
-// 当前选中的 IP DB（用于 SelectValue 显示）
+// Current selected IP DB (for SelectValue display)
 const currentIpDB = computed(() =>
     ipDBs.value.find(db => db.id === userPreferences.value.ipGeoSource)
 );
 
-// 主题切换需要协调 darkMode + body class + PWA meta
+// Theme change needs to coordinate darkMode + body class + PWA meta
 const prefersDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
 const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -287,9 +279,8 @@ onMounted(() => {
     setTimeout(updateIPDBs, 4000);
 });
 
-// ——— 内联 functional 子组件：减少模板里重复的 section title / tip / Switch row 样式 ———
 
-// section 标题：lucide icon + 文字，统一节奏
+// Section title: lucide icon + text, unified rhythm
 const SectionTitle = (props, { slots }) =>
     h('h3', { class: 'flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2' }, [
         props.icon ? h(props.icon, { class: 'size-3.5' }) : null,
@@ -297,11 +288,11 @@ const SectionTitle = (props, { slots }) =>
     ]);
 SectionTitle.props = ['icon'];
 
-// section 提示文字：放在控件下方
+// Section tip text
 const SectionTip = (props, { slots }) =>
     h('p', { class: 'mt-2 text-xs text-muted-foreground leading-relaxed' }, slots.default?.());
 
-// App Settings 里的开关行：label + tip 在左，Switch 在右
+// App Settings switch row: label + tip on left, Switch on right
 const PrefRow = (props, { emit }) =>
     h('div', { class: 'flex items-start justify-between gap-3 p-3' }, [
         h('div', { class: 'flex-1 min-w-0' }, [

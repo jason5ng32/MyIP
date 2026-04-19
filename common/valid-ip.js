@@ -1,9 +1,10 @@
-// 验证IP地址是否合法
+// Validate if IP address is valid
 function isValidIP(ip) {
     if (typeof ip !== 'string') {
         return false;
     }
 
+    // IPv4
     const ipv4Pattern =
         /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
@@ -15,7 +16,8 @@ function isValidIP(ip) {
     if (doubleColonParts.length > 2) {
         return false;
     }
-
+    
+    // IPv6
     const hasCompressedGroup = doubleColonParts.length === 2;
     const groups = doubleColonParts.flatMap(part => part === '' ? [] : part.split(':'));
 

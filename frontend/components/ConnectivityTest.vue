@@ -1,8 +1,7 @@
 <template>
-  <!-- Network Connectivity — refactor/UI round 2：去掉 jn-* 遗留样式，
-       整体结构向 shadcn Card + 现代 service-status-card 模式靠拢 -->
+  <!-- Network Connectivity -->
   <section class="mb-10">
-    <!-- 章节头：标题 + 说明 + 刷新按钮 -->
+    <!-- Header -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
         <h2 id="Connectivity" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
@@ -18,21 +17,21 @@
       </JnTooltip>
     </header>
 
-    <!-- 卡片网格：现代设计用 CSS Grid 而不是负 margin flex -->
+    <!-- Card grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       <Card v-for="test in connectivityTests" :key="test.id" class="keyboard-shortcut-card cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card"
         @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
         :title="t('connectivity.RefreshThisTest')">
         <CardContent class="p-4">
-          <!-- 顶部：品牌图标 + 服务名 -->
+          <!-- Top: brand icon + service name -->
           <div class="flex items-center gap-2 mb-3">
             <component :is="test.icon" class="size-6 text-muted-foreground" />
             <span class="text-base font-medium truncate">{{ test.name }}</span>
           </div>
-          <!-- 底部：状态指示灯 + 文字 + 延迟（mono 等宽数字右对齐） -->
+          <!-- Bottom: status indicator + text + delay -->
           <div class="flex items-center justify-between gap-2">
             <span class="flex items-center gap-1.5 text-base min-w-0">
-              <!-- 状态指示：wait 态用 ping 动画的彩色圆点；结果态用表情脸替代（Frown / Smile / Meh） -->
+              <!-- Status indicator: use color dot for wait state, use face icon for result state -->
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
                 <span class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
@@ -66,9 +65,6 @@ import {
   MessageSquareQuote, RotateCw, Smile, Store, Youtube,
 } from 'lucide-vue-next';
 
-// 品牌图标直接在 connectivityTests 数据里用 lucide 组件，不再走
-// "bi-xxx 字符串 → map → lucide" 间接层
-
 const { t } = useI18n();
 const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
@@ -96,7 +92,7 @@ const connectivityTests = reactive([
   { id: 'chatgpt',    name: 'ChatGPT',    icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico?',                           status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
 ]);
 
-// 业务状态 → 4 档 tone（wait / ok-fast / ok-slow / fail）
+// Business status → 4 tone levels (wait / ok-fast / ok-slow / fail)
 const toneOf = (test) => {
   const waitLabel = t('connectivity.StatusWait');
   const okLabel = t('connectivity.StatusAvailable');
@@ -108,9 +104,9 @@ const toneOf = (test) => {
 };
 const { dotClass, textClass } = useStatusTone();
 
-// 表情图标映射 —— 迁自原版 bi-emoji-{frown,smile,expressionless}
-// 不可达/超时 → Frown；可达且 <200ms → Smile；可达且 ≥200ms → Meh
-// wait 态不展示脸（状态灯的 ping 动画已经表达"在等"）
+// Face icon mapping
+// Unreachable/timeout → Frown; reachable and <200ms → Smile; reachable and ≥200ms → Meh
+// Wait state does not show face (the status light's ping animation already expresses "waiting")
 const statusFaceIcon = (test) => {
   const unavailableLabels = [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')];
   const okLabel = t('connectivity.StatusAvailable');
@@ -119,7 +115,7 @@ const statusFaceIcon = (test) => {
   return null;
 };
 
-// 检查单个连通性
+// Check single connectivity
 const checkConnectivityHandler = (test, onTestComplete = () => { }, isManualRun) => {
   const beginTime = +new Date();
   manualRun.value = isManualRun;
@@ -146,7 +142,7 @@ const checkConnectivityHandler = (test, onTestComplete = () => { }, isManualRun)
   img.src = `${test.url}${Date.now()}`;
 };
 
-// 检查所有
+// Check all
 const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
   alertToShow.value = isAlertToShow;
   return new Promise((resolve) => {
@@ -202,7 +198,7 @@ const updateConnectivityAlert = (type) => {
   }
 };
 
-// 主控制
+// Main control
 const handelCheckStart = async (fromApp = false) => {
   if (fromApp) await checkAllConnectivity(false, true, true);
   else await checkAllConnectivity(true, false, false);

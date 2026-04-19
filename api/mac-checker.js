@@ -9,7 +9,7 @@ const isValidMAC = (address) => {
 }
 
 export default async (req, res) => {
-    // 从请求中获取 IP 地址
+    // Get IP address from request
     let macAddress = req.query.mac;
     if (!macAddress) {
         return res.status(400).json({ error: 'No MAC address provided' });
@@ -17,7 +17,7 @@ export default async (req, res) => {
         macAddress = macAddress.replace(/:/g, '').replace(/-/g, '');
     }
 
-    // 检查 IP 地址是否合法
+    // Check if address is valid
     if (!isValidMAC(macAddress)) {
         return res.status(400).json({ error: 'Invalid MAC address' });
     }
@@ -43,7 +43,7 @@ export default async (req, res) => {
 
 
 const modifyData = (data) => {
-    // 检查单播/多播以及本地/全球地址
+    // Check if address is unicast/multicast and local/global
     const firstByte = parseInt(data.macPrefix.substring(0, 2), 16);
     const isMulticast = (firstByte & 0x01) === 0x01;
     const isLocal = (firstByte & 0x02) === 0x02;

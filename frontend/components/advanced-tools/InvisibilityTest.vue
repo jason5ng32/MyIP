@@ -1,15 +1,15 @@
 <template>
     <div class="invisibilitytest-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="text-sm text-muted-foreground space-y-1.5 leading-relaxed">
             <p>{{ t('invisibilitytest.Note') }}</p>
             <p>{{ t('invisibilitytest.Note2') }}</p>
         </div>
 
-        <!-- 输入区：同意勾选 + Run -->
+        <!-- Input area: Agree to check + Run -->
         <div class="space-y-2">
             <div class="flex items-stretch gap-0">
-                <!-- 勾选框（扁平容器跟 Button 拼成一体） -->
+                <!-- Checkbox (flat container and Button combined) -->
                 <label for="collectingDatas"
                     class="flex items-center gap-2 px-3 border border-input border-r-0 bg-background rounded-l-md text-sm cursor-pointer select-none"
                     :class="{ 'opacity-50 cursor-not-allowed': !store.user }">
@@ -25,7 +25,7 @@
                 </Button>
             </div>
 
-            <!-- 登录提示（未登录时） -->
+            <!-- Login Hint -->
             <div v-if="!store.user"
                 class="flex items-start gap-2 p-3 rounded-md border border-info/30 bg-info/10 text-sm text-info">
                 <Info class="size-4 mt-0.5 shrink-0" />
@@ -35,19 +35,19 @@
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
-        <!-- 结果：总结卡 + 明细列表 -->
+        <!-- Result: Summary card + Detailed list -->
         <template v-if="Object.keys(testResults).length > 0 && store.user">
-            <!-- 总结 Card：IP + 两个分数 + 判定 -->
+            <!-- Summary Card: IP + two scores + judgment -->
             <Transition name="fade-slide">
                 <Card>
                     <CardContent class="p-4 md:p-6 space-y-4">
-                        <!-- IP 显示 -->
+                        <!-- IP Display -->
                         <div>
                             <div class="text-xs text-muted-foreground mb-1">{{ t('invisibilitytest.yourIP') }}</div>
                             <div class="font-mono font-semibold text-lg wrap-break-word">{{ testResults.ip }}</div>
                         </div>
 
-                        <!-- 两个分数 -->
+                        <!-- Two scores -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="flex items-center gap-2">
                                 <div class="flex-1 min-w-0">
@@ -77,7 +77,7 @@
                             </div>
                         </div>
 
-                        <!-- 判定 -->
+                        <!-- Judgment -->
                         <div class="text-sm">
                             <span
                                 :class="testResults.score.proxy >= 50 ? 'text-destructive font-semibold' : 'text-muted-foreground'">
@@ -95,7 +95,7 @@
                 </Card>
             </Transition>
 
-            <!-- 明细列表：14 项检测，divide-y 列表 -->
+            <!-- Detailed list: 14 items, divide-y list -->
             <Transition name="fade-slide">
                 <Card>
                     <CardContent class="p-0">
@@ -106,17 +106,17 @@
                         <ul class="divide-y list-none p-0 m-0">
                             <li v-for="item in detectionItems" :key="item.key"
                                 class="flex items-start gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
-                                <!-- 状态图标 -->
+                                <!-- Status icon -->
                                 <component :is="item.flagged ? CircleX : CircleCheck" class="size-4 mt-0.5 shrink-0"
                                     :class="item.flagged ? 'text-destructive' : 'text-success'" />
-                                <!-- 条目名 + 描述 -->
+                                <!-- Item name + description -->
                                 <div class="flex-1 min-w-0">
                                     <div class="text-sm font-medium mb-0.5">{{ t(`invisibilitytest.${item.key}.title`)
                                         }}</div>
                                     <div class="text-xs text-muted-foreground leading-relaxed">
                                         {{ t(`invisibilitytest.${item.key}.${item.flagged ? 'positive' : 'negative'}`)
                                         }}
-                                        <!-- 条目额外信息：根据 key 各自渲染 -->
+                                        <!-- Item extra information: render each key separately -->
                                         <template v-if="item.flagged && item.extras">
                                             <br />
                                             <template v-if="item.key === 'tcp'">
@@ -182,15 +182,15 @@ const userID = ref('');
 const isAgreed = ref(false);
 const retryCount = ref(0);
 
-// 分数 → 语义色：<30 clean / 30-70 warning / ≥70 danger
+// Score → semantic color: <30 clean / 30-70 warning / ≥70 danger
 const scoreToneClass = (score) => {
     if (score < 30) return 'text-success';
     if (score < 70) return 'text-warning';
     return 'text-destructive';
 };
 
-// 14 项检测数据化：label 走 i18n {key}.title；positive/negative 文字也是
-// key 确定后会被模板用来拉 t(`invisibilitytest.${key}.title|positive|negative`)
+// 14 items detection data: label goes i18n {key}.title; positive/negative text is also
+// key determined will be used by template to pull t(`invisibilitytest.${key}.title|positive|negative`) from i18n.
 const detectionItems = computed(() => {
     const r = testResults.value;
     if (!r || !r.headers) return [];
@@ -334,7 +334,7 @@ const getResult = async () => {
     opacity: 0;
 }
 
-/* 让 native checkbox 的选中色跟 action 主题色一致 */
+/* Make the selected color of the native checkbox consistent with the action theme color */
 input[type='checkbox'].accent-action {
     accent-color: var(--action);
 }

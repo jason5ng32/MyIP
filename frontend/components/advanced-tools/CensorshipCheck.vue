@@ -1,9 +1,9 @@
 <template>
     <div class="censorship-check-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <p class="text-sm text-muted-foreground leading-relaxed">{{ t('censorshipcheck.Note') }}</p>
 
-        <!-- 输入区 -->
+        <!-- Input area -->
         <div class="space-y-2">
             <label for="queryURL" class="text-sm font-medium block">{{ t('censorshipcheck.Note2') }}</label>
             <InputGroup>
@@ -21,9 +21,9 @@
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
-        <!-- 结果双表 -->
+        <!-- Result tables -->
         <div v-if="censorshipResults.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Test Group（高风险国） -->
+            <!-- Test Group (high-risk countries) -->
             <Card>
                 <CardContent class="p-0">
                     <header class="flex items-center gap-2 px-4 py-3 border-b">
@@ -34,7 +34,7 @@
                 </CardContent>
             </Card>
 
-            <!-- Control Group（对照国） -->
+            <!-- Control Group (control countries) -->
             <Card>
                 <CardContent class="p-0">
                     <header class="flex items-center gap-2 px-4 py-3 border-b">
@@ -46,7 +46,7 @@
             </Card>
         </div>
 
-        <!-- 底部结论 banner（3 态：isBlocked / isDown / notBlocked）—— 带 fade-slide 入场 -->
+        <!-- Bottom conclusion banner (3 states: isBlocked / isDown / notBlocked) —— with fade-slide entrance -->
         <Transition name="fade-slide">
             <div v-if="censorshipCheckStatus === 'finished'"
                 class="flex items-start gap-2 p-3 rounded-md border text-sm"
@@ -90,7 +90,7 @@ const blockedCountries = ref([]);
 const queryURL = ref('');
 const errorMsg = ref('');
 
-// 过滤后的分组结果，用 computed 避免模板里两次调用 .filter
+// Filtered group results, use computed to avoid two calls to .filter in template
 const testGroupResults = computed(() =>
     censorshipResults.value.filter(r => highRiskCountries.includes(r.country))
 );
@@ -98,7 +98,7 @@ const controlGroupResults = computed(() =>
     censorshipResults.value.filter(r => !highRiskCountries.includes(r.country))
 );
 
-// 结论 banner 3 态
+// Conclusion banner 3 states
 const bannerClass = computed(() => {
     if (isBlocked.value) return 'border-destructive/30 bg-destructive/10 text-destructive';
     if (isDown.value) return 'border-warning/30 bg-warning/10 text-warning';
@@ -115,7 +115,7 @@ const bannerText = computed(() => {
     return t('censorshipcheck.notBlocked');
 });
 
-// ——— 双表共享的行渲染：用内联 functional 组件避免模板重复 ———
+// ——— Shared row rendering for double tables: use inline functional components to avoid template repetition ———
 const CensorshipTable = (props) => h('div', { class: 'overflow-x-auto' },
     h('table', { class: 'w-full text-sm' }, [
         h('thead', {},
@@ -146,7 +146,7 @@ const CensorshipTable = (props) => h('div', { class: 'overflow-x-auto' },
 );
 CensorshipTable.props = ['rows'];
 
-// 状态图标渲染：finished → 成功勾；failed → 失败叉；in-progress → Spinner
+// Status icon rendering: finished → success check; failed → failure cross; in-progress → Spinner
 const renderStatus = (status) => {
     if (status === 'finished') return h(CircleCheck, { class: 'size-4 text-success' });
     if (status === 'failed') return h(CircleX, { class: 'size-4 text-destructive' });

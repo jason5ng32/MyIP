@@ -3,8 +3,8 @@ import { describe, it } from 'node:test';
 
 import unixToDateTime from '../frontend/utils/timestamp-to-date.js';
 
-// 时间戳到本地日期字符串的转换依赖运行时 locale + TZ。
-// 这里尽量用格式宽松的断言（正则），避免 CI 环境 locale 差异导致假失败。
+// The conversion from timestamp to local date string depends on runtime locale + TZ.
+// Here we use a flexible assertion (regex) to avoid false failures due to CI environment locale differences.
 describe('unixToDateTime(timestamp)', () => {
   it('accepts a numeric timestamp and returns a non-empty string', () => {
     const out = unixToDateTime(1704067200000); // 2024-01-01 UTC

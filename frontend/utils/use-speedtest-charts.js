@@ -1,6 +1,6 @@
 import { ref, reactive } from 'vue';
 
-// 将 Chart.js 相关的配置抽离出来
+// Extract Chart.js related configurations
 const getChartConfig = (t) => ({
     download: {
         type: 'line',
@@ -75,7 +75,7 @@ const getChartConfig = (t) => ({
 });
 
 export default function useSpeedTestCharts(t) {
-    // 图表引用
+    // Chart references
     const downloadChart = ref(null);
     const uploadChart = ref(null);
     const latencyChart = ref(null);
@@ -115,7 +115,7 @@ export default function useSpeedTestCharts(t) {
         }
     });
 
-    // 图表通用配置
+    // Chart common configuration
     const getLineChartOptions = (yAxisLabel) => ({
         responsive: true,
         maintainAspectRatio: false,
@@ -172,15 +172,15 @@ export default function useSpeedTestCharts(t) {
         }
     });
 
-    // 初始化图表
+    // Initialize charts
     const initCharts = async () => {
-        // 动态导入 Chart.js
+        // Dynamically import Chart.js
         const { Chart, registerables } = await import('chart.js/auto');
         Chart.register(...registerables);
 
         const config = getChartConfig(t);
 
-        // 初始化每个图表
+        // Initialize each chart
         if (downloadChart.value) {
             const ctx = downloadChart.value.getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, 200);
@@ -226,7 +226,7 @@ export default function useSpeedTestCharts(t) {
         }
     };
 
-    // 更新图表
+    // Update charts
     const updateCharts = (downloadSpeed, uploadSpeed, latency, jitter, rawData) => {
         if (!charts.download || !charts.upload || !charts.latency || !charts.jitter) return;
 
@@ -299,16 +299,16 @@ export default function useSpeedTestCharts(t) {
         }
     };
 
-    // 初始化图表的起始点
+    // Initialize starting points of charts
     const initStartingPoints = async () => {
-        // 确保图表已经初始化
+        // Ensure charts are initialized
         if (!charts.download || !charts.upload) {
             await initCharts();
         }
 
         const currentTime = Date.now();
         ['download', 'upload'].forEach(type => {
-            if (charts[type]) {  // 添加额外检查
+            if (charts[type]) {  // Add additional check
                 chartData[type].started = true;
                 chartData[type].startTime = currentTime;
                 chartData[type].labels = ['0.0'];
@@ -322,7 +322,7 @@ export default function useSpeedTestCharts(t) {
         });
     };
 
-    // 清理图表
+    // Clean up charts
     const destroyCharts = () => {
         Object.values(charts).forEach(chart => {
             if (chart) {
@@ -332,7 +332,7 @@ export default function useSpeedTestCharts(t) {
         charts = { download: null, upload: null, latency: null, jitter: null };
     };
 
-    // 重置图表数据
+    // Reset chart data
     const resetChartData = () => {
         ['download', 'upload', 'latency', 'jitter'].forEach(type => {
             chartData[type] = {

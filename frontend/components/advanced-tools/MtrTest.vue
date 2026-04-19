@@ -1,12 +1,12 @@
 <template>
     <div class="mtr-test-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="text-sm text-muted-foreground space-y-1.5">
             <p>{{ t('mtrtest.Note') }}</p>
             <p v-if="!isMobile">{{ t('mtrtest.Note2') }}</p>
         </div>
 
-        <!-- 输入区：IP 选择 + Run 按钮 -->
+        <!-- Input area: IP selection + Run button -->
         <div class="space-y-2">
             <label for="mtrIP" class="text-sm font-medium block">{{ t('mtrtest.Note3') }}</label>
             <InputGroup>
@@ -27,14 +27,14 @@
             </InputGroup>
         </div>
 
-        <!-- 错误提示 -->
+        <!-- Error message -->
         <div v-if="mtrCheckStatus === 'error'"
             class="flex items-start gap-2 p-3 rounded-md border border-info/30 bg-info/10 text-sm text-info">
             <Info class="size-4 mt-0.5 shrink-0" />
             <span class="leading-relaxed">{{ t('mtrtest.Error') }}</span>
         </div>
 
-        <!-- 结果 Accordion -->
+        <!-- Result Accordion -->
         <Accordion v-if="mtrResults.length > 0" type="single" collapsible default-value="0" class="space-y-2">
             <AccordionItem v-for="(result, index) in mtrResults" :key="result.country" :value="String(index)"
                 class="rounded-lg border bg-card px-4">

@@ -1,3 +1,5 @@
+// Service Worker configuration
+
 import { CacheFirst, ExpirationPlugin, NetworkFirst, Serwist, StaleWhileRevalidate } from 'serwist';
 
 const serwist = new Serwist({

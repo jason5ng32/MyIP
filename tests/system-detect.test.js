@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it, before, after } from 'node:test';
 
-// 被测模块通过 window.navigator 访问 UA / platform，Node 环境没有 window，
-// 这里用 globalThis.window 直接注入一个最小 stub，模块加载后才读取值，
-// 所以必须在 import 之前就注入。
+// The tested module accesses UA / platform via window.navigator, Node environment does not have window,
+// here we inject a minimal globalThis.window stub directly, the module reads the value after loading,
+// so it must be injected before the import.
 
 function setNavigator({ userAgent = '', platform = '' } = {}) {
   globalThis.window = { navigator: { userAgent, platform } };
@@ -108,7 +108,7 @@ describe('detectOS()', () => {
   });
 });
 
-// 清理全局污染
+// clean up global pollution
 after(() => {
   delete globalThis.window;
 });

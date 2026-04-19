@@ -4,7 +4,7 @@ export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
 
-    // 构建请求 ip-api.com 的 URL
+    // Build request URL for ip-api.com
     const lang = req.query.lang || 'en';
     const url = `http://ip-api.com/json/${ipAddress}?fields=66842623&lang=${lang}`;
 

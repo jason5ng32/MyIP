@@ -1,15 +1,15 @@
-// 信息遮罩（Info Mask）逻辑：3 级切换（不遮罩 / 遮罩 IP / 遮罩 IP + 地理信息）
+// Info mask logic: 3 level switch (no mask / mask IP / mask IP + geographic information)
 //
-// 输入：
-//   - refs: { IPCheckRef, webRTCRef, dnsLeaksRef } — 各结果卡片组件 ref
-//   - store: 主 store（用于 setAlert / allHasLoaded 监听）
-//   - t: i18n 翻译函数
+// Input:
+//   - refs: { IPCheckRef, webRTCRef, dnsLeaksRef } — each result card component ref
+//   - store: main store (for setAlert / allHasLoaded monitoring)
+//   - t: i18n translation function
 //
-// 输出：
+// Output:
 //   - infoMaskLevel: ref<0|1|2>
 //   - toggleInfoMask(): () => void
-//   - showMaskButton: ref<boolean> — 在 allHasLoaded 后变 true
-//   - isInfosLoaded: ref<boolean> — 同步自 store.allHasLoaded，供 shortcut 判断
+//   - showMaskButton: ref<boolean> — becomes true after allHasLoaded
+//   - isInfosLoaded: ref<boolean> — synchronized from store.allHasLoaded, for shortcut judgment
 
 import { ref, watch } from 'vue';
 import { trackEvent } from '../utils/use-analytics.js';

@@ -1,4 +1,4 @@
-// 平滑滚动到指定元素（支持传元素或 id 字符串）
+// Smooth scroll to specified element (supports passing element or id string)
 export function scrollToElement(el, offset = 0) {
     const element = typeof el === 'string' ? document.getElementById(el) : el;
     if (!element) return;

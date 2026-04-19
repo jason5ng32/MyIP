@@ -4,7 +4,7 @@ export default (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ip = req.query.ip;
 
-    // 获取请求语言
+    // Get request language
     const supportedLanguages = ['zh-CN', 'en', 'fr', 'tr'];
     const lang = supportedLanguages.includes(req.query.lang) ? req.query.lang : 'en';
 

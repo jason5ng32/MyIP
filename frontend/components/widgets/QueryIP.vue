@@ -1,5 +1,5 @@
 <template>
-    <!-- 悬浮查询按钮（右下固定）—— "run action" 蓝 -->
+    <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
             class="fixed bottom-5 z-1050 rounded-full shadow-lg cursor-pointer"
@@ -9,13 +9,13 @@
         </Button>
     </JnTooltip>
 
-    <!-- 查询 Dialog -->
+    <!-- Query Dialog -->
     <Dialog :open="isOpen" @update:open="onOpenChange">
         <DialogContent :title="t('ipcheck.Title')" class="max-w-xl">
             <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
             <div class="space-y-4">
-                <!-- Input Group：整条输入条由 group 承担 border / rounded / focus-ring -->
+                <!-- Input Group -->
                 <InputGroup>
                     <Input type="text" id="inputIP" name="inputIP"
                         :placeholder="t('ipcheck.Placeholder')"
@@ -28,10 +28,10 @@
                     </Button>
                 </InputGroup>
 
-                <!-- 错误提示 -->
+                <!-- Error message -->
                 <p v-if="modalQueryError" class="text-sm text-destructive">{{ modalQueryError }}</p>
 
-                <!-- 查询结果：Hero IP（无 Copy / Map）+ 共享 IpDetailPanel -->
+                <!-- Query result: Hero IP (no Copy / Map) + shared IpDetailPanel -->
                 <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
                     <div class="px-4 py-3 flex items-center gap-2 min-w-0 border-b mb-4">
                         <Monitor class="size-5 text-muted-foreground shrink-0" />
@@ -139,7 +139,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
     }
 };
 
-// 悬浮按钮定位（超宽屏时对齐到内容区右侧）
+// Floating button positioning (align to content area right on wide screen)
 const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
 const positionStyle = computed(() => {
     if (screenWidth.value > 1600) {

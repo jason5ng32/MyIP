@@ -1,7 +1,6 @@
 <template>
-  <!-- WebRTC Test — 与 Connectivity 一致的 service-status-card 结构 -->
   <section class="mb-10">
-    <!-- 章节头 -->
+    <!-- Header -->
     <header class="flex items-start justify-between gap-4 mb-3">
       <div class="flex-1 min-w-0">
         <h2 id="WebRTC" class="text-xl md:text-3xl font-semibold tracking-tight leading-tight">
@@ -17,23 +16,23 @@
       </JnTooltip>
     </header>
 
-    <!-- 卡片网格 -->
+    <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card v-for="stun in stunServers" :key="stun.id"
         class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
         <CardContent class="p-4">
-          <!-- 顶部：服务商 icon + 名字 -->
+          <!-- Top: service provider icon + name -->
           <div class="flex items-center gap-2 mb-1">
             <Merge class="size-6 text-muted-foreground shrink-0" />
             <span class="text-base font-medium truncate">{{ stun.name }}</span>
           </div>
 
-          <!-- STUN URL（次要信息） -->
+          <!-- STUN URL (secondary information) -->
           <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="stun.url">
             {{ stun.url }}
           </p>
 
-          <!-- IP 行：超长 IPv6 通过字号降级保持单行显示，不再换行 -->
+          <!-- IP -->
           <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(stun) === 'wait'"
@@ -44,8 +43,7 @@
               :class="[fitOneLineClass(stun.ip), textClass(toneOf(stun))]" :title="stun.ip">{{ stun.ip }}</span>
           </div>
 
-          <!-- NAT + Country 子块：dt 配图标做视觉锚点；
-               等待/错误态统一显示 —，不复述顶部状态文字 -->
+          <!-- NAT + Country -->
           <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -105,7 +103,7 @@ const stunServers = reactive([
   { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
 ]);
 
-// 业务状态 → 4 档 tone
+// Business status → 4 tone levels
 const toneOf = (stun) => {
   if (stun.ip === t('webrtc.StatusWait')) return 'wait';
   if (stun.ip === t('webrtc.StatusError')) return 'fail';
@@ -113,14 +111,14 @@ const toneOf = (stun) => {
   return 'wait';
 };
 
-// dl 子块里单个字段是否处于"无数据"态（等待/错误）
-// 这些字段可能独立失败（比如 IP 成功但国家查询失败），所以按字段判断
+// Single field in dl block is in "no data" state (waiting/error)
+// These fields may fail independently (e.g. IP success but country query fails), so determine by field.
 const isFieldPending = (value) => {
   return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
 };
 
-// IP 字号降级：IPv4 ≤15 字符保持 base；短压缩 IPv6 降到 sm；完整 IPv6（最长 39 字符）再降到 xs
-// 保证单行显示全，不因 IPv6 换行或截断
+// IP font size downgrade: IPv4 ≤15 characters keep base; short compressed IPv6 down to sm; full IPv6 (max 39 characters) down to xs
+// Ensure full line display, without line breaks due to IPv6.
 const fitOneLineClass = (text) => {
   const len = typeof text === 'string' ? text.length : 0;
   if (len <= 15) return 'text-base';
@@ -128,7 +126,7 @@ const fitOneLineClass = (text) => {
   return 'text-xs';
 };
 
-// 测试 STUN 服务器
+// Test STUN server
 const checkSTUNServer = async (stun) => {
   return new Promise((resolve, reject) => {
     try {
@@ -165,9 +163,7 @@ const checkSTUNServer = async (stun) => {
       pc.createDataChannel('');
       pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-      // STUN 超时（5s 未收到候选）：把 ip / natType / country 都标记为连接错误，
-      // 这样状态灯能正确变红；如果不改 ip，它会一直停在 Awaiting Test，
-      // 视觉上永远无法区分"还没测"和"测失败了"
+      // STUN timeout (5s no candidate received): mark ip / natType / country as connection error
       setTimeout(() => {
         if (!candidateReceived) {
           stun.ip = t('webrtc.StatusError');
@@ -187,7 +183,7 @@ const checkSTUNServer = async (stun) => {
   });
 };
 
-// 分析 ICE 候选信息，推断 NAT 类型
+// Analyze ICE candidate information, infer NAT type
 const determineNATType = (candidate) => {
   const parts = candidate.split(' ');
   const type = parts[7];
@@ -198,7 +194,7 @@ const determineNATType = (candidate) => {
   return t('webrtc.NATType.unknown');
 };
 
-// 通过 Maxmind 获取 IP 地区归属
+// Get IP country via Maxmind
 const fetchCountryCode = async (ip) => {
   let setLang = lang.value;
   if (setLang === 'zh') setLang = 'zh-CN';
@@ -220,7 +216,7 @@ const fetchCountryCode = async (ip) => {
   }
 };
 
-// 测试所有 STUN 服务器
+// Test all STUN servers
 const checkAllWebRTC = async (isRefresh) => {
   if (isRefresh) trackEvent('Section', 'RefreshClick', 'WebRTC');
   isStarted.value = true;

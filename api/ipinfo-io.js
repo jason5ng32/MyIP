@@ -5,7 +5,7 @@ export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
     const ipAddress = req.query.ip;
 
-    // 构建请求 ipinfo.io 的 URL
+    // Build request URL for ipinfo.io
     const tokens = (process.env.IPINFO_API_TOKEN || '').split(',');
     const token = tokens[Math.floor(Math.random() * tokens.length)];
 

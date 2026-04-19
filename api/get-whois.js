@@ -12,7 +12,7 @@ export default async (req, res) => {
         return res.status(400).json({ error: 'No address provided' });
     }
 
-    // 检查 IP 地址是否合法
+    // Check if address is valid IP or domain
     if (!isValidIP(query) && !isValidDomain(query)) {
         return res.status(400).json({ error: 'Invalid IP or address' });
     }

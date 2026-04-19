@@ -14,9 +14,6 @@
 </template>
 
 <script setup>
-// refactor/01 阶段 C.2：基于 shadcn-vue Button (size="icon") + 内联 Tailwind
-// 状态色，避免自己从头写 <button>。Button 无 success/warning 变体，因此
-// 背景色由 :class 响应 infoMaskLevel 覆盖 default 变体的 bg-primary。
 import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Eye, EyeOff } from 'lucide-vue-next';
@@ -31,14 +28,14 @@ const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     toggleInfoMask: Function,
 });
 
-// 三态颜色 —— 对照旧版 btn-success / btn-warning / btn-secondary
+// Three state colors
 const stateClasses = computed(() => ({
     'bg-success text-success-foreground hover:bg-success/80': infoMaskLevel === 0,
     'bg-warning text-warning-foreground hover:bg-warning/80': infoMaskLevel === 1,
     'bg-secondary text-secondary-foreground hover:bg-secondary/80': infoMaskLevel === 2,
 }));
 
-// 超宽屏（>1600px）时对齐到内容区右侧（max-width 1600px），否则贴右 20px
+// Wide screen (>1600px) align to content area right (max-width 1600px), otherwise stick right 20px
 const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
 const positionStyle = computed(() => {
     if (screenWidth.value > 1600) {

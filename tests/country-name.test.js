@@ -32,7 +32,7 @@ describe('getCountryName(abbr, lang)', () => {
   });
 
   it('returns undefined for known abbr but unknown lang', () => {
-    // 未支持的语言 key 不会 fallback 到别的语言
+    // unsupported language key will not fallback to other languages
     assert.equal(getCountryName('US', 'de'), undefined);
   });
 });

@@ -1,7 +1,7 @@
-// 用户偏好默认值（refactor/04）
+// Default user preferences
 //
-// 当 localStorage 里没有 userPreferences 键，或者缺失字段时，用这份默认值兜底。
-// store.loadPreferences() 会合并 localStorage 覆盖值。
+// When userPreferences key is missing or missing fields in localStorage, use this default value as fallback.
+// store.loadPreferences() will merge localStorage override values.
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
@@ -16,8 +16,8 @@ export const DEFAULT_PREFERENCES = Object.freeze({
 });
 
 /**
- * 返回一份全新的默认偏好对象（可写副本）。
- * 避免调用方直接修改 DEFAULT_PREFERENCES（Object.freeze 也会阻止）。
+ * Returns a fresh default preferences object (writable copy).
+ * Avoid calling side directly modifying DEFAULT_PREFERENCES (Object.freeze also prevents).
  */
 export function createDefaultPreferences() {
   return { ...DEFAULT_PREFERENCES };

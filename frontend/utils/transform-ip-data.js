@@ -1,4 +1,4 @@
-// 解析IP数据
+// Parse IP data
 function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
     if (data.error) {
         throw new Error(data.reason);
@@ -29,7 +29,7 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
     return baseData;
 };
 
-// 解析代理数据
+// Parse proxy data
 function extractAdvancedData(advancedData = {}, t) {
     const isProxy = determineIsProxy(advancedData, t);
     const type = determineType(advancedData, t);
@@ -41,7 +41,7 @@ function extractAdvancedData(advancedData = {}, t) {
     return { isProxy, type, qualityScore, proxyProtocol, proxyOperator, isNativeIP };
 }
 
-// 判断是否代理
+// Determine if it is a proxy
 function determineIsProxy(advancedData, t) {
 
     if (advancedData.tags === 'sign_in_required') {
@@ -57,7 +57,7 @@ function determineIsProxy(advancedData, t) {
     }
 }
 
-// 判断代理类型
+// Determine proxy type
 function determineType(advancedData, t) {
     switch (advancedData.operatorType) {
         case 'Business':
@@ -77,7 +77,7 @@ function determineType(advancedData, t) {
     }
 }
 
-// 判断代理协议
+// Determine proxy protocol
 function determineProtocol(advancedData, t) {
     if (advancedData.proxyProtocol === 'unknown' || !advancedData.proxyProtocol) {
         return t('ipInfos.advancedData.proxyUnknownProtocol');

@@ -1,14 +1,14 @@
 <template>
-    <!-- ASN 信息面板：嵌入在 IPCard 的 Collapsible 里展开 -->
+    <!-- ASN Info Panel: embedded in IPCard's Collapsible to expand -->
     <div class="rounded-md border bg-muted/40 text-sm">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
             <Info class="size-3.5 mt-[0.15em] shrink-0" />
             <span>{{ t('ipInfos.ASNInfo.note') }}</span>
         </div>
 
         <div v-if="asnInfos[asn]" class="px-3 pb-3 space-y-3">
-            <!-- 基本信息：紧凑的 dl 两列 -->
+            <!-- Basic information: compact dl two columns -->
             <dl class="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
                 <div v-for="(item, key) in basicInfo" :key="key" :class="{ 'col-span-2': key === 'asnOrgName' }">
                     <dt class="text-xs text-muted-foreground mb-0.5">{{ t(`ipInfos.ASNInfo.${key}`) }}</dt>
@@ -22,7 +22,7 @@
                 </div>
             </dl>
 
-            <!-- 成对数据可视化 -->
+            <!-- Pair data visualization -->
             <div v-if="pairDataList.length" class="space-y-2.5 pt-1">
                 <div class="text-xs text-muted-foreground">
                     {{ t('ipInfos.ASNInfo.trafficPercentage') }}
@@ -31,7 +31,7 @@
                     :leftValue="pair.leftValue" :rightLabel="pair.rightLabel" :rightValue="pair.rightValue" />
             </div>
 
-            <!-- 外部链接 -->
+            <!-- External links -->
             <div class="flex flex-wrap items-center gap-2 pt-1">
                 <span class="text-xs text-muted-foreground">{{ t('ipInfos.ASNInfo.moreData') }}</span>
                 <a class="inline-flex" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`" target="_blank"
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <!-- 加载态 skeleton -->
+        <!-- Loading state skeleton -->
         <div v-else class="px-3 pb-3 space-y-2">
             <div v-for="(w, i) in placeholderSizes" :key="i" class="h-3.5 bg-muted rounded animate-pulse"
                 :style="`width: ${(w / 12) * 100}%`"></div>
@@ -84,7 +84,7 @@ const props = defineProps({
     asnInfos: { type: Object, required: true }
 });
 
-// 提取基本信息(非成对数据)
+// Extract basic information (non-pair data)
 const basicInfo = computed(() => {
     const data = props.asnInfos[props.asn];
     if (!data) return {};
@@ -97,7 +97,7 @@ const basicInfo = computed(() => {
     return info;
 });
 
-// 处理成对数据
+// Process pair data
 const pairData = computed(() => {
     const data = props.asnInfos[props.asn];
     if (!data) return {};

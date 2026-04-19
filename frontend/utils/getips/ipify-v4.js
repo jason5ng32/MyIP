@@ -1,7 +1,7 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 IPify 获取 IPv4 地址
+// Get IPv4 address from IPify
 const getIPFromIpify_V4 = async () => {
     try {
         const response = await fetchWithTimeout("https://api4.ipify.org?format=json");

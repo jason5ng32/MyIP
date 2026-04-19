@@ -1,20 +1,20 @@
-// 键盘快捷键注册
+// Keyboard shortcut registration
 //
-// 输入：
-//   - refs: 所有参与快捷键的组件 ref（见下方解构），加上 `toggleInfoMask` 函数
-//   - store: 主 store
-//   - t: i18n 翻译函数
+// Input:
+//   - refs: all components involved in the shortcut keys (see below for destructuring)
+//   - store: main store
+//   - t: i18n translation function
 //   - configs: computed(() => store.configs)
 //   - userPreferences: computed(() => store.userPreferences)
 //   - isSignedIn: computed(() => store.isSignedIn)
 //
-// 输出：
-//   - loadShortcuts(): 应在 onMounted 时调用，内部会延迟 2s 以等 configs 加载，
-//     然后注册所有 mapping 并把 keyMap 传给 helpModalRef（用于帮助弹窗）
+// Output:
+//   - loadShortcuts(): should be called onMounted, internally will delay 2s to wait for configs to load,
+//     then register all mappings and pass keyMap to helpModalRef (for help modal)
 //
-// 注意：
-//   - 所有滚动 + 导航动作统一用 scrollToElement + advancedToolsRef.navigateAndToggleOffcanvas
-//   - `h` 键的 infoMask 切换会在 isInfosLoaded 为 true 时才执行
+// Note:
+//   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.navigateAndToggleOffcanvas
+//   - `h` key infoMask switch only executes when isInfosLoaded is true
 
 import { trackEvent } from '../utils/use-analytics.js';
 import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';

@@ -1,18 +1,18 @@
-// 引入 Google Analytics 配置
-// import.meta.env 只在 Vite 下存在；Node / 测试环境访问 .env 会得到 undefined，
-// 因此用可选链兜底，避免模块顶层求值时抛 TypeError。
+// Import Google Analytics configuration
+// import.meta.env only exists in Vite; Node / test environment may not have it, use optional chaining to fallback
+// Use optional chaining to fallback, avoid TypeError when evaluating at module top level
 const MEASUREMENT_ID = import.meta.env?.VITE_GOOGLE_ANALYTICS_ID || '';
 
-// 全局状态
+// Global state
 let scriptInjected = false;
 let eventQueue = [];
 
-// 注入 gtag.js
+// Inject gtag.js
 function injectGAScript() {
     if (scriptInjected || !MEASUREMENT_ID || typeof window === 'undefined') return;
     scriptInjected = true;
 
-    // 若页面已存在 gtag 脚本（例如 GTM），直接初始化即可
+    // If the page already has a gtag script (e.g. GTM), initialize directly
     if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
         initialiseGtag();
         return;
@@ -25,13 +25,13 @@ function injectGAScript() {
     script.onload = initialiseGtag;
     script.onerror = () => {
         console.warn('[GA] Failed to load gtag.js');
-        scriptInjected = false;               // 允许后续重试
+        scriptInjected = false;               // Allow subsequent retries
     };
 
     document.head.appendChild(script);
 }
 
-// 初始化 gtag & flush 队列
+// Initialize gtag & flush queue
 function initialiseGtag() {
     if (window.gtag) { flushQueue(); return; }
 
@@ -48,13 +48,13 @@ function initialiseGtag() {
 function flushQueue() {
     if (!window.gtag) return;
     eventQueue.forEach(args => window.gtag(...args));
-    eventQueue.length = 0;                    // 清空队列
+    eventQueue.length = 0;                    // Clear queue
 }
 
-// 内部助手：推送或排队
+// Internal helper: push or queue
 function pushEvent(...args) {
-    if (typeof window === 'undefined') return; // SSR 安全
-    if (!scriptInjected) injectGAScript();     // 懒加载脚本
+    if (typeof window === 'undefined') return; // SSR safe
+    if (!scriptInjected) injectGAScript();     // Lazy load script
 
     if (window.gtag) {
         window.gtag(...args);
@@ -63,7 +63,7 @@ function pushEvent(...args) {
     }
 }
 
-// 公共 API
+// Public API
 const analytics = {
     /** analytics.track(action, { category, label, ... }) */
     track(action, properties = {}) {
@@ -85,12 +85,12 @@ const analytics = {
     }
 };
 
-// 兼容 MyIP 旧版的 helper
+// Compatible with MyIP old version helper
 function trackEvent(category, action, label) {
     analytics.track(action, { category, label });
 }
 
-// 首屏初始化
+// First screen initialization
 if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', injectGAScript);

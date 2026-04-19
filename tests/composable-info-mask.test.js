@@ -4,12 +4,12 @@ import { ref, reactive, nextTick } from 'vue';
 
 import { useInfoMask } from '../frontend/composables/use-info-mask.js';
 
-// 最小化的 i18n 桩：返回带前缀的 key，方便断言
+// minimal i18n stub: return key with prefix for assertions
 const t = (key) => `<${key}>`;
 
-// 造一个极简的 store 桩，只要求提供 useInfoMask 用到的 API：
-//   - setAlert(show, style, message, title) —— 会被记录到 lastAlert
-//   - allHasLoaded —— reactive，getter 触发 watch
+// create a minimal store stub, only requiring the API used by useInfoMask:
+//   - setAlert(show, style, message, title) —— will be recorded in lastAlert
+//   - allHasLoaded —— reactive, getter triggers watch
 function makeStoreStub() {
   const state = reactive({ allHasLoaded: false, lastAlert: null });
   return {
@@ -21,7 +21,7 @@ function makeStoreStub() {
   };
 }
 
-// 造参与遮罩的三个组件 ref：ipDataCards / stunServers / leakTest 是数组
+// create three component refs for masking: ipDataCards / stunServers / leakTest are arrays
 function makeCards() {
   const IPCheckRef = ref({
     ipDataCards: [

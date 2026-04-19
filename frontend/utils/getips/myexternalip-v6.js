@@ -1,7 +1,7 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 MyExternalIP 获取 IPv6 地址
+// Get IPv6 address from MyExternalIP
 const getIPFromMyExternalIP_V6 = async () => {
     try {
         const response = await fetchWithTimeout("https://ipv6.myexternalip.com/json");

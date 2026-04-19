@@ -9,7 +9,7 @@ function refererCheck(referer) {
         const domain = new URL(referer).hostname;
         return allowedDomains.includes(domain);
     }
-    return false;  // 如果没有提供 referer，返回 false
+    return false;  // if no referer is provided, return false
 }
 
 export { refererCheck };

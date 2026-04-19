@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { useMainStore } from '@/store';
 
-// 路由组件的懒加载
+// Lazy loading of route components
 const MTRTest = () => import('../components/advanced-tools/MtrTest.vue');
 const PingTest = () => import('../components/advanced-tools/GlobalLatencyTest.vue');
 const RuleTest = () => import('../components/advanced-tools/RuleTest.vue');
@@ -41,12 +41,10 @@ const setOpenedCard = (currentPath) => {
   }
 };
 
-// refactor/01：原实现通过 document.getElementById + Bootstrap Offcanvas.show/hide 操作 DOM，
-// 现在改为设置 store.openSheet，由 Advanced.vue 的 <Sheet v-bind:open> 响应式渲染。
 router.afterEach((to) => {
   const store = useMainStore();
 
-  // 路由非工具页：关闭 tools sheet
+
   if (!routes.find(route => route.path === to.path)) {
     if (store.openSheet === 'tools') {
       store.setOpenSheet(null);

@@ -1,7 +1,7 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 IPify 获取 IPv6 地址
+// Get IPv6 address from IPify
 const getIPFromIpify_V6 = async () => {
     try {
         const response = await fetchWithTimeout("https://api6.ipify.org?format=json");

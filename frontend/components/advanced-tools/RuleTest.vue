@@ -1,14 +1,14 @@
 <template>
     <div class="rule-test-section my-4 space-y-4">
-        <!-- 顶部说明 -->
+        <!-- Top note -->
         <p class="text-sm text-muted-foreground">{{ t('ruletest.Note') }}</p>
 
-        <!-- 卡片网格 —— 跟 WebRTC / DnsLeak 同款"服务状态卡"结构 -->
+        <!-- Card grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <Card v-for="test in ruleTests" :key="test.id"
                 class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
                 <CardContent class="p-4">
-                    <!-- 顶部：图标 + 名字 + #id -->
+                    <!-- Top: icon + name + #id -->
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <div class="flex items-center gap-2 min-w-0">
                             <SignpostBig class="size-6 text-muted-foreground shrink-0" />
@@ -18,12 +18,12 @@
 
                     </div>
 
-                    <!-- URL（次要信息） -->
+                    <!-- URL (secondary information) -->
                     <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="test.url">
                         {{ test.url }}
                     </p>
 
-                    <!-- IP 行：状态灯 + IP（长 IPv6 字号降级） -->
+                    <!-- IP row: status light + IP (long IPv6 font downgrade) -->
                     <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
                         <span class="relative flex shrink-0">
                             <span v-if="toneOf(test) === 'wait'"
@@ -35,7 +35,7 @@
                             :title="test.ip">{{ test.ip }}</span>
                     </div>
 
-                    <!-- Country 子块 -->
+                    <!-- Country sub-block -->
                     <dl class="rounded-md bg-muted/50 p-3 text-sm">
                         <div>
                             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -57,7 +57,7 @@
             </Card>
         </div>
 
-        <!-- 底部 RefreshAll 按钮（action 色 + Spinner 规范） -->
+        <!-- Bottom RefreshAll button (action color + Spinner standard) -->
         <div class="flex justify-center pt-2">
             <Button variant="action" :disabled="!finishAll"
                 :class="[isMobile ? 'w-full' : 'w-64']"
@@ -107,7 +107,7 @@ const IPArray = ref([]);
 const testCount = ref(ruleTests.value.length);
 const finishAll = ref(false);
 
-// 业务状态 → 4 档 tone
+// Business status → 4 tone levels
 const toneOf = (test) => {
     if (test.ip === t('ruletest.StatusWait')) return 'wait';
     if (test.ip === t('ruletest.StatusError')) return 'fail';
@@ -115,12 +115,11 @@ const toneOf = (test) => {
     return 'wait';
 };
 
-// Country / ISP 等字段是否处于"无数据"态
 const isFieldPending = (value) => {
     return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
 };
 
-// IP 字号降级：IPv4 ≤15 base；短压缩 IPv6 ≤26 sm；完整 IPv6 xs
+// IP font downgrade: IPv4 ≤15 base; short compressed IPv6 ≤26 sm; full IPv6 xs
 const fitOneLineClass = (text) => {
     const len = typeof text === 'string' ? text.length : 0;
     if (len <= 15) return 'text-base';

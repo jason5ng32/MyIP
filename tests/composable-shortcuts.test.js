@@ -1,5 +1,5 @@
-// use-shortcuts 依赖 shortcut.js，后者在模块加载时调用 document.addEventListener。
-// 这里先注入最小 document / window 桩，再 dynamic import 被测模块。
+// use-shortcuts depends on shortcut.js, which calls document.addEventListener at module load time.
+// Here we inject minimal document / window stubs first, then dynamically import the tested module.
 
 import assert from 'node:assert/strict';
 import { describe, it, after } from 'node:test';
@@ -84,7 +84,7 @@ function makeRefs() {
   };
 }
 
-// 用假 setTimeout 使 loadShortcuts 同步化
+// use fake setTimeout to synchronize loadShortcuts
 const realSetTimeout = globalThis.setTimeout;
 globalThis.setTimeout = (fn) => { fn(); return 0; };
 

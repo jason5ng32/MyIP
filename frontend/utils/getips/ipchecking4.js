@@ -2,7 +2,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { getIPFromIpify_V4 } from "./ipify-v4";
 
-// 从 IPCheck.ing 获取 IPv4 地址
+// Get IPv4 address from IPCheck.ing
 const getIPFromIPChecking4 = async (originalSite) => {
     try {
         let ip;
@@ -23,7 +23,7 @@ const getIPFromIPChecking4 = async (originalSite) => {
     } catch (error) {
         console.error("Error fetching IP from IPCheck.ing IPv4:", error);
     }
-    // 故障转移
+    // Fallback
     const { ip, source } = await getIPFromIpify_V4();
     return {
         ip: ip,

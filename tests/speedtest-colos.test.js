@@ -16,7 +16,7 @@ describe('getColoCountry(abbr)', () => {
 
   it('throws for unknown abbr (direct access on undefined)', () => {
     // Note: current implementation `coloList[abbr].country` throws if abbr is unknown.
-    // 如果未来改成 safe fallback，本测试需要同步更新。
+    // If future implementation uses safe fallback, this test needs to be updated.
     assert.throws(() => getColoCountry('ZZZ'));
   });
 });

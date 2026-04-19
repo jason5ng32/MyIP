@@ -1,7 +1,7 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 Cloudflare 中国获取 IP 地址
+// Get IP address from Cloudflare China
 const getIPFromCloudflare_CN = async () => {
     try {
         const response = await fetchWithTimeout("https://cf-ns.com/cdn-cgi/trace");

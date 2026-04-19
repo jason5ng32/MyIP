@@ -1,10 +1,10 @@
-// IP 数据源定义（refactor/04）
+// IP database definitions
 //
-// 每项：{ id, text, url, enabled }
-// - id    数字标识，App 内其他地方通过 id 引用（例如 userPreferences.ipGeoSource）
-// - text  UI 展示名，也是查找 key（例如 `WebRtcTest.vue` 找 "MaxMind"）
-// - url   模板字符串，{{ip}} 与 {{lang}} 会被 buildDbUrl() 替换
-// - enabled 初始使能状态（用户可在 Preferences 里切换，store 会写回这个字段）
+// Each item: { id, text, url, enabled }
+// - id    numeric identifier, referenced elsewhere in the app (e.g. userPreferences.ipGeoSource)
+// - text  UI display name, also lookup key (e.g. `WebRtcTest.vue` looks for "MaxMind")
+// - url   template string, {{ip}} and {{lang}} will be replaced by buildDbUrl()
+// - enabled initial enabled state (user can toggle in Preferences, store will write back this field)
 
 export const IP_DATABASES = [
   { id: 0, text: 'IPCheck.ing', url: '/api/ipchecking?ip={{ip}}&lang={{lang}}', enabled: true },
@@ -17,16 +17,15 @@ export const IP_DATABASES = [
 ];
 
 /**
- * 返回一份全新的 ipDBs 数组（store state 初始值），不与导出的 IP_DATABASES 共享引用。
- * 每条记录也是新对象 —— 用户改 enabled 不会污染定义。
+ * Returns a fresh ipDBs array (store state initial value), not sharing references with exported IP_DATABASES.
  */
 export function createInitialIpDBs() {
   return IP_DATABASES.map((db) => ({ ...db }));
 }
 
 /**
- * 纯函数：根据数据源记录和 IP/lang 渲染最终请求 URL。
- * 提取到 data 层是为了方便单测，避免依赖 Pinia store。
+ * Pure function: render the final request URL based on the data source record and IP/lang.
+ * Extracted to data layer for convenience of unit tests, avoiding dependency on Pinia store.
  */
 export function buildDbUrl(db, ip, lang) {
   if (!db || !db.url) return null;

@@ -1,17 +1,17 @@
-// 刷新 / 初次加载的时序编排
+// Refresh / initial load sequence orchestration
 //
-// 输入：
+// Input:
 //   - refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef }
-//   - store: 主 store
-//   - t: i18n 翻译函数
+//   - store: main store
+//   - t: i18n translation function
 //   - userPreferences: computed(() => store.userPreferences)
-//   - infoMaskLevel: ref<number> — 刷新时会被重置为 0
+//   - infoMaskLevel: ref<number> — reset to 0 when refreshing
 //
-// 输出：
-//   - loadingControl(): 初次加载的时序启动（等各卡片 mounted 后发起首次检测）
+// Output:
+//   - loadingControl(): initial load sequence starts (after all cards are mounted)
 //
-// 内部：
-//   - 监听 store.shouldRefreshEveryThing，触发刷新 → 重置 loadingStatus → 错峰执行各组件 refresh → Alert → 还原 flag
+// Internal:
+//   - monitor store.shouldRefreshEveryThing, trigger refresh → reset loadingStatus → schedule component refreshes → Alert → reset flag
 
 import { watch } from 'vue';
 

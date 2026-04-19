@@ -8,7 +8,7 @@
                 <p class="text-sm text-muted-foreground leading-relaxed">{{ t('user.Benefits.Note1') }}</p>
                 <p class="text-sm text-muted-foreground leading-relaxed">{{ t('user.Benefits.Note2') }}</p>
 
-                <!-- Benefits 列表：数字徽章 + Check 图标 + 文本；比原版 <table> 更现代 -->
+                <!-- Benefits List -->
                 <ul class="rounded-lg border bg-card divide-y">
                     <li v-for="n in 4" :key="n" class="flex items-start gap-3 p-3 text-sm">
                         <span
@@ -26,9 +26,6 @@
 </template>
 
 <script setup>
-// refactor/02：User Benefits 弹窗用 DialogHeader primitive
-// - 表格 → 列表（4 条好处，table 太重，list + 数字/Check 徽章更友好）
-// - opacity-75 硬编码 → text-muted-foreground 语义
 import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -60,6 +57,7 @@ const openUserBenefits = () => {
     trackEvent('Nav', 'NavClick', 'UserBenefits');
 };
 
+// Fetch user info
 const getUserInfo = async () => {
     if (remoteUserInfoFetched.value || !isSignedIn.value) return;
     try {
@@ -73,6 +71,7 @@ const getUserInfo = async () => {
     store.remoteUserInfoFetched = true;
 };
 
+// Initialize user achievements
 const initUserAchievements = () => {
     if (!remoteUserInfo.value) return;
 
@@ -94,11 +93,13 @@ const initUserAchievements = () => {
     }
 };
 
+// Update local achievement status
 const updateLocalAchievementStatus = (achievementName) => {
     store.userAchievements[achievementName].achieved = true;
     store.userAchievements[achievementName].achievedTime = Date.now();
 };
 
+// Update user achievement
 const updateUserAchievement = async (achievementName) => {
     isUpdateAchievementsSuccess.value = false;
     updateLocalAchievementStatus(achievementName);

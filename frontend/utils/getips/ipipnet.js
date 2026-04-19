@@ -2,7 +2,7 @@ import { getIPFromUpai } from "./upai";
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-// 从 IPIP.net 获取 IP 地址
+// Get IP address from IPIP.net
 const getIPFromIPIP = async () => {
     try {
         const response = await fetchWithTimeout("https://myip.ipip.net/json");
@@ -20,7 +20,7 @@ const getIPFromIPIP = async () => {
     } catch (error) {
         console.error("Error fetching IP from IPIP.net:", error);
     }
-    // 故障时尝试从 Upai 获取 IP 地址
+    // Fallback
     const { ip, source } = await getIPFromUpai();
     return {
         ip: ip,
