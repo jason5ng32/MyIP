@@ -1,0 +1,42 @@
+name: Sync README to Docker Hub
+
+# Keeps the Docker Hub overview page in sync with README.md in this repo.
+# Triggers on any push to main that touches README.md (or this workflow file
+# itself), so documentation edits propagate without waiting for the next
+# release or a manual step. Also exposes `workflow_dispatch` for a manual
+# one-shot push (useful the first time this workflow is enabled, or to force
+# a resync after rotating the Docker Hub token).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - '.github/workflows/dockerhub-readme.yml'
+  workflow_dispatch:
+
+# Least-privilege GITHUB_TOKEN: the job only needs to read the repo; the
+# Docker Hub write happens through the separately scoped access token secret.
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Push README to Docker Hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          # DOCKER_HUB_ACCESS_TOKEN must have the "Read, Write, Delete" scope
+          # for this endpoint. The token used for image pushes might only
+          # carry "Read, Write" — if this step 403s, generate a new PAT with
+          # the wider scope on Docker Hub and replace the secret.
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          repository: jason5ng32/myip
+          readme-filepath: ./README.md
