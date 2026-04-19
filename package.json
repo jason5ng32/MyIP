@@ -19,6 +19,7 @@
     "@iconify/vue": "^5.0.0",
     "@khmyznikov/pwa-install": "^0.6.3",
     "@thumbmarkjs/thumbmarkjs": "^1.7.7",
+    "@vueuse/core": "^14.2.1",
     "chart.js": "^4.5.1",
     "circle-progress.vue": "^3.4.1",
     "class-variance-authority": "^0.7.1",
