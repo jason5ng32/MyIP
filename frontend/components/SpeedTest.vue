@@ -87,7 +87,7 @@
         <!-- 4 Metrics Tiles -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div v-for="m in metrics" :key="m.key" class="text-center">
-            <p class="text-lg uppercase tracking-wider text-primary font-semibold mb-1">{{ m.label }}</p>
+            <p class="text-lg uppercase tracking-wider text-primary mb-1">{{ m.label }}</p>
             <p class="text-2xl md:text-3xl font-mono font-light tabular-nums" :class="metricColorClass">
               <span>{{ state.speedTest[m.key] }}</span>
               <span v-if="state.speedTest.status !== 'idle'" class="ml-1 text-sm font-normal text-muted-foreground">{{
