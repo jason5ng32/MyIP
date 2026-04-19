@@ -122,7 +122,6 @@ MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进
 
 | 变量名 | 是否必须 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `IPCHECKING_API_ENDPOINT` | **是** | `""` | IPCheck.ing 的 API 端点 URL |
 | `MAXMIND_ACCOUNT_ID` | **是** | `""` | MaxMind 账号 ID，和 `MAXMIND_LICENSE_KEY` 一起用于下载 GeoLite2 数据库。详见上方 MaxMind 配置说明。 |
 | `MAXMIND_LICENSE_KEY` | **是** | `""` | MaxMind License Key，和 `MAXMIND_ACCOUNT_ID` 配合使用。详见上方 MaxMind 配置说明。 |
 | `MAXMIND_AUTO_UPDATE` | **是** | `"false"` | 设置为 `"true"` 时，程序会在启动后 60 秒左右自动下载 GeoLite2 数据库，之后每 24 小时刷新一次。**Docker 部署必须设置为 `"true"`。** 只有当你已经手动放置了 `.mmdb` 文件时，才能保持为 `"false"`。 |
@@ -134,7 +133,8 @@ MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `"logs/blacklist-ip.log"` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
 | `GOOGLE_MAP_API_KEY` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
-| `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 的 API Key，用于获取精准的 IP 归属地信息 |
+| `IPCHECKING_API_ENDPOINT` | 否 | `""` | IPCheck.ing 数据库的 API 端点 URL |
+| `IPCHECKING_API_KEY` | 否 | `""` | IPCheck.ing 数据库的 API Key，用于获取精准的 IP 归属地信息 |
 | `IPINFO_API_TOKEN` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
@@ -159,7 +159,6 @@ cp .env.example .env
 ```bash
 BACKEND_PORT=11966
 FRONTEND_PORT=18966
-IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE"
 MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
 MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
 MAXMIND_AUTO_UPDATE="true"
@@ -175,7 +174,6 @@ ALLOWED_DOMAINS="example.com"
 
 ```bash
 docker run -d -p 18966:18966 \
-  -e IPCHECKING_API_ENDPOINT="YOUR_ENDPOINT_HERE" \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \
