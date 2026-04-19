@@ -65,6 +65,23 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             description: t('shortcutKeys.GoPrevious'),
         },
         {
+            // Open the currently J/K-highlighted card if it's an Advanced Tool
+            // (those carry data-adv-path). No-op for any other card type —
+            // IP cards, Connectivity, WebRTC, etc. have their own refresh
+            // shortcuts rather than an "open" concept.
+            keys: 'o',
+            action: () => {
+                const highlighted = document.querySelector(
+                    '.keyboard-shortcut-card[data-keyboard-hover="true"]'
+                );
+                const path = highlighted?.getAttribute('data-adv-path');
+                if (!path) return;
+                advancedToolsRef.value.navigateAndToggleOffcanvas(path);
+                trackEvent('ShortCut', 'ShortCut', 'OpenHighlightedTool');
+            },
+            description: t('shortcutKeys.OpenHighlightedTool'),
+        },
+        {
             keys: 'G',
             action: () => {
                 window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });

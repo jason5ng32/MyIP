@@ -645,6 +645,7 @@
     "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
     "GoNext": "Carte suivante",
     "GoPrevious": "Carte précédente",
+    "OpenHighlightedTool": "Ouvrir l'outil avancé sélectionné",
     "RefreshRuleTests": "Actualiser les tests de règles",
     "CensorshipCheck": "Ouvrir le Test de censorship",
     "Preferences": "Ouvrir les Préférences",

@@ -12,7 +12,8 @@
         <!-- Card grid -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Card v-for="(card, index) in enabledCards" :key="index"
-                class="jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5"
+                :data-adv-path="card.path"
+                class="keyboard-shortcut-card jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
                 role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
                 @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
                 @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">

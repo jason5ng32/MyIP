@@ -6,9 +6,13 @@ import { describe, it, after } from 'node:test';
 import { ref, computed, reactive } from 'vue';
 
 const documentHandlers = {};
+// Per-test override (see "o" shortcut cases below). Default: no card is
+// currently highlighted via J/K, so any lookup returns null.
+let querySelectorImpl = () => null;
 globalThis.document = {
   addEventListener(type, handler) { documentHandlers[type] = handler; },
   getElementById() { return null; },
+  querySelector(sel) { return querySelectorImpl(sel); },
 };
 globalThis.window = {
   scrollTo() {},
@@ -110,14 +114,15 @@ function loadAndGetKeyMap({ originalSite = false, isSignedIn = false } = {}) {
 }
 
 describe('useShortcuts()', () => {
-  it('loadShortcuts() registers a keymap of 26+ entries on a non-original site', () => {
+  it('loadShortcuts() registers a keymap of 27+ entries on a non-original site', () => {
     const { keyMap } = loadAndGetKeyMap({ originalSite: false });
-    // 26 base entries (no invisibility); keyMap is append-only globally so ≥ 26
+    // 27 base entries (no invisibility); keyMap is append-only globally so ≥ 27
     const distinctKeys = new Set(keyMap.map((e) => e.keys));
-    assert.ok(distinctKeys.size >= 26, `expected ≥26 distinct shortcut keys, got ${distinctKeys.size}`);
+    assert.ok(distinctKeys.size >= 27, `expected ≥27 distinct shortcut keys, got ${distinctKeys.size}`);
     assert.ok(distinctKeys.has('R'));
     assert.ok(distinctKeys.has('?'));
     assert.ok(distinctKeys.has('g'));
+    assert.ok(distinctKeys.has('o'));
   });
 
   it('originalSite=true adds the invisibility-test shortcut (key "i")', () => {
@@ -176,5 +181,39 @@ describe('useShortcuts()', () => {
     const entry = keyMap.findLast((e) => e.keys === 'h');
     entry.action();
     assert.equal(calls.mask, 1);
+  });
+
+  it('"o" opens the highlighted advanced tool by its data-adv-path', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    // Stub the highlighted card to be an advanced tool card pointing at /mtrtest.
+    querySelectorImpl = (sel) => {
+      if (sel === '.keyboard-shortcut-card[data-keyboard-hover="true"]') {
+        return {
+          getAttribute: (name) => name === 'data-adv-path' ? '/mtrtest' : null,
+        };
+      }
+      return null;
+    };
+    const entry = keyMap.findLast((e) => e.keys === 'o');
+    entry.action();
+    querySelectorImpl = () => null;
+    assert.deepEqual(calls.advancedNavigate, ['/mtrtest']);
+  });
+
+  it('"o" is a no-op when the highlighted card has no data-adv-path (e.g. IP card)', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    querySelectorImpl = () => ({ getAttribute: () => null });
+    const entry = keyMap.findLast((e) => e.keys === 'o');
+    entry.action();
+    querySelectorImpl = () => null;
+    assert.deepEqual(calls.advancedNavigate, []);
+  });
+
+  it('"o" is a no-op when nothing is highlighted', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    // querySelectorImpl default returns null (nothing highlighted).
+    const entry = keyMap.findLast((e) => e.keys === 'o');
+    entry.action();
+    assert.deepEqual(calls.advancedNavigate, []);
   });
 });
