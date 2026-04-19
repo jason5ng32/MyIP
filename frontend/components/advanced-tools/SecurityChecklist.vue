@@ -413,14 +413,45 @@ const changeList = (listName, shouldScroll = true) => {
         if (previousList !== currentList.value) {
             trackEvent('SecurityChecklist', 'SecurityChecklist', 'ChangeList');
         }
-        // Use scrollIntoView({ block: 'nearest' }) to let the browser decide whether to scroll:
-        // - Desktop navigation and details side by side visible → no-op
-        // - Mobile vertical stack → automatically scroll to details
-        // The original scrollToElementInOffcanvas uses .closest('[data-state]') to find the container,
-        // which will incorrectly match the DrawerContent root (overflow:hidden cannot be scrolled), causing scroll exceptions
+        // Scroll the details area into view when switching category — but *only*
+        // by moving the drawer's own scroll container, never by letting the
+        // scroll request bubble to <body>.
+        //
+        // The earlier version used `scrollIntoView({ block: 'nearest' })`. On
+        // desktop the target element (#checklist) was already visible in the
+        // md 3-column grid, so the call no-op'd and everything worked. On iOS
+        // Safari however, the drawer library (vaul) scroll-locks the page by
+        // setting `body { position: fixed; top: -Npx }`. When scrollIntoView
+        // walked up past the drawer's own scrollable div to any ancestor that
+        // still negotiated with the browser's root scroller, its implicit
+        // side-effect of "settle page scroll" knocked vaul's recorded offset
+        // out of sync — the entire drawer visually slid up by the scroll
+        // distance (header disappearing off the top, blank space at bottom).
+        //
+        // Manually walking to the nearest scrollable ancestor and calling
+        // `scrollBy` on that element keeps the effect fully contained inside
+        // the drawer, and the PC path still short-circuits via the
+        // "already-visible" check.
         nextTick(() => {
             const el = document.getElementById('checklist');
-            el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            if (!el) return;
+            let scrollParent = el.parentElement;
+            while (scrollParent) {
+                const { overflowY } = getComputedStyle(scrollParent);
+                if (overflowY === 'auto' || overflowY === 'scroll') break;
+                scrollParent = scrollParent.parentElement;
+            }
+            if (!scrollParent) return;
+            const containerRect = scrollParent.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            const alreadyVisible =
+                elRect.top >= containerRect.top &&
+                elRect.bottom <= containerRect.bottom;
+            if (alreadyVisible) return;
+            scrollParent.scrollBy({
+                top: elRect.top - containerRect.top - 8,
+                behavior: 'smooth',
+            });
         });
     }
 };
