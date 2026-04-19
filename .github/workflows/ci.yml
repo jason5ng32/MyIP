@@ -10,6 +10,14 @@ jobs:
   check:
     name: Test + Build
     runs-on: ubuntu-latest
+    # `node-version: 24` below sets the Node runtime for the project itself.
+    # This env var is separate: it tells GitHub's Actions runner to execute
+    # the JavaScript actions (checkout / setup-node / ...) on Node 24 instead
+    # of the deprecated Node 20. After 2026-06-02 this will be the default and
+    # the env var can be removed. See:
+    # https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
     steps:
       - name: Checkout

@@ -13,6 +13,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: production
+    # Opt every JavaScript action in this job into the Node 24 runner ahead of
+    # the 2026-06-02 default flip (see ci.yml for the full rationale).
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
     steps:
     - name: Check Out Repo
