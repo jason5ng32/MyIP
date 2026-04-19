@@ -1,4 +1,3 @@
-import { getIPFromCloudflare_CN } from "./cloudflare-cn";
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
@@ -23,13 +22,6 @@ const getIPFromUpai = async () => {
     } catch (error) {
         console.error("Error fetching IP from Upai:", error);
     }
-
-    // Fallback
-    const { ip, source } = await getIPFromCloudflare_CN();
-    return {
-        ip: ip,
-        source: source
-    };
 };
 
 export { getIPFromUpai };
