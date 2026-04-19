@@ -54,7 +54,7 @@
           <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                <Building2 class="size-3.5" />
+                <EthernetPort class="size-3.5" />
                 <span>{{ t('ipInfos.ISP') }}</span>
               </dt>
               <dd class="font-medium wrap-break-word" :title="leak.org">
@@ -95,7 +95,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw, SquareArrowRightExit } from 'lucide-vue-next';
+import { EthernetPort, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 
 

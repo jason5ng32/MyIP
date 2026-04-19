@@ -99,8 +99,12 @@
                 <ul class="space-y-2">
                   <li v-for="(item, idx) in version.content" :key="idx" class="flex items-start gap-2 text-sm">
                     <Badge :class="changelogBadgeClass(item.type)"
-                      class="shrink-0 shadow-none! rounded-full font-normal mt-0.5 min-w-16 justify-center">
-                      {{ t('changelog.' + item.type) }}
+                      class="shrink-0 shadow-none! rounded-full justify-center text-secondary p-1" 
+                      :title="t('changelog.' + item.type)"
+                      >
+                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-4" />
+                      <CirclePlus v-if="item.type === 'add'" class="size-4" />
+                      <BugOff v-if="item.type === 'fix'" class="size-4" />
                     </Badge>
                     <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
                   </li>
@@ -147,7 +151,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight } from 'lucide-vue-next';
+import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from 'lucide-vue-next';
 
 const { t, locale } = useI18n();
 
@@ -183,9 +187,9 @@ const thanksList = [
 
 // changelog type → semantic color token: add → success; improve → info; fix → destructive
 const changelogBadgeClass = (type) => {
-  if (type === 'add') return 'bg-success text-success-foreground border-transparent';
-  if (type === 'improve') return 'bg-info text-info-foreground border-transparent';
-  if (type === 'fix') return 'bg-destructive text-destructive-foreground border-transparent';
+  if (type === 'add') return 'bg-success ';
+  if (type === 'improve') return 'bg-info ';
+  if (type === 'fix') return 'bg-destructive ';
   return '';
 };
 
