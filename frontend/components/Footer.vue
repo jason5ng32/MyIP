@@ -178,6 +178,7 @@ const thanksList = [
   { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
   { name: 'Digital Defense', link: 'https://digital-defense.io/' },
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
+  { name: 'Claude', link: 'https://claude.ai/' },
 ];
 
 // changelog type → semantic color token: add → success; improve → info; fix → destructive
