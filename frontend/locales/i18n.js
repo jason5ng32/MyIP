@@ -26,7 +26,10 @@ function mergeMessagesSync() {
 // 设置语言
 function setLanguage() {
   let locale = 'en';
-  let storedPreferences = localStorage.getItem('userPreferences');
+  // Keep in sync with PREFS_STORAGE_KEY in frontend/store.js — both must read
+  // from the same versioned key so an old value doesn't mislead the i18n
+  // initialization into a previously-chosen language after we bumped defaults.
+  let storedPreferences = localStorage.getItem('userPreferences_v6');
   storedPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
   if (supportedLanguages.includes(storedPreferences.lang)) {
     locale = storedPreferences.lang;

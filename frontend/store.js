@@ -9,6 +9,17 @@ import { createDefaultPreferences } from './data/default-preferences.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 const { t } = i18n.global;
 
+// Versioned localStorage key for userPreferences.
+//
+// When a release changes a default in a way that would be disruptive if
+// merged on top of older stored overrides (e.g. repurposing an option, or
+// when we simply want everyone to see the freshly-tuned defaults), bump
+// this suffix. The mismatch leaves old stored values "orphaned" — the
+// loader below won't find anything at the new key, falls back to defaults,
+// and removes the legacy key(s) so browsers don't accumulate dead data.
+const PREFS_STORAGE_KEY = 'userPreferences_v6';
+const LEGACY_PREFS_KEYS = ['userPreferences'];
+
 export const useMainStore = defineStore('main', {
 
   state: () => ({
@@ -119,17 +130,17 @@ export const useMainStore = defineStore('main', {
     // set user preferences
     setPreferences(userPreferences) {
       this.userPreferences = userPreferences;
-      localStorage.setItem('userPreferences', JSON.stringify(userPreferences));
+      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(userPreferences));
     },
     // update user preferences
     updatePreference(key, value) {
       this.userPreferences[key] = value;
-      localStorage.setItem('userPreferences', JSON.stringify(this.userPreferences));
+      localStorage.setItem(PREFS_STORAGE_KEY, JSON.stringify(this.userPreferences));
     },
     // load user preferences from local storage
     loadPreferences() {
       const defaultPreferences = createDefaultPreferences();
-      const storedPreferences = localStorage.getItem('userPreferences');
+      const storedPreferences = localStorage.getItem(PREFS_STORAGE_KEY);
       let preferencesToStore;
 
       if (storedPreferences) {
@@ -137,9 +148,17 @@ export const useMainStore = defineStore('main', {
         preferencesToStore = { ...defaultPreferences, ...currentPreferences };
       } else {
         preferencesToStore = defaultPreferences;
+        // First load on the current schema version — purge any older keys
+        // so we don't leave zombie entries in the browser forever. Running
+        // this only in the "fresh install" branch avoids racing users who
+        // have already migrated on another tab.
+        for (const legacyKey of LEGACY_PREFS_KEYS) {
+          if (localStorage.getItem(legacyKey) !== null) {
+            localStorage.removeItem(legacyKey);
+          }
+        }
       }
 
-      localStorage.setItem('userPreferences', JSON.stringify(preferencesToStore));
       this.setPreferences(preferencesToStore);
     },
     // fetch configs from server
