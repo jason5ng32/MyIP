@@ -540,11 +540,10 @@
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
-    "Name": "Test",
+    "Name": "DNS Uç Noktası Testi",
     "Title": "DNS Sızıntı Testi",
     "Note": "DNS sızıntısı, bir VPN/proxy'ye bağlıyken alan adı çözümlemelerinizin hala yerel İSS'niz aracılığıyla yapılması anlamına gelir, bu da DNS sızıntısı riski oluşturur.",
     "Note2": "DNS sızıntılarını test etme yöntemi, hangi bölgesel DNS çıkışı üzerinden çözümleme yaptığınızı tespit etmek için yeni oluşturulmuş bir alan adına erişmeyi içerir. Dönen uç nokta bölgesi, yerel hizmet sağlayıcınızın bölgesiyle eşleşirse, DNS sızıntısı riski vardır. Bu durumda, VPN/proxy ayarlarınızı değiştirmeniz gerekebilir.",
-    "Endpoint": "DNS Uç Noktası",
     "EndpointCountry": "Uç Nokta Bölgesi",
     "StatusWait": "Test Bekleniyor",
     "StatusError": "Test Hatası"

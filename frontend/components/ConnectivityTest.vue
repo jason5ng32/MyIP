@@ -38,7 +38,7 @@
               </span>
               <component v-else-if="statusFaceIcon(test)" :is="statusFaceIcon(test)"
                 class="size-4 shrink-0" :class="textClass(toneOf(test))" />
-              <span :class="textClass(toneOf(test))" class="truncate">{{ test.status }}</span>
+              <span :class="textClass(toneOf(test))" class="font-mono whitespace-nowrap min-w-0">{{ test.status }}</span>
             </span>
             <span v-if="test.time !== 0" class="text-base font-mono tabular-nums text-muted-foreground"
               :title="t('connectivity.minTestTime') + test.mintime + ' ms'">

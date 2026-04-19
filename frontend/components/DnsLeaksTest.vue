@@ -11,8 +11,7 @@
         <p class="my-3 text-base text-muted-foreground">{{ t('dnsleaktest.Note2') }}</p>
       </div>
       <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer"
-          @click="checkAllDNSLeakTest(true)"
+        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
           aria-label="Refresh DNS Leak Test">
           <component :is="isStarted ? RotateCw : ChevronRight" />
         </Button>
@@ -29,9 +28,9 @@
             <div class="flex items-center gap-2 min-w-0">
               <HeartPulse class="size-6 text-muted-foreground shrink-0" />
               <span class="text-base font-medium truncate">{{ leak.name }}</span>
-            
-            <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
-          </div>
+
+              <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
+            </div>
           </div>
 
           <!-- Endpoint status row: long IPv6 downgraded by font size to keep single line display -->
@@ -41,13 +40,13 @@
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <span class="whitespace-nowrap truncate min-w-0"
-              :class="fitOneLineClass(endpointLineText(leak))"
-              :title="leak.ip">
+            <span class="whitespace-nowrap truncate min-w-0" :class="fitOneLineClass(leak.ip)" :title="leak.ip">
               <template v-if="isResolved(leak)">
-                <span class="font-mono ml-1" :class="textClass(toneOf(leak))">{{ t('dnsleaktest.Endpoint') }}: {{ leak.ip }}</span>
+                <span class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{ leak.ip
+                  }}</span>
               </template>
-              <span v-else class="text-base" :class="textClass(toneOf(leak))">{{ leak.ip }}</span>
+              <span v-else class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{
+                leak.ip }}</span>
             </span>
           </div>
 
@@ -66,12 +65,11 @@
             <div>
               <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                 <MapPin class="size-3.5" />
-                <span>{{ t('ipInfos.Country') }}</span>
+                <span>{{ t('dnsleaktest.EndpointCountry') }}</span>
               </dt>
               <dd class="font-medium flex items-center gap-1.5 flex-wrap">
                 <template v-if="!isFieldPending(leak.country)">
-                  <Icon v-if="leak.country_code"
-                    :icon="'circle-flags:' + leak.country_code.toLowerCase()"
+                  <Icon v-if="leak.country_code" :icon="'circle-flags:' + leak.country_code.toLowerCase()"
                     class="shrink-0 size-4" />
                   <span class="wrap-break-word">{{ leak.country }}</span>
                 </template>
@@ -97,7 +95,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { Building2, ChevronRight, HeartPulse, MapPin, RotateCw, SquareArrowRightExit } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 
 
@@ -129,12 +127,8 @@ const fitOneLineClass = (text) => {
   const len = typeof text === 'string' ? text.length : 0;
   if (len <= 15) return 'text-base';
   if (len <= 26) return 'text-sm';
-  return 'text-xs';
+  return 'text-sm md:text-xs';
 };
-// When resolved, the total text = label + ': ' + ip; use it to determine the font size of the entire line, so that the label and IP scale together
-const endpointLineText = (leak) => isResolved(leak)
-  ? `${t('dnsleaktest.Endpoint')}: ${leak.ip}`
-  : leak.ip;
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),

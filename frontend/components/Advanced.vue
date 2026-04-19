@@ -10,7 +10,7 @@
         </header>
 
         <!-- Card grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Card v-for="(card, index) in enabledCards" :key="index"
                 class="jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5"
                 role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
@@ -18,7 +18,7 @@
                 @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
                 <CardContent class="p-4">
                     <h3 class="text-xl md:text-2xl font-medium text-primary mb-2 pr-10">
-                        <CircleArrowOutUpRight
+                        <PanelBottomOpen
                             class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
                         {{ t(card.titleKey) }}
                     </h3>
@@ -71,7 +71,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
-import { CircleArrowOutUpRight, Maximize, Minimize } from 'lucide-vue-next';
+import { CircleArrowOutUpRight, Maximize, Minimize, PanelBottomOpen } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

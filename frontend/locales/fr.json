@@ -541,11 +541,10 @@
   },
   "dnsleaktest": {
     "id": "dnsleaktest",
-    "Name": "Test",
+    "Name": "Test de point de DNS",
     "Title": "Test de fuite DNS",
     "Note": "Une fuite DNS signifie que lorsque vous êtes connecté à un VPN/proxy, vos résolutions de noms de domaine sont toujours effectuées via votre fournisseur d'accès Internet local, ce qui pose un risque de fuite DNS.",
     "Note2": "La méthode de test des fuites DNS consiste à accéder à un nom de domaine nouvellement généré pour détecter la région DNS de sortie à laquelle vous effectuez une résolution. Si la région de l'extrémité renvoyée correspond à la région de votre fournisseur de services local, il y a un risque de fuite DNS. Dans ce cas, vous devrez peut-être modifier vos paramètres VPN/proxy.",
-    "Endpoint": "Point de terminaison DNS",
     "EndpointCountry": "Région de l'extrémité",
     "StatusWait": "En attente du test",
     "StatusError": "Erreur de test"

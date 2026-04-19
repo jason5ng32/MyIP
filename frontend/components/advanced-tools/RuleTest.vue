@@ -11,7 +11,7 @@
                     <!-- Top: icon + name + #id -->
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <div class="flex items-center gap-2 min-w-0">
-                            <SignpostBig class="size-6 text-muted-foreground shrink-0" />
+                            <Waypoints class="size-6 text-muted-foreground shrink-0" />
                             <span class="text-base font-medium truncate">{{ test.name }}</span>
                             <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
                         </div>
@@ -28,11 +28,12 @@
                         <span class="relative flex shrink-0">
                             <span v-if="toneOf(test) === 'wait'"
                                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
-                            <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
+                            <span class="relative inline-flex size-2 rounded-full"
+                                :class="dotClass(toneOf(test))"></span>
                         </span>
                         <span class="font-mono whitespace-nowrap truncate min-w-0"
-                            :class="[fitOneLineClass(test.ip), textClass(toneOf(test))]"
-                            :title="test.ip">{{ test.ip }}</span>
+                            :class="[fitOneLineClass(test.ip), textClass(toneOf(test))]" :title="test.ip">{{ test.ip
+                            }}</span>
                     </div>
 
                     <!-- Country sub-block -->
@@ -59,9 +60,8 @@
 
         <!-- Bottom RefreshAll button (action color + Spinner standard) -->
         <div class="flex justify-center pt-2">
-            <Button variant="action" :disabled="!finishAll"
-                :class="[isMobile ? 'w-full' : 'w-64']"
-                @click="checkAllRuleTest(true)">
+            <Button variant="action" :disabled="!finishAll" class="cursor-pointer"
+                :class="[isMobile ? 'w-full' : 'w-64']" @click="checkAllRuleTest(true)">
                 <Spinner v-if="!finishAll" />
                 <RotateCw v-else />
                 {{ t('ruletest.RefreshAll') }}
@@ -80,7 +80,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Icon } from '@iconify/vue';
-import { MapPin, RotateCw, Server, SignpostBig } from 'lucide-vue-next';
+import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
@@ -124,7 +124,7 @@ const fitOneLineClass = (text) => {
     const len = typeof text === 'string' ? text.length : 0;
     if (len <= 15) return 'text-base';
     if (len <= 26) return 'text-sm';
-    return 'text-xs';
+    return 'text-sm md:text-xs';
 };
 
 const fetchTrace = async (id, url) => {
