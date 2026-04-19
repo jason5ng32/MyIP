@@ -516,7 +516,7 @@
   "connectivity": {
     "id": "connectivity",
     "Title": "Connectivité réseau",
-    "Note": "Tests via chargement d'images à partir des sites correspondants. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité.",
+    "Note": "Tests via chargement d'images à partir des sites correspondants. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
     "StatusWait": "En attente du test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",

@@ -515,7 +515,7 @@
   "connectivity": {
     "id": "connectivity",
     "Title": "Ağ Bağlantısı",
-    "Note": "Test, ilgili web sitelerinden küçük resimler yüklenerek yapılır. Gecikme değerleri yalnızca referans amaçlıdır ve gerçekte daha küçük olacaktır.",
+    "Note": "Test, ilgili web sitelerinden küçük resimler yüklenerek yapılır. Gecikme değerleri yalnızca referans amaçlıdır ve gerçekte daha küçük olacaktır. Sık kullandığınız diğer web sitelerini test listesine ekleyerek hızlı testler yapabilirsiniz.",
     "StatusWait": "Test Bekleniyor",
     "StatusAvailable": "Tamam",
     "StatusUnavailable": "Kullanılamıyor",

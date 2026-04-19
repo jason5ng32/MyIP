@@ -518,7 +518,7 @@
   "connectivity": {
     "id": "connectivity",
     "Title": "网络连通性",
-    "Note": "通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。",
+    "Note": "通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。你可以添加其它你常用的网站到测试列表中，方便快速测试。",
     "StatusWait": "待检测",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",

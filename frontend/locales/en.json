@@ -516,7 +516,7 @@
   "connectivity": {
     "id": "connectivity",
     "Title": "Network Connectivity",
-    "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality.",
+    "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
     "StatusWait": "Awaiting Test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
