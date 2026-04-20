@@ -158,13 +158,13 @@ const intervalId = ref(3000);
 // add/remove UI cares which one is which.
 const MAX_CUSTOM_TARGETS = 9;
 const connectivityTests = reactive([
-  { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'google', name: 'Google', icon: Chrome, url: 'https://www.google.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud, url: 'https://www.cloudflare.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'youtube', name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'github', name: 'GitHub', icon: Github, url: 'https://github.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'chatgpt', name: 'ChatGPT', icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico?', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'google', name: 'Google', icon: Chrome, url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud, url: 'https://www.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'github', name: 'GitHub', icon: Github, url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'chatgpt', name: 'ChatGPT', icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
 ]);
 
 // Sync user-defined custom targets into the reactive list. Runs on mount
@@ -248,31 +248,46 @@ const statusFaceIcon = (test) => {
   return null;
 };
 
-// Check single connectivity
-const checkConnectivityHandler = (test, onTestComplete = () => { }, isManualRun) => {
-  const beginTime = +new Date();
+// Check single connectivity.
+//
+// Uses `fetch` in `no-cors` mode with a `HEAD` method rather than an <img>
+// load, on purpose:
+//   - no-cors makes the promise resolve on ANY HTTP status the server returns
+//     (200, 403, 405, 500 …), matching the semantic question we're actually
+//     asking ("can I reach this origin?"). <img> routed 403 to `onerror` and
+//     flagged reachable-but-forbidden sites (notably github.com/favicon.ico)
+//     as unavailable.
+//   - HEAD transfers only response headers, so the measured time is RTT, not
+//     RTT + favicon payload. Some favicons are 100 KB+ SVG/PNG — that used to
+//     blow up the latency number on certain targets.
+// Network-level failure (DNS error, connection refused, abort) still rejects
+// and is caught below. An AbortController replaces the old bare setTimeout so
+// we can distinguish a completed request from a timeout and never double-fire
+// `onTestComplete`.
+const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
   manualRun.value = isManualRun;
-  const img = new Image();
-  const timeout = setTimeout(() => {
-    test.status = t('connectivity.StatusUnavailable');
-    onTestComplete(false);
-  }, 3 * 1200);
-
-  img.onload = () => {
-    clearTimeout(timeout);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3 * 1200);
+  const beginTime = performance.now();
+  try {
+    await fetch(test.url, {
+      mode: 'no-cors',
+      method: 'HEAD',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    const testTime = Math.round(performance.now() - beginTime);
     test.status = t('connectivity.StatusAvailable');
-    const testTime = new Date() - beginTime;
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);
     test.time = (autoRefresh.value && !isManualRun) ? test.mintime : testTime;
     onTestComplete(true);
-  };
-  img.onerror = () => {
-    clearTimeout(timeout);
+  } catch {
+    clearTimeout(timeoutId);
     test.time = 0;
     test.status = t('connectivity.StatusUnavailable');
     onTestComplete(false);
-  };
-  img.src = `${test.url}${Date.now()}`;
+  }
 };
 
 // Check all
@@ -366,17 +381,27 @@ const openAddDialog = () => {
 
 const onAddDialogChange = (val) => { addDialogOpen.value = val; };
 
-// Normalize any of { "weibo.com", "www.weibo.com", "https://weibo.com/x/y?q=1" }
-// down to a stable favicon URL ending with '?' (the cache-bust suffix
-// gets appended at request time by checkConnectivityHandler).
-const normalizeToFaviconUrl = (input) => {
+// Normalize user input into the URL that checkConnectivityHandler will
+// HEAD-probe. Preserve whatever path the user typed — if they entered
+// "example.com/api/health" they explicitly want that endpoint probed,
+// not the root. Only when they give a bare domain (no path) do we
+// default to "/favicon.ico", because roots often force the server to
+// run full app logic even for HEAD (SSR prep, cookie checks, A/B
+// routing) while a favicon is a CDN-edge-cached static asset that
+// responds in a few milliseconds — that keeps the "is it reachable?"
+// latency number meaningful instead of drowned in per-site handler
+// overhead.
+const normalizeTestUrl = (input) => {
   const raw = (input || '').trim();
   if (!raw) return null;
   try {
     const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
     const parsed = new URL(withScheme);
     if (!parsed.hostname || !parsed.hostname.includes('.')) return null;
-    return `${parsed.origin}/favicon.ico?`;
+    if (parsed.pathname === '/' && !parsed.search) {
+      return `${parsed.origin}/favicon.ico`;
+    }
+    return parsed.toString();
   } catch {
     return null;
   }
@@ -395,7 +420,7 @@ const handleAdd = () => {
     addError.value = t('connectivity.addCustom.UrlRequired');
     return;
   }
-  const url = normalizeToFaviconUrl(rawUrl);
+  const url = normalizeTestUrl(rawUrl);
   if (!url) {
     addError.value = t('connectivity.addCustom.InvalidUrl');
     return;
