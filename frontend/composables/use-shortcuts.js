@@ -103,7 +103,7 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             action: (num) => {
                 if (num > userPreferences.value.ipCardsToShow) return;
                 const card = IPCheckRef.value.ipDataCards[num - 1];
-                scrollToElement('IPInfo-' + num, 300);
+                scrollToElement('IPInfoCard-' + num, 70);
                 IPCheckRef.value.refreshCard(card, num - 1);
                 trackEvent('ShortCut', 'ShortCut', 'IPCheck');
             },
