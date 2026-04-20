@@ -102,6 +102,7 @@ The backend enforces access control and timeouts through shared middleware rathe
 
 ## Workflow
 
+- **Branch discipline — `dev` in, `dev` out.** All work starts from `dev` and lands on `dev`. `main` is only updated via PRs that merge `dev` → `main`; never base a branch on `main`, never push directly to `main`. When an AI assistant operates from a worktree and needs to fast-forward `dev`, use `git push . HEAD:dev` (the repo has `receive.denyCurrentBranch=updateInstead` set, so git syncs the main worktree's files too when it's clean) rather than `git update-ref`, which leaves the main worktree's files out of sync with HEAD.
 - **Do not commit without explicit user approval.** The flow is: AI edits → user reviews → user tests → user says "commit" → AI commits. Silent commits are a breach of trust.
 - **One concern per commit.** Don't mix unrelated changes into a single commit. Split at the right seam.
 - **Self-test before handing off.** Run `npm run check` (or at least `npm test`) for every change. If the change is visual (UI layout, styling, interactions) and can't be verified headless, say so explicitly so the user can test it in `npm run dev`.
