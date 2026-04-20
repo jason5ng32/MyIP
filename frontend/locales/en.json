@@ -470,6 +470,7 @@
     "City": "City",
     "ISP": "ISP",
     "ASN": "ASN",
+    "Coordinates": "Coordinates",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
     "SelectSource": "Select IP Geolocation Source",

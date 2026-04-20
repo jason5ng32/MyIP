@@ -469,6 +469,7 @@
     "City": "Şehir",
     "ISP": "İnternet Servis Sağlayıcı",
     "ASN": "ASN",
+    "Coordinates": "Koordinatlar",
     "IPv4Error": "Alım Başarısız veya IPv4 Adresi Yok",
     "IPv6Error": "Alım Başarısız veya IPv6 Adresi Yok",
     "SelectSource": "IP Coğrafi Konum Kaynağını Seç",

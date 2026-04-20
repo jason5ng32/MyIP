@@ -470,6 +470,7 @@
     "City": "Ville",
     "ISP": "ISP",
     "ASN": "ASN",
+    "Coordinates": "Coordonnées",
     "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
     "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
     "SelectSource": "Source de géolocalisation IP",

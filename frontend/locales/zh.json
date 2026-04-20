@@ -472,6 +472,7 @@
     "City": "城市",
     "ISP": "网络",
     "ASN": "ASN",
+    "Coordinates": "经纬度",
     "IPv4Error": "获取失败或不存在 IPv4 地址",
     "IPv6Error": "获取失败或不存在 IPv6 地址",
     "SelectSource": "选择 IP 归属地数据来源",
