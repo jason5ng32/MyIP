@@ -108,7 +108,7 @@
                 </dt>
                 <dd class="font-normal flex items-center gap-1 wrap-break-word">
                     <component :is="data.isNativeIP === true ? CircleCheck : CircleX"
-                        class="size-3.5 text-muted-foreground shrink-0" />
+                        class="size-3.5 shrink-0" />
                     <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
                         t('ipInfos.advancedData.NativeIPNo') }}</span>
                 </dd>
