@@ -38,8 +38,8 @@
             <!-- Built-in: lucide icon. Custom: first-letter colored tile. -->
             <component v-if="test.icon" :is="test.icon" class="size-6 text-muted-foreground" />
             <span v-else
-              class="size-6 shrink-0 rounded inline-flex items-center justify-center text-xs font-semibold text-white"
-              :style="{ backgroundColor: letterColor(test.name) }">
+              class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground"
+              >
               {{ (test.name || '?').charAt(0).toUpperCase() }}
             </span>
             <span class="text-base font-medium truncate">{{ test.name }}</span>
@@ -217,8 +217,7 @@ const canAddCustom = computed(() => {
   return current.length < MAX_CUSTOM_TARGETS;
 });
 
-// Deterministic color for a name — same input always returns the same hue so
-// "Weibo" stays red / "Mastodon" stays teal across sessions and devices.
+// Deterministic color for a name
 const letterColor = (name) => {
   const hash = [...(name || '')].reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const hue = hash % 360;
