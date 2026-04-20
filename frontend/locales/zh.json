@@ -622,7 +622,7 @@
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP 查询",
-    "Placeholder": "请输入 IP 地址",
+    "Placeholder": "例如 1.1.1.1",
     "Error": "请输入有效的 IPv4 或 IPv6 地址。"
   },
   "alert": {

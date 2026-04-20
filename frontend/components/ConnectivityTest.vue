@@ -85,6 +85,8 @@
             <Label for="custom-conn-name">{{ t('connectivity.addCustom.NameLabel') }}</Label>
             <Input id="custom-conn-name" v-model="addName" :placeholder="t('connectivity.addCustom.NamePlaceholder')"
               :aria-invalid="isNameError ? 'true' : undefined"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              data-1p-ignore data-lpignore="true"
               @keyup.enter="handleAdd" maxlength="20" />
           </div>
           <!-- URL -->
@@ -92,6 +94,8 @@
             <Label for="custom-conn-url">{{ t('connectivity.addCustom.UrlLabel') }}</Label>
             <Input id="custom-conn-url" v-model="addUrl" :placeholder="t('connectivity.addCustom.UrlPlaceholder')"
               :aria-invalid="isUrlError ? 'true' : undefined"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              data-1p-ignore data-lpignore="true"
               @keyup.enter="handleAdd" />
           </div>
           <!-- Hint about test method limitations -->

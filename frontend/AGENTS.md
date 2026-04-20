@@ -116,7 +116,9 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
 
 ```vue
 <div class="flex items-center gap-2">
-  <Input v-model="q" :placeholder="t('…')" @keyup.enter="run" />
+  <Input v-model="q" :placeholder="t('…')" @keyup.enter="run"
+    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+    data-1p-ignore data-lpignore="true" />
   <Button variant="action" :disabled="!isValidQ(q) || running"
     @click="run" class="cursor-pointer">
     <Spinner v-if="running" />
@@ -126,6 +128,8 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
   </Button>
 </div>
 ```
+
+Every free-form Input that takes a URL / IP / MAC / domain / custom identifier carries the same six attributes shown above: `autocomplete="off"`, `autocorrect="off"`, `autocapitalize="off"`, `spellcheck="false"`, `data-1p-ignore`, `data-lpignore="true"`. iOS Safari's QuickType bar uses placeholder + nearby label text to offer address / email / password AutoFill — without these attributes it will push iCloud-address or password suggestions onto a plain IP/URL input. Keep placeholder copy free of "address / 地址 / adresse / adresi" style words where possible — iOS heuristics trigger on the word itself even with `autocomplete="off"`.
 
 The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGroupAddon` / `InputGroupButton` / `InputGroupText` / `InputGroupTextarea` sub-parts) is available if you need a genuinely merged border / ring around a composite input — but the current convention above is what every consumer uses today.
 

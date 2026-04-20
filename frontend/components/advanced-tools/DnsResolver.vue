@@ -21,7 +21,9 @@
 
             <!-- Input + Run -->
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore :disabled="dnsCheckStatus === 'running'"
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    :disabled="dnsCheckStatus === 'running'"
                     :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
                     :aria-invalid="errorMsg !== ''" />
                 <Button variant="action" :disabled="dnsCheckStatus === 'running' || !queryURL" @click="onSubmit"

@@ -7,7 +7,7 @@
         <div class="space-y-2">
             <Label for="queryMAC">{{ t('macchecker.Note2') }}</Label>
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore
+                <Input type="text" id="queryMAC" name="queryMAC" data-1p-ignore data-lpignore="true"
                     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="macCheckStatus === 'running'"
                     :placeholder="t('macchecker.Placeholder')"

@@ -619,7 +619,7 @@
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Kontrolü",
-    "Placeholder": "Lütfen bir IP adresi girin",
+    "Placeholder": "örn. 1.1.1.1",
     "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin."
   },
   "alert": {

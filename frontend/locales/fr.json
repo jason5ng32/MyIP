@@ -620,7 +620,7 @@
   "ipcheck": {
     "id": "ipcheck",
     "Title": "Vérification IP",
-    "Placeholder": "Veuillez entrer une adresse IP",
+    "Placeholder": "ex. 1.1.1.1",
     "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide."
   },
   "alert": {
