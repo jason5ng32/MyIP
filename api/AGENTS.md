@@ -22,7 +22,7 @@ api/
 │   ipcheck-ing.js, maxmind.js   ← IP geolocation source handlers (route per source)
 ├── invisibility-test.js         ← /api/invisibility — proxy to private IPCheck.ing endpoint
 ├── mac-checker.js               ← /api/macchecker — MAC vendor lookup
-├── get-whois.js                 ← /api/whois — whoiser wrapper
+├── get-whois.js                 ← /api/whois — whoiser primary + RDAP fallback for new gTLDs
 ├── cf-radar.js                  ← /api/cfradar — ASN details via Cloudflare Radar
 ├── dns-resolver.js              ← /api/dnsresolver — DNS + DoH parallel query
 ├── get-user-info.js             ← /api/getuserinfo — user-profile proxy
@@ -33,6 +33,7 @@ common/
 ├── guards.js                    ← requireReferer + requireValidIP Express middleware
 ├── referer-check.js             ← low-level referer allow-list check
 ├── valid-ip.js                  ← IPv4 / IPv6 validator (also re-exported from frontend)
+├── rdap.js                      ← RDAP client (domain fallback when whoiser returns no __raw)
 ├── maxmind-service.js           ← mmdb reader + lookup
 ├── maxmind-updater.js           ← scheduled mmdb auto-update
 └── maxmind-db/                  ← GeoLite2-ASN.mmdb + GeoLite2-City.mmdb
