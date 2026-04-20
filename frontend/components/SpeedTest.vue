@@ -151,6 +151,7 @@ import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
@@ -259,7 +260,7 @@ const qualityBadgeClass = (score) => {
 const connectionMethods = {
   async getIPFromSpeedTest() {
     try {
-      const response = await fetch('https://speed.cloudflare.com/cdn-cgi/trace');
+      const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
       const data = await response.text();
       const lines = data.split('\n');
       const ip = lines.find((l) => l.startsWith('ip='))?.split('=')[1];

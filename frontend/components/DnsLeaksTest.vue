@@ -88,6 +88,7 @@ import { ref, computed, onMounted, reactive } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -155,7 +156,7 @@ const fetchLeakTestIpApiCom = (index) => {
     const urlString = generate32DigitString();
     const url = `https://${urlString}.edns.ip-api.com/json`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
@@ -190,7 +191,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
     const urlString = generate14DigitString();
     const url = `https://${urlString}.ipv4.surfsharkdns.com`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();

@@ -84,6 +84,7 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/data/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -197,7 +198,7 @@ const fetchCountryCode = async (ip) => {
 
   try {
     const url = store.getDbUrl(source.id, ip, setLang);
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url);
     const data = await response.json();
     const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
     if (ipData) {
