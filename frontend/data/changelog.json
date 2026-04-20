@@ -1052,6 +1052,33 @@
           "fr": "Suppression du bref scintillement visuel au premier chargement de la page",
           "tr": "Sayfanın ilk yüklenmesindeki kısa görsel titreme giderildi"
         }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Whois lookup now covers newer gTLDs (.ing / .app / .dev, etc.) via an RDAP fallback",
+          "zh": "Whois 查询支持更多新 gTLD（.ing / .app / .dev 等），自动回退至 RDAP",
+          "fr": "La recherche Whois couvre désormais les gTLD récents (.ing / .app / .dev, etc.) via un repli RDAP",
+          "tr": "Whois sorgusu artık yeni gTLD'leri (.ing / .app / .dev, vb.) RDAP geri dönüşüyle kapsıyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Network connectivity test upgraded — more reliable reachability detection, latency no longer skewed by resource payload size",
+          "zh": "改进网络连通性测试——可达性判定更可靠，延迟测量不再受资源大小影响",
+          "fr": "Test de connectivité réseau amélioré — détection de disponibilité plus fiable, latence non biaisée par la taille de la charge utile",
+          "tr": "Ağ bağlantı testi güncellendi — daha güvenilir erişilebilirlik tespiti, gecikme ölçümü artık kaynak boyutundan etkilenmiyor"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "DNS resolver is noticeably faster — per-call timeouts prevent a slow server from holding up the whole response",
+          "zh": "DNS 查询更快——每个上游查询都有独立超时，慢的服务器不再拖慢整体响应",
+          "fr": "Le résolveur DNS est nettement plus rapide — des délais par appel empêchent un serveur lent de bloquer toute la réponse",
+          "tr": "DNS çözücü belirgin şekilde daha hızlı — çağrı başına zaman aşımları yavaş sunucuların tüm yanıtı bekletmesini önlüyor"
+        }
       }
     ]
   }
