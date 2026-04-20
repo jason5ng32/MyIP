@@ -75,6 +75,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { isValidDomain } from '@/utils/valid-ip.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -97,8 +98,7 @@ const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
-        const hostname = url.hostname;
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+        if (isValidDomain(url.hostname)) return url.hostname;
     } catch { /* noop */ }
     errorMsg.value = t('dnsresolver.invalidURL');
     return null;

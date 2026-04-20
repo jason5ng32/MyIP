@@ -70,6 +70,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
+import { isValidDomain } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -165,8 +166,7 @@ const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
-        const hostname = url.hostname;
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+        if (isValidDomain(url.hostname)) return url.hostname;
     } catch { /* noop */ }
     errorMsg.value = t('censorshipcheck.invalidURL');
     return null;

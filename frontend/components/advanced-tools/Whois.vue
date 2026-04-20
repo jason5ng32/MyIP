@@ -67,7 +67,7 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP, isValidDomain } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -91,10 +91,9 @@ const formatURL = (domain) => {
     if (!domain.match(/^https?:\/\//)) domain = 'http://' + domain;
     try {
         const url = new URL(domain);
-        const hostname = url.hostname;
-        const parts = hostname.split('.');
+        const parts = url.hostname.split('.');
         const mainDomain = parts.slice(-2).join('.');
-        if (mainDomain.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return mainDomain;
+        if (isValidDomain(mainDomain)) return mainDomain;
     } catch { /* noop */ }
     return false;
 };

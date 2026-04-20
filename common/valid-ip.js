@@ -28,4 +28,15 @@ function isValidIP(ip) {
     return hasCompressedGroup ? groups.length < 8 : groups.length === 8;
 };
 
-export { isValidIP };
+// Validate if a string is a syntactically plausible domain name.
+// Matches the hostname pattern used by DnsResolver / Whois / CensorshipCheck:
+// lowercase-only labels of [a-z0-9-], at least one dot, and a TLD of 2+
+// letters. This is intentionally a surface-level check — it accepts
+// "foo.example" and doesn't know about public suffixes — because every
+// caller also routes through `new URL()` parsing before landing here.
+function isValidDomain(domain) {
+    if (typeof domain !== 'string') return false;
+    return /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(domain);
+}
+
+export { isValidIP, isValidDomain };
