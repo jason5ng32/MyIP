@@ -39,7 +39,8 @@
                                     <Button variant="ghost" size="icon" class="size-7 -mr-1 cursor-pointer hover:bg-transparent"
                                         @click="copyToClipboard(userAgent.ua)"
                                         aria-label="Copy UA">
-                                        <component :is="copiedStatus ? ClipboardCheck : ClipboardPlus" />
+                                        <component :is="copiedStatus ? CopyCheck : Copy" class="size-4"
+                                        :class="copiedStatus ? 'text-success' : ''" />
                                     </Button>
                                 </div>
                                 <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>
@@ -106,7 +107,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Spinner } from '@/components/ui/spinner';
-import { BriefcaseBusiness, ClipboardCheck, ClipboardPlus, Fingerprint, Info } from 'lucide-vue-next';
+import { BriefcaseBusiness, CopyCheck, Copy, Fingerprint, Info } from 'lucide-vue-next';
 import { Card, CardContent } from '@/components/ui/card';
 
 const { t } = useI18n();
