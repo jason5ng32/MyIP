@@ -101,6 +101,8 @@ Badge adds `success` to the defaults. Badge hover is globally disabled — Badge
 
 All "business state → visual color" mapping goes through `frontend/composables/use-status-tone.js`. It exposes four tones: `wait` / `ok-fast` / `ok-slow` / `fail`.
 
+For the common "status string → tone" shape (WebRTC / DnsLeak / RuleTest / Connectivity style), use the `ipFieldTone(value, { waitLabels, errorLabels, isSuccess?, time?, fastMs? })` helper from the same module rather than hand-rolling the switch locally. Default `isSuccess` treats any string containing `.` or `:` as a successful IP-shaped payload; pass a custom predicate when the success signal is elsewhere (Connectivity uses the localized "Available" label).
+
 Rule: any new module that surfaces a status reuses these tones. Do not hand-write `switch` statements that map states to hex codes or Tailwind classes.
 
 ### Canonical patterns

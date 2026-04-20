@@ -93,7 +93,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
-import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { EthernetPort, Play, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
@@ -108,12 +108,10 @@ const isStarted = ref(false);
 const { dotClass, textClass } = useStatusTone();
 
 // Business status → 4 tone levels
-const toneOf = (leak) => {
-  if (leak.ip === t('dnsleaktest.StatusWait')) return 'wait';
-  if (leak.ip === t('dnsleaktest.StatusError')) return 'fail';
-  if (leak.ip.includes('.') || leak.ip.includes(':')) return 'ok-fast';
-  return 'wait';
-};
+const toneOf = (leak) => ipFieldTone(leak.ip, {
+  waitLabels: t('dnsleaktest.StatusWait'),
+  errorLabels: t('dnsleaktest.StatusError'),
+});
 
 
 // Status

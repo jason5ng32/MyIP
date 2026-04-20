@@ -89,7 +89,7 @@ import getCountryName from '@/data/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { Play, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
@@ -110,12 +110,10 @@ const stunServers = reactive([
 ]);
 
 // Business status → 4 tone levels
-const toneOf = (stun) => {
-  if (stun.ip === t('webrtc.StatusWait')) return 'wait';
-  if (stun.ip === t('webrtc.StatusError')) return 'fail';
-  if (stun.ip.includes('.') || stun.ip.includes(':')) return 'ok-fast';
-  return 'wait';
-};
+const toneOf = (stun) => ipFieldTone(stun.ip, {
+  waitLabels: t('webrtc.StatusWait'),
+  errorLabels: t('webrtc.StatusError'),
+});
 
 // Single field in dl block is in "no data" state (waiting/error)
 // These fields may fail independently (e.g. IP success but country query fails), so determine by field.

@@ -78,7 +78,7 @@ import getCountryName from '@/data/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { Icon } from '@iconify/vue';
 import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
 import FitText from '@/components/widgets/FitText.vue';
@@ -110,12 +110,10 @@ const testCount = ref(ruleTests.value.length);
 const finishAll = ref(false);
 
 // Business status → 4 tone levels
-const toneOf = (test) => {
-    if (test.ip === t('ruletest.StatusWait')) return 'wait';
-    if (test.ip === t('ruletest.StatusError')) return 'fail';
-    if (test.ip.includes('.') || test.ip.includes(':')) return 'ok-fast';
-    return 'wait';
-};
+const toneOf = (test) => ipFieldTone(test.ip, {
+    waitLabels: t('ruletest.StatusWait'),
+    errorLabels: t('ruletest.StatusError'),
+});
 
 const isFieldPending = (value) => {
     return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
