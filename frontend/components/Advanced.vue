@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -134,13 +134,26 @@ const resetNavigatorURL = () => {
     router.push('/');
 };
 
+// Delayed enable for the Invisibility test card — waits for configs to
+// arrive. Track the timer id so we can cancel it if the component unmounts
+// before the callback fires.
+let invisibilityEnableTimer = null;
+
 onMounted(() => {
     store.setMountingStatus('advancedtools', true);
-    setTimeout(() => {
+    invisibilityEnableTimer = setTimeout(() => {
+        invisibilityEnableTimer = null;
         if (configs.value.originalSite) {
             cards.find(x => x.path === '/invisibilitytest').enabled = true;
         }
     }, 1500);
+});
+
+onBeforeUnmount(() => {
+    if (invisibilityEnableTimer !== null) {
+        clearTimeout(invisibilityEnableTimer);
+        invisibilityEnableTimer = null;
+    }
 });
 
 defineExpose({

@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -146,7 +146,7 @@ const isStarted = ref(false);
 const counter = ref(0);
 const maxCounts = ref(5);
 const manualRun = ref(false);
-const intervalId = ref(3000);
+const intervalId = ref(null);
 
 // Connectivity test list.
 //
@@ -474,6 +474,15 @@ const handelCheckStart = async (fromApp = false) => {
 
 onMounted(() => {
   store.setMountingStatus('connectivity', true);
+});
+
+// Clear the autoRefresh interval on unmount — otherwise it keeps pinging
+// targets (and mutating refs) after the component is gone.
+onBeforeUnmount(() => {
+  if (intervalId.value !== null) {
+    clearInterval(intervalId.value);
+    intervalId.value = null;
+  }
 });
 
 watch(() => store.allHasLoaded, (newValue) => {

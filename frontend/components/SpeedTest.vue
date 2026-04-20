@@ -523,7 +523,19 @@ const speedTestController = async () => {
 // --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('speedtest', true); });
-onUnmounted(() => { if (testEngine) testEngine = null; destroyCharts(); });
+// If the user navigates away mid-test, detach the engine's callbacks before
+// dropping the reference — otherwise any in-flight async work inside the
+// SpeedTestEngine would still try to write state refs that no longer exist.
+onUnmounted(() => {
+  if (testEngine) {
+    testEngine.onRunningChange = null;
+    testEngine.onResultsChange = null;
+    testEngine.onFinish = null;
+    testEngine.onError = null;
+    testEngine = null;
+  }
+  destroyCharts();
+});
 
 defineExpose({ speedTestController });
 </script>
