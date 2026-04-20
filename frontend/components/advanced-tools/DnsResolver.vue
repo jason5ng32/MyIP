@@ -8,11 +8,12 @@
             <Label for="queryURL">{{ t('dnsresolver.Note2') }}</Label>
 
             <!-- Record type selector: 6 options → ToggleGroup horizontally -->
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-2">
                 <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
-                <ToggleGroup :model-value="queryType" type="single"
+                <ToggleGroup :model-value="queryType" type="single" variant="outline"
                     @update:model-value="(v) => v && changeType(v)">
-                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type" class="h-8 px-3">
+                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
+                        class="flex-1 gap-1.5 min-w-12 md:min-w-20" :aria-label="type" :title="type">
                         {{ type }}
                     </ToggleGroupItem>
                 </ToggleGroup>
@@ -20,13 +21,11 @@
 
             <!-- Input + Run -->
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
-                    :disabled="dnsCheckStatus === 'running'"
-                    :placeholder="t('dnsresolver.Placeholder')"
-                    v-model="queryURL" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
-                <Button variant="action"
-                    :disabled="dnsCheckStatus === 'running' || !queryURL"
-                    @click="onSubmit" class="cursor-pointer">
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore :disabled="dnsCheckStatus === 'running'"
+                    :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
+                    :aria-invalid="errorMsg !== ''" />
+                <Button variant="action" :disabled="dnsCheckStatus === 'running' || !queryURL" @click="onSubmit"
+                    class="cursor-pointer">
                     <Spinner v-if="dnsCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />

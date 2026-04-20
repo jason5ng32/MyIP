@@ -170,19 +170,19 @@
 
                             <!-- Filter Toggle -->
                             <div class="flex justify-start">
-                                <ToggleGroup v-model="filterTag" type="single"
+                                <ToggleGroup v-model="filterTag" type="single" variant="outline"
                                     @update:model-value="(v) => v && filterChecklist(v)">
-                                    <ToggleGroupItem value="all" :aria-label="t('securitychecklist.ShowAll')">
+                                    <ToggleGroupItem value="all" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowAll')">
                                         <ListChecks class="size-4" />
                                     </ToggleGroupItem>
                                     <ToggleGroupItem value="unchecked"
-                                        :aria-label="t('securitychecklist.ShowUnchecked')">
+                                        class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowUnchecked')">
                                         <Circle class="size-4" />
                                     </ToggleGroupItem>
-                                    <ToggleGroupItem value="checked" :aria-label="t('securitychecklist.ShowChecked')">
+                                    <ToggleGroupItem value="checked" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowChecked')">
                                         <CircleCheck class="size-4" />
                                     </ToggleGroupItem>
-                                    <ToggleGroupItem value="ignored" :aria-label="t('securitychecklist.ShowIgnored')">
+                                    <ToggleGroupItem value="ignored" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowIgnored')">
                                         <CirclePause class="size-4" />
                                     </ToggleGroupItem>
                                 </ToggleGroup>
