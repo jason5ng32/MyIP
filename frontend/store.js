@@ -200,7 +200,7 @@ export const useMainStore = defineStore('main', {
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
+        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
         console.error("Google sign-in failed:", error);
       }
     },
@@ -214,7 +214,7 @@ export const useMainStore = defineStore('main', {
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
+        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
         console.error("GitHub sign-in failed:", error);
       }
     },
