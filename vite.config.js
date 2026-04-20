@@ -126,6 +126,7 @@ export default defineConfig({
     port: frontEndPort,
     proxy: {
       '/api': `http://localhost:${backEndPort}`
-    }
+    },
+    allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],
   }
 })
