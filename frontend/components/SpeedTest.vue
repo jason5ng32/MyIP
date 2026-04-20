@@ -23,7 +23,7 @@
             <Select :model-value="String(state.config.package.download.bytes)"
               @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -40,7 +40,7 @@
             <Select :model-value="String(state.config.package.upload.bytes)"
               @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -162,7 +162,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  ArrowLeftRight, CalendarCheck2, ChevronRight, CloudDownload, CloudUpload,
+  ArrowLeftRight, CalendarCheck2, Play, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
 } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
@@ -219,7 +219,7 @@ const isError = computed(() => state.speedTest.status === 'error');
 const ctaIcon = computed(() => {
   if (isRunning.value) return Pause;
   if (isFinished.value || isError.value) return RotateCw;
-  return ChevronRight;
+  return Play;
 });
 
 

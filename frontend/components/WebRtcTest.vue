@@ -10,7 +10,7 @@
         <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
             aria-label="Refresh WebRTC Test">
-            <component :is="isStarted ? RotateCw : ChevronRight" />
+            <component :is="isStarted ? RotateCw : Play" />
           </Button>
         </JnTooltip>
       </div>
@@ -89,7 +89,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { ChevronRight, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
+import { Play, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();

@@ -11,7 +11,7 @@
         <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer"
             @click="checkAllConnectivity(false, true, true)" aria-label="Refresh Connectivity Test">
-            <component :is="isStarted ? RotateCw : ChevronRight" />
+            <component :is="isStarted ? RotateCw : Play" />
           </Button>
         </JnTooltip>
       </div>
@@ -124,7 +124,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import {
-  ChevronRight, Chrome, Cloud, Compass, CirclePlus, Frown, Github, Meh, MessageCircle,
+  Play, Chrome, Cloud, Compass, CirclePlus, Frown, Github, Meh, MessageCircle,
   MessageSquareQuote, RotateCw, Smile, Store, X, Youtube,
 } from 'lucide-vue-next';
 

@@ -12,7 +12,7 @@
         <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
         <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
           aria-label="Refresh DNS Leak Test">
-          <component :is="isStarted ? RotateCw : ChevronRight" />
+          <component :is="isStarted ? RotateCw : Play" />
         </Button>
       </JnTooltip>
       </div>
@@ -99,7 +99,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { EthernetPort, Play, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 
 
