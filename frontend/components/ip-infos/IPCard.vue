@@ -25,18 +25,22 @@
         <!-- Main body in three states: normal / error / loading -->
         <div class="flex-1 flex flex-col">
             <template v-if="hasData">
-                <!-- Hero IP area  -->
-                <div class="px-4 py-3 flex items-center gap-2 min-w-0">
-                    <Monitor class="size-5 text-muted-foreground shrink-0" />
-                    <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0 min-h-5"
-                        :class="heroIpSizeClass(card.ip)" :title="card.ip">{{ card.ip }}</span>
+                <!-- Monitor is inline inside FitText so it rides the IP's
+                     first line; Copy stays a flex sibling so ellipsis
+                     never clips it. -->
+                <div class="px-4 py-3 flex items-start gap-2 min-w-0">
+                    <FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
+                        class="font-mono font-semibold min-w-0 items-start">
+                        <template #prefix >
+                            <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
+                        </template>
+                    </FitText>
                     <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="left">
                         <button type="button"
                             class="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                             @click="copyToClipboard(card.ip, card.id)" :aria-label="'Copy ' + card.ip">
                             <component :is="copiedStatus[card.id] ? CopyCheck : Copy" class="size-4"
-                            :class="copiedStatus[card.id] ? 'text-success' : ''"
-                            />
+                                :class="copiedStatus[card.id] ? 'text-success' : ''" />
                         </button>
                     </JnTooltip>
                 </div>
@@ -66,7 +70,8 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isValidIP } from '@/utils/valid-ip.js';
-import { heroIpSizeClass } from '@/utils/hero-ip-size.js';
+import FitText from '@/components/widgets/FitText.vue';
+import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import IPErrorIcon from '../svgicons/IPError.vue';
 import IpDetailPanel from './IpDetailPanel.vue';
 import { JnTooltip } from '@/components/ui/tooltip';

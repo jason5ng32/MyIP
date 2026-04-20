@@ -42,8 +42,9 @@
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
-            <span class="font-mono whitespace-nowrap truncate min-w-0"
-              :class="[fitOneLineClass(stun.ip), textClass(toneOf(stun))]" :title="stun.ip">{{ stun.ip }}</span>
+            <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip"
+              class="font-mono min-w-0"
+              :class="textClass(toneOf(stun))" />
           </div>
 
           <!-- NAT + Country -->
@@ -91,6 +92,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Play, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
+import FitText from '@/components/widgets/FitText.vue';
+import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -118,15 +121,6 @@ const toneOf = (stun) => {
 // These fields may fail independently (e.g. IP success but country query fails), so determine by field.
 const isFieldPending = (value) => {
   return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
-};
-
-// IP font size downgrade: IPv4 ≤15 characters keep base; short compressed IPv6 down to sm; full IPv6 (max 39 characters) down to xs
-// Ensure full line display, without line breaks due to IPv6.
-const fitOneLineClass = (text) => {
-  const len = typeof text === 'string' ? text.length : 0;
-  if (len <= 15) return 'text-base';
-  if (len <= 26) return 'text-sm';
-  return 'text-sm md:text-xs';
 };
 
 // Test STUN server

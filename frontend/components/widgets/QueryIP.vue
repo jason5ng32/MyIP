@@ -35,10 +35,14 @@
 
                 <!-- Query result: Hero IP (no Copy / Map) + shared IpDetailPanel -->
                 <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
-                    <div class="px-4 py-3 flex items-center gap-2 min-w-0 border-b mb-4">
-                        <Monitor class="size-5 text-muted-foreground shrink-0" />
-                        <span class="font-mono font-semibold whitespace-nowrap truncate min-w-0"
-                            :class="heroIpSizeClass(inputIP)" :title="inputIP">{{ inputIP }}</span>
+                    <div class="px-4 py-3 flex items-start gap-2 min-w-0 border-b mb-4">                        
+                        <FitText :text="inputIP" :tiers="HERO_TIERS" :title="inputIP"
+                        :max-lines="2"
+                            class="font-mono font-semibold min-w-0">
+                            <template #prefix>
+                                <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
+                            </template>
+                        </FitText>
                     </div>
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
@@ -58,7 +62,8 @@
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
-import { heroIpSizeClass } from '@/utils/hero-ip-size.js';
+import FitText from '@/components/widgets/FitText.vue';
+import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';

@@ -25,8 +25,9 @@ frontend/
 │                                   default-preferences / changelog)
 ├── utils/                       ← pure helpers
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   hero-ip-size / fetch-with-timeout / …)
+│                                   fetch-with-timeout / …)
 ├── composables/                 ← reusable composition logic
+│   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
 │   ├── use-scroll-to.js
@@ -42,7 +43,7 @@ frontend/
     │                              (MtrTest / GlobalLatencyTest / RuleTest / DnsResolver /
     │                               CensorshipCheck / Whois / MacChecker / BrowserInfo /
     │                               InvisibilityTest / SecurityChecklist + Empty)
-    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast)
+    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText)
     ├── svgicons/                ← a few inline SVGs
     └── ui/                      ← shadcn-vue copy-in primitives (see "UI system" below)
 ```
@@ -146,6 +147,19 @@ The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGr
 ```vue
 <Icon :icon="'circle-flags:' + code.toLowerCase()" class="size-4" />
 ```
+
+**Fit-to-width IP text** — any span that renders an IP, MAC, or similar variable-length token goes through `<FitText>`. Pass `HERO_TIERS` for the big hero rows (IPCard / QueryIP) and `INLINE_TIERS` for the compact test-card rows (WebRTC / DnsLeak / RuleTest). Do not write a length-threshold helper per component — that pattern existed historically (`heroIpSizeClass`, `fitOneLineClass`) and was replaced because it couldn't account for actual card width.
+
+```vue
+<FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
+  class="font-mono font-semibold min-w-0">
+  <template #prefix>
+    <Monitor class="inline size-5 align-middle text-muted-foreground mr-2" />
+  </template>
+</FitText>
+```
+
+`:max-lines="2"` is opt-in — hero rows use it so a long IPv6 wraps rather than shrinking to 12 px. The `#prefix` slot keeps a decorative icon riding the first line (not the center of a 2-line block). Action buttons like Copy stay as flex siblings of `<FitText>` so the ellipsis clips only the IP itself, not the button.
 
 **Tables vs lists** — two or three columns with independent header semantics → `<table>` with `thead text-xs uppercase tracking-wide text-muted-foreground` + `tbody divide-y` + row `hover:bg-muted/50`. Mobile-friendly rows or asymmetric content with no header meaning → `<ul class="rounded-lg border bg-card divide-y">` + `<li>`.
 

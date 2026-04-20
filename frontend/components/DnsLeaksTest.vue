@@ -37,21 +37,16 @@
             </div>
           </div>
 
-          <!-- Endpoint status row: long IPv6 downgraded by font size to keep single line display -->
+          <!-- Endpoint status row -->
           <div class="flex items-center gap-1.5 mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(leak) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <span class="whitespace-nowrap truncate min-w-0" :class="fitOneLineClass(leak.ip)" :title="leak.ip">
-              <template v-if="isResolved(leak)">
-                <span class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{ leak.ip
-                  }}</span>
-              </template>
-              <span v-else class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{
-                leak.ip }}</span>
-            </span>
+            <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip"
+              class="font-mono min-w-0"
+              :class="textClass(toneOf(leak))" />
           </div>
 
           <!-- ISP + Country sub-block -->
@@ -101,6 +96,8 @@ import getCountryName from '@/data/country-name.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { EthernetPort, Play, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
+import FitText from '@/components/widgets/FitText.vue';
+import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 
 const { t } = useI18n();
@@ -122,16 +119,6 @@ const toneOf = (leak) => {
 // Status
 const isFieldPending = (value) => {
   return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
-};
-
-const isResolved = (leak) => toneOf(leak) === 'ok-fast';
-
-// Ensure full line display, without line breaks due to IPv6
-const fitOneLineClass = (text) => {
-  const len = typeof text === 'string' ? text.length : 0;
-  if (len <= 15) return 'text-base';
-  if (len <= 26) return 'text-sm';
-  return 'text-sm md:text-xs';
 };
 
 const createDefaultCard = () => ({

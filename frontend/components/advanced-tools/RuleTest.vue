@@ -23,7 +23,7 @@
                         {{ test.url }}
                     </p>
 
-                    <!-- IP row: status light + IP (long IPv6 font downgrade) -->
+                    <!-- IP row: status light + IP -->
                     <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
                         <span class="relative flex shrink-0">
                             <span v-if="toneOf(test) === 'wait'"
@@ -31,9 +31,9 @@
                             <span class="relative inline-flex size-2 rounded-full"
                                 :class="dotClass(toneOf(test))"></span>
                         </span>
-                        <span class="font-mono whitespace-nowrap truncate min-w-0"
-                            :class="[fitOneLineClass(test.ip), textClass(toneOf(test))]" :title="test.ip">{{ test.ip
-                            }}</span>
+                        <FitText :text="test.ip" :tiers="INLINE_TIERS" :title="test.ip"
+                            class="font-mono min-w-0"
+                            :class="textClass(toneOf(test))" />
                     </div>
 
                     <!-- Country sub-block -->
@@ -81,6 +81,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Icon } from '@iconify/vue';
 import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
+import FitText from '@/components/widgets/FitText.vue';
+import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
 
@@ -119,13 +121,6 @@ const isFieldPending = (value) => {
     return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
 };
 
-// IP font downgrade: IPv4 ≤15 base; short compressed IPv6 ≤26 sm; full IPv6 xs
-const fitOneLineClass = (text) => {
-    const len = typeof text === 'string' ? text.length : 0;
-    if (len <= 15) return 'text-base';
-    if (len <= 26) return 'text-sm';
-    return 'text-sm md:text-xs';
-};
 
 const fetchTrace = async (id, url) => {
     try {
