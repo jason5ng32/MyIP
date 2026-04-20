@@ -28,6 +28,7 @@ frontend/
 │                                   fetch-with-timeout / …)
 ├── composables/                 ← reusable composition logic
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
+│   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
 │   ├── use-scroll-to.js
