@@ -28,8 +28,8 @@
         :title="t('connectivity.RefreshThisTest')">
         <!-- Remove button — only on custom cards, fades in on hover -->
         <button v-if="test.custom" type="button" @click.stop="removeCustomTarget(test.id)"
-          class="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted transition-opacity cursor-pointer"
-          :aria-label="t('connectivity.addCustom.Remove')">
+          class="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground md:opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted transition-opacity cursor-pointer"
+          :aria-label="t('connectivity.addCustom.Remove')" :title="t('connectivity.addCustom.Remove')">
           <X class="size-3.5" />
         </button>
         <CardContent class="p-4">
