@@ -120,18 +120,10 @@ const CANDIDATE_IP_RE = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-
 // the connection is created and removed once it's closed.
 const activeConnections = new Set();
 
-// All non-wait status labels we may surface for a STUN row, kept in one
-// place so toneOf and isFieldPending stay in sync.
-const errorStatusLabels = computed(() => [
-  t('webrtc.StatusError'),
-  t('webrtc.StatusTimeout'),
-  t('webrtc.StatusPrivacy'),
-]);
-
 // Business status → 4 tone levels
 const toneOf = (stun) => ipFieldTone(stun.ip, {
   waitLabels: t('webrtc.StatusWait'),
-  errorLabels: errorStatusLabels.value,
+  errorLabels: t('webrtc.StatusError'),
 });
 
 // Single field in dl block is in "no data" state (waiting/error).
@@ -140,7 +132,7 @@ const toneOf = (stun) => ipFieldTone(stun.ip, {
 const isFieldPending = (value) => {
   return !value
     || value === t('webrtc.StatusWait')
-    || errorStatusLabels.value.includes(value);
+    || value === t('webrtc.StatusError');
 };
 
 // Run a STUN test against one server. ICE gathering with a 5s backstop.
@@ -148,25 +140,19 @@ const isFieldPending = (value) => {
 // Success criteria: receive a server-reflexive ('srflx') or peer-reflexive
 // ('prflx') candidate with an extractable IP. That IP is what the STUN
 // server reported; host candidates don't prove STUN worked (the browser
-// emits them regardless).
+// emits them regardless) and must not be shown as the "STUN IP".
 //
-// Timeout taxonomy — surfaces on stun.ip / natType / country as a
-// localized label:
-//   - StatusPrivacy: 5s elapsed, candidates arrived but every single one
-//       was an mDNS .local host candidate and no srflx came through.
-//       Indicates browser mDNS privacy is on AND STUN didn't return
-//       usable srflx (e.g. the STUN port is blocked).
-//   - StatusTimeout: 5s elapsed, no srflx / prflx ever arrived (server
-//       unreachable, UDP blocked, wrong URL, etc.).
-//   - StatusError: unexpected throw in the try/catch path
-//       (RTCPeerConnection construction failure, etc.).
+// Any non-success path — 5s elapsed without srflx / prflx, or an
+// unexpected throw in the try/catch — collapses to StatusError.
+// Distinguishing "timeout" vs "mDNS privacy" looks tempting but the
+// two conditions are independent (mDNS privacy can be on while STUN
+// still works via srflx, and vice versa), so a split label produces
+// false positives — we deliberately stay vague here.
 const checkSTUNServer = (stun) => {
   return new Promise((resolve) => {
     let pc = null;
     let timer = null;
     let settled = false;
-    let sawAnyCandidate = false;
-    let sawNonMdnsCandidate = false;
 
     const finish = () => {
       settled = true;
@@ -226,16 +212,8 @@ const checkSTUNServer = (stun) => {
 
       pc.onicecandidate = (event) => {
         if (!event.candidate || settled) return;  // null = end-of-candidates
-        sawAnyCandidate = true;
         const candidate = event.candidate.candidate;
-        const parts = candidate.split(' ');
-        const address = parts[4] || '';
-        const type = parts[7];
-
-        // An mDNS candidate uses an `<id>.local` hostname instead of an IP,
-        // so we record it for the privacy-vs-timeout distinction below but
-        // don't try to extract an IP from it.
-        if (!address.endsWith('.local')) sawNonMdnsCandidate = true;
+        const type = candidate.split(' ')[7];
 
         // Only server-reflexive / peer-reflexive candidates represent a
         // STUN answer. Host candidates (with or without mDNS) don't prove
@@ -252,11 +230,7 @@ const checkSTUNServer = (stun) => {
 
       timer = setTimeout(() => {
         timer = null;
-        if (sawAnyCandidate && !sawNonMdnsCandidate) {
-          failWith('StatusPrivacy');
-        } else {
-          failWith('StatusTimeout');
-        }
+        failWith('StatusError');
       }, 5000);
     } catch (error) {
       console.error('STUN Server Test Error:', error);
