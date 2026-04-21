@@ -10,7 +10,7 @@
 
                 <!-- Benefits List -->
                 <ul class="rounded-lg border bg-card divide-y">
-                    <li v-for="n in 4" :key="n" class="flex items-start gap-3 p-3 text-sm">
+                    <li v-for="n in 5" :key="n" class="flex items-start gap-3 p-3 text-sm">
                         <span
                             class="shrink-0 inline-flex items-center justify-center size-5 rounded-full bg-success/15 text-success mt-0.5">
                             <CircleCheck class="size-3.5" />

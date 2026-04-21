@@ -31,8 +31,9 @@
       "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
       "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
       "Benefit2": "You can use the invisibility test.",
-      "Benefit3": "You can view your own achievement badges",
-      "Benefit4": "Reduces access restrictions on some features.",
+      "Benefit3": "You can use the in-depth DNS leak test.",
+      "Benefit4": "You can view your own achievement badges",
+      "Benefit5": "Reduces access restrictions on some features.",
       "FootNote": "More benefits are being developed..."
     },
     "Achievements": {

@@ -31,8 +31,9 @@
       "Note2": "Ancak, kötüye kullanımı önlemek için bazı özellikleri sınırlıyoruz. Giriş yaparak aşağıdaki avantajları elde edeceksiniz:",
       "Benefit1": "IPCheck.ing'i IP veri kaynağı olarak kullandığınızda, tüm alanlar tam olarak görüntülenir.",
       "Benefit2": "Görünmezlik testini kullanabilirsiniz.",
-      "Benefit3": "Kendi başarı rozetlerinizi görüntüleyebilirsiniz",
-      "Benefit4": "Bazı özelliklerdeki erişim kısıtlamalarını azaltır.",
+      "Benefit3": "Derin DNS sızıntı testini kullanabilirsiniz.",
+      "Benefit4": "Kendi başarı rozetlerinizi görüntüleyebilirsiniz",
+      "Benefit5": "Bazı özelliklerdeki erişim kısıtlamalarını azaltır.",
       "FootNote": "Daha fazla avantaj geliştirilmektedir..."
     },
     "Achievements": {
