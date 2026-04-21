@@ -194,16 +194,14 @@ const checkSTUNServer = (stun) => {
       stun.ip = ip;
       stun.natType = determineNATType(candidate);
       IPArray.value = [...IPArray.value, ip];
-      try {
-        const countryInfo = await fetchCountryCode(ip);
-        if (countryInfo) {
-          stun.country_code = countryInfo[0];
-          stun.country = countryInfo[1];
-        } else {
-          stun.country = t('webrtc.StatusError');
-        }
-      } catch (err) {
-        console.error('Error fetching country code:', err);
+      // fetchCountryCode swallows its own errors and returns null on miss,
+      // so a single null check handles both "no MaxMind source" and
+      // "upstream failure" paths.
+      const countryInfo = await fetchCountryCode(ip);
+      if (countryInfo) {
+        stun.country_code = countryInfo[0];
+        stun.country = countryInfo[1];
+      } else {
         stun.country = t('webrtc.StatusError');
       }
       if (pc) pc.close();
@@ -265,25 +263,30 @@ const determineNATType = (candidate) => {
   return t('webrtc.NATType.unknown');
 };
 
-// Get IP country via Maxmind
+// Get IP country via Maxmind. Returns [country_code, country_name] on a
+// successful lookup, or null on any miss (missing MaxMind source, empty
+// upstream response, network error). Callers use the null as the signal
+// to surface an Error label — no TypeError round-trip through a catch.
 const fetchCountryCode = async (ip) => {
+  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
+  if (!source) return null;
   let setLang = lang.value;
   if (setLang === 'zh') setLang = 'zh-CN';
-  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
 
   try {
     const url = store.getDbUrl(source.id, ip, setLang);
     const response = await fetchWithTimeout(url);
     const data = await response.json();
     const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
-    if (ipData) {
-      const country_code = ipData.country_code.toLowerCase();
-      let country = ipData.country_code || 'N/A';
-      if (country !== 'N/A') country = getCountryName(ipData.country_code, lang.value);
-      return [country_code, country];
-    }
+    if (!ipData) return null;
+    const country_code = ipData.country_code.toLowerCase();
+    const country = ipData.country_code
+      ? getCountryName(ipData.country_code, lang.value)
+      : 'N/A';
+    return [country_code, country];
   } catch (error) {
     console.error('Error fetching IP country code', error);
+    return null;
   }
 };
 
