@@ -14,9 +14,9 @@
             <Card v-for="(card, index) in enabledCards" :key="index"
                 :data-adv-path="card.path"
                 class="keyboard-shortcut-card jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
-                role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
-                @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
-                @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
+                role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path, $event)"
+                @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path, $event)"
+                @keydown.space.prevent="navigateAndToggleOffcanvas(card.path, $event)">
                 <CardContent class="p-4">
                     <h3 class="text-xl font-medium text-primary mb-2 pr-10">
                         <PanelBottomOpen
@@ -117,8 +117,13 @@ const onOpenChange = (val) => {
 };
 
 // Navigate to specified page
-// Toggle driven by router/index.js afterEach and store.setOpenSheet
-const navigateAndToggleOffcanvas = (routePath) => {
+// Toggle driven by router/index.js afterEach and store.setOpenSheet.
+// Blur the card before routing: when the Drawer opens, vaul marks the
+// rest of the page (including #mainpart, which contains the card) with
+// aria-hidden="true". Browsers warn if a focused descendant sits inside
+// an aria-hidden ancestor — releasing focus here sidesteps that.
+const navigateAndToggleOffcanvas = (routePath, event) => {
+    event?.currentTarget?.blur?.();
     router.push(routePath);
     let capitalizedRoutePath = routePath.replace('/', '');
     capitalizedRoutePath = capitalizedRoutePath.charAt(0).toUpperCase() + capitalizedRoutePath.slice(1);
