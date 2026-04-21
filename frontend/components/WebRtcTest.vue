@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -113,6 +113,12 @@ const stunServers = reactive([
 // Regex extracting the IP portion out of an ICE candidate line
 // (full SDP grammar not needed — just IPv4 / IPv6 with common forms).
 const CANDIDATE_IP_RE = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i;
+
+// Track in-flight RTCPeerConnections so they can all be closed on unmount.
+// Without this, navigating away mid-test would leave each pc (and its
+// ICE gathering machinery) lingering until GC. Entries are added when
+// the connection is created and removed once it's closed.
+const activeConnections = new Set();
 
 // All non-wait status labels we may surface for a STUN row, kept in one
 // place so toneOf and isFieldPending stay in sync.
@@ -168,7 +174,10 @@ const checkSTUNServer = (stun) => {
         clearTimeout(timer);
         timer = null;
       }
-      if (pc) pc.close();
+      if (pc) {
+        pc.close();
+        activeConnections.delete(pc);
+      }
       resolve();
     };
 
@@ -204,12 +213,16 @@ const checkSTUNServer = (stun) => {
       } else {
         stun.country = t('webrtc.StatusError');
       }
-      if (pc) pc.close();
+      if (pc) {
+        pc.close();
+        activeConnections.delete(pc);
+      }
       resolve();
     };
 
     try {
       pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:' + stun.url }] });
+      activeConnections.add(pc);
 
       pc.onicecandidate = (event) => {
         if (!event.candidate || settled) return;  // null = end-of-candidates
@@ -311,6 +324,14 @@ const checkAllWebRTC = async (isRefresh) => {
 
 onMounted(() => {
   store.setMountingStatus('webrtc', true);
+});
+
+// Close any still-open peer connections if the component unmounts
+// mid-test — otherwise ICE gathering keeps running for seconds and
+// callbacks fire on refs that no longer exist.
+onBeforeUnmount(() => {
+  activeConnections.forEach((pc) => pc.close());
+  activeConnections.clear();
 });
 
 watch(IPArray, () => {
