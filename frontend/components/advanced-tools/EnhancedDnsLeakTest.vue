@@ -233,7 +233,7 @@
         <!-- Field legend: one bordered block per field, icon + name + description. -->
         <Card v-if="hasResult && result.queries.length > 0">
             <CardContent class="p-4 md:p-5 space-y-4">
-                <h4 class="text-base font-semibold m-0">
+                <h4 class="text-base font-semibold mb-2">
                     {{ t('enhanceddnsleaktest.Legend.Title') }}
                 </h4>
                 <dl class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -295,7 +295,7 @@ const FETCH_MAX_ATTEMPTS = 3;
 const status = ref('idle');
 const errorMsg = ref('');
 const result = ref(null);
-const dedupe = ref(false);
+const dedupe = ref(true);
 
 const probeStates = reactive(Array.from({ length: PROBE_COUNT }, () => ({
     state: 'pending', fqdn: '', nonce: '',
