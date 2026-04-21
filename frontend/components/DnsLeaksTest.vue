@@ -10,11 +10,11 @@
           <span class="min-w-0">{{ t('dnsleaktest.Title') }}</span>
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
-          aria-label="Refresh DNS Leak Test">
-          <component :is="isStarted ? RotateCw : Play" />
-        </Button>
-      </JnTooltip>
+          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
+            aria-label="Refresh DNS Leak Test">
+            <component :is="isStarted ? RotateCw : Play" />
+          </Button>
+        </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
         <p>{{ t('dnsleaktest.Note') }}</p>
@@ -44,8 +44,7 @@
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip"
-              class="font-mono min-w-0"
+            <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip" class="font-mono min-w-0"
               :class="textClass(toneOf(leak))" />
           </div>
 
@@ -85,21 +84,23 @@
          transition mirrors CensorshipCheck's conclusion banner. -->
     <Transition name="fade-slide">
       <div v-if="showEnhancedBanner"
-        class="mt-3 flex items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
-        <Sparkles class="size-5 text-info shrink-0 mt-0.5 hidden sm:block" />
+        class="mt-3 flex flex-col md:flex-row items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
+
         <div class="flex-1 min-w-0 space-y-1.5">
-          <h3 class="text-sm md:text-base font-semibold m-0">
+          <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
+            <Sparkles class="size-4 text-info shrink-0" />
             {{ t('dnsleaktest.EnhancedBanner.Title') }}
           </h3>
           <p class="text-sm text-muted-foreground leading-relaxed m-0">
             {{ t('dnsleaktest.EnhancedBanner.Note') }}
           </p>
         </div>
-        <Button variant="action" size="sm" @click="openEnhancedTest"
-          class="shrink-0 cursor-pointer self-start md:self-center">
-          <span>{{ t('dnsleaktest.EnhancedBanner.CTA') }}</span>
-          <ArrowRight class="size-4 ml-1" />
-        </Button>
+        <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
+          <Button variant="action" size="sm" @click="openEnhancedTest" class="shrink-0 cursor-pointer">
+            <span>{{ t('dnsleaktest.EnhancedBanner.CTA') }}</span>
+            <ArrowRight class="size-4 ml-1" />
+          </Button>
+        </div>
       </div>
     </Transition>
   </section>
@@ -136,12 +137,12 @@ const hasEverSettled = ref(false);
 
 // Also gated on configs.originalSite to match the Advanced.vue card gate.
 const showEnhancedBanner = computed(() =>
-    hasEverSettled.value && store.configs?.originalSite === true
+  hasEverSettled.value && store.configs?.originalSite === true
 );
 
 const openEnhancedTest = () => {
-    trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
-    router.push('/enhanceddnsleaktest');
+  trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
+  router.push('/enhanceddnsleaktest');
 };
 
 const { dotClass, textClass } = useStatusTone();
@@ -310,16 +311,19 @@ defineExpose({
 <style scoped>
 /* fade-slide — same shape as CensorshipCheck.vue's conclusion banner */
 .fade-slide-enter-active {
-    transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
 }
+
 .fade-slide-leave-active {
-    transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
 }
+
 .fade-slide-enter-from {
-    transform: translateY(10px);
-    opacity: 0;
+  transform: translateY(10px);
+  opacity: 0;
 }
+
 .fade-slide-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>
