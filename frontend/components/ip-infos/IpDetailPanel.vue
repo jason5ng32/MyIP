@@ -195,6 +195,7 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import ASNInfo from './ASNInfo.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
@@ -306,7 +307,7 @@ const getASNInfo = async (asn) => {
     try {
         if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-        const response = await fetch(`/api/cfradar?asn=${asn}`);
+        const response = await fetchWithTimeout(`/api/cfradar?asn=${asn}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {

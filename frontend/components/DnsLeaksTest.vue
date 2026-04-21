@@ -88,12 +88,13 @@ import { ref, computed, onMounted, reactive } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
-import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { EthernetPort, Play, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
@@ -108,12 +109,10 @@ const isStarted = ref(false);
 const { dotClass, textClass } = useStatusTone();
 
 // Business status → 4 tone levels
-const toneOf = (leak) => {
-  if (leak.ip === t('dnsleaktest.StatusWait')) return 'wait';
-  if (leak.ip === t('dnsleaktest.StatusError')) return 'fail';
-  if (leak.ip.includes('.') || leak.ip.includes(':')) return 'ok-fast';
-  return 'wait';
-};
+const toneOf = (leak) => ipFieldTone(leak.ip, {
+  waitLabels: t('dnsleaktest.StatusWait'),
+  errorLabels: t('dnsleaktest.StatusError'),
+});
 
 
 // Status
@@ -157,7 +156,7 @@ const fetchLeakTestIpApiCom = (index) => {
     const urlString = generate32DigitString();
     const url = `https://${urlString}.edns.ip-api.com/json`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
@@ -192,7 +191,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
     const urlString = generate14DigitString();
     const url = `https://${urlString}.ipv4.surfsharkdns.com`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();

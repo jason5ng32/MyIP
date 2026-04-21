@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -126,7 +126,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
   Play, Chrome, Cloud, Compass, CirclePlus, Frown, Github, Meh, MessageCircle,
   MessageSquareQuote, RotateCw, Smile, Store, X, Youtube,
@@ -146,7 +146,7 @@ const isStarted = ref(false);
 const counter = ref(0);
 const maxCounts = ref(5);
 const manualRun = ref(false);
-const intervalId = ref(3000);
+const intervalId = ref(null);
 
 // Connectivity test list.
 //
@@ -224,15 +224,19 @@ const letterColor = (name) => {
   return `hsl(${hue}, 50%, 45%)`;
 };
 
-// Business status → 4 tone levels (wait / ok-fast / ok-slow / fail)
+// Business status → 4 tone levels (wait / ok-fast / ok-slow / fail).
+// Unlike the other toneOf call sites (WebRTC / DnsLeak / RuleTest), here the
+// value is a status string like "Available (123ms)" rather than a raw IP,
+// so we pass a custom isSuccess predicate plus test.time for the ok-fast /
+// ok-slow split at 200ms.
 const toneOf = (test) => {
-  const waitLabel = t('connectivity.StatusWait');
   const okLabel = t('connectivity.StatusAvailable');
-  const unavailableLabels = [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')];
-  if (test.status === waitLabel) return 'wait';
-  if (unavailableLabels.includes(test.status)) return 'fail';
-  if (test.status.includes(okLabel)) return test.time < 200 ? 'ok-fast' : 'ok-slow';
-  return 'wait';
+  return ipFieldTone(test.status, {
+    waitLabels: t('connectivity.StatusWait'),
+    errorLabels: [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')],
+    isSuccess: (s) => typeof s === 'string' && s.includes(okLabel),
+    time: test.time,
+  });
 };
 const { dotClass, textClass } = useStatusTone();
 
@@ -470,6 +474,15 @@ const handelCheckStart = async (fromApp = false) => {
 
 onMounted(() => {
   store.setMountingStatus('connectivity', true);
+});
+
+// Clear the autoRefresh interval on unmount — otherwise it keeps pinging
+// targets (and mutating refs) after the component is gone.
+onBeforeUnmount(() => {
+  if (intervalId.value !== null) {
+    clearInterval(intervalId.value);
+    intervalId.value = null;
+  }
 });
 
 watch(() => store.allHasLoaded, (newValue) => {

@@ -6,8 +6,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { isValidIP as isValidCommonIP } from '../common/valid-ip.js';
-import { isValidIP as isValidFrontendIP } from '../frontend/utils/valid-ip.js';
+import { isValidIP as isValidCommonIP, isValidDomain as isValidCommonDomain } from '../common/valid-ip.js';
+import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain } from '../frontend/utils/valid-ip.js';
 
 const validAddresses = [
   '1.1.1.1',
@@ -37,6 +37,47 @@ describe('IP validation helpers', () => {
     it(`rejects ${ip || 'empty string'}`, () => {
       assert.equal(isValidCommonIP(ip), false);
       assert.equal(isValidFrontendIP(ip), false);
+    });
+  }
+});
+
+const validDomains = [
+  'example.com',
+  'sub.example.com',
+  'a.b.c.example.co',
+  'EXAMPLE.COM',
+  'xn--n3h.example',
+  'with-hyphen.io',
+];
+
+const invalidDomains = [
+  '',
+  'nodot',
+  '.example.com',
+  'example.',
+  'example..com',
+  'has_underscore.com',
+  'trailing.dot.',
+  'one.1',         // TLD must be 2+ letters, not digits
+  '192.168.1.1',   // numeric-only TLD is rejected
+  null,
+  undefined,
+  42,
+];
+
+describe('Domain validation helpers', () => {
+  for (const d of validDomains) {
+    it(`accepts ${d}`, () => {
+      assert.equal(isValidCommonDomain(d), true);
+      assert.equal(isValidFrontendDomain(d), true);
+    });
+  }
+
+  for (const d of invalidDomains) {
+    const label = d == null ? String(d) : (d === '' ? 'empty string' : d);
+    it(`rejects ${label}`, () => {
+      assert.equal(isValidCommonDomain(d), false);
+      assert.equal(isValidFrontendDomain(d), false);
     });
   }
 });

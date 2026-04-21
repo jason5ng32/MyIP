@@ -151,6 +151,7 @@ import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
@@ -259,7 +260,7 @@ const qualityBadgeClass = (score) => {
 const connectionMethods = {
   async getIPFromSpeedTest() {
     try {
-      const response = await fetch('https://speed.cloudflare.com/cdn-cgi/trace');
+      const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
       const data = await response.text();
       const lines = data.split('\n');
       const ip = lines.find((l) => l.startsWith('ip='))?.split('=')[1];
@@ -522,7 +523,19 @@ const speedTestController = async () => {
 // --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('speedtest', true); });
-onUnmounted(() => { if (testEngine) testEngine = null; destroyCharts(); });
+// If the user navigates away mid-test, detach the engine's callbacks before
+// dropping the reference — otherwise any in-flight async work inside the
+// SpeedTestEngine would still try to write state refs that no longer exist.
+onUnmounted(() => {
+  if (testEngine) {
+    testEngine.onRunningChange = null;
+    testEngine.onResultsChange = null;
+    testEngine.onFinish = null;
+    testEngine.onError = null;
+    testEngine = null;
+  }
+  destroyCharts();
+});
 
 defineExpose({ speedTestController });
 </script>

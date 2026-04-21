@@ -7,6 +7,7 @@ import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl } from './data/ip-databases.js';
 import { createDefaultPreferences } from './data/default-preferences.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
+import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
 
 // Versioned localStorage key for userPreferences.
@@ -163,7 +164,7 @@ export const useMainStore = defineStore('main', {
     },
     // fetch configs from server
     fetchConfigs() {
-      fetch('/api/configs')
+      fetchWithTimeout('/api/configs')
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -199,7 +200,7 @@ export const useMainStore = defineStore('main', {
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
+        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
         console.error("Google sign-in failed:", error);
       }
     },
@@ -213,7 +214,7 @@ export const useMainStore = defineStore('main', {
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.alert = { alertToShow: true, alertStyle: "text-danger", alertMessage: t('alert.SignInFailedReason') + ' : ' + error, alertTitle: t('alert.SignInFailed') };
+        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
         console.error("GitHub sign-in failed:", error);
       }
     },

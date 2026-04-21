@@ -67,6 +67,7 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
 import getCountryName from '@/data/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -88,63 +89,32 @@ const allIPs = computed(() => {
 
 const selectedIP = ref('');
 const mtrResults = ref([]);
-const mtrCheckStatus = ref('idle');
+// status: 'idle' | 'running' | 'finished' | 'error' — driven by the composable
+const { status: mtrCheckStatus, start: runMeasurement } = useGlobalpingMeasurement({
+    pollInterval: 1000,
+    maxRetries: 4,
+});
 
 const startmtrCheck = () => {
     trackEvent('Section', 'StartClick', 'MTRTest');
     mtrResults.value = [];
-    let tryCount = 0;
 
-    const sendmtrRequest = async () => {
-        mtrCheckStatus.value = 'running';
-        try {
-            const response = await fetch('https://api.globalping.io/v1/measurements', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    limit: 16,
-                    locations: [
-                        { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-                        { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-                        { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-                        { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
-                    ],
-                    target: selectedIP.value,
-                    type: 'mtr',
-                    measurementOptions: { port: 80, protocol: 'ICMP' },
-                }),
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Error sending mtr request:', error);
-        }
-    };
-
-    const fetchmtrResults = async (id) => {
-        try {
-            const response = await fetch(`https://api.globalping.io/v1/measurements/${id}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            const data = await response.json();
+    runMeasurement({
+        limit: 16,
+        locations: [
+            { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
+            { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
+            { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
+            { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
+        ],
+        target: selectedIP.value,
+        type: 'mtr',
+        measurementOptions: { port: 80, protocol: 'ICMP' },
+    }, {
+        onResults: (data) => {
             processmtrResults(data);
-
-            if (data.status === 'in-progress' && tryCount < 4) {
-                setTimeout(() => fetchmtrResults(id), 1000);
-                tryCount++;
-            } else {
-                mtrCheckStatus.value = mtrResults.value.length === 0 ? 'error' : 'finished';
-            }
-        } catch (error) {
-            console.error('Error fetching mtr results:', error);
-        }
-    };
-
-    sendmtrRequest().then(data => {
-        if (data && data.id) {
-            setTimeout(() => { fetchmtrResults(data.id); }, 1000);
-        }
+            return mtrResults.value.length > 0;
+        },
     });
 };
 
