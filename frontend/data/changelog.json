@@ -1015,8 +1015,17 @@
   },
   {
     "version": "v6.1.0",
-    "date": "Apr 20, 2026",
+    "date": "Apr 21, 2026",
     "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "New advanced tool: In-depth DNS Leak Test — captures every recursive resolver you use, with ECS and DNSSEC analysis",
+          "zh": "新增高级工具：深度 DNS 泄漏测试，捕获所有递归解析器并分析 ECS 与 DNSSEC",
+          "fr": "Nouvel outil avancé : Test de fuite DNS approfondi — capture tous les résolveurs récursifs utilisés, avec analyse ECS et DNSSEC",
+          "tr": "Yeni gelişmiş araç: Derinlemesine DNS Sızıntı Testi — kullandığınız tüm yinelemeli çözümleyicileri yakalar, ECS ve DNSSEC analizi ile"
+        }
+      },
       {
         "type": "add",
         "change": {

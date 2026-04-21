@@ -21,6 +21,7 @@ import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
+import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
 
 // -- shared test utilities ------------------------------------------------
 
@@ -244,6 +245,49 @@ describe('get-user-info handler', () => {
         delete process.env.IPCHECKING_API_KEY;
         const res = createResponse();
         await getUserInfoHandler(createRequest(), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+// -- dns-leak-test handler ------------------------------------------------
+
+describe('dns-leak-test getSessionResult', () => {
+    it('rejects non-GET with 405', async () => {
+        const res = createResponse();
+        await dnsLeakGetResult({ method: 'POST', headers: {}, query: {}, params: {} }, res);
+        assert.equal(res.statusCode, 405);
+        assert.deepEqual(res.body, { error: 'Method Not Allowed' });
+    });
+
+    it('rejects missing / malformed token before calling upstream', async () => {
+        const missing = createResponse();
+        await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: {} }, missing);
+        assert.equal(missing.statusCode, 400);
+        assert.deepEqual(missing.body, { error: 'Invalid token' });
+
+        const tooShort = createResponse();
+        await dnsLeakGetResult({ method: 'GET', headers: {}, query: {}, params: { token: 'abc' } }, tooShort);
+        assert.equal(tooShort.statusCode, 400);
+        assert.deepEqual(tooShort.body, { error: 'Invalid token' });
+
+        const notHex = createResponse();
+        await dnsLeakGetResult({
+            method: 'GET', headers: {}, query: {}, params: { token: 'G'.repeat(32) },
+        }, notHex);
+        assert.equal(notHex.statusCode, 400);
+        assert.deepEqual(notHex.body, { error: 'Invalid token' });
+    });
+
+    it('reports missing API key after token passes validation', async () => {
+        delete process.env.IPCHECKING_API_KEY;
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        const res = createResponse();
+        await dnsLeakGetResult({
+            method: 'GET', headers: {}, query: {},
+            params: { token: 'a'.repeat(32) },
+            set() { return this; },
+        }, res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });

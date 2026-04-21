@@ -25,6 +25,9 @@ api/
 ├── get-whois.js                 ← /api/whois — whoiser primary + RDAP fallback for new gTLDs
 ├── cf-radar.js                  ← /api/cfradar — ASN details via Cloudflare Radar
 ├── dns-resolver.js              ← /api/dnsresolver — DNS + DoH parallel query
+├── dns-leak-test.js             ← /api/dnsleaktest/session/:token — proxy to private
+│                                  IPCheck.ing endpoint (Firebase-gated) that drives the
+│                                  in-depth DNS Leak Test advanced tool
 ├── get-user-info.js             ← /api/getuserinfo — user-profile proxy
 └── update-user-achievement.js   ← /api/updateuserachievement — user-achievement proxy
 
@@ -66,7 +69,7 @@ common/
 
 ### Private-API header pass-through (intentional exception)
 
-Handlers that call our own private IPCheck.ing API (`ipcheck-ing.js`, `invisibility-test.js`, `update-user-achievement.js`, `get-user-info.js`) forward the caller's request headers to the upstream:
+Handlers that call our own private IPCheck.ing API (`ipcheck-ing.js`, `invisibility-test.js`, `update-user-achievement.js`, `get-user-info.js`, `dns-leak-test.js`) forward the caller's request headers to the upstream:
 
 ```js
 const apiResponse = await fetchUpstream(url, { headers: { ...req.headers } });

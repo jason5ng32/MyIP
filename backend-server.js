@@ -20,6 +20,7 @@ import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
 import dnsResolver from './api/dns-resolver.js';
+import { getSessionResult as dnsLeakGetResult } from './api/dns-leak-test.js';
 import getWhois from './api/get-whois.js';
 import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
@@ -161,6 +162,7 @@ app.get('/api/ipchecking', requireValidIP(), ipCheckingHandler);
 app.get('/api/ipsb', requireValidIP(), ipsbHandler);
 app.get('/api/cfradar', cfHander);
 app.get('/api/dnsresolver', dnsResolver);
+app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/whois', getWhois);
 app.get('/api/ipapiis', requireValidIP(), ipapiisHandler);
 app.get('/api/ip2location', requireValidIP(), ip2locationHandler);

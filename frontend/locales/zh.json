@@ -377,6 +377,7 @@
     "PingTestNote": "全球的 Ping 值测试",
     "MTRTestNote": "全球的 MTR 路由测试",
     "DNSResolverNote": "实时多渠道 DNS 解析",
+    "EnhancedDnsLeakTest": "捕获所有递归解析器，并分析 ECS 与 DNSSEC",
     "RuleTestNote": "检查代理软件的规则设置",
     "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
     "Whois": "对域名或 IP 进行 Whois 查询",
@@ -420,6 +421,58 @@
     "invalidURL": "无效的域名或 IP",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"
+  },
+  "enhanceddnsleaktest": {
+    "Title": "深度 DNS 泄漏测试",
+    "Note": "你已经在首页的 DNS 泄漏测试中大致了解了当前是否存在 DNS 泄漏，以及 DNS 请求的出口地理归属。在这个深度测试里，我们会从更多维度进行检测：捕获更多 DNS 解析器出口 IP、检查这些解析器是否通过 ECS 把你真实 IP 段的前缀转发给了权威服务器、以及它们是否支持 DNSSEC，从而帮助你对自己的 DNS 链路安全性形成更完整的认识。",
+    "Note2": "点击「开始测试」即可开始，通常几秒内就能得到结果。我们会在后台发起多次 DNS 探测，由我们的权威 DNS 服务器捕获你所使用的递归解析器出口 IP，一次测试通常可以捕获 20–40 条记录。若完全没有捕获到解析器，可能是浏览器的 DNS 缓存吃掉了请求，稍等片刻再试一次即可。",
+    "Note3": "由于这是深度测试，页面里会出现一些较为专业的概念（例如 ECS、DNSSEC 等）。不用担心，运行测试后你可以参考下方的「字段说明」来了解每个字段的具体含义。",
+    "Run": "开始测试",
+    "RunAgain": "再测一次",
+    "RunningProbes": "正在发起 DNS 探测...",
+    "PollingResult": "正在收集结果...",
+    "FetchError": "获取 DNS 泄漏测试结果失败，请稍后重试。",
+    "Empty": "本次会话没有捕获到任何 DNS 解析器，可能是浏览器的 DNS 缓存吃掉了请求，请稍后重试。",
+    "TableTitle": "捕获到的 DNS 查询记录",
+    "DedupeToggle": "隐藏重复项",
+    "Flow": {
+      "Probing": "正在发起第 {current} / {total} 次探测...",
+      "Waiting": "等待递归 DNS 访问我们的权威服务器（通常 1–3 秒）。",
+      "Fetching": "正在获取捕获到的 DNS 查询记录...",
+      "Done": "测试已完成。"
+    },
+    "DnssecChip": {
+      "Signed": "已请求 DNSSEC 签名",
+      "Unsigned": "未请求 DNSSEC 签名",
+      "Validated": "DNSSEC 校验正常",
+      "CdSet": "DNSSEC 校验被禁用"
+    },
+    "Summary": {
+      "ResolverCount": "去重后的解析器数量",
+      "RawCount": "原始捕获记录数",
+      "DnssecPosture": "DNSSEC 状态",
+      "DnssecGood": "支持 DNSSEC —— 所有解析器都请求了签名，并且没有跳过校验。",
+      "DnssecNoDo": "较弱 —— 至少有一个解析器没有请求 DNSSEC 签名。",
+      "DnssecCdSet": "可疑 —— 至少有一个解析器要求跳过 DNSSEC 校验。",
+      "DnssecNone": "暂无数据。"
+    },
+    "Fields": {
+      "ResolverIP": "解析器 IP",
+      "Location": "归属地",
+      "ASN": "组织 / ASN",
+      "QueryType": "请求记录类型",
+      "Transport": "请求传输协议",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "字段说明",
+      "ResolverIP": "实际与我们权威 DNS 服务器通信的递归解析器出口 IP。如果你使用 VPN，把它的 ASN 与你当前 VPN 出口的 ASN 做对比，就能看出 DNS 请求是否绕过了 VPN 通道（即发生了泄漏）。",
+      "QueryType": "解析器向权威服务器请求的记录类型（A、AAAA、HTTPS 等）。浏览器通常会同时发起 A 与 AAAA 查询。",
+      "Transport": "DNS 默认走 UDP；出现 TCP 通常意味着响应过大，而响应过大往往是因为带上了 DNSSEC 相关记录。",
+      "ECS": "EDNS Client Subnet —— 部分递归 DNS 会在向上游转发查询时附带你真实 IP 的一段前缀（通常是 IPv4 的 /24 或 IPv6 的 /48）。这意味着你的 IP 段会被 DNS 链路上的权威服务器获知，可能用于 CDN 的就近调度，也可能在一定程度上削弱匿名性。",
+      "DO": "DNSSEC OK —— 标记为对勾时，表示递归解析器在查询时主动请求了 DNSSEC 签名，代表链路具备密码学校验能力；标记为叉时，表示本次查询未请求签名，响应在链路上被伪造或篡改时可能无法被察觉。",
+      "CD": "Checking Disabled —— 标记为对勾时，表示调用方没有要求跳过 DNSSEC 校验，递归解析器会进行正常的签名验证；标记为叉时，表示调用方显式要求跳过校验，即使签名对不上也会接受结果。正常情况下应该为对勾；如果出现叉，大多是由特定的调试工具或客户端的安全降级造成的，在极少数情况下也可能是链路上存在中间人篡改的征兆。"
+    }
   },
   "dnsresolver": {
     "Title": "DNS 解析",
@@ -565,7 +618,12 @@
     "Note2": "泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的 DNS 出口进行解析，如果返回的出口区域和你当地的运营商区域相同，则有 DNS 泄露风险，你可能需要修改 VPN/代理设置。",
     "EndpointCountry": "出口地区",
     "StatusWait": "待检测",
-    "StatusError": "测试出错"
+    "StatusError": "测试出错",
+    "EnhancedBanner": {
+      "Title": "想做更深入的检查？",
+      "Note": "如果想进一步了解你正在使用的所有递归解析器是谁、它们的 ASN 归属、是否通过 ECS 把你真实 IP 的前缀转发给了上游、以及是否启用了 DNSSEC 校验，可以打开下方的「深度 DNS 泄漏测试」。",
+      "CTA": "打开深度 DNS 泄漏测试"
+    }
   },
   "speedtest": {
     "id": "speedtest",
@@ -670,6 +728,7 @@
     "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
     "InvisibilityTest": "打开隐身测试面板",
+    "EnhancedDnsLeakTest": "打开深度 DNS 泄漏测试面板",
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",

@@ -79,12 +79,36 @@
         </CardContent>
       </Card>
     </div>
+
+    <!-- Enhanced DNS leak test banner — surfaces the deeper tool once the
+         homepage test has resolved (success or timeout). fade-slide
+         transition mirrors CensorshipCheck's conclusion banner. -->
+    <Transition name="fade-slide">
+      <div v-if="showEnhancedBanner"
+        class="mt-3 flex items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
+        <Sparkles class="size-5 text-info shrink-0 mt-0.5 hidden sm:block" />
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <h3 class="text-sm md:text-base font-semibold m-0">
+            {{ t('dnsleaktest.EnhancedBanner.Title') }}
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed m-0">
+            {{ t('dnsleaktest.EnhancedBanner.Note') }}
+          </p>
+        </div>
+        <Button variant="action" size="sm" @click="openEnhancedTest"
+          class="shrink-0 cursor-pointer self-start md:self-center">
+          <span>{{ t('dnsleaktest.EnhancedBanner.CTA') }}</span>
+          <ArrowRight class="size-4 ml-1" />
+        </Button>
+      </div>
+    </Transition>
   </section>
 </template>
 
 
 <script setup>
 import { ref, computed, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -95,7 +119,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, Play, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
@@ -103,8 +127,22 @@ import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
 const store = useMainStore();
+const router = useRouter();
 const lang = computed(() => store.lang);
 const isStarted = ref(false);
+
+// Sticky flag for the Enhanced DNS Leak Test banner.
+const hasEverSettled = ref(false);
+
+// Also gated on configs.originalSite to match the Advanced.vue card gate.
+const showEnhancedBanner = computed(() =>
+    hasEverSettled.value && store.configs?.originalSite === true
+);
+
+const openEnhancedTest = () => {
+    trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
+    router.push('/enhanceddnsleaktest');
+};
 
 const { dotClass, textClass } = useStatusTone();
 
@@ -254,6 +292,8 @@ const checkAllDNSLeakTest = async (isRefresh) => {
 
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
     store.setLoadingStatus('dnsleaktest', true);
+    // Local sticky flag for the Enhanced DNS Leak Test banner
+    hasEverSettled.value = true;
   });
 };
 
@@ -266,3 +306,20 @@ defineExpose({
   leakTest,
 });
 </script>
+
+<style scoped>
+/* fade-slide — same shape as CensorshipCheck.vue's conclusion banner */
+.fade-slide-enter-active {
+    transition: all 0.3s ease-out;
+}
+.fade-slide-leave-active {
+    transition: all 0.2s ease-out;
+}
+.fade-slide-enter-from {
+    transform: translateY(10px);
+    opacity: 0;
+}
+.fade-slide-leave-to {
+    opacity: 0;
+}
+</style>

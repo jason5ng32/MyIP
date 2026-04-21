@@ -6,6 +6,7 @@ const MTRTest = () => import('../components/advanced-tools/MtrTest.vue');
 const PingTest = () => import('../components/advanced-tools/GlobalLatencyTest.vue');
 const RuleTest = () => import('../components/advanced-tools/RuleTest.vue');
 const DNSResolver = () => import('../components/advanced-tools/DnsResolver.vue');
+const EnhancedDnsLeakTest = () => import('../components/advanced-tools/EnhancedDnsLeakTest.vue');
 const CensorshipCheck = () => import('../components/advanced-tools/CensorshipCheck.vue');
 const Whois = () => import('../components/advanced-tools/Whois.vue');
 const InvisibilityTest = () => import('../components/advanced-tools/InvisibilityTest.vue');
@@ -20,6 +21,7 @@ const routes = [
   { path: '/mtrtest', component: MTRTest },
   { path: '/ruletest', component: RuleTest },
   { path: '/dnsresolver', component: DNSResolver },
+  { path: '/enhanceddnsleaktest', component: EnhancedDnsLeakTest },
   { path: '/censorshipcheck', component: CensorshipCheck },
   { path: '/whois', component: Whois },
   { path: '/macchecker', component: MacChecker },

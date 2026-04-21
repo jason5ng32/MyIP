@@ -93,13 +93,23 @@ const cards = reactive([
     { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
     { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', enabled: true },
     { path: '/securitychecklist', icon: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', enabled: true },
-    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false }
+    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false },
+    { path: '/enhanceddnsleaktest', icon: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', enabled: false },
 ]);
 
 const enabledCards = computed(() => cards.filter(c => c.enabled));
 
 const isFullScreen = ref(false);
-const openedCard = computed(() => store.currentPath.id);
+// Look the card up by path rather than by store.currentPath.id — the id is
+// a route-index (minus 1), which doesn't match our cards[] ordering once
+// routes[] and cards[] drift out of sync. Stale ids caused the Drawer
+// header to sometimes show a neighboring tool's title. Path is the only
+// stable key between the two lists.
+const openedCard = computed(() => {
+    const p = store.currentPath.path;
+    if (!p || p === '/') return -1;
+    return cards.findIndex(c => c.path === p);
+});
 
 // Drawer toggle and store.openSheet bidirectional binding
 const isOpen = computed(() => store.openSheet === 'tools');
@@ -145,6 +155,7 @@ onMounted(() => {
         invisibilityEnableTimer = null;
         if (configs.value.originalSite) {
             cards.find(x => x.path === '/invisibilitytest').enabled = true;
+            cards.find(x => x.path === '/enhanceddnsleaktest').enabled = true;
         }
     }, 1500);
 });

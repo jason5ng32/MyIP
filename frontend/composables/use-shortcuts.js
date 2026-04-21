@@ -211,6 +211,14 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             action: () => goToAdvancedTool('/invisibilitytest', 'InvisibilityTest'),
             description: t('shortcutKeys.InvisibilityTest'),
         });
+        // Uppercase D mirrors lowercase `d` (refresh homepage DNS leak test) —
+        // `D` opens the in-depth version of the same feature. Gated on
+        // originalSite since the advanced card itself is gated the same way.
+        config.push({
+            keys: 'D',
+            action: () => goToAdvancedTool('/enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
+            description: t('shortcutKeys.EnhancedDnsLeakTest'),
+        });
     }
 
     return config;

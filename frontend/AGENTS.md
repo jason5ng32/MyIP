@@ -40,10 +40,11 @@ frontend/
     │                              / SpeedTest / Advanced / Footer / Nav / Achievements / User /
     │                              Additional)
     ├── ip-infos/                ← IP-card subcomponents (IPCard / IpDetailPanel / ASNInfo / DataPairBar)
-    ├── advanced-tools/          ← 10 tool subpages opened inside the bottom Drawer
+    ├── advanced-tools/          ← 11 tool subpages opened inside the bottom Drawer
     │                              (MtrTest / GlobalLatencyTest / RuleTest / DnsResolver /
-    │                               CensorshipCheck / Whois / MacChecker / BrowserInfo /
-    │                               InvisibilityTest / SecurityChecklist + Empty)
+    │                               EnhancedDnsLeakTest / CensorshipCheck / Whois /
+    │                               MacChecker / BrowserInfo / InvisibilityTest /
+    │                               SecurityChecklist + Empty)
     ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText)
     ├── svgicons/                ← a few inline SVGs
     └── ui/                      ← shadcn-vue copy-in primitives (see "UI system" below)
@@ -67,9 +68,9 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 22 primitives copied in:
+Located at `frontend/components/ui/`. 23 primitives copied in:
 
-`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `tabs` · `textarea` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
 Two are project-specific, not in stock shadcn-vue:
 

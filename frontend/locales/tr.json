@@ -375,6 +375,7 @@
     "PingTestNote": "Global Ping değeri testi",
     "MTRTestNote": "Global MTR rota testi",
     "DNSResolverNote": "Gerçek zamanlı çok kanallı DNS çözümlemesi",
+    "EnhancedDnsLeakTest": "Tüm yinelemeli çözümleyicileri yakalar, ECS ve DNSSEC analizi ile",
     "RuleTestNote": "Proxy yazılımının kural ayarlarını kontrol edin",
     "CensorshipCheck": "Bir web sitesinin bazı ülkelerde engellenip engellenmediğini kontrol edin",
     "Whois": "Alan adı/IP kayıt bilgilerini arayın",
@@ -417,6 +418,58 @@
     "Placeholder": "Alan Adı veya IP",
     "invalidURL": "Geçersiz alan adı veya IP",
     "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
+  },
+  "enhanceddnsleaktest": {
+    "Title": "Derinlemesine DNS Sızıntı Testi",
+    "Note": "Ana sayfadaki DNS sızıntı testi size zaten genel bir fikir verdi: bir sızıntınız var mı ve DNS trafiğiniz hangi ülkeden çıkıyor. Bu derinlemesine test birkaç boyut daha ekler: daha fazla çözümleyici çıkış IP'sini yakalarız, herhangi birinin gerçek IP'nizin bir önekini ECS aracılığıyla üst akışa ilettiğini kontrol ederiz ve DNSSEC'i destekleyip desteklemediklerine bakarız — böylece DNS zincirinizin güvenlik durumuna ilişkin daha eksiksiz bir görüşe sahip olursunuz.",
+    "Note2": "Başlatmak için Çalıştır'a tıklayın. Test genellikle birkaç saniye içinde tamamlanır. Arka planda birkaç DNS sondası gönderir ve yetkili DNS sunucumuzun gerçekten kullandığınız yinelemeli çözümleyici çıkış IP'lerini yakalamasına izin veririz — tipik bir çalıştırmada 20–40 kayıt yakalanır. Hiçbir çözümleyici görünmüyorsa, tarayıcınızın DNS önbelleği muhtemelen istekleri emmiştir — biraz sonra tekrar deneyin.",
+    "Note3": "Bu derinlemesine bir test olduğundan sayfada bazı uzmanlık gerektiren kavramlarla karşılaşırsınız (ECS, DNSSEC vb.). Endişelenmeyin — testi çalıştırdıktan sonra, her sütunun kısa açıklaması için sayfanın altındaki «Alan referansı»na bakın.",
+    "Run": "Testi çalıştır",
+    "RunAgain": "Tekrar çalıştır",
+    "RunningProbes": "DNS sondaları gönderiliyor...",
+    "PollingResult": "Sonuçlar toplanıyor...",
+    "FetchError": "DNS sızıntı testi sonuçları alınamadı. Lütfen daha sonra tekrar deneyin.",
+    "Empty": "Bu oturum için hiçbir DNS çözümleyici yakalanmadı. Tarayıcı DNS önbelleği isteği emmiş olabilir — biraz sonra tekrar deneyin.",
+    "TableTitle": "Yakalanan DNS sorguları",
+    "DedupeToggle": "Yinelenenleri gizle",
+    "Flow": {
+      "Probing": "{current} / {total}. sonda gönderiliyor...",
+      "Waiting": "Yinelemeli DNS'in ad sunucumuza ulaşması bekleniyor (genellikle 1–3 sn).",
+      "Fetching": "Yakalanan DNS sorguları alınıyor...",
+      "Done": "Test tamamlandı."
+    },
+    "DnssecChip": {
+      "Signed": "DNSSEC imzaları istendi",
+      "Unsigned": "DNSSEC imzaları istenmedi",
+      "Validated": "DNSSEC doğrulaması normal",
+      "CdSet": "DNSSEC doğrulaması devre dışı"
+    },
+    "Summary": {
+      "ResolverCount": "Benzersiz çözümleyici",
+      "RawCount": "Ham yakalama",
+      "DnssecPosture": "DNSSEC durumu",
+      "DnssecGood": "DNSSEC uyumlu — tüm çözümleyiciler imzaları istedi ve hiçbiri doğrulamayı atlamadı.",
+      "DnssecNoDo": "Zayıf — en az bir çözümleyici DNSSEC imzalarını istemedi.",
+      "DnssecCdSet": "Şüpheli — en az bir çözümleyici DNSSEC doğrulamasını atlamayı istedi.",
+      "DnssecNone": "Henüz sinyal yok."
+    },
+    "Fields": {
+      "ResolverIP": "Çözümleyici IP",
+      "Location": "Konum",
+      "ASN": "Kuruluş / ASN",
+      "QueryType": "Kayıt türü",
+      "Transport": "Taşıma protokolü",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "Alan referansı",
+      "ResolverIP": "Ad sunucumuza gerçekten ulaşan yinelemeli DNS çözümleyicinin çıkış IP'si. Bir VPN kullanıyorsanız, ASN'sini VPN çıkışınızın ASN'siyle karşılaştırın — uyuşmazlık, DNS sorgularınızın VPN tünelini atladığını (yani sızıntı olduğunu) gösterir.",
+      "QueryType": "Çözümleyicinin tarayıcınız adına istediği kayıt türü (A, AAAA, HTTPS vb.). Tarayıcılar genellikle A ve AAAA'yı birlikte gönderir.",
+      "Transport": "DNS varsayılan olarak UDP kullanır. TCP genellikle büyük bir yanıtı gösterir — yanıt büyük olduğunda bunun nedeni çoğu zaman DNSSEC kayıtları taşımasıdır.",
+      "ECS": "EDNS Client Subnet — bazı yinelemeli çözümleyiciler sorguyu üst akıştaki yetkili sunuculara iletirken gerçek IP'nizin bir önekini (genellikle IPv4 /24 veya IPv6 /48) ekler. Bu, IP'nizin bir parçasının DNS zincirindeki sunucular tarafından öğrenilmesi anlamına gelir — CDN'in yerine göre yönlendirme yapması için kullanılabilir, ancak anonimliğinizi de bir miktar zayıflatır.",
+      "DO": "DNSSEC OK — onay işareti, yinelemeli çözümleyicinin bu sorgu için DNSSEC imzalarını aktif olarak istediğini gösterir; zincir kriptografik doğrulama kapasitesine sahiptir. Çarpı işareti ise sorgunun imza istemeden gittiğini ve yoldaki değiştirilmiş bir yanıtın fark edilmeyebileceğini gösterir.",
+      "CD": "Checking Disabled — onay işareti, çağıranın DNSSEC doğrulamasını atlamasını istemediğini, çözümleyicinin normal imza doğrulaması yaptığını gösterir. Çarpı işareti ise çağıranın açıkça doğrulamayı atlamasını istediğini ve imzalar uymasa bile yanıtları kabul edeceğini gösterir. Normalde bu bir onay işareti olmalıdır; eğer çarpı görüyorsanız, genellikle bir hata ayıklama aracından veya istemcinin güvenlik düşürme davranışından kaynaklanır, ancak nadiren yolda araya giren bir müdahalenin işareti de olabilir."
+    }
   },
   "dnsresolver": {
     "Title": "DNS Çözümlemesi",
@@ -562,12 +615,17 @@
     "Note2": "DNS sızıntılarını test etme yöntemi, hangi bölgesel DNS çıkışı üzerinden çözümleme yaptığınızı tespit etmek için yeni oluşturulmuş bir alan adına erişmeyi içerir. Dönen uç nokta bölgesi, yerel hizmet sağlayıcınızın bölgesiyle eşleşirse, DNS sızıntısı riski vardır. Bu durumda, VPN/proxy ayarlarınızı değiştirmeniz gerekebilir.",
     "EndpointCountry": "Uç Nokta Bölgesi",
     "StatusWait": "Test Bekleniyor",
-    "StatusError": "Test Hatası"
+    "StatusError": "Test Hatası",
+    "EnhancedBanner": {
+      "Title": "Daha derine inmek ister misiniz?",
+      "Note": "Buradaki DNS sızıntı testi size yalnızca DNS çıkışınızın yaklaşık olarak hangi ülkede olduğunu söyler. Gerçekten kullandığınız tüm yinelemeli çözümleyicileri, ASN'lerini, herhangi birinin gerçek IP'nizin bir önekini ECS aracılığıyla üst akışa iletip iletmediğini ve DNSSEC doğrulamasının devrede olup olmadığını görmek istiyorsanız, aşağıdaki «Derinlemesine DNS Sızıntı Testi»ni açın.",
+      "CTA": "Derinlemesine testi aç"
+    }
   },
   "speedtest": {
     "id": "speedtest",
     "Title": "Hız Testi",
-    "Note": "Hız testi Cloudflare'in uç ağı (edge network) üzerinden yapılacaktır, bu da uzun sürebilir. Ağınız anakara Çin'de bulunuyorsa, veriler yanlı olabilir. Hız testi sonuçları yalnızca referans amaçlıdır, gerçek hız daha hızlı olacaktır. İndirme ve yükleme testleri için paket boyutunu seçebilirsiniz. Varsayılan olarak, hız testi 4 tur paket yüklemesi ve indirmesi yapacaktır, lütfen veri kullanımına dikkat edin.",
+    "Note": "Ağınız anakara Çin'de bulunuyorsa, veriler yanlı olabilir. Hız testi sonuçları yalnızca referans amaçlıdır, gerçek hız daha hızlı olacaktır. İndirme ve yükleme testleri için paket boyutunu seçebilirsiniz. Varsayılan olarak, hız testi 4 tur paket yüklemesi ve indirmesi yapacaktır, lütfen veri kullanımına dikkat edin.",
     "Download": "İndirme",
     "Upload": "Yükleme",
     "Latency": "Gecikme",
@@ -667,6 +725,7 @@
     "About": "Hakkında panelini aç",
     "Whois": "Whois Araması panelini aç",
     "InvisibilityTest": "Görünmezlik Testi panelini aç",
+    "EnhancedDnsLeakTest": "Derinlemesine DNS Sızıntı Testi panelini aç",
     "MacChecker": "MAC arama panelini aç",
     "BrowserInfo": "Tarayıcı Bilgileri panelini aç",
     "fullScreenAdvancedTools": "Tam Ekran Gelişmiş Araçlar",

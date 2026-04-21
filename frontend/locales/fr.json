@@ -375,6 +375,7 @@
     "PingTestNote": "Test de la valeur Ping mondiale",
     "MTRTestNote": "Test de route MTR mondial",
     "DNSResolverNote": "Résolution DNS multi-canal en temps réel",
+    "EnhancedDnsLeakTest": "Capture tous les résolveurs récursifs avec analyse ECS et DNSSEC",
     "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
     "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP",
@@ -418,6 +419,58 @@
     "invalidURL": "Nom de domaine ou IP invalide",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
+  },
+  "enhanceddnsleaktest": {
+    "Title": "Test de fuite DNS approfondi",
+    "Note": "Le test de fuite DNS de la page d'accueil vous a déjà donné une idée générale : avez-vous une fuite, et par quel pays votre trafic DNS sort. Ce test approfondi ajoute plusieurs dimensions : nous capturons davantage d'IPs de sortie de vos résolveurs, vérifions si certains d'entre eux transmettent un préfixe de votre IP réelle en amont via ECS, et vérifions s'ils prennent en charge DNSSEC — pour que vous obteniez une vue plus complète de la sécurité de votre chaîne DNS.",
+    "Note2": "Cliquez sur Lancer pour démarrer. Le test se termine généralement en quelques secondes. Nous envoyons plusieurs sondes DNS en arrière-plan et laissons notre serveur DNS autoritaire capturer les IPs de sortie des résolveurs récursifs que vous utilisez réellement — une exécution typique capture 20–40 enregistrements. Si aucun résolveur n'apparaît, le cache DNS du navigateur a probablement absorbé les requêtes ; réessayez dans un instant.",
+    "Note3": "Comme il s'agit d'un test approfondi, vous rencontrerez sur cette page des concepts plus spécialisés (ECS, DNSSEC, etc.). Pas d'inquiétude — après avoir lancé le test, consultez la « Référence des champs » en bas de page pour une courte explication de chaque colonne.",
+    "Run": "Lancer le test",
+    "RunAgain": "Relancer",
+    "RunningProbes": "Envoi des sondes DNS...",
+    "PollingResult": "Collecte des résultats...",
+    "FetchError": "Impossible de récupérer les résultats du test de fuite DNS. Veuillez réessayer plus tard.",
+    "Empty": "Aucun résolveur DNS n'a été capturé pour cette session. Le cache DNS du navigateur a probablement absorbé la requête — réessayez dans un instant.",
+    "TableTitle": "Requêtes DNS capturées",
+    "DedupeToggle": "Masquer les doublons",
+    "Flow": {
+      "Probing": "Envoi de la sonde {current} / {total}...",
+      "Waiting": "En attente que les DNS récursifs contactent notre serveur autoritaire (1–3 s en général).",
+      "Fetching": "Récupération des requêtes DNS capturées...",
+      "Done": "Test terminé."
+    },
+    "DnssecChip": {
+      "Signed": "Signatures DNSSEC demandées",
+      "Unsigned": "Signatures DNSSEC non demandées",
+      "Validated": "Validation DNSSEC normale",
+      "CdSet": "Validation DNSSEC désactivée"
+    },
+    "Summary": {
+      "ResolverCount": "Résolveurs uniques",
+      "RawCount": "Captures brutes",
+      "DnssecPosture": "État DNSSEC",
+      "DnssecGood": "Compatible DNSSEC — tous les résolveurs ont demandé les signatures et aucun n'a sauté la validation.",
+      "DnssecNoDo": "Faible — au moins un résolveur n'a pas demandé de signatures DNSSEC.",
+      "DnssecCdSet": "Suspect — au moins un résolveur a demandé à sauter la validation DNSSEC.",
+      "DnssecNone": "Aucun signal pour l'instant."
+    },
+    "Fields": {
+      "ResolverIP": "IP du résolveur",
+      "Location": "Emplacement",
+      "ASN": "Organisation / ASN",
+      "QueryType": "Type d'enregistrement",
+      "Transport": "Protocole de transport",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "Référence des champs",
+      "ResolverIP": "IP de sortie du résolveur DNS récursif qui a réellement contacté notre serveur de noms. Si vous utilisez un VPN, comparez son ASN à celui de la sortie de votre VPN — une différence signifie que vos requêtes DNS contournent le tunnel VPN (donc qu'il y a fuite).",
+      "QueryType": "Type d'enregistrement demandé par le résolveur au nom de votre navigateur (A, AAAA, HTTPS, etc.). Les navigateurs envoient généralement A et AAAA en même temps.",
+      "Transport": "DNS fonctionne par défaut en UDP. TCP indique généralement une réponse volumineuse — souvent parce qu'elle contient des enregistrements DNSSEC.",
+      "ECS": "EDNS Client Subnet — certains résolveurs récursifs ajoutent un préfixe de votre IP réelle (typiquement /24 en IPv4 ou /48 en IPv6) lorsqu'ils transmettent la requête aux serveurs autoritaires en amont. Un segment de votre IP devient donc connu des serveurs en amont, ce qui peut servir au routage géographique CDN, mais affaiblit aussi en partie votre anonymat.",
+      "DO": "DNSSEC OK — une coche signifie que le résolveur récursif a activement demandé des signatures DNSSEC pour cette requête, donc la chaîne est protégée cryptographiquement ; une croix signifie que la requête est partie sans signatures, donc une réponse falsifiée sur le trajet pourrait passer inaperçue.",
+      "CD": "Checking Disabled — une coche signifie que l'appelant n'a pas demandé de sauter la validation DNSSEC, le résolveur récursif effectue donc la vérification normale ; une croix signifie que l'appelant a explicitement demandé de sauter la validation et acceptera les réponses même si les signatures ne correspondent pas. Normalement cela devrait être une coche ; une croix vient le plus souvent d'un outil de débogage ou d'un comportement de repli de sécurité côté client, mais peut aussi, dans de rares cas, signaler une tentative d'interception sur le trajet."
+    }
   },
   "dnsresolver": {
     "Title": "Résolution DNS",
@@ -563,7 +616,12 @@
     "Note2": "La méthode de test des fuites DNS consiste à accéder à un nom de domaine nouvellement généré pour détecter la région DNS de sortie à laquelle vous effectuez une résolution. Si la région de l'extrémité renvoyée correspond à la région de votre fournisseur de services local, il y a un risque de fuite DNS. Dans ce cas, vous devrez peut-être modifier vos paramètres VPN/proxy.",
     "EndpointCountry": "Région de l'extrémité",
     "StatusWait": "En attente du test",
-    "StatusError": "Erreur de test"
+    "StatusError": "Erreur de test",
+    "EnhancedBanner": {
+      "Title": "Envie d'aller plus loin ?",
+      "Note": "Si vous voulez voir tous les résolveurs récursifs que vous utilisez réellement, leur ASN, si l'un d'entre eux transmet un préfixe de votre IP réelle en amont via ECS, et si la validation DNSSEC est en place, ouvrez le « Test de fuite DNS approfondi » ci-dessous.",
+      "CTA": "Ouvrir le test approfondi"
+    }
   },
   "speedtest": {
     "id": "speedtest",
@@ -668,6 +726,7 @@
     "About": "Ouvrir À propos",
     "Whois": "Ouvrir la Recherche Whois",
     "InvisibilityTest": "Ouvrir le Test d'invisibilité",
+    "EnhancedDnsLeakTest": "Ouvrir le Test de fuite DNS approfondi",
     "MacChecker": "Ouvrir le Recherche de MAC",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "fullScreenAdvancedTools": "Outils avancés en plein écran",
