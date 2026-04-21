@@ -110,71 +110,146 @@ const stunServers = reactive([
   { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
 ]);
 
+// Regex extracting the IP portion out of an ICE candidate line
+// (full SDP grammar not needed — just IPv4 / IPv6 with common forms).
+const CANDIDATE_IP_RE = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i;
+
+// All non-wait status labels we may surface for a STUN row, kept in one
+// place so toneOf and isFieldPending stay in sync.
+const errorStatusLabels = computed(() => [
+  t('webrtc.StatusError'),
+  t('webrtc.StatusTimeout'),
+  t('webrtc.StatusPrivacy'),
+]);
+
 // Business status → 4 tone levels
 const toneOf = (stun) => ipFieldTone(stun.ip, {
   waitLabels: t('webrtc.StatusWait'),
-  errorLabels: t('webrtc.StatusError'),
+  errorLabels: errorStatusLabels.value,
 });
 
-// Single field in dl block is in "no data" state (waiting/error)
-// These fields may fail independently (e.g. IP success but country query fails), so determine by field.
+// Single field in dl block is in "no data" state (waiting/error).
+// Fields may fail independently (e.g. IP success but country lookup fails),
+// so the check is run per-field in the template.
 const isFieldPending = (value) => {
-  return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
+  return !value
+    || value === t('webrtc.StatusWait')
+    || errorStatusLabels.value.includes(value);
 };
 
-// Test STUN server
-const checkSTUNServer = async (stun) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const servers = { iceServers: [{ urls: 'stun:' + stun.url }] };
-      const pc = new RTCPeerConnection(servers);
-      let candidateReceived = false;
+// Run a STUN test against one server. ICE gathering with a 5s backstop.
+//
+// Success criteria: receive a server-reflexive ('srflx') or peer-reflexive
+// ('prflx') candidate with an extractable IP. That IP is what the STUN
+// server reported; host candidates don't prove STUN worked (the browser
+// emits them regardless).
+//
+// Timeout taxonomy — surfaces on stun.ip / natType / country as a
+// localized label:
+//   - StatusPrivacy: 5s elapsed, candidates arrived but every single one
+//       was an mDNS .local host candidate and no srflx came through.
+//       Indicates browser mDNS privacy is on AND STUN didn't return
+//       usable srflx (e.g. the STUN port is blocked).
+//   - StatusTimeout: 5s elapsed, no srflx / prflx ever arrived (server
+//       unreachable, UDP blocked, wrong URL, etc.).
+//   - StatusError: unexpected throw in the try/catch path
+//       (RTCPeerConnection construction failure, etc.).
+const checkSTUNServer = (stun) => {
+  return new Promise((resolve) => {
+    let pc = null;
+    let timer = null;
+    let settled = false;
+    let sawAnyCandidate = false;
+    let sawNonMdnsCandidate = false;
 
-      pc.onicecandidate = async (event) => {
-        if (event.candidate) {
-          candidateReceived = true;
-          const candidate = event.candidate.candidate;
-          const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
-          if (ipMatch) {
-            stun.ip = ipMatch[0];
-            try {
-              const countryInfo = await fetchCountryCode(stun.ip);
-              stun.country_code = countryInfo[0];
-              stun.country = countryInfo[1];
-            } catch (error) {
-              console.error('Error fetching country code:', error);
-              stun.country = t('webrtc.StatusError');
-              reject(error);
-              pc.close();
-              return;
-            }
-            IPArray.value = [...IPArray.value, stun.ip];
-            stun.natType = determineNATType(candidate);
-            pc.close();
-            resolve();
-          }
+    const finish = () => {
+      settled = true;
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (pc) pc.close();
+      resolve();
+    };
+
+    const failWith = (statusKey) => {
+      if (settled) return;
+      const label = t(`webrtc.${statusKey}`);
+      stun.ip = label;
+      stun.natType = label;
+      stun.country = label;
+      stun.country_code = '';
+      finish();
+    };
+
+    const succeedWith = async (ip, candidate) => {
+      if (settled) return;
+      // Mark settled now so a late candidate can't double-resolve,
+      // but keep pc / timer alive until the country lookup returns.
+      settled = true;
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      stun.ip = ip;
+      stun.natType = determineNATType(candidate);
+      IPArray.value = [...IPArray.value, ip];
+      try {
+        const countryInfo = await fetchCountryCode(ip);
+        if (countryInfo) {
+          stun.country_code = countryInfo[0];
+          stun.country = countryInfo[1];
+        } else {
+          stun.country = t('webrtc.StatusError');
         }
+      } catch (err) {
+        console.error('Error fetching country code:', err);
+        stun.country = t('webrtc.StatusError');
+      }
+      if (pc) pc.close();
+      resolve();
+    };
+
+    try {
+      pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:' + stun.url }] });
+
+      pc.onicecandidate = (event) => {
+        if (!event.candidate || settled) return;  // null = end-of-candidates
+        sawAnyCandidate = true;
+        const candidate = event.candidate.candidate;
+        const parts = candidate.split(' ');
+        const address = parts[4] || '';
+        const type = parts[7];
+
+        // An mDNS candidate uses an `<id>.local` hostname instead of an IP,
+        // so we record it for the privacy-vs-timeout distinction below but
+        // don't try to extract an IP from it.
+        if (!address.endsWith('.local')) sawNonMdnsCandidate = true;
+
+        // Only server-reflexive / peer-reflexive candidates represent a
+        // STUN answer. Host candidates (with or without mDNS) don't prove
+        // STUN worked and we must not display them as the "STUN IP".
+        if (type !== 'srflx' && type !== 'prflx') return;
+
+        const ipMatch = CANDIDATE_IP_RE.exec(candidate);
+        if (!ipMatch) return;
+        succeedWith(ipMatch[0], candidate);
       };
 
       pc.createDataChannel('');
       pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-      // STUN timeout (5s no candidate received): mark ip / natType / country as connection error
-      setTimeout(() => {
-        if (!candidateReceived) {
-          stun.ip = t('webrtc.StatusError');
-          stun.natType = t('webrtc.StatusError');
-          stun.country = t('webrtc.StatusError');
-          pc.close();
-          reject(new Error('Stun Server Test Timeout'));
+      timer = setTimeout(() => {
+        timer = null;
+        if (sawAnyCandidate && !sawNonMdnsCandidate) {
+          failWith('StatusPrivacy');
+        } else {
+          failWith('StatusTimeout');
         }
       }, 5000);
     } catch (error) {
       console.error('STUN Server Test Error:', error);
-      stun.ip = t('webrtc.StatusError');
-      stun.natType = t('webrtc.StatusError');
-      stun.country = t('webrtc.StatusError');
-      reject(error);
+      failWith('StatusError');
     }
   });
 };
