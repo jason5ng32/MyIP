@@ -5,7 +5,7 @@
     <Achievements ref="achievementsRef" />
     <Preferences ref="preferencesRef" />
     <Alert />
-    <div id="mainpart" :inert="isMainInert" class="mx-auto w-full px-4 jn-container">
+    <div id="mainpart" class="mx-auto w-full px-4 jn-container">
       <div class="rounded-md" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />
@@ -67,15 +67,6 @@ const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const isSignedIn = computed(() => store.isSignedIn);
 const openedCard = computed(() => store.currentPath.id);
-
-// Make #mainpart inert while any sheet / drawer / dialog is open.
-// vaul / reka-ui mark the backdrop aria-hidden="true", but aria-hidden
-// alone doesn't remove descendants from the Tab focus ring — browsers
-// warn whenever focus lands inside an aria-hidden subtree. `inert` is
-// the spec-correct escape hatch: it blocks focus and input on the
-// subtree, and toggling it in sync with store.openSheet keeps the main
-// content focusable whenever no overlay is open.
-const isMainInert = computed(() => store.openSheet !== null);
 
 // Template refs
 const navBarRef = ref(null);
