@@ -253,16 +253,23 @@ const statusFaceIcon = (test) => {
 
 // Check single connectivity.
 //
-// Uses `fetch` in `no-cors` mode with a `HEAD` method rather than an <img>
-// load, on purpose:
+// Uses `fetch` in `no-cors` mode with `GET`, rather than an <img> load or a
+// HEAD request:
 //   - no-cors makes the promise resolve on ANY HTTP status the server returns
-//     (200, 403, 405, 500 …), matching the semantic question we're actually
+//     (200, 403, 404, 500 …), matching the semantic question we're actually
 //     asking ("can I reach this origin?"). <img> routed 403 to `onerror` and
 //     flagged reachable-but-forbidden sites (notably github.com/favicon.ico)
 //     as unavailable.
-//   - HEAD transfers only response headers, so the measured time is RTT, not
-//     RTT + favicon payload. Some favicons are 100 KB+ SVG/PNG — that used to
-//     blow up the latency number on certain targets.
+//   - GET (not HEAD) because many real-world servers / CDNs / WAFs either
+//     silently drop HEAD, route it to a different backend, or close the
+//     connection — which all reject the promise and falsely mark the target
+//     unavailable even when the site is fine over GET. User-added custom
+//     endpoints are especially prone to this: most health-check / API paths
+//     only implement GET. The payload overhead (~few KB for a favicon on a
+//     CDN edge, discarded as opaque in no-cors) is a small price for the
+//     correctness.
+// `cache: 'no-store'` prevents the browser from serving a cached response
+// (which would give a misleading near-zero RTT).
 // Network-level failure (DNS error, connection refused, abort) still rejects
 // and is caught below. An AbortController replaces the old bare setTimeout so
 // we can distinguish a completed request from a timeout and never double-fire
@@ -275,7 +282,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
   try {
     await fetch(test.url, {
       mode: 'no-cors',
-      method: 'HEAD',
+      method: 'GET',
       cache: 'no-store',
       signal: controller.signal,
     });
