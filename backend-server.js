@@ -29,18 +29,9 @@ import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
-import { startMaxMindAutoUpdate } from './common/maxmind-updater.js';
+import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
 
 dotenv.config();
-
-// Load the bundled MaxMind databases during startup without blocking the server boot.
-reloadMaxMindDatabases('startup').catch(() => {
-    console.error('MaxMind API will return 503 until databases are loaded successfully');
-});
-// Watch database file changes so pm2 or another process can publish updates safely.
-startMaxMindFileWatcher();
-// Schedule credential-gated MaxMind updates when MAXMIND_AUTO_UPDATE is enabled.
-startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
@@ -181,8 +172,32 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, './dist')));
 
 
-// Start server
-app.listen(backEndPort, () => {
-    // Output listening address, for local running and process manager log troubleshooting
-    console.log(`Backend server running on http://localhost:${backEndPort}`);
-});
+// Bootstrap the MaxMind layer before accepting traffic. The sequence is:
+//   1. bootstrapMaxMindIfMissing — if the .mmdb files are absent and
+//      credentials are configured, download them synchronously (capped at
+//      5 min). Never throws; logs a warning and moves on if it can't.
+//   2. reloadMaxMindDatabases — load readers into memory. Also non-fatal;
+//      if the files still aren't there, MaxMind API will return 503.
+//   3. startMaxMindFileWatcher — pick up files that arrive later (manual
+//      drop-in or a background process publishing updates).
+//   4. startMaxMindAutoUpdate — schedule credential-gated periodic updates
+//      when MAXMIND_AUTO_UPDATE is enabled.
+//   5. app.listen — only after all of the above, so the server never accepts
+//      requests mid-download and log order stays readable.
+async function bootBackend() {
+    await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
+
+    await reloadMaxMindDatabases('startup').catch(() => {
+        console.error('MaxMind API will return 503 until databases are loaded successfully');
+    });
+
+    startMaxMindFileWatcher();
+    startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
+
+    app.listen(backEndPort, () => {
+        // Output listening address, for local running and process manager log troubleshooting
+        console.log(`Backend server running on http://localhost:${backEndPort}`);
+    });
+}
+
+bootBackend();

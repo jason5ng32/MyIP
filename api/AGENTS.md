@@ -38,7 +38,8 @@ common/
 ├── valid-ip.js                  ← IPv4 / IPv6 validator (also re-exported from frontend)
 ├── rdap.js                      ← RDAP client (domain fallback when whoiser returns no __raw)
 ├── maxmind-service.js           ← mmdb reader + lookup
-├── maxmind-updater.js           ← scheduled mmdb auto-update
+├── maxmind-updater.js           ← mmdb bootstrap download at boot +
+│                                  scheduled auto-update
 └── maxmind-db/                  ← GeoLite2-ASN.mmdb + GeoLite2-City.mmdb
 ```
 
