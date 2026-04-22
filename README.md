@@ -131,6 +131,9 @@ Download `GeoLite2-City.mmdb` and `GeoLite2-ASN.mmdb` from your MaxMind account 
 | `SECURITY_RATE_LIMIT` | No | `"0"` | Controls the number of requests an IP can make to the backend server every 60 minutes (set to 0 for no limit) |
 | `SECURITY_DELAY_AFTER` | No | `"0"` | Controls the first X requests from an IP every 20 minutes that are not subject to speed limits, and after X requests, the delay will increase |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | No | `"logs/blacklist-ip.log"` | Path setting. Records the list of IPs that triggered the limit after SECURITY_RATE_LIMIT is enabled |
+| `LOG_LEVEL` | No | `"info"` | Minimum log level (`debug` / `info` / `warn` / `error`). Lower-level messages are suppressed. |
+| `LOG_FORMAT` | No | pretty | Set to `"json"` to emit one JSON event per line (for log aggregators / jq). Any other value (or unset) keeps the colored pretty output used in dev and pm2 log tails. |
+| `LOG_HTTP` | No | `"false"` | Set to `"true"` to enable per-request HTTP logging on `/api/*` (method, URL, status, response time). Off by default to keep pm2 logs lean. Handler-level 4xx/5xx errors are always logged regardless of this flag. |
 | `ALLOWED_DOMAINS` | No | `""` | Allowed domains for access, separated by commas, used to prevent misuse of the backend API |
 | `GOOGLE_MAP_API_KEY` | No | `""` | API Key for Google Maps, used to display the location of the IP on a map |
 | `IPCHECKING_API_ENDPOINT` | No | `""` | API endpoint for IPCheck.ing database, used to obtain accurate IP geolocation information |

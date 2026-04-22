@@ -12,6 +12,7 @@
 // project's timeout convention.
 
 import { fetchUpstream } from './fetch-with-timeout.js';
+import logger from './logger.js';
 
 const BOOTSTRAP_URL = 'https://data.iana.org/rdap/dns.json';
 const CACHE_TTL_MS  = 24 * 60 * 60 * 1000;
@@ -22,7 +23,10 @@ async function loadBootstrap() {
         return bootstrapCache.data;
     }
     const res = await fetchUpstream(BOOTSTRAP_URL);
-    if (!res.ok) throw new Error(`RDAP bootstrap failed: ${res.status}`);
+    if (!res.ok) {
+        logger.error({ status: res.status }, 'RDAP bootstrap failed');
+        throw new Error(`RDAP bootstrap failed: ${res.status}`);
+    }
     const data = await res.json();
     bootstrapCache = { data, expiresAt: Date.now() + CACHE_TTL_MS };
     return data;
@@ -42,13 +46,20 @@ export async function rdapDomain(domain, { timeoutMs = 5000 } = {}) {
     const bootstrap = await loadBootstrap();
     const tld = domain.split('.').pop();
     const base = findEndpoint(bootstrap.services, tld);
-    if (!base) throw new Error(`No RDAP endpoint for .${tld}`);
+    if (!base) {
+        throw new Error(`No RDAP endpoint for .${tld}`);
+    }
 
     const host = new URL(base).hostname;
     const url  = `${trimSlash(base)}/domain/${encodeURIComponent(domain)}`;
     const res  = await fetchUpstream(url, { timeoutMs });
-    if (res.status === 404) throw new Error(`Domain not found: ${domain}`);
-    if (!res.ok) throw new Error(`RDAP query failed: ${res.status}`);
+    if (res.status === 404) {
+        throw new Error(`Domain not found: ${domain}`);
+    }
+    if (!res.ok) {
+        logger.error({ domain, status: res.status }, 'RDAP query failed');
+        throw new Error(`RDAP query failed: ${res.status}`);
+    }
     const data = await res.json();
 
     return { [host]: { ...data, __raw: formatDomain(data) } };

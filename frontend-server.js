@@ -4,8 +4,9 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import logger from './common/logger.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const frontendApp = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
@@ -25,5 +26,5 @@ frontendApp.use(express.static(path.join(__dirname, './dist')));
 
 // Start static file server
 frontendApp.listen(frontEndPort, () => {
-  console.log(`Static file server running on port http://localhost:${frontEndPort}`);
+  logger.info(`🚀 Static file server ready on http://localhost:${frontEndPort}`);
 });

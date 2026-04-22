@@ -1,4 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 export default async (req, res) => {
     // defensive; app.put() in backend-server.js already gates method
@@ -37,7 +38,7 @@ export default async (req, res) => {
         const data = await apiResponse.json();
         res.json(data);
     } catch (error) {
-        console.error("Error during API request:", error);
+        logger.error({ err: error }, 'update-user-achievement upstream request failed');
         res.status(500).json({ error: error.message });
     }
 

@@ -1,4 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 // A canonical MAC address is 48 bits = 12 hex chars. Accepting shorter
 // strings let the upstream API receive partial prefixes and return
@@ -37,6 +38,7 @@ export default async (req, res) => {
         }
         res.json(modifyData(json));
     } catch (e) {
+        logger.error({ err: e, mac: macAddress }, 'mac-checker handler failed');
         res.status(500).json({ error: e.message });
     }
 };

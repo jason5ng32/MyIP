@@ -9,6 +9,7 @@
 //   GET /api/dnsleaktest/session/:token
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 const TOKEN_RE = /^[0-9a-f]{32}$/;
 const SUPPORTED_LANGS = ['zh-CN', 'en', 'fr', 'tr'];
@@ -47,7 +48,7 @@ export async function getSessionResult(req, res) {
         res.set('Cache-Control', 'no-store');
         res.status(apiResponse.status).json(data);
     } catch (error) {
-        console.error('[dnsleaktest] upstream fetch failed:', error.message);
+        logger.error({ err: error }, 'dnsleaktest upstream fetch failed');
         res.status(502).json({ error: 'Upstream fetch failed', detail: error.message });
     }
 }

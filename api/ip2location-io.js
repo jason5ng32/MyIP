@@ -1,4 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
@@ -13,6 +14,7 @@ export default async (req, res) => {
         const json = await apiRes.json();
         res.json(modifyJsonForIPAPI(json));
     } catch (e) {
+        logger.error({ err: e, ip: ipAddress }, 'ip2location-io handler failed');
         res.status(500).json({ error: e.message });
     }
 };

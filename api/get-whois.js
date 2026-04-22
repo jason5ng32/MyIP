@@ -1,6 +1,7 @@
 import whoiser from 'whoiser';
 import { isValidIP } from '../common/valid-ip.js';
 import { rdapDomain } from '../common/rdap.js';
+import logger from '../common/logger.js';
 
 function isValidDomain(domain) {
     const domainPattern = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
@@ -33,6 +34,7 @@ export default async (req, res) => {
             const ipinfo = await whoiser.ip(query, { timeout: 5000, raw: true });
             return res.json(ipinfo);
         } catch (e) {
+            logger.error({ err: e, query }, 'Failed to get IP info');
             return res.status(500).json({ error: e.message });
         }
     }
@@ -60,6 +62,7 @@ export default async (req, res) => {
         const rdap = await rdapDomain(query);
         return res.json(rdap);
     } catch (e) {
+        logger.error({ err: e, query }, 'Failed to get RDAP info');
         return res.status(500).json({ error: e.message });
     }
 };

@@ -5,6 +5,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
+import pinoHttp from 'pino-http';
+import logger from './common/logger.js';
 import { requireReferer, requireValidIP } from './common/guards.js';
 
 // Backend APIs
@@ -31,7 +33,7 @@ import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
 import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
@@ -40,6 +42,27 @@ const rateLimitSet = parseInt(process.env.SECURITY_RATE_LIMIT || 0, 10);
 const speedLimitSet = parseInt(process.env.SECURITY_DELAY_AFTER || 0, 10);
 
 app.set('trust proxy', 1);
+
+// HTTP request logging on /api/* — off by default to keep pm2 logs lean.
+// Set LOG_HTTP=true in .env to enable. Mounted before the rate limiter
+// so 429s are also logged when enabled.
+if (process.env.LOG_HTTP === 'true') {
+    app.use('/api', pinoHttp({
+        logger,
+        customLogLevel: (req, res, err) => {
+            if (err || res.statusCode >= 500) return 'error';
+            if (res.statusCode >= 400) return 'warn';
+            return 'info';
+        },
+        customSuccessMessage: (req, res) => `${req.method} ${req.url} → ${res.statusCode}`,
+        customErrorMessage: (req, res, err) => `${req.method} ${req.url} → ${res.statusCode}: ${err.message}`,
+        serializers: {
+            req: (req) => ({ method: req.method, url: req.url }),
+            res: (res) => ({ statusCode: res.statusCode }),
+        },
+    }));
+    logger.info('📝 HTTP request logging enabled (LOG_HTTP=true)');
+}
 
 // Helper function to get client IP
 function getClientIp(req) {
@@ -62,13 +85,13 @@ function logLimitedIP(ip) {
     const logDir = path.dirname(logPath);
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir, { recursive: true });
-        console.log('Created log directory:', logDir);
+        logger.info({ logDir }, 'Created log directory');
     }
 
     // Read log file, update IP count, create new log file if it does not exist
     fs.readFile(logPath, 'utf8', (err, data) => {
         if (err && err.code !== 'ENOENT') {
-            console.error('Error reading the log file:', err);
+            logger.error({ err }, 'Error reading the log file');
             return;
         }
 
@@ -84,7 +107,7 @@ function logLimitedIP(ip) {
                 if (currentIp === ip) {
                     newCount = parseInt(count, 10) + 1;
                     logExists = true;
-                    console.log(`IP ${ip} has been limited ${newCount} times`);
+                    logger.warn({ ip, count: newCount }, 'Rate-limited IP hit again');
                     return `${ip},${newCount},${timestamp}`;  // Update count but keep the original timestamp
                 }
                 return line;
@@ -94,12 +117,12 @@ function logLimitedIP(ip) {
         if (!logExists) {
             const newLine = `${ip},${newCount},${formatDate(now)}`;
             updatedData += (updatedData ? '\n' : '') + newLine;
-            console.log(`IP ${ip} has been limited for the first time`);
+            logger.warn({ ip }, 'IP rate-limited for the first time');
         }
 
         fs.writeFile(logPath, updatedData, 'utf8', err => {
             if (err) {
-                console.error('Failed to write to log file:', err);
+                logger.error({ err }, 'Failed to write to log file');
             }
         });
     });
@@ -129,13 +152,13 @@ const speedLimiter = slowDown({
 // If rateLimitSet is 0, do not enable rate limiting
 if (rateLimitSet !== 0) {
     app.use('/api', rateLimiter);
-    console.log('Rate limiter is enabled, limit:', rateLimitSet, 'requests per 60 minutes');
+    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 60 minutes`);
 }
 
 // If delayAfter is 0, do not enable delay
 if (speedLimitSet !== 0) {
     app.use('/api', speedLimiter);
-    console.log('Speed limiter is enabled, slowing down after:', speedLimitSet, 'requests');
+    logger.info(`🐢 Speed limiter enabled — slow down after ${speedLimitSet} requests`);
 }
 
 app.use(express.json());
@@ -188,7 +211,7 @@ async function bootBackend() {
     await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
 
     await reloadMaxMindDatabases('startup').catch(() => {
-        console.error('MaxMind API will return 503 until databases are loaded successfully');
+        logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
     });
 
     startMaxMindFileWatcher();
@@ -196,7 +219,7 @@ async function bootBackend() {
 
     app.listen(backEndPort, () => {
         // Output listening address, for local running and process manager log troubleshooting
-        console.log(`Backend server running on http://localhost:${backEndPort}`);
+        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
     });
 }
 

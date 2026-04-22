@@ -2,6 +2,7 @@
 import { Resolver } from 'dns';
 import { promisify } from 'util';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 // Bound each upstream lookup so the slowest server doesn't pin the
 // overall response. 3s for UDP DNS (`Resolver` rejects on first
@@ -79,7 +80,10 @@ const resolveDns = async (hostname, type, name, server) => {
 
         return { [name]: addresses };
     } catch (error) {
-        console.log(error.message);
+        // Per-server timeouts are expected (some DNS hosts are unreachable
+        // from a given network); demote to debug so they don't spam the
+        // terminal during normal operation.
+        logger.debug({ err: error, server: name }, 'DNS resolver: lookup failed, returning N/A');
         return { [name]: `N/A` };
     }
 };
@@ -97,7 +101,7 @@ const resolveDoh = async (hostname, type, name, url) => {
         }
         return { [name]: addresses };
     } catch (error) {
-        console.log(error.message);
+        logger.debug({ err: error, server: name }, 'DoH resolver: lookup failed, returning N/A');
         return { [name]: `N/A` };
     }
 };

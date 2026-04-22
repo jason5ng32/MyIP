@@ -29,6 +29,7 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 | Bottom drawer | `vaul-vue` |
 | Toast | `vue-sonner` |
 | Backend | Express 5 |
+| Logger | `pino` + `pino-pretty` (dev) + `pino-http` (request logs) — singleton at `common/logger.js` |
 | Auth | Firebase Auth (optional, env-gated) |
 | PWA | Serwist |
 | Tests | Node built-in test runner (`node --test`) |
@@ -83,6 +84,14 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 
 - Any feature that surfaces copy must land in **all four locales** (`en` / `zh` / `fr` / `tr`) in the same change. No English-only or Chinese-only keys slipping through.
 - Same rule applies to `frontend/data/changelog.json` — every entry's `change` object must have all four languages. `tests/changelog.test.js` enforces this.
+
+### Logging (backend)
+
+- **Use the shared logger from `common/logger.js`** in every backend file (`backend-server.js`, `frontend-server.js`, `api/*`, `common/*`). It's a `pino` singleton — pretty-printed via `pino-pretty` by default; set `LOG_FORMAT=json` in `.env` to emit raw JSON for log aggregators. Log level defaults to `warn`; override with `LOG_LEVEL` env in `.env` (`debug` / `info` / `warn` / `error`). At the default `warn`, pino-http's 2xx/3xx request lines are filtered out (they log at level `info`); 4xx become visible warns and 5xx errors. No `NODE_ENV` dependency — the project doesn't use that variable anywhere else.
+- **Bare `console.*` is banned** in backend code — it bypasses level filtering and dumps unstructured text into the prod log stream. Frontend code (`frontend/`) is unaffected; browser code keeps using `console.*`.
+- **Pino's first-arg-is-context convention.** Errors: `logger.error({ err: error, ip, ... }, 'short message')`. Pino has a built-in serializer for the `err` key that formats stack traces nicely.
+- **Startup-only lines (called once at boot)** lead with an emoji for at-a-glance scanning when the dev terminal is busy: 🚀 listening, 📦 ready, 📥 downloading, 🛡️ security on, 🐢 throttling on, 🗓️ schedule, ⚠️ recoverable warning, ❌ failure. Per-request and per-handler logs stay plain.
+- **HTTP request logging** is **off by default** to keep pm2 logs from bloating. Set `LOG_HTTP=true` in `.env` to mount `pino-http` on `/api`; when on, 2xx/3xx log as `info`, 4xx as `warn`, 5xx as `error`. Handlers never log incoming requests themselves — they log domain-specific events / errors only, regardless of this flag.
 
 ## Testing
 

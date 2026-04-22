@@ -6,6 +6,7 @@ import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import * as tar from 'tar';
 import maxmind from 'maxmind';
+import logger from './logger.js';
 import {
     getMaxMindDbPaths,
     MAXMIND_ASN_DB,
@@ -58,19 +59,19 @@ export function startMaxMindAutoUpdate({ reload } = {}) {
     }
 
     if (!isAutoUpdateEnabled()) {
-        console.log('MaxMind auto update plan: disabled');
+        logger.info('MaxMind auto update plan: disabled');
         return;
     }
 
     if (!hasDownloadCredentials()) {
-        console.log('MaxMind auto update skipped: MAXMIND_ACCOUNT_ID or MAXMIND_LICENSE_KEY is missing');
+        logger.info('MaxMind auto update skipped: MAXMIND_ACCOUNT_ID or MAXMIND_LICENSE_KEY is missing');
         return;
     }
 
     // Run one update cycle and keep the scheduler alive if that cycle fails.
     const run = () => {
         updateMaxMindDatabases({ reload }).catch(error => {
-            console.error('MaxMind auto update failed:', error.message);
+            logger.error({ err: error }, 'MaxMind auto update failed');
         });
     };
 
@@ -111,8 +112,8 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
     }
 
     if (!hasDownloadCredentials()) {
-        console.warn(
-            'MaxMind databases are missing and MAXMIND_ACCOUNT_ID / MAXMIND_LICENSE_KEY are not configured.\n' +
+        logger.warn(
+            '⚠️  MaxMind databases are missing and MAXMIND_ACCOUNT_ID / MAXMIND_LICENSE_KEY are not configured.\n' +
             '  Set the credentials in .env and restart, or drop GeoLite2-City.mmdb + GeoLite2-ASN.mmdb\n' +
             '  into common/maxmind-db/. Starting server anyway; MaxMind API will return 503 until\n' +
             '  databases are available.'
@@ -121,7 +122,7 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
     }
 
     const timeoutMinutes = BOOTSTRAP_TIMEOUT_MS / 60000;
-    console.log(`MaxMind databases missing; attempting initial download (timeout ${timeoutMinutes} min)...`);
+    logger.info(`📥 MaxMind databases missing; attempting initial download (timeout ${timeoutMinutes} min)...`);
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(new Error('bootstrap timed out')), BOOTSTRAP_TIMEOUT_MS);
@@ -141,8 +142,8 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
         const reason = controller.signal.aborted
             ? `download did not complete within ${timeoutMinutes} min (check connectivity to download.maxmind.com)`
             : error.message;
-        console.warn(
-            `MaxMind initial download failed: ${reason}\n` +
+        logger.warn(
+            `⚠️  MaxMind initial download failed: ${reason}\n` +
             '  Starting server anyway; MaxMind API will return 503 until databases are available.'
         );
         return { status: 'failed', error };
@@ -221,7 +222,7 @@ function hasAnyUpdateEnvironment() {
  */
 function logUpdatePlan() {
     const nextRunAt = new Date(Date.now() + INITIAL_UPDATE_DELAY_MS);
-    console.log(`MaxMind auto update plan: next check at ${formatScheduleTime(nextRunAt)}, then every ${formatDuration(UPDATE_INTERVAL_MS)}`);
+    logger.info(`🗓️  MaxMind auto update plan: next check at ${formatScheduleTime(nextRunAt)}, then every ${formatDuration(UPDATE_INTERVAL_MS)}`);
 }
 
 /**
@@ -288,7 +289,7 @@ async function downloadAndReplaceDatabases(dbDir, tempDir, { signal } = {}) {
     }
 
     await writeUpdateState(dbDir, state);
-    console.log(`MaxMind databases updated: ${plannedUpdates.map(update => update.editionId).join(', ')}`);
+    logger.info({ editions: plannedUpdates.map(update => update.editionId) }, 'MaxMind databases updated');
 
     return {
         updated: true,
@@ -518,7 +519,7 @@ async function acquireUpdateLock(dbDir) {
             return acquireUpdateLock(dbDir);
         }
 
-        console.log('MaxMind update skipped: another process is updating databases');
+        logger.info('MaxMind update skipped: another process is updating databases');
         return null;
     }
 }

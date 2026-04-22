@@ -131,6 +131,9 @@ MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进
 | `SECURITY_RATE_LIMIT` | 否 | `"0"` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
 | `SECURITY_DELAY_AFTER` | 否 | `"0"` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `"logs/blacklist-ip.log"` | 路径设置。记录由 SECURITY_RATE_LIMIT 开启后，触发限制的 IP 列表 |
+| `LOG_LEVEL` | 否 | `"info"` | 日志最低级别（`debug` / `info` / `warn` / `error`），低于该级别的日志会被过滤 |
+| `LOG_FORMAT` | 否 | pretty | 设置为 `"json"` 时每行输出一个 JSON 事件（给日志聚合器 / jq 使用）；其它值（或未设置）则使用带颜色的 pretty 格式，适合开发及 pm2 log tail |
+| `LOG_HTTP` | 否 | `"false"` | 设置为 `"true"` 时启用 `/api/*` 的按请求日志（方法、URL、状态码、响应时间）。默认关闭以控制 pm2 日志体积。即使关闭，handler 层的 4xx/5xx 错误日志依然会被记录 |
 | `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
 | `GOOGLE_MAP_API_KEY` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
 | `IPCHECKING_API_ENDPOINT` | 否 | `""` | IPCheck.ing 数据库的 API 端点 URL |

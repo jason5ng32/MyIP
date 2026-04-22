@@ -131,6 +131,9 @@ Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte Ma
 | `SECURITY_RATE_LIMIT` | Non | `"0"` | Contrôle le nombre de requêtes qu'une adresse IP peut faire au serveur backend toutes les 60 minutes (réglé sur 0 pour aucune limite) |
 | `SECURITY_DELAY_AFTER` | Non | `"0"` | Contrôle les premières X requêtes d'une adresse IP toutes les 20 minutes qui ne sont pas soumises à des limites de vitesse, et après X requêtes, le délai augmentera |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `"logs/blacklist-ip.log"` | Paramètre de chemin. Enregistre la liste des adresses IP qui ont déclenché la limite après que `SECURITY_RATE_LIMIT` soit activé |
+| `LOG_LEVEL` | Non | `"info"` | Niveau minimum des journaux (`debug` / `info` / `warn` / `error`). Les messages de niveau inférieur sont supprimés. |
+| `LOG_FORMAT` | Non | pretty | Définir sur `"json"` pour émettre un événement JSON par ligne (agrégateurs de logs / jq). Toute autre valeur (ou non défini) conserve la sortie colorée lisible utilisée en dev et lors du tail des logs pm2. |
+| `LOG_HTTP` | Non | `"false"` | Définir sur `"true"` pour activer la journalisation par requête HTTP sur `/api/*` (méthode, URL, statut, temps de réponse). Désactivé par défaut pour garder les logs pm2 légers. Les erreurs 4xx/5xx côté handler sont toujours loguées, que ce drapeau soit activé ou non. |
 | `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
 | `GOOGLE_MAP_API_KEY` | Non | `""` | Clé API pour Google Maps, utilisée pour afficher l'emplacement de l'adresse IP sur une carte |
 | `IPCHECKING_API_ENDPOINT` | Non | `""` | endpoint de l'API pour IPCheck.ing database, utilisée pour obtenir des informations de géolocalisation précises sur l'adresse IP |

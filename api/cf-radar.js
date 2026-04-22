@@ -1,4 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 // Common fetch request function
 async function fetchFromCloudflare(endpoint) {
@@ -17,7 +18,7 @@ async function getASNInfo(asn) {
     try {
         return await fetchFromCloudflare(`/radar/entities/asns/${asn}`);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch ASN info');
         throw new Error('Failed to fetch ASN info');
     }
 };
@@ -27,7 +28,7 @@ async function getASNIPVersion(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch ASN IP version');
         throw new Error('Failed to fetch ASN IP version');
     }
 };
@@ -37,7 +38,7 @@ async function getASNHTTPProtocol(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch ASN HTTP protocol');
         throw new Error('Failed to fetch ASN HTTP protocol');
     }
 };
@@ -47,7 +48,7 @@ async function getASNDeviceType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/device_type?asn=${asn}&dateRange=7d`);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch ASN device type');
         throw new Error('Failed to fetch ASN device type');
     }
 };
@@ -57,7 +58,7 @@ async function getASNBotType(asn) {
     try {
         return await fetchFromCloudflare(`/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch ASN bot type');
         throw new Error('Failed to fetch ASN bot type');
     }
 };
@@ -74,7 +75,7 @@ async function getAllASNData(asn) {
         ]);
         return { asnInfo, ipVersion, httpProtocol, deviceType, botType };
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, 'Failed to fetch all ASN data');
         throw new Error('Failed to fetch all ASN data');
     }
 }
@@ -155,7 +156,7 @@ export default async (req, res) => {
 
         res.json(finalResponse);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error, asn }, 'cf-radar handler failed');
         res.status(500).json({ error: 'Internal server error' });
     }
 }
