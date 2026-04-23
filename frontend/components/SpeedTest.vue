@@ -110,7 +110,7 @@
         </div>
 
         <!-- Result Block -->
-        <div v-if="isFinished && state.speedTest.hasScores"
+        <div v-if="isFinished && state.speedTest.hasScores && state.connection.colo"
           class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
           <div class="flex items-start gap-2">
             <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
