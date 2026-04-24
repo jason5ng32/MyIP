@@ -29,6 +29,9 @@
        `store.setDarkMode`. -->
   <script>
     (function () {
+      // Gates the initial-hidden `#app` rule; App.vue clears it for the
+      // scale/fade-in. If this script never runs, #app renders normally.
+      document.documentElement.setAttribute('data-booting', '');
       try {
         var stored = JSON.parse(localStorage.getItem('userPreferences') || '{}');
         var theme = stored.theme || 'auto';
@@ -81,16 +84,16 @@
       color: #fafafa;
     }
 
-    /* Boot screen — shown until App.vue's setup hides it
-       (see `frontend/App.vue`: `document.getElementById('jn-loading')`).
-
-       Anchored to the upper third of the viewport rather than dead-center
-       because phones eat ~50-60px at the top with their status bar / notch,
-       which pushed "centered" content visually low. 15vh top padding + flex
-       top alignment puts the logo around ~1/6 to 1/5 from the top on phone
-       and desktop alike. */
+    /* Boot screen — shown until App.vue runs the hand-off sequence.
+       Fixed overlay (not an in-flow 100vh block) so mobile chrome doesn't
+       push it into a scroll, and so Vue can mount into `#app` underneath
+       while the overlay is still visible.
+       25vh top padding anchors the logo to the upper third so phone
+       notches / status bars don't visually push it low. */
     .jn-loading {
-      min-height: 100vh;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -98,6 +101,33 @@
       gap: 16px;
       padding: 25vh 24px 24px;
       text-align: center;
+      background: #ffffff;
+    }
+
+    html.dark .jn-loading {
+      background: #0a0a0a;
+    }
+
+    /* Hand-off, driven from App.vue:
+         stage-1 — non-logo children fade out, logo stays put.
+         stage-2 — logo scales down to 0 and fades.
+         stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
+    .jn-loading > svg,
+    .jn-loading > div,
+    .jn-loading > .jn-spinner,
+    .jn-loading > p {
+      transition: opacity 180ms ease-out,
+                  transform 220ms cubic-bezier(0.55, 0, 0.7, 0);
+      transform-origin: center center;
+    }
+
+    .jn-loading.jn-loading-stage-1 > :not(svg) {
+      opacity: 0;
+    }
+
+    .jn-loading.jn-loading-stage-2 > svg {
+      opacity: 0;
+      transform: scale(0);
     }
 
     .jn-loading svg {
@@ -134,6 +164,24 @@
         transform: rotate(360deg);
       }
     }
+
+    /* `#app` starts hidden + shrunk; App.vue flips `.jn-app-enter` to
+       hand off from the collapsing logo. Gated on `html[data-booting]` so
+       a missing inline script doesn't strand the user on a blank screen. */
+    html[data-booting] #app {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+
+    #app {
+      transform-origin: center center;
+      transition: opacity 320ms ease-out, transform 320ms ease-out;
+    }
+
+    #app.jn-app-enter {
+      opacity: 1;
+      transform: none;
+    }
   </style>
 
   <!-- Pre-Vue runtime:
@@ -154,9 +202,8 @@
 </head>
 
 <body>
-  <!-- Pre-Vue boot screen. App.vue hides this element in its setup() via
-      `document.getElementById('jn-loading').style.display = 'none'`, so the ID
-      name here is a load-bearing contract — keep them in sync. -->
+  <!-- Pre-Vue boot screen. App.vue drives the hand-off via `#jn-loading` —
+       the id is a load-bearing contract, keep it in sync. -->
   <div id="jn-loading" class="jn-loading" role="status" aria-live="polite">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 511 512.35" aria-hidden="true"
       shape-rendering="geometricPrecision" fill-rule="evenodd" clip-rule="evenodd">
