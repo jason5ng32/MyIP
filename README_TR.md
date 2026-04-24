@@ -131,6 +131,9 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 | `SECURITY_RATE_LIMIT` | Hayır | `"0"` | Bir IP'nin backend sunucusuna 60 dakikada yapabileceği istek sayısını kontrol eder (sınır yok için 0) |
 | `SECURITY_DELAY_AFTER` | Hayır | `"0"` | 20 dakikada bir IP'den gelen ilk X isteğin hız sınırına tabi olmadığını kontrol eder; X'ten sonra gecikme artar |
 | `SECURITY_BLACKLIST_LOG_FILE_PATH` | Hayır | `"logs/blacklist-ip.log"` | Yol ayarı. SECURITY_RATE_LIMIT etkinleştirildiğinde limit tetikleyen IP'leri kaydeder |
+| `LOG_LEVEL` | Hayır | `"info"` | Minimum log seviyesi (`debug` / `info` / `warn` / `error`). Daha düşük seviyedeki mesajlar bastırılır. |
+| `LOG_FORMAT` | Hayır | pretty | `"json"` olarak ayarlandığında satır başına bir JSON olayı çıkarır (log toplayıcılar / jq için). Diğer değerler (veya ayarlanmamışsa) dev ortamında ve pm2 log tail sırasında kullanılan renkli güzel biçimli çıktıyı korur. |
+| `LOG_HTTP` | Hayır | `"false"` | `"true"` yapıldığında `/api/*` üzerinde istek başı HTTP loglamasını etkinleştirir (metod, URL, durum, yanıt süresi). pm2 loglarını küçük tutmak için varsayılan olarak kapalıdır. Bu bayrak kapalı olsa bile handler düzeyindeki 4xx/5xx hataları her zaman loglanır. |
 | `ALLOWED_DOMAINS` | Hayır | `""` | Erişime izin verilen alan adları, virgülle ayrılmış; backend API kötüye kullanımını önlemek için kullanılır |
 | `GOOGLE_MAP_API_KEY` | Hayır | `""` | IP'nin konumunu haritada göstermek için Google Maps API Anahtarı |
 | `IPCHECKING_API_ENDPOINT` | Hayır | `""` | IPCheck.ing veritabanı API uç noktası, doğru IP konum bilgisi almak için |

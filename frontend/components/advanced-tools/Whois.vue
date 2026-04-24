@@ -1,16 +1,17 @@
 <template>
     <div class="whois-section my-4 space-y-4">
         <!-- Top note -->
-        <p class="text-sm text-muted-foreground">{{ t('whois.Note') }}</p>
+        <p class="text-sm text-muted-foreground leading-relaxed">{{ t('whois.Note') }}</p>
 
         <!-- Input area -->
         <div class="space-y-2">
-            <label for="queryURLorIP" class="text-sm font-medium block">{{ t('whois.Note2') }}</label>
+            <Label for="queryURLorIP">{{ t('whois.Note2') }}</Label>
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore
+                <Input type="text" id="queryURLorIP" name="queryURLorIP" data-1p-ignore data-lpignore="true"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="whoisCheckStatus === 'running'"
                     :placeholder="t('whois.Placeholder')"
-                    v-model="queryURLorIP" @keyup.enter="onSubmit" />
+                    v-model="queryURLorIP" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
                     :disabled="whoisCheckStatus === 'running' || !queryURLorIP"
                     @click="onSubmit" class="cursor-pointer">
@@ -66,12 +67,13 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP, isValidDomain } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Info, Search } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 
@@ -89,10 +91,9 @@ const formatURL = (domain) => {
     if (!domain.match(/^https?:\/\//)) domain = 'http://' + domain;
     try {
         const url = new URL(domain);
-        const hostname = url.hostname;
-        const parts = hostname.split('.');
+        const parts = url.hostname.split('.');
         const mainDomain = parts.slice(-2).join('.');
-        if (mainDomain.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return mainDomain;
+        if (isValidDomain(mainDomain)) return mainDomain;
     } catch { /* noop */ }
     return false;
 };

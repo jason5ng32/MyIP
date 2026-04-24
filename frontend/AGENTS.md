@@ -25,8 +25,10 @@ frontend/
 │                                   default-preferences / changelog)
 ├── utils/                       ← pure helpers
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   hero-ip-size / fetch-with-timeout / …)
+│                                   fetch-with-timeout / …)
 ├── composables/                 ← reusable composition logic
+│   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
+│   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
 │   ├── use-scroll-to.js
@@ -38,11 +40,12 @@ frontend/
     │                              / SpeedTest / Advanced / Footer / Nav / Achievements / User /
     │                              Additional)
     ├── ip-infos/                ← IP-card subcomponents (IPCard / IpDetailPanel / ASNInfo / DataPairBar)
-    ├── advanced-tools/          ← 10 tool subpages opened inside the bottom Drawer
+    ├── advanced-tools/          ← 11 tool subpages opened inside the bottom Drawer
     │                              (MtrTest / GlobalLatencyTest / RuleTest / DnsResolver /
-    │                               CensorshipCheck / Whois / MacChecker / BrowserInfo /
-    │                               InvisibilityTest / SecurityChecklist + Empty)
-    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast)
+    │                               EnhancedDnsLeakTest / CensorshipCheck / Whois /
+    │                               MacChecker / BrowserInfo / InvisibilityTest /
+    │                               SecurityChecklist + Empty)
+    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText)
     ├── svgicons/                ← a few inline SVGs
     └── ui/                      ← shadcn-vue copy-in primitives (see "UI system" below)
 ```
@@ -65,9 +68,9 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 22 primitives copied in:
+Located at `frontend/components/ui/`. 23 primitives copied in:
 
-`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `tabs` · `textarea` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
 Two are project-specific, not in stock shadcn-vue:
 
@@ -99,6 +102,8 @@ Badge adds `success` to the defaults. Badge hover is globally disabled — Badge
 
 All "business state → visual color" mapping goes through `frontend/composables/use-status-tone.js`. It exposes four tones: `wait` / `ok-fast` / `ok-slow` / `fail`.
 
+For the common "status string → tone" shape (WebRTC / DnsLeak / RuleTest / Connectivity style), use the `ipFieldTone(value, { waitLabels, errorLabels, isSuccess?, time?, fastMs? })` helper from the same module rather than hand-rolling the switch locally. Default `isSuccess` treats any string containing `.` or `:` as a successful IP-shaped payload; pass a custom predicate when the success signal is elsewhere (Connectivity uses the localized "Available" label).
+
 Rule: any new module that surfaces a status reuses these tones. Do not hand-write `switch` statements that map states to hex codes or Tailwind classes.
 
 ### Canonical patterns
@@ -116,7 +121,9 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
 
 ```vue
 <div class="flex items-center gap-2">
-  <Input v-model="q" :placeholder="t('…')" @keyup.enter="run" />
+  <Input v-model="q" :placeholder="t('…')" @keyup.enter="run"
+    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+    data-1p-ignore data-lpignore="true" />
   <Button variant="action" :disabled="!isValidQ(q) || running"
     @click="run" class="cursor-pointer">
     <Spinner v-if="running" />
@@ -126,6 +133,8 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
   </Button>
 </div>
 ```
+
+Every free-form Input that takes a URL / IP / MAC / domain / custom identifier carries the same six attributes shown above: `autocomplete="off"`, `autocorrect="off"`, `autocapitalize="off"`, `spellcheck="false"`, `data-1p-ignore`, `data-lpignore="true"`. iOS Safari's QuickType bar uses placeholder + nearby label text to offer address / email / password AutoFill — without these attributes it will push iCloud-address or password suggestions onto a plain IP/URL input. Keep placeholder copy free of "address / 地址 / adresse / adresi" style words where possible — iOS heuristics trigger on the word itself even with `autocomplete="off"`.
 
 The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGroupAddon` / `InputGroupButton` / `InputGroupText` / `InputGroupTextarea` sub-parts) is available if you need a genuinely merged border / ring around a composite input — but the current convention above is what every consumer uses today.
 
@@ -142,6 +151,19 @@ The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGr
 ```vue
 <Icon :icon="'circle-flags:' + code.toLowerCase()" class="size-4" />
 ```
+
+**Fit-to-width IP text** — any span that renders an IP, MAC, or similar variable-length token goes through `<FitText>`. Pass `HERO_TIERS` for the big hero rows (IPCard / QueryIP) and `INLINE_TIERS` for the compact test-card rows (WebRTC / DnsLeak / RuleTest). Do not write a length-threshold helper per component — that pattern existed historically (`heroIpSizeClass`, `fitOneLineClass`) and was replaced because it couldn't account for actual card width.
+
+```vue
+<FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
+  class="font-mono font-semibold min-w-0">
+  <template #prefix>
+    <Monitor class="inline size-5 align-middle text-muted-foreground mr-2" />
+  </template>
+</FitText>
+```
+
+`:max-lines="2"` is opt-in — hero rows use it so a long IPv6 wraps rather than shrinking to 12 px. The `#prefix` slot keeps a decorative icon riding the first line (not the center of a 2-line block). Action buttons like Copy stay as flex siblings of `<FitText>` so the ellipsis clips only the IP itself, not the button.
 
 **Tables vs lists** — two or three columns with independent header semantics → `<table>` with `thead text-xs uppercase tracking-wide text-muted-foreground` + `tbody divide-y` + row `hover:bg-muted/50`. Mobile-friendly rows or asymmetric content with no header meaning → `<ul class="rounded-lg border bg-card divide-y">` + `<li>`.
 

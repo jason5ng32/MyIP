@@ -18,7 +18,7 @@
                 @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
                 @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
                 <CardContent class="p-4">
-                    <h3 class="text-xl md:text-2xl font-medium text-primary mb-2 pr-10">
+                    <h3 class="text-xl font-medium text-primary mb-2 pr-10">
                         <PanelBottomOpen
                             class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
                         {{ t(card.titleKey) }}
@@ -65,14 +65,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
-import { CircleArrowOutUpRight, Maximize, Minimize, PanelBottomOpen } from 'lucide-vue-next';
+import { Maximize, Minimize, PanelBottomOpen } from 'lucide-vue-next';
 
 const { t } = useI18n();
 
@@ -93,13 +93,23 @@ const cards = reactive([
     { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
     { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', enabled: true },
     { path: '/securitychecklist', icon: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', enabled: true },
-    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false }
+    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false },
+    { path: '/enhanceddnsleaktest', icon: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', enabled: false },
 ]);
 
 const enabledCards = computed(() => cards.filter(c => c.enabled));
 
 const isFullScreen = ref(false);
-const openedCard = computed(() => store.currentPath.id);
+// Look the card up by path rather than by store.currentPath.id — the id is
+// a route-index (minus 1), which doesn't match our cards[] ordering once
+// routes[] and cards[] drift out of sync. Stale ids caused the Drawer
+// header to sometimes show a neighboring tool's title. Path is the only
+// stable key between the two lists.
+const openedCard = computed(() => {
+    const p = store.currentPath.path;
+    if (!p || p === '/') return -1;
+    return cards.findIndex(c => c.path === p);
+});
 
 // Drawer toggle and store.openSheet bidirectional binding
 const isOpen = computed(() => store.openSheet === 'tools');
@@ -134,13 +144,27 @@ const resetNavigatorURL = () => {
     router.push('/');
 };
 
+// Delayed enable for the Invisibility test card — waits for configs to
+// arrive. Track the timer id so we can cancel it if the component unmounts
+// before the callback fires.
+let invisibilityEnableTimer = null;
+
 onMounted(() => {
     store.setMountingStatus('advancedtools', true);
-    setTimeout(() => {
+    invisibilityEnableTimer = setTimeout(() => {
+        invisibilityEnableTimer = null;
         if (configs.value.originalSite) {
             cards.find(x => x.path === '/invisibilitytest').enabled = true;
+            cards.find(x => x.path === '/enhanceddnsleaktest').enabled = true;
         }
     }, 1500);
+});
+
+onBeforeUnmount(() => {
+    if (invisibilityEnableTimer !== null) {
+        clearTimeout(invisibilityEnableTimer);
+        invisibilityEnableTimer = null;
+    }
 });
 
 defineExpose({

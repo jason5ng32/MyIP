@@ -10,11 +10,11 @@
           <span class="min-w-0">{{ t('dnsleaktest.Title') }}</span>
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
-        <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
-          aria-label="Refresh DNS Leak Test">
-          <component :is="isStarted ? RotateCw : ChevronRight" />
-        </Button>
-      </JnTooltip>
+          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
+            aria-label="Refresh DNS Leak Test">
+            <component :is="isStarted ? RotateCw : Play" />
+          </Button>
+        </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
         <p>{{ t('dnsleaktest.Note') }}</p>
@@ -37,21 +37,15 @@
             </div>
           </div>
 
-          <!-- Endpoint status row: long IPv6 downgraded by font size to keep single line display -->
+          <!-- Endpoint status row -->
           <div class="flex items-center gap-1.5 mb-3 min-w-0 min-h-6">
             <span class="relative flex shrink-0">
               <span v-if="toneOf(leak) === 'wait'"
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
-            <span class="whitespace-nowrap truncate min-w-0" :class="fitOneLineClass(leak.ip)" :title="leak.ip">
-              <template v-if="isResolved(leak)">
-                <span class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{ leak.ip
-                  }}</span>
-              </template>
-              <span v-else class="font-mono whitespace-nowrap truncate min-w-0" :class="textClass(toneOf(leak))">{{
-                leak.ip }}</span>
-            </span>
+            <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip" class="font-mono min-w-0"
+              :class="textClass(toneOf(leak))" />
           </div>
 
           <!-- ISP + Country sub-block -->
@@ -84,54 +78,85 @@
         </CardContent>
       </Card>
     </div>
+
+    <!-- Enhanced DNS leak test banner — surfaces the deeper tool once the
+         homepage test has resolved (success or timeout). fade-slide
+         transition mirrors CensorshipCheck's conclusion banner. -->
+    <Transition name="fade-slide">
+      <div v-if="showEnhancedBanner"
+        class="mt-3 flex flex-col md:flex-row items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
+
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
+            <Sparkles class="size-4 text-info shrink-0" />
+            {{ t('dnsleaktest.EnhancedBanner.Title') }}
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed m-0">
+            {{ t('dnsleaktest.EnhancedBanner.Note') }}
+          </p>
+        </div>
+        <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
+          <Button variant="action" size="sm" @click="openEnhancedTest" class="shrink-0 cursor-pointer">
+            <span>{{ t('dnsleaktest.EnhancedBanner.CTA') }}</span>
+            <ArrowRight class="size-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+    </Transition>
   </section>
 </template>
 
 
 <script setup>
 import { ref, computed, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import countryLookup from 'country-code-lookup';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
-import { useStatusTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, ChevronRight, HeartPulse, MapPin, RotateCw } from 'lucide-vue-next';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
+import FitText from '@/components/widgets/FitText.vue';
+import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 
 const { t } = useI18n();
 const store = useMainStore();
+const router = useRouter();
 const lang = computed(() => store.lang);
 const isStarted = ref(false);
+
+// Sticky flag for the Enhanced DNS Leak Test banner.
+const hasEverSettled = ref(false);
+
+// Also gated on configs.originalSite to match the Advanced.vue card gate.
+const showEnhancedBanner = computed(() =>
+  hasEverSettled.value && store.configs?.originalSite === true
+);
+
+const openEnhancedTest = () => {
+  trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
+  router.push('/enhanceddnsleaktest');
+};
 
 const { dotClass, textClass } = useStatusTone();
 
 // Business status → 4 tone levels
-const toneOf = (leak) => {
-  if (leak.ip === t('dnsleaktest.StatusWait')) return 'wait';
-  if (leak.ip === t('dnsleaktest.StatusError')) return 'fail';
-  if (leak.ip.includes('.') || leak.ip.includes(':')) return 'ok-fast';
-  return 'wait';
-};
+const toneOf = (leak) => ipFieldTone(leak.ip, {
+  waitLabels: t('dnsleaktest.StatusWait'),
+  errorLabels: t('dnsleaktest.StatusError'),
+});
 
 
 // Status
 const isFieldPending = (value) => {
   return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
-};
-
-const isResolved = (leak) => toneOf(leak) === 'ok-fast';
-
-// Ensure full line display, without line breaks due to IPv6
-const fitOneLineClass = (text) => {
-  const len = typeof text === 'string' ? text.length : 0;
-  if (len <= 15) return 'text-base';
-  if (len <= 26) return 'text-sm';
-  return 'text-sm md:text-xs';
 };
 
 const createDefaultCard = () => ({
@@ -170,7 +195,7 @@ const fetchLeakTestIpApiCom = (index) => {
     const urlString = generate32DigitString();
     const url = `https://${urlString}.edns.ip-api.com/json`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
@@ -205,7 +230,7 @@ const fetchLeakTestSfSharkCom = (index, key) => {
     const urlString = generate14DigitString();
     const url = `https://${urlString}.ipv4.surfsharkdns.com`;
 
-    fetch(url)
+    fetchWithTimeout(url)
       .then((response) => {
         if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
@@ -268,6 +293,8 @@ const checkAllDNSLeakTest = async (isRefresh) => {
 
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
     store.setLoadingStatus('dnsleaktest', true);
+    // Local sticky flag for the Enhanced DNS Leak Test banner
+    hasEverSettled.value = true;
   });
 };
 
@@ -280,3 +307,23 @@ defineExpose({
   leakTest,
 });
 </script>
+
+<style scoped>
+/* fade-slide — same shape as CensorshipCheck.vue's conclusion banner */
+.fade-slide-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.fade-slide-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.fade-slide-enter-from {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+}
+</style>

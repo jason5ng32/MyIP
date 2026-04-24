@@ -1,6 +1,15 @@
 // api/dnsresolver.js
 import { Resolver } from 'dns';
 import { promisify } from 'util';
+import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
+
+// Bound each upstream lookup so the slowest server doesn't pin the
+// overall response. 3s for UDP DNS (`Resolver` rejects on first
+// timeout because `tries: 1`); 5s for DoH via fetchUpstream's per-call
+// override.
+const DNS_TIMEOUT_MS = 3000;
+const DOH_TIMEOUT_MS = 5000;
 
 // Normal DNS server list
 const dnsServers = {
@@ -26,7 +35,7 @@ const dohServers = {
 };
 
 const resolveDns = async (hostname, type, name, server) => {
-    const resolver = new Resolver();
+    const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
     const resolve4Async = promisify(resolver.resolve4.bind(resolver));
     const resolve6Async = promisify(resolver.resolve6.bind(resolver));
@@ -71,14 +80,18 @@ const resolveDns = async (hostname, type, name, server) => {
 
         return { [name]: addresses };
     } catch (error) {
-        console.log(error.message);
+        // Per-server timeouts are expected (some DNS hosts are unreachable
+        // from a given network); demote to debug so they don't spam the
+        // terminal during normal operation.
+        logger.debug({ err: error, server: name }, 'DNS resolver: lookup failed, returning N/A');
         return { [name]: `N/A` };
     }
 };
 
 const resolveDoh = async (hostname, type, name, url) => {
     try {
-        const response = await fetch(`${url}name=${hostname}&type=${type}`, {
+        const response = await fetchUpstream(`${url}name=${hostname}&type=${type}`, {
+            timeoutMs: DOH_TIMEOUT_MS,
             headers: { 'Accept': 'application/dns-json' }
         });
         const data = await response.json();
@@ -88,7 +101,7 @@ const resolveDoh = async (hostname, type, name, url) => {
         }
         return { [name]: addresses };
     } catch (error) {
-        console.log(error.message);
+        logger.debug({ err: error, server: name }, 'DoH resolver: lookup failed, returning N/A');
         return { [name]: `N/A` };
     }
 };

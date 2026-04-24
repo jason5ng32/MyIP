@@ -1,4 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 export default async (req, res) => {
     // IP presence + validity guaranteed by requireValidIP middleware.
@@ -29,7 +30,7 @@ export default async (req, res) => {
         const data = await apiResponse.json();
         res.json(data);
     } catch (error) {
-        console.error("Error during API request:", error);
+        logger.error({ err: error, ip: ipAddress, lang }, 'ipcheck-ing handler failed');
         res.status(500).json({ error: error.message });
     }
 }

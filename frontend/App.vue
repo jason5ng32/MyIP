@@ -84,9 +84,29 @@ const connectivityRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
 
-// Hide loading mask on first screen
+// Pre-Vue boot overlay → real app hand-off. CSS lives in index.html.
+// Stages: text fade → logo shrink → remove overlay + reveal #app.
 const loadingElement = document.getElementById('jn-loading');
-if (loadingElement) loadingElement.style.display = 'none';
+const appElement = document.getElementById('app');
+
+const revealApp = () => {
+    document.documentElement.removeAttribute('data-booting');
+    if (appElement) {
+        requestAnimationFrame(() => appElement.classList.add('jn-app-enter'));
+    }
+};
+
+if (loadingElement) {
+    requestAnimationFrame(() => loadingElement.classList.add('jn-loading-stage-1'));
+    setTimeout(() => loadingElement.classList.add('jn-loading-stage-2'), 160);
+    setTimeout(() => {
+        loadingElement.remove();
+        revealApp();
+    }, 380);
+} else {
+    // Overlay already gone (e.g. HMR remount) — still reveal the app.
+    revealApp();
+}
 
 // Info mask
 const { infoMaskLevel, isInfosLoaded, showMaskButton, toggleInfoMask } = useInfoMask({

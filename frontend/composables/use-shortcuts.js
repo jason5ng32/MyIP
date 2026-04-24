@@ -103,7 +103,7 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             action: (num) => {
                 if (num > userPreferences.value.ipCardsToShow) return;
                 const card = IPCheckRef.value.ipDataCards[num - 1];
-                scrollToElement('IPInfo-' + num, 300);
+                scrollToElement('IPInfoCard-' + num, 70);
                 IPCheckRef.value.refreshCard(card, num - 1);
                 trackEvent('ShortCut', 'ShortCut', 'IPCheck');
             },
@@ -210,6 +210,14 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
             keys: 'i',
             action: () => goToAdvancedTool('/invisibilitytest', 'InvisibilityTest'),
             description: t('shortcutKeys.InvisibilityTest'),
+        });
+        // Uppercase D mirrors lowercase `d` (refresh homepage DNS leak test) —
+        // `D` opens the in-depth version of the same feature. Gated on
+        // originalSite since the advanced card itself is gated the same way.
+        config.push({
+            keys: 'D',
+            action: () => goToAdvancedTool('/enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
+            description: t('shortcutKeys.EnhancedDnsLeakTest'),
         });
     }
 

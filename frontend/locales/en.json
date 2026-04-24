@@ -31,8 +31,9 @@
       "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
       "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
       "Benefit2": "You can use the invisibility test.",
-      "Benefit3": "You can view your own achievement badges",
-      "Benefit4": "Reduces access restrictions on some features.",
+      "Benefit3": "You can use the in-depth DNS leak test.",
+      "Benefit4": "You can view your own achievement badges",
+      "Benefit5": "Reduces access restrictions on some features.",
       "FootNote": "More benefits are being developed..."
     },
     "Achievements": {
@@ -375,6 +376,7 @@
     "PingTestNote": "Global Ping value test",
     "MTRTestNote": "Global MTR route test",
     "DNSResolverNote": "Real-time multi-channel DNS resolution",
+    "EnhancedDnsLeakTest": "Captures every recursive resolver, with ECS and DNSSEC analysis",
     "RuleTestNote": "Check the rule settings of proxy software",
     "CensorshipCheck": "Check if a website is blocked in some countries",
     "Whois": "Search for domain/IP registration information",
@@ -418,6 +420,58 @@
     "invalidURL": "Invalid domain name or IP",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
+  },
+  "enhanceddnsleaktest": {
+    "Title": "In-depth DNS Leak Test",
+    "Note": "The homepage DNS leak test already gave you a rough idea of whether you're leaking and where your DNS traffic exits. This deeper test adds more dimensions: it captures more of your resolver exit IPs, checks whether any of them forwards a prefix of your real IP upstream via ECS, and checks whether they support DNSSEC — so you come away with a more complete picture of your DNS chain's security posture.",
+    "Note2": "Click Run to start. The test usually completes within a few seconds. We fire several DNS probes in the background and let our authoritative DNS server capture the recursive resolver exit IPs you're actually using — a typical run captures 20–40 records. If no resolvers show up at all, your browser's DNS cache probably absorbed the requests; just wait a moment and try again.",
+    "Note3": "Since this is an in-depth test, you'll run into some specialized concepts on this page (ECS, DNSSEC, etc.). No worries — after running the test, check the \"Field reference\" at the bottom of the page for a short explanation of each column.",
+    "Run": "Run test",
+    "RunAgain": "Run again",
+    "RunningProbes": "Sending DNS probes...",
+    "PollingResult": "Collecting results...",
+    "FetchError": "Failed to fetch DNS leak test results. Please try again later.",
+    "Empty": "No DNS resolvers were captured for this session. This usually means the browser DNS cache absorbed the request — try again in a moment.",
+    "TableTitle": "Captured DNS queries",
+    "DedupeToggle": "Hide duplicates",
+    "Flow": {
+      "Probing": "Sending probe {current} / {total}...",
+      "Waiting": "Waiting for recursive DNS to reach our name server (usually 1–3 s).",
+      "Fetching": "Fetching captured DNS queries...",
+      "Done": "Test complete."
+    },
+    "DnssecChip": {
+      "Signed": "DNSSEC signatures requested",
+      "Unsigned": "DNSSEC signatures not requested",
+      "Validated": "DNSSEC validation normal",
+      "CdSet": "DNSSEC validation disabled"
+    },
+    "Summary": {
+      "ResolverCount": "Unique resolvers",
+      "RawCount": "Raw captures",
+      "DnssecPosture": "DNSSEC posture",
+      "DnssecGood": "DNSSEC-aware — every resolver requested signatures and none of them skipped validation.",
+      "DnssecNoDo": "Weak — at least one resolver did not request DNSSEC signatures.",
+      "DnssecCdSet": "Suspicious — at least one resolver asked to skip DNSSEC validation.",
+      "DnssecNone": "No signal yet."
+    },
+    "Fields": {
+      "ResolverIP": "Resolver IP",
+      "Location": "Location",
+      "ASN": "Org / ASN",
+      "QueryType": "Record type",
+      "Transport": "Transport protocol",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "Field reference",
+      "ResolverIP": "The egress IP of the recursive DNS resolver that actually reached our authoritative name server. If you use a VPN, compare its ASN with the ASN of your VPN exit — a mismatch means your DNS queries are bypassing the VPN tunnel (i.e., leaking).",
+      "QueryType": "The record type the resolver asked for on behalf of your browser (A, AAAA, HTTPS, etc.). Browsers typically fire A and AAAA queries together.",
+      "Transport": "DNS defaults to UDP. TCP usually means the response was large — and responses tend to be large because they carry DNSSEC records.",
+      "ECS": "EDNS Client Subnet — some recursive resolvers attach a prefix of your real IP (typically IPv4 /24 or IPv6 /48) when forwarding queries to upstream authoritative servers. That means a segment of your IP becomes known to servers along the DNS chain, which can be used for CDN geo-routing but also chips away at your anonymity.",
+      "DO": "DNSSEC OK — a check means the recursive resolver actively requested DNSSEC signatures on this query, so the chain carries cryptographic verification; a cross means the query went out without signatures, so a tampered response on the wire could go undetected.",
+      "CD": "Checking Disabled — a check means the caller did not ask to skip DNSSEC validation, so the recursive resolver performs normal signature verification; a cross means the caller explicitly asked to skip validation and will accept responses even when signatures don't match. Normally this should be a check; if you see a cross, it's usually because of a debugging tool or a client's security-downgrade behavior, and in rare cases a signal of man-in-the-middle tampering on the path."
+    }
   },
   "dnsresolver": {
     "Title": "DNS Resolution",
@@ -470,6 +524,7 @@
     "City": "City",
     "ISP": "ISP",
     "ASN": "ASN",
+    "Coordinates": "Coordinates",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
     "SelectSource": "Select IP Geolocation Source",
@@ -516,14 +571,29 @@
   "connectivity": {
     "id": "connectivity",
     "Title": "Network Connectivity",
-    "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality.",
+    "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
     "StatusWait": "Awaiting Test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
     "StatusTimeout": "Timeout or Unavailable",
     "checking": "Checking...",
     "minTestTime": "Min Test Time: ",
-    "RefreshThisTest": "Refresh This Test"
+    "RefreshThisTest": "Refresh This Test",
+    "addCustom": {
+      "AddCard": "Add Test",
+      "Title": "Add a custom test",
+      "Hint": "We test by loading the site's favicon over HTTPS. Some sites may not be reachable this way. Custom tests are saved locally in your browser.",
+      "NameLabel": "Name",
+      "NamePlaceholder": "e.g. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "e.g. wikipedia.org",
+      "Add": "Add",
+      "Remove": "Remove test",
+      "NameRequired": "Please enter a name.",
+      "UrlRequired": "Please enter a URL.",
+      "InvalidUrl": "That doesn't look like a valid URL.",
+      "LimitReached": "You've reached the 10 custom tests limit."
+    }
   },
   "webrtc": {
     "id": "webrtc",
@@ -547,7 +617,12 @@
     "Note2": "The method to test for DNS leaks involves accessing a newly generated domain name to detect which regional DNS exit you are resolving through. If the endpoint region returned matches your local service provider's region, there is a risk of DNS leakage. In this case, you may need to modify your VPN/proxy settings.",
     "EndpointCountry": "Endpoint Region",
     "StatusWait": "Awaiting Test",
-    "StatusError": "Test Error"
+    "StatusError": "Test Error",
+    "EnhancedBanner": {
+      "Title": "Want to dig deeper?",
+      "Note": "Want to see every recursive resolver you're actually using, their ASN, whether any of them forwards a prefix of your real IP upstream via ECS, and whether DNSSEC validation is in play, open the \"In-depth DNS Leak Test\" below.",
+      "CTA": "Open the in-depth test"
+    }
   },
   "speedtest": {
     "id": "speedtest",
@@ -604,7 +679,7 @@
   "ipcheck": {
     "id": "ipcheck",
     "Title": "IP Check",
-    "Placeholder": "Please enter an IP address",
+    "Placeholder": "e.g. 1.1.1.1",
     "Error": "Please enter a valid IPv4 or IPv6 address."
   },
   "alert": {
@@ -652,6 +727,7 @@
     "About": "Open About panel",
     "Whois": "Open Whois Search panel",
     "InvisibilityTest": "Open Invisibility Test panel",
+    "EnhancedDnsLeakTest": "Open In-depth DNS Leak Test panel",
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",

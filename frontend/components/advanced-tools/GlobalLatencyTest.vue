@@ -43,7 +43,7 @@
                         <thead>
                             <tr class="border-b">
                                 <th scope="col" v-for="header in headers" :key="header.key"
-                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide"
+                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide min-w-20 text-nowrap"
                                     :class="header.align === 'right' ? 'text-right' : 'text-left'">
                                     {{ t('pingtest.' + header.key) }}
                                 </th>
@@ -102,6 +102,7 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
 import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -110,10 +111,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Info,Play } from 'lucide-vue-next';
 
-// svgmap CSS：静态 side-effect import。原本在 drawMap() 里 await import('svgmap/style.min')
-// 动态引入 —— dev 下能跑，build 下 Rollup 把 CSS chunk 当 JS 模块去解 export 导致
-// 'svg_map_min_exports is not defined' 运行时错误。
-// 这个组件本身走 router 懒加载，CSS 会跟着组件 chunk 一起按需加载，不影响首屏。
 import 'svgmap/style.min';
 
 const { t } = useI18n();
@@ -128,7 +125,11 @@ const allIPs = computed(() => {
 
 const selectedIP = ref('');
 const pingResults = ref([]);
-const pingCheckStatus = ref('idle');
+// status: 'idle' | 'running' | 'finished' | 'error' — driven by the composable
+const { status: pingCheckStatus, start: runMeasurement } = useGlobalpingMeasurement({
+    pollInterval: 1000,
+    maxRetries: 4,
+});
 
 // Header configuration: Region left aligned, all numbers right aligned (tabular-nums aligns decimal points more neatly)
 const headers = [
@@ -153,61 +154,24 @@ const startPingCheck = () => {
     trackEvent('Section', 'StartClick', 'GlobalLatency');
     pingResults.value = [];
     cleanMap();
-    let tryCount = 0;
 
-    const sendPingRequest = async () => {
-        pingCheckStatus.value = 'running';
-        try {
-            const response = await fetch('https://api.globalping.io/v1/measurements', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    limit: 16,
-                    locations: [
-                        { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-                        { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-                        { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-                        { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
-                    ],
-                    target: selectedIP.value,
-                    type: 'ping',
-                    measurementOptions: { packets: 8 },
-                }),
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Error sending ping request:', error);
-        }
-    };
-
-    const fetchpingResults = async (id) => {
-        try {
-            const response = await fetch(`https://api.globalping.io/v1/measurements/${id}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            const data = await response.json();
+    runMeasurement({
+        limit: 16,
+        locations: [
+            { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
+            { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
+            { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
+            { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
+        ],
+        target: selectedIP.value,
+        type: 'ping',
+        measurementOptions: { packets: 8 },
+    }, {
+        onResults: (data) => {
             processpingResults(data);
-
-            if (data.status === 'in-progress' && tryCount < 4) {
-                setTimeout(() => fetchpingResults(id), 1000);
-                tryCount++;
-            } else {
-                if (pingResults.value.length === 0) {
-                    pingCheckStatus.value = 'error';
-                } else {
-                    pingCheckStatus.value = 'finished';
-                    drawMap();
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching ping results:', error);
-        }
-    };
-
-    sendPingRequest().then(data => {
-        if (data && data.id) setTimeout(() => fetchpingResults(data.id), 1000);
+            return pingResults.value.length > 0;
+        },
+        onFinish: () => drawMap(),
     });
 };
 

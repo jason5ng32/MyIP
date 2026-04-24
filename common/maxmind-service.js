@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import maxmind from 'maxmind';
+import logger from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -61,11 +62,11 @@ export async function reloadMaxMindDatabases(reason = 'manual') {
         .then(({ city, asn }) => {
             cityLookup = city;
             asnLookup = asn;
-            console.log(`MaxMind databases loaded (${reason})`);
+            logger.info(`📦 MaxMind databases loaded (${reason})`);
             return true;
         })
         .catch(error => {
-            console.error(`Failed to load MaxMind databases (${reason}):`, error.message);
+            logger.error({ err: error, reason }, 'Failed to load MaxMind databases');
             throw error;
         })
         .finally(() => {

@@ -37,3 +37,4 @@ common/maxmind-db/*.bak
 common/maxmind-db/*.next
 common/maxmind-db/*.mmdb
 .learnings/
+docs/

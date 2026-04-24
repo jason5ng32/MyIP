@@ -5,12 +5,13 @@
 
         <!-- Input area -->
         <div class="space-y-2">
-            <label for="queryURL" class="text-sm font-medium block">{{ t('censorshipcheck.Note2') }}</label>
+                <Label for="queryURL">{{ t('censorshipcheck.Note2') }}</Label>
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="censorshipCheckStatus === 'running'"
                     :placeholder="t('censorshipcheck.Placeholder')"
-                    v-model="queryURL" @keyup.enter="onSubmit" />
+                    v-model="queryURL" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
                     :disabled="censorshipCheckStatus === 'running' || !queryURL"
                     @click="onSubmit">
@@ -68,6 +69,8 @@ import { ref, computed, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
+import { isValidDomain } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -75,6 +78,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 
@@ -84,7 +88,11 @@ const isSignedIn = computed(() => store.isSignedIn);
 
 const highRiskCountries = ['CN', 'RU', 'TR', 'SA'];
 const censorshipResults = ref([]);
-const censorshipCheckStatus = ref('idle');
+// status: 'idle' | 'running' | 'finished' | 'error' — driven by the composable
+const { status: censorshipCheckStatus, start: runMeasurement } = useGlobalpingMeasurement({
+    pollInterval: 3000,
+    maxRetries: 5,
+});
 const isBlocked = ref(false);
 const isDown = ref(false);
 const blockedCountries = ref([]);
@@ -158,8 +166,7 @@ const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
-        const hostname = url.hostname;
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+        if (isValidDomain(url.hostname)) return url.hostname;
     } catch { /* noop */ }
     errorMsg.value = t('censorshipcheck.invalidURL');
     return null;
@@ -177,74 +184,37 @@ const onSubmit = () => {
     if (hostname) startHttpCheck(hostname);
 };
 
-const startHttpCheck = () => {
-    trackEvent('Section', 'StartClick', 'CensorshipCheck');
-    const hostname = validateInput(queryURL.value);
-    if (!hostname) return;
-    let tryCount = 0;
-
-    const sendHttpRequest = async () => {
-        censorshipCheckStatus.value = 'running';
-        try {
-            const response = await fetch('https://api.globalping.io/v1/measurements', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    locations: [
-                        { country: 'CN', limit: 2 }, { country: 'RU', limit: 2 },
-                        { country: 'TR', limit: 2 }, { country: 'SA', limit: 2 },
-                        { country: 'JP' }, { country: 'US' }, { country: 'CA' }, { country: 'IT' },
-                        { country: 'FI' }, { country: 'AU' }, { country: 'FR' }, { country: 'DE' },
-                    ],
-                    target: hostname,
-                    type: 'http',
-                    measurementOptions: {
-                        request: { host: hostname, path: '/', method: 'HEAD' },
-                        port: 443,
-                        protocol: 'HTTPS',
-                    },
-                }),
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error('Error sending HTTP request:', error);
-            censorshipCheckStatus.value = 'error';
-            errorMsg.value = t('censorshipcheck.invalidURL');
-        }
-    };
-
-    const fetchHttpResults = async (id) => {
-        try {
-            const response = await fetch(`https://api.globalping.io/v1/measurements/${id}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            const data = await response.json();
+const startHttpCheck = (hostname) => {
+    runMeasurement({
+        locations: [
+            { country: 'CN', limit: 2 }, { country: 'RU', limit: 2 },
+            { country: 'TR', limit: 2 }, { country: 'SA', limit: 2 },
+            { country: 'JP' }, { country: 'US' }, { country: 'CA' }, { country: 'IT' },
+            { country: 'FI' }, { country: 'AU' }, { country: 'FR' }, { country: 'DE' },
+        ],
+        target: hostname,
+        type: 'http',
+        measurementOptions: {
+            request: { host: hostname, path: '/', method: 'HEAD' },
+            port: 443,
+            protocol: 'HTTPS',
+        },
+    }, {
+        onResults: (data) => {
             processHttpResults(data);
-
-            if (data.status === 'in-progress' && tryCount < 5) {
-                setTimeout(() => fetchHttpResults(id), 3000);
-                tryCount++;
-            } else {
-                if (censorshipResults.value.length === 0) {
-                    censorshipCheckStatus.value = 'error';
-                    errorMsg.value = t('censorshipcheck.fetchError');
-                } else {
-                    correctResult();
-                    calResult(censorshipResults.value);
-                    censorshipCheckStatus.value = 'finished';
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching HTTP results:', error);
-            censorshipCheckStatus.value = 'error';
-            errorMsg.value = t('censorshipcheck.fetchError');
-        }
-    };
-
-    sendHttpRequest().then(data => {
-        if (data && data.id) setTimeout(() => fetchHttpResults(data.id), 3000);
+            return censorshipResults.value.length > 0;
+        },
+        onFinish: () => {
+            correctResult();
+            calResult(censorshipResults.value);
+        },
+        // POST error surfaces as 'invalidURL' (preserves pre-refactor copy);
+        // poll failure / empty result surface as 'fetchError'.
+        onError: (reason) => {
+            errorMsg.value = reason === 'create'
+                ? t('censorshipcheck.invalidURL')
+                : t('censorshipcheck.fetchError');
+        },
     });
 };
 

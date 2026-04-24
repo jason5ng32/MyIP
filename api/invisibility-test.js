@@ -1,15 +1,10 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 // If length is not 28 and is not a combination of letters and numbers, return false
 function isValidUserID(userID) {
-    if (typeof userID !== 'string') {
-        console.error("Invalid type for userID");
-        return false;
-    }
-    if (userID.length !== 28 || !/^[a-zA-Z0-9]+$/.test(userID)) {
-        console.error("Invalid userID format");
-        return false;
-    }
+    if (typeof userID !== 'string') return false;
+    if (userID.length !== 28 || !/^[a-zA-Z0-9]+$/.test(userID)) return false;
     return true;
 }
 
@@ -55,7 +50,7 @@ export default async (req, res) => {
         const data = await apiResponse.json();
         res.json(data);
     } catch (error) {
-        console.error("Error during API request:", error);
+        logger.error({ err: error }, 'invisibility-test upstream request failed');
         res.status(500).json({ error: error.message });
     }
 

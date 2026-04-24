@@ -22,19 +22,25 @@ api/
 │   ipcheck-ing.js, maxmind.js   ← IP geolocation source handlers (route per source)
 ├── invisibility-test.js         ← /api/invisibility — proxy to private IPCheck.ing endpoint
 ├── mac-checker.js               ← /api/macchecker — MAC vendor lookup
-├── get-whois.js                 ← /api/whois — whoiser wrapper
+├── get-whois.js                 ← /api/whois — whoiser primary + RDAP fallback for new gTLDs
 ├── cf-radar.js                  ← /api/cfradar — ASN details via Cloudflare Radar
 ├── dns-resolver.js              ← /api/dnsresolver — DNS + DoH parallel query
+├── dns-leak-test.js             ← /api/dnsleaktest/session/:token — proxy to private
+│                                  IPCheck.ing endpoint (Firebase-gated) that drives the
+│                                  in-depth DNS Leak Test advanced tool
 ├── get-user-info.js             ← /api/getuserinfo — user-profile proxy
 └── update-user-achievement.js   ← /api/updateuserachievement — user-achievement proxy
 
 common/
 ├── fetch-with-timeout.js        ← fetchWithTimeout (5s default) + fetchUpstream (8s preset)
 ├── guards.js                    ← requireReferer + requireValidIP Express middleware
+├── logger.js                    ← shared pino logger (pretty in dev, JSON in prod)
 ├── referer-check.js             ← low-level referer allow-list check
 ├── valid-ip.js                  ← IPv4 / IPv6 validator (also re-exported from frontend)
+├── rdap.js                      ← RDAP client (domain fallback when whoiser returns no __raw)
 ├── maxmind-service.js           ← mmdb reader + lookup
-├── maxmind-updater.js           ← scheduled mmdb auto-update
+├── maxmind-updater.js           ← mmdb bootstrap download at boot +
+│                                  scheduled auto-update
 └── maxmind-db/                  ← GeoLite2-ASN.mmdb + GeoLite2-City.mmdb
 ```
 
@@ -54,6 +60,7 @@ common/
   Default timeout is 8s. Never add a bare `fetch()` or `https.get()` — if a provider hangs, the Express connection should time out, not pin indefinitely.
 - **Error shape.** `res.status(500).json({ error: error.message })` on upstream failures; `res.status(400).json({ error: '…' })` on bad input. Be terse — the frontend doesn't display these error strings verbatim.
 - **Response shape.** IP-geolocation handlers normalize their upstream's response into the canonical shape consumed by the frontend (`ip` / `country` / `country_name` / `country_code` / `latitude` / `longitude` / `asn` / `org` / …). If you add a new source, match the existing shape.
+- **Logging.** `import logger from '../common/logger.js'` and use `logger.error({ err: error, ...context }, 'short message')` on upstream failures, never bare `console.*` (banned project-wide for backend code — see root AGENTS.md "Logging"). The `pino-http` middleware mounted on `/api` already records the request line + status + response time, so handlers should only log domain-specific events / errors, not "received request" lines.
 
 ## Security & Boundaries
 
@@ -65,7 +72,7 @@ common/
 
 ### Private-API header pass-through (intentional exception)
 
-Handlers that call our own private IPCheck.ing API (`ipcheck-ing.js`, `invisibility-test.js`, `update-user-achievement.js`, `get-user-info.js`) forward the caller's request headers to the upstream:
+Handlers that call our own private IPCheck.ing API (`ipcheck-ing.js`, `invisibility-test.js`, `update-user-achievement.js`, `get-user-info.js`, `dns-leak-test.js`) forward the caller's request headers to the upstream:
 
 ```js
 const apiResponse = await fetchUpstream(url, { headers: { ...req.headers } });

@@ -5,14 +5,15 @@
 
         <!-- Input area -->
         <div class="space-y-3">
-            <label for="queryURL" class="text-sm font-medium block">{{ t('dnsresolver.Note2') }}</label>
+            <Label for="queryURL">{{ t('dnsresolver.Note2') }}</Label>
 
             <!-- Record type selector: 6 options → ToggleGroup horizontally -->
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-2">
                 <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
-                <ToggleGroup :model-value="queryType" type="single"
+                <ToggleGroup :model-value="queryType" type="single" variant="outline"
                     @update:model-value="(v) => v && changeType(v)">
-                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type" class="h-8 px-3">
+                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
+                        class="flex-1 gap-1.5 min-w-12 md:min-w-20" :aria-label="type" :title="type">
                         {{ type }}
                     </ToggleGroupItem>
                 </ToggleGroup>
@@ -20,13 +21,13 @@
 
             <!-- Input + Run -->
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="dnsCheckStatus === 'running'"
-                    :placeholder="t('dnsresolver.Placeholder')"
-                    v-model="queryURL" @keyup.enter="onSubmit" />
-                <Button variant="action"
-                    :disabled="dnsCheckStatus === 'running' || !queryURL"
-                    @click="onSubmit" class="cursor-pointer">
+                    :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
+                    :aria-invalid="errorMsg !== ''" />
+                <Button variant="action" :disabled="dnsCheckStatus === 'running' || !queryURL" @click="onSubmit"
+                    class="cursor-pointer">
                     <Spinner v-if="dnsCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />
@@ -74,12 +75,14 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { isValidDomain } from '@/utils/valid-ip.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
 import { Play } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 
@@ -95,8 +98,7 @@ const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);
-        const hostname = url.hostname;
-        if (hostname.match(/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i)) return hostname;
+        if (isValidDomain(url.hostname)) return url.hostname;
     } catch { /* noop */ }
     errorMsg.value = t('dnsresolver.invalidURL');
     return null;

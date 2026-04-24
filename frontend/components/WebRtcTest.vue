@@ -10,7 +10,7 @@
         <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
             aria-label="Refresh WebRTC Test">
-            <component :is="isStarted ? RotateCw : ChevronRight" />
+            <component :is="isStarted ? RotateCw : Play" />
           </Button>
         </JnTooltip>
       </div>
@@ -26,7 +26,7 @@
         <CardContent class="p-4">
           <!-- Top: service provider icon + name -->
           <div class="flex items-center gap-2 mb-1">
-            <PhoneCall class="size-6 text-muted-foreground shrink-0" />
+            <Flower class="size-6 text-muted-foreground shrink-0" />
             <span class="text-base font-medium truncate">{{ stun.name }}</span>
           </div>
 
@@ -42,8 +42,9 @@
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
-            <span class="font-mono whitespace-nowrap truncate min-w-0"
-              :class="[fitOneLineClass(stun.ip), textClass(toneOf(stun))]" :title="stun.ip">{{ stun.ip }}</span>
+            <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip"
+              class="font-mono min-w-0"
+              :class="textClass(toneOf(stun))" />
           </div>
 
           <!-- NAT + Country -->
@@ -79,18 +80,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import getCountryName from '@/data/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useStatusTone } from '@/composables/use-status-tone.js';
-import { ChevronRight, MapPin, PhoneCall, Network, RotateCw } from 'lucide-vue-next';
+import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { Play, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
+import FitText from '@/components/widgets/FitText.vue';
+import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -106,82 +110,131 @@ const stunServers = reactive([
   { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
 ]);
 
+// Regex extracting the IP portion out of an ICE candidate line
+// (full SDP grammar not needed — just IPv4 / IPv6 with common forms).
+const CANDIDATE_IP_RE = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i;
+
+// Track in-flight RTCPeerConnections so they can all be closed on unmount.
+// Without this, navigating away mid-test would leave each pc (and its
+// ICE gathering machinery) lingering until GC. Entries are added when
+// the connection is created and removed once it's closed.
+const activeConnections = new Set();
+
 // Business status → 4 tone levels
-const toneOf = (stun) => {
-  if (stun.ip === t('webrtc.StatusWait')) return 'wait';
-  if (stun.ip === t('webrtc.StatusError')) return 'fail';
-  if (stun.ip.includes('.') || stun.ip.includes(':')) return 'ok-fast';
-  return 'wait';
-};
+const toneOf = (stun) => ipFieldTone(stun.ip, {
+  waitLabels: t('webrtc.StatusWait'),
+  errorLabels: t('webrtc.StatusError'),
+});
 
-// Single field in dl block is in "no data" state (waiting/error)
-// These fields may fail independently (e.g. IP success but country query fails), so determine by field.
+// Single field in dl block is in "no data" state (waiting/error).
+// Fields may fail independently (e.g. IP success but country lookup fails),
+// so the check is run per-field in the template.
 const isFieldPending = (value) => {
-  return !value || value === t('webrtc.StatusWait') || value === t('webrtc.StatusError');
+  return !value
+    || value === t('webrtc.StatusWait')
+    || value === t('webrtc.StatusError');
 };
 
-// IP font size downgrade: IPv4 ≤15 characters keep base; short compressed IPv6 down to sm; full IPv6 (max 39 characters) down to xs
-// Ensure full line display, without line breaks due to IPv6.
-const fitOneLineClass = (text) => {
-  const len = typeof text === 'string' ? text.length : 0;
-  if (len <= 15) return 'text-base';
-  if (len <= 26) return 'text-sm';
-  return 'text-sm md:text-xs';
-};
+// Run a STUN test against one server. ICE gathering with a 5s backstop.
+//
+// Success criteria: receive a server-reflexive ('srflx') or peer-reflexive
+// ('prflx') candidate with an extractable IP. That IP is what the STUN
+// server reported; host candidates don't prove STUN worked (the browser
+// emits them regardless) and must not be shown as the "STUN IP".
+//
+// Any non-success path — 5s elapsed without srflx / prflx, or an
+// unexpected throw in the try/catch — collapses to StatusError.
+// Distinguishing "timeout" vs "mDNS privacy" looks tempting but the
+// two conditions are independent (mDNS privacy can be on while STUN
+// still works via srflx, and vice versa), so a split label produces
+// false positives — we deliberately stay vague here.
+const checkSTUNServer = (stun) => {
+  return new Promise((resolve) => {
+    let pc = null;
+    let timer = null;
+    let settled = false;
 
-// Test STUN server
-const checkSTUNServer = async (stun) => {
-  return new Promise((resolve, reject) => {
+    const finish = () => {
+      settled = true;
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (pc) {
+        pc.close();
+        activeConnections.delete(pc);
+      }
+      resolve();
+    };
+
+    const failWith = (statusKey) => {
+      if (settled) return;
+      const label = t(`webrtc.${statusKey}`);
+      stun.ip = label;
+      stun.natType = label;
+      stun.country = label;
+      stun.country_code = '';
+      finish();
+    };
+
+    const succeedWith = async (ip, candidate) => {
+      if (settled) return;
+      // Mark settled now so a late candidate can't double-resolve,
+      // but keep pc / timer alive until the country lookup returns.
+      settled = true;
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      stun.ip = ip;
+      stun.natType = determineNATType(candidate);
+      IPArray.value = [...IPArray.value, ip];
+      // fetchCountryCode swallows its own errors and returns null on miss,
+      // so a single null check handles both "no MaxMind source" and
+      // "upstream failure" paths.
+      const countryInfo = await fetchCountryCode(ip);
+      if (countryInfo) {
+        stun.country_code = countryInfo[0];
+        stun.country = countryInfo[1];
+      } else {
+        stun.country = t('webrtc.StatusError');
+      }
+      if (pc) {
+        pc.close();
+        activeConnections.delete(pc);
+      }
+      resolve();
+    };
+
     try {
-      const servers = { iceServers: [{ urls: 'stun:' + stun.url }] };
-      const pc = new RTCPeerConnection(servers);
-      let candidateReceived = false;
+      pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:' + stun.url }] });
+      activeConnections.add(pc);
 
-      pc.onicecandidate = async (event) => {
-        if (event.candidate) {
-          candidateReceived = true;
-          const candidate = event.candidate.candidate;
-          const ipMatch = /([0-9a-f]{1,4}(:[0-9a-f]{1,4}){7}|[0-9a-f]{0,4}(:[0-9a-f]{1,4}){0,6}::[0-9a-f]{0,4}|::[0-9a-f]{1,4}(:[0-9a-f]{1,4}){0,6}|[0-9]{1,3}(\.[0-9]{1,3}){3})/i.exec(candidate);
-          if (ipMatch) {
-            stun.ip = ipMatch[0];
-            try {
-              const countryInfo = await fetchCountryCode(stun.ip);
-              stun.country_code = countryInfo[0];
-              stun.country = countryInfo[1];
-            } catch (error) {
-              console.error('Error fetching country code:', error);
-              stun.country = t('webrtc.StatusError');
-              reject(error);
-              pc.close();
-              return;
-            }
-            IPArray.value = [...IPArray.value, stun.ip];
-            stun.natType = determineNATType(candidate);
-            pc.close();
-            resolve();
-          }
-        }
+      pc.onicecandidate = (event) => {
+        if (!event.candidate || settled) return;  // null = end-of-candidates
+        const candidate = event.candidate.candidate;
+        const type = candidate.split(' ')[7];
+
+        // Only server-reflexive / peer-reflexive candidates represent a
+        // STUN answer. Host candidates (with or without mDNS) don't prove
+        // STUN worked and we must not display them as the "STUN IP".
+        if (type !== 'srflx' && type !== 'prflx') return;
+
+        const ipMatch = CANDIDATE_IP_RE.exec(candidate);
+        if (!ipMatch) return;
+        succeedWith(ipMatch[0], candidate);
       };
 
       pc.createDataChannel('');
       pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-      // STUN timeout (5s no candidate received): mark ip / natType / country as connection error
-      setTimeout(() => {
-        if (!candidateReceived) {
-          stun.ip = t('webrtc.StatusError');
-          stun.natType = t('webrtc.StatusError');
-          stun.country = t('webrtc.StatusError');
-          pc.close();
-          reject(new Error('Stun Server Test Timeout'));
-        }
+      timer = setTimeout(() => {
+        timer = null;
+        failWith('StatusError');
       }, 5000);
     } catch (error) {
       console.error('STUN Server Test Error:', error);
-      stun.ip = t('webrtc.StatusError');
-      stun.natType = t('webrtc.StatusError');
-      stun.country = t('webrtc.StatusError');
-      reject(error);
+      failWith('StatusError');
     }
   });
 };
@@ -197,25 +250,30 @@ const determineNATType = (candidate) => {
   return t('webrtc.NATType.unknown');
 };
 
-// Get IP country via Maxmind
+// Get IP country via Maxmind. Returns [country_code, country_name] on a
+// successful lookup, or null on any miss (missing MaxMind source, empty
+// upstream response, network error). Callers use the null as the signal
+// to surface an Error label — no TypeError round-trip through a catch.
 const fetchCountryCode = async (ip) => {
+  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
+  if (!source) return null;
   let setLang = lang.value;
   if (setLang === 'zh') setLang = 'zh-CN';
-  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
 
   try {
     const url = store.getDbUrl(source.id, ip, setLang);
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url);
     const data = await response.json();
     const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
-    if (ipData) {
-      const country_code = ipData.country_code.toLowerCase();
-      let country = ipData.country_code || 'N/A';
-      if (country !== 'N/A') country = getCountryName(ipData.country_code, lang.value);
-      return [country_code, country];
-    }
+    if (!ipData) return null;
+    const country_code = ipData.country_code.toLowerCase();
+    const country = ipData.country_code
+      ? getCountryName(ipData.country_code, lang.value)
+      : 'N/A';
+    return [country_code, country];
   } catch (error) {
     console.error('Error fetching IP country code', error);
+    return null;
   }
 };
 
@@ -240,6 +298,14 @@ const checkAllWebRTC = async (isRefresh) => {
 
 onMounted(() => {
   store.setMountingStatus('webrtc', true);
+});
+
+// Close any still-open peer connections if the component unmounts
+// mid-test — otherwise ICE gathering keeps running for seconds and
+// callbacks fire on refs that no longer exist.
+onBeforeUnmount(() => {
+  activeConnections.forEach((pc) => pc.close());
+  activeConnections.clear();
 });
 
 watch(IPArray, () => {

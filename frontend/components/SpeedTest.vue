@@ -3,7 +3,8 @@
   <section class="mb-10">
     <!-- Header -->
     <header class="mb-3">
-      <h2 id="SpeedTest" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+      <h2 id="SpeedTest"
+        class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
         🚀 {{ t('speedtest.Title') }}
       </h2>
       <p class="my-3 text-base text-muted-foreground">{{ t('speedtest.Note') }}</p>
@@ -22,7 +23,7 @@
             <Select :model-value="String(state.config.package.download.bytes)"
               @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -39,7 +40,7 @@
             <Select :model-value="String(state.config.package.upload.bytes)"
               @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
               :disabled="isRunning || isPaused">
-              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto">
+              <SelectTrigger class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -109,30 +110,34 @@
         </div>
 
         <!-- Result Block -->
-        <div v-if="isFinished && state.speedTest.hasScores"
+        <div v-if="isFinished && state.speedTest.hasScores && state.connection.colo"
           class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
-          <div class="flex items-start gap-2 mb-3">
+          <div class="flex items-start gap-2">
             <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
-            <span class="text-base text-success" v-if="state.connection.colo">
-              {{ t('speedtest.connectionFrom') }}
-              <span class="font-mono">{{ state.connection.ip }}</span>
-              ( {{ state.connection.country }} )
-              {{ t('speedtest.connectionTo') }}
-              {{ state.connection.colo }}
-              ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
-              {{ t('speedtest.connectionEnd') }}
-              {{ t('speedtest.score') }}
-              {{ t('speedtest.videoStreaming') }}
-              <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
-                state.speedTest.streamingQuality) }}</span>
-              {{ t('speedtest.gaming') }}
-              <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
-                {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
-              </span>
-              {{ t('speedtest.rtc') }}
-              <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
-                {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
-              </span>
+            <span class="text-base text-success break-all" v-if="state.connection.colo">
+              <p class="mb-2">
+                {{ t('speedtest.connectionFrom') }}
+                <span class="font-mono">{{ state.connection.ip }}</span>
+                ( {{ state.connection.country }} )
+                {{ t('speedtest.connectionTo') }}
+                {{ state.connection.colo }}
+                ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
+                {{ t('speedtest.connectionEnd') }}
+              </p>
+              <p class="mb-2">
+                {{ t('speedtest.score') }}
+                {{ t('speedtest.videoStreaming') }}
+                <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
+                  state.speedTest.streamingQuality) }}</span>
+                {{ t('speedtest.gaming') }}
+                <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
+                  {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
+                </span>
+                {{ t('speedtest.rtc') }}
+                <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
+                  {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
+                </span>
+              </p>
             </span>
           </div>
         </div>
@@ -146,6 +151,7 @@ import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
@@ -157,7 +163,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  ArrowLeftRight, CalendarCheck2, ChevronRight, CloudDownload, CloudUpload,
+  ArrowLeftRight, CalendarCheck2, Play, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
 } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
@@ -214,7 +220,7 @@ const isError = computed(() => state.speedTest.status === 'error');
 const ctaIcon = computed(() => {
   if (isRunning.value) return Pause;
   if (isFinished.value || isError.value) return RotateCw;
-  return ChevronRight;
+  return Play;
 });
 
 
@@ -254,7 +260,7 @@ const qualityBadgeClass = (score) => {
 const connectionMethods = {
   async getIPFromSpeedTest() {
     try {
-      const response = await fetch('https://speed.cloudflare.com/cdn-cgi/trace');
+      const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
       const data = await response.text();
       const lines = data.split('\n');
       const ip = lines.find((l) => l.startsWith('ip='))?.split('=')[1];
@@ -517,7 +523,19 @@ const speedTestController = async () => {
 // --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('speedtest', true); });
-onUnmounted(() => { if (testEngine) testEngine = null; destroyCharts(); });
+// If the user navigates away mid-test, detach the engine's callbacks before
+// dropping the reference — otherwise any in-flight async work inside the
+// SpeedTestEngine would still try to write state refs that no longer exist.
+onUnmounted(() => {
+  if (testEngine) {
+    testEngine.onRunningChange = null;
+    testEngine.onResultsChange = null;
+    testEngine.onFinish = null;
+    testEngine.onError = null;
+    testEngine = null;
+  }
+  destroyCharts();
+});
 
 defineExpose({ speedTestController });
 </script>

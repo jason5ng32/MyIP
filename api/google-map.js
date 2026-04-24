@@ -1,5 +1,6 @@
 import { Readable } from 'node:stream';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import logger from '../common/logger.js';
 
 // Validate request legitimacy
 function isValidRequest(req) {
@@ -80,6 +81,7 @@ export default async (req, res) => {
         res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'image/jpeg');
         Readable.fromWeb(apiRes.body).pipe(res);
     } catch (e) {
+        logger.error({ err: e, latitude, longitude, language, CanvasMode }, 'google-map handler failed');
         res.status(500).json({ error: e.message });
     }
 };

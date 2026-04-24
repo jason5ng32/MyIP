@@ -6,6 +6,7 @@ import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import * as tar from 'tar';
 import maxmind from 'maxmind';
+import logger from './logger.js';
 import {
     getMaxMindDbPaths,
     MAXMIND_ASN_DB,
@@ -15,6 +16,12 @@ import {
 const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const INITIAL_UPDATE_DELAY_MS = 60 * 1000;
 const LOCK_STALE_MS = 2 * 60 * 60 * 1000;
+// Cap the blocking "download databases at boot if missing" path. Long enough
+// for a reasonable initial download over slow residential links, short enough
+// that a misconfigured credential or a blocked outbound connection doesn't
+// hold up the whole server indefinitely. We only abort the download — the
+// server still starts after this timeout, just without MaxMind ready.
+const BOOTSTRAP_TIMEOUT_MS = 5 * 60 * 1000;
 const STATE_FILE = '.maxmind-update-state.json';
 const LOCK_FILE = '.maxmind-update.lock';
 const MAXMIND_UPDATE_ENV_KEYS = [
@@ -52,19 +59,19 @@ export function startMaxMindAutoUpdate({ reload } = {}) {
     }
 
     if (!isAutoUpdateEnabled()) {
-        console.log('MaxMind auto update plan: disabled');
+        logger.info('MaxMind auto update plan: disabled');
         return;
     }
 
     if (!hasDownloadCredentials()) {
-        console.log('MaxMind auto update skipped: MAXMIND_ACCOUNT_ID or MAXMIND_LICENSE_KEY is missing');
+        logger.info('MaxMind auto update skipped: MAXMIND_ACCOUNT_ID or MAXMIND_LICENSE_KEY is missing');
         return;
     }
 
     // Run one update cycle and keep the scheduler alive if that cycle fails.
     const run = () => {
         updateMaxMindDatabases({ reload }).catch(error => {
-            console.error('MaxMind auto update failed:', error.message);
+            logger.error({ err: error }, 'MaxMind auto update failed');
         });
     };
 
@@ -78,9 +85,85 @@ export function startMaxMindAutoUpdate({ reload } = {}) {
 }
 
 /**
- * Run one locked update cycle and reload readers only after a successful publish.
+ * One-shot "download the MaxMind databases at boot if they are missing" path.
+ *
+ * The decision tree matches what we want the operator to experience on a
+ * cold checkout:
+ *   - Both mmdb files already on disk → do nothing, let reload handle it.
+ *   - Files missing AND no MAXMIND_ACCOUNT_ID / MAXMIND_LICENSE_KEY configured
+ *     → print a clear "how to fix this" warning and return; server will start
+ *     anyway but the MaxMind API will 503 until DBs are provided.
+ *   - Files missing AND credentials present → run a single download cycle,
+ *     capped at BOOTSTRAP_TIMEOUT_MS. On failure (timeout, auth error, network
+ *     block), log a warning and return; the server still starts.
+ *
+ * MAXMIND_AUTO_UPDATE is intentionally NOT consulted here — that flag only
+ * gates the periodic scheduler. If the operator put valid credentials in .env,
+ * the intent is obviously "I want MaxMind working", and making them set a
+ * second flag just to get the first download would be confusing.
+ *
+ * Never throws: the caller ({@link ./../backend-server.js}) treats this as
+ * advisory and always proceeds to `app.listen`.
  */
-export async function updateMaxMindDatabases({ reload } = {}) {
+export async function bootstrapMaxMindIfMissing({ reload } = {}) {
+    const { cityDbPath, asnDbPath } = getMaxMindDbPaths();
+    if (fs.existsSync(cityDbPath) && fs.existsSync(asnDbPath)) {
+        return { status: 'present' };
+    }
+
+    if (!hasDownloadCredentials()) {
+        logger.warn(
+            '⚠️  MaxMind databases are missing and MAXMIND_ACCOUNT_ID / MAXMIND_LICENSE_KEY are not configured.\n' +
+            '  Set the credentials in .env and restart, or drop GeoLite2-City.mmdb + GeoLite2-ASN.mmdb\n' +
+            '  into common/maxmind-db/. Starting server anyway; MaxMind API will return 503 until\n' +
+            '  databases are available.'
+        );
+        return { status: 'missing-credentials' };
+    }
+
+    const timeoutMinutes = BOOTSTRAP_TIMEOUT_MS / 60000;
+    logger.info(`📥 MaxMind databases missing; attempting initial download (timeout ${timeoutMinutes} min)...`);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(new Error('bootstrap timed out')), BOOTSTRAP_TIMEOUT_MS);
+    timer.unref?.();
+
+    try {
+        await updateMaxMindDatabases({
+            reload,
+            signal: controller.signal,
+            reloadReason: 'bootstrap',
+        });
+        return { status: 'downloaded' };
+    } catch (error) {
+        // Disambiguate "we hit the 5-minute cap" from "the download itself
+        // failed" so operators know whether to look at network / firewall vs
+        // credentials / MaxMind account status.
+        const reason = controller.signal.aborted
+            ? `download did not complete within ${timeoutMinutes} min (check connectivity to download.maxmind.com)`
+            : error.message;
+        logger.warn(
+            `⚠️  MaxMind initial download failed: ${reason}\n` +
+            '  Starting server anyway; MaxMind API will return 503 until databases are available.'
+        );
+        return { status: 'failed', error };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+/**
+ * Run one locked update cycle and reload readers only after a successful publish.
+ *
+ * `signal` is an optional AbortSignal that is threaded into every HTTP fetch
+ * and stream pipeline, so callers (notably the bootstrap path at startup) can
+ * cap the whole cycle with a single timeout and have in-flight network I/O
+ * actually stop instead of quietly dangling in the background.
+ *
+ * `reloadReason` lets the caller tag the reload log line ("auto update" for
+ * the scheduler, "bootstrap" for the startup download, etc.).
+ */
+export async function updateMaxMindDatabases({ reload, signal, reloadReason = 'auto update' } = {}) {
     if (updateInProgress) {
         return { updated: false, reason: 'already-running' };
     }
@@ -99,10 +182,10 @@ export async function updateMaxMindDatabases({ reload } = {}) {
     const tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'myip-maxmind-'));
 
     try {
-        const result = await downloadAndReplaceDatabases(dbDir, tempDir);
+        const result = await downloadAndReplaceDatabases(dbDir, tempDir, { signal });
 
         if (result.updated && reload) {
-            await reload('auto update');
+            await reload(reloadReason);
         }
 
         return result;
@@ -139,7 +222,7 @@ function hasAnyUpdateEnvironment() {
  */
 function logUpdatePlan() {
     const nextRunAt = new Date(Date.now() + INITIAL_UPDATE_DELAY_MS);
-    console.log(`MaxMind auto update plan: next check at ${formatScheduleTime(nextRunAt)}, then every ${formatDuration(UPDATE_INTERVAL_MS)}`);
+    logger.info(`🗓️  MaxMind auto update plan: next check at ${formatScheduleTime(nextRunAt)}, then every ${formatDuration(UPDATE_INTERVAL_MS)}`);
 }
 
 /**
@@ -169,19 +252,19 @@ function formatDuration(milliseconds) {
 /**
  * Download all required newer editions, validate them, then publish them together.
  */
-async function downloadAndReplaceDatabases(dbDir, tempDir) {
+async function downloadAndReplaceDatabases(dbDir, tempDir, { signal } = {}) {
     const state = await readUpdateState(dbDir);
     const plannedUpdates = [];
 
     for (const edition of editions) {
-        const remoteInfo = await getRemoteInfo(edition);
+        const remoteInfo = await getRemoteInfo(edition, { signal });
         const targetPath = path.join(dbDir, edition.fileName);
 
         if (!shouldDownloadDatabase(targetPath, state, edition.editionId, remoteInfo.lastModified)) {
             continue;
         }
 
-        const downloadedPath = await downloadAndExtractDatabase(edition, tempDir);
+        const downloadedPath = await downloadAndExtractDatabase(edition, tempDir, { signal });
         plannedUpdates.push({
             ...edition,
             lastModified: remoteInfo.lastModified,
@@ -206,7 +289,7 @@ async function downloadAndReplaceDatabases(dbDir, tempDir) {
     }
 
     await writeUpdateState(dbDir, state);
-    console.log(`MaxMind databases updated: ${plannedUpdates.map(update => update.editionId).join(', ')}`);
+    logger.info({ editions: plannedUpdates.map(update => update.editionId) }, 'MaxMind databases updated');
 
     return {
         updated: true,
@@ -217,11 +300,12 @@ async function downloadAndReplaceDatabases(dbDir, tempDir) {
 /**
  * Fetch remote metadata for a MaxMind edition without downloading the archive.
  */
-async function getRemoteInfo(edition) {
+async function getRemoteInfo(edition, { signal } = {}) {
     const response = await fetch(getDownloadUrl(edition.editionId), {
         method: 'HEAD',
         headers: getAuthHeaders(),
         redirect: 'follow',
+        signal,
     });
 
     if (!response.ok) {
@@ -261,7 +345,7 @@ function shouldDownloadDatabase(targetPath, state, editionId, lastModified) {
 /**
  * Download a MaxMind archive, extract it, and return the matching .mmdb file path.
  */
-async function downloadAndExtractDatabase(edition, tempDir) {
+async function downloadAndExtractDatabase(edition, tempDir, { signal } = {}) {
     const editionDir = path.join(tempDir, edition.editionId);
     const archivePath = path.join(tempDir, `${edition.editionId}.tar.gz`);
 
@@ -270,13 +354,14 @@ async function downloadAndExtractDatabase(edition, tempDir) {
     const response = await fetch(getDownloadUrl(edition.editionId), {
         headers: getAuthHeaders(),
         redirect: 'follow',
+        signal,
     });
 
     if (!response.ok || !response.body) {
         throw new Error(`Failed to download ${edition.editionId}: HTTP ${response.status}`);
     }
 
-    await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(archivePath));
+    await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(archivePath), { signal });
     await tar.x({ file: archivePath, cwd: editionDir });
 
     const mmdbPath = await findExtractedDatabase(editionDir, edition.fileName);
@@ -434,7 +519,7 @@ async function acquireUpdateLock(dbDir) {
             return acquireUpdateLock(dbDir);
         }
 
-        console.log('MaxMind update skipped: another process is updating databases');
+        logger.info('MaxMind update skipped: another process is updating databases');
         return null;
     }
 }

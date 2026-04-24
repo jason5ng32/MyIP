@@ -187,7 +187,7 @@ describe('store — preferences', () => {
     const s = useMainStore();
     s.setPreferences({ lang: 'zh', autoStart: false });
     assert.deepEqual(s.userPreferences, { lang: 'zh', autoStart: false });
-    const fromStorage = JSON.parse(globalThis.localStorage.getItem('userPreferences'));
+    const fromStorage = JSON.parse(globalThis.localStorage.getItem('userPreferences_v6'));
     assert.deepEqual(fromStorage, { lang: 'zh', autoStart: false });
   });
 
@@ -196,7 +196,7 @@ describe('store — preferences', () => {
     s.setPreferences({ lang: 'en', autoStart: true });
     s.updatePreference('autoStart', false);
     assert.equal(s.userPreferences.autoStart, false);
-    const fromStorage = JSON.parse(globalThis.localStorage.getItem('userPreferences'));
+    const fromStorage = JSON.parse(globalThis.localStorage.getItem('userPreferences_v6'));
     assert.equal(fromStorage.autoStart, false);
   });
 
@@ -207,11 +207,11 @@ describe('store — preferences', () => {
     // just assert the result is a non-empty object and gets persisted.
     assert.equal(typeof s.userPreferences, 'object');
     assert.ok(Object.keys(s.userPreferences).length > 0);
-    assert.ok(globalThis.localStorage.getItem('userPreferences'));
+    assert.ok(globalThis.localStorage.getItem('userPreferences_v6'));
   });
 
   it('loadPreferences merges stored over defaults (stored keys win)', () => {
-    globalThis.localStorage.setItem('userPreferences', JSON.stringify({ lang: 'zh' }));
+    globalThis.localStorage.setItem('userPreferences_v6', JSON.stringify({ lang: 'zh' }));
     const s = useMainStore();
     s.loadPreferences();
     assert.equal(s.userPreferences.lang, 'zh', 'stored lang wins');

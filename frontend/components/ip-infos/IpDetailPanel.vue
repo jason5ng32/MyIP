@@ -6,8 +6,7 @@
 
     <!-- Metadata grid: 2 cols on mobile, 3 cols on PC for Country / Region / City.
          ISP takes its own row (col-span-3) so long provider names have room to breathe. -->
-    <dl v-if="data.country_name"
-        class="px-4 pb-3 grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-3 text-sm items-start"
+    <dl v-if="data.country_name" class="px-4 pb-3 grid grid-cols-2 md:grid-cols-3 gap-x-3 gap-y-3 text-sm items-start"
         :class="{ 'grid-cols-1!': collapsed }">
         <div>
             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -15,8 +14,7 @@
                 <span>{{ t('ipInfos.Country') }}</span>
             </dt>
             <dd class="font-normal flex items-center gap-1.5 flex-wrap">
-                <Icon v-if="data.country_code"
-                    :icon="'circle-flags:' + data.country_code.toLowerCase()"
+                <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
                     class="shrink-0 size-4" />
                 <span class="wrap-break-word">{{ data.country_name }}</span>
             </dd>
@@ -58,8 +56,7 @@
     </dl>
 
     <!-- Advanced block (IPCheck.ing source only): locked CTA for signed-out, label-value grid for signed-in. -->
-    <div v-if="!collapsed" v-show="showAdvancedBlock"
-        class="px-4 pb-3 border-t pt-3 space-y-2.5">
+    <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
         <!-- Signed-out: single CTA banner + 4-field preview grid with *** values. -->
         <template v-if="allAdvancedLocked">
@@ -111,7 +108,7 @@
                 </dt>
                 <dd class="font-normal flex items-center gap-1 wrap-break-word">
                     <component :is="data.isNativeIP === true ? CircleCheck : CircleX"
-                        class="size-3.5 text-muted-foreground shrink-0" />
+                        class="size-3.5 shrink-0" />
                     <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
                         t('ipInfos.advancedData.NativeIPNo') }}</span>
                 </dd>
@@ -162,21 +159,30 @@
 
     <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
     <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
-        <DialogContent :title="data.ip" class="max-w-3xl">
+        <DialogContent :title="data.ip" class="max-w-2xl">
             <DialogHeader>
                 <template #title>
                     <span class="flex items-center gap-2 min-w-0">
-                        <Icon v-if="data.country_code"
-                            :icon="'circle-flags:' + data.country_code.toLowerCase()"
+                        <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
                             class="size-4 shrink-0" />
                         <span class="truncate">{{ data.country_name }}<template v-if="data.city"> · {{ data.city
-                                }}</template></span>
-                        <span class="font-mono text-sm text-muted-foreground shrink-0">{{ data.ip }}</span>
+                                }}
+                            </template>
+                        </span>
                     </span>
                 </template>
             </DialogHeader>
+            <div class="mb-2">
+            <span class="flex items-center gap-2 text-sm text-muted-foreground ">
+                <Earth class="size-4" />
+                <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
+            </span>
+            <span class="font-mono shrink-0 truncate whitespace-nowrap">{{  data.longitude }}, {{  data.latitude }}</span>
+            </div>
+            <span>
             <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
                 class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
+            </span>
         </DialogContent>
     </Dialog>
 </template>
@@ -189,12 +195,14 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import ASNInfo from './ASNInfo.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Icon } from '@iconify/vue';
+import { Earth } from 'lucide-vue-next';
 import {
     Building2,
     ChevronDown,
@@ -299,7 +307,7 @@ const getASNInfo = async (asn) => {
     try {
         if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-        const response = await fetch(`/api/cfradar?asn=${asn}`);
+        const response = await fetchWithTimeout(`/api/cfradar?asn=${asn}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {

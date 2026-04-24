@@ -14,7 +14,8 @@
     <!-- Card grid: 1 col on mobile, always 2 cols on PC (md+). Card counts
          (2 / 4 / 6) are all even, so the last row always fills. -->
     <div class="grid gap-4 items-stretch grid-cols-1 md:grid-cols-2">
-      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id" class="flex"
+      <div v-for="(card, index) in ipDataCards.slice(0, ipCardsToShow)" :key="card.id" :ref="card.id"
+        :id="'IPInfoCard-' + (index + 1)" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
           :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
