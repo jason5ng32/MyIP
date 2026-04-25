@@ -15,24 +15,21 @@
                     <p class="jn-comment">
                         <span class="text-muted-foreground"><Badge variant="outline" class="text-success">geo</Badge> {{ t('curl.Note3') }}</span>
                     </p>
-                    <p class="jn-comment">
-                        <span class="text-muted-foreground"><Badge variant="outline" class="text-success">YOUR_API_KEY</Badge> {{ t('curl.Note4') }}</span>
-                    </p>
                 </div>
 
                 <!-- 3 curl command blocks -->
                 <div class="space-y-3">
                     <div>
                         <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv4') }}</p>
-                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv4Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv4Domain }}<span class="text-success">/geo</span></pre>
                     </div>
                     <div>
                         <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.getIPv6') }}</p>
-                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv6Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv6Domain }}<span class="text-success">/geo</span></pre>
                     </div>
                     <div>
                         <p class="jn-comment text-xs font-mono mb-1.5 text-muted-foreground">{{ t('curl.get6and4') }}</p>
-                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv64Domain }}<span class="text-success">/geo</span> -H 'x-key: <span class="text-yellow-400">YOUR_API_KEY</span>'</pre>
+                        <pre class="jn-curl bg-black text-neutral-100 rounded-md p-3 text-xs font-mono overflow-x-auto">curl {{ ipv64Domain }}<span class="text-success">/geo</span></pre>
                     </div>
                 </div>
             </div>
