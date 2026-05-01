@@ -119,3 +119,7 @@ The backend enforces access control and timeouts through shared middleware rathe
 - **Add yourself as a co-author to the commit.** If you are an AI.
 - **Commit message style** follows recent `git log` — `Refactor(xxx): …` / `Fix(ui): …` / `Feat(xxx): …` / `Style: …` / `Chore: …` prefix.
 - **On every commit, scan AGENTS.md (root + relevant sub-file) for staleness** — if the change adds a convention, renames a shared module, flips a rule, or invalidates an example, update the doc in the same commit. AGENTS.md drifting from reality is the main failure mode of this kind of document.
+
+---
+
+If [local-context.md](./local-context.md) exists in the workspace root, please Read it as well — it lists Knowledge Hub paths relevant to this project (machine-local only; not in git).
