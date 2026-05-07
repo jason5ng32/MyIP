@@ -163,6 +163,15 @@ if (speedLimitSet !== 0) {
 
 app.use(express.json());
 
+// Default every /api/* response to no-store. 
+// Pure-function handlers (whois / macchecker / cfradar / map / configs) MAY
+// override this with `res.setHeader('Cache-Control', 'public, max-age=...')`
+// before sending the response.
+app.use('/api', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+});
+
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
