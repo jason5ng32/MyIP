@@ -55,12 +55,10 @@
     "whoiser": "^1.18.0"
   },
   "devDependencies": {
-    "@serwist/vite": "^9.5.7",
     "@tailwindcss/vite": "^4.2.2",
     "@vitejs/plugin-vue": "^6.0.6",
     "code-inspector-plugin": "^1.5.1",
     "nodemon": "^3.1.14",
-    "serwist": "^9.5.7",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.8"
   }

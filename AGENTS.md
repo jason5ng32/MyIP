@@ -31,7 +31,7 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 | Backend | Express 5 |
 | Logger | `pino` + `pino-pretty` (dev) + `pino-http` (request logs) — singleton at `common/logger.js` |
 | Auth | Firebase Auth (optional, env-gated) |
-| PWA | Serwist |
+| PWA install | `manifest.webmanifest` only (installable but online-only — no service worker) |
 | Tests | Node built-in test runner (`node --test`) |
 | Runtime libs | chart.js · svgmap · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · circle-progress.vue · @vueuse/core (used by shadcn-vue primitives) |
 

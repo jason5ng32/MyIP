@@ -5,7 +5,7 @@ import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
 import { analytics } from './utils/use-analytics';
-import { registerServiceWorker } from './utils/register-service-worker';
+import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
 
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
@@ -45,7 +45,7 @@ window.addEventListener('resize', handleResize);
 
 // Start Google Analytics
 analytics.page();
-registerServiceWorker();
+unregisterLegacyServiceWorker();
 
 // Check Firebase environment
 store.checkFirebaseEnv();
