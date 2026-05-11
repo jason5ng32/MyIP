@@ -14,7 +14,7 @@ describe('DEFAULT_PREFERENCES', () => {
   it('contains the full preference shape with expected defaults', () => {
     assert.deepEqual(DEFAULT_PREFERENCES, {
       theme: 'auto',
-      connectivityAutoRefresh: false,
+      connectivityMultipleTests: false,
       simpleMode: false,
       autoStart: true,
       hideUnavailableIPStack: false,

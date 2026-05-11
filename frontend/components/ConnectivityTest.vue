@@ -1,7 +1,5 @@
 <template>
-  <!-- Network Connectivity -->
   <section class="mb-10">
-    <!-- Header -->
     <header class="mb-2 flex flex-col items-start justify-between gap-4">
       <div class="flex flex-row items-center justify-between gap-4 w-full">
         <h2 id="Connectivity"
@@ -26,25 +24,23 @@
         class="keyboard-shortcut-card group relative cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card"
         @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
         :title="t('connectivity.RefreshThisTest')">
-        <!-- Remove button — only on custom cards, fades in on hover -->
+        <!-- Custom-card remove button, fades in on hover -->
         <button v-if="test.custom" type="button" @click.stop="removeCustomTarget(test.id)"
           class="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground md:opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted transition-opacity cursor-pointer"
           :aria-label="t('connectivity.addCustom.Remove')" :title="t('connectivity.addCustom.Remove')">
           <X class="size-3.5" />
         </button>
         <CardContent class="p-4">
-          <!-- Top: brand icon + service name -->
+          <!-- Brand icon (built-in) or first-letter tile (custom) + name -->
           <div class="flex items-center gap-2 mb-3">
-            <!-- Built-in: lucide icon. Custom: first-letter colored tile. -->
             <component v-if="test.icon" :is="test.icon" class="size-6 text-muted-foreground" />
             <span v-else
-              class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground"
-              >
+              class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
             </span>
             <span class="text-base font-medium truncate">{{ test.name }}</span>
           </div>
-          <!-- Bottom: status indicator + text + delay -->
+          <!-- Status + ms. Multi mode pins these to the best round (see checkConnectivityHandler). -->
           <div class="flex items-center justify-between gap-2">
             <span class="flex items-center gap-1.5 text-base min-w-0">
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
@@ -61,14 +57,20 @@
               {{ test.time }}<span class="ml-0.5 text-sm">ms</span>
             </span>
           </div>
+          <!-- Multi-test per-round progress dots (historical snapshot) -->
+          <div v-if="multipleTests" class="pointer-events-none flex items-center gap-1 mt-2">
+            <span v-for="i in totalRounds" :key="i" class="size-1.5 rounded-full transition-colors duration-200"
+              :class="progressDotClass(test, i - 1)"></span>
+          </div>
         </CardContent>
       </Card>
 
-      <!-- "+" tile for adding a custom test. Hidden when at the 10-item cap. -->
+      <!-- "+" tile to add a custom test; hidden at the cap -->
       <Card v-if="canAddCustom" @click="openAddDialog"
         class="cursor-pointer border-dashed bg-transparent hover:bg-muted/50 transition-colors"
         :title="t('connectivity.addCustom.AddCard')">
-        <CardContent class="p-4 min-h-[84px] flex flex-col items-center justify-center gap-1.5 text-muted-foreground">
+        <CardContent class="p-4 flex flex-col items-center justify-center gap-1.5 text-muted-foreground"
+          :class="multipleTests ? 'min-h-[106px]' : 'min-h-[92px]'">
           <CirclePlus class="size-5" />
           <span class="text-sm font-medium">{{ t('connectivity.addCustom.AddCard') }}</span>
         </CardContent>
@@ -80,28 +82,20 @@
       <DialogContent class="max-w-md">
         <DialogHeader :icon="CirclePlus" :title="t('connectivity.addCustom.Title')" />
         <div class="space-y-4">
-          <!-- Name -->
           <div class="space-y-1.5">
             <Label for="custom-conn-name">{{ t('connectivity.addCustom.NameLabel') }}</Label>
             <Input id="custom-conn-name" v-model="addName" :placeholder="t('connectivity.addCustom.NamePlaceholder')"
-              :aria-invalid="isNameError ? 'true' : undefined"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-              data-1p-ignore data-lpignore="true"
-              @keyup.enter="handleAdd" maxlength="20" />
+              :aria-invalid="isNameError ? 'true' : undefined" autocomplete="off" autocorrect="off" autocapitalize="off"
+              spellcheck="false" data-1p-ignore data-lpignore="true" @keyup.enter="handleAdd" maxlength="20" />
           </div>
-          <!-- URL -->
           <div class="space-y-1.5">
             <Label for="custom-conn-url">{{ t('connectivity.addCustom.UrlLabel') }}</Label>
             <Input id="custom-conn-url" v-model="addUrl" :placeholder="t('connectivity.addCustom.UrlPlaceholder')"
-              :aria-invalid="isUrlError ? 'true' : undefined"
-              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-              data-1p-ignore data-lpignore="true"
-              @keyup.enter="handleAdd" />
+              :aria-invalid="isUrlError ? 'true' : undefined" autocomplete="off" autocorrect="off" autocapitalize="off"
+              spellcheck="false" data-1p-ignore data-lpignore="true" @keyup.enter="handleAdd" />
           </div>
-          <!-- Hint about test method limitations -->
           <p class="mb-2 text-xs text-muted-foreground leading-relaxed">{{ t('connectivity.addCustom.Hint') }}</p>
-          <!-- Error message. Always rendered (no v-if) with min-height so the
-               dialog height never jumps when an error appears/disappears. -->
+          <!-- min-h-4 reserves space so the dialog height doesn't jump -->
           <p class="text-xs text-destructive min-h-4" aria-live="polite">{{ addError }}</p>
           <div class="flex justify-end gap-2 pt-2">
             <Button variant="action" type="button" @click="handleAdd"
@@ -140,49 +134,44 @@ const alertToShow = ref(false);
 const alertStyle = ref("");
 const alertTitle = ref("");
 const alertMessage = ref("");
-const autoRefresh = ref(userPreferences.value.connectivityAutoRefresh);
+// Snapshot at mount; pref applies on next reload to avoid mid-cycle split-brain.
+const multipleTests = ref(userPreferences.value.connectivityMultipleTests);
 const autoShowAltert = ref(userPreferences.value.popupConnectivityNotifications);
 const isStarted = ref(false);
 const counter = ref(0);
-const maxCounts = ref(5);
+const maxCounts = ref(9);
 const manualRun = ref(false);
 const intervalId = ref(null);
+const totalRounds = computed(() => 1 + maxCounts.value);
+// Defer the toast until all rounds are done so multi mode can't fire OhNo after round 1.
+const allRoundsDone = ref(false);
+const alertFired = ref(false);
 
-// Connectivity test list.
-//
-// The first 8 entries are the built-in (non-removable) targets. Any additional
-// entries have `.custom = true` and are sync'd in from
-// `userPreferences.customConnectivityTargets` by the watcher below. Keeping
-// both in a single reactive array lets `checkAllConnectivity` / `forEach` /
-// the J/K keyboard navigation treat all tiles uniformly — only the
-// add/remove UI cares which one is which.
+// Built-in targets first; custom ones (`.custom = true`) are merged in by
+// the watcher below. Keeping both in one reactive array lets every iterator
+// (run-loop, keyboard nav) treat tiles uniformly.
 const MAX_CUSTOM_TARGETS = 9;
+// `roundResults` records per-round outcomes for the progress dots,
+// independent of the best-of-N face/text. Bootstrap-only writer.
 const connectivityTests = reactive([
-  { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'google', name: 'Google', icon: Chrome, url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud, url: 'https://www.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'youtube', name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'github', name: 'GitHub', icon: Github, url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
-  { id: 'chatgpt', name: 'ChatGPT', icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0 },
+  { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'google', name: 'Google', icon: Chrome, url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud, url: 'https://www.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'youtube', name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'github', name: 'GitHub', icon: Github, url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'chatgpt', name: 'ChatGPT', icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
 ]);
 
-// Sync user-defined custom targets into the reactive list. Runs on mount
-// (immediate) and any time the stored preference changes (add / remove).
-//
-// IMPORTANT: preserve existing custom-test state on reconciliation. A naïve
-// "remove all custom + re-push from storage" resets `status` / `time` /
-// `mintime` every time the user adds one more target, flashing every existing
-// custom card back to "Awaiting Test". Instead we diff by id: drop only the
-// customs that disappeared, leave survivors untouched, and push brand-new
-// ones in "Awaiting Test" state.
+// Reconcile custom targets by id (not wipe-and-refill) so existing cards
+// don't flash back to "Awaiting Test" each time the user adds another one.
 watch(
   () => userPreferences.value.customConnectivityTargets,
   (newTargets) => {
     const targets = newTargets || [];
     const targetIds = new Set(targets.map((t) => t.id));
 
-    // Drop customs that are no longer in storage; keep the rest in place.
+    // Drop customs no longer in storage.
     for (let i = connectivityTests.length - 1; i >= 0; i--) {
       const entry = connectivityTests[i];
       if (entry.custom && !targetIds.has(entry.id)) {
@@ -190,7 +179,7 @@ watch(
       }
     }
 
-    // Track which custom ids already exist so we only push true newcomers.
+    // Push only newcomers.
     const existingCustomIds = new Set(
       connectivityTests.filter((entry) => entry.custom).map((entry) => entry.id),
     );
@@ -202,10 +191,11 @@ watch(
         name: target.name,
         url: target.url,
         custom: true,
-        icon: null, // rendered as a first-letter tile in the template
+        icon: null,
         status: t('connectivity.StatusWait'),
         time: 0,
         mintime: 0,
+        roundResults: [],
       });
     }
   },
@@ -217,18 +207,14 @@ const canAddCustom = computed(() => {
   return current.length < MAX_CUSTOM_TARGETS;
 });
 
-// Deterministic color for a name
 const letterColor = (name) => {
   const hash = [...(name || '')].reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const hue = hash % 360;
   return `hsl(${hue}, 50%, 45%)`;
 };
 
-// Business status → 4 tone levels (wait / ok-fast / ok-slow / fail).
-// Unlike the other toneOf call sites (WebRTC / DnsLeak / RuleTest), here the
-// value is a status string like "Available (123ms)" rather than a raw IP,
-// so we pass a custom isSuccess predicate plus test.time for the ok-fast /
-// ok-slow split at 200ms.
+// Status string → tone. Custom isSuccess + time-based fast/slow split,
+// since the value here isn't an IP like the other toneOf call sites.
 const toneOf = (test) => {
   const okLabel = t('connectivity.StatusAvailable');
   return ipFieldTone(test.status, {
@@ -240,9 +226,16 @@ const toneOf = (test) => {
 };
 const { dotClass, textClass } = useStatusTone();
 
-// Face icon mapping
-// Unreachable/timeout → Frown; reachable and <200ms → Smile; reachable and ≥200ms → Meh
-// Wait state does not show face (the status light's ping animation already expresses "waiting")
+// Filled → tone color; head-of-queue → pulse (suppressed once the user
+// takes over manually so we don't promise rounds that won't land); rest → dim.
+const progressDotClass = (test, idx) => {
+  const tone = test.roundResults[idx];
+  if (tone) return dotClass(tone);
+  if (!manualRun.value && idx === test.roundResults.length) return 'bg-muted-foreground/40 animate-pulse';
+  return 'bg-muted-foreground/20';
+};
+
+// Reachable: Smile <200ms, Meh ≥200ms. Unreachable: Frown. Wait: no face.
 const statusFaceIcon = (test) => {
   const unavailableLabels = [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')];
   const okLabel = t('connectivity.StatusAvailable');
@@ -251,31 +244,14 @@ const statusFaceIcon = (test) => {
   return null;
 };
 
-// Check single connectivity.
-//
-// Uses `fetch` in `no-cors` mode with `GET`, rather than an <img> load or a
-// HEAD request:
-//   - no-cors makes the promise resolve on ANY HTTP status the server returns
-//     (200, 403, 404, 500 …), matching the semantic question we're actually
-//     asking ("can I reach this origin?"). <img> routed 403 to `onerror` and
-//     flagged reachable-but-forbidden sites (notably github.com/favicon.ico)
-//     as unavailable.
-//   - GET (not HEAD) because many real-world servers / CDNs / WAFs either
-//     silently drop HEAD, route it to a different backend, or close the
-//     connection — which all reject the promise and falsely mark the target
-//     unavailable even when the site is fine over GET. User-added custom
-//     endpoints are especially prone to this: most health-check / API paths
-//     only implement GET. The payload overhead (~few KB for a favicon on a
-//     CDN edge, discarded as opaque in no-cors) is a small price for the
-//     correctness.
-// `cache: 'no-store'` prevents the browser from serving a cached response
-// (which would give a misleading near-zero RTT).
-// Network-level failure (DNS error, connection refused, abort) still rejects
-// and is caught below. An AbortController replaces the old bare setTimeout so
-// we can distinguish a completed request from a timeout and never double-fire
-// `onTestComplete`.
+// no-cors GET so any reachable origin resolves the promise — HEAD and <img>
+// both have failure modes that mis-flag reachable sites as down.
+// cache: 'no-store' avoids cached near-zero RTTs. AbortController lets us
+// distinguish a completed request from a timeout without double-firing.
 const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
   manualRun.value = isManualRun;
+  // Only bootstrap multi-test rounds feed the dot history; manual paths skip it.
+  const recordRound = multipleTests.value && !isManualRun;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3 * 1200);
   const beginTime = performance.now();
@@ -290,19 +266,29 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     const testTime = Math.round(performance.now() - beginTime);
     test.status = t('connectivity.StatusAvailable');
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);
-    test.time = (autoRefresh.value && !isManualRun) ? test.mintime : testTime;
+    test.time = (multipleTests.value && !isManualRun) ? test.mintime : testTime;
+    if (recordRound) test.roundResults.push(testTime < 200 ? 'ok-fast' : 'ok-slow');
     onTestComplete(true);
   } catch {
     clearTimeout(timeoutId);
-    test.time = 0;
-    test.status = t('connectivity.StatusUnavailable');
+    // Best-of-N: in multi mode a later failure doesn't downgrade a card
+    // that already succeeded (mintime > 0). The dot row still records the
+    // real 'fail' — it's per-round history, separate from the face/text.
+    if (multipleTests.value && !isManualRun && test.mintime > 0) {
+      test.status = t('connectivity.StatusAvailable');
+      test.time = test.mintime;
+    } else {
+      test.time = 0;
+      test.status = t('connectivity.StatusUnavailable');
+    }
+    if (recordRound) test.roundResults.push('fail');
     onTestComplete(false);
   }
 };
 
-// Check all
 const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
-  alertToShow.value = isAlertToShow;
+  // Sticky false→true; interval ticks must not overwrite the bootstrap's `true`.
+  if (isAlertToShow) alertToShow.value = true;
   return new Promise((resolve) => {
     if (isRefresh) {
       connectivityTests.forEach((test) => {
@@ -330,6 +316,7 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
     });
 
     Promise.allSettled(testPromises).then(() => {
+      // Multi mode overwrites this with finalizeMultiTestAlert before the toast fires.
       updateConnectivityAlert(successCount === totalTests ? 'success' : 'error');
       resolve();
     });
@@ -338,10 +325,15 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
   });
 };
 
+// Fires once when all four gates pass: pref, bootstrap opted in, allHasLoaded, allRoundsDone.
 const sendAlert = () => {
-  if ((alertToShow.value || !isStarted.value) && autoShowAltert.value) {
-    store.setAlert(alertToShow.value, alertStyle.value, alertMessage.value, alertTitle.value);
-  }
+  if (alertFired.value) return;
+  if (!autoShowAltert.value) return;
+  if (!alertToShow.value) return;
+  if (!store.allHasLoaded) return;
+  if (!allRoundsDone.value) return;
+  alertFired.value = true;
+  store.setAlert(true, alertStyle.value, alertMessage.value, alertTitle.value);
 };
 
 const updateConnectivityAlert = (type) => {
@@ -356,20 +348,14 @@ const updateConnectivityAlert = (type) => {
   }
 };
 
-// ───────────────────────────────────────────────────────────────────────────
-// Add/remove custom targets
-
+// ── Add/remove custom targets ──────────────────────────────────────────────
 const addDialogOpen = ref(false);
 const addName = ref('');
 const addUrl = ref('');
 const addError = ref('');
 
-// Map the shared `addError` string back to which field it belongs to, so we
-// can toggle each Input's `aria-invalid` independently. Shadcn-vue's Input
-// component has Tailwind `aria-invalid:*` styling built in — setting the
-// attribute paints a red ring on just the offending field without any extra
-// CSS. Comparing against translated strings is uglier than field-specific
-// error refs would be, but it keeps the existing single-error API intact.
+// Map the shared addError back to its field so aria-invalid only flags the
+// offending Input (shadcn-vue's Input paints the red ring from that attr).
 const isNameError = computed(() => addError.value === t('connectivity.addCustom.NameRequired'));
 const isUrlError = computed(() => {
   const err = addError.value;
@@ -382,7 +368,7 @@ const openAddDialog = () => {
   addUrl.value = '';
   addError.value = '';
   addDialogOpen.value = true;
-  // Focus the first input once the dialog's portal content mounts.
+  // Focus first input after the portal mounts.
   nextTick(() => {
     const el = document.getElementById('custom-conn-name');
     if (el) el.focus();
@@ -391,16 +377,8 @@ const openAddDialog = () => {
 
 const onAddDialogChange = (val) => { addDialogOpen.value = val; };
 
-// Normalize user input into the URL that checkConnectivityHandler will
-// HEAD-probe. Preserve whatever path the user typed — if they entered
-// "example.com/api/health" they explicitly want that endpoint probed,
-// not the root. Only when they give a bare domain (no path) do we
-// default to "/favicon.ico", because roots often force the server to
-// run full app logic even for HEAD (SSR prep, cookie checks, A/B
-// routing) while a favicon is a CDN-edge-cached static asset that
-// responds in a few milliseconds — that keeps the "is it reachable?"
-// latency number meaningful instead of drowned in per-site handler
-// overhead.
+// Bare domain → /favicon.ico (CDN-cached, fast & meaningful RTT).
+// Explicit paths preserved so users can probe specific endpoints.
 const normalizeTestUrl = (input) => {
   const raw = (input || '').trim();
   if (!raw) return null;
@@ -461,21 +439,39 @@ const removeCustomTarget = (id) => {
   trackEvent('Section', 'RemoveCustomTarget', 'Connectivity');
 };
 
-// ───────────────────────────────────────────────────────────────────────────
-// Main control
+// Multi-mode aggregate: `mintime > 0` ≡ reachable in at least one round.
+const finalizeMultiTestAlert = () => {
+  const total = connectivityTests.length;
+  const everSucceeded = connectivityTests.filter((t) => t.mintime > 0).length;
+  updateConnectivityAlert(everSucceeded === total ? 'success' : 'error');
+};
+
+// ── Main control ───────────────────────────────────────────────────────────
 const handelCheckStart = async (fromApp = false) => {
+  const multi = multipleTests.value;
   if (fromApp) await checkAllConnectivity(false, true, true);
   else await checkAllConnectivity(true, false, false);
   store.setLoadingStatus('connectivity', true);
-  if (autoRefresh.value) {
+  if (multi) {
     intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
         await checkAllConnectivity(false, false, false);
         counter.value++;
+        if (counter.value >= maxCounts.value) {
+          // Final round — re-aggregate and unlock the toast pipeline.
+          finalizeMultiTestAlert();
+          allRoundsDone.value = true;
+          clearInterval(intervalId.value);
+          intervalId.value = null;
+        }
       } else {
+        // User took over (card click) — stop and suppress the auto-toast.
         clearInterval(intervalId.value);
+        intervalId.value = null;
       }
-    }, 3000);
+    }, 500);
+  } else {
+    allRoundsDone.value = true;
   }
 };
 
@@ -483,8 +479,7 @@ onMounted(() => {
   store.setMountingStatus('connectivity', true);
 });
 
-// Clear the autoRefresh interval on unmount — otherwise it keeps pinging
-// targets (and mutating refs) after the component is gone.
+// Stop the interval on unmount.
 onBeforeUnmount(() => {
   if (intervalId.value !== null) {
     clearInterval(intervalId.value);
@@ -492,9 +487,9 @@ onBeforeUnmount(() => {
   }
 });
 
-watch(() => store.allHasLoaded, (newValue) => {
-  if (newValue === true) sendAlert();
-});
+// Either signal flipping fires sendAlert; the gates inside pick the winner.
+watch(() => store.allHasLoaded, (v) => { if (v) sendAlert(); });
+watch(allRoundsDone, (v) => { if (v) sendAlert(); });
 
 defineExpose({ checkAllConnectivity, handelCheckStart });
 </script>
