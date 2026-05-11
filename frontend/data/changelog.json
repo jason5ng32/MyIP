@@ -1090,5 +1090,29 @@
         }
       }
     ]
+  },
+  {
+    "version": "v6.1.2",
+    "date": "May 12, 2026",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized Connectivity Test to show multiple test progress",
+          "zh": "优化网络连通性测试，显示多次测试进度",
+          "fr": "Optimisation du test de connectivité pour afficher le progrès des tests multiples",
+          "tr": "Ağ bağlantı testi çoklu test ilerlemesini görüntüleme iyileştirildi"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed a bug that caused the notification to fire too early when running multiple connectivity tests",
+          "zh": "修复运行多次网络连通性测试时，通知时机错误的问题",
+          "fr": "Correction d'un bug causant la notification à se déclencher trop tôt lors de l'exécution de plusieurs tests de connectivité",
+          "tr": "Birden fazla ağ bağlantı testi çalıştırılırken bildirimin erken tetiklenmesine neden olan bir hata düzeltildi"
+        }
+      }
+    ]
   }
 ]
