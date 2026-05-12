@@ -21,9 +21,7 @@
     <!-- Card grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       <Card v-for="test in connectivityTests" :key="test.id"
-        class="keyboard-shortcut-card group relative cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card"
-        @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
-        :title="t('connectivity.RefreshThisTest')">
+        class="keyboard-shortcut-card group relative transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card">
         <!-- Custom-card remove button, fades in on hover -->
         <button v-if="test.custom" type="button" @click.stop="removeCustomTarget(test.id)"
           class="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground md:opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted transition-opacity cursor-pointer"
@@ -42,7 +40,9 @@
           </div>
           <!-- Status + ms. Multi mode pins these to the best round (see checkConnectivityHandler). -->
           <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-base min-w-0">
+            <span class="flex items-center gap-1.5 text-base min-w-0 cursor-pointer"
+              @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
+              :title="t('connectivity.RefreshThisTest')">
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
                 <span class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
@@ -57,10 +57,14 @@
               {{ test.time }}<span class="ml-0.5 text-sm">ms</span>
             </span>
           </div>
-          <!-- Multi-test per-round progress dots (historical snapshot) -->
-          <div v-if="multipleTests" class="pointer-events-none flex items-center gap-1 mt-2">
-            <span v-for="i in totalRounds" :key="i" class="size-1.5 rounded-full transition-colors duration-200"
-              :class="progressDotClass(test, i - 1)"></span>
+          <!-- Multi-test per-round progress dots (historical snapshot). -->
+          <div v-if="multipleTests" class="flex items-center gap-1 mt-2">
+            <JnTooltip v-for="i in totalRounds" :key="i" :text="roundTooltipText(test, i - 1)" side="top">
+              <span class="group/dot inline-flex items-center justify-center p-1 -m-1 cursor-default">
+                <span class="size-1.5 rounded-full md:transition-transform md:duration-200 md:group-hover/dot:scale-[2.0]"
+                  :class="progressDotClass(test, i - 1)"></span>
+              </span>
+            </JnTooltip>
           </div>
         </CardContent>
       </Card>
@@ -151,8 +155,9 @@ const alertFired = ref(false);
 // the watcher below. Keeping both in one reactive array lets every iterator
 // (run-loop, keyboard nav) treat tiles uniformly.
 const MAX_CUSTOM_TARGETS = 9;
-// `roundResults` records per-round outcomes for the progress dots,
-// independent of the best-of-N face/text. Bootstrap-only writer.
+// `roundResults` records per-round { tone, time } for the progress dots,
+// independent of the best-of-N face/text. `time` powers the per-dot hover
+// tooltip; for `tone: 'fail'` rounds it stays 0. Bootstrap-only writer.
 const connectivityTests = reactive([
   { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
@@ -229,10 +234,21 @@ const { dotClass, textClass } = useStatusTone();
 // Filled → tone color; head-of-queue → pulse (suppressed once the user
 // takes over manually so we don't promise rounds that won't land); rest → dim.
 const progressDotClass = (test, idx) => {
-  const tone = test.roundResults[idx];
-  if (tone) return dotClass(tone);
+  const entry = test.roundResults[idx];
+  if (entry) return dotClass(entry.tone);
   if (!manualRun.value && idx === test.roundResults.length) return 'bg-muted-foreground/40 animate-pulse';
   return 'bg-muted-foreground/20';
+};
+
+// Per-dot hover tooltip: empty string disables the tooltip (JnTooltip's
+// own `!text` guard handles that), so pending/never-run dots stay quiet
+// while finished rounds report their latency or a localized "Failed" label.
+const roundTooltipText = (test, idx) => {
+  const entry = test.roundResults[idx];
+  if (!entry) return '';
+  const n = idx + 1;
+  if (entry.tone === 'fail') return t('connectivity.RoundCount', { n }) + t('connectivity.StatusUnavailable');
+  return t('connectivity.RoundCount', { n}) + entry.time + ' ms';
 };
 
 // Reachable: Smile <200ms, Meh ≥200ms. Unreachable: Frown. Wait: no face.
@@ -267,7 +283,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     test.status = t('connectivity.StatusAvailable');
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);
     test.time = (multipleTests.value && !isManualRun) ? test.mintime : testTime;
-    if (recordRound) test.roundResults.push(testTime < 200 ? 'ok-fast' : 'ok-slow');
+    if (recordRound) test.roundResults.push({ tone: testTime < 200 ? 'ok-fast' : 'ok-slow', time: testTime });
     onTestComplete(true);
   } catch {
     clearTimeout(timeoutId);
@@ -281,7 +297,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
       test.time = 0;
       test.status = t('connectivity.StatusUnavailable');
     }
-    if (recordRound) test.roundResults.push('fail');
+    if (recordRound) test.roundResults.push({ tone: 'fail', time: 0 });
     onTestComplete(false);
   }
 };

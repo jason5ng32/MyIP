@@ -579,6 +579,7 @@
     "checking": "Vérification en cours...",
     "minTestTime": "Minimal: ",
     "RefreshThisTest": "Rafraîchir ce test",
+    "RoundCount": "Tour {n} : ",
     "addCustom": {
       "AddCard": "Ajouter un test",
       "Title": "Ajouter un test personnalisé",

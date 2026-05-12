@@ -578,6 +578,7 @@
     "checking": "Kontrol ediliyor...",
     "minTestTime": "Min Test Süresi: ",
     "RefreshThisTest": "Bu Testi Yenile",
+    "RoundCount": "Tur {n}: ",
     "addCustom": {
       "AddCard": "Test Ekle",
       "Title": "Özel test ekle",

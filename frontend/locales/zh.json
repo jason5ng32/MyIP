@@ -581,6 +581,7 @@
     "checking": "检查中...",
     "minTestTime": "最小测试时间：",
     "RefreshThisTest": "刷新此测试",
+    "RoundCount": "第 {n} 次：",
     "addCustom": {
       "AddCard": "添加测试",
       "Title": "添加自定义测试",
