@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requireValidIP } from '../common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -87,5 +87,45 @@ describe('requireValidIP', () => {
         let nextCalled = false;
         custom(makeReq({ query: { target: '8.8.8.8' } }), makeRes(), () => { nextCalled = true; });
         assert.equal(nextCalled, true);
+    });
+});
+
+describe('requireValidPrefix', () => {
+    const guard = requireValidPrefix();
+
+    it('calls next() when prefix is a valid IPv4 CIDR', () => {
+        let nextCalled = false;
+        guard(makeReq({ query: { prefix: '8.8.8.0/24' } }), makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+    });
+
+    it('calls next() when prefix is a valid IPv6 CIDR', () => {
+        let nextCalled = false;
+        guard(makeReq({ query: { prefix: '2001:4860:4860::/48' } }), makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+    });
+
+    it('returns 400 "No prefix provided" when prefix is missing', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: {} }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'No prefix provided');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 "Invalid prefix" when prefix is malformed', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: { prefix: '8.8.8.0' } }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'Invalid prefix');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 when prefix length is out of v4 range', () => {
+        const res = makeRes();
+        guard(makeReq({ query: { prefix: '8.8.8.0/33' } }), res, () => {});
+        assert.equal(res.statusCode, 400);
     });
 });

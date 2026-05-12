@@ -67,13 +67,14 @@ const { t } = useI18n();
 const placeholderSizes = [12, 8, 6, 8, 4];
 
 const props = defineProps({
-    // The IP we're displaying history for; used as cache key.
-    ip: { type: String, required: true },
-    // Shared session cache, keyed by IP. Owned by IpInfos.vue (or local in QueryIP).
+    // BGP-floor prefix the parent quantized the IP to (/24 v4, /48 v6).
+    // Used both as cache key and as the URL param sent to the backend.
+    prefix: { type: String, required: true },
+    // Shared session cache, keyed by prefix. Owned by IpInfos.vue (or local in QueryIP).
     asnHistoryInfos: { type: Object, required: true },
 });
 
-const entry = computed(() => props.asnHistoryInfos[props.ip]);
+const entry = computed(() => props.asnHistoryInfos[props.prefix]);
 const rows = computed(() => (entry.value && !entry.value.error) ? entry.value.history : null);
 
 // Compact YYYY-MM-DD — RIPEstat returns "2013-12-05T00:00:00", so slice is enough.

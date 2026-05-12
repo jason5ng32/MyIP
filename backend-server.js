@@ -7,7 +7,7 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requireValidIP } from './common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -195,7 +195,7 @@ app.get('/api/ipinfo', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipinfoHandle
 app.get('/api/ipapicom', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapicomHandler);
 app.get('/api/ipsb', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipsbHandler);
 app.get('/api/cfradar', cacheable(ONE_DAY_CACHE), cfHander);
-app.get('/api/asn-history', requireValidIP(), cacheable(ONE_DAY_CACHE), asnHistoryHandler);
+app.get('/api/asn-history', requireValidPrefix(), cacheable(ONE_DAY_CACHE), asnHistoryHandler);
 app.get('/api/whois', cacheable(ONE_HOUR_CACHE), getWhois);
 app.get('/api/ipapiis', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requireValidIP(), cacheable(ONE_HOUR_CACHE), ip2locationHandler);

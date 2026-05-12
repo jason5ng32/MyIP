@@ -68,6 +68,7 @@ common/
 
 - `requireReferer` is mounted globally on `/api/*` in `backend-server.js`. It rejects any request whose `Referer` header isn't on the `ALLOWED_DOMAINS` list (plus `localhost` always). **Handlers must not repeat the referer check.**
 - `requireValidIP()` is attached per-route to every handler that takes `?ip=`. It rejects missing or malformed IPs before the handler runs. **Handlers must not repeat the IP check** — inside the handler body, `req.query.ip` is already known to be a well-formed string.
+- `requireValidPrefix()` is the same pattern for `?prefix=` (CIDR-shaped param). Used by `asn-history` so the frontend can quantize the user's IP to its BGP DFZ-floor (/24 v4 or /48 v6) before the request lands, maximizing CF edge cache reuse across every IP in the same prefix.
 - If you add a new handler that needs a different-shape param guard, add the guard to `common/guards.js` and attach it in `backend-server.js` rather than open-coding the check in the handler.
 
 ### Private-API header pass-through (intentional exception)
@@ -90,7 +91,7 @@ Default: every `/api/*` response gets `Cache-Control: no-store` from the global 
 
 ```js
 app.get('/api/cfradar', cacheable(60 * 60), cfHander);
-app.get('/api/asn-history', requireValidIP(), cacheable(24 * 60 * 60), asnHistoryHandler);
+app.get('/api/asn-history', requireValidPrefix(), cacheable(24 * 60 * 60), asnHistoryHandler);
 ```
 
 Write the TTL as a multiplied expression (`60 * 60` / `24 * 60 * 60` / `30 * 24 * 60 * 60`) rather than a raw second count — the intent is self-evident at a glance, and JS folds the constant at call time so there's no runtime cost.

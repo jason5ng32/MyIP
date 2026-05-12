@@ -110,7 +110,8 @@ const asnInfos = ref({
   }
 });
 
-// ASN routing history (RIPEstat), keyed by IP. Session cache — wipes on reload.
+// ASN routing history (RIPEstat), keyed by BGP-floor prefix (/24 v4, /48 v6).
+// Session cache — wipes on reload.
 const asnHistoryInfos = ref({});
 
 // Other data

@@ -152,7 +152,7 @@
                     </Button>
                 </JnTooltip>
                 <!-- ASN History -->
-                <JnTooltip v-if="data.ip" :text="t('Tooltips.ShowASNHistory')" side="top">
+                <JnTooltip v-if="ipPrefix" :text="t('Tooltips.ShowASNHistory')" side="top">
                     <Button variant="ghost" size="icon"
                         :class="['size-7 cursor-pointer', activePanel === 'history' && 'bg-muted text-foreground hover:bg-muted']"
                         @click="togglePanel('history')" :aria-expanded="activePanel === 'history'"
@@ -166,7 +166,7 @@
             <CollapsibleContent class="pt-3">
                 <ASNInfo v-if="activePanel === 'info'" :index="index" :isDarkMode="isDarkMode" :asn="data.asn"
                     :asnInfos="asnInfos" />
-                <ASNHistory v-else-if="activePanel === 'history'" :ip="data.ip"
+                <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
                     :asnHistoryInfos="asnHistoryInfos" />
             </CollapsibleContent>
         </Collapsible>
@@ -211,6 +211,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -316,6 +317,11 @@ const openMapDialog = () => {
     trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
 };
 
+// BGP DFZ-floor prefix for the IP — /24 v4, /48 v6. Used both as the query
+// param sent to /api/asn-history (so CF dedupes across every IP in the same
+// prefix) and as the local session-cache key.
+const ipPrefix = computed(() => toBgpPrefix(props.data.ip));
+
 // Toggle the panel for `name`. Clicking the already-active button collapses
 // the panel entirely; clicking the inactive one switches view and lazily
 // triggers its data fetch. Session caches (asnInfos / asnHistoryInfos) make
@@ -328,8 +334,8 @@ const togglePanel = async (name) => {
     activePanel.value = name;
     if (name === 'info') {
         await getASNInfo(props.data.asn);
-    } else if (name === 'history') {
-        await getASNHistory(props.data.ip);
+    } else if (name === 'history' && ipPrefix.value) {
+        await getASNHistory(ipPrefix.value);
     }
 };
 
@@ -352,23 +358,23 @@ const getASNInfo = async (asn) => {
     }
 };
 
-const getASNHistory = async (ip) => {
+const getASNHistory = async (prefix) => {
     trackEvent('IPCheck', 'ASNHistoryClick', 'Show ASN History');
     try {
-        if (props.asnHistoryInfos[ip]) return;
+        if (props.asnHistoryInfos[prefix]) return;
         const response = await fetchWithTimeout(
-            `/api/asn-history?ip=${encodeURIComponent(ip)}`,
+            `/api/asn-history?prefix=${encodeURIComponent(prefix)}`,
             { timeoutMs: 10000 }
         );
         if (!response.ok) {
-            props.asnHistoryInfos[ip] = { error: true };
+            props.asnHistoryInfos[prefix] = { error: true };
             return;
         }
         const data = await response.json();
-        props.asnHistoryInfos[ip] = data;
+        props.asnHistoryInfos[prefix] = data;
     } catch (error) {
         console.error('Error fetching ASN history:', error);
-        props.asnHistoryInfos[ip] = { error: true };
+        props.asnHistoryInfos[prefix] = { error: true };
     }
 };
 </script>

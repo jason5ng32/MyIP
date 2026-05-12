@@ -5,6 +5,7 @@
 
 import { refererCheck } from './referer-check.js';
 import { isValidIP } from './valid-ip.js';
+import { isValidBgpPrefix } from './bgp-prefix.js';
 
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
@@ -28,6 +29,20 @@ export const requireValidIP = (paramName = 'ip') => (req, res, next) => {
     }
     if (!isValidIP(ip)) {
         return res.status(400).json({ error: 'Invalid IP address' });
+    }
+    next();
+};
+
+// Reject requests without a valid CIDR prefix in the specified query param.
+// Accepts any well-formed CIDR — the quantization policy (e.g. /24 for v4,
+// /48 for v6) is the frontend's job, not the guard's.
+export const requireValidPrefix = (paramName = 'prefix') => (req, res, next) => {
+    const prefix = req.query[paramName];
+    if (!prefix) {
+        return res.status(400).json({ error: 'No prefix provided' });
+    }
+    if (!isValidBgpPrefix(prefix)) {
+        return res.status(400).json({ error: 'Invalid prefix' });
     }
     next();
 };

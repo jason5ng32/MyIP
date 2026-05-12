@@ -1,5 +1,7 @@
-// /api/asn-history — RIPEstat routing-history for an IP, enriched with
-// per-ASN org names from RIPEstat as-overview (in parallel, best-effort).
+// /api/asn-history — RIPEstat routing-history for a CIDR prefix (the
+// frontend quantizes the user's IP to /24 v4 or /48 v6 first, so all IPs
+// in the same prefix collapse to one CF edge cache entry). Org names per
+// ASN come from RIPEstat as-overview, fetched in parallel, best-effort.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
@@ -21,8 +23,8 @@ const SOURCE_APP = process.env.RIPESTAT_SOURCE_APP || 'myip';
 // timeout for a slow secondary lookup.
 const ORG_FETCH_TIMEOUT_MS = 8000;
 
-function summarizeOrigin(entry, family) {
-    const acceptedPrefixes = (entry.prefixes || []).filter(p => prefixLength(p.prefix) >= MIN_PREFIX[family]);
+function summarizeOrigin(entry, minLen) {
+    const acceptedPrefixes = (entry.prefixes || []).filter(p => prefixLength(p.prefix) >= minLen);
     if (acceptedPrefixes.length === 0) return null;
 
     const allTimes = [];
@@ -76,22 +78,26 @@ async function fetchAsOrgName(asn) {
 }
 
 export default async (req, res) => {
-    const ip = req.query.ip;
+    // Prefix presence + validity guaranteed by requireValidPrefix middleware.
+    // Frontend quantizes the user's IP to /24 (v4) or /48 (v6) so every IP in
+    // the same prefix collapses to one cache entry at CF's edge.
+    const prefix = req.query.prefix;
+    const family = prefix.includes(':') ? 'v6' : 'v4';
+    const minLen = MIN_PREFIX[family];
 
     try {
         const url = `https://stat.ripe.net/data/routing-history/data.json`
-            + `?resource=${encodeURIComponent(ip)}&sourceapp=${SOURCE_APP}`;
+            + `?resource=${encodeURIComponent(prefix)}&sourceapp=${SOURCE_APP}`;
         const apiRes = await fetchUpstream(url);
         if (!apiRes.ok) {
-            logger.warn({ ip, status: apiRes.status }, 'RIPEstat routing-history non-2xx');
+            logger.warn({ prefix, status: apiRes.status }, 'RIPEstat routing-history non-2xx');
             return res.status(502).json({ error: 'Upstream error' });
         }
         const payload = await apiRes.json();
         const origins = payload?.data?.by_origin || [];
-        const family = ip.includes(':') ? 'v6' : 'v4';
 
         const history = origins
-            .map(entry => summarizeOrigin(entry, family))
+            .map(entry => summarizeOrigin(entry, minLen))
             .filter(Boolean)
             .sort((a, b) => (b.lastSeen || '').localeCompare(a.lastSeen || ''));
 
@@ -107,12 +113,12 @@ export default async (req, res) => {
                 row.org = orgByAsn[row.asn] || null;
             }
         } catch (error) {
-            logger.warn({ err: error, ip }, 'as-overview batch failed; returning ASN-only history');
+            logger.warn({ err: error, prefix }, 'as-overview batch failed; returning ASN-only history');
         }
 
-        res.json({ ip, history });
+        res.json({ prefix, history });
     } catch (error) {
-        logger.error({ err: error, ip }, 'asn-history handler failed');
+        logger.error({ err: error, prefix }, 'asn-history handler failed');
         res.status(500).json({ error: error.message });
     }
 };
