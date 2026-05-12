@@ -551,6 +551,7 @@
       "moreData": "Daha Fazla Veri : "
     },
     "ASNHistory": {
+      "announcedPrefixes": "Duyurulan Önekler : ",
       "note": "Bu IP için geçmiş ASN duyuruları : ",
       "empty": "Bu IP için geçmiş yönlendirme verisi bulunamadı.",
       "error": "ASN geçmişi yüklenemedi.",

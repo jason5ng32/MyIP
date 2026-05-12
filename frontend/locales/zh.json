@@ -554,6 +554,7 @@
       "moreData": "更多数据："
     },
     "ASNHistory": {
+      "announcedPrefixes": "公告前缀：",
       "note": "该 IP 的历史 ASN 公告：",
       "empty": "未找到该 IP 的历史路由数据。",
       "error": "加载 ASN 历史失败。",

@@ -3,7 +3,6 @@
     <div class="rounded-md border bg-muted/40 text-sm">
         <!-- Top note -->
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
-            <Info class="size-3.5 mt-[0.15em] shrink-0" />
             <span>{{ t('ipInfos.ASNInfo.note') }}</span>
         </div>
 

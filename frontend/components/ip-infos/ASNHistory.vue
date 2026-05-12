@@ -1,11 +1,10 @@
 <template>
     <!-- ASN History Panel: embedded in IpDetailPanel's Collapsible.
-         Lists every ASN that has announced (a prefix covering) this IP over
-         time, per RIPEstat routing-history. -->
+        Lists every ASN that has announced (a prefix covering) this IP over
+        time, per RIPEstat routing-history. -->
     <div class="rounded-md border bg-muted/40 text-sm">
         <!-- Top note -->
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
-            <Info class="size-3.5 mt-[0.15em] shrink-0" />
             <span>{{ t('ipInfos.ASNHistory.note') }}</span>
         </div>
 
@@ -18,9 +17,9 @@
                         <span class="font-mono font-medium shrink-0">AS{{ row.asn }}</span>
                         <span v-if="row.org" class="truncate text-muted-foreground" :title="row.org">· {{ row.org }}</span>
                     </div>
-                    <Badge v-if="row.peers" variant="outline" class="shrink-0 gap-1 font-normal"
+                    <Badge v-if="row.peers" variant="outline" class="shrink-0 gap-1 font-normal min-w-[64px] flex items-center justify-center"
                         :title="t('ipInfos.ASNHistory.seenBy', { peers: row.peers })">
-                        <Eye class="size-3" />
+                        <RadioTower class="size-3" />
                         <span class="tabular-nums">{{ row.peers }}</span>
                     </Badge>
                 </div>
@@ -29,6 +28,9 @@
                     <span class="tabular-nums">{{ fmtDate(row.firstSeen) }} → {{ fmtDate(row.lastSeen) }}</span>
                 </div>
                 <div v-if="row.prefixes && row.prefixes.length" class="flex flex-wrap gap-1">
+                    <span class="text-xs text-muted-foreground">
+                        {{ t('ipInfos.ASNHistory.announcedPrefixes') }}
+                    </span>
                     <Badge v-for="p in row.prefixes.slice(0, 4)" :key="p" variant="outline"
                         class="font-mono text-[10px] py-0 px-1.5 font-normal">{{ p }}</Badge>
                     <span v-if="row.prefixes.length > 4" class="text-[10px] text-muted-foreground self-center">
@@ -60,7 +62,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Clock4, Eye, Info } from 'lucide-vue-next';
+import { Building2, Clock4, RadioTower } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

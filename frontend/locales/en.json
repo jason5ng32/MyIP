@@ -552,6 +552,7 @@
       "moreData": "More Data : "
     },
     "ASNHistory": {
+      "announcedPrefixes": "Announced Prefixes: ",
       "note": "Historical ASN announcements for this IP: ",
       "empty": "No historical routing data found for this IP.",
       "error": "Failed to load ASN history.",
