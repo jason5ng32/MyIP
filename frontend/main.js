@@ -6,13 +6,17 @@ import i18n from './locales/i18n';
 import router from './router';
 import { analytics } from './utils/use-analytics';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
+import { addCollection } from '@iconify/vue';
 
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
 
-// Dynamic import of circle-flags collection
+// The flag icon JSON is hundreds of KB — keep it dynamic so it doesn't bloat
+// the first-paint bundle. `@iconify/vue` itself is statically imported (above)
+// because a dozen components already pull it in synchronously, so wrapping
+// addCollection in another dynamic() would just be a no-op Promise tick.
 import('@iconify-json/circle-flags/icons.json').then(({ default: flags }) => {
-    import('@iconify/vue').then(({ addCollection }) => addCollection(flags));
+    addCollection(flags);
 });
 
 const app = createApp(App);
