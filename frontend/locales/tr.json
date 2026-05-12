@@ -500,6 +500,7 @@
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
     "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
     "ShowASNInfo": "AS Detaylarını Göster",
+    "ShowASNHistory": "ASN Geçmişini Göster",
     "CopyIP": "IP Adresini Kopyala",
     "ViewOnMap": "Konumu haritada görüntüle",
     "InfoMask": "IP Bilgilerini Gizle",
@@ -548,6 +549,12 @@
       "Bot_Pct": "Bot : ",
       "Human_Pct": "İnsan : ",
       "moreData": "Daha Fazla Veri : "
+    },
+    "ASNHistory": {
+      "note": "Bu IP için geçmiş ASN duyuruları : ",
+      "empty": "Bu IP için geçmiş yönlendirme verisi bulunamadı.",
+      "error": "ASN geçmişi yüklenemedi.",
+      "seenBy": "{peers} BGP full-feed eşi tarafından görüldü"
     },
     "advancedData": {
       "proxyYes": "Kesinlikle bir proxy veya VPN",

@@ -501,6 +501,7 @@
     "SpeedTestButton": "Start/Pause Speed Test",
     "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
+    "ShowASNHistory": "Show ASN History",
     "CopyIP": "Copy IP Address",
     "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
@@ -549,6 +550,12 @@
       "Bot_Pct": "Bot",
       "Human_Pct": "Human",
       "moreData": "More Data : "
+    },
+    "ASNHistory": {
+      "note": "Historical ASN announcements for this IP: ",
+      "empty": "No historical routing data found for this IP.",
+      "error": "Failed to load ASN history.",
+      "seenBy": "Seen by {peers} BGP full-feed peers"
     },
     "advancedData": {
       "proxyYes": "Must be a proxy or VPN",

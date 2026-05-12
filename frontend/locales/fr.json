@@ -501,6 +501,7 @@
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "SourceSelect": "Sélectionner la source de géolocalisation IP",
     "ShowASNInfo": "Afficher les détails AS",
+    "ShowASNHistory": "Afficher l'historique ASN",
     "CopyIP": "Copier l'adresse IP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
@@ -549,6 +550,12 @@
       "Bot_Pct": "Robots : ",
       "Human_Pct": "Humain : ",
       "moreData": "Plus de données : "
+    },
+    "ASNHistory": {
+      "note": "Annonces ASN historiques pour cette IP : ",
+      "empty": "Aucune donnée de routage historique trouvée pour cette IP.",
+      "error": "Échec du chargement de l'historique ASN.",
+      "seenBy": "Vu par {peers} pairs BGP full-feed"
     },
     "advancedData": {
       "proxyYes": "Doit être un proxy ou un VPN",

@@ -21,6 +21,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
+import asnHistoryHandler from './api/asn-history.js';
 import dnsResolver from './api/dns-resolver.js';
 import { getSessionResult as dnsLeakGetResult } from './api/dns-leak-test.js';
 import getWhois from './api/get-whois.js';
@@ -184,6 +185,7 @@ app.get('/api/ipapicom', requireValidIP(), ipapicomHandler);
 app.get('/api/ipchecking', requireValidIP(), ipCheckingHandler);
 app.get('/api/ipsb', requireValidIP(), ipsbHandler);
 app.get('/api/cfradar', cfHander);
+app.get('/api/asn-history', requireValidIP(), asnHistoryHandler);
 app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/whois', getWhois);

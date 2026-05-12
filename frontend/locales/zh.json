@@ -503,6 +503,7 @@
     "SpeedTestButton": "开始/暂停网速测试",
     "SourceSelect": "选择 IP 归属地数据来源",
     "ShowASNInfo": "显示 AS 详细信息",
+    "ShowASNHistory": "显示 ASN 历史",
     "CopyIP": "复制 IP 地址",
     "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
@@ -551,6 +552,12 @@
       "Bot_Pct": "机器人",
       "Human_Pct": "人类",
       "moreData": "更多数据："
+    },
+    "ASNHistory": {
+      "note": "该 IP 的历史 ASN 公告：",
+      "empty": "未找到该 IP 的历史路由数据。",
+      "error": "加载 ASN 历史失败。",
+      "seenBy": "被 {peers} 个 BGP 全表节点观测到"
     },
     "advancedData": {
       "proxyYes": "是代理或 VPN",

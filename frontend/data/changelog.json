@@ -1092,9 +1092,18 @@
     ]
   },
   {
-    "version": "v6.1.2",
+    "version": "v6.2.0",
     "date": "May 12, 2026",
     "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Now you can view the historical ASN records of an IP",
+          "zh": "可以查看一个 IP 过往的所有 ASN 记录",
+          "fr": "Vous pouvez maintenant voir l'historique des ASN d'une IP",
+          "tr": "Bir IP'in geçmiş ASN kayıtlarını görüntüleyebilirsiniz"
+        }
+      },
       {
         "type": "improve",
         "change": {

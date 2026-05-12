@@ -46,7 +46,8 @@
                     </div>
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false" />
+                        :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
+                        :enable-map="false" />
                 </div>
             </div>
         </DialogContent>
@@ -58,7 +59,7 @@
 // Differences from IPCard:
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
-// - Own asnInfos cache (local to this component; not shared with IPCard).
+// - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
@@ -90,6 +91,7 @@ const modalQueryError = ref('');
 const isChecking = ref('idle');
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const asnInfos = ref({});
+const asnHistoryInfos = ref({});
 
 watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
@@ -148,7 +150,7 @@ const fetchIPForModal = async (ip, sourceID = null) => {
         try {
             const url = store.getDbUrl(source.id, ip, selectedLang);
             const response = await authenticatedFetch(url);
-            modalQueryResult.value = transformDataFromIPapi(response, source.id, t, lang.value);
+            modalQueryResult.value = { ...transformDataFromIPapi(response, source.id, t, lang.value), ip };
             isChecking.value = 'idle';
             break;
         } catch (error) {

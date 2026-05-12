@@ -46,8 +46,8 @@
                 </div>
 
                 <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                    :configs="configs" :is-dark-mode="isDarkMode" :collapsed="isMobile && isCardsCollapsed"
-                    :enable-map="true" />
+                    :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
+                    :collapsed="isMobile && isCardsCollapsed" :enable-map="true" />
             </template>
 
             <!-- Error state -->
@@ -97,7 +97,8 @@ const props = defineProps({
     isCardsCollapsed: { type: Boolean, required: true },
     copiedStatus: { type: Object, required: true },
     configs: { type: Object, required: true },
-    asnInfos: { type: Object, required: true }
+    asnInfos: { type: Object, required: true },
+    asnHistoryInfos: { type: Object, default: () => ({}) }
 });
 
 defineEmits(['refresh-card']);

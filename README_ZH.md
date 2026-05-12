@@ -142,6 +142,7 @@ MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进
 | `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
 | `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
 | `CLOUDFLARE_API` | 否 | `""` | Cloudflare 的 API Key，用于通过 Cloudflare 获取 AS 系统的信息 |
+| `RIPESTAT_SOURCE_APP` | 否 | `""` | RIPE.net 的源应用名称，用于通过 RIPE.net 获取 ASN 的历史信息 |
 | `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
 | `VITE_CURL_IPV4_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv4 域名 |
 | `VITE_CURL_IPV6_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv6 域名 |
