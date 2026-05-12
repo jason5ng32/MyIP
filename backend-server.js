@@ -65,31 +65,29 @@ if (process.env.LOG_HTTP === 'true') {
     logger.info('📝 HTTP request logging enabled (LOG_HTTP=true)');
 }
 
-// Helper function to get client IP
 function getClientIp(req) {
-    const cfIp = req.headers['cf-connecting-ip']; // Cloudflare IP
+    const cfIp = req.headers['cf-connecting-ip'];
     const forwardedIps = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : null;
     const cfIpV6 = req.headers['cf-connecting-ipv6'];
     return cfIp || forwardedIps || cfIpV6 || req.ip;
 }
 
-// Format timestamp for rate limit log using Shanghai time zone
+// Shanghai TZ — fixed for log consistency across deployments regardless of host locale.
 function formatDate(timestamp) {
     return new Date(timestamp).toLocaleString('en-US', { timeZone: 'Asia/Shanghai' });
 }
 
-// Write IP that triggered the limit to the log and count the number of times the same IP was limited
+// Append-or-update one line in the rate-limit log, keeping the original
+// timestamp on repeat offenders so we can see when an IP *first* showed up.
 function logLimitedIP(ip) {
     const logPath = path.join(__dirname, blackListIPLogFilePath);
 
-    // If logs directory does not exist, create it
     const logDir = path.dirname(logPath);
     if (!fs.existsSync(logDir)) {
         fs.mkdirSync(logDir, { recursive: true });
         logger.info({ logDir }, 'Created log directory');
     }
 
-    // Read log file, update IP count, create new log file if it does not exist
     fs.readFile(logPath, 'utf8', (err, data) => {
         if (err && err.code !== 'ENOENT') {
             logger.error({ err }, 'Error reading the log file');
@@ -109,7 +107,7 @@ function logLimitedIP(ip) {
                     newCount = parseInt(count, 10) + 1;
                     logExists = true;
                     logger.warn({ ip, count: newCount }, 'Rate-limited IP hit again');
-                    return `${ip},${newCount},${timestamp}`;  // Update count but keep the original timestamp
+                    return `${ip},${newCount},${timestamp}`;
                 }
                 return line;
             }).join('\n');
@@ -133,9 +131,11 @@ const rateLimiter = rateLimit({
     windowMs: 20 * 60 * 1000,
     max: rateLimitSet,
     message: 'Too Many Requests',
-    // Handle requests that exceed the rate limit threshold, and record the IP that triggered the limit as needed
     handler: (req, res, next) => {
         const ip = getClientIp(req);
+        // Log on the exact transition into rate-limited state — not every
+        // blocked request — to avoid log flooding when an abusive client
+        // keeps hammering after being limited.
         if (req.rateLimit.current === req.rateLimit.limit + 1 && blackListIPLogFilePath) {
             logLimitedIP(ip);
         }
@@ -146,17 +146,14 @@ const rateLimiter = rateLimit({
 const speedLimiter = slowDown({
 	windowMs: 60 * 60 * 1000,
 	delayAfter: speedLimitSet,
-    // Increase response delay gradually based on the number of hits
 	delayMs: (hits) => hits * 400,
 })
 
-// If rateLimitSet is 0, do not enable rate limiting
 if (rateLimitSet !== 0) {
     app.use('/api', rateLimiter);
     logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 60 minutes`);
 }
 
-// If delayAfter is 0, do not enable delay
 if (speedLimitSet !== 0) {
     app.use('/api', speedLimiter);
     logger.info(`🐢 Speed limiter enabled — slow down after ${speedLimitSet} requests`);
@@ -164,40 +161,55 @@ if (speedLimitSet !== 0) {
 
 app.use(express.json());
 
-// Default every /api/* response to no-store. 
-// Pure-function handlers (whois / macchecker / cfradar / map / configs) MAY
-// override this with `res.setHeader('Cache-Control', 'public, max-age=...')`
-// before sending the response.
+// Default every /api/* response to no-store. Routes that want edge caching
+// declare it explicitly via the `cacheable(maxAge)` middleware below.
 app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
     next();
 });
 
+// Cache-Control middleware factory. Hooks res.json so the header is only
+// attached on 2xx — CF must not cache 4xx/5xx error pages. Binary streams
+// (res.send) bypass this and must set their own header if needed.
+const cacheable = (maxAgeSeconds) => (req, res, next) => {
+    const originalJson = res.json.bind(res);
+    res.json = function (body) {
+        if (res.statusCode < 400) {
+            res.setHeader('Cache-Control', `public, max-age=${maxAgeSeconds}`);
+        }
+        return originalJson(body);
+    };
+    next();
+};
+
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
 
-// APIs. Routes that validate an `?ip=` param attach requireValidIP() so the
-// handler body no longer repeats the check.
+const ONE_HOUR_CACHE = 60 * 60;
+const ONE_DAY_CACHE = 24 * 60 * 60;
+const THIRTY_DAYS_CACHE = 30 * 24 * 60 * 60;
+
+// Cacheable routes — TTLs picked against each upstream's natural refresh cadence.
+app.get('/api/ipinfo', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipinfoHandler);
+app.get('/api/ipapicom', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapicomHandler);
+app.get('/api/ipsb', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipsbHandler);
+app.get('/api/cfradar', cacheable(ONE_DAY_CACHE), cfHander);
+app.get('/api/asn-history', requireValidIP(), cacheable(ONE_DAY_CACHE), asnHistoryHandler);
+app.get('/api/whois', cacheable(ONE_HOUR_CACHE), getWhois);
+app.get('/api/ipapiis', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapiisHandler);
+app.get('/api/ip2location', requireValidIP(), cacheable(ONE_HOUR_CACHE), ip2locationHandler);
+app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
+app.get('/api/maxmind', requireValidIP(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+
+// Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/map', mapHandler);
-app.get('/api/ipinfo', requireValidIP(), ipinfoHandler);
-app.get('/api/ipapicom', requireValidIP(), ipapicomHandler);
 app.get('/api/ipchecking', requireValidIP(), ipCheckingHandler);
-app.get('/api/ipsb', requireValidIP(), ipsbHandler);
-app.get('/api/cfradar', cfHander);
-app.get('/api/asn-history', requireValidIP(), asnHistoryHandler);
 app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
-app.get('/api/whois', getWhois);
-app.get('/api/ipapiis', requireValidIP(), ipapiisHandler);
-app.get('/api/ip2location', requireValidIP(), ip2locationHandler);
 app.get('/api/invisibility', invisibilitytestHandler);
-app.get('/api/macchecker', macChecker);
-app.get('/api/maxmind', requireValidIP(), maxmindHandler);
 app.get('/api/getuserinfo', getUserinfo);
 app.put('/api/updateuserachievement', updateUserAchievement);
-
-// Handle all configuration requests using query parameters
 app.get('/api/configs', validateConfigs);
 
 // Set static file server
@@ -206,18 +218,9 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, './dist')));
 
 
-// Bootstrap the MaxMind layer before accepting traffic. The sequence is:
-//   1. bootstrapMaxMindIfMissing — if the .mmdb files are absent and
-//      credentials are configured, download them synchronously (capped at
-//      5 min). Never throws; logs a warning and moves on if it can't.
-//   2. reloadMaxMindDatabases — load readers into memory. Also non-fatal;
-//      if the files still aren't there, MaxMind API will return 503.
-//   3. startMaxMindFileWatcher — pick up files that arrive later (manual
-//      drop-in or a background process publishing updates).
-//   4. startMaxMindAutoUpdate — schedule credential-gated periodic updates
-//      when MAXMIND_AUTO_UPDATE is enabled.
-//   5. app.listen — only after all of the above, so the server never accepts
-//      requests mid-download and log order stays readable.
+// Bootstrap MaxMind before accepting traffic so we never serve mid-download.
+// Each step is non-fatal: a failure here leaves the MaxMind API returning
+// 503 until the watcher picks up valid databases later.
 async function bootBackend() {
     await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
 
@@ -229,7 +232,6 @@ async function bootBackend() {
     startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
 
     app.listen(backEndPort, () => {
-        // Output listening address, for local running and process manager log troubleshooting
         logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
     });
 }

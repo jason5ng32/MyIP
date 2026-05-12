@@ -84,6 +84,19 @@ This is deliberate — the upstream expects caller context (Accept-Language, aut
 
 Some handlers keep a `req.method !== 'GET'` (or `PUT`) branch even though Express routes already gate the method. These exist because dedicated smoke tests assert on that branch directly against the handler. If you add or copy a handler, leave the defensive gate in place if a test covers it.
 
+## Edge caching
+
+Default: every `/api/*` response gets `Cache-Control: no-store` from the global middleware in `backend-server.js`. Routes that serve slowly-changing public data opt in to Cloudflare edge caching by attaching the `cacheable(maxAgeSeconds)` middleware (defined in `backend-server.js`):
+
+```js
+app.get('/api/cfradar', cacheable(60 * 60), cfHander);
+app.get('/api/asn-history', requireValidIP(), cacheable(24 * 60 * 60), asnHistoryHandler);
+```
+
+Write the TTL as a multiplied expression (`60 * 60` / `24 * 60 * 60` / `30 * 24 * 60 * 60`) rather than a raw second count — the intent is self-evident at a glance, and JS folds the constant at call time so there's no runtime cost.
+
+The middleware hooks `res.json` and only sets `Cache-Control: public, max-age=N` when the response status is < 400 — error responses keep `no-store` so CF never caches a 4xx/5xx page. Handlers themselves stay pure and don't touch `Cache-Control`. **Auth'd or per-user endpoints** (`ipchecking` / `invisibility` / `dns-leak-test/session` / `getuserinfo` / etc.) must not be wrapped with `cacheable` — their caching belongs at the upstream service that owns the auth context.
+
 ## Testing
 
 - Smoke tests for every handler live in `tests/api-handlers.test.js`. They cover method gating, param presence / validity (beyond what middleware handles), and the "API key missing" early-return branches.
