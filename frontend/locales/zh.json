@@ -524,6 +524,7 @@
     "SourceSelect": "选择 IP 归属地数据来源",
     "ShowASNInfo": "显示 AS 详细信息",
     "ShowASNHistory": "显示 ASN 历史",
+    "ShowASNConnectivity": "显示 ASN 连接图",
     "CopyIP": "复制 IP 地址",
     "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
@@ -579,6 +580,16 @@
       "empty": "未找到该 IP 的历史路由数据。",
       "error": "加载 ASN 历史失败。",
       "seenBy": "被 {peers} 个 BGP 全表节点观测到"
+    },
+    "ASNConnectivity": {
+      "note": "该 AS 到全球 Tier 1 骨干网的上游路径，数据来自 CAIDA AS Relationships。",
+      "empty": "未找到该 AS 的上游连接数据。",
+      "error": "加载 ASN 连接图失败。",
+      "expand": "放大",
+      "dialogTitle": "AS{asn} 的网络连接图",
+      "legendOrigin": "起源",
+      "legendTier1": "Tier 1 骨干",
+      "legendIntermediate": "中间 AS"
     },
     "advancedData": {
       "proxyYes": "是代理或 VPN",

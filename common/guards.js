@@ -46,3 +46,19 @@ export const requireValidPrefix = (paramName = 'prefix') => (req, res, next) => 
     }
     next();
 };
+
+// Reject requests without a valid ASN (numeric, with optional 'AS' prefix).
+// Used by /api/asn-connectivity; other ASN-taking handlers (cf-radar) still
+// validate inline for historical reasons.
+export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
+    const raw = req.query[paramName];
+    if (!raw) {
+        return res.status(400).json({ error: 'No ASN provided' });
+    }
+    const numeric = String(raw).replace(/^AS/i, '');
+    if (!/^[0-9]+$/.test(numeric)) {
+        return res.status(400).json({ error: 'Invalid ASN' });
+    }
+    req.query[paramName] = numeric;
+    next();
+};

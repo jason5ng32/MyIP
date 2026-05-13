@@ -46,7 +46,8 @@
                 </div>
 
                 <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                    :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
+                    :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
+                    :configs="configs" :is-dark-mode="isDarkMode"
                     :collapsed="isMobile && isCardsCollapsed" :enable-map="true" />
             </template>
 
@@ -98,7 +99,8 @@ const props = defineProps({
     copiedStatus: { type: Object, required: true },
     configs: { type: Object, required: true },
     asnInfos: { type: Object, required: true },
-    asnHistoryInfos: { type: Object, default: () => ({}) }
+    asnHistoryInfos: { type: Object, default: () => ({}) },
+    asnConnectivityInfos: { type: Object, default: () => ({}) }
 });
 
 defineEmits(['refresh-card']);

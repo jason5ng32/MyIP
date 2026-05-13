@@ -522,6 +522,7 @@
     "SourceSelect": "Sélectionner la source de géolocalisation IP",
     "ShowASNInfo": "Afficher les détails AS",
     "ShowASNHistory": "Afficher l'historique ASN",
+    "ShowASNConnectivity": "Afficher la connectivité ASN",
     "CopyIP": "Copier l'adresse IP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
@@ -577,6 +578,16 @@
       "empty": "Aucune donnée de routage historique trouvée pour cette IP.",
       "error": "Échec du chargement de l'historique ASN.",
       "seenBy": "Vu par {peers} pairs BGP full-feed"
+    },
+    "ASNConnectivity": {
+      "note": "Chemins amont depuis cet AS vers les opérateurs de transit Tier 1 mondiaux. Construit à partir de CAIDA AS Relationships.",
+      "empty": "Aucune donnée de connectivité amont disponible pour cet AS.",
+      "error": "Échec du chargement de la connectivité ASN.",
+      "expand": "Agrandir",
+      "dialogTitle": "Carte de connectivité réseau d'AS{asn}",
+      "legendOrigin": "Origine",
+      "legendTier1": "FAI Tier 1",
+      "legendIntermediate": "AS intermédiaire"
     },
     "advancedData": {
       "proxyYes": "Doit être un proxy ou un VPN",

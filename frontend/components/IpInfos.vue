@@ -20,7 +20,7 @@
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
           :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
           :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
-          @refresh-card="refreshCard" />
+          :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
     </div>
   </section>
@@ -113,6 +113,9 @@ const asnInfos = ref({
 // ASN routing history (RIPEstat), keyed by BGP-floor prefix (/24 v4, /48 v6).
 // Session cache — wipes on reload.
 const asnHistoryInfos = ref({});
+
+// ASN upstream connectivity graph, keyed by numeric ASN string. Session cache.
+const asnConnectivityInfos = ref({});
 
 // Other data
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);

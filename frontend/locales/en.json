@@ -522,6 +522,7 @@
     "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
     "ShowASNHistory": "Show ASN History",
+    "ShowASNConnectivity": "Show ASN Connectivity",
     "CopyIP": "Copy IP Address",
     "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
@@ -577,6 +578,16 @@
       "empty": "No historical routing data found for this IP.",
       "error": "Failed to load ASN history.",
       "seenBy": "Seen by {peers} BGP full-feed peers"
+    },
+    "ASNConnectivity": {
+      "note": "Upstream paths from this AS toward the Tier 1 global transit providers. Built from CAIDA AS Relationships.",
+      "empty": "No upstream connectivity data available for this AS.",
+      "error": "Failed to load ASN connectivity.",
+      "expand": "Expand",
+      "dialogTitle": "Network connectivity for AS{asn}",
+      "legendOrigin": "Origin",
+      "legendTier1": "Tier 1 ISP",
+      "legendIntermediate": "Intermediate AS"
     },
     "advancedData": {
       "proxyYes": "Must be a proxy or VPN",

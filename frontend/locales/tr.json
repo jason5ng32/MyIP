@@ -521,6 +521,7 @@
     "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
     "ShowASNInfo": "AS Detaylarını Göster",
     "ShowASNHistory": "ASN Geçmişini Göster",
+    "ShowASNConnectivity": "ASN Bağlantı Haritasını Göster",
     "CopyIP": "IP Adresini Kopyala",
     "ViewOnMap": "Konumu haritada görüntüle",
     "InfoMask": "IP Bilgilerini Gizle",
@@ -576,6 +577,16 @@
       "empty": "Bu IP için geçmiş yönlendirme verisi bulunamadı.",
       "error": "ASN geçmişi yüklenemedi.",
       "seenBy": "{peers} BGP full-feed eşi tarafından görüldü"
+    },
+    "ASNConnectivity": {
+      "note": "Bu AS'tan Tier 1 küresel transit sağlayıcılarına giden yukarı akış yolları. CAIDA AS Relationships üzerinden oluşturulmuştur.",
+      "empty": "Bu AS için yukarı akış bağlantı verisi bulunamadı.",
+      "error": "ASN bağlantı haritası yüklenemedi.",
+      "expand": "Büyüt",
+      "dialogTitle": "AS{asn} ağ bağlantı haritası",
+      "legendOrigin": "Kaynak",
+      "legendTier1": "Tier 1 ISP",
+      "legendIntermediate": "Ara AS"
     },
     "advancedData": {
       "proxyYes": "Kesinlikle bir proxy veya VPN",

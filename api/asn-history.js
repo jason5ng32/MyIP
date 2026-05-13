@@ -3,7 +3,12 @@
 // in the same prefix collapse to one CF edge cache entry). Org names per
 // ASN come from RIPEstat as-overview, fetched in parallel, best-effort.
 
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import {
+    fetchRoutingHistory,
+    fetchAsOverview,
+    extractOrgFromHolder,
+} from '../common/ripestat.js';
+import { lookupAsOrgName } from '../common/as-org-db.js';
 import logger from '../common/logger.js';
 
 const prefixLength = (prefix) => parseInt((prefix || '').split('/')[1], 10);
@@ -14,14 +19,6 @@ const MIN_PREFIX = { v4: 8, v6: 19 };
 
 // Below this peer count an announcement is route noise / brief misconfig.
 const MIN_PEERS = 30;
-
-// RIPEstat polite-citizen marker; overridable per deployment.
-const SOURCE_APP = process.env.RIPESTAT_SOURCE_APP || 'myip';
-
-// Shorter timeout for the org enrichment calls — they're best-effort, we'd
-// rather return ASN-only history than make the user wait the full upstream
-// timeout for a slow secondary lookup.
-const ORG_FETCH_TIMEOUT_MS = 8000;
 
 function summarizeOrigin(entry, minLen) {
     const acceptedPrefixes = (entry.prefixes || []).filter(p => prefixLength(p.prefix) >= minLen);
@@ -54,20 +51,14 @@ function summarizeOrigin(entry, minLen) {
     };
 }
 
-// Holder is typically "<HANDLE> - <Company>, <CC>"; strip the leading handle.
-function extractOrgFromHolder(holder) {
-    if (!holder || typeof holder !== 'string') return null;
-    const dashIdx = holder.indexOf(' - ');
-    return dashIdx > 0 ? holder.slice(dashIdx + 3).trim() : holder.trim();
-}
-
-// Best-effort. Any failure (timeout, non-2xx, parse error) yields null so the
-// parent Promise.all never rejects and the row falls back to ASN-only display.
-async function fetchAsOrgName(asn) {
+// Two-tier resolver: local CAIDA as2org first (µs), RIPEstat as-overview
+// fallback. Best-effort — any failure yields null so the row drops to
+// ASN-only display rather than blocking the whole batch.
+async function resolveOrgName(asn) {
+    const local = lookupAsOrgName(asn);
+    if (local) return local;
     try {
-        const url = `https://stat.ripe.net/data/as-overview/data.json`
-            + `?resource=AS${encodeURIComponent(asn)}&sourceapp=${SOURCE_APP}`;
-        const res = await fetchUpstream(url, { timeoutMs: ORG_FETCH_TIMEOUT_MS });
+        const res = await fetchAsOverview(asn);
         if (!res.ok) return null;
         const payload = await res.json();
         return extractOrgFromHolder(payload?.data?.holder);
@@ -79,16 +70,12 @@ async function fetchAsOrgName(asn) {
 
 export default async (req, res) => {
     // Prefix presence + validity guaranteed by requireValidPrefix middleware.
-    // Frontend quantizes the user's IP to /24 (v4) or /48 (v6) so every IP in
-    // the same prefix collapses to one cache entry at CF's edge.
     const prefix = req.query.prefix;
     const family = prefix.includes(':') ? 'v6' : 'v4';
     const minLen = MIN_PREFIX[family];
 
     try {
-        const url = `https://stat.ripe.net/data/routing-history/data.json`
-            + `?resource=${encodeURIComponent(prefix)}&sourceapp=${SOURCE_APP}`;
-        const apiRes = await fetchUpstream(url);
+        const apiRes = await fetchRoutingHistory(prefix);
         if (!apiRes.ok) {
             logger.warn({ prefix, status: apiRes.status }, 'RIPEstat routing-history non-2xx');
             return res.status(502).json({ error: 'Upstream error' });
@@ -106,7 +93,7 @@ export default async (req, res) => {
         try {
             const uniqueAsns = [...new Set(history.map(row => row.asn))];
             const orgPairs = await Promise.all(
-                uniqueAsns.map(async asn => [asn, await fetchAsOrgName(asn)])
+                uniqueAsns.map(async asn => [asn, await resolveOrgName(asn)])
             );
             const orgByAsn = Object.fromEntries(orgPairs);
             for (const row of history) {

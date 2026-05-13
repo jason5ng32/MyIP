@@ -160,6 +160,15 @@
                         <History />
                     </Button>
                 </JnTooltip>
+                <!-- ASN Connectivity -->
+                <JnTooltip v-if="asnNumeric" :text="t('Tooltips.ShowASNConnectivity')" side="top">
+                    <Button variant="ghost" size="icon"
+                        :class="['size-7 cursor-pointer', isPanelActive('connectivity') && 'bg-muted text-foreground hover:bg-muted']"
+                        @click="togglePanel('connectivity')" :aria-expanded="isPanelActive('connectivity')"
+                        :aria-label="'Display ASN Connectivity of ' + data.asn">
+                        <Network />
+                    </Button>
+                </JnTooltip>
             </div>
         </div>
         <Collapsible :open="isPanelOpen" @update:open="onPanelOpenChange">
@@ -169,6 +178,8 @@
                         :asnInfos="asnInfos" />
                     <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
                         :asnHistoryInfos="asnHistoryInfos" />
+                    <ASNConnectivity v-else-if="activePanel === 'connectivity'" :asn="asnNumeric"
+                        :asnConnectivityInfos="asnConnectivityInfos" />
                 </div>
             </CollapsibleContent>
         </Collapsible>
@@ -216,6 +227,10 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
+// ASNConnectivity is heavy (dagre + SVG render); async-import so it
+// only enters the bundle when a user opens the Connectivity panel.
+import { defineAsyncComponent } from 'vue';
+const ASNConnectivity = defineAsyncComponent(() => import('./ASNConnectivity.vue'));
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -233,6 +248,7 @@ import {
     History,
     House,
     Info,
+    Network,
     Lock,
     Map,
     MapPin,
@@ -248,6 +264,8 @@ const props = defineProps({
     asnInfos: { type: Object, required: true },
     // Optional — keyed by IP. IpInfos owns the shared map; QueryIP falls back to its own.
     asnHistoryInfos: { type: Object, default: () => ({}) },
+    // Optional — keyed by numeric ASN string. Same shared-cache pattern.
+    asnConnectivityInfos: { type: Object, default: () => ({}) },
     configs: { type: Object, required: true },
     isDarkMode: { type: Boolean, required: true },
     // ASNInfo requires an index; homepage cards pass their grid index, QueryIP has nothing meaningful.
@@ -326,6 +344,16 @@ const openMapDialog = () => {
 // prefix) and as the local session-cache key.
 const ipPrefix = computed(() => toBgpPrefix(props.data.ip));
 
+// Numeric ASN (no 'AS' prefix), used as the connectivity cache key and the
+// /api/asn-connectivity query param. Null when the geo source didn't return
+// an ASN.
+const asnNumeric = computed(() => {
+    const raw = props.data.asn;
+    if (!raw) return null;
+    const m = String(raw).match(/^AS?(\d+)$/i);
+    return m ? m[1] : null;
+});
+
 // Toggle the panel for `name`. Clicking the already-active button collapses
 // the panel entirely; clicking the inactive one switches view and lazily
 // triggers its data fetch. Session caches (asnInfos / asnHistoryInfos) make
@@ -341,6 +369,8 @@ const togglePanel = async (name) => {
         await getASNInfo(props.data.asn);
     } else if (name === 'history' && ipPrefix.value) {
         await getASNHistory(ipPrefix.value);
+    } else if (name === 'connectivity' && asnNumeric.value) {
+        await getASNConnectivity(asnNumeric.value);
     }
 };
 
@@ -382,6 +412,26 @@ const getASNHistory = async (prefix) => {
     } catch (error) {
         console.error('Error fetching ASN history:', error);
         props.asnHistoryInfos[prefix] = { error: true };
+    }
+};
+
+const getASNConnectivity = async (asn) => {
+    trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');
+    try {
+        if (props.asnConnectivityInfos[asn]) return;
+        const response = await fetchWithTimeout(
+            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}`,
+            { timeoutMs: 5000 } // backend is sub-ms local lookup; tight cap is fine
+        );
+        if (!response.ok) {
+            props.asnConnectivityInfos[asn] = { error: true };
+            return;
+        }
+        const graph = await response.json();
+        props.asnConnectivityInfos[asn] = { graph };
+    } catch (error) {
+        console.error('Error fetching ASN connectivity:', error);
+        props.asnConnectivityInfos[asn] = { error: true };
     }
 };
 </script>

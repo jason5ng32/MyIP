@@ -1129,12 +1129,30 @@
     "date": "Beta",
     "content": [
       {
+        "type": "add",
+        "change": {
+          "en": "Now you can view the upstream connectivity graph of an ASN",
+          "zh": "可以查看 ASN 上游连接图，更直观地了解 ASN 的网络拓扑结构",
+          "fr": "Vous pouvez maintenant voir le graphique de connectivité des ASN",
+          "tr": "Bir ASN'in üst bağlantı grafiğini görüntüleyebilirsiniz"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Improved Browser Info tool for more accurate and practical information",
           "zh": "优化了浏览器信息工具，使其更加准确和实用",
           "fr": "Amélioration de l'outil d'informations sur le navigateur pour plus d'informations précises et pratiques",
           "tr": "Tarayıcı bilgisi aracı iyileştirildi, daha doğru ve kullanışlı bilgiler"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some small issues",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de petits problèmes",
+          "tr": "Birkaç küçük sorun düzeltildi"
         }
       }
     ]
