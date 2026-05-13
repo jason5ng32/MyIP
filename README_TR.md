@@ -125,6 +125,7 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 | `MAXMIND_ACCOUNT_ID` | **Evet** | `""` | MaxMind hesap ID'si, GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_LICENSE_KEY` | **Evet** | `""` | MaxMind lisans anahtarı, `MAXMIND_ACCOUNT_ID` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_AUTO_UPDATE` | **Evet** | `"false"` | `"true"` yapıldığında GeoLite2 veritabanları başlatmadan yaklaşık 60 saniye sonra otomatik olarak indirilir ve her 24 saatte bir yenilenir. **Docker için zorunlu.** Yalnızca `.mmdb` dosyalarını manuel olarak yerleştirdiyseniz `"false"` olarak kalabilir. |
+| `CAIDA_AUTO_UPDATE` | Hayır | `"false"` | `"true"` yapıldığında CAIDA veri setleri günlük olarak yenilenir (as2org ASN org adı için, as-rel2 ASN bağlantı haritası için). `"false"` olduğunda, eksik anlık görüntüler başlatmada yine de indirilir ancak sonradan yenilenmez. |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Evet** | `""` | Google Analytics ID, kullanıcı davranışını izlemek için |
 | `BACKEND_PORT` | Hayır | `"11966"` | Backend kısmının çalıştığı port |
 | `FRONTEND_PORT` | Hayır | `"18966"` | Frontend kısmının çalıştığı port |

@@ -181,6 +181,8 @@ const thanksList = [
   { name: 'Globalping by jsDelivr', link: 'https://globalping.io/' },
   { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
   { name: 'Digital Defense', link: 'https://digital-defense.io/' },
+  { name: 'RIPE NCC', link: 'https://stat.ripe.net/' },
+  { name: 'CAIDA', link: 'https://www.caida.org/' },
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
   { name: 'Claude', link: 'https://claude.ai/' },
 ];

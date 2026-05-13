@@ -580,7 +580,7 @@
       "seenBy": "Seen by {peers} BGP full-feed peers"
     },
     "ASNConnectivity": {
-      "note": "Upstream paths from this AS toward the Tier 1 global transit providers. Built from CAIDA AS Relationships.",
+      "note": "Upstream paths from this AS toward the Tier 1 global transit providers: ",
       "empty": "No upstream connectivity data available for this AS.",
       "error": "Failed to load ASN connectivity.",
       "expand": "Expand",

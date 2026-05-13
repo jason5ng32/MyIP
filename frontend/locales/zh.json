@@ -582,7 +582,7 @@
       "seenBy": "被 {peers} 个 BGP 全表节点观测到"
     },
     "ASNConnectivity": {
-      "note": "该 AS 到全球 Tier 1 骨干网的上游路径，数据来自 CAIDA AS Relationships。",
+      "note": "该 AS 到全球 Tier 1 骨干网的上游路径：",
       "empty": "未找到该 AS 的上游连接数据。",
       "error": "加载 ASN 连接图失败。",
       "expand": "放大",

@@ -579,7 +579,7 @@
       "seenBy": "{peers} BGP full-feed eşi tarafından görüldü"
     },
     "ASNConnectivity": {
-      "note": "Bu AS'tan Tier 1 küresel transit sağlayıcılarına giden yukarı akış yolları. CAIDA AS Relationships üzerinden oluşturulmuştur.",
+      "note": "Bu AS'tan Tier 1 küresel transit sağlayıcılarına giden yukarı akış yolları: ",
       "empty": "Bu AS için yukarı akış bağlantı verisi bulunamadı.",
       "error": "ASN bağlantı haritası yüklenemedi.",
       "expand": "Büyüt",

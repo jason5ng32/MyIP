@@ -3,7 +3,6 @@
          origin AS toward Tier 1 ISPs. Lazy-loads dagre on first open. -->
     <div class="rounded-md border bg-muted/40 text-sm">
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
-            <Info class="size-3.5 mt-[0.15em] shrink-0" />
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
             <button v-if="layout" type="button" @click="isExpanded = true"
                 class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"

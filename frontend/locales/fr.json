@@ -580,7 +580,7 @@
       "seenBy": "Vu par {peers} pairs BGP full-feed"
     },
     "ASNConnectivity": {
-      "note": "Chemins amont depuis cet AS vers les opérateurs de transit Tier 1 mondiaux. Construit à partir de CAIDA AS Relationships.",
+      "note": "Chemins amont depuis cet AS vers les opérateurs de transit Tier 1 mondiaux: ",
       "empty": "Aucune donnée de connectivité amont disponible pour cet AS.",
       "error": "Échec du chargement de la connectivité ASN.",
       "expand": "Agrandir",

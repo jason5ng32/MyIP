@@ -125,6 +125,7 @@ Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte Ma
 | `MAXMIND_ACCOUNT_ID` | **Oui** | `""` | ID de compte MaxMind, associé à `MAXMIND_LICENSE_KEY` pour télécharger les bases GeoLite2. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_LICENSE_KEY` | **Oui** | `""` | Clé de licence MaxMind, associée à `MAXMIND_ACCOUNT_ID`. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_AUTO_UPDATE` | **Oui** | `"false"` | Définissez sur `"true"` pour télécharger automatiquement les bases GeoLite2 environ 60 s après le démarrage et les rafraîchir toutes les 24 h. **Obligatoire pour Docker.** Peut rester à `"false"` uniquement si vous avez pré-déposé les fichiers `.mmdb` manuellement. |
+| `CAIDA_AUTO_UPDATE` | Non | `"false"` | Définissez sur `"true"` pour rafraîchir quotidiennement les jeux de données CAIDA (as2org pour la résolution du nom d'organisation par ASN, as-rel2 pour le graphe de connectivité ASN). Lorsque `"false"`, les snapshots manquants sont quand même téléchargés au démarrage mais ne sont jamais rafraîchis ensuite. |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
 | `BACKEND_PORT` | Non | `"11966"` | Le port d'exécution de la partie backend du programme |
 | `FRONTEND_PORT` | Non | `"18966"` | Le port d'exécution de la partie frontend du programme |
