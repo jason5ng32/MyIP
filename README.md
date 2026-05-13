@@ -33,6 +33,7 @@ Feel free to bookmark the demo or deploy your own.
 * 🛜 **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address. 
 * 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
+* 🛰️ **ASN History & Upstream Topology**: View historical AS announcements for an IP prefix, and visualize the upstream paths from an ASN to the Tier 1 backbone networks.
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
 * 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.

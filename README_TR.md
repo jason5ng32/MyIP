@@ -33,6 +33,7 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 * 🛜 **IP'lerinizi Görüntüleyin**: Yerel IP'lerinizi tespit eder ve birden fazla IPv4/IPv6 sağlayıcısından alır.
 * 🔍 **IP Bilgisi Arama**: Herhangi bir IP adresi hakkında sorgu yapma aracı sağlar.
 * 🕵️ **IP Bilgileri**: Ülke, bölge, ASN, coğrafi konum ve daha fazlasını içeren ayrıntılı IP bilgileri sunar.
+* 🛰️ **ASN Geçmişi ve Üst Topoloji**: Bir IP önekinin geçmiş AS duyurularını ve ASN'den Tier 1 omurga ağlarına giden üst bağlantı yollarını görüntüleyin.
 * 🚦 **Erişilebilirlik Kontrolü**: Google, GitHub, YouTube, ChatGPT ve diğerleri gibi sitelerin erişilebilirliğini test eder.
 * 🚥 **WebRTC Tespiti**: WebRTC bağlantısında kullanılan IP adresini belirler.
 * 🛑 **DNS Leak Testi**: VPN veya proxy kullanırken DNS sızıntısı riskini değerlendirmek için DNS uç nokta verilerini gösterir.

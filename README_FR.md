@@ -33,6 +33,7 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 🛜 **Afficher vos adresses IP** : Détecte et affiche votre adresse IP locale, provenant de plusieurs fournisseurs IPv4 et IPv6.
 * 🔍 **Recherche d'informations sur l'adresse IP** : Fournit un outil pour interroger des informations sur n'importe quelle adresse IP.
 * 🕵️ **Informations sur l'adresse IP** : Présente des informations détaillées pour toutes les adresses IP, y compris le pays, la région, l'ASN, la localisation géographique, et plus encore.
+* 🛰️ **Historique ASN et topologie amont** : Consultez l'historique des annonces AS pour un préfixe IP, et visualisez les chemins amont d'un ASN vers les réseaux dorsaux Tier 1.
 * 🚦 **Vérification de disponibilité** : Teste l'accessibilité de différents sites web, tels que Google, GitHub, YouTube, ChatGPT, et d'autres.
 * 🚥 **Détection WebRTC** : Identifie l'adresse IP utilisée lors des connexions WebRTC.
 * 🛑 **Test de fuite DNS** : Affiche les données de point de terminaison DNS pour évaluer le risque de fuites DNS lors de l'utilisation de VPN ou de proxies.
