@@ -5,8 +5,7 @@
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
             <button v-if="layout" type="button" @click="isExpanded = true"
                 class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"
-                :aria-label="t('ipInfos.ASNConnectivity.expand')"
-                :title="t('ipInfos.ASNConnectivity.expand')">
+                :aria-label="t('ipInfos.ASNConnectivity.expand')" :title="t('ipInfos.ASNConnectivity.expand')">
                 <Maximize2 class="size-3.5" />
             </button>
         </div>
@@ -15,27 +14,22 @@
         <div v-if="layout" class="px-3 pb-3 overflow-auto">
             <!-- height:auto + maxWidth:100% lets the viewBox ratio scale without letterboxing. -->
             <svg :viewBox="`0 0 ${layout.width} ${layout.height}`"
-                :style="{ width: layout.width + 'px', height: 'auto', maxWidth: '100%' }"
-                class="block mx-auto">
+                :style="{ width: layout.width + 'px', height: 'auto', maxWidth: '100%' }" class="block mx-auto">
                 <defs>
-                    <marker id="jn-arrow" viewBox="0 0 10 10" refX="9" refY="5"
-                        markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <marker id="jn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
                         <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
                     </marker>
                 </defs>
                 <g class="text-muted-foreground">
-                    <path v-for="(e, i) in layout.edges" :key="i" :d="e.d"
-                        fill="none" stroke="currentColor" stroke-width="1.2"
-                        marker-end="url(#jn-arrow)" opacity="0.6"
-                        stroke-linejoin="miter" />
+                    <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
+                        stroke-width="1.2" marker-end="url(#jn-arrow)" opacity="0.6" stroke-linejoin="miter" />
                 </g>
                 <!-- Opaque fill-card base under the tinted type rect so edges behind don't bleed through. -->
-                <g v-for="n in layout.nodes" :key="n.asn"
-                    :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`">
+                <g v-for="n in layout.nodes" :key="n.asn" :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`">
                     <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
                     <rect :width="n.w" :height="n.h" rx="6" class="fill-card" />
-                    <rect :width="n.w" :height="n.h" rx="6"
-                        :class="nodeBoxClass(n.type)" stroke-width="1.5" />
+                    <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)" stroke-width="1.5" />
                     <text :x="n.w / 2" :y="n.h / 2 - 5" text-anchor="middle"
                         class="font-mono font-semibold text-[11px] fill-foreground">
                         AS{{ n.asn }}
@@ -47,7 +41,8 @@
                 </g>
             </svg>
 
-            <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+            <div
+                class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
                 <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
                     <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
                     {{ item.label }}
@@ -75,11 +70,11 @@
 
     <!-- Expanded view: bottom Drawer (mobile-fullscreen / md+ sheet at 90vh). -->
     <Drawer v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
-        <DrawerContent
-            :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
+        <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
             class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
             <header class="flex items-center gap-2 px-4 pt-1 pb-3 border-b shrink-0">
-                <span class="flex-1 text-base font-semibold truncate flex items-center justify-center gap-2">
+                <span
+                    class="flex-1 text-base font-semibold truncate flex items-center justify-start md:justify-center gap-2">
                     <Network class="size-4 shrink-0 text-muted-foreground" />
                     {{ t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn }) }}
                 </span>
@@ -90,28 +85,24 @@
             <!-- flex + m-auto + shrink-0: narrow SVG centers, wide SVG hugs the start (scroll from x=0). -->
             <div class="overflow-auto flex-1 min-h-0 px-4 flex">
                 <!-- :width/:height attrs seed intrinsic dims. Mobile caps to scroll area
-                     (horizontal-only scroll); desktop renders natural size for legible labels. -->
-                <svg :viewBox="`0 0 ${layout.width} ${layout.height}`"
-                    :width="layout.width" :height="layout.height"
+                    (horizontal-only scroll); desktop renders natural size for legible labels. -->
+                <svg :viewBox="`0 0 ${layout.width} ${layout.height}`" :width="layout.width" :height="layout.height"
                     class="block m-auto shrink-0 w-auto max-h-full md:max-h-none">
                     <defs>
-                        <marker id="jn-arrow-lg" viewBox="0 0 10 10" refX="9" refY="5"
-                            markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <marker id="jn-arrow-lg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6"
+                            orient="auto-start-reverse">
                             <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
                         </marker>
                     </defs>
                     <g class="text-muted-foreground">
-                        <path v-for="(e, i) in layout.edges" :key="i" :d="e.d"
-                            fill="none" stroke="currentColor" stroke-width="1.2"
-                            marker-end="url(#jn-arrow-lg)" opacity="0.6"
-                            stroke-linejoin="miter" />
+                        <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
+                            stroke-width="1.2" marker-end="url(#jn-arrow-lg)" opacity="0.6" stroke-linejoin="miter" />
                     </g>
                     <g v-for="n in layout.nodes" :key="n.asn"
                         :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`">
                         <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
                         <rect :width="n.w" :height="n.h" rx="6" class="fill-card" />
-                        <rect :width="n.w" :height="n.h" rx="6"
-                            :class="nodeBoxClass(n.type)" stroke-width="1.5" />
+                        <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)" stroke-width="1.5" />
                         <text :x="n.w / 2" :y="n.h / 2 - 5" text-anchor="middle"
                             class="font-mono font-semibold text-[11px] fill-foreground">
                             AS{{ n.asn }}
@@ -124,7 +115,8 @@
                 </svg>
             </div>
             <!-- Legend pinned outside the scroll area so it stays visible. -->
-            <div class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
+            <div
+                class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
                 <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
                     <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
                     {{ item.label }}
@@ -158,8 +150,8 @@ const isExpanded = ref(false);
 // Shared by inline + drawer views so swatches and labels can't drift.
 const legendItems = computed(() => [
     { swatchClass: 'border-2 border-success bg-success/10', label: t('ipInfos.ASNConnectivity.legendOrigin') },
-    { swatchClass: 'border-2 border-info bg-info/10',       label: t('ipInfos.ASNConnectivity.legendTier1') },
-    { swatchClass: 'border bg-card',                        label: t('ipInfos.ASNConnectivity.legendIntermediate') },
+    { swatchClass: 'border-2 border-info bg-info/10', label: t('ipInfos.ASNConnectivity.legendTier1') },
+    { swatchClass: 'border bg-card', label: t('ipInfos.ASNConnectivity.legendIntermediate') },
 ]);
 
 watch(
@@ -252,9 +244,9 @@ function buildChannelPath(source, target, channelXs) {
         ? valid[valid.length - 1]
         : (sourceRight + targetLeft) / 2;
     return `M ${sourceRight} ${source.y} `
-         + `L ${channelX} ${source.y} `
-         + `L ${channelX} ${target.y} `
-         + `L ${targetLeft} ${target.y}`;
+        + `L ${channelX} ${source.y} `
+        + `L ${channelX} ${target.y} `
+        + `L ${targetLeft} ${target.y}`;
 }
 
 function nodeBoxClass(type) {
