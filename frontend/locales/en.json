@@ -689,7 +689,8 @@
     "id": "ipcheck",
     "Title": "IP Check",
     "Placeholder": "e.g. 1.1.1.1",
-    "Error": "Please enter a valid IPv4 or IPv6 address."
+    "Error": "Please enter a valid IPv4 or IPv6 address.",
+    "NoData": "Unable to fetch information for this IP. It may be unroutable (e.g. 0.0.0.0, private address) or the upstream source has no data for it."
   },
   "alert": {
     "id": "alert",

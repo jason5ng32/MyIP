@@ -688,7 +688,8 @@
     "id": "ipcheck",
     "Title": "IP Kontrolü",
     "Placeholder": "örn. 1.1.1.1",
-    "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin."
+    "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin.",
+    "NoData": "Bu IP için bilgi alınamadı. Yönlendirilemez bir adres olabilir (örn. 0.0.0.0, özel adres) veya kaynak bu IP için veri bulamadı."
   },
   "alert": {
     "id": "alert",

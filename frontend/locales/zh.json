@@ -691,7 +691,8 @@
     "id": "ipcheck",
     "Title": "IP 查询",
     "Placeholder": "例如 1.1.1.1",
-    "Error": "请输入有效的 IPv4 或 IPv6 地址。"
+    "Error": "请输入有效的 IPv4 或 IPv6 地址。",
+    "NoData": "无法查询到该 IP 的信息。可能是不可路由地址（如 0.0.0.0、私有地址）或数据源没有该 IP 的记录。"
   },
   "alert": {
     "id": "alert",

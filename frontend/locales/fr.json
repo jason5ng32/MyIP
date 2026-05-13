@@ -689,7 +689,8 @@
     "id": "ipcheck",
     "Title": "Vérification IP",
     "Placeholder": "ex. 1.1.1.1",
-    "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide."
+    "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
+    "NoData": "Impossible de récupérer les informations pour cette IP. Elle peut être non routable (ex. 0.0.0.0, adresse privée) ou la source amont n'a pas de données pour celle-ci."
   },
   "alert": {
     "id": "alert",
