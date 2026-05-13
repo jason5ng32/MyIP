@@ -142,6 +142,7 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 | `IPAPIIS_API_KEY` | Hayır | `""` | IPAPI.is API anahtarı, IP konum bilgisi almak için |
 | `IP2LOCATION_API_KEY` | Hayır | `""` | IP2Location.io API anahtarı, IP konum bilgisi almak için |
 | `CLOUDFLARE_API` | Hayır | `""` | Cloudflare API anahtarı, AS sistemi bilgisi almak için |
+| `RIPESTAT_SOURCE_APP` | Hayır | `""` | RIPE.net kaynak uygulama adı, RIPE.net üzerinden ASN geçmiş bilgisi almak için |
 | `MAC_LOOKUP_API_KEY` | Hayır | `""` | MAC Lookup API anahtarı, MAC adresi bilgisi almak için |
 | `VITE_CURL_IPV4_DOMAIN` | Hayır | `""` | Kullanıcılara CURL API için IPv4 domain sağlar |
 | `VITE_CURL_IPV6_DOMAIN` | Hayır | `""` | Kullanıcılara CURL API için IPv6 domain sağlar |

@@ -46,7 +46,8 @@
                     </div>
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false" />
+                        :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
+                        :enable-map="false" />
                 </div>
             </div>
         </DialogContent>
@@ -58,7 +59,7 @@
 // Differences from IPCard:
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
-// - Own asnInfos cache (local to this component; not shared with IPCard).
+// - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
@@ -90,6 +91,7 @@ const modalQueryError = ref('');
 const isChecking = ref('idle');
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const asnInfos = ref({});
+const asnHistoryInfos = ref({});
 
 watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
@@ -138,23 +140,38 @@ const openQueryIP = () => {
 
 const openModal = () => onOpenChange(true);
 
-const fetchIPForModal = async (ip, sourceID = null) => {
-    let selectedLang = lang.value === 'zh' ? 'zh-CN' : lang.value;
-    sourceID = ipGeoSource.value;
-    const sources = store.ipDBs;
+const fetchIPForModal = async (ip) => {
+    const selectedLang = lang.value === 'zh' ? 'zh-CN' : lang.value;
+    const sources = store.ipDBs.filter(s => s.enabled);
 
-    for (const source of sources) {
-        if (sourceID && source.id !== sourceID) continue;
+    // Cyclic walk from the user's preferred source
+    // Fallback fires only on real failures (network error, 4xx/5xx,
+    // transform throwing). A 200 response that contains "N/A" fields
+    // means the upstream is healthy but doesn't know the IP — display
+    // those as-is rather than walking to the next source.
+    const startIdx = Math.max(0, sources.findIndex(s => s.id === ipGeoSource.value));
+    let currentIdx = startIdx;
+    let attempts = 0;
+
+    while (attempts < sources.length) {
+        const source = sources[currentIdx];
         try {
             const url = store.getDbUrl(source.id, ip, selectedLang);
             const response = await authenticatedFetch(url);
-            modalQueryResult.value = transformDataFromIPapi(response, source.id, t, lang.value);
+            modalQueryResult.value = { ...transformDataFromIPapi(response, source.id, t, lang.value), ip };
             isChecking.value = 'idle';
-            break;
+            return;
         } catch (error) {
-            console.error('Error fetching IP details:', error);
+            console.error(`Error fetching IP details from source ${source.id}:`, error);
+            currentIdx = (currentIdx + 1) % sources.length;
+            attempts++;
         }
     }
+
+    // Every source exhausted with real failures — surface a user-facing
+    // error instead of leaving the spinner running forever.
+    isChecking.value = 'idle';
+    modalQueryError.value = t('ipcheck.NoData');
 };
 
 // Floating button positioning (align to content area right on wide screen)

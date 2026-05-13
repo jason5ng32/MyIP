@@ -100,11 +100,11 @@
                             :tip="t('nav.preferences.autoRunTips')" :model-value="userPreferences.autoStart"
                             @update:model-value="prefAutoStart" />
 
-                        <PrefRow v-if="userPreferences.autoStart" id="ConnectivityRefresh"
-                            :label="t('nav.preferences.connectivityAutoRefresh')"
-                            :tip="t('nav.preferences.connectivityAutoRefreshTips')"
-                            :model-value="userPreferences.connectivityAutoRefresh"
-                            @update:model-value="prefConnectivityRefresh" />
+                        <PrefRow v-if="userPreferences.autoStart" id="ConnectivityMultipleTests"
+                            :label="t('nav.preferences.connectivityMultipleTests')"
+                            :tip="t('nav.preferences.connectivityMultipleTestsTips')"
+                            :model-value="userPreferences.connectivityMultipleTests"
+                            @update:model-value="prefConnectivityMultipleTests" />
 
                         <PrefRow v-if="isMobile" id="simpleMode" :label="t('nav.preferences.simpleMode')"
                             :tip="t('nav.preferences.simpleModeTips')" :model-value="userPreferences.simpleMode"
@@ -244,12 +244,12 @@ const prefLanguage = (value) => {
     trackEvent('Nav', 'PrefereceClick', 'LanguageChange');
 };
 
-const prefConnectivityRefresh = (value) => {
-    store.updatePreference('connectivityAutoRefresh', value);
+const prefConnectivityMultipleTests = (value) => {
+    store.updatePreference('connectivityMultipleTests', value);
     if (isSignedIn.value && !store.userAchievements.ResourceHog.achieved) {
         store.setTriggerUpdateAchievements('ResourceHog');
     }
-    trackEvent('Nav', 'PrefereceClick', 'ConnectivityRefresh');
+    trackEvent('Nav', 'PrefereceClick', 'ConnectivityMultipleTests');
 };
 
 const prefSimpleMode = (value) => {

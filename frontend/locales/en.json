@@ -162,8 +162,8 @@
       "autoRunTips": "If disabled, the app will only check the local IP and will not run tests automatically.",
       "simpleMode": "Simple Mode",
       "simpleModeTips": "Reduces the information displayed on IP cards. Effective on mobile devices only.",
-      "connectivityAutoRefresh": "Multiple Connectivity Refreshes",
-      "connectivityAutoRefreshTips": "When enabled, the app runs five checks at startup and displays the lowest latency.",
+      "connectivityMultipleTests": "Multiple Connectivity Refreshes",
+      "connectivityMultipleTestsTips": "When enabled, the app runs multiple checks at startup and displays the lowest latency.",
       "popupConnectivityNotifications": "Pop-up Connectivity Alerts",
       "popupConnectivityNotificationsTips": "When enabled, the initial check's results are shown as a pop-up alert.",
       "ipDB": "IP Geolocation Database",
@@ -501,6 +501,7 @@
     "SpeedTestButton": "Start/Pause Speed Test",
     "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
+    "ShowASNHistory": "Show ASN History",
     "CopyIP": "Copy IP Address",
     "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
@@ -550,6 +551,13 @@
       "Human_Pct": "Human",
       "moreData": "More Data : "
     },
+    "ASNHistory": {
+      "announcedPrefixes": "Announced Prefixes: ",
+      "note": "Historical ASN announcements for this IP: ",
+      "empty": "No historical routing data found for this IP.",
+      "error": "Failed to load ASN history.",
+      "seenBy": "Seen by {peers} BGP full-feed peers"
+    },
     "advancedData": {
       "proxyYes": "Must be a proxy or VPN",
       "proxyMaybe": "Possibly a proxy or VPN",
@@ -579,6 +587,7 @@
     "checking": "Checking...",
     "minTestTime": "Min Test Time: ",
     "RefreshThisTest": "Refresh This Test",
+    "RoundCount": "Round {n}: ",
     "addCustom": {
       "AddCard": "Add Test",
       "Title": "Add a custom test",
@@ -680,7 +689,8 @@
     "id": "ipcheck",
     "Title": "IP Check",
     "Placeholder": "e.g. 1.1.1.1",
-    "Error": "Please enter a valid IPv4 or IPv6 address."
+    "Error": "Please enter a valid IPv4 or IPv6 address.",
+    "NoData": "Unable to fetch information for this IP. It may be unroutable (e.g. 0.0.0.0, private address) or the upstream source has no data for it."
   },
   "alert": {
     "id": "alert",

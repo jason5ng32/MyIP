@@ -168,7 +168,7 @@ const sheetBody = ref(null);
 const personalLinks = [
   { href: 'https://wujiaxian.com', labelKey: 'about.personal' },
   { href: 'https://kenengba.com', labelKey: 'about.blog' },
-  { href: 'https://retire.money', labelKey: 'about.retiremoney' },
+  { href: 'https://fire.beavern.com', labelKey: 'about.retiremoney' },
   { href: 'https://twitter.com/jason5ng32', labelKey: 'about.twitter' },
 ];
 

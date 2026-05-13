@@ -5,7 +5,7 @@
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
-  connectivityAutoRefresh: false,
+  connectivityMultipleTests: false,
   simpleMode: false,
   autoStart: true,
   hideUnavailableIPStack: false,

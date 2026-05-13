@@ -15,7 +15,6 @@ frontend/
 ├── main.js                      ← app bootstrap + global init
 ├── store.js                     ← Pinia main store
 ├── firebase-init.js             ← Firebase Auth env-gated init
-├── sw.js                        ← Serwist service worker
 ├── router/                      ← Advanced Tools subroutes (open inside a Drawer)
 ├── locales/                     ← i18n copy (en / zh / fr / tr) + security-checklist data
 ├── style/style.css              ← Tailwind v4 entry + design tokens

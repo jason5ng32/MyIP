@@ -38,3 +38,6 @@ common/maxmind-db/*.next
 common/maxmind-db/*.mmdb
 .learnings/
 docs/
+
+# Private AI context (per-machine, not for the public repo)
+local-context.md

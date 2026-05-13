@@ -38,7 +38,7 @@
                     <span class="wrap-break-word">{{ data.city || '—' }}</span>
                     <JnTooltip v-if="canShowMap" :text="t('Tooltips.ViewOnMap')" side="left">
                         <button type="button"
-                            class="shrink-0 -my-0.5 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                            class="shrink-0 -my-0.5 p-1 rounded-md hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                             @click="openMapDialog" :aria-label="'View ' + data.ip + ' on map'">
                             <Map class="size-3.5" />
                         </button>
@@ -133,26 +133,43 @@
         </dl>
     </div>
 
-    <!-- ASN row + expandable ASNInfo. mt-auto on IPCard flex-col pushes this to card bottom. -->
-    <div v-if="data.asn && !collapsed" class="px-4 py-3 border-t mt-auto">
+    <!-- ASN block -->
+    <div v-if="data.asn && !collapsed" class="px-4 py-3 border-t">
         <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0 text-sm">
                 <Building2 class="size-4 text-muted-foreground shrink-0" />
                 <span class="text-xs text-muted-foreground shrink-0">{{ t('ipInfos.ASN') }}</span>
                 <span class="font-mono font-normal truncate">{{ data.asn }}</span>
             </div>
-            <JnTooltip v-if="data.asnlink && configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="left">
-                <button type="button"
-                    class="shrink-0 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                    @click="toggleASNCollapse(data.asn)" :aria-expanded="isAsnOpen"
-                    :aria-label="'Display AS Info of ' + data.asn">
-                    <component :is="isAsnOpen ? ChevronUp : ChevronDown" class="size-4" />
-                </button>
-            </JnTooltip>
+            <div class="shrink-0 flex items-center gap-1">
+                <!-- ASN Info -->
+                <JnTooltip v-if="data.asnlink && configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="top">
+                    <Button variant="ghost" size="icon"
+                        :class="['size-7 cursor-pointer', isPanelActive('info') && 'bg-muted text-foreground hover:bg-muted']"
+                        @click="togglePanel('info')" :aria-expanded="isPanelActive('info')"
+                        :aria-label="'Display AS Info of ' + data.asn">
+                        <Info />
+                    </Button>
+                </JnTooltip>
+                <!-- ASN History -->
+                <JnTooltip v-if="ipPrefix" :text="t('Tooltips.ShowASNHistory')" side="top">
+                    <Button variant="ghost" size="icon"
+                        :class="['size-7 cursor-pointer', isPanelActive('history') && 'bg-muted text-foreground hover:bg-muted']"
+                        @click="togglePanel('history')" :aria-expanded="isPanelActive('history')"
+                        :aria-label="'Display ASN History of ' + data.ip">
+                        <History />
+                    </Button>
+                </JnTooltip>
+            </div>
         </div>
-        <Collapsible :open="isAsnOpen" @update:open="isAsnOpen = $event">
-            <CollapsibleContent class="pt-3">
-                <ASNInfo :index="index" :isDarkMode="isDarkMode" :asn="data.asn" :asnInfos="asnInfos" />
+        <Collapsible :open="isPanelOpen" @update:open="onPanelOpenChange">
+            <CollapsibleContent>
+                <div class="pt-3">
+                    <ASNInfo v-if="activePanel === 'info'" :index="index" :isDarkMode="isDarkMode" :asn="data.asn"
+                        :asnInfos="asnInfos" />
+                    <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
+                        :asnHistoryInfos="asnHistoryInfos" />
+                </div>
             </CollapsibleContent>
         </Collapsible>
     </div>
@@ -196,23 +213,26 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import ASNInfo from './ASNInfo.vue';
+import ASNHistory from './ASNHistory.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import { Earth } from 'lucide-vue-next';
 import {
     Building2,
-    ChevronDown,
-    ChevronUp,
     CircleCheck,
     CircleX,
     CornerUpRight,
     EthernetPort,
     Gauge,
+    History,
     House,
+    Info,
     Lock,
     Map,
     MapPin,
@@ -226,6 +246,8 @@ const props = defineProps({
     data: { type: Object, required: true },
     ipGeoSource: { type: Number, required: true },
     asnInfos: { type: Object, required: true },
+    // Optional — keyed by IP. IpInfos owns the shared map; QueryIP falls back to its own.
+    asnHistoryInfos: { type: Object, default: () => ({}) },
     configs: { type: Object, required: true },
     isDarkMode: { type: Boolean, required: true },
     // ASNInfo requires an index; homepage cards pass their grid index, QueryIP has nothing meaningful.
@@ -237,7 +259,11 @@ const props = defineProps({
     enableMap: { type: Boolean, default: false },
 });
 
-const isAsnOpen = ref(false);
+// Single-select panel content for the ASN block: 'info' | 'history' | null.
+// Kept separate from the open state so close animations retain their content
+// until Collapsible finishes measuring and animating the closing height.
+const activePanel = ref(null);
+const isPanelOpen = ref(false);
 const isMapDialogOpen = ref(false);
 
 // Advanced block only surfaces for the IPCheck.ing source (ipGeoSource === 0).
@@ -295,11 +321,35 @@ const openMapDialog = () => {
     trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
 };
 
-const toggleASNCollapse = async (asn) => {
-    isAsnOpen.value = !isAsnOpen.value;
-    if (isAsnOpen.value) {
-        await getASNInfo(asn);
+// BGP DFZ-floor prefix for the IP — /24 v4, /48 v6. Used both as the query
+// param sent to /api/asn-history (so CF dedupes across every IP in the same
+// prefix) and as the local session-cache key.
+const ipPrefix = computed(() => toBgpPrefix(props.data.ip));
+
+// Toggle the panel for `name`. Clicking the already-active button collapses
+// the panel entirely; clicking the inactive one switches view and lazily
+// triggers its data fetch. Session caches (asnInfos / asnHistoryInfos) make
+// the switch instant on the second visit.
+const togglePanel = async (name) => {
+    if (isPanelOpen.value && activePanel.value === name) {
+        isPanelOpen.value = false;
+        return;
     }
+    activePanel.value = name;
+    isPanelOpen.value = true;
+    if (name === 'info') {
+        await getASNInfo(props.data.asn);
+    } else if (name === 'history' && ipPrefix.value) {
+        await getASNHistory(ipPrefix.value);
+    }
+};
+
+const isPanelActive = (name) => isPanelOpen.value && activePanel.value === name;
+
+// Collapsible's controlled mode can emit open-state updates from its internals;
+// mirror those without clearing the selected content before the close animation.
+const onPanelOpenChange = (open) => {
+    isPanelOpen.value = open;
 };
 
 const getASNInfo = async (asn) => {
@@ -312,6 +362,26 @@ const getASNInfo = async (asn) => {
         props.asnInfos['AS' + asn] = data;
     } catch (error) {
         console.error('Error fetching ASN info:', error);
+    }
+};
+
+const getASNHistory = async (prefix) => {
+    trackEvent('IPCheck', 'ASNHistoryClick', 'Show ASN History');
+    try {
+        if (props.asnHistoryInfos[prefix]) return;
+        const response = await fetchWithTimeout(
+            `/api/asn-history?prefix=${encodeURIComponent(prefix)}`,
+            { timeoutMs: 10000 }
+        );
+        if (!response.ok) {
+            props.asnHistoryInfos[prefix] = { error: true };
+            return;
+        }
+        const data = await response.json();
+        props.asnHistoryInfos[prefix] = data;
+    } catch (error) {
+        console.error('Error fetching ASN history:', error);
+        props.asnHistoryInfos[prefix] = { error: true };
     }
 };
 </script>

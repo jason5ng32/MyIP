@@ -162,8 +162,8 @@
       "autoRunTips": "Si désactivé, l'appli vérifiera seulement l'IP local et n'exécutera pas de tests automatiquement.",
       "simpleMode": "Mode Simple",
       "simpleModeTips": "Réduit les informations affichées sur les cartes IP. Effectif uniquement sur les appareils mobiles.",
-      "connectivityAutoRefresh": "Rafraîchissements Multiples de Connectivité",
-      "connectivityAutoRefreshTips": "Activé, l'appli effectue cinq vérifications au démarrage et affiche le délai le plus bas.",
+      "connectivityMultipleTests": "Rafraîchissements Multiples de Connectivité",
+      "connectivityMultipleTestsTips": "Activé, l'appli effectue plusieurs vérifications au démarrage et affiche le délai le plus bas.",
       "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
       "popupConnectivityNotificationsTips": "Activé, les résultats de la première vérification sont affichés sous forme d'alerte pop-up.",
       "ipDB": "Base de données de géolocalisation IP",
@@ -501,6 +501,7 @@
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "SourceSelect": "Sélectionner la source de géolocalisation IP",
     "ShowASNInfo": "Afficher les détails AS",
+    "ShowASNHistory": "Afficher l'historique ASN",
     "CopyIP": "Copier l'adresse IP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
@@ -550,6 +551,13 @@
       "Human_Pct": "Humain : ",
       "moreData": "Plus de données : "
     },
+    "ASNHistory": {
+      "announcedPrefixes": "Préfixes annoncés : ",
+      "note": "Annonces ASN historiques pour cette IP : ",
+      "empty": "Aucune donnée de routage historique trouvée pour cette IP.",
+      "error": "Échec du chargement de l'historique ASN.",
+      "seenBy": "Vu par {peers} pairs BGP full-feed"
+    },
     "advancedData": {
       "proxyYes": "Doit être un proxy ou un VPN",
       "proxyMaybe": "Possiblement un proxy ou un VPN",
@@ -579,6 +587,7 @@
     "checking": "Vérification en cours...",
     "minTestTime": "Minimal: ",
     "RefreshThisTest": "Rafraîchir ce test",
+    "RoundCount": "Tour {n} : ",
     "addCustom": {
       "AddCard": "Ajouter un test",
       "Title": "Ajouter un test personnalisé",
@@ -680,7 +689,8 @@
     "id": "ipcheck",
     "Title": "Vérification IP",
     "Placeholder": "ex. 1.1.1.1",
-    "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide."
+    "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
+    "NoData": "Impossible de récupérer les informations pour cette IP. Elle peut être non routable (ex. 0.0.0.0, adresse privée) ou la source amont n'a pas de données pour celle-ci."
   },
   "alert": {
     "id": "alert",

@@ -162,8 +162,8 @@
       "autoRunTips": "关闭后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。",
       "simpleMode": "简洁模式",
       "simpleModeTips": "减少 IP 卡片显示的内容。仅在手机上生效。",
-      "connectivityAutoRefresh": "多次刷新可用性检测",
-      "connectivityAutoRefreshTips": "开启多次刷新后，程序在启动时将运行 5 次检测，并显示最小延迟值。",
+      "connectivityMultipleTests": "多次刷新可用性检测",
+      "connectivityMultipleTestsTips": "开启多次刷新后，程序在启动时将运行多次检测，并显示最小延迟值。",
       "popupConnectivityNotifications": "显示可用性检测气泡",
       "popupConnectivityNotificationsTips": "开启后，将会在首次检测时以气泡形式提示可用性结果。",
       "ipDB": "IP 解析数据源",
@@ -503,6 +503,7 @@
     "SpeedTestButton": "开始/暂停网速测试",
     "SourceSelect": "选择 IP 归属地数据来源",
     "ShowASNInfo": "显示 AS 详细信息",
+    "ShowASNHistory": "显示 ASN 历史",
     "CopyIP": "复制 IP 地址",
     "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
@@ -552,6 +553,13 @@
       "Human_Pct": "人类",
       "moreData": "更多数据："
     },
+    "ASNHistory": {
+      "announcedPrefixes": "公告前缀：",
+      "note": "该 IP 的历史 ASN 公告：",
+      "empty": "未找到该 IP 的历史路由数据。",
+      "error": "加载 ASN 历史失败。",
+      "seenBy": "被 {peers} 个 BGP 全表节点观测到"
+    },
     "advancedData": {
       "proxyYes": "是代理或 VPN",
       "proxyMaybe": "可能是代理或 VPN",
@@ -581,6 +589,7 @@
     "checking": "检查中...",
     "minTestTime": "最小测试时间：",
     "RefreshThisTest": "刷新此测试",
+    "RoundCount": "第 {n} 次：",
     "addCustom": {
       "AddCard": "添加测试",
       "Title": "添加自定义测试",
@@ -682,7 +691,8 @@
     "id": "ipcheck",
     "Title": "IP 查询",
     "Placeholder": "例如 1.1.1.1",
-    "Error": "请输入有效的 IPv4 或 IPv6 地址。"
+    "Error": "请输入有效的 IPv4 或 IPv6 地址。",
+    "NoData": "无法查询到该 IP 的信息。可能是不可路由地址（如 0.0.0.0、私有地址）或数据源没有该 IP 的记录。"
   },
   "alert": {
     "id": "alert",
