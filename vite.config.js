@@ -13,7 +13,7 @@ const nodeModuleChunkGroups = {
   chart: ['chart.js'],
   speedtest: ['@cloudflare/speedtest'],
   svgmap: ['svgmap'],
-  'browser-detect': ['@thumbmarkjs/thumbmarkjs', 'detect-gpu', 'ua-parser-js'],
+  'browser-detect': ['@thumbmarkjs/thumbmarkjs', 'ua-parser-js'],
 };
 
 const sourceChunkGroups = {

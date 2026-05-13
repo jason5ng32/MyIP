@@ -228,7 +228,18 @@
       "cpuArchitecture": "CPU Architecture",
       "gpu": "GPU",
       "cpuCores": "CPU Cores",
-      "language": "Language Code",
+      "languages": "Languages",
+      "timezone": "Timezone",
+      "display": "Display",
+      "connection": "Connection",
+      "touchPoints": "Touch Points",
+      "doNotTrack": "Do Not Track",
+      "doNotTrackOn": "On",
+      "doNotTrackOff": "Off",
+      "doNotTrackUnset": "Not Set",
+      "pdfViewer": "PDF Viewer",
+      "pdfViewerYes": "Yes",
+      "pdfViewerNo": "No",
       "cookieEnabled": "Cookies Enabled",
       "cookieEnabledTrue": "Yes",
       "cookieEnabledFalse": "No"
@@ -250,7 +261,16 @@
       "screen": "Screen",
       "system": "Browser Version",
       "webgl": "WebGL",
-      "math": "Math"
+      "math": "Math",
+      "intl": "Intl Formatters",
+      "mediaDevices": "Media Devices",
+      "speech": "Speech Synthesis",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Fingerprint Components",
+      "note": "Each component below contributes to the hash above. Toggle items in the Fingerprint panel to exclude them from the fingerprint."
     },
     "calError": "Failed to calculate browser information, please refresh and try again.",
     "calculating": "Calculating..."

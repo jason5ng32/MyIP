@@ -228,7 +228,18 @@
       "cpuArchitecture": "Architecture CPU",
       "gpu": "GPU",
       "cpuCores": "Cœurs CPU",
-      "language": "Code Langue",
+      "languages": "Langues Préférées",
+      "timezone": "Fuseau Horaire",
+      "display": "Affichage",
+      "connection": "Connexion Réseau",
+      "touchPoints": "Points Tactiles",
+      "doNotTrack": "Ne Pas Suivre",
+      "doNotTrackOn": "Activé",
+      "doNotTrackOff": "Désactivé",
+      "doNotTrackUnset": "Non Défini",
+      "pdfViewer": "Lecteur PDF",
+      "pdfViewerYes": "Oui",
+      "pdfViewerNo": "Non",
       "cookieEnabled": "Cookies Activés",
       "cookieEnabledTrue": "Oui",
       "cookieEnabledFalse": "Non"
@@ -250,7 +261,16 @@
       "screen": "Écran",
       "system": "Version du Navigateur",
       "webgl": "WebGL",
-      "math": "Mathématiques"
+      "math": "Mathématiques",
+      "intl": "Formats Intl",
+      "mediaDevices": "Périphériques Média",
+      "speech": "Synthèse Vocale",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Composants de l'empreinte",
+      "note": "Chaque composant ci-dessous contribue au hash affiché plus haut. Désactivez un élément dans le panneau Fingerprint pour l'exclure de l'empreinte."
     },
     "calError": "Échec du calcul des informations du navigateur, veuillez rafraîchir et réessayer.",
     "calculating": "Calcul en cours..."

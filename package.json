@@ -27,7 +27,6 @@
     "clsx": "^2.1.1",
     "concurrently": "^9.2.1",
     "country-code-lookup": "^0.1.5",
-    "detect-gpu": "^5.0.70",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",

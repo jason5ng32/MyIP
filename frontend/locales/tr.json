@@ -228,7 +228,18 @@
       "cpuArchitecture": "CPU Mimarisi",
       "gpu": "GPU",
       "cpuCores": "CPU Çekirdekleri",
-      "language": "Dil Kodu",
+      "languages": "Dil Tercihleri",
+      "timezone": "Saat Dilimi",
+      "display": "Ekran",
+      "connection": "Ağ Bağlantısı",
+      "touchPoints": "Dokunma Noktaları",
+      "doNotTrack": "İzlemeyi Engelle",
+      "doNotTrackOn": "Açık",
+      "doNotTrackOff": "Kapalı",
+      "doNotTrackUnset": "Ayarlanmamış",
+      "pdfViewer": "PDF Görüntüleyici",
+      "pdfViewerYes": "Evet",
+      "pdfViewerNo": "Hayır",
       "cookieEnabled": "Çerezler Etkin",
       "cookieEnabledTrue": "Evet",
       "cookieEnabledFalse": "Hayır"
@@ -250,7 +261,16 @@
       "screen": "Ekran",
       "system": "Tarayıcı Sürümü",
       "webgl": "WebGL",
-      "math": "Matematik"
+      "math": "Matematik",
+      "intl": "Intl Biçimlendiricileri",
+      "mediaDevices": "Medya Cihazları",
+      "speech": "Konuşma Sentezi",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Parmak İzi Bileşenleri",
+      "note": "Aşağıdaki her bileşen yukarıdaki hash'e katkıda bulunur. Fingerprint panelindeki ilgili anahtarı kapatarak bir bileşeni parmak izinden çıkarabilirsiniz."
     },
     "calError": "Tarayıcı bilgileri hesaplanamadı, lütfen yenileyip tekrar deneyin.",
     "calculating": "Hesaplanıyor..."

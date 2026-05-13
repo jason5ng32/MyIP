@@ -228,7 +228,18 @@
       "cpuArchitecture": "CPU 架构",
       "gpu": "GPU",
       "cpuCores": "CPU 核心数",
-      "language": "语言代码",
+      "languages": "语言偏好",
+      "timezone": "时区",
+      "display": "显示规格",
+      "connection": "网络连接",
+      "touchPoints": "触控点数",
+      "doNotTrack": "请勿跟踪",
+      "doNotTrackOn": "已开启",
+      "doNotTrackOff": "已关闭",
+      "doNotTrackUnset": "未设置",
+      "pdfViewer": "PDF 阅读器",
+      "pdfViewerYes": "支持",
+      "pdfViewerNo": "不支持",
       "cookieEnabled": "是否启用 Cookie",
       "cookieEnabledTrue": "是",
       "cookieEnabledFalse": "否"
@@ -250,7 +261,16 @@
       "screen": "屏幕",
       "system": "浏览器版本",
       "webgl": "WebGL",
-      "math": "运算"
+      "math": "运算",
+      "intl": "国际化格式",
+      "mediaDevices": "媒体设备",
+      "speech": "语音合成",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "指纹组件明细",
+      "note": "下方每一项都参与了上方哈希的计算。在上方 Fingerprint 区域里关掉对应开关即可将其从指纹中排除。"
     },
     "calError": "浏览器信息计算失败，请刷新重试。",
     "calculating": "计算中..."
