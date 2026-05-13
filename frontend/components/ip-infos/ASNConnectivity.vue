@@ -1,6 +1,5 @@
 <template>
-    <!-- ASN Connectivity Panel: layered graph of upstream paths from the
-         origin AS toward Tier 1 ISPs. Lazy-loads dagre on first open. -->
+    <!-- ASN Connectivity: layered upstream graph from origin AS to Tier 1 ISPs (lazy-loads dagre). -->
     <div class="rounded-md border bg-muted/40 text-sm">
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
@@ -14,10 +13,7 @@
 
         <!-- Loaded -->
         <div v-if="layout" class="px-3 pb-3 overflow-auto">
-            <!-- height: auto (not px) so the SVG scales proportionally when
-                 maxWidth:100% shrinks it on narrow viewports; otherwise the
-                 viewBox-preserved aspect ratio centers the content and leaves
-                 large empty bands above and below. -->
+            <!-- height:auto + maxWidth:100% lets the viewBox ratio scale without letterboxing. -->
             <svg :viewBox="`0 0 ${layout.width} ${layout.height}`"
                 :style="{ width: layout.width + 'px', height: 'auto', maxWidth: '100%' }"
                 class="block mx-auto">
@@ -33,8 +29,7 @@
                         marker-end="url(#jn-arrow)" opacity="0.6"
                         stroke-linejoin="miter" />
                 </g>
-                <!-- Each node = opaque fill-card base + tinted "type" rect on
-                     top, so edges routed behind the node don't bleed through. -->
+                <!-- Opaque fill-card base under the tinted type rect so edges behind don't bleed through. -->
                 <g v-for="n in layout.nodes" :key="n.asn"
                     :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`">
                     <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
@@ -60,9 +55,7 @@
             </div>
         </div>
 
-        <!-- Empty (graph has 0 nodes — usually means the AS wasn't found
-             in CAIDA at all). Tier 1 origins legitimately produce a 1-node
-             graph, so we don't treat that as empty. -->
+        <!-- Empty (0 nodes = AS not in CAIDA). 1-node graphs are legit (Tier 1 origins). -->
         <div v-else-if="entry && !entry.error && entry.graph && (!entry.graph.nodes || entry.graph.nodes.length === 0)"
             class="px-3 pb-3 text-xs text-muted-foreground">
             {{ t('ipInfos.ASNConnectivity.empty') }}
@@ -80,16 +73,27 @@
         </div>
     </div>
 
-    <!-- Expanded view: same SVG at natural pixel size, no maxWidth clamp.
-         Wide graphs scroll horizontally inside the dialog. -->
-    <Dialog v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
-        <DialogContent class="max-w-[95vw] sm:max-w-[95vw] max-h-[95vh] overflow-hidden flex flex-col">
-            <DialogHeader :icon="Network"
-                :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })" />
-            <div class="overflow-auto flex-1 min-h-0">
+    <!-- Expanded view: bottom Drawer (mobile-fullscreen / md+ sheet at 90vh). -->
+    <Drawer v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
+        <DrawerContent
+            :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
+            class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
+            <header class="flex items-center gap-2 px-4 pt-1 pb-3 border-b shrink-0">
+                <span class="flex-1 text-base font-semibold truncate flex items-center justify-center gap-2">
+                    <Network class="size-4 shrink-0 text-muted-foreground" />
+                    {{ t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn }) }}
+                </span>
+                <DrawerClose
+                    class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
+            </header>
+
+            <!-- flex + m-auto + shrink-0: narrow SVG centers, wide SVG hugs the start (scroll from x=0). -->
+            <div class="overflow-auto flex-1 min-h-0 px-4 flex">
+                <!-- :width/:height attrs seed intrinsic dims. Mobile caps to scroll area
+                     (horizontal-only scroll); desktop renders natural size for legible labels. -->
                 <svg :viewBox="`0 0 ${layout.width} ${layout.height}`"
-                    :style="{ width: layout.width + 'px', height: layout.height + 'px' }"
-                    class="block">
+                    :width="layout.width" :height="layout.height"
+                    class="block m-auto shrink-0 w-auto max-h-full md:max-h-none">
                     <defs>
                         <marker id="jn-arrow-lg" viewBox="0 0 10 10" refX="9" refY="5"
                             markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -120,21 +124,21 @@
                 </svg>
             </div>
             <!-- Legend pinned outside the scroll area so it stays visible. -->
-            <div class="shrink-0 pt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
+            <div class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
                 <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
                     <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
                     {{ item.label }}
                 </span>
             </div>
-        </DialogContent>
-    </Dialog>
+        </DrawerContent>
+    </Drawer>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Info, Maximize2, Network } from 'lucide-vue-next';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Maximize2, Network } from 'lucide-vue-next';
+import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 
 const { t } = useI18n();
 const placeholderSizes = [12, 10, 8, 6, 4];
@@ -151,7 +155,7 @@ const entry = computed(() => props.asnConnectivityInfos[props.asn]);
 const layout = ref(null);
 const isExpanded = ref(false);
 
-// Shared by inline + dialog views so swatches and labels can't drift.
+// Shared by inline + drawer views so swatches and labels can't drift.
 const legendItems = computed(() => [
     { swatchClass: 'border-2 border-success bg-success/10', label: t('ipInfos.ASNConnectivity.legendOrigin') },
     { swatchClass: 'border-2 border-info bg-info/10',       label: t('ipInfos.ASNConnectivity.legendTier1') },
@@ -176,9 +180,8 @@ watch(
     { immediate: true },
 );
 
-// LR dagre layout, then Manhattan routing on top. We bypass dagre's natural
-// spline points (which produce diagonal-looking polylines) for explicit
-// right-angle paths via buildChannelPath.
+// LR dagre layout + custom Manhattan routing via buildChannelPath.
+// Dagre's own spline points produce diagonal-looking polylines, so we bypass them.
 function computeLayout(dagre, graph) {
     const NODE_W = 130;
     const NODE_H = 46;
@@ -195,9 +198,8 @@ function computeLayout(dagre, graph) {
 
     for (const n of graph.nodes) {
         const opts = { width: NODE_W, height: NODE_H, _data: n };
-        // Pin Tier 1s to the rightmost column so all "destinations" line up,
-        // matching bgp.tools' look. Trade-off: direct origin → Tier 1 edges
-        // become long horizontal lines.
+        // Pin Tier 1s to the rightmost column (bgp.tools look).
+        // Trade-off: direct origin → Tier 1 edges become long horizontals.
         if (n.type === 'tier1') opts.rank = 'sink';
         g.setNode(String(n.asn), opts);
     }
@@ -221,8 +223,7 @@ function computeLayout(dagre, graph) {
         return layoutNode;
     });
 
-    // Vertical corridors at each inter-column midpoint — buildChannelPath
-    // routes edge bends through these so they never cut through a node.
+    // Vertical corridors at each inter-column midpoint; buildChannelPath routes bends through them.
     const colXs = [...new Set(nodes.map(n => n.x))].sort((a, b) => a - b);
     const channelXs = [];
     for (let i = 0; i < colXs.length - 1; i++) {
@@ -237,11 +238,9 @@ function computeLayout(dagre, graph) {
     return { width, height, nodes, edges };
 }
 
-// 3-segment Manhattan path that bends at the LAST inter-column channel before
-// the target, so the vertical segment is always in known-empty space (never
-// passes through an intermediate column). Multiple edges converging on the
-// same target column share that channel, forming a clean trunk-and-branches.
-// Same-row edges degenerate to a straight horizontal line.
+// Manhattan path: bends at the LAST channel before the target so vertical
+// segments never cut through intermediate columns. Edges to the same target
+// share that channel (trunk-and-branches). Same-row edges become straight.
 function buildChannelPath(source, target, channelXs) {
     const sourceRight = source.x + source.w / 2;
     const targetLeft = target.x - target.w / 2;
@@ -260,16 +259,13 @@ function buildChannelPath(source, target, channelXs) {
 
 function nodeBoxClass(type) {
     if (type === 'origin') return 'fill-success/10 stroke-success';
-    // The queried AS is itself a Tier 1: blue fill (Tier 1 column) + green
-    // stroke (origin marker) so the box says "both" without needing a
-    // separate color or a third legend entry.
+    // Queried AS is itself a Tier 1: blue fill + green stroke says "both" without a third legend entry.
     if (type === 'origin-tier1') return 'fill-info/10 stroke-success';
     if (type === 'tier1') return 'fill-info/10 stroke-info';
     return 'fill-card stroke-border';
 }
 
-// Truncate org names that would overflow the 130px node box. Full name is
-// still available via the SVG <title> browser tooltip.
+// Truncate org names that would overflow the 130px node box; full name stays in the SVG <title> tooltip.
 const MAX_LABEL_CHARS = 20;
 function shortLabel(label) {
     if (!label) return '';
