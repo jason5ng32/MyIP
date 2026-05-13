@@ -38,7 +38,7 @@
                     <span class="wrap-break-word">{{ data.city || '—' }}</span>
                     <JnTooltip v-if="canShowMap" :text="t('Tooltips.ViewOnMap')" side="left">
                         <button type="button"
-                            class="shrink-0 -my-0.5 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                            class="shrink-0 -my-0.5 p-1 rounded-md hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                             @click="openMapDialog" :aria-label="'View ' + data.ip + ' on map'">
                             <Map class="size-3.5" />
                         </button>
