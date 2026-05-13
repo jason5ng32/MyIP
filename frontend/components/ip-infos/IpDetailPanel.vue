@@ -145,8 +145,8 @@
                 <!-- ASN Info -->
                 <JnTooltip v-if="data.asnlink && configs.cloudFlare" :text="t('Tooltips.ShowASNInfo')" side="top">
                     <Button variant="ghost" size="icon"
-                        :class="['size-7 cursor-pointer', activePanel === 'info' && 'bg-muted text-foreground hover:bg-muted']"
-                        @click="togglePanel('info')" :aria-expanded="activePanel === 'info'"
+                        :class="['size-7 cursor-pointer', isPanelActive('info') && 'bg-muted text-foreground hover:bg-muted']"
+                        @click="togglePanel('info')" :aria-expanded="isPanelActive('info')"
                         :aria-label="'Display AS Info of ' + data.asn">
                         <Info />
                     </Button>
@@ -154,20 +154,22 @@
                 <!-- ASN History -->
                 <JnTooltip v-if="ipPrefix" :text="t('Tooltips.ShowASNHistory')" side="top">
                     <Button variant="ghost" size="icon"
-                        :class="['size-7 cursor-pointer', activePanel === 'history' && 'bg-muted text-foreground hover:bg-muted']"
-                        @click="togglePanel('history')" :aria-expanded="activePanel === 'history'"
+                        :class="['size-7 cursor-pointer', isPanelActive('history') && 'bg-muted text-foreground hover:bg-muted']"
+                        @click="togglePanel('history')" :aria-expanded="isPanelActive('history')"
                         :aria-label="'Display ASN History of ' + data.ip">
                         <History />
                     </Button>
                 </JnTooltip>
             </div>
         </div>
-        <Collapsible :open="activePanel !== null" @update:open="onPanelOpenChange">
-            <CollapsibleContent class="pt-3">
-                <ASNInfo v-if="activePanel === 'info'" :index="index" :isDarkMode="isDarkMode" :asn="data.asn"
-                    :asnInfos="asnInfos" />
-                <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
-                    :asnHistoryInfos="asnHistoryInfos" />
+        <Collapsible :open="isPanelOpen" @update:open="onPanelOpenChange">
+            <CollapsibleContent>
+                <div class="pt-3">
+                    <ASNInfo v-if="activePanel === 'info'" :index="index" :isDarkMode="isDarkMode" :asn="data.asn"
+                        :asnInfos="asnInfos" />
+                    <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
+                        :asnHistoryInfos="asnHistoryInfos" />
+                </div>
             </CollapsibleContent>
         </Collapsible>
     </div>
@@ -257,9 +259,11 @@ const props = defineProps({
     enableMap: { type: Boolean, default: false },
 });
 
-// Single-select panel state for the ASN block: 'info' | 'history' | null.
-// At most one panel open at a time — they're alternate views of the same ASN.
+// Single-select panel content for the ASN block: 'info' | 'history' | null.
+// Kept separate from the open state so close animations retain their content
+// until Collapsible finishes measuring and animating the closing height.
 const activePanel = ref(null);
+const isPanelOpen = ref(false);
 const isMapDialogOpen = ref(false);
 
 // Advanced block only surfaces for the IPCheck.ing source (ipGeoSource === 0).
@@ -327,11 +331,12 @@ const ipPrefix = computed(() => toBgpPrefix(props.data.ip));
 // triggers its data fetch. Session caches (asnInfos / asnHistoryInfos) make
 // the switch instant on the second visit.
 const togglePanel = async (name) => {
-    if (activePanel.value === name) {
-        activePanel.value = null;
+    if (isPanelOpen.value && activePanel.value === name) {
+        isPanelOpen.value = false;
         return;
     }
     activePanel.value = name;
+    isPanelOpen.value = true;
     if (name === 'info') {
         await getASNInfo(props.data.asn);
     } else if (name === 'history' && ipPrefix.value) {
@@ -339,10 +344,12 @@ const togglePanel = async (name) => {
     }
 };
 
-// Collapsible's controlled mode also emits close on outside interactions like
-// the Esc key; mirror that back into the activePanel state.
+const isPanelActive = (name) => isPanelOpen.value && activePanel.value === name;
+
+// Collapsible's controlled mode can emit open-state updates from its internals;
+// mirror those without clearing the selected content before the close animation.
 const onPanelOpenChange = (open) => {
-    if (!open) activePanel.value = null;
+    isPanelOpen.value = open;
 };
 
 const getASNInfo = async (asn) => {
