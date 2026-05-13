@@ -1093,7 +1093,7 @@
   },
   {
     "version": "v6.2.0",
-    "date": "May 12, 2026",
+    "date": "May 13, 2026",
     "content": [
       {
         "type": "add",
@@ -1120,6 +1120,21 @@
           "zh": "修复运行多次网络连通性测试时，通知时机错误的问题",
           "fr": "Correction d'un bug causant la notification à se déclencher trop tôt lors de l'exécution de plusieurs tests de connectivité",
           "tr": "Birden fazla ağ bağlantı testi çalıştırılırken bildirimin erken tetiklenmesine neden olan bir hata düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v6.3.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved Browser Info tool for more accurate and practical information",
+          "zh": "优化了浏览器信息工具，使其更加准确和实用",
+          "fr": "Amélioration de l'outil d'informations sur le navigateur pour plus d'informations précises et pratiques",
+          "tr": "Tarayıcı bilgisi aracı iyileştirildi, daha doğru ve kullanışlı bilgiler"
         }
       }
     ]

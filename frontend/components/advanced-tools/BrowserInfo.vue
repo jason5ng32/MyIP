@@ -156,7 +156,7 @@ const excludeOptions = ref({
     'fonts': true,
     'hardware': true,
     'locales': true,
-    'permissions': true,
+    'permissions': false,
     'plugins': true,
     'screen': true,
     'system': true,
