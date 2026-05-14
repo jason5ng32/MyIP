@@ -577,7 +577,7 @@
       "note": "Historical ASN announcements for this IP: ",
       "empty": "No historical routing data found for this IP.",
       "error": "Failed to load ASN history.",
-      "seenBy": "Seen by {peers} BGP full-feed peers"
+      "seenBy": "RIPE RIS visibility: {pct}% — peak {peers} full-feed peers"
     },
     "ASNConnectivity": {
       "note": "Upstream paths from this AS toward the Tier 1 global transit providers: ",

@@ -2,6 +2,13 @@
 // frontend quantizes the user's IP to /24 v4 or /48 v6 first, so all IPs
 // in the same prefix collapse to one CF edge cache entry). Org names per
 // ASN come from RIPEstat as-overview, fetched in parallel, best-effort.
+//
+// `peers` is the peak RIS-peer count for a row (raw RIPE observation, not
+// global BGP reach). We also emit `peersPct` — each row's peers normalized
+// by the response's max — so the UI can show a relative visibility metric
+// instead of an absolute count that users might mistake for "the whole
+// internet". The max-of-response baseline is a fair proxy for "active RIS
+// peers" since well-propagated announcements typically saturate the panel.
 
 import {
     fetchRoutingHistory,
@@ -87,6 +94,13 @@ export default async (req, res) => {
             .map(entry => summarizeOrigin(entry, minLen))
             .filter(Boolean)
             .sort((a, b) => (b.lastSeen || '').localeCompare(a.lastSeen || ''));
+
+        // Relative visibility: each row's peers / max peers in this response.
+        // Most-propagated row is 100%; sparse ones surface as low percentages.
+        const peersMax = history.reduce((m, r) => Math.max(m, r.peers), 0);
+        for (const row of history) {
+            row.peersPct = peersMax > 0 ? Math.round((row.peers / peersMax) * 100) : 0;
+        }
 
         // Org enrichment is strictly best-effort: anything that goes wrong here
         // leaves rows with org=null, but the ASN-keyed timeline still ships.

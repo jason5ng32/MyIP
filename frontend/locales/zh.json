@@ -579,7 +579,7 @@
       "note": "该 IP 的历史 ASN 公告：",
       "empty": "未找到该 IP 的历史路由数据。",
       "error": "加载 ASN 历史失败。",
-      "seenBy": "被 {peers} 个 BGP 全表节点观测到"
+      "seenBy": "RIPE RIS 可见度：{pct}% — 峰值 {peers} 个全表 peer"
     },
     "ASNConnectivity": {
       "note": "该 AS 到全球 Tier 1 骨干网的上游路径：",

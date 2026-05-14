@@ -576,7 +576,7 @@
       "note": "Bu IP için geçmiş ASN duyuruları : ",
       "empty": "Bu IP için geçmiş yönlendirme verisi bulunamadı.",
       "error": "ASN geçmişi yüklenemedi.",
-      "seenBy": "{peers} BGP full-feed eşi tarafından görüldü"
+      "seenBy": "RIPE RIS görünürlüğü: %{pct} — zirvede {peers} full-feed eş"
     },
     "ASNConnectivity": {
       "note": "Bu AS'tan Tier 1 küresel transit sağlayıcılarına giden yukarı akış yolları: ",
