@@ -17,6 +17,23 @@
     Ping/MTR Test - Jason Ng Open Source </title>
   <link rel="icon" href="/logos/logo.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- @site-url:open -->
+  <link rel="canonical" href="__SITE_URL__/" />
+  <meta property="og:url" content="__SITE_URL__/" />
+  <!-- @site-url:close -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="IPCheck.ing" />
+  <meta property="og:title" content="IPCheck.ing — All in one IP Toolbox" />
+  <meta property="og:description" content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
+  <meta property="og:image" content="/logos/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="IPCheck.ing logo with the tagline: All in one IP Toolbox" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="IPCheck.ing — All in one IP Toolbox" />
+  <meta name="twitter:description" content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
+  <meta name="twitter:image" content="/logos/og.png" />
 
   <!-- Seed the `.dark` class on <html> BEFORE first paint.
        Reads the user's stored theme preference from localStorage (key
@@ -203,7 +220,7 @@
 
 <body>
   <!-- Pre-Vue boot screen. App.vue drives the hand-off via `#jn-loading` —
-       the id is a load-bearing contract, keep it in sync. -->
+      the id is a load-bearing contract, keep it in sync. -->
   <div id="jn-loading" class="jn-loading" role="status" aria-live="polite">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 511 512.35" aria-hidden="true"
       shape-rendering="geometricPrecision" fill-rule="evenodd" clip-rule="evenodd">

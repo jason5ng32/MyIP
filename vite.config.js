@@ -47,6 +47,29 @@ function isNodePackage(normalizedId, packageName) {
   return packagePath === packageName || packagePath.startsWith(`${packageName}/`);
 }
 
+// `index.html` contains a small conditional block delimited by
+// `<!-- @site-url:open -->` … `<!-- @site-url:close -->` and uses
+// `__SITE_URL__` as the placeholder for an absolute origin.
+function siteUrlHtmlPlugin() {
+  const siteUrl = (process.env.VITE_SITE_URL || '').trim().replace(/\/+$/, '');
+  const blockRe = /[ \t]*<!--\s*@site-url:open\s*-->[\s\S]*?<!--\s*@site-url:close\s*-->\n?/g;
+  const markerOpenRe = /[ \t]*<!--\s*@site-url:open\s*-->\n?/g;
+  const markerCloseRe = /[ \t]*<!--\s*@site-url:close\s*-->\n?/g;
+  return {
+    name: 'site-url-html',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        if (!siteUrl) return html.replace(blockRe, '');
+        return html
+          .replace(markerOpenRe, '')
+          .replace(markerCloseRe, '')
+          .replaceAll('__SITE_URL__', siteUrl);
+      },
+    },
+  };
+}
+
 function manualChunks(id) {
   const normalizedId = id.replaceAll('\\', '/');
 
@@ -75,6 +98,7 @@ export default defineConfig({
       }
     }),
     tailwindcss(),
+    siteUrlHtmlPlugin(),
     CodeInspectorPlugin({
       bundler: 'vite',
       hideDomPathAttr: true,
