@@ -51,5 +51,15 @@ common/as-rel-db/*.next
 .learnings/
 docs/
 
+# Local Scripts
+scripts/
+
+# Site configuration
+public/sitemap.xml
+public/robots.txt
+public/llms.txt
+public/llms-full.txt
+public/tools/
+
 # Private AI context (per-machine, not for the public repo)
 local-context.md
