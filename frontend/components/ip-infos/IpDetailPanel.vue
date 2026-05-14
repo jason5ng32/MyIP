@@ -399,9 +399,12 @@ const getASNHistory = async (prefix) => {
     trackEvent('IPCheck', 'ASNHistoryClick', 'Show ASN History');
     try {
         if (props.asnHistoryInfos[prefix]) return;
+        // RIPEstat routing-history is a slow analytical endpoint (10–20s on
+        // cold prefixes). Backend caps it at 25s; browser waits 26s so the
+        // server's 504 surfaces instead of the browser aborting first.
         const response = await fetchWithTimeout(
             `/api/asn-history?prefix=${encodeURIComponent(prefix)}`,
-            { timeoutMs: 10000 }
+            { timeoutMs: 26000 }
         );
         if (!response.ok) {
             props.asnHistoryInfos[prefix] = { error: true };

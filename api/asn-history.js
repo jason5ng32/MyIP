@@ -119,6 +119,12 @@ export default async (req, res) => {
 
         res.json({ prefix, history });
     } catch (error) {
+        // RIPEstat routing-history can exceed our timeout for prefixes with long
+        // history — surface that as 504 so it's distinguishable from real 5xx.
+        if (error?.name === 'AbortError') {
+            logger.warn({ prefix }, 'asn-history upstream timeout');
+            return res.status(504).json({ error: 'Upstream timeout' });
+        }
         logger.error({ err: error, prefix }, 'asn-history handler failed');
         res.status(500).json({ error: error.message });
     }

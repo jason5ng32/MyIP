@@ -16,8 +16,10 @@ export function fetchAsOverview(asn, { timeoutMs = 3000 } = {}) {
     return fetchRipestat('as-overview', `AS${asn}`, { timeoutMs });
 }
 
-/** routing-history: historical AS announcements for a prefix or IP. */
-export function fetchRoutingHistory(resource, { timeoutMs = 8000 } = {}) {
+/** routing-history: historical AS announcements for a prefix or IP.
+ *  Slow analytical endpoint — scans years of BGP data, regularly takes
+ *  10–20s for prefixes with long history. */
+export function fetchRoutingHistory(resource, { timeoutMs = 25000 } = {}) {
     return fetchRipestat('routing-history', resource, { timeoutMs });
 }
 
