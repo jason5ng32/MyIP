@@ -7,17 +7,21 @@
     content="MyIP, IP tool, IP check, IP lookup, DNS leak test, WebRTC test, speed test, DNS lookup, WHOIS lookup, ping test, privacy test" />
   <meta name="description"
     content="A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.">
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Jason Ng" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#f8f9fa" />
   <meta name="background-color" content="#ffffff" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- Avoid auto-linking phone numbers -->
+  <meta name="format-detection" content="telephone=no" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/logos/ios-logo-512.png" />
   <title>IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test -
     Ping/MTR Test - Jason Ng Open Source </title>
   <link rel="icon" href="/logos/logo.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  
+
   <!-- @site-url:open -->
   <link rel="canonical" href="__SITE_URL__/" />
   <meta property="og:url" content="__SITE_URL__/" />
@@ -25,25 +29,43 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="IPCheck.ing" />
   <meta property="og:title" content="IPCheck.ing — All in one IP Toolbox" />
-  <meta property="og:description" content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
+  <meta property="og:description"
+    content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
   <meta property="og:image" content="/logos/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="IPCheck.ing logo with the tagline: All in one IP Toolbox" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="IPCheck.ing — All in one IP Toolbox" />
-  <meta name="twitter:description" content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
+  <meta name="twitter:description"
+    content="IP lookup, ASN history, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint — in one open-source web app." />
   <meta name="twitter:image" content="/logos/og.png" />
 
+  <!-- WebSite JSON-LD: helps Google and AI engines recognize the site as a single entity instead of a loose collection of pages. -->
+  <!-- @site-url:open -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "__SITE_URL__/#website",
+    "name": "IPCheck.ing",
+    "url": "__SITE_URL__/",
+    "description": "Open-source IP toolbox: lookup, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint.",
+    "inLanguage": ["en", "zh", "fr", "tr"],
+    "publisher": { "@type": "Person", "name": "Jason Ng" }
+  }
+  </script>
+  <!-- @site-url:close -->
+
   <!-- Seed the `.dark` class on <html> BEFORE first paint.
-       Reads the user's stored theme preference from localStorage (key
-       `userPreferences`, field `theme`, values: "auto" / "light" / "dark"),
-       falling back to the OS `prefers-color-scheme` when on "auto" or when
-       there's no stored preference yet. Runs synchronously — must come before
-       the inline <style> block below and before the Vue bundle loads, so the
-       boot screen and the eventually-mounted app agree on the theme from
-       frame 1. Preferences.vue owns the class after mount via
-       `store.setDarkMode`. -->
+      Reads the user's stored theme preference from localStorage (key
+      `userPreferences`, field `theme`, values: "auto" / "light" / "dark"),
+      falling back to the OS `prefers-color-scheme` when on "auto" or when
+      there's no stored preference yet. Runs synchronously — must come before
+      the inline <style> block below and before the Vue bundle loads, so the
+      boot screen and the eventually-mounted app agree on the theme from
+      frame 1. Preferences.vue owns the class after mount via
+      `store.setDarkMode`. -->
   <script>
     (function () {
       // Gates the initial-hidden `#app` rule; App.vue clears it for the
@@ -129,20 +151,20 @@
          stage-1 — non-logo children fade out, logo stays put.
          stage-2 — logo scales down to 0 and fades.
          stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
-    .jn-loading > svg,
-    .jn-loading > div,
-    .jn-loading > .jn-spinner,
-    .jn-loading > p {
+    .jn-loading>svg,
+    .jn-loading>div,
+    .jn-loading>.jn-spinner,
+    .jn-loading>p {
       transition: opacity 180ms ease-out,
-                  transform 220ms cubic-bezier(0.55, 0, 0.7, 0);
+        transform 220ms cubic-bezier(0.55, 0, 0.7, 0);
       transform-origin: center center;
     }
 
-    .jn-loading.jn-loading-stage-1 > :not(svg) {
+    .jn-loading.jn-loading-stage-1> :not(svg) {
       opacity: 0;
     }
 
-    .jn-loading.jn-loading-stage-2 > svg {
+    .jn-loading.jn-loading-stage-2>svg {
       opacity: 0;
       transform: scale(0);
     }
