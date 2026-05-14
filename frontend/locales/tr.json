@@ -586,7 +586,10 @@
       "dialogTitle": "AS{asn} ağ bağlantı haritası",
       "legendOrigin": "Kaynak",
       "legendTier1": "Tier 1 ISP",
-      "legendIntermediate": "Ara AS"
+      "legendIntermediate": "Ara AS",
+      "zoomIn": "Yakınlaştır",
+      "zoomOut": "Uzaklaştır",
+      "zoomReset": "Sıfırla"
     },
     "advancedData": {
       "proxyYes": "Kesinlikle bir proxy veya VPN",

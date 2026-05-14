@@ -589,7 +589,10 @@
       "dialogTitle": "AS{asn} 的网络连接图",
       "legendOrigin": "起源",
       "legendTier1": "Tier 1 骨干",
-      "legendIntermediate": "中间 AS"
+      "legendIntermediate": "中间 AS",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "zoomReset": "重置缩放"
     },
     "advancedData": {
       "proxyYes": "是代理或 VPN",

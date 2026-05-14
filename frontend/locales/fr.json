@@ -587,7 +587,10 @@
       "dialogTitle": "Carte de connectivité réseau d'AS{asn}",
       "legendOrigin": "Origine",
       "legendTier1": "FAI Tier 1",
-      "legendIntermediate": "AS intermédiaire"
+      "legendIntermediate": "AS intermédiaire",
+      "zoomIn": "Zoom avant",
+      "zoomOut": "Zoom arrière",
+      "zoomReset": "Réinitialiser le zoom"
     },
     "advancedData": {
       "proxyYes": "Doit être un proxy ou un VPN",

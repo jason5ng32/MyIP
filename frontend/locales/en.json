@@ -587,7 +587,10 @@
       "dialogTitle": "Network connectivity for AS{asn}",
       "legendOrigin": "Origin",
       "legendTier1": "Tier 1 ISP",
-      "legendIntermediate": "Intermediate AS"
+      "legendIntermediate": "Intermediate AS",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomReset": "Reset zoom"
     },
     "advancedData": {
       "proxyYes": "Must be a proxy or VPN",
