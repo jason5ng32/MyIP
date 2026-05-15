@@ -100,7 +100,7 @@ function loadAndGetKeyMap({ originalSite = false, isSignedIn = false } = {}) {
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
   const configs = computed(() => ({ originalSite, map: true }));
-  const userPreferences = computed(() => ({ ipCardsToShow: 4 }));
+  const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
   const signedInRef = computed(() => isSignedIn);
 
   const { loadShortcuts } = useShortcuts({
