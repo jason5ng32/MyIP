@@ -2,11 +2,15 @@
     <!-- Advanced Tools -->
     <section class="advanced-tools-section mb-10">
         <!-- Header -->
-        <header class="mb-3">
+        <header class="mb-2 flex flex-col items-start justify-between gap-4">
+            <div class="flex flex-row items-center justify-between gap-4 w-full">
             <h2 id="AdvancedTools" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
                 🧰 {{ t('advancedtools.Title') }}
             </h2>
-            <p class="my-3 text-base text-muted-foreground">{{ t('advancedtools.Note') }}</p>
+            </div>
+            <div class="text-base text-muted-foreground">
+                <p>{{ t('advancedtools.Note') }}</p>
+            </div>
         </header>
 
         <!-- Card grid -->
