@@ -48,7 +48,7 @@
                 <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                     :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
                     :configs="configs" :is-dark-mode="isDarkMode"
-                    :collapsed="isMobile && isCardsCollapsed" :enable-map="true" />
+                    :enable-map="true" />
             </template>
 
             <!-- Error state -->
@@ -95,7 +95,6 @@ const props = defineProps({
     isDarkMode: { type: Boolean, required: true },
     isMobile: { type: Boolean, required: true },
     ipGeoSource: { type: Number, required: true },
-    isCardsCollapsed: { type: Boolean, required: true },
     copiedStatus: { type: Object, required: true },
     configs: { type: Object, required: true },
     asnInfos: { type: Object, required: true },

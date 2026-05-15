@@ -15,7 +15,7 @@
         </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('webrtc.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('webrtc.Note') }}</p>
       </div>
     </header>
 
@@ -99,6 +99,8 @@ import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const { dotClass, textClass } = useStatusTone();
 
 const isStarted = ref(false);

@@ -1138,6 +1138,15 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added simple mode, hide the description text of each module",
+          "zh": "添加简约模式，隐藏每个模块的说明文字",
+          "fr": "Ajout du mode simple, masque le texte de description de chaque module",
+          "tr": "Basit mod eklendi, her modülün açıklamasını gizler"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Improved Browser Info tool for more accurate and practical information",

@@ -9,7 +9,7 @@
             </h2>
             </div>
             <div class="text-base text-muted-foreground">
-                <p>{{ t('advancedtools.Note') }}</p>
+                <p v-if="!isSimpleMode">{{ t('advancedtools.Note') }}</p>
             </div>
         </header>
 
@@ -83,7 +83,8 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const scrollContainer = ref(null);
 const router = useRouter();
 

@@ -161,7 +161,7 @@
       "autoRun": "自动运行",
       "autoRunTips": "关闭后，打开应用将只会进行本机 IP 检测，不会自动运行其它的测试。",
       "simpleMode": "简洁模式",
-      "simpleModeTips": "减少 IP 卡片显示的内容。仅在手机上生效。",
+      "simpleModeTips": "隐藏每个模块的说明文字，适合已经了解本应用的用户。",
       "connectivityMultipleTests": "多次刷新可用性检测",
       "connectivityMultipleTestsTips": "开启多次刷新后，程序在启动时将运行多次检测，并显示最小延迟值。",
       "popupConnectivityNotifications": "显示可用性检测气泡",

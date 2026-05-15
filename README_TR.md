@@ -51,7 +51,6 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 ## 💪 Ayrıca
 
 * 🌗 **Karanlık Mod**: Sistem ayarlarına göre otomatik olarak gündüz/karanlık mod arasında geçiş yapar; manuel geçiş seçeneği de vardır.
-* 📱 **Minimal Mod**: Mobil için optimize edilmiş, sayfa uzunluğunu kısaltan hızlı erişim modu.
 * 📲 **PWA Desteği**：Telefonunuza masaüstü uygulaması olarak veya bilgisayarınızda Chrome uygulaması olarak eklenebilir.
 * ⌨️ **Klavye Kısayolları**: Tüm işlevler için kısayolları destekler; kısayol listesini görmek için `?` tuşuna basın.
 * 🌍 Erişilebilirlik test sonuçlarına göre küresel internet erişiminin şu an mümkün olup olmadığını gösterir.

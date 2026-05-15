@@ -10,7 +10,7 @@
         </h2>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('speedtest.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('speedtest.Note') }}</p>
       </div>
     </header>
 
@@ -176,7 +176,8 @@ const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 // State Management
 const state = reactive({
   speedTest: {

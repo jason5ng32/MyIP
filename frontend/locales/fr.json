@@ -161,7 +161,7 @@
       "autoRun": "Exécution Automatique",
       "autoRunTips": "Si désactivé, l'appli vérifiera seulement l'IP local et n'exécutera pas de tests automatiquement.",
       "simpleMode": "Mode Simple",
-      "simpleModeTips": "Réduit les informations affichées sur les cartes IP. Effectif uniquement sur les appareils mobiles.",
+      "simpleModeTips": "Masque le texte de description de chaque module. Effectif uniquement sur les appareils mobiles.",
       "connectivityMultipleTests": "Rafraîchissements Multiples de Connectivité",
       "connectivityMultipleTestsTips": "Activé, l'appli effectue plusieurs vérifications au démarrage et affiche le délai le plus bas.",
       "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",

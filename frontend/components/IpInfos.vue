@@ -7,7 +7,7 @@
         🔎 {{ t('ipInfos.Title') }}
       </h2>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('ipInfos.Notes') }}</p>
+        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }}</p>
       </div>
     </header>
 
@@ -18,7 +18,7 @@
         :id="'IPInfoCard-' + (index + 1)" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
+          :ipGeoSource="ipGeoSource" :copiedStatus="copiedStatus"
           :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
           :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
@@ -48,9 +48,7 @@ const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
-
-// Dynamic configuration of the page
-const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 
 // Default card data
 const createDefaultCard = () => ({

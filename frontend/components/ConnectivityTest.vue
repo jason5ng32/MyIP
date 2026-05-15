@@ -14,7 +14,7 @@
         </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('connectivity.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('connectivity.Note') }}</p>
       </div>
     </header>
 
@@ -133,7 +133,7 @@ import {
 const { t } = useI18n();
 const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
-
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const alertToShow = ref(false);
 const alertStyle = ref("");
 const alertTitle = ref("");

@@ -17,8 +17,8 @@
         </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('dnsleaktest.Note') }}</p>
-        <p>{{ t('dnsleaktest.Note2') }}</p>
+        <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note2') }}</p>
       </div>
     </header>
 
@@ -131,7 +131,8 @@ const store = useMainStore();
 const router = useRouter();
 const lang = computed(() => store.lang);
 const isStarted = ref(false);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 // Sticky flag for the Enhanced DNS Leak Test banner.
 const hasEverSettled = ref(false);
 
