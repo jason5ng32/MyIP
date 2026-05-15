@@ -4,7 +4,7 @@
     <header class="mb-2 flex flex-col items-start justify-between gap-4">
       <h2 id="IPInfo"
         class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-        📮 {{ t('ipInfos.Title') }}
+        🔦 {{ t('ipInfos.Title') }}
       </h2>
       <div class="text-base text-muted-foreground">
         <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }}</p>
