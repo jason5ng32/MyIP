@@ -6,8 +6,7 @@
       <div class="flex flex-row items-center justify-between gap-4 w-full">
         <h2 id="DNSLeakTest"
           class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-          <span class="shrink-0 leading-none" aria-hidden="true">🛑</span>
-          <span class="min-w-0">{{ t('dnsleaktest.Title') }}</span>
+          🛑 {{ t('dnsleaktest.Title') }}
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
