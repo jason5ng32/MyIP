@@ -672,7 +672,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Hız Testi",
-    "Note": "Ağınız anakara Çin'de bulunuyorsa, veriler yanlı olabilir. Hız testi sonuçları yalnızca referans amaçlıdır, gerçek hız daha hızlı olacaktır. İndirme ve yükleme testleri için paket boyutunu seçebilirsiniz. Varsayılan olarak, hız testi 4 tur paket yüklemesi ve indirmesi yapacaktır, lütfen veri kullanımına dikkat edin.",
+    "Note": "Hız testi, Cloudflare'in kenar ağı kullanılarak gerçekleştirilecektir. İndirme ve yükleme için veri paketi boyutunu ihtiyacınıza göre seçebilirsiniz. Test sırasında veri paketleri 4 kez yüklenip indirilecektir; lütfen veri tüketimine dikkat edin. Cloudflare dünyadaki her ülkede kenar düğümü bulundurmadığından, test sonuçları yalnızca referans niteliğindedir ve gerçek hız daha yüksek olabilir.",
     "Download": "İndirme",
     "Upload": "Yükleme",
     "Latency": "Gecikme",

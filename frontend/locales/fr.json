@@ -673,7 +673,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Test de vitesse",
-    "Note": "Le test de vitesse sera effectué via le réseau de bordure de Cloudflare, ce qui peut prendre beaucoup de temps. Si votre réseau est situé en Chine continentale, les données peuvent être biaisées. Les résultats du test de vitesse sont donnés à titre indicatif, la vitesse réelle sera plus rapide. Vous pouvez choisir la taille des paquets pour les tests de téléchargement et d'upload. Par défaut, le test de vitesse effectuera 4 tours de téléchargements et d'uploads de paquets, veuillez faire attention à la consommation de données.",
+    "Note": "Le test de vitesse sera effectué via le réseau périphérique de Cloudflare. Vous pouvez choisir la taille des paquets de téléchargement et de téléversement selon vos besoins. Pendant le test, les paquets seront téléchargés et téléversés 4 fois — veuillez tenir compte de votre consommation de données. Cloudflare ne disposant pas de nœuds périphériques dans tous les pays, les résultats sont donnés à titre indicatif ; la vitesse réelle peut être plus élevée.",
     "Download": "Téléchargement",
     "Upload": "Téléversement",
     "Latency": "Latence",

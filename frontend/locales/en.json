@@ -673,7 +673,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Speed Test",
-    "Note": "Speed test will be done via Cloudflare's edge network, which may take a long time. If your network is located in mainland China, the data may be biased. The speed test results are for reference only, the actual speed will be faster. You can choose the packet size for download and upload tests. By default, the speed test will perform 4 rounds of packet uploads and downloads, please be mindful of data usage.",
+    "Note": "The speed test will be conducted using Cloudflare's edge network. You can choose the packet size for download and upload according to your needs. During the test, packets will be uploaded and downloaded 4 times — please be mindful of data usage. Since Cloudflare does not deploy edge nodes in every country worldwide, the results are for reference only; actual speeds may be faster.",
     "Download": "Download",
     "Upload": "Upload",
     "Latency": "Latency",
