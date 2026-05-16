@@ -524,6 +524,7 @@
     "ShowASNHistory": "Afficher l'historique ASN",
     "ShowASNConnectivity": "Afficher la connectivité ASN",
     "CopyIP": "Copier l'adresse IP",
+    "CopySdpLog": "Copier le journal SDP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
     "QueryIP": "Interroger l'adresse IP",
@@ -645,6 +646,7 @@
     "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
     "StatusWait": "En attente du test",
     "StatusError": "Erreur de connexion",
+    "SdpLog": "Journal SDP",
     "NATType": {
       "srflx": "Port Restricted Cone ou Symmetric",
       "prflx": "Port Restricted Cone",

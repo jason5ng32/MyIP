@@ -42,8 +42,7 @@
                 class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
-            <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip"
-              class="font-mono min-w-0"
+            <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip" class="font-mono min-w-0"
               :class="textClass(toneOf(stun))" />
           </div>
 
@@ -73,6 +72,31 @@
               </dd>
             </div>
           </dl>
+
+          <!-- SDP / ICE event log -->
+          <Collapsible v-if="stun.sdpLog.length" v-model:open="stun.sdpOpen" class="mt-3 flex flex-col">
+            <CollapsibleTrigger as-child>
+              <Button variant="ghost" class="self-end text-xs text-muted-foreground cursor-pointer"
+                :aria-expanded="stun.sdpOpen" :aria-label="`${t('webrtc.SdpLog')} (${stun.sdpLog.length})`">
+                <span class="inline-flex items-center gap-1.5">
+                  <FileText class="size-3.5" />
+                  <span>{{ t('webrtc.SdpLog') }}</span>
+                  <span class="tabular-nums opacity-70">({{ stun.sdpLog.length }})</span>
+                </span>
+                <ChevronDown class="size-3.5 shrink-0 transition-transform duration-200"
+                  :class="stun.sdpOpen ? 'rotate-180' : ''" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div class="relative mt-2">
+                <pre
+                  class="p-4 pr-8 rounded-md bg-muted/50 text-xs leading-relaxed font-mono whitespace-pre-wrap break-all max-h-64 overflow-auto">
+        {{ stun.sdpLog.join('\n') }}</pre>
+                <CopyButton :value="() => stun.sdpLog.join('\n')" :tooltip="t('Tooltips.CopySdpLog')"
+                  class="absolute top-2 right-2" />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </CardContent>
       </Card>
     </div>
@@ -90,10 +114,12 @@ import getCountryName from '@/data/country-name.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { Play, MapPin, Flower, Network, RotateCw } from 'lucide-vue-next';
+import { Play, MapPin, Flower, Network, RotateCw, FileText, ChevronDown } from 'lucide-vue-next';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
+import CopyButton from '@/components/widgets/CopyButton.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
@@ -106,10 +132,10 @@ const { dotClass, textClass } = useStatusTone();
 const isStarted = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
-  { id: 'google', name: 'Google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
-  { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
-  { id: 'twilio', name: 'Twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
-  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '' },
+  { id: 'google', name: 'Google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'twilio', name: 'Twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
 ]);
 
 // Regex extracting the IP portion out of an ICE candidate line
@@ -156,6 +182,18 @@ const checkSTUNServer = (stun) => {
     let timer = null;
     let settled = false;
 
+    // Event log helper: every line is prefixed with a millisecond offset
+    // from the start of this server's test, so the log reads as a timeline.
+    // `stun.sdpLog` is reset to a fresh reactive array (rather than length=0)
+    // so the panel scroll position resets cleanly between runs.
+    const startTime = performance.now();
+    stun.sdpLog = [];
+    stun.sdpOpen = false;
+    const log = (msg) => {
+      const ts = Math.round(performance.now() - startTime).toString().padStart(4, ' ');
+      stun.sdpLog.push(`[+${ts}ms] ${msg}`);
+    };
+
     const finish = () => {
       settled = true;
       if (timer !== null) {
@@ -176,6 +214,7 @@ const checkSTUNServer = (stun) => {
       stun.natType = label;
       stun.country = label;
       stun.country_code = '';
+      log(`status: ${statusKey}`);
       finish();
     };
 
@@ -190,6 +229,7 @@ const checkSTUNServer = (stun) => {
       }
       stun.ip = ip;
       stun.natType = determineNATType(candidate);
+      log(`resolved IP: ${ip}`);
       IPArray.value = [...IPArray.value, ip];
       // fetchCountryCode swallows its own errors and returns null on miss,
       // so a single null check handles both "no MaxMind source" and
@@ -209,12 +249,30 @@ const checkSTUNServer = (stun) => {
     };
 
     try {
+      log(`new RTCPeerConnection -> stun:${stun.url}`);
       pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:' + stun.url }] });
       activeConnections.add(pc);
 
+      pc.onicegatheringstatechange = () => {
+        if (pc) log(`iceGatheringState: ${pc.iceGatheringState}`);
+      };
+
+      // `RTCIceCandidate` errors fire when STUN/TURN signalling fails
+      // (host unreachable, auth issues). They don't terminate the
+      // connection on their own, but they're highly informative for
+      // debugging "why did this STUN never answer" cases.
+      pc.onicecandidateerror = (event) => {
+        log(`iceCandidateError: ${event.errorCode || ''} ${event.errorText || ''} url=${event.url || ''}`.trim());
+      };
+
       pc.onicecandidate = (event) => {
-        if (!event.candidate || settled) return;  // null = end-of-candidates
+        if (!event.candidate) {
+          log('candidate: (end-of-candidates)');
+          return;
+        }
         const candidate = event.candidate.candidate;
+        log(`candidate: ${candidate}`);
+        if (settled) return;
         const type = candidate.split(' ')[7];
 
         // Only server-reflexive / peer-reflexive candidates represent a
@@ -228,7 +286,16 @@ const checkSTUNServer = (stun) => {
       };
 
       pc.createDataChannel('');
-      pc.createOffer().then((offer) => pc.setLocalDescription(offer));
+      pc.createOffer().then((offer) => {
+        // Offer SDP is multi-line; record it as a single block so the
+        // Collapsible <pre> renders it verbatim.
+        log(`createOffer ok\n--- Offer SDP ---\n${offer.sdp}--- end SDP ---`);
+        return pc.setLocalDescription(offer);
+      }).then(() => {
+        log('setLocalDescription ok');
+      }).catch((error) => {
+        log(`offer/setLocalDescription failed: ${error?.message || error}`);
+      });
 
       timer = setTimeout(() => {
         timer = null;
@@ -236,6 +303,7 @@ const checkSTUNServer = (stun) => {
       }, 5000);
     } catch (error) {
       console.error('STUN Server Test Error:', error);
+      log(`exception: ${error?.message || error}`);
       failWith('StatusError');
     }
   });

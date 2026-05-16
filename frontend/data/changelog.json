@@ -1149,6 +1149,15 @@
       {
         "type": "improve",
         "change": {
+          "en": "Added SDP Log to WebRTC Test tool",
+          "zh": "WebRTC 测试工具添加了 SDP 日志功能",
+          "fr": "Ajout de la fonctionnalité de journalisation SDP dans l'outil de test WebRTC",
+          "tr": "WebRTC Test aracına SDP günlüğü eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Improved Browser Info tool for more accurate and practical information",
           "zh": "优化了浏览器信息工具，使其更加准确和实用",
           "fr": "Amélioration de l'outil d'informations sur le navigateur pour plus d'informations précises et pratiques",

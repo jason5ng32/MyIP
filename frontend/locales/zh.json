@@ -526,6 +526,7 @@
     "ShowASNHistory": "显示 ASN 历史",
     "ShowASNConnectivity": "显示 ASN 连接图",
     "CopyIP": "复制 IP 地址",
+    "CopySdpLog": "复制 SDP 日志",
     "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
     "QueryIP": "查询 IP 信息",
@@ -647,6 +648,7 @@
     "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
     "StatusWait": "待检测",
     "StatusError": "连接错误",
+    "SdpLog": "SDP 日志",
     "NATType": {
       "srflx": "端口限制型或对称型",
       "prflx": "端口限制型",
