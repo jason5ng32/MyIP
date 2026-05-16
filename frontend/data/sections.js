@@ -10,8 +10,8 @@
 export const SECTION_IDS = [
   'IPInfo',
   'Connectivity',
-  'DNSLeakTest',
   'WebRTC',
+  'DNSLeakTest',
   'SpeedTest',
   'AdvancedTools',
 ];
@@ -25,8 +25,8 @@ export const DEFAULT_SECTION = 'IPInfo';
 const LOADING_SECTIONS = [
   'IPInfo',
   'Connectivity',
-  'DNSLeakTest',
   'WebRTC',
+  'DNSLeakTest',
 ];
 
 function createStatusObject(keys) {
