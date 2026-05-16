@@ -18,7 +18,7 @@
         :id="'IPInfoCard-' + (index + 1)" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :copiedStatus="copiedStatus"
+          :ipGeoSource="ipGeoSource"
           :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
           :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
@@ -117,7 +117,6 @@ const asnConnectivityInfos = ref({});
 
 // Other data
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
-const copiedStatus = ref({});
 const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);

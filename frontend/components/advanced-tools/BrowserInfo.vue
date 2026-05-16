@@ -36,12 +36,9 @@
                                     <Badge class="bg-success text-success-foreground border-transparent font-normal">
                                         User Agent
                                     </Badge>
-                                    <Button variant="ghost" size="icon" class="size-7 -mr-1 cursor-pointer hover:bg-transparent"
-                                        @click="copyToClipboard(userAgent.ua)"
-                                        aria-label="Copy UA">
-                                        <component :is="copiedStatus ? CopyCheck : Copy" class="size-4"
-                                        :class="copiedStatus ? 'text-success' : ''" />
-                                    </Button>
+                                    <CopyButton :value="userAgent.ua"
+                                        class="-mr-1 hover:bg-transparent"
+                                        aria-label="Copy UA" />
                                 </div>
                                 <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>
                             </div>
@@ -134,11 +131,11 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Spinner } from '@/components/ui/spinner';
-import { BriefcaseBusiness, CopyCheck, Copy, Fingerprint, Info, Microscope } from 'lucide-vue-next';
+import { BriefcaseBusiness, Fingerprint, Info, Microscope } from 'lucide-vue-next';
 import { Card, CardContent } from '@/components/ui/card';
+import CopyButton from '@/components/widgets/CopyButton.vue';
 
 const { t } = useI18n();
 
@@ -170,7 +167,6 @@ const excludeOptions = ref({
 });
 const errorMsg = ref('');
 const checkingStatus = ref('idle');
-const copiedStatus = ref(false);
 
 const userAgent = ref('');
 const gpu = ref('');
@@ -359,16 +355,6 @@ const getAll = async () => {
         console.error('Error during checks:', error);
         checkingStatus.value = 'error';
         errorMsg.value = t('browserinfo.calError');
-    }
-};
-
-const copyToClipboard = async (ua) => {
-    try {
-        await navigator.clipboard.writeText(ua);
-        copiedStatus.value = true;
-        setTimeout(() => { copiedStatus.value = false; }, 5000);
-    } catch (err) {
-        console.error('Copy error:', err);
     }
 };
 
