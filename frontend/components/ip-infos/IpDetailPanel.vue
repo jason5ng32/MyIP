@@ -105,9 +105,12 @@
                 <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                     <House class="size-3.5" />
                     <span>{{ t('ipInfos.advancedData.Nativeness') }}</span>
+                    <JnTooltip :text="t('ipInfos.advancedData.nativenessTooltip')" side="top" class="hidden md:block">
+                        <CircleQuestionMark class="size-3 cursor-help opacity-70" />
+                    </JnTooltip>
                 </dt>
                 <dd class="font-normal flex items-center gap-1 wrap-break-word">
-                    <component :is="data.isNativeIP === true ? CircleCheck : CircleX"
+                    <component :is="data.isNativeIP === true ? Equal : EqualNot"
                         class="size-3.5 shrink-0" />
                     <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
                         t('ipInfos.advancedData.NativeIPNo') }}</span>
@@ -240,9 +243,9 @@ import { Icon } from '@iconify/vue';
 import { Earth } from 'lucide-vue-next';
 import {
     Building2,
-    CircleCheck,
-    CircleX,
     CornerUpRight,
+    Equal,
+    EqualNot,
     EthernetPort,
     Gauge,
     History,
@@ -254,6 +257,7 @@ import {
     MapPin,
     ShieldCheck,
     SignalHigh,
+    CircleQuestionMark,
 } from 'lucide-vue-next';
 
 const { t } = useI18n();

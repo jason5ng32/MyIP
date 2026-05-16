@@ -592,9 +592,9 @@
       "zoomReset": "Sıfırla"
     },
     "advancedData": {
-      "proxyYes": "Kesinlikle bir proxy veya VPN",
-      "proxyMaybe": "Muhtemelen bir proxy veya VPN",
-      "proxyNo": "Proxy veya VPN değil",
+      "proxyYes": "Proxy / VPN olarak işaretlendi",
+      "proxyMaybe": "Olası proxy / VPN",
+      "proxyNo": "İşaretlenmedi",
       "proxyUnknown": "Bilinmeyen tür",
       "proxyUnknownProtocol": "Bilinmeyen protokol",
       "type": {
@@ -604,9 +604,10 @@
         "Hosting": "Barındırma",
         "unknownType": "Bilinmeyen Tür"
       },
-      "Nativeness": "Yerellik",
-      "NativeIPYes": "Bu yerel bir IP",
-      "NativeIPNo": "Yerel bir IP değil"
+      "Nativeness": "ASN-Coğrafya eşleşmesi",
+      "NativeIPYes": "Eşleşiyor",
+      "NativeIPNo": "Eşleşmiyor",
+      "nativenessTooltip": "ASN'nin kayıtlı ülkesinin IP'nin coğrafi konum ülkesiyle eşleşip eşleşmediğini gösterir"
     }
   },
   "connectivity": {

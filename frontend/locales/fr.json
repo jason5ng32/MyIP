@@ -593,9 +593,9 @@
       "zoomReset": "Réinitialiser le zoom"
     },
     "advancedData": {
-      "proxyYes": "Doit être un proxy ou un VPN",
-      "proxyMaybe": "Possiblement un proxy ou un VPN",
-      "proxyNo": "Pas un proxy ou un VPN",
+      "proxyYes": "Signalé comme proxy / VPN",
+      "proxyMaybe": "Probablement proxy / VPN",
+      "proxyNo": "Non signalé",
       "proxyUnknown": "Type inconnu",
       "proxyUnknownProtocol": "Protocole inconnu",
       "type": {
@@ -605,9 +605,10 @@
         "Hosting": "Hébergement",
         "unknownType": "Type inconnu"
       },
-      "Nativeness": "Nativité",
-      "NativeIPYes": "C'est un IP natif",
-      "NativeIPNo": "Ce n'est pas un IP natif"
+      "Nativeness": "Correspondance ASN-Geo",
+      "NativeIPYes": "Aligné",
+      "NativeIPNo": "Décalé",
+      "nativenessTooltip": "Indique si le pays d'enregistrement de l'ASN correspond au pays de géolocalisation de l'IP"
     }
   },
   "connectivity": {
