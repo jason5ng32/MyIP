@@ -90,8 +90,7 @@
             <CollapsibleContent>
               <div class="relative mt-2">
                 <pre
-                  class="p-4 pr-8 rounded-md bg-muted/50 text-xs leading-relaxed font-mono whitespace-pre-wrap break-all max-h-64 overflow-auto">
-        {{ stun.sdpLog.join('\n') }}</pre>
+                  class="p-4 pr-8 rounded-md bg-muted/50 text-xs leading-relaxed font-mono whitespace-pre-wrap break-all max-h-64 overflow-auto">{{ stun.sdpLog.join('\n') }}</pre>
                 <CopyButton :value="() => stun.sdpLog.join('\n')" :tooltip="t('Tooltips.CopySdpLog')"
                   class="absolute top-2 right-2" />
               </div>
