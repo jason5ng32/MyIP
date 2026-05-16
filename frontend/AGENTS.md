@@ -44,7 +44,7 @@ frontend/
     │                               EnhancedDnsLeakTest / CensorshipCheck / Whois /
     │                               MacChecker / BrowserInfo / InvisibilityTest /
     │                               SecurityChecklist + Empty)
-    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText)
+    ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText / CopyButton)
     ├── svgicons/                ← a few inline SVGs
     └── ui/                      ← shadcn-vue copy-in primitives (see "UI system" below)
 ```
