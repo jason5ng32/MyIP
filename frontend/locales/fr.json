@@ -681,6 +681,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Erreur de test",
+    "loadedLatency": "Latence en charge : ",
     "videoStreaming": "Streaming vidéo : ",
     "gaming": ", Jeu : ",
     "rtc": ", Chat vidéo : ",
@@ -690,9 +691,11 @@
     "connectionTo": " vers le serveur de test:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "Bon",
-      "Medium": "Moyen",
-      "Bad": "Mauvais"
+      "bad": "Mauvais",
+      "poor": "Faible",
+      "average": "Moyen",
+      "good": "Bon",
+      "great": "Excellent"
     }
   },
   "pingtest": {

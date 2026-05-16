@@ -683,6 +683,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "测试出错",
+    "loadedLatency": "满载延迟：",
     "videoStreaming": "在线视频：",
     "gaming": " ，在线游戏：",
     "rtc": " ，视频会议：",
@@ -692,9 +693,11 @@
     "connectionTo": "与测速服务器：",
     "connectionEnd": " 的测试。",
     "quality": {
-      "Good": "优秀",
-      "Medium": "中等",
-      "Bad": "较差"
+      "bad": "差",
+      "poor": "较差",
+      "average": "一般",
+      "good": "良好",
+      "great": "优秀"
     }
   },
   "pingtest": {

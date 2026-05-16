@@ -680,6 +680,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Test Hatası",
+    "loadedLatency": "Yüklü gecikme: ",
     "videoStreaming": "Video Akışı: ",
     "gaming": ", Oyun: ",
     "rtc": ", Görüntülü Sohbet: ",
@@ -689,9 +690,11 @@
     "connectionTo": " test sunucusuna:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "İyi",
-      "Medium": "Orta",
-      "Bad": "Kötü"
+      "bad": "Kötü",
+      "poor": "Zayıf",
+      "average": "Orta",
+      "good": "İyi",
+      "great": "Mükemmel"
     }
   },
   "pingtest": {

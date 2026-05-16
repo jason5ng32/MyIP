@@ -681,6 +681,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Test Error",
+    "loadedLatency": "Loaded latency: ",
     "videoStreaming": "Video Streaming: ",
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
@@ -690,9 +691,11 @@
     "connectionTo": " to test server:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "Good",
-      "Medium": "Medium",
-      "Bad": "Bad"
+      "bad": "Bad",
+      "poor": "Poor",
+      "average": "Average",
+      "good": "Good",
+      "great": "Great"
     }
   },
   "pingtest": {
