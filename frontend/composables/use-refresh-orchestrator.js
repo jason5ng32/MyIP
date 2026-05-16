@@ -35,10 +35,10 @@ export function useRefreshOrchestrator({ refs, store, t, userPreferences, infoMa
     };
 
     const refreshEverything = () => {
-        store.setLoadingStatus('connectivity', false);
-        store.setLoadingStatus('webrtc', false);
-        store.setLoadingStatus('dnsleaktest', false);
-        store.setLoadingStatus('ipcheck', false);
+        store.setLoadingStatus('Connectivity', false);
+        store.setLoadingStatus('WebRTC', false);
+        store.setLoadingStatus('DNSLeakTest', false);
+        store.setLoadingStatus('IPInfo', false);
 
         const { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef } = refs;
         scheduleTimedTasks([
@@ -62,9 +62,9 @@ export function useRefreshOrchestrator({ refs, store, t, userPreferences, infoMa
                 setTimeout(() => webRTCRef.value.checkAllWebRTC(false), t3);
                 setTimeout(() => dnsLeaksRef.value.checkAllDNSLeakTest(false), t4);
             } else {
-                store.setLoadingStatus('connectivity', true);
-                store.setLoadingStatus('webrtc', true);
-                store.setLoadingStatus('dnsleaktest', true);
+                store.setLoadingStatus('Connectivity', true);
+                store.setLoadingStatus('WebRTC', true);
+                store.setLoadingStatus('DNSLeakTest', true);
             }
         } else {
             setTimeout(() => loadingControl(t1, t2, t3, t4), 1000);

@@ -15,9 +15,9 @@
         <a href="#" @click="handleLogoClick"
           class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity">
           <brandIcon />
-          <span class="tracking-tight">
-            <span class="font-bold">IP</span><span class="font-extralight">Check.</span><span
-              class="font-extralight"
+          <span class="tracking-tight truncate">
+            <span class="font-bold">IP</span><span class="font-extralight">Check.</span>
+            <span class="font-extralight"
               :class="{ 'jn-shimmer-light': !loaded && !isDarkMode, 'jn-shimmer-dark': !loaded && isDarkMode }">ing</span>
           </span>
         </a>
@@ -26,6 +26,7 @@
       <!-- Middle: Desktop nav links + GitHub star badge (left aligned, next to brand) -->
       <div v-if="!isMobile" class="flex items-center gap-0.5">
         <a v-for="item in navItems" :key="item" href="#"
+        class=""
           :class="navLinkClass(item)"
           @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
           {{ t(`nav.${item}`) }}
@@ -190,6 +191,7 @@ import {
   LogOut, Menu, SlidersHorizontal,
 } from 'lucide-vue-next';
 import brandIcon from './svgicons/Brand.vue';
+import { SECTION_IDS } from '@/data/sections';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -201,7 +203,7 @@ const currentSection = computed(() => store.currentSection);
 const loaded = ref(false);
 
 // Navigation items (desktop + mobile share the same list)
-const navItems = ['IPInfo', 'Connectivity', 'WebRTC', 'DNSLeakTest', 'SpeedTest', 'AdvancedTools'];
+const navItems = SECTION_IDS;
 
 // nav link style — current section highlight use bg-accent instead of only bold
 const navLinkClass = (item, { block = false } = {}) => {

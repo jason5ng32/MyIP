@@ -5,7 +5,7 @@
       <div class="flex flex-row items-center justify-between gap-4 w-full">
         <h2 id="WebRTC"
           class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-          🚥 {{ t('webrtc.Title') }}
+          🚱 {{ t('webrtc.Title') }}
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshWebRTC')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllWebRTC(true)"
@@ -361,12 +361,12 @@ const checkAllWebRTC = async (isRefresh) => {
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
-    store.setLoadingStatus('webrtc', true);
+    store.setLoadingStatus('WebRTC', true);
   });
 };
 
 onMounted(() => {
-  store.setMountingStatus('webrtc', true);
+  store.setMountingStatus('WebRTC', true);
 });
 
 // Close any still-open peer connections if the component unmounts

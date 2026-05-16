@@ -159,7 +159,7 @@ const trackFetchStatus = (status) => {
     }
   }
   if (allHasFetched) {
-    store.setLoadingStatus('ipcheck', true);
+    store.setLoadingStatus('IPInfo', true);
   }
 };
 
@@ -335,7 +335,7 @@ watch(IPArray, () => {
 });
 
 onMounted(() => {
-  store.setMountingStatus('ipcheck', true);
+  store.setMountingStatus('IPInfo', true);
 });
 
 defineExpose({

@@ -155,7 +155,7 @@ const resetNavigatorURL = () => {
 let invisibilityEnableTimer = null;
 
 onMounted(() => {
-    store.setMountingStatus('advancedtools', true);
+    store.setMountingStatus('AdvancedTools', true);
     invisibilityEnableTimer = setTimeout(() => {
         invisibilityEnableTimer = null;
         if (configs.value.originalSite) {

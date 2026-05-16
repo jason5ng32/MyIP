@@ -141,7 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
-    "WebRTC": "WebRTC Test",
+    "WebRTC": "WebRTC Leak Test",
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
     "PingTest": "Global Latency",
@@ -516,7 +516,7 @@
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
-    "RefreshWebRTC": "Refresh WebRTC Test",
+    "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
     "SourceSelect": "Select IP Geolocation Source",
@@ -642,7 +642,7 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "WebRTC Test",
+    "Title": "WebRTC Leak Test",
     "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
     "StatusWait": "Awaiting Test",
     "StatusError": "Connection Error",
@@ -757,7 +757,7 @@
     "RefreshEverything": "Refresh Everything",
     "RefreshIPCard": "Refresh IP Card",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
-    "RefreshWebRTC": "Refresh WebRTC Test",
+    "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
     "PingTest": "Open Global Latency Test panel",
@@ -785,9 +785,9 @@
     "SecurityChecklist": "Open Security Checklist panel"
   },
   "page": {
-    "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
-    "description": "A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.",
-    "keywords": "MyIP, IP tool, IP check, IP lookup, DNS leak test, WebRTC test, speed test, DNS lookup, WHOIS lookup, ping test, privacy test",
+    "title": "IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - Jason Ng Open Source",
+    "description": "A better and open-source IP toolbox: check your IP address & geolocation, test IP for WebRTC and DNS IP leaks, run an IP quality check, browser fingerprint check, plus speed test, global latency test, MTR test, Whois search, and more.",
+    "keywords": "MyIP, IP tool, IP check, IP Leak Check, IP quality check, IP lookup, DNS leak test, WebRTC leak test, browser fingerprint check, speed test, global latency test, MTR test, DNS lookup, Whois search",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",

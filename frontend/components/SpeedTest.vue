@@ -498,7 +498,7 @@ const speedTestController = async () => {
 
 // --- Lifecycle ----------------------------------------------------------
 
-onMounted(() => { store.setMountingStatus('speedtest', true); });
+onMounted(() => { store.setMountingStatus('SpeedTest', true); });
 // If the user navigates away mid-test, detach the engine's callbacks before
 // dropping the reference — otherwise any in-flight async work inside the
 // SpeedTestEngine would still try to write state refs that no longer exist.

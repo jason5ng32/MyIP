@@ -141,7 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "Infos IP",
     "Connectivity": "Connectivité",
-    "WebRTC": "Test WebRTC",
+    "WebRTC": "Test WebRTC Leak",
     "DNSLeakTest": "Test de fuite DNS",
     "SpeedTest": "Test de vitesse",
     "PingTest": "Latence mondiale",
@@ -516,7 +516,7 @@
   "Tooltips": {
     "RefreshIPCard": "Actualiser la carte IP",
     "RefreshConnectivityTests": "Actualiser les tests de connectivité",
-    "RefreshWebRTC": "Actualiser le test WebRTC",
+    "RefreshWebRTC": "Actualiser le test WebRTC Leak",
     "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "SourceSelect": "Sélectionner la source de géolocalisation IP",
@@ -642,7 +642,7 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "Test WebRTC",
+    "Title": "Test WebRTC Leak",
     "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
     "StatusWait": "En attente du test",
     "StatusError": "Erreur de connexion",
@@ -757,7 +757,7 @@
     "RefreshEverything": "Actualiser tout",
     "RefreshIPCard": "Actualiser la carte IP",
     "RefreshConnectivityTests": "Actualiser les tests de connectivité",
-    "RefreshWebRTC": "Actualiser le test WebRTC",
+    "RefreshWebRTC": "Actualiser le test WebRTC Leak",
     "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "PingTest": "Ouvrir le Test de latence mondial",
@@ -785,9 +785,9 @@
     "SecurityChecklist": "Ouvrir la Liste de sécurité"
   },
   "page": {
-    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
-    "description": "Une boîte à outils IP meilleure et open source. Facile à vérifier vos adresses IP, informations IP, vérifier les fuites DNS, examiner les connexions WebRTC, tester la disponibilité des sites web, rechercher des enregistrements DNS, rechercher des informations Whois et tester la latence dans le monde entier.",
-    "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse, Recherche DNS, Recherche Whois, Test de ping, Test de confidentialité",
+    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",
+    "description": "Une boîte à outils IP open source et tout-en-un : vérifiez votre adresse IP et sa géolocalisation, testez les fuites IP via WebRTC et DNS, effectuez une vérification de la qualité IP, une vérification de l'empreinte du navigateur, ainsi qu'un test de vitesse, un test de latence mondiale, un test MTR, une recherche Whois, et plus encore.",
+    "keywords": "MonIP, Outil IP, Vérification IP, Test de fuite IP, Test de fuite DNS, Qualité IP, Test de fuite WebRTC, Empreinte du navigateur, Test de vitesse, Test de latence mondiale, Test MTR, Recherche DNS, Recherche Whois",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originalement de ",
     "copyRightLink": "https://ipcheck.ing",

@@ -59,10 +59,10 @@ describe('store — trivial setter actions', () => {
 
   it('setLoadingStatus mutates one key at a time', () => {
     const s = useMainStore();
-    assert.equal(s.loadingStatus.ipcheck, false);
-    s.setLoadingStatus('ipcheck', true);
-    assert.equal(s.loadingStatus.ipcheck, true);
-    assert.equal(s.loadingStatus.connectivity, false, 'other keys untouched');
+    assert.equal(s.loadingStatus.IPInfo, false);
+    s.setLoadingStatus('IPInfo', true);
+    assert.equal(s.loadingStatus.IPInfo, true);
+    assert.equal(s.loadingStatus.Connectivity, false, 'other keys untouched');
   });
 
   it('setRefreshEveryThing mirrors payload', () => {
@@ -81,8 +81,8 @@ describe('store — trivial setter actions', () => {
 
   it('setMountingStatus mutates one key', () => {
     const s = useMainStore();
-    s.setMountingStatus('webrtc', true);
-    assert.equal(s.mountingStatus.webrtc, true);
+    s.setMountingStatus('WebRTC', true);
+    assert.equal(s.mountingStatus.WebRTC, true);
   });
 
   it('setIsMobile mirrors payload', () => {

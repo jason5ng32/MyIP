@@ -9,8 +9,8 @@
       <div class="rounded-md" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />
-        <WebRTC ref="webRTCRef" />
         <DNSLeaks ref="dnsLeaksRef" />
+        <WebRTC ref="webRTCRef" />
         <SpeedTest ref="speedTestRef" />
         <AdvancedTools ref="advancedToolsRef" />
       </div>

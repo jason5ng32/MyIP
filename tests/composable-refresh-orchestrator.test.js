@@ -8,8 +8,8 @@ const t = (k) => `<${k}>`;
 
 function makeStoreStub({ mountedFlags = {}, shouldRefresh = false, autoStart = false } = {}) {
   const state = reactive({
-    mountingStatus: { ipcheck: false, connectivity: false, webrtc: false, dnsleaktest: false, ...mountedFlags },
-    loadingStatus: { ipcheck: false, connectivity: false, webrtc: false, dnsleaktest: false },
+    mountingStatus: { IPInfo: false, Connectivity: false, WebRTC: false, DNSLeakTest: false, ...mountedFlags },
+    loadingStatus: { IPInfo: false, Connectivity: false, WebRTC: false, DNSLeakTest: false },
     shouldRefreshEveryThing: shouldRefresh,
     userPreferences: { autoStart },
     alertHistory: [],
@@ -48,7 +48,7 @@ describe('useRefreshOrchestrator()', () => {
 
   it('loadingControl: all cards mounted + autoStart=true triggers all four checks', () => {
     const store = makeStoreStub({
-      mountedFlags: { ipcheck: true, connectivity: true, webrtc: true, dnsleaktest: true },
+      mountedFlags: { IPInfo: true, Connectivity: true, WebRTC: true, DNSLeakTest: true },
       autoStart: true,
     });
     const userPreferences = computed(() => store.state.userPreferences);
@@ -66,7 +66,7 @@ describe('useRefreshOrchestrator()', () => {
 
   it('loadingControl: autoStart=false skips auto checks and flags loading complete', () => {
     const store = makeStoreStub({
-      mountedFlags: { ipcheck: true, connectivity: true, webrtc: true, dnsleaktest: true },
+      mountedFlags: { IPInfo: true, Connectivity: true, WebRTC: true, DNSLeakTest: true },
       autoStart: false,
     });
     const userPreferences = computed(() => store.state.userPreferences);
@@ -83,9 +83,9 @@ describe('useRefreshOrchestrator()', () => {
     assert.deepEqual(calls.conn, [], 'connectivity should not auto-run');
     assert.deepEqual(calls.web, [], 'webrtc should not auto-run');
     assert.deepEqual(calls.dns, [], 'dns leak test should not auto-run');
-    assert.equal(store.state.loadingStatus.connectivity, true);
-    assert.equal(store.state.loadingStatus.webrtc, true);
-    assert.equal(store.state.loadingStatus.dnsleaktest, true);
+    assert.equal(store.state.loadingStatus.Connectivity, true);
+    assert.equal(store.state.loadingStatus.WebRTC, true);
+    assert.equal(store.state.loadingStatus.DNSLeakTest, true);
   });
 
   it('watch: shouldRefreshEveryThing=true triggers full refresh, resets flag + mask', async () => {
@@ -107,7 +107,7 @@ describe('useRefreshOrchestrator()', () => {
     assert.equal(infoMaskLevel.value, 0, 'info mask reset on refresh');
     assert.equal(store.state.shouldRefreshEveryThing, false, 'trigger flag cleared');
     // refresh resets all loading flags to false
-    assert.equal(store.state.loadingStatus.ipcheck, false);
+    assert.equal(store.state.loadingStatus.IPInfo, false);
     // A success alert was published
     const alert = store.state.alertHistory.at(-1);
     assert.equal(alert.style, 'text-success');
@@ -127,7 +127,7 @@ describe('useRefreshOrchestrator()', () => {
 
     const store = makeStoreStub({
       // initially no card mounted
-      mountedFlags: { ipcheck: false, connectivity: false, webrtc: false, dnsleaktest: false },
+      mountedFlags: { IPInfo: false, Connectivity: false, WebRTC: false, DNSLeakTest: false },
       autoStart: false,
     });
     const userPreferences = computed(() => store.state.userPreferences);

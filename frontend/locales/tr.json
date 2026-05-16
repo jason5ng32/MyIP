@@ -141,7 +141,7 @@
     "Navigation": "Navigasyon",
     "IPInfo": "IP Bilgileri",
     "Connectivity": "Bağlantı",
-    "WebRTC": "WebRTC Testi",
+    "WebRTC": "WebRTC Sızıntı Testi",
     "DNSLeakTest": "DNS Sızıntı Testi",
     "SpeedTest": "Hız Testi",
     "PingTest": "Global Gecikme",
@@ -515,7 +515,7 @@
   "Tooltips": {
     "RefreshIPCard": "IP Kartını Yenile",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
-    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
     "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
@@ -641,7 +641,7 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "WebRTC Testi",
+    "Title": "WebRTC Sızıntı Testi",
     "Note": "WebRTC genellikle doğrudan UDP üzerinden bağlantı kurar. Test gerçek IP'nizi döndürürse, bu, proxy ayarlarınızın bu bağlantıları kapsamadığı anlamına gelir. WebRTC'ye bağlanırken kullandığınız IP'yi tespit etmenin yanı sıra, NAT türünüzü de tespit ediyoruz. Ancak, NAT türü tespiti %100 doğru değildir ve yalnızca referans amaçlıdır.",
     "StatusWait": "Test Bekleniyor",
     "StatusError": "Bağlantı Hatası",
@@ -756,7 +756,7 @@
     "RefreshEverything": "Her Şeyi Yenile",
     "RefreshIPCard": "IP Kartını Yenile",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
-    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
     "PingTest": "Global Gecikme Testi panelini aç",
@@ -784,9 +784,9 @@
     "SecurityChecklist": "Güvenlik Kontrol Listesi panelini aç"
   },
   "page": {
-    "title": "IPCheck.ing - IP Adresimi ve Coğrafi Konumumu Kontrol Et - WebRTC Bağlantı IP'sini Kontrol Et - DNS Sızıntı Testi - Hız Testi - Jason Ng Açık Kaynak",
-    "description": "Daha iyi ve açık kaynaklı bir IP Araç Kutusu. IP'lerinizin ne olduğunu, IP bilgilerini, DNS sızıntılarını kontrol etmek, WebRTC bağlantılarını incelemek, web sitesi kullanılabilirliğini test etmek, DNS kaydını aramak, Whois'i aramak ve dünyanın dört bir yanından gecikmeyi test etmek kolaydır.",
-    "keywords": "IPim, IP Aracı, IP Adresim, IP kontrol, IP arama, DNS sızıntı testi, WebRTC testi, Hız testi, DNS arama, Whois arama, Ping testi, gizlilik testi",
+    "title": "IPCheck.ing - IP Adresimi ve Coğrafi Konumumu Kontrol Et - IP Sızıntı Testi - DNS Sızıntı Testi - IP Kalite Kontrolü - Ağ Hızı Testi - Jason Ng Açık Kaynak",
+    "description": "Daha iyi ve açık kaynaklı, hepsi bir arada IP araç kutusu: IP adresinizi ve coğrafi konumunuzu kontrol edin, WebRTC ve DNS üzerinden IP sızıntılarını test edin, IP kalite kontrolü ve tarayıcı parmak izi kontrolü yapın; ayrıca hız testi, küresel gecikme testi, MTR testi, Whois araması ve daha fazlası.",
+    "keywords": "IPim, IP Aracı, IP Sorgulama, IP Sızıntı Testi, DNS Sızıntı Testi, IP Kalite Testi, WebRTC Sızıntı Testi, Tarayıcı Parmak İzi Testi, Hız Testi, Küresel Gecikme Testi, MTR Testi, DNS Sorgulama, Whois Araması",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Orijinal Kaynak ",
     "copyRightLink": "https://ipcheck.ing",

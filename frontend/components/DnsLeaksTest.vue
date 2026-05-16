@@ -292,14 +292,14 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
 
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
-    store.setLoadingStatus('dnsleaktest', true);
+    store.setLoadingStatus('DNSLeakTest', true);
     // Local sticky flag for the Enhanced DNS Leak Test banner
     hasEverSettled.value = true;
   });
 };
 
 onMounted(() => {
-  store.setMountingStatus('dnsleaktest', true);
+  store.setMountingStatus('DNSLeakTest', true);
 });
 
 defineExpose({

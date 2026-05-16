@@ -467,7 +467,7 @@ const handelCheckStart = async (fromApp = false) => {
   const multi = multipleTests.value;
   if (fromApp) await checkAllConnectivity(false, true, true);
   else await checkAllConnectivity(true, false, false);
-  store.setLoadingStatus('connectivity', true);
+  store.setLoadingStatus('Connectivity', true);
   if (multi) {
     intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
@@ -492,7 +492,7 @@ const handelCheckStart = async (fromApp = false) => {
 };
 
 onMounted(() => {
-  store.setMountingStatus('connectivity', true);
+  store.setMountingStatus('Connectivity', true);
 });
 
 // Stop the interval on unmount.

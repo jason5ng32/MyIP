@@ -10,45 +10,35 @@
 export const SECTION_IDS = [
   'IPInfo',
   'Connectivity',
-  'WebRTC',
   'DNSLeakTest',
+  'WebRTC',
   'SpeedTest',
   'AdvancedTools',
 ];
 
 export const DEFAULT_SECTION = 'IPInfo';
 
-// store.mountingStatus key mapping (lowercase snake-ish format, compatible with historical naming)
-const MOUNTING_KEYS = [
-  'ipcheck',
-  'connectivity',
-  'webrtc',
-  'dnsleaktest',
-  'speedtest',
-  'advancedtools',
-];
-
-// store.loadingStatus key mapping (subset of mounting: without speedtest / advancedtools)
-const LOADING_KEYS = [
-  'ipcheck',
-  'connectivity',
-  'webrtc',
-  'dnsleaktest',
+// Loading semantics only apply to the four sections that actually run async
+// network tests on mount. SpeedTest and AdvancedTools mount but have no
+// orchestrator-tracked loading phase. Listed explicitly (not derived via
+// slice) so future reorders of SECTION_IDS don't silently change membership.
+const LOADING_SECTIONS = [
+  'IPInfo',
+  'Connectivity',
+  'DNSLeakTest',
+  'WebRTC',
 ];
 
 function createStatusObject(keys) {
-  return keys.reduce((acc, key) => {
-    acc[key] = false;
-    return acc;
-  }, {});
+  return Object.fromEntries(keys.map((key) => [key, false]));
 }
 
 /** Returns a fresh mountingStatus initial object */
 export function createMountingStatus() {
-  return createStatusObject(MOUNTING_KEYS);
+  return createStatusObject(SECTION_IDS);
 }
 
 /** Returns a fresh loadingStatus initial object */
 export function createLoadingStatus() {
-  return createStatusObject(LOADING_KEYS);
+  return createStatusObject(LOADING_SECTIONS);
 }
