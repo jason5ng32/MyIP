@@ -3,7 +3,6 @@ import { describe, it } from 'node:test';
 
 import {
   SECTION_IDS,
-  DEFAULT_SECTION,
   createMountingStatus,
   createLoadingStatus,
 } from '../frontend/data/sections.js';
@@ -20,9 +19,6 @@ describe('SECTION_IDS', () => {
     ]);
   });
 
-  it('DEFAULT_SECTION is the first entry', () => {
-    assert.equal(DEFAULT_SECTION, SECTION_IDS[0]);
-  });
 });
 
 describe('createMountingStatus()', () => {

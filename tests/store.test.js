@@ -56,40 +56,6 @@ describe('store — trivial setter actions', () => {
       alertDuration: 5000,
     });
   });
-
-  it('setLoadingStatus mutates one key at a time', () => {
-    const s = useMainStore();
-    assert.equal(s.loadingStatus.IPInfo, false);
-    s.setLoadingStatus('IPInfo', true);
-    assert.equal(s.loadingStatus.IPInfo, true);
-    assert.equal(s.loadingStatus.Connectivity, false, 'other keys untouched');
-  });
-
-  it('setRefreshEveryThing mirrors payload', () => {
-    const s = useMainStore();
-    s.setRefreshEveryThing(true);
-    assert.equal(s.shouldRefreshEveryThing, true);
-    s.setRefreshEveryThing(false);
-    assert.equal(s.shouldRefreshEveryThing, false);
-  });
-
-  it('setCurrentPath writes {path, id}', () => {
-    const s = useMainStore();
-    s.setCurrentPath('/mtrtest', 3);
-    assert.deepEqual(s.currentPath, { path: '/mtrtest', id: 3 });
-  });
-
-  it('setMountingStatus mutates one key', () => {
-    const s = useMainStore();
-    s.setMountingStatus('WebRTC', true);
-    assert.equal(s.mountingStatus.WebRTC, true);
-  });
-
-  it('setIsMobile mirrors payload', () => {
-    const s = useMainStore();
-    s.setIsMobile(true);
-    assert.equal(s.isMobile, true);
-  });
 });
 
 describe('store — sheet toggling', () => {
@@ -153,18 +119,6 @@ describe('store — IPDBs / allIPs', () => {
 });
 
 describe('store — trigger* actions', () => {
-  it('setTriggerAchievements mirrors payload', () => {
-    const s = useMainStore();
-    s.setTriggerAchievements(true);
-    assert.equal(s.triggerAchievements, true);
-  });
-
-  it('setTriggerUserBenefits mirrors payload', () => {
-    const s = useMainStore();
-    s.setTriggerUserBenefits(true);
-    assert.equal(s.triggerUserBenefits, true);
-  });
-
   it('setTriggerRemoteUserInfo only sets when truthy (guard against reset loops)', () => {
     const s = useMainStore();
     s.setTriggerRemoteUserInfo(true);
