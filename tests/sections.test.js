@@ -12,8 +12,8 @@ describe('SECTION_IDS', () => {
     assert.deepEqual(SECTION_IDS, [
       'IPInfo',
       'Connectivity',
-      'DNSLeakTest',
       'WebRTC',
+      'DNSLeakTest',
       'SpeedTest',
       'AdvancedTools',
     ]);
