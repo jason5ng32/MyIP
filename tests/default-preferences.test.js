@@ -18,7 +18,7 @@ describe('DEFAULT_PREFERENCES', () => {
       simpleMode: false,
       autoStart: true,
       hideUnavailableIPStack: false,
-      popupConnectivityNotifications: false,
+      popupConnectivityNotifications: true,
       ipCardsToShow: 2,
       ipGeoSource: 0,
       lang: 'auto',

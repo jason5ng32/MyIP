@@ -9,7 +9,7 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   simpleMode: false,
   autoStart: true,
   hideUnavailableIPStack: false,
-  popupConnectivityNotifications: false,
+  popupConnectivityNotifications: true,
   ipCardsToShow: 2,
   ipGeoSource: 0,
   lang: 'auto', // auto | zh | en | fr | tr
