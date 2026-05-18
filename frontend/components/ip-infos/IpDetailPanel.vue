@@ -95,9 +95,15 @@
                     <span>{{ t('ipInfos.isProxy') }}</span>
                 </dt>
                 <dd class="font-normal wrap-break-word">
-                    {{ data.isProxy }}<span
-                        v-if="data.proxyProtocol && data.proxyProtocol !== t('ipInfos.advancedData.proxyUnknownProtocol')"
-                        class="text-muted-foreground font-normal"> · {{ data.proxyProtocol }}</span>
+                    {{ data.isProxy }}
+                </dd>
+                <dd class="font-normal wrap-break-word">
+                    <span v-if="data.proxyProvider && data.proxyProvider !== 'unknown'"
+                        class="text-muted-foreground font-normal text-xs">{{ data.proxyProvider }} {{ data.proxyProtocol
+                        &&
+                        data.proxyProtocol !== 'unknown'
+                        ?
+                        '· ' + data.proxyProtocol : '' }}</span>
                 </dd>
             </div>
 
@@ -110,8 +116,7 @@
                     </JnTooltip>
                 </dt>
                 <dd class="font-normal flex items-center gap-1 wrap-break-word">
-                    <component :is="data.isNativeIP === true ? Equal : EqualNot"
-                        class="size-3.5 shrink-0" />
+                    <component :is="data.isNativeIP === true ? Equal : EqualNot" class="size-3.5 shrink-0" />
                     <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
                         t('ipInfos.advancedData.NativeIPNo') }}</span>
                 </dd>
@@ -204,15 +209,16 @@
                 </template>
             </DialogHeader>
             <div class="mb-2">
-            <span class="flex items-center gap-2 text-sm text-muted-foreground ">
-                <Earth class="size-4" />
-                <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
-            </span>
-            <span class="font-mono shrink-0 truncate whitespace-nowrap">{{  data.longitude }}, {{  data.latitude }}</span>
+                <span class="flex items-center gap-2 text-sm text-muted-foreground ">
+                    <Earth class="size-4" />
+                    <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
+                </span>
+                <span class="font-mono shrink-0 truncate whitespace-nowrap">{{ data.longitude }}, {{ data.latitude
+                    }}</span>
             </div>
             <span>
-            <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
-                class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
+                <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
+                    class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
             </span>
         </DialogContent>
     </Dialog>
