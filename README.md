@@ -33,6 +33,7 @@ Feel free to bookmark the demo or deploy your own.
 * 🛜 **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
 * 🔍 **Search IP Information**: Provides a tool for querying information about any IP address. 
 * 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
+* 🛰️ **ASN History & Upstream Topology**: View historical AS announcements for an IP prefix, and visualize the upstream paths from an ASN to the Tier 1 backbone networks.
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
 * 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
@@ -50,7 +51,6 @@ Feel free to bookmark the demo or deploy your own.
 ## 💪 Also
 
 * 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
-* 📱 **Minimalist Mode**: A mobile-optimized mode that shortens page length for quick access to essential information..
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
@@ -125,6 +125,7 @@ Download `GeoLite2-City.mmdb` and `GeoLite2-ASN.mmdb` from your MaxMind account 
 | `MAXMIND_ACCOUNT_ID` | **Yes** | `""` | MaxMind account ID, paired with `MAXMIND_LICENSE_KEY` to download GeoLite2 databases. See the MaxMind section above. |
 | `MAXMIND_LICENSE_KEY` | **Yes** | `""` | MaxMind license key, paired with `MAXMIND_ACCOUNT_ID`. See the MaxMind section above. |
 | `MAXMIND_AUTO_UPDATE` | **Yes** | `"false"` | Set to `"true"` to auto-download GeoLite2 databases ~60s after startup and refresh every 24h. **Required for Docker.** Can stay `"false"` only if you've pre-seeded the `.mmdb` files manually. |
+| `CAIDA_AUTO_UPDATE` | No | `"false"` | Set to `"true"` to refresh the CAIDA datasets daily (as2org for ASN org-name lookup, as-rel2 for the ASN connectivity graph). When `"false"`, missing snapshots are still downloaded at startup but never refreshed afterwards. |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Yes** | `""` | Google Analytics ID, used to track user behavior |
 | `BACKEND_PORT` | No | `"11966"` | The running port of the backend part of the program |
 | `FRONTEND_PORT` | No | `"18966"` | The running port of the frontend part of the program |

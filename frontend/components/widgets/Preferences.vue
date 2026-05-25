@@ -2,7 +2,7 @@
     <!-- Preferences panel -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('nav.preferences.title')"
-            :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[420px] max-w-[420px]']">
+            class="flex flex-col p-0 gap-0 w-full max-w-full md:w-[420px] md:max-w-[420px]">
             <!-- Header -->
             <header class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
                 <h2 class="flex items-center gap-2 text-base font-semibold m-0">
@@ -106,7 +106,7 @@
                             :model-value="userPreferences.connectivityMultipleTests"
                             @update:model-value="prefConnectivityMultipleTests" />
 
-                        <PrefRow v-if="isMobile" id="simpleMode" :label="t('nav.preferences.simpleMode')"
+                        <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')"
                             :tip="t('nav.preferences.simpleModeTips')" :model-value="userPreferences.simpleMode"
                             @update:model-value="prefSimpleMode" />
 
@@ -149,7 +149,6 @@ const { t } = useI18n();
 
 const store = useMainStore();
 const isDarkMode = computed(() => store.isDarkMode);
-const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);

@@ -86,21 +86,25 @@ function isValidASN(asn) {
 };
 
 // Clean up Cloudflare Radar return data to uniform field names.
-// Hoisted to module scope — was redefined inside the handler on every request.
+// Optional-chaining everywhere because CF Radar returns sparse data for
+// small / private / new ASNs (e.g. AS64512 is in the RFC 6996 private range
+// and has no info at all; many smaller ASNs have asn info but no traffic
+// summaries). Missing fields fall through as undefined and get stripped
+// downstream in filterData via the NaN check.
 function cleanUpResponseData(data) {
     return {
-        asnName: data.asnInfo.result.asn.name,
-        asnCountryCode: data.asnInfo.result.asn.country,
-        asnOrgName: data.asnInfo.result.asn.orgName,
-        estimatedUsers: data.asnInfo.result.asn.estimatedUsers.estimatedUsers,
-        IPv4_Pct: data.ipVersion.result.summary_0.IPv4,
-        IPv6_Pct: data.ipVersion.result.summary_0.IPv6,
-        HTTP_Pct: data.httpProtocol.result.summary_0.http,
-        HTTPS_Pct: data.httpProtocol.result.summary_0.https,
-        Desktop_Pct: data.deviceType.result.summary_0.desktop,
-        Mobile_Pct: data.deviceType.result.summary_0.mobile,
-        Bot_Pct: data.botType.result.summary_0.bot,
-        Human_Pct: data.botType.result.summary_0.human
+        asnName: data.asnInfo?.result?.asn?.name,
+        asnCountryCode: data.asnInfo?.result?.asn?.country,
+        asnOrgName: data.asnInfo?.result?.asn?.orgName,
+        estimatedUsers: data.asnInfo?.result?.asn?.estimatedUsers?.estimatedUsers,
+        IPv4_Pct: data.ipVersion?.result?.summary_0?.IPv4,
+        IPv6_Pct: data.ipVersion?.result?.summary_0?.IPv6,
+        HTTP_Pct: data.httpProtocol?.result?.summary_0?.http,
+        HTTPS_Pct: data.httpProtocol?.result?.summary_0?.https,
+        Desktop_Pct: data.deviceType?.result?.summary_0?.desktop,
+        Mobile_Pct: data.deviceType?.result?.summary_0?.mobile,
+        Bot_Pct: data.botType?.result?.summary_0?.bot,
+        Human_Pct: data.botType?.result?.summary_0?.human
     };
 }
 

@@ -17,10 +17,14 @@
                         <span class="font-mono font-medium shrink-0">AS{{ row.asn }}</span>
                         <span v-if="row.org" class="truncate text-muted-foreground" :title="row.org">· {{ row.org }}</span>
                     </div>
-                    <Badge v-if="row.peers" variant="outline" class="shrink-0 gap-1 font-normal min-w-[64px] flex items-center justify-center"
-                        :title="t('ipInfos.ASNHistory.seenBy', { peers: row.peers })">
-                        <RadioTower class="size-3" />
-                        <span class="tabular-nums">{{ row.peers }}</span>
+                    <!-- Visibility relative to the peak in this history. Raw peer count lives in the tooltip
+                        so it's still recoverable — the badge avoids exposing an absolute number that users
+                        might mistake for "global BGP reach" (RIPE RIS is a sample, not the whole internet). -->
+                    <Badge v-if="row.peersPct != null" variant="outline"
+                        class="shrink-0 gap-1 font-normal min-w-[74px] flex items-center justify-center"
+                        :title="t('ipInfos.ASNHistory.seenBy', { peers: row.peers, pct: row.peersPct })">
+                        <Eye class="size-3" />
+                        <span class="tabular-nums">{{ row.peersPct }}%</span>
                     </Badge>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -62,7 +66,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Clock4, RadioTower } from 'lucide-vue-next';
+import { Building2, Clock4, Eye } from 'lucide-vue-next';
 
 const { t } = useI18n();
 

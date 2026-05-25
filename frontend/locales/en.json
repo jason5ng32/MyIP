@@ -141,7 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
-    "WebRTC": "WebRTC Test",
+    "WebRTC": "WebRTC Leak Test",
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
     "PingTest": "Global Latency",
@@ -161,7 +161,7 @@
       "autoRun": "Auto Run",
       "autoRunTips": "If disabled, the app will only check the local IP and will not run tests automatically.",
       "simpleMode": "Simple Mode",
-      "simpleModeTips": "Reduces the information displayed on IP cards. Effective on mobile devices only.",
+      "simpleModeTips": "Hide the description text of each module, suitable for users who are already familiar with the application.",
       "connectivityMultipleTests": "Multiple Connectivity Refreshes",
       "connectivityMultipleTestsTips": "When enabled, the app runs multiple checks at startup and displays the lowest latency.",
       "popupConnectivityNotifications": "Pop-up Connectivity Alerts",
@@ -228,7 +228,18 @@
       "cpuArchitecture": "CPU Architecture",
       "gpu": "GPU",
       "cpuCores": "CPU Cores",
-      "language": "Language Code",
+      "languages": "Languages",
+      "timezone": "Timezone",
+      "display": "Display",
+      "connection": "Connection",
+      "touchPoints": "Touch Points",
+      "doNotTrack": "Do Not Track",
+      "doNotTrackOn": "On",
+      "doNotTrackOff": "Off",
+      "doNotTrackUnset": "Not Set",
+      "pdfViewer": "PDF Viewer",
+      "pdfViewerYes": "Yes",
+      "pdfViewerNo": "No",
       "cookieEnabled": "Cookies Enabled",
       "cookieEnabledTrue": "Yes",
       "cookieEnabledFalse": "No"
@@ -250,7 +261,16 @@
       "screen": "Screen",
       "system": "Browser Version",
       "webgl": "WebGL",
-      "math": "Math"
+      "math": "Math",
+      "intl": "Intl Formatters",
+      "mediaDevices": "Media Devices",
+      "speech": "Speech Synthesis",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Fingerprint Components",
+      "note": "Each component below contributes to the hash above. Toggle items in the Fingerprint panel to exclude them from the fingerprint."
     },
     "calError": "Failed to calculate browser information, please refresh and try again.",
     "calculating": "Calculating..."
@@ -496,13 +516,15 @@
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
-    "RefreshWebRTC": "Refresh WebRTC Test",
+    "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
     "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
     "ShowASNHistory": "Show ASN History",
+    "ShowASNConnectivity": "Show ASN Connectivity",
     "CopyIP": "Copy IP Address",
+    "CopySdpLog": "Copy SDP Log",
     "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
     "QueryIP": "Query IP Address",
@@ -556,12 +578,25 @@
       "note": "Historical ASN announcements for this IP: ",
       "empty": "No historical routing data found for this IP.",
       "error": "Failed to load ASN history.",
-      "seenBy": "Seen by {peers} BGP full-feed peers"
+      "seenBy": "RIPE RIS visibility: {pct}% — peak {peers} full-feed peers"
+    },
+    "ASNConnectivity": {
+      "note": "Upstream paths from this AS toward the Tier 1 global transit providers: ",
+      "empty": "No upstream connectivity data available for this AS.",
+      "error": "Failed to load ASN connectivity.",
+      "expand": "Expand",
+      "dialogTitle": "Network connectivity for AS{asn}",
+      "legendOrigin": "Origin",
+      "legendTier1": "Tier 1 ISP",
+      "legendIntermediate": "Intermediate AS",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomReset": "Reset zoom"
     },
     "advancedData": {
-      "proxyYes": "Must be a proxy or VPN",
-      "proxyMaybe": "Possibly a proxy or VPN",
-      "proxyNo": "Not a proxy or VPN",
+      "proxyYes": "Flagged as proxy / VPN",
+      "proxyMaybe": "Possible proxy / VPN",
+      "proxyNo": "Not flagged",
       "proxyUnknown": "Unknown type",
       "proxyUnknownProtocol": "Unknown protocol",
       "type": {
@@ -571,9 +606,10 @@
         "Hosting": "Hosting",
         "unknownType": "Unknown Type"
       },
-      "Nativeness": "Nativeness",
-      "NativeIPYes": "It's a native IP",
-      "NativeIPNo": "Not a native IP"
+      "Nativeness": "ASN-Geo match",
+      "NativeIPYes": "Aligned",
+      "NativeIPNo": "Mismatched",
+      "nativenessTooltip": "Whether the ASN's registered country matches the IP's geolocation country"
     }
   },
   "connectivity": {
@@ -606,10 +642,11 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "WebRTC Test",
+    "Title": "WebRTC Leak Test",
     "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
     "StatusWait": "Awaiting Test",
     "StatusError": "Connection Error",
+    "SdpLog": "SDP Log",
     "NATType": {
       "srflx": "Port Restricted Cone or Symmetric",
       "prflx": "Port Restricted Cone",
@@ -636,7 +673,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Speed Test",
-    "Note": "Speed test will be done via Cloudflare's edge network, which may take a long time. If your network is located in mainland China, the data may be biased. The speed test results are for reference only, the actual speed will be faster. You can choose the packet size for download and upload tests. By default, the speed test will perform 4 rounds of packet uploads and downloads, please be mindful of data usage.",
+    "Note": "The speed test will be conducted using Cloudflare's edge network. You can choose the packet size for download and upload according to your needs. During the test, packets will be uploaded and downloaded 4 times — please be mindful of data usage. Since Cloudflare does not deploy edge nodes in every country worldwide, the results are for reference only; actual speeds may be faster.",
     "Download": "Download",
     "Upload": "Upload",
     "Latency": "Latency",
@@ -644,6 +681,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Test Error",
+    "loadedLatency": "Loaded latency: ",
     "videoStreaming": "Video Streaming: ",
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
@@ -653,9 +691,11 @@
     "connectionTo": " to test server:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "Good",
-      "Medium": "Medium",
-      "Bad": "Bad"
+      "bad": "Bad",
+      "poor": "Poor",
+      "average": "Average",
+      "good": "Good",
+      "great": "Great"
     }
   },
   "pingtest": {
@@ -717,7 +757,7 @@
     "RefreshEverything": "Refresh Everything",
     "RefreshIPCard": "Refresh IP Card",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
-    "RefreshWebRTC": "Refresh WebRTC Test",
+    "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
     "PingTest": "Open Global Latency Test panel",
@@ -745,9 +785,9 @@
     "SecurityChecklist": "Open Security Checklist panel"
   },
   "page": {
-    "title": "IPCheck.ing - Check My IP Address and Geolocation - Check WebRTC Connection IP - DNS Leak Test - Speed Test - Jason Ng Open Source",
-    "description": "A better and open source IP Toolbox. Easy to check what's your IPs, IP information, check for DNS leaks, examine WebRTC connections, test website availability, lookup DNS record, lookup Whois, and test latency from around the world.",
-    "keywords": "MyIP, IP tool, IP check, IP lookup, DNS leak test, WebRTC test, speed test, DNS lookup, WHOIS lookup, ping test, privacy test",
+    "title": "IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - Jason Ng Open Source",
+    "description": "A better and open-source IP toolbox: check your IP address & geolocation, test IP for WebRTC and DNS IP leaks, run an IP quality check, browser fingerprint check, plus speed test, global latency test, MTR test, Whois search, and more.",
+    "keywords": "MyIP, IP tool, IP check, IP Leak Check, IP quality check, IP lookup, DNS leak test, WebRTC leak test, browser fingerprint check, speed test, global latency test, MTR test, DNS lookup, Whois search",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originally from ",
     "copyRightLink": "https://ipcheck.ing",

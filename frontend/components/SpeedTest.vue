@@ -2,12 +2,16 @@
   <!-- Speed Test -->
   <section class="mb-10">
     <!-- Header -->
-    <header class="mb-3">
-      <h2 id="SpeedTest"
-        class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-        🚀 {{ t('speedtest.Title') }}
-      </h2>
-      <p class="my-3 text-base text-muted-foreground">{{ t('speedtest.Note') }}</p>
+    <header class="mb-2 flex flex-col items-start justify-between gap-4">
+      <div class="flex flex-row items-center justify-between gap-4 w-full">
+        <h2 id="SpeedTest"
+          class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
+          🚀 {{ t('speedtest.Title') }}
+        </h2>
+      </div>
+      <div class="text-base text-muted-foreground">
+        <p v-if="!isSimpleMode">{{ t('speedtest.Note') }}</p>
+      </div>
     </header>
 
     <Card class="keyboard-shortcut-card jn-card">
@@ -124,17 +128,25 @@
                 ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
                 {{ t('speedtest.connectionEnd') }}
               </p>
+              <!-- Loaded latency = ping under full saturation, the "bufferbloat" signal. -->
+              <p v-if="state.speedTest.downLoadedLatency !== '-' || state.speedTest.upLoadedLatency !== '-'"
+                class="mb-2">
+                {{ t('speedtest.loadedLatency') }}
+                <span class="font-mono">↓ {{ state.speedTest.downLoadedLatency }} ms</span>
+                ·
+                <span class="font-mono">↑ {{ state.speedTest.upLoadedLatency }} ms</span>
+              </p>
               <p class="mb-2">
                 {{ t('speedtest.score') }}
                 {{ t('speedtest.videoStreaming') }}
-                <span :class="qualityBadgeClass(state.speedTest.streamingScore)">{{ t('speedtest.quality.' +
+                <span :class="qualityBadgeClass(state.speedTest.streamingQuality)">{{ t('speedtest.quality.' +
                   state.speedTest.streamingQuality) }}</span>
                 {{ t('speedtest.gaming') }}
-                <span :class="qualityBadgeClass(state.speedTest.gamingScore)">
+                <span :class="qualityBadgeClass(state.speedTest.gamingQuality)">
                   {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
                 </span>
                 {{ t('speedtest.rtc') }}
-                <span :class="qualityBadgeClass(state.speedTest.rtcScore)">
+                <span :class="qualityBadgeClass(state.speedTest.rtcQuality)">
                   {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
                 </span>
               </p>
@@ -158,7 +170,6 @@ import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -172,7 +183,8 @@ const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 // State Management
 const state = reactive({
   speedTest: {
@@ -181,6 +193,8 @@ const state = reactive({
     uploadSpeed: '-',
     latency: '-',
     jitter: '-',
+    downLoadedLatency: '-',
+    upLoadedLatency: '-',
     streamingScore: '-',
     streamingQuality: '-',
     gamingScore: '-',
@@ -247,12 +261,20 @@ const metrics = computed(() => [
   { key: 'jitter', label: t('speedtest.Jitter'), unit: 'ms' },
 ]);
 
-// Quality Badge Color: >=50 success, >=10 warning, else destructive
-const qualityBadgeClass = (score) => {
-  if (score === '-' || score === undefined) return 'text-muted-foreground';
-  if (score >= 50) return 'text-success';
-  if (score >= 10) return 'text-warning';
-  return 'text-destructive';
+// 5-tier classification → 3 color tokens (label carries the 5-way distinction).
+const qualityBadgeClass = (classification) => {
+  switch (classification) {
+    case 'bad':
+    case 'poor':
+      return 'text-destructive';
+    case 'average':
+      return 'text-warning';
+    case 'good':
+    case 'great':
+      return 'text-success';
+    default:
+      return 'text-muted-foreground';
+  }
 };
 
 // --- Connection Data ----------------------------------------------------------
@@ -289,15 +311,8 @@ const connectionMethods = {
 
 let testEngine;
 const engineMethods = {
+  // Build a fresh engine. State reset is owned by speedTestController.
   reset() {
-    state.speedTest.hasScores = false;
-    Object.assign(state.speedTest, {
-      downloadSpeed: 0, uploadSpeed: 0, latency: 0, jitter: 0,
-      streamingScore: '-', gamingScore: '-', rtcScore: '-',
-      progress: 0,
-    });
-    if (testEngine) testEngine = null;
-
     return markRaw(new SpeedTestEngine({
       autoStart: false,
       measurements: [
@@ -315,99 +330,50 @@ const engineMethods = {
       uploadSpeed: parseFloat((summary.upload / 1000000).toFixed(2)),
       latency: parseFloat(summary.latency.toFixed(2)),
       jitter: parseFloat(summary.jitter.toFixed(2)),
+      // Loaded latency only present when the engine measured it.
+      downLoadedLatency: summary.downLoadedLatency == null ? '-' : parseFloat(summary.downLoadedLatency.toFixed(2)),
+      upLoadedLatency: summary.upLoadedLatency == null ? '-' : parseFloat(summary.upLoadedLatency.toFixed(2)),
     });
   },
 
   updateProgress() {
     const rawData = testEngine.results.raw;
+    // 3 stages: latency / download / upload.
     const perStage = 100 / 3;
     let progress = 0;
+    if (rawData.latency?.started) progress += rawData.latency.finished ? perStage : perStage / 2;
     if (rawData.download?.started) progress += rawData.download.finished ? perStage : perStage / 2;
     if (rawData.upload?.started) progress += rawData.upload.finished ? perStage : perStage / 2;
-    if (rawData.latency?.started) progress += rawData.latency.finished ? perStage : perStage / 2;
     state.speedTest.progress = Math.min(progress, 100);
   },
 
+  // Live values via engine getters (supported API). Getters can briefly return
+  // `null` between "started" and "first datapoint", so guard with `!= null`.
   updateSpeedInRealTime() {
     if (state.speedTest.status === 'finished' || state.speedTest.status === 'error') return;
     try {
-      const rawData = testEngine?.results?.raw;
-      if (!rawData) return;
+      const results = testEngine?.results;
+      if (!results) return;
 
-      if (rawData.latency?.started) {
-        if (rawData.latency?.results?.timings?.length > 0) {
-          const latencyTimings = rawData.latency.results.timings;
-          state.speedTest.latency = parseFloat(latencyTimings[latencyTimings.length - 1].ping.toFixed(2));
+      const dl = results.getDownloadBandwidth();
+      const ul = results.getUploadBandwidth();
+      const lat = results.getUnloadedLatency();
+      const jit = results.getUnloadedJitter();
 
-          if (latencyTimings.length >= 2) {
-            const differences = [];
-            for (let i = 1; i < latencyTimings.length; i++) {
-              differences.push(Math.abs(latencyTimings[i].ping - latencyTimings[i - 1].ping));
-            }
-            const mean = differences.reduce((a, b) => a + b, 0) / differences.length;
-            const variance = differences.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / differences.length;
-            state.speedTest.jitter = parseFloat(Math.sqrt(variance).toFixed(2));
-          }
-        }
-      }
-
-      if (rawData.download?.started) {
-        if (rawData.download.current?.timings?.length > 0) {
-          const timings = rawData.download.current.timings;
-          state.speedTest.downloadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
-        } else if (rawData.download?.results) {
-          const downloadKeys = Object.keys(rawData.download.results);
-          if (downloadKeys.length > 0) {
-            const lastKey = downloadKeys[downloadKeys.length - 1];
-            const downloadTimings = rawData.download.results[lastKey].timings;
-            if (downloadTimings?.length > 0) {
-              const latestTiming = downloadTimings[downloadTimings.length - 1];
-              state.speedTest.downloadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
-            }
-          }
-        } else {
-          state.speedTest.downloadSpeed = 0;
-        }
-      }
-
-      if (rawData.upload?.started) {
-        if (rawData.upload.current?.timings?.length > 0) {
-          const timings = rawData.upload.current.timings;
-          state.speedTest.uploadSpeed = parseFloat((timings[timings.length - 1].bps / 1000000).toFixed(2));
-        } else if (rawData.upload?.results) {
-          const uploadKeys = Object.keys(rawData.upload.results);
-          if (uploadKeys.length > 0) {
-            const lastKey = uploadKeys[uploadKeys.length - 1];
-            const uploadTimings = rawData.upload.results[lastKey].timings;
-            if (uploadTimings?.length > 0) {
-              const latestTiming = uploadTimings[uploadTimings.length - 1];
-              state.speedTest.uploadSpeed = parseFloat((latestTiming.bps / 1000000).toFixed(2));
-            }
-          }
-        } else {
-          state.speedTest.uploadSpeed = 0;
-        }
-      }
+      if (dl != null) state.speedTest.downloadSpeed = parseFloat((dl / 1e6).toFixed(2));
+      if (ul != null) state.speedTest.uploadSpeed = parseFloat((ul / 1e6).toFixed(2));
+      if (lat != null) state.speedTest.latency = parseFloat(lat.toFixed(2));
+      if (jit != null) state.speedTest.jitter = parseFloat(jit.toFixed(2));
 
       updateCharts(
         state.speedTest.downloadSpeed,
         state.speedTest.uploadSpeed,
         state.speedTest.latency,
         state.speedTest.jitter,
-        rawData,
+        results.raw,
       );
     } catch (error) {
       console.error('Error in updateSpeedInRealTime:', error);
-    }
-  },
-
-  updateLatency(rawData) {
-    if (!rawData.latency?.results?.timings?.length) return;
-    const latencyTimings = rawData.latency.results.timings;
-    const latestLatency = latencyTimings[latencyTimings.length - 1].ping;
-    const newLatency = parseFloat(latestLatency.toFixed(2));
-    if (newLatency < state.speedTest.latency || state.speedTest.latency === 0) {
-      state.speedTest.latency = newLatency;
     }
   },
 };
@@ -464,15 +430,24 @@ const setupTestEngine = async () => {
     testEngine.onError = null;
     engineMethods.updateResults(results);
 
+    // Engine's getScores() reads getSummary() internally; when packetLoss is
+    // unmeasured it falls back to defaultPoints.packetLoss=0, which costs every
+    // experience a flat 10 points vs. an actually-measured 0% loss (+10 from
+    // the scaleThreshold formula). That single delta pushes gaming/rtc one or
+    // two tiers down. Since we don't run packetLoss (would need TURN setup),
+    // inject the optimistic 0 — matches Cloudflare's own UI behavior whenever
+    // the user's network has near-zero loss, which is the common case.
+    const origGetSummary = results.getSummary.bind(results);
+    results.getSummary = () => ({ ...origGetSummary(), packetLoss: 0 });
     const scores = results.getScores();
     if (scores?.streaming) {
       state.speedTest.hasScores = true;
       state.speedTest.streamingScore = scores.streaming.points;
       state.speedTest.gamingScore = scores.gaming.points;
       state.speedTest.rtcScore = scores.rtc.points;
-      state.speedTest.streamingQuality = scores.streaming.points >= 50 ? 'Good' : scores.streaming.points >= 10 ? 'Medium' : 'Bad';
-      state.speedTest.gamingQuality = scores.gaming.points >= 50 ? 'Good' : scores.gaming.points >= 10 ? 'Medium' : 'Bad';
-      state.speedTest.rtcQuality = scores.rtc.points >= 50 ? 'Good' : scores.rtc.points >= 10 ? 'Medium' : 'Bad';
+      state.speedTest.streamingQuality = scores.streaming.classificationName;
+      state.speedTest.gamingQuality = scores.gaming.classificationName;
+      state.speedTest.rtcQuality = scores.rtc.classificationName;
     }
 
     testEngine = null;
@@ -504,6 +479,7 @@ const speedTestController = async () => {
 
     Object.assign(state.speedTest, {
       downloadSpeed: 0, uploadSpeed: 0, latency: 0, jitter: 0,
+      downLoadedLatency: '-', upLoadedLatency: '-',
       streamingScore: '-', gamingScore: '-', rtcScore: '-',
       hasScores: false, progress: 0,
     });
@@ -522,7 +498,7 @@ const speedTestController = async () => {
 
 // --- Lifecycle ----------------------------------------------------------
 
-onMounted(() => { store.setMountingStatus('speedtest', true); });
+onMounted(() => { store.setMountingStatus('SpeedTest', true); });
 // If the user navigates away mid-test, detach the engine's callbacks before
 // dropping the reference — otherwise any in-flight async work inside the
 // SpeedTestEngine would still try to write state refs that no longer exist.

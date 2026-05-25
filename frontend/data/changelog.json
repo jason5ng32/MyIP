@@ -1093,7 +1093,7 @@
   },
   {
     "version": "v6.2.0",
-    "date": "May 12, 2026",
+    "date": "May 13, 2026",
     "content": [
       {
         "type": "add",
@@ -1120,6 +1120,57 @@
           "zh": "修复运行多次网络连通性测试时，通知时机错误的问题",
           "fr": "Correction d'un bug causant la notification à se déclencher trop tôt lors de l'exécution de plusieurs tests de connectivité",
           "tr": "Birden fazla ağ bağlantı testi çalıştırılırken bildirimin erken tetiklenmesine neden olan bir hata düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v6.3.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Now you can view the upstream connectivity graph of an ASN",
+          "zh": "可以查看 ASN 上游连接图，更直观地了解 ASN 的网络拓扑结构",
+          "fr": "Vous pouvez maintenant voir le graphique de connectivité des ASN",
+          "tr": "Bir ASN'in üst bağlantı grafiğini görüntüleyebilirsiniz"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added simple mode, hide the description text of each module",
+          "zh": "添加简约模式，隐藏每个模块的说明文字",
+          "fr": "Ajout du mode simple, masque le texte de description de chaque module",
+          "tr": "Basit mod eklendi, her modülün açıklamasını gizler"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Added SDP Log to WebRTC Test tool",
+          "zh": "WebRTC 测试工具添加了 SDP 日志功能",
+          "fr": "Ajout de la fonctionnalité de journalisation SDP dans l'outil de test WebRTC",
+          "tr": "WebRTC Test aracına SDP günlüğü eklendi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved Browser Info tool for more accurate and practical information",
+          "zh": "优化了浏览器信息工具，使其更加准确和实用",
+          "fr": "Amélioration de l'outil d'informations sur le navigateur pour plus d'informations précises et pratiques",
+          "tr": "Tarayıcı bilgisi aracı iyileştirildi, daha doğru ve kullanışlı bilgiler"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some small issues",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de petits problèmes",
+          "tr": "Birkaç küçük sorun düzeltildi"
         }
       }
     ]

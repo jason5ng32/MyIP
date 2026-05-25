@@ -7,7 +7,7 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requireValidIP, requireValidPrefix } from './common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -22,6 +22,7 @@ import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
+import asnConnectivityHandler from './api/asn-connectivity.js';
 import dnsResolver from './api/dns-resolver.js';
 import { getSessionResult as dnsLeakGetResult } from './api/dns-leak-test.js';
 import getWhois from './api/get-whois.js';
@@ -33,6 +34,7 @@ import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
 import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
+import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
 
 dotenv.config({ quiet: true });
 
@@ -188,14 +190,16 @@ app.use('/api', requireReferer);
 
 const ONE_HOUR_CACHE = 60 * 60;
 const ONE_DAY_CACHE = 24 * 60 * 60;
+const ONE_WEEK_CACHE = 7 * 24 * 60 * 60;
 const THIRTY_DAYS_CACHE = 30 * 24 * 60 * 60;
 
 // Cacheable routes — TTLs picked against each upstream's natural refresh cadence.
 app.get('/api/ipinfo', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipinfoHandler);
 app.get('/api/ipapicom', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapicomHandler);
 app.get('/api/ipsb', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipsbHandler);
-app.get('/api/cfradar', cacheable(ONE_DAY_CACHE), cfHander);
-app.get('/api/asn-history', requireValidPrefix(), cacheable(ONE_DAY_CACHE), asnHistoryHandler);
+app.get('/api/cfradar', cacheable(ONE_WEEK_CACHE), cfHander);
+app.get('/api/asn-history', requireValidPrefix(), cacheable(ONE_WEEK_CACHE), asnHistoryHandler);
+app.get('/api/asn-connectivity', requireValidASN(), cacheable(ONE_WEEK_CACHE), asnConnectivityHandler);
 app.get('/api/whois', cacheable(ONE_HOUR_CACHE), getWhois);
 app.get('/api/ipapiis', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requireValidIP(), cacheable(ONE_HOUR_CACHE), ip2locationHandler);
@@ -218,18 +222,20 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, './dist')));
 
 
-// Bootstrap MaxMind before accepting traffic so we never serve mid-download.
-// Each step is non-fatal: a failure here leaves the MaxMind API returning
-// 503 until the watcher picks up valid databases later.
+// Bootstrap every offline dataset (MaxMind, CAIDA) before accepting traffic
+// so we never serve mid-download. Each step is non-fatal: a failure leaves
+// the dependent API in a degraded state (MaxMind → 503; CAIDA → empty graph
+// or RIPEstat fallback) but doesn't block the listener.
 async function bootBackend() {
     await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
-
     await reloadMaxMindDatabases('startup').catch(() => {
         logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
     });
+    await bootstrapCaidaIfMissing();
 
     startMaxMindFileWatcher();
     startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
+    startCaidaAutoUpdate();
 
     app.listen(backEndPort, () => {
         logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);

@@ -34,11 +34,11 @@ function extractAdvancedData(advancedData = {}, t) {
     const isProxy = determineIsProxy(advancedData, t);
     const type = determineType(advancedData, t);
     const qualityScore = advancedData.score === 'sign_in_required' ? 'sign_in_required' : advancedData.score;
-    const proxyProtocol = determineProtocol(advancedData, t);
-    const proxyOperator = advancedData.proxyProvider || "";
+    const proxyProtocol = advancedData.proxyProtocol || "";
+    const proxyProvider = advancedData.proxyProvider || "";
     const isNativeIP = advancedData.tags === 'sign_in_required' ? 'sign_in_required' : advancedData.tags.isNative;
 
-    return { isProxy, type, qualityScore, proxyProtocol, proxyOperator, isNativeIP };
+    return { isProxy, type, qualityScore, proxyProtocol, proxyProvider, isNativeIP };
 }
 
 // Determine if it is a proxy
@@ -59,6 +59,9 @@ function determineIsProxy(advancedData, t) {
 
 // Determine proxy type
 function determineType(advancedData, t) {
+    if (advancedData.operatorType === 'sign_in_required') {
+        return 'sign_in_required';
+    }
     switch (advancedData.operatorType) {
         case 'Business':
             return t('ipInfos.advancedData.type.Business');
@@ -68,21 +71,8 @@ function determineType(advancedData, t) {
             return t('ipInfos.advancedData.type.Wireless');
         case 'Hosting':
             return t('ipInfos.advancedData.type.Hosting');
-        case 'VPN':
-            if (advancedData.proxyProtocol === 'unknown') {
-                return t('ipInfos.advancedData.type.Hosting');
-            }
         default:
-            return advancedData.operatorType || t('ipInfos.advancedData.type.unknownType');
-    }
-}
-
-// Determine proxy protocol
-function determineProtocol(advancedData, t) {
-    if (advancedData.proxyProtocol === 'unknown' || !advancedData.proxyProtocol) {
-        return t('ipInfos.advancedData.proxyUnknownProtocol');
-    } else {
-        return advancedData.proxyProtocol;
+            return t('ipInfos.advancedData.type.unknownType');
     }
 }
 

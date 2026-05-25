@@ -46,8 +46,8 @@
                     </div>
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                        :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
-                        :enable-map="false" />
+                        :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
+                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false" />
                 </div>
             </div>
         </DialogContent>
@@ -92,6 +92,7 @@ const isChecking = ref('idle');
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const asnInfos = ref({});
 const asnHistoryInfos = ref({});
+const asnConnectivityInfos = ref({});
 
 watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;

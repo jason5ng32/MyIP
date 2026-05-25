@@ -33,6 +33,7 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 🛜 **Afficher vos adresses IP** : Détecte et affiche votre adresse IP locale, provenant de plusieurs fournisseurs IPv4 et IPv6.
 * 🔍 **Recherche d'informations sur l'adresse IP** : Fournit un outil pour interroger des informations sur n'importe quelle adresse IP.
 * 🕵️ **Informations sur l'adresse IP** : Présente des informations détaillées pour toutes les adresses IP, y compris le pays, la région, l'ASN, la localisation géographique, et plus encore.
+* 🛰️ **Historique ASN et topologie amont** : Consultez l'historique des annonces AS pour un préfixe IP, et visualisez les chemins amont d'un ASN vers les réseaux dorsaux Tier 1.
 * 🚦 **Vérification de disponibilité** : Teste l'accessibilité de différents sites web, tels que Google, GitHub, YouTube, ChatGPT, et d'autres.
 * 🚥 **Détection WebRTC** : Identifie l'adresse IP utilisée lors des connexions WebRTC.
 * 🛑 **Test de fuite DNS** : Affiche les données de point de terminaison DNS pour évaluer le risque de fuites DNS lors de l'utilisation de VPN ou de proxies.
@@ -50,7 +51,6 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 ## 💪Également
 
 * 🌗 **Mode sombre** : Bascule automatiquement entre les modes sombre et clair en fonction des paramètres du système, avec une option de basculement manuel.
-* 📱 **Mode minimaliste** : Un mode optimisé pour les mobiles qui réduit la longueur de la page pour un accès rapide aux informations essentielles.
 * 📲 **Prise en charge de PWA** : Peut être ajouté en tant qu'application de bureau sur votre téléphone ainsi qu'en tant qu'application Chrome sur votre ordinateur.
 * ⌨️ **Raccourcis clavier** : Prend en charge les raccourcis clavier pour toutes les fonctions, appuyez sur `?` pour afficher la liste des raccourcis.
 * 🌍 Basé sur les résultats des tests de disponibilité, il indique si l'accès Internet mondial est actuellement réalisable.
@@ -125,6 +125,7 @@ Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte Ma
 | `MAXMIND_ACCOUNT_ID` | **Oui** | `""` | ID de compte MaxMind, associé à `MAXMIND_LICENSE_KEY` pour télécharger les bases GeoLite2. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_LICENSE_KEY` | **Oui** | `""` | Clé de licence MaxMind, associée à `MAXMIND_ACCOUNT_ID`. Voir la section MaxMind ci-dessus. |
 | `MAXMIND_AUTO_UPDATE` | **Oui** | `"false"` | Définissez sur `"true"` pour télécharger automatiquement les bases GeoLite2 environ 60 s après le démarrage et les rafraîchir toutes les 24 h. **Obligatoire pour Docker.** Peut rester à `"false"` uniquement si vous avez pré-déposé les fichiers `.mmdb` manuellement. |
+| `CAIDA_AUTO_UPDATE` | Non | `"false"` | Définissez sur `"true"` pour rafraîchir quotidiennement les jeux de données CAIDA (as2org pour la résolution du nom d'organisation par ASN, as-rel2 pour le graphe de connectivité ASN). Lorsque `"false"`, les snapshots manquants sont quand même téléchargés au démarrage mais ne sont jamais rafraîchis ensuite. |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
 | `BACKEND_PORT` | Non | `"11966"` | Le port d'exécution de la partie backend du programme |
 | `FRONTEND_PORT` | Non | `"18966"` | Le port d'exécution de la partie frontend du programme |

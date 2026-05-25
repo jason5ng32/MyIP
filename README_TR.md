@@ -33,6 +33,7 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 * 🛜 **IP'lerinizi Görüntüleyin**: Yerel IP'lerinizi tespit eder ve birden fazla IPv4/IPv6 sağlayıcısından alır.
 * 🔍 **IP Bilgisi Arama**: Herhangi bir IP adresi hakkında sorgu yapma aracı sağlar.
 * 🕵️ **IP Bilgileri**: Ülke, bölge, ASN, coğrafi konum ve daha fazlasını içeren ayrıntılı IP bilgileri sunar.
+* 🛰️ **ASN Geçmişi ve Üst Topoloji**: Bir IP önekinin geçmiş AS duyurularını ve ASN'den Tier 1 omurga ağlarına giden üst bağlantı yollarını görüntüleyin.
 * 🚦 **Erişilebilirlik Kontrolü**: Google, GitHub, YouTube, ChatGPT ve diğerleri gibi sitelerin erişilebilirliğini test eder.
 * 🚥 **WebRTC Tespiti**: WebRTC bağlantısında kullanılan IP adresini belirler.
 * 🛑 **DNS Leak Testi**: VPN veya proxy kullanırken DNS sızıntısı riskini değerlendirmek için DNS uç nokta verilerini gösterir.
@@ -50,7 +51,6 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 ## 💪 Ayrıca
 
 * 🌗 **Karanlık Mod**: Sistem ayarlarına göre otomatik olarak gündüz/karanlık mod arasında geçiş yapar; manuel geçiş seçeneği de vardır.
-* 📱 **Minimal Mod**: Mobil için optimize edilmiş, sayfa uzunluğunu kısaltan hızlı erişim modu.
 * 📲 **PWA Desteği**：Telefonunuza masaüstü uygulaması olarak veya bilgisayarınızda Chrome uygulaması olarak eklenebilir.
 * ⌨️ **Klavye Kısayolları**: Tüm işlevler için kısayolları destekler; kısayol listesini görmek için `?` tuşuna basın.
 * 🌍 Erişilebilirlik test sonuçlarına göre küresel internet erişiminin şu an mümkün olup olmadığını gösterir.
@@ -125,6 +125,7 @@ MaxMind hesabınızdan `GeoLite2-City.mmdb` ve `GeoLite2-ASN.mmdb` dosyalarını
 | `MAXMIND_ACCOUNT_ID` | **Evet** | `""` | MaxMind hesap ID'si, GeoLite2 veritabanlarını indirmek için `MAXMIND_LICENSE_KEY` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_LICENSE_KEY` | **Evet** | `""` | MaxMind lisans anahtarı, `MAXMIND_ACCOUNT_ID` ile birlikte kullanılır. Yukarıdaki MaxMind bölümüne bakın. |
 | `MAXMIND_AUTO_UPDATE` | **Evet** | `"false"` | `"true"` yapıldığında GeoLite2 veritabanları başlatmadan yaklaşık 60 saniye sonra otomatik olarak indirilir ve her 24 saatte bir yenilenir. **Docker için zorunlu.** Yalnızca `.mmdb` dosyalarını manuel olarak yerleştirdiyseniz `"false"` olarak kalabilir. |
+| `CAIDA_AUTO_UPDATE` | Hayır | `"false"` | `"true"` yapıldığında CAIDA veri setleri günlük olarak yenilenir (as2org ASN org adı için, as-rel2 ASN bağlantı haritası için). `"false"` olduğunda, eksik anlık görüntüler başlatmada yine de indirilir ancak sonradan yenilenmez. |
 | `VITE_GOOGLE_ANALYTICS_ID` | **Evet** | `""` | Google Analytics ID, kullanıcı davranışını izlemek için |
 | `BACKEND_PORT` | Hayır | `"11966"` | Backend kısmının çalıştığı port |
 | `FRONTEND_PORT` | Hayır | `"18966"` | Frontend kısmının çalıştığı port |

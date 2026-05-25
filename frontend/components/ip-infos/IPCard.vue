@@ -35,19 +35,15 @@
                             <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
                         </template>
                     </FitText>
-                    <JnTooltip v-if="isValidIP(card.ip)" :text="t('Tooltips.CopyIP')" side="left">
-                        <button type="button"
-                            class="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                            @click="copyToClipboard(card.ip, card.id)" :aria-label="'Copy ' + card.ip">
-                            <component :is="copiedStatus[card.id] ? CopyCheck : Copy" class="size-4"
-                                :class="copiedStatus[card.id] ? 'text-success' : ''" />
-                        </button>
-                    </JnTooltip>
+                    <CopyButton v-if="isValidIP(card.ip)" :value="card.ip"
+                        :tooltip="t('Tooltips.CopyIP')"
+                        :aria-label="'Copy ' + card.ip" />
                 </div>
 
                 <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
-                    :asn-history-infos="asnHistoryInfos" :configs="configs" :is-dark-mode="isDarkMode"
-                    :collapsed="isMobile && isCardsCollapsed" :enable-map="true" />
+                    :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
+                    :configs="configs" :is-dark-mode="isDarkMode"
+                    :enable-map="true" />
             </template>
 
             <!-- Error state -->
@@ -77,9 +73,8 @@ import IpDetailPanel from './IpDetailPanel.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import CopyButton from '@/components/widgets/CopyButton.vue';
 import {
-    CopyCheck,
-    Copy,
     Monitor,
     RotateCw,
 } from 'lucide-vue-next';
@@ -94,11 +89,10 @@ const props = defineProps({
     isDarkMode: { type: Boolean, required: true },
     isMobile: { type: Boolean, required: true },
     ipGeoSource: { type: Number, required: true },
-    isCardsCollapsed: { type: Boolean, required: true },
-    copiedStatus: { type: Object, required: true },
     configs: { type: Object, required: true },
     asnInfos: { type: Object, required: true },
-    asnHistoryInfos: { type: Object, default: () => ({}) }
+    asnHistoryInfos: { type: Object, default: () => ({}) },
+    asnConnectivityInfos: { type: Object, default: () => ({}) }
 });
 
 defineEmits(['refresh-card']);
@@ -110,13 +104,4 @@ const hasData = computed(() =>
 const isErrorState = computed(() =>
     props.card.ip === t('ipInfos.IPv4Error') || props.card.ip === t('ipInfos.IPv6Error')
 );
-
-const copyToClipboard = (ip, id) => {
-    navigator.clipboard.writeText(ip).then(() => {
-        props.copiedStatus[id] = true;
-        setTimeout(() => { props.copiedStatus[id] = false; }, 5000);
-    }).catch(err => {
-        console.error('Copy error', err);
-    });
-};
 </script>

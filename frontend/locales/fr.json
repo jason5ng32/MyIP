@@ -141,7 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "Infos IP",
     "Connectivity": "Connectivité",
-    "WebRTC": "Test WebRTC",
+    "WebRTC": "Test WebRTC Leak",
     "DNSLeakTest": "Test de fuite DNS",
     "SpeedTest": "Test de vitesse",
     "PingTest": "Latence mondiale",
@@ -161,7 +161,7 @@
       "autoRun": "Exécution Automatique",
       "autoRunTips": "Si désactivé, l'appli vérifiera seulement l'IP local et n'exécutera pas de tests automatiquement.",
       "simpleMode": "Mode Simple",
-      "simpleModeTips": "Réduit les informations affichées sur les cartes IP. Effectif uniquement sur les appareils mobiles.",
+      "simpleModeTips": "Masque le texte de description de chaque module. Effectif uniquement sur les appareils mobiles.",
       "connectivityMultipleTests": "Rafraîchissements Multiples de Connectivité",
       "connectivityMultipleTestsTips": "Activé, l'appli effectue plusieurs vérifications au démarrage et affiche le délai le plus bas.",
       "popupConnectivityNotifications": "Alertes de Connectivité Pop-up",
@@ -228,7 +228,18 @@
       "cpuArchitecture": "Architecture CPU",
       "gpu": "GPU",
       "cpuCores": "Cœurs CPU",
-      "language": "Code Langue",
+      "languages": "Langues Préférées",
+      "timezone": "Fuseau Horaire",
+      "display": "Affichage",
+      "connection": "Connexion Réseau",
+      "touchPoints": "Points Tactiles",
+      "doNotTrack": "Ne Pas Suivre",
+      "doNotTrackOn": "Activé",
+      "doNotTrackOff": "Désactivé",
+      "doNotTrackUnset": "Non Défini",
+      "pdfViewer": "Lecteur PDF",
+      "pdfViewerYes": "Oui",
+      "pdfViewerNo": "Non",
       "cookieEnabled": "Cookies Activés",
       "cookieEnabledTrue": "Oui",
       "cookieEnabledFalse": "Non"
@@ -250,7 +261,16 @@
       "screen": "Écran",
       "system": "Version du Navigateur",
       "webgl": "WebGL",
-      "math": "Mathématiques"
+      "math": "Mathématiques",
+      "intl": "Formats Intl",
+      "mediaDevices": "Périphériques Média",
+      "speech": "Synthèse Vocale",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Composants de l'empreinte",
+      "note": "Chaque composant ci-dessous contribue au hash affiché plus haut. Désactivez un élément dans le panneau Fingerprint pour l'exclure de l'empreinte."
     },
     "calError": "Échec du calcul des informations du navigateur, veuillez rafraîchir et réessayer.",
     "calculating": "Calcul en cours..."
@@ -496,13 +516,15 @@
   "Tooltips": {
     "RefreshIPCard": "Actualiser la carte IP",
     "RefreshConnectivityTests": "Actualiser les tests de connectivité",
-    "RefreshWebRTC": "Actualiser le test WebRTC",
+    "RefreshWebRTC": "Actualiser le test WebRTC Leak",
     "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "SourceSelect": "Sélectionner la source de géolocalisation IP",
     "ShowASNInfo": "Afficher les détails AS",
     "ShowASNHistory": "Afficher l'historique ASN",
+    "ShowASNConnectivity": "Afficher la connectivité ASN",
     "CopyIP": "Copier l'adresse IP",
+    "CopySdpLog": "Copier le journal SDP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
     "QueryIP": "Interroger l'adresse IP",
@@ -556,12 +578,25 @@
       "note": "Annonces ASN historiques pour cette IP : ",
       "empty": "Aucune donnée de routage historique trouvée pour cette IP.",
       "error": "Échec du chargement de l'historique ASN.",
-      "seenBy": "Vu par {peers} pairs BGP full-feed"
+      "seenBy": "Visibilité RIPE RIS: {pct}% — pic {peers} pairs full-feed"
+    },
+    "ASNConnectivity": {
+      "note": "Chemins amont depuis cet AS vers les opérateurs de transit Tier 1 mondiaux: ",
+      "empty": "Aucune donnée de connectivité amont disponible pour cet AS.",
+      "error": "Échec du chargement de la connectivité ASN.",
+      "expand": "Agrandir",
+      "dialogTitle": "Carte de connectivité réseau d'AS{asn}",
+      "legendOrigin": "Origine",
+      "legendTier1": "FAI Tier 1",
+      "legendIntermediate": "AS intermédiaire",
+      "zoomIn": "Zoom avant",
+      "zoomOut": "Zoom arrière",
+      "zoomReset": "Réinitialiser le zoom"
     },
     "advancedData": {
-      "proxyYes": "Doit être un proxy ou un VPN",
-      "proxyMaybe": "Possiblement un proxy ou un VPN",
-      "proxyNo": "Pas un proxy ou un VPN",
+      "proxyYes": "Signalé comme proxy / VPN",
+      "proxyMaybe": "Probablement proxy / VPN",
+      "proxyNo": "Non signalé",
       "proxyUnknown": "Type inconnu",
       "proxyUnknownProtocol": "Protocole inconnu",
       "type": {
@@ -571,9 +606,10 @@
         "Hosting": "Hébergement",
         "unknownType": "Type inconnu"
       },
-      "Nativeness": "Nativité",
-      "NativeIPYes": "C'est un IP natif",
-      "NativeIPNo": "Ce n'est pas un IP natif"
+      "Nativeness": "Correspondance ASN-Geo",
+      "NativeIPYes": "Aligné",
+      "NativeIPNo": "Décalé",
+      "nativenessTooltip": "Indique si le pays d'enregistrement de l'ASN correspond au pays de géolocalisation de l'IP"
     }
   },
   "connectivity": {
@@ -606,10 +642,11 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "Test WebRTC",
+    "Title": "Test WebRTC Leak",
     "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
     "StatusWait": "En attente du test",
     "StatusError": "Erreur de connexion",
+    "SdpLog": "Journal SDP",
     "NATType": {
       "srflx": "Port Restricted Cone ou Symmetric",
       "prflx": "Port Restricted Cone",
@@ -636,7 +673,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Test de vitesse",
-    "Note": "Le test de vitesse sera effectué via le réseau de bordure de Cloudflare, ce qui peut prendre beaucoup de temps. Si votre réseau est situé en Chine continentale, les données peuvent être biaisées. Les résultats du test de vitesse sont donnés à titre indicatif, la vitesse réelle sera plus rapide. Vous pouvez choisir la taille des paquets pour les tests de téléchargement et d'upload. Par défaut, le test de vitesse effectuera 4 tours de téléchargements et d'uploads de paquets, veuillez faire attention à la consommation de données.",
+    "Note": "Le test de vitesse sera effectué via le réseau périphérique de Cloudflare. Vous pouvez choisir la taille des paquets de téléchargement et de téléversement selon vos besoins. Pendant le test, les paquets seront téléchargés et téléversés 4 fois — veuillez tenir compte de votre consommation de données. Cloudflare ne disposant pas de nœuds périphériques dans tous les pays, les résultats sont donnés à titre indicatif ; la vitesse réelle peut être plus élevée.",
     "Download": "Téléchargement",
     "Upload": "Téléversement",
     "Latency": "Latence",
@@ -644,6 +681,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Erreur de test",
+    "loadedLatency": "Latence en charge : ",
     "videoStreaming": "Streaming vidéo : ",
     "gaming": ", Jeu : ",
     "rtc": ", Chat vidéo : ",
@@ -653,9 +691,11 @@
     "connectionTo": " vers le serveur de test:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "Bon",
-      "Medium": "Moyen",
-      "Bad": "Mauvais"
+      "bad": "Mauvais",
+      "poor": "Faible",
+      "average": "Moyen",
+      "good": "Bon",
+      "great": "Excellent"
     }
   },
   "pingtest": {
@@ -717,7 +757,7 @@
     "RefreshEverything": "Actualiser tout",
     "RefreshIPCard": "Actualiser la carte IP",
     "RefreshConnectivityTests": "Actualiser les tests de connectivité",
-    "RefreshWebRTC": "Actualiser le test WebRTC",
+    "RefreshWebRTC": "Actualiser le test WebRTC Leak",
     "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
     "PingTest": "Ouvrir le Test de latence mondial",
@@ -745,9 +785,9 @@
     "SecurityChecklist": "Ouvrir la Liste de sécurité"
   },
   "page": {
-    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Vérifier l'adresse IP de connexion WebRTC - Test de fuite DNS - Test de vitesse - Jason Ng Open Source",
-    "description": "Une boîte à outils IP meilleure et open source. Facile à vérifier vos adresses IP, informations IP, vérifier les fuites DNS, examiner les connexions WebRTC, tester la disponibilité des sites web, rechercher des enregistrements DNS, rechercher des informations Whois et tester la latence dans le monde entier.",
-    "keywords": "MonIP, Outil IP, Mon IP, Vérification IP, Recherche IP, Test de fuite DNS, Test WebRTC, Test de vitesse, Recherche DNS, Recherche Whois, Test de ping, Test de confidentialité",
+    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",
+    "description": "Une boîte à outils IP open source et tout-en-un : vérifiez votre adresse IP et sa géolocalisation, testez les fuites IP via WebRTC et DNS, effectuez une vérification de la qualité IP, une vérification de l'empreinte du navigateur, ainsi qu'un test de vitesse, un test de latence mondiale, un test MTR, une recherche Whois, et plus encore.",
+    "keywords": "MonIP, Outil IP, Vérification IP, Test de fuite IP, Test de fuite DNS, Qualité IP, Test de fuite WebRTC, Empreinte du navigateur, Test de vitesse, Test de latence mondiale, Test MTR, Recherche DNS, Recherche Whois",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Originalement de ",
     "copyRightLink": "https://ipcheck.ing",

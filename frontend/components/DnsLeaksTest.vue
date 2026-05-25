@@ -6,8 +6,7 @@
       <div class="flex flex-row items-center justify-between gap-4 w-full">
         <h2 id="DNSLeakTest"
           class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-          <span class="shrink-0 leading-none" aria-hidden="true">🛑</span>
-          <span class="min-w-0">{{ t('dnsleaktest.Title') }}</span>
+          🛑 {{ t('dnsleaktest.Title') }}
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshDNSLeakTest')" side="left">
           <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="checkAllDNSLeakTest(true)"
@@ -17,8 +16,8 @@
         </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('dnsleaktest.Note') }}</p>
-        <p>{{ t('dnsleaktest.Note2') }}</p>
+        <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note2') }}</p>
       </div>
     </header>
 
@@ -131,7 +130,8 @@ const store = useMainStore();
 const router = useRouter();
 const lang = computed(() => store.lang);
 const isStarted = ref(false);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 // Sticky flag for the Enhanced DNS Leak Test banner.
 const hasEverSettled = ref(false);
 
@@ -292,14 +292,14 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
 
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
-    store.setLoadingStatus('dnsleaktest', true);
+    store.setLoadingStatus('DNSLeakTest', true);
     // Local sticky flag for the Enhanced DNS Leak Test banner
     hasEverSettled.value = true;
   });
 };
 
 onMounted(() => {
-  store.setMountingStatus('dnsleaktest', true);
+  store.setMountingStatus('DNSLeakTest', true);
 });
 
 defineExpose({

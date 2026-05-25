@@ -14,7 +14,7 @@
         </JnTooltip>
       </div>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('connectivity.Note') }}</p>
+        <p v-if="!isSimpleMode">{{ t('connectivity.Note') }}</p>
       </div>
     </header>
 
@@ -133,7 +133,7 @@ import {
 const { t } = useI18n();
 const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
-
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const alertToShow = ref(false);
 const alertStyle = ref("");
 const alertTitle = ref("");
@@ -467,7 +467,7 @@ const handelCheckStart = async (fromApp = false) => {
   const multi = multipleTests.value;
   if (fromApp) await checkAllConnectivity(false, true, true);
   else await checkAllConnectivity(true, false, false);
-  store.setLoadingStatus('connectivity', true);
+  store.setLoadingStatus('Connectivity', true);
   if (multi) {
     intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
@@ -492,7 +492,7 @@ const handelCheckStart = async (fromApp = false) => {
 };
 
 onMounted(() => {
-  store.setMountingStatus('connectivity', true);
+  store.setMountingStatus('Connectivity', true);
 });
 
 // Stop the interval on unmount.

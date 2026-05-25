@@ -89,20 +89,21 @@ describe('transformDataFromIPapi()', () => {
     assert.equal(out.type, '<ipInfos.advancedData.type.Business>');
     assert.equal(out.qualityScore, 92);
     assert.equal(out.proxyProtocol, 'http');
-    assert.equal(out.proxyOperator, 'Acme');
+    assert.equal(out.proxyProvider, 'Acme');
     assert.equal(out.isNativeIP, true);
   });
 });
 
 describe('extractAdvancedData()', () => {
-  it('propagates sign_in_required sentinel verbatim for qualityScore / isNativeIP / isProxy', () => {
+  it('propagates sign_in_required sentinel verbatim for type / qualityScore / isNativeIP / isProxy', () => {
     const out = extractAdvancedData({
       tags: 'sign_in_required',
       score: 'sign_in_required',
-      operatorType: 'Business',
+      operatorType: 'sign_in_required',
       proxyProtocol: 'http',
     }, t);
     assert.equal(out.isProxy, 'sign_in_required');
+    assert.equal(out.type, 'sign_in_required');
     assert.equal(out.qualityScore, 'sign_in_required');
     assert.equal(out.isNativeIP, 'sign_in_required');
   });
@@ -120,39 +121,18 @@ describe('extractAdvancedData()', () => {
   it("classifies isProxy='proxyMaybe' for VPN with unknown protocol", () => {
     const out = extractAdvancedData({
       tags: { isProxyOrVPN: true, isNative: false },
-      operatorType: 'VPN',
+      operatorType: 'Hosting',
       score: 10,
       proxyProtocol: 'unknown',
     }, t);
-    assert.equal(out.isProxy, '<ipInfos.advancedData.proxyMaybe>');
-  });
+    assert.equal(out.isProxy, '<ipInfos.advancedData.proxyMaybe>');  });
 
-  it('falls back type to operatorType for non-standard values', () => {
-    const out = extractAdvancedData({
-      tags: { isProxyOrVPN: false, isNative: true },
-      operatorType: 'CustomType',
-      score: 50,
-      proxyProtocol: 'unknown',
-    }, t);
-    assert.equal(out.type, 'CustomType');
-  });
-
-  it('downgrades VPN with unknown protocol to Hosting type', () => {
-    const out = extractAdvancedData({
-      tags: { isProxyOrVPN: true, isNative: false },
-      operatorType: 'VPN',
-      score: 10,
-      proxyProtocol: 'unknown',
-    }, t);
-    assert.equal(out.type, '<ipInfos.advancedData.type.Hosting>');
-  });
-
-  it('falls back proxyProtocol to unknown i18n when missing', () => {
+  it('falls back proxyProtocol to empty string when missing (template decides display)', () => {
     const out = extractAdvancedData({
       tags: { isProxyOrVPN: false, isNative: true },
       operatorType: 'Residential',
       score: 80,
     }, t);
-    assert.equal(out.proxyProtocol, '<ipInfos.advancedData.proxyUnknownProtocol>');
+    assert.equal(out.proxyProtocol, '');
   });
 });

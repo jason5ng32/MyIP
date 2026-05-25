@@ -3,7 +3,6 @@ import { describe, it } from 'node:test';
 
 import {
   SECTION_IDS,
-  DEFAULT_SECTION,
   createMountingStatus,
   createLoadingStatus,
 } from '../frontend/data/sections.js';
@@ -20,21 +19,18 @@ describe('SECTION_IDS', () => {
     ]);
   });
 
-  it('DEFAULT_SECTION is the first entry', () => {
-    assert.equal(DEFAULT_SECTION, SECTION_IDS[0]);
-  });
 });
 
 describe('createMountingStatus()', () => {
-  it('returns all 6 mount keys set to false', () => {
+  it('returns all 6 section ids as mount keys, set to false', () => {
     const s = createMountingStatus();
     assert.deepEqual(s, {
-      ipcheck: false,
-      connectivity: false,
-      webrtc: false,
-      dnsleaktest: false,
-      speedtest: false,
-      advancedtools: false,
+      IPInfo: false,
+      Connectivity: false,
+      DNSLeakTest: false,
+      WebRTC: false,
+      SpeedTest: false,
+      AdvancedTools: false,
     });
   });
 
@@ -42,19 +38,19 @@ describe('createMountingStatus()', () => {
     const a = createMountingStatus();
     const b = createMountingStatus();
     assert.notEqual(a, b);
-    a.ipcheck = true;
-    assert.equal(b.ipcheck, false);
+    a.IPInfo = true;
+    assert.equal(b.IPInfo, false);
   });
 });
 
 describe('createLoadingStatus()', () => {
-  it('returns the 4 loading keys set to false (subset of mounting keys)', () => {
+  it('returns the 4 loading section ids set to false (subset of mounting keys)', () => {
     const s = createLoadingStatus();
     assert.deepEqual(s, {
-      ipcheck: false,
-      connectivity: false,
-      webrtc: false,
-      dnsleaktest: false,
+      IPInfo: false,
+      Connectivity: false,
+      DNSLeakTest: false,
+      WebRTC: false,
     });
   });
 
@@ -62,7 +58,7 @@ describe('createLoadingStatus()', () => {
     const a = createLoadingStatus();
     const b = createLoadingStatus();
     assert.notEqual(a, b);
-    a.webrtc = true;
-    assert.equal(b.webrtc, false);
+    a.WebRTC = true;
+    assert.equal(b.WebRTC, false);
   });
 });

@@ -141,7 +141,7 @@
     "Navigation": "Navigasyon",
     "IPInfo": "IP Bilgileri",
     "Connectivity": "Bağlantı",
-    "WebRTC": "WebRTC Testi",
+    "WebRTC": "WebRTC Sızıntı Testi",
     "DNSLeakTest": "DNS Sızıntı Testi",
     "SpeedTest": "Hız Testi",
     "PingTest": "Global Gecikme",
@@ -161,7 +161,7 @@
       "autoRun": "Otomatik Çalıştır",
       "autoRunTips": "Devre dışı bırakılırsa, uygulama yalnızca yerel IP'yi kontrol eder ve testleri otomatik olarak çalıştırmaz.",
       "simpleMode": "Basit Mod",
-      "simpleModeTips": "IP kartlarında görüntülenen bilgiyi azaltır. Yalnızca mobil cihazlarda etkilidir.",
+      "simpleModeTips": "Her modülün açıklamasını gizler. Yalnızca mobil cihazlarda etkilidir.",
       "connectivityMultipleTests": "Çoklu Bağlantı Yenilemeleri",
       "connectivityMultipleTestsTips": "Etkinleştirildiğinde, uygulama başlangıçta birden fazla kontrol çalıştırır ve en düşük gecikmeyi görüntüler.",
       "popupConnectivityNotifications": "Açılır Bağlantı Uyarıları",
@@ -228,7 +228,18 @@
       "cpuArchitecture": "CPU Mimarisi",
       "gpu": "GPU",
       "cpuCores": "CPU Çekirdekleri",
-      "language": "Dil Kodu",
+      "languages": "Dil Tercihleri",
+      "timezone": "Saat Dilimi",
+      "display": "Ekran",
+      "connection": "Ağ Bağlantısı",
+      "touchPoints": "Dokunma Noktaları",
+      "doNotTrack": "İzlemeyi Engelle",
+      "doNotTrackOn": "Açık",
+      "doNotTrackOff": "Kapalı",
+      "doNotTrackUnset": "Ayarlanmamış",
+      "pdfViewer": "PDF Görüntüleyici",
+      "pdfViewerYes": "Evet",
+      "pdfViewerNo": "Hayır",
       "cookieEnabled": "Çerezler Etkin",
       "cookieEnabledTrue": "Evet",
       "cookieEnabledFalse": "Hayır"
@@ -250,7 +261,16 @@
       "screen": "Ekran",
       "system": "Tarayıcı Sürümü",
       "webgl": "WebGL",
-      "math": "Matematik"
+      "math": "Matematik",
+      "intl": "Intl Biçimlendiricileri",
+      "mediaDevices": "Medya Cihazları",
+      "speech": "Konuşma Sentezi",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Parmak İzi Bileşenleri",
+      "note": "Aşağıdaki her bileşen yukarıdaki hash'e katkıda bulunur. Fingerprint panelindeki ilgili anahtarı kapatarak bir bileşeni parmak izinden çıkarabilirsiniz."
     },
     "calError": "Tarayıcı bilgileri hesaplanamadı, lütfen yenileyip tekrar deneyin.",
     "calculating": "Hesaplanıyor..."
@@ -495,13 +515,15 @@
   "Tooltips": {
     "RefreshIPCard": "IP Kartını Yenile",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
-    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
     "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
     "ShowASNInfo": "AS Detaylarını Göster",
     "ShowASNHistory": "ASN Geçmişini Göster",
+    "ShowASNConnectivity": "ASN Bağlantı Haritasını Göster",
     "CopyIP": "IP Adresini Kopyala",
+    "CopySdpLog": "SDP Günlüğünü Kopyala",
     "ViewOnMap": "Konumu haritada görüntüle",
     "InfoMask": "IP Bilgilerini Gizle",
     "QueryIP": "IP Adresini Sorgula",
@@ -555,12 +577,25 @@
       "note": "Bu IP için geçmiş ASN duyuruları : ",
       "empty": "Bu IP için geçmiş yönlendirme verisi bulunamadı.",
       "error": "ASN geçmişi yüklenemedi.",
-      "seenBy": "{peers} BGP full-feed eşi tarafından görüldü"
+      "seenBy": "RIPE RIS görünürlüğü: %{pct} — zirvede {peers} full-feed eş"
+    },
+    "ASNConnectivity": {
+      "note": "Bu AS'tan Tier 1 küresel transit sağlayıcılarına giden yukarı akış yolları: ",
+      "empty": "Bu AS için yukarı akış bağlantı verisi bulunamadı.",
+      "error": "ASN bağlantı haritası yüklenemedi.",
+      "expand": "Büyüt",
+      "dialogTitle": "AS{asn} ağ bağlantı haritası",
+      "legendOrigin": "Kaynak",
+      "legendTier1": "Tier 1 ISP",
+      "legendIntermediate": "Ara AS",
+      "zoomIn": "Yakınlaştır",
+      "zoomOut": "Uzaklaştır",
+      "zoomReset": "Sıfırla"
     },
     "advancedData": {
-      "proxyYes": "Kesinlikle bir proxy veya VPN",
-      "proxyMaybe": "Muhtemelen bir proxy veya VPN",
-      "proxyNo": "Proxy veya VPN değil",
+      "proxyYes": "Proxy / VPN olarak işaretlendi",
+      "proxyMaybe": "Olası proxy / VPN",
+      "proxyNo": "İşaretlenmedi",
       "proxyUnknown": "Bilinmeyen tür",
       "proxyUnknownProtocol": "Bilinmeyen protokol",
       "type": {
@@ -570,9 +605,10 @@
         "Hosting": "Barındırma",
         "unknownType": "Bilinmeyen Tür"
       },
-      "Nativeness": "Yerellik",
-      "NativeIPYes": "Bu yerel bir IP",
-      "NativeIPNo": "Yerel bir IP değil"
+      "Nativeness": "ASN-Coğrafya eşleşmesi",
+      "NativeIPYes": "Eşleşiyor",
+      "NativeIPNo": "Eşleşmiyor",
+      "nativenessTooltip": "ASN'nin kayıtlı ülkesinin IP'nin coğrafi konum ülkesiyle eşleşip eşleşmediğini gösterir"
     }
   },
   "connectivity": {
@@ -605,10 +641,11 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Title": "WebRTC Testi",
+    "Title": "WebRTC Sızıntı Testi",
     "Note": "WebRTC genellikle doğrudan UDP üzerinden bağlantı kurar. Test gerçek IP'nizi döndürürse, bu, proxy ayarlarınızın bu bağlantıları kapsamadığı anlamına gelir. WebRTC'ye bağlanırken kullandığınız IP'yi tespit etmenin yanı sıra, NAT türünüzü de tespit ediyoruz. Ancak, NAT türü tespiti %100 doğru değildir ve yalnızca referans amaçlıdır.",
     "StatusWait": "Test Bekleniyor",
     "StatusError": "Bağlantı Hatası",
+    "SdpLog": "SDP Günlüğü",
     "NATType": {
       "srflx": "Port Kısıtlı Koni veya Simetrik",
       "prflx": "Port Kısıtlı Koni",
@@ -635,7 +672,7 @@
   "speedtest": {
     "id": "speedtest",
     "Title": "Hız Testi",
-    "Note": "Ağınız anakara Çin'de bulunuyorsa, veriler yanlı olabilir. Hız testi sonuçları yalnızca referans amaçlıdır, gerçek hız daha hızlı olacaktır. İndirme ve yükleme testleri için paket boyutunu seçebilirsiniz. Varsayılan olarak, hız testi 4 tur paket yüklemesi ve indirmesi yapacaktır, lütfen veri kullanımına dikkat edin.",
+    "Note": "Hız testi, Cloudflare'in kenar ağı kullanılarak gerçekleştirilecektir. İndirme ve yükleme için veri paketi boyutunu ihtiyacınıza göre seçebilirsiniz. Test sırasında veri paketleri 4 kez yüklenip indirilecektir; lütfen veri tüketimine dikkat edin. Cloudflare dünyadaki her ülkede kenar düğümü bulundurmadığından, test sonuçları yalnızca referans niteliğindedir ve gerçek hız daha yüksek olabilir.",
     "Download": "İndirme",
     "Upload": "Yükleme",
     "Latency": "Gecikme",
@@ -643,6 +680,7 @@
     "Unit": "Mbps",
     "StatusWait": "--",
     "StatusError": "Test Hatası",
+    "loadedLatency": "Yüklü gecikme: ",
     "videoStreaming": "Video Akışı: ",
     "gaming": ", Oyun: ",
     "rtc": ", Görüntülü Sohbet: ",
@@ -652,9 +690,11 @@
     "connectionTo": " test sunucusuna:",
     "connectionEnd": " .",
     "quality": {
-      "Good": "İyi",
-      "Medium": "Orta",
-      "Bad": "Kötü"
+      "bad": "Kötü",
+      "poor": "Zayıf",
+      "average": "Orta",
+      "good": "İyi",
+      "great": "Mükemmel"
     }
   },
   "pingtest": {
@@ -716,7 +756,7 @@
     "RefreshEverything": "Her Şeyi Yenile",
     "RefreshIPCard": "IP Kartını Yenile",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
-    "RefreshWebRTC": "WebRTC Testini Yenile",
+    "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
     "PingTest": "Global Gecikme Testi panelini aç",
@@ -744,9 +784,9 @@
     "SecurityChecklist": "Güvenlik Kontrol Listesi panelini aç"
   },
   "page": {
-    "title": "IPCheck.ing - IP Adresimi ve Coğrafi Konumumu Kontrol Et - WebRTC Bağlantı IP'sini Kontrol Et - DNS Sızıntı Testi - Hız Testi - Jason Ng Açık Kaynak",
-    "description": "Daha iyi ve açık kaynaklı bir IP Araç Kutusu. IP'lerinizin ne olduğunu, IP bilgilerini, DNS sızıntılarını kontrol etmek, WebRTC bağlantılarını incelemek, web sitesi kullanılabilirliğini test etmek, DNS kaydını aramak, Whois'i aramak ve dünyanın dört bir yanından gecikmeyi test etmek kolaydır.",
-    "keywords": "IPim, IP Aracı, IP Adresim, IP kontrol, IP arama, DNS sızıntı testi, WebRTC testi, Hız testi, DNS arama, Whois arama, Ping testi, gizlilik testi",
+    "title": "IPCheck.ing - IP Adresimi ve Coğrafi Konumumu Kontrol Et - IP Sızıntı Testi - DNS Sızıntı Testi - IP Kalite Kontrolü - Ağ Hızı Testi - Jason Ng Açık Kaynak",
+    "description": "Daha iyi ve açık kaynaklı, hepsi bir arada IP araç kutusu: IP adresinizi ve coğrafi konumunuzu kontrol edin, WebRTC ve DNS üzerinden IP sızıntılarını test edin, IP kalite kontrolü ve tarayıcı parmak izi kontrolü yapın; ayrıca hız testi, küresel gecikme testi, MTR testi, Whois araması ve daha fazlası.",
+    "keywords": "IPim, IP Aracı, IP Sorgulama, IP Sızıntı Testi, DNS Sızıntı Testi, IP Kalite Testi, WebRTC Sızıntı Testi, Tarayıcı Parmak İzi Testi, Hız Testi, Küresel Gecikme Testi, MTR Testi, DNS Sorgulama, Whois Araması",
     "footerLink": "https://github.com/jason5ng32/MyIP",
     "copyRightName": "Orijinal Kaynak ",
     "copyRightLink": "https://ipcheck.ing",

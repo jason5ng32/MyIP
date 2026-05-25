@@ -2,11 +2,15 @@
     <!-- Advanced Tools -->
     <section class="advanced-tools-section mb-10">
         <!-- Header -->
-        <header class="mb-3">
+        <header class="mb-2 flex flex-col items-start justify-between gap-4">
+            <div class="flex flex-row items-center justify-between gap-4 w-full">
             <h2 id="AdvancedTools" class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
                 🧰 {{ t('advancedtools.Title') }}
             </h2>
-            <p class="my-3 text-base text-muted-foreground">{{ t('advancedtools.Note') }}</p>
+            </div>
+            <div class="text-base text-muted-foreground">
+                <p v-if="!isSimpleMode">{{ t('advancedtools.Note') }}</p>
+            </div>
         </header>
 
         <!-- Card grid -->
@@ -79,7 +83,8 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
-
+const userPreferences = computed(() => store.userPreferences);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const scrollContainer = ref(null);
 const router = useRouter();
 
@@ -87,7 +92,7 @@ const cards = reactive([
     { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', enabled: true },
     { path: '/mtrtest', icon: '📡', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', enabled: true },
     { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', enabled: true },
-    { path: '/dnsresolver', icon: '🔦', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', enabled: true },
+    { path: '/dnsresolver', icon: '📟', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', enabled: true },
     { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', enabled: true },
     { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', enabled: true },
     { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
@@ -150,7 +155,7 @@ const resetNavigatorURL = () => {
 let invisibilityEnableTimer = null;
 
 onMounted(() => {
-    store.setMountingStatus('advancedtools', true);
+    store.setMountingStatus('AdvancedTools', true);
     invisibilityEnableTimer = setTimeout(() => {
         invisibilityEnableTimer = null;
         if (configs.value.originalSite) {

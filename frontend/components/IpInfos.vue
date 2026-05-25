@@ -4,10 +4,10 @@
     <header class="mb-2 flex flex-col items-start justify-between gap-4">
       <h2 id="IPInfo"
         class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-        🔎 {{ t('ipInfos.Title') }}
+        🔦 {{ t('ipInfos.Title') }}
       </h2>
       <div class="text-base text-muted-foreground">
-        <p>{{ t('ipInfos.Notes') }}</p>
+        <p v-if="!isSimpleMode">{{ t('ipInfos.Notes') }}</p>
       </div>
     </header>
 
@@ -18,9 +18,9 @@
         :id="'IPInfoCard-' + (index + 1)" class="flex"
         :class="{ 'opacity-60': !card.ip || card.ip === t('ipInfos.IPv4Error') || card.ip === t('ipInfos.IPv6Error') }">
         <IPCard class="w-full" :card="card" :index="index" :isDarkMode="isDarkMode" :isMobile="isMobile"
-          :ipGeoSource="ipGeoSource" :isCardsCollapsed="isCardsCollapsed" :copiedStatus="copiedStatus"
+          :ipGeoSource="ipGeoSource"
           :configs="configs" :asnInfos="asnInfos" :asnHistoryInfos="asnHistoryInfos"
-          @refresh-card="refreshCard" />
+          :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
     </div>
   </section>
@@ -48,9 +48,7 @@ const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const lang = computed(() => store.lang);
-
-// Dynamic configuration of the page
-const isCardsCollapsed = computed(() => userPreferences.value.simpleMode);
+const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 
 // Default card data
 const createDefaultCard = () => ({
@@ -114,9 +112,11 @@ const asnInfos = ref({
 // Session cache — wipes on reload.
 const asnHistoryInfos = ref({});
 
+// ASN upstream connectivity graph, keyed by numeric ASN string. Session cache.
+const asnConnectivityInfos = ref({});
+
 // Other data
 const ipCardsToShow = ref(userPreferences.value.ipCardsToShow);
-const copiedStatus = ref({});
 const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
@@ -159,7 +159,7 @@ const trackFetchStatus = (status) => {
     }
   }
   if (allHasFetched) {
-    store.setLoadingStatus('ipcheck', true);
+    store.setLoadingStatus('IPInfo', true);
   }
 };
 
@@ -335,7 +335,7 @@ watch(IPArray, () => {
 });
 
 onMounted(() => {
-  store.setMountingStatus('ipcheck', true);
+  store.setMountingStatus('IPInfo', true);
 });
 
 defineExpose({
