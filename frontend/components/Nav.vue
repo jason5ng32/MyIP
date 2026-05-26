@@ -1,7 +1,18 @@
 <template>
+  <!-- iOS PWA safe-area painter. Pairs with apple-mobile-web-app-status-bar-style=black-translucent
+       in index.html — the only way to get a live status-bar tint on iOS PWA, since WebKit
+       ignores JS theme-color writes and media-variant theme-color tags in standalone mode.
+       Color tracks --page-bg (style.css), which follows .dark class. -->
+  <div
+    class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-colors duration-300"
+    style="height: env(safe-area-inset-top); background: var(--page-bg);"
+    aria-hidden="true"
+  ></div>
+
   <!-- Nav -->
   <header
-    class="sticky top-0 z-40 w-full border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur">
+    class="sticky top-[env(safe-area-inset-top)] z-40 w-full border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur transition-transform duration-300 ease-out will-change-transform"
+    :class="{ '-translate-y-full': isNavHidden }">
     <nav id="navbar-top"
       class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
@@ -170,7 +181,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -196,13 +207,11 @@ import { SECTION_IDS } from '@/data/sections';
 const { t } = useI18n();
 const store = useMainStore();
 
-// Basic state
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const currentSection = computed(() => store.currentSection);
 const loaded = ref(false);
 
-// Navigation items (desktop + mobile share the same list)
 const navItems = SECTION_IDS;
 
 // nav link style — current section highlight use bg-accent instead of only bold
@@ -247,17 +256,14 @@ const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
 };
 
-// Open preferences — consumed by `p` key in use-shortcuts.js defineExpose
+// Consumed by `p` shortcut in use-shortcuts.js via defineExpose.
 const OpenPreferences = () => {
   store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
-// Logo click:
-//   - Page middle → smooth scroll to top
-//   - Already at top → trigger full refresh
-// Note: native behavior of <a href="#"> is to jump to top instantly, not smooth scrolling.
-// Here we prevent the default behavior and use window.scrollTo + smooth to ensure the animation effect.
+// At top → full refresh; mid-page → smooth scroll up. preventDefault
+// avoids the native instant-jump of <a href="#">.
 const handleLogoClick = (e) => {
   if (window.scrollY === 0) {
     store.setRefreshEveryThing(true);
@@ -277,6 +283,58 @@ const scrollToSection = (el, offset = 70) => {
 };
 
 watch(() => store.allHasLoaded, (newValue) => { loaded.value = newValue; });
+
+// Mobile: hide nav on scroll-down, show on scroll-up.
+// SCROLL_DELTA filters out micro-jitter; SHOW_AT_TOP forces the nav
+// visible near the top of the page regardless of direction.
+const isNavHidden = ref(false);
+let lastScrollY = 0;
+let scrollTicking = false;
+const SCROLL_DELTA = 5;
+const SHOW_AT_TOP = 48;
+
+const onScroll = () => {
+  if (scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    const y = window.scrollY;
+    const dy = y - lastScrollY;
+    if (y <= SHOW_AT_TOP) {
+      isNavHidden.value = false;
+    } else if (Math.abs(dy) > SCROLL_DELTA) {
+      // Keep nav visible while the menu drawer is open so its close
+      // affordance stays in place.
+      if (dy > 0 && !isNavMenuOpen.value) {
+        isNavHidden.value = true;
+      } else if (dy < 0) {
+        isNavHidden.value = false;
+      }
+    }
+    lastScrollY = y;
+    scrollTicking = false;
+  });
+};
+
+watch(isMobile, (mobile) => {
+  if (!mobile) {
+    isNavHidden.value = false;
+    window.removeEventListener('scroll', onScroll);
+  } else {
+    lastScrollY = window.scrollY;
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+}, { immediate: false });
+
+onMounted(() => {
+  if (isMobile.value) {
+    lastScrollY = window.scrollY;
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll);
+});
 
 defineExpose({ OpenPreferences });
 </script>

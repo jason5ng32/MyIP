@@ -67,6 +67,11 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.5rem;
+  /* Canonical page background. Single source of truth for the iOS PWA
+     safe-area painter (Nav.vue). Must stay in sync with the literal
+     hex values in: index.html inline `html { background }`, index.html
+     <meta theme-color>, public/manifest.webmanifest. */
+  --page-bg: #ffffff;
 }
 
 .dark {
@@ -98,6 +103,7 @@
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
+  --page-bg: #0e0e0e;
 }
 
 @theme inline {

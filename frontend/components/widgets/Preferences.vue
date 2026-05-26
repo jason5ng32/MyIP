@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, h } from 'vue';
+import { computed, onMounted, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
@@ -148,7 +148,6 @@ import {
 const { t } = useI18n();
 
 const store = useMainStore();
-const isDarkMode = computed(() => store.isDarkMode);
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
@@ -183,45 +182,6 @@ const currentIpDB = computed(() =>
     ipDBs.value.find(db => db.id === userPreferences.value.ipGeoSource)
 );
 
-// Theme coordination — applies the user's preference ("light" / "dark" / "auto")
-// to the store, <html> `.dark` class, body class, and PWA meta colors.
-//
-// Single source of truth: applyTheme() reads the *current* userPreferences.theme
-// and the *current* OS color-scheme together, decides the effective dark state,
-// and pushes it everywhere. Called on mount, on OS flip, and on user preference
-// change — so all three triggers path through the same logic.
-//
-// The earlier version read userPreferences.theme at callback-definition time
-// and also called handleThemeChange inside prefTheme *before* persisting the
-// new theme value, so "auto" could miss the OS flip and "click auto" could
-// get stuck on the previous manual state.
-const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
-
-const applyTheme = () => {
-    const theme = userPreferences.value.theme;
-    const isDark =
-        theme === 'dark' ||
-        (theme === 'auto' && mediaQueryList.matches);
-    store.setDarkMode(isDark);
-    updateBodyClass();
-    PWAColor();
-};
-
-const handleMediaChange = () => applyTheme();
-
-const updateBodyClass = () => {
-    document.body.classList.toggle('body-dark-mode', isDarkMode.value);
-};
-
-const PWAColor = () => {
-    const themeColor = document.querySelector('meta[name="theme-color"]');
-    const backgroundColor = document.querySelector('meta[name="background-color"]');
-    const color = isDarkMode.value ? '#171a1d' : '#f8f9fa';
-    const bgColor = isDarkMode.value ? '#212529' : '#ffffff';
-    themeColor.setAttribute('content', color);
-    backgroundColor.setAttribute('content', bgColor);
-};
-
 const updateIPDBs = () => {
     if (configs.value && Object.keys(configs.value).length > 0) {
         store.updateIPDBs({ id: 0, enabled: configs.value.ipChecking });
@@ -232,9 +192,8 @@ const updateIPDBs = () => {
 };
 
 const prefTheme = (value) => {
-    // Persist first so applyTheme() reads the new value, then apply.
+    // Application is handled by use-theme.js, which watches this preference.
     store.updatePreference('theme', value);
-    applyTheme();
     trackEvent('Nav', 'PreferenceClick', 'Theme');
 };
 
@@ -281,20 +240,8 @@ const prefipGeoSource = (value) => {
 };
 
 onMounted(() => {
-    mediaQueryList.addEventListener('change', handleMediaChange);
-    applyTheme();
     setTimeout(updateIPDBs, 4000);
 });
-
-// Clean up the OS listener if this component is ever torn down (it normally
-// lives for the life of the app, but be hygienic).
-onUnmounted(() => {
-    mediaQueryList.removeEventListener('change', handleMediaChange);
-});
-
-// Also react when the user switches theme via any path — the watcher keeps
-// applyTheme() firing even if a future code path mutates store.theme directly.
-watch(() => userPreferences.value.theme, applyTheme);
 
 
 // Section title: lucide icon + text, unified rhythm

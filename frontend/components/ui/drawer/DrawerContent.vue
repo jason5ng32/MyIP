@@ -25,6 +25,7 @@ defineEmits(['close', 'escapeKeyDown']);
         'fixed inset-x-0 bottom-0 z-[10001] mt-24 flex h-auto flex-col rounded-t-[14px] border bg-background shadow-lg outline-none',
         props.class,
       )"
+      :style="{ paddingBottom: 'env(safe-area-inset-bottom)' }"
       @escape-key-down="$emit('escapeKeyDown', $event)"
     >
       <DrawerHandle

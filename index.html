@@ -10,7 +10,9 @@
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Jason Ng" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#f8f9fa" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
   <meta name="background-color" content="#ffffff" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- Avoid auto-linking phone numbers -->
@@ -98,6 +100,12 @@
       padding: 0;
     }
 
+    /* Keep page content below the iOS safe-area (transparent status
+       bar). env() resolves to 0 on non-notch platforms — no effect. */
+    body {
+      padding-top: env(safe-area-inset-top);
+    }
+
     html {
       line-height: 1.5;
       -webkit-text-size-adjust: 100%;
@@ -108,7 +116,7 @@
         "Apple Color Emoji", "Segoe UI Emoji";
       scrollbar-gutter: stable;
       background: #ffffff;
-      color: #0a0a0a;
+      color: #0e0e0e;
     }
 
     /* Dark mode is gated strictly on the `.dark` class — *never* on
@@ -118,7 +126,7 @@
        before first paint, so boot-screen rendering already reflects the
        right theme without a flash. */
     html.dark {
-      background: #0a0a0a;
+      background: #0e0e0e;
       color: #fafafa;
     }
 
@@ -143,13 +151,13 @@
     }
 
     html.dark .jn-loading {
-      background: #0a0a0a;
+      background: #0e0e0e;
     }
 
     /* Hand-off, driven from App.vue:
-         stage-1 — non-logo children fade out, logo stays put.
-         stage-2 — logo scales down to 0 and fades.
-         stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
+        stage-1 — non-logo children fade out, logo stays put.
+        stage-2 — logo scales down to 0 and fades.
+        stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
     .jn-loading>svg,
     .jn-loading>div,
     .jn-loading>.jn-spinner,

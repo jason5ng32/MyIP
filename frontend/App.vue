@@ -60,6 +60,7 @@ import { useInfoMask } from '@/composables/use-info-mask.js';
 import { useRefreshOrchestrator } from '@/composables/use-refresh-orchestrator.js';
 import { useShortcuts } from '@/composables/use-shortcuts.js';
 import { useSectionTracking } from '@/composables/use-section-tracking.js';
+import { useTheme } from '@/composables/use-theme.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -136,6 +137,9 @@ const { loadShortcuts } = useShortcuts({
 
 // Scroll monitoring + section tracking (logic from widgets/Patch.vue)
 useSectionTracking();
+
+// Theme orchestration: initial apply, OS flip listener, preference watcher.
+useTheme();
 
 onMounted(() => {
     loadingControl();
