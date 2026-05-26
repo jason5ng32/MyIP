@@ -1126,7 +1126,7 @@
   },
   {
     "version": "v6.3.0",
-    "date": "Beta",
+    "date": "May 27, 2026",
     "content": [
       {
         "type": "add",
@@ -1171,6 +1171,30 @@
           "zh": "修复了一些小问题",
           "fr": "Correction de petits problèmes",
           "tr": "Birkaç küçük sorun düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v6.4.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Navbar will hide when scrolling on mobile",
+          "zh": "导航栏在手机上会跟随滚动隐藏",
+          "fr": "La barre de navigation se cache lors du défilement sur mobile",
+          "tr": "Navbar mobil tarayıcıda kaydırılırken gizlenir"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed a bug that caused the PWA status bar color to not match the theme",
+          "zh": "修复 PWA 状态栏颜色与主题不一致的问题",
+          "fr": "Correction d'un bug causant la couleur de la barre de statut PWA à ne pas correspondre au thème",
+          "tr": "PWA durum çubuğu rengi tema ile eşleşmediği bir hata düzeltildi"
         }
       }
     ]
