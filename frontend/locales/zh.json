@@ -645,6 +645,7 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC 泄露测试",
+    "Name": "WebRTC 连接",
     "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
     "StatusWait": "待检测",
     "StatusError": "连接错误",

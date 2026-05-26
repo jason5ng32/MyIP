@@ -148,7 +148,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Maximize2, Network, ZoomIn, ZoomOut, RotateCcw } from 'lucide-vue-next';
+import { Maximize2, Network, ZoomIn, ZoomOut, RotateCcw } from '@lucide/vue';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 
 const { t } = useI18n();

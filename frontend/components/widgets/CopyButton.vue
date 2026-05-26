@@ -18,7 +18,7 @@
 // Events:
 // - `copied(text)` on success, `error(err)` on clipboard failure.
 import { ref, onBeforeUnmount } from 'vue';
-import { Copy, CopyCheck } from 'lucide-vue-next';
+import { Copy, CopyCheck } from '@lucide/vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 

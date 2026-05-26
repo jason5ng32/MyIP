@@ -109,7 +109,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from 'lucide-vue-next';
+import { Info,Play } from '@lucide/vue';
 
 import 'svgmap/style.min';
 

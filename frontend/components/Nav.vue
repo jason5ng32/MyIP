@@ -56,7 +56,7 @@
         <Button v-if="isMobile" variant="ghost" size="icon" class="size-8" as-child>
           <a :href="t('page.footerLink')" target="_blank" rel="noopener"
             aria-label="View source on GitHub">
-            <Github />
+            <Icon icon="ri:github-line" />
           </a>
         </Button>
 
@@ -129,11 +129,11 @@
             <!-- Not signed in -->
             <template v-else>
               <DropdownMenuItem @select="store.signInWithGoogle">
-                <Chrome />
+                <Icon icon="ri:google-line" />
                 <span>{{ t('user.SignInWithGoogle') }}</span>
               </DropdownMenuItem>
               <DropdownMenuItem @select="store.signInWithGithub">
-                <Github />
+                <Icon icon="ri:github-line" />
                 <span>{{ t('user.SignInWithGithub') }}</span>
               </DropdownMenuItem>
             </template>
@@ -171,7 +171,7 @@
           </a>
           <a :href="t('page.footerLink')" target="_blank" rel="noopener"
             class="mt-3 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted">
-            <Github class="size-4" />
+            <Icon icon="ri:github-line" class="size-4" />
             <span>Star on GitHub</span>
           </a>
         </nav>
@@ -198,9 +198,10 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  Award, ChevronDown, Chrome, Github, HeartHandshake,
+  Award, ChevronDown, HeartHandshake,
   LogOut, Menu, SlidersHorizontal,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
+import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
 

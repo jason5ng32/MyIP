@@ -276,7 +276,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { Play, Check, X, Info, Server, Hash, Route, MapPin, ShieldCheck, ShieldAlert } from 'lucide-vue-next';
+import { Play, Check, X, Info, Server, Hash, Route, MapPin, ShieldCheck, ShieldAlert } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();

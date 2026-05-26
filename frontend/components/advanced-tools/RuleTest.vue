@@ -80,7 +80,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { Icon } from '@iconify/vue';
-import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
+import { MapPin, RotateCw, Waypoints, SignpostBig } from '@lucide/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 

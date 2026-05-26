@@ -29,7 +29,7 @@
           <!-- Top: heartbeat icon + name + index -->
           <div class="flex items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2 min-w-0">
-              <HeartPulse class="size-6 text-muted-foreground shrink-0" />
+              <DoorOpen class="size-6 text-muted-foreground shrink-0" />
               <span class="text-base font-medium truncate">{{ leak.name }}</span>
 
               <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
@@ -119,7 +119,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight } from 'lucide-vue-next';
+import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';

@@ -1,7 +1,7 @@
 <script setup>
 // shadcn-vue Drawer 关闭按钮：包装 vaul-vue DrawerClose
 import { DrawerClose } from 'vaul-vue';
-import { X } from 'lucide-vue-next';
+import { X } from '@lucide/vue';
 import { cn } from '@/lib/utils';
 
 defineProps({

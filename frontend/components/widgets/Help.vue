@@ -29,7 +29,7 @@
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
-import { Keyboard, ThumbsUp } from 'lucide-vue-next';
+import { Keyboard, ThumbsUp } from '@lucide/vue';
 
 const { t } = useI18n();
 

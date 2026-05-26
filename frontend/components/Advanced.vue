@@ -76,7 +76,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
-import { Maximize, Minimize, PanelBottomOpen } from 'lucide-vue-next';
+import { Maximize, Minimize, PanelBottomOpen } from '@lucide/vue';
 
 const { t } = useI18n();
 

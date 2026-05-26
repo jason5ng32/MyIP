@@ -72,7 +72,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { Info, Search } from 'lucide-vue-next';
+import { Info, Search } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

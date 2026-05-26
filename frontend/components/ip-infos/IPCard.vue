@@ -77,7 +77,7 @@ import CopyButton from '@/components/widgets/CopyButton.vue';
 import {
     Monitor,
     RotateCw,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 const { t } = useI18n();
 

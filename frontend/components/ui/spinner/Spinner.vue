@@ -6,7 +6,7 @@
 //     {{ loading ? '' : 'Submit' }}
 //   </Button>
 // Button 的 cva 里有 [&_svg]:size-4 [&_svg]:shrink-0，所以直接 slot 进 Button 就会对齐
-import { Loader2 } from 'lucide-vue-next';
+import { Loader2 } from '@lucide/vue';
 import { cn } from '@/lib/utils';
 
 defineProps({

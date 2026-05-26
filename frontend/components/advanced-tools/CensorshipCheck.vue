@@ -77,7 +77,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

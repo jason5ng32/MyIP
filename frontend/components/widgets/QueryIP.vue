@@ -75,7 +75,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
-import { Monitor, Search } from 'lucide-vue-next';
+import { Monitor, Search } from '@lucide/vue';
 
 const { t } = useI18n();
 

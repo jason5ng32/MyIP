@@ -81,7 +81,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
-import { Play } from 'lucide-vue-next';
+import { Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

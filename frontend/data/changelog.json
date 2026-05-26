@@ -1182,6 +1182,15 @@
       {
         "type": "improve",
         "change": {
+          "en": "Optimized the brand icons of the Connectivity Test",
+          "zh": "优化网络连通性测试的品牌图标",
+          "fr": "Optimisation des icônes de marque du test de connectivité",
+          "tr": "Ağ bağlantı testi marka simgeleri iyileştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Navbar will hide when scrolling on mobile",
           "zh": "导航栏在手机上会跟随滚动隐藏",
           "fr": "La barre de navigation se cache lors du défilement sur mobile",

@@ -16,7 +16,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff } from '@lucide/vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 

@@ -7,7 +7,7 @@
         <Button variant="ghost" size="icon" as-child class="size-6 text-foreground/70 hover:text-foreground">
           <a :href="t('page.footerLink')" target="_blank" rel="noopener" aria-label="Github"
             @click="trackEvent('Footer', 'FooterClick', 'Github')">
-            <Github />
+            <Icon icon="ri:github-line" />
           </a>
         </Button>
       </JnTooltip>
@@ -151,7 +151,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from 'lucide-vue-next';
+import { ArrowLeftCircle, Compass, ExternalLink, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from '@lucide/vue';
+import { Icon } from '@iconify/vue';
 
 const { t, locale } = useI18n();
 

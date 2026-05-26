@@ -66,7 +66,7 @@ import getCountryName from '@/data/country-name.js';
 import DataPairBar from './DataPairBar.vue';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/vue';
-import { Database, ExternalLink, Info } from 'lucide-vue-next';
+import { Database, ExternalLink, Info } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();

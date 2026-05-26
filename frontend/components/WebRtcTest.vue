@@ -21,13 +21,14 @@
 
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-      <Card v-for="stun in stunServers" :key="stun.id"
+      <Card v-for="(stun, index) in stunServers" :key="stun.id"
         class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
         <CardContent class="p-4">
           <!-- Top: service provider icon + name -->
           <div class="flex items-center gap-2 mb-1">
             <Flower class="size-6 text-muted-foreground shrink-0" />
-            <span class="text-base font-medium truncate">{{ stun.name }}</span>
+            <span class="text-base font-medium truncate">{{ t('webrtc.Name') }}</span>
+            <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
           </div>
 
           <!-- STUN URL (secondary information) -->
@@ -115,7 +116,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { Play, MapPin, Flower, Network, RotateCw, FileText, ChevronDown } from 'lucide-vue-next';
+import { Play, MapPin, Flower, Network, RotateCw, FileText, ChevronDown } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';
@@ -131,10 +132,10 @@ const { dotClass, textClass } = useStatusTone();
 const isStarted = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
-  { id: 'google', name: 'Google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'twilio', name: 'Twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'blackberry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
 ]);
 
 // Regex extracting the IP portion out of an ICE candidate line

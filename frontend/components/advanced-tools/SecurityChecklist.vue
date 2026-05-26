@@ -280,7 +280,7 @@ import {
     ShieldHalf,
     Smartphone,
     Users,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 // Security checklist icon mapping: directly use slug as key (slug itself is a semantic category name)
 const checklistIconMap = {

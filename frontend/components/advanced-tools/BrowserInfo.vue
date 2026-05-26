@@ -133,7 +133,7 @@ import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Spinner } from '@/components/ui/spinner';
-import { BriefcaseBusiness, Fingerprint, Info, Microscope } from 'lucide-vue-next';
+import { BriefcaseBusiness, Fingerprint, Info, Microscope } from '@lucide/vue';
 import { Card, CardContent } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 

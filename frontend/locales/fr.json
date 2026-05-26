@@ -642,6 +642,7 @@
   },
   "webrtc": {
     "id": "webrtc",
+    "Name": "Connexion WebRTC",
     "Title": "Test WebRTC Leak",
     "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
     "StatusWait": "En attente du test",

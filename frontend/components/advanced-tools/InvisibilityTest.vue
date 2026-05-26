@@ -170,7 +170,7 @@ import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { CircleCheck, CircleX, Info, ListChecks, Lock, Shield, Play } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Info, ListChecks, Lock, Shield, Play } from '@lucide/vue';
 
 const { t } = useI18n();
 

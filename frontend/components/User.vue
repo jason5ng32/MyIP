@@ -32,7 +32,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
-import { CircleCheck, HeartHandshake } from 'lucide-vue-next';
+import { CircleCheck, HeartHandshake } from '@lucide/vue';
 
 const { t } = useI18n();
 

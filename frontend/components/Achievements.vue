@@ -111,7 +111,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Award, CircleCheck, CircleX } from 'lucide-vue-next';
+import { Award, CircleCheck, CircleX } from '@lucide/vue';
 
 const { t } = useI18n();
 

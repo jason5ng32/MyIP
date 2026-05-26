@@ -176,7 +176,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeftRight, CalendarCheck2, Play, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();

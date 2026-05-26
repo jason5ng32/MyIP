@@ -143,7 +143,7 @@ import {
     Palette,
     SlidersHorizontal,
     Sun,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 const { t } = useI18n();
 

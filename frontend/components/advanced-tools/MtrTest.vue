@@ -75,7 +75,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from 'lucide-vue-next';
+import { Info,Play } from '@lucide/vue';
 
 const { t } = useI18n();
 
