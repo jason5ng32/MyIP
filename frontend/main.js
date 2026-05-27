@@ -19,7 +19,7 @@ import './style/style.css'
 // guard doesn't catch those keystrokes).
 if (import.meta.env.DEV) {
     const dbgOS = detectOS();
-    if (dbgOS.isAndroid || dbgOS.isIOS || window.innerWidth < 768) {
+    if (dbgOS.isAndroid || dbgOS.isIOS) {
         import('vconsole').then(({ default: VConsole }) => {
             new VConsole();
             window.__vConsoleActive = true;
