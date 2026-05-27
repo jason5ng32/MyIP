@@ -63,6 +63,14 @@ document.addEventListener(
   (event) => {
     const { key, target, metaKey, altKey, ctrlKey } = event;
 
+    // vConsole renders inside its own Shadow DOM, so when the user types in
+    // its filter / eval inputs the event's `target` (as seen from document)
+    // is the shadow host — typically a DIV — not the INPUT. The tagName
+    // guard below would let those keystrokes through and fire our global
+    // shortcuts. main.js sets this flag when vConsole boots; dev + mobile
+    // only, so prod is unaffected (the flag is undefined → falsy).
+    if (window.__vConsoleActive) return;
+
     if (target.tagName === "INPUT") return;
     if (metaKey || altKey || ctrlKey) return;
 
