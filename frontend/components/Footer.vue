@@ -102,9 +102,9 @@
                       class="shrink-0 shadow-none! rounded-full justify-center text-secondary p-1" 
                       :title="t('changelog.' + item.type)"
                       >
-                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-4" />
-                      <CirclePlus v-if="item.type === 'add'" class="size-4" />
-                      <BugOff v-if="item.type === 'fix'" class="size-4" />
+                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-3.5" />
+                      <CirclePlus v-if="item.type === 'add'" class="size-3.5" />
+                      <BugOff v-if="item.type === 'fix'" class="size-3.5" />
                     </Badge>
                     <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
                   </li>

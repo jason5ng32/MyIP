@@ -3,24 +3,19 @@
        in index.html — the only way to get a live status-bar tint on iOS PWA, since WebKit
        ignores JS theme-color writes and media-variant theme-color tags in standalone mode.
        Color tracks --page-bg (style.css), which follows .dark class. -->
-  <div
-    class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-colors duration-300"
-    style="height: env(safe-area-inset-top); background: var(--page-bg);"
-    aria-hidden="true"
-  ></div>
+  <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-colors duration-300"
+    style="height: env(safe-area-inset-top); background: var(--page-bg);" aria-hidden="true"></div>
   <header
     class="fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
-    'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isStandalone,
-    'bg-page-bg': isStandalone }">
-    <nav id="navbar-top"
-      class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
+    'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isStandalone || (isStandalone && !isMobile),
+    'bg-page-bg': isStandalone && isMobile }">
+    <nav id="navbar-top" class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
       <!-- Left: Hamburger (only mobile) + Brand -->
       <div class="flex items-center gap-2">
-        <Button v-if="isMobile" variant="ghost" size="icon" class="size-8"
-          :aria-expanded="isNavMenuOpen" aria-label="Toggle navigation menu"
-          @click="store.toggleSheet('navMenu')">
+        <Button v-if="isMobile" variant="ghost" size="icon" class="size-8" :aria-expanded="isNavMenuOpen"
+          aria-label="Toggle navigation menu" @click="store.toggleSheet('navMenu')">
           <Menu />
         </Button>
         <a href="#" @click="handleLogoClick"
@@ -36,17 +31,13 @@
 
       <!-- Middle: Desktop nav links + GitHub star badge (left aligned, next to brand) -->
       <div v-if="!isMobile" class="flex items-center gap-0.5">
-        <a v-for="item in navItems" :key="item" href="#"
-        class=""
-          :class="navLinkClass(item)"
+        <a v-for="item in navItems" :key="item" href="#" class="" :class="navLinkClass(item)"
           @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
           {{ t(`nav.${item}`) }}
         </a>
         <a :href="t('page.footerLink')" target="_blank" rel="noopener"
-          class="ml-2 inline-flex items-center hover:opacity-80 transition-opacity"
-          aria-label="View source on GitHub">
-          <img src="https://img.shields.io/github/stars/jason5ng32/MyIP"
-            alt="GitHub stars" class="h-5">
+          class="ml-2 inline-flex items-center hover:opacity-80 transition-opacity" aria-label="View source on GitHub">
+          <img src="https://img.shields.io/github/stars/jason5ng32/MyIP" alt="GitHub stars" class="h-5">
         </a>
       </div>
 
@@ -54,16 +45,14 @@
       <div class="ml-auto flex items-center gap-2">
         <!-- Mobile: GitHub icon -->
         <Button v-if="isMobile" variant="ghost" size="icon" class="size-8" as-child>
-          <a :href="t('page.footerLink')" target="_blank" rel="noopener"
-            aria-label="View source on GitHub">
+          <a :href="t('page.footerLink')" target="_blank" rel="noopener" aria-label="View source on GitHub">
             <Icon icon="ri:github-line" />
           </a>
         </Button>
 
         <!-- Preferences -->
         <JnTooltip :text="t('shortcutKeys.Preferences')">
-          <Button variant="ghost" size="icon" class="size-8"
-            aria-label="Open preferences" @click="OpenPreferences">
+          <Button variant="ghost" size="icon" class="size-8" aria-label="Open preferences" @click="OpenPreferences">
             <SlidersHorizontal />
           </Button>
         </JnTooltip>
@@ -72,15 +61,15 @@
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
             <!-- Not signed in -->
-            <Button v-if="!isSignedIn"  size="sm" @click="getUserInfo" class="h-8 gap-1.5">
+            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1.5">
               <span>{{ t('user.SignIn') }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo"
-              class="h-8 gap-1.5 px-1.5" aria-label="User menu">
+            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1.5 px-1.5"
+              aria-label="User menu">
               <span class="inline-flex size-6 overflow-hidden rounded-full">
-                <img :src="userPhotoURL" :alt="userName" :title="userName"
-                  class="size-full object-cover" referrerpolicy="no-referrer">
+                <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
+                  referrerpolicy="no-referrer">
               </span>
               <span v-if="!isMobile" class="text-sm font-medium max-w-40 truncate">{{ userName }}</span>
               <ChevronDown class="opacity-60" />
@@ -93,12 +82,14 @@
               <div class="px-2 pt-2 pb-3">
                 <div class="flex items-center gap-3">
                   <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
-                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover" referrerpolicy="no-referrer">
+                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover"
+                      referrerpolicy="no-referrer">
                   </span>
                   <div class="flex min-w-0 flex-1 flex-col gap-1">
                     <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
                     <span v-if="remoteUserInfoFetched">
-                      <Badge :class="levelBadgeClass" class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
+                      <Badge :class="levelBadgeClass"
+                        class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
                         {{ t('user.Level.' + remoteUserInfo.userLevel) }}
                       </Badge>
                     </span>
@@ -113,7 +104,8 @@
                   <div class="flex items-baseline justify-between gap-2">
                     <dt class="text-muted-foreground">{{ t('user.Fields.FunctionUses') }}</dt>
                     <dd class="font-medium">
-                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{ t('user.Fields.Times') }}</span>
+                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses.total }} {{
+                        t('user.Fields.Times') }}</span>
                       <span v-else class="text-muted-foreground">{{ t('user.Fields.Fetching') }}</span>
                     </dd>
                   </div>
@@ -164,8 +156,7 @@
           <SheetClose />
         </div>
         <nav class="flex flex-col gap-0.5 p-3">
-          <a v-for="item in navItems" :key="item" href="#"
-            :class="navLinkClass(item, { block: true })"
+          <a v-for="item in navItems" :key="item" href="#" :class="navLinkClass(item, { block: true })"
             @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
             {{ t(`nav.${item}`) }}
           </a>
@@ -214,8 +205,8 @@ const currentSection = computed(() => store.currentSection);
 const loaded = ref(false);
 
 // Check if the app is running in standalone mode
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
-|| window.navigator.standalone;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  || window.navigator.standalone;
 
 const navItems = SECTION_IDS;
 
@@ -241,12 +232,12 @@ const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 const levelBadgeClass = computed(() => {
   const level = remoteUserInfo.value?.userLevel;
   switch (level) {
-    case 'Premium':        return 'bg-action text-action-foreground';   
-    case 'Owner':          return 'bg-foreground text-background';      
-    case 'Developer':      return 'bg-success text-success-foreground'; 
-    case 'HonoraryMember': return 'bg-warning text-warning-foreground'; 
+    case 'Premium': return 'bg-action text-action-foreground';
+    case 'Owner': return 'bg-foreground text-background';
+    case 'Developer': return 'bg-success text-success-foreground';
+    case 'HonoraryMember': return 'bg-warning text-warning-foreground';
     case 'Standard':
-    default:               return 'bg-muted-foreground text-background';
+    default: return 'bg-muted-foreground text-background';
   }
 });
 
@@ -363,11 +354,21 @@ defineExpose({ OpenPreferences });
   animation: jn-shimmer-slide 1s linear infinite;
 }
 
-.jn-shimmer-light::before { background-color: rgb(0, 0, 0); }
-.jn-shimmer-dark::before  { background-color: rgb(255, 255, 255); }
+.jn-shimmer-light::before {
+  background-color: rgb(0, 0, 0);
+}
+
+.jn-shimmer-dark::before {
+  background-color: rgb(255, 255, 255);
+}
 
 @keyframes jn-shimmer-slide {
-  from { left: -100%; }
-  to   { left: 100%; }
+  from {
+    left: -100%;
+  }
+
+  to {
+    left: 100%;
+  }
 }
 </style>
