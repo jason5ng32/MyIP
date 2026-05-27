@@ -71,6 +71,7 @@
     <!-- Expanded view: bottom Drawer (mobile-fullscreen / md+ sheet at 90vh). -->
     <Drawer v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
         <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
+        :safe-area-top="isMobile"
             class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
             <!-- Screenshot root; control widgets inside opt out via `data-screenshot-exclude`. -->
             <div data-screenshot-root class="flex flex-col h-full bg-background">
@@ -170,7 +171,10 @@ import { ImageDown, Maximize2, Network, ZoomIn, ZoomOut, RotateCcw } from '@luci
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Spinner } from '@/components/ui/spinner';
 import ScreenshotButton from '@/components/widgets/ScreenshotButton.vue';
+import { useMainStore } from '@/store';
 
+const store = useMainStore();
+const isMobile = computed(() => store.isMobile);
 const { t } = useI18n();
 const placeholderSizes = [12, 10, 8, 6, 4];
 
