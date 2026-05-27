@@ -1,28 +1,27 @@
 // Barrel + retry runner for the homepage DNS leak test providers.
 //
-// Each provider in this directory is a single async function that, on
-// every call, generates a fresh subdomain prefix, hits its upstream, and
-// returns either { ip, testUrl } or throws. They are stateless and have
-// no Vue / store dependency — the consuming component (DnsLeaksTest.vue)
-// writes results into its reactive `leakTest[]` array and runs the
+// Each provider in this directory is a self-describing object:
+//   { id, name, run() }
+// where `run()` generates a fresh subdomain prefix, hits the upstream, and
+// resolves to `{ ip }` or throws. Providers are stateless and have no Vue /
+// store dependency — the consuming component (DnsLeaksTest.vue) iterates a
+// list of them, wires results into its reactive `leakTest[]`, and runs the
 // MaxMind geo lookup separately.
 
-export { runIpApi } from './ipapi.js';
-export { runSurfshark } from './surfshark.js';
-export { runIpleak } from './ipleak.js';
-export { runBrowserLeaks } from './browserleaks.js';
+export { ipApi } from './ipapi.js';
+export { surfshark } from './surfshark.js';
+export { ipleak } from './ipleak.js';
+export { browserleaks } from './browserleaks.js';
 
-// Invoke `provider` up to `attempts` times. Each invocation regenerates
-// its subdomain prefix, so retries trigger fresh DNS lookups upstream
-// rather than returning cached failures. `opts.onUrl(host)` fires on
-// every attempt so the UI can display the host currently being probed.
-// Returns the first successful result; throws the last error if all
-// attempts failed.
-export async function runWithRetry(provider, opts = {}, attempts = 3) {
+// Invoke `provider.run()` up to `attempts` times. Because each provider
+// regenerates its prefix internally on every call, retries trigger fresh
+// DNS lookups upstream rather than returning cached failures. Returns the
+// first successful result; throws the last error if every attempt failed.
+export async function runWithRetry(provider, attempts = 3) {
     let lastError;
     for (let i = 0; i < attempts; i++) {
         try {
-            return await provider(opts);
+            return await provider.run();
         } catch (err) {
             lastError = err;
         }

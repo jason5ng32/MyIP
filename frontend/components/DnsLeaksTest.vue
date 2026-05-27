@@ -34,10 +34,11 @@
 
               <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
             </div>
-            <!-- Test URL (secondary information) — single line, ellipsis inside card -->
-            <p v-if="leak.testUrl" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate"
-              :title="leak.testUrl">
-              {{ leak.testUrl }}
+            <!-- Provider name (secondary information) — fixed per card, sourced
+                 from each provider's `name` export in utils/dnsleaks. -->
+            <p class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate"
+              :title="leak.providerName">
+              {{ leak.providerName }}
             </p>
           </div>
 
@@ -129,8 +130,12 @@ import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
-  runIpApi, runSurfshark, runIpleak, runBrowserLeaks, runWithRetry,
+  ipApi, surfshark, ipleak, browserleaks, runWithRetry,
 } from '@/utils/dnsleaks';
+
+// One source of truth for which providers to run and in what order. Adding
+// a new provider = create the file under utils/dnsleaks and append it here.
+const PROVIDERS = [ipApi, surfshark, ipleak, browserleaks];
 
 
 const { t } = useI18n();
@@ -175,12 +180,11 @@ const createDefaultCard = () => ({
   org: t('dnsleaktest.StatusWait'),
 });
 
-const leakTest = reactive([
-  { ...createDefaultCard(), id: 'ipapi' },
-  { ...createDefaultCard(), id: 'surfshark' },
-  { ...createDefaultCard(), id: 'ipleak' },
-  { ...createDefaultCard(), id: 'browserleaks' },
-]);
+const leakTest = reactive(PROVIDERS.map((p) => ({
+  ...createDefaultCard(),
+  id: p.id,
+  providerName: p.name,
+})));
 
 // ISP + country via MaxMind (same pipeline as WebRtcTest.vue). Returns
 // { country_code, country, org } on success, or null on any miss.
@@ -233,15 +237,11 @@ const markLeakCardError = (index) => {
 };
 
 // Run one provider against its card slot, with retry (3 attempts, fresh
-// prefix per attempt — see `runWithRetry` in utils/dnsleaks). The current
-// attempt's host is written to `testUrl` as it changes, so the user sees
-// the latest probe; on full failure (all attempts threw) the card is
-// flipped to the error state.
+// prefix per attempt — see `runWithRetry` in utils/dnsleaks). On full
+// failure (all attempts threw) the card is flipped to the error state.
 const runProvider = async (index, provider) => {
   try {
-    const { ip } = await runWithRetry(provider, {
-      onUrl: (host) => { leakTest[index].testUrl = host; },
-    });
+    const { ip } = await runWithRetry(provider);
     leakTest[index].ip = ip;
     await applyMaxMindGeo(index, ip);
   } catch (error) {
@@ -250,13 +250,13 @@ const runProvider = async (index, provider) => {
   }
 };
 
-// Check all
+// Check all. Staggers startup by 300ms per provider to avoid a thundering-
+// herd on first paint.
 const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
     leakTest.forEach((server) => {
-      server.testUrl = '';
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
       server.country_code = '';
@@ -270,12 +270,9 @@ const checkAllDNSLeakTest = async (isRefresh) => {
     }, delay);
   });
 
-  const promises = [
-    delayedRun(runIpApi, 0, 100),
-    delayedRun(runSurfshark, 1, 400),
-    delayedRun(runIpleak, 2, 700),
-    delayedRun(runBrowserLeaks, 3, 1000),
-  ];
+  const promises = PROVIDERS.map((provider, index) =>
+    delayedRun(provider, index, 100 + index * 300),
+  );
 
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));

@@ -17,15 +17,16 @@ const pickLeakIp = (data) => {
     return null;
 };
 
-export async function runSurfshark({ onUrl } = {}) {
-    const host = `${generatePrefix()}.ipv4.surfsharkdns.com`;
-    const url = `https://${host}`;
-    onUrl?.(host);
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) throw new Error('surfshark: response not ok');
-    const data = await response.json();
-    const ip = pickLeakIp(data);
-    if (!ip) throw new Error('surfshark: no IP in response');
-    return { ip, testUrl: host };
-}
+export const surfshark = {
+    id: 'surfshark',
+    name: 'surfsharkdns.com',
+    async run() {
+        const host = `${generatePrefix()}.ipv4.surfsharkdns.com`;
+        const response = await fetchWithTimeout(`https://${host}`);
+        if (!response.ok) throw new Error('surfshark: response not ok');
+        const data = await response.json();
+        const ip = pickLeakIp(data);
+        if (!ip) throw new Error('surfshark: no IP in response');
+        return { ip };
+    },
+};

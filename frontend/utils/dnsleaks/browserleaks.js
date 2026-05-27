@@ -28,15 +28,16 @@ const pickIp = (data) => {
     return ips[0];
 };
 
-export async function runBrowserLeaks({ onUrl } = {}) {
-    const host = `${generateToken()}${HOST_SUFFIX}`;
-    const url = `https://${host}/`;
-    onUrl?.(host);
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) throw new Error('browserleaks: response not ok');
-    const data = await response.json();
-    const ip = pickIp(data);
-    if (!ip) throw new Error('browserleaks: no IP in response');
-    return { ip, testUrl: host };
-}
+export const browserleaks = {
+    id: 'browserleaks',
+    name: 'browserleaks.net',
+    async run() {
+        const host = `${generateToken()}${HOST_SUFFIX}`;
+        const response = await fetchWithTimeout(`https://${host}/`);
+        if (!response.ok) throw new Error('browserleaks: response not ok');
+        const data = await response.json();
+        const ip = pickIp(data);
+        if (!ip) throw new Error('browserleaks: no IP in response');
+        return { ip };
+    },
+};

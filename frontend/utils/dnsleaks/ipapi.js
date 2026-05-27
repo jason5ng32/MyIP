@@ -10,14 +10,15 @@ const generatePrefix = () => {
     return unixTime + fixedString + randomString;
 };
 
-export async function runIpApi({ onUrl } = {}) {
-    const host = `${generatePrefix()}.edns.ip-api.com`;
-    const url = `https://${host}/json`;
-    onUrl?.(host);
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) throw new Error('ipapi: response not ok');
-    const data = await response.json();
-    if (!data?.dns?.ip) throw new Error('ipapi: missing dns.ip');
-    return { ip: data.dns.ip, testUrl: host };
-}
+export const ipApi = {
+    id: 'ipapi',
+    name: 'ip-api.com',
+    async run() {
+        const host = `${generatePrefix()}.edns.ip-api.com`;
+        const response = await fetchWithTimeout(`https://${host}/json`);
+        if (!response.ok) throw new Error('ipapi: response not ok');
+        const data = await response.json();
+        if (!data?.dns?.ip) throw new Error('ipapi: missing dns.ip');
+        return { ip: data.dns.ip };
+    },
+};

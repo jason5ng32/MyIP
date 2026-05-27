@@ -30,15 +30,16 @@ const pickTopIp = (ipMap) => {
     return topIp;
 };
 
-export async function runIpleak({ onUrl } = {}) {
-    const host = `${generateSession()}${HOST_SUFFIX}`;
-    const url = `https://${host}/dnsdetection/`;
-    onUrl?.(host);
-
-    const response = await fetchWithTimeout(url);
-    if (!response.ok) throw new Error('ipleak: response not ok');
-    const data = await response.json();
-    const ip = pickTopIp(data?.ip);
-    if (!ip) throw new Error('ipleak: no IP in response');
-    return { ip, testUrl: host };
-}
+export const ipleak = {
+    id: 'ipleak',
+    name: 'ipleak.net',
+    async run() {
+        const host = `${generateSession()}${HOST_SUFFIX}`;
+        const response = await fetchWithTimeout(`https://${host}/dnsdetection/`);
+        if (!response.ok) throw new Error('ipleak: response not ok');
+        const data = await response.json();
+        const ip = pickTopIp(data?.ip);
+        if (!ip) throw new Error('ipleak: no IP in response');
+        return { ip };
+    },
+};
