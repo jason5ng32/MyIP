@@ -113,20 +113,9 @@ const submitQuery = async () => {
 
 const isOpen = ref(false);
 
-// Programmatic focus here is only useful on desktop. On iOS, focus outside of
-// the direct tap on the <input> doesn't trigger the native keyboard + visual
-// viewport scroll-into-view, so it's better to let the user tap the input
-// themselves and let iOS handle the whole dance natively.
-// iPadOS 13+ reports a Mac user-agent, so we detect it via the "lying Mac"
-// trick: a Macintosh UA that also claims multi-touch capability. We avoid
-// `navigator.platform` because it's deprecated.
-const isIOS = typeof navigator !== 'undefined'
-    && (/iPad|iPhone|iPod/.test(navigator.userAgent)
-        || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
-
 const onOpenChange = (val) => {
     isOpen.value = val;
-    if (val && !isIOS) {
+    if (val) {
         nextTick(() => {
             const inputElement = document.getElementById('inputIP');
             if (inputElement) inputElement.focus();
