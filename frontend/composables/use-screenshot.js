@@ -72,6 +72,43 @@ function inlineSvgComputedStyles(root) {
     return () => restorers.forEach((fn) => fn());
 }
 
+// CSS `filter: blur()` doesn't render reliably in iOS Safari's SVG
+// <foreignObject> path. Swap it for an SVG <feGaussianBlur> referenced via
+// `filter: url(#id)` — SVG filters are native to the SVG renderer and
+// survive serialization. The filter <svg> lives inside the capture root so
+// it gets cloned alongside the masked elements, keeping the url() reference
+// self-contained.
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function freezeInfoMaskForCapture(root) {
+    if (!root || typeof document === 'undefined') return () => {};
+    if (!document.documentElement.hasAttribute('data-mask-level')) return () => {};
+    const targets = root.querySelectorAll('[data-mask="ip"]');
+    if (!targets.length) return () => {};
+
+    const filterId = `myip-mask-blur-${Math.random().toString(36).slice(2, 8)}`;
+    const holder = document.createElementNS(SVG_NS, 'svg');
+    holder.setAttribute('aria-hidden', 'true');
+    holder.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden');
+    const filterEl = document.createElementNS(SVG_NS, 'filter');
+    filterEl.setAttribute('id', filterId);
+    const blur = document.createElementNS(SVG_NS, 'feGaussianBlur');
+    blur.setAttribute('stdDeviation', '6');
+    filterEl.appendChild(blur);
+    holder.appendChild(filterEl);
+    root.appendChild(holder);
+
+    const restorers = [() => holder.remove()];
+    targets.forEach((el) => {
+        const orig = el.getAttribute('style');
+        el.setAttribute('style', (orig || '') + `;filter:url(#${filterId})`);
+        restorers.push(() => {
+            if (orig === null) el.removeAttribute('style');
+            else el.setAttribute('style', orig);
+        });
+    });
+    return () => restorers.forEach((fn) => fn());
+}
+
 export function useScreenshot() {
     const isCapturing = ref(false);
 
@@ -93,6 +130,7 @@ export function useScreenshot() {
                 if (typeof teardown === 'function') cleanups.push(teardown);
             }
             cleanups.push(inlineSvgComputedStyles(element));
+            cleanups.push(freezeInfoMaskForCapture(element));
             const { toPng } = await import('html-to-image');
             const dataUrl = await toPng(element, {
                 pixelRatio,
