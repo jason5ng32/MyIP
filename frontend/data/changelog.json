@@ -1191,6 +1191,15 @@
       {
         "type": "improve",
         "change": {
+          "en": "Enriched the information display of WebRTC Test and Rule Test",
+          "zh": "丰富 WebRTC 测试和规则测试的信息展示",
+          "fr": "Amélioration de l'affichage des informations du test WebRTC et du test de règles",
+          "tr": "WebRTC Test ve Rule Test bilgi görüntüleme iyileştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Navbar will hide when scrolling on mobile",
           "zh": "导航栏在手机上会跟随滚动隐藏",
           "fr": "La barre de navigation se cache lors du défilement sur mobile",

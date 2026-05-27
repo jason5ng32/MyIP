@@ -118,13 +118,11 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import getCountryName from '@/data/country-name.js';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useMaxmind } from '@/composables/use-maxmind.js';
 import { EthernetPort, Play, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
@@ -141,7 +139,7 @@ const PROVIDERS = [ipApi, surfshark, ipleak, browserleaks];
 const { t } = useI18n();
 const store = useMainStore();
 const router = useRouter();
-const lang = computed(() => store.lang);
+const { lookupMaxmind } = useMaxmind();
 const isStarted = ref(false);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
@@ -186,38 +184,9 @@ const leakTest = reactive(PROVIDERS.map((p) => ({
   providerName: p.name,
 })));
 
-// ISP + country via MaxMind (same pipeline as WebRtcTest.vue). Returns
-// { country_code, country, org } on success, or null on any miss.
-const fetchIpGeoFromMaxMind = async (ip) => {
-  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
-  if (!source) return null;
-  let setLang = lang.value;
-  if (setLang === 'zh') setLang = 'zh-CN';
-
-  try {
-    const url = store.getDbUrl(source.id, ip, setLang);
-    const response = await fetchWithTimeout(url);
-    const data = await response.json();
-    const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
-    if (!ipData) return null;
-    const country_code = (ipData.country_code || '').toLowerCase();
-    const country = country_code
-      ? getCountryName(ipData.country_code, lang.value)
-      : '';
-    return {
-      country_code,
-      country,
-      org: ipData.isp || '',
-    };
-  } catch (error) {
-    console.error('Error fetching IP geo from MaxMind', error);
-    return null;
-  }
-};
-
 // Apply MaxMind lookup to a card that already has a resolved leak IP.
 const applyMaxMindGeo = async (index, ip) => {
-  const geo = await fetchIpGeoFromMaxMind(ip);
+  const geo = await lookupMaxmind(ip);
   if (geo) {
     leakTest[index].country_code = geo.country_code;
     leakTest[index].country = geo.country;

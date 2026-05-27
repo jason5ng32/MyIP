@@ -36,8 +36,18 @@
                             :class="textClass(toneOf(test))" />
                     </div>
 
-                    <!-- Country sub-block -->
-                    <dl class="rounded-md bg-muted/50 p-3 text-sm">
+                    <!-- ISP + Country sub-block -->
+                    <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <EthernetPort class="size-3.5" />
+                                <span>{{ t('ipInfos.ISP') }}</span>
+                            </dt>
+                            <dd class="font-medium wrap-break-word" :title="test.org">
+                                <span v-if="!isFieldPending(test.org)">{{ test.org }}</span>
+                                <span v-else class="text-muted-foreground font-normal">—</span>
+                            </dd>
+                        </div>
                         <div>
                             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                                 <MapPin class="size-3.5" />
@@ -79,8 +89,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useMaxmind } from '@/composables/use-maxmind.js';
 import { Icon } from '@iconify/vue';
-import { MapPin, RotateCw, Waypoints, SignpostBig } from '@lucide/vue';
+import { EthernetPort, MapPin, RotateCw, Waypoints, SignpostBig } from '@lucide/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
@@ -91,12 +102,14 @@ const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
 const { dotClass, textClass } = useStatusTone();
+const { lookupMaxmind } = useMaxmind();
 
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
     ip: t('ruletest.StatusWait'),
     country_code: '',
     country: t('ruletest.StatusWait'),
+    org: t('ruletest.StatusWait'),
 });
 
 const ruleTests = ref(Array.from({ length: 8 }, (_, index) => ({
@@ -137,10 +150,19 @@ const fetchTrace = async (id, url) => {
             ruleTests.value[id].country_code = country;
             ruleTests.value[id].country = getCountryName(country, lang.value);
         }
+        // Enrich with MaxMind for ISP. Trace gives IP + country code but
+        // no org — MaxMind fills that gap. Country resolution stays on
+        // trace (authoritative for each ptest worker's egress), so a
+        // MaxMind miss leaves the existing country untouched.
+        if (ipLine) {
+            const geo = await lookupMaxmind(ruleTests.value[id].ip);
+            ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
+        }
     } catch (error) {
         ruleTests.value[id].ip = t('ruletest.StatusError');
         ruleTests.value[id].country_code = '';
         ruleTests.value[id].country = t('ruletest.StatusError');
+        ruleTests.value[id].org = t('ruletest.StatusError');
         console.error('Error fetching Data:', error);
     }
 };
@@ -152,6 +174,7 @@ const checkAllRuleTest = async (refresh = false) => {
             test.ip = t('ruletest.StatusWait');
             test.country = t('ruletest.StatusWait');
             test.country_code = '';
+            test.org = t('ruletest.StatusWait');
         });
     }
 
