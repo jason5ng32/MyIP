@@ -3,8 +3,8 @@
         <Button v-show="showMaskButton"
             size="icon"
             type="button"
+            variant="secondary"
             class="fixed bottom-[86px] z-1050 rounded-full shadow-lg cursor-pointer"
-            :class="stateClasses"
             :style="positionStyle"
             aria-label="Toggle Info Mask"
             @click="toggleInfoMask">
@@ -27,12 +27,6 @@ const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     infoMaskLevel: Number,
     toggleInfoMask: Function,
 });
-
-// Two-state color: idle (success) vs IP masked (warning).
-const stateClasses = computed(() => infoMaskLevel === 0
-    ? 'bg-success text-success-foreground hover:bg-success/80'
-    : 'bg-warning text-warning-foreground hover:bg-warning/80',
-);
 
 // Wide screen (>1600px) align to content area right (max-width 1600px), otherwise stick right 20px
 const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);

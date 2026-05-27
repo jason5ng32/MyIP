@@ -38,21 +38,11 @@ export function useInfoMask({ store, t }) {
         trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
         infoMaskLevel.value = infoMaskLevel.value === 0 ? 1 : 0;
 
-        if (infoMaskLevel.value === 1) {
-            store.setAlert(
-                true,
-                'text-warning',
-                t('alert.maskedInfoMessage'),
-                t('alert.maskedInfoTitle'),
-            );
-        } else {
-            store.setAlert(
-                true,
-                'text-danger',
-                t('alert.unmaskedInfoMessage'),
-                t('alert.unmaskedInfoTitle'),
-            );
-        }
+        // Masking is a neutral toggle, not a success/warning state — both
+        // directions surface the same info-toned toast.
+        const titleKey = infoMaskLevel.value === 1 ? 'alert.maskedInfoTitle' : 'alert.unmaskedInfoTitle';
+        const messageKey = infoMaskLevel.value === 1 ? 'alert.maskedInfoMessage' : 'alert.unmaskedInfoMessage';
+        store.setAlert(true, 'text-info', t(messageKey), t(titleKey));
     };
 
     // Mirror the level to <html data-mask-level="…"> so the global CSS rule can

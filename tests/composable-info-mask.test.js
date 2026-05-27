@@ -43,15 +43,15 @@ describe('useInfoMask()', () => {
     assert.equal(composable.isInfosLoaded.value, true);
   });
 
-  it('toggle flips 0 ↔ 1 and fires the matching alert', () => {
+  it('toggle flips 0 ↔ 1 and fires a neutral info toast in both directions', () => {
     composable.toggleInfoMask();
     assert.equal(composable.infoMaskLevel.value, 1);
-    assert.equal(store.state.lastAlert.style, 'text-warning');
+    assert.equal(store.state.lastAlert.style, 'text-info');
     assert.equal(store.state.lastAlert.title, '<alert.maskedInfoTitle>');
 
     composable.toggleInfoMask();
     assert.equal(composable.infoMaskLevel.value, 0);
-    assert.equal(store.state.lastAlert.style, 'text-danger');
+    assert.equal(store.state.lastAlert.style, 'text-info');
     assert.equal(store.state.lastAlert.title, '<alert.unmaskedInfoTitle>');
   });
 
