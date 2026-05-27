@@ -1207,6 +1207,15 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "You can now mask IP when taking screenshots",
+          "zh": "现在可以给 IP 打码，保护隐私",
+          "fr": "Vous pouvez maintenant masquer les IP lors des captures d'écran",
+          "tr": "Ekran görüntülerinde IP'leri gizleyebilirsiniz"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed a bug that caused the PWA status bar color to not match the theme",
