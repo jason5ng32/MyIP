@@ -40,6 +40,7 @@
         <!-- Tool details Drawer -->
         <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
             <DrawerContent :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
+                :safe-area-top="isMobile || isFullScreen"
                 :class="['jn-tools-drawer overflow-hidden', (isMobile || isFullScreen) ? 'h-full rounded-none' : 'h-[85vh]']">
                 <!-- Drawer internal header -->
                 <div class="flex items-center gap-2 px-4 pt-1 pb-3 jn-drawer-header shrink-0">
