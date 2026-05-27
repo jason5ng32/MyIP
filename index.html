@@ -100,10 +100,15 @@
       padding: 0;
     }
 
-    /* Keep page content below the iOS safe-area (transparent status
-       bar). env() resolves to 0 on non-notch platforms — no effect. */
+    /* Reserve space at the top of the body for: (a) the iOS safe-area
+       (transparent status bar) — `env()` resolves to 0 on non-notch
+       platforms, and (b) the fixed Nav (3.5rem = h-14 in Nav.vue). The Nav
+       used to be `position: sticky` and lived in the normal flow, so no
+       padding was needed; switching it to `fixed` lets the body rubber-band
+       bounce on iOS without dragging the Nav along, but now we have to
+       compensate for the Nav's lost flow height here. */
     body {
-      padding-top: env(safe-area-inset-top);
+      padding-top: calc(env(safe-area-inset-top) + 3.5rem);
     }
 
     html {
@@ -216,12 +221,10 @@
        a missing inline script doesn't strand the user on a blank screen. */
     html[data-booting] #app {
       opacity: 0;
-      transform: scale(0.94);
     }
 
     #app {
-      transform-origin: center center;
-      transition: opacity 320ms ease-out, transform 320ms ease-out;
+      transition: opacity 320ms ease-out;
     }
 
     #app.jn-app-enter {
