@@ -3,7 +3,7 @@
         <Button v-show="showMaskButton"
             size="icon"
             type="button"
-            class="fixed bottom-[70px] z-1050 rounded-full shadow-lg cursor-pointer"
+            class="fixed bottom-[86px] z-1050 rounded-full shadow-lg cursor-pointer"
             :class="stateClasses"
             :style="positionStyle"
             aria-label="Toggle Info Mask"
@@ -40,9 +40,9 @@ const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
 const positionStyle = computed(() => {
     if (screenWidth.value > 1600) {
         const spaceOnRight = (screenWidth.value - 1600) / 2;
-        return { right: `${spaceOnRight + 20}px` };
+        return { right: `${spaceOnRight + 18}px` };
     }
-    return { right: '20px' };
+    return { right: '18px' };
 });
 const handleResize = () => { screenWidth.value = window.innerWidth; };
 

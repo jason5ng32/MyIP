@@ -2,7 +2,7 @@
     <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
-            class="fixed bottom-6 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
+            class="fixed bottom-9 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
             @click="openQueryIP">
             <Search class="size-4" />
         </Button>
@@ -169,9 +169,9 @@ const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
 const positionStyle = computed(() => {
     if (screenWidth.value > 1600) {
         const spaceOnRight = (screenWidth.value - 1600) / 2;
-        return { right: `${spaceOnRight + 20}px` };
+        return { right: `${spaceOnRight + 18}px` };
     }
-    return { right: '20px' };
+    return { right: '18px' };
 });
 const handleResize = () => { screenWidth.value = window.innerWidth; };
 onMounted(() => window.addEventListener('resize', handleResize));
