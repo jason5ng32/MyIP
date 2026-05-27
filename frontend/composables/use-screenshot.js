@@ -5,6 +5,34 @@
 import { ref } from 'vue';
 import { trackEvent } from '../utils/use-analytics.js';
 
+// On touch-primary devices route through the OS share sheet — iOS in
+// particular surfaces "Save Image" → Photos there, while a plain <a download>
+// on iOS Safari only saves to Files. Desktop browsers keep the classic
+// download path so a click doesn't unexpectedly open a share UI.
+async function deliverImage(dataUrl, filename) {
+    const wantsShare = typeof window !== 'undefined'
+        && window.matchMedia?.('(pointer: coarse)').matches
+        && typeof navigator !== 'undefined'
+        && typeof navigator.canShare === 'function';
+    if (wantsShare) {
+        try {
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], filename, { type: blob.type || 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: filename });
+                return;
+            }
+        } catch (err) {
+            if (err?.name === 'AbortError') return;  // user dismissed the sheet
+            // Anything else: fall through to download.
+        }
+    }
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = filename;
+    a.click();
+}
+
 export function slugifyForFilename(text, fallback = 'image') {
     return String(text || '')
         .toLowerCase()
@@ -72,10 +100,10 @@ export function useScreenshot() {
                 filter: (node) => !(node instanceof HTMLElement)
                     || !node.hasAttribute('data-screenshot-exclude'),
             });
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = filename || `myip-${Date.now()}.png`;
-            a.click();
+            // Restore DOM before opening share sheet / triggering download,
+            // so the page behind the iOS share sheet shows the normal UI.
+            while (cleanups.length) cleanups.pop()();
+            await deliverImage(dataUrl, filename || `myip-${Date.now()}.png`);
             return true;
         } catch (err) {
             console.error('Screenshot failed:', err);

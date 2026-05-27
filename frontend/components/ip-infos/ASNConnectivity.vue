@@ -96,7 +96,7 @@
                         </button>
                         <span class="w-px h-5 bg-border mx-0.5" aria-hidden="true"></span>
                         <ScreenshotButton
-                            filename-prefix="myip-asn"
+                            filename-prefix="asn-connectivity"
                             :filename-label="props.asn"
                             :track-label="`AS${props.asn}`"
                             :before-capture="prepareGraphForCapture">

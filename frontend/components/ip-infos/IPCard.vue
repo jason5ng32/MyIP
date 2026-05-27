@@ -16,7 +16,7 @@
             </div>
             <div class="shrink-0 flex items-center gap-1" data-screenshot-exclude>
                 <ScreenshotButton
-                    filename-prefix="myip-card"
+                    filename-prefix="myip"
                     :filename-label="card.source"
                     :track-label="card.source || 'unknown'"
                     :disabled="!hasData"
