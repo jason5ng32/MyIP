@@ -28,7 +28,7 @@
                 <!-- Monitor is inline inside FitText so it rides the IP's
                      first line; Copy stays a flex sibling so ellipsis
                      never clips it. -->
-                <div class="px-4 py-3 flex items-start gap-2 min-w-0">
+                <div class="px-4 py-3 flex items-start gap-2 min-w-0" data-mask="ip">
                     <FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
                         class="font-mono font-semibold min-w-0 items-start">
                         <template #prefix >
@@ -98,9 +98,7 @@ const props = defineProps({
 defineEmits(['refresh-card']);
 
 // Three state check: has data (normal) / error / loading
-const hasData = computed(() =>
-    Boolean(props.card.asn) || props.card.ip === '2001:4860:4860::8888'
-);
+const hasData = computed(() => Boolean(props.card.asn));
 const isErrorState = computed(() =>
     props.card.ip === t('ipInfos.IPv4Error') || props.card.ip === t('ipInfos.IPv6Error')
 );

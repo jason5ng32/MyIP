@@ -50,7 +50,7 @@
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
             <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip" class="font-mono min-w-0"
-              :class="textClass(toneOf(leak))" />
+              :class="textClass(toneOf(leak))" data-mask="ip" />
           </div>
 
           <!-- ISP + Country sub-block -->

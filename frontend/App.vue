@@ -111,7 +111,6 @@ if (loadingElement) {
 
 // Info mask
 const { infoMaskLevel, isInfosLoaded, showMaskButton, toggleInfoMask } = useInfoMask({
-    refs: { IPCheckRef, webRTCRef, dnsLeaksRef },
     store,
     t,
 });

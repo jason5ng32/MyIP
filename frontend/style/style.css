@@ -157,6 +157,19 @@
 
 /* === Custom CSS === */
 
+/* InfoMask — CSS-only privacy blur.
+   The toggle widget mirrors its on/off state to <html data-mask-level="1">; IP
+   cells throughout the app mark themselves with data-mask="ip". A blur filter
+   then renders those values unreadable in screenshots without mutating any data,
+   so toggling on/off is instantaneous and screenshot-safe. */
+[data-mask-level="1"] [data-mask="ip"] {
+  filter: blur(7px) saturate(0.6);
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.25s ease;
+}
+
 @keyframes jn-collapsible-down {
   from { height: 0; }
   to { height: var(--reka-collapsible-content-height); }

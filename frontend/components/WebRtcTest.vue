@@ -46,7 +46,7 @@
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
             <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip" class="font-mono min-w-0"
-              :class="textClass(toneOf(stun))" />
+              :class="textClass(toneOf(stun))" data-mask="ip" />
           </div>
 
           <!-- NAT + ISP + Country -->

@@ -28,12 +28,11 @@ const { showMaskButton, infoMaskLevel, toggleInfoMask } = defineProps({
     toggleInfoMask: Function,
 });
 
-// Three state colors
-const stateClasses = computed(() => ({
-    'bg-success text-success-foreground hover:bg-success/80': infoMaskLevel === 0,
-    'bg-warning text-warning-foreground hover:bg-warning/80': infoMaskLevel === 1,
-    'bg-secondary text-secondary-foreground hover:bg-secondary/80': infoMaskLevel === 2,
-}));
+// Two-state color: idle (success) vs IP masked (warning).
+const stateClasses = computed(() => infoMaskLevel === 0
+    ? 'bg-success text-success-foreground hover:bg-success/80'
+    : 'bg-warning text-warning-foreground hover:bg-warning/80',
+);
 
 // Wide screen (>1600px) align to content area right (max-width 1600px), otherwise stick right 20px
 const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
