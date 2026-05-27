@@ -71,7 +71,7 @@
      safe-area painter (Nav.vue). Must stay in sync with the literal
      hex values in: index.html inline `html { background }`, index.html
      <meta theme-color>, public/manifest.webmanifest. */
-  --page-bg: #ffffff;
+  --page-bg: #f4f4f4;
 }
 
 .dark {
@@ -134,6 +134,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-page-bg: var(--page-bg);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);

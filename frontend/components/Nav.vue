@@ -11,8 +11,10 @@
 
   <!-- Nav -->
   <header
-    class="sticky top-[env(safe-area-inset-top)] z-40 w-full border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur transition-transform duration-300 ease-out will-change-transform"
-    :class="{ '-translate-y-full': isNavHidden }">
+    class="sticky top-[env(safe-area-inset-top)] z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
+    :class="{ '-translate-y-full': isNavHidden, 
+    'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isStandalone,
+    'bg-page-bg': isStandalone }">
     <nav id="navbar-top"
       class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
@@ -212,6 +214,10 @@ const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
 const currentSection = computed(() => store.currentSection);
 const loaded = ref(false);
+
+// Check if the app is running in standalone mode
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+|| window.navigator.standalone;
 
 const navItems = SECTION_IDS;
 
