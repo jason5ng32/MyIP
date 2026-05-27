@@ -1,8 +1,8 @@
 <template>
     <!-- IP Info Card -->
-    <Card
+    <Card data-screenshot-root
         class="keyboard-shortcut-card jn-card flex flex-col h-full overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <!-- Card header: number badge + source + refresh -->
+        <!-- Card header: number badge + source + save-image + refresh -->
         <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b">
             <div class="flex items-center gap-2 min-w-0">
                 <span
@@ -14,12 +14,21 @@
                     {{ card.source }}
                 </span>
             </div>
-            <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
-                <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
-                    @click="$emit('refresh-card', card, index)" :aria-label="'Refresh ' + card.source">
-                    <RotateCw class="size-4" />
-                </Button>
-            </JnTooltip>
+            <div class="shrink-0 flex items-center gap-1" data-screenshot-exclude>
+                <ScreenshotButton
+                    filename-prefix="myip-card"
+                    :filename-label="card.source"
+                    :track-label="card.source || 'unknown'"
+                    :disabled="!hasData"
+                    :tooltip-text="t('Tooltips.SaveAsImage')"
+                    :aria-label="'Save ' + card.source + ' as image'" />
+                <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
+                    <Button size="icon" variant="outline" class="size-8 cursor-pointer"
+                        @click="$emit('refresh-card', card, index)" :aria-label="'Refresh ' + card.source">
+                        <RotateCw class="size-4" />
+                    </Button>
+                </JnTooltip>
+            </div>
         </div>
 
         <!-- Main body in three states: normal / error / loading -->
@@ -74,6 +83,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
+import ScreenshotButton from '@/components/widgets/ScreenshotButton.vue';
 import {
     Monitor,
     RotateCw,

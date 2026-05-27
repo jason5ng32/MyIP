@@ -1180,6 +1180,15 @@
     "date": "Beta",
     "content": [
       {
+        "type": "add",
+        "change": {
+          "en": "You can now save IP card or ASN connectivity graph as image",
+          "zh": "现在可以保存 IP 卡片或 ASN 连接图作为图片",
+          "fr": "Vous pouvez maintenant enregistrer les cartes IP ou le graphique de connectivité ASN en image",
+          "tr": "IP kartı veya ASN bağlantı grafiği görüntüsü olarak kaydedilebilir"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Optimized the brand icons of the Connectivity Test",
@@ -1204,15 +1213,6 @@
           "zh": "导航栏在手机上会跟随滚动隐藏",
           "fr": "La barre de navigation se cache lors du défilement sur mobile",
           "tr": "Navbar mobil tarayıcıda kaydırılırken gizlenir"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "You can now mask IP when taking screenshots",
-          "zh": "现在可以给 IP 打码，保护隐私",
-          "fr": "Vous pouvez maintenant masquer les IP lors des captures d'écran",
-          "tr": "Ekran görüntülerinde IP'leri gizleyebilirsiniz"
         }
       },
       {

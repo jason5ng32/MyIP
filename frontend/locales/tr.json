@@ -514,6 +514,7 @@
   },
   "Tooltips": {
     "RefreshIPCard": "IP Kartını Yenile",
+    "SaveAsImage": "Resim olarak kaydet",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
     "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",

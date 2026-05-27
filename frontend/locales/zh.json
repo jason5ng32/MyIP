@@ -517,6 +517,7 @@
   },
   "Tooltips": {
     "RefreshIPCard": "刷新 IP 信息",
+    "SaveAsImage": "保存为图片",
     "RefreshConnectivityTests": "刷新连通性测试",
     "RefreshWebRTC": "刷新 WebRTC 泄露测试",
     "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",

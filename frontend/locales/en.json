@@ -515,6 +515,7 @@
   },
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
+    "SaveAsImage": "Save as image",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
     "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
