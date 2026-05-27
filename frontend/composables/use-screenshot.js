@@ -9,6 +9,18 @@ import { trackEvent } from '../utils/use-analytics.js';
 // particular surfaces "Save Image" → Photos there, while a plain <a download>
 // on iOS Safari only saves to Files. Desktop browsers keep the classic
 // download path so a click doesn't unexpectedly open a share UI.
+//
+// Share payload is files-only — no `title` / `text`. IM targets like
+// Telegram and WhatsApp treat title/text as an attached caption and post
+// it as a separate text message after the image, which on Telegram shows
+// up as a stray "filename" line. File.name still carries the suggested
+// name for Save to Photos / Files / AirDrop, which read it directly.
+//
+// Note on the share-sheet thumbnail: iOS Safari intentionally shows a
+// generic document icon instead of a QuickLook preview for Web Share API
+// files (WebKit PR #5043, IPC hardening — the file URL handed to the
+// system is a placeholder, so the OS can't render a thumbnail). This is
+// a platform-level limitation with no developer-side workaround.
 async function deliverImage(dataUrl, filename) {
     const wantsShare = typeof window !== 'undefined'
         && window.matchMedia?.('(pointer: coarse)').matches
@@ -19,7 +31,7 @@ async function deliverImage(dataUrl, filename) {
             const blob = await (await fetch(dataUrl)).blob();
             const file = new File([blob], filename, { type: blob.type || 'image/png' });
             if (navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: filename });
+                await navigator.share({ files: [file] });
                 return;
             }
         } catch (err) {
