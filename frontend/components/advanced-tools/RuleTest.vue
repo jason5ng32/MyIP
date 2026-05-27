@@ -7,19 +7,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <Card v-for="test in ruleTests" :key="test.id"
                 class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
-                <CardContent class="p-4">
+                <CardContent class="p-4 min-w-0">
                     <!-- Top: icon + name + #id -->
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
+                    <div class="flex flex-col gap-2 mb-1 w-full min-w-0">
+                        <div class="flex items-center gap-2 min-w-0 w-full">
                             <Waypoints class="size-6 text-muted-foreground shrink-0" />
-                            <span class="text-base font-medium truncate">{{ test.name }}</span>
+                            <span class="text-base font-medium truncate min-w-0 flex-1">{{ test.name }}</span>
                             <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
                         </div>
 
                     </div>
 
                     <!-- URL (secondary information) -->
-                    <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="test.url">
+                    <p v-if="test.url" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="test.url">
                         {{ test.url }}
                     </p>
 

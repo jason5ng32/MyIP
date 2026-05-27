@@ -24,16 +24,21 @@
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card v-for="(leak, index) in leakTest" :key="leak.id"
-        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <CardContent class="p-4">
+        class="keyboard-shortcut-card jn-card min-w-0 overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4 min-w-0">
           <!-- Top: heartbeat icon + name + index -->
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <div class="flex items-center gap-2 min-w-0">
+          <div class="flex flex-col gap-2 mb-3 w-full min-w-0">
+            <div class="flex items-center gap-2 min-w-0 w-full">
               <DoorOpen class="size-6 text-muted-foreground shrink-0" />
-              <span class="text-base font-medium truncate">{{ leak.name }}</span>
+              <span class="text-base font-medium truncate min-w-0 flex-1">{{ leak.name }}</span>
 
-              <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
+              <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
             </div>
+            <!-- Test URL (secondary information) — single line, ellipsis inside card -->
+            <p v-if="leak.testUrl" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate"
+              :title="leak.testUrl">
+              {{ leak.testUrl }}
+            </p>
           </div>
 
           <!-- Endpoint status row -->
@@ -113,16 +118,19 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import countryLookup from 'country-code-lookup';
+import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import getCountryName from '@/data/country-name.js';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
+import { EthernetPort, Play, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
+import {
+  runIpApi, runSurfshark, runIpleak, runBrowserLeaks, runWithRetry,
+} from '@/utils/dnsleaks';
 
 
 const { t } = useI18n();
@@ -168,97 +176,78 @@ const createDefaultCard = () => ({
 });
 
 const leakTest = reactive([
-  { ...createDefaultCard(), id: 'ipapi1' },
-  { ...createDefaultCard(), id: 'ipapi2' },
-  { ...createDefaultCard(), id: 'sfshark1' },
-  { ...createDefaultCard(), id: 'sfshark2' },
+  { ...createDefaultCard(), id: 'ipapi' },
+  { ...createDefaultCard(), id: 'surfshark' },
+  { ...createDefaultCard(), id: 'ipleak' },
+  { ...createDefaultCard(), id: 'browserleaks' },
 ]);
 
-// Generate 32-digit random string
-const generate32DigitString = () => {
-  const unixTime = Date.now().toString();
-  const fixedString = 'jason5ng32';
-  const randomString = Math.random().toString(36).substring(2, 11);
-  return unixTime + fixedString + randomString;
+// ISP + country via MaxMind (same pipeline as WebRtcTest.vue). Returns
+// { country_code, country, org } on success, or null on any miss.
+const fetchIpGeoFromMaxMind = async (ip) => {
+  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
+  if (!source) return null;
+  let setLang = lang.value;
+  if (setLang === 'zh') setLang = 'zh-CN';
+
+  try {
+    const url = store.getDbUrl(source.id, ip, setLang);
+    const response = await fetchWithTimeout(url);
+    const data = await response.json();
+    const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
+    if (!ipData) return null;
+    const country_code = (ipData.country_code || '').toLowerCase();
+    const country = country_code
+      ? getCountryName(ipData.country_code, lang.value)
+      : '';
+    return {
+      country_code,
+      country,
+      org: ipData.isp || '',
+    };
+  } catch (error) {
+    console.error('Error fetching IP geo from MaxMind', error);
+    return null;
+  }
 };
 
-// Generate 14-digit random string
-const generate14DigitString = () => {
-  const fixedString = 'jn32';
-  const randomString = Math.random().toString(36).substring(2, 11);
-  return fixedString + randomString;
+// Apply MaxMind lookup to a card that already has a resolved leak IP.
+const applyMaxMindGeo = async (index, ip) => {
+  const geo = await fetchIpGeoFromMaxMind(ip);
+  if (geo) {
+    leakTest[index].country_code = geo.country_code;
+    leakTest[index].country = geo.country;
+    leakTest[index].org = geo.org;
+    return;
+  }
+  leakTest[index].country = t('dnsleaktest.StatusError');
+  leakTest[index].country_code = '';
+  leakTest[index].org = t('dnsleaktest.StatusError');
 };
 
-// DNS leak test 1
-const fetchLeakTestIpApiCom = (index) => {
-  return new Promise((resolve, reject) => {
-    const urlString = generate32DigitString();
-    const url = `https://${urlString}.edns.ip-api.com/json`;
-
-    fetchWithTimeout(url)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        if (data.dns && 'geo' in data.dns && 'ip' in data.dns) {
-          const geoSplit = data.dns.geo.split(' - ');
-          leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
-          leakTest[index].country = getCountryName(leakTest[index].country_code, lang.value);
-          leakTest[index].org = geoSplit[1] || '';
-          leakTest[index].ip = data.dns.ip;
-          resolve();
-        } else {
-          console.error('Unexpected data structure:', data);
-          reject(new Error('Unexpected data structure'));
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching leak test data:', error);
-        leakTest[index].country = t('dnsleaktest.StatusError');
-        leakTest[index].ip = t('dnsleaktest.StatusError');
-        leakTest[index].country_code = '';
-        leakTest[index].org = '';
-        reject(error);
-      });
-  });
+const markLeakCardError = (index) => {
+  leakTest[index].ip = t('dnsleaktest.StatusError');
+  leakTest[index].country = t('dnsleaktest.StatusError');
+  leakTest[index].country_code = '';
+  leakTest[index].org = t('dnsleaktest.StatusError');
 };
 
-// DNS leak test 2
-const fetchLeakTestSfSharkCom = (index, key) => {
-  return new Promise((resolve, reject) => {
-    const urlString = generate14DigitString();
-    const url = `https://${urlString}.ipv4.surfsharkdns.com`;
-
-    fetchWithTimeout(url)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        const getKey = Object.keys(data)[key];
-        const keyEntry = data[getKey];
-
-        if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
-          leakTest[index].country_code = keyEntry.CountryCode;
-          leakTest[index].country = getCountryName(keyEntry.CountryCode, lang.value);
-          leakTest[index].org = keyEntry.ISP || '';
-          leakTest[index].ip = keyEntry.IP;
-          resolve();
-        } else {
-          console.error('Unexpected data structure:', data);
-          reject(new Error('Unexpected data structure'));
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching leak test data:', error);
-        leakTest[index].ip = t('dnsleaktest.StatusError');
-        leakTest[index].country = t('dnsleaktest.StatusError');
-        leakTest[index].country_code = '';
-        leakTest[index].org = '';
-        reject(error);
-      });
-  });
+// Run one provider against its card slot, with retry (3 attempts, fresh
+// prefix per attempt — see `runWithRetry` in utils/dnsleaks). The current
+// attempt's host is written to `testUrl` as it changes, so the user sees
+// the latest probe; on full failure (all attempts threw) the card is
+// flipped to the error state.
+const runProvider = async (index, provider) => {
+  try {
+    const { ip } = await runWithRetry(provider, {
+      onUrl: (host) => { leakTest[index].testUrl = host; },
+    });
+    leakTest[index].ip = ip;
+    await applyMaxMindGeo(index, ip);
+  } catch (error) {
+    console.error('Error fetching leak test data:', error);
+    markLeakCardError(index);
+  }
 };
 
 // Check all
@@ -267,7 +256,7 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
     leakTest.forEach((server) => {
-      server.geo = t('dnsleaktest.StatusWait');
+      server.testUrl = '';
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
       server.country_code = '';
@@ -275,17 +264,17 @@ const checkAllDNSLeakTest = async (isRefresh) => {
     });
   }
 
-  const delayedFetch = (fetchFunction, index, key, delay) => new Promise((resolve) => {
+  const delayedRun = (provider, index, delay) => new Promise((resolve) => {
     setTimeout(() => {
-      fetchFunction(index, key).then(resolve).catch(resolve);
+      runProvider(index, provider).then(resolve, resolve);
     }, delay);
   });
 
   const promises = [
-    delayedFetch(fetchLeakTestIpApiCom, 0, null, 100),
-    delayedFetch(fetchLeakTestIpApiCom, 1, null, 1000),
-    delayedFetch(fetchLeakTestSfSharkCom, 2, 0, 100),
-    delayedFetch(fetchLeakTestSfSharkCom, 3, 0, 1000),
+    delayedRun(runIpApi, 0, 100),
+    delayedRun(runSurfshark, 1, 400),
+    delayedRun(runIpleak, 2, 700),
+    delayedRun(runBrowserLeaks, 3, 1000),
   ];
 
   const allSettledPromise = Promise.allSettled(promises);

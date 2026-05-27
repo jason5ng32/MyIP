@@ -22,19 +22,21 @@
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card v-for="(stun, index) in stunServers" :key="stun.id"
-        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <CardContent class="p-4">
+        class="keyboard-shortcut-card jn-card min-w-0 overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4 min-w-0">
           <!-- Top: service provider icon + name -->
-          <div class="flex items-center gap-2 mb-1">
+          <div class="flex flex-col gap-2 mb-1 w-full min-w-0">
+            <div class="flex items-center gap-2 min-w-0 w-full">
             <Flower class="size-6 text-muted-foreground shrink-0" />
-            <span class="text-base font-medium truncate">{{ t('webrtc.Name') }}</span>
-            <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
+            <span class="text-base font-medium truncate min-w-0 flex-1">{{ t('webrtc.Name') }}</span>
+            <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
           </div>
 
           <!-- STUN URL (secondary information) -->
-          <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="stun.url">
+          <p v-if="stun.url" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="stun.url">
             {{ stun.url }}
           </p>
+          </div>
 
           <!-- IP -->
           <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
