@@ -162,7 +162,12 @@ const connectivityTests = reactive([
   { id: 'wechat', name: 'WeChat', icon: 'ri:wechat-line', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'taobao', name: 'Taobao', icon: 'ri:taobao-line', url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'google', name: 'Google', icon: 'ri:google-line', url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'ri:cloud-line', url: 'https://www.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  // Use speed.cloudflare.com (not www.cloudflare.com): the marketing site
+  // attaches `Link: rel=preload` headers for its brand fonts to every response
+  // — including /favicon.ico — which the browser honors regardless of fetch
+  // mode, then fails CORS on the woff2 files. speed.cloudflare.com serves a
+  // plain favicon with no preload headers.
+  { id: 'cloudflare', name: 'Cloudflare', icon: 'ri:cloud-line', url: 'https://speed.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'youtube', name: 'YouTube', icon: 'ri:youtube-line', url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'github', name: 'GitHub', icon: 'ri:github-line', url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'chatgpt', name: 'ChatGPT', icon: 'ri:openai-line', url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
