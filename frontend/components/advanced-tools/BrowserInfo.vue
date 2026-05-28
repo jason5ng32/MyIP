@@ -37,7 +37,7 @@
                                         User Agent
                                     </Badge>
                                     <CopyButton :value="userAgent.ua"
-                                        class="-mr-1 hover:bg-transparent"
+                                        class="-mr-1 hover:bg-success/10"
                                         aria-label="Copy UA" />
                                 </div>
                                 <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>

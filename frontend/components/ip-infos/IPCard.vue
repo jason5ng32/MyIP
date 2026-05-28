@@ -10,8 +10,8 @@
                     {{ index + 1 }}
                 </span>
                 <span class="text-sm font-medium truncate">
-                    <span class="text-muted-foreground">{{ t('ipInfos.Source') }}:</span>
-                    {{ card.source }}
+                    <span class="text-muted-foreground">{{ t('ipInfos.Source') }}:
+                    {{ card.source }}</span>
                 </span>
             </div>
             <div class="shrink-0 flex items-center gap-1" data-screenshot-exclude>
@@ -35,15 +35,11 @@
         <div class="flex-1 flex flex-col">
             <template v-if="hasData">
                 <!-- Monitor is inline inside FitText so it rides the IP's
-                     first line; Copy stays a flex sibling so ellipsis
-                     never clips it. -->
+                    first line; Copy stays a flex sibling so ellipsis
+                    never clips it. -->
                 <div class="px-4 py-3 flex items-start gap-2 min-w-0" data-mask="ip">
                     <FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
-                        class="font-mono font-semibold min-w-0 items-start">
-                        <template #prefix >
-                            <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
-                        </template>
-                    </FitText>
+                        class="font-mono font-semibold min-w-0 items-start"/>
                     <CopyButton v-if="isValidIP(card.ip)" :value="card.ip"
                         :tooltip="t('Tooltips.CopyIP')"
                         :aria-label="'Copy ' + card.ip" />
@@ -85,7 +81,6 @@ import { Card } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 import ScreenshotButton from '@/components/widgets/ScreenshotButton.vue';
 import {
-    Monitor,
     RotateCw,
 } from '@lucide/vue';
 

@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
 <template>
   <JnTooltip :text="tooltip" :side="tooltipSide" :disabled="!tooltip">
     <button type="button"
-      :class="cn('shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer', $props.class)"
+      :class="cn('shrink-0 p-1.5 rounded-md text-primary hover:bg-muted transition-colors cursor-pointer', $props.class)"
       :aria-label="ariaLabel || tooltip || 'Copy'"
       @click="onClick">
       <component :is="copied ? CopyCheck : Copy"

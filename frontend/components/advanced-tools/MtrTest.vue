@@ -18,8 +18,7 @@
                         <SelectItem v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</SelectItem>
                     </SelectContent>
                 </Select>
-                <Button variant="action"
-                    :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
+                <Button variant="action" :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
                     @click="startmtrCheck" class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
                     <template v-else>
@@ -39,23 +38,25 @@
         <!-- Result Accordion -->
         <Accordion v-if="mtrResults.length > 0" type="single" collapsible default-value="0" class="space-y-2">
             <AccordionItem v-for="(result, index) in mtrResults" :key="result.country" :value="String(index)"
-                class="rounded-lg border bg-card px-4">
-                <AccordionTrigger class="hover:no-underline">
+                class="rounded-lg border bg-card px-4 data-[state=open]:border-primary/30">
+                <AccordionTrigger class="hover:no-underline cursor-pointer my-1">
                     <div class="flex items-center gap-2 min-w-0 flex-wrap">
-                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()"
-                            class="shrink-0 size-5" />
+                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()" class="shrink-0 size-5" />
                         <span class="text-sm font-semibold">
                             {{ result.country_name }}, {{ result.city }}
                         </span>
                         <template v-if="!isMobile">
                             <span class="text-muted-foreground">·</span>
                             <span class="text-sm text-muted-foreground truncate">{{ result.network }}</span>
-                            <Badge variant="success" class="font-mono font-normal shadow-none rounded-full">AS{{ result.asn }}</Badge>
+                            <Badge variant="success" class="font-mono font-normal shadow-none rounded-full">AS{{
+                                result.asn }}</Badge>
                         </template>
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <pre class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ result.rawOutput }}</pre>
+                    <pre
+                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
+                {{ result.rawOutput }}</pre>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -75,7 +76,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from '@lucide/vue';
+import { Info, Play } from '@lucide/vue';
 
 const { t } = useI18n();
 

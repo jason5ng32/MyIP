@@ -54,7 +54,7 @@
                     <ToggleGroup :model-value="userPreferences.theme" type="single" class="w-full" variant="outline"
                         @update:model-value="(v) => v && prefTheme(v)">
                         <ToggleGroupItem v-for="opt in themeOptions" :key="opt.value" :value="opt.value"
-                            class="flex-1 gap-1.5" :aria-label="opt.label" :title="opt.label">
+                            class="flex-1 gap-1.5 cursor-pointer" :aria-label="opt.label" :title="opt.label">
                             <component :is="opt.icon" class="size-4" />
                             {{ opt.label }}
                         </ToggleGroupItem>
@@ -66,7 +66,7 @@
                     <SectionTitle :icon="LayoutGrid">{{ t('nav.preferences.ipSourcesToCheck') }}</SectionTitle>
                     <ToggleGroup :model-value="String(userPreferences.ipCardsToShow)" type="single" class="w-full"
                         variant="outline" @update:model-value="(v) => v && prefipCards(Number(v))">
-                        <ToggleGroupItem v-for="num in [2, 4, 6]" :key="num" :value="String(num)" class="flex-1 gap-1.5"
+                        <ToggleGroupItem v-for="num in [2, 4, 6]" :key="num" :value="String(num)" class="flex-1 gap-1.5 cursor-pointer"
                             :aria-label="num.toString()" :title="num.toString()">
                             {{ num }}
                         </ToggleGroupItem>

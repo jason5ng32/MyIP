@@ -3,7 +3,7 @@
         <Button v-show="showMaskButton"
             size="icon"
             type="button"
-            variant="secondary"
+            variant="default"
             class="fixed bottom-[86px] z-1050 rounded-full shadow-lg cursor-pointer"
             :style="positionStyle"
             aria-label="Toggle Info Mask"

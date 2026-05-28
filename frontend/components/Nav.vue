@@ -52,7 +52,7 @@
 
         <!-- Preferences -->
         <JnTooltip :text="t('shortcutKeys.Preferences')">
-          <Button variant="ghost" size="icon" class="size-8" aria-label="Open preferences" @click="OpenPreferences">
+          <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences" @click="OpenPreferences">
             <SlidersHorizontal />
           </Button>
         </JnTooltip>
@@ -61,11 +61,11 @@
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
             <!-- Not signed in -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1.5">
+            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1.5 cursor-pointer">
               <span>{{ t('user.SignIn') }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1.5 px-1.5"
+            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1.5 px-1.5 cursor-pointer"
               aria-label="User menu">
               <span class="inline-flex size-6 overflow-hidden rounded-full">
                 <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
@@ -112,7 +112,7 @@
                 </dl>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem @select="store.setTriggerAchievements(true)">
+              <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerAchievements(true)">
                 <Award />
                 <span>{{ t('user.MyAchievements') }}</span>
               </DropdownMenuItem>
@@ -120,25 +120,25 @@
 
             <!-- Not signed in -->
             <template v-else>
-              <DropdownMenuItem @select="store.signInWithGoogle">
+              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGoogle">
                 <Icon icon="ri:google-line" />
                 <span>{{ t('user.SignInWithGoogle') }}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem @select="store.signInWithGithub">
+              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGithub">
                 <Icon icon="ri:github-line" />
                 <span>{{ t('user.SignInWithGithub') }}</span>
               </DropdownMenuItem>
             </template>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem @select="store.setTriggerUserBenefits(true)">
+            <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
               <HeartHandshake />
               <span>{{ t('user.Benefits.Title') }}</span>
             </DropdownMenuItem>
 
             <template v-if="isSignedIn">
               <DropdownMenuSeparator />
-              <DropdownMenuItem @select="store.signOut">
+              <DropdownMenuItem class="cursor-pointer" @select="store.signOut">
                 <LogOut />
                 <span>{{ t('user.SignOut') }}</span>
               </DropdownMenuItem>

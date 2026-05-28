@@ -4,7 +4,7 @@
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
             <button v-if="layout" type="button" @click="isExpanded = true"
-                class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"
+                class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted-foreground/10 cursor-pointer transition-colors"
                 :aria-label="t('ipInfos.ASNConnectivity.expand')" :title="t('ipInfos.ASNConnectivity.expand')">
                 <Maximize2 class="size-3.5" />
             </button>
@@ -70,8 +70,7 @@
 
     <!-- Expanded view: bottom Drawer (mobile-fullscreen / md+ sheet at 90vh). -->
     <Drawer v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
-        <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
-        :safe-area-top="isMobile"
+        <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })" :safe-area-top="isMobile"
             class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
             <!-- Screenshot root; control widgets inside opt out via `data-screenshot-exclude`. -->
             <div data-screenshot-root class="flex flex-col h-full bg-background">
@@ -96,11 +95,8 @@
                             <component :is="ctrl.icon" class="size-4" />
                         </button>
                         <span class="w-px h-5 bg-border mx-0.5" aria-hidden="true"></span>
-                        <ScreenshotButton
-                            filename-prefix="asn-connectivity"
-                            :filename-label="props.asn"
-                            :track-label="`AS${props.asn}`"
-                            :before-capture="prepareGraphForCapture">
+                        <ScreenshotButton filename-prefix="asn-connectivity" :filename-label="props.asn"
+                            :track-label="`AS${props.asn}`" :before-capture="prepareGraphForCapture">
                             <template #default="{ capture, isCapturing }">
                                 <button type="button" @click="capture" :disabled="isCapturing"
                                     class="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
@@ -138,7 +134,8 @@
                                 @mouseleave="hoveredAsn = null" @click.stop="onNodeClick(n.asn)">
                                 <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
                                 <rect :width="n.w" :height="n.h" rx="6" class="fill-card" />
-                                <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)" stroke-width="1.5" />
+                                <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)"
+                                    stroke-width="1.5" />
                                 <text :x="n.w / 2" :y="n.h / 2 - 5" text-anchor="middle"
                                     class="font-mono font-semibold text-[11px] fill-foreground">
                                     AS{{ n.asn }}
