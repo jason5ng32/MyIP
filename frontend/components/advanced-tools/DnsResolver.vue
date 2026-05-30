@@ -13,7 +13,7 @@
                 <ToggleGroup :model-value="queryType" type="single" variant="outline"
                     @update:model-value="(v) => v && changeType(v)">
                     <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
-                        class="flex-1 gap-1.5 min-w-12 md:min-w-20" :aria-label="type" :title="type">
+                        class="flex-1 gap-1.5 min-w-12 md:min-w-20 cursor-pointer" :aria-label="type" :title="type">
                         {{ type }}
                     </ToggleGroupItem>
                 </ToggleGroup>
