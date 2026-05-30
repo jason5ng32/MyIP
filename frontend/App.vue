@@ -15,9 +15,11 @@
         <AdvancedTools ref="advancedToolsRef" />
       </div>
     </div>
-    <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
-      :toggleInfoMask="toggleInfoMask" />
-    <QueryIP ref="queryIPRef" />
+    <FloatingDock>
+      <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
+        :toggleInfoMask="toggleInfoMask" />
+      <QueryIP ref="queryIPRef" />
+    </FloatingDock>
     <HelpModal ref="helpModalRef" />
     <Additional ref="additionalRef" />
     <Footer ref="footerRef" />
@@ -46,6 +48,7 @@ import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
+import FloatingDock from './components/widgets/FloatingDock.vue';
 
 // UI
 import { TooltipProvider } from './components/ui/tooltip';

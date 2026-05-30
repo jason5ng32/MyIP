@@ -2,8 +2,7 @@
     <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
-            class="fixed bottom-9 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
-            @click="openQueryIP">
+            class="rounded-full shadow-lg cursor-pointer" @click="openQueryIP">
             <Search class="size-4" />
         </Button>
     </JnTooltip>
@@ -60,7 +59,7 @@
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
-import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
 import FitText from '@/components/widgets/FitText.vue';
@@ -163,19 +162,6 @@ const fetchIPForModal = async (ip) => {
     isChecking.value = 'idle';
     modalQueryError.value = t('ipcheck.NoData');
 };
-
-// Floating button positioning (align to content area right on wide screen)
-const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
-const positionStyle = computed(() => {
-    if (screenWidth.value > 1600) {
-        const spaceOnRight = (screenWidth.value - 1600) / 2;
-        return { right: `${spaceOnRight + 18}px` };
-    }
-    return { right: '18px' };
-});
-const handleResize = () => { screenWidth.value = window.innerWidth; };
-onMounted(() => window.addEventListener('resize', handleResize));
-onBeforeUnmount(() => window.removeEventListener('resize', handleResize));
 
 defineExpose({ openModal });
 </script>
