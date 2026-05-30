@@ -88,7 +88,7 @@ import getCountryName from '@/data/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
 import { Icon } from '@iconify/vue';
 import { EthernetPort, MapPin, RotateCw, Waypoints } from '@lucide/vue';
@@ -128,9 +128,10 @@ const toneOf = (test) => ipFieldTone(test.ip, {
     errorLabels: t('ruletest.StatusError'),
 });
 
-const isFieldPending = (value) => {
-    return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+    waitLabels: t('ruletest.StatusWait'),
+    errorLabels: t('ruletest.StatusError'),
+});
 
 
 const fetchTrace = async (id, url) => {

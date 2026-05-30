@@ -62,6 +62,17 @@ export function ipFieldTone(value, {
     return 'wait';
 }
 
+// Shared "is this single field still in a no-data state?" predicate.
+//
+// A field is pending when it's empty/falsy, or equals one of the localized
+// wait / error sentinels. Callers pass their own localized label arrays so
+// each module keeps its own i18n namespace (webrtc / dnsleaktest / ruletest).
+// Mirrors the per-field check the card-row components run in their templates
+// (e.g. IP succeeds but country lookup fails independently).
+export function isFieldPending(value, { waitLabels = [], errorLabels = [] } = {}) {
+    return !value || asArray(waitLabels).includes(value) || asArray(errorLabels).includes(value);
+}
+
 function asArray(x) {
     if (Array.isArray(x)) return x;
     if (x == null) return [];

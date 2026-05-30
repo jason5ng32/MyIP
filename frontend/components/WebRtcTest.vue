@@ -124,7 +124,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
 import { Play, MapPin, EthernetPort, Flower, Network, RotateCw, FileText, ChevronDown } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
@@ -167,11 +167,10 @@ const toneOf = (stun) => ipFieldTone(stun.ip, {
 // Single field in dl block is in "no data" state (waiting/error).
 // Fields may fail independently (e.g. IP success but country lookup fails),
 // so the check is run per-field in the template.
-const isFieldPending = (value) => {
-  return !value
-    || value === t('webrtc.StatusWait')
-    || value === t('webrtc.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+  waitLabels: t('webrtc.StatusWait'),
+  errorLabels: t('webrtc.StatusError'),
+});
 
 // Run a STUN test against one server. ICE gathering with a 5s backstop.
 //

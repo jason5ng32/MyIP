@@ -121,7 +121,7 @@ import { trackEvent } from '@/utils/use-analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
 import { EthernetPort, Play, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
@@ -166,9 +166,10 @@ const toneOf = (leak) => ipFieldTone(leak.ip, {
 
 
 // Status
-const isFieldPending = (value) => {
-  return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+  waitLabels: t('dnsleaktest.StatusWait'),
+  errorLabels: t('dnsleaktest.StatusError'),
+});
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),
