@@ -378,6 +378,8 @@
     "latencyVSPing": {
       "title": "TCP vs Ping Gecikmesi",
       "positive": "TCP gecikmesi ve Ping farkı büyük, bu da bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "fromTCP": "TCP gecikme değeri: ",
+      "fromPing": "Ping gecikme değeri: ",
       "negative": "TCP gecikmesi ve Ping farkı büyük değil, bu da bir proxy veya VPN kullanmıyor olabileceğinizi gösterir."
     },
     "highlatency": {

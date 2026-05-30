@@ -378,6 +378,8 @@
     "latencyVSPing": {
       "title": "TCP vs Ping Latency",
       "positive": "TCP latency and Ping difference is large, indicating that you may be using a proxy or VPN.",
+      "fromTCP": "TCP latency value: ",
+      "fromPing": "Ping latency value: ",
       "negative": "TCP latency and Ping difference is not large, indicating that you may not be using a proxy or VPN."
     },
     "highlatency": {

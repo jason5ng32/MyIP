@@ -359,6 +359,8 @@
     "latencyVSPing": {
       "title": "Latence TCP vs Ping",
       "positive": "La différence entre la latence TCP et le Ping est importante, indiquant que vous utilisez peut-être un proxy ou un VPN.",
+      "fromTCP": "Valeur de latence TCP : ",
+      "fromPing": "Valeur de latence Ping : ",
       "negative": "La différence entre la latence TCP et le Ping n'est pas importante, indiquant que vous n'utilisez peut-être pas de proxy ou de VPN."
     },
     "highlatency": {
