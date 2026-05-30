@@ -4,7 +4,7 @@ import { useMainStore } from './store';
 import App from './App.vue'
 import i18n from './locales/i18n';
 import router from './router';
-import { analytics } from './utils/use-analytics';
+import { analytics } from './utils/analytics';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
 import { addCollection } from '@iconify/vue';
 

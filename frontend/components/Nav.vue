@@ -175,7 +175,7 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';

@@ -16,7 +16,7 @@
 //   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.navigateAndToggleOffcanvas
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
 
-import { trackEvent } from '../utils/use-analytics.js';
+import { trackEvent } from '../utils/analytics.js';
 import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
 

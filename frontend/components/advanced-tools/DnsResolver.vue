@@ -74,7 +74,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { isValidDomain } from '@/utils/valid-ip.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

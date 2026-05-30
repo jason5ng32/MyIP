@@ -16,7 +16,7 @@
 //   - isInfosLoaded: ref<boolean> — synchronized from store.allHasLoaded, for shortcut judgment
 
 import { ref, watch } from 'vue';
-import { trackEvent } from '../utils/use-analytics.js';
+import { trackEvent } from '../utils/analytics.js';
 
 const MASK_ATTR = 'data-mask-level';
 

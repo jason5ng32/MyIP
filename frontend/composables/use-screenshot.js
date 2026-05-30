@@ -3,7 +3,7 @@
 // doesn't enter the initial bundle.
 
 import { ref } from 'vue';
-import { trackEvent } from '../utils/use-analytics.js';
+import { trackEvent } from '../utils/analytics.js';
 
 // On touch-primary devices route through the OS share sheet — iOS in
 // particular surfaces "Save Image" → Photos there, while a plain <a download>

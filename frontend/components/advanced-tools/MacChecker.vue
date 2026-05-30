@@ -89,7 +89,7 @@
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import getCountryName from '@/data/country-name.js';
 import { CircleCheck, CircleX, Factory, ListChecks, Search } from '@lucide/vue';
 import { Input } from '@/components/ui/input';
