@@ -18,7 +18,7 @@
 
 import { trackEvent } from '../utils/use-analytics.js';
 import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
-import { scrollToElement } from './use-scroll-to.js';
+import { scrollToElement } from '../utils/scroll-to.js';
 
 function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSignedIn }) {
     const {
