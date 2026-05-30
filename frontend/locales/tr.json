@@ -436,7 +436,8 @@
     "Note3": "Whois bilgileri çeşitli türde alanlar içerir. Aşağıda ham metin bilgisi bulunmaktadır",
     "Placeholder": "Alan Adı veya IP",
     "invalidURL": "Geçersiz alan adı veya IP",
-    "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
+    "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş",
+    "Provider": "Bilgi Sağlayıcısı"
   },
   "enhanceddnsleaktest": {
     "Title": "Derinlemesine DNS Sızıntı Testi",
