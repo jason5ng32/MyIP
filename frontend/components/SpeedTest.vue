@@ -167,7 +167,7 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
-import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
+import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
