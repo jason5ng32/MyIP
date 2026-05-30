@@ -12,10 +12,8 @@
 
 import {
     fetchRoutingHistory,
-    fetchAsOverview,
-    extractOrgFromHolder,
+    resolveAsnOrgName,
 } from '../common/ripestat.js';
-import { lookupAsOrgName } from '../common/as-org-db.js';
 import logger from '../common/logger.js';
 
 const prefixLength = (prefix) => parseInt((prefix || '').split('/')[1], 10);
@@ -58,22 +56,13 @@ function summarizeOrigin(entry, minLen) {
     };
 }
 
-// Two-tier resolver: local CAIDA as2org first (µs), RIPEstat as-overview
-// fallback. Best-effort — any failure yields null so the row drops to
-// ASN-only display rather than blocking the whole batch.
-async function resolveOrgName(asn) {
-    const local = lookupAsOrgName(asn);
-    if (local) return local;
-    try {
-        const res = await fetchAsOverview(asn);
-        if (!res.ok) return null;
-        const payload = await res.json();
-        return extractOrgFromHolder(payload?.data?.holder);
-    } catch (error) {
-        logger.warn({ err: error, asn }, 'as-overview lookup failed');
-        return null;
-    }
-}
+// Two-tier resolver lives in common/ripestat.js. Here we pass a warn hook so
+// a failed as-overview fallback stays observable (asn-connectivity omits it
+// and stays silent — keep that difference).
+const resolveOrgName = (asn) =>
+    resolveAsnOrgName(asn, {
+        onError: (error) => logger.warn({ err: error, asn }, 'as-overview lookup failed'),
+    });
 
 export default async (req, res) => {
     // Prefix presence + validity guaranteed by requireValidPrefix middleware.
