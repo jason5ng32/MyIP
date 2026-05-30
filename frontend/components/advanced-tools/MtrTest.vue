@@ -68,7 +68,7 @@ import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/use-analytics';
-import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
+import { useGlobalpingMeasurement, GLOBALPING_DEFAULT_LOCATIONS, selectableIPs } from '@/composables/use-globalping-measurement';
 import getCountryName from '@/data/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -83,10 +83,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
-const allIPs = computed(() => {
-    const _allIPs = store.allIPs;
-    return _allIPs.filter(ip => ip && !ip.includes(' '));
-});
+const allIPs = computed(() => selectableIPs(store.allIPs));
 
 const selectedIP = ref('');
 const mtrResults = ref([]);
@@ -102,12 +99,7 @@ const startmtrCheck = () => {
 
     runMeasurement({
         limit: 16,
-        locations: [
-            { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-            { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-            { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-            { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
-        ],
+        locations: GLOBALPING_DEFAULT_LOCATIONS,
         target: selectedIP.value,
         type: 'mtr',
         measurementOptions: { port: 80, protocol: 'ICMP' },
