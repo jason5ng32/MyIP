@@ -22,17 +22,17 @@ frontend/
 ├── data/                        ← static config
 │                                  (achievements / ip-databases / sections /
 │                                   default-preferences / changelog)
-├── utils/                       ← pure helpers
+├── utils/                       ← framework-agnostic pure helpers + IO modules
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   fetch-with-timeout / …)
-├── composables/                 ← reusable composition logic
+│                                   fetch-with-timeout / analytics / scroll-to / …)
+├── composables/                 ← Vue-aware reactive / stateful logic (useXxx)
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
-│   ├── use-scroll-to.js
 │   ├── use-section-tracking.js
 │   ├── use-shortcuts.js
+│   ├── use-speedtest-charts.js  ← Chart.js config + reactive chart state for SpeedTest
 │   └── use-status-tone.js       ← shared 4-tier business-state → visual-color mapping
 └── components/
     ├── *.vue                    ← top-level sections (IpInfos / Connectivity / WebRTC / DnsLeaks
@@ -54,6 +54,16 @@ frontend/
 - **Composition API.** All components use `<script setup>`; no Options API.
 - **Path alias.** `@` → `frontend/` (defined in `jsconfig.json` and `vite.config.js`). Use `@/components/...`, `@/utils/...`, `@/composables/...`.
 - **Shared-with-backend helpers live under `common/`.** Import them with a relative path, e.g. `../../common/valid-ip.js`. `common/valid-ip.js` is re-exported from `frontend/utils/valid-ip.js` so most consumers can keep using `@/utils/valid-ip.js`; follow that pattern when adding more shared helpers (see `frontend/utils/fetch-with-timeout.js` for the second example).
+
+### Where does a helper go? `lib/` vs `composables/` vs `utils/`
+
+Three sibling directories hold non-component code. The deciding question is **does it touch Vue's reactivity or lifecycle?**
+
+- **`composables/`** — Vue-aware reactive / stateful logic. It uses `ref` / `reactive` / `computed` / `watch` or a lifecycle hook (`onMounted` / `onUnmounted`), or it wires into a component's `setup()` (registers listeners, returns reactive state, must be called once at mount). Named `useXxx()`. Examples: `use-theme`, `use-info-mask`, `use-speedtest-charts`, `use-shortcuts`. A `setup()`-time factory with no internal `ref` (e.g. `use-maxmind`, `use-status-tone`) still belongs here when it's Vue-app glue, but a *pure* function that happens to live next to a composable should be exported from that same file, not promoted to its own composable.
+- **`utils/`** — framework-agnostic pure helpers and IO modules. No `vue` import, no reactive state: pure transforms / validators / detection (`transform-ip-data`, `valid-ip`, `system-detect`, `timestamp-to-date`), network fetchers (`getips/`, `dnsleaks/`, `authenticated-fetch`), module-level services (`analytics`), and the thin re-export bridges to `common/` (`valid-ip`, `fetch-with-timeout`, `bgp-prefix`). **A file here must not carry a `use-` prefix** — that prefix is reserved for composables.
+- **`lib/`** — the shadcn-vue support layer, *not* a general dumping ground. Today it holds only `cn()` (tailwind-merge + clsx), which every `ui/` primitive imports as `@/lib/utils`. Don't add business or app logic here; new shared helpers go to `utils/` or `composables/` per the rule above.
+
+Quick test before adding a file: needs Vue reactivity/lifecycle → `composables/` (`useXxx`); otherwise → `utils/` (no `use-` prefix). Leave `lib/` to shadcn.
 
 ## shadcn-vue first
 
