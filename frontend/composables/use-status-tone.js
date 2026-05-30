@@ -9,14 +9,14 @@
 // to these 4 tone levels, then calls dotClass(tone) / textClass(tone) to get the corresponding
 // Tailwind class. This way Connectivity / WebRTC / DnsLeak / future similar modules
 // all use the same visual language, and the color scheme is applied throughout the site.
-export const dotColorMap = {
+const dotColorMap = {
     'wait':    'bg-info',
     'ok-fast': 'bg-success',
     'ok-slow': 'bg-warning',
     'fail':    'bg-destructive',
 };
 
-export const textColorMap = {
+const textColorMap = {
     'wait':    'text-muted-foreground',
     'ok-fast': 'text-success',
     'ok-slow': 'text-warning',

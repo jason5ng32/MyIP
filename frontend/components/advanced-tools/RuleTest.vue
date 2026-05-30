@@ -91,7 +91,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
 import { Icon } from '@iconify/vue';
-import { EthernetPort, MapPin, RotateCw, Waypoints, SignpostBig } from '@lucide/vue';
+import { EthernetPort, MapPin, RotateCw, Waypoints } from '@lucide/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
