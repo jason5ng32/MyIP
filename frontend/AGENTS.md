@@ -59,7 +59,7 @@ frontend/
 
 Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
-1. **Check `frontend/components/ui/` first** — 21 primitives are already copied in (see below). Missing variants are almost never a reason to bypass a primitive; `:class` overrides, `as-child`, and tw-merge cover nearly every state-color need.
+1. **Check `frontend/components/ui/` first** — 20 primitives are already copied in (see below). Missing variants are almost never a reason to bypass a primitive; `:class` overrides, `as-child`, and tw-merge cover nearly every state-color need.
 2. **If no local primitive fits, check https://www.shadcn-vue.com/docs/components** — shadcn-vue covers a lot more than what's in the repo. Copy one in if it's a good fit.
 3. **Only fall back to hand-rolled Tailwind** when the shape or behavior genuinely doesn't exist in shadcn-vue.
 
@@ -67,9 +67,9 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 22 primitives copied in:
+Located at `frontend/components/ui/`. 21 primitives copied in:
 
-`accordion` · `badge` · `button` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
 One is project-specific, not in stock shadcn-vue:
 
@@ -133,8 +133,6 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
 ```
 
 Every free-form Input that takes a URL / IP / MAC / domain / custom identifier carries the same six attributes shown above: `autocomplete="off"`, `autocorrect="off"`, `autocapitalize="off"`, `spellcheck="false"`, `data-1p-ignore`, `data-lpignore="true"`. iOS Safari's QuickType bar uses placeholder + nearby label text to offer address / email / password AutoFill — without these attributes it will push iCloud-address or password suggestions onto a plain IP/URL input. Keep placeholder copy free of "address / 地址 / adresse / adresi" style words where possible — iOS heuristics trigger on the word itself even with `autocomplete="off"`.
-
-The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGroupAddon` / `InputGroupButton` / `InputGroupText` / `InputGroupTextarea` sub-parts) is available if you need a genuinely merged border / ring around a composite input — but the current convention above is what every consumer uses today.
 
 **Status card** — homepage status cards (Connectivity / WebRTC / DnsLeak / IPCard / RuleTest) use:
 
