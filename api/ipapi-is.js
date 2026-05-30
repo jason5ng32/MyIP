@@ -1,23 +1,16 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+// /api/ipapiis — geolocation source handler backed by api.ipapi.is.
+// Picks a random API key and normalizes the response into the canonical
+// geo shape (plus isHosting / isProxy) via the shared makeGeoHandler factory.
 
-export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+import { makeGeoHandler } from '../common/geo-handler.js';
+
+function buildUrl(req) {
     const ipAddress = req.query.ip;
 
     const keys = (process.env.IPAPIIS_API_KEY).split(',');
     const key = keys[Math.floor(Math.random() * keys.length)];
-    const url = `https://api.ipapi.is?q=${ipAddress}&key=${key}`;
-
-    try {
-        const apiRes = await fetchUpstream(url);
-        const json = await apiRes.json();
-        res.json(modifyJsonForIPAPI(json));
-    } catch (e) {
-        logger.error({ err: e, ip: ipAddress }, 'ipapi-is handler failed');
-        res.status(500).json({ error: e.message });
-    }
-};
+    return `https://api.ipapi.is?q=${ipAddress}&key=${key}`;
+}
 
 function modifyJsonForIPAPI(json) {
     let asn = json.asn || {};
@@ -38,3 +31,5 @@ function modifyJsonForIPAPI(json) {
         isProxy: is_proxy || is_vpn || is_tor || false
     };
 }
+
+export default makeGeoHandler({ name: 'ipapi-is', buildUrl, normalize: modifyJsonForIPAPI });

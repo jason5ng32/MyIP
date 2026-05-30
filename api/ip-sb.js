@@ -1,21 +1,13 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+// /api/ipsb — geolocation source handler backed by api.ip.sb.
+// Token-free upstream; normalizes the response into the canonical geo
+// shape via the shared makeGeoHandler factory.
 
-export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+import { makeGeoHandler } from '../common/geo-handler.js';
+
+function buildUrl(req) {
     const ipAddress = req.query.ip;
-
-    const url = `https://api.ip.sb/geoip/${ipAddress}`;
-
-    try {
-        const apiRes = await fetchUpstream(url);
-        const json = await apiRes.json();
-        res.json(modifyJsonForIPSB(json));
-    } catch (e) {
-        logger.error({ err: e, ip: ipAddress }, 'ip-sb handler failed');
-        res.status(500).json({ error: e.message });
-    }
-};
+    return `https://api.ip.sb/geoip/${ipAddress}`;
+}
 
 function modifyJsonForIPSB(json) {
     return {
@@ -31,3 +23,5 @@ function modifyJsonForIPSB(json) {
         org: json.isp
     };
 }
+
+export default makeGeoHandler({ name: 'ip-sb', buildUrl, normalize: modifyJsonForIPSB });
