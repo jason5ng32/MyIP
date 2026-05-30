@@ -22,7 +22,7 @@ const dnsServers = {
     'AliDNS': '223.5.5.5',
     'DNSPod': '119.29.29.29',
     '114DNS': '114.114.114.114',
-    'China Unicom': '123.123.123.123',
+    'DNS4EU': '86.54.11.1',
 };
 
 // DNS-over-HTTPS server list
