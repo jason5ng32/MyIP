@@ -218,12 +218,8 @@
     "browser": {
       "Infos": "Informations du Navigateur",
       "browserName": "Nom du Navigateur",
-      "browserVersion": "Version",
       "engineName": "Moteur",
-      "engineVersion": "Version",
       "osName": "Système d'Exploitation",
-      "osVersion": "Version",
-      "deviceModel": "Modèle",
       "deviceVendor": "Fabricant",
       "cpuArchitecture": "Architecture CPU",
       "gpu": "GPU",
@@ -520,7 +516,6 @@
     "RefreshWebRTC": "Actualiser le test WebRTC Leak",
     "RefreshDNSLeakTest": "Actualiser le test de fuite DNS",
     "SpeedTestButton": "Démarrer/Pause le test de vitesse",
-    "SourceSelect": "Sélectionner la source de géolocalisation IP",
     "ShowASNInfo": "Afficher les détails AS",
     "ShowASNHistory": "Afficher l'historique ASN",
     "ShowASNConnectivity": "Afficher la connectivité ASN",
@@ -529,20 +524,12 @@
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "InfoMask": "Masquer les informations IP",
     "QueryIP": "Interroger l'adresse IP",
-    "GithubLink": "Voir le code source sur GitHub",
-    "RefreshRuleTests": "Actualiser les tests de règles",
-    "qualityScoreExplain": "Le score de qualité IP est calculé sur la base de plusieurs facteurs pondérés, incluant le type d'IP, si c'est un proxy/VPN, et le nombre d'événements d'attaque récemment détectés provenant de cette IP. Un score plus élevé indique une meilleure qualité de l'IP, réduisant la probabilité d'être bloqué par le contrôle de risques sur certains sites."
+    "GithubLink": "Voir le code source sur GitHub"
   },
   "ipInfos": {
-    "id": "ipinfos",
-    "database": "Données",
     "Title": "Infos IP",
     "Notes": "Le programme vérifie d'abord votre adresse IP à partir des sources différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes à partir de la source d'informations de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
-    "Simple": "Simple",
-    "Map": "Carte",
-    "MapUnavailable": "Carte non disponible",
     "Source": "Source IP",
-    "IP": "IP",
     "Country": "Région",
     "Region": "État",
     "City": "Ville",
@@ -551,7 +538,6 @@
     "Coordinates": "Coordonnées",
     "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
     "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
-    "SelectSource": "Source de géolocalisation IP",
     "type": "Type",
     "isProxy": "Proxy",
     "qualityScore": "Qualité IP",
@@ -599,7 +585,6 @@
       "proxyMaybe": "Probablement proxy / VPN",
       "proxyNo": "Non signalé",
       "proxyUnknown": "Type inconnu",
-      "proxyUnknownProtocol": "Protocole inconnu",
       "type": {
         "Residential": "Résidentiel",
         "Wireless": "Sans fil",
@@ -614,7 +599,6 @@
     }
   },
   "connectivity": {
-    "id": "connectivity",
     "Title": "Connectivité réseau",
     "Note": "Tests via chargement d'images à partir des sites correspondants. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
     "StatusWait": "En attente du test",
@@ -658,7 +642,6 @@
     }
   },
   "dnsleaktest": {
-    "id": "dnsleaktest",
     "Name": "Test de point de DNS",
     "Title": "Test de fuite DNS",
     "Note": "Une fuite DNS signifie que lorsque vous êtes connecté à un VPN/proxy, vos résolutions de noms de domaine sont toujours effectuées via votre fournisseur d'accès Internet local, ce qui pose un risque de fuite DNS.",
@@ -673,22 +656,17 @@
     }
   },
   "speedtest": {
-    "id": "speedtest",
     "Title": "Test de vitesse",
     "Note": "Le test de vitesse sera effectué via le réseau périphérique de Cloudflare. Vous pouvez choisir la taille des paquets de téléchargement et de téléversement selon vos besoins. Pendant le test, les paquets seront téléchargés et téléversés 4 fois — veuillez tenir compte de votre consommation de données. Cloudflare ne disposant pas de nœuds périphériques dans tous les pays, les résultats sont donnés à titre indicatif ; la vitesse réelle peut être plus élevée.",
     "Download": "Téléchargement",
     "Upload": "Téléversement",
     "Latency": "Latence",
     "Jitter": "Gigue",
-    "Unit": "Mbps",
-    "StatusWait": "--",
-    "StatusError": "Erreur de test",
     "loadedLatency": "Latence en charge : ",
     "videoStreaming": "Streaming vidéo : ",
     "gaming": ", Jeu : ",
     "rtc": ", Chat vidéo : ",
     "score": "Sur la base du test de vitesse, voici les scores de qualité suivants :",
-    "resultNote": ".",
     "connectionFrom": "Test de vitesse terminé depuis votre machine, IP: ",
     "connectionTo": " vers le serveur de test:",
     "connectionEnd": " .",
@@ -718,7 +696,6 @@
     "Error": "Échec du test, il semble que votre IP ne soit pas autorisée à effectuer le test de ping."
   },
   "mtrtest": {
-    "id": "mtrtest",
     "Title": "Test MTR",
     "Note": "Le test MTR (My Traceroute) effectue une traçabilité détaillée de votre adresse IP à partir de serveurs situés sur différents continents et régions du monde. Le test MTR combine les fonctionnalités des commandes de traceroute traditionnelles et de ping pour diagnostiquer la qualité et les performances des connexions réseau en temps réel.",
     "Note2": "Ce processus couvre le chemin complet depuis différentes localisations géographiques jusqu'à votre environnement réseau, fournissant des informations sur la latence et la perte de paquets pour chaque saut. Qu'il s'agisse de congestion dans le chemin de routage, de problèmes de latence à un nœud spécifique ou de perte de paquets pendant la transmission, le test MTR fournit des informations de diagnostic essentielles.",
@@ -728,14 +705,12 @@
     "Error": "Échec du test, il semble que votre IP ne soit pas autorisée à effectuer le test MTR."
   },
   "ipcheck": {
-    "id": "ipcheck",
     "Title": "Vérification IP",
     "Placeholder": "ex. 1.1.1.1",
     "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
     "NoData": "Impossible de récupérer les informations pour cette IP. Elle peut être non routable (ex. 0.0.0.0, adresse privée) ou la source amont n'a pas de données pour celle-ci."
   },
   "alert": {
-    "id": "alert",
     "refreshEverythingMessage": "Actualisation de toutes les données, veuillez patienter...",
     "refreshEverythingTitle": "Actualisation",
     "OhNo": "Oh non !",
@@ -750,7 +725,6 @@
     "SignInFailedReason": "Raison"
   },
   "shortcutKeys": {
-    "id": "shortcutKeys",
     "GoToTop": "Aller en haut",
     "GoToBottom": "Aller en bas",
     "ToggleDarkMode": "Activer/désactiver le mode sombre",
