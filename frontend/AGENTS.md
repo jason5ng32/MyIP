@@ -67,13 +67,12 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 23 primitives copied in:
+Located at `frontend/components/ui/`. 22 primitives copied in:
 
-`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
-Two are project-specific, not in stock shadcn-vue:
+One is project-specific, not in stock shadcn-vue:
 
-- **`ButtonGroup`** — visual container for stitching buttons together.
 - **`Spinner`** — lucide `Loader2` + `animate-spin` + `role="status"`.
 
 ### Design tokens
