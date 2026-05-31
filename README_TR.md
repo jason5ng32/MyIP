@@ -68,9 +68,10 @@ Kodu klonlayın:
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-Kurun ve derleyin:
+Kurun ve derleyin. Bu proje pnpm kullanır — eğer yoksa önce onu kurun (npm, Node ile birlikte gelir, bu yüzden bu komut her zaman çalışır):
 
 ```bash
+npm install -g pnpm
 pnpm install && pnpm run build
 ```
 

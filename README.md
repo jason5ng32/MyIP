@@ -68,9 +68,10 @@ Clone the code:
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-Install and build:
+Install and build. This project uses pnpm — if you don't have it, install it first (npm ships with Node, so this command always works):
 
 ```bash
+npm install -g pnpm
 pnpm install && pnpm run build
 ```
 

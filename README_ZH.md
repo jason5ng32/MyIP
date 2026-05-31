@@ -68,9 +68,10 @@
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-安装与编译:
+安装与编译。本项目使用 pnpm，如果你还没有，请先安装（npm 随 Node 一起提供，这条命令一定能用）：
 
 ```bash
+npm install -g pnpm
 pnpm install && pnpm run build
 ```
 
