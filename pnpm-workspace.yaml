@@ -1,0 +1,5 @@
+allowBuilds:
+  '@firebase/util': true
+  core-js: true
+  protobufjs: true
+  vue-demi: true

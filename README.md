@@ -71,13 +71,13 @@ git clone https://github.com/jason5ng32/MyIP.git
 Install and build:
 
 ```bash
-npm install && npm run build
+pnpm install && pnpm run build
 ```
 
 Run:
 
 ```bash
-npm start
+pnpm start
 ```
 
 The program will run on port 18966.

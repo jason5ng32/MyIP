@@ -3,15 +3,16 @@
   "private": true,
   "version": "6.4.0",
   "type": "module",
+  "packageManager": "pnpm@11.5.0",
   "scripts": {
     "dev": "concurrently \"vite\" \"nodemon backend-server.js\"",
     "build": "vite build",
     "test": "node --test tests/*.test.js",
-    "check": "npm run test && npm run build",
+    "check": "pnpm run test && pnpm run build",
     "preview": "vite preview",
     "start-backend": "node backend-server.js",
     "start-frontend": "node frontend-server.js",
-    "start": "concurrently \"npm run start-frontend\" \"npm run start-backend\""
+    "start": "concurrently \"pnpm run start-frontend\" \"pnpm run start-backend\""
   },
   "dependencies": {
     "@cloudflare/speedtest": "^1.9.1",

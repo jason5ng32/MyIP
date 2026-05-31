@@ -183,4 +183,4 @@ Every free-form Input that takes a URL / IP / MAC / domain / custom identifier c
 
 - Composables and utils are the main target — covered by `tests/composable-*.test.js` and the various utility tests.
 - Vue rendering / user interactions / browser APIs: out of scope for the Node test runner.
-- For visual changes (layout, styling, animations), self-testing is not possible — explicitly ask the user to verify via `npm run dev`.
+- For visual changes (layout, styling, animations), self-testing is not possible — explicitly ask the user to verify via `pnpm dev`.

@@ -39,12 +39,14 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Vite + backend (nodemon) together — front-end 5173, back-end 11966 |
-| `npm run build` | Front-end production build |
-| `npm run preview` | Vite preview of the build output |
-| `npm run start` | Built front-end + backend (static file server) |
-| `npm test` | Run all `tests/*.test.js` specs |
-| `npm run check` | `test` + `build`, the pre-commit self-check |
+| `pnpm dev` | Vite + backend (nodemon) together — front-end 5173, back-end 11966 |
+| `pnpm build` | Front-end production build |
+| `pnpm preview` | Vite preview of the build output |
+| `pnpm start` | Built front-end + backend (static file server) |
+| `pnpm test` | Run all `tests/*.test.js` specs |
+| `pnpm check` | `test` + `build`, the pre-commit self-check |
+
+This project uses **pnpm** as its package manager (pinned via the `packageManager` field in `package.json`). The lockfile is `pnpm-lock.yaml` (committed); `pnpm-workspace.yaml` holds the `allowBuilds` approvals for the few dependencies whose install scripts are trusted to run. Do not use `npm` / `yarn` — they would produce a competing lockfile.
 
 ## Project layout
 
@@ -61,7 +63,7 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 ├── tests/                       ← Node test runner specs
 │
 ├── backend-server.js            ← Express app (default port 11966)
-├── frontend-server.js           ← static file server for `npm start`
+├── frontend-server.js           ← static file server for `pnpm start`
 ├── index.html                   ← Vite entry; #app mounts vaul-drawer-wrapper
 ├── vite.config.js
 ├── jsconfig.json                ← JS project, alias @ → frontend/
@@ -96,10 +98,10 @@ Single repo, two halves: a Vue 3 SPA front-end and an Express 5 back-end API, se
 ## Testing
 
 - **Test runner:** Node built-in (`node --test`), no third-party framework. Specs live in `tests/*.test.js`.
-- **Coverage expectation:** any non-visual logic that can be exercised without a network call — pure functions, composables with mockable inputs, transform utilities, validators — ships with a test in `tests/` and is wired into `npm test`. UI rendering, real network behavior, and browser-API-dependent code are out of scope.
+- **Coverage expectation:** any non-visual logic that can be exercised without a network call — pure functions, composables with mockable inputs, transform utilities, validators — ships with a test in `tests/` and is wired into `pnpm test`. UI rendering, real network behavior, and browser-API-dependent code are out of scope.
 - **Big new features:** write the tests in the same change. Don't defer.
 - **Modifying a tested feature:** check the related tests; update them in the same change if behavior shifts.
-- **Tests must pass locally before you hand off.** If `npm run check` is red, don't ask the user to review.
+- **Tests must pass locally before you hand off.** If `pnpm check` is red, don't ask the user to review.
 
 ## Security & Boundaries
 
@@ -114,7 +116,7 @@ The backend enforces access control and timeouts through shared middleware rathe
 - **Branch discipline — `dev` in, `dev` out.** All work starts from `dev` and lands on `dev`. `main` is only updated via PRs that merge `dev` → `main`; never base a branch on `main`, never push directly to `main`. When an AI assistant operates from a worktree and needs to fast-forward `dev`, use `git push . HEAD:dev` (the repo has `receive.denyCurrentBranch=updateInstead` set, so git syncs the main worktree's files too when it's clean) rather than `git update-ref`, which leaves the main worktree's files out of sync with HEAD.
 - **Do not commit without explicit user approval.** The flow is: AI edits → user reviews → user tests → user says "commit" → AI commits. Silent commits are a breach of trust.
 - **One concern per commit.** Don't mix unrelated changes into a single commit. Split at the right seam.
-- **Self-test before handing off.** Run `npm run check` (or at least `npm test`) for every change. If the change is visual (UI layout, styling, interactions) and can't be verified headless, say so explicitly so the user can test it in `npm run dev`.
+- **Self-test before handing off.** Run `pnpm check` (or at least `pnpm test`) for every change. If the change is visual (UI layout, styling, interactions) and can't be verified headless, say so explicitly so the user can test it in `pnpm dev`.
 - **Every commit is gated on user testing.** Even with tests green, a visual change needs the user to have looked at it before it lands.
 - **Add yourself as a co-author to the commit.** If you are an AI.
 - **Commit message style** follows recent `git log` — `Refactor(xxx): …` / `Fix(ui): …` / `Feat(xxx): …` / `Style: …` / `Chore: …` prefix.

@@ -71,13 +71,13 @@ git clone https://github.com/jason5ng32/MyIP.git
 安装与编译:
 
 ```bash
-npm install && npm run build
+pnpm install && pnpm run build
 ```
 
 运行:
 
 ```bash
-npm start
+pnpm start
 ```
 
 程序会运行在 18966 端口。
