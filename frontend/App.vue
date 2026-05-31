@@ -15,9 +15,11 @@
         <AdvancedTools ref="advancedToolsRef" />
       </div>
     </div>
-    <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
-      :toggleInfoMask="toggleInfoMask" />
-    <QueryIP ref="queryIPRef" />
+    <FloatingDock>
+      <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
+        :toggleInfoMask="toggleInfoMask" />
+      <QueryIP ref="queryIPRef" />
+    </FloatingDock>
     <HelpModal ref="helpModalRef" />
     <Additional ref="additionalRef" />
     <Footer ref="footerRef" />
@@ -46,6 +48,7 @@ import HelpModal from './components/widgets/Help.vue';
 import PWA from './components/widgets/PWA.vue';
 import Alert from './components/widgets/Toast.vue';
 import InfoMask from './components/widgets/InfoMask.vue';
+import FloatingDock from './components/widgets/FloatingDock.vue';
 
 // UI
 import { TooltipProvider } from './components/ui/tooltip';
@@ -60,6 +63,7 @@ import { useInfoMask } from '@/composables/use-info-mask.js';
 import { useRefreshOrchestrator } from '@/composables/use-refresh-orchestrator.js';
 import { useShortcuts } from '@/composables/use-shortcuts.js';
 import { useSectionTracking } from '@/composables/use-section-tracking.js';
+import { useTheme } from '@/composables/use-theme.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -110,7 +114,6 @@ if (loadingElement) {
 
 // Info mask
 const { infoMaskLevel, isInfosLoaded, showMaskButton, toggleInfoMask } = useInfoMask({
-    refs: { IPCheckRef, webRTCRef, dnsLeaksRef },
     store,
     t,
 });
@@ -136,6 +139,9 @@ const { loadShortcuts } = useShortcuts({
 
 // Scroll monitoring + section tracking (logic from widgets/Patch.vue)
 useSectionTracking();
+
+// Theme orchestration: initial apply, OS flip listener, preference watcher.
+useTheme();
 
 onMounted(() => {
     loadingControl();

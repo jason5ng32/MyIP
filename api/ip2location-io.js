@@ -1,23 +1,16 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+// /api/ip2location — geolocation source handler backed by api.ip2location.io.
+// Picks a random API key and normalizes the response into the canonical
+// geo shape via the shared makeGeoHandler factory.
 
-export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+import { makeGeoHandler } from '../common/geo-handler.js';
+
+function buildUrl(req) {
     const ipAddress = req.query.ip;
 
     const keys = (process.env.IP2LOCATION_API_KEY).split(',');
     const key = keys[Math.floor(Math.random() * keys.length)];
-    const url = `https://api.ip2location.io/?ip=${ipAddress}&key=${key}`;
-
-    try {
-        const apiRes = await fetchUpstream(url);
-        const json = await apiRes.json();
-        res.json(modifyJsonForIPAPI(json));
-    } catch (e) {
-        logger.error({ err: e, ip: ipAddress }, 'ip2location-io handler failed');
-        res.status(500).json({ error: e.message });
-    }
-};
+    return `https://api.ip2location.io/?ip=${ipAddress}&key=${key}`;
+}
 
 function modifyJsonForIPAPI(json) {
     let asn = json.asn || {};
@@ -36,3 +29,5 @@ function modifyJsonForIPAPI(json) {
         org: as || 'N/A',
     };
 }
+
+export default makeGeoHandler({ name: 'ip2location-io', buildUrl, normalize: modifyJsonForIPAPI });

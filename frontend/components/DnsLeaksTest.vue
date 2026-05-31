@@ -24,16 +24,22 @@
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Card v-for="(leak, index) in leakTest" :key="leak.id"
-        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <CardContent class="p-4">
+        class="keyboard-shortcut-card jn-card min-w-0 overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4 min-w-0">
           <!-- Top: heartbeat icon + name + index -->
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <div class="flex items-center gap-2 min-w-0">
-              <HeartPulse class="size-6 text-muted-foreground shrink-0" />
-              <span class="text-base font-medium truncate">{{ leak.name }}</span>
+          <div class="flex flex-col gap-2 mb-3 w-full min-w-0">
+            <div class="flex items-center gap-2 min-w-0 w-full">
+              <DoorOpen class="size-6 text-muted-foreground shrink-0" />
+              <span class="text-base font-medium truncate min-w-0 flex-1">{{ leak.name }}</span>
 
-              <span class="font-mono text-muted-foreground ">#{{ index + 1 }}</span>
+              <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
             </div>
+            <!-- Provider name (secondary information) — fixed per card, sourced
+                 from each provider's `name` export in utils/dnsleaks. -->
+            <p class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate"
+              :title="leak.providerName">
+              {{ leak.providerName }}
+            </p>
           </div>
 
           <!-- Endpoint status row -->
@@ -44,7 +50,7 @@
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(leak))"></span>
             </span>
             <FitText :text="leak.ip" :tiers="INLINE_TIERS" :title="leak.ip" class="font-mono min-w-0"
-              :class="textClass(toneOf(leak))" />
+              :class="textClass(toneOf(leak))" data-mask="ip" />
           </div>
 
           <!-- ISP + Country sub-block -->
@@ -111,24 +117,29 @@ import { ref, computed, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import countryLookup from 'country-code-lookup';
+import { trackEvent } from '@/utils/analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import getCountryName from '@/data/country-name.js';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { EthernetPort, Play, HeartPulse, MapPin, RotateCw, Sparkles, ArrowRight } from 'lucide-vue-next';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
+import { useMaxmind } from '@/composables/use-maxmind.js';
+import { EthernetPort, Play, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
+import {
+  ipApi, surfshark, ipleak, browserleaks, runWithRetry,
+} from '@/utils/dnsleaks';
+
+// One source of truth for which providers to run and in what order. Adding
+// a new provider = create the file under utils/dnsleaks and append it here.
+const PROVIDERS = [ipApi, surfshark, ipleak, browserleaks];
 
 
 const { t } = useI18n();
 const store = useMainStore();
 const router = useRouter();
-const lang = computed(() => store.lang);
+const { lookupMaxmind } = useMaxmind();
 const isStarted = ref(false);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
@@ -155,9 +166,10 @@ const toneOf = (leak) => ipFieldTone(leak.ip, {
 
 
 // Status
-const isFieldPending = (value) => {
-  return !value || value === t('dnsleaktest.StatusWait') || value === t('dnsleaktest.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+  waitLabels: t('dnsleaktest.StatusWait'),
+  errorLabels: t('dnsleaktest.StatusError'),
+});
 
 const createDefaultCard = () => ({
   name: t('dnsleaktest.Name'),
@@ -167,107 +179,54 @@ const createDefaultCard = () => ({
   org: t('dnsleaktest.StatusWait'),
 });
 
-const leakTest = reactive([
-  { ...createDefaultCard(), id: 'ipapi1' },
-  { ...createDefaultCard(), id: 'ipapi2' },
-  { ...createDefaultCard(), id: 'sfshark1' },
-  { ...createDefaultCard(), id: 'sfshark2' },
-]);
+const leakTest = reactive(PROVIDERS.map((p) => ({
+  ...createDefaultCard(),
+  id: p.id,
+  providerName: p.name,
+})));
 
-// Generate 32-digit random string
-const generate32DigitString = () => {
-  const unixTime = Date.now().toString();
-  const fixedString = 'jason5ng32';
-  const randomString = Math.random().toString(36).substring(2, 11);
-  return unixTime + fixedString + randomString;
+// Apply MaxMind lookup to a card that already has a resolved leak IP.
+const applyMaxMindGeo = async (index, ip) => {
+  const geo = await lookupMaxmind(ip);
+  if (geo) {
+    leakTest[index].country_code = geo.country_code;
+    leakTest[index].country = geo.country;
+    leakTest[index].org = geo.org;
+    return;
+  }
+  leakTest[index].country = t('dnsleaktest.StatusError');
+  leakTest[index].country_code = '';
+  leakTest[index].org = t('dnsleaktest.StatusError');
 };
 
-// Generate 14-digit random string
-const generate14DigitString = () => {
-  const fixedString = 'jn32';
-  const randomString = Math.random().toString(36).substring(2, 11);
-  return fixedString + randomString;
+const markLeakCardError = (index) => {
+  leakTest[index].ip = t('dnsleaktest.StatusError');
+  leakTest[index].country = t('dnsleaktest.StatusError');
+  leakTest[index].country_code = '';
+  leakTest[index].org = t('dnsleaktest.StatusError');
 };
 
-// DNS leak test 1
-const fetchLeakTestIpApiCom = (index) => {
-  return new Promise((resolve, reject) => {
-    const urlString = generate32DigitString();
-    const url = `https://${urlString}.edns.ip-api.com/json`;
-
-    fetchWithTimeout(url)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        if (data.dns && 'geo' in data.dns && 'ip' in data.dns) {
-          const geoSplit = data.dns.geo.split(' - ');
-          leakTest[index].country_code = countryLookup.byCountry(geoSplit[0]).iso2;
-          leakTest[index].country = getCountryName(leakTest[index].country_code, lang.value);
-          leakTest[index].org = geoSplit[1] || '';
-          leakTest[index].ip = data.dns.ip;
-          resolve();
-        } else {
-          console.error('Unexpected data structure:', data);
-          reject(new Error('Unexpected data structure'));
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching leak test data:', error);
-        leakTest[index].country = t('dnsleaktest.StatusError');
-        leakTest[index].ip = t('dnsleaktest.StatusError');
-        leakTest[index].country_code = '';
-        leakTest[index].org = '';
-        reject(error);
-      });
-  });
+// Run one provider against its card slot, with retry (3 attempts, fresh
+// prefix per attempt — see `runWithRetry` in utils/dnsleaks). On full
+// failure (all attempts threw) the card is flipped to the error state.
+const runProvider = async (index, provider) => {
+  try {
+    const { ip } = await runWithRetry(provider);
+    leakTest[index].ip = ip;
+    await applyMaxMindGeo(index, ip);
+  } catch (error) {
+    console.error('Error fetching leak test data:', error);
+    markLeakCardError(index);
+  }
 };
 
-// DNS leak test 2
-const fetchLeakTestSfSharkCom = (index, key) => {
-  return new Promise((resolve, reject) => {
-    const urlString = generate14DigitString();
-    const url = `https://${urlString}.ipv4.surfsharkdns.com`;
-
-    fetchWithTimeout(url)
-      .then((response) => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-      })
-      .then((data) => {
-        const getKey = Object.keys(data)[key];
-        const keyEntry = data[getKey];
-
-        if (keyEntry && keyEntry.CountryCode && keyEntry.IP) {
-          leakTest[index].country_code = keyEntry.CountryCode;
-          leakTest[index].country = getCountryName(keyEntry.CountryCode, lang.value);
-          leakTest[index].org = keyEntry.ISP || '';
-          leakTest[index].ip = keyEntry.IP;
-          resolve();
-        } else {
-          console.error('Unexpected data structure:', data);
-          reject(new Error('Unexpected data structure'));
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching leak test data:', error);
-        leakTest[index].ip = t('dnsleaktest.StatusError');
-        leakTest[index].country = t('dnsleaktest.StatusError');
-        leakTest[index].country_code = '';
-        leakTest[index].org = '';
-        reject(error);
-      });
-  });
-};
-
-// Check all
+// Check all. Staggers startup by 300ms per provider to avoid a thundering-
+// herd on first paint.
 const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
     leakTest.forEach((server) => {
-      server.geo = t('dnsleaktest.StatusWait');
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
       server.country_code = '';
@@ -275,18 +234,15 @@ const checkAllDNSLeakTest = async (isRefresh) => {
     });
   }
 
-  const delayedFetch = (fetchFunction, index, key, delay) => new Promise((resolve) => {
+  const delayedRun = (provider, index, delay) => new Promise((resolve) => {
     setTimeout(() => {
-      fetchFunction(index, key).then(resolve).catch(resolve);
+      runProvider(index, provider).then(resolve, resolve);
     }, delay);
   });
 
-  const promises = [
-    delayedFetch(fetchLeakTestIpApiCom, 0, null, 100),
-    delayedFetch(fetchLeakTestIpApiCom, 1, null, 1000),
-    delayedFetch(fetchLeakTestSfSharkCom, 2, 0, 100),
-    delayedFetch(fetchLeakTestSfSharkCom, 3, 0, 1000),
-  ];
+  const promises = PROVIDERS.map((provider, index) =>
+    delayedRun(provider, index, 100 + index * 300),
+  );
 
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));

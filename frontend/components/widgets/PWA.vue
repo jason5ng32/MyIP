@@ -7,7 +7,7 @@
 import { ref, onMounted } from 'vue';
 import '@khmyznikov/pwa-install';
 import { detectBrowser, detectOS } from '@/utils/system-detect.js';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 
 
 // Define data

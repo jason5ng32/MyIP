@@ -10,9 +10,9 @@
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
+import { pickLang } from '../common/langs.js';
 
 const TOKEN_RE = /^[0-9a-f]{32}$/;
-const SUPPORTED_LANGS = ['zh-CN', 'en', 'fr', 'tr'];
 
 export async function getSessionResult(req, res) {
     if (req.method !== 'GET') {
@@ -30,7 +30,7 @@ export async function getSessionResult(req, res) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const lang = SUPPORTED_LANGS.includes(req.query.lang) ? req.query.lang : 'zh-CN';
+    const lang = pickLang(req.query.lang, 'zh-CN');
 
     const url = new URL(`${apiEndpoint}/dnsleaktest/session/${token}`);
     url.searchParams.set('apikey', apiKey);

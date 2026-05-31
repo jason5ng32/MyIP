@@ -114,6 +114,17 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      // @vueuse/core ships a couple of /* #__PURE__ */ comments in positions
+      // Rolldown (Vite 8's new bundler) can't interpret. They're harmless —
+      // just slightly less aggressive tree-shaking for those call sites —
+      // but the warnings clutter every build. Filter them out and let
+      // everything else through. Drop this once @vueuse/core fixes positions.
+      onwarn(warning, defaultHandler) {
+        if (warning.code === 'INVALID_ANNOTATION' && warning.id?.includes('@vueuse/core')) {
+          return;
+        }
+        defaultHandler(warning);
+      },
       output: {
         manualChunks,
         assetFileNames: (assetInfo) => {

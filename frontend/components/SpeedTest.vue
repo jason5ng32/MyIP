@@ -162,12 +162,12 @@
 import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
-import useSpeedTestCharts from '@/utils/use-speedtest-charts.js';
+import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -176,7 +176,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import {
   ArrowLeftRight, CalendarCheck2, Play, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();

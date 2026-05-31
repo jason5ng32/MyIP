@@ -218,12 +218,8 @@
     "browser": {
       "Infos": "Tarayıcı Bilgileri",
       "browserName": "Tarayıcı Adı",
-      "browserVersion": "Sürüm",
       "engineName": "Motor",
-      "engineVersion": "Sürüm",
       "osName": "İşletim Sistemi",
-      "osVersion": "Sürüm",
-      "deviceModel": "Model",
       "deviceVendor": "Üretici",
       "cpuArchitecture": "CPU Mimarisi",
       "gpu": "GPU",
@@ -382,6 +378,8 @@
     "latencyVSPing": {
       "title": "TCP vs Ping Gecikmesi",
       "positive": "TCP gecikmesi ve Ping farkı büyük, bu da bir proxy veya VPN kullanıyor olabileceğinizi gösterir.",
+      "fromTCP": "TCP gecikme değeri: ",
+      "fromPing": "Ping gecikme değeri: ",
       "negative": "TCP gecikmesi ve Ping farkı büyük değil, bu da bir proxy veya VPN kullanmıyor olabileceğinizi gösterir."
     },
     "highlatency": {
@@ -438,7 +436,8 @@
     "Note3": "Whois bilgileri çeşitli türde alanlar içerir. Aşağıda ham metin bilgisi bulunmaktadır",
     "Placeholder": "Alan Adı veya IP",
     "invalidURL": "Geçersiz alan adı veya IP",
-    "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş"
+    "fetchError": "Sorgu sonuçları alınamadı veya sorgu sonuçları boş",
+    "Provider": "Bilgi Sağlayıcısı"
   },
   "enhanceddnsleaktest": {
     "Title": "Derinlemesine DNS Sızıntı Testi",
@@ -514,11 +513,11 @@
   },
   "Tooltips": {
     "RefreshIPCard": "IP Kartını Yenile",
+    "SaveAsImage": "Resim olarak kaydet",
     "RefreshConnectivityTests": "Bağlantı Testlerini Yenile",
     "RefreshWebRTC": "WebRTC Sızıntı Testini Yenile",
     "RefreshDNSLeakTest": "DNS Sızıntı Testini Yenile",
     "SpeedTestButton": "Hız Testini Başlat/Duraklat",
-    "SourceSelect": "IP Coğrafi Konum Kaynağını Seç",
     "ShowASNInfo": "AS Detaylarını Göster",
     "ShowASNHistory": "ASN Geçmişini Göster",
     "ShowASNConnectivity": "ASN Bağlantı Haritasını Göster",
@@ -527,20 +526,12 @@
     "ViewOnMap": "Konumu haritada görüntüle",
     "InfoMask": "IP Bilgilerini Gizle",
     "QueryIP": "IP Adresini Sorgula",
-    "GithubLink": "Kaynak Kodunu GitHub'da Görüntüle",
-    "RefreshRuleTests": "Kural Testlerini Yenile",
-    "qualityScoreExplain": "IP kalite puanı, IP'nin türü, proxy/VPN olup olmadığı ve bu IP'den son zamanlarda tespit edilen saldırı olaylarının sayısı dahil olmak üzere birden fazla ağırlıklı faktöre göre hesaplanır. Daha yüksek bir puan, daha iyi IP kalitesi anlamına gelir ve bazı web sitelerinde risk kontrolü tarafından engellenme olasılığını azaltır."
+    "GithubLink": "Kaynak Kodunu GitHub'da Görüntüle"
   },
   "ipInfos": {
-    "id": "ipinfos",
-    "database": "Veritabanı",
     "Title": "IP Bilgileri",
     "Notes": "Program önce IP adresinizi farklı kaynaklardan (IPv4 ve IPv6 dahil) kontrol edecek ve ardından seçtiğiniz IP coğrafi konum kaynağından ilgili coğrafi verileri sorgulayacaktır. Yalnızca 1 IP yığını varsa, verisi olmayan kaynak boş olarak görüntülenecektir.",
-    "Simple": "Basit",
-    "Map": "Harita",
-    "MapUnavailable": "Harita Kullanılamıyor",
     "Source": "IP Kaynağı",
-    "IP": "IP",
     "Country": "Bölge",
     "Region": "Eyalet",
     "City": "Şehir",
@@ -549,7 +540,6 @@
     "Coordinates": "Koordinatlar",
     "IPv4Error": "Alım Başarısız veya IPv4 Adresi Yok",
     "IPv6Error": "Alım Başarısız veya IPv6 Adresi Yok",
-    "SelectSource": "IP Coğrafi Konum Kaynağını Seç",
     "type": "Tür",
     "isProxy": "Proxy",
     "qualityScore": "IP Kalitesi",
@@ -597,7 +587,6 @@
       "proxyMaybe": "Olası proxy / VPN",
       "proxyNo": "İşaretlenmedi",
       "proxyUnknown": "Bilinmeyen tür",
-      "proxyUnknownProtocol": "Bilinmeyen protokol",
       "type": {
         "Residential": "Konut",
         "Wireless": "Kablosuz",
@@ -612,7 +601,6 @@
     }
   },
   "connectivity": {
-    "id": "connectivity",
     "Title": "Ağ Bağlantısı",
     "Note": "Test, ilgili web sitelerinden küçük resimler yüklenerek yapılır. Gecikme değerleri yalnızca referans amaçlıdır ve gerçekte daha küçük olacaktır. Sık kullandığınız diğer web sitelerini test listesine ekleyerek hızlı testler yapabilirsiniz.",
     "StatusWait": "Test Bekleniyor",
@@ -642,6 +630,7 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC Sızıntı Testi",
+    "Name": "WebRTC Bağlantısı",
     "Note": "WebRTC genellikle doğrudan UDP üzerinden bağlantı kurar. Test gerçek IP'nizi döndürürse, bu, proxy ayarlarınızın bu bağlantıları kapsamadığı anlamına gelir. WebRTC'ye bağlanırken kullandığınız IP'yi tespit etmenin yanı sıra, NAT türünüzü de tespit ediyoruz. Ancak, NAT türü tespiti %100 doğru değildir ve yalnızca referans amaçlıdır.",
     "StatusWait": "Test Bekleniyor",
     "StatusError": "Bağlantı Hatası",
@@ -655,7 +644,6 @@
     }
   },
   "dnsleaktest": {
-    "id": "dnsleaktest",
     "Name": "DNS Uç Noktası Testi",
     "Title": "DNS Sızıntı Testi",
     "Note": "DNS sızıntısı, bir VPN/proxy'ye bağlıyken alan adı çözümlemelerinizin hala yerel İSS'niz aracılığıyla yapılması anlamına gelir, bu da DNS sızıntısı riski oluşturur.",
@@ -670,22 +658,17 @@
     }
   },
   "speedtest": {
-    "id": "speedtest",
     "Title": "Hız Testi",
     "Note": "Hız testi, Cloudflare'in kenar ağı kullanılarak gerçekleştirilecektir. İndirme ve yükleme için veri paketi boyutunu ihtiyacınıza göre seçebilirsiniz. Test sırasında veri paketleri 4 kez yüklenip indirilecektir; lütfen veri tüketimine dikkat edin. Cloudflare dünyadaki her ülkede kenar düğümü bulundurmadığından, test sonuçları yalnızca referans niteliğindedir ve gerçek hız daha yüksek olabilir.",
     "Download": "İndirme",
     "Upload": "Yükleme",
     "Latency": "Gecikme",
     "Jitter": "Jitter",
-    "Unit": "Mbps",
-    "StatusWait": "--",
-    "StatusError": "Test Hatası",
     "loadedLatency": "Yüklü gecikme: ",
     "videoStreaming": "Video Akışı: ",
     "gaming": ", Oyun: ",
     "rtc": ", Görüntülü Sohbet: ",
     "score": "Hız testine dayanarak, aşağıdaki kalite puanları alındı:",
-    "resultNote": ".",
     "connectionFrom": "Makinenizden hız testi tamamlandı, IP: ",
     "connectionTo": " test sunucusuna:",
     "connectionEnd": " .",
@@ -715,7 +698,6 @@
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin Ping testi yapmasına izin verilmiyor."
   },
   "mtrtest": {
-    "id": "mtrtest",
     "Title": "MTR Testi",
     "Note": "MTR (My Traceroute) testi, dünyanın farklı kıtalarında ve bölgelerinde bulunan sunuculardan IP adresinize ayrıntılı rota takibi yapar. MTR, ağ bağlantılarının kalitesini ve performansını gerçek zamanlı olarak teşhis etmek için geleneksel traceroute ve ping komutlarının işlevselliğini birleştirir.",
     "Note2": "Bu süreç, çeşitli coğrafi konumlardan ağ ortamınıza giden tüm yolu kapsar ve her atlama (hop) için gecikme ve paket kaybı hakkında bilgi sağlar. İster yönlendirme yolundaki tıkanıklık, ister belirli bir düğümdeki gecikme sorunları veya iletim sırasındaki paket kaybı olsun, MTR testi kritik teşhis bilgileri sağlar.",
@@ -725,31 +707,26 @@
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin MTR testi yapmasına izin verilmiyor."
   },
   "ipcheck": {
-    "id": "ipcheck",
     "Title": "IP Kontrolü",
     "Placeholder": "örn. 1.1.1.1",
     "Error": "Lütfen geçerli bir IPv4 veya IPv6 adresi girin.",
     "NoData": "Bu IP için bilgi alınamadı. Yönlendirilemez bir adres olabilir (örn. 0.0.0.0, özel adres) veya kaynak bu IP için veri bulamadı."
   },
   "alert": {
-    "id": "alert",
     "refreshEverythingMessage": "Tüm veriler yenileniyor, lütfen bekleyin...",
     "refreshEverythingTitle": "Yenileniyor",
     "OhNo": "Eyvah!",
     "Congrats": "Tebrikler!",
     "OhNo_Message": "Bağlantı testi başarısız oldu, bazı web sitelerine erişilemiyor.",
     "Congrats_Message": "Tüm bağlantı testleri geçti, tüm web sitelerine erişebilirsiniz.",
-    "maskedInfoTitle_1": "IP gizlendi",
-    "maskedInfoMessage_1": "IP bilgileri gizlendi, lütfen ekran görüntüsü alırken dikkatli olun.",
-    "maskedInfoTitle": "Tüm bilgiler gizlendi",
-    "maskedInfoMessage": "Tüm bilgiler gizlendi, şimdi güvenle ekran görüntüsü alabilirsiniz.",
-    "unmaskedInfoTitle": "Bilgiler gösterildi",
-    "unmaskedInfoMessage": "Bilgiler gösterildi, lütfen ekran görüntüsü alırken dikkatli olun.",
+    "maskedInfoTitle": "IP Bilgileri Gizlendi",
+    "maskedInfoMessage": "IP bilgileri gizlendi. Ekran görüntülerini paylaştığınızda IP bilgilerinizi gözetmez.",
+    "unmaskedInfoTitle": "IP Bilgileri Görünür",
+    "unmaskedInfoMessage": "IP bilgileri görünür. Ekran görüntülerini paylaştığınızda IP bilgilerinizi görünür.",
     "SignInFailed": "Giriş Başarısız",
     "SignInFailedReason": "Neden"
   },
   "shortcutKeys": {
-    "id": "shortcutKeys",
     "GoToTop": "En Üste Git",
     "GoToBottom": "En Alta Git",
     "ToggleDarkMode": "Karanlık Modu Değiştir",

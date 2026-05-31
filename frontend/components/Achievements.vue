@@ -84,8 +84,8 @@
                                 class="jn-achievement-card opacity-50 cursor-not-allowed">
                                 <div class="p-3 flex flex-col items-center justify-center min-h-[200px]">
                                     <img :src="achievement.img" alt=""
-                                        class="jn-slide-in size-[120px] object-contain grayscale blur-[4px]" />
-                                    <h3 class="mt-2 text-sm font-medium text-center text-muted-foreground grayscale blur-[4px]">
+                                        class="jn-slide-in size-[120px] object-contain grayscale blur-xs" />
+                                    <h3 class="mt-2 text-sm font-medium text-center text-muted-foreground grayscale blur-xs">
                                         {{ t(`user.Achievements.Type.${achievement.name}.Title`) }}
                                     </h3>
                                 </div>
@@ -107,11 +107,11 @@
 import { computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import unixToDateTime from '@/utils/timestamp-to-date';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Award, CircleCheck, CircleX } from 'lucide-vue-next';
+import { Award, CircleCheck, CircleX } from '@lucide/vue';
 
 const { t } = useI18n();
 

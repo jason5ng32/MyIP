@@ -1126,7 +1126,7 @@
   },
   {
     "version": "v6.3.0",
-    "date": "Beta",
+    "date": "May 27, 2026",
     "content": [
       {
         "type": "add",
@@ -1171,6 +1171,57 @@
           "zh": "修复了一些小问题",
           "fr": "Correction de petits problèmes",
           "tr": "Birkaç küçük sorun düzeltildi"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v6.4.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "You can now save IP card or ASN connectivity graph as image",
+          "zh": "现在可以保存 IP 卡片或 ASN 连接图作为图片",
+          "fr": "Vous pouvez maintenant enregistrer les cartes IP ou le graphique de connectivité ASN en image",
+          "tr": "IP kartı veya ASN bağlantı grafiği görüntüsü olarak kaydedilebilir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized the brand icons of the Connectivity Test",
+          "zh": "优化网络连通性测试的品牌图标",
+          "fr": "Optimisation des icônes de marque du test de connectivité",
+          "tr": "Ağ bağlantı testi marka simgeleri iyileştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Enriched the information display of WebRTC Test and Rule Test",
+          "zh": "丰富 WebRTC 测试和规则测试的信息展示",
+          "fr": "Amélioration de l'affichage des informations du test WebRTC et du test de règles",
+          "tr": "WebRTC Test ve Rule Test bilgi görüntüleme iyileştirildi"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Navbar will hide when scrolling on mobile",
+          "zh": "导航栏在手机上会跟随滚动隐藏",
+          "fr": "La barre de navigation se cache lors du défilement sur mobile",
+          "tr": "Navbar mobil tarayıcıda kaydırılırken gizlenir"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed a bug that caused the PWA status bar color to not match the theme",
+          "zh": "修复 PWA 状态栏颜色与主题不一致的问题",
+          "fr": "Correction d'un bug causant la couleur de la barre de statut PWA à ne pas correspondre au thème",
+          "tr": "PWA durum çubuğu rengi tema ile eşleşmediği bir hata düzeltildi"
         }
       }
     ]

@@ -1,7 +1,6 @@
 <script setup>
 // shadcn-vue Tabs 根组件（refactor/01 阶段 C commit 2）
 import { TabsRoot } from 'reka-ui';
-import { cn } from '@/lib/utils';
 
 defineProps({
   modelValue: { type: String, default: undefined },

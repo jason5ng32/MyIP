@@ -1,9 +1,11 @@
-import countryLookup from 'country-code-lookup';
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+// /api/ipinfo — geolocation source handler backed by ipinfo.io.
+// Picks a random API token (when configured) and normalizes the response
+// into the canonical geo shape via the shared makeGeoHandler factory.
 
-export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+import countryLookup from 'country-code-lookup';
+import { makeGeoHandler } from '../common/geo-handler.js';
+
+function buildUrl(req) {
     const ipAddress = req.query.ip;
 
     // Build request URL for ipinfo.io
@@ -12,17 +14,8 @@ export default async (req, res) => {
 
     const url_hasToken = `https://ipinfo.io/${ipAddress}?token=${token}`;
     const url_noToken = `https://ipinfo.io/${ipAddress}`;
-    const url = token ? url_hasToken : url_noToken;
-
-    try {
-        const apiRes = await fetchUpstream(url);
-        const json = await apiRes.json();
-        res.json(modifyJson(json));
-    } catch (e) {
-        logger.error({ err: e, ip: ipAddress }, 'ipinfo-io handler failed');
-        res.status(500).json({ error: e.message });
-    }
-};
+    return token ? url_hasToken : url_noToken;
+}
 
 function modifyJson(json) {
     const { ip, city, region, country, loc, org } = json;
@@ -46,3 +39,5 @@ function modifyJson(json) {
         org: modifiedOrg
     };
 }
+
+export default makeGeoHandler({ name: 'ipinfo-io', buildUrl, normalize: modifyJson });

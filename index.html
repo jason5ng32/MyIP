@@ -10,7 +10,9 @@
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Jason Ng" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#f8f9fa" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
   <meta name="background-color" content="#ffffff" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- Avoid auto-linking phone numbers -->
@@ -98,6 +100,17 @@
       padding: 0;
     }
 
+    /* Reserve space at the top of the body for: (a) the iOS safe-area
+       (transparent status bar) — `env()` resolves to 0 on non-notch
+       platforms, and (b) the fixed Nav (3.5rem = h-14 in Nav.vue). The Nav
+       used to be `position: sticky` and lived in the normal flow, so no
+       padding was needed; switching it to `fixed` lets the body rubber-band
+       bounce on iOS without dragging the Nav along, but now we have to
+       compensate for the Nav's lost flow height here. */
+    body {
+      padding-top: calc(env(safe-area-inset-top) + 3.5rem);
+    }
+
     html {
       line-height: 1.5;
       -webkit-text-size-adjust: 100%;
@@ -108,7 +121,7 @@
         "Apple Color Emoji", "Segoe UI Emoji";
       scrollbar-gutter: stable;
       background: #ffffff;
-      color: #0a0a0a;
+      color: #0e0e0e;
     }
 
     /* Dark mode is gated strictly on the `.dark` class — *never* on
@@ -118,7 +131,7 @@
        before first paint, so boot-screen rendering already reflects the
        right theme without a flash. */
     html.dark {
-      background: #0a0a0a;
+      background: #0e0e0e;
       color: #fafafa;
     }
 
@@ -143,13 +156,13 @@
     }
 
     html.dark .jn-loading {
-      background: #0a0a0a;
+      background: #0e0e0e;
     }
 
     /* Hand-off, driven from App.vue:
-         stage-1 — non-logo children fade out, logo stays put.
-         stage-2 — logo scales down to 0 and fades.
-         stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
+        stage-1 — non-logo children fade out, logo stays put.
+        stage-2 — logo scales down to 0 and fades.
+        stage-3 — overlay removed, `#app` runs `.jn-app-enter` below. */
     .jn-loading>svg,
     .jn-loading>div,
     .jn-loading>.jn-spinner,
@@ -208,12 +221,10 @@
        a missing inline script doesn't strand the user on a blank screen. */
     html[data-booting] #app {
       opacity: 0;
-      transform: scale(0.94);
     }
 
     #app {
-      transform-origin: center center;
-      transition: opacity 320ms ease-out, transform 320ms ease-out;
+      transition: opacity 320ms ease-out;
     }
 
     #app.jn-app-enter {

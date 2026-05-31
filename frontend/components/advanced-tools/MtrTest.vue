@@ -18,8 +18,7 @@
                         <SelectItem v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</SelectItem>
                     </SelectContent>
                 </Select>
-                <Button variant="action"
-                    :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
+                <Button variant="action" :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
                     @click="startmtrCheck" class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
                     <template v-else>
@@ -39,23 +38,25 @@
         <!-- Result Accordion -->
         <Accordion v-if="mtrResults.length > 0" type="single" collapsible default-value="0" class="space-y-2">
             <AccordionItem v-for="(result, index) in mtrResults" :key="result.country" :value="String(index)"
-                class="rounded-lg border bg-card px-4">
-                <AccordionTrigger class="hover:no-underline">
+                class="rounded-lg border bg-card px-4 data-[state=open]:border-primary/30">
+                <AccordionTrigger class="hover:no-underline cursor-pointer my-1">
                     <div class="flex items-center gap-2 min-w-0 flex-wrap">
-                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()"
-                            class="shrink-0 size-5" />
+                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()" class="shrink-0 size-5" />
                         <span class="text-sm font-semibold">
                             {{ result.country_name }}, {{ result.city }}
                         </span>
                         <template v-if="!isMobile">
                             <span class="text-muted-foreground">·</span>
                             <span class="text-sm text-muted-foreground truncate">{{ result.network }}</span>
-                            <Badge variant="success" class="font-mono font-normal shadow-none rounded-full">AS{{ result.asn }}</Badge>
+                            <Badge variant="success" class="font-mono font-normal shadow-none rounded-full">AS{{
+                                result.asn }}</Badge>
                         </template>
                     </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                    <pre class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ result.rawOutput }}</pre>
+                    <pre
+                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
+                {{ result.rawOutput }}</pre>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -66,8 +67,8 @@
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
-import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
+import { trackEvent } from '@/utils/analytics';
+import { useGlobalpingMeasurement, GLOBALPING_DEFAULT_LOCATIONS, selectableIPs } from '@/composables/use-globalping-measurement';
 import getCountryName from '@/data/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -75,17 +76,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from 'lucide-vue-next';
+import { Info, Play } from '@lucide/vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
-const allIPs = computed(() => {
-    const _allIPs = store.allIPs;
-    return _allIPs.filter(ip => ip && !ip.includes(' '));
-});
+const allIPs = computed(() => selectableIPs(store.allIPs));
 
 const selectedIP = ref('');
 const mtrResults = ref([]);
@@ -101,12 +99,7 @@ const startmtrCheck = () => {
 
     runMeasurement({
         limit: 16,
-        locations: [
-            { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-            { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-            { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-            { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
-        ],
+        locations: GLOBALPING_DEFAULT_LOCATIONS,
         target: selectedIP.value,
         type: 'mtr',
         measurementOptions: { port: 80, protocol: 'ICMP' },

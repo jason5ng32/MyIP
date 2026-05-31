@@ -218,12 +218,8 @@
     "browser": {
       "Infos": "浏览器信息",
       "browserName": "浏览器名称",
-      "browserVersion": "版本",
       "engineName": "引擎",
-      "engineVersion": "版本",
       "osName": "系统",
-      "osVersion": "版本",
-      "deviceModel": "型号",
       "deviceVendor": "制造商",
       "cpuArchitecture": "CPU 架构",
       "gpu": "GPU",
@@ -517,11 +513,11 @@
   },
   "Tooltips": {
     "RefreshIPCard": "刷新 IP 信息",
+    "SaveAsImage": "保存为图片",
     "RefreshConnectivityTests": "刷新连通性测试",
     "RefreshWebRTC": "刷新 WebRTC 泄露测试",
     "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",
     "SpeedTestButton": "开始/暂停网速测试",
-    "SourceSelect": "选择 IP 归属地数据来源",
     "ShowASNInfo": "显示 AS 详细信息",
     "ShowASNHistory": "显示 ASN 历史",
     "ShowASNConnectivity": "显示 ASN 连接图",
@@ -530,20 +526,12 @@
     "ViewOnMap": "在地图上查看位置",
     "InfoMask": "隐藏信息",
     "QueryIP": "查询 IP 信息",
-    "GithubLink": "查看源代码",
-    "RefreshRuleTests": "刷新规则测试",
-    "qualityScoreExplain": "IP 质量分根据多个因素加权计算出来，包含了 IP 的类型、是否属于代理/VPN 和近期监测到来自该 IP 的攻击事件数量等。分数越高，意味着该 IP 的质量越好，在一些网站里，这个 IP 被风控阻断的概率就越低。"
+    "GithubLink": "查看源代码"
   },
   "ipInfos": {
-    "id": "ipinfos",
-    "database": "数据源",
     "Title": "IP 信息",
     "Notes": "程序会先从多个不同的来源（包含 IPv4 和 IPv6）检查你的 IP 地址，然后通过你选择的 IP 地理位置信息源查询对应的地理数据。如果当前 IP 栈只有 1 个，则没有数据的来源会显示为空。",
-    "Simple": "简约",
-    "Map": "地图",
-    "MapUnavailable": "地图不可用",
     "Source": "IP 来源",
-    "IP": "IP",
     "Country": "地区",
     "Region": "省份",
     "City": "城市",
@@ -552,7 +540,6 @@
     "Coordinates": "经纬度",
     "IPv4Error": "获取失败或不存在 IPv4 地址",
     "IPv6Error": "获取失败或不存在 IPv6 地址",
-    "SelectSource": "选择 IP 归属地数据来源",
     "type": "类型",
     "isProxy": "代理",
     "qualityScore": "IP 质量分",
@@ -600,7 +587,6 @@
       "proxyMaybe": "疑似代理 / VPN",
       "proxyNo": "未识别为代理",
       "proxyUnknown": "未知类型",
-      "proxyUnknownProtocol": "未知协议",
       "type": {
         "Residential": "住宅线路",
         "Wireless": "无线网络",
@@ -615,7 +601,6 @@
     }
   },
   "connectivity": {
-    "id": "connectivity",
     "Title": "网络连通性",
     "Note": "通过加载对应网站上的小图片进行测试，延迟值仅供参考，实际会更小。你可以添加其它你常用的网站到测试列表中，方便快速测试。",
     "StatusWait": "待检测",
@@ -645,6 +630,7 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC 泄露测试",
+    "Name": "WebRTC 连接",
     "Note": "WebRTC 往往通过 UDP 直连进行建立，如果测试返回了真实 IP，则意味着你的代理设置没有覆盖这些连接。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。然而，NAT 类型的检测并不是 100% 准确的，仅供参考。",
     "StatusWait": "待检测",
     "StatusError": "连接错误",
@@ -658,7 +644,6 @@
     }
   },
   "dnsleaktest": {
-    "id": "dnsleaktest",
     "Name": "DNS 出口检测",
     "Title": "DNS 泄漏测试",
     "Note": "DNS 泄露（DNS Leaks）的意思是，当你挂上 VPN/代理后，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS 泄露的风险。",
@@ -673,22 +658,17 @@
     }
   },
   "speedtest": {
-    "id": "speedtest",
     "Title": "网速测试",
     "Note": "将从 Cloudflare 使用边缘网络进行速度测试。你可以根据需要，选择测速时下载和上传的数据包大小。测速过程中，会进行 4 次数据包上传与下载，请注意流量消耗。考虑到 Cloudflare 并非在全球每一个国家都部署边缘节点，测速结果仅供参考，实际速度可能更快。",
     "Download": "下载",
     "Upload": "上传",
     "Latency": "延迟",
     "Jitter": "抖动",
-    "Unit": "Mbps",
-    "StatusWait": "--",
-    "StatusError": "测试出错",
     "loadedLatency": "满载延迟：",
     "videoStreaming": "在线视频：",
     "gaming": " ，在线游戏：",
     "rtc": " ，视频会议：",
     "score": "根据网速测试，得出以下质量分数：",
-    "resultNote": " 。",
     "connectionFrom": "已完成从你的机器，IP：",
     "connectionTo": "与测速服务器：",
     "connectionEnd": " 的测试。",
@@ -718,7 +698,6 @@
     "Error": "测试失败，看起来你的 IP 不允许进行 Ping 测试。"
   },
   "mtrtest": {
-    "id": "mtrtest",
     "Title": "MTR 测试",
     "Note": "MTR (My Traceroute) 测试会从遍布全球不同大洲和地区的服务器出发，对你的 IP 地址进行详细的路由跟踪。MTR 结合了传统 traceroute 和 ping 命令的功能，能够实时地诊断网络连接的质量和性能。",
     "Note2": "这个过程涵盖了从各个地理位置到你的网络环境的完整路径，提供关于每一跳的延迟和数据包丢失信息。无论是路由路径的拥堵、某个特定节点的延迟问题，还是数据包在传输过程中的丢失，MTR 测试都能提供关键的诊断信息。",
@@ -728,31 +707,26 @@
     "Error": "测试失败，看起来你的 IP 不允许进行 MTR 测试。"
   },
   "ipcheck": {
-    "id": "ipcheck",
     "Title": "IP 查询",
     "Placeholder": "例如 1.1.1.1",
     "Error": "请输入有效的 IPv4 或 IPv6 地址。",
     "NoData": "无法查询到该 IP 的信息。可能是不可路由地址（如 0.0.0.0、私有地址）或数据源没有该 IP 的记录。"
   },
   "alert": {
-    "id": "alert",
     "refreshEverythingMessage": "正在刷新所有数据，请等待...",
     "refreshEverythingTitle": "正在刷新",
     "OhNo": "糟糕！",
     "Congrats": "恭喜呀！",
     "OhNo_Message": "连通性检测没有通过，部分网站无法访问。",
     "Congrats_Message": "所有的连通性检测均通过，你可以访问所有网站。",
-    "maskedInfoTitle_1": "IP 隐藏成功",
-    "maskedInfoMessage_1": "IP 信息已隐藏，截图时请注意隐私。",
-    "maskedInfoTitle": "全部隐藏成功",
-    "maskedInfoMessage": "所有信息已隐藏，现在可以安心截图了。",
-    "unmaskedInfoTitle": "取消隐藏",
-    "unmaskedInfoMessage": "信息已显示，截图时请注意隐私。",
+    "maskedInfoTitle": "IP 信息已隐藏",
+    "maskedInfoMessage": "IP 信息已隐藏。分享截图不会泄露你的 IP 信息。",
+    "unmaskedInfoTitle": "IP 信息已显示",
+    "unmaskedInfoMessage": "IP 信息已显示。分享截图时请注意隐私。",
     "SignInFailed": "登录失败",
     "SignInFailedReason": "原因"
   },
   "shortcutKeys": {
-    "id": "shortcutKeys",
     "GoToTop": "回到顶部",
     "GoToBottom": "回到底部",
     "ToggleDarkMode": "切换深色模式",

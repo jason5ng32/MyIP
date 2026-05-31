@@ -68,7 +68,7 @@
 import { ref, computed, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
 import { isValidDomain } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
@@ -77,7 +77,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from 'lucide-vue-next';
+import { CircleCheck, CircleX, Frown, Meh, Shield, ShieldAlert, Smile, Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

@@ -1,8 +1,8 @@
 <template>
     <!-- IP Info Card -->
-    <Card
+    <Card data-screenshot-root
         class="keyboard-shortcut-card jn-card flex flex-col h-full overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <!-- Card header: number badge + source + refresh -->
+        <!-- Card header: number badge + source + save-image + refresh -->
         <div class="flex items-center justify-between gap-2 px-4 py-2.5 bg-muted/50 border-b">
             <div class="flex items-center gap-2 min-w-0">
                 <span
@@ -10,31 +10,36 @@
                     {{ index + 1 }}
                 </span>
                 <span class="text-sm font-medium truncate">
-                    <span class="text-muted-foreground">{{ t('ipInfos.Source') }}:</span>
-                    {{ card.source }}
+                    <span class="text-muted-foreground">{{ t('ipInfos.Source') }}:
+                    {{ card.source }}</span>
                 </span>
             </div>
-            <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
-                <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
-                    @click="$emit('refresh-card', card, index)" :aria-label="'Refresh ' + card.source">
-                    <RotateCw class="size-4" />
-                </Button>
-            </JnTooltip>
+            <div class="shrink-0 flex items-center gap-1" data-screenshot-exclude>
+                <ScreenshotButton
+                    filename-prefix="myip"
+                    :filename-label="card.source"
+                    :track-label="card.source || 'unknown'"
+                    :disabled="!hasData"
+                    :tooltip-text="t('Tooltips.SaveAsImage')"
+                    :aria-label="'Save ' + card.source + ' as image'" />
+                <JnTooltip :text="t('Tooltips.RefreshIPCard')" side="left">
+                    <Button size="icon" variant="outline" class="size-8 cursor-pointer"
+                        @click="$emit('refresh-card', card, index)" :aria-label="'Refresh ' + card.source">
+                        <RotateCw class="size-4" />
+                    </Button>
+                </JnTooltip>
+            </div>
         </div>
 
         <!-- Main body in three states: normal / error / loading -->
         <div class="flex-1 flex flex-col">
             <template v-if="hasData">
                 <!-- Monitor is inline inside FitText so it rides the IP's
-                     first line; Copy stays a flex sibling so ellipsis
-                     never clips it. -->
-                <div class="px-4 py-3 flex items-start gap-2 min-w-0">
+                    first line; Copy stays a flex sibling so ellipsis
+                    never clips it. -->
+                <div class="px-4 py-3 flex items-start gap-2 min-w-0" data-mask="ip">
                     <FitText :text="card.ip" :tiers="HERO_TIERS" :max-lines="2" :title="card.ip"
-                        class="font-mono font-semibold min-w-0 items-start">
-                        <template #prefix >
-                            <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
-                        </template>
-                    </FitText>
+                        class="font-mono font-semibold min-w-0 items-start"/>
                     <CopyButton v-if="isValidIP(card.ip)" :value="card.ip"
                         :tooltip="t('Tooltips.CopyIP')"
                         :aria-label="'Copy ' + card.ip" />
@@ -74,10 +79,10 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
+import ScreenshotButton from '@/components/widgets/ScreenshotButton.vue';
 import {
-    Monitor,
     RotateCw,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 const { t } = useI18n();
 
@@ -98,9 +103,7 @@ const props = defineProps({
 defineEmits(['refresh-card']);
 
 // Three state check: has data (normal) / error / loading
-const hasData = computed(() =>
-    Boolean(props.card.asn) || props.card.ip === '2001:4860:4860::8888'
-);
+const hasData = computed(() => Boolean(props.card.asn));
 const isErrorState = computed(() =>
     props.card.ip === t('ipInfos.IPv4Error') || props.card.ip === t('ipInfos.IPv6Error')
 );

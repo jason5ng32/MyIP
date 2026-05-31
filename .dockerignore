@@ -17,7 +17,23 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
+# Runtime-downloaded databases — never bake them into the image. A clean CI build
+# wouldn't have them anyway; this keeps a local build (which has them on disk from
+# `pnpm dev`) consistent with CI, so the container always downloads fresh data on
+# first boot. Kept in sync with the matching block in .gitignore.
 common/maxmind-db/.maxmind-update-*.json
 common/maxmind-db/.maxmind-update.lock
 common/maxmind-db/*.bak
 common/maxmind-db/*.next
+common/maxmind-db/*.mmdb
+
+common/as-org-db/*.txt
+common/as-rel-db/*.txt
+common/as-org-db/.caida-update-state.json
+common/as-rel-db/.caida-update-state.json
+common/as-org-db/.caida-update.lock
+common/as-rel-db/.caida-update.lock
+common/as-org-db/*.bak
+common/as-rel-db/*.bak
+common/as-org-db/*.next
+common/as-rel-db/*.next

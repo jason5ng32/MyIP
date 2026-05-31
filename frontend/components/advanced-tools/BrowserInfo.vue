@@ -37,7 +37,7 @@
                                         User Agent
                                     </Badge>
                                     <CopyButton :value="userAgent.ua"
-                                        class="-mr-1 hover:bg-transparent"
+                                        class="-mr-1 hover:bg-success/10"
                                         aria-label="Copy UA" />
                                 </div>
                                 <p class="font-mono text-sm leading-relaxed wrap-break-word">{{ userAgent.ua }}</p>
@@ -133,7 +133,7 @@ import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Spinner } from '@/components/ui/spinner';
-import { BriefcaseBusiness, Fingerprint, Info, Microscope } from 'lucide-vue-next';
+import { BriefcaseBusiness, Fingerprint, Info, Microscope } from '@lucide/vue';
 import { Card, CardContent } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 

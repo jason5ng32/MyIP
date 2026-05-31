@@ -1,6 +1,6 @@
 <script setup>
 import { SelectTrigger, SelectIcon } from 'reka-ui';
-import { ChevronDown } from 'lucide-vue-next';
+import { ChevronDown } from '@lucide/vue';
 import { cn } from '@/lib/utils';
 
 defineProps({ class: { type: [String, Array, Object], default: undefined } });

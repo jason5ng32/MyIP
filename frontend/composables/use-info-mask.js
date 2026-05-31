@@ -1,97 +1,53 @@
-// Info mask logic: 3 level switch (no mask / mask IP / mask IP + geographic information)
+// Info mask logic: 2-state switch (no mask / mask IP).
+//
+// The actual masking is purely CSS-driven (see `style/style.css`): we mirror the level
+// to a `data-mask-level` attribute on <html>, and components mark their IP cells with
+// `data-mask="ip"`. A blur filter then renders those values unreadable in screenshots
+// — without mutating any underlying value, so refresh / data flows are unaffected.
 //
 // Input:
-//   - refs: { IPCheckRef, webRTCRef, dnsLeaksRef } — each result card component ref
 //   - store: main store (for setAlert / allHasLoaded monitoring)
 //   - t: i18n translation function
 //
 // Output:
-//   - infoMaskLevel: ref<0|1|2>
+//   - infoMaskLevel: ref<0|1>
 //   - toggleInfoMask(): () => void
 //   - showMaskButton: ref<boolean> — becomes true after allHasLoaded
 //   - isInfosLoaded: ref<boolean> — synchronized from store.allHasLoaded, for shortcut judgment
 
 import { ref, watch } from 'vue';
-import { trackEvent } from '../utils/use-analytics.js';
-import { maskedInfo } from '../utils/masked-info.js';
+import { trackEvent } from '../utils/analytics.js';
 
-export function useInfoMask({ refs, store, t }) {
+const MASK_ATTR = 'data-mask-level';
+
+const syncMaskAttribute = (level) => {
+    if (typeof document === 'undefined') return;
+    if (level === 0) {
+        document.documentElement.removeAttribute(MASK_ATTR);
+    } else {
+        document.documentElement.setAttribute(MASK_ATTR, String(level));
+    }
+};
+
+export function useInfoMask({ store, t }) {
     const infoMaskLevel = ref(0);
     const isInfosLoaded = ref(false);
     const showMaskButton = ref(false);
-    const originipDataCards = ref([]);
-    const originleakTest = ref([]);
-    const originstunServers = ref([]);
-
-    const applyMask = () => {
-        const { IPCheckRef, webRTCRef, dnsLeaksRef } = refs;
-        if (infoMaskLevel.value === 0) {
-            IPCheckRef.value.ipDataCards.forEach((card) => {
-                if (card.id === 'cloudflare_v6' || card.id === 'ipify_v6') {
-                    card.ip = maskedInfo(t).ipv6;
-                } else {
-                    card.ip = maskedInfo(t).ipv4;
-                }
-            });
-            webRTCRef.value.stunServers.forEach((server) => {
-                server.ip = maskedInfo(t).webrtcip;
-            });
-            dnsLeaksRef.value.leakTest.forEach((server) => {
-                server.ip = maskedInfo(t).dnsendpoints;
-            });
-            infoMaskLevel.value = 1;
-        } else if (infoMaskLevel.value === 1) {
-            IPCheckRef.value.ipDataCards.forEach((card) => {
-                Object.assign(card, maskedInfo(t));
-            });
-            dnsLeaksRef.value.leakTest.forEach((server) => {
-                server.geo = maskedInfo(t).country_name;
-            });
-            infoMaskLevel.value = 2;
-        }
-    };
-
-    const removeMask = () => {
-        const { IPCheckRef, webRTCRef, dnsLeaksRef } = refs;
-        const newIpDataCards = JSON.parse(JSON.stringify(originipDataCards.value));
-        IPCheckRef.value.ipDataCards.splice(0, IPCheckRef.value.ipDataCards.length, ...newIpDataCards);
-
-        const newStunServers = JSON.parse(JSON.stringify(originstunServers.value));
-        webRTCRef.value.stunServers.splice(0, webRTCRef.value.stunServers.length, ...newStunServers);
-
-        const newLeakTests = JSON.parse(JSON.stringify(originleakTest.value));
-        dnsLeaksRef.value.leakTest.splice(0, dnsLeaksRef.value.leakTest.length, ...newLeakTests);
-
-        infoMaskLevel.value = 0;
-    };
 
     const toggleInfoMask = () => {
-        const { IPCheckRef, webRTCRef, dnsLeaksRef } = refs;
         trackEvent('SideButtons', 'ToggleClick', 'InfoMask');
-        let style;
-        let title;
-        let message;
-        if (infoMaskLevel.value === 0) {
-            originipDataCards.value = JSON.parse(JSON.stringify(IPCheckRef.value.ipDataCards));
-            originstunServers.value = JSON.parse(JSON.stringify(webRTCRef.value.stunServers));
-            originleakTest.value = JSON.parse(JSON.stringify(dnsLeaksRef.value.leakTest));
-            applyMask();
-            style = 'text-warning';
-            message = t('alert.maskedInfoMessage_1');
-            title = t('alert.maskedInfoTitle_1');
-        } else if (infoMaskLevel.value === 1) {
-            applyMask();
-            style = 'text-success';
-            message = t('alert.maskedInfoMessage');
-            title = t('alert.maskedInfoTitle');
-        } else {
-            removeMask();
-            style = 'text-danger';
-            message = t('alert.unmaskedInfoMessage');
-            title = t('alert.unmaskedInfoTitle');
-        }
-        store.setAlert(true, style, message, title);
+        infoMaskLevel.value = infoMaskLevel.value === 0 ? 1 : 0;
+
+        // Masking is a neutral toggle, not a success/warning state — both
+        // directions surface the same info-toned toast.
+        const titleKey = infoMaskLevel.value === 1 ? 'alert.maskedInfoTitle' : 'alert.unmaskedInfoTitle';
+        const messageKey = infoMaskLevel.value === 1 ? 'alert.maskedInfoMessage' : 'alert.unmaskedInfoMessage';
+        store.setAlert(true, 'text-info', t(messageKey), t(titleKey));
     };
+
+    // Mirror the level to <html data-mask-level="…"> so the global CSS rule can
+    // apply the blur. Also covers the orchestrator's external reset to 0.
+    watch(infoMaskLevel, syncMaskAttribute, { immediate: true });
 
     watch(
         () => store.allHasLoaded,

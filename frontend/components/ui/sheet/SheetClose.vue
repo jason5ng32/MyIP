@@ -1,7 +1,7 @@
 <script setup>
 // shadcn-vue Sheet 关闭按钮：包装 reka-ui DialogClose
 import { DialogClose } from 'reka-ui';
-import { X } from 'lucide-vue-next';
+import { X } from '@lucide/vue';
 import { cn } from '@/lib/utils';
 
 defineProps({

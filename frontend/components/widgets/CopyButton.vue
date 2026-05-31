@@ -18,7 +18,7 @@
 // Events:
 // - `copied(text)` on success, `error(err)` on clipboard failure.
 import { ref, onBeforeUnmount } from 'vue';
-import { Copy, CopyCheck } from 'lucide-vue-next';
+import { Copy, CopyCheck } from '@lucide/vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
 <template>
   <JnTooltip :text="tooltip" :side="tooltipSide" :disabled="!tooltip">
     <button type="button"
-      :class="cn('shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer', $props.class)"
+      :class="cn('shrink-0 p-1.5 rounded-md text-primary hover:bg-muted transition-colors cursor-pointer', $props.class)"
       :aria-label="ariaLabel || tooltip || 'Copy'"
       @click="onClick">
       <component :is="copied ? CopyCheck : Copy"

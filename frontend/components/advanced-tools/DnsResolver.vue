@@ -13,7 +13,7 @@
                 <ToggleGroup :model-value="queryType" type="single" variant="outline"
                     @update:model-value="(v) => v && changeType(v)">
                     <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
-                        class="flex-1 gap-1.5 min-w-12 md:min-w-20" :aria-label="type" :title="type">
+                        class="flex-1 gap-1.5 min-w-12 md:min-w-20 cursor-pointer" :aria-label="type" :title="type">
                         {{ type }}
                     </ToggleGroupItem>
                 </ToggleGroup>
@@ -74,14 +74,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { isValidDomain } from '@/utils/valid-ip.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
-import { Play } from 'lucide-vue-next';
+import { Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

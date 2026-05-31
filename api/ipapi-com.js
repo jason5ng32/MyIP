@@ -1,23 +1,17 @@
-import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+// /api/ipapi — geolocation source handler backed by ip-api.com.
+// Forwards the optional ?lang and normalizes the response into the
+// canonical geo shape via the shared makeGeoHandler factory.
 
-export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+import { makeGeoHandler } from '../common/geo-handler.js';
+
+function buildUrl(req) {
     const ipAddress = req.query.ip;
 
     // Build request URL for ip-api.com
     const lang = req.query.lang || 'en';
     const url = `http://ip-api.com/json/${ipAddress}?fields=66842623&lang=${lang}`;
-
-    try {
-        const apiRes = await fetchUpstream(url);
-        const json = await apiRes.json();
-        res.json(modifyJsonForIPAPI(json));
-    } catch (e) {
-        logger.error({ err: e, ip: ipAddress, lang }, 'ipapi-com handler failed');
-        res.status(500).json({ error: e.message });
-    }
-};
+    return { url, logContext: { lang } };
+}
 
 function modifyJsonForIPAPI(json) {
     const { query, country, countryCode, regionName, city, lat, lon, isp, as } = json;
@@ -36,3 +30,5 @@ function modifyJsonForIPAPI(json) {
         org: isp
     };
 }
+
+export default makeGeoHandler({ name: 'ipapi-com', buildUrl, normalize: modifyJsonForIPAPI });

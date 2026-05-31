@@ -7,19 +7,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <Card v-for="test in ruleTests" :key="test.id"
                 class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
-                <CardContent class="p-4">
+                <CardContent class="p-4 min-w-0">
                     <!-- Top: icon + name + #id -->
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
+                    <div class="flex flex-col gap-2 mb-1 w-full min-w-0">
+                        <div class="flex items-center gap-2 min-w-0 w-full">
                             <Waypoints class="size-6 text-muted-foreground shrink-0" />
-                            <span class="text-base font-medium truncate">{{ test.name }}</span>
+                            <span class="text-base font-medium truncate min-w-0 flex-1">{{ test.name }}</span>
                             <span class="font-mono text-muted-foreground">#{{ test.id }}</span>
                         </div>
 
                     </div>
 
                     <!-- URL (secondary information) -->
-                    <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="test.url">
+                    <p v-if="test.url" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="test.url">
                         {{ test.url }}
                     </p>
 
@@ -36,8 +36,18 @@
                             :class="textClass(toneOf(test))" />
                     </div>
 
-                    <!-- Country sub-block -->
-                    <dl class="rounded-md bg-muted/50 p-3 text-sm">
+                    <!-- ISP + Country sub-block -->
+                    <dl class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
+                        <div>
+                            <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                                <EthernetPort class="size-3.5" />
+                                <span>{{ t('ipInfos.ISP') }}</span>
+                            </dt>
+                            <dd class="font-medium wrap-break-word" :title="test.org">
+                                <span v-if="!isFieldPending(test.org)">{{ test.org }}</span>
+                                <span v-else class="text-muted-foreground font-normal">—</span>
+                            </dd>
+                        </div>
                         <div>
                             <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                                 <MapPin class="size-3.5" />
@@ -78,9 +88,10 @@ import getCountryName from '@/data/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
+import { useMaxmind } from '@/composables/use-maxmind.js';
 import { Icon } from '@iconify/vue';
-import { MapPin, RotateCw, Waypoints, SignpostBig } from 'lucide-vue-next';
+import { EthernetPort, MapPin, RotateCw, Waypoints } from '@lucide/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
@@ -91,12 +102,14 @@ const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
 const isSignedIn = computed(() => store.isSignedIn);
 const { dotClass, textClass } = useStatusTone();
+const { lookupMaxmind } = useMaxmind();
 
 const createDefaultCard = () => ({
     name: t('ruletest.Name'),
     ip: t('ruletest.StatusWait'),
     country_code: '',
     country: t('ruletest.StatusWait'),
+    org: t('ruletest.StatusWait'),
 });
 
 const ruleTests = ref(Array.from({ length: 8 }, (_, index) => ({
@@ -115,9 +128,10 @@ const toneOf = (test) => ipFieldTone(test.ip, {
     errorLabels: t('ruletest.StatusError'),
 });
 
-const isFieldPending = (value) => {
-    return !value || value === t('ruletest.StatusWait') || value === t('ruletest.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+    waitLabels: t('ruletest.StatusWait'),
+    errorLabels: t('ruletest.StatusError'),
+});
 
 
 const fetchTrace = async (id, url) => {
@@ -137,10 +151,19 @@ const fetchTrace = async (id, url) => {
             ruleTests.value[id].country_code = country;
             ruleTests.value[id].country = getCountryName(country, lang.value);
         }
+        // Enrich with MaxMind for ISP. Trace gives IP + country code but
+        // no org — MaxMind fills that gap. Country resolution stays on
+        // trace (authoritative for each ptest worker's egress), so a
+        // MaxMind miss leaves the existing country untouched.
+        if (ipLine) {
+            const geo = await lookupMaxmind(ruleTests.value[id].ip);
+            ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
+        }
     } catch (error) {
         ruleTests.value[id].ip = t('ruletest.StatusError');
         ruleTests.value[id].country_code = '';
         ruleTests.value[id].country = t('ruletest.StatusError');
+        ruleTests.value[id].org = t('ruletest.StatusError');
         console.error('Error fetching Data:', error);
     }
 };
@@ -152,6 +175,7 @@ const checkAllRuleTest = async (refresh = false) => {
             test.ip = t('ruletest.StatusWait');
             test.country = t('ruletest.StatusWait');
             test.country_code = '';
+            test.org = t('ruletest.StatusWait');
         });
     }
 

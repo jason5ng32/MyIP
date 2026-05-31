@@ -7,8 +7,7 @@
 // whole BFS is synchronous. We only hit RIPEstat for as-overview as a
 // rare fallback when as2org doesn't have an ASN's org name.
 
-import { fetchAsOverview, extractOrgFromHolder } from '../common/ripestat.js';
-import { lookupAsOrgName } from '../common/as-org-db.js';
+import { resolveAsnOrgName } from '../common/ripestat.js';
 import { providersOf, customerCountOf, isTier1 } from '../common/as-rel-db.js';
 import logger from '../common/logger.js';
 
@@ -21,20 +20,10 @@ const MAX_DEPTH = 3;
 // as a proxy for "primary transit".
 const MAX_INTERMEDIATE_BRANCH = 3;
 
-// Two-tier org name resolver: local CAIDA as2org first (µs), RIPEstat
-// as-overview fallback when the snapshot doesn't have the ASN.
-async function resolveOrgName(asn) {
-    const local = lookupAsOrgName(asn);
-    if (local) return local;
-    try {
-        const res = await fetchAsOverview(asn);
-        if (!res.ok) return null;
-        const payload = await res.json();
-        return extractOrgFromHolder(payload?.data?.holder);
-    } catch {
-        return null;
-    }
-}
+// Two-tier org name resolver lives in common/ripestat.js. No onError hook
+// here — connectivity stays silent on as-overview fallback failures (a node
+// just keeps name=null); asn-history is the one that warns.
+const resolveOrgName = (asn) => resolveAsnOrgName(asn);
 
 async function buildGraph(origin) {
     const nodes = new Map();

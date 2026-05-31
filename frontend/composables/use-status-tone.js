@@ -9,14 +9,14 @@
 // to these 4 tone levels, then calls dotClass(tone) / textClass(tone) to get the corresponding
 // Tailwind class. This way Connectivity / WebRTC / DnsLeak / future similar modules
 // all use the same visual language, and the color scheme is applied throughout the site.
-export const dotColorMap = {
+const dotColorMap = {
     'wait':    'bg-info',
     'ok-fast': 'bg-success',
     'ok-slow': 'bg-warning',
     'fail':    'bg-destructive',
 };
 
-export const textColorMap = {
+const textColorMap = {
     'wait':    'text-muted-foreground',
     'ok-fast': 'text-success',
     'ok-slow': 'text-warning',
@@ -60,6 +60,17 @@ export function ipFieldTone(value, {
         return 'ok-fast';
     }
     return 'wait';
+}
+
+// Shared "is this single field still in a no-data state?" predicate.
+//
+// A field is pending when it's empty/falsy, or equals one of the localized
+// wait / error sentinels. Callers pass their own localized label arrays so
+// each module keeps its own i18n namespace (webrtc / dnsleaktest / ruletest).
+// Mirrors the per-field check the card-row components run in their templates
+// (e.g. IP succeeds but country lookup fails independently).
+export function isFieldPending(value, { waitLabels = [], errorLabels = [] } = {}) {
+    return !value || asArray(waitLabels).includes(value) || asArray(errorLabels).includes(value);
 }
 
 function asArray(x) {

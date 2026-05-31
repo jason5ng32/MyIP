@@ -257,7 +257,7 @@
 import { ref, reactive, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import getCountryName from '@/data/country-name.js';
 import { Button } from '@/components/ui/button';
@@ -276,7 +276,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { Play, Check, X, Info, Server, Hash, Route, MapPin, ShieldCheck, ShieldAlert } from 'lucide-vue-next';
+import { Play, Check, X, Info, Server, Hash, Route, MapPin, ShieldCheck, ShieldAlert } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();

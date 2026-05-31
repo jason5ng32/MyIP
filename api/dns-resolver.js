@@ -19,11 +19,10 @@ const dnsServers = {
     'Quad9': '9.9.9.9',
     'ControlD': '76.76.2.0',
     'AdGuard': '94.140.14.14',
-    'Quad 101': '101.101.101.101',
     'AliDNS': '223.5.5.5',
     'DNSPod': '119.29.29.29',
     '114DNS': '114.114.114.114',
-    'China Unicom': '123.123.123.123',
+    'DNS4EU': '86.54.11.1',
 };
 
 // DNS-over-HTTPS server list

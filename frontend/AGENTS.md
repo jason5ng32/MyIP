@@ -22,17 +22,17 @@ frontend/
 ├── data/                        ← static config
 │                                  (achievements / ip-databases / sections /
 │                                   default-preferences / changelog)
-├── utils/                       ← pure helpers
+├── utils/                       ← framework-agnostic pure helpers + IO modules
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   fetch-with-timeout / …)
-├── composables/                 ← reusable composition logic
+│                                   fetch-with-timeout / analytics / scroll-to / …)
+├── composables/                 ← Vue-aware reactive / stateful logic (useXxx)
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
-│   ├── use-scroll-to.js
 │   ├── use-section-tracking.js
 │   ├── use-shortcuts.js
+│   ├── use-speedtest-charts.js  ← Chart.js config + reactive chart state for SpeedTest
 │   └── use-status-tone.js       ← shared 4-tier business-state → visual-color mapping
 └── components/
     ├── *.vue                    ← top-level sections (IpInfos / Connectivity / WebRTC / DnsLeaks
@@ -55,11 +55,21 @@ frontend/
 - **Path alias.** `@` → `frontend/` (defined in `jsconfig.json` and `vite.config.js`). Use `@/components/...`, `@/utils/...`, `@/composables/...`.
 - **Shared-with-backend helpers live under `common/`.** Import them with a relative path, e.g. `../../common/valid-ip.js`. `common/valid-ip.js` is re-exported from `frontend/utils/valid-ip.js` so most consumers can keep using `@/utils/valid-ip.js`; follow that pattern when adding more shared helpers (see `frontend/utils/fetch-with-timeout.js` for the second example).
 
+### Where does a helper go? `lib/` vs `composables/` vs `utils/`
+
+Three sibling directories hold non-component code. The deciding question is **does it touch Vue's reactivity or lifecycle?**
+
+- **`composables/`** — Vue-aware reactive / stateful logic. It uses `ref` / `reactive` / `computed` / `watch` or a lifecycle hook (`onMounted` / `onUnmounted`), or it wires into a component's `setup()` (registers listeners, returns reactive state, must be called once at mount). Named `useXxx()`. Examples: `use-theme`, `use-info-mask`, `use-speedtest-charts`, `use-shortcuts`. A `setup()`-time factory with no internal `ref` (e.g. `use-maxmind`, `use-status-tone`) still belongs here when it's Vue-app glue, but a *pure* function that happens to live next to a composable should be exported from that same file, not promoted to its own composable.
+- **`utils/`** — framework-agnostic pure helpers and IO modules. No `vue` import, no reactive state: pure transforms / validators / detection (`transform-ip-data`, `valid-ip`, `system-detect`, `timestamp-to-date`), network fetchers (`getips/`, `dnsleaks/`, `authenticated-fetch`), module-level services (`analytics`), and the thin re-export bridges to `common/` (`valid-ip`, `fetch-with-timeout`, `bgp-prefix`). **A file here must not carry a `use-` prefix** — that prefix is reserved for composables.
+- **`lib/`** — the shadcn-vue support layer, *not* a general dumping ground. Today it holds only `cn()` (tailwind-merge + clsx), which every `ui/` primitive imports as `@/lib/utils`. Don't add business or app logic here; new shared helpers go to `utils/` or `composables/` per the rule above.
+
+Quick test before adding a file: needs Vue reactivity/lifecycle → `composables/` (`useXxx`); otherwise → `utils/` (no `use-` prefix). Leave `lib/` to shadcn.
+
 ## shadcn-vue first
 
 Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
-1. **Check `frontend/components/ui/` first** — 21 primitives are already copied in (see below). Missing variants are almost never a reason to bypass a primitive; `:class` overrides, `as-child`, and tw-merge cover nearly every state-color need.
+1. **Check `frontend/components/ui/` first** — 20 primitives are already copied in (see below). Missing variants are almost never a reason to bypass a primitive; `:class` overrides, `as-child`, and tw-merge cover nearly every state-color need.
 2. **If no local primitive fits, check https://www.shadcn-vue.com/docs/components** — shadcn-vue covers a lot more than what's in the repo. Copy one in if it's a good fit.
 3. **Only fall back to hand-rolled Tailwind** when the shape or behavior genuinely doesn't exist in shadcn-vue.
 
@@ -67,13 +77,12 @@ Before hand-rolling a UI component (button, dialog, popover, list, etc.):
 
 ### Primitives
 
-Located at `frontend/components/ui/`. 23 primitives copied in:
+Located at `frontend/components/ui/`. 21 primitives copied in:
 
-`accordion` · `badge` · `button` · `button-group` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `input-group` (with `InputGroupAddon` / `InputGroupButton` / `InputGroupInput` / `InputGroupText` / `InputGroupTextarea`) · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
+`accordion` · `badge` · `button` · `card` · `collapsible` · `dialog` (with `DialogHeader`) · `drawer` (vaul-vue) · `dropdown-menu` · `input` · `progress` · `select` · `separator` · `sheet` · `sonner` · `spinner` · `switch` · `table` (with `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`) · `tabs` · `textarea` · `toggle-group` · `tooltip`
 
-Two are project-specific, not in stock shadcn-vue:
+One is project-specific, not in stock shadcn-vue:
 
-- **`ButtonGroup`** — visual container for stitching buttons together.
 - **`Spinner`** — lucide `Loader2` + `animate-spin` + `role="status"`.
 
 ### Design tokens
@@ -135,8 +144,6 @@ Rule: any new module that surfaces a status reuses these tones. Do not hand-writ
 
 Every free-form Input that takes a URL / IP / MAC / domain / custom identifier carries the same six attributes shown above: `autocomplete="off"`, `autocorrect="off"`, `autocapitalize="off"`, `spellcheck="false"`, `data-1p-ignore`, `data-lpignore="true"`. iOS Safari's QuickType bar uses placeholder + nearby label text to offer address / email / password AutoFill — without these attributes it will push iCloud-address or password suggestions onto a plain IP/URL input. Keep placeholder copy free of "address / 地址 / adresse / adresi" style words where possible — iOS heuristics trigger on the word itself even with `autocomplete="off"`.
 
-The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGroupAddon` / `InputGroupButton` / `InputGroupText` / `InputGroupTextarea` sub-parts) is available if you need a genuinely merged border / ring around a composite input — but the current convention above is what every consumer uses today.
-
 **Status card** — homepage status cards (Connectivity / WebRTC / DnsLeak / IPCard / RuleTest) use:
 
 ```vue
@@ -176,4 +183,4 @@ The `input-group` primitive (stock shadcn-vue, with `InputGroupInput` / `InputGr
 
 - Composables and utils are the main target — covered by `tests/composable-*.test.js` and the various utility tests.
 - Vue rendering / user interactions / browser APIs: out of scope for the Node test runner.
-- For visual changes (layout, styling, animations), self-testing is not possible — explicitly ask the user to verify via `npm run dev`.
+- For visual changes (layout, styling, animations), self-testing is not possible — explicitly ask the user to verify via `pnpm dev`.

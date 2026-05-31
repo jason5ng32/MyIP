@@ -53,12 +53,12 @@ To set up the development environment for this project, you'll need to:
 
 1. Install Node.js, Vite, and Vue3.
 2. Clone the repository.
-3. Run `npm install` to install dependencies.
+3. Run `pnpm install` to install dependencies.
 4. Follow the instructions for Docker and Vercel deployment in our documentation if necessary.
 
 ### Testing
 
-Ensure that all tests pass and, if applicable, add new tests for your changes. Run `npm test` to execute tests.
+Ensure that all tests pass and, if applicable, add new tests for your changes. Run `pnpm test` to execute tests.
 
 ### Pull Request Guidelines
 

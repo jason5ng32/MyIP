@@ -21,19 +21,22 @@
 
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-      <Card v-for="stun in stunServers" :key="stun.id"
-        class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-        <CardContent class="p-4">
+      <Card v-for="(stun, index) in stunServers" :key="stun.id"
+        class="keyboard-shortcut-card jn-card min-w-0 overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+        <CardContent class="p-4 min-w-0">
           <!-- Top: service provider icon + name -->
-          <div class="flex items-center gap-2 mb-1">
+          <div class="flex flex-col gap-2 mb-1 w-full min-w-0">
+            <div class="flex items-center gap-2 min-w-0 w-full">
             <Flower class="size-6 text-muted-foreground shrink-0" />
-            <span class="text-base font-medium truncate">{{ stun.name }}</span>
+            <span class="text-base font-medium truncate min-w-0 flex-1">{{ t('webrtc.Name') }}</span>
+            <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
           </div>
 
           <!-- STUN URL (secondary information) -->
-          <p class="text-xs font-mono text-muted-foreground mb-3 break-all" :title="stun.url">
+          <p v-if="stun.url" class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="stun.url">
             {{ stun.url }}
           </p>
+          </div>
 
           <!-- IP -->
           <div class="flex items-center gap-1.5 text-base mb-3 min-w-0 min-h-6">
@@ -43,10 +46,10 @@
               <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(stun))"></span>
             </span>
             <FitText :text="stun.ip" :tiers="INLINE_TIERS" :title="stun.ip" class="font-mono min-w-0"
-              :class="textClass(toneOf(stun))" />
+              :class="textClass(toneOf(stun))" data-mask="ip" />
           </div>
 
-          <!-- NAT + Country -->
+          <!-- NAT + ISP + Country -->
           <dl v-if="stun.natType" class="rounded-md bg-muted/50 p-3 space-y-2 text-sm">
             <div>
               <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -55,6 +58,16 @@
               </dt>
               <dd class="font-medium wrap-break-word">
                 <span v-if="!isFieldPending(stun.natType)">{{ stun.natType }}</span>
+                <span v-else class="text-muted-foreground font-normal">—</span>
+              </dd>
+            </div>
+            <div>
+              <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <EthernetPort class="size-3.5" />
+                <span>{{ t('ipInfos.ISP') }}</span>
+              </dt>
+              <dd class="font-medium wrap-break-word" :title="stun.org">
+                <span v-if="!isFieldPending(stun.org)">{{ stun.org }}</span>
                 <span v-else class="text-muted-foreground font-normal">—</span>
               </dd>
             </div>
@@ -106,16 +119,14 @@
 import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
-import getCountryName from '@/data/country-name.js';
+import { trackEvent } from '@/utils/analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
-import { Play, MapPin, Flower, Network, RotateCw, FileText, ChevronDown } from 'lucide-vue-next';
+import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
+import { useMaxmind } from '@/composables/use-maxmind.js';
+import { Play, MapPin, EthernetPort, Flower, Network, RotateCw, FileText, ChevronDown } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';
@@ -123,18 +134,18 @@ import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
 const store = useMainStore();
-const lang = computed(() => store.lang);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const { dotClass, textClass } = useStatusTone();
+const { lookupMaxmind } = useMaxmind();
 
 const isStarted = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
-  { id: 'google', name: 'Google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'blackberry', name: 'BlackBerry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'twilio', name: 'Twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
-  { id: 'cloudflare', name: 'Cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', sdpLog: [], sdpOpen: false },
+  { id: 'google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', org: t('webrtc.StatusWait'), sdpLog: [], sdpOpen: false },
+  { id: 'blackberry', url: 'stun.voip.blackberry.com:3478', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', org: t('webrtc.StatusWait'), sdpLog: [], sdpOpen: false },
+  { id: 'twilio', url: 'global.stun.twilio.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', org: t('webrtc.StatusWait'), sdpLog: [], sdpOpen: false },
+  { id: 'cloudflare', url: 'stun.cloudflare.com', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', org: t('webrtc.StatusWait'), sdpLog: [], sdpOpen: false },
 ]);
 
 // Regex extracting the IP portion out of an ICE candidate line
@@ -156,11 +167,10 @@ const toneOf = (stun) => ipFieldTone(stun.ip, {
 // Single field in dl block is in "no data" state (waiting/error).
 // Fields may fail independently (e.g. IP success but country lookup fails),
 // so the check is run per-field in the template.
-const isFieldPending = (value) => {
-  return !value
-    || value === t('webrtc.StatusWait')
-    || value === t('webrtc.StatusError');
-};
+const isFieldPending = (value) => isFieldPendingShared(value, {
+  waitLabels: t('webrtc.StatusWait'),
+  errorLabels: t('webrtc.StatusError'),
+});
 
 // Run a STUN test against one server. ICE gathering with a 5s backstop.
 //
@@ -213,6 +223,7 @@ const checkSTUNServer = (stun) => {
       stun.natType = label;
       stun.country = label;
       stun.country_code = '';
+      stun.org = label;
       log(`status: ${statusKey}`);
       finish();
     };
@@ -230,15 +241,17 @@ const checkSTUNServer = (stun) => {
       stun.natType = determineNATType(candidate);
       log(`resolved IP: ${ip}`);
       IPArray.value = [...IPArray.value, ip];
-      // fetchCountryCode swallows its own errors and returns null on miss,
-      // so a single null check handles both "no MaxMind source" and
-      // "upstream failure" paths.
-      const countryInfo = await fetchCountryCode(ip);
-      if (countryInfo) {
-        stun.country_code = countryInfo[0];
-        stun.country = countryInfo[1];
+      // useMaxmind swallows its own errors and returns null on miss, so
+      // a single null check handles both "no MaxMind source" and "upstream
+      // failure" paths.
+      const geo = await lookupMaxmind(ip);
+      if (geo) {
+        stun.country_code = geo.country_code;
+        stun.country = geo.country;
+        stun.org = geo.org;
       } else {
         stun.country = t('webrtc.StatusError');
+        stun.org = t('webrtc.StatusError');
       }
       if (pc) {
         pc.close();
@@ -319,33 +332,6 @@ const determineNATType = (candidate) => {
   return t('webrtc.NATType.unknown');
 };
 
-// Get IP country via Maxmind. Returns [country_code, country_name] on a
-// successful lookup, or null on any miss (missing MaxMind source, empty
-// upstream response, network error). Callers use the null as the signal
-// to surface an Error label — no TypeError round-trip through a catch.
-const fetchCountryCode = async (ip) => {
-  const source = store.ipDBs.find((s) => s.text === 'MaxMind');
-  if (!source) return null;
-  let setLang = lang.value;
-  if (setLang === 'zh') setLang = 'zh-CN';
-
-  try {
-    const url = store.getDbUrl(source.id, ip, setLang);
-    const response = await fetchWithTimeout(url);
-    const data = await response.json();
-    const ipData = transformDataFromIPapi(data, source.id, t, lang.value);
-    if (!ipData) return null;
-    const country_code = ipData.country_code.toLowerCase();
-    const country = ipData.country_code
-      ? getCountryName(ipData.country_code, lang.value)
-      : 'N/A';
-    return [country_code, country];
-  } catch (error) {
-    console.error('Error fetching IP country code', error);
-    return null;
-  }
-};
-
 // Test all STUN servers
 const checkAllWebRTC = async (isRefresh) => {
   if (isRefresh) trackEvent('Section', 'RefreshClick', 'WebRTC');
@@ -355,6 +341,7 @@ const checkAllWebRTC = async (isRefresh) => {
     server.natType = t('webrtc.StatusWait');
     server.country = t('webrtc.StatusWait');
     server.country_code = '';
+    server.org = t('webrtc.StatusWait');
     return checkSTUNServer(server);
   });
 

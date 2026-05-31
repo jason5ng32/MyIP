@@ -249,7 +249,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { CircleProgressBar } from 'circle-progress.vue';
 import VueMarkdown from 'vue-markdown-render';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -280,7 +280,7 @@ import {
     ShieldHalf,
     Smartphone,
     Users,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 // Security checklist icon mapping: directly use slug as key (slug itself is a semantic category name)
 const checklistIconMap = {

@@ -218,12 +218,8 @@
     "browser": {
       "Infos": "Browser Information",
       "browserName": "Browser Name",
-      "browserVersion": "Version",
       "engineName": "Engine",
-      "engineVersion": "Version",
       "osName": "Operating System",
-      "osVersion": "Version",
-      "deviceModel": "Model",
       "deviceVendor": "Manufacturer",
       "cpuArchitecture": "CPU Architecture",
       "gpu": "GPU",
@@ -382,6 +378,8 @@
     "latencyVSPing": {
       "title": "TCP vs Ping Latency",
       "positive": "TCP latency and Ping difference is large, indicating that you may be using a proxy or VPN.",
+      "fromTCP": "TCP latency value: ",
+      "fromPing": "Ping latency value: ",
       "negative": "TCP latency and Ping difference is not large, indicating that you may not be using a proxy or VPN."
     },
     "highlatency": {
@@ -515,11 +513,11 @@
   },
   "Tooltips": {
     "RefreshIPCard": "Refresh IP Card",
+    "SaveAsImage": "Save as image",
     "RefreshConnectivityTests": "Refresh Connectivity Tests",
     "RefreshWebRTC": "Refresh WebRTC Leak Test",
     "RefreshDNSLeakTest": "Refresh DNS Leak Test",
     "SpeedTestButton": "Start/Pause Speed Test",
-    "SourceSelect": "Select IP Geolocation Source",
     "ShowASNInfo": "Show AS Details",
     "ShowASNHistory": "Show ASN History",
     "ShowASNConnectivity": "Show ASN Connectivity",
@@ -528,20 +526,12 @@
     "ViewOnMap": "View location on map",
     "InfoMask": "Hide IP Information",
     "QueryIP": "Query IP Address",
-    "GithubLink": "View Source Code on GitHub",
-    "RefreshRuleTests": "Refresh Rule Tests",
-    "qualityScoreExplain": "The IP quality score is calculated based on multiple weighted factors, including the type of IP, whether it is a proxy/VPN, and the number of recent attack events detected from this IP. A higher score indicates better IP quality, reducing the likelihood of being blocked by risk control on some websites."
+    "GithubLink": "View Source Code on GitHub"
   },
   "ipInfos": {
-    "id": "ipinfos",
-    "database": "Database",
     "Title": "IP Infos",
     "Notes": "The program will first check your IP address from different sources (including IPv4 and IPv6), and then query the corresponding geographical data from the IP geolocation source you selected. If there is only 1 IP stack, the source without data will be displayed as empty.",
-    "Simple": "Simple",
-    "Map": "Map",
-    "MapUnavailable": "Map Unavailable",
     "Source": "IP Source",
-    "IP": "IP",
     "Country": "Region",
     "Region": "State",
     "City": "City",
@@ -550,7 +540,6 @@
     "Coordinates": "Coordinates",
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
-    "SelectSource": "Select IP Geolocation Source",
     "type": "Type",
     "isProxy": "Proxy",
     "qualityScore": "IP Quality",
@@ -598,7 +587,6 @@
       "proxyMaybe": "Possible proxy / VPN",
       "proxyNo": "Not flagged",
       "proxyUnknown": "Unknown type",
-      "proxyUnknownProtocol": "Unknown protocol",
       "type": {
         "Residential": "Residential",
         "Wireless": "Wireless",
@@ -613,7 +601,6 @@
     }
   },
   "connectivity": {
-    "id": "connectivity",
     "Title": "Network Connectivity",
     "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
     "StatusWait": "Awaiting Test",
@@ -643,6 +630,7 @@
   "webrtc": {
     "id": "webrtc",
     "Title": "WebRTC Leak Test",
+    "Name": "WebRTC Connection",
     "Note": "WebRTC often establishes connections directly via UDP. If the test returns your real IP, it means your proxy settings do not cover these connections. In addition to detecting the IP you use when connecting to WebRTC, we also detect your NAT type. However, NAT type detection is not 100% accurate and is for reference only.",
     "StatusWait": "Awaiting Test",
     "StatusError": "Connection Error",
@@ -656,7 +644,6 @@
     }
   },
   "dnsleaktest": {
-    "id": "dnsleaktest",
     "Name": "DNS Endpoint Test",
     "Title": "DNS Leak Test",
     "Note": "A DNS leak means that when you are connected to a VPN/proxy, your domain name resolutions are still done through your local ISP, thus posing a risk of DNS leaks.",
@@ -671,22 +658,17 @@
     }
   },
   "speedtest": {
-    "id": "speedtest",
     "Title": "Speed Test",
     "Note": "The speed test will be conducted using Cloudflare's edge network. You can choose the packet size for download and upload according to your needs. During the test, packets will be uploaded and downloaded 4 times — please be mindful of data usage. Since Cloudflare does not deploy edge nodes in every country worldwide, the results are for reference only; actual speeds may be faster.",
     "Download": "Download",
     "Upload": "Upload",
     "Latency": "Latency",
     "Jitter": "Jitter",
-    "Unit": "Mbps",
-    "StatusWait": "--",
-    "StatusError": "Test Error",
     "loadedLatency": "Loaded latency: ",
     "videoStreaming": "Video Streaming: ",
     "gaming": ", Gaming: ",
     "rtc": ", Video Chatting: ",
     "score": "Based on the speed test, got the following quality scores:",
-    "resultNote": ".",
     "connectionFrom": "Finished speed test from your machine, IP: ",
     "connectionTo": " to test server:",
     "connectionEnd": " .",
@@ -716,7 +698,6 @@
     "Error": "Test failed, it looks like your IP is not allowed to perform Ping test."
   },
   "mtrtest": {
-    "id": "mtrtest",
     "Title": "MTR Test",
     "Note": "The MTR (My Traceroute) test performs detailed route tracing of your IP address from servers located in different continents and regions around the world. MTR combines the functionality of traditional traceroute and ping commands to diagnose the quality and performance of network connections in real-time.",
     "Note2": "This process covers the complete path from various geographical locations to your network environment, providing information on latency and packet loss for each hop. Whether it's congestion in the routing path, latency issues at a specific node, or packet loss during transmission, the MTR test provides critical diagnostic information.",
@@ -726,31 +707,26 @@
     "Error": "Test failed, it looks like your IP is not allowed to perform MTR test."
   },
   "ipcheck": {
-    "id": "ipcheck",
     "Title": "IP Check",
     "Placeholder": "e.g. 1.1.1.1",
     "Error": "Please enter a valid IPv4 or IPv6 address.",
     "NoData": "Unable to fetch information for this IP. It may be unroutable (e.g. 0.0.0.0, private address) or the upstream source has no data for it."
   },
   "alert": {
-    "id": "alert",
     "refreshEverythingMessage": "Refreshing all data, please wait...",
     "refreshEverythingTitle": "Refreshing",
     "OhNo": "Oh No!",
     "Congrats": "Congrats!",
     "OhNo_Message": "Connectivity test failed, some websites are not accessible.",
     "Congrats_Message": "All connectivity tests passed, you can access all websites.",
-    "maskedInfoTitle_1": "IP masked",
-    "maskedInfoMessage_1": "IP information has been masked, please be careful when taking screenshots.",
-    "maskedInfoTitle": "All infos masked",
-    "maskedInfoMessage": "All information has been masked, you can now safely take screenshots.",
-    "unmaskedInfoTitle": "Infos Unmasked",
-    "unmaskedInfoMessage": "Information has been unmasked, please be careful when taking screenshots.",
+    "maskedInfoTitle": "IPs Masked",
+    "maskedInfoMessage": "IPs have been masked. Sharing screenshots won't reveal your IPs.",
+    "unmaskedInfoTitle": "IPs Unmasked",
+    "unmaskedInfoMessage": "IPs have been unmasked. Be careful when sharing screenshots.",
     "SignInFailed": "Sign In Failed",
     "SignInFailedReason": "Reason"
   },
   "shortcutKeys": {
-    "id": "shortcutKeys",
     "GoToTop": "Go to Top",
     "GoToBottom": "Go to Bottom",
     "ToggleDarkMode": "Toggle Dark Mode",

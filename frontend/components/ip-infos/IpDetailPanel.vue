@@ -231,7 +231,7 @@
 // (copy button, etc.) differ.
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import ASNInfo from './ASNInfo.vue';
@@ -246,7 +246,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { Earth } from 'lucide-vue-next';
+import { Earth } from '@lucide/vue';
 import {
     Building2,
     CornerUpRight,
@@ -264,7 +264,7 @@ import {
     ShieldCheck,
     SignalHigh,
     CircleQuestionMark,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 
 const { t } = useI18n();
 

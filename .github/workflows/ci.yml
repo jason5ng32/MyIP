@@ -19,20 +19,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup pnpm
+        # Reads the `packageManager` field in package.json to pin the pnpm version,
+        # so CI uses the exact same pnpm as local dev.
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          # Intentionally no `cache: npm` — that requires a package-lock.json, and this
-          # repo gitignores the lockfile by design. `npm install` below runs cold every
-          # run; dependency install on this project takes ~30s, which is acceptable
-          # versus the drift risk of committing a lockfile we don't otherwise use.
+          # The committed pnpm-lock.yaml lets setup-node cache the pnpm store keyed
+          # off the lockfile hash — installs are warm on every run after the first.
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        # --frozen-lockfile: install strictly from the lockfile and fail if it is
+        # out of sync with package.json, rather than silently rewriting it.
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests
-        run: npm test
+        run: pnpm test
 
       - name: Build
-        run: npm run build
+        run: pnpm run build

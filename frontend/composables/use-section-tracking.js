@@ -4,7 +4,7 @@
 
 import { onMounted, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { SECTION_IDS } from '@/data/sections';
 
 const isElementFullyInViewport = (el) => {

@@ -35,8 +35,8 @@
             <!-- domain type: multiple provider Accordion -->
             <Accordion v-if="type === 'domain'" type="single" collapsible default-value="0" class="space-y-2">
                 <AccordionItem v-for="(provider, index) in providers" :key="provider" :value="String(index)"
-                    class="rounded-lg border bg-card px-4">
-                    <AccordionTrigger class="hover:no-underline">
+                    class="rounded-lg border bg-card px-4 data-[state=open]:border-primary/30">
+                    <AccordionTrigger class="hover:no-underline cursor-pointer my-1">
                         <div class="flex items-center gap-2 min-w-0">
                             <span
                                 class="shrink-0 inline-flex size-5 items-center justify-center rounded-full bg-foreground text-background text-xs font-semibold">
@@ -66,13 +66,13 @@
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { isValidIP, isValidDomain } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { Info, Search } from 'lucide-vue-next';
+import { Info, Search } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();

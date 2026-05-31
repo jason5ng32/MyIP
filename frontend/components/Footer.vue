@@ -7,7 +7,7 @@
         <Button variant="ghost" size="icon" as-child class="size-6 text-foreground/70 hover:text-foreground">
           <a :href="t('page.footerLink')" target="_blank" rel="noopener" aria-label="Github"
             @click="trackEvent('Footer', 'FooterClick', 'Github')">
-            <Github />
+            <Icon icon="ri:github-line" />
           </a>
         </Button>
       </JnTooltip>
@@ -102,9 +102,9 @@
                       class="shrink-0 shadow-none! rounded-full justify-center text-secondary p-1" 
                       :title="t('changelog.' + item.type)"
                       >
-                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-4" />
-                      <CirclePlus v-if="item.type === 'add'" class="size-4" />
-                      <BugOff v-if="item.type === 'fix'" class="size-4" />
+                      <CircleFadingArrowUp v-if="item.type === 'improve'" class="size-3.5" />
+                      <CirclePlus v-if="item.type === 'add'" class="size-3.5" />
+                      <BugOff v-if="item.type === 'fix'" class="size-3.5" />
                     </Badge>
                     <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
                   </li>
@@ -144,14 +144,15 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeftCircle, Compass, ExternalLink, Github, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from 'lucide-vue-next';
+import { ArrowLeftCircle, Compass, ExternalLink, Smile, SquareArrowOutUpRight, CircleFadingArrowUp, CirclePlus, BugOff} from '@lucide/vue';
+import { Icon } from '@iconify/vue';
 
 const { t, locale } = useI18n();
 

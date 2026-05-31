@@ -101,15 +101,15 @@
 import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
-import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
+import { trackEvent } from '@/utils/analytics';
+import { useGlobalpingMeasurement, GLOBALPING_DEFAULT_LOCATIONS, selectableIPs } from '@/composables/use-globalping-measurement';
 import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from 'lucide-vue-next';
+import { Info,Play } from '@lucide/vue';
 
 import 'svgmap/style.min';
 
@@ -118,10 +118,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const lang = computed(() => store.lang);
-const allIPs = computed(() => {
-    const _allIPs = store.allIPs;
-    return _allIPs.filter(ip => ip && !ip.includes(' '));
-});
+const allIPs = computed(() => selectableIPs(store.allIPs));
 
 const selectedIP = ref('');
 const pingResults = ref([]);
@@ -157,12 +154,7 @@ const startPingCheck = () => {
 
     runMeasurement({
         limit: 16,
-        locations: [
-            { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-            { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-            { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-            { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
-        ],
+        locations: GLOBALPING_DEFAULT_LOCATIONS,
         target: selectedIP.value,
         type: 'ping',
         measurementOptions: { packets: 8 },

@@ -67,6 +67,11 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.5rem;
+  /* Canonical page background. Single source of truth for the iOS PWA
+     safe-area painter (Nav.vue). Must stay in sync with the literal
+     hex values in: index.html inline `html { background }`, index.html
+     <meta theme-color>, public/manifest.webmanifest. */
+  --page-bg: #f4f4f4;
 }
 
 .dark {
@@ -98,6 +103,7 @@
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
+  --page-bg: #0e0e0e;
 }
 
 @theme inline {
@@ -128,6 +134,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-page-bg: var(--page-bg);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -149,6 +156,19 @@
 /* === Base end === */
 
 /* === Custom CSS === */
+
+/* InfoMask — CSS-only privacy blur.
+   The toggle widget mirrors its on/off state to <html data-mask-level="1">; IP
+   cells throughout the app mark themselves with data-mask="ip". A blur filter
+   then renders those values unreadable in screenshots without mutating any data,
+   so toggling on/off is instantaneous and screenshot-safe. */
+[data-mask-level="1"] [data-mask="ip"] {
+  filter: blur(7px) saturate(0.6);
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.25s ease;
+}
 
 @keyframes jn-collapsible-down {
   from { height: 0; }
@@ -179,40 +199,6 @@
   animation: jn-accordion-up 200ms ease-out;
 }
 
-.jn-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-direction: row;
-  margin-top: 10pt;
-  margin-bottom: 10pt;
-}
-
-.jn-title2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-direction: row;
-  margin-top: 10pt;
-  margin-bottom: 10pt;
-}
-
-.jn-ip-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: row;
-  border: 0;
-  background-color: unset;
-}
-
-.jn-alert {
-  z-index: 9999;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-}
-
 .jn-card {
   box-shadow: 0 0 10pt #0000001c;
   height: 100%;
@@ -231,36 +217,6 @@
   max-width: 1400px;
 }
 
-.jn-con-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.jn-text {
-  height: fit-content;
-}
-
-.jn-fl {
-  box-shadow: 0 0 1pt #201f1f70;
-}
-
-.jn-list-group-item {
-  border-bottom: 1px dashed rgb(222, 226, 230);
-  padding: 12px 4px 12px 4px;
-  display: flex;
-  margin: 0;
-}
-
-.jn-navbar-top {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 9999;
-  border-bottom: 1px solid #0000001c;
-
-}
-
 footer {
   height: 100pt;
   padding-top: 20pt;
@@ -270,33 +226,6 @@ footer {
   footer {
     height: 140pt;
   }
-
-  .speedtest-h5 {
-    /* font-size: 12px; */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-.jn-radio {
-  display: flex;
-  justify-content: flex-end;
-  align-items: stretch;
-  flex-direction: row;
-}
-
-.jn-logo {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: row;
-}
-
-.dark-mode {
-  background-color: #212529 !important;
-  color: #e3e3e3 !important;
-  border-color: #757575;
 }
 
 .body-dark-mode {
@@ -305,157 +234,18 @@ footer {
   border-color: #757575;
 }
 
-.dark-mode::placeholder {
-  color: #e3e3e38e !important;
-}
-
-.dark-mode-border {
-  border-color: #89949f57;
-  box-shadow: 0 0 4pt #154b8022;
-}
-
-.dark-mode-title {
-  background-color: #171a1d;
-}
-
-.dark-mode-nav {
-  background-color: #171a1d !important;
-  border-color: #a8a8a863 !important;
-}
-
-.jn-deactive {
-  opacity: 0.5;
-}
-
-.active {
-  opacity: 1 !important;
-}
-
-.dark-mode-nav-border {
-  border-color: #a8a8a863 !important;
-}
-
-.dark-mode-close-button {
-  background-color: white;
-}
-
-.dark-mode-refresh {
-  background-color: #141618;
-}
-
-.dark-mode-refresh:hover {
-  background-color: #00000054;
-}
-
-.mobile-list {
-  border: 0;
-}
-
-.mobile-h2 {
-  font-size: 1.25rem;
-}
-
-.mobile-h3 {
-  font-size: 1.25rem;
-}
-
-.mobile-h6 {
-  font-size: 0.8rem;
-}
-
-[v-cloak] {
-  display: none;
-}
-
 .hidden {
   display: none !important;
-}
-
-.jn-dark-mode-help-border {
-  border-color: #a8a8a863 !important;
-}
-
-.jn-border-bottom-none {
-  border-bottom: none !important;
-}
-
-.jn-help-note {
-  background: linear-gradient(to right, #e04343, orange, #8d8d22, green, #50c0ae, indigo, violet);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.jn-progress {
-  padding-bottom: 20pt;
-}
-
-.jn-opacity-0 {
-  opacity: 0;
-}
-
-.jn-progress-dark {
-  background-color: #4b4b4b !important;
 }
 
 *:focus {
   outline: none;
 }
 
-.jn-speedtest-number {
-  font-size: 2em;
-}
-
-.jn-ip-score {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.jn-speedtest-note {
-  background-color: #b2d6c33b;
-  border: 1px solid #1a8754;
-  margin: 0;
-  border-radius: 6pt;
-}
-
-/* .jn-speedtest-note::before {
-  content: "";
-  border-top: 1px solid #19945a5c;
-  width: 50%;
-  margin: 0 auto;
-} */
-
 .speedtest-p {
   margin-top: 10pt;
 }
 
-.jn-ping-form-select {
-  min-width: 140pt;
-}
-
 .svgMap-tooltip {
   z-index: 10001 !important;
-}
-.fs-7 {
-  font-size: 0.9rem !important;
-}
-.jn-check-dark:checked {
-  background-color: #ffffff;
-  border-color: #ffffff;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23212529'/%3e%3c/svg%3e");
-
-}
-
-.jn-check-dark:focus {
-  border-color: #ffffff;
-}
-
-.jn-check-light:checked {
-  background-color: #212529;
-  border-color: #212529;
-}
-
-.jn-check-light:focus {
-  border-color: #212529;
 }

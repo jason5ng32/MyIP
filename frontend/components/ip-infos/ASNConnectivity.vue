@@ -4,7 +4,7 @@
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
             <button v-if="layout" type="button" @click="isExpanded = true"
-                class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"
+                class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted-foreground/10 cursor-pointer transition-colors"
                 :aria-label="t('ipInfos.ASNConnectivity.expand')" :title="t('ipInfos.ASNConnectivity.expand')">
                 <Maximize2 class="size-3.5" />
             </button>
@@ -70,87 +70,108 @@
 
     <!-- Expanded view: bottom Drawer (mobile-fullscreen / md+ sheet at 90vh). -->
     <Drawer v-if="layout" :open="isExpanded" @update:open="isExpanded = $event">
-        <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })"
+        <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })" :safe-area-top="isMobile"
             class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
-            <header class="flex items-center gap-2 px-4 pt-1 pb-3 border-b shrink-0">
-                <span
-                    class="flex-1 text-base font-semibold truncate flex items-center justify-start md:justify-center gap-2">
-                    <Network class="size-4 shrink-0 text-muted-foreground" />
-                    {{ t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn }) }}
-                </span>
-                <DrawerClose
-                    class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
-            </header>
+            <!-- Screenshot root; control widgets inside opt out via `data-screenshot-exclude`. -->
+            <div data-screenshot-root class="flex flex-col h-full bg-background">
+                <header class="flex items-center gap-2 px-4 pt-1 pb-3 border-b shrink-0">
+                    <span
+                        class="flex-1 text-base font-semibold truncate flex items-center justify-start md:justify-center gap-2">
+                        <Network class="size-4 shrink-0 text-muted-foreground" />
+                        {{ t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn }) }}
+                    </span>
+                    <DrawerClose data-screenshot-exclude
+                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
+                </header>
 
-            <!-- Relative wrapper so the floating zoom controls stay pinned while the SVG scrolls. -->
-            <div class="relative flex-1 min-h-0">
+                <!-- Relative wrapper so the floating zoom controls stay pinned while the SVG scrolls. -->
+                <div class="relative flex-1 min-h-0">
+                    <div data-screenshot-exclude
+                        class="absolute top-2 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-card/90 backdrop-blur-sm shadow-sm p-0.5">
+                        <button v-for="ctrl in zoomControls" :key="ctrl.label" type="button" @click="ctrl.action"
+                            :disabled="ctrl.disabled"
+                            class="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                            :aria-label="ctrl.label" :title="ctrl.label">
+                            <component :is="ctrl.icon" class="size-4" />
+                        </button>
+                        <span class="w-px h-5 bg-border mx-0.5" aria-hidden="true"></span>
+                        <ScreenshotButton filename-prefix="asn-connectivity" :filename-label="props.asn"
+                            :track-label="`AS${props.asn}`" :before-capture="prepareGraphForCapture">
+                            <template #default="{ capture, isCapturing }">
+                                <button type="button" @click="capture" :disabled="isCapturing"
+                                    class="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                                    :aria-label="t('Tooltips.SaveAsImage')" :title="t('Tooltips.SaveAsImage')">
+                                    <Spinner v-if="isCapturing" class="size-4" />
+                                    <ImageDown v-else class="size-4" />
+                                </button>
+                            </template>
+                        </ScreenshotButton>
+                    </div>
+                    <!-- flex + m-auto + shrink-0: narrow SVG centers, wide SVG hugs the start (scroll from x=0).
+                        @click clears the click-pinned highlight; nodes use @click.stop to opt out. -->
+                    <div data-svg-scroll class="h-full overflow-auto px-4 flex" @click="pinnedAsn = null">
+                        <!-- intrinsic w/h scaled by zoom; viewBox stays fixed so content scales with it.
+                            max-h clamp is only kept at zoom=1 so the wrapper actually scrolls when zoomed. -->
+                        <svg :viewBox="`0 0 ${layout.width} ${layout.height}`" :width="layout.width * zoom"
+                            :height="layout.height * zoom"
+                            :class="['block m-auto shrink-0', zoom === 1 ? 'w-auto max-h-full md:max-h-none' : '']">
+                            <defs>
+                                <marker id="jn-arrow-lg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+                                    markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+                                </marker>
+                            </defs>
+                            <g class="text-muted-foreground">
+                                <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
+                                    stroke-width="1.2" marker-end="url(#jn-arrow-lg)" stroke-linejoin="miter"
+                                    class="transition-opacity duration-150"
+                                    :class="isDimmedEdge(i) ? 'opacity-10' : 'opacity-60'" />
+                            </g>
+                            <g v-for="n in layout.nodes" :key="n.asn"
+                                :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`"
+                                class="cursor-pointer transition-opacity duration-150"
+                                :class="{ 'opacity-25': isDimmedNode(n.asn) }" @mouseenter="hoveredAsn = n.asn"
+                                @mouseleave="hoveredAsn = null" @click.stop="onNodeClick(n.asn)">
+                                <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
+                                <rect :width="n.w" :height="n.h" rx="6" class="fill-card" />
+                                <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)"
+                                    stroke-width="1.5" />
+                                <text :x="n.w / 2" :y="n.h / 2 - 5" text-anchor="middle"
+                                    class="font-mono font-semibold text-[11px] fill-foreground">
+                                    AS{{ n.asn }}
+                                </text>
+                                <text v-if="n.label" :x="n.w / 2" :y="n.h / 2 + 9" text-anchor="middle"
+                                    class="text-[10px] fill-muted-foreground">
+                                    {{ shortLabel(n.label) }}
+                                </text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <!-- Legend pinned outside the scroll area so it stays visible. -->
                 <div
-                    class="absolute top-2 right-2 z-10 flex items-center gap-0.5 rounded-md border bg-card/90 backdrop-blur-sm shadow-sm p-0.5">
-                    <button v-for="ctrl in zoomControls" :key="ctrl.label" type="button" @click="ctrl.action"
-                        :disabled="ctrl.disabled"
-                        class="p-1.5 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                        :aria-label="ctrl.label" :title="ctrl.label">
-                        <component :is="ctrl.icon" class="size-4" />
-                    </button>
+                    class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
+                    <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
+                        <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
+                        {{ item.label }}
+                    </span>
                 </div>
-                <!-- flex + m-auto + shrink-0: narrow SVG centers, wide SVG hugs the start (scroll from x=0).
-                    @click clears the click-pinned highlight; nodes use @click.stop to opt out. -->
-                <div class="h-full overflow-auto px-4 flex" @click="pinnedAsn = null">
-                    <!-- intrinsic w/h scaled by zoom; viewBox stays fixed so content scales with it.
-                        max-h clamp is only kept at zoom=1 so the wrapper actually scrolls when zoomed. -->
-                    <svg :viewBox="`0 0 ${layout.width} ${layout.height}`" :width="layout.width * zoom"
-                        :height="layout.height * zoom"
-                        :class="['block m-auto shrink-0', zoom === 1 ? 'w-auto max-h-full md:max-h-none' : '']">
-                        <defs>
-                            <marker id="jn-arrow-lg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
-                                markerHeight="6" orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-                            </marker>
-                        </defs>
-                        <g class="text-muted-foreground">
-                            <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
-                                stroke-width="1.2" marker-end="url(#jn-arrow-lg)" stroke-linejoin="miter"
-                                class="transition-opacity duration-150"
-                                :class="isDimmedEdge(i) ? 'opacity-10' : 'opacity-60'" />
-                        </g>
-                        <g v-for="n in layout.nodes" :key="n.asn"
-                            :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`"
-                            class="cursor-pointer transition-opacity duration-150"
-                            :class="{ 'opacity-25': isDimmedNode(n.asn) }" @mouseenter="hoveredAsn = n.asn"
-                            @mouseleave="hoveredAsn = null" @click.stop="onNodeClick(n.asn)">
-                            <title v-if="n.label">AS{{ n.asn }} · {{ n.label }}</title>
-                            <rect :width="n.w" :height="n.h" rx="6" class="fill-card" />
-                            <rect :width="n.w" :height="n.h" rx="6" :class="nodeBoxClass(n.type)" stroke-width="1.5" />
-                            <text :x="n.w / 2" :y="n.h / 2 - 5" text-anchor="middle"
-                                class="font-mono font-semibold text-[11px] fill-foreground">
-                                AS{{ n.asn }}
-                            </text>
-                            <text v-if="n.label" :x="n.w / 2" :y="n.h / 2 + 9" text-anchor="middle"
-                                class="text-[10px] fill-muted-foreground">
-                                {{ shortLabel(n.label) }}
-                            </text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-            <!-- Legend pinned outside the scroll area so it stays visible. -->
-            <div
-                class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
-                <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
-                    <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
-                    {{ item.label }}
-                </span>
             </div>
         </DrawerContent>
     </Drawer>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Maximize2, Network, ZoomIn, ZoomOut, RotateCcw } from 'lucide-vue-next';
+import { ImageDown, Maximize2, Network, ZoomIn, ZoomOut, RotateCcw } from '@lucide/vue';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
+import { Spinner } from '@/components/ui/spinner';
+import ScreenshotButton from '@/components/widgets/ScreenshotButton.vue';
+import { useMainStore } from '@/store';
 
+const store = useMainStore();
+const isMobile = computed(() => store.isMobile);
 const { t } = useI18n();
 const placeholderSizes = [12, 10, 8, 6, 4];
 
@@ -199,6 +220,38 @@ watch(isExpanded, (open) => {
         hoveredAsn.value = null;
     }
 });
+
+// Force the captured image to be the full 1:1 topology regardless of the
+// Drawer viewport or current zoom: reset zoom to 1 and drop every height /
+// overflow / max-* constraint that would otherwise clip the SVG. Teardown
+// restores the prior inline styles.
+const prepareGraphForCapture = async (cap) => {
+    const scr = cap.querySelector('[data-svg-scroll]');
+    const svg = scr?.querySelector('svg');
+    if (!scr || !svg) return;
+
+    const prevZoom = zoom.value;
+    const snapshot = [
+        { el: cap, css: cap.style.cssText },
+        { el: scr, css: scr.style.cssText },
+        { el: svg, css: svg.style.cssText },
+    ];
+
+    zoom.value = 1;
+    // `min-width: max-content` so wide topologies aren't clipped to Drawer width.
+    cap.style.height = 'auto';
+    cap.style.minWidth = 'max-content';
+    scr.style.height = 'auto';
+    scr.style.overflow = 'visible';
+    svg.style.maxHeight = 'none';
+    svg.style.maxWidth = 'none';
+    await nextTick();
+
+    return () => {
+        zoom.value = prevZoom;
+        snapshot.forEach(({ el, css }) => { el.style.cssText = css; });
+    };
+};
 
 // Reverse BFS from the active node collects every ancestor that can reach it.
 // An edge is on-path iff both endpoints are in that ancestor set — works for graphs

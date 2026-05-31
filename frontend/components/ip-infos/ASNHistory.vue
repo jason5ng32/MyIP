@@ -66,7 +66,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Clock4, Eye } from 'lucide-vue-next';
+import { Building2, Clock4, Eye } from '@lucide/vue';
 
 const { t } = useI18n();
 

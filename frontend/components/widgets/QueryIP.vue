@@ -2,8 +2,7 @@
     <!-- Floating query button (bottom right fixed) -->
     <JnTooltip :text="t('Tooltips.QueryIP')" side="left">
         <Button size="icon" variant="action" type="button" aria-label="IP Check"
-            class="fixed bottom-6 z-1050 rounded-full shadow-lg cursor-pointer" :style="positionStyle"
-            @click="openQueryIP">
+            class="rounded-full shadow-lg cursor-pointer" @click="openQueryIP">
             <Search class="size-4" />
         </Button>
     </JnTooltip>
@@ -60,14 +59,14 @@
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
-import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP } from '@/utils/valid-ip.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -75,7 +74,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
-import { Monitor, Search } from 'lucide-vue-next';
+import { Monitor, Search } from '@lucide/vue';
 
 const { t } = useI18n();
 
@@ -113,20 +112,9 @@ const submitQuery = async () => {
 
 const isOpen = ref(false);
 
-// Programmatic focus here is only useful on desktop. On iOS, focus outside of
-// the direct tap on the <input> doesn't trigger the native keyboard + visual
-// viewport scroll-into-view, so it's better to let the user tap the input
-// themselves and let iOS handle the whole dance natively.
-// iPadOS 13+ reports a Mac user-agent, so we detect it via the "lying Mac"
-// trick: a Macintosh UA that also claims multi-touch capability. We avoid
-// `navigator.platform` because it's deprecated.
-const isIOS = typeof navigator !== 'undefined'
-    && (/iPad|iPhone|iPod/.test(navigator.userAgent)
-        || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
-
 const onOpenChange = (val) => {
     isOpen.value = val;
-    if (val && !isIOS) {
+    if (val) {
         nextTick(() => {
             const inputElement = document.getElementById('inputIP');
             if (inputElement) inputElement.focus();
@@ -174,19 +162,6 @@ const fetchIPForModal = async (ip) => {
     isChecking.value = 'idle';
     modalQueryError.value = t('ipcheck.NoData');
 };
-
-// Floating button positioning (align to content area right on wide screen)
-const screenWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 0);
-const positionStyle = computed(() => {
-    if (screenWidth.value > 1600) {
-        const spaceOnRight = (screenWidth.value - 1600) / 2;
-        return { right: `${spaceOnRight + 20}px` };
-    }
-    return { right: '20px' };
-});
-const handleResize = () => { screenWidth.value = window.innerWidth; };
-onMounted(() => window.addEventListener('resize', handleResize));
-onBeforeUnmount(() => window.removeEventListener('resize', handleResize));
 
 defineExpose({ openModal });
 </script>

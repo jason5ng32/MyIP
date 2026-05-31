@@ -3,4 +3,4 @@
 // valid-ip.js and fetch-with-timeout.js).
 //
 //     import { toBgpPrefix } from '@/utils/bgp-prefix.js';
-export { toBgpPrefix, isValidBgpPrefix } from '../../common/bgp-prefix.js';
+export { toBgpPrefix } from '../../common/bgp-prefix.js';

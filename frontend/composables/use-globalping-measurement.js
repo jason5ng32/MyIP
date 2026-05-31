@@ -26,6 +26,24 @@
 import { ref, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
 
+// Default 16-country probe spread shared by the MtrTest and GlobalLatencyTest
+// tools (both POST `limit: 16` against exactly this set). CensorshipCheck keeps
+// its own list because it applies per-country probe limits.
+export const GLOBALPING_DEFAULT_LOCATIONS = [
+    { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
+    { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
+    { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
+    { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
+];
+
+// Filter the store's collected IPs down to the ones usable as a measurement
+// target: truthy and free of spaces (the store sometimes holds placeholder /
+// status strings that contain whitespace). Shared by the Globalping tools'
+// IP picker dropdowns.
+export function selectableIPs(storeIPs) {
+    return storeIPs.filter(ip => ip && !ip.includes(' '));
+}
+
 const API_BASE = 'https://api.globalping.io/v1/measurements';
 // Globalping probes can be slow on first create + under load; allow more
 // headroom than the 5s front-end default.

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, after } from 'node:test';
 
-import { scrollToElement } from '../frontend/composables/use-scroll-to.js';
+import { scrollToElement } from '../frontend/utils/scroll-to.js';
 
 // inject minimal DOM stub, module itself does not access globalThis, reads only when function is called
 let scrollTarget = null;

@@ -1,6 +1,7 @@
 <script setup>
 // shadcn-vue Sheet 面板：四向滑入，包含 overlay
 // 见 refactor/01 阶段 B
+import { computed } from 'vue';
 import { DialogContent, DialogOverlay, DialogPortal, DialogTitle, VisuallyHidden } from 'reka-ui';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,25 @@ const props = defineProps({
   onInteractOutside: { type: Function, default: undefined },
 });
 defineEmits(['close', 'escapeKeyDown']);
+
+// Push content past the iOS safe-area insets so it doesn't render
+// behind the transparent status bar / home indicator. Inline style
+// so consumers' `p-0` doesn't override it.
+const safeAreaStyle = computed(() => {
+  switch (props.side) {
+    case 'top':
+      return { paddingTop: 'env(safe-area-inset-top)' };
+    case 'bottom':
+      return { paddingBottom: 'env(safe-area-inset-bottom)' };
+    case 'left':
+    case 'right':
+    default:
+      return {
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      };
+  }
+});
 </script>
 
 <template>
@@ -39,6 +59,7 @@ defineEmits(['close', 'escapeKeyDown']);
     />
     <DialogContent
       :class="cn(sheetVariants({ side }), props.class)"
+      :style="safeAreaStyle"
       :on-pointer-down-outside="onPointerDownOutside"
       :on-interact-outside="onInteractOutside"
       @escape-key-down="$emit('escapeKeyDown', $event)"

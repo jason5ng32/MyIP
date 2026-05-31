@@ -31,7 +31,7 @@
         <CardContent class="p-4">
           <!-- Brand icon (built-in) or first-letter tile (custom) + name -->
           <div class="flex items-center gap-2 mb-3">
-            <component v-if="test.icon" :is="test.icon" class="size-6 text-muted-foreground" />
+            <Icon v-if="test.icon" :icon="test.icon" class="size-6 text-muted-foreground" />
             <span v-else
               class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
@@ -117,7 +117,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/use-analytics';
+import { trackEvent } from '@/utils/analytics';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -126,9 +126,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
-  Play, Chrome, Cloud, Compass, CirclePlus, Frown, Github, Meh, MessageCircle,
-  MessageSquareQuote, RotateCw, Smile, Store, X, Youtube,
-} from 'lucide-vue-next';
+  Play, CirclePlus, Frown, Meh, RotateCw, Smile, X,
+} from '@lucide/vue';
+import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -159,13 +159,18 @@ const MAX_CUSTOM_TARGETS = 9;
 // independent of the best-of-N face/text. `time` powers the per-dot hover
 // tooltip; for `tone: 'fail'` rounds it stays 0. Bootstrap-only writer.
 const connectivityTests = reactive([
-  { id: 'wechat', name: 'WeChat', icon: MessageCircle, url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'taobao', name: 'Taobao', icon: Store, url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'google', name: 'Google', icon: Chrome, url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'cloudflare', name: 'Cloudflare', icon: Cloud, url: 'https://www.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'youtube', name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'github', name: 'GitHub', icon: Github, url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'chatgpt', name: 'ChatGPT', icon: MessageSquareQuote, url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'wechat', name: 'WeChat', icon: 'ri:wechat-line', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'taobao', name: 'Taobao', icon: 'ri:taobao-line', url: 'https://www.taobao.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'google', name: 'Google', icon: 'ri:google-line', url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  // Use speed.cloudflare.com (not www.cloudflare.com): the marketing site
+  // attaches `Link: rel=preload` headers for its brand fonts to every response
+  // — including /favicon.ico — which the browser honors regardless of fetch
+  // mode, then fails CORS on the woff2 files. speed.cloudflare.com serves a
+  // plain favicon with no preload headers.
+  { id: 'cloudflare', name: 'Cloudflare', icon: 'ri:cloud-line', url: 'https://speed.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'youtube', name: 'YouTube', icon: 'ri:youtube-line', url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'github', name: 'GitHub', icon: 'ri:github-line', url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'chatgpt', name: 'ChatGPT', icon: 'ri:openai-line', url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
 ]);
 
 // Reconcile custom targets by id (not wipe-and-refill) so existing cards
