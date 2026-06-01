@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "start-backend": "node backend-server.js",
     "start-frontend": "node frontend-server.js",
-    "start": "concurrently \"pnpm run start-frontend\" \"pnpm run start-backend\""
+    "start": "concurrently \"node frontend-server.js\" \"node backend-server.js\""
   },
   "dependencies": {
     "@cloudflare/speedtest": "^1.9.1",
