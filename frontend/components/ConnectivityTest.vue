@@ -30,7 +30,9 @@
         </button>
         <CardContent class="p-4">
           <!-- Brand icon (built-in) or first-letter tile (custom) + name -->
-          <div class="flex items-center gap-2 mb-3">
+          <div class="flex items-center gap-2 mb-3 cursor-pointer"
+            @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
+            :title="t('connectivity.RefreshThisTest')">
             <Icon v-if="test.icon" :icon="test.icon" class="size-6 text-muted-foreground" />
             <span v-else
               class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
@@ -40,9 +42,7 @@
           </div>
           <!-- Status + ms. Multi mode pins these to the best round (see checkConnectivityHandler). -->
           <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-base min-w-0 cursor-pointer"
-              @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
-              :title="t('connectivity.RefreshThisTest')">
+            <span class="flex items-center gap-1.5 text-base min-w-0">
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
                 <span class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
@@ -61,7 +61,8 @@
           <div v-if="multipleTests" class="flex items-center gap-1 mt-2">
             <JnTooltip v-for="i in totalRounds" :key="i" :text="roundTooltipText(test, i - 1)" side="top">
               <span class="group/dot inline-flex items-center justify-center p-1 -m-1 cursor-default">
-                <span class="size-1.5 rounded-full md:transition-transform md:duration-200 md:group-hover/dot:scale-[2.0]"
+                <span
+                  class="size-1.5 rounded-full md:transition-transform md:duration-200 md:group-hover/dot:scale-[2.0]"
                   :class="progressDotClass(test, i - 1)"></span>
               </span>
             </JnTooltip>
@@ -253,7 +254,7 @@ const roundTooltipText = (test, idx) => {
   if (!entry) return '';
   const n = idx + 1;
   if (entry.tone === 'fail') return t('connectivity.RoundCount', { n }) + t('connectivity.StatusUnavailable');
-  return t('connectivity.RoundCount', { n}) + entry.time + ' ms';
+  return t('connectivity.RoundCount', { n }) + entry.time + ' ms';
 };
 
 // Reachable: Smile <200ms, Meh ≥200ms. Unreachable: Frown. Wait: no face.

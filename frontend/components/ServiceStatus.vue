@@ -24,9 +24,10 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
       <Collapsible v-for="p in PROVIDERS" :key="p.id" v-model:open="openState[p.id]" as-child>
         <Card class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
-          <!-- Always-visible summary; the whole header toggles the panel -->
-          <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
-            <CardContent class="p-4">
+          <!-- Always-visible summary; only the provider header row toggles the
+              panel — the status line below stays non-interactive. -->
+          <CardContent class="p-4">
+            <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
               <div class="flex items-center gap-2 mb-3">
                 <Icon v-if="p.icon" :icon="p.icon" class="size-6 text-muted-foreground" />
                 <span v-else
@@ -37,25 +38,25 @@
                 <ChevronDown class="size-4 ml-auto shrink-0 text-muted-foreground transition-transform duration-200"
                   :class="{ 'rotate-180': openState[p.id] }" />
               </div>
-              <!-- Checking → pulse + label; otherwise a status icon + label -->
-              <div class="flex items-center gap-1.5 text-base min-w-0">
-                <template v-if="loading">
-                  <span class="relative flex shrink-0">
-                    <span class="absolute inline-flex size-2.5 rounded-full bg-info opacity-75 animate-ping"></span>
-                    <span class="relative inline-flex size-2.5 rounded-full bg-info"></span>
-                  </span>
-                  <span class="text-muted-foreground truncate">{{ t('serviceStatus.Checking') }}</span>
-                </template>
-                <template v-else>
-                  <component :is="toneIcon(indicatorTone(p))" class="size-4 shrink-0"
-                    :class="textClass(indicatorTone(p))" />
-                  <span :class="textClass(indicatorTone(p))" class="truncate">
-                    {{ indicatorLabel(effectiveIndicator(p)) }}
-                  </span>
-                </template>
-              </div>
-            </CardContent>
-          </CollapsibleTrigger>
+            </CollapsibleTrigger>
+            <!-- Checking → pulse + label; otherwise a status icon + label -->
+            <div class="flex items-center gap-1.5 text-base min-w-0">
+              <template v-if="loading">
+                <span class="relative flex shrink-0">
+                  <span class="absolute inline-flex size-2.5 rounded-full bg-info opacity-75 animate-ping"></span>
+                  <span class="relative inline-flex size-2.5 rounded-full bg-info"></span>
+                </span>
+                <span class="text-muted-foreground truncate">{{ t('serviceStatus.Checking') }}</span>
+              </template>
+              <template v-else>
+                <component :is="toneIcon(indicatorTone(p))" class="size-4 shrink-0"
+                  :class="textClass(indicatorTone(p))" />
+                <span :class="textClass(indicatorTone(p))" class="truncate">
+                  {{ indicatorLabel(effectiveIndicator(p)) }}
+                </span>
+              </template>
+            </div>
+          </CardContent>
 
           <!-- Expanded: services + recent incidents behind tabs (keeps the
                opened card from stretching the page too tall). Each tab's data
@@ -340,7 +341,9 @@ const onTabChange = (p, tab) => {
 
 const refresh = () => {
   trackEvent('Section', 'RefreshClick', 'ServiceStatus');
-  // Drop cached detail so a reopened card refetches the fresh snapshot.
+  // Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
+  // cached detail so a reopened card refetches the fresh snapshot.
+  for (const k of Object.keys(openState)) openState[k] = false;
   for (const k of Object.keys(componentsState)) delete componentsState[k];
   for (const k of Object.keys(incidentsState)) delete incidentsState[k];
   loadOverview();
