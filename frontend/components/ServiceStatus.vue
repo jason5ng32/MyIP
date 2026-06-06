@@ -189,8 +189,8 @@ const PROVIDERS = [
   { id: 'notion', name: 'Notion', icon: 'ri:notion-line' },
   { id: 'github', name: 'GitHub', icon: 'ri:github-line' },
   { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare' },
-  { id: 'discord', name: 'Discord', icon: 'ri:discord-line' },
-  { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
+  { id: 'elevenlabs', name: 'ElevenLabs', icon: 'simple-icons:elevenlabs' },
+  { id: 'langchain', name: 'LangChain', icon: 'simple-icons:langchain' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];

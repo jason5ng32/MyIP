@@ -22,13 +22,13 @@ export const STATUS_PROVIDERS = [
     { id: 'cursor', name: 'Cursor', api: 'https://status.cursor.com', page: 'https://status.cursor.com' },
     // exclude: drop GitHub's "Visit … for more information" placeholder row.
     { id: 'github', name: 'GitHub', api: 'https://www.githubstatus.com', page: 'https://www.githubstatus.com', components: { exclude: ['0l2p9nhqnxpd'] } },
-    { id: 'discord', name: 'Discord', api: 'https://discordstatus.com', page: 'https://discordstatus.com' },
+    { id: 'elevenlabs', name: 'ElevenLabs', api: 'https://status.elevenlabs.io', page: 'https://status.elevenlabs.io' },
     // Default top-level: summary.json flattens away CF's mid-level product
     // categories, leaving one "Cloudflare Sites and Services" rollup + 7
     // continents — which keeps the card light consistent with this list.
     { id: 'cloudflare', name: 'Cloudflare', api: 'https://new.cloudflarestatus.com', page: 'https://new.cloudflarestatus.com' },
-    // flatten: Reddit buckets everything under reddit.com / ads.reddit.com headers.
-    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com', components: { flatten: true } },
+    // LangSmith is the status page for the LangChain platform.
+    { id: 'langchain', name: 'LangChain', api: 'https://status.smith.langchain.com', page: 'https://status.smith.langchain.com' },
     { id: 'notion', name: 'Notion', api: 'https://www.notion-status.com', page: 'https://www.notion-status.com' },
 ];
 

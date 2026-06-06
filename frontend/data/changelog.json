@@ -1233,10 +1233,10 @@
       {
         "type": "add",
         "change": {
-          "en": "Added a Service Status section showing live availability of popular services (Claude, OpenAI, GitHub, Cloudflare and more)",
-          "zh": "新增「服务可用性」板块，实时展示知名服务（Claude、OpenAI、GitHub、Cloudflare 等）的可用状态",
-          "fr": "Ajout d'une section État des services affichant la disponibilité en temps réel de services populaires (Claude, OpenAI, GitHub, Cloudflare, etc.)",
-          "tr": "Popüler servislerin (Claude, OpenAI, GitHub, Cloudflare ve daha fazlası) canlı kullanılabilirliğini gösteren Servis Durumu bölümü eklendi"
+          "en": "Added a Service Status section showing live availability of popular services",
+          "zh": "新增「服务可用性」板块，实时展示知名服务的可用状态",
+          "fr": "Ajout d'une section État des services affichant la disponibilité en temps réel de services populaires",
+          "tr": "Popüler servislerin canlı kullanılabilirliğini gösteren Servis Durumu bölümü eklendi"
         }
       }
     ]

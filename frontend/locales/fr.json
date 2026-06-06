@@ -603,7 +603,7 @@
   },
   "serviceStatus": {
     "Title": "État des services",
-    "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Cette section affiche la disponibilité en temps réel de services populaires ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
+    "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Cette section affiche la disponibilité en temps réel de services AI populaires ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
     "Refresh": "Actualiser l'état des services",
     "AllOperational": "Tous les systèmes sont opérationnels",
     "ComponentsTitle": "Services",

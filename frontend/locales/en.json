@@ -603,7 +603,7 @@
   },
   "serviceStatus": {
     "Title": "Service Status",
-    "Note": "When a service won't open, it might not be your problem — the service itself could be down. This section shows the live availability of well-known services; expand a card to see each sub-service's status and recent incidents.",
+    "Note": "When a service won't open, it might not be your problem — the service itself could be down. This section shows the live availability of well-known AI services; expand a card to see each sub-service's status and recent incidents.",
     "Refresh": "Refresh Service Status",
     "AllOperational": "All Systems Operational",
     "ComponentsTitle": "Services",
