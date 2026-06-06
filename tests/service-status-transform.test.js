@@ -24,27 +24,49 @@ describe('normalizeSummary', () => {
         assert.deepEqual(out.components[0], { name: 'API', status: 'operational' });
     });
 
-    it('keeps only first-level rows: group headers stay, nested children drop', () => {
-        const json = {
-            status: { indicator: 'minor', description: 'Partial' },
-            components: [
-                { id: 'g1', name: 'Core', status: 'operational', group: true },
-                { id: 'c1', name: 'Login', status: 'operational', group_id: 'g1' },
-                { id: 'c2', name: 'Search', status: 'partial_outage', group_id: 'g1' },
-                { id: 's1', name: 'Standalone', status: 'operational' },
-            ],
-        };
-        const out = normalizeSummary(json);
-        // Top-level header 'Core' + standalone 'Standalone'; children dropped.
-        assert.equal(out.components.length, 2);
+    // Shared 2-level fixture: one group header (g1) with two children, plus a
+    // standalone top-level leaf.
+    const GROUPED = {
+        status: { indicator: 'minor', description: 'Partial' },
+        components: [
+            { id: 'g1', name: 'Core', status: 'operational', group: true },
+            { id: 'c1', name: 'Login', status: 'operational', group_id: 'g1' },
+            { id: 'c2', name: 'Search', status: 'partial_outage', group_id: 'g1' },
+            { id: 's1', name: 'Standalone', status: 'operational' },
+        ],
+    };
+
+    it('default selector keeps top-level rows (header + standalone), drops children', () => {
+        const out = normalizeSummary(GROUPED);
         assert.deepEqual(out.components.map((c) => c.name), ['Core', 'Standalone']);
     });
 
-    it('caps the component list at the limit', () => {
+    it('flatten selector keeps every leaf, drops group headers', () => {
+        const out = normalizeSummary(GROUPED, { flatten: true });
+        assert.deepEqual(out.components.map((c) => c.name), ['Login', 'Search', 'Standalone']);
+    });
+
+    it('include selector whitelists by name in the given order', () => {
+        const out = normalizeSummary(GROUPED, { include: ['Search', 'Standalone', 'Missing'] });
+        // 'Missing' isn't present → dropped; the rest keep the include order.
+        assert.deepEqual(out.components.map((c) => c.name), ['Search', 'Standalone']);
+        assert.equal(out.components[0].status, 'partial_outage');
+    });
+
+    it('exclude drops rows by id or name, on top of any mode', () => {
+        // Default mode keeps top-level [Core, Standalone]; exclude Core by id.
+        const byId = normalizeSummary(GROUPED, { exclude: ['g1'] });
+        assert.deepEqual(byId.components.map((c) => c.name), ['Standalone']);
+        // Exclude also matches by name, and composes with flatten.
+        const byName = normalizeSummary(GROUPED, { flatten: true, exclude: ['Search'] });
+        assert.deepEqual(byName.components.map((c) => c.name), ['Login', 'Standalone']);
+    });
+
+    it('caps the component list at the internal limit', () => {
         const components = Array.from({ length: 50 }, (_, i) => ({
             id: `c${i}`, name: `svc${i}`, status: 'operational',
         }));
-        const out = normalizeSummary({ status: {}, components }, 40);
+        const out = normalizeSummary({ status: {}, components });
         assert.equal(out.components.length, 40);
     });
 
@@ -135,6 +157,20 @@ describe('assembleProvider', () => {
         assert.equal(out.indicator, 'unknown');
         assert.deepEqual(out.components, []);
         assert.deepEqual(out.incidents, []);
+    });
+
+    it('threads the provider component selector through to normalizeSummary', () => {
+        const withSelector = { ...provider, components: { flatten: true } };
+        const summaryJson = {
+            status: { indicator: 'none' },
+            components: [
+                { id: 'g', name: 'Group', status: 'operational', group: true },
+                { id: 'k', name: 'Leaf', status: 'operational', group_id: 'g' },
+            ],
+        };
+        const out = assembleProvider(withSelector, summaryJson, null);
+        // flatten drops the header, keeps the leaf.
+        assert.deepEqual(out.components.map((c) => c.name), ['Leaf']);
     });
 });
 

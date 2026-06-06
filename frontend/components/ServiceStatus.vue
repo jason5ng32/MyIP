@@ -84,7 +84,7 @@
                     class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
                     <li v-for="(c, i) in detailState[p.id].components" :key="i"
                       class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
-                      <span class="truncate min-w-0">{{ c.name }}</span>
+                      <span class="truncate min-w-0" :title="c.name">{{ c.name }}</span>
                       <span class="flex items-center gap-1.5 shrink-0">
                         <component :is="toneIcon(componentStatusToTone(c.status))" class="size-3.5 shrink-0"
                           :class="textClass(componentStatusToTone(c.status))" />

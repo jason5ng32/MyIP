@@ -5,24 +5,42 @@
 // dependency-free and side-effect-free so they're unit-testable with inline
 // fixtures (tests/service-status-transform.test.js) — no live upstream calls.
 
-// Safety cap on forwarded components. First-level lists are short, so this is
-// just a guard against a pathological page bloating the payload.
-const DEFAULT_COMPONENT_LIMIT = 40;
+// Safety cap on forwarded components — a guard against a pathological page
+// bloating the payload. Selected lists are normally well under this.
+const COMPONENT_LIMIT = 40;
+
+// Pick which components a provider exposes (vendors structure pages too
+// differently for one rule to fit all). Per-provider selector — see STATUS_PROVIDERS:
+//   (default)            top-level rows: group headers + ungrouped components
+//   { flatten: true }    every leaf, group headers dropped
+//   { include: [names] } ordered whitelist by component name
+//   { exclude: [id|name] } final filter on top of any mode (drops junk rows)
+function selectComponents(raw, selector = {}) {
+    let picked;
+    if (Array.isArray(selector.include)) {
+        const byName = new Map(raw.filter((c) => !c?.group).map((c) => [c?.name, c]));
+        picked = selector.include.map((name) => byName.get(name)).filter(Boolean);
+    } else if (selector.flatten) {
+        picked = raw.filter((c) => !c?.group); // all leaves, drop group headers
+    } else {
+        picked = raw.filter((c) => !c?.group_id); // top-level rows
+    }
+
+    if (Array.isArray(selector.exclude) && selector.exclude.length) {
+        const blocked = new Set(selector.exclude);
+        picked = picked.filter((c) => !blocked.has(c?.id) && !blocked.has(c?.name));
+    }
+    return picked;
+}
 
 // Normalize a `/api/v2/summary.json` payload to
 //   { indicator, components: [{ name, status }] }
 // where indicator is 'none' | 'minor' | 'major' | 'critical' | 'maintenance' | 'unknown'.
-//
-// Keeps only the *first level* of components — rows with no parent group
-// (`group_id` absent). For pages that nest (Discord, Cloudflare) this keeps the
-// category headers, which carry a rolled-up status, and drops their nested
-// children; deeper detail belongs on the provider's own status page. Flat pages
-// (Claude, GitHub, …) have no groups, so every row is kept.
-export function normalizeSummary(json, limit = DEFAULT_COMPONENT_LIMIT) {
-    const rawComponents = Array.isArray(json?.components) ? json.components : [];
-    const components = rawComponents
-        .filter((c) => !c?.group_id)
-        .slice(0, limit)
+// `selector` chooses which components to keep (see selectComponents).
+export function normalizeSummary(json, selector = {}) {
+    const raw = Array.isArray(json?.components) ? json.components : [];
+    const components = selectComponents(raw, selector)
+        .slice(0, COMPONENT_LIMIT)
         .map((c) => ({ name: c?.name ?? '', status: c?.status ?? 'operational' }));
 
     return {
@@ -79,7 +97,7 @@ function incidentTimestamp(incident) {
 // with no components, normalizeIncidents(null) → []. Keeps the poller's
 // per-provider error handling free of shape-building logic.
 export function assembleProvider(provider, summaryJson, incidentsJson) {
-    const { indicator, components } = normalizeSummary(summaryJson);
+    const { indicator, components } = normalizeSummary(summaryJson, provider.components);
     return {
         id: provider.id,
         name: provider.name,

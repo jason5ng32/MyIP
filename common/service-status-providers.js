@@ -20,10 +20,15 @@ export const STATUS_PROVIDERS = [
     { id: 'claude', name: 'Claude', api: 'https://status.claude.com', page: 'https://status.claude.com' },
     { id: 'openai', name: 'OpenAI', api: 'https://status.openai.com', page: 'https://status.openai.com' },
     { id: 'cursor', name: 'Cursor', api: 'https://status.cursor.com', page: 'https://status.cursor.com' },
-    { id: 'github', name: 'GitHub', api: 'https://www.githubstatus.com', page: 'https://www.githubstatus.com' },
+    // exclude: drop GitHub's "Visit … for more information" placeholder row.
+    { id: 'github', name: 'GitHub', api: 'https://www.githubstatus.com', page: 'https://www.githubstatus.com', components: { exclude: ['0l2p9nhqnxpd'] } },
     { id: 'discord', name: 'Discord', api: 'https://discordstatus.com', page: 'https://discordstatus.com' },
+    // Default top-level: summary.json flattens away CF's mid-level product
+    // categories, leaving one "Cloudflare Sites and Services" rollup + 7
+    // continents — which keeps the card light consistent with this list.
     { id: 'cloudflare', name: 'Cloudflare', api: 'https://new.cloudflarestatus.com', page: 'https://new.cloudflarestatus.com' },
-    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
+    // flatten: Reddit buckets everything under reddit.com / ads.reddit.com headers.
+    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com', components: { flatten: true } },
     { id: 'notion', name: 'Notion', api: 'https://www.notion-status.com', page: 'https://www.notion-status.com' },
 ];
 
