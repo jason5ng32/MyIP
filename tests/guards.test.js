@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requireValidIP, requireValidPrefix } from '../common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix, requireValidProviderId } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -127,5 +127,33 @@ describe('requireValidPrefix', () => {
         const res = makeRes();
         guard(makeReq({ query: { prefix: '8.8.8.0/33' } }), res, () => {});
         assert.equal(res.statusCode, 400);
+    });
+});
+
+describe('requireValidProviderId', () => {
+    const guard = requireValidProviderId();
+
+    it('calls next() for a whitelisted provider id', () => {
+        let nextCalled = false;
+        guard(makeReq({ query: { id: 'claude' } }), makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+    });
+
+    it('returns 400 "No provider id provided" when id is missing', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: {} }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'No provider id provided');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 "Invalid provider id" for an unknown id', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: { id: 'not-a-provider' } }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'Invalid provider id');
+        assert.equal(nextCalled, false);
     });
 });

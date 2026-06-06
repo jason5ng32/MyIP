@@ -141,6 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
+    "ServiceStatus": "Service Status",
     "WebRTC": "WebRTC Leak Test",
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
@@ -598,6 +599,45 @@
       "NativeIPYes": "Aligned",
       "NativeIPNo": "Mismatched",
       "nativenessTooltip": "Whether the ASN's registered country matches the IP's geolocation country"
+    }
+  },
+  "serviceStatus": {
+    "Title": "Service Status",
+    "Note": "Live availability of popular services, pulled from their official status pages. Expand a card to see its sub-services and recent incidents.",
+    "Refresh": "Refresh Service Status",
+    "AllOperational": "All Systems Operational",
+    "ComponentsTitle": "Services",
+    "IncidentsTitle": "Recent Incidents",
+    "NoComponents": "No service details available.",
+    "NoRecentIncidents": "No recent incidents.",
+    "Loading": "Loading…",
+    "Checking": "Checking…",
+    "IncidentsError": "Couldn't load incidents.",
+    "ComponentsError": "Couldn't load services.",
+    "indicator": {
+      "minor": "Minor Issues",
+      "major": "Major Outage",
+      "critical": "Critical Outage",
+      "maintenance": "Under Maintenance",
+      "unknown": "Status unavailable"
+    },
+    "component": {
+      "operational": "Operational",
+      "degraded_performance": "Degraded",
+      "partial_outage": "Partial Outage",
+      "major_outage": "Major Outage",
+      "under_maintenance": "Maintenance"
+    },
+    "incidentStatus": {
+      "investigating": "Investigating",
+      "identified": "Identified",
+      "monitoring": "Monitoring",
+      "resolved": "Resolved",
+      "postmortem": "Postmortem",
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "verifying": "Verifying",
+      "completed": "Completed"
     }
   },
   "connectivity": {

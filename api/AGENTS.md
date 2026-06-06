@@ -25,6 +25,9 @@ api/
 ├── get-whois.js                 ← /api/whois — whoiser primary + RDAP fallback for new gTLDs
 ├── cf-radar.js                  ← /api/cfradar — ASN details via Cloudflare Radar
 ├── dns-resolver.js              ← /api/dnsresolver — DNS + DoH parallel query
+├── service-status.js            ← /api/service-status (+ /components, /incidents) —
+│                                  serves the in-memory snapshot from the poller
+│                                  (common/service-status-store.js); no upstream call per request
 ├── dns-leak-test.js             ← /api/dnsleaktest/session/:token — proxy to private
 │                                  IPCheck.ing endpoint (Firebase-gated) that drives the
 │                                  in-depth DNS Leak Test advanced tool
@@ -33,11 +36,14 @@ api/
 
 common/
 ├── fetch-with-timeout.js        ← fetchWithTimeout (5s default) + fetchUpstream (8s preset)
-├── guards.js                    ← requireReferer + requireValidIP Express middleware
+├── guards.js                    ← requireReferer + requireValidIP / Prefix / ASN / ProviderId middleware
 ├── logger.js                    ← shared pino logger (pretty in dev, JSON in prod)
 ├── referer-check.js             ← low-level referer allow-list check
 ├── valid-ip.js                  ← IPv4 / IPv6 validator (also re-exported from frontend)
 ├── rdap.js                      ← RDAP client (domain fallback when whoiser returns no __raw)
+├── service-status-providers.js  ← static upstream list + id whitelist for service-status
+├── service-status-transform.js  ← pure summary / incidents normalizers (unit-tested)
+├── service-status-store.js      ← 5-min in-memory poller + cache behind /api/service-status
 ├── maxmind-service.js           ← mmdb reader + lookup
 ├── maxmind-updater.js           ← mmdb bootstrap download at boot +
 │                                  scheduled auto-update
@@ -70,6 +76,7 @@ common/
 - `requireValidIP()` is attached per-route to every handler that takes `?ip=`. It rejects missing or malformed IPs before the handler runs. **Handlers must not repeat the IP check** — inside the handler body, `req.query.ip` is already known to be a well-formed string.
 - `requireValidPrefix()` is the same pattern for `?prefix=` (CIDR-shaped param). Used by `asn-history` so the frontend can quantize the user's IP to its BGP DFZ-floor (/24 v4 or /48 v6) before the request lands, maximizing CF edge cache reuse across every IP in the same prefix.
 - `requireValidASN()` does the same for `?asn=` (numeric, with optional leading `AS`). Strips the prefix and rewrites `req.query.asn` to a pure numeric string. Used by `asn-connectivity`; older handlers (`cf-radar`) still validate inline.
+- `requireValidProviderId()` whitelists `?id=` against the `service-status` provider slugs. Used by the `/api/service-status/components` and `/incidents` detail routes so an `id` can only select a known provider's slice of the in-memory snapshot.
 - If you add a new handler that needs a different-shape param guard, add the guard to `common/guards.js` and attach it in `backend-server.js` rather than open-coding the check in the handler.
 
 ### Private-API header pass-through (intentional exception)

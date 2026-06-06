@@ -141,6 +141,7 @@
     "Navigation": "Navigasyon",
     "IPInfo": "IP Bilgileri",
     "Connectivity": "Bağlantı",
+    "ServiceStatus": "Servis Durumu",
     "WebRTC": "WebRTC Sızıntı Testi",
     "DNSLeakTest": "DNS Sızıntı Testi",
     "SpeedTest": "Hız Testi",
@@ -598,6 +599,45 @@
       "NativeIPYes": "Eşleşiyor",
       "NativeIPNo": "Eşleşmiyor",
       "nativenessTooltip": "ASN'nin kayıtlı ülkesinin IP'nin coğrafi konum ülkesiyle eşleşip eşleşmediğini gösterir"
+    }
+  },
+  "serviceStatus": {
+    "Title": "Servis Durumu",
+    "Note": "Popüler servislerin resmi durum sayfalarından alınan canlı kullanılabilirlik bilgisi. Alt servisleri ve son olayları görmek için bir kartı genişletin.",
+    "Refresh": "Servis Durumunu Yenile",
+    "AllOperational": "Tüm Sistemler Çalışıyor",
+    "ComponentsTitle": "Servisler",
+    "IncidentsTitle": "Son Olaylar",
+    "NoComponents": "Servis ayrıntısı yok.",
+    "NoRecentIncidents": "Yakın zamanda olay yok.",
+    "Loading": "Yükleniyor…",
+    "Checking": "Kontrol ediliyor…",
+    "IncidentsError": "Olaylar yüklenemedi.",
+    "ComponentsError": "Servisler yüklenemedi.",
+    "indicator": {
+      "minor": "Küçük Sorunlar",
+      "major": "Büyük Kesinti",
+      "critical": "Kritik Kesinti",
+      "maintenance": "Bakımda",
+      "unknown": "Durum alınamadı"
+    },
+    "component": {
+      "operational": "Çalışıyor",
+      "degraded_performance": "Düşük Performans",
+      "partial_outage": "Kısmi Kesinti",
+      "major_outage": "Büyük Kesinti",
+      "under_maintenance": "Bakım"
+    },
+    "incidentStatus": {
+      "investigating": "İnceleniyor",
+      "identified": "Tespit Edildi",
+      "monitoring": "İzleniyor",
+      "resolved": "Çözüldü",
+      "postmortem": "Değerlendirme",
+      "scheduled": "Planlandı",
+      "in_progress": "Sürüyor",
+      "verifying": "Doğrulanıyor",
+      "completed": "Tamamlandı"
     }
   },
   "connectivity": {

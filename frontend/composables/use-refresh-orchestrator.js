@@ -1,7 +1,7 @@
 // Refresh / initial load sequence orchestration
 //
 // Input:
-//   - refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef }
+//   - refs: { IPCheckRef, connectivityRef, serviceStatusRef, webRTCRef, dnsLeaksRef }
 //   - store: main store
 //   - t: i18n translation function
 //   - userPreferences: computed(() => store.userPreferences)
@@ -40,10 +40,13 @@ export function useRefreshOrchestrator({ refs, store, t, userPreferences, infoMa
         store.setLoadingStatus('DNSLeakTest', false);
         store.setLoadingStatus('IPInfo', false);
 
-        const { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef } = refs;
+        const { IPCheckRef, connectivityRef, serviceStatusRef, webRTCRef, dnsLeaksRef } = refs;
         scheduleTimedTasks([
             { action: () => IPCheckRef.value.checkAllIPs(), delay: 0 },
             { action: () => connectivityRef.value.handelCheckStart(true), delay: 2000 },
+            // ServiceStatus is display-only (not in LOADING_SECTIONS): just re-pull,
+            // no loadingStatus reset needed.
+            { action: () => serviceStatusRef.value.refresh(), delay: 1500 },
             { action: () => webRTCRef.value.checkAllWebRTC(true), delay: 3000 },
             { action: () => dnsLeaksRef.value.checkAllDNSLeakTest(true), delay: 2500 },
             { action: () => refreshingAlert(), delay: 500 },

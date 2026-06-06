@@ -141,6 +141,7 @@
     "Navigation": "导航",
     "IPInfo": "IP 信息",
     "Connectivity": "网络连通性",
+    "ServiceStatus": "服务可用性",
     "WebRTC": "WebRTC 泄露测试",
     "DNSLeakTest": "DNS 泄漏测试",
     "SpeedTest": "网速测试",
@@ -598,6 +599,45 @@
       "NativeIPYes": "原生",
       "NativeIPNo": "非原生",
       "nativenessTooltip": "判断 ASN 的注册国家是否与 IP 的归属国家一致"
+    }
+  },
+  "serviceStatus": {
+    "Title": "服务可用性",
+    "Note": "展示一些知名服务的实时可用状态，数据来自它们的官方状态页。展开卡片可查看各子服务的状态与最近的事故。",
+    "Refresh": "刷新服务状态",
+    "AllOperational": "所有系统正常",
+    "ComponentsTitle": "服务项",
+    "IncidentsTitle": "最近事故",
+    "NoComponents": "暂无服务详情。",
+    "NoRecentIncidents": "近期无事故。",
+    "Loading": "加载中…",
+    "Checking": "查询中…",
+    "IncidentsError": "无法加载事故信息。",
+    "ComponentsError": "无法加载服务项。",
+    "indicator": {
+      "minor": "部分异常",
+      "major": "重大故障",
+      "critical": "严重故障",
+      "maintenance": "维护中",
+      "unknown": "状态获取失败"
+    },
+    "component": {
+      "operational": "正常",
+      "degraded_performance": "性能下降",
+      "partial_outage": "部分中断",
+      "major_outage": "重大中断",
+      "under_maintenance": "维护中"
+    },
+    "incidentStatus": {
+      "investigating": "调查中",
+      "identified": "已定位",
+      "monitoring": "监控中",
+      "resolved": "已解决",
+      "postmortem": "复盘",
+      "scheduled": "已计划",
+      "in_progress": "进行中",
+      "verifying": "验证中",
+      "completed": "已完成"
     }
   },
   "connectivity": {

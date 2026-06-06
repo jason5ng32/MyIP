@@ -8,10 +8,11 @@ import {
 } from '../frontend/data/sections.js';
 
 describe('SECTION_IDS', () => {
-  it('lists all 6 section DOM ids in render order', () => {
+  it('lists all 7 section DOM ids in render order', () => {
     assert.deepEqual(SECTION_IDS, [
       'IPInfo',
       'Connectivity',
+      'ServiceStatus',
       'WebRTC',
       'DNSLeakTest',
       'SpeedTest',
@@ -22,11 +23,12 @@ describe('SECTION_IDS', () => {
 });
 
 describe('createMountingStatus()', () => {
-  it('returns all 6 section ids as mount keys, set to false', () => {
+  it('returns all 7 section ids as mount keys, set to false', () => {
     const s = createMountingStatus();
     assert.deepEqual(s, {
       IPInfo: false,
       Connectivity: false,
+      ServiceStatus: false,
       DNSLeakTest: false,
       WebRTC: false,
       SpeedTest: false,

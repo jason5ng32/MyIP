@@ -7,7 +7,7 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN } from './common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN, requireValidProviderId } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -24,6 +24,10 @@ import cfHander from './api/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import dnsResolver from './api/dns-resolver.js';
+import serviceStatusHandler, {
+    componentsHandler as serviceStatusComponentsHandler,
+    incidentsHandler as serviceStatusIncidentsHandler,
+} from './api/service-status.js';
 import { getSessionResult as dnsLeakGetResult } from './api/dns-leak-test.js';
 import getWhois from './api/get-whois.js';
 import invisibilitytestHandler from './api/invisibility-test.js';
@@ -35,6 +39,7 @@ import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
 import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
 import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
+import { bootstrapServiceStatus, startServiceStatusPolling } from './common/service-status-store.js';
 
 dotenv.config({ quiet: true });
 
@@ -188,6 +193,7 @@ const cacheable = (maxAgeSeconds) => (req, res, next) => {
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
 
+const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
 const ONE_DAY_CACHE = 24 * 60 * 60;
 const ONE_WEEK_CACHE = 7 * 24 * 60 * 60;
@@ -205,6 +211,9 @@ app.get('/api/ipapiis', requireValidIP(), cacheable(ONE_HOUR_CACHE), ipapiisHand
 app.get('/api/ip2location', requireValidIP(), cacheable(ONE_HOUR_CACHE), ip2locationHandler);
 app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/maxmind', requireValidIP(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
+app.get('/api/service-status/components', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusComponentsHandler);
+app.get('/api/service-status/incidents', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusIncidentsHandler);
 
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/map', mapHandler);
@@ -232,10 +241,12 @@ async function bootBackend() {
         logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
     });
     await bootstrapCaidaIfMissing();
+    await bootstrapServiceStatus();
 
     startMaxMindFileWatcher();
     startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
     startCaidaAutoUpdate();
+    startServiceStatusPolling();
 
     app.listen(backEndPort, () => {
         logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);

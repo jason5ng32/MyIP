@@ -6,6 +6,7 @@
 import { refererCheck } from './referer-check.js';
 import { isValidIP } from './valid-ip.js';
 import { isValidBgpPrefix } from './bgp-prefix.js';
+import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
@@ -60,5 +61,19 @@ export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
     req.query[paramName] = numeric;
+    next();
+};
+
+// Reject requests whose `id` isn't a known service-status provider slug.
+// Used by the per-provider components / incidents endpoints, which select a
+// row from the in-memory snapshot by id.
+export const requireValidProviderId = (paramName = 'id') => (req, res, next) => {
+    const id = req.query[paramName];
+    if (!id) {
+        return res.status(400).json({ error: 'No provider id provided' });
+    }
+    if (!STATUS_PROVIDER_IDS.has(id)) {
+        return res.status(400).json({ error: 'Invalid provider id' });
+    }
     next();
 };

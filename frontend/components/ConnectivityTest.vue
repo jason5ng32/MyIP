@@ -167,7 +167,7 @@ const connectivityTests = reactive([
   // — including /favicon.ico — which the browser honors regardless of fetch
   // mode, then fails CORS on the woff2 files. speed.cloudflare.com serves a
   // plain favicon with no preload headers.
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'ri:cloud-line', url: 'https://speed.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'youtube', name: 'YouTube', icon: 'ri:youtube-line', url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'github', name: 'GitHub', icon: 'ri:github-line', url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
   { id: 'chatgpt', name: 'ChatGPT', icon: 'ri:openai-line', url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },

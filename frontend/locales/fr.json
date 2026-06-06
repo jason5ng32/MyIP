@@ -141,6 +141,7 @@
     "Navigation": "Navigation",
     "IPInfo": "Infos IP",
     "Connectivity": "Connectivité",
+    "ServiceStatus": "État des services",
     "WebRTC": "Test WebRTC Leak",
     "DNSLeakTest": "Test de fuite DNS",
     "SpeedTest": "Test de vitesse",
@@ -598,6 +599,45 @@
       "NativeIPYes": "Aligné",
       "NativeIPNo": "Décalé",
       "nativenessTooltip": "Indique si le pays d'enregistrement de l'ASN correspond au pays de géolocalisation de l'IP"
+    }
+  },
+  "serviceStatus": {
+    "Title": "État des services",
+    "Note": "Disponibilité en temps réel de services populaires, issue de leurs pages d'état officielles. Dépliez une carte pour voir ses sous-services et ses incidents récents.",
+    "Refresh": "Actualiser l'état des services",
+    "AllOperational": "Tous les systèmes sont opérationnels",
+    "ComponentsTitle": "Services",
+    "IncidentsTitle": "Incidents récents",
+    "NoComponents": "Aucun détail de service disponible.",
+    "NoRecentIncidents": "Aucun incident récent.",
+    "Loading": "Chargement…",
+    "Checking": "Vérification…",
+    "IncidentsError": "Impossible de charger les incidents.",
+    "ComponentsError": "Impossible de charger les services.",
+    "indicator": {
+      "minor": "Problèmes mineurs",
+      "major": "Panne majeure",
+      "critical": "Panne critique",
+      "maintenance": "En maintenance",
+      "unknown": "Statut indisponible"
+    },
+    "component": {
+      "operational": "Opérationnel",
+      "degraded_performance": "Dégradé",
+      "partial_outage": "Panne partielle",
+      "major_outage": "Panne majeure",
+      "under_maintenance": "Maintenance"
+    },
+    "incidentStatus": {
+      "investigating": "Enquête en cours",
+      "identified": "Identifié",
+      "monitoring": "Surveillance",
+      "resolved": "Résolu",
+      "postmortem": "Post-mortem",
+      "scheduled": "Planifié",
+      "in_progress": "En cours",
+      "verifying": "Vérification",
+      "completed": "Terminé"
     }
   },
   "connectivity": {

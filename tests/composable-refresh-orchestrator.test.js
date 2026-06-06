@@ -27,12 +27,13 @@ function makeStoreStub({ mountedFlags = {}, shouldRefresh = false, autoStart = f
 }
 
 function makeRefs() {
-  const calls = { ip: 0, conn: [], web: [], dns: [] };
-  const IPCheckRef      = ref({ checkAllIPs:            () => { calls.ip += 1; } });
-  const connectivityRef = ref({ handelCheckStart:       (flag) => { calls.conn.push(flag); } });
-  const webRTCRef       = ref({ checkAllWebRTC:         (flag) => { calls.web.push(flag); } });
-  const dnsLeaksRef     = ref({ checkAllDNSLeakTest:    (flag) => { calls.dns.push(flag); } });
-  return { refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef }, calls };
+  const calls = { ip: 0, conn: [], svc: 0, web: [], dns: [] };
+  const IPCheckRef       = ref({ checkAllIPs:            () => { calls.ip += 1; } });
+  const connectivityRef  = ref({ handelCheckStart:       (flag) => { calls.conn.push(flag); } });
+  const serviceStatusRef = ref({ refresh:                () => { calls.svc += 1; } });
+  const webRTCRef        = ref({ checkAllWebRTC:         (flag) => { calls.web.push(flag); } });
+  const dnsLeaksRef      = ref({ checkAllDNSLeakTest:    (flag) => { calls.dns.push(flag); } });
+  return { refs: { IPCheckRef, connectivityRef, serviceStatusRef, webRTCRef, dnsLeaksRef }, calls };
 }
 
 describe('useRefreshOrchestrator()', () => {
@@ -102,6 +103,7 @@ describe('useRefreshOrchestrator()', () => {
 
     assert.equal(calls.ip, 1, 'ipcheck refreshes');
     assert.deepEqual(calls.conn, [true], 'connectivity refresh with forced flag');
+    assert.equal(calls.svc, 1, 'service status re-pulled on full refresh');
     assert.deepEqual(calls.web, [true]);
     assert.deepEqual(calls.dns, [true]);
     assert.equal(infoMaskLevel.value, 0, 'info mask reset on refresh');
