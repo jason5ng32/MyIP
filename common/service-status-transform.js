@@ -54,13 +54,13 @@ export function normalizeSummary(json, selector = {}) {
 //
 // `pageUrl` is the provider's status-page origin; each incident's detail link
 // is built as `${pageUrl}/incidents/${id}`. We construct it rather than trust
-// the feed's `shortlink` because incident.io pages (OpenAI, Notion) omit it —
+// the feed's `shortlink` because incident.io pages (ChatGPT(OpenAI), Notion) omit it —
 // their feed otherwise points only at the page root, not the incident.
 //
 // Returns: [{ id, name, status, impact, startedAt, url }]
 //
 // Sorted newest-first by `startedAt` (the timestamp we display) before
-// capping, NOT by upstream order: incident.io feeds (OpenAI, Notion) leave
+// capping, NOT by upstream order: incident.io feeds (ChatGPT(OpenAI), Notion) leave
 // `started_at` null and order by `updated_at`, so the `created_at` we fall
 // back to would otherwise render out of chronological order in the UI.
 export function normalizeIncidents(json, { limit = 10, pageUrl = '' } = {}) {

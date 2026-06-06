@@ -603,7 +603,7 @@
   },
   "serviceStatus": {
     "Title": "Servis Durumu",
-    "Note": "Bir servis açılmadığında sorun sizde olmayabilir — servisin kendisi çökmüş olabilir. Bu bölüm tanınmış AI servislerin canlı kullanılabilirliğini gösterir; her alt servisin durumunu ve son olayları görmek için bir kartı genişletin.",
+    "Note": "Bir servis açılmadığında sorun sizde olmayabilir — servisin kendisi çökmüş olabilir. Mevcutta, insanlar çok fazla AI ürünü kullanıyor ve AI ürünü yanıt vermediğinde, kendi sorunu mı yoksa servisin sorunu mu olduğunu bilmiyorlar. Bu bölüm, tanınmış AI servislerin canlı kullanılabilirliğini gösterir; her alt servisin durumunu ve son olayları görmek için bir kartı genişletin.",
     "Refresh": "Servis Durumunu Yenile",
     "AllOperational": "Tüm Sistemler Çalışıyor",
     "ComponentsTitle": "Servisler",

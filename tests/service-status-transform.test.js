@@ -135,7 +135,7 @@ describe('normalizeIncidents', () => {
 });
 
 describe('assembleProvider', () => {
-    const provider = { id: 'openai', name: 'OpenAI', page: 'https://status.openai.com', api: 'https://status.openai.com' };
+    const provider = { id: 'chatgpt', name: 'ChatGPT', page: 'https://status.openai.com', api: 'https://status.openai.com' };
 
     it('combines config + summary + incidents into the frontend shape', () => {
         const summaryJson = {
@@ -144,8 +144,8 @@ describe('assembleProvider', () => {
         };
         const incidentsJson = { incidents: [{ id: 'i1', name: 'Latency', status: 'monitoring', impact: 'minor' }] };
         const out = assembleProvider(provider, summaryJson, incidentsJson);
-        assert.equal(out.id, 'openai');
-        assert.equal(out.name, 'OpenAI');
+        assert.equal(out.id, 'chatgpt');
+        assert.equal(out.name, 'ChatGPT');
         assert.equal(out.page, 'https://status.openai.com');
         assert.equal(out.indicator, 'minor');
         assert.equal(out.components.length, 1);

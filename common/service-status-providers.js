@@ -18,7 +18,7 @@
 
 export const STATUS_PROVIDERS = [
     { id: 'claude', name: 'Claude', api: 'https://status.claude.com', page: 'https://status.claude.com' },
-    { id: 'openai', name: 'OpenAI', api: 'https://status.openai.com', page: 'https://status.openai.com' },
+    { id: 'chatgpt', name: 'ChatGPT', api: 'https://status.openai.com', page: 'https://status.openai.com' },
     { id: 'cursor', name: 'Cursor', api: 'https://status.cursor.com', page: 'https://status.cursor.com' },
     // exclude: drop GitHub's "Visit … for more information" placeholder row.
     { id: 'github', name: 'GitHub', api: 'https://www.githubstatus.com', page: 'https://www.githubstatus.com', components: { exclude: ['0l2p9nhqnxpd'] } },

@@ -184,7 +184,7 @@ const { textClass } = useStatusTone();
 // are left null and fall back to a first-letter tile.
 const PROVIDERS = [
   { id: 'claude', name: 'Claude', icon: 'ri:claude-line' },
-  { id: 'openai', name: 'OpenAI', icon: 'ri:openai-line' },
+  { id: 'chatgpt', name: 'ChatGPT', icon: 'ri:openai-line' },
   { id: 'cursor', name: 'Cursor', icon: 'simple-icons:cursor' },
   { id: 'notion', name: 'Notion', icon: 'ri:notion-line' },
   { id: 'github', name: 'GitHub', icon: 'ri:github-line' },
