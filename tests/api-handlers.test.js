@@ -23,8 +23,7 @@ import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
 import serviceStatusHandler, {
-    componentsHandler as serviceStatusComponentsHandler,
-    incidentsHandler as serviceStatusIncidentsHandler,
+    detailHandler as serviceStatusDetailHandler,
 } from '../api/service-status.js';
 
 // -- shared test utilities ------------------------------------------------
@@ -323,34 +322,19 @@ describe('service-status overview handler', () => {
     });
 });
 
-describe('service-status components handler', () => {
+describe('service-status detail handler', () => {
     it('rejects non-GET with 405', async () => {
         const res = createResponse();
-        await serviceStatusComponentsHandler(createRequest({ method: 'POST', query: { id: 'claude' } }), res);
+        await serviceStatusDetailHandler(createRequest({ method: 'POST', query: { id: 'claude' } }), res);
         assert.equal(res.statusCode, 405);
     });
 
-    it('serves a components array (empty until the poller fills the snapshot)', async () => {
+    it('serves components + incidents arrays (empty until the poller fills the snapshot)', async () => {
         const res = createResponse();
-        await serviceStatusComponentsHandler(createRequest({ query: { id: 'claude' } }), res);
+        await serviceStatusDetailHandler(createRequest({ query: { id: 'claude' } }), res);
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.id, 'claude');
         assert.ok(Array.isArray(res.body.components));
-    });
-});
-
-describe('service-status incidents handler', () => {
-    it('rejects non-GET with 405', async () => {
-        const res = createResponse();
-        await serviceStatusIncidentsHandler(createRequest({ method: 'POST', query: { id: 'claude' } }), res);
-        assert.equal(res.statusCode, 405);
-    });
-
-    it('serves an incidents array (empty until the poller fills the snapshot)', async () => {
-        const res = createResponse();
-        await serviceStatusIncidentsHandler(createRequest({ query: { id: 'claude' } }), res);
-        assert.equal(res.statusCode, 200);
-        assert.equal(res.body.id, 'claude');
         assert.ok(Array.isArray(res.body.incidents));
     });
 });

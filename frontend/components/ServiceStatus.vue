@@ -63,7 +63,7 @@
                is fetched on first view, not with the overview. -->
           <CollapsibleContent>
             <CardContent class="px-4 pb-4 pt-0">
-              <Tabs :model-value="activeTab[p.id] || 'components'" @update:model-value="(v) => onTabChange(p, v)">
+              <Tabs :model-value="activeTab[p.id] || 'components'" @update:model-value="(v) => (activeTab[p.id] = v)">
                 <TabsList class="grid w-full grid-cols-2">
                   <TabsTrigger value="components">{{ t('serviceStatus.ComponentsTitle') }}</TabsTrigger>
                   <TabsTrigger value="incidents">{{ t('serviceStatus.IncidentsTitle') }}</TabsTrigger>
@@ -72,17 +72,17 @@
                 <!-- Sub-services (first level only) -->
                 <TabsContent value="components" class="mt-3">
                   <!-- Skeleton placeholder keeps the panel height stable while loading -->
-                  <ul v-if="componentsState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
+                  <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
                     <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
                       <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
                     </li>
                   </ul>
-                  <p v-else-if="componentsState[p.id]?.error" class="text-sm text-destructive py-2">
+                  <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
                     {{ t('serviceStatus.ComponentsError') }}
                   </p>
-                  <ul v-else-if="componentsState[p.id]?.data?.length"
+                  <ul v-else-if="detailState[p.id]?.components?.length"
                     class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
-                    <li v-for="(c, i) in componentsState[p.id].data" :key="i"
+                    <li v-for="(c, i) in detailState[p.id].components" :key="i"
                       class="flex items-center justify-between gap-2 px-3 py-2 text-sm">
                       <span class="truncate min-w-0">{{ c.name }}</span>
                       <span class="flex items-center gap-1.5 shrink-0">
@@ -99,17 +99,17 @@
 
                 <!-- Recent incidents -->
                 <TabsContent value="incidents" class="mt-3">
-                  <ul v-if="incidentsState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
+                  <ul v-if="detailState[p.id]?.loading" class="rounded-lg border bg-card divide-y">
                     <li v-for="(w, i) in placeholderSizes" :key="i" class="px-3 py-2.5">
                       <div class="h-3.5 bg-muted rounded animate-pulse" :style="`width:${(w / 12) * 100}%`"></div>
                     </li>
                   </ul>
-                  <p v-else-if="incidentsState[p.id]?.error" class="text-sm text-destructive py-2">
+                  <p v-else-if="detailState[p.id]?.error" class="text-sm text-destructive py-2">
                     {{ t('serviceStatus.IncidentsError') }}
                   </p>
-                  <ul v-else-if="incidentsState[p.id]?.data?.length"
+                  <ul v-else-if="detailState[p.id]?.incidents?.length"
                     class="rounded-lg border bg-card divide-y max-h-150 overflow-y-auto">
-                    <li v-for="inc in incidentsState[p.id].data" :key="inc.id" class="px-3 py-2 text-sm">
+                    <li v-for="inc in detailState[p.id].incidents" :key="inc.id" class="px-3 py-2 text-sm">
                       <!-- Line 1: incident title -->
                       <a :href="inc.url || statusById[p.id]?.page" target="_blank" rel="noopener noreferrer"
                         :title="inc.name" class="block truncate hover:underline">
@@ -152,11 +152,10 @@
 // falls back to a "status unavailable" state instead of the section vanishing.
 //
 // The backend polls every provider on a fixed 5-minute schedule and caches the
-// result in memory. Three cheap snapshot-read endpoints back this view:
-//   /api/service-status             → overview (status per provider)
-//   /api/service-status/components  → one provider's sub-services (on expand)
-//   /api/service-status/incidents   → one provider's recent incidents (on tab)
-// so the initial load stays light and detail is pulled only when opened.
+// result in memory. Two cheap snapshot-read endpoints back this view:
+//   /api/service-status         → overview (status per provider)
+//   /api/service-status/detail  → one provider's sub-services + incidents (on expand)
+// so the initial load stays light and detail is pulled only when a card opens.
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -213,10 +212,9 @@ const fetchFailed = ref(false);
 // id → { indicator, page } from the overview fetch.
 const statusById = reactive({});
 // Per-provider UI / detail-fetch state.
-const openState = reactive({});       // id → bool (expanded)
-const activeTab = reactive({});       // id → 'components' | 'incidents'
-const componentsState = reactive({}); // id → { loading, error, data }
-const incidentsState = reactive({});  // id → { loading, error, data }
+const openState = reactive({});   // id → bool (expanded)
+const activeTab = reactive({});   // id → 'components' | 'incidents'
+const detailState = reactive({}); // id → { loading, error, loaded, components, incidents }
 
 // A provider with no known indicator (fetch failed, or our API unreachable)
 // reads as 'unknown' → the "status unavailable" label + CircleHelp icon.
@@ -290,53 +288,37 @@ const loadOverview = async () => {
 const MIN_SKELETON_MS = 1000;
 const floorDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Lazy per-provider detail loaders. Both guard against duplicate fetches and
-// cache their result on the reactive map until the next refresh clears it.
-const loadComponents = async (id) => {
-  if (componentsState[id]?.data || componentsState[id]?.loading) return;
-  componentsState[id] = { loading: true, error: false, data: null };
+// Lazy per-provider detail loader: one request returns both the sub-services
+// and the recent incidents (a user who opens a card looks at both). Guards
+// against duplicate fetches; a successful result is cached until refresh, while
+// an error leaves `loaded` false so re-expanding retries.
+const loadDetail = async (id) => {
+  if (detailState[id]?.loading || detailState[id]?.loaded) return;
+  detailState[id] = { loading: true, error: false, loaded: false, components: [], incidents: [] };
   try {
     const [res] = await Promise.all([
-      fetchWithTimeout(`/api/service-status/components?id=${id}`, { timeoutMs: 10000 }),
+      fetchWithTimeout(`/api/service-status/detail?id=${id}`, { timeoutMs: 10000 }),
       floorDelay(MIN_SKELETON_MS),
     ]);
     if (!res.ok) throw new Error(`status ${res.status}`);
     const json = await res.json();
-    componentsState[id] = { loading: false, error: false, data: json.components || [] };
+    detailState[id] = {
+      loading: false, error: false, loaded: true,
+      components: json.components || [],
+      incidents: json.incidents || [],
+    };
   } catch {
-    componentsState[id] = { loading: false, error: true, data: null };
-  }
-};
-
-const loadIncidents = async (id) => {
-  if (incidentsState[id]?.data || incidentsState[id]?.loading) return;
-  incidentsState[id] = { loading: true, error: false, data: null };
-  try {
-    const [res] = await Promise.all([
-      fetchWithTimeout(`/api/service-status/incidents?id=${id}`, { timeoutMs: 10000 }),
-      floorDelay(MIN_SKELETON_MS),
-    ]);
-    if (!res.ok) throw new Error(`status ${res.status}`);
-    const json = await res.json();
-    incidentsState[id] = { loading: false, error: false, data: json.incidents || [] };
-  } catch {
-    incidentsState[id] = { loading: false, error: true, data: null };
+    detailState[id] = { loading: false, error: true, loaded: false, components: [], incidents: [] };
   }
 };
 
 const onToggle = (p) => {
   // Collapsible flips openState via v-model; this fires on the same click, so
-  // a falsy current value means we're opening. Default tab is components.
+  // a falsy current value means we're opening.
   if (!openState[p.id]) {
     trackEvent('Section', 'ExpandProvider', `ServiceStatus:${p.id}`);
-    loadComponents(p.id);
+    loadDetail(p.id);
   }
-};
-
-const onTabChange = (p, tab) => {
-  activeTab[p.id] = tab;
-  if (tab === 'incidents') loadIncidents(p.id);
-  else loadComponents(p.id);
 };
 
 const refresh = () => {
@@ -344,8 +326,7 @@ const refresh = () => {
   // Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
   // cached detail so a reopened card refetches the fresh snapshot.
   for (const k of Object.keys(openState)) openState[k] = false;
-  for (const k of Object.keys(componentsState)) delete componentsState[k];
-  for (const k of Object.keys(incidentsState)) delete incidentsState[k];
+  for (const k of Object.keys(detailState)) delete detailState[k];
   loadOverview();
 };
 

@@ -91,6 +91,21 @@ describe('normalizeIncidents', () => {
         assert.equal(out[0].url, 'https://status.example.com');
     });
 
+    it('sorts newest-first by the displayed timestamp, regardless of upstream order', () => {
+        // Upstream order here is NOT chronological by start (mirrors incident.io,
+        // which orders by updated_at) — the output must still be newest-first.
+        const json = {
+            incidents: [
+                { id: 'a', name: 'older', created_at: '2026-06-05T13:00:00Z' },
+                { id: 'b', name: 'newest', created_at: '2026-06-06T01:00:00Z' },
+                { id: 'c', name: 'no-date' },
+                { id: 'd', name: 'oldest', created_at: '2026-06-04T09:00:00Z' },
+            ],
+        };
+        const out = normalizeIncidents(json, { pageUrl: 'https://x' });
+        assert.deepEqual(out.map((i) => i.id), ['b', 'a', 'd', 'c']);
+    });
+
     it('returns an empty array on a malformed payload', () => {
         assert.deepEqual(normalizeIncidents({}), []);
         assert.deepEqual(normalizeIncidents(null), []);

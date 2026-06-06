@@ -40,21 +40,37 @@ export function normalizeSummary(json, limit = DEFAULT_COMPONENT_LIMIT) {
 // their feed otherwise points only at the page root, not the incident.
 //
 // Returns: [{ id, name, status, impact, startedAt, url }]
+//
+// Sorted newest-first by `startedAt` (the timestamp we display) before
+// capping, NOT by upstream order: incident.io feeds (OpenAI, Notion) leave
+// `started_at` null and order by `updated_at`, so the `created_at` we fall
+// back to would otherwise render out of chronological order in the UI.
 export function normalizeIncidents(json, { limit = 10, pageUrl = '' } = {}) {
     const base = String(pageUrl).replace(/\/+$/, ''); // trim trailing slash(es)
     const incidents = Array.isArray(json?.incidents) ? json.incidents : [];
-    return incidents.slice(0, limit).map((i) => {
-        const id = i?.id ?? null;
-        return {
-            id,
-            name: i?.name ?? '',
-            status: i?.status ?? null,
-            impact: i?.impact ?? 'none',
-            // `started_at` is the canonical start; fall back to created_at.
-            startedAt: i?.started_at ?? i?.created_at ?? null,
-            url: id && base ? `${base}/incidents/${id}` : (base || null),
-        };
-    });
+    return incidents
+        .map((i) => {
+            const id = i?.id ?? null;
+            return {
+                id,
+                name: i?.name ?? '',
+                status: i?.status ?? null,
+                impact: i?.impact ?? 'none',
+                // `started_at` is the canonical start; fall back to created_at.
+                startedAt: i?.started_at ?? i?.created_at ?? null,
+                url: id && base ? `${base}/incidents/${id}` : (base || null),
+            };
+        })
+        .sort((a, b) => incidentTimestamp(b) - incidentTimestamp(a))
+        .slice(0, limit);
+}
+
+// Parse an incident's display timestamp to a comparable number; missing /
+// unparseable dates sort oldest (0) so they fall to the bottom of the list.
+function incidentTimestamp(incident) {
+    if (!incident.startedAt) return 0;
+    const ms = Date.parse(incident.startedAt);
+    return Number.isNaN(ms) ? 0 : ms;
 }
 
 // Combine one provider's config with its (possibly null) summary + incidents

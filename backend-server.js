@@ -25,8 +25,7 @@ import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import dnsResolver from './api/dns-resolver.js';
 import serviceStatusHandler, {
-    componentsHandler as serviceStatusComponentsHandler,
-    incidentsHandler as serviceStatusIncidentsHandler,
+    detailHandler as serviceStatusDetailHandler,
 } from './api/service-status.js';
 import { getSessionResult as dnsLeakGetResult } from './api/dns-leak-test.js';
 import getWhois from './api/get-whois.js';
@@ -212,8 +211,7 @@ app.get('/api/ip2location', requireValidIP(), cacheable(ONE_HOUR_CACHE), ip2loca
 app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/maxmind', requireValidIP(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
-app.get('/api/service-status/components', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusComponentsHandler);
-app.get('/api/service-status/incidents', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusIncidentsHandler);
+app.get('/api/service-status/detail', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
 
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/map', mapHandler);
