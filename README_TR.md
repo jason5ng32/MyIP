@@ -35,12 +35,13 @@ Demo'yu yer imlerine ekleyebilir veya kendi kurulumunuzu yapabilirsiniz.
 * 🕵️ **IP Bilgileri**: Ülke, bölge, ASN, coğrafi konum ve daha fazlasını içeren ayrıntılı IP bilgileri sunar.
 * 🛰️ **ASN Geçmişi ve Üst Topoloji**: Bir IP önekinin geçmiş AS duyurularını ve ASN'den Tier 1 omurga ağlarına giden üst bağlantı yollarını görüntüleyin.
 * 🚦 **Erişilebilirlik Kontrolü**: Google, GitHub, YouTube, ChatGPT ve diğerleri gibi sitelerin erişilebilirliğini test eder.
+* 📡 **Servis Durumu**: Tanınmış servislerin (Claude, OpenAI, GitHub, Cloudflare vb.) resmi durum sayfalarından alınan canlı kullanılabilirliğini, her alt servisin durumu ve son olaylarla birlikte gösterir.
 * 🚥 **WebRTC Tespiti**: WebRTC bağlantısında kullanılan IP adresini belirler.
 * 🛑 **DNS Leak Testi**: VPN veya proxy kullanırken DNS sızıntısı riskini değerlendirmek için DNS uç nokta verilerini gösterir.
 * 🚀 **Hız Testi**：Edge ağlarıyla ağ hızınızı test edin.
 * 🚏 **Proxy Kural Testi**: Proxy yazılımlarının kural ayarlarını doğru çalışıp çalışmadığını test edin.
 * ⏱️ **Küresel Gecikme Testi**: Dünyanın farklı bölgelerindeki sunuculara gecikme testleri yapın.
-* 📡 **MTR Testi**: Dünya çapındaki sunucular için MTR testleri gerçekleştirin.
+* 🚉 **MTR Testi**: Dünya çapındaki sunucular için MTR testleri gerçekleştirin.
 * 🔦 **DNS Çözücüsü**: Bir alan adının birden fazla kaynaktan DNS çözümlemesini yapar ve gerçek zamanlı çözümleme sonuçları alır.
 * 🚧 **Sansür Kontrolü**: Bir web sitesinin bazı ülkelerde engellenip engellenmediğini kontrol edin.
 * 📓 **Whois Arama**: Alan adı veya IP adresi için whois bilgisi sorgulayın.

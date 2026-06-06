@@ -603,7 +603,7 @@
   },
   "serviceStatus": {
     "Title": "État des services",
-    "Note": "Disponibilité en temps réel de services populaires, issue de leurs pages d'état officielles. Dépliez une carte pour voir ses sous-services et ses incidents récents.",
+    "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Cette section affiche la disponibilité en temps réel de services populaires ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
     "Refresh": "Actualiser l'état des services",
     "AllOperational": "Tous les systèmes sont opérationnels",
     "ComponentsTitle": "Services",
@@ -642,7 +642,7 @@
   },
   "connectivity": {
     "Title": "Connectivité réseau",
-    "Note": "Tests via chargement d'images à partir des sites correspondants. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
+    "Note": "Ce test vérifie si vous pouvez atteindre un site web donné. Il fonctionne en chargeant une petite image depuis ce site. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
     "StatusWait": "En attente du test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",

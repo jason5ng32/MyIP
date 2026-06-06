@@ -35,12 +35,13 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 🕵️ **Informations sur l'adresse IP** : Présente des informations détaillées pour toutes les adresses IP, y compris le pays, la région, l'ASN, la localisation géographique, et plus encore.
 * 🛰️ **Historique ASN et topologie amont** : Consultez l'historique des annonces AS pour un préfixe IP, et visualisez les chemins amont d'un ASN vers les réseaux dorsaux Tier 1.
 * 🚦 **Vérification de disponibilité** : Teste l'accessibilité de différents sites web, tels que Google, GitHub, YouTube, ChatGPT, et d'autres.
+* 📡 **État des services** : Affiche la disponibilité en temps réel de services populaires (Claude, OpenAI, GitHub, Cloudflare, etc.) depuis leurs pages d'état officielles, avec l'état de chaque sous-service et les incidents récents.
 * 🚥 **Détection WebRTC** : Identifie l'adresse IP utilisée lors des connexions WebRTC.
 * 🛑 **Test de fuite DNS** : Affiche les données de point de terminaison DNS pour évaluer le risque de fuites DNS lors de l'utilisation de VPN ou de proxies.
 * 🚀 **Test de vitesse** : Testez la vitesse de votre réseau avec des réseaux de pointe.
 * 🚏 **Test de règles** : Teste si les paramètres de règles fonctionnent correctement avec le logiciel de proxy.
 * ⏱️ **Test de latence mondiale** : Effectue des tests de latence sur des serveurs situés dans différentes régions du monde.
-* 📡 **Test MTR** : Effectue des tests MTR sur des serveurs situés dans différentes régions du monde.
+* 🚉 **Test MTR** : Effectue des tests MTR sur des serveurs situés dans différentes régions du monde.
 * 🔦 **Résolveur DNS** : effectue la résolution DNS d'un nom de domaine à partir de plusieurs sources, obtient les résultats de la résolution en temps réel et peut être utilisé pour la détermination de la contamination.
 * 🚧 **Test de Censorship**: Vérifier si un site est bloqué dans certains pays.
 * 📓 **Recherche Whois** : Effectuer une recherche d'informations Whois pour les noms de domaine ou les adresses IP

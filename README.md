@@ -35,12 +35,13 @@ Feel free to bookmark the demo or deploy your own.
 * 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
 * 🛰️ **ASN History & Upstream Topology**: View historical AS announcements for an IP prefix, and visualize the upstream paths from an ASN to the Tier 1 backbone networks.
 * 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
+* 📡 **Service Status**: Shows the live availability of well-known services (Claude, OpenAI, GitHub, Cloudflare, and more) from their official status pages, with per-service status and recent incidents.
 * 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
 * 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
 * 🚀 **Speed Test**：Test your network speed with edge networks.
 * 🚏 **Proxy Rule Testing**: Test the rule settings of proxy software to ensure their correctness.
 * ⏱️ **Global Latency Test**: Performe lantency tests on servers located in different regions around the world.
-* 📡 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
+* 🚉 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
 * 🔦 **DNS Resolver**: Performs DNS resolution of a domain name from multiple sources and obtains real-time resolution results that can be used for contamination determination.
 * 🚧 **Censorship Check**: Check if a website is blocked in some countries.
 * 📓 **Whois Search**: Perform whois information search for domain names or IP addresses

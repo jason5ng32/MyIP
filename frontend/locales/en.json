@@ -603,7 +603,7 @@
   },
   "serviceStatus": {
     "Title": "Service Status",
-    "Note": "Live availability of popular services, pulled from their official status pages. Expand a card to see its sub-services and recent incidents.",
+    "Note": "When a service won't open, it might not be your problem — the service itself could be down. This section shows the live availability of well-known services; expand a card to see each sub-service's status and recent incidents.",
     "Refresh": "Refresh Service Status",
     "AllOperational": "All Systems Operational",
     "ComponentsTitle": "Services",
@@ -642,7 +642,7 @@
   },
   "connectivity": {
     "Title": "Network Connectivity",
-    "Note": "Testing is done by loading small images from corresponding websites. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
+    "Note": "This test checks whether you can reach a given website. It works by loading a small image from that site. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
     "StatusWait": "Awaiting Test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",

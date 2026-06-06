@@ -20,11 +20,10 @@
     </header>
 
     <!-- Provider card grid — always rendered from the static list, so a failed
-         fetch shows per-card "status unavailable" rather than removing cards. -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        fetch shows per-card "status unavailable" rather than removing cards. -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
       <Collapsible v-for="p in PROVIDERS" :key="p.id" v-model:open="openState[p.id]" as-child>
-        <Card
-          class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
+        <Card class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
           <!-- Always-visible summary; the whole header toggles the panel -->
           <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
             <CardContent class="p-4">
@@ -63,8 +62,7 @@
                is fetched on first view, not with the overview. -->
           <CollapsibleContent>
             <CardContent class="px-4 pb-4 pt-0">
-              <Tabs :model-value="activeTab[p.id] || 'components'"
-                @update:model-value="(v) => onTabChange(p, v)">
+              <Tabs :model-value="activeTab[p.id] || 'components'" @update:model-value="(v) => onTabChange(p, v)">
                 <TabsList class="grid w-full grid-cols-2">
                   <TabsTrigger value="components">{{ t('serviceStatus.ComponentsTitle') }}</TabsTrigger>
                   <TabsTrigger value="incidents">{{ t('serviceStatus.IncidentsTitle') }}</TabsTrigger>
@@ -118,15 +116,15 @@
                       </a>
                       <!-- Line 2: date · severity (! icon count, no color) · status (colored by lifecycle) -->
                       <div class="flex items-center justify-between gap-2 text-xs">
-                      <div class="mt-0.5 flex items-center gap-1.5  text-muted-foreground">
-                        <span>{{ formatDate(inc.startedAt) }}</span>
-                        <template v-if="impactLevel(inc.impact) > 0">
-                          <span aria-hidden="true">·</span>
-                          <span class="inline-flex items-center" :title="indicatorLabel(inc.impact)">
-                            <TriangleAlert v-for="n in impactLevel(inc.impact)" :key="n" class="size-3 mr-[2px]" />
-                          </span>
-                        </template>
-                      </div>
+                        <div class="mt-0.5 flex items-center gap-1.5  text-muted-foreground">
+                          <span>{{ formatDate(inc.startedAt) }}</span>
+                          <template v-if="impactLevel(inc.impact) > 0">
+                            <span aria-hidden="true">·</span>
+                            <span class="inline-flex items-center" :title="indicatorLabel(inc.impact)">
+                              <TriangleAlert v-for="n in impactLevel(inc.impact)" :key="n" class="size-3 mr-[2px]" />
+                            </span>
+                          </template>
+                        </div>
                         <span :class="textClass(incidentStatusTone(inc.status))">
                           {{ incidentStatusLabel(inc.status) }}
                         </span>
@@ -185,14 +183,14 @@ const { textClass } = useStatusTone();
 // reuses the generic cloud glyph; providers with no reliable `ri` brand glyph
 // are left null and fall back to a first-letter tile.
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude', icon: 'ri:anthropic-fill' },
-  { id: 'openai', name: 'OpenAI', icon: 'ri:openai-fill' },
+  { id: 'claude', name: 'Claude', icon: 'ri:claude-line' },
+  { id: 'openai', name: 'OpenAI', icon: 'ri:openai-line' },
   { id: 'cursor', name: 'Cursor', icon: 'simple-icons:cursor' },
-  { id: 'github', name: 'GitHub', icon: 'ri:github-fill' },
-  { id: 'discord', name: 'Discord', icon: 'ri:discord-fill' },
+  { id: 'notion', name: 'Notion', icon: 'ri:notion-line' },
+  { id: 'github', name: 'GitHub', icon: 'ri:github-line' },
   { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare' },
-  { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-fill' },
-  { id: 'notion', name: 'Notion', icon: 'ri:notion-fill' },
+  { id: 'discord', name: 'Discord', icon: 'ri:discord-line' },
+  { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
