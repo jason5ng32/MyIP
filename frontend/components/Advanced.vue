@@ -70,11 +70,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
+import { ADVANCED_TOOLS } from '@/data/tools.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Maximize, Minimize, PanelBottomOpen } from '@lucide/vue';
@@ -89,22 +90,21 @@ const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const scrollContainer = ref(null);
 const router = useRouter();
 
-const cards = reactive([
-    { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', enabled: true },
-    { path: '/mtrtest', icon: '🚉', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', enabled: true },
-    { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', enabled: true },
-    { path: '/dnsresolver', icon: '📟', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', enabled: true },
-    { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', enabled: true },
-    { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', enabled: true },
-    { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
-    { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', enabled: true },
-    { path: '/securitychecklist', icon: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', enabled: true },
-    { path: '/servicestatus', icon: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', enabled: true },
-    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false },
-    { path: '/enhanceddnsleaktest', icon: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', enabled: false },
-]);
+// Cards derive from the shared tool registry (frontend/data/tools.js). `path`
+// and `icon` are mapped from the registry's `slug` / `emoji` so the template
+// keys stay stable.
+const cards = ADVANCED_TOOLS.map((tool) => ({
+    ...tool,
+    path: `/${tool.slug}`,
+    icon: tool.emoji,
+}));
 
-const enabledCards = computed(() => cards.filter(c => c.enabled));
+// Gate: the invisibility + enhanced DNS-leak tools only show on the original
+// site (they need the private API + sign-in). Reactive on configs, so they
+// appear the moment configs land — no fixed timeout needed.
+const enabledCards = computed(() =>
+    cards.filter((c) => !c.requiresOriginalSite || configs.value.originalSite),
+);
 
 const isFullScreen = ref(false);
 // Look the card up by path rather than by store.currentPath.id — the id is
@@ -151,27 +151,8 @@ const resetNavigatorURL = () => {
     router.push('/');
 };
 
-// Delayed enable for the Invisibility test card — waits for configs to
-// arrive. Track the timer id so we can cancel it if the component unmounts
-// before the callback fires.
-let invisibilityEnableTimer = null;
-
 onMounted(() => {
     store.setMountingStatus('AdvancedTools', true);
-    invisibilityEnableTimer = setTimeout(() => {
-        invisibilityEnableTimer = null;
-        if (configs.value.originalSite) {
-            cards.find(x => x.path === '/invisibilitytest').enabled = true;
-            cards.find(x => x.path === '/enhanceddnsleaktest').enabled = true;
-        }
-    }, 1500);
-});
-
-onBeforeUnmount(() => {
-    if (invisibilityEnableTimer !== null) {
-        clearTimeout(invisibilityEnableTimer);
-        invisibilityEnableTimer = null;
-    }
 });
 
 defineExpose({

@@ -21,7 +21,9 @@ frontend/
 ├── lib/                         ← cn() helper (tailwind-merge + clsx)
 ├── data/                        ← static config
 │                                  (achievements / ip-databases / sections /
-│                                   default-preferences / changelog)
+│                                   default-preferences / changelog / tools —
+│                                   the Advanced Tools registry: router + cards
+│                                   + drawer + standalone pages all derive from it)
 ├── utils/                       ← framework-agnostic pure helpers + IO modules
 │                                  (valid-ip / getips / transform-ip-data /
 │                                   fetch-with-timeout / analytics / scroll-to / …)

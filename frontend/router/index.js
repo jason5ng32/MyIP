@@ -1,35 +1,15 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { useMainStore } from '@/store';
+import { ADVANCED_TOOLS } from '@/data/tools.js';
 
-// Lazy loading of route components
-const MTRTest = () => import('../components/advanced-tools/MtrTest.vue');
-const PingTest = () => import('../components/advanced-tools/GlobalLatencyTest.vue');
-const RuleTest = () => import('../components/advanced-tools/RuleTest.vue');
-const DNSResolver = () => import('../components/advanced-tools/DnsResolver.vue');
-const EnhancedDnsLeakTest = () => import('../components/advanced-tools/EnhancedDnsLeakTest.vue');
-const CensorshipCheck = () => import('../components/advanced-tools/CensorshipCheck.vue');
-const Whois = () => import('../components/advanced-tools/Whois.vue');
-const InvisibilityTest = () => import('../components/advanced-tools/InvisibilityTest.vue');
-const MacChecker = () => import('../components/advanced-tools/MacChecker.vue');
-const BrowserInfo = () => import('../components/advanced-tools/BrowserInfo.vue');
-const Checklist = () => import('../components/advanced-tools/SecurityChecklist.vue');
-const ServiceStatus = () => import('../components/advanced-tools/ServiceStatus.vue');
-const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
+// `/` renders an empty placeholder inside the drawer; every tool route renders
+// its component there. Routes are derived from the shared tool registry
+// (frontend/data/tools.js) so there's a single ordered list to maintain.
+const EmptyComponent = () => import('@/components/advanced-tools/Empty.vue');
 
 const routes = [
   { path: '/', component: EmptyComponent },
-  { path: '/pingtest', component: PingTest },
-  { path: '/mtrtest', component: MTRTest },
-  { path: '/ruletest', component: RuleTest },
-  { path: '/dnsresolver', component: DNSResolver },
-  { path: '/enhanceddnsleaktest', component: EnhancedDnsLeakTest },
-  { path: '/censorshipcheck', component: CensorshipCheck },
-  { path: '/whois', component: Whois },
-  { path: '/macchecker', component: MacChecker },
-  { path: '/browserinfo', component: BrowserInfo },
-  { path: '/securitychecklist', component: Checklist },
-  { path: '/servicestatus', component: ServiceStatus },
-  { path: '/invisibilitytest', component: InvisibilityTest },
+  ...ADVANCED_TOOLS.map((tool) => ({ path: `/${tool.slug}`, component: tool.component })),
 ];
 
 const router = createRouter({
