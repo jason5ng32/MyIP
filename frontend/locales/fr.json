@@ -391,7 +391,7 @@
   },
   "advancedtools": {
     "OpenInNewTab": "Ouvrir dans un nouvel onglet",
-    "BackToHome": "Accueil",
+    "BackToHome": "Retour à l'accueil",
     "Title": "Outils avancés",
     "Note": "Certains outils sont utilisés relativement rarement, mais sont très utiles lors des tests de réseaux.",
     "PingTestNote": "Test de la valeur Ping mondiale",

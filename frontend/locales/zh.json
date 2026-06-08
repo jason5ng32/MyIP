@@ -391,7 +391,7 @@
   },
   "advancedtools": {
     "OpenInNewTab": "在新标签页打开",
-    "BackToHome": "首页",
+    "BackToHome": "回到首页",
     "Title": "高级工具",
     "Note": "一些使用频率相对较低，但在进行网络测试时，非常有用的工具。",
     "PingTestNote": "全球的 Ping 值测试",

@@ -391,7 +391,7 @@
   },
   "advancedtools": {
     "OpenInNewTab": "Open in new tab",
-    "BackToHome": "Home",
+    "BackToHome": "Back to Home",
     "Title": "Advanced Tools",
     "Note": "Tools that are used relatively infrequently, but are very useful when performing network testing.",
     "PingTestNote": "Global Ping value test",

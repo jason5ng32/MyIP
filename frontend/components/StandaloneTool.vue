@@ -20,11 +20,13 @@
           <span class="text-muted-foreground" aria-hidden="true">/</span>
           <span class="min-w-0 truncate font-medium">{{ tool.emoji }} {{ t(tool.titleKey) }}</span>
         </template>
-        <RouterLink to="/"
-          class="ml-auto inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-          <ArrowLeft class="size-4" />
-          <span class="hidden sm:inline">{{ t('advancedtools.BackToHome') }}</span>
-        </RouterLink>
+        <!-- Button `as-child` renders the RouterLink as its root, so this is a
+             single <a> styled as a button — not a <button> nested in an <a>. -->
+        <Button as-child variant="default" class="ml-auto shrink-0 cursor-pointer">
+          <RouterLink to="/">
+            <ArrowLeft class="size-4" /> {{ t('advancedtools.BackToHome') }}
+          </RouterLink>
+        </Button>
       </div>
     </header>
 
@@ -52,6 +54,7 @@ import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import brandIcon from '@/components/svgicons/Brand.vue';
 import { ArrowLeft } from '@lucide/vue';
+import { Button } from '@/components/ui/button';
 
 const { t } = useI18n();
 const route = useRoute();
