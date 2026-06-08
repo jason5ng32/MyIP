@@ -36,7 +36,6 @@ export const useMainStore = defineStore('main', {
     userAchievements: createInitialAchievementsState(),
     remoteUserInfo: {},
     remoteUserInfoFetched: false,
-    currentPath: {},
     mountingStatus: createMountingStatus(),
     curl: {
       ipv4Domain: import.meta.env?.VITE_CURL_IPV4_DOMAIN,
@@ -74,10 +73,6 @@ export const useMainStore = defineStore('main', {
   },
 
   actions: {
-    // set current route path
-    setCurrentPath(path, id) {
-      this.currentPath = { path: path, id: id };
-    },
     // get database URL (URL template replacement logic is extracted to buildDbUrl pure function in data/ip-databases.js)
     getDbUrl(id, ip, lang) {
       const db = this.ipDBs.find(d => d.id === id);
