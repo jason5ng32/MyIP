@@ -10,7 +10,6 @@
 export const SECTION_IDS = [
   'IPInfo',
   'Connectivity',
-  'ServiceStatus',
   'WebRTC',
   'DNSLeakTest',
   'SpeedTest',

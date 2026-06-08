@@ -154,6 +154,7 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences, isSigne
         { keys: 'C', action: () => goToAdvancedTool('/censorshipcheck', 'CensorshipCheck'), description: t('shortcutKeys.CensorshipCheck') },
         { keys: 'b', action: () => goToAdvancedTool('/browserinfo', 'BrowserInfo'), description: t('shortcutKeys.BrowserInfo') },
         { keys: 'W', action: () => goToAdvancedTool('/whois', 'Whois'), description: t('shortcutKeys.Whois') },
+        { keys: 'v', action: () => goToAdvancedTool('/servicestatus', 'ServiceStatus'), description: t('shortcutKeys.ServiceStatus') },
         {
             keys: 'f',
             action: () => {

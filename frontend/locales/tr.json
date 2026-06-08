@@ -398,6 +398,7 @@
     "EnhancedDnsLeakTest": "Tüm yinelemeli çözümleyicileri yakalar, ECS ve DNSSEC analizi ile",
     "RuleTestNote": "Proxy yazılımının kural ayarlarını kontrol edin",
     "CensorshipCheck": "Bir web sitesinin bazı ülkelerde engellenip engellenmediğini kontrol edin",
+    "ServiceStatus": "Tanınmış yapay zeka ve geliştirici servislerinin anlık erişilebilirliğini ve yaşadığınız kesintinin nedeninin yakın zamanlı bir arıza olup olmadığını kontrol edin",
     "Whois": "Alan adı/IP kayıt bilgilerini arayın",
     "InvisibilityTest": "Proxy veya VPN kullanıp kullanmadığınızı kontrol edin",
     "MacChecker": "Bir fiziksel adresin bilgilerini sorgulayın",
@@ -605,6 +606,7 @@
     "Title": "Servis Durumu",
     "Note": "Bir servis açılmadığında sorun sizde olmayabilir — servisin kendisi çökmüş olabilir. Mevcutta, insanlar çok fazla AI ürünü kullanıyor ve AI ürünü yanıt vermediğinde, kendi sorunu mı yoksa servisin sorunu mu olduğunu bilmiyorlar. Bu bölüm, tanınmış AI servislerin canlı kullanılabilirliğini gösterir; her alt servisin durumunu ve son olayları görmek için bir kartı genişletin.",
     "Refresh": "Servis Durumunu Yenile",
+    "LastChecked": "Son kontrol",
     "AllOperational": "Tüm Sistemler Çalışıyor",
     "ComponentsTitle": "Servisler",
     "IncidentsTitle": "Son Olaylar",
@@ -643,6 +645,11 @@
   "connectivity": {
     "Title": "Ağ Bağlantısı",
     "Note": "Bu test, belirli bir web sitesine ulaşıp ulaşamadığınızı kontrol eder. İlgili siteden küçük bir resim yüklenerek çalışır. Gecikme değerleri yalnızca referans amaçlıdır ve gerçekte daha küçük olacaktır. Sık kullandığınız diğer web sitelerini test listesine ekleyerek hızlı testler yapabilirsiniz.",
+    "ServiceStatusBanner": {
+      "Title": "Bir servis açılmıyor mu?",
+      "Note": "Yukarıdaki testte ChatGPT veya Claude gibi bir yapay zeka ürünü başarısız olduysa, sorun ağınızda olmayabilir — servisin kendisi çökmüş olabilir. Anlık erişilebilirliğini ve son arızalarını kontrol edin.",
+      "CTA": "Servis Durumunu Aç"
+    },
     "StatusWait": "Test Bekleniyor",
     "StatusAvailable": "Tamam",
     "StatusUnavailable": "Kullanılamıyor",
@@ -792,6 +799,7 @@
     "Preferences": "Tercihleri Aç",
     "About": "Hakkında panelini aç",
     "Whois": "Whois Araması panelini aç",
+    "ServiceStatus": "Servis Durumu panelini aç",
     "InvisibilityTest": "Görünmezlik Testi panelini aç",
     "EnhancedDnsLeakTest": "Derinlemesine DNS Sızıntı Testi panelini aç",
     "MacChecker": "MAC arama panelini aç",

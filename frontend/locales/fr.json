@@ -398,6 +398,7 @@
     "EnhancedDnsLeakTest": "Capture tous les résolveurs récursifs avec analyse ECS et DNSSEC",
     "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
     "CensorshipCheck": "Vérifier si un site est bloqué dans certains pays",
+    "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
@@ -605,6 +606,7 @@
     "Title": "État des services",
     "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Actuellement, les gens utilisent beaucoup de produits AI, et quand le produit AI ne répond pas, ils ne savent pas si c'est leur problème ou celui du service. Cette section affiche la disponibilité en temps réel de services AI populaires ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
     "Refresh": "Actualiser l'état des services",
+    "LastChecked": "Dernière vérification",
     "AllOperational": "Tous les systèmes sont opérationnels",
     "ComponentsTitle": "Services",
     "IncidentsTitle": "Incidents récents",
@@ -643,6 +645,11 @@
   "connectivity": {
     "Title": "Connectivité réseau",
     "Note": "Ce test vérifie si vous pouvez atteindre un site web donné. Il fonctionne en chargeant une petite image depuis ce site. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
+    "ServiceStatusBanner": {
+      "Title": "Un service ne se charge pas ?",
+      "Note": "Si un produit d'IA comme ChatGPT ou Claude a échoué au test ci-dessus, le problème ne vient peut-être pas de votre réseau — le service lui-même peut être en panne. Vérifiez sa disponibilité en temps réel et ses incidents récents.",
+      "CTA": "Ouvrir l'état des services"
+    },
     "StatusWait": "En attente du test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",
@@ -792,6 +799,7 @@
     "Preferences": "Ouvrir les Préférences",
     "About": "Ouvrir À propos",
     "Whois": "Ouvrir la Recherche Whois",
+    "ServiceStatus": "Ouvrir l'état des services",
     "InvisibilityTest": "Ouvrir le Test d'invisibilité",
     "EnhancedDnsLeakTest": "Ouvrir le Test de fuite DNS approfondi",
     "MacChecker": "Ouvrir le Recherche de MAC",

@@ -1233,10 +1233,28 @@
       {
         "type": "add",
         "change": {
-          "en": "Added a Service Status section showing live availability of popular services",
-          "zh": "新增「服务可用性」板块，实时展示知名服务的可用状态",
-          "fr": "Ajout d'une section État des services affichant la disponibilité en temps réel de services populaires",
-          "tr": "Popüler servislerin canlı kullanılabilirliğini gösteren Servis Durumu bölümü eklendi"
+          "en": "New Advanced Tool: Service Status, showing live availability of popular AI services",
+          "zh": "新增「服务可用性」高级工具，实时展示知名 AI 服务的可用状态",
+          "fr": "Nouvel outil avancé : État des services, affichant la disponibilité en temps réel de services populaires",
+          "tr": "Yeni Gelişmiş Araç: Servis Durumu, popüler AI servislerin canlı kullanılabilirliğini gösterir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved multiple experiences to enhance usability",
+          "zh": "优化多处体验，提升可用性",
+          "fr": "Amélioration de multiples expériences pour améliorer l'utilisabilité",
+          "tr": "Kullanılabilirlikyi artırmak için birden fazla deneyim iyileştirildi"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复一些问题",
+          "fr": "Correction de petits problèmes",
+          "tr": "Birkaç küçük sorun düzeltildi"
         }
       }
     ]

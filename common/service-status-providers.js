@@ -30,6 +30,17 @@ export const STATUS_PROVIDERS = [
     // LangSmith is the status page for the LangChain platform.
     { id: 'langchain', name: 'LangChain', api: 'https://status.smith.langchain.com', page: 'https://status.smith.langchain.com' },
     { id: 'notion', name: 'Notion', api: 'https://www.notion-status.com', page: 'https://www.notion-status.com' },
+    { id: 'vercel', name: 'Vercel', api: 'https://www.vercel-status.com', page: 'https://www.vercel-status.com' },
+    { id: 'netlify', name: 'Netlify', api: 'https://www.netlifystatus.com', page: 'https://www.netlifystatus.com' },
+    { id: 'render', name: 'Render', api: 'https://status.render.com', page: 'https://status.render.com' },
+    { id: 'supabase', name: 'Supabase', api: 'https://status.supabase.com', page: 'https://status.supabase.com' },
+    { id: 'replicate', name: 'Replicate', api: 'https://replicatestatus.com', page: 'https://replicatestatus.com' },
+    { id: 'figma', name: 'Figma', api: 'https://status.figma.com', page: 'https://status.figma.com' },
+    { id: 'linear', name: 'Linear', api: 'https://linearstatus.com', page: 'https://linearstatus.com' },
+    // Stripe's customer-facing status.stripe.com is a homegrown page with a
+    // non-Statuspage schema; www.stripestatus.com is its Statuspage mirror,
+    // which exposes the /api/v2 endpoints this poller needs.
+    { id: 'stripe', name: 'Stripe', api: 'https://www.stripestatus.com', page: 'https://www.stripestatus.com' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

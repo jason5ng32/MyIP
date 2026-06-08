@@ -13,6 +13,7 @@ const InvisibilityTest = () => import('../components/advanced-tools/Invisibility
 const MacChecker = () => import('../components/advanced-tools/MacChecker.vue');
 const BrowserInfo = () => import('../components/advanced-tools/BrowserInfo.vue');
 const Checklist = () => import('../components/advanced-tools/SecurityChecklist.vue');
+const ServiceStatus = () => import('../components/advanced-tools/ServiceStatus.vue');
 const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
 
 const routes = [
@@ -27,6 +28,7 @@ const routes = [
   { path: '/macchecker', component: MacChecker },
   { path: '/browserinfo', component: BrowserInfo },
   { path: '/securitychecklist', component: Checklist },
+  { path: '/servicestatus', component: ServiceStatus },
   { path: '/invisibilitytest', component: InvisibilityTest },
 ];
 

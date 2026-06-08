@@ -1,46 +1,35 @@
 <template>
-  <section class="mb-10">
-    <!-- Header: title + aggregate light + refresh trigger -->
-    <header class="mb-2 flex flex-col items-start justify-between gap-4">
-      <div class="flex flex-row items-center justify-between gap-4 w-full">
-        <h2 id="ServiceStatus"
-          class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
-          📡 {{ t('serviceStatus.Title') }}
-        </h2>
-        <JnTooltip :text="t('serviceStatus.Refresh')" side="left">
-          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" :disabled="loading" @click="refresh"
-            aria-label="Refresh Service Status">
-            <component :is="hasLoaded ? RotateCw : Play" />
-          </Button>
-        </JnTooltip>
-      </div>
-      <div class="text-base text-muted-foreground">
-        <p v-if="!isSimpleMode">{{ t('serviceStatus.Note') }}</p>
-      </div>
-    </header>
+  <!-- Service Status advanced tool: shows whether a set of well-known
+       products are currently up, expandable per-card into sub-services and
+       recent incidents. Lives inside the Advanced Tools drawer (its title is
+       rendered by the drawer header), so this template starts at the note row
+       rather than a section <h2>. -->
+  <div class="service-status-section my-4 space-y-4">
+    <!-- Top note -->
+    <p class="text-sm text-muted-foreground leading-relaxed">{{ t('serviceStatus.Note') }}</p>
 
     <!-- Provider card grid — always rendered from the static list, so a failed
         fetch shows per-card "status unavailable" rather than removing cards. -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <Collapsible v-for="p in PROVIDERS" :key="p.id" v-model:open="openState[p.id]" as-child>
-        <Card class="keyboard-shortcut-card jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
-          <!-- Always-visible summary; only the provider header row toggles the
-              panel — the status line below stays non-interactive. -->
-          <CardContent class="p-4">
+        <Card class="jn-card transition-transform duration-300 ease-out hover:-translate-y-1.5">
+          <CardContent class="p-4 min-w-0">
+            <!-- Header row (toggles the panel) — provider icon + name + chevron -->
             <CollapsibleTrigger class="w-full text-left cursor-pointer" @click="onToggle(p)">
               <div class="flex items-center gap-2 mb-3">
-                <Icon v-if="p.icon" :icon="p.icon" class="size-6 text-muted-foreground" />
+                <Icon v-if="p.icon" :icon="p.icon" class="size-6 text-muted-foreground shrink-0" />
                 <span v-else
                   class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
                   {{ (p.name || '?').charAt(0).toUpperCase() }}
                 </span>
-                <span class="text-base font-medium truncate">{{ p.name }}</span>
-                <ChevronDown class="size-4 ml-auto shrink-0 text-muted-foreground transition-transform duration-200"
+                <span class="text-base font-medium truncate min-w-0 flex-1">{{ p.name }}</span>
+                <ChevronDown class="size-4 shrink-0 text-muted-foreground transition-transform duration-200"
                   :class="{ 'rotate-180': openState[p.id] }" />
               </div>
             </CollapsibleTrigger>
-            <!-- Checking → pulse + label; otherwise a status icon + label -->
-            <div class="flex items-center gap-1.5 text-base min-w-0">
+
+            <!-- Primary status line — checking → pulse + label; else status icon + label -->
+            <div class="flex items-center gap-1.5 text-base min-w-0 min-h-6">
               <template v-if="loading">
                 <span class="relative flex shrink-0">
                   <span class="absolute inline-flex size-2.5 rounded-full bg-info opacity-75 animate-ping"></span>
@@ -140,22 +129,46 @@
         </Card>
       </Collapsible>
     </div>
-  </section>
+
+    <!-- Bottom RefreshAll button (action color + Spinner standard) + the
+         time of the frontend's last pull. We show *our last fetch* time, not
+         the backend snapshot's: the poller refreshes on its own 5-min cadence,
+         so surfacing its timestamp would leave the time (and content) looking
+         frozen after a manual refresh. Seconds are included so back-to-back
+         clicks within the same minute still visibly advance. -->
+    <div class="flex flex-col items-center gap-2 pt-2">
+      <Button variant="action" :disabled="loading" class="cursor-pointer" :class="[isMobile ? 'w-full' : 'w-64']"
+        @click="refresh">
+        <Spinner v-if="loading" />
+        <RotateCw v-else />
+        {{ t('serviceStatus.Refresh') }}
+      </Button>
+      <p v-if="formattedRefreshed" class="text-xs text-muted-foreground">
+        {{ t('serviceStatus.LastChecked') }} · {{ formattedRefreshed }}
+      </p>
+    </div>
+  </div>
 </template>
 
 <script setup>
-// "Service Status" homepage section: shows whether a set of well-known
-// products are currently up, with an aggregate check/alert/x light.
+// "Service Status" advanced tool: shows whether a set of well-known products
+// are currently up, with a per-card check/alert/x light, a link to each
+// provider's official status page, and our snapshot's last-checked time.
 //
 // The provider list is static here (like the Connectivity section's targets)
 // so the cards always render — even if our API is unreachable, each card just
-// falls back to a "status unavailable" state instead of the section vanishing.
+// falls back to a "status unavailable" state instead of the grid vanishing.
 //
 // The backend polls every provider on a fixed 5-minute schedule and caches the
 // result in memory. Two cheap snapshot-read endpoints back this view:
-//   /api/service-status         → overview (status per provider)
+//   /api/service-status         → overview (status + page per provider, updatedAt)
 //   /api/service-status/detail  → one provider's sub-services + incidents (on expand)
 // so the initial load stays light and detail is pulled only when a card opens.
+//
+// Moved out of the homepage into the Advanced Tools drawer: it mounts fresh
+// each time the tool is opened (loadOverview on mount) and is no longer wired
+// into the homepage's global-refresh orchestrator — the bottom Refresh button
+// here is the only re-pull path.
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -165,17 +178,19 @@ import { useStatusTone } from '@/composables/use-status-tone.js';
 import {
   indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
 } from '@/utils/service-status-tone.js';
-import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Play, RotateCw, ChevronDown, CircleCheck, CircleAlert, CircleX, CircleHelp, TriangleAlert } from '@lucide/vue';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  RotateCw, ChevronDown, CircleCheck, CircleAlert, CircleX, CircleHelp, TriangleAlert,
+} from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
-const isSimpleMode = computed(() => store.userPreferences.simpleMode);
+const isMobile = computed(() => store.isMobile);
 const { textClass } = useStatusTone();
 
 // Static provider list — drives the always-visible cards. Brand icons from the
@@ -191,6 +206,14 @@ const PROVIDERS = [
   { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare' },
   { id: 'elevenlabs', name: 'ElevenLabs', icon: 'simple-icons:elevenlabs' },
   { id: 'langchain', name: 'LangChain', icon: 'simple-icons:langchain' },
+  { id: 'vercel', name: 'Vercel', icon: 'simple-icons:vercel' },
+  { id: 'netlify', name: 'Netlify', icon: 'simple-icons:netlify' },
+  { id: 'render', name: 'Render', icon: 'simple-icons:render' },
+  { id: 'supabase', name: 'Supabase', icon: 'simple-icons:supabase' },
+  { id: 'replicate', name: 'Replicate', icon: 'simple-icons:replicate' },
+  { id: 'figma', name: 'Figma', icon: 'simple-icons:figma' },
+  { id: 'linear', name: 'Linear', icon: 'simple-icons:linear' },
+  { id: 'stripe', name: 'Stripe', icon: 'simple-icons:stripe' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
@@ -205,9 +228,11 @@ const TONE_ICON = {
 };
 const toneIcon = (tone) => TONE_ICON[tone] || CircleHelp;
 
-const hasLoaded = ref(false);
 const loading = ref(true);
 const fetchFailed = ref(false);
+// Wall-clock of the frontend's last overview pull (mount + each Refresh click).
+// Deliberately NOT the backend snapshot's updatedAt — see the template comment.
+const lastRefreshedAt = ref(null);
 
 // id → { indicator, page } from the overview fetch.
 const statusById = reactive({});
@@ -221,6 +246,19 @@ const detailState = reactive({}); // id → { loading, error, loaded, components
 const effectiveIndicator = (p) =>
   (fetchFailed.value ? 'unknown' : statusById[p.id]?.indicator) || 'unknown';
 const indicatorTone = (p) => indicatorToTone(effectiveIndicator(p));
+
+// Localized HH:MM:SS of the frontend's last pull — the data-freshness signal
+// shown under the Refresh button. Seconds included so rapid re-clicks advance.
+const formattedRefreshed = computed(() => {
+  if (!lastRefreshedAt.value) return '';
+  try {
+    return lastRefreshedAt.value.toLocaleTimeString(locale.value || 'en-US', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    });
+  } catch {
+    return '';
+  }
+});
 
 // ── i18n label lookups (graceful fallback to the raw key) ───────────────────
 const indicatorLabel = (indicator) => {
@@ -277,7 +315,9 @@ const loadOverview = async () => {
     fetchFailed.value = true;
   } finally {
     loading.value = false;
-    hasLoaded.value = true;
+    // Stamp the pull time on every completed attempt (success or failure), so
+    // the displayed time always advances when the user hits Refresh.
+    lastRefreshedAt.value = new Date();
   }
 };
 
@@ -331,11 +371,6 @@ const refresh = () => {
 };
 
 onMounted(() => {
-  // Critical: this signal lets the refresh orchestrator's loadingControl
-  // proceed (it waits for every section's mountingStatus to be true).
-  store.setMountingStatus('ServiceStatus', true);
   loadOverview();
 });
-
-defineExpose({ refresh });
 </script>

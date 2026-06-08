@@ -3,7 +3,7 @@
 // Rather than fetch upstream status pages on each visitor request, a single
 // background timer refreshes all providers every REFRESH_INTERVAL and keeps
 // the latest normalized snapshot in memory. Request handlers just read the
-// snapshot — upstream load is constant (8 providers × 2 endpoints / 5 min)
+// snapshot — upstream load is constant (16 providers × 2 endpoints / 5 min)
 // no matter how much traffic the site gets.
 //
 // Mirrors the bootstrap-at-boot + start-scheduler shape of the MaxMind / CAIDA

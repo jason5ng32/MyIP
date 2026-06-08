@@ -398,6 +398,7 @@
     "EnhancedDnsLeakTest": "捕获所有递归解析器，并分析 ECS 与 DNSSEC",
     "RuleTestNote": "检查代理软件的规则设置",
     "CensorshipCheck": "检查一个网站在某些国家是否被封锁",
+    "ServiceStatus": "查看知名 AI 与开发者服务的实时可用性，确认你遇到的中断是不是对方的故障",
     "Whois": "对域名或 IP 进行 Whois 查询",
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
     "MacChecker": "查询物理地址的归属信息",
@@ -605,6 +606,7 @@
     "Title": "服务可用性",
     "Note": "当你打不开某些服务的时候，可能并不是你的问题，而是这些服务出故障了。当前，人们大量使用 AI 产品，并在 AI 产品没有回复的时候，不确定是自己的问题还是服务的问题。本板块展示一些知名 AI 服务的实时可用状态，展开卡片可查看各子服务的状态与最近的事故。",
     "Refresh": "刷新服务状态",
+    "LastChecked": "最后检查",
     "AllOperational": "所有系统正常",
     "ComponentsTitle": "服务项",
     "IncidentsTitle": "最近事故",
@@ -643,6 +645,11 @@
   "connectivity": {
     "Title": "网络连通性",
     "Note": "本测试用于测试你是否能够连通到某个网站。测试方法是通过加载对应网站上的小图片进行的。延迟值仅供参考，实际会更小。你可以添加其它你常用的网站到测试列表中，方便快速测试。",
+    "ServiceStatusBanner": {
+      "Title": "某个服务打不开？",
+      "Note": "如果上面 ChatGPT、Claude 等 AI 产品测试失败，未必是你的网络问题——可能是服务本身挂了。看看它们的实时可用性和近期故障。",
+      "CTA": "打开服务可用性"
+    },
     "StatusWait": "待检测",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
@@ -792,6 +799,7 @@
     "Preferences": "打开偏好设置面板",
     "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
+    "ServiceStatus": "打开服务可用性面板",
     "InvisibilityTest": "打开隐身测试面板",
     "EnhancedDnsLeakTest": "打开深度 DNS 泄漏测试面板",
     "MacChecker": "打开物理地址查询面板",

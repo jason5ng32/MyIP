@@ -9,7 +9,6 @@
       <div class="rounded-md" tabindex="0">
         <IPCheck ref="IPCheckRef" />
         <Connectivity ref="connectivityRef" />
-        <ServiceStatus ref="serviceStatusRef" />
         <WebRTC ref="webRTCRef" />
         <DNSLeaks ref="dnsLeaksRef" />
         <SpeedTest ref="speedTestRef" />
@@ -33,7 +32,6 @@
 import NavBar from './components/Nav.vue';
 import IPCheck from './components/IpInfos.vue';
 import Connectivity from './components/ConnectivityTest.vue';
-import ServiceStatus from './components/ServiceStatus.vue';
 import WebRTC from './components/WebRtcTest.vue';
 import DNSLeaks from './components/DnsLeaksTest.vue';
 import SpeedTest from './components/SpeedTest.vue';
@@ -87,7 +85,6 @@ const speedTestRef = ref(null);
 const advancedToolsRef = ref(null);
 const IPCheckRef = ref(null);
 const connectivityRef = ref(null);
-const serviceStatusRef = ref(null);
 const webRTCRef = ref(null);
 const dnsLeaksRef = ref(null);
 
@@ -123,7 +120,7 @@ const { infoMaskLevel, isInfosLoaded, showMaskButton, toggleInfoMask } = useInfo
 
 // Refresh / initial load sequence
 const { loadingControl } = useRefreshOrchestrator({
-    refs: { IPCheckRef, connectivityRef, serviceStatusRef, webRTCRef, dnsLeaksRef },
+    refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef },
     store,
     t,
     userPreferences,
