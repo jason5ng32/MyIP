@@ -17,7 +17,10 @@ frontend/
 ├── store.js                     ← Pinia main store
 ├── firebase-init.js             ← Firebase Auth env-gated init
 ├── router/                      ← history mode: `/` → Home.vue, `/tools/:slug` →
-│                                  StandaloneTool.vue. Advanced tools also open
+│                                  StandaloneTool.vue (the "standalone" tool pages;
+│                                  "standalone" here is the page — NOT the PWA
+│                                  display mode, which is utils/pwa.js's
+│                                  isRunningAsPwa()). Advanced tools also open
 │                                  in-page via the `?tool=<slug>` query on `/`.
 ├── locales/                     ← i18n copy (en / zh / fr / tr) + security-checklist data
 ├── style/style.css              ← Tailwind v4 entry + design tokens
@@ -29,7 +32,8 @@ frontend/
 │                                   + drawer + standalone pages all derive from it)
 ├── utils/                       ← framework-agnostic pure helpers + IO modules
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   fetch-with-timeout / analytics / scroll-to / …)
+│                                   fetch-with-timeout / analytics / scroll-to /
+│                                   pwa — isRunningAsPwa() / …)
 ├── composables/                 ← Vue-aware reactive / stateful logic (useXxx)
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
