@@ -1,69 +1,33 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-import { useMainStore } from '@/store';
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '@/components/Home.vue';
 
-// Lazy loading of route components
-const MTRTest = () => import('../components/advanced-tools/MtrTest.vue');
-const PingTest = () => import('../components/advanced-tools/GlobalLatencyTest.vue');
-const RuleTest = () => import('../components/advanced-tools/RuleTest.vue');
-const DNSResolver = () => import('../components/advanced-tools/DnsResolver.vue');
-const EnhancedDnsLeakTest = () => import('../components/advanced-tools/EnhancedDnsLeakTest.vue');
-const CensorshipCheck = () => import('../components/advanced-tools/CensorshipCheck.vue');
-const Whois = () => import('../components/advanced-tools/Whois.vue');
-const InvisibilityTest = () => import('../components/advanced-tools/InvisibilityTest.vue');
-const MacChecker = () => import('../components/advanced-tools/MacChecker.vue');
-const BrowserInfo = () => import('../components/advanced-tools/BrowserInfo.vue');
-const Checklist = () => import('../components/advanced-tools/SecurityChecklist.vue');
-const ServiceStatus = () => import('../components/advanced-tools/ServiceStatus.vue');
-const EmptyComponent = () => import('../components/advanced-tools/Empty.vue');
+// Two real, crawlable pages:
+//   /              → the homepage. Advanced tools open as an in-page drawer,
+//                    driven by the `?tool=<slug>` query (handled in Advanced.vue).
+//   /tools/:slug   → a standalone full page for one tool (shareable + SEO).
+// Both render the SAME tool components; only the wrapper differs.
+//
+// Home is imported eagerly (it's the default landing); the standalone layout is
+// lazy so it stays out of the homepage bundle.
+const StandaloneTool = () => import('@/components/StandaloneTool.vue');
 
 const routes = [
-  { path: '/', component: EmptyComponent },
-  { path: '/pingtest', component: PingTest },
-  { path: '/mtrtest', component: MTRTest },
-  { path: '/ruletest', component: RuleTest },
-  { path: '/dnsresolver', component: DNSResolver },
-  { path: '/enhanceddnsleaktest', component: EnhancedDnsLeakTest },
-  { path: '/censorshipcheck', component: CensorshipCheck },
-  { path: '/whois', component: Whois },
-  { path: '/macchecker', component: MacChecker },
-  { path: '/browserinfo', component: BrowserInfo },
-  { path: '/securitychecklist', component: Checklist },
-  { path: '/servicestatus', component: ServiceStatus },
-  { path: '/invisibilitytest', component: InvisibilityTest },
+  { path: '/', name: 'home', component: Home },
+  { path: '/tools/:slug', name: 'tool', component: StandaloneTool },
+  // Unknown paths fall back to the homepage.
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Opening/closing the drawer only flips the query on the home route — don't
+    // scroll the homepage in that case. Genuine page changes go to the top.
+    if (to.path === from.path) return false;
+    if (savedPosition) return savedPosition;
+    return { top: 0 };
+  },
 });
-
-const setOpenedCard = (currentPath) => {
-  for (let i = 0; i < routes.length; i++) {
-    if (currentPath === routes[i].path) {
-      return i - 1;
-    }
-  }
-};
-
-router.afterEach((to) => {
-  const store = useMainStore();
-
-
-  if (!routes.find(route => route.path === to.path)) {
-    if (store.openSheet === 'tools') {
-      store.setOpenSheet(null);
-    }
-    return;
-  }
-
-  store.setCurrentPath(to.path, setOpenedCard(to.path));
-
-  if (to.path !== '/') {
-    store.setOpenSheet('tools');
-  } else if (store.openSheet === 'tools') {
-    store.setOpenSheet(null);
-  }
-});
-
 
 export default router;

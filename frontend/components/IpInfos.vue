@@ -133,8 +133,14 @@ const fetchIP = async (cardID, getFromSource) => {
   if (ip !== null) {
     ipDataCards[cardID].ip = ip;
     ipDataCards[cardID].source = source;
-    IPArray.value = [...IPArray.value, ip];
+    // Record the IP up front — fetchIPDetails throws if every geo source fails,
+    // and we still want the IP available to the Globalping picker. The country
+    // is back-filled once details resolve (updateAllIPs merges it in).
+    IPArray.value = [...IPArray.value, { ip, country: '' }];
     await fetchIPDetails(cardID, ip);
+    if (ipDataCards[cardID].country_code) {
+      IPArray.value = [...IPArray.value, { ip, country: ipDataCards[cardID].country_code }];
+    }
   } else if (cardID === 1 || cardID === 3) {
     // v6 cards in the new order: ipchecking_v6 (1), cloudflare_v6 (3)
     ipDataCards[cardID].ip = t('ipInfos.IPv6Error');

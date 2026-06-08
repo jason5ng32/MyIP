@@ -13,33 +13,41 @@
             </div>
         </header>
 
-        <!-- Card grid -->
+        <!-- Card grid. Each card is a real <a> to the standalone /tools/:slug
+             page, so ⌘/Ctrl-click, middle-click and "open in new tab" all work.
+             A plain left-click (or Enter / Space) is intercepted to open the
+             in-page drawer instead. A dedicated ↗ corner button always opens the
+             standalone page in a new tab. -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <Card v-for="(card, index) in enabledCards" :key="index"
-                :data-adv-path="card.path"
-                class="keyboard-shortcut-card jn-card jn-adv-card group relative cursor-pointer overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50"
-                role="button" tabindex="0" @click.prevent="navigateAndToggleOffcanvas(card.path)"
-                @keydown.enter.prevent="navigateAndToggleOffcanvas(card.path)"
-                @keydown.space.prevent="navigateAndToggleOffcanvas(card.path)">
-                <CardContent class="p-4">
-                    <h3 class="text-xl font-medium text-primary mb-2 pr-10">
-                        <PanelBottomOpen
-                            class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
-                        {{ t(card.titleKey) }}
-                    </h3>
-                    <!-- Description -->
-                    <p class="text-base text-muted-foreground line-clamp-2 min-h-10">
-                        {{ t(card.noteKey) }}
-                    </p>
-                    <!-- Top right emoji -->
-                    <span class="jn-emoji" aria-hidden="true">{{ card.icon }}</span>
-                </CardContent>
+            <Card v-for="card in enabledCards" :key="card.slug"
+                :data-adv-slug="card.slug"
+                class="keyboard-shortcut-card jn-card jn-adv-card group relative overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
+                <a :href="`/tools/${card.slug}`"
+                    class="block cursor-pointer no-underline text-inherit"
+                    @click="onCardClick($event, card.slug)"
+                    @keydown.enter.prevent="openTool(card.slug)"
+                    @keydown.space.prevent="openTool(card.slug)">
+                    <CardContent class="p-4">
+                        <h3 class="text-xl font-medium text-primary mb-2 pr-10">
+                            <PanelBottomOpen
+                                class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
+                            {{ t(card.titleKey) }}
+                        </h3>
+                        <!-- Description -->
+                        <p class="text-base text-muted-foreground line-clamp-2 min-h-10">
+                            {{ t(card.noteKey) }}
+                        </p>
+                        <!-- Top right emoji -->
+                        <span class="jn-emoji" aria-hidden="true">{{ card.icon }}</span>
+                    </CardContent>
+                </a>
+
             </Card>
         </div>
 
         <!-- Tool details Drawer -->
         <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
-            <DrawerContent :title="openedCard >= 0 ? t(cards[openedCard].titleKey) : t('advancedtools.Title')"
+            <DrawerContent :title="activeTool ? t(activeTool.titleKey) : t('advancedtools.Title')"
                 :safe-area-top="isMobile || isFullScreen"
                 :class="['jn-tools-drawer overflow-hidden', (isMobile || isFullScreen) ? 'h-full rounded-none' : 'h-[85vh]']">
                 <!-- Drawer internal header -->
@@ -50,18 +58,25 @@
                         <Maximize v-if="!isFullScreen" class="size-4" />
                         <Minimize v-else class="size-4" />
                     </button>
-                    <span v-if="openedCard >= 0" class="flex-1 text-base md:text-lg font-medium truncate"
+                    <span v-if="activeTool" class="flex-1 text-base md:text-lg font-medium truncate"
                         :class="isMobile ? 'text-left' : 'text-center'">
-                        <span class="mr-1">{{ cards[openedCard].icon }}</span>{{ t(cards[openedCard].titleKey) }}
+                        <span class="mr-1">{{ activeTool.emoji }}</span>{{ t(activeTool.titleKey) }}
                     </span>
                     <span v-else class="flex-1" />
-                    <DrawerClose @click="resetNavigatorURL()"
+                    <!-- Open the current tool as a standalone page (hidden in a
+                         PWA window, which has no new-tab affordance) -->
+                    <a v-if="activeTool && !isPwa" :href="`/tools/${activeTool.slug}`" target="_blank" rel="noopener"
+                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        :title="t('advancedtools.OpenInNewTab')" :aria-label="t('advancedtools.OpenInNewTab')">
+                        <SquareArrowOutUpRight class="size-4" />
+                    </a>
+                    <DrawerClose
                         class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
                 </div>
                 <!-- Content area (scrollable) -->
                 <div class="flex-1 overflow-y-auto px-1 md:px-2 pb-6" ref="scrollContainer">
                     <div :class="isMobile ? 'w-full px-3' : 'jn-canvas-width px-6'">
-                        <router-view></router-view>
+                        <component :is="activeComponent" v-if="activeComponent" />
                     </div>
                 </div>
             </DrawerContent>
@@ -70,76 +85,85 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
+import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '@/data/tools.js';
+import { isRunningAsPwa } from '@/utils/pwa.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
-import { Maximize, Minimize, PanelBottomOpen } from '@lucide/vue';
+import { Maximize, Minimize, PanelBottomOpen, SquareArrowOutUpRight } from '@lucide/vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+// Running as an installed PWA → hide the "open in new tab" affordance (a PWA
+// window has no tab strip; it would pop out to the browser). See utils/pwa.js.
+const isPwa = isRunningAsPwa();
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const scrollContainer = ref(null);
+const route = useRoute();
 const router = useRouter();
 
-const cards = reactive([
-    { path: '/pingtest', icon: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', enabled: true },
-    { path: '/mtrtest', icon: '🚉', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', enabled: true },
-    { path: '/ruletest', icon: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', enabled: true },
-    { path: '/dnsresolver', icon: '📟', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', enabled: true },
-    { path: '/censorshipcheck', icon: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', enabled: true },
-    { path: '/whois', icon: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', enabled: true },
-    { path: '/macchecker', icon: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', enabled: true },
-    { path: '/browserinfo', icon: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', enabled: true },
-    { path: '/securitychecklist', icon: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', enabled: true },
-    { path: '/servicestatus', icon: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', enabled: true },
-    { path: '/invisibilitytest', icon: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', enabled: false },
-    { path: '/enhanceddnsleaktest', icon: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', enabled: false },
-]);
+// Cards derive from the shared tool registry (frontend/data/tools.js). `icon`
+// is mapped from the registry's `emoji` so the template key stays stable.
+const cards = ADVANCED_TOOLS.map((tool) => ({ ...tool, icon: tool.emoji }));
 
-const enabledCards = computed(() => cards.filter(c => c.enabled));
+// Gate: the invisibility + enhanced DNS-leak tools only show on the original
+// site (they need the private API + sign-in). Reactive on configs, so they
+// appear the moment configs land — no fixed timeout needed.
+const enabledCards = computed(() =>
+    cards.filter((c) => !c.requiresOriginalSite || configs.value.originalSite),
+);
 
-const isFullScreen = ref(false);
-// Look the card up by path rather than by store.currentPath.id — the id is
-// a route-index (minus 1), which doesn't match our cards[] ordering once
-// routes[] and cards[] drift out of sync. Stale ids caused the Drawer
-// header to sometimes show a neighboring tool's title. Path is the only
-// stable key between the two lists.
-const openedCard = computed(() => {
-    const p = store.currentPath.path;
-    if (!p || p === '/') return -1;
-    return cards.findIndex(c => c.path === p);
+// ── Drawer state, driven by the `?tool=<slug>` query on the home route ───────
+// `?tool=whois` ⇒ the drawer is open showing Whois. Closing clears the query.
+const activeTool = computed(() => {
+    const slug = route.query.tool;
+    return (typeof slug === 'string' && TOOL_BY_SLUG.get(slug)) || null;
+});
+const isOpen = computed(() => !!activeTool.value);
+
+// Resolve each tool's lazy component once and cache it, so re-renders don't
+// rebuild the async wrapper (which would remount the tool).
+const asyncToolCache = new Map();
+const activeComponent = computed(() => {
+    const tool = activeTool.value;
+    if (!tool) return null;
+    if (!asyncToolCache.has(tool.slug)) {
+        asyncToolCache.set(tool.slug, defineAsyncComponent(tool.component));
+    }
+    return asyncToolCache.get(tool.slug);
 });
 
-// Drawer toggle and store.openSheet bidirectional binding
-const isOpen = computed(() => store.openSheet === 'tools');
-const onOpenChange = (val) => {
-    // When closed, go back to '/'
-    if (!val) {
-        store.setOpenSheet(null);
-        if (router.currentRoute.value.path !== '/') {
-            router.push('/');
-        }
-        isFullScreen.value = false;
-    } else {
-        store.setOpenSheet('tools');
-    }
+const isFullScreen = ref(false);
+
+// Open a tool in the in-page drawer (just sets the query; isOpen reacts).
+const openTool = (slug) => {
+    router.push({ path: '/', query: { tool: slug } });
+    const name = slug.charAt(0).toUpperCase() + slug.slice(1);
+    trackEvent('Nav', 'NavClick', name);
 };
 
-// Navigate to specified page
-// Toggle driven by router/index.js afterEach and store.setOpenSheet
-const navigateAndToggleOffcanvas = (routePath) => {
-    router.push(routePath);
-    let capitalizedRoutePath = routePath.replace('/', '');
-    capitalizedRoutePath = capitalizedRoutePath.charAt(0).toUpperCase() + capitalizedRoutePath.slice(1);
-    trackEvent('Nav', 'NavClick', capitalizedRoutePath);
+// Card left-click: open the drawer. Modifier / middle clicks fall through to
+// the <a href> default so the browser opens the standalone page in a new tab.
+const onCardClick = (e, slug) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    e.preventDefault();
+    openTool(slug);
+};
+
+const onOpenChange = (val) => {
+    // Drawer closed (drag / overlay / Esc / close button) → drop the ?tool query.
+    if (!val) {
+        if (route.query.tool) router.push({ path: '/', query: {} });
+        isFullScreen.value = false;
+    }
 };
 
 // Full screen toggle: height determined by DrawerContent's class
@@ -147,35 +171,12 @@ const fullScreen = () => {
     isFullScreen.value = !isFullScreen.value;
 };
 
-const resetNavigatorURL = () => {
-    router.push('/');
-};
-
-// Delayed enable for the Invisibility test card — waits for configs to
-// arrive. Track the timer id so we can cancel it if the component unmounts
-// before the callback fires.
-let invisibilityEnableTimer = null;
-
 onMounted(() => {
     store.setMountingStatus('AdvancedTools', true);
-    invisibilityEnableTimer = setTimeout(() => {
-        invisibilityEnableTimer = null;
-        if (configs.value.originalSite) {
-            cards.find(x => x.path === '/invisibilitytest').enabled = true;
-            cards.find(x => x.path === '/enhanceddnsleaktest').enabled = true;
-        }
-    }, 1500);
-});
-
-onBeforeUnmount(() => {
-    if (invisibilityEnableTimer !== null) {
-        clearTimeout(invisibilityEnableTimer);
-        invisibilityEnableTimer = null;
-    }
 });
 
 defineExpose({
-    navigateAndToggleOffcanvas, fullScreen
+    openTool, fullScreen,
 });
 
 </script>

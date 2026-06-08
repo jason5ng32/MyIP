@@ -49,6 +49,27 @@ function setStaticHeaders(res, filePath) {
 
 frontendApp.use(express.static(distDir, { setHeaders: setStaticHeaders }));
 
+// SPA history fallback. The app uses HTML5 history routing (e.g. /tools/whois),
+// so a hard load / new-tab of a client route reaches this server as a real
+// path with no matching file. Serve index.html for navigation requests and let
+// vue-router resolve the route. Mounted after the /api proxy and the static
+// layer, so real assets and API calls are untouched.
+//   - GET only; other methods fall through.
+//   - `req.accepts('html')` gates on navigations: browsers asking for a page
+//     send `Accept: text/html`.
+//   - A path whose final segment has a file extension (e.g. /assets/x.js) is an
+//     asset request, not a client route — let it 404 rather than return an HTML
+//     body, which would break a missing JS/CSS chunk's importer after a deploy
+//     (`*/*` requests otherwise match `accepts('html')`).
+//   - index.html is never cached (same as the static layer), so a deploy can't
+//     leave a stale shell pointing at hashed chunks that no longer exist.
+frontendApp.use((req, res, next) => {
+  if (req.method !== 'GET' || !req.accepts('html')) return next();
+  if (req.path.split('/').pop().includes('.')) return next();
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.sendFile(path.join(distDir, 'index.html'));
+});
+
 // Start static file server
 frontendApp.listen(frontEndPort, () => {
   logger.info(`🚀 Static file server ready on http://localhost:${frontEndPort}`);

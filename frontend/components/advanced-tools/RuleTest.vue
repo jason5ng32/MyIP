@@ -141,13 +141,13 @@ const fetchTrace = async (id, url) => {
         const lines = data.split('\n');
         const ipLine = lines.find((line) => line.startsWith('ip='));
         const countryLine = lines.find((line) => line.startsWith('loc='));
+        const country = countryLine ? countryLine.split('=')[1] : '';
         if (ipLine) {
             const ip = ipLine.split('=')[1];
             ruleTests.value[id].ip = ip;
-            IPArray.value = [...IPArray.value, ip];
+            IPArray.value = [...IPArray.value, { ip, country }];
         }
-        if (countryLine) {
-            const country = countryLine.split('=')[1];
+        if (country) {
             ruleTests.value[id].country_code = country;
             ruleTests.value[id].country = getCountryName(country, lang.value);
         }

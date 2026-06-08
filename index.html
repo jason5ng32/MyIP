@@ -111,6 +111,14 @@
       padding-top: calc(env(safe-area-inset-top) + 3.5rem);
     }
 
+    /* Standalone tool pages (/tools/:slug) have their own in-flow sticky header
+       instead of the homepage's fixed Nav, so they must not reserve the 3.5rem
+       Nav height — only the iOS safe-area inset. App.vue toggles this class on
+       the standalone route. */
+    body.jn-standalone-page {
+      padding-top: env(safe-area-inset-top);
+    }
+
     html {
       line-height: 1.5;
       -webkit-text-size-adjust: 100%;

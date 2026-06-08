@@ -17,8 +17,8 @@
                 <div class="flex items-center gap-2">
                     <Input type="text" id="inputIP" name="inputIP" :placeholder="t('ipcheck.Placeholder')"
                         v-model="inputIP" @keyup.enter="submitQuery" :aria-invalid="modalQueryError !== ''"
-                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                        data-1p-ignore data-lpignore="true" />
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore
+                        data-lpignore="true" class="font-mono" />
                     <Button id="sumitQueryButton" type="button" variant="action"
                         :disabled="!isValidIP(inputIP) || isChecking === 'running'" @click="submitQuery"
                         class="cursor-pointer">
@@ -34,9 +34,8 @@
 
                 <!-- Query result: Hero IP (no Copy / Map) + shared IpDetailPanel -->
                 <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
-                    <div class="px-4 py-3 flex items-start gap-2 min-w-0 border-b mb-4">                        
-                        <FitText :text="inputIP" :tiers="HERO_TIERS" :title="inputIP"
-                        :max-lines="2"
+                    <div class="px-4 py-3 flex items-start gap-2 min-w-0 border-b mb-4">
+                        <FitText :text="inputIP" :tiers="HERO_TIERS" :title="inputIP" :max-lines="2"
                             class="font-mono font-semibold min-w-0">
                             <template #prefix>
                                 <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />

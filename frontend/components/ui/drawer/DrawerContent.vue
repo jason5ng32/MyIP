@@ -2,7 +2,7 @@
 // shadcn-vue Drawer 面板内容：包含 overlay + handle + 自适应方向
 // 默认从底部滑入，配合 vaul 的拖拽关闭手势
 import { computed } from 'vue';
-import { DrawerContent, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerHandle } from 'vaul-vue';
+import { DrawerContent, DrawerDescription, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerHandle } from 'vaul-vue';
 import { VisuallyHidden } from 'reka-ui';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,9 @@ const props = defineProps({
   class: { type: [String, Array, Object], default: undefined },
   // a11y 标题；未给且无 #title slot 时用 VisuallyHidden 兜底
   title: { type: String, default: 'Drawer' },
+  // a11y 描述；未给且无 #description slot 时回退到 title，填满 reka-ui 要求的
+  // aria-describedby 链接，消除每次打开时控制台的 "Missing Description" 警告。
+  description: { type: String, default: '' },
   // 是否显示顶部把手（仅 bottom 方向有意义）
   showHandle: { type: Boolean, default: true },
   // 顶部是否避让 iOS safe-area；只在 drawer 贴到顶部（如 h-full / fullscreen）时打开，
@@ -45,6 +48,12 @@ const contentStyle = computed(() => ({
         <DrawerTitle>{{ title }}</DrawerTitle>
       </VisuallyHidden>
       <slot name="title" />
+      <!-- a11y 描述兜底：未给 description 时回退到 title，满足 reka-ui 的
+           aria-describedby 链接，消除 "Missing Description" 控制台警告。 -->
+      <VisuallyHidden v-if="!$slots.description">
+        <DrawerDescription>{{ description || title }}</DrawerDescription>
+      </VisuallyHidden>
+      <slot name="description" />
       <slot />
     </DrawerContent>
   </DrawerPortal>

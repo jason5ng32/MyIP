@@ -7,7 +7,7 @@
         <div class="space-y-2">
                 <Label for="queryURL">{{ t('censorshipcheck.Note2') }}</Label>
             <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
+                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true" class="font-mono"
                     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
                     :disabled="censorshipCheckStatus === 'running'"
                     :placeholder="t('censorshipcheck.Placeholder')"

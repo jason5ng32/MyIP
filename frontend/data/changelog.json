@@ -1242,6 +1242,15 @@
       {
         "type": "improve",
         "change": {
+          "en": "Advanced tools can now be opened in a new page",
+          "zh": "高级工具可以在新页面打开",
+          "fr": "Les outils avancés peuvent maintenant être ouverts dans une nouvelle page",
+          "tr": "Gelişmiş araçlar artık yeni bir sayfada açılabilir"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Improved multiple experiences to enhance usability",
           "zh": "优化多处体验，提升可用性",
           "fr": "Amélioration de multiples expériences pour améliorer l'utilisabilité",

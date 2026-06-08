@@ -36,12 +36,13 @@ export const GLOBALPING_DEFAULT_LOCATIONS = [
     { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
 ];
 
-// Filter the store's collected IPs down to the ones usable as a measurement
-// target: truthy and free of spaces (the store sometimes holds placeholder /
-// status strings that contain whitespace). Shared by the Globalping tools'
-// IP picker dropdowns.
+// Filter the store's collected IP entries down to the ones usable as a
+// measurement target: a truthy `ip` free of spaces (the store sometimes holds
+// placeholder / status strings that contain whitespace). Returns the full
+// { ip, country } entries so the picker can show each IP's flag. Shared by the
+// Globalping tools' IP picker dropdowns.
 export function selectableIPs(storeIPs) {
-    return storeIPs.filter(ip => ip && !ip.includes(' '));
+    return storeIPs.filter((e) => e && e.ip && !e.ip.includes(' '));
 }
 
 const API_BASE = 'https://api.globalping.io/v1/measurements';

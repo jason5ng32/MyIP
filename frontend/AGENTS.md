@@ -5,29 +5,39 @@ See ../AGENTS.md for universal project rules (language, i18n, commits, testing e
 
 ## Overview
 
-Vue 3 + Composition API single-page app. State in Pinia, routing via vue-router hash mode, styling via Tailwind CSS v4 on top of shadcn-vue primitives (copied in, not imported from a package). No TypeScript, no Bootstrap, no `dark:` dual-pair utilities.
+Vue 3 + Composition API single-page app. State in Pinia, routing via vue-router HTML5 history mode, styling via Tailwind CSS v4 on top of shadcn-vue primitives (copied in, not imported from a package). No TypeScript, no Bootstrap, no `dark:` dual-pair utilities.
 
 ## Project layout
 
 ```
 frontend/
-├── App.vue                      ← thin shell, delegates to composables
-├── main.js                      ← app bootstrap + global init
+├── App.vue                      ← thin shell: globals (tooltip / toast / PWA /
+│                                  theme / boot-overlay) + <router-view>
+├── main.js                      ← app bootstrap + global init (+ legacy /#/x → /?tool=x shim)
 ├── store.js                     ← Pinia main store
 ├── firebase-init.js             ← Firebase Auth env-gated init
-├── router/                      ← Advanced Tools subroutes (open inside a Drawer)
+├── router/                      ← history mode: `/` → Home.vue, `/tools/:slug` →
+│                                  StandaloneTool.vue (the "standalone" tool pages;
+│                                  "standalone" here is the page — NOT the PWA
+│                                  display mode, which is utils/pwa.js's
+│                                  isRunningAsPwa()). Advanced tools also open
+│                                  in-page via the `?tool=<slug>` query on `/`.
 ├── locales/                     ← i18n copy (en / zh / fr / tr) + security-checklist data
 ├── style/style.css              ← Tailwind v4 entry + design tokens
 ├── lib/                         ← cn() helper (tailwind-merge + clsx)
 ├── data/                        ← static config
 │                                  (achievements / ip-databases / sections /
-│                                   default-preferences / changelog)
+│                                   default-preferences / changelog / tools —
+│                                   the Advanced Tools registry: router + cards
+│                                   + drawer + standalone pages all derive from it)
 ├── utils/                       ← framework-agnostic pure helpers + IO modules
 │                                  (valid-ip / getips / transform-ip-data /
-│                                   fetch-with-timeout / analytics / scroll-to / …)
+│                                   fetch-with-timeout / analytics / scroll-to /
+│                                   pwa — isRunningAsPwa() / …)
 ├── composables/                 ← Vue-aware reactive / stateful logic (useXxx)
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
+│   ├── use-document-meta.js     ← per-route title / description / canonical / OG (no SSR)
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
 │   ├── use-section-tracking.js
@@ -35,13 +45,16 @@ frontend/
 │   ├── use-speedtest-charts.js  ← Chart.js config + reactive chart state for SpeedTest
 │   └── use-status-tone.js       ← shared 4-tier business-state → visual-color mapping
 └── components/
+    ├── Home.vue                 ← the homepage (`/` route): all top-level sections + the drawer
+    ├── StandaloneTool.vue       ← `/tools/:slug` page: one tool in a minimal full-page layout
     ├── *.vue                    ← top-level sections (IpInfos / Connectivity / WebRTC / DnsLeaks
     │                              / SpeedTest / Advanced / Footer / Nav / Achievements / User /
     │                              Additional)
     ├── ip-infos/                ← IP-card subcomponents (IPCard / IpDetailPanel / ASNInfo / DataPairBar)
-    ├── advanced-tools/          ← 11 tool subpages opened inside the bottom Drawer
+    ├── advanced-tools/          ← 12 tool subpages, shown in the bottom Drawer (on `/`)
+    │                              or as a standalone /tools/:slug page — same components either way
     │                              (MtrTest / GlobalLatencyTest / RuleTest / DnsResolver /
-    │                               EnhancedDnsLeakTest / CensorshipCheck / Whois /
+    │                               EnhancedDnsLeakTest / CensorshipCheck / Whois / ServiceStatus /
     │                               MacChecker / BrowserInfo / InvisibilityTest /
     │                               SecurityChecklist + Empty)
     ├── widgets/                 ← small reusables (QueryIP / Help / Preferences / InfoMask / PWA / Toast / FitText / CopyButton)

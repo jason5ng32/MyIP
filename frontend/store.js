@@ -36,7 +36,6 @@ export const useMainStore = defineStore('main', {
     userAchievements: createInitialAchievementsState(),
     remoteUserInfo: {},
     remoteUserInfoFetched: false,
-    currentPath: {},
     mountingStatus: createMountingStatus(),
     curl: {
       ipv4Domain: import.meta.env?.VITE_CURL_IPV4_DOMAIN,
@@ -49,6 +48,9 @@ export const useMainStore = defineStore('main', {
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
+    // Collected user IPs for the Globalping tools' picker.
+    // Shape: Array<{ ip: string, country: string }> — country is a 2-letter
+    // code ('' when unknown). Populated by IpInfos / WebRTC / RuleTest.
     allIPs: [],
     configs: {},
     userPreferences: {},
@@ -74,10 +76,6 @@ export const useMainStore = defineStore('main', {
   },
 
   actions: {
-    // set current route path
-    setCurrentPath(path, id) {
-      this.currentPath = { path: path, id: id };
-    },
     // get database URL (URL template replacement logic is extracted to buildDbUrl pure function in data/ip-databases.js)
     getDbUrl(id, ip, lang) {
       const db = this.ipDBs.find(d => d.id === id);
@@ -95,10 +93,23 @@ export const useMainStore = defineStore('main', {
     setAlert(alertToShow, alertStyle, alertMessage, alertTitle, alertDuration) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle, alertDuration };
     },
-    // collect and merge IP data from different components
+    // Collect and merge IP data from different components. Entries are
+    // { ip, country } objects (bare strings are tolerated for safety).
+    // Deduped by `ip`; a later source can back-fill a country left empty by an
+    // earlier one.
     updateAllIPs(payload) {
-      const uniqueIPs = new Set([...this.allIPs, ...payload]);
-      this.allIPs = Array.from(uniqueIPs);
+      const byIp = new Map(this.allIPs.map((e) => [e.ip, { ...e }]));
+      for (const raw of payload) {
+        const entry = typeof raw === 'string' ? { ip: raw, country: '' } : raw;
+        if (!entry || !entry.ip) continue;
+        const existing = byIp.get(entry.ip);
+        if (!existing) {
+          byIp.set(entry.ip, { ip: entry.ip, country: entry.country || '' });
+        } else if (!existing.country && entry.country) {
+          existing.country = entry.country;
+        }
+      }
+      this.allIPs = Array.from(byIp.values());
     },
     // set mobile mode
     setIsMobile(payload) {
