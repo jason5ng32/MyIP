@@ -73,7 +73,7 @@
         <DrawerContent :title="t('ipInfos.ASNConnectivity.dialogTitle', { asn: props.asn })" :safe-area-top="isMobile"
             class="overflow-hidden flex flex-col h-full rounded-none md:h-[90vh] md:rounded-t-[14px]">
             <!-- Screenshot root; control widgets inside opt out via `data-screenshot-exclude`. -->
-            <div data-screenshot-root class="flex flex-col h-full bg-background">
+            <div data-screenshot-root class="flex flex-col flex-1 min-h-0 bg-background">
                 <header class="flex items-center gap-2 px-4 pt-1 pb-3 border-b shrink-0">
                     <span
                         class="flex-1 text-base font-semibold truncate flex items-center justify-start md:justify-center gap-2">
