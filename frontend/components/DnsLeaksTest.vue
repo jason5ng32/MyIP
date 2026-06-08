@@ -153,7 +153,8 @@ const showEnhancedBanner = computed(() =>
 
 const openEnhancedTest = () => {
   trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
-  router.push('/enhanceddnsleaktest');
+  // Open the in-depth DNS Leak Test's in-page drawer (tools are query-driven now).
+  router.push({ path: '/', query: { tool: 'enhanceddnsleaktest' } });
 };
 
 const { dotClass, textClass } = useStatusTone();

@@ -179,7 +179,8 @@ const showServiceStatusBanner = computed(() => hasEverSettled.value);
 
 const openServiceStatus = () => {
   trackEvent('Section', 'BannerClick', 'ServiceStatus');
-  router.push('/servicestatus');
+  // Open the Service Status tool's in-page drawer (tools are query-driven now).
+  router.push({ path: '/', query: { tool: 'servicestatus' } });
 };
 const counter = ref(0);
 const maxCounts = ref(9);
