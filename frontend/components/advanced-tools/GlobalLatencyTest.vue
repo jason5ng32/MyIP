@@ -11,14 +11,14 @@
              so it's manual entry only. -->
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
-                <Label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="text-sm font-medium">
+                <Label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="font-medium">
                     {{ manualMode ? t('pingtest.EnterIPLabel') : t('pingtest.Note3') }}
                 </Label>
                 <!-- Only when stored IPs exist: switch between the dropdown and
                      manual entry (on = use a stored IP). -->
                 <div v-if="allIPs.length" class="flex items-center gap-2 shrink-0">
                     <Switch id="pingUseStored" v-model="useStored" :disabled="pingCheckStatus === 'running'" />
-                    <Label for="pingUseStored" class="text-xs font-normal text-muted-foreground cursor-pointer">
+                    <Label for="pingUseStored" class="font-normal text-muted-foreground cursor-pointer">
                         {{ t('pingtest.UseStored') }}
                     </Label>
                 </div>
@@ -26,19 +26,19 @@
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="pingCheckStatus === 'running'">
                     <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1 min-w-0">
-                        <SelectValue :placeholder="t('pingtest.SelectIP')" class="truncate" />
+                        <SelectValue :placeholder="t('pingtest.SelectIP')" class="truncate font-mono" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="item in allIPs" :key="item.ip" :value="item.ip">
                             <span class="flex items-center gap-1 min-w-0">
                                 <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()"
-                                    class="size-3.5 shrink-0" />
-                                <span class="font-mono truncate text-xs">{{ item.ip }}</span>
+                                    class="size-3.5 md:size-4 shrink-0" />
+                                <span class="font-mono truncate text-xs md:text-sm">{{ item.ip }}</span>
                             </span>
                         </SelectItem>
                     </SelectContent>
                 </Select>
-                <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1"
+                <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1 font-mono"
                     :placeholder="t('pingtest.EnterIPPlaceholder')" :disabled="pingCheckStatus === 'running'"
                     :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
                     autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
