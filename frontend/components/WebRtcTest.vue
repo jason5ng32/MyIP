@@ -240,7 +240,7 @@ const checkSTUNServer = (stun) => {
       stun.ip = ip;
       stun.natType = determineNATType(candidate);
       log(`resolved IP: ${ip}`);
-      IPArray.value = [...IPArray.value, ip];
+      IPArray.value = [...IPArray.value, { ip, country: '' }];
       // useMaxmind swallows its own errors and returns null on miss, so
       // a single null check handles both "no MaxMind source" and "upstream
       // failure" paths.
@@ -249,6 +249,8 @@ const checkSTUNServer = (stun) => {
         stun.country_code = geo.country_code;
         stun.country = geo.country;
         stun.org = geo.org;
+        // Back-fill the country for this IP in the Globalping picker.
+        IPArray.value = [...IPArray.value, { ip, country: geo.country_code }];
       } else {
         stun.country = t('webrtc.StatusError');
         stun.org = t('webrtc.StatusError');

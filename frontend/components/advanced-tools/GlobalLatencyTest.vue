@@ -29,7 +29,13 @@
                         <SelectValue :placeholder="t('pingtest.SelectIP')" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</SelectItem>
+                        <SelectItem v-for="item in allIPs" :key="item.ip" :value="item.ip">
+                            <span class="flex items-center gap-1.5">
+                                <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()"
+                                    class="size-4 shrink-0" />
+                                <span class="font-mono">{{ item.ip }}</span>
+                            </span>
+                        </SelectItem>
                     </SelectContent>
                 </Select>
                 <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1"

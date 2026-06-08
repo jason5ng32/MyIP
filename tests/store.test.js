@@ -110,11 +110,18 @@ describe('store — IPDBs / allIPs', () => {
     assert.deepEqual(s.ipDBs.map((d) => d.enabled), snapshot);
   });
 
-  it('updateAllIPs dedupes via Set union semantics', () => {
+  it('updateAllIPs dedupes by ip and back-fills a missing country', () => {
     const s = useMainStore();
-    s.updateAllIPs(['1.1.1.1', '2.2.2.2']);
-    s.updateAllIPs(['2.2.2.2', '3.3.3.3']);
-    assert.deepEqual([...s.allIPs].sort(), ['1.1.1.1', '2.2.2.2', '3.3.3.3']);
+    s.updateAllIPs([{ ip: '1.1.1.1', country: 'US' }, { ip: '2.2.2.2', country: '' }]);
+    s.updateAllIPs([{ ip: '2.2.2.2', country: 'DE' }, { ip: '3.3.3.3', country: 'JP' }]);
+    const byIp = Object.fromEntries(s.allIPs.map((e) => [e.ip, e.country]));
+    assert.deepEqual(byIp, { '1.1.1.1': 'US', '2.2.2.2': 'DE', '3.3.3.3': 'JP' });
+  });
+
+  it('updateAllIPs tolerates bare-string entries', () => {
+    const s = useMainStore();
+    s.updateAllIPs(['9.9.9.9']);
+    assert.deepEqual(s.allIPs, [{ ip: '9.9.9.9', country: '' }]);
   });
 });
 
