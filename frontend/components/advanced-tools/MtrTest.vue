@@ -80,8 +80,7 @@
                 </AccordionTrigger>
                 <AccordionContent>
                     <pre
-                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
-                {{ result.rawOutput }}</pre>
+                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ result.rawOutput }}</pre>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
