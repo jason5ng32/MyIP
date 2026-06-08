@@ -6,12 +6,23 @@
             <p v-if="!isMobile">{{ t('mtrtest.Note2') }}</p>
         </div>
 
-        <!-- Input area: known IPs → dropdown; none (standalone page / empty
-             store) → free-form entry with validation. -->
+        <!-- Input area. With stored IPs (homepage drawer) the user can pick one
+             OR switch to manual entry; on the standalone page allIPs is empty,
+             so it's manual entry only. -->
         <div class="space-y-2">
-            <label :for="manualMode ? 'mtrIPManual' : 'mtrIP'" class="text-sm font-medium block">
-                {{ manualMode ? t('mtrtest.EnterIPLabel') : t('mtrtest.Note3') }}
-            </label>
+            <div class="flex items-center justify-between gap-2">
+                <Label :for="manualMode ? 'mtrIPManual' : 'mtrIP'" class="text-sm font-medium">
+                    {{ manualMode ? t('mtrtest.EnterIPLabel') : t('mtrtest.Note3') }}
+                </Label>
+                <!-- Only when stored IPs exist: switch between the dropdown and
+                     manual entry (on = use a stored IP). -->
+                <div v-if="allIPs.length" class="flex items-center gap-2 shrink-0">
+                    <Switch id="mtrUseStored" v-model="useStored" :disabled="mtrCheckStatus === 'running'" />
+                    <Label for="mtrUseStored" class="text-xs font-normal text-muted-foreground cursor-pointer">
+                        {{ t('mtrtest.UseStored') }}
+                    </Label>
+                </div>
+            </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="mtrCheckStatus === 'running'">
                     <SelectTrigger id="mtrIP" aria-label="Select IP to MTR" class="flex-1">
@@ -87,6 +98,8 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Info, Play } from '@lucide/vue';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const { t } = useI18n();
 
@@ -98,9 +111,11 @@ const allIPs = computed(() => selectableIPs(store.allIPs));
 const selectedIP = ref('');
 const mtrResults = ref([]);
 
-// No known IPs (e.g. the standalone /tools/mtrtest page, where the homepage
-// never ran to populate them) → let the user type a target IP, validated.
-const manualMode = computed(() => allIPs.value.length === 0);
+// Manual entry is forced when there are no stored IPs (the standalone page,
+// where the homepage never ran). When stored IPs exist, the "use stored IP"
+// switch (on by default) toggles between the dropdown and manual entry.
+const useStored = ref(true);
+const manualMode = computed(() => allIPs.value.length === 0 || !useStored.value);
 const manualIP = ref('');
 const isValidManualIP = computed(() => isValidIP(manualIP.value.trim()));
 // The effective target: a picked IP, or a valid typed one ('' blocks Run).

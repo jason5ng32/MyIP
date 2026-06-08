@@ -732,6 +732,7 @@
   "pingtest": {
     "EnterIPLabel": "Enter an IP to test",
     "EnterIPPlaceholder": "e.g. 1.1.1.1",
+    "UseStored": "Use a stored IP",
     "id": "pingtest",
     "Title": "Global Latency Test",
     "Note": "Ping test is a network tool used to measure the round-trip time of data packets from your device to specific targets (in this case, our servers located in different continents and regions). It is a key metric for evaluating network performance.",
@@ -751,6 +752,7 @@
   "mtrtest": {
     "EnterIPLabel": "Enter an IP to test",
     "EnterIPPlaceholder": "e.g. 1.1.1.1",
+    "UseStored": "Use a stored IP",
     "Title": "MTR Test",
     "Note": "The MTR (My Traceroute) test performs detailed route tracing of your IP address from servers located in different continents and regions around the world. MTR combines the functionality of traditional traceroute and ping commands to diagnose the quality and performance of network connections in real-time.",
     "Note2": "This process covers the complete path from various geographical locations to your network environment, providing information on latency and packet loss for each hop. Whether it's congestion in the routing path, latency issues at a specific node, or packet loss during transmission, the MTR test provides critical diagnostic information.",

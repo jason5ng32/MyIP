@@ -6,12 +6,23 @@
             <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>
         </div>
 
-        <!-- Input area: known IPs → dropdown; none (standalone page / empty
-             store) → free-form entry with validation. -->
+        <!-- Input area. With stored IPs (homepage drawer) the user can pick one
+             OR switch to manual entry; on the standalone page allIPs is empty,
+             so it's manual entry only. -->
         <div class="space-y-2">
-            <label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="text-sm font-medium block">
-                {{ manualMode ? t('pingtest.EnterIPLabel') : t('pingtest.Note3') }}
-            </label>
+            <div class="flex items-center justify-between gap-2">
+                <Label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="text-sm font-medium">
+                    {{ manualMode ? t('pingtest.EnterIPLabel') : t('pingtest.Note3') }}
+                </Label>
+                <!-- Only when stored IPs exist: switch between the dropdown and
+                     manual entry (on = use a stored IP). -->
+                <div v-if="allIPs.length" class="flex items-center gap-2 shrink-0">
+                    <Switch id="pingUseStored" v-model="useStored" :disabled="pingCheckStatus === 'running'" />
+                    <Label for="pingUseStored" class="text-xs font-normal text-muted-foreground cursor-pointer">
+                        {{ t('pingtest.UseStored') }}
+                    </Label>
+                </div>
+            </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="pingCheckStatus === 'running'">
                     <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1">
@@ -116,6 +127,8 @@ import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
@@ -133,9 +146,11 @@ const allIPs = computed(() => selectableIPs(store.allIPs));
 const selectedIP = ref('');
 const pingResults = ref([]);
 
-// No known IPs (e.g. the standalone /tools/pingtest page, where the homepage
-// never ran to populate them) → let the user type a target IP, validated.
-const manualMode = computed(() => allIPs.value.length === 0);
+// Manual entry is forced when there are no stored IPs (the standalone page,
+// where the homepage never ran). When stored IPs exist, the "use stored IP"
+// switch (on by default) toggles between the dropdown and manual entry.
+const useStored = ref(true);
+const manualMode = computed(() => allIPs.value.length === 0 || !useStored.value);
 const manualIP = ref('');
 const isValidManualIP = computed(() => isValidIP(manualIP.value.trim()));
 // The effective target: a picked IP, or a valid typed one ('' blocks Run).
