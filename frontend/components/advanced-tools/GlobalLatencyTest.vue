@@ -25,26 +25,26 @@
             </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="pingCheckStatus === 'running'">
-                    <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1">
-                        <SelectValue :placeholder="t('pingtest.SelectIP')" />
+                    <SelectTrigger id="pingIP" aria-label="Select IP to Ping" class="flex-1 min-w-0">
+                        <SelectValue :placeholder="t('pingtest.SelectIP')" class="truncate" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="item in allIPs" :key="item.ip" :value="item.ip">
-                            <span class="flex items-center gap-1.5">
+                            <span class="flex items-center gap-1 min-w-0">
                                 <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()"
-                                    class="size-4 shrink-0" />
-                                <span class="font-mono">{{ item.ip }}</span>
+                                    class="size-3.5 shrink-0" />
+                                <span class="font-mono truncate text-xs">{{ item.ip }}</span>
                             </span>
                         </SelectItem>
                     </SelectContent>
                 </Select>
                 <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1"
                     :placeholder="t('pingtest.EnterIPPlaceholder')" :disabled="pingCheckStatus === 'running'"
-                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP"
-                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    data-1p-ignore data-lpignore="true" @keyup.enter="startPingCheck" />
-                <Button variant="action" :disabled="pingCheckStatus === 'running' || !targetIP"
-                    @click="startPingCheck" class="cursor-pointer">
+                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
+                    autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
+                    @keyup.enter="startPingCheck" />
+                <Button variant="action" :disabled="pingCheckStatus === 'running' || !targetIP" @click="startPingCheck"
+                    class="cursor-pointer">
                     <Spinner v-if="pingCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />
@@ -138,7 +138,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
-import { Info,Play } from '@lucide/vue';
+import { Info, Play } from '@lucide/vue';
 
 import 'svgmap/style.min';
 

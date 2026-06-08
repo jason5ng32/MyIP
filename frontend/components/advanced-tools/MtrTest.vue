@@ -25,26 +25,26 @@
             </div>
             <div class="flex items-center gap-2">
                 <Select v-if="!manualMode" v-model="selectedIP" :disabled="mtrCheckStatus === 'running'">
-                    <SelectTrigger id="mtrIP" aria-label="Select IP to MTR" class="flex-1">
-                        <SelectValue :placeholder="t('mtrtest.SelectIP')" />
+                    <SelectTrigger id="mtrIP" aria-label="Select IP to MTR" class="flex-1 min-w-0">
+                        <SelectValue :placeholder="t('mtrtest.SelectIP')" class="truncate" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem v-for="item in allIPs" :key="item.ip" :value="item.ip">
-                            <span class="flex items-center gap-1.5">
+                            <span class="flex items-center gap-1 min-w-0">
                                 <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()"
-                                    class="size-4 shrink-0" />
-                                <span class="font-mono">{{ item.ip }}</span>
+                                    class="size-3.5 shrink-0" />
+                                <span class="font-mono truncate text-xs">{{ item.ip }}</span>
                             </span>
                         </SelectItem>
                     </SelectContent>
                 </Select>
                 <Input v-else id="mtrIPManual" v-model="manualIP" class="flex-1"
                     :placeholder="t('mtrtest.EnterIPPlaceholder')" :disabled="mtrCheckStatus === 'running'"
-                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP"
-                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    data-1p-ignore data-lpignore="true" @keyup.enter="startmtrCheck" />
-                <Button variant="action" :disabled="mtrCheckStatus === 'running' || !targetIP"
-                    @click="startmtrCheck" class="cursor-pointer">
+                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
+                    autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
+                    @keyup.enter="startmtrCheck" />
+                <Button variant="action" :disabled="mtrCheckStatus === 'running' || !targetIP" @click="startmtrCheck"
+                    class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />
