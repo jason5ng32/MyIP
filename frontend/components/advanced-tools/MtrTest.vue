@@ -6,11 +6,14 @@
             <p v-if="!isMobile">{{ t('mtrtest.Note2') }}</p>
         </div>
 
-        <!-- Input area: IP selection + Run button -->
+        <!-- Input area: known IPs → dropdown; none (standalone page / empty
+             store) → free-form entry with validation. -->
         <div class="space-y-2">
-            <label for="mtrIP" class="text-sm font-medium block">{{ t('mtrtest.Note3') }}</label>
+            <label :for="manualMode ? 'mtrIPManual' : 'mtrIP'" class="text-sm font-medium block">
+                {{ manualMode ? t('mtrtest.EnterIPLabel') : t('mtrtest.Note3') }}
+            </label>
             <div class="flex items-center gap-2">
-                <Select v-model="selectedIP" :disabled="mtrCheckStatus === 'running'">
+                <Select v-if="!manualMode" v-model="selectedIP" :disabled="mtrCheckStatus === 'running'">
                     <SelectTrigger id="mtrIP" aria-label="Select IP to MTR" class="flex-1">
                         <SelectValue :placeholder="t('mtrtest.SelectIP')" />
                     </SelectTrigger>
@@ -18,7 +21,12 @@
                         <SelectItem v-for="ip in allIPs" :key="ip" :value="ip">{{ ip }}</SelectItem>
                     </SelectContent>
                 </Select>
-                <Button variant="action" :disabled="mtrCheckStatus === 'running' || selectedIP === ''"
+                <Input v-else id="mtrIPManual" v-model="manualIP" class="flex-1"
+                    :placeholder="t('mtrtest.EnterIPPlaceholder')" :disabled="mtrCheckStatus === 'running'"
+                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP"
+                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    data-1p-ignore data-lpignore="true" @keyup.enter="startmtrCheck" />
+                <Button variant="action" :disabled="mtrCheckStatus === 'running' || !targetIP"
                     @click="startmtrCheck" class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
                     <template v-else>
@@ -69,9 +77,11 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { useGlobalpingMeasurement, GLOBALPING_DEFAULT_LOCATIONS, selectableIPs } from '@/composables/use-globalping-measurement';
+import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
@@ -87,6 +97,16 @@ const allIPs = computed(() => selectableIPs(store.allIPs));
 
 const selectedIP = ref('');
 const mtrResults = ref([]);
+
+// No known IPs (e.g. the standalone /tools/mtrtest page, where the homepage
+// never ran to populate them) → let the user type a target IP, validated.
+const manualMode = computed(() => allIPs.value.length === 0);
+const manualIP = ref('');
+const isValidManualIP = computed(() => isValidIP(manualIP.value.trim()));
+// The effective target: a picked IP, or a valid typed one ('' blocks Run).
+const targetIP = computed(() =>
+    manualMode.value ? (isValidManualIP.value ? manualIP.value.trim() : '') : selectedIP.value,
+);
 // status: 'idle' | 'running' | 'finished' | 'error' — driven by the composable
 const { status: mtrCheckStatus, start: runMeasurement } = useGlobalpingMeasurement({
     pollInterval: 1000,
@@ -94,13 +114,14 @@ const { status: mtrCheckStatus, start: runMeasurement } = useGlobalpingMeasureme
 });
 
 const startmtrCheck = () => {
+    if (!targetIP.value) return;
     trackEvent('Section', 'StartClick', 'MTRTest');
     mtrResults.value = [];
 
     runMeasurement({
         limit: 16,
         locations: GLOBALPING_DEFAULT_LOCATIONS,
-        target: selectedIP.value,
+        target: targetIP.value,
         type: 'mtr',
         measurementOptions: { port: 80, protocol: 'ICMP' },
     }, {

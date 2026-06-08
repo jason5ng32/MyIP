@@ -390,6 +390,8 @@
     }
   },
   "advancedtools": {
+    "OpenInNewTab": "Yeni sekmede aç",
+    "BackToHome": "Ana sayfa",
     "Title": "Gelişmiş Araçlar",
     "Note": "Nispeten seyrek kullanılan ancak ağ testi yaparken çok faydalı olan araçlar.",
     "PingTestNote": "Global Ping değeri testi",
@@ -728,6 +730,8 @@
     }
   },
   "pingtest": {
+    "EnterIPLabel": "Test edilecek bir IP girin",
+    "EnterIPPlaceholder": "örn. 1.1.1.1",
     "id": "pingtest",
     "Title": "Global Gecikme Testi",
     "Note": "Ping testi, veri paketlerinin cihazınızdan belirli hedeflere (bu durumda, farklı kıtalarda ve bölgelerde bulunan sunucularımıza) gidiş-dönüş süresini ölçmek için kullanılan bir ağ aracıdır. Ağ performansını değerlendirmek için önemli bir metriktir.",
@@ -745,6 +749,8 @@
     "Error": "Test başarısız oldu, görünüşe göre IP'nizin Ping testi yapmasına izin verilmiyor."
   },
   "mtrtest": {
+    "EnterIPLabel": "Test edilecek bir IP girin",
+    "EnterIPPlaceholder": "örn. 1.1.1.1",
     "Title": "MTR Testi",
     "Note": "MTR (My Traceroute) testi, dünyanın farklı kıtalarında ve bölgelerinde bulunan sunuculardan IP adresinize ayrıntılı rota takibi yapar. MTR, ağ bağlantılarının kalitesini ve performansını gerçek zamanlı olarak teşhis etmek için geleneksel traceroute ve ping komutlarının işlevselliğini birleştirir.",
     "Note2": "Bu süreç, çeşitli coğrafi konumlardan ağ ortamınıza giden tüm yolu kapsar ve her atlama (hop) için gecikme ve paket kaybı hakkında bilgi sağlar. İster yönlendirme yolundaki tıkanıklık, ister belirli bir düğümdeki gecikme sorunları veya iletim sırasındaki paket kaybı olsun, MTR testi kritik teşhis bilgileri sağlar.",

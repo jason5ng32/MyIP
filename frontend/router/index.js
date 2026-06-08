@@ -1,49 +1,33 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-import { useMainStore } from '@/store';
-import { ADVANCED_TOOLS } from '@/data/tools.js';
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '@/components/Home.vue';
 
-// `/` renders an empty placeholder inside the drawer; every tool route renders
-// its component there. Routes are derived from the shared tool registry
-// (frontend/data/tools.js) so there's a single ordered list to maintain.
-const EmptyComponent = () => import('@/components/advanced-tools/Empty.vue');
+// Two real, crawlable pages:
+//   /              → the homepage. Advanced tools open as an in-page drawer,
+//                    driven by the `?tool=<slug>` query (handled in Advanced.vue).
+//   /tools/:slug   → a standalone full page for one tool (shareable + SEO).
+// Both render the SAME tool components; only the wrapper differs.
+//
+// Home is imported eagerly (it's the default landing); the standalone layout is
+// lazy so it stays out of the homepage bundle.
+const StandaloneTool = () => import('@/components/StandaloneTool.vue');
 
 const routes = [
-  { path: '/', component: EmptyComponent },
-  ...ADVANCED_TOOLS.map((tool) => ({ path: `/${tool.slug}`, component: tool.component })),
+  { path: '/', name: 'home', component: Home },
+  { path: '/tools/:slug', name: 'tool', component: StandaloneTool },
+  // Unknown paths fall back to the homepage.
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Opening/closing the drawer only flips the query on the home route — don't
+    // scroll the homepage in that case. Genuine page changes go to the top.
+    if (to.path === from.path) return false;
+    if (savedPosition) return savedPosition;
+    return { top: 0 };
+  },
 });
-
-const setOpenedCard = (currentPath) => {
-  for (let i = 0; i < routes.length; i++) {
-    if (currentPath === routes[i].path) {
-      return i - 1;
-    }
-  }
-};
-
-router.afterEach((to) => {
-  const store = useMainStore();
-
-
-  if (!routes.find(route => route.path === to.path)) {
-    if (store.openSheet === 'tools') {
-      store.setOpenSheet(null);
-    }
-    return;
-  }
-
-  store.setCurrentPath(to.path, setOpenedCard(to.path));
-
-  if (to.path !== '/') {
-    store.setOpenSheet('tools');
-  } else if (store.openSheet === 'tools') {
-    store.setOpenSheet(null);
-  }
-});
-
 
 export default router;

@@ -56,7 +56,7 @@ function makeRefs() {
   };
 
   const advancedToolsRef = ref({
-    navigateAndToggleOffcanvas(path) { calls.advancedNavigate.push(path); },
+    openTool(slug) { calls.advancedNavigate.push(slug); },
     fullScreen() { calls.advancedFullScreen += 1; },
   });
 
@@ -81,7 +81,7 @@ function makeRefs() {
       webRTCRef:         ref({ checkAllWebRTC: (flag) => { calls.webrtc.push(flag); } }),
       dnsLeaksRef:       ref({ checkAllDNSLeakTest: (flag) => { calls.dnsleak.push(flag); } }),
       isInfosLoaded:     ref(true),
-      openedCard:        ref(1),
+      isToolOpen:        ref(true),
       toggleInfoMask:    () => { calls.mask += 1; },
     },
     calls,
@@ -139,12 +139,12 @@ describe('useShortcuts()', () => {
     assert.equal(store.state.refreshRequested, true);
   });
 
-  it('advanced-tool shortcuts navigate via advancedToolsRef.navigateAndToggleOffcanvas', () => {
+  it('advanced-tool shortcuts open via advancedToolsRef.openTool(slug)', () => {
     const { keyMap, calls } = loadAndGetKeyMap();
     const l = keyMap.findLast((e) => e.keys === 'l'); l.action();
     const M = keyMap.findLast((e) => e.keys === 'M'); M.action();
     const t_ = keyMap.findLast((e) => e.keys === 't'); t_.action();
-    assert.deepEqual(calls.advancedNavigate, ['/pingtest', '/macchecker', '/mtrtest']);
+    assert.deepEqual(calls.advancedNavigate, ['pingtest', 'macchecker', 'mtrtest']);
   });
 
   it('numeric regex "[1-6]" passes through number argument to refreshCard', () => {
@@ -183,13 +183,13 @@ describe('useShortcuts()', () => {
     assert.equal(calls.mask, 1);
   });
 
-  it('"o" opens the highlighted advanced tool by its data-adv-path', () => {
+  it('"o" opens the highlighted advanced tool by its data-adv-slug', () => {
     const { keyMap, calls } = loadAndGetKeyMap();
-    // Stub the highlighted card to be an advanced tool card pointing at /mtrtest.
+    // Stub the highlighted card to be an advanced tool card pointing at mtrtest.
     querySelectorImpl = (sel) => {
       if (sel === '.keyboard-shortcut-card[data-keyboard-hover="true"]') {
         return {
-          getAttribute: (name) => name === 'data-adv-path' ? '/mtrtest' : null,
+          getAttribute: (name) => name === 'data-adv-slug' ? 'mtrtest' : null,
         };
       }
       return null;
@@ -197,10 +197,10 @@ describe('useShortcuts()', () => {
     const entry = keyMap.findLast((e) => e.keys === 'o');
     entry.action();
     querySelectorImpl = () => null;
-    assert.deepEqual(calls.advancedNavigate, ['/mtrtest']);
+    assert.deepEqual(calls.advancedNavigate, ['mtrtest']);
   });
 
-  it('"o" is a no-op when the highlighted card has no data-adv-path (e.g. IP card)', () => {
+  it('"o" is a no-op when the highlighted card has no data-adv-slug (e.g. IP card)', () => {
     const { keyMap, calls } = loadAndGetKeyMap();
     querySelectorImpl = () => ({ getAttribute: () => null });
     const entry = keyMap.findLast((e) => e.keys === 'o');

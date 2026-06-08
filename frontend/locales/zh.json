@@ -390,6 +390,8 @@
     "ControlGroup": "控制组"
   },
   "advancedtools": {
+    "OpenInNewTab": "在新标签页打开",
+    "BackToHome": "首页",
     "Title": "高级工具",
     "Note": "一些使用频率相对较低，但在进行网络测试时，非常有用的工具。",
     "PingTestNote": "全球的 Ping 值测试",
@@ -728,6 +730,8 @@
     }
   },
   "pingtest": {
+    "EnterIPLabel": "输入要测试的 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
     "id": "pingtest",
     "Title": "全球延迟测试",
     "Note": "Ping 测试是一种网络工具，用于测量数据包从你的设备到特定目标（在这里是我们分布在全球各个大洲和地区的服务器）的往返时间。是评估网络性能的关键指标。",
@@ -745,6 +749,8 @@
     "Error": "测试失败，看起来你的 IP 不允许进行 Ping 测试。"
   },
   "mtrtest": {
+    "EnterIPLabel": "输入要测试的 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
     "Title": "MTR 测试",
     "Note": "MTR (My Traceroute) 测试会从遍布全球不同大洲和地区的服务器出发，对你的 IP 地址进行详细的路由跟踪。MTR 结合了传统 traceroute 和 ping 命令的功能，能够实时地诊断网络连接的质量和性能。",
     "Note2": "这个过程涵盖了从各个地理位置到你的网络环境的完整路径，提供关于每一跳的延迟和数据包丢失信息。无论是路由路径的拥堵、某个特定节点的延迟问题，还是数据包在传输过程中的丢失，MTR 测试都能提供关键的诊断信息。",

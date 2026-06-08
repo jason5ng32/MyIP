@@ -7,6 +7,7 @@ import router from './router';
 import { analytics } from './utils/analytics';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
 import { addCollection } from '@iconify/vue';
+import { TOOL_BY_SLUG } from './data/tools';
 
 import { detectOS } from './utils/system-detect';
 import './style/style.css'
@@ -39,6 +40,20 @@ if (import.meta.env.DEV) {
 import('@iconify-json/circle-flags/icons.json').then(({ default: flags }) => {
     addCollection(flags);
 });
+
+// Legacy hash-route compatibility. The app used hash routing (`/#/whois`)
+// before moving to HTML5 history mode; old bookmarks, shared links and search
+// results still carry that shape. Rewrite the URL *before* the router resolves
+// the initial route so those keep working:
+//   /#/whois → /?tool=whois  (opens the tool's drawer over the homepage, as before)
+//   /#/      → /
+(function redirectLegacyHashRoute() {
+    const hash = window.location.hash;
+    if (!hash.startsWith('#/')) return;
+    const slug = hash.slice(2).split(/[/?#]/)[0];
+    const target = TOOL_BY_SLUG.has(slug) ? `/?tool=${slug}` : '/';
+    window.history.replaceState(null, '', target);
+})();
 
 const app = createApp(App);
 const pinia = createPinia();
