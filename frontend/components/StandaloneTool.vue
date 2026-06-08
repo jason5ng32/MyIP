@@ -48,6 +48,7 @@ import { computed, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import brandIcon from '@/components/svgicons/Brand.vue';
 import { ArrowLeft } from '@lucide/vue';
@@ -58,6 +59,16 @@ const router = useRouter();
 
 const tool = computed(() => TOOL_BY_SLUG.get(route.params.slug) || null);
 const toolComponent = computed(() => (tool.value ? defineAsyncComponent(tool.value.component) : null));
+
+// Per-tool head: localized title + description, self-referential canonical.
+useDocumentMeta(() => {
+    if (!tool.value) return {};
+    return {
+        title: `${t(tool.value.titleKey)} · IPCheck.ing`,
+        description: t(tool.value.noteKey),
+        canonical: `${window.location.origin}/tools/${tool.value.slug}`,
+    };
+});
 
 // Unknown slug → bounce to the homepage rather than show an empty shell.
 if (!tool.value) router.replace('/');

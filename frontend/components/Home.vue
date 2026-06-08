@@ -60,6 +60,7 @@ import { useInfoMask } from '@/composables/use-info-mask.js';
 import { useRefreshOrchestrator } from '@/composables/use-refresh-orchestrator.js';
 import { useShortcuts } from '@/composables/use-shortcuts.js';
 import { useSectionTracking } from '@/composables/use-section-tracking.js';
+import { useDocumentMeta } from '@/composables/use-document-meta.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -114,6 +115,10 @@ const { loadShortcuts } = useShortcuts({
 
 // Scroll monitoring + section tracking (logic from widgets/Patch.vue)
 useSectionTracking();
+
+// Reset the head to the homepage defaults (matters when SPA-navigating back
+// from a /tools/:slug page, which had overridden title / canonical / OG).
+useDocumentMeta(() => ({ canonical: `${window.location.origin}/` }));
 
 onMounted(() => {
     loadingControl();

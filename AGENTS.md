@@ -63,7 +63,7 @@ This project uses **pnpm** as its package manager (pinned via the `packageManage
 ├── tests/                       ← Node test runner specs
 │
 ├── backend-server.js            ← Express app (default port 11966)
-├── frontend-server.js           ← static file server for `pnpm start`
+├── frontend-server.js           ← static file server for `pnpm start` (+ SPA history fallback)
 ├── index.html                   ← Vite entry; #app mounts vaul-drawer-wrapper
 ├── vite.config.js
 ├── jsconfig.json                ← JS project, alias @ → frontend/

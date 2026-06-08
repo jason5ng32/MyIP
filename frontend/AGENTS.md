@@ -33,6 +33,7 @@ frontend/
 ├── composables/                 ← Vue-aware reactive / stateful logic (useXxx)
 │   ├── use-fit-text.js          ← auto-fit font-size picker (+ HERO_TIERS / INLINE_TIERS presets)
 │   ├── use-globalping-measurement.js ← shared POST+poll orchestrator for the Globalping tools
+│   ├── use-document-meta.js     ← per-route title / description / canonical / OG (no SSR)
 │   ├── use-info-mask.js
 │   ├── use-refresh-orchestrator.js
 │   ├── use-section-tracking.js
