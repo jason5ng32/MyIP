@@ -17,14 +17,15 @@ import Alert from './components/widgets/Toast.vue';
 import PWA from './components/widgets/PWA.vue';
 import { useTheme } from '@/composables/use-theme.js';
 
-// Standalone tool pages drop the homepage's fixed-Nav body padding (see the
-// `body.jn-standalone-page` rule in index.html). Toggle the marker class as the
-// route changes so the override applies on the /tools/:slug route only.
+// The standalone tool pages (/tools/:slug) drop the homepage's fixed-Nav body
+// padding (see the `body.jn-standalone-page` rule in index.html). Toggle the
+// marker class as the route changes. NB: "tool page" here is unrelated to PWA
+// display mode — that's `isRunningAsPwa()` in utils/pwa.js.
 const route = useRoute();
 watch(
     () => route.name === 'tool',
-    (isStandalone) => {
-        document.body.classList.toggle('jn-standalone-page', isStandalone);
+    (isToolPage) => {
+        document.body.classList.toggle('jn-standalone-page', isToolPage);
     },
     { immediate: true },
 );

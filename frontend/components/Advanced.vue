@@ -63,8 +63,9 @@
                         <span class="mr-1">{{ activeTool.emoji }}</span>{{ t(activeTool.titleKey) }}
                     </span>
                     <span v-else class="flex-1" />
-                    <!-- Open the current tool as a standalone page -->
-                    <a v-if="activeTool" :href="`/tools/${activeTool.slug}`" target="_blank" rel="noopener"
+                    <!-- Open the current tool as a standalone page (hidden in a
+                         PWA window, which has no new-tab affordance) -->
+                    <a v-if="activeTool && !isPwa" :href="`/tools/${activeTool.slug}`" target="_blank" rel="noopener"
                         class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         :title="t('advancedtools.OpenInNewTab')" :aria-label="t('advancedtools.OpenInNewTab')">
                         <SquareArrowOutUpRight class="size-4" />
@@ -90,6 +91,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '@/data/tools.js';
+import { isRunningAsPwa } from '@/utils/pwa.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Maximize, Minimize, PanelBottomOpen, SquareArrowOutUpRight } from '@lucide/vue';
@@ -98,6 +100,9 @@ const { t } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+// Running as an installed PWA → hide the "open in new tab" affordance (a PWA
+// window has no tab strip; it would pop out to the browser). See utils/pwa.js.
+const isPwa = isRunningAsPwa();
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);

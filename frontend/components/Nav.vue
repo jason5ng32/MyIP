@@ -8,8 +8,8 @@
   <header
     class="fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
-    'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isStandalone || (isStandalone && !isMobile),
-    'bg-page-bg': isStandalone && isMobile }">
+    'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isPwa || (isPwa && !isMobile),
+    'bg-page-bg': isPwa && isMobile }">
     <nav id="navbar-top" class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
       <!-- Left: Hamburger (only mobile) + Brand -->
@@ -195,6 +195,7 @@ import {
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
+import { isRunningAsPwa } from '@/utils/pwa.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -204,9 +205,9 @@ const isMobile = computed(() => store.isMobile);
 const currentSection = computed(() => store.currentSection);
 const loaded = ref(false);
 
-// Check if the app is running in standalone mode
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  || window.navigator.standalone;
+// Running as an installed PWA (chromeless window). Distinct from the app's
+// "standalone tool pages" — see utils/pwa.js.
+const isPwa = isRunningAsPwa();
 
 const navItems = SECTION_IDS;
 
