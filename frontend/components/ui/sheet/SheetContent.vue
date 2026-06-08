@@ -2,7 +2,7 @@
 // shadcn-vue Sheet 面板：四向滑入，包含 overlay
 // 见 refactor/01 阶段 B
 import { computed } from 'vue';
-import { DialogContent, DialogOverlay, DialogPortal, DialogTitle, VisuallyHidden } from 'reka-ui';
+import { DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogTitle, VisuallyHidden } from 'reka-ui';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +26,9 @@ const props = defineProps({
   class: { type: [String, Array, Object], default: undefined },
   // 可选 a11y 标题；如果未给且没有 #title slot，用 VisuallyHidden 兜底以满足 reka-ui 的 a11y 警告
   title: { type: String, default: 'Panel' },
+  // 可选 a11y 描述；未给且无 #description slot 时回退到 title，填满 reka-ui 要求的
+  // aria-describedby 链接，消除每次打开时控制台的 "Missing Description" 警告。
+  description: { type: String, default: '' },
   // 透传给 DialogContent，比如 onPointerDownOutside
   onPointerDownOutside: { type: Function, default: undefined },
   onInteractOutside: { type: Function, default: undefined },
@@ -69,6 +72,12 @@ const safeAreaStyle = computed(() => {
         <DialogTitle>{{ title }}</DialogTitle>
       </VisuallyHidden>
       <slot name="title" />
+      <!-- a11y 描述兜底：未给 description 时回退到 title，满足 reka-ui 的
+           aria-describedby 链接，消除 "Missing Description" 控制台警告。 -->
+      <VisuallyHidden v-if="!$slots.description">
+        <DialogDescription>{{ description || title }}</DialogDescription>
+      </VisuallyHidden>
+      <slot name="description" />
       <slot />
     </DialogContent>
   </DialogPortal>
