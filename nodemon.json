@@ -1,0 +1,14 @@
+{
+  "_comment": "Restart the backend only on real source changes. The CAIDA / MaxMind runtime DB dirs under common/ receive downloaded snapshots and temp `.next` files at runtime; watching them crashes nodemon on Windows with EBUSY when a temp file is mid-write. We watch the source files explicitly and ignore the runtime DB dirs so the watcher never touches them.",
+  "watch": [
+    "backend-server.js",
+    "frontend-server.js",
+    "api"
+  ],
+  "ext": "js,mjs,cjs,json",
+  "ignore": [
+    "common/as-org-db/*",
+    "common/as-rel-db/*",
+    "common/maxmind-db/*"
+  ]
+}

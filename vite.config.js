@@ -153,5 +153,16 @@ export default defineConfig({
       '/api': `http://localhost:${backEndPort}`
     },
     allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],
+    watch: {
+      // The backend writes runtime data (CAIDA / MaxMind snapshots and their
+      // temp `.next` files) into these dirs while it runs. Watching them makes
+      // Vite's file watcher crash on Windows with EBUSY when a temp file is
+      // mid-write. They aren't frontend sources, so ignore them outright.
+      ignored: [
+        '**/common/as-org-db/**',
+        '**/common/as-rel-db/**',
+        '**/common/maxmind-db/**',
+      ],
+    },
   }
 })

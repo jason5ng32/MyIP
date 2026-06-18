@@ -165,6 +165,7 @@ const langOptions = [
     { value: 'en', label: 'English', flag: 'us' },
     { value: 'fr', label: 'Français', flag: 'fr' },
     { value: 'tr', label: 'Türkçe', flag: 'tr' },
+    { value: 'fa', label: 'فارسی', flag: 'ir' },
 ];
 const currentLang = computed(() =>
     langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]
