@@ -14,6 +14,7 @@ const localeLoaders = {
   zh: () => import('./zh.json'),
   fr: () => import('./fr.json'),
   tr: () => import('./tr.json'),
+  fa: () => import('./fa.json'),
 };
 
 const supportedLanguages = Object.keys(localeLoaders);
@@ -77,9 +78,17 @@ export async function loadActiveLocaleMessages() {
   updateMeta();
 }
 
+// Languages that require right-to-left layout.
+const RTL_LOCALES = new Set(['fa', 'ar', 'he']);
+
 // 更新 meta 标签（依赖 messages，故在 loadActiveLocaleMessages 之后调用）
 function updateMeta() {
   document.title = i18n.global.t('page.title');
+
+  // Set dir and lang on <html> for RTL support.
+  const locale = i18n.global.locale.value ?? i18n.global.locale;
+  document.documentElement.lang = locale;
+  document.documentElement.dir = RTL_LOCALES.has(locale) ? 'rtl' : 'ltr';
 
   const metaKeywords = document.querySelector('meta[name="keywords"]');
   const metaDescription = document.querySelector('meta[name="description"]');

@@ -11,7 +11,7 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   popupConnectivityNotifications: false,
   ipCardsToShow: 2,
   ipGeoSource: 0,
-  lang: 'auto', // auto | zh | en | fr | tr
+  lang: 'auto', // auto | zh | en | fr | tr | fa
   // User-defined extra targets for the Connectivity test grid. Each entry:
   //   { id: 'custom-<timestamp>', name: string, url: string-with-trailing-? }
   // See ConnectivityTest.vue for how these are merged with the built-in list.
