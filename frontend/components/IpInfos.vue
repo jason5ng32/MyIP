@@ -172,8 +172,8 @@ const resolveIP = async (cardID, getFromSource) => {
       : t('ipInfos.IPv4Error');
     // Domain event: this source AND all its internal fallbacks failed to
     // produce an IP. Emitted unconditionally (bus semantics); subscribers
-    // decide what matters — sentry-init.js reports v4 exhaustion directly
-    // and gates v6 exhaustion on evidence the visitor has working IPv6.
+    // decide what matters — sentry-init.js gates exhaustion on evidence the
+    // visitor's network works for that IP version (some card resolved one).
     emitAppEvent('ip-source:exhausted', {
       source: CARD_SOURCE_SLUGS[cardID] ?? `card-${cardID}`,
       ipVersion: isV6Card ? 'v6' : 'v4',

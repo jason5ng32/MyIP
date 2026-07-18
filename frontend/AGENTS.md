@@ -86,10 +86,11 @@ philosophy as `firebase-init.js`). Two rules:
   SDK back into the main bundle. All Sentry config lives in `sentry-init.js`.
 - **Explicit signals go through the app-events bus**, like achievements: the
   component emits, `sentry-init.js` subscribes. One signal is captured:
-  `ip-source:exhausted` (an IP card's whole source chain failed). v4 cards
-  report directly; v6 cards report only when the `ipinfo:finished` snapshot
-  shows some card resolved a valid IPv6 — otherwise "our v6 chain failed" is
-  indistinguishable from "visitor has no IPv6", which is routine noise.
+  `ip-source:exhausted` (an IP card's whole source chain failed). Cards
+  report only when the `ipinfo:finished` snapshot shows some card resolved a
+  valid IP of the same version — otherwise "our chain failed" is
+  indistinguishable from visitor-side conditions (no IPv6 / dead network),
+  which is routine noise.
 
 Capture surface: uncaught errors; `console.error` (fingerprinted per message
 prefix so each source stays a distinct issue; individual `utils/getips/`

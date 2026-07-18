@@ -146,12 +146,14 @@ const initSentry = (app, router, earlyErrors = []) => {
     // ip-source:exhausted — an IP card's whole source chain (primary + all
     // fallbacks) produced no IP. Individual source failures are console.warn
     // (any single provider can be blocked on a given network); full-card
-    // exhaustion is the health signal. v4 cards report directly. v6 cards
-    // are held until the ipinfo:finished snapshot and only report when some
-    // card resolved a valid IPv6 — proof the visitor's network stack has
-    // working v6, so the exhausted chain is OUR problem. Without that proof,
-    // "our v6 chain failed" is indistinguishable from "visitor has no IPv6",
-    // which is routine (roughly half the internet) and pure noise.
+    // exhaustion is the health signal. Exhaustions are held until the
+    // ipinfo:finished snapshot and only report when some card resolved a
+    // valid IP of the same version — proof the visitor's network stack works
+    // for that version, so the exhausted chain is OUR problem. Without that
+    // proof the failure is indistinguishable from visitor-side conditions
+    // (no IPv6 — roughly half the internet — or a dead/offline network) and
+    // is pure noise. The snapshot re-emits after single-card refreshes, so
+    // queued entries always get flushed.
     const reportExhaustion = (source, ipVersion) => {
         Sentry.captureMessage(`IP source exhausted: ${source}`, {
             level: 'error',
@@ -159,22 +161,21 @@ const initSentry = (app, router, earlyErrors = []) => {
             tags: { ip_version: ipVersion },
         });
     };
-    let pendingV6Exhaustions = [];
+    const pendingExhaustions = { v4: [], v6: [] };
     onAppEvent('ip-source:exhausted', ({ source, ipVersion }) => {
-        if (ipVersion === 'v6') {
-            pendingV6Exhaustions.push(source);
-        } else {
-            reportExhaustion(source, ipVersion);
-        }
+        (pendingExhaustions[ipVersion] ?? pendingExhaustions.v4).push(source);
     });
     onAppEvent('ipinfo:finished', ({ cards }) => {
-        if (pendingV6Exhaustions.length === 0) return;
-        const queued = pendingV6Exhaustions;
-        pendingV6Exhaustions = [];
-        const visitorHasV6 = (cards ?? []).some(
-            (card) => typeof card.ip === 'string' && card.ip.includes(':') && isValidIP(card.ip)
-        );
-        if (visitorHasV6) queued.forEach((source) => reportExhaustion(source, 'v6'));
+        for (const version of ['v4', 'v6']) {
+            const queued = pendingExhaustions[version];
+            if (queued.length === 0) continue;
+            pendingExhaustions[version] = [];
+            const visitorHasVersion = (cards ?? []).some(
+                (card) => typeof card.ip === 'string' && isValidIP(card.ip)
+                    && card.ip.includes(':') === (version === 'v6')
+            );
+            if (visitorHasVersion) queued.forEach((source) => reportExhaustion(source, version));
+        }
     });
 };
 
