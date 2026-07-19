@@ -129,7 +129,7 @@ const tableItems = computed(() => [
 const validateInput = (input) => {
     if (!input) return null;
     const normalizedInput = input.replace(/[:-]/g, '').replace(/\s+/g, '');
-    if (normalizedInput.length < 6 || normalizedInput.length > 12 || !/^[0-9A-Fa-f]+$/.test(normalizedInput)) {
+    if (normalizedInput.length !== 12 || !/^[0-9A-Fa-f]+$/.test(normalizedInput)) {
         errorMsg.value = t('macchecker.invalidMAC');
         return null;
     }
