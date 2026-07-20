@@ -81,7 +81,7 @@
                 <AccordionContent>
                     <!-- Structured hop table parsed from the mtr raw output;
                          falls back to the raw text when nothing was parseable. -->
-                    <div v-if="result.hops.length" class="mt-2 rounded-md border overflow-x-auto">
+                    <div v-if="result.hops.length" class="mt-2 rounded-md  overflow-x-auto">
                         <table class="w-full text-xs">
                             <thead>
                                 <tr class="border-b">
