@@ -205,7 +205,7 @@ const PROVIDERS = [
   { id: 'github', name: 'GitHub', icon: 'ri:github-line' },
   { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare' },
   { id: 'elevenlabs', name: 'ElevenLabs', icon: 'simple-icons:elevenlabs' },
-  { id: 'langchain', name: 'LangChain', icon: 'simple-icons:langchain' },
+  { id: 'groq', name: 'Groq', icon: 'bxl:groq-ai' },
   { id: 'vercel', name: 'Vercel', icon: 'simple-icons:vercel' },
   { id: 'netlify', name: 'Netlify', icon: 'simple-icons:netlify' },
   { id: 'render', name: 'Render', icon: 'simple-icons:render' },

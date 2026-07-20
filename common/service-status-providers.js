@@ -27,8 +27,7 @@ export const STATUS_PROVIDERS = [
     // categories, leaving one "Cloudflare Sites and Services" rollup + 7
     // continents — which keeps the card light consistent with this list.
     { id: 'cloudflare', name: 'Cloudflare', api: 'https://new.cloudflarestatus.com', page: 'https://new.cloudflarestatus.com' },
-    // LangSmith is the status page for the LangChain platform.
-    { id: 'langchain', name: 'LangChain', api: 'https://status.smith.langchain.com', page: 'https://status.smith.langchain.com' },
+    { id: 'groq', name: 'Groq', api: 'https://groqstatus.com', page: 'https://groqstatus.com' },
     { id: 'notion', name: 'Notion', api: 'https://www.notion-status.com', page: 'https://www.notion-status.com' },
     { id: 'vercel', name: 'Vercel', api: 'https://www.vercel-status.com', page: 'https://www.vercel-status.com' },
     { id: 'netlify', name: 'Netlify', api: 'https://www.netlifystatus.com', page: 'https://www.netlifystatus.com' },
