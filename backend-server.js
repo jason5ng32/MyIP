@@ -42,8 +42,10 @@ import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmin
 import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
 import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
 import { bootstrapServiceStatus, startServiceStatusPolling } from './common/service-status-store.js';
+import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
 dotenv.config({ quiet: true });
+initUpstreamUserAgent();
 
 const app = express();
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);

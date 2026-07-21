@@ -27,6 +27,10 @@ states its route and purpose — read those for specifics.
 - **Every upstream call uses `fetchUpstream`** from
   `common/fetch-with-timeout.js` (8s timeout). Never a bare `fetch()` /
   `https.get()` — a hanging provider must time out, not pin the connection.
+  It also injects a default `User-Agent` of `MyIP/v<version>/<VITE_SITE_URL>`
+  (registered at boot by `common/upstream-ua.js` — some upstream WAFs block
+  undici's default `node` UA); caller-supplied `User-Agent` headers, including
+  the private-API `{ ...req.headers }` pass-through, always win.
 - **Error shape.** `res.status(500).json({ error: error.message })` on
   upstream failure, `400` on bad input. Terse — the frontend doesn't display
   these verbatim.

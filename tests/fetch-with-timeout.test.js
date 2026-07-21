@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
 
-import { fetchWithTimeout, fetchUpstream } from '../common/fetch-with-timeout.js';
+import { fetchWithTimeout, fetchUpstream, setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 // Stub global fetch per-test so we can control whether it resolves, rejects,
 // or stays pending (and observe whether the wrapper aborted it via signal).
@@ -173,5 +173,72 @@ describe('fetchUpstream()', () => {
         });
         await fetchUpstream('https://example.test', { timeoutMs: 100 });
         assert.ok(observedSignal instanceof AbortSignal);
+    });
+});
+
+describe('fetchUpstream() default User-Agent', () => {
+    afterEach(() => {
+        restoreFetch();
+        setUpstreamUserAgent(null);
+    });
+
+    it('sends no User-Agent header when none has been registered', async () => {
+        let observedHeaders;
+        installFetch(async (_input, init) => {
+            observedHeaders = init.headers;
+            return new Response('ok');
+        });
+        await fetchUpstream('https://example.test');
+        assert.equal(observedHeaders, undefined);
+    });
+
+    it('injects the registered User-Agent when the caller sets no headers', async () => {
+        setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
+        let observedHeaders;
+        installFetch(async (_input, init) => {
+            observedHeaders = init.headers;
+            return new Response('ok');
+        });
+        await fetchUpstream('https://example.test');
+        assert.deepEqual(observedHeaders, { 'User-Agent': 'MyIP/v0.0.0/https://example.test' });
+    });
+
+    it('merges the User-Agent into caller headers without clobbering them', async () => {
+        setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
+        let observedHeaders;
+        installFetch(async (_input, init) => {
+            observedHeaders = init.headers;
+            return new Response('ok');
+        });
+        await fetchUpstream('https://example.test', { headers: { Accept: 'application/json' } });
+        assert.deepEqual(observedHeaders, {
+            Accept: 'application/json',
+            'User-Agent': 'MyIP/v0.0.0/https://example.test',
+        });
+    });
+
+    it('never overrides or duplicates a caller-supplied User-Agent, any casing', async () => {
+        // Pass-through handlers forward the visitor's headers, whose
+        // user-agent key arrives lowercase from Node — that one must win.
+        setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
+        let observedHeaders;
+        installFetch(async (_input, init) => {
+            observedHeaders = init.headers;
+            return new Response('ok');
+        });
+        await fetchUpstream('https://example.test', { headers: { 'user-agent': 'Mozilla/5.0' } });
+        assert.deepEqual(observedHeaders, { 'user-agent': 'Mozilla/5.0' });
+    });
+
+    it('respects a User-Agent carried in a Headers instance', async () => {
+        setUpstreamUserAgent('MyIP/v0.0.0/https://example.test');
+        let observedHeaders;
+        installFetch(async (_input, init) => {
+            observedHeaders = init.headers;
+            return new Response('ok');
+        });
+        const headers = new Headers({ 'User-Agent': 'Mozilla/5.0' });
+        await fetchUpstream('https://example.test', { headers });
+        assert.equal(observedHeaders, headers);
     });
 });
