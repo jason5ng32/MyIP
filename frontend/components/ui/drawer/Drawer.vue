@@ -16,6 +16,11 @@ defineProps({
   setBackgroundColorOnScale: { type: Boolean, default: false },
   // 关闭时是否处理 body 滚动锁
   dismissible: { type: Boolean, default: true },
+  // Keep vaul away from body styles. Its Safari-only position:fixed scroll
+  // lock zeroes window.scrollY and restores it via a rAF scrollTo, which is
+  // unreliable on WebKit. reka-ui's own scroll lock (overflow:hidden + iOS
+  // touchmove guard, same as Sheet/Dialog) already covers us.
+  noBodyStyles: { type: Boolean, default: true },
   // snap 点（数组，0~1 之间或 px 字符串）；不传则自由高度
   snapPoints: { type: Array, default: undefined },
   activeSnapPoint: { type: [Number, String], default: undefined },
@@ -36,6 +41,7 @@ defineEmits(['update:open', 'update:activeSnapPoint']);
     :should-scale-background="shouldScaleBackground"
     :set-background-color-on-scale="setBackgroundColorOnScale"
     :dismissible="dismissible"
+    :no-body-styles="noBodyStyles"
     :snap-points="snapPoints"
     :active-snap-point="activeSnapPoint"
     :handle-only="handleOnly"
