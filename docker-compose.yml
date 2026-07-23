@@ -1,5 +1,4 @@
 # docker-compose up -d
-version: '3'
 services:
     myip:
         container_name: myip
