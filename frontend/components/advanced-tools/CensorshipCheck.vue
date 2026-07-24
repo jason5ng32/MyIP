@@ -26,7 +26,9 @@
             <div v-if="hasData" class="space-y-3">
                 <!-- Summary banner -->
                 <div class="flex items-start gap-2 p-3 rounded-md border text-sm" :class="historyBannerClass">
-                    <component :is="historyBannerIcon" class="size-4 mt-0.5 shrink-0" />
+                    <ShieldAlert v-if="flagged.length > 0" class="size-4 mt-0.5 shrink-0" />
+                    <Meh v-else-if="isSparse" class="size-4 mt-0.5 shrink-0" />
+                    <ShieldCheck v-else class="size-4 mt-0.5 shrink-0" />
                     <span class="leading-relaxed">{{ summaryText }}</span>
                 </div>
 
@@ -136,8 +138,48 @@
 
                         <!-- Right: raw results only, no verdict. The pre-run hint
                              centers on both axes of the column -->
-                        <div class="col-span-3" :class="runStarted ? '' : 'flex items-center justify-center'">
-                            <CensorshipTable v-if="runStarted" :rows="testRows" />
+                        <div class="col-span-3 shadow-inner md:shadow-none"
+                            :class="runStarted ? '' : 'flex items-center justify-center'">
+                            <div v-if="runStarted" class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b">
+                                            <th v-for="key in ['Country', 'Status', 'City', 'Network']" :key="key"
+                                                scope="col"
+                                                class="text-left px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide text-nowrap">
+                                                {{ t('censorshipcheck.' + key) }}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y">
+                                        <tr v-for="(result, idx) in testRows"
+                                            :key="result.country + '-' + result.city + '-' + idx"
+                                            class="hover:bg-muted/50 transition-colors">
+                                            <td class="px-3 py-2 whitespace-nowrap">
+                                                <div class="flex items-center gap-1.5">
+                                                    <Icon :icon="'circle-flags:' + result.country.toLowerCase()"
+                                                        class="shrink-0 size-4" />
+                                                    <span>{{ result.country_name }}</span>
+                                                </div>
+                                            </td>
+                                            <!-- finished → check; failed → cross; in-progress →
+                                                 spinner; pre-run placeholder → muted dash -->
+                                            <td class="px-3 py-2">
+                                                <CircleCheck v-if="result.status === 'finished'"
+                                                    class="size-4 text-success" />
+                                                <CircleX v-else-if="result.status === 'failed'"
+                                                    class="size-4 text-destructive" />
+                                                <Spinner v-else-if="result.status === 'in-progress'"
+                                                    class="size-4 text-info" />
+                                                <span v-else class="text-muted-foreground">—</span>
+                                            </td>
+                                            <td class="px-3 py-2 text-muted-foreground">{{ result.city }}</td>
+                                            <td class="px-3 py-2 text-muted-foreground truncate max-w-100"
+                                                :title="result.network">{{ result.network }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             <p v-else class="px-4 py-6 text-sm text-muted-foreground text-center">
                                 {{ t('censorshipcheck.ResultsHint') }}
                             </p>
@@ -156,7 +198,7 @@
 </template>
 
 <script setup>
-import { ref, computed, h } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -256,7 +298,8 @@ const methodList = (c) => Object.entries(c.methods || {})
     .map(([type]) => type);
 
 // History banner: worst flagged tier decides the tone; a clean-but-sparse
-// result stays neutral instead of green.
+// result stays neutral instead of green. (The matching icon branches live
+// in the template.)
 const historyBannerClass = computed(() => {
     if (flagged.value.some((c) => c.tier === 'confirmed' || c.tier === 'likely')) {
         return 'border-destructive/30 bg-destructive/10 text-destructive';
@@ -264,10 +307,6 @@ const historyBannerClass = computed(() => {
     if (flagged.value.length > 0) return 'border-warning/30 bg-warning/10 text-warning';
     if (isSparse.value) return 'border-info/30 bg-info/10 text-info';
     return 'border-success/30 bg-success/10 text-success';
-});
-const historyBannerIcon = computed(() => {
-    if (flagged.value.length > 0) return ShieldAlert;
-    return isSparse.value ? Meh : ShieldCheck;
 });
 
 // —— country picker: three checkbox sections over one shared selection ——
@@ -341,46 +380,6 @@ const testRows = computed(() => activeTestCountries.value.flatMap((cc) => {
     if (rows.length > 0) return rows;
     return [placeholderRow(cc, 'waiting')];
 }));
-
-// ——— Shared table rendering as an inline functional component ———
-const CensorshipTable = (props) => h('div', { class: 'overflow-x-auto' },
-    h('table', { class: 'w-full text-sm' }, [
-        h('thead', {},
-            h('tr', { class: 'border-b' },
-                ['Country', 'Status', 'City', 'Network'].map(key =>
-                    h('th', {
-                        scope: 'col',
-                        class: 'text-left px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide',
-                    }, t('censorshipcheck.' + key))
-                )
-            )
-        ),
-        h('tbody', { class: 'divide-y' },
-            props.rows.map((result, idx) => h('tr', {
-                key: result.country + '-' + result.city + '-' + idx,
-                class: 'hover:bg-muted/50 transition-colors',
-            }, [
-                h('td', { class: 'px-3 py-2 whitespace-nowrap' }, h('div', { class: 'flex items-center gap-1.5' }, [
-                    h(Icon, { icon: 'circle-flags:' + result.country.toLowerCase(), class: 'shrink-0 size-4' }),
-                    h('span', {}, result.country_name),
-                ])),
-                h('td', { class: 'px-3 py-2' }, renderStatus(result.status)),
-                h('td', { class: 'px-3 py-2 text-muted-foreground' }, result.city),
-                h('td', { class: 'px-3 py-2 text-muted-foreground truncate max-w-[160px]', title: result.network }, result.network),
-            ]))
-        ),
-    ])
-);
-CensorshipTable.props = ['rows'];
-
-// Status icon rendering: finished → success check; failed → failure cross;
-// in-progress → Spinner; anything else (pre-run placeholder) → muted dash.
-const renderStatus = (status) => {
-    if (status === 'finished') return h(CircleCheck, { class: 'size-4 text-success' });
-    if (status === 'failed') return h(CircleX, { class: 'size-4 text-destructive' });
-    if (status === 'in-progress') return h(Spinner, { class: 'size-4 text-info' });
-    return h('span', { class: 'text-muted-foreground' }, '—');
-};
 
 const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
