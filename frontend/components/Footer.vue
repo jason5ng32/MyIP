@@ -201,6 +201,7 @@ const acknowledgementsList = [
   { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
   { name: 'Digital Defense', link: 'https://digital-defense.io/' },
   { name: 'RIPE NCC', link: 'https://stat.ripe.net/' },
+  { name: 'OONI', link: 'https://ooni.org/' },
   { name: 'CAIDA', link: 'https://www.caida.org/' },
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
   { name: 'Claude', link: 'https://claude.ai/' },
