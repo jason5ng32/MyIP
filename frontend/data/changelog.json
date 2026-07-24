@@ -1465,5 +1465,47 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.2.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Rebuilt the Censorship Check: see where a website is blocked worldwide and by what means",
+          "zh": "全面重构封锁测试，可以查询一个网站在全球的封锁情况和被封锁手段",
+          "fr": "Refonte complète du test de censure : découvrez où un site est bloqué dans le monde et par quels moyens",
+          "ru": "Полностью переработана проверка цензуры: видно, где в мире сайт заблокирован и какими методами"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Increased probe counts for the MTR and Global Latency tests",
+          "zh": "提高 MTR 测试和全球延迟测试的探针数量",
+          "fr": "Augmentation du nombre de sondes pour les tests MTR et de latence mondiale",
+          "ru": "Увеличено число зондов в тестах MTR и глобальной задержки"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the stability of the Service Status tool",
+          "zh": "提升「服务可用性」高级工具的稳定性",
+          "fr": "Amélioration de la stabilité de l'outil Disponibilité des services",
+          "ru": "Повышена стабильность инструмента «Статус сервисов»"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Minor issues fixed",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые мелкие проблемы"
+        }
+      }
+    ]
   }
 ]
