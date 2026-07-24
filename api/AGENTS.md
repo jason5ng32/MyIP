@@ -14,8 +14,9 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `asn-history` / `asn-connectivity` / `service-status` /
-`google-map` / `github-stars` / `invisibility-test` / `dns-leak-test`), user
+`cf-radar` / `asn-history` / `asn-connectivity` / `ooni-blocking` /
+`service-status` / `google-map` / `github-stars` / `invisibility-test` /
+`dns-leak-test`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
@@ -63,6 +64,8 @@ these checks:
 
 - `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
 - `requireValidIP()` — per-route for `?ip=`; handler sees a well-formed IP.
+- `requireValidDomain()` — `?domain=`, lowercases in place so the edge cache
+  sees one canonical key.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
 - `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric

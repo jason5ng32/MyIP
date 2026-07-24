@@ -4,7 +4,7 @@
 // carrying the defensive checks and can't accidentally forget them.
 
 import { refererCheck } from './referer-check.js';
-import { isValidIP } from './valid-ip.js';
+import { isValidIP, isValidDomain } from './valid-ip.js';
 import { isValidBgpPrefix } from './bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 
@@ -31,6 +31,23 @@ export const requireValidIP = (paramName = 'ip') => (req, res, next) => {
     if (!isValidIP(ip)) {
         return res.status(400).json({ error: 'Invalid IP address' });
     }
+    next();
+};
+
+// Reject requests without a syntactically valid domain in the specified
+// query param. Lowercases the value in place so handlers and the edge cache
+// see one canonical form (domains are case-insensitive; a mixed-case query
+// must not become a distinct CF cache entry).
+export const requireValidDomain = (paramName = 'domain') => (req, res, next) => {
+    const raw = req.query[paramName];
+    if (!raw) {
+        return res.status(400).json({ error: 'No domain provided' });
+    }
+    const domain = String(raw).toLowerCase();
+    if (!isValidDomain(domain)) {
+        return res.status(400).json({ error: 'Invalid domain' });
+    }
+    req.query[paramName] = domain;
     next();
 };
 

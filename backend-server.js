@@ -7,7 +7,7 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN, requireValidProviderId, requireValidReportId } from './common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId, requireValidReportId } from './common/guards.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -23,6 +23,7 @@ import maxmindHandler from './api/maxmind.js';
 import cfHander from './api/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
+import ooniBlockingHandler from './api/ooni-blocking.js';
 import dnsResolver from './api/dns-resolver.js';
 import serviceStatusHandler, {
     detailHandler as serviceStatusDetailHandler,
@@ -248,6 +249,10 @@ app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
 app.get('/api/configs', cacheable(ONE_HOUR_CACHE), validateConfigs);
+// OONI aggregates cover a 30-day window aligned to UTC days — the payload
+// only drifts as new measurements land, so 1 day of edge cache keeps us polite
+// to OONI's free API without the view going meaningfully stale.
+app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), ooniBlockingHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
