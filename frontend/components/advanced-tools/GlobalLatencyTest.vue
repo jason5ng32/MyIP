@@ -196,7 +196,7 @@ const startPingCheck = () => {
     cleanMap();
 
     runMeasurement({
-        limit: 16,
+        limit: 28,
         locations: GLOBALPING_DEFAULT_LOCATIONS,
         target: targetIP.value,
         type: 'ping',

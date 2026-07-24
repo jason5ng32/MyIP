@@ -30,10 +30,20 @@ import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
 // tools (both POST `limit: 16` against exactly this set). CensorshipCheck keeps
 // its own list because it applies per-country probe limits.
 export const GLOBALPING_DEFAULT_LOCATIONS = [
+    // Asia
     { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-    { country: 'SG' }, { country: 'IN' }, { country: 'RU' }, { country: 'US' },
-    { country: 'CA' }, { country: 'AU' }, { country: 'GB' }, { country: 'DE' },
-    { country: 'FR' }, { country: 'BR' }, { country: 'ZA' }, { country: 'SA' },
+    { country: 'KR' }, { country: 'MY' }, { country: 'ID' }, { country: 'SG' },
+    { country: 'IN' }, { country: 'SA' },
+    // Europe
+    { country: 'GB' }, { country: 'DE' }, { country: 'PL' }, { country: 'FI' },
+    { country: 'FR' }, { country: 'TR' }, { country: 'UA' }, { country: 'RU' },
+    // Africa
+    { country: 'ZA' }, { country: 'NG' }, { country: 'EG' },
+    // Americas
+    { country: 'CA' }, { country: 'US' }, { country: 'MX' }, { country: 'AR' },
+    { country: 'BR' },
+    // Oceania
+    { country: 'NZ' }, { country: 'AU' },
 ];
 
 // Filter the store's collected IP entries down to the ones usable as a

@@ -111,14 +111,17 @@
                                 <tr v-for="hop in result.hops" :key="hop.n" class="hover:bg-muted/50 transition-colors">
                                     <td class="px-3 py-2 font-mono tabular-nums text-muted-foreground">{{ hop.n }}</td>
                                     <td v-if="result.hasHost" class="px-3 py-2 font-mono max-w-56">
-                                        <span v-if="hop.host" class="block truncate" :title="hop.host">{{ hop.host }}</span>
-                                        <span v-else-if="!hop.ip" class="text-muted-foreground italic font-sans">{{ t('mtrtest.NoReply') }}</span>
+                                        <span v-if="hop.host" class="block truncate" :title="hop.host">{{ hop.host
+                                            }}</span>
+                                        <span v-else-if="!hop.ip" class="text-muted-foreground italic font-sans">{{
+                                            t('mtrtest.NoReply') }}</span>
                                         <span v-else class="text-muted-foreground">—</span>
                                     </td>
                                     <td v-if="result.hasIp" class="px-3 py-2 font-mono whitespace-nowrap">
                                         <template v-if="hop.ip">{{ hop.ip }}</template>
                                         <span v-else-if="!result.hasHost && !hop.host"
-                                            class="text-muted-foreground italic font-sans">{{ t('mtrtest.NoReply') }}</span>
+                                            class="text-muted-foreground italic font-sans">{{ t('mtrtest.NoReply')
+                                            }}</span>
                                         <span v-else class="text-muted-foreground">—</span>
                                     </td>
                                     <td v-if="result.hasAsn"
@@ -135,7 +138,8 @@
                         </table>
                     </div>
                     <pre v-else
-                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ result.rawOutput }}</pre>
+                        class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
+                {{ result.rawOutput }}</pre>
                 </AccordionContent>
             </AccordionItem>
         </Accordion>
@@ -196,7 +200,7 @@ const startmtrCheck = () => {
     mtrResults.value = [];
 
     runMeasurement({
-        limit: 16,
+        limit: 28,
         locations: GLOBALPING_DEFAULT_LOCATIONS,
         target: targetIP.value,
         type: 'mtr',

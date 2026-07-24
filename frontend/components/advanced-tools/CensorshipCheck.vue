@@ -5,16 +5,13 @@
 
         <!-- Input area -->
         <div class="space-y-2">
-                <Label for="queryURL">{{ t('censorshipcheck.Note2') }}</Label>
+            <Label for="queryURL">{{ t('censorshipcheck.Note2') }}</Label>
             <div class="flex items-center gap-2">
                 <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true" class="font-mono"
                     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    :disabled="censorshipCheckStatus === 'running'"
-                    :placeholder="t('censorshipcheck.Placeholder')"
+                    :disabled="censorshipCheckStatus === 'running'" :placeholder="t('censorshipcheck.Placeholder')"
                     v-model="queryURL" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
-                <Button variant="action"
-                    :disabled="censorshipCheckStatus === 'running' || !queryURL"
-                    @click="onSubmit">
+                <Button variant="action" :disabled="censorshipCheckStatus === 'running' || !queryURL" @click="onSubmit">
                     <Spinner v-if="censorshipCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />
@@ -52,8 +49,7 @@
         <!-- Bottom conclusion banner (3 states: isBlocked / isDown / notBlocked) —— with fade-slide entrance -->
         <Transition name="fade-slide">
             <div v-if="censorshipCheckStatus === 'finished'"
-                class="flex items-start gap-2 p-3 rounded-md border text-sm"
-                :class="bannerClass">
+                class="flex items-start gap-2 p-3 rounded-md border text-sm" :class="bannerClass">
                 <component :is="bannerIcon" class="size-4 mt-0.5 shrink-0" />
                 <div class="leading-relaxed">
                     {{ bannerText }}
@@ -86,7 +82,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
 
-const highRiskCountries = ['CN', 'RU', 'TR', 'SA'];
+const highRiskCountries = ['CN', 'RU', 'TR', 'SA', 'IR'];
 const censorshipResults = ref([]);
 // status: 'idle' | 'running' | 'finished' | 'error' — driven by the composable
 const { status: censorshipCheckStatus, start: runMeasurement } = useGlobalpingMeasurement({
@@ -188,9 +184,9 @@ const startHttpCheck = (hostname) => {
     runMeasurement({
         locations: [
             { country: 'CN', limit: 2 }, { country: 'RU', limit: 2 },
-            { country: 'TR', limit: 2 }, { country: 'SA', limit: 2 },
+            { country: 'TR', limit: 2 }, { country: 'SA', limit: 2 }, { country: 'IR', limit: 2 },
             { country: 'JP' }, { country: 'US' }, { country: 'CA' }, { country: 'IT' },
-            { country: 'FI' }, { country: 'AU' }, { country: 'FR' }, { country: 'DE' },
+            { country: 'FI' }, { country: 'AU' }, { country: 'FR' }, { country: 'DE' }, { country: 'GB' }, { country: 'NL' },
         ],
         target: hostname,
         type: 'http',
@@ -278,13 +274,16 @@ const calResult = (testResults) => {
 .fade-slide-enter-active {
     transition: all 0.3s ease-out;
 }
+
 .fade-slide-leave-active {
     transition: all 0.2s ease-out;
 }
+
 .fade-slide-enter-from {
     transform: translateY(10px);
     opacity: 0;
 }
+
 .fade-slide-leave-to {
     opacity: 0;
 }

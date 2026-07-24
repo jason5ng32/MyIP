@@ -376,7 +376,7 @@
   },
   "censorshipcheck": {
     "Title": "Test de censorship",
-    "Note": "Vérifie la disponibilité des sites cibles dans quatre régions connues pour une censure internet rigoureuse, incluant : la Chine continentale, l'Arabie Saoudite, la Russie, et la Turquie. Des tests sont également réalisés depuis des régions où l'internet est relativement libre, servant de groupe témoin pour la vérification. Certaines régions disposent de dispositions légales claires sur la censure internet, tandis que d'autres sont plus vagues.",
+    "Note": "Vérifie la disponibilité des sites cibles dans cinq régions connues pour une censure internet rigoureuse, incluant : la Chine continentale, l'Arabie Saoudite, la Russie, la Turquie et l'Iran. Des tests sont également réalisés depuis des régions où l'internet est relativement libre, servant de groupe témoin pour la vérification. Certaines régions disposent de dispositions légales claires sur la censure internet, tandis que d'autres sont plus vagues.",
     "Note2": "Veuillez entrer une URL ou un nom de domaine pour commencer le test de censure :",
     "Note3": "Un site est considéré comme bloqué uniquement si aucun serveur dans le même pays ne peut y accéder.",
     "Placeholder": "URL ou Nom de Domaine",

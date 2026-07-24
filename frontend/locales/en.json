@@ -277,7 +277,7 @@
   },
   "censorshipcheck": {
     "Title": "Censorship Check",
-    "Note": "Checks the availability of target websites in four regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, and Turkey. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
+    "Note": "Checks the availability of target websites in five regions known for rigorous internet censorship, including: Mainland China, Saudi Arabia, Russia, Turkey, and Iran. Tests are also conducted from regions with relatively free internet as a control group for verification. Some regions have clear legal provisions for internet censorship, while others are more vague.",
     "Note2": "Please enter a URL or domain name to start the censorship test:",
     "Note3": "A website is only considered blocked if it cannot be accessed from all servers within the same country.",
     "Placeholder": "URL or Domain Name",
