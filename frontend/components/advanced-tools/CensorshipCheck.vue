@@ -94,7 +94,8 @@
                         <h3 class="text-sm font-semibold m-0">{{ t('censorshipcheck.RealtimeTitle') }}</h3>
                         <Button variant="action" size="sm" class="ml-auto cursor-pointer"
                             :disabled="selectedCountries.length === 0 || overLimit || running"
-                            :title="overLimit ? t('censorshipcheck.GroupFull') : ''" @click="runTest">
+                            :title="overLimit ? t('globalping.GroupFull', { max: MAX_TEST_COUNTRIES }) : ''"
+                            @click="runTest">
                             <Spinner v-if="censorshipCheckStatus === 'running'" />
                             <Play v-else class="size-4 shrink-0" />
                             {{ t('censorshipcheck.RunVerify') }}
@@ -102,37 +103,15 @@
                     </header>
 
                     <div class="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x">
-                        <!-- Left: country picker — capped height with inner scroll on
-                             mobile so long flagged lists don't swallow the page -->
-                        <div
-                            class="px-4 py-3 space-y-4 col-span-1 max-h-72 overflow-y-auto md:max-h-none md:overflow-visible">
-                            <!-- Selection tally lives with the checkboxes it counts;
-                                 only the numerator turns red past the cap -->
-                            <div class="text-xs text-muted-foreground">
-                                {{ t('censorshipcheck.SelectedLabel') }}
-                                <span :class="overLimit ? 'text-destructive font-semibold' : ''">{{
-                                    selectedCountries.length }}</span>/{{ MAX_TEST_COUNTRIES }}
-                            </div>
-                            <div v-for="section in sections" :key="section.key" class="space-y-2">
-                                <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                                    <Checkbox :model-value="sectionState(section)" :disabled="running"
-                                        @update:model-value="(v) => toggleSection(section, v)">
-                                        <Minus v-if="sectionState(section) === 'indeterminate'" class="size-3" />
-                                        <Check v-else class="size-3.5" />
-                                    </Checkbox>
-                                    {{ t('censorshipcheck.' + section.titleKey) }}
-                                </label>
-                                <div class="flex flex-col gap-1.5 pl-6">
-                                    <label v-for="cc in section.countries" :key="section.key + '-' + cc"
-                                        class="flex items-center gap-2 text-sm min-w-0"
-                                        :class="countryDisabled(cc) ? 'opacity-50' : 'cursor-pointer'"
-                                        :title="countryTitle(cc)">
-                                        <Checkbox :model-value="isChecked(cc)" :disabled="countryDisabled(cc)"
-                                            @update:model-value="(v) => setCountry(cc, v)" />
-                                        <Icon :icon="'circle-flags:' + cc.toLowerCase()" class="shrink-0 size-3.5" />
-                                        <span class="truncate">{{ countryName(cc) }}</span>
-                                    </label>
-                                </div>
+                        <!-- Left: suggestion sections (flagged / high-risk / open) +
+                             the picker's own continent catalog. -->
+                        <div class="col-span-1" :class="runStarted
+                                ? 'max-h-72 overflow-y-auto md:max-h-none md:overflow-visible md:relative md:min-h-96'
+                                : 'max-h-72 md:max-h-128 overflow-y-auto'">
+                            <div class="px-4 py-3"
+                                :class="runStarted ? 'md:absolute md:inset-0 md:overflow-y-auto' : ''">
+                                <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
+                                    :max="MAX_TEST_COUNTRIES" :disabled="running" />
                             </div>
                         </div>
 
@@ -204,18 +183,17 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
-import { getProbeCountries } from '@/utils/globalping-probes.js';
+import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
 import { isValidDomain } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import {
-    Activity, Check, CircleCheck, CircleX, Meh, Minus, ShieldAlert, ShieldCheck, Play, TriangleAlert,
+    Activity, CircleCheck, CircleX, Meh, ShieldAlert, ShieldCheck, Play, TriangleAlert,
 } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
@@ -228,7 +206,7 @@ const lang = computed(() => store.lang);
 // share one selection and one cap: MAX_TEST_COUNTRIES.
 const HIGH_RISK_COUNTRIES = ['CN', 'RU', 'TR', 'SA', 'IR'];
 const OPEN_COUNTRIES = ['US', 'DE', 'JP', 'SG'];
-const MAX_TEST_COUNTRIES = 12;
+const MAX_TEST_COUNTRIES = 15;
 const PROBES_PER_COUNTRY = 2;
 
 // OONI tier / blocking-method display maps (tiers computed by the backend,
@@ -252,9 +230,6 @@ const currentHostname = ref('');
 // —— OONI history state ——
 const ooniStatus = ref('idle');  // 'idle' | 'running' | 'finished' | 'error'
 const ooniData = ref(null);
-// null until loaded; buttons fail open while unknown (Globalping partially
-// allocates, so a stale "available" only costs one empty location).
-const probeCountries = ref(null);
 
 // —— realtime test state ——
 const selectedCountries = ref([]);   // checked countries across all sections
@@ -309,55 +284,24 @@ const historyBannerClass = computed(() => {
     return 'border-success/30 bg-success/10 text-success';
 });
 
-// —— country picker: three checkbox sections over one shared selection ——
-// A country appearing in two sections (e.g. CN both flagged and high-risk)
-// is one entry in selectedCountries — both checkboxes reflect it. Checking
-// is never capped; going past MAX_TEST_COUNTRIES turns the tally red and
-// locks the run button until the user deselects.
+// —— country picker: suggestion sections for the shared picker component ——
+// (which appends the full continent catalog itself). Selection is never
+// hard-capped; past MAX_TEST_COUNTRIES the picker's tally turns red and the
+// run button locks until the user deselects.
 const overLimit = computed(() => selectedCountries.value.length > MAX_TEST_COUNTRIES);
 const running = computed(() => censorshipCheckStatus.value === 'running');
 const runStarted = computed(() => running.value || censorshipCheckStatus.value === 'finished');
-const hasProbes = (cc) => probeCountries.value === null || probeCountries.value.has(cc);
 
-const sections = computed(() => {
+const pickerSections = computed(() => {
     const list = [];
     const flaggedCcs = flagged.value.map((c) => c.country);
-    if (flaggedCcs.length > 0) list.push({ key: 'flagged', titleKey: 'SectionFlagged', countries: flaggedCcs });
-    list.push({ key: 'highrisk', titleKey: 'PresetHighRisk', countries: HIGH_RISK_COUNTRIES });
-    list.push({ key: 'open', titleKey: 'PresetOpen', countries: OPEN_COUNTRIES });
+    if (flaggedCcs.length > 0) {
+        list.push({ key: 'flagged', label: t('censorshipcheck.SectionFlagged'), countries: flaggedCcs });
+    }
+    list.push({ key: 'highrisk', label: t('censorshipcheck.PresetHighRisk'), countries: HIGH_RISK_COUNTRIES });
+    list.push({ key: 'open', label: t('censorshipcheck.PresetOpen'), countries: OPEN_COUNTRIES });
     return list;
 });
-
-const isChecked = (cc) => selectedCountries.value.includes(cc);
-const countryDisabled = (cc) => running.value || (!isChecked(cc) && !hasProbes(cc));
-const countryTitle = (cc) => (!isChecked(cc) && !hasProbes(cc) ? t('censorshipcheck.NoProbe') : '');
-const setCountry = (cc, checked) => {
-    if (checked) {
-        if (!isChecked(cc) && !countryDisabled(cc)) {
-            selectedCountries.value = [...selectedCountries.value, cc];
-        }
-    } else {
-        selectedCountries.value = selectedCountries.value.filter((c) => c !== cc);
-    }
-};
-
-// Section-level select-all: operates on the section's probe-having countries.
-const sectionSelectable = (section) => section.countries.filter(hasProbes);
-const sectionMissing = (section) => sectionSelectable(section).filter((cc) => !isChecked(cc));
-const sectionState = (section) => {
-    const selectable = sectionSelectable(section);
-    if (selectable.length > 0 && selectable.every(isChecked)) return true;
-    return section.countries.some(isChecked) ? 'indeterminate' : false;
-};
-const toggleSection = (section, checked) => {
-    if (running.value) return;
-    if (checked === true) {
-        selectedCountries.value = [...selectedCountries.value, ...sectionMissing(section)];
-    } else {
-        const drop = new Set(section.countries);
-        selectedCountries.value = selectedCountries.value.filter((cc) => !drop.has(cc));
-    }
-};
 
 // Result rows for the right column. While running, every country is padded
 // to PROBES_PER_COUNTRY spinner rows up front so arriving results replace
@@ -429,14 +373,6 @@ const queryOoni = async (hostname) => {
         // realtime module below stays fully usable via the preset sections.
         console.error('Error fetching OONI blocking data:', error);
         ooniStatus.value = 'error';
-    }
-    // Warm the probe-country set either way — the picker renders on both
-    // paths; fail-open on error (checkboxes stay enabled, partial allocation
-    // copes).
-    if (probeCountries.value === null) {
-        getProbeCountries()
-            .then((set) => { probeCountries.value = set; })
-            .catch(() => { /* keep fail-open */ });
     }
 };
 

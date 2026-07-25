@@ -26,25 +26,20 @@
 import { ref, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
 
-// Default 16-country probe spread shared by the MtrTest and GlobalLatencyTest
-// tools (both POST `limit: 16` against exactly this set). CensorshipCheck keeps
-// its own list because it applies per-country probe limits.
-export const GLOBALPING_DEFAULT_LOCATIONS = [
-    // Asia
-    { country: 'HK' }, { country: 'TW' }, { country: 'CN' }, { country: 'JP' },
-    { country: 'KR' }, { country: 'MY' }, { country: 'ID' }, { country: 'SG' },
-    { country: 'IN' }, { country: 'SA' },
-    // Europe
-    { country: 'GB' }, { country: 'DE' }, { country: 'PL' }, { country: 'FI' },
-    { country: 'FR' }, { country: 'TR' }, { country: 'UA' }, { country: 'RU' },
-    // Africa
-    { country: 'ZA' }, { country: 'NG' }, { country: 'EG' },
-    // Americas
-    { country: 'CA' }, { country: 'US' }, { country: 'MX' }, { country: 'AR' },
-    { country: 'BR' },
-    // Oceania
-    { country: 'NZ' }, { country: 'AU' },
+// Curated 28-country spread shared by the MtrTest and GlobalLatencyTest
+// tools: their picker's "suggested" section and default selection. The full
+// per-continent catalog comes from the live probe inventory
+// (utils/globalping-probes.js); CensorshipCheck keeps its own suggestion
+// lists because its sections are censorship-oriented, not geographic.
+export const GLOBALPING_SUGGESTED_COUNTRIES = [
+    'HK', 'TW', 'CN', 'JP', 'KR', 'MY', 'ID', 'SG', 'IN', 'SA',
+    'GB', 'DE', 'PL', 'FI', 'FR', 'TR', 'UA', 'RU',
+    'ZA', 'NG', 'EG',
+    'CA', 'US', 'MX', 'AR', 'BR',
+    'NZ', 'AU',
 ];
+// Shared cap for user-composed Globalping runs (one probe per country).
+export const GLOBALPING_MAX_COUNTRIES = 30;
 
 // Filter the store's collected IP entries down to the ones usable as a
 // measurement target: a truthy `ip` free of spaces (the store sometimes holds

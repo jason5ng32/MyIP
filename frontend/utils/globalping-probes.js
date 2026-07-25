@@ -1,33 +1,26 @@
-// Session-cached lookup of which countries currently have online Globalping
-// probes. Drives CensorshipCheck's "add to realtime verification" buttons:
-// a country without probes gets a disabled button up front instead of a
-// dead-end measurement. The list changes slowly, so one fetch per session
-// is plenty; a failed fetch clears the cache so the next call can retry,
-// and callers treat "unknown" as available (fail-open — Globalping's
-// partial allocation just skips locations it can't fill).
+// Session-cached inventory of countries that currently have online
+// Globalping probes, grouped into the five continent buckets the country
+// pickers display. Served by our backend (/api/globalping-probes).
 
 import { fetchWithTimeout } from './fetch-with-timeout.js';
 
-const PROBES_URL = 'https://api.globalping.io/v1/probes';
-const REQUEST_TIMEOUT_MS = 10000;
+let inventoryPromise = null;
 
-let probeCountriesPromise = null;
-
-export const getProbeCountries = () => {
-    if (!probeCountriesPromise) {
-        probeCountriesPromise = (async () => {
-            const response = await fetchWithTimeout(PROBES_URL, { timeoutMs: REQUEST_TIMEOUT_MS });
+// Resolves to { countries: Set<cc>, continents: [{ key, countries: [cc] }] }.
+export const getProbeInventory = () => {
+    if (!inventoryPromise) {
+        inventoryPromise = (async () => {
+            const response = await fetchWithTimeout('/api/globalping-probes');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const probes = await response.json();
-            return new Set(
-                (Array.isArray(probes) ? probes : [])
-                    .map((p) => p?.location?.country)
-                    .filter(Boolean)
-            );
+            const data = await response.json();
+            return {
+                countries: new Set(Array.isArray(data.countries) ? data.countries : []),
+                continents: Array.isArray(data.continents) ? data.continents : [],
+            };
         })().catch((err) => {
-            probeCountriesPromise = null;
+            inventoryPromise = null;
             throw err;
         });
     }
-    return probeCountriesPromise;
+    return inventoryPromise;
 };
