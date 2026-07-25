@@ -24,6 +24,7 @@ import cfHander from './api/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
+import globalpingProbesHandler from './api/globalping-probes.js';
 import dnsResolver from './api/dns-resolver.js';
 import serviceStatusHandler, {
     detailHandler as serviceStatusDetailHandler,
@@ -230,6 +231,7 @@ app.use('/api', requireReferer);
 const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
 const ONE_DAY_CACHE = 24 * 60 * 60;
+const SEVEN_DAYS_CACHE = 7 * 24 * 60 * 60;
 const THIRTY_DAYS_CACHE = 30 * 24 * 60 * 60;
 const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 
@@ -253,6 +255,9 @@ app.get('/api/configs', cacheable(ONE_HOUR_CACHE), validateConfigs);
 // only drifts as new measurements land, so 1 day of edge cache keeps us polite
 // to OONI's free API without the view going meaningfully stale.
 app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), ooniBlockingHandler);
+// Which countries have online Globalping probes — coverage changes slowly,
+// and the pickers fail open anyway, so a week of edge cache is fine.
+app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
