@@ -1471,7 +1471,7 @@
     "date": "Beta",
     "content": [
       {
-        "type": "improve",
+        "type": "add",
         "change": {
           "en": "Rebuilt the Censorship Check: see where a website is blocked worldwide and by what means",
           "zh": "全面重构封锁测试，可以查询一个网站在全球的封锁情况和被封锁手段",
@@ -1480,12 +1480,12 @@
         }
       },
       {
-        "type": "improve",
+        "type": "add",
         "change": {
-          "en": "Increased probe counts for the MTR and Global Latency tests",
-          "zh": "提高 MTR 测试和全球延迟测试的探针数量",
-          "fr": "Augmentation du nombre de sondes pour les tests MTR et de latence mondiale",
-          "ru": "Увеличено число зондов в тестах MTR и глобальной задержки"
+          "en": "MTR, Global Latency and Censorship tests now let you pick countries from all available Globalping probes, grouped by continent",
+          "zh": "MTR 测试、全球延迟测试和封锁测试支持从全球可用探针中按大洲自选国家/地区",
+          "fr": "Les tests MTR, latence mondiale et censure permettent de choisir les pays parmi toutes les sondes Globalping disponibles, groupées par continent",
+          "ru": "В тестах MTR, глобальной задержки и цензуры можно выбирать страны из всех доступных зондов Globalping, сгруппированных по континентам"
         }
       },
       {

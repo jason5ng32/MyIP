@@ -402,13 +402,10 @@
     "MethodHttpFailure": "连接失败",
     "MethodHttpDiff": "内容篡改",
     "RealtimeTitle": "实时测试",
-    "ResultsHint": "点击「开始实时测试」后，结果将显示在这里。",
-    "SelectedLabel": "已选",
+    "ResultsHint": "选择探针并点击「开始实时测试」后，结果将显示在这里。",
     "SectionFlagged": "命中封锁国家",
     "PresetHighRisk": "审查严重国家",
     "PresetOpen": "通常开放国家",
-    "NoProbe": "该国家/地区暂无可用的实时探针",
-    "GroupFull": "最多 12 个国家/地区，请先取消部分勾选",
     "RunVerify": "开始实时测试",
     "RealtimeNote": "你可以选择多个探针进行实时的连通性测试，以综合判断网站的封锁情况。当运行测试时，每个国家将运行 2 个探针进行测试，当 2 个探针的结果相同时，可信性较高。",
     "RealtimeFooterNote": "实时探针大多位于数据中心网络，结果可能与实际来自居民网络的历史观测不一致，因为有些网站可能会屏蔽数据中心网络的访问。请将实际情况综合判断。"
@@ -836,6 +833,18 @@
       "good": "良好",
       "great": "优秀"
     }
+  },
+  "globalping": {
+    "Selected": "已选地区：",
+    "Suggested": "推荐地区",
+    "NoProbe": "该国家/地区暂无可用探针",
+    "GroupFull": "最多 {max} 个国家/地区，请先取消部分勾选",
+    "ResultsHint": "选择探针并运行测试后，结果将显示在这里。",
+    "Asia": "亚洲",
+    "Europe": "欧洲",
+    "Africa": "非洲",
+    "Americas": "美洲",
+    "Oceania": "大洋洲"
   },
   "pingtest": {
     "EnterIPLabel": "输入要测试的 IP",

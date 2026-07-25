@@ -402,13 +402,10 @@
     "MethodHttpFailure": "Échec de connexion",
     "MethodHttpDiff": "Altération du contenu",
     "RealtimeTitle": "Test en temps réel",
-    "ResultsHint": "Les résultats s'afficheront ici après le lancement du test.",
-    "SelectedLabel": "Sélection :",
+    "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
     "SectionFlagged": "Pays signalés",
     "PresetHighRisk": "Pays à forte censure",
     "PresetOpen": "Pays généralement ouverts",
-    "NoProbe": "Aucune sonde en temps réel disponible dans ce pays/région",
-    "GroupFull": "12 pays/régions maximum — décochez-en d'abord",
     "RunVerify": "Lancer le test en temps réel",
     "RealtimeNote": "Vous pouvez sélectionner plusieurs sondes pour des tests de connectivité en temps réel afin d'évaluer globalement le blocage du site. Lors du test, 2 sondes seront exécutées par pays ; des résultats identiques entre les deux sondes garantissent une fiabilité plus élevée.",
     "RealtimeFooterNote": "Les sondes en temps réel sont surtout hébergées dans des centres de données ; leurs résultats peuvent différer des observations résidentielles réelles, car certains sites web peuvent bloquer l'accès depuis les réseaux de centres de données. Interprétez-les ensemble et faites une jugement basé sur la réalité."
@@ -836,6 +833,18 @@
       "good": "Bon",
       "great": "Excellent"
     }
+  },
+  "globalping": {
+    "Selected": "Régions sélectionnées: ",
+    "Suggested": "Régions suggérées",
+    "NoProbe": "Aucune sonde disponible dans ce pays/région",
+    "GroupFull": "{max} pays/régions maximum — décochez-en d'abord",
+    "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
+    "Asia": "Asie",
+    "Europe": "Europe",
+    "Africa": "Afrique",
+    "Americas": "Amériques",
+    "Oceania": "Océanie"
   },
   "pingtest": {
     "EnterIPLabel": "Saisissez une IP à tester",
