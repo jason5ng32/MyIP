@@ -7,8 +7,8 @@
           🚦 {{ t('connectivity.Title') }}
         </h2>
         <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
-          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer"
-            @click="handelCheckStart('manual')" aria-label="Refresh Connectivity Test">
+          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="handelCheckStart('manual')"
+            aria-label="Refresh Connectivity Test">
             <component :is="isStarted ? RotateCw : Play" />
           </Button>
         </JnTooltip>
@@ -82,32 +82,6 @@
       </Card>
     </div>
 
-    <!-- Service Status banner — once a pass settles, point users to the
-         Service Status advanced tool: a failed AI-product check is often the
-         service being down, not the user's connection. fade-slide entrance
-         mirrors the DNS Leak / Censorship conclusion banners. -->
-    <Transition name="fade-slide">
-      <div v-if="showServiceStatusBanner"
-        class="mt-3 flex flex-col md:flex-row items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
-
-        <div class="flex-1 min-w-0 space-y-1.5">
-          <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
-            <Activity class="size-4 text-info shrink-0" />
-            {{ t('connectivity.ServiceStatusBanner.Title') }}
-          </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed m-0">
-            {{ t('connectivity.ServiceStatusBanner.Note') }}
-          </p>
-        </div>
-        <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
-          <Button variant="action" size="sm" @click="openServiceStatus" class="shrink-0 cursor-pointer">
-            <span>{{ t('connectivity.ServiceStatusBanner.CTA') }}</span>
-            <ArrowRight class="size-4 ml-1" />
-          </Button>
-        </div>
-      </div>
-    </Transition>
-
     <!-- Add custom test dialog -->
     <Dialog :open="addDialogOpen" @update:open="onAddDialogChange">
       <DialogContent class="max-w-md">
@@ -156,7 +130,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
-  Play, CirclePlus, Frown, Meh, RotateCw, Smile, X, Activity, ArrowRight,
+  Play, CirclePlus, Frown, Meh, RotateCw, Smile, X,
 } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
@@ -585,23 +559,3 @@ watch(allRoundsDone, (v) => { if (v) sendAlert(); });
 
 defineExpose({ checkAllConnectivity, handelCheckStart });
 </script>
-
-<style scoped>
-/* fade-slide — same shape as DnsLeaksTest.vue's enhanced-test banner */
-.fade-slide-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.fade-slide-leave-active {
-  transition: all 0.2s ease-out;
-}
-
-.fade-slide-enter-from {
-  transform: translateY(10px);
-  opacity: 0;
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-}
-</style>

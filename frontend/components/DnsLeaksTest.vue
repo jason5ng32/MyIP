@@ -85,29 +85,15 @@
     </div>
 
     <!-- Enhanced DNS leak test banner — surfaces the deeper tool once the
-         homepage test has resolved (success or timeout). fade-slide
-         transition mirrors CensorshipCheck's conclusion banner. -->
-    <Transition name="fade-slide">
-      <div v-if="showEnhancedBanner"
-        class="mt-3 flex flex-col md:flex-row items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
-
-        <div class="flex-1 min-w-0 space-y-1.5">
-          <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
-            <Sparkles class="size-4 text-info shrink-0" />
-            {{ t('dnsleaktest.EnhancedBanner.Title') }}
-          </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed m-0">
-            {{ t('dnsleaktest.EnhancedBanner.Note') }}
-          </p>
-        </div>
-        <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
-          <Button variant="action" size="sm" @click="openEnhancedTest" class="shrink-0 cursor-pointer">
-            <span>{{ t('dnsleaktest.EnhancedBanner.CTA') }}</span>
-            <ArrowRight class="size-4 ml-1" />
-          </Button>
-        </div>
-      </div>
-    </Transition>
+         homepage test has resolved (success or timeout). -->
+    <InfoBanner
+      :show="showEnhancedBanner"
+      :icon="Sparkles"
+      :title="t('dnsleaktest.EnhancedBanner.Title')"
+      :note="t('dnsleaktest.EnhancedBanner.Note')"
+      :cta="t('dnsleaktest.EnhancedBanner.CTA')"
+      @action="openEnhancedTest"
+    />
   </section>
 </template>
 
@@ -125,9 +111,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
 import { createMaskGate } from '@/composables/use-info-mask.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
-import { EthernetPort, Play, MapPin, RotateCw, Sparkles, ArrowRight, DoorOpen } from '@lucide/vue';
+import { EthernetPort, Play, MapPin, RotateCw, Sparkles, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
+import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
   ipApi, surfshark, ipleak, browserleaks, runWithRetry,
@@ -279,23 +266,3 @@ defineExpose({
   leakTest,
 });
 </script>
-
-<style scoped>
-/* fade-slide — same shape as CensorshipCheck.vue's conclusion banner */
-.fade-slide-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.fade-slide-leave-active {
-  transition: all 0.2s ease-out;
-}
-
-.fade-slide-enter-from {
-  transform: translateY(10px);
-  opacity: 0;
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-}
-</style>
