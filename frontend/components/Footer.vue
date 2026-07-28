@@ -204,6 +204,7 @@ const acknowledgementsList = [
   { name: 'Sentry', link: 'https://www.sentry.io/' },
   { name: '1Password', link: 'https://www.1password.com/' },
   { name: 'Greptile', link: 'https://www.greptile.com/' },
+  { name: 'GitBook', link: 'https://www.gitbook.com/' },
   { name: 'Globalping by jsDelivr', link: 'https://globalping.io/' },
   { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
   { name: 'Digital Defense', link: 'https://digital-defense.io/' },
