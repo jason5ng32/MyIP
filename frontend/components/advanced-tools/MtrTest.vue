@@ -44,7 +44,7 @@
                     autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
                     @keyup.enter="startmtrCheck" />
                 <Button variant="action"
-                    :disabled="mtrCheckStatus === 'running' || !targetIP || selectedCountries.length === 0 || overLimit"
+                    :disabled="!canRun"
                     :title="overLimit ? t('globalping.GroupFull', { max: GLOBALPING_MAX_COUNTRIES }) : ''"
                     @click="startmtrCheck" class="cursor-pointer">
                     <Spinner v-if="mtrCheckStatus === 'running'" />
@@ -247,8 +247,17 @@ const { status: mtrCheckStatus, start: runMeasurement } = useGlobalpingMeasureme
     maxRetries: 4,
 });
 
+// Single source of truth for "may this measurement start", shared by the run
+// button and the Enter-key path so the two can't drift apart.
+const canRun = computed(() => mtrCheckStatus.value !== 'running'
+    && !!targetIP.value
+    && selectedCountries.value.length > 0
+    && !overLimit.value);
+
 const startmtrCheck = () => {
-    if (!targetIP.value) return;
+    // Enter on the target input reaches this handler directly, so a disabled
+    // run button alone wouldn't stop an over-limit submission.
+    if (!canRun.value) return;
     trackEvent('Section', 'StartClick', 'MTRTest');
     mtrResults.value = [];
 

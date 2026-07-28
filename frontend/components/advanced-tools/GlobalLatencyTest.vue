@@ -44,7 +44,7 @@
                     autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
                     @keyup.enter="startPingCheck" />
                 <Button variant="action"
-                    :disabled="pingCheckStatus === 'running' || !targetIP || selectedCountries.length === 0 || overLimit"
+                    :disabled="!canRun"
                     :title="overLimit ? t('globalping.GroupFull', { max: GLOBALPING_MAX_COUNTRIES }) : ''"
                     @click="startPingCheck" class="cursor-pointer">
                     <Spinner v-if="pingCheckStatus === 'running'" />
@@ -234,8 +234,17 @@ const latencyToneClass = (ms) => {
     return 'text-warning';
 };
 
+// Single source of truth for "may this measurement start", shared by the run
+// button and the Enter-key path so the two can't drift apart.
+const canRun = computed(() => pingCheckStatus.value !== 'running'
+    && !!targetIP.value
+    && selectedCountries.value.length > 0
+    && !overLimit.value);
+
 const startPingCheck = () => {
-    if (!targetIP.value) return;
+    // Enter on the target input reaches this handler directly, so a disabled
+    // run button alone wouldn't stop an over-limit submission.
+    if (!canRun.value) return;
     trackEvent('Section', 'StartClick', 'GlobalLatency');
     pingResults.value = [];
     cleanMap();
