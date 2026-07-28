@@ -29,6 +29,12 @@ const contentStyle = computed(() => ({
 
 <template>
   <DrawerPortal>
+    <!-- close-auto-focus must be preventDefault'ed: otherwise reka-ui's
+         DialogContentModal calls a bare focus() (no preventScroll) on the
+         trigger when closing. Safari doesn't focus links on click, so the
+         trigger is recorded as the outer tabindex container — focusing it
+         scrolls the page back to the container top. Same handling as Sheet;
+         do not remove. -->
     <DrawerOverlay
       class="fixed inset-0 z-[10000] bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
     />
@@ -39,6 +45,7 @@ const contentStyle = computed(() => ({
       )"
       :style="contentStyle"
       @escape-key-down="$emit('escapeKeyDown', $event)"
+      @close-auto-focus="(e) => e.preventDefault()"
     >
       <DrawerHandle
         v-if="showHandle"

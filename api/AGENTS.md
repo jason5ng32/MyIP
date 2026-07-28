@@ -14,8 +14,9 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `asn-history` / `asn-connectivity` / `service-status` /
-`google-map` / `github-stars` / `invisibility-test` / `dns-leak-test`), user
+`cf-radar` / `asn-history` / `asn-connectivity` / `ooni-blocking` /
+`globalping-probes` / `service-status` / `google-map` / `github-stars` /
+`invisibility-test` / `dns-leak-test`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
@@ -27,6 +28,10 @@ states its route and purpose — read those for specifics.
 - **Every upstream call uses `fetchUpstream`** from
   `common/fetch-with-timeout.js` (8s timeout). Never a bare `fetch()` /
   `https.get()` — a hanging provider must time out, not pin the connection.
+  It also injects a default `User-Agent` of `MyIP/v<version>/<VITE_SITE_URL>`
+  (registered at boot by `common/upstream-ua.js` — some upstream WAFs block
+  undici's default `node` UA); caller-supplied `User-Agent` headers, including
+  the private-API `{ ...req.headers }` pass-through, always win.
 - **Error shape.** `res.status(500).json({ error: error.message })` on
   upstream failure, `400` on bad input. Terse — the frontend doesn't display
   these verbatim.
@@ -59,6 +64,8 @@ these checks:
 
 - `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
 - `requireValidIP()` — per-route for `?ip=`; handler sees a well-formed IP.
+- `requireValidDomain()` — `?domain=`, lowercases in place so the edge cache
+  sees one canonical key.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
 - `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric

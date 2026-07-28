@@ -6,7 +6,8 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 
-// The project's own repository. GitHub requires a User-Agent on every request.
+// The project's own repository. GitHub requires a User-Agent on every
+// request; fetchUpstream's default project UA satisfies that.
 const REPO = 'jason5ng32/MyIP';
 
 export default async (req, res) => {
@@ -20,7 +21,6 @@ export default async (req, res) => {
         const apiRes = await fetchUpstream(`https://api.github.com/repos/${REPO}`, {
             headers: {
                 'Accept': 'application/vnd.github+json',
-                'User-Agent': 'MyIP-IPCheck.ing',
             },
         });
         if (!apiRes.ok) {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requireValidIP, requireValidPrefix, requireValidProviderId, requireValidReportId } from '../common/guards.js';
+import { requireReferer, requireValidIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidReportId } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -186,6 +186,43 @@ describe('requireValidReportId', () => {
             const res = makeRes();
             let nextCalled = false;
             guard(makeParamsReq({ id: bad }), res, () => { nextCalled = true; });
+            assert.equal(res.statusCode, 400, `should reject "${bad}"`);
+            assert.equal(nextCalled, false);
+        }
+    });
+});
+
+describe('requireValidDomain', () => {
+    const guard = requireValidDomain();
+
+    it('calls next() for a valid domain', () => {
+        let nextCalled = false;
+        guard(makeReq({ query: { domain: 'example.com' } }), makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+    });
+
+    it('lowercases the domain in place (canonical cache key)', () => {
+        const req = makeReq({ query: { domain: 'WWW.Example.COM' } });
+        let nextCalled = false;
+        guard(req, makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+        assert.equal(req.query.domain, 'www.example.com');
+    });
+
+    it('returns 400 when the domain is missing', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: {} }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'No domain provided');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 for non-domain inputs', () => {
+        for (const bad of ['not a domain', 'nodot', '1.2.3.4.5.', 'http://example.com', 'exa_mple.com']) {
+            const res = makeRes();
+            let nextCalled = false;
+            guard(makeReq({ query: { domain: bad } }), res, () => { nextCalled = true; });
             assert.equal(res.statusCode, 400, `should reject "${bad}"`);
             assert.equal(nextCalled, false);
         }

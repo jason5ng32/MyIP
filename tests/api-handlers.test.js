@@ -23,6 +23,8 @@ import githubStarsHandler from '../api/github-stars.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
+import ooniBlockingHandler from '../api/ooni-blocking.js';
+import globalpingProbesHandler from '../api/globalping-probes.js';
 import serviceStatusHandler, {
     detailHandler as serviceStatusDetailHandler,
 } from '../api/service-status.js';
@@ -467,5 +469,31 @@ describe('share-report handlers', () => {
         req.params = { id: 'a'.repeat(22) };
         await getReportHandler(req, res);
         assert.equal(res.statusCode, 503);
+    });
+});
+
+// -- ooni-blocking handler -------------------------------------------------
+// Domain presence/shape is enforced by requireValidDomain middleware
+// (tests/guards.test.js); the handler's only pre-fetch branch is the
+// defensive method gate.
+
+describe('ooni-blocking handler', () => {
+    it('rejects non-GET with 405 before hitting OONI', async () => {
+        const res = createResponse();
+        await ooniBlockingHandler(createRequest({ method: 'POST', query: { domain: 'example.com' } }), res);
+        assert.equal(res.statusCode, 405);
+        assert.equal(res.body.error, 'Method Not Allowed');
+    });
+});
+
+// -- globalping-probes handler ----------------------------------------------
+// No params to validate; the only pre-fetch branch is the method gate.
+
+describe('globalping-probes handler', () => {
+    it('rejects non-GET with 405 before hitting Globalping', async () => {
+        const res = createResponse();
+        await globalpingProbesHandler(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+        assert.equal(res.body.error, 'Method Not Allowed');
     });
 });

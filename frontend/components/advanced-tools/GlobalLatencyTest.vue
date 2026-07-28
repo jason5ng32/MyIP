@@ -43,8 +43,10 @@
                     :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
                     autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
                     @keyup.enter="startPingCheck" />
-                <Button variant="action" :disabled="pingCheckStatus === 'running' || !targetIP" @click="startPingCheck"
-                    class="cursor-pointer">
+                <Button variant="action"
+                    :disabled="!canRun"
+                    :title="overLimit ? t('globalping.GroupFull', { max: GLOBALPING_MAX_COUNTRIES }) : ''"
+                    @click="startPingCheck" class="cursor-pointer">
                     <Spinner v-if="pingCheckStatus === 'running'" />
                     <template v-else>
                         <Play class="size-4 shrink-0" />
@@ -60,11 +62,33 @@
             <span class="leading-relaxed">{{ t('pingtest.Error') }}</span>
         </div>
 
-        <!-- Result table -->
-        <Card v-if="pingResults.length > 0">
+        <!-- Country picker (left) + results (right) -->
+        <Card>
             <CardContent class="p-0">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x">
+                    <!-- Left: suggested spread + full continent catalog. Before
+                         results exist the column caps its own height; once the
+                         right column has content, an absolutely-positioned inner
+                         wrapper makes the picker exactly as tall as the results
+                         (the row height comes from the right column alone) -->
+                    <div class="col-span-1"
+                        :class="pingResults.length > 0
+                            ? 'max-h-72 overflow-y-auto md:max-h-none md:overflow-visible md:relative md:min-h-96'
+                            : 'max-h-72 md:max-h-128 overflow-y-auto'">
+                        <div class="px-4 py-3"
+                            :class="pingResults.length > 0 ? 'md:absolute md:inset-0 md:overflow-y-auto' : ''">
+                            <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
+                                :max="GLOBALPING_MAX_COUNTRIES" :disabled="pingCheckStatus === 'running'" />
+                        </div>
+                    </div>
+
+                    <!-- Right: results table + map; hint / spinner before that -->
+                    <div class="col-span-3"
+                        :class="pingResults.length > 0 ? '' : 'flex items-center justify-center'">
+                        <template v-if="pingResults.length > 0">
+                            <div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b">
                                 <th scope="col" v-for="header in headers" :key="header.key"
@@ -110,11 +134,21 @@
                                     {{ result.stats.drop }}
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Map container (svgmap library renders here) -->
+                                <div id="svgMap" class="m-3"></div>
+                            </div>
+                        </template>
+                        <div v-else-if="pingCheckStatus === 'running'" class="px-4 py-6">
+                            <Spinner class="size-5 text-info" />
+                        </div>
+                        <p v-else class="px-4 py-6 text-sm text-muted-foreground text-center">
+                            {{ t('globalping.ResultsHint') }}
+                        </p>
+                    </div>
                 </div>
-                <!-- Map container (svgmap library renders here) -->
-                <div id="svgMap" class="m-3"></div>
             </CardContent>
         </Card>
 
@@ -128,7 +162,8 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
-import { useGlobalpingMeasurement, GLOBALPING_DEFAULT_LOCATIONS, selectableIPs } from '@/composables/use-globalping-measurement';
+import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs } from '@/composables/use-globalping-measurement';
+import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
 import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -152,6 +187,16 @@ const allIPs = computed(() => selectableIPs(store.allIPs));
 
 const selectedIP = ref('');
 const pingResults = ref([]);
+
+// Country picker: the curated spread as a suggested section (selected by
+// default, parity with the old fixed list); the picker itself appends the
+// full per-continent catalog of probe-having countries. Soft cap of
+// GLOBALPING_MAX_COUNTRIES gates the run button, not the checkboxes.
+const selectedCountries = ref([...GLOBALPING_SUGGESTED_COUNTRIES]);
+const overLimit = computed(() => selectedCountries.value.length > GLOBALPING_MAX_COUNTRIES);
+const pickerSections = computed(() => [
+    { key: 'suggested', label: t('globalping.Suggested'), countries: GLOBALPING_SUGGESTED_COUNTRIES },
+]);
 
 // Manual entry is forced when there are no stored IPs (the standalone page,
 // where the homepage never ran). When stored IPs exist, the "use stored IP"
@@ -189,15 +234,24 @@ const latencyToneClass = (ms) => {
     return 'text-warning';
 };
 
+// Single source of truth for "may this measurement start", shared by the run
+// button and the Enter-key path so the two can't drift apart.
+const canRun = computed(() => pingCheckStatus.value !== 'running'
+    && !!targetIP.value
+    && selectedCountries.value.length > 0
+    && !overLimit.value);
+
 const startPingCheck = () => {
-    if (!targetIP.value) return;
+    // Enter on the target input reaches this handler directly, so a disabled
+    // run button alone wouldn't stop an over-limit submission.
+    if (!canRun.value) return;
     trackEvent('Section', 'StartClick', 'GlobalLatency');
     pingResults.value = [];
     cleanMap();
 
     runMeasurement({
-        limit: 16,
-        locations: GLOBALPING_DEFAULT_LOCATIONS,
+        limit: selectedCountries.value.length,
+        locations: selectedCountries.value.map((cc) => ({ country: cc })),
         target: targetIP.value,
         type: 'ping',
         measurementOptions: { packets: 8 },

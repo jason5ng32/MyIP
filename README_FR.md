@@ -92,110 +92,32 @@ Cliquez sur le bouton 'Déployer sur Docker' en haut pour terminer le déploieme
 docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
-## 📚 Variables d'environnement
+## 📖 Documentation
 
-Les variables marquées **Oui** ci-dessous doivent être définies pour que le backend fonctionne correctement. Les identifiants MaxMind sont particulièrement importants — lisez les notes de configuration ci-dessous avant de remplir le tableau.
+Les guides complets se trouvent dans le centre de documentation MyIP : **[docs.ipcheck.ing](https://docs.ipcheck.ing)** (sélecteur de langue en haut à droite)
 
-### Bases de données MaxMind (requis)
+* [Guide du développeur](https://docs.ipcheck.ing/developer) — déploiement, configuration, architecture et contribution
+* [Base de connaissances](https://docs.ipcheck.ing/knowledge-base) — utilisation de chaque outil, diagnostic réseau pas à pas, concepts réseau
 
-MyIP s'appuie sur les bases **GeoLite2** gratuites de MaxMind (City + ASN) pour la géolocalisation IP, la recherche ASN / organisation, et les badges de code pays qui apparaissent partout dans l'application (cartes IP, candidats ICE WebRTC, etc.). Une configuration MaxMind fonctionnelle est nécessaire pour que le backend offre une expérience complète.
+## ⚙️ Configuration
 
-Les fichiers `.mmdb` ne sont **pas inclus dans ce dépôt** car la licence GeoLite2 de MaxMind interdit la redistribution. Vous devez les fournir vous-même. Deux options :
+Deux réglages comptent avant tout :
 
-**Option A — Automatique (recommandée, obligatoire pour Docker)**
-
-1. Créez un compte gratuit sur [maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup).
-2. Générez une clé de licence depuis la page « Manage License Keys » de votre compte.
-3. Définissez ces trois variables d'environnement :
-   ```bash
-   MAXMIND_ACCOUNT_ID="your-account-id"
-   MAXMIND_LICENSE_KEY="your-license-key"
-   MAXMIND_AUTO_UPDATE="true"
-   ```
-4. Démarrez le backend. Environ 60 secondes après le premier démarrage, l'updater téléchargera les deux bases, puis les rafraîchira automatiquement toutes les 24 heures.
-
-> ⚠️ **Les déploiements Docker doivent utiliser l'option A.** Un conteneur neuf est livré avec un répertoire `common/maxmind-db/` vide — sans les trois variables ci-dessus, le backend démarre mais la source IP basée sur MaxMind et les badges de pays WebRTC ne fonctionneront pas, et vous verrez `MaxMind API will return 503...` dans les journaux à chaque démarrage.
-
-**Option B — Manuelle (environnements isolés ou non-Docker)**
-
-Téléchargez `GeoLite2-City.mmdb` et `GeoLite2-ASN.mmdb` depuis votre compte MaxMind et placez-les dans `common/maxmind-db/` avant de démarrer le backend. Dans ce cas, `MAXMIND_AUTO_UPDATE` peut rester à `"false"`, mais vous devrez rafraîchir les fichiers manuellement à chaque nouvelle version publiée par MaxMind.
-
-### Liste des variables d'environnement
-
-| Nom de la variable | Requis | Valeur par défaut | Description |
-| --- | --- | --- | --- |
-| `MAXMIND_ACCOUNT_ID` | **Oui** | `""` | ID de compte MaxMind, associé à `MAXMIND_LICENSE_KEY` pour télécharger les bases GeoLite2. Voir la section MaxMind ci-dessus. |
-| `MAXMIND_LICENSE_KEY` | **Oui** | `""` | Clé de licence MaxMind, associée à `MAXMIND_ACCOUNT_ID`. Voir la section MaxMind ci-dessus. |
-| `MAXMIND_AUTO_UPDATE` | **Oui** | `"false"` | Définissez sur `"true"` pour télécharger automatiquement les bases GeoLite2 environ 60 s après le démarrage et les rafraîchir toutes les 24 h. **Obligatoire pour Docker.** Peut rester à `"false"` uniquement si vous avez pré-déposé les fichiers `.mmdb` manuellement. |
-| `CAIDA_AUTO_UPDATE` | Non | `"false"` | Définissez sur `"true"` pour rafraîchir quotidiennement les jeux de données CAIDA (as2org pour la résolution du nom d'organisation par ASN, as-rel2 pour le graphe de connectivité ASN). Lorsque `"false"`, les snapshots manquants sont quand même téléchargés au démarrage mais ne sont jamais rafraîchis ensuite. |
-| `VITE_GOOGLE_ANALYTICS_ID` | **Oui** | `""` | Identifiant Google Analytics, utilisé pour l'analyse des utilisateurs |
-| `BACKEND_PORT` | Non | `"11966"` | Le port d'exécution de la partie backend du programme |
-| `FRONTEND_PORT` | Non | `"18966"` | Le port d'exécution de la partie frontend du programme |
-| `SECURITY_RATE_LIMIT` | Non | `"0"` | Contrôle le nombre de requêtes qu'une adresse IP peut faire au serveur backend toutes les 60 minutes (réglé sur 0 pour aucune limite) |
-| `SECURITY_DELAY_AFTER` | Non | `"0"` | Contrôle les premières X requêtes d'une adresse IP toutes les 20 minutes qui ne sont pas soumises à des limites de vitesse, et après X requêtes, le délai augmentera |
-| `SECURITY_BLACKLIST_LOG_FILE_PATH` | Non | `""` | Registre local optionnel des IP limitées (ex. `"logs/blacklist-ip.log"`). Vide = aucun fichier n'est écrit ; l'événement est de toute façon toujours journalisé via le logger partagé |
-| `LOG_LEVEL` | Non | `"info"` | Niveau minimum des journaux (`debug` / `info` / `warn` / `error`). Les messages de niveau inférieur sont supprimés. |
-| `LOG_FORMAT` | Non | pretty | Définir sur `"json"` pour émettre un événement JSON par ligne (agrégateurs de logs / jq). Toute autre valeur (ou non défini) conserve la sortie colorée lisible utilisée en dev et lors du tail des logs pm2. |
-| `LOG_HTTP` | Non | `"false"` | Définir sur `"true"` pour activer la journalisation par requête HTTP sur `/api/*` (méthode, URL, statut, temps de réponse). Désactivé par défaut pour garder les logs pm2 légers. Les erreurs 4xx/5xx côté handler sont toujours loguées, que ce drapeau soit activé ou non. |
-| `VITE_SENTRY_DSN_FRONTEND` | Non | `""` | DSN Sentry du frontend (au moment du build). Si vide, aucun code Sentry n'est inclus dans le bundle. Également lu par le backend à l'exécution comme liste blanche pour `/api/monitoring`, le tunnel first-party qui fait passer les enveloppes Sentry malgré les bloqueurs de publicité. Si vous l'intégrez dans une image Docker auto-construite au moment du build, passez aussi la même valeur au conteneur à l'exécution — sinon la route du tunnel reste désactivée |
-| `SENTRY_DSN_BACKEND` | Non | `""` | DSN Sentry du backend (à l'exécution). Si vide, le SDK Sentry n'est jamais chargé |
-| `SENTRY_ENVIRONMENT` | Non | `"production"` | Étiquette d'environnement des événements Sentry du backend. Définir sur `"development"` sur les machines de développement ; le frontend s'étiquette automatiquement |
-| `SENTRY_ORG` | Non | `""` | Slug de l'organisation Sentry, utilisé avec `SENTRY_PROJECT_FRONTEND` et `SENTRY_AUTH_TOKEN` pour téléverser les source maps au moment du build |
-| `SENTRY_PROJECT_FRONTEND` | Non | `""` | Slug du projet Sentry du frontend, pour le téléversement des source maps au moment du build |
-| `SENTRY_AUTH_TOKEN` | Non | `""` | Jeton Sentry activant le téléversement des source maps au moment du build. Secret de build uniquement — jamais exposé au navigateur |
-| `ALLOWED_DOMAINS` | Non | `""` | Domaines autorisés pour l'accès, séparés par des virgules, utilisés pour empêcher une utilisation abusive de l'API backend |
-| `GOOGLE_MAP_API_KEY` | Non | `""` | Clé API pour Google Maps, utilisée pour afficher l'emplacement de l'adresse IP sur une carte |
-| `IPINFO_API_KEY` | Non | `""` | Jeton API pour IPInfo.io, utilisé pour obtenir des informations de géolocalisation sur l'adresse IP via IPInfo.io |
-| `IPAPIIS_API_KEY` | Non | `""` | Clé API pour IPAPI.is, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IPAPI.is |
-| `IP2LOCATION_API_KEY` | Non | `""` | Clé API pour IP2Location.io, utilisée pour obtenir des informations de géolocalisation sur l'adresse IP via IP2Location.io |
-| `CLOUDFLARE_API_KEY` | Non | `""` | Clé API pour Cloudflare, utilisée pour les informations AS ; avec les deux variables KV ci-dessous (et la permission « Workers KV Storage: Edit »), elle alimente aussi le partage de rapports de diagnostic |
-| `CLOUDFLARE_ACCOUNT_ID` | Non | `""` | ID du compte Cloudflare, requis pour stocker les rapports de diagnostic partageables dans Workers KV |
-| `CLOUDFLARE_KV_NAMESPACE_ID` | Non | `""` | ID hexadécimal (pas le nom) de l'espace de noms Workers KV qui stocke les rapports de diagnostic partageables |
-| `RIPESTAT_SOURCE_APP` | Non | `""` | Nom de l'application source pour RIPE.net, utilisé pour obtenir des informations sur l'historique ASN via RIPE.net |
-| `MAC_LOOKUP_API_KEY` | Non | `""` | Clé API pour MAC Lookup, utilisée pour obtenir des informations sur l'adresse MAC via MAC Lookup |
-| `VITE_CURL_IPV4_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv4 pour l'API CURL |
-| `VITE_CURL_IPV6_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine IPv6 pour l'API CURL |
-| `VITE_CURL_IPV64_DOMAIN` | Non | `""` | Fournit aux utilisateurs le domaine à pile double pour l'API CURL |
-
-Il est à noter que si l'une quelconque des variables d'environnement de la série CURL est manquante, l'API CURL ne sera pas activée.
-
-### Utilisation des variables d'environnement dans un environnement Node
-
-Créez les variables d'environnement :
-
-```bash
-cp .env.example .env
-```
-
-Modifiez le fichier `.env`, et par exemple, ajoutez ce qui suit :
-
-```bash
-BACKEND_PORT=11966
-FRONTEND_PORT=18966
-MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
-MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
-MAXMIND_AUTO_UPDATE="true"
-GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
-ALLOWED_DOMAINS="example.com,example.org"
-```
-
-Ensuite, redémarrez le service backend.
-
-### Utilisation des variables d'environnement dans Docker
-
-Vous pouvez ajouter des variables d'environnement lors de l'exécution de Docker, par exemple :
+* **MaxMind GeoLite2 (requis)** — identifiants gratuits pour la géolocalisation IP et les recherches ASN. Sans eux, la source MaxMind renvoie 503. → [Configuration MaxMind](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
+* **`ALLOWED_DOMAINS` (requis sur un vrai domaine)** — liste blanche de noms d'hôte pour l'API backend. Sans elle, toute requête venant d'un domaine autre que localhost reçoit un 403. → [Reverse proxy et domaines](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \
-  -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
-  -e ALLOWED_DOMAINS="example.com,example.org" \
-  --name myip \
+  -e ALLOWED_DOMAINS="your-domain.com" \
+  --name myip --restart always \
   jason5ng32/myip:latest
-
 ```
+
+Tout le reste — clés API optionnelles, sécurité et limitation de débit, journalisation, Sentry, domaines de l'API curl — est documenté dans la [référence des variables d'environnement](https://docs.ipcheck.ing/developer/reference/environment-variables).
+
 
 ## 👩🏻‍💻 Utilisation avancée
 
@@ -229,5 +151,7 @@ En tant que projet open source, je suis très reconnaissant aux sponsors suivant
 <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" title="Greptile" width="240px"  /></a>
 
 <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" title="Sentry" width="240px" /></a>
+
+<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" title="GitBook" width="240px" /></a>
 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>

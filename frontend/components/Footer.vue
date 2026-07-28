@@ -14,6 +14,12 @@
           {{ t('about.Privacy') }}
         </RouterLink>
       </Button>
+      <Button v-if="isDocsConfigured" variant="link" size="default" as-child class="cursor-pointer">
+        <a :href="DOCS_URL" target="_blank" rel="noopener"
+          @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
+          {{ t('about.HelpCenter') }}
+        </a>
+      </Button>
       <Button variant="link" size="default" @click="openAboutTab('changelog', 'Changelog')" class="cursor-pointer">
         {{ t('changelog.Title') }}
       </Button>
@@ -159,6 +165,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/analytics';
+import { DOCS_URL, isDocsConfigured } from '@/composables/use-docs-assistant';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -197,10 +204,12 @@ const acknowledgementsList = [
   { name: 'Sentry', link: 'https://www.sentry.io/' },
   { name: '1Password', link: 'https://www.1password.com/' },
   { name: 'Greptile', link: 'https://www.greptile.com/' },
+  { name: 'GitBook', link: 'https://www.gitbook.com/' },
   { name: 'Globalping by jsDelivr', link: 'https://globalping.io/' },
   { name: 'ProxyCheck.io', link: 'https://proxycheck.io/' },
   { name: 'Digital Defense', link: 'https://digital-defense.io/' },
   { name: 'RIPE NCC', link: 'https://stat.ripe.net/' },
+  { name: 'OONI', link: 'https://ooni.org/' },
   { name: 'CAIDA', link: 'https://www.caida.org/' },
   { name: 'ChatGPT', link: 'https://chatgpt.com/' },
   { name: 'Claude', link: 'https://claude.ai/' },

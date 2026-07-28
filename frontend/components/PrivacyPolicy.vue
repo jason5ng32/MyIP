@@ -45,6 +45,7 @@ import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useMainStore } from '@/store';
 import { isAnalyticsEnabled } from '@/utils/analytics';
+import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
@@ -55,7 +56,7 @@ const store = useMainStore();
 const { isFireBaseSet } = storeToRefs(store);
 
 // Bump when the policy text changes materially.
-const LAST_UPDATED = '2026-07-17';
+const LAST_UPDATED = '2026-07-28';
 
 // Sentry telemetry is a build-time decision (see frontend/AGENTS.md): the
 // section only renders on deployments actually built with a DSN.
@@ -64,6 +65,11 @@ const isSentryEnabled = !!(import.meta.env ?? {}).VITE_SENTRY_DSN_FRONTEND;
 // Report sharing is env-gated on the backend (CLOUDFLARE_* KV variables);
 // the section only renders on deployments where links can actually be made.
 const isReportSharingEnabled = computed(() => store.configs?.reportSharing === true);
+
+// The docs assistant carries its own gate (build-time VITE_DOCS_URL plus the
+// canonical deployment) — same condition as its nav entry point, so the
+// section never describes a feature this deployment doesn't ship.
+const isDocsAssistantEnabled = computed(() => isDocsConfigured && store.configs?.originalSite === true);
 
 // Privacy copy is loaded on demand per locale (mirrors the security-checklist
 // dataset pattern), then merged into i18n so t() / tm() can resolve it.
@@ -104,6 +110,7 @@ watch(locale, async (loc) => {
 const order = computed(() => {
   const ids = ['tools'];
   if (isReportSharingEnabled.value) ids.push('sharedReports');
+  if (isDocsAssistantEnabled.value) ids.push('docsAssistant');
   if (isAnalyticsEnabled) ids.push('analytics');
   if (isFireBaseSet.value) ids.push('account');
   if (isSentryEnabled) ids.push('telemetry');

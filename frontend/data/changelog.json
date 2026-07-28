@@ -1426,7 +1426,7 @@
   },
   {
     "version": "v7.1.0",
-    "date": "Beta",
+    "date": "July 21, 2026",
     "content": [
       {
         "type": "improve",
@@ -1462,6 +1462,66 @@
           "zh": "修复 Whois 查询工具无法查询部分 IP 的错误",
           "fr": "Correction d'un bug qui empêchait la recherche de certains IP avec l'outil Whois",
           "ru": "Исправлен поиск Whois для некоторых IP-адресов"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v7.2.0",
+    "date": "July 28, 2026",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Rebuilt the Censorship Check: see where a website is blocked worldwide and by what means",
+          "zh": "全面重构封锁测试，可以查询一个网站在全球的封锁情况和被封锁手段",
+          "fr": "Refonte complète du test de censure : découvrez où un site est bloqué dans le monde et par quels moyens",
+          "ru": "Полностью переработана проверка цензуры: видно, где в мире сайт заблокирован и какими методами"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "MTR, Global Latency and Censorship tests now let you pick countries from all available Globalping probes, grouped by continent",
+          "zh": "MTR 测试、全球延迟测试和封锁测试支持从全球可用探针中按大洲自选国家/地区",
+          "fr": "Les tests MTR, latence mondiale et censure permettent de choisir les pays parmi toutes les sondes Globalping disponibles, groupées par continent",
+          "ru": "В тестах MTR, глобальной задержки и цензуры можно выбирать страны из всех доступных зондов Globalping, сгруппированных по континентам"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "New AI assistant: IPChecking Copilot answers your questions from the docs, and can read your on-page results with your permission",
+          "zh": "新增 AI 助手 IPChecking Copilot：基于文档回答你的问题，并可在你授权后读取页面上的检测结果",
+          "fr": "Nouvel assistant IA : IPChecking Copilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
+          "ru": "Новый ИИ-помощник IPChecking Copilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "New documentation site for users and developers, with tool guides, network troubleshooting and self-hosting docs",
+          "zh": "新增用户与开发帮助文档，包含工具使用说明、网络问题排查和自部署指南",
+          "fr": "Nouveau site de documentation pour les utilisateurs et les développeurs : guides des outils, dépannage réseau et auto-hébergement",
+          "ru": "Новый сайт документации для пользователей и разработчиков: описания инструментов, диагностика сети и самостоятельный хостинг"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the stability of the Service Status tool",
+          "zh": "提升「服务可用性」高级工具的稳定性",
+          "fr": "Amélioration de la stabilité de l'outil Disponibilité des services",
+          "ru": "Повышена стабильность инструмента «Статус сервисов»"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Minor issues fixed",
+          "zh": "修复了一些小问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые мелкие проблемы"
         }
       }
     ]

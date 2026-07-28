@@ -19,6 +19,14 @@
           "Copier un rapport pour un assistant IA ou le télécharger en JSON se fait entièrement dans votre navigateur et ne stocke rien sur nos serveurs."
         ]
       },
+      "docsAssistant": {
+        "title": "Assistant de documentation",
+        "paragraphs": [
+          "L'assistant de documentation répond aux questions à partir de notre site de documentation. Il ne démarre que lorsque vous l'utilisez : l'assistant est chargé à la demande, et la question que vous saisissez est envoyée à GitBook, qui héberge notre documentation et fournit l'assistant, afin de générer une réponse.",
+          "L'assistant peut aussi lire les résultats de tests actuellement affichés sur votre page — vos adresses IP avec leur localisation et leur réseau, ainsi que les résultats des tests que vous avez lancés. Cela n'arrive jamais en silence : l'assistant doit le demander, et vous l'autorisez via le bouton de confirmation affiché dans la conversation. En cas de refus, il peut toujours répondre à partir de la documentation.",
+          "La conversation se déroule entre votre navigateur et GitBook ; elle ne transite pas par nos serveurs et nous ne la conservons pas. Les conditions de confidentialité de GitBook s'appliquent aux messages que vous envoyez."
+        ]
+      },
       "analytics": {
         "title": "Ce que nous collectons via l'analyse",
         "paragraphs": [

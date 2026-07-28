@@ -35,6 +35,33 @@ export async function fetchWithTimeout(url, init = {}) {
     }
 }
 
-// Back-end preset: 8s default for server-to-server upstream calls.
-export const fetchUpstream = (url, init = {}) =>
-    fetchWithTimeout(url, { timeoutMs: 8000, ...init });
+// Optional User-Agent for fetchUpstream calls. Backend boot injects a
+// project-identifying UA (see common/upstream-ua.js) because some upstream
+// WAFs hard-block undici's default `User-Agent: node`. Injection keeps this
+// file browser-safe: the frontend bundle never touches fs / process.
+let upstreamUserAgent = null;
+
+export const setUpstreamUserAgent = (ua) => {
+    upstreamUserAgent = ua || null;
+};
+
+// True when caller-supplied headers already carry a User-Agent (any casing;
+// plain object or Headers instance) — pass-through handlers forward the
+// visitor's headers and must not have them overridden or duplicated. The
+// array-of-pairs headers form isn't used in this repo; treat it as opting
+// out of injection rather than attempting a merge.
+const headersCarryUA = (h) => {
+    if (!h) return false;
+    if (typeof h.has === 'function') return h.has('user-agent');
+    if (Array.isArray(h)) return true;
+    return Object.keys(h).some((k) => k.toLowerCase() === 'user-agent');
+};
+
+// Back-end preset: 8s default for server-to-server upstream calls, plus the
+// default User-Agent above unless the caller already set one.
+export const fetchUpstream = (url, init = {}) => {
+    const headers = upstreamUserAgent && !headersCarryUA(init.headers)
+        ? { ...init.headers, 'User-Agent': upstreamUserAgent }
+        : init.headers;
+    return fetchWithTimeout(url, { timeoutMs: 8000, ...init, headers });
+};

@@ -131,8 +131,10 @@
                                     {{ fullList[currentList].title }}
                                 </h2>
                                 <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
-                                    <p class="text-sm text-muted-foreground leading-relaxed">
-                                        {{ fullList[currentList].description }}
+                                    <span class="flex items-center">
+                                        <span class="text-sm text-muted-foreground leading-relaxed">
+                                            {{ fullList[currentList].description }}
+                                        </span>
                                         <CollapsibleTrigger v-if="fullList[currentList].intro" as-child>
                                             <button type="button"
                                                 class="inline-flex items-center ml-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -141,7 +143,7 @@
                                                 <Info class="size-3.5" />
                                             </button>
                                         </CollapsibleTrigger>
-                                    </p>
+                                    </span>
                                     <CollapsibleContent>
                                         <div
                                             class="mt-2 p-3 rounded-md bg-muted/50 text-sm text-muted-foreground leading-relaxed">
@@ -163,7 +165,8 @@
                                     countItems({ action: 'total', category: currentList }) -
                                     countItems({ action: 'ignored', category: currentList })
                                     }}
-                                    <span class="opacity-70">(ignored: {{ countItems({ action: 'ignored', category:
+                                    <span class="opacity-70">({{ t('securitychecklist.Ignored') }}: {{ countItems({
+                                        action: 'ignored', category:
                                         currentList }) }})</span>
                                 </span>
                             </div>
@@ -172,17 +175,20 @@
                             <div class="flex justify-start">
                                 <ToggleGroup v-model="filterTag" type="single" variant="outline"
                                     @update:model-value="(v) => v && filterChecklist(v)">
-                                    <ToggleGroupItem value="all" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowAll')">
+                                    <ToggleGroupItem value="all" class="flex-1 gap-1.5"
+                                        :aria-label="t('securitychecklist.ShowAll')">
                                         <ListChecks class="size-4" />
                                     </ToggleGroupItem>
-                                    <ToggleGroupItem value="unchecked"
-                                        class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowUnchecked')">
+                                    <ToggleGroupItem value="unchecked" class="flex-1 gap-1.5"
+                                        :aria-label="t('securitychecklist.ShowUnchecked')">
                                         <Circle class="size-4" />
                                     </ToggleGroupItem>
-                                    <ToggleGroupItem value="checked" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowChecked')">
+                                    <ToggleGroupItem value="checked" class="flex-1 gap-1.5"
+                                        :aria-label="t('securitychecklist.ShowChecked')">
                                         <CircleCheck class="size-4" />
                                     </ToggleGroupItem>
-                                    <ToggleGroupItem value="ignored" class="flex-1 gap-1.5" :aria-label="t('securitychecklist.ShowIgnored')">
+                                    <ToggleGroupItem value="ignored" class="flex-1 gap-1.5"
+                                        :aria-label="t('securitychecklist.ShowIgnored')">
                                         <CirclePause class="size-4" />
                                     </ToggleGroupItem>
                                 </ToggleGroup>
@@ -205,11 +211,11 @@
 
                                         <!-- Item name + Info expand -->
                                         <div class="flex-1 min-w-0 text-sm">
-                                            <div class="flex items-center gap-1.5"
+                                            <div class="flex items-start gap-1"
                                                 :class="{ 'line-through opacity-50': item.ignored }">
                                                 <span>{{ item.point }}</span>
                                                 <button type="button" @click="toggleChecklistInfo(index)"
-                                                    class="shrink-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                                                    class="mt-0.75 shrink-0 text-muted-foreground hover:text-foreground cursor-pointer"
                                                     :aria-expanded="!!checklistInfoOpen[index]"
                                                     :aria-label="'Display Info of ' + item.point">
                                                     <Info class="size-3.5" />

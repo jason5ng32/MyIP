@@ -81,6 +81,9 @@
 
       <!-- Right: Action area (ml-auto push to the right) -->
       <div class="ml-auto flex items-center gap-2">
+        <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
+        <DocsSearch />
+
         <!-- Preferences -->
         <JnTooltip :text="t('shortcutKeys.Preferences')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
@@ -265,6 +268,7 @@ import {
   Award, ChevronDown, HeartHandshake,
   LogOut, Menu, Cog,
 } from '@lucide/vue';
+import DocsSearch from '@/components/widgets/DocsSearch.vue';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
