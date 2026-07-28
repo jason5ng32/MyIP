@@ -1489,6 +1489,24 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "New AI assistant: IPChecking Copilot answers your questions from the docs, and can read your on-page results with your permission",
+          "zh": "新增 AI 助手 IPChecking Copilot：基于文档回答你的问题，并可在你授权后读取页面上的检测结果",
+          "fr": "Nouvel assistant IA : IPChecking Copilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
+          "ru": "Новый ИИ-помощник IPChecking Copilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "New documentation site for users and developers, with tool guides, network troubleshooting and self-hosting docs",
+          "zh": "新增用户与开发帮助文档，包含工具使用说明、网络问题排查和自部署指南",
+          "fr": "Nouveau site de documentation pour les utilisateurs et les développeurs : guides des outils, dépannage réseau et auto-hébergement",
+          "ru": "Новый сайт документации для пользователей и разработчиков: описания инструментов, диагностика сети и самостоятельный хостинг"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Improved the stability of the Service Status tool",
