@@ -38,6 +38,7 @@
   Each semantic color has a foreground pair, which automatically corrects the text color when used in bg-* ≈ amber-500 (foreground is dark because amber is light; sky / green / red are dark, so foreground is white). The light/dark mode is defined independently by :root / .dark, and tokens do not need to write dark: variants.
 */
 :root {
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -75,6 +76,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -248,4 +250,31 @@ footer {
 
 .svgMap-tooltip {
   z-index: 10001 !important;
+}
+/* GitBook Docs Assistant embed (loaded on demand by use-docs-assistant.js).
+   The embed anchors its launcher and panel bottom-right, where our FAB stack
+   lives — move both to the bottom-LEFT, with the launcher on the FAB dock's
+   baseline (bottom-9 = 2.25rem). The panel must clear the launcher by the
+   same amount the embed leaves by default, so it stacks on top of it rather
+   than overlapping: launcher height (2.5rem) + the embed's own gap (0.75rem).
+   The launcher doubles as the panel's toggle, which is how it gets closed. */
+#gitbook-widget-button,
+#gitbook-widget-window {
+  --jn-gb-anchor: 2.25rem;
+  right: auto !important;
+  left: 1rem !important;
+}
+
+#gitbook-widget-button {
+  bottom: var(--jn-gb-anchor) !important;
+}
+
+#gitbook-widget-window {
+  bottom: calc(var(--jn-gb-anchor) + 3.25rem) !important;
+  /* Raising the panel above the launcher eats into its headroom, so cap the
+     height to what is left — otherwise a tall panel runs off the top of the
+     screen on phones. dvh tracks mobile browser chrome as it collapses; the
+     vh line is the fallback for browsers without it. */
+  max-height: calc(100vh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
+  max-height: calc(100dvh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
 }

@@ -81,6 +81,39 @@
 
       <!-- Right: Action area (ml-auto push to the right) -->
       <div class="ml-auto flex items-center gap-2">
+        <!-- Docs search: submitting opens the GitBook Assistant embed with the
+             query as the visitor's first message (see use-docs-assistant.js).
+             The placeholder rotates through preset questions so visitors see
+             this is an "ask anything" box, not plain search. -->
+        <form v-if="showDocsSearch && !isMobile" class="relative" @submit.prevent="submitDocsSearch">
+          <MessageCircleQuestionMark
+            class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground z-10" />
+          <Input v-model="docsQuery" type="text" :aria-label="t('nav.SearchDocs')"
+            class="h-8 w-44 focus:w-64 transition-[width] duration-300 pl-8 text-sm" autocomplete="off"
+            autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
+            @keydown.enter.prevent="submitDocsSearch" />
+          <!-- Rotating placeholder rendered as an overlay (native placeholders
+               can't animate). Hidden as soon as the visitor types. -->
+          <div v-if="!docsQuery"
+            class="pointer-events-none absolute inset-y-0 left-8 right-2 flex items-center overflow-hidden">
+            <Transition enter-active-class="transition-all duration-300 ease-out"
+              enter-from-class="opacity-0 translate-y-3" enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition-all duration-300 ease-in absolute"
+              leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-3">
+              <span :key="docsPlaceholder" class="block w-full truncate text-sm text-muted-foreground">
+                {{ docsPlaceholder }}
+              </span>
+            </Transition>
+          </div>
+        </form>
+        <!-- Mobile: same entry as a single icon — opens the assistant without a query. -->
+        <JnTooltip v-else-if="showDocsSearch" :text="t('nav.SearchDocs')">
+          <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.SearchDocs')"
+            @click="openDocsAssistant">
+            <MessageCircleQuestionMark />
+          </Button>
+        </JnTooltip>
+
         <!-- Preferences -->
         <JnTooltip :text="t('shortcutKeys.Preferences')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
@@ -263,8 +296,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Award, ChevronDown, HeartHandshake,
-  LogOut, Menu, Cog,
+  LogOut, Menu, Cog, MessageCircleQuestionMark,
 } from '@lucide/vue';
+import { Input } from '@/components/ui/input';
+import { useDocsAssistant, isDocsConfigured } from '@/composables/use-docs-assistant';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
@@ -297,6 +332,41 @@ const advancedTools = computed(() =>
 
 // Mobile: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);
+
+// Docs search → GitBook Assistant embed (lazy-loaded on first submit).
+// Needs a docs site to answer from: configured at build time, and only on the
+// canonical deployment — same gate as the original-site-only tools above.
+const showDocsSearch = computed(() => isDocsConfigured && configs.value.originalSite);
+const { askDocs, docsQuestions } = useDocsAssistant();
+const docsQuery = ref('');
+const submitDocsSearch = () => {
+  if (!docsQuery.value.trim()) return;
+  trackEvent('Nav', 'DocsSearch', 'submit');
+  askDocs(docsQuery.value);
+  docsQuery.value = '';
+};
+const openDocsAssistant = () => {
+  trackEvent('Nav', 'DocsSearch', 'open');
+  askDocs('');
+};
+
+// Rotating placeholder: cycle through the preset questions so the box reads
+// as "ask anything". Rotation is cosmetic — pausing it while the visitor is
+// typing avoids distraction; locale switches re-resolve via docsQuestions().
+const docsPlaceholderIndex = ref(0);
+const docsPlaceholder = computed(() => {
+  const questions = docsQuestions();
+  return questions[docsPlaceholderIndex.value % questions.length] || t('nav.SearchDocs');
+});
+let docsPlaceholderTimer = null;
+onMounted(() => {
+  docsPlaceholderTimer = setInterval(() => {
+    if (!docsQuery.value) docsPlaceholderIndex.value += 1;
+  }, 4000);
+});
+onBeforeUnmount(() => {
+  if (docsPlaceholderTimer) clearInterval(docsPlaceholderTimer);
+});
 
 // GitHub star count for the repo badge. Fetched from our own edge-cached
 // endpoint; stays null (badge hides the count) if the request fails.

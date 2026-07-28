@@ -148,6 +148,16 @@
     "MTRTest": "MTR 测试",
     "RuleTest": "分流测试",
     "AdvancedTools": "高级工具",
+    "SearchDocs": "搜索文档…",
+    "OpenDocs": "打开文档",
+    "DocsGreetingTitle": "有什么可以帮你？",
+    "DocsGreetingSubtitle": "关于 MyIP 的工具、测试结果或自部署，都可以问我。",
+    "DocsQuestions": [
+      "我的 VPN 泄漏真实 IP 了吗？",
+      "为什么我的 IP 归属地不对？",
+      "MTR 结果怎么看？",
+      "怎么部署一个自己的 MyIP？"
+    ],
     "preferences": {
       "title": "偏好设置",
       "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
@@ -976,7 +986,9 @@
     "linkedIn": "LinkedIn",
     "twitter": "Twitter",
     "Sponsor": "赞助我们",
-    "Privacy": "隐私政策"
+    "Privacy": "隐私政策",
+    "HelpCenter": "帮助中心",
+    "Close": "关闭"
   },
   "acknowledgement": {
     "Title": "致谢",

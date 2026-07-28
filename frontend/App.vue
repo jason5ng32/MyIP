@@ -5,6 +5,7 @@
   <TooltipProvider :delay-duration="150">
     <router-view />
     <Alert />
+    <DocsAssistant />
     <PWA v-if="offerPwaInstall" />
   </TooltipProvider>
 </template>
@@ -12,15 +13,16 @@
 <script setup>
 import { watch, ref, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { TooltipProvider } from './components/ui/tooltip';
-import Alert from './components/widgets/Toast.vue';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import Alert from '@/components/widgets/Toast.vue';
+import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { useTheme } from '@/composables/use-theme.js';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (first
 // visit, prompt cap reached, already installed) never load pwa-install or
 // trigger its manifest fetch; eligible ones load it at the prompt's 30s mark.
-const PWA = defineAsyncComponent(() => import('./components/widgets/PWA.vue'));
+const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 const offerPwaInstall = ref(false);
 onMounted(() => {
     if (shouldOfferPwaInstall()) {

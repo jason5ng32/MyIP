@@ -148,6 +148,16 @@
     "MTRTest": "Test MTR",
     "RuleTest": "Test de règles",
     "AdvancedTools": "Outils avancés",
+    "SearchDocs": "Rechercher dans la doc…",
+    "OpenDocs": "Ouvrir la doc",
+    "DocsGreetingTitle": "Comment puis-je vous aider ?",
+    "DocsGreetingSubtitle": "Posez vos questions sur MyIP : les outils, vos résultats ou l'auto-hébergement.",
+    "DocsQuestions": [
+      "Mon VPN fuit-il ma vraie IP ?",
+      "Pourquoi ma localisation IP est-elle fausse ?",
+      "Comment lire les résultats MTR ?",
+      "Comment déployer mon propre MyIP ?"
+    ],
     "preferences": {
       "title": "Préférences",
       "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",
@@ -976,7 +986,9 @@
     "linkedIn": "LinkedIn",
     "twitter": "Twitter",
     "Sponsor": "Nous soutenir",
-    "Privacy": "Confidentialité"
+    "Privacy": "Confidentialité",
+    "HelpCenter": "Centre d'aide",
+    "Close": "Fermer"
   },
   "acknowledgement": {
     "Title": "Remerciements",
