@@ -149,14 +149,18 @@
     "RuleTest": "Rule Test",
     "AdvancedTools": "Advanced Tools",
     "SearchDocs": "Search docs…",
+    "DocsToolConfirm": "Share your current test results?",
+    "DocsToolSummary": "Read your on-page results",
     "OpenDocs": "Open docs",
     "DocsGreetingTitle": "How can I help?",
     "DocsGreetingSubtitle": "Ask me anything about MyIP — the tools, your results, or self-hosting.",
     "DocsQuestions": [
       "Is my VPN leaking my real IP?",
       "Why is my IP location wrong?",
+      "Compare my WebRTC test and DNS leak test results and give me suggestions",
       "How do I read MTR results?",
-      "How do I deploy my own MyIP?"
+      "How do I deploy my own MyIP?",
+      "I want to see more help documents"
     ],
     "preferences": {
       "title": "Preferences",

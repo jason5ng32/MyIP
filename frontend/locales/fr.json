@@ -149,14 +149,18 @@
     "RuleTest": "Test de règles",
     "AdvancedTools": "Outils avancés",
     "SearchDocs": "Rechercher dans la doc…",
+    "DocsToolConfirm": "Partager vos résultats actuels ?",
+    "DocsToolSummary": "Résultats de la page lus",
     "OpenDocs": "Ouvrir la doc",
     "DocsGreetingTitle": "Comment puis-je vous aider ?",
     "DocsGreetingSubtitle": "Posez vos questions sur MyIP : les outils, vos résultats ou l'auto-hébergement.",
     "DocsQuestions": [
       "Mon VPN fuit-il ma vraie IP ?",
       "Pourquoi ma localisation IP est-elle fausse ?",
+      "Comparer mes résultats de test WebRTC et de fuite DNS et me donner des suggestions",
       "Comment lire les résultats MTR ?",
-      "Comment déployer mon propre MyIP ?"
+      "Comment déployer mon propre MyIP ?",
+      "Je veux voir plus de documents d'aide"
     ],
     "preferences": {
       "title": "Préférences",
