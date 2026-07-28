@@ -59,6 +59,8 @@ jobs:
       uses: docker/build-push-action@v7
       with:
         push: true
+        provenance: mode=max
+        sbom: true
         tags: |
           jason5ng32/myip:latest
           jason5ng32/myip:${{ env.RELEASE_VERSION }}
