@@ -28,12 +28,12 @@
       "Benefit": "Avantage",
       "Note1": "En tant que produit open-source, l'utilisation de IPCheck.ing est gratuite.",
       "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
-      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement.",
-      "Benefit2": "Peut utiliser le test d'invisibilité.",
-      "Benefit3": "Peut utiliser le test d'invisibilité.",
+      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement",
+      "Benefit2": "Peut utiliser le test d'invisibilité",
+      "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Vous pouvez interroger IPChecking Copilot, notre assistant IA.",
-      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités.",
+      "Benefit5": "Peut poser des questions à IPChecking Copilot, notre assistant IA",
+      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
     "Achievements": {
