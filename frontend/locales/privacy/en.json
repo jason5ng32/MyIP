@@ -19,6 +19,14 @@
           "Copying a report for an AI assistant or downloading it as JSON happens entirely in your browser and stores nothing on our servers."
         ]
       },
+      "docsAssistant": {
+        "title": "Documentation assistant",
+        "paragraphs": [
+          "The documentation assistant answers questions from our documentation site. It only starts when you use it: the assistant is loaded on demand, and the question you type is sent to GitBook, which hosts our documentation and provides the assistant, to generate an answer.",
+          "The assistant can also read the test results currently on your page — your IP addresses with their location and network, and the results of any tests you have run. This never happens silently: the assistant must ask, and you approve it with the confirmation button shown in the chat. Declining still lets it answer from the documentation.",
+          "The conversation runs between your browser and GitBook; it does not pass through our servers, and we do not store it. GitBook's own privacy terms apply to the messages you send."
+        ]
+      },
       "analytics": {
         "title": "What we collect through analytics",
         "paragraphs": [
