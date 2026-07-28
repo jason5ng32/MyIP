@@ -92,110 +92,32 @@ pnpm start
 docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 ```
 
-## 📚 环境变量
+## 📖 官方文档
 
-下表中标记为 **是** 的变量必须配置，后端才能正常工作。其中 MaxMind 相关的三项尤其重要——填写环境变量之前请先阅读下面的 MaxMind 配置说明。
+完整文档在 MyIP 文档中心：**[docs.ipcheck.ing](https://docs.ipcheck.ing)**（右上角可切换中文）
 
-### MaxMind 数据库（必须配置）
+* [开发者指南](https://docs.ipcheck.ing/developer) —— 部署、配置、架构说明与参与贡献
+* [知识库](https://docs.ipcheck.ing/knowledge-base) —— 每个工具的使用说明、网络问题排查指南、网络概念科普
 
-MyIP 依赖 MaxMind 提供的免费 **GeoLite2** 数据库（City + ASN）来进行 IP 地理位置查询、ASN / 组织归属查询，以及全站各处（IP 卡片、WebRTC ICE candidate 等）的国家/地区标识。MaxMind 配置是后端完整运行的前提。
+## ⚙️ 配置
 
-由于 MaxMind GeoLite2 协议不允许再分发，`.mmdb` 文件**没有被包含在本仓库里**，你需要自己准备。有两种做法：
+开始之前，有两项配置最重要：
 
-**方案 A —— 自动下载（推荐，Docker 部署必选）**
-
-1. 去 [maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup) 注册一个免费账号。
-2. 在账号的 "Manage License Keys" 页面生成一个 License Key。
-3. 配置这三个环境变量：
-   ```bash
-   MAXMIND_ACCOUNT_ID="your-account-id"
-   MAXMIND_LICENSE_KEY="your-license-key"
-   MAXMIND_AUTO_UPDATE="true"
-   ```
-4. 启动后端。首次启动后约 60 秒内，程序会自动下载两个数据库，之后每 24 小时自动检查更新。
-
-> ⚠️ **Docker 部署必须使用方案 A。** 一个全新的容器里 `common/maxmind-db/` 目录是空的——如果不配置这三个变量，后端虽然能起来，但 MaxMind 相关的 IP 查询源和 WebRTC 国家标识将无法工作，并且每次启动日志里都会刷出 `MaxMind API will return 503...` 的报错。
-
-**方案 B —— 手动放置（离线 / 非 Docker 场景）**
-
-从你的 MaxMind 账号下载 `GeoLite2-City.mmdb` 和 `GeoLite2-ASN.mmdb`，在启动后端前手动放入 `common/maxmind-db/` 目录。这种情况下 `MAXMIND_AUTO_UPDATE` 可以保持 `"false"`，但每次 MaxMind 发布新版本时你需要自己手动更新文件。
-
-### 环境变量一览
-
-| 变量名 | 是否必须 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `MAXMIND_ACCOUNT_ID` | **是** | `""` | MaxMind 账号 ID，和 `MAXMIND_LICENSE_KEY` 一起用于下载 GeoLite2 数据库。详见上方 MaxMind 配置说明。 |
-| `MAXMIND_LICENSE_KEY` | **是** | `""` | MaxMind License Key，和 `MAXMIND_ACCOUNT_ID` 配合使用。详见上方 MaxMind 配置说明。 |
-| `MAXMIND_AUTO_UPDATE` | **是** | `"false"` | 设置为 `"true"` 时，程序会在启动后 60 秒左右自动下载 GeoLite2 数据库，之后每 24 小时刷新一次。**Docker 部署必须设置为 `"true"`。** 只有当你已经手动放置了 `.mmdb` 文件时，才能保持为 `"false"`。 |
-| `CAIDA_AUTO_UPDATE` | 否 | `"false"` | 设置为 `"true"` 时，每天自动刷新 CAIDA 数据集（as2org 用于 ASN 组织名查询、as-rel2 用于 ASN 连接图）。设置为 `"false"` 时仍会在启动时下载缺失的快照，之后保持不变。 |
-| `VITE_GOOGLE_ANALYTICS_ID` | **是** | `""` | Google Analytics 的 ID，用于统计访问量 |
-| `BACKEND_PORT` | 否 | `"11966"` | 程序后端部分的运行端口 |
-| `FRONTEND_PORT` | 否 | `"18966"` | 程序前端部分的运行端口 |
-| `SECURITY_RATE_LIMIT` | 否 | `"0"` | 控制每 60 分钟一个 IP 可以对后端服务器请求的次数（设置为 0 则为不限制） |
-| `SECURITY_DELAY_AFTER` | 否 | `"0"` | 控制每 20 分钟一个 IP 的前 X 次请求不受速度限制，超过 X 次后会逐次增加延迟 |
-| `SECURITY_BLACKLIST_LOG_FILE_PATH` | 否 | `""` | 可选的本地黑名单文件（如 `"logs/blacklist-ip.log"`），记录触发限流的 IP。留空则不写文件；无论是否设置，事件都会通过共享 logger 记录 |
-| `LOG_LEVEL` | 否 | `"info"` | 日志最低级别（`debug` / `info` / `warn` / `error`），低于该级别的日志会被过滤 |
-| `LOG_FORMAT` | 否 | pretty | 设置为 `"json"` 时每行输出一个 JSON 事件（给日志聚合器 / jq 使用）；其它值（或未设置）则使用带颜色的 pretty 格式，适合开发及 pm2 log tail |
-| `LOG_HTTP` | 否 | `"false"` | 设置为 `"true"` 时启用 `/api/*` 的按请求日志（方法、URL、状态码、响应时间）。默认关闭以控制 pm2 日志体积。即使关闭，handler 层的 4xx/5xx 错误日志依然会被记录 |
-| `VITE_SENTRY_DSN_FRONTEND` | 否 | `""` | 前端 Sentry DSN（构建时）。留空则构建产物中完全不包含 Sentry 代码。后端运行时也会读取它，作为 `/api/monitoring`（绕过广告拦截器的第一方转发隧道）的白名单。如果你自建 Docker 镜像并在构建时注入了它，运行容器时也要传入同一个值，否则隧道路由不会启用 |
-| `SENTRY_DSN_BACKEND` | 否 | `""` | 后端 Sentry DSN（运行时）。留空则完全不加载 Sentry SDK |
-| `SENTRY_ENVIRONMENT` | 否 | `"production"` | 后端 Sentry 事件的环境标签。开发机上设为 `"development"`；前端会自动打标签 |
-| `SENTRY_ORG` | 否 | `""` | Sentry 组织 slug，与 `SENTRY_PROJECT_FRONTEND`、`SENTRY_AUTH_TOKEN` 配合，在构建时上传 source map |
-| `SENTRY_PROJECT_FRONTEND` | 否 | `""` | 前端项目的 Sentry 项目 slug，用于构建时上传 source map |
-| `SENTRY_AUTH_TOKEN` | 否 | `""` | 用于构建时上传 source map 的 Sentry 令牌。仅构建时使用的机密，绝不会暴露给浏览器 |
-| `ALLOWED_DOMAINS` | 否 | `""` | 允许访问的域名，用逗号分隔，用于防止后端 API 被滥用 |
-| `GOOGLE_MAP_API_KEY` | 否 | `""` | Google 地图的 API Key，用于展示 IP 所在地的地图 |
-| `IPINFO_API_KEY` | 否 | `""` | IPInfo.io 的 API Token，用于通过 IPInfo.io 获取 IP 归属地信息 |
-| `IPAPIIS_API_KEY` | 否 | `""` | IPAPI.is 的 API Key，用于通过 IPAPI.is 获取 IP 归属地信息 |
-| `IP2LOCATION_API_KEY` | 否 | `""` | IP2Location.io 的 API Key，用于通过 IP2Location.io 获取 IP 归属地信息 |
-| `CLOUDFLARE_API_KEY` | 否 | `""` | Cloudflare 的 API Key，用于获取 AS 系统信息；配合下方两个 KV 变量（token 需追加 "Workers KV Storage: Edit" 权限）还用于诊断报告分享 |
-| `CLOUDFLARE_ACCOUNT_ID` | 否 | `""` | Cloudflare 账号 ID，诊断报告分享（Workers KV 存储）所需 |
-| `CLOUDFLARE_KV_NAMESPACE_ID` | 否 | `""` | 存储诊断分享报告的 Workers KV namespace 的十六进制 ID（不是名字） |
-| `RIPESTAT_SOURCE_APP` | 否 | `""` | RIPE.net 的源应用名称，用于通过 RIPE.net 获取 ASN 的历史信息 |
-| `MAC_LOOKUP_API_KEY` | 否 | `""` | MAC 查询的 API Key，用于通过 MAC Lookup 获取 MAC 地址的归属信息 |
-| `VITE_CURL_IPV4_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv4 域名 |
-| `VITE_CURL_IPV6_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的 IPv6 域名 |
-| `VITE_CURL_IPV64_DOMAIN` | 否 | `""` | 为用户提供 CURL API 的双网络栈域名 |
-
-需要注意的是，如果 CURL 系列的环境变量任意一个缺失，都不会启用 CURL API。
-
-### 在 Node 环境里使用环境变量
-
-创建环境变量：
-
-```bash
-cp .env.example .env
-```
-
-修改 `.env` 里的内容，比如：
-
-```bash
-BACKEND_PORT=11966
-FRONTEND_PORT=18966
-MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID"
-MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY"
-MAXMIND_AUTO_UPDATE="true"
-GOOGLE_MAP_API_KEY="YOUR_KEY_HERE"
-ALLOWED_DOMAINS="example.com,example.org"
-```
-
-然后重新启动后端服务。
-
-### 在 Docker 里使用环境变量
-
-你可以在运行 Docker 的时候，添加环境变量，比如：
+* **MaxMind GeoLite2（必须）** —— 免费凭证，为 IP 地理位置与 ASN 查询提供数据。不配置时 MaxMind 数据源会返回 503。→ [MaxMind 配置指南](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
+* **`ALLOWED_DOMAINS`（使用真实域名时必须）** —— 后端 API 的域名白名单。不配置时，来自非 localhost 域名的请求都会收到 403。→ [反向代理与域名](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
   -e MAXMIND_AUTO_UPDATE="true" \
-  -e GOOGLE_MAP_API_KEY="YOUR_KEY_HERE" \
-  -e ALLOWED_DOMAINS="example.com,example.org" \
-  --name myip \
+  -e ALLOWED_DOMAINS="your-domain.com" \
+  --name myip --restart always \
   jason5ng32/myip:latest
-
 ```
+
+其余全部为可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、CURL API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
+
 
 ## 👩🏻‍💻 高级用法
 
@@ -229,5 +151,7 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" title="Greptile" width="240px"  /></a>
 
 <a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" title="Sentry" width="240px" /></a>
+
+<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" title="GitBook" width="240px" /></a>
 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
