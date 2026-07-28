@@ -32,7 +32,8 @@
       "Benefit2": "Peut utiliser le test d'invisibilité.",
       "Benefit3": "Peut utiliser le test d'invisibilité.",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Réduit les restrictions d'accès à certaines fonctionnalités.",
+      "Benefit5": "Vous pouvez interroger IPChecking Copilot, notre assistant IA.",
+      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités.",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
     "Achievements": {
@@ -189,7 +190,8 @@
       "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes.",
       "language": "Paramètres de langue",
       "languageTips": "Rafraîchissement du navigateur pour prendre effet."
-    }
+    },
+    "DocsPrompt": "Saisissez votre question…"
   },
   "securitychecklist": {
     "Title": "Liste de vérification de sécurité",

@@ -19,7 +19,7 @@
          the content area, so the two sides stay symmetric on wide screens.
          No enter/leave transition — the toggle swaps state often enough that
          animating it just reads as a flicker. -->
-    <div v-if="isLoaded" class="fixed bottom-9 z-1100" :style="{ left: DOCK_INSET }">
+    <div v-if="isLoaded && isSignedIn" class="fixed bottom-9 z-1100" :style="{ left: DOCK_INSET }">
       <JnTooltip :text="isOpen ? t('about.Close') : t('nav.AskCopilot')" side="right">
         <Button size="icon" type="button" :variant="isOpen ? 'secondary' : 'outline'"
           :aria-label="isOpen ? t('about.Close') : t('nav.AskCopilot')" :aria-expanded="isOpen"
@@ -49,6 +49,9 @@ const DOCK_INSET = 'max(18px, calc((100vw - 1600px) / 2 + 18px))';
 const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+// The assistant is a sign-in benefit (see DocsSearch.vue) — signing out mid
+// session takes the toggle away with the rest of the entry points.
+const isSignedIn = computed(() => store.isSignedIn === true);
 
 const { isOpen, isLoaded, askDocs, closeDocs, setOpen } = useDocsAssistant();
 
@@ -96,6 +99,12 @@ watch(isLoaded, (loaded) => {
 watch([isOpen, isMobile], ([open, mobile]) => {
   lockScroll(open && mobile);
 }, { immediate: true });
+
+// Signing out mid-conversation closes the panel too — otherwise it would sit
+// there with no visible way back to it.
+watch(isSignedIn, (signedIn) => {
+  if (!signedIn && isOpen.value) closeDocs();
+});
 
 const onKeydown = (event) => {
   if (event.key === 'Escape' && isOpen.value) closeDocs();
