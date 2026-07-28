@@ -86,7 +86,7 @@
              The placeholder rotates through preset questions so visitors see
              this is an "ask anything" box, not plain search. -->
         <form v-if="showDocsSearch && !isMobile" class="relative" @submit.prevent="submitDocsSearch">
-          <MessageCircleQuestionMark
+          <Sparkle
             class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground z-10" />
           <Input v-model="docsQuery" type="text" :aria-label="t('nav.SearchDocs')"
             class="h-8 w-44 focus:w-64 transition-[width] duration-300 pl-8 text-sm" autocomplete="off"
@@ -110,7 +110,7 @@
         <JnTooltip v-else-if="showDocsSearch" :text="t('nav.SearchDocs')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.SearchDocs')"
             @click="openDocsAssistant">
-            <MessageCircleQuestionMark />
+            <Sparkle />
           </Button>
         </JnTooltip>
 
@@ -296,7 +296,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Award, ChevronDown, HeartHandshake,
-  LogOut, Menu, Cog, MessageCircleQuestionMark,
+  LogOut, Menu, Cog, Sparkle,
 } from '@lucide/vue';
 import { Input } from '@/components/ui/input';
 import { useDocsAssistant, isDocsConfigured } from '@/composables/use-docs-assistant';
