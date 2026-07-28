@@ -252,76 +252,23 @@ footer {
   z-index: 10001 !important;
 }
 /* GitBook Docs Assistant embed (loaded on demand by use-docs-assistant.js).
-   The embed anchors its launcher and panel bottom-right, where our FAB stack
-   lives — move both to the bottom-LEFT, with the launcher on the FAB dock's
-   baseline (bottom-9 = 2.25rem). The panel must clear the launcher by the
-   same amount the embed leaves by default, so it stacks on top of it rather
-   than overlapping: launcher height (2.5rem) + the embed's own gap (0.75rem).
-   The launcher doubles as the panel's toggle, which is how it gets closed. */
-#gitbook-widget-button,
-#gitbook-widget-window {
-  --jn-gb-anchor: 2.25rem;
-  /* Mirror of FloatingDock's inset: it hugs the 1600px content area's right
-     edge with an 18px gutter, so past 1600px it steps inward by half the
-     overflow. max() keeps that at a plain 18px on narrower viewports. */
-  --jn-gb-inset: max(18px, (100vw - 1600px) / 2 + 18px);
-  right: auto !important;
-  left: var(--jn-gb-inset) !important;
-}
-
-/* Launcher restyled to match the FAB dock's icon buttons: a 2.25rem circle
-   (size-9) with the same elevation. The embed ships it as a pill with a text
-   label, so the label is dropped and the padding/width constraints that came
-   with it are reset — otherwise the circle squashes the icon. The icon keeps
-   its own 1rem box (size-4, as in buttonVariants) rather than scaling with
-   the button. */
+   The stock launcher is hidden — widgets/DocsAssistant.vue renders our own
+   toggle in its place, styled like the FAB dock's buttons. The panel is
+   pinned bottom-LEFT (the FAB stack owns the bottom-right), mirroring the
+   dock's inset off the 1600px content area and clearing the toggle by its
+   height plus a gap, with a height cap so it never runs off the top on
+   phones. dvh tracks mobile browser chrome as it collapses; the vh line is
+   the fallback for browsers without it. */
 #gitbook-widget-button {
-  bottom: var(--jn-gb-anchor) !important;
-  width: 2.25rem !important;
-  height: 2.25rem !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  padding: 0 !important;
-  gap: 0 !important;
-  border-radius: 9999px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
-}
-
-/* The embed names these parts inconsistently across versions, so match both
-   an id and a class of the same name. */
-#gitbook-widget-button-label,
-#gitbook-widget-button .gitbook-widget-button-label {
   display: none !important;
 }
 
-/* flex:none is the point — inside a 2.25rem circle a flexible child would be
-   squeezed. The 1rem box matches the FAB icons (size-4 in buttonVariants). */
-#gitbook-widget-button-icon,
-#gitbook-widget-button .gitbook-widget-button-icon,
-#gitbook-widget-button > svg {
-  width: 1rem !important;
-  height: 1rem !important;
-  flex: none !important;
-  margin: 0 !important;
-}
-
-#gitbook-widget-button-icon svg,
-#gitbook-widget-button .gitbook-widget-button-icon svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-}
-
 #gitbook-widget-window {
+  --jn-gb-anchor: 2.25rem;
+  --jn-gb-inset: max(18px, (100vw - 1600px) / 2 + 18px);
+  right: auto !important;
+  left: var(--jn-gb-inset) !important;
   bottom: calc(var(--jn-gb-anchor) + 3.25rem) !important;
-  /* Raising the panel above the launcher eats into its headroom, so cap the
-     height to what is left — otherwise a tall panel runs off the top of the
-     screen on phones. dvh tracks mobile browser chrome as it collapses; the
-     vh line is the fallback for browsers without it. */
   max-height: calc(100vh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
   max-height: calc(100dvh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
 }

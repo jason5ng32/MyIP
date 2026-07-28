@@ -47,6 +47,15 @@ let loadPromise = null;
 const isOpen = ref(false);
 const isLoaded = ref(false);
 
+// Opening and closing are animated, so for a moment after we act the panel
+// still measures as its previous state. DocsAssistant.vue's watcher consults
+// this before overwriting `isOpen` — otherwise a close reads as "still open"
+// on the next tick and the toggle icon flickers back and forth.
+const SETTLE_MS = 700;
+let lastIntentAt = 0;
+const markIntent = () => { lastIntentAt = Date.now(); };
+export const isSettling = () => Date.now() - lastIntentAt < SETTLE_MS;
+
 const loadEmbedScript = () => {
     if (loadPromise) return loadPromise;
     loadPromise = new Promise((resolve, reject) => {
@@ -116,6 +125,7 @@ export function useDocsAssistant() {
     };
 
     const closeDocs = () => {
+        markIntent();
         isOpen.value = false;
         if (typeof window.GitBook === 'function') window.GitBook('close');
     };
@@ -142,6 +152,8 @@ export function useDocsAssistant() {
                 tools: [readResultsTool],
             });
             window.GitBook('open');
+            markIntent();
+            isOpen.value = true;
             if (question) {
                 window.GitBook('navigateToAssistant');
                 window.GitBook('postUserMessage', question);

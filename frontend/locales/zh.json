@@ -151,6 +151,7 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
+    "AskCopilot": "询问 IPChecking Copilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
     "DocsGreetingSubtitle": "关于 MyIP 的工具、测试结果或自部署，都可以问我。",
