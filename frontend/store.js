@@ -4,7 +4,7 @@ import { loadFirebaseAuth } from './firebase-init.js';
 import { writeAuthHint } from './utils/auth-hint.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
-import { createInitialIpDBs, buildDbUrl } from './data/ip-databases.js';
+import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, migrateLegacyPreferences, PREFS_STORAGE_KEY, LEGACY_PREFS_KEYS } from './data/default-preferences.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
@@ -127,13 +127,6 @@ export const useMainStore = defineStore('main', {
         document.documentElement.classList.toggle('dark', !!value);
       }
     },
-    // set IP database enable status
-    updateIPDBs({ id, enabled }) {
-      const index = this.ipDBs.findIndex(db => db.id === id);
-      if (index !== -1) {
-        this.ipDBs[index].enabled = enabled;
-      }
-    },
     // set user preferences
     setPreferences(userPreferences) {
       this.userPreferences = userPreferences;
@@ -185,6 +178,21 @@ export const useMainStore = defineStore('main', {
         })
         .then(data => {
           this.configs = data;
+          // Configs flags are the only thing that flips ipDBs.enabled. If the
+          // stored preference is no longer configured, migrate it to the
+          // nearest available source (the one case that rewrites the user's
+          // setting) and say so via toast. Failed fetch → all stay enabled.
+          this.ipDBs = applyConfigAvailability(this.ipDBs, data);
+          const preferred = this.userPreferences.ipGeoSource;
+          const nearest = nearestEnabledId(preferred, this.ipDBs);
+          if (nearest !== preferred) {
+            const from = this.ipDBs.find(db => db.id === preferred)?.text || `#${preferred}`;
+            const to = this.ipDBs.find(db => db.id === nearest)?.text || `#${nearest}`;
+            this.updatePreference('ipGeoSource', nearest);
+            this.setAlert(true, 'text-warning',
+              t('alert.IpGeoSourceFallbackMessage', { from, to }),
+              t('alert.IpGeoSourceFallbackTitle'), 5000);
+          }
         })
         .catch(error => console.error('Fetching configs failed: ', error));
     },

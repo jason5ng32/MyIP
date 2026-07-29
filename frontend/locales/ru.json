@@ -927,7 +927,9 @@
     "unmaskedInfoTitle": "IP показаны",
     "unmaskedInfoMessage": "Будьте осторожны, публикуя снимки экрана.",
     "SignInFailed": "Не удалось войти",
-    "SignInFailedReason": "Причина"
+    "SignInFailedReason": "Причина",
+    "IpGeoSourceFallbackTitle": "Источник IP-геоданных переключён",
+    "IpGeoSourceFallbackMessage": "{from} временно недоступен — этот результат временно получен из {to}."
   },
   "shortcutKeys": {
     "GoToTop": "Перейти наверх",

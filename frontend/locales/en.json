@@ -926,7 +926,9 @@
     "unmaskedInfoTitle": "IPs Unmasked",
     "unmaskedInfoMessage": "Be careful when sharing screenshots.",
     "SignInFailed": "Sign In Failed",
-    "SignInFailedReason": "Reason"
+    "SignInFailedReason": "Reason",
+    "IpGeoSourceFallbackTitle": "IP Geolocation Source Switched",
+    "IpGeoSourceFallbackMessage": "{from} is temporarily unavailable — this result comes from {to} for now."
   },
   "shortcutKeys": {
     "GoToTop": "Go to Top",

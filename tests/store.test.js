@@ -95,20 +95,6 @@ describe('store — dark mode side effect', () => {
 });
 
 describe('store — IPDBs / allIPs', () => {
-  it('updateIPDBs flips the enabled flag of a matching entry', () => {
-    const s = useMainStore();
-    const firstId = s.ipDBs[0].id;
-    assert.equal(s.ipDBs[0].enabled, true);
-    s.updateIPDBs({ id: firstId, enabled: false });
-    assert.equal(s.ipDBs[0].enabled, false);
-  });
-
-  it('updateIPDBs ignores unknown ids', () => {
-    const s = useMainStore();
-    const snapshot = s.ipDBs.map((d) => d.enabled);
-    s.updateIPDBs({ id: 9999, enabled: false });
-    assert.deepEqual(s.ipDBs.map((d) => d.enabled), snapshot);
-  });
 
   it('updateAllIPs dedupes by ip and back-fills a missing country', () => {
     const s = useMainStore();
@@ -224,7 +210,8 @@ describe('store — getters', () => {
   it('activeSources returns only enabled databases', () => {
     const s = useMainStore();
     const firstId = s.ipDBs[0].id;
-    s.updateIPDBs({ id: firstId, enabled: false });
+    // Availability is config-derived state; flip it the way fetchConfigs does.
+    s.ipDBs[0].enabled = false;
     const active = s.activeSources;
     assert.ok(active.every((db) => db.enabled));
     assert.ok(!active.find((db) => db.id === firstId));

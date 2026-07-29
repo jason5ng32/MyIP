@@ -927,7 +927,9 @@
     "unmaskedInfoTitle": "IPs démasquées",
     "unmaskedInfoMessage": "Faites attention lors de la partage des captures d'écran.",
     "SignInFailed": "Echec de connexion",
-    "SignInFailedReason": "Raison"
+    "SignInFailedReason": "Raison",
+    "IpGeoSourceFallbackTitle": "Source de géolocalisation IP changée",
+    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}."
   },
   "shortcutKeys": {
     "GoToTop": "Aller en haut",
