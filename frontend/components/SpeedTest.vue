@@ -348,8 +348,11 @@ const engineMethods = {
     });
   },
 
+  // The engine's queued timers deliver one last measurement after onFinish /
+  // onUnmounted dropped the reference, so the engine may already be gone.
   updateProgress() {
-    const rawData = testEngine.results.raw;
+    const rawData = testEngine?.results?.raw;
+    if (!rawData) return;
     // 3 stages: latency / download / upload.
     const perStage = 100 / 3;
     let progress = 0;
