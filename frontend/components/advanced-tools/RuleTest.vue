@@ -85,6 +85,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { parseTrace } from '@/utils/parse-trace.js';
 import getCountryName from '@/data/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -138,12 +139,8 @@ const fetchTrace = async (id, url) => {
     try {
         const response = await fetch(`https://${url}/cdn-cgi/trace`);
         const data = await response.text();
-        const lines = data.split('\n');
-        const ipLine = lines.find((line) => line.startsWith('ip='));
-        const countryLine = lines.find((line) => line.startsWith('loc='));
-        const country = countryLine ? countryLine.split('=')[1] : '';
-        if (ipLine) {
-            const ip = ipLine.split('=')[1];
+        const { ip, loc: country = '' } = parseTrace(data);
+        if (ip) {
             ruleTests.value[id].ip = ip;
             IPArray.value = [...IPArray.value, { ip, country }];
         }
@@ -155,8 +152,7 @@ const fetchTrace = async (id, url) => {
         // no org — MaxMind fills that gap. Country resolution stays on
         // trace (authoritative for each ptest worker's egress), so a
         // MaxMind miss leaves the existing country untouched.
-        if (ipLine) {
-            const ip = ruleTests.value[id].ip;
+        if (ip) {
             const geo = await lookupMaxmind(ip);
             ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
             if (geo) {

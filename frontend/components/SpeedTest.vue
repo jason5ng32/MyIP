@@ -176,6 +176,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
+import { parseTrace } from '@/utils/parse-trace.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
@@ -294,12 +295,15 @@ const connectionMethods = {
     try {
       const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
       const data = await response.text();
-      const lines = data.split('\n');
-      const ip = lines.find((l) => l.startsWith('ip='))?.split('=')[1];
-      const colo = lines.find((l) => l.startsWith('colo='))?.split('=')[1];
-      const loc = lines.find((l) => l.startsWith('loc='))?.split('=')[1];
+      const { ip, colo, loc } = parseTrace(data);
 
-      if (!isValidIP(ip)) throw new Error('Invalid IP from SpeedTest Server');
+      if (!isValidIP(ip)) {
+        // Self-describing diagnostic.
+        const detail = ip == null ? 'no-ip-line'
+          : ip === '' ? 'empty-value'
+            : `len=${ip.length} tail=0x${ip.charCodeAt(ip.length - 1).toString(16)}`;
+        throw new Error(`Invalid IP from SpeedTest Server (${detail})`);
+      }
 
       const { default: getColoCountry } = await import('@/data/speedtest-colos.js');
 
