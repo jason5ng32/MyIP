@@ -96,15 +96,15 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 完整文档在 MyIP 文档中心：**[docs.ipcheck.ing](https://docs.ipcheck.ing)**（右上角可切换中文）
 
-* [开发者指南](https://docs.ipcheck.ing/developer) —— 部署、配置、架构说明与参与贡献
-* [知识库](https://docs.ipcheck.ing/knowledge-base) —— 每个工具的使用说明、网络问题排查指南、网络概念科普
+* [开发者指南](https://docs.ipcheck.ing/developer/zh) —— 部署、配置、架构说明与参与贡献
+* [知识库](https://docs.ipcheck.ing/knowledge-base/zh) —— 每个工具的使用说明、网络问题排查指南、网络概念科普
 
 ## ⚙️ 配置
 
 开始之前，有两项配置最重要：
 
-* **MaxMind GeoLite2（必须）** —— 免费凭证，为 IP 地理位置与 ASN 查询提供数据。不配置时 MaxMind 数据源会返回 503。→ [MaxMind 配置指南](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
-* **`ALLOWED_DOMAINS`（使用真实域名时必须）** —— 后端 API 的域名白名单。不配置时，来自非 localhost 域名的请求都会收到 403。→ [反向代理与域名](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
+* **MaxMind GeoLite2（必须）** —— 免费凭证，为 IP 地理位置与 ASN 查询提供数据。不配置时 MaxMind 数据源会返回 503。→ [MaxMind 配置指南](https://docs.ipcheck.ing/developer/getting-started/zh/maxmind-setup)
+* **`ALLOWED_DOMAINS`（使用真实域名时必须）** —— 后端 API 的域名白名单。不配置时，来自非 localhost 域名的请求都会收到 403。→ [反向代理与域名](https://docs.ipcheck.ing/developer/getting-started/zh/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
@@ -116,7 +116,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其余全部为可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、CURL API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
+其余全部为可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、CURL API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/zh/environment-variables)。
 
 
 ## 👩🏻‍💻 高级用法
