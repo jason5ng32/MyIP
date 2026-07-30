@@ -455,8 +455,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll);
   clearTimeout(openToolTimer);
 });
-
-defineExpose({ OpenPreferences });
 </script>
 
 <style scoped>

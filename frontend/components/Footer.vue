@@ -250,7 +250,4 @@ watch(content, () => {
   });
 });
 
-defineExpose({
-  openAbout,
-});
 </script>
