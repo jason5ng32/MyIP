@@ -134,7 +134,10 @@ export const rdapIp = async (ip, { timeoutMs = 5000 } = {}) => {
         throw new Error(`No RDAP endpoint for ${ip}`);
     }
 
-    const url = `${trimSlash(base)}/ip/${encodeURIComponent(ip)}`;
+    // Literal IP, not encodeURIComponent: colons are legal in a URL path,
+    // the guard layer already ensures a well-formed IP, and some RIR
+    // delegates (e.g. IDNIC behind APNIC's redirect) reject %3A with a 400.
+    const url = `${trimSlash(base)}/ip/${ip}`;
     const res = await fetchUpstream(url, { timeoutMs });
     if (res.status === 404) {
         throw new Error(`IP not found: ${ip}`);

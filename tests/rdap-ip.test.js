@@ -1,11 +1,12 @@
 // Coverage for the IP half of common/rdap.js — bootstrap endpoint
-// selection (longest-prefix CIDR match) and the RDAP-JSON → WHOIS-like
-// `__raw` text formatter. Network calls (rdapIp itself) are out of scope.
+// selection (longest-prefix CIDR match), the RDAP-JSON → WHOIS-like
+// `__raw` text formatter, and rdapIp's query-URL shape (fetch stubbed;
+// real network stays out of scope).
 
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it, mock } from 'node:test';
 
-import { findIpEndpoint, formatIpNetwork } from '../common/rdap.js';
+import { findIpEndpoint, formatIpNetwork, rdapIp } from '../common/rdap.js';
 
 // Shaped like IANA's ipv4.json / ipv6.json `services` arrays:
 // [[cidr, …], [url, …]] per registry.
@@ -125,5 +126,26 @@ describe('formatIpNetwork', () => {
         assert.match(minimal, /^NetRange: 10\.0\.0\.0 - 10\.255\.255\.255$/m);
         assert.ok(!minimal.includes('undefined'));
         assert.equal(formatIpNetwork({}).startsWith('NetRange: N/A - N/A'), true);
+    });
+});
+
+describe('rdapIp — query URL shape', () => {
+    it('keeps IPv6 colons literal in the path (some RIR delegates 400 on %3A)', async () => {
+        const jsonResponse = (body) => ({ ok: true, status: 200, json: async () => body });
+        const fetchMock = mock.method(globalThis, 'fetch', async (url) => {
+            if (String(url).startsWith('https://data.iana.org/rdap/')) {
+                return jsonResponse({ services: [[['2400::/12'], ['https://rdap.apnic.net/']]] });
+            }
+            return jsonResponse({ startAddress: '2404::', endAddress: '2404:ffff::' });
+        });
+        try {
+            await rdapIp('2404:c0:2520::1');
+            const queried = fetchMock.mock.calls
+                .map((c) => String(c.arguments[0]))
+                .find((u) => u.includes('/ip/'));
+            assert.equal(queried, 'https://rdap.apnic.net/ip/2404:c0:2520::1');
+        } finally {
+            fetchMock.mock.restore();
+        }
     });
 });
