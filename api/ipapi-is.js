@@ -12,9 +12,13 @@ function buildUrl(req) {
     return `https://api.ipapi.is?q=${ipAddress}&key=${key}`;
 }
 
-function modifyJsonForIPAPI(json) {
-    let asn = json.asn || {};
-    const { ip, location, is_datacenter, is_proxy, is_vpn, is_tor } = json;
+// Both nested objects are optional: the upstream answers 200 with a null
+// `location` (and no `asn`) for addresses it can't place — anycast ranges,
+// bogons — so neither may be dereferenced directly.
+export function modifyJsonForIPAPI(json) {
+    const asn = json.asn || {};
+    const location = json.location || {};
+    const { ip, is_datacenter, is_proxy, is_vpn, is_tor } = json;
 
     return {
         ip: ip,

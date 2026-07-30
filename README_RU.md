@@ -96,15 +96,15 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 Полные руководства — в центре документации MyIP: **[docs.ipcheck.ing](https://docs.ipcheck.ing)** (переключатель языка в правом верхнем углу)
 
-* [Руководство разработчика](https://docs.ipcheck.ing/developer) — развёртывание, настройка, архитектура и участие в разработке
-* [База знаний](https://docs.ipcheck.ing/knowledge-base) — как пользоваться каждым инструментом, пошаговая диагностика сети, сетевые концепции
+* [Руководство разработчика](https://docs.ipcheck.ing/developer/ru) — развёртывание, настройка, архитектура и участие в разработке
+* [База знаний](https://docs.ipcheck.ing/knowledge-base/ru) — как пользоваться каждым инструментом, пошаговая диагностика сети, сетевые концепции
 
 ## ⚙️ Конфигурация
 
 Прежде всего важны две настройки:
 
-* **MaxMind GeoLite2 (обязательно)** — бесплатные учётные данные для геолокации IP и запросов ASN. Без них источник MaxMind возвращает 503. → [Настройка MaxMind](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
-* **`ALLOWED_DOMAINS` (обязательно на реальном домене)** — белый список хостов для backend API. Без него любой запрос с домена, отличного от localhost, получает 403. → [Обратный прокси и домены](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
+* **MaxMind GeoLite2 (обязательно)** — бесплатные учётные данные для геолокации IP и запросов ASN. Без них источник MaxMind возвращает 503. → [Настройка MaxMind](https://docs.ipcheck.ing/developer/getting-started/ru/maxmind-setup)
+* **`ALLOWED_DOMAINS` (обязательно на реальном домене)** — белый список хостов для backend API. Без него любой запрос с домена, отличного от localhost, получает 403. → [Обратный прокси и домены](https://docs.ipcheck.ing/developer/getting-started/ru/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
@@ -116,7 +116,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Всё остальное — необязательные ключи API, безопасность и ограничение частоты запросов, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Всё остальное — необязательные ключи API, безопасность и ограничение частоты запросов, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/ru/environment-variables).
 
 
 ## 👩🏻‍💻 Расширенное использование

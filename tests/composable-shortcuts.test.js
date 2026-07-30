@@ -39,10 +39,8 @@ function makeRefs() {
   const calls = {
     queryOpen: 0,
     helpOpen: 0,
-    additionalCurl: 0,
-    footerAbout: 0,
+    shareOpen: 0,
     speedTest: 0,
-    navPrefs: 0,
     advancedNavigate: [],
     advancedFullScreen: 0,
     ipRefresh: [],
@@ -59,12 +57,9 @@ function makeRefs() {
 
   return {
     refs: {
-      navBarRef:         ref({ OpenPreferences: () => { calls.navPrefs += 1; } }),
-      preferencesRef:    ref({}),
       queryIPRef:        ref({ openModal: () => { calls.queryOpen += 1; } }),
       helpModalRef:      ref({ openModal: () => { calls.helpOpen += 1; }, keyMap: null }),
-      additionalRef:     ref({ openCurlModal: () => { calls.additionalCurl += 1; } }),
-      footerRef:         ref({ openAbout: () => { calls.footerAbout += 1; } }),
+      shareReportRef:    ref({ openDialog: () => { calls.shareOpen += 1; } }),
       speedTestRef:      ref({ speedTestController: () => { calls.speedTest += 1; } }),
       advancedToolsRef,
       IPCheckRef:        ref({
@@ -169,6 +164,14 @@ describe('useShortcuts()', () => {
     off();
     assert.equal(calls.helpOpen, 1);
     assert.equal(emitted, 1);
+  });
+
+  it('"e" opens the share report dialog', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    const entry = keyMap.findLast((e) => e.keys === 'e');
+    assert.ok(entry, '"e" key should be registered');
+    entry.action();
+    assert.equal(calls.shareOpen, 1);
   });
 
   it('"h" toggles info mask only when infos loaded', () => {

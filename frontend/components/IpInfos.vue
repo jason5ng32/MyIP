@@ -297,9 +297,8 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   const fetchPromise = (async () => {
     const sources = store.ipDBs.filter(source => source.enabled);
 
-    // The preferred source may no longer be in the enabled list (disabled by
-    // a concurrent card's failure, or a stale stored preference); findIndex
-    // then yields -1 and sources[-1] is undefined — start from the first one.
+    // The requested source may be absent from the enabled list (config flag
+    // off, or configs not loaded yet); findIndex yields -1 — start from 0.
     let currentSourceIndex = sourceID !== null ? sources.findIndex(source => source.id === sourceID) : 0;
     if (currentSourceIndex === -1) currentSourceIndex = 0;
     let attempts = 0;
@@ -312,16 +311,23 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
         const cardData = transformDataFromIPapi(response, source.id, t, lang.value);
 
         if (cardData) {
+          // Fallback landed off the requested source: toast once (parallel
+          // cards dedupe via usingSource), drift the runtime refs, but never
+          // rewrite the user's stored preference.
+          if (source.id !== sourceID && usingSource.value !== source.id) {
+            const from = store.ipDBs.find(db => db.id === sourceID)?.text || `#${sourceID}`;
+            store.setAlert(true, 'text-warning',
+              t('alert.IpGeoSourceFallbackMessage', { from, to: source.text }),
+              t('alert.IpGeoSourceFallbackTitle'), 5000);
+          }
           ipGeoSource.value = source.id;
           usingSource.value = source.id;
-          store.updatePreference('ipGeoSource', source.id);
           Object.assign(card, cardData);
           ipDataCache.set(ip, cardData);
           return;
         }
       } catch (error) {
         console.error("Error fetching IP details from source " + source.id + ":", error);
-        store.updateIPDBs({ id: source.id, enabled: false });
         currentSourceIndex = (currentSourceIndex + 1) % sources.length;
         attempts++;
       }

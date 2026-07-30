@@ -88,9 +88,6 @@ const openCurlModal = () => {
     trackEvent('Additional', 'AdditionalClick', 'Curl');
 };
 
-defineExpose({
-    openCurlModal,
-});
 </script>
 
 <style scoped>

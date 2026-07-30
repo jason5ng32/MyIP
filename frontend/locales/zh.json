@@ -30,9 +30,10 @@
       "Note2": "但是，为了避免滥用，我们会限制一些功能。当你登录后，你将得到以下权益：",
       "Benefit1": "当你使用 IPCheck.ing 作为 IP 数据解析源时，完整显示所有字段",
       "Benefit2": "可以使用隐身测试",
-      "Benefit3": "可以使用深度 DNS 泄漏测试",
+      "Benefit3": "可以使用深度 DNS 泄露测试",
       "Benefit4": "可以看到自己获得的成就勋章",
-      "Benefit5": "减少部分功能的访问限制",
+      "Benefit5": "可以使用 AI 助手 IPChecking Copilot 提问",
+      "Benefit6": "减少部分功能的访问限制",
       "FootNote": "更多权益陆续开发中..."
     },
     "Achievements": {
@@ -142,7 +143,7 @@
     "Connectivity": "网络连通性",
     "ServiceStatus": "服务可用性",
     "WebRTC": "WebRTC 泄露测试",
-    "DNSLeakTest": "DNS 泄漏测试",
+    "DNSLeakTest": "DNS 泄露测试",
     "SpeedTest": "网速测试",
     "PingTest": "全球延迟",
     "MTRTest": "MTR 测试",
@@ -151,13 +152,14 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
+    "AskCopilot": "询问 IPChecking Copilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
     "DocsGreetingSubtitle": "关于 MyIP 的工具、测试结果或自部署，都可以问我。",
     "DocsQuestions": [
-      "我的 VPN 泄漏真实 IP 了吗？",
+      "我的 VPN 泄露真实 IP 了吗？",
       "为什么我的 IP 归属地不对？",
-      "对比我的 WebRTC 测试和 DNS 泄漏测试结果并给出建议",
+      "对比我的 WebRTC 测试和 DNS 泄露测试结果并给出建议",
       "MTR 结果怎么看？",
       "怎么部署一个自己的 MyIP？",
       "我想看更多帮助文档"
@@ -188,7 +190,8 @@
       "ipDBTips": "你可以选择你默认使用的 IP 地理位置数据源，如果你选定的不可用，系统会依次使用后续的数据源。",
       "language": "语言设置",
       "languageTips": "刷新浏览器后生效。"
-    }
+    },
+    "DocsPrompt": "请输入你要询问的问题"
   },
   "securitychecklist": {
     "Title": "安全检查清单",
@@ -479,15 +482,15 @@
     "Provider": "信息服务商"
   },
   "enhanceddnsleaktest": {
-    "Title": "深度 DNS 泄漏测试",
-    "Note": "你已经在首页的 DNS 泄漏测试中大致了解了当前是否存在 DNS 泄漏，以及 DNS 请求的出口地理归属。在这个深度测试里，我们会从更多维度进行检测：捕获更多 DNS 解析器出口 IP、检查这些解析器是否通过 ECS 把你真实 IP 段的前缀转发给了权威服务器、以及它们是否支持 DNSSEC，从而帮助你对自己的 DNS 链路安全性形成更完整的认识。",
+    "Title": "深度 DNS 泄露测试",
+    "Note": "你已经在首页的 DNS 泄露测试中大致了解了当前是否存在 DNS 泄露，以及 DNS 请求的出口地理归属。在这个深度测试里，我们会从更多维度进行检测：捕获更多 DNS 解析器出口 IP、检查这些解析器是否通过 ECS 把你真实 IP 段的前缀转发给了权威服务器、以及它们是否支持 DNSSEC，从而帮助你对自己的 DNS 链路安全性形成更完整的认识。",
     "Note2": "点击「开始测试」即可开始，通常几秒内就能得到结果。我们会在后台发起多次 DNS 探测，由我们的权威 DNS 服务器捕获你所使用的递归解析器出口 IP，一次测试通常可以捕获 20–40 条记录。若完全没有捕获到解析器，可能是浏览器的 DNS 缓存吃掉了请求，稍等片刻再试一次即可。",
     "Note3": "由于这是深度测试，页面里会出现一些较为专业的概念（例如 ECS、DNSSEC 等）。不用担心，运行测试后你可以参考下方的「字段说明」来了解每个字段的具体含义。",
     "Run": "开始测试",
     "RunAgain": "再测一次",
     "RunningProbes": "正在发起 DNS 探测...",
     "PollingResult": "正在收集结果...",
-    "FetchError": "获取 DNS 泄漏测试结果失败，请稍后重试。",
+    "FetchError": "获取 DNS 泄露测试结果失败，请稍后重试。",
     "Empty": "本次会话没有捕获到任何 DNS 解析器，可能是浏览器的 DNS 缓存吃掉了请求，请稍后重试。",
     "TableTitle": "捕获到的 DNS 查询记录",
     "DedupeToggle": "隐藏重复项",
@@ -522,7 +525,7 @@
     },
     "Legend": {
       "Title": "字段说明",
-      "ResolverIP": "实际与我们权威 DNS 服务器通信的递归解析器出口 IP。如果你使用 VPN，把它的 ASN 与你当前 VPN 出口的 ASN 做对比，就能看出 DNS 请求是否绕过了 VPN 通道（即发生了泄漏）。",
+      "ResolverIP": "实际与我们权威 DNS 服务器通信的递归解析器出口 IP。如果你使用 VPN，把它的 ASN 与你当前 VPN 出口的 ASN 做对比，就能看出 DNS 请求是否绕过了 VPN 通道（即发生了泄露）。",
       "QueryType": "解析器向权威服务器请求的记录类型（A、AAAA、HTTPS 等）。浏览器通常会同时发起 A 与 AAAA 查询。",
       "Transport": "DNS 默认走 UDP；出现 TCP 通常意味着响应过大，而响应过大往往是因为带上了 DNSSEC 相关记录。",
       "ECS": "EDNS Client Subnet —— 部分递归 DNS 会在向上游转发查询时附带你真实 IP 的一段前缀（通常是 IPv4 的 /24 或 IPv6 的 /48）。这意味着你的 IP 段会被 DNS 链路上的权威服务器获知，可能用于 CDN 的就近调度，也可能在一定程度上削弱匿名性。",
@@ -555,7 +558,7 @@
     "SaveAsImage": "保存为图片",
     "RefreshConnectivityTests": "刷新连通性测试",
     "RefreshWebRTC": "刷新 WebRTC 泄露测试",
-    "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",
+    "RefreshDNSLeakTest": "刷新 DNS 泄露测试",
     "SpeedTestButton": "开始/暂停网速测试",
     "ShowASNInfo": "显示 AS 详细信息",
     "ShowASNHistory": "显示 ASN 历史",
@@ -594,12 +597,12 @@
       "Heading": "MyIP 网络诊断报告",
       "Intro": "本报告由 MyIP（{origin}）于 {time} 生成，数据来自在用户浏览器中运行的网络测试。字段名为稳定的 schema 标识符；所有延迟数值单位为毫秒。",
       "Masked": "注意：出于隐私考虑，报告中的 IP 地址已遮盖尾段（IPv4 末段、IPv6 接口位，以 \"x\" 表示）。",
-      "Instruction": "请基于以上数据分析该网络的健康状况，指出异常项（DNS 泄漏、WebRTC 暴露、代理/VPN 特征、丢包、高延迟、路由问题等），并给出具体的排查建议。",
+      "Instruction": "请基于以上数据分析该网络的健康状况，指出异常项（DNS 泄露、WebRTC 暴露、代理/VPN 特征、丢包、高延迟、路由问题等），并给出具体的排查建议。",
       "Sections": {
         "ipinfo": "多个独立来源看到的公网 IP（存在代理或分流时不同来源可能不一致）。",
         "connectivity": "浏览器对知名网站的可达性探测；timeMs 为展示的往返耗时，minTimeMs 为多轮中的最佳值。",
-        "webrtc": "通过 WebRTC STUN 暴露的 IP——若与主公网 IP 不同，真实地址可能绕过代理/VPN 泄漏。",
-        "dnsleak": "实际应答浏览器查询的 DNS 解析器出口 IP——解析器不属于用户的 ISP/VPN 供应商即为 DNS 泄漏迹象。",
+        "webrtc": "通过 WebRTC STUN 暴露的 IP——若与主公网 IP 不同，真实地址可能绕过代理/VPN 泄露。",
+        "dnsleak": "实际应答浏览器查询的 DNS 解析器出口 IP——解析器不属于用户的 ISP/VPN 供应商即为 DNS 泄露迹象。",
         "speedtest": "对 Cloudflare 测得的带宽、延迟与负载延迟（bufferbloat）；分数衡量流媒体/游戏/实时通话体验，越高越好。",
         "pingtest": "全球 Globalping 探针对用户 IP 的 ICMP ping 统计。",
         "mtrtest": "全球探针到用户 IP 的逐跳 MTR 路由追踪；中间跳的丢包可能只是 ICMP 限速，从某一跳起持续丢包才代表真实问题。",
@@ -812,7 +815,7 @@
   },
   "dnsleaktest": {
     "Name": "DNS 出口检测",
-    "Title": "DNS 泄漏测试",
+    "Title": "DNS 泄露测试",
     "Note": "DNS 泄露（DNS Leaks）的意思是，当你挂上 VPN/代理后，你解析域名时，依然通过当地的运营商进行解析，这时就有 DNS 泄露的风险。",
     "Note2": "泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的 DNS 出口进行解析，如果返回的出口区域和你当地的运营商区域相同，则有 DNS 泄露风险，你可能需要修改 VPN/代理设置。",
     "EndpointCountry": "出口地区",
@@ -820,8 +823,8 @@
     "StatusError": "测试出错",
     "EnhancedBanner": {
       "Title": "想做更深入的检查？",
-      "Note": "如果想进一步了解你正在使用的所有递归解析器是谁、它们的 ASN 归属、是否通过 ECS 把你真实 IP 的前缀转发给了上游、以及是否启用了 DNSSEC 校验，可以打开下方的「深度 DNS 泄漏测试」。",
-      "CTA": "打开深度 DNS 泄漏测试"
+      "Note": "如果想进一步了解你正在使用的所有递归解析器是谁、它们的 ASN 归属、是否通过 ECS 把你真实 IP 的前缀转发给了上游、以及是否启用了 DNSSEC 校验，可以打开下方的「深度 DNS 泄露测试」。",
+      "CTA": "打开深度 DNS 泄露测试"
     }
   },
   "speedtest": {
@@ -924,7 +927,9 @@
     "unmaskedInfoTitle": "IP 信息已显示",
     "unmaskedInfoMessage": "分享截图时请注意隐私。",
     "SignInFailed": "登录失败",
-    "SignInFailedReason": "原因"
+    "SignInFailedReason": "原因",
+    "IpGeoSourceFallbackTitle": "IP 解析数据源已切换",
+    "IpGeoSourceFallbackMessage": "解析源 {from} 暂时不可用，本次结果临时改由 {to} 提供。"
   },
   "shortcutKeys": {
     "GoToTop": "回到顶部",
@@ -934,15 +939,16 @@
     "RefreshIPCard": "刷新某张 IP 卡片",
     "RefreshConnectivityTests": "刷新连通性测试",
     "RefreshWebRTC": "刷新 WebRTC 泄露测试",
-    "RefreshDNSLeakTest": "刷新 DNS 泄漏测试",
+    "RefreshDNSLeakTest": "刷新 DNS 泄露测试",
     "SpeedTestButton": "开始/暂停网速测试",
     "PingTest": "打开全球延迟测试面板",
-    "MTRTest": "打开全球路由测试面板",
+    "MTRTest": "打开 MTR 测试面板",
     "RuleTest": "打开规则测试面板",
     "DNSResolver": "打开 DNS 解析器面板",
     "IPCheck": "IP 查询",
     "ToggleInfoMask": "切换信息隐藏",
     "IPHistory": "打开 IP 历史记录面板",
+    "ShareReport": "打开分享报告面板",
     "Help": "显示快捷键",
     "HelpNote": "使用快捷键的人，是喜欢效率的人，你真棒！",
     "GoNext": "下一张卡片",
@@ -951,15 +957,13 @@
     "RefreshRuleTests": "刷新规则测试",
     "CensorshipCheck": "打开封锁测试面板",
     "Preferences": "打开偏好设置面板",
-    "About": "打开关于页面",
     "Whois": "打开 Whois 查询面板",
     "ServiceStatus": "打开服务可用性面板",
     "InvisibilityTest": "打开隐身测试面板",
-    "EnhancedDnsLeakTest": "打开深度 DNS 泄漏测试面板",
+    "EnhancedDnsLeakTest": "打开深度 DNS 泄露测试面板",
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",
-    "Curl": "命令行 API",
     "SecurityChecklist": "打开安全检查清单"
   },
   "page": {

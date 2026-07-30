@@ -23,12 +23,9 @@ import { scrollToElement } from '../utils/scroll-to.js';
 
 function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
     const {
-        navBarRef,
-        preferencesRef,
         queryIPRef,
         helpModalRef,
-        additionalRef,
-        footerRef,
+        shareReportRef,
         speedTestRef,
         advancedToolsRef,
         IPCheckRef,
@@ -191,19 +188,9 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
             description: t('shortcutKeys.IPHistory'),
         },
         {
-            keys: 'p',
-            action: () => { navBarRef.value.OpenPreferences(); trackEvent('ShortCut', 'ShortCut', 'Preferences'); },
-            description: t('shortcutKeys.Preferences'),
-        },
-        {
-            keys: 'a',
-            action: () => { footerRef.value?.openAbout(); trackEvent('ShortCut', 'ShortCut', 'About'); },
-            description: t('shortcutKeys.About'),
-        },
-        {
-            keys: 'x',
-            action: () => { additionalRef.value?.openCurlModal(); trackEvent('ShortCut', 'ShortCut', 'Curl'); },
-            description: t('shortcutKeys.Curl'),
+            keys: 'e',
+            action: () => { shareReportRef.value?.openDialog(); trackEvent('ShortCut', 'ShortCut', 'ShareReport'); },
+            description: t('shortcutKeys.ShareReport'),
         },
         {
             keys: '?',

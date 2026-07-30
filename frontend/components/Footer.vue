@@ -15,7 +15,7 @@
         </RouterLink>
       </Button>
       <Button v-if="isDocsConfigured" variant="link" size="default" as-child class="cursor-pointer">
-        <a :href="DOCS_URL" target="_blank" rel="noopener"
+        <a :href="DOCS_URL+'/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
           @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
           {{ t('about.HelpCenter') }}
         </a>
@@ -250,7 +250,4 @@ watch(content, () => {
   });
 });
 
-defineExpose({
-  openAbout,
-});
 </script>

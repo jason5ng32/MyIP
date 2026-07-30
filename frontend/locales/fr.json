@@ -28,11 +28,12 @@
       "Benefit": "Avantage",
       "Note1": "En tant que produit open-source, l'utilisation de IPCheck.ing est gratuite.",
       "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
-      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement.",
-      "Benefit2": "Peut utiliser le test d'invisibilité.",
-      "Benefit3": "Peut utiliser le test d'invisibilité.",
+      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement",
+      "Benefit2": "Peut utiliser le test d'invisibilité",
+      "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Réduit les restrictions d'accès à certaines fonctionnalités.",
+      "Benefit5": "Peut poser des questions à IPChecking Copilot, notre assistant IA",
+      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
     "Achievements": {
@@ -151,6 +152,7 @@
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
     "DocsToolSummary": "Résultats de la page lus",
+    "AskCopilot": "Demander à IPChecking Copilot",
     "OpenDocs": "Ouvrir la doc",
     "DocsGreetingTitle": "Comment puis-je vous aider ?",
     "DocsGreetingSubtitle": "Posez vos questions sur MyIP : les outils, vos résultats ou l'auto-hébergement.",
@@ -188,7 +190,8 @@
       "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes.",
       "language": "Paramètres de langue",
       "languageTips": "Rafraîchissement du navigateur pour prendre effet."
-    }
+    },
+    "DocsPrompt": "Saisissez votre question…"
   },
   "securitychecklist": {
     "Title": "Liste de vérification de sécurité",
@@ -924,7 +927,9 @@
     "unmaskedInfoTitle": "IPs démasquées",
     "unmaskedInfoMessage": "Faites attention lors de la partage des captures d'écran.",
     "SignInFailed": "Echec de connexion",
-    "SignInFailedReason": "Raison"
+    "SignInFailedReason": "Raison",
+    "IpGeoSourceFallbackTitle": "Source de géolocalisation IP changée",
+    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}."
   },
   "shortcutKeys": {
     "GoToTop": "Aller en haut",
@@ -943,6 +948,7 @@
     "IPCheck": "Vérification IP",
     "ToggleInfoMask": "Masquer/Démasquer les informations",
     "IPHistory": "Ouvrir l'historique des IP",
+    "ShareReport": "Ouvrir le partage de rapport",
     "Help": "Afficher les raccourcis clavier",
     "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
     "GoNext": "Carte suivante",
@@ -951,7 +957,6 @@
     "RefreshRuleTests": "Actualiser les tests de règles",
     "CensorshipCheck": "Ouvrir le Test de censorship",
     "Preferences": "Ouvrir les Préférences",
-    "About": "Ouvrir À propos",
     "Whois": "Ouvrir la Recherche Whois",
     "ServiceStatus": "Ouvrir l'état des services",
     "InvisibilityTest": "Ouvrir le Test d'invisibilité",
@@ -959,7 +964,6 @@
     "MacChecker": "Ouvrir le Recherche de MAC",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "fullScreenAdvancedTools": "Outils avancés en plein écran",
-    "Curl": "Ouvrir le Shell",
     "SecurityChecklist": "Ouvrir la Liste de sécurité"
   },
   "page": {

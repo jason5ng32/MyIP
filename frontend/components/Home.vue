@@ -1,8 +1,8 @@
 <template>
-  <NavBar ref="navBarRef" />
+  <NavBar />
   <User ref="userRef" />
   <Achievements ref="achievementsRef" />
-  <Preferences ref="preferencesRef" />
+  <Preferences />
   <main id="mainpart" class="mx-auto w-full px-4 jn-container">
     <div class="rounded-md" tabindex="0">
       <IPCheck ref="IPCheckRef" />
@@ -16,13 +16,13 @@
   <FloatingDock :ready="showMaskButton" :mask-active="infoMaskLevel > 0">
     <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
       :toggleInfoMask="toggleInfoMask" />
-    <ShareReport />
+    <ShareReport ref="shareReportRef" />
     <IPHistory />
     <QueryIP ref="queryIPRef" />
   </FloatingDock>
   <HelpModal ref="helpModalRef" />
-  <Additional ref="additionalRef" />
-  <Footer ref="footerRef" />
+  <Additional />
+  <Footer />
 </template>
 
 <script setup>
@@ -81,14 +81,11 @@ const userPreferences = computed(() => store.userPreferences);
 const isToolOpen = computed(() => !!route.query.tool);
 
 // Template refs
-const navBarRef = ref(null);
 const userRef = ref(null);
 const achievementsRef = ref(null);
-const preferencesRef = ref(null);
 const queryIPRef = ref(null);
 const helpModalRef = ref(null);
-const additionalRef = ref(null);
-const footerRef = ref(null);
+const shareReportRef = ref(null);
 const speedTestRef = ref(null);
 const advancedToolsRef = ref(null);
 const IPCheckRef = ref(null);
@@ -114,7 +111,7 @@ const { loadingControl } = useRefreshOrchestrator({
 // Shortcuts
 const { loadShortcuts } = useShortcuts({
     refs: {
-        navBarRef, preferencesRef, queryIPRef, helpModalRef, additionalRef, footerRef,
+        queryIPRef, helpModalRef, shareReportRef,
         speedTestRef, advancedToolsRef, IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef,
         isInfosLoaded, isToolOpen, toggleInfoMask,
     },

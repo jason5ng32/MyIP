@@ -209,4 +209,7 @@ const onDownloadJson = () => {
 
 const expiresAtDisplay = computed(() =>
     expiresAt.value ? new Date(expiresAt.value).toLocaleString() : '');
+
+// For the `e` keyboard shortcut (use-shortcuts.js).
+defineExpose({ openDialog });
 </script>

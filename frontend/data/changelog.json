@@ -88,7 +88,7 @@
         "type": "add",
         "change": {
           "en": "Added DNS leak test",
-          "zh": "添加了 DNS 泄漏测试",
+          "zh": "添加了 DNS 泄露测试",
           "fr": "Ajout du test de fuite DNS",
           "ru": "Добавлен тест утечки DNS"
         }
@@ -1021,7 +1021,7 @@
         "type": "add",
         "change": {
           "en": "In-depth DNS Leak Test: captures every recursive resolver you use, with ECS and DNSSEC analysis",
-          "zh": "深度 DNS 泄漏测试：捕获所有递归解析器并分析 ECS 与 DNSSEC",
+          "zh": "深度 DNS 泄露测试：捕获所有递归解析器并分析 ECS 与 DNSSEC",
           "fr": "Test de fuite DNS approfondi : capture tous les résolveurs récursifs utilisés, avec analyse ECS et DNSSEC",
           "ru": "Углублённый тест утечки DNS: выявляет все используемые рекурсивные резолверы и анализирует ECS и DNSSEC"
         }

@@ -1,5 +1,6 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { parseTrace } from '@/utils/parse-trace.js';
 import { getIPFromMyExternalIP_V4 } from "./myexternalip-v4";
 
 // Get IPv4 address from Cloudflare
@@ -7,12 +8,7 @@ const getIPFromCloudflare_V4 = async () => {
     try {
         const response = await fetchWithTimeout("https://1.0.0.1/cdn-cgi/trace");
         const data = await response.text();
-        const lines = data.split("\n");
-        const ipLine = lines.find((line) => line.startsWith("ip="));
-        let ip = "";
-        if (ipLine) {
-            ip = ipLine.split("=")[1];
-        }
+        const ip = parseTrace(data).ip ?? "";
         const source = "Cloudflare IPv4";
         if (isValidIP(ip)) {
             return {

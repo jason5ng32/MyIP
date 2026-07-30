@@ -28,11 +28,12 @@
       "Benefit": "Benefit",
       "Note1": "As an open-source product, your use of IPCheck.ing is free of charge.",
       "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
-      "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full.",
-      "Benefit2": "You can use the invisibility test.",
-      "Benefit3": "You can use the in-depth DNS leak test.",
+      "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full",
+      "Benefit2": "You can use the invisibility test",
+      "Benefit3": "You can use the in-depth DNS leak test",
       "Benefit4": "You can view your own achievement badges",
-      "Benefit5": "Reduces access restrictions on some features.",
+      "Benefit5": "You can ask IPChecking Copilot, our AI assistant",
+      "Benefit6": "Reduces access restrictions on some features",
       "FootNote": "More benefits are being developed..."
     },
     "Achievements": {
@@ -151,6 +152,7 @@
     "SearchDocs": "Search docs…",
     "DocsToolConfirm": "Share your current test results?",
     "DocsToolSummary": "Read your on-page results",
+    "AskCopilot": "Ask IPChecking Copilot",
     "OpenDocs": "Open docs",
     "DocsGreetingTitle": "How can I help?",
     "DocsGreetingSubtitle": "Ask me anything about MyIP — the tools, your results, or self-hosting.",
@@ -188,7 +190,8 @@
       "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order.",
       "language": "Language Setting",
       "languageTips": "Refreshing the browser will take effect."
-    }
+    },
+    "DocsPrompt": "Type your question…"
   },
   "securitychecklist": {
     "Title": "Security Checklist",
@@ -923,7 +926,9 @@
     "unmaskedInfoTitle": "IPs Unmasked",
     "unmaskedInfoMessage": "Be careful when sharing screenshots.",
     "SignInFailed": "Sign In Failed",
-    "SignInFailedReason": "Reason"
+    "SignInFailedReason": "Reason",
+    "IpGeoSourceFallbackTitle": "IP Geolocation Source Switched",
+    "IpGeoSourceFallbackMessage": "{from} is temporarily unavailable — this result comes from {to} for now."
   },
   "shortcutKeys": {
     "GoToTop": "Go to Top",
@@ -942,6 +947,7 @@
     "IPCheck": "Query IP Address",
     "ToggleInfoMask": "Toggle Info Masking",
     "IPHistory": "Open IP History panel",
+    "ShareReport": "Open Share Report dialog",
     "Help": "Show Shortcut Keys",
     "HelpNote": "People who use shortcuts are really awesome!",
     "GoNext": "Next Card",
@@ -950,7 +956,6 @@
     "RefreshRuleTests": "Refresh Rule Tests",
     "CensorshipCheck": "Open Censorship Check panel",
     "Preferences": "Open Preferences",
-    "About": "Open About panel",
     "Whois": "Open Whois Search panel",
     "ServiceStatus": "Open Service Status panel",
     "InvisibilityTest": "Open Invisibility Test panel",
@@ -958,7 +963,6 @@
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",
-    "Curl": "Command Line API",
     "SecurityChecklist": "Open Security Checklist panel"
   },
   "page": {

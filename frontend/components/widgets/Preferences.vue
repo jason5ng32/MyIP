@@ -168,7 +168,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted, h } from 'vue';
+import { computed, ref, watch, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -198,7 +198,6 @@ import {
 const { t } = useI18n();
 
 const store = useMainStore();
-const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 
@@ -230,15 +229,6 @@ const themeOptions = [
 const currentIpDB = computed(() =>
     ipDBs.value.find(db => db.id === userPreferences.value.ipGeoSource)
 );
-
-const updateIPDBs = () => {
-    if (configs.value && Object.keys(configs.value).length > 0) {
-        store.updateIPDBs({ id: 0, enabled: configs.value.ipChecking });
-        store.updateIPDBs({ id: 1, enabled: configs.value.ipInfo });
-        store.updateIPDBs({ id: 3, enabled: configs.value.ipapiis });
-        store.updateIPDBs({ id: 4, enabled: configs.value.ip2location });
-    }
-};
 
 const prefTheme = (value) => {
     // Application is handled by use-theme.js, which watches this preference.
@@ -309,11 +299,6 @@ const prefipGeoSource = (value) => {
     trackEvent('Nav', 'PrefereceClick', 'ipGeoSource');
     trackEvent('IPCheck', 'SelectSource', ipDBs.value.find(x => x.id === value).text);
 };
-
-onMounted(() => {
-    setTimeout(updateIPDBs, 4000);
-});
-
 
 // Section title: lucide icon + text, unified rhythm
 const SectionTitle = (props, { slots }) =>

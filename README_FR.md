@@ -96,15 +96,15 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 
 Les guides complets se trouvent dans le centre de documentation MyIP : **[docs.ipcheck.ing](https://docs.ipcheck.ing)** (sélecteur de langue en haut à droite)
 
-* [Guide du développeur](https://docs.ipcheck.ing/developer) — déploiement, configuration, architecture et contribution
-* [Base de connaissances](https://docs.ipcheck.ing/knowledge-base) — utilisation de chaque outil, diagnostic réseau pas à pas, concepts réseau
+* [Guide du développeur](https://docs.ipcheck.ing/developer/fr) — déploiement, configuration, architecture et contribution
+* [Base de connaissances](https://docs.ipcheck.ing/knowledge-base/fr) — utilisation de chaque outil, diagnostic réseau pas à pas, concepts réseau
 
 ## ⚙️ Configuration
 
 Deux réglages comptent avant tout :
 
-* **MaxMind GeoLite2 (requis)** — identifiants gratuits pour la géolocalisation IP et les recherches ASN. Sans eux, la source MaxMind renvoie 503. → [Configuration MaxMind](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
-* **`ALLOWED_DOMAINS` (requis sur un vrai domaine)** — liste blanche de noms d'hôte pour l'API backend. Sans elle, toute requête venant d'un domaine autre que localhost reçoit un 403. → [Reverse proxy et domaines](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
+* **MaxMind GeoLite2 (requis)** — identifiants gratuits pour la géolocalisation IP et les recherches ASN. Sans eux, la source MaxMind renvoie 503. → [Configuration MaxMind](https://docs.ipcheck.ing/developer/getting-started/fr/maxmind-setup)
+* **`ALLOWED_DOMAINS` (requis sur un vrai domaine)** — liste blanche de noms d'hôte pour l'API backend. Sans elle, toute requête venant d'un domaine autre que localhost reçoit un 403. → [Reverse proxy et domaines](https://docs.ipcheck.ing/developer/getting-started/fr/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
@@ -116,7 +116,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Tout le reste — clés API optionnelles, sécurité et limitation de débit, journalisation, Sentry, domaines de l'API curl — est documenté dans la [référence des variables d'environnement](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Tout le reste — clés API optionnelles, sécurité et limitation de débit, journalisation, Sentry, domaines de l'API curl — est documenté dans la [référence des variables d'environnement](https://docs.ipcheck.ing/developer/reference/fr/environment-variables).
 
 
 ## 👩🏻‍💻 Utilisation avancée

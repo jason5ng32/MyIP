@@ -29,6 +29,7 @@ import serviceStatusHandler, {
     detailHandler as serviceStatusDetailHandler,
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
+import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 
 // -- shared test utilities ------------------------------------------------
@@ -335,6 +336,45 @@ describe('ipcheck-ing handler', () => {
         await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+// -- ipapi-is normalizer --------------------------------------------------
+// Pure transform, no fetch involved.
+
+describe('ipapi-is normalize', () => {
+    it('maps a fully populated upstream payload', () => {
+        const out = modifyJsonForIPAPI({
+            ip: '8.8.8.8',
+            location: {
+                city: 'Mountain View', state: 'California', country: 'United States',
+                country_code: 'US', latitude: 37.4, longitude: -122.07,
+            },
+            asn: { asn: 15169, org: 'Google LLC' },
+            is_datacenter: true,
+        });
+        assert.equal(out.city, 'Mountain View');
+        assert.equal(out.country_code, 'US');
+        assert.equal(out.asn, 'AS15169');
+        assert.equal(out.isHosting, true);
+        assert.equal(out.isProxy, false);
+    });
+
+    it('falls back to N/A when the upstream places no location', () => {
+        // Anycast / bogon addresses come back 200 with location: null.
+        const out = modifyJsonForIPAPI({ ip: '104.28.212.153', location: null });
+        assert.equal(out.ip, '104.28.212.153');
+        for (const key of ['city', 'region', 'country', 'country_name', 'country_code', 'latitude', 'longitude']) {
+            assert.equal(out[key], 'N/A', `${key} should degrade to N/A`);
+        }
+        assert.equal(out.asn, 'N/A');
+        assert.equal(out.isHosting, false);
+        assert.equal(out.isProxy, false);
+    });
+
+    it('flags a proxy when any of the vpn / tor / proxy bits is set', () => {
+        assert.equal(modifyJsonForIPAPI({ location: {}, is_vpn: true }).isProxy, true);
+        assert.equal(modifyJsonForIPAPI({ location: {}, is_tor: true }).isProxy, true);
     });
 });
 

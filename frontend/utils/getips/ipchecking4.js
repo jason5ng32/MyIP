@@ -1,5 +1,6 @@
 import { isValidIP } from '@/utils/valid-ip.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { parseTrace } from '@/utils/parse-trace.js';
 import { getIPFromIpify_V4 } from "./ipify-v4";
 
 // Get IPv4 address from IPCheck.ing
@@ -51,13 +52,7 @@ const getFromTrace = async () => {
     try {
         const response = await fetchWithTimeout("https://4.ipcheck.ing/cdn-cgi/trace");
         const data = await response.text();
-        const lines = data.split("\n");
-        const ipLine = lines.find((line) => line.startsWith("ip="));
-        let ip = "";
-        if (ipLine) {
-            ip = ipLine.split("=")[1];
-        }
-        return ip;
+        return parseTrace(data).ip ?? "";
     } catch (error) {
         console.warn("Error fetching IP from IPCheck.ing IPv4 Trace:", error);
         throw error;
