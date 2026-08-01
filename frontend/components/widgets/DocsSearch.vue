@@ -8,7 +8,7 @@
     <Sparkle class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground z-10" />
     <!-- Focused, the native placeholder prompts for a question; idle, the
          rotating overlay below advertises what can be asked. -->
-    <Input v-model="query" type="text" :aria-label="t('nav.AskCopilot')" :disabled="isDocsOpen"
+    <Input v-model="query" type="text" :aria-label="t('nav.AskIPilot')" :disabled="isDocsOpen"
       :placeholder="isFocused ? t('nav.DocsPrompt') : ''"
       class="h-8 w-44 focus:w-64 transition-[width] duration-300 pl-8 text-sm" autocomplete="off" autocorrect="off"
       autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
@@ -27,8 +27,8 @@
     </div>
   </form>
 
-  <JnTooltip v-else-if="enabled" :text="t('nav.AskCopilot')">
-    <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.AskCopilot')"
+  <JnTooltip v-else-if="enabled" :text="t('nav.AskIPilot')">
+    <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.AskIPilot')"
       :disabled="isDocsOpen" @click="openAssistant">
       <Sparkle />
     </Button>

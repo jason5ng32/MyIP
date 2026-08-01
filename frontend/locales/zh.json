@@ -32,7 +32,7 @@
       "Benefit2": "可以使用隐身测试",
       "Benefit3": "可以使用深度 DNS 泄露测试",
       "Benefit4": "可以看到自己获得的成就勋章",
-      "Benefit5": "可以使用 AI 助手 IPChecking Copilot 提问",
+      "Benefit5": "可以使用 AI 助手 IPilot 提问",
       "Benefit6": "减少部分功能的访问限制",
       "FootNote": "更多权益陆续开发中..."
     },
@@ -152,7 +152,7 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
-    "AskCopilot": "询问 IPChecking Copilot",
+    "AskIPilot": "询问 IPilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
     "DocsGreetingSubtitle": "关于 MyIP 的工具、测试结果或自部署，都可以问我。",
@@ -193,7 +193,7 @@
     },
     "DocsPrompt": "请输入你要询问的问题",
     "DocsSignInTitle": "请先登录",
-    "DocsSignInMessage": "登录后即可向 IPChecking Copilot 提问"
+    "DocsSignInMessage": "登录后即可向 IPilot 提问"
   },
   "securitychecklist": {
     "Title": "安全检查清单",

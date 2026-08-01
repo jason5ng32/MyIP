@@ -32,7 +32,7 @@
       "Benefit2": "Peut utiliser le test d'invisibilité",
       "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Peut poser des questions à IPChecking Copilot, notre assistant IA",
+      "Benefit5": "Peut poser des questions à IPilot, notre assistant IA",
       "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
@@ -152,7 +152,7 @@
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
     "DocsToolSummary": "Résultats de la page lus",
-    "AskCopilot": "Demander à IPChecking Copilot",
+    "AskIPilot": "Demander à IPilot",
     "OpenDocs": "Ouvrir la doc",
     "DocsGreetingTitle": "Comment puis-je vous aider ?",
     "DocsGreetingSubtitle": "Posez vos questions sur MyIP : les outils, vos résultats ou l'auto-hébergement.",
@@ -193,7 +193,7 @@
     },
     "DocsPrompt": "Saisissez votre question…",
     "DocsSignInTitle": "Connexion requise",
-    "DocsSignInMessage": "Connectez-vous pour interroger IPChecking Copilot"
+    "DocsSignInMessage": "Connectez-vous pour interroger IPilot"
   },
   "securitychecklist": {
     "Title": "Liste de vérification de sécurité",

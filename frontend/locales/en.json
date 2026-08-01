@@ -32,7 +32,7 @@
       "Benefit2": "You can use the invisibility test",
       "Benefit3": "You can use the in-depth DNS leak test",
       "Benefit4": "You can view your own achievement badges",
-      "Benefit5": "You can ask IPChecking Copilot, our AI assistant",
+      "Benefit5": "You can ask IPilot, our AI assistant",
       "Benefit6": "Reduces access restrictions on some features",
       "FootNote": "More benefits are being developed..."
     },
@@ -152,7 +152,7 @@
     "SearchDocs": "Search docs…",
     "DocsToolConfirm": "Share your current test results?",
     "DocsToolSummary": "Read your on-page results",
-    "AskCopilot": "Ask IPChecking Copilot",
+    "AskIPilot": "Ask IPilot",
     "OpenDocs": "Open docs",
     "DocsGreetingTitle": "How can I help?",
     "DocsGreetingSubtitle": "Ask me anything about MyIP — the tools, your results, or self-hosting.",
@@ -193,7 +193,7 @@
     },
     "DocsPrompt": "Type your question…",
     "DocsSignInTitle": "Sign In Required",
-    "DocsSignInMessage": "Sign in to ask IPChecking Copilot"
+    "DocsSignInMessage": "Sign in to ask IPilot"
   },
   "securitychecklist": {
     "Title": "Security Checklist",

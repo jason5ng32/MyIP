@@ -41,7 +41,7 @@ export const DOCS_URL = (import.meta.env?.VITE_DOCS_URL || '').replace(/\/+$/, '
 export const isDocsConfigured = !!DOCS_URL;
 
 const EMBED_SRC = `${DOCS_URL}/~gitbook/embed/script.js`;
-const ASSISTANT_NAME = 'IPChecking Copilot'; // embed caps this at 32 chars
+const ASSISTANT_NAME = 'IPilot'; // embed caps this at 32 chars
 
 let loadPromise = null;
 

@@ -20,9 +20,9 @@
          No enter/leave transition — the toggle swaps state often enough that
          animating it just reads as a flicker. -->
     <div v-if="isLoaded" class="fixed bottom-9 z-1100" :style="{ left: DOCK_INSET }">
-      <JnTooltip :text="isOpen ? t('about.Close') : t('nav.AskCopilot')" side="right">
+      <JnTooltip :text="isOpen ? t('about.Close') : t('nav.AskIPilot')" side="right">
         <Button size="icon" type="button" :variant="isOpen ? 'secondary' : 'outline'"
-          :aria-label="isOpen ? t('about.Close') : t('nav.AskCopilot')" :aria-expanded="isOpen"
+          :aria-label="isOpen ? t('about.Close') : t('nav.AskIPilot')" :aria-expanded="isOpen"
           class="rounded-full shadow-lg cursor-pointer" @click="toggleDocs">
           <component :is="isOpen ? X : Sparkle" class="size-4" />
         </Button>
