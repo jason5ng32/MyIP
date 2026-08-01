@@ -32,7 +32,8 @@
       "Benefit2": "Peut utiliser le test d'invisibilité",
       "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Réduit les restrictions d'accès à certaines fonctionnalités",
+      "Benefit5": "Peut poser des questions à IPChecking Copilot, notre assistant IA",
+      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
     "Achievements": {
