@@ -32,8 +32,7 @@
       "Benefit2": "可以使用隐身测试",
       "Benefit3": "可以使用深度 DNS 泄露测试",
       "Benefit4": "可以看到自己获得的成就勋章",
-      "Benefit5": "可以使用 AI 助手 IPChecking Copilot 提问",
-      "Benefit6": "减少部分功能的访问限制",
+      "Benefit5": "减少部分功能的访问限制",
       "FootNote": "更多权益陆续开发中..."
     },
     "Achievements": {
@@ -191,7 +190,9 @@
       "language": "语言设置",
       "languageTips": "刷新浏览器后生效。"
     },
-    "DocsPrompt": "请输入你要询问的问题"
+    "DocsPrompt": "请输入你要询问的问题",
+    "DocsSignInTitle": "请先登录",
+    "DocsSignInMessage": "登录后即可向 IPChecking Copilot 提问"
   },
   "securitychecklist": {
     "Title": "安全检查清单",

@@ -1,9 +1,11 @@
 // Lazy loader + controller for the GitBook Docs Assistant embed.
 //
-// Gated twice: the docs site origin comes from `VITE_DOCS_URL` (build-time —
-// empty means the whole feature is absent), and the nav entry points only
-// render on the canonical deployment (`configs.originalSite`), since the
-// assistant answers from IPCheck.ing's own docs site.
+// Gated three ways: the docs site origin comes from `VITE_DOCS_URL`
+// (build-time — empty means the whole feature is absent); the nav entry
+// points only render on the canonical deployment (`configs.originalSite`),
+// since the assistant answers from IPCheck.ing's own docs site; and the
+// assistant itself is a sign-in benefit — entry points are visible to
+// everyone, but a signed-out interaction only prompts to sign in.
 //
 // Nothing loads until the visitor actually asks for docs: the embed script
 // (served by the docs site) is injected on demand, then the assistant panel
@@ -31,6 +33,7 @@
 // docs site in a new tab so the action never dead-ends.
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useMainStore } from '@/store';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
 import { REPORT_SECTION_IDS } from '@/utils/report-schema.js';
 
@@ -78,6 +81,7 @@ const loadEmbedScript = () => {
 
 export function useDocsAssistant() {
     const { t, tm, rt } = useI18n();
+    const store = useMainStore();
     const isOpening = ref(false);
     const { sections } = useCollectedReport();
 
@@ -132,6 +136,12 @@ export function useDocsAssistant() {
 
     const askDocs = async (query) => {
         if (!isDocsConfigured) return;
+        // Every entry point funnels through here, so this is the one place
+        // the sign-in benefit is enforced.
+        if (store.isSignedIn !== true) {
+            store.setAlert(true, 'text-warning', t('nav.DocsSignInMessage'), t('nav.DocsSignInTitle'));
+            return;
+        }
         const question = (query || '').trim();
         if (isOpening.value) return;
         isOpening.value = true;

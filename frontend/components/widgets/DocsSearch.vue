@@ -52,12 +52,12 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 
-// Three gates: a docs site to answer from (build time), the canonical
-// deployment (same as the original-site-only advanced tools), and a signed-in
-// visitor.
+// Two gates for visibility: a docs site to answer from (build time) and the
+// canonical deployment (same as the original-site-only advanced tools).
+// Using the assistant additionally requires sign-in — enforced inside
+// askDocs, which prompts signed-out visitors to sign in.
 const enabled = computed(() => isDocsConfigured
-  && store.configs?.originalSite === true
-  && store.isSignedIn === true);
+  && store.configs?.originalSite === true);
 
 // While the assistant panel is open it owns the conversation, so this entry
 // point goes inert — otherwise there are two places to type. State comes from

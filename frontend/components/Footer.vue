@@ -14,8 +14,8 @@
           {{ t('about.Privacy') }}
         </RouterLink>
       </Button>
-      <Button v-if="isDocsConfigured" variant="link" size="default" as-child class="cursor-pointer">
-        <a :href="DOCS_URL+'/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
+      <Button variant="link" size="default" as-child class="cursor-pointer">
+        <a :href="'https://docs.ipcheck.ing/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
           @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
           {{ t('about.HelpCenter') }}
         </a>
@@ -165,7 +165,6 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/analytics';
-import { DOCS_URL, isDocsConfigured } from '@/composables/use-docs-assistant';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
