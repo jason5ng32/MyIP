@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 
@@ -84,9 +85,13 @@ export default async (req, res) => {
         if (res.locals.cacheControl) {
             res.setHeader('Cache-Control', res.locals.cacheControl);
         }
-        Readable.fromWeb(apiRes.body).pipe(res);
+        await pipeline(Readable.fromWeb(apiRes.body), res);
     } catch (e) {
         logger.error({ err: e, latitude, longitude, language, CanvasMode }, 'google-map handler failed');
-        res.status(500).json({ error: e.message });
+        if (res.headersSent || res.destroyed) {
+            if (!res.destroyed) res.destroy();
+            return;
+        }
+        return res.status(500).json({ error: e.message });
     }
 };

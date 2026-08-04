@@ -9,6 +9,8 @@
 // repeat those checks, so this file focuses on handler-specific branches.
 
 import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { Writable } from 'node:stream';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
@@ -64,6 +66,7 @@ const ENV_KEYS = [
     // Pre-rename spellings, still honored as fallbacks.
     'IPINFO_API_TOKEN', 'CLOUDFLARE_API',
 ];
+const originalFetch = globalThis.fetch;
 let envBackup = {};
 
 beforeEach(() => {
@@ -72,6 +75,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+    globalThis.fetch = originalFetch;
     for (const k of ENV_KEYS) {
         if (envBackup[k] === undefined) delete process.env[k];
         else process.env[k] = envBackup[k];
@@ -120,6 +124,79 @@ describe('google-map handler', () => {
         }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid request' });
+    });
+
+    it('stays active until the upstream image stream completes', async () => {
+        let closeBody;
+        const upstreamBody = new ReadableStream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('partial image'));
+                closeBody = () => controller.close();
+            },
+        });
+        globalThis.fetch = async () => new Response(upstreamBody, {
+            headers: { 'content-type': 'image/jpeg' },
+        });
+
+        const chunks = [];
+        const res = new Writable({
+            write(chunk, _encoding, callback) {
+                chunks.push(Buffer.from(chunk));
+                callback();
+            },
+        });
+        res.locals = {};
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (payload) => { res.body = payload; res.end(); return res; };
+
+        let settled = false;
+        const handlerPromise = googleMapHandler(createRequest({
+            query: { latitude: '1', longitude: '2', language: 'en' },
+        }), res).finally(() => { settled = true; });
+
+        await new Promise(setImmediate);
+        const settledBeforeClose = settled;
+        closeBody();
+        await handlerPromise;
+        if (!res.writableFinished) await once(res, 'finish');
+
+        assert.equal(settledBeforeClose, false);
+        assert.equal(Buffer.concat(chunks).toString(), 'partial image');
+    });
+
+    it('closes a partial image response when the upstream stream fails', async () => {
+        const upstreamBody = new ReadableStream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('partial image'));
+                setImmediate(() => controller.error(new Error('upstream reset')));
+            },
+        });
+        globalThis.fetch = async () => new Response(upstreamBody, {
+            headers: { 'content-type': 'image/jpeg' },
+        });
+
+        let headersSent = false;
+        let jsonCalled = false;
+        const res = new Writable({
+            write(_chunk, _encoding, callback) {
+                headersSent = true;
+                callback();
+            },
+        });
+        Object.defineProperty(res, 'headersSent', { get: () => headersSent });
+        res.locals = {};
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = () => { jsonCalled = true; return res; };
+
+        await googleMapHandler(createRequest({
+            query: { latitude: '1', longitude: '2', language: 'en' },
+        }), res);
+
+        assert.equal(headersSent, true);
+        assert.equal(res.destroyed, true);
+        assert.equal(jsonCalled, false);
     });
 });
 
