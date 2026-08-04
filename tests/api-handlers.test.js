@@ -165,6 +165,34 @@ describe('google-map handler', () => {
         assert.equal(Buffer.concat(chunks).toString(), 'partial image');
     });
 
+    it('returns 500 when the upstream stream fails before its first chunk', async () => {
+        const upstreamBody = new ReadableStream({
+            start(controller) {
+                controller.error(new Error('upstream reset'));
+            },
+        });
+        globalThis.fetch = async () => new Response(upstreamBody, {
+            headers: { 'content-type': 'image/jpeg' },
+        });
+
+        const res = new Writable({
+            write(_chunk, _encoding, callback) {
+                callback();
+            },
+        });
+        res.locals = {};
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (payload) => { res.body = payload; res.end(); return res; };
+
+        await googleMapHandler(createRequest({
+            query: { latitude: '1', longitude: '2', language: 'en' },
+        }), res);
+
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'upstream reset' });
+    });
+
     it('closes a partial image response when the upstream stream fails', async () => {
         const upstreamBody = new ReadableStream({
             start(controller) {
@@ -197,6 +225,48 @@ describe('google-map handler', () => {
         assert.equal(headersSent, true);
         assert.equal(res.destroyed, true);
         assert.equal(jsonCalled, false);
+    });
+
+    it('cancels the upstream body when the client disconnects', async () => {
+        let closeTimer;
+        let bodyCancelled = false;
+        const upstreamBody = new ReadableStream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('partial image'));
+            },
+            pull(controller) {
+                closeTimer ||= setTimeout(() => controller.close(), 100);
+            },
+            cancel() {
+                clearTimeout(closeTimer);
+                bodyCancelled = true;
+            },
+        });
+        globalThis.fetch = async () => new Response(upstreamBody, {
+            headers: { 'content-type': 'image/jpeg' },
+        });
+
+        let firstWrite;
+        const firstWritePromise = new Promise((resolve) => { firstWrite = resolve; });
+        const res = new Writable({
+            write(_chunk, _encoding, callback) {
+                firstWrite();
+                callback();
+            },
+        });
+        res.locals = {};
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (payload) => { res.body = payload; return res; };
+
+        const handlerPromise = googleMapHandler(createRequest({
+            query: { latitude: '1', longitude: '2', language: 'en' },
+        }), res);
+        await firstWritePromise;
+        res.destroy();
+        await handlerPromise;
+
+        assert.equal(bodyCancelled, true);
     });
 });
 

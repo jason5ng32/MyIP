@@ -40,6 +40,39 @@ const styles = {
     ]
 };
 
+const createRemainingBody = (reader) => {
+    let readerReleased = false;
+    const releaseReader = () => {
+        if (readerReleased) return;
+        reader.releaseLock();
+        readerReleased = true;
+    };
+
+    return new ReadableStream({
+        async pull(controller) {
+            try {
+                const { done, value } = await reader.read();
+                if (done) {
+                    releaseReader();
+                    controller.close();
+                    return;
+                }
+                controller.enqueue(value);
+            } catch (e) {
+                releaseReader();
+                controller.error(e);
+            }
+        },
+        async cancel(reason) {
+            try {
+                await reader.cancel(reason);
+            } finally {
+                releaseReader();
+            }
+        },
+    });
+};
+
 export default async (req, res) => {
     // Check if request is legitimate
     if (!isValidRequest(req)) {
@@ -71,22 +104,40 @@ export default async (req, res) => {
 
     const url = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&markers=color:blue%7C${latitude},${longitude}&scale=${scale}&zoom=${zoom}&maptype=roadmap&language=${language}&format=${fmt}&size=${mapSize}&style=${styleParam}&key=${apiKey}`;
 
-    // Unlike the JSON handlers, the Static Maps response is a binary JPEG
-    // and must be passed through to the client. Convert the WHATWG ReadableStream
-    // from fetch into a Node Readable and pipe it at the Express response.
+    let bodyReader;
     try {
         const apiRes = await fetchUpstream(url);
         if (!apiRes.ok) {
             return res.status(apiRes.status).json({ error: `Upstream map API returned ${apiRes.status}` });
         }
+
+        // Read one chunk before the response starts. An early upstream error can
+        // then return JSON instead of closing the client connection.
+        bodyReader = apiRes.body.getReader();
+        const firstChunk = await bodyReader.read();
+
         res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'image/jpeg');
         // Binary streams bypass the res.json hook in the cacheable() middleware,
         // so apply the cache value it stashed on res.locals here on the 2xx path.
         if (res.locals.cacheControl) {
             res.setHeader('Cache-Control', res.locals.cacheControl);
         }
-        await pipeline(Readable.fromWeb(apiRes.body), res);
+
+        if (firstChunk.done) {
+            bodyReader.releaseLock();
+            bodyReader = undefined;
+            return res.end();
+        }
+
+        res.write(firstChunk.value);
+        const remainingBody = Readable.fromWeb(createRemainingBody(bodyReader));
+        bodyReader = undefined;
+        await pipeline(remainingBody, res);
     } catch (e) {
+        if (bodyReader) {
+            await bodyReader.cancel(e).catch(() => undefined);
+            bodyReader.releaseLock();
+        }
         logger.error({ err: e, latitude, longitude, language, CanvasMode }, 'google-map handler failed');
         if (res.headersSent || res.destroyed) {
             if (!res.destroyed) res.destroy();

@@ -128,8 +128,8 @@ Access control and timeouts live in shared middleware, not handlers
 - **No commits without explicit user approval** — AI edits → user reviews →
   user tests → user says "commit". Even with tests green, visual changes need
   user eyes before landing.
-- **One concern per commit**, message style per `git log`
-  (`Feat(xxx):` / `Fix(ui):` / `Refactor(xxx):` / `Style:` / `Chore:`),
+- **One concern per commit**, message style per commitlint
+  (`feat(xxx):` / `fix(ui):` / `refactor(xxx):` / `style:` / `chore:`),
   AI adds itself as co-author.
 - **Self-test before handing off** (`pnpm check`); if a change is visual and
   headless-unverifiable, say so explicitly.
