@@ -193,6 +193,52 @@ describe('google-map handler', () => {
         assert.deepEqual(res.body, { error: 'upstream reset' });
     });
 
+    it('cancels the upstream body when the client disconnects before the first chunk', async () => {
+        let closeBody;
+        let bodyCancelled = false;
+        const upstreamBody = new ReadableStream({
+            start(controller) {
+                closeBody = () => controller.close();
+            },
+            cancel() {
+                bodyCancelled = true;
+            },
+        });
+        globalThis.fetch = async () => new Response(upstreamBody, {
+            headers: { 'content-type': 'image/jpeg' },
+        });
+
+        const res = new Writable({
+            write(_chunk, _encoding, callback) {
+                callback();
+            },
+        });
+        res.locals = {};
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (payload) => { res.body = payload; return res; };
+
+        const handlerPromise = googleMapHandler(createRequest({
+            query: { latitude: '1', longitude: '2', language: 'en' },
+        }), res);
+        await new Promise(setImmediate);
+        res.destroy();
+
+        let timeoutId;
+        const settledPromptly = await Promise.race([
+            handlerPromise.then(() => true),
+            new Promise((resolve) => { timeoutId = setTimeout(() => resolve(false), 100); }),
+        ]);
+        clearTimeout(timeoutId);
+        if (!settledPromptly) {
+            closeBody();
+            await handlerPromise;
+        }
+
+        assert.equal(settledPromptly, true);
+        assert.equal(bodyCancelled, true);
+    });
+
     it('closes a partial image response when the upstream stream fails', async () => {
         const upstreamBody = new ReadableStream({
             start(controller) {

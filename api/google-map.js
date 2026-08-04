@@ -114,7 +114,26 @@ export default async (req, res) => {
         // Read one chunk before the response starts. An early upstream error can
         // then return JSON instead of closing the client connection.
         bodyReader = apiRes.body.getReader();
-        const firstChunk = await bodyReader.read();
+        let clientClosed = false;
+        const cancelFirstRead = () => {
+            clientClosed = true;
+            void bodyReader.cancel(new Error('client disconnected')).catch(() => undefined);
+        };
+        res.once('close', cancelFirstRead);
+        if (res.destroyed) cancelFirstRead();
+
+        let firstChunk;
+        try {
+            firstChunk = await bodyReader.read();
+        } finally {
+            res.off('close', cancelFirstRead);
+        }
+
+        if (clientClosed || res.destroyed) {
+            bodyReader.releaseLock();
+            bodyReader = undefined;
+            return;
+        }
 
         res.setHeader('Content-Type', apiRes.headers.get('content-type') || 'image/jpeg');
         // Binary streams bypass the res.json hook in the cacheable() middleware,
