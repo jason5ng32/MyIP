@@ -29,11 +29,16 @@
           <X class="size-3.5" />
         </button>
         <CardContent class="p-4">
-          <!-- Brand icon (built-in) or first-letter tile (custom) + name -->
+          <!-- Site favicon (built-in / imported) or first-letter tile (custom) + name.
+               Favicons are same-origin (public/favicons/), so they render even
+               when the tested site is unreachable; a load error falls back to
+               the letter tile. -->
           <div class="flex items-center gap-2 mb-3 cursor-pointer"
-            @click.prevent="checkConnectivityHandler(test, onTestComplete, true)"
+            @click.prevent="checkConnectivityHandler(test, () => { }, true)"
             :title="t('connectivity.RefreshThisTest')">
-            <Icon v-if="test.icon" :icon="test.icon" class="size-6 text-muted-foreground" />
+            <img v-if="test.favicon && !test.faviconFailed" :src="test.favicon" alt=""
+              @error="test.faviconFailed = true"
+              class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" />
             <span v-else
               class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
@@ -70,73 +75,55 @@
         </CardContent>
       </Card>
 
-      <!-- "+" tile to add a custom test; hidden at the cap -->
-      <Card v-if="canAddCustom" @click="openAddDialog"
+      <!-- "Add Test" tile: stacked flag/brand icons signal that curated
+           lists live behind it, not just a blank form. Hidden at the cap. -->
+      <Card v-if="canAddCustom" @click="addDialogOpen = true"
         class="cursor-pointer border-dashed bg-transparent hover:bg-muted/50 transition-colors"
         :title="t('connectivity.addCustom.AddCard')">
-        <CardContent class="p-4 flex flex-col items-center justify-center gap-1.5 text-muted-foreground"
+        <CardContent class="p-4 flex flex-col items-center justify-center gap-2 text-muted-foreground"
           :class="multipleTests ? 'min-h-[106px]' : 'min-h-[92px]'">
-          <CirclePlus class="size-5" />
-          <span class="text-sm font-medium">{{ t('connectivity.addCustom.AddCard') }}</span>
+          <span class="flex -space-x-2">
+            <template v-for="item in TILE_PREVIEW" :key="item.emoji || item.id">
+              <span v-if="item.type === 'emoji'"
+                class="size-6 rounded-full ring-2 ring-background bg-background inline-flex items-center justify-center text-sm leading-none">
+                {{ item.emoji }}</span>
+              <img v-else :src="faviconPath(item.id)" alt=""
+                class="size-6 rounded-full ring-2 ring-background bg-background object-contain p-0.5" />
+            </template>
+          </span>
+          <span class="text-sm font-medium inline-flex items-center gap-1">
+            <Plus class="size-4" /> {{ t('connectivity.addCustom.AddCard') }}
+          </span>
         </CardContent>
       </Card>
     </div>
 
-    <!-- Add custom test dialog -->
-    <Dialog :open="addDialogOpen" @update:open="onAddDialogChange">
-      <DialogContent class="max-w-md">
-        <DialogHeader :icon="CirclePlus" :title="t('connectivity.addCustom.Title')" />
-        <div class="space-y-4">
-          <div class="space-y-1.5">
-            <Label for="custom-conn-name">{{ t('connectivity.addCustom.NameLabel') }}</Label>
-            <Input id="custom-conn-name" v-model="addName" :placeholder="t('connectivity.addCustom.NamePlaceholder')"
-              :aria-invalid="isNameError ? 'true' : undefined" autocomplete="off" autocorrect="off" autocapitalize="off"
-              spellcheck="false" data-1p-ignore data-lpignore="true" @keyup.enter="handleAdd" maxlength="20" />
-          </div>
-          <div class="space-y-1.5">
-            <Label for="custom-conn-url">{{ t('connectivity.addCustom.UrlLabel') }}</Label>
-            <Input id="custom-conn-url" v-model="addUrl" :placeholder="t('connectivity.addCustom.UrlPlaceholder')"
-              :aria-invalid="isUrlError ? 'true' : undefined" autocomplete="off" autocorrect="off" autocapitalize="off"
-              spellcheck="false" data-1p-ignore data-lpignore="true" @keyup.enter="handleAdd" />
-          </div>
-          <p class="mb-2 text-xs text-muted-foreground leading-relaxed">{{ t('connectivity.addCustom.Hint') }}</p>
-          <!-- min-h-4 reserves space so the dialog height doesn't jump -->
-          <p class="text-xs text-destructive min-h-4" aria-live="polite">{{ addError }}</p>
-          <div class="flex justify-end gap-2 pt-2">
-            <Button variant="action" type="button" @click="handleAdd"
-              :disabled="addName.length === 0 || addUrl.length === 0" class="cursor-pointer">
-              {{ t('connectivity.addCustom.Add') }}
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <!-- Add / import dialog (custom form + curated list browser) -->
+    <ConnectivityAddDialog v-model:open="addDialogOpen" :builtin-urls="builtinUrls" />
   </section>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
+import {
+  CONNECTIVITY_TARGET_LIMIT, TILE_PREVIEW, faviconPath,
+} from '@/data/connectivity-import-lists.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import ConnectivityAddDialog from '@/components/widgets/ConnectivityAddDialog.vue';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
-  Play, CirclePlus, Frown, Meh, RotateCw, Smile, X,
+  Play, Frown, Meh, Plus, RotateCw, Smile, X,
 } from '@lucide/vue';
-import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
-const router = useRouter();
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 const alertToShow = ref(false);
@@ -147,17 +134,6 @@ const alertMessage = ref("");
 const multipleTests = ref(userPreferences.value.connectivityMultipleTests);
 const autoShowAltert = ref(userPreferences.value.popupConnectivityNotifications);
 const isStarted = ref(false);
-// Sticky flag: once any connectivity pass has settled, surface the Service
-// Status banner — a connectivity failure on an AI product is often the
-// service being down, not the user's network.
-const hasEverSettled = ref(false);
-const showServiceStatusBanner = computed(() => hasEverSettled.value);
-
-const openServiceStatus = () => {
-  trackEvent('Section', 'BannerClick', 'ServiceStatus');
-  // Open the Service Status tool's in-page drawer (tools are query-driven now).
-  router.push({ path: '/', query: { tool: 'servicestatus' } });
-};
 const counter = ref(0);
 const maxCounts = ref(9);
 const manualRun = ref(false);
@@ -167,27 +143,33 @@ const totalRounds = computed(() => 1 + maxCounts.value);
 const allRoundsDone = ref(false);
 const alertFired = ref(false);
 
-// Built-in targets first; custom ones (`.custom = true`) are merged in by
-// the watcher below. Keeping both in one reactive array lets every iterator
-// (run-loop, keyboard nav) treat tiles uniformly.
-const MAX_CUSTOM_TARGETS = 9;
+// Built-in targets first; custom / imported ones (`.custom = true`) are
+// merged in by the watcher below. Keeping both in one reactive array lets
+// every iterator (run-loop, keyboard nav) treat tiles uniformly.
 // `roundResults` records per-round { tone, time } for the progress dots,
 // independent of the best-of-N face/text. `time` powers the per-dot hover
 // tooltip; for `tone: 'fail'` rounds it stays 0. Bootstrap-only writer.
+// Icons come from the committed same-origin favicon set (public/favicons/).
+const builtinTarget = (id, name, url) => ({
+  id, name, url, favicon: faviconPath(id), status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [],
+});
 const connectivityTests = reactive([
-  { id: 'google', name: 'Google', icon: 'ri:google-line', url: 'https://www.google.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'youtube', name: 'YouTube', icon: 'ri:youtube-line', url: 'https://www.youtube.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'github', name: 'GitHub', icon: 'ri:github-line', url: 'https://github.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  builtinTarget('google', 'Google', 'https://www.google.com/favicon.ico'),
+  builtinTarget('youtube', 'YouTube', 'https://www.youtube.com/favicon.ico'),
+  builtinTarget('github', 'GitHub', 'https://github.com/favicon.ico'),
   // Use speed.cloudflare.com (not www.cloudflare.com): the marketing site
   // attaches `Link: rel=preload` headers for its brand fonts to every response
   // — including /favicon.ico — which the browser honors regardless of fetch
   // mode, then fails CORS on the woff2 files. speed.cloudflare.com serves a
   // plain favicon with no preload headers.
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'simple-icons:cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'claude', name: 'Claude', icon: 'ri:claude-line', url: 'https://claude.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'chatgpt', name: 'ChatGPT', icon: 'ri:openai-line', url: 'https://chatgpt.com/favicon.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
-  { id: 'wechat', name: 'WeChat', icon: 'ri:wechat-line', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [] },
+  builtinTarget('cloudflare', 'Cloudflare', 'https://speed.cloudflare.com/favicon.ico'),
+  builtinTarget('claude', 'Claude', 'https://claude.com/favicon.ico'),
+  builtinTarget('chatgpt', 'ChatGPT', 'https://chatgpt.com/favicon.ico'),
+  builtinTarget('wechat', 'WeChat', 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico'),
 ]);
+
+// Hostname-dedupe input for the import dialog.
+const builtinUrls = connectivityTests.map((test) => test.url);
 
 // Reconcile custom targets by id (not wipe-and-refill) so existing cards
 // don't flash back to "Awaiting Test" each time the user adds another one.
@@ -212,17 +194,24 @@ watch(
 
     for (const target of targets) {
       if (existingCustomIds.has(target.id)) continue;
-      connectivityTests.push({
+      const entry = reactive({
         id: target.id,
         name: target.name,
         url: target.url,
         custom: true,
-        icon: null,
+        // Imported entries carry a same-origin favicon + their source list;
+        // hand-added ones fall back to the letter tile.
+        favicon: target.favicon || null,
+        listId: target.listId || null,
         status: t('connectivity.StatusWait'),
         time: 0,
         mintime: 0,
         roundResults: [],
       });
+      connectivityTests.push(entry);
+      // Cards added after the bootstrap pass (import / hand-add) test
+      // themselves right away instead of sitting at "Awaiting Test".
+      if (isStarted.value) checkConnectivityHandler(entry, () => { }, true);
     }
   },
   { immediate: true, deep: true },
@@ -230,14 +219,8 @@ watch(
 
 const canAddCustom = computed(() => {
   const current = userPreferences.value.customConnectivityTargets || [];
-  return current.length < MAX_CUSTOM_TARGETS;
+  return current.length < CONNECTIVITY_TARGET_LIMIT;
 });
-
-const letterColor = (name) => {
-  const hash = [...(name || '')].reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const hue = hash % 360;
-  return `hsl(${hue}, 50%, 45%)`;
-};
 
 // Status string → tone. Custom isSuccess + time-based fast/slow split,
 // since the value here isn't an IP like the other toneOf call sites.
@@ -287,7 +270,7 @@ const statusFaceIcon = (test) => {
 // distinguish a completed request from a timeout without double-firing.
 const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
   manualRun.value = isManualRun;
-  // Only bootstrap multi-test rounds feed the dot history; manual paths skip it.
+  // Only multi-cycle passes feed the dot history; per-card refreshes skip it.
   const recordRound = multipleTests.value && !isManualRun;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3 * 1200);
@@ -307,7 +290,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     // back to an enum without string comparison against t() output.
     test.statusCode = CONNECTIVITY_STATUS.OK;
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);
-    test.time = (multipleTests.value && !isManualRun) ? test.mintime : testTime;
+    test.time = recordRound ? test.mintime : testTime;
     if (recordRound) test.roundResults.push({ tone: testTime < 200 ? 'ok-fast' : 'ok-slow', time: testTime });
     onTestComplete(true);
   } catch {
@@ -315,7 +298,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     // Best-of-N: in multi mode a later failure doesn't downgrade a card
     // that already succeeded (mintime > 0). The dot row still records the
     // real 'fail' — it's per-round history, separate from the face/text.
-    if (multipleTests.value && !isManualRun && test.mintime > 0) {
+    if (recordRound && test.mintime > 0) {
       test.status = t('connectivity.StatusAvailable');
       test.statusCode = CONNECTIVITY_STATUS.OK;
       test.time = test.mintime;
@@ -362,8 +345,6 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
     Promise.allSettled(testPromises).then(() => {
       // Multi mode overwrites this with finalizeMultiTestAlert before the toast fires.
       updateConnectivityAlert(successCount === totalTests ? 'success' : 'error');
-      // Sticky flag for the Service Status banner — set once the first pass lands.
-      hasEverSettled.value = true;
       // Domain event: snapshot after every pass (multi-round included) —
       // latest wins downstream in the report collector.
       emitAppEvent('connectivity:finished', {
@@ -407,86 +388,9 @@ const updateConnectivityAlert = (type) => {
 };
 
 // ── Add/remove custom targets ──────────────────────────────────────────────
+// The add/import dialog itself lives in ConnectivityAddDialog.vue; this
+// component only owns the open flag and per-card removal.
 const addDialogOpen = ref(false);
-const addName = ref('');
-const addUrl = ref('');
-const addError = ref('');
-
-// Map the shared addError back to its field so aria-invalid only flags the
-// offending Input (shadcn-vue's Input paints the red ring from that attr).
-const isNameError = computed(() => addError.value === t('connectivity.addCustom.NameRequired'));
-const isUrlError = computed(() => {
-  const err = addError.value;
-  return err === t('connectivity.addCustom.UrlRequired')
-    || err === t('connectivity.addCustom.InvalidUrl');
-});
-
-const openAddDialog = () => {
-  addName.value = '';
-  addUrl.value = '';
-  addError.value = '';
-  addDialogOpen.value = true;
-  // Focus first input after the portal mounts.
-  nextTick(() => {
-    const el = document.getElementById('custom-conn-name');
-    if (el) el.focus();
-  });
-};
-
-const onAddDialogChange = (val) => { addDialogOpen.value = val; };
-
-// Bare domain → /favicon.ico (CDN-cached, fast & meaningful RTT).
-// Explicit paths preserved so users can probe specific endpoints.
-const normalizeTestUrl = (input) => {
-  const raw = (input || '').trim();
-  if (!raw) return null;
-  try {
-    const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
-    const parsed = new URL(withScheme);
-    if (!parsed.hostname || !parsed.hostname.includes('.')) return null;
-    if (parsed.pathname === '/' && !parsed.search) {
-      return `${parsed.origin}/favicon.ico`;
-    }
-    return parsed.toString();
-  } catch {
-    return null;
-  }
-};
-
-const handleAdd = () => {
-  addError.value = '';
-  const name = addName.value.trim();
-  const rawUrl = addUrl.value.trim();
-
-  if (!name) {
-    addError.value = t('connectivity.addCustom.NameRequired');
-    return;
-  }
-  if (!rawUrl) {
-    addError.value = t('connectivity.addCustom.UrlRequired');
-    return;
-  }
-  const url = normalizeTestUrl(rawUrl);
-  if (!url) {
-    addError.value = t('connectivity.addCustom.InvalidUrl');
-    return;
-  }
-
-  const current = userPreferences.value.customConnectivityTargets || [];
-  if (current.length >= MAX_CUSTOM_TARGETS) {
-    addError.value = t('connectivity.addCustom.LimitReached');
-    return;
-  }
-
-  const newTarget = {
-    id: `custom-${Date.now()}`,
-    name: name.slice(0, 20),
-    url,
-  };
-  store.updatePreference('customConnectivityTargets', [...current, newTarget]);
-  trackEvent('Section', 'AddCustomTarget', 'Connectivity');
-  addDialogOpen.value = false;
-};
 
 const removeCustomTarget = (id) => {
   const current = userPreferences.value.customConnectivityTargets || [];
@@ -506,19 +410,36 @@ const finalizeMultiTestAlert = () => {
 
 // ── Main control ───────────────────────────────────────────────────────────
 // `trigger` selects three behaviors (arming the toast = setting alertToShow):
-//   'boot'    — startup auto-run: arm toast, no card reset, auto pass (records rounds)
-//   'manual'  — section refresh button: arm toast, reset cards, single pass
+//   'boot'    — startup auto-run: arm toast, no card reset
+//   'manual'  — section refresh button: arm toast, reset cards
 //   'refresh' — global "refresh everything": suppress toast (global alert covers it), reset cards
+// Multi-round mode applies to every trigger, not just boot — with the
+// connectivity auto-run switch off, the manual/global refresh IS the user's
+// only entry point, and the rounds preference must still hold there.
 const handelCheckStart = async (trigger = 'boot') => {
   const multi = multipleTests.value;
   const isAuto = trigger === 'boot';
   const showToast = trigger !== 'refresh';
   const resetCards = trigger !== 'boot';
-  await checkAllConnectivity(showToast, resetCards, !isAuto);
+  // Fresh multi cycle: stop any round loop still ticking and zero its
+  // bookkeeping so the dot rows and the best-of-N aggregate restart cleanly.
+  if (multi) {
+    if (intervalId.value !== null) {
+      clearInterval(intervalId.value);
+      intervalId.value = null;
+    }
+    counter.value = 0;
+    manualRun.value = false;
+    allRoundsDone.value = false;
+    connectivityTests.forEach((test) => {
+      test.roundResults = [];
+      test.mintime = 0;
+    });
+  }
+  await checkAllConnectivity(showToast, resetCards, !multi && !isAuto);
   store.setLoadingStatus('Connectivity', true);
-  // Multi-round follow-ups are a startup-only feature; manual/global refreshes
-  // are a single pass and flag completion immediately so the toast can fire.
-  if (multi && isAuto) {
+  if (multi) {
+    if (intervalId.value !== null) clearInterval(intervalId.value);
     intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
         await checkAllConnectivity(false, false, false);
@@ -557,5 +478,5 @@ onBeforeUnmount(() => {
 watch(() => store.allHasLoaded, (v) => { if (v) sendAlert(); });
 watch(allRoundsDone, (v) => { if (v) sendAlert(); });
 
-defineExpose({ checkAllConnectivity, handelCheckStart });
+defineExpose({ handelCheckStart });
 </script>

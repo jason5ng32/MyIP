@@ -768,11 +768,6 @@
   "connectivity": {
     "Title": "Network Connectivity",
     "Note": "This test checks whether you can reach a given website. It works by loading a small image from that site. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
-    "ServiceStatusBanner": {
-      "Title": "A service not loading?",
-      "Note": "If an AI product like ChatGPT or Claude failed the test above, it might not be your network — the service itself could be down. Check its live availability and recent incidents.",
-      "CTA": "Open Service Status"
-    },
     "StatusWait": "Awaiting Test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
@@ -794,7 +789,32 @@
       "NameRequired": "Please enter a name.",
       "UrlRequired": "Please enter a URL.",
       "InvalidUrl": "That doesn't look like a valid URL.",
-      "LimitReached": "You've reached the 10 custom tests limit."
+      "LimitReached": "You've reached the 60 tests limit."
+    },
+    "importDialog": {
+      "Title": "Add / Import Tests",
+      "CustomOption": "Add Custom",
+      "ImportOption": "Import a List",
+      "SiteCount": "{n} sites",
+      "Import": "Import",
+      "RemoveList": "Remove this list",
+      "AddedCount": "{n} added",
+      "SkippedCount": "{n} duplicates skipped",
+      "OverflowCount": "{n} over the limit",
+      "Capacity": "{used}/{limit} used"
+    },
+    "importLists": {
+      "iran": "Iran Essentials",
+      "russia": "Russia Essentials",
+      "china": "China Essentials",
+      "ai": "AI Services",
+      "social": "Social & Messaging",
+      "streaming": "Streaming",
+      "gaming": "Gaming",
+      "developer": "Developer",
+      "cloud": "Cloud & CDN",
+      "crypto": "Crypto Exchanges",
+      "news": "News & Wiki"
     }
   },
   "webrtc": {

@@ -769,11 +769,6 @@
   "connectivity": {
     "Title": "网络连通性",
     "Note": "本测试用于测试你是否能够连通到某个网站。测试方法是通过加载对应网站上的小图片进行的。延迟值仅供参考，实际会更小。你可以添加其它你常用的网站到测试列表中，方便快速测试。",
-    "ServiceStatusBanner": {
-      "Title": "某个服务打不开？",
-      "Note": "如果上面 ChatGPT、Claude 等 AI 产品测试失败，未必是你的网络问题——可能是服务本身挂了。看看它们的实时可用性和近期故障。",
-      "CTA": "打开服务可用性"
-    },
     "StatusWait": "待检测",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
@@ -795,7 +790,32 @@
       "NameRequired": "请输入名称",
       "UrlRequired": "请输入 URL",
       "InvalidUrl": "这看起来不是一个有效的 URL",
-      "LimitReached": "自定义测试已达到 10 个上限"
+      "LimitReached": "测试数量已达到 60 个上限"
+    },
+    "importDialog": {
+      "Title": "添加 / 导入测试",
+      "CustomOption": "添加自定义",
+      "ImportOption": "导入列表",
+      "SiteCount": "{n} 个网站",
+      "Import": "导入",
+      "RemoveList": "移除该列表",
+      "AddedCount": "已添加 {n} 个",
+      "SkippedCount": "跳过 {n} 个重复项",
+      "OverflowCount": "{n} 个超出上限",
+      "Capacity": "已用 {used}/{limit}"
+    },
+    "importLists": {
+      "iran": "伊朗常用",
+      "russia": "俄罗斯常用",
+      "china": "中国常用",
+      "ai": "AI 服务",
+      "social": "社交通讯",
+      "streaming": "流媒体",
+      "gaming": "游戏平台",
+      "developer": "开发者",
+      "cloud": "云与 CDN",
+      "crypto": "加密交易所",
+      "news": "新闻与百科"
     }
   },
   "webrtc": {

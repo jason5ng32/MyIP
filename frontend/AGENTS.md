@@ -28,7 +28,10 @@ frontend/
 ├── lib/             ← cn() only (shadcn support layer)
 ├── data/            ← static config: achievements + achievement-rules /
 │                      ip-databases / sections / changelog / tools registry
-│                      (router + cards + drawer all derive from it)
+│                      (router + cards + drawer all derive from it) /
+│                      connectivity-import-lists (curated target sets; icons
+│                      are committed 64px PNGs under public/favicons/ — one
+│                      per member, enforced by its data test)
 ├── utils/           ← framework-agnostic helpers + IO
 │                      (app-events bus / getips/ / valid-ip / analytics / …)
 ├── composables/     ← Vue-aware `useXxx` logic

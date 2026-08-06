@@ -769,11 +769,6 @@
   "connectivity": {
     "Title": "Connectivité réseau",
     "Note": "Ce test vérifie si vous pouvez atteindre un site web donné. Il fonctionne en chargeant une petite image depuis ce site. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
-    "ServiceStatusBanner": {
-      "Title": "Un service ne se charge pas ?",
-      "Note": "Si un produit d'IA comme ChatGPT ou Claude a échoué au test ci-dessus, le problème ne vient peut-être pas de votre réseau — le service lui-même peut être en panne. Vérifiez sa disponibilité en temps réel et ses incidents récents.",
-      "CTA": "Ouvrir l'état des services"
-    },
     "StatusWait": "En attente du test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",
@@ -795,7 +790,32 @@
       "NameRequired": "Veuillez saisir un nom.",
       "UrlRequired": "Veuillez saisir une URL.",
       "InvalidUrl": "Cela ne ressemble pas à une URL valide.",
-      "LimitReached": "Limite de 10 tests personnalisés atteinte."
+      "LimitReached": "Limite de 60 tests atteinte."
+    },
+    "importDialog": {
+      "Title": "Ajouter / importer des tests",
+      "CustomOption": "Test personnalisé",
+      "ImportOption": "Importer une liste",
+      "SiteCount": "{n} sites",
+      "Import": "Importer",
+      "RemoveList": "Retirer cette liste",
+      "AddedCount": "{n} ajoutés",
+      "SkippedCount": "{n} doublons ignorés",
+      "OverflowCount": "{n} au-delà de la limite",
+      "Capacity": "{used}/{limit} utilisés"
+    },
+    "importLists": {
+      "iran": "Essentiels Iran",
+      "russia": "Essentiels Russie",
+      "china": "Essentiels Chine",
+      "ai": "Services IA",
+      "social": "Réseaux sociaux",
+      "streaming": "Streaming",
+      "gaming": "Jeux vidéo",
+      "developer": "Développeurs",
+      "cloud": "Cloud et CDN",
+      "crypto": "Plateformes crypto",
+      "news": "Actualités"
     }
   },
   "webrtc": {

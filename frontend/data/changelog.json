@@ -1525,5 +1525,47 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.3.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Connectivity: import curated test lists — country packs (Iran, Russia, China) plus AI, social, streaming, gaming, developer, cloud, crypto and news sets",
+          "zh": "网络连通性支持导入内置测试列表：伊朗、俄罗斯、中国等国家合集，以及 AI、社交、流媒体、游戏、开发者、云服务、加密交易所、新闻等主题合集",
+          "fr": "Connectivité : importez des listes de tests prêtes à l'emploi — packs pays (Iran, Russie, Chine) et ensembles IA, réseaux sociaux, streaming, jeux, développeurs, cloud, crypto et actualités",
+          "ru": "Проверка доступности: импорт готовых списков — наборы по странам (Иран, Россия, Китай), а также ИИ, соцсети, стриминг, игры, разработка, облака, криптобиржи и новости"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity cards now show real site favicons, and the test capacity grows to 60",
+          "zh": "连通性卡片改用网站真实图标显示，可测试数量上限提升至 60 个",
+          "fr": "Les cartes de connectivité affichent désormais les vraies favicons des sites, et la capacité de test passe à 60",
+          "ru": "Карточки доступности теперь показывают настоящие favicon сайтов, а лимит тестов увеличен до 60"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized some program logic to increase code reuse rate",
+          "zh": "优化了一些程序逻辑，提高代码复用率",
+          "fr": "Optimisation de certaines logiques de programmation pour augmenter le taux de réutilisation du code",
+          "ru": "Оптимизация некоторых логических программ для повышения коэффициента повторного использования кода"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые проблемы"
+        }
+      }
+    ]
   }
 ]

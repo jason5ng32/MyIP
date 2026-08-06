@@ -151,7 +151,9 @@ const SECTION_SPECS = {
     }),
     connectivity: obj({
         testedAt: isoDate(),
-        targets: arr(24, obj({
+        // 72 = 7 built-in targets + the 60-target custom/import cap, plus
+        // headroom; matches the builder's slice in utils/report-builders.js.
+        targets: arr(72, obj({
             id: str(48),
             name: str(64),
             status: oneOf(...Object.values(CONNECTIVITY_STATUS)),

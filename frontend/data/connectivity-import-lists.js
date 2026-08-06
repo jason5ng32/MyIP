@@ -1,0 +1,243 @@
+// Curated importable target lists for the Connectivity section: country sets
+// (domestic reachability) and theme sets (global services). Importing
+// materializes members into the user's customConnectivityTargets preference
+// (tagged with listId), so imported cards behave exactly like hand-added
+// ones. Display names live in the locale packs under
+// `connectivity.importLists.<id>`; member names are brand names and stay
+// untranslated. Every member ships a committed 64px PNG at
+// public/favicons/<id>.png (the data test enforces it) — same-origin, so
+// icons render even when the tested site is blocked for the visitor.
+
+// Total cap shared by hand-added and imported targets. The grid and the
+// multi-round test loop stay usable at this scale; the import dialog
+// surfaces remaining headroom.
+export const CONNECTIVITY_TARGET_LIMIT = 60;
+
+// Same-origin favicon path for a member id (fetched at dev time).
+export const faviconPath = (id) => `/favicons/${id}.png`;
+
+// The seven built-in targets render through the same favicon pipeline as
+// imported members (ConnectivityTest.vue maps these ids onto its tiles).
+// `iconDomain` feeds scripts/fetch-favicons.js — it differs from the test
+// URL's host where that host serves a poor or missing icon.
+export const BUILTIN_FAVICONS = [
+    { id: 'google', iconDomain: 'www.google.com' },
+    { id: 'youtube', iconDomain: 'www.youtube.com' },
+    { id: 'github', iconDomain: 'github.com' },
+    { id: 'cloudflare', iconDomain: 'www.cloudflare.com' },
+    { id: 'claude', iconDomain: 'claude.com' },
+    { id: 'chatgpt', iconDomain: 'chatgpt.com' },
+    { id: 'wechat', iconDomain: 'weixin.qq.com' },
+];
+
+// Every list is fronted by an emoji (flag emoji for country lists) — one
+// uniform icon system, no icon-font dependency in this data.
+// Member shape: { id, name, url } (+ optional `iconDomain` when the test
+// URL's host would give the favicon fetcher a poor or missing icon).
+export const IMPORT_LISTS = [
+    {
+        id: 'iran',
+        emoji: '🇮🇷',
+        members: [
+            { id: 'aparat', name: 'Aparat', url: 'https://www.aparat.com/favicon.ico' },
+            { id: 'digikala', name: 'Digikala', url: 'https://www.digikala.com/favicon.ico' },
+            { id: 'divar', name: 'Divar', url: 'https://divar.ir/favicon.ico' },
+            { id: 'cafebazaar', name: 'Cafe Bazaar', url: 'https://cafebazaar.ir/favicon.ico' },
+            { id: 'balad', name: 'Balad', url: 'https://balad.ir/favicon.ico' },
+            { id: 'filimo', name: 'Filimo', url: 'https://www.filimo.com/favicon.ico' },
+            { id: 'torob', name: 'Torob', url: 'https://torob.com/favicon.ico' },
+            { id: 'zarinpal', name: 'Zarinpal', url: 'https://www.zarinpal.com/favicon.ico' },
+            { id: 'rubika', name: 'Rubika', url: 'https://rubika.ir/favicon.ico' },
+            { id: 'eitaa', name: 'Eitaa', url: 'https://eitaa.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'russia',
+        emoji: '🇷🇺',
+        members: [
+            { id: 'yandex', name: 'Yandex', url: 'https://yandex.ru/favicon.ico' },
+            { id: 'vk', name: 'VK', url: 'https://vk.com/favicon.ico' },
+            { id: 'gosuslugi', name: 'Gosuslugi', url: 'https://www.gosuslugi.ru/favicon.ico' },
+            { id: 'ozon', name: 'Ozon', url: 'https://www.ozon.ru/favicon.ico' },
+            { id: 'mailru', name: 'Mail.ru', url: 'https://mail.ru/favicon.ico' },
+            { id: 'rutube', name: 'Rutube', url: 'https://rutube.ru/favicon.ico' },
+            { id: 'wildberries', name: 'Wildberries', url: 'https://www.wildberries.ru/favicon.ico' },
+            { id: 'avito', name: 'Avito', url: 'https://www.avito.ru/favicon.ico' },
+            { id: 'kinopoisk', name: 'Kinopoisk', url: 'https://www.kinopoisk.ru/favicon.ico' },
+            { id: '2gis', name: '2GIS', url: 'https://2gis.ru/favicon.ico' },
+            { id: 'dzen', name: 'Dzen', url: 'https://dzen.ru/favicon.ico' },
+        ],
+    },
+    {
+        id: 'china',
+        emoji: '🇨🇳',
+        members: [
+            { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/favicon.ico' },
+            { id: 'taobao', name: 'Taobao', url: 'https://www.taobao.com/favicon.ico' },
+            { id: 'bilibili', name: 'Bilibili', url: 'https://www.bilibili.com/favicon.ico' },
+            { id: 'qq', name: 'QQ', url: 'https://im.qq.com/favicon.ico', iconDomain: 'qq.com' },
+            { id: 'douyin', name: 'Douyin', url: 'https://www.douyin.com/favicon.ico' },
+            { id: 'zhihu', name: 'Zhihu', url: 'https://www.zhihu.com/favicon.ico' },
+            { id: 'jd', name: 'JD', url: 'https://www.jd.com/favicon.ico' },
+            { id: 'weibo', name: 'Weibo', url: 'https://weibo.com/favicon.ico' },
+            { id: 'netease', name: 'NetEase', url: 'https://www.163.com/favicon.ico' },
+            { id: 'xiaohongshu', name: 'Xiaohongshu', url: 'https://www.xiaohongshu.com/favicon.ico' },
+            { id: 'douban', name: 'Douban', url: 'https://www.douban.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'ai',
+        emoji: '🤖',
+        members: [
+            { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/favicon.ico' },
+            { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/favicon.ico', iconDomain: 'www.deepseek.com' },
+            { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co/favicon.ico' },
+            { id: 'midjourney', name: 'Midjourney', url: 'https://www.midjourney.com/favicon.ico' },
+            { id: 'suno', name: 'Suno', url: 'https://suno.com/favicon.ico' },
+            { id: 'manus', name: 'Manus', url: 'https://manus.im/favicon.ico' },
+            { id: 'mistral', name: 'Mistral', url: 'https://chat.mistral.ai/favicon.ico', iconDomain: 'mistral.ai' },
+            { id: 'meta-ai', name: 'Meta AI', url: 'https://www.meta.ai/favicon.ico' },
+            { id: 'qwen', name: 'Qwen', url: 'https://chat.qwen.ai/favicon.ico' },
+            { id: 'kimi', name: 'Kimi', url: 'https://www.kimi.com/favicon.ico' },
+            { id: 'poe', name: 'Poe', url: 'https://poe.com/favicon.ico' },
+            { id: 'characterai', name: 'Character.ai', url: 'https://character.ai/favicon.ico' },
+        ],
+    },
+    {
+        id: 'social',
+        emoji: '💬',
+        members: [
+            { id: 'telegram', name: 'Telegram', url: 'https://telegram.org/favicon.ico' },
+            { id: 'whatsapp', name: 'WhatsApp', url: 'https://whatsapp.com/favicon.ico' },
+            { id: 'instagram', name: 'Instagram', url: 'https://www.instagram.com/favicon.ico' },
+            { id: 'x', name: 'X', url: 'https://x.com/favicon.ico' },
+            { id: 'discord', name: 'Discord', url: 'https://discord.com/favicon.ico' },
+            { id: 'signal', name: 'Signal', url: 'https://signal.org/favicon.ico' },
+            { id: 'facebook', name: 'Facebook', url: 'https://www.facebook.com/favicon.ico' },
+            { id: 'reddit', name: 'Reddit', url: 'https://www.reddit.com/favicon.ico' },
+            { id: 'threads', name: 'Threads', url: 'https://www.threads.com/favicon.ico' },
+            { id: 'line', name: 'LINE', url: 'https://line.me/favicon.ico' },
+            { id: 'viber', name: 'Viber', url: 'https://www.viber.com/favicon.ico' },
+            { id: 'snapchat', name: 'Snapchat', url: 'https://www.snapchat.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'streaming',
+        emoji: '🎬',
+        members: [
+            { id: 'netflix', name: 'Netflix', url: 'https://www.netflix.com/favicon.ico' },
+            { id: 'spotify', name: 'Spotify', url: 'https://open.spotify.com/favicon.ico' },
+            { id: 'tiktok', name: 'TikTok', url: 'https://www.tiktok.com/favicon.ico' },
+            { id: 'twitch', name: 'Twitch', url: 'https://www.twitch.tv/favicon.ico' },
+            { id: 'primevideo', name: 'Prime Video', url: 'https://www.primevideo.com/favicon.ico' },
+            { id: 'disneyplus', name: 'Disney+', url: 'https://www.disneyplus.com/favicon.ico' },
+            { id: 'hbomax', name: 'HBO Max', url: 'https://www.hbomax.com/favicon.ico' },
+            { id: 'appletv', name: 'Apple TV+', url: 'https://tv.apple.com/favicon.ico' },
+            { id: 'soundcloud', name: 'SoundCloud', url: 'https://soundcloud.com/favicon.ico' },
+            { id: 'vimeo', name: 'Vimeo', url: 'https://vimeo.com/favicon.ico' },
+            { id: 'dailymotion', name: 'Dailymotion', url: 'https://www.dailymotion.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'gaming',
+        emoji: '🎮',
+        members: [
+            { id: 'steam', name: 'Steam', url: 'https://store.steampowered.com/favicon.ico' },
+            { id: 'epicgames', name: 'Epic Games', url: 'https://store.epicgames.com/favicon.ico', iconDomain: 'www.epicgames.com' },
+            { id: 'playstation', name: 'PlayStation', url: 'https://www.playstation.com/favicon.ico' },
+            { id: 'xbox', name: 'Xbox', url: 'https://www.xbox.com/favicon.ico' },
+            { id: 'riotgames', name: 'Riot Games', url: 'https://www.riotgames.com/favicon.ico' },
+            { id: 'nintendo', name: 'Nintendo', url: 'https://www.nintendo.com/favicon.ico' },
+            { id: 'ea', name: 'EA', url: 'https://www.ea.com/favicon.ico' },
+            { id: 'ubisoft', name: 'Ubisoft', url: 'https://www.ubisoft.com/favicon.ico' },
+            { id: 'battlenet', name: 'Battle.net', url: 'https://www.blizzard.com/favicon.ico' },
+            { id: 'rockstar', name: 'Rockstar', url: 'https://www.rockstargames.com/favicon.ico' },
+            { id: 'roblox', name: 'Roblox', url: 'https://www.roblox.com/favicon.ico' },
+            { id: 'itchio', name: 'itch.io', url: 'https://itch.io/favicon.ico' },
+        ],
+    },
+    {
+        id: 'developer',
+        emoji: '👨‍💻',
+        members: [
+            { id: 'npm', name: 'npm', url: 'https://registry.npmjs.org/favicon.ico', iconDomain: 'www.npmjs.com' },
+            { id: 'dockerhub', name: 'Docker Hub', url: 'https://hub.docker.com/favicon.ico', iconDomain: 'www.docker.com' },
+            { id: 'pypi', name: 'PyPI', url: 'https://pypi.org/favicon.ico' },
+            { id: 'stackoverflow', name: 'Stack Overflow', url: 'https://stackoverflow.com/favicon.ico' },
+            { id: 'gitlab', name: 'GitLab', url: 'https://gitlab.com/favicon.ico' },
+            { id: 'bitbucket', name: 'Bitbucket', url: 'https://bitbucket.org/favicon.ico' },
+            { id: 'crates', name: 'crates.io', url: 'https://crates.io/favicon.ico' },
+            { id: 'maven', name: 'Maven Central', url: 'https://repo.maven.apache.org/favicon.ico', iconDomain: 'maven.apache.org' },
+            { id: 'goproxy', name: 'Go Proxy', url: 'https://proxy.golang.org/favicon.ico', iconDomain: 'go.dev' },
+            { id: 'homebrew', name: 'Homebrew', url: 'https://brew.sh/favicon.ico' },
+            { id: 'jetbrains', name: 'JetBrains', url: 'https://www.jetbrains.com/favicon.ico' },
+            { id: 'vscode-marketplace', name: 'VS Code Marketplace', url: 'https://marketplace.visualstudio.com/favicon.ico', iconDomain: 'code.visualstudio.com' },
+        ],
+    },
+    {
+        id: 'cloud',
+        emoji: '☁️',
+        members: [
+            { id: 'aws', name: 'AWS', url: 'https://aws.amazon.com/favicon.ico' },
+            { id: 'azure', name: 'Azure', url: 'https://azure.microsoft.com/favicon.ico' },
+            { id: 'gcloud', name: 'Google Cloud', url: 'https://cloud.google.com/favicon.ico' },
+            { id: 'vercel', name: 'Vercel', url: 'https://vercel.com/favicon.ico' },
+            { id: 'netlify', name: 'Netlify', url: 'https://www.netlify.com/favicon.ico' },
+            { id: 'digitalocean', name: 'DigitalOcean', url: 'https://www.digitalocean.com/favicon.ico' },
+            { id: 'oraclecloud', name: 'Oracle Cloud', url: 'https://www.oracle.com/favicon.ico' },
+            { id: 'akamai', name: 'Akamai', url: 'https://www.akamai.com/favicon.ico' },
+            { id: 'fastly', name: 'Fastly', url: 'https://www.fastly.com/favicon.ico' },
+            { id: 'jsdelivr', name: 'jsDelivr', url: 'https://cdn.jsdelivr.net/favicon.ico', iconDomain: 'www.jsdelivr.com' },
+            { id: 'unpkg', name: 'unpkg', url: 'https://unpkg.com/favicon.ico' },
+            { id: 'heroku', name: 'Heroku', url: 'https://www.heroku.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'crypto',
+        emoji: '💰',
+        members: [
+            { id: 'binance', name: 'Binance', url: 'https://www.binance.com/favicon.ico' },
+            { id: 'coinbase', name: 'Coinbase', url: 'https://www.coinbase.com/favicon.ico' },
+            { id: 'okx', name: 'OKX', url: 'https://www.okx.com/favicon.ico' },
+            { id: 'kraken', name: 'Kraken', url: 'https://www.kraken.com/favicon.ico' },
+            { id: 'bybit', name: 'Bybit', url: 'https://www.bybit.com/favicon.ico' },
+            { id: 'kucoin', name: 'KuCoin', url: 'https://www.kucoin.com/favicon.ico' },
+            { id: 'gate', name: 'Gate', url: 'https://www.gate.io/favicon.ico' },
+            { id: 'bitget', name: 'Bitget', url: 'https://www.bitget.com/favicon.ico' },
+            { id: 'htx', name: 'HTX', url: 'https://www.htx.com/favicon.ico' },
+            { id: 'mexc', name: 'MEXC', url: 'https://www.mexc.com/favicon.ico' },
+            { id: 'coinmarketcap', name: 'CoinMarketCap', url: 'https://coinmarketcap.com/favicon.ico' },
+            { id: 'coingecko', name: 'CoinGecko', url: 'https://www.coingecko.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'news',
+        emoji: '📰',
+        members: [
+            { id: 'bbc', name: 'BBC', url: 'https://www.bbc.com/favicon.ico' },
+            { id: 'reuters', name: 'Reuters', url: 'https://www.reuters.com/favicon.ico' },
+            { id: 'apnews', name: 'AP News', url: 'https://apnews.com/favicon.ico' },
+            { id: 'cnn', name: 'CNN', url: 'https://edition.cnn.com/favicon.ico', iconDomain: 'www.cnn.com' },
+            { id: 'nytimes', name: 'The New York Times', url: 'https://www.nytimes.com/favicon.ico' },
+            { id: 'guardian', name: 'The Guardian', url: 'https://www.theguardian.com/favicon.ico' },
+            { id: 'dw', name: 'DW', url: 'https://www.dw.com/favicon.ico' },
+            { id: 'aljazeera', name: 'Al Jazeera', url: 'https://www.aljazeera.com/favicon.ico' },
+            { id: 'france24', name: 'France 24', url: 'https://www.france24.com/favicon.ico' },
+            { id: 'bloomberg', name: 'Bloomberg', url: 'https://www.bloomberg.com/favicon.ico' },
+            { id: 'wikipedia', name: 'Wikipedia', url: 'https://www.wikipedia.org/favicon.ico' },
+        ],
+    },
+];
+
+// Icons shown stacked on the "Add Test" grid tile — a hand-picked mix of
+// flag emoji and high-recognition brands that reads as "there are curated
+// lists inside". Kept here so the tile and the lists stay in one file.
+export const TILE_PREVIEW = [
+    { type: 'favicon', id: 'reddit' },
+    { type: 'favicon', id: 'yandex' },
+    { type: 'favicon', id: 'zarinpal' },
+    { type: 'favicon', id: 'xiaohongshu' },
+    { type: 'favicon', id: 'nytimes' },
+    { type: 'favicon', id: 'telegram' },
+    { type: 'favicon', id: 'netflix' },
+];

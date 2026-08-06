@@ -79,7 +79,9 @@ const CONNECTIVITY_STATUSES = new Set(Object.values(CONNECTIVITY_STATUS));
 const buildConnectivity = (payload) => {
     const targets = (payload?.targets ?? [])
         .filter((target) => CONNECTIVITY_STATUSES.has(target?.statusCode))
-        .slice(0, 24)
+        // 72 = 7 built-ins + the 60-target custom/import cap, with headroom —
+        // reports carry every tested target rather than a confusing subset.
+        .slice(0, 72)
         .map((target) => compact({
             id: clip(target.id, 48) ?? '',
             name: clip(target.name, 64) ?? '',
