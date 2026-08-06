@@ -34,11 +34,10 @@
                when the tested site is unreachable; a load error falls back to
                the letter tile. -->
           <div class="flex items-center gap-2 mb-3 cursor-pointer"
-            @click.prevent="checkConnectivityHandler(test, () => { }, true)"
-            :title="t('connectivity.RefreshThisTest')">
+            @click.prevent="checkConnectivityHandler(test, () => { }, true)" :title="t('connectivity.RefreshThisTest')">
             <img v-if="test.favicon && !test.faviconFailed" :src="test.favicon" alt=""
               @error="test.faviconFailed = true"
-              class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" />
+              class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" loading="lazy" />
             <span v-else
               class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
