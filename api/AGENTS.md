@@ -106,8 +106,9 @@ to the upstream that owns the auth context.
 
 - Every handler has smoke tests in `tests/api-handlers.test.js`: method
   gating, param branches, "API key missing" early returns.
-- Never hit real upstreams — assert only on branches that return before the
-  first `fetchUpstream`.
+- Never hit real upstreams — assert on branches that return before the first
+  `fetchUpstream`, or stub `globalThis.fetch` when the behavior under test
+  lives past it (google-map stream tests; restored in the shared `afterEach`).
 - Middleware is covered by `tests/guards.test.js`; don't duplicate its
   assertions per-handler. Fetch timeout/abort behavior:
   `tests/fetch-with-timeout.test.js`.
