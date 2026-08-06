@@ -5,9 +5,11 @@
 
 // Versioned localStorage key for userPreferences; bump the suffix when stored
 // values shouldn't merge onto a changed default. Shared with locales/i18n.js
-// (which reads the active language from storage at boot) so the key can't drift.
+// (which reads the active language from storage at boot) so the key can't
+// drift. Older keys (userPreferences_v6 / userPreferences) are neither read
+// nor migrated anymore — a visitor coming from that era simply starts from
+// defaults.
 export const PREFS_STORAGE_KEY = 'userPreferences_v7';
-export const LEGACY_PREFS_KEYS = ['userPreferences_v6', 'userPreferences'];
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
@@ -37,24 +39,4 @@ export const DEFAULT_PREFERENCES = Object.freeze({
  */
 export function createDefaultPreferences() {
   return { ...DEFAULT_PREFERENCES };
-}
-
-/**
- * Map a legacy preferences object onto the current schema: expand the single
- * `autoStart` switch into the three per-module switches, pass everything else
- * through. Pure — store.js does the localStorage read.
- *
- * @param {object|null} legacy parsed legacy preferences (or null/undefined)
- * @returns {object} a writable object ready to spread over the defaults
- */
-export function migrateLegacyPreferences(legacy) {
-  if (!legacy || typeof legacy !== 'object') return {};
-  const migrated = { ...legacy };
-  if (typeof legacy.autoStart === 'boolean') {
-    migrated.autoRunConnectivity = legacy.autoStart;
-    migrated.autoRunWebRTC = legacy.autoStart;
-    migrated.autoRunDnsLeak = legacy.autoStart;
-  }
-  delete migrated.autoStart;
-  return migrated;
 }

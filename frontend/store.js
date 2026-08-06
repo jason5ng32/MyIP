@@ -5,7 +5,7 @@ import { writeAuthHint } from './utils/auth-hint.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
-import { createDefaultPreferences, migrateLegacyPreferences, PREFS_STORAGE_KEY, LEGACY_PREFS_KEYS } from './data/default-preferences.js';
+import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
@@ -139,33 +139,13 @@ export const useMainStore = defineStore('main', {
     },
     // load user preferences from local storage
     loadPreferences() {
+      // Current-key values merge over the defaults; anything older
+      // (userPreferences_v6 / userPreferences) is deliberately ignored —
+      // legacy migration was retired, those visitors restart from defaults.
       const defaultPreferences = createDefaultPreferences();
       const storedPreferences = localStorage.getItem(PREFS_STORAGE_KEY);
-      let preferencesToStore;
-
-      if (storedPreferences) {
-        const currentPreferences = JSON.parse(storedPreferences);
-        preferencesToStore = { ...defaultPreferences, ...currentPreferences };
-      } else {
-        // No prefs at the current key yet: carry over the newest legacy
-        // snapshot (migrating retired keys), then purge the old keys. Purging
-        // only here avoids racing a tab that already migrated.
-        const legacyRaw = LEGACY_PREFS_KEYS
-          .map((key) => localStorage.getItem(key))
-          .find((value) => value !== null);
-        let legacy = null;
-        if (legacyRaw) {
-          try { legacy = JSON.parse(legacyRaw); } catch { legacy = null; }
-        }
-        preferencesToStore = { ...defaultPreferences, ...migrateLegacyPreferences(legacy) };
-        for (const legacyKey of LEGACY_PREFS_KEYS) {
-          if (localStorage.getItem(legacyKey) !== null) {
-            localStorage.removeItem(legacyKey);
-          }
-        }
-      }
-
-      this.setPreferences(preferencesToStore);
+      const currentPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
+      this.setPreferences({ ...defaultPreferences, ...currentPreferences });
     },
     // fetch configs from server
     fetchConfigs() {

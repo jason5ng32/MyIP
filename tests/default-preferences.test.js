@@ -4,7 +4,6 @@ import { describe, it } from 'node:test';
 import {
   DEFAULT_PREFERENCES,
   createDefaultPreferences,
-  migrateLegacyPreferences,
 } from '../frontend/data/default-preferences.js';
 
 describe('DEFAULT_PREFERENCES', () => {
@@ -31,35 +30,6 @@ describe('DEFAULT_PREFERENCES', () => {
   });
 });
 
-describe('migrateLegacyPreferences()', () => {
-  it('maps a retired autoStart=false onto all three per-module switches', () => {
-    const out = migrateLegacyPreferences({ lang: 'zh', autoStart: false });
-    assert.equal(out.autoRunConnectivity, false);
-    assert.equal(out.autoRunWebRTC, false);
-    assert.equal(out.autoRunDnsLeak, false);
-    assert.equal(out.lang, 'zh', 'other keys carry over');
-    assert.ok(!('autoStart' in out), 'retired key is dropped');
-  });
-
-  it('maps autoStart=true onto all three per-module switches', () => {
-    const out = migrateLegacyPreferences({ autoStart: true });
-    assert.equal(out.autoRunConnectivity, true);
-    assert.equal(out.autoRunWebRTC, true);
-    assert.equal(out.autoRunDnsLeak, true);
-  });
-
-  it('leaves the per-module switches unset when autoStart is absent', () => {
-    const out = migrateLegacyPreferences({ theme: 'dark' });
-    assert.ok(!('autoRunConnectivity' in out), 'falls through to defaults later');
-    assert.equal(out.theme, 'dark');
-  });
-
-  it('returns an empty object for null / non-object input', () => {
-    assert.deepEqual(migrateLegacyPreferences(null), {});
-    assert.deepEqual(migrateLegacyPreferences(undefined), {});
-    assert.deepEqual(migrateLegacyPreferences('nope'), {});
-  });
-});
 
 describe('createDefaultPreferences()', () => {
   it('returns a writable copy with the same values', () => {

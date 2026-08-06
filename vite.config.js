@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { CodeInspectorPlugin } from 'code-inspector-plugin';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { PREFS_STORAGE_KEY, LEGACY_PREFS_KEYS } from './frontend/data/default-preferences.js';
+import { PREFS_STORAGE_KEY } from './frontend/data/default-preferences.js';
 
 dotenv.config();
 
@@ -76,8 +76,8 @@ function siteUrlHtmlPlugin() {
 // only start after index.js has downloaded and executed — a serialized
 // round-trip on the boot critical path. This plugin finds the emitted
 // locale-pack chunks in the bundle and injects a small head script that
-// picks the language exactly like locales/i18n.js (stored prefs incl.
-// legacy keys → ?hl= → browser language → en) and appends
+// picks the language exactly like locales/i18n.js (stored prefs →
+// ?hl= → browser language → en) and appends
 // <link rel="modulepreload"> for it (plus the en fallback pack, which
 // non-English boots also await) while the HTML is still streaming — the
 // packs then download in parallel with the main bundle. A wrong pick only
@@ -86,14 +86,11 @@ function siteUrlHtmlPlugin() {
 const localePreloadPlugin = () => {
   const preloadScript = (chunks) => `(function () {
   var chunks = ${JSON.stringify(chunks)};
-  var keys = ${JSON.stringify([PREFS_STORAGE_KEY, ...LEGACY_PREFS_KEYS])};
   var lang = null;
-  for (var i = 0; i < keys.length && !lang; i++) {
-    try {
-      var stored = JSON.parse(localStorage.getItem(keys[i]) || '{}').lang;
-      if (chunks[stored]) lang = stored;
-    } catch (e) { /* malformed entry — try the next key */ }
-  }
+  try {
+    var stored = JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_STORAGE_KEY)}) || '{}').lang;
+    if (chunks[stored]) lang = stored;
+  } catch (e) { /* malformed entry — fall through to the default pick */ }
   if (!lang) {
     var hl = new URLSearchParams(location.search).get('hl');
     if (hl) {

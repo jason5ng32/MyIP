@@ -177,21 +177,18 @@ describe('store — preferences', () => {
     assert.ok('autoRunConnectivity' in s.userPreferences, 'default keys fill in missing slots');
   });
 
-  it('loadPreferences migrates a legacy v6 autoStart onto the per-module switches', () => {
+  it('loadPreferences ignores legacy pref keys entirely', () => {
     globalThis.localStorage.setItem(
       'userPreferences_v6',
       JSON.stringify({ lang: 'fr', autoStart: false }),
     );
     const s = useMainStore();
     s.loadPreferences();
-    assert.equal(s.userPreferences.lang, 'fr', 'other legacy keys carry over');
-    assert.equal(s.userPreferences.autoRunConnectivity, false);
-    assert.equal(s.userPreferences.autoRunWebRTC, false);
-    assert.equal(s.userPreferences.autoRunDnsLeak, false);
-    assert.ok(!('autoStart' in s.userPreferences), 'retired key dropped');
-    // Legacy key purged, value re-saved under the current key.
-    assert.equal(globalThis.localStorage.getItem('userPreferences_v6'), null);
-    assert.ok(globalThis.localStorage.getItem('userPreferences_v7'));
+    // Legacy migration was retired: v6 content must not leak into the store,
+    // and the stale key is left untouched (nothing reads it anymore).
+    assert.equal(s.userPreferences.lang, 'auto', 'legacy lang does not carry over');
+    assert.equal(s.userPreferences.autoRunConnectivity, true, 'defaults win');
+    assert.ok(!('autoStart' in s.userPreferences));
   });
 });
 
