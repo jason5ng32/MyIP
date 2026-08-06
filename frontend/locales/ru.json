@@ -799,10 +799,8 @@
       "SiteCount": "Сайтов: {n}",
       "Import": "Импорт",
       "RemoveList": "Удалить этот список",
-      "AddedCount": "Добавлено: {n}",
-      "SkippedCount": "Пропущено дубликатов: {n}",
-      "OverflowCount": "Сверх лимита: {n}",
-      "Capacity": "Использовано {used}/{limit}"
+      "Capacity": "Использовано {used}/{limit}",
+      "OverLimit": "Превышен лимит — добавлено только {n}."
     },
     "importLists": {
       "iran": "Иран: основные",

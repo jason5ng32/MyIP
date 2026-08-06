@@ -40,7 +40,7 @@
               @error="test.faviconFailed = true"
               class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" />
             <span v-else
-              class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border-2 border-muted-foreground">
+              class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
             </span>
             <span class="text-base font-medium truncate">{{ test.name }}</span>
@@ -76,8 +76,9 @@
       </Card>
 
       <!-- "Add Test" tile: stacked flag/brand icons signal that curated
-           lists live behind it, not just a blank form. Hidden at the cap. -->
-      <Card v-if="canAddCustom" @click="addDialogOpen = true"
+           lists live behind it, not just a blank form. Always visible —
+           at the cap the dialog is still the way to remove imported lists. -->
+      <Card @click="addDialogOpen = true"
         class="cursor-pointer border-dashed bg-transparent hover:bg-muted/50 transition-colors"
         :title="t('connectivity.addCustom.AddCard')">
         <CardContent class="p-4 flex flex-col items-center justify-center gap-2 text-muted-foreground"
@@ -110,9 +111,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
-import {
-  CONNECTIVITY_TARGET_LIMIT, TILE_PREVIEW, faviconPath,
-} from '@/data/connectivity-import-lists.js';
+import { TILE_PREVIEW, faviconPath } from '@/data/connectivity-import-lists.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -216,11 +215,6 @@ watch(
   },
   { immediate: true, deep: true },
 );
-
-const canAddCustom = computed(() => {
-  const current = userPreferences.value.customConnectivityTargets || [];
-  return current.length < CONNECTIVITY_TARGET_LIMIT;
-});
 
 // Status string → tone. Custom isSuccess + time-based fast/slow split,
 // since the value here isn't an IP like the other toneOf call sites.

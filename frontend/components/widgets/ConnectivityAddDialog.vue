@@ -51,11 +51,10 @@
               </Button>
             </li>
           </ul>
-          <!-- Result + capacity share the right edge on one baseline so the
-               footer reads as a single line; min-h-4 keeps the height stable
-               before the first import. -->
+          <!-- Success stays quiet (the inline check is the confirmation);
+               only a cap overflow surfaces a message here. -->
           <div class="flex flex-col items-end justify-end gap-1 min-h-4 text-xs text-muted-foreground">
-            <span aria-live="polite">{{ importResult || '&nbsp;'}}</span>
+            <span aria-live="polite" class="text-destructive">{{ importResult || '&nbsp;' }}</span>
             <span class="tabular-nums shrink-0">
               {{ t('connectivity.importDialog.Capacity', { used: customTargets.length, limit: CONNECTIVITY_TARGET_LIMIT
               }) }}
@@ -158,10 +157,11 @@ const importList = (list) => {
   if (plan.additions.length) {
     store.updatePreference('customConnectivityTargets', [...customTargets.value, ...plan.additions]);
   }
-  const parts = [t('connectivity.importDialog.AddedCount', { n: plan.additions.length })];
-  if (plan.skippedCount) parts.push(t('connectivity.importDialog.SkippedCount', { n: plan.skippedCount }));
-  if (plan.overflowCount) parts.push(t('connectivity.importDialog.OverflowCount', { n: plan.overflowCount }));
-  importResult.value = parts.join(' · ');
+  // Quiet on success — the inline check marks the list; only hitting the
+  // shared cap warrants a message.
+  importResult.value = plan.overflowCount
+    ? t('connectivity.importDialog.OverLimit', { n: plan.additions.length })
+    : '';
   trackEvent('Section', 'ImportList', list.id);
 };
 

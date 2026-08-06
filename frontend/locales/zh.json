@@ -799,10 +799,8 @@
       "SiteCount": "{n} 个网站",
       "Import": "导入",
       "RemoveList": "移除该列表",
-      "AddedCount": "已添加 {n} 个",
-      "SkippedCount": "跳过 {n} 个重复项",
-      "OverflowCount": "{n} 个超出上限",
-      "Capacity": "已用 {used}/{limit}"
+      "Capacity": "已用 {used}/{limit}",
+      "OverLimit": "已超过上限，仅添加了其中 {n} 个"
     },
     "importLists": {
       "iran": "伊朗常用",

@@ -798,10 +798,8 @@
       "SiteCount": "{n} sites",
       "Import": "Import",
       "RemoveList": "Remove this list",
-      "AddedCount": "{n} added",
-      "SkippedCount": "{n} duplicates skipped",
-      "OverflowCount": "{n} over the limit",
-      "Capacity": "{used}/{limit} used"
+      "Capacity": "{used}/{limit} used",
+      "OverLimit": "Over the limit — only {n} of them were added."
     },
     "importLists": {
       "iran": "Iran Essentials",

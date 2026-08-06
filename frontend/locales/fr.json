@@ -799,10 +799,8 @@
       "SiteCount": "{n} sites",
       "Import": "Importer",
       "RemoveList": "Retirer cette liste",
-      "AddedCount": "{n} ajoutés",
-      "SkippedCount": "{n} doublons ignorés",
-      "OverflowCount": "{n} au-delà de la limite",
-      "Capacity": "{used}/{limit} utilisés"
+      "Capacity": "{used}/{limit} utilisés",
+      "OverLimit": "Limite dépassée — seulement {n} ajoutés."
     },
     "importLists": {
       "iran": "Essentiels Iran",
