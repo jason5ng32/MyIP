@@ -52,3 +52,13 @@ minimumReleaseAgeExclude:
   - '@sentry/server-utils@10.68.0'
   - '@sentry/vue@10.68.0'
   - concurrently@10.0.4
+  - '@vue/compiler-core@3.5.41'
+  - '@vue/compiler-dom@3.5.41'
+  - '@vue/compiler-sfc@3.5.41'
+  - '@vue/compiler-ssr@3.5.41'
+  - '@vue/reactivity@3.5.41'
+  - '@vue/runtime-core@3.5.41'
+  - '@vue/runtime-dom@3.5.41'
+  - '@vue/server-renderer@3.5.41'
+  - '@vue/shared@3.5.41'
+  - vue@3.5.41
