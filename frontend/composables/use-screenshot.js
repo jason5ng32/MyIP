@@ -121,6 +121,19 @@ function freezeInfoMaskForCapture(root) {
     return () => restorers.forEach((fn) => fn());
 }
 
+// Extension- or translator-injected cross-origin stylesheets make
+// html-to-image's webfont embedding throw a SecurityError while reading
+// `cssRules`. Retry once without font embedding — the live page has already
+// loaded its fonts, so the rendered output is unaffected in practice.
+export async function toPngWithFontFallback(toPng, element, options) {
+    try {
+        return await toPng(element, options);
+    } catch (err) {
+        if (err?.name !== 'SecurityError') throw err;
+        return toPng(element, { ...options, skipFonts: true });
+    }
+}
+
 export function useScreenshot() {
     const isCapturing = ref(false);
 
@@ -144,7 +157,7 @@ export function useScreenshot() {
             cleanups.push(inlineSvgComputedStyles(element));
             cleanups.push(freezeInfoMaskForCapture(element));
             const { toPng } = await import('html-to-image');
-            const dataUrl = await toPng(element, {
+            const dataUrl = await toPngWithFontFallback(toPng, element, {
                 pixelRatio,
                 cacheBust: true,
                 filter: (node) => !(node instanceof HTMLElement)
