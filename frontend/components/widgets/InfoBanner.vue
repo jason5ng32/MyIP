@@ -1,6 +1,6 @@
 <!-- InfoBanner — fade-slide section banner that upsells an advanced tool
-     after a homepage test settles (Connectivity → Service Status, DNS Leak
-     → Enhanced DNS Leak Test, …). Callers pass show / icon / copy / action. -->
+     after a homepage test settles (DNS Leak → Enhanced DNS Leak Test).
+     Callers pass show / icon / copy / action. -->
 <template>
   <Transition name="fade-slide">
     <div v-if="show"
