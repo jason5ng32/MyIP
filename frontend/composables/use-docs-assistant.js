@@ -20,8 +20,9 @@
 //
 // One tool is registered (`get_my_test_results`): the assistant can read the
 // visitor's finished on-page diagnostics — the report collector's snapshots,
-// reused as-is — so "is this normal?" is answered against their actual data.
-// It asks for confirmation first, since those results carry their IP.
+// annotated with each test's localized product name so the assistant refers
+// to tests as the visitor knows them, not by raw schema ids. It asks for
+// confirmation first, since those results carry their IP.
 //
 // The welcome screen's greeting, suggestions and the sidebar action are
 // localized, and re-sent on every open so a language switch takes effect. The
@@ -36,6 +37,7 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
 import { REPORT_SECTION_IDS } from '@/utils/report-schema.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report-export.js';
 
 export const DOCS_URL = (import.meta.env?.VITE_DOCS_URL || '').replace(/\/+$/, '');
 export const isDocsConfigured = !!DOCS_URL;
@@ -105,15 +107,24 @@ export function useDocsAssistant() {
             'so the answer reflects their actual data instead of generic documentation.',
             'Returns only tests that have finished; `missingSections` lists the ones',
             'they have not run yet, which you may suggest running.',
+            'Every test carries both a stable `id` and a localized `name` — when',
+            'talking to the visitor, always call tests by `name` (their product name',
+            "in the visitor's UI language), never by the raw id.",
         ].join(' '),
         inputSchema: { type: 'object', properties: {}, required: [] },
         confirmation: { icon: 'eye', label: t('nav.DocsToolConfirm') },
         execute: async () => {
             const available = Object.keys(sections);
+            // Localized product names alongside the schema ids
+            const sectionName = (id) => t(SECTION_TITLE_KEYS[id]);
             return {
                 output: {
-                    results: JSON.parse(JSON.stringify(sections)),
-                    missingSections: REPORT_SECTION_IDS.filter((id) => !available.includes(id)),
+                    results: Object.fromEntries(available.map((id) => [id, {
+                        name: sectionName(id),
+                        ...JSON.parse(JSON.stringify(sections[id])),
+                    }])),
+                    missingSections: REPORT_SECTION_IDS.filter((id) => !available.includes(id))
+                        .map((id) => ({ id, name: sectionName(id) })),
                 },
                 summary: { icon: 'eye', text: t('nav.DocsToolSummary') },
             };
