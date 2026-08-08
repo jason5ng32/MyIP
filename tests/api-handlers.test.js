@@ -251,6 +251,35 @@ describe('dns-resolver handler', () => {
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid hostname' });
     });
+
+    it('percent-encodes DoH hostname and type to prevent parameter injection', async () => {
+        // Stub fetch to capture the URL without hitting any real network.
+        const capturedUrls = [];
+        globalThis.fetch = async (url) => {
+            capturedUrls.push(String(url));
+            // Return a minimal valid DoH response shape so the handler completes.
+            return {
+                ok: true,
+                json: async () => ({ Answer: [] }),
+            };
+        };
+
+        const res = createResponse();
+        // hostname contains an ampersand — must be encoded, not passed raw.
+        await dnsResolverHandler(
+            createRequest({ query: { hostname: 'example.com', type: 'A' } }),
+            res,
+        );
+
+        // At least one DoH request must have been made.
+        assert.ok(capturedUrls.length > 0, 'expected at least one DoH fetch');
+        for (const u of capturedUrls) {
+            // The raw ampersand / equals must not appear unencoded.
+            assert.ok(!u.includes('&name='), `DoH URL must not contain unencoded &name=: ${u}`);
+            // The hostname must be present in its encoded form.
+            assert.ok(u.includes('example.com'), `DoH URL must include the hostname: ${u}`);
+        }
+    });
 });
 
 // -- get-whois handler ----------------------------------------------------
@@ -434,6 +463,33 @@ describe('ipcheck-ing handler', () => {
         await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('percent-encodes lang value to prevent upstream parameter injection', async () => {
+        process.env.IPCHECKING_API_KEY = 'testkey';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://example.internal';
+
+        let capturedUrl = null;
+        globalThis.fetch = async (url) => {
+            capturedUrl = String(url);
+            return { ok: true, json: async () => ({}) };
+        };
+
+        const res = createResponse();
+        // lang contains an ampersand — must be encoded so it cannot inject a second &ip=.
+        await ipcheckIngHandler(
+            createRequest({ query: { ip: '1.2.3.4', lang: 'en&ip=192.168.1.1' } }),
+            res,
+        );
+
+        assert.ok(capturedUrl !== null, 'expected a fetch call');
+        // The injected literal must not appear unencoded.
+        assert.ok(
+            !capturedUrl.includes('&ip=192.168.1.1'),
+            `upstream URL must not contain unencoded injected param: ${capturedUrl}`,
+        );
+        // The real ip= must be 1.2.3.4.
+        assert.ok(capturedUrl.includes('ip=1.2.3.4'), `upstream URL must contain original ip: ${capturedUrl}`);
     });
 });
 
