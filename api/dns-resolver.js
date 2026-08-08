@@ -26,12 +26,14 @@ const dnsServers = {
     'DNS4EU': '86.54.11.1',
 };
 
-// DNS-over-HTTPS server list
+// DNS-over-HTTPS server list — values are [baseUrl, extraParams] pairs.
+// Extra params are merged into the URLSearchParams so no raw query chars
+// are ever concatenated into the URL string.
 const dohServers = {
-    'Google': 'https://dns.google/resolve?',
-    'Cloudflare': 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&',
-    'AdGuard': 'https://dns.adguard.com/resolve?',
-    'AliDNS': 'https://dns.alidns.com/resolve?',
+    'Google': ['https://dns.google/resolve', {}],
+    'Cloudflare': ['https://cloudflare-dns.com/dns-query', { ct: 'application/dns-json' }],
+    'AdGuard': ['https://dns.adguard.com/resolve', {}],
+    'AliDNS': ['https://dns.alidns.com/resolve', {}],
 };
 
 const resolveDns = async (hostname, type, name, server) => {
@@ -88,9 +90,10 @@ const resolveDns = async (hostname, type, name, server) => {
     }
 };
 
-const resolveDoh = async (hostname, type, name, url) => {
+const resolveDoh = async (hostname, type, name, [baseUrl, extraParams]) => {
     try {
-        const response = await fetchUpstream(`${url}${new URLSearchParams({ name: hostname, type })}`, {
+        const params = new URLSearchParams({ ...extraParams, name: hostname, type });
+        const response = await fetchUpstream(`${baseUrl}?${params}`, {
             timeoutMs: DOH_TIMEOUT_MS,
             headers: { 'Accept': 'application/dns-json' }
         });
