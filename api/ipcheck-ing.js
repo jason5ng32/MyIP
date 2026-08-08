@@ -11,10 +11,14 @@ export default async (req, res) => {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    // Build request
+    // Build request — use URLSearchParams so lang/ip values cannot inject
+    // extra query parameters into the upstream URL.
     const lang = req.query.lang || 'en';
     const apiEndpoint = process.env.IPCHECKING_API_ENDPOINT;
-    const url = new URL(`${apiEndpoint}/ipinfo?key=${key}&ip=${ipAddress}&lang=${lang}`);
+    const url = new URL(`${apiEndpoint}/ipinfo`);
+    url.searchParams.set('key', key);
+    url.searchParams.set('ip', ipAddress);
+    url.searchParams.set('lang', lang);
 
     try {
         const apiResponse = await fetchUpstream(url, {

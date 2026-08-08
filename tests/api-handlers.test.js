@@ -244,6 +244,13 @@ describe('dns-resolver handler', () => {
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid hostname' });
     });
+
+    it('rejects hostname containing query-parameter injection characters', async () => {
+        const res = createResponse();
+        await dnsResolverHandler(createRequest({ query: { hostname: 'foo.com&name=evil.com', type: 'A' } }), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'Invalid hostname' });
+    });
 });
 
 // -- get-whois handler ----------------------------------------------------

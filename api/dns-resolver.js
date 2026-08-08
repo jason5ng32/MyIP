@@ -2,6 +2,7 @@
 import { Resolver } from 'dns';
 import { promisify } from 'util';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
+import { isValidDomain } from '../common/valid-ip.js';
 import logger from '../common/logger.js';
 
 // Bound each upstream lookup so the slowest server doesn't pin the
@@ -89,7 +90,7 @@ const resolveDns = async (hostname, type, name, server) => {
 
 const resolveDoh = async (hostname, type, name, url) => {
     try {
-        const response = await fetchUpstream(`${url}name=${hostname}&type=${type}`, {
+        const response = await fetchUpstream(`${url}${new URLSearchParams({ name: hostname, type })}`, {
             timeoutMs: DOH_TIMEOUT_MS,
             headers: { 'Accept': 'application/dns-json' }
         });
@@ -123,7 +124,7 @@ const dnsResolver = async (req, res) => {
         return res.status(400).send({ error: 'Missing hostname parameter' });
     }
 
-    if (!hostname.includes('.')) {
+    if (!isValidDomain(hostname)) {
         return res.status(400).send({ error: 'Invalid hostname' });
     }
 
