@@ -1,3 +1,8 @@
+// Cloudflare colo (PoP) IATA code → country / city, used by SpeedTest to
+// label the edge location reported by speed.cloudflare.com. Source of truth:
+// the datacenter components on https://www.cloudflarestatus.com/api/v2/components.json
+// ("City, Country - (IATA)" entries). Retired colos are kept — they cost
+// nothing and old measurements may still reference them.
 const coloList = {
     "AAE": {
         "country": "DZ",
@@ -15,13 +20,25 @@ const coloList = {
         "country": "GH",
         "city": "Accra"
     },
+    "ACX": {
+        "country": "CN",
+        "city": "Xingyi"
+    },
     "ADB": {
         "country": "TR",
         "city": "Izmir"
     },
+    "ADD": {
+        "country": "ET",
+        "city": "Addis Ababa"
+    },
     "ADL": {
         "country": "AU",
         "city": "Adelaide"
+    },
+    "AGR": {
+        "country": "IN",
+        "city": "Agra"
     },
     "AKL": {
         "country": "NZ",
@@ -87,6 +104,10 @@ const coloList = {
         "country": "US",
         "city": "Austin"
     },
+    "AVA": {
+        "country": "CN",
+        "city": "Anshun"
+    },
     "BAH": {
         "country": "BH",
         "city": "Manama"
@@ -102,6 +123,10 @@ const coloList = {
     "BCN": {
         "country": "ES",
         "city": "Barcelona"
+    },
+    "BDQ": {
+        "country": "IN",
+        "city": "Jamnagar"
     },
     "BEG": {
         "country": "RS",
@@ -129,7 +154,8 @@ const coloList = {
     },
     "BHY": {
         "country": "CN",
-        "city": "Beihai"},
+        "city": "Beihai"
+    },
     "BKK": {
         "country": "TH",
         "city": "Bangkok"
@@ -200,7 +226,8 @@ const coloList = {
     },
     "CAN": {
         "country": "CN",
-        "city": "Guangzhou"},
+        "city": "Guangzhou"
+    },
     "CAW": {
         "country": "BR",
         "city": "Campos dos Goytacazes"
@@ -231,14 +258,16 @@ const coloList = {
     },
     "CGD": {
         "country": "CN",
-        "city": "Changde"},
+        "city": "Changde"
+    },
     "CGK": {
         "country": "ID",
         "city": "Jakarta"
     },
     "CGO": {
         "country": "CN",
-        "city": "Zhengzhou"},
+        "city": "Zhengzhou"
+    },
     "CGP": {
         "country": "BD",
         "city": "Chittagong"
@@ -251,9 +280,14 @@ const coloList = {
         "country": "NZ",
         "city": "Christchurch"
     },
+    "CJB": {
+        "country": "IN",
+        "city": "Coimbatore"
+    },
     "CKG": {
         "country": "CN",
-        "city": "Chongqing"},
+        "city": "Chongqing"
+    },
     "CLE": {
         "country": "US",
         "city": "Cleveland"
@@ -308,17 +342,28 @@ const coloList = {
     },
     "CSX": {
         "country": "CN",
-        "city": "Changsha"},
+        "city": "Changsha"
+    },
     "CTU": {
         "country": "CN",
-        "city": "Chengdu"},
+        "city": "Chengdu"
+    },
+    "CVG": {
+        "country": "US",
+        "city": "Cincinnati"
+    },
     "CWB": {
         "country": "BR",
         "city": "Curitiba"
     },
+    "CZL": {
+        "country": "DZ",
+        "city": "Constantine"
+    },
     "CZX": {
         "country": "CN",
-        "city": "Changzhou"},
+        "city": "Changzhou"
+    },
     "DAC": {
         "country": "BD",
         "city": "Dhaka"
@@ -347,9 +392,14 @@ const coloList = {
         "country": "SN",
         "city": "Dakar"
     },
+    "DLA": {
+        "country": "CM",
+        "city": "Douala"
+    },
     "DLC": {
         "country": "CN",
-        "city": "Dalian"},
+        "city": "Dalian"
+    },
     "DME": {
         "country": "RU",
         "city": "Moscow"
@@ -424,7 +474,8 @@ const coloList = {
     },
     "FOC": {
         "country": "CN",
-        "city": "Fuzhou"},
+        "city": "Fuzhou"
+    },
     "FOR": {
         "country": "BR",
         "city": "Fortaleza"
@@ -432,6 +483,10 @@ const coloList = {
     "FRA": {
         "country": "DE",
         "city": "Frankfurt"
+    },
+    "FRU": {
+        "country": "KG",
+        "city": "Bishkek"
     },
     "FSD": {
         "country": "US",
@@ -443,7 +498,8 @@ const coloList = {
     },
     "FUO": {
         "country": "CN",
-        "city": "Foshan"},
+        "city": "Foshan"
+    },
     "GBE": {
         "country": "BW",
         "city": "Gaborone"
@@ -498,7 +554,8 @@ const coloList = {
     },
     "HAK": {
         "country": "CN",
-        "city": "Chengmai"},
+        "city": "Chengmai"
+    },
     "HAM": {
         "country": "DE",
         "city": "Hamburg"
@@ -521,13 +578,16 @@ const coloList = {
     },
     "HFE": {
         "country": "CN",
-        "city": "Huainan"},
+        "city": "Huainan"
+    },
     "HGH": {
         "country": "CN",
-        "city": "Shaoxing"},
+        "city": "Shaoxing"
+    },
     "HKG": {
         "country": "HK",
-        "city": "Hong Kong"},
+        "city": "Hong Kong"
+    },
     "HNL": {
         "country": "US",
         "city": "Honolulu"
@@ -542,7 +602,8 @@ const coloList = {
     },
     "HYN": {
         "country": "CN",
-        "city": "Taizhou"},
+        "city": "Taizhou"
+    },
     "IAD": {
         "country": "US",
         "city": "Ashburn"
@@ -611,13 +672,18 @@ const coloList = {
         "country": "BR",
         "city": "Joinville"
     },
+    "JRG": {
+        "country": "IN",
+        "city": "Sambalpur"
+    },
     "JSR": {
         "country": "BD",
         "city": "Jashore"
     },
     "JXG": {
         "country": "CN",
-        "city": "Jiaxing"},
+        "city": "Jiaxing"
+    },
     "KBP": {
         "country": "UA",
         "city": "Kyiv"
@@ -644,7 +710,8 @@ const coloList = {
     },
     "KHN": {
         "country": "CN",
-        "city": "Nanchang"},
+        "city": "Nanchang"
+    },
     "KIN": {
         "country": "JM",
         "city": "Kingston"
@@ -667,7 +734,8 @@ const coloList = {
     },
     "KMG": {
         "country": "CN",
-        "city": "Kunming"},
+        "city": "Kunming"
+    },
     "KNU": {
         "country": "IN",
         "city": "Kanpur"
@@ -682,7 +750,8 @@ const coloList = {
     },
     "KWE": {
         "country": "CN",
-        "city": "Guiyang"},
+        "city": "Guiyang"
+    },
     "KWI": {
         "country": "KW",
         "city": "Kuwait City"
@@ -717,7 +786,8 @@ const coloList = {
     },
     "LHW": {
         "country": "CN",
-        "city": "Lanzhou"},
+        "city": "Lanzhou"
+    },
     "LIM": {
         "country": "PE",
         "city": "Lima"
@@ -726,9 +796,17 @@ const coloList = {
         "country": "PT",
         "city": "Lisbon"
     },
+    "LJU": {
+        "country": "SI",
+        "city": "Ljubljana"
+    },
     "LLK": {
         "country": "AZ",
         "city": "Astara"
+    },
+    "LLW": {
+        "country": "MW",
+        "city": "Lilongwe"
     },
     "LOS": {
         "country": "NG",
@@ -738,9 +816,17 @@ const coloList = {
         "country": "BO",
         "city": "La Paz"
     },
+    "LUN": {
+        "country": "ZM",
+        "city": "Lusaka"
+    },
     "LUX": {
         "country": "LU",
         "city": "Luxembourg City"
+    },
+    "LYA": {
+        "country": "CN",
+        "city": "Luoyang"
     },
     "LYS": {
         "country": "FR",
@@ -800,7 +886,8 @@ const coloList = {
     },
     "MFM": {
         "country": "MO",
-        "city": "Macau"},
+        "city": "Macau"
+    },
     "MGM": {
         "country": "US",
         "city": "Montgomery"
@@ -809,9 +896,17 @@ const coloList = {
         "country": "US",
         "city": "Miami"
     },
+    "MLA": {
+        "country": "MT",
+        "city": "Santa Venera"
+    },
     "MLE": {
         "country": "MV",
         "city": "Male"
+    },
+    "MLG": {
+        "country": "ID",
+        "city": "Malang"
     },
     "MNL": {
         "country": "PH",
@@ -859,7 +954,8 @@ const coloList = {
     },
     "NNG": {
         "country": "CN",
-        "city": "Nanning"},
+        "city": "Nanning"
+    },
     "NOU": {
         "country": "NC",
         "city": "Noumea"
@@ -954,7 +1050,8 @@ const coloList = {
     },
     "PKX": {
         "country": "CN",
-        "city": "Langfang"},
+        "city": "Langfang"
+    },
     "PMO": {
         "country": "IT",
         "city": "Palermo"
@@ -966,6 +1063,10 @@ const coloList = {
     "PNH": {
         "country": "KH",
         "city": "Phnom Penh"
+    },
+    "PNQ": {
+        "country": "IN",
+        "city": "Pune"
     },
     "POA": {
         "country": "BR",
@@ -1031,6 +1132,10 @@ const coloList = {
         "country": "US",
         "city": "San Diego"
     },
+    "SAP": {
+        "country": "HN",
+        "city": "San Pedro Sula"
+    },
     "SAT": {
         "country": "US",
         "city": "San Antonio"
@@ -1057,7 +1162,8 @@ const coloList = {
     },
     "SHA": {
         "country": "CN",
-        "city": "Shanghai"},
+        "city": "Shanghai"
+    },
     "SIN": {
         "country": "SG",
         "city": "Singapore"
@@ -1084,7 +1190,8 @@ const coloList = {
     },
     "SJW": {
         "country": "CN",
-        "city": "Hengshui"},
+        "city": "Hengshui"
+    },
     "SKG": {
         "country": "GR",
         "city": "Thessaloniki"
@@ -1139,10 +1246,12 @@ const coloList = {
     },
     "SZX": {
         "country": "CN",
-        "city": "Shenzhen"},
+        "city": "Shenzhen"
+    },
     "TAO": {
         "country": "CN",
-        "city": "Qingdao"},
+        "city": "Qingdao"
+    },
     "TAS": {
         "country": "UZ",
         "city": "Tashkent"
@@ -1153,7 +1262,8 @@ const coloList = {
     },
     "TEN": {
         "country": "CN",
-        "city": "Tongren"},
+        "city": "Tongren"
+    },
     "TGU": {
         "country": "HN",
         "city": "Tegucigalpa"
@@ -1176,7 +1286,8 @@ const coloList = {
     },
     "TNA": {
         "country": "CN",
-        "city": "Zibo"},
+        "city": "Zibo"
+    },
     "TNR": {
         "country": "MG",
         "city": "Antananarivo"
@@ -1187,10 +1298,12 @@ const coloList = {
     },
     "TPE": {
         "country": "TW",
-        "city": "Taipei"},
+        "city": "Taipei"
+    },
     "TSN": {
         "country": "CN",
-        "city": "Tianjin"},
+        "city": "Tianjin"
+    },
     "TUN": {
         "country": "TN",
         "city": "Tunis"
@@ -1201,10 +1314,15 @@ const coloList = {
     },
     "TYN": {
         "country": "CN",
-        "city": "Yangquan"},
+        "city": "Yangquan"
+    },
     "UDI": {
         "country": "BR",
         "city": "Uberlandia"
+    },
+    "UDR": {
+        "country": "IN",
+        "city": "Udaipur"
     },
     "UIO": {
         "country": "EC",
@@ -1248,24 +1366,36 @@ const coloList = {
     },
     "WHU": {
         "country": "CN",
-        "city": "Wuhu"},
+        "city": "Wuhu"
+    },
+    "WLG": {
+        "country": "NZ",
+        "city": "Wellington"
+    },
+    "WRO": {
+        "country": "PL",
+        "city": "Wroclaw"
+    },
     "XAP": {
         "country": "BR",
         "city": "Chapeco"
     },
     "XFN": {
         "country": "CN",
-        "city": "Xiangyang"},
+        "city": "Xiangyang"
+    },
     "XIY": {
         "country": "CN",
-        "city": "Baoji"},
+        "city": "Baoji"
+    },
     "XNH": {
         "country": "IQ",
         "city": "Nasiriyah"
     },
     "XNN": {
         "country": "CN",
-        "city": "Xining"},
+        "city": "Xining"
+    },
     "YHZ": {
         "country": "CA",
         "city": "Halifax"
@@ -1316,9 +1446,14 @@ const coloList = {
     }
 }
 
-export default function getColoCountry(abbr) {
+// Unknown abbr (a colo newer than this list) falls back to empty fields —
+// the SpeedTest card just omits the location instead of crashing.
+const getColoCountry = (abbr) => {
+    const colo = coloList[abbr] ?? {};
     return {
-        country: coloList[abbr].country || '',
-        city: coloList[abbr].city || ''
+        country: colo.country || '',
+        city: colo.city || ''
     }
 }
+
+export default getColoCountry

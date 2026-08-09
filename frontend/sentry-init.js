@@ -86,6 +86,7 @@ const initSentry = (app, router, earlyErrors = []) => {
             'auth/network-request-failed',
             'auth/popup-closed-by-user',
             'auth/popup-blocked',
+            'auth/internal-error',
             'auth/cancelled-popup-request',
             'INTERNAL ASSERTION FAILED',
             // firebase auth's indexedDB layer refuses writes while the page
