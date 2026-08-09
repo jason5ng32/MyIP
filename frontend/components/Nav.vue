@@ -81,11 +81,16 @@
 
       <!-- Right: Action area (ml-auto push to the right) -->
       <div class="ml-auto flex items-center gap-2">
+        <!-- Earth Online entry (code name: pulse) -->
+        <Pulse />
+
         <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
         <DocsSearch />
 
-        <!-- Preferences — standalone cog for visitors and Firebase-less self-hosted instances. -->
-        <JnTooltip v-if="!isFireBaseSet || !isSignedIn" :text="t('shortcutKeys.Preferences')">
+        <!-- Preferences — standalone cog only for Firebase-less self-hosted
+             instances (no user menu to host it). With the user system on,
+             preferences lives inside the user dropdown for every state. -->
+        <JnTooltip v-if="!isFireBaseSet" :text="t('shortcutKeys.Preferences')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
             @click="OpenPreferences">
             <Cog />
@@ -95,9 +100,12 @@
         <!-- Sign In / User Dropdown -->
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
-            <!-- Not signed in -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1.5 cursor-pointer">
-              <span>{{ t('user.SignIn') }}</span>
+            <!-- Not signed in: the solid block reads as the "sign in"
+                 call-to-action, and the menu opens on the sign-in options, so
+                 the affordance is self-explaining one click deep. -->
+            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo"
+              class="h-8 gap-1 px-1.5 cursor-pointer" aria-label="User menu">
+              <UserRound class="size-5" />
               <ChevronDown class="opacity-60" />
             </Button>
             <!-- Signed in: avatar + chevron -->
@@ -151,10 +159,6 @@
                 <Award />
                 <span>{{ t('user.MyAchievements') }}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
-                <Cog />
-                <span>{{ t('nav.preferences.title') }}</span>
-              </DropdownMenuItem>
             </template>
 
             <!-- Not signed in -->
@@ -170,6 +174,10 @@
             </template>
 
             <DropdownMenuSeparator />
+            <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
+              <Cog />
+              <span>{{ t('nav.preferences.title') }}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
               <HeartHandshake />
               <span>{{ t('user.Benefits.Title') }}</span>
@@ -270,10 +278,11 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  Award, ChevronDown, HeartHandshake,
+  Award, ChevronDown, UserRound, HeartHandshake,
   LogOut, Menu, Cog,
 } from '@lucide/vue';
 import DocsSearch from '@/components/widgets/DocsSearch.vue';
+import Pulse from '@/components/widgets/Pulse.vue';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';

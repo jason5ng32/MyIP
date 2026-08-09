@@ -164,6 +164,32 @@
       "Comment déployer mon propre MyIP ?",
       "Je veux financer le projet MyIP"
     ],
+    "pulse": {
+      "title": "La Terre en ligne",
+      "tooltip": "Des visiteurs du monde entier",
+      "others": "Autres",
+      "shareStatus": "Partagez votre statut",
+      "worldSaying": "Ce que dit le monde",
+      "quiet": "Tout est calme pour l’instant — soyez le premier à partager",
+      "share": "Part des visiteurs",
+      "latest": "À l’instant",
+      "sent": "Envoyé",
+      "rateLimited": "Un seul statut possible sur une courte période",
+      "statuses": {
+        "fast": "Réseau ultra rapide",
+        "ok": "Tout va bien ici",
+        "slow": "Réseau un peu lent",
+        "flaky": "Connexion instable",
+        "blocked": "Un site ne s'ouvre pas",
+        "good": "De bonne humeur aujourd'hui",
+        "bad": "Journée difficile",
+        "passing": "Juste de passage",
+        "lag": "Lag de jeu insupportable",
+        "newip": "Nouvelle IP toute fraîche",
+        "vpn": "Je passe par un VPN",
+        "night": "Encore debout à cette heure"
+      }
+    },
     "preferences": {
       "title": "Préférences",
       "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",

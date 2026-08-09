@@ -1540,6 +1540,15 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Earth Online: see where visitors come from and share a preset status",
+          "zh": "地球在线：查看访客来自哪里，并分享预置状态",
+          "fr": "La Terre en ligne : voyez d'où viennent les visiteurs et partagez un statut prédéfini",
+          "ru": "Земля онлайн: смотрите, откуда посетители, и делитесь готовым статусом"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Connectivity cards now show real site favicons, and the test capacity grows to 60",

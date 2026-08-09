@@ -164,6 +164,32 @@
       "How do I deploy my own MyIP?",
       "I want to sponsor the MyIP project"
     ],
+    "pulse": {
+      "title": "Earth Online",
+      "tooltip": "Visitors from around the world",
+      "others": "Others",
+      "shareStatus": "Share your status",
+      "worldSaying": "What the world is saying",
+      "quiet": "All quiet right now — be the first to share",
+      "share": "Visitor share",
+      "latest": "Latest",
+      "sent": "Sent",
+      "rateLimited": "Only one status can be shared in a short period",
+      "statuses": {
+        "fast": "Blazing fast network",
+        "ok": "All good here",
+        "slow": "Network feels slow",
+        "flaky": "Connection keeps dropping",
+        "blocked": "A site won't open",
+        "good": "Feeling good today",
+        "bad": "Rough day today",
+        "passing": "Just passing by",
+        "lag": "Game lag is unreal",
+        "newip": "Just got a new IP",
+        "vpn": "Cruising through a VPN",
+        "night": "Up late tonight"
+      }
+    },
     "preferences": {
       "title": "Preferences",
       "preferenceTips": "These settings are saved in your browser for easy reuse. Some options require refreshing the page to take effect.",

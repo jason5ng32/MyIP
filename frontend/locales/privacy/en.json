@@ -11,6 +11,13 @@
           "To look up IP geolocation, the IP being queried is sent to third-party providers (such as ipinfo.io, ip-api.com and similar). Those lookups are governed by each provider's own privacy policy."
         ]
       },
+      "pulse": {
+        "title": "Earth Online",
+        "paragraphs": [
+          "When you visit the site, we count one anonymous visit tick together with your country or region, derived from your IP address at our edge network. The IP itself is only used transiently — as a truncated hash for de-duplication and as a masked prefix (e.g. \"84.152.x.x\") for display. The full address is never stored.",
+          "If you choose to share a preset status, we record the status id, your country or region and the masked IP prefix for up to 30 hours, after which the data is deleted automatically. Statuses come from a fixed list — there is no free-text input."
+        ]
+      },
       "sharedReports": {
         "title": "Shared diagnostic reports",
         "paragraphs": [

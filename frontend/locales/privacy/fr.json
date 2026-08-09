@@ -11,6 +11,13 @@
           "Pour rechercher la géolocalisation d'une IP, l'IP interrogée est envoyée à des fournisseurs tiers (tels qu'ipinfo.io, ip-api.com et similaires). Ces recherches sont régies par la politique de confidentialité propre à chaque fournisseur."
         ]
       },
+      "pulse": {
+        "title": "La Terre en ligne",
+        "paragraphs": [
+          "Lors de votre visite, nous comptons une visite anonyme accompagnée de votre pays ou région, déduits de votre adresse IP sur notre réseau edge. L'IP elle-même n'est utilisée que de façon transitoire — sous forme de hachage tronqué pour la déduplication et de préfixe masqué (par ex. « 84.152.x.x ») pour l'affichage. L'adresse complète n'est jamais stockée.",
+          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué pendant au plus 30 heures, après quoi ces données sont supprimées automatiquement. Les statuts proviennent d'une liste fixe — aucune saisie libre."
+        ]
+      },
       "sharedReports": {
         "title": "Rapports de diagnostic partagés",
         "paragraphs": [

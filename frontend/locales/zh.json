@@ -164,6 +164,32 @@
       "怎么部署一个自己的 MyIP？",
       "我想资助 MyIP 项目"
     ],
+    "pulse": {
+      "title": "地球在线",
+      "tooltip": "来自世界各地的访客",
+      "others": "其它地区",
+      "shareStatus": "分享你的状态",
+      "worldSaying": "世界正在说",
+      "quiet": "此刻还很安静，来当第一个发声的人吧",
+      "share": "访客占比",
+      "latest": "最新动态",
+      "sent": "已发送",
+      "rateLimited": "短期内只能发一次状态",
+      "statuses": {
+        "fast": "网速快得飞起",
+        "ok": "一切正常",
+        "slow": "网速有点慢",
+        "flaky": "网络时断时续",
+        "blocked": "有网站打不开",
+        "good": "今天心情不错",
+        "bad": "今天有点丧",
+        "passing": "路过看看",
+        "lag": "游戏延迟爆炸",
+        "newip": "刚换了新 IP",
+        "vpn": "正挂着 VPN",
+        "night": "熬夜中"
+      }
+    },
     "preferences": {
       "title": "偏好设置",
       "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
