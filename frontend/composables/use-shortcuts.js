@@ -20,6 +20,7 @@ import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
+import { isPulseEnabled } from '../utils/pulse-beacon.js';
 
 function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
     const {
@@ -217,6 +218,17 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
             keys: 'D',
             action: () => goToAdvancedTool('enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
             description: t('shortcutKeys.EnhancedDnsLeakTest'),
+        });
+    }
+
+    if (isPulseEnabled) {
+        config.push({
+            keys: 'p',
+            action: () => {
+                store.toggleSheet('pulse');
+                trackEvent('ShortCut', 'ShortCut', 'Pulse');
+            },
+            description: t('shortcutKeys.Pulse'),
         });
     }
 
