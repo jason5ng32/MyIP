@@ -15,7 +15,7 @@
         "title": "Earth Online",
         "paragraphs": [
           "When you visit the site, we count one anonymous visit tick together with your country or region, derived from your IP address at our edge network. The IP itself is only used transiently, the full address is never stored.",
-          "If you choose to share a preset status, we record the status id, your country or region and the masked IP prefix for up to 24 hours, after which the data is deleted automatically. Statuses come from a fixed list — there is no free-text input."
+          "If you choose to share a preset status, we record the status id, your country or region and the masked IP prefix for up to 48 hours, after which the data is deleted automatically. Statuses come from a fixed list — there is no free-text input."
         ]
       },
       "sharedReports": {

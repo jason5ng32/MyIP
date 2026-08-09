@@ -117,7 +117,7 @@
                                             {{ regionName(entry.code) }}
                                         </span>
                                         <span class="text-xs tabular-nums text-muted-foreground">{{
-                                            entry.share.toFixed(1) }}%</span>
+                                            shareLabel(entry.share) }}</span>
                                     </div>
                                     <div class="h-1.5 overflow-hidden rounded-full bg-muted">
                                         <div class="h-full rounded-full bg-primary"
@@ -141,7 +141,7 @@
                                             {{ t('nav.pulse.others') }}
                                         </span>
                                         <span class="text-xs tabular-nums text-muted-foreground">{{
-                                            othersShare.toFixed(1) }}%</span>
+                                            shareLabel(othersShare) }}</span>
                                     </div>
                                     <div class="h-1.5 overflow-hidden rounded-full bg-muted">
                                         <div class="h-full rounded-full bg-muted-foreground/40"
@@ -245,6 +245,10 @@ const barWidth = (share) => {
     return max > 0 ? `${Math.min(100, (share / max) * 100)}%` : '0%';
 };
 
+// The backend sends shares at two decimals so tiny countries stay nonzero;
+// below one display decimal they read as "<0.1%" — "few", never "zero".
+const shareLabel = (share) => (share > 0 && share < 0.1 ? '<0.1%' : `${share.toFixed(1)}%`);
+
 // Country names via the shared Intl helper (data/country-name.js).
 // "T1" is the backend's pseudo-code for Tor exit traffic — no ISO name, no
 // territory on the map. Any non-two-letter code (T1 included) falls back to
@@ -326,7 +330,7 @@ const renderMap = async () => {
         colorTo: '#1449AB',
         formatValue: (value) => (value === undefined
             ? ` ${t('nav.pulse.noVisitors')}`
-            : ` ${t('nav.pulse.share')}: ${value}%`),
+            : ` ${t('nav.pulse.share')}: ${shareLabel(value)}`),
     });
 };
 

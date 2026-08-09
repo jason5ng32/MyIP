@@ -15,7 +15,7 @@
         "title": "La Terre en ligne",
         "paragraphs": [
           "Lors de votre visite, nous comptons une visite anonyme accompagnée de votre pays ou région, déduits de votre adresse IP sur notre réseau edge. L'IP elle-même n'est utilisée que de façon transitoire, l'adresse complète n'est jamais stockée.",
-          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué pendant au plus 24 heures, après quoi ces données sont supprimées automatiquement. Les statuts proviennent d'une liste fixe — aucune saisie libre."
+          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué pendant au plus 48 heures, après quoi ces données sont supprimées automatiquement. Les statuts proviennent d'une liste fixe — aucune saisie libre."
         ]
       },
       "sharedReports": {
