@@ -90,7 +90,7 @@
                 <!-- Per-country share + status mix; quiet placeholder when
                     empty or the fetch failed. -->
                 <section class="space-y-4">
-                    <h3 class="mb-2.5 text-sm font-semibold">{{ t('nav.pulse.worldSaying') }}</h3>
+                    <h3 class="mb-2.5 text-sm font-semibold">{{ t('nav.pulse.liveMap') }}</h3>
 
                     <div v-if="statsLoading && countries.length === 0" class="flex justify-center py-8">
                         <Spinner />
@@ -101,8 +101,12 @@
                     </p>
 
                     <template v-else>
-                        <!-- svgmap container; id must match MAP_ELEMENT_ID. -->
-                        <div id="pulseSvgMap" class="overflow-hidden rounded-lg border"></div>
+                        <!-- Choropleth canvas. The wrapper's aspect ratio tracks
+                            the equalEarth projection (~2.2:1) so the map fills
+                            the full width with no letterboxing. -->
+                        <div class="relative w-full aspect-[2.2/1] overflow-hidden rounded-lg border">
+                            <canvas ref="mapCanvas"></canvas>
+                        </div>
 
                         <ul class="m-0 list-none space-y-4 p-0">
                             <li v-for="entry in topCountries" :key="entry.code" class="flex items-start gap-3">
@@ -167,6 +171,8 @@ import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
+import { renderWorldMapChart } from '@/utils/world-map-chart.js';
+import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -239,7 +245,7 @@ const barWidth = (share) => {
     return max > 0 ? `${Math.min(100, (share / max) * 100)}%` : '0%';
 };
 
-// Country names always via Intl.DisplayNames, per project convention.
+// Country names via the shared Intl helper (data/country-name.js).
 // "T1" is the backend's pseudo-code for Tor exit traffic — no ISO name, no
 // territory on the map. Any non-two-letter code (T1 included) falls back to
 // the international flag (circle-flags:xx).
@@ -247,12 +253,9 @@ const isTor = (code) => code === 'T1';
 const flagIcon = (code) =>
     `circle-flags:${/^[A-Za-z]{2}$/.test(code) ? code.toLowerCase() : 'xx'}`;
 const regionName = (code) => {
+    if (!code) return '';
     if (isTor(code)) return 'Tor';
-    try {
-        return new Intl.DisplayNames([locale.value], { type: 'region' }).of(code.toUpperCase());
-    } catch {
-        return code.toUpperCase();
-    }
+    return getCountryName(code, locale.value) || code.toUpperCase();
 };
 
 // Relative times via Intl as well — no locale keys needed. Minutes within
@@ -305,34 +308,25 @@ const sendStatus = async (id) => {
 };
 onBeforeUnmount(() => clearTimeout(hintTimer));
 
-// World map (svgmap), shaded by share; the token discards a stale async
-// draw superseded by newer data.
-const MAP_ELEMENT_ID = 'pulseSvgMap';
-let mapDrawToken = 0;
-const drawMap = async () => {
-    const token = ++mapDrawToken;
-    const [svgMapModule] = await Promise.all([import('svgmap'), import('svgmap/style.min')]);
-    const el = document.getElementById(MAP_ELEMENT_ID);
-    if (token !== mapDrawToken || !el) return;
-    el.innerHTML = '';
-    const values = {};
-    for (const entry of countries.value) {
-        if (isTor(entry.code)) continue; // no territory to shade
-        values[entry.code.toUpperCase()] = { share: entry.share };
-    }
-    new svgMapModule.default({
-        targetElementID: MAP_ELEMENT_ID,
-        data: {
-            data: { share: { name: t('nav.pulse.share'), format: '{0}%' } },
-            applyData: 'share',
-            values,
-        },
-        colorMax: '#083923',
-        colorMin: '#22CB80',
-        minZoom: 1,
-        maxZoom: 1,
-        initialZoom: 1,
-        mouseWheelZoomEnabled: false,
+// World map via the shared choropleth util (utils/world-map-chart.js) —
+// heat ramp (warm orange → deep red), fitting the "heatmap" framing; T1 has
+// no territory to shade.
+const mapCanvas = ref(null);
+let mapChart = null;
+
+const renderMap = async () => {
+    mapChart = await renderWorldMapChart({
+        canvas: mapCanvas.value,
+        chart: mapChart,
+        values: Object.fromEntries(countries.value
+            .filter((entry) => !isTor(entry.code))
+            .map((entry) => [entry.code.toUpperCase(), entry.share])),
+        lang: locale.value,
+        colorFrom: '#6597F3',
+        colorTo: '#1449AB',
+        formatValue: (value) => (value === undefined
+            ? ` ${t('nav.pulse.noVisitors')}`
+            : ` ${t('nav.pulse.share')}: ${value}%`),
     });
 };
 
@@ -349,10 +343,18 @@ watch(isOpen, (open) => {
 });
 
 // Map draw trigger — declared after isOpen (watch sources are read at setup;
-// referencing a later const would hit its temporal dead zone).
+// referencing a later const would hit its temporal dead zone). Closing the
+// Sheet unmounts the canvas, so the chart is destroyed with it.
 watch([isOpen, countries], async () => {
-    if (!isOpen.value || countries.value.length === 0) return;
+    if (!isOpen.value) {
+        if (mapChart) {
+            mapChart.destroy();
+            mapChart = null;
+        }
+        return;
+    }
+    if (countries.value.length === 0) return;
     await nextTick(); // let the v-else branch render the map container first
-    drawMap();
+    renderMap();
 });
 </script>

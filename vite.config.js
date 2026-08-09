@@ -21,7 +21,6 @@ const nodeModuleChunkGroups = {
   vendor: ['vue', 'vue-router', 'vue-i18n'],
   chart: ['chart.js'],
   speedtest: ['@cloudflare/speedtest'],
-  svgmap: ['svgmap'],
   'browser-detect': ['@thumbmarkjs/thumbmarkjs', 'ua-parser-js'],
 };
 

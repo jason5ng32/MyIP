@@ -43,8 +43,7 @@
                     :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
                     autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
                     @keyup.enter="startPingCheck" />
-                <Button variant="action"
-                    :disabled="!canRun"
+                <Button variant="action" :disabled="!canRun"
                     :title="overLimit ? t('globalping.GroupFull', { max: GLOBALPING_MAX_COUNTRIES }) : ''"
                     @click="startPingCheck" class="cursor-pointer">
                     <Spinner v-if="pingCheckStatus === 'running'" />
@@ -71,8 +70,7 @@
                          right column has content, an absolutely-positioned inner
                          wrapper makes the picker exactly as tall as the results
                          (the row height comes from the right column alone) -->
-                    <div class="col-span-1"
-                        :class="pingResults.length > 0
+                    <div class="col-span-1" :class="pingResults.length > 0
                             ? 'max-h-72 overflow-y-auto md:max-h-none md:overflow-visible md:relative md:min-h-96'
                             : 'max-h-72 md:max-h-128 overflow-y-auto'">
                         <div class="px-4 py-3"
@@ -83,62 +81,68 @@
                     </div>
 
                     <!-- Right: results table + map; hint / spinner before that -->
-                    <div class="col-span-3"
-                        :class="pingResults.length > 0 ? '' : 'flex items-center justify-center'">
+                    <div class="col-span-3" :class="pingResults.length > 0 ? '' : 'flex items-center justify-center'">
                         <template v-if="pingResults.length > 0">
                             <div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b">
-                                <th scope="col" v-for="header in headers" :key="header.key"
-                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide min-w-20 text-nowrap"
-                                    :class="header.align === 'right' ? 'text-right' : 'text-left'">
-                                    {{ t('pingtest.' + header.key) }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            <tr v-for="result in pingResults" :key="result.country"
-                                class="hover:bg-muted/50 transition-colors">
-                                <td class="px-3 py-2.5 whitespace-nowrap">
-                                    <div class="flex items-center gap-1.5">
-                                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()"
-                                            class="shrink-0 size-4" />
-                                        <span>{{ result.country_name }}</span>
-                                    </div>
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
-                                    :class="latencyToneClass(result.stats.min)">
-                                    {{ result.stats.min.toFixed(1) }}
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
-                                    :class="latencyToneClass(result.stats.max)">
-                                    {{ result.stats.max.toFixed(1) }}
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
-                                    :class="latencyToneClass(result.stats.avg)">
-                                    {{ result.stats.avg.toFixed(1) }}
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
-                                    {{ result.stats.total }}
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
-                                    :class="result.stats.loss > 0 ? 'text-warning' : 'text-muted-foreground'">
-                                    {{ Math.round(result.stats.loss) }}%
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
-                                    {{ result.stats.rcv }}
-                                </td>
-                                <td class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
-                                    {{ result.stats.drop }}
-                                </td>
-                            </tr>
+                                        <thead>
+                                            <tr class="border-b">
+                                                <th scope="col" v-for="header in headers" :key="header.key"
+                                                    class="px-3 py-2.5 text-xs font-medium text-muted-foreground uppercase tracking-wide min-w-20 text-nowrap"
+                                                    :class="header.align === 'right' ? 'text-right' : 'text-left'">
+                                                    {{ t('pingtest.' + header.key) }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y">
+                                            <tr v-for="result in pingResults" :key="result.country"
+                                                class="hover:bg-muted/50 transition-colors">
+                                                <td class="px-3 py-2.5 whitespace-nowrap">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <Icon :icon="'circle-flags:' + result.country.toLowerCase()"
+                                                            class="shrink-0 size-4" />
+                                                        <span>{{ result.country_name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
+                                                    :class="latencyToneClass(result.stats.min)">
+                                                    {{ result.stats.min.toFixed(1) }}
+                                                </td>
+                                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
+                                                    :class="latencyToneClass(result.stats.max)">
+                                                    {{ result.stats.max.toFixed(1) }}
+                                                </td>
+                                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
+                                                    :class="latencyToneClass(result.stats.avg)">
+                                                    {{ result.stats.avg.toFixed(1) }}
+                                                </td>
+                                                <td
+                                                    class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
+                                                    {{ result.stats.total }}
+                                                </td>
+                                                <td class="px-3 py-2.5 text-right font-mono tabular-nums"
+                                                    :class="result.stats.loss > 0 ? 'text-warning' : 'text-muted-foreground'">
+                                                    {{ Math.round(result.stats.loss) }}%
+                                                </td>
+                                                <td
+                                                    class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
+                                                    {{ result.stats.rcv }}
+                                                </td>
+                                                <td
+                                                    class="px-3 py-2.5 text-right font-mono tabular-nums text-muted-foreground">
+                                                    {{ result.stats.drop }}
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- Map container (svgmap library renders here) -->
-                                <div id="svgMap" class="m-3"></div>
+                                <!-- Latency world map (shared choropleth util).
+                                    Aspect ratio tracks the equalEarth projection
+                                    (~2.2:1) so the map fills the full width. -->
+                                <div class="relative m-3 aspect-[2.2/1] overflow-hidden rounded-lg border">
+                                    <canvas ref="mapCanvas"></canvas>
+                                </div>
                             </div>
                         </template>
                         <div v-else-if="pingCheckStatus === 'running'" class="px-4 py-6">
@@ -157,7 +161,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -175,8 +179,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Info, Play } from '@lucide/vue';
-
-import 'svgmap/style.min';
+import { renderWorldMapChart } from '@/utils/world-map-chart.js';
 
 const { t } = useI18n();
 
@@ -285,49 +288,42 @@ const processpingResults = (data) => {
         }));
 };
 
+// Latency map via the shared choropleth util: shaded by average delay
+// (green = fast, dark = slow); tooltip lists the per-country stats.
+const mapCanvas = ref(null);
+let mapChart = null;
+
 const drawMap = async () => {
-    const svgMapModule = await import('svgmap');
-
-    const mapData = {
-        data: {
-            avgPing: { name: t('pingtest.AvgDelay'), format: '{0} ms', thresholdMax: 250, thresholdMin: 0 },
-            minPing: { name: t('pingtest.MinDelay'), format: '{0} ms' },
-            maxPing: { name: t('pingtest.MaxDelay'), format: '{0} ms' },
-            total: { name: t('pingtest.TotalPackets'), format: '{0}' },
-            loss: { name: t('pingtest.PacketLoss'), format: '{0}%' },
-            rcv: { name: t('pingtest.ReceivedPackets'), format: '{0}' },
-            drop: { name: t('pingtest.DroppedPackets'), format: '{0}' },
+    await nextTick(); // the results branch (and its canvas) render on status flip
+    const statsByCountry = Object.fromEntries(
+        pingResults.value.map((result) => [result.country.toUpperCase(), result.stats]));
+    mapChart = await renderWorldMapChart({
+        canvas: mapCanvas.value,
+        chart: mapChart,
+        values: Object.fromEntries(
+            Object.entries(statsByCountry).map(([cc, stats]) => [cc, stats.avg])),
+        lang: lang.value,
+        colorFrom: '#22CB80',
+        colorTo: '#FFC870',
+        tooltipOnMissing: false, // untested countries get no hover UI
+        formatValue: (value, alpha2) => {
+            const stats = statsByCountry[alpha2];
+            if (!stats) return '';
+            return [
+                ` ${t('pingtest.AvgDelay')}: ${stats.avg.toFixed(1)} ms`,
+                ` ${t('pingtest.MinDelay')}: ${stats.min.toFixed(1)} ms`,
+                ` ${t('pingtest.MaxDelay')}: ${stats.max.toFixed(1)} ms`,
+                ` ${t('pingtest.PacketLoss')}: ${Math.round(stats.loss)}%`,
+            ];
         },
-        applyData: 'avgPing',
-        values: {},
-    };
-
-    pingResults.value.forEach(countryData => {
-        mapData.values[countryData.country] = {
-            avgPing: countryData.stats.avg,
-            minPing: countryData.stats.min,
-            maxPing: countryData.stats.max,
-            total: countryData.stats.total,
-            loss: countryData.stats.loss,
-            rcv: countryData.stats.rcv,
-            drop: countryData.stats.drop,
-        };
-    });
-
-    new svgMapModule.default({
-        targetElementID: 'svgMap',
-        data: mapData,
-        colorMax: '#083923',
-        colorMin: '#22CB80',
-        minZoom: 1,
-        maxZoom: 1,
-        mouseWheelZoomEnabled: false,
-        initialZoom: 1,
     });
 };
 
 const cleanMap = () => {
-    const el = document.getElementById('svgMap');
-    if (el) el.innerHTML = '';
+    if (mapChart) {
+        mapChart.destroy();
+        mapChart = null;
+    }
 };
+onBeforeUnmount(cleanMap);
 </script>
