@@ -12,7 +12,7 @@
                 <!-- Multi-column shortcut list -->
                 <div class="grid grid-cols-2 md:grid-cols-3  gap-x-6 gap-y-1">
                     <div v-for="key in keyMap" :key="key.keys"
-                        class="flex items-center justify-between gap-3 py-2 border-b last:border-b-0">
+                        class="flex items-center justify-between gap-3 py-2 border-b">
                         <span class="text-sm">{{ key.description }}</span>
                         <kbd
                             class="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded border bg-muted text-xs font-mono text-foreground">
