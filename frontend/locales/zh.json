@@ -189,7 +189,9 @@
         "newip": "刚换了新 IP",
         "vpn": "正挂着 VPN",
         "night": "熬夜中",
-        "vibing": "正在 Vibe Coding"
+        "vibing": "正在 Vibe Coding",
+        "fixing": "又在给家里修网",
+        "tuning": "又减少了 10ms"
       }
     },
     "preferences": {

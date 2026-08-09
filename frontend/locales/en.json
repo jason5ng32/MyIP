@@ -189,7 +189,9 @@
         "newip": "Just got a new IP",
         "vpn": "Cruising through a VPN",
         "night": "Up late tonight",
-        "vibing": "Vibe coding"
+        "vibing": "Vibe coding",
+        "fixing": "Fixing the family Wi-Fi again",
+        "tuning": "Shaved off another 10ms"
       }
     },
     "preferences": {

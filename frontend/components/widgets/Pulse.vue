@@ -197,6 +197,8 @@ const PRESET_STATUSES = [
     { id: 'lag', emoji: '🎮' },
     { id: 'newip', emoji: '🔄' },
     { id: 'vpn', emoji: '🛡️' },
+    { id: 'fixing', emoji: '🔧' },
+    { id: 'tuning', emoji: '⏱️' },
     { id: 'good', emoji: '😎' },
     { id: 'bad', emoji: '😮‍💨' },
     { id: 'night', emoji: '🌙' },
