@@ -1,6 +1,6 @@
 {
   "user": {
-    "SignIn": "登录/注册",
+    "SignIn": "登录",
     "SignInWithGoogle": "使用 Google 登录",
     "SignInWithGithub": "使用 GitHub 登录",
     "SignOut": "登出",

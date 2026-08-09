@@ -84,8 +84,8 @@
         <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
         <DocsSearch />
 
-        <!-- Preferences -->
-        <JnTooltip :text="t('shortcutKeys.Preferences')">
+        <!-- Preferences — standalone cog for visitors and Firebase-less self-hosted instances. -->
+        <JnTooltip v-if="!isFireBaseSet || !isSignedIn" :text="t('shortcutKeys.Preferences')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
             @click="OpenPreferences">
             <Cog />
@@ -100,13 +100,13 @@
               <span>{{ t('user.SignIn') }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1.5 px-1.5 cursor-pointer"
+            <!-- Signed in: avatar + chevron -->
+            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
               aria-label="User menu">
-              <span class="inline-flex size-6 overflow-hidden rounded-full">
+              <span class="inline-flex size-7 overflow-hidden rounded-full">
                 <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
                   referrerpolicy="no-referrer">
               </span>
-              <span v-if="!isMobile" class="text-sm font-medium max-w-40 truncate">{{ userName }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
           </DropdownMenuTrigger>
@@ -150,6 +150,10 @@
               <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerAchievements(true)">
                 <Award />
                 <span>{{ t('user.MyAchievements') }}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
+                <Cog />
+                <span>{{ t('nav.preferences.title') }}</span>
               </DropdownMenuItem>
             </template>
 
@@ -226,7 +230,8 @@
             <span>Star on GitHub</span>
             <!-- Same /api/github-stars count as the desktop badge (fetched on
                  mount); hidden until it lands / on error. -->
-            <span v-if="githubStarsLabel" class="ml-auto tabular-nums text-muted-foreground inline-flex items-center gap-1">
+            <span v-if="githubStarsLabel"
+              class="ml-auto tabular-nums text-muted-foreground inline-flex items-center gap-1">
               <Icon icon="ri:star-fill" class="size-3.5 text-yellow-400" />
               {{ githubStarsLabel }}
             </span>
@@ -359,7 +364,7 @@ const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
 };
 
-// Consumed by `p` shortcut in use-shortcuts.js via defineExpose.
+// Opens the Preferences sheet
 const OpenPreferences = () => {
   store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');
