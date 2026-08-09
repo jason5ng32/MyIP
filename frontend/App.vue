@@ -30,7 +30,7 @@ onMounted(() => {
         setTimeout(() => { offerPwaInstall.value = true; }, 30 * 1000);
     }
     // Earth Online visit tick — app-level so every route counts, once per
-    // page load; the Worker's per-IP window does the dedup (utils/pulse-beacon.js).
+    // page load; the backend dedups per IP (utils/pulse-beacon.js).
     sendVisitBeacon();
 });
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';

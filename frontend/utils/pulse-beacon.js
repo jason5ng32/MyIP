@@ -1,6 +1,6 @@
 // Visit beacon + endpoint config for the "Earth Online" feature.
 //
-// PULSE_URL is the full URL of the pulse Worker from build-time
+// PULSE_URL is the full URL of the pulse backend from build-time
 // env; unset disables the feature entirely (no entry point, no requests).
 // The beacon fires once per page load from App.vue — an app-level concern,
 // deliberately NOT tied to any component: every route (homepage, standalone

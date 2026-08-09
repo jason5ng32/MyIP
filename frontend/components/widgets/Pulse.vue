@@ -67,8 +67,7 @@
                     <ul class="m-0 list-none space-y-3 p-0">
                         <li v-for="entry in feedEntries" :key="entry.ip + entry.status + entry.min"
                             class="flex items-start gap-2.5">
-                            <Icon :icon="'circle-flags:' + entry.code.toLowerCase()"
-                                class="mt-0.5 size-5 shrink-0 rounded-full" />
+                            <Icon :icon="flagIcon(entry.code)" class="mt-0.5 size-5 shrink-0 rounded-full" />
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-baseline justify-between gap-2">
                                     <span class="truncate text-sm font-medium">
@@ -87,7 +86,7 @@
                     </ul>
                 </section>
 
-                <Separator class="mt-5 mb-2" />
+                <Separator class="mt-7 mb-2" />
                 <!-- Per-country share + status mix; quiet placeholder when
                     empty or the fetch failed. -->
                 <section class="space-y-4">
@@ -106,12 +105,11 @@
                         <div id="pulseSvgMap" class="overflow-hidden rounded-lg border"></div>
 
                         <ul class="m-0 list-none space-y-4 p-0">
-                            <li v-for="entry in countries" :key="entry.code" class="flex items-start gap-3">
+                            <li v-for="entry in topCountries" :key="entry.code" class="flex items-start gap-3">
                                 <div class="min-w-0 flex-1">
                                     <div class="mb-1 flex items-baseline justify-between gap-2">
                                         <span class="truncate text-sm flex items-center gap-1.5">
-                                            <Icon :icon="'circle-flags:' + entry.code.toLowerCase()"
-                                                class="size-4 shrink-0 rounded-full" />
+                                            <Icon :icon="flagIcon(entry.code)" class="size-4 shrink-0 rounded-full" />
                                             {{ regionName(entry.code) }}
                                         </span>
                                         <span class="text-xs tabular-nums text-muted-foreground">{{
@@ -132,10 +130,12 @@
                                 </div>
                             </li>
                             <li v-if="othersShare > 0" class="flex items-start gap-3">
-                                <Globe class="mt-0.5 size-5 shrink-0 text-muted-foreground" />
                                 <div class="min-w-0 flex-1">
                                     <div class="mb-1 flex items-baseline justify-between gap-2">
-                                        <span class="truncate text-sm">{{ t('nav.pulse.others') }}</span>
+                                        <span class="truncate text-sm flex items-center gap-1.5">
+                                            <Icon icon="circle-flags:earth" class="size-4 shrink-0 rounded-full" />
+                                            {{ t('nav.pulse.others') }}
+                                        </span>
                                         <span class="text-xs tabular-nums text-muted-foreground">{{
                                             othersShare.toFixed(1) }}%</span>
                                     </div>
@@ -157,7 +157,7 @@
 // "Earth Online": anonymous, number-free view of where visitors come from and
 // what they're expressing via preset statuses. Naming rule: "Earth Online" is
 // the user-facing name only; everything technical (files, ids, locale keys,
-// the myip-pulse Worker) uses the code name "pulse".
+// the backend service) uses the code name "pulse".
 // POST <PULSE_URL>/status on pick; GET <PULSE_URL>/stats on open and after a
 // send — uncached end to end. The visit beacon is app-level: App.vue via
 // utils/pulse-beacon.js, not this widget.
@@ -173,14 +173,14 @@ import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Icon } from '@iconify/vue';
-import { Check, Globe, Orbit } from '@lucide/vue';
+import { Check, Orbit } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
 
 
 // Fixed ids + emoji; text lives in the locale packs. Must stay in sync with
-// the Worker's STATUS_IDS. Emoji must carry meaning alone (country rows show
+// the backend's status whitelist. Emoji must carry meaning alone (country rows show
 // them bare). Ordered network → mood → greeting.
 const PRESET_STATUSES = [
     { id: 'fast', emoji: '🚀' },
@@ -218,12 +218,18 @@ const loadStats = async () => {
     }
 };
 
-// Unknown status ids (newer Worker vocabulary) are dropped, not crashed on.
+// Unknown status ids (a newer backend vocabulary) are dropped, not crashed on.
+// The backend returns ALL countries (the map needs full coverage); the list
+// shows the top N and aggregates the rest into "others" — display decisions
+// live here, not in the contract.
+const LIST_TOP = 20;
 const countries = computed(() => (stats.value?.countries || []).map((entry) => ({
     ...entry,
     statuses: (entry.statuses || []).filter((s) => KNOWN_STATUS_IDS.has(s.id)),
 })));
-const othersShare = computed(() => stats.value?.othersShare || 0);
+const topCountries = computed(() => countries.value.slice(0, LIST_TOP));
+const othersShare = computed(() =>
+    Math.round(countries.value.slice(LIST_TOP).reduce((sum, e) => sum + e.share, 0) * 10) / 10);
 const feedEntries = computed(() =>
     (stats.value?.feed || []).filter((e) => KNOWN_STATUS_IDS.has(e.status)));
 
@@ -234,7 +240,14 @@ const barWidth = (share) => {
 };
 
 // Country names always via Intl.DisplayNames, per project convention.
+// "T1" is the backend's pseudo-code for Tor exit traffic — no ISO name, no
+// territory on the map. Any non-two-letter code (T1 included) falls back to
+// the international flag (circle-flags:xx).
+const isTor = (code) => code === 'T1';
+const flagIcon = (code) =>
+    `circle-flags:${/^[A-Za-z]{2}$/.test(code) ? code.toLowerCase() : 'xx'}`;
 const regionName = (code) => {
+    if (isTor(code)) return 'Tor';
     try {
         return new Intl.DisplayNames([locale.value], { type: 'region' }).of(code.toUpperCase());
     } catch {
@@ -242,17 +255,20 @@ const regionName = (code) => {
     }
 };
 
-// Relative times via Intl as well — no locale keys needed.
+// Relative times via Intl as well — no locale keys needed. Minutes within
+// the first hour, hours beyond.
 const relTime = (minutesAgo) => {
     try {
-        return new Intl.RelativeTimeFormat(locale.value, { style: 'narrow' })
-            .format(-minutesAgo, 'minute');
+        const rtf = new Intl.RelativeTimeFormat(locale.value, { style: 'narrow' });
+        return minutesAgo >= 60
+            ? rtf.format(-Math.floor(minutesAgo / 60), 'hour')
+            : rtf.format(-minutesAgo, 'minute');
     } catch {
         return `-${minutesAgo}m`;
     }
 };
 
-// Sending: 204 = durably written (Worker awaits the DO) → refetch shows the
+// Sending: 204 = the backend confirmed the write → refetch shows the
 // sender; 429 = rate-limited → revert the highlight, no refresh. Hints are
 // 3s one-shots; hintKind keeps the message mounted so fading is a pure
 // opacity toggle (see template note).
@@ -301,6 +317,7 @@ const drawMap = async () => {
     el.innerHTML = '';
     const values = {};
     for (const entry of countries.value) {
+        if (isTor(entry.code)) continue; // no territory to shade
         values[entry.code.toUpperCase()] = { share: entry.share };
     }
     new svgMapModule.default({
