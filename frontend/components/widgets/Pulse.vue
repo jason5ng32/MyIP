@@ -194,6 +194,7 @@ const PRESET_STATUSES = [
     { id: 'good', emoji: '😎' },
     { id: 'bad', emoji: '😮‍💨' },
     { id: 'night', emoji: '🌙' },
+    { id: 'vibing', emoji: '🧑‍💻' },
     { id: 'passing', emoji: '👋' },
 ];
 const KNOWN_STATUS_IDS = new Set(PRESET_STATUSES.map((s) => s.id));
