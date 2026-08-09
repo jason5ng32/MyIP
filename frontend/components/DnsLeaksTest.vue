@@ -36,8 +36,7 @@
             </div>
             <!-- Provider name (secondary information) — fixed per card, sourced
                  from each provider's `name` export in utils/dnsleaks. -->
-            <p class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate"
-              :title="leak.providerName">
+            <p class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="leak.providerName">
               {{ leak.providerName }}
             </p>
           </div>
@@ -86,14 +85,9 @@
 
     <!-- Enhanced DNS leak test banner — surfaces the deeper tool once the
          homepage test has resolved (success or timeout). -->
-    <InfoBanner
-      :show="showEnhancedBanner"
-      :icon="Sparkles"
-      :title="t('dnsleaktest.EnhancedBanner.Title')"
-      :note="t('dnsleaktest.EnhancedBanner.Note')"
-      :cta="t('dnsleaktest.EnhancedBanner.CTA')"
-      @action="openEnhancedTest"
-    />
+    <InfoBanner :show="showEnhancedBanner" :icon="Sparkles" :title="t('dnsleaktest.EnhancedBanner.Title')"
+      :note="t('dnsleaktest.EnhancedBanner.Note')" :cta="t('dnsleaktest.EnhancedBanner.CTA')"
+      @action="openEnhancedTest" />
   </section>
 </template>
 
@@ -117,12 +111,13 @@ import FitText from '@/components/widgets/FitText.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
-  ipApi, surfshark, ipleak, browserleaks, runWithRetry,
+  ipApi, surfshark, ipleak, fastly, runWithRetry,
 } from '@/utils/dnsleaks';
 
 // One source of truth for which providers to run and in what order. Adding
 // a new provider = create the file under utils/dnsleaks and append it here.
-const PROVIDERS = [ipApi, surfshark, ipleak, browserleaks];
+// (browserleaks stays available in utils/dnsleaks but is benched for now.)
+const PROVIDERS = [ipApi, surfshark, ipleak, fastly];
 
 
 const { t } = useI18n();
@@ -233,7 +228,7 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   });
 
   const promises = PROVIDERS.map((provider, index) =>
-    delayedRun(provider, index, 100 + index * 300),
+    delayedRun(provider, index, index * 200),
   );
 
   const allSettledPromise = Promise.allSettled(promises);
