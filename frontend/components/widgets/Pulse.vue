@@ -12,7 +12,7 @@
     <!-- Sheet: status composer → latest events → per-country share + mix. -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="right" :title="t('nav.pulse.title')"
-            class="flex w-full max-w-full flex-col gap-0 p-0 md:w-105 md:max-w-105">
+            class="flex w-full max-w-full flex-col gap-0 p-0 md:w-125 md:max-w-125">
             <header class="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-3">
                 <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
                     <Orbit class="size-4 text-muted-foreground" />

@@ -59,7 +59,7 @@
     <!-- About Sheet -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
       <SheetContent side="right" :title="t('about.Title')"
-        :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]']">
+        :class="['flex flex-col p-0 gap-0 w-full max-w-full md:w-125 md:max-w-125']">
         <Tabs v-model="content" class="flex flex-col h-full">
           <!-- Top: tabs + close -->
           <div class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
