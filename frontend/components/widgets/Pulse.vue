@@ -27,13 +27,22 @@
                     class="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" />
             </header>
 
-            <div class="flex-1 overflow-y-auto px-4 py-5 pb-10">
+            <div class="flex-1 overflow-y-auto px-4 py-3 pb-10">
                 <!-- Composer: preset status ids only, never free text. -->
                 <section>
-                    <h3 class="mb-2 text-sm font-semibold">{{ t('nav.pulse.shareStatus') }}</h3>
+                    <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.shareStatus') }}</h3>
                     <div class="flex flex-wrap gap-2">
+                        <button v-for="fest in activeFestivals" :key="fest.id" type="button"
+                            :title="t('nav.pulse.limitedTitle')"
+                            class="flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed px-3 py-1 text-sm transition-colors"
+                            :class="sentStatusId === fest.id
+                                ? 'border-transparent bg-primary text-primary-foreground'
+                                : 'border-primary/60 text-primary hover:bg-accent/50'" @click="sendStatus(fest.id)">
+                            <span>{{ fest.emoji }}</span>
+                            <span>{{ t('nav.pulse.statuses.' + fest.id) }}</span>
+                        </button>
                         <button v-for="preset in PRESET_STATUSES" :key="preset.id" type="button"
-                            class="flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+                            class="flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors"
                             :class="sentStatusId === preset.id
                                 ? 'border-transparent bg-primary text-primary-foreground'
                                 : 'hover:bg-accent/50'" @click="sendStatus(preset.id)">
@@ -41,10 +50,15 @@
                             <span>{{ t('nav.pulse.statuses.' + preset.id) }}</span>
                         </button>
                     </div>
+                    <p v-for="fest in activeFestivals" :key="'desc-' + fest.id"
+                        class="m-0 my-1.5 text-xs text-muted-foreground flex items-center gap-1">
+                        <ClockFading class="size-3" />{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
+                        t('nav.pulse.festivalDesc.' + fest.id) }}
+                    </p>
                     <!-- Fixed-height hint slot (no layout shift). The span stays
                         mounted and only fades — mobile WebKit can drop the
                         transitionend a removal would depend on. -->
-                    <div class="mt-2 flex h-4 items-center text-xs" aria-live="polite">
+                    <div class="mt-1 flex h-4 items-center text-xs" aria-live="polite">
                         <span class="transition-opacity duration-300"
                             :class="hintVisible ? 'opacity-100' : 'opacity-0'">
                             <span v-if="hintKind === 'sent'" class="inline-flex items-center gap-1 text-success">
@@ -63,7 +77,7 @@
                     the viewer's language. No local echo — the post-send
                     refetch shows the sender in the real feed. -->
                 <section v-if="feedEntries.length > 0">
-                    <h3 class="mb-2.5 text-sm font-semibold">{{ t('nav.pulse.latest') }}</h3>
+                    <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.latest') }}</h3>
                     <ul class="m-0 list-none space-y-3 p-0">
                         <li v-for="entry in feedEntries" :key="entry.ip + entry.status + entry.min"
                             class="flex items-start gap-2.5">
@@ -80,6 +94,8 @@
                                 </div>
                                 <div class="truncate text-sm text-muted-foreground">
                                     {{ statusById(entry.status).emoji }} {{ t('nav.pulse.statuses.' + entry.status) }}
+                                    <ClockFading v-if="FESTIVAL_IDS.has(entry.status)"
+                                        class="inline size-3 text-primary" />
                                 </div>
                             </div>
                         </li>
@@ -90,7 +106,7 @@
                 <!-- Per-country share + status mix; quiet placeholder when
                     empty or the fetch failed. -->
                 <section class="space-y-4">
-                    <h3 class="mb-2.5 text-sm font-semibold">{{ t('nav.pulse.liveMap') }}</h3>
+                    <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.liveMap') }}</h3>
 
                     <div v-if="statsLoading && countries.length === 0" class="flex justify-center py-8">
                         <Spinner />
@@ -172,42 +188,37 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
+import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
 import { renderWorldMapChart } from '@/utils/world-map-chart.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Icon } from '@iconify/vue';
-import { Check, Orbit } from '@lucide/vue';
+import { Check, Orbit, ClockFading } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
 
 
-// Fixed ids + emoji; text lives in the locale packs. Must stay in sync with
-// the backend's status whitelist. Emoji must carry meaning alone (country rows show
-// them bare). Ordered network → mood → greeting.
-const PRESET_STATUSES = [
-    { id: 'fast', emoji: '🚀' },
-    { id: 'ok', emoji: '✅' },
-    { id: 'slow', emoji: '🐢' },
-    { id: 'flaky', emoji: '🔌' },
-    { id: 'blocked', emoji: '🚧' },
-    { id: 'lag', emoji: '🎮' },
-    { id: 'newip', emoji: '🔄' },
-    { id: 'vpn', emoji: '🛡️' },
-    { id: 'fixing', emoji: '🔧' },
-    { id: 'tuning', emoji: '⏱️' },
-    { id: 'good', emoji: '😎' },
-    { id: 'bad', emoji: '😮‍💨' },
-    { id: 'night', emoji: '🌙' },
-    { id: 'vibing', emoji: '🧑‍💻' },
-    { id: 'passing', emoji: '👋' },
-];
-const KNOWN_STATUS_IDS = new Set(PRESET_STATUSES.map((s) => s.id));
-const statusById = (id) => PRESET_STATUSES.find((s) => s.id === id);
+// Status vocabulary lives in data/pulse-statuses.js (shared with tests).
+// KNOWN ids span BOTH lists with no window filtering — a festival status in
+// the feed must keep rendering after its window closes; only the composer
+// is window-gated.
+const ALL_STATUSES = [...PRESET_STATUSES, ...FESTIVAL_STATUSES];
+const KNOWN_STATUS_IDS = new Set(ALL_STATUSES.map((s) => s.id));
+const FESTIVAL_IDS = new Set(FESTIVAL_STATUSES.map((s) => s.id));
+const statusById = (id) => ALL_STATUSES.find((s) => s.id === id);
+
+// Active festival windows, re-evaluated on every Sheet open (a session can
+// straddle midnight).
+const activeFestivals = ref([]);
+const refreshFestivals = () => {
+    activeFestivals.value = festivalsActiveOn(localDateString());
+};
 
 // Stats: fetched fresh on every open and after each send; previous data
 // stays on screen while a refresh is in flight.
@@ -347,7 +358,10 @@ const openPulse = () => {
     trackEvent('Nav', 'NavClick', 'Pulse');
 };
 watch(isOpen, (open) => {
-    if (open) loadStats();
+    if (open) {
+        refreshFestivals();
+        loadStats();
+    }
 });
 
 // Map draw trigger — declared after isOpen (watch sources are read at setup;
