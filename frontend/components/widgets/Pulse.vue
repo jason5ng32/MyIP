@@ -55,12 +55,9 @@
                         <ClockFading class="size-3" />{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
                         t('nav.pulse.festivalDesc.' + fest.id) }}
                     </p>
-                    <!-- Fixed-height hint slot (no layout shift). The span stays
-                        mounted and only fades — mobile WebKit can drop the
-                        transitionend a removal would depend on. -->
+                    <!-- Fixed-height hint slot (no layout shift). Auto-hide after 3 seconds. -->
                     <div class="mt-1 flex h-4 items-center text-xs" aria-live="polite">
-                        <span class="transition-opacity duration-300"
-                            :class="hintVisible ? 'opacity-100' : 'opacity-0'">
+                        <span v-if="hintKind" :key="hintStamp" class="pulse-hint-fade">
                             <span v-if="hintKind === 'sent'" class="inline-flex items-center gap-1 text-success">
                                 <Check class="size-3.5" />
                                 {{ t('nav.pulse.sent') }}
@@ -181,7 +178,7 @@
 // POST <PULSE_URL>/status on pick; GET <PULSE_URL>/stats on open and after a
 // send — uncached end to end. The visit beacon is app-level: App.vue via
 // utils/pulse-beacon.js, not this widget.
-import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
@@ -295,13 +292,10 @@ const relTime = (minutesAgo) => {
 // opacity toggle (see template note).
 const sentStatusId = ref(null);
 const hintKind = ref(null); // 'sent' | 'limited' — last shown message
-const hintVisible = ref(false);
-let hintTimer = null;
+const hintStamp = ref(0);   // re-keys the hint span so its animation replays
 const showHint = (kind) => {
     hintKind.value = kind;
-    hintVisible.value = true;
-    clearTimeout(hintTimer);
-    hintTimer = setTimeout(() => { hintVisible.value = false; }, 3000);
+    hintStamp.value += 1;
 };
 const sendStatus = async (id) => {
     const prev = sentStatusId.value;
@@ -325,7 +319,6 @@ const sendStatus = async (id) => {
         /* network error — keep the optimistic highlight, no refresh */
     }
 };
-onBeforeUnmount(() => clearTimeout(hintTimer));
 
 // World map via the shared choropleth util (utils/world-map-chart.js) —
 // heat ramp (warm orange → deep red), fitting the "heatmap" framing; T1 has
@@ -380,3 +373,20 @@ watch([isOpen, countries], async () => {
     renderMap();
 });
 </script>
+
+<style scoped>
+/* Hint auto-hide: visible for 3s, then gone — no fade. */
+@keyframes pulse-hint-fade {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.pulse-hint-fade {
+    animation: pulse-hint-fade 3s step-end forwards;
+}
+</style>
