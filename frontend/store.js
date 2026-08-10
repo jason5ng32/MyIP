@@ -23,6 +23,11 @@ export const useMainStore = defineStore('main', {
     achievementToUpdate: '',
     // achievements defined in data/achievements.js; state is created by factory to avoid shared references between instances
     userAchievements: createInitialAchievementsState(),
+    // True once the remote achievements snapshot has been applied to
+    // userAchievements (User.vue initUserAchievements). The achievement
+    // engine holds rule evaluation until then — the all-false initial state
+    // must never be mistaken for "nothing achieved yet".
+    userAchievementsSynced: false,
     remoteUserInfo: {},
     remoteUserInfoFetched: false,
     mountingStatus: createMountingStatus(),

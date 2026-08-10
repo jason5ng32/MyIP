@@ -62,7 +62,9 @@ unconditionally — `emitAppEvent('speedtest:finished', {…})` on the
 `utils/app-events.js` bus — and the pipeline downstream handles the rest:
 `data/achievement-rules.js` maps events to achievement slugs (single place to
 look for "what unlocks X"); `composables/use-achievement-engine.js` (init'd
-once in App.vue) owns the signed-in / already-achieved / rate guards.
+once in App.vue) owns the signed-in / remote-sync / already-achieved / rate
+guards (rules never evaluate until the remote achievements snapshot lands —
+`store.userAchievementsSynced`; pre-sync hits are parked and re-checked).
 New achievement = entry in `data/achievements.js` + rule + (only if no
 suitable event exists) a new domain event. Tests:
 `tests/achievement-rules.test.js`, `tests/composable-achievement-engine.test.js`.

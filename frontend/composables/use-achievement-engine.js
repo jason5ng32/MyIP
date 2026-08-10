@@ -10,7 +10,7 @@
 //     are dispatched TRIGGER_SPACING_MS apart via a small queue.
 // Call once from App.vue setup.
 
-import { onScopeDispose } from 'vue';
+import { onScopeDispose, watch } from 'vue';
 import { useMainStore } from '../store.js';
 import { onAppEvent } from '../utils/app-events.js';
 import { ACHIEVEMENT_RULES } from '../data/achievement-rules.js';
@@ -44,12 +44,31 @@ export const useAchievementEngine = () => {
         if (!draining) drain();
     };
 
+    // Boot events (ipinfo:finished, iphistory:updated, …) can beat the remote
+    // achievements snapshot (/api/getuserinfo). Evaluating the already-achieved
+    // guard against the all-false initial state would re-toast and re-report
+    // badges the account holds, so slugs whose rule fired pre-sync park here
+    // and are re-checked once User.vue applies the snapshot.
+    const pendingUntilSynced = new Set();
+    watch(() => store.userAchievementsSynced, (synced) => {
+        if (!synced) return;
+        for (const slug of pendingUntilSynced) {
+            const entry = store.userAchievements[slug];
+            if (entry && !entry.achieved) enqueue(slug);
+        }
+        pendingUntilSynced.clear();
+    }, { flush: 'sync' });
+
     const unsubscribes = ACHIEVEMENT_RULES.map((rule) =>
         onAppEvent(rule.event, (payload) => {
             if (!store.isSignedIn) return;
+            if (rule.when && !rule.when(payload)) return;
+            if (!store.userAchievementsSynced) {
+                pendingUntilSynced.add(rule.slug);
+                return;
+            }
             const entry = store.userAchievements[rule.slug];
             if (!entry || entry.achieved) return;
-            if (rule.when && !rule.when(payload)) return;
             enqueue(rule.slug);
         }),
     );

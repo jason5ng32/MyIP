@@ -85,6 +85,10 @@ const initUserAchievements = () => {
         }
     });
 
+    // Snapshot applied — release the achievement engine's evaluation gate
+    // before emitting anything, so the event below already sees synced state.
+    store.userAchievementsSynced = true;
+
     // Unlock rules (IAmHuman / MakingBigNews) live in data/achievement-rules.js.
     emitAppEvent('user:info-loaded', { totalFunctionUses: functionUses?.total ?? 0 });
 };
