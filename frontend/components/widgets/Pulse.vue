@@ -13,6 +13,10 @@
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="right" :title="t('nav.pulse.title')"
             class="flex w-full max-w-full flex-col gap-0 p-0 md:w-125 md:max-w-125">
+            <!-- Celebration overlay: one canvas above the whole Sheet, drawn
+                by utils/pulse-celebration.js. Inert to input. -->
+            <canvas ref="fxCanvas" class="pointer-events-none absolute inset-0 z-10 size-full"
+                aria-hidden="true"></canvas>
             <header class="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-3">
                 <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
                     <Orbit class="size-4 text-muted-foreground" />
@@ -37,7 +41,8 @@
                             class="flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed px-3 py-1 text-sm transition-colors"
                             :class="sentStatusId === fest.id
                                 ? 'border-transparent bg-primary text-primary-foreground'
-                                : 'border-primary/60 text-primary hover:bg-accent/50'" @click="sendStatus(fest.id)">
+                                : 'border-primary/60 text-primary hover:bg-accent/50'"
+                            @click="sendStatus(fest.id, $event)">
                             <span>{{ fest.emoji }}</span>
                             <span>{{ t('nav.pulse.statuses.' + fest.id) }}</span>
                         </button>
@@ -45,7 +50,7 @@
                             class="flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors"
                             :class="sentStatusId === preset.id
                                 ? 'border-transparent bg-primary text-primary-foreground'
-                                : 'hover:bg-accent/50'" @click="sendStatus(preset.id)">
+                                : 'hover:bg-accent/50'" @click="sendStatus(preset.id, $event)">
                             <span>{{ preset.emoji }}</span>
                             <span>{{ t('nav.pulse.statuses.' + preset.id) }}</span>
                         </button>
@@ -61,6 +66,9 @@
                             <span v-if="hintKind === 'sent'" class="inline-flex items-center gap-1 text-success">
                                 <Check class="size-3.5" />
                                 {{ t('nav.pulse.sent') }}
+                            </span>
+                            <span v-else-if="hintKind === 'already'" class="text-muted-foreground">
+                                {{ t('nav.pulse.alreadySent') }}
                             </span>
                             <span v-else-if="hintKind === 'limited'" class="text-warning">
                                 {{ t('nav.pulse.rateLimited') }}
@@ -186,10 +194,10 @@ import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
+import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
 import { renderWorldMapChart } from '@/utils/world-map-chart.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
@@ -291,13 +299,58 @@ const relTime = (minutesAgo) => {
 // 3s one-shots; hintKind keeps the message mounted so fading is a pure
 // opacity toggle (see template note).
 const sentStatusId = ref(null);
-const hintKind = ref(null); // 'sent' | 'limited' — last shown message
+const hintKind = ref(null); // 'sent' | 'already' | 'limited' — last shown message
 const hintStamp = ref(0);   // re-keys the hint span so its animation replays
 const showHint = (kind) => {
     hintKind.value = kind;
     hintStamp.value += 1;
 };
-const sendStatus = async (id) => {
+// Celebration overlay (utils/pulse-celebration.js): one canvas over the
+// Sheet, played optimistically on click — delight belongs to the tap, not
+// the round-trip. A 429 stops it immediately (the send didn't count); a new
+// click restarts it. The engine no-ops under prefers-reduced-motion.
+const fxCanvas = ref(null);
+let celebration = null;
+const stopCelebration = () => {
+    if (celebration) {
+        celebration.stop();
+        celebration = null;
+    }
+};
+const playCelebrationFor = (id, evt) => {
+    const canvas = fxCanvas.value;
+    if (!canvas) return;
+    stopCelebration();
+    const { kind, emoji } = resolveEffect(statusById(id));
+    const rect = canvas.getBoundingClientRect();
+    const chip = evt?.currentTarget?.getBoundingClientRect?.();
+    const origin = chip
+        ? { x: chip.left + chip.width / 2 - rect.left, y: chip.top + chip.height / 2 - rect.top }
+        : { x: rect.width / 2, y: rect.height / 3 };
+    celebration = playCelebration({ canvas, kind, emoji, origin });
+};
+
+// Local send gate mirroring the backend's per-IP rate limit, in-memory
+// only (no storage by design — a refresh resets it and the backend 429
+// stays as the second line of defense). Two branches before any network:
+// re-clicking the already-sent status is a free replay — animation +
+// "already sent" hint, spam-friendly by design; switching statuses inside
+// the cooldown window gets the rateLimited hint, no animation.
+const SEND_COOLDOWN_MS = 2 * 60 * 1000;
+let lastSentAt = 0;
+let lastSentId = null;
+
+const sendStatus = async (id, evt) => {
+    if (lastSentId === id) {
+        playCelebrationFor(id, evt);
+        showHint('already');
+        return;
+    }
+    if (lastSentAt && Date.now() - lastSentAt < SEND_COOLDOWN_MS) {
+        showHint('limited');
+        return;
+    }
+    playCelebrationFor(id, evt);
     const prev = sentStatusId.value;
     sentStatusId.value = id;
     trackEvent('Nav', 'PulseStatus', id);
@@ -308,9 +361,12 @@ const sendStatus = async (id) => {
             body: JSON.stringify({ status: id }),
         });
         if (res.status === 429) {
+            stopCelebration(); // the send didn't count — cut the party short
             sentStatusId.value = prev;
             showHint('limited');
         } else if (res.ok) {
+            lastSentAt = Date.now();
+            lastSentId = id;
             showHint('sent');
             emitAppEvent('pulse:status-sent', { status: id });
             loadStats();
@@ -354,6 +410,8 @@ watch(isOpen, (open) => {
     if (open) {
         refreshFestivals();
         loadStats();
+    } else {
+        stopCelebration(); // don't let a rAF loop outlive the unmounted canvas
     }
 });
 

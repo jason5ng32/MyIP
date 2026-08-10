@@ -1,5 +1,9 @@
 // Pulse (Earth Online) status vocabulary: evergreen preset statuses plus
-// time-limited festival statuses. ids + emoji only
+// time-limited festival statuses. ids + emoji, plus an optional celebration
+// `effect` on festivals ('fireworks' | 'fall'; absent → the default emoji
+// pop). `effectEmoji` overrides the particle sprite when the status emoji
+// isn't the thing that should fall (christmas 🎄 snows ❄️). Recipes live in
+// utils/pulse-celebration.js.
 
 export const PRESET_STATUSES = [
     { id: 'fast', emoji: '🚀' },
@@ -38,10 +42,10 @@ export const PRESET_STATUSES = [
 export const FESTIVAL_STATUSES = [
     { id: 'prgday', emoji: '⌨️', yearly: { from: '09-12', to: '09-14' } },
     { id: 'internetday', emoji: '🌐', yearly: { from: '10-28', to: '10-30' } },
-    { id: 'halloween', emoji: '🎃', yearly: { from: '10-30', to: '11-01' } },
-    { id: 'birthday', emoji: '🎂', yearly: { from: '11-05', to: '11-07' } },
+    { id: 'halloween', emoji: '🎃', effect: 'fall', yearly: { from: '10-30', to: '11-01' } },
+    { id: 'birthday', emoji: '🎂', effect: 'fireworks', yearly: { from: '11-05', to: '11-07' } },
     {
-        id: 'diwali', emoji: '🪔',
+        id: 'diwali', emoji: '🪔', effect: 'fireworks',
         windows: [
             { from: '2026-11-07', to: '2026-11-09' },
             { from: '2027-10-28', to: '2027-10-30' },
@@ -51,11 +55,11 @@ export const FESTIVAL_STATUSES = [
             { from: '2031-11-13', to: '2031-11-15' },
         ],
     },
-    { id: 'christmas', emoji: '🎄', yearly: { from: '12-24', to: '12-26' } },
-    { id: 'newyear', emoji: '🎆', yearly: { from: '12-30', to: '01-02' } },
+    { id: 'christmas', emoji: '🎄', effect: 'fall', effectEmoji: '❄️', yearly: { from: '12-24', to: '12-26' } },
+    { id: 'newyear', emoji: '🎆', effect: 'fireworks', yearly: { from: '12-30', to: '01-02' } },
     { id: 'privacyday', emoji: '🕵️', yearly: { from: '01-27', to: '01-29' } },
     {
-        id: 'lunar', emoji: '🧧',
+        id: 'lunar', emoji: '🧧', effect: 'fall',
         windows: [
             { from: '2027-02-05', to: '2027-02-07' },
             { from: '2028-01-25', to: '2028-01-27' },
@@ -64,7 +68,7 @@ export const FESTIVAL_STATUSES = [
             { from: '2031-01-22', to: '2031-01-24' },
         ],
     },
-    { id: 'valentine', emoji: '💘', yearly: { from: '02-13', to: '02-15' } },
+    { id: 'valentine', emoji: '💘', effect: 'fall', yearly: { from: '02-13', to: '02-15' } },
     { id: 'jobs', emoji: '🍎', yearly: { from: '02-23', to: '02-25' } },
     {
         id: 'eid', emoji: '🕌',

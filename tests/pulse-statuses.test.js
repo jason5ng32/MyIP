@@ -37,6 +37,21 @@ describe('pulse status vocabulary', () => {
             assert.ok(typeof s.emoji === 'string' && s.emoji.length > 0, `${s.id} missing emoji`);
         }
     });
+
+    it('celebration effect fields are valid', () => {
+        for (const s of ALL) {
+            if (s.effect !== undefined) {
+                assert.ok(['fireworks', 'fall'].includes(s.effect),
+                    `${s.id} has unknown effect "${s.effect}"`);
+            }
+            if (s.effectEmoji !== undefined) {
+                assert.equal(s.effect, 'fall',
+                    `${s.id}: effectEmoji only overrides the sprite of a fall effect`);
+                assert.ok(typeof s.effectEmoji === 'string' && s.effectEmoji.length > 0,
+                    `${s.id} effectEmoji empty`);
+            }
+        }
+    });
 });
 
 describe('festival windows', () => {

@@ -199,6 +199,7 @@
       "share": "访客占比",
       "latest": "最新动态",
       "sent": "已发送",
+      "alreadySent": "状态已经发送过了",
       "rateLimited": "短期内只能发一次状态",
       "limitedTitle": "限时状态",
       "statuses": {

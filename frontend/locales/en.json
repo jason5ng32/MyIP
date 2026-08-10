@@ -199,6 +199,7 @@
       "share": "Visitor share",
       "latest": "Latest",
       "sent": "Sent",
+      "alreadySent": "This status has already been sent",
       "rateLimited": "Only one status can be shared in a short period",
       "limitedTitle": "Limited-time status",
       "statuses": {

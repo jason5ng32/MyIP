@@ -199,6 +199,7 @@
       "share": "Part des visiteurs",
       "latest": "À l’instant",
       "sent": "Envoyé",
+      "alreadySent": "Ce statut a déjà été envoyé",
       "rateLimited": "Un seul statut possible sur une courte période",
       "limitedTitle": "Statut à durée limitée",
       "statuses": {
