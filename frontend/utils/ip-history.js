@@ -147,6 +147,18 @@ export const countryFacets = (days) => {
         .sort((a, b) => b.count - a.count || (a.code < b.code ? -1 : 1));
 };
 
+// Distinct country codes recorded across the whole history (entries without
+// a country don't count). Feeds the iphistory:updated achievement event.
+export const distinctCountryCount = (history) => {
+    const codes = new Set();
+    for (const entries of Object.values(history?.days || {})) {
+        for (const { country } of entries) {
+            if (country) codes.add(country);
+        }
+    }
+    return codes.size;
+};
+
 // Entry counts per IP version over a sortedHistoryDays() list.
 export const ipVersionCounts = (days) => {
     let v4 = 0;

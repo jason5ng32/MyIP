@@ -7,8 +7,8 @@ import {
 } from '../frontend/data/achievements.js';
 
 describe('ACHIEVEMENTS_DEFINITIONS', () => {
-  it('has exactly 21 entries', () => {
-    assert.equal(ACHIEVEMENTS_DEFINITIONS.length, 21);
+  it('has exactly 27 entries', () => {
+    assert.equal(ACHIEVEMENTS_DEFINITIONS.length, 27);
   });
 
   it('each entry has name and img with absolute /achievements/*.webp path', () => {

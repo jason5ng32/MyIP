@@ -50,4 +50,20 @@ export const ACHIEVEMENT_RULES = [
 
     // Help modal opened via keyboard shortcut.
     { event: 'shortcut:help-opened', slug: 'CleverTrickery' },
+
+    // IP cards settled — payload { cards: [{ country_code, qualityScore, … }] }.
+    // qualityScore (1–100) only rides the IPCheck.ing card; Number() maps its
+    // 'sign_in_required' / absent states to NaN so they never match.
+    { event: 'ipinfo:finished', slug: 'PrettyDirty', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 1) },
+    { event: 'ipinfo:finished', slug: 'SqueakyClean', when: (p) => (p.cards || []).some((c) => Number(c.qualityScore) === 100) },
+    { event: 'ipinfo:finished', slug: 'WalkWithPenguins', when: (p) => (p.cards || []).some((c) => (c.country_code || '').toUpperCase() === 'AQ') },
+
+    // Local IP history snapshot — payload { countryCount } (distinct countries).
+    { event: 'iphistory:updated', slug: 'GlobeTrotter', when: (p) => p.countryCount >= 10 },
+
+    // Earth Online status posted (backend confirmed the write).
+    { event: 'pulse:status-sent', slug: 'HelloWorld' },
+
+    // Connectivity custom target hand-added (imported lists emit nothing).
+    { event: 'connectivity:custom-added', slug: 'AddSweetAdd' },
 ];

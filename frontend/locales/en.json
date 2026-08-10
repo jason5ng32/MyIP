@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "Crossing The Wall",
           "Meet": "All 8 test IPs are different in the Rule Test"
+        },
+        "GlobeTrotter": {
+          "Title": "Globe Trotter",
+          "Meet": "Reach 10 countries or regions in your IP history"
+        },
+        "HelloWorld": {
+          "Title": "Hello World",
+          "Meet": "Share a status on Earth Online"
+        },
+        "AddSweetAdd": {
+          "Title": "Add Sweet Add",
+          "Meet": "Add a custom target in the Connectivity test"
+        },
+        "PrettyDirty": {
+          "Title": "Pretty Dirty",
+          "Meet": "Any IP card shows a quality score of 1"
+        },
+        "SqueakyClean": {
+          "Title": "Squeaky Clean",
+          "Meet": "Any IP card shows a quality score of 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Walk With Penguins",
+          "Meet": "Any IP card locates you in Antarctica"
         }
       }
     }

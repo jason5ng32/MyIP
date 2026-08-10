@@ -106,6 +106,7 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
+import { emitAppEvent } from '@/utils/app-events';
 import {
   IMPORT_LISTS, CONNECTIVITY_TARGET_LIMIT, faviconPath,
 } from '@/data/connectivity-import-lists.js';
@@ -234,6 +235,8 @@ const handleAdd = () => {
   };
   store.updatePreference('customConnectivityTargets', [...customTargets.value, newTarget]);
   trackEvent('Section', 'AddCustomTarget', 'Connectivity');
+  // Hand-add only — importList() deliberately doesn't emit this.
+  emitAppEvent('connectivity:custom-added', { name: newTarget.name, url: newTarget.url });
   emit('update:open', false);
 };
 </script>

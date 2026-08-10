@@ -1549,6 +1549,15 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "New achievements to unlock",
+          "zh": "新增一批可以解锁的成就",
+          "fr": "Nouveaux succès à débloquer",
+          "ru": "Новые достижения"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Connectivity cards now show real site favicons, and the test capacity grows to 60",

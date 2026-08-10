@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "八仙过墙",
           "Meet": "在规则测试中，8 个测试的 IP 全部不相同"
+        },
+        "GlobeTrotter": {
+          "Title": "包罗万有",
+          "Meet": "IP 历史记录中的国家或地区达到 10 个"
+        },
+        "HelloWorld": {
+          "Title": "你好世界",
+          "Meet": "在地球在线中发布一条状态"
+        },
+        "AddSweetAdd": {
+          "Title": "我爱我加",
+          "Meet": "在网络连通性中添加一个自定义测试"
+        },
+        "PrettyDirty": {
+          "Title": "你挺脏的",
+          "Meet": "任意一张 IP 卡片的 IP 质量分为 1"
+        },
+        "SqueakyClean": {
+          "Title": "清清白白",
+          "Meet": "任意一张 IP 卡片的 IP 质量分为 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "与鹅同行",
+          "Meet": "任意一张 IP 卡片的归属地是南极洲"
         }
       }
     }

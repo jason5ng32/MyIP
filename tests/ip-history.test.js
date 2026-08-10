@@ -15,6 +15,7 @@ import {
     pruneHistory,
     sortedHistoryDays,
     countryFacets,
+    distinctCountryCount,
     ipVersionCounts,
     filterHistoryDays,
 } from '../frontend/utils/ip-history.js';
@@ -241,6 +242,27 @@ describe('countryFacets', () => {
             days: { '2026-07-08': [{ ip: '1.1.1.1', country: 'jp', location: '', asn: '', org: '' }] },
         });
         assert.equal(parseHistory(raw).days['2026-07-08'][0].country, 'JP');
+    });
+});
+
+describe('distinctCountryCount', () => {
+    it('counts unique countries across all days, ignoring empty codes', () => {
+        let state = createEmptyHistory();
+        ({ history: state } = mergeIntoHistory(state, [
+            { ip: '1.1.1.1', country: 'US' },
+            { ip: '2.2.2.2', country: 'DE' },
+            { ip: '3.3.3.3', country: '' },
+        ], '2026-07-07'));
+        ({ history: state } = mergeIntoHistory(state, [
+            { ip: '4.4.4.4', country: 'US' },
+            { ip: '5.5.5.5', country: 'SG' },
+        ], '2026-07-08'));
+        assert.equal(distinctCountryCount(state), 3);
+    });
+
+    it('is 0 for an empty or missing history', () => {
+        assert.equal(distinctCountryCount(createEmptyHistory()), 0);
+        assert.equal(distinctCountryCount(undefined), 0);
     });
 });
 

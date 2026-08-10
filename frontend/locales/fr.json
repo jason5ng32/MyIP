@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "Huit personnes traversent la muraille",
           "Meet": "Toutes les 8 adresses IP de test sont différentes dans le test de règles"
+        },
+        "GlobeTrotter": {
+          "Title": "Globe-trotteur",
+          "Meet": "Atteignez 10 pays ou régions dans votre historique d'IP"
+        },
+        "HelloWorld": {
+          "Title": "Bonjour le monde",
+          "Meet": "Partagez un statut sur La Terre en ligne"
+        },
+        "AddSweetAdd": {
+          "Title": "Ajout doux ajout",
+          "Meet": "Ajoutez une cible personnalisée au test de connectivité"
+        },
+        "PrettyDirty": {
+          "Title": "Plutôt sale",
+          "Meet": "Une carte IP affiche un score de qualité de 1"
+        },
+        "SqueakyClean": {
+          "Title": "Blanc comme neige",
+          "Meet": "Une carte IP affiche un score de qualité de 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Parmi les manchots",
+          "Meet": "Une carte IP vous localise en Antarctique"
         }
       }
     }

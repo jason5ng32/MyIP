@@ -4,6 +4,7 @@
 // account. Gated by user preferences: ipHistoryEnabled stops recording,
 // ipHistoryDays (1–90) sets retention. Pure logic lives in utils/ip-history.js.
 import { ref, computed, watch } from 'vue';
+import { emitAppEvent } from '@/utils/app-events.js';
 import {
     IP_HISTORY_STORAGE_KEY,
     parseHistory,
@@ -13,6 +14,7 @@ import {
     sortedHistoryDays,
     localDayKey,
     clampRetentionDays,
+    distinctCountryCount,
 } from '@/utils/ip-history.js';
 
 export const useIpHistory = ({ store }) => {
@@ -36,6 +38,14 @@ export const useIpHistory = ({ store }) => {
 
     const history = ref(loadInitial());
 
+    // Domain event for the achievement engine: distinct-country snapshot of
+    // the whole history. Emitted once at mount (records accumulated in past
+    // sessions count too) and again whenever a merge lands new entries.
+    const emitSnapshot = (h) => {
+        emitAppEvent('iphistory:updated', { countryCount: distinctCountryCount(h) });
+    };
+    emitSnapshot(history.value);
+
     // Fold newly detected IPs into today's bucket. `immediate` covers IPs that
     // landed in the store before this composable mounted.
     watch(() => store.allIPs, (ips) => {
@@ -44,6 +54,7 @@ export const useIpHistory = ({ store }) => {
         if (changed) {
             history.value = next;
             persist(next);
+            emitSnapshot(next);
         }
     }, { immediate: true });
 

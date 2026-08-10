@@ -169,6 +169,7 @@ import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
+import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
 import { renderWorldMapChart } from '@/utils/world-map-chart.js';
@@ -306,6 +307,7 @@ const sendStatus = async (id) => {
             showHint('limited');
         } else if (res.ok) {
             showHint('sent');
+            emitAppEvent('pulse:status-sent', { status: id });
             loadStats();
         }
     } catch {
