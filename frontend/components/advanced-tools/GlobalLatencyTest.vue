@@ -40,8 +40,8 @@
                 </Select>
                 <Input v-else id="pingIPManual" v-model="manualIP" class="flex-1 font-mono"
                     :placeholder="t('pingtest.EnterIPPlaceholder')" :disabled="pingCheckStatus === 'running'"
-                    :aria-invalid="manualIP.trim() !== '' && !isValidManualIP" autocomplete="off" autocorrect="off"
-                    autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
+                    :aria-invalid="targetState === 'invalid' || targetState === 'unreachable'" autocomplete="off"
+                    autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
                     @keyup.enter="startPingCheck" />
                 <Button variant="action" :disabled="!canRun"
                     :title="overLimit ? t('globalping.GroupFull', { max: GLOBALPING_MAX_COUNTRIES }) : ''"
@@ -52,6 +52,10 @@
                     </template>
                 </Button>
             </div>
+            <!-- A well-formed address the probe fleet still can't reach -->
+            <p v-if="targetState === 'unreachable'" class="text-sm text-destructive">
+                {{ t('globalping.UnreachableTarget') }}
+            </p>
         </div>
 
         <!-- Error Message -->
@@ -166,9 +170,8 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
-import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs } from '@/composables/use-globalping-measurement';
+import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
-import { isValidIP } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -207,7 +210,9 @@ const pickerSections = computed(() => [
 const useStored = ref(true);
 const manualMode = computed(() => allIPs.value.length === 0 || !useStored.value);
 const manualIP = ref('');
-const isValidManualIP = computed(() => isValidIP(manualIP.value.trim()));
+// 'empty' | 'invalid' | 'unreachable' | 'ok' — only 'ok' may run.
+const targetState = computed(() => classifyTarget(manualIP.value));
+const isValidManualIP = computed(() => targetState.value === 'ok');
 // The effective target: a picked IP, or a valid typed one ('' blocks Run).
 const targetIP = computed(() =>
     manualMode.value ? (isValidManualIP.value ? manualIP.value.trim() : '') : selectedIP.value,

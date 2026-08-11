@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { effectScope } from 'vue';
 
-import { useGlobalpingMeasurement } from '../frontend/composables/use-globalping-measurement.js';
+import { useGlobalpingMeasurement, classifyTarget } from '../frontend/composables/use-globalping-measurement.js';
 
 const API_BASE = 'https://api.globalping.io/v1/measurements';
 const originalFetch = globalThis.fetch;
@@ -242,4 +242,32 @@ describe('useGlobalpingMeasurement()', () => {
     assert.equal(finishCalls, 0);
     assert.equal(errorCalls, 0);
   });
+});
+
+// classifyTarget gates the MtrTest / GlobalLatencyTest manual-entry inputs:
+// only 'ok' may run, 'unreachable' earns its own explanation in the UI.
+describe('classifyTarget()', () => {
+  const cases = [
+    ['', 'empty'],
+    ['   ', 'empty'],
+    [undefined, 'empty'],
+    ['not an ip', 'invalid'],
+    ['1.1.1.1.1', 'invalid'],
+    ['256.1.1.1', 'invalid'],
+    ['192.168.1.1', 'unreachable'],
+    ['10.0.0.1', 'unreachable'],
+    ['127.0.0.1', 'unreachable'],
+    ['169.254.1.1', 'unreachable'],
+    ['fd00::1', 'unreachable'],
+    ['fe80::1', 'unreachable'],
+    ['1.1.1.1', 'ok'],
+    ['  8.8.8.8  ', 'ok'],
+    ['2001:4860:4860::8888', 'ok'],
+  ];
+
+  for (const [input, expected] of cases) {
+    it(`classifies ${JSON.stringify(input)} as ${expected}`, () => {
+      assert.equal(classifyTarget(input), expected);
+    });
+  }
 });

@@ -997,6 +997,7 @@
     "Suggested": "Suggested regions",
     "NoProbe": "No probes available in this country/region",
     "GroupFull": "Up to {max} countries/regions — deselect some first",
+    "UnreachableTarget": "Probes run on the public internet, so private and reserved addresses cannot be reached from any country.",
     "ResultsHint": "Results will appear here after you select probes and run the test.",
     "Asia": "Asia",
     "Europe": "Europe",
@@ -1054,6 +1055,7 @@
     "Title": "IP Check",
     "Placeholder": "e.g. 1.1.1.1",
     "Error": "Please enter a valid IPv4 or IPv6 address.",
+    "reservedIP": "Private, loopback and other reserved addresses have no geolocation, so there is nothing to look up.",
     "NoData": "Unable to fetch information for this IP. It may be unroutable (e.g. 0.0.0.0, private address) or the upstream source has no data for it."
   },
   "alert": {

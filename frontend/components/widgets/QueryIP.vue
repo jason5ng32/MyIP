@@ -60,7 +60,7 @@
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP, isUsablePublicIP } from '@/utils/valid-ip.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
@@ -96,17 +96,28 @@ watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
 }, { deep: true });
 
+// Emptying the box retracts whatever the last attempt complained about —
+// the message no longer describes anything on screen.
+watch(inputIP, (value) => {
+    if (value.trim() === '') modalQueryError.value = '';
+});
+
+const rejectQuery = (message) => {
+    modalQueryError.value = message;
+    modalQueryResult.value = null;
+    isChecking.value = 'idle';
+};
+
 const submitQuery = async () => {
-    if (isValidIP(inputIP.value)) {
-        modalQueryError.value = '';
-        modalQueryResult.value = null;
-        isChecking.value = 'running';
-        await fetchIPForModal(inputIP.value);
-    } else {
-        modalQueryError.value = t('ipcheck.Error');
-        modalQueryResult.value = null;
-        isChecking.value = 'idle';
-    }
+    if (!isValidIP(inputIP.value)) return rejectQuery(t('ipcheck.Error'));
+    // Only publicly routable space has geolocation, so answer here rather
+    // than walking every geo source to collect the same "no data" from each.
+    if (!isUsablePublicIP(inputIP.value)) return rejectQuery(t('ipcheck.reservedIP'));
+
+    modalQueryError.value = '';
+    modalQueryResult.value = null;
+    isChecking.value = 'running';
+    await fetchIPForModal(inputIP.value);
 };
 
 const isOpen = ref(false);

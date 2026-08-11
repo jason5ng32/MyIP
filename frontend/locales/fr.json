@@ -998,6 +998,7 @@
     "Suggested": "Régions suggérées",
     "NoProbe": "Aucune sonde disponible dans ce pays/région",
     "GroupFull": "{max} pays/régions maximum — décochez-en d'abord",
+    "UnreachableTarget": "Les sondes fonctionnent sur l'internet public : les adresses privées et réservées ne sont joignables depuis aucun pays.",
     "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
     "Asia": "Asie",
     "Europe": "Europe",
@@ -1055,6 +1056,7 @@
     "Title": "Vérification IP",
     "Placeholder": "ex. 1.1.1.1",
     "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
+    "reservedIP": "Les adresses privées, de bouclage et autres adresses réservées n'ont pas de géolocalisation, il n'y a donc rien à consulter.",
     "NoData": "Impossible de récupérer les informations pour cette IP. Elle peut être non routable (ex. 0.0.0.0, adresse privée) ou la source amont n'a pas de données pour celle-ci."
   },
   "alert": {
