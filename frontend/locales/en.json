@@ -196,6 +196,7 @@
       "liveMap": "Live visitor heatmap",
       "noVisitors": "No visitors yet",
       "quiet": "All quiet right now — be the first to share",
+      "loadError": "Couldn't load the latest activity — try again in a moment",
       "share": "Visitor share",
       "latest": "Latest",
       "sent": "Sent",

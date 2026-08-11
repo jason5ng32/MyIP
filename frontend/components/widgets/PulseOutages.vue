@@ -3,7 +3,7 @@
         rendered between the Pulse latest-events feed and the live map. 
         A successful fetch with zero events shows the quiet line ("no news is good news"); 
         a FAILED fetch hides the section entirely. -->
-    <template v-if="loaded">
+    <template v-if="loaded || loading">
         <Separator class="mt-7 mb-2" />
         <section>
             <h3 class="mb-3 flex items-center gap-1.5 text-sm font-semibold">
@@ -11,7 +11,21 @@
                 {{ t('nav.pulse.outages.title') }}
             </h3>
 
-            <p v-if="events.length === 0" class="py-4 text-center text-sm text-muted-foreground">
+            <!-- Placeholder rows mirror a bulletin: kind badge + state, subject,
+                description. A failed fetch drops the whole section, so this can
+                end in a collapse rather than in content. -->
+            <ul v-if="loading" class="m-0 list-none divide-y rounded-lg border bg-card p-0">
+                <li v-for="i in PLACEHOLDER_ROWS" :key="i" class="space-y-2 px-3 py-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="h-4 w-28 animate-pulse rounded bg-muted"></div>
+                        <div class="h-3.5 w-16 shrink-0 animate-pulse rounded bg-muted"></div>
+                    </div>
+                    <div class="h-4 w-40 animate-pulse rounded bg-muted"></div>
+                    <div class="h-3 w-full animate-pulse rounded bg-muted"></div>
+                </li>
+            </ul>
+
+            <p v-else-if="events.length === 0" class="py-4 text-center text-sm text-muted-foreground">
                 {{ t('nav.pulse.outages.quiet') }}
             </p>
 
@@ -113,10 +127,14 @@ const KNOWN_LEVELS = new Set(['NATIONWIDE', 'REGIONAL', 'NETWORK']);
 
 const LIST_TOP = 8;
 const CACHE_TTL_MS = 10 * 60 * 1000;
+const PLACEHOLDER_ROWS = 3;
 
 const events = ref(cachedEvents.value);
 const loaded = ref(cachedEvents.loaded);
 const expanded = ref(false);
+// Only the very first fetch of the session shows placeholders; a warm module
+// cache renders the real feed on the first frame.
+const loading = ref(!cachedEvents.loaded);
 
 // The backend delivers the display order: ongoing events first, ended ones
 // after, newest-first inside each group. The collapsed view is therefore a
@@ -147,6 +165,8 @@ const loadEvents = async () => {
         loaded.value = true;
     } catch {
         /* silent — the section simply doesn't render */
+    } finally {
+        loading.value = false;
     }
 };
 

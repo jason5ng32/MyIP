@@ -76,14 +76,28 @@
                         </span>
                     </div>
                 </section>
-
-                <Separator class="my-2" />
+                
                 <!-- Latest events: IPs arrive pre-masked; status ids render in
                     the viewer's language. No local echo — the post-send
                     refetch shows the sender in the real feed. -->
-                <section v-if="feedEntries.length > 0">
+                <section>
+                    <Separator class="my-2" />
                     <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.latest') }}</h3>
-                    <ul class="m-0 list-none space-y-3 p-0">
+                    <!-- Placeholder rows mirror a real entry: flag, region +
+                        time, status line. -->
+                    <ul v-if="firstLoad" class="m-0 list-none space-y-3 p-0">
+                        <li v-for="i in FEED_PLACEHOLDER_ROWS" :key="i" class="flex items-start gap-2.5">
+                            <div class="mt-0.5 size-5 shrink-0 animate-pulse rounded-full bg-muted"></div>
+                            <div class="min-w-0 flex-1 space-y-1.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="h-3.5 w-40 animate-pulse rounded bg-muted"></div>
+                                    <div class="h-3 w-12 shrink-0 animate-pulse rounded bg-muted"></div>
+                                </div>
+                                <div class="h-3.5 w-28 animate-pulse rounded bg-muted"></div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul v-else-if="feedEntries.length > 0" class="m-0 list-none space-y-3 p-0">
                         <li v-for="entry in feedEntries" :key="entry.ip + entry.status + entry.min"
                             class="flex items-start gap-2.5">
                             <Icon :icon="flagIcon(entry.code)" class="mt-0.5 size-5 shrink-0 rounded-full" />
@@ -105,32 +119,45 @@
                             </div>
                         </li>
                     </ul>
+                    <!-- Nothing to show: the fetch failed, or nobody has
+                        shared yet. -->
+                    <p v-else class="py-4 text-center text-sm text-muted-foreground">
+                        {{ statsError ? t('nav.pulse.loadError') : t('nav.pulse.quiet') }}
+                    </p>
                 </section>
 
                 <!-- Global outage broadcast; renders its
                     own leading separator, collapses to nothing when empty. -->
                 <PulseOutages />
 
-                <Separator class="mt-7 mb-2" />
-                <!-- Per-country share + status mix; quiet placeholder when
-                    empty or the fetch failed. -->
-                <section class="space-y-4">
+                <!-- Per-country share + status mix. Two states only: the first
+                    load paints placeholders, everything after that has data —
+                    an empty or failed fetch collapses the whole section. -->
+                <section v-if="firstLoad || countries.length > 0" class="space-y-4">
+                    <Separator class="mt-7 mb-2" />
                     <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.liveMap') }}</h3>
 
-                    <div v-if="statsLoading && countries.length === 0" class="flex justify-center py-8">
-                        <Spinner />
+                    <!-- Map + ranking placeholder, same footprint as the real
+                        thing so nothing jumps when the data lands. -->
+                    <div v-if="firstLoad" class="space-y-4">
+                        <div class="aspect-[2.2/1] w-full animate-pulse rounded-lg bg-muted"></div>
+                        <div v-for="i in MAP_PLACEHOLDER_ROWS" :key="i" class="space-y-1.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="h-3.5 w-32 animate-pulse rounded bg-muted"></div>
+                                <div class="h-3 w-10 shrink-0 animate-pulse rounded bg-muted"></div>
+                            </div>
+                            <div class="h-1.5 w-full animate-pulse rounded-full bg-muted"></div>
+                        </div>
                     </div>
-
-                    <p v-else-if="countries.length === 0" class="py-6 text-center text-sm text-muted-foreground">
-                        {{ t('nav.pulse.quiet') }}
-                    </p>
 
                     <template v-else>
                         <!-- Choropleth canvas. The wrapper's aspect ratio tracks
                             the equalEarth projection (~2.2:1) so the map fills
                             the full width with no letterboxing. -->
-                        <div class="relative w-full aspect-[2.2/1] overflow-hidden rounded-lg border">
+                        <div v-if="!mapFailed"
+                            class="relative w-full aspect-[2.2/1] overflow-hidden rounded-lg border">
                             <canvas ref="mapCanvas"></canvas>
+                            <div v-if="!mapReady" class="absolute inset-0 animate-pulse bg-muted"></div>
                         </div>
 
                         <ul class="m-0 list-none space-y-4 p-0">
@@ -204,7 +231,6 @@ import { relativeTimeFromMinutes } from '@/utils/relative-time.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import PulseOutages from '@/components/widgets/PulseOutages.vue';
@@ -235,15 +261,28 @@ const refreshFestivals = () => {
 // stays on screen while a refresh is in flight.
 const stats = ref(null);
 const statsLoading = ref(false);
+const statsError = ref(false);
+
+// Placeholders stand in only until the first payload of the session lands —
+// later refreshes repaint under the data already on screen. Row counts are
+// picked to fill the fold without inventing a longer list than usual.
+const FEED_PLACEHOLDER_ROWS = 4;
+const MAP_PLACEHOLDER_ROWS = 5;
+const firstLoad = computed(() => statsLoading.value && stats.value === null);
 
 const loadStats = async () => {
     if (statsLoading.value) return;
     statsLoading.value = true;
     try {
         const res = await fetchWithTimeout(`${PULSE_URL}/stats`);
-        if (res.ok) stats.value = await res.json();
+        if (res.ok) {
+            stats.value = await res.json();
+            statsError.value = false;
+        } else {
+            statsError.value = true;
+        }
     } catch {
-        /* keep whatever we had; empty state covers the rest */
+        statsError.value = true; // keep whatever we had on screen
     } finally {
         statsLoading.value = false;
     }
@@ -377,21 +416,37 @@ const sendStatus = async (id, evt) => {
 // heat ramp (warm orange → deep red), fitting the "heatmap" framing; T1 has
 // no territory to shade.
 const mapCanvas = ref(null);
+const mapReady = ref(false);  // the chart has painted on the current canvas
+const mapFailed = ref(false); // its lazy chunk never arrived
 let mapChart = null;
 
-const renderMap = async () => {
-    mapChart = await renderWorldMapChart({
-        canvas: mapCanvas.value,
-        chart: mapChart,
-        values: Object.fromEntries(countries.value
-            .filter((entry) => !isTor(entry.code))
-            .map((entry) => [entry.code.toUpperCase(), entry.share])),
-        lang: locale.value,
-        colorFrom: '#6597F3',
-        colorTo: '#1449AB',
-        formatValue: (value) => (value === undefined
-            ? ` ${t('nav.pulse.noVisitors')}`
-            : ` ${t('nav.pulse.share')}: ${shareLabel(value)}`),
+// Renders are serialized through this chain. The chart chunk takes a network
+// round of its own, so on a slow link a status send can refresh the stats
+// while the very first render is still awaiting the import — two concurrent
+// creates on one canvas make Chart.js throw, leaving the frame blank.
+let mapRender = Promise.resolve();
+
+const renderMap = () => {
+    mapRender = mapRender.then(async () => {
+        // The Sheet may have closed while we waited our turn.
+        if (!isOpen.value || !mapCanvas.value) return;
+        mapChart = await renderWorldMapChart({
+            canvas: mapCanvas.value,
+            chart: mapChart,
+            values: Object.fromEntries(countries.value
+                .filter((entry) => !isTor(entry.code))
+                .map((entry) => [entry.code.toUpperCase(), entry.share])),
+            lang: locale.value,
+            colorFrom: '#6597F3',
+            colorTo: '#1449AB',
+            formatValue: (value) => (value === undefined
+                ? ` ${t('nav.pulse.noVisitors')}`
+                : ` ${t('nav.pulse.share')}: ${shareLabel(value)}`),
+        });
+        mapReady.value = Boolean(mapChart);
+        mapFailed.value = !mapChart;
+    }).catch(() => {
+        mapFailed.value = true; // decorative — the ranking below still stands
     });
 };
 
@@ -417,10 +472,18 @@ watch(isOpen, (open) => {
 // Sheet unmounts the canvas, so the chart is destroyed with it.
 watch([isOpen, countries], async () => {
     if (!isOpen.value) {
-        if (mapChart) {
-            mapChart.destroy();
-            mapChart = null;
-        }
+        // Tear down on the render chain too: a draw still waiting for its
+        // chunk would otherwise land after the canvas is gone and leave a
+        // chart bound to a detached element. Flags reset so the next open
+        // shows the placeholder and retries a chunk that failed to load.
+        mapRender = mapRender.then(() => {
+            if (mapChart) {
+                mapChart.destroy();
+                mapChart = null;
+            }
+            mapReady.value = false;
+            mapFailed.value = false;
+        });
         return;
     }
     if (countries.value.length === 0) return;

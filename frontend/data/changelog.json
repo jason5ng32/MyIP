@@ -1542,10 +1542,10 @@
       {
         "type": "add",
         "change": {
-          "en": "Earth Online: see where visitors come from and share a preset status",
-          "zh": "地球在线：查看访客来自哪里，并分享预置状态",
-          "fr": "La Terre en ligne : voyez d'où viennent les visiteurs et partagez un statut prédéfini",
-          "ru": "Земля онлайн: смотрите, откуда посетители, и делитесь готовым статусом"
+          "en": "Earth Online: see visitor status, global network outages, and share your own status",
+          "zh": "地球在线：查看全球访客的状态、全球网络故障情况，以及分享自己的状态",
+          "fr": "La Terre en ligne : voyez le statut des visiteurs, les pannes de réseau mondiales et partagez votre statut",
+          "ru": "Земля онлайн: смотрите статус посетителей, глобальные сбои сети и делитесь своим статусом"
         }
       },
       {

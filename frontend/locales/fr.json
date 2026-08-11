@@ -196,6 +196,7 @@
       "liveMap": "Carte des visiteurs en temps réel",
       "noVisitors": "Aucun visiteur pour l’instant",
       "quiet": "Tout est calme pour l’instant — soyez le premier à partager",
+      "loadError": "Impossible de charger l'activité récente — réessayez dans un instant",
       "share": "Part des visiteurs",
       "latest": "À l’instant",
       "sent": "Envoyé",
