@@ -207,7 +207,7 @@
         "outage": "Internet Outage",
         "anomaly": "Traffic Anomaly",
         "ongoing": "Ongoing",
-        "ended": "Ended",
+        "ended": "Recovered",
         "started": "Started {time}",
         "lasted": "Lasted {duration}",
         "quiet": "All quiet — no outage events in the past 30 days",

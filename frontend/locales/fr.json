@@ -207,7 +207,7 @@
         "outage": "Panne d'Internet",
         "anomaly": "Anomalie de trafic",
         "ongoing": "En cours",
-        "ended": "Terminé",
+        "ended": "Rétabli",
         "started": "Commencé {time}",
         "lasted": "A duré {duration}",
         "quiet": "Tout est calme — aucune panne au cours des 30 derniers jours",
