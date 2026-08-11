@@ -202,6 +202,35 @@
       "alreadySent": "This status has already been sent",
       "rateLimited": "Only one status can be shared in a short period",
       "limitedTitle": "Limited-time status",
+      "outages": {
+        "title": "Global Outage Events",
+        "outage": "Internet Outage",
+        "anomaly": "Traffic Anomaly",
+        "ongoing": "Ongoing",
+        "ended": "Ended",
+        "started": "Started {time}",
+        "lasted": "Lasted {duration}",
+        "quiet": "All quiet — no outage events in the past 30 days",
+        "loadMore": "Load more",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Government Directed",
+          "POWER_OUTAGE": "Power Outage",
+          "CABLE_CUT": "Cable Cut",
+          "TECHNICAL_PROBLEM": "Technical Problem",
+          "UNKNOWN": "Unknown Cause",
+          "WEATHER": "Severe Weather",
+          "FIRE": "Fire",
+          "CYBERATTACK": "Cyberattack",
+          "NATURAL_DISASTER": "Natural Disaster",
+          "MAINTENANCE": "Maintenance",
+          "MILITARY_ACTION": "Military Action"
+        },
+        "level": {
+          "NATIONWIDE": "Nationwide",
+          "REGIONAL": "Regional",
+          "NETWORK": "Network"
+        }
+      },
       "statuses": {
         "fast": "Blazing fast network",
         "ok": "All good here",

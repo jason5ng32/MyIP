@@ -202,6 +202,35 @@
       "alreadySent": "状态已经发送过了",
       "rateLimited": "短期内只能发一次状态",
       "limitedTitle": "限时状态",
+      "outages": {
+        "title": "全球断网事件",
+        "outage": "互联网中断",
+        "anomaly": "流量异常",
+        "ongoing": "进行中",
+        "ended": "已结束",
+        "started": "{time}开始",
+        "lasted": "持续 {duration}",
+        "quiet": "一切平静——过去 30 天没有断网事件",
+        "loadMore": "加载更多",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "政府主导断网",
+          "POWER_OUTAGE": "电力中断",
+          "CABLE_CUT": "光缆中断",
+          "TECHNICAL_PROBLEM": "技术故障",
+          "UNKNOWN": "原因未知",
+          "WEATHER": "恶劣天气",
+          "FIRE": "火灾",
+          "CYBERATTACK": "网络攻击",
+          "NATURAL_DISASTER": "自然灾害",
+          "MAINTENANCE": "计划维护",
+          "MILITARY_ACTION": "军事行动"
+        },
+        "level": {
+          "NATIONWIDE": "全国范围",
+          "REGIONAL": "区域范围",
+          "NETWORK": "单一网络"
+        }
+      },
       "statuses": {
         "fast": "网速快得飞起",
         "ok": "一切正常",

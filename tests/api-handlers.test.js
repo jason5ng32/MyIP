@@ -18,6 +18,7 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
+import netOutagesHandler from '../api/net-outages.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
@@ -290,6 +291,25 @@ describe('cf-radar handler', () => {
         await cfRadarHandler(createRequest({ query: { asn: 'AS12345' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+});
+
+// -- net-outages handler ----------------------------------------------------
+
+describe('net-outages handler', () => {
+    it('rejects non-GET methods', async () => {
+        const res = createResponse();
+        await netOutagesHandler(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+    });
+
+    it('returns 500 when no Cloudflare API key is configured', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        const res = createResponse();
+        await netOutagesHandler(createRequest(), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 });
 

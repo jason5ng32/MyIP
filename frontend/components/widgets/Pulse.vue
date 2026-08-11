@@ -107,6 +107,10 @@
                     </ul>
                 </section>
 
+                <!-- Global outage broadcast; renders its
+                    own leading separator, collapses to nothing when empty. -->
+                <PulseOutages />
+
                 <Separator class="mt-7 mb-2" />
                 <!-- Per-country share + status mix; quiet placeholder when
                     empty or the fetch failed. -->
@@ -202,6 +206,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
+import PulseOutages from '@/components/widgets/PulseOutages.vue';
 import { Icon } from '@iconify/vue';
 import { Check, Orbit, ClockFading } from '@lucide/vue';
 

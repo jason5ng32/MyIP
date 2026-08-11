@@ -21,6 +21,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
+import netOutagesHandler from './api/net-outages.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -251,6 +252,8 @@ app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
 app.get('/api/configs', cacheable(ONE_HOUR_CACHE), validateConfigs);
+// Radar's outage feed moves on an hourly-ish cadence
+app.get('/api/outages', cacheable(ONE_HOUR_CACHE), netOutagesHandler);
 // OONI aggregates cover a 30-day window aligned to UTC days — the payload
 // only drifts as new measurements land, so 1 day of edge cache keeps us polite
 // to OONI's free API without the view going meaningfully stale.

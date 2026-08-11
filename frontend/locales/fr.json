@@ -202,6 +202,35 @@
       "alreadySent": "Ce statut a déjà été envoyé",
       "rateLimited": "Un seul statut possible sur une courte période",
       "limitedTitle": "Statut à durée limitée",
+      "outages": {
+        "title": "Pannes d'Internet dans le monde",
+        "outage": "Panne d'Internet",
+        "anomaly": "Anomalie de trafic",
+        "ongoing": "En cours",
+        "ended": "Terminé",
+        "started": "Commencé {time}",
+        "lasted": "A duré {duration}",
+        "quiet": "Tout est calme — aucune panne au cours des 30 derniers jours",
+        "loadMore": "Afficher plus",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Décision gouvernementale",
+          "POWER_OUTAGE": "Panne d'électricité",
+          "CABLE_CUT": "Câble sectionné",
+          "TECHNICAL_PROBLEM": "Problème technique",
+          "UNKNOWN": "Cause inconnue",
+          "WEATHER": "Intempéries",
+          "FIRE": "Incendie",
+          "CYBERATTACK": "Cyberattaque",
+          "NATURAL_DISASTER": "Catastrophe naturelle",
+          "MAINTENANCE": "Maintenance",
+          "MILITARY_ACTION": "Action militaire"
+        },
+        "level": {
+          "NATIONWIDE": "National",
+          "REGIONAL": "Régional",
+          "NETWORK": "Réseau"
+        }
+      },
       "statuses": {
         "fast": "Réseau ultra rapide",
         "ok": "Tout va bien ici",
