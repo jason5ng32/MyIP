@@ -25,22 +25,41 @@ let worldFeatures = null;
 
 // One-shot lazy loader; a failure leaves everything null so the caller's
 // map area just stays empty — maps are decorative, never load-bearing.
-const loadModules = async () => {
-    if (chartCtor) return true;
-    const [chartMod, geoMod, world] = await Promise.all([
-        import('chart.js/auto').catch(() => null),
-        import('chartjs-chart-geo').catch(() => null),
-        import('world-atlas/countries-110m.json').catch(() => null),
-    ]);
-    if (!chartMod || !geoMod || !world) return false;
-    const { Chart, registerables } = chartMod;
-    Chart.register(...registerables);
-    Chart.register(geoMod.ChoroplethController, geoMod.GeoFeature, geoMod.ColorScale, geoMod.ProjectionScale);
-    const topology = world.default ?? world;
-    worldFeatures = geoMod.topojson.feature(topology, topology.objects.countries)
-        .features.filter((f) => f.id !== '010'); // Antarctica — dead space
-    chartCtor = Chart;
-    return true;
+// Memoized as a promise, not just by its result: a preload and the first
+// real render overlap, and one download must serve both. A failed attempt
+// clears the memo so a later render retries.
+let modulesPromise = null;
+const loadModules = () => {
+    if (chartCtor) return Promise.resolve(true);
+    if (!modulesPromise) {
+        modulesPromise = (async () => {
+            const [chartMod, geoMod, world] = await Promise.all([
+                import('chart.js/auto').catch(() => null),
+                import('chartjs-chart-geo').catch(() => null),
+                import('world-atlas/countries-110m.json').catch(() => null),
+            ]);
+            if (!chartMod || !geoMod || !world) {
+                modulesPromise = null;
+                return false;
+            }
+            const { Chart, registerables } = chartMod;
+            Chart.register(...registerables);
+            Chart.register(geoMod.ChoroplethController, geoMod.GeoFeature, geoMod.ColorScale, geoMod.ProjectionScale);
+            const topology = world.default ?? world;
+            worldFeatures = geoMod.topojson.feature(topology, topology.objects.countries)
+                .features.filter((f) => f.id !== '010'); // Antarctica — dead space
+            chartCtor = Chart;
+            return true;
+        })();
+    }
+    return modulesPromise;
+};
+
+// Start the download without waiting for it — call this the moment a map is
+// known to be coming (its panel opened), so the chunk travels in parallel
+// with the data fetch that feeds the map instead of starting after it.
+export const preloadWorldMapChart = () => {
+    loadModules();
 };
 
 const hexToRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));

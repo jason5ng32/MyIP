@@ -226,7 +226,7 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
 import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
-import { renderWorldMapChart } from '@/utils/world-map-chart.js';
+import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/relative-time.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
@@ -462,6 +462,7 @@ watch(isOpen, (open) => {
     if (open) {
         refreshFestivals();
         loadStats();
+        preloadWorldMapChart(); // chart chunk downloads alongside /stats
     } else {
         stopCelebration(); // don't let a rAF loop outlive the unmounted canvas
     }
