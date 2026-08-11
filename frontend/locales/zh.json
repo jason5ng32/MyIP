@@ -600,7 +600,7 @@
     "Note3": "Whois 信息包含多种类型的字段，以下为原始文本信息",
     "Placeholder": "域名或 IP",
     "invalidURL": "无效的域名或 IP",
-    "privateIP": "内网或保留地址没有公开的注册信息，无法查询。",
+    "reservedIP": "内网或保留地址没有公开的注册信息，无法查询。",
     "noData": "该查询没有公开的 Whois / RDAP 数据。部分顶级域名不提供公开查询服务。",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"

@@ -68,7 +68,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { isValidIP, isValidDomain, isPrivateIP } from '@/utils/valid-ip.js';
+import { isValidIP, isValidDomain, isUsablePublicIP } from '@/utils/valid-ip.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -101,9 +101,9 @@ const validInput = (input) => {
         type.value = 'domain';
         return formatURL(input);
     } else if (isValidIP(input)) {
-        // non-public space has no registry record
-        if (isPrivateIP(input)) {
-            errorMsg.value = t('whois.privateIP');
+        // only publicly routable space has a registry record
+        if (!isUsablePublicIP(input)) {
+            errorMsg.value = t('whois.reservedIP');
             return false;
         }
         type.value = 'ip';

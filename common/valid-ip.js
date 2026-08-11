@@ -46,9 +46,9 @@ function isValidDomain(domain) {
     return /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(domain);
 }
 
-// IPv4 blocks that carry no public registry record: the RFC 1918 private
-// ranges plus loopback, link-local, CGNAT, documentation, benchmarking,
-// multicast and the reserved tail.
+// IPv4 blocks outside publicly routable space: the RFC 1918 private ranges
+// plus loopback, link-local, CGNAT, documentation, benchmarking, multicast
+// and the reserved tail.
 const RESERVED_V4 = [
     ['0.0.0.0', 8],        // "this network"
     ['10.0.0.0', 8],       // RFC 1918
@@ -58,6 +58,7 @@ const RESERVED_V4 = [
     ['172.16.0.0', 12],    // RFC 1918
     ['192.0.0.0', 24],     // IETF protocol assignments
     ['192.0.2.0', 24],     // TEST-NET-1
+    ['192.88.99.0', 24],  // 6to4 relay anycast, RFC 3068
     ['192.168.0.0', 16],   // RFC 1918
     ['198.18.0.0', 15],    // benchmarking, RFC 2544
     ['198.51.100.0', 24],  // TEST-NET-2
@@ -88,24 +89,32 @@ const leadingHextets = (ip) => {
     return [0, 1].map((i) => (groups[i] === undefined ? 0 : parseInt(groups[i], 16)));
 };
 
+// IANA hands out global unicast IPv6 only from 2000::/3, so the whole
+// question reduces to "outside that range, or inside one of its carve-outs".
+// Enumerating reserved prefixes instead would leave holes — everything from
+// 4000:: to fbff:: is unassigned, and new blocks keep landing inside 2000::/3
+// (3fff::/20 became documentation space in 2024).
 const isReservedV6 = (ip) => {
     const [h0, h1] = leadingHextets(ip);
-    if (h0 === 0x0000) return true;                   // ::, ::1, ::ffff:0:0/96 — all of ::/8 is reserved
-    if (h0 === 0x0064 && h1 === 0xff9b) return true;  // NAT64 well-known prefix, RFC 6052
-    if (h0 === 0x0100) return true;                   // discard-only / unassigned, RFC 6666
-    if (h0 === 0x2001 && h1 === 0x0db8) return true;  // documentation, RFC 3849
-    if (h0 >= 0xfc00 && h0 <= 0xfdff) return true;    // unique local
-    if (h0 >= 0xfe80 && h0 <= 0xfebf) return true;    // link-local
-    if (h0 >= 0xff00) return true;                    // multicast
+    if (h0 < 0x2000 || h0 > 0x3fff) return true;
+
+    if (h0 === 0x2001 && h1 === 0x0000) return true;                    // Teredo, RFC 4380
+    if (h0 === 0x2001 && h1 >= 0x0020 && h1 <= 0x002f) return true;     // ORCHIDv2, RFC 7343
+    if (h0 === 0x2001 && h1 === 0x0db8) return true;                    // documentation, RFC 3849
+    if (h0 === 0x2002) return true;                                     // 6to4, RFC 3056
+    if (h0 === 0x3fff && h1 <= 0x0fff) return true;                     // documentation, RFC 9637
     return false;
 };
 
-// Whether an IP belongs to non-public address space — private, loopback,
-// link-local, documentation or otherwise reserved. Assumes an already-valid
-// IP string; run isValidIP first for untrusted input.
-const isPrivateIP = (ip) => {
-    if (typeof ip !== 'string') return false;
-    return isIPv6(ip) ? isReservedV6(ip) : isReservedV4(ip);
+// Whether an IP is one this project can actually look up: a well-formed
+// address that lives in publicly routable space. Every IP form in the app
+// feeds an external service — a registry, a geolocation source, a probe
+// fleet — so the question worth asking is "can anyone out there answer
+// about this address", and reserved space answers no whatever the service.
+// Validation is folded in: a string that isn't an IP isn't a usable one.
+const isUsablePublicIP = (ip) => {
+    if (!isValidIP(ip)) return false;
+    return !(isIPv6(ip) ? isReservedV6(ip) : isReservedV4(ip));
 };
 
-export { isValidIP, isIPv6, isValidDomain, isPrivateIP };
+export { isValidIP, isIPv6, isValidDomain, isUsablePublicIP };

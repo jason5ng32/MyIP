@@ -265,11 +265,11 @@ describe('get-whois handler', () => {
     });
 
     for (const ip of ['10.92.24.150', '192.168.1.1', '198.18.0.2', 'fd00::1', '::1']) {
-        it(`short-circuits the non-public address ${ip} before any lookup`, async () => {
+        it(`rejects the non-public address ${ip} before any lookup`, async () => {
             const res = createResponse();
             await getWhoisHandler(createRequest({ query: { q: ip } }), res);
             assert.equal(res.statusCode, 400);
-            assert.deepEqual(res.body, { error: 'Private or reserved IP address' });
+            assert.deepEqual(res.body, { error: 'Not a public IP address' });
         });
     }
 });

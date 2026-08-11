@@ -6,8 +6,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { isValidIP as isValidCommonIP, isValidDomain as isValidCommonDomain, isIPv6 as isCommonIPv6, isPrivateIP as isCommonPrivateIP } from '../common/valid-ip.js';
-import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isPrivateIP as isFrontendPrivateIP } from '../frontend/utils/valid-ip.js';
+import { isValidIP as isValidCommonIP, isValidDomain as isValidCommonDomain, isIPv6 as isCommonIPv6, isUsablePublicIP as isCommonUsablePublicIP } from '../common/valid-ip.js';
+import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isUsablePublicIP as isFrontendUsablePublicIP } from '../frontend/utils/valid-ip.js';
 
 const validAddresses = [
   '1.1.1.1',
@@ -101,10 +101,10 @@ describe('isIPv6', () => {
   });
 });
 
-// Addresses with no registry record — the Whois tool short-circuits on these
-// rather than spending an RDAP / WHOIS lookup that can only fail. Every v4
-// case below appeared in a real production Whois query.
-const privateAddresses = [
+// Addresses outside publicly routable space — every IP form in the app
+// short-circuits on these rather than spending a lookup that can only fail.
+// Every v4 case below appeared in a real production Whois query.
+const reservedAddresses = [
   '10.92.24.150',
   '172.16.0.1',
   '172.30.232.1',
@@ -120,9 +120,18 @@ const privateAddresses = [
   '0.0.0.0',
   '::',
   '::1',
+  '::ffff:c000:1',    // IPv4-mapped
+  '64:ff9b::1',
+  '100::1',
+  '4000::1',          // unassigned — outside global unicast 2000::/3
+  'fbff::1',          // unassigned, just below the ULA block
   'fd00::1',
   'fe80::1ff:fe23:4567:890a',
+  '2001::1',          // Teredo
+  '2001:20::1',       // ORCHIDv2
   '2001:db8::1',
+  '2002:c000:204::1', // 6to4
+  '3fff::1',          // documentation, RFC 9637
   'ff02::1',
 ];
 
@@ -140,26 +149,33 @@ const publicAddresses = [
   '2001:4860:4860::8888',
   '2400:cb00::1',
   '2a03:f80:372:1c55::1',
+  '2000::1',          // lower bound of global unicast
+  '2001:1::1',        // just above Teredo
+  '2001:30::1',       // just above ORCHIDv2
   '2001:db9::1',      // neighbour of the documentation prefix
+  '3fff:1000::1',     // just above the RFC 9637 documentation block
 ];
 
-describe('isPrivateIP', () => {
-  for (const ip of privateAddresses) {
-    it(`flags ${ip} as non-public`, () => {
-      assert.equal(isCommonPrivateIP(ip), true);
-      assert.equal(isFrontendPrivateIP(ip), true);
+describe('isUsablePublicIP', () => {
+  for (const ip of reservedAddresses) {
+    it(`rejects ${ip} as outside public space`, () => {
+      assert.equal(isCommonUsablePublicIP(ip), false);
+      assert.equal(isFrontendUsablePublicIP(ip), false);
     });
   }
 
   for (const ip of publicAddresses) {
-    it(`treats ${ip} as public`, () => {
-      assert.equal(isCommonPrivateIP(ip), false);
-      assert.equal(isFrontendPrivateIP(ip), false);
+    it(`accepts ${ip}`, () => {
+      assert.equal(isCommonUsablePublicIP(ip), true);
+      assert.equal(isFrontendUsablePublicIP(ip), true);
     });
   }
 
-  it('is false for non-strings', () => {
-    assert.equal(isCommonPrivateIP(null), false);
-    assert.equal(isCommonPrivateIP(42), false);
-  });
+  // Validation is folded in, so anything that isn't an IP is not usable.
+  for (const junk of ['', 'hello', '256.1.1.1', '1.1.1', null, undefined, 42]) {
+    it(`rejects the non-address ${JSON.stringify(junk)}`, () => {
+      assert.equal(isCommonUsablePublicIP(junk), false);
+      assert.equal(isFrontendUsablePublicIP(junk), false);
+    });
+  }
 });
