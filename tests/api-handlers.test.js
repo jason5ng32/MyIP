@@ -263,6 +263,15 @@ describe('get-whois handler', () => {
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid IP or address' });
     });
+
+    for (const ip of ['10.92.24.150', '192.168.1.1', '198.18.0.2', 'fd00::1', '::1']) {
+        it(`short-circuits the non-public address ${ip} before any lookup`, async () => {
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q: ip } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Private or reserved IP address' });
+        });
+    }
 });
 
 // -- github-stars handler -------------------------------------------------

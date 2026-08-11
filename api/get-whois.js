@@ -1,5 +1,5 @@
 import whoiser from 'whoiser';
-import { isValidIP } from '../common/valid-ip.js';
+import { isValidIP, isPrivateIP } from '../common/valid-ip.js';
 import { rdapDomain, rdapIp } from '../common/rdap.js';
 import logger from '../common/logger.js';
 
@@ -28,6 +28,12 @@ export default async (req, res) => {
     }
     if (!isValidIP(query) && !isValidDomain(query)) {
         return res.status(400).json({ error: 'Invalid IP or address' });
+    }
+    // Non-public address space has no registry record at all — asking RDAP or
+    // WHOIS about it burns an upstream call to earn a guaranteed failure.
+    // Visitors pasting their LAN address land here routinely.
+    if (isValidIP(query) && isPrivateIP(query)) {
+        return res.status(400).json({ error: 'Private or reserved IP address' });
     }
 
     // IP path: RDAP first — authoritative-RIR HTTPS + JSON, immune to the

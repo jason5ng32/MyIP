@@ -599,6 +599,8 @@
     "Note3": "Whois information contains various types of fields. The following is the raw text information",
     "Placeholder": "Domain Name or IP",
     "invalidURL": "Invalid domain name or IP",
+    "privateIP": "Private or reserved IP addresses have no public registry record, so there is nothing to look up.",
+    "noData": "No Whois or RDAP data is published for this query. Some top-level domains do not offer a public lookup service.",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
   },

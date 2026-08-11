@@ -600,6 +600,8 @@
     "Note3": "Whois informations contient plusieurs types de champs, voici le texte brut original",
     "Placeholder": "Nom de domaine ou IP",
     "invalidURL": "Nom de domaine ou IP invalide",
+    "privateIP": "Les adresses IP privées ou réservées n'ont aucun enregistrement public, il n'y a donc rien à consulter.",
+    "noData": "Aucune donnée Whois ou RDAP n'est publiée pour cette requête. Certains domaines de premier niveau ne proposent pas de service de consultation public.",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
   },
