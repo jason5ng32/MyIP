@@ -63,7 +63,11 @@ states its route and purpose — read those for specifics.
 these checks:
 
 - `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
-- `requireValidIP()` — per-route for `?ip=`; handler sees a well-formed IP.
+- `requirePublicIP()` — per-route for `?ip=`; handler sees a well-formed,
+  publicly routable IP. Reserved space (RFC 1918, loopback, CGNAT, link-local,
+  documentation, …) is rejected here, so no geo source is ever asked about an
+  address it can't answer for — `isUsablePublicIP` in `common/valid-ip.js` is
+  the single definition, shared with the front-end IP forms.
 - `requireValidDomain()` — `?domain=`, lowercases in place so the edge cache
   sees one canonical key.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to

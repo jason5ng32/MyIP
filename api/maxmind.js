@@ -3,7 +3,8 @@ import logger from '../common/logger.js';
 import { pickLang } from '../common/langs.js';
 
 export default (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+    // Presence, validity and public routability guaranteed by the
+    // requirePublicIP middleware — a reserved address never reaches here.
     const ip = req.query.ip;
 
     // Get request language

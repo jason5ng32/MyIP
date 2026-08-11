@@ -1,10 +1,11 @@
 // Express middleware that factors out the boilerplate every api/ handler
-// used to repeat at the top of its function body: referer check, IP presence
-// check, IP validity check. Mount once in backend-server.js; handlers stop
-// carrying the defensive checks and can't accidentally forget them.
+// used to repeat at the top of its function body: referer check, param
+// presence check, param validity check. Mount once in backend-server.js;
+// handlers stop carrying the defensive checks and can't accidentally forget
+// them.
 
 import { refererCheck } from './referer-check.js';
-import { isValidIP, isValidDomain } from './valid-ip.js';
+import { isValidIP, isValidDomain, isUsablePublicIP } from './valid-ip.js';
 import { isValidBgpPrefix } from './bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 
@@ -20,16 +21,23 @@ export const requireReferer = (req, res, next) => {
     next();
 };
 
-// Reject requests without a valid IP in the specified query param.
-// Factory so handlers that use a non-default param name (none today, but
-// leaving the door open) can say `requireValidIP('query')` etc.
-export const requireValidIP = (paramName = 'ip') => (req, res, next) => {
+// Reject requests whose IP query param isn't a publicly routable address.
+// Every `?ip=` route asks an external service about that address — a
+// registry, a geolocation source — and reserved space has no answer there,
+// so it never reaches an upstream call. Malformed input and reserved space
+// get distinct messages; the two failures need different fixes.
+// Factory so a route using another param name (none today, but leaving the
+// door open) can say `requirePublicIP('target')`.
+export const requirePublicIP = (paramName = 'ip') => (req, res, next) => {
     const ip = req.query[paramName];
     if (!ip) {
         return res.status(400).json({ error: 'No IP address provided' });
     }
     if (!isValidIP(ip)) {
         return res.status(400).json({ error: 'Invalid IP address' });
+    }
+    if (!isUsablePublicIP(ip)) {
+        return res.status(400).json({ error: 'Not a public IP address' });
     }
     next();
 };

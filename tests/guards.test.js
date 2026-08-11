@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requireValidIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidReportId } from '../common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidReportId } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -49,8 +49,8 @@ describe('requireReferer', () => {
     });
 });
 
-describe('requireValidIP', () => {
-    const guard = requireValidIP();
+describe('requirePublicIP', () => {
+    const guard = requirePublicIP();
 
     it('calls next() when ip query param is a valid IPv4', () => {
         let nextCalled = false;
@@ -82,8 +82,21 @@ describe('requireValidIP', () => {
         assert.equal(nextCalled, false);
     });
 
+    // Reserved space is well-formed but unanswerable by any upstream, so it
+    // gets its own message — rejected before the handler, never fetched.
+    for (const ip of ['10.0.0.1', '192.168.1.1', '127.0.0.1', '198.18.0.2', 'fd00::1', '::1']) {
+        it(`returns 400 "Not a public IP address" for ${ip}`, () => {
+            const res = makeRes();
+            let nextCalled = false;
+            guard(makeReq({ query: { ip } }), res, () => { nextCalled = true; });
+            assert.equal(res.statusCode, 400);
+            assert.equal(res.body.error, 'Not a public IP address');
+            assert.equal(nextCalled, false);
+        });
+    }
+
     it('honors a custom param name', () => {
-        const custom = requireValidIP('target');
+        const custom = requirePublicIP('target');
         let nextCalled = false;
         custom(makeReq({ query: { target: '8.8.8.8' } }), makeRes(), () => { nextCalled = true; });
         assert.equal(nextCalled, true);

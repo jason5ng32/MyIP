@@ -115,7 +115,7 @@ use npm / yarn — they'd produce a competing lockfile.
 Access control and timeouts live in shared middleware, not handlers
 (details in @api/AGENTS.md):
 
-- `requireReferer` is global on `/api/*`; `requireValidIP()` per-route —
+- `requireReferer` is global on `/api/*`; `requirePublicIP()` per-route —
   handlers never repeat these checks.
 - Every upstream HTTP call goes through `fetchUpstream`
   (`common/fetch-with-timeout.js`, 8s timeout). Never a bare `fetch()` in `api/`.

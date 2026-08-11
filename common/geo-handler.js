@@ -21,7 +21,8 @@ import logger from './logger.js';
 
 export function makeGeoHandler({ name, buildUrl, normalize }) {
     return async (req, res) => {
-        // IP presence + validity guaranteed by requireValidIP middleware.
+        // Presence, validity and public routability guaranteed by the
+        // requirePublicIP middleware — a reserved address never reaches here.
         const ipAddress = req.query.ip;
 
         const built = buildUrl(req);
