@@ -200,6 +200,7 @@ import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
 import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
 import { renderWorldMapChart } from '@/utils/world-map-chart.js';
+import { relativeTimeFromMinutes } from '@/utils/relative-time.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -286,18 +287,9 @@ const regionName = (code) => {
     return getCountryName(code, locale.value) || code.toUpperCase();
 };
 
-// Relative times via Intl as well — no locale keys needed. Minutes within
-// the first hour, hours beyond.
-const relTime = (minutesAgo) => {
-    try {
-        const rtf = new Intl.RelativeTimeFormat(locale.value, { style: 'narrow' });
-        return minutesAgo >= 60
-            ? rtf.format(-Math.floor(minutesAgo / 60), 'hour')
-            : rtf.format(-minutesAgo, 'minute');
-    } catch {
-        return `-${minutesAgo}m`;
-    }
-};
+// Relative times via the shared Intl helper (utils/relative-time.js) — no
+// locale keys needed.
+const relTime = (minutesAgo) => relativeTimeFromMinutes(minutesAgo, locale.value);
 
 // Sending: 204 = the backend confirmed the write → refetch shows the
 // sender; 429 = rate-limited → revert the highlight, no refresh. Hints are

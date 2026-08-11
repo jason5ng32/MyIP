@@ -94,6 +94,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import getCountryName from '@/data/country-name.js';
+import { relativeTimeSince, formatDuration } from '@/utils/relative-time.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -193,45 +194,15 @@ const metaLine = (event) => [
     event.level ? levelLabel(event.level) : null,
 ].filter(Boolean).join(' · ');
 
-// "Started 3h ago · Lasted 5h" — every time-related fact in one closing line.
-const timeLine = (event) => [
-    t('nav.pulse.outages.started', { time: relTime(event.startDate) }),
-    event.endDate ? t('nav.pulse.outages.lasted', { duration: durationLabel(event) }) : null,
-].filter(Boolean).join(' · ');
-
-const relTime = (startDate) => {
-    const minutesAgo = Math.max(0, Math.round((Date.now() - Date.parse(startDate)) / 60000));
-    try {
-        const rtf = new Intl.RelativeTimeFormat(locale.value, { style: 'narrow' });
-        if (minutesAgo >= 48 * 60) return rtf.format(-Math.round(minutesAgo / (24 * 60)), 'day');
-        if (minutesAgo >= 60) return rtf.format(-Math.floor(minutesAgo / 60), 'hour');
-        return rtf.format(-minutesAgo, 'minute');
-    } catch {
-        return `-${minutesAgo}m`;
-    }
-};
-
-// Compact localized duration ("2d 3h" / "2 天 3 小时") via Intl.DurationFormat,
-// falling back to plain d/h/m units where the API is unavailable.
-const durationLabel = (event) => {
-    const ms = Date.parse(event.endDate) - Date.parse(event.startDate);
-    if (!Number.isFinite(ms) || ms <= 0) return '';
-    const totalMinutes = Math.round(ms / 60000);
-    const days = Math.floor(totalMinutes / (24 * 60));
-    const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
-    const minutes = totalMinutes % 60;
-    // Two largest units are enough at bulletin granularity.
-    const parts = days > 0
-        ? { days, hours }
-        : (hours > 0 ? { hours, minutes } : { minutes });
-    try {
-        return new Intl.DurationFormat(locale.value, { style: 'narrow' }).format(parts);
-    } catch {
-        return [
-            parts.days ? `${parts.days}d` : null,
-            parts.hours ? `${parts.hours}h` : null,
-            parts.minutes ? `${parts.minutes}m` : null,
-        ].filter(Boolean).join(' ') || '0m';
-    }
+// "Started 3 hr. ago · Lasted 5h" — every time-related fact in one closing
+// line; both halves come from the shared utils/relative-time.js helpers.
+const timeLine = (event) => {
+    const duration = event.endDate
+        ? formatDuration(Date.parse(event.endDate) - Date.parse(event.startDate), locale.value)
+        : '';
+    return [
+        t('nav.pulse.outages.started', { time: relativeTimeSince(event.startDate, locale.value) }),
+        duration ? t('nav.pulse.outages.lasted', { duration }) : null,
+    ].filter(Boolean).join(' · ');
 };
 </script>
