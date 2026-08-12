@@ -45,7 +45,19 @@
                     </JnTooltip>
                 </dd>
             </div>
-            <div class="col-span-2 md:col-span-3">
+            <!-- Timezone -->
+            <div v-if="data.timezone">
+                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                    <Clock class="size-3.5" />
+                    <span>{{ t('ipInfos.TimeZone') }}</span>
+                </dt>
+                <dd class="font-normal wrap-break-word" :title="zoneLocalTime" @mouseenter="refreshZoneLocalTime">
+                    {{ data.timezone }}
+                    <span class="text-muted-foreground">{{ zoneOffset }}</span>
+                </dd>
+            </div>
+
+            <div class="col-span-2" :class="data.timezone ? 'md:col-span-2' : 'md:col-span-3'">
                 <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
                     <EthernetPort class="size-3.5" />
                     <span>{{ t('ipInfos.ISP') }}</span>
@@ -234,6 +246,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
+import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/timezone.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it
@@ -254,7 +267,6 @@ import {
     EqualNot,
     EthernetPort,
     Gauge,
-    History,
     House,
     Info,
     Network,
@@ -264,10 +276,11 @@ import {
     ShieldCheck,
     SignalHigh,
     CircleQuestionMark,
+    Clock,
     FolderClock,
 } from '@lucide/vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const props = defineProps({
     data: { type: Object, required: true },
@@ -294,6 +307,16 @@ const props = defineProps({
 const activePanel = ref(null);
 const isPanelOpen = ref(false);
 const isMapDialogOpen = ref(false);
+
+// The backend sends the zone name only; the offset follows DST, so it is
+// resolved here rather than travelling through the routes' 24h edge cache.
+const zoneOffset = computed(() => getZoneUtcOffset(props.data.timezone));
+
+// Hover title: the wall-clock time where the IP sits, re-read on each hover.
+const zoneLocalTime = ref('');
+const refreshZoneLocalTime = () => {
+    zoneLocalTime.value = getZoneLocalTime(props.data.timezone, locale.value);
+};
 
 // Advanced block only surfaces for the IPCheck.ing source (ipGeoSource === 0).
 const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && Boolean(props.data));

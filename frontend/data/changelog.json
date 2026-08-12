@@ -1533,6 +1533,15 @@
       {
         "type": "add",
         "change": {
+          "en": "IP cards and IP lookup now show the time zone of the located IP, with its current UTC offset",
+          "zh": "IP 信息卡片与 IP 查询新增时区显示，并附带当前 UTC 偏移",
+          "fr": "Les cartes IP et la recherche d'IP affichent désormais le fuseau horaire de l'IP localisée, avec son décalage UTC actuel",
+          "ru": "На карточках IP и в поиске по IP теперь отображается часовой пояс найденного IP-адреса и его текущее смещение UTC"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
           "en": "Connectivity: import curated test lists — country packs (Iran, Russia, China) plus AI, social, streaming, gaming, developer, cloud, crypto and news sets",
           "zh": "网络连通性支持导入内置测试列表：伊朗、俄罗斯、中国等国家合集，以及 AI、社交、流媒体、游戏、开发者、云服务、加密交易所、新闻等主题合集",
           "fr": "Connectivité : importez des listes de tests prêtes à l'emploi — packs pays (Iran, Russie, Chine) et ensembles IA, réseaux sociaux, streaming, jeux, développeurs, cloud, crypto et actualités",

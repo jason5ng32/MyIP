@@ -77,9 +77,9 @@ const SECTION_RENDERERS = {
     ipinfo: (section) => {
         const extras = IPINFO_EXTRA_COLS.filter((key) => section.cards.some((c) => c[key] !== undefined));
         return mdTable(
-            ['source', 'ip', 'countryCode', 'region', 'city', 'asn', 'isp', ...extras],
+            ['source', 'ip', 'countryCode', 'region', 'city', 'timezone', 'asn', 'isp', ...extras],
             section.cards.map((c) => [
-                c.source, c.ip, c.countryCode, c.region, c.city, c.asn, c.isp,
+                c.source, c.ip, c.countryCode, c.region, c.city, c.timezone, c.asn, c.isp,
                 ...extras.map((key) => c[key]),
             ]),
         );

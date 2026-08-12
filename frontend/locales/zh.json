@@ -783,6 +783,7 @@
     "Country": "地区",
     "Region": "省份",
     "City": "城市",
+    "TimeZone": "时区",
     "ISP": "网络",
     "ASN": "ASN",
     "Coordinates": "经纬度",

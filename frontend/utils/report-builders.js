@@ -39,9 +39,9 @@ const compact = (obj) => {
 
 // --- per-section builders ---------------------------------------------------
 
-// ipinfo:finished — { cards: [{ source, ip, country_code, region, city, asn,
-// isp, proxyCode?, ipTypeCode?, isNativeIP?, qualityScore?, proxyProtocol?,
-// proxyProvider? }] }. Cards whose ip never resolved (placeholder text in the
+// ipinfo:finished — { cards: [{ source, ip, country_code, region, city,
+// timezone, asn, isp, proxyCode?, ipTypeCode?, isNativeIP?, qualityScore?,
+// proxyProtocol?, proxyProvider? }] }. Cards whose ip never resolved (placeholder text in the
 // slot) are dropped. The optional enrichments only exist on the IPCheck.ing
 // source and stay absent when sign-in-gated ('sign_in_required' upstream
 // values never turn into codes — see transform-ip-data.js). 'unknown' codes
@@ -58,6 +58,9 @@ const buildIpinfo = (payload) => {
             countryCode: countryCode(card.country_code),
             region: clip(card.region, 64),
             city: clip(card.city, 64),
+            // Absent rather than empty when the source gave no usable
+            // coordinates — the schema has no '' spelling for a zone.
+            timezone: card.timezone ? clip(card.timezone, 64) : undefined,
             asn: clip(card.asn, 16),
             isp: clip(card.isp, 128),
             isProxy: PROXY_CODES.has(card.proxyCode) ? card.proxyCode : undefined,

@@ -783,6 +783,7 @@
     "Country": "Région",
     "Region": "État",
     "City": "Ville",
+    "TimeZone": "Fuseau horaire",
     "ISP": "ISP",
     "ASN": "ASN",
     "Coordinates": "Coordonnées",

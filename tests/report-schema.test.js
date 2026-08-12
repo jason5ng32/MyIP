@@ -29,7 +29,7 @@ const makeValidReport = () => ({
         ipinfo: {
             testedAt: '2026-07-14T08:00:00.000Z',
             cards: [
-                { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', asn: 'AS15169', isp: 'Google LLC', isProxy: 'no', ipType: 'residential', nativeIP: true, qualityScore: 85, proxyProtocol: 'SOCKS5', proxyProvider: 'ACME' },
+                { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', isProxy: 'no', ipType: 'residential', nativeIP: true, qualityScore: 85, proxyProtocol: 'SOCKS5', proxyProvider: 'ACME' },
                 { source: 'Cloudflare IPv6', ip: '2001:db8::1', countryCode: '', city: '' },
             ],
         },
@@ -219,6 +219,21 @@ describe('validateReport', () => {
         const badDate = makeValidReport();
         badDate.generatedAt = 'yesterday-ish';
         assert.equal(validateReport(badDate).ok, false);
+    });
+
+    it('accepts IANA zone names and rejects anything else in timezone', () => {
+        for (const zone of ['UTC', 'Asia/Singapore', 'America/Argentina/Buenos_Aires', 'Etc/GMT+8']) {
+            const ok = makeValidReport();
+            ok.sections.ipinfo.cards[0].timezone = zone;
+            assert.equal(validateReport(ok).ok, true, `${zone} should validate`);
+        }
+
+        // '' has no meaning here — the builder omits the field instead.
+        for (const bad of ['', '+08:00', 'Asia/Singapore; DROP', 'Asia//Singapore', '/Singapore', 'x'.repeat(65)]) {
+            const report = makeValidReport();
+            report.sections.ipinfo.cards[0].timezone = bad;
+            assert.equal(validateReport(report).ok, false, `${bad} should be rejected`);
+        }
     });
 
     it('rejects unexpected nulls but allows speced nullables', () => {

@@ -23,6 +23,9 @@ importers:
       '@lucide/vue':
         specifier: ^1.28.0
         version: 1.28.0(vue@3.5.41)
+      '@photostructure/tz-lookup':
+        specifier: ^11.6.1
+        version: 11.6.1
       '@sentry/node':
         specifier: ^10.69.0
         version: 10.69.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(supports-color@5.5.0)
@@ -686,6 +689,9 @@ packages:
 
   '@oxc-project/types@0.142.0':
     resolution: {integrity: sha512-7W+2q5AKQVU36fkaryontrHn3YDt1RyUYXatw9i5H8ocYe2sPKSFB6eS8WNPeRKiN1qAWWZUPm7gwFzJGrccqQ==}
+
+  '@photostructure/tz-lookup@11.6.1':
+    resolution: {integrity: sha512-azPdhOkwEyNFed8hSR7/U5Xe9eMO3YfbGYUnW3R9wlseimxSw6IkFaYAInDTb1KlbuwTOMzpa5oPcpAOXUM29A==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -3499,6 +3505,8 @@ snapshots:
   '@opentelemetry/semantic-conventions@1.43.0': {}
 
   '@oxc-project/types@0.142.0': {}
+
+  '@photostructure/tz-lookup@11.6.1': {}
 
   '@pinojs/redact@0.4.0': {}
 

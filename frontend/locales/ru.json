@@ -783,6 +783,7 @@
     "Country": "Регион",
     "Region": "Область",
     "City": "Город",
+    "TimeZone": "Часовой пояс",
     "ISP": "ISP",
     "ASN": "ASN",
     "Coordinates": "Координаты",

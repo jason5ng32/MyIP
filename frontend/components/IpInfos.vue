@@ -56,6 +56,7 @@ const createDefaultCard = () => ({
   country_name: "",
   region: "",
   city: "",
+  timezone: "",
   latitude: "",
   longitude: "",
   isp: "",
@@ -234,6 +235,7 @@ const trackFetchStatus = (status) => {
         country_code: card.country_code,
         region: card.region,
         city: card.city,
+        timezone: card.timezone,
         asn: card.asn,
         isp: card.isp,
         // IPCheck.ing-source enrichments (locale-free codes; absent on other

@@ -37,7 +37,8 @@ states its route and purpose — read those for specifics.
   these verbatim.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
   frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …);
-  new sources match it.
+  new sources match it. `timezone` is the exception — no handler produces it;
+  see "Response enrichment" below.
 - **Logging.** Shared logger only, `logger.error({ err, ...ctx }, 'msg')`;
   no `console.*`, no "received request" lines (`pino-http` covers those when
   enabled).
@@ -79,6 +80,22 @@ these checks:
 
 New param shape → new guard in `common/guards.js`, attached in
 `backend-server.js`; never open-coded in the handler.
+
+### Response enrichment lives in middleware too
+
+`withTimeZone()` (`common/ip-timezone.js`), attached to all seven geo routes,
+derives `timezone` (IANA name) from the `latitude` / `longitude` the handler
+just returned and adds it on the way out — 2xx only, same res.json hook and
+same rule as `cacheable`. No handler computes or forwards a timezone, not even
+the private-API pass-throughs.
+
+Deriving it from the response's own coordinates is what keeps the zone from
+contradicting the city beside it; a second database asked about the same IP
+would eventually disagree. Only the zone name ships — the frontend renders the
+UTC offset from it, because these routes sit behind a 24h edge cache and a
+cached offset goes an hour wrong at every DST switch.
+
+A new geo source inherits the field by adding the middleware to its route.
 
 ### Private-API header pass-through (intentional exception)
 

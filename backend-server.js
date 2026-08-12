@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId, requireValidReportId } from './common/guards.js';
+import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -241,12 +242,12 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
 app.get('/api/service-status/detail', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
 // Cache for 1 day
-app.get('/api/ipinfo', requirePublicIP(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
-app.get('/api/ipapicom', requirePublicIP(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
-app.get('/api/ipsb', requirePublicIP(), cacheable(ONE_DAY_CACHE), ipsbHandler);
-app.get('/api/ipapiis', requirePublicIP(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
-app.get('/api/ip2location', requirePublicIP(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requirePublicIP(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
+app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
+app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
+app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
+app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
+app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/whois', cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
@@ -271,7 +272,7 @@ app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
-app.get('/api/ipchecking', requirePublicIP(), ipCheckingHandler);
+app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
 app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);

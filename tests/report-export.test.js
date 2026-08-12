@@ -20,7 +20,7 @@ const t = (key, params) => (params ? `${key}[${Object.values(params).join(',')}]
 const makeSections = () => ({
     ipinfo: {
         testedAt: '2026-07-14T08:00:00.000Z',
-        cards: [{ source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', city: 'LA', asn: 'AS15169', isp: 'Google' }],
+        cards: [{ source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', city: 'LA', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google' }],
     },
     speedtest: {
         testedAt: '2026-07-14T08:05:00.000Z',
@@ -126,6 +126,11 @@ describe('reportToMarkdown', () => {
         assert.ok(md.trimEnd().endsWith('report.ai.Instruction'));
         // Data made it into the tables.
         assert.ok(md.includes('| IPCheck.ing IPv4 | 1.2.3.4 |'));
+        // Every schema field the ipinfo card carries reaches the AI table —
+        // its columns are hand-listed, so a new field is silently dropped
+        // unless it is added there too.
+        assert.ok(md.includes('| source | ip | countryCode | region | city | timezone | asn | isp |'));
+        assert.ok(md.includes('America/Los_Angeles'));
         assert.ok(md.includes('- downloadMbps: 500.2'));
         assert.ok(md.includes('### probe: DE — Hetzner (AS24940)'));
     });

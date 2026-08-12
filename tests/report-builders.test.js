@@ -146,6 +146,19 @@ describe('cleaning rules', () => {
         assert.equal(section.cards[0].countryCode, 'US'); // normalized to upper
     });
 
+    it('ipinfo carries the timezone through, absent when the source had no coordinates', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        const section = build({
+            cards: [
+                { source: 'IP.sb', ip: '1.2.3.4', country_code: 'SG', timezone: 'Asia/Singapore' },
+                // Anycast / unlocatable: the backend sends '' rather than guessing.
+                { source: 'MaxMind', ip: '2001:db8::1', country_code: 'US', timezone: '' },
+            ],
+        });
+        assert.equal(section.cards[0].timezone, 'Asia/Singapore');
+        assert.ok(!('timezone' in section.cards[1]));
+    });
+
     it('ipinfo keeps IPCheck.ing enrichments and drops gated/unknown values', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const section = build({

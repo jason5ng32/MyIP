@@ -782,6 +782,7 @@
     "Country": "Region",
     "Region": "State",
     "City": "City",
+    "TimeZone": "Time Zone",
     "ISP": "ISP",
     "ASN": "ASN",
     "Coordinates": "Coordinates",

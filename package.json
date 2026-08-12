@@ -22,6 +22,7 @@
     "@iconify/vue": "^5.0.1",
     "@khmyznikov/pwa-install": "^0.6.4",
     "@lucide/vue": "^1.28.0",
+    "@photostructure/tz-lookup": "^11.6.1",
     "@sentry/node": "^10.69.0",
     "@sentry/vue": "^10.69.0",
     "@tanstack/vue-table": "^9.0.0",
