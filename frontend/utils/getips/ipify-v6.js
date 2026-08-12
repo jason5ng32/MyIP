@@ -1,36 +1,14 @@
-import { isValidIP } from '@/utils/valid-ip.js';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+// IPify IPv6 — api6.ipify.org JSON endpoint. Fallback hop for the
+// IPCheck.ing IPv6 chain in index.js.
+import { fetchWithTimeout } from '../fetch-with-timeout.js';
 
-// Get IPv6 address from IPify
-const getIPFromIpify_V6 = async () => {
-    try {
-        const response = await fetchWithTimeout("https://api6.ipify.org?format=json");
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-
+export const ipifyV6 = {
+    id: 'ipify-v6',
+    name: 'IPify IPv6',
+    run: async () => {
+        const response = await fetchWithTimeout('https://api6.ipify.org?format=json');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        const ip = data.ip;
-        const source = "IPify IPv6";
-        if (isValidIP(ip)) {
-            return {
-                ip: ip,
-                source: source
-            };
-        } else { 
-            console.warn("Invalid IP from IPify IPv6:", ip);
-            return {
-                ip: null,
-                source: source
-            };
-        }
-    } catch (error) {
-        console.warn("Error fetching IPv6 address from ipify:", error);
-        return {
-            ip: null,
-            source: "IPify IPv6"
-        };
-    }
+        return data.ip;
+    },
 };
-
-export { getIPFromIpify_V6 };
