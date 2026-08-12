@@ -446,6 +446,7 @@
     "SectionFlagged": "Flagged countries",
     "PresetHighRisk": "Heavily-censored countries",
     "PresetOpen": "Usually-open countries",
+    "RunVerify": "Run Realtime Test",
     "RealtimeNote": "You can select multiple probes for real-time connectivity testing to comprehensively evaluate the website's block status. When running the test, 2 probes will be executed per country; matching results from both probes indicate higher reliability.",
     "RealtimeFooterNote": "Realtime probes mostly run from datacenter networks; their results can differ from actual residential-network observations, as some websites may block access from datacenter networks. Please read them together and make a judgment based on the actual situation."
   },

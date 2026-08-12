@@ -125,8 +125,9 @@ to the upstream that owns the auth context.
 
 ## Testing
 
-- Every handler has smoke tests in `tests/api-handlers.test.js`: method
-  gating, param branches, "API key missing" early returns.
+- Handlers get smoke tests in `tests/api-handlers.test.js`: method gating,
+  param branches, "API key missing" early returns. Most are covered; a new
+  or touched handler ships its block in the same change.
 - Never hit real upstreams — assert on branches that return before the first
   `fetchUpstream`, or stub `globalThis.fetch` when the behavior under test
   lives past it (google-map stream tests; restored in the shared `afterEach`).

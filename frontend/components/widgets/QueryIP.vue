@@ -9,7 +9,7 @@
 
     <!-- Query Dialog -->
     <Dialog :open="isOpen" @update:open="onOpenChange">
-        <DialogContent :title="t('ipcheck.Title')" class="max-w-xl min-h-[200px]">
+        <DialogContent :title="t('ipcheck.Title')" class="max-w-2xl min-h-50">
             <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
             <div class="space-y-4">
