@@ -353,6 +353,20 @@ describe('invisibility-test handler', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    it('passes an upstream auth rejection through as its own 4xx, not a 500', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = async () => ({
+            status: 403,
+            ok: false,
+            json: async () => ({ message: 'Authorization header is missing.' }),
+        });
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, { error: 'Authorization header is missing.' });
+    });
 });
 
 // -- mac-checker handler --------------------------------------------------

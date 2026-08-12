@@ -313,12 +313,14 @@ const getResult = async () => {
         }
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
-        if (error.message.includes('Invalid token')) {
-            errorMsg.value = t('user.InvalidUserToken');
-            return;
-        }
-        if (error.message.includes('Sign in required')) {
-            errorMsg.value = t('user.SignInToUse');
+        // 401/403 passed through by the backend: the visitor's sign-in state
+        // is the problem — retrying can't fix it, so reset and bail.
+        if (/Status: 40[13] /.test(error.message)) {
+            errorMsg.value = error.message.includes('Invalid token')
+                ? t('user.InvalidUserToken')
+                : t('user.SignInToUse');
+            checkingStatus.value = 'idle';
+            retryCount.value = 0;
             return;
         }
         if (retryCount.value < 3) {
