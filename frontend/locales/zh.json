@@ -7,13 +7,21 @@
     "SignInToView": "登录后查看",
     "SignInToUse": "请登录后使用",
     "InvalidUserToken": "无效的用户 Token",
+    "QuotaExceeded": "本功能本月的免费额度已用完，下个月会自动重置。",
+    "QuotaSponsorCta": "赞助我们",
+    "ViewUsage": "查看用量",
+    "Usage": {
+      "Title": "用量统计",
+      "Note": "高级功能设有每月免费额度，每月（UTC）自动重置。",
+      "IpinfoFeature": "IP 高级数据",
+      "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。"
+    },
     "MyAchievements": "我的成就",
     "Fields": {
       "User": "用户",
       "CreatedAt": "创建于",
       "LastLogin": "最后登录",
       "Level": "用户等级",
-      "FunctionUses": "高级功能使用",
       "Fetching": "获取中..."
     },
     "Level": {
@@ -24,17 +32,38 @@
       "HonoraryMember": "荣誉用户"
     },
     "Benefits": {
-      "Title": "用户权益",
+      "Title": "权益与用量",
       "Benefit": "权益",
-      "Note1": "作为一个开源产品，你使用 IPCheck.ing 的过程是免费的。",
-      "Note2": "但是，为了避免滥用，我们会限制一些功能。当你登录后，你将得到以下权益：",
-      "Benefit1": "当你使用 IPCheck.ing 作为 IP 数据解析源时，完整显示所有字段",
-      "Benefit2": "可以使用隐身测试",
-      "Benefit3": "可以使用深度 DNS 泄露测试",
-      "Benefit4": "可以看到自己获得的成就勋章",
-      "Benefit5": "可以使用 AI 助手 IPilot 提问",
-      "Benefit6": "减少部分功能的访问限制",
-      "FootNote": "更多权益陆续开发中..."
+      "Note1": "作为一个开源产品，你使用 IPCheck.ing 的过程是免费的。我们维护这个开源产品付出大量的精力和成本。",
+      "Note2": "为了让这个项目可以长期稳定地运行，避免滥用，部分高级功能需要登录才能使用。我们对每个登录用户设置了足够使用的每月额度，如果你觉得额度不够，可以考虑赞助我们，赞助后可以获得更高的额度。",
+      "Current": "当前",
+      "Tiers": {
+        "Visitor": {
+          "Name": "未登录用户",
+          "Item1": "查询 IP 信息，多数据源对比",
+          "Item2": "网络连通性与服务可用性检测",
+          "Item3": "WebRTC / DNS 泄露检测",
+          "Item4": "网速、全球延迟与 MTR 测试",
+          "Item5": "Whois、DNS 解析等更多高级工具",
+          "Item6": "无需注册，开源可自部署"
+        },
+        "SignedIn": {
+          "Name": "登录用户",
+          "Item1": "包含未登录用户的所有权益",
+          "Item2": "可以查看 IP 的质量分、代理判断、类型、原生性等高级信息",
+          "Item3": "可以使用隐身测试",
+          "Item4": "可以使用深度 DNS 泄露测试",
+          "Item5": "可以看到自己获得的成就勋章",
+          "Item6": "可以使用 AI 助手 IPilot 提问",
+          "Item7": "高级功能享有每月免费额度，每月自动重置"
+        },
+        "Sponsor": {
+          "Name": "赞助用户",
+          "Item1": "包含登录用户的所有权益",
+          "Item2": "高级功能获得更高的每月额度",
+          "Item3": "支持这个开源项目的持续开发与运营"
+        }
+      }
     },
     "Achievements": {
       "Title": "成就",
@@ -794,6 +823,7 @@
     "qualityScore": "IP 质量分",
     "qualityScoreUnknown": "未知分数",
     "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
+    "advancedQuotaCta": "本月高级数据额度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",

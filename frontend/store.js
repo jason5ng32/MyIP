@@ -67,7 +67,23 @@ export const useMainStore = defineStore('main', {
     },
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
-    }
+    },
+    // Per-feature "monthly quota exhausted" booleans, derived from the
+    // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
+    // only — the backend enforces the same limits authoritatively; absent
+    // data (signed out, old backend, fetch pending) reads as not exceeded.
+    quotaExceeded: (state) => {
+      const features = state.remoteUserInfo?.quota?.features || {};
+      const exceeded = (key) => {
+        const feature = features[key];
+        return Boolean(feature && feature.limit > 0 && feature.used >= feature.limit);
+      };
+      return {
+        ipinfo: exceeded('ipinfo'),
+        invisibility_test: exceeded('invisibility_test'),
+        dns_leak_test: exceeded('dns_leak_test'),
+      };
+    },
   },
 
   actions: {
@@ -263,6 +279,14 @@ export const useMainStore = defineStore('main', {
     // trigger open user benefits
     setTriggerUserBenefits(value) {
       this.triggerUserBenefits = value;
+    },
+    // Backend replied 429 quota_exceeded for a feature: pin the local snapshot
+    // to its limit so the quotaExceeded getter flips without a refetch.
+    markQuotaExhausted(feature) {
+      const quotaFeature = this.remoteUserInfo?.quota?.features?.[feature];
+      if (quotaFeature && typeof quotaFeature.limit === 'number') {
+        quotaFeature.used = Math.max(quotaFeature.used ?? 0, quotaFeature.limit);
+      }
     },
     // trigger remote fetch user info
     setTriggerRemoteUserInfo(value) {

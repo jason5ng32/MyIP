@@ -145,13 +145,6 @@
                     <dt class="text-muted-foreground">{{ t('user.Fields.CreatedAt') }}</dt>
                     <dd class="font-medium">{{ userCreatedAt }}</dd>
                   </div>
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.FunctionUses') }}</dt>
-                    <dd class="font-medium">
-                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses?.total ?? 0 }}</span>
-                      <span v-else class="text-muted-foreground">{{ t('user.Fields.Fetching') }}</span>
-                    </dd>
-                  </div>
                 </dl>
               </div>
               <DropdownMenuSeparator />

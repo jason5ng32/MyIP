@@ -43,8 +43,8 @@ const compact = (obj) => {
 // timezone, asn, isp, proxyCode?, ipTypeCode?, isNativeIP?, qualityScore?,
 // proxyProtocol?, proxyProvider? }] }. Cards whose ip never resolved (placeholder text in the
 // slot) are dropped. The optional enrichments only exist on the IPCheck.ing
-// source and stay absent when sign-in-gated ('sign_in_required' upstream
-// values never turn into codes — see transform-ip-data.js). 'unknown' codes
+// source and stay absent when gated ('sign_in_required' / 'quota_exceeded'
+// upstream values never turn into codes — see transform-ip-data.js). 'unknown' codes
 // are noise in a report ("Unknown type" says nothing) — dropped like absent.
 const PROXY_CODES = new Set(['yes', 'maybe', 'no']);
 const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);

@@ -4,6 +4,11 @@
        component the drawer does, just inside a minimal page chrome instead of
        the homepage + drawer. -->
   <div class="flex min-h-screen flex-col">
+    <!-- User system dialogs host (Benefits & Usage) — the sign-in gated tools
+         link to it from their quota hints, and it fetches the user's usage
+         snapshot so their frontend quota gate works here too. -->
+    <User />
+
     <!-- Slim header: brand → home, current tool breadcrumb, back link. -->
     <StandalonePageHeader :title="tool ? `${tool.emoji} ${t(tool.titleKey)}` : ''" />
 
@@ -30,6 +35,7 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import User from '@/components/User.vue';
 
 const { t } = useI18n();
 const route = useRoute();

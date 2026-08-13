@@ -70,14 +70,25 @@
     <!-- Advanced block (IPCheck.ing source only): locked CTA for signed-out, label-value grid for signed-in. -->
     <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
-        <!-- Signed-out: single CTA banner + 4-field preview grid with *** values. -->
-        <template v-if="allAdvancedLocked">
+        <!-- Gated: single CTA banner + 4-field preview grid with *** values.
+             Signed-out shows the sign-in copy; over-quota shows the monthly
+             quota copy + sponsor link instead. -->
+        <template v-if="allAdvancedLocked || allAdvancedQuotaExceeded">
             <span
                 class="w-full flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground transition-colors group">
                 <span class="flex items-center gap-1.5 min-w-0">
-                    <Lock class="size-3.5 shrink-0" />
-                    <span class="truncate">{{ t('ipInfos.advancedUnlockCta') }}</span>
+                    <component :is="allAdvancedQuotaExceeded ? Hourglass : Lock" class="size-3.5 shrink-0" />
+                    <span class="truncate">
+                        {{ allAdvancedQuotaExceeded ? t('ipInfos.advancedQuotaCta') : t('ipInfos.advancedUnlockCta') }}
+                    </span>
                 </span>
+                <!-- Opens the Benefits & Usage dialog (usage tab for signed-in
+                     users) — the sponsor path lives there, not a direct jump. -->
+                <button v-if="allAdvancedQuotaExceeded" type="button"
+                    class="shrink-0 underline underline-offset-2 hover:text-foreground cursor-pointer"
+                    @click="store.setTriggerUserBenefits(true)">
+                    {{ t('user.ViewUsage') }}
+                </button>
             </span>
 
             <dl class="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-3 text-sm items-start">
@@ -242,6 +253,7 @@
 // Hero IP is NOT part of this panel — consumers render their own hero row since affordances
 // (copy button, etc.) differ.
 import { ref, computed } from 'vue';
+import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
@@ -267,6 +279,7 @@ import {
     EqualNot,
     EthernetPort,
     Gauge,
+    Hourglass,
     House,
     Info,
     Network,
@@ -281,6 +294,7 @@ import {
 } from '@lucide/vue';
 
 const { t, locale } = useI18n();
+const store = useMainStore();
 
 const props = defineProps({
     data: { type: Object, required: true },
@@ -327,28 +341,37 @@ const canShowMap = computed(() =>
     props.enableMap && Boolean(props.configs.map) && Boolean(props.data.country_name)
 );
 
-// If every advanced field is masked behind login → show the single CTA + preview grid instead
-// of rendering four individual "sign in to unlock" rows.
+// Backend gating sentinels for the advanced fields (see transform-ip-data.js).
+const isGatedValue = (value) => value === 'sign_in_required' || value === 'quota_exceeded';
+
+// If every advanced field is masked → show the single CTA + preview grid instead
+// of rendering four individual gated rows. The two sentinels pick different copy.
 const allAdvancedLocked = computed(() =>
     props.data.type === 'sign_in_required' &&
     props.data.isProxy === 'sign_in_required' &&
     props.data.isNativeIP === 'sign_in_required' &&
     props.data.qualityScore === 'sign_in_required'
 );
+const allAdvancedQuotaExceeded = computed(() =>
+    props.data.type === 'quota_exceeded' &&
+    props.data.isProxy === 'quota_exceeded' &&
+    props.data.isNativeIP === 'quota_exceeded' &&
+    props.data.qualityScore === 'quota_exceeded'
+);
 
 const showTypeBadge = computed(() =>
-    props.data.type && props.data.type !== 'sign_in_required'
+    props.data.type && !isGatedValue(props.data.type)
     && props.data.type !== t('ipInfos.advancedData.type.unknownType')
 );
 const showProxyBadge = computed(() =>
-    props.data.isProxy && props.data.isProxy !== 'sign_in_required'
+    props.data.isProxy && !isGatedValue(props.data.isProxy)
     && props.data.isProxy !== t('ipInfos.advancedData.proxyUnknown')
 );
 const showNativeBadge = computed(() =>
-    props.data.isNativeIP !== undefined && props.data.isNativeIP !== 'sign_in_required'
+    props.data.isNativeIP !== undefined && !isGatedValue(props.data.isNativeIP)
 );
 const showQualityScore = computed(() =>
-    props.data.qualityScore !== undefined && props.data.qualityScore !== 'sign_in_required'
+    props.data.qualityScore !== undefined && !isGatedValue(props.data.qualityScore)
 );
 
 // Locked field preview: the 4 advanced fields shown as "label + ***" for signed-out users.

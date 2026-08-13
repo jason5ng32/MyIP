@@ -51,6 +51,7 @@ common/as-org-db/*.next
 common/as-rel-db/*.next
 .learnings/
 docs/
+.plan/
 
 # Local Scripts
 scripts/

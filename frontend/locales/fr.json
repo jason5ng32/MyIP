@@ -7,13 +7,21 @@
     "SignInToView": "Connectez-vous pour voir",
     "SignInToUse": "Connectez-vous pour utiliser",
     "InvalidUserToken": "Token utilisateur non valide",
+    "QuotaExceeded": "Vous avez épuisé le quota mensuel gratuit de cette fonctionnalité. Il sera réinitialisé automatiquement le mois prochain.",
+    "QuotaSponsorCta": "Sponsoriser nous",
+    "ViewUsage": "Voir l'utilisation",
+    "Usage": {
+      "Title": "Statistiques d'utilisation",
+      "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC).",
+      "IpinfoFeature": "Données IP avancées",
+      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels."
+    },
     "MyAchievements": "Succès",
     "Fields": {
       "User": "Utilisateur",
       "CreatedAt": "Créé Le",
       "LastLogin": "Dernière Connexion",
       "Level": "Niveau d'Utilisateur",
-      "FunctionUses": "Utilisation des Avancées",
       "Fetching": "Recherche..."
     },
     "Level": {
@@ -24,17 +32,38 @@
       "HonoraryMember": "Membre Honoraire"
     },
     "Benefits": {
-      "Title": "Avantages Utilisateurs",
-      "Benefit": "Avantage",
-      "Note1": "En tant que produit open-source, l'utilisation de IPCheck.ing est gratuite.",
-      "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
-      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement",
-      "Benefit2": "Peut utiliser le test d'invisibilité",
-      "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
-      "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Peut poser des questions à IPilot, notre assistant IA",
-      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
-      "FootNote": "D'autres avantages sont en cours de développement..."
+      "Title": "Avantages et utilisation",
+      "Benefit": "Avantages",
+      "Note1": "En tant que produit open source, IPCheck.ing est gratuit. Sa maintenance demande des efforts et des coûts considérables.",
+      "Note2": "Pour assurer la pérennité du projet et éviter les abus, certaines fonctionnalités avancées nécessitent une connexion. Chaque utilisateur connecté dispose d'un quota mensuel largement suffisant — s'il ne vous suffit pas, envisagez de nous sponsoriser pour obtenir des limites plus élevées.",
+      "Current": "Actuel",
+      "Tiers": {
+        "Visitor": {
+          "Name": "Visiteurs",
+          "Item1": "Recherche d'IP avec comparaison multi-sources",
+          "Item2": "Tests de connectivité et de disponibilité des services",
+          "Item3": "Tests de fuite WebRTC / DNS",
+          "Item4": "Test de vitesse, latence mondiale et MTR",
+          "Item5": "Whois, résolveur DNS et autres outils avancés",
+          "Item6": "Aucune inscription requise — open source et auto-hébergeable"
+        },
+        "SignedIn": {
+          "Name": "Utilisateurs connectés",
+          "Item1": "Tous les avantages des visiteurs",
+          "Item2": "Consultez les données IP avancées : score de qualité, détection de proxy, type de réseau et nativité",
+          "Item3": "Utilisez le test d'invisibilité",
+          "Item4": "Utilisez le test approfondi de fuite DNS",
+          "Item5": "Consultez vos badges de succès",
+          "Item6": "Interrogez IPilot, notre assistant IA",
+          "Item7": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé chaque mois"
+        },
+        "Sponsor": {
+          "Name": "Sponsors",
+          "Item1": "Tous les avantages des utilisateurs connectés",
+          "Item2": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
+          "Item3": "Soutenez le développement continu de ce projet open source"
+        }
+      }
     },
     "Achievements": {
       "Title": "Succès",
@@ -794,6 +823,7 @@
     "qualityScore": "Qualité IP",
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
+    "advancedQuotaCta": "Quota mensuel épuisé",
     "ASNInfo": {
       "trafficPercentage": "Pourcentage de trafic : ",
       "note": "Données associées à cet AS : ",

@@ -125,6 +125,22 @@ describe('extractAdvancedData()', () => {
     assert.equal(out.isNativeIP, 'sign_in_required');
   });
 
+  it('propagates quota_exceeded sentinel verbatim, and drops the report codes', () => {
+    const out = extractAdvancedData({
+      tags: 'quota_exceeded',
+      score: 'quota_exceeded',
+      operatorType: 'quota_exceeded',
+      proxyProtocol: 'quota_exceeded',
+    }, t);
+    assert.equal(out.isProxy, 'quota_exceeded');
+    assert.equal(out.type, 'quota_exceeded');
+    assert.equal(out.qualityScore, 'quota_exceeded');
+    assert.equal(out.isNativeIP, 'quota_exceeded');
+    // Locale-free report codes must be absent for gated data.
+    assert.equal(out.proxyCode, undefined);
+    assert.equal(out.ipTypeCode, undefined);
+  });
+
   it("classifies isProxy='proxyYes' for VPN + known protocol", () => {
     const out = extractAdvancedData({
       tags: { isProxyOrVPN: true, isNative: false },

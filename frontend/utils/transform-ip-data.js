@@ -50,14 +50,20 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
     return baseData;
 };
 
+// Gated sentinels the backend may substitute for the real advanced fields:
+// signed-out visitors get 'sign_in_required', over-quota users get
+// 'quota_exceeded'. Both propagate as-is so the UI can pick the right CTA.
+const gatedSentinel = (value) =>
+    value === 'sign_in_required' || value === 'quota_exceeded' ? value : null;
+
 // Parse proxy data
 function extractAdvancedData(advancedData = {}, t) {
     const isProxy = determineIsProxy(advancedData, t);
     const type = determineType(advancedData, t);
-    const qualityScore = advancedData.score === 'sign_in_required' ? 'sign_in_required' : advancedData.score;
+    const qualityScore = gatedSentinel(advancedData.score) || advancedData.score;
     const proxyProtocol = advancedData.proxyProtocol || "";
     const proxyProvider = advancedData.proxyProvider || "";
-    const isNativeIP = advancedData.tags === 'sign_in_required' ? 'sign_in_required' : advancedData.tags.isNative;
+    const isNativeIP = gatedSentinel(advancedData.tags) || advancedData.tags.isNative;
 
     // Locale-free twins of isProxy / type for the diagnostic report payload
     // (the display fields above are t()-localized at capture time; the report
@@ -71,8 +77,8 @@ function extractAdvancedData(advancedData = {}, t) {
 // Determine if it is a proxy
 function determineIsProxy(advancedData, t) {
 
-    if (advancedData.tags === 'sign_in_required') {
-        return 'sign_in_required';
+    if (gatedSentinel(advancedData.tags)) {
+        return advancedData.tags;
     } else if (advancedData.tags.isProxyOrVPN && advancedData.proxyProtocol !== 'unknown') {
         return t('ipInfos.advancedData.proxyYes');
     } else if (advancedData.tags.isProxyOrVPN) {
@@ -85,9 +91,9 @@ function determineIsProxy(advancedData, t) {
 }
 
 // Locale-free code for determineIsProxy — same branch order, enum output.
-// undefined when the data is sign-in-gated (the report then omits the field).
+// undefined when the data is gated (the report then omits the field).
 function determineProxyCode(advancedData) {
-    if (advancedData.tags === 'sign_in_required') return undefined;
+    if (gatedSentinel(advancedData.tags)) return undefined;
     if (advancedData.tags.isProxyOrVPN && advancedData.proxyProtocol !== 'unknown') return 'yes';
     if (advancedData.tags.isProxyOrVPN) return 'maybe';
     if (!advancedData.tags.isProxyOrVPN) return 'no';
@@ -96,15 +102,15 @@ function determineProxyCode(advancedData) {
 
 // Locale-free code for determineType.
 function determineTypeCode(advancedData) {
-    if (advancedData.operatorType === 'sign_in_required') return undefined;
+    if (gatedSentinel(advancedData.operatorType)) return undefined;
     const codes = { Business: 'business', Residential: 'residential', Wireless: 'wireless', Hosting: 'hosting' };
     return codes[advancedData.operatorType] ?? 'unknown';
 }
 
 // Determine proxy type
 function determineType(advancedData, t) {
-    if (advancedData.operatorType === 'sign_in_required') {
-        return 'sign_in_required';
+    if (gatedSentinel(advancedData.operatorType)) {
+        return advancedData.operatorType;
     }
     switch (advancedData.operatorType) {
         case 'Business':

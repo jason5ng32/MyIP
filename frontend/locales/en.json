@@ -7,13 +7,21 @@
     "SignInToView": "Sign In to View",
     "SignInToUse": "Please sign in to use",
     "InvalidUserToken": "Invalid User Token",
+    "QuotaExceeded": "You've used up this month's free quota for this feature. It resets automatically next month.",
+    "QuotaSponsorCta": "Sponsor Us",
+    "ViewUsage": "View usage",
+    "Usage": {
+      "Title": "Usage Stats",
+      "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC).",
+      "IpinfoFeature": "IP Advanced Data",
+      "SponsorNote": "Sponsoring on GitHub raises your monthly quotas."
+    },
     "MyAchievements": "My Achievements",
     "Fields": {
       "User": "User",
       "CreatedAt": "Created At",
       "LastLogin": "Last Login",
       "Level": "User Level",
-      "FunctionUses": "Advanced Usage",
       "Fetching": "Fetching..."
     },
     "Level": {
@@ -24,17 +32,38 @@
       "HonoraryMember": "Honorary Member"
     },
     "Benefits": {
-      "Title": "User Benefits",
-      "Benefit": "Benefit",
-      "Note1": "As an open-source product, your use of IPCheck.ing is free of charge.",
-      "Note2": "However, to prevent abuse, we limit some features. By logging in, you will receive the following benefits:",
-      "Benefit1": "When you use IPCheck.ing as IP data source, all fields are displayed in full",
-      "Benefit2": "You can use the invisibility test",
-      "Benefit3": "You can use the in-depth DNS leak test",
-      "Benefit4": "You can view your own achievement badges",
-      "Benefit5": "You can ask IPilot, our AI assistant",
-      "Benefit6": "Reduces access restrictions on some features",
-      "FootNote": "More benefits are being developed..."
+      "Title": "Benefits & Usage",
+      "Benefit": "Benefits",
+      "Note1": "As an open-source product, IPCheck.ing is free to use. Maintaining it takes considerable effort and cost.",
+      "Note2": "To keep the project running sustainably and prevent abuse, some advanced features require signing in. Every signed-in user gets a generous monthly quota — if it's not enough for you, consider sponsoring us to unlock higher limits.",
+      "Current": "Current",
+      "Tiers": {
+        "Visitor": {
+          "Name": "Visitors",
+          "Item1": "IP lookup with multi-source comparison",
+          "Item2": "Connectivity and service availability checks",
+          "Item3": "WebRTC / DNS leak tests",
+          "Item4": "Speed test, global latency and MTR",
+          "Item5": "Whois, DNS resolver and more advanced tools",
+          "Item6": "No registration required — open source and self-hostable"
+        },
+        "SignedIn": {
+          "Name": "Signed-in Users",
+          "Item1": "Everything in Visitors",
+          "Item2": "View advanced IP data: quality score, proxy detection, network type and nativeness",
+          "Item3": "Use the invisibility test",
+          "Item4": "Use the in-depth DNS leak test",
+          "Item5": "View your achievement badges",
+          "Item6": "Ask IPilot, our AI assistant",
+          "Item7": "Advanced features come with a free monthly quota that resets every month"
+        },
+        "Sponsor": {
+          "Name": "Sponsors",
+          "Item1": "Everything in Signed-in Users",
+          "Item2": "Higher monthly quotas for advanced features",
+          "Item3": "Support the ongoing development of this open-source project"
+        }
+      }
     },
     "Achievements": {
       "Title": "Achievements",
@@ -794,6 +823,7 @@
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
     "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
+    "advancedQuotaCta": "Monthly quota used up",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
