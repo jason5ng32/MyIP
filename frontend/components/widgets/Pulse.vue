@@ -1,11 +1,13 @@
 <template>
-    <!-- Nav entry: slow-orbit icon + green dot, no numbers exposed.
-        Rendered only when VITE_PULSE_URL is configured. -->
     <JnTooltip v-if="pulseEnabled" :text="t('nav.pulse.tooltip')">
-        <Button variant="ghost" size="icon" class="relative size-8 cursor-pointer" :aria-label="t('nav.pulse.title')"
-            @click="openPulse">
-            <Orbit class="size-4 animate-spin animation-duration-[8s]" />
-            <span class="absolute right-1 top-1 size-1.5 rounded-full bg-success" aria-hidden="true"></span>
+        <Button variant="ghost" :size="isMobile ? 'icon' : 'sm'" class="relative cursor-pointer"
+            :class="isMobile ? 'size-8' : 'h-8 gap-1.5 px-2'" :aria-label="t('nav.pulse.title')" @click="openPulse">
+            <Earth class="size-4 animate-spin animation-duration-[8s]" />
+            <span v-if="!isMobile">{{ t('nav.pulse.title') }}</span>
+            <span class="flex size-1.5" :class="isMobile ? 'absolute right-1 top-1' : 'relative'" aria-hidden="true">
+                <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
+                <span class="relative inline-flex size-1.5 rounded-full bg-success"></span>
+            </span>
         </Button>
     </JnTooltip>
 
@@ -19,7 +21,7 @@
                 aria-hidden="true"></canvas>
             <header class="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-3">
                 <h2 class="m-0 flex items-center gap-2 text-base font-semibold">
-                    <Orbit class="size-4 text-muted-foreground" />
+                    <Earth class="size-4 text-muted-foreground" />
                     {{ t('nav.pulse.title') }}
                     <span class="relative flex size-2">
                         <span
@@ -235,10 +237,11 @@ import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import PulseOutages from '@/components/widgets/PulseOutages.vue';
 import { Icon } from '@iconify/vue';
-import { Check, Orbit, ClockFading } from '@lucide/vue';
+import { Check, Earth, ClockFading } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
+const isMobile = computed(() => store.isMobile);
 
 
 // Status vocabulary lives in data/pulse-statuses.js (shared with tests).

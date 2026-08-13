@@ -38,7 +38,7 @@ minimumReleaseAgeExclude:
   - '@firebase/remote-config-compat@0.2.27'
   - '@firebase/remote-config@0.9.0'
   - firebase@12.16.0
-  - pinia@4.0.2
+  - pinia@4.0.2 || 4.0.3
   - vue-router@5.2.0
   - '@sentry/browser-utils@10.68.0'
   - '@sentry/browser@10.68.0'
