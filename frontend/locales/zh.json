@@ -924,7 +924,7 @@
       "Import": "导入",
       "RemoveList": "移除该列表",
       "Capacity": "已用 {used}/{limit}",
-      "OverLimit": "已超过上限，仅添加了其中 {n} 个"
+      "NotEnoughCapacity": "容量不足——该列表需要 {need} 个空位，仅剩 {free} 个"
     },
     "importLists": {
       "iran": "伊朗常用",

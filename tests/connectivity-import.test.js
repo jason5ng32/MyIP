@@ -46,12 +46,22 @@ describe('planImport', () => {
         assert.equal(skippedCount, 1);
     });
 
-    it('truncates at the shared cap and reports the overflow', () => {
-        const { additions, overflowCount } = planImport(sampleList, {
+    it('refuses a partial import when the list does not fully fit (all-or-nothing)', () => {
+        const { additions, overflowCount, freshCount, capacity } = planImport(sampleList, {
             currentCount: CONNECTIVITY_TARGET_LIMIT - 1,
         });
-        assert.equal(additions.length, 1);
+        assert.equal(additions.length, 0);
         assert.equal(overflowCount, 2);
+        assert.equal(freshCount, 3);
+        assert.equal(capacity, 1);
+    });
+
+    it('imports in full when the list exactly fits the remaining capacity', () => {
+        const { additions, overflowCount } = planImport(sampleList, {
+            currentCount: CONNECTIVITY_TARGET_LIMIT - 3,
+        });
+        assert.equal(additions.length, 3);
+        assert.equal(overflowCount, 0);
     });
 
     it('adds nothing when the cap is already reached', () => {
@@ -60,6 +70,17 @@ describe('planImport', () => {
         });
         assert.equal(additions.length, 0);
         assert.equal(overflowCount, 3);
+    });
+
+    it('counts only fresh members against capacity — deduped ones do not block', () => {
+        // 1 slot left, 2 of 3 members already present: the single fresh one fits.
+        const { additions, overflowCount, skippedCount } = planImport(sampleList, {
+            existingUrls: ['https://alpha.example/x', 'https://www.beta.example/x'],
+            currentCount: CONNECTIVITY_TARGET_LIMIT - 1,
+        });
+        assert.deepEqual(additions.map((a) => a.id), ['import-gamma']);
+        assert.equal(overflowCount, 0);
+        assert.equal(skippedCount, 2);
     });
 
     it('ignores malformed existing URLs instead of throwing', () => {

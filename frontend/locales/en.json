@@ -924,7 +924,7 @@
       "Import": "Import",
       "RemoveList": "Remove this list",
       "Capacity": "{used}/{limit} used",
-      "OverLimit": "Over the limit — only {n} of them were added."
+      "NotEnoughCapacity": "Not enough capacity — this list needs {need} slots, only {free} left."
     },
     "importLists": {
       "iran": "Iran Essentials",

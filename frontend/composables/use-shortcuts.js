@@ -22,7 +22,7 @@ import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
 import { isPulseEnabled } from '../utils/pulse-beacon.js';
 
-function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
+const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     const {
         queryIPRef,
         helpModalRef,
@@ -233,9 +233,9 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
     }
 
     return config;
-}
+};
 
-export function useShortcuts({ refs, store, t, configs, userPreferences }) {
+export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     const registerShortcutKeys = () => {
         const shortcuts = buildShortcutConfig({ refs, store, t, configs, userPreferences });
         shortcuts.forEach((entry) => mappingKeys(entry));
@@ -260,4 +260,4 @@ export function useShortcuts({ refs, store, t, configs, userPreferences }) {
     };
 
     return { loadShortcuts };
-}
+};

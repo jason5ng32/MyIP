@@ -125,14 +125,14 @@ function freezeInfoMaskForCapture(root) {
 // html-to-image's webfont embedding throw a SecurityError while reading
 // `cssRules`. Retry once without font embedding — the live page has already
 // loaded its fonts, so the rendered output is unaffected in practice.
-export async function toPngWithFontFallback(toPng, element, options) {
+export const toPngWithFontFallback = async (toPng, element, options) => {
     try {
         return await toPng(element, options);
     } catch (err) {
         if (err?.name !== 'SecurityError') throw err;
         return toPng(element, { ...options, skipFonts: true });
     }
-}
+};
 
 export function useScreenshot() {
     const isCapturing = ref(false);
