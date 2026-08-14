@@ -33,13 +33,17 @@ frontendApp.use('/api', createProxyMiddleware({
 //   - non-hashed images    favicon / logos / achievements / … → 7d
 //                          (any depth; not content-hashed, so changing one
 //                          of these images requires renaming the file)
-//   - index.html + manifest 24h at the edge (s-maxage), zero in browsers —
-//                          the build's postbuild purge evicts them on deploy,
-//                          so the TTL only caps drift between deploys;
-//                          manifest references only stable /logos/* paths, so
-//                          a stale copy never points at dead assets
-//   - everything else      (robots.txt, …) → 1h
+//   - HTML + manifest +    24h at the edge (s-maxage), zero in browsers — the
+//     SEO surfaces         build's postbuild purge evicts them on deploy, so
+//                          the TTL only caps drift between deploys and no
+//                          browser copy outlives a purge; manifest references
+//                          only stable /logos/* paths, so a stale copy never
+//                          points at dead assets
+//   - everything else      (ads.txt, …) → 1h
 const distDir = path.join(__dirname, './dist');
+
+// Root-level SEO / AI-engine surfaces
+const SEO_SURFACES = new Set(['llms.txt', 'llms-full.txt', 'sitemap.xml', 'robots.txt']);
 
 function setStaticHeaders(res, filePath) {
   const rel = path.relative(distDir, filePath).replaceAll(path.sep, '/');
@@ -50,7 +54,7 @@ function setStaticHeaders(res, filePath) {
     res.setHeader('Cache-Control', `public, max-age=${30 * 24 * 60 * 60}`);
   } else if (/\.(png|jpg|jpeg|webp|svg|ico)$/i.test(rel)) {
     res.setHeader('Cache-Control', `public, max-age=${7 * 24 * 60 * 60}`);
-  } else if (rel.endsWith('.html') || rel === 'manifest.webmanifest') {
+  } else if (rel.endsWith('.html') || rel === 'manifest.webmanifest' || SEO_SURFACES.has(rel)) {
     res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${24 * 60 * 60}, must-revalidate`);
   } else {
     res.setHeader('Cache-Control', `public, max-age=${60 * 60}`);
