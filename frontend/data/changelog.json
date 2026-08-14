@@ -1594,5 +1594,29 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.4.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized date display in multiple places",
+          "zh": "优化多处日期格式显示",
+          "fr": "Optimisation de l'affichage des dates dans plusieurs endroits",
+          "ru": "Оптимизация отображения дат в нескольких местах"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые проблемы"
+        }
+      }
+    ]
   }
 ]
