@@ -32,7 +32,7 @@
       "Benefit2": "You can use the invisibility test",
       "Benefit3": "You can use the in-depth DNS leak test",
       "Benefit4": "You can view your own achievement badges",
-      "Benefit5": "You can ask IPChecking Copilot, our AI assistant",
+      "Benefit5": "You can ask IPilot, our AI assistant",
       "Benefit6": "Reduces access restrictions on some features",
       "FootNote": "More benefits are being developed..."
     },
@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "Crossing The Wall",
           "Meet": "All 8 test IPs are different in the Rule Test"
+        },
+        "GlobeTrotter": {
+          "Title": "Globe Trotter",
+          "Meet": "Reach 10 countries or regions in your IP history"
+        },
+        "HelloWorld": {
+          "Title": "Hello World",
+          "Meet": "Share a status on Earth Online"
+        },
+        "AddSweetAdd": {
+          "Title": "Add Sweet Add",
+          "Meet": "Add a custom target in the Connectivity test"
+        },
+        "PrettyDirty": {
+          "Title": "Pretty Dirty",
+          "Meet": "Any IP card shows a quality score of 1"
+        },
+        "SqueakyClean": {
+          "Title": "Squeaky Clean",
+          "Meet": "Any IP card shows a quality score of 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Walk With Penguins",
+          "Meet": "Any IP card locates you in Antarctica"
         }
       }
     }
@@ -152,7 +176,7 @@
     "SearchDocs": "Search docs…",
     "DocsToolConfirm": "Share your current test results?",
     "DocsToolSummary": "Read your on-page results",
-    "AskCopilot": "Ask IPChecking Copilot",
+    "AskIPilot": "Ask IPilot",
     "OpenDocs": "Open docs",
     "DocsGreetingTitle": "How can I help?",
     "DocsGreetingSubtitle": "Ask me anything about MyIP — the tools, your results, or self-hosting.",
@@ -162,8 +186,105 @@
       "Compare my WebRTC test and DNS leak test results and give me suggestions",
       "How do I read MTR results?",
       "How do I deploy my own MyIP?",
-      "I want to see more help documents"
+      "I want to sponsor the MyIP project"
     ],
+    "pulse": {
+      "title": "Earth Online",
+      "tooltip": "Visitors from around the world",
+      "others": "Others",
+      "shareStatus": "Share your status",
+      "liveMap": "Live visitor heatmap",
+      "noVisitors": "No visitors yet",
+      "quiet": "All quiet right now — be the first to share",
+      "loadError": "Couldn't load the latest activity — try again in a moment",
+      "share": "Visitor share",
+      "latest": "Latest",
+      "sent": "Sent",
+      "alreadySent": "This status has already been sent",
+      "rateLimited": "Only one status can be shared in a short period",
+      "limitedTitle": "Limited-time status",
+      "outages": {
+        "title": "Global Outage Events",
+        "outage": "Internet Outage",
+        "anomaly": "Traffic Anomaly",
+        "ongoing": "Ongoing",
+        "ended": "Recovered",
+        "started": "Started {time}",
+        "lasted": "Lasted {duration}",
+        "quiet": "All quiet — no outage events in the past 30 days",
+        "loadMore": "Load more",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Government Directed",
+          "POWER_OUTAGE": "Power Outage",
+          "CABLE_CUT": "Cable Cut",
+          "TECHNICAL_PROBLEM": "Technical Problem",
+          "MECHANICAL": "Mechanical Problem",
+          "UNKNOWN": "Unknown Cause",
+          "WEATHER": "Severe Weather",
+          "FIRE": "Fire",
+          "CYBERATTACK": "Cyberattack",
+          "NATURAL_DISASTER": "Natural Disaster",
+          "MAINTENANCE": "Maintenance",
+          "MILITARY_ACTION": "Military Action"
+        },
+        "level": {
+          "NATIONWIDE": "Nationwide",
+          "REGIONAL": "Regional",
+          "NETWORK": "Network"
+        }
+      },
+      "statuses": {
+        "fast": "Blazing fast network",
+        "ok": "All good here",
+        "slow": "Network feels slow",
+        "flaky": "Connection keeps dropping",
+        "blocked": "A site won't open",
+        "good": "Feeling good today",
+        "bad": "Rough day today",
+        "passing": "Just passing by",
+        "lag": "Game lag is unreal",
+        "newip": "Just got a new IP",
+        "vpn": "Cruising through a VPN",
+        "night": "Up late tonight",
+        "vibing": "Vibe coding",
+        "fixing": "Fixing the family Wi-Fi again",
+        "tuning": "Shaved off another 10ms",
+        "prgday": "Happy 0x100th day!",
+        "internetday": "LO and behold, happy Internet Day",
+        "halloween": "Trick or ping!",
+        "diwali": "Festival of lights (and fiber)",
+        "christmas": "Santa's on a low-latency route",
+        "newyear": "New year, new IP!",
+        "privacyday": "This status is end-to-end encrypted",
+        "lunar": "May all your red packets arrive",
+        "valentine": "Looking for a stable connection",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "Eid Mubarak, world!",
+        "aprilfools": "My IP is 127.0.0.1",
+        "earthday": "Logging off to touch grass",
+        "turing": "This status was sent by a human. Probably.",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "Happy birthday, IPCheck.ing!"
+      },
+      "festivalDesc": {
+        "prgday": "Programmers' Day — the 256th day of the year, 0x100 in hex",
+        "internetday": "Oct 29, 1969: ARPANET tried to send LOGIN — it crashed after “LO”",
+        "halloween": "Halloween (Oct 31) — the scariest thing is still packet loss",
+        "diwali": "Diwali — may your lamps and your fiber both shine",
+        "christmas": "Christmas — sleigh on a dedicated line, zero jitter",
+        "newyear": "New Year — fireworks included, no extra bandwidth required",
+        "privacyday": "Data Privacy Day (Jan 28) — yes, we see the irony of broadcasting this",
+        "lunar": "Lunar New Year — zero packet loss on the red packets",
+        "valentine": "Valentine's Day — TCP and true love both start with a handshake",
+        "jobs": "Steve Jobs's birthday (Feb 24, 1955) — from his 2005 Stanford speech",
+        "eid": "Eid al-Fitr — warm wishes from this corner of Earth Online",
+        "aprilfools": "April Fools' Day — there's no place like 127.0.0.1",
+        "earthday": "Earth Day (Apr 22) — even Earth Online recommends a little Earth Offline",
+        "turing": "Alan Turing's birthday (Jun 23, 1912) — father of the Turing test",
+        "emojiday": "World Emoji Day (Jul 17) — words are so last century",
+        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020"
+      }
+    },
     "preferences": {
       "title": "Preferences",
       "preferenceTips": "These settings are saved in your browser for easy reuse. Some options require refreshing the page to take effect.",
@@ -191,7 +312,9 @@
       "language": "Language Setting",
       "languageTips": "Refreshing the browser will take effect."
     },
-    "DocsPrompt": "Type your question…"
+    "DocsPrompt": "Type your question…",
+    "DocsSignInTitle": "Sign In Required",
+    "DocsSignInMessage": "Sign in to ask IPilot"
   },
   "securitychecklist": {
     "Title": "Security Checklist",
@@ -324,6 +447,7 @@
     "SectionFlagged": "Flagged countries",
     "PresetHighRisk": "Heavily-censored countries",
     "PresetOpen": "Usually-open countries",
+    "RunVerify": "Run Realtime Test",
     "RealtimeNote": "You can select multiple probes for real-time connectivity testing to comprehensively evaluate the website's block status. When running the test, 2 probes will be executed per country; matching results from both probes indicate higher reliability.",
     "RealtimeFooterNote": "Realtime probes mostly run from datacenter networks; their results can differ from actual residential-network observations, as some websites may block access from datacenter networks. Please read them together and make a judgment based on the actual situation."
   },
@@ -477,6 +601,8 @@
     "Note3": "Whois information contains various types of fields. The following is the raw text information",
     "Placeholder": "Domain Name or IP",
     "invalidURL": "Invalid domain name or IP",
+    "reservedIP": "Private or reserved IP addresses have no public registry record, so there is nothing to look up.",
+    "noData": "No Whois or RDAP data is published for this query. Some top-level domains do not offer a public lookup service.",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
   },
@@ -658,6 +784,7 @@
     "Country": "Region",
     "Region": "State",
     "City": "City",
+    "TimeZone": "Time Zone",
     "ISP": "ISP",
     "ASN": "ASN",
     "Coordinates": "Coordinates",
@@ -766,11 +893,6 @@
   "connectivity": {
     "Title": "Network Connectivity",
     "Note": "This test checks whether you can reach a given website. It works by loading a small image from that site. Delay values are for reference only and will be smaller in reality. You can add other websites you frequently use to the test list for quick testing.",
-    "ServiceStatusBanner": {
-      "Title": "A service not loading?",
-      "Note": "If an AI product like ChatGPT or Claude failed the test above, it might not be your network — the service itself could be down. Check its live availability and recent incidents.",
-      "CTA": "Open Service Status"
-    },
     "StatusWait": "Awaiting Test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
@@ -792,7 +914,30 @@
       "NameRequired": "Please enter a name.",
       "UrlRequired": "Please enter a URL.",
       "InvalidUrl": "That doesn't look like a valid URL.",
-      "LimitReached": "You've reached the 10 custom tests limit."
+      "LimitReached": "You've reached the 60 tests limit."
+    },
+    "importDialog": {
+      "Title": "Add / Import Tests",
+      "CustomOption": "Add Custom",
+      "ImportOption": "Import a List",
+      "SiteCount": "{n} sites",
+      "Import": "Import",
+      "RemoveList": "Remove this list",
+      "Capacity": "{used}/{limit} used",
+      "NotEnoughCapacity": "Not enough capacity — this list needs {need} slots, only {free} left."
+    },
+    "importLists": {
+      "iran": "Iran Essentials",
+      "russia": "Russia Essentials",
+      "china": "China Essentials",
+      "ai": "AI Services",
+      "social": "Social & Messaging",
+      "streaming": "Streaming",
+      "gaming": "Gaming",
+      "developer": "Developer",
+      "cloud": "Cloud & CDN",
+      "crypto": "Crypto Exchanges",
+      "news": "News & Wiki"
     }
   },
   "webrtc": {
@@ -855,6 +1000,7 @@
     "Suggested": "Suggested regions",
     "NoProbe": "No probes available in this country/region",
     "GroupFull": "Up to {max} countries/regions — deselect some first",
+    "UnreachableTarget": "Probes run on the public internet, so private and reserved addresses cannot be reached from any country.",
     "ResultsHint": "Results will appear here after you select probes and run the test.",
     "Asia": "Asia",
     "Europe": "Europe",
@@ -912,6 +1058,7 @@
     "Title": "IP Check",
     "Placeholder": "e.g. 1.1.1.1",
     "Error": "Please enter a valid IPv4 or IPv6 address.",
+    "reservedIP": "Private, loopback and other reserved addresses have no geolocation, so there is nothing to look up.",
     "NoData": "Unable to fetch information for this IP. It may be unroutable (e.g. 0.0.0.0, private address) or the upstream source has no data for it."
   },
   "alert": {
@@ -955,7 +1102,7 @@
     "OpenHighlightedTool": "Open Highlighted Advanced Tool",
     "RefreshRuleTests": "Refresh Rule Tests",
     "CensorshipCheck": "Open Censorship Check panel",
-    "Preferences": "Open Preferences",
+    "Pulse": "Open Earth Online panel",
     "Whois": "Open Whois Search panel",
     "ServiceStatus": "Open Service Status panel",
     "InvisibilityTest": "Open Invisibility Test panel",

@@ -19,10 +19,18 @@ const loadFirebaseAuth = () => {
     authModulePromise ??= Promise.all([
         import('firebase/app'),
         import('firebase/auth'),
-    ]).then(([{ initializeApp }, authModule]) => ({
-        ...authModule,
-        auth: authModule.getAuth(initializeApp(firebaseConfig)),
-    })).catch((error) => {
+    ]).then(([appModule, authModule]) => {
+        // Hostile client environments (extensions, filtered networks) can
+        // resolve a dynamic import to undefined instead of rejecting —
+        // convert that to a readable rejection so the retry path below runs.
+        if (!appModule?.initializeApp || !authModule?.getAuth) {
+            throw new Error('Firebase modules resolved without expected exports');
+        }
+        return {
+            ...authModule,
+            auth: authModule.getAuth(appModule.initializeApp(firebaseConfig)),
+        };
+    }).catch((error) => {
         // Don't memoize a transient chunk-load failure — the next auth
         // action should retry the import instead of replaying the rejection.
         authModulePromise = null;

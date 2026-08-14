@@ -7,7 +7,8 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requireValidIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId, requireValidReportId } from './common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId, requireValidReportId } from './common/guards.js';
+import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -21,6 +22,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
+import netOutagesHandler from './api/net-outages.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -240,17 +242,19 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
 app.get('/api/service-status/detail', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
 // Cache for 1 day
-app.get('/api/ipinfo', requireValidIP(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
-app.get('/api/ipapicom', requireValidIP(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
-app.get('/api/ipsb', requireValidIP(), cacheable(ONE_DAY_CACHE), ipsbHandler);
-app.get('/api/ipapiis', requireValidIP(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
-app.get('/api/ip2location', requireValidIP(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requireValidIP(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
+app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
+app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
+app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
+app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
+app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/whois', cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
 app.get('/api/configs', cacheable(ONE_HOUR_CACHE), validateConfigs);
+// Radar's outage feed moves on an hourly-ish cadence
+app.get('/api/outages', cacheable(ONE_HOUR_CACHE), netOutagesHandler);
 // OONI aggregates cover a 30-day window aligned to UTC days — the payload
 // only drifts as new measurements land, so 1 day of edge cache keeps us polite
 // to OONI's free API without the view going meaningfully stale.
@@ -268,7 +272,7 @@ app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
-app.get('/api/ipchecking', requireValidIP(), ipCheckingHandler);
+app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
 app.get('/api/dnsresolver', dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);

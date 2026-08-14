@@ -1,62 +1,29 @@
-import { isValidIP } from '@/utils/valid-ip.js';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { parseTrace } from '@/utils/parse-trace.js';
-import { getIPFromIpify_V6 } from "./ipify-v6";
+// IPCheck.ing IPv6 — resolves via 6.ipcheck.ing. On the original site the
+// JSON endpoint is preferred (trace as internal fallback); mirrors go
+// straight to trace. Chained ahead of IPify IPv6 in index.js.
+import { fetchWithTimeout } from '../fetch-with-timeout.js';
+import { parseTrace } from '../parse-trace.js';
 
-// Get IPv6 address from IPCheck.ing
-const getIPFromIPChecking6 = async (originalSite) => {
-    try {
-        let ip;
-        originalSite ? ip = await getFromJson() : ip = await getFromTrace();
-        const source = "IPCheck.ing IPv6";
-        if (isValidIP(ip)) {
-            return {
-                ip: ip,
-                source: source
-            };
-        } else {
-            console.warn("Invalid IP from IPCheck.ing IPv6:", ip);
-            return {
-                ip: null,
-                source: source
-            };
-        }
-    } catch (error) {
-        console.warn("Error fetching IP from IPCheck.ing IPv6:", error);
-    }
-    // Fallback
-    const { ip, source } = await getIPFromIpify_V6();
-    return {
-        ip: ip,
-        source: source
-    };
+const getFromTrace = async () => {
+    const response = await fetchWithTimeout('https://6.ipcheck.ing/cdn-cgi/trace');
+    const data = await response.text();
+    return parseTrace(data).ip ?? '';
 };
 
 const getFromJson = async () => {
     try {
-        const response = await fetchWithTimeout("https://6.ipcheck.ing");
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-
+        const response = await fetchWithTimeout('https://6.ipcheck.ing');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
-        const ip = data.ip;
-        return ip;
+        return data.ip;
     } catch (error) {
-        console.warn("Error fetching IP from IPCheck.ing IPv6 JSON:", error);
-    }
-    return getFromTrace();
-};
-
-const getFromTrace = async () => {
-    try {
-        const response = await fetchWithTimeout("https://6.ipcheck.ing/cdn-cgi/trace");
-        const data = await response.text();
-        return parseTrace(data).ip ?? "";
-    } catch (error) {
-        console.warn("Error fetching IP from IPCheck.ing IPv6 Trace:", error);
-        throw error;
+        console.warn('Error fetching IP from IPCheck.ing IPv6 JSON:', error);
+        return getFromTrace();
     }
 };
 
-export { getIPFromIPChecking6 };
+export const ipChecking6 = {
+    id: 'ipchecking-v6',
+    name: 'IPCheck.ing IPv6',
+    run: (originalSite) => (originalSite ? getFromJson() : getFromTrace()),
+};

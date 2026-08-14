@@ -67,14 +67,16 @@ describe('useAchievementEngine — guards', () => {
     assert.deepEqual(dispatched, []);
   });
 
-  it('dispatches a matching rule when signed in', () => {
+  it('dispatches a matching rule when signed in and synced', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     emitAppEvent('shortcut:help-opened');
     assert.deepEqual(dispatched, ['CleverTrickery']);
   });
 
   it('skips achievements that are already achieved', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     store.userAchievements.CleverTrickery.achieved = true;
     emitAppEvent('shortcut:help-opened');
     assert.deepEqual(dispatched, []);
@@ -82,6 +84,7 @@ describe('useAchievementEngine — guards', () => {
 
   it('respects the rule predicate', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     emitAppEvent('censorship:tested', { blocked: false });
     assert.deepEqual(dispatched, []);
     emitAppEvent('censorship:tested', { blocked: true });
@@ -89,9 +92,55 @@ describe('useAchievementEngine — guards', () => {
   });
 });
 
+describe('useAchievementEngine — remote sync gate', () => {
+  it('parks signed-in events until the snapshot lands, then re-checks and dispatches', () => {
+    store.isSignedIn = true;
+    emitAppEvent('shortcut:help-opened');
+    assert.deepEqual(dispatched, [], 'nothing may dispatch before the snapshot');
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, ['CleverTrickery']);
+  });
+
+  it('drops parked slugs the snapshot marks as achieved (the refresh race)', () => {
+    store.isSignedIn = true;
+    emitAppEvent('ipinfo:finished', { cards: [{ qualityScore: 100 }] });
+    // Remote snapshot arrives: SqueakyClean is already held by the account.
+    store.userAchievements.SqueakyClean.achieved = true;
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, []);
+  });
+
+  it('does not park events whose predicate fails', () => {
+    store.isSignedIn = true;
+    emitAppEvent('censorship:tested', { blocked: false });
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, []);
+  });
+
+  it('still drops signed-out events — they never reach the pending set', () => {
+    store.isSignedIn = false;
+    emitAppEvent('shortcut:help-opened');
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, []);
+  });
+
+  it('parks each slug once and replays the pending set exactly once', () => {
+    store.isSignedIn = true;
+    emitAppEvent('shortcut:help-opened');
+    emitAppEvent('shortcut:help-opened');
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, ['CleverTrickery']);
+    // Toggling the flag again must not re-dispatch a drained set.
+    store.userAchievementsSynced = false;
+    store.userAchievementsSynced = true;
+    assert.deepEqual(dispatched, ['CleverTrickery']);
+  });
+});
+
 describe('useAchievementEngine — queue', () => {
   it('one event can unlock several achievements, dispatched in rule order', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     emitAppEvent('speedtest:finished', { downloadSpeed: 1200, uploadSpeed: 260 });
     assert.deepEqual(dispatched, [
       'BarelyEnough', 'RapidPace', 'TorrentFlow', 'SteadyGoing', 'TooFastTooSimple',
@@ -100,6 +149,7 @@ describe('useAchievementEngine — queue', () => {
 
   it('filters already-achieved slugs when several rules match at once', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     store.userAchievements.RapidPace.achieved = true;
     emitAppEvent('speedtest:finished', { downloadSpeed: 600, uploadSpeed: 0 });
     assert.deepEqual(dispatched, ['BarelyEnough']);
@@ -107,6 +157,7 @@ describe('useAchievementEngine — queue', () => {
 
   it('stops listening after the scope is disposed', () => {
     store.isSignedIn = true;
+    store.userAchievementsSynced = true;
     scope.stop();
     emitAppEvent('shortcut:help-opened');
     assert.deepEqual(dispatched, []);

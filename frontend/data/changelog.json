@@ -1,7 +1,7 @@
 [
   {
     "version": "v1.0",
-    "date": "Nov 06, 2020",
+    "date": "2020-11-06",
     "content": [
       {
         "type": "add",
@@ -34,7 +34,7 @@
   },
   {
     "version": "v2.0",
-    "date": "Nov 24, 2023",
+    "date": "2023-11-24",
     "content": [
       {
         "type": "add",
@@ -58,7 +58,7 @@
   },
   {
     "version": "v2.1",
-    "date": "Nov 25, 2023",
+    "date": "2023-11-25",
     "content": [
       {
         "type": "add",
@@ -82,7 +82,7 @@
   },
   {
     "version": "v2.2",
-    "date": "Nov 26, 2023",
+    "date": "2023-11-26",
     "content": [
       {
         "type": "add",
@@ -115,7 +115,7 @@
   },
   {
     "version": "v2.3",
-    "date": "Nov 27, 2023",
+    "date": "2023-11-27",
     "content": [
       {
         "type": "add",
@@ -148,7 +148,7 @@
   },
   {
     "version": "v2.4",
-    "date": "Dec 1, 2023",
+    "date": "2023-12-01",
     "content": [
       {
         "type": "add",
@@ -181,7 +181,7 @@
   },
   {
     "version": "v2.5",
-    "date": "Dec 20, 2023",
+    "date": "2023-12-20",
     "content": [
       {
         "type": "add",
@@ -223,7 +223,7 @@
   },
   {
     "version": "v3.0",
-    "date": "Jan 28, 2024",
+    "date": "2024-01-28",
     "content": [
       {
         "type": "add",
@@ -265,7 +265,7 @@
   },
   {
     "version": "v3.1",
-    "date": "Jan 30, 2024",
+    "date": "2024-01-30",
     "content": [
       {
         "type": "add",
@@ -316,7 +316,7 @@
   },
   {
     "version": "v3.2",
-    "date": "Feb 3, 2024",
+    "date": "2024-02-03",
     "content": [
       {
         "type": "add",
@@ -349,7 +349,7 @@
   },
   {
     "version": "v3.3",
-    "date": "Feb 6, 2024",
+    "date": "2024-02-06",
     "content": [
       {
         "type": "add",
@@ -382,7 +382,7 @@
   },
   {
     "version": "v3.4",
-    "date": "Feb 17, 2024",
+    "date": "2024-02-17",
     "content": [
       {
         "type": "add",
@@ -415,7 +415,7 @@
   },
   {
     "version": "v3.5",
-    "date": "Mar 3, 2024",
+    "date": "2024-03-03",
     "content": [
       {
         "type": "add",
@@ -439,7 +439,7 @@
   },
   {
     "version": "v3.6",
-    "date": "Mar 10, 2024",
+    "date": "2024-03-10",
     "content": [
       {
         "type": "add",
@@ -472,7 +472,7 @@
   },
   {
     "version": "v3.7",
-    "date": "Apr 26, 2024",
+    "date": "2024-04-26",
     "content": [
       {
         "type": "add",
@@ -505,7 +505,7 @@
   },
   {
     "version": "v3.8",
-    "date": "May 4, 2024",
+    "date": "2024-05-04",
     "content": [
       {
         "type": "add",
@@ -547,7 +547,7 @@
   },
   {
     "version": "v3.9",
-    "date": "May 8, 2024",
+    "date": "2024-05-08",
     "content": [
       {
         "type": "add",
@@ -580,7 +580,7 @@
   },
   {
     "version": "v4.0",
-    "date": "May 13, 2024",
+    "date": "2024-05-13",
     "content": [
       {
         "type": "add",
@@ -631,7 +631,7 @@
   },
   {
     "version": "v4.1",
-    "date": "July 11, 2024",
+    "date": "2024-07-11",
     "content": [
       {
         "type": "add",
@@ -655,7 +655,7 @@
   },
   {
     "version": "v4.2",
-    "date": "Sept 25, 2024",
+    "date": "2024-09-25",
     "content": [
       {
         "type": "add",
@@ -688,7 +688,7 @@
   },
   {
     "version": "v4.3",
-    "date": "Oct 30, 2024",
+    "date": "2024-10-30",
     "content": [
       {
         "type": "add",
@@ -721,7 +721,7 @@
   },
   {
     "version": "v4.4",
-    "date": "Dec 7, 2024",
+    "date": "2024-12-07",
     "content": [
       {
         "type": "add",
@@ -754,7 +754,7 @@
   },
   {
     "version": "v4.5",
-    "date": "Dec 25, 2024",
+    "date": "2024-12-25",
     "content": [
       {
         "type": "add",
@@ -778,7 +778,7 @@
   },
   {
     "version": "v5.0",
-    "date": "Jan 31, 2025",
+    "date": "2025-01-31",
     "content": [
       {
         "type": "add",
@@ -829,7 +829,7 @@
   },
   {
     "version": "v5.1",
-    "date": "Nov 12, 2025",
+    "date": "2025-11-12",
     "content": [
       {
         "type": "add",
@@ -853,7 +853,7 @@
   },
   {
     "version": "v5.2",
-    "date": "Jan 05, 2026",
+    "date": "2026-01-05",
     "content": [
       {
         "type": "add",
@@ -886,7 +886,7 @@
   },
   {
     "version": "v5.3",
-    "date": "Apr 14, 2026",
+    "date": "2026-04-14",
     "content": [
       {
         "type": "add",
@@ -919,7 +919,7 @@
   },
   {
     "version": "v6.0",
-    "date": "Apr 19, 2026",
+    "date": "2026-04-19",
     "content": [
       {
         "type": "add",
@@ -1015,7 +1015,7 @@
   },
   {
     "version": "v6.1.0",
-    "date": "Apr 25, 2026",
+    "date": "2026-04-25",
     "content": [
       {
         "type": "add",
@@ -1093,7 +1093,7 @@
   },
   {
     "version": "v6.2.0",
-    "date": "May 13, 2026",
+    "date": "2026-05-13",
     "content": [
       {
         "type": "add",
@@ -1126,7 +1126,7 @@
   },
   {
     "version": "v6.3.0",
-    "date": "May 27, 2026",
+    "date": "2026-05-27",
     "content": [
       {
         "type": "add",
@@ -1177,7 +1177,7 @@
   },
   {
     "version": "v6.4.0",
-    "date": "June 1, 2026",
+    "date": "2026-06-01",
     "content": [
       {
         "type": "add",
@@ -1228,7 +1228,7 @@
   },
   {
     "version": "v6.5.0",
-    "date": "June 15, 2026",
+    "date": "2026-06-15",
     "content": [
       {
         "type": "add",
@@ -1270,7 +1270,7 @@
   },
   {
     "version": "v6.6.0",
-    "date": "July 1, 2026",
+    "date": "2026-07-01",
     "content": [
       {
         "type": "add",
@@ -1321,7 +1321,7 @@
   },
   {
     "version": "v7.0.0",
-    "date": "July 14, 2026",
+    "date": "2026-07-14",
     "content": [
       {
         "type": "add",
@@ -1426,7 +1426,7 @@
   },
   {
     "version": "v7.1.0",
-    "date": "July 21, 2026",
+    "date": "2026-07-21",
     "content": [
       {
         "type": "improve",
@@ -1468,7 +1468,7 @@
   },
   {
     "version": "v7.2.0",
-    "date": "July 28, 2026",
+    "date": "2026-07-28",
     "content": [
       {
         "type": "add",
@@ -1491,10 +1491,10 @@
       {
         "type": "add",
         "change": {
-          "en": "New AI assistant: IPChecking Copilot answers your questions from the docs, and can read your on-page results with your permission",
-          "zh": "新增 AI 助手 IPChecking Copilot：基于文档回答你的问题，并可在你授权后读取页面上的检测结果",
-          "fr": "Nouvel assistant IA : IPChecking Copilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
-          "ru": "Новый ИИ-помощник IPChecking Copilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения"
+          "en": "New AI assistant: IPilot answers your questions from the docs, and can read your on-page results with your permission",
+          "zh": "新增 AI 助手 IPilot：基于文档回答你的问题，并可在你授权后读取页面上的检测结果",
+          "fr": "Nouvel assistant IA : IPilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
+          "ru": "Новый ИИ-помощник IPilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения"
         }
       },
       {
@@ -1522,6 +1522,75 @@
           "zh": "修复了一些小问题",
           "fr": "Correction de petits problèmes",
           "ru": "Исправлены некоторые мелкие проблемы"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v7.3.0",
+    "date": "2026-08-15",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "IP cards and IP lookup now show the time zone of the located IP, with its current UTC offset",
+          "zh": "IP 信息卡片与 IP 查询新增时区显示，并附带当前 UTC 偏移",
+          "fr": "Les cartes IP et la recherche d'IP affichent désormais le fuseau horaire de l'IP localisée, avec son décalage UTC actuel",
+          "ru": "На карточках IP и в поиске по IP теперь отображается часовой пояс найденного IP-адреса и его текущее смещение UTC"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Connectivity: import curated test lists — country packs (Iran, Russia, China) plus AI, social, streaming, gaming, developer, cloud, crypto and news sets",
+          "zh": "网络连通性支持导入内置测试列表：伊朗、俄罗斯、中国等国家合集，以及 AI、社交、流媒体、游戏、开发者、云服务、加密交易所、新闻等主题合集",
+          "fr": "Connectivité : importez des listes de tests prêtes à l'emploi — packs pays (Iran, Russie, Chine) et ensembles IA, réseaux sociaux, streaming, jeux, développeurs, cloud, crypto et actualités",
+          "ru": "Проверка доступности: импорт готовых списков — наборы по странам (Иран, Россия, Китай), а также ИИ, соцсети, стриминг, игры, разработка, облака, криптобиржи и новости"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Earth Online: see visitor status, global network outages, and share your own status",
+          "zh": "地球在线：查看全球访客的状态、全球网络故障情况，以及分享自己的状态",
+          "fr": "La Terre en ligne : voyez le statut des visiteurs, les pannes de réseau mondiales et partagez votre statut",
+          "ru": "Земля онлайн: смотрите статус посетителей, глобальные сбои сети и делитесь своим статусом"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "New achievements to unlock",
+          "zh": "新增一批可以解锁的成就",
+          "fr": "Nouveaux succès à débloquer",
+          "ru": "Новые достижения"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity cards now show real site favicons, and the test capacity grows to 60",
+          "zh": "连通性卡片改用网站真实图标显示，可测试数量上限提升至 60 个",
+          "fr": "Les cartes de connectivité affichent désormais les vraies favicons des sites, et la capacité de test passe à 60",
+          "ru": "Карточки доступности теперь показывают настоящие favicon сайтов, а лимит тестов увеличен до 60"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized some program logic to increase code reuse rate",
+          "zh": "优化了一些程序逻辑，提高代码复用率",
+          "fr": "Optimisation de certaines logiques de programmation pour augmenter le taux de réutilisation du code",
+          "ru": "Оптимизация некоторых логических программ для повышения коэффициента повторного использования кода"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые проблемы"
         }
       }
     ]

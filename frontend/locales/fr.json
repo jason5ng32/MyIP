@@ -32,7 +32,7 @@
       "Benefit2": "Peut utiliser le test d'invisibilité",
       "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
       "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Peut poser des questions à IPChecking Copilot, notre assistant IA",
+      "Benefit5": "Peut poser des questions à IPilot, notre assistant IA",
       "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
       "FootNote": "D'autres avantages sont en cours de développement..."
     },
@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "Huit personnes traversent la muraille",
           "Meet": "Toutes les 8 adresses IP de test sont différentes dans le test de règles"
+        },
+        "GlobeTrotter": {
+          "Title": "Globe-trotteur",
+          "Meet": "Atteignez 10 pays ou régions dans votre historique d'IP"
+        },
+        "HelloWorld": {
+          "Title": "Bonjour le monde",
+          "Meet": "Partagez un statut sur La Terre en ligne"
+        },
+        "AddSweetAdd": {
+          "Title": "Ajout doux ajout",
+          "Meet": "Ajoutez une cible personnalisée au test de connectivité"
+        },
+        "PrettyDirty": {
+          "Title": "Plutôt sale",
+          "Meet": "Une carte IP affiche un score de qualité de 1"
+        },
+        "SqueakyClean": {
+          "Title": "Blanc comme neige",
+          "Meet": "Une carte IP affiche un score de qualité de 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Parmi les manchots",
+          "Meet": "Une carte IP vous localise en Antarctique"
         }
       }
     }
@@ -152,7 +176,7 @@
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
     "DocsToolSummary": "Résultats de la page lus",
-    "AskCopilot": "Demander à IPChecking Copilot",
+    "AskIPilot": "Demander à IPilot",
     "OpenDocs": "Ouvrir la doc",
     "DocsGreetingTitle": "Comment puis-je vous aider ?",
     "DocsGreetingSubtitle": "Posez vos questions sur MyIP : les outils, vos résultats ou l'auto-hébergement.",
@@ -162,8 +186,105 @@
       "Comparer mes résultats de test WebRTC et de fuite DNS et me donner des suggestions",
       "Comment lire les résultats MTR ?",
       "Comment déployer mon propre MyIP ?",
-      "Je veux voir plus de documents d'aide"
+      "Je veux financer le projet MyIP"
     ],
+    "pulse": {
+      "title": "La Terre en ligne",
+      "tooltip": "Des visiteurs du monde entier",
+      "others": "Autres",
+      "shareStatus": "Partagez votre statut",
+      "liveMap": "Carte des visiteurs en temps réel",
+      "noVisitors": "Aucun visiteur pour l’instant",
+      "quiet": "Tout est calme pour l’instant — soyez le premier à partager",
+      "loadError": "Impossible de charger l'activité récente — réessayez dans un instant",
+      "share": "Part des visiteurs",
+      "latest": "À l’instant",
+      "sent": "Envoyé",
+      "alreadySent": "Ce statut a déjà été envoyé",
+      "rateLimited": "Un seul statut possible sur une courte période",
+      "limitedTitle": "Statut à durée limitée",
+      "outages": {
+        "title": "Pannes d'Internet dans le monde",
+        "outage": "Panne d'Internet",
+        "anomaly": "Anomalie de trafic",
+        "ongoing": "En cours",
+        "ended": "Rétabli",
+        "started": "Commencé {time}",
+        "lasted": "A duré {duration}",
+        "quiet": "Tout est calme — aucune panne au cours des 30 derniers jours",
+        "loadMore": "Afficher plus",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Décision gouvernementale",
+          "POWER_OUTAGE": "Panne d'électricité",
+          "CABLE_CUT": "Câble sectionné",
+          "TECHNICAL_PROBLEM": "Problème technique",
+          "MECHANICAL": "Problème mécanique",
+          "UNKNOWN": "Cause inconnue",
+          "WEATHER": "Intempéries",
+          "FIRE": "Incendie",
+          "CYBERATTACK": "Cyberattaque",
+          "NATURAL_DISASTER": "Catastrophe naturelle",
+          "MAINTENANCE": "Maintenance",
+          "MILITARY_ACTION": "Action militaire"
+        },
+        "level": {
+          "NATIONWIDE": "National",
+          "REGIONAL": "Régional",
+          "NETWORK": "Réseau"
+        }
+      },
+      "statuses": {
+        "fast": "Réseau ultra rapide",
+        "ok": "Tout va bien ici",
+        "slow": "Réseau un peu lent",
+        "flaky": "Connexion instable",
+        "blocked": "Un site ne s'ouvre pas",
+        "good": "De bonne humeur aujourd'hui",
+        "bad": "Journée difficile",
+        "passing": "Juste de passage",
+        "lag": "Lag de jeu insupportable",
+        "newip": "Nouvelle IP toute fraîche",
+        "vpn": "Je passe par un VPN",
+        "night": "Encore debout à cette heure",
+        "vibing": "Vibe coding",
+        "fixing": "Je répare encore le Wi-Fi familial",
+        "tuning": "Encore 10 ms de gagnées",
+        "prgday": "Bon 0x100ᵉ jour !",
+        "internetday": "LO et voilà — bon anniversaire Internet",
+        "halloween": "Un ping ou un sort !",
+        "diwali": "La fête des lumières (et de la fibre)",
+        "christmas": "Le Père Noël passe par la ligne dédiée",
+        "newyear": "Nouvelle année, nouvelle IP !",
+        "privacyday": "Ce statut est chiffré de bout en bout",
+        "lunar": "Que tous vos paquets rouges arrivent",
+        "valentine": "Recherche connexion stable",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "Aïd Moubarak !",
+        "aprilfools": "Mon IP est 127.0.0.1",
+        "earthday": "Déconnexion — je vais toucher de l'herbe",
+        "turing": "Ce statut a été envoyé par un humain. Probablement.",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "Joyeux anniversaire IPCheck.ing !"
+      },
+      "festivalDesc": {
+        "prgday": "Jour du programmeur — le 256ᵉ jour de l'année, 0x100 en hexadécimal",
+        "internetday": "Le 29 octobre 1969, ARPANET voulait envoyer LOGIN — ça a planté après « LO »",
+        "halloween": "Halloween (31 octobre) — le plus effrayant reste la perte de paquets",
+        "diwali": "Diwali — que vos lampes et votre fibre brillent",
+        "christmas": "Noël — traîneau sur ligne dédiée, zéro gigue",
+        "newyear": "Nouvel An — feu d'artifice inclus, sans bande passante supplémentaire",
+        "privacyday": "Journée de la protection des données (28 janvier) — oui, l'ironie est voulue",
+        "lunar": "Nouvel An lunaire — zéro perte sur les paquets rouges",
+        "valentine": "Saint-Valentin — TCP ou amour, tout commence par un handshake",
+        "jobs": "Anniversaire de Steve Jobs (24 février 1955) — extrait de son discours à Stanford en 2005",
+        "eid": "Aïd el-Fitr — meilleurs vœux depuis la Terre en ligne",
+        "aprilfools": "1ᵉʳ avril — rien ne vaut 127.0.0.1",
+        "earthday": "Jour de la Terre (22 avril) — même la Terre en ligne conseille un peu de Terre hors ligne",
+        "turing": "Anniversaire d'Alan Turing (23 juin 1912) — le père du test de Turing",
+        "emojiday": "Journée mondiale des emojis (17 juillet) — les mots, c'était le siècle dernier",
+        "birthday": "Anniversaire d'IPCheck.ing — la v1.0 est sortie le 6 novembre 2020"
+      }
+    },
     "preferences": {
       "title": "Préférences",
       "preferenceTips": "Ces paramètres sont enregistrés dans votre navigateur pour une utilisation ultérieure. Certains paramètres nécessitent un rafraîchissement de la page pour prendre effet.",
@@ -191,7 +312,9 @@
       "language": "Paramètres de langue",
       "languageTips": "Rafraîchissement du navigateur pour prendre effet."
     },
-    "DocsPrompt": "Saisissez votre question…"
+    "DocsPrompt": "Saisissez votre question…",
+    "DocsSignInTitle": "Connexion requise",
+    "DocsSignInMessage": "Connectez-vous pour interroger IPilot"
   },
   "securitychecklist": {
     "Title": "Liste de vérification de sécurité",
@@ -478,6 +601,8 @@
     "Note3": "Whois informations contient plusieurs types de champs, voici le texte brut original",
     "Placeholder": "Nom de domaine ou IP",
     "invalidURL": "Nom de domaine ou IP invalide",
+    "reservedIP": "Les adresses IP privées ou réservées n'ont aucun enregistrement public, il n'y a donc rien à consulter.",
+    "noData": "Aucune donnée Whois ou RDAP n'est publiée pour cette requête. Certains domaines de premier niveau ne proposent pas de service de consultation public.",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
   },
@@ -659,6 +784,7 @@
     "Country": "Région",
     "Region": "État",
     "City": "Ville",
+    "TimeZone": "Fuseau horaire",
     "ISP": "ISP",
     "ASN": "ASN",
     "Coordinates": "Coordonnées",
@@ -767,11 +893,6 @@
   "connectivity": {
     "Title": "Connectivité réseau",
     "Note": "Ce test vérifie si vous pouvez atteindre un site web donné. Il fonctionne en chargeant une petite image depuis ce site. Les valeurs de délai sont données à titre indicatif seulement et seront plus petites en réalité. Vous pouvez ajouter d'autres sites web que vous utilisez fréquemment à la liste de tests pour des tests rapides.",
-    "ServiceStatusBanner": {
-      "Title": "Un service ne se charge pas ?",
-      "Note": "Si un produit d'IA comme ChatGPT ou Claude a échoué au test ci-dessus, le problème ne vient peut-être pas de votre réseau — le service lui-même peut être en panne. Vérifiez sa disponibilité en temps réel et ses incidents récents.",
-      "CTA": "Ouvrir l'état des services"
-    },
     "StatusWait": "En attente du test",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",
@@ -793,7 +914,30 @@
       "NameRequired": "Veuillez saisir un nom.",
       "UrlRequired": "Veuillez saisir une URL.",
       "InvalidUrl": "Cela ne ressemble pas à une URL valide.",
-      "LimitReached": "Limite de 10 tests personnalisés atteinte."
+      "LimitReached": "Limite de 60 tests atteinte."
+    },
+    "importDialog": {
+      "Title": "Ajouter / importer des tests",
+      "CustomOption": "Test personnalisé",
+      "ImportOption": "Importer une liste",
+      "SiteCount": "{n} sites",
+      "Import": "Importer",
+      "RemoveList": "Retirer cette liste",
+      "Capacity": "{used}/{limit} utilisés",
+      "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants."
+    },
+    "importLists": {
+      "iran": "Essentiels Iran",
+      "russia": "Essentiels Russie",
+      "china": "Essentiels Chine",
+      "ai": "Services IA",
+      "social": "Réseaux sociaux",
+      "streaming": "Streaming",
+      "gaming": "Jeux vidéo",
+      "developer": "Développeurs",
+      "cloud": "Cloud et CDN",
+      "crypto": "Plateformes crypto",
+      "news": "Actualités"
     }
   },
   "webrtc": {
@@ -856,6 +1000,7 @@
     "Suggested": "Régions suggérées",
     "NoProbe": "Aucune sonde disponible dans ce pays/région",
     "GroupFull": "{max} pays/régions maximum — décochez-en d'abord",
+    "UnreachableTarget": "Les sondes fonctionnent sur l'internet public : les adresses privées et réservées ne sont joignables depuis aucun pays.",
     "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
     "Asia": "Asie",
     "Europe": "Europe",
@@ -913,6 +1058,7 @@
     "Title": "Vérification IP",
     "Placeholder": "ex. 1.1.1.1",
     "Error": "Veuillez entrer une adresse IPv4 ou IPv6 valide.",
+    "reservedIP": "Les adresses privées, de bouclage et autres adresses réservées n'ont pas de géolocalisation, il n'y a donc rien à consulter.",
     "NoData": "Impossible de récupérer les informations pour cette IP. Elle peut être non routable (ex. 0.0.0.0, adresse privée) ou la source amont n'a pas de données pour celle-ci."
   },
   "alert": {
@@ -956,7 +1102,7 @@
     "OpenHighlightedTool": "Ouvrir l'outil avancé sélectionné",
     "RefreshRuleTests": "Actualiser les tests de règles",
     "CensorshipCheck": "Ouvrir le Test de censorship",
-    "Preferences": "Ouvrir les Préférences",
+    "Pulse": "Ouvrir la Terre en ligne",
     "Whois": "Ouvrir la Recherche Whois",
     "ServiceStatus": "Ouvrir l'état des services",
     "InvisibilityTest": "Ouvrir le Test d'invisibilité",

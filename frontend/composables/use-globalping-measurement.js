@@ -25,6 +25,7 @@
 
 import { ref, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
+import { isValidIP, isUsablePublicIP } from '../utils/valid-ip.js';
 
 // Curated 28-country spread shared by the MtrTest and GlobalLatencyTest
 // tools: their picker's "suggested" section and default selection. The full
@@ -48,6 +49,19 @@ export const GLOBALPING_MAX_COUNTRIES = 30;
 // Globalping tools' IP picker dropdowns.
 export function selectableIPs(storeIPs) {
     return storeIPs.filter((e) => e && e.ip && !e.ip.includes(' '));
+}
+
+// Classify a typed measurement target into one of four states, so the manual
+// -entry inputs can style themselves and explain a rejection. 'unreachable'
+// is the interesting one: Globalping probes sit on the public internet, so an
+// address outside publicly routable space — most often the visitor's own LAN
+// IP — has no path from any country. Shared by MtrTest / GlobalLatencyTest.
+export function classifyTarget(input) {
+    const ip = typeof input === 'string' ? input.trim() : '';
+    if (ip === '') return 'empty';
+    if (!isValidIP(ip)) return 'invalid';
+    if (!isUsablePublicIP(ip)) return 'unreachable';
+    return 'ok';
 }
 
 const API_BASE = 'https://api.globalping.io/v1/measurements';

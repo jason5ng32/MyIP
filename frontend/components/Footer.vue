@@ -14,8 +14,8 @@
           {{ t('about.Privacy') }}
         </RouterLink>
       </Button>
-      <Button v-if="isDocsConfigured" variant="link" size="default" as-child class="cursor-pointer">
-        <a :href="DOCS_URL+'/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
+      <Button variant="link" size="default" as-child class="cursor-pointer">
+        <a :href="'https://docs.ipcheck.ing/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
           @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
           {{ t('about.HelpCenter') }}
         </a>
@@ -59,7 +59,7 @@
     <!-- About Sheet -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
       <SheetContent side="right" :title="t('about.Title')"
-        :class="['flex flex-col p-0 gap-0', isMobile ? 'w-full max-w-full' : 'w-[500px] max-w-[500px]']">
+        :class="['flex flex-col p-0 gap-0 w-full max-w-full md:w-125 md:max-w-125']">
         <Tabs v-model="content" class="flex flex-col h-full">
           <!-- Top: tabs + close -->
           <div class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
@@ -108,13 +108,14 @@
             </TabsContent>
 
             <!-- Changelog -->
-            <!-- Data lives in frontend/data/changelog.json (shared version / date, per-lang change text).
-                Badge labels and the section title stay in locale files as UI chrome. -->
+            <!-- Data lives in frontend/data/changelog.json (shared version, ISO date, per-lang change
+                text). Dates localize at render via formatIsoDate; badge labels and the section title
+                stay in locale files as UI chrome. -->
             <TabsContent value="changelog" class="space-y-6 mt-0">
               <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
                   <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
-                  <span class="text-xs text-muted-foreground tabular-nums">{{ version.date }}</span>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale) }}</span>
                 </header>
                 <Separator class="mb-3" />
                 <ul class="space-y-2">
@@ -165,7 +166,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/analytics';
-import { DOCS_URL, isDocsConfigured } from '@/composables/use-docs-assistant';
+import { formatIsoDate } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';

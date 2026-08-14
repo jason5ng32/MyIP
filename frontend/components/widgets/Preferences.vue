@@ -2,7 +2,7 @@
     <!-- Preferences panel -->
     <Sheet :open="isOpen" @update:open="onOpenChange">
         <SheetContent side="left" :title="t('nav.preferences.title')"
-            class="flex flex-col p-0 gap-0 w-full max-w-full md:w-[420px] md:max-w-[420px]">
+            class="flex flex-col p-0 gap-0 w-full max-w-full md:w-125 md:max-w-125">
             <!-- Header -->
             <header class="flex items-center justify-between gap-2 px-4 py-3 border-b shrink-0">
                 <h2 class="flex items-center gap-2 text-base font-semibold m-0">

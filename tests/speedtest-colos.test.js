@@ -14,9 +14,12 @@ describe('getColoCountry(abbr)', () => {
     assert.deepEqual(getColoCountry('HKG'), { country: 'HK', city: 'Hong Kong' });
   });
 
-  it('throws for unknown abbr (direct access on undefined)', () => {
-    // Note: current implementation `coloList[abbr].country` throws if abbr is unknown.
-    // If future implementation uses safe fallback, this test needs to be updated.
-    assert.throws(() => getColoCountry('ZZZ'));
+  it('covers PoPs added after the original snapshot', () => {
+    assert.deepEqual(getColoCountry('WLG'), { country: 'NZ', city: 'Wellington' });
+    assert.deepEqual(getColoCountry('CVG'), { country: 'US', city: 'Cincinnati' });
+  });
+
+  it('falls back to empty fields for an unknown abbr', () => {
+    assert.deepEqual(getColoCountry('ZZZ'), { country: '', city: '' });
   });
 });

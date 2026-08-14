@@ -5,7 +5,7 @@ import App from './App.vue'
 import i18n, { loadActiveLocaleMessages } from './locales/i18n';
 import router from './router';
 import { analytics } from './utils/analytics';
-import { getTimezoneInfo } from './utils/timezone';
+import { getTimezoneInfo } from './utils/time-utils';
 import { isRunningAsPwa } from './utils/pwa';
 import { readAuthHint } from './utils/auth-hint';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
@@ -154,6 +154,12 @@ Promise.all([
     // probe auth once in the background so an already-signed-in user is
     // recognized and the next boot takes the exact path.
     if (store.isFireBaseSet && authHint === null) {
-        setTimeout(() => store.initializeAuthListener(), 3000);
+        // Probe failure means "treat as visitor" — never an error: an
+        // uncaught rejection here would reach Sentry as a crash signal.
+        setTimeout(() => {
+            store.initializeAuthListener().catch((error) => {
+                console.warn('Background auth probe failed, continuing as visitor:', error);
+            });
+        }, 3000);
     }
 });

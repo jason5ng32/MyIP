@@ -31,6 +31,7 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
         city: data.city || "",
         latitude: data.latitude || "",
         longitude: data.longitude || "",
+        timezone: data.timezone || "",
         isp: data.org || "",
         asn: data.asn || "",
         asnlink: data.asn ? data.asn.startsWith('AS') ? `https://bgp.tools/as/${data.asn}` : false : false,

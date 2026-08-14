@@ -1,5 +1,5 @@
 import { createI18n } from 'vue-i18n';
-import { PREFS_STORAGE_KEY, LEGACY_PREFS_KEYS } from '../data/default-preferences.js';
+import { PREFS_STORAGE_KEY } from '../data/default-preferences.js';
 
 // Locale messages are loaded on demand so the first-paint path carries only the
 // language actually in use. Bundling all four eagerly cost ~44 KB gzipped of dead
@@ -20,19 +20,15 @@ const localeLoaders = {
 const supportedLanguages = Object.keys(localeLoaders);
 const FALLBACK_LOCALE = 'en';
 
-// Read the saved language from localStorage, trying the current prefs key then
-// the legacy ones (so a freshly bumped key still finds the choice before
-// loadPreferences migrates it). Keys come from default-preferences.js so they
-// stay in step with what store.js writes.
+// Read the saved language from the current prefs key. The key comes from
+// default-preferences.js so it stays in step with what store.js writes.
 function readStoredLang() {
-  for (const key of [PREFS_STORAGE_KEY, ...LEGACY_PREFS_KEYS]) {
-    const raw = localStorage.getItem(key);
-    if (!raw) continue;
-    try {
-      const prefs = JSON.parse(raw);
-      if (supportedLanguages.includes(prefs?.lang)) return prefs.lang;
-    } catch { /* ignore malformed entry, try the next key */ }
-  }
+  const raw = localStorage.getItem(PREFS_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const prefs = JSON.parse(raw);
+    if (supportedLanguages.includes(prefs?.lang)) return prefs.lang;
+  } catch { /* malformed entry — fall through to the default pick */ }
   return null;
 }
 

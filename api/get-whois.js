@@ -1,5 +1,5 @@
 import whoiser from 'whoiser';
-import { isValidIP } from '../common/valid-ip.js';
+import { isValidIP, isUsablePublicIP } from '../common/valid-ip.js';
 import { rdapDomain, rdapIp } from '../common/rdap.js';
 import logger from '../common/logger.js';
 
@@ -28,6 +28,12 @@ export default async (req, res) => {
     }
     if (!isValidIP(query) && !isValidDomain(query)) {
         return res.status(400).json({ error: 'Invalid IP or address' });
+    }
+    // Only publicly routable addresses have a registry record — asking RDAP
+    // or WHOIS about anything else burns an upstream call to earn a
+    // guaranteed failure. Visitors paste their LAN address routinely.
+    if (isValidIP(query) && !isUsablePublicIP(query)) {
+        return res.status(400).json({ error: 'Not a public IP address' });
     }
 
     // IP path: RDAP first — authoritative-RIR HTTPS + JSON, immune to the

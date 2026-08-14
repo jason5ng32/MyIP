@@ -28,7 +28,13 @@ frontend/
 ├── lib/             ← cn() only (shadcn support layer)
 ├── data/            ← static config: achievements + achievement-rules /
 │                      ip-databases / sections / changelog / tools registry
-│                      (router + cards + drawer all derive from it)
+│                      (router + cards + drawer all derive from it) /
+│                      pulse-statuses (Earth Online vocabulary: presets +
+│                      date-windowed festival statuses + their celebration
+│                      effect mapping; recipes in utils/pulse-celebration.js)/
+│                      connectivity-import-lists (curated target sets; icons
+│                      are committed 64px PNGs under public/favicons/ — one
+│                      per member, enforced by its data test)
 ├── utils/           ← framework-agnostic helpers + IO
 │                      (app-events bus / getips/ / valid-ip / analytics / …)
 ├── composables/     ← Vue-aware `useXxx` logic
@@ -59,7 +65,9 @@ unconditionally — `emitAppEvent('speedtest:finished', {…})` on the
 `utils/app-events.js` bus — and the pipeline downstream handles the rest:
 `data/achievement-rules.js` maps events to achievement slugs (single place to
 look for "what unlocks X"); `composables/use-achievement-engine.js` (init'd
-once in App.vue) owns the signed-in / already-achieved / rate guards.
+once in App.vue) owns the signed-in / remote-sync / already-achieved / rate
+guards (rules never evaluate until the remote achievements snapshot lands —
+`store.userAchievementsSynced`; pre-sync hits are parked and re-checked).
 New achievement = entry in `data/achievements.js` + rule + (only if no
 suitable event exists) a new domain event. Tests:
 `tests/achievement-rules.test.js`, `tests/composable-achievement-engine.test.js`.
@@ -92,10 +100,13 @@ philosophy as `firebase-init.js`). Two rules:
   indistinguishable from visitor-side conditions (no IPv6 / dead network),
   which is routine noise.
 
-Capture surface: uncaught errors; `console.error` (fingerprinted per message
-prefix so each source stays a distinct issue; individual `utils/getips/`
-source failures are `console.warn` — invisible to Sentry by design, the
-per-card exhaustion event above is the health signal); route-change traces;
+Capture surface: uncaught errors; `console.error` (fingerprinted on the first
+argument, so a call site that fails several ways names the failure there —
+`fetchErrorLabel` in `utils/authenticated-fetch.js` renders the HTTP status,
+keeping an edge-blocked 403 out of the same issue as a 5xx; individual
+`utils/getips/` source failures are `console.warn` — invisible to Sentry by
+design, the per-card exhaustion event above is the health signal);
+route-change traces;
 error-only Replay, page text deliberately unmasked (the visitor's on-screen
 network info IS the debugging context; typed input stays masked; disclosed
 in the privacy policy). Third-party script errors (Cloudflare's RUM beacon)

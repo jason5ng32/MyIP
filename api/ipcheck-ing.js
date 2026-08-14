@@ -2,7 +2,8 @@ import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 
 export default async (req, res) => {
-    // IP presence + validity guaranteed by requireValidIP middleware.
+    // Presence, validity and public routability guaranteed by the
+    // requirePublicIP middleware — a reserved address never reaches here.
     const ipAddress = req.query.ip;
 
     const key = process.env.IPCHECKING_API_KEY;

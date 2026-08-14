@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 
@@ -71,8 +72,9 @@ export default async (req, res) => {
     const url = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&markers=color:blue%7C${latitude},${longitude}&scale=${scale}&zoom=${zoom}&maptype=roadmap&language=${language}&format=${fmt}&size=${mapSize}&style=${styleParam}&key=${apiKey}`;
 
     // Unlike the JSON handlers, the Static Maps response is a binary JPEG
-    // and must be passed through to the client. Convert the WHATWG ReadableStream
-    // from fetch into a Node Readable and pipe it at the Express response.
+    // and must be passed through to the client. pipeline() propagates errors
+    // both ways: an upstream reset destroys the response, a client
+    // disconnect cancels the upstream body.
     try {
         const apiRes = await fetchUpstream(url);
         if (!apiRes.ok) {
@@ -84,9 +86,14 @@ export default async (req, res) => {
         if (res.locals.cacheControl) {
             res.setHeader('Cache-Control', res.locals.cacheControl);
         }
-        Readable.fromWeb(apiRes.body).pipe(res);
+        await pipeline(Readable.fromWeb(apiRes.body), res);
     } catch (e) {
+        // Visitors abandoning a half-loaded image are routine, not a failure.
+        if (e?.code === 'ERR_STREAM_PREMATURE_CLOSE') return;
         logger.error({ err: e, latitude, longitude, language, CanvasMode }, 'google-map handler failed');
-        res.status(500).json({ error: e.message });
+        if (!res.headersSent && !res.destroyed) {
+            return res.status(500).json({ error: e.message });
+        }
+        if (!res.destroyed) res.destroy();
     }
 };

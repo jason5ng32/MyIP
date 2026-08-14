@@ -1,8 +1,13 @@
 // use-shortcuts depends on shortcut.js, which calls document.addEventListener at module load time.
 // Here we inject minimal document / window stubs first, then dynamically import the tested module.
+//
+// pulse-beacon.js pulls `@/utils/...` (Vite alias) and gates the `p` shortcut on a
+// build-time env flag — both are awkward in the Node runner. A load hook stubs
+// that module with a mutable `isPulseEnabled` so we can cover both branches.
 
 import assert from 'node:assert/strict';
 import { describe, it, after } from 'node:test';
+import { registerHooks } from 'node:module';
 import { ref, computed, reactive } from 'vue';
 
 const documentHandlers = {};
@@ -20,6 +25,24 @@ globalThis.window = {
   pageYOffset: 0,
 };
 
+registerHooks({
+  load(url, context, nextLoad) {
+    if (url.includes('/utils/pulse-beacon.js')) {
+      return {
+        format: 'module',
+        shortCircuit: true,
+        source: `
+          export const PULSE_URL = 'https://pulse.test';
+          export const sendVisitBeacon = () => {};
+          export let isPulseEnabled = false;
+          globalThis.__setPulseEnabledForTest = (v) => { isPulseEnabled = Boolean(v); };
+        `,
+      };
+    }
+    return nextLoad(url, context);
+  },
+});
+
 const { useShortcuts } = await import('../frontend/composables/use-shortcuts.js');
 const { onAppEvent } = await import('../frontend/utils/app-events.js');
 
@@ -28,10 +51,12 @@ const t = (k) => `<${k}>`;
 function makeStoreStub() {
   const state = reactive({
     refreshRequested: false,
+    toggledSheets: [],
   });
   return {
     state,
     setRefreshEveryThing(v) { state.refreshRequested = v; },
+    toggleSheet(name) { state.toggledSheets.push(name); },
   };
 }
 
@@ -86,13 +111,19 @@ globalThis.setTimeout = (fn) => { fn(); return 0; };
 
 after(() => {
   globalThis.setTimeout = realSetTimeout;
+  globalThis.__setPulseEnabledForTest?.(false);
 });
 
-function loadAndGetKeyMap({ originalSite = false } = {}) {
+function loadAndGetKeyMap({
+  originalSite = false,
+  ipHistoryEnabled = true,
+  pulseEnabled = false,
+} = {}) {
+  globalThis.__setPulseEnabledForTest(pulseEnabled);
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
   const configs = computed(() => ({ originalSite, map: true }));
-  const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
+  const userPreferences = computed(() => ({ ipCardsToShow: 2, ipHistoryEnabled }));
 
   const { loadShortcuts } = useShortcuts({
     refs, store, t, configs, userPreferences,
@@ -106,20 +137,27 @@ function loadAndGetKeyMap({ originalSite = false } = {}) {
 
 describe('useShortcuts()', () => {
   it('loadShortcuts() registers a keymap of 27+ entries on a non-original site', () => {
-    const { keyMap } = loadAndGetKeyMap({ originalSite: false });
-    // 27 base entries (no invisibility); keyMap is append-only globally so ≥ 27
+    const { keyMap } = loadAndGetKeyMap({ originalSite: false, pulseEnabled: false });
+    // 27 base entries (no invisibility / enhanced-DNS / pulse); keyMap is
+    // append-only globally so ≥ 27
     const distinctKeys = new Set(keyMap.map((e) => e.keys));
     assert.ok(distinctKeys.size >= 27, `expected ≥27 distinct shortcut keys, got ${distinctKeys.size}`);
     assert.ok(distinctKeys.has('R'));
     assert.ok(distinctKeys.has('?'));
     assert.ok(distinctKeys.has('g'));
     assert.ok(distinctKeys.has('o'));
+    assert.ok(distinctKeys.has('H'));
+    assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off when isPulseEnabled is false');
   });
 
-  it('originalSite=true adds the invisibility-test shortcut (key "i")', () => {
-    const { keyMap } = loadAndGetKeyMap({ originalSite: true });
+  it('originalSite=true adds invisibility ("i") and enhanced DNS-leak ("D") shortcuts', () => {
+    const { keyMap, calls } = loadAndGetKeyMap({ originalSite: true });
     const hasInvisibility = keyMap.some((e) => e.keys === 'i');
     assert.ok(hasInvisibility, 'key "i" should be present on originalSite');
+    const D = keyMap.findLast((e) => e.keys === 'D');
+    assert.ok(D, 'key "D" should be present on originalSite');
+    D.action();
+    assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest']);
   });
 
   it('"R" action triggers store.setRefreshEveryThing(true)', () => {
@@ -149,7 +187,7 @@ describe('useShortcuts()', () => {
   it('numeric shortcut respects userPreferences.ipCardsToShow upper bound', () => {
     const { keyMap, calls } = loadAndGetKeyMap();
     const entry = keyMap.findLast((e) => e.type === 'regex');
-    entry.action(6); // beyond ipCardsToShow (4)
+    entry.action(6); // beyond ipCardsToShow (2)
     assert.deepEqual(calls.ipRefresh, [], 'num > ipCardsToShow → no-op');
   });
 
@@ -179,6 +217,29 @@ describe('useShortcuts()', () => {
     const entry = keyMap.findLast((e) => e.keys === 'h');
     entry.action();
     assert.equal(calls.mask, 1);
+  });
+
+  it('"H" opens the IP history sheet when ipHistoryEnabled', () => {
+    const { keyMap, store } = loadAndGetKeyMap({ ipHistoryEnabled: true });
+    const entry = keyMap.findLast((e) => e.keys === 'H');
+    assert.ok(entry, '"H" key should be registered');
+    entry.action();
+    assert.deepEqual(store.state.toggledSheets, ['ipHistory']);
+  });
+
+  it('"H" is a no-op when ipHistoryEnabled is false', () => {
+    const { keyMap, store } = loadAndGetKeyMap({ ipHistoryEnabled: false });
+    const entry = keyMap.findLast((e) => e.keys === 'H');
+    entry.action();
+    assert.deepEqual(store.state.toggledSheets, []);
+  });
+
+  it('isPulseEnabled adds the pulse shortcut (key "p")', () => {
+    const { keyMap, store } = loadAndGetKeyMap({ pulseEnabled: true });
+    const entry = keyMap.findLast((e) => e.keys === 'p');
+    assert.ok(entry, '"p" key should be present when isPulseEnabled');
+    entry.action();
+    assert.deepEqual(store.state.toggledSheets, ['pulse']);
   });
 
   it('"o" opens the highlighted advanced tool by its data-adv-slug', () => {

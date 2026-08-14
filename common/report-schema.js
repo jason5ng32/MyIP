@@ -83,6 +83,7 @@ const bool = () => ({ kind: 'bool' });
 const oneOf = (...values) => ({ kind: 'enum', values });
 const isoDate = () => ({ kind: 'isoDate' });
 const countryCode = () => ({ kind: 'countryCode' });
+const timeZone = () => ({ kind: 'timeZone' });
 const ipValue = () => ({ kind: 'ip' });
 const ipOrDomain = () => ({ kind: 'ipOrDomain' });
 const arr = (max, items) => ({ kind: 'array', max, items });
@@ -136,6 +137,7 @@ const SECTION_SPECS = {
             countryCode: opt(countryCode()),
             region: opt(str(64)),
             city: opt(str(64)),
+            timezone: opt(timeZone()),
             asn: opt(str(16)),
             isp: opt(str(128)),
             // IPCheck.ing-source enrichments — absent on other sources, when
@@ -151,7 +153,9 @@ const SECTION_SPECS = {
     }),
     connectivity: obj({
         testedAt: isoDate(),
-        targets: arr(24, obj({
+        // 72 = 7 built-in targets + the 60-target custom/import cap, plus
+        // headroom; matches the builder's slice in utils/report-builders.js.
+        targets: arr(72, obj({
             id: str(48),
             name: str(64),
             status: oneOf(...Object.values(CONNECTIVITY_STATUS)),
@@ -331,6 +335,13 @@ const checkLeaf = (value, spec) => {
             // '' is a legal "unknown" — several sources can't always geolocate.
             return typeof value === 'string' && (value === '' || /^[a-z]{2}$/i.test(value))
                 ? null : 'expected 2-letter country code or empty string';
+        case 'timeZone':
+            // IANA zone names: 'UTC', 'Asia/Singapore', 'America/Argentina/Buenos_Aires'.
+            // Unlike countryCode, '' is not legal here — the builder omits the
+            // field rather than reporting a zone it couldn't derive.
+            return typeof value === 'string' && value.length <= 64
+                && /^[A-Za-z][A-Za-z0-9_+-]*(?:\/[A-Za-z0-9_+-]+)*$/.test(value)
+                ? null : 'expected IANA time zone name';
         case 'ip':
             return typeof value === 'string' && (isValidIP(value) || isMaskedIP(value))
                 ? null : 'expected IP address (full or tail-masked)';

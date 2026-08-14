@@ -8,7 +8,7 @@
     <Sparkle class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground z-10" />
     <!-- Focused, the native placeholder prompts for a question; idle, the
          rotating overlay below advertises what can be asked. -->
-    <Input v-model="query" type="text" :aria-label="t('nav.AskCopilot')" :disabled="isDocsOpen"
+    <Input v-model="query" type="text" :aria-label="t('nav.AskIPilot')" :disabled="isDocsOpen"
       :placeholder="isFocused ? t('nav.DocsPrompt') : ''"
       class="h-8 w-44 focus:w-64 transition-[width] duration-300 pl-8 text-sm" autocomplete="off" autocorrect="off"
       autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
@@ -27,8 +27,8 @@
     </div>
   </form>
 
-  <JnTooltip v-else-if="enabled" :text="t('nav.AskCopilot')">
-    <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.AskCopilot')"
+  <JnTooltip v-else-if="enabled" :text="t('nav.AskIPilot')">
+    <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.AskIPilot')"
       :disabled="isDocsOpen" @click="openAssistant">
       <Sparkle />
     </Button>
@@ -52,12 +52,12 @@ const { t } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 
-// Three gates: a docs site to answer from (build time), the canonical
-// deployment (same as the original-site-only advanced tools), and a signed-in
-// visitor.
+// Two gates for visibility: a docs site to answer from (build time) and the
+// canonical deployment (same as the original-site-only advanced tools).
+// Using the assistant additionally requires sign-in — enforced inside
+// askDocs, which prompts signed-out visitors to sign in.
 const enabled = computed(() => isDocsConfigured
-  && store.configs?.originalSite === true
-  && store.isSignedIn === true);
+  && store.configs?.originalSite === true);
 
 // While the assistant panel is open it owns the conversation, so this entry
 // point goes inert — otherwise there are two places to type. State comes from

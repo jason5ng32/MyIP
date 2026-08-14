@@ -1,22 +1,32 @@
 <script setup>
-// shadcn-vue Tabs 根组件（refactor/01 阶段 C commit 2）
-import { TabsRoot } from 'reka-ui';
+import { reactiveOmit } from "@vueuse/core";
+import { TabsRoot, useForwardPropsEmits } from "reka-ui";
+import { cn } from "@/lib/utils";
 
-defineProps({
-  modelValue: { type: String, default: undefined },
-  defaultValue: { type: String, default: undefined },
-  class: { type: [String, Array, Object], default: undefined },
+const props = defineProps({
+  defaultValue: { type: null, required: false },
+  orientation: { type: String, required: false },
+  dir: { type: String, required: false },
+  activationMode: { type: String, required: false },
+  modelValue: { type: null, required: false },
+  unmountOnHide: { type: Boolean, required: false },
+  asChild: { type: Boolean, required: false },
+  as: { type: null, required: false },
+  class: { type: null, required: false },
 });
-defineEmits(['update:modelValue']);
+const emits = defineEmits(["update:modelValue"]);
+
+const delegatedProps = reactiveOmit(props, "class");
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
   <TabsRoot
-    :model-value="modelValue"
-    :default-value="defaultValue"
-    :class="$props.class"
-    @update:model-value="$emit('update:modelValue', $event)"
+    v-slot="slotProps"
+    data-slot="tabs"
+    v-bind="forwarded"
+    :class="cn('flex flex-col gap-2', props.class)"
   >
-    <slot />
+    <slot v-bind="slotProps" />
   </TabsRoot>
 </template>

@@ -56,7 +56,7 @@ const store = useMainStore();
 const { isFireBaseSet } = storeToRefs(store);
 
 // Bump when the policy text changes materially.
-const LAST_UPDATED = '2026-07-28';
+const LAST_UPDATED = '2026-08-09';
 
 // Sentry telemetry is a build-time decision (see frontend/AGENTS.md): the
 // section only renders on deployments actually built with a DSN.
@@ -109,6 +109,9 @@ watch(locale, async (loc) => {
 // "why" section explains the reason for whichever collection is active.
 const order = computed(() => {
   const ids = ['tools'];
+  // Earth Online — build-time gate (VITE_PULSE_URL), same as its nav entry
+  // point: the section only renders on builds that actually ship the feature.
+  if ((import.meta.env ?? {}).VITE_PULSE_URL) ids.push('pulse');
   if (isReportSharingEnabled.value) ids.push('sharedReports');
   if (isDocsAssistantEnabled.value) ids.push('docsAssistant');
   if (isAnalyticsEnabled) ids.push('analytics');

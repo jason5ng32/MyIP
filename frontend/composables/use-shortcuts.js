@@ -20,8 +20,9 @@ import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
+import { isPulseEnabled } from '../utils/pulse-beacon.js';
 
-function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
+const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     const {
         queryIPRef,
         helpModalRef,
@@ -220,10 +221,21 @@ function buildShortcutConfig({ refs, store, t, configs, userPreferences }) {
         });
     }
 
-    return config;
-}
+    if (isPulseEnabled) {
+        config.push({
+            keys: 'p',
+            action: () => {
+                store.toggleSheet('pulse');
+                trackEvent('ShortCut', 'ShortCut', 'Pulse');
+            },
+            description: t('shortcutKeys.Pulse'),
+        });
+    }
 
-export function useShortcuts({ refs, store, t, configs, userPreferences }) {
+    return config;
+};
+
+export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     const registerShortcutKeys = () => {
         const shortcuts = buildShortcutConfig({ refs, store, t, configs, userPreferences });
         shortcuts.forEach((entry) => mappingKeys(entry));
@@ -248,4 +260,4 @@ export function useShortcuts({ refs, store, t, configs, userPreferences }) {
     };
 
     return { loadShortcuts };
-}
+};

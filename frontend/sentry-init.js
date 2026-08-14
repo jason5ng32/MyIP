@@ -86,8 +86,14 @@ const initSentry = (app, router, earlyErrors = []) => {
             'auth/network-request-failed',
             'auth/popup-closed-by-user',
             'auth/popup-blocked',
+            'auth/internal-error',
             'auth/cancelled-popup-request',
             'INTERNAL ASSERTION FAILED',
+            // firebase auth's indexedDB layer refuses writes while the page
+            // is hiding (its guard against sign-out on pagehide); the
+            // rejection escapes from the SDK's own init promise — benign,
+            // means "skipped a write", not user-visible.
+            'Database is closing/hidden',
             // Stale-deploy chunk loads: a client from before the latest
             // deploy lazy-loads a hashed asset that no longer exists.
             // Self-heals on reload, not a defect. One entry per browser

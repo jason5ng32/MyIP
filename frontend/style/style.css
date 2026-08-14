@@ -248,9 +248,6 @@ footer {
   margin-top: 10pt;
 }
 
-.svgMap-tooltip {
-  z-index: 10001 !important;
-}
 /* GitBook Docs Assistant embed (loaded on demand by use-docs-assistant.js).
    The stock launcher is hidden — widgets/DocsAssistant.vue renders our own
    toggle in its place, styled like the FAB dock's buttons. The panel is

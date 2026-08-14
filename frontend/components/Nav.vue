@@ -81,11 +81,16 @@
 
       <!-- Right: Action area (ml-auto push to the right) -->
       <div class="ml-auto flex items-center gap-2">
+        <!-- Earth Online entry (code name: pulse) -->
+        <Pulse />
+
         <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
         <DocsSearch />
 
-        <!-- Preferences -->
-        <JnTooltip :text="t('shortcutKeys.Preferences')">
+        <!-- Preferences — standalone cog only for Firebase-less self-hosted
+             instances (no user menu to host it). With the user system on,
+             preferences lives inside the user dropdown for every state. -->
+        <JnTooltip v-if="!isFireBaseSet" :text="t('shortcutKeys.Preferences')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
             @click="OpenPreferences">
             <Cog />
@@ -95,18 +100,21 @@
         <!-- Sign In / User Dropdown -->
         <DropdownMenu v-if="isFireBaseSet">
           <DropdownMenuTrigger as-child>
-            <!-- Not signed in -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1.5 cursor-pointer">
-              <span>{{ t('user.SignIn') }}</span>
+            <!-- Not signed in: the solid block reads as the "sign in"
+                 call-to-action, and the menu opens on the sign-in options, so
+                 the affordance is self-explaining one click deep. -->
+            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo"
+              class="h-8 gap-1 px-1.5 cursor-pointer" aria-label="User menu">
+              <UserRound class="size-5" />
               <ChevronDown class="opacity-60" />
             </Button>
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1.5 px-1.5 cursor-pointer"
+            <!-- Signed in: avatar + chevron -->
+            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
               aria-label="User menu">
-              <span class="inline-flex size-6 overflow-hidden rounded-full">
+              <span class="inline-flex size-7 overflow-hidden rounded-full">
                 <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
                   referrerpolicy="no-referrer">
               </span>
-              <span v-if="!isMobile" class="text-sm font-medium max-w-40 truncate">{{ userName }}</span>
               <ChevronDown class="opacity-60" />
             </Button>
           </DropdownMenuTrigger>
@@ -166,6 +174,10 @@
             </template>
 
             <DropdownMenuSeparator />
+            <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
+              <Cog />
+              <span>{{ t('nav.preferences.title') }}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
               <HeartHandshake />
               <span>{{ t('user.Benefits.Title') }}</span>
@@ -226,7 +238,8 @@
             <span>Star on GitHub</span>
             <!-- Same /api/github-stars count as the desktop badge (fetched on
                  mount); hidden until it lands / on error. -->
-            <span v-if="githubStarsLabel" class="ml-auto tabular-nums text-muted-foreground inline-flex items-center gap-1">
+            <span v-if="githubStarsLabel"
+              class="ml-auto tabular-nums text-muted-foreground inline-flex items-center gap-1">
               <Icon icon="ri:star-fill" class="size-3.5 text-yellow-400" />
               {{ githubStarsLabel }}
             </span>
@@ -243,7 +256,7 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import unixToDateTime from '@/utils/timestamp-to-date';
+import { unixToDateTime } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import {
@@ -265,10 +278,11 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
-  Award, ChevronDown, HeartHandshake,
+  Award, ChevronDown, UserRound, HeartHandshake,
   LogOut, Menu, Cog,
 } from '@lucide/vue';
 import DocsSearch from '@/components/widgets/DocsSearch.vue';
+import Pulse from '@/components/widgets/Pulse.vue';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
@@ -359,7 +373,7 @@ const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
 };
 
-// Consumed by `p` shortcut in use-shortcuts.js via defineExpose.
+// Opens the Preferences sheet
 const OpenPreferences = () => {
   store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');

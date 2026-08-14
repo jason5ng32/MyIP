@@ -155,3 +155,54 @@ describe('shortcut:help-opened', () => {
     assert.equal(fires(rulesFor('shortcut:help-opened').CleverTrickery, {}), true);
   });
 });
+
+describe('ipinfo:finished card rules', () => {
+  const rules = rulesFor('ipinfo:finished');
+  const cards = (...qualityScores) => ({ cards: qualityScores.map((qualityScore) => ({ qualityScore })) });
+
+  it('PrettyDirty needs a card at score 1, SqueakyClean at score 100', () => {
+    assert.equal(fires(rules.PrettyDirty, cards(1, 50)), true);
+    assert.equal(fires(rules.PrettyDirty, cards(2, 100)), false);
+    assert.equal(fires(rules.SqueakyClean, cards(100, 50)), true);
+    assert.equal(fires(rules.SqueakyClean, cards(99, 1)), false);
+  });
+
+  it('quality scores survive string form but not gated / absent states', () => {
+    assert.equal(fires(rules.PrettyDirty, cards('1')), true);
+    assert.equal(fires(rules.SqueakyClean, cards('100')), true);
+    for (const rule of [rules.PrettyDirty, rules.SqueakyClean]) {
+      assert.equal(fires(rule, cards('sign_in_required', 'unknown', undefined)), false);
+      assert.equal(fires(rule, { cards: [] }), false);
+      assert.equal(fires(rule, {}), false);
+    }
+  });
+
+  it('WalkWithPenguins fires on an AQ card regardless of code case', () => {
+    const withCountry = (...codes) => ({ cards: codes.map((country_code) => ({ country_code })) });
+    assert.equal(fires(rules.WalkWithPenguins, withCountry('US', 'AQ')), true);
+    assert.equal(fires(rules.WalkWithPenguins, withCountry('aq')), true);
+    assert.equal(fires(rules.WalkWithPenguins, withCountry('US', undefined)), false);
+    assert.equal(fires(rules.WalkWithPenguins, {}), false);
+  });
+});
+
+describe('iphistory:updated', () => {
+  it('GlobeTrotter needs 10 distinct countries', () => {
+    const rule = rulesFor('iphistory:updated').GlobeTrotter;
+    assert.equal(fires(rule, { countryCount: 9 }), false);
+    assert.equal(fires(rule, { countryCount: 10 }), true);
+    assert.equal(fires(rule, {}), false);
+  });
+});
+
+describe('pulse:status-sent', () => {
+  it('HelloWorld fires on any confirmed status', () => {
+    assert.equal(fires(rulesFor('pulse:status-sent').HelloWorld, { status: 'vibing' }), true);
+  });
+});
+
+describe('connectivity:custom-added', () => {
+  it('AddSweetAdd fires on any hand-added target', () => {
+    assert.equal(fires(rulesFor('connectivity:custom-added').AddSweetAdd, { name: 'x', url: 'https://x.tld/favicon.ico' }), true);
+  });
+});

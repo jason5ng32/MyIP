@@ -6,6 +6,7 @@
                     <th scope="col" :class="TH_LEFT">{{ t('reportPage.Col.Source') }}</th>
                     <th scope="col" :class="TH_LEFT">{{ t('reportPage.Col.IP') }}</th>
                     <th scope="col" :class="TH_LEFT">{{ t('reportPage.Col.Location') }}</th>
+                    <th v-if="has.timezone" scope="col" :class="TH_LEFT">{{ t('ipInfos.TimeZone') }}</th>
                     <th scope="col" :class="TH_LEFT">ASN</th>
                     <th scope="col" :class="TH_LEFT">{{ t('reportPage.Col.ISP') }}</th>
                     <th v-if="has.isProxy" scope="col" :class="TH_LEFT">{{ t('ipInfos.isProxy') }}</th>
@@ -20,6 +21,9 @@
                     <td class="px-3 py-2 font-mono whitespace-nowrap">{{ card.ip }}</td>
                     <td class="px-3 py-2">
                         <GeoCell :code="card.countryCode" :detail="[card.region, card.city].filter(Boolean).join(' · ')" />
+                    </td>
+                    <td v-if="has.timezone" class="px-3 py-2 whitespace-nowrap">
+                        {{ card.timezone || '—' }}
                     </td>
                     <td class="px-3 py-2 font-mono tabular-nums text-muted-foreground whitespace-nowrap">{{ card.asn || '—' }}</td>
                     <td class="px-3 py-2 text-muted-foreground">{{ card.isp || '—' }}</td>
@@ -80,6 +84,7 @@ const TYPE_KEYS = {
 };
 
 const has = computed(() => ({
+    timezone: props.section.cards.some((card) => card.timezone !== undefined),
     isProxy: props.section.cards.some((card) => card.isProxy !== undefined),
     ipType: props.section.cards.some((card) => card.ipType !== undefined),
     nativeIP: props.section.cards.some((card) => card.nativeIP !== undefined),

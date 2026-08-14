@@ -26,6 +26,12 @@ export const ACHIEVEMENTS_DEFINITIONS = [
   { name: 'ItIsOpen', img: '/achievements/itisopen.webp' },
   { name: 'CuriousCat', img: '/achievements/curiouscat.webp' },
   { name: 'CrossingTheWall', img: '/achievements/crossingthewall.webp' },
+  { name: 'GlobeTrotter', img: '/achievements/globetrotter.webp' },
+  { name: 'HelloWorld', img: '/achievements/helloworld.webp' },
+  { name: 'AddSweetAdd', img: '/achievements/addsweetadd.webp' },
+  { name: 'PrettyDirty', img: '/achievements/prettydirty.webp' },
+  { name: 'SqueakyClean', img: '/achievements/squeakyclean.webp' },
+  { name: 'WalkWithPenguins', img: '/achievements/walkwithpenguins.webp' },
 ];
 
 /**

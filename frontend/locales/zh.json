@@ -1,6 +1,6 @@
 {
   "user": {
-    "SignIn": "登录/注册",
+    "SignIn": "登录",
     "SignInWithGoogle": "使用 Google 登录",
     "SignInWithGithub": "使用 GitHub 登录",
     "SignOut": "登出",
@@ -32,7 +32,7 @@
       "Benefit2": "可以使用隐身测试",
       "Benefit3": "可以使用深度 DNS 泄露测试",
       "Benefit4": "可以看到自己获得的成就勋章",
-      "Benefit5": "可以使用 AI 助手 IPChecking Copilot 提问",
+      "Benefit5": "可以使用 AI 助手 IPilot 提问",
       "Benefit6": "减少部分功能的访问限制",
       "FootNote": "更多权益陆续开发中..."
     },
@@ -131,6 +131,30 @@
         "CrossingTheWall": {
           "Title": "八仙过墙",
           "Meet": "在规则测试中，8 个测试的 IP 全部不相同"
+        },
+        "GlobeTrotter": {
+          "Title": "包罗万有",
+          "Meet": "IP 历史记录中的国家或地区达到 10 个"
+        },
+        "HelloWorld": {
+          "Title": "你好世界",
+          "Meet": "在地球在线中发布一条状态"
+        },
+        "AddSweetAdd": {
+          "Title": "我爱我加",
+          "Meet": "在网络连通性中添加一个自定义测试"
+        },
+        "PrettyDirty": {
+          "Title": "你挺脏的",
+          "Meet": "任意一张 IP 卡片的 IP 质量分为 1"
+        },
+        "SqueakyClean": {
+          "Title": "清清白白",
+          "Meet": "任意一张 IP 卡片的 IP 质量分为 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "与鹅同行",
+          "Meet": "任意一张 IP 卡片的归属地是南极洲"
         }
       }
     }
@@ -152,7 +176,7 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
-    "AskCopilot": "询问 IPChecking Copilot",
+    "AskIPilot": "询问 IPilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
     "DocsGreetingSubtitle": "关于 MyIP 的工具、测试结果或自部署，都可以问我。",
@@ -162,8 +186,105 @@
       "对比我的 WebRTC 测试和 DNS 泄露测试结果并给出建议",
       "MTR 结果怎么看？",
       "怎么部署一个自己的 MyIP？",
-      "我想看更多帮助文档"
+      "我想资助 MyIP 项目"
     ],
+    "pulse": {
+      "title": "地球在线",
+      "tooltip": "来自世界各地的访客",
+      "others": "其它地区",
+      "shareStatus": "分享你的状态",
+      "liveMap": "实时访客热力图",
+      "noVisitors": "暂无访客",
+      "quiet": "此刻还很安静，来当第一个发声的人吧",
+      "loadError": "暂时无法加载最新动态，稍后再试",
+      "share": "访客占比",
+      "latest": "最新动态",
+      "sent": "已发送",
+      "alreadySent": "状态已经发送过了",
+      "rateLimited": "短期内只能发一次状态",
+      "limitedTitle": "限时状态",
+      "outages": {
+        "title": "全球断网事件",
+        "outage": "互联网中断",
+        "anomaly": "流量异常",
+        "ongoing": "故障中",
+        "ended": "已恢复",
+        "started": "{time}发生",
+        "lasted": "持续 {duration}",
+        "quiet": "一切平静——过去 30 天没有断网事件",
+        "loadMore": "加载更多",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "政府主导断网",
+          "POWER_OUTAGE": "电力中断",
+          "CABLE_CUT": "光缆中断",
+          "TECHNICAL_PROBLEM": "技术故障",
+          "MECHANICAL": "机械故障",
+          "UNKNOWN": "原因未知",
+          "WEATHER": "恶劣天气",
+          "FIRE": "火灾",
+          "CYBERATTACK": "网络攻击",
+          "NATURAL_DISASTER": "自然灾害",
+          "MAINTENANCE": "计划维护",
+          "MILITARY_ACTION": "军事行动"
+        },
+        "level": {
+          "NATIONWIDE": "全国范围",
+          "REGIONAL": "区域范围",
+          "NETWORK": "单一网络"
+        }
+      },
+      "statuses": {
+        "fast": "网速快得飞起",
+        "ok": "一切正常",
+        "slow": "网速有点慢",
+        "flaky": "网络时断时续",
+        "blocked": "有网站打不开",
+        "good": "今天心情不错",
+        "bad": "今天有点丧",
+        "passing": "路过看看",
+        "lag": "游戏延迟爆炸",
+        "newip": "刚换了新 IP",
+        "vpn": "正挂着 VPN",
+        "night": "熬夜中",
+        "vibing": "正在 Vibe Coding",
+        "fixing": "又在给家里修网",
+        "tuning": "又减少了 10ms",
+        "prgday": "0x100 天快乐！",
+        "internetday": "互联网生日快乐，从 LO 说起",
+        "halloween": "不给糖就 Ping 你",
+        "diwali": "排灯节快乐，光纤也在发光",
+        "christmas": "圣诞老人走的是专线",
+        "newyear": "新的一年，新的 IP",
+        "privacyday": "本状态已端到端加密",
+        "lunar": "恭喜发财，红包一个不丢",
+        "valentine": "想要一段稳定的连接",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "开斋节快乐",
+        "aprilfools": "我的 IP 是 127.0.0.1",
+        "earthday": "临时下线，摸草去了",
+        "turing": "本状态由人类发送（大概）",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "IPCheck.ing 生日快乐"
+      },
+      "festivalDesc": {
+        "prgday": "程序员节 · 一年的第 256 天，十六进制写作 0x100",
+        "internetday": "1969 年 10 月 29 日，ARPANET 想发出 LOGIN，传到 LO 就崩了",
+        "halloween": "万圣节（10 月 31 日）· 最吓人的还是丢包",
+        "diwali": "排灯节 · 愿灯火与光纤同样明亮",
+        "christmas": "圣诞节 · 雪橇专线，零抖动",
+        "newyear": "新年限定 · 烟花已包含，不额外占用带宽",
+        "privacyday": "数据隐私日（1 月 28 日）· 公开广播这句话的反差感，是故意的",
+        "lunar": "农历新年 · 红包（packet）零丢包",
+        "valentine": "情人节 · TCP 和爱情都始于握手",
+        "jobs": "史蒂夫·乔布斯诞辰（1955 年 2 月 24 日）· 出自 2005 年斯坦福演讲",
+        "eid": "开斋节 · 来自地球在线的祝福",
+        "aprilfools": "愚人节 · 金窝银窝不如自己的 localhost",
+        "earthday": "世界地球日（4 月 22 日）· 地球在线也建议你偶尔地球离线",
+        "turing": "艾伦·图灵诞辰（1912 年 6 月 23 日）· 图灵测试之父",
+        "emojiday": "世界 Emoji 日（7 月 17 日）· 文字是上个世纪的事了",
+        "birthday": "IPCheck.ing 生日 · v1.0 发布于 2020 年 11 月 6 日"
+      }
+    },
     "preferences": {
       "title": "偏好设置",
       "preferenceTips": "这些设置会保存在浏览器，方便下次使用。部分选项需要刷新页面方可生效。",
@@ -191,7 +312,9 @@
       "language": "语言设置",
       "languageTips": "刷新浏览器后生效。"
     },
-    "DocsPrompt": "请输入你要询问的问题"
+    "DocsPrompt": "请输入你要询问的问题",
+    "DocsSignInTitle": "请先登录",
+    "DocsSignInMessage": "登录后即可向 IPilot 提问"
   },
   "securitychecklist": {
     "Title": "安全检查清单",
@@ -478,6 +601,8 @@
     "Note3": "Whois 信息包含多种类型的字段，以下为原始文本信息",
     "Placeholder": "域名或 IP",
     "invalidURL": "无效的域名或 IP",
+    "reservedIP": "内网或保留地址没有公开的注册信息，无法查询。",
+    "noData": "该查询没有公开的 Whois / RDAP 数据。部分顶级域名不提供公开查询服务。",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"
   },
@@ -659,6 +784,7 @@
     "Country": "地区",
     "Region": "省份",
     "City": "城市",
+    "TimeZone": "时区",
     "ISP": "网络",
     "ASN": "ASN",
     "Coordinates": "经纬度",
@@ -767,11 +893,6 @@
   "connectivity": {
     "Title": "网络连通性",
     "Note": "本测试用于测试你是否能够连通到某个网站。测试方法是通过加载对应网站上的小图片进行的。延迟值仅供参考，实际会更小。你可以添加其它你常用的网站到测试列表中，方便快速测试。",
-    "ServiceStatusBanner": {
-      "Title": "某个服务打不开？",
-      "Note": "如果上面 ChatGPT、Claude 等 AI 产品测试失败，未必是你的网络问题——可能是服务本身挂了。看看它们的实时可用性和近期故障。",
-      "CTA": "打开服务可用性"
-    },
     "StatusWait": "待检测",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
@@ -793,7 +914,30 @@
       "NameRequired": "请输入名称",
       "UrlRequired": "请输入 URL",
       "InvalidUrl": "这看起来不是一个有效的 URL",
-      "LimitReached": "自定义测试已达到 10 个上限"
+      "LimitReached": "测试数量已达到 60 个上限"
+    },
+    "importDialog": {
+      "Title": "添加 / 导入测试",
+      "CustomOption": "添加自定义",
+      "ImportOption": "导入列表",
+      "SiteCount": "{n} 个网站",
+      "Import": "导入",
+      "RemoveList": "移除该列表",
+      "Capacity": "已用 {used}/{limit}",
+      "NotEnoughCapacity": "容量不足——该列表需要 {need} 个空位，仅剩 {free} 个"
+    },
+    "importLists": {
+      "iran": "伊朗常用",
+      "russia": "俄罗斯常用",
+      "china": "中国常用",
+      "ai": "AI 服务",
+      "social": "社交通讯",
+      "streaming": "流媒体",
+      "gaming": "游戏平台",
+      "developer": "开发者",
+      "cloud": "云与 CDN",
+      "crypto": "加密交易所",
+      "news": "新闻与百科"
     }
   },
   "webrtc": {
@@ -856,6 +1000,7 @@
     "Suggested": "推荐地区",
     "NoProbe": "该国家/地区暂无可用探针",
     "GroupFull": "最多 {max} 个国家/地区，请先取消部分勾选",
+    "UnreachableTarget": "探针运行在公网上，内网及保留地址在任何国家/地区都无法抵达。",
     "ResultsHint": "选择探针并运行测试后，结果将显示在这里。",
     "Asia": "亚洲",
     "Europe": "欧洲",
@@ -913,6 +1058,7 @@
     "Title": "IP 查询",
     "Placeholder": "例如 1.1.1.1",
     "Error": "请输入有效的 IPv4 或 IPv6 地址。",
+    "reservedIP": "内网、回环等保留地址没有地理位置信息，无法查询。",
     "NoData": "无法查询到该 IP 的信息。可能是不可路由地址（如 0.0.0.0、私有地址）或数据源没有该 IP 的记录。"
   },
   "alert": {
@@ -956,7 +1102,7 @@
     "OpenHighlightedTool": "打开选中的高级工具",
     "RefreshRuleTests": "刷新规则测试",
     "CensorshipCheck": "打开封锁测试面板",
-    "Preferences": "打开偏好设置面板",
+    "Pulse": "打开地球在线面板",
     "Whois": "打开 Whois 查询面板",
     "ServiceStatus": "打开服务可用性面板",
     "InvisibilityTest": "打开隐身测试面板",

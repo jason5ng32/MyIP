@@ -9,6 +9,7 @@
 // repeat those checks, so this file focuses on handler-specific branches.
 
 import assert from 'node:assert/strict';
+import { Writable } from 'node:stream';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
@@ -17,6 +18,7 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
+import netOutagesHandler from '../api/net-outages.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
@@ -31,6 +33,7 @@ import serviceStatusHandler, {
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
+import logger from '../common/logger.js';
 
 // -- shared test utilities ------------------------------------------------
 
@@ -66,12 +69,16 @@ const ENV_KEYS = [
 ];
 let envBackup = {};
 
+// Stream tests stub globalThis.fetch; restore the real one after each case.
+const originalFetch = globalThis.fetch;
+
 beforeEach(() => {
     envBackup = {};
     for (const k of ENV_KEYS) envBackup[k] = process.env[k];
 });
 
 afterEach(() => {
+    globalThis.fetch = originalFetch;
     for (const k of ENV_KEYS) {
         if (envBackup[k] === undefined) delete process.env[k];
         else process.env[k] = envBackup[k];
@@ -113,6 +120,30 @@ describe('configs handler', () => {
 // -- google-map handler ---------------------------------------------------
 
 describe('google-map handler', () => {
+    // Express-ish streaming response: a real Writable so pipeline() can pipe
+    // into it, plus the status/json surface the handler's error paths use.
+    const createStreamResponse = () => {
+        const chunks = [];
+        const res = new Writable({
+            write(chunk, _encoding, callback) { chunks.push(Buffer.from(chunk)); callback(); },
+        });
+        res.locals = {};
+        res.chunks = chunks;
+        res.jsonCalls = [];
+        Object.defineProperty(res, 'headersSent', { get: () => chunks.length > 0 });
+        res.setHeader = () => res;
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (payload) => { res.jsonCalls.push(payload); res.body = payload; return res; };
+        return res;
+    };
+
+    const jpegUpstream = (streamInit) => async () => new Response(
+        new ReadableStream(streamInit),
+        { headers: { 'content-type': 'image/jpeg' } },
+    );
+
+    const mapQuery = { query: { latitude: '1', longitude: '2', language: 'en' } };
+
     it('rejects invalid map parameters without calling the external API', () => {
         const res = createResponse();
         googleMapHandler(createRequest({
@@ -120,6 +151,67 @@ describe('google-map handler', () => {
         }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid request' });
+    });
+
+    it('streams the upstream image through to completion', async () => {
+        globalThis.fetch = jpegUpstream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('jpeg bytes'));
+                controller.close();
+            },
+        });
+        const res = createStreamResponse();
+        await googleMapHandler(createRequest(mapQuery), res);
+        assert.equal(Buffer.concat(res.chunks).toString(), 'jpeg bytes');
+        assert.equal(res.writableFinished, true);
+    });
+
+    it('destroys a partial response instead of crashing when the upstream body fails', async () => {
+        globalThis.fetch = jpegUpstream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('partial'));
+                setImmediate(() => controller.error(new Error('upstream reset')));
+            },
+        });
+        const res = createStreamResponse();
+        // Resolving without an unhandled 'error' event is the crash regression.
+        await googleMapHandler(createRequest(mapQuery), res);
+        assert.equal(res.destroyed, true);
+        assert.equal(res.jsonCalls.length, 0);
+    });
+
+    it('cancels the upstream body silently when the client disconnects', async () => {
+        let bodyCancelled = false;
+        globalThis.fetch = jpegUpstream({
+            start(controller) {
+                controller.enqueue(new TextEncoder().encode('partial'));
+            },
+            cancel() { bodyCancelled = true; },
+        });
+        const errorCalls = [];
+        const originalError = logger.error;
+        logger.error = (...args) => { errorCalls.push(args); };
+        try {
+            const res = createStreamResponse();
+            const handlerPromise = googleMapHandler(createRequest(mapQuery), res);
+            await new Promise((resolve) => setImmediate(resolve));
+            res.destroy();
+            await handlerPromise;
+            await new Promise((resolve) => setImmediate(resolve));
+            assert.equal(bodyCancelled, true);
+            assert.equal(res.jsonCalls.length, 0);
+            assert.equal(errorCalls.length, 0);
+        } finally {
+            logger.error = originalError;
+        }
+    });
+
+    it('returns 500 JSON when the upstream fetch itself rejects', async () => {
+        globalThis.fetch = async () => { throw new Error('connect timeout'); };
+        const res = createStreamResponse();
+        await googleMapHandler(createRequest(mapQuery), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'connect timeout' });
     });
 });
 
@@ -171,6 +263,15 @@ describe('get-whois handler', () => {
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid IP or address' });
     });
+
+    for (const ip of ['10.92.24.150', '192.168.1.1', '198.18.0.2', 'fd00::1', '::1']) {
+        it(`rejects the non-public address ${ip} before any lookup`, async () => {
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q: ip } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Not a public IP address' });
+        });
+    }
 });
 
 // -- github-stars handler -------------------------------------------------
@@ -199,6 +300,25 @@ describe('cf-radar handler', () => {
         await cfRadarHandler(createRequest({ query: { asn: 'AS12345' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+});
+
+// -- net-outages handler ----------------------------------------------------
+
+describe('net-outages handler', () => {
+    it('rejects non-GET methods', async () => {
+        const res = createResponse();
+        await netOutagesHandler(createRequest({ method: 'POST' }), res);
+        assert.equal(res.statusCode, 405);
+    });
+
+    it('returns 500 when no Cloudflare API key is configured', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        const res = createResponse();
+        await netOutagesHandler(createRequest(), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
     });
 });
 
@@ -232,6 +352,20 @@ describe('invisibility-test handler', () => {
         await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('passes an upstream auth rejection through as its own 4xx, not a 500', async () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        globalThis.fetch = async () => ({
+            status: 403,
+            ok: false,
+            json: async () => ({ message: 'Authorization header is missing.' }),
+        });
+        const res = createResponse();
+        await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, { error: 'Authorization header is missing.' });
     });
 });
 

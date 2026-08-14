@@ -35,7 +35,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent } from '@/utils/app-events';
-import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
 
 
@@ -56,6 +56,7 @@ const createDefaultCard = () => ({
   country_name: "",
   region: "",
   city: "",
+  timezone: "",
   latitude: "",
   longitude: "",
   isp: "",
@@ -234,6 +235,7 @@ const trackFetchStatus = (status) => {
         country_code: card.country_code,
         region: card.region,
         city: card.city,
+        timezone: card.timezone,
         asn: card.asn,
         isp: card.isp,
         // IPCheck.ing-source enrichments (locale-free codes; absent on other
@@ -327,7 +329,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
           return;
         }
       } catch (error) {
-        console.error("Error fetching IP details from source " + source.id + ":", error);
+        console.error(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
         currentSourceIndex = (currentSourceIndex + 1) % sources.length;
         attempts++;
       }

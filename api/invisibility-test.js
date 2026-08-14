@@ -42,6 +42,17 @@ export default async (req, res) => {
             return res.json({ status: 'pending' });
         }
 
+        // Upstream 401/403. Pass the status through so the frontend prompts
+        // sign-in instead of retrying; keep it off the error logger.
+        if (apiResponse.status === 401 || apiResponse.status === 403) {
+            let detail = 'Sign in required';
+            try {
+                const errorData = await apiResponse.json();
+                detail = errorData.message || detail;
+            } catch { /* unreadable body — keep the generic detail */ }
+            return res.status(apiResponse.status).json({ error: detail });
+        }
+
         // Catch upstream error
         if (!apiResponse.ok) {
             let errorDetail = '';

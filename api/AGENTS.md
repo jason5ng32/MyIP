@@ -14,9 +14,9 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `asn-history` / `asn-connectivity` / `ooni-blocking` /
-`globalping-probes` / `service-status` / `google-map` / `github-stars` /
-`invisibility-test` / `dns-leak-test`), user
+`cf-radar` / `net-outages` / `asn-history` / `asn-connectivity` /
+`ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
+`github-stars` / `invisibility-test` / `dns-leak-test`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
@@ -37,7 +37,8 @@ states its route and purpose — read those for specifics.
   these verbatim.
 - **Response shape.** IP-geolocation handlers normalize to the canonical
   frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …);
-  new sources match it.
+  new sources match it. `timezone` is the exception — no handler produces it;
+  see "Response enrichment" below.
 - **Logging.** Shared logger only, `logger.error({ err, ...ctx }, 'msg')`;
   no `console.*`, no "received request" lines (`pino-http` covers those when
   enabled).
@@ -63,7 +64,11 @@ states its route and purpose — read those for specifics.
 these checks:
 
 - `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
-- `requireValidIP()` — per-route for `?ip=`; handler sees a well-formed IP.
+- `requirePublicIP()` — per-route for `?ip=`; handler sees a well-formed,
+  publicly routable IP. Reserved space (RFC 1918, loopback, CGNAT, link-local,
+  documentation, …) is rejected here, so no geo source is ever asked about an
+  address it can't answer for — `isUsablePublicIP` in `common/valid-ip.js` is
+  the single definition, shared with the front-end IP forms.
 - `requireValidDomain()` — `?domain=`, lowercases in place so the edge cache
   sees one canonical key.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
@@ -75,6 +80,22 @@ these checks:
 
 New param shape → new guard in `common/guards.js`, attached in
 `backend-server.js`; never open-coded in the handler.
+
+### Response enrichment lives in middleware too
+
+`withTimeZone()` (`common/ip-timezone.js`), attached to all seven geo routes,
+derives `timezone` (IANA name) from the `latitude` / `longitude` the handler
+just returned and adds it on the way out — 2xx only, same res.json hook and
+same rule as `cacheable`. No handler computes or forwards a timezone, not even
+the private-API pass-throughs.
+
+Deriving it from the response's own coordinates is what keeps the zone from
+contradicting the city beside it; a second database asked about the same IP
+would eventually disagree. Only the zone name ships — the frontend renders the
+UTC offset from it, because these routes sit behind a 24h edge cache and a
+cached offset goes an hour wrong at every DST switch.
+
+A new geo source inherits the field by adding the middleware to its route.
 
 ### Private-API header pass-through (intentional exception)
 
@@ -104,10 +125,12 @@ to the upstream that owns the auth context.
 
 ## Testing
 
-- Every handler has smoke tests in `tests/api-handlers.test.js`: method
-  gating, param branches, "API key missing" early returns.
-- Never hit real upstreams — assert only on branches that return before the
-  first `fetchUpstream`.
+- Handlers get smoke tests in `tests/api-handlers.test.js`: method gating,
+  param branches, "API key missing" early returns. Most are covered; a new
+  or touched handler ships its block in the same change.
+- Never hit real upstreams — assert on branches that return before the first
+  `fetchUpstream`, or stub `globalThis.fetch` when the behavior under test
+  lives past it (google-map stream tests; restored in the shared `afterEach`).
 - Middleware is covered by `tests/guards.test.js`; don't duplicate its
   assertions per-handler. Fetch timeout/abort behavior:
   `tests/fetch-with-timeout.test.js`.

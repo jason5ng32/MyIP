@@ -9,7 +9,7 @@
 
     <!-- Query Dialog -->
     <Dialog :open="isOpen" @update:open="onOpenChange">
-        <DialogContent :title="t('ipcheck.Title')" class="max-w-xl min-h-[200px]">
+        <DialogContent :title="t('ipcheck.Title')" class="max-w-2xl min-h-50">
             <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
 
             <div class="space-y-4">
@@ -60,13 +60,13 @@
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP, isUsablePublicIP } from '@/utils/valid-ip.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -96,17 +96,28 @@ watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
 }, { deep: true });
 
+// Emptying the box retracts whatever the last attempt complained about —
+// the message no longer describes anything on screen.
+watch(inputIP, (value) => {
+    if (value.trim() === '') modalQueryError.value = '';
+});
+
+const rejectQuery = (message) => {
+    modalQueryError.value = message;
+    modalQueryResult.value = null;
+    isChecking.value = 'idle';
+};
+
 const submitQuery = async () => {
-    if (isValidIP(inputIP.value)) {
-        modalQueryError.value = '';
-        modalQueryResult.value = null;
-        isChecking.value = 'running';
-        await fetchIPForModal(inputIP.value);
-    } else {
-        modalQueryError.value = t('ipcheck.Error');
-        modalQueryResult.value = null;
-        isChecking.value = 'idle';
-    }
+    if (!isValidIP(inputIP.value)) return rejectQuery(t('ipcheck.Error'));
+    // Only publicly routable space has geolocation, so answer here rather
+    // than walking every geo source to collect the same "no data" from each.
+    if (!isUsablePublicIP(inputIP.value)) return rejectQuery(t('ipcheck.reservedIP'));
+
+    modalQueryError.value = '';
+    modalQueryResult.value = null;
+    isChecking.value = 'running';
+    await fetchIPForModal(inputIP.value);
 };
 
 const isOpen = ref(false);
@@ -150,7 +161,7 @@ const fetchIPForModal = async (ip) => {
             isChecking.value = 'idle';
             return;
         } catch (error) {
-            console.error(`Error fetching IP details from source ${source.id}:`, error);
+            console.error(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
             currentIdx = (currentIdx + 1) % sources.length;
             attempts++;
         }

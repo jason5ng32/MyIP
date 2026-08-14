@@ -23,7 +23,7 @@ halves: a Vue 3 SPA front-end and an Express 5 back-end API.
 | Error monitoring | Sentry — optional & env-gated on both halves: `@sentry/vue` (no `VITE_SENTRY_DSN_FRONTEND`, no Sentry in the build — see frontend/AGENTS.md) + `@sentry/node` (no `SENTRY_DSN_BACKEND`, never loaded — see api/AGENTS.md) |
 | PWA | `manifest.webmanifest` only — installable but online-only, no service worker |
 | Tests | Node built-in test runner (`node --test`) |
-| Runtime libs | chart.js · svgmap · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · @vueuse/core |
+| Runtime libs | chart.js · chartjs-chart-geo · @cloudflare/speedtest · maxmind · whoiser · thumbmarkjs · ua-parser-js · detect-gpu · @vueuse/core |
 
 ## Commands
 
@@ -115,7 +115,7 @@ use npm / yarn — they'd produce a competing lockfile.
 Access control and timeouts live in shared middleware, not handlers
 (details in @api/AGENTS.md):
 
-- `requireReferer` is global on `/api/*`; `requireValidIP()` per-route —
+- `requireReferer` is global on `/api/*`; `requirePublicIP()` per-route —
   handlers never repeat these checks.
 - Every upstream HTTP call goes through `fetchUpstream`
   (`common/fetch-with-timeout.js`, 8s timeout). Never a bare `fetch()` in `api/`.
