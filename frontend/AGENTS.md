@@ -100,10 +100,13 @@ philosophy as `firebase-init.js`). Two rules:
   indistinguishable from visitor-side conditions (no IPv6 / dead network),
   which is routine noise.
 
-Capture surface: uncaught errors; `console.error` (fingerprinted per message
-prefix so each source stays a distinct issue; individual `utils/getips/`
-source failures are `console.warn` — invisible to Sentry by design, the
-per-card exhaustion event above is the health signal); route-change traces;
+Capture surface: uncaught errors; `console.error` (fingerprinted on the first
+argument, so a call site that fails several ways names the failure there —
+`fetchErrorLabel` in `utils/authenticated-fetch.js` renders the HTTP status,
+keeping an edge-blocked 403 out of the same issue as a 5xx; individual
+`utils/getips/` source failures are `console.warn` — invisible to Sentry by
+design, the per-card exhaustion event above is the health signal);
+route-change traces;
 error-only Replay, page text deliberately unmasked (the visitor's on-screen
 network info IS the debugging context; typed input stays masked; disclosed
 in the privacy policy). Third-party script errors (Cloudflare's RUM beacon)
