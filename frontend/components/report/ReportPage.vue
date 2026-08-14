@@ -67,6 +67,7 @@ import { useRoute, RouterLink } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { isoToDateTime } from '@/utils/time-utils.js';
 import { REPORT_VERSION, REPORT_SECTION_IDS } from '@/utils/report-schema.js';
 import { reportToMarkdown } from '@/utils/report-export.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
@@ -102,7 +103,7 @@ const SECTION_COMPONENTS = {
     enhanceddnsleak: ReportEnhanceddnsleak,
 };
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const store = useMainStore();
 
@@ -115,12 +116,9 @@ const presentSectionIds = computed(() =>
     REPORT_SECTION_IDS.filter((id) => report.value?.sections?.[id]));
 
 const generatedAtDisplay = computed(() =>
-    report.value ? new Date(report.value.generatedAt).toLocaleString() : '');
+    report.value ? isoToDateTime(report.value.generatedAt, locale.value) : '');
 
-const expiresAtDisplay = computed(() => {
-    const stamp = Date.parse(expiresAt.value);
-    return Number.isNaN(stamp) ? '' : new Date(stamp).toLocaleString();
-});
+const expiresAtDisplay = computed(() => isoToDateTime(expiresAt.value, locale.value));
 
 const STALE_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
 const isStale = computed(() =>

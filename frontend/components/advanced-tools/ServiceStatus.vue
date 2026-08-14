@@ -175,6 +175,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
+import { unixToDateTime } from '@/utils/time-utils.js';
 import {
   indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
 } from '@/utils/service-status-tone.js';
@@ -249,6 +250,8 @@ const indicatorTone = (p) => indicatorToTone(effectiveIndicator(p));
 
 // Localized HH:MM:SS of the frontend's last pull — the data-freshness signal
 // shown under the Refresh button. Seconds included so rapid re-clicks advance.
+// Deliberately hand-rolled: time-utils has no time-only helper, and its
+// short/medium styles drop the seconds this clock exists for.
 const formattedRefreshed = computed(() => {
   if (!lastRefreshedAt.value) return '';
   try {
@@ -284,17 +287,9 @@ const incidentStatusLabel = (status) => {
   return label === key ? status : label;
 };
 
-// Localized short date for an incident's start time.
-const formatDate = (iso) => {
-  if (!iso) return '';
-  try {
-    return new Date(iso).toLocaleDateString(locale.value || 'en-US', {
-      year: 'numeric', month: '2-digit', day: '2-digit',
-    });
-  } catch {
-    return '';
-  }
-};
+// Localized date for an incident's start instant, via the shared helper
+// (medium style, viewer's zone — matches the rest of the app's dates).
+const formatDate = (iso) => unixToDateTime(Date.parse(iso ?? ''), locale.value);
 
 // ── Data loading ────────────────────────────────────────────────────────────
 // Overview is a cheap snapshot read — the backend timer owns the upstream

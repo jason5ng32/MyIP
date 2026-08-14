@@ -16,6 +16,7 @@ import {
     relativeTimeSince,
     formatDuration,
     unixToDateTime,
+    isoToDateTime,
     formatIsoDate,
 } from '../frontend/utils/time-utils.js';
 
@@ -206,7 +207,7 @@ describe('formatDuration', () => {
 /* Absolute dates                                                      */
 /* ------------------------------------------------------------------ */
 
-// The timestamp → local date string output depends on runtime locale + TZ, so
+// The timestamp → local date string output depends on the host TZ, so
 // assertions stay flexible to avoid false failures across CI environments.
 describe('unixToDateTime', () => {
   it('accepts a numeric timestamp and returns a non-empty string', () => {
@@ -226,10 +227,48 @@ describe('unixToDateTime', () => {
     assert.ok(/2023|2024/.test(epochYearZero), `expected 2023 or 2024 in output, got "${epochYearZero}"`);
   });
 
+  it('renders in the app locale when one is passed', () => {
+    assert.match(unixToDateTime(1704067200000, 'zh'), /年/);
+    assert.notEqual(
+      unixToDateTime(1704067200000, 'zh'),
+      unixToDateTime(1704067200000, 'en'),
+    );
+  });
+
   it('different timestamps produce different strings', () => {
     const a = unixToDateTime(1704067200000); // 2024
     const b = unixToDateTime(1767225600000); // 2026 UTC
     assert.notEqual(a, b);
+  });
+
+  it("returns '' for an unusable timestamp", () => {
+    assert.equal(unixToDateTime(undefined), '');
+    assert.equal(unixToDateTime('not-a-number'), '');
+    assert.equal(unixToDateTime(null), ''); // Number(null) is 0 — but null means "no data"
+  });
+});
+
+// Host-TZ-dependent output → structural assertions only (same policy as
+// unixToDateTime above).
+describe('isoToDateTime', () => {
+  it('renders an ISO instant as a localized date + time', () => {
+    const out = isoToDateTime('2026-08-15T09:23:41.412Z', 'en');
+    assert.match(out, /2026/);
+    assert.match(out, /\d:\d{2}/); // carries a time, unlike the date-only helpers
+  });
+
+  it('follows the app locale', () => {
+    assert.match(isoToDateTime('2026-08-15T09:23:41Z', 'zh'), /年/);
+    assert.notEqual(
+      isoToDateTime('2026-08-15T09:23:41Z', 'zh'),
+      isoToDateTime('2026-08-15T09:23:41Z', 'en'),
+    );
+  });
+
+  it("returns '' for a missing or unparseable input", () => {
+    assert.equal(isoToDateTime('', 'en'), '');
+    assert.equal(isoToDateTime(undefined, 'en'), '');
+    assert.equal(isoToDateTime('not-a-date', 'en'), '');
   });
 });
 

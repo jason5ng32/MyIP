@@ -184,6 +184,9 @@ export const reportToMarkdown = (report, t, { masked = false } = {}) => {
     const lines = [
         `# ${t('report.ai.Heading')}`,
         '',
+        // generatedAt stays a raw ISO instant even inside localized prose:
+        // the reader is an AI, and ISO is unambiguous and timezone-explicit
+        // where a localized date+time would drop the zone.
         t('report.ai.Intro', { origin: report.origin, time: report.generatedAt }),
     ];
     if (masked) lines.push('', t('report.ai.Masked'));

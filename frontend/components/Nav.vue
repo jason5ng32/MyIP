@@ -291,7 +291,7 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useMainStore();
 const router = useRouter();
 
@@ -345,7 +345,7 @@ const isFireBaseSet = computed(() => store.isFireBaseSet);
 const isSignedIn = computed(() => store.isSignedIn);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
-const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
+const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt, locale.value));
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 
