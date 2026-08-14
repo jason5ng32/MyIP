@@ -120,7 +120,7 @@ const { t, locale } = useI18n();
 // Radar cause/level values with a translation; see locales `nav.pulse.outages`.
 const KNOWN_CAUSES = new Set([
     'GOVERNMENT_DIRECTED', 'POWER_OUTAGE', 'CABLE_CUT', 'TECHNICAL_PROBLEM',
-    'UNKNOWN', 'WEATHER', 'FIRE', 'CYBERATTACK', 'NATURAL_DISASTER',
+    'MECHANICAL', 'UNKNOWN', 'WEATHER', 'FIRE', 'CYBERATTACK', 'NATURAL_DISASTER',
     'MAINTENANCE', 'MILITARY_ACTION',
 ]);
 const KNOWN_LEVELS = new Set(['NATIONWIDE', 'REGIONAL', 'NETWORK']);

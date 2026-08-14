@@ -218,6 +218,7 @@
           "POWER_OUTAGE": "Panne d'électricité",
           "CABLE_CUT": "Câble sectionné",
           "TECHNICAL_PROBLEM": "Problème technique",
+          "MECHANICAL": "Problème mécanique",
           "UNKNOWN": "Cause inconnue",
           "WEATHER": "Intempéries",
           "FIRE": "Incendie",

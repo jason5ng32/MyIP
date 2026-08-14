@@ -218,6 +218,7 @@
           "POWER_OUTAGE": "电力中断",
           "CABLE_CUT": "光缆中断",
           "TECHNICAL_PROBLEM": "技术故障",
+          "MECHANICAL": "机械故障",
           "UNKNOWN": "原因未知",
           "WEATHER": "恶劣天气",
           "FIRE": "火灾",

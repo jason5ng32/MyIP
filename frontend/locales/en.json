@@ -218,6 +218,7 @@
           "POWER_OUTAGE": "Power Outage",
           "CABLE_CUT": "Cable Cut",
           "TECHNICAL_PROBLEM": "Technical Problem",
+          "MECHANICAL": "Mechanical Problem",
           "UNKNOWN": "Unknown Cause",
           "WEATHER": "Severe Weather",
           "FIRE": "Fire",
