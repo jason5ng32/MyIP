@@ -229,7 +229,7 @@ import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
 import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/world-map-chart.js';
-import { relativeTimeFromMinutes } from '@/utils/relative-time.js';
+import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -329,7 +329,7 @@ const regionName = (code) => {
     return getCountryName(code, locale.value) || code.toUpperCase();
 };
 
-// Relative times via the shared Intl helper (utils/relative-time.js) — no
+// Relative times via the shared Intl helper (utils/time-utils.js) — no
 // locale keys needed.
 const relTime = (minutesAgo) => relativeTimeFromMinutes(minutesAgo, locale.value);
 

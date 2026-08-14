@@ -108,7 +108,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import getCountryName from '@/data/country-name.js';
-import { relativeTimeSince, formatDuration } from '@/utils/relative-time.js';
+import { relativeTimeSince, formatDuration } from '@/utils/time-utils.js';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -215,7 +215,7 @@ const metaLine = (event) => [
 ].filter(Boolean).join(' · ');
 
 // "Started 3 hr. ago · Lasted 5h" — every time-related fact in one closing
-// line; both halves come from the shared utils/relative-time.js helpers.
+// line; both halves come from the shared utils/time-utils.js helpers.
 const timeLine = (event) => {
     const duration = event.endDate
         ? formatDuration(Date.parse(event.endDate) - Date.parse(event.startDate), locale.value)

@@ -1,7 +1,7 @@
 [
   {
     "version": "v1.0",
-    "date": "Nov 06, 2020",
+    "date": "2020-11-06",
     "content": [
       {
         "type": "add",
@@ -34,7 +34,7 @@
   },
   {
     "version": "v2.0",
-    "date": "Nov 24, 2023",
+    "date": "2023-11-24",
     "content": [
       {
         "type": "add",
@@ -58,7 +58,7 @@
   },
   {
     "version": "v2.1",
-    "date": "Nov 25, 2023",
+    "date": "2023-11-25",
     "content": [
       {
         "type": "add",
@@ -82,7 +82,7 @@
   },
   {
     "version": "v2.2",
-    "date": "Nov 26, 2023",
+    "date": "2023-11-26",
     "content": [
       {
         "type": "add",
@@ -115,7 +115,7 @@
   },
   {
     "version": "v2.3",
-    "date": "Nov 27, 2023",
+    "date": "2023-11-27",
     "content": [
       {
         "type": "add",
@@ -148,7 +148,7 @@
   },
   {
     "version": "v2.4",
-    "date": "Dec 1, 2023",
+    "date": "2023-12-01",
     "content": [
       {
         "type": "add",
@@ -181,7 +181,7 @@
   },
   {
     "version": "v2.5",
-    "date": "Dec 20, 2023",
+    "date": "2023-12-20",
     "content": [
       {
         "type": "add",
@@ -223,7 +223,7 @@
   },
   {
     "version": "v3.0",
-    "date": "Jan 28, 2024",
+    "date": "2024-01-28",
     "content": [
       {
         "type": "add",
@@ -265,7 +265,7 @@
   },
   {
     "version": "v3.1",
-    "date": "Jan 30, 2024",
+    "date": "2024-01-30",
     "content": [
       {
         "type": "add",
@@ -316,7 +316,7 @@
   },
   {
     "version": "v3.2",
-    "date": "Feb 3, 2024",
+    "date": "2024-02-03",
     "content": [
       {
         "type": "add",
@@ -349,7 +349,7 @@
   },
   {
     "version": "v3.3",
-    "date": "Feb 6, 2024",
+    "date": "2024-02-06",
     "content": [
       {
         "type": "add",
@@ -382,7 +382,7 @@
   },
   {
     "version": "v3.4",
-    "date": "Feb 17, 2024",
+    "date": "2024-02-17",
     "content": [
       {
         "type": "add",
@@ -415,7 +415,7 @@
   },
   {
     "version": "v3.5",
-    "date": "Mar 3, 2024",
+    "date": "2024-03-03",
     "content": [
       {
         "type": "add",
@@ -439,7 +439,7 @@
   },
   {
     "version": "v3.6",
-    "date": "Mar 10, 2024",
+    "date": "2024-03-10",
     "content": [
       {
         "type": "add",
@@ -472,7 +472,7 @@
   },
   {
     "version": "v3.7",
-    "date": "Apr 26, 2024",
+    "date": "2024-04-26",
     "content": [
       {
         "type": "add",
@@ -505,7 +505,7 @@
   },
   {
     "version": "v3.8",
-    "date": "May 4, 2024",
+    "date": "2024-05-04",
     "content": [
       {
         "type": "add",
@@ -547,7 +547,7 @@
   },
   {
     "version": "v3.9",
-    "date": "May 8, 2024",
+    "date": "2024-05-08",
     "content": [
       {
         "type": "add",
@@ -580,7 +580,7 @@
   },
   {
     "version": "v4.0",
-    "date": "May 13, 2024",
+    "date": "2024-05-13",
     "content": [
       {
         "type": "add",
@@ -631,7 +631,7 @@
   },
   {
     "version": "v4.1",
-    "date": "July 11, 2024",
+    "date": "2024-07-11",
     "content": [
       {
         "type": "add",
@@ -655,7 +655,7 @@
   },
   {
     "version": "v4.2",
-    "date": "Sept 25, 2024",
+    "date": "2024-09-25",
     "content": [
       {
         "type": "add",
@@ -688,7 +688,7 @@
   },
   {
     "version": "v4.3",
-    "date": "Oct 30, 2024",
+    "date": "2024-10-30",
     "content": [
       {
         "type": "add",
@@ -721,7 +721,7 @@
   },
   {
     "version": "v4.4",
-    "date": "Dec 7, 2024",
+    "date": "2024-12-07",
     "content": [
       {
         "type": "add",
@@ -754,7 +754,7 @@
   },
   {
     "version": "v4.5",
-    "date": "Dec 25, 2024",
+    "date": "2024-12-25",
     "content": [
       {
         "type": "add",
@@ -778,7 +778,7 @@
   },
   {
     "version": "v5.0",
-    "date": "Jan 31, 2025",
+    "date": "2025-01-31",
     "content": [
       {
         "type": "add",
@@ -829,7 +829,7 @@
   },
   {
     "version": "v5.1",
-    "date": "Nov 12, 2025",
+    "date": "2025-11-12",
     "content": [
       {
         "type": "add",
@@ -853,7 +853,7 @@
   },
   {
     "version": "v5.2",
-    "date": "Jan 05, 2026",
+    "date": "2026-01-05",
     "content": [
       {
         "type": "add",
@@ -886,7 +886,7 @@
   },
   {
     "version": "v5.3",
-    "date": "Apr 14, 2026",
+    "date": "2026-04-14",
     "content": [
       {
         "type": "add",
@@ -919,7 +919,7 @@
   },
   {
     "version": "v6.0",
-    "date": "Apr 19, 2026",
+    "date": "2026-04-19",
     "content": [
       {
         "type": "add",
@@ -1015,7 +1015,7 @@
   },
   {
     "version": "v6.1.0",
-    "date": "Apr 25, 2026",
+    "date": "2026-04-25",
     "content": [
       {
         "type": "add",
@@ -1093,7 +1093,7 @@
   },
   {
     "version": "v6.2.0",
-    "date": "May 13, 2026",
+    "date": "2026-05-13",
     "content": [
       {
         "type": "add",
@@ -1126,7 +1126,7 @@
   },
   {
     "version": "v6.3.0",
-    "date": "May 27, 2026",
+    "date": "2026-05-27",
     "content": [
       {
         "type": "add",
@@ -1177,7 +1177,7 @@
   },
   {
     "version": "v6.4.0",
-    "date": "June 1, 2026",
+    "date": "2026-06-01",
     "content": [
       {
         "type": "add",
@@ -1228,7 +1228,7 @@
   },
   {
     "version": "v6.5.0",
-    "date": "June 15, 2026",
+    "date": "2026-06-15",
     "content": [
       {
         "type": "add",
@@ -1270,7 +1270,7 @@
   },
   {
     "version": "v6.6.0",
-    "date": "July 1, 2026",
+    "date": "2026-07-01",
     "content": [
       {
         "type": "add",
@@ -1321,7 +1321,7 @@
   },
   {
     "version": "v7.0.0",
-    "date": "July 14, 2026",
+    "date": "2026-07-14",
     "content": [
       {
         "type": "add",
@@ -1426,7 +1426,7 @@
   },
   {
     "version": "v7.1.0",
-    "date": "July 21, 2026",
+    "date": "2026-07-21",
     "content": [
       {
         "type": "improve",
@@ -1468,7 +1468,7 @@
   },
   {
     "version": "v7.2.0",
-    "date": "July 28, 2026",
+    "date": "2026-07-28",
     "content": [
       {
         "type": "add",

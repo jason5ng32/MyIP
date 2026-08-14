@@ -4,7 +4,7 @@
 // because a second database disagreed about where the IP lives.
 //
 // This is the timezone *of a looked-up IP*. The visitor's own browser timezone
-// is a separate concern living in frontend/utils/timezone.js.
+// is a separate concern living in frontend/utils/time-utils.js.
 //
 // Only the zone name travels to the client. The UTC offset is rendered
 // frontend-side from this name: geo routes sit behind a 24h edge cache, and a

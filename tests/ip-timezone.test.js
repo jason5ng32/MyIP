@@ -1,6 +1,6 @@
 // Contract tests for common/ip-timezone — the coordinate → IANA zone
 // derivation behind the withTimeZone() middleware. Distinct from
-// frontend/utils/timezone.js, which reads the visitor's own browser timezone.
+// frontend/utils/time-utils.js, which reads the visitor's own browser timezone.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

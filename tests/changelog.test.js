@@ -21,6 +21,9 @@ describe('changelog.json', () => {
             assert.equal(typeof v.version, 'string', `missing version string`);
             assert.match(v.version, /^v\d+\.\d+/, `version ${v.version} should look like "vX.Y"`);
             assert.equal(typeof v.date, 'string', `${v.version} missing date`);
+            // ISO dates localize per viewer in the Footer; "Beta" marks the unreleased entry.
+            assert.match(v.date, /^(\d{4}-\d{2}-\d{2}|Beta)$/,
+                `${v.version} date must be ISO "YYYY-MM-DD" (or "Beta"), got "${v.date}"`);
             assert.ok(Array.isArray(v.content), `${v.version} content must be an array`);
             assert.ok(v.content.length > 0, `${v.version} content must be non-empty`);
         }

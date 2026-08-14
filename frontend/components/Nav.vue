@@ -256,7 +256,7 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import unixToDateTime from '@/utils/timestamp-to-date';
+import { unixToDateTime } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import {
