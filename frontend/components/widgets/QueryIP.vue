@@ -45,7 +45,8 @@
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                         :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
-                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false" />
+                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false"
+                        @view-usage="onOpenChange(false)" />
                 </div>
             </div>
         </DialogContent>
@@ -57,6 +58,7 @@
 // Differences from IPCard:
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
+// - The panel's "view usage" link closes this dialog first, for the same reason.
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';

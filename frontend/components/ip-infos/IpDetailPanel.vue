@@ -86,7 +86,7 @@
                      users) — the sponsor path lives there, not a direct jump. -->
                 <button v-if="allAdvancedQuotaExceeded" type="button"
                     class="shrink-0 underline underline-offset-2 hover:text-foreground cursor-pointer"
-                    @click="store.setTriggerUserBenefits(true)">
+                    @click="openUsageDialog">
                     {{ t('user.ViewUsage') }}
                 </button>
             </span>
@@ -314,6 +314,15 @@ const props = defineProps({
     // QueryIP opts out — the parent is already a Dialog, stacking dialogs is confusing.
     enableMap: { type: Boolean, default: false },
 });
+
+// Consumers rendering this panel inside a dialog listen to close themselves
+// first — the Benefits & Usage dialog would otherwise stack on top of them.
+const emit = defineEmits(['view-usage']);
+
+const openUsageDialog = () => {
+    emit('view-usage');
+    store.setTriggerUserBenefits(true);
+};
 
 // Single-select panel content for the ASN block: 'info' | 'history' | null.
 // Kept separate from the open state so close animations retain their content
