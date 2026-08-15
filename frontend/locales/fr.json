@@ -12,8 +12,8 @@
     "ViewUsage": "Voir l'utilisation",
     "Usage": {
       "Title": "Statistiques d'utilisation",
-      "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC).",
-      "IpinfoFeature": "Données IP avancées",
+      "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC). Les données IP avancées ne comptent que les IP uniques — interroger à nouveau une IP déjà consultée ce mois-ci ne consomme pas de quota.",
+      "IpinfoFeature": "Données IP avancées (IP uniques)",
       "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels."
     },
     "MyAchievements": "Succès",
@@ -824,7 +824,7 @@
     "qualityScore": "Qualité IP",
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
-    "advancedQuotaCta": "Quota mensuel épuisé",
+    "advancedQuotaCta": "Quota mensuel de nouvelles IP épuisé",
     "ASNInfo": {
       "trafficPercentage": "Pourcentage de trafic : ",
       "note": "Données associées à cet AS : ",

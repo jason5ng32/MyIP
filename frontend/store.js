@@ -72,6 +72,14 @@ export const useMainStore = defineStore('main', {
     // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
     // only — the backend enforces the same limits authoritatively; absent
     // data (signed out, old backend, fetch pending) reads as not exceeded.
+    //
+    // Metering differs per feature: invisibility_test / dns_leak_test count
+    // requests, so exhausted means every further run is blocked and their
+    // components use this as a pre-flight gate. ipinfo counts UNIQUE target
+    // IPs per month — exhausted only means "no NEW IPs"; already-queried IPs
+    // still pass, only the backend can tell which is which. Never use the
+    // ipinfo flag to preemptively block a lookup (no component does today);
+    // it is display-only.
     quotaExceeded: (state) => {
       const features = state.remoteUserInfo?.quota?.features || {};
       const exceeded = (key) => {

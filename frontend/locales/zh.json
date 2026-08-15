@@ -12,8 +12,8 @@
     "ViewUsage": "查看用量",
     "Usage": {
       "Title": "用量统计",
-      "Note": "高级功能设有每月免费额度，每月（UTC）自动重置。",
-      "IpinfoFeature": "IP 高级数据",
+      "Note": "高级功能设有每月免费额度，每月（UTC）自动重置。IP 高级数据仅按独立 IP 计数——本月已查询过的 IP 再次查询不消耗额度。",
+      "IpinfoFeature": "IP 高级数据（按独立 IP 计）",
       "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。"
     },
     "MyAchievements": "我的成就",
@@ -824,7 +824,7 @@
     "qualityScore": "IP 质量分",
     "qualityScoreUnknown": "未知分数",
     "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
-    "advancedQuotaCta": "本月高级数据额度已用完",
+    "advancedQuotaCta": "本月新 IP 查询额度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",
