@@ -155,14 +155,18 @@ const importList = (list) => {
     existingUrls: [...props.builtinUrls, ...customTargets.value.map((c) => c.url)],
     currentCount: customTargets.value.length,
   });
-  if (plan.additions.length) {
-    store.updatePreference('customConnectivityTargets', [...customTargets.value, ...plan.additions]);
+  // All-or-nothing (enforced in planImport): a capacity shortfall stores
+  // nothing, so the list is never half-imported behind a complete-looking ✓.
+  if (plan.overflowCount) {
+    importResult.value = t('connectivity.importDialog.NotEnoughCapacity', {
+      need: plan.freshCount,
+      free: plan.capacity,
+    });
+    return;
   }
-  // Quiet on success — the inline check marks the list; only hitting the
-  // shared cap warrants a message.
-  importResult.value = plan.overflowCount
-    ? t('connectivity.importDialog.OverLimit', { n: plan.additions.length })
-    : '';
+  store.updatePreference('customConnectivityTargets', [...customTargets.value, ...plan.additions]);
+  // Quiet on success — the inline check marks the list.
+  importResult.value = '';
   trackEvent('Section', 'ImportList', list.id);
 };
 

@@ -129,6 +129,7 @@ import { useIpHistory } from '@/composables/use-ip-history.js';
 import { createMaskGate } from '@/composables/use-info-mask.js';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import { filterHistoryDays, countryFacets, ipVersionCounts } from '@/utils/ip-history.js';
+import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
@@ -199,14 +200,9 @@ const countryName = (code) => {
     return getCountryName(code, lang.value) || code;
 };
 
-// Localized day header, e.g. "Jul 8, 2026" / "2026年7月8日".
-const formatDay = (dayKey) => {
-    const [y, m, d] = dayKey.split('-').map(Number);
-    const locale = lang.value === 'zh' ? 'zh-CN' : lang.value;
-    return new Date(y, m - 1, d).toLocaleDateString(locale, {
-        year: 'numeric', month: 'short', day: 'numeric',
-    });
-};
+// Localized day header, e.g. "Jul 8, 2026" / "2026年7月8日" — the shared
+// helper takes the storage bucket's "YYYY-MM-DD" key directly.
+const formatDay = (dayKey) => formatIsoDate(dayKey, lang.value);
 
 // Clear-all is destructive: first click arms, second click within the armed
 // window actually clears. Disarms when the panel closes.

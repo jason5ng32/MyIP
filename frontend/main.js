@@ -5,7 +5,7 @@ import App from './App.vue'
 import i18n, { loadActiveLocaleMessages } from './locales/i18n';
 import router from './router';
 import { analytics } from './utils/analytics';
-import { getTimezoneInfo } from './utils/timezone';
+import { getTimezoneInfo } from './utils/time-utils';
 import { isRunningAsPwa } from './utils/pwa';
 import { readAuthHint } from './utils/auth-hint';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';

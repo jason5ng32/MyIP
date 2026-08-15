@@ -247,6 +247,7 @@
           "POWER_OUTAGE": "电力中断",
           "CABLE_CUT": "光缆中断",
           "TECHNICAL_PROBLEM": "技术故障",
+          "MECHANICAL": "机械故障",
           "UNKNOWN": "原因未知",
           "WEATHER": "恶劣天气",
           "FIRE": "火灾",
@@ -953,7 +954,7 @@
       "Import": "导入",
       "RemoveList": "移除该列表",
       "Capacity": "已用 {used}/{limit}",
-      "OverLimit": "已超过上限，仅添加了其中 {n} 个"
+      "NotEnoughCapacity": "容量不足——该列表需要 {need} 个空位，仅剩 {free} 个"
     },
     "importLists": {
       "iran": "伊朗常用",

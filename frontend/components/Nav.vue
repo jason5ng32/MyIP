@@ -249,7 +249,7 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import unixToDateTime from '@/utils/timestamp-to-date';
+import { unixToDateTime } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import {
@@ -284,7 +284,7 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useMainStore();
 const router = useRouter();
 
@@ -338,7 +338,7 @@ const isFireBaseSet = computed(() => store.isFireBaseSet);
 const isSignedIn = computed(() => store.isSignedIn);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
-const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
+const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt, locale.value));
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 

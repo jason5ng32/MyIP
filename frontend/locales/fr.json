@@ -247,6 +247,7 @@
           "POWER_OUTAGE": "Panne d'électricité",
           "CABLE_CUT": "Câble sectionné",
           "TECHNICAL_PROBLEM": "Problème technique",
+          "MECHANICAL": "Problème mécanique",
           "UNKNOWN": "Cause inconnue",
           "WEATHER": "Intempéries",
           "FIRE": "Incendie",
@@ -953,7 +954,7 @@
       "Import": "Importer",
       "RemoveList": "Retirer cette liste",
       "Capacity": "{used}/{limit} utilisés",
-      "OverLimit": "Limite dépassée — seulement {n} ajoutés."
+      "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants."
     },
     "importLists": {
       "iran": "Essentiels Iran",

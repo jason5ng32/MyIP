@@ -258,7 +258,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
-import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/timezone.js';
+import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it

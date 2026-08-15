@@ -126,6 +126,7 @@ import { useCollectedReport } from '@/composables/use-report-collector.js';
 import { useReportShare } from '@/composables/use-report-share.js';
 import { REPORT_SECTION_IDS, REPORT_TTL_DAYS } from '@/utils/report-schema.js';
 import { SECTION_TITLE_KEYS, buildShareReport, reportToMarkdown, downloadReportJson } from '@/utils/report-export.js';
+import { isoToDateTime } from '@/utils/time-utils.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
@@ -138,7 +139,7 @@ import { Spinner } from '@/components/ui/spinner';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 import { Share2, Link2, Bot, FileJson, ChevronRight } from '@lucide/vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useMainStore();
 const { sections, availableSectionIds } = useCollectedReport();
 const { creating, shareLink, expiresAt, shareError, createShareLink, resetShareLink } = useReportShare();
@@ -207,8 +208,7 @@ const onDownloadJson = () => {
     downloadReportJson(assembleReport());
 };
 
-const expiresAtDisplay = computed(() =>
-    expiresAt.value ? new Date(expiresAt.value).toLocaleString() : '');
+const expiresAtDisplay = computed(() => isoToDateTime(expiresAt.value, locale.value));
 
 // For the `e` keyboard shortcut (use-shortcuts.js).
 defineExpose({ openDialog });

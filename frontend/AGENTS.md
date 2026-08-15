@@ -100,10 +100,13 @@ philosophy as `firebase-init.js`). Two rules:
   indistinguishable from visitor-side conditions (no IPv6 / dead network),
   which is routine noise.
 
-Capture surface: uncaught errors; `console.error` (fingerprinted per message
-prefix so each source stays a distinct issue; individual `utils/getips/`
-source failures are `console.warn` — invisible to Sentry by design, the
-per-card exhaustion event above is the health signal); route-change traces;
+Capture surface: uncaught errors; `console.error` (fingerprinted on the first
+argument, so a call site that fails several ways names the failure there —
+`fetchErrorLabel` in `utils/authenticated-fetch.js` renders the HTTP status,
+keeping an edge-blocked 403 out of the same issue as a 5xx; individual
+`utils/getips/` source failures are `console.warn` — invisible to Sentry by
+design, the per-card exhaustion event above is the health signal);
+route-change traces;
 error-only Replay, page text deliberately unmasked (the visitor's on-screen
 network info IS the debugging context; typed input stays masked; disclosed
 in the privacy policy). Third-party script errors (Cloudflare's RUM beacon)
@@ -115,7 +118,7 @@ upload at build, gated on `SENTRY_AUTH_TOKEN`.
 
 ## UI system
 
-**shadcn-vue first.** Check `components/ui/` (21 copied-in primitives), then
+**shadcn-vue first.** Check `components/ui/` (copied-in primitives), then
 https://www.shadcn-vue.com/docs/components for something to copy in;
 hand-rolled Tailwind only when neither fits. Two local notes: `Spinner` is
 project-specific (lucide `Loader2` + `role="status"`); `toggle` /
@@ -163,6 +166,16 @@ Copy from the named exemplar instead of re-inventing:
   transition (Connectivity / WebRTC / IPCard). `jn-card` = shadow / border /
   keyboard outline; `keyboard-shortcut-card` = J/K navigation target.
 - **Flag** — always `<Icon :icon="'circle-flags:' + code.toLowerCase()" />`.
+- **Dates & times** — every user-visible stamp renders through
+  `utils/time-utils.js` with the vue-i18n locale: `formatIsoDate` (date-only
+  ISO — changelog, OONI windows, IP-history day headers), `isoToDateTime`
+  (ISO instants — report generated / expiry / per-section stamps),
+  `unixToDateTime` (epoch ms — account & achievement dates),
+  `relativeTimeFromMinutes` / `relativeTimeSince` / `formatDuration` (Pulse).
+  No hand-rolled `toLocaleDateString` / `Intl.DateTimeFormat` in components;
+  a deliberate exception carries a comment saying why (ASNHistory's
+  fixed-width ISO columns, report-export's AI-facing ISO intro,
+  ServiceStatus's seconds-bearing refresh clock).
 - **Fit-to-width tokens** — IP / MAC strings render inside `<FitText>`
   (`HERO_TIERS` hero rows, `INLINE_TIERS` compact rows; `:max-lines="2"` on
   heroes). Never per-component length-threshold helpers (IPCard, QueryIP).

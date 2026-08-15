@@ -37,8 +37,8 @@
                     <CardContent class="p-0">
                         <header class="flex items-center justify-between gap-2 px-4 py-3 border-b">
                             <h3 class="text-sm font-semibold m-0">{{ t('censorshipcheck.HistoryTitle') }}</h3>
-                            <span class="text-xs text-muted-foreground font-mono">{{ ooniData.since }} → {{
-                                ooniData.until }}</span>
+                            <span class="text-xs text-muted-foreground">{{ formatIsoDate(ooniData.since, locale) }} → {{
+                                formatIsoDate(ooniData.until, locale) }}</span>
                         </header>
                         <ul class="divide-y">
                             <li v-for="c in flagged" :key="c.country" class="px-4 py-2.5 space-y-1.5">
@@ -186,6 +186,7 @@ import { useGlobalpingMeasurement } from '@/composables/use-globalping-measureme
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
 import { isValidDomain } from '@/utils/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
+import { formatIsoDate } from '@/utils/time-utils.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -197,7 +198,7 @@ import {
 } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const store = useMainStore();
 const lang = computed(() => store.lang);

@@ -108,13 +108,14 @@
             </TabsContent>
 
             <!-- Changelog -->
-            <!-- Data lives in frontend/data/changelog.json (shared version / date, per-lang change text).
-                Badge labels and the section title stay in locale files as UI chrome. -->
+            <!-- Data lives in frontend/data/changelog.json (shared version, ISO date, per-lang change
+                text). Dates localize at render via formatIsoDate; badge labels and the section title
+                stay in locale files as UI chrome. -->
             <TabsContent value="changelog" class="space-y-6 mt-0">
               <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
                   <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
-                  <span class="text-xs text-muted-foreground tabular-nums">{{ version.date }}</span>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale) }}</span>
                 </header>
                 <Separator class="mb-3" />
                 <ul class="space-y-2">
@@ -165,6 +166,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/analytics';
+import { formatIsoDate } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
