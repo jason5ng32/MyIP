@@ -22,7 +22,8 @@
       "CreatedAt": "Created At",
       "LastLogin": "Last Login",
       "Level": "User Level",
-      "Fetching": "Fetching..."
+      "Fetching": "Fetching...",
+      "SignInMethods": "Sign-in"
     },
     "Level": {
       "Standard": "Standard User",
@@ -1105,7 +1106,9 @@
     "SignInFailed": "Sign In Failed",
     "SignInFailedReason": "Reason",
     "IpGeoSourceFallbackTitle": "IP Geolocation Source Switched",
-    "IpGeoSourceFallbackMessage": "{from} is temporarily unavailable — this result comes from {to} for now."
+    "IpGeoSourceFallbackMessage": "{from} is temporarily unavailable — this result comes from {to} for now.",
+    "SignInEmailTakenTitle": "This email is already in use",
+    "SignInEmailTakenMessage": "An account already exists for this email address. Please sign in with {other} instead."
   },
   "shortcutKeys": {
     "GoToTop": "Go to Top",

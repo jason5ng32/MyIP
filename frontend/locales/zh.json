@@ -22,7 +22,8 @@
       "CreatedAt": "创建于",
       "LastLogin": "最后登录",
       "Level": "用户等级",
-      "Fetching": "获取中..."
+      "Fetching": "获取中...",
+      "SignInMethods": "登录方式"
     },
     "Level": {
       "Standard": "标准用户",
@@ -1105,7 +1106,9 @@
     "SignInFailed": "登录失败",
     "SignInFailedReason": "原因",
     "IpGeoSourceFallbackTitle": "IP 解析数据源已切换",
-    "IpGeoSourceFallbackMessage": "解析源 {from} 暂时不可用，本次结果临时改由 {to} 提供。"
+    "IpGeoSourceFallbackMessage": "解析源 {from} 暂时不可用，本次结果临时改由 {to} 提供。",
+    "SignInEmailTakenTitle": "该邮箱已被使用",
+    "SignInEmailTakenMessage": "该邮箱已经注册过账号，请改用 {other} 登录。"
   },
   "shortcutKeys": {
     "GoToTop": "回到顶部",

@@ -22,7 +22,8 @@
       "CreatedAt": "Дата создания",
       "LastLogin": "Последний вход",
       "Level": "Уровень пользователя",
-      "Fetching": "Загрузка..."
+      "Fetching": "Загрузка...",
+      "SignInMethods": "Вход"
     },
     "Level": {
       "Standard": "Обычный пользователь",
@@ -1105,7 +1106,9 @@
     "SignInFailed": "Не удалось войти",
     "SignInFailedReason": "Причина",
     "IpGeoSourceFallbackTitle": "Источник IP-геоданных переключён",
-    "IpGeoSourceFallbackMessage": "{from} временно недоступен — этот результат временно получен из {to}."
+    "IpGeoSourceFallbackMessage": "{from} временно недоступен — этот результат временно получен из {to}.",
+    "SignInEmailTakenTitle": "Этот адрес уже используется",
+    "SignInEmailTakenMessage": "Аккаунт с этим адресом электронной почты уже существует. Войдите через {other}."
   },
   "shortcutKeys": {
     "GoToTop": "Перейти наверх",

@@ -10,6 +10,33 @@ import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './da
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
 
+// The two sign-in buttons. `other` is the provider to point a visitor at when
+// their email already owns an account through the other one;
+const SIGN_IN_PROVIDERS = {
+  google: {
+    label: 'Google',
+    other: 'GitHub',
+    providerId: 'google.com',
+    icon: 'ri:google-line',
+    build: ({ GoogleAuthProvider }) => {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('email');
+      return provider;
+    },
+  },
+  github: {
+    label: 'GitHub',
+    other: 'Google',
+    providerId: 'github.com',
+    icon: 'ri:github-line',
+    build: ({ GithubAuthProvider }) => {
+      const provider = new GithubAuthProvider();
+      provider.addScope('user:email');
+      return provider;
+    },
+  },
+};
+
 export const useMainStore = defineStore('main', {
 
   state: () => ({
@@ -68,6 +95,19 @@ export const useMainStore = defineStore('main', {
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
     },
+    // How this account signs in, for display in the user menu. A provider the
+    // app no longer offers still shows, under its raw id rather than hidden.
+    linkedProviders: (state) => {
+      const known = Object.values(SIGN_IN_PROVIDERS);
+      return (state.user?.providerData || []).map((entry) => {
+        const descriptor = known.find((item) => item.providerId === entry.providerId);
+        return {
+          providerId: entry.providerId,
+          label: descriptor?.label || entry.providerId,
+          icon: descriptor?.icon || null,
+        };
+      });
+    },
     // Per-feature "monthly quota exhausted" booleans, derived from the
     // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
     // only — the backend enforces the same limits authoritatively; absent
@@ -75,11 +115,7 @@ export const useMainStore = defineStore('main', {
     //
     // Metering differs per feature: invisibility_test / dns_leak_test count
     // requests, so exhausted means every further run is blocked and their
-    // components use this as a pre-flight gate. ipinfo counts UNIQUE target
-    // IPs per month — exhausted only means "no NEW IPs"; already-queried IPs
-    // still pass, only the backend can tell which is which. Never use the
-    // ipinfo flag to preemptively block a lookup (no component does today);
-    // it is display-only.
+    // components use this as a pre-flight gate.
     quotaExceeded: (state) => {
       const features = state.remoteUserInfo?.quota?.features || {};
       const exceeded = (key) => {
@@ -221,34 +257,48 @@ export const useMainStore = defineStore('main', {
     },
     // sign in with Google
     async signInWithGoogle() {
-      try {
-        const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-        const provider = new GoogleAuthProvider();
-        provider.addScope('email');
-        const result = await signInWithPopup(auth, provider);
-        this.user = result.user;
-        writeAuthHint(true);
-        // refresh browser after successful login
-        window.location.reload();
-      } catch (error) {
-        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
-        console.error("Google sign-in failed:", error);
-      }
+      await this.signInWithProvider('google');
     },
     // sign in with GitHub
     async signInWithGithub() {
+      await this.signInWithProvider('github');
+    },
+    // Shared sign-in path for both buttons.
+    async signInWithProvider(providerKey) {
+      const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
-        const { auth, GithubAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-        const provider = new GithubAuthProvider();
-        provider.addScope('user:email');
-        const result = await signInWithPopup(auth, provider);
+        const fb = await loadFirebaseAuth();
+        const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
         this.user = result.user;
         writeAuthHint(true);
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
-        console.error("GitHub sign-in failed:", error);
+        this.handleSignInError(error, descriptor);
+      }
+    },
+    // Turns Firebase auth error codes into something a visitor can act on.
+    handleSignInError(error, descriptor) {
+      console.error(`${descriptor.label} sign-in failed:`, error);
+
+      switch (error?.code) {
+        // Closing the popup is normal, not a failure worth a red toast.
+        case 'auth/popup-closed-by-user':
+        case 'auth/cancelled-popup-request':
+        case 'auth/user-cancelled':
+          return;
+        case 'auth/account-exists-with-different-credential':
+        case 'auth/email-already-in-use':
+        case 'auth/credential-already-in-use':
+          this.setAlert(true, 'text-warning',
+            t('alert.SignInEmailTakenMessage', { other: descriptor.other }),
+            t('alert.SignInEmailTakenTitle'), 8000);
+          return;
+
+        default:
+          this.setAlert(true, 'text-danger',
+            t('alert.SignInFailedReason') + ' : ' + error,
+            t('alert.SignInFailed'));
       }
     },
     // sign out

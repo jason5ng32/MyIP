@@ -238,3 +238,86 @@ describe('store — getDbUrl delegates to buildDbUrl', () => {
     assert.ok(!result, `expected falsy result for unknown id, got ${result}`);
   });
 });
+
+describe('store — linkedProviders', () => {
+  const signedInWith = (store, ...providerIds) => {
+    store.isSignedIn = true;
+    store.user = { providerData: providerIds.map((providerId) => ({ providerId })) };
+  };
+
+  it('is empty while signed out', () => {
+    const s = useMainStore();
+    s.user = null;
+    assert.deepEqual(s.linkedProviders, []);
+  });
+
+  it('names each provider and the icon the menu renders', () => {
+    const s = useMainStore();
+    signedInWith(s, 'google.com');
+    assert.deepEqual(s.linkedProviders, [
+      { providerId: 'google.com', label: 'Google', icon: 'ri:google-line' },
+    ]);
+  });
+
+  it('keeps Firebase order when several are present', () => {
+    const s = useMainStore();
+    signedInWith(s, 'github.com', 'google.com');
+    assert.deepEqual(s.linkedProviders.map((entry) => entry.label), ['GitHub', 'Google']);
+  });
+
+  it('falls back to the raw id for a provider the app does not offer', () => {
+    const s = useMainStore();
+    signedInWith(s, 'password');
+    // Shown rather than hidden: an account signing in some other way should
+    // not read as having no sign-in method at all.
+    assert.deepEqual(s.linkedProviders, [
+      { providerId: 'password', label: 'password', icon: null },
+    ]);
+  });
+});
+
+describe('store — handleSignInError', () => {
+  const google = { label: 'Google', other: 'GitHub' };
+  const github = { label: 'GitHub', other: 'Google' };
+  // i18n has no messages loaded here, so t() returns the key itself — which
+  // makes these tests about WHICH message each code picks.
+  const fail = (store, code, descriptor) => {
+    store.setAlert(false, '', '', '', 0);
+    store.handleSignInError({ code }, descriptor);
+    return store.alert;
+  };
+
+  it('stays silent when the visitor just closes the popup', () => {
+    const s = useMainStore();
+    for (const code of ['auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/user-cancelled']) {
+      assert.equal(fail(s, code, github).alertToShow, false, code);
+    }
+  });
+
+  it('warns and points at the other provider when the email is taken', () => {
+    const s = useMainStore();
+    for (const code of [
+      'auth/account-exists-with-different-credential',
+      'auth/email-already-in-use',
+      'auth/credential-already-in-use',
+    ]) {
+      const alert = fail(s, code, github);
+      assert.equal(alert.alertMessage, 'alert.SignInEmailTakenMessage', code);
+      assert.equal(alert.alertStyle, 'text-warning', code);
+    }
+  });
+
+  it('still surfaces unexpected failures as errors', () => {
+    const s = useMainStore();
+    const unknown = fail(s, 'auth/network-request-failed', google);
+    assert.equal(unknown.alertStyle, 'text-danger');
+    assert.ok(unknown.alertToShow);
+  });
+
+  it('survives an error object with no code at all', () => {
+    const s = useMainStore();
+    s.setAlert(false, '', '', '', 0);
+    s.handleSignInError(new Error('boom'), google);
+    assert.equal(s.alert.alertStyle, 'text-danger');
+  });
+});

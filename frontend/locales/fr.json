@@ -22,7 +22,8 @@
       "CreatedAt": "Créé Le",
       "LastLogin": "Dernière Connexion",
       "Level": "Niveau d'Utilisateur",
-      "Fetching": "Recherche..."
+      "Fetching": "Recherche...",
+      "SignInMethods": "Connexion"
     },
     "Level": {
       "Standard": "Utilisateur Standard",
@@ -1105,7 +1106,9 @@
     "SignInFailed": "Echec de connexion",
     "SignInFailedReason": "Raison",
     "IpGeoSourceFallbackTitle": "Source de géolocalisation IP changée",
-    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}."
+    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}.",
+    "SignInEmailTakenTitle": "Cette adresse e-mail est déjà utilisée",
+    "SignInEmailTakenMessage": "Un compte existe déjà pour cette adresse e-mail. Veuillez vous connecter avec {other}."
   },
   "shortcutKeys": {
     "GoToTop": "Aller en haut",
