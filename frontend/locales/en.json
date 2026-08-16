@@ -1186,5 +1186,9 @@
     "add": "Added",
     "improve": "Improved",
     "fix": "Fixed"
+  },
+  "pwa": {
+    "appDescription": "All in one IP Toolbox",
+    "installDescription": "You've already used IPCheck.ing {count} times — install it as an app for a smoother experience and quicker access."
   }
 }

@@ -20,9 +20,10 @@ import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
 
-// PWA install prompt — async and eligibility-gated: ineligible visits (first
-// visit, prompt cap reached, already installed) never load pwa-install or
-// trigger its manifest fetch; eligible ones load it at the prompt's 30s mark.
+// PWA install prompt — async and eligibility-gated: ineligible visits (too
+// few 12h-deduped uses, prompt cap reached, already installed) never load
+// pwa-install or trigger its manifest fetch; eligible ones load it at the
+// prompt's 30s mark.
 const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 const offerPwaInstall = ref(false);
 onMounted(() => {

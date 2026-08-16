@@ -1186,5 +1186,9 @@
     "add": "新增",
     "improve": "优化",
     "fix": "修复"
+  },
+  "pwa": {
+    "appDescription": "一站式 IP 工具箱",
+    "installDescription": "这已经是你第 {count} 次使用 IPCheck.ing 了，把它安装为应用，可以获得更好的使用体验，打开也更方便。"
   }
 }

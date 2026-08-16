@@ -1186,5 +1186,9 @@
     "add": "Ajouté",
     "improve": "Amélioré",
     "fix": "Corrigé"
+  },
+  "pwa": {
+    "appDescription": "La boîte à outils IP tout-en-un",
+    "installDescription": "Vous avez déjà utilisé IPCheck.ing {count} fois — installez-le comme application pour une expérience plus fluide et un accès plus rapide."
   }
 }

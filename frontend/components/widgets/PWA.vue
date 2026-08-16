@@ -5,9 +5,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import '@khmyznikov/pwa-install';
 import { detectBrowser, detectOS } from '@/utils/system-detect.js';
+import { getPwaVisitCount } from '@/utils/pwa.js';
 import { trackEvent } from '@/utils/analytics';
+
+const { t } = useI18n();
 
 
 // Define data
@@ -47,6 +51,8 @@ const showPWA = () => {
     pwaInstall.isAppleMobilePlatform = isIosSafari.value;
     pwaInstall.isAppleDesktopPlatform = isMacSafari.value;
     pwaInstall.externalPromptEvent = window.ipcheckInstallPromptEvent || pwaInstall.externalPromptEvent;
+    pwaInstall.installDescription = t('pwa.installDescription', { count: getPwaVisitCount() });
+    pwaInstall.description = t('pwa.appDescription');
 
     if (!pwaInstall.isUnderStandaloneMode && pwaInstall.isInstallAvailable) {
         pwaInstall.showDialog(true);
