@@ -15,7 +15,7 @@
         </p>
       </div>
       <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
-        <Button variant="action" size="sm" @click="emit('action')" class="shrink-0 cursor-pointer">
+        <Button variant="action" size="sm" @click="emit('action')" class="w-full md:w-auto shrink-0 cursor-pointer">
           <span>{{ cta }}</span>
           <ArrowRight class="size-4 ml-1" />
         </Button>
