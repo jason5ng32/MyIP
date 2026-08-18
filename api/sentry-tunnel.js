@@ -133,7 +133,19 @@ export default async (req, res) => {
             headers: { 'Content-Type': 'application/x-sentry-envelope' },
             body,
         });
-        res.status(apiRes.status).send(await apiRes.text());
+        const relayed = await apiRes.text();
+        if (!apiRes.ok) {
+            // Ingest refuses an envelope for reasons the browser can do
+            // nothing about — most often size, since replay recordings travel
+            // uncompressed here. Without this line the rejection is visible
+            // only in the visitor's devtools.
+            logger.warn({
+                statusCode: apiRes.status,
+                envelopeBytes: body.length,
+                bodyPreview: relayed.slice(0, 200),
+            }, 'sentry tunnel upstream rejected the envelope');
+        }
+        res.status(apiRes.status).send(relayed);
     } catch (error) {
         // warn, not error: a transient relay failure is infra noise, not an
         // application defect worth a grouped Issue of its own.
