@@ -41,7 +41,10 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const tool = computed(() => TOOL_BY_SLUG.get(route.params.slug) || null);
+// noStandalone tools are blacklisted from this page entirely — they depend on
+// homepage state, so the drawer on the homepage is their only home.
+const registered = TOOL_BY_SLUG.get(route.params.slug) || null;
+const tool = computed(() => (registered && !registered.noStandalone ? registered : null));
 const toolComponent = computed(() => (tool.value ? defineAsyncComponent(tool.value.component) : null));
 
 // Per-tool head: localized title + description, self-referential canonical.
@@ -54,6 +57,11 @@ useDocumentMeta(() => {
   };
 });
 
-// Unknown slug → bounce to the homepage rather than show an empty shell.
-if (!tool.value) router.replace('/');
+// Unknown slug → bounce to the homepage rather than show an empty shell; a
+// blacklisted tool keeps its destination by reopening as the homepage drawer.
+if (!tool.value) {
+    router.replace(registered?.noStandalone
+        ? { path: '/', query: { tool: registered.slug } }
+        : '/');
+}
 </script>

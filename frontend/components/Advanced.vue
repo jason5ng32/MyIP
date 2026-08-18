@@ -22,7 +22,7 @@
             <Card v-for="card in enabledCards" :key="card.slug"
                 :data-adv-slug="card.slug"
                 class="keyboard-shortcut-card jn-card jn-adv-card group relative overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-                <a :href="`/tools/${card.slug}`"
+                <a :href="card.noStandalone ? `/?tool=${card.slug}` : `/tools/${card.slug}`"
                     class="block cursor-pointer no-underline text-inherit"
                     @click="onCardClick($event, card.slug)"
                     @keydown.enter.prevent="openTool(card.slug)"
@@ -64,8 +64,10 @@
                     </span>
                     <span v-else class="flex-1" />
                     <!-- Open the current tool as a standalone page (hidden in a
-                         PWA window, which has no new-tab affordance) -->
-                    <a v-if="activeTool && !isPwa" :href="`/tools/${activeTool.slug}`" target="_blank" rel="noopener"
+                         PWA window, which has no new-tab affordance, and for
+                         noStandalone tools, which have no such page) -->
+                    <a v-if="activeTool && !isPwa && !activeTool.noStandalone" :href="`/tools/${activeTool.slug}`"
+                        target="_blank" rel="noopener"
                         class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         :title="t('advancedtools.OpenInNewTab')" :aria-label="t('advancedtools.OpenInNewTab')">
                         <SquareArrowOutUpRight class="size-4" />
