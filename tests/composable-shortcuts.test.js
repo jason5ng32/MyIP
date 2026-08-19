@@ -148,9 +148,10 @@ describe('useShortcuts()', () => {
     assert.ok(distinctKeys.has('o'));
     assert.ok(distinctKeys.has('H'));
     assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off when isPulseEnabled is false');
+    assert.equal(distinctKeys.has('P'), false, 'persona shortcut stays off a self-hosted instance');
   });
 
-  it('originalSite=true adds invisibility ("i") and enhanced DNS-leak ("D") shortcuts', () => {
+  it('originalSite=true adds invisibility ("i"), enhanced DNS-leak ("D") and persona ("P") shortcuts', () => {
     const { keyMap, calls } = loadAndGetKeyMap({ originalSite: true });
     const hasInvisibility = keyMap.some((e) => e.keys === 'i');
     assert.ok(hasInvisibility, 'key "i" should be present on originalSite');
@@ -158,6 +159,11 @@ describe('useShortcuts()', () => {
     assert.ok(D, 'key "D" should be present on originalSite');
     D.action();
     assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest']);
+    // Uppercase P is its own key — lowercase p is Earth Online's.
+    const P = keyMap.findLast((e) => e.keys === 'P');
+    assert.ok(P, 'key "P" should be present on originalSite');
+    P.action();
+    assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest', 'personacheck']);
   });
 
   it('"R" action triggers store.setRefreshEveryThing(true)', () => {

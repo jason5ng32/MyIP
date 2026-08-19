@@ -1409,7 +1409,8 @@
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "fullScreenAdvancedTools": "全屏展开高级工具面板",
-    "SecurityChecklist": "打开安全检查清单"
+    "SecurityChecklist": "打开安全检查清单",
+    "PersonaCheck": "打开身份画像检测面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址及归属地 - IP 泄露检测 - DNS 泄露检测 - IP 质量检查 - 网速测试 - Jason Ng 阿禅开源作品",

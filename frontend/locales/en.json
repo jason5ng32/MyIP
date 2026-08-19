@@ -1409,7 +1409,8 @@
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "fullScreenAdvancedTools": "Full Screen Advanced Tools",
-    "SecurityChecklist": "Open Security Checklist panel"
+    "SecurityChecklist": "Open Security Checklist panel",
+    "PersonaCheck": "Open Persona Check panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - Jason Ng Open Source",

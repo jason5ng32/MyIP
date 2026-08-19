@@ -1409,7 +1409,8 @@
     "MacChecker": "Ouvrir le Recherche de MAC",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "fullScreenAdvancedTools": "Outils avancés en plein écran",
-    "SecurityChecklist": "Ouvrir la Liste de sécurité"
+    "SecurityChecklist": "Ouvrir la Liste de sécurité",
+    "PersonaCheck": "Ouvrir le panneau Vérification de persona"
   },
   "page": {
     "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",

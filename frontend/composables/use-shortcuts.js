@@ -219,6 +219,12 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             action: () => goToAdvancedTool('enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
             description: t('shortcutKeys.EnhancedDnsLeakTest'),
         });
+        // Uppercase P: lowercase `p` belongs to Earth Online.
+        config.push({
+            keys: 'P',
+            action: () => goToAdvancedTool('personacheck', 'PersonaCheck'),
+            description: t('shortcutKeys.PersonaCheck'),
+        });
     }
 
     if (isPulseEnabled) {
