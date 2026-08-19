@@ -26,6 +26,19 @@
           "Copier un rapport pour un assistant IA ou le télécharger en JSON se fait entièrement dans votre navigateur et ne stocke rien sur nos serveurs."
         ]
       },
+      "personaCheck": {
+        "title": "Vérification de persona",
+        "paragraphs": [
+          "La Vérification de persona est le seul outil dont les mesures quittent votre navigateur. Les autres calculent dans votre navigateur ou effectuent une recherche affichée à vous seul ; celui-ci envoie ce qu'il a collecté à notre propre API, qui l'évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Il nécessite une connexion, et chaque exécution consomme une unité de votre quota mensuel. Ni ce que vous envoyez ni le rapport reçu ne sont conservés.",
+          "Ce qui accompagne une exécution :"
+        ],
+        "bullets": [
+          "Vos réglages de fuseau horaire et de langue, ainsi que la façon dont votre navigateur formate une date et un nombre d'exemple fixes.",
+          "Les systèmes d'écriture couverts par vos polices installées et vos voix de synthèse, ainsi que votre disposition de clavier — les résultats mêmes que le rapport vous montre. Les lire rend votre navigateur légèrement plus identifiable en général, ce qui est inhérent à cette mesure.",
+          "Les résultats déjà présents sur la page pour les tests IP, WebRTC et DNS.",
+          "Uniquement si vous les fournissez : votre position, arrondie à environ un kilomètre avant de quitter votre appareil et utilisée seulement pour en déduire un pays ; et les 6 à 8 premiers chiffres d'une carte de paiement. Ces chiffres identifient la banque émettrice, jamais votre compte, et ne permettent aucun paiement — ils sont vérifiés auprès d'une base tierce d'émetteurs de cartes."
+        ]
+      },
       "docsAssistant": {
         "title": "Assistant de documentation",
         "paragraphs": [

@@ -56,7 +56,7 @@ const store = useMainStore();
 const { isFireBaseSet } = storeToRefs(store);
 
 // Bump when the policy text changes materially.
-const LAST_UPDATED = '2026-08-09';
+const LAST_UPDATED = '2026-08-19';
 
 // Sentry telemetry is a build-time decision (see frontend/AGENTS.md): the
 // section only renders on deployments actually built with a DSN.
@@ -70,6 +70,11 @@ const isReportSharingEnabled = computed(() => store.configs?.reportSharing === t
 // canonical deployment) — same condition as its nav entry point, so the
 // section never describes a feature this deployment doesn't ship.
 const isDocsAssistantEnabled = computed(() => isDocsConfigured && store.configs?.originalSite === true);
+
+// Persona Check is the one tool whose measurements leave the browser, so it
+// gets its own section — gated exactly like the tool itself (originalSite in
+// data/tools.js), which keeps the section off deployments without it.
+const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === true);
 
 // Privacy copy is loaded on demand per locale (mirrors the security-checklist
 // dataset pattern), then merged into i18n so t() / tm() can resolve it.
@@ -113,6 +118,7 @@ const order = computed(() => {
   // point: the section only renders on builds that actually ship the feature.
   if ((import.meta.env ?? {}).VITE_PULSE_URL) ids.push('pulse');
   if (isReportSharingEnabled.value) ids.push('sharedReports');
+  if (isPersonaCheckEnabled.value) ids.push('personaCheck');
   if (isDocsAssistantEnabled.value) ids.push('docsAssistant');
   if (isAnalyticsEnabled) ids.push('analytics');
   if (isFireBaseSet.value) ids.push('account');

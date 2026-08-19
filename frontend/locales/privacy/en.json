@@ -26,6 +26,19 @@
           "Copying a report for an AI assistant or downloading it as JSON happens entirely in your browser and stores nothing on our servers."
         ]
       },
+      "personaCheck": {
+        "title": "Persona Check",
+        "paragraphs": [
+          "Persona Check is the one tool whose measurements leave your browser. The others compute in your browser or look something up and show it only to you; this one sends what it collected to our own API, which scores it against the country you picked and returns the graded report to you. It requires signing in, and each run counts against your monthly allowance. Neither what you send nor the report you get back is stored.",
+          "What travels with a run:"
+        ],
+        "bullets": [
+          "Your time zone and language settings, and the way your browser formats one fixed sample date and number.",
+          "Which writing systems your installed fonts and speech-synthesis voices cover, plus your keyboard layout — the same findings the report shows you. Reading them makes your browser marginally more identifiable in general, which is inherent in measuring them.",
+          "The results already on the page from the IP lookup, WebRTC and DNS tests.",
+          "Only if you provide them: your position, rounded to about a kilometre before it leaves your device and used only to derive a country; and the first 6-8 digits of a payment card. Those digits identify the issuing bank, never your account, and cannot pay for anything — they are checked against a third-party card-issuer database."
+        ]
+      },
       "docsAssistant": {
         "title": "Documentation assistant",
         "paragraphs": [
