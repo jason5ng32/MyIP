@@ -183,13 +183,14 @@ const rateLimiter = rateLimit({
 const speedLimiter = slowDown({
     windowMs: 60 * 60 * 1000,
     delayAfter: speedLimitSet,
-    delayMs: (hits) => hits * 400,
-    skip: (req) => req.path === '/monitoring',
+    delayMs: (used, req) => (used - req.slowDown.limit) * 400,
+    maxDelayMs: 5000,
+    skip: (req) => req.path === '/monitoring' || req.path === '/maxmind',
 })
 
 if (rateLimitSet !== 0) {
     app.use('/api', rateLimiter);
-    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 60 minutes`);
+    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 20 minutes`);
 }
 
 if (speedLimitSet !== 0) {
