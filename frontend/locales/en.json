@@ -585,7 +585,6 @@
     "Note": "There is an old test: if it looks like a duck, swims like a duck and quacks like a duck, it probably is a duck. Sites read you the same way — your IP may claim you are in country A, but your time zone, languages, installed fonts, keyboard and a dozen other signals each tell their own story, and together they are the persona a site actually sees. This tool measures that persona, compares it against the local resident you want to be read as, and shows exactly where the two diverge.",
     "NoteVs": "It asks a different question than the Invisibility Test. That one checks whether your proxy itself can be detected; this one checks who sites think they are looking at — and how far that picture is from the one you expect to present.",
     "Note2": "Start by choosing the country you want to be read as a local of.",
-    "signInFirst": "Sign in first to use this tool — head to the home page, sign in, then come back; every run spends one unit of your monthly allowance.",
     "axis": {
       "match": "Match with the target",
       "coherence": "Internal consistency",

@@ -32,7 +32,7 @@
                         <div v-if="!signedIn"
                             class="flex items-start gap-2 p-3 rounded-md border border-info/30 bg-info/10 text-sm text-info">
                             <Info class="size-4 mt-0.5 shrink-0" />
-                            <span>{{ t('personacheck.signInFirst') }}</span>
+                            <span>{{ t('user.SignInToUse') }}</span>
                         </div>
 
                         <!-- Zone 1 — the identity the visitor expects to show -->

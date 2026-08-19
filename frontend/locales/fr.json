@@ -549,7 +549,6 @@
     "Note": "Un vieux test dit : si ça ressemble à un canard, nage comme un canard et cancane comme un canard, c'est probablement un canard. Les sites vous lisent de la même façon — votre IP peut prétendre que vous êtes dans le pays A, mais votre fuseau horaire, vos langues, vos polices installées, votre clavier et une dizaine d'autres signaux racontent chacun leur propre histoire, et c'est leur ensemble qui forme le persona qu'un site voit réellement. Cet outil mesure ce persona, le compare au résident local que vous voulez incarner et montre précisément où les deux divergent.",
     "NoteVs": "Il répond à une autre question que le test d'invisibilité : celui-ci vérifie si votre proxy peut être détecté ; ici, il s'agit de savoir qui les sites croient voir — et à quelle distance ce portrait se trouve de celui que vous pensez présenter.",
     "Note2": "Commencez par choisir le pays dont vous voulez avoir l'air d'être un habitant.",
-    "signInFirst": "Connectez-vous d'abord pour utiliser cet outil — passez par la page d'accueil, connectez-vous, puis revenez ; chaque exécution consomme une unité de votre quota mensuel.",
     "axis": {
       "match": "Concordance avec la cible",
       "coherence": "Cohérence interne",
