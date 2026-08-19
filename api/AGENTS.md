@@ -16,7 +16,7 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
 `cf-radar` / `net-outages` / `asn-history` / `asn-connectivity` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
-`github-stars` / `invisibility-test` / `dns-leak-test`), user
+`github-stars` / `invisibility-test` / `dns-leak-test` / `persona`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
@@ -101,9 +101,11 @@ A new geo source inherits the field by adding the middleware to its route.
 
 Handlers proxying our private IPCheck.ing API (`ipcheck-ing`,
 `invisibility-test`, `update-user-achievement`, `get-user-info`,
-`dns-leak-test`) forward the caller's headers upstream
+`dns-leak-test`, `persona`) forward the caller's headers upstream
 (`headers: { ...req.headers }`) — the upstream needs caller context
-(Accept-Language, auth tokens). Do **not** replicate for third-party
+(Accept-Language, auth tokens). `persona` is the one that strips the framing
+headers first (`host` / `content-length` / …): it re-serializes the body, so
+the caller's length no longer describes what goes out. Do **not** replicate for third-party
 upstreams; those get only what's explicitly needed.
 
 ### Defensive method gates

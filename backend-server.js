@@ -38,6 +38,7 @@ import createReportHandler, { getReport as getReportHandler } from './api/share-
 import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
+import personaEvaluateHandler from './api/persona.js';
 // User
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
@@ -282,6 +283,8 @@ app.put('/api/updateuserachievement', updateUserAchievement);
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
+// One observation in, one graded report out — per-visitor by definition.
+app.post('/api/persona/evaluate', personaEvaluateHandler);
 
 // Sentry tunnel — first-party relay for the frontend SDK's envelopes
 // Mounted only when this deployment actually built the frontend with a DSN.
