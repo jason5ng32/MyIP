@@ -830,6 +830,7 @@
     "dependencies": {
       "note": "The check needs the results of all of these base tests — run any that are missing before starting:",
       "runButton": "Run the missing tests",
+      "runButtonRunning": "Running the missing tests…",
       "measured": "{n} of {total} measured",
       "allReady": "All tests have run"
     },

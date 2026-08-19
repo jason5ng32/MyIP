@@ -794,6 +794,7 @@
     "dependencies": {
       "note": "La vérification a besoin des résultats de tous ces tests de base — lancez d'abord ceux qui manquent :",
       "runButton": "Lancer les tests manquants",
+      "runButtonRunning": "Tests en cours…",
       "measured": "{n} sur {total} mesurées",
       "allReady": "Tous les tests ont été lancés"
     },

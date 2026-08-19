@@ -127,8 +127,8 @@
                                 <p class="text-xs leading-4 text-muted-foreground">
                                     {{ t('personacheck.optional.gpsNote') }}
                                 </p>
-                                <Button variant="outline" size="sm" class="w-full" :disabled="!signedIn || locating"
-                                    @click="requestLocation">
+                                <Button variant="outline" size="sm" class="w-full cursor-pointer"
+                                    :disabled="!signedIn || locating" @click="requestLocation">
                                     <Spinner v-if="locating" />
                                     <MapPin v-else class="size-4" />
                                     {{ t('personacheck.optional.gpsButton') }}
@@ -200,10 +200,14 @@
                                         </span>
                                     </li>
                                 </ul>
-                                <Button v-if="missingSources.length" variant="outline" size="sm" class="w-full"
-                                    :disabled="!signedIn" @click="runDependencies">
-                                    <RefreshCw class="size-4" />
-                                    {{ t('personacheck.dependencies.runButton') }}
+                                <Button v-if="missingSources.length || runningDependencies" variant="outline" size="sm"
+                                    class="w-full cursor-pointer" :disabled="!signedIn || runningDependencies"
+                                    @click="runDependencies">
+                                    <Spinner v-if="runningDependencies" />
+                                    <RefreshCw v-else class="size-4" />
+                                    {{ runningDependencies
+                                    ? t('personacheck.dependencies.runButtonRunning')
+                                    : t('personacheck.dependencies.runButton') }}
                                 </Button>
                                 <p v-else class="flex items-center gap-1.5 text-xs text-success">
                                     <CircleCheck class="size-3.5 shrink-0" />
@@ -212,8 +216,8 @@
                             </div>
 
                             <div class="space-y-2">
-                                <Button variant="action" class="w-full" :disabled="!canRun || runStatus === 'running'"
-                                    @click="run">
+                                <Button variant="action" class="w-full cursor-pointer"
+                                    :disabled="!canRun || runStatus === 'running'" @click="run">
                                     <Spinner v-if="runStatus === 'running'" />
                                     <Play v-else class="size-4" />
                                     {{ t('personacheck.runCompare') }}
@@ -258,7 +262,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onScopeDispose } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { REGEXP_ONLY_DIGITS } from 'vue-input-otp';
@@ -358,10 +362,33 @@ const requestLocation = async () => {
 const dependencyRows = computed(() => ['ipinfo', 'webrtc', 'dnsleak']
     .map((id) => ({ id, ready: Boolean(snapshots[id]) })));
 
+// The repair click only kicks off the homepage sequence; the tests report back
+// through the snapshots, so the button holds its running state until the last
+// missing one lands rather than disappearing the moment it is pressed. The cap
+// hands the button back if a test never reports at all.
+const DEPENDENCY_RUN_TIMEOUT = 60 * 1000;
+const runningDependencies = ref(false);
+let dependencyTimer = null;
+
+const stopDependencyRun = () => {
+    runningDependencies.value = false;
+    clearTimeout(dependencyTimer);
+    dependencyTimer = null;
+};
+
 const runDependencies = () => {
     if (route.name !== 'home') router.push('/');
+    runningDependencies.value = true;
+    clearTimeout(dependencyTimer);
+    dependencyTimer = setTimeout(stopDependencyRun, DEPENDENCY_RUN_TIMEOUT);
     store.setRefreshEveryThing(true);
 };
+
+watch(missingSources, (missing) => {
+    if (runningDependencies.value && !missing.length) stopDependencyRun();
+});
+
+onScopeDispose(stopDependencyRun);
 
 const report = ref(null);
 const runStatus = ref('idle');
