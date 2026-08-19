@@ -285,6 +285,38 @@ const SECTION_SPECS = {
             cd: opt(bool()),
         })),
     }),
+    // Persona Check. Deliberately verdict-only: each check contributes its id,
+    // its axis and its conclusion, and nothing else. The live report's `detail`
+    // objects carry what the visitor themselves supplied or what their machine
+    // exposed — issuing bank, the country their position resolved to, their
+    // zone and language list — none of which belongs behind a link anyone can
+    // open. Same doctrine as the invisibility section, which stores its signals
+    // as key + flag rather than the evidence behind them.
+    persona: obj({
+        testedAt: isoDate(),
+        country: countryCode(),
+        grade: oneOf('A', 'B', 'C', 'D', 'unknown'),
+        // Null whenever there was too little signal to grade at all.
+        score: nullable(int(0, 100)),
+        counts: obj({
+            total: int(0, 64),
+            scored: int(0, 64),
+            match: int(0, 64),
+            mismatch: int(0, 64),
+            unnatural: int(0, 64),
+            leak: int(0, 64),
+            unknown: int(0, 64),
+            notApplicable: int(0, 64),
+        }),
+        // `id` stays a capped string rather than an enum: the check registry
+        // lives in the evaluating API, and duplicating its ids here would be a
+        // second list to keep in step for no validation gain.
+        results: arr(32, obj({
+            id: str(48),
+            axis: oneOf('match', 'coherence', 'leak'),
+            verdict: oneOf('match', 'mismatch', 'leak', 'unnatural', 'unknown', 'not-applicable'),
+        })),
+    }),
 };
 
 // Section ids in homepage order — the report page renders in this order.

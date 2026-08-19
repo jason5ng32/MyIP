@@ -1029,7 +1029,8 @@
         "ruletest": "IP de sortie observées en accédant à 8 points de test — plusieurs IP distinctes signifient que le trafic est réparti sur différentes routes (règles de proxy, par ex.).",
         "browserinfo": "Navigateur, système et environnement d'affichage de l'appareil testé.",
         "invisibility": "Scores de détection proxy/VPN (0-100, plus haut = plus probablement détecté) avec les signaux de détection déclenchés.",
-        "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd)."
+        "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd).",
+        "persona": "À quel point le navigateur correspond à un habitant du pays choisi : une note globale et le verdict de chaque vérification. Verdicts uniquement — les valeurs sous-jacentes ne sont volontairement pas stockées dans un rapport partagé."
       }
     }
   },

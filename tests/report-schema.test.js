@@ -108,6 +108,21 @@ const makeValidReport = () => ({
             dnssec: 'partial',
             queries: [{ ip: '8.8.8.8', countryCode: 'US', asn: 'AS15169', org: 'Google', transport: 'udp', ecs: '1.2.3.0/24', do: true, cd: false }],
         },
+        persona: {
+            testedAt: '2026-07-14T08:00:00.000Z',
+            country: 'JP',
+            grade: 'C',
+            score: 72,
+            counts: {
+                total: 18, scored: 12, match: 9, mismatch: 2,
+                unnatural: 0, leak: 1, unknown: 3, notApplicable: 3,
+            },
+            results: [
+                { id: 'ip-country', axis: 'match', verdict: 'match' },
+                { id: 'gps-location', axis: 'leak', verdict: 'leak' },
+                { id: 'accept-language-header', axis: 'coherence', verdict: 'not-applicable' },
+            ],
+        },
     },
 });
 
@@ -263,7 +278,7 @@ describe('constants', () => {
         assert.deepEqual(REPORT_TTL_DAYS, [1, 3, 7]);
         assert.ok(REPORT_SECTION_IDS.includes('ipinfo'));
         assert.ok(REPORT_SECTION_IDS.includes('enhanceddnsleak'));
-        assert.equal(REPORT_SECTION_IDS.length, 11);
+        assert.equal(REPORT_SECTION_IDS.length, 12);
     });
 });
 

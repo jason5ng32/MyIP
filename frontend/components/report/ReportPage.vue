@@ -87,6 +87,7 @@ import ReportRuletest from './sections/ReportRuletest.vue';
 import ReportBrowserinfo from './sections/ReportBrowserinfo.vue';
 import ReportInvisibility from './sections/ReportInvisibility.vue';
 import ReportEnhanceddnsleak from './sections/ReportEnhanceddnsleak.vue';
+import ReportPersona from './sections/ReportPersona.vue';
 import { FileText, FileQuestion, Bot } from '@lucide/vue';
 
 const SECTION_COMPONENTS = {
@@ -101,6 +102,7 @@ const SECTION_COMPONENTS = {
     browserinfo: ReportBrowserinfo,
     invisibility: ReportInvisibility,
     enhanceddnsleak: ReportEnhanceddnsleak,
+    persona: ReportPersona,
 };
 
 const { t, locale } = useI18n();

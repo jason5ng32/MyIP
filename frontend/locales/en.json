@@ -1029,7 +1029,8 @@
         "ruletest": "Egress IPs observed when fetching 8 test endpoints — more than one unique IP means traffic is split across different routes (e.g. proxy rules).",
         "browserinfo": "Browser, OS and display environment of the tested device.",
         "invisibility": "Proxy/VPN detection scores (0-100, higher = more likely detected) with the individual detection signals that flagged.",
-        "enhanceddnsleak": "Resolver-level DNS capture: every resolver IP that queried the test domain, with transport, ECS exposure and DNSSEC flags (do/cd)."
+        "enhanceddnsleak": "Resolver-level DNS capture: every resolver IP that queried the test domain, with transport, ECS exposure and DNSSEC flags (do/cd).",
+        "persona": "How closely the browser matches a local resident of the chosen country: an overall grade plus each check's verdict. Verdicts only — the underlying values are deliberately not stored in a shared report."
       }
     }
   },

@@ -258,6 +258,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { REGEXP_ONLY_DIGITS } from 'vue-input-otp';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
+import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import { buildObservation, usePersonaSnapshots } from '@/composables/use-persona-collector.js';
 import { localProfile } from '@/utils/persona/local-profile.js';
@@ -387,6 +388,15 @@ const run = async () => {
         report.value = await authenticatedFetch('/api/persona/evaluate', 'POST',
             { persona: persona.value, observation });
         runStatus.value = 'finished';
+        // The shareable report keeps only each check's conclusion — the
+        // builder in utils/report-builders.js drops every detail field.
+        emitAppEvent('persona:finished', {
+            country: persona.value.country,
+            grade: report.value.grade,
+            score: report.value.score,
+            counts: report.value.counts,
+            results: report.value.results,
+        });
         trackEvent('PersonaCheck', 'run', report.value.grade);
     } catch (error) {
         runStatus.value = 'idle';

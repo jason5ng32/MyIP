@@ -29,7 +29,7 @@
       "personaCheck": {
         "title": "Vérification de persona",
         "paragraphs": [
-          "La Vérification de persona est le seul outil dont les mesures quittent votre navigateur. Les autres calculent dans votre navigateur ou effectuent une recherche affichée à vous seul ; celui-ci envoie ce qu'il a collecté à notre propre API, qui l'évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Il nécessite une connexion, et chaque exécution consomme une unité de votre quota mensuel. Ni ce que vous envoyez ni le rapport reçu ne sont conservés.",
+          "La Vérification de persona est le seul outil dont les mesures quittent votre navigateur. Les autres calculent dans votre navigateur ou effectuent une recherche affichée à vous seul ; celui-ci envoie ce qu'il a collecté à notre propre API, qui l'évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Il nécessite une connexion, et chaque exécution consomme une unité de votre quota mensuel. Ni ce que vous envoyez ni le rapport reçu ne sont conservés — sauf si vous choisissez explicitement de regrouper le résultat dans un lien de rapport partageable ; et même alors, seuls la note et le verdict de chaque vérification y figurent, jamais les valeurs qui les sous-tendent.",
           "Ce qui accompagne une exécution :"
         ],
         "bullets": [

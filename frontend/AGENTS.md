@@ -84,6 +84,13 @@ semantics or an upstream field means updating that test's builder whitelist
 field) and test fixtures are frozen, so drift shows up as quietly missing
 report fields, not as errors.
 
+A report link is readable by anyone who has it, so the builder — not the
+renderer — is where anything the visitor supplied gets dropped. Persona
+Check is the sharpest case: its live results carry a `detail` per check
+(issuing bank, the country a shared position resolved to), and only the
+id / axis / verdict triple reaches the section. Invisibility follows the
+same rule with key + flag. Keep new sections on that side of the line.
+
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
 `sentry-init.js` loads via a build-time-gated dynamic import: no

@@ -319,6 +319,49 @@ const buildEnhanceddnsleak = (payload) => {
     };
 };
 
+// persona:finished — { country, grade, score, counts, results } from the
+// Persona Check. Only each check's conclusion travels: the live results carry
+// a `detail` object per check (issuing bank, the country a shared position
+// resolved to, the zone and languages), which has no place behind a link
+// anyone can open, so it is dropped here rather than at render time.
+const PERSONA_GRADES = new Set(['A', 'B', 'C', 'D', 'unknown']);
+const PERSONA_AXES = new Set(['match', 'coherence', 'leak']);
+const PERSONA_VERDICTS = new Set([
+    'match', 'mismatch', 'leak', 'unnatural', 'unknown', 'not-applicable',
+]);
+const personaCount = (value) => clampInt(value, 0, 64) ?? 0;
+
+const buildPersona = (payload) => {
+    if (!PERSONA_GRADES.has(payload?.grade)) return null;
+    const results = (payload?.results ?? [])
+        .filter((result) => typeof result?.id === 'string'
+            && PERSONA_AXES.has(result?.axis) && PERSONA_VERDICTS.has(result?.verdict))
+        .slice(0, 32)
+        .map((result) => ({ id: clip(result.id, 48), axis: result.axis, verdict: result.verdict }));
+    if (!results.length) return null;
+
+    const counts = payload?.counts ?? {};
+    return {
+        country: countryCode(payload?.country),
+        grade: payload.grade,
+        // Stored the way the tool displays it; null when the run was too thin
+        // to grade, which the schema allows and the renderer shows as a dash.
+        score: finiteNum(payload?.score, 0, 1) === undefined
+            ? null : Math.round(payload.score * 100),
+        counts: {
+            total: personaCount(counts.total),
+            scored: personaCount(counts.scored),
+            match: personaCount(counts.match),
+            mismatch: personaCount(counts.mismatch),
+            unnatural: personaCount(counts.unnatural),
+            leak: personaCount(counts.leak),
+            unknown: personaCount(counts.unknown),
+            notApplicable: personaCount(counts.notApplicable),
+        },
+        results,
+    };
+};
+
 // --- event → builder registry (consumed by use-report-collector) ------------
 
 export const REPORT_EVENT_BUILDERS = {
@@ -333,4 +376,5 @@ export const REPORT_EVENT_BUILDERS = {
     'browserinfo:finished': { section: 'browserinfo', build: buildBrowserinfo },
     'invisibility:result': { section: 'invisibility', build: buildInvisibility },
     'enhanceddnsleak:finished': { section: 'enhanceddnsleak', build: buildEnhanceddnsleak },
+    'persona:finished': { section: 'persona', build: buildPersona },
 };

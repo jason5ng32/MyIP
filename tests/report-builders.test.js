@@ -103,6 +103,28 @@ const PAYLOADS = {
         proxyScore: 12, vpnScore: 88, ip: '1.2.3.4',
         flags: [{ key: 'timezone', flagged: true }, { key: 'blocklist.vpn', flagged: false }],
     },
+    'persona:finished': {
+        country: 'JP',
+        grade: 'C',
+        score: 0.7234,
+        counts: {
+            total: 18, scored: 12, match: 9, mismatch: 2,
+            unnatural: 0, leak: 1, unknown: 3, notApplicable: 3,
+        },
+        results: [
+            // Detail objects ride along on the live result and must not reach
+            // the report — the visitor's bank and resolved position are in there.
+            {
+                id: 'payment-region', axis: 'match', visibility: 'risk-engine', verdict: 'mismatch',
+                detail: { expected: 'JP', actual: 'SG', cardIssuer: 'EXAMPLE BANK', cardTier: 'PLATINUM' },
+            },
+            {
+                id: 'gps-location', axis: 'leak', visibility: 'probed', verdict: 'leak',
+                detail: { expected: 'JP', actual: 'IT', accuracyMetres: 30 },
+            },
+            { id: 'nonsense', axis: 'bogus', verdict: 'match' },
+        ],
+    },
     'enhanceddnsleak:finished': {
         rawCount: 12, resolverCount: 3,
         queries: [
@@ -267,6 +289,41 @@ describe('cleaning rules', () => {
             queries: [{ ip: '8.8.8.8', do: true, cd: false, ipInfo: {} }],
         });
         assert.equal(allDo.dnssec, 'ok');
+    });
+
+    it('persona keeps verdicts only — never the detail behind them', () => {
+        const { build } = REPORT_EVENT_BUILDERS['persona:finished'];
+        const section = build(PAYLOADS['persona:finished']);
+        // Rows with an axis the schema doesn't know are dropped outright.
+        assert.deepEqual(section.results, [
+            { id: 'payment-region', axis: 'match', verdict: 'mismatch' },
+            { id: 'gps-location', axis: 'leak', verdict: 'leak' },
+        ]);
+        // No row carries anything beyond those three keys.
+        for (const row of section.results) {
+            assert.deepEqual(Object.keys(row).sort(), ['axis', 'id', 'verdict']);
+        }
+        // The serialized section mentions neither the bank nor the position.
+        const serialized = JSON.stringify(section);
+        assert.ok(!serialized.includes('EXAMPLE BANK'));
+        assert.ok(!serialized.includes('accuracyMetres'));
+        assert.equal(section.country, 'JP');
+        assert.equal(section.score, 72, 'the 0..1 score is stored the way the tool shows it');
+    });
+
+    it('persona reports an ungraded run with a null score', () => {
+        const { build } = REPORT_EVENT_BUILDERS['persona:finished'];
+        const section = build({
+            ...PAYLOADS['persona:finished'], grade: 'unknown', score: null,
+        });
+        assert.equal(section.grade, 'unknown');
+        assert.equal(section.score, null);
+    });
+
+    it('persona rejects a payload with no usable verdicts', () => {
+        const { build } = REPORT_EVENT_BUILDERS['persona:finished'];
+        assert.equal(build({ grade: 'A', results: [] }), null);
+        assert.equal(build({ grade: 'nope', results: PAYLOADS['persona:finished'].results }), null);
     });
 
     it('invisibility requires both scores', () => {

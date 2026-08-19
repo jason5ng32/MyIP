@@ -29,7 +29,7 @@
       "personaCheck": {
         "title": "Persona Check",
         "paragraphs": [
-          "Persona Check is the one tool whose measurements leave your browser. The others compute in your browser or look something up and show it only to you; this one sends what it collected to our own API, which scores it against the country you picked and returns the graded report to you. It requires signing in, and each run counts against your monthly allowance. Neither what you send nor the report you get back is stored.",
+          "Persona Check is the one tool whose measurements leave your browser. The others compute in your browser or look something up and show it only to you; this one sends what it collected to our own API, which scores it against the country you picked and returns the graded report to you. It requires signing in, and each run counts against your monthly allowance. Neither what you send nor the report you get back is stored — unless you explicitly bundle the result into a shareable report link, and even then only the grade and each check's verdict travel into it, never the values behind them.",
           "What travels with a run:"
         ],
         "bullets": [
