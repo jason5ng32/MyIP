@@ -806,7 +806,12 @@
       "keyboard-api-unavailable": "Not exposed by this browser",
       "no-layout-expectation": "No layout expectation for this country",
       "no-persona-languages": "Persona has no language set",
-      "geolocation-unsupported": "Geolocation not supported"
+      "geolocation-unsupported": "Geolocation not supported",
+      "ip-no-country": "The IP lookup returned no country",
+      "ip-no-type": "No source reported the network type",
+      "ip-no-timezone": "No source reported a time zone",
+      "webrtc-no-candidates": "WebRTC produced no candidates",
+      "dns-no-country": "No resolver could be located"
     },
     "optional": {
       "gpsNote": "GPS position is one of the dimensions the check can measure — share it if you want it compared too.",

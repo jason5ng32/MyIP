@@ -12,27 +12,25 @@
         <!-- Score hero. The grade sits inside a ring that draws to the score,
              so the number is read spatially before it is read numerically;
              everything is toned by the grade, nothing else competes. -->
-        <section class="space-y-5 p-4 md:p-6">
+        <section class="space-y-4 p-4 md:p-6">
             <div class="flex flex-wrap items-center gap-5 md:gap-8">
                 <!-- Grade dial: track + score arc, letter and score inside.
                      An ungraded run shows the bare track around a dash. -->
                 <div class="relative size-28 shrink-0" role="img"
                     :aria-label="scoreOutOf100 !== null ? `${grade} · ${scoreOutOf100}/100` : ''">
                     <svg class="size-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor"
-                            stroke-width="7" class="text-muted" />
-                        <circle v-if="scoreOutOf100 !== null" cx="50" cy="50" r="45" fill="none"
-                            stroke="currentColor" stroke-width="7" stroke-linecap="round"
-                            :stroke-dasharray="RING_CIRCUMFERENCE" :stroke-dashoffset="ringOffset"
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="7"
+                            class="text-muted" />
+                        <circle v-if="scoreOutOf100 !== null" cx="50" cy="50" r="45" fill="none" stroke="currentColor"
+                            stroke-width="7" stroke-linecap="round" :stroke-dasharray="RING_CIRCUMFERENCE"
+                            :stroke-dashoffset="ringOffset"
                             :class="[textClass(gradeTone), 'transition-[stroke-dashoffset] duration-700 ease-out']" />
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-4xl font-bold leading-none tracking-tight"
-                            :class="textClass(gradeTone)">
+                        <span class="text-4xl font-bold leading-none tracking-tight" :class="textClass(gradeTone)">
                             {{ grade === 'unknown' ? '—' : grade }}
                         </span>
-                        <span v-if="scoreOutOf100 !== null"
-                            class="mt-1 text-xs tabular-nums text-muted-foreground">
+                        <span v-if="scoreOutOf100 !== null" class="mt-1 text-xs tabular-nums text-muted-foreground">
                             {{ scoreOutOf100 }}<span class="opacity-60">/100</span>
                         </span>
                     </div>
@@ -66,8 +64,7 @@
                 </div>
             </div>
 
-            <p v-if="nothingActionable"
-                class="rounded-lg border border-success/30 bg-success/10 p-3 text-sm">
+            <p v-if="nothingActionable" class="rounded-lg border border-success/30 bg-success/10 p-3 text-sm">
                 {{ t('personacheck.report.nothingActionable') }}
             </p>
         </section>
@@ -81,7 +78,7 @@
                 </h3>
                 <Badge variant="secondary" class="font-normal">
                     {{ t('personacheck.dependencies.measured', {
-                        n: measured.scored, total: measured.total }) }}
+                    n: measured.scored, total: measured.total }) }}
                 </Badge>
             </div>
             <Accordion type="single" collapsible class="space-y-2">
@@ -130,10 +127,8 @@
                                 <dd class="min-w-0">
                                     <!-- title carries the full value of the
                                          truncated line. -->
-                                    <Badge variant="secondary"
-                                        class="max-w-full font-normal shadow-none"
-                                        :class="item.kind === 'mono' ? 'font-mono' : ''"
-                                        :title="item.text">
+                                    <Badge variant="secondary" class="max-w-full font-normal shadow-none"
+                                        :class="item.kind === 'mono' ? 'font-mono' : ''" :title="item.text">
                                         <Icon v-if="item.kind === 'country'"
                                             :icon="'circle-flags:' + item.code.toLowerCase()"
                                             class="mr-1 size-3.5 shrink-0" />
@@ -144,15 +139,13 @@
                         </dl>
 
                         <!-- WebRTC's shaped payload is the evidence itself -->
-                        <ul v-if="row.detail?.exposed?.length"
-                            class="rounded-lg border bg-muted/40 divide-y text-sm">
+                        <ul v-if="row.detail?.exposed?.length" class="rounded-lg border bg-muted/40 divide-y text-sm">
                             <li v-for="entry in row.detail.exposed" :key="entry.ip"
                                 class="flex items-center justify-between gap-2 px-3 py-1.5">
                                 <span class="font-mono truncate" :title="entry.ip">{{ entry.ip }}</span>
                                 <span v-if="entry.countryCode"
                                     class="flex shrink-0 items-center gap-1.5 text-muted-foreground">
-                                    <Icon :icon="'circle-flags:' + entry.countryCode.toLowerCase()"
-                                        class="size-4" />
+                                    <Icon :icon="'circle-flags:' + entry.countryCode.toLowerCase()" class="size-4" />
                                     {{ getCountryName(entry.countryCode, locale) || entry.countryCode }}
                                 </span>
                             </li>
@@ -161,8 +154,7 @@
                         <!-- Who reads this, and what to do — only where there
                              is something to do. -->
                         <template v-if="row.actionable && row.known">
-                            <p v-if="row.visibility"
-                                class="flex items-start gap-2 text-sm text-muted-foreground">
+                            <p v-if="row.visibility" class="flex items-start gap-2 text-sm text-muted-foreground">
                                 <Eye class="size-4 mt-0.5 shrink-0" />
                                 <span>{{ t(`personacheck.report.visibility.${row.visibility}`) }}</span>
                             </p>

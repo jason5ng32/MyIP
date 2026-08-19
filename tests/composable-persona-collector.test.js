@@ -40,11 +40,13 @@ describe('payload normalization', () => {
         assert.equal(normalized.cards.length, 1);
     });
 
-    it('returns null when a run produced nothing usable', () => {
-        assert.equal(normalizeIpinfo({ cards: [] }), null);
-        assert.equal(normalizeIpinfo({}), null);
-        assert.equal(normalizeWebrtc({ servers: [{ ip: 'n/a' }] }), null);
-        assert.equal(normalizeDnsleak({ providers: [] }), null);
+    it('returns an empty slice when a run produced nothing usable', () => {
+        // Empty, never null: the slice is what tells the evaluator the test
+        // ran, which is what separates "not applicable" from "not measured".
+        assert.deepEqual(normalizeIpinfo({ cards: [] }), { cards: [] });
+        assert.deepEqual(normalizeIpinfo({}), { cards: [] });
+        assert.deepEqual(normalizeWebrtc({ servers: [{ ip: 'n/a' }] }), { servers: [] });
+        assert.deepEqual(normalizeDnsleak({ providers: [] }), { providers: [] });
     });
 
     it('maps WebRTC servers, keeping the NAT type the check needs', () => {
@@ -109,10 +111,13 @@ describe('collector subscription', () => {
         assert.deepEqual(missingSources.value, []);
     });
 
-    it('ignores a source that reports nothing usable', () => {
+    it('counts a source that ran and found nothing as no longer missing', () => {
+        // A browser that blocks WebRTC, or a resolver test that comes back
+        // empty, must not lock the tool away from the visitor.
         emitAppEvent('dnsleak:finished', { providers: [{ ip: 'error' }] });
-        const { missingSources } = usePersonaSnapshots();
-        assert.ok(missingSources.value.includes('dnsleak'));
+        const { snapshots, missingSources } = usePersonaSnapshots();
+        assert.deepEqual(snapshots.dnsleak, { providers: [] });
+        assert.ok(!missingSources.value.includes('dnsleak'));
     });
 });
 
@@ -183,9 +188,13 @@ describe('buildObservation', () => {
 
     it('assembles what it has and omits what has not run', async () => {
         emitAppEvent('ipinfo:finished', { cards: [{ ip: '203.0.113.9', country_code: 'JP' }] });
+        emitAppEvent('webrtc:finished', { servers: [] });
         const observation = await buildObservation();
         assert.equal(observation.ip.cards.length, 1);
-        assert.equal(observation.webrtc, undefined, 'a test that never ran must not be reported as empty');
+        // Ran-and-empty travels as an empty slice; never-run is left out
+        // entirely — the evaluator reads the difference.
+        assert.deepEqual(observation.webrtc, { servers: [] });
+        assert.equal(observation.dns, undefined, 'a test that never ran must not be reported as empty');
         assert.equal(observation.trace, undefined, 'an unreachable trace endpoint is left out');
         assert.ok(observation.browser.languages.includes('ja-JP'));
         // No canvas in Node: the probe reports "could not measure" rather than

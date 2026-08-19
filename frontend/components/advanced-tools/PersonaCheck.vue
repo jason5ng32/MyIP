@@ -4,8 +4,9 @@
 
   The rail is one intake flow, three numbered zones: declare the expected
   identity, optionally sharpen it (GPS, card prefix), then run — the run
-  requires every base test's result. Sign-in gated like the other
-  quota-metered tools; signed out, the rail is display-only.
+  requires every base test to have run, not to have found something. Sign-in
+  gated like the other quota-metered tools; signed out, the rail is
+  display-only.
 -->
 
 <template>
@@ -38,7 +39,8 @@
                         <!-- Zone 1 — the identity the visitor expects to show -->
                         <div class="space-y-4">
                             <h4 class="flex items-center gap-2 text-sm font-semibold tracking-tight m-0 mb-3">
-                                <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">1</span>
+                                <span
+                                    class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">1</span>
                                 {{ t('personacheck.zone.expected') }}
                             </h4>
 
@@ -80,8 +82,8 @@
                                 </Select>
                                 <p v-if="profile" class="text-xs leading-4 text-muted-foreground">
                                     {{ profile.languages.length > 1
-                                        ? t('personacheck.languageMulti')
-                                        : t('personacheck.languageSingle') }}
+                                    ? t('personacheck.languageMulti')
+                                    : t('personacheck.languageSingle') }}
                                 </p>
                             </div>
 
@@ -93,7 +95,9 @@
                                     {{ t('personacheck.profile.timezone') }}
                                 </p>
                                 <Select v-model="timeZone" :disabled="!signedIn">
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem v-for="zone in profile.timeZones" :key="zone" :value="zone">
                                             {{ zone }}
@@ -110,7 +114,8 @@
                              the run so no permission prompt lands mid-report. -->
                         <div class="space-y-4 border-t pt-4">
                             <h4 class="flex items-center gap-2 text-sm font-semibold tracking-tight m-0 mb-3">
-                                <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">2</span>
+                                <span
+                                    class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">2</span>
                                 {{ t('personacheck.zone.optional') }}
                             </h4>
 
@@ -134,8 +139,8 @@
                                     :class="geolocation?.available ? 'text-success' : 'text-muted-foreground'">
                                     <span v-if="geolocation">
                                         {{ geolocation.available
-                                            ? t('personacheck.optional.gpsGranted')
-                                            : t(`personacheck.optional.gpsFailed.${geolocation.reason}`) }}
+                                        ? t('personacheck.optional.gpsGranted')
+                                        : t(`personacheck.optional.gpsFailed.${geolocation.reason}`) }}
                                     </span>
                                 </p>
                             </div>
@@ -151,9 +156,8 @@
                                 <!-- One box per digit, so the 6-8 expectation
                                      is visible before anything is typed; the
                                      digits-only pattern rejects letters. -->
-                                <InputOTP v-model="cardBin" :maxlength="BIN_MAX_LENGTH"
-                                    :pattern="REGEXP_ONLY_DIGITS" :disabled="!signedIn"
-                                    autocomplete="off" class="w-full gap-1">
+                                <InputOTP v-model="cardBin" :maxlength="BIN_MAX_LENGTH" :pattern="REGEXP_ONLY_DIGITS"
+                                    :disabled="!signedIn" autocomplete="off" class="w-full gap-1">
                                     <InputOTPGroup class="w-full">
                                         <InputOTPSlot v-for="slot in BIN_MAX_LENGTH" :key="slot" :index="slot - 1"
                                             class="h-9 flex-1 min-w-0" />
@@ -169,11 +173,14 @@
                             </div>
                         </div>
 
-                        <!-- Zone 3 — run. Base tests are required input: a
-                             missing one disables the run, repaired in one click. -->
+                        <!-- Zone 3 — run. Base tests are required input: one
+                             that hasn't run disables the run, repaired in one
+                             click. A test that ran and found nothing counts —
+                             the checks reading it report as not applicable. -->
                         <div class="space-y-4 border-t pt-4">
                             <h4 class="flex items-center gap-2 text-sm font-semibold tracking-tight m-0 mb-3">
-                                <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">3</span>
+                                <span
+                                    class="flex size-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-semibold leading-none text-primary-foreground">3</span>
                                 {{ t('personacheck.zone.run') }}
                             </h4>
 
@@ -182,8 +189,7 @@
                                     {{ t('personacheck.dependencies.note') }}
                                 </p>
                                 <ul class="space-y-1 text-xs">
-                                    <li v-for="row in dependencyRows" :key="row.id"
-                                        class="flex items-center gap-1.5">
+                                    <li v-for="row in dependencyRows" :key="row.id" class="flex items-center gap-1.5">
                                         <CircleCheck v-if="row.ready" class="size-3.5 shrink-0 text-success" />
                                         <span v-else
                                             class="size-3.5 shrink-0 rounded-full border border-current opacity-40" />
@@ -206,8 +212,8 @@
                             </div>
 
                             <div class="space-y-2">
-                                <Button variant="action" class="w-full"
-                                    :disabled="!canRun || runStatus === 'running'" @click="run">
+                                <Button variant="action" class="w-full" :disabled="!canRun || runStatus === 'running'"
+                                    @click="run">
                                     <Spinner v-if="runStatus === 'running'" />
                                     <Play v-else class="size-4" />
                                     {{ t('personacheck.runCompare') }}
@@ -344,7 +350,10 @@ const requestLocation = async () => {
 // The IP, WebRTC and DNS tests belong to the homepage components. Rather than
 // running second copies here, the tool requires their snapshots before the
 // run — a thorough check must not silently skip a whole dimension — and the
-// repair is one click on the sequence that owns them.
+// repair is one click on the sequence that owns them. Having run is the whole
+// requirement: a browser that blocks WebRTC, or a network that resolves no
+// IP, still leaves a snapshot, and the evaluator reports the checks that read
+// it as not applicable rather than passed.
 
 const dependencyRows = computed(() => ['ipinfo', 'webrtc', 'dnsleak']
     .map((id) => ({ id, ready: Boolean(snapshots[id]) })));
@@ -360,8 +369,8 @@ const runStatus = ref('idle');
 const errorKey = ref('');
 const quotaExceeded = ref(false);
 
-// Every gate in one place: signed in, a scoreable country, and all base tests
-// present — the run button is the rail's own summary of the three zones.
+// Every gate in one place: signed in, a scoreable country, and every base
+// test run — the run button is the rail's own summary of the three zones.
 const canRun = computed(() =>
     signedIn.value && hasProfile.value && !missingSources.value.length);
 

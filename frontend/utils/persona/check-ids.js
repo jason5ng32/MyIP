@@ -104,14 +104,23 @@ export const PERSONA_DETAIL_KEYS = [
 // result carries its reason into the report; unknown results keep theirs
 // internal ("run the missing test" is the same advice either way) — except
 // the ones below, where the visitor's next move differs per reason.
+//
+// The `ip-` / `webrtc-` / `dns-` reasons are the base tests answering empty:
+// the test ran, so "go run it" would be wrong advice, and its checks say what
+// came back missing instead of quietly passing.
 export const PERSONA_NOT_APPLICABLE_REASONS = [
+    'dns-no-country',
     'font-probe-unavailable',
     'geolocation-unsupported',
+    'ip-no-country',
+    'ip-no-timezone',
+    'ip-no-type',
     'keyboard-api-unavailable',
     'no-layout-expectation',
     'no-marker-script',
     'no-persona-languages',
     'no-voice-packs',
+    'webrtc-no-candidates',
 ];
 
 // Unknown-verdict reasons that DO render copy: a card prefix the upstream did

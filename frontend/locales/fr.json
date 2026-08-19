@@ -637,7 +637,12 @@
       "keyboard-api-unavailable": "Non exposé par ce navigateur",
       "no-layout-expectation": "Aucune disposition attendue pour ce pays",
       "no-persona-languages": "Aucune langue définie pour le persona",
-      "geolocation-unsupported": "Géolocalisation non prise en charge"
+      "geolocation-unsupported": "Géolocalisation non prise en charge",
+      "ip-no-country": "La recherche d'IP n'a renvoyé aucun pays",
+      "ip-no-type": "Aucune source n'a indiqué le type de réseau",
+      "ip-no-timezone": "Aucune source n'a indiqué de fuseau horaire",
+      "webrtc-no-candidates": "WebRTC n'a produit aucun candidat",
+      "dns-no-country": "Aucun résolveur n'a pu être localisé"
     },
     "detail": {
       "expected": "Attendu",
