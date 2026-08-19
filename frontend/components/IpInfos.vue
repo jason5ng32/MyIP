@@ -31,7 +31,7 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isUsablePublicIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent } from '@/utils/app-events';
@@ -207,10 +207,18 @@ const loadCardDetails = async (cardID, ip) => {
   }
 };
 
-// Single-card path (refresh button).
+// Single-card path (refresh button), and the per-card body of checkAllIPs.
 const fetchIP = async (cardID, getFromSource) => {
   const { ip } = await resolveIP(cardID, getFromSource);
-  if (ip !== null) await loadCardDetails(cardID, ip);
+  if (ip === null) return; // resolveIP already settled the card
+  if (isUsablePublicIP(ip)) {
+    await loadCardDetails(cardID, ip);
+  } else {
+    // A source can hand back reserved space (DNS hijack, captive portal, LAN
+    // echo). The address stays on the card — the visitor really did get it —
+    // but the geo phase is skipped: /api/* rejects non-public IPs with 400.
+    markFetched(cardID);
+  }
 };
 
 // Report data fetch status, and send to store
@@ -363,14 +371,16 @@ const selectIPGeoSource = async () => {
   });
   ipDataCache.clear();
 
-  // Query every card that holds a valid IP against the chosen source, in
-  // parallel. Captured once so an in-flight fetchIPDetails mutating
+  // Query every card that holds a publicly routable IP against the chosen
+  // source, in parallel — a card's ip slot can hold an error label or an
+  // address from reserved space, neither of which the geo routes accept.
+  // chosenSource is captured once so an in-flight fetchIPDetails mutating
   // ipGeoSource.value can't shift the source mid-batch.
   const chosenSource = ipGeoSource.value;
   await Promise.allSettled(
     ipDataCards
       .map((card, index) => ({ card, index }))
-      .filter(({ card }) => isValidIP(card.ip))
+      .filter(({ card }) => isUsablePublicIP(card.ip))
       .map(({ card, index }) => fetchIPDetails(index, card.ip, chosenSource))
   );
 };
