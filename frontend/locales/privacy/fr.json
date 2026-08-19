@@ -7,7 +7,7 @@
       "tools": {
         "title": "Comment fonctionnent les outils",
         "paragraphs": [
-          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs, sauf si vous créez explicitement un lien de rapport partageable (voir la section suivante).",
+          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs, sauf si vous créez explicitement un lien de rapport partageable.",
           "Pour rechercher la géolocalisation d'une IP, l'IP interrogée est envoyée à des fournisseurs tiers (tels qu'ipinfo.io, ip-api.com et similaires). Ces recherches sont régies par la politique de confidentialité propre à chaque fournisseur."
         ]
       },

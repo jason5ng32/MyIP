@@ -7,7 +7,7 @@
       "tools": {
         "title": "How the tools work",
         "paragraphs": [
-          "Most of what the tools show you — your IP details, browser fingerprint, DNS, connectivity and speed-test results — is computed in your browser or looked up live and shown only to you. We do not keep these results on our servers, unless you explicitly create a shareable report link (see the next section).",
+          "Most of what the tools show you — your IP details, browser fingerprint, DNS, connectivity and speed-test results — is computed in your browser or looked up live and shown only to you. We do not keep these results on our servers, unless you explicitly create a shareable report link.",
           "To look up IP geolocation, the IP being queried is sent to third-party providers (such as ipinfo.io, ip-api.com and similar). Those lookups are governed by each provider's own privacy policy."
         ]
       },
