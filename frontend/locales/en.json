@@ -580,6 +580,270 @@
       "negative": "No evidence of you using a proxy or VPN was found in high latency analysis."
     }
   },
+  "personacheck": {
+    "Title": "Persona Check",
+    "Note": "There is an old test: if it looks like a duck, swims like a duck and quacks like a duck, it probably is a duck. Sites read you the same way — your IP may claim you are in country A, but your time zone, languages, installed fonts, keyboard and a dozen other signals each tell their own story, and together they are the persona a site actually sees. This tool measures that persona, compares it against the local resident you want to be read as, and shows exactly where the two diverge.",
+    "NoteVs": "It asks a different question than the Invisibility Test. That one checks whether your proxy itself can be detected; this one checks who sites think they are looking at — and how far that picture is from the one you expect to present.",
+    "Note2": "Start by choosing the country you want to be read as a local of.",
+    "signInFirst": "Sign in first to use this tool — head to the home page, sign in, then come back; every run spends one unit of your monthly allowance.",
+    "axis": {
+      "match": "Match with the target",
+      "coherence": "Internal consistency",
+      "leak": "Identity leak"
+    },
+    "zone": {
+      "expected": "Expected identity",
+      "optional": "Sharper signals (optional)",
+      "run": "Run the check"
+    },
+    "selectCountry": "Search for a country",
+    "noCountryMatch": "No matching country",
+    "noProfile": "This territory has no local profile to compare against.",
+    "languageSingle": "This country has a single primary language.",
+    "languageMulti": "This country has several languages — pick the one you want to present.",
+    "timezoneMulti": "This country spans several time zones — pick the one you want to present.",
+    "hourCycle": {
+      "h11": "12-hour clock (0–11)",
+      "h12": "12-hour clock",
+      "h23": "24-hour clock",
+      "h24": "24-hour clock (1–24)"
+    },
+    "profile": {
+      "timezone": "Time zone"
+    },
+    "runCompare": "Run the check",
+    "runError": "The check could not complete.",
+    "source": {
+      "ipinfo": "IP lookup",
+      "webrtc": "WebRTC",
+      "dnsleak": "DNS leak"
+    },
+    "report": {
+      "grade": {
+        "A": "🎉 You look every bit like a local of {country}",
+        "B": "😊 You look somewhat like a local of {country}",
+        "C": "🤔 You don't quite look like a local of {country}",
+        "D": "😅 You don't look like a local of {country}",
+        "unknown": "🤷 Not enough signal to grade"
+      },
+      "gradeNote": {
+        "A": "Every signal we can read agrees with the persona you chose.",
+        "B": "The persona mostly holds, but a few signals point elsewhere.",
+        "C": "Several signals disagree with the persona, or with each other — the results below show which.",
+        "D": "Most signals point somewhere other than this persona.",
+        "unknown": "Run the underlying tests first — there is too little to go on."
+      },
+      "counts": {
+        "leak": "{n} exposing",
+        "warning": "{n} inconsistent",
+        "match": "{n} passing",
+        "unknown": "{n} unmeasured",
+        "notApplicable": "{n} not applicable"
+      },
+      "nothingActionable": "Nothing to fix — every measurable signal fits the persona.",
+      "howToFix": "How to fix it",
+      "verdict": {
+        "match": "Fits the persona.",
+        "mismatch": "Contradicts the persona.",
+        "leak": "Exposes your real environment.",
+        "unnatural": "Internally inconsistent — two signals that should agree tell different stories, which draws more attention than a plain mismatch.",
+        "unknown": "Not measurable right now.",
+        "not-applicable": "No conclusion is possible here."
+      },
+      "visibility": {
+        "public": "Any site sees this",
+        "probed": "Sites that probe for it",
+        "risk-engine": "Anti-fraud systems"
+      },
+      "profileTitle": "Measurement details",
+      "state": {
+        "match": "Passed",
+        "mismatch": "Not local",
+        "unnatural": "Inconsistent",
+        "leak": "Exposed",
+        "unknown": "Not measured",
+        "not-applicable": "N/A"
+      }
+    },
+    "detail": {
+      "expected": "Expected",
+      "actual": "Actual",
+      "disputed": "Sources disagree",
+      "v4": "IPv4",
+      "v6": "IPv6",
+      "candidateCount": "Candidates",
+      "matching": "Matches expected",
+      "ipType": "Address type",
+      "expectedOffset": "Expected offset",
+      "actualOffset": "Actual offset",
+      "sameOffset": "Same offset",
+      "primary": "Primary language",
+      "primaryExpected": "Expected primary",
+      "demoted": "Listed but not first",
+      "timeZone": "Time zone",
+      "reportedOffset": "Offset from Date",
+      "zoneOffset": "Offset from zone",
+      "samples": "Samples",
+      "expectedScripts": "Expected scripts",
+      "installedScripts": "Installed scripts",
+      "expectedLanguages": "Expected languages",
+      "voiceLanguages": "Voice languages",
+      "voiceCount": "Voices",
+      "expectedLayout": "Expected layout",
+      "actualLayout": "Actual layout",
+      "headerPrimary": "Header primary",
+      "scriptPrimary": "Script primary",
+      "headerLanguages": "Header languages",
+      "ipZone": "IP time zone",
+      "browserZone": "Browser time zone",
+      "ipOffset": "IP offset",
+      "browserOffset": "Browser offset",
+      "colo": "Cloudflare PoP",
+      "gpsTimezone": "Time zone at your position",
+      "accuracyMetres": "Accuracy (m)",
+      "cardIssuer": "Issuing bank",
+      "cardNetwork": "Card network",
+      "cardTier": "Card tier",
+      "cardType": "Card type"
+    },
+    "checks": {
+      "ip-country": {
+        "title": "IP country",
+        "fix": "Part of your exits land outside the target country — with several proxy exits, different cards genuinely show different countries, and any one exit is what some site will see. The fractions above say how many exits agree. Route everything through nodes in the target country; if a single source disagrees about one IP, that node may just be mislabelled in its database, which is not fixable from your side.",
+        "what": "Which country the IP lookup cards on the home page place your exit address in — every source is read, and every exit has to sit in the target country."
+      },
+      "webrtc-leak": {
+        "title": "WebRTC exposure",
+        "fix": "Block WebRTC, or use a setup where it can only ever see the proxy address. The cost is real: video calls and voice conferencing stop working. A browser extension that filters WebRTC is gentler than disabling it outright, but the extension itself leaves traces of its own.",
+        "what": "Whether WebRTC hands out an address from a different country than your persona."
+      },
+      "dns-resolver-country": {
+        "title": "DNS resolver country",
+        "fix": "Use a resolver in the target country, or let the proxy handle DNS resolution. Note that a public resolver like 1.1.1.1 will not expose your location, but it will not support your persona either — it is equally neutral for every country.",
+        "what": "Which country the DNS resolvers answering for you sit in."
+      },
+      "asn-type": {
+        "title": "Address type",
+        "fix": "A datacenter range is the single loudest \"this is a proxy\" signal an address carries. A residential exit fixes it outright, but costs considerably more and varies a lot in quality.",
+        "what": "Whether your address belongs to a residential ISP or a datacenter range."
+      },
+      "timezone-vs-persona": {
+        "title": "Time zone vs persona",
+        "fix": "Change the time zone at the operating-system level — that way every browser API stays consistent with itself. Extensions that override the time zone often change only part of it, creating the contradictions flagged under the coherence checks, which is worse than not changing it at all.",
+        "what": "Whether your browser's time zone is the one a local would have."
+      },
+      "language-match": {
+        "title": "Browser language",
+        "fix": "Change the language in your system or browser settings rather than rewriting a single HTTP header. The order matters too: sites read the whole list, and a local would rarely lead with a foreign language.",
+        "what": "Whether the language your browser leads with is one a local would use."
+      },
+      "script-fonts": {
+        "title": "Writing-system fonts",
+        "fix": "A machine set up for this locale ships that writing system's fonts. Installing them by hand is possible but rarely worth it: it changes one signal while the rest of the system stays in its original language, which usually creates more contradictions than it resolves. If this needs to hold up, the system language itself is the thing to change.",
+        "what": "Whether fonts for this country's writing system are installed on the machine."
+      },
+      "speech-voices": {
+        "title": "Speech synthesis voices",
+        "fix": "Text-to-speech packs follow the language your OS was installed with, and essentially no proxy or spoofing extension touches them. Adding a voice pack for the target language is a real fix, with the same caveat as fonts: one changed signal inside an otherwise unchanged system reads as deliberate.",
+        "what": "Which languages the text-to-speech packs on your system cover."
+      },
+      "keyboard-layout": {
+        "title": "Keyboard layout",
+        "fix": "Your physical keyboard layout is not what is typical for the target country. Only Chromium browsers expose this, so it is a narrower signal than the others — but wherever it is readable, it is hard to fake without changing the actual keyboard.",
+        "what": "Which physical keyboard layout your machine reports."
+      },
+      "edge-geo-consensus": {
+        "title": "Edge geolocation",
+        "fix": "Cloudflare's own reading of your exit address disagrees with the target country. When this and the IP lookup contradict each other, the address is more likely mislabelled in one database than actually moving — but every site behind Cloudflare sees this verdict, not the other one.",
+        "what": "Cloudflare's own reading of your exit address, formed independently of the databases above."
+      },
+      "accept-language-header": {
+        "title": "Language header vs script",
+        "fix": "The Accept-Language header your browser sends on the wire does not match what navigator.languages reports to scripts. Almost nothing produces this except an extension that rewrote one and left the other. Change the language in your browser or system settings instead — that moves both at once.",
+        "what": "Whether the language header sent on the wire matches what scripts are told. Deliberately independent of the target country: a pass only says your two language channels agree — whether the language itself fits is the Browser language check's job. Half-applied language spoofs fail exactly here."
+      },
+      "ip-timezone-vs-browser": {
+        "title": "IP time zone vs browser",
+        "fix": "The time zone of your exit IP and the one your browser reports are different places. This holds whichever country you are aiming for: a real machine sits somewhere, and both should say the same somewhere. Usually it means the proxy moved your address but not your system clock.",
+        "what": "Whether the time zone of your IP and the one your browser reports agree."
+      },
+      "gps-location": {
+        "title": "Device location (GPS)",
+        "fix": "Your device reports being physically in a different country than the one you are aiming for. No proxy touches this: any site that asks for your location gets the real answer, and browser extensions that fake it typically leave the accuracy and timing patterns intact. The realistic options are to deny location permission for sites that ask, or to accept that this one will not hold up.",
+        "what": "Which country your device reports being physically in."
+      },
+      "payment-region": {
+        "title": "Card issuer country",
+        "fix": "Your card was issued in a different country than the one you are presenting as. Merchants see the issuing country before almost anything else, and payment risk systems weigh it heavily against the address and IP. There is no browser-side fix for this — it is a property of the card itself.",
+        "what": "Which country issued the card behind the prefix you entered."
+      },
+      "intl-number-format": {
+        "title": "Number format",
+        "what": "How your browser groups digits and marks decimals.",
+        "fix": "Your browser groups numbers the way its own region does, not the way the target country does. This is separate from the language: a machine can carry the right language tag while its region still says elsewhere. Change the region — not just the language — in your system settings: Region on Windows, Language & Region on macOS."
+      },
+      "intl-date-format": {
+        "title": "Date format",
+        "what": "The order and separators your browser uses when writing a date.",
+        "fix": "Your browser writes dates in a different order or with different separators than a local would. Like the number format, this follows the system region rather than the language, and changing the region is what moves it."
+      },
+      "intl-hour-cycle": {
+        "title": "Clock format",
+        "what": "Whether your browser presents a 12-hour or 24-hour clock — the convention sites see when they format times.",
+        "fix": "The clock format follows the browser's language, not the system's 24-hour toggle — most browsers ignore that switch entirely (Safari is the main exception). To present the target country's convention, switch the browser's language or region to a locale of that country."
+      },
+      "timezone-authenticity": {
+        "title": "Time zone authenticity",
+        "what": "Whether the time zone your browser reports is the machine's real one.",
+        "fix": "The zone your browser reports is not the one the machine actually runs on: Intl and Date disagree, or past dates do not follow that zone's daylight-saving rules. This matters because it means the timezone check above passed on a value that is not real — a site reading the clock directly sees through it. Set the zone in your operating system rather than with an extension, and both the current offset and the historical rules move together."
+      }
+    },
+    "reason": {
+      "no-marker-script": "No marker writing system",
+      "bin-lookup-failed": "The card lookup service could not be reached — the digits may well be fine; try again later.",
+      "bin-not-recognized": "The card database did not recognize this prefix — a typo is the most common cause; double-check the digits and run again.",
+      "font-probe-unavailable": "Canvas unavailable",
+      "no-voice-packs": "No voice packs installed",
+      "keyboard-api-unavailable": "Not exposed by this browser",
+      "no-layout-expectation": "No layout expectation for this country",
+      "no-persona-languages": "Persona has no language set",
+      "geolocation-unsupported": "Geolocation not supported"
+    },
+    "optional": {
+      "gpsNote": "GPS position is one of the dimensions the check can measure — share it if you want it compared too.",
+      "gpsButton": "Share location",
+      "gpsGranted": "Location received.",
+      "gpsFailed": {
+        "denied": "Permission denied — this check will report as not measured.",
+        "timeout": "The location request timed out.",
+        "unavailable": "Your device could not determine a position.",
+        "unsupported": "This browser has no geolocation support."
+      },
+      "cardNote": "Sometimes you also want to pay as a local. Enter your card's first 6-8 digits and the check tells you whether the card reads as issued in that country.",
+      "cardError": "6 to 8 digits needed — enter at least 6 to look up the issuer.",
+      "cardReady": "Prefix ready — the issuing country is looked up when the check runs."
+    },
+    "dependencies": {
+      "note": "The check needs the results of all of these base tests — run any that are missing before starting:",
+      "runButton": "Run the missing tests",
+      "measured": "{n} of {total} measured",
+      "allReady": "All tests have run"
+    },
+    "step": {
+      "country": "Target country",
+      "language": "Main language",
+      "location": "Location",
+      "card": "Card prefix",
+      "awaitingCountry": "Pick a country first",
+      "otherTests": "Base tests"
+    },
+    "emptyHint": "Pick the country you want to look local to, then run the check.",
+    "readyHint": "Ready. Run the check to see how local you look.",
+    "value": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "Open in new tab",
     "BackToHome": "Back to Home",
@@ -596,7 +860,8 @@
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "BrowserInfo": "Check browser information and fingerprint",
-    "SecurityChecklist": "Guide to securing your digital life"
+    "SecurityChecklist": "Guide to securing your digital life",
+    "PersonaCheck": "Compare what sites see against the country you want to look local to"
   },
   "macchecker": {
     "Title": "MAC Lookup",

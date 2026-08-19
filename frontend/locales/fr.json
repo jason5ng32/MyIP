@@ -544,6 +544,270 @@
       "negative": "Aucune preuve de votre utilisation d'un proxy ou d'un VPN n'a été trouvée lors de l'analyse de haute latence."
     }
   },
+  "personacheck": {
+    "Title": "Vérification de persona",
+    "Note": "Un vieux test dit : si ça ressemble à un canard, nage comme un canard et cancane comme un canard, c'est probablement un canard. Les sites vous lisent de la même façon — votre IP peut prétendre que vous êtes dans le pays A, mais votre fuseau horaire, vos langues, vos polices installées, votre clavier et une dizaine d'autres signaux racontent chacun leur propre histoire, et c'est leur ensemble qui forme le persona qu'un site voit réellement. Cet outil mesure ce persona, le compare au résident local que vous voulez incarner et montre précisément où les deux divergent.",
+    "NoteVs": "Il répond à une autre question que le test d'invisibilité : celui-ci vérifie si votre proxy peut être détecté ; ici, il s'agit de savoir qui les sites croient voir — et à quelle distance ce portrait se trouve de celui que vous pensez présenter.",
+    "Note2": "Commencez par choisir le pays dont vous voulez avoir l'air d'être un habitant.",
+    "signInFirst": "Connectez-vous d'abord pour utiliser cet outil — passez par la page d'accueil, connectez-vous, puis revenez ; chaque exécution consomme une unité de votre quota mensuel.",
+    "axis": {
+      "match": "Concordance avec la cible",
+      "coherence": "Cohérence interne",
+      "leak": "Fuite d'identité"
+    },
+    "zone": {
+      "expected": "Identité attendue",
+      "optional": "Signaux plus précis (facultatif)",
+      "run": "Lancer la vérification"
+    },
+    "selectCountry": "Rechercher un pays",
+    "noCountryMatch": "Aucun pays correspondant",
+    "noProfile": "Ce territoire n'a aucun profil local auquel se comparer.",
+    "languageSingle": "Ce pays n'a qu'une seule langue principale.",
+    "languageMulti": "Ce pays a plusieurs langues — choisissez celle que vous voulez présenter.",
+    "timezoneMulti": "Ce pays s'étend sur plusieurs fuseaux horaires — choisissez celui que vous voulez présenter.",
+    "hourCycle": {
+      "h11": "cycle de 12 heures (0–11)",
+      "h12": "cycle de 12 heures",
+      "h23": "cycle de 24 heures",
+      "h24": "cycle de 24 heures (1–24)"
+    },
+    "runCompare": "Lancer la vérification",
+    "runError": "La vérification n'a pas pu aboutir.",
+    "profile": {
+      "timezone": "Fuseau horaire"
+    },
+    "source": {
+      "ipinfo": "Recherche IP",
+      "webrtc": "WebRTC",
+      "dnsleak": "Fuite DNS"
+    },
+    "report": {
+      "grade": {
+        "A": "🎉 Vous avez tout d'un habitant du pays ({country})",
+        "B": "😊 Vous ressemblez un peu à un habitant du pays ({country})",
+        "C": "🤔 Vous ne ressemblez pas vraiment à un habitant du pays ({country})",
+        "D": "😅 Vous ne ressemblez pas à un habitant du pays ({country})",
+        "unknown": "🤷 Signal insuffisant pour noter"
+      },
+      "gradeNote": {
+        "A": "Tous les signaux lisibles concordent avec le persona choisi.",
+        "B": "Le persona tient globalement, mais quelques signaux pointent ailleurs.",
+        "C": "Plusieurs signaux contredisent le persona, ou se contredisent entre eux — les résultats ci-dessous montrent lesquels.",
+        "D": "La plupart des signaux pointent ailleurs que vers ce persona.",
+        "unknown": "Lancez d'abord les tests sous-jacents — il y a trop peu d'éléments."
+      },
+      "counts": {
+        "leak": "{n} exposition(s)",
+        "warning": "{n} incohérence(s)",
+        "match": "{n} conforme(s)",
+        "unknown": "{n} non mesurée(s)",
+        "notApplicable": "{n} non applicable(s)"
+      },
+      "nothingActionable": "Rien à corriger — tous les signaux mesurables correspondent au persona.",
+      "howToFix": "Comment corriger",
+      "verdict": {
+        "match": "Conforme au persona.",
+        "mismatch": "Contredit le persona.",
+        "leak": "Expose votre environnement réel.",
+        "unnatural": "Incohérent en interne — deux signaux censés concorder racontent des histoires différentes, ce qui attire plus l'attention qu'un simple écart.",
+        "unknown": "Non mesurable pour le moment.",
+        "not-applicable": "Aucune conclusion possible ici."
+      },
+      "visibility": {
+        "public": "N'importe quel site le voit",
+        "probed": "Les sites qui le sondent",
+        "risk-engine": "Systèmes anti-fraude"
+      },
+      "profileTitle": "Détails des mesures",
+      "state": {
+        "match": "Conforme",
+        "mismatch": "Pas local",
+        "unnatural": "Incohérent",
+        "leak": "Exposé",
+        "unknown": "Non mesuré",
+        "not-applicable": "N/A"
+      }
+    },
+    "reason": {
+      "no-marker-script": "Pas de système d'écriture distinctif",
+      "bin-lookup-failed": "Le service de recherche de cartes était injoignable — les chiffres sont peut-être corrects ; réessayez plus tard.",
+      "bin-not-recognized": "La base de cartes n'a pas reconnu ce préfixe — une faute de frappe en est la cause la plus fréquente ; vérifiez les chiffres et relancez.",
+      "font-probe-unavailable": "Canvas indisponible",
+      "no-voice-packs": "Aucun pack vocal installé",
+      "keyboard-api-unavailable": "Non exposé par ce navigateur",
+      "no-layout-expectation": "Aucune disposition attendue pour ce pays",
+      "no-persona-languages": "Aucune langue définie pour le persona",
+      "geolocation-unsupported": "Géolocalisation non prise en charge"
+    },
+    "detail": {
+      "expected": "Attendu",
+      "actual": "Observé",
+      "disputed": "Sources en désaccord",
+      "v4": "IPv4",
+      "v6": "IPv6",
+      "candidateCount": "Candidats",
+      "matching": "Conformes à l'attendu",
+      "ipType": "Type d'adresse",
+      "expectedOffset": "Décalage attendu",
+      "actualOffset": "Décalage observé",
+      "sameOffset": "Même décalage",
+      "primary": "Langue principale",
+      "primaryExpected": "Principale attendue",
+      "demoted": "Présente mais pas en tête",
+      "timeZone": "Fuseau horaire",
+      "reportedOffset": "Décalage selon Date",
+      "zoneOffset": "Décalage selon le fuseau",
+      "samples": "Échantillons",
+      "expectedScripts": "Systèmes attendus",
+      "installedScripts": "Systèmes installés",
+      "expectedLanguages": "Langues attendues",
+      "voiceLanguages": "Langues des voix",
+      "voiceCount": "Voix",
+      "expectedLayout": "Disposition attendue",
+      "actualLayout": "Disposition observée",
+      "headerPrimary": "Langue principale de l'en-tête",
+      "scriptPrimary": "Langue principale du script",
+      "headerLanguages": "Langues de l'en-tête",
+      "ipZone": "Fuseau de l'IP",
+      "browserZone": "Fuseau du navigateur",
+      "ipOffset": "Décalage de l'IP",
+      "browserOffset": "Décalage du navigateur",
+      "colo": "PoP Cloudflare",
+      "gpsTimezone": "Fuseau de votre position",
+      "accuracyMetres": "Précision (m)",
+      "cardIssuer": "Banque émettrice",
+      "cardNetwork": "Réseau de carte",
+      "cardTier": "Gamme de carte",
+      "cardType": "Type de carte"
+    },
+    "checks": {
+      "ip-country": {
+        "title": "Pays de l’IP",
+        "fix": "Une partie de vos sorties se trouve hors du pays visé — avec plusieurs sorties de proxy, des cartes différentes peuvent réellement afficher des pays différents, et chaque sortie est ce que verra tel ou tel site. Les fractions ci-dessus indiquent combien de sorties concordent. Faites tout passer par des nœuds du pays visé ; si une seule source diverge sur une IP, le nœud est peut-être simplement mal étiqueté dans sa base, ce qui n'est pas corrigeable de votre côté.",
+        "what": "Dans quel pays les cartes IP de la page d'accueil situent votre adresse de sortie — chaque source est lue, et chaque sortie doit se trouver dans le pays visé."
+      },
+      "webrtc-leak": {
+        "title": "Exposition WebRTC",
+        "fix": "Bloquez WebRTC, ou utilisez une configuration où il ne peut voir que l'adresse du proxy. Le coût est réel : les appels vidéo et la visioconférence cessent de fonctionner. Une extension qui filtre WebRTC est plus douce qu'une désactivation totale, mais l'extension elle-même laisse ses propres traces.",
+        "what": "Si WebRTC divulgue une adresse située dans un autre pays que votre persona."
+      },
+      "dns-resolver-country": {
+        "title": "Pays du résolveur DNS",
+        "fix": "Utilisez un résolveur situé dans le pays visé, ou laissez le proxy gérer la résolution DNS. Notez qu'un résolveur public comme 1.1.1.1 n'exposera pas votre position, mais ne soutiendra pas non plus votre persona : il est neutre pour tous les pays.",
+        "what": "Dans quel pays se trouvent les résolveurs DNS qui répondent pour vous."
+      },
+      "asn-type": {
+        "title": "Type d'adresse",
+        "fix": "Une plage de centre de données est le signal « ceci est un proxy » le plus bruyant qu'une adresse puisse porter. Une sortie résidentielle corrige le problème, mais coûte nettement plus cher et sa qualité varie beaucoup.",
+        "what": "Si votre adresse relève d'un FAI résidentiel ou d'une plage de centre de données."
+      },
+      "timezone-vs-persona": {
+        "title": "Fuseau horaire et persona",
+        "fix": "Changez le fuseau horaire au niveau du système d'exploitation : toutes les API du navigateur restent alors cohérentes entre elles. Les extensions qui forcent le fuseau n'en modifient souvent qu'une partie, créant les contradictions signalées par les vérifications de cohérence — ce qui est pire que de ne rien changer.",
+        "what": "Si le fuseau horaire de votre navigateur est celui qu'aurait un habitant."
+      },
+      "language-match": {
+        "title": "Langue du navigateur",
+        "fix": "Changez la langue dans les réglages du système ou du navigateur plutôt que de réécrire un seul en-tête HTTP. L'ordre compte aussi : les sites lisent toute la liste, et un habitant place rarement une langue étrangère en tête.",
+        "what": "Si la langue que votre navigateur place en tête est celle d'un habitant."
+      },
+      "script-fonts": {
+        "title": "Polices du système d'écriture",
+        "fix": "Une machine configurée pour cette région embarque les polices de ce système d'écriture. Les installer à la main est possible mais rarement utile : cela change un signal alors que le reste du système demeure dans sa langue d'origine, ce qui crée généralement plus de contradictions que cela n'en résout. Si ce point doit tenir, c'est la langue du système qu'il faut changer.",
+        "what": "Si les polices du système d'écriture de ce pays sont installées sur la machine."
+      },
+      "speech-voices": {
+        "title": "Voix de synthèse vocale",
+        "fix": "Les packs de synthèse vocale suivent la langue d'installation du système, et pratiquement aucun proxy ni extension de falsification n'y touche. Ajouter un pack vocal pour la langue visée est une vraie correction, avec la même réserve que pour les polices : un seul signal modifié dans un système par ailleurs inchangé paraît délibéré.",
+        "what": "Quelles langues couvrent les packs de synthèse vocale de votre système."
+      },
+      "keyboard-layout": {
+        "title": "Disposition du clavier",
+        "fix": "Votre disposition physique de clavier ne correspond pas à celle du pays visé. Seuls les navigateurs Chromium l'exposent, le signal est donc plus étroit que les autres — mais là où il est lisible, il est difficile à falsifier sans changer le clavier lui-même.",
+        "what": "Quelle disposition physique de clavier votre machine déclare."
+      },
+      "edge-geo-consensus": {
+        "title": "Géolocalisation en périphérie",
+        "fix": "La lecture que Cloudflare fait de votre adresse de sortie diffère du pays visé. Quand cette vérification et la recherche IP se contredisent, l'adresse est plus probablement mal étiquetée dans une base que réellement déplacée — mais tout site derrière Cloudflare voit ce verdict-ci, pas l'autre.",
+        "what": "La lecture propre à Cloudflare de votre adresse de sortie, indépendante des bases ci-dessus."
+      },
+      "accept-language-header": {
+        "title": "En-tête de langue vs script",
+        "fix": "L'en-tête Accept-Language envoyé par votre navigateur ne correspond pas à ce que navigator.languages rapporte aux scripts. Presque rien ne produit cela, hormis une extension qui a réécrit l'un en laissant l'autre. Changez plutôt la langue dans les réglages du navigateur ou du système : les deux suivront ensemble.",
+        "what": "Si l'en-tête de langue envoyé sur le réseau correspond à ce qui est dit aux scripts. Volontairement indépendant du pays visé : réussir dit seulement que vos deux canaux de langue concordent — savoir si la langue elle-même convient relève de la vérification « Langue du navigateur ». Les falsifications de langue à moitié appliquées échouent précisément ici."
+      },
+      "ip-timezone-vs-browser": {
+        "title": "Fuseau de l’IP vs navigateur",
+        "fix": "Le fuseau horaire de votre IP de sortie et celui que rapporte votre navigateur désignent deux endroits différents. Cela vaut quel que soit le pays visé : une vraie machine se trouve quelque part, et les deux devraient désigner ce même endroit. En général, le proxy a déplacé votre adresse mais pas l'horloge de votre système.",
+        "what": "Si le fuseau de votre IP et celui rapporté par le navigateur concordent."
+      },
+      "gps-location": {
+        "title": "Position de l'appareil (GPS)",
+        "fix": "Votre appareil se déclare physiquement dans un autre pays que celui visé. Aucun proxy n'y touche : tout site qui demande votre position obtient la vraie réponse, et les extensions qui la falsifient laissent généralement intactes la précision et la temporisation. Les options réalistes : refuser l'autorisation de localisation aux sites qui la demandent, ou accepter que ce point ne tienne pas.",
+        "what": "Dans quel pays votre appareil se déclare physiquement."
+      },
+      "payment-region": {
+        "title": "Pays émetteur de la carte",
+        "fix": "Votre carte a été émise dans un autre pays que celui dont vous vous réclamez. Les marchands voient le pays émetteur avant presque tout le reste, et les systèmes de risque le comparent étroitement à l'adresse et à l'IP. Il n'existe pas de correctif côté navigateur — c'est une propriété de la carte elle-même.",
+        "what": "Quel pays a émis la carte correspondant au préfixe saisi."
+      },
+      "intl-number-format": {
+        "title": "Format numérique",
+        "what": "Comment votre navigateur groupe les chiffres et marque les décimales.",
+        "fix": "Votre navigateur groupe les nombres selon sa propre région, pas selon celle du pays visé. C'est distinct de la langue : une machine peut porter la bonne balise de langue alors que sa région désigne encore ailleurs. Changez la région — et pas seulement la langue — dans les réglages système : « Région » sous Windows, « Langue et région » sous macOS."
+      },
+      "intl-date-format": {
+        "title": "Format de date",
+        "what": "L'ordre et les séparateurs employés par votre navigateur pour écrire une date.",
+        "fix": "Votre navigateur écrit les dates dans un ordre ou avec des séparateurs différents de ceux d'un habitant. Comme le format numérique, cela suit la région du système et non la langue : c'est la région qu'il faut changer."
+      },
+      "intl-hour-cycle": {
+        "title": "Format d'heure",
+        "what": "Si votre navigateur présente une horloge de 12 ou de 24 heures — la convention que voient les sites quand ils formatent l'heure.",
+        "fix": "Le format d'heure suit la langue du navigateur, pas l'interrupteur « 24 heures » du système — la plupart des navigateurs ignorent complètement ce réglage (Safari est la principale exception). Pour présenter la convention du pays visé, passez la langue ou la région du navigateur sur une locale de ce pays."
+      },
+      "timezone-authenticity": {
+        "title": "Authenticité du fuseau horaire",
+        "what": "Si le fuseau horaire annoncé par votre navigateur est bien celui de la machine.",
+        "fix": "Le fuseau annoncé n'est pas celui sur lequel tourne réellement la machine : Intl et Date se contredisent, ou les dates passées ne suivent pas les règles d'heure d'été de ce fuseau. C'est important parce que la vérification de fuseau ci-dessus a donc validé une valeur qui n'est pas réelle — un site qui lit l'horloge directement s'en aperçoit. Réglez le fuseau dans votre système d'exploitation plutôt qu'avec une extension : le décalage courant et les règles historiques suivront ensemble."
+      }
+    },
+    "optional": {
+      "gpsNote": "La position GPS est l'une des dimensions que la vérification peut mesurer — partagez-la si vous voulez qu'elle soit comparée aussi.",
+      "gpsButton": "Partager ma position",
+      "gpsGranted": "Position reçue.",
+      "gpsFailed": {
+        "denied": "Autorisation refusée — cette vérification sera non mesurée.",
+        "timeout": "La demande de position a expiré.",
+        "unavailable": "Votre appareil n'a pas pu déterminer de position.",
+        "unsupported": "Ce navigateur ne prend pas en charge la géolocalisation."
+      },
+      "cardNote": "Parfois, vous voulez aussi payer comme un local. Saisissez les 6 à 8 premiers chiffres de votre carte : la vérification dira si la carte passe pour émise dans ce pays.",
+      "cardError": "6 à 8 chiffres requis — saisissez-en au moins 6 pour identifier la banque émettrice.",
+      "cardReady": "Préfixe prêt — le pays émetteur est recherché au moment de la vérification."
+    },
+    "dependencies": {
+      "note": "La vérification a besoin des résultats de tous ces tests de base — lancez d'abord ceux qui manquent :",
+      "runButton": "Lancer les tests manquants",
+      "measured": "{n} sur {total} mesurées",
+      "allReady": "Tous les tests ont été lancés"
+    },
+    "step": {
+      "country": "Pays visé",
+      "language": "Langue principale",
+      "location": "Position",
+      "card": "Préfixe de carte",
+      "awaitingCountry": "Choisissez d'abord un pays",
+      "otherTests": "Tests de base"
+    },
+    "emptyHint": "Choisissez le pays dont vous voulez avoir l'air d'être un habitant, puis lancez la vérification.",
+    "readyHint": "Prêt. Lancez la vérification pour voir à quel point vous passez pour un habitant.",
+    "value": {
+      "yes": "Oui",
+      "no": "Non"
+    }
+  },
   "censorshipcheck": {
     "Title": "Test de censure",
     "Note": "Consultez, à partir des données ouvertes du réseau mondial de volontaires OONI, dans quels pays/régions un site a été bloqué ou perturbé au cours des 30 derniers jours — et par quels moyens. Vous pouvez ensuite vérifier les régions suspectes avec un test en temps réel Globalping. Dans certains pays, la censure est clairement définie par la loi, tandis que dans d'autres elle est plus floue.",
@@ -596,7 +860,8 @@
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
-    "SecurityChecklist": "Guide pour sécuriser votre vie numérique"
+    "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
+    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant"
   },
   "macchecker": {
     "Title": "Recherche MAC",

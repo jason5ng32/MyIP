@@ -7,7 +7,8 @@ Area-specific details: @frontend/AGENTS.md (Vue SPA) · @api/AGENTS.md (Express 
 
 **MyIP** (IPCheck.ing) is an open-source IP toolbox: IP lookup, connectivity
 tests, WebRTC / DNS-leak detection, speed test, MTR, Whois, security
-checklist, browser fingerprint, anonymity checks, and more. Single repo, two
+checklist, browser fingerprint, anonymity checks, persona check, and
+more. Single repo, two
 halves: a Vue 3 SPA front-end and an Express 5 back-end API.
 
 ## Stack
