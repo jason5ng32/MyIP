@@ -33,6 +33,7 @@ import serviceStatusHandler, {
 } from '../api/service-status.js';
 import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } from '../api/share-report.js';
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
+import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
 import logger from '../common/logger.js';
 
@@ -547,6 +548,81 @@ describe('ipcheck-ing handler', () => {
         await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+// -- ipinfo-io normalizer -------------------------------------------------
+// Pure transform, no fetch involved.
+
+describe('ipinfo-io normalize', () => {
+    const CANONICAL_KEYS = [
+        'ip', 'city', 'region', 'country', 'country_name', 'country_code',
+        'latitude', 'longitude', 'asn', 'org',
+    ];
+
+    it('maps a fully populated upstream payload', () => {
+        const out = modifyJsonForIpinfo({
+            ip: '8.8.8.8',
+            city: 'Mountain View',
+            region: 'California',
+            country: 'US',
+            loc: '37.4056,-122.0775',
+            org: 'AS15169 Google LLC',
+        });
+        assert.equal(out.country_name, 'United States');
+        assert.equal(out.country_code, 'US');
+        assert.equal(out.latitude, 37.4056);
+        assert.equal(out.longitude, -122.0775);
+        assert.equal(out.asn, 'AS15169');
+        assert.equal(out.org, 'Google LLC');
+    });
+
+    it('degrades coordinates to null when the upstream omits loc', () => {
+        // Anycast ranges answer 200 without loc.
+        const out = modifyJsonForIpinfo({
+            ip: '104.28.212.153', city: 'Los Angeles', country: 'US', org: 'AS13335 Cloudflare, Inc.',
+        });
+        assert.equal(out.latitude, null);
+        assert.equal(out.longitude, null);
+        assert.equal(out.asn, 'AS13335');
+    });
+
+    it('degrades a partial or non-numeric loc to null', () => {
+        assert.equal(modifyJsonForIpinfo({ loc: '37.4056' }).longitude, null);
+        assert.equal(modifyJsonForIpinfo({ loc: '' }).latitude, null);
+        assert.equal(modifyJsonForIpinfo({ loc: 'unknown,unknown' }).latitude, null);
+        assert.equal(modifyJsonForIpinfo({ loc: ',-122.0775' }).latitude, null);
+        // 0 is a real coordinate, not a blank one.
+        assert.equal(modifyJsonForIpinfo({ loc: '0,0' }).latitude, 0);
+    });
+
+    it('empties asn / org when the upstream omits org', () => {
+        const out = modifyJsonForIpinfo({ ip: '8.8.8.8', country: 'US', loc: '37.4,-122.0' });
+        assert.equal(out.asn, '');
+        assert.equal(out.org, '');
+    });
+
+    it('falls back to Unknown Country for an absent or unlisted code', () => {
+        assert.equal(modifyJsonForIpinfo({}).country_name, 'Unknown Country');
+        assert.equal(modifyJsonForIpinfo({ country: 'XX' }).country_name, 'Unknown Country');
+    });
+
+    it('survives a bogon payload and still emits the canonical shape', () => {
+        // ipinfo.io answers {"ip":…,"bogon":true} — no loc, org or country.
+        const out = modifyJsonForIpinfo({ ip: '192.0.2.1', bogon: true });
+        assert.equal(out.ip, '192.0.2.1');
+        for (const key of CANONICAL_KEYS) {
+            assert.ok(key in out, `${key} must stay present in the response`);
+        }
+    });
+
+    it('survives an empty or null upstream body', () => {
+        for (const payload of [{}, null, undefined]) {
+            const out = modifyJsonForIpinfo(payload);
+            for (const key of CANONICAL_KEYS) {
+                assert.ok(key in out, `${key} must stay present in the response`);
+            }
+        }
     });
 });
 
