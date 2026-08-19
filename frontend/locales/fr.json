@@ -545,7 +545,7 @@
     }
   },
   "personacheck": {
-    "Title": "Vérification de persona",
+    "Title": "Vérification de persona approfondie",
     "Note": "Un vieux test dit : si ça ressemble à un canard, nage comme un canard et cancane comme un canard, c'est probablement un canard. Les sites vous lisent de la même façon — votre IP peut prétendre que vous êtes dans le pays A, mais votre fuseau horaire, vos langues, vos polices installées, votre clavier et une dizaine d'autres signaux racontent chacun leur propre histoire, et c'est leur ensemble qui forme le persona qu'un site voit réellement. Cet outil mesure ce persona, le compare au résident local que vous voulez incarner et montre précisément où les deux divergent.",
     "NoteVs": "Il répond à une autre question que le test d'invisibilité : celui-ci vérifie si votre proxy peut être détecté ; ici, il s'agit de savoir qui les sites croient voir — et à quelle distance ce portrait se trouve de celui que vous pensez présenter.",
     "Note2": "Commencez par choisir le pays dont vous voulez avoir l'air d'être un habitant.",
@@ -1410,7 +1410,7 @@
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "fullScreenAdvancedTools": "Outils avancés en plein écran",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
-    "PersonaCheck": "Ouvrir le panneau Vérification de persona"
+    "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie"
   },
   "page": {
     "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",

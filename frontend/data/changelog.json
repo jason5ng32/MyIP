@@ -1602,10 +1602,10 @@
       {
         "type": "add",
         "change": {
-          "en": "New tool: Persona Check — see how much of what sites read agrees with the country you want to be taken for",
-          "zh": "新增工具：身份画像检测——看看网站能读到的信息，有多少和你想被当成的国家对得上",
-          "fr": "Nouvel outil : Vérification de persona — voyez dans quelle mesure ce que lisent les sites correspond au pays pour lequel vous voulez passer",
-          "ru": "Новый инструмент: проверка цифрового портрета — насколько то, что видят сайты, совпадает со страной, за жителя которой вы хотите себя выдавать"
+          "en": "New tool: In-depth Persona Check — see how much of what sites read agrees with the country you want to be taken for",
+          "zh": "新增工具：深度画像检测——看看网站能读到的信息，有多少和你想被当成的国家对得上",
+          "fr": "Nouvel outil : Vérification de persona approfondie — voyez dans quelle mesure ce que lisent les sites correspond au pays pour lequel vous voulez passer",
+          "ru": "Новый инструмент: углублённая проверка портрета — насколько то, что видят сайты, совпадает со страной, за жителя которой вы хотите себя выдавать"
         }
       },
       {
