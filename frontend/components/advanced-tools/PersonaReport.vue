@@ -17,7 +17,7 @@
                 <!-- Grade dial: track + score arc, letter and score inside.
                      An ungraded run shows the bare track around a dash. -->
                 <div class="relative size-28 shrink-0" role="img"
-                    :aria-label="scoreOutOf100 !== null ? `${report.grade} · ${scoreOutOf100}/100` : ''">
+                    :aria-label="scoreOutOf100 !== null ? `${grade} · ${scoreOutOf100}/100` : ''">
                     <svg class="size-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
                         <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor"
                             stroke-width="7" class="text-muted" />
@@ -29,7 +29,7 @@
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <span class="text-4xl font-bold leading-none tracking-tight"
                             :class="textClass(gradeTone)">
-                            {{ report.grade === 'unknown' ? '—' : report.grade }}
+                            {{ grade === 'unknown' ? '—' : grade }}
                         </span>
                         <span v-if="scoreOutOf100 !== null"
                             class="mt-1 text-xs tabular-nums text-muted-foreground">
@@ -42,10 +42,10 @@
                     <!-- The verdict sentence — no flag here, just the
                          conclusion, in the same tone as the grade letter. -->
                     <p class="text-base md:text-lg font-semibold leading-snug m-0" :class="textClass(gradeTone)">
-                        {{ t(`personacheck.report.grade.${report.grade}`, { country: countryName }) }}
+                        {{ t(`personacheck.report.grade.${grade}`, { country: countryName }) }}
                     </p>
                     <p class="text-sm leading-relaxed text-muted-foreground">
-                        {{ t(`personacheck.report.gradeNote.${report.grade}`) }}
+                        {{ t(`personacheck.report.gradeNote.${grade}`) }}
                     </p>
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <div class="space-y-2">
                 <div class="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div v-for="entry in counts" :key="entry.key" :class="dotClass(entry.tone)"
-                        :style="{ width: `${(entry.n / report.counts.total) * 100}%` }" />
+                        :style="{ width: `${entry.percent}%` }" />
                 </div>
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                     <span v-for="entry in counts" :key="entry.key" class="flex items-center gap-1.5">
@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <p v-if="!report.counts.leak && !report.counts.mismatch && !report.counts.unnatural"
+            <p v-if="nothingActionable"
                 class="rounded-lg border border-success/30 bg-success/10 p-3 text-sm">
                 {{ t('personacheck.report.nothingActionable') }}
             </p>
@@ -81,7 +81,7 @@
                 </h3>
                 <Badge variant="secondary" class="font-normal">
                     {{ t('personacheck.dependencies.measured', {
-                        n: report.counts.scored, total: report.counts.total }) }}
+                        n: measured.scored, total: measured.total }) }}
                 </Badge>
             </div>
             <Accordion type="single" collapsible class="space-y-2">
@@ -92,8 +92,8 @@
                             <component :is="VERDICT_ICON[row.verdict]" class="size-4 shrink-0"
                                 :class="textClass(VERDICT_TONE[row.verdict])" />
                             <span class="truncate text-sm" :class="row.actionable ? 'font-semibold' : ''"
-                                :title="t(`personacheck.checks.${row.id}.title`)">
-                                {{ t(`personacheck.checks.${row.id}.title`) }}
+                                :title="row.known ? t(`personacheck.checks.${row.id}.title`) : row.id">
+                                {{ row.known ? t(`personacheck.checks.${row.id}.title`) : row.id }}
                             </span>
                             <span class="ml-auto shrink-0 text-xs" :class="textClass(VERDICT_TONE[row.verdict])">
                                 {{ t(`personacheck.report.state.${row.verdict}`) }}
@@ -103,13 +103,13 @@
 
                     <AccordionContent class="space-y-3 pb-4">
                         <!-- Which of the three questions this row answers. -->
-                        <Badge variant="outline" class="font-normal">
+                        <Badge v-if="row.axis" variant="outline" class="font-normal">
                             {{ t(`personacheck.axis.${row.axis}`) }}
                         </Badge>
 
                         <!-- What this dimension looks at — shown for every row,
                              passing ones included. -->
-                        <p class="text-sm text-muted-foreground">
+                        <p v-if="row.known" class="text-sm text-muted-foreground">
                             {{ t(`personacheck.checks.${row.id}.what`) }}
                         </p>
 
@@ -160,8 +160,9 @@
 
                         <!-- Who reads this, and what to do — only where there
                              is something to do. -->
-                        <template v-if="row.actionable">
-                            <p class="flex items-start gap-2 text-sm text-muted-foreground">
+                        <template v-if="row.actionable && row.known">
+                            <p v-if="row.visibility"
+                                class="flex items-start gap-2 text-sm text-muted-foreground">
                                 <Eye class="size-4 mt-0.5 shrink-0" />
                                 <span>{{ t(`personacheck.report.visibility.${row.visibility}`) }}</span>
                             </p>
@@ -186,7 +187,9 @@
 import { computed, ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { VERDICT, GRADE, PERSONA_UNKNOWN_REASONS } from '@/utils/persona/check-ids.js';
+import {
+    VERDICT, GRADE, AXIS, VISIBILITY, PERSONA_CHECK_IDS, PERSONA_UNKNOWN_REASONS,
+} from '@/utils/persona/check-ids.js';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Icon } from '@iconify/vue';
@@ -228,7 +231,13 @@ const VERDICT_ICON = {
     [VERDICT.NOT_APPLICABLE]: CircleSlash,
 };
 
-const gradeTone = computed(() => GRADE_TONE[props.report.grade] || 'wait');
+// A grade this build has no copy for reads as ungraded — the dial then shows
+// its bare track, which is honest about "we cannot say" either way.
+const KNOWN_GRADES = new Set(Object.values(GRADE));
+const grade = computed(() =>
+    (KNOWN_GRADES.has(props.report.grade) ? props.report.grade : GRADE.UNKNOWN));
+
+const gradeTone = computed(() => GRADE_TONE[grade.value] || 'wait');
 
 // The graded sentence names the country ("you look like a local of X") — the
 // localized display name, same source as everywhere else in the app.
@@ -242,13 +251,17 @@ const countryName = computed(() =>
 const RING_CIRCUMFERENCE = 2 * Math.PI * 45;
 const ringProgress = ref(0);
 const ringOffset = computed(() => RING_CIRCUMFERENCE * (1 - ringProgress.value));
-const syncRing = () => { ringProgress.value = (props.report.score ?? 0); };
-onMounted(() => requestAnimationFrame(syncRing));
-watch(() => props.report.score, syncRing);
+// A score is a 0..1 fraction, or null when the run was too thin to grade.
+// Anything else (absent, NaN) reads as ungraded rather than as 0.
+const score = computed(() =>
+    (Number.isFinite(props.report.score) ? props.report.score : null));
 
-const scoreOutOf100 = computed(() => (props.report.score === null
-    ? null
-    : Math.round(props.report.score * 100)));
+const syncRing = () => { ringProgress.value = score.value ?? 0; };
+onMounted(() => requestAnimationFrame(syncRing));
+watch(score, syncRing);
+
+const scoreOutOf100 = computed(() =>
+    (score.value === null ? null : Math.round(score.value * 100)));
 
 const isActionable = (verdict) =>
     [VERDICT.LEAK, VERDICT.UNNATURAL, VERDICT.MISMATCH].includes(verdict);
@@ -269,19 +282,58 @@ const reasonKey = (result) => {
     return '';
 };
 
-const rows = computed(() => props.report.results.map((result) => ({
-    ...result,
-    actionable: isActionable(result.verdict),
-    reasonKey: reasonKey(result),
-})));
+// The evaluator can ship a check before this front end ships its copy, so a
+// row's id / verdict / axis are treated as claims rather than as facts: an
+// unrecognized one degrades to something renderable instead of a raw
+// translation key. The row still appears — it counted toward the score, and
+// dropping it would leave the numbers unexplained.
+const KNOWN_CHECK_IDS = new Set(PERSONA_CHECK_IDS);
+const KNOWN_VERDICTS = new Set(Object.values(VERDICT));
+const KNOWN_AXES = new Set(Object.values(AXIS));
+const KNOWN_VISIBILITIES = new Set(Object.values(VISIBILITY));
 
-const counts = computed(() => [
-    { key: 'leak', tone: 'fail', n: props.report.counts.leak },
-    { key: 'warning', tone: 'ok-slow', n: props.report.counts.mismatch + props.report.counts.unnatural },
-    { key: 'match', tone: 'ok-fast', n: props.report.counts.match },
-    { key: 'unknown', tone: 'wait', n: props.report.counts.unknown },
-    { key: 'notApplicable', tone: 'wait', n: props.report.counts.notApplicable },
-].filter((entry) => entry.n > 0));
+const rows = computed(() => (Array.isArray(props.report.results) ? props.report.results : [])
+    .map((result) => {
+        const verdict = KNOWN_VERDICTS.has(result?.verdict) ? result.verdict : VERDICT.UNKNOWN;
+        return {
+            ...result,
+            verdict,
+            // '' hides the chip / line rather than printing an untranslated one.
+            axis: KNOWN_AXES.has(result?.axis) ? result.axis : '',
+            visibility: KNOWN_VISIBILITIES.has(result?.visibility) ? result.visibility : '',
+            known: KNOWN_CHECK_IDS.has(result?.id),
+            actionable: isActionable(verdict),
+            reasonKey: reasonKey({ ...result, verdict }),
+        };
+    }));
+
+const safeCount = (value) => (Number.isFinite(value) ? value : 0);
+
+const counts = computed(() => {
+    const raw = props.report.counts ?? {};
+    const entries = [
+        { key: 'leak', tone: 'fail', n: safeCount(raw.leak) },
+        { key: 'warning', tone: 'ok-slow', n: safeCount(raw.mismatch) + safeCount(raw.unnatural) },
+        { key: 'match', tone: 'ok-fast', n: safeCount(raw.match) },
+        { key: 'unknown', tone: 'wait', n: safeCount(raw.unknown) },
+        { key: 'notApplicable', tone: 'wait', n: safeCount(raw.notApplicable) },
+    ].filter((entry) => entry.n > 0);
+    // The bar divides by the total, so it is taken from the entries rather
+    // than from a `total` that could arrive as 0 or absent.
+    const total = entries.reduce((sum, entry) => sum + entry.n, 0);
+    return entries.map((entry) => ({ ...entry, percent: total ? (entry.n / total) * 100 : 0 }));
+});
+
+// Headline counters, each safe to render on their own.
+const measured = computed(() => {
+    const raw = props.report.counts ?? {};
+    return { scored: safeCount(raw.scored), total: safeCount(raw.total) };
+});
+
+const nothingActionable = computed(() => {
+    const raw = props.report.counts ?? {};
+    return !safeCount(raw.leak) && !safeCount(raw.mismatch) && !safeCount(raw.unnatural);
+});
 
 // --- value rendering --------------------------------------------------------
 // Raw values are the checks' own vocabulary, not the visitor's. A country code,

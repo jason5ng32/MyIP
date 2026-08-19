@@ -78,7 +78,9 @@ use npm / yarn — they'd produce a competing lockfile.
 
 ### Comments
 
-- **Every new file opens with a header comment** stating its purpose.
+- **Every new file opens with a header comment** stating its purpose —
+  except `frontend/components/ui/`, which holds shadcn-vue CLI output kept
+  verbatim so it can be re-synced (see frontend/AGENTS.md).
 - **Large templates / functions carry block comments** per meaningful region.
 - **Comments describe the code as it is now** — no changelog narration
   (`previously…`, `…fixes that`); git history covers the past. A comment
