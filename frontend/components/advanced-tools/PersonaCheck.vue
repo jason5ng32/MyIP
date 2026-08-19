@@ -377,6 +377,7 @@ const run = async () => {
         quotaExceeded.value = true;
         return;
     }
+    trackEvent('Section', 'StartClick', 'PersonaCheck');
     runStatus.value = 'running';
     errorKey.value = '';
     quotaExceeded.value = false;
@@ -397,7 +398,6 @@ const run = async () => {
             counts: report.value.counts,
             results: report.value.results,
         });
-        trackEvent('PersonaCheck', 'run', report.value.grade);
     } catch (error) {
         runStatus.value = 'idle';
         // 429 passed through by the backend: monthly quota exhausted —
