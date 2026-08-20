@@ -14,11 +14,15 @@
 // Note:
 //   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug)
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
+//   - every entry here is a home-page action. Overlays (Dialog / Sheet /
+//     Drawer) suspend the whole map while they are open — see
+//     utils/shortcut.js — so nothing needs a per-key "is something covering
+//     the page?" check.
 
-import { watch } from 'vue';
+import { getCurrentScope, onScopeDispose, watch } from 'vue';
 import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
-import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
+import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
 import { isPulseEnabled } from '../utils/pulse-beacon.js';
 
@@ -34,7 +38,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         webRTCRef,
         dnsLeaksRef,
         isInfosLoaded,
-        isToolOpen,
         toggleInfoMask,
     } = refs;
 
@@ -155,16 +158,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         { keys: 'W', action: () => goToAdvancedTool('whois', 'Whois'), description: t('shortcutKeys.Whois') },
         { keys: 'v', action: () => goToAdvancedTool('servicestatus', 'ServiceStatus'), description: t('shortcutKeys.ServiceStatus') },
         {
-            keys: 'f',
-            action: () => {
-                if (isToolOpen.value) {
-                    advancedToolsRef.value.fullScreen();
-                    trackEvent('ShortCut', 'ShortCut', 'FullScreen');
-                }
-            },
-            description: t('shortcutKeys.fullScreenAdvancedTools'),
-        },
-        {
             keys: 'q',
             // Async components (see Home.vue): ref is null until the chunk
             // lands, so these actions optional-chain instead of throwing.
@@ -242,13 +235,27 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
 };
 
 export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
+    // Suspending the map behind an overlay is the primitives' job
+    // (composables/use-overlay-shortcuts.js), so nothing is wired here.
+    //
+    // Home is the only route that registers shortcuts; drop them when it
+    // unmounts, so keystrokes on /privacy or /r/:id can't reach refs that no
+    // longer point at anything.
+    let disposed = false;
+    if (getCurrentScope()) {
+        onScopeDispose(() => {
+            disposed = true;
+            registerShortcuts([]);
+        });
+    }
+
     const registerShortcutKeys = () => {
-        const shortcuts = buildShortcutConfig({ refs, store, t, configs, userPreferences });
-        shortcuts.forEach((entry) => mappingKeys(entry));
+        registerShortcuts(buildShortcutConfig({ refs, store, t, configs, userPreferences }));
     };
 
     const loadShortcuts = () => {
         setTimeout(() => {
+            if (disposed) return;
             registerShortcutKeys();
             // Help is an async component (Home.vue): on slow networks its
             // chunk may land after this timer, so wait for the ref instead

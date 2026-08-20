@@ -1413,7 +1413,6 @@
     "EnhancedDnsLeakTest": "打开深度 DNS 泄露测试面板",
     "MacChecker": "打开物理地址查询面板",
     "BrowserInfo": "打开浏览器信息面板",
-    "fullScreenAdvancedTools": "全屏展开高级工具面板",
     "SecurityChecklist": "打开安全检查清单",
     "PersonaCheck": "打开深度画像检测面板"
   },

@@ -98,7 +98,6 @@ function makeRefs() {
       webRTCRef:         ref({ checkAllWebRTC: (flag) => { calls.webrtc.push(flag); } }),
       dnsLeaksRef:       ref({ checkAllDNSLeakTest: (flag) => { calls.dnsleak.push(flag); } }),
       isInfosLoaded:     ref(true),
-      isToolOpen:        ref(true),
       toggleInfoMask:    () => { calls.mask += 1; },
     },
     calls,
@@ -136,12 +135,11 @@ function loadAndGetKeyMap({
 }
 
 describe('useShortcuts()', () => {
-  it('loadShortcuts() registers a keymap of 27+ entries on a non-original site', () => {
+  it('loadShortcuts() registers a keymap of 26+ entries on a non-original site', () => {
     const { keyMap } = loadAndGetKeyMap({ originalSite: false, pulseEnabled: false });
-    // 27 base entries (no invisibility / enhanced-DNS / pulse); keyMap is
-    // append-only globally so ≥ 27
+    // 26 base entries (no invisibility / enhanced-DNS / pulse).
     const distinctKeys = new Set(keyMap.map((e) => e.keys));
-    assert.ok(distinctKeys.size >= 27, `expected ≥27 distinct shortcut keys, got ${distinctKeys.size}`);
+    assert.ok(distinctKeys.size >= 26, `expected ≥26 distinct shortcut keys, got ${distinctKeys.size}`);
     assert.ok(distinctKeys.has('R'));
     assert.ok(distinctKeys.has('?'));
     assert.ok(distinctKeys.has('g'));
@@ -149,6 +147,9 @@ describe('useShortcuts()', () => {
     assert.ok(distinctKeys.has('H'));
     assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off when isPulseEnabled is false');
     assert.equal(distinctKeys.has('P'), false, 'persona shortcut stays off a self-hosted instance');
+    // Overlays take no keys at all (utils/shortcut.js), so there is no
+    // drawer-only entry left to register.
+    assert.equal(distinctKeys.has('f'), false, 'no shortcut acts on an open overlay');
   });
 
   it('originalSite=true adds invisibility ("i"), enhanced DNS-leak ("D") and persona ("P") shortcuts', () => {

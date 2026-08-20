@@ -3,8 +3,9 @@
 // 与 Sheet 不同：vaul 自带拖拽手势 + body scale（需配合 index.html 的 [vaul-drawer-wrapper]）
 // 用法：<Drawer :open="..." @update:open="..."> 或 v-model:open
 import { DrawerRoot } from 'vaul-vue';
+import { useOverlayShortcuts } from '@/composables/use-overlay-shortcuts.js';
 
-defineProps({
+const props = defineProps({
   open: { type: Boolean, default: undefined },
   modal: { type: Boolean, default: true },
   // 'top' | 'bottom' | 'left' | 'right'，默认 bottom
@@ -31,6 +32,10 @@ defineProps({
   handleOnly: { type: Boolean, default: true },
 });
 defineEmits(['update:open', 'update:activeSnapPoint']);
+
+// Overlays suspend the page's keyboard shortcuts while open — see
+// composables/use-overlay-shortcuts.js.
+useOverlayShortcuts(() => props.open);
 </script>
 
 <template>

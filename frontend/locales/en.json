@@ -1413,7 +1413,6 @@
     "EnhancedDnsLeakTest": "Open In-depth DNS Leak Test panel",
     "MacChecker": "Open MAC lookup panel",
     "BrowserInfo": "Open Browser Info panel",
-    "fullScreenAdvancedTools": "Full Screen Advanced Tools",
     "SecurityChecklist": "Open Security Checklist panel",
     "PersonaCheck": "Open In-depth Persona Check panel"
   },

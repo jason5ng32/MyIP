@@ -91,6 +91,19 @@ Check is the sharpest case: its live results carry a `detail` per check
 id / axis / verdict triple reaches the section. Invisibility follows the
 same rule with key + flag. Keep new sections on that side of the line.
 
+### Overlays take no keyboard shortcuts
+
+`utils/shortcut.js` runs one document-level keydown dispatcher over the map
+`composables/use-shortcuts.js` registers — every entry there is a home-page
+action, and the whole map is suspended while any overlay is open. The rule keys
+off the component's form, not its purpose: the `ui/` roots (`Dialog` / `Sheet` /
+`Drawer`) call `composables/use-overlay-shortcuts.js`, so anything built on them
+inherits it, and overlays nest. Esc and the native scrolling keys still work —
+reka-ui / vaul and the browser own those.
+
+`registerShortcuts()` replaces the map rather than appending, and Home clears it
+on unmount — shortcuts belong to the home route alone.
+
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
 `sentry-init.js` loads via a build-time-gated dynamic import: no
@@ -127,10 +140,11 @@ upload at build, gated on `SENTRY_AUTH_TOKEN`.
 
 **shadcn-vue first.** Check `components/ui/` (copied-in primitives), then
 https://www.shadcn-vue.com/docs/components for something to copy in;
-hand-rolled Tailwind only when neither fits. Two local notes: `Spinner` is
+hand-rolled Tailwind only when neither fits. Three local notes: `Spinner` is
 project-specific (lucide `Loader2` + `role="status"`); `toggle` /
-`toggle-group` deliberately use the `primary` pair for the pressed state —
-don't revert that when syncing upstream.
+`toggle-group` deliberately use the `primary` pair for the pressed state; and
+the `Dialog` / `Sheet` / `Drawer` roots suspend the keyboard shortcuts while
+open — keep all three when syncing upstream.
 
 ### Design tokens
 
@@ -189,8 +203,9 @@ Copy from the named exemplar instead of re-inventing:
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
-- **Drawer vs Sheet** — the vaul-vue bottom Drawer is reserved for the
-  Advanced Tools panel; side panels use `Sheet`.
+- **Drawer vs Sheet** — the vaul-vue bottom Drawer is for the Advanced Tools
+  panel and full-bleed expansions of an inline visual (ASNConnectivity); side
+  panels use `Sheet`.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
   hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dot clusters.
 
