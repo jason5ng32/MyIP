@@ -312,9 +312,11 @@ const barWidth = (share) => {
     return max > 0 ? `${Math.min(100, (share / max) * 100)}%` : '0%';
 };
 
-// The backend sends shares at two decimals so tiny countries stay nonzero;
-// below one display decimal they read as "<0.1%" — "few", never "zero".
-const shareLabel = (share) => (share > 0 && share < 0.1 ? '<0.1%' : `${share.toFixed(1)}%`);
+// Any country the backend returns has visitors — even one its two-decimal
+// rounding flattened to 0 — so below one display decimal the label reads
+// "<0.1%", never "0.0%". Only countries absent from the response are
+// "no visitors" (the map tooltip's undefined branch).
+const shareLabel = (share) => (share < 0.1 ? '<0.1%' : `${share.toFixed(1)}%`);
 
 // Country names via the shared Intl helper (data/country-name.js).
 // "T1" is the backend's pseudo-code for Tor exit traffic — no ISO name, no
