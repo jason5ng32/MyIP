@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
+import { ref, computed, h, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -96,6 +96,7 @@ import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '@/data/tools.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { Maximize, Minimize, PanelBottomOpen, SquareArrowOutUpRight } from '@lucide/vue';
 
 const { t } = useI18n();
@@ -131,6 +132,12 @@ const activeTool = computed(() => {
 });
 const isOpen = computed(() => !!activeTool.value);
 
+// Centered spinner while a tool's chunk downloads — on slow networks the
+// drawer otherwise opens onto blank space. The async wrapper's `delay`
+// keeps fast loads flash-free.
+const ToolLoading = () => h('div', { class: 'flex justify-center py-20' },
+    h(Spinner, { class: 'size-6 text-muted-foreground' }));
+
 // Resolve each tool's lazy component once and cache it, so re-renders don't
 // rebuild the async wrapper (which would remount the tool).
 const asyncToolCache = new Map();
@@ -138,7 +145,11 @@ const activeComponent = computed(() => {
     const tool = activeTool.value;
     if (!tool) return null;
     if (!asyncToolCache.has(tool.slug)) {
-        asyncToolCache.set(tool.slug, defineAsyncComponent(tool.component));
+        asyncToolCache.set(tool.slug, defineAsyncComponent({
+            loader: tool.component,
+            loadingComponent: ToolLoading,
+            delay: 200,
+        }));
     }
     return asyncToolCache.get(tool.slug);
 });
