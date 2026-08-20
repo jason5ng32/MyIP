@@ -231,22 +231,24 @@ const effectiveZoom = () => {
         : zoom.value;
 };
 
-// Zoom keeping the content point under (clientX, clientY) stationary — scroll offsets
-// are re-applied after Vue commits the new width/height attrs.
+// Zoom keeping the content point under (clientX, clientY) stationary. Anchored on
+// the SVG's own rect — not the scroll container's — so the container padding and
+// the m-auto centering offsets can't skew it; the post-render re-measure corrects
+// for wherever those offsets end up at the new size.
 const zoomAt = (next, clientX, clientY) => {
     const el = scrollEl.value;
+    const svg = el?.querySelector('svg');
     next = clampZoom(next);
     const prev = effectiveZoom();
-    if (!el || next === prev) { zoom.value = next; return; }
-    const rect = el.getBoundingClientRect();
-    const ox = clientX - rect.left;
-    const oy = clientY - rect.top;
-    const cx = (el.scrollLeft + ox) / prev;
-    const cy = (el.scrollTop + oy) / prev;
+    if (!el || !svg || next === prev) { zoom.value = next; return; }
+    const rect = svg.getBoundingClientRect();
+    const px = (clientX - rect.left) / prev;
+    const py = (clientY - rect.top) / prev;
     zoom.value = next;
     nextTick(() => {
-        el.scrollLeft = cx * next - ox;
-        el.scrollTop = cy * next - oy;
+        const moved = svg.getBoundingClientRect();
+        el.scrollLeft += moved.left + px * next - clientX;
+        el.scrollTop += moved.top + py * next - clientY;
     });
 };
 
