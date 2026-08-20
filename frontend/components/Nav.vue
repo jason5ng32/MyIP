@@ -90,7 +90,7 @@
         <!-- Preferences — standalone cog only for Firebase-less self-hosted
              instances (no user menu to host it). With the user system on,
              preferences lives inside the user dropdown for every state. -->
-        <JnTooltip v-if="!isFireBaseSet" :text="t('shortcutKeys.Preferences')">
+        <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
             @click="OpenPreferences">
             <Cog />
