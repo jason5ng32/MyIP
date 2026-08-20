@@ -140,7 +140,10 @@
 
                         <!-- WebRTC's shaped payload is the evidence itself -->
                         <ul v-if="row.detail?.exposed?.length" class="rounded-lg border bg-muted/40 divide-y text-sm">
-                            <li v-for="entry in row.detail.exposed" :key="entry.ip"
+                            <!-- Keyed by position, not by address: the evaluator
+                                 dedupes, but an older one repeating the same
+                                 address must not collide here. -->
+                            <li v-for="(entry, index) in row.detail.exposed" :key="index"
                                 class="flex items-center justify-between gap-2 px-3 py-1.5">
                                 <span class="font-mono truncate" :title="entry.ip">{{ entry.ip }}</span>
                                 <span v-if="entry.countryCode"
