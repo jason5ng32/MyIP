@@ -6,7 +6,7 @@ import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
-import { buildInitialTargets } from './utils/connectivity-import.js';
+import { sanitizeTargets } from './utils/connectivity-import.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
@@ -213,11 +213,12 @@ export const useMainStore = defineStore('main', {
       const storedPreferences = localStorage.getItem(PREFS_STORAGE_KEY);
       const currentPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
       const merged = { ...defaultPreferences, ...currentPreferences };
-      // One-time build of the Connectivity target set: defaults + legacy
-      // flat customs (the legacy key stays for rollback, never written).
-      if (!merged.connectivityTargets) {
-        merged.connectivityTargets = buildInitialTargets(merged.customConnectivityTargets);
-      }
+      // Missing keys get their defaults from the spread above; the
+      // Connectivity target set additionally guards its structure — junk
+      // entries drop, and an absent/emptied set rebuilds from the defaults
+      // + legacy flat customs (the legacy key stays for rollback, never
+      // written). Persisted right back via setPreferences.
+      merged.connectivityTargets = sanitizeTargets(merged.connectivityTargets, merged.customConnectivityTargets);
       this.setPreferences(merged);
     },
     // fetch configs from server

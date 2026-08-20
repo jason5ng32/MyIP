@@ -28,7 +28,8 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   ipHistoryDays: 90,
   lang: 'auto', // auto | zh | en | fr | tr
   // The full Connectivity target set (defaults included). null until first
-  // load — store.loadPreferences() builds it via buildInitialTargets().
+  // load — store.loadPreferences() runs it through sanitizeTargets(), which
+  // also rebuilds a hand-emptied or corrupted stored value.
   connectivityTargets: null,
   // Legacy pre-connectivityTargets key. Read once by the build above, kept
   // for rollback; never written.

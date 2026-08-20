@@ -28,6 +28,23 @@ export const buildInitialTargets = (legacyTargets = []) => [
     ...legacyTargets.map(toStoredTarget),
 ];
 
+// localStorage is user-editable, so a stored target can be arbitrary junk.
+const isValidTarget = (t) => Boolean(t)
+    && typeof t.id === 'string'
+    && typeof t.name === 'string'
+    && typeof t.url === 'string';
+
+// Boot-time guard for the stored preference: keeps the well-formed entries,
+// and when none remain (missing key, emptied array, all junk) rebuilds from
+// the defaults plus any legacy flat targets — the grid must never come up
+// empty. Idempotent; runs on every load.
+export const sanitizeTargets = (stored, legacy) => {
+    const valid = (list) => (Array.isArray(list) ? list.filter(isValidTarget) : []);
+    const targets = valid(stored);
+    if (targets.length > 0) return targets;
+    return buildInitialTargets(valid(legacy));
+};
+
 // What importing a curated list would add. Dedupe is by hostname, so lists
 // may overlap each other and the defaults. All-or-nothing: if the fresh
 // members don't all fit under the cap, nothing is added and overflowCount

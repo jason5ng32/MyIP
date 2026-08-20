@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
     buildInitialTargets,
+    sanitizeTargets,
     planImport,
     isListFullyPresent,
     removeTarget,
@@ -46,6 +47,36 @@ describe('buildInitialTargets', () => {
         const legacy = Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, i) => target(`custom-${i}`));
         const targets = buildInitialTargets(legacy);
         assert.equal(targets.length, DEFAULT_LIST_MEMBERS.length + CONNECTIVITY_TARGET_LIMIT);
+    });
+});
+
+describe('sanitizeTargets', () => {
+    it('passes a well-formed stored set through untouched', () => {
+        const stored = [target('a'), target('b')];
+        assert.deepEqual(sanitizeTargets(stored, []), stored);
+    });
+
+    it('drops junk entries but keeps the valid rest', () => {
+        const good = target('a');
+        const result = sanitizeTargets([good, null, { id: 42 }, { name: 'no-url' }], []);
+        assert.deepEqual(result, [good]);
+    });
+
+    it('reseeds the defaults when both stored and legacy are emptied', () => {
+        const result = sanitizeTargets([], []);
+        assert.deepEqual(result.map((m) => m.id), DEFAULT_LIST_MEMBERS.map((m) => m.id));
+    });
+
+    it('reseeds defaults + legacy when only the stored set is emptied', () => {
+        const legacy = [target('custom-1')];
+        const result = sanitizeTargets([], legacy);
+        assert.equal(result.length, DEFAULT_LIST_MEMBERS.length + 1);
+        assert.equal(result.at(-1).id, 'custom-1');
+    });
+
+    it('treats non-array values (missing key, corruption) as empty', () => {
+        assert.equal(sanitizeTargets(null, undefined).length, DEFAULT_LIST_MEMBERS.length);
+        assert.equal(sanitizeTargets('junk', { not: 'an array' }).length, DEFAULT_LIST_MEMBERS.length);
     });
 });
 
