@@ -1611,6 +1611,15 @@
       {
         "type": "improve",
         "change": {
+          "en": "Optimized multiple user experience",
+          "zh": "优化了多个地方的用户体验",
+          "fr": "Optimisation de l'expérience utilisateur dans plusieurs endroits",
+          "ru": "Оптимизация пользовательского опыта в нескольких местах"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Optimized date display in multiple places",
           "zh": "优化多处日期格式显示",
           "fr": "Optimisation de l'affichage des dates dans plusieurs endroits",

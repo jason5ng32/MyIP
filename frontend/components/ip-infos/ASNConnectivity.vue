@@ -108,8 +108,12 @@
                         </ScreenshotButton>
                     </div>
                     <!-- flex + m-auto + shrink-0: narrow SVG centers, wide SVG hugs the start (scroll from x=0).
-                        @click clears the click-pinned highlight; nodes use @click.stop to opt out. -->
-                    <div data-svg-scroll class="h-full overflow-auto px-4 flex" @click="pinnedAsn = null">
+                        @click clears the click-pinned highlight; nodes use @click.stop to opt out.
+                        touch-pan-x/y keeps one-finger scrolling native while two-finger pinch
+                        (and trackpad ctrl+wheel) is handled by the zoom handlers below. -->
+                    <div ref="scrollEl" data-svg-scroll class="h-full overflow-auto px-4 flex touch-pan-x touch-pan-y"
+                        @click="pinnedAsn = null" @touchstart.passive="onTouchStart" @touchmove="onTouchMove"
+                        @touchend="onTouchEnd" @touchcancel="onTouchEnd" @wheel="onWheel">
                         <!-- intrinsic w/h scaled by zoom; viewBox stays fixed so content scales with it.
                             max-h clamp is only kept at zoom=1 so the wrapper actually scrolls when zoomed. -->
                         <svg :viewBox="`0 0 ${layout.width} ${layout.height}`" :width="layout.width * zoom"
@@ -211,6 +215,67 @@ const zoomControls = computed(() => [
     { action: resetZoom, icon: RotateCcw, disabled: zoom.value === 1, label: t('ipInfos.ASNConnectivity.zoomReset') },
     { action: zoomIn, icon: ZoomIn, disabled: zoom.value >= ZOOM_MAX, label: t('ipInfos.ASNConnectivity.zoomIn') },
 ]);
+
+// --- Gesture zoom: two-finger pinch on touch, ctrl+wheel (trackpad pinch) on desktop.
+const scrollEl = ref(null);
+let pinchStart = null; // { dist, zoom } while a two-finger gesture is active
+
+const clampZoom = (z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+
+// Actual on-screen scale. At zoom=1 the fit classes (w-auto max-h-full) may render the
+// SVG smaller than intrinsic, so gestures baseline on the rendered width, not `zoom`.
+const effectiveZoom = () => {
+    const svg = scrollEl.value?.querySelector('svg');
+    return svg && layout.value
+        ? svg.getBoundingClientRect().width / layout.value.width
+        : zoom.value;
+};
+
+// Zoom keeping the content point under (clientX, clientY) stationary — scroll offsets
+// are re-applied after Vue commits the new width/height attrs.
+const zoomAt = (next, clientX, clientY) => {
+    const el = scrollEl.value;
+    next = clampZoom(next);
+    const prev = effectiveZoom();
+    if (!el || next === prev) { zoom.value = next; return; }
+    const rect = el.getBoundingClientRect();
+    const ox = clientX - rect.left;
+    const oy = clientY - rect.top;
+    const cx = (el.scrollLeft + ox) / prev;
+    const cy = (el.scrollTop + oy) / prev;
+    zoom.value = next;
+    nextTick(() => {
+        el.scrollLeft = cx * next - ox;
+        el.scrollTop = cy * next - oy;
+    });
+};
+
+const touchDistance = (touches) =>
+    Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+
+const onTouchStart = (e) => {
+    if (e.touches.length === 2) pinchStart = { dist: touchDistance(e.touches), zoom: effectiveZoom() };
+};
+
+const onTouchMove = (e) => {
+    if (!pinchStart || e.touches.length !== 2) return;
+    e.preventDefault(); // keep the browser from page-zooming and vaul from dragging
+    zoomAt(
+        pinchStart.zoom * (touchDistance(e.touches) / pinchStart.dist),
+        (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        (e.touches[0].clientY + e.touches[1].clientY) / 2,
+    );
+};
+
+const onTouchEnd = (e) => {
+    if (e.touches.length < 2) pinchStart = null;
+};
+
+const onWheel = (e) => {
+    if (!e.ctrlKey) return; // plain wheel keeps native scrolling
+    e.preventDefault();
+    zoomAt(effectiveZoom() * Math.exp(-e.deltaY / 100), e.clientX, e.clientY);
+};
 
 // Each drawer open starts fresh.
 watch(isExpanded, (open) => {
