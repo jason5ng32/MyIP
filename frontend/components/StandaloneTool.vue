@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, h } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
@@ -36,7 +36,7 @@ import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
 import User from '@/components/User.vue';
-import { Spinner } from '@/components/ui/spinner';
+import ToolLoadingSkeleton from '@/components/widgets/ToolLoadingSkeleton.vue';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -47,15 +47,12 @@ const router = useRouter();
 const registered = TOOL_BY_SLUG.get(route.params.slug) || null;
 const tool = computed(() => (registered && !registered.noStandalone ? registered : null));
 
-// Centered spinner while the tool's chunk downloads — same treatment as the
-// homepage drawer; `delay` keeps fast loads flash-free.
-const ToolLoading = () => h('div', { class: 'flex justify-center py-20' },
-    h(Spinner, { class: 'size-6 text-muted-foreground' }));
-
+// The skeleton covers the chunk download — same treatment as the homepage
+// drawer; `delay` keeps fast loads flash-free.
 const toolComponent = computed(() => (tool.value
     ? defineAsyncComponent({
         loader: tool.value.component,
-        loadingComponent: ToolLoading,
+        loadingComponent: ToolLoadingSkeleton,
         delay: 200,
     })
     : null));

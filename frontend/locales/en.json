@@ -370,8 +370,7 @@
     "ShowAll": "Show All",
     "ShowUnchecked": "Show Unchecked",
     "ShowIgnored": "Show Ignored",
-    "ShowChecked": "Show Checked",
-    "Loading": "Loading..."
+    "ShowChecked": "Show Checked"
   },
   "curl": {
     "Title": "Command Line API",

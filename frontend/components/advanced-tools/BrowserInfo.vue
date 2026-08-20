@@ -7,13 +7,10 @@
         </div>
 
         <Transition name="slide-fade" mode="out-in">
-            <!-- Loading / error state -->
-            <div v-if="checkingStatus !== 'finished'"
-                class="flex items-center justify-center gap-2 py-8 text-sm">
-                <template v-if="checkingStatus === 'running'">
-                    <Spinner class="text-info" />
-                    <span class="text-muted-foreground">{{ t('browserinfo.calculating') }}</span>
-                </template>
+            <!-- Loading / error state; the chunk phase before it shows
+                 ToolLoadingSkeleton instead. -->
+            <div v-if="checkingStatus !== 'finished'" class="flex justify-center py-12 text-sm">
+                <Spinner v-if="checkingStatus === 'running'" class="size-6 text-info" />
                 <p v-else-if="checkingStatus === 'error'" class="text-destructive">{{ errorMsg }}</p>
             </div>
 
@@ -367,7 +364,7 @@ const getAll = async () => {
 
 onMounted(() => {
     checkingStatus.value = 'running';
-    setTimeout(() => { getAll(); }, 1000);
+    getAll();
 });
 
 watch(excludeOptions, () => { getFingerPrint(); }, { immediate: true, deep: true });
