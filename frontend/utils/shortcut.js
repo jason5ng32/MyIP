@@ -129,7 +129,11 @@ document.addEventListener(
     keyPool += ignoreKeys.includes(key) ? "" : key;
     timer && clearTimeout(timer);
     timer = setTimeout(() => {
-      collectShortcutActions(keyPool).forEach((run) => run());
+      // Re-checked: an overlay may have opened during the pool window, and a
+      // queued action must not fire behind it.
+      if (!isOverlayOpen()) {
+        collectShortcutActions(keyPool).forEach((run) => run());
+      }
       keyPool = "";
     }, keyDelay);
   }

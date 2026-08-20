@@ -90,6 +90,17 @@ describe('shortcut dispatcher', () => {
         closeOverlay();
     });
 
+    it('drops an action still queued when an overlay opens mid-window', async () => {
+        registerShortcuts([{ keys: 's', action: record('speedtest') }]);
+        log = [];
+        keydown({ key: 's', target: { tagName: 'DIV' }, preventDefault() {} });
+        openOverlay(); // lands inside the 10ms key-pool window
+        await new Promise((resolve) => setTimeout(resolve, 40));
+        assert.deepEqual(log, [], 'the queued action must not fire behind the overlay');
+        closeOverlay();
+        assert.deepEqual(await press('s'), ['speedtest'], 'and the pool was cleared, not replayed');
+    });
+
     it('ignores keystrokes typed into a field', async () => {
         registerShortcuts([{ keys: 's', action: record('speedtest') }]);
         assert.deepEqual(await pressInto('s', { tagName: 'INPUT' }), []);
