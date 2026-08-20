@@ -264,8 +264,15 @@ const statusFaceIcon = (test) => {
 // both have failure modes that mis-flag reachable sites as down.
 // cache: 'no-store' avoids cached near-zero RTTs. AbortController lets us
 // distinguish a completed request from a timeout without double-firing.
+// Run generation: bumped per handelCheckStart cycle. Checks still in
+// flight from a previous run must not write into the fresh grid; rounds
+// overlapping within one run keep writing by design — slow sites' round
+// results land after the next tick starts.
+let runSeq = 0;
+
 const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
   manualRun.value = isManualRun;
+  const runId = runSeq;
   // Only multi-cycle passes feed the dot history; per-card refreshes skip it.
   const recordRound = multipleTests.value && !isManualRun;
   const controller = new AbortController();
@@ -279,6 +286,10 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
+    if (runId !== runSeq) {
+      onTestComplete(true);
+      return;
+    }
     const testTime = Math.round(performance.now() - beginTime);
     test.status = t('connectivity.StatusAvailable');
     // Locale-free twin of the localized status label, consumed by the report
@@ -291,6 +302,10 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     onTestComplete(true);
   } catch {
     clearTimeout(timeoutId);
+    if (runId !== runSeq) {
+      onTestComplete(false);
+      return;
+    }
     // Best-of-N: in multi mode a later failure doesn't downgrade a card
     // that already succeeded (mintime > 0). The dot row still records the
     // real 'fail' — it's per-round history, separate from the face/text.
@@ -328,6 +343,9 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
       trackEvent('Section', 'RefreshClick', 'Connectivity');
     }
 
+    // The pass judges only the targets it schedules here — cards added
+    // mid-pass (self-tested by the watcher) belong to the next pass.
+    const scheduledIds = new Set(connectivityTests.map((test) => test.id));
     const testPromises = [];
 
     connectivityTests.forEach((test, index) => {
@@ -346,16 +364,18 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
         resolve();
         return;
       }
-      // Aggregate over the targets still present when the pass settles, not
-      // a start-time count — a card removed mid-pass must not fail the
-      // toast for the survivors. Entries added mid-pass are still testing
-      // (no statusCode yet) and stay out of the verdict.
+      // Verdict = scheduled targets still present at settle time: a card
+      // removed mid-pass must not fail the survivors, a card added
+      // mid-pass must not fail the pass it never ran in.
       // Multi mode overwrites this with finalizeMultiTestAlert before the toast fires.
-      const finished = connectivityTests.filter((test) => test.statusCode !== undefined);
+      const finished = connectivityTests.filter(
+        (test) => scheduledIds.has(test.id) && test.statusCode !== undefined,
+      );
       const allOk = finished.every((test) => test.statusCode === CONNECTIVITY_STATUS.OK);
       updateConnectivityAlert(allOk ? 'success' : 'error');
-      // Domain event: snapshot after every pass (multi-round included) —
-      // latest wins downstream in the report collector.
+      // Domain event: deliberately the whole grid, not just this pass —
+      // the report is a latest-wins snapshot, and a mid-pass addition with
+      // a real result is accurate information there.
       emitAppEvent('connectivity:finished', {
         targets: connectivityTests.map((test) => ({
           id: test.id,
@@ -446,6 +466,7 @@ const finalizeMultiTestAlert = () => {
 // connectivity auto-run switch off, the manual/global refresh IS the user's
 // only entry point, and the rounds preference must still hold there.
 const handelCheckStart = async (trigger = 'boot') => {
+  runSeq += 1;
   const multi = multipleTests.value;
   const isAuto = trigger === 'boot';
   const showToast = trigger !== 'refresh';
