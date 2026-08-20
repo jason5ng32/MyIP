@@ -7,7 +7,7 @@
       "tools": {
         "title": "How the tools work",
         "paragraphs": [
-          "Most of what the tools show you — your IP details, browser fingerprint, DNS, connectivity and speed-test results — is computed in your browser or looked up live and shown only to you. We do not keep these results on our servers, unless you explicitly create a shareable report link.",
+          "Most of what the tools show you — your IP details, browser fingerprint, DNS, connectivity and speed-test results — is computed in your browser or looked up live and shown only to you. We do not keep these results on our servers for anyone else to access, unless you explicitly create a shareable report link.",
           "To look up IP geolocation, the IP being queried is sent to third-party providers (such as ipinfo.io, ip-api.com and similar). Those lookups are governed by each provider's own privacy policy."
         ]
       },
@@ -15,7 +15,7 @@
         "title": "Earth Online",
         "paragraphs": [
           "When you visit the site, we count one anonymous visit tick together with your country or region, derived from your IP address at our edge network. The IP itself is only used transiently, the full address is never stored.",
-          "If you choose to share a preset status, we record the status id, your country or region and the masked IP prefix for up to 48 hours, after which the data is deleted automatically. Statuses come from a fixed list — there is no free-text input."
+          "If you choose to share a preset status, we record the status id, your country or region and the masked IP prefix, and the data is deleted automatically within a few days. Statuses come from a fixed list — there is no free-text input."
         ]
       },
       "sharedReports": {
@@ -29,7 +29,7 @@
       "personaCheck": {
         "title": "In-depth Persona Check",
         "paragraphs": [
-          "In-depth Persona Check is the one tool whose measurements leave your browser. The others compute in your browser or look something up and show it only to you; this one sends what it collected to our own API, which scores it against the country you picked and returns the graded report to you. It requires signing in, and each run counts against your monthly allowance. Neither what you send nor the report you get back is stored — unless you explicitly bundle the result into a shareable report link, and even then only the grade and each check's verdict travel into it, never the values behind them.",
+          "In-depth Persona Check sends your data to our scoring service, which grades it against the country you picked and returns the graded report to you. Neither what you send nor the report you get back is stored — unless you explicitly bundle the result into a shareable report link, and even then only the grade and each check's verdict travel into it, never the values behind them.",
           "What travels with a run:"
         ],
         "bullets": [
@@ -61,11 +61,12 @@
       "account": {
         "title": "What we collect when you sign in",
         "paragraphs": [
-          "Signing in is optional — you can use every tool on the site without an account. We use Google Firebase Authentication to manage your login and to sync your achievements. When you are signed in, the following is collected:"
+          "Signing in is optional — you can use most of the tools on the site without an account. Signing in is not a way for us to charge you, now or later; it is what we need to keep the service from being abused. We use Google Firebase Authentication to manage your login and to sync your achievements. When you are signed in, the following is collected:"
         ],
         "bullets": [
           "Your sign-in email, used to identify your account so we can provide the features that require logging in.",
-          "Your usage count of advanced features, used to calculate your achievements."
+          "Your usage count of advanced features, used to detect malicious abuse.",
+          "At the end of each accounting period, the abuse-analysis logs for each signed-in user, if any, are cleared automatically; only the total usage counts are kept."
         ]
       },
       "telemetry": {
@@ -84,7 +85,7 @@
       "why": {
         "title": "Why we collect it",
         "analytics": "We use the analytics data to understand how the site is used and to improve the user experience. This data is not used to personally identify you, and we never sell it.",
-        "account": "Your account data (email and advanced-feature usage count) is used only to identify your account, to provide the features that require signing in, and to calculate your achievements. We do not use it for advertising and never sell it.",
+        "account": "Your account data (email and advanced-feature usage count) is used only to identify your account, to provide the features that require signing in. We do not use it for advertising and never sell it.",
         "telemetry": "Error and performance telemetry is used solely to find and fix defects. It is never used for advertising or to track you across sites, and it is deleted automatically after a short retention period."
       },
       "cookies": {

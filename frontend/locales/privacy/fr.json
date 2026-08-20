@@ -7,7 +7,7 @@
       "tools": {
         "title": "Comment fonctionnent les outils",
         "paragraphs": [
-          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs, sauf si vous créez explicitement un lien de rapport partageable.",
+          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs de manière accessible à d'autres, sauf si vous créez explicitement un lien de rapport partageable.",
           "Pour rechercher la géolocalisation d'une IP, l'IP interrogée est envoyée à des fournisseurs tiers (tels qu'ipinfo.io, ip-api.com et similaires). Ces recherches sont régies par la politique de confidentialité propre à chaque fournisseur."
         ]
       },
@@ -15,7 +15,7 @@
         "title": "La Terre en ligne",
         "paragraphs": [
           "Lors de votre visite, nous comptons une visite anonyme accompagnée de votre pays ou région, déduits de votre adresse IP sur notre réseau edge. L'IP elle-même n'est utilisée que de façon transitoire, l'adresse complète n'est jamais stockée.",
-          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué pendant au plus 48 heures, après quoi ces données sont supprimées automatiquement. Les statuts proviennent d'une liste fixe — aucune saisie libre."
+          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué ; ces données sont supprimées automatiquement en quelques jours. Les statuts proviennent d'une liste fixe — aucune saisie libre."
         ]
       },
       "sharedReports": {
@@ -29,7 +29,7 @@
       "personaCheck": {
         "title": "Vérification de persona approfondie",
         "paragraphs": [
-          "La Vérification de persona approfondie est le seul outil dont les mesures quittent votre navigateur. Les autres calculent dans votre navigateur ou effectuent une recherche affichée à vous seul ; celui-ci envoie ce qu'il a collecté à notre propre API, qui l'évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Il nécessite une connexion, et chaque exécution consomme une unité de votre quota mensuel. Ni ce que vous envoyez ni le rapport reçu ne sont conservés — sauf si vous choisissez explicitement de regrouper le résultat dans un lien de rapport partageable ; et même alors, seuls la note et le verdict de chaque vérification y figurent, jamais les valeurs qui les sous-tendent.",
+          "La Vérification de persona approfondie envoie vos données à notre service de notation, qui les évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Ni ce que vous envoyez ni le rapport reçu ne sont conservés — sauf si vous choisissez explicitement de regrouper le résultat dans un lien de rapport partageable ; et même alors, seuls la note et le verdict de chaque vérification y figurent, jamais les valeurs qui les sous-tendent.",
           "Ce qui accompagne une exécution :"
         ],
         "bullets": [
@@ -61,11 +61,12 @@
       "account": {
         "title": "Ce que nous collectons lorsque vous vous connectez",
         "paragraphs": [
-          "La connexion est facultative — vous pouvez utiliser tous les outils du site sans compte. Nous utilisons Google Firebase Authentication pour gérer votre connexion et synchroniser vos succès. Lorsque vous êtes connecté, les éléments suivants sont collectés :"
+          "La connexion est facultative — vous pouvez utiliser la plupart des outils du site sans compte. La connexion n'est pas un moyen de vous facturer, ni aujourd'hui ni demain : elle nous est nécessaire pour empêcher les abus du service. Nous utilisons Google Firebase Authentication pour gérer votre connexion et synchroniser vos succès. Lorsque vous êtes connecté, les éléments suivants sont collectés :"
         ],
         "bullets": [
           "Votre adresse e-mail de connexion, utilisée pour identifier votre compte afin de fournir les fonctionnalités nécessitant une connexion.",
-          "Votre nombre d'utilisations des fonctionnalités avancées, utilisé pour calculer vos succès."
+          "Votre nombre d'utilisations des fonctionnalités avancées, utilisé pour détecter les abus malveillants.",
+          "À la fin de chaque période de comptabilisation, les journaux d'analyse des abus de chaque utilisateur connecté, le cas échéant, sont effacés automatiquement ; seuls les totaux d'utilisation sont conservés."
         ]
       },
       "telemetry": {
@@ -84,7 +85,7 @@
       "why": {
         "title": "Pourquoi nous les collectons",
         "analytics": "Nous utilisons les données d'analyse pour comprendre l'utilisation du site et améliorer l'expérience utilisateur. Ces données ne servent pas à vous identifier personnellement et ne sont jamais vendues.",
-        "account": "Les données de votre compte (e-mail et nombre d'utilisations des fonctionnalités avancées) servent uniquement à identifier votre compte, à fournir les fonctionnalités nécessitant une connexion et à calculer vos succès. Nous ne les utilisons pas à des fins publicitaires et ne les vendons jamais.",
+        "account": "Les données de votre compte (e-mail et nombre d'utilisations des fonctionnalités avancées) servent uniquement à identifier votre compte, à fournir les fonctionnalités nécessitant une connexion. Nous ne les utilisons pas à des fins publicitaires et ne les vendons jamais.",
         "telemetry": "La télémétrie d'erreurs et de performance sert uniquement à détecter et corriger les défauts. Elle n'est jamais utilisée à des fins publicitaires ni pour vous suivre sur d'autres sites, et elle est supprimée automatiquement après une courte période de conservation."
       },
       "cookies": {
