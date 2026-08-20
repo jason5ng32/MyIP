@@ -1611,10 +1611,10 @@
       {
         "type": "add",
         "change": {
-          "en": "Connectivity: preset sites are now removable, plus a new Global E-commerce import list",
-          "zh": "网络连通性测试可删除预设网站、新增国际电商平台导入列表",
-          "fr": "Connectivité : les sites prédéfinis sont désormais supprimables, avec une nouvelle liste importable « E-commerce mondial »",
-          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлен импортируемый список «Электронная коммерция»"
+          "en": "Connectivity: preset sites are now removable, plus new Global E-commerce and Brazil Essentials import lists",
+          "zh": "网络连通性测试可删除预设网站、新增国际电商平台、巴西常用网站导入列表",
+          "fr": "Connectivité : les sites prédéfinis sont désormais supprimables, avec de nouvelles listes importables « E-commerce mondial » et « Essentiels Brésil »",
+          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлены импортируемые списки «Электронная коммерция» и «Бразилия: основные»"
         }
       },
       {
