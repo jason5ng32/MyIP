@@ -4,7 +4,7 @@
   <Achievements ref="achievementsRef" />
   <Preferences />
   <main id="mainpart" class="mx-auto w-full px-4 jn-container">
-    <div class="rounded-md" tabindex="0">
+    <div class="rounded-md">
       <IPCheck ref="IPCheckRef" />
       <Connectivity ref="connectivityRef" />
       <WebRTC ref="webRTCRef" />
