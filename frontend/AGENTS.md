@@ -32,9 +32,10 @@ frontend/
 │                      pulse-statuses (Earth Online vocabulary: presets +
 │                      date-windowed festival statuses + their celebration
 │                      effect mapping; recipes in utils/pulse-celebration.js)/
-│                      connectivity-import-lists (curated target sets; icons
-│                      are committed 64px PNGs under public/favicons/ — one
-│                      per member, enforced by its data test)
+│                      connectivity-import-lists (default target set +
+│                      curated import sets + the shared cap; icons are
+│                      committed 64px PNGs under public/favicons/ — one per
+│                      member, enforced by its data test)
 ├── utils/           ← framework-agnostic helpers + IO
 │                      (app-events bus / getips/ / valid-ip / analytics / …)
 ├── composables/     ← Vue-aware `useXxx` logic

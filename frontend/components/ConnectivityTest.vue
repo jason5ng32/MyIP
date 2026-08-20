@@ -22,14 +22,20 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
       <Card v-for="test in connectivityTests" :key="test.id"
         class="keyboard-shortcut-card group relative transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50 jn-card">
-        <!-- Custom-card remove button, fades in on hover -->
-        <button v-if="test.custom" type="button" @click.stop="removeCustomTarget(test.id)"
-          class="absolute top-1.5 right-1.5 p-1 rounded-md text-muted-foreground md:opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted transition-opacity cursor-pointer"
+        <!-- Remove button, fades in on hover. Two-step confirm: first click
+             arms "X?" (self-reverting), the second deletes; on the last
+             remaining target the click just raises a toast. -->
+        <button type="button" @click.stop="handleRemoveClick(test.id)"
+          class="absolute top-1.5 right-1.5 p-1 rounded-md inline-flex items-center transition-opacity cursor-pointer"
+          :class="confirmingRemoveId === test.id
+            ? 'text-destructive bg-muted'
+            : 'text-muted-foreground md:opacity-0 group-hover:opacity-100 hover:text-foreground hover:bg-muted'"
           :aria-label="t('connectivity.addCustom.Remove')" :title="t('connectivity.addCustom.Remove')">
           <X class="size-3.5" />
+          <span v-if="confirmingRemoveId === test.id" class="text-xs font-semibold leading-none">?</span>
         </button>
         <CardContent class="p-4">
-          <!-- Site favicon (built-in / imported) or first-letter tile (custom) + name.
+          <!-- Site favicon (default / imported) or first-letter tile (custom) + name.
                Favicons are same-origin (public/favicons/), so they render even
                when the tested site is unreachable; a load error falls back to
                the letter tile. -->
@@ -61,13 +67,14 @@
               {{ test.time }}<span class="ml-0.5 text-sm">ms</span>
             </span>
           </div>
-          <!-- Multi-test per-round progress dots (historical snapshot). -->
-          <div v-if="multipleTests" class="flex items-center gap-1 mt-2">
+          <!-- Multi-test per-round latency bars, all on one absolute scale
+               (taller = slower, see barStyle); failed / pending rounds are
+               short gray stubs. -->
+          <div v-if="multipleTests" class="flex items-end gap-1 mt-2 h-4">
             <JnTooltip v-for="i in totalRounds" :key="i" :text="roundTooltipText(test, i - 1)" side="top">
-              <span class="group/dot inline-flex items-center justify-center p-1 -m-1 cursor-default">
-                <span
-                  class="size-1.5 rounded-full md:transition-transform md:duration-200 md:group-hover/dot:scale-[2.0]"
-                  :class="progressDotClass(test, i - 1)"></span>
+              <span class="group/bar inline-flex h-full items-end justify-center px-1 -mx-1 cursor-default">
+                <span class="w-1.5 rounded-[2px] md:transition-[height,filter] md:duration-200 md:group-hover/bar:brightness-125"
+                  :class="barClass(test, i - 1)" :style="barStyle(test, i - 1)"></span>
               </span>
             </JnTooltip>
           </div>
@@ -75,13 +82,12 @@
       </Card>
 
       <!-- "Add Test" tile: stacked flag/brand icons signal that curated
-           lists live behind it, not just a blank form. Always visible —
-           at the cap the dialog is still the way to remove imported lists. -->
+           lists live behind it, not just a blank form. -->
       <Card @click="addDialogOpen = true"
         class="cursor-pointer border-dashed bg-transparent hover:bg-muted/50 transition-colors"
         :title="t('connectivity.addCustom.AddCard')">
         <CardContent class="p-4 flex flex-col items-center justify-center gap-2 text-muted-foreground"
-          :class="multipleTests ? 'min-h-[106px]' : 'min-h-[92px]'">
+          :class="multipleTests ? 'min-h-29' : 'min-h-23'">
           <span class="flex -space-x-2">
             <template v-for="item in TILE_PREVIEW" :key="item.emoji || item.id">
               <span v-if="item.type === 'emoji'"
@@ -99,7 +105,7 @@
     </div>
 
     <!-- Add / import dialog (custom form + curated list browser) -->
-    <ConnectivityAddDialog v-model:open="addDialogOpen" :builtin-urls="builtinUrls" />
+    <ConnectivityAddDialog v-model:open="addDialogOpen" />
   </section>
 </template>
 
@@ -111,6 +117,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
 import { TILE_PREVIEW, faviconPath } from '@/data/connectivity-import-lists.js';
+import { removeTarget } from '@/utils/connectivity-import.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -141,71 +148,42 @@ const totalRounds = computed(() => 1 + maxCounts.value);
 const allRoundsDone = ref(false);
 const alertFired = ref(false);
 
-// Built-in targets first; custom / imported ones (`.custom = true`) are
-// merged in by the watcher below. Keeping both in one reactive array lets
-// every iterator (run-loop, keyboard nav) treat tiles uniformly.
-// `roundResults` records per-round { tone, time } for the progress dots,
-// independent of the best-of-N face/text. `time` powers the per-dot hover
-// tooltip; for `tone: 'fail'` rounds it stays 0. Bootstrap-only writer.
-// Icons come from the committed same-origin favicon set (public/favicons/).
-const builtinTarget = (id, name, url) => ({
-  id, name, url, favicon: faviconPath(id), status: t('connectivity.StatusWait'), time: 0, mintime: 0, roundResults: [],
+// One reactive test entry per stored target (the connectivityTargets
+// preference holds the whole set, defaults included). `roundResults`
+// records per-round { tone, time } for the latency bars; icons come from
+// the committed favicon set, hand-added targets fall back to letter tiles.
+const targetEntry = (target) => reactive({
+  id: target.id,
+  name: target.name,
+  url: target.url,
+  favicon: target.favicon || null,
+  status: t('connectivity.StatusWait'),
+  time: 0,
+  mintime: 0,
+  roundResults: [],
 });
-const connectivityTests = reactive([
-  builtinTarget('google', 'Google', 'https://www.google.com/favicon.ico'),
-  builtinTarget('youtube', 'YouTube', 'https://www.youtube.com/favicon.ico'),
-  builtinTarget('github', 'GitHub', 'https://github.com/favicon.ico'),
-  // Use speed.cloudflare.com (not www.cloudflare.com): the marketing site
-  // attaches `Link: rel=preload` headers for its brand fonts to every response
-  // — including /favicon.ico — which the browser honors regardless of fetch
-  // mode, then fails CORS on the woff2 files. speed.cloudflare.com serves a
-  // plain favicon with no preload headers.
-  builtinTarget('cloudflare', 'Cloudflare', 'https://speed.cloudflare.com/favicon.ico'),
-  builtinTarget('claude', 'Claude', 'https://claude.com/favicon.ico'),
-  builtinTarget('chatgpt', 'ChatGPT', 'https://chatgpt.com/favicon.ico'),
-  builtinTarget('wechat', 'WeChat', 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico'),
-]);
+const connectivityTests = reactive([]);
 
-// Hostname-dedupe input for the import dialog.
-const builtinUrls = connectivityTests.map((test) => test.url);
-
-// Reconcile custom targets by id (not wipe-and-refill) so existing cards
-// don't flash back to "Awaiting Test" each time the user adds another one.
+// Reconcile by id (not wipe-and-refill) so existing cards don't flash back
+// to "Awaiting Test" each time the user adds or removes another one.
 watch(
-  () => userPreferences.value.customConnectivityTargets,
+  () => userPreferences.value.connectivityTargets,
   (newTargets) => {
     const targets = newTargets || [];
     const targetIds = new Set(targets.map((t) => t.id));
 
-    // Drop customs no longer in storage.
+    // Drop targets no longer in storage.
     for (let i = connectivityTests.length - 1; i >= 0; i--) {
-      const entry = connectivityTests[i];
-      if (entry.custom && !targetIds.has(entry.id)) {
+      if (!targetIds.has(connectivityTests[i].id)) {
         connectivityTests.splice(i, 1);
       }
     }
 
     // Push only newcomers.
-    const existingCustomIds = new Set(
-      connectivityTests.filter((entry) => entry.custom).map((entry) => entry.id),
-    );
-
+    const existingIds = new Set(connectivityTests.map((entry) => entry.id));
     for (const target of targets) {
-      if (existingCustomIds.has(target.id)) continue;
-      const entry = reactive({
-        id: target.id,
-        name: target.name,
-        url: target.url,
-        custom: true,
-        // Imported entries carry a same-origin favicon + their source list;
-        // hand-added ones fall back to the letter tile.
-        favicon: target.favicon || null,
-        listId: target.listId || null,
-        status: t('connectivity.StatusWait'),
-        time: 0,
-        mintime: 0,
-        roundResults: [],
-      });
+      if (existingIds.has(target.id)) continue;
+      const entry = targetEntry(target);
       connectivityTests.push(entry);
       // Cards added after the bootstrap pass (import / hand-add) test
       // themselves right away instead of sitting at "Awaiting Test".
@@ -228,13 +206,38 @@ const toneOf = (test) => {
 };
 const { dotClass, textClass } = useStatusTone();
 
-// Filled → tone color; head-of-queue → pulse (suppressed once the user
-// takes over manually so we don't promise rounds that won't land); rest → dim.
-const progressDotClass = (test, idx) => {
+// Bar color, by absolute latency bucket: green <200ms, yellow <1000ms, red
+// beyond (extreme latency shares the fail tone), solid gray for
+// unreachable rounds. Pending bars stay faint; head-of-queue pulses
+// (suppressed once the user takes over manually).
+const BAR_RED_MS = 1000;
+const barClass = (test, idx) => {
   const entry = test.roundResults[idx];
-  if (entry) return dotClass(entry.tone);
-  if (!manualRun.value && idx === test.roundResults.length) return 'bg-muted-foreground/40 animate-pulse';
-  return 'bg-muted-foreground/20';
+  if (!entry) {
+    if (!manualRun.value && idx === test.roundResults.length) return 'bg-muted-foreground/40 animate-pulse';
+    return 'bg-muted-foreground/20';
+  }
+  if (entry.tone === 'fail') return 'bg-muted-foreground';
+  if (entry.time < 200) return dotClass('ok-fast');
+  if (entry.time < BAR_RED_MS) return dotClass('ok-slow');
+  return dotClass('fail');
+};
+
+// Bar height, on the card's own dynamic range: the fastest round sits at
+// the floor (kept hoverable), the slowest at 100%, the rest on a log curve
+// between — rising latency compresses into ever-smaller height steps, and
+// the top end is told apart by color instead. Failed and pending rounds
+// have no latency and sit at the floor.
+const BAR_FLOOR = 25;
+const barStyle = (test, idx) => {
+  const entry = test.roundResults[idx];
+  if (!entry || !entry.time) return { height: `${BAR_FLOOR}%` };
+  const times = test.roundResults.map((r) => r.time).filter((v) => v > 0);
+  const min = Math.min(...times);
+  const max = Math.max(...times);
+  if (max === min) return { height: '100%' };
+  const p = Math.log(entry.time / min) / Math.log(max / min);
+  return { height: `${Math.round(BAR_FLOOR + (100 - BAR_FLOOR) * p)}%` };
 };
 
 // Per-dot hover tooltip: empty string disables the tooltip (JnTooltip's
@@ -344,7 +347,7 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
         targets: connectivityTests.map((test) => ({
           id: test.id,
           name: test.name,
-          custom: test.custom === true,
+          custom: test.id.startsWith('custom-'),
           statusCode: test.statusCode,
           time: test.time,
           mintime: test.mintime,
@@ -380,18 +383,38 @@ const updateConnectivityAlert = (type) => {
   }
 };
 
-// ── Add/remove custom targets ──────────────────────────────────────────────
+// ── Add/remove targets ─────────────────────────────────────────────────────
 // The add/import dialog itself lives in ConnectivityAddDialog.vue; this
 // component only owns the open flag and per-card removal.
 const addDialogOpen = ref(false);
 
-const removeCustomTarget = (id) => {
-  const current = userPreferences.value.customConnectivityTargets || [];
-  store.updatePreference(
-    'customConnectivityTargets',
-    current.filter((t) => t.id !== id),
-  );
+const removeTargetById = (id) => {
+  const result = removeTarget(userPreferences.value.connectivityTargets || [], id);
+  if (result.error) return;
+  store.updatePreference('connectivityTargets', result.targets);
   trackEvent('Section', 'RemoveCustomTarget', 'Connectivity');
+};
+
+// Two-step removal: first click arms "X?" (self-reverting), second click
+// deletes. The last remaining target skips the dance — the set must never
+// go empty, so the click just explains itself via toast.
+const confirmingRemoveId = ref(null);
+let confirmResetTimer = null;
+const handleRemoveClick = (id) => {
+  clearTimeout(confirmResetTimer);
+  if ((userPreferences.value.connectivityTargets || []).length <= 1) {
+    confirmingRemoveId.value = null;
+    store.setAlert(true, 'text-warning',
+      t('connectivity.addCustom.LastTargetMessage'), t('connectivity.addCustom.LastTargetTitle'));
+    return;
+  }
+  if (confirmingRemoveId.value === id) {
+    confirmingRemoveId.value = null;
+    removeTargetById(id);
+    return;
+  }
+  confirmingRemoveId.value = id;
+  confirmResetTimer = setTimeout(() => { confirmingRemoveId.value = null; }, 3000);
 };
 
 // Multi-mode aggregate: `mintime > 0` ≡ reachable in at least one round.
@@ -459,12 +482,13 @@ onMounted(() => {
   store.setMountingStatus('Connectivity', true);
 });
 
-// Stop the interval on unmount.
+// Stop the interval (and any pending confirm revert) on unmount.
 onBeforeUnmount(() => {
   if (intervalId.value !== null) {
     clearInterval(intervalId.value);
     intervalId.value = null;
   }
+  clearTimeout(confirmResetTimer);
 });
 
 // Either signal flipping fires sendAlert; the gates inside pick the winner.

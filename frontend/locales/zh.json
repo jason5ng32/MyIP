@@ -1216,7 +1216,9 @@
       "NameRequired": "请输入名称",
       "UrlRequired": "请输入 URL",
       "InvalidUrl": "这看起来不是一个有效的 URL",
-      "LimitReached": "测试数量已达到 60 个上限"
+      "LimitReached": "测试数量已达到 60 个上限",
+      "LastTargetTitle": "无法删除",
+      "LastTargetMessage": "至少需要保留一个测试网站。"
     },
     "importDialog": {
       "Title": "添加 / 导入测试",
@@ -1224,11 +1226,11 @@
       "ImportOption": "导入列表",
       "SiteCount": "{n} 个网站",
       "Import": "导入",
-      "RemoveList": "移除该列表",
       "Capacity": "已用 {used}/{limit}",
       "NotEnoughCapacity": "容量不足——该列表需要 {need} 个空位，仅剩 {free} 个"
     },
     "importLists": {
+      "defaults": "系统预设",
       "iran": "伊朗常用",
       "russia": "俄罗斯常用",
       "china": "中国常用",

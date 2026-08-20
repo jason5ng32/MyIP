@@ -1216,7 +1216,9 @@
       "NameRequired": "Введите название.",
       "UrlRequired": "Введите URL.",
       "InvalidUrl": "Похоже, это недействительный URL.",
-      "LimitReached": "Достигнут лимит в 60 тестов."
+      "LimitReached": "Достигнут лимит в 60 тестов.",
+      "LastTargetTitle": "Нельзя удалить",
+      "LastTargetMessage": "Должен остаться хотя бы один сайт для теста."
     },
     "importDialog": {
       "Title": "Добавить / импортировать тесты",
@@ -1224,11 +1226,11 @@
       "ImportOption": "Импорт списка",
       "SiteCount": "Сайтов: {n}",
       "Import": "Импорт",
-      "RemoveList": "Удалить этот список",
       "Capacity": "Использовано {used}/{limit}",
       "NotEnoughCapacity": "Недостаточно места — для списка нужно слотов: {need}, свободно: {free}."
     },
     "importLists": {
+      "defaults": "Системный набор",
       "iran": "Иран: основные",
       "russia": "Россия: основные",
       "china": "Китай: основные",

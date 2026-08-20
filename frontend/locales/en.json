@@ -1216,7 +1216,9 @@
       "NameRequired": "Please enter a name.",
       "UrlRequired": "Please enter a URL.",
       "InvalidUrl": "That doesn't look like a valid URL.",
-      "LimitReached": "You've reached the 60 tests limit."
+      "LimitReached": "You've reached the 60 tests limit.",
+      "LastTargetTitle": "Can't Remove",
+      "LastTargetMessage": "At least one test site must remain."
     },
     "importDialog": {
       "Title": "Add / Import Tests",
@@ -1224,11 +1226,11 @@
       "ImportOption": "Import a List",
       "SiteCount": "{n} sites",
       "Import": "Import",
-      "RemoveList": "Remove this list",
       "Capacity": "{used}/{limit} used",
       "NotEnoughCapacity": "Not enough capacity — this list needs {need} slots, only {free} left."
     },
     "importLists": {
+      "defaults": "System Defaults",
       "iran": "Iran Essentials",
       "russia": "Russia Essentials",
       "china": "China Essentials",

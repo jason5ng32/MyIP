@@ -13,22 +13,18 @@
             {{ t('connectivity.importDialog.CustomOption') }}</TabsTrigger>
         </TabsList>
 
-        <!-- Curated lists: one card per list, two columns on desktop;
-             import / remove in place. -->
+        <!-- Curated lists, two columns on desktop; the system defaults
+             close the grid as a recovery entry. Lists may overlap —
+             hostname dedupe on import keeps cards unique. -->
         <TabsContent value="import" class="space-y-3">
           <ul class="grid gap-2 md:grid-cols-2 max-h-[55vh] overflow-y-auto pr-1">
-            <li v-for="list in IMPORT_LISTS" :key="list.id"
+            <li v-for="list in importableLists" :key="list.id"
               class="flex items-start gap-3 p-3 rounded-lg border bg-card">
               <span class="size-6 shrink-0 inline-flex items-center justify-center text-lg leading-none">
                 {{ list.emoji }}</span>
               <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-                <!-- The inline check is the imported-state marker; the action
-                     column stays a single icon either way. -->
-                <span class="flex items-center gap-1.5 min-w-0">
-                  <span class="truncate" :title="t('connectivity.importLists.' + list.id)">
-                    {{ t('connectivity.importLists.' + list.id) }}</span>
-                  <Check v-if="importedIds.has(list.id)" class="size-3.5 shrink-0 text-success" />
-                </span>
+                <span class="truncate min-w-0" :title="t('connectivity.importLists.' + list.id)">
+                  {{ t('connectivity.importLists.' + list.id) }}</span>
                 <span class="flex items-center gap-2">
                   <span class="flex -space-x-1.5">
                     <img v-for="m in list.members.slice(0, 4)" :key="m.id" :src="faviconPath(m.id)" alt=""
@@ -38,25 +34,25 @@
                     {{ t('connectivity.importDialog.SiteCount', { n: list.members.length }) }}</span>
                 </span>
               </span>
-              <Button v-if="!importedIds.has(list.id)" size="icon" variant="outline"
+              <!-- Fully present → the import button itself becomes an inert
+                   green check, so the action column never goes empty. -->
+              <Button v-if="!isListFullyPresent(list, targets)" size="icon" variant="outline"
                 class="size-8 shrink-0 cursor-pointer" @click="importList(list)"
                 :title="t('connectivity.importDialog.Import')" :aria-label="t('connectivity.importDialog.Import')">
                 <Plus class="size-4" />
               </Button>
-              <Button v-else size="icon" variant="ghost"
-                class="size-8 shrink-0 cursor-pointer text-muted-foreground hover:text-destructive"
-                @click="removeList(list)" :title="t('connectivity.importDialog.RemoveList')"
-                :aria-label="t('connectivity.importDialog.RemoveList')">
-                <X class="size-4" />
+              <Button v-else size="icon" variant="ghost" disabled
+                class="size-8 shrink-0 text-success disabled:opacity-100">
+                <Check class="size-4" />
               </Button>
             </li>
           </ul>
-          <!-- Success stays quiet (the inline check is the confirmation);
-               only a cap overflow surfaces a message here. -->
+          <!-- Success stays quiet (the button turning into a check is the
+               confirmation); only a cap overflow surfaces a message here. -->
           <div class="flex flex-col items-end justify-end gap-1 min-h-4 text-xs text-muted-foreground">
             <span aria-live="polite" class="text-destructive">{{ importResult || '&nbsp;' }}</span>
             <span class="tabular-nums shrink-0">
-              {{ t('connectivity.importDialog.Capacity', { used: customTargets.length, limit: CONNECTIVITY_TARGET_LIMIT
+              {{ t('connectivity.importDialog.Capacity', { used: targets.length, limit: CONNECTIVITY_TARGET_LIMIT
               }) }}
             </span>
           </div>
@@ -99,35 +95,35 @@
 // curated country/theme list (default tab, matching the tile's stacked-icon
 // cue), or hand-add a single custom target (migrated from
 // ConnectivityTest.vue). Imports materialize list members into the
-// customConnectivityTargets preference tagged with listId — imported cards
-// then behave exactly like hand-added ones (individually removable); this
-// dialog is also where a whole list gets removed again.
+// connectivityTargets preference — imported cards then behave exactly like
+// hand-added ones (individually removable in the grid).
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import {
-  IMPORT_LISTS, CONNECTIVITY_TARGET_LIMIT, faviconPath,
+  IMPORT_LISTS, SYSTEM_IMPORT_LIST, CONNECTIVITY_TARGET_LIMIT, faviconPath,
 } from '@/data/connectivity-import-lists.js';
-import { planImport, importedListIds, withoutList } from '@/utils/connectivity-import.js';
+import { planImport, isListFullyPresent } from '@/utils/connectivity-import.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, CirclePlus, Plus, X } from '@lucide/vue';
+import { Check, CirclePlus, Plus } from '@lucide/vue';
 
 const props = defineProps({
   open: { type: Boolean, default: false },
-  // Built-in target URLs, for hostname dedupe during import planning.
-  builtinUrls: { type: Array, default: () => [] },
 });
 const emit = defineEmits(['update:open']);
 
 const { t } = useI18n();
 const store = useMainStore();
-const customTargets = computed(() => store.userPreferences.customConnectivityTargets || []);
+const targets = computed(() => store.userPreferences.connectivityTargets || []);
+
+// System defaults last — a recovery entry, not a suggestion.
+const importableLists = [...IMPORT_LISTS, SYSTEM_IMPORT_LIST];
 
 const tab = ref('import');
 const importResult = ref('');
@@ -148,13 +144,8 @@ watch(tab, (v) => {
 });
 
 // ── Curated lists ──────────────────────────────────────────────────────────
-const importedIds = computed(() => importedListIds(customTargets.value));
-
 const importList = (list) => {
-  const plan = planImport(list, {
-    existingUrls: [...props.builtinUrls, ...customTargets.value.map((c) => c.url)],
-    currentCount: customTargets.value.length,
-  });
+  const plan = planImport(list, targets.value);
   // All-or-nothing (enforced in planImport): a capacity shortfall stores
   // nothing, so the list is never half-imported behind a complete-looking ✓.
   if (plan.overflowCount) {
@@ -164,16 +155,10 @@ const importList = (list) => {
     });
     return;
   }
-  store.updatePreference('customConnectivityTargets', [...customTargets.value, ...plan.additions]);
-  // Quiet on success — the inline check marks the list.
+  store.updatePreference('connectivityTargets', [...targets.value, ...plan.additions]);
+  // Quiet on success — the button flips to a check.
   importResult.value = '';
   trackEvent('Section', 'ImportList', list.id);
-};
-
-const removeList = (list) => {
-  store.updatePreference('customConnectivityTargets', withoutList(customTargets.value, list.id));
-  importResult.value = '';
-  trackEvent('Section', 'RemoveImportList', list.id);
 };
 
 // ── Custom add (migrated intact from ConnectivityTest.vue) ────────────────
@@ -227,7 +212,7 @@ const handleAdd = () => {
     return;
   }
 
-  if (customTargets.value.length >= CONNECTIVITY_TARGET_LIMIT) {
+  if (targets.value.length >= CONNECTIVITY_TARGET_LIMIT) {
     addError.value = t('connectivity.addCustom.LimitReached');
     return;
   }
@@ -237,7 +222,7 @@ const handleAdd = () => {
     name: name.slice(0, 20),
     url,
   };
-  store.updatePreference('customConnectivityTargets', [...customTargets.value, newTarget]);
+  store.updatePreference('connectivityTargets', [...targets.value, newTarget]);
   trackEvent('Section', 'AddCustomTarget', 'Connectivity');
   // Hand-add only — importList() deliberately doesn't emit this.
   emitAppEvent('connectivity:custom-added', { name: newTarget.name, url: newTarget.url });

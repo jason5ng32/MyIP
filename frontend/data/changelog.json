@@ -1611,10 +1611,19 @@
       {
         "type": "add",
         "change": {
-          "en": "Connectivity: new importable list — global e-commerce platforms (Amazon, AliExpress, Temu, SHEIN and more)",
-          "zh": "网络连通性新增可导入列表：国际电商平台（Amazon、AliExpress、Temu、SHEIN 等）",
-          "fr": "Connectivité : nouvelle liste importable — plateformes e-commerce internationales (Amazon, AliExpress, Temu, SHEIN et plus)",
-          "ru": "Проверка доступности: новый список для импорта — международные площадки электронной коммерции (Amazon, AliExpress, Temu, SHEIN и другие)"
+          "en": "Connectivity: preset sites are now removable, plus a new Global E-commerce import list",
+          "zh": "网络连通性测试可删除预设网站、新增国际电商平台导入列表",
+          "fr": "Connectivité : les sites prédéfinis sont désormais supprimables, avec une nouvelle liste importable « E-commerce mondial »",
+          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлен импортируемый список «Электронная коммерция»"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity: multi-round test results now render as beautiful latency bars",
+          "zh": "使用精美的柱状图展示多次刷新模式下的网络连通性测试结果",
+          "fr": "Connectivité : les résultats des tests multi-passes s'affichent désormais en élégantes barres de latence",
+          "ru": "Проверка доступности: результаты многократных тестов теперь отображаются изящными столбиками задержки"
         }
       },
       {

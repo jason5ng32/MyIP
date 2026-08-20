@@ -1216,7 +1216,9 @@
       "NameRequired": "Veuillez saisir un nom.",
       "UrlRequired": "Veuillez saisir une URL.",
       "InvalidUrl": "Cela ne ressemble pas à une URL valide.",
-      "LimitReached": "Limite de 60 tests atteinte."
+      "LimitReached": "Limite de 60 tests atteinte.",
+      "LastTargetTitle": "Suppression impossible",
+      "LastTargetMessage": "Au moins un site de test doit rester."
     },
     "importDialog": {
       "Title": "Ajouter / importer des tests",
@@ -1224,11 +1226,11 @@
       "ImportOption": "Importer une liste",
       "SiteCount": "{n} sites",
       "Import": "Importer",
-      "RemoveList": "Retirer cette liste",
       "Capacity": "{used}/{limit} utilisés",
       "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants."
     },
     "importLists": {
+      "defaults": "Sites par défaut",
       "iran": "Essentiels Iran",
       "russia": "Essentiels Russie",
       "china": "Essentiels Chine",

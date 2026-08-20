@@ -1,34 +1,53 @@
 // Curated importable target lists for the Connectivity section: country sets
 // (domestic reachability) and theme sets (global services). Importing
-// materializes members into the user's customConnectivityTargets preference
-// (tagged with listId), so imported cards behave exactly like hand-added
-// ones. Display names live in the locale packs under
-// `connectivity.importLists.<id>`; member names are brand names and stay
-// untranslated. Every member ships a committed 64px PNG at
-// public/favicons/<id>.png (the data test enforces it) — same-origin, so
-// icons render even when the tested site is blocked for the visitor.
+// materializes members into the user's connectivityTargets preference, so
+// imported cards behave exactly like hand-added ones. Display names live in
+// the locale packs under `connectivity.importLists.<id>`; member names are
+// brand names and stay untranslated. Every member ships a committed 64px
+// PNG at public/favicons/<id>.png (the data test enforces it) —
+// same-origin, so icons render even when the tested site is blocked for
+// the visitor.
 
-// Total cap shared by hand-added and imported targets. The grid and the
-// multi-round test loop stay usable at this scale; the import dialog
-// surfaces remaining headroom.
+// Total cap on stored targets, defaults included; enforced at add/import
+// time only, so an over-cap migrated set keeps working but can't grow.
 export const CONNECTIVITY_TARGET_LIMIT = 60;
 
 // Same-origin favicon path for a member id (fetched at dev time).
 export const faviconPath = (id) => `/favicons/${id}.png`;
 
-// The seven built-in targets render through the same favicon pipeline as
-// imported members (ConnectivityTest.vue maps these ids onto its tiles).
-// `iconDomain` feeds scripts/fetch-favicons.js — it differs from the test
-// URL's host where that host serves a poor or missing icon.
-export const BUILTIN_FAVICONS = [
-    { id: 'google', iconDomain: 'www.google.com' },
-    { id: 'youtube', iconDomain: 'www.youtube.com' },
-    { id: 'github', iconDomain: 'github.com' },
-    { id: 'cloudflare', iconDomain: 'www.cloudflare.com' },
-    { id: 'claude', iconDomain: 'claude.com' },
-    { id: 'chatgpt', iconDomain: 'chatgpt.com' },
-    { id: 'wechat', iconDomain: 'weixin.qq.com' },
+// Targets every fresh install starts with (migration appends legacy
+// customs); all removable once stored. Cloudflare tests
+// speed.cloudflare.com, not www: the marketing site attaches font-preload
+// headers to every response, and those preloads then fail CORS.
+export const DEFAULT_LIST_MEMBERS = [
+    { id: 'google', name: 'Google', url: 'https://www.google.com/favicon.ico' },
+    { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com/favicon.ico' },
+    { id: 'github', name: 'GitHub', url: 'https://github.com/favicon.ico' },
+    { id: 'cloudflare', name: 'Cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', iconDomain: 'www.cloudflare.com' },
+    { id: 'claude', name: 'Claude', url: 'https://claude.com/favicon.ico' },
+    { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/favicon.ico' },
+    { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', iconDomain: 'weixin.qq.com' },
 ];
+
+// Favicon-fetch targets for scripts/fetch-favicons.js. `iconDomain` differs
+// from the test URL's host where that host serves a poor or missing icon.
+export const BUILTIN_FAVICONS = DEFAULT_LIST_MEMBERS.map((m) => ({
+    id: m.id,
+    iconDomain: m.iconDomain || new URL(m.url).hostname,
+}));
+
+// The defaults as an importable list (shown last in the dialog) to bring
+// deleted default sites back. Not in IMPORT_LISTS: below its size floor.
+export const SYSTEM_IMPORT_LIST = {
+    id: 'defaults',
+    emoji: '🚦',
+    members: DEFAULT_LIST_MEMBERS,
+};
+
+// Defaults that also belong in a themed list are referenced, not
+// re-declared — themed lists stay complete on their own (AI ⊃ ChatGPT);
+// hostname dedupe on import keeps cards unique.
+const builtinMember = (id) => DEFAULT_LIST_MEMBERS.find((m) => m.id === id);
 
 // Every list is fronted by an emoji (flag emoji for country lists) — one
 // uniform icon system, no icon-font dependency in this data.
@@ -72,6 +91,7 @@ export const IMPORT_LISTS = [
         id: 'china',
         emoji: '🇨🇳',
         members: [
+            builtinMember('wechat'),
             { id: 'baidu', name: 'Baidu', url: 'https://www.baidu.com/favicon.ico' },
             { id: 'taobao', name: 'Taobao', url: 'https://www.taobao.com/favicon.ico' },
             { id: 'bilibili', name: 'Bilibili', url: 'https://www.bilibili.com/favicon.ico' },
@@ -89,6 +109,8 @@ export const IMPORT_LISTS = [
         id: 'ai',
         emoji: '🤖',
         members: [
+            builtinMember('claude'),
+            builtinMember('chatgpt'),
             { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/favicon.ico' },
             { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/favicon.ico', iconDomain: 'www.deepseek.com' },
             { id: 'huggingface', name: 'Hugging Face', url: 'https://huggingface.co/favicon.ico' },
@@ -125,6 +147,7 @@ export const IMPORT_LISTS = [
         id: 'streaming',
         emoji: '🎬',
         members: [
+            builtinMember('youtube'),
             { id: 'netflix', name: 'Netflix', url: 'https://www.netflix.com/favicon.ico' },
             { id: 'spotify', name: 'Spotify', url: 'https://open.spotify.com/favicon.ico' },
             { id: 'tiktok', name: 'TikTok', url: 'https://www.tiktok.com/favicon.ico' },
@@ -160,6 +183,7 @@ export const IMPORT_LISTS = [
         id: 'developer',
         emoji: '👨‍💻',
         members: [
+            builtinMember('github'),
             { id: 'npm', name: 'npm', url: 'https://registry.npmjs.org/favicon.ico', iconDomain: 'www.npmjs.com' },
             { id: 'dockerhub', name: 'Docker Hub', url: 'https://hub.docker.com/favicon.ico', iconDomain: 'www.docker.com' },
             { id: 'pypi', name: 'PyPI', url: 'https://pypi.org/favicon.ico' },
@@ -178,6 +202,7 @@ export const IMPORT_LISTS = [
         id: 'cloud',
         emoji: '☁️',
         members: [
+            builtinMember('cloudflare'),
             { id: 'aws', name: 'AWS', url: 'https://aws.amazon.com/favicon.ico' },
             { id: 'azure', name: 'Azure', url: 'https://azure.microsoft.com/favicon.ico' },
             { id: 'gcloud', name: 'Google Cloud', url: 'https://cloud.google.com/favicon.ico' },
