@@ -1609,6 +1609,15 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Connectivity: new importable list — global e-commerce platforms (Amazon, AliExpress, Temu, SHEIN and more)",
+          "zh": "网络连通性新增可导入列表：国际电商平台（Amazon、AliExpress、Temu、SHEIN 等）",
+          "fr": "Connectivité : nouvelle liste importable — plateformes e-commerce internationales (Amazon, AliExpress, Temu, SHEIN et plus)",
+          "ru": "Проверка доступности: новый список для импорта — международные площадки электронной коммерции (Amazon, AliExpress, Temu, SHEIN и другие)"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Optimized multiple user experience",

@@ -211,6 +211,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'ecommerce',
+        emoji: '🛒',
+        members: [
+            { id: 'amazon', name: 'Amazon', url: 'https://www.amazon.com/favicon.ico' },
+            { id: 'aliexpress', name: 'AliExpress', url: 'https://www.aliexpress.com/favicon.ico' },
+            { id: 'alibaba', name: 'Alibaba.com', url: 'https://www.alibaba.com/favicon.ico' },
+            { id: 'ebay', name: 'eBay', url: 'https://www.ebay.com/favicon.ico' },
+            { id: 'temu', name: 'Temu', url: 'https://www.temu.com/favicon.ico' },
+            { id: 'shein', name: 'SHEIN', url: 'https://www.shein.com/favicon.ico' },
+            { id: 'etsy', name: 'Etsy', url: 'https://www.etsy.com/favicon.ico' },
+            { id: 'shopify', name: 'Shopify', url: 'https://www.shopify.com/favicon.ico' },
+            { id: 'walmart', name: 'Walmart', url: 'https://www.walmart.com/favicon.ico' },
+            { id: 'shopee', name: 'Shopee', url: 'https://shopee.com/favicon.ico' },
+            { id: 'mercadolibre', name: 'Mercado Libre', url: 'https://www.mercadolibre.com/favicon.ico' },
+            { id: 'rakuten', name: 'Rakuten', url: 'https://www.rakuten.co.jp/favicon.ico' },
+        ],
+    },
+    {
         id: 'news',
         emoji: '📰',
         members: [
