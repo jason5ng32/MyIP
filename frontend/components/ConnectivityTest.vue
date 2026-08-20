@@ -308,9 +308,16 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
   }
 };
 
+// Pass generation counter: overlapping passes (a manual refresh over a
+// still-running boot pass, or multi-round ticks outlasting their interval)
+// share the per-target state, so only the newest pass may judge and report
+// it — a superseded pass just resolves.
+let passSeq = 0;
+
 const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
   // Sticky false→true; interval ticks must not overwrite the bootstrap's `true`.
   if (isAlertToShow) alertToShow.value = true;
+  const passId = ++passSeq;
   return new Promise((resolve) => {
     if (isRefresh) {
       connectivityTests.forEach((test) => {
@@ -335,6 +342,10 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
     });
 
     Promise.allSettled(testPromises).then(() => {
+      if (passId !== passSeq) {
+        resolve();
+        return;
+      }
       // Aggregate over the targets still present when the pass settles, not
       // a start-time count — a card removed mid-pass must not fail the
       // toast for the survivors. Entries added mid-pass are still testing
