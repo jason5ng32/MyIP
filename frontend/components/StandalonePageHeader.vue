@@ -1,10 +1,13 @@
 <template>
-  <!-- Slim sticky header shared by the standalone pages (/tools/:slug and
-       /privacy). Brand → home, an optional breadcrumb title, and a back-to-home
-       button. This is NOT the homepage nav (Nav.vue) — that one carries the full
-       navigation, user menu, and mobile drawer; this is the minimal page chrome
-       those standalone layouts wrap their content in. -->
-  <header class="sticky top-0 z-40 border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur">
+  <!-- Slim sticky header shared by the standalone pages (/tools/:slug,
+       /privacy, /r/:id). Brand → home, an optional breadcrumb title, and a
+       back-to-home button. This is NOT the homepage nav (Nav.vue) — that one
+       carries the full navigation, user menu, mobile drawer, and hides on
+       scroll; this one stays pinned. It carries the iOS safe-area inset itself
+       (body.jn-standalone-page in index.html reserves nothing), so when sticky
+       pins it at the viewport top the row sits below the Dynamic Island and
+       the blurred background paints the status-bar strip. -->
+  <header class="sticky top-0 z-40 border-b bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur pt-[env(safe-area-inset-top)]">
     <div class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-4 h-14">
       <RouterLink to="/"
         class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity"
