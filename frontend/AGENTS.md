@@ -141,11 +141,12 @@ upload at build, gated on `SENTRY_AUTH_TOKEN`.
 
 **shadcn-vue first.** Check `components/ui/` (copied-in primitives), then
 https://www.shadcn-vue.com/docs/components for something to copy in;
-hand-rolled Tailwind only when neither fits. Three local notes: `Spinner` is
-project-specific (lucide `Loader2` + `role="status"`); `toggle` /
-`toggle-group` deliberately use the `primary` pair for the pressed state; and
-the `Dialog` / `Sheet` / `Drawer` roots suspend the keyboard shortcuts while
-open — keep all three when syncing upstream.
+hand-rolled Tailwind only when neither fits. Four local notes: `Spinner`
+(lucide `Loader2` + `role="status"`) and `ToolLoadingSkeleton` (chunk-loading
+placeholder for lazy tools) are project-specific; `toggle` / `toggle-group`
+deliberately use the `primary` pair for the pressed state; and the `Dialog` /
+`Sheet` / `Drawer` roots suspend the keyboard shortcuts while open — keep all
+of these when syncing upstream.
 
 ### Design tokens
 

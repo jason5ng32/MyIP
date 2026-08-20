@@ -36,7 +36,7 @@ import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
 import User from '@/components/User.vue';
-import ToolLoadingSkeleton from '@/components/widgets/ToolLoadingSkeleton.vue';
+import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
 
 const { t } = useI18n();
 const route = useRoute();
