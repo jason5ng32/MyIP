@@ -82,8 +82,8 @@
                     </h3>
                     <ul class="rounded-lg border bg-card divide-y">
                         <li v-for="entry in group.entries" :key="entry.ip" class="px-3 py-2.5 min-w-0">
-                            <!-- IP row: flag + fit-to-width IP, blurred under InfoMask -->
-                            <div class="flex items-center gap-2 min-w-0" :data-mask="maskAttr(entry.ip)">
+                            <!-- IP row: flag + fit-to-width IP. -->
+                            <div class="flex items-center gap-2 min-w-0">
                                 <Icon v-if="entry.country" :icon="'circle-flags:' + entry.country.toLowerCase()"
                                     class="size-4 shrink-0" />
                                 <Globe v-else class="size-4 shrink-0 text-muted-foreground" />
@@ -120,13 +120,12 @@
 // IPHistory — local record of every IP detected while using the app.
 // Data comes from store.allIPs via use-ip-history (localStorage, grouped by
 // day, 90-day retention, never synced to the account). The panel mirrors the
-// Preferences left-sheet shell; IPs respect the global InfoMask blur.
+// Preferences left-sheet shell.
 import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { useIpHistory } from '@/composables/use-ip-history.js';
-import { createMaskGate } from '@/composables/use-info-mask.js';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import { filterHistoryDays, countryFacets, ipVersionCounts } from '@/utils/ip-history.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
@@ -144,7 +143,6 @@ const { t } = useI18n();
 const store = useMainStore();
 
 const { enabled, sortedDays, hasHistory, clearHistory } = useIpHistory({ store });
-const maskAttr = createMaskGate(t);
 
 // Sheet open state rides the shared openSheet slot (same as Preferences).
 const isOpen = computed(() => store.openSheet === 'ipHistory');
