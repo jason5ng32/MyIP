@@ -321,26 +321,28 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
       trackEvent('Section', 'RefreshClick', 'Connectivity');
     }
 
-    const totalTests = connectivityTests.length;
-    let successCount = 0;
     const testPromises = [];
-
-    const onTestComplete = (isSuccess) => { if (isSuccess) successCount++; };
 
     connectivityTests.forEach((test, index) => {
       testPromises.push(new Promise((testResolve, testReject) => {
         setTimeout(() => {
           checkConnectivityHandler(test, (isSuccess) => {
-            if (isSuccess) { onTestComplete(true); testResolve(); }
-            else { onTestComplete(false); testReject(); }
+            if (isSuccess) testResolve();
+            else testReject();
           }, isManualRun);
         }, 50 * index);
       }));
     });
 
     Promise.allSettled(testPromises).then(() => {
+      // Aggregate over the targets still present when the pass settles, not
+      // a start-time count — a card removed mid-pass must not fail the
+      // toast for the survivors. Entries added mid-pass are still testing
+      // (no statusCode yet) and stay out of the verdict.
       // Multi mode overwrites this with finalizeMultiTestAlert before the toast fires.
-      updateConnectivityAlert(successCount === totalTests ? 'success' : 'error');
+      const finished = connectivityTests.filter((test) => test.statusCode !== undefined);
+      const allOk = finished.every((test) => test.statusCode === CONNECTIVITY_STATUS.OK);
+      updateConnectivityAlert(allOk ? 'success' : 'error');
       // Domain event: snapshot after every pass (multi-round included) —
       // latest wins downstream in the report collector.
       emitAppEvent('connectivity:finished', {

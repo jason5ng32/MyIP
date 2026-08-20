@@ -46,8 +46,13 @@ export const SYSTEM_IMPORT_LIST = {
 
 // Defaults that also belong in a themed list are referenced, not
 // re-declared — themed lists stay complete on their own (AI ⊃ ChatGPT);
-// hostname dedupe on import keeps cards unique.
-const builtinMember = (id) => DEFAULT_LIST_MEMBERS.find((m) => m.id === id);
+// hostname dedupe on import keeps cards unique. Throws on an unknown id so
+// a renamed default fails at module load, not in some far-away template.
+const builtinMember = (id) => {
+    const member = DEFAULT_LIST_MEMBERS.find((m) => m.id === id);
+    if (!member) throw new Error(`Unknown default member: ${id}`);
+    return member;
+};
 
 // Every list is fronted by an emoji (flag emoji for country lists) — one
 // uniform icon system, no icon-font dependency in this data.
