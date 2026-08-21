@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, after } from 'node:test';
 import { registerHooks } from 'node:module';
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, nextTick } from 'vue';
 
 const documentHandlers = {};
 // Per-test override (see "o" shortcut cases below). Default: no card is
@@ -106,12 +106,7 @@ function makeRefs() {
   };
 }
 
-// use fake setTimeout to synchronize loadShortcuts
-const realSetTimeout = globalThis.setTimeout;
-globalThis.setTimeout = (fn) => { fn(); return 0; };
-
 after(() => {
-  globalThis.setTimeout = realSetTimeout;
   globalThis.__setPulseBackendForTest?.(false);
 });
 
@@ -258,6 +253,25 @@ describe('useShortcuts()', () => {
     assert.ok(entry, '"p" key should be present when configs.cloudFlare is set');
     entry.action();
     assert.deepEqual(store.state.toggledSheets, ['pulse']);
+  });
+
+  it('configs landing after registration re-registers the map (late "p")', async () => {
+    globalThis.__setPulseBackendForTest(false);
+    const store = makeStoreStub();
+    const { refs } = makeRefs();
+    // Reactive configs source so the watcher inside useShortcuts can fire.
+    const configsData = ref({ originalSite: false, map: true });
+    const configs = computed(() => configsData.value);
+    const userPreferences = computed(() => ({ ipCardsToShow: 2, ipHistoryEnabled: true }));
+
+    const { loadShortcuts } = useShortcuts({ refs, store, t, configs, userPreferences });
+    loadShortcuts();
+    const keyMap = refs.helpModalRef.value.keyMap;
+    assert.equal(keyMap.some((e) => e.keys === 'p'), false, 'no "p" before configs resolve');
+
+    configsData.value = { originalSite: false, map: true, cloudFlare: true };
+    await nextTick(); // flush the configs watcher
+    assert.equal(keyMap.some((e) => e.keys === 'p'), true, '"p" appears once cloudFlare lands');
   });
 
   it('"o" opens the highlighted advanced tool by its data-adv-slug', () => {

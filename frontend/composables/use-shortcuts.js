@@ -8,8 +8,9 @@
 //   - userPreferences: computed(() => store.userPreferences)
 //
 // Output:
-//   - loadShortcuts(): should be called onMounted, internally will delay 2s to wait for configs to load,
-//     then register all mappings and pass keyMap to helpModalRef (for help modal)
+//   - loadShortcuts(): should be called onMounted; registers all mappings
+//     immediately and passes keyMap to helpModalRef (for help modal).
+//     Config-gated keys fill in reactively when /api/configs lands
 //
 // Note:
 //   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug)
@@ -255,22 +256,27 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     };
 
     const loadShortcuts = () => {
-        setTimeout(() => {
-            if (disposed) return;
-            registerShortcutKeys();
-            // Help is an async component (Home.vue): on slow networks its
-            // chunk may land after this timer, so wait for the ref instead
-            // of silently skipping the keyMap hand-off.
-            if (refs.helpModalRef.value) {
-                refs.helpModalRef.value.keyMap = keyMap;
-            } else {
-                const stop = watch(refs.helpModalRef, (help) => {
-                    if (!help) return;
-                    help.keyMap = keyMap;
-                    stop();
-                });
-            }
-        }, 2000);
+        // Register immediately so the base keys work from the first paint;
+        // config-gated keys (originalSite's i/D/P, pulse's p) fill in when
+        // /api/configs lands (`{}` → data, once per page load) and the watcher
+        // rebuilds the map. keyMap is mutated in place (utils/shortcut.js),
+        // so the help modal's reference stays current across rebuilds.
+        registerShortcutKeys();
+        watch(configs, () => {
+            if (!disposed) registerShortcutKeys();
+        });
+        // Help is an async component (Home.vue): on slow networks its chunk
+        // may land later, so wait for the ref instead of silently skipping
+        // the keyMap hand-off.
+        if (refs.helpModalRef.value) {
+            refs.helpModalRef.value.keyMap = keyMap;
+        } else {
+            const stop = watch(refs.helpModalRef, (help) => {
+                if (!help) return;
+                help.keyMap = keyMap;
+                stop();
+            });
+        }
     };
 
     return { loadShortcuts };
