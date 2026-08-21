@@ -1433,17 +1433,26 @@
   },
   "about": {
     "Title": "À propos",
-    "product1": "IPCheck.ing est une boîte à outils IP gratuite qui vous aide à vérifier vos informations IP, tester la disponibilité des sites web, examiner les informations de sortie DNS, effectuer des tests de vitesse, des tests de latence mondiale, des tests MTR, et plus encore.",
-    "product2": "Il s'agit d'un projet open-source, et vous pouvez consulter le code source en cliquant sur l'icône GitHub en bas de la page.",
-    "product3": "Au départ, il s'agissait d'un projet personnel pour moi afin d'apprendre Vue.js et comment écrire du code en utilisant AI. Au fil du temps, il a gagné en popularité sur GitHub, j'ai donc effectué beaucoup de refactoring et ajouté de nombreuses fonctionnalités utiles. J'espère que vous l'apprécierez.",
-    "meTitle": "À propos de moi",
-    "me1": "Je m'appelle Jason Ng, également connu sous le nom d'Achán en ligne. Je ne suis pas un programmeur professionnel, mais j'adore coder, l'open-source et le partage.",
-    "me2": "La plupart du temps, je travaille en tant que chef de produit, blogueur, motard et geek.",
-    "me3": "Vous pouvez trouver une présentation plus détaillée à mon sujet dans le lien suivant :",
-    "contactTitle": "Contactez-moi",
-    "contact": "Si vous avez des questions ou des suggestions, veuillez me contacter par email : jason[AT]kenengba.com.",
+    "project": [
+      "IPCheck.ing est une boîte à outils IP tout-en-un et gratuite : elle vous aide à consulter vos informations IP, à tester la disponibilité des sites web, à examiner les informations de sortie DNS, à mesurer votre débit, à tester la latence mondiale, à lancer des tests MTR, et bien plus encore.",
+      "Il s'agit d'un projet open source : cliquez sur l'icône GitHub en bas de la page pour consulter le code source.",
+      "Si vous ne comprenez pas comment utiliser une fonctionnalité, ouvrez le « Centre d'aide » en bas de la page. Notre documentation est très détaillée : en plus de présenter chaque fonctionnalité, elle vous aide à comprendre les différents concepts réseau et à diagnostiquer vos problèmes de connexion.",
+      "Si vous souhaitez participer au projet open source, cliquez sur le bouton « Contribuer au code » en bas de la page pour découvrir comment faire."
+    ],
+    "founderTitle": "À propos du fondateur",
+    "founder": [
+      "Au départ, ce n'était qu'un projet personnel de Jason Ng (阿禅), qui voulait apprendre Vue.js et apprendre à écrire du code avec l'IA. Le projet gagnant de plus en plus d'étoiles sur GitHub, il l'a largement refactorisé et lui a ajouté de nombreuses fonctionnalités très utiles. Nous espérons qu'il vous plaira.",
+      "Il n'est pas programmeur professionnel : la plupart du temps, il est chef de produit, blogueur, motard et geek. Mais il adore coder, l'open source et le partage.",
+      "Vous trouverez une présentation plus détaillée de son parcours dans les liens ci-dessous :"
+    ],
+    "contactTitle": "Nous contacter",
+    "contact": [
+      "Si vous rencontrez un problème en utilisant IPCheck.ing ou en déployant le projet MyIP, commencez par chercher la réponse dans le « Centre d'aide ». Si vous ne la trouvez pas et que vous restez bloqué, ouvrez une issue sur GitHub ou écrivez-nous par email.",
+      "Et si vous tombez sur un bug et que vous aimez coder (ou coder avec l'IA), n'hésitez surtout pas à nous envoyer directement une PR avec votre correctif.",
+      "Notre email : i[AT]ipcheck.ing."
+    ],
     "personal": "Site personnel",
-    "blog": "Mon blog",
+    "blog": "Blog Posts",
     "linkedIn": "LinkedIn",
     "twitter": "Twitter",
     "Sponsor": "Nous soutenir",

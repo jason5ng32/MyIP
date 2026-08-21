@@ -80,23 +80,19 @@
 
           <!-- Content area (independent scrolling) -->
           <div class="flex-1 overflow-y-auto px-5 py-5" ref="sheetBody">
-            <!-- About -->
+            <!-- About: sections come from aboutSections, each one's paragraphs an array
+                 in the locale file — adding or reordering copy is a locale-only edit. -->
             <TabsContent value="about" class="space-y-6 mt-0">
-              <section class="space-y-2">
-                <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
-                  {{ t(`about.product${i}`) }}
-                </p>
-              </section>
-
-              <section>
-                <h3 class="text-base font-semibold mb-2">{{ t('about.meTitle') }}</h3>
-                <div class="space-y-2 mb-3">
-                  <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
-                    {{ t(`about.me${i}`) }}
+              <section v-for="section in aboutSections" :key="section.key">
+                <h3 v-if="section.titleKey" class="text-base font-semibold mb-2">{{ t(section.titleKey) }}</h3>
+                <div class="space-y-2" :class="section.links && 'mb-3'">
+                  <p v-for="(paragraph, idx) in tm(`about.${section.key}`)" :key="idx"
+                    class="text-sm leading-relaxed text-foreground/85">
+                    {{ rt(paragraph) }}
                   </p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Button v-for="link in personalLinks" :key="link.href" variant="outline" size="sm" as-child
+                <div v-if="section.links" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Button v-for="link in section.links" :key="link.href" variant="outline" size="sm" as-child
                     class="justify-start">
                     <a :href="link.href" target="_blank" rel="noopener">
                       <Compass />
@@ -105,11 +101,6 @@
                     </a>
                   </Button>
                 </div>
-              </section>
-
-              <section>
-                <h3 class="text-base font-semibold mb-2">{{ t('about.contactTitle') }}</h3>
-                <div class="text-sm leading-relaxed text-foreground/85" v-html="t('about.contact')"></div>
               </section>
             </TabsContent>
 
@@ -183,7 +174,7 @@ import { Separator } from '@/components/ui/separator';
 import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
-const { t, locale } = useI18n();
+const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
@@ -200,6 +191,15 @@ const personalLinks = [
   { href: 'https://kenengba.com', labelKey: 'about.blog' },
   { href: 'https://www.linkedin.com/in/jason5ng32/', labelKey: 'about.linkedIn' },
   { href: 'https://twitter.com/jason5ng32', labelKey: 'about.twitter' },
+];
+
+// About tab layout: one entry per section, rendered in order. `key` names the
+// paragraph array under `about.` in the locale files; `titleKey` is omitted for
+// the lead-in section, and `links` appends a link grid under the paragraphs.
+const aboutSections = [
+  { key: 'project' },
+  { key: 'founder', titleKey: 'about.founderTitle', links: personalLinks },
+  { key: 'contact', titleKey: 'about.contactTitle' },
 ];
 
 const acknowledgementsList = [

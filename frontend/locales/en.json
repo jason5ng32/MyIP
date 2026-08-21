@@ -1433,17 +1433,26 @@
   },
   "about": {
     "Title": "About",
-    "product1": "IPCheck.ing is a free IP toolbox that helps you check your IP information, test website availability, examine DNS exit information, perform speed tests, global latency tests, MTR tests, and more.",
-    "product2": "This is an open-source project, and you can view the source code by clicking on the GitHub icon at the bottom of the page.",
-    "product3": "Initially, this was a personal project for me to learn Vue.js and how to write code using AI. Over time, it gained more stars on GitHub, so I did a lot of refactoring and added many useful features. I hope you will enjoy it.",
-    "meTitle": "About Me",
-    "me1": "My name is Jason Ng, also known as Achán online. I'm not a professional programmer, but I love coding, open-source, and sharing.",
-    "me2": "Most of the time, I work as a product manager, a blogger, a motorcyle rider and a geek.",
-    "me3": "You can find a more detailed introduction about me in the following link:",
-    "contactTitle": "Contact Me",
-    "contact": "If you have any questions or suggestions, please contact me via email: jason[AT]kenengba.com.",
+    "project": [
+      "IPCheck.ing is a free all-in-one IP toolbox that helps you check your own IP information, test website availability, examine DNS exit information, and run speed tests, global latency tests, MTR tests and more.",
+      "This is an open-source project — click the GitHub icon at the bottom of the page to browse the source code.",
+      "If you are unsure how a feature works, open the \"Help Center\" link at the bottom of the page. The documentation is thorough: beyond describing each feature, it also explains networking concepts and how to troubleshoot network problems.",
+      "If you would like to take part in the open-source project, click the \"Contribute Code\" button at the bottom of the page to see how."
+    ],
+    "founderTitle": "About the Founder",
+    "founder": [
+      "This started out as a side project for Jason Ng (阿禅) to learn Vue.js and how to write code with AI. As it collected more and more stars on GitHub, he refactored it heavily and added many genuinely useful features. We hope you enjoy it.",
+      "He is not a professional programmer. Most of the time he works as a product manager, a blogger, a motorcycle rider and a geek — but he loves coding, open source and sharing.",
+      "You can find a more detailed introduction about him at the links below:"
+    ],
+    "contactTitle": "Contact Us",
+    "contact": [
+      "If you run into trouble using IPCheck.ing or deploying the MyIP project, head to the \"Help Center\" first. If you cannot find the answer there and are stuck, open an issue on GitHub or reach us by email.",
+      "And if you hit a bug and enjoy coding (or coding with AI), you are very welcome to send us a PR with your fix.",
+      "Our email: i[AT]ipcheck.ing."
+    ],
     "personal": "Personal Website",
-    "blog": "My Blog",
+    "blog": "Blog Posts",
     "linkedIn": "LinkedIn",
     "twitter": "Twitter",
     "Sponsor": "Sponsor Us",
