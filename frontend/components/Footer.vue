@@ -15,9 +15,15 @@
         </RouterLink>
       </Button>
       <Button variant="link" size="default" as-child class="cursor-pointer">
-        <a :href="'https://docs.ipcheck.ing/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
-          @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
+        <a :href="'https://docs.ipcheck.ing/knowledge-base/'+(locale === 'en' ? '' : locale)" target="_blank"
+          rel="noopener" @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
           {{ t('about.HelpCenter') }}
+        </a>
+      </Button>
+      <Button variant="link" size="default" as-child class="cursor-pointer">
+        <a :href="'https://docs.ipcheck.ing/developer/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
+          @click="trackEvent('Footer', 'FooterClick', 'Contribute')">
+          {{ t('about.Contribute') }}
         </a>
       </Button>
       <Button variant="link" size="default" @click="openAboutTab('changelog', 'Changelog')" class="cursor-pointer">
@@ -115,7 +121,8 @@
               <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
                   <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
-                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale) }}</span>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale)
+                    }}</span>
                 </header>
                 <Separator class="mb-3" />
                 <ul class="space-y-2">
