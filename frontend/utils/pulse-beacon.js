@@ -1,7 +1,9 @@
 // Visit beacon + endpoint config for the "Earth Online" feature.
 //
-// PULSE_URL is the full URL of the pulse backend from build-time
-// env; unset disables the feature entirely (no entry point, no requests).
+// PULSE_BEACON_URL is the full URL of the pulse beacon backend from build-time env;
+// unset disables the social parts (status composer / latest feed / visitor
+// map / this beacon). The outage feed is independent — it rides /api/outages
+// and gates on the runtime `cloudFlare` configs flag.
 // The beacon fires once per page load from App.vue — an app-level concern,
 // deliberately NOT tied to any component: every route (homepage, standalone
 // tools, /privacy) counts.
@@ -12,14 +14,14 @@
 // so it can't even compete with the app's own boot fetches.
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 
-export const PULSE_URL = ((import.meta.env ?? {}).VITE_PULSE_URL || '').replace(/\/+$/, '');
-export const isPulseEnabled = Boolean(PULSE_URL);
+export const PULSE_BEACON_URL = ((import.meta.env ?? {}).VITE_PULSE_BEACON_URL || '').replace(/\/+$/, '');
+export const hasPulseBackend = Boolean(PULSE_BEACON_URL);
 
 export const sendVisitBeacon = () => {
-    if (!isPulseEnabled) return;
+    if (!hasPulseBackend) return;
     try {
         const fire = () => {
-            fetchWithTimeout(`${PULSE_URL}/beacon`, { method: 'POST', keepalive: true })
+            fetchWithTimeout(`${PULSE_BEACON_URL}/beacon`, { method: 'POST', keepalive: true })
                 .catch(() => { /* fire-and-forget — the next page load tries again */ });
         };
         if (typeof requestIdleCallback === 'function') {

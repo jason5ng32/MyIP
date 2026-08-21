@@ -24,7 +24,7 @@ import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
-import { isPulseEnabled } from '../utils/pulse-beacon.js';
+import { hasPulseBackend } from '../utils/pulse-beacon.js';
 
 const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     const {
@@ -220,7 +220,8 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         });
     }
 
-    if (isPulseEnabled) {
+    // Mirrors the Earth Online entry's visibility (widgets/Pulse.vue).
+    if (hasPulseBackend || configs.value.cloudFlare) {
         config.push({
             keys: 'p',
             action: () => {

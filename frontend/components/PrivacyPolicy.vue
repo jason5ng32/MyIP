@@ -114,9 +114,10 @@ watch(locale, async (loc) => {
 // "why" section explains the reason for whichever collection is active.
 const order = computed(() => {
   const ids = ['tools'];
-  // Earth Online — build-time gate (VITE_PULSE_URL), same as its nav entry
-  // point: the section only renders on builds that actually ship the feature.
-  if ((import.meta.env ?? {}).VITE_PULSE_URL) ids.push('pulse');
+  // Earth Online — gated on the pulse beacon backend (build-time), where all its
+  // collection (beacon / status sends) happens; the outage-only mode
+  // collects nothing, so no section.
+  if ((import.meta.env ?? {}).VITE_PULSE_BEACON_URL) ids.push('pulse');
   if (isReportSharingEnabled.value) ids.push('sharedReports');
   if (isPersonaCheckEnabled.value) ids.push('personaCheck');
   if (isDocsAssistantEnabled.value) ids.push('docsAssistant');

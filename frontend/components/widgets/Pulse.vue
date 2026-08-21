@@ -1,5 +1,5 @@
 <template>
-    <JnTooltip v-if="pulseEnabled" :text="t('nav.pulse.tooltip')">
+    <JnTooltip v-if="pulseVisible" :text="t('nav.pulse.tooltip')">
         <Button variant="ghost" :size="isMobile ? 'icon' : 'sm'" class="relative cursor-pointer"
             :class="isMobile ? 'size-8' : 'h-8 gap-1.5 px-2'" :aria-label="t('nav.pulse.title')" @click="openPulse">
             <Earth class="size-4 animate-spin animation-duration-[8s]" />
@@ -34,8 +34,9 @@
             </header>
 
             <div class="flex-1 overflow-y-auto px-4 py-3 pb-10">
-                <!-- Composer: preset status ids only, never free text. -->
-                <section>
+                <!-- Composer: preset status ids only, never free text.
+                    Social section — needs the pulse beacon backend. -->
+                <section v-if="hasPulseBackend">
                     <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.shareStatus') }}</h3>
                     <div class="flex flex-wrap gap-2">
                         <button v-for="fest in activeFestivals" :key="fest.id" type="button"
@@ -81,8 +82,9 @@
                 
                 <!-- Latest events: IPs arrive pre-masked; status ids render in
                     the viewer's language. No local echo — the post-send
-                    refetch shows the sender in the real feed. -->
-                <section>
+                    refetch shows the sender in the real feed.
+                    Social section — needs the pulse beacon backend. -->
+                <section v-if="hasPulseBackend">
                     <Separator class="my-2" />
                     <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.latest') }}</h3>
                     <!-- Placeholder rows mirror a real entry: flag, region +
@@ -128,14 +130,16 @@
                     </p>
                 </section>
 
-                <!-- Global outage broadcast; renders its
-                    own leading separator, collapses to nothing when empty. -->
-                <PulseOutages />
+                <!-- Global outage broadcast (/api/outages); collapses to
+                    nothing when empty. Its leading separator drops when the
+                    social sections above it are absent. -->
+                <PulseOutages :leading-separator="hasPulseBackend" />
 
                 <!-- Per-country share + status mix. Two states only: the first
                     load paints placeholders, everything after that has data —
-                    an empty or failed fetch collapses the whole section. -->
-                <section v-if="firstLoad || countries.length > 0" class="space-y-4">
+                    an empty or failed fetch collapses the whole section.
+                    Social section — needs the pulse beacon backend. -->
+                <section v-if="hasPulseBackend && (firstLoad || countries.length > 0)" class="space-y-4">
                     <Separator class="mt-7 mb-2" />
                     <h3 class="mb-3 text-sm font-semibold">{{ t('nav.pulse.liveMap') }}</h3>
 
@@ -216,16 +220,21 @@
 // what they're expressing via preset statuses. Naming rule: "Earth Online" is
 // the user-facing name only; everything technical (files, ids, locale keys,
 // the backend service) uses the code name "pulse".
-// POST <PULSE_URL>/status on pick; GET <PULSE_URL>/stats on open and after a
-// send — uncached end to end. The visit beacon is app-level: App.vue via
-// utils/pulse-beacon.js, not this widget.
+//
+// Two-tier gating: the social sections (composer / feed / visitor map) need
+// the pulse beacon backend (VITE_PULSE_BEACON_URL, build-time); the outage feed
+// only needs /api/outages, gated on the runtime `cloudFlare` configs flag.
+// The entry button shows when either half can render.
+// POST <PULSE_BEACON_URL>/status on pick; GET <PULSE_BEACON_URL>/stats on
+// open and after a send — uncached end to end. The visit beacon is app-level:
+// App.vue via utils/pulse-beacon.js, not this widget.
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { PULSE_URL, isPulseEnabled as pulseEnabled } from '@/utils/pulse-beacon.js';
+import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/pulse-beacon.js';
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
 import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/world-map-chart.js';
@@ -242,6 +251,10 @@ import { Check, Earth, ClockFading } from '@lucide/vue';
 const { t, locale } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+
+// Entry visibility: either half of the panel can carry it (see header).
+// `cloudFlare` lands with the /api/configs fetch, so the button may appear late.
+const pulseVisible = computed(() => hasPulseBackend || Boolean(store.configs.cloudFlare));
 
 
 // Status vocabulary lives in data/pulse-statuses.js (shared with tests).
@@ -277,7 +290,7 @@ const loadStats = async () => {
     if (statsLoading.value) return;
     statsLoading.value = true;
     try {
-        const res = await fetchWithTimeout(`${PULSE_URL}/stats`);
+        const res = await fetchWithTimeout(`${PULSE_BEACON_URL}/stats`);
         if (res.ok) {
             stats.value = await res.json();
             statsError.value = false;
@@ -396,7 +409,7 @@ const sendStatus = async (id, evt) => {
     sentStatusId.value = id;
     trackEvent('Nav', 'PulseStatus', id);
     try {
-        const res = await fetchWithTimeout(`${PULSE_URL}/status`, {
+        const res = await fetchWithTimeout(`${PULSE_BEACON_URL}/status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: id }),
@@ -464,11 +477,12 @@ const openPulse = () => {
     trackEvent('Nav', 'NavClick', 'Pulse');
 };
 watch(isOpen, (open) => {
-    if (open) {
+    if (open && hasPulseBackend) {
+        // Social data only — the outage feed fetches for itself (PulseOutages).
         refreshFestivals();
         loadStats();
         preloadWorldMapChart(); // chart chunk downloads alongside /stats
-    } else {
+    } else if (!open) {
         stopCelebration(); // don't let a rAF loop outlive the unmounted canvas
     }
 });

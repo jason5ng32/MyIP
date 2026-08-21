@@ -4,7 +4,7 @@
         A successful fetch with zero events shows the quiet line ("no news is good news"); 
         a FAILED fetch hides the section entirely. -->
     <template v-if="loaded || loading">
-        <Separator class="mt-7 mb-2" />
+        <Separator v-if="leadingSeparator" class="mt-7 mb-2" />
         <section>
             <h3 class="mb-3 text-sm font-semibold">
                 {{ t('nav.pulse.outages.title') }}
@@ -115,6 +115,12 @@ import { Icon } from '@iconify/vue';
 import { CircleCheck, Network, RadioTower } from '@lucide/vue';
 
 const { t, locale } = useI18n();
+
+// The leading separator belongs to the sections above — the parent drops it
+// when this renders first in the panel.
+defineProps({
+    leadingSeparator: { type: Boolean, default: true },
+});
 
 // Radar cause/level values with a translation; see locales `nav.pulse.outages`.
 const KNOWN_CAUSES = new Set([
