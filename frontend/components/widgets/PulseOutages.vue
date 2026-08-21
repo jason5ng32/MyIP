@@ -6,8 +6,7 @@
     <template v-if="loaded || loading">
         <Separator class="mt-7 mb-2" />
         <section>
-            <h3 class="mb-3 flex items-center gap-1.5 text-sm font-semibold">
-                <RadioTower class="size-4 text-muted-foreground" />
+            <h3 class="mb-3 text-sm font-semibold">
                 {{ t('nav.pulse.outages.title') }}
             </h3>
 
