@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { parseArgs } from 'node:util';
 
 import { LOCALES, FALLBACK_LOCALE } from '../common/locale-registry.js';
+import { flattenPack, isUntranslated } from '../common/locale-pack.js';
 
 const localesDir = new URL('../frontend/locales/', import.meta.url);
 
@@ -22,28 +23,29 @@ const DATASETS = [
 const packUrl = (dir, code) => new URL(`${dir}${code}.json`, localesDir);
 const readPack = (dir, code) => JSON.parse(fs.readFileSync(packUrl(dir, code), 'utf8'));
 
-// path → leaf value, matching how the test gate reads a pack.
-const flatten = (value, prefix = '', out = new Map()) => {
-    for (const [key, child] of Object.entries(value)) {
-        const path = prefix ? `${prefix}.${key}` : key;
-        if (child && typeof child === 'object') flatten(child, path, out);
-        else out.set(path, child);
-    }
-    return out;
-};
+// Checklist slugs and priorities are data, not copy — they are supposed to be
+// identical to en, so they stay out of the sameAsEn signal below.
+const DATA_KEY = /(^|\.)(slug|priority)$/;
 
 // A key counts as translated when it is present and not blank — except where
 // en is blank too, which makes the empty value the correct translation.
+// `sameAsEn` is a soft signal for reviewers: copied-over English reads as
+// translated to every other check here, and sometimes that is even correct
+// (product names, "MTR"), so it is reported, never judged.
 const compare = (dir, code) => {
-    const en = flatten(readPack(dir, FALLBACK_LOCALE));
-    if (!fs.existsSync(packUrl(dir, code))) return { total: en.size, done: 0, missing: [...en.keys()], file: false };
-    const pack = flatten(readPack(dir, code));
+    const en = flattenPack(readPack(dir, FALLBACK_LOCALE));
+    if (!fs.existsSync(packUrl(dir, code))) {
+        return { total: en.size, done: 0, missing: [...en.keys()], sameAsEn: 0, file: false };
+    }
+    const pack = flattenPack(readPack(dir, code));
     const missing = [...en].filter(([key, enValue]) => {
         const value = pack.get(key);
         if (value === undefined) return true;
-        return String(value).trim() === '' && String(enValue).trim() !== '';
+        return isUntranslated(value) && !isUntranslated(enValue);
     }).map(([key]) => key);
-    return { total: en.size, done: en.size - missing.length, missing, file: true };
+    const sameAsEn = [...en].filter(([key, enValue]) =>
+        !DATA_KEY.test(key) && !isUntranslated(enValue) && pack.get(key) === enValue).length;
+    return { total: en.size, done: en.size - missing.length, missing, sameAsEn, file: true };
 };
 
 const bar = (ratio, width = 24) => {
@@ -67,12 +69,16 @@ if (targets.length === 0) {
         const total = reports.reduce((sum, r) => sum + r.total, 0);
         const done = reports.reduce((sum, r) => sum + r.done, 0);
 
+        const sameAsEn = reports.reduce((sum, r) => sum + r.sameAsEn, 0);
+
         console.log(`${code} — ${nativeName} [${status}]  ${bar(done / total)} ${((done / total) * 100).toFixed(1)}% (${done}/${total})`);
         for (const report of reports) {
             const note = report.file ? '' : '  (no file yet)';
             const pct = ((report.done / report.total) * 100).toFixed(1);
             console.log(`    ${report.name.padEnd(12)} ${pct.padStart(5)}%  ${report.done}/${report.total}${note}`);
         }
+
+        if (sameAsEn > 0) console.log(`    ${'identical to en'.padEnd(12)}  ${sameAsEn} value(s) — worth a spot check`);
 
         const nextUp = reports.flatMap((r) => r.missing.map((key) => `${r.dir}${key}`));
         if (nextUp.length > 0 && limit > 0) {

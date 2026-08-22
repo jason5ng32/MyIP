@@ -2,10 +2,16 @@
 // Every rule is expressed against en, the reference pack — a translation may
 // lag behind it, never contradict it.
 //
-// full locales must be complete (main pack, privacy copy and the security
-// checklist, all key-for-key with en); beta locales may leave keys — and the
-// privacy / checklist files as a whole — untranslated, but whatever they do
-// ship plays by the same rules. Coverage progress is not a failure: run
+// Packs are skeletons: a main pack has exactly en's keys, and an untranslated
+// string is "" rather than a missing key, so a review diff reads `"" → text`
+// and nothing can hide between "not translated yet" and "forgot". `pnpm
+// i18n-new` writes the skeleton, `pnpm i18n-sync` keeps it aligned, and
+// vite.config.js strips the empties on the way into the bundle.
+//
+// The main pack is the one that ships half-done: beta locales may leave any
+// value "". The two optional files are all-or-nothing — they render as a
+// whole, so a beta locale either finishes one or leaves it out, and a full
+// locale ships all three. Coverage progress is not a failure: run
 // `pnpm i18n-status` to see how far along a language is.
 
 import assert from 'node:assert/strict';
@@ -20,11 +26,13 @@ import {
 
 const localesDir = new URL('../frontend/locales/', import.meta.url);
 
-// The three per-locale datasets, by the folder they live in.
+// The three per-locale datasets. `optional` ones may be left out by a beta
+// locale — but never left half-translated: neither has a per-key fallback of
+// its own, so what ships is one file's worth of language.
 const DATASETS = [
-    { name: 'main pack', dir: '' },
-    { name: 'privacy copy', dir: 'privacy/' },
-    { name: 'security checklist', dir: 'security-checklist/' },
+    { name: 'main pack', dir: '', optional: false },
+    { name: 'privacy copy', dir: 'privacy/', optional: true },
+    { name: 'security checklist', dir: 'security-checklist/', optional: true },
 ];
 
 const packUrl = (dir, code) => new URL(`${dir}${code}.json`, localesDir);
@@ -42,15 +50,18 @@ const flatten = (value, prefix = '', out = new Map()) => {
     return out;
 };
 
+const isBlank = (value) => String(value ?? '').trim() === '';
 const placeholders = (value) => new Set(String(value).match(/\{[^}]*\}/g) ?? []);
 
 const reference = new Map(DATASETS.map(({ dir }) => [dir, flatten(readPack(dir, FALLBACK_LOCALE))]));
 const translations = LOCALE_CODES.filter((code) => code !== FALLBACK_LOCALE);
+const isFull = (code) => FULL_LOCALE_CODES.includes(code);
 
 describe('locale packs — registry and files agree', () => {
     it('every registered locale ships a main pack', () => {
         for (const code of LOCALE_CODES) {
-            assert.ok(packExists('', code), `frontend/locales/${code}.json is missing`);
+            assert.ok(packExists('', code),
+                `frontend/locales/${code}.json is missing — scaffold it with \`pnpm i18n-new ${code}\``);
         }
     });
 
@@ -72,28 +83,27 @@ describe('locale packs — registry and files agree', () => {
 });
 
 describe('locale packs — rules every translation follows', () => {
-    for (const { name, dir } of DATASETS) {
+    for (const { name, dir, optional } of DATASETS) {
         for (const code of translations) {
             if (!packExists(dir, code)) continue;
             const en = reference.get(dir);
             const pack = flatten(readPack(dir, code));
             const label = `${dir}${code}.json`;
 
-            it(`${label} (${name}) invents no key en doesn't have`, () => {
+            // Every pack that exists is a skeleton of en: same keys, no more,
+            // no fewer. What may be left "" is what differs below.
+            it(`${label} (${name}) has exactly en's keys`, () => {
                 const extra = [...pack.keys()].filter((key) => !en.has(key));
-                assert.deepEqual(extra, [], `${label}: keys absent from en`);
-            });
-
-            it(`${label} (${name}) leaves nothing blank that en fills in`, () => {
-                for (const [key, value] of pack) {
-                    if (String(value).trim() !== '') continue;
-                    assert.equal(String(en.get(key) ?? '').trim(), '',
-                        `${label}: ${key} is empty — drop the key instead, it falls back to en`);
-                }
+                assert.deepEqual(extra, [], `${label}: keys absent from en — a typo'd path is the usual cause`);
+                const missing = [...en.keys()].filter((key) => !pack.has(key));
+                assert.deepEqual(missing, [], optional
+                    ? `${label}: keys missing against en — finish the file or leave it out entirely`
+                    : `${label}: keys missing against en — run \`pnpm i18n-sync\`, untranslated values are ""`);
             });
 
             it(`${label} (${name}) invents no placeholder en doesn't have`, () => {
                 for (const [key, value] of pack) {
+                    if (isBlank(value)) continue; // untranslated: nothing to check
                     const allowed = placeholders(en.get(key) ?? '');
                     for (const token of placeholders(value)) {
                         assert.ok(allowed.has(token),
@@ -101,6 +111,26 @@ describe('locale packs — rules every translation follows', () => {
                     }
                 }
             });
+
+            // The optional files load whole, with no per-key fallback inside
+            // them, so one that exists must be finished.
+            if (optional) {
+                it(`${label} (${name}) is complete — it ships whole or not at all`, () => {
+                    for (const [key, value] of pack) {
+                        if (!isBlank(value) || isBlank(en.get(key))) continue;
+                        assert.fail(`${label}: ${key} is empty — finish the file or leave it out entirely`);
+                    }
+                });
+            }
+
+            if (!optional && isFull(code)) {
+                it(`${label} (${name}) leaves nothing untranslated — ${code} is a full locale`, () => {
+                    for (const [key, value] of pack) {
+                        if (!isBlank(value) || isBlank(en.get(key))) continue;
+                        assert.fail(`${label}: ${key} is empty — a full locale translates everything`);
+                    }
+                });
+            }
         }
     }
 

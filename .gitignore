@@ -55,11 +55,12 @@ docs/
 .plan/
 
 # Local Scripts (the listed exceptions are public — contributors need
-# fetch-favicons.js for the Connectivity favicon pipeline and i18n-status.js
-# to see how far along a translation is)
+# fetch-favicons.js for the Connectivity favicon pipeline, and the i18n pair
+# to scaffold a locale pack and see how far along it is)
 scripts/*
 !scripts/fetch-favicons.js
 !scripts/i18n-status.js
+!scripts/i18n-scaffold.js
 
 # Section banners — deploy-time data (ads and campaign promos stay out of git)
 frontend/data/banners/*

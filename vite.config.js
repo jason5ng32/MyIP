@@ -6,6 +6,7 @@ import { CodeInspectorPlugin } from 'code-inspector-plugin';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { PREFS_STORAGE_KEY } from './frontend/data/default-preferences.js';
 import { LOCALE_CODES } from './common/locale-registry.js';
+import { stripPack } from './common/locale-pack.js';
 
 dotenv.config();
 
@@ -70,6 +71,21 @@ function siteUrlHtmlPlugin() {
     },
   };
 }
+
+// Locale packs mark untranslated strings with "" (TRANSLATING.md). Dropping
+// them here — ahead of the built-in JSON handling, hence `enforce: 'pre'` —
+// is what makes "" behave like an absent key at runtime: the app never holds
+// one, so the i18n fallback chain resolves it. The whole folder is in scope;
+// the convention belongs to locale packs, not to whichever file uses it today.
+const localeStripPlugin = () => ({
+  name: 'locale-strip-untranslated',
+  enforce: 'pre',
+  transform(code, id) {
+    const file = id.replaceAll('\\', '/').split('?')[0];
+    if (!file.includes('/frontend/locales/') || !file.endsWith('.json')) return null;
+    return { code: JSON.stringify(stripPack(JSON.parse(code))), map: null };
+  },
+});
 
 // Build-only inline script that modulepreloads the visitor's locale pack.
 // Mount waits on the active locale's messages, but their dynamic import can
@@ -178,6 +194,7 @@ export default defineConfig({
     }),
     tailwindcss(),
     siteUrlHtmlPlugin(),
+    localeStripPlugin(),
     localePreloadPlugin(),
     CodeInspectorPlugin({
       bundler: 'vite',
