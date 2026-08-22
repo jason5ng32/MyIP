@@ -165,15 +165,19 @@
         </div>
       </CardContent>
     </Card>
+
+    <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
+    <InfoBanner section="speedtest" :settled="hasEverSettled" />
   </section>
 </template>
 
 <script setup>
-import { reactive, computed, onMounted, markRaw, onUnmounted } from 'vue';
+import { reactive, ref, computed, onMounted, markRaw, onUnmounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { parseTrace } from '@/utils/parse-trace.js';
@@ -185,6 +189,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import {
   ArrowLeftRight, CalendarCheck2, CircleAlert, Play, CloudDownload, CloudUpload,
   Globe, Pause, PersonStanding, RotateCw,
@@ -196,6 +201,8 @@ const store = useMainStore();
 const lang = computed(() => store.lang);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
+// Sticky settled flag for the section's banner slot: true once a run finishes.
+const hasEverSettled = ref(false);
 // State Management
 const state = reactive({
   speedTest: {
@@ -462,6 +469,7 @@ const setupTestEngine = async () => {
     // Achievement rules for speed thresholds live in data/achievement-rules.js;
     // the report collector consumes the full result (unmeasured fields keep
     // their '-' placeholder — the builder drops non-numbers).
+    hasEverSettled.value = true;
     emitAppEvent('speedtest:finished', {
       downloadSpeed: state.speedTest.downloadSpeed,
       uploadSpeed: state.speedTest.uploadSpeed,
@@ -529,6 +537,10 @@ const speedTestController = async () => {
   }
 };
 
+// Command owner: run / pause / resume toggle, same semantics as the section's
+// own button. Resolves when the toggle applies, not when the test finishes.
+useAppCommand('speedtest:toggle', () => speedTestController());
+
 // --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('SpeedTest', true); });
@@ -546,8 +558,6 @@ onUnmounted(() => {
   }
   destroyCharts();
 });
-
-defineExpose({ speedTestController });
 </script>
 
 <style scoped>

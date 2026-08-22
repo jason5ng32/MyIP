@@ -262,13 +262,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onScopeDispose } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { REGEXP_ONLY_DIGITS } from 'vue-input-otp';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { dispatchAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import { buildObservation, usePersonaSnapshots } from '@/composables/use-persona-collector.js';
 import { localProfile } from '@/utils/persona/local-profile.js';
@@ -362,33 +363,39 @@ const requestLocation = async () => {
 const dependencyRows = computed(() => ['ipinfo', 'webrtc', 'dnsleak']
     .map((id) => ({ id, ready: Boolean(snapshots[id]) })));
 
-// The repair click only kicks off the homepage sequence; the tests report back
-// through the snapshots, so the button holds its running state until the last
-// missing one lands rather than disappearing the moment it is pressed. The cap
-// hands the button back if a test never reports at all.
+// The repair click dispatches only the tests that never ran, through the
+// command bus; each dispatch resolves when its test reports. The button holds
+// its running state until every dispatch settles; the per-command timeout
+// hands it back if a test never reports at all.
 const DEPENDENCY_RUN_TIMEOUT = 60 * 1000;
 const runningDependencies = ref(false);
-let dependencyTimer = null;
 
-const stopDependencyRun = () => {
-    runningDependencies.value = false;
-    clearTimeout(dependencyTimer);
-    dependencyTimer = null;
+// missing source id → its owner's command (all payload-free here: these
+// tests never ran, so nothing needs the refresh/reset variants).
+const DEPENDENCY_COMMANDS = {
+    ipinfo: 'ipinfo:refresh',
+    webrtc: 'webrtc:run',
+    dnsleak: 'dnsleak:run',
 };
 
-const runDependencies = () => {
-    if (route.name !== 'home') router.push('/');
+const runDependencies = async () => {
+    if (runningDependencies.value) return;
+    const missing = missingSources.value;
+    if (!missing.length) return;
     runningDependencies.value = true;
-    clearTimeout(dependencyTimer);
-    dependencyTimer = setTimeout(stopDependencyRun, DEPENDENCY_RUN_TIMEOUT);
-    store.setRefreshEveryThing(true);
+    try {
+        // Off the homepage, the owners aren't mounted yet — navigate first,
+        // then wait for each command to be registered before dispatching.
+        if (route.name !== 'home') await router.push('/');
+        await Promise.allSettled(missing.map(async (source) => {
+            const command = DEPENDENCY_COMMANDS[source];
+            await waitForAppCommand(command, { timeoutMs: DEPENDENCY_RUN_TIMEOUT });
+            await dispatchAppCommand(command, {}, { timeoutMs: DEPENDENCY_RUN_TIMEOUT });
+        }));
+    } finally {
+        runningDependencies.value = false;
+    }
 };
-
-watch(missingSources, (missing) => {
-    if (runningDependencies.value && !missing.length) stopDependencyRun();
-});
-
-onScopeDispose(stopDependencyRun);
 
 const report = ref(null);
 const runStatus = ref('idle');

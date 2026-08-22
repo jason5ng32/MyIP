@@ -1,10 +1,11 @@
 // Tests for the app-wide event bus (frontend/utils/app-events.js):
-// subscribe / emit / unsubscribe semantics and handler error isolation.
+// subscribe / emit / unsubscribe semantics, handler error isolation, and the
+// waitForAppEvent one-shot subscription.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { onAppEvent, emitAppEvent } from '../frontend/utils/app-events.js';
+import { onAppEvent, emitAppEvent, waitForAppEvent } from '../frontend/utils/app-events.js';
 
 describe('app-events', () => {
   it('delivers the payload to every subscriber of the event', () => {
@@ -53,5 +54,33 @@ describe('app-events', () => {
 
   it('emitting an event with no subscribers is a no-op', () => {
     assert.doesNotThrow(() => emitAppEvent('test:nobody-listens', { any: 'thing' }));
+  });
+
+  it('waitForAppEvent resolves with the next payload, subscribe-before-trigger', async () => {
+    const waited = waitForAppEvent('test:one-shot');
+    emitAppEvent('test:one-shot', { value: 1 });
+    assert.deepEqual(await waited, { value: 1 });
+  });
+
+  it('waitForAppEvent is one-shot: only the first emission is delivered', async () => {
+    let delivered = 0;
+    const waited = waitForAppEvent('test:one-shot-only').then(() => { delivered += 1; });
+    emitAppEvent('test:one-shot-only', { n: 1 });
+    emitAppEvent('test:one-shot-only', { n: 2 });
+    await waited;
+    assert.equal(delivered, 1);
+  });
+
+  it('waitForAppEvent rejects with code "timeout" and unsubscribes', async () => {
+    await assert.rejects(
+      waitForAppEvent('test:never-fires', { timeoutMs: 20 }),
+      (error) => {
+        assert.equal(error.code, 'timeout');
+        assert.match(error.message, /test:never-fires/);
+        return true;
+      },
+    );
+    // The timed-out subscription is gone: emitting afterwards is a no-op.
+    assert.doesNotThrow(() => emitAppEvent('test:never-fires'));
   });
 });

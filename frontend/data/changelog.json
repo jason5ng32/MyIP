@@ -1654,5 +1654,38 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.5.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Section promo slots: every fork can light up promo content under any homepage section as needed",
+          "zh": "Section 推广位：每个 Forker 可以根据需要，在不同的 Section 增加推广内容",
+          "fr": "Emplacements promotionnels par section : chaque fork peut afficher du contenu promotionnel sous n'importe quelle section de la page d'accueil",
+          "ru": "Промо-слоты в секциях: каждый форк может при необходимости добавлять промо-контент в разные секции главной страницы"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IPilot can now run some of the tests for you",
+          "zh": "IPilot 现在可以帮使用者运行部分测试",
+          "fr": "IPilot peut désormais exécuter certains tests pour vous",
+          "ru": "IPilot теперь может запускать часть тестов за вас"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы"
+        }
+      }
+    ]
   }
 ]

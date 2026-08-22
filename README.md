@@ -99,6 +99,13 @@ Full guides live in the MyIP Docs Center: **[docs.ipcheck.ing](https://docs.ipch
 * [Developer Guide](https://docs.ipcheck.ing/developer) — deployment, configuration, architecture, and contributing
 * [Knowledge Base](https://docs.ipcheck.ing/knowledge-base) — how to use every tool, step-by-step network diagnosis, and networking concepts
 
+## 🤝 Contributing
+
+Contributions are welcome! We keep a curated set of beginner-friendly tasks — each with exact file paths, acceptance criteria, and tests that guide you to a green build:
+
+* 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) — add a DNS resolver from your country, add curated site lists, translate the README into your language, polish translations, and more
+* 📄 [CONTRIBUTING.md](CONTRIBUTING.md) — setup, conventions, and how PRs flow (target the `dev` branch)
+
 ## ⚙️ Configuration
 
 Two settings matter before anything else:

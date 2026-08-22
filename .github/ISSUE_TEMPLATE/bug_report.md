@@ -1,58 +1,33 @@
 ---
 name: Bug report
-about: Bug Report Template
-title: "[Short Description of the Bug]"
+about: Something isn't working
+title: ''
 labels: bug
 assignees: ''
 
 ---
 
-## Environment:
+## What happened?
 
-* Operating System:
-* Browser (if applicable):
-* Node Version:
-* Vite Version:
-* Vue3 Version:
-* Docker Version (if applicable):
-* Deployment Method (Vercel/Docker/Node):
-* Environment Variables (without sensitive info):
-* Any other relevant software versions:
+A clear description of the bug. Screenshots or recordings help a lot.
 
-## Description:
+## Steps to reproduce
 
-Provide a clear and concise description of what the bug is.
+1. …
+2. …
 
-Steps to Reproduce:
+## What did you expect?
 
-1. Step one to reproduce
-2. Step two...
-3. ...
+## Environment
 
-## Expected Behavior:
+- Where: ipcheck.ing / self-hosted (Docker / Node / Vercel)
+- OS & browser (for page issues):
+- Node version (self-hosted only):
 
-Describe what you expected to happen.
+## Logs (if applicable)
 
-## Actual Behavior:
+Browser console errors for page issues; terminal output for self-hosted / backend issues.
 
-Describe what actually happened. Include screenshots or screen recordings if possible.
-
-## Terminal & Console Logs:
-
-**Important**: Please include the terminal logs and browser console logs if applicable. These logs are crucial for identifying the root cause of the issue.
-
-### Terminal Logs (include any error messages or stack traces):
-
-[Logs here]
-
-### Browser Console Logs (if frontend issue):
-
-[Logs here]
-
-Additional Context:
-
-Add any other context about the problem here, like links to related issues, logs, etc.
-
-## Possible Solution (optional):
-
-If you have an idea of how to fix the issue, please describe it here.
+```text
+paste logs here
+```

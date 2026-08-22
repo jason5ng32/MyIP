@@ -83,6 +83,9 @@
                 </div>
             </DrawerContent>
         </Drawer>
+
+        <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
+        <InfoBanner section="advanced" />
     </section>
 </template>
 
@@ -97,6 +100,7 @@ import { isRunningAsPwa } from '@/utils/pwa.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
+import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { Maximize, Minimize, PanelBottomOpen, SquareArrowOutUpRight } from '@lucide/vue';
 
 const { t } = useI18n();

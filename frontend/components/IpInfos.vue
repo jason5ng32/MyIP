@@ -22,6 +22,10 @@
           :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
     </div>
+
+    <!-- Section banner slot — renders nothing unless a data file for this
+        section exists (see InfoBanner.vue). -->
+    <InfoBanner section="ipinfo" :settled="cardsHaveSettled" />
   </section>
 </template>
 
@@ -34,9 +38,11 @@ import { trackEvent } from '@/utils/analytics';
 import { isUsablePublicIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
+import InfoBanner from './widgets/InfoBanner.vue';
 
 
 const { t } = useI18n();
@@ -122,6 +128,8 @@ const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
+// Timing gate for the sponsor slot: flips once every visible card settled.
+const cardsHaveSettled = ref(false);
 
 // Middleware
 let pendingIPDetailsRequests = new Map();
@@ -232,6 +240,7 @@ const trackFetchStatus = (status) => {
     }
   }
   if (allHasFetched) {
+    cardsHaveSettled.value = true;
     store.setLoadingStatus('IPInfo', true);
     // Domain event: full snapshot of the visible cards, re-emitted whenever a
     // card settles after this point (single-card refresh included). The report
@@ -263,6 +272,10 @@ const trackFetchStatus = (status) => {
 // allSettled so one card can't sink the batch (fetchIP already swallows per-card
 // errors — this is belt-and-suspenders). Cards paint independently as they land.
 const checkAllIPs = async () => {
+  // A whole-grid pass means no card is settled: clear the completion flags so
+  // ipinfo:finished (and the ipinfo:refresh command riding on it) waits for
+  // every card to land again, instead of re-firing on the first one.
+  fetchStatus.splice(0);
   const ipSources = [
     [0, getIPFromIPChecking4],
     [1, getIPFromIPChecking6],
@@ -430,14 +443,21 @@ watch(IPArray, () => {
   store.updateAllIPs(IPArray.value);
 });
 
-onMounted(() => {
-  store.setMountingStatus('IPInfo', true);
+// Command owner: refresh one card ({ index }) or the whole grid. Resolves
+// with the next ipinfo:finished snapshot — the grid re-emits it whenever a
+// card settles, single-card refreshes included.
+useAppCommand('ipinfo:refresh', ({ index } = {}) => {
+  const finished = waitForAppEvent('ipinfo:finished');
+  if (Number.isInteger(index) && ipDataCards[index]) {
+    refreshCard(ipDataCards[index], index);
+  } else {
+    checkAllIPs();
+  }
+  return finished;
 });
 
-defineExpose({
-  checkAllIPs,
-  ipDataCards,
-  refreshCard,
+onMounted(() => {
+  store.setMountingStatus('IPInfo', true);
 });
 
 </script>

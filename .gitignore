@@ -54,8 +54,13 @@ common/as-rel-db/*.next
 docs/
 .plan/
 
-# Local Scripts
-scripts/
+# Local Scripts (fetch-favicons.js is the one public exception —
+# contributors need it for the Connectivity favicon pipeline)
+scripts/*
+!scripts/fetch-favicons.js
+
+# Section banners — deploy-time data (ads and campaign promos stay out of git)
+frontend/data/banners/*
 
 # Site configuration
 public/sitemap.xml

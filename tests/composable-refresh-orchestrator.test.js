@@ -3,6 +3,7 @@ import { describe, it, beforeEach, afterEach } from 'node:test';
 import { ref, computed, reactive, nextTick } from 'vue';
 
 import { useRefreshOrchestrator } from '../frontend/composables/use-refresh-orchestrator.js';
+import { registerAppCommand } from '../frontend/utils/app-commands.js';
 
 const t = (k) => `<${k}>`;
 
@@ -32,42 +33,49 @@ function makeStoreStub({ mountedFlags = {}, shouldRefresh = false, autoRun = {} 
   };
 }
 
-function makeRefs() {
-  const calls = { ip: 0, conn: [], web: [], dns: [] };
-  const IPCheckRef       = ref({ checkAllIPs:            () => { calls.ip += 1; } });
-  const connectivityRef  = ref({ handelCheckStart:       (flag) => { calls.conn.push(flag); } });
-  const webRTCRef        = ref({ checkAllWebRTC:         (flag) => { calls.web.push(flag); } });
-  const dnsLeaksRef      = ref({ checkAllDNSLeakTest:    (flag) => { calls.dns.push(flag); } });
-  return { refs: { IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef }, calls };
+// The orchestrator drives sections through the command bus; stub the four
+// owner commands and record the payloads each dispatch carried.
+function registerCommandStubs() {
+  const calls = { ip: [], conn: [], web: [], dns: [] };
+  const unregisters = [
+    registerAppCommand('ipinfo:refresh', (payload) => { calls.ip.push(payload); }),
+    registerAppCommand('connectivity:run', (payload) => { calls.conn.push(payload.trigger); }),
+    registerAppCommand('webrtc:run', (payload) => { calls.web.push(payload.isRefresh); }),
+    registerAppCommand('dnsleak:run', (payload) => { calls.dns.push(payload.isRefresh); }),
+  ];
+  return { calls, unregister: () => unregisters.forEach((off) => off()) };
 }
 
 describe('useRefreshOrchestrator()', () => {
   let realSetTimeout;
+  let stubs;
   beforeEach(() => {
     // synchronize setTimeout immediately: ignore delay, for assertion order
     realSetTimeout = globalThis.setTimeout;
     globalThis.setTimeout = (fn) => { fn(); return 0; };
+    stubs = registerCommandStubs();
   });
   afterEach(() => {
     globalThis.setTimeout = realSetTimeout;
+    stubs.unregister();
   });
 
-  it('loadingControl: all cards mounted + every module on triggers all four checks', () => {
+  it('loadingControl: all cards mounted + every module on dispatches all four commands', () => {
     const store = makeStoreStub({
       mountedFlags: { IPInfo: true, Connectivity: true, WebRTC: true, DNSLeakTest: true },
       autoRun: { autoRunConnectivity: true, autoRunWebRTC: true, autoRunDnsLeak: true },
     });
     const userPreferences = computed(() => store.state.userPreferences);
     const infoMaskLevel = ref(0);
-    const { refs, calls } = makeRefs();
+    const { calls } = stubs;
 
-    const { loadingControl } = useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
+    const { loadingControl } = useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
     loadingControl();
 
-    assert.equal(calls.ip, 1);
-    assert.deepEqual(calls.conn, [undefined]); // initial load passes no arg
-    assert.deepEqual(calls.web, [false]);
-    assert.deepEqual(calls.dns, [false]);
+    assert.equal(calls.ip.length, 1);
+    assert.deepEqual(calls.conn, ['boot'], 'initial load runs the boot trigger');
+    assert.deepEqual(calls.web, [undefined], 'initial load leaves isRefresh to the owner default');
+    assert.deepEqual(calls.dns, [undefined]);
   });
 
   it('loadingControl: every module off skips auto checks and flags loading complete', () => {
@@ -77,12 +85,12 @@ describe('useRefreshOrchestrator()', () => {
     });
     const userPreferences = computed(() => store.state.userPreferences);
     const infoMaskLevel = ref(0);
-    const { refs, calls } = makeRefs();
+    const { calls } = stubs;
 
-    const { loadingControl } = useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
+    const { loadingControl } = useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
     loadingControl();
 
-    assert.equal(calls.ip, 1, 'IP info always runs');
+    assert.equal(calls.ip.length, 1, 'IP info always runs');
     assert.deepEqual(calls.conn, [], 'connectivity should not auto-run');
     assert.deepEqual(calls.web, [], 'webrtc should not auto-run');
     assert.deepEqual(calls.dns, [], 'dns leak test should not auto-run');
@@ -98,13 +106,13 @@ describe('useRefreshOrchestrator()', () => {
     });
     const userPreferences = computed(() => store.state.userPreferences);
     const infoMaskLevel = ref(0);
-    const { refs, calls } = makeRefs();
+    const { calls } = stubs;
 
-    const { loadingControl } = useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
+    const { loadingControl } = useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
     loadingControl();
 
-    assert.equal(calls.ip, 1);
-    assert.deepEqual(calls.conn, [undefined], 'connectivity runs');
+    assert.equal(calls.ip.length, 1);
+    assert.deepEqual(calls.conn, ['boot'], 'connectivity runs');
     assert.deepEqual(calls.web, [], 'webrtc stays off');
     assert.deepEqual(calls.dns, [], 'dns stays off');
     // Connectivity flags itself loaded when its check resolves (not here);
@@ -119,15 +127,15 @@ describe('useRefreshOrchestrator()', () => {
     const store = makeStoreStub();
     const userPreferences = computed(() => store.state.userPreferences);
     const infoMaskLevel = ref(2);
-    const { refs, calls } = makeRefs();
+    const { calls } = stubs;
 
-    useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
+    useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
 
     // flip the trigger
     store.state.shouldRefreshEveryThing = true;
     await nextTick();
 
-    assert.equal(calls.ip, 1, 'ipcheck refreshes');
+    assert.equal(calls.ip.length, 1, 'ipcheck refreshes');
     assert.deepEqual(calls.conn, ['refresh'], 'connectivity refresh via the refresh trigger');
     assert.deepEqual(calls.web, [true]);
     assert.deepEqual(calls.dns, [true]);
@@ -138,6 +146,27 @@ describe('useRefreshOrchestrator()', () => {
     // A success alert was published
     const alert = store.state.alertHistory.at(-1);
     assert.equal(alert.style, 'text-success');
+  });
+
+  it('refresh with no command owners logs, never throws', async () => {
+    stubs.unregister();
+    const warns = [];
+    const originalWarn = console.warn;
+    console.warn = (...args) => { warns.push(args[0]); };
+    try {
+      const store = makeStoreStub();
+      const userPreferences = computed(() => store.state.userPreferences);
+      const infoMaskLevel = ref(0);
+      useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
+      store.state.shouldRefreshEveryThing = true;
+      await nextTick();
+      // Let the dispatch rejections reach their .catch handlers.
+      await Promise.resolve();
+      await Promise.resolve();
+      assert.equal(warns.length, 4, 'each unavailable command logs one warning');
+    } finally {
+      console.warn = originalWarn;
+    }
   });
 
   it('loadingControl: not all mounted → re-schedules itself until ready', () => {
@@ -158,9 +187,8 @@ describe('useRefreshOrchestrator()', () => {
     });
     const userPreferences = computed(() => store.state.userPreferences);
     const infoMaskLevel = ref(0);
-    const { refs } = makeRefs();
 
-    const { loadingControl } = useRefreshOrchestrator({ refs, store, t, userPreferences, infoMaskLevel });
+    const { loadingControl } = useRefreshOrchestrator({ store, t, userPreferences, infoMaskLevel });
 
     // run first attempt (mounted = false) → schedule retry 1s later
     loadingControl();

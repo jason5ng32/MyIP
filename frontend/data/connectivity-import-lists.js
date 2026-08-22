@@ -29,8 +29,10 @@ export const DEFAULT_LIST_MEMBERS = [
     { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', iconDomain: 'weixin.qq.com' },
 ];
 
-// Favicon-fetch targets for scripts/fetch-favicons.js. `iconDomain` differs
-// from the test URL's host where that host serves a poor or missing icon.
+// Favicon-fetch targets for the committed scripts/fetch-favicons.js
+// (`pnpm fetch-favicons`; the data test also auto-invokes it when icons
+// are missing). `iconDomain` differs from the test URL's host where that
+// host serves a poor or missing icon.
 export const BUILTIN_FAVICONS = DEFAULT_LIST_MEMBERS.map((m) => ({
     id: m.id,
     iconDomain: m.iconDomain || new URL(m.url).hostname,

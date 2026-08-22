@@ -1,11 +1,16 @@
 // Data-integrity tests for the curated Connectivity import lists
 // (frontend/data/connectivity-import-lists.js): shape, uniqueness, size
-// floor, HTTPS-only URLs, and a committed favicon PNG for every member,
-// built-in target, and tile-preview reference.
+// floor, HTTPS-only URLs, locale coverage of list names, and a committed
+// favicon PNG for every member, built-in target, and tile-preview
+// reference. When icons are missing locally, a before() hook auto-fetches
+// them via scripts/fetch-favicons.js (skipped under CI, which stays
+// offline and deterministic — there the assertions just tell the
+// contributor to run `pnpm fetch-favicons` and commit the PNGs). With all
+// PNGs committed, the whole spec runs without touching the network.
 
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
-import { existsSync } from 'node:fs';
+import { describe, it, before } from 'node:test';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -17,12 +22,37 @@ import {
     faviconPath,
     CONNECTIVITY_TARGET_LIMIT,
 } from '../frontend/data/connectivity-import-lists.js';
+import { fetchFavicons } from '../scripts/fetch-favicons.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const faviconFile = (id) => path.join(repoRoot, 'public', 'favicons', `${id}.png`);
 const allMembers = IMPORT_LISTS.flatMap((l) => l.members);
 
+// Every id that must have a committed PNG: members + built-ins + defaults.
+const faviconIds = [...new Set([
+    ...allMembers.map((m) => m.id),
+    ...BUILTIN_FAVICONS.map((b) => b.id),
+    ...DEFAULT_LIST_MEMBERS.map((m) => m.id),
+])];
+const missingFavicons = () => faviconIds.filter((id) => !existsSync(faviconFile(id)));
+
+// Failure message for a still-missing PNG — after the local auto-fetch has
+// had its chance, or under CI where no network is allowed.
+const faviconHelp = (id) => (process.env.CI
+    ? `missing public/favicons/${id}.png — run pnpm fetch-favicons locally and commit the PNGs`
+    : `missing public/favicons/${id}.png — auto-fetch could not find a PNG — hand-source a `
+      + `64px PNG into public/favicons/${id}.png (or run pnpm fetch-favicons)`);
+
 describe('import lists data integrity', () => {
+    // Local runs self-heal: missing PNGs are fetched before the existence
+    // assertions re-check them. CI never touches the network — the
+    // committed-PNG gate stays intact there.
+    before(async () => {
+        const missing = missingFavicons();
+        if (!missing.length || process.env.CI) return;
+        await fetchFavicons({ ids: missing });
+    });
+
     it('list ids are unique and every list carries an emoji icon', () => {
         const ids = IMPORT_LISTS.map((l) => l.id);
         assert.equal(new Set(ids).size, ids.length);
@@ -76,7 +106,7 @@ describe('import lists data integrity', () => {
         assert.equal(new Set(ids).size, ids.length);
         for (const m of DEFAULT_LIST_MEMBERS) {
             assert.equal(new URL(m.url).protocol, 'https:', m.id);
-            assert.ok(existsSync(faviconFile(m.id)), `missing public/favicons/${m.id}.png`);
+            assert.ok(existsSync(faviconFile(m.id)), faviconHelp(m.id));
         }
     });
 
@@ -89,7 +119,7 @@ describe('import lists data integrity', () => {
     it('every member and built-in target has a committed favicon PNG', () => {
         const builtinIds = BUILTIN_FAVICONS.map((b) => b.id);
         for (const id of [...allMembers.map((m) => m.id), ...builtinIds]) {
-            assert.ok(existsSync(faviconFile(id)), `missing public/favicons/${id}.png`);
+            assert.ok(existsSync(faviconFile(id)), faviconHelp(id));
         }
     });
 
@@ -108,6 +138,22 @@ describe('import lists data integrity', () => {
     it('no single list exceeds the shared target cap', () => {
         for (const list of IMPORT_LISTS) {
             assert.ok(list.members.length <= CONNECTIVITY_TARGET_LIMIT, list.id);
+        }
+    });
+
+    it('every list (and the system list) is named in all four locale packs', () => {
+        // ConnectivityAddDialog renders `connectivity.importLists.<id>` for
+        // IMPORT_LISTS and SYSTEM_IMPORT_LIST alike. Translations can't be
+        // auto-filled — the failure message names the exact file and key.
+        const listIds = [...IMPORT_LISTS.map((l) => l.id), SYSTEM_IMPORT_LIST.id];
+        for (const locale of ['en', 'zh', 'fr', 'ru']) {
+            const packPath = path.join(repoRoot, 'frontend', 'locales', `${locale}.json`);
+            const names = JSON.parse(readFileSync(packPath, 'utf8')).connectivity?.importLists ?? {};
+            for (const id of listIds) {
+                assert.ok(typeof names[id] === 'string' && names[id].trim().length > 0,
+                    `frontend/locales/${locale}.json is missing a non-empty `
+                    + `connectivity.importLists.${id}`);
+            }
         }
     });
 });

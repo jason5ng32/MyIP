@@ -21,6 +21,10 @@ proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
 
+`api/data/` holds contributor-editable static config consumed by handlers —
+currently `dns-resolvers.js`, the country-annotated resolver list behind
+`dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
+
 ## Conventions
 
 - **Handler shape.** Single default export `async (req, res) => …`: read

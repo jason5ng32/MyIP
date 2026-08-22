@@ -106,6 +106,9 @@
 
     <!-- Add / import dialog (custom form + curated list browser) -->
     <ConnectivityAddDialog v-model:open="addDialogOpen" />
+
+    <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
+    <InfoBanner section="connectivity" :settled="hasEverSettled" />
   </section>
 </template>
 
@@ -114,7 +117,8 @@ import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
 import { TILE_PREVIEW, faviconPath } from '@/data/connectivity-import-lists.js';
 import { removeTarget } from '@/utils/connectivity-import.js';
@@ -122,6 +126,7 @@ import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import ConnectivityAddDialog from '@/components/widgets/ConnectivityAddDialog.vue';
+import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
   Play, Frown, Meh, Plus, RotateCw, Smile, X,
@@ -139,6 +144,8 @@ const alertMessage = ref("");
 const multipleTests = ref(userPreferences.value.connectivityMultipleTests);
 const autoShowAltert = ref(userPreferences.value.popupConnectivityNotifications);
 const isStarted = ref(false);
+// Sticky settled flag for the section's banner slot: true once a pass settles.
+const hasEverSettled = ref(false);
 const counter = ref(0);
 const maxCounts = ref(9);
 const manualRun = ref(false);
@@ -373,6 +380,7 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
       );
       const allOk = finished.every((test) => test.statusCode === CONNECTIVITY_STATUS.OK);
       updateConnectivityAlert(allOk ? 'success' : 'error');
+      hasEverSettled.value = true;
       // Domain event: deliberately the whole grid, not just this pass —
       // the report is a latest-wins snapshot, and a mid-pass addition with
       // a real result is accurate information there.
@@ -512,6 +520,15 @@ const handelCheckStart = async (trigger = 'boot') => {
   }
 };
 
+// Command owner: run the connectivity pass. `trigger` keeps handelCheckStart's
+// toast / card-reset semantics; resolves with the next connectivity:finished
+// snapshot (the first pass in multi-round mode).
+useAppCommand('connectivity:run', ({ trigger = 'manual' } = {}) => {
+  const finished = waitForAppEvent('connectivity:finished');
+  handelCheckStart(trigger);
+  return finished;
+});
+
 onMounted(() => {
   store.setMountingStatus('Connectivity', true);
 });
@@ -528,6 +545,4 @@ onBeforeUnmount(() => {
 // Either signal flipping fires sendAlert; the gates inside pick the winner.
 watch(() => store.allHasLoaded, (v) => { if (v) sendAlert(); });
 watch(allRoundsDone, (v) => { if (v) sendAlert(); });
-
-defineExpose({ handelCheckStart });
 </script>

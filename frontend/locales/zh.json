@@ -206,6 +206,8 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
+    "DocsToolRunConfirm": "在你的页面上运行检测？",
+    "DocsToolRunSummary": "已运行你的网络检测",
     "AskIPilot": "询问 IPilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
@@ -966,7 +968,8 @@
     "fetchError": "无法获取解析结果",
     "Provider": "DNS 服务商",
     "Result": "解析结果",
-    "Record": "记录"
+    "Record": "记录",
+    "AllRegions": "全部地区"
   },
   "ruletest": {
     "Title": "分流测试",
@@ -1269,12 +1272,7 @@
     "Note2": "泄露测试的方法是通过访问新生成的域名，检测你是通过哪个地区的 DNS 出口进行解析，如果返回的出口区域和你当地的运营商区域相同，则有 DNS 泄露风险，你可能需要修改 VPN/代理设置。",
     "EndpointCountry": "出口地区",
     "StatusWait": "待检测",
-    "StatusError": "测试出错",
-    "EnhancedBanner": {
-      "Title": "想做更深入的检查？",
-      "Note": "如果想进一步了解你正在使用的所有递归解析器是谁、它们的 ASN 归属、是否通过 ECS 把你真实 IP 的前缀转发给了上游、以及是否启用了 DNSSEC 校验，可以打开下方的「深度 DNS 泄露测试」。",
-      "CTA": "打开深度 DNS 泄露测试"
-    }
+    "StatusError": "测试出错"
   },
   "speedtest": {
     "Title": "网速测试",
