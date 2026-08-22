@@ -1,82 +1,110 @@
-# CONTRIBUTING.md
+# Contributing to MyIP
 
-## Welcome Contributors! 👋
+Thanks for your interest in contributing! MyIP ([IPCheck.ing](https://ipcheck.ing)) is an
+open-source IP toolbox — IP lookup, connectivity tests, WebRTC / DNS-leak detection,
+speed test, and more — built as a Vue 3 SPA with an Express 5 backend.
 
-We're delighted that you're interested in contributing to our project! This document provides guidelines to ensure a smooth contribution process for everyone involved.
+New here? Look for issues labeled
+[`good first issue`](https://github.com/jason5ng32/MyIP/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+— they're scoped to be doable without knowing the whole codebase.
 
-### Table of Contents
+## Quick start
 
-- [CONTRIBUTING.md](#contributingmd)
-  - [Welcome Contributors! 👋](#welcome-contributors-)
-    - [Table of Contents](#table-of-contents)
-    - [Code of Conduct](#code-of-conduct)
-    - [Getting Started](#getting-started)
-    - [Reporting Bugs](#reporting-bugs)
-    - [Feature Requests](#feature-requests)
-    - [Submitting Changes](#submitting-changes)
-    - [Setting Up Your Environment](#setting-up-your-environment)
-    - [Testing](#testing)
-    - [Pull Request Guidelines](#pull-request-guidelines)
-    - [Code Review Process](#code-review-process)
-    - [Community and Support](#community-and-support)
-  - [Thank You! 👏](#thank-you-)
+1. **Fork** the repo and create your branch **from `dev`** (never `main` — `main` only
+   receives release merges from `dev`).
+2. **Set up:** Node.js 20+ (CI runs on Node 24) and pnpm. The pnpm version is pinned
+   via the `packageManager` field, so the easiest path is:
 
-### Code of Conduct
+   ```bash
+   corepack enable   # or: npm install -g pnpm
+   pnpm install
+   pnpm dev          # starts Vite + the backend together
+   ```
 
-This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+   **pnpm only.** npm or yarn would produce a competing lockfile — PRs that touch
+   `package-lock.json` / `yarn.lock` will be asked to redo the install with pnpm.
+3. Make your change — **one concern per PR**, don't bundle unrelated changes.
+4. **Run `pnpm check`** (tests + production build). It must be green before you open a PR.
+5. Open your PR **against `dev`**, rebased onto the latest `dev`, with a clear
+   description of what changed and why.
 
-### Getting Started
+For anything non-trivial, open an issue first to discuss the approach — it saves you
+from building something that can't be merged.
 
-If you're new to the project, consider:
+## Project map
 
-- Reading the project's README for an overview.
-- Checking the issues labeled as `good first issue` for an easy entry point.
+```
+frontend/   Vue 3 SPA (Pinia, vue-router, vue-i18n, Tailwind v4 + shadcn-vue)
+api/        Express 5 handlers, one file per route (wired in backend-server.js)
+common/     Code shared by both halves (validators, fetch helper, logger, …)
+tests/      Node test runner specs (node --test)
+```
 
-### Reporting Bugs
+**The real architecture and convention docs are the AGENTS.md files:**
+[`AGENTS.md`](AGENTS.md) (root), [`frontend/AGENTS.md`](frontend/AGENTS.md), and
+[`api/AGENTS.md`](api/AGENTS.md). Don't let the filename fool you — they're written
+for humans and AI agents alike, and they're the single source of truth for how this
+repo works. Read the root one plus whichever half you're touching before writing code.
 
-Please follow the bug report template provided in [BUG_REPORT_TEMPLATE.md](.github/ISSUE_TEMPLATE/bug_report.md). Include terminal and console logs for a comprehensive report.
+Prefer a guided tour? The online **[Developer Guide](https://docs.ipcheck.ing/developer)**
+walks through the project architecture, configuration, and deployment in detail
+(also available in 中文, français, and русский).
 
-### Feature Requests
+## Key conventions (short version)
 
-We love to hear your ideas! Open an issue with the tag `feature request` and provide a clear and detailed explanation of the feature and its benefits.
+Details and rationale live in the AGENTS.md files; the headlines:
 
-### Submitting Changes
+- **JavaScript only** — no TypeScript, no `lang="ts"`.
+- **New functions use `const` arrow syntax** (`const fn = async () => {}`).
+- **Every new file opens with a header comment** stating its purpose.
+- **Four locales land together** — user-visible copy ships in `en` / `zh` / `fr` / `ru`
+  in the same PR (`frontend/locales/`; tests enforce this for some surfaces).
+- **Backend logging goes through the shared pino logger** (`common/logger.js`) —
+  no `console.*` in `api/` or `common/`.
 
-Before making any changes, please:
+## Good places to start
 
-1. Open a new issue discussing your proposed change.
-2. Fork the repository and create your branch from **`dev`** — all contributions are based on `dev`, not `main`.
+**DNS resolvers** — the resolver list lives in `api/data/dns-resolvers.js`, a
+country-annotated data file written for exactly this kind of PR (the header
+comment documents the entry shape and rules, and `tests/dns-resolvers-data.test.js`
+checks your entry). Adding a well-known public resolver — especially from a
+country not yet represented — is a one-object change; the UI groups results
+by country automatically.
 
-### Setting Up Your Environment
+**Connectivity test sites & lists** — curated site lists live in
+`frontend/data/connectivity-import-lists.js`. Each member needs a committed 64px PNG
+icon at `public/favicons/<id>.png`, but you normally don't source it yourself: run
+`pnpm test` locally and the data test auto-downloads any missing icons (also
+runnable directly as `pnpm fetch-favicons`). Only if auto-fetch can't find a usable
+PNG do you hand-source one (on macOS, `sips` handles ICO→PNG). Remember to commit
+the PNGs with your change — CI stays offline and only checks they exist.
 
-To set up the development environment for this project, you'll need to:
+**Translations** — improvements to the existing `en` / `zh` / `fr` / `ru` packs are
+welcome. Adding a whole new locale is heavier than it looks (every future copy change
+must land in it too), so please open an issue to discuss before starting one.
 
-1. Install Node.js, Vite, and Vue3.
-2. Clone the repository.
-3. Run `pnpm install` to install dependencies.
-4. Follow the instructions for Docker and Vercel deployment in our documentation if necessary.
+## Bugs & feature requests
 
-### Testing
+Use the issue templates in [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) —
+one for bug reports (include terminal / browser console logs) and one for feature
+requests. For general questions, GitHub Issues is also the right place; there are
+no chat channels.
 
-Ensure that all tests pass and, if applicable, add new tests for your changes. Run `pnpm test` to execute tests.
+## Testing
 
-### Pull Request Guidelines
+- Specs live in `tests/` and run with `pnpm test` (Node's built-in test runner).
+- Non-visual logic — pure functions, composables, transforms, validators — ships with
+  a spec in the same PR. Tests never hit real upstreams (the one exception: the
+  connectivity data test may download missing favicons on local runs, never in CI).
+- UI rendering and browser APIs are out of scope for the Node runner; visual changes
+  are verified by the maintainer during review, so mention in your PR what to look at.
 
-When you're ready to submit your changes:
+## Code of Conduct
 
-1. **Open your pull request against the `dev` branch — not `main`.** `main` only receives release merges from `dev`, so any PR targeting `main` will be asked to retarget.
-2. Rebase your branch onto the latest `dev` before submitting.
-3. Keep one concern per PR — don't bundle unrelated changes (e.g. a feature plus a dev-environment tweak) into the same pull request.
-4. Ensure your changes adhere to the coding standards and guidelines, with a clear description of what you changed.
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating,
+you agree to uphold it.
 
-### Code Review Process
+---
 
-The project maintainers will review your pull request. They might request changes or provide feedback before merging.
-
-### Community and Support
-
-Join our community channels (link your channels here) for support and discussions.
-
-## Thank You! 👏
-
-Your contributions are what make this community great. We appreciate your efforts in making this project better!
+Thank you for making MyIP better! Every contribution — a one-line fix, a new
+resolver, a better translation — is appreciated.
