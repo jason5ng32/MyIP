@@ -59,8 +59,12 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-.
+reported privately to the maintainer using GitHub's
+[private report form](https://github.com/jason5ng32/MyIP/security/advisories/new)
+— it reaches only the maintainer; start the report with "Code of Conduct" so it
+isn't triaged as a security issue. Behavior that violates
+[GitHub's own terms](https://github.com/contact/report-abuse) can also be
+reported to GitHub directly.
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

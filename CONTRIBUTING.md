@@ -98,8 +98,10 @@ ships as `beta` until it's complete. Full walkthrough: **[TRANSLATING.md](TRANSL
 
 Use the issue templates in [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) —
 one for bug reports (include terminal / browser console logs) and one for feature
-requests. For general questions, GitHub Issues is also the right place; there are
-no chat channels.
+requests. Questions, setup help, and "is this a bug?" go to
+[Discussions → Q&A](https://github.com/jason5ng32/MyIP/discussions/categories/q-a)
+instead — see [SUPPORT.md](SUPPORT.md). Security vulnerabilities go through the
+private channel in [SECURITY.md](SECURITY.md), never a public issue.
 
 ## Testing
 
