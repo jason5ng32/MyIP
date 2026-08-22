@@ -12,20 +12,18 @@
 
 <script setup>
 // Shared shell for every read-only report section: the section's usual site
-// title on the left, its test timestamp (viewer's locale) on the right.
+// title on the left, its test timestamp (app locale) on the right.
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Card, CardContent } from '@/components/ui/card';
 import { SECTION_TITLE_KEYS } from '@/utils/report-export.js';
+import { isoToDateTime } from '@/utils/time-utils.js';
 
 const props = defineProps({
     sectionId: { type: String, required: true },
     testedAt: { type: String, default: '' },
 });
 
-const { t } = useI18n();
-const testedAtDisplay = computed(() => {
-    const stamp = Date.parse(props.testedAt);
-    return Number.isNaN(stamp) ? '' : new Date(stamp).toLocaleString();
-});
+const { t, locale } = useI18n();
+const testedAtDisplay = computed(() => isoToDateTime(props.testedAt, locale.value));
 </script>

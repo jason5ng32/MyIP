@@ -11,6 +11,8 @@ import { fileURLToPath } from 'node:url';
 import {
     IMPORT_LISTS,
     BUILTIN_FAVICONS,
+    DEFAULT_LIST_MEMBERS,
+    SYSTEM_IMPORT_LIST,
     TILE_PREVIEW,
     faviconPath,
     CONNECTIVITY_TARGET_LIMIT,
@@ -41,9 +43,41 @@ describe('import lists data integrity', () => {
         assert.equal(new Set(ids).size, ids.length);
     });
 
-    it('member hostnames are unique across all lists (import dedupe assumes it)', () => {
-        const hosts = allMembers.map((m) => new URL(m.url).hostname);
-        assert.equal(new Set(hosts).size, hosts.length);
+    it('member hostnames are unique within each list (import dedupe is by hostname)', () => {
+        // Cross-list overlap is deliberate — themed lists stay semantically
+        // complete even where they intersect the defaults (AI ⊃ ChatGPT).
+        for (const list of IMPORT_LISTS) {
+            const hosts = list.members.map((m) => new URL(m.url).hostname);
+            assert.equal(new Set(hosts).size, hosts.length, list.id);
+        }
+    });
+
+    it('members shared with the defaults reuse the exact default definition', () => {
+        // Overlapping entries are references into DEFAULT_LIST_MEMBERS, so
+        // url / iconDomain can never drift between the two.
+        const defaults = new Map(DEFAULT_LIST_MEMBERS.map((m) => [m.id, m]));
+        let shared = 0;
+        for (const m of allMembers) {
+            if (!defaults.has(m.id)) continue;
+            assert.equal(m, defaults.get(m.id), m.id);
+            shared += 1;
+        }
+        assert.ok(shared > 0, 'expected some default members inside themed lists');
+    });
+
+    it('the system import list re-exposes the defaults under a non-clashing id', () => {
+        assert.equal(SYSTEM_IMPORT_LIST.members, DEFAULT_LIST_MEMBERS);
+        assert.ok(SYSTEM_IMPORT_LIST.emoji.length > 0);
+        assert.ok(!IMPORT_LISTS.some((l) => l.id === SYSTEM_IMPORT_LIST.id));
+    });
+
+    it('default list members are well-formed and favicon-backed', () => {
+        const ids = DEFAULT_LIST_MEMBERS.map((m) => m.id);
+        assert.equal(new Set(ids).size, ids.length);
+        for (const m of DEFAULT_LIST_MEMBERS) {
+            assert.equal(new URL(m.url).protocol, 'https:', m.id);
+            assert.ok(existsSync(faviconFile(m.id)), `missing public/favicons/${m.id}.png`);
+        }
     });
 
     it('every member URL is HTTPS and parseable', () => {

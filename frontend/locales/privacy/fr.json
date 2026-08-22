@@ -7,7 +7,7 @@
       "tools": {
         "title": "Comment fonctionnent les outils",
         "paragraphs": [
-          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs, sauf si vous créez explicitement un lien de rapport partageable (voir la section suivante).",
+          "La plupart de ce que les outils vous affichent — détails de votre IP, empreinte du navigateur, DNS, connectivité et résultats de test de débit — est calculé dans votre navigateur ou interrogé en direct et affiché à vous seul. Nous ne conservons pas ces résultats sur nos serveurs de manière accessible à d'autres, sauf si vous créez explicitement un lien de rapport partageable.",
           "Pour rechercher la géolocalisation d'une IP, l'IP interrogée est envoyée à des fournisseurs tiers (tels qu'ipinfo.io, ip-api.com et similaires). Ces recherches sont régies par la politique de confidentialité propre à chaque fournisseur."
         ]
       },
@@ -15,7 +15,7 @@
         "title": "La Terre en ligne",
         "paragraphs": [
           "Lors de votre visite, nous comptons une visite anonyme accompagnée de votre pays ou région, déduits de votre adresse IP sur notre réseau edge. L'IP elle-même n'est utilisée que de façon transitoire, l'adresse complète n'est jamais stockée.",
-          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué pendant au plus 48 heures, après quoi ces données sont supprimées automatiquement. Les statuts proviennent d'une liste fixe — aucune saisie libre."
+          "Si vous choisissez de partager un statut prédéfini, nous enregistrons l'identifiant du statut, votre pays ou région et le préfixe IP masqué ; ces données sont supprimées automatiquement en quelques jours. Les statuts proviennent d'une liste fixe — aucune saisie libre."
         ]
       },
       "sharedReports": {
@@ -24,6 +24,19 @@
           "Vous pouvez regrouper vos résultats de test dans un rapport de diagnostic et le partager. La création d'un lien de partage est toujours une action explicite — rien n'est envoyé automatiquement. Vous choisissez les tests à inclure et pouvez masquer la fin des adresses IP avant la création du lien.",
           "Lorsque vous créez un lien, les résultats sélectionnés sont stockés sur notre infrastructure serveur (Cloudflare Workers KV) afin que les personnes avec qui vous partagez le lien puissent l'ouvrir. Le rapport est supprimé automatiquement à la fin de la période de conservation choisie (1, 3 ou 7 jours). Les liens utilisent des identifiants aléatoires impossibles à deviner, nous ne tenons aucun répertoire des rapports existants, et toute personne disposant du lien peut consulter le rapport jusqu'à son expiration.",
           "Copier un rapport pour un assistant IA ou le télécharger en JSON se fait entièrement dans votre navigateur et ne stocke rien sur nos serveurs."
+        ]
+      },
+      "personaCheck": {
+        "title": "Vérification de persona approfondie",
+        "paragraphs": [
+          "La Vérification de persona approfondie envoie vos données à notre service de notation, qui les évalue par rapport au pays que vous avez choisi et vous renvoie le rapport noté. Ni ce que vous envoyez ni le rapport reçu ne sont conservés — sauf si vous choisissez explicitement de regrouper le résultat dans un lien de rapport partageable ; et même alors, seuls la note et le verdict de chaque vérification y figurent, jamais les valeurs qui les sous-tendent.",
+          "Ce qui accompagne une exécution :"
+        ],
+        "bullets": [
+          "Vos réglages de fuseau horaire et de langue, ainsi que la façon dont votre navigateur formate une date et un nombre d'exemple fixes.",
+          "Les systèmes d'écriture couverts par vos polices installées et vos voix de synthèse, ainsi que votre disposition de clavier — les résultats mêmes que le rapport vous montre. Les lire rend votre navigateur légèrement plus identifiable en général, ce qui est inhérent à cette mesure.",
+          "Les résultats déjà présents sur la page pour les tests IP, WebRTC et DNS.",
+          "Uniquement si vous les fournissez : votre position, arrondie à environ un kilomètre avant de quitter votre appareil et utilisée seulement pour en déduire un pays ; et les 6 à 8 premiers chiffres d'une carte de paiement. Ces chiffres identifient la banque émettrice, jamais votre compte, et ne permettent aucun paiement — ils sont vérifiés auprès d'une base tierce d'émetteurs de cartes."
         ]
       },
       "docsAssistant": {
@@ -48,11 +61,12 @@
       "account": {
         "title": "Ce que nous collectons lorsque vous vous connectez",
         "paragraphs": [
-          "La connexion est facultative — vous pouvez utiliser tous les outils du site sans compte. Nous utilisons Google Firebase Authentication pour gérer votre connexion et synchroniser vos succès. Lorsque vous êtes connecté, les éléments suivants sont collectés :"
+          "La connexion est facultative — vous pouvez utiliser la plupart des outils du site sans compte. La connexion n'est pas un moyen de vous facturer, ni aujourd'hui ni demain : elle nous est nécessaire pour empêcher les abus du service. Nous utilisons Google Firebase Authentication pour gérer votre connexion et synchroniser vos succès. Lorsque vous êtes connecté, les éléments suivants sont collectés :"
         ],
         "bullets": [
           "Votre adresse e-mail de connexion, utilisée pour identifier votre compte afin de fournir les fonctionnalités nécessitant une connexion.",
-          "Votre nombre d'utilisations des fonctionnalités avancées, utilisé pour calculer vos succès."
+          "Votre nombre d'utilisations des fonctionnalités avancées, utilisé pour détecter les abus malveillants.",
+          "À la fin de chaque période de comptabilisation, les journaux d'analyse des abus de chaque utilisateur connecté, le cas échéant, sont effacés automatiquement ; seuls les totaux d'utilisation sont conservés."
         ]
       },
       "telemetry": {
@@ -71,7 +85,7 @@
       "why": {
         "title": "Pourquoi nous les collectons",
         "analytics": "Nous utilisons les données d'analyse pour comprendre l'utilisation du site et améliorer l'expérience utilisateur. Ces données ne servent pas à vous identifier personnellement et ne sont jamais vendues.",
-        "account": "Les données de votre compte (e-mail et nombre d'utilisations des fonctionnalités avancées) servent uniquement à identifier votre compte, à fournir les fonctionnalités nécessitant une connexion et à calculer vos succès. Nous ne les utilisons pas à des fins publicitaires et ne les vendons jamais.",
+        "account": "Les données de votre compte (e-mail et nombre d'utilisations des fonctionnalités avancées) servent uniquement à identifier votre compte, à fournir les fonctionnalités nécessitant une connexion. Nous ne les utilisons pas à des fins publicitaires et ne les vendons jamais.",
         "telemetry": "La télémétrie d'erreurs et de performance sert uniquement à détecter et corriger les défauts. Elle n'est jamais utilisée à des fins publicitaires ni pour vous suivre sur d'autres sites, et elle est supprimée automatiquement après une courte période de conservation."
       },
       "cookies": {

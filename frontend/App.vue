@@ -1,13 +1,13 @@
 <template>
-  <!-- Thin app shell: only the globals that must exist on every route live
-       here (tooltip context, toast host, PWA install prompt, theme). The
-       homepage and the standalone tool pages are swapped in via <router-view>. -->
-  <TooltipProvider :delay-duration="150">
-    <router-view />
-    <Alert />
-    <DocsAssistant />
-    <PWA v-if="offerPwaInstall" />
-  </TooltipProvider>
+    <!-- Thin app shell: only the globals that must exist on every route live
+    here (tooltip context, toast host, PWA install prompt, theme). The
+    homepage and the standalone tool pages are swapped in via <router-view>. -->
+    <TooltipProvider :delay-duration="150">
+        <router-view />
+        <Alert />
+        <DocsAssistant />
+        <PWA v-if="offerPwaInstall" />
+    </TooltipProvider>
 </template>
 
 <script setup>
@@ -20,9 +20,10 @@ import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
 
-// PWA install prompt — async and eligibility-gated: ineligible visits (first
-// visit, prompt cap reached, already installed) never load pwa-install or
-// trigger its manifest fetch; eligible ones load it at the prompt's 30s mark.
+// PWA install prompt — async and eligibility-gated: ineligible visits (too
+// few 12h-deduped uses, prompt cap reached, already installed) never load
+// pwa-install or trigger its manifest fetch; eligible ones load it at the
+// prompt's 30s mark.
 const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 const offerPwaInstall = ref(false);
 onMounted(() => {
@@ -35,6 +36,7 @@ onMounted(() => {
 });
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
+import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
 // The standalone pages (/tools/:slug, /privacy) carry their own header, so they
 // drop the homepage's fixed-Nav body padding (see the `body.jn-standalone-page`
@@ -84,6 +86,11 @@ useAchievementEngine();
 // Report collector: keeps the latest schema-shaped snapshot of every finished
 // test for the shareable diagnostic report.
 useReportCollector();
+
+// Persona collector: same bus, different consumer — keeps the normalized
+// snapshots the Persona Check cross-references, so opening the tool costs no
+// re-run of tests the visitor already went through.
+useAppPersonaCollector();
 </script>
 
 <style scoped></style>

@@ -18,6 +18,20 @@ import { REPORT_SECTION_IDS, REPORT_VERSION, validateReport } from '../common/re
 const t = (key, params) => (params ? `${key}[${Object.values(params).join(',')}]` : key);
 
 const makeSections = () => ({
+    persona: {
+        testedAt: '2026-07-14T08:20:00.000Z',
+        country: 'JP',
+        grade: 'C',
+        score: 72,
+        counts: {
+            total: 18, scored: 12, match: 9, mismatch: 2,
+            unnatural: 0, leak: 1, unknown: 3, notApplicable: 3,
+        },
+        results: [
+            { id: 'ip-country', axis: 'match', verdict: 'match' },
+            { id: 'gps-location', axis: 'leak', verdict: 'leak' },
+        ],
+    },
     ipinfo: {
         testedAt: '2026-07-14T08:00:00.000Z',
         cards: [{ source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', city: 'LA', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google' }],
@@ -113,6 +127,21 @@ describe('reportToMarkdown', () => {
         maskTail,
         locale: 'en',
         origin: 'ipcheck.ing',
+    });
+
+    it('renders the persona section as verdicts, carrying no detail values', () => {
+        const report = buildShareReport({
+            sections: makeSections(),
+            selectedIds: ['persona'],
+            maskTail: false,
+            locale: 'en',
+            origin: 'ipcheck.ing',
+        });
+        const md = reportToMarkdown(report, t);
+        assert.ok(md.includes('| ip-country | match | match |'));
+        assert.ok(md.includes('| gps-location | leak | leak |'));
+        assert.ok(md.includes('grade: C'));
+        assert.ok(md.includes('score: 72/100'));
     });
 
     it('renders heading, intro, per-section blocks and the closing instruction', () => {

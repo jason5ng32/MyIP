@@ -7,14 +7,23 @@
     "SignInToView": "Connectez-vous pour voir",
     "SignInToUse": "Connectez-vous pour utiliser",
     "InvalidUserToken": "Token utilisateur non valide",
+    "QuotaExceeded": "Vous avez épuisé le quota mensuel gratuit de cette fonctionnalité. Il sera réinitialisé automatiquement le mois prochain.",
+    "QuotaSponsorCta": "Sponsoriser nous",
+    "ViewUsage": "Voir l'utilisation",
+    "Usage": {
+      "Title": "Statistiques d'utilisation",
+      "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC). Les données IP avancées ne comptent que les IP uniques — interroger à nouveau une IP déjà consultée ce mois-ci ne consomme pas de quota.",
+      "IpinfoFeature": "Données IP avancées (IP uniques)",
+      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels."
+    },
     "MyAchievements": "Succès",
     "Fields": {
       "User": "Utilisateur",
       "CreatedAt": "Créé Le",
       "LastLogin": "Dernière Connexion",
       "Level": "Niveau d'Utilisateur",
-      "FunctionUses": "Utilisation des Avancées",
-      "Fetching": "Recherche..."
+      "Fetching": "Recherche...",
+      "SignInMethods": "Connexion"
     },
     "Level": {
       "Standard": "Utilisateur Standard",
@@ -24,17 +33,38 @@
       "HonoraryMember": "Membre Honoraire"
     },
     "Benefits": {
-      "Title": "Avantages Utilisateurs",
-      "Benefit": "Avantage",
-      "Note1": "En tant que produit open-source, l'utilisation de IPCheck.ing est gratuite.",
-      "Note2": "Cependant, afin de prévenir les abus, nous limitons certaines fonctionnalités. En vous connectant, vous obtiendrez les avantages suivants :",
-      "Benefit1": "Lorsque vous utilisez IPCheck.ing comme source de données IP, tous les champs sont affichés intégralement",
-      "Benefit2": "Peut utiliser le test d'invisibilité",
-      "Benefit3": "Peut utiliser le test de fuite DNS en profondeur",
-      "Benefit4": "Peut voir les badges de réussite qu'il a obtenus",
-      "Benefit5": "Peut poser des questions à IPilot, notre assistant IA",
-      "Benefit6": "Réduit les restrictions d'accès à certaines fonctionnalités",
-      "FootNote": "D'autres avantages sont en cours de développement..."
+      "Title": "Avantages et utilisation",
+      "Benefit": "Avantages",
+      "Note1": "En tant que produit open source, IPCheck.ing est gratuit. Sa maintenance demande des efforts et des coûts considérables.",
+      "Note2": "Pour assurer la pérennité du projet et éviter les abus, certaines fonctionnalités avancées nécessitent une connexion. Chaque utilisateur connecté dispose d'un quota mensuel largement suffisant — s'il ne vous suffit pas, envisagez de nous sponsoriser pour obtenir des limites plus élevées.",
+      "Current": "Actuel",
+      "Tiers": {
+        "Visitor": {
+          "Name": "Visiteurs",
+          "Item1": "Recherche d'IP avec comparaison multi-sources",
+          "Item2": "Tests de connectivité et de disponibilité des services",
+          "Item3": "Tests de fuite WebRTC / DNS",
+          "Item4": "Test de vitesse, latence mondiale et MTR",
+          "Item5": "Whois, résolveur DNS et autres outils avancés",
+          "Item6": "Aucune inscription requise — open source et auto-hébergeable"
+        },
+        "SignedIn": {
+          "Name": "Utilisateurs connectés",
+          "Item1": "Tous les avantages des visiteurs",
+          "Item2": "Consultez les données IP avancées : score de qualité, détection de proxy, type de réseau et nativité",
+          "Item3": "Utilisez le test d'invisibilité",
+          "Item4": "Utilisez le test approfondi de fuite DNS",
+          "Item5": "Consultez vos badges de succès",
+          "Item6": "Interrogez IPilot, notre assistant IA",
+          "Item7": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé chaque mois"
+        },
+        "Sponsor": {
+          "Name": "Sponsors",
+          "Item1": "Tous les avantages des utilisateurs connectés",
+          "Item2": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
+          "Item3": "Soutenez le développement continu de ce projet open source"
+        }
+      }
     },
     "Achievements": {
       "Title": "Succès",
@@ -340,8 +370,7 @@
     "ShowAll": "Afficher tout",
     "ShowUnchecked": "Afficher les éléments non cochés",
     "ShowIgnored": "Afficher les éléments ignorés",
-    "ShowChecked": "Afficher les éléments cochés",
-    "Loading": "Chargement..."
+    "ShowChecked": "Afficher les éléments cochés"
   },
   "curl": {
     "Title": "API de ligne de commande",
@@ -514,6 +543,275 @@
       "negative": "Aucune preuve de votre utilisation d'un proxy ou d'un VPN n'a été trouvée lors de l'analyse de haute latence."
     }
   },
+  "personacheck": {
+    "Title": "Vérification de persona approfondie",
+    "Note": "Un vieux test dit : si ça ressemble à un canard, nage comme un canard et cancane comme un canard, c'est probablement un canard. Les sites vous lisent de la même façon — votre IP peut prétendre que vous êtes dans le pays A, mais votre fuseau horaire, vos langues, vos polices installées, votre clavier et une dizaine d'autres signaux racontent chacun leur propre histoire, et c'est leur ensemble qui forme le persona qu'un site voit réellement. Cet outil mesure ce persona, le compare au résident local que vous voulez incarner et montre précisément où les deux divergent.",
+    "NoteVs": "Il répond à une autre question que le test d'invisibilité : celui-ci vérifie si votre proxy peut être détecté ; ici, il s'agit de savoir qui les sites croient voir — et à quelle distance ce portrait se trouve de celui que vous pensez présenter.",
+    "Note2": "Commencez par choisir le pays dont vous voulez avoir l'air d'être un habitant.",
+    "axis": {
+      "match": "Concordance avec la cible",
+      "coherence": "Cohérence interne",
+      "leak": "Fuite d'identité"
+    },
+    "zone": {
+      "expected": "Identité attendue",
+      "optional": "Signaux plus précis (facultatif)",
+      "run": "Lancer la vérification"
+    },
+    "selectCountry": "Rechercher un pays",
+    "noCountryMatch": "Aucun pays correspondant",
+    "noProfile": "Ce territoire n'a aucun profil local auquel se comparer.",
+    "languageSingle": "Ce pays n'a qu'une seule langue principale.",
+    "languageMulti": "Ce pays a plusieurs langues — choisissez celle que vous voulez présenter.",
+    "timezoneMulti": "Ce pays s'étend sur plusieurs fuseaux horaires — choisissez celui que vous voulez présenter.",
+    "hourCycle": {
+      "h11": "cycle de 12 heures (0–11)",
+      "h12": "cycle de 12 heures",
+      "h23": "cycle de 24 heures",
+      "h24": "cycle de 24 heures (1–24)"
+    },
+    "runCompare": "Lancer la vérification",
+    "runError": "La vérification n'a pas pu aboutir.",
+    "profile": {
+      "timezone": "Fuseau horaire"
+    },
+    "source": {
+      "ipinfo": "Recherche IP",
+      "webrtc": "WebRTC",
+      "dnsleak": "Fuite DNS"
+    },
+    "report": {
+      "grade": {
+        "A": "🎉 Vous avez tout d'un habitant du pays ({country})",
+        "B": "😊 Vous ressemblez un peu à un habitant du pays ({country})",
+        "C": "🤔 Vous ne ressemblez pas vraiment à un habitant du pays ({country})",
+        "D": "😅 Vous ne ressemblez pas à un habitant du pays ({country})",
+        "unknown": "🤷 Signal insuffisant pour noter"
+      },
+      "gradeNote": {
+        "A": "Tous les signaux lisibles concordent avec le persona choisi.",
+        "B": "Le persona tient globalement, mais quelques signaux pointent ailleurs.",
+        "C": "Plusieurs signaux contredisent le persona, ou se contredisent entre eux — les résultats ci-dessous montrent lesquels.",
+        "D": "La plupart des signaux pointent ailleurs que vers ce persona.",
+        "unknown": "Lancez d'abord les tests sous-jacents — il y a trop peu d'éléments."
+      },
+      "counts": {
+        "leak": "{n} exposition(s)",
+        "warning": "{n} incohérence(s)",
+        "match": "{n} conforme(s)",
+        "unknown": "{n} non mesurée(s)",
+        "notApplicable": "{n} non applicable(s)"
+      },
+      "nothingActionable": "Rien à corriger — tous les signaux mesurables correspondent au persona.",
+      "howToFix": "Comment corriger",
+      "verdict": {
+        "match": "Conforme au persona.",
+        "mismatch": "Contredit le persona.",
+        "leak": "Expose votre environnement réel.",
+        "unnatural": "Incohérent en interne — deux signaux censés concorder racontent des histoires différentes, ce qui attire plus l'attention qu'un simple écart.",
+        "unknown": "Non mesurable pour le moment.",
+        "not-applicable": "Aucune conclusion possible ici."
+      },
+      "visibility": {
+        "public": "N'importe quel site le voit",
+        "probed": "Les sites qui le sondent",
+        "risk-engine": "Systèmes anti-fraude"
+      },
+      "profileTitle": "Détails des mesures",
+      "state": {
+        "match": "Conforme",
+        "mismatch": "Pas local",
+        "unnatural": "Incohérent",
+        "leak": "Exposé",
+        "unknown": "Non mesuré",
+        "not-applicable": "N/A"
+      }
+    },
+    "reason": {
+      "no-marker-script": "Pas de système d'écriture distinctif",
+      "bin-lookup-failed": "Le service de recherche de cartes était injoignable — les chiffres sont peut-être corrects ; réessayez plus tard.",
+      "bin-not-recognized": "La base de cartes n'a pas reconnu ce préfixe — une faute de frappe en est la cause la plus fréquente ; vérifiez les chiffres et relancez.",
+      "font-probe-unavailable": "Canvas indisponible",
+      "no-voice-packs": "Aucun pack vocal installé",
+      "keyboard-api-unavailable": "Non exposé par ce navigateur",
+      "no-layout-expectation": "Aucune disposition attendue pour ce pays",
+      "no-persona-languages": "Aucune langue définie pour le persona",
+      "geolocation-unsupported": "Géolocalisation non prise en charge",
+      "ip-no-country": "La recherche d'IP n'a renvoyé aucun pays",
+      "ip-no-type": "Aucune source n'a indiqué le type de réseau",
+      "ip-no-timezone": "Aucune source n'a indiqué de fuseau horaire",
+      "webrtc-no-candidates": "WebRTC n'a produit aucun candidat",
+      "dns-no-country": "Aucun résolveur n'a pu être localisé"
+    },
+    "detail": {
+      "expected": "Attendu",
+      "actual": "Observé",
+      "disputed": "Sources en désaccord",
+      "v4": "IPv4",
+      "v6": "IPv6",
+      "candidateCount": "Candidats",
+      "matching": "Conformes à l'attendu",
+      "ipType": "Type d'adresse",
+      "expectedOffset": "Décalage attendu",
+      "actualOffset": "Décalage observé",
+      "sameOffset": "Même décalage",
+      "primary": "Langue principale",
+      "primaryExpected": "Principale attendue",
+      "demoted": "Présente mais pas en tête",
+      "timeZone": "Fuseau horaire",
+      "reportedOffset": "Décalage selon Date",
+      "zoneOffset": "Décalage selon le fuseau",
+      "samples": "Échantillons",
+      "expectedScripts": "Systèmes attendus",
+      "installedScripts": "Systèmes installés",
+      "expectedLanguages": "Langues attendues",
+      "voiceLanguages": "Langues des voix",
+      "voiceCount": "Voix",
+      "expectedLayout": "Disposition attendue",
+      "actualLayout": "Disposition observée",
+      "headerPrimary": "Langue principale de l'en-tête",
+      "scriptPrimary": "Langue principale du script",
+      "headerLanguages": "Langues de l'en-tête",
+      "ipZone": "Fuseau de l'IP",
+      "browserZone": "Fuseau du navigateur",
+      "ipOffset": "Décalage de l'IP",
+      "browserOffset": "Décalage du navigateur",
+      "colo": "PoP Cloudflare",
+      "gpsTimezone": "Fuseau de votre position",
+      "accuracyMetres": "Précision (m)",
+      "cardIssuer": "Banque émettrice",
+      "cardNetwork": "Réseau de carte",
+      "cardTier": "Gamme de carte",
+      "cardType": "Type de carte"
+    },
+    "checks": {
+      "ip-country": {
+        "title": "Pays de l’IP",
+        "fix": "Une partie de vos sorties se trouve hors du pays visé — avec plusieurs sorties de proxy, des cartes différentes peuvent réellement afficher des pays différents, et chaque sortie est ce que verra tel ou tel site. Les fractions ci-dessus indiquent combien de sorties concordent. Faites tout passer par des nœuds du pays visé ; si une seule source diverge sur une IP, le nœud est peut-être simplement mal étiqueté dans sa base, ce qui n'est pas corrigeable de votre côté.",
+        "what": "Dans quel pays les cartes IP de la page d'accueil situent votre adresse de sortie — chaque source est lue, et chaque sortie doit se trouver dans le pays visé."
+      },
+      "webrtc-leak": {
+        "title": "Exposition WebRTC",
+        "fix": "Bloquez WebRTC, ou utilisez une configuration où il ne peut voir que l'adresse du proxy. Le coût est réel : les appels vidéo et la visioconférence cessent de fonctionner. Une extension qui filtre WebRTC est plus douce qu'une désactivation totale, mais l'extension elle-même laisse ses propres traces.",
+        "what": "Si WebRTC divulgue une adresse située dans un autre pays que votre persona."
+      },
+      "dns-resolver-country": {
+        "title": "Pays du résolveur DNS",
+        "fix": "Utilisez un résolveur situé dans le pays visé, ou laissez le proxy gérer la résolution DNS. Notez qu'un résolveur public comme 1.1.1.1 n'exposera pas votre position, mais ne soutiendra pas non plus votre persona : il est neutre pour tous les pays.",
+        "what": "Dans quel pays se trouvent les résolveurs DNS qui répondent pour vous."
+      },
+      "asn-type": {
+        "title": "Type d'adresse",
+        "fix": "Une plage de centre de données est le signal « ceci est un proxy » le plus bruyant qu'une adresse puisse porter. Une sortie résidentielle corrige le problème, mais coûte nettement plus cher et sa qualité varie beaucoup.",
+        "what": "Si votre adresse relève d'un FAI résidentiel ou d'une plage de centre de données."
+      },
+      "timezone-vs-persona": {
+        "title": "Fuseau horaire et persona",
+        "fix": "Changez le fuseau horaire au niveau du système d'exploitation : toutes les API du navigateur restent alors cohérentes entre elles. Les extensions qui forcent le fuseau n'en modifient souvent qu'une partie, créant les contradictions signalées par les vérifications de cohérence — ce qui est pire que de ne rien changer.",
+        "what": "Si le fuseau horaire de votre navigateur est celui qu'aurait un habitant."
+      },
+      "language-match": {
+        "title": "Langue du navigateur",
+        "fix": "Changez la langue dans les réglages du système ou du navigateur plutôt que de réécrire un seul en-tête HTTP. L'ordre compte aussi : les sites lisent toute la liste, et un habitant place rarement une langue étrangère en tête.",
+        "what": "Si la langue que votre navigateur place en tête est celle d'un habitant."
+      },
+      "script-fonts": {
+        "title": "Polices du système d'écriture",
+        "fix": "Une machine configurée pour cette région embarque les polices de ce système d'écriture. Les installer à la main est possible mais rarement utile : cela change un signal alors que le reste du système demeure dans sa langue d'origine, ce qui crée généralement plus de contradictions que cela n'en résout. Si ce point doit tenir, c'est la langue du système qu'il faut changer.",
+        "what": "Si les polices du système d'écriture de ce pays sont installées sur la machine."
+      },
+      "speech-voices": {
+        "title": "Voix de synthèse vocale",
+        "fix": "Les packs de synthèse vocale suivent la langue d'installation du système, et pratiquement aucun proxy ni extension de falsification n'y touche. Ajouter un pack vocal pour la langue visée est une vraie correction, avec la même réserve que pour les polices : un seul signal modifié dans un système par ailleurs inchangé paraît délibéré.",
+        "what": "Quelles langues couvrent les packs de synthèse vocale de votre système."
+      },
+      "keyboard-layout": {
+        "title": "Disposition du clavier",
+        "fix": "Votre disposition physique de clavier ne correspond pas à celle du pays visé. Seuls les navigateurs Chromium l'exposent, le signal est donc plus étroit que les autres — mais là où il est lisible, il est difficile à falsifier sans changer le clavier lui-même.",
+        "what": "Quelle disposition physique de clavier votre machine déclare."
+      },
+      "edge-geo-consensus": {
+        "title": "Géolocalisation en périphérie",
+        "fix": "La lecture que Cloudflare fait de votre adresse de sortie diffère du pays visé. Quand cette vérification et la recherche IP se contredisent, l'adresse est plus probablement mal étiquetée dans une base que réellement déplacée — mais tout site derrière Cloudflare voit ce verdict-ci, pas l'autre.",
+        "what": "La lecture propre à Cloudflare de votre adresse de sortie, indépendante des bases ci-dessus."
+      },
+      "accept-language-header": {
+        "title": "En-tête de langue vs script",
+        "fix": "L'en-tête Accept-Language envoyé par votre navigateur ne correspond pas à ce que navigator.languages rapporte aux scripts. Presque rien ne produit cela, hormis une extension qui a réécrit l'un en laissant l'autre. Changez plutôt la langue dans les réglages du navigateur ou du système : les deux suivront ensemble.",
+        "what": "Si l'en-tête de langue envoyé sur le réseau correspond à ce qui est dit aux scripts. Volontairement indépendant du pays visé : réussir dit seulement que vos deux canaux de langue concordent — savoir si la langue elle-même convient relève de la vérification « Langue du navigateur ». Les falsifications de langue à moitié appliquées échouent précisément ici."
+      },
+      "ip-timezone-vs-browser": {
+        "title": "Fuseau de l’IP vs navigateur",
+        "fix": "Le fuseau horaire de votre IP de sortie et celui que rapporte votre navigateur désignent deux endroits différents. Cela vaut quel que soit le pays visé : une vraie machine se trouve quelque part, et les deux devraient désigner ce même endroit. En général, le proxy a déplacé votre adresse mais pas l'horloge de votre système.",
+        "what": "Si le fuseau de votre IP et celui rapporté par le navigateur concordent."
+      },
+      "gps-location": {
+        "title": "Position de l'appareil (GPS)",
+        "fix": "Votre appareil se déclare physiquement dans un autre pays que celui visé. Aucun proxy n'y touche : tout site qui demande votre position obtient la vraie réponse, et les extensions qui la falsifient laissent généralement intactes la précision et la temporisation. Les options réalistes : refuser l'autorisation de localisation aux sites qui la demandent, ou accepter que ce point ne tienne pas.",
+        "what": "Dans quel pays votre appareil se déclare physiquement."
+      },
+      "payment-region": {
+        "title": "Pays émetteur de la carte",
+        "fix": "Votre carte a été émise dans un autre pays que celui dont vous vous réclamez. Les marchands voient le pays émetteur avant presque tout le reste, et les systèmes de risque le comparent étroitement à l'adresse et à l'IP. Il n'existe pas de correctif côté navigateur — c'est une propriété de la carte elle-même.",
+        "what": "Quel pays a émis la carte correspondant au préfixe saisi."
+      },
+      "intl-number-format": {
+        "title": "Format numérique",
+        "what": "Comment votre navigateur groupe les chiffres et marque les décimales.",
+        "fix": "Votre navigateur groupe les nombres selon sa propre région, pas selon celle du pays visé. C'est distinct de la langue : une machine peut porter la bonne balise de langue alors que sa région désigne encore ailleurs. Changez la région — et pas seulement la langue — dans les réglages système : « Région » sous Windows, « Langue et région » sous macOS."
+      },
+      "intl-date-format": {
+        "title": "Format de date",
+        "what": "L'ordre et les séparateurs employés par votre navigateur pour écrire une date.",
+        "fix": "Votre navigateur écrit les dates dans un ordre ou avec des séparateurs différents de ceux d'un habitant. Comme le format numérique, cela suit la région du système et non la langue : c'est la région qu'il faut changer."
+      },
+      "intl-hour-cycle": {
+        "title": "Format d'heure",
+        "what": "Si votre navigateur présente une horloge de 12 ou de 24 heures — la convention que voient les sites quand ils formatent l'heure.",
+        "fix": "Le format d'heure suit la langue du navigateur, pas l'interrupteur « 24 heures » du système — la plupart des navigateurs ignorent complètement ce réglage (Safari est la principale exception). Pour présenter la convention du pays visé, passez la langue ou la région du navigateur sur une locale de ce pays."
+      },
+      "timezone-authenticity": {
+        "title": "Authenticité du fuseau horaire",
+        "what": "Si le fuseau horaire annoncé par votre navigateur est bien celui de la machine.",
+        "fix": "Le fuseau annoncé n'est pas celui sur lequel tourne réellement la machine : Intl et Date se contredisent, ou les dates passées ne suivent pas les règles d'heure d'été de ce fuseau. C'est important parce que la vérification de fuseau ci-dessus a donc validé une valeur qui n'est pas réelle — un site qui lit l'horloge directement s'en aperçoit. Réglez le fuseau dans votre système d'exploitation plutôt qu'avec une extension : le décalage courant et les règles historiques suivront ensemble."
+      }
+    },
+    "optional": {
+      "gpsNote": "La position GPS est l'une des dimensions que la vérification peut mesurer — partagez-la si vous voulez qu'elle soit comparée aussi.",
+      "gpsButton": "Partager ma position",
+      "gpsGranted": "Position reçue.",
+      "gpsFailed": {
+        "denied": "Autorisation refusée — cette vérification sera non mesurée.",
+        "timeout": "La demande de position a expiré.",
+        "unavailable": "Votre appareil n'a pas pu déterminer de position.",
+        "unsupported": "Ce navigateur ne prend pas en charge la géolocalisation."
+      },
+      "cardNote": "Parfois, vous voulez aussi payer comme un local. Saisissez les 6 à 8 premiers chiffres de votre carte : la vérification dira si la carte passe pour émise dans ce pays.",
+      "cardError": "6 à 8 chiffres requis — saisissez-en au moins 6 pour identifier la banque émettrice.",
+      "cardReady": "Préfixe prêt — le pays émetteur est recherché au moment de la vérification."
+    },
+    "dependencies": {
+      "note": "La vérification a besoin des résultats de tous ces tests de base — lancez d'abord ceux qui manquent :",
+      "runButton": "Lancer les tests manquants",
+      "runButtonRunning": "Tests en cours…",
+      "measured": "{n} sur {total} mesurées",
+      "allReady": "Tous les tests ont été lancés"
+    },
+    "step": {
+      "country": "Pays visé",
+      "language": "Langue principale",
+      "location": "Position",
+      "card": "Préfixe de carte",
+      "awaitingCountry": "Choisissez d'abord un pays",
+      "otherTests": "Tests de base"
+    },
+    "emptyHint": "Choisissez le pays dont vous voulez avoir l'air d'être un habitant, puis lancez la vérification.",
+    "readyHint": "Prêt. Lancez la vérification pour voir à quel point vous passez pour un habitant.",
+    "value": {
+      "yes": "Oui",
+      "no": "Non"
+    }
+  },
   "censorshipcheck": {
     "Title": "Test de censure",
     "Note": "Consultez, à partir des données ouvertes du réseau mondial de volontaires OONI, dans quels pays/régions un site a été bloqué ou perturbé au cours des 30 derniers jours — et par quels moyens. Vous pouvez ensuite vérifier les régions suspectes avec un test en temps réel Globalping. Dans certains pays, la censure est clairement définie par la loi, tandis que dans d'autres elle est plus floue.",
@@ -566,7 +864,8 @@
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
-    "SecurityChecklist": "Guide pour sécuriser votre vie numérique"
+    "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
+    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant"
   },
   "macchecker": {
     "Title": "Recherche MAC",
@@ -734,7 +1033,8 @@
         "ruletest": "IP de sortie observées en accédant à 8 points de test — plusieurs IP distinctes signifient que le trafic est réparti sur différentes routes (règles de proxy, par ex.).",
         "browserinfo": "Navigateur, système et environnement d'affichage de l'appareil testé.",
         "invisibility": "Scores de détection proxy/VPN (0-100, plus haut = plus probablement détecté) avec les signaux de détection déclenchés.",
-        "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd)."
+        "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd).",
+        "persona": "À quel point le navigateur correspond à un habitant du pays choisi : une note globale et le verdict de chaque vérification. Verdicts uniquement — les valeurs sous-jacentes ne sont volontairement pas stockées dans un rapport partagé."
       }
     }
   },
@@ -795,6 +1095,7 @@
     "qualityScore": "Qualité IP",
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
+    "advancedQuotaCta": "Quota mensuel de nouvelles IP épuisé",
     "ASNInfo": {
       "trafficPercentage": "Pourcentage de trafic : ",
       "note": "Données associées à cet AS : ",
@@ -914,7 +1215,9 @@
       "NameRequired": "Veuillez saisir un nom.",
       "UrlRequired": "Veuillez saisir une URL.",
       "InvalidUrl": "Cela ne ressemble pas à une URL valide.",
-      "LimitReached": "Limite de 60 tests atteinte."
+      "LimitReached": "Limite de 60 tests atteinte.",
+      "LastTargetTitle": "Suppression impossible",
+      "LastTargetMessage": "Au moins un site de test doit rester."
     },
     "importDialog": {
       "Title": "Ajouter / importer des tests",
@@ -922,14 +1225,15 @@
       "ImportOption": "Importer une liste",
       "SiteCount": "{n} sites",
       "Import": "Importer",
-      "RemoveList": "Retirer cette liste",
       "Capacity": "{used}/{limit} utilisés",
       "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants."
     },
     "importLists": {
+      "defaults": "Sites par défaut",
       "iran": "Essentiels Iran",
       "russia": "Essentiels Russie",
       "china": "Essentiels Chine",
+      "brazil": "Essentiels Brésil",
       "ai": "Services IA",
       "social": "Réseaux sociaux",
       "streaming": "Streaming",
@@ -937,6 +1241,7 @@
       "developer": "Développeurs",
       "cloud": "Cloud et CDN",
       "crypto": "Plateformes crypto",
+      "ecommerce": "E-commerce mondial",
       "news": "Actualités"
     }
   },
@@ -1075,7 +1380,9 @@
     "SignInFailed": "Echec de connexion",
     "SignInFailedReason": "Raison",
     "IpGeoSourceFallbackTitle": "Source de géolocalisation IP changée",
-    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}."
+    "IpGeoSourceFallbackMessage": "{from} est momentanément indisponible — ce résultat provient temporairement de {to}.",
+    "SignInEmailTakenTitle": "Cette adresse e-mail est déjà utilisée",
+    "SignInEmailTakenMessage": "Un compte existe déjà pour cette adresse e-mail. Veuillez vous connecter avec {other}."
   },
   "shortcutKeys": {
     "GoToTop": "Aller en haut",
@@ -1109,8 +1416,8 @@
     "EnhancedDnsLeakTest": "Ouvrir le Test de fuite DNS approfondi",
     "MacChecker": "Ouvrir le Recherche de MAC",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
-    "fullScreenAdvancedTools": "Outils avancés en plein écran",
-    "SecurityChecklist": "Ouvrir la Liste de sécurité"
+    "SecurityChecklist": "Ouvrir la Liste de sécurité",
+    "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie"
   },
   "page": {
     "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",
@@ -1126,22 +1433,32 @@
   },
   "about": {
     "Title": "À propos",
-    "product1": "IPCheck.ing est une boîte à outils IP gratuite qui vous aide à vérifier vos informations IP, tester la disponibilité des sites web, examiner les informations de sortie DNS, effectuer des tests de vitesse, des tests de latence mondiale, des tests MTR, et plus encore.",
-    "product2": "Il s'agit d'un projet open-source, et vous pouvez consulter le code source en cliquant sur l'icône GitHub en bas de la page.",
-    "product3": "Au départ, il s'agissait d'un projet personnel pour moi afin d'apprendre Vue.js et comment écrire du code en utilisant AI. Au fil du temps, il a gagné en popularité sur GitHub, j'ai donc effectué beaucoup de refactoring et ajouté de nombreuses fonctionnalités utiles. J'espère que vous l'apprécierez.",
-    "meTitle": "À propos de moi",
-    "me1": "Je m'appelle Jason Ng, également connu sous le nom d'Achán en ligne. Je ne suis pas un programmeur professionnel, mais j'adore coder, l'open-source et le partage.",
-    "me2": "La plupart du temps, je travaille en tant que chef de produit, blogueur, motard et geek.",
-    "me3": "Vous pouvez trouver une présentation plus détaillée à mon sujet dans le lien suivant :",
-    "contactTitle": "Contactez-moi",
-    "contact": "Si vous avez des questions ou des suggestions, veuillez me contacter par email : jason[AT]kenengba.com.",
+    "project": [
+      "IPCheck.ing est une boîte à outils IP tout-en-un et gratuite : elle vous aide à consulter vos informations IP, à tester la disponibilité des sites web, à examiner les informations de sortie DNS, à mesurer votre débit, à tester la latence mondiale, à lancer des tests MTR, et bien plus encore.",
+      "Il s'agit d'un projet open source : cliquez sur l'icône GitHub en bas de la page pour consulter le code source.",
+      "Si vous ne comprenez pas comment utiliser une fonctionnalité, ouvrez le « Centre d'aide » en bas de la page. Notre documentation est très détaillée : en plus de présenter chaque fonctionnalité, elle vous aide à comprendre les différents concepts réseau et à diagnostiquer vos problèmes de connexion.",
+      "Si vous souhaitez participer au projet open source, cliquez sur le bouton « Contribuer au code » en bas de la page pour découvrir comment faire."
+    ],
+    "founderTitle": "À propos du fondateur",
+    "founder": [
+      "Au départ, ce n'était qu'un projet personnel de Jason Ng (阿禅), qui voulait apprendre Vue.js et apprendre à écrire du code avec l'IA. Le projet gagnant de plus en plus d'étoiles sur GitHub, il l'a largement refactorisé et lui a ajouté de nombreuses fonctionnalités très utiles. Nous espérons qu'il vous plaira.",
+      "Il n'est pas programmeur professionnel : la plupart du temps, il est chef de produit, blogueur, motard et geek. Mais il adore coder, l'open source et le partage.",
+      "Vous trouverez une présentation plus détaillée de son parcours dans les liens ci-dessous :"
+    ],
+    "contactTitle": "Nous contacter",
+    "contact": [
+      "Si vous rencontrez un problème en utilisant IPCheck.ing ou en déployant le projet MyIP, commencez par chercher la réponse dans le « Centre d'aide ». Si vous ne la trouvez pas et que vous restez bloqué, ouvrez une issue sur GitHub ou écrivez-nous par email.",
+      "Et si vous tombez sur un bug et que vous aimez coder (ou coder avec l'IA), n'hésitez surtout pas à nous envoyer directement une PR avec votre correctif.",
+      "Notre email : i[AT]ipcheck.ing."
+    ],
     "personal": "Site personnel",
-    "blog": "Mon blog",
+    "blog": "Articles de blog",
     "linkedIn": "LinkedIn",
     "twitter": "Twitter",
     "Sponsor": "Nous soutenir",
     "Privacy": "Confidentialité",
     "HelpCenter": "Centre d'aide",
+    "Contribute": "Contribuer au code",
     "Close": "Fermer"
   },
   "acknowledgement": {
@@ -1153,5 +1470,9 @@
     "add": "Ajouté",
     "improve": "Amélioré",
     "fix": "Corrigé"
+  },
+  "pwa": {
+    "appDescription": "La boîte à outils IP tout-en-un",
+    "installDescription": "Vous avez déjà utilisé IPCheck.ing {count} fois — installez-le comme application pour une expérience plus fluide et un accès plus rapide."
   }
 }

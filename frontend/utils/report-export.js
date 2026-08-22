@@ -21,6 +21,7 @@ export const SECTION_TITLE_KEYS = {
     browserinfo: 'browserinfo.Title',
     invisibility: 'invisibilitytest.Title',
     enhanceddnsleak: 'enhanceddnsleaktest.Title',
+    persona: 'personacheck.Title',
 };
 
 // Assemble the envelope from collected snapshots. Sections keep homepage
@@ -164,6 +165,20 @@ const SECTION_RENDERERS = {
         ]),
         mdTable(['signal', 'flagged'], section.flags.map((f) => [f.key, f.flagged])),
     ].join('\n'),
+    persona: (section) => [
+        kvLines([
+            ['targetCountry', section.country],
+            ['grade', section.grade],
+            ['score', section.score === null ? '—' : `${section.score}/100`],
+            ['scored', `${section.counts.scored}/${section.counts.total}`],
+            ['match', section.counts.match],
+            ['mismatch', section.counts.mismatch],
+            ['unnatural', section.counts.unnatural],
+            ['leak', section.counts.leak],
+        ]),
+        mdTable(['check', 'axis', 'verdict'],
+            section.results.map((r) => [r.id, r.axis, r.verdict])),
+    ].join('\n'),
     enhanceddnsleak: (section) => [
         kvLines([
             ['rawCount', section.rawCount],
@@ -184,6 +199,9 @@ export const reportToMarkdown = (report, t, { masked = false } = {}) => {
     const lines = [
         `# ${t('report.ai.Heading')}`,
         '',
+        // generatedAt stays a raw ISO instant even inside localized prose:
+        // the reader is an AI, and ISO is unambiguous and timezone-explicit
+        // where a localized date+time would drop the zone.
         t('report.ai.Intro', { origin: report.origin, time: report.generatedAt }),
     ];
     if (masked) lines.push('', t('report.ai.Masked'));

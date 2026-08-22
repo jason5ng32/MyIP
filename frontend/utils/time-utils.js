@@ -151,19 +151,43 @@ export const formatDuration = (ms, locale) => {
 /* Absolute dates                                                      */
 /* ------------------------------------------------------------------ */
 
-// Localized numeric date ("1/1/2024" / "2024/1/1") from a Unix millisecond
-// timestamp, in the browser's own locale and zone.
-export const unixToDateTime = (timestamp) => {
-    const date = new Date(Number(timestamp));
-    return date.toLocaleString(undefined, {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-    });
+// Localized absolute date ("Jan 1, 2024" / "2024年1月1日") from a Unix
+// millisecond timestamp (number or numeric string), rendered in the viewer's
+// own zone. `locale` is the app UI language; omitted → browser locale. '' for
+// an unusable timestamp.
+export const unixToDateTime = (timestamp, locale) => {
+    // Number(null) / Number('') coerce to 0 — treat "no data" as unusable, not epoch.
+    if (timestamp == null || timestamp === '') return '';
+    const ms = Number(timestamp);
+    if (!Number.isFinite(ms)) return '';
+    try {
+        return new Intl.DateTimeFormat(locale || undefined, { dateStyle: 'medium' })
+            .format(new Date(ms));
+    } catch {
+        return '';
+    }
+};
+
+// Localized date + time ("Aug 15, 2026, 3:04 PM" / "2026年8月15日 15:04") from
+// an ISO 8601 instant (anything Date.parse accepts), rendered in the viewer's
+// own zone — the shared report's generated / expiry / per-section stamps.
+// '' for a missing or unparseable input.
+export const isoToDateTime = (iso, locale) => {
+    const ms = Date.parse(iso ?? '');
+    if (!Number.isFinite(ms)) return '';
+    try {
+        return new Intl.DateTimeFormat(locale || undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        }).format(ms);
+    } catch {
+        return '';
+    }
 };
 
 // Localized absolute date ("Nov 6, 2020" / "2020年11月6日") from an ISO
-// "YYYY-MM-DD" string, used by the changelog. Formatted in UTC so the calendar
+// "YYYY-MM-DD" string — the changelog and every date-only ISO surface
+// (OONI windows, IP-history day headers). Formatted in UTC so the calendar
 // date never shifts a day for west-of-UTC viewers; non-ISO strings (the
 // changelog's "Beta" placeholder) pass through untouched.
 export const formatIsoDate = (isoDate, locale) => {

@@ -1,15 +1,21 @@
-// Tests for the Connectivity import-list logic
-// (frontend/utils/connectivity-import.js): import planning (dedupe + cap),
-// list removal, and imported-list detection.
+// Tests for frontend/utils/connectivity-import.js: initial build, import
+// planning, the "fully present" check, and removal with its guard.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+    buildInitialTargets,
+    sanitizeTargets,
     planImport,
-    importedListIds,
-    withoutList,
+    isListFullyPresent,
+    removeTarget,
 } from '../frontend/utils/connectivity-import.js';
-import { CONNECTIVITY_TARGET_LIMIT } from '../frontend/data/connectivity-import-lists.js';
+import {
+    CONNECTIVITY_TARGET_LIMIT,
+    DEFAULT_LIST_MEMBERS,
+} from '../frontend/data/connectivity-import-lists.js';
+
+const target = (id, host = `${id}.example`) => ({ id, name: id, url: `https://${host}/favicon.ico` });
 
 const sampleList = {
     id: 'sample',
@@ -20,9 +26,63 @@ const sampleList = {
     ],
 };
 
+describe('buildInitialTargets', () => {
+    it('seeds the defaults plus legacy targets, dropping provenance tags', () => {
+        const legacy = [
+            { id: 'custom-1', name: 'Probe', url: 'https://probe.example/health' },
+            { id: 'import-ozon', name: 'Ozon', url: 'https://www.ozon.ru/favicon.ico', listId: 'russia', favicon: '/favicons/ozon.png' },
+        ];
+        const targets = buildInitialTargets(legacy);
+        assert.equal(targets.length, DEFAULT_LIST_MEMBERS.length + 2);
+        // Defaults carry their committed favicon.
+        const github = targets.find((m) => m.id === 'github');
+        assert.equal(github.favicon, '/favicons/github.png');
+        // Legacy entries keep their favicon but lose the listId tag.
+        const ozon = targets.find((m) => m.id === 'import-ozon');
+        assert.equal(ozon.favicon, '/favicons/ozon.png');
+        assert.equal('listId' in ozon, false);
+    });
+
+    it('never drops legacy sites, even past the cap', () => {
+        const legacy = Array.from({ length: CONNECTIVITY_TARGET_LIMIT }, (_, i) => target(`custom-${i}`));
+        const targets = buildInitialTargets(legacy);
+        assert.equal(targets.length, DEFAULT_LIST_MEMBERS.length + CONNECTIVITY_TARGET_LIMIT);
+    });
+});
+
+describe('sanitizeTargets', () => {
+    it('passes a well-formed stored set through untouched', () => {
+        const stored = [target('a'), target('b')];
+        assert.deepEqual(sanitizeTargets(stored, []), stored);
+    });
+
+    it('drops junk entries but keeps the valid rest', () => {
+        const good = target('a');
+        const result = sanitizeTargets([good, null, { id: 42 }, { name: 'no-url' }], []);
+        assert.deepEqual(result, [good]);
+    });
+
+    it('reseeds the defaults when both stored and legacy are emptied', () => {
+        const result = sanitizeTargets([], []);
+        assert.deepEqual(result.map((m) => m.id), DEFAULT_LIST_MEMBERS.map((m) => m.id));
+    });
+
+    it('reseeds defaults + legacy when only the stored set is emptied', () => {
+        const legacy = [target('custom-1')];
+        const result = sanitizeTargets([], legacy);
+        assert.equal(result.length, DEFAULT_LIST_MEMBERS.length + 1);
+        assert.equal(result.at(-1).id, 'custom-1');
+    });
+
+    it('treats non-array values (missing key, corruption) as empty', () => {
+        assert.equal(sanitizeTargets(null, undefined).length, DEFAULT_LIST_MEMBERS.length);
+        assert.equal(sanitizeTargets('junk', { not: 'an array' }).length, DEFAULT_LIST_MEMBERS.length);
+    });
+});
+
 describe('planImport', () => {
-    it('materializes members as preference entries tagged with the list id', () => {
-        const { additions, skippedCount, overflowCount } = planImport(sampleList, {});
+    it('materializes members with import ids and favicons', () => {
+        const { additions, skippedCount, overflowCount } = planImport(sampleList, []);
         assert.equal(additions.length, 3);
         assert.equal(skippedCount, 0);
         assert.equal(overflowCount, 0);
@@ -30,26 +90,22 @@ describe('planImport', () => {
             id: 'import-alpha',
             name: 'Alpha',
             url: 'https://alpha.example/favicon.ico',
-            listId: 'sample',
             favicon: '/favicons/alpha.png',
         });
     });
 
-    it('skips members whose hostname already exists (built-in or custom)', () => {
-        const { additions, skippedCount } = planImport(sampleList, {
-            existingUrls: [
-                'https://www.beta.example/some/other/path.ico',
-                'https://unrelated.example/favicon.ico',
-            ],
-        });
+    it('skips members whose hostname is already present', () => {
+        const { additions, skippedCount } = planImport(sampleList, [
+            target('x', 'www.beta.example'),
+            target('y', 'unrelated.example'),
+        ]);
         assert.deepEqual(additions.map((a) => a.id), ['import-alpha', 'import-gamma']);
         assert.equal(skippedCount, 1);
     });
 
     it('refuses a partial import when the list does not fully fit (all-or-nothing)', () => {
-        const { additions, overflowCount, freshCount, capacity } = planImport(sampleList, {
-            currentCount: CONNECTIVITY_TARGET_LIMIT - 1,
-        });
+        const existing = Array.from({ length: CONNECTIVITY_TARGET_LIMIT - 1 }, (_, i) => target(`m${i}`));
+        const { additions, overflowCount, freshCount, capacity } = planImport(sampleList, existing);
         assert.equal(additions.length, 0);
         assert.equal(overflowCount, 2);
         assert.equal(freshCount, 3);
@@ -57,52 +113,39 @@ describe('planImport', () => {
     });
 
     it('imports in full when the list exactly fits the remaining capacity', () => {
-        const { additions, overflowCount } = planImport(sampleList, {
-            currentCount: CONNECTIVITY_TARGET_LIMIT - 3,
-        });
+        const existing = Array.from({ length: CONNECTIVITY_TARGET_LIMIT - 3 }, (_, i) => target(`m${i}`));
+        const { additions, overflowCount } = planImport(sampleList, existing);
         assert.equal(additions.length, 3);
         assert.equal(overflowCount, 0);
     });
 
-    it('adds nothing when the cap is already reached', () => {
-        const { additions, overflowCount } = planImport(sampleList, {
-            currentCount: CONNECTIVITY_TARGET_LIMIT,
-        });
+    it('an over-cap set (legacy migration) can only shed, never gain', () => {
+        const existing = Array.from({ length: CONNECTIVITY_TARGET_LIMIT + 5 }, (_, i) => target(`m${i}`));
+        const { additions, overflowCount, capacity } = planImport(sampleList, existing);
         assert.equal(additions.length, 0);
+        assert.equal(capacity, 0);
         assert.equal(overflowCount, 3);
     });
+});
 
-    it('counts only fresh members against capacity — deduped ones do not block', () => {
-        // 1 slot left, 2 of 3 members already present: the single fresh one fits.
-        const { additions, overflowCount, skippedCount } = planImport(sampleList, {
-            existingUrls: ['https://alpha.example/x', 'https://www.beta.example/x'],
-            currentCount: CONNECTIVITY_TARGET_LIMIT - 1,
-        });
-        assert.deepEqual(additions.map((a) => a.id), ['import-gamma']);
-        assert.equal(overflowCount, 0);
-        assert.equal(skippedCount, 2);
+describe('isListFullyPresent', () => {
+    it('is true when every member hostname exists in the target set', () => {
+        const targets = [target('x', 'alpha.example'), target('y', 'www.beta.example'), target('z', 'gamma.example')];
+        assert.equal(isListFullyPresent(sampleList, targets), true);
     });
 
-    it('ignores malformed existing URLs instead of throwing', () => {
-        const { additions } = planImport(sampleList, { existingUrls: ['not a url'] });
-        assert.equal(additions.length, 3);
+    it('is false while any member is missing', () => {
+        assert.equal(isListFullyPresent(sampleList, [target('x', 'alpha.example')]), false);
     });
 });
 
-describe('importedListIds / withoutList', () => {
-    const prefs = [
-        { id: 'custom-1', name: 'Mine', url: 'https://mine.example/favicon.ico' },
-        { id: 'import-alpha', listId: 'sample', url: 'https://alpha.example/favicon.ico' },
-        { id: 'import-yandex', listId: 'russia', url: 'https://yandex.ru/favicon.ico' },
-    ];
-
-    it('collects listIds from imported entries only', () => {
-        assert.deepEqual([...importedListIds(prefs)].sort(), ['russia', 'sample']);
+describe('removeTarget', () => {
+    it('removes the matching target', () => {
+        const { targets } = removeTarget([target('a'), target('b')], 'a');
+        assert.deepEqual(targets.map((m) => m.id), ['b']);
     });
 
-    it('removes every member of one list, keeps customs and other lists', () => {
-        const left = withoutList(prefs, 'sample');
-        assert.deepEqual(left.map((t) => t.id), ['custom-1', 'import-yandex']);
+    it('refuses to remove the last remaining target', () => {
+        assert.equal(removeTarget([target('a')], 'a').error, 'last-target');
     });
 });
-

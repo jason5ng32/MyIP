@@ -121,12 +121,14 @@
       padding-top: calc(env(safe-area-inset-top) + 3.5rem);
     }
 
-    /* Standalone tool pages (/tools/:slug) have their own in-flow sticky header
-       instead of the homepage's fixed Nav, so they must not reserve the 3.5rem
-       Nav height — only the iOS safe-area inset. App.vue toggles this class on
-       the standalone route. */
+    /* Standalone pages (/tools/:slug, /privacy, /r/:id) have their own in-flow
+       sticky header instead of the homepage's fixed Nav, and that header carries
+       the iOS safe-area inset as its own padding (StandalonePageHeader.vue) so
+       it keeps clearing the Dynamic Island once sticky pins it to the viewport
+       top. The body therefore reserves nothing here. App.vue toggles this class
+       on the standalone routes. */
     body.jn-standalone-page {
-      padding-top: env(safe-area-inset-top);
+      padding-top: 0;
     }
 
     html {

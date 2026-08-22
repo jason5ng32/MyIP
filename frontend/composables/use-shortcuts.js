@@ -8,19 +8,24 @@
 //   - userPreferences: computed(() => store.userPreferences)
 //
 // Output:
-//   - loadShortcuts(): should be called onMounted, internally will delay 2s to wait for configs to load,
-//     then register all mappings and pass keyMap to helpModalRef (for help modal)
+//   - loadShortcuts(): should be called onMounted; registers all mappings
+//     immediately and passes keyMap to helpModalRef (for help modal).
+//     Config-gated keys fill in reactively when /api/configs lands
 //
 // Note:
 //   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug)
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
+//   - every entry here is a home-page action. Overlays (Dialog / Sheet /
+//     Drawer) suspend the whole map while they are open — see
+//     utils/shortcut.js — so nothing needs a per-key "is something covering
+//     the page?" check.
 
-import { watch } from 'vue';
+import { getCurrentScope, onScopeDispose, watch } from 'vue';
 import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
-import { mappingKeys, keyMap, navigateCards } from '../utils/shortcut.js';
+import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
-import { isPulseEnabled } from '../utils/pulse-beacon.js';
+import { hasPulseBackend } from '../utils/pulse-beacon.js';
 
 const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     const {
@@ -34,7 +39,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         webRTCRef,
         dnsLeaksRef,
         isInfosLoaded,
-        isToolOpen,
         toggleInfoMask,
     } = refs;
 
@@ -155,16 +159,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         { keys: 'W', action: () => goToAdvancedTool('whois', 'Whois'), description: t('shortcutKeys.Whois') },
         { keys: 'v', action: () => goToAdvancedTool('servicestatus', 'ServiceStatus'), description: t('shortcutKeys.ServiceStatus') },
         {
-            keys: 'f',
-            action: () => {
-                if (isToolOpen.value) {
-                    advancedToolsRef.value.fullScreen();
-                    trackEvent('ShortCut', 'ShortCut', 'FullScreen');
-                }
-            },
-            description: t('shortcutKeys.fullScreenAdvancedTools'),
-        },
-        {
             keys: 'q',
             // Async components (see Home.vue): ref is null until the chunk
             // lands, so these actions optional-chain instead of throwing.
@@ -219,9 +213,16 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             action: () => goToAdvancedTool('enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
             description: t('shortcutKeys.EnhancedDnsLeakTest'),
         });
+        // Uppercase P: lowercase `p` belongs to Earth Online.
+        config.push({
+            keys: 'P',
+            action: () => goToAdvancedTool('personacheck', 'PersonaCheck'),
+            description: t('shortcutKeys.PersonaCheck'),
+        });
     }
 
-    if (isPulseEnabled) {
+    // Mirrors the Earth Online entry's visibility (widgets/Pulse.vue).
+    if (hasPulseBackend || configs.value.cloudFlare) {
         config.push({
             keys: 'p',
             action: () => {
@@ -236,27 +237,46 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
 };
 
 export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
+    // Suspending the map behind an overlay is the primitives' job
+    // (composables/use-overlay-shortcuts.js), so nothing is wired here.
+    //
+    // Home is the only route that registers shortcuts; drop them when it
+    // unmounts, so keystrokes on /privacy or /r/:id can't reach refs that no
+    // longer point at anything.
+    let disposed = false;
+    if (getCurrentScope()) {
+        onScopeDispose(() => {
+            disposed = true;
+            registerShortcuts([]);
+        });
+    }
+
     const registerShortcutKeys = () => {
-        const shortcuts = buildShortcutConfig({ refs, store, t, configs, userPreferences });
-        shortcuts.forEach((entry) => mappingKeys(entry));
+        registerShortcuts(buildShortcutConfig({ refs, store, t, configs, userPreferences }));
     };
 
     const loadShortcuts = () => {
-        setTimeout(() => {
-            registerShortcutKeys();
-            // Help is an async component (Home.vue): on slow networks its
-            // chunk may land after this timer, so wait for the ref instead
-            // of silently skipping the keyMap hand-off.
-            if (refs.helpModalRef.value) {
-                refs.helpModalRef.value.keyMap = keyMap;
-            } else {
-                const stop = watch(refs.helpModalRef, (help) => {
-                    if (!help) return;
-                    help.keyMap = keyMap;
-                    stop();
-                });
-            }
-        }, 2000);
+        // Register immediately so the base keys work from the first paint;
+        // config-gated keys (originalSite's i/D/P, pulse's p) fill in when
+        // /api/configs lands (`{}` → data, once per page load) and the watcher
+        // rebuilds the map. keyMap is mutated in place (utils/shortcut.js),
+        // so the help modal's reference stays current across rebuilds.
+        registerShortcutKeys();
+        watch(configs, () => {
+            if (!disposed) registerShortcutKeys();
+        });
+        // Help is an async component (Home.vue): on slow networks its chunk
+        // may land later, so wait for the ref instead of silently skipping
+        // the keyMap hand-off.
+        if (refs.helpModalRef.value) {
+            refs.helpModalRef.value.keyMap = keyMap;
+        } else {
+            const stop = watch(refs.helpModalRef, (help) => {
+                if (!help) return;
+                help.keyMap = keyMap;
+                stop();
+            });
+        }
     };
 
     return { loadShortcuts };

@@ -1594,5 +1594,65 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.4.0",
+    "date": "2026-08-22",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "New tool: In-depth Persona Check — see how much of what sites read agrees with the country you want to be taken for",
+          "zh": "新增工具：深度画像检测——看看网站能读到的信息，有多少和你想被当成的国家对得上",
+          "fr": "Nouvel outil : Vérification de persona approfondie — voyez dans quelle mesure ce que lisent les sites correspond au pays pour lequel vous voulez passer",
+          "ru": "Новый инструмент: углублённая проверка портрета — насколько то, что видят сайты, совпадает со страной, за жителя которой вы хотите себя выдавать"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Connectivity: preset sites are now removable, plus new Global E-commerce and Brazil Essentials import lists",
+          "zh": "网络连通性测试可删除预设网站、新增国际电商平台、巴西常用网站导入列表",
+          "fr": "Connectivité : les sites prédéfinis sont désormais supprimables, avec de nouvelles listes importables « E-commerce mondial » et « Essentiels Brésil »",
+          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлены импортируемые списки «Электронная коммерция» и «Бразилия: основные»"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity: multi-round test results now render as beautiful latency bars",
+          "zh": "使用精美的柱状图展示多次刷新模式下的网络连通性测试结果",
+          "fr": "Connectivité : les résultats des tests multi-passes s'affichent désormais en élégantes barres de latence",
+          "ru": "Проверка доступности: результаты многократных тестов теперь отображаются изящными столбиками задержки"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized multiple user experience",
+          "zh": "优化了多个地方的用户体验",
+          "fr": "Optimisation de l'expérience utilisateur dans plusieurs endroits",
+          "ru": "Оптимизация пользовательского опыта в нескольких местах"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Optimized date display in multiple places",
+          "zh": "优化多处日期格式显示",
+          "fr": "Optimisation de l'affichage des dates dans plusieurs endroits",
+          "ru": "Оптимизация отображения дат в нескольких местах"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "fr": "Correction de petits problèmes",
+          "ru": "Исправлены некоторые проблемы"
+        }
+      }
+    ]
   }
 ]

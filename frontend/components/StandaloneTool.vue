@@ -4,6 +4,11 @@
        component the drawer does, just inside a minimal page chrome instead of
        the homepage + drawer. -->
   <div class="flex min-h-screen flex-col">
+    <!-- User system dialogs host (Benefits & Usage) — the sign-in gated tools
+         link to it from their quota hints, and it fetches the user's usage
+         snapshot so their frontend quota gate works here too. -->
+    <User />
+
     <!-- Slim header: brand → home, current tool breadcrumb, back link. -->
     <StandalonePageHeader :title="tool ? `${tool.emoji} ${t(tool.titleKey)}` : ''" />
 
@@ -30,13 +35,27 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import User from '@/components/User.vue';
+import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 
-const tool = computed(() => TOOL_BY_SLUG.get(route.params.slug) || null);
-const toolComponent = computed(() => (tool.value ? defineAsyncComponent(tool.value.component) : null));
+// noStandalone tools are blacklisted from this page entirely — they depend on
+// homepage state, so the drawer on the homepage is their only home.
+const registered = TOOL_BY_SLUG.get(route.params.slug) || null;
+const tool = computed(() => (registered && !registered.noStandalone ? registered : null));
+
+// The skeleton covers the chunk download — same treatment as the homepage
+// drawer; `delay` keeps fast loads flash-free.
+const toolComponent = computed(() => (tool.value
+    ? defineAsyncComponent({
+        loader: tool.value.component,
+        loadingComponent: ToolLoadingSkeleton,
+        delay: 200,
+    })
+    : null));
 
 // Per-tool head: localized title + description, self-referential canonical.
 useDocumentMeta(() => {
@@ -48,6 +67,11 @@ useDocumentMeta(() => {
   };
 });
 
-// Unknown slug → bounce to the homepage rather than show an empty shell.
-if (!tool.value) router.replace('/');
+// Unknown slug → bounce to the homepage rather than show an empty shell; a
+// blacklisted tool keeps its destination by reopening as the homepage drawer.
+if (!tool.value) {
+    router.replace(registered?.noStandalone
+        ? { path: '/', query: { tool: registered.slug } }
+        : '/');
+}
 </script>

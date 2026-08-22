@@ -25,6 +25,7 @@ describe('DEFAULT_PREFERENCES', () => {
       ipHistoryEnabled: true,
       ipHistoryDays: 90,
       lang: 'auto',
+      connectivityTargets: null,
       customConnectivityTargets: [],
     });
   });

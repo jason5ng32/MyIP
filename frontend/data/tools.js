@@ -32,6 +32,9 @@ export const ADVANCED_TOOLS = [
   { slug: 'servicestatus', emoji: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
   { slug: 'invisibilitytest', emoji: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresOriginalSite: true },
   { slug: 'enhanceddnsleaktest', emoji: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
+    // noStandalone: the check requires the homepage tests' results, and running
+  // them navigates home — a /tools/ page for it would immediately bounce away.
+  { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true, noStandalone: true },
 ];
 
 // Fast slug → entry lookup (drawer + standalone page resolve a tool by slug).

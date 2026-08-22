@@ -113,7 +113,7 @@ import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Award, CircleCheck, CircleX } from '@lucide/vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
@@ -132,7 +132,7 @@ const notAchievedList = computed(() =>
 const achievedCount = computed(() => achievedList.value.length);
 const notAchievedCount = computed(() => notAchievedList.value.length);
 
-const convertTime = (timestamp) => timestamp == null ? '' : unixToDateTime(timestamp);
+const convertTime = (timestamp) => timestamp == null ? '' : unixToDateTime(timestamp, locale.value);
 
 const isOpen = computed(() => store.openSheet === 'achievements');
 const onOpenChange = (val) => {

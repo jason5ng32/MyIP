@@ -7,7 +7,8 @@ Area-specific details: @frontend/AGENTS.md (Vue SPA) · @api/AGENTS.md (Express 
 
 **MyIP** (IPCheck.ing) is an open-source IP toolbox: IP lookup, connectivity
 tests, WebRTC / DNS-leak detection, speed test, MTR, Whois, security
-checklist, browser fingerprint, anonymity checks, and more. Single repo, two
+checklist, browser fingerprint, anonymity checks, persona check, and
+more. Single repo, two
 halves: a Vue 3 SPA front-end and an Express 5 back-end API.
 
 ## Stack
@@ -77,7 +78,9 @@ use npm / yarn — they'd produce a competing lockfile.
 
 ### Comments
 
-- **Every new file opens with a header comment** stating its purpose.
+- **Every new file opens with a header comment** stating its purpose —
+  except `frontend/components/ui/`, which holds shadcn-vue CLI output kept
+  verbatim so it can be re-synced (see frontend/AGENTS.md).
 - **Large templates / functions carry block comments** per meaningful region.
 - **Comments describe the code as it is now** — no changelog narration
   (`previously…`, `…fixes that`); git history covers the past. A comment

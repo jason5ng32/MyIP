@@ -2,9 +2,11 @@
 // shadcn-vue Drawer 根组件：薄包装 vaul-vue DrawerRoot
 // 与 Sheet 不同：vaul 自带拖拽手势 + body scale（需配合 index.html 的 [vaul-drawer-wrapper]）
 // 用法：<Drawer :open="..." @update:open="..."> 或 v-model:open
+import { nextTick, watch } from 'vue';
 import { DrawerRoot } from 'vaul-vue';
+import { useOverlayShortcuts } from '@/composables/use-overlay-shortcuts.js';
 
-defineProps({
+const props = defineProps({
   open: { type: Boolean, default: undefined },
   modal: { type: Boolean, default: true },
   // 'top' | 'bottom' | 'left' | 'right'，默认 bottom
@@ -31,6 +33,23 @@ defineProps({
   handleOnly: { type: Boolean, default: true },
 });
 defineEmits(['update:open', 'update:activeSnapPoint']);
+
+// Overlays suspend the page's keyboard shortcuts while open — see
+// composables/use-overlay-shortcuts.js.
+useOverlayShortcuts(() => props.open);
+
+// vaul-vue preventDefaults open-auto-focus (avoids the iOS keyboard). Blur
+// the trigger first so hideOthers can aria-hide #mainpart, then put focus
+// on the panel so Tab stays inside the drawer.
+watch(() => props.open, (isOpen) => {
+  if (!isOpen || typeof document === 'undefined') return;
+  const el = document.activeElement;
+  if (el instanceof HTMLElement && !el.closest('[data-vaul-drawer]')) el.blur();
+  nextTick(() => {
+    const panel = document.querySelector('[data-vaul-drawer]');
+    if (panel instanceof HTMLElement) panel.focus({ preventScroll: true });
+  });
+}, { flush: 'sync' });
 </script>
 
 <template>

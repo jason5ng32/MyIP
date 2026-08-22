@@ -15,9 +15,15 @@
         </RouterLink>
       </Button>
       <Button variant="link" size="default" as-child class="cursor-pointer">
-        <a :href="'https://docs.ipcheck.ing/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
-          @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
+        <a :href="'https://docs.ipcheck.ing/knowledge-base/'+(locale === 'en' ? '' : locale)" target="_blank"
+          rel="noopener" @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
           {{ t('about.HelpCenter') }}
+        </a>
+      </Button>
+      <Button variant="link" size="default" as-child class="cursor-pointer">
+        <a :href="'https://docs.ipcheck.ing/developer/'+(locale === 'en' ? '' : locale)" target="_blank" rel="noopener"
+          @click="trackEvent('Footer', 'FooterClick', 'Contribute')">
+          {{ t('about.Contribute') }}
         </a>
       </Button>
       <Button variant="link" size="default" @click="openAboutTab('changelog', 'Changelog')" class="cursor-pointer">
@@ -74,23 +80,19 @@
 
           <!-- Content area (independent scrolling) -->
           <div class="flex-1 overflow-y-auto px-5 py-5" ref="sheetBody">
-            <!-- About -->
+            <!-- About: sections come from aboutSections, each one's paragraphs an array
+                 in the locale file — adding or reordering copy is a locale-only edit. -->
             <TabsContent value="about" class="space-y-6 mt-0">
-              <section class="space-y-2">
-                <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
-                  {{ t(`about.product${i}`) }}
-                </p>
-              </section>
-
-              <section>
-                <h3 class="text-base font-semibold mb-2">{{ t('about.meTitle') }}</h3>
-                <div class="space-y-2 mb-3">
-                  <p v-for="i in 3" :key="i" class="text-sm leading-relaxed text-foreground/85">
-                    {{ t(`about.me${i}`) }}
+              <section v-for="section in aboutSections" :key="section.key">
+                <h3 v-if="section.titleKey" class="text-base font-semibold mb-2">{{ t(section.titleKey) }}</h3>
+                <div class="space-y-2" :class="section.links && 'mb-3'">
+                  <p v-for="(paragraph, idx) in tm(`about.${section.key}`)" :key="idx"
+                    class="text-sm leading-relaxed text-foreground/85">
+                    {{ rt(paragraph) }}
                   </p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Button v-for="link in personalLinks" :key="link.href" variant="outline" size="sm" as-child
+                <div v-if="section.links" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Button v-for="link in section.links" :key="link.href" variant="outline" size="sm" as-child
                     class="justify-start">
                     <a :href="link.href" target="_blank" rel="noopener">
                       <Compass />
@@ -99,11 +101,6 @@
                     </a>
                   </Button>
                 </div>
-              </section>
-
-              <section>
-                <h3 class="text-base font-semibold mb-2">{{ t('about.contactTitle') }}</h3>
-                <div class="text-sm leading-relaxed text-foreground/85" v-html="t('about.contact')"></div>
               </section>
             </TabsContent>
 
@@ -115,7 +112,8 @@
               <section v-for="(version, vi) in changelogReversed" :key="vi">
                 <header class="flex items-baseline justify-between mb-2">
                   <h3 class="text-lg font-semibold tracking-tight">{{ version.version }}</h3>
-                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale) }}</span>
+                  <span class="text-xs text-muted-foreground tabular-nums">{{ formatIsoDate(version.date, locale)
+                    }}</span>
                 </header>
                 <Separator class="mb-3" />
                 <ul class="space-y-2">
@@ -176,7 +174,7 @@ import { Separator } from '@/components/ui/separator';
 import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 
-const { t, locale } = useI18n();
+const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
@@ -195,6 +193,15 @@ const personalLinks = [
   { href: 'https://twitter.com/jason5ng32', labelKey: 'about.twitter' },
 ];
 
+// About tab layout: one entry per section, rendered in order. `key` names the
+// paragraph array under `about.` in the locale files; `titleKey` is omitted for
+// the lead-in section, and `links` appends a link grid under the paragraphs.
+const aboutSections = [
+  { key: 'project' },
+  { key: 'founder', titleKey: 'about.founderTitle', links: personalLinks },
+  { key: 'contact', titleKey: 'about.contactTitle' },
+];
+
 const acknowledgementsList = [
   { name: 'Setilis Hu', link: '' },
   { name: 'Seven Yu', link: 'https://github.com/dofy' },
@@ -202,6 +209,7 @@ const acknowledgementsList = [
   { name: 'Project Alexandria (Cloudflare)', link: 'https://www.cloudflare.com/lp/project-alexandria/' },
   { name: 'Cloudflare Speedtest', link: 'https://github.com/cloudflare/speedtest' },
   { name: 'DigitalOcean', link: 'https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge' },
+  { name: 'V.PS', link: 'https://v.ps/?utm_source=ipcheck.ing&utm_medium=acknowledgement&utm_campaign=footer' },
   { name: 'Sentry', link: 'https://www.sentry.io/' },
   { name: '1Password', link: 'https://www.1password.com/' },
   { name: 'Greptile', link: 'https://www.greptile.com/' },

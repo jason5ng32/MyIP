@@ -27,9 +27,12 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   ipHistoryEnabled: true,
   ipHistoryDays: 90,
   lang: 'auto', // auto | zh | en | fr | tr
-  // User-defined extra targets for the Connectivity test grid. Each entry:
-  //   { id: 'custom-<timestamp>', name: string, url: string-with-trailing-? }
-  // See ConnectivityTest.vue for how these are merged with the built-in list.
+  // The full Connectivity target set (defaults included). null until first
+  // load — store.loadPreferences() runs it through sanitizeTargets(), which
+  // also rebuilds a hand-emptied or corrupted stored value.
+  connectivityTargets: null,
+  // Legacy pre-connectivityTargets key. Read once by the build above, kept
+  // for rollback; never written.
   customConnectivityTargets: [],
 });
 

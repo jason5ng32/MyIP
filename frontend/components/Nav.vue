@@ -90,7 +90,7 @@
         <!-- Preferences — standalone cog only for Firebase-less self-hosted
              instances (no user menu to host it). With the user system on,
              preferences lives inside the user dropdown for every state. -->
-        <JnTooltip v-if="!isFireBaseSet" :text="t('shortcutKeys.Preferences')">
+        <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
           <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
             @click="OpenPreferences">
             <Cog />
@@ -103,8 +103,8 @@
             <!-- Not signed in: the solid block reads as the "sign in"
                  call-to-action, and the menu opens on the sign-in options, so
                  the affordance is self-explaining one click deep. -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo"
-              class="h-8 gap-1 px-1.5 cursor-pointer" aria-label="User menu">
+            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1.5 cursor-pointer"
+              aria-label="User menu">
               <UserRound class="size-5" />
               <ChevronDown class="opacity-60" />
             </Button>
@@ -145,11 +145,16 @@
                     <dt class="text-muted-foreground">{{ t('user.Fields.CreatedAt') }}</dt>
                     <dd class="font-medium">{{ userCreatedAt }}</dd>
                   </div>
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.FunctionUses') }}</dt>
-                    <dd class="font-medium">
-                      <span v-if="remoteUserInfoFetched">{{ remoteUserInfo.functionUses?.total ?? 0 }}</span>
-                      <span v-else class="text-muted-foreground">{{ t('user.Fields.Fetching') }}</span>
+                  <!-- How this account signs in. One account per email
+                       address, so this is also the only way in. -->
+                  <div v-if="linkedProviders.length" class="flex items-baseline justify-between gap-2">
+                    <dt class="text-muted-foreground">{{ t('user.Fields.SignInMethods') }}</dt>
+                    <dd class="flex min-w-0 items-center gap-1.5 font-medium">
+                      <span v-for="provider in linkedProviders" :key="provider.providerId"
+                        class="inline-flex items-center gap-1" :title="provider.label">
+                        <Icon v-if="provider.icon" :icon="provider.icon" class="size-3.5 shrink-0" />
+                        <span>{{ provider.label }}</span>
+                      </span>
                     </dd>
                   </div>
                 </dl>
@@ -291,7 +296,7 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const store = useMainStore();
 const router = useRouter();
 
@@ -345,9 +350,11 @@ const isFireBaseSet = computed(() => store.isFireBaseSet);
 const isSignedIn = computed(() => store.isSignedIn);
 const userName = computed(() => store.user?.displayName);
 const userPhotoURL = computed(() => store.user?.photoURL);
-const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt));
+const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt, locale.value));
 const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
+// Sign-in methods attached to this account.
+const linkedProviders = computed(() => store.linkedProviders);
 
 // Level Badge Color: mapped to semantic token, keep each level color distinction
 const levelBadgeClass = computed(() => {

@@ -83,6 +83,9 @@ const props = defineProps({
 const entry = computed(() => props.asnHistoryInfos[props.prefix]);
 const rows = computed(() => (entry.value && !entry.value.error) ? entry.value.history : null);
 
-// Compact YYYY-MM-DD — RIPEstat returns "2013-12-05T00:00:00", so slice is enough.
+// Compact YYYY-MM-DD — RIPEstat returns "2013-12-05T00:00:00", so slice is
+// enough. Deliberately NOT localized (unlike the rest of the app's dates):
+// these are dense two-per-row ranges aligned via tabular-nums, and only
+// fixed-width ISO keeps the columns lined up.
 const fmtDate = (iso) => (typeof iso === 'string' ? iso.slice(0, 10) : '—');
 </script>

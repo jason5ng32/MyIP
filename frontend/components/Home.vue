@@ -4,7 +4,7 @@
   <Achievements ref="achievementsRef" />
   <Preferences />
   <main id="mainpart" class="mx-auto w-full px-4 jn-container">
-    <div class="rounded-md" tabindex="0">
+    <div class="rounded-md">
       <IPCheck ref="IPCheckRef" />
       <Connectivity ref="connectivityRef" />
       <WebRTC ref="webRTCRef" />
@@ -60,7 +60,6 @@ const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));
 const HelpModal = defineAsyncComponent(() => import('./widgets/Help.vue'));
 const IPHistory = defineAsyncComponent(() => import('./widgets/IPHistory.vue'));
 const ShareReport = defineAsyncComponent(() => import('./report/ShareReportDialog.vue'));
-import { useRoute } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 
@@ -73,12 +72,8 @@ import { useDocumentMeta } from '@/composables/use-document-meta.js';
 
 const { t } = useI18n();
 const store = useMainStore();
-const route = useRoute();
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
-// A tool drawer is open iff the home route carries a `?tool=` query (set by
-// Advanced.vue). Drives the `f` fullscreen shortcut gate.
-const isToolOpen = computed(() => !!route.query.tool);
 
 // Template refs
 const userRef = ref(null);
@@ -113,7 +108,7 @@ const { loadShortcuts } = useShortcuts({
     refs: {
         queryIPRef, helpModalRef, shareReportRef,
         speedTestRef, advancedToolsRef, IPCheckRef, connectivityRef, webRTCRef, dnsLeaksRef,
-        isInfosLoaded, isToolOpen, toggleInfoMask,
+        isInfosLoaded, toggleInfoMask,
     },
     store, t, configs, userPreferences,
 });

@@ -35,6 +35,17 @@
             </div>
 
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
+
+            <!-- Monthly quota exhausted: not an error — explain + sponsor path. -->
+            <div v-if="quotaExceeded"
+                class="flex items-start gap-2 p-3 rounded-md border border-warning/30 bg-warning/10 text-sm text-warning">
+                <Hourglass class="size-4 mt-0.5 shrink-0" />
+                <span>
+                    {{ t('user.QuotaExceeded') }}
+                    <button type="button" class="underline underline-offset-2 cursor-pointer"
+                        @click="openUsageDialog">{{ t('user.ViewUsage') }}</button>
+                </span>
+            </div>
         </div>
 
         <!-- Result: Summary card + Detailed list -->
@@ -163,6 +174,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -171,14 +183,25 @@ import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
-import { CircleCheck, CircleX, Info, ListChecks, Lock, Shield, Play } from '@lucide/vue';
+import { CircleCheck, CircleX, Hourglass, Info, ListChecks, Lock, Shield, Play } from '@lucide/vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
+const route = useRoute();
+const router = useRouter();
+
+// Open the Benefits & Usage dialog. Inside the Advanced Tools drawer the
+// dialog would stack on top of it — close the drawer first (it's driven by
+// the ?tool query; standalone pages don't carry it, nothing to close).
+const openUsageDialog = () => {
+    if (route.query.tool) router.push({ path: '/', query: {} });
+    store.setTriggerUserBenefits(true);
+};
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');
+const quotaExceeded = ref(false);
 const testResults = ref({});
 const userID = ref('');
 const isAgreed = ref(false);
@@ -271,10 +294,18 @@ const removeScript = () => {
 let resultTimer = null;
 
 const onSubmit = () => {
+    // Frontend first line: the store's quota snapshot already knows the month
+    // is exhausted — skip the whole probe run (script load + 10s poll). The
+    // backend independently enforces the same limit (429) as the real guard.
+    if (store.quotaExceeded.invisibility_test) {
+        quotaExceeded.value = true;
+        return;
+    }
     checkingStatus.value = 'running';
     userID.value = generate28DigitString();
     trackEvent('Section', 'StartClick', 'InvisibilityTest');
     errorMsg.value = '';
+    quotaExceeded.value = false;
     testResults.value = {};
     loadScript();
     // Achievement rule (JustInCase) lives in data/achievement-rules.js.
@@ -313,6 +344,15 @@ const getResult = async () => {
         }
     } catch (error) {
         console.error('Error fetching InvisibilityTest results:', error);
+        // 429 passed through by the backend: monthly quota exhausted —
+        // retrying can't fix it, show the quota hint (with the sponsor path).
+        if (error.message.includes('quota_exceeded')) {
+            quotaExceeded.value = true;
+            store.markQuotaExhausted('invisibility_test');
+            checkingStatus.value = 'idle';
+            retryCount.value = 0;
+            return;
+        }
         // 401/403 passed through by the backend: the visitor's sign-in state
         // is the problem — retrying can't fix it, so reset and bail.
         if (/Status: 40[13] /.test(error.message)) {

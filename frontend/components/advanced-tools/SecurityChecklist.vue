@@ -6,10 +6,10 @@
             <p>{{ t('securitychecklist.Note2') }}</p>
         </div>
 
-        <!-- Loading state -->
-        <div v-if="!fullList" class="flex items-center justify-center gap-2 py-8 text-sm">
-            <Spinner class="text-info" />
-            <span class="text-muted-foreground">{{ t('securitychecklist.Loading') }}</span>
+        <!-- Loading state (initial dataset fetch + locale switches); the
+             chunk phase before it shows ToolLoadingSkeleton instead. -->
+        <div v-if="!fullList" class="flex justify-center py-12">
+            <Spinner class="size-6 text-info" />
         </div>
 
         <template v-else>

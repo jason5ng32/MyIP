@@ -32,9 +32,10 @@ frontend/
 │                      pulse-statuses (Earth Online vocabulary: presets +
 │                      date-windowed festival statuses + their celebration
 │                      effect mapping; recipes in utils/pulse-celebration.js)/
-│                      connectivity-import-lists (curated target sets; icons
-│                      are committed 64px PNGs under public/favicons/ — one
-│                      per member, enforced by its data test)
+│                      connectivity-import-lists (default target set +
+│                      curated import sets + the shared cap; icons are
+│                      committed 64px PNGs under public/favicons/ — one per
+│                      member, enforced by its data test)
 ├── utils/           ← framework-agnostic helpers + IO
 │                      (app-events bus / getips/ / valid-ip / analytics / …)
 ├── composables/     ← Vue-aware `useXxx` logic
@@ -84,6 +85,26 @@ semantics or an upstream field means updating that test's builder whitelist
 field) and test fixtures are frozen, so drift shows up as quietly missing
 report fields, not as errors.
 
+A report link is readable by anyone who has it, so the builder — not the
+renderer — is where anything the visitor supplied gets dropped. Persona
+Check is the sharpest case: its live results carry a `detail` per check
+(issuing bank, the country a shared position resolved to), and only the
+id / axis / verdict triple reaches the section. Invisibility follows the
+same rule with key + flag. Keep new sections on that side of the line.
+
+### Overlays take no keyboard shortcuts
+
+`utils/shortcut.js` runs one document-level keydown dispatcher over the map
+`composables/use-shortcuts.js` registers — every entry there is a home-page
+action, and the whole map is suspended while any overlay is open. The rule keys
+off the component's form, not its purpose: the `ui/` roots (`Dialog` / `Sheet` /
+`Drawer`) call `composables/use-overlay-shortcuts.js`, so anything built on them
+inherits it, and overlays nest. Esc and the native scrolling keys still work —
+reka-ui / vaul and the browser own those.
+
+`registerShortcuts()` replaces the map rather than appending, and Home clears it
+on unmount — shortcuts belong to the home route alone.
+
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
 `sentry-init.js` loads via a build-time-gated dynamic import: no
@@ -118,12 +139,14 @@ upload at build, gated on `SENTRY_AUTH_TOKEN`.
 
 ## UI system
 
-**shadcn-vue first.** Check `components/ui/` (21 copied-in primitives), then
+**shadcn-vue first.** Check `components/ui/` (copied-in primitives), then
 https://www.shadcn-vue.com/docs/components for something to copy in;
-hand-rolled Tailwind only when neither fits. Two local notes: `Spinner` is
-project-specific (lucide `Loader2` + `role="status"`); `toggle` /
-`toggle-group` deliberately use the `primary` pair for the pressed state —
-don't revert that when syncing upstream.
+hand-rolled Tailwind only when neither fits. Four local notes: `Spinner`
+(lucide `Loader2` + `role="status"`) and `ToolLoadingSkeleton` (chunk-loading
+placeholder for lazy tools) are project-specific; `toggle` / `toggle-group`
+deliberately use the `primary` pair for the pressed state; and the `Dialog` /
+`Sheet` / `Drawer` roots suspend the keyboard shortcuts while open — keep all
+of these when syncing upstream.
 
 ### Design tokens
 
@@ -166,14 +189,25 @@ Copy from the named exemplar instead of re-inventing:
   transition (Connectivity / WebRTC / IPCard). `jn-card` = shadow / border /
   keyboard outline; `keyboard-shortcut-card` = J/K navigation target.
 - **Flag** — always `<Icon :icon="'circle-flags:' + code.toLowerCase()" />`.
+- **Dates & times** — every user-visible stamp renders through
+  `utils/time-utils.js` with the vue-i18n locale: `formatIsoDate` (date-only
+  ISO — changelog, OONI windows, IP-history day headers), `isoToDateTime`
+  (ISO instants — report generated / expiry / per-section stamps),
+  `unixToDateTime` (epoch ms — account & achievement dates),
+  `relativeTimeFromMinutes` / `relativeTimeSince` / `formatDuration` (Pulse).
+  No hand-rolled `toLocaleDateString` / `Intl.DateTimeFormat` in components;
+  a deliberate exception carries a comment saying why (ASNHistory's
+  fixed-width ISO columns, report-export's AI-facing ISO intro,
+  ServiceStatus's seconds-bearing refresh clock).
 - **Fit-to-width tokens** — IP / MAC strings render inside `<FitText>`
   (`HERO_TIERS` hero rows, `INLINE_TIERS` compact rows; `:max-lines="2"` on
   heroes). Never per-component length-threshold helpers (IPCard, QueryIP).
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
-- **Drawer vs Sheet** — the vaul-vue bottom Drawer is reserved for the
-  Advanced Tools panel; side panels use `Sheet`.
+- **Drawer vs Sheet** — the vaul-vue bottom Drawer is for the Advanced Tools
+  panel and full-bleed expansions of an inline visual (ASNConnectivity); side
+  panels use `Sheet`.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
   hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dot clusters.
 

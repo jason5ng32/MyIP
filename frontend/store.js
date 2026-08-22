@@ -6,9 +6,37 @@ import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
+import { sanitizeTargets } from './utils/connectivity-import.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
+
+// The two sign-in buttons. `other` is the provider to point a visitor at when
+// their email already owns an account through the other one;
+const SIGN_IN_PROVIDERS = {
+  google: {
+    label: 'Google',
+    other: 'GitHub',
+    providerId: 'google.com',
+    icon: 'ri:google-line',
+    build: ({ GoogleAuthProvider }) => {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('email');
+      return provider;
+    },
+  },
+  github: {
+    label: 'GitHub',
+    other: 'Google',
+    providerId: 'github.com',
+    icon: 'ri:github-line',
+    build: ({ GithubAuthProvider }) => {
+      const provider = new GithubAuthProvider();
+      provider.addScope('user:email');
+      return provider;
+    },
+  },
+};
 
 export const useMainStore = defineStore('main', {
 
@@ -67,7 +95,41 @@ export const useMainStore = defineStore('main', {
     },
     curlDomainsHadSet: (state) => {
       return state.curl.ipv4Domain && state.curl.ipv6Domain && state.curl.ipv64Domain;
-    }
+    },
+    // How this account signs in, for display in the user menu. A provider the
+    // app no longer offers still shows, under its raw id rather than hidden.
+    linkedProviders: (state) => {
+      const known = Object.values(SIGN_IN_PROVIDERS);
+      return (state.user?.providerData || []).map((entry) => {
+        const descriptor = known.find((item) => item.providerId === entry.providerId);
+        return {
+          providerId: entry.providerId,
+          label: descriptor?.label || entry.providerId,
+          icon: descriptor?.icon || null,
+        };
+      });
+    },
+    // Per-feature "monthly quota exhausted" booleans, derived from the
+    // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
+    // only — the backend enforces the same limits authoritatively; absent
+    // data (signed out, old backend, fetch pending) reads as not exceeded.
+    //
+    // Metering differs per feature: invisibility_test / dns_leak_test /
+    // persona_check count requests, so exhausted means every further run is
+    // blocked and their components use this as a pre-flight gate.
+    quotaExceeded: (state) => {
+      const features = state.remoteUserInfo?.quota?.features || {};
+      const exceeded = (key) => {
+        const feature = features[key];
+        return Boolean(feature && feature.limit > 0 && feature.used >= feature.limit);
+      };
+      return {
+        ipinfo: exceeded('ipinfo'),
+        invisibility_test: exceeded('invisibility_test'),
+        dns_leak_test: exceeded('dns_leak_test'),
+        persona_check: exceeded('persona_check'),
+      };
+    },
   },
 
   actions: {
@@ -150,7 +212,14 @@ export const useMainStore = defineStore('main', {
       const defaultPreferences = createDefaultPreferences();
       const storedPreferences = localStorage.getItem(PREFS_STORAGE_KEY);
       const currentPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
-      this.setPreferences({ ...defaultPreferences, ...currentPreferences });
+      const merged = { ...defaultPreferences, ...currentPreferences };
+      // Missing keys get their defaults from the spread above; the
+      // Connectivity target set additionally guards its structure — junk
+      // entries drop, and an absent/emptied set rebuilds from the defaults
+      // + legacy flat customs (the legacy key stays for rollback, never
+      // written). Persisted right back via setPreferences.
+      merged.connectivityTargets = sanitizeTargets(merged.connectivityTargets, merged.customConnectivityTargets);
+      this.setPreferences(merged);
     },
     // fetch configs from server
     fetchConfigs() {
@@ -197,34 +266,48 @@ export const useMainStore = defineStore('main', {
     },
     // sign in with Google
     async signInWithGoogle() {
-      try {
-        const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-        const provider = new GoogleAuthProvider();
-        provider.addScope('email');
-        const result = await signInWithPopup(auth, provider);
-        this.user = result.user;
-        writeAuthHint(true);
-        // refresh browser after successful login
-        window.location.reload();
-      } catch (error) {
-        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
-        console.error("Google sign-in failed:", error);
-      }
+      await this.signInWithProvider('google');
     },
     // sign in with GitHub
     async signInWithGithub() {
+      await this.signInWithProvider('github');
+    },
+    // Shared sign-in path for both buttons.
+    async signInWithProvider(providerKey) {
+      const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
-        const { auth, GithubAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-        const provider = new GithubAuthProvider();
-        provider.addScope('user:email');
-        const result = await signInWithPopup(auth, provider);
+        const fb = await loadFirebaseAuth();
+        const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
         this.user = result.user;
         writeAuthHint(true);
         // refresh browser after successful login
         window.location.reload();
       } catch (error) {
-        this.setAlert(true, "text-danger", t('alert.SignInFailedReason') + ' : ' + error, t('alert.SignInFailed'));
-        console.error("GitHub sign-in failed:", error);
+        this.handleSignInError(error, descriptor);
+      }
+    },
+    // Turns Firebase auth error codes into something a visitor can act on.
+    handleSignInError(error, descriptor) {
+      console.error(`${descriptor.label} sign-in failed:`, error);
+
+      switch (error?.code) {
+        // Closing the popup is normal, not a failure worth a red toast.
+        case 'auth/popup-closed-by-user':
+        case 'auth/cancelled-popup-request':
+        case 'auth/user-cancelled':
+          return;
+        case 'auth/account-exists-with-different-credential':
+        case 'auth/email-already-in-use':
+        case 'auth/credential-already-in-use':
+          this.setAlert(true, 'text-warning',
+            t('alert.SignInEmailTakenMessage', { other: descriptor.other }),
+            t('alert.SignInEmailTakenTitle'), 8000);
+          return;
+
+        default:
+          this.setAlert(true, 'text-danger',
+            t('alert.SignInFailedReason') + ' : ' + error,
+            t('alert.SignInFailed'));
       }
     },
     // sign out
@@ -263,6 +346,14 @@ export const useMainStore = defineStore('main', {
     // trigger open user benefits
     setTriggerUserBenefits(value) {
       this.triggerUserBenefits = value;
+    },
+    // Backend replied 429 quota_exceeded for a feature: pin the local snapshot
+    // to its limit so the quotaExceeded getter flips without a refetch.
+    markQuotaExhausted(feature) {
+      const quotaFeature = this.remoteUserInfo?.quota?.features?.[feature];
+      if (quotaFeature && typeof quotaFeature.limit === 'number') {
+        quotaFeature.used = Math.max(quotaFeature.used ?? 0, quotaFeature.limit);
+      }
     },
     // trigger remote fetch user info
     setTriggerRemoteUserInfo(value) {

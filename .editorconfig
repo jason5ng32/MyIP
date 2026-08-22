@@ -1,0 +1,18 @@
+# EditorConfig — the file-level basics (charset, line endings, indent, final
+# newline) that every editor and formatter should agree on, so a "format
+# document" in one editor doesn't produce diff noise for the next person.
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+# Two trailing spaces are a hard line break in Markdown — don't strip them.
+trim_trailing_whitespace = false

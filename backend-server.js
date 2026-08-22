@@ -38,6 +38,7 @@ import createReportHandler, { getReport as getReportHandler } from './api/share-
 import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
+import personaEvaluateHandler from './api/persona.js';
 // User
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
@@ -182,13 +183,14 @@ const rateLimiter = rateLimit({
 const speedLimiter = slowDown({
     windowMs: 60 * 60 * 1000,
     delayAfter: speedLimitSet,
-    delayMs: (hits) => hits * 400,
-    skip: (req) => req.path === '/monitoring',
+    delayMs: (used, req) => (used - req.slowDown.limit) * 400,
+    maxDelayMs: 5000,
+    skip: (req) => req.path === '/monitoring' || req.path === '/maxmind',
 })
 
 if (rateLimitSet !== 0) {
     app.use('/api', rateLimiter);
-    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 60 minutes`);
+    logger.info(`🛡️  Rate limiter enabled — ${rateLimitSet} requests per 20 minutes`);
 }
 
 if (speedLimitSet !== 0) {
@@ -282,6 +284,8 @@ app.put('/api/updateuserachievement', updateUserAchievement);
 // KV expiry, and private diagnostic data doesn't belong in a public cache.
 app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
+// One observation in, one graded report out — per-visitor by definition.
+app.post('/api/persona/evaluate', personaEvaluateHandler);
 
 // Sentry tunnel — first-party relay for the frontend SDK's envelopes
 // Mounted only when this deployment actually built the frontend with a DSN.
