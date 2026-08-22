@@ -1,0 +1,1476 @@
+{
+  "user": {
+    "SignIn": "",
+    "SignInWithGoogle": "",
+    "SignInWithGithub": "",
+    "SignOut": "",
+    "SignInToView": "",
+    "SignInToUse": "",
+    "InvalidUserToken": "",
+    "QuotaExceeded": "",
+    "QuotaSponsorCta": "",
+    "ViewUsage": "",
+    "Usage": {
+      "Title": "",
+      "Note": "",
+      "IpinfoFeature": "",
+      "SponsorNote": ""
+    },
+    "MyAchievements": "",
+    "Fields": {
+      "User": "",
+      "CreatedAt": "",
+      "LastLogin": "",
+      "Level": "",
+      "Fetching": "",
+      "SignInMethods": ""
+    },
+    "Level": {
+      "Standard": "",
+      "Premium": "",
+      "Owner": "",
+      "Developer": "",
+      "HonoraryMember": ""
+    },
+    "Benefits": {
+      "Title": "",
+      "Benefit": "",
+      "Note1": "",
+      "Note2": "",
+      "Current": "",
+      "Tiers": {
+        "Visitor": {
+          "Name": "",
+          "Item1": "",
+          "Item2": "",
+          "Item3": "",
+          "Item4": "",
+          "Item5": "",
+          "Item6": ""
+        },
+        "SignedIn": {
+          "Name": "",
+          "Item1": "",
+          "Item2": "",
+          "Item3": "",
+          "Item4": "",
+          "Item5": "",
+          "Item6": "",
+          "Item7": ""
+        },
+        "Sponsor": {
+          "Name": "",
+          "Item1": "",
+          "Item2": "",
+          "Item3": ""
+        }
+      }
+    },
+    "Achievements": {
+      "Title": "",
+      "Note": "",
+      "Get": "",
+      "GetCount": "",
+      "NotGet": "",
+      "NotGetCount": "",
+      "FooterNote": "",
+      "Congrats": "",
+      "CongratsMessage": "",
+      "NewAchievementIs": "",
+      "Type": {
+        "IAmHuman": {
+          "Title": "",
+          "Meet": ""
+        },
+        "BarelyEnough": {
+          "Title": "",
+          "Meet": ""
+        },
+        "RapidPace": {
+          "Title": "",
+          "Meet": ""
+        },
+        "TorrentFlow": {
+          "Title": "",
+          "Meet": ""
+        },
+        "SteadyGoing": {
+          "Title": "",
+          "Meet": ""
+        },
+        "TooFastTooSimple": {
+          "Title": "",
+          "Meet": ""
+        },
+        "SwiftAscent": {
+          "Title": "",
+          "Meet": ""
+        },
+        "SurfaceCheck": {
+          "Title": "",
+          "Meet": ""
+        },
+        "HalfwayThere": {
+          "Title": "",
+          "Meet": ""
+        },
+        "FullySecured": {
+          "Title": "",
+          "Meet": ""
+        },
+        "JustInCase": {
+          "Title": "",
+          "Meet": ""
+        },
+        "HiddenWell": {
+          "Title": "",
+          "Meet": ""
+        },
+        "SlipUp": {
+          "Title": "",
+          "Meet": ""
+        },
+        "CleverTrickery": {
+          "Title": "",
+          "Meet": ""
+        },
+        "EnergySaver": {
+          "Title": "",
+          "Meet": ""
+        },
+        "ResourceHog": {
+          "Title": "",
+          "Meet": ""
+        },
+        "MakingBigNews": {
+          "Title": "",
+          "Meet": ""
+        },
+        "GenerousDonor": {
+          "Title": "",
+          "Meet": ""
+        },
+        "ItIsOpen": {
+          "Title": "",
+          "Meet": ""
+        },
+        "CuriousCat": {
+          "Title": "",
+          "Meet": ""
+        },
+        "CrossingTheWall": {
+          "Title": "",
+          "Meet": ""
+        },
+        "GlobeTrotter": {
+          "Title": "",
+          "Meet": ""
+        },
+        "HelloWorld": {
+          "Title": "",
+          "Meet": ""
+        },
+        "AddSweetAdd": {
+          "Title": "",
+          "Meet": ""
+        },
+        "PrettyDirty": {
+          "Title": "",
+          "Meet": ""
+        },
+        "SqueakyClean": {
+          "Title": "",
+          "Meet": ""
+        },
+        "WalkWithPenguins": {
+          "Title": "",
+          "Meet": ""
+        }
+      }
+    }
+  },
+  "nav": {
+    "id": "nav",
+    "Title": "IPCheck.ing",
+    "Navigation": "Navegação",
+    "IPInfo": "Informações de IP",
+    "Connectivity": "Conectividade",
+    "ServiceStatus": "Status dos serviços",
+    "WebRTC": "Teste de vazamento WebRTC",
+    "DNSLeakTest": "Teste de vazamento de DNS",
+    "SpeedTest": "Teste de velocidade",
+    "PingTest": "Latência global",
+    "MTRTest": "Teste MTR",
+    "RuleTest": "Teste de regras",
+    "AdvancedTools": "Ferramentas avançadas",
+    "SearchDocs": "Pesquisar na documentação…",
+    "DocsToolConfirm": "Compartilhar seus resultados atuais dos testes?",
+    "DocsToolSummary": "Ler os resultados nesta página",
+    "DocsToolRunConfirm": "Executar testes na sua página?",
+    "DocsToolRunSummary": "Executou seus testes de rede",
+    "AskIPilot": "Perguntar ao IPilot",
+    "OpenDocs": "Abrir documentação",
+    "DocsGreetingTitle": "Como posso ajudar?",
+    "DocsGreetingSubtitle": "Pergunte qualquer coisa sobre o MyIP — as ferramentas, seus resultados ou auto-hospedagem.",
+    "DocsQuestions": [
+      "Minha VPN está vazando meu IP real?",
+      "Por que a localização do meu IP está errada?",
+      "Compare meus resultados do teste WebRTC e do teste de vazamento de DNS e me dê sugestões",
+      "Como leio resultados de MTR?",
+      "Como faço para hospedar meu próprio MyIP?",
+      "Quero patrocinar o projeto MyIP"
+    ],
+    "pulse": {
+      "title": "Earth Online",
+      "tooltip": "Visitantes do mundo todo",
+      "others": "Outros",
+      "shareStatus": "Compartilhar seu status",
+      "liveMap": "Mapa de calor de visitantes ao vivo",
+      "noVisitors": "Nenhum visitante ainda",
+      "quiet": "Tudo tranquilo agora — seja a primeira pessoa a compartilhar",
+      "loadError": "Não foi possível carregar a atividade mais recente — tente novamente em instantes",
+      "share": "Compartilhamento de visitante",
+      "latest": "Mais recente",
+      "sent": "Enviado",
+      "alreadySent": "Este status já foi enviado",
+      "rateLimited": "Apenas um status pode ser compartilhado em um curto período",
+      "limitedTitle": "Status por tempo limitado",
+      "outages": {
+        "title": "Eventos globais de indisponibilidade",
+        "outage": "Queda de internet",
+        "anomaly": "Anomalia de tráfego",
+        "ongoing": "Em andamento",
+        "ended": "Recuperado",
+        "started": "Iniciado {time}",
+        "lasted": "Durou {duration}",
+        "quiet": "Tudo tranquilo — nenhum evento de indisponibilidade nos últimos 30 dias",
+        "loadMore": "Carregar mais",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Direcionado pelo governo",
+          "POWER_OUTAGE": "Falta de energia",
+          "CABLE_CUT": "Rompimento de cabo",
+          "TECHNICAL_PROBLEM": "Problema técnico",
+          "MECHANICAL": "Problema mecânico",
+          "UNKNOWN": "Causa desconhecida",
+          "WEATHER": "Tempo severo",
+          "FIRE": "Incêndio",
+          "CYBERATTACK": "Ataque cibernético",
+          "NATURAL_DISASTER": "Desastre natural",
+          "MAINTENANCE": "Manutenção",
+          "MILITARY_ACTION": "Ação militar"
+        },
+        "level": {
+          "NATIONWIDE": "Nacional",
+          "REGIONAL": "Regional",
+          "NETWORK": "Rede"
+        }
+      },
+      "statuses": {
+        "fast": "Rede extremamente rápida",
+        "ok": "Tudo certo por aqui",
+        "slow": "A rede parece lenta",
+        "flaky": "A conexão vive caindo",
+        "blocked": "Um site não abre",
+        "good": "Me sentindo bem hoje",
+        "bad": "Dia difícil por aqui",
+        "passing": "Só passando",
+        "lag": "O lag no jogo está surreal",
+        "newip": "Acabei de ganhar um IP novo",
+        "vpn": "Navegando por uma VPN",
+        "night": "Acordado até tarde hoje",
+        "vibing": "Codando no embalo",
+        "fixing": "Consertando o Wi-Fi da família de novo",
+        "tuning": "Tirei mais 10 ms",
+        "prgday": "Feliz 0x100º dia!",
+        "internetday": "LO and behold, feliz Dia da Internet",
+        "halloween": "Travessura ou ping!",
+        "diwali": "Festival das luzes (e da fibra)",
+        "christmas": "O Papai Noel está em uma rota de baixa latência",
+        "newyear": "Ano novo, IP novo!",
+        "privacyday": "Este status é criptografado de ponta a ponta",
+        "lunar": "Que todos os seus envelopes vermelhos cheguem",
+        "valentine": "Procurando uma conexão estável",
+        "jobs": "Continue faminto, continue tolo.",
+        "eid": "Eid Mubarak, mundo!",
+        "aprilfools": "Meu IP é 127.0.0.1",
+        "earthday": "Fazendo logoff para tocar na grama",
+        "turing": "Este status foi enviado por um humano. Provavelmente.",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "Feliz aniversário, IPCheck.ing!"
+      },
+      "festivalDesc": {
+        "prgday": "Dia dos Programadores — o 256º dia do ano, 0x100 em hexadecimal",
+        "internetday": "29 de outubro de 1969: a ARPANET tentou enviar LOGIN — travou depois de “LO”",
+        "halloween": "Halloween (31 de outubro) — o mais assustador ainda é a perda de pacotes",
+        "diwali": "Diwali — que suas lâmpadas e sua fibra brilhem",
+        "christmas": "Natal — trenó em linha dedicada, jitter zero",
+        "newyear": "Ano Novo — fogos incluídos, sem largura de banda extra",
+        "privacyday": "Dia da Privacidade de Dados (28 de janeiro) — sim, percebemos a ironia de transmitir isto",
+        "lunar": "Ano-Novo Lunar — perda de pacotes zero nos envelopes vermelhos",
+        "valentine": "Dia de São Valentim — TCP e amor verdadeiro começam com um handshake",
+        "jobs": "Aniversário de Steve Jobs (24 de fevereiro de 1955) — do discurso dele em Stanford, em 2005",
+        "eid": "Eid al-Fitr — votos calorosos deste canto do Earth Online",
+        "aprilfools": "Dia da Mentira — não há lugar como 127.0.0.1",
+        "earthday": "Dia da Terra (22 de abril) — até o Earth Online recomenda um pouco de Earth Offline",
+        "turing": "Aniversário de Alan Turing (23 de junho de 1912) — pai do teste de Turing",
+        "emojiday": "Dia Mundial do Emoji (17 de julho) — palavras são coisa do século passado",
+        "birthday": "Aniversário do IPCheck.ing — a v1.0 foi lançada em 6 de novembro de 2020"
+      }
+    },
+    "preferences": {
+      "title": "Preferências",
+      "preferenceTips": "Estas configurações são salvas no seu navegador para reutilização fácil. Algumas opções exigem atualizar a página para entrar em vigor.",
+      "colorScheme": "Esquema de cores",
+      "systemAuto": "Automático",
+      "colorLight": "Dia",
+      "colorDark": "Noite",
+      "ipSourcesToCheck": "Servidores para verificar IPs",
+      "ipSourcesToCheckTips": "Selecione o número de servidores que verificarão seu IP. Quanto mais servidores forem selecionados, mais tempo a verificação levará.",
+      "appSettings": "Configurações do programa",
+      "autoRun": "Execução automática",
+      "autoRunTips": "As informações de IP sempre são verificadas quando a página carrega. Escolha quais outros módulos serão executados automaticamente na inicialização.",
+      "simpleMode": "Modo simples",
+      "simpleModeTips": "Oculta o texto descritivo de cada módulo, adequado para usuários que já conhecem o aplicativo.",
+      "connectivityMultipleTests": "Múltiplas atualizações de conectividade",
+      "connectivityMultipleTestsTips": "Quando ativado, o aplicativo executa várias verificações na inicialização e exibe a menor latência.",
+      "popupConnectivityNotifications": "Alertas pop-up de conectividade",
+      "popupConnectivityNotificationsTips": "Quando ativado, os resultados da verificação inicial são exibidos como alerta pop-up.",
+      "ipHistory": "Histórico de IP",
+      "ipHistoryEnabled": "Registrar histórico de IP",
+      "ipHistoryDays": "Dias de retenção",
+      "ipHistoryTips": "Quando ativado, os IPs detectados são registrados somente neste navegador e mantidos pelo número de dias selecionado. Desativar essa opção interrompe o registro; os registros existentes permanecem até você apagá-los no painel Histórico de IP.",
+      "ipDB": "Banco de geolocalização de IP",
+      "ipDBTips": "Você pode selecionar a fonte padrão de geolocalização de IP. Se a fonte selecionada estiver indisponível, o sistema usará as fontes seguintes em ordem.",
+      "language": "Configuração de idioma",
+      "languageTips": "Atualize o navegador para a alteração entrar em vigor."
+    },
+    "DocsPrompt": "Digite sua pergunta…",
+    "DocsSignInTitle": "Login necessário",
+    "DocsSignInMessage": "Faça login para perguntar ao IPilot"
+  },
+  "securitychecklist": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Progress": "",
+    "Item": "",
+    "Items": "",
+    "Priority": "",
+    "Ignore": "",
+    "alert-total": "",
+    "alert-checked": "",
+    "alert-ignored": "",
+    "alert-unchecked": "",
+    "Checked": "",
+    "Ignored": "",
+    "Unchecked": "",
+    "Basic": "",
+    "Optional": "",
+    "Essential": "",
+    "Advanced": "",
+    "Reset": "",
+    "ShowAll": "",
+    "ShowUnchecked": "",
+    "ShowIgnored": "",
+    "ShowChecked": ""
+  },
+  "curl": {
+    "Title": "",
+    "Note1": "",
+    "Note2_1": "",
+    "Note2_2": "",
+    "Note3": "",
+    "Note4": "",
+    "getIPv4": "",
+    "getIPv6": "",
+    "get6and4": "",
+    "notAvailable": ""
+  },
+  "browserinfo": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "browser": {
+      "Infos": "",
+      "browserName": "",
+      "engineName": "",
+      "osName": "",
+      "deviceVendor": "",
+      "cpuArchitecture": "",
+      "gpu": "",
+      "cpuCores": "",
+      "languages": "",
+      "timezone": "",
+      "display": "",
+      "connection": "",
+      "touchPoints": "",
+      "doNotTrack": "",
+      "doNotTrackOn": "",
+      "doNotTrackOff": "",
+      "doNotTrackUnset": "",
+      "pdfViewer": "",
+      "pdfViewerYes": "",
+      "pdfViewerNo": "",
+      "cookieEnabled": "",
+      "cookieEnabledTrue": "",
+      "cookieEnabledFalse": ""
+    },
+    "fingerprint": {
+      "Infos": "",
+      "fingerprint": "",
+      "changeOption": "",
+      "browserTips": ""
+    },
+    "options": {
+      "audio": "",
+      "canvas": "",
+      "fonts": "",
+      "hardware": "",
+      "locales": "",
+      "permissions": "",
+      "plugins": "",
+      "screen": "",
+      "system": "",
+      "webgl": "",
+      "math": "",
+      "intl": "",
+      "mediaDevices": "",
+      "speech": "",
+      "mathml": "",
+      "webrtc": ""
+    },
+    "components": {
+      "title": "",
+      "note": ""
+    },
+    "calError": "",
+    "calculating": ""
+  },
+  "censorshipcheck": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "Country": "",
+    "Status": "",
+    "City": "",
+    "Network": "",
+    "invalidURL": "",
+    "fetchError": "",
+    "HistoryTitle": "",
+    "SummaryFlagged": "",
+    "SummaryClean": "",
+    "SummarySparseFlagged": "",
+    "SummarySparseClean": "",
+    "NoData": "",
+    "OoniError": "",
+    "TierConfirmed": "",
+    "TierLikely": "",
+    "TierSigns": "",
+    "Measurements": "",
+    "AnomalyShare": "",
+    "MethodDns": "",
+    "MethodTcpIp": "",
+    "MethodHttpFailure": "",
+    "MethodHttpDiff": "",
+    "RealtimeTitle": "",
+    "ResultsHint": "",
+    "SectionFlagged": "",
+    "PresetHighRisk": "",
+    "PresetOpen": "",
+    "RunVerify": "",
+    "RealtimeNote": "",
+    "RealtimeFooterNote": ""
+  },
+  "invisibilitytest": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "fetchError": "",
+    "scriptLoadError": "",
+    "yourIP": "",
+    "proxyScore": "",
+    "VPNScore": "",
+    "isProxy": "",
+    "notProxy": "",
+    "isVPN": "",
+    "notVPN": "",
+    "itemName": "",
+    "itemProxyResult": "",
+    "itemComment": "",
+    "agreement": "",
+    "blocklist": {
+      "proxy": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      },
+      "vpn": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      },
+      "vpnExitNode": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      }
+    },
+    "tor": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "headers": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "datacenter": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "tcp": {
+      "title": "",
+      "positive": "",
+      "computer": "",
+      "server": "",
+      "negative": ""
+    },
+    "timezone": {
+      "title": "",
+      "positive": "",
+      "computer": "",
+      "server": "",
+      "negative": ""
+    },
+    "net": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "webrtc": {
+      "title": "",
+      "positive": "",
+      "ipsAre": "",
+      "negative": ""
+    },
+    "flow": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "latencyVSWS": {
+      "title": "",
+      "positive": "",
+      "fromTCP": "",
+      "fromWS": "",
+      "negative": ""
+    },
+    "latencyVSPing": {
+      "title": "",
+      "positive": "",
+      "fromTCP": "",
+      "fromPing": "",
+      "negative": ""
+    },
+    "highlatency": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    }
+  },
+  "personacheck": {
+    "Title": "",
+    "Note": "",
+    "NoteVs": "",
+    "Note2": "",
+    "axis": {
+      "match": "",
+      "coherence": "",
+      "leak": ""
+    },
+    "zone": {
+      "expected": "",
+      "optional": "",
+      "run": ""
+    },
+    "selectCountry": "",
+    "noCountryMatch": "",
+    "noProfile": "",
+    "languageSingle": "",
+    "languageMulti": "",
+    "timezoneMulti": "",
+    "hourCycle": {
+      "h11": "",
+      "h12": "",
+      "h23": "",
+      "h24": ""
+    },
+    "profile": {
+      "timezone": ""
+    },
+    "runCompare": "",
+    "runError": "",
+    "source": {
+      "ipinfo": "",
+      "webrtc": "",
+      "dnsleak": ""
+    },
+    "report": {
+      "grade": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": "",
+        "unknown": ""
+      },
+      "gradeNote": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": "",
+        "unknown": ""
+      },
+      "counts": {
+        "leak": "",
+        "warning": "",
+        "match": "",
+        "unknown": "",
+        "notApplicable": ""
+      },
+      "nothingActionable": "",
+      "howToFix": "",
+      "verdict": {
+        "match": "",
+        "mismatch": "",
+        "leak": "",
+        "unnatural": "",
+        "unknown": "",
+        "not-applicable": ""
+      },
+      "visibility": {
+        "public": "",
+        "probed": "",
+        "risk-engine": ""
+      },
+      "profileTitle": "",
+      "state": {
+        "match": "",
+        "mismatch": "",
+        "unnatural": "",
+        "leak": "",
+        "unknown": "",
+        "not-applicable": ""
+      }
+    },
+    "detail": {
+      "expected": "",
+      "actual": "",
+      "disputed": "",
+      "v4": "",
+      "v6": "",
+      "candidateCount": "",
+      "matching": "",
+      "ipType": "",
+      "expectedOffset": "",
+      "actualOffset": "",
+      "sameOffset": "",
+      "primary": "",
+      "primaryExpected": "",
+      "demoted": "",
+      "timeZone": "",
+      "reportedOffset": "",
+      "zoneOffset": "",
+      "samples": "",
+      "expectedScripts": "",
+      "installedScripts": "",
+      "expectedLanguages": "",
+      "voiceLanguages": "",
+      "voiceCount": "",
+      "expectedLayout": "",
+      "actualLayout": "",
+      "headerPrimary": "",
+      "scriptPrimary": "",
+      "headerLanguages": "",
+      "ipZone": "",
+      "browserZone": "",
+      "ipOffset": "",
+      "browserOffset": "",
+      "colo": "",
+      "gpsTimezone": "",
+      "accuracyMetres": "",
+      "cardIssuer": "",
+      "cardNetwork": "",
+      "cardTier": "",
+      "cardType": ""
+    },
+    "checks": {
+      "ip-country": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "webrtc-leak": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "dns-resolver-country": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "asn-type": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "timezone-vs-persona": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "language-match": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "script-fonts": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "speech-voices": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "keyboard-layout": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "edge-geo-consensus": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "accept-language-header": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "ip-timezone-vs-browser": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "gps-location": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "payment-region": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "intl-number-format": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "intl-date-format": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "intl-hour-cycle": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "timezone-authenticity": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      }
+    },
+    "reason": {
+      "no-marker-script": "",
+      "bin-lookup-failed": "",
+      "bin-not-recognized": "",
+      "font-probe-unavailable": "",
+      "no-voice-packs": "",
+      "keyboard-api-unavailable": "",
+      "no-layout-expectation": "",
+      "no-persona-languages": "",
+      "geolocation-unsupported": "",
+      "ip-no-country": "",
+      "ip-no-type": "",
+      "ip-no-timezone": "",
+      "webrtc-no-candidates": "",
+      "dns-no-country": ""
+    },
+    "optional": {
+      "gpsNote": "",
+      "gpsButton": "",
+      "gpsGranted": "",
+      "gpsFailed": {
+        "denied": "",
+        "timeout": "",
+        "unavailable": "",
+        "unsupported": ""
+      },
+      "cardNote": "",
+      "cardError": "",
+      "cardReady": ""
+    },
+    "dependencies": {
+      "note": "",
+      "runButton": "",
+      "runButtonRunning": "",
+      "measured": "",
+      "allReady": ""
+    },
+    "step": {
+      "country": "",
+      "language": "",
+      "location": "",
+      "card": "",
+      "awaitingCountry": "",
+      "otherTests": ""
+    },
+    "emptyHint": "",
+    "readyHint": "",
+    "value": {
+      "yes": "",
+      "no": ""
+    }
+  },
+  "advancedtools": {
+    "OpenInNewTab": "",
+    "BackToHome": "",
+    "Title": "",
+    "Note": "",
+    "PingTestNote": "",
+    "MTRTestNote": "",
+    "DNSResolverNote": "",
+    "EnhancedDnsLeakTest": "",
+    "RuleTestNote": "",
+    "CensorshipCheck": "",
+    "ServiceStatus": "",
+    "Whois": "",
+    "InvisibilityTest": "",
+    "MacChecker": "",
+    "BrowserInfo": "",
+    "SecurityChecklist": "",
+    "PersonaCheck": ""
+  },
+  "macchecker": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "invalidMAC": "",
+    "fetchError": "",
+    "company": "",
+    "macPrefix": "",
+    "address": "",
+    "country": "",
+    "blockStart": "",
+    "blockEnd": "",
+    "blockSize": "",
+    "blockType": "",
+    "blockRange": "",
+    "isRand": "",
+    "isPrivate": "",
+    "isMulticast": "",
+    "isUnicast": "",
+    "isGlobal": "",
+    "isLocal": "",
+    "property": "",
+    "value": "",
+    "manufacturer": ""
+  },
+  "whois": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "Placeholder": "",
+    "invalidURL": "",
+    "reservedIP": "",
+    "noData": "",
+    "fetchError": "",
+    "Provider": ""
+  },
+  "enhanceddnsleaktest": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "Run": "",
+    "RunAgain": "",
+    "RunningProbes": "",
+    "PollingResult": "",
+    "FetchError": "",
+    "Empty": "",
+    "TableTitle": "",
+    "DedupeToggle": "",
+    "Flow": {
+      "Probing": "",
+      "Waiting": "",
+      "Fetching": "",
+      "Done": ""
+    },
+    "DnssecChip": {
+      "Signed": "",
+      "Unsigned": "",
+      "Validated": "",
+      "CdSet": ""
+    },
+    "Summary": {
+      "ResolverCount": "",
+      "RawCount": "",
+      "DnssecPosture": "",
+      "DnssecGood": "",
+      "DnssecNoDo": "",
+      "DnssecCdSet": "",
+      "DnssecNone": ""
+    },
+    "Fields": {
+      "ResolverIP": "",
+      "Location": "",
+      "ASN": "",
+      "QueryType": "",
+      "Transport": "",
+      "ECS": ""
+    },
+    "Legend": {
+      "Title": "",
+      "ResolverIP": "",
+      "QueryType": "",
+      "Transport": "",
+      "ECS": "",
+      "DO": "",
+      "CD": ""
+    }
+  },
+  "dnsresolver": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "invalidURL": "",
+    "fetchError": "",
+    "Provider": "",
+    "Result": "",
+    "Record": "",
+    "AllRegions": ""
+  },
+  "ruletest": {
+    "Title": "",
+    "Name": "",
+    "Note": "",
+    "StatusWait": "",
+    "StatusError": "",
+    "Country": "",
+    "RefreshAll": ""
+  },
+  "Tooltips": {
+    "RefreshIPCard": "",
+    "SaveAsImage": "",
+    "RefreshConnectivityTests": "",
+    "RefreshWebRTC": "",
+    "RefreshDNSLeakTest": "",
+    "SpeedTestButton": "",
+    "ShowASNInfo": "",
+    "ShowASNHistory": "",
+    "ShowASNConnectivity": "",
+    "CopyIP": "",
+    "CopySdpLog": "",
+    "ViewOnMap": "",
+    "InfoMask": "",
+    "IPHistory": "",
+    "ShareReport": "",
+    "QueryIP": "",
+    "GithubLink": ""
+  },
+  "report": {
+    "Title": "",
+    "Note": "",
+    "SectionsLabel": "",
+    "NotTested": "",
+    "MaskTail": "",
+    "TtlLabel": "",
+    "Ttl1": "",
+    "Ttl3": "",
+    "Ttl7": "",
+    "Preview": "",
+    "CreateLink": "",
+    "CopyAI": "",
+    "DownloadJson": "",
+    "CopyLink": "",
+    "NoSelection": "",
+    "CreateFailed": "",
+    "LinkOnce": "",
+    "ExpiresAt": "",
+    "CopiedTitle": "",
+    "CopiedMessage": "",
+    "ai": {
+      "Heading": "",
+      "Intro": "",
+      "Masked": "",
+      "Instruction": "",
+      "Sections": {
+        "ipinfo": "",
+        "connectivity": "",
+        "webrtc": "",
+        "dnsleak": "",
+        "speedtest": "",
+        "pingtest": "",
+        "mtrtest": "",
+        "ruletest": "",
+        "browserinfo": "",
+        "invisibility": "",
+        "enhanceddnsleak": "",
+        "persona": ""
+      }
+    }
+  },
+  "reportPage": {
+    "Loading": "",
+    "NotFound": "",
+    "NotFoundNote": "",
+    "LoadFailed": "",
+    "Unsupported": "",
+    "GeneratedBy": "",
+    "Stale": "",
+    "TestMine": "",
+    "Col": {
+      "Source": "",
+      "Name": "",
+      "IP": "",
+      "Location": "",
+      "ISP": "",
+      "Status": "",
+      "Server": "",
+      "Provider": "",
+      "Target": "",
+      "UniqueIPs": "",
+      "Resolvers": ""
+    },
+    "Dnssec": {
+      "ok": "",
+      "partial": "",
+      "none": ""
+    }
+  },
+  "ipHistory": {
+    "Title": "",
+    "Notes": "",
+    "Empty": "",
+    "FilterByType": "",
+    "FilterByCountry": "",
+    "UnknownCountry": "",
+    "NoMatch": "",
+    "ClearAll": "",
+    "ClearConfirm": ""
+  },
+  "ipInfos": {
+    "Title": "",
+    "Notes": "",
+    "Source": "",
+    "Country": "",
+    "Region": "",
+    "City": "",
+    "TimeZone": "",
+    "ISP": "",
+    "ASN": "",
+    "Coordinates": "",
+    "IPv4Error": "",
+    "IPv6Error": "",
+    "type": "",
+    "isProxy": "",
+    "qualityScore": "",
+    "qualityScoreUnknown": "",
+    "advancedUnlockCta": "",
+    "advancedQuotaCta": "",
+    "ASNInfo": {
+      "trafficPercentage": "",
+      "note": "",
+      "asnName": "",
+      "asnOrgName": "",
+      "asnCountryCode": "",
+      "estimatedUsers": "",
+      "IPv4_Pct": "",
+      "IPv6_Pct": "",
+      "HTTP_Pct": "",
+      "HTTPS_Pct": "",
+      "Desktop_Pct": "",
+      "Mobile_Pct": "",
+      "Bot_Pct": "",
+      "Human_Pct": "",
+      "moreData": ""
+    },
+    "ASNHistory": {
+      "announcedPrefixes": "",
+      "note": "",
+      "empty": "",
+      "error": "",
+      "seenBy": ""
+    },
+    "ASNConnectivity": {
+      "note": "",
+      "empty": "",
+      "error": "",
+      "expand": "",
+      "dialogTitle": "",
+      "legendOrigin": "",
+      "legendTier1": "",
+      "legendIntermediate": "",
+      "zoomIn": "",
+      "zoomOut": "",
+      "zoomReset": ""
+    },
+    "advancedData": {
+      "proxyYes": "",
+      "proxyMaybe": "",
+      "proxyNo": "",
+      "proxyUnknown": "",
+      "type": {
+        "Residential": "",
+        "Wireless": "",
+        "Business": "",
+        "Hosting": "",
+        "unknownType": ""
+      },
+      "Nativeness": "",
+      "NativeIPYes": "",
+      "NativeIPNo": "",
+      "nativenessTooltip": ""
+    }
+  },
+  "serviceStatus": {
+    "Title": "",
+    "Note": "",
+    "Refresh": "",
+    "LastChecked": "",
+    "AllOperational": "",
+    "ComponentsTitle": "",
+    "IncidentsTitle": "",
+    "NoComponents": "",
+    "NoRecentIncidents": "",
+    "Loading": "",
+    "Checking": "",
+    "IncidentsError": "",
+    "ComponentsError": "",
+    "indicator": {
+      "minor": "",
+      "major": "",
+      "critical": "",
+      "maintenance": "",
+      "unknown": ""
+    },
+    "component": {
+      "operational": "",
+      "degraded_performance": "",
+      "partial_outage": "",
+      "major_outage": "",
+      "under_maintenance": ""
+    },
+    "incidentStatus": {
+      "investigating": "",
+      "identified": "",
+      "monitoring": "",
+      "resolved": "",
+      "postmortem": "",
+      "scheduled": "",
+      "in_progress": "",
+      "verifying": "",
+      "completed": ""
+    }
+  },
+  "connectivity": {
+    "Title": "",
+    "Note": "",
+    "StatusWait": "",
+    "StatusAvailable": "",
+    "StatusUnavailable": "",
+    "StatusTimeout": "",
+    "checking": "",
+    "minTestTime": "",
+    "RefreshThisTest": "",
+    "RoundCount": "",
+    "addCustom": {
+      "AddCard": "",
+      "Title": "",
+      "Hint": "",
+      "NameLabel": "",
+      "NamePlaceholder": "",
+      "UrlLabel": "",
+      "UrlPlaceholder": "",
+      "Add": "",
+      "Remove": "",
+      "NameRequired": "",
+      "UrlRequired": "",
+      "InvalidUrl": "",
+      "LimitReached": "",
+      "LastTargetTitle": "",
+      "LastTargetMessage": ""
+    },
+    "importDialog": {
+      "Title": "",
+      "CustomOption": "",
+      "ImportOption": "",
+      "SiteCount": "",
+      "Import": "",
+      "Capacity": "",
+      "NotEnoughCapacity": ""
+    },
+    "importLists": {
+      "defaults": "",
+      "iran": "",
+      "russia": "",
+      "china": "",
+      "brazil": "",
+      "ai": "",
+      "social": "",
+      "streaming": "",
+      "gaming": "",
+      "developer": "",
+      "cloud": "",
+      "crypto": "",
+      "ecommerce": "",
+      "news": ""
+    }
+  },
+  "webrtc": {
+    "id": "webrtc",
+    "Title": "",
+    "Name": "",
+    "Note": "",
+    "StatusWait": "",
+    "StatusError": "",
+    "StatusUnavailable": "",
+    "SdpLog": "",
+    "NATType": {
+      "srflx": "",
+      "prflx": "",
+      "relay": "",
+      "host": "",
+      "unknown": ""
+    }
+  },
+  "dnsleaktest": {
+    "Name": "",
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "EndpointCountry": "",
+    "StatusWait": "",
+    "StatusError": ""
+  },
+  "speedtest": {
+    "Title": "",
+    "Note": "",
+    "Download": "",
+    "Upload": "",
+    "Latency": "",
+    "Jitter": "",
+    "loadedLatency": "",
+    "videoStreaming": "",
+    "gaming": "",
+    "rtc": "",
+    "score": "",
+    "connectionFrom": "",
+    "connectionTo": "",
+    "connectionEnd": "",
+    "testFailed": "",
+    "quality": {
+      "bad": "",
+      "poor": "",
+      "average": "",
+      "good": "",
+      "great": ""
+    }
+  },
+  "globalping": {
+    "Selected": "",
+    "Suggested": "",
+    "NoProbe": "",
+    "GroupFull": "",
+    "UnreachableTarget": "",
+    "ResultsHint": "",
+    "Asia": "",
+    "Europe": "",
+    "Africa": "",
+    "Americas": "",
+    "Oceania": ""
+  },
+  "pingtest": {
+    "EnterIPLabel": "",
+    "EnterIPPlaceholder": "",
+    "UseStored": "",
+    "id": "pingtest",
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "SelectIP": "",
+    "Region": "",
+    "MinDelay": "",
+    "MaxDelay": "",
+    "AvgDelay": "",
+    "TotalPackets": "",
+    "PacketLoss": "",
+    "ReceivedPackets": "",
+    "DroppedPackets": "",
+    "Error": ""
+  },
+  "mtrtest": {
+    "EnterIPLabel": "",
+    "EnterIPPlaceholder": "",
+    "UseStored": "",
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "SelectIP": "",
+    "Region": "",
+    "Error": "",
+    "ColHost": "",
+    "ColIP": "",
+    "ColASN": "",
+    "ColLoss": "",
+    "ColSent": "",
+    "ColDrop": "",
+    "ColRecv": "",
+    "ColLast": "",
+    "ColAvg": "",
+    "ColBest": "",
+    "ColWorst": "",
+    "ColStDev": "",
+    "ColJitter": "",
+    "NoReply": ""
+  },
+  "ipcheck": {
+    "Title": "",
+    "Placeholder": "",
+    "Error": "",
+    "reservedIP": "",
+    "NoData": ""
+  },
+  "alert": {
+    "refreshEverythingMessage": "",
+    "refreshEverythingTitle": "",
+    "OhNo": "",
+    "Congrats": "",
+    "OhNo_Message": "",
+    "Congrats_Message": "",
+    "maskedInfoTitle": "",
+    "maskedInfoMessage": "",
+    "unmaskedInfoTitle": "",
+    "unmaskedInfoMessage": "",
+    "SignInFailed": "",
+    "SignInFailedReason": "",
+    "IpGeoSourceFallbackTitle": "",
+    "IpGeoSourceFallbackMessage": "",
+    "SignInEmailTakenTitle": "",
+    "SignInEmailTakenMessage": ""
+  },
+  "shortcutKeys": {
+    "GoToTop": "",
+    "GoToBottom": "",
+    "ToggleDarkMode": "",
+    "RefreshEverything": "",
+    "RefreshIPCard": "",
+    "RefreshConnectivityTests": "",
+    "RefreshWebRTC": "",
+    "RefreshDNSLeakTest": "",
+    "SpeedTestButton": "",
+    "PingTest": "",
+    "MTRTest": "",
+    "RuleTest": "",
+    "DNSResolver": "",
+    "IPCheck": "",
+    "ToggleInfoMask": "",
+    "IPHistory": "",
+    "ShareReport": "",
+    "Help": "",
+    "HelpNote": "",
+    "GoNext": "",
+    "GoPrevious": "",
+    "OpenHighlightedTool": "",
+    "RefreshRuleTests": "",
+    "CensorshipCheck": "",
+    "Pulse": "",
+    "Whois": "",
+    "ServiceStatus": "",
+    "InvisibilityTest": "",
+    "EnhancedDnsLeakTest": "",
+    "MacChecker": "",
+    "BrowserInfo": "",
+    "SecurityChecklist": "",
+    "PersonaCheck": ""
+  },
+  "page": {
+    "title": "IPCheck.ing - Verifique meu IP e geolocalização - Teste de vazamento de IP - Teste de vazamento de DNS - Verificação de qualidade de IP - Teste de velocidade da rede - Caixa de ferramentas de IP tudo em um",
+    "description": "Uma caixa de ferramentas de IP melhor e de código aberto: verifique seu IP e sua geolocalização, teste vazamentos de IP por WebRTC e DNS, faça uma verificação de qualidade de IP, verifique a impressão digital do navegador, além de teste de velocidade, teste de latência global, teste MTR, pesquisa Whois e muito mais.",
+    "keywords": "MyIP, ferramenta de IP, verificar IP, teste de vazamento de IP, verificação de qualidade de IP, consulta de IP, teste de vazamento de DNS, teste de vazamento WebRTC, verificação de impressão digital do navegador, teste de velocidade, teste de latência global, teste MTR, consulta DNS, pesquisa Whois",
+    "footerLink": "https://github.com/jason5ng32/MyIP",
+    "copyRightName": "Originalmente de ",
+    "copyRightLink": "https://ipcheck.ing",
+    "copyRightLinkName": "IPCheck.ing"
+  },
+  "helpModal": {
+    "Title": ""
+  },
+  "about": {
+    "Title": "",
+    "project": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "founderTitle": "",
+    "founder": [
+      "",
+      "",
+      ""
+    ],
+    "contactTitle": "",
+    "contact": [
+      "",
+      "",
+      ""
+    ],
+    "personal": "",
+    "blog": "",
+    "linkedIn": "",
+    "twitter": "",
+    "Sponsor": "",
+    "Privacy": "",
+    "HelpCenter": "",
+    "Contribute": "",
+    "Close": ""
+  },
+  "acknowledgement": {
+    "Title": "",
+    "Note1": ""
+  },
+  "changelog": {
+    "Title": "",
+    "add": "",
+    "improve": "",
+    "fix": ""
+  },
+  "pwa": {
+    "appDescription": "",
+    "installDescription": ""
+  }
+}
