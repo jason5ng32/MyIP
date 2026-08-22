@@ -79,9 +79,17 @@ runnable directly as `pnpm fetch-favicons`). Only if auto-fetch can't find a usa
 PNG do you hand-source one (on macOS, `sips` handles ICO→PNG). Remember to commit
 the PNGs with your change — CI stays offline and only checks they exist.
 
-**Translations** — improvements to the existing `en` / `zh` / `fr` / `ru` packs are
-welcome. Adding a whole new locale is heavier than it looks (every future copy change
-must land in it too), so please open an issue to discuss before starting one.
+**README translations** — beyond the four READMEs we maintain (`en` / `zh` / `fr` /
+`ru`), community-maintained translations in any language are welcome. Create
+`README_<LANG>.md` from the English [README.md](README.md) (the canonical source),
+open it with a one-line "community-maintained translation — English is canonical"
+note in your language, and add your language to the switcher row near the top of the
+existing READMEs. Keep code blocks, URLs, and badges unchanged. Check open issues
+for requested languages before starting.
+
+**UI translations** — improvements to the existing `en` / `zh` / `fr` / `ru` packs are
+welcome. Adding a whole new UI locale is heavier than it looks (every future copy
+change must land in it too), so please open an issue to discuss before starting one.
 
 ## Bugs & feature requests
 

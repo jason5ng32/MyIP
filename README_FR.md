@@ -99,6 +99,13 @@ Les guides complets se trouvent dans le centre de documentation MyIP : **[docs.i
 * [Guide du développeur](https://docs.ipcheck.ing/developer/fr) — déploiement, configuration, architecture et contribution
 * [Base de connaissances](https://docs.ipcheck.ing/knowledge-base/fr) — utilisation de chaque outil, diagnostic réseau pas à pas, concepts réseau
 
+## 🤝 Contribuer
+
+Les contributions sont les bienvenues ! Nous maintenons une sélection de tâches adaptées aux débutants — chacune avec les fichiers précis, les critères d'acceptation et des tests pour vous guider :
+
+* 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) — ajouter un résolveur DNS de votre pays, enrichir les listes de sites, traduire le README dans votre langue, améliorer les traductions…
+* 📄 [CONTRIBUTING.md](CONTRIBUTING.md) — installation, conventions et flux des PR (ciblez la branche `dev`)
+
 ## ⚙️ Configuration
 
 Deux réglages comptent avant tout :
