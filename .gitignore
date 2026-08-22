@@ -57,6 +57,9 @@ docs/
 # Local Scripts
 scripts/
 
+# Section banners — deploy-time data (ads and campaign promos stay out of git)
+frontend/data/banners/*
+
 # Site configuration
 public/sitemap.xml
 public/robots.txt

@@ -83,18 +83,15 @@
       </Card>
     </div>
 
-    <!-- Enhanced DNS leak test banner — surfaces the deeper tool once the
-         homepage test has resolved (success or timeout). -->
-    <InfoBanner :show="showEnhancedBanner" :icon="Sparkles" :title="t('dnsleaktest.EnhancedBanner.Title')"
-      :note="t('dnsleaktest.EnhancedBanner.Note')" :cta="t('dnsleaktest.EnhancedBanner.CTA')"
-      @action="openEnhancedTest" />
+    <!-- Section banner slot (data-driven; see InfoBanner.vue); settled once
+         the homepage test has resolved (success or timeout). -->
+    <InfoBanner section="dnsleak" :settled="hasEverSettled" />
   </section>
 </template>
 
 
 <script setup>
 import { ref, computed, onMounted, reactive } from 'vue';
-import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -106,7 +103,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStatusTone, ipFieldTone, isFieldPending as isFieldPendingShared } from '@/composables/use-status-tone.js';
 import { createMaskGate } from '@/composables/use-info-mask.js';
 import { useMaxmind } from '@/composables/use-maxmind.js';
-import { EthernetPort, Play, MapPin, RotateCw, Sparkles, DoorOpen } from '@lucide/vue';
+import { EthernetPort, Play, MapPin, RotateCw, DoorOpen } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
@@ -123,26 +120,14 @@ const PROVIDERS = [ipApi, surfshark, ipleak, fastly];
 
 const { t } = useI18n();
 const store = useMainStore();
-const router = useRouter();
 const { lookupMaxmind } = useMaxmind();
 // Skip the info-mask blur on waiting/error placeholders (not a real IP).
 const maskAttr = createMaskGate(t);
 const isStarted = ref(false);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
-// Sticky flag for the Enhanced DNS Leak Test banner.
+// Sticky settled flag for the section's banner slot.
 const hasEverSettled = ref(false);
-
-// Also gated on configs.originalSite to match the Advanced.vue card gate.
-const showEnhancedBanner = computed(() =>
-  hasEverSettled.value && store.configs?.originalSite === true
-);
-
-const openEnhancedTest = () => {
-  trackEvent('Section', 'BannerClick', 'EnhancedDnsLeakTest');
-  // Open the in-depth DNS Leak Test's in-page drawer (tools are query-driven now).
-  router.push({ path: '/', query: { tool: 'enhanceddnsleaktest' } });
-};
 
 const { dotClass, textClass } = useStatusTone();
 

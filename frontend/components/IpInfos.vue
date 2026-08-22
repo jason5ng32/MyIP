@@ -23,6 +23,9 @@
       </div>
     </div>
 
+    <!-- Section banner slot — renders nothing unless a data file for this
+        section exists (see InfoBanner.vue). -->
+    <InfoBanner section="ipinfo" :settled="cardsHaveSettled" />
   </section>
 </template>
 
@@ -39,6 +42,7 @@ import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
+import InfoBanner from './widgets/InfoBanner.vue';
 
 
 const { t } = useI18n();
@@ -124,6 +128,8 @@ const IPArray = ref([]);
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const usingSource = ref(userPreferences.value.ipGeoSource);
 const fetchStatus = reactive([]);
+// Timing gate for the sponsor slot: flips once every visible card settled.
+const cardsHaveSettled = ref(false);
 
 // Middleware
 let pendingIPDetailsRequests = new Map();
@@ -234,6 +240,7 @@ const trackFetchStatus = (status) => {
     }
   }
   if (allHasFetched) {
+    cardsHaveSettled.value = true;
     store.setLoadingStatus('IPInfo', true);
     // Domain event: full snapshot of the visible cards, re-emitted whenever a
     // card settles after this point (single-card refresh included). The report

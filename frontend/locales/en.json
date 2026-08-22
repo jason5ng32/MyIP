@@ -1271,12 +1271,7 @@
     "Note2": "The method to test for DNS leaks involves accessing a newly generated domain name to detect which regional DNS exit you are resolving through. If the endpoint region returned matches your local service provider's region, there is a risk of DNS leakage. In this case, you may need to modify your VPN/proxy settings.",
     "EndpointCountry": "Endpoint Region",
     "StatusWait": "Awaiting Test",
-    "StatusError": "Test Error",
-    "EnhancedBanner": {
-      "Title": "Want to dig deeper?",
-      "Note": "Want to see every recursive resolver you're actually using, their ASN, whether any of them forwards a prefix of your real IP upstream via ECS, and whether DNSSEC validation is in play, open the \"In-depth DNS Leak Test\" below.",
-      "CTA": "Open the in-depth test"
-    }
+    "StatusError": "Test Error"
   },
   "speedtest": {
     "Title": "Speed Test",

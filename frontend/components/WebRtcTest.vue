@@ -113,6 +113,8 @@
       </Card>
     </div>
 
+    <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
+    <InfoBanner section="webrtc" :settled="hasEverSettled" />
   </section>
 </template>
 
@@ -134,6 +136,7 @@ import { Play, MapPin, EthernetPort, Flower, Network, RotateCw, FileText, Chevro
 import { Icon } from '@iconify/vue';
 import FitText from '@/components/widgets/FitText.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';
+import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 
 const { t } = useI18n();
@@ -146,6 +149,9 @@ const { dotClass, textClass } = useStatusTone();
 const { lookupMaxmind } = useMaxmind();
 
 const isStarted = ref(false);
+// Sticky settled flag for the section's banner slot: true once a full STUN
+// pass finishes (including the WebRTC-unavailable path).
+const hasEverSettled = ref(false);
 const IPArray = ref([]);
 const stunServers = reactive([
   { id: 'google', url: 'stun.l.google.com:19302', ip: t('webrtc.StatusWait'), natType: t('webrtc.StatusWait'), country: t('webrtc.StatusWait'), country_code: '', org: t('webrtc.StatusWait'), sdpLog: [], sdpOpen: false },
@@ -384,6 +390,7 @@ const natTypeCodeOf = (candidate) => {
 // Domain event: snapshot of all STUN cards for the report collector (servers
 // still waiting carry no natTypeCode and are dropped by the builder).
 const emitWebrtcFinished = () => {
+  hasEverSettled.value = true;
   emitAppEvent('webrtc:finished', {
     servers: stunServers.map((server) => ({
       id: server.id,
