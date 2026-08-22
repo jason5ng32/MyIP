@@ -1,6 +1,6 @@
 # Translating MyIP
 
-MyIP ([IPCheck.ing](https://ipcheck.ing)) ships its UI in English, 简体中文, Français and
+MyIP (demo: [IPCheck.ing](https://ipcheck.ing)) ships its UI in English, 简体中文, Français and
 Русский. Adding a fifth — or a sixth — is a two-file change, and **a partial translation is
 a welcome first PR**. You do not need to translate everything, and you do not need to know
 Vue.

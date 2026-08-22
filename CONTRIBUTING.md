@@ -1,6 +1,6 @@
 # Contributing to MyIP
 
-Thanks for your interest in contributing! MyIP ([IPCheck.ing](https://ipcheck.ing)) is an
+Thanks for your interest in contributing! MyIP (demo: [IPCheck.ing](https://ipcheck.ing)) is an
 open-source IP toolbox — IP lookup, connectivity tests, WebRTC / DNS-leak detection,
 speed test, and more — built as a Vue 3 SPA with an Express 5 backend.
 
