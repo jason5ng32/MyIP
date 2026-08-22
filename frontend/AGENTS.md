@@ -6,214 +6,145 @@ Conventions specific to the Vue 3 SPA under `frontend/`. Universal rules
 ## Overview
 
 Vue 3 `<script setup>` + Pinia + vue-router (HTML5 history) + Tailwind CSS v4
-over shadcn-vue primitives (copied in, not a package). No TypeScript, no
-`dark:` dual-pair utilities.
+over copied-in shadcn-vue primitives. No TypeScript, no `dark:` dual pairs.
 
 ## Layout
 
 ```
 frontend/
-├── App.vue          ← thin shell: global providers + <router-view>
-├── main.js          ← bootstrap + env-gated dynamic init (Sentry, Firebase)
-├── store.js         ← Pinia main store
-├── firebase-init.js ← env-gated lazy Firebase Auth; boot path picked by the
-│                      utils/auth-hint.js flag (signed-in → gate mount on
-│                      auth; visitor → SDK never loads until sign-in)
-├── sentry-init.js   ← env-gated Sentry (see "Error monitoring" below)
-├── router/          ← `/` Home · `/tools/:slug` StandaloneTool · `/privacy`
-│                      · `/r/:id` shared report (noindex)
-│                      (advanced tools also open in-page via `?tool=<slug>`)
-├── locales/         ← en / zh / fr / ru + on-demand sub-packs
-├── style/style.css  ← Tailwind v4 entry + design tokens
-├── lib/             ← cn() only (shadcn support layer)
-├── data/            ← static config: achievements + achievement-rules /
-│                      ip-databases / sections / changelog / tools registry
-│                      (router + cards + drawer all derive from it) /
-│                      pulse-statuses (Earth Online vocabulary: presets +
-│                      date-windowed festival statuses + their celebration
-│                      effect mapping; recipes in utils/pulse-celebration.js)/
-│                      connectivity-import-lists (default target set +
-│                      curated import sets + the shared cap; icons are
-│                      committed 64px PNGs under public/favicons/ — one per
-│                      member, enforced by its data test)
-├── utils/           ← framework-agnostic helpers + IO
-│                      (app-events bus / getips/ / valid-ip / analytics / …)
-├── composables/     ← Vue-aware `useXxx` logic
-└── components/      ← Home / StandaloneTool / top-level sections, plus
-                       ip-infos/ · advanced-tools/ · report/ · widgets/ ·
-                       svgicons/ · ui/
+├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
+├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js)
+├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
+├── data/            ← static config (tools registry drives router+cards+drawer)
+├── lib/ · utils/ · composables/  ← see "Helper placement"
+└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ ui/
 ```
 
-Directory-level only — every file opens with a header comment stating its
-purpose; read those for specifics.
+Every file opens with a header comment stating its purpose — read those.
 
 ## Conventions
 
-- **Composition API.** `<script setup>` everywhere; no Options API.
-- **Path alias.** `@` → `frontend/`.
-- **Shared-with-backend helpers live in `common/`**, re-exported through a
-  thin bridge in `utils/` so consumers keep `@/utils/...` imports (pattern:
-  `utils/valid-ip.js`, `utils/fetch-with-timeout.js`).
-- **Helper placement:** needs Vue reactivity / lifecycle → `composables/`
-  (`useXxx`); otherwise → `utils/` (never `use-` prefixed). `lib/` stays
-  shadcn-only. A pure function living next to a composable is exported from
-  that composable's file, not promoted to its own.
+- **Composition API** everywhere; no Options API. Alias `@` → `frontend/`.
+- **Shared-with-backend helpers live in `common/`**, re-exported through a thin
+  `utils/` bridge so consumers keep `@/utils/...` imports (`utils/valid-ip.js`).
+- **Helper placement:** Vue reactivity / lifecycle → `composables/` (`useXxx`);
+  otherwise `utils/` (never `use-` prefixed). `lib/` stays shadcn-only. A pure
+  function next to a composable exports from that composable's file.
 
 ### Achievements are event-driven
 
-Components never touch the achievement system. They emit domain events
-unconditionally — `emitAppEvent('speedtest:finished', {…})` on the
-`utils/app-events.js` bus — and the pipeline downstream handles the rest:
-`data/achievement-rules.js` maps events to achievement slugs (single place to
-look for "what unlocks X"); `composables/use-achievement-engine.js` (init'd
-once in App.vue) owns the signed-in / remote-sync / already-achieved / rate
-guards (rules never evaluate until the remote achievements snapshot lands —
-`store.userAchievementsSynced`; pre-sync hits are parked and re-checked).
-New achievement = entry in `data/achievements.js` + rule + (only if no
-suitable event exists) a new domain event. Tests:
-`tests/achievement-rules.test.js`, `tests/composable-achievement-engine.test.js`.
+Components never touch the achievement system — they emit domain events
+unconditionally (`emitAppEvent('speedtest:finished', {…})` on `utils/app-events.js`);
+`data/achievement-rules.js` maps events → slugs, `composables/use-achievement-engine.js`
+owns all guards (rules wait for the remote snapshot; pre-sync hits parked).
+New achievement = entry + rule + (only if no suitable event exists) a new event.
 
-The shareable diagnostic report rides the same bus: every "my network" test
-emits `<domain>:finished` with its full structured result;
-`composables/use-report-collector.js` (init'd once in App.vue) normalizes
-payloads through `utils/report-builders.js` into sections whitelisted by
-`common/report-schema.js`, and `components/report/` consumes the snapshots
-(share dialog + read-only /r/:id page). New reportable test = emit event +
-builder + schema entry, in the same change. Changing a test's result
-semantics or an upstream field means updating that test's builder whitelist
-+ schema enum too — builders fail soft (unknown values silently drop the
-field) and test fixtures are frozen, so drift shows up as quietly missing
-report fields, not as errors.
+The shareable report rides the same bus: tests emit `<domain>:finished`;
+`composables/use-report-collector.js` normalizes via `utils/report-builders.js`
+into sections whitelisted by `common/report-schema.js`. New reportable test =
+event + builder + schema entry, same change; changing result semantics means
+updating builder whitelist + schema enum too — builders fail soft and fixtures
+are frozen, so drift shows up as quietly missing fields, not errors.
 
-A report link is readable by anyone who has it, so the builder — not the
-renderer — is where anything the visitor supplied gets dropped. Persona
-Check is the sharpest case: its live results carry a `detail` per check
-(issuing bank, the country a shared position resolved to), and only the
-id / axis / verdict triple reaches the section. Invisibility follows the
-same rule with key + flag. Keep new sections on that side of the line.
+A report link is readable by anyone, so the builder — not the renderer — drops
+anything the visitor supplied: Persona Check ships only id / axis / verdict
+(never the per-check `detail`); Invisibility likewise key + flag only.
+
+### Commands are the imperative twin of events
+
+`utils/app-commands.js`: events say "this happened" (any subscribers); a command
+says "do this" — exactly one owner, and `dispatchAppCommand` resolves when the
+work is done, with the owner's result. Owners register via
+`composables/use-app-command.js` (scope-bound, setup-time); payload = one plain
+JSON object whose shape the owner defines at its registration site. Handlers
+reject gated / invalid runs with `appCommandError(code, message)` and reserved
+codes `auth` / `quota` / `input` (the bus produces `unavailable` / `timeout`),
+so callers react programmatically. Cross-component triggers go through the bus —
+never template refs (refs stay for UI chrome). Future advanced tools register
+at setup (`?tool=` mount); callers `waitForAppCommand` + dispatch.
 
 ### Overlays take no keyboard shortcuts
 
-`utils/shortcut.js` runs one document-level keydown dispatcher over the map
-`composables/use-shortcuts.js` registers — every entry there is a home-page
-action, and the whole map is suspended while any overlay is open. The rule keys
-off the component's form, not its purpose: the `ui/` roots (`Dialog` / `Sheet` /
-`Drawer`) call `composables/use-overlay-shortcuts.js`, so anything built on them
-inherits it, and overlays nest. Esc and the native scrolling keys still work —
-reka-ui / vaul and the browser own those.
-
-`registerShortcuts()` replaces the map rather than appending, and Home clears it
-on unmount — shortcuts belong to the home route alone.
+One document-level dispatcher (`utils/shortcut.js`) over the map
+`composables/use-shortcuts.js` registers — all home-page actions, suspended
+while any overlay is open. The rule keys off form, not purpose: the `ui/`
+roots (`Dialog` / `Sheet` / `Drawer`) call `composables/use-overlay-shortcuts.js`,
+so anything built on them inherits it; overlays nest. Esc and native scrolling
+keys still work (reka-ui / vaul / the browser own those). `registerShortcuts()`
+replaces the map, and Home clears it on unmount — shortcuts are home-route only.
 
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
-`sentry-init.js` loads via a build-time-gated dynamic import: no
-`VITE_SENTRY_DSN_FRONTEND` → no Sentry code in the bundle at all (same
-philosophy as `firebase-init.js`). Two rules:
+No `VITE_SENTRY_DSN_FRONTEND` → no Sentry code in the bundle at all
+(build-time-gated dynamic import, like `firebase-init.js`). Rules:
 
-- **Never import `@sentry/vue` in app code** — a static import would drag the
-  SDK back into the main bundle. All Sentry config lives in `sentry-init.js`.
-- **Explicit signals go through the app-events bus**, like achievements: the
-  component emits, `sentry-init.js` subscribes. One signal is captured:
-  `ip-source:exhausted` (an IP card's whole source chain failed). Cards
-  report only when the `ipinfo:finished` snapshot shows some card resolved a
-  valid IP of the same version — otherwise "our chain failed" is
-  indistinguishable from visitor-side conditions (no IPv6 / dead network),
-  which is routine noise.
+- **Never import `@sentry/vue` in app code** — a static import drags the SDK
+  into the main bundle. All config lives in `sentry-init.js`.
+- **Explicit signals go through the app-events bus**: component emits,
+  `sentry-init.js` subscribes. One signal: `ip-source:exhausted` (a card's whole
+  source chain failed) — emitted only when another card resolved a valid IP of
+  the same version; otherwise no-IPv6 / dead-network visitors = routine noise.
 
-Capture surface: uncaught errors; `console.error` (fingerprinted on the first
-argument, so a call site that fails several ways names the failure there —
-`fetchErrorLabel` in `utils/authenticated-fetch.js` renders the HTTP status,
-keeping an edge-blocked 403 out of the same issue as a 5xx; individual
-`utils/getips/` source failures are `console.warn` — invisible to Sentry by
-design, the per-card exhaustion event above is the health signal);
-route-change traces;
-error-only Replay, page text deliberately unmasked (the visitor's on-screen
-network info IS the debugging context; typed input stays masked; disclosed
-in the privacy policy). Third-party script errors (Cloudflare's RUM beacon)
-are dropped via `denyUrls`.
-Backend 5xx is deliberately NOT captured frontend-side — the backend SDK
-reports its own failures. Envelopes ship through the first-party tunnel
-`/api/monitoring` (`api/sentry-tunnel.js`) to beat ad blockers; source maps
-upload at build, gated on `SENTRY_AUTH_TOKEN`.
+Traps: `console.error` is captured, fingerprinted on the first argument — name
+the failure there; `utils/getips/` source failures stay `console.warn`,
+invisible by design. Replay leaves page text unmasked deliberately (on-screen
+network info IS the debugging context; typed input masked; in the privacy
+policy). Backend 5xx is NOT captured frontend-side. Envelopes ship through the
+first-party tunnel `/api/monitoring` to beat ad blockers.
 
 ## UI system
 
-**shadcn-vue first.** Check `components/ui/` (copied-in primitives), then
-https://www.shadcn-vue.com/docs/components for something to copy in;
-hand-rolled Tailwind only when neither fits. Four local notes: `Spinner`
-(lucide `Loader2` + `role="status"`) and `ToolLoadingSkeleton` (chunk-loading
-placeholder for lazy tools) are project-specific; `toggle` / `toggle-group`
-deliberately use the `primary` pair for the pressed state; and the `Dialog` /
-`Sheet` / `Drawer` roots suspend the keyboard shortcuts while open — keep all
-of these when syncing upstream.
+**shadcn-vue first.** Check `components/ui/`, then the shadcn-vue docs for
+something to copy in; hand-rolled Tailwind only when neither fits. Keep when
+syncing upstream: `Spinner` + `ToolLoadingSkeleton` (project-specific),
+`toggle` / `toggle-group`'s deliberate `primary` pressed pair, and the
+overlay roots' shortcut suspension.
 
 ### Design tokens
 
-Top of `style/style.css`; four business-semantic colors on top of shadcn
-defaults, each with a paired `-foreground`:
-
-`--info` (waiting / in-progress) · `--success` (ok-fast) · `--warning`
-(ok-slow) · `--action` (the "run / trigger" brand color)
-
-Rule: semantic tokens only (`bg-info` / `bg-action` / `bg-muted` /
-`text-muted-foreground` / …). Never write `dark:` dual pairs — tokens theme
-themselves.
-
-Button adds `action` and `success` variants to the shadcn set; Badge adds
-`success` and has hover globally disabled (display element — wrap it for
-interactivity). FAB colors express semantics, never decoration: `action` =
-trigger, `default` = stateless panels, `success` = protective state active,
-`secondary` = dock controls; at most two accents visible at once.
+Top of `style/style.css`; four business-semantic colors with paired `-foreground`:
+`--info` (waiting) · `--success` (ok-fast) · `--warning` (ok-slow) · `--action`
+(run / trigger). Semantic tokens only; never `dark:` dual pairs — tokens theme
+themselves. Button adds `action` / `success` variants; Badge adds `success`,
+hover globally disabled (display element — wrap it for interactivity). FAB colors
+are semantic, never decorative: `action` = trigger, `default` = stateless panel,
+`success` = protective state active, `secondary` = dock; max two accents at once.
 
 ### Status tones
 
 Every "business state → color" mapping goes through
 `composables/use-status-tone.js` (`wait` / `ok-fast` / `ok-slow` / `fail`),
-normally via its `ipFieldTone()` helper. No hand-rolled state→color switches.
+normally via `ipFieldTone()` — no hand-rolled state→color switches.
 
 ### Canonical patterns
 
-Copy from the named exemplar instead of re-inventing:
+Copy the named exemplar instead of re-inventing:
 
-- **Trigger button** — `variant="action"` + `<Spinner v-if />` + `:disabled`
-  (QueryIP, MacChecker, Whois, …).
-- **Input + icon trigger** — flex row, compact icon Button (lucide `Search`),
-  no text label (QueryIP / Whois / DnsResolver).
-- **AutoFill-proof inputs** — every free-form Input carries all six:
+- **Trigger button** — `variant="action"` + `<Spinner v-if />` + `:disabled` (QueryIP, Whois).
+- **Input + icon trigger** — flex row, compact icon Button, no text label (QueryIP).
+- **AutoFill-proof inputs** — all six on every free-form Input:
   `autocomplete="off" autocorrect="off" autocapitalize="off"
-  spellcheck="false" data-1p-ignore data-lpignore="true"`, and placeholder
-  copy avoids "address / 地址 / adresse / adresi" — iOS QuickType keys on the
-  word itself even with autocomplete off.
-- **Status card** — `keyboard-shortcut-card jn-card` markers + hover-lift
-  transition (Connectivity / WebRTC / IPCard). `jn-card` = shadow / border /
-  keyboard outline; `keyboard-shortcut-card` = J/K navigation target.
+  spellcheck="false" data-1p-ignore data-lpignore="true"`; placeholder copy
+  avoids "address / 地址 / adresse / adresi" — iOS QuickType keys on the word.
+- **Status card** — `keyboard-shortcut-card jn-card` + hover lift (IPCard):
+  `jn-card` = shadow / border / outline; `keyboard-shortcut-card` = J/K target.
 - **Flag** — always `<Icon :icon="'circle-flags:' + code.toLowerCase()" />`.
 - **Dates & times** — every user-visible stamp renders through
-  `utils/time-utils.js` with the vue-i18n locale: `formatIsoDate` (date-only
-  ISO — changelog, OONI windows, IP-history day headers), `isoToDateTime`
-  (ISO instants — report generated / expiry / per-section stamps),
-  `unixToDateTime` (epoch ms — account & achievement dates),
-  `relativeTimeFromMinutes` / `relativeTimeSince` / `formatDuration` (Pulse).
-  No hand-rolled `toLocaleDateString` / `Intl.DateTimeFormat` in components;
-  a deliberate exception carries a comment saying why (ASNHistory's
-  fixed-width ISO columns, report-export's AI-facing ISO intro,
-  ServiceStatus's seconds-bearing refresh clock).
-- **Fit-to-width tokens** — IP / MAC strings render inside `<FitText>`
-  (`HERO_TIERS` hero rows, `INLINE_TIERS` compact rows; `:max-lines="2"` on
-  heroes). Never per-component length-threshold helpers (IPCard, QueryIP).
+  `utils/time-utils.js` with the vue-i18n locale; no hand-rolled
+  `toLocaleDateString` / `Intl.DateTimeFormat` — deliberate exceptions carry a
+  why-comment (ASNHistory ISO columns, report-export intro, ServiceStatus clock).
+- **Fit-to-width tokens** — IP / MAC strings render in `<FitText>` (`HERO_TIERS` /
+  `INLINE_TIERS`; `:max-lines="2"` on heroes); never length-threshold helpers.
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
-- **Drawer vs Sheet** — the vaul-vue bottom Drawer is for the Advanced Tools
-  panel and full-bleed expansions of an inline visual (ASNConnectivity); side
-  panels use `Sheet`.
+- **Drawer vs Sheet** — vaul-vue bottom Drawer for the Advanced Tools panel
+  and full-bleed expansions of an inline visual; side panels use `Sheet`.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
-  hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dot clusters.
+  hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dots.
 
 ## Testing
 
-Composables and utils are the target (`tests/composable-*.test.js` and
-friends). Vue rendering / browser APIs are out of scope for the Node runner.
-Visual changes can't be self-tested — say so and let the user verify in
-`pnpm dev`.
+Composables and utils are the target (`tests/composable-*.test.js`). Vue
+rendering / browser APIs are out of scope for the Node runner. Visual changes
+can't be self-tested — say so and let the user verify in `pnpm dev`.
