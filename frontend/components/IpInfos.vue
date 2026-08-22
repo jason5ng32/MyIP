@@ -272,6 +272,10 @@ const trackFetchStatus = (status) => {
 // allSettled so one card can't sink the batch (fetchIP already swallows per-card
 // errors — this is belt-and-suspenders). Cards paint independently as they land.
 const checkAllIPs = async () => {
+  // A whole-grid pass means no card is settled: clear the completion flags so
+  // ipinfo:finished (and the ipinfo:refresh command riding on it) waits for
+  // every card to land again, instead of re-firing on the first one.
+  fetchStatus.splice(0);
   const ipSources = [
     [0, getIPFromIPChecking4],
     [1, getIPFromIPChecking6],
