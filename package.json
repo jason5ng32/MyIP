@@ -15,7 +15,8 @@
     "start-frontend": "node frontend-server.js",
     "start": "concurrently \"node frontend-server.js\" \"node --import ./sentry-instrument.js backend-server.js\"",
     "purge-index": "node scripts/purge-index-cache.js",
-    "fetch-favicons": "node scripts/fetch-favicons.js"
+    "fetch-favicons": "node scripts/fetch-favicons.js",
+    "i18n-status": "node scripts/i18n-status.js"
   },
   "dependencies": {
     "@cloudflare/speedtest": "^1.13.0",

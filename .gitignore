@@ -54,10 +54,12 @@ common/as-rel-db/*.next
 docs/
 .plan/
 
-# Local Scripts (fetch-favicons.js is the one public exception —
-# contributors need it for the Connectivity favicon pipeline)
+# Local Scripts (the listed exceptions are public — contributors need
+# fetch-favicons.js for the Connectivity favicon pipeline and i18n-status.js
+# to see how far along a translation is)
 scripts/*
 !scripts/fetch-favicons.js
+!scripts/i18n-status.js
 
 # Section banners — deploy-time data (ads and campaign promos stay out of git)
 frontend/data/banners/*

@@ -17,6 +17,11 @@ export const LOCALES = [
 // Registry order — also the order the language picker renders.
 export const LOCALE_CODES = LOCALES.map((locale) => locale.code);
 
+// Locales held to full coverage; beta ones may ship a partial pack.
+export const FULL_LOCALE_CODES = LOCALES.filter((l) => l.status === 'full').map((l) => l.code);
+
+export const FALLBACK_LOCALE = 'en';
+
 export const getLocale = (code) => LOCALES.find((locale) => locale.code === code);
 
 // Both mappings pass an unregistered code through rather than blanking it.
@@ -24,13 +29,26 @@ export const toApiTag = (code) => getLocale(code)?.apiTag ?? code;
 
 export const toHtmlLang = (code) => getLocale(code)?.htmlLang ?? code;
 
-// Exact match first, base language second — `zh-TW` prefers a zh-TW pack and
-// only falls back to `zh` when there is none.
+// The chain a missing translation walks: variant → base → en. A base only
+// joins the chain when it is registered. This is the single definition of the
+// order — i18n, the privacy / checklist datasets and the changelog all use it.
+export const fallbackChain = (code) => {
+    const chain = [code];
+    const base = String(code).split('-')[0];
+    if (base !== code && LOCALE_CODES.includes(base)) chain.push(base);
+    if (!chain.includes(FALLBACK_LOCALE)) chain.push(FALLBACK_LOCALE);
+    return chain;
+};
+
+// Resolve a BCP-47 tag against `codes` in three steps: exact, then the base
+// language, then any locale of that family (pt-PT → pt-BR), registry order
+// deciding between siblings.
 export const matchLocale = (tag, codes = LOCALE_CODES) => {
     if (!tag) return null;
     const wanted = String(tag).toLowerCase();
-    const exact = codes.find((code) => code.toLowerCase() === wanted);
-    if (exact) return exact;
     const base = wanted.split('-')[0];
-    return codes.find((code) => code.toLowerCase() === base) ?? null;
+    return codes.find((code) => code.toLowerCase() === wanted)
+        ?? codes.find((code) => code.toLowerCase() === base)
+        ?? codes.find((code) => code.toLowerCase().split('-')[0] === base)
+        ?? null;
 };

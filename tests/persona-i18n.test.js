@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import fs from 'node:fs';
 
-import { LOCALE_CODES } from '../common/locale-registry.js';
+import { FULL_LOCALE_CODES } from '../common/locale-registry.js';
 import {
     PERSONA_CHECK_IDS,
     PERSONA_DETAIL_KEYS,
@@ -27,8 +27,9 @@ import {
 // the unknown reasons whitelisted to explain themselves.
 const RENDERED_REASONS = [...PERSONA_NOT_APPLICABLE_REASONS, ...PERSONA_UNKNOWN_REASONS];
 
-// Read from disk so the registry alone decides which languages are checked.
-const LOCALES = Object.fromEntries(LOCALE_CODES.map((code) => [
+// Read from disk so the registry alone decides which languages are checked —
+// full ones only, a beta pack is allowed to still be missing these keys.
+const LOCALES = Object.fromEntries(FULL_LOCALE_CODES.map((code) => [
     code,
     JSON.parse(fs.readFileSync(new URL(`../frontend/locales/${code}.json`, import.meta.url), 'utf8')),
 ]));

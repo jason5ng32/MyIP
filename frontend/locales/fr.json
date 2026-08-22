@@ -1418,7 +1418,7 @@
     "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie"
   },
   "page": {
-    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",
+    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Boîte à outils IP tout-en-un",
     "description": "Une boîte à outils IP open source et tout-en-un : vérifiez votre adresse IP et sa géolocalisation, testez les fuites IP via WebRTC et DNS, effectuez une vérification de la qualité IP, une vérification de l'empreinte du navigateur, ainsi qu'un test de vitesse, un test de latence mondiale, un test MTR, une recherche Whois, et plus encore.",
     "keywords": "MonIP, Outil IP, Vérification IP, Test de fuite IP, Test de fuite DNS, Qualité IP, Test de fuite WebRTC, Empreinte du navigateur, Test de vitesse, Test de latence mondiale, Test MTR, Recherche DNS, Recherche Whois",
     "footerLink": "https://github.com/jason5ng32/MyIP",

@@ -1418,7 +1418,7 @@
     "PersonaCheck": "打开深度画像检测面板"
   },
   "page": {
-    "title": "IPCheck.ing - 查看我的 IP 地址及归属地 - IP 泄露检测 - DNS 泄露检测 - IP 质量检查 - 网速测试 - Jason Ng 阿禅开源作品",
+    "title": "IPCheck.ing - 查看我的 IP 地址及归属地 - IP 泄露检测 - DNS 泄露检测 - IP 质量检查 - 网速测试 - 多合一 IP 工具箱",
     "description": "好用和开源的全能 IP 工具箱。轻松查看你的 IP 地址和信息、检查 IP 泄露、DNS 与 WebRTC 泄露检查、查看 IP 质量分数、浏览器指纹检查。还有网速测试、全球延迟测试、MTR 测试、Whois 查询等。",
     "keywords": "我的IP,IP工具,IP查询,IP泄露检测,DNS泄露检测,IP质量检测,WebRTC泄露检测,浏览器指纹检测,网速测试,全球延迟测试,MTR测试,DNS查询,Whois搜索",
     "footerLink": "https://github.com/jason5ng32/MyIP",

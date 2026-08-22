@@ -1,17 +1,19 @@
 // Unit tests for common/locale-registry.js: the entry shape every consumer
-// relies on, plus the two shared mappings — apiTag and browser-language
-// matching.
+// relies on, plus the shared mappings — apiTag, the fallback chain and
+// browser-language matching. Pack contents are gated in locale-packs.test.js.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import fs from 'node:fs';
 
 import {
     LOCALES,
     LOCALE_CODES,
+    FULL_LOCALE_CODES,
+    FALLBACK_LOCALE,
     getLocale,
     toApiTag,
     toHtmlLang,
+    fallbackChain,
     matchLocale,
 } from '../common/locale-registry.js';
 import { LOCALES as BRIDGED } from '../frontend/utils/locale-registry.js';
@@ -28,16 +30,14 @@ describe('locale registry entries', () => {
         }
     });
 
-    it('codes are unique and en is registered (it is the fallback locale)', () => {
+    it('codes are unique and the fallback locale is registered', () => {
         assert.equal(new Set(LOCALE_CODES).size, LOCALE_CODES.length);
-        assert.ok(LOCALE_CODES.includes('en'));
+        assert.ok(LOCALE_CODES.includes(FALLBACK_LOCALE));
     });
 
-    it('every registered code has a message pack on disk', () => {
-        for (const code of LOCALE_CODES) {
-            assert.ok(fs.existsSync(new URL(`../frontend/locales/${code}.json`, import.meta.url)),
-                `frontend/locales/${code}.json is missing`);
-        }
+    it('full locales are a subset of all locales', () => {
+        for (const code of FULL_LOCALE_CODES) assert.ok(LOCALE_CODES.includes(code));
+        assert.ok(FULL_LOCALE_CODES.includes(FALLBACK_LOCALE), 'en must stay full — everything falls back to it');
     });
 
     it('the front-end bridge re-exports the same registry', () => {
@@ -66,6 +66,25 @@ describe('toApiTag / toHtmlLang', () => {
     });
 });
 
+describe('fallbackChain', () => {
+    it('ends at en, which falls back to nothing', () => {
+        assert.deepEqual(fallbackChain('en'), ['en']);
+        for (const code of LOCALE_CODES) {
+            assert.equal(fallbackChain(code).at(-1), FALLBACK_LOCALE);
+        }
+    });
+
+    it('sends a plain language straight to en', () => {
+        assert.deepEqual(fallbackChain('zh'), ['zh', 'en']);
+        assert.deepEqual(fallbackChain('tr'), ['tr', 'en']);
+    });
+
+    it('routes a variant through its base — but only a registered one', () => {
+        assert.deepEqual(fallbackChain('zh-TW'), ['zh-TW', 'zh', 'en']);
+        assert.deepEqual(fallbackChain('pt-BR'), ['pt-BR', 'en']);
+    });
+});
+
 describe('matchLocale', () => {
     it('prefers an exact match over the base language', () => {
         assert.equal(matchLocale('zh-TW', ['zh', 'zh-TW']), 'zh-TW');
@@ -77,8 +96,19 @@ describe('matchLocale', () => {
         assert.equal(matchLocale('zh-Hans-CN'), 'zh');
     });
 
-    it('never widens a base tag into a regional pack', () => {
-        assert.equal(matchLocale('zh', ['en', 'zh-TW']), null);
+    it('falls sideways within a family when the base itself is unregistered', () => {
+        // A pt-BR-only registry still serves a pt-PT visitor.
+        assert.equal(matchLocale('pt-PT', ['en', 'pt-BR']), 'pt-BR');
+        assert.equal(matchLocale('pt', ['en', 'pt-BR']), 'pt-BR');
+        assert.equal(matchLocale('zh-CN', ['en', 'zh-TW']), 'zh-TW');
+    });
+
+    it('picks the first sibling in registry order', () => {
+        assert.equal(matchLocale('pt-AO', ['en', 'pt-PT', 'pt-BR']), 'pt-PT');
+    });
+
+    it('never crosses into another language', () => {
+        assert.equal(matchLocale('de-CH', ['en', 'fr', 'zh-TW']), null);
     });
 
     it('returns null for an unknown or empty tag', () => {

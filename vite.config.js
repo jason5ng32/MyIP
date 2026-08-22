@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { CodeInspectorPlugin } from 'code-inspector-plugin';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { PREFS_STORAGE_KEY } from './frontend/data/default-preferences.js';
+import { LOCALE_CODES } from './common/locale-registry.js';
 
 dotenv.config();
 
@@ -76,9 +77,9 @@ function siteUrlHtmlPlugin() {
 // round-trip on the boot critical path. This plugin finds the emitted
 // locale-pack chunks in the bundle and injects a small head script that
 // picks the language exactly like locales/i18n.js (stored prefs →
-// ?hl= → browser language → en) and appends
-// <link rel="modulepreload"> for it (plus the en fallback pack, which
-// non-English boots also await) while the HTML is still streaming — the
+// ?hl= → browser language → en) and appends a
+// <link rel="modulepreload"> for every pack on its fallback chain — the
+// same set mount awaits — while the HTML is still streaming; the
 // packs then download in parallel with the main bundle. A wrong pick only
 // wastes one preload; the real import decides. Dev serves no bundle, so
 // nothing is injected there.
@@ -93,6 +94,7 @@ const localePreloadPlugin = () => {
     for (var i = 0; i < codes.length; i++) if (codes[i].toLowerCase() === wanted) return codes[i];
     var base = wanted.split('-')[0];
     for (var j = 0; j < codes.length; j++) if (codes[j].toLowerCase() === base) return codes[j];
+    for (var k = 0; k < codes.length; k++) if (codes[k].toLowerCase().split('-')[0] === base) return codes[k];
     return null;
   };
   var lang = null;
@@ -102,13 +104,14 @@ const localePreloadPlugin = () => {
   } catch (e) { /* malformed entry — fall through to the default pick */ }
   if (!lang) {
     var hl = new URLSearchParams(location.search).get('hl');
-    if (hl) {
-      lang = chunks[hl] ? hl : 'en';
-    } else {
-      lang = match(navigator.language) || 'en';
-    }
+    lang = match(hl || navigator.language) || 'en';
   }
-  (lang === 'en' ? ['en'] : [lang, 'en']).forEach(function (l) {
+  // Same chain as fallbackChain(): variant, base, en.
+  var chain = [lang];
+  var base = lang.split('-')[0];
+  if (base !== lang && chunks[base]) chain.push(base);
+  if (chain.indexOf('en') === -1) chain.push('en');
+  chain.forEach(function (l) {
     if (!chunks[l]) return;
     var link = document.createElement('link');
     link.rel = 'modulepreload';
@@ -132,10 +135,14 @@ const localePreloadPlugin = () => {
           const match = facade.match(/\/frontend\/locales\/([a-z]{2}(?:-[A-Za-z]{2,4})?)\.json$/);
           if (match) chunks[match[1]] = '/' + fileName;
         }
-        if (Object.keys(chunks).length === 0) return html;
+        // Registry order, so the sibling `match()` settles on is the one the
+        // app itself would pick.
+        const ordered = {};
+        for (const code of LOCALE_CODES) if (chunks[code]) ordered[code] = chunks[code];
+        if (Object.keys(ordered).length === 0) return html;
         return {
           html,
-          tags: [{ tag: 'script', children: preloadScript(chunks), injectTo: 'head' }],
+          tags: [{ tag: 'script', children: preloadScript(ordered), injectTo: 'head' }],
         };
       },
     },

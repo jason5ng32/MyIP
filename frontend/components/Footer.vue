@@ -125,7 +125,7 @@
                       <CirclePlus v-if="item.type === 'add'" class="size-3.5" />
                       <BugOff v-if="item.type === 'fix'" class="size-3.5" />
                     </Badge>
-                    <span class="leading-relaxed">{{ item.change[locale] || item.change.en }}</span>
+                    <span class="leading-relaxed">{{ changeText(item.change) }}</span>
                   </li>
                 </ul>
               </section>
@@ -165,6 +165,7 @@ import { useI18n } from 'vue-i18n';
 import changelogData from '@/data/changelog.json';
 import { trackEvent } from '@/utils/analytics';
 import { formatIsoDate } from '@/utils/time-utils';
+import { fallbackChain } from '@/utils/locale-registry.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -184,6 +185,11 @@ const tabs = ['about', 'changelog', 'acknowledgement'];
 const content = ref('about');
 // Static data from JSON — reverse once via computed so the template stays tidy.
 const changelogReversed = computed(() => changelogData.slice().reverse());
+
+// Entries carry one string per language; history is only guaranteed for full
+// locales, so a beta one walks its fallback chain.
+const changeText = (change) => fallbackChain(locale.value).map((code) => change[code]).find(Boolean) ?? '';
+
 const sheetBody = ref(null);
 
 const personalLinks = [
