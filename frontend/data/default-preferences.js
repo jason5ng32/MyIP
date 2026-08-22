@@ -26,7 +26,7 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   // Local IP-history recorder (see use-ip-history.js). Days: 1–90.
   ipHistoryEnabled: true,
   ipHistoryDays: 90,
-  lang: 'auto', // auto | zh | en | fr | tr
+  lang: 'auto', // auto | zh | en | fr | ru
   // The full Connectivity target set (defaults included). null until first
   // load — store.loadPreferences() runs it through sanitizeTargets(), which
   // also rebuilds a hand-emptied or corrupted stored value.
