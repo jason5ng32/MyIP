@@ -85,6 +85,16 @@ function siteUrlHtmlPlugin() {
 const localePreloadPlugin = () => {
   const preloadScript = (chunks) => `(function () {
   var chunks = ${JSON.stringify(chunks)};
+  // Mirrors matchLocale() in common/locale-registry.js.
+  var match = function (tag) {
+    var wanted = String(tag || '').toLowerCase();
+    if (!wanted) return null;
+    var codes = Object.keys(chunks);
+    for (var i = 0; i < codes.length; i++) if (codes[i].toLowerCase() === wanted) return codes[i];
+    var base = wanted.split('-')[0];
+    for (var j = 0; j < codes.length; j++) if (codes[j].toLowerCase() === base) return codes[j];
+    return null;
+  };
   var lang = null;
   try {
     var stored = JSON.parse(localStorage.getItem(${JSON.stringify(PREFS_STORAGE_KEY)}) || '{}').lang;
@@ -95,8 +105,7 @@ const localePreloadPlugin = () => {
     if (hl) {
       lang = chunks[hl] ? hl : 'en';
     } else {
-      var bl = (navigator.language || '').slice(0, 2).toLowerCase();
-      lang = chunks[bl] ? bl : 'en';
+      lang = match(navigator.language) || 'en';
     }
   }
   (lang === 'en' ? ['en'] : [lang, 'en']).forEach(function (l) {
@@ -118,7 +127,9 @@ const localePreloadPlugin = () => {
         for (const [fileName, chunk] of Object.entries(ctx.bundle || {})) {
           if (chunk.type !== 'chunk') continue;
           const facade = (chunk.facadeModuleId || '').replaceAll('\\', '/');
-          const match = facade.match(/\/frontend\/locales\/([a-z]{2})\.json$/);
+          // Optional region subtag leaves room for `zh-TW`; the privacy /
+          // security-checklist packs sit a folder deeper and never match.
+          const match = facade.match(/\/frontend\/locales\/([a-z]{2}(?:-[A-Za-z]{2,4})?)\.json$/);
           if (match) chunks[match[1]] = '/' + fileName;
         }
         if (Object.keys(chunks).length === 0) return html;

@@ -174,6 +174,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { clampRetentionDays } from '@/utils/ip-history.js';
+import { LOCALES } from '@/utils/locale-registry.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Slider } from '@/components/ui/slider';
@@ -206,13 +207,11 @@ const onOpenChange = (val) => {
     store.setOpenSheet(val ? 'preferences' : null);
 };
 
-// Language options (data driven; flag use circle-flags ISO code)
+// "Follow the system" plus one entry per registered locale (flag = circle-flags
+// ISO code).
 const langOptions = [
     { value: 'auto', label: t('nav.preferences.systemAuto'), flag: '' },
-    { value: 'zh', label: '中文', flag: 'cn' },
-    { value: 'en', label: 'English', flag: 'us' },
-    { value: 'ru', label: 'Русский', flag: 'ru' },
-    { value: 'fr', label: 'Français', flag: 'fr' },
+    ...LOCALES.map(({ code, nativeName, flag }) => ({ value: code, label: nativeName, flag })),
 ];
 const currentLang = computed(() =>
     langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]

@@ -317,12 +317,12 @@ const { t, locale } = useI18n();
 // The checklist dataset is large (~30 KB gzipped per language) and only this tool
 // reads it, so it's loaded on demand for the active locale instead of being baked
 // into the initial i18n bundle (see frontend/locales/i18n.js).
-const securityDataLoaders = {
-    en: () => import('@/locales/security-checklist/en.json'),
-    zh: () => import('@/locales/security-checklist/zh.json'),
-    fr: () => import('@/locales/security-checklist/fr.json'),
-    ru: () => import('@/locales/security-checklist/ru.json'),
-};
+// Discovered by glob, keyed by locale code; a locale with no dataset of its
+// own falls back to en in loadSecurityChecklist() below.
+const securityDataPacks = import.meta.glob('../../locales/security-checklist/*.json');
+const securityDataLoaders = Object.fromEntries(
+    Object.entries(securityDataPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
+);
 
 const securityChecklist = ref(null);
 

@@ -273,6 +273,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import getCountryName from '@/data/country-name.js';
+import { toApiTag } from '@/utils/locale-registry.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -518,13 +519,8 @@ const animateProbes = async () => {
     }
 };
 
-// store.lang is 'zh' but the upstream keys on 'zh-CN' (same mapping as IpInfos/WebRtcTest).
-const apiLang = () => {
-    const current = lang.value;
-    if (current === 'zh') return 'zh-CN';
-    if (current && ['en', 'fr', 'ru', 'zh-CN'].includes(current)) return current;
-    return 'zh-CN';
-};
+// store.lang is a UI code ('zh'); the upstream keys on the apiTag ('zh-CN').
+const apiLang = () => toApiTag(lang.value);
 
 // authenticatedFetch attaches the Firebase ID token as Authorization; our
 // backend then forwards request headers to the upstream IPCheck.ing API.

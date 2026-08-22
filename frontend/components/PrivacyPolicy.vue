@@ -78,12 +78,12 @@ const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === tru
 
 // Privacy copy is loaded on demand per locale (mirrors the security-checklist
 // dataset pattern), then merged into i18n so t() / tm() can resolve it.
-const privacyLoaders = {
-  en: () => import('@/locales/privacy/en.json'),
-  zh: () => import('@/locales/privacy/zh.json'),
-  fr: () => import('@/locales/privacy/fr.json'),
-  ru: () => import('@/locales/privacy/ru.json'),
-};
+// Discovered by glob, keyed by locale code; a locale with no file of its own
+// falls back to en in loadPrivacy() below.
+const privacyPacks = import.meta.glob('../locales/privacy/*.json');
+const privacyLoaders = Object.fromEntries(
+  Object.entries(privacyPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
+);
 
 const loaded = new Set();
 const ready = ref(false);

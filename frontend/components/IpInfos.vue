@@ -36,6 +36,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { isUsablePublicIP } from '@/utils/valid-ip.js';
+import { toApiTag } from '@/utils/locale-registry.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
@@ -295,10 +296,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
   sourceID = sourceID || ipGeoSource.value;
   const card = ipDataCards[cardIndex];
   card.ip = ip;
-  let setLang = lang.value;
-  if (setLang === 'zh') {
-    setLang = 'zh-CN';
-  }
+  const setLang = toApiTag(lang.value);
 
   // Check if the IP data is already in the cache
   if (ipDataCache.has(ip)) {

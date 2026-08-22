@@ -23,6 +23,7 @@ import {
     CONNECTIVITY_TARGET_LIMIT,
 } from '../frontend/data/connectivity-import-lists.js';
 import { fetchFavicons } from '../scripts/fetch-favicons.js';
+import { LOCALE_CODES } from '../common/locale-registry.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const faviconFile = (id) => path.join(repoRoot, 'public', 'favicons', `${id}.png`);
@@ -146,7 +147,7 @@ describe('import lists data integrity', () => {
         // IMPORT_LISTS and SYSTEM_IMPORT_LIST alike. Translations can't be
         // auto-filled — the failure message names the exact file and key.
         const listIds = [...IMPORT_LISTS.map((l) => l.id), SYSTEM_IMPORT_LIST.id];
-        for (const locale of ['en', 'zh', 'fr', 'ru']) {
+        for (const locale of LOCALE_CODES) {
             const packPath = path.join(repoRoot, 'frontend', 'locales', `${locale}.json`);
             const names = JSON.parse(readFileSync(packPath, 'utf8')).connectivity?.importLists ?? {};
             for (const id of listIds) {
