@@ -1,8 +1,11 @@
-// api/dnsresolver.js
+// api/dns-resolver.js — GET /api/dnsresolver: resolve a hostname against every
+// resolver in api/data/dns-resolvers.js (UDP DNS + DoH) in parallel and return
+// one flat, country-annotated result list the frontend groups by country.
 import { Resolver } from 'dns';
 import { promisify } from 'util';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
+import { DNS_RESOLVERS } from './data/dns-resolvers.js';
 
 // Bound each upstream lookup so the slowest server doesn't pin the
 // overall response. 3s for UDP DNS (`Resolver` rejects on first
@@ -11,28 +14,8 @@ import logger from '../common/logger.js';
 const DNS_TIMEOUT_MS = 3000;
 const DOH_TIMEOUT_MS = 5000;
 
-// Normal DNS server list
-const dnsServers = {
-    'Google': '8.8.8.8',
-    'Cloudflare': '1.1.1.1',
-    'OpenDNS': '208.67.222.222',
-    'Quad9': '9.9.9.9',
-    'ControlD': '76.76.2.0',
-    'AdGuard': '94.140.14.14',
-    'AliDNS': '223.5.5.5',
-    'DNSPod': '119.29.29.29',
-    '114DNS': '114.114.114.114',
-    'DNS4EU': '86.54.11.1',
-};
-
-// DNS-over-HTTPS server list
-const dohServers = {
-    'Google': 'https://dns.google/resolve?',
-    'Cloudflare': 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&',
-    'AdGuard': 'https://dns.adguard.com/resolve?',
-    'AliDNS': 'https://dns.alidns.com/resolve?',
-};
-
+// Resolve via classic UDP DNS. Returns the raw result value: an array of
+// strings, a joined MX string, or 'N/A' on empty/failure.
 const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
@@ -74,19 +57,21 @@ const resolveDns = async (hostname, type, name, server) => {
         }
 
         if (addresses.length === 0 || addresses === '' || addresses === null) {
-            return { [name]: `N/A` };
+            return 'N/A';
         }
 
-        return { [name]: addresses };
+        return addresses;
     } catch (error) {
         // Per-server timeouts are expected (some DNS hosts are unreachable
         // from a given network); demote to debug so they don't spam the
         // terminal during normal operation.
         logger.debug({ err: error, server: name }, 'DNS resolver: lookup failed, returning N/A');
-        return { [name]: `N/A` };
+        return 'N/A';
     }
 };
 
+// Resolve via the DNS-over-HTTPS JSON API. Same return semantics as
+// resolveDns. `url` is a prefix ending in '?' or '&' (see the data file).
 const resolveDoh = async (hostname, type, name, url) => {
     try {
         const response = await fetchUpstream(`${url}name=${hostname}&type=${type}`, {
@@ -96,12 +81,12 @@ const resolveDoh = async (hostname, type, name, url) => {
         const data = await response.json();
         const addresses = data.Answer ? data.Answer.map(answer => answer.data) : ['N/A'];
         if (addresses.length === 0 || addresses === '' || addresses === null) {
-            return { [name]: `N/A` };
+            return 'N/A';
         }
-        return { [name]: addresses };
+        return addresses;
     } catch (error) {
         logger.debug({ err: error, server: name }, 'DoH resolver: lookup failed, returning N/A');
-        return { [name]: `N/A` };
+        return 'N/A';
     }
 };
 
@@ -127,20 +112,36 @@ const dnsResolver = async (req, res) => {
         return res.status(400).send({ error: 'Invalid hostname' });
     }
 
-    const dnsPromises = Object.entries(dnsServers).map(([name, ip]) => resolveDns(hostname, type, name, ip));
-    const dohPromises = Object.entries(dohServers).map(([name, url]) => resolveDoh(hostname, type, name, url));
+    // One lookup task per entry × protocol, in stable order: data-file order,
+    // udp before doh within a provider. Each task resolves to one row of the
+    // response; failures collapse to result 'N/A' inside the resolvers, so
+    // Promise.all never rejects here.
+    const lookups = DNS_RESOLVERS.flatMap((server) => {
+        const tasks = [];
+        if (server.udp) {
+            tasks.push(resolveDns(hostname, type, server.name, server.udp).then((result) => ({
+                id: server.id,
+                provider: server.name,
+                country: server.country,
+                type: 'udp',
+                result,
+            })));
+        }
+        if (server.doh) {
+            tasks.push(resolveDoh(hostname, type, server.name, server.doh).then((result) => ({
+                id: server.id,
+                provider: server.name,
+                country: server.country,
+                type: 'doh',
+                result,
+            })));
+        }
+        return tasks;
+    });
 
     try {
-        // Execute all DNS and DoH queries in parallel
-
-        const result_dns = await Promise.all(dnsPromises);
-        const result_doh = await Promise.all(dohPromises);
-
-        res.json({
-            hostname,
-            result_dns,
-            result_doh
-        });
+        const results = await Promise.all(lookups);
+        res.json({ hostname, results });
     } catch (error) {
         res.status(500).send({ error: error.message });
     }

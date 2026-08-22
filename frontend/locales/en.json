@@ -968,7 +968,8 @@
     "fetchError": "Unable to fetch resolution results",
     "Provider": "DNS Provider",
     "Result": "Resolution Result",
-    "Record": "Record"
+    "Record": "Record",
+    "AllRegions": "All Regions"
   },
   "ruletest": {
     "Title": "Rule Test",

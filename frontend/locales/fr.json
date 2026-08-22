@@ -968,7 +968,8 @@
     "fetchError": "Impossible de récupérer les résultats de résolution",
     "Provider": "Fournisseur DNS",
     "Result": "Résultat de la Résolution",
-    "Record": "Enregistrement"
+    "Record": "Enregistrement",
+    "AllRegions": "Toutes les régions"
   },
   "ruletest": {
     "Title": "Test de règles",
