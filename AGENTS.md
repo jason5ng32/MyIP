@@ -15,7 +15,7 @@ halves: a Vue 3 SPA front-end and an Express 5 back-end API.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vue 3 (`<script setup>`) · Pinia · vue-router (HTML5 history) · vue-i18n (`en`/`zh`/`fr`/`ru`) |
+| Frontend | Vue 3 (`<script setup>`) · Pinia · vue-router (HTML5 history) · vue-i18n (locales registered in `common/locale-registry.js`) |
 | Build | Vite + `@vitejs/plugin-vue`; Tailwind CSS v4 + `tw-animate-css` |
 | UI | shadcn-vue copy-in primitives (reka-ui) · lucide icons · circle-flags via `@iconify/vue` · vaul-vue drawer · vue-sonner toast |
 | Backend | Express 5 |
@@ -88,9 +88,13 @@ use npm / yarn — they'd produce a competing lockfile.
 
 ### i18n coverage
 
-- Copy-surfacing features land in **all four locales** in the same change —
-  including `frontend/data/changelog.json` entries
-  (`tests/changelog.test.js` enforces it).
+- Copy-surfacing features land in **every `full` locale** in the same change —
+  including `frontend/data/changelog.json` entries (`tests/changelog.test.js`
+  and `tests/locale-packs.test.js` enforce it against `en`). `beta` locales are
+  free to lag: their gaps resolve down the fallback chain in
+  `common/locale-registry.js`, which is also where a new language is registered.
+- Contributor-facing walkthrough: [TRANSLATING.md](TRANSLATING.md) — keep it in
+  step when the registry, the pack gate or `pnpm i18n-status` changes.
 
 ### Logging (backend)
 

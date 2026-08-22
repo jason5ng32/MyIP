@@ -57,8 +57,9 @@ Details and rationale live in the AGENTS.md files; the headlines:
 - **JavaScript only** — no TypeScript, no `lang="ts"`.
 - **New functions use `const` arrow syntax** (`const fn = async () => {}`).
 - **Every new file opens with a header comment** stating its purpose.
-- **Four locales land together** — user-visible copy ships in `en` / `zh` / `fr` / `ru`
-  in the same PR (`frontend/locales/`; tests enforce this for some surfaces).
+- **The `full` locales land together** — user-visible copy ships in `en` / `zh` / `fr` /
+  `ru` in the same PR (`frontend/locales/`; tests enforce it). `beta` locales are exempt —
+  they fall back to English.
 - **Backend logging goes through the shared pino logger** (`common/logger.js`) —
   no `console.*` in `api/` or `common/`.
 
@@ -88,8 +89,10 @@ existing READMEs. Keep code blocks, URLs, and badges unchanged. Check open issue
 for requested languages before starting.
 
 **UI translations** — improvements to the existing `en` / `zh` / `fr` / `ru` packs are
-welcome. Adding a whole new UI locale is heavier than it looks (every future copy
-change must land in it too), so please open an issue to discuss before starting one.
+welcome, and so is a whole new language. Adding one is two files: a locale pack under
+`frontend/locales/` and a line in `common/locale-registry.js`. **A partial pack is a
+welcome first PR** — anything you don't translate falls back to English, and the language
+ships as `beta` until it's complete. Full walkthrough: **[TRANSLATING.md](TRANSLATING.md)**.
 
 ## Bugs & feature requests
 
