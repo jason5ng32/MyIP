@@ -43,6 +43,10 @@ currently `dns-resolvers.js`, the country-annotated resolver list behind
   frontend shape (`ip` / `country_code` / `latitude` / `asn` / `org` / …);
   new sources match it. `timezone` is the exception — no handler produces it;
   see "Response enrichment" below.
+- **`?lang` is never validated in a handler.** Handlers pass the raw tag
+  through: `lookupMaxMind` normalizes it onto the languages its data carries
+  (`SUPPORTED_LANGS` in `common/maxmind-service.js`), and the private-API
+  proxies forward it for the upstream's own resolution. No allow-lists.
 - **Logging.** Shared logger only, `logger.error({ err, ...ctx }, 'msg')`;
   no `console.*`, no "received request" lines (`pino-http` covers those when
   enabled).

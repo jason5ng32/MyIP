@@ -6,8 +6,11 @@ import { describe, it } from 'node:test';
 import fs from 'node:fs';
 
 import changelog from '../frontend/data/changelog.json' with { type: 'json' };
+import { FULL_LOCALE_CODES } from '../common/locale-registry.js';
 
-const REQUIRED_LOCALES = ['en', 'zh', 'fr', 'ru'];
+// Beta locales are exempt: back-translating the whole history is the single
+// biggest deterrent to a first translation PR.
+const REQUIRED_LOCALES = FULL_LOCALE_CODES;
 const VALID_TYPES = new Set(['add', 'improve', 'fix']);
 
 describe('changelog.json', () => {

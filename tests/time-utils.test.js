@@ -19,6 +19,7 @@ import {
     isoToDateTime,
     formatIsoDate,
 } from '../frontend/utils/time-utils.js';
+import { LOCALE_CODES } from '../common/locale-registry.js';
 
 /* ------------------------------------------------------------------ */
 /* UTC offsets & zone wall-clock time                                  */
@@ -150,7 +151,7 @@ describe('relativeTimeFromMinutes', () => {
     });
 
     it('separates numerals from their unit in every shipped locale', () => {
-        for (const locale of ['en', 'zh', 'fr', 'ru']) {
+        for (const locale of LOCALE_CODES) {
             for (const minutes of [5, 90, 3 * 24 * 60]) {
                 assertSpacedNumerals(relativeTimeFromMinutes(minutes, locale));
             }
@@ -190,7 +191,7 @@ describe('formatDuration', () => {
 
     // Duration stays deliberately compact ("2d 3h"), so only the CJK rule applies.
     it('spaces numerals against CJK units', () => {
-        for (const locale of ['en', 'zh', 'fr', 'ru']) {
+        for (const locale of LOCALE_CODES) {
             assertCjkSpacing(formatDuration(26 * 60 * 60 * 1000, locale));
         }
         assert.match(formatDuration(26 * 60 * 60 * 1000, 'zh'), /1 天 2 小时/);

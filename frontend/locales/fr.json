@@ -446,6 +446,42 @@
     "calError": "Échec du calcul des informations du navigateur, veuillez rafraîchir et réessayer.",
     "calculating": "Calcul en cours..."
   },
+  "censorshipcheck": {
+    "Title": "Test de censure",
+    "Note": "Consultez, à partir des données ouvertes du réseau mondial de volontaires OONI, dans quels pays/régions un site a été bloqué ou perturbé au cours des 30 derniers jours — et par quels moyens. Vous pouvez ensuite vérifier les régions suspectes avec un test en temps réel Globalping. Dans certains pays, la censure est clairement définie par la loi, tandis que dans d'autres elle est plus floue.",
+    "Note2": "Veuillez entrer une URL ou un nom de domaine pour lancer la recherche :",
+    "Placeholder": "URL ou Nom de Domaine",
+    "Country": "Région",
+    "Status": "Statut",
+    "City": "Ville",
+    "Network": "Réseau",
+    "invalidURL": "URL ou Nom de Domaine invalide",
+    "fetchError": "Impossible de récupérer les résultats des tests",
+    "HistoryTitle": "Observations mondiales, 30 derniers jours",
+    "SummaryFlagged": "Des signes de blocage ou d'interférence ont été observés dans {n} pays/régions au cours des 30 derniers jours.",
+    "SummaryClean": "Aucun signe clair de blocage observé dans {n} pays/régions au cours des 30 derniers jours.",
+    "SummarySparseFlagged": "Au cours des 30 derniers jours, seulement {total} pays/régions ont observé ce site, dont {n} présentant des signes de blocage ou d'interférence.",
+    "SummarySparseClean": "Au cours des 30 derniers jours, seulement {total} pays/régions ont observé ce site ({m} mesures) — trop peu de données pour conclure à un blocage.",
+    "NoData": "Aucune mesure pour ce site au cours des 30 derniers jours — cela ne signifie pas qu'il n'est pas bloqué. Cochez ci-dessous les pays à forte censure et lancez un test en temps réel.",
+    "OoniError": "Les données d'observation historiques sont temporairement indisponibles — l'API en amont rencontre peut-être des problèmes. Vous pouvez tout de même cocher des pays ci-dessous et lancer un test en temps réel.",
+    "TierConfirmed": "Blocage confirmé",
+    "TierLikely": "Blocage probable",
+    "TierSigns": "Interférence partielle",
+    "Measurements": "{n} mesures",
+    "AnomalyShare": "{pct}% d'anomalies",
+    "MethodDns": "Altération DNS",
+    "MethodTcpIp": "Blocage TCP",
+    "MethodHttpFailure": "Échec de connexion",
+    "MethodHttpDiff": "Altération du contenu",
+    "RealtimeTitle": "Test en temps réel",
+    "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
+    "SectionFlagged": "Pays signalés",
+    "PresetHighRisk": "Pays à forte censure",
+    "PresetOpen": "Pays généralement ouverts",
+    "RunVerify": "Lancer le test en temps réel",
+    "RealtimeNote": "Vous pouvez sélectionner plusieurs sondes pour des tests de connectivité en temps réel afin d'évaluer globalement le blocage du site. Lors du test, 2 sondes seront exécutées par pays ; des résultats identiques entre les deux sondes garantissent une fiabilité plus élevée.",
+    "RealtimeFooterNote": "Les sondes en temps réel sont surtout hébergées dans des centres de données ; leurs résultats peuvent différer des observations résidentielles réelles, car certains sites web peuvent bloquer l'accès depuis les réseaux de centres de données. Interprétez-les ensemble et faites une jugement basé sur la réalité."
+  },
   "invisibilitytest": {
     "Title": "Test d'invisibilité",
     "Note": "Lorsque vous utilisez un proxy ou un VPN, les sites que vous visitez ne savent-ils vraiment pas que vous utilisez un proxy ? Êtes-vous réellement invisible ? Nous utiliserons plusieurs méthodes pour essayer de détecter les failles de votre anonymat et trouver des preuves de l'utilisation d'un proxy. Bien que certains résultats de test puissent ne pas être entièrement précis, ce test reste très instructif.",
@@ -572,11 +608,11 @@
       "h23": "cycle de 24 heures",
       "h24": "cycle de 24 heures (1–24)"
     },
-    "runCompare": "Lancer la vérification",
-    "runError": "La vérification n'a pas pu aboutir.",
     "profile": {
       "timezone": "Fuseau horaire"
     },
+    "runCompare": "Lancer la vérification",
+    "runError": "La vérification n'a pas pu aboutir.",
     "source": {
       "ipinfo": "Recherche IP",
       "webrtc": "WebRTC",
@@ -628,22 +664,6 @@
         "unknown": "Non mesuré",
         "not-applicable": "N/A"
       }
-    },
-    "reason": {
-      "no-marker-script": "Pas de système d'écriture distinctif",
-      "bin-lookup-failed": "Le service de recherche de cartes était injoignable — les chiffres sont peut-être corrects ; réessayez plus tard.",
-      "bin-not-recognized": "La base de cartes n'a pas reconnu ce préfixe — une faute de frappe en est la cause la plus fréquente ; vérifiez les chiffres et relancez.",
-      "font-probe-unavailable": "Canvas indisponible",
-      "no-voice-packs": "Aucun pack vocal installé",
-      "keyboard-api-unavailable": "Non exposé par ce navigateur",
-      "no-layout-expectation": "Aucune disposition attendue pour ce pays",
-      "no-persona-languages": "Aucune langue définie pour le persona",
-      "geolocation-unsupported": "Géolocalisation non prise en charge",
-      "ip-no-country": "La recherche d'IP n'a renvoyé aucun pays",
-      "ip-no-type": "Aucune source n'a indiqué le type de réseau",
-      "ip-no-timezone": "Aucune source n'a indiqué de fuseau horaire",
-      "webrtc-no-candidates": "WebRTC n'a produit aucun candidat",
-      "dns-no-country": "Aucun résolveur n'a pu être localisé"
     },
     "detail": {
       "expected": "Attendu",
@@ -778,6 +798,22 @@
         "fix": "Le fuseau annoncé n'est pas celui sur lequel tourne réellement la machine : Intl et Date se contredisent, ou les dates passées ne suivent pas les règles d'heure d'été de ce fuseau. C'est important parce que la vérification de fuseau ci-dessus a donc validé une valeur qui n'est pas réelle — un site qui lit l'horloge directement s'en aperçoit. Réglez le fuseau dans votre système d'exploitation plutôt qu'avec une extension : le décalage courant et les règles historiques suivront ensemble."
       }
     },
+    "reason": {
+      "no-marker-script": "Pas de système d'écriture distinctif",
+      "bin-lookup-failed": "Le service de recherche de cartes était injoignable — les chiffres sont peut-être corrects ; réessayez plus tard.",
+      "bin-not-recognized": "La base de cartes n'a pas reconnu ce préfixe — une faute de frappe en est la cause la plus fréquente ; vérifiez les chiffres et relancez.",
+      "font-probe-unavailable": "Canvas indisponible",
+      "no-voice-packs": "Aucun pack vocal installé",
+      "keyboard-api-unavailable": "Non exposé par ce navigateur",
+      "no-layout-expectation": "Aucune disposition attendue pour ce pays",
+      "no-persona-languages": "Aucune langue définie pour le persona",
+      "geolocation-unsupported": "Géolocalisation non prise en charge",
+      "ip-no-country": "La recherche d'IP n'a renvoyé aucun pays",
+      "ip-no-type": "Aucune source n'a indiqué le type de réseau",
+      "ip-no-timezone": "Aucune source n'a indiqué de fuseau horaire",
+      "webrtc-no-candidates": "WebRTC n'a produit aucun candidat",
+      "dns-no-country": "Aucun résolveur n'a pu être localisé"
+    },
     "optional": {
       "gpsNote": "La position GPS est l'une des dimensions que la vérification peut mesurer — partagez-la si vous voulez qu'elle soit comparée aussi.",
       "gpsButton": "Partager ma position",
@@ -813,42 +849,6 @@
       "yes": "Oui",
       "no": "Non"
     }
-  },
-  "censorshipcheck": {
-    "Title": "Test de censure",
-    "Note": "Consultez, à partir des données ouvertes du réseau mondial de volontaires OONI, dans quels pays/régions un site a été bloqué ou perturbé au cours des 30 derniers jours — et par quels moyens. Vous pouvez ensuite vérifier les régions suspectes avec un test en temps réel Globalping. Dans certains pays, la censure est clairement définie par la loi, tandis que dans d'autres elle est plus floue.",
-    "Note2": "Veuillez entrer une URL ou un nom de domaine pour lancer la recherche :",
-    "Placeholder": "URL ou Nom de Domaine",
-    "Country": "Région",
-    "Status": "Statut",
-    "City": "Ville",
-    "Network": "Réseau",
-    "invalidURL": "URL ou Nom de Domaine invalide",
-    "fetchError": "Impossible de récupérer les résultats des tests",
-    "HistoryTitle": "Observations mondiales, 30 derniers jours",
-    "SummaryFlagged": "Des signes de blocage ou d'interférence ont été observés dans {n} pays/régions au cours des 30 derniers jours.",
-    "SummaryClean": "Aucun signe clair de blocage observé dans {n} pays/régions au cours des 30 derniers jours.",
-    "SummarySparseFlagged": "Au cours des 30 derniers jours, seulement {total} pays/régions ont observé ce site, dont {n} présentant des signes de blocage ou d'interférence.",
-    "SummarySparseClean": "Au cours des 30 derniers jours, seulement {total} pays/régions ont observé ce site ({m} mesures) — trop peu de données pour conclure à un blocage.",
-    "NoData": "Aucune mesure pour ce site au cours des 30 derniers jours — cela ne signifie pas qu'il n'est pas bloqué. Cochez ci-dessous les pays à forte censure et lancez un test en temps réel.",
-    "OoniError": "Les données d'observation historiques sont temporairement indisponibles — l'API en amont rencontre peut-être des problèmes. Vous pouvez tout de même cocher des pays ci-dessous et lancer un test en temps réel.",
-    "TierConfirmed": "Blocage confirmé",
-    "TierLikely": "Blocage probable",
-    "TierSigns": "Interférence partielle",
-    "Measurements": "{n} mesures",
-    "AnomalyShare": "{pct}% d'anomalies",
-    "MethodDns": "Altération DNS",
-    "MethodTcpIp": "Blocage TCP",
-    "MethodHttpFailure": "Échec de connexion",
-    "MethodHttpDiff": "Altération du contenu",
-    "RealtimeTitle": "Test en temps réel",
-    "ResultsHint": "Les résultats s'afficheront ici après la sélection des sondes et le lancement du test.",
-    "SectionFlagged": "Pays signalés",
-    "PresetHighRisk": "Pays à forte censure",
-    "PresetOpen": "Pays généralement ouverts",
-    "RunVerify": "Lancer le test en temps réel",
-    "RealtimeNote": "Vous pouvez sélectionner plusieurs sondes pour des tests de connectivité en temps réel afin d'évaluer globalement le blocage du site. Lors du test, 2 sondes seront exécutées par pays ; des résultats identiques entre les deux sondes garantissent une fiabilité plus élevée.",
-    "RealtimeFooterNote": "Les sondes en temps réel sont surtout hébergées dans des centres de données ; leurs résultats peuvent différer des observations résidentielles réelles, car certains sites web peuvent bloquer l'accès depuis les réseaux de centres de données. Interprétez-les ensemble et faites une jugement basé sur la réalité."
   },
   "advancedtools": {
     "OpenInNewTab": "Ouvrir dans un nouvel onglet",
@@ -1250,8 +1250,8 @@
   },
   "webrtc": {
     "id": "webrtc",
-    "Name": "Connexion WebRTC",
     "Title": "Test WebRTC Leak",
+    "Name": "Connexion WebRTC",
     "Note": "WebRTC établit souvent des connexions directes via UDP. Si le test renvoie votre véritable adresse IP, cela signifie que vos paramètres de proxy ne couvrent pas ces connexions. En plus de détecter l'adresse IP que vous utilisez lors de la connexion à WebRTC, nous détectons également votre type de NAT. Cependant, la détection du type de NAT n'est pas précise à 100% et est fournie à titre indicatif uniquement.",
     "StatusWait": "En attente du test",
     "StatusError": "Erreur de connexion",
@@ -1418,7 +1418,7 @@
     "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie"
   },
   "page": {
-    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Jason Ng Open Source",
+    "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Boîte à outils IP tout-en-un",
     "description": "Une boîte à outils IP open source et tout-en-un : vérifiez votre adresse IP et sa géolocalisation, testez les fuites IP via WebRTC et DNS, effectuez une vérification de la qualité IP, une vérification de l'empreinte du navigateur, ainsi qu'un test de vitesse, un test de latence mondiale, un test MTR, une recherche Whois, et plus encore.",
     "keywords": "MonIP, Outil IP, Vérification IP, Test de fuite IP, Test de fuite DNS, Qualité IP, Test de fuite WebRTC, Empreinte du navigateur, Test de vitesse, Test de latence mondiale, Test MTR, Recherche DNS, Recherche Whois",
     "footerLink": "https://github.com/jason5ng32/MyIP",

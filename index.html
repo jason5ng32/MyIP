@@ -19,7 +19,7 @@
   <meta name="format-detection" content="telephone=no" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/logos/ios-logo-512.png" />
-  <title>IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - Jason Ng Open Source</title>
+  <title>IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - All in one IP Toolbox</title>
   <link rel="icon" href="/logos/logo.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -56,7 +56,7 @@
     "name": "IPCheck.ing",
     "url": "__SITE_URL__/",
     "description": "Open-source IP toolbox: lookup, connectivity tests, WebRTC and DNS leak detection, speed test, MTR, Whois, and browser fingerprint.",
-    "inLanguage": ["en", "zh", "fr", "ru"],
+    "inLanguage": ["en", "zh-CN", "fr", "ru"],
     "publisher": { "@type": "Person", "name": "Jason Ng" }
   }
   </script>
@@ -320,9 +320,11 @@
   </div>
 
   <!-- Boot quips + fake progress. The copy lives inline (not in vue-i18n)
-      because it runs before Vue loads; all four locales ship here and the
-      language pick mirrors frontend/locales/i18n.js (stored prefs → ?hl= →
-      browser language → en). The progress is time-driven make-believe: one
+      because it runs before Vue loads; every full locale ships here (beta ones
+      are welcome but not required) and the language pick mirrors
+      frontend/locales/i18n.js (stored prefs → ?hl= → browser language → en).
+      tests/index-html-i18n.test.js holds both to common/locale-registry.js.
+      The progress is time-driven make-believe: one
       quip every 1.5s, width easing toward a 92% cap. App.vue's hand-off
       removes the overlay the moment Vue mounts and is never delayed by the
       script — returning visitors with a warm cache may only glimpse quip #1. -->
@@ -381,13 +383,33 @@
         ru: 'Слишком долго? Попробуйте <a href="https://lite.ipcheck.ing/">IPCheck.ing Lite</a> или обновите страницу.',
       };
 
+      // Hand-copy of matchLocale() in common/locale-registry.js — index.html
+      // ships outside the bundle and can't import it. Resolves a BCP-47 tag in
+      // three steps: exact, then the base language, then any locale of the same
+      // family, `codes` order deciding between siblings.
+      // tests/index-html-i18n.test.js runs both implementations side by side;
+      // change one and change the other.
+      const matchLang = (tag, codes) => {
+        if (!tag) return null;
+        const wanted = String(tag).toLowerCase();
+        const base = wanted.split('-')[0];
+        return codes.find((code) => code.toLowerCase() === wanted)
+          ?? codes.find((code) => code.toLowerCase() === base)
+          ?? codes.find((code) => code.toLowerCase().split('-')[0] === base)
+          ?? null;
+      };
+
+      // Which languages the inline copy above covers — beta locales may not be
+      // among them and then resolve to a neighbour or to English.
+      const QUIP_LANGS = Object.keys(QUIPS);
+
       const pickLang = () => {
-        const stored = window.jnReadPrefs ? window.jnReadPrefs().lang : null;
-        if (QUIPS[stored]) return stored;
+        const prefs = window.jnReadPrefs ? window.jnReadPrefs() : {};
         const hl = new URLSearchParams(window.location.search).get('hl');
-        if (QUIPS[hl]) return hl;
-        const nav = (navigator.language || '').slice(0, 2).toLowerCase();
-        return QUIPS[nav] ? nav : 'en';
+        return matchLang(prefs.lang, QUIP_LANGS)
+          ?? matchLang(hl, QUIP_LANGS)
+          ?? matchLang(navigator.language, QUIP_LANGS)
+          ?? 'en';
       };
 
       const lang = pickLang();

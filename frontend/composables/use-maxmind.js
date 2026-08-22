@@ -16,6 +16,7 @@ import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { transformDataFromIPapi } from '../utils/transform-ip-data.js';
 import getCountryName from '../data/country-name.js';
+import { toApiTag } from '../utils/locale-registry.js';
 
 // key → resolved result (successes only) / key → in-flight promise.
 const lookupCache = new Map();
@@ -50,8 +51,8 @@ export function useMaxmind() {
         if (!source) return null;
 
         const lang = store.lang;
-        // ip-api.com style locale tag — same mapping the legacy call sites used.
-        const apiLang = lang === 'zh' ? 'zh-CN' : lang;
+        // ip-api.com style locale tag.
+        const apiLang = toApiTag(lang);
 
         // `country` below is localized, so the cache key must carry the lang.
         return dedupedLookup(`${ip}|${lang}`, async () => {

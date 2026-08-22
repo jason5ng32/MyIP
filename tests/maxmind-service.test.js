@@ -3,6 +3,8 @@
 // The repo ships real GeoLite2-ASN.mmdb + GeoLite2-City.mmdb binaries, so we
 // exercise openMaxMindReaders() / reloadMaxMindDatabases() against the actual
 // database files end-to-end rather than mocking fs.
+//
+// The language set and its resolver are pure and run regardless.
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,12 +20,62 @@ import {
   openMaxMindReaders,
   reloadMaxMindDatabases,
   lookupMaxMind,
+  SUPPORTED_LANGS,
+  normalizeLang,
 } from '../common/maxmind-service.js';
 
 // The repo should ship maxmind database files; if not on CI, skip related tests
 const cityPath = path.join(MAXMIND_DB_DIR, MAXMIND_CITY_DB);
 const asnPath = path.join(MAXMIND_DB_DIR, MAXMIND_ASN_DB);
 const dbsAvailable = fs.existsSync(cityPath) && fs.existsSync(asnPath);
+
+describe('maxmind-service — supported languages', () => {
+  it('is the set the City database carries names for', () => {
+    // Verified against the shipped GeoLite2-City `names` objects; it tracks the
+    // upstream data, not the UI locale registry.
+    assert.deepEqual(SUPPORTED_LANGS, ['de', 'en', 'es', 'fr', 'ja', 'pt-BR', 'ru', 'zh-CN']);
+  });
+
+  it('contains en, the universal fallback', () => {
+    assert.ok(SUPPORTED_LANGS.includes('en'));
+  });
+});
+
+describe('maxmind-service — normalizeLang', () => {
+  it('returns the canonical spelling on an exact hit', () => {
+    for (const tag of SUPPORTED_LANGS) assert.equal(normalizeLang(tag), tag);
+  });
+
+  it('is case-insensitive and trims surrounding whitespace', () => {
+    assert.equal(normalizeLang('ZH-CN'), 'zh-CN');
+    assert.equal(normalizeLang('pt-br'), 'pt-BR');
+    assert.equal(normalizeLang('  FR  '), 'fr');
+  });
+
+  it('keeps a supported base language', () => {
+    assert.equal(normalizeLang('de-AT'), 'de');
+    assert.equal(normalizeLang('en-GB'), 'en');
+    assert.equal(normalizeLang('es-419'), 'es');
+  });
+
+  it('falls sideways to a sibling when the base itself is unsupported', () => {
+    assert.equal(normalizeLang('zh'), 'zh-CN');
+    assert.equal(normalizeLang('zh-TW'), 'zh-CN');
+    assert.equal(normalizeLang('zh-Hant-HK'), 'zh-CN');
+    assert.equal(normalizeLang('pt'), 'pt-BR');
+    assert.equal(normalizeLang('pt-PT'), 'pt-BR');
+  });
+
+  it('sends an unsupported language to en', () => {
+    for (const tag of ['tr', 'ko', 'ar-EG', 'nl']) assert.equal(normalizeLang(tag), 'en');
+  });
+
+  it('never throws on junk input', () => {
+    for (const value of [undefined, null, '', '   ', 42, {}, [], true, '-', '???']) {
+      assert.equal(normalizeLang(value), 'en');
+    }
+  });
+});
 
 describe('maxmind-service — path + ready contract', () => {
   it('getMaxMindDbPaths returns City + ASN paths under MAXMIND_DB_DIR', () => {
@@ -99,12 +151,24 @@ describe('maxmind-service — end-to-end with real DB (skipped if files missing)
     assert.equal(result.asn, 'N/A');
   });
 
-  it('lookupMaxMind honors lang argument (falls back to en for unknown lang)', () => {
+  it('lookupMaxMind serves a supported language from the database', () => {
     if (!dbsAvailable) return;
-    const enResult = lookupMaxMind('8.8.8.8', 'en');
-    const deResult = lookupMaxMind('8.8.8.8', 'de');
-    // 'de' may have a localized city name; if not, falls back to 'en'
-    assert.ok(enResult.country_name);
-    assert.ok(deResult.country_name);
+    // A CN address has genuinely different names per language, so this catches
+    // a lookup that silently answers in English.
+    assert.equal(lookupMaxMind('223.5.5.5', 'zh-CN').country_name, '中国');
+    assert.equal(lookupMaxMind('223.5.5.5', 'ru').country_name, 'Китай');
+    assert.equal(lookupMaxMind('223.5.5.5', 'en').country_name, 'China');
+  });
+
+  it('lookupMaxMind normalizes the tag itself, so no caller can skip it', () => {
+    if (!dbsAvailable) return;
+    const canonical = lookupMaxMind('223.5.5.5', 'zh-CN');
+    // Family variants and sloppy casing reach the same names...
+    assert.deepEqual(lookupMaxMind('223.5.5.5', 'zh-TW'), canonical);
+    assert.deepEqual(lookupMaxMind('223.5.5.5', ' zh '), canonical);
+    // ...while an unsupported tag, or none at all, lands on en.
+    const english = lookupMaxMind('223.5.5.5', 'en');
+    assert.deepEqual(lookupMaxMind('223.5.5.5', 'tr'), english);
+    assert.deepEqual(lookupMaxMind('223.5.5.5'), english);
   });
 });

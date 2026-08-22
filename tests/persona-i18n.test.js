@@ -1,6 +1,6 @@
 // Guards the Persona Check's i18n coverage the way changelog.test.js
 // guards the changelog: a check id, a not-applicable reason or a detail field
-// arriving from the evaluating API without its four locale entries fails here
+// arriving from the evaluating API without its locale entries fails here
 // rather than rendering a raw key in front of a visitor.
 //
 // The expected vocabulary comes from utils/persona/check-ids.js, which is this
@@ -9,11 +9,9 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import fs from 'node:fs';
 
-import en from '../frontend/locales/en.json' with { type: 'json' };
-import zh from '../frontend/locales/zh.json' with { type: 'json' };
-import fr from '../frontend/locales/fr.json' with { type: 'json' };
-import ru from '../frontend/locales/ru.json' with { type: 'json' };
+import { FULL_LOCALE_CODES } from '../common/locale-registry.js';
 import {
     PERSONA_CHECK_IDS,
     PERSONA_DETAIL_KEYS,
@@ -29,7 +27,12 @@ import {
 // the unknown reasons whitelisted to explain themselves.
 const RENDERED_REASONS = [...PERSONA_NOT_APPLICABLE_REASONS, ...PERSONA_UNKNOWN_REASONS];
 
-const LOCALES = { en, zh, fr, ru };
+// Read from disk so the registry alone decides which languages are checked —
+// full ones only, a beta pack is allowed to still be missing these keys.
+const LOCALES = Object.fromEntries(FULL_LOCALE_CODES.map((code) => [
+    code,
+    JSON.parse(fs.readFileSync(new URL(`../frontend/locales/${code}.json`, import.meta.url), 'utf8')),
+]));
 
 const flatten = (value, prefix = '') => {
     const keys = new Set();
@@ -45,7 +48,7 @@ const flatten = (value, prefix = '') => {
 };
 
 describe('persona check i18n coverage', () => {
-    it('every check has a title, a description and a fix in all four locales', () => {
+    it('every check has a title, a description and a fix in every locale', () => {
         for (const id of PERSONA_CHECK_IDS) {
             for (const [lang, pack] of Object.entries(LOCALES)) {
                 const entry = pack.personacheck.checks[id];
@@ -145,8 +148,8 @@ describe('persona check i18n coverage', () => {
         }
     });
 
-    it('keeps the four locales structurally identical', () => {
-        const reference = flatten(en.personacheck);
+    it('keeps every locale structurally identical to en', () => {
+        const reference = flatten(LOCALES.en.personacheck);
         for (const [lang, pack] of Object.entries(LOCALES)) {
             if (lang === 'en') continue;
             const other = flatten(pack.personacheck);

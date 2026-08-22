@@ -14,8 +14,10 @@ import {
     festivalsActiveOn,
     localDateString,
 } from '../frontend/data/pulse-statuses.js';
+import { FULL_LOCALE_CODES } from '../common/locale-registry.js';
 
-const REQUIRED_LOCALES = ['en', 'zh', 'fr', 'ru'];
+// Coverage is required of full locales only; a beta pack may still be filling in.
+const REQUIRED_LOCALES = FULL_LOCALE_CODES;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MONTH_DAY_RE = /^\d{2}-\d{2}$/;
 const ALL = [...PRESET_STATUSES, ...FESTIVAL_STATUSES];

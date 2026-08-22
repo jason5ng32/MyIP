@@ -47,6 +47,7 @@ import { useMainStore } from '@/store';
 import { isAnalyticsEnabled } from '@/utils/analytics';
 import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
+import { fallbackChain } from '@/utils/locale-registry.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
 import { Spinner } from '@/components/ui/spinner';
@@ -78,12 +79,12 @@ const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === tru
 
 // Privacy copy is loaded on demand per locale (mirrors the security-checklist
 // dataset pattern), then merged into i18n so t() / tm() can resolve it.
-const privacyLoaders = {
-  en: () => import('@/locales/privacy/en.json'),
-  zh: () => import('@/locales/privacy/zh.json'),
-  fr: () => import('@/locales/privacy/fr.json'),
-  ru: () => import('@/locales/privacy/ru.json'),
-};
+// Discovered by glob, keyed by locale code; a locale with no file of its own
+// resolves to the first one on its fallback chain that has one.
+const privacyPacks = import.meta.glob('../locales/privacy/*.json');
+const privacyLoaders = Object.fromEntries(
+  Object.entries(privacyPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
+);
 
 const loaded = new Set();
 const ready = ref(false);
@@ -93,21 +94,21 @@ const ready = ref(false);
 // active locale and paint the wrong language.
 const loadPrivacy = async (loc) => {
   if (loaded.has(loc)) return;
-  const load = privacyLoaders[loc] || privacyLoaders.en;
+  const load = fallbackChain(loc).map((code) => privacyLoaders[code]).find(Boolean);
   const { default: msgs } = await load();
   mergeLocaleMessage(loc, msgs);
   loaded.add(loc);
 };
 
-// Reveal only after the ACTIVE locale's copy is merged — otherwise the en
-// fallback load could resolve first and paint English (t() falling back) until
-// the next re-render. The en fallback (covering any key the active locale might
+// Reveal only after the ACTIVE locale's copy is merged — otherwise a fallback
+// load could resolve first and paint English (t() falling back) until the next
+// re-render. The rest of the chain (covering any key the active locale might
 // miss) loads in the background and doesn't gate the reveal.
 watch(locale, async (loc) => {
   ready.value = false;
   await loadPrivacy(loc);
   if (loc === locale.value) ready.value = true; // ignore a stale load if locale changed mid-flight
-  if (loc !== 'en') loadPrivacy('en');
+  for (const code of fallbackChain(loc).slice(1)) loadPrivacy(code);
 }, { immediate: true });
 
 // Ordered section ids, gated on which collection actually happens here. The

@@ -41,6 +41,9 @@
                                         class="size-4 shrink-0" />
                                     <Globe v-else class="size-4 text-muted-foreground shrink-0" />
                                     {{ lang.label }}
+                                    <!-- Partial translation: literal "Beta", deliberately untranslated. -->
+                                    <Badge v-if="lang.beta" variant="secondary"
+                                        class="px-1.5 py-0 text-[10px] font-medium">Beta</Badge>
                                 </span>
                             </SelectItem>
                         </SelectContent>
@@ -174,11 +177,13 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { clampRetentionDays } from '@/utils/ip-history.js';
+import { LOCALES } from '@/utils/locale-registry.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/vue';
 import {
     AppWindow,
@@ -206,13 +211,13 @@ const onOpenChange = (val) => {
     store.setOpenSheet(val ? 'preferences' : null);
 };
 
-// Language options (data driven; flag use circle-flags ISO code)
+// "Follow the system" plus one entry per registered locale (flag = circle-flags
+// ISO code).
 const langOptions = [
     { value: 'auto', label: t('nav.preferences.systemAuto'), flag: '' },
-    { value: 'zh', label: '中文', flag: 'cn' },
-    { value: 'en', label: 'English', flag: 'us' },
-    { value: 'ru', label: 'Русский', flag: 'ru' },
-    { value: 'fr', label: 'Français', flag: 'fr' },
+    ...LOCALES.map(({ code, nativeName, flag, status }) => ({
+        value: code, label: nativeName, flag, beta: status === 'beta',
+    })),
 ];
 const currentLang = computed(() =>
     langOptions.find(l => l.value === userPreferences.value.lang) || langOptions[0]

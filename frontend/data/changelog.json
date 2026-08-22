@@ -1662,10 +1662,19 @@
       {
         "type": "add",
         "change": {
-          "en": "Section promo slots: every fork can light up promo content under any homepage section as needed",
-          "zh": "Section 推广位：每个 Forker 可以根据需要，在不同的 Section 增加推广内容",
-          "fr": "Emplacements promotionnels par section : chaque fork peut afficher du contenu promotionnel sous n'importe quelle section de la page d'accueil",
-          "ru": "Промо-слоты в секциях: каждый форк может при необходимости добавлять промо-контент в разные секции главной страницы"
+          "en": "For developers: refactored the multi-language architecture, making it easier to add new languages",
+          "zh": "为开发者：重构多国语言架构，添加新语言变得更容易",
+          "fr": "Pour les développeurs : refonte de l'architecture multi-langue, rendant plus facile l'ajout de nouvelles langues",
+          "ru": "Для разработчиков: переработана архитектура многоязычности, чтобы было легче добавлять новые языки"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "For Forker: added section promotion slots, can add promotion content in different sections as needed",
+          "zh": "为 Forker: 新增 Section 推广位，可以根据需要，在不同的 Section 增加推广内容",
+          "fr": "Pour les Forker : ajout de slots promotionnels par section, permettant d'ajouter du contenu promotionnel dans différentes sections selon les besoins",
+          "ru": "Для Forker: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей"
         }
       },
       {

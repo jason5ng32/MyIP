@@ -104,6 +104,7 @@ Les guides complets se trouvent dans le centre de documentation MyIP : **[docs.i
 Les contributions sont les bienvenues ! Nous maintenons une sélection de tâches adaptées aux débutants — chacune avec les fichiers précis, les critères d'acceptation et des tests pour vous guider :
 
 * 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) — ajouter un résolveur DNS de votre pays, enrichir les listes de sites, traduire le README dans votre langue, améliorer les traductions…
+* 🌐 [TRANSLATING.md](TRANSLATING.md) — mettez l'interface à votre langue : un paquet de langue plus une ligne dans le registre, et **des traductions partielles sont les bienvenues pour votre première PR**
 * 📄 [CONTRIBUTING.md](CONTRIBUTING.md) — installation, conventions et flux des PR (ciblez la branche `dev`)
 
 ## ⚙️ Configuration

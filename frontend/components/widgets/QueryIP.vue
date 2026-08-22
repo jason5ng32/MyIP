@@ -63,6 +63,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP, isUsablePublicIP } from '@/utils/valid-ip.js';
+import { toApiTag } from '@/utils/locale-registry.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
@@ -142,7 +143,7 @@ const openQueryIP = () => {
 const openModal = () => onOpenChange(true);
 
 const fetchIPForModal = async (ip) => {
-    const selectedLang = lang.value === 'zh' ? 'zh-CN' : lang.value;
+    const selectedLang = toApiTag(lang.value);
     const sources = store.ipDBs.filter(s => s.enabled);
 
     // Cyclic walk from the user's preferred source

@@ -257,6 +257,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { fallbackChain } from '@/utils/locale-registry.js';
 import { CircleProgressBar } from 'circle-progress.vue';
 import VueMarkdown from 'vue-markdown-render';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -317,12 +318,12 @@ const { t, locale } = useI18n();
 // The checklist dataset is large (~30 KB gzipped per language) and only this tool
 // reads it, so it's loaded on demand for the active locale instead of being baked
 // into the initial i18n bundle (see frontend/locales/i18n.js).
-const securityDataLoaders = {
-    en: () => import('@/locales/security-checklist/en.json'),
-    zh: () => import('@/locales/security-checklist/zh.json'),
-    fr: () => import('@/locales/security-checklist/fr.json'),
-    ru: () => import('@/locales/security-checklist/ru.json'),
-};
+// Discovered by glob, keyed by locale code; a locale with no dataset of its
+// own resolves to the first one on its fallback chain that has one.
+const securityDataPacks = import.meta.glob('../../locales/security-checklist/*.json');
+const securityDataLoaders = Object.fromEntries(
+    Object.entries(securityDataPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
+);
 
 const securityChecklist = ref(null);
 
@@ -330,7 +331,7 @@ const securityChecklist = ref(null);
 // surfaces the template's existing loading state during the swap.
 const loadSecurityChecklist = async () => {
     fullList.value = null;
-    const load = securityDataLoaders[locale.value] || securityDataLoaders.en;
+    const load = fallbackChain(locale.value).map((code) => securityDataLoaders[code]).find(Boolean);
     const { default: data } = await load();
     securityChecklist.value = data;
     fullList.value = initSecurityList(securityChecklist.value);

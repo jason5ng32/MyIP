@@ -1,14 +1,14 @@
 import { lookupMaxMind } from '../common/maxmind-service.js';
 import logger from '../common/logger.js';
-import { pickLang } from '../common/langs.js';
 
 export default (req, res) => {
     // Presence, validity and public routability guaranteed by the
     // requirePublicIP middleware — a reserved address never reaches here.
     const ip = req.query.ip;
 
-    // Get request language
-    const lang = pickLang(req.query.lang, 'en');
+    // The raw tag goes straight in: the service owns the language set and
+    // normalizes onto it.
+    const lang = req.query.lang;
 
     try {
         res.json(lookupMaxMind(ip, lang));
