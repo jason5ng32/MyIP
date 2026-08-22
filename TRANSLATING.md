@@ -222,9 +222,9 @@ bugs, and none of them block a PR:
 - **Some tool output is upstream data**, not UI copy: Whois records, DNS answers, ASN
   organization names, service-status incident text. Those arrive in whatever language the
   source publishes.
-- **The backend's `?lang` allow-list** (`common/langs.js`) stays hand-maintained by
-  maintainers, because it depends on what upstream data sources accept. A translation PR
-  never touches it.
+- **The backend needs no change for a new language** — it resolves whatever tag the UI
+  sends onto the closest one its data sources actually have, so a translation PR never
+  touches back-end code.
 - **Documentation** at [docs.ipcheck.ing](https://docs.ipcheck.ing) and the README
   translations are separate efforts — see CONTRIBUTING.md for README translations.
 

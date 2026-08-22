@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import maxmind from 'maxmind';
 import logger from './logger.js';
+import { matchLocale } from './locale-registry.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +14,21 @@ export const MAXMIND_ASN_DB = 'GeoLite2-ASN.mmdb';
 
 const cityDbPath = path.join(MAXMIND_DB_DIR, MAXMIND_CITY_DB);
 const asnDbPath = path.join(MAXMIND_DB_DIR, MAXMIND_ASN_DB);
+
+// The languages the City database carries `names` for — a property of the data
+// itself, not of the UI: registering a new front-end locale changes nothing
+// here, and this list only moves if MaxMind's own coverage does.
+export const SUPPORTED_LANGS = ['de', 'en', 'es', 'fr', 'ja', 'pt-BR', 'ru', 'zh-CN'];
+
+// Resolve any BCP-47 tag onto that set: exact match (canonical spelling wins),
+// then the base language, then a sibling of the same family — `zh-TW` reads
+// `zh-CN` names rather than falling all the way to English. Anything else, junk
+// included, lands on `en`. Family resolution is defined once, in the locale
+// registry; only the resolver is borrowed, never its list of UI locales.
+export const normalizeLang = (tag) => {
+    if (typeof tag !== 'string') return 'en';
+    return matchLocale(tag.trim(), SUPPORTED_LANGS) ?? 'en';
+};
 
 let cityLookup = null;
 let asnLookup = null;
@@ -108,8 +124,9 @@ export function startMaxMindFileWatcher() {
 
 /**
  * Look up an IP address and return the API response shape expected by the frontend.
+ * `lang` is any raw tag — normalization happens here, so no caller can skip it.
  */
-export function lookupMaxMind(ip, lang = 'en') {
+export function lookupMaxMind(ip, lang) {
     if (!isMaxMindReady()) {
         const error = new Error('MaxMind database is not ready');
         error.statusCode = 503;
@@ -119,7 +136,7 @@ export function lookupMaxMind(ip, lang = 'en') {
     const city = cityLookup.get(ip);
     const asn = asnLookup.get(ip);
 
-    return formatMaxMindResult(ip, lang, city, asn);
+    return formatMaxMindResult(ip, normalizeLang(lang), city, asn);
 }
 
 /**

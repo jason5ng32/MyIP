@@ -537,6 +537,49 @@ describe('dns-leak-test getSessionResult', () => {
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });
+
+    // ?lang is a pass-through: the upstream owns tag resolution, so the handler
+    // neither validates nor substitutes a default.
+    describe('lang forwarding', () => {
+        const callWithLang = async (query) => {
+            process.env.IPCHECKING_API_KEY = 'test-key';
+            process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+            let requested;
+            globalThis.fetch = async (url) => {
+                requested = new URL(String(url));
+                return { status: 200, ok: true, json: async () => ({}) };
+            };
+            // The success path sets a Cache-Control header on the way out.
+            const res = createResponse();
+            res.set = () => res;
+            await dnsLeakGetResult({
+                method: 'GET', headers: {}, query,
+                params: { token: 'a'.repeat(32) },
+            }, res);
+            assert.equal(res.statusCode, 200);
+            return requested;
+        };
+
+        it('forwards the caller tag verbatim, family variants included', async () => {
+            for (const lang of ['zh-TW', 'ja', 'pt-PT', 'tr']) {
+                const url = await callWithLang({ lang });
+                assert.equal(url.searchParams.get('lang'), lang);
+            }
+        });
+
+        it('sends no lang at all when the caller omits it', async () => {
+            const url = await callWithLang({});
+            assert.equal(url.searchParams.has('lang'), false);
+            // The apikey still rides along — proof the request was built, not skipped.
+            assert.equal(url.searchParams.get('apikey'), 'test-key');
+        });
+
+        it('drops a non-string lang rather than stringifying it', async () => {
+            // Express turns a repeated ?lang= into an array; "a,b" is not a tag.
+            const url = await callWithLang({ lang: ['zh-CN', 'en'] });
+            assert.equal(url.searchParams.has('lang'), false);
+        });
+    });
 });
 
 // -- ipcheck-ing handler --------------------------------------------------

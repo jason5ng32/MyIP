@@ -2,7 +2,7 @@
 //
 //   - validates the 32-hex token locally (fail fast before any network hop),
 //   - forwards request headers (notably Authorization: Bearer <Firebase ID>),
-//   - attaches the apikey query param,
+//   - attaches the apikey query param and forwards ?lang untouched,
 //   - passes the upstream status + JSON back to the caller verbatim so the
 //     frontend can surface "Sign in required" / "Invalid token" etc.
 //
@@ -10,7 +10,6 @@
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
-import { pickLang } from '../common/langs.js';
 
 const TOKEN_RE = /^[0-9a-f]{32}$/;
 
@@ -30,11 +29,13 @@ export async function getSessionResult(req, res) {
         return res.status(500).json({ error: 'API key is missing' });
     }
 
-    const lang = pickLang(req.query.lang, 'zh-CN');
-
     const url = new URL(`${apiEndpoint}/dnsleaktest/session/${token}`);
     url.searchParams.set('apikey', apiKey);
-    url.searchParams.set('lang', lang);
+    // The upstream resolves any tag onto the languages it has, so the caller's
+    // value rides along untouched; omitting it lets the upstream default apply.
+    if (typeof req.query.lang === 'string' && req.query.lang) {
+        url.searchParams.set('lang', req.query.lang);
+    }
 
     try {
         const apiResponse = await fetchUpstream(url, {

@@ -1,9 +1,11 @@
 // Central registry of the languages the UI ships. Adding one = a locale pack
 // plus a line here. Front end imports it via `@/utils/locale-registry.js`.
 //
-// One exception stays hand-maintained: the backend's `?lang` allow-list
-// (common/langs.js) — the private upstream's tolerance for unknown tags is
-// unverified.
+// The back end takes no part in that: which languages upstream *data* comes in
+// is a separate set owned by the source itself (SUPPORTED_LANGS in
+// common/maxmind-service.js), and every `?lang` consumer resolves an unfamiliar
+// tag onto its own family instead of rejecting it. A new UI locale is a
+// front-end-only change.
 
 // code=UI code + locale file name · apiTag=tag sent upstream ·
 // htmlLang=<html lang> · status=full|beta
