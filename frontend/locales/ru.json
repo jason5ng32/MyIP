@@ -206,6 +206,8 @@
     "SearchDocs": "Поиск по документации…",
     "DocsToolConfirm": "Показать ваши текущие результаты?",
     "DocsToolSummary": "Результаты со страницы прочитаны",
+    "DocsToolRunConfirm": "Запустить тесты на вашей странице?",
+    "DocsToolRunSummary": "Сетевые тесты выполнены",
     "AskIPilot": "Спросить IPilot",
     "OpenDocs": "Открыть документацию",
     "DocsGreetingTitle": "Чем могу помочь?",

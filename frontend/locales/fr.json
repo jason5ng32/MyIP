@@ -206,6 +206,8 @@
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
     "DocsToolSummary": "Résultats de la page lus",
+    "DocsToolRunConfirm": "Lancer les tests sur votre page ?",
+    "DocsToolRunSummary": "Tests réseau exécutés",
     "AskIPilot": "Demander à IPilot",
     "OpenDocs": "Ouvrir la doc",
     "DocsGreetingTitle": "Comment puis-je vous aider ?",

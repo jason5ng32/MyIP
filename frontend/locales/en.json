@@ -206,6 +206,8 @@
     "SearchDocs": "Search docs…",
     "DocsToolConfirm": "Share your current test results?",
     "DocsToolSummary": "Read your on-page results",
+    "DocsToolRunConfirm": "Run tests on your page?",
+    "DocsToolRunSummary": "Ran your network tests",
     "AskIPilot": "Ask IPilot",
     "OpenDocs": "Open docs",
     "DocsGreetingTitle": "How can I help?",

@@ -206,6 +206,8 @@
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
     "DocsToolSummary": "已读取页面上的检测结果",
+    "DocsToolRunConfirm": "在你的页面上运行检测？",
+    "DocsToolRunSummary": "已运行你的网络检测",
     "AskIPilot": "询问 IPilot",
     "OpenDocs": "打开文档",
     "DocsGreetingTitle": "有什么可以帮你？",
