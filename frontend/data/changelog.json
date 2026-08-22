@@ -1671,10 +1671,10 @@
       {
         "type": "add",
         "change": {
-          "en": "For Forker: added section promotion slots, can add promotion content in different sections as needed",
-          "zh": "为 Forker: 新增 Section 推广位，可以根据需要，在不同的 Section 增加推广内容",
-          "fr": "Pour les Forker : ajout de slots promotionnels par section, permettant d'ajouter du contenu promotionnel dans différentes sections selon les besoins",
-          "ru": "Для Forker: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей"
+          "en": "For developers: added section promotion slots, can add promotion content in different sections as needed",
+          "zh": "为开发者：新增 Section 推广位，可以根据需要，在不同的 Section 增加推广内容",
+          "fr": "Pour les développeurs : ajout de slots promotionnels par section, permettant d'ajouter du contenu promotionnel dans différentes sections selon les besoins",
+          "ru": "Для разработчиков: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей"
         }
       },
       {
