@@ -1,3 +1,9 @@
+# Force the patched @grpc/grpc-js (CVE-2026-48068). It arrives only as a
+# transitive dep of @firebase/firestore, which this app never imports
+# (only firebase/app + firebase/auth) — kept as defense-in-depth. 1.9.16 stays
+# within firestore's declared ~1.9.0 range, so it's an in-range patch bump.
+overrides:
+  '@grpc/grpc-js': 1.9.16
 allowBuilds:
   '@code-inspector/core': true
   '@firebase/util': true
