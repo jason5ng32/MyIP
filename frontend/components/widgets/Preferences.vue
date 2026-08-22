@@ -43,7 +43,7 @@
                                     {{ lang.label }}
                                     <!-- Partial translation: literal "Beta", deliberately untranslated. -->
                                     <Badge v-if="lang.beta" variant="secondary"
-                                        class="px-1.5 py-0 text-[10px] font-medium">Beta</Badge>
+                                        class="px-1.5 py-0.5 text-[10px] font-medium">Beta</Badge>
                                 </span>
                             </SelectItem>
                         </SelectContent>
