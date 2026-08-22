@@ -98,7 +98,8 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -252,12 +253,15 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   });
 };
 
-onMounted(() => {
-  store.setMountingStatus('DNSLeakTest', true);
+// Command owner: run all leak providers. Resolves with the next
+// dnsleak:finished snapshot.
+useAppCommand('dnsleak:run', ({ isRefresh = false } = {}) => {
+  const finished = waitForAppEvent('dnsleak:finished');
+  checkAllDNSLeakTest(isRefresh);
+  return finished;
 });
 
-defineExpose({
-  checkAllDNSLeakTest,
-  leakTest,
+onMounted(() => {
+  store.setMountingStatus('DNSLeakTest', true);
 });
 </script>

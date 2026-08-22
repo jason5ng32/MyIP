@@ -1,7 +1,8 @@
 // Keyboard shortcut registration
 //
 // Input:
-//   - refs: all components involved in the shortcut keys (see below for destructuring)
+//   - refs: UI chrome the shortcut keys drive (see below for destructuring) —
+//     test sections aren't here, they're reached via the command bus
 //   - store: main store
 //   - t: i18n translation function
 //   - configs: computed(() => store.configs)
@@ -13,7 +14,8 @@
 //     Config-gated keys fill in reactively when /api/configs lands
 //
 // Note:
-//   - all scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug)
+//   - scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug);
+//     test-running keys dispatch commands on utils/app-commands.js
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
 //   - every entry here is a home-page action. Overlays (Dialog / Sheet /
 //     Drawer) suspend the whole map while they are open — see
@@ -23,21 +25,25 @@
 import { getCurrentScope, onScopeDispose, watch } from 'vue';
 import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
+import { dispatchAppCommand } from '../utils/app-commands.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
 import { hasPulseBackend } from '../utils/pulse-beacon.js';
+
+// A shortcut only kicks the run off — completion is the owner's business —
+// so a failed dispatch just logs.
+const runCommand = (name, payload) => {
+    dispatchAppCommand(name, payload).catch((error) => {
+        console.warn(`[shortcuts] ${name} failed:`, error);
+    });
+};
 
 const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     const {
         queryIPRef,
         helpModalRef,
         shareReportRef,
-        speedTestRef,
         advancedToolsRef,
-        IPCheckRef,
-        connectivityRef,
-        webRTCRef,
-        dnsLeaksRef,
         isInfosLoaded,
         toggleInfoMask,
     } = refs;
@@ -105,9 +111,8 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             type: 'regex',
             action: (num) => {
                 if (num > userPreferences.value.ipCardsToShow) return;
-                const card = IPCheckRef.value.ipDataCards[num - 1];
                 scrollToElement('IPInfoCard-' + num, 70);
-                IPCheckRef.value.refreshCard(card, num - 1);
+                runCommand('ipinfo:refresh', { index: num - 1 });
                 trackEvent('ShortCut', 'ShortCut', 'IPCheck');
             },
             description: t('shortcutKeys.RefreshIPCard'),
@@ -116,7 +121,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             keys: 'c',
             action: () => {
                 scrollToElement('Connectivity', 80);
-                connectivityRef.value.handelCheckStart('manual');
+                runCommand('connectivity:run', { trigger: 'manual' });
                 trackEvent('ShortCut', 'ShortCut', 'Connectivity');
             },
             description: t('shortcutKeys.RefreshConnectivityTests'),
@@ -125,7 +130,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             keys: 'w',
             action: () => {
                 scrollToElement('WebRTC', 80);
-                webRTCRef.value.checkAllWebRTC(false);
+                runCommand('webrtc:run', { isRefresh: false });
                 trackEvent('ShortCut', 'ShortCut', 'WebRTC');
             },
             description: t('shortcutKeys.RefreshWebRTC'),
@@ -134,7 +139,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             keys: 'd',
             action: () => {
                 scrollToElement('DNSLeakTest', 80);
-                dnsLeaksRef.value.checkAllDNSLeakTest(true);
+                runCommand('dnsleak:run', { isRefresh: true });
                 trackEvent('ShortCut', 'ShortCut', 'DNSLeakTest');
             },
             description: t('shortcutKeys.RefreshDNSLeakTest'),
@@ -143,7 +148,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             keys: 's',
             action: () => {
                 scrollToElement('SpeedTest', 80);
-                speedTestRef.value.speedTestController();
+                runCommand('speedtest:toggle');
                 trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
             },
             description: t('shortcutKeys.SpeedTestButton'),

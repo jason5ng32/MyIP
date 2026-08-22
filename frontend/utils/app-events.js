@@ -19,6 +19,28 @@ export const onAppEvent = (event, handler) => {
     };
 };
 
+// One-shot subscription: resolves with the next payload of the event. Safe
+// to call before triggering the producer — subscribe first, then invoke.
+// With timeoutMs, rejects (code 'timeout') and unsubscribes if the event
+// never fires.
+export const waitForAppEvent = (event, { timeoutMs } = {}) => new Promise((resolve, reject) => {
+    let timer;
+    const off = onAppEvent(event, (payload) => {
+        clearTimeout(timer);
+        off();
+        resolve(payload);
+    });
+    if (timeoutMs) {
+        timer = setTimeout(() => {
+            off();
+            reject(Object.assign(
+                new Error(`[app-events] "${event}" did not fire within ${timeoutMs}ms`),
+                { code: 'timeout' },
+            ));
+        }, timeoutMs);
+    }
+});
+
 // Emit an event to all subscribers. Emitting is fire-and-forget: a throwing
 // handler must not break the emitter or the remaining handlers.
 export const emitAppEvent = (event, payload = {}) => {

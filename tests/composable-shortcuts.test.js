@@ -47,8 +47,27 @@ registerHooks({
 
 const { useShortcuts } = await import('../frontend/composables/use-shortcuts.js');
 const { onAppEvent } = await import('../frontend/utils/app-events.js');
+const { registerAppCommand } = await import('../frontend/utils/app-commands.js');
 
 const t = (k) => `<${k}>`;
+
+// The test-running shortcuts dispatch on the command bus rather than calling
+// through refs. Register the five owner commands once, into a shared record
+// that loadAndGetKeyMap resets per test.
+const commandCalls = { ipRefresh: [], connectivity: [], webrtc: [], dnsleak: [], speedTest: 0 };
+registerAppCommand('ipinfo:refresh', (payload) => { commandCalls.ipRefresh.push(payload.index); });
+registerAppCommand('connectivity:run', (payload) => { commandCalls.connectivity.push(payload.trigger); });
+registerAppCommand('webrtc:run', (payload) => { commandCalls.webrtc.push(payload.isRefresh); });
+registerAppCommand('dnsleak:run', (payload) => { commandCalls.dnsleak.push(payload.isRefresh); });
+registerAppCommand('speedtest:toggle', () => { commandCalls.speedTest += 1; });
+
+const resetCommandCalls = () => {
+  commandCalls.ipRefresh = [];
+  commandCalls.connectivity = [];
+  commandCalls.webrtc = [];
+  commandCalls.dnsleak = [];
+  commandCalls.speedTest = 0;
+};
 
 function makeStoreStub() {
   const state = reactive({
@@ -63,18 +82,20 @@ function makeStoreStub() {
 }
 
 function makeRefs() {
+  // UI-chrome calls live here; the test-section calls land in commandCalls
+  // (merged into the returned record so assertions read one object).
   const calls = {
     queryOpen: 0,
     helpOpen: 0,
     shareOpen: 0,
-    speedTest: 0,
     advancedNavigate: [],
     advancedFullScreen: 0,
-    ipRefresh: [],
-    connectivity: [],
-    webrtc: [],
-    dnsleak: [],
     mask: 0,
+    get speedTest() { return commandCalls.speedTest; },
+    get ipRefresh() { return commandCalls.ipRefresh; },
+    get connectivity() { return commandCalls.connectivity; },
+    get webrtc() { return commandCalls.webrtc; },
+    get dnsleak() { return commandCalls.dnsleak; },
   };
 
   const advancedToolsRef = ref({
@@ -87,18 +108,7 @@ function makeRefs() {
       queryIPRef:        ref({ openModal: () => { calls.queryOpen += 1; } }),
       helpModalRef:      ref({ openModal: () => { calls.helpOpen += 1; }, keyMap: null }),
       shareReportRef:    ref({ openDialog: () => { calls.shareOpen += 1; } }),
-      speedTestRef:      ref({ speedTestController: () => { calls.speedTest += 1; } }),
       advancedToolsRef,
-      IPCheckRef:        ref({
-        ipDataCards: [
-          { id: 'a', ip: '1.1.1.1' }, { id: 'b', ip: '2.2.2.2' }, { id: 'c', ip: '3.3.3.3' },
-          { id: 'd', ip: '4.4.4.4' }, { id: 'e', ip: '5.5.5.5' }, { id: 'f', ip: '6.6.6.6' },
-        ],
-        refreshCard: (_card, i) => { calls.ipRefresh.push(i); },
-      }),
-      connectivityRef:   ref({ handelCheckStart: (flag) => { calls.connectivity.push(flag); } }),
-      webRTCRef:         ref({ checkAllWebRTC: (flag) => { calls.webrtc.push(flag); } }),
-      dnsLeaksRef:       ref({ checkAllDNSLeakTest: (flag) => { calls.dnsleak.push(flag); } }),
       isInfosLoaded:     ref(true),
       toggleInfoMask:    () => { calls.mask += 1; },
     },
@@ -117,6 +127,7 @@ function loadAndGetKeyMap({
   cloudFlare = false,
 } = {}) {
   globalThis.__setPulseBackendForTest(pulseBackend);
+  resetCommandCalls();
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
   const configs = computed(() => ({ originalSite, map: true, cloudFlare }));
@@ -194,6 +205,18 @@ describe('useShortcuts()', () => {
     const entry = keyMap.findLast((e) => e.type === 'regex');
     entry.action(6); // beyond ipCardsToShow (2)
     assert.deepEqual(calls.ipRefresh, [], 'num > ipCardsToShow → no-op');
+  });
+
+  it('"c"/"w"/"d"/"s" dispatch the section commands with their payloads', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    keyMap.findLast((e) => e.keys === 'c').action();
+    keyMap.findLast((e) => e.keys === 'w').action();
+    keyMap.findLast((e) => e.keys === 'd').action();
+    keyMap.findLast((e) => e.keys === 's').action();
+    assert.deepEqual(calls.connectivity, ['manual']);
+    assert.deepEqual(calls.webrtc, [false]);
+    assert.deepEqual(calls.dnsleak, [true]);
+    assert.equal(calls.speedTest, 1, 'the s key stays a run/pause toggle');
   });
 
   it('"?" opens help modal and emits the shortcut:help-opened app event', () => {

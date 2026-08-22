@@ -112,6 +112,7 @@
         </CardContent>
       </Card>
     </div>
+
   </section>
 </template>
 
@@ -120,7 +121,8 @@ import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -435,6 +437,14 @@ const checkAllWebRTC = async (isRefresh) => {
   });
 };
 
+// Command owner: run all STUN checks. Resolves with the next webrtc:finished
+// snapshot (also emitted when WebRTC is unavailable in this browser).
+useAppCommand('webrtc:run', ({ isRefresh = false } = {}) => {
+  const finished = waitForAppEvent('webrtc:finished');
+  checkAllWebRTC(isRefresh);
+  return finished;
+});
+
 onMounted(() => {
   store.setMountingStatus('WebRTC', true);
 });
@@ -450,9 +460,4 @@ onBeforeUnmount(() => {
 watch(IPArray, () => {
   store.updateAllIPs(IPArray.value);
 }, { deep: true });
-
-defineExpose({
-  checkAllWebRTC,
-  stunServers,
-});
 </script>

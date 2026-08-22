@@ -165,6 +165,7 @@
         </div>
       </CardContent>
     </Card>
+
   </section>
 </template>
 
@@ -174,6 +175,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/valid-ip.js';
 import { parseTrace } from '@/utils/parse-trace.js';
@@ -529,6 +531,10 @@ const speedTestController = async () => {
   }
 };
 
+// Command owner: run / pause / resume toggle, same semantics as the section's
+// own button. Resolves when the toggle applies, not when the test finishes.
+useAppCommand('speedtest:toggle', () => speedTestController());
+
 // --- Lifecycle ----------------------------------------------------------
 
 onMounted(() => { store.setMountingStatus('SpeedTest', true); });
@@ -546,8 +552,6 @@ onUnmounted(() => {
   }
   destroyCharts();
 });
-
-defineExpose({ speedTestController });
 </script>
 
 <style scoped>

@@ -106,6 +106,7 @@
 
     <!-- Add / import dialog (custom form + curated list browser) -->
     <ConnectivityAddDialog v-model:open="addDialogOpen" />
+
   </section>
 </template>
 
@@ -114,7 +115,8 @@ import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
 import { TILE_PREVIEW, faviconPath } from '@/data/connectivity-import-lists.js';
 import { removeTarget } from '@/utils/connectivity-import.js';
@@ -512,6 +514,15 @@ const handelCheckStart = async (trigger = 'boot') => {
   }
 };
 
+// Command owner: run the connectivity pass. `trigger` keeps handelCheckStart's
+// toast / card-reset semantics; resolves with the next connectivity:finished
+// snapshot (the first pass in multi-round mode).
+useAppCommand('connectivity:run', ({ trigger = 'manual' } = {}) => {
+  const finished = waitForAppEvent('connectivity:finished');
+  handelCheckStart(trigger);
+  return finished;
+});
+
 onMounted(() => {
   store.setMountingStatus('Connectivity', true);
 });
@@ -528,6 +539,4 @@ onBeforeUnmount(() => {
 // Either signal flipping fires sendAlert; the gates inside pick the winner.
 watch(() => store.allHasLoaded, (v) => { if (v) sendAlert(); });
 watch(allRoundsDone, (v) => { if (v) sendAlert(); });
-
-defineExpose({ handelCheckStart });
 </script>

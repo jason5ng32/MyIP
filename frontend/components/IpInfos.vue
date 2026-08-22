@@ -22,6 +22,7 @@
           :asnConnectivityInfos="asnConnectivityInfos" @refresh-card="refreshCard" />
       </div>
     </div>
+
   </section>
 </template>
 
@@ -34,7 +35,8 @@ import { trackEvent } from '@/utils/analytics';
 import { isUsablePublicIP } from '@/utils/valid-ip.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
-import { emitAppEvent } from '@/utils/app-events';
+import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
+import { useAppCommand } from '@/composables/use-app-command.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
 
@@ -430,14 +432,21 @@ watch(IPArray, () => {
   store.updateAllIPs(IPArray.value);
 });
 
-onMounted(() => {
-  store.setMountingStatus('IPInfo', true);
+// Command owner: refresh one card ({ index }) or the whole grid. Resolves
+// with the next ipinfo:finished snapshot — the grid re-emits it whenever a
+// card settles, single-card refreshes included.
+useAppCommand('ipinfo:refresh', ({ index } = {}) => {
+  const finished = waitForAppEvent('ipinfo:finished');
+  if (Number.isInteger(index) && ipDataCards[index]) {
+    refreshCard(ipDataCards[index], index);
+  } else {
+    checkAllIPs();
+  }
+  return finished;
 });
 
-defineExpose({
-  checkAllIPs,
-  ipDataCards,
-  refreshCard,
+onMounted(() => {
+  store.setMountingStatus('IPInfo', true);
 });
 
 </script>
