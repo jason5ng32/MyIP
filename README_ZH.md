@@ -104,6 +104,7 @@ docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
 欢迎参与贡献！我们维护着一批对新手友好的任务，每条都写明了具体文件、验收标准，并有测试引导你完成：
 
 * 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) —— 添加你所在国家的 DNS 解析服务、添加精选网站列表、把 README 翻译成你的语言、润色翻译等
+* 🌐 [TRANSLATING.md](TRANSLATING.md) —— 把 UI 带到你的语言：一个语言包加上一行注册表，以及 **部分翻译也是欢迎的首次 PR**
 * 📄 [CONTRIBUTING.md](CONTRIBUTING.md) —— 环境搭建、开发约定与 PR 流程（请将 PR 提交到 `dev` 分支）
 
 ## ⚙️ 配置
