@@ -45,12 +45,12 @@
                 </NavigationMenuTrigger>
                 <NavigationMenuContent class="z-50">
                   <!-- Two-column grid on PC -->
-                  <ul class="relative grid grid-cols-2 gap-x-4 gap-y-0.5 min-w-[24rem]">
+                  <ul class="relative grid grid-cols-2 gap-x-4 gap-y-0.5 min-w-[28rem]">
                     <span aria-hidden="true"
                       class="pointer-events-none absolute inset-y-1 left-1/2 w-px -translate-x-1/2 bg-border"></span>
                     <li v-for="tool in advancedTools" :key="tool.slug">
                       <NavigationMenuLink as-child class="cursor-pointer">
-                        <button type="button" class="w-full truncate text-left" @click="openTool(tool.slug)">
+                        <button type="button" class="w-full text-left leading-snug" @click="openTool(tool.slug)">
                           {{ t(tool.titleKey) }}
                         </button>
                       </NavigationMenuLink>
@@ -203,7 +203,7 @@
     <!-- Mobile navigation drawer. Flex column so the link list scrolls instead
          of clipping on short screens when Advanced Tools is expanded. -->
     <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
-      <SheetContent side="left" class="w-72 p-0 flex flex-col gap-0" :title="t('nav.Navigation')">
+      <SheetContent side="left" class="w-80 p-0 flex flex-col gap-0" :title="t('nav.Navigation')">
         <div class="flex shrink-0 items-center justify-between border-b px-4 py-3">
           <h5 class="m-0 text-base font-semibold">{{ t('nav.Navigation') }}</h5>
           <SheetClose />
@@ -224,7 +224,7 @@
               <CollapsibleContent>
                 <div class="my-0.5 ml-3 flex flex-col gap-0.5 border-l pl-3">
                   <button v-for="tool in advancedTools" :key="tool.slug" type="button"
-                    class="block w-full truncate rounded-md px-3 py-1.5 text-left text-sm text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
+                    class="block w-full rounded-md px-3 py-1.5 text-left text-sm leading-snug text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                     @click="openTool(tool.slug)">
                     {{ t(tool.titleKey) }}
                   </button>
