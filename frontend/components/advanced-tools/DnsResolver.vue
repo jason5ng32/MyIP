@@ -118,7 +118,7 @@ const errorMsg = ref('');
 const combinedResults = ref([]);
 const countryFilter = ref('all');
 
-const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'];
+const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'CAA'];
 
 const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;

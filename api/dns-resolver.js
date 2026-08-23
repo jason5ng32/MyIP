@@ -14,6 +14,20 @@ import { DNS_RESOLVERS } from './data/dns-resolvers.js';
 const DNS_TIMEOUT_MS = 3000;
 const DOH_TIMEOUT_MS = 5000;
 
+// Flatten `resolveSoa`'s single object into one readable line, matching the
+// zone-file field order the DoH JSON path already returns as a string.
+const formatSoa = (soa) =>
+    `${soa.nsname}. ${soa.hostmaster}. ${soa.serial} ${soa.refresh} ${soa.retry} ${soa.expire} ${soa.minttl}`;
+
+// Format `resolveCaa`'s objects into "flag tag value" lines. Each record
+// carries `critical` plus exactly one property tag (issue, issuewild, iodef, …).
+const CAA_TAGS = ['issue', 'issuewild', 'iodef', 'contactemail', 'contactphone'];
+const formatCaa = (records) =>
+    records.map((record) => {
+        const tag = CAA_TAGS.find((key) => key in record);
+        return `${record.critical ?? 0} ${tag ?? '?'} "${tag ? record[tag] : ''}"`;
+    });
+
 // Resolve via classic UDP DNS. Returns the raw result value: an array of
 // strings, a joined MX string, or 'N/A' on empty/failure.
 const resolveDns = async (hostname, type, name, server) => {
@@ -25,6 +39,8 @@ const resolveDns = async (hostname, type, name, server) => {
     const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
     const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
     const resolveMXAsync = promisify(resolver.resolveMx.bind(resolver));
+    const resolveSoaAsync = promisify(resolver.resolveSoa.bind(resolver));
+    const resolveCaaAsync = promisify(resolver.resolveCaa.bind(resolver));
     try {
         let addresses;
 
@@ -51,6 +67,12 @@ const resolveDns = async (hostname, type, name, server) => {
                 addresses = await resolveMXAsync(hostname);
                 addresses = addresses.map(item => `${item.priority} ${item.exchange}.`)
                 .join(', ');
+                break;
+            case 'SOA':
+                addresses = formatSoa(await resolveSoaAsync(hostname));
+                break;
+            case 'CAA':
+                addresses = formatCaa(await resolveCaaAsync(hostname));
                 break;
             default:
                 throw new Error('Unsupported type');
@@ -148,3 +170,4 @@ const dnsResolver = async (req, res) => {
 };
 
 export default dnsResolver;
+export { formatSoa, formatCaa };

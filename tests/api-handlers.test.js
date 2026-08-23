@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
 import googleMapHandler from '../api/google-map.js';
-import dnsResolverHandler from '../api/dns-resolver.js';
+import dnsResolverHandler, { formatSoa, formatCaa } from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
@@ -246,6 +246,29 @@ describe('dns-resolver handler', () => {
         await dnsResolverHandler(createRequest({ query: { hostname: 'localhost', type: 'A' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid hostname' });
+    });
+
+    it('formats an SOA record object into one zone-file-ordered line', () => {
+        const line = formatSoa({
+            nsname: 'ns.example.com',
+            hostmaster: 'hostmaster.example.com',
+            serial: 2026010101,
+            refresh: 7200,
+            retry: 3600,
+            expire: 1209600,
+            minttl: 300,
+        });
+        assert.equal(line, 'ns.example.com. hostmaster.example.com. 2026010101 7200 3600 1209600 300');
+    });
+
+    it('formats CAA records, defaulting a missing flag to 0', () => {
+        assert.deepEqual(
+            formatCaa([
+                { critical: 0, issue: 'letsencrypt.org' },
+                { iodef: 'mailto:admin@example.com' },
+            ]),
+            ['0 issue "letsencrypt.org"', '0 iodef "mailto:admin@example.com"'],
+        );
     });
 });
 
