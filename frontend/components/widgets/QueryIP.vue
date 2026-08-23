@@ -69,7 +69,7 @@ import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
+import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -164,7 +164,7 @@ const fetchIPForModal = async (ip) => {
             isChecking.value = 'idle';
             return;
         } catch (error) {
-            console.error(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
+            logSourceFetchFailure(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
             currentIdx = (currentIdx + 1) % sources.length;
             attempts++;
         }

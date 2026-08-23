@@ -21,7 +21,7 @@
     "i18n-sync": "node scripts/i18n-scaffold.js sync"
   },
   "dependencies": {
-    "@cloudflare/speedtest": "^1.13.0",
+    "@cloudflare/speedtest": "^1.13.1",
     "@iconify-json/circle-flags": "^1.2.10",
     "@iconify/vue": "^5.0.1",
     "@khmyznikov/pwa-install": "^0.6.4",
@@ -76,6 +76,6 @@
     "nodemon": "^3.1.14",
     "tailwindcss": "^4.3.3",
     "vconsole": "^3.15.1",
-    "vite": "^8.2.1"
+    "vite": "^8.2.2"
   }
 }

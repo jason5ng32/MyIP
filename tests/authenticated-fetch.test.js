@@ -29,7 +29,7 @@ import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { createPinia, setActivePinia } from 'pinia';
 
-const { authenticatedFetch, fetchErrorLabel } = await import('../frontend/utils/authenticated-fetch.js');
+const { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } = await import('../frontend/utils/authenticated-fetch.js');
 
 const realFetch = globalThis.fetch;
 
@@ -111,5 +111,57 @@ describe('authenticatedFetch — error shape', () => {
   it('returns the parsed body on success', async () => {
     globalThis.fetch = async () => httpResponse(200, { ip: '1.1.1.1' });
     assert.deepEqual(await authenticatedFetch('/api/ipchecking?ip=1.1.1.1'), { ip: '1.1.1.1' });
+  });
+});
+
+// A source declining with 403 is a fail-over, not a defect: it must log below
+// the level error monitoring captures, while every other failure stays an
+// error so a real outage still surfaces.
+describe('logSourceFetchFailure', () => {
+  const captured = { warn: [], error: [] };
+  const realWarn = console.warn;
+  const realError = console.error;
+
+  beforeEach(() => {
+    captured.warn = [];
+    captured.error = [];
+    console.warn = (...args) => captured.warn.push(args);
+    console.error = (...args) => captured.error.push(args);
+  });
+
+  afterEach(() => {
+    console.warn = realWarn;
+    console.error = realError;
+  });
+
+  const failWith = async (status, opts) => {
+    globalThis.fetch = async () => httpResponse(status, null, opts);
+    return authenticatedFetch('/api/ipchecking?ip=1.1.1.1').catch((e) => e);
+  };
+
+  it('warns on 403', async () => {
+    logSourceFetchFailure('source 0', await failWith(403, { json: false }));
+    assert.equal(captured.warn.length, 1);
+    assert.equal(captured.error.length, 0);
+  });
+
+  it('keeps 500 at error level', async () => {
+    logSourceFetchFailure('source 0', await failWith(500, { json: true }));
+    assert.equal(captured.error.length, 1);
+    assert.equal(captured.warn.length, 0);
+  });
+
+  it('keeps other 4xx at error level', async () => {
+    logSourceFetchFailure('source 0', await failWith(400, { json: true }));
+    assert.equal(captured.error.length, 1);
+    assert.equal(captured.warn.length, 0);
+  });
+
+  it('keeps a status-less network failure at error level', async () => {
+    globalThis.fetch = async () => { throw new TypeError('Failed to fetch'); };
+    const error = await authenticatedFetch('/api/ipchecking?ip=1.1.1.1').catch((e) => e);
+    logSourceFetchFailure('source 0', error);
+    assert.equal(captured.error.length, 1);
+    assert.equal(captured.warn.length, 0);
   });
 });

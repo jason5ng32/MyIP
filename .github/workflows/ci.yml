@@ -37,6 +37,18 @@ jobs:
         # out of sync with package.json, rather than silently rewriting it.
         run: pnpm install --frozen-lockfile
 
+      - name: Translation status
+        # Locale progress dashboard into the run summary, so a translation PR's
+        # author and reviewer see coverage and the next keys to translate without
+        # a local run. Report only — the script always exits 0; the mechanical
+        # gate for locale packs lives in pnpm test below.
+        run: |
+          {
+            echo '```text'
+            node scripts/i18n-status.js
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Run tests
         run: pnpm test
 

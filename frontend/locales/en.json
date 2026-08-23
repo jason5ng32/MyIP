@@ -342,7 +342,7 @@
       "ipDB": "IP Geolocation Database",
       "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order.",
       "language": "Language Setting",
-      "languageTips": "Refreshing the browser will take effect."
+      "languageTips": "Refreshing the browser will take effect. Languages in beta may contain incomplete translations."
     },
     "DocsPrompt": "Type your question…",
     "DocsSignInTitle": "Sign In Required",

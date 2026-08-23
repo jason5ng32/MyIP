@@ -41,7 +41,7 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
-import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
+import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
 import InfoBanner from './widgets/InfoBanner.vue';
 
@@ -348,7 +348,7 @@ const fetchIPDetails = async (cardIndex, ip, sourceID = null) => {
           return;
         }
       } catch (error) {
-        console.error(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
+        logSourceFetchFailure(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
         currentSourceIndex = (currentSourceIndex + 1) % sources.length;
         attempts++;
       }
