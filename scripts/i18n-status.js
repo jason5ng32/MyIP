@@ -54,32 +54,10 @@ const bar = (ratio, width = 24) => {
 };
 
 const { values } = parseArgs({
-    options: {
-        locale: { type: 'string' },
-        limit: { type: 'string', default: '10' },
-        json: { type: 'boolean', default: false },
-    },
+    options: { locale: { type: 'string' }, limit: { type: 'string', default: '10' } },
 });
 const limit = Math.max(0, Number.parseInt(values.limit, 10) || 0);
 const targets = LOCALES.filter((l) => l.code !== FALLBACK_LOCALE && (!values.locale || l.code === values.locale));
-
-// --json: machine-readable snapshot of the same numbers, for CI's PR-comment
-// pipeline. Counts and key paths only, no prose — the consumer treats every
-// field as untrusted input and validates it before rendering anything.
-if (values.json) {
-    const locales = targets.map(({ code, status }) => {
-        const reports = DATASETS.map((dataset) => ({ ...dataset, ...compare(dataset.dir, code) }));
-        return {
-            code,
-            status,
-            sameAsEn: reports.reduce((sum, r) => sum + r.sameAsEn, 0),
-            datasets: reports.map((r) => ({ name: r.name, done: r.done, total: r.total, file: r.file })),
-            nextUp: reports.flatMap((r) => r.missing.map((key) => `${r.dir}${key}`)).slice(0, limit),
-        };
-    });
-    console.log(JSON.stringify({ locales }));
-    process.exit(0);
-}
 
 console.log(`\nTranslation status — reference locale: ${FALLBACK_LOCALE}\n`);
 

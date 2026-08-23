@@ -49,41 +49,6 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Prepare translation report artifact
-        # Locale-touching PRs get a sticky status comment, posted by
-        # i18n-comment.yml (this job's token is read-only, and fork PRs never
-        # see secrets — so the report is computed here and handed over as an
-        # artifact). No locale changes → no artifact → no comment.
-        #
-        # The artifact carries STRUCTURED NUMBERS only (--json: counts, locale
-        # codes, key paths). This run executes the PR's own code, so nothing
-        # produced here reaches a comment as text — the privileged side
-        # validates every field against strict shapes and renders the comment
-        # entirely with its own trusted code.
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          if ! gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --paginate \
-              --jq '.[].filename' \
-            | grep -qE '^(frontend/locales/|common/locale-registry\.js|frontend/data/changelog\.json)'; then
-            exit 0
-          fi
-          mkdir -p i18n-report
-          node scripts/i18n-status.js --json > i18n-report/report.json
-          printf '%s\n' "$PR_NUMBER" > i18n-report/pr-number
-          printf '%s\n' "$HEAD_SHA" > i18n-report/head-sha
-
-      - name: Upload translation report
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: i18n-report
-          path: i18n-report/
-          if-no-files-found: ignore
-
       - name: Run tests
         run: pnpm test
 
