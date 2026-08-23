@@ -1,0 +1,67 @@
+name: PR welcome
+
+# Greets every newly opened PR from an outside contributor: first-time
+# contributors get the full onboarding message, returning contributors a
+# shorter welcome-back one. Maintainer PRs (owner / member / collaborator)
+# and bot PRs are skipped.
+#
+# pull_request_target is safe here precisely because this workflow never
+# checks out or executes anything from the PR — it only posts a comment
+# with trusted code from the base branch. Keep it that way: no checkout,
+# no build steps in this file, ever. It also means the greeting posts
+# immediately, even while CI still sits behind the fork-approval gate.
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  welcome:
+    if: >-
+      !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+      && github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Post greeting
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const repoUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}`;
+
+            // The PR just opened is included in the count, so 1 = first ever.
+            const { data: search } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${context.repo.owner}/${context.repo.repo} is:pr author:${author}`,
+              per_page: 1,
+            });
+            const isFirstTime = search.total_count <= 1;
+
+            const firstTime = [
+              `Thanks for your first PR here, @${author} — contributions like this are what keep MyIP going! 🙏`,
+              '',
+              'This project has a single maintainer, so reviews are usually quick but not instant — expect a response within a day or two. A couple of things that speed a merge up:',
+              '',
+              '- `pnpm check` green locally (tests + build) is the fastest path through review.',
+              `- Conventions live in [AGENTS.md](${repoUrl}/blob/dev/AGENTS.md); translation PRs additionally in [TRANSLATING.md](${repoUrl}/blob/dev/TRANSLATING.md).`,
+              "- If the checks tab says a workflow is *awaiting approval*, that's normal for first-time contributors — the maintainer approves it as part of the review.",
+              '',
+              '_This is an automated greeting; a human review follows._',
+            ];
+
+            const returning = [
+              `Thanks for another PR, @${author} — always good to see you back! 🙌`,
+              '',
+              'The maintainer will take a look shortly (usually within a day or two). As ever, `pnpm check` green locally is the fastest path through review.',
+              '',
+              '_This is an automated greeting; a human review follows._',
+            ];
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pr.number,
+              body: (isFirstTime ? firstTime : returning).join('\n'),
+            });
