@@ -1,0 +1,73 @@
+name: i18n PR comment
+
+# Posts / updates one sticky translation-status comment on locale PRs.
+#
+# Deliberately split from CI: the report is computed there, under the
+# read-only token fork PRs get, and handed over as an artifact. This
+# workflow runs only trusted code from the default branch and holds the
+# pull-requests: write token — never check out or execute anything from
+# the PR here.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  actions: read
+
+jobs:
+  comment:
+    # Only PR runs can carry the artifact; push runs are skipped outright.
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download translation report
+        id: download
+        # No artifact = the PR didn't touch locale data; treat as a clean skip.
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: i18n-report
+          path: i18n-report
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upsert sticky comment
+        if: steps.download.outcome == 'success'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const read = (f) => fs.readFileSync(`i18n-report/${f}`, 'utf8').trim();
+
+            const prNumber = Number.parseInt(read('pr-number'), 10);
+            const headSha = read('head-sha');
+            // GitHub caps comment bodies at 65536 chars; the report is far
+            // smaller, but the artifact is untrusted input — cap it anyway.
+            const report = read('report.md').slice(0, 60000);
+            if (!Number.isInteger(prNumber) || prNumber <= 0) return;
+
+            // The artifact came from an untrusted run: only write to the PR
+            // whose head actually triggered that run.
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo, pull_number: prNumber,
+            });
+            const runHead = context.payload.workflow_run.head_sha;
+            if (pr.head.sha !== runHead || headSha !== runHead) return;
+
+            const marker = '<!-- i18n-status-bot -->';
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo, issue_number: prNumber, per_page: 100,
+            });
+            const existing = comments.find((c) => c.body?.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo, comment_id: existing.id, body: report,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: prNumber, body: report,
+              });
+            }

@@ -37,6 +37,55 @@ jobs:
         # out of sync with package.json, rather than silently rewriting it.
         run: pnpm install --frozen-lockfile
 
+      - name: Translation status
+        # Locale progress dashboard into the run summary, so a translation PR's
+        # author and reviewer see coverage and the next keys to translate without
+        # a local run. Report only — the script always exits 0; the mechanical
+        # gate for locale packs lives in pnpm test below.
+        run: |
+          {
+            echo '```text'
+            node scripts/i18n-status.js
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Prepare translation report artifact
+        # Locale-touching PRs get a sticky status comment, posted by
+        # i18n-comment.yml (this job's token is read-only, and fork PRs never
+        # see secrets — so the report is computed here and handed over as an
+        # artifact). No locale changes → no artifact → no comment.
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --paginate \
+              --jq '.[].filename' \
+            | grep -qE '^(frontend/locales/|common/locale-registry\.js|frontend/data/changelog\.json)'; then
+            exit 0
+          fi
+          mkdir -p i18n-report
+          {
+            echo '<!-- i18n-status-bot -->'
+            echo '### 🌍 Translation status'
+            echo ''
+            echo '```text'
+            node scripts/i18n-status.js
+            echo '```'
+            echo "Untranslated keys fall back to English — partial PRs are welcome, and every extra key helps. Guide: [TRANSLATING.md](https://github.com/$GITHUB_REPOSITORY/blob/dev/TRANSLATING.md)."
+          } > i18n-report/report.md
+          printf '%s\n' "$PR_NUMBER" > i18n-report/pr-number
+          printf '%s\n' "$HEAD_SHA" > i18n-report/head-sha
+
+      - name: Upload translation report
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: i18n-report
+          path: i18n-report/
+          if-no-files-found: ignore
+
       - name: Run tests
         run: pnpm test
 
