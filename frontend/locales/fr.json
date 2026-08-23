@@ -342,7 +342,7 @@
       "ipDB": "Base de données de géolocalisation IP",
       "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes.",
       "language": "Paramètres de langue",
-      "languageTips": "Rafraîchissement du navigateur pour prendre effet."
+      "languageTips": "Rafraîchissement du navigateur pour prendre effet. Les idiomes en bêta peuvent contenir des traductions incomplètes."
     },
     "DocsPrompt": "Saisissez votre question…",
     "DocsSignInTitle": "Connexion requise",
