@@ -1,5 +1,3 @@
-name: PR welcome
-
 # Greets every newly opened PR from an outside contributor: first-time
 # contributors get the full onboarding message, returning contributors a
 # shorter welcome-back one. Maintainer PRs (owner / member / collaborator)
@@ -10,6 +8,8 @@ name: PR welcome
 # with trusted code from the base branch. Keep it that way: no checkout,
 # no build steps in this file, ever. It also means the greeting posts
 # immediately, even while CI still sits behind the fork-approval gate.
+name: PR welcome
+
 on:
   pull_request_target:
     types: [opened]

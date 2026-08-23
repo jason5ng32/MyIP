@@ -1,5 +1,3 @@
-name: i18n PR comment
-
 # Posts / updates one sticky translation-status comment on locale PRs.
 #
 # Deliberately split from CI: the report is computed there, under the
@@ -7,6 +5,14 @@ name: i18n PR comment
 # workflow runs only trusted code from the default branch and holds the
 # pull-requests: write token — never check out or execute anything from
 # the PR here.
+#
+# The artifact is untrusted input (a PR can change scripts/i18n-status.js
+# to print whatever it likes). It is therefore treated as opaque text:
+# backticks stripped, length capped, always rendered inside a code fence.
+# Every piece of Markdown around it is authored here, by trusted code —
+# nothing from the artifact can become a link, an image or formatting.
+name: i18n PR comment
+
 on:
   workflow_run:
     workflows: [CI]
@@ -44,9 +50,9 @@ jobs:
 
             const prNumber = Number.parseInt(read('pr-number'), 10);
             const headSha = read('head-sha');
-            // GitHub caps comment bodies at 65536 chars; the report is far
-            // smaller, but the artifact is untrusted input — cap it anyway.
-            const report = read('report.md').slice(0, 60000);
+            // Neutralize the untrusted report: no backticks (so it can never
+            // escape the fence below), bounded size (comment cap is 65536).
+            const report = read('report.txt').replace(/`/g, '').slice(0, 55000);
             if (!Number.isInteger(prNumber) || prNumber <= 0) return;
 
             // The artifact came from an untrusted run: only write to the PR
@@ -58,16 +64,27 @@ jobs:
             if (pr.head.sha !== runHead || headSha !== runHead) return;
 
             const marker = '<!-- i18n-status-bot -->';
-            const { data: comments } = await github.rest.issues.listComments({
+            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
+            const body = [
+              marker,
+              '### 🌍 Translation status',
+              '',
+              '```text',
+              report,
+              '```',
+              `Untranslated keys fall back to English — partial PRs are welcome, and every extra key helps. Guide: [TRANSLATING.md](${repoUrl}/blob/dev/TRANSLATING.md).`,
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
               ...context.repo, issue_number: prNumber, per_page: 100,
             });
             const existing = comments.find((c) => c.body?.startsWith(marker));
             if (existing) {
               await github.rest.issues.updateComment({
-                ...context.repo, comment_id: existing.id, body: report,
+                ...context.repo, comment_id: existing.id, body,
               });
             } else {
               await github.rest.issues.createComment({
-                ...context.repo, issue_number: prNumber, body: report,
+                ...context.repo, issue_number: prNumber, body,
               });
             }

@@ -54,6 +54,10 @@ jobs:
         # i18n-comment.yml (this job's token is read-only, and fork PRs never
         # see secrets — so the report is computed here and handed over as an
         # artifact). No locale changes → no artifact → no comment.
+        #
+        # The artifact carries RAW TEXT only. This run executes the PR's own
+        # code, so nothing produced here may reach a comment as Markdown —
+        # the privileged side sanitizes the text and owns all formatting.
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -66,15 +70,7 @@ jobs:
             exit 0
           fi
           mkdir -p i18n-report
-          {
-            echo '<!-- i18n-status-bot -->'
-            echo '### 🌍 Translation status'
-            echo ''
-            echo '```text'
-            node scripts/i18n-status.js
-            echo '```'
-            echo "Untranslated keys fall back to English — partial PRs are welcome, and every extra key helps. Guide: [TRANSLATING.md](https://github.com/$GITHUB_REPOSITORY/blob/dev/TRANSLATING.md)."
-          } > i18n-report/report.md
+          node scripts/i18n-status.js > i18n-report/report.txt
           printf '%s\n' "$PR_NUMBER" > i18n-report/pr-number
           printf '%s\n' "$HEAD_SHA" > i18n-report/head-sha
 
