@@ -51,20 +51,20 @@
             <span class="text-base font-medium truncate">{{ test.name }}</span>
           </div>
           <!-- Status + ms. Multi mode pins these to the best round (see checkConnectivityHandler). -->
-          <div class="flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 text-base min-w-0">
+          <div class="flex items-center justify-between gap-2 text-sm md:text-base">
+            <span class="flex items-center gap-1.5 min-w-0">
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
                 <span class="absolute inline-flex size-2 rounded-full bg-info opacity-75 animate-ping"></span>
                 <span class="relative inline-flex size-2 rounded-full" :class="dotClass(toneOf(test))"></span>
               </span>
               <component v-else-if="statusFaceIcon(test)" :is="statusFaceIcon(test)" class="size-4 shrink-0"
                 :class="textClass(toneOf(test))" />
-              <span :class="textClass(toneOf(test))" class="font-mono whitespace-nowrap min-w-0">{{ test.status
+              <span :class="textClass(toneOf(test))" class="min-w-0 truncate" :title="test.status">{{ test.status
                 }}</span>
             </span>
-            <span v-if="test.time !== 0" class="text-base font-mono tabular-nums text-muted-foreground"
+            <span v-if="test.time !== 0" class="shrink-0 font-mono tabular-nums text-muted-foreground"
               :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
-              {{ test.time }}<span class="ml-0.5 text-sm">ms</span>
+              {{ test.time }}<span class="ml-0.5 text-xs md:text-sm">ms</span>
             </span>
           </div>
           <!-- Multi-test per-round latency bars, all on one absolute scale
