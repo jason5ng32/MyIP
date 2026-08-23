@@ -55,9 +55,11 @@ jobs:
         # see secrets — so the report is computed here and handed over as an
         # artifact). No locale changes → no artifact → no comment.
         #
-        # The artifact carries RAW TEXT only. This run executes the PR's own
-        # code, so nothing produced here may reach a comment as Markdown —
-        # the privileged side sanitizes the text and owns all formatting.
+        # The artifact carries STRUCTURED NUMBERS only (--json: counts, locale
+        # codes, key paths). This run executes the PR's own code, so nothing
+        # produced here reaches a comment as text — the privileged side
+        # validates every field against strict shapes and renders the comment
+        # entirely with its own trusted code.
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -70,7 +72,7 @@ jobs:
             exit 0
           fi
           mkdir -p i18n-report
-          node scripts/i18n-status.js > i18n-report/report.txt
+          node scripts/i18n-status.js --json > i18n-report/report.json
           printf '%s\n' "$PR_NUMBER" > i18n-report/pr-number
           printf '%s\n' "$HEAD_SHA" > i18n-report/head-sha
 

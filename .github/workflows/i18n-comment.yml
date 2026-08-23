@@ -7,10 +7,13 @@
 # the PR here.
 #
 # The artifact is untrusted input (a PR can change scripts/i18n-status.js
-# to print whatever it likes). It is therefore treated as opaque text:
-# backticks stripped, length capped, always rendered inside a code fence.
-# Every piece of Markdown around it is authored here, by trusted code —
-# nothing from the artifact can become a link, an image or formatting.
+# to emit whatever it likes), so no artifact byte ever reaches the comment.
+# It carries structured claims — counts, locale codes, key paths — and each
+# field is validated against a strict shape (enums, integer bounds, tight
+# regexes) before trusted code here renders the comment text from scratch.
+# A hostile PR can at most misstate its own coverage numbers; it cannot put
+# a single word of prose, a link, or an instruction into the bot's mouth.
+# (The numbers are advisory anyway — the merge gate is pnpm test.)
 name: i18n PR comment
 
 on:
@@ -50,10 +53,10 @@ jobs:
 
             const prNumber = Number.parseInt(read('pr-number'), 10);
             const headSha = read('head-sha');
-            // Neutralize the untrusted report: no backticks (so it can never
-            // escape the fence below), bounded size (comment cap is 65536).
-            const report = read('report.txt').replace(/`/g, '').slice(0, 55000);
             if (!Number.isInteger(prNumber) || prNumber <= 0) return;
+
+            let data;
+            try { data = JSON.parse(read('report.json')); } catch { return; }
 
             // The artifact came from an untrusted run: only write to the PR
             // whose head actually triggered that run.
@@ -63,6 +66,45 @@ jobs:
             const runHead = context.payload.workflow_run.head_sha;
             if (pr.head.sha !== runHead || headSha !== runHead) return;
 
+            // Validate-then-render: every value below either matches a strict
+            // shape or its row is dropped. Only validated numbers, enum labels
+            // and regex-tight identifiers make it into the rendered text.
+            const CODE = /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
+            const KEY = /^[\w./-]{1,120}$/;
+            const DATASET_LABELS = ['main pack', 'privacy copy', 'checklist'];
+            const int = (v, max) => Number.isInteger(v) && v >= 0 && v <= max;
+            const pct = (done, total) => ((done / (total || 1)) * 100).toFixed(1);
+            const bar = (done, total) => {
+              const filled = Math.min(24, Math.max(0, Math.round((done / (total || 1)) * 24)));
+              return '█'.repeat(filled) + '░'.repeat(24 - filled);
+            };
+
+            const lines = [];
+            const locales = Array.isArray(data?.locales) ? data.locales.slice(0, 50) : [];
+            for (const loc of locales) {
+              if (typeof loc?.code !== 'string' || !CODE.test(loc.code)) continue;
+              if (!['full', 'beta'].includes(loc.status)) continue;
+              const rows = (Array.isArray(loc.datasets) ? loc.datasets.slice(0, 10) : [])
+                .filter((d) => DATASET_LABELS.includes(d?.name) && typeof d.file === 'boolean'
+                  && int(d.done, 1e6) && int(d.total, 1e6) && d.done <= d.total);
+              if (rows.length === 0) continue;
+              const done = rows.reduce((sum, d) => sum + d.done, 0);
+              const total = rows.reduce((sum, d) => sum + d.total, 0);
+              lines.push(`${loc.code} [${loc.status}]  ${bar(done, total)} ${pct(done, total)}% (${done}/${total})`);
+              for (const d of rows) {
+                const note = d.file ? '' : '  (no file yet)';
+                lines.push(`    ${d.name.padEnd(12)} ${pct(d.done, d.total).padStart(5)}%  ${d.done}/${d.total}${note}`);
+              }
+              if (int(loc.sameAsEn, 1e6) && loc.sameAsEn > 0) {
+                lines.push(`    identical to en: ${loc.sameAsEn} value(s) — worth a spot check`);
+              }
+              const nextUp = (Array.isArray(loc.nextUp) ? loc.nextUp.slice(0, 10) : [])
+                .filter((k) => typeof k === 'string' && KEY.test(k));
+              if (nextUp.length > 0) lines.push(`    next up: ${nextUp.join(', ')}`);
+              lines.push('');
+            }
+            if (lines.length === 0) return;
+
             const marker = '<!-- i18n-status-bot -->';
             const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
             const body = [
@@ -70,7 +112,7 @@ jobs:
               '### 🌍 Translation status',
               '',
               '```text',
-              report,
+              lines.join('\n').trimEnd(),
               '```',
               `Untranslated keys fall back to English — partial PRs are welcome, and every extra key helps. Guide: [TRANSLATING.md](${repoUrl}/blob/dev/TRANSLATING.md).`,
             ].join('\n');
