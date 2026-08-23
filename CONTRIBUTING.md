@@ -12,7 +12,7 @@ New here? Look for issues labeled
 
 1. **Fork** the repo and create your branch **from `dev`** (never `main` — `main` only
    receives release merges from `dev`).
-2. **Set up:** Node.js 20+ (CI runs on Node 24) and pnpm. The pnpm version is pinned
+2. **Set up:** Node.js 24+ (same as CI; the test suite uses `Intl` APIs that landed in Node 23) and pnpm. The pnpm version is pinned
    via the `packageManager` field, so the easiest path is:
 
    ```bash
