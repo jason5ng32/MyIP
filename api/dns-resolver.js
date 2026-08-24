@@ -98,19 +98,8 @@ const dnsResolver = async (req, res) => {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
+    // Hostname presence, shape and lowercasing are guaranteed by requireValidDomain.
     const { hostname, type } = req.query;
-
-    if (typeof hostname !== 'string') {
-        return res.status(400).send({ error: 'Hostname parameter must be a string' });
-    }
-
-    if (!hostname) {
-        return res.status(400).send({ error: 'Missing hostname parameter' });
-    }
-
-    if (!hostname.includes('.')) {
-        return res.status(400).send({ error: 'Invalid hostname' });
-    }
 
     // One lookup task per entry × protocol, in stable order: data-file order,
     // udp before doh within a provider. Each task resolves to one row of the

@@ -275,7 +275,7 @@ app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
-app.get('/api/dnsresolver', dnsResolver);
+app.get('/api/dnsresolver', requireValidDomain('hostname'), dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);
 app.get('/api/getuserinfo', getUserinfo);

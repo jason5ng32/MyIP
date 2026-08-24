@@ -222,6 +222,15 @@ describe('requireValidDomain', () => {
         assert.equal(req.query.domain, 'www.example.com');
     });
 
+    it('supports a custom query parameter name', () => {
+        const hostnameGuard = requireValidDomain('hostname');
+        const req = makeReq({ query: { hostname: 'WWW.Example.COM' } });
+        let nextCalled = false;
+        hostnameGuard(req, makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+        assert.equal(req.query.hostname, 'www.example.com');
+    });
+
     it('returns 400 when the domain is missing', () => {
         const res = makeRes();
         let nextCalled = false;
