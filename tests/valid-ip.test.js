@@ -48,6 +48,9 @@ const validDomains = [
   'EXAMPLE.COM',
   'xn--n3h.example',
   'with-hyphen.io',
+  '_dmarc.example.com',                  // RFC 8552 underscored service names —
+  '_xmpp-server._tcp.example.com',       // DnsResolver has to be able to reach
+  'selector1._domainkey.example.com',    // DMARC / DKIM / SRV records
 ];
 
 const invalidDomains = [
@@ -56,7 +59,9 @@ const invalidDomains = [
   '.example.com',
   'example.',
   'example..com',
-  'has_underscore.com',
+  'has_underscore.com',   // underscore is a label prefix only, not mid-label
+  'example._com',         // ...and never in the TLD
+  '_.com',                // ...and never the whole label
   'trailing.dot.',
   'one.1',         // TLD must be 2+ letters, not digits
   '192.168.1.1',   // numeric-only TLD is rejected
