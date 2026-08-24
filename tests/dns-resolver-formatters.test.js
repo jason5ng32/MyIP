@@ -60,6 +60,19 @@ describe('DoH answer selection', () => {
         assert.deepEqual(dohRecords(data, 'A'), data.Answer);
     });
 
+    it('skips a CNAME answer and takes the authority SOA for a SOA query on an aliased name', () => {
+        const soa = { type: 6, data: 'ns1.example.com. hostmaster.example.com. 1 2 3 4 5' };
+        assert.deepEqual(dohRecords({
+            Answer: [{ type: 5, data: 'target.example.net.' }],
+            Authority: [soa],
+        }, 'SOA'), [soa]);
+    });
+
+    it('keeps a SOA answer at the zone apex', () => {
+        const soa = { type: 6, data: 'ns1.example.com. hostmaster.example.com. 1 2 3 4 5' };
+        assert.deepEqual(dohRecords({ Answer: [soa] }, 'SOA'), [soa]);
+    });
+
     it('falls back to the authority SOA for a name below the zone apex', () => {
         const soa = { type: 6, data: 'ns1.example.com. hostmaster.example.com. 1 2 3 4 5' };
         assert.deepEqual(dohRecords({ Authority: [{ type: 2, data: 'ns1.example.com.' }, soa] }, 'SOA'), [soa]);

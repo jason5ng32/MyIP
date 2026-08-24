@@ -62,10 +62,13 @@ const SOA_RECORD_TYPE = 6;
 // The records a DoH envelope actually answers with. A SOA query for a name
 // below the zone apex carries the zone's own SOA in the authority section
 // instead, so fall back to it — otherwise any hostname that isn't itself a zone
-// reports N/A on every DoH row.
+// reports N/A on every DoH row. SOA answers are filtered by type because a
+// CNAME name puts the chain in Answer with the SOA in Authority, and the CNAME
+// target must not render as the SOA result.
 export const dohRecords = (data, type) => {
-    if (data.Answer?.length) return data.Answer;
-    if (type !== 'SOA') return [];
+    if (type !== 'SOA') return data.Answer ?? [];
+    const answers = (data.Answer ?? []).filter((record) => record.type === SOA_RECORD_TYPE);
+    if (answers.length) return answers;
     return (data.Authority ?? []).filter((record) => record.type === SOA_RECORD_TYPE);
 };
 
