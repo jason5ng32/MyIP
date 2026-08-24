@@ -80,7 +80,7 @@ runnable directly as `pnpm fetch-favicons`). Only if auto-fetch can't find a usa
 PNG do you hand-source one (on macOS, `sips` handles ICO→PNG). Remember to commit
 the PNGs with your change — CI stays offline and only checks they exist.
 
-**README translations** — beyond the four READMEs we maintain (`en` / `zh` / `fr` /
+**README translations** — beyond the five READMEs we maintain (`en` / `zh` / `zh-TW` / `fr` /
 `ru`), community-maintained translations in any language are welcome. Create
 `README_<LANG>.md` from the English [README.md](README.md) (the canonical source),
 open it with a one-line "community-maintained translation — English is canonical"
