@@ -24,10 +24,17 @@
         <span class="min-w-0 truncate font-medium">{{ title }}</span>
       </template>
       <!-- Button `as-child` renders the RouterLink as its root, so this is a
-           single <a> styled as a button — not a <button> nested in an <a>. -->
-      <Button as-child variant="default" class="ml-auto shrink-0 cursor-pointer">
+           single <a> styled as a button — not a <button> nested in an <a>.
+           Icon-only below `sm`: brand (132px) + this button's label (up to
+           178px in pt-BR) + gaps + px-4 exceeded 320px, and since the title is
+           the only item that can shrink, it collapsed to 0 and the row still
+           overflowed — a dangling "/" plus a clipped button. `sr-only` (not
+           `hidden`) keeps the accessible name in every locale, and being out of
+           flow it costs no `gap-2`. -->
+      <Button as-child variant="default" size="icon" class="ml-auto shrink-0 cursor-pointer sm:w-auto sm:px-4">
         <RouterLink to="/">
-          <ArrowLeft class="size-4" /> {{ t('advancedtools.BackToHome') }}
+          <ArrowLeft class="size-4" />
+          <span class="sr-only sm:not-sr-only">{{ t('advancedtools.BackToHome') }}</span>
         </RouterLink>
       </Button>
     </div>
