@@ -105,7 +105,7 @@ export const IMPORT_LISTS = [
             { id: 'bigbasket', name: 'Bigbasket', url: 'https://www.bigbasket.com/favicon.ico' },
             { id: 'phonepe', name: 'Phonepe', url: 'https://www.phonepe.com/favicon.ico' },
             { id: 'policybazaar', name: 'Policybazaar', url: 'https://www.policybazaar.com/favicon.ico' },
-            { id: 'digilocker', name: 'Digilocker', url: 'https://cdn.digilocker.gov.in/digilocker-landing-page/assets/img/meta/favicon-32x32.png' },
+            { id: 'nykaa', name: 'Nykaa', url: 'https://www.nykaa.com/favicon.ico' },
             { id: 'amfi', name: 'AMFI', url: 'https://www.amfiindia.com/favicon.ico' },
             { id: 'groww', name: 'Groww', url: 'https://groww.in/favicon.ico' },
         ],
