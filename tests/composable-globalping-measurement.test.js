@@ -42,6 +42,25 @@ function withScope(fn) {
 // promises settle before we assert.
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
+// Wait until `predicate()` holds, polling on a macrotask so the composable's
+// setTimeout-driven poll chain can advance between checks.
+//
+// A fixed sleep cannot do this job: a run here spans a POST plus up to three
+// real `pollInterval` timers, so any constant is either flaky when the machine
+// is loaded or slow on every green run. The "retries while in-progress" case
+// used to allow 80ms for that chain and failed under a parallel suite with
+// status still 'running' — a wait that expired, reported as a wrong result.
+//
+// The timeout only bounds a hang; it is never reached on a passing run.
+async function waitFor(predicate, { timeout = 2000, label = 'condition' } = {}) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    if (predicate()) return;
+    if (Date.now() > deadline) throw new Error(`timed out after ${timeout}ms waiting for ${label}`);
+    await tick();
+  }
+}
+
 describe('useGlobalpingMeasurement()', () => {
   beforeEach(() => {
     globalThis.fetch = originalFetch;
@@ -73,8 +92,7 @@ describe('useGlobalpingMeasurement()', () => {
         onError: () => { errorCalls++; },
       });
 
-      // wait for the poll to land (initial create + one setTimeout(pollInterval))
-      await tick(); await tick(); await new Promise((r) => setTimeout(r, 20));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
 
       assert.equal(value.status.value, 'finished');
       assert.equal(finishCalls, 1);
@@ -105,7 +123,7 @@ describe('useGlobalpingMeasurement()', () => {
       value.start({}, {
         onResults: (d) => d.results.length > 0,
       });
-      await new Promise((r) => setTimeout(r, 80));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
       assert.equal(value.status.value, 'finished');
       assert.equal(pollCount, 3);
     } finally {
@@ -131,7 +149,7 @@ describe('useGlobalpingMeasurement()', () => {
         onResults: () => false,
         onError: (r) => errorReasons.push(r),
       });
-      await new Promise((r) => setTimeout(r, 60));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
       assert.equal(value.status.value, 'error');
       assert.deepEqual(errorReasons, ['empty']);
       // 1 initial poll + 2 retries = 3 total
@@ -160,7 +178,7 @@ describe('useGlobalpingMeasurement()', () => {
     );
     try {
       value.start({}, { onError: (r) => errorReasons.push(r) });
-      await new Promise((r) => setTimeout(r, 20));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
       assert.equal(value.status.value, 'error');
       assert.deepEqual(errorReasons, ['create']);
       assert.equal(polled, false);
@@ -181,7 +199,7 @@ describe('useGlobalpingMeasurement()', () => {
     );
     try {
       value.start({}, { onError: (r) => errorReasons.push(r) });
-      await new Promise((r) => setTimeout(r, 20));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
       assert.equal(value.status.value, 'error');
       assert.deepEqual(errorReasons, ['create']);
     } finally {
@@ -205,7 +223,7 @@ describe('useGlobalpingMeasurement()', () => {
     );
     try {
       value.start({}, { onError: (r) => errorReasons.push(r) });
-      await new Promise((r) => setTimeout(r, 20));
+      await waitFor(() => value.status.value !== 'running', { label: "status to leave 'running'" });
       assert.equal(value.status.value, 'error');
       assert.deepEqual(errorReasons, ['poll']);
     } finally {
@@ -216,9 +234,13 @@ describe('useGlobalpingMeasurement()', () => {
 
   it('scope disposal before the first poll cancels pending timer and never transitions status', async () => {
     let polled = false;
+    // Set once the create response body has been read: the composable schedules
+    // the first poll immediately after that await, so this is the earliest
+    // point at which there is a pending timer for scope.stop() to cancel.
+    let createRead = false;
     stubFetch([
       [(url, init) => url === API_BASE && init?.method === 'POST',
-        () => jsonResponse({ id: 'abc' })],
+        () => ({ ok: true, status: 200, json: async () => { createRead = true; return { id: 'abc' }; } })],
       [(url) => url === `${API_BASE}/abc`,
         () => { polled = true; return jsonResponse({ status: 'finished', results: [{ ok: true }] }); }],
     ]);
@@ -233,9 +255,14 @@ describe('useGlobalpingMeasurement()', () => {
       onFinish: () => { finishCalls++; },
       onError: () => { errorCalls++; },
     });
-    // let the POST resolve but stop the scope before the poll fires
-    await new Promise((r) => setTimeout(r, 10));
+    // Stop the scope after the poll is scheduled but before it fires. A fixed
+    // 10ms sleep here could land before the POST resolved, leaving no timer to
+    // cancel — the test would then pass without exercising the cancellation.
+    await waitFor(() => createRead, { label: 'the create response to be read' });
+    await tick();
     scope.stop();
+    // Nothing should happen from here on, and only a real wait can show that:
+    // this is the one delay in the file that is asserting an absence.
     await new Promise((r) => setTimeout(r, 80));
 
     assert.equal(polled, false, 'poll should never fire after scope stop');
