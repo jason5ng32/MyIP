@@ -40,6 +40,10 @@ const coloList = {
         "country": "IN",
         "city": "Agra"
     },
+    "AIP": {
+        "country": "IN",
+        "city": "Jalandhar"
+    },
     "AKL": {
         "country": "NZ",
         "city": "Auckland"
