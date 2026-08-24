@@ -42,4 +42,5 @@ export const DNS_RESOLVERS = [
     { id: 'dnspod', name: 'DNSPod', country: 'CN', udp: '119.29.29.29' },
     { id: '114dns', name: '114DNS', country: 'CN', udp: '114.114.114.114' },
     { id: 'dns4eu', name: 'DNS4EU', country: 'EU', udp: '86.54.11.1' },
+    { id: 'cznic', name: 'CZ.NIC ODVR', country: 'CZ', udp: '193.17.47.1' },
 ];
