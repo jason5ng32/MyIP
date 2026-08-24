@@ -247,23 +247,47 @@ describe('useGlobalpingMeasurement()', () => {
 
     let finishCalls = 0;
     let errorCalls = 0;
-    const { scope, value } = withScope(() =>
-      useGlobalpingMeasurement({ pollInterval: 50 })
-    );
-    value.start({}, {
-      onResults: () => true,
-      onFinish: () => { finishCalls++; },
-      onError: () => { errorCalls++; },
-    });
-    // Stop the scope after the poll is scheduled but before it fires. A fixed
-    // 10ms sleep here could land before the POST resolved, leaving no timer to
-    // cancel — the test would then pass without exercising the cancellation.
-    await waitFor(() => createRead, { label: 'the create response to be read' });
-    await tick();
-    scope.stop();
-    // Nothing should happen from here on, and only a real wait can show that:
-    // this is the one delay in the file that is asserting an absence.
-    await new Promise((r) => setTimeout(r, 80));
+
+    // `polled === false` alone does not pin the cancellation: onScopeDispose
+    // also sets `disposed`, and poll() returns early on that, so deleting the
+    // clearTimeout leaves every other assertion here green. Record the poll
+    // timer by its distinctive 50ms delay — tick() and waitFor() use 0 — and
+    // require that exact timer to have been cleared.
+    const origSetTimeout = globalThis.setTimeout;
+    const origClearTimeout = globalThis.clearTimeout;
+    const pollTimers = [];
+    const clearedTimers = [];
+    globalThis.setTimeout = (fn, delay, ...rest) => {
+      const id = origSetTimeout(fn, delay, ...rest);
+      if (delay === 50) pollTimers.push(id);
+      return id;
+    };
+    globalThis.clearTimeout = (id) => { clearedTimers.push(id); return origClearTimeout(id); };
+
+    try {
+      const { scope, value } = withScope(() =>
+        useGlobalpingMeasurement({ pollInterval: 50 })
+      );
+      value.start({}, {
+        onResults: () => true,
+        onFinish: () => { finishCalls++; },
+        onError: () => { errorCalls++; },
+      });
+      // Stop the scope after the poll is scheduled but before it fires. A fixed
+      // 10ms sleep here could land before the POST resolved, leaving no timer to
+      // cancel — the test would then pass without exercising the cancellation.
+      await waitFor(() => createRead, { label: 'the create response to be read' });
+      await tick();
+      assert.equal(pollTimers.length, 1, 'the first poll should be scheduled before the scope stops');
+      scope.stop();
+      assert.ok(clearedTimers.includes(pollTimers[0]), 'scope.stop() should clear the pending poll timer');
+      // Nothing should happen from here on, and only a real wait can show that:
+      // this is the one delay in the file that is asserting an absence.
+      await new Promise((r) => origSetTimeout(r, 80));
+    } finally {
+      globalThis.setTimeout = origSetTimeout;
+      globalThis.clearTimeout = origClearTimeout;
+    }
 
     assert.equal(polled, false, 'poll should never fire after scope stop');
     assert.equal(finishCalls, 0);
