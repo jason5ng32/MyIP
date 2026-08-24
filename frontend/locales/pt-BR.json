@@ -961,7 +961,7 @@
   },
   "dnsresolver": {
     "Title": "Resolução DNS",
-    "Note": "Em algumas regiões, por motivos políticos ou comerciais, algumas operadoras podem contaminar determinados nomes de domínio, resultando em respostas incorretas quando acessados diretamente. Usar verificações de resolução DNS ajuda a inspecionar os resultados de nomes de domínio em provedores DNS conhecidos no mundo todo. Entre os testes DNS integrados, alguns provedores são da China, cujos resultados de resolução DNS podem estar contaminados. Analise com critério.",
+    "Note": "Resolva um mesmo domínio em provedores de DNS públicos conhecidos no mundo todo ao mesmo tempo — por DNS clássico e por DNS-over-HTTPS — e compare o que cada um responde. Quando as respostas variam entre provedores ou regiões, normalmente significa que um CDN está direcionando o tráfego para um nó próximo, que algum cache está desatualizado, ou que o registro está sendo filtrado ou redirecionado em algum ponto do caminho. Escolha um tipo de registro, informe um domínio ou URL e execute a consulta: cada linha indica o país do resolvedor, e a tabela pode ser filtrada por região.",
     "Note2": "Digite uma URL ou nome de domínio para iniciar a resolução:",
     "Placeholder": "URL ou nome de domínio",
     "invalidURL": "URL ou nome de domínio inválido",

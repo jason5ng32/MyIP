@@ -961,7 +961,7 @@
   },
   "dnsresolver": {
     "Title": "DNS Resolution",
-    "Note": "In some regions, due to political or commercial reasons, some operators may contaminate certain domain names, resulting in incorrect results when accessed directly. Using DNS resolution checks will help you inspect the resolution results of domain names from well-known DNS providers around the world. Among the built-in DNS tests, some providers are from China, whose DNS resolution results may be contaminated. Please be discerning.",
+    "Note": "Resolve one domain against well-known public DNS providers around the world at the same time — over both classic DNS and DNS-over-HTTPS — and compare what each one answers. When the answers differ between providers or regions, it usually means a CDN is steering traffic to a nearby node, a cache somewhere is stale, or the record is being filtered or redirected along the way. Pick a record type, enter a domain or URL, and run the query: each row shows which country the resolver sits in, and the table can be filtered by region.",
     "Note2": "Please enter a URL or domain name to start resolution:",
     "Placeholder": "URL or Domain Name",
     "invalidURL": "Invalid URL or Domain Name",
