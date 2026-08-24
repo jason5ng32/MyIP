@@ -24,8 +24,41 @@ const logDnsFailure = (error, server, provider) => {
     logger.debug(context, 'DNS resolver: lookup failed, returning N/A');
 };
 
+export const formatSoaRecord = (record) => [
+    record.nsname,
+    record.hostmaster,
+    record.serial,
+    record.refresh,
+    record.retry,
+    record.expire,
+    record.minttl,
+].join(' ');
+
+// Node reports `critical` plus a constant `type: 'CAA'` as metadata alongside
+// the record's one extensible property tag.
+const CAA_META_KEYS = new Set(['critical', 'type']);
+
+// RFC 8659 allows any alphanumeric tag, including one named `type` or
+// `critical`. Node writes the tag onto the record under its own name, so such a
+// tag overwrites the metadata field of the same name and no other key is left
+// to find. Recover it from whichever field stopped holding a metadata value:
+// `type` is always the constant 'CAA', and `critical` is always a number.
+const caaTagEntry = (record) => {
+    const tagged = Object.entries(record).find(([key]) => !CAA_META_KEYS.has(key));
+    if (tagged) return tagged;
+    if (record.type !== 'CAA') return ['type', record.type];
+    return ['critical', record.critical];
+};
+
+export const formatCaaRecords = (records) => records.map((record) => {
+    const [tag, value] = caaTagEntry(record);
+    // A tag named `critical` displaces the flag itself; it is unrecoverable.
+    const critical = typeof record.critical === 'number' ? record.critical : 0;
+    return `${critical} ${tag} ${JSON.stringify(value)}`;
+}).join(', ');
+
 // Resolve via classic UDP DNS. Returns the raw result value: an array of
-// strings, a joined MX string, or 'N/A' on empty/failure.
+// strings, a formatted record string, or 'N/A' on empty/failure.
 const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
@@ -35,6 +68,8 @@ const resolveDns = async (hostname, type, name, server) => {
     const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
     const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
     const resolveMXAsync = promisify(resolver.resolveMx.bind(resolver));
+    const resolveSoaAsync = promisify(resolver.resolveSoa.bind(resolver));
+    const resolveCaaAsync = promisify(resolver.resolveCaa.bind(resolver));
     try {
         let addresses;
 
@@ -61,6 +96,12 @@ const resolveDns = async (hostname, type, name, server) => {
                 addresses = await resolveMXAsync(hostname);
                 addresses = addresses.map(item => `${item.priority} ${item.exchange}.`)
                 .join(', ');
+                break;
+            case 'SOA':
+                addresses = formatSoaRecord(await resolveSoaAsync(hostname));
+                break;
+            case 'CAA':
+                addresses = formatCaaRecords(await resolveCaaAsync(hostname));
                 break;
             default:
                 throw new Error('Unsupported type');
