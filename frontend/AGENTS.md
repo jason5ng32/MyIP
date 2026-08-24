@@ -97,8 +97,10 @@ first-party tunnel `/api/monitoring` to beat ad blockers.
 **shadcn-vue first.** Check `components/ui/`, then the shadcn-vue docs for
 something to copy in; hand-rolled Tailwind only when neither fits. Keep when
 syncing upstream: `Spinner` + `ToolLoadingSkeleton` (project-specific),
-`toggle` / `toggle-group`'s deliberate `primary` pressed pair, and the
-overlay roots' shortcut suspension.
+`toggle` / `toggle-group`'s deliberate `primary` pressed pair, the overlay
+roots' shortcut suspension, and `select`'s trigger geometry — `py-1` plus a
+flex (not `-webkit-box` line-clamp) value span, because Safari shifts button
+content up ~2px once it overflows the trigger's content box.
 
 ### Design tokens
 
