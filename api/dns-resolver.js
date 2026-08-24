@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 import { DNS_RESOLVERS } from './data/dns-resolvers.js';
+import { NAME_VALUED_TYPES } from '../common/dns-record-types.js';
 
 // Bound each upstream lookup so the slowest server doesn't pin the
 // overall response. 3s for UDP DNS (`Resolver` rejects on first
@@ -24,9 +25,12 @@ const logDnsFailure = (error, server, provider) => {
     logger.debug(context, 'DNS resolver: lookup failed, returning N/A');
 };
 
+// Node's resolveSoa strips the trailing root dot from both names; the DoH JSON
+// path returns them in presentation form. Re-add them so the two rows a single
+// provider contributes read identically — the MX branch below does the same.
 export const formatSoaRecord = (record) => [
-    record.nsname,
-    record.hostmaster,
+    `${record.nsname}.`,
+    `${record.hostmaster}.`,
     record.serial,
     record.refresh,
     record.retry,
@@ -34,28 +38,36 @@ export const formatSoaRecord = (record) => [
     record.minttl,
 ].join(' ');
 
-// Node reports `critical` plus a constant `type: 'CAA'` as metadata alongside
-// the record's one extensible property tag.
+// Node returns each CAA record as { critical, type: 'CAA', <tag>: value }, so
+// the tag is whichever key is neither piece of metadata. Reading it that way
+// renders a provider-specific tag as itself instead of dropping it.
 const CAA_META_KEYS = new Set(['critical', 'type']);
 
-// RFC 8659 allows any alphanumeric tag, including one named `type` or
-// `critical`. Node writes the tag onto the record under its own name, so such a
-// tag overwrites the metadata field of the same name and no other key is left
-// to find. Recover it from whichever field stopped holding a metadata value:
-// `type` is always the constant 'CAA', and `critical` is always a number.
-const caaTagEntry = (record) => {
+export const formatCaaRecords = (records) => records.flatMap((record) => {
     const tagged = Object.entries(record).find(([key]) => !CAA_META_KEYS.has(key));
-    if (tagged) return tagged;
-    if (record.type !== 'CAA') return ['type', record.type];
-    return ['critical', record.critical];
-};
-
-export const formatCaaRecords = (records) => records.map((record) => {
-    const [tag, value] = caaTagEntry(record);
-    // A tag named `critical` displaces the flag itself; it is unrecoverable.
-    const critical = typeof record.critical === 'number' ? record.critical : 0;
-    return `${critical} ${tag} ${JSON.stringify(value)}`;
+    if (!tagged) return [];
+    const [tag, value] = tagged;
+    return `${record.critical ?? 0} ${tag} ${JSON.stringify(value)}`;
 }).join(', ');
+
+// Both transports run name-valued answers through this: Node's resolver
+// returns `dns.google`, a DoH endpoint returns `dns.google.`, and that lone
+// dot would read as two providers disagreeing.
+export const withRootDot = (name) => (name.endsWith('.') ? name : `${name}.`);
+
+// DNS numeric type for SOA, used to pick the zone's SOA out of a DoH authority
+// section (see dohRecords).
+const SOA_RECORD_TYPE = 6;
+
+// The records a DoH envelope actually answers with. A SOA query for a name
+// below the zone apex carries the zone's own SOA in the authority section
+// instead, so fall back to it — otherwise any hostname that isn't itself a zone
+// reports N/A on every DoH row.
+export const dohRecords = (data, type) => {
+    if (data.Answer?.length) return data.Answer;
+    if (type !== 'SOA') return [];
+    return (data.Authority ?? []).filter((record) => record.type === SOA_RECORD_TYPE);
+};
 
 // Resolve via classic UDP DNS. Returns the raw result value: an array of
 // strings, a formatted record string, or 'N/A' on empty/failure.
@@ -107,6 +119,8 @@ const resolveDns = async (hostname, type, name, server) => {
                 throw new Error('Unsupported type');
         }
 
+        if (NAME_VALUED_TYPES.has(type)) addresses = addresses.map(withRootDot);
+
         if (addresses.length === 0 || addresses === '' || addresses === null) {
             return 'N/A';
         }
@@ -130,12 +144,10 @@ const resolveDoh = async (hostname, type, name, url) => {
             logger.warn({ server: name, code: response.status }, 'DoH resolver: upstream returned a non-2xx response');
             return 'N/A';
         }
-        const data = await response.json();
-        const addresses = data.Answer ? data.Answer.map(answer => answer.data) : ['N/A'];
-        if (addresses.length === 0 || addresses === '' || addresses === null) {
-            return 'N/A';
-        }
-        return addresses;
+        const records = dohRecords(await response.json(), type);
+        if (records.length === 0) return 'N/A';
+        const addresses = records.map((record) => record.data);
+        return NAME_VALUED_TYPES.has(type) ? addresses.map(withRootDot) : addresses;
     } catch (error) {
         logger.warn({ err: error, server: name, code: error?.code }, 'DoH resolver: lookup failed, returning N/A');
         return 'N/A';
