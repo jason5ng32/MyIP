@@ -60,6 +60,11 @@ describe('toApiTag / toHtmlLang', () => {
         }
     });
 
+    it('maps zh-TW to the supported upstream tag and preserves its document language', () => {
+        assert.equal(toApiTag('zh-TW'), 'zh-CN');
+        assert.equal(toHtmlLang('zh-TW'), 'zh-TW');
+    });
+
     it('passes an unregistered code through untouched', () => {
         assert.equal(toApiTag('tr'), 'tr');
         assert.equal(toHtmlLang('tr'), 'tr');
