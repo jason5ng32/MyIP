@@ -43,6 +43,7 @@ export const DNS_RESOLVERS = [
     { id: 'quad9', name: 'Quad9', country: 'CH', udp: '9.9.9.9' },
     { id: 'controld', name: 'ControlD', country: 'CA', udp: '76.76.2.0' },
     { id: 'adguard', name: 'AdGuard', country: 'CY', udp: '94.140.14.14', doh: 'https://dns.adguard.com/resolve?' },
+    { id: 'yandex', name: 'Yandex.DNS', country: 'RU', udp: '77.88.8.8' },
     { id: 'alidns', name: 'AliDNS', country: 'CN', udp: '223.5.5.5', doh: 'https://dns.alidns.com/resolve?' },
     { id: 'dnspod', name: 'DNSPod', country: 'CN', udp: '119.29.29.29' },
     { id: '114dns', name: '114DNS', country: 'CN', udp: '114.114.114.114' },
