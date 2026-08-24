@@ -17,12 +17,14 @@ const DOH_TIMEOUT_MS = 5000;
 const DNS_AVAILABILITY_ERRORS = new Set(['ETIMEOUT', 'ECONNREFUSED', 'EREFUSED']);
 
 const logDnsFailure = (error, server, provider) => {
-    const context = { err: error, server, provider, code: error?.code };
+    // warn+ mirrors to telemetry and a DNS err.message carries the queried
+    // hostname, so the availability branch logs the code alone; the local-only
+    // debug branch keeps the full error.
     if (DNS_AVAILABILITY_ERRORS.has(error?.code)) {
-        logger.warn(context, 'DNS resolver: availability lookup failed, returning N/A');
+        logger.warn({ server, provider, code: error?.code }, 'DNS resolver: availability lookup failed, returning N/A');
         return;
     }
-    logger.debug(context, 'DNS resolver: lookup failed, returning N/A');
+    logger.debug({ err: error, server, provider, code: error?.code }, 'DNS resolver: lookup failed, returning N/A');
 };
 
 // Node's resolveSoa strips the trailing root dot from both names; the DoH JSON
