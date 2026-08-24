@@ -72,7 +72,7 @@
       "telemetry": {
         "title": "Telemetria de erros e desempenho",
         "paragraphs": [
-          "Esta implantação usa o Sentry, um serviço de monitoramento de erros, para que possamos saber quando o site apresenta falhas e corrigi-las. A telemetria é enviada ao Sentry por meio de um retransmissor hospedado em nosso próprio servidor e não é compartilhada com terceiros. Ela inclui:"
+          "Esta implantação usa o Sentry, um serviço de monitoramento de erros, para que possamos saber quando o site apresenta falhas e corrigi-las. A telemetria é enviada ao Sentry por meio de um retransmissor hospedado em nosso próprio servidor e não é compartilhada com mais ninguém. Ela inclui:"
         ],
         "bullets": [
           "Relatórios técnicos de erros: o que deu errado no código, em qual página e o tipo de navegador e sistema operacional que você utiliza.",
