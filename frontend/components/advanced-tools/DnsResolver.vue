@@ -7,10 +7,11 @@
         <div class="space-y-3">
             <Label for="queryURL">{{ t('dnsresolver.Note2') }}</Label>
 
-            <!-- Record type selector: 6 options → ToggleGroup horizontally -->
+            <!-- Record type selector: 8 options - four-column grid on narrow screens, single row on desktop -->
             <div class="flex flex-col md:flex-row items-start md:items-center gap-2">
                 <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
                 <ToggleGroup :model-value="queryType" type="single" variant="outline"
+                    class="grid grid-cols-4 w-full md:flex md:w-auto"
                     @update:model-value="(v) => v && changeType(v)">
                     <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
                         class="flex-1 gap-1.5 min-w-12 md:min-w-20 cursor-pointer" :aria-label="type" :title="type">
@@ -118,7 +119,7 @@ const errorMsg = ref('');
 const combinedResults = ref([]);
 const countryFilter = ref('all');
 
-const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'];
+const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'CAA'];
 
 const validateInput = (input) => {
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;

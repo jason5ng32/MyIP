@@ -14,8 +14,26 @@ import { DNS_RESOLVERS } from './data/dns-resolvers.js';
 const DNS_TIMEOUT_MS = 3000;
 const DOH_TIMEOUT_MS = 5000;
 
+export const formatSoaRecord = (record) => [
+    record.nsname,
+    record.hostmaster,
+    record.serial,
+    record.refresh,
+    record.retry,
+    record.expire,
+    record.minttl,
+].join(' ');
+
+// Node includes these metadata fields alongside one extensible property tag.
+const CAA_META_KEYS = new Set(['critical', 'type']);
+
+export const formatCaaRecords = (records) => records.map((record) => {
+    const [tag, value] = Object.entries(record).find(([key]) => !CAA_META_KEYS.has(key));
+    return `${record.critical} ${tag} ${JSON.stringify(value)}`;
+}).join(', ');
+
 // Resolve via classic UDP DNS. Returns the raw result value: an array of
-// strings, a joined MX string, or 'N/A' on empty/failure.
+// strings, a formatted record string, or 'N/A' on empty/failure.
 const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
@@ -25,6 +43,8 @@ const resolveDns = async (hostname, type, name, server) => {
     const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
     const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
     const resolveMXAsync = promisify(resolver.resolveMx.bind(resolver));
+    const resolveSoaAsync = promisify(resolver.resolveSoa.bind(resolver));
+    const resolveCaaAsync = promisify(resolver.resolveCaa.bind(resolver));
     try {
         let addresses;
 
@@ -51,6 +71,12 @@ const resolveDns = async (hostname, type, name, server) => {
                 addresses = await resolveMXAsync(hostname);
                 addresses = addresses.map(item => `${item.priority} ${item.exchange}.`)
                 .join(', ');
+                break;
+            case 'SOA':
+                addresses = formatSoaRecord(await resolveSoaAsync(hostname));
+                break;
+            case 'CAA':
+                addresses = formatCaaRecords(await resolveCaaAsync(hostname));
                 break;
             default:
                 throw new Error('Unsupported type');
