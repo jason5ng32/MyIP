@@ -18,6 +18,20 @@ describe('DNS resolver record formatting', () => {
         }), 'ns1.example.com hostmaster.example.com 2026082301 3600 600 1209600 300');
     });
 
+    it('recovers a tag whose name collides with Node\'s metadata fields', () => {
+        // Node writes the tag onto the record under its own name, so a record
+        // tagged `type` arrives with no key outside the metadata set. Without
+        // recovery the destructure throws and the whole answer becomes N/A.
+        assert.equal(formatCaaRecords([
+            { critical: 1, type: 'hello' },
+        ]), '1 type "hello"');
+
+        // A tag named `critical` displaces the flag; 0 is the documented default.
+        assert.equal(formatCaaRecords([
+            { critical: 'ca.example', type: 'CAA' },
+        ]), '0 critical "ca.example"');
+    });
+
     it('formats standard and provider-specific CAA tags from each record shape', () => {
         assert.equal(formatCaaRecords([
             { critical: 0, type: 'CAA', issue: 'letsencrypt.org' },
