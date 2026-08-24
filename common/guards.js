@@ -101,9 +101,6 @@ export const requireValidReportId = (paramName = 'id') => (req, res, next) => {
     next();
 };
 
-// Reject requests whose `id` isn't a known service-status provider slug.
-// Used by the per-provider components / incidents endpoints, which select a
-// row from the in-memory snapshot by id.
 // Whitelist ?type= against the record types the resolver actually handles.
 // Without it the DoH branch forwards any string verbatim to four third-party
 // endpoints, which makes this route a query proxy for types we never support.
@@ -119,6 +116,9 @@ export const requireValidRecordType = (paramName = 'type') => (req, res, next) =
     next();
 };
 
+// Reject requests whose `id` isn't a known service-status provider slug.
+// Used by the per-provider components / incidents endpoints, which select a
+// row from the in-memory snapshot by id.
 export const requireValidProviderId = (paramName = 'id') => (req, res, next) => {
     const id = req.query[paramName];
     if (!id) {

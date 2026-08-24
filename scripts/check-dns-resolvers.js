@@ -25,7 +25,7 @@ export const ensureDigAvailable = async (exec = execFileAsync) => {
         if (error?.code === 'ENOENT') {
             throw new Error('The `dig` executable is required for DNS resolver checks; install dnsutils (Debian/Ubuntu) or bind (macOS).');
         }
-        throw new Error(`Unable to run \'dig\': ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(`Unable to run 'dig': ${error instanceof Error ? error.message : String(error)}`);
     }
 };
 

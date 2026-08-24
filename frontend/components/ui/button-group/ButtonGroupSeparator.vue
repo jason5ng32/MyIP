@@ -1,7 +1,7 @@
 <script setup>
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "@/lib/utils";
-import { Separator } from '@/components/ui/separator';
+import { Separator } from "@/components/ui/separator";
 
 const props = defineProps({
   orientation: { type: String, required: false, default: "vertical" },
