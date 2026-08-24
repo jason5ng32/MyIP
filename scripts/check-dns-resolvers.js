@@ -18,6 +18,17 @@ const DIG_ARGUMENTS = ['+noall', '+comments', '+answer'];
 
 const sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs));
 
+export const ensureDigAvailable = async (exec = execFileAsync) => {
+    try {
+        await exec('dig', ['-v'], { timeout: 5000, maxBuffer: 64 * 1024 });
+    } catch (error) {
+        if (error?.code === 'ENOENT') {
+            throw new Error('The `dig` executable is required for DNS resolver checks; install dnsutils (Debian/Ubuntu) or bind (macOS).');
+        }
+        throw new Error(`Unable to run \'dig\': ${error instanceof Error ? error.message : String(error)}`);
+    }
+};
+
 const parseAttempts = (value) => {
     const attempts = Number.parseInt(value, 10);
     if (!Number.isInteger(attempts) || attempts < 1) {
@@ -237,6 +248,7 @@ export const formatMarkdown = (report) => {
 
 const main = async () => {
     const options = parseCliArgs(process.argv.slice(2));
+    await ensureDigAvailable();
     const report = await checkDnsResolvers(DNS_RESOLVERS, { attempts: options.attempts });
     const output = options.json ? { ...report, markdown: formatMarkdown(report) } : formatMarkdown(report);
     process.stdout.write(`${options.json ? JSON.stringify(output, null, 2) : output}\n`);

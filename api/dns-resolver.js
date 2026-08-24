@@ -13,6 +13,16 @@ import { DNS_RESOLVERS } from './data/dns-resolvers.js';
 // override.
 const DNS_TIMEOUT_MS = 3000;
 const DOH_TIMEOUT_MS = 5000;
+const DNS_AVAILABILITY_ERRORS = new Set(['ETIMEOUT', 'ECONNREFUSED', 'EREFUSED']);
+
+const logDnsFailure = (error, server, provider) => {
+    const context = { err: error, server, provider, code: error?.code };
+    if (DNS_AVAILABILITY_ERRORS.has(error?.code)) {
+        logger.warn(context, 'DNS resolver: availability lookup failed, returning N/A');
+        return;
+    }
+    logger.debug(context, 'DNS resolver: lookup failed, returning N/A');
+};
 
 // Resolve via classic UDP DNS. Returns the raw result value: an array of
 // strings, a joined MX string, or 'N/A' on empty/failure.
@@ -62,10 +72,7 @@ const resolveDns = async (hostname, type, name, server) => {
 
         return addresses;
     } catch (error) {
-        // Per-server timeouts are expected (some DNS hosts are unreachable
-        // from a given network); demote to debug so they don't spam the
-        // terminal during normal operation.
-        logger.debug({ err: error, server: name }, 'DNS resolver: lookup failed, returning N/A');
+        logDnsFailure(error, server, name);
         return 'N/A';
     }
 };
@@ -78,6 +85,10 @@ const resolveDoh = async (hostname, type, name, url) => {
             timeoutMs: DOH_TIMEOUT_MS,
             headers: { 'Accept': 'application/dns-json' }
         });
+        if (!response.ok) {
+            logger.warn({ server: name, code: response.status }, 'DoH resolver: upstream returned a non-2xx response');
+            return 'N/A';
+        }
         const data = await response.json();
         const addresses = data.Answer ? data.Answer.map(answer => answer.data) : ['N/A'];
         if (addresses.length === 0 || addresses === '' || addresses === null) {
@@ -85,7 +96,7 @@ const resolveDoh = async (hostname, type, name, url) => {
         }
         return addresses;
     } catch (error) {
-        logger.debug({ err: error, server: name }, 'DoH resolver: lookup failed, returning N/A');
+        logger.warn({ err: error, server: name, code: error?.code }, 'DoH resolver: lookup failed, returning N/A');
         return 'N/A';
     }
 };
@@ -143,8 +154,10 @@ const dnsResolver = async (req, res) => {
         const results = await Promise.all(lookups);
         res.json({ hostname, results });
     } catch (error) {
+        logger.error({ err: error }, 'DNS resolver handler failed');
         res.status(500).send({ error: error.message });
     }
 };
 
+export { resolveDns, resolveDoh };
 export default dnsResolver;

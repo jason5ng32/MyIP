@@ -6,6 +6,7 @@ import { describe, it } from 'node:test';
 import {
     checkDnsResolvers,
     checkResolver,
+    ensureDigAvailable,
     formatMarkdown,
     parseDigResponse,
 } from '../scripts/check-dns-resolvers.js';
@@ -21,6 +22,19 @@ const nxdomainResponse = (flags = 'qr rd ra') => [
 ].join('\n');
 
 const resolver = { id: 'test', name: 'Test Resolver', country: 'ZZ', udp: '192.0.2.1' };
+
+describe('ensureDigAvailable', () => {
+    it('reports one actionable diagnostic when dig is missing', async () => {
+        await assert.rejects(
+            () => ensureDigAvailable(async () => {
+                const error = new Error('spawn dig ENOENT');
+                error.code = 'ENOENT';
+                throw error;
+            }),
+            /The `dig` executable is required.*dnsutils.*bind/,
+        );
+    });
+});
 
 describe('parseDigResponse', () => {
     it('accepts a recursive NOERROR response with an answer', () => {
