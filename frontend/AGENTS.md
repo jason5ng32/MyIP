@@ -137,6 +137,20 @@ Copy the named exemplar instead of re-inventing:
   why-comment (ASNHistory ISO columns, report-export intro, ServiceStatus clock).
 - **Fit-to-width tokens** — IP / MAC strings render in `<FitText>` (`HERO_TIERS` /
   `INLINE_TIERS`; `:max-lines="2"` on heroes); never length-threshold helpers.
+- **Filter tags** — an open-ended facet row (regions, IP types) is a
+  `ToggleGroup :spacing="2" class="w-full flex-wrap justify-start"` of detached
+  pills, `h-7 rounded-full px-2.5 text-xs` (IPHistory, DnsResolver). Never the
+  default `spacing=0` connected form: its `border-l-0` / `first:border-l` seam
+  only reads as one bar on a single line, and breaks the moment it wraps.
+- **Fixed option sets** — a known, closed list of choices is a `Select`, not a
+  toggle row, once it outgrows a comfortable single line (DnsResolver's record
+  types, MtrTest's targets).
+- **Qualifier + input + run** — wrap the qualifying `Select` and the `Input` in
+  a `ButtonGroup` so they read as one bordered control (the trigger's own right
+  border becomes the divider), and nest a second `ButtonGroup` around the run
+  Button for the gap (DnsResolver). Pass the trigger `w-auto shrink-0` — our
+  `SelectTrigger` predates `data-slot`, so ButtonGroup's own width rule misses
+  it — and keep the row unwrapped at every width.
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
