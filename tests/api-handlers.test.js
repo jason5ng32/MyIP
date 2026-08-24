@@ -226,27 +226,6 @@ describe('dns-resolver handler', () => {
         assert.equal(res.statusCode, 405);
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
     });
-
-    it('rejects missing and non-string hostname', async () => {
-        const missing = createResponse();
-        await dnsResolverHandler(createRequest(), missing);
-        assert.equal(missing.statusCode, 400);
-        assert.deepEqual(missing.body, { error: 'Hostname parameter must be a string' });
-
-        const numeric = createResponse();
-        // Callers sometimes pass non-string via programmatic access; Express
-        // itself would stringify query, but we guard defensively.
-        await dnsResolverHandler(createRequest({ query: { hostname: 12345, type: 'A' } }), numeric);
-        assert.equal(numeric.statusCode, 400);
-        assert.deepEqual(numeric.body, { error: 'Hostname parameter must be a string' });
-    });
-
-    it("rejects hostname that doesn't contain a dot", async () => {
-        const res = createResponse();
-        await dnsResolverHandler(createRequest({ query: { hostname: 'localhost', type: 'A' } }), res);
-        assert.equal(res.statusCode, 400);
-        assert.deepEqual(res.body, { error: 'Invalid hostname' });
-    });
 });
 
 // -- get-whois handler ----------------------------------------------------

@@ -8,6 +8,7 @@ import { refererCheck } from './referer-check.js';
 import { isValidIP, isValidDomain, isUsablePublicIP } from './valid-ip.js';
 import { isValidBgpPrefix } from './bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
+import { DNS_RECORD_TYPE_SET } from './dns-record-types.js';
 
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
@@ -97,6 +98,21 @@ export const requireValidReportId = (paramName = 'id') => (req, res, next) => {
     if (!id || !/^[A-Za-z0-9_-]{22}$/.test(id)) {
         return res.status(400).json({ error: 'Invalid report id' });
     }
+    next();
+};
+
+// Whitelist ?type= against the record types the resolver actually handles.
+// Without it the DoH branch forwards any string verbatim to four third-party
+// endpoints, which makes this route a query proxy for types we never support.
+export const requireValidRecordType = (paramName = 'type') => (req, res, next) => {
+    const type = req.query[paramName];
+    if (!type) {
+        return res.status(400).json({ error: 'No record type provided' });
+    }
+    if (!DNS_RECORD_TYPE_SET.has(String(type).toUpperCase())) {
+        return res.status(400).json({ error: 'Invalid record type' });
+    }
+    req.query[paramName] = String(type).toUpperCase();
     next();
 };
 

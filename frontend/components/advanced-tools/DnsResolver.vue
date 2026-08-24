@@ -7,50 +7,61 @@
         <div class="space-y-3">
             <Label for="queryURL">{{ t('dnsresolver.Note2') }}</Label>
 
-            <!-- Record type selector: 6 options → ToggleGroup horizontally -->
-            <div class="flex flex-col md:flex-row items-start md:items-center gap-2">
-                <span class="text-xs text-muted-foreground">{{ t('dnsresolver.Record') }}:</span>
-                <ToggleGroup :model-value="queryType" type="single" variant="outline"
-                    @update:model-value="(v) => v && changeType(v)">
-                    <ToggleGroupItem v-for="type in recordTypes" :key="type" :value="type"
-                        class="flex-1 gap-1.5 min-w-12 md:min-w-20 cursor-pointer" :aria-label="type" :title="type">
-                        {{ type }}
-                    </ToggleGroupItem>
-                </ToggleGroup>
-            </div>
-
-            <!-- Input + Run -->
-            <div class="flex items-center gap-2">
-                <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true" class="font-mono"
-                    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                    :disabled="dnsCheckStatus === 'running'"
-                    :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
-                    :aria-invalid="errorMsg !== ''" />
-                <Button variant="action" :disabled="dnsCheckStatus === 'running' || !queryURL" @click="onSubmit"
-                    class="cursor-pointer">
-                    <Spinner v-if="dnsCheckStatus === 'running'" />
-                    <template v-else>
-                        <Play class="size-4 shrink-0" />
-                    </template>
-                </Button>
-            </div>
+            <!-- Record type + hostname as one connected control, run button
+                 beside it. Stays on a single row at every width — no record
+                 label runs past four characters. -->
+            <ButtonGroup class="w-full">
+                <ButtonGroup class="flex-1">
+                    <Select :model-value="queryType" :disabled="dnsCheckStatus === 'running'"
+                        @update:model-value="(v) => v && changeType(v)">
+                        <!-- Floor the trigger at CNAME's width — five mono chars
+                             plus padding, chevron and border — so switching
+                             record type never jolts the row. -->
+                        <SelectTrigger id="queryType"
+                            class="w-auto min-w-[calc(5ch+2.875rem)] shrink-0 gap-1 font-mono shadow-xs"
+                            :aria-label="t('dnsresolver.Record')">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="type in recordTypes" :key="type" :value="type" class="font-mono">
+                                {{ type }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Input type="text" id="queryURL" name="queryURL" data-1p-ignore data-lpignore="true"
+                        class="font-mono"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        :disabled="dnsCheckStatus === 'running'"
+                        :placeholder="t('dnsresolver.Placeholder')" v-model="queryURL" @keyup.enter="onSubmit"
+                        :aria-invalid="errorMsg !== ''" />
+                </ButtonGroup>
+                <ButtonGroup>
+                    <Button variant="action" :disabled="dnsCheckStatus === 'running' || !queryURL" @click="onSubmit"
+                        class="cursor-pointer">
+                        <Spinner v-if="dnsCheckStatus === 'running'" />
+                        <template v-else>
+                            <Play class="size-4 shrink-0" />
+                        </template>
+                    </Button>
+                </ButtonGroup>
+            </ButtonGroup>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
         </div>
 
         <!-- Results: region filter chips + provider table -->
         <div v-if="combinedResults && combinedResults.length" class="space-y-3">
-            <!-- Country selector (first-appearance order from the response),
-                 badge-shaped toggles: all regions + one per country. -->
-            <ToggleGroup :model-value="countryFilter" type="single" variant="outline" size="sm"
-                class="flex-wrap justify-start"
+            <!-- Region filter (first-appearance order from the response) as
+                 detached pills, so any number of countries wraps cleanly. -->
+            <ToggleGroup :model-value="countryFilter" type="single" variant="outline" :spacing="2"
+                class="w-full flex-wrap justify-start"
                 @update:model-value="(v) => v && (countryFilter = v)">
-                <ToggleGroupItem value="all" class="gap-1.5 cursor-pointer">
+                <ToggleGroupItem value="all" :class="tagClass">
                     {{ t('dnsresolver.AllRegions') }}
                 </ToggleGroupItem>
                 <ToggleGroupItem v-for="country in resultCountries" :key="country" :value="country"
-                    class="gap-1.5 cursor-pointer" :aria-label="countryName(country)">
+                    :class="tagClass" :aria-label="countryName(country)">
                     <Icon :icon="'circle-flags:' + country.toLowerCase()" class="size-3.5 shrink-0" />
-                    {{ countryName(country) }}
+                    <span class="truncate max-w-32">{{ countryName(country) }}</span>
                 </ToggleGroupItem>
             </ToggleGroup>
 
@@ -100,11 +111,14 @@ import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
 import { trackEvent } from '@/utils/analytics';
 import { isValidDomain } from '@/utils/valid-ip.js';
+import { DNS_RECORD_TYPES } from '@/utils/dns-record-types.js';
 import getCountryName from '@/data/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
@@ -118,9 +132,13 @@ const errorMsg = ref('');
 const combinedResults = ref([]);
 const countryFilter = ref('all');
 
-const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'];
+const recordTypes = DNS_RECORD_TYPES;
+
+// Region filter pills, matching IPHistory's tag row.
+const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 
 const validateInput = (input) => {
+    input = input.trim();
     if (!input.match(/^https?:\/\//)) input = 'http://' + input;
     try {
         const url = new URL(input);

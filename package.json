@@ -18,6 +18,7 @@
     "start-frontend": "node frontend-server.js",
     "start": "concurrently \"node frontend-server.js\" \"node --import ./sentry-instrument.js backend-server.js\"",
     "purge-index": "node scripts/purge-index-cache.js",
+    "dns-check": "node scripts/check-dns-resolvers.js",
     "fetch-favicons": "node scripts/fetch-favicons.js",
     "i18n-status": "node scripts/i18n-status.js",
     "i18n-new": "node scripts/i18n-scaffold.js new",

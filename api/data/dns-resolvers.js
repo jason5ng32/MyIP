@@ -22,6 +22,11 @@
 //   not just RFC 8484 wire format.
 // - `country` is where the operator is based (headquarters), not where the
 //   anycast nodes are.
+// - VERIFY THE RESOLVER ACTUALLY ANSWERS before opening a PR — a documented
+//   IP is not enough. Query it from a machine outside the operator's country
+//   and confirm you get an answer with the `ra` flag set. Services get shut
+//   down and open resolvers get restricted to their own subscribers without
+//   the published docs ever being updated.
 //
 // ⚠️ Keep this list curated, not exhaustive: EVERY resolver here adds one
 // parallel upstream query per protocol to EVERY /api/dnsresolver request.
@@ -38,8 +43,12 @@ export const DNS_RESOLVERS = [
     { id: 'quad9', name: 'Quad9', country: 'CH', udp: '9.9.9.9' },
     { id: 'controld', name: 'ControlD', country: 'CA', udp: '76.76.2.0' },
     { id: 'adguard', name: 'AdGuard', country: 'CY', udp: '94.140.14.14', doh: 'https://dns.adguard.com/resolve?' },
+    { id: 'yandex', name: 'Yandex.DNS', country: 'RU', udp: '77.88.8.8' },
     { id: 'alidns', name: 'AliDNS', country: 'CN', udp: '223.5.5.5', doh: 'https://dns.alidns.com/resolve?' },
     { id: 'dnspod', name: 'DNSPod', country: 'CN', udp: '119.29.29.29' },
     { id: '114dns', name: '114DNS', country: 'CN', udp: '114.114.114.114' },
+    { id: 'hinet', name: 'HiNet', country: 'TW', udp: '168.95.1.1' },
+    { id: 'giga', name: 'GIGA', country: 'TW', udp: '203.133.1.6' },
     { id: 'dns4eu', name: 'DNS4EU', country: 'EU', udp: '86.54.11.1' },
+    { id: 'cznic', name: 'CZ.NIC ODVR', country: 'CZ', udp: '193.17.47.1' },
 ];

@@ -7,7 +7,8 @@ import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId, requireValidReportId } from './common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
+    requireValidRecordType, requireValidReportId } from './common/guards.js';
 import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
@@ -275,7 +276,7 @@ app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
 app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler);
-app.get('/api/dnsresolver', dnsResolver);
+app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);
 app.get('/api/getuserinfo', getUserinfo);

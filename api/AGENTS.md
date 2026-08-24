@@ -78,12 +78,19 @@ these checks:
   address it can't answer for — `isUsablePublicIP` in `common/valid-ip.js` is
   the single definition, shared with the front-end IP forms.
 - `requireValidDomain()` — `?domain=`, lowercases in place so the edge cache
-  sees one canonical key.
+  sees one canonical key. `isValidDomain` allows a leading underscore on any
+  label but the TLD, so RFC 8552 service names (`_dmarc.…`, `_domainkey.…`)
+  are reachable — that is what a DMARC or DKIM lookup needs.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
 - `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric
   (`cf-radar` predates it and still validates inline).
 - `requireValidProviderId()` — whitelists `?id=` against service-status slugs.
+- `requireValidRecordType()` — whitelists `?type=` against `DNS_RECORD_TYPES`
+  in `common/dns-record-types.js` and uppercases it. That list is the single
+  source the picker in DnsResolver.vue and the `resolveDns` switch also read;
+  without the guard the DoH branch forwards any string verbatim to four
+  third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
 
 New param shape → new guard in `common/guards.js`, attached in
