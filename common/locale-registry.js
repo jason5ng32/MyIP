@@ -12,10 +12,10 @@
 export const LOCALES = [
     { code: 'en', nativeName: 'English', flag: 'us', apiTag: 'en', htmlLang: 'en', status: 'full' },
     { code: 'zh', nativeName: '简体中文', flag: 'cn', apiTag: 'zh-CN', htmlLang: 'zh-CN', status: 'full' },
+    { code: 'zh-TW', nativeName: '繁體中文', flag: 'tw', apiTag: 'zh-CN', htmlLang: 'zh-TW', status: 'full' },
     { code: 'fr', nativeName: 'Français', flag: 'fr', apiTag: 'fr', htmlLang: 'fr', status: 'full' },
     { code: 'ru', nativeName: 'Русский', flag: 'ru', apiTag: 'ru', htmlLang: 'ru', status: 'full' },
     { code: 'pt-BR', nativeName: 'Português (Brasil)', flag: 'br', apiTag: 'pt-BR', htmlLang: 'pt-BR', status: 'beta' },
-    { code: 'zh-TW', nativeName: '繁體中文（台灣）', flag: 'tw', apiTag: 'zh-CN', htmlLang: 'zh-TW', status: 'beta' },
 ];
 
 // Registry order — also the order the language picker renders.
