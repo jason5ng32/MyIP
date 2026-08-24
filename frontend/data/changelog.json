@@ -1687,6 +1687,15 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "DNS Resolver now groups results by country",
+          "zh": "DNS 解析器现在按国家分组显示结果",
+          "fr": "Le DNS Resolver affiche désormais les résultats par pays",
+          "ru": "DNS Resolver теперь группирует результаты по странам"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",
