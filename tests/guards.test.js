@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidReportId } from '../common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -201,6 +201,42 @@ describe('requireValidReportId', () => {
             guard(makeParamsReq({ id: bad }), res, () => { nextCalled = true; });
             assert.equal(res.statusCode, 400, `should reject "${bad}"`);
             assert.equal(nextCalled, false);
+        }
+    });
+});
+
+describe('requireValidRecordType', () => {
+    const guard = requireValidRecordType();
+
+    it('calls next() for a supported type', () => {
+        let nextCalled = false;
+        guard(makeReq({ query: { type: 'CAA' } }), makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+    });
+
+    it('uppercases the type in place so the handler switch matches', () => {
+        const req = makeReq({ query: { type: 'caa' } });
+        guard(req, makeRes(), () => {});
+        assert.equal(req.query.type, 'CAA');
+    });
+
+    it('rejects a missing type', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: {} }), res, () => { nextCalled = true; });
+        assert.equal(nextCalled, false);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'No record type provided' });
+    });
+
+    it('rejects a type the resolver does not handle, so DoH never forwards it', () => {
+        for (const type of ['ANY', 'DNSKEY', 'HTTPS', 'PTR', '../etc']) {
+            const res = makeRes();
+            let nextCalled = false;
+            guard(makeReq({ query: { type } }), res, () => { nextCalled = true; });
+            assert.equal(nextCalled, false, type);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Invalid record type' });
         }
     });
 });
