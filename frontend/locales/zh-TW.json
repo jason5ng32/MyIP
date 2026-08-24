@@ -1,0 +1,1476 @@
+{
+  "user": {
+    "SignIn": "登入",
+    "SignInWithGoogle": "使用 Google 登入",
+    "SignInWithGithub": "使用 GitHub 登入",
+    "SignOut": "登出",
+    "SignInToView": "登入後檢視",
+    "SignInToUse": "請登入後使用",
+    "InvalidUserToken": "無效的使用者 Token",
+    "QuotaExceeded": "本功能本月的免費額度已用完，下個月會自動重置。",
+    "QuotaSponsorCta": "贊助我們",
+    "ViewUsage": "檢視用量",
+    "Usage": {
+      "Title": "用量統計",
+      "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料僅按獨立 IP 計數——本月已查詢過的 IP 再次查詢不消耗額度。",
+      "IpinfoFeature": "IP 進階資料（按獨立 IP 計）",
+      "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。"
+    },
+    "MyAchievements": "我的成就",
+    "Fields": {
+      "User": "使用者",
+      "CreatedAt": "建立於",
+      "LastLogin": "最後登入",
+      "Level": "使用者等級",
+      "Fetching": "取得中...",
+      "SignInMethods": "登入方式"
+    },
+    "Level": {
+      "Standard": "標準使用者",
+      "Premium": "進階使用者",
+      "Owner": "管理員",
+      "Developer": "開發者",
+      "HonoraryMember": "榮譽使用者"
+    },
+    "Benefits": {
+      "Title": "權益與用量",
+      "Benefit": "權益",
+      "Note1": "作為一個開源產品，你使用 IPCheck.ing 的過程是免費的。我們維護這個開源產品付出大量的精力和成本。",
+      "Note2": "為了讓這個專案可以長期穩定地執行，避免濫用，部分進階功能需要登入才能使用。我們對每個登入使用者設定了足夠使用的每月額度，如果你覺得額度不夠，可以考慮贊助我們，贊助後可以獲得更高的額度。",
+      "Current": "目前",
+      "Tiers": {
+        "Visitor": {
+          "Name": "未登入使用者",
+          "Item1": "查詢 IP 資訊，多資料來源對比",
+          "Item2": "網路連通性與服務可用性檢測",
+          "Item3": "WebRTC / DNS 洩漏檢測",
+          "Item4": "網速、全球延遲與 MTR 測試",
+          "Item5": "Whois、DNS 解析等更多進階工具",
+          "Item6": "無需註冊，開源可自部署"
+        },
+        "SignedIn": {
+          "Name": "登入使用者",
+          "Item1": "包含未登入使用者的所有權益",
+          "Item2": "可以檢視 IP 的品質分、代理判斷、型別、原生性等進階資訊",
+          "Item3": "可以使用隱身測試",
+          "Item4": "可以使用深度 DNS 洩漏測試",
+          "Item5": "可以看到自己獲得的成就勳章",
+          "Item6": "可以使用 AI 助手 IPilot 提問",
+          "Item7": "進階功能享有每月免費額度，每月自動重置"
+        },
+        "Sponsor": {
+          "Name": "贊助使用者",
+          "Item1": "包含登入使用者的所有權益",
+          "Item2": "進階功能獲得更高的每月額度",
+          "Item3": "支援這個開源專案的持續開發與營運"
+        }
+      }
+    },
+    "Achievements": {
+      "Title": "成就",
+      "Note": "在使用 IPCheck.ing 的過程中，你可能會觸發一些成就，在這裡，你可以看到你所有的成就。",
+      "Get": "已獲得",
+      "GetCount": "已獲得的成就數量",
+      "NotGet": "未獲得",
+      "NotGetCount": "未獲得的成就數量",
+      "FooterNote": "有時候，可能會有一些限時成就。",
+      "Congrats": "🎉 恭喜",
+      "CongratsMessage": "你獲得了一個新成就！",
+      "NewAchievementIs": "新成就是：",
+      "Type": {
+        "IAmHuman": {
+          "Title": "有頭有臉",
+          "Meet": "登入後使用 IPCheck.ing"
+        },
+        "BarelyEnough": {
+          "Title": "湊湊合合",
+          "Meet": "下載速度超過 100Mb/s"
+        },
+        "RapidPace": {
+          "Title": "快馬加鞭",
+          "Meet": "下載速度超過 500Mb/s"
+        },
+        "TorrentFlow": {
+          "Title": "一瀉千里",
+          "Meet": "下載速度超過 1000Mb/s"
+        },
+        "SteadyGoing": {
+          "Title": "普普通通",
+          "Meet": "上傳速度超過 50Mb/s"
+        },
+        "TooFastTooSimple": {
+          "Title": "港記難追",
+          "Meet": "上傳速度超過 200Mb/s"
+        },
+        "SwiftAscent": {
+          "Title": "日行千里",
+          "Meet": "上傳速度超過 1000Mb/s"
+        },
+        "SurfaceCheck": {
+          "Title": "蜻蜓點水",
+          "Meet": "完成一項安全檢查清單"
+        },
+        "HalfwayThere": {
+          "Title": "半半拉拉",
+          "Meet": "完成 50% 安全檢查清單"
+        },
+        "FullySecured": {
+          "Title": "滴水不漏",
+          "Meet": "完成全部安全檢查清單"
+        },
+        "JustInCase": {
+          "Title": "以防萬一",
+          "Meet": "完成一次隱身測試"
+        },
+        "HiddenWell": {
+          "Title": "不露聲色",
+          "Meet": "隱身測試中代理和 VPN 機率都是 0"
+        },
+        "SlipUp": {
+          "Title": "露出馬腳",
+          "Meet": "隱身測試中代理或 VPN 機率大於 50%"
+        },
+        "CleverTrickery": {
+          "Title": "奇技淫巧",
+          "Meet": "查看了所有快捷鍵"
+        },
+        "EnergySaver": {
+          "Title": "省油的燈",
+          "Meet": "設定程式不自動執行"
+        },
+        "ResourceHog": {
+          "Title": "費油的車",
+          "Meet": "設定多次重新整理網路連通性"
+        },
+        "MakingBigNews": {
+          "Title": "搞大新聞",
+          "Meet": "進階功能呼叫超過 1000 次"
+        },
+        "GenerousDonor": {
+          "Title": "慷慨解囊",
+          "Meet": "給 IPCheck.ing 專案捐贈過"
+        },
+        "ItIsOpen": {
+          "Title": "是開放的",
+          "Meet": "在封鎖測試中，查詢到了一個被封鎖的網站"
+        },
+        "CuriousCat": {
+          "Title": "好奇的貓",
+          "Meet": "在 Whois 查詢中，查詢了 IPCheck.ing 的資訊"
+        },
+        "CrossingTheWall": {
+          "Title": "八仙過牆",
+          "Meet": "在規則測試中，8 個測試的 IP 全部不相同"
+        },
+        "GlobeTrotter": {
+          "Title": "包羅萬有",
+          "Meet": "IP 歷史記錄中的國家或地區達到 10 個"
+        },
+        "HelloWorld": {
+          "Title": "你好世界",
+          "Meet": "在地球線上中釋出一條狀態"
+        },
+        "AddSweetAdd": {
+          "Title": "我愛我加",
+          "Meet": "在網路連通性中新增一個自訂測試"
+        },
+        "PrettyDirty": {
+          "Title": "你挺髒的",
+          "Meet": "任意一張 IP 卡片的 IP 品質分為 1"
+        },
+        "SqueakyClean": {
+          "Title": "清清白白",
+          "Meet": "任意一張 IP 卡片的 IP 品質分為 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "與鵝同行",
+          "Meet": "任意一張 IP 卡片的歸屬地是南極洲"
+        }
+      }
+    }
+  },
+  "nav": {
+    "id": "nav",
+    "Title": "IPCheck.ing",
+    "Navigation": "導覽",
+    "IPInfo": "IP 資訊",
+    "Connectivity": "網路連線",
+    "ServiceStatus": "服務狀態",
+    "WebRTC": "WebRTC 洩漏測試",
+    "DNSLeakTest": "DNS 洩漏測試",
+    "SpeedTest": "網速測試",
+    "PingTest": "全球延遲",
+    "MTRTest": "MTR 測試",
+    "RuleTest": "分流測試",
+    "AdvancedTools": "進階工具",
+    "SearchDocs": "搜尋文件…",
+    "DocsToolConfirm": "要讓助手查看目前的測試結果嗎？",
+    "DocsToolSummary": "已讀取頁面上的測試結果",
+    "DocsToolRunConfirm": "要在你的頁面上執行測試嗎？",
+    "DocsToolRunSummary": "已執行你的網路測試",
+    "AskIPilot": "詢問 IPilot",
+    "OpenDocs": "開啟文件",
+    "DocsGreetingTitle": "有什麼可以幫你？",
+    "DocsGreetingSubtitle": "關於 MyIP 的工具、測試結果或自行部署，都可以問我。",
+    "DocsQuestions": [
+      "我的 VPN 洩漏真實 IP 了嗎？",
+      "為什麼我的 IP 位置不正確？",
+      "比較我的 WebRTC 測試與 DNS 洩漏測試結果，並給我一些建議",
+      "要如何閱讀 MTR 結果？",
+      "要如何部署自己的 MyIP？",
+      "我想贊助 MyIP 專案"
+    ],
+    "pulse": {
+      "title": "地球線上",
+      "tooltip": "來自世界各地的訪客",
+      "others": "其他地區",
+      "shareStatus": "分享你的狀態",
+      "liveMap": "即時訪客熱力圖",
+      "noVisitors": "暫無訪客",
+      "quiet": "此刻還很安靜，來當第一個發聲的人吧",
+      "loadError": "暫時無法載入最新動態，稍後再試",
+      "share": "訪客佔比",
+      "latest": "最新動態",
+      "sent": "已傳送",
+      "alreadySent": "狀態已經發送過了",
+      "rateLimited": "短期內只能發一次狀態",
+      "limitedTitle": "限時狀態",
+      "outages": {
+        "title": "全球斷網事件",
+        "outage": "網際網路中斷",
+        "anomaly": "流量異常",
+        "ongoing": "故障中",
+        "ended": "已恢復",
+        "started": "{time}發生",
+        "lasted": "持續 {duration}",
+        "quiet": "一切平靜——過去 30 天沒有斷網事件",
+        "loadMore": "載入更多",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "政府主導斷網",
+          "POWER_OUTAGE": "電力中斷",
+          "CABLE_CUT": "光纜中斷",
+          "TECHNICAL_PROBLEM": "技術故障",
+          "MECHANICAL": "機械故障",
+          "UNKNOWN": "原因未知",
+          "WEATHER": "惡劣天氣",
+          "FIRE": "火災",
+          "CYBERATTACK": "網路攻擊",
+          "NATURAL_DISASTER": "自然災害",
+          "MAINTENANCE": "計劃維護",
+          "MILITARY_ACTION": "軍事行動"
+        },
+        "level": {
+          "NATIONWIDE": "全國範圍",
+          "REGIONAL": "區域範圍",
+          "NETWORK": "單一網路"
+        }
+      },
+      "statuses": {
+        "fast": "網速快得飛起",
+        "ok": "一切正常",
+        "slow": "網速有點慢",
+        "flaky": "網路時斷時續",
+        "blocked": "有網站打不開",
+        "good": "今天心情不錯",
+        "bad": "今天有點喪",
+        "passing": "路過看看",
+        "lag": "遊戲延遲爆炸",
+        "newip": "剛換了新 IP",
+        "vpn": "正掛著 VPN",
+        "night": "熬夜中",
+        "vibing": "正在 Vibe Coding",
+        "fixing": "又在給家裡修網",
+        "tuning": "又減少了 10ms",
+        "prgday": "0x100 天快樂！",
+        "internetday": "網際網路生日快樂，從 LO 說起",
+        "halloween": "不給糖就 Ping 你",
+        "diwali": "排燈節快樂，光纖也在發光",
+        "christmas": "聖誕老人走的是專線",
+        "newyear": "新的一年，新的 IP",
+        "privacyday": "本狀態已端到端加密",
+        "lunar": "恭喜發財，紅包一個不丟",
+        "valentine": "想要一段穩定的連線",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "開齋節快樂",
+        "aprilfools": "我的 IP 是 127.0.0.1",
+        "earthday": "臨時下線，摸草去了",
+        "turing": "本狀態由人類傳送（大概）",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "IPCheck.ing 生日快樂"
+      },
+      "festivalDesc": {
+        "prgday": "程式設計師節 · 一年的第 256 天，十六進位制寫作 0x100",
+        "internetday": "1969 年 10 月 29 日，ARPANET 想發出 LOGIN，傳到 LO 就崩了",
+        "halloween": "萬聖節（10 月 31 日）· 最嚇人的還是丟包",
+        "diwali": "排燈節 · 願燈火與光纖同樣明亮",
+        "christmas": "聖誕節 · 雪橇專線，零抖動",
+        "newyear": "新年限定 · 煙花已包含，不額外佔用頻寬",
+        "privacyday": "資料隱私日（1 月 28 日）· 公開廣播這句話的反差感，是故意的",
+        "lunar": "農曆新年 · 紅包（packet）零丟包",
+        "valentine": "情人節 · TCP 和愛情都始於握手",
+        "jobs": "史蒂夫·喬布斯誕辰（1955 年 2 月 24 日）· 出自 2005 年斯坦福演講",
+        "eid": "開齋節 · 來自地球線上的祝福",
+        "aprilfools": "愚人節 · 金窩銀窩不如自己的 localhost",
+        "earthday": "世界地球日（4 月 22 日）· 地球線上也建議你偶爾地球離線",
+        "turing": "艾倫·圖靈誕辰（1912 年 6 月 23 日）· 圖靈測試之父",
+        "emojiday": "世界 Emoji 日（7 月 17 日）· 文字是上個世紀的事了",
+        "birthday": "IPCheck.ing 生日 · v1.0 釋出於 2020 年 11 月 6 日"
+      }
+    },
+    "preferences": {
+      "title": "偏好設定",
+      "preferenceTips": "這些設定會儲存在瀏覽器中，方便之後使用。部分選項需要重新整理頁面才會生效。",
+      "colorScheme": "色彩模式",
+      "systemAuto": "自動",
+      "colorLight": "日間",
+      "colorDark": "夜間",
+      "ipSourcesToCheck": "IP 檢測伺服器數量",
+      "ipSourcesToCheckTips": "選擇要用來檢測 IP 位址的伺服器數量。選擇越多伺服器，完成檢測所需的時間越長。",
+      "appSettings": "程式設定",
+      "autoRun": "自動執行",
+      "autoRunTips": "頁面載入時一定會檢查 IP 資訊。你可以選擇其他模組是否在啟動時自動執行。",
+      "simpleMode": "簡潔模式",
+      "simpleModeTips": "隱藏每個模組的說明文字，適合已熟悉本應用程式的使用者。",
+      "connectivityMultipleTests": "多次重新整理連線測試",
+      "connectivityMultipleTestsTips": "啟用後，應用程式會在啟動時執行多次檢查，並顯示最低延遲。",
+      "popupConnectivityNotifications": "彈出連線通知",
+      "popupConnectivityNotificationsTips": "啟用後，初次檢查的結果會以彈出通知顯示。",
+      "ipHistory": "IP 歷史記錄",
+      "ipHistoryEnabled": "記錄 IP 歷史",
+      "ipHistoryDays": "保留天數",
+      "ipHistoryTips": "啟用後，偵測到的 IP 只會記錄在此瀏覽器中，並保留所選天數。關閉後會停止記錄；現有記錄會保留，直到你在 IP 歷史面板中清除。",
+      "ipDB": "IP 地理位置資料庫",
+      "ipDBTips": "你可以選擇預設使用的 IP 地理位置資料來源。如果選定的來源無法使用，系統會依序使用後續來源。",
+      "language": "語言設定",
+      "languageTips": "重新整理瀏覽器後生效。Beta 語言可能包含不完整的翻譯。"
+    },
+    "DocsPrompt": "輸入你想詢問的問題…",
+    "DocsSignInTitle": "需要登入",
+    "DocsSignInMessage": "登入後即可詢問 IPilot"
+  },
+  "securitychecklist": {
+    "Title": "安全檢查清單",
+    "Note": "這是一份非常全面的網路安全檢查清單，涵蓋密碼安全、瀏覽安全、行動裝置安全等方面的內容。在目前環境下，資訊外洩可能會導致重大的損失，因此，確保我們在連線網際網路的時候，我們儘可能地保護自己的隱私、提高存取的安全性是很有必要的。",
+    "Note2": "這個清單羅列的內容非常多，你不一定要一次性檢查完，進度會在瀏覽器裡儲存，你可以隨時回來繼續檢查。",
+    "Progress": "檢查進度",
+    "Item": "專案",
+    "Items": "個專案",
+    "Priority": "級別",
+    "Ignore": "忽略",
+    "alert-total": "安全檢查一共有",
+    "alert-checked": "你已經完成了",
+    "alert-ignored": "被忽略",
+    "alert-unchecked": "個未進行檢查。",
+    "Checked": "已檢查",
+    "Ignored": "已忽略",
+    "Unchecked": "未檢查",
+    "Basic": "基礎",
+    "Optional": "可選",
+    "Essential": "必要",
+    "Advanced": "進階",
+    "Reset": "重置",
+    "ShowAll": "顯示所有",
+    "ShowUnchecked": "顯示未檢查",
+    "ShowIgnored": "顯示已忽略",
+    "ShowChecked": "顯示已檢查"
+  },
+  "curl": {
+    "Title": "命令列 API",
+    "Note1": "喲，原來你也喜歡用終端？",
+    "Note2_1": "你可以在終端裡，透過",
+    "Note2_2": "命令取得本機的 IP 位址",
+    "Note3": "是可選路徑，新增後可取得到 IP 的地理資訊",
+    "Note4": "請使用你申請的 IPCheck.ing API 金鑰",
+    "getIPv4": "取得本機 IPv4 位址",
+    "getIPv6": "取得本機 IPv6 位址",
+    "get6and4": "取得本機優先網路出口的 IP 位址",
+    "notAvailable": "此功能暫未開放，敬請期待"
+  },
+  "browserinfo": {
+    "Title": "瀏覽器資訊",
+    "Note": "本頁面展示兩類瀏覽器資訊：瀏覽器 User Agent 解析出來的基本資訊，以及透過多項資料計算出來的瀏覽器指紋。瀏覽器指紋就像手掌的掌紋，當瀏覽器的資訊暴露越多，你被網站識別的唯一性越高，也就是說，你越容易被網站追蹤到。有些時候，即使你切換到隱私模式，甚至更換瀏覽器，指紋可能也不會發生變化。",
+    "Note2": "瀏覽器指紋的計算的方法是多種多樣的，不同的技術方案演算法和結果不完全一致，我們在這裡採用一種相對簡單的方法進行計算。",
+    "browser": {
+      "Infos": "瀏覽器資訊",
+      "browserName": "瀏覽器名稱",
+      "engineName": "引擎",
+      "osName": "系統",
+      "deviceVendor": "製造商",
+      "cpuArchitecture": "CPU 架構",
+      "gpu": "GPU",
+      "cpuCores": "CPU 核心數",
+      "languages": "語言偏好",
+      "timezone": "時區",
+      "display": "顯示規格",
+      "connection": "網路連線",
+      "touchPoints": "觸控點數",
+      "doNotTrack": "請勿追蹤",
+      "doNotTrackOn": "已開啟",
+      "doNotTrackOff": "已關閉",
+      "doNotTrackUnset": "未設定",
+      "pdfViewer": "PDF 閱讀器",
+      "pdfViewerYes": "支援",
+      "pdfViewerNo": "不支援",
+      "cookieEnabled": "是否啟用 Cookie",
+      "cookieEnabledTrue": "是",
+      "cookieEnabledFalse": "否"
+    },
+    "fingerprint": {
+      "Infos": "指紋資訊",
+      "fingerprint": "指紋編碼",
+      "changeOption": "你可以嘗試變更用於計算瀏覽器指紋的資料，觀察指紋的變化（記得開啟隱私模式對照檢視）。",
+      "browserTips": "有些瀏覽器（比如 Safari）為了保護使用者不被追蹤，即使勾選相同的資料，每次計算都可能會得到不同的指紋值。"
+    },
+    "options": {
+      "audio": "音訊",
+      "canvas": "畫布",
+      "fonts": "字型",
+      "hardware": "硬體",
+      "locales": "語言",
+      "permissions": "權限",
+      "plugins": "外掛",
+      "screen": "螢幕",
+      "system": "瀏覽器版本",
+      "webgl": "WebGL",
+      "math": "運算",
+      "intl": "國際化格式",
+      "mediaDevices": "媒體裝置",
+      "speech": "語音合成",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "指紋元件明細",
+      "note": "下方每一項都參與了上方雜湊的計算。在上方 Fingerprint 區域裡關掉對應開關即可將其從指紋中排除。"
+    },
+    "calError": "瀏覽器資訊計算失敗，請重新整理重試。",
+    "calculating": "計算中..."
+  },
+  "censorshipcheck": {
+    "Title": "封鎖測試",
+    "Note": "基於 OONI（開放網路干預觀測站）全球志願者的開放資料，查詢一個網站過去 30 天在哪些國家/地區被遮蔽或干擾、以及採用的遮蔽手段。對可疑地區，還可以用 Globalping 全球探針進行即時連通性驗證。在一些地區，網際網路審查有較為明確的法律條文，有些則相對含糊。",
+    "Note2": "請輸入 URL 或網域名稱，開始查詢：",
+    "Placeholder": "URL 或網域名稱",
+    "Country": "地區",
+    "Status": "狀態",
+    "City": "城市",
+    "Network": "網路",
+    "invalidURL": "無效的 URL 或網域名稱",
+    "fetchError": "無法取得測試結果",
+    "HistoryTitle": "過去 30 天的全球觀測",
+    "SummaryFlagged": "過去 30 天，共在 {n} 個國家/地區觀測到遮蔽或干擾跡象。",
+    "SummaryClean": "過去 30 天，在 {n} 個國家/地區均未觀測到明顯遮蔽跡象。",
+    "SummarySparseFlagged": "過去 30 天，僅在 {total} 個國家/地區觀測過這個網站，其中 {n} 個出現遮蔽或干擾跡象。",
+    "SummarySparseClean": "過去 30 天，僅在 {total} 個國家/地區觀測過這個網站（共 {m} 次測量），資料量較少，不足以判斷是否被遮蔽。",
+    "NoData": "在過去 30 天沒有關於這個網站的觀測資料——這並不代表它沒有被遮蔽。你可以在下方勾選「審查嚴重國家」，進行一次即時測試。",
+    "OoniError": "歷史觀測資料暫時無法取得，可能是上游介面不穩定。你仍然可以在下方勾選國家，進行即時測試。",
+    "TierConfirmed": "確認遮蔽",
+    "TierLikely": "疑似遮蔽",
+    "TierSigns": "部分干擾",
+    "Measurements": "{n} 次測量",
+    "AnomalyShare": "{pct}% 異常",
+    "MethodDns": "DNS 干擾",
+    "MethodTcpIp": "TCP 阻斷",
+    "MethodHttpFailure": "連線失敗",
+    "MethodHttpDiff": "內容篡改",
+    "RealtimeTitle": "即時測試",
+    "ResultsHint": "選擇探針並點選「開始即時測試」後，結果將顯示在這裡。",
+    "SectionFlagged": "命中封鎖國家",
+    "PresetHighRisk": "審查嚴重國家",
+    "PresetOpen": "通常開放國家",
+    "RunVerify": "開始即時測試",
+    "RealtimeNote": "你可以選擇多個探針進行即時的連通性測試，以綜合判斷網站的封鎖情況。當執行測試時，每個國家將執行 2 個探針進行測試，當 2 個探針的結果相同時，可信性較高。",
+    "RealtimeFooterNote": "即時探針大多位於資料中心網路，結果可能與實際來自居民網路的歷史觀測不一致，因為有些網站可能會封鎖資料中心網路的存取。請將實際情況綜合判斷。"
+  },
+  "invisibilitytest": {
+    "Title": "隱身測試",
+    "Note": "當你掛上代理或 VPN 之後，你造訪的網站真的不知道你掛著代理嗎？你真的隱身了嗎？我們會透過多種手段，嘗試找出偽裝後的漏洞，以及你正在使用代理的證據。儘管部分測試結果可能不完全準確，本測試依然有較高的參考價值。",
+    "Note2": "點選執行後，系統將會執行一個指令碼，通常在 10s 內將會完成所有的測試，在這個過程中，你的 IP 資訊、瀏覽器資訊等將會被收集並在後臺進行分析。",
+    "fetchError": "無法取得測試結果",
+    "scriptLoadError": "測試指令碼載入失敗，無法繼續測試。請檢查網路後重試。",
+    "yourIP": "你的主測 IP 是",
+    "proxyScore": "代理機率",
+    "VPNScore": "VPN 機率",
+    "isProxy": "你可能使用了代理。",
+    "notProxy": "未發現你使用了代理。",
+    "isVPN": "你可能使用了 VPN。",
+    "notVPN": "未發現你使用了 VPN。",
+    "itemName": "測試專案",
+    "itemProxyResult": "測試結果",
+    "itemComment": "分析",
+    "agreement": "同意資訊收集",
+    "blocklist": {
+      "proxy": {
+        "title": "代理名單",
+        "positive": "你的 IP 在代理名單中。",
+        "negative": "你的 IP 不在代理名單中。"
+      },
+      "vpn": {
+        "title": "VPN 名單",
+        "positive": "你的 IP 在 VPN 名單中。",
+        "negative": "你的 IP 不在 VPN 名單中。"
+      },
+      "vpnExitNode": {
+        "title": "VPN 出口節點",
+        "positive": "你的 IP 在 VPN 出口節點名單中。",
+        "negative": "你的 IP 不在 VPN 出口節點名單中。"
+      }
+    },
+    "tor": {
+      "title": "TOR 出口節點",
+      "positive": "你的 IP 在 TOR 出口節點中。",
+      "negative": "你的 IP 不在 TOR 出口名單中。"
+    },
+    "headers": {
+      "title": "HTTP 頭資訊",
+      "positive": "你的 HTTP 頭資訊中包含了代理資訊，你可能正在使用代理。",
+      "negative": "你的 HTTP 頭資訊中沒有代理資訊。"
+    },
+    "datacenter": {
+      "title": "資料中心 IP",
+      "positive": "你的 IP 是資料中心 IP，普通使用者的 IP 通常不會是資料中心。",
+      "negative": "你的 IP 不是資料中心 IP。"
+    },
+    "tcp": {
+      "title": "TCP 指紋",
+      "positive": "你發起連線的系統與你的電腦系統不同，你可能正在使用代理。儘管系統判斷不一定準確，但可以肯定兩個系統並不相同。",
+      "computer": "你的電腦系統是：",
+      "server": "你發起連線的系統可能是：",
+      "negative": "你發起連線的系統與你的電腦系統相同。"
+    },
+    "timezone": {
+      "title": "時區差異",
+      "positive": "你的時區與你的 IP 地理位置不匹配，你可能正在使用代理。",
+      "computer": "你的時區是：",
+      "server": "你的 IP 地理位置時區是：",
+      "negative": "你的時區與你的 IP 地理位置匹配。"
+    },
+    "net": {
+      "title": "網路行為",
+      "positive": "從用戶端網路行為發現你可能使用了代理或 VPN",
+      "negative": "從用戶端網路行為未發現你使用代理或 VPN 的證據。"
+    },
+    "webrtc": {
+      "title": "WebRTC 檢測",
+      "positive": "WebRTC 發現你存在多個不同地區的 IP，你可能使用了代理或 VPN。",
+      "ipsAre": "IP 分別是：",
+      "negative": "WebRTC 檢測未發現存在多個不同地區的 IP。"
+    },
+    "flow": {
+      "title": "流量特徵",
+      "positive": "TCP/IP 流量特徵發現你可能使用了代理或 VPN。",
+      "negative": "TCP/IP 流量特徵未發現你使用代理或 VPN 的證據。"
+    },
+    "latencyVSWS": {
+      "title": "TCP vs WebSocket 延遲",
+      "positive": "TCP 延遲與 WebSocket 延遲差值較大，看起來你使用了代理或 VPN。",
+      "fromTCP": "TCP 延遲值：",
+      "fromWS": "WebSocket 延遲值：",
+      "negative": "TCP 延遲與 WebSocket 延遲差值不大，沒有明顯的使用了代理或 VPN 的證據。"
+    },
+    "latencyVSPing": {
+      "title": "TCP vs Ping 延遲",
+      "positive": "TCP 延遲與 Ping 差值較大，看起來你使用了 VPN。",
+      "fromTCP": "TCP 延遲值：",
+      "fromPing": "Ping 延遲值：",
+      "negative": "TCP 延遲與 Ping 差值不大，沒有明顯的使用了 VPN 的證據。"
+    },
+    "highlatency": {
+      "title": "高延遲分析",
+      "positive": "高延遲分析發現你可能使用了代理或 VPN。",
+      "negative": "高延遲分析未發現你使用代理或 VPN 的證據。"
+    }
+  },
+  "personacheck": {
+    "Title": "深度畫像檢測",
+    "Note": "有一個經典的判斷法：如果它長得像鴨子、遊起來像鴨子、叫起來也像鴨子，那它多半就是鴨子。網站也是這樣看你的——IP 可以聲稱你在 A 國，但時區、語言、已安裝字型、鍵盤佈局等十幾個訊號各自都在講述自己的故事，它們合在一起才是網站真正看到的那個「你」。本工具測量這個真實呈現的身份畫像，與你希望被看作的那個本地人做對照，並告訴你兩者的差距具體在哪裡。",
+    "NoteVs": "它和隱身測試（Invisibility Test）回答的是不同的問題：隱身測試判斷你的代理本身是否會被識別出來；本工具判斷的是——在網站眼裡你是一個什麼樣的人，以及這個畫像和你預期呈現的差了多少。",
+    "Note2": "先選擇你希望被看作哪個國家的本地人。",
+    "axis": {
+      "match": "與目標匹配",
+      "coherence": "自洽性",
+      "leak": "身分外洩"
+    },
+    "zone": {
+      "expected": "預期身份",
+      "optional": "更精準的定位（可選）",
+      "run": "開始檢測"
+    },
+    "selectCountry": "搜尋國家",
+    "noCountryMatch": "沒有匹配的國家",
+    "noProfile": "該地區沒有可用於比較的本地畫像。",
+    "languageSingle": "該國只有一種主要語言。",
+    "languageMulti": "該國有多種語言，請選擇你想呈現的那一種。",
+    "timezoneMulti": "該國橫跨多個時區，請選擇你想呈現的那一個。",
+    "hourCycle": {
+      "h11": "12 小時制（0–11 時）",
+      "h12": "12 小時制",
+      "h23": "24 小時制",
+      "h24": "24 小時制（1–24 時）"
+    },
+    "profile": {
+      "timezone": "時區"
+    },
+    "runCompare": "開始檢測",
+    "runError": "檢測未能完成。",
+    "source": {
+      "ipinfo": "IP 查詢",
+      "webrtc": "WebRTC",
+      "dnsleak": "DNS 洩漏"
+    },
+    "report": {
+      "grade": {
+        "A": "🎉 你看起來就是一個{country}本地人",
+        "B": "😊 你看起來有點像{country}本地人",
+        "C": "🤔 你看起來不太像{country}本地人",
+        "D": "😅 你看起來不像{country}本地人",
+        "unknown": "🤷 訊號不足，無法評級"
+      },
+      "gradeNote": {
+        "A": "所有能讀到的特徵都與你選擇的畫像一致。",
+        "B": "畫像基本成立，但有少數特徵指向別處。",
+        "C": "有幾項特徵與畫像不符，或彼此矛盾——下面的結果會告訴你是哪些。",
+        "D": "多數特徵指向的並不是這個畫像。",
+        "unknown": "請先執行底層檢測——目前可用的資訊太少。"
+      },
+      "counts": {
+        "leak": "{n} 項暴露",
+        "warning": "{n} 項不一致",
+        "match": "{n} 項通過",
+        "unknown": "{n} 項未測量",
+        "notApplicable": "{n} 項不適用"
+      },
+      "nothingActionable": "沒有需要修復的——所有可測量的特徵都符合該畫像。",
+      "howToFix": "怎麼修",
+      "verdict": {
+        "match": "符合角色設定。",
+        "mismatch": "與角色設定矛盾。",
+        "leak": "暴露了你的真實環境。",
+        "unnatural": "內部自相矛盾——本該一致的兩個訊號各說各話，比單純的不一致更引人注目。",
+        "unknown": "目前無法測量。",
+        "not-applicable": "此項無法給出結論。"
+      },
+      "visibility": {
+        "public": "任何網站都看得到",
+        "probed": "會主動探測的網站",
+        "risk-engine": "反欺詐系統"
+      },
+      "profileTitle": "特徵詳解",
+      "state": {
+        "match": "通過",
+        "mismatch": "不像本地",
+        "unnatural": "自相矛盾",
+        "leak": "已暴露",
+        "unknown": "未測量",
+        "not-applicable": "不適用"
+      }
+    },
+    "detail": {
+      "expected": "預期",
+      "actual": "實際",
+      "disputed": "資料來源有分歧",
+      "v4": "IPv4",
+      "v6": "IPv6",
+      "candidateCount": "候選位址數",
+      "matching": "與預期相符",
+      "ipType": "位址型別",
+      "expectedOffset": "預期偏移",
+      "actualOffset": "實際偏移",
+      "sameOffset": "偏移相同",
+      "primary": "首選語言",
+      "primaryExpected": "預期首選",
+      "demoted": "在清單中但非首位",
+      "timeZone": "時區",
+      "reportedOffset": "Date 報告的偏移",
+      "zoneOffset": "時區應有的偏移",
+      "samples": "取樣數",
+      "expectedScripts": "預期書寫系統",
+      "installedScripts": "已安裝書寫系統",
+      "expectedLanguages": "預期語言",
+      "voiceLanguages": "語音包語言",
+      "voiceCount": "語音包數量",
+      "expectedLayout": "預期佈局",
+      "actualLayout": "實際佈局",
+      "headerPrimary": "請求頭首選語言",
+      "scriptPrimary": "指令碼首選語言",
+      "headerLanguages": "請求頭語言清單",
+      "ipZone": "IP 時區",
+      "browserZone": "瀏覽器時區",
+      "ipOffset": "IP 偏移",
+      "browserOffset": "瀏覽器偏移",
+      "colo": "Cloudflare 接入點",
+      "gpsTimezone": "你所在位置的時區",
+      "accuracyMetres": "定位精度（米）",
+      "cardIssuer": "發卡行",
+      "cardNetwork": "卡組織",
+      "cardTier": "卡片等級",
+      "cardType": "卡型別"
+    },
+    "checks": {
+      "ip-country": {
+        "title": "IP 歸屬國家",
+        "fix": "你有部分出口落在目標國家之外——有多個代理出口時，不同卡片顯示不同國家是真實情況，而任何一個出口都會被某些網站看到。上方分數顯示有多少出口符合條件。將所有流量導向目標國家的節點；如果只是單一資料來源對某個 IP 有異議，可能只是該節點在資料庫中被誤標，這不是你這端能修正的。",
+        "what": "首頁各張 IP 檢測卡片把你的出口位址判定在哪個國家——每個資料來源都會讀取，且每個出口都必須落在目標國家。"
+      },
+      "webrtc-leak": {
+        "title": "WebRTC 暴露",
+        "fix": "遮蔽 WebRTC，或者改用只能看到代理位址的方案。代價是實打實的：視訊通話和語音會議會失效。用外掛過濾 WebRTC 比徹底停用溫和，但外掛本身也會留下自己的痕跡。",
+        "what": "WebRTC 是否暴露了與目標國家不符的位址。"
+      },
+      "dns-resolver-country": {
+        "title": "DNS 解析器國家",
+        "fix": "改用目標國家的解析器，或者讓代理接管 DNS 解析。注意：1.1.1.1 這類公共解析器不會暴露你的位置，但也不會支撐你的角色——它對每個國家都同樣中性。",
+        "what": "為你解析網域名稱的 DNS 伺服器位於哪個國家。"
+      },
+      "asn-type": {
+        "title": "位址型別",
+        "fix": "資料中心位址段是一個位址能攜帶的最響亮的「這是代理」訊號。換住宅出口能直接解決，但成本高得多，而且品質參差不齊。",
+        "what": "你的位址屬於住宅寬頻還是資料中心網段。"
+      },
+      "timezone-vs-persona": {
+        "title": "時區與角色",
+        "fix": "在作業系統層面改時區——這樣所有瀏覽器 API 才會自洽。用外掛覆蓋時區往往只改了一部分，會製造出「內部一致性」那幾項標記的矛盾，比不改更糟。",
+        "what": "你瀏覽器的時區是不是當地人應有的那個。"
+      },
+      "language-match": {
+        "title": "瀏覽器語言",
+        "fix": "改系統或瀏覽器的語言設定，而不是隻改寫一個 HTTP 頭。順序同樣重要：網站讀的是整個清單，而當地人很少把外語排在第一位。",
+        "what": "你瀏覽器排在首位的語言是不是當地人會用的。"
+      },
+      "script-fonts": {
+        "title": "書寫系統字型",
+        "fix": "針對該地區設定的裝置會自帶對應書寫系統的字型。手動安裝字型可行，但通常不值得：它只改了一個訊號，系統其餘部分仍是原來的語言，往往製造出比解決掉的更多矛盾。如果真要讓這一項站得住腳，該改的是系統語言本身。",
+        "what": "這臺機器有沒有安裝該國書寫系統的字型。"
+      },
+      "speech-voices": {
+        "title": "語音合成語音包",
+        "fix": "語音合成包跟隨系統安裝時的語言，基本沒有任何代理或換區外掛會去動它。為目標語言裝一個語音包是真正有效的修復，但和字型一樣有個前提：在其餘部分都沒變的系統裡只改一個訊號，反而顯得刻意。",
+        "what": "你的系統裡有哪些語音合成套件，以及它們涵蓋哪些語言。"
+      },
+      "keyboard-layout": {
+        "title": "鍵盤佈局",
+        "fix": "你的物理鍵盤佈局和目標國家的常見佈局不符。只有 Chromium 系瀏覽器會暴露這一項，所以它的覆蓋面比其他項窄——但凡是讀得到的地方，不換真實鍵盤就很難偽造。",
+        "what": "你的機器報告的物理鍵盤佈局是哪一種。"
+      },
+      "edge-geo-consensus": {
+        "title": "邊緣地理判定",
+        "fix": "Cloudflare 對你出口位址的判定和目標國家不符。當這一項和 IP 查詢互相矛盾時，多半是某個資料庫標錯了，而不是位址真的換了位置——但所有走 Cloudflare 的網站看到的是這個判定，不是那個。",
+        "what": "Cloudflare 對你出口位址的獨立判定，與上面那些資料庫彼此無關。"
+      },
+      "accept-language-header": {
+        "title": "語言請求頭與指令碼",
+        "fix": "你的瀏覽器在網路請求裡發出的 Accept-Language 頭，和 navigator.languages 向指令碼報告的不一致。除了「外掛只改了其中一個」，幾乎沒有別的原因會造成這種情況。改用瀏覽器或系統的語言設定——那樣兩者會一起變。",
+        "what": "網路請求裡發出的語言頭，和告訴指令碼的是否一致。這一項刻意與目標國家無關：通過只說明你的兩個語言通道沒有互相矛盾，語言本身合不合適由「瀏覽器語言」那一項判定——只改了一半的語言偽裝工具正是在這裡露餡。"
+      },
+      "ip-timezone-vs-browser": {
+        "title": "IP 時區與瀏覽器時區",
+        "fix": "你出口 IP 所在的時區，和瀏覽器報告的時區是兩個地方。這一項和你想扮演哪個國家無關：真實機器總在某一個地方，兩者本就該說同一個地方。通常意味著代理換了你的位址，卻沒換系統時區。",
+        "what": "你 IP 所在的時區和瀏覽器報告的時區是否一致。"
+      },
+      "gps-location": {
+        "title": "裝置定位（GPS）",
+        "fix": "你的裝置報告的物理位置和你想扮演的國家不是一個地方。代理完全碰不到這一項：任何向你索取定位的網站拿到的都是真實答案，而偽造定位的瀏覽器外掛通常會留下精度和時序上的破綻。現實的選擇只有兩個：對索取定位的網站一律拒絕授權，或者接受這一項撐不住。",
+        "what": "你的裝置報告自己實際位於哪個國家。"
+      },
+      "payment-region": {
+        "title": "信用卡發卡國",
+        "fix": "你的卡是在另一個國家發行的，和你所呈現的國家不符。商家幾乎在了解你的其他一切之前就先看到了發卡國，而付款風險控管系統會把它和帳單地址、IP 放在一起重點比對。這一項沒有瀏覽器端的解法——它是卡本身的屬性。",
+        "what": "你輸入的卡號段對應的發卡國是哪裡。"
+      },
+      "intl-number-format": {
+        "title": "數字格式",
+        "what": "你的瀏覽器如何分組數字、如何標記小數點。",
+        "fix": "你的瀏覽器按自己的區域習慣給數字分組，而不是按目標國家的習慣。這和語言是兩回事：一臺機器完全可能帶著正確的語言標籤，區域卻仍指向別處。請在系統設定裡改**區域**而不只是語言——Windows 在「區域」，macOS 在「語言與地區」。"
+      },
+      "intl-date-format": {
+        "title": "日期格式",
+        "what": "你的瀏覽器書寫日期時用的順序和分隔符。",
+        "fix": "你的瀏覽器書寫日期的順序或分隔符與當地人不同。和數字格式一樣，它跟隨的是系統區域而非語言，改區域才會跟著變。"
+      },
+      "intl-hour-cycle": {
+        "title": "時間制",
+        "what": "你的瀏覽器呈現 12 小時制還是 24 小時制——網站格式化時間時看到的就是這個慣例。",
+        "fix": "時間制跟隨瀏覽器語言，而不是系統的「24 小時制」開關——多數瀏覽器完全忽略那個開關（Safari 是主要例外）。想呈現目標國家的習慣，需要把瀏覽器的語言或區域切換成該國的。"
+      },
+      "timezone-authenticity": {
+        "title": "時區可信度",
+        "what": "瀏覽器報告的時區是不是這臺機器真實的時區。",
+        "fix": "瀏覽器報告的時區不是機器真正執行的那個：要麼 Intl 和 Date 說法不一致，要麼歷史日期不符合該時區的夏令時規則。這一點之所以重要，是因為它意味著上面那項時區檢測是在一個不真實的值上通過的——網站只要直接讀時鐘就能看穿。請在作業系統裡設定時區而不是靠外掛，這樣目前偏移和歷史規則會一起變。"
+      }
+    },
+    "reason": {
+      "no-marker-script": "無特徵書寫系統",
+      "bin-lookup-failed": "號段查詢服務暫時不可用——號碼本身可能沒有問題，請稍後重試。",
+      "bin-not-recognized": "卡片資料庫沒有識別出這個號段——最常見的原因是輸錯了，請核對後重新檢測。",
+      "font-probe-unavailable": "Canvas 不可用",
+      "no-voice-packs": "未安裝語音包",
+      "keyboard-api-unavailable": "本瀏覽器不暴露",
+      "no-layout-expectation": "該國無對應佈局預期",
+      "no-persona-languages": "角色未設定語言",
+      "geolocation-unsupported": "不支援地理定位",
+      "ip-no-country": "IP 查詢沒有回傳國家",
+      "ip-no-type": "沒有來源給出網路型別",
+      "ip-no-timezone": "沒有來源給出時區",
+      "webrtc-no-candidates": "WebRTC 沒有產生任何候選位址",
+      "dns-no-country": "沒有解析器能被定位"
+    },
+    "optional": {
+      "gpsNote": "GPS 位置是檢測的維度之一——願意的話可以共享，讓它一併參與對照。",
+      "gpsButton": "共享定位",
+      "gpsGranted": "已取得定位。",
+      "gpsFailed": {
+        "denied": "已拒絕授權——該項將顯示為未測量。",
+        "timeout": "定位請求超時。",
+        "unavailable": "你的裝置無法確定位置。",
+        "unsupported": "此瀏覽器不支援地理定位。"
+      },
+      "cardNote": "有時你也希望以該國身份完成支付——填入卡號前 6-8 位，檢測會判斷這張卡是否會被視為該國發行。",
+      "cardError": "需要 6-8 位數字——至少輸入 6 位才能查詢發卡行。",
+      "cardReady": "號段已填好——發卡國會在檢測時查詢。"
+    },
+    "dependencies": {
+      "note": "檢測需要以下所有基礎測試的結果——開始前請先補跑缺失的：",
+      "runButton": "一鍵補跑缺失的測試",
+      "runButtonRunning": "補跑中",
+      "measured": "已測量 {n} / {total}",
+      "allReady": "所有測試已執行"
+    },
+    "step": {
+      "country": "目標國家",
+      "language": "主要語言",
+      "location": "定位",
+      "card": "卡號段",
+      "awaitingCountry": "請先選擇國家",
+      "otherTests": "基礎測試"
+    },
+    "emptyHint": "先選擇你希望看起來像哪國本地人，然後開始檢測。",
+    "readyHint": "已就緒。開始檢測，看看你有多像本地人。",
+    "value": {
+      "yes": "是",
+      "no": "否"
+    }
+  },
+  "advancedtools": {
+    "OpenInNewTab": "在新標籤頁開啟",
+    "BackToHome": "回到首頁",
+    "Title": "進階工具",
+    "Note": "一些使用頻率相對較低，但在進行網路測試時，非常有用的工具。",
+    "PingTestNote": "全球的 Ping 值測試",
+    "MTRTestNote": "全球的 MTR 路由測試",
+    "DNSResolverNote": "即時多渠道 DNS 解析",
+    "EnhancedDnsLeakTest": "捕獲所有遞迴解析器，並分析 ECS 與 DNSSEC",
+    "RuleTestNote": "檢查代理軟體的規則設定",
+    "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
+    "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
+    "Whois": "對網域名稱或 IP 進行 Whois 查詢",
+    "InvisibilityTest": "猜猜看我是否知道你掛了代理",
+    "MacChecker": "查詢實體位址的歸屬資訊",
+    "BrowserInfo": "檢閱瀏覽器資訊和指紋",
+    "SecurityChecklist": "全面的數位生活安全檢查清單",
+    "PersonaCheck": "把網站看到的你，和你想扮成的本地人做對照"
+  },
+  "macchecker": {
+    "Title": "MAC 位址查詢",
+    "Note": "查詢一個實體位址（MAC 位址）所屬的製造商、是否單播/多播、是否廣域/區域等資訊。支援使用完整的 12 位進行查詢，也支援字首查詢。當然，你也可以用本查詢工具來驗證你產生的實體位址是否符合自己的需求。",
+    "Note2": "請輸入一個實體位址，開始查詢：",
+    "Placeholder": "F0:2F:4B:01:0A:AA",
+    "invalidMAC": "無效的實體位址",
+    "fetchError": "無法取得查詢結果",
+    "company": "製造商",
+    "macPrefix": "實體位址字首",
+    "address": "登記地址",
+    "country": "註冊國家/地區",
+    "blockStart": "起始區塊",
+    "blockEnd": "結束區塊",
+    "blockSize": "區塊大小",
+    "blockType": "區塊型別",
+    "blockRange": "區塊範圍",
+    "isRand": "隨機位址",
+    "isPrivate": "私有資料",
+    "isMulticast": "多播位址",
+    "isUnicast": "單播位址",
+    "isGlobal": "全球位址",
+    "isLocal": "本地位址",
+    "property": "位址屬性",
+    "value": "值",
+    "manufacturer": "製造商資訊"
+  },
+  "whois": {
+    "Title": "Whois 查詢",
+    "Note": "Whois 查詢是一種用於查詢網域名稱註冊資訊的服務。透過輸入網域名稱或 IP 位址，可以查詢到網域名稱的註冊資訊、註冊商、註冊日期、過期日期等資訊。IP 與網域名稱的 Whois 資訊欄位不完全一致。同時，部分比較小眾的網域名稱（TLD）可能無法查詢到相關資訊。",
+    "Note2": "請輸入網域名稱或 IP，開始進行查詢：",
+    "Note3": "Whois 資訊包含多種型別的欄位，以下為原始文字內容",
+    "Placeholder": "網域名稱或 IP",
+    "invalidURL": "無效的網域名稱或 IP",
+    "reservedIP": "內網或保留位址沒有公開的註冊資訊，無法查詢。",
+    "noData": "該查詢沒有公開的 Whois / RDAP 資料。部分頂級網域名稱不提供公開查詢服務。",
+    "fetchError": "無法取得查詢結果或查詢結果為空",
+    "Provider": "資訊服務商"
+  },
+  "enhanceddnsleaktest": {
+    "Title": "深度 DNS 洩漏測試",
+    "Note": "你已經在首頁的 DNS 洩漏測試中大致了解了目前是否存在 DNS 洩漏，以及 DNS 請求的出口地理歸屬。在這個深度測試裡，我們會從更多維度進行檢測：捕獲更多 DNS 解析器出口 IP、檢查這些解析器是否透過 ECS 把你真實 IP 段的字首轉發給權威伺服器，以及它們是否支援 DNSSEC，從而協助你對自己的 DNS 鏈路安全性形成更完整的認識。",
+    "Note2": "點選「開始測試」即可開始，通常幾秒內就能得到結果。我們會在後臺發起多次 DNS 探測，由我們的權威 DNS 伺服器捕獲你所使用的遞迴解析器出口 IP，一次測試通常可以捕獲 20–40 條記錄。若完全沒有捕獲到解析器，可能是瀏覽器的 DNS 快取吃掉了請求，稍等片刻再試一次即可。",
+    "Note3": "由於這是深度測試，頁面裡會出現一些較為專業的概念（例如 ECS、DNSSEC 等）。不用擔心，執行測試後你可以參考下方的「欄位說明」來了解每個欄位的具體含義。",
+    "Run": "開始測試",
+    "RunAgain": "再測一次",
+    "RunningProbes": "正在發起 DNS 探測...",
+    "PollingResult": "正在收集結果...",
+    "FetchError": "取得 DNS 洩漏測試結果失敗，請稍後重試。",
+    "Empty": "本次會話沒有捕獲到任何 DNS 解析器，可能是瀏覽器的 DNS 快取吃掉了請求，請稍後重試。",
+    "TableTitle": "捕獲到的 DNS 查詢記錄",
+    "DedupeToggle": "隱藏重複項",
+    "Flow": {
+      "Probing": "正在發起第 {current} / {total} 次探測...",
+      "Waiting": "等待遞迴 DNS 存取我們的權威伺服器（通常 1–3 秒）。",
+      "Fetching": "正在取得捕獲到的 DNS 查詢記錄...",
+      "Done": "測試已完成。"
+    },
+    "DnssecChip": {
+      "Signed": "已請求 DNSSEC 簽名",
+      "Unsigned": "未請求 DNSSEC 簽名",
+      "Validated": "DNSSEC 校驗正常",
+      "CdSet": "DNSSEC 校驗被停用"
+    },
+    "Summary": {
+      "ResolverCount": "去重後的解析器數量",
+      "RawCount": "原始捕獲記錄數",
+      "DnssecPosture": "DNSSEC 狀態",
+      "DnssecGood": "支援 DNSSEC —— 所有解析器都請求了簽名，並且沒有跳過校驗。",
+      "DnssecNoDo": "較弱 —— 至少有一個解析器沒有請求 DNSSEC 簽名。",
+      "DnssecCdSet": "可疑 —— 至少有一個解析器要求跳過 DNSSEC 校驗。",
+      "DnssecNone": "暫無資料。"
+    },
+    "Fields": {
+      "ResolverIP": "解析器 IP",
+      "Location": "歸屬地",
+      "ASN": "組織 / ASN",
+      "QueryType": "請求記錄型別",
+      "Transport": "請求傳輸協議",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "欄位說明",
+      "ResolverIP": "實際與我們權威 DNS 伺服器通訊的遞迴解析器出口 IP。如果你使用 VPN，把它的 ASN 與你目前 VPN 出口的 ASN 做對比，就能看出 DNS 請求是否繞過了 VPN 通道（即發生洩漏）。",
+      "QueryType": "解析器向權威伺服器請求的記錄型別（A、AAAA、HTTPS 等）。瀏覽器通常會同時發起 A 與 AAAA 查詢。",
+      "Transport": "DNS 預設走 UDP；出現 TCP 通常意味著響應過大，而響應過大往往是因為帶上了 DNSSEC 相關記錄。",
+      "ECS": "EDNS Client Subnet —— 部分遞迴 DNS 會在向上遊轉發查詢時附帶你真實 IP 的一段字首（通常是 IPv4 的 /24 或 IPv6 的 /48）。這意味著你的 IP 段會被 DNS 鏈路上的權威伺服器獲知，可能用於 CDN 的就近排程，也可能在一定程度上削弱匿名性。",
+      "DO": "DNSSEC OK —— 標記為對勾時，表示遞迴解析器在查詢時主動請求了 DNSSEC 簽名，代表鏈路具備密碼學校驗能力；標記為叉時，表示本次查詢未請求籤名，響應在鏈路上被偽造或篡改時可能無法被察覺。",
+      "CD": "Checking Disabled —— 標記為勾選時，表示呼叫方沒有要求跳過 DNSSEC 驗證，遞迴解析器會進行正常的簽章驗證；標記為叉號時，表示呼叫方明確要求跳過驗證，即使簽章不符也會接受結果。正常情況下應該為勾選；如果出現叉號，大多是由特定除錯工具或用戶端的安全降級造成的，在極少數情況下也可能是連線上存在中間人竄改的徵兆。"
+    }
+  },
+  "dnsresolver": {
+    "Title": "DNS 解析",
+    "Note": "同時向全球知名的公共 DNS 服務商解析同一個網域名稱，覆蓋傳統 DNS 與 DNS over HTTPS 兩種方式，並對比各家回傳的結果。不同服務商或不同地區的結果出現差異，通常意味著 CDN 在做就近排程、某處的快取尚未更新，或者這條記錄在鏈路上被過濾或重新導向了。使用時先選擇記錄型別，再填入網域名稱或網址並執行：每一行都會標註該解析伺服器所在的國家，表格也可以按地區篩選。",
+    "Note2": "請輸入 URL 或網域名稱，開始進行解析：",
+    "Placeholder": "URL 或網域名稱",
+    "invalidURL": "無效的 URL 或網域名稱",
+    "fetchError": "無法取得解析結果",
+    "Provider": "DNS 服務商",
+    "Result": "解析結果",
+    "Record": "記錄",
+    "AllRegions": "全部地區"
+  },
+  "ruletest": {
+    "Title": "分流測試",
+    "Name": "檢測",
+    "Note": "分流測試用於判斷代理軟體基於網域名稱的規則設定是否正確。在進行測試之前，你需要先參考下方的卡片，在你的代理軟體裡對 IPCheck.ing 的 8 個不同的 URL 設定不同的網域名稱分流規則。通常，設定規則可能會使用類似於：DOMAIN, ptest-3.ipcheck.ing, POLICY 這樣的寫法，具體寫法不同的代理軟體可能會有所不同。",
+    "StatusWait": "待檢測",
+    "StatusError": "檢測出錯",
+    "Country": "代理地區",
+    "RefreshAll": "重新整理所有"
+  },
+  "Tooltips": {
+    "RefreshIPCard": "重新整理 IP 資訊",
+    "SaveAsImage": "儲存為圖片",
+    "RefreshConnectivityTests": "重新整理連通性測試",
+    "RefreshWebRTC": "重新整理 WebRTC 洩漏測試",
+    "RefreshDNSLeakTest": "重新整理 DNS 洩漏測試",
+    "SpeedTestButton": "開始/暫停網速測試",
+    "ShowASNInfo": "顯示 AS 詳細資訊",
+    "ShowASNHistory": "顯示 ASN 歷史",
+    "ShowASNConnectivity": "顯示 ASN 連線圖",
+    "CopyIP": "複製 IP 位址",
+    "CopySdpLog": "複製 SDP 日誌",
+    "ViewOnMap": "在地圖上檢視位置",
+    "InfoMask": "隱藏資訊",
+    "IPHistory": "檢視 IP 歷史記錄",
+    "ShareReport": "產生診斷報告",
+    "QueryIP": "查詢 IP 資訊",
+    "GithubLink": "檢視原始碼"
+  },
+  "report": {
+    "Title": "診斷報告",
+    "Note": "把已完成的測試結果打包成一份報告，分享給朋友或 AI 協助診斷網路問題。在你複製、下載或產生連結之前，資料不會離開本機。",
+    "SectionsLabel": "選擇要包含的測試",
+    "NotTested": "未測試",
+    "MaskTail": "遮蓋 IP 尾段",
+    "TtlLabel": "自動刪除",
+    "Ttl1": "1 天",
+    "Ttl3": "3 天",
+    "Ttl7": "7 天",
+    "Preview": "預覽分享內容",
+    "CreateLink": "產生分享連結",
+    "CopyAI": "複製給 AI 診斷",
+    "DownloadJson": "下載 JSON",
+    "CopyLink": "複製連結",
+    "NoSelection": "請先選擇至少一項測試。",
+    "CreateFailed": "產生分享連結失敗，請稍後再試。",
+    "LinkOnce": "連結僅顯示這一次，請立即複製。任何拿到連結的人都能在過期前檢視這份報告。",
+    "ExpiresAt": "報告將於 {time} 自動刪除。",
+    "CopiedTitle": "已複製",
+    "CopiedMessage": "報告已複製，可直接貼上給任意 AI 助手。",
+    "ai": {
+      "Heading": "MyIP 網路診斷報告",
+      "Intro": "本報告由 MyIP（{origin}）於 {time} 產生，資料來自在使用者瀏覽器中執行的網路測試。欄位名為穩定的 schema 識別符號；所有延遲數值單位為毫秒。",
+      "Masked": "注意：出於隱私考慮，報告中的 IP 位址已遮蓋尾段（IPv4 末段、IPv6 介面位，以 \"x\" 表示）。",
+      "Instruction": "請基於以上資料分析該網路的健康狀況，指出異常項（DNS 洩漏、WebRTC 暴露、代理/VPN 特徵、封包遺失、高延遲、路由問題等），並給出具體的疑難排解建議。",
+      "Sections": {
+        "ipinfo": "多個獨立來源看到的公網 IP（存在代理或分流時不同來源可能不一致）。",
+        "connectivity": "瀏覽器對知名網站的可達性探測；timeMs 為展示的往返耗時，minTimeMs 為多輪中的最佳值。",
+        "webrtc": "透過 WebRTC STUN 暴露的 IP——若與主要公網 IP 不同，真實位址可能繞過代理/VPN 而洩漏。",
+        "dnsleak": "實際回應瀏覽器查詢的 DNS 解析器出口 IP——解析器不屬於使用者的 ISP/VPN 供應商即為 DNS 洩漏跡象。",
+        "speedtest": "對 Cloudflare 測得的頻寬、延遲與負載延遲（bufferbloat）；分數衡量流媒體/遊戲/即時通話體驗，越高越好。",
+        "pingtest": "全球 Globalping 探針對使用者 IP 的 ICMP ping 統計。",
+        "mtrtest": "全球探針到使用者 IP 的逐跳 MTR 路由追蹤；中間跳的丟包可能只是 ICMP 限速，從某一跳起持續丟包才代表真實問題。",
+        "ruletest": "存取 8 個測試端點時觀測到的出口 IP——出現多個不同 IP 表示流量被分流到不同線路（如代理規則）。",
+        "browserinfo": "被測裝置的瀏覽器、作業系統與顯示環境。",
+        "invisibility": "代理/VPN 檢測得分（0-100，越高越可能被識別）及各項命中的檢測訊號。",
+        "enhanceddnsleak": "解析器級 DNS 捕獲：向測試網域名稱發起查詢的每個解析器 IP，含傳輸協議、ECS 暴露與 DNSSEC 標誌（do/cd）。",
+        "persona": "瀏覽器與所選國家本地居民的相符程度：一個總體評級，加上每項檢查的結論。只有結論——各項檢查依據的具體數值刻意不寫入可分享的報告。"
+      }
+    }
+  },
+  "reportPage": {
+    "Loading": "報告載入中…",
+    "NotFound": "報告不存在或已過期",
+    "NotFoundNote": "分享報告到期後會自動刪除。",
+    "LoadFailed": "報告載入失敗，請稍後重試。",
+    "Unsupported": "此報告由更新版本產生，無法顯示。",
+    "GeneratedBy": "由 {origin} 於 {time} 產生的診斷報告",
+    "Stale": "此報告已超過 3 天，網路狀況可能已發生變化。",
+    "TestMine": "測一測我自己的網路",
+    "Col": {
+      "Source": "來源",
+      "Name": "名稱",
+      "IP": "IP",
+      "Location": "位置",
+      "ISP": "網路服務供應商",
+      "Status": "狀態",
+      "Server": "伺服器",
+      "Provider": "提供商",
+      "Target": "目標",
+      "UniqueIPs": "不同出口 IP 數",
+      "Resolvers": "解析器數量"
+    },
+    "Dnssec": {
+      "ok": "DNSSEC 已啟用",
+      "partial": "DNSSEC 部分啟用",
+      "none": "DNSSEC 未啟用"
+    }
+  },
+  "ipHistory": {
+    "Title": "IP 歷史記錄",
+    "Notes": "這裡記錄你使用本站時被偵測到的 IP。資料僅儲存在目前瀏覽器本地，不會同步到帳號，也不會離開你的裝置。你可以在「偏好設定」中調整記錄保留時間。",
+    "Empty": "暫無記錄。首頁檢測到 IP 後會自動記錄在這裡。",
+    "FilterByType": "按 IP 型別篩選",
+    "FilterByCountry": "按國家或地區篩選",
+    "UnknownCountry": "未知",
+    "NoMatch": "沒有符合篩選條件的記錄。",
+    "ClearAll": "清空記錄",
+    "ClearConfirm": "再次點選確認清空"
+  },
+  "ipInfos": {
+    "Title": "IP 資訊",
+    "Notes": "程式會先從多個不同的來源（包含 IPv4 和 IPv6）檢查你的 IP 位址，然後透過你選擇的 IP 地理位置資訊源查詢對應的地理資料。如果目前 IP 堆疊只有 1 個，則沒有資料的來源會顯示為空。",
+    "Source": "IP 來源",
+    "Country": "地區",
+    "Region": "省份",
+    "City": "城市",
+    "TimeZone": "時區",
+    "ISP": "網路",
+    "ASN": "ASN",
+    "Coordinates": "經緯度",
+    "IPv4Error": "取得失敗或不存在 IPv4 位址",
+    "IPv6Error": "取得失敗或不存在 IPv6 位址",
+    "type": "型別",
+    "isProxy": "代理",
+    "qualityScore": "IP 品質分",
+    "qualityScoreUnknown": "未知分數",
+    "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
+    "advancedQuotaCta": "本月新 IP 查詢額度已用完",
+    "ASNInfo": {
+      "trafficPercentage": "流量比例：",
+      "note": "此 AS 的相關資料：",
+      "asnName": "AS 名稱：",
+      "asnOrgName": "AS 組織名稱：",
+      "asnCountryCode": "AS 地區：",
+      "estimatedUsers": "估計使用者數：",
+      "IPv4_Pct": "IPv4",
+      "IPv6_Pct": "IPv6",
+      "HTTP_Pct": "HTTP",
+      "HTTPS_Pct": "HTTPS",
+      "Desktop_Pct": "桌面裝置",
+      "Mobile_Pct": "行動裝置",
+      "Bot_Pct": "機器人",
+      "Human_Pct": "人類",
+      "moreData": "更多資料："
+    },
+    "ASNHistory": {
+      "announcedPrefixes": "公告字首：",
+      "note": "該 IP 的歷史 ASN 公告：",
+      "empty": "未找到該 IP 的歷史路由資料。",
+      "error": "載入 ASN 歷史失敗。",
+      "seenBy": "RIPE RIS 可見度：{pct}% — 峰值 {peers} 個全表 peer"
+    },
+    "ASNConnectivity": {
+      "note": "該 AS 到全球 Tier 1 骨幹網的上游路徑：",
+      "empty": "未找到該 AS 的上游連線資料。",
+      "error": "載入 ASN 連線圖失敗。",
+      "expand": "放大",
+      "dialogTitle": "AS{asn} 的網路連線圖",
+      "legendOrigin": "起源",
+      "legendTier1": "Tier 1 骨幹",
+      "legendIntermediate": "中間 AS",
+      "zoomIn": "放大",
+      "zoomOut": "縮小",
+      "zoomReset": "重置縮放"
+    },
+    "advancedData": {
+      "proxyYes": "已識別為代理 / VPN",
+      "proxyMaybe": "疑似代理 / VPN",
+      "proxyNo": "未識別為代理",
+      "proxyUnknown": "未知型別",
+      "type": {
+        "Residential": "住宅線路",
+        "Wireless": "無線網路",
+        "Business": "商業線路",
+        "Hosting": "資料中心",
+        "unknownType": "未知型別"
+      },
+      "Nativeness": "原生性",
+      "NativeIPYes": "原生",
+      "NativeIPNo": "非原生",
+      "nativenessTooltip": "判斷 ASN 的註冊國家是否與 IP 的歸屬國家一致"
+    }
+  },
+  "serviceStatus": {
+    "Title": "服務可用性",
+    "Note": "當你打不開某些服務的時候，可能並不是你的問題，而是這些服務出故障了。目前，人們大量使用 AI 產品，並在 AI 產品沒有回覆的時候，不確定是自己的問題還是服務的問題。本板塊展示一些知名 AI 服務的即時可用狀態，展開卡片可檢視各子服務的狀態與最近的事故。",
+    "Refresh": "重新整理服務狀態",
+    "LastChecked": "最後檢查",
+    "AllOperational": "所有系統正常",
+    "ComponentsTitle": "服務項",
+    "IncidentsTitle": "最近事故",
+    "NoComponents": "暫無服務詳情。",
+    "NoRecentIncidents": "近期無事故。",
+    "Loading": "載入中…",
+    "Checking": "查詢中…",
+    "IncidentsError": "無法載入事故資訊。",
+    "ComponentsError": "無法載入服務項。",
+    "indicator": {
+      "minor": "部分異常",
+      "major": "重大故障",
+      "critical": "嚴重故障",
+      "maintenance": "維護中",
+      "unknown": "狀態取得失敗"
+    },
+    "component": {
+      "operational": "正常",
+      "degraded_performance": "效能下降",
+      "partial_outage": "部分中斷",
+      "major_outage": "重大中斷",
+      "under_maintenance": "維護中"
+    },
+    "incidentStatus": {
+      "investigating": "調查中",
+      "identified": "已定位",
+      "monitoring": "監控中",
+      "resolved": "已解決",
+      "postmortem": "復盤",
+      "scheduled": "已計劃",
+      "in_progress": "進行中",
+      "verifying": "驗證中",
+      "completed": "已完成"
+    }
+  },
+  "connectivity": {
+    "Title": "網路連通性",
+    "Note": "本測試用於測試你是否能夠連線到某個網站。測試方法是透過載入對應網站上的小圖片進行。延遲值僅供參考，實際會更小。你可以將其他常用網站新增到測試清單中，方便快速測試。",
+    "StatusWait": "待檢測",
+    "StatusAvailable": "可用",
+    "StatusUnavailable": "不可用",
+    "StatusTimeout": "超時或不可用",
+    "checking": "檢查中...",
+    "minTestTime": "最小測試時間：",
+    "RefreshThisTest": "重新整理此測試",
+    "RoundCount": "第 {n} 次：",
+    "addCustom": {
+      "AddCard": "新增測試",
+      "Title": "新增自訂測試",
+      "Hint": "透過 HTTPS 載入站點 favicon 進行測試，部分站點可能無法以這種方式測試。自訂測試會儲存在瀏覽器本地。",
+      "NameLabel": "名稱",
+      "NamePlaceholder": "例如：維基百科",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "例如：wikipedia.org",
+      "Add": "新增",
+      "Remove": "移除測試",
+      "NameRequired": "請輸入名稱",
+      "UrlRequired": "請輸入 URL",
+      "InvalidUrl": "這看起來不是一個有效的 URL",
+      "LimitReached": "測試數量已達到 60 個上限",
+      "LastTargetTitle": "無法刪除",
+      "LastTargetMessage": "至少需要保留一個測試網站。"
+    },
+    "importDialog": {
+      "Title": "新增 / 匯入測試",
+      "CustomOption": "新增自訂",
+      "ImportOption": "匯入清單",
+      "SiteCount": "{n} 個網站",
+      "Import": "匯入",
+      "Capacity": "已用 {used}/{limit}",
+      "NotEnoughCapacity": "容量不足——該清單需要 {need} 個空位，僅剩 {free} 個"
+    },
+    "importLists": {
+      "defaults": "系統預設",
+      "iran": "伊朗常用",
+      "russia": "俄羅斯常用",
+      "china": "中國常用",
+      "brazil": "巴西常用",
+      "ai": "AI 服務",
+      "social": "社交通訊",
+      "streaming": "流媒體",
+      "gaming": "遊戲平臺",
+      "developer": "開發者",
+      "cloud": "雲與 CDN",
+      "crypto": "加密交易所",
+      "ecommerce": "國際電商平臺",
+      "news": "新聞與百科"
+    }
+  },
+  "webrtc": {
+    "id": "webrtc",
+    "Title": "WebRTC 洩漏測試",
+    "Name": "WebRTC 連線",
+    "Note": "WebRTC 往往透過 UDP 直連進行建立，如果測試回傳了真實 IP，則意味著你的代理設定沒有覆蓋這些連線。除了檢測你連線 WebRTC 時所使用的 IP，我們還會檢測你的 NAT 型別。然而，NAT 型別的檢測並不是 100% 準確的，僅供參考。",
+    "StatusWait": "待檢測",
+    "StatusError": "連線錯誤",
+    "StatusUnavailable": "WebRTC 不可用",
+    "SdpLog": "SDP 日誌",
+    "NATType": {
+      "srflx": "埠限制型或對稱型",
+      "prflx": "埠限制型",
+      "relay": "對稱型",
+      "host": "全錐型",
+      "unknown": "未知型別"
+    }
+  },
+  "dnsleaktest": {
+    "Name": "DNS 出口檢測",
+    "Title": "DNS 洩漏測試",
+    "Note": "DNS 洩漏（DNS Leak）是指當你連上 VPN/代理後，解析網域名稱時依然透過當地的網路服務供應商進行解析，此時就有 DNS 洩漏的風險。",
+    "Note2": "洩漏測試會透過造訪新產生的網域名稱，檢測你是經由哪個地區的 DNS 出口進行解析。如果回傳的出口區域和你當地的網路服務供應商區域相同，則有 DNS 洩漏風險，你可能需要修改 VPN/代理設定。",
+    "EndpointCountry": "出口地區",
+    "StatusWait": "待檢測",
+    "StatusError": "測試出錯"
+  },
+  "speedtest": {
+    "Title": "網速測試",
+    "Note": "將從 Cloudflare 使用邊緣網路進行速度測試。你可以根據需要，選擇測速時下載和上傳的封包大小。測速過程中，會進行 4 次封包上傳與下載，請注意流量消耗。考慮到 Cloudflare 並非在全球每一個國家都部署邊緣節點，測速結果僅供參考，實際速度可能更快。",
+    "Download": "下載",
+    "Upload": "上傳",
+    "Latency": "延遲",
+    "Jitter": "抖動",
+    "loadedLatency": "滿載延遲：",
+    "videoStreaming": "線上影片",
+    "gaming": " 線上遊戲",
+    "rtc": " 視訊會議",
+    "score": "根據網速測試，得出以下品質分數：",
+    "connectionFrom": "已完成從你的機器，IP：",
+    "connectionTo": "與測速伺服器：",
+    "connectionEnd": " 的測試。",
+    "testFailed": "無法連線測速伺服器，請檢查網路後重試。",
+    "quality": {
+      "bad": "差",
+      "poor": "較差",
+      "average": "一般",
+      "good": "良好",
+      "great": "優秀"
+    }
+  },
+  "globalping": {
+    "Selected": "已選地區：",
+    "Suggested": "推薦地區",
+    "NoProbe": "該國家/地區暫無可用探針",
+    "GroupFull": "最多 {max} 個國家/地區，請先取消部分勾選",
+    "UnreachableTarget": "探針執行在公網上，內網及保留位址在任何國家/地區都無法抵達。",
+    "ResultsHint": "選擇探針並執行測試後，結果將顯示在這裡。",
+    "Asia": "亞洲",
+    "Europe": "歐洲",
+    "Africa": "非洲",
+    "Americas": "美洲",
+    "Oceania": "大洋洲"
+  },
+  "pingtest": {
+    "EnterIPLabel": "輸入要測試的 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "UseStored": "使用已知 IP",
+    "id": "pingtest",
+    "Title": "全球延遲測試",
+    "Note": "Ping 測試是一種網路工具，用於測量封包從兩個目標（伺服器）之間的往返時間。是評估網路效能的關鍵指標。",
+    "Note2": "在下面的測試過程中，IPCheck.ing 會利用 Globalping 全球探針從世界各地的伺服器傳送小型封包到你的 IP 位址，然後測量這些封包從伺服器傳送到你的裝置，再傳回伺服器所需的時間。透過這些不同地理位置的 Ping 測試，你可以獲得一個全面的檢視，了解你的裝置與全球網路連線的速度和穩定性。",
+    "Note3": "請選取你的 IP 位址進行測試：",
+    "SelectIP": "選擇一個 IP 位址",
+    "Region": "地區",
+    "MinDelay": "最小延遲（ms）",
+    "MaxDelay": "最大延遲（ms）",
+    "AvgDelay": "平均延遲（ms）",
+    "TotalPackets": "總包數",
+    "PacketLoss": "丟包率",
+    "ReceivedPackets": "收到",
+    "DroppedPackets": "丟失",
+    "Error": "測試失敗，看起來你的 IP 不允許進行 Ping 測試。"
+  },
+  "mtrtest": {
+    "EnterIPLabel": "輸入要測試的 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "UseStored": "使用已知 IP",
+    "Title": "MTR 測試",
+    "Note": "MTR (My Traceroute) 測試會利用 Globalping 全球探針從遍佈全球不同大洲和地區的伺服器出發，對你的 IP 位址進行詳細的路由追蹤。MTR 結合了傳統 traceroute 和 ping 命令的功能，能夠即時地診斷網路連線的品質和效能。",
+    "Note2": "這個過程涵蓋了從各個地理位置到你的網路環境的完整路徑，提供關於每一跳的延遲和封包丟失資訊。無論是路由路徑的擁堵、某個特定節點的延遲問題，還是封包在傳輸過程中的丟失，MTR 測試都能提供關鍵的診斷資訊。",
+    "Note3": "請選取你的 IP 位址進行測試：",
+    "SelectIP": "選擇一個 IP 位址",
+    "Region": "地區",
+    "Error": "測試失敗，看起來你的 IP 不允許進行 MTR 測試。",
+    "ColHost": "主機",
+    "ColIP": "IP",
+    "ColASN": "ASN",
+    "ColLoss": "丟包",
+    "ColSent": "傳送",
+    "ColDrop": "丟棄",
+    "ColRecv": "接收",
+    "ColLast": "最近",
+    "ColAvg": "平均",
+    "ColBest": "最佳",
+    "ColWorst": "最差",
+    "ColStDev": "標準差",
+    "ColJitter": "抖動",
+    "NoReply": "無響應"
+  },
+  "ipcheck": {
+    "Title": "IP 查詢",
+    "Placeholder": "例如 1.1.1.1",
+    "Error": "請輸入有效的 IPv4 或 IPv6 位址。",
+    "reservedIP": "內網、迴環等保留位址沒有地理位置資訊，無法查詢。",
+    "NoData": "無法查詢到該 IP 的資訊。可能是不可路由位址（如 0.0.0.0、私有位址）或資料來源沒有該 IP 的記錄。"
+  },
+  "alert": {
+    "refreshEverythingMessage": "正在重新整理所有資料，請等待...",
+    "refreshEverythingTitle": "正在重新整理",
+    "OhNo": "糟糕！",
+    "Congrats": "恭喜呀！",
+    "OhNo_Message": "連線能力檢測未通過，部分網站無法存取。",
+    "Congrats_Message": "所有連線能力檢測均已通過，你可以存取所有網站。",
+    "maskedInfoTitle": "IP 資訊已隱藏",
+    "maskedInfoMessage": "分享截圖不會外洩你的 IP 資訊。",
+    "unmaskedInfoTitle": "IP 資訊已顯示",
+    "unmaskedInfoMessage": "分享截圖時請注意隱私。",
+    "SignInFailed": "登入失敗",
+    "SignInFailedReason": "原因",
+    "IpGeoSourceFallbackTitle": "IP 解析資料來源已切換",
+    "IpGeoSourceFallbackMessage": "解析源 {from} 暫時不可用，本次結果臨時改由 {to} 提供。",
+    "SignInEmailTakenTitle": "該電子郵件信箱已被使用",
+    "SignInEmailTakenMessage": "該電子郵件信箱已經註冊過帳號，請改用 {other} 登入。"
+  },
+  "shortcutKeys": {
+    "GoToTop": "回到頂部",
+    "GoToBottom": "回到底部",
+    "ToggleDarkMode": "切換深色模式",
+    "RefreshEverything": "重新整理所有資料",
+    "RefreshIPCard": "重新整理某張 IP 卡片",
+    "RefreshConnectivityTests": "重新整理連通性測試",
+    "RefreshWebRTC": "重新整理 WebRTC 洩漏測試",
+    "RefreshDNSLeakTest": "重新整理 DNS 洩漏測試",
+    "SpeedTestButton": "開始/暫停網速測試",
+    "PingTest": "開啟全球延遲測試面板",
+    "MTRTest": "開啟 MTR 測試面板",
+    "RuleTest": "開啟規則測試面板",
+    "DNSResolver": "開啟 DNS 解析器面板",
+    "IPCheck": "IP 查詢",
+    "ToggleInfoMask": "切換資訊隱藏",
+    "IPHistory": "開啟 IP 歷史記錄面板",
+    "ShareReport": "開啟分享報告面板",
+    "Help": "顯示快捷鍵",
+    "HelpNote": "使用快捷鍵的人，是喜歡效率的人，你真棒！",
+    "GoNext": "下一張卡片",
+    "GoPrevious": "上一張卡片",
+    "OpenHighlightedTool": "開啟選中的進階工具",
+    "RefreshRuleTests": "重新整理規則測試",
+    "CensorshipCheck": "開啟封鎖測試面板",
+    "Pulse": "開啟地球線上面板",
+    "Whois": "開啟 Whois 查詢面板",
+    "ServiceStatus": "開啟服務可用性面板",
+    "InvisibilityTest": "開啟隱身測試面板",
+    "EnhancedDnsLeakTest": "開啟深度 DNS 洩漏測試面板",
+    "MacChecker": "開啟實體位址查詢面板",
+    "BrowserInfo": "開啟瀏覽器資訊面板",
+    "SecurityChecklist": "開啟安全檢查清單",
+    "PersonaCheck": "開啟深度畫像檢測面板"
+  },
+  "page": {
+    "title": "IPCheck.ing - 查詢我的 IP 位址與地理位置 - IP 洩漏測試 - DNS 洩漏測試 - IP 品質檢查 - 網路速度測試 - 全方位 IP 工具箱",
+    "description": "更完善的開源 IP 工具箱：查詢 IP 位址與地理位置、測試 WebRTC 與 DNS IP 洩漏、執行 IP 品質檢查、瀏覽器指紋檢查，還有網速測試、全球延遲測試、MTR 測試、Whois 查詢等。",
+    "keywords": "MyIP, IP 工具, IP 檢查, IP 洩漏檢查, IP 品質檢查, IP 查詢, DNS 洩漏測試, WebRTC 洩漏測試, 瀏覽器指紋檢查, 網速測試, 全球延遲測試, MTR 測試, DNS 查詢, Whois 查詢",
+    "footerLink": "https://github.com/jason5ng32/MyIP",
+    "copyRightName": "原始來源：",
+    "copyRightLink": "https://ipcheck.ing",
+    "copyRightLinkName": "IPCheck.ing"
+  },
+  "helpModal": {
+    "Title": "鍵盤快速鍵"
+  },
+  "about": {
+    "Title": "關於",
+    "project": [
+      "IPCheck.ing 是一個免費的多合一 IP 工具箱，可以協助你檢視自己的 IP 資訊，檢測網站的可用性，檢視 DNS 出口資訊，進行網速測試，全球延遲測試，MTR 測試等。",
+      "這是一個開源專案，你可以點選頁面底部的 GitHub 圖示檢視原始碼。",
+      "如果你對於產品中功能使用不理解，可以透過底部的「說明中心」取得協助，我們已經寫了非常詳細的協助文件，除了功能介紹，也能協助你理解各種網路概念和如何排查網路問題。",
+      "如果你有興趣參與到開源專案中，可以點選頁面底部的「貢獻程式碼」按鈕，檢視如何貢獻程式碼。"
+    ],
+    "founderTitle": "關於專案發起人",
+    "founder": [
+      "最早的時候，這是阿禪（Jason Ng）的一個用來學習 Vue.js 和學習如何使用 AI 寫程式碼的練手專案，後來在 GitHub 上獲得的星星數量越來越多，於是他進行了大量的重構和新增了許多非常有用的功能，希望你會喜歡。",
+      "他並不是一個專業的程式設計師，在大多數時候，他是一名產品經理、一名部落格作者、一個摩托車騎士以及一名極客。但他喜歡程式設計、喜歡開源，喜歡分享。",
+      "你可以在下面的連結裡找到他更詳細的介紹："
+    ],
+    "contactTitle": "聯絡我們",
+    "contact": [
+      "如果你在使用 IPCheck.ing 或者部署 MyIP 專案的時候，遇到問題，可以先前往「說明中心」尋找答案。如果找不到答案，而你無法解決，可以在 Github 上給我們提 issue 或透過郵件和我們聯絡。",
+      "當然了，如果你遇到了一個 bug，而你又喜歡程式設計（或者使用 AI 程式設計），非常歡迎你將你的最佳化方案直接提交 PR 給我們。",
+      "我們的電子郵件信箱： i[AT]ipcheck.ing。"
+    ],
+    "personal": "個人網站",
+    "blog": "可能吧部落格",
+    "linkedIn": "LinkedIn",
+    "twitter": "Twitter",
+    "Sponsor": "贊助我們",
+    "Privacy": "隱私政策",
+    "HelpCenter": "說明中心",
+    "Contribute": "貢獻程式碼",
+    "Close": "關閉"
+  },
+  "acknowledgement": {
+    "Title": "致謝",
+    "Note1": "這個專案之所以能夠完成，少不了一些熱心人士與組織的支持和協助，以及提供靈感或開放原始碼的貢獻者。非常感謝大家："
+  },
+  "changelog": {
+    "Title": "更新日誌",
+    "add": "新增",
+    "improve": "優化",
+    "fix": "修復"
+  },
+  "pwa": {
+    "appDescription": "一站式 IP 工具箱",
+    "installDescription": "這已經是你第 {count} 次使用 IPCheck.ing 了，將它安裝為應用程式，可以獲得更好的使用體驗，開啟也更方便。"
+  }
+}
