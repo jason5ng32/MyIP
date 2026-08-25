@@ -95,6 +95,22 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'india',
+        emoji: '🇮🇳',
+        members: [
+            { id: 'cricbuzz', name: 'Cricbuzz', url: 'https://www.cricbuzz.com/favicon.ico' },
+            { id: 'zomato', name: 'Zomato', url: 'https://www.zomato.com/favicon.ico' },
+            { id: 'paytm', name: 'Paytm', url: 'https://paytm.com/favicon.ico' },
+            { id: 'flipkart', name: 'Flipkart', url: 'https://www.flipkart.com/favicon.ico' },
+            { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/favicon.ico' },
+            { id: 'phonepe', name: 'PhonePe', url: 'https://www.phonepe.com/favicon.ico' },
+            { id: 'policybazaar', name: 'Policybazaar', url: 'https://www.policybazaar.com/favicon.ico' },
+            { id: 'nykaa', name: 'Nykaa', url: 'https://www.nykaa.com/favicon.ico' },
+            { id: 'justdail', name: 'Justdail', url: 'https://www.justdial.com/favicon.ico' },
+            { id: 'groww', name: 'Groww', url: 'https://groww.in/favicon.ico' },
+        ],
+    },
+    {
         id: 'china',
         emoji: '🇨🇳',
         members: [
