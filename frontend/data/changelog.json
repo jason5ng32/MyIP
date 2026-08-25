@@ -1778,7 +1778,7 @@
           "zh-TW": "新增 AI 助手 IPilot：依據文件回答你的問題，並可在你授權後讀取頁面上的測試結果",
           "fr": "Nouvel assistant IA : IPilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
           "ru": "Новый ИИ-помощник IPilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения",
-          "pt-BR": "Novo assistente de IA: o IPilot responde às suas perguntas nos documentos e pode ler os resultados na página com sua permissão"
+          "pt-BR": "Novo assistente de IA: o IPilot responde às suas perguntas com base na documentação e pode ler os resultados exibidos na página com sua permissão."
         }
       },
       {

@@ -8,7 +8,7 @@
       {
         "point": "Use uma senha forte",
         "priority": "Essential",
-        "details": "Se sua senha for muito curta ou contiver palavras, lugares ou nomes de dicionário, ela poderá ser facilmente quebrada por força bruta ou adivinhada por alguém. A maneira mais fácil de criar uma senha forte é torná-la longa (mais de 12 caracteres). Considere usar uma 'frase secreta', composta de muitas palavras. Como alternativa, use um gerador de senha para criar uma senha aleatória longa e forte. Experimente [HowSecureIsMyPassword.net](https://howsecureismypassword.net) para ter uma ideia da rapidez com que senhas comuns podem ser quebradas. Leia mais sobre como criar senhas fortes: [securityinabox.org](https://securityinabox.org/en/passwords/passwords-and-2fa/)",
+        "details": "Se sua senha for muito curta ou contiver palavras, lugares ou nomes de dicionário, ela poderá ser facilmente quebrada por força bruta ou adivinhada por alguém. A maneira mais fácil de criar uma senha forte é torná-la longa (pelo menos 12 caracteres). Considere usar uma 'frase secreta', composta de muitas palavras. Como alternativa, use um gerador de senha para criar uma senha aleatória longa e forte. Experimente [HowSecureIsMyPassword.net](https://howsecureismypassword.net) para ter uma ideia da rapidez com que senhas comuns podem ser quebradas. Leia mais sobre como criar senhas fortes: [securityinabox.org](https://securityinabox.org/en/passwords/passwords-and-2fa/)",
         "slug": "authentication-use-a-strong-password"
       },
       {
@@ -44,7 +44,7 @@
       {
         "point": "Inscreva-se para receber alertas de violação",
         "priority": "Optional",
-        "details": "Depois que um site sofre uma violação significativa de dados, os dados vazados geralmente acabam na Internet. Existem vários sites que coletam esses registros vazados e permitem que você pesquise seu endereço de e-mail para verificar se está em alguma de suas listas. [Firefox Monitor](https://monitor.firefox.com), [Have I been pwned](https://haveibeenpwned.com) e [DeHashed](https://dehashed.com) permitem que você se inscreva no monitoramento, onde eles irão notificá-lo se seu endereço de e-mail aparecer em algum novo conjunto de dados. É útil saber o mais rápido possível quando isso acontece, para que você possa alterar as senhas das contas afetadas. [Fui pwned](https://awesome-privacy.xyz/security-tools/online-tools/have-i-been-pwned) também possui notificação em todo o domínio, onde você pode receber alertas se algum endereço de e-mail em todo o seu domínio aparecer (útil se você usar aliases para [encaminhamento anônimo](https://github.com/Lissy93/awesome-privacy#anonymous-mail-forwarding))",
+        "details": "Depois que um site sofre uma violação significativa de dados, os dados vazados geralmente acabam na Internet. Existem vários sites que coletam esses registros vazados e permitem que você pesquise seu endereço de e-mail para verificar se está em alguma de suas listas. [Firefox Monitor](https://monitor.firefox.com), [Have I Been Pwned](https://haveibeenpwned.com) e [DeHashed](https://dehashed.com) permitem que você se inscreva no monitoramento, onde eles irão notificá-lo se seu endereço de e-mail aparecer em algum novo conjunto de dados. É útil saber o mais rápido possível quando isso acontece, para que você possa alterar as senhas das contas afetadas. [Have I Been Pwned](https://awesome-privacy.xyz/security-tools/online-tools/have-i-been-pwned) também possui notificação em todo o domínio, onde você pode receber alertas se algum endereço de e-mail em todo o seu domínio aparecer (útil se você usar aliases para [encaminhamento anônimo](https://github.com/Lissy93/awesome-privacy#anonymous-mail-forwarding))",
         "slug": "authentication-sign-up-for-breach-alerts"
       },
       {
@@ -86,7 +86,7 @@
       {
         "point": "Não use um PIN de 4 dígitos",
         "priority": "Optional",
-        "details": "Não use um PIN curto para acessar seu smartphone ou computador. Em vez disso, use uma senha de texto ou um PIN muito mais longo. As senhas numéricas são fáceis de decifrar (um pino de 4 dígitos tem 10.000 combinações, em comparação com 7,4 milhões para um código alfanumérico de 4 caracteres)",
+        "details": "Não use um PIN curto para acessar seu smartphone ou computador. Em vez disso, use uma senha de texto ou um PIN muito mais longo. As senhas numéricas são fáceis de decifrar (um PIN de 4 dígitos tem 10.000 combinações, em comparação com 7,4 milhões para um código alfanumérico de 4 caracteres)",
         "slug": "authentication-dont-use-a-4-digit-pin"
       },
       {
@@ -184,7 +184,7 @@
       {
         "point": "Verifique se há HTTPS",
         "priority": "Essential",
-        "details": "Se você inserir informações em um site não HTTPS, esses dados serão transportados sem criptografia e poderão, portanto, ser lidos por qualquer pessoa que os intercepte. Não insira nenhum dado em um site que não seja HTTPS, mas também não deixe que o cadeado verde lhe dê uma falsa sensação de segurança, só porque um site possui certificado SSL, não significa que seja legítimo ou confiável. [HTTPS-Everywhere](https://www.eff.org/https-everywhere) (desenvolvido por [EFF](https://www.eff.org/)) costumava ser uma extensão/complemento de navegador que habilitava HTTPS automaticamente em sites, mas a partir de 2022 está obsoleto. Em seu [artigo de relatório](https://www.eff.org/) a EFF explica que a maioria dos navegadores agora integra essas proteções. Além disso, fornece instruções para os navegadores [Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox), Chrome, Edge e Safari sobre como ativar suas proteções seguras HTTPS.",
+        "details": "Se você inserir informações em um site não HTTPS, esses dados serão transportados sem criptografia e poderão, portanto, ser lidos por qualquer pessoa que os intercepte. Não insira nenhum dado em um site que não seja HTTPS, mas também não deixe que o cadeado verde lhe dê uma falsa sensação de segurança, só porque um site possui certificado SSL, não significa que seja legítimo ou confiável. [HTTPS-Everywhere](https://www.eff.org/https-everywhere) (desenvolvido por [EFF](https://www.eff.org/)) costumava ser uma extensão/complemento de navegador que habilitava HTTPS automaticamente em sites, mas a partir de 2022 está obsoleto. Em seu [comunicado](https://www.eff.org/) a EFF explica que a maioria dos navegadores agora integra essas proteções. Além disso, fornece instruções para os navegadores [Firefox](https://awesome-privacy.xyz/essentials/browsers/firefox), Chrome, Edge e Safari sobre como ativar suas proteções seguras HTTPS.",
         "slug": "web-browsing-check-for-https"
       },
       {
@@ -314,7 +314,7 @@
         "slug": "web-browsing-disable-webrtc"
       },
       {
-        "point": "Falsificação de assinatura de tela HTML5",
+        "point": "Falsificação de assinatura Canvas HTML5",
         "priority": "Optional",
         "details": "O Canvas Fingerprinting permite que os sites identifiquem e rastreiem os usuários com muita precisão. Você pode usar a extensão Canvas-Fingerprint-Blocker para falsificar sua impressão digital ou usar [Tor](https://awesome-privacy.xyz/networking/mix-networks/tor).",
         "slug": "web-browsing-spoof-html5-canvas-sig"
@@ -384,7 +384,7 @@
       {
         "point": "Ter mais de um endereço de e-mail",
         "priority": "Essential",
-        "details": "Considere usar um endereço de e-mail diferente para comunicações críticas de segurança de e-mails triviais, como boletins informativos. Esta compartimentação poderia reduzir a quantidade de danos causados por uma violação de dados e também facilitar a recuperação de uma conta comprometida.",
+        "details": "Considere usar um endereço de e-mail separado para comunicações críticas de segurança, distinto do usado para e-mails triviais, como boletins informativos. Esta compartimentação poderia reduzir a quantidade de danos causados por uma violação de dados e também facilitar a recuperação de uma conta comprometida.",
         "slug": "email-have-more-than-one-email-address"
       },
       {
@@ -576,7 +576,7 @@
         "slug": "messaging-strip-meta-data-from-media"
       },
       {
-        "point": "URLs padrão",
+        "point": "Neutralize URLs (defang)",
         "priority": "Optional",
         "details": "O envio de links por meio de vários serviços pode expor involuntariamente suas informações pessoais. Isso ocorre porque, quando uma miniatura ou visualização é gerada, isso acontece no lado do cliente.",
         "slug": "messaging-defang-urls"
@@ -596,7 +596,7 @@
       {
         "point": "Evite SMS",
         "priority": "Optional",
-        "details": "SMS pode ser conveniente, mas não é seguro. É suscetível a ameaças como interceptação, troca de sim, manipulação e malware.",
+        "details": "SMS pode ser conveniente, mas não é seguro. É suscetível a ameaças como interceptação, troca de SIM, manipulação e malware.",
         "slug": "messaging-avoid-sms"
       },
       {
@@ -658,13 +658,13 @@
       {
         "point": "Pense em todas as interações como permanentes",
         "priority": "Essential",
-        "details": "Praticamente todas as postagens, comentários, fotos, etc., são continuamente apoiados por uma infinidade de serviços de terceiros, que arquivam esses dados e os tornam indexáveis e disponíveis publicamente quase para sempre.",
+        "details": "Praticamente todas as postagens, comentários e fotos são continuamente copiados e armazenados em backup por inúmeros serviços de terceiros, que arquivam esses dados e os tornam indexáveis e disponíveis publicamente quase para sempre.",
         "slug": "social-media-think-of-all-interactions-as-permanent"
       },
       {
         "point": "Não revele muito",
         "priority": "Essential",
-        "details": "As informações de perfil criam uma mina de ouro de informações para hackers, o tipo de dados que os ajuda a personalizar golpes de phishing. Evite compartilhar muitos detalhes (DoB, cidade natal, escola, etc.).",
+        "details": "As informações de perfil criam uma mina de ouro de informações para hackers, o tipo de dados que os ajuda a personalizar golpes de phishing. Evite compartilhar muitos detalhes (data de nascimento, cidade natal, escola etc.).",
         "slug": "social-media-don-t-reveal-too-much"
       },
       {
@@ -682,7 +682,7 @@
       {
         "point": "Não conceda permissões desnecessárias",
         "priority": "Essential",
-        "details": "Por padrão, muitos dos aplicativos populares de redes sociais solicitarão permissão para acessar seus contatos, registro de chamadas, localização, histórico de mensagens, etc.",
+        "details": "Por padrão, muitos aplicativos populares de redes sociais solicitarão permissão para acessar seus contatos, registro de chamadas, localização, histórico de mensagens etc. Se não precisarem desse acesso, não o conceda.",
         "slug": "social-media-don-t-grant-unnecessary-permissions"
       },
       {
@@ -694,7 +694,7 @@
       {
         "point": "Evite publicar dados geográficos enquanto ainda estiver no local",
         "priority": "Essential",
-        "details": "Se você planeja compartilhar qualquer conteúdo que revele um local, espere até sair desse local. Isto é particularmente importante quando você estiver viajando em um restaurante, campus, hotel/resort, prédio público ou aeroporto.",
+        "details": "Se você planeja compartilhar qualquer conteúdo que revele sua localização, espere até sair do local. Isso é particularmente importante quando estiver viajando, em um restaurante, campus, hotel ou resort, prédio público ou aeroporto.",
         "slug": "social-media-avoid-publishing-geo-data-while-still-onsite"
       },
       {
@@ -786,7 +786,7 @@
       {
         "point": "Evite o roteador gratuito do seu ISP",
         "priority": "Optional",
-        "details": "Normalmente, eles são fabricados a granel e baratos na China, com firmware de propriedade insegura que não recebe atualizações de segurança regulares.",
+        "details": "Normalmente, eles são fabricados a granel e baratos na China, com firmware proprietário e inseguro que não recebe atualizações de segurança regulares.",
         "slug": "networks-avoid-the-free-router-from-your-isp"
       },
       {
@@ -804,7 +804,7 @@
       {
         "point": "Não revele informações pessoais no SSID",
         "priority": "Optional",
-        "details": "Você deve atualizar o nome da sua rede, escolhendo um SSID que não o identifique, inclua seu número/endereço fixo e não especifique a marca/modelo do dispositivo.",
+        "details": "Você deve atualizar o nome da sua rede, escolhendo um SSID que não o identifique, não inclua o número do seu apartamento ou endereço e não especifique a marca ou o modelo do dispositivo.",
         "slug": "networks-don-t-reveal-personal-info-in-ssid"
       },
       {
@@ -850,7 +850,7 @@
         "slug": "networks-kill-unused-processes-and-services-on-your-router"
       },
       {
-        "point": "Não tenho portas abertas",
+        "point": "Não tenha portas abertas",
         "priority": "Optional",
         "details": "Feche todas as portas abertas em seu roteador que não sejam necessárias. As portas abertas fornecem uma entrada fácil para hackers.",
         "slug": "networks-don-t-have-open-ports"
@@ -956,7 +956,7 @@
       {
         "point": "Apagar após muitas tentativas de login",
         "priority": "Optional",
-        "details": "Para se proteger contra um invasor forçando seu PIN, configure seu dispositivo para apagar após muitas tentativas de login malsucedidas.",
+        "details": "Para se proteger contra um invasor tentando descobrir seu PIN por força bruta, configure seu dispositivo para apagar após muitas tentativas de login malsucedidas.",
         "slug": "mobile-devices-erase-after-too-many-login-attempts"
       },
       {
@@ -1108,7 +1108,7 @@
       {
         "point": "Não vincule seu PC à sua conta Microsoft ou Apple",
         "priority": "Optional",
-        "details": "Use uma conta local apenas para evitar sincronização e exposição de dados. Evite usar serviços de sincronização que comprometam a privacidade.",
+        "details": "Use apenas uma conta local para evitar sincronização e exposição de dados. Evite usar serviços de sincronização que comprometam a privacidade.",
         "slug": "personal-computers-don-t-link-your-pc-with-your-microsoft-or-apple-account"
       },
       {
@@ -1132,7 +1132,7 @@
       {
         "point": "Use um filtro de privacidade",
         "priority": "Optional",
-        "details": "Use um filtro de privacidade de tela em espaços públicos para evitar a navegação e proteger informações confidenciais.",
+        "details": "Use um filtro de privacidade para a tela em espaços públicos, para impedir que pessoas vejam sua tela por cima do seu ombro e proteger informações confidenciais.",
         "slug": "personal-computers-use-a-privacy-filter"
       },
       {
@@ -1144,7 +1144,7 @@
       {
         "point": "Não carregue dispositivos do seu PC",
         "priority": "Optional",
-        "details": "Use um banco de energia ou carregador CA de parede em vez do PC para evitar riscos de segurança associados às conexões USB.",
+        "details": "Use um carregador portátil ou um carregador de parede em vez do PC para evitar riscos de segurança associados às conexões USB.",
         "slug": "personal-computers-don-t-charge-devices-from-your-pc"
       },
       {
@@ -1341,7 +1341,7 @@
     "title": "Finanças Pessoais",
     "slug": "personal-finance",
     "description": "Protegendo seus fundos, contas financeiras e transações",
-    "intro": "A fraude de cartão de crédito é a forma mais comum de roubo de identidade (com [133.015 relatos apenas nos EUA em 2017](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)) e uma perda total de US$ 905 milhões, o que representou um aumento de 26% em relação ao ano anterior. O valor médio perdido por pessoa foi de US$ 429 em 2017. É mais importante do que nunca tomar medidas básicas para se proteger de ser vítima\nObservação sobre cartões de crédito: Os cartões de crédito possuem métodos tecnológicos para detectar e impedir algumas transações fraudulentas. Os principais processadores de pagamentos implementam isso, extraindo enormes quantidades de dados dos titulares de seus cartões, a fim de saber muito sobre os hábitos de consumo de cada pessoa. Esses dados são usados para identificar fraudes, mas também são vendidos a outros corretores de dados. Os cartões de crédito são, portanto, bons para a segurança, mas terríveis para a privacidade dos dados.",
+    "intro": "A fraude de cartão de crédito é a forma mais comum de roubo de identidade (com [133.015 relatos apenas nos EUA em 2017](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)) e uma perda total de US$ 905 milhões, o que representou um aumento de 26% em relação ao ano anterior. O valor mediano perdido por pessoa foi de US$ 429 em 2017. É mais importante do que nunca tomar medidas básicas para se proteger de ser vítima\nObservação sobre cartões de crédito: Os cartões de crédito possuem métodos tecnológicos para detectar e impedir algumas transações fraudulentas. Os principais processadores de pagamentos implementam isso, extraindo enormes quantidades de dados dos titulares de seus cartões, a fim de saber muito sobre os hábitos de consumo de cada pessoa. Esses dados são usados para identificar fraudes, mas também são vendidos a outros corretores de dados. Os cartões de crédito são, portanto, bons para a segurança, mas terríveis para a privacidade dos dados.",
     "checklist": [
       {
         "point": "Inscreva-se para receber alertas de fraude e monitoramento de crédito",
@@ -1386,7 +1386,7 @@
         "slug": "personal-finance-buy-crypto-anonymously"
       },
       {
-        "point": "Tombar/Misturar Moedas",
+        "point": "Misture suas criptomoedas (tumbling)",
         "priority": "Advanced",
         "details": "Use um misturador de bitcoin ou CoinJoin antes de converter Bitcoin em moeda para ocultar trilhas de transação.",
         "slug": "personal-finance-tumble-mix-coins"
@@ -1466,7 +1466,7 @@
         "slug": "human-aspect-store-personal-data-securely"
       },
       {
-        "point": "Detalhes pessoais obscuros de documentos",
+        "point": "Oculte detalhes pessoais em documentos",
         "priority": "Essential",
         "details": "Ao compartilhar documentos, oculte detalhes pessoais com retângulos opacos para evitar vazamento de informações.",
         "slug": "human-aspect-obscure-personal-details-from-documents"
@@ -1520,7 +1520,7 @@
         "slug": "human-aspect-compartmentalize"
       },
       {
-        "point": "Quem é o protetor de privacidade",
+        "point": "Use o WhoIs Privacy Guard",
         "priority": "Advanced",
         "details": "Use o WhoIs Privacy Guard para registros de domínio para proteger suas informações pessoais de pesquisas públicas.",
         "slug": "human-aspect-whois-privacy-guard"
@@ -1548,13 +1548,13 @@
       {
         "point": "Destrua documentos confidenciais",
         "priority": "Essential",
-        "details": "Destrua ou edite documentos confidenciais antes de descartá-los para protegê-los contra\nroubo de identidade e manter a confidencialidade.",
+        "details": "Destrua ou tarje documentos confidenciais antes de descartá-los para protegê-los contra roubo de identidade e manter a confidencialidade.",
         "slug": "physical-security-destroy-sensitive-documents"
       },
       {
-        "point": "Desativação de registros públicos",
+        "point": "Remova-se dos registros públicos",
         "priority": "Essential",
-        "details": "Entre em contato com pessoas que pesquisam sites para cancelar listagens que mostram a personalidade\ninformações, usando guias como o Manual de Remoção de Dados Pessoais de Michael Bazzell.",
+        "details": "Entre em contato com sites de busca de pessoas para remover listagens que exibem informações pessoais, usando guias como o Manual de Remoção de Dados Pessoais de Michael Bazzell.",
         "slug": "physical-security-opt-out-of-public-records"
       },
       {
@@ -1564,7 +1564,7 @@
         "slug": "physical-security-watermark-documents"
       },
       {
-        "point": "Não revele informações sobre chamadas recebidas",
+        "point": "Não revele informações em chamadas recebidas",
         "priority": "Essential",
         "details": "Compartilhe apenas dados pessoais nas chamadas que você iniciar e verifique o número de telefone do destinatário.",
         "slug": "physical-security-don-t-reveal-info-on-inbound-calls"
@@ -1624,7 +1624,7 @@
         "slug": "physical-security-reduce-exposure-to-cctv"
       },
       {
-        "point": "Roupas de reconhecimento antifacial",
+        "point": "Roupas que dificultam o reconhecimento facial",
         "priority": "Advanced",
         "details": "Use roupas com padrões que enganem a tecnologia de reconhecimento facial.",
         "slug": "physical-security-anti-facial-recognition-clothing"
@@ -1638,7 +1638,7 @@
       {
         "point": "Proteja seu DNA",
         "priority": "Advanced",
-        "details": "Evite compartilhar DNA com sites históricos e tenha cuidado ao deixar vestígios de DNA.",
+        "details": "Evite compartilhar DNA com sites de genealogia ou ancestralidade e tenha cuidado ao deixar vestígios de DNA.",
         "slug": "physical-security-protect-your-dna"
       }
     ]
