@@ -166,7 +166,7 @@
       {
         "point": "Use um mecanismo de pesquisa privado",
         "priority": "Essential",
-        "details": "Usar um mecanismo de pesquisa que preserva a privacidade e não rastreia reduzirá o risco de que seus termos de pesquisa não sejam registrados ou usados ​​contra você. Considere [DuckDuckGo](https://awesome-privacy.xyz/essentials/search-engines/duckduckgo) ou [Qwant](https://awesome-privacy.xyz/essentials/search-engines/qwant). O Google implementa algumas políticas de rastreamento [incrivelmente invasivas](https://hackernoon.com/data-privacy-concerns-with-google-b946f2b7afea) e tem um histórico de exibição de [resultados de pesquisa tendenciosos](https://www.businessinsider.com/evidence-that-google-search-results-are-biased-2014-10). Portanto, o Google, juntamente com o Bing, o Baidu, o Yahoo e o Yandex, são incompatíveis com qualquer pessoa que pretenda proteger a sua privacidade. Recomenda-se atualizar sua [pesquisa padrão do navegador](https://duckduckgo.com/install) para um mecanismo de pesquisa que respeite a privacidade.",
+        "details": "Usar um mecanismo de pesquisa que preserva a privacidade e não rastreia reduzirá o risco de que seus termos de pesquisa não sejam registrados ou usados contra você. Considere [DuckDuckGo](https://awesome-privacy.xyz/essentials/search-engines/duckduckgo) ou [Qwant](https://awesome-privacy.xyz/essentials/search-engines/qwant). O Google implementa algumas políticas de rastreamento [incrivelmente invasivas](https://hackernoon.com/data-privacy-concerns-with-google-b946f2b7afea) e tem um histórico de exibição de [resultados de pesquisa tendenciosos](https://www.businessinsider.com/evidence-that-google-search-results-are-biased-2014-10). Portanto, o Google, juntamente com o Bing, o Baidu, o Yahoo e o Yandex, são incompatíveis com qualquer pessoa que pretenda proteger a sua privacidade. Recomenda-se atualizar sua [pesquisa padrão do navegador](https://duckduckgo.com/install) para um mecanismo de pesquisa que respeite a privacidade.",
         "slug": "web-browsing-use-a-private-search-engine"
       },
       {
@@ -190,7 +190,7 @@
       {
         "point": "Use DNS sobre HTTPS",
         "priority": "Essential",
-        "details": "O DNS tradicional faz solicitações em texto simples para que todos possam ver. Ele permite a espionagem e manipulação de dados DNS por meio de ataques man-in-the-middle. Enquanto o DNS sobre HTTPS realiza a resolução de DNS por meio do protocolo HTTPS, o que significa que os dados entre você e seu resolvedor de DNS são criptografados. Uma opção popular é [1.1.1.1](https://awesome-privacy.xyz/security-tools/mobile-apps/1.1.1.1) do [CloudFlare](https://awesome-privacy.xyz/networking/dns-providers/cloudflare) ou compare provedores - é simples de ativar no navegador. Observe que o DoH tem seus próprios problemas, principalmente impedindo a filtragem da web.",
+        "details": "O DNS tradicional envia consultas em texto simples, visíveis a qualquer pessoa. Isso permite espionagem e manipulação de dados de DNS por ataques man-in-the-middle. Já o DNS sobre HTTPS (DoH) realiza a resolução por HTTPS, criptografando os dados entre você e seu resolvedor de DNS. O [1.1.1.1](https://awesome-privacy.xyz/security-tools/mobile-apps/1.1.1.1) da [Cloudflare](https://awesome-privacy.xyz/networking/dns-providers/cloudflare) é uma opção popular, mas vale comparar provedores; a ativação no navegador é simples. Observe, porém, que o DoH também tem limitações, sobretudo por dificultar a filtragem da web.",
         "slug": "web-browsing-use-dns-over-https"
       },
       {
@@ -232,7 +232,7 @@
       {
         "point": "Cuidado com redirecionamentos",
         "priority": "Optional",
-        "details": "Embora alguns redirecionamentos sejam inofensivos, outros, como os redirecionamentos não validados, são usados ​​em ataques de phishing, podendo fazer com que um link malicioso pareça legítimo. Se não tiver certeza sobre um URL de redirecionamento, você pode verificar para onde ele encaminha com uma ferramenta como o RedirectDetective.",
+        "details": "Embora alguns redirecionamentos sejam inofensivos, outros, como os redirecionamentos não validados, são usados em ataques de phishing, podendo fazer com que um link malicioso pareça legítimo. Se não tiver certeza sobre um URL de redirecionamento, você pode verificar para onde ele encaminha com uma ferramenta como o RedirectDetective.",
         "slug": "web-browsing-beware-of-redirects"
       },
       {
@@ -384,7 +384,7 @@
       {
         "point": "Ter mais de um endereço de e-mail",
         "priority": "Essential",
-        "details": "Considere usar um endereço de e-mail diferente para comunicações críticas de segurança de e-mails triviais, como boletins informativos. Esta compartimentação poderia reduzir a quantidade de danos causados ​​por uma violação de dados e também facilitar a recuperação de uma conta comprometida.",
+        "details": "Considere usar um endereço de e-mail diferente para comunicações críticas de segurança de e-mails triviais, como boletins informativos. Esta compartimentação poderia reduzir a quantidade de danos causados por uma violação de dados e também facilitar a recuperação de uma conta comprometida.",
         "slug": "email-have-more-than-one-email-address"
       },
       {
@@ -474,7 +474,7 @@
       {
         "point": "Sempre use portas TLS",
         "priority": "Advanced",
-        "details": "Existem opções SSL para POP3, IMAP e SMTP como portas TCP/IP padrão. Eles são fáceis de usar e têm amplo suporte, portanto devem sempre ser usados ​​em vez de portas de e-mail de texto simples.",
+        "details": "Existem opções SSL para POP3, IMAP e SMTP como portas TCP/IP padrão. Eles são fáceis de usar e têm amplo suporte, portanto devem sempre ser usados em vez de portas de e-mail de texto simples.",
         "slug": "email-always-use-tls-ports"
       },
       {
@@ -658,7 +658,7 @@
       {
         "point": "Pense em todas as interações como permanentes",
         "priority": "Essential",
-        "details": "Praticamente todas as postagens, comentários, fotos, etc., são continuamente apoiados por uma infinidade de serviços de terceiros, que arquivam esses dados e os tornam indexáveis ​​e disponíveis publicamente quase para sempre.",
+        "details": "Praticamente todas as postagens, comentários, fotos, etc., são continuamente apoiados por uma infinidade de serviços de terceiros, que arquivam esses dados e os tornam indexáveis e disponíveis publicamente quase para sempre.",
         "slug": "social-media-think-of-all-interactions-as-permanent"
       },
       {
@@ -798,7 +798,7 @@
       {
         "point": "Altere o endereço IP local do roteador",
         "priority": "Optional",
-        "details": "É possível que um script malicioso em seu navegador explore uma vulnerabilidade de script entre sites, acessando roteadores vulneráveis ​​conhecidos em seus endereços IP locais e adulterando-os.",
+        "details": "É possível que um script malicioso em seu navegador explore uma vulnerabilidade de script entre sites, acessando roteadores vulneráveis conhecidos em seus endereços IP locais e adulterando-os.",
         "slug": "networks-change-the-routers-local-ip-address"
       },
       {
@@ -864,7 +864,7 @@
       {
         "point": "Desative o gerenciamento baseado em nuvem",
         "priority": "Optional",
-        "details": "Você deve tratar o painel de administração do seu roteador com o máximo cuidado, pois danos consideráveis ​​podem ser causados ​​se um invasor conseguir obter acesso.",
+        "details": "Você deve tratar o painel de administração do seu roteador com o máximo cuidado, pois danos consideráveis podem ser causados se um invasor conseguir obter acesso.",
         "slug": "networks-disable-cloud-based-management"
       },
       {
@@ -890,8 +890,8 @@
   {
     "title": "Dispositivos móveis",
     "slug": "mobile-devices",
-    "description": "Reduza o rastreamento invasivo para células, smartphones e tablets",
-    "intro": "Os smartphones revolucionaram muitos aspectos da vida e trouxeram o mundo ao nosso alcance. Para muitos de nós, os smartphones são o principal meio de comunicação, entretenimento e acesso ao conhecimento. Mas embora eles tenham levado a conveniência a um nível totalmente novo, há algumas coisas horríveis acontecendo por trás da tela.\nO rastreamento geográfico é usado para rastrear todos os nossos movimentos e temos pouco controle sobre quem possui esses dados – seu telefone é capaz até de [rastrear sua localização sem GPS](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371). Ao longo dos anos, surgiram vários relatórios, descrevendo maneiras pelas quais o [microfone pode escutar](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html) e a [câmera pode observar você](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6) do seu telefone - tudo sem o seu conhecimento ou consentimento. E há também os aplicativos maliciosos, a falta de patches de segurança e backdoors potenciais/prováveis.\nUsar um smartphone gera muitos dados sobre você – desde informações que você compartilha intencionalmente até dados gerados silenciosamente a partir de suas ações. Pode ser assustador ver o que o Google, a Microsoft, a Apple e o Facebook sabem sobre nós – às vezes eles sabem mais do que a nossa família mais próxima. É difícil compreender o que os seus dados revelarão, especialmente em conjunto com outros dados.\nEsses dados são usados ​​para [muito mais do que apenas publicidade](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - mais frequentemente, são usados ​​para avaliar pessoas em finanças, seguros e emprego. Anúncios direcionados podem até ser usados para vigilância refinada (consulte [ADINT](https://adint.cs.washington.edu))\nMuitos de nós estamos preocupados sobre como [os governos coletam e usam nossos dados de smartphones](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/) e, com razão, as agências federais frequentemente [solicitam nossos dados ao Google](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/), [Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/), Apple, Microsoft, Amazon e outras empresas de tecnologia. Às vezes, as solicitações são feitas em massa, retornando informações detalhadas sobre todos dentro de uma determinada cerca geográfica, [muitas vezes para pessoas inocentes.pessoas](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html). E isto não inclui todo o tráfego da Internet ao qual as agências de inteligência de todo o mundo têm acesso irrestrito.",
+    "description": "Reduza o rastreamento invasivo em celulares, smartphones e tablets",
+    "intro": "Os smartphones revolucionaram muitos aspectos da vida e trouxeram o mundo ao nosso alcance. Para muitos de nós, os smartphones são o principal meio de comunicação, entretenimento e acesso ao conhecimento. Mas embora eles tenham levado a conveniência a um nível totalmente novo, há algumas coisas horríveis acontecendo por trás da tela.\nO rastreamento geográfico é usado para rastrear todos os nossos movimentos e temos pouco controle sobre quem possui esses dados – seu telefone é capaz até de [rastrear sua localização sem GPS](https://gizmodo.com/how-to-track-a-cellphone-without-gps-or-consent-1821125371). Ao longo dos anos, surgiram vários relatórios, descrevendo maneiras pelas quais o [microfone pode escutar](https://www.independent.co.uk/life-style/gadgets-and-tech/news/smartphone-apps-listening-privacy-alphonso-shazam-advertising-pool-3d-honey-quest-a8139451.html) e a [câmera pode observar você](https://www.businessinsider.com/hackers-governments-smartphone-iphone-camera-wikileaks-cybersecurity-hack-privacy-webcam-2017-6) do seu telefone - tudo sem o seu conhecimento ou consentimento. E há também os aplicativos maliciosos, a falta de patches de segurança e backdoors potenciais/prováveis.\nUsar um smartphone gera muitos dados sobre você – desde informações que você compartilha intencionalmente até dados gerados silenciosamente a partir de suas ações. Pode ser assustador ver o que o Google, a Microsoft, a Apple e o Facebook sabem sobre nós – às vezes eles sabem mais do que a nossa família mais próxima. É difícil compreender o que os seus dados revelarão, especialmente em conjunto com outros dados.\nEsses dados são usados para [muito mais do que apenas publicidade](https://internethealthreport.org/2018/the-good-the-bad-and-the-ugly-sides-of-data-tracking/) - mais frequentemente, são usados para avaliar pessoas em finanças, seguros e emprego. Anúncios direcionados podem até ser usados para vigilância refinada (consulte [ADINT](https://adint.cs.washington.edu))\nMuitos de nós estamos preocupados sobre como [os governos coletam e usam nossos dados de smartphones](https://www.statista.com/statistics/373916/global-opinion-online-monitoring-government/) e, com razão, as agências federais frequentemente [solicitam nossos dados ao Google](https://www.statista.com/statistics/273501/global-data-requests-from-google-by-federal-agencies-and-governments/), [Facebook](https://www.statista.com/statistics/287845/global-data-requests-from-facebook-by-federal-agencies-and-governments/), Apple, Microsoft, Amazon e outras empresas de tecnologia. Às vezes, as solicitações são feitas em massa, retornando informações detalhadas sobre todos dentro de uma determinada cerca geográfica, [inclusive pessoas inocentes](https://www.nytimes.com/interactive/2019/04/13/us/google-location-tracking-police.html). E isto não inclui todo o tráfego da Internet ao qual as agências de inteligência de todo o mundo têm acesso irrestrito.",
     "checklist": [
       {
         "point": "Criptografe seu dispositivo",
@@ -1240,7 +1240,7 @@
       {
         "point": "Implementar controle de acesso obrigatório",
         "priority": "Advanced",
-        "details": "Restrinja o acesso privilegiado para limitar os danos que podem ser causados ​​se um sistema for comprometido.",
+        "details": "Restrinja o acesso privilegiado para limitar os danos que podem ser causados se um sistema for comprometido.",
         "slug": "personal-computers-implement-mandatory-access-control"
       },
       {
@@ -1314,7 +1314,7 @@
       {
         "point": "Mitigar os riscos do Alexa/Google Home",
         "priority": "Optional",
-        "details": "Considere alternativas focadas na privacidade, como [Mycroft](https://awesome-privacy.xyz/smart-home-and-iot/voice-assistants/mycroft) ou use o Project Alias ​​para evitar a escuta ociosa por assistentes ativados por voz.",
+        "details": "Considere alternativas focadas na privacidade, como [Mycroft](https://awesome-privacy.xyz/smart-home-and-iot/voice-assistants/mycroft) ou use o Project Alias para evitar a escuta ociosa por assistentes ativados por voz.",
         "slug": "smart-home-mitigate-alexa-google-home-risks"
       },
       {
@@ -1341,7 +1341,7 @@
     "title": "Finanças Pessoais",
     "slug": "personal-finance",
     "description": "Protegendo seus fundos, contas financeiras e transações",
-    "intro": "A fraude de cartão de crédito é a forma mais comum de roubo de identidade (com [133.015 relatos apenas nos EUA em 2017](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)) e uma perda total de US$ 905 milhões, o que representou um aumento de 26% em relação ao ano anterior. O valor médio perdido por pessoa foi de US$ 429 em 2017. É mais importante do que nunca tomar medidas básicas para se proteger de ser vítima\nObservação sobre cartões de crédito: Os cartões de crédito possuem métodos tecnológicos para detectar e impedir algumas transações fraudulentas. Os principais processadores de pagamentos implementam isso, extraindo enormes quantidades de dados dos titulares de seus cartões, a fim de saber muito sobre os hábitos de consumo de cada pessoa. Esses dados são usados ​​para identificar fraudes, mas também são vendidos a outros corretores de dados. Os cartões de crédito são, portanto, bons para a segurança, mas terríveis para a privacidade dos dados.",
+    "intro": "A fraude de cartão de crédito é a forma mais comum de roubo de identidade (com [133.015 relatos apenas nos EUA em 2017](https://www.experian.com/blogs/ask-experian/identity-theft-statistics/)) e uma perda total de US$ 905 milhões, o que representou um aumento de 26% em relação ao ano anterior. O valor médio perdido por pessoa foi de US$ 429 em 2017. É mais importante do que nunca tomar medidas básicas para se proteger de ser vítima\nObservação sobre cartões de crédito: Os cartões de crédito possuem métodos tecnológicos para detectar e impedir algumas transações fraudulentas. Os principais processadores de pagamentos implementam isso, extraindo enormes quantidades de dados dos titulares de seus cartões, a fim de saber muito sobre os hábitos de consumo de cada pessoa. Esses dados são usados para identificar fraudes, mas também são vendidos a outros corretores de dados. Os cartões de crédito são, portanto, bons para a segurança, mas terríveis para a privacidade dos dados.",
     "checklist": [
       {
         "point": "Inscreva-se para receber alertas de fraude e monitoramento de crédito",
@@ -1350,7 +1350,7 @@
         "slug": "personal-finance-sign-up-for-fraud-alerts-and-credit-monitoring"
       },
       {
-        "point": "Aplicar um congelamento de crédito",
+        "point": "Congele seu crédito",
         "priority": "Essential",
         "details": "Evite consultas de crédito não autorizadas congelando seu crédito por meio da Experian, TransUnion e Equifax.",
         "slug": "personal-finance-apply-a-credit-freeze"
@@ -1374,13 +1374,13 @@
         "slug": "personal-finance-use-cryptocurrency-for-online-transactions"
       },
       {
-        "point": "Armazene criptografia com segurança",
+        "point": "Armazene criptomoedas com segurança",
         "priority": "Advanced",
         "details": "Armazene criptomoedas com segurança usando geração de carteira offline, carteiras de hardware como [Trezor](https://awesome-privacy.xyz/finance/crypto-wallets/trezor) ou [ColdCard](https://awesome-privacy.xyz/finance/crypto-wallets/coldcard), ou considere soluções de armazenamento de longo prazo como [CryptoSteel](https://awesome-privacy.xyz/finance/crypto-wallets/cryptosteel).",
         "slug": "personal-finance-store-crypto-securely"
       },
       {
-        "point": "Compre criptografia anonimamente",
+        "point": "Compre criptomoedas de forma anônima",
         "priority": "Advanced",
         "details": "Compre criptomoedas sem vincular à sua identidade por meio de serviços como [LocalBitcoins](https://awesome-privacy.xyz/finance/crypto-exchanges/localbitcoins), [Bisq](https://awesome-privacy.xyz/finance/crypto-exchanges/bisq) ou caixas eletrônicos Bitcoin.",
         "slug": "personal-finance-buy-crypto-anonymously"
@@ -1409,7 +1409,7 @@
     "title": "Aspecto Humano",
     "slug": "human-aspect",
     "description": "Evitando riscos de segurança de engenharia social",
-    "intro": "Muitas violações de dados, hacks e ataques são causados ​​por erro humano. A lista a seguir contém etapas que você deve seguir para reduzir o risco de isso acontecer com você. Muitos deles são de bom senso, mas vale a pena anotá-los.",
+    "intro": "Muitas violações de dados, hacks e ataques são causados por erro humano. A lista a seguir contém etapas que você deve seguir para reduzir o risco de isso acontecer com você. Muitos deles são de bom senso, mas vale a pena anotá-los.",
     "checklist": [
       {
         "point": "Verifique os destinatários",
@@ -1534,7 +1534,7 @@
       {
         "point": "Use métodos de pagamento anônimos",
         "priority": "Advanced",
-        "details": "Opte por métodos de pagamento anônimos, como criptomoedas, para evitar inserir informações identificáveis ​​online.",
+        "details": "Opte por métodos de pagamento anônimos, como criptomoedas, para evitar inserir informações identificáveis online.",
         "slug": "human-aspect-use-anonymous-payment-methods"
       }
     ]
