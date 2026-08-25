@@ -47,19 +47,17 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 //
 // A fixed sleep cannot do this job: a run here spans a POST plus up to three
 // real `pollInterval` timers, so any constant is either flaky when the machine
-// is loaded or slow on every green run. The "retries while in-progress" case
-// used to allow 80ms for that chain and failed under a parallel suite with
-// status still 'running' — a wait that expired, reported as a wrong result.
+// is loaded or slow on every green run.
 //
 // The timeout only bounds a hang; it is never reached on a passing run.
-async function waitFor(predicate, { timeout = 2000, label = 'condition' } = {}) {
+const waitFor = async (predicate, { timeout = 2000, label = 'condition' } = {}) => {
   const deadline = Date.now() + timeout;
   for (;;) {
     if (predicate()) return;
     if (Date.now() > deadline) throw new Error(`timed out after ${timeout}ms waiting for ${label}`);
     await tick();
   }
-}
+};
 
 describe('useGlobalpingMeasurement()', () => {
   beforeEach(() => {
