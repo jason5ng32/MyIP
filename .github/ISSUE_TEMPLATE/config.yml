@@ -3,9 +3,6 @@ contact_links:
   - name: 📖 Documentation
     url: https://docs.ipcheck.ing
     about: Deployment, MaxMind setup, environment variables, and how each tool works.
-  - name: 💬 Questions & help
-    url: https://github.com/jason5ng32/MyIP/discussions/categories/q-a
-    about: Setup help, "why does my result look like this", and anything that isn't a bug.
   - name: 🔒 Report a security vulnerability
     url: https://github.com/jason5ng32/MyIP/security/advisories/new
     about: Private report, visible only to the maintainer. Please don't open a public issue.
