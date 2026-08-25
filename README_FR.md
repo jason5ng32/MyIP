@@ -18,7 +18,7 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇹🇼 [繁體中文](README_ZH_TW.md) | 🇷🇺 [Русский](README_RU.md) | 🇫🇷 [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
 
 👉 Démo: [https://ipcheck.ing](https://ipcheck.ing)
 
@@ -55,7 +55,7 @@ Notes: Vous pouvez utiliser ma démo gratuitement et vous pouvez également la d
 * 📲 **Prise en charge de PWA** : Peut être ajouté en tant qu'application de bureau sur votre téléphone ainsi qu'en tant qu'application Chrome sur votre ordinateur.
 * ⌨️ **Raccourcis clavier** : Prend en charge les raccourcis clavier pour toutes les fonctions, appuyez sur `?` pour afficher la liste des raccourcis.
 * 🌍 Basé sur les résultats des tests de disponibilité, il indique si l'accès Internet mondial est actuellement réalisable.
-* 🇺🇸 🇨🇳 🇹🇼 🇷🇺 🇫🇷 Prise en charge de l'anglais, du chinois simplifié, du chinois traditionnel, du russe et du français.
+* 🔤 Prise en charge de plusieurs langues.
 
 ## 📕 Comment utiliser
 

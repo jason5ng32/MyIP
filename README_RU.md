@@ -18,7 +18,7 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Сборка и публикация Docker](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇹🇼 [繁體中文](README_ZH_TW.md) | 🇷🇺 [Русский](README_RU.md) | 🇫🇷 [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
 
 👉 Демо: [https://ipcheck.ing](https://ipcheck.ing)
 
@@ -55,7 +55,7 @@
 * 📲 **Поддержка PWA**: сайт можно установить как приложение на телефон или компьютер через Chrome.
 * ⌨️ **Сочетания клавиш**: все функции поддерживают горячие клавиши; нажмите `?`, чтобы открыть их список.
 * 🌍 По результатам проверки доступности определяется, возможен ли полноценный доступ к глобальному интернету.
-* 🇺🇸 🇨🇳 🇹🇼 🇷🇺 🇫🇷 Поддерживаются английский, китайский (упрощённый и традиционный), русский и французский языки.
+* 🔤 Поддерживаются многочисленные языки.
 
 ## 📕 Использование
 

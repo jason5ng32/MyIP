@@ -18,7 +18,7 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇹🇼 [繁體中文](README_ZH_TW.md) | 🇷🇺 [Русский](README_RU.md) | 🇫🇷 [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
 
 👉 在这里体验：[https://ipcheck.ing](https://ipcheck.ing)
 
@@ -55,7 +55,7 @@
 * 📲 **支持 PWA**：可以添加为手机应用以及电脑里的桌面应用，方便使用
 * ⌨️ **支持快捷键**：可以随时输入 `?` 查看快捷键菜单
 * 🌍 根据可用性检测结果，返回目前是否可以访问全世界网络的提示
-* 🇺🇸 🇨🇳 🇹🇼 🇷🇺 🇫🇷 支持简体中文、繁体中文、英文、俄文、法文
+* 🔤 支持多种语言
 
 ## 📕 如何使用
 

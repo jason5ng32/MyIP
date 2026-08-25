@@ -27,7 +27,6 @@
             <SelectTrigger class="w-full shadow-none">
               <SelectValue>
                 <span class="inline-flex items-center gap-2">
-                  <Icon :icon="'circle-flags:' + (currentLang.flag || 'earth')" class="size-4 shrink-0" />
                   {{ currentLang.label }}
                 </span>
               </SelectValue>
@@ -35,7 +34,6 @@
             <SelectContent>
               <SelectItem v-for="lang in langOptions" :key="lang.value" :value="lang.value">
                 <span class="inline-flex items-center gap-2">
-                  <Icon :icon="'circle-flags:' + (lang.flag || 'earth')" class="size-4 shrink-0" />
                   {{ lang.label }}
                   <!-- Partial translation: literal "Beta", deliberately untranslated. -->
                   <Badge v-if="lang.beta" variant="outline" class="px-1.5 text-[10px] font-medium">Beta</Badge>
