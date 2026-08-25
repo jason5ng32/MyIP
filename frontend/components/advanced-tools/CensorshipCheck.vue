@@ -104,14 +104,16 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x">
                         <!-- Left: suggestion sections (flagged / high-risk / open) +
-                             the picker's own continent catalog. -->
-                        <div class="col-span-1" :class="runStarted
-                                ? 'max-h-72 overflow-y-auto md:max-h-none md:overflow-visible md:relative md:min-h-96'
-                                : 'max-h-72 md:max-h-128 overflow-y-auto'">
-                            <div class="px-4 py-3"
-                                :class="runStarted ? 'md:absolute md:inset-0 md:overflow-y-auto' : ''">
-                                <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
-                                    :max="MAX_TEST_COUNTRIES" :disabled="running" />
+                             the picker's own continent catalog. Scroll container
+                             stays padding-free (sticky top-0 can't cover a
+                             scroll container's own padding) -->
+                        <div class="col-span-1" :class="runStarted ? 'md:relative md:min-h-96' : ''">
+                            <div class="max-h-72 overflow-y-auto"
+                                :class="runStarted ? 'md:max-h-none md:absolute md:inset-0' : 'md:max-h-128'">
+                                <div class="px-4 py-3">
+                                    <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
+                                        :max="MAX_TEST_COUNTRIES" :disabled="running" />
+                                </div>
                             </div>
                         </div>
 

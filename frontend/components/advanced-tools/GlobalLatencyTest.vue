@@ -73,14 +73,17 @@
                          results exist the column caps its own height; once the
                          right column has content, an absolutely-positioned inner
                          wrapper makes the picker exactly as tall as the results
-                         (the row height comes from the right column alone) -->
-                    <div class="col-span-1" :class="pingResults.length > 0
-                            ? 'max-h-72 overflow-y-auto md:max-h-none md:overflow-visible md:relative md:min-h-96'
-                            : 'max-h-72 md:max-h-128 overflow-y-auto'">
-                        <div class="px-4 py-3"
-                            :class="pingResults.length > 0 ? 'md:absolute md:inset-0 md:overflow-y-auto' : ''">
-                            <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
-                                :max="GLOBALPING_MAX_COUNTRIES" :disabled="pingCheckStatus === 'running'" />
+                         (the row height comes from the right column alone).
+                         The scroll container stays padding-free — sticky top-0
+                         can't cover a scroll container's own padding, so the
+                         px-4 py-3 lives one level further in -->
+                    <div class="col-span-1" :class="pingResults.length > 0 ? 'md:relative md:min-h-96' : ''">
+                        <div class="max-h-72 overflow-y-auto"
+                            :class="pingResults.length > 0 ? 'md:max-h-none md:absolute md:inset-0' : 'md:max-h-128'">
+                            <div class="px-4 py-3">
+                                <GlobalpingCountryPicker v-model="selectedCountries" :sections="pickerSections"
+                                    :max="GLOBALPING_MAX_COUNTRIES" :disabled="pingCheckStatus === 'running'" />
+                            </div>
                         </div>
                     </div>
 
