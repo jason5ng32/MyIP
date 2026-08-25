@@ -18,7 +18,7 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-🇺🇸 [English](README.md) | 🇨🇳 [简体中文](README_ZH.md) | 🇷🇺 [Русский](README_RU.md) | 🇫🇷 [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
 
 👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
@@ -55,7 +55,7 @@ Feel free to bookmark the demo or deploy your own.
 * 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
 * ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
 * 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
-* 🇺🇸 🇨🇳 🇷🇺 🇫🇷 English, Chinese, Russian, French support.
+* 🔤 Multiple languages supported.
 
 ## 📕 How to Use
 

@@ -27,7 +27,6 @@
             <SelectTrigger class="w-full shadow-none">
               <SelectValue>
                 <span class="inline-flex items-center gap-2">
-                  <Icon :icon="'circle-flags:' + (currentLang.flag || 'earth')" class="size-4 shrink-0" />
                   {{ currentLang.label }}
                 </span>
               </SelectValue>
@@ -35,7 +34,6 @@
             <SelectContent>
               <SelectItem v-for="lang in langOptions" :key="lang.value" :value="lang.value">
                 <span class="inline-flex items-center gap-2">
-                  <Icon :icon="'circle-flags:' + (lang.flag || 'earth')" class="size-4 shrink-0" />
                   {{ lang.label }}
                   <!-- Partial translation: literal "Beta", deliberately untranslated. -->
                   <Badge v-if="lang.beta" variant="outline" class="px-1.5 text-[10px] font-medium">Beta</Badge>
@@ -173,7 +171,6 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Icon } from '@iconify/vue';
 import {
   AppWindow,
   Database,
@@ -199,11 +196,12 @@ const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);
 };
 
-// "Follow the system" uses circle-flags:earth; other entries use ISO codes.
+// Text-only options — the picker deliberately shows no flags: a language
+// isn't a country (e.g. English under a US flag reads wrong to Brits).
 const langOptions = [
-  { value: 'auto', label: t('nav.preferences.systemAuto'), flag: 'earth' },
-  ...LOCALES.map(({ code, nativeName, flag, status }) => ({
-    value: code, label: nativeName, flag, beta: status === 'beta',
+  { value: 'auto', label: t('nav.preferences.systemAuto') },
+  ...LOCALES.map(({ code, nativeName, status }) => ({
+    value: code, label: nativeName, beta: status === 'beta',
   })),
 ];
 const currentLang = computed(() =>

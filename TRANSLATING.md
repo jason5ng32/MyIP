@@ -1,9 +1,9 @@
 # Translating MyIP
 
-MyIP (demo website: [IPCheck.ing](https://ipcheck.ing)) ships its UI in English, 简体中文, Français and
-Русский. Adding a fifth — or a sixth — is a two-file change, and **a partial translation is
-a welcome first PR**. You do not need to translate everything, and you do not need to know
-Vue.
+MyIP (demo website: [IPCheck.ing](https://ipcheck.ing)) ships its UI in English, 简体中文, 繁體中文,
+Français and Русский. Adding a sixth — or a seventh — is a two-file change, and **a partial
+translation is a welcome first PR**. You do not need to translate everything, and you do not
+need to know Vue.
 
 Anything you leave untranslated falls back to English, so a pack with a hundred strings in
 it is genuinely useful on day one and can grow over several PRs. Untranslated strings stay
@@ -44,7 +44,7 @@ can see at a glance which strings you actually wrote.
 | `frontend/locales/<code>.json` | The main pack — every string in the app UI (~1,150 keys) | **Yes** — all keys, values may be `""` |
 | `frontend/locales/privacy/<code>.json` | Privacy policy copy (~50 keys) | No — but whole or not at all |
 | `frontend/locales/security-checklist/<code>.json` | The Cybersecurity Checklist dataset (~1,080 keys, 258 items) | No — but whole or not at all |
-| `frontend/data/changelog.json` | Release history, one string per language per entry (161 entries) | No — beta languages are exempt |
+| `frontend/data/changelog.json` | Release history, one string per language per entry (163 entries) | No — beta languages are exempt |
 
 `en.json` is the reference for all of them: a translation may lag behind English, never
 contradict it.
@@ -184,7 +184,7 @@ them would fail the gate on your behalf. Translate the new keys, or drop the fil
 
 ## Improving an existing language
 
-Fixes and better phrasings for `en` / `zh` / `fr` / `ru` are just as welcome as new
+Fixes and better phrasings for `en` / `zh` / `zh-TW` / `fr` / `ru` are just as welcome as new
 languages — edit the JSON and open the PR. Two things to keep in mind:
 
 - Prefer natural phrasing over literal translation; this is a networking tool, and the
@@ -201,7 +201,7 @@ maintainer decision, made when the language is actually complete:
 
 - Main pack, privacy copy and security checklist all at 100% against `en` — not a single
   `""` left (`pnpm i18n-status` shows this).
-- Changelog history back-filled — all 161 entries in `frontend/data/changelog.json`.
+- Changelog history back-filled — all 163 entries in `frontend/data/changelog.json`.
 - Enough of a track record that copy changes will keep landing in it.
 
 Once `status` flips to `'full'`, `tests/locale-packs.test.js` and `tests/changelog.test.js`
