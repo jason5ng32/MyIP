@@ -171,7 +171,6 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Icon } from '@iconify/vue';
 import {
   AppWindow,
   Database,
@@ -197,11 +196,12 @@ const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);
 };
 
-// "Follow the system" uses circle-flags:earth; other entries use ISO codes.
+// Text-only options — the picker deliberately shows no flags: a language
+// isn't a country (e.g. English under a US flag reads wrong to Brits).
 const langOptions = [
-  { value: 'auto', label: t('nav.preferences.systemAuto'), flag: 'earth' },
-  ...LOCALES.map(({ code, nativeName, flag, status }) => ({
-    value: code, label: nativeName, flag, beta: status === 'beta',
+  { value: 'auto', label: t('nav.preferences.systemAuto') },
+  ...LOCALES.map(({ code, nativeName, status }) => ({
+    value: code, label: nativeName, beta: status === 'beta',
   })),
 ];
 const currentLang = computed(() =>
