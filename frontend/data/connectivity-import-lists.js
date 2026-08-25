@@ -106,7 +106,7 @@ export const IMPORT_LISTS = [
             { id: 'phonepe', name: 'PhonePe', url: 'https://www.phonepe.com/favicon.ico' },
             { id: 'policybazaar', name: 'Policybazaar', url: 'https://www.policybazaar.com/favicon.ico' },
             { id: 'nykaa', name: 'Nykaa', url: 'https://www.nykaa.com/favicon.ico' },
-            { id: 'justdail', name: 'Justdail', url: 'https://www.justdial.com/favicon.ico' },
+            { id: 'justdial', name: 'Justdial', url: 'https://www.justdial.com/favicon.ico' },
             { id: 'groww', name: 'Groww', url: 'https://groww.in/favicon.ico' },
         ],
     },
