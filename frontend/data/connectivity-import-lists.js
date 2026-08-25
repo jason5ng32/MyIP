@@ -185,6 +185,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'productivity',
+        emoji: '💼',
+        members: [
+            { id: 'notion', name: 'Notion', url: 'https://www.notion.so/front-static/favicon.ico' },
+            { id: 'slack', name: 'Slack', url: 'https://slack.com/favicon.ico' },
+            { id: 'zoom', name: 'Zoom', url: 'https://zoom.us/favicon.ico' },
+            { id: 'figma', name: 'Figma', url: 'https://static.figma.com/app/icon/2/favicon.ico', iconDomain: 'www.figma.com' },
+            { id: 'trello', name: 'Trello', url: 'https://trello.com/favicon.ico' },
+            { id: 'asana', name: 'Asana', url: 'https://asana.com/favicon.ico' },
+            { id: 'dropbox', name: 'Dropbox', url: 'https://cfl.dropboxstatic.com/static/metaserver/static/images/favicon.ico', iconDomain: 'www.dropbox.com' },
+            { id: 'canva', name: 'Canva', url: 'https://www.canva.com/favicon.ico' },
+            { id: 'miro', name: 'Miro', url: 'https://miro.com/favicon.ico' },
+            { id: 'airtable', name: 'Airtable', url: 'https://airtable.com/favicon.ico' },
+            { id: 'linear', name: 'Linear', url: 'https://linear.app/favicon.ico' },
+            { id: 'clickup', name: 'ClickUp', url: 'https://clickup.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'streaming',
         emoji: '🎬',
         members: [
