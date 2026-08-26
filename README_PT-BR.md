@@ -1,5 +1,6 @@
 # 🧰 MyIP - Uma caixa de ferramentas de IP aprimorada
 
+> [!NOTE]
 > Esta é uma tradução mantida pela comunidade; o README em inglês é a fonte canônica e esta versão pode ficar desatualizada.
 
 <div align="center">
@@ -22,6 +23,8 @@
 
 [English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
 
+Uma caixa de ferramentas de IP completa e de código aberto: consulta de IP a partir de múltiplas fontes, testes de conectividade, detecção de WebRTC e de vazamento de DNS, teste de velocidade, MTR, verificação de censura, Whois e muito mais — auto-hospedável com um único comando Docker.
+
 👉 Demonstração: [https://ipcheck.ing](https://ipcheck.ing)
 
 Adicione a demonstração aos favoritos ou faça sua própria implantação.
@@ -30,42 +33,63 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 
 </div>
 
-## 👀 Principais recursos
+## 👀 Recursos
 
-* 🛜 **Veja seus IPs**: Detecta e exibe seus IPs locais a partir de vários provedores IPv4 e IPv6.
-* 🔍 **Consulte informações sobre IPs**: Fornece uma ferramenta para consultar informações sobre qualquer endereço IP.
-* 🕵️ **Informações de IP**: Apresenta informações detalhadas de todos os endereços IP, incluindo país, região, ASN, localização geográfica e muito mais.
-* 🛰️ **Histórico de ASN e topologia de upstream**: Visualize anúncios históricos de AS para um prefixo IP e os caminhos de upstream de um ASN até as redes de backbone Tier 1.
-* 🚦 **Teste de disponibilidade**: Testa a acessibilidade de vários sites, como Google, GitHub, YouTube, ChatGPT e outros.
-* 📡 **Status dos serviços**: Exibe a disponibilidade atual de serviços conhecidos, como Claude, OpenAI, GitHub e Cloudflare, a partir de suas páginas oficiais de status, com o status de cada serviço e incidentes recentes.
-* 🚥 **Detecção de WebRTC**: Identifica o endereço IP usado durante conexões WebRTC.
-* 🛑 **Teste de vazamento de DNS**: Exibe dados de endpoints DNS para avaliar o risco de vazamentos de DNS ao usar VPNs ou proxies.
-* 🚀 **Teste de velocidade**: Testa a velocidade da sua rede com redes de borda.
-* 🚏 **Teste de regras de proxy**: Testa as configurações de regras de software de proxy para assegurar que funcionem corretamente.
-* ⏱️ **Teste global de latência**: Realiza testes de latência em servidores localizados em diferentes regiões do mundo.
-* 🚉 **Teste MTR**: Realiza testes MTR em servidores localizados em diferentes regiões do mundo.
-* 🔦 **Resolvedor DNS**: Resolve nomes de domínio a partir de diversas fontes e obtém resultados de resolução em tempo real que podem ser usados para determinar se há contaminação.
-* 🚧 **Verificação de censura**: Verifica se um site está bloqueado em determinados países.
-* 📓 **Consulta Whois**: Realiza consultas Whois para nomes de domínio ou endereços IP.
-* 📀 **Consulta MAC**: Consulta informações sobre um endereço físico.
-* 🖥️ **Impressões digitais do navegador**: Oferece várias formas de calcular a impressão digital do seu navegador.
-* 📋 **Checklist de cibersegurança**: Um checklist abrangente de cibersegurança com um total de 258 itens.
+### 🪪 Seu IP e identidade
 
-## 💪 Também
+* 🛜 **Cartões de IP**: Detecta seus IPv4 e IPv6 a partir de várias fontes independentes, lado a lado — país, região, cidade, ASN, organização e o fuso horário local do IP.
+* 🔍 **Verificação de IP**: Consulta as mesmas informações detalhadas de qualquer endereço IP que despertar sua curiosidade.
+* 🧾 **Histórico de IP**: Mantém um registro local dos IPs com os quais você já foi visto, filtrável por tipo e país — armazenado apenas no seu navegador.
+* 🖥️ **Impressão digital do navegador**: Calcula a impressão digital do seu navegador de várias formas e mostra o que torna você identificável.
 
-* 🌗 **Modo escuro**: Alterna automaticamente entre os modos escuro e claro com base nas configurações do sistema, além de permitir a alteração manual.
-* 📲 **Suporte a PWA**: Pode ser instalado como aplicativo no celular e como app do Chrome no computador.
-* ⌨️ **Atalhos de teclado**: Oferece atalhos de teclado para todas as funções; pressione `?` para ver a lista de atalhos.
-* 🌍 Com base nos resultados dos testes de disponibilidade, indica se o acesso global à Internet está viável no momento.
-* 🔤 Compatível com diversos idiomas.
+### 🕵️ Vazamentos e privacidade
+
+* 🚥 **Detecção de WebRTC**: Revela o endereço IP exposto durante conexões WebRTC — inclusive se as proteções de privacidade do seu navegador estão ativas.
+* 🛑 **Teste de vazamento de DNS**: Mostra quais endpoints DNS resolvem suas consultas, para avaliar o risco de vazamentos de DNS ao usar VPNs ou proxies.
+* 📋 **Checklist de segurança**: Um checklist pessoal de cibersegurança com 258 itens em 12 áreas, com progresso salvo no seu navegador.
+
+### 📡 Testes de rede
+
+* 🚦 **Conectividade de rede**: Testa a acessibilidade de até 60 sites da sua escolha, com resultados de latência mínima em múltiplas rodadas — além de listas de importação selecionadas, de pacotes por país a IA, redes sociais, streaming, jogos, desenvolvimento e mais. Com base nos resultados, indica se o acesso global à Internet está viável para você no momento.
+* 🚀 **Teste de velocidade**: Mede seu download, upload e latência em redes de borda.
+* ⏱️ **Teste de latência global**: Faz ping no seu alvo a partir de sondas espalhadas pelo mundo — escolha países entre todas as sondas Globalping disponíveis, agrupadas por continente.
+* 🚉 **Teste MTR**: Executa MTR a partir de sondas distribuídas globalmente para ver a rota que os pacotes realmente percorrem.
+* 🚧 **Verificação de censura**: Mostra onde um site está bloqueado no mundo — e por quais meios.
+* 🚏 **Teste de regras de proxy**: Verifica se a configuração de regras do seu software de proxy funciona do jeito que você pretendia.
+
+### 🔦 Consultas e infraestrutura
+
+* 📟 **Resolução DNS**: Resolve um domínio por vários resolvedores de uma só vez, agrupados por país — um jeito fácil de detectar sequestro ou contaminação.
+* 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio e endereços IP.
+* 🗄️ **Consulta de MAC**: Identifica o fabricante e os detalhes por trás de um endereço físico.
+* 🛰️ **Informações de ASN e topologia de upstream**: Mostra detalhes do AS, anúncios históricos de um prefixo IP e os caminhos de upstream de um ASN até o backbone Tier 1.
+* 📶 **Status dos serviços**: Disponibilidade em tempo real de serviços conhecidos — Claude, OpenAI, GitHub, Cloudflare e outros — a partir de suas páginas oficiais de status, com incidentes recentes.
+
+### ✨ Plataforma
+
+* 📤 **Relatórios compartilháveis**: Transforme seus resultados de teste em um relatório diagnóstico — um link somente leitura com expiração automática, Markdown pronto para IA ou JSON.
+* ⌨️ **API de linha de comando**: Obtenha seu IP no terminal com um único comando `curl`.
+* 🌍 **Earth Online**: Um painel que transmite eventos globais de indisponibilidade da Internet em tempo real.
+* 🌗 **Modo escuro**: Acompanha automaticamente o sistema, com alternância manual.
+* 📲 **PWA**: Instalável como aplicativo no celular e como app do Chrome no computador.
+* ⚡ **Atalhos de teclado**: Toda função tem o seu — pressione `?` para ver a lista.
+* 🔤 **Vários idiomas**: A interface é distribuída em 6 idiomas, e adicionar o seu exige apenas um pacote de locale.
 
 ## 📕 Como usar
 
+### Usando Docker
+
+Um comando e pronto:
+
+```bash
+docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+```
+
+Ou clique no botão "Deploy with Docker" no topo desta página.
+
 ### Implantação em um ambiente Node
 
-Certifique-se de que o Node.js esteja instalado.
-
-Clone o código:
+Certifique-se de que o Node.js esteja instalado e, em seguida, clone o código:
 
 ```bash
 git clone https://github.com/jason5ng32/MyIP.git
@@ -86,13 +110,25 @@ pnpm start
 
 O programa será executado na porta 18966.
 
-### Uso com Docker
+## ⚙️ Configuração
 
-Clique no botão “Deploy to Docker” no topo deste documento para concluir a implantação. Ou use o comando a seguir:
+> [!IMPORTANT]
+> **As credenciais do MaxMind GeoLite2 são obrigatórias.** Elas viabilizam a geolocalização de IP e as consultas ASN — sem elas, a fonte MaxMind retorna 503. Elas são gratuitas: → [Configuração do MaxMind](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
+
+> [!WARNING]
+> **`ALLOWED_DOMAINS` é obrigatório em um domínio real.** É a lista de nomes de host permitidos para a API de backend — sem ela, toda solicitação proveniente de um domínio que não seja localhost recebe 403. → [Proxy reverso e domínios](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
 
 ```bash
-docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+docker run -d -p 18966:18966 \
+  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
+  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
+  -e MAXMIND_AUTO_UPDATE="true" \
+  -e ALLOWED_DOMAINS="your-domain.com" \
+  --name myip --restart always \
+  jason5ng32/myip:latest
 ```
+
+Todo o restante — chaves de API opcionais, segurança e limitação de taxa, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentação
 
@@ -109,29 +145,12 @@ As contribuições são bem-vindas! Mantemos uma seleção de tarefas adequadas 
 * 🌐 [TRANSLATING.md](TRANSLATING.md) — leve a UI ao seu idioma: um pacote de locale e uma linha no registro; uma **tradução parcial é bem-vinda em uma primeira PR**
 * 📄 [CONTRIBUTING.md](CONTRIBUTING.md) — instalação, convenções e o fluxo das PRs (direcione-as para a branch `dev`)
 
-## ⚙️ Configuração
-
-Dois ajustes são essenciais antes de qualquer outra coisa:
-
-* **MaxMind GeoLite2 (obrigatório)** — credenciais gratuitas que viabilizam a geolocalização de IP e as consultas ASN. Sem elas, a fonte MaxMind retorna 503. → [Configuração do MaxMind](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
-* **`ALLOWED_DOMAINS` (obrigatório em um domínio real)** — lista de nomes de host permitidos para a API de backend. Sem ela, toda solicitação proveniente de um domínio que não seja localhost recebe 403. → [Proxy reverso e domínios](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
-
-```bash
-docker run -d -p 18966:18966 \
-  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
-  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
-  -e MAXMIND_AUTO_UPDATE="true" \
-  -e ALLOWED_DOMAINS="your-domain.com" \
-  --name myip --restart always \
-  jason5ng32/myip:latest
-```
-
-Todo o restante — chaves de API opcionais, segurança e limitação de taxa, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
-
-
 ## 👩🏻‍💻 Uso avançado
 
-Se você usa um proxy para acessar a Internet, considere adicionar esta regra à configuração do proxy e adaptá-la ao seu cliente. Essa configuração permite verificar tanto seu IP real quanto o IP usado com o proxy:
+<details>
+<summary>Regras de proxy para verificar seu IP real e seu IP de proxy ao mesmo tempo</summary>
+
+Se você usa um proxy para acessar a Internet, considere adicionar esta regra à configuração do proxy (adapte-a ao seu cliente). Essa configuração permite verificar tanto seu IP real quanto o IP usado com o proxy:
 
 ```ini
 # IP Testing
@@ -150,9 +169,11 @@ DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
 
+</details>
+
 ## 💖 Patrocinadores
 
-Como projeto de código aberto, somos muito gratos aos seguintes patrocinadores pelo apoio:
+Como projeto de código aberto, sou muito grato aos seguintes patrocinadores pelo apoio:
 
 <a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
@@ -167,3 +188,7 @@ Como projeto de código aberto, somos muito gratos aos seguintes patrocinadores 
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
+
+## 📄 Licença
+
+[MIT](LICENSE) © Jason Ng
