@@ -1978,6 +1978,17 @@
       {
         "type": "add",
         "change": {
+          "en": "Added a country online-activity heatmap: see when an IP's country is online by weekday and hour, with a human-only traffic switch",
+          "zh": "新增国家/地区网络活跃时段热力图：按星期和小时查看 IP 所在国家的活跃分布，可切换仅看人类流量",
+          "zh-TW": "新增國家/地區網路活躍時段熱力圖：依星期與小時查看 IP 所在國家的活躍分布，可切換僅看人類流量",
+          "fr": "Ajout d'une carte thermique de l'activité en ligne par pays : répartition par jour de la semaine et par heure, avec option trafic humain uniquement",
+          "ru": "Добавлена тепловая карта онлайн-активности страны: распределение по дням недели и часам, с переключателем «только люди»",
+          "pt-BR": "Adicionado mapa de calor da atividade online por país: distribuição por dia da semana e hora, com opção de tráfego somente humano"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
           "en": "For developers: refactored the multi-language architecture, making it easier to add new languages",
           "zh": "为开发者：重构多国语言架构，添加新语言变得更容易",
           "zh-TW": "為開發者：重構多國語言架構，新增語言變得更容易",
@@ -2039,17 +2050,6 @@
           "fr": "Correction de divers problèmes",
           "ru": "Исправлены некоторые проблемы",
           "pt-BR": "Corrigidos alguns problemas"
-        }
-      },
-      {
-        "type": "add",
-        "change": {
-          "en": "Added a country online-activity heatmap: see when an IP's country is online by weekday and hour, with a human-only traffic switch",
-          "zh": "新增国家/地区网络活跃时段热力图：按星期和小时查看 IP 所在国家的活跃分布，可切换仅看人类流量",
-          "zh-TW": "新增國家/地區網路活躍時段熱力圖：依星期與小時查看 IP 所在國家的活躍分布，可切換僅看人類流量",
-          "fr": "Ajout d'une carte thermique de l'activité en ligne par pays : répartition par jour de la semaine et par heure, avec option trafic humain uniquement",
-          "ru": "Добавлена тепловая карта онлайн-активности страны: распределение по дням недели и часам, с переключателем «только люди»",
-          "pt-BR": "Adicionado mapa de calor da atividade online por país: distribuição por dia da semana e hora, com opção de tráfego somente humano"
         }
       }
     ]
