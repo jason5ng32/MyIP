@@ -17,6 +17,14 @@
                 <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
                     class="shrink-0 size-4" />
                 <span class="wrap-break-word">{{ data.country_name }}</span>
+                <JnTooltip v-if="canShowCountryTraffic" :text="t('Tooltips.ShowCountryTraffic')" side="left">
+                    <button type="button"
+                        class="shrink-0 -my-0.5 p-1 rounded-md hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                        @click="openTrafficDialog"
+                        :aria-label="'Show online activity pattern of ' + data.country_name">
+                        <Activity class="size-3.5" />
+                    </button>
+                </JnTooltip>
             </dd>
         </div>
 
@@ -216,6 +224,11 @@
         </Collapsible>
     </div>
 
+    <!-- Country online-activity dialog. Same opt-in rationale as the Map Dialog. -->
+    <CountryTraffic v-if="enableCountryTraffic" :open="isTrafficDialogOpen"
+        @update:open="isTrafficDialogOpen = $event" :country-code="data.country_code || ''"
+        :country-name="data.country_name" :timezone="data.timezone" :isDarkMode="isDarkMode" />
+
     <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
     <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
         <DialogContent :title="data.ip" class="max-w-2xl">
@@ -261,6 +274,7 @@ import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
+import CountryTraffic from './CountryTraffic.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it
 // only enters the bundle when a user opens the Connectivity panel.
 import { defineAsyncComponent } from 'vue';
@@ -273,6 +287,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import { Earth } from '@lucide/vue';
 import {
+    Activity,
     Building2,
     CornerUpRight,
     Equal,
@@ -313,6 +328,8 @@ const props = defineProps({
     // IPCard opts in to show the Map button (in the City cell) + the Map Dialog.
     // QueryIP opts out — the parent is already a Dialog, stacking dialogs is confusing.
     enableMap: { type: Boolean, default: false },
+    // Same opt-in for the Country online-activity button + dialog (Country cell).
+    enableCountryTraffic: { type: Boolean, default: false },
 });
 
 // Consumers rendering this panel inside a dialog listen to close themselves
@@ -330,6 +347,7 @@ const openUsageDialog = () => {
 const activePanel = ref(null);
 const isPanelOpen = ref(false);
 const isMapDialogOpen = ref(false);
+const isTrafficDialogOpen = ref(false);
 
 // The backend sends the zone name only; the offset follows DST, so it is
 // resolved here rather than travelling through the routes' 24h edge cache.
@@ -403,6 +421,17 @@ const qualityTone = computed(() => {
 const openMapDialog = () => {
     isMapDialogOpen.value = true;
     trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
+};
+
+// Consumer opt-in + a Cloudflare key on the deployment + a country to query.
+const canShowCountryTraffic = computed(() =>
+    props.enableCountryTraffic && !props.collapsed
+    && Boolean(props.configs.cloudFlare) && Boolean(props.data.country_code)
+);
+
+const openTrafficDialog = () => {
+    isTrafficDialogOpen.value = true;
+    trackEvent('IPCheck', 'CountryTrafficClick', props.data.country_code || 'unknown');
 };
 
 // BGP DFZ-floor prefix for the IP — /24 v4, /48 v6. Used both as the query

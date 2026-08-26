@@ -18,6 +18,7 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
+import cfRadarTrafficHandler, { buildTrafficMatrix } from '../api/cf-radar-traffic.js';
 import netOutagesHandler from '../api/net-outages.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
@@ -357,6 +358,67 @@ describe('cf-radar handler', () => {
         await cfRadarHandler(createRequest({ query: { asn: 'AS12345' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+});
+
+// -- cf-radar-traffic handler -----------------------------------------------
+
+describe('cf-radar-traffic handler', () => {
+    it('returns 500 when no Cloudflare API key is configured', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        const res = createResponse();
+        await cfRadarTrafficHandler(createRequest({ query: { country: 'US' } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+describe('buildTrafficMatrix', () => {
+    // 28 days of hourly points from Monday 2024-01-01T00:00Z, Radar-style
+    // string values. `valueAt` receives the point's UTC date.
+    const makeSerie = (valueAt) => {
+        const start = Date.UTC(2024, 0, 1);
+        const timestamps = [];
+        const values = [];
+        for (let i = 0; i < 28 * 24; i++) {
+            const date = new Date(start + i * 60 * 60 * 1000);
+            timestamps.push(date.toISOString());
+            values.push(String(valueAt(date)));
+        }
+        return { timestamps, values };
+    };
+
+    it('returns null for a missing or malformed serie', () => {
+        assert.equal(buildTrafficMatrix(undefined), null);
+        assert.equal(buildTrafficMatrix({}), null);
+        assert.equal(buildTrafficMatrix({ timestamps: [], values: [] }), null);
+    });
+
+    it('returns null when the serie covers less than a full week', () => {
+        const serie = makeSerie(() => 0.5);
+        serie.timestamps = serie.timestamps.slice(0, 100);
+        serie.values = serie.values.slice(0, 100);
+        assert.equal(buildTrafficMatrix(serie), null);
+    });
+
+    it('aggregates into a Monday-first 7×24 matrix scaled to a max of 1', () => {
+        // Baseline 0.1 with a spike every Tuesday at 05:00 UTC.
+        const serie = makeSerie((date) => (date.getUTCDay() === 2 && date.getUTCHours() === 5 ? 1 : 0.1));
+        const matrix = buildTrafficMatrix(serie);
+        assert.equal(matrix.length, 7);
+        assert.ok(matrix.every((row) => row.length === 24));
+        assert.equal(matrix[1][5], 1); // Tuesday is row 1 when Monday-first
+        assert.equal(matrix[0][0], 0.1);
+        assert.equal(Math.max(...matrix.flat()), 1);
+    });
+
+    it('skips unparsable points without breaking the aggregate', () => {
+        const serie = makeSerie(() => 0.5);
+        serie.values[0] = 'not-a-number';
+        const matrix = buildTrafficMatrix(serie);
+        assert.equal(matrix.length, 7);
+        assert.equal(Math.max(...matrix.flat()), 1);
     });
 });
 

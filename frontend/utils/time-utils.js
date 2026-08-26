@@ -18,14 +18,15 @@ export const formatUtcOffset = (offsetMinutes) => {
     return `${sign}${hh}:${mm}`;
 };
 
-// Current UTC offset of an IANA zone name ("Asia/Singapore" → "+08:00"), '' for
-// a missing or unrecognized zone. The backend sends geo results the zone name
-// alone — offsets are computed here, per view, because those routes sit behind
-// a 24h edge cache that would keep serving a pre-DST offset after the switch.
+// Current UTC offset of an IANA zone in east-positive minutes
+// ("Asia/Singapore" → 480), null for a missing or unrecognized zone. The
+// backend sends geo results the zone name alone — offsets are computed here,
+// per view, because those routes sit behind a 24h edge cache that would keep
+// serving a pre-DST offset after the switch.
 //
 // `at` exists so tests can pin an instant; callers pass nothing and get now.
-export const getZoneUtcOffset = (timezone, at = new Date()) => {
-    if (!timezone) return '';
+export const getZoneUtcOffsetMinutes = (timezone, at = new Date()) => {
+    if (!timezone) return null;
 
     let label = '';
     try {
@@ -34,18 +35,25 @@ export const getZoneUtcOffset = (timezone, at = new Date()) => {
             .find((part) => part.type === 'timeZoneName')?.value || '';
     } catch {
         // Unknown zone name — Intl throws rather than falling back.
-        return '';
+        return null;
     }
 
     // Intl spells the offset "GMT+08:00" / "GMT-03:30", and a bare "GMT" at zero.
     const match = label.match(/^GMT(?:([+-])(\d{1,2})(?::(\d{2}))?)?$/);
-    if (!match) return '';
+    if (!match) return null;
 
     const [, sign, hours, minutes] = match;
-    if (!sign) return formatUtcOffset(0);
+    if (!sign) return 0;
 
     const total = Number(hours) * 60 + Number(minutes || 0);
-    return formatUtcOffset(sign === '-' ? -total : total);
+    return sign === '-' ? -total : total;
+};
+
+// Same offset formatted for display ("Asia/Singapore" → "+08:00"), '' for a
+// missing or unrecognized zone.
+export const getZoneUtcOffset = (timezone, at = new Date()) => {
+    const minutes = getZoneUtcOffsetMinutes(timezone, at);
+    return minutes == null ? '' : formatUtcOffset(minutes);
 };
 
 // Wall-clock time in an IANA zone right now, localized for the viewer
@@ -79,6 +87,18 @@ export const getTimezoneInfo = () => {
         offset = formatUtcOffset(-new Date().getTimezoneOffset());
     } catch { /* leave empty */ }
     return { timezone, offset };
+};
+
+// Monday-first localized weekday abbreviations ("Mon" / "周一"), built by
+// formatting a fixed known-Monday week (2024-01-01, UTC) so Intl owns the
+// wording. Used for the traffic heatmap's row labels.
+export const getWeekdayNames = (locale) => {
+    try {
+        const fmt = new Intl.DateTimeFormat(locale || undefined, { weekday: 'short', timeZone: 'UTC' });
+        return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(Date.UTC(2024, 0, 1 + i))));
+    } catch {
+        return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    }
 };
 
 /* ------------------------------------------------------------------ */

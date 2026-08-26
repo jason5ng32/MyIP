@@ -993,6 +993,7 @@
     "CopyIP": "复制 IP 地址",
     "CopySdpLog": "复制 SDP 日志",
     "ViewOnMap": "在地图上查看位置",
+    "ShowCountryTraffic": "查看网络活跃时段",
     "InfoMask": "隐藏信息",
     "IPHistory": "查看 IP 历史记录",
     "ShareReport": "生成诊断报告",
@@ -1152,6 +1153,12 @@
       "NativeIPYes": "原生",
       "NativeIPNo": "非原生",
       "nativenessTooltip": "判断 ASN 的注册国家是否与 IP 的归属国家一致"
+    },
+    "countryTraffic": {
+      "subtitle": "该国家/地区的每周网络活跃分布—— 你可以选择仅看人类所产生的流量或全部流量（包含机器人/自动化流量）。",
+      "human": "仅人类流量",
+      "loading": "加载中...",
+      "error": "加载网络活跃数据失败。"
     }
   },
   "serviceStatus": {

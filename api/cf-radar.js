@@ -1,10 +1,10 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 
-// Common fetch request function.
+// Common fetch request function, shared with cf-radar-traffic.
 // CLOUDFLARE_API is the pre-rename spelling — keep reading it so existing
 // deployments don't lose the key on upgrade.
-async function fetchFromCloudflare(endpoint) {
+export async function fetchFromCloudflare(endpoint) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
     const response = await fetchUpstream(url, {
         headers: {
@@ -20,7 +20,8 @@ async function fetchFromCloudflare(endpoint) {
 }
 
 // The five Radar segments backing one /api/cfradar response, keyed by the
-// field name cleanUpResponseData expects.
+// field name cleanUpResponseData expects. (The country online-activity
+// heatmap lives on its own route, cf-radar-traffic.)
 const SEGMENTS = {
     asnInfo: (asn) => `/radar/entities/asns/${asn}`,
     ipVersion: (asn) => `/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`,

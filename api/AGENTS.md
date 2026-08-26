@@ -14,7 +14,7 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `net-outages` / `asn-history` / `asn-connectivity` /
+`cf-radar` / `cf-radar-traffic` / `net-outages` / `asn-history` / `asn-connectivity` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
@@ -85,6 +85,9 @@ these checks:
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
 - `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric
   (`cf-radar` predates it and still validates inline).
+- `requireValidCountry()` — `?country=` (alpha-2), uppercases in place for one
+  canonical edge-cache key. Syntactic only — an unassigned code just yields an
+  empty upstream series.
 - `requireValidProviderId()` — whitelists `?id=` against service-status slugs.
 - `requireValidRecordType()` — whitelists `?type=` against `DNS_RECORD_TYPES`
   in `common/dns-record-types.js` and uppercases it. That list is the single

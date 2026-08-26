@@ -12,6 +12,8 @@ import {
     getTimezoneInfo,
     getZoneUtcOffset,
     getZoneLocalTime,
+    getZoneUtcOffsetMinutes,
+    getWeekdayNames,
     relativeTimeFromMinutes,
     relativeTimeSince,
     formatDuration,
@@ -120,6 +122,46 @@ describe('getTimezoneInfo', () => {
     const { offset } = getTimezoneInfo();
     // Empty only on platforms without Date; otherwise must match ±HH:MM.
     assert.match(offset, /^$|^[+-]\d{2}:\d{2}$/);
+  });
+});
+
+describe('getZoneUtcOffsetMinutes', () => {
+    it('returns east-positive minutes for whole and half-hour zones', () => {
+        const jan = new Date('2026-01-15T12:00:00Z');
+        assert.equal(getZoneUtcOffsetMinutes('Asia/Singapore', jan), 480);
+        assert.equal(getZoneUtcOffsetMinutes('Asia/Kolkata', jan), 330);
+        assert.equal(getZoneUtcOffsetMinutes('America/New_York', jan), -300);
+        assert.equal(getZoneUtcOffsetMinutes('UTC', jan), 0);
+    });
+
+    it('follows DST at the pinned instant', () => {
+        assert.equal(getZoneUtcOffsetMinutes('America/New_York', new Date('2026-07-15T12:00:00Z')), -240);
+    });
+
+    it('returns null for missing or unknown zones', () => {
+        assert.equal(getZoneUtcOffsetMinutes(''), null);
+        assert.equal(getZoneUtcOffsetMinutes('Not/AZone'), null);
+    });
+});
+
+describe('getWeekdayNames', () => {
+  it('returns seven Monday-first names in English', () => {
+    const names = getWeekdayNames('en');
+    assert.equal(names.length, 7);
+    assert.equal(names[0], 'Mon');
+    assert.equal(names[6], 'Sun');
+  });
+
+  it('localizes for every registered locale without throwing', () => {
+    for (const code of LOCALE_CODES) {
+      const names = getWeekdayNames(code);
+      assert.equal(names.length, 7);
+      assert.ok(names.every((n) => typeof n === 'string' && n.length > 0), code);
+    }
+  });
+
+  it('starts the Chinese week on 周一', () => {
+    assert.equal(getWeekdayNames('zh')[0], '周一');
   });
 });
 

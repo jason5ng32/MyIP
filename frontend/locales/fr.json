@@ -993,6 +993,7 @@
     "CopyIP": "Copier l'adresse IP",
     "CopySdpLog": "Copier le journal SDP",
     "ViewOnMap": "Voir l'emplacement sur la carte",
+    "ShowCountryTraffic": "Voir le rythme d'activité en ligne",
     "InfoMask": "Masquer les informations IP",
     "IPHistory": "Voir l'historique des IP",
     "ShareReport": "Créer un rapport de diagnostic",
@@ -1152,6 +1153,12 @@
       "NativeIPYes": "Aligné",
       "NativeIPNo": "Décalé",
       "nativenessTooltip": "Indique si le pays d'enregistrement de l'ASN correspond au pays de géolocalisation de l'IP"
+    },
+    "countryTraffic": {
+      "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",
+      "human": "Humains uniquement",
+      "loading": "Chargement...",
+      "error": "Échec du chargement de l'activité en ligne."
     }
   },
   "serviceStatus": {

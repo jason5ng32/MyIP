@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId } from './common/guards.js';
+    requireValidRecordType, requireValidReportId, requireValidCountry } from './common/guards.js';
 import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
@@ -23,6 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfHander from './api/cf-radar.js';
+import cfRadarTrafficHandler from './api/cf-radar-traffic.js';
 import netOutagesHandler from './api/net-outages.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
@@ -269,6 +270,7 @@ app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesH
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
 app.get('/api/cfradar', cacheable(THIRTY_DAYS_CACHE), cfHander);
+app.get('/api/cfradar-traffic', requireValidCountry(), cacheable(THIRTY_DAYS_CACHE), cfRadarTrafficHandler);
 app.get('/api/asn-history', requireValidPrefix(), cacheable(THIRTY_DAYS_CACHE), asnHistoryHandler);
 app.get('/api/asn-connectivity', requireValidASN(), cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
 app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
