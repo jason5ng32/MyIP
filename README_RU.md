@@ -21,7 +21,7 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
 
 Универсальный набор IP-инструментов с открытым исходным кодом: определение IP по нескольким источникам, проверка доступности сайтов, обнаружение утечек WebRTC и DNS, тест скорости, MTR, проверка цензуры, Whois и многое другое — разворачивается на своём сервере одной командой Docker.
 
