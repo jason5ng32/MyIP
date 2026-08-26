@@ -147,6 +147,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'germany',
+        emoji: '🇩🇪',
+        members: [
+            { id: 'deutsche-bahn', name: 'Deutsche Bahn', url: 'https://www.bahn.de/favicon.ico' },
+            { id: 'dhl-de', name: 'DHL', url: 'https://www.dhl.de/favicon.ico' },
+            { id: 'otto', name: 'OTTO', url: 'https://www.otto.de/favicon.ico' },
+            { id: 'spiegel', name: 'DER SPIEGEL', url: 'https://www.spiegel.de/favicon.ico' },
+            { id: 'check24', name: 'CHECK24', url: 'https://www.check24.de/favicon.ico' },
+            { id: 'bund-de', name: 'Bund.de', url: 'https://www.bund.de/favicon.ico' },
+            { id: 'tagesschau', name: 'tagesschau', url: 'https://www.tagesschau.de/favicon.ico' },
+            { id: 'kleinanzeigen', name: 'Kleinanzeigen', url: 'https://www.kleinanzeigen.de/favicon.ico' },
+            { id: 'zdf', name: 'ZDF', url: 'https://www.zdf.de/favicon.ico' },
+            { id: 'telekom-de', name: 'Deutsche Telekom', url: 'https://www.telekom.de/favicon.ico' },
+            { id: 'amazon-de', name: 'Amazon.de', url: 'https://www.amazon.de/favicon.ico' },
+            { id: 'google-de', name: 'Google.de', url: 'https://www.google.de/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
