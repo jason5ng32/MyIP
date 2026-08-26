@@ -10,7 +10,8 @@
           "zh": "显示用户的 IP 信息",
           "zh-TW": "顯示使用者的 IP 資訊",
           "fr": "Affichage des informations IP de l'utilisateur",
-          "ru": "Добавлено отображение информации об IP-адресе пользователя"
+          "ru": "Добавлено отображение информации об IP-адресе пользователя",
+          "pt-BR": "Exibir informações de IP do usuário"
         }
       },
       {
@@ -20,7 +21,8 @@
           "zh": "显示代理前后的 IP 信息",
           "zh-TW": "顯示代理前後的 IP 資訊",
           "fr": "Affichage des informations IP avant et après le proxy",
-          "ru": "Добавлено отображение информации об IP-адресе до и после использования прокси"
+          "ru": "Добавлено отображение информации об IP-адресе до и после использования прокси",
+          "pt-BR": "Exibir informações de IP antes e depois do proxy"
         }
       },
       {
@@ -30,7 +32,8 @@
           "zh": "检查网站可用性",
           "zh-TW": "檢查網站可用性",
           "fr": "Vérification de la disponibilité des sites web",
-          "ru": "Добавлена проверка доступности сайтов"
+          "ru": "Добавлена проверка доступности сайтов",
+          "pt-BR": "Verifique a disponibilidade do site"
         }
       }
     ]
@@ -46,7 +49,8 @@
           "zh": "使用 Vue2 重构了整个项目",
           "zh-TW": "使用 Vue2 重構了整個專案",
           "fr": "Refonte complète du projet en utilisant Vue2",
-          "ru": "Выполнен полный рефакторинг проекта с использованием Vue2"
+          "ru": "Выполнен полный рефакторинг проекта с использованием Vue2",
+          "pt-BR": "Projeto inteiro refatorado com Vue 2"
         }
       },
       {
@@ -56,7 +60,8 @@
           "zh": "使用 Bootstrap v5 重构了 UI",
           "zh-TW": "使用 Bootstrap v5 重構了 UI",
           "fr": "Refonte de l'interface utilisateur en utilisant Bootstrap v5",
-          "ru": "Выполнен рефакторинг UI с использованием Bootstrap v5"
+          "ru": "Выполнен рефакторинг UI с использованием Bootstrap v5",
+          "pt-BR": "UI refatorada usando Bootstrap v5"
         }
       }
     ]
@@ -72,7 +77,8 @@
           "zh": "添加了 WebRTC 测试",
           "zh-TW": "新增了 WebRTC 測試",
           "fr": "Ajout du test WebRTC",
-          "ru": "Добавлен тест WebRTC"
+          "ru": "Добавлен тест WebRTC",
+          "pt-BR": "Adicionado teste WebRTC"
         }
       },
       {
@@ -82,7 +88,8 @@
           "zh": "优化了程序的一些逻辑",
           "zh-TW": "最佳化了程式的一些邏輯",
           "fr": "Optimisation de la logique du programme",
-          "ru": "Оптимизирована логика программы"
+          "ru": "Оптимизирована логика программы",
+          "pt-BR": "Lógica de programa otimizada"
         }
       }
     ]
@@ -98,7 +105,8 @@
           "zh": "添加了 DNS 泄露测试",
           "zh-TW": "新增了 DNS 洩漏測試",
           "fr": "Ajout du test de fuite DNS",
-          "ru": "Добавлен тест утечки DNS"
+          "ru": "Добавлен тест утечки DNS",
+          "pt-BR": "Adicionado teste de vazamento de DNS"
         }
       },
       {
@@ -108,7 +116,8 @@
           "zh": "支持在前端显示 Bing 地图",
           "zh-TW": "支援在前端顯示 Bing 地圖",
           "fr": "Prise en charge de l'affichage des cartes Bing dans l'interface",
-          "ru": "Добавлена поддержка карт Bing в клиентском интерфейсе"
+          "ru": "Добавлена поддержка карт Bing в клиентском интерфейсе",
+          "pt-BR": "Suporte à exibição de mapas do Bing no frontend"
         }
       },
       {
@@ -118,7 +127,8 @@
           "zh": "多个逻辑优化",
           "zh-TW": "多項邏輯最佳化",
           "fr": "Multiples optimisations de la logique",
-          "ru": "Выполнено несколько оптимизаций логики"
+          "ru": "Выполнено несколько оптимизаций логики",
+          "pt-BR": "Múltiplas otimizações lógicas"
         }
       }
     ]
@@ -134,7 +144,8 @@
           "zh": "添加了黑暗模式",
           "zh-TW": "新增了深色模式",
           "fr": "Ajout du mode sombre",
-          "ru": "Добавлена тёмная тема"
+          "ru": "Добавлена тёмная тема",
+          "pt-BR": "Adicionado modo escuro"
         }
       },
       {
@@ -144,7 +155,8 @@
           "zh": "增加移动版简约模式",
           "zh-TW": "新增行動版簡潔模式",
           "fr": "Ajout du mode minimaliste pour mobile",
-          "ru": "Добавлен минималистичный режим для мобильных устройств"
+          "ru": "Добавлен минималистичный режим для мобильных устройств",
+          "pt-BR": "Adicionado modo minimalista para celular"
         }
       },
       {
@@ -154,7 +166,8 @@
           "zh": "优化了文件结构",
           "zh-TW": "最佳化了檔案結構",
           "fr": "Optimisation de la structure des fichiers",
-          "ru": "Оптимизирована структура файлов"
+          "ru": "Оптимизирована структура файлов",
+          "pt-BR": "Estrutura de arquivos otimizada"
         }
       }
     ]
@@ -170,7 +183,8 @@
           "zh": "支持英文语言",
           "zh-TW": "支援英文",
           "fr": "Prise en charge de la langue anglaise",
-          "ru": "Добавлена поддержка английского языка"
+          "ru": "Добавлена поддержка английского языка",
+          "pt-BR": "Adicionado suporte para o idioma inglês"
         }
       },
       {
@@ -180,7 +194,8 @@
           "zh": "添加信息遮罩功能",
           "zh-TW": "新增資訊隱藏功能",
           "fr": "Ajout de la fonctionnalité de masquage des informations",
-          "ru": "Добавлена функция маскировки информации"
+          "ru": "Добавлена функция маскировки информации",
+          "pt-BR": "Adicionado recurso de mascaramento de informações"
         }
       },
       {
@@ -190,7 +205,8 @@
           "zh": "支持 PWA，可以安装到手机和桌面上",
           "zh-TW": "支援 PWA，可以安裝到手機和桌面上",
           "fr": "Prise en charge de PWA, peut être installé sur mobile et ordinateur de bureau",
-          "ru": "Добавлена поддержка PWA с установкой на мобильные и настольные устройства"
+          "ru": "Добавлена поддержка PWA с установкой на мобильные и настольные устройства",
+          "pt-BR": "Suporte a PWA, com instalação em dispositivos móveis e desktops"
         }
       }
     ]
@@ -206,7 +222,8 @@
           "zh": "支持快捷键操作",
           "zh-TW": "支援快捷鍵操作",
           "fr": "Prise en charge des raccourcis clavier",
-          "ru": "Добавлена поддержка сочетаний клавиш"
+          "ru": "Добавлена поддержка сочетаний клавиш",
+          "pt-BR": "Adicionado suporte para atalhos de teclado"
         }
       },
       {
@@ -216,7 +233,8 @@
           "zh": "添加网速测试功能",
           "zh-TW": "新增網速測試功能",
           "fr": "Ajout de la fonctionnalité de test de vitesse des sites web",
-          "ru": "Добавлена функция проверки скорости сайта"
+          "ru": "Добавлена функция проверки скорости сайта",
+          "pt-BR": "Adicionado recurso de teste de velocidade do site"
         }
       },
       {
@@ -226,7 +244,8 @@
           "zh": "支持使用 Docker 部署",
           "zh-TW": "支援使用 Docker 部署",
           "fr": "Prise en charge du déploiement à l'aide de Docker",
-          "ru": "Добавлена поддержка развёртывания через Docker"
+          "ru": "Добавлена поддержка развёртывания через Docker",
+          "pt-BR": "Suporte à implantação com Docker"
         }
       },
       {
@@ -236,7 +255,8 @@
           "zh": "支持从多个来源获取 IP 归属地等信息",
           "zh-TW": "支援從多個來源取得 IP 地理位置等資訊",
           "fr": "Prise en charge de la récupération des informations de géolocalisation IP à partir de plusieurs sources",
-          "ru": "Добавлено получение данных о геолокации IP из нескольких источников"
+          "ru": "Добавлено получение данных о геолокации IP из нескольких источников",
+          "pt-BR": "Suporte à recuperação de informações de geolocalização de IP de múltiplas fontes"
         }
       }
     ]
@@ -252,7 +272,8 @@
           "zh": "使用 Vite + Vue3 重构了整个项目",
           "zh-TW": "使用 Vite + Vue3 重構了整個專案",
           "fr": "Refonte complète du projet en utilisant Vite + Vue3",
-          "ru": "Выполнен полный рефакторинг проекта с использованием Vite + Vue3"
+          "ru": "Выполнен полный рефакторинг проекта с использованием Vite + Vue3",
+          "pt-BR": "Projeto inteiro refatorado com Vite e Vue 3"
         }
       },
       {
@@ -262,7 +283,8 @@
           "zh": "增加全球延迟测试功能",
           "zh-TW": "新增全球延遲測試功能",
           "fr": "Ajout de la fonctionnalité de test de latence mondiale",
-          "ru": "Добавлена глобальная проверка задержки"
+          "ru": "Добавлена глобальная проверка задержки",
+          "pt-BR": "Adicionado recurso de teste de latência global"
         }
       },
       {
@@ -272,7 +294,8 @@
           "zh": "增加 MTR 测试功能",
           "zh-TW": "新增 MTR 測試功能",
           "fr": "Ajout de la fonctionnalité de test MTR",
-          "ru": "Добавлен тест MTR"
+          "ru": "Добавлен тест MTR",
+          "pt-BR": "Adicionado recurso de teste MTR"
         }
       },
       {
@@ -282,7 +305,8 @@
           "zh": "多个性能优化和体验优化",
           "zh-TW": "多項效能與體驗最佳化",
           "fr": "Multiples optimisations de performance et d'expérience utilisateur",
-          "ru": "Выполнено несколько оптимизаций производительности и пользовательского опыта"
+          "ru": "Выполнено несколько оптимизаций производительности и пользовательского опыта",
+          "pt-BR": "Múltiplas otimizações de desempenho e experiência do usuário"
         }
       }
     ]
@@ -298,7 +322,8 @@
           "zh": "支持新的语言：法语",
           "zh-TW": "支援新的語言：法文",
           "fr": "Ajout de la prise en charge d'une nouvelle langue : français",
-          "ru": "Добавлена поддержка нового языка — французского"
+          "ru": "Добавлена поддержка нового языка — французского",
+          "pt-BR": "Adicionado suporte para um novo idioma: francês"
         }
       },
       {
@@ -308,7 +333,8 @@
           "zh": "添加数据加载中的动画",
           "zh-TW": "新增資料載入中的動畫",
           "fr": "Ajout d'une animation de chargement des données",
-          "ru": "Добавлена анимация загрузки"
+          "ru": "Добавлена анимация загрузки",
+          "pt-BR": "Adicionada animação de carregamento"
         }
       },
       {
@@ -318,7 +344,8 @@
           "zh": "优化了缓存策略",
           "zh-TW": "最佳化了快取策略",
           "fr": "Optimisation de la stratégie de cache",
-          "ru": "Оптимизирована стратегия кэширования"
+          "ru": "Оптимизирована стратегия кэширования",
+          "pt-BR": "Estratégia de cache otimizada"
         }
       },
       {
@@ -328,7 +355,8 @@
           "zh": "调整黑暗模式样式",
           "zh-TW": "調整深色模式樣式",
           "fr": "Ajustement du style du mode sombre",
-          "ru": "Скорректированы стили тёмной темы"
+          "ru": "Скорректированы стили тёмной темы",
+          "pt-BR": "Estilos de modo escuro ajustados"
         }
       },
       {
@@ -338,7 +366,8 @@
           "zh": "修复了一些小问题",
           "zh-TW": "修正了一些小問題",
           "fr": "Correction de quelques problèmes mineurs",
-          "ru": "Исправлены небольшие проблемы"
+          "ru": "Исправлены небольшие проблемы",
+          "pt-BR": "Corrigidos alguns pequenos problemas"
         }
       }
     ]
@@ -354,7 +383,8 @@
           "zh": "添加 NAT 类型检测",
           "zh-TW": "新增 NAT 類型偵測",
           "fr": "Ajout de la détection du type NAT",
-          "ru": "Добавлено определение типа NAT"
+          "ru": "Добавлено определение типа NAT",
+          "pt-BR": "Adicionada detecção de tipo NAT"
         }
       },
       {
@@ -364,7 +394,8 @@
           "zh": "优化 PWA 应用的体验",
           "zh-TW": "最佳化 PWA 應用程式的體驗",
           "fr": "Optimisation de l'expérience de l'application PWA",
-          "ru": "Улучшена работа PWA-приложения"
+          "ru": "Улучшена работа PWA-приложения",
+          "pt-BR": "Experiência otimizada de aplicativo PWA"
         }
       },
       {
@@ -374,7 +405,8 @@
           "zh": "提高后端脚本安全性",
           "zh-TW": "提高後端腳本安全性",
           "fr": "Amélioration de la sécurité du script backend",
-          "ru": "Повышена безопасность серверных скриптов"
+          "ru": "Повышена безопасность серверных скриптов",
+          "pt-BR": "Segurança dos scripts de back-end aprimorada"
         }
       }
     ]
@@ -390,7 +422,8 @@
           "zh": "支持使用不同的 IP 地理位置信息源",
           "zh-TW": "支援使用不同的 IP 地理位置資訊來源",
           "fr": "Prise en charge de l'utilisation de différentes sources d'informations de géolocalisation IP",
-          "ru": "Добавлена поддержка разных источников геолокации IP"
+          "ru": "Добавлена поддержка разных источников геолокации IP",
+          "pt-BR": "Adicionado suporte ao uso de diferentes fontes de geolocalização de IP"
         }
       },
       {
@@ -400,7 +433,8 @@
           "zh": "优化连接可用性检测的用户体验",
           "zh-TW": "最佳化連線可用性偵測的使用者體驗",
           "fr": "Amélioration de l'expérience utilisateur de la détection de disponibilité de connexion",
-          "ru": "Улучшен пользовательский опыт при проверке доступности соединения"
+          "ru": "Улучшен пользовательский опыт при проверке доступности соединения",
+          "pt-BR": "Experiência do usuário aprimorada para detecção de disponibilidade de conexão"
         }
       },
       {
@@ -410,7 +444,8 @@
           "zh": "优化 UI 体验",
           "zh-TW": "最佳化 UI 體驗",
           "fr": "Amélioration de l'expérience utilisateur de l'interface utilisateur",
-          "ru": "Улучшен интерфейс"
+          "ru": "Улучшен интерфейс",
+          "pt-BR": "Experiência da interface otimizada"
         }
       }
     ]
@@ -426,7 +461,8 @@
           "zh": "添加 ASN 详细信息查看器",
           "zh-TW": "新增 ASN 詳細資訊檢視器",
           "fr": "Ajout d'un visualiseur de détails ASN",
-          "ru": "Добавлен просмотр подробных сведений об ASN"
+          "ru": "Добавлен просмотр подробных сведений об ASN",
+          "pt-BR": "Adicionado visualizador de detalhes ASN"
         }
       },
       {
@@ -436,7 +472,8 @@
           "zh": "添加 IP 地址是否为代理的判断",
           "zh-TW": "新增 IP 位址是否為代理的判斷",
           "fr": "Ajout de la détection de proxy",
-          "ru": "Добавлена функция обнаружения прокси"
+          "ru": "Добавлена функция обнаружения прокси",
+          "pt-BR": "Adicionado recurso de detecção de proxy"
         }
       },
       {
@@ -446,7 +483,8 @@
           "zh": "优化 IP 信息的展示 UI",
           "zh-TW": "最佳化 IP 資訊的展示 UI",
           "fr": "Optimisation de l'interface utilisateur pour l'affichage des informations IP",
-          "ru": "Улучшен UI для отображения информации об IP"
+          "ru": "Улучшен UI для отображения информации об IP",
+          "pt-BR": "UI otimizada para exibir informações de IP"
         }
       }
     ]
@@ -462,7 +500,8 @@
           "zh": "添加规则测试",
           "zh-TW": "新增分流測試",
           "fr": "Ajout du test de règles",
-          "ru": "Добавлен тест правил"
+          "ru": "Добавлен тест правил",
+          "pt-BR": "Adicionado recurso de teste de regras"
         }
       },
       {
@@ -472,7 +511,8 @@
           "zh": "优化了部分逻辑",
           "zh-TW": "最佳化了部分邏輯",
           "fr": "Quelques améliorations",
-          "ru": "Внесены улучшения"
+          "ru": "Внесены улучшения",
+          "pt-BR": "Algumas melhorias"
         }
       }
     ]
@@ -488,7 +528,8 @@
           "zh": "添加 DNS 解析功能",
           "zh-TW": "新增 DNS 解析功能",
           "fr": "Ajout de la fonction de résolution DNS",
-          "ru": "Добавлена функция разрешения DNS"
+          "ru": "Добавлена функция разрешения DNS",
+          "pt-BR": "Adicionado recurso de resolução de DNS"
         }
       },
       {
@@ -498,7 +539,8 @@
           "zh": "优化主页结构，高级功能折叠展示",
           "zh-TW": "最佳化首頁結構，進階功能改為摺疊展示",
           "fr": "Optimisation de la structure de la page d'accueil, les fonctionnalités avancées sont désormais repliables",
-          "ru": "Оптимизирована структура главной страницы, расширенные функции теперь можно сворачивать"
+          "ru": "Оптимизирована структура главной страницы, расширенные функции теперь можно сворачивать",
+          "pt-BR": "Estrutura da página inicial otimizada; recursos avançados agora podem ser recolhidos."
         }
       },
       {
@@ -508,7 +550,8 @@
           "zh": "优化了程序逻辑",
           "zh-TW": "最佳化了程式邏輯",
           "fr": "Optimisation de la logique du programme",
-          "ru": "Оптимизирована логика программы"
+          "ru": "Оптимизирована логика программы",
+          "pt-BR": "Lógica de programa otimizada"
         }
       }
     ]
@@ -524,7 +567,8 @@
           "zh": "添加封锁测试功能",
           "zh-TW": "新增封鎖測試功能",
           "fr": "Fonctionnalité de test de censure ajoutée",
-          "ru": "Добавлена проверка интернет-цензуры"
+          "ru": "Добавлена проверка интернет-цензуры",
+          "pt-BR": "Adicionado recurso de teste de censura"
         }
       },
       {
@@ -534,7 +578,8 @@
           "zh": "网速测试可以自定义数据包大小",
           "zh-TW": "網速測試可以自訂封包大小",
           "fr": "Le test de vitesse réseau permet maintenant de personnaliser la taille des paquets",
-          "ru": "В тесте скорости сети теперь можно задавать размер пакета"
+          "ru": "В тесте скорости сети теперь можно задавать размер пакета",
+          "pt-BR": "O teste de velocidade da rede agora permite um tamanho de pacote personalizado"
         }
       },
       {
@@ -544,7 +589,8 @@
           "zh": "优化了部分功能逻辑",
           "zh-TW": "最佳化了部分功能邏輯",
           "fr": "Optimisation de certaines logiques fonctionnelles",
-          "ru": "Оптимизирована логика некоторых функций"
+          "ru": "Оптимизирована логика некоторых функций",
+          "pt-BR": "Lógica funcional otimizada"
         }
       }
     ]
@@ -560,7 +606,8 @@
           "zh": "增加设置面板，可以在本地保存偏好设置",
           "zh-TW": "新增設定面板，可以在本機儲存偏好設定",
           "fr": "Ajout du panneau de préférences pour enregistrer les paramètres localement",
-          "ru": "Добавлена панель настроек с локальным сохранением"
+          "ru": "Добавлена панель настроек с локальным сохранением",
+          "pt-BR": "Adicionado painel de preferências para salvar configurações localmente"
         }
       },
       {
@@ -570,7 +617,8 @@
           "zh": "可以自定义程序在第二次启动时的多个默认行为",
           "zh-TW": "可以自訂程式在第二次啟動時的多個預設行為",
           "fr": "Permettre la personnalisation de plusieurs comportements par défaut lors du deuxième lancement du programme",
-          "ru": "Добавлена настройка нескольких вариантов поведения по умолчанию при повторном запуске программы"
+          "ru": "Добавлена настройка нескольких вариантов поведения по умолчанию при повторном запуске программы",
+          "pt-BR": "Personalização de diversos comportamentos padrão permitida na segunda inicialização do programa"
         }
       },
       {
@@ -580,7 +628,8 @@
           "zh": "大量优化了程序的逻辑",
           "zh-TW": "大量最佳化了程式的邏輯",
           "fr": "Optimisation significative de la logique du programme",
-          "ru": "Значительно оптимизирована логика программы"
+          "ru": "Значительно оптимизирована логика программы",
+          "pt-BR": "Lógica de programa significativamente otimizada"
         }
       },
       {
@@ -590,7 +639,8 @@
           "zh": "修复了一些小问题",
           "zh-TW": "修正了一些小問題",
           "fr": "Correction de quelques problèmes mineurs",
-          "ru": "Исправлены небольшие проблемы"
+          "ru": "Исправлены небольшие проблемы",
+          "pt-BR": "Corrigidos alguns pequenos problemas"
         }
       }
     ]
@@ -606,7 +656,8 @@
           "zh": "增加 Whois 查询功能",
           "zh-TW": "新增 Whois 查詢功能",
           "fr": "Ajout de la fonction de recherche Whois",
-          "ru": "Добавлен поиск Whois"
+          "ru": "Добавлен поиск Whois",
+          "pt-BR": "Adicionado recurso de pesquisa Whois"
         }
       },
       {
@@ -616,7 +667,8 @@
           "zh": "优化高级功能的展示与动画效果",
           "zh-TW": "最佳化進階功能的展示與動畫效果",
           "fr": "Optimisation de l'affichage et des effets d'animation pour les outils avancés",
-          "ru": "Улучшены отображение и анимация расширенных инструментов"
+          "ru": "Улучшены отображение и анимация расширенных инструментов",
+          "pt-BR": "Efeitos de exibição e animação otimizados para ferramentas avançadas"
         }
       },
       {
@@ -626,7 +678,8 @@
           "zh": "修复了一些小问题",
           "zh-TW": "修正了一些小問題",
           "fr": "Correction de quelques problèmes mineurs",
-          "ru": "Исправлены небольшие проблемы"
+          "ru": "Исправлены небольшие проблемы",
+          "pt-BR": "Corrigidos alguns pequenos problemas"
         }
       }
     ]
@@ -642,7 +695,8 @@
           "zh": "采用 Vue 3 的 Composition API 重构了整个项目",
           "zh-TW": "採用 Vue 3 的 Composition API 重構了整個專案",
           "fr": "Refonte complète du projet en utilisant la Composition API de Vue 3",
-          "ru": "Выполнен полный рефакторинг проекта с использованием Composition API из Vue 3"
+          "ru": "Выполнен полный рефакторинг проекта с использованием Composition API из Vue 3",
+          "pt-BR": "Projeto inteiro refatorado com a Composition API do Vue 3"
         }
       },
       {
@@ -652,7 +706,8 @@
           "zh": "拆分前端多个模块，提高了程序的可维护性",
           "zh-TW": "拆分前端多個模組，提高了程式的可維護性",
           "fr": "Découpage du frontend en plusieurs modules pour améliorer la maintenabilité du programme",
-          "ru": "Клиентская часть разделена на несколько модулей для упрощения сопровождения"
+          "ru": "Клиентская часть разделена на несколько модулей для упрощения сопровождения",
+          "pt-BR": "Frontend dividido em vários módulos para facilitar a manutenção"
         }
       },
       {
@@ -662,7 +717,8 @@
           "zh": "增加隐身测试功能（Beta）",
           "zh-TW": "新增隱身測試功能（Beta）",
           "fr": "Ajout de la Test d'invisibilité (bêta)",
-          "ru": "Добавлен «Тест невидимости» (бета)"
+          "ru": "Добавлен «Тест невидимости» (бета)",
+          "pt-BR": "Adicionado recurso de teste de invisibilidade (Beta)"
         }
       },
       {
@@ -672,7 +728,8 @@
           "zh": "优化后端程序的依赖结构",
           "zh-TW": "最佳化後端程式的相依結構",
           "fr": "Optimisation de la structure des dépendances du backend",
-          "ru": "Оптимизированы зависимости серверной части"
+          "ru": "Оптимизированы зависимости серверной части",
+          "pt-BR": "Dependências otimizadas do programa de back-end"
         }
       },
       {
@@ -682,7 +739,8 @@
           "zh": "优化了大量细节",
           "zh-TW": "最佳化了大量細節",
           "fr": "Optimisation de nombreux détails",
-          "ru": "Оптимизировано множество деталей"
+          "ru": "Оптимизировано множество деталей",
+          "pt-BR": "Vários detalhes otimizados"
         }
       }
     ]
@@ -698,7 +756,8 @@
           "zh": "添加 MAC 地址查询功能",
           "zh-TW": "新增 MAC 位址查詢功能",
           "fr": "Ajout de la fonction de recherche MAC",
-          "ru": "Добавлен поиск по MAC-адресу"
+          "ru": "Добавлен поиск по MAC-адресу",
+          "pt-BR": "Adicionado recurso de pesquisa de endereço MAC"
         }
       },
       {
@@ -708,7 +767,8 @@
           "zh": "优化了部分程序细节",
           "zh-TW": "最佳化了部分程式細節",
           "fr": "Optimisation de nombreux détails",
-          "ru": "Оптимизировано множество деталей"
+          "ru": "Оптимизировано множество деталей",
+          "pt-BR": "Vários detalhes otimizados"
         }
       }
     ]
@@ -724,7 +784,8 @@
           "zh": "添加浏览器信息查询功能",
           "zh-TW": "新增瀏覽器資訊查詢功能",
           "fr": "Ajout de la fonction de requête d'informations du navigateur",
-          "ru": "Добавлен просмотр информации о браузере"
+          "ru": "Добавлен просмотр информации о браузере",
+          "pt-BR": "Adicionado recurso de consulta de informações do navegador"
         }
       },
       {
@@ -734,7 +795,8 @@
           "zh": "添加 MaxMind 地理数据库",
           "zh-TW": "新增 MaxMind 地理資料庫",
           "fr": "Ajout de la base de données géographique MaxMind",
-          "ru": "Добавлена база данных MaxMind GeoIP"
+          "ru": "Добавлена база данных MaxMind GeoIP",
+          "pt-BR": "Adicionado banco de dados MaxMind GeoIP"
         }
       },
       {
@@ -744,7 +806,8 @@
           "zh": "多处体验优化",
           "zh-TW": "多處體驗最佳化",
           "fr": "Améliorations multiples de l'expérience",
-          "ru": "Внесено несколько улучшений пользовательского опыта"
+          "ru": "Внесено несколько улучшений пользовательского опыта",
+          "pt-BR": "Múltiplas melhorias de experiência"
         }
       }
     ]
@@ -760,7 +823,8 @@
           "zh": "添加命令行 API 功能",
           "zh-TW": "新增命令列 API 功能",
           "fr": "Ajout de la fonctionnalité API en ligne de commande",
-          "ru": "Добавлен API командной строки"
+          "ru": "Добавлен API командной строки",
+          "pt-BR": "Adicionado recurso de API de linha de comando"
         }
       },
       {
@@ -770,7 +834,8 @@
           "zh": "WebRTC 测试可以展示地区信息",
           "zh-TW": "WebRTC 測試可以顯示地區資訊",
           "fr": "Le test WebRTC peut maintenant afficher des informations régionales",
-          "ru": "Тест WebRTC теперь отображает информацию о регионе"
+          "ru": "Тест WebRTC теперь отображает информацию о регионе",
+          "pt-BR": "O teste WebRTC agora pode exibir informações regionais"
         }
       },
       {
@@ -780,7 +845,8 @@
           "zh": "DNS 泄露测试可以展示地区信息",
           "zh-TW": "DNS 洩漏測試可以顯示地區資訊",
           "fr": "Le test de fuite DNS peut maintenant afficher des informations régionales",
-          "ru": "Тест утечки DNS теперь отображает информацию о регионе"
+          "ru": "Тест утечки DNS теперь отображает информацию о регионе",
+          "pt-BR": "O teste de vazamento de DNS agora pode exibir informações regionais"
         }
       }
     ]
@@ -796,7 +862,8 @@
           "zh": "语言偏好设置",
           "zh-TW": "語言偏好設定",
           "fr": "Préférences de langue",
-          "ru": "Добавлены настройки языка"
+          "ru": "Добавлены настройки языка",
+          "pt-BR": "Preferências de idioma"
         }
       },
       {
@@ -806,7 +873,8 @@
           "zh": "地图展示供应商变更为 Google",
           "zh-TW": "地圖顯示供應商變更為 Google",
           "fr": "Fournisseur de carte changé en Google",
-          "ru": "Поставщик карт изменён на Google"
+          "ru": "Поставщик карт изменён на Google",
+          "pt-BR": "Provedor de mapas alterado para Google"
         }
       },
       {
@@ -816,7 +884,8 @@
           "zh": "其它常规优化",
           "zh-TW": "其他常規最佳化",
           "fr": "Autres optimisations générales",
-          "ru": "Выполнены другие общие оптимизации"
+          "ru": "Выполнены другие общие оптимизации",
+          "pt-BR": "Outras otimizações gerais"
         }
       }
     ]
@@ -832,7 +901,8 @@
           "zh": "添加安全检查清单",
           "zh-TW": "新增安全檢查清單",
           "fr": "Liste de vérification de sécurité",
-          "ru": "Добавлен контрольный список безопасности"
+          "ru": "Добавлен контрольный список безопасности",
+          "pt-BR": "Lista de verificação de segurança adicionada"
         }
       },
       {
@@ -842,7 +912,8 @@
           "zh": "其它常规优化",
           "zh-TW": "其他常規最佳化",
           "fr": "Autres optimisations générales",
-          "ru": "Выполнены другие общие оптимизации"
+          "ru": "Выполнены другие общие оптимизации",
+          "pt-BR": "Outras otimizações gerais"
         }
       }
     ]
@@ -858,7 +929,8 @@
           "zh": "新增用户系统",
           "zh-TW": "新增使用者系統",
           "fr": "Ajout de la système d'utilisateur",
-          "ru": "Добавлена система пользователей"
+          "ru": "Добавлена система пользователей",
+          "pt-BR": "Sistema de usuários adicionado"
         }
       },
       {
@@ -868,7 +940,8 @@
           "zh": "新增用户成就系统",
           "zh-TW": "新增使用者成就系統",
           "fr": "Ajout de la système de réussite utilisateur",
-          "ru": "Добавлена система достижений пользователей"
+          "ru": "Добавлена система достижений пользователей",
+          "pt-BR": "Sistema de conquistas de usuários adicionado"
         }
       },
       {
@@ -878,7 +951,8 @@
           "zh": "新增 Lite 版本",
           "zh-TW": "新增 Lite 版本",
           "fr": "Ajout de la version Lite",
-          "ru": "Добавлена облегчённая версия"
+          "ru": "Добавлена облегчённая версия",
+          "pt-BR": "Versão Lite adicionada"
         }
       },
       {
@@ -888,7 +962,8 @@
           "zh": "网速测试可以看到数据变化图表",
           "zh-TW": "網速測試可以看到資料變化圖表",
           "fr": "Le test de vitesse peut maintenant afficher des graphiques de données",
-          "ru": "Тест скорости теперь отображает графики изменения данных"
+          "ru": "Тест скорости теперь отображает графики изменения данных",
+          "pt-BR": "O teste de velocidade agora pode exibir gráficos de alteração de dados"
         }
       },
       {
@@ -898,7 +973,8 @@
           "zh": "代码效率优化",
           "zh-TW": "程式碼效率最佳化",
           "fr": "Optimisation de la performance du code",
-          "ru": "Оптимизирована эффективность кода"
+          "ru": "Оптимизирована эффективность кода",
+          "pt-BR": "Otimização da eficiência do código"
         }
       }
     ]
@@ -914,7 +990,8 @@
           "zh": "支持土耳其语",
           "zh-TW": "支援土耳其文",
           "fr": "Ajout de la prise en charge de la langue turque",
-          "ru": "Добавлена поддержка турецкого языка"
+          "ru": "Добавлена поддержка турецкого языка",
+          "pt-BR": "Adicionado suporte para o idioma turco"
         }
       },
       {
@@ -924,7 +1001,8 @@
           "zh": "代码效率优化",
           "zh-TW": "程式碼效率最佳化",
           "fr": "Optimisation de l'efficacité du code",
-          "ru": "Повышена эффективность кода"
+          "ru": "Повышена эффективность кода",
+          "pt-BR": "Eficiência de código otimizada"
         }
       }
     ]
@@ -940,7 +1018,8 @@
           "zh": "提升 ASN 信息的丰富性",
           "zh-TW": "提升 ASN 資訊的豐富度",
           "fr": "Amélioration de la richesse des informations ASN",
-          "ru": "Расширены сведения об ASN"
+          "ru": "Расширены сведения об ASN",
+          "pt-BR": "Informações de ASN mais completas"
         }
       },
       {
@@ -950,7 +1029,8 @@
           "zh": "IP 质量分数显示",
           "zh-TW": "IP 品質分數顯示",
           "fr": "Affichage de la qualité IP",
-          "ru": "Добавлено отображение оценки качества IP"
+          "ru": "Добавлено отображение оценки качества IP",
+          "pt-BR": "Adicionada exibição de índice de qualidade de IP"
         }
       },
       {
@@ -960,7 +1040,8 @@
           "zh": "代码效率优化",
           "zh-TW": "程式碼效率最佳化",
           "fr": "Optimisation de l'efficacité du code",
-          "ru": "Повышена эффективность кода"
+          "ru": "Повышена эффективность кода",
+          "pt-BR": "Eficiência de código otimizada"
         }
       }
     ]
@@ -976,7 +1057,8 @@
           "zh": "MaxMind 地理数据库自动更新",
           "zh-TW": "MaxMind 地理資料庫自動更新",
           "fr": "Mise à jour automatique de la base de données géographique MaxMind",
-          "ru": "Добавлено автоматическое обновление базы данных MaxMind GeoIP"
+          "ru": "Добавлено автоматическое обновление базы данных MaxMind GeoIP",
+          "pt-BR": "Adicionada atualização automática do banco de dados MaxMind GeoIP"
         }
       },
       {
@@ -986,7 +1068,8 @@
           "zh": "优化缓存策略",
           "zh-TW": "最佳化快取策略",
           "fr": "Optimisation de la stratégie de cache",
-          "ru": "Оптимизирована стратегия кэширования"
+          "ru": "Оптимизирована стратегия кэширования",
+          "pt-BR": "Estratégia de cache otimizada"
         }
       },
       {
@@ -996,7 +1079,8 @@
           "zh": "大大提升构建速度",
           "zh-TW": "大幅提升建置速度",
           "fr": "Amélioration significative de la vitesse de construction",
-          "ru": "Значительно ускорена сборка"
+          "ru": "Значительно ускорена сборка",
+          "pt-BR": "Velocidade de compilação significativamente aprimorada"
         }
       }
     ]
@@ -1012,7 +1096,8 @@
           "zh": "使用 Shadcn UI + Tailwind CSS 重构了整个项目",
           "zh-TW": "使用 Shadcn UI + Tailwind CSS 重構了整個專案",
           "fr": "Refonte complète du projet avec Shadcn UI + Tailwind CSS",
-          "ru": "Выполнен полный рефакторинг проекта с использованием Shadcn UI + Tailwind CSS"
+          "ru": "Выполнен полный рефакторинг проекта с использованием Shadcn UI + Tailwind CSS",
+          "pt-BR": "Projeto inteiro refatorado com Shadcn UI e Tailwind CSS"
         }
       },
       {
@@ -1022,7 +1107,8 @@
           "zh": "通过多个 Agents.md 提升 AI 开发友好性",
           "zh-TW": "透過多個 Agents.md 提升 AI 開發友善度",
           "fr": "Amélioration de la compatibilité avec le développement assisté par IA grâce à plusieurs fichiers Agents.md",
-          "ru": "Проект стал удобнее для AI-разработки благодаря нескольким файлам Agents.md"
+          "ru": "Проект стал удобнее для AI-разработки благодаря нескольким файлам Agents.md",
+          "pt-BR": "Desenvolvimento com IA facilitado por vários arquivos AGENTS.md"
         }
       },
       {
@@ -1032,7 +1118,8 @@
           "zh": "增加自动测试功能，提升程序健壮性",
           "zh-TW": "新增自動測試功能，提升程式穩健性",
           "fr": "Ajout de tests automatisés pour améliorer la robustesse",
-          "ru": "Добавлены автоматические тесты для повышения надёжности"
+          "ru": "Добавлены автоматические тесты для повышения надёжности",
+          "pt-BR": "Adicionados testes automatizados para melhorar a robustez"
         }
       },
       {
@@ -1042,7 +1129,8 @@
           "zh": "更加组件化的设计，更方便维护和扩展",
           "zh-TW": "更加元件化的設計，更方便維護和擴充",
           "fr": "Conception davantage orientée composants, plus facile à maintenir et à étendre",
-          "ru": "Архитектура стала более компонентной, что упрощает сопровождение и развитие"
+          "ru": "Архитектура стала более компонентной, что упрощает сопровождение и развитие",
+          "pt-BR": "Arquitetura mais orientada a componentes, mais fácil de manter e estender"
         }
       },
       {
@@ -1052,7 +1140,8 @@
           "zh": "重新设计程序目录结构，使其更加清晰易懂",
           "zh-TW": "重新設計程式目錄結構，使其更加清晰易懂",
           "fr": "Réorganisation de la structure des répertoires du projet pour plus de clarté",
-          "ru": "Структура каталогов проекта реорганизована для большей ясности"
+          "ru": "Структура каталогов проекта реорганизована для большей ясности",
+          "pt-BR": "Estrutura de diretórios do projeto reorganizada para maior clareza"
         }
       },
       {
@@ -1062,7 +1151,8 @@
           "zh": "所有页面全部重新设计，更具现代化美感",
           "zh-TW": "所有頁面全部重新設計，更具現代化美感",
           "fr": "Toutes les pages redessinées avec une esthétique plus moderne",
-          "ru": "Все страницы получили более современный дизайн"
+          "ru": "Все страницы получили более современный дизайн",
+          "pt-BR": "Todas as páginas redesenhadas com uma aparência mais moderna"
         }
       },
       {
@@ -1072,7 +1162,8 @@
           "zh": "提升程序打包速度，减少打包体积",
           "zh-TW": "提升程式打包速度，減少打包體積",
           "fr": "Temps de compilation plus rapides et taille de bundle réduite",
-          "ru": "Ускорена сборка и уменьшен размер бандла"
+          "ru": "Ускорена сборка и уменьшен размер бандла",
+          "pt-BR": "Tempos de compilação menores e bundle reduzido"
         }
       },
       {
@@ -1082,7 +1173,8 @@
           "zh": "后端程序大量简化，提升程序性能",
           "zh-TW": "後端程式大量簡化，提升程式效能",
           "fr": "Backend largement simplifié pour améliorer les performances",
-          "ru": "Серверная часть значительно упрощена для повышения производительности"
+          "ru": "Серверная часть значительно упрощена для повышения производительности",
+          "pt-BR": "Back-end significativamente simplificado para melhorar o desempenho"
         }
       },
       {
@@ -1092,7 +1184,8 @@
           "zh": "优化程序里所有的注释，使其更加清晰易懂",
           "zh-TW": "最佳化程式裡所有的註解，使其更加清晰易懂",
           "fr": "Commentaires affinés dans tout le code source pour une meilleure lisibilité",
-          "ru": "Комментарии во всей кодовой базе улучшены для большей читаемости"
+          "ru": "Комментарии во всей кодовой базе улучшены для большей читаемости",
+          "pt-BR": "Comentários refinados em toda a base de código para melhor legibilidade"
         }
       },
       {
@@ -1102,7 +1195,8 @@
           "zh": "修复了多个 Bug，提升了程序稳定性",
           "zh-TW": "修正了多個 Bug，提升了程式穩定性",
           "fr": "Correction de plusieurs bugs et amélioration de la stabilité globale",
-          "ru": "Исправлено множество ошибок и повышена общая стабильность"
+          "ru": "Исправлено множество ошибок и повышена общая стабильность",
+          "pt-BR": "Vários bugs corrigidos e estabilidade geral melhorada"
         }
       }
     ]
@@ -1118,7 +1212,8 @@
           "zh": "深度 DNS 泄露测试：捕获所有递归解析器并分析 ECS 与 DNSSEC",
           "zh-TW": "深度 DNS 洩漏測試：捕獲所有遞迴解析器並分析 ECS 與 DNSSEC",
           "fr": "Test de fuite DNS approfondi : capture tous les résolveurs récursifs utilisés, avec analyse ECS et DNSSEC",
-          "ru": "Углублённый тест утечки DNS: выявляет все используемые рекурсивные резолверы и анализирует ECS и DNSSEC"
+          "ru": "Углублённый тест утечки DNS: выявляет все используемые рекурсивные резолверы и анализирует ECS и DNSSEC",
+          "pt-BR": "Teste aprofundado de vazamento de DNS: captura todos os resolvedores recursivos que você usa, com análise de ECS e DNSSEC"
         }
       },
       {
@@ -1128,7 +1223,8 @@
           "zh": "网络连通性支持添加自定义测试站点",
           "zh-TW": "網路連通性支援新增自訂測試站點",
           "fr": "La Connectivité réseau accepte désormais des cibles de test personnalisées",
-          "ru": "В проверку сетевого подключения теперь можно добавлять собственные цели"
+          "ru": "В проверку сетевого подключения теперь можно добавлять собственные цели",
+          "pt-BR": "A conectividade de rede agora aceita alvos de teste adicionados pelo usuário"
         }
       },
       {
@@ -1138,7 +1234,8 @@
           "zh": "通知（Toast）回归屏幕右下角，自动避让悬浮按钮组",
           "zh-TW": "通知（Toast）回歸螢幕右下角，自動避開懸浮按鈕組",
           "fr": "Les notifications reviennent dans le coin inférieur droit, en contournant les boutons flottants",
-          "ru": "Уведомления (тосты) возвращены в правый нижний угол и больше не перекрывают плавающие кнопки действий"
+          "ru": "Уведомления (тосты) возвращены в правый нижний угол и больше не перекрывают плавающие кнопки действий",
+          "pt-BR": "As notificações (toasts) voltaram ao canto inferior direito, deixando de sobrepor os botões de ação flutuantes"
         }
       },
       {
@@ -1148,7 +1245,8 @@
           "zh": "Whois 查询支持更多现代 TLD",
           "zh-TW": "Whois 查詢支援更多現代 TLD",
           "fr": "La recherche Whois couvre désormais les TLD modernes",
-          "ru": "Поиск Whois теперь охватывает больше современных TLD"
+          "ru": "Поиск Whois теперь охватывает больше современных TLD",
+          "pt-BR": "A pesquisa Whois agora cobre TLDs mais modernos"
         }
       },
       {
@@ -1158,7 +1256,8 @@
           "zh": "改进网络连通性测试，可达性判定更可靠",
           "zh-TW": "改進網路連通性測試，可達性判定更可靠",
           "fr": "Test de connectivité réseau amélioré — détection de disponibilité plus fiable",
-          "ru": "Обновлена проверка сетевого подключения — определение доступности стало надёжнее"
+          "ru": "Обновлена проверка сетевого подключения — определение доступности стало надёжнее",
+          "pt-BR": "Teste de conectividade de rede atualizado – detecção de acessibilidade mais confiável"
         }
       },
       {
@@ -1168,7 +1267,8 @@
           "zh": "DNS 查询更快",
           "zh-TW": "DNS 查詢更快",
           "fr": "Le résolveur DNS est nettement plus rapide",
-          "ru": "DNS-резолвер стал заметно быстрее"
+          "ru": "DNS-резолвер стал заметно быстрее",
+          "pt-BR": "O resolvedor de DNS é visivelmente mais rápido"
         }
       },
       {
@@ -1178,7 +1278,8 @@
           "zh": "修复自动主题模式下跟随系统切换时不立即生效的问题",
           "zh-TW": "修正自動主題模式下跟隨系統切換時不立即生效的問題",
           "fr": "Le mode thème automatique suit désormais instantanément le changement clair/sombre du système",
-          "ru": "Автоматическая тема теперь мгновенно реагирует на переключение светлой/тёмной темы в операционной системе"
+          "ru": "Автоматическая тема теперь мгновенно реагирует на переключение светлой/тёмной темы в операционной системе",
+          "pt-BR": "O modo de tema automático agora segue a mudança claro/escuro do sistema operacional instantaneamente"
         }
       },
       {
@@ -1188,7 +1289,8 @@
           "zh": "修复页面首次加载时的短暂视觉抖动",
           "zh-TW": "修正頁面首次載入時的短暫視覺抖動",
           "fr": "Suppression du bref scintillement visuel au premier chargement de la page",
-          "ru": "Устранено краткое мерцание при первой загрузке страницы"
+          "ru": "Устранено краткое мерцание при первой загрузке страницы",
+          "pt-BR": "Removida a breve oscilação visual no carregamento da primeira página"
         }
       }
     ]
@@ -1204,7 +1306,8 @@
           "zh": "可以查看一个 IP 过往的所有 ASN 记录",
           "zh-TW": "可以檢視一個 IP 過往的所有 ASN 記錄",
           "fr": "Vous pouvez maintenant voir l'historique des ASN d'une IP",
-          "ru": "Теперь можно просматривать историю записей ASN для IP"
+          "ru": "Теперь можно просматривать историю записей ASN для IP",
+          "pt-BR": "Agora você pode visualizar os registros históricos de ASN de um IP"
         }
       },
       {
@@ -1214,7 +1317,8 @@
           "zh": "优化网络连通性测试，显示多次测试进度",
           "zh-TW": "最佳化網路連通性測試，顯示多次測試進度",
           "fr": "Optimisation du test de connectivité pour afficher le progrès des tests multiples",
-          "ru": "Проверка подключения оптимизирована: теперь виден ход нескольких тестов"
+          "ru": "Проверка подключения оптимизирована: теперь виден ход нескольких тестов",
+          "pt-BR": "Teste de conectividade otimizado para mostrar o progresso de vários testes"
         }
       },
       {
@@ -1224,7 +1328,8 @@
           "zh": "修复运行多次网络连通性测试时，通知时机错误的问题",
           "zh-TW": "修正執行多次網路連通性測試時，通知時機錯誤的問題",
           "fr": "Correction d'un bug causant la notification à se déclencher trop tôt lors de l'exécution de plusieurs tests de connectivité",
-          "ru": "Исправлена ошибка, из-за которой при нескольких проверках подключения уведомление появлялось слишком рано"
+          "ru": "Исправлена ошибка, из-за которой при нескольких проверках подключения уведомление появлялось слишком рано",
+          "pt-BR": "Corrigido um bug que fazia com que a notificação fosse disparada muito cedo ao executar vários testes de conectividade"
         }
       }
     ]
@@ -1240,7 +1345,8 @@
           "zh": "可以查看 ASN 上游连接图，更直观地了解 ASN 的网络拓扑结构",
           "zh-TW": "可以檢視 ASN 上游連線圖，更直觀地了解 ASN 的網路拓撲結構",
           "fr": "Vous pouvez maintenant voir le graphique de connectivité des ASN",
-          "ru": "Теперь можно просматривать граф связности ASN с вышестоящими сетями"
+          "ru": "Теперь можно просматривать граф связности ASN с вышестоящими сетями",
+          "pt-BR": "Agora você pode visualizar o gráfico de conectividade upstream de um ASN"
         }
       },
       {
@@ -1250,7 +1356,8 @@
           "zh": "添加简约模式，隐藏每个模块的说明文字",
           "zh-TW": "新增簡潔模式，隱藏每個模組的說明文字",
           "fr": "Ajout du mode simple, masque le texte de description de chaque module",
-          "ru": "Добавлен простой режим, скрывающий описание каждого модуля"
+          "ru": "Добавлен простой режим, скрывающий описание каждого модуля",
+          "pt-BR": "Modo simples adicionado, ocultando o texto descritivo de cada módulo"
         }
       },
       {
@@ -1260,7 +1367,8 @@
           "zh": "WebRTC 测试工具添加了 SDP 日志功能",
           "zh-TW": "WebRTC 測試工具新增了 SDP 日誌功能",
           "fr": "Ajout de la fonctionnalité de journalisation SDP dans l'outil de test WebRTC",
-          "ru": "В инструмент «Тест WebRTC» добавлен журнал SDP"
+          "ru": "В инструмент «Тест WebRTC» добавлен журнал SDP",
+          "pt-BR": "Adicionado log SDP à ferramenta de teste WebRTC"
         }
       },
       {
@@ -1270,7 +1378,8 @@
           "zh": "优化了浏览器信息工具，使其更加准确和实用",
           "zh-TW": "最佳化了瀏覽器資訊工具，使其更加準確和實用",
           "fr": "Amélioration de l'outil d'informations sur le navigateur pour plus d'informations précises et pratiques",
-          "ru": "Инструмент «Информация о браузере» улучшен для получения более точных и полезных сведений"
+          "ru": "Инструмент «Информация о браузере» улучшен для получения более точных и полезных сведений",
+          "pt-BR": "Ferramenta de Informações do Navegador aprimorada para fornecer informações mais precisas e úteis"
         }
       },
       {
@@ -1280,7 +1389,8 @@
           "zh": "修复了一些小问题",
           "zh-TW": "修正了一些小問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены небольшие проблемы"
+          "ru": "Исправлены небольшие проблемы",
+          "pt-BR": "Corrigidos alguns pequenos problemas"
         }
       }
     ]
@@ -1296,7 +1406,8 @@
           "zh": "现在可以保存 IP 卡片或 ASN 连接图作为图片",
           "zh-TW": "現在可以將 IP 卡片或 ASN 連線圖儲存為圖片",
           "fr": "Vous pouvez maintenant enregistrer les cartes IP ou le graphique de connectivité ASN en image",
-          "ru": "Теперь карточку IP или граф связности ASN можно сохранить как изображение"
+          "ru": "Теперь карточку IP или граф связности ASN можно сохранить как изображение",
+          "pt-BR": "Agora é possível salvar o cartão de IP ou o gráfico de conectividade de ASN como imagem"
         }
       },
       {
@@ -1306,7 +1417,8 @@
           "zh": "优化网络连通性测试的品牌图标",
           "zh-TW": "最佳化網路連通性測試的品牌圖示",
           "fr": "Optimisation des icônes de marque du test de connectivité",
-          "ru": "Обновлены значки брендов в проверке подключения"
+          "ru": "Обновлены значки брендов в проверке подключения",
+          "pt-BR": "Ícones de marca do Teste de Conectividade otimizados"
         }
       },
       {
@@ -1316,7 +1428,8 @@
           "zh": "丰富 WebRTC 测试和规则测试的信息展示",
           "zh-TW": "豐富 WebRTC 測試和分流測試的資訊展示",
           "fr": "Amélioration de l'affichage des informations du test WebRTC et du test de règles",
-          "ru": "Расширено отображение сведений в тесте WebRTC и тесте правил"
+          "ru": "Расширено отображение сведений в тесте WebRTC и тесте правил",
+          "pt-BR": "Exibição de informações do Teste WebRTC e do Teste de Regras enriquecida"
         }
       },
       {
@@ -1326,7 +1439,8 @@
           "zh": "导航栏在手机上会跟随滚动隐藏",
           "zh-TW": "導覽列在手機上會跟隨捲動隱藏",
           "fr": "La barre de navigation se cache lors du défilement sur mobile",
-          "ru": "Панель навигации теперь скрывается при прокрутке на мобильных устройствах"
+          "ru": "Панель навигации теперь скрывается при прокрутке на мобильных устройствах",
+          "pt-BR": "A barra de navegação será ocultada ao rolar no celular"
         }
       },
       {
@@ -1336,7 +1450,8 @@
           "zh": "修复 PWA 状态栏颜色与主题不一致的问题",
           "zh-TW": "修正 PWA 狀態列顏色與主題不一致的問題",
           "fr": "Correction d'un bug causant la couleur de la barre de statut PWA à ne pas correspondre au thème",
-          "ru": "Исправлена ошибка, из-за которой цвет строки состояния PWA не соответствовал теме"
+          "ru": "Исправлена ошибка, из-за которой цвет строки состояния PWA не соответствовал теме",
+          "pt-BR": "Corrigido um bug que fazia com que a cor da barra de status do PWA não correspondesse ao tema"
         }
       }
     ]
@@ -1352,7 +1467,8 @@
           "zh": "新增「服务可用性」高级工具，实时展示知名 AI 服务的可用状态",
           "zh-TW": "新增「服務可用性」進階工具，即時展示知名 AI 服務的可用狀態",
           "fr": "Nouvel outil avancé : État des services, affichant la disponibilité en temps réel de services populaires",
-          "ru": "Новый расширенный инструмент «Статус сервисов» показывает доступность популярных AI-сервисов в реальном времени"
+          "ru": "Новый расширенный инструмент «Статус сервисов» показывает доступность популярных AI-сервисов в реальном времени",
+          "pt-BR": "Nova ferramenta avançada: Status dos serviços, com disponibilidade em tempo real de serviços de IA populares"
         }
       },
       {
@@ -1362,7 +1478,8 @@
           "zh": "高级工具可以在新页面打开",
           "zh-TW": "進階工具可以在新頁面開啟",
           "fr": "Les outils avancés peuvent maintenant être ouverts dans une nouvelle page",
-          "ru": "Расширенные инструменты теперь можно открывать на отдельной странице"
+          "ru": "Расширенные инструменты теперь можно открывать на отдельной странице",
+          "pt-BR": "Ferramentas avançadas agora podem ser abertas em uma nova página"
         }
       },
       {
@@ -1372,7 +1489,8 @@
           "zh": "优化多处体验，提升可用性",
           "zh-TW": "最佳化多處體驗，提升可用性",
           "fr": "Amélioration de multiples expériences pour améliorer l'utilisabilité",
-          "ru": "Внесено несколько улучшений для повышения удобства использования"
+          "ru": "Внесено несколько улучшений для повышения удобства использования",
+          "pt-BR": "Diversos aspectos da experiência do usuário aprimorados para facilitar o uso"
         }
       },
       {
@@ -1382,7 +1500,8 @@
           "zh": "修复一些问题",
           "zh-TW": "修正一些問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены некоторые проблемы"
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
         }
       }
     ]
@@ -1398,7 +1517,8 @@
           "zh": "网络连通性测试可以设置多次刷新，并显示最小延迟值",
           "zh-TW": "網路連通性測試可以設定多次重新整理，並顯示最小延遲值",
           "fr": "Le test de connectivité réseau peut maintenant être configuré pour plusieurs rafraîchissements et afficher la valeur de latence minimale",
-          "ru": "Для проверки сетевого подключения теперь можно задать несколько повторных проверок и отображать минимальную задержку"
+          "ru": "Для проверки сетевого подключения теперь можно задать несколько повторных проверок и отображать минимальную задержку",
+          "pt-BR": "O teste de conectividade de rede agora pode ser configurado para realizar várias atualizações e exibir o menor valor de latência"
         }
       },
       {
@@ -1408,7 +1528,8 @@
           "zh": "新增隐私政策页面",
           "zh-TW": "新增隱私政策頁面",
           "fr": "Ajout de la page Politique de confidentialité",
-          "ru": "Добавлена страница политики конфиденциальности"
+          "ru": "Добавлена страница политики конфиденциальности",
+          "pt-BR": "Adicionada página de Política de Privacidade"
         }
       },
       {
@@ -1418,7 +1539,8 @@
           "zh": "导航栏展示所有高级工具的入口",
           "zh-TW": "導覽列展示所有進階工具的入口",
           "fr": "La barre de navigation affiche désormais tous les outils avancés",
-          "ru": "Панель навигации теперь показывает все расширенные инструменты"
+          "ru": "Панель навигации теперь показывает все расширенные инструменты",
+          "pt-BR": "A barra de navegação agora mostra todas as ferramentas avançadas"
         }
       },
       {
@@ -1428,7 +1550,8 @@
           "zh": "首页的所有模块现在可以单独控制是否自动运行",
           "zh-TW": "首頁的所有模組現在可以個別控制是否自動執行",
           "fr": "Tous les modules de la page d'accueil peuvent maintenant être contrôlés individuellement pour déterminer s'ils doivent être exécutés automatiquement",
-          "ru": "Для каждого модуля на главной странице теперь можно отдельно настроить автоматический запуск"
+          "ru": "Для каждого модуля на главной странице теперь можно отдельно настроить автоматический запуск",
+          "pt-BR": "Todos os módulos da página inicial agora podem ser configurados individualmente para execução automática"
         }
       },
       {
@@ -1438,7 +1561,8 @@
           "zh": "修复一些问题",
           "zh-TW": "修正一些問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены некоторые проблемы"
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
         }
       }
     ]
@@ -1454,7 +1578,8 @@
           "zh": "测试结果可生成诊断报告并分享——自动过期的只读链接、AI 可读的 Markdown 或 JSON",
           "zh-TW": "測試結果可產生診斷報告並分享——自動過期的唯讀連結、AI 可讀的 Markdown 或 JSON",
           "fr": "Partagez vos résultats de test sous forme de rapport de diagnostic — lien en lecture seule à expiration automatique, Markdown prêt pour l'IA ou JSON",
-          "ru": "Результатами тестов теперь можно делиться в виде диагностического отчёта — по ссылке только для чтения с автоматическим истечением срока, в формате Markdown для AI или JSON"
+          "ru": "Результатами тестов теперь можно делиться в виде диагностического отчёта — по ссылке только для чтения с автоматическим истечением срока, в формате Markdown для AI или JSON",
+          "pt-BR": "Compartilhe resultados de testes como um relatório de diagnóstico — link somente para leitura com expiração automática, Markdown pronto para IA ou JSON"
         }
       },
       {
@@ -1464,7 +1589,8 @@
           "zh": "新增 IP 历史记录面板，并支持按类型和国家筛选",
           "zh-TW": "新增 IP 歷史記錄面板，並支援依類型和國家篩選",
           "fr": "Ajout du panneau Historique IP avec filtres par type et par pays",
-          "ru": "Добавлена панель истории IP с фильтрами по типу и стране"
+          "ru": "Добавлена панель истории IP с фильтрами по типу и стране",
+          "pt-BR": "Adicionado painel Histórico de IP com filtros de tipo e país"
         }
       },
       {
@@ -1474,7 +1600,8 @@
           "zh": "集成错误与性能监控，开发者可选启用",
           "zh-TW": "整合錯誤與效能監控，開發者可選擇啟用",
           "fr": "Intégration de la surveillance des erreurs et des performances, activable en option par les développeurs",
-          "ru": "Добавлен мониторинг ошибок и производительности, который разработчики могут включить при необходимости"
+          "ru": "Добавлен мониторинг ошибок и производительности, который разработчики могут включить при необходимости",
+          "pt-BR": "Monitoramento de erros e desempenho integrado, com ativação opcional por desenvolvedores"
         }
       },
       {
@@ -1484,7 +1611,8 @@
           "zh": "新增一个幽默的启动动画",
           "zh-TW": "新增一個幽默的啟動動畫",
           "fr": "Ajout d'une animation de lancement humoristique",
-          "ru": "Добавлена юмористическая анимация запуска"
+          "ru": "Добавлена юмористическая анимация запуска",
+          "pt-BR": "Adicionada uma animação de inicialização humorística"
         }
       },
       {
@@ -1494,7 +1622,8 @@
           "zh": "使用用户浏览器内置国家地区名称，避免政治争议",
           "zh-TW": "改用瀏覽器內建的國家與地區名稱，避免政治爭議",
           "fr": "Les noms de pays et de régions proviennent désormais des données intégrées au navigateur, évitant les controverses politiques",
-          "ru": "Названия стран и регионов теперь берутся из встроенных данных браузера пользователя, что помогает избежать политических споров"
+          "ru": "Названия стран и регионов теперь берутся из встроенных данных браузера пользователя, что помогает избежать политических споров",
+          "pt-BR": "Os nomes de países e regiões agora vêm dos dados integrados ao navegador do usuário, evitando controvérsias políticas"
         }
       },
       {
@@ -1504,7 +1633,8 @@
           "zh": "IP 信息源链路出现故障时优雅降级",
           "zh-TW": "IP 資訊來源鏈路發生故障時優雅降級",
           "fr": "La chaîne de sources IP se dégrade désormais en douceur en cas de panne",
-          "ru": "Цепочка источников IP теперь корректно переключается на резервные источники при сбое"
+          "ru": "Цепочка источников IP теперь корректно переключается на резервные источники при сбое",
+          "pt-BR": "A cadeia de fontes de IP agora lida adequadamente com falhas de uma fonte"
         }
       },
       {
@@ -1514,7 +1644,8 @@
           "zh": "WebRTC 测试可检测浏览器隐私加固情况",
           "zh-TW": "WebRTC 測試可偵測瀏覽器隱私強化情況",
           "fr": "Le test WebRTC peut désormais détecter le renforcement de la confidentialité du navigateur",
-          "ru": "Тест WebRTC теперь выявляет усиленную защиту конфиденциальности браузера"
+          "ru": "Тест WebRTC теперь выявляет усиленную защиту конфиденциальности браузера",
+          "pt-BR": "O teste WebRTC agora pode detectar proteções de privacidade reforçadas do navegador"
         }
       },
       {
@@ -1524,7 +1655,8 @@
           "zh": "手机端 FAB 按钮体验优化",
           "zh-TW": "手機端 FAB 懸浮按鈕體驗最佳化",
           "fr": "Optimisation de l'expérience des boutons FAB sur mobile",
-          "ru": "Улучшено использование кнопок FAB на мобильных устройствах"
+          "ru": "Улучшено использование кнопок FAB на мобильных устройствах",
+          "pt-BR": "Experiência do botão FAB em dispositivos móveis aprimorada"
         }
       },
       {
@@ -1534,7 +1666,8 @@
           "zh": "网速测试在连接中途失败时会显示明确的错误状态",
           "zh-TW": "網速測試在連線中途失敗時會顯示明確的錯誤狀態",
           "fr": "Le test de vitesse affiche désormais un état d'erreur clair lorsque la connexion échoue en cours d'exécution",
-          "ru": "Тест скорости теперь явно показывает ошибку, если соединение обрывается во время выполнения"
+          "ru": "Тест скорости теперь явно показывает ошибку, если соединение обрывается во время выполнения",
+          "pt-BR": "O teste de velocidade agora mostra um estado de erro claro quando a conexão falha durante a execução"
         }
       },
       {
@@ -1544,7 +1677,8 @@
           "zh": "其它数十处用户体验优化",
           "zh-TW": "其他數十處使用者體驗最佳化",
           "fr": "Des dizaines d'autres améliorations de l'expérience utilisateur",
-          "ru": "Внесены десятки других улучшений пользовательского опыта"
+          "ru": "Внесены десятки других улучшений пользовательского опыта",
+          "pt-BR": "Dezenas de outras melhorias na experiência do usuário"
         }
       },
       {
@@ -1554,7 +1688,8 @@
           "zh": "修复各个工具的 20 多处问题，提升整体稳定性",
           "zh-TW": "修正各個工具的 20 多處問題，提升整體穩定性",
           "fr": "Correction de plus de 20 problèmes dans les outils, améliorant la stabilité globale",
-          "ru": "Исправлено более 20 проблем в инструментах и повышена общая стабильность"
+          "ru": "Исправлено более 20 проблем в инструментах и повышена общая стабильность",
+          "pt-BR": "Corrigidos mais de 20 problemas nas ferramentas, melhorando a estabilidade geral"
         }
       }
     ]
@@ -1570,7 +1705,8 @@
           "zh": "使用多种方式优化加载速度，提升 50%+",
           "zh-TW": "使用多種方式最佳化載入速度，提升 50%+",
           "fr": "Optimisation de la vitesse de chargement de 50%+",
-          "ru": "Скорость загрузки повышена более чем на 50%"
+          "ru": "Скорость загрузки повышена более чем на 50%",
+          "pt-BR": "Velocidade de carregamento aprimorada em mais de 50%"
         }
       },
       {
@@ -1580,7 +1716,8 @@
           "zh": "支持俄语语言",
           "zh-TW": "支援俄文",
           "fr": "Support de la langue russe",
-          "ru": "Добавлена поддержка русского языка"
+          "ru": "Добавлена поддержка русского языка",
+          "pt-BR": "Idioma russo suportado"
         }
       },
       {
@@ -1590,7 +1727,8 @@
           "zh": "提升本地 Maxmind 并发查询能力",
           "zh-TW": "提升本機 Maxmind 並行查詢能力",
           "fr": "Amélioration de la capacité de requête concurrente Maxmind locale",
-          "ru": "Улучшена поддержка параллельных запросов к локальной базе MaxMind"
+          "ru": "Улучшена поддержка параллельных запросов к локальной базе MaxMind",
+          "pt-BR": "Capacidade de consultas simultâneas à base MaxMind local aprimorada"
         }
       },
       {
@@ -1600,7 +1738,8 @@
           "zh": "修复 Whois 查询工具无法查询部分 IP 的错误",
           "zh-TW": "修正 Whois 查詢工具無法查詢部分 IP 的錯誤",
           "fr": "Correction d'un bug qui empêchait la recherche de certains IP avec l'outil Whois",
-          "ru": "Исправлен поиск Whois для некоторых IP-адресов"
+          "ru": "Исправлен поиск Whois для некоторых IP-адресов",
+          "pt-BR": "Corrigido problema que impedia a Pesquisa Whois de consultar alguns IPs"
         }
       }
     ]
@@ -1616,7 +1755,8 @@
           "zh": "全面重构封锁测试，可以查询一个网站在全球的封锁情况和被封锁手段",
           "zh-TW": "全面重構封鎖測試，可以查詢一個網站在全球的封鎖情況和被封鎖手段",
           "fr": "Refonte complète du test de censure : découvrez où un site est bloqué dans le monde et par quels moyens",
-          "ru": "Полностью переработана проверка цензуры: видно, где в мире сайт заблокирован и какими методами"
+          "ru": "Полностью переработана проверка цензуры: видно, где в мире сайт заблокирован и какими методами",
+          "pt-BR": "Verificação de censura reformulada: veja onde um site é bloqueado em todo o mundo e por quais meios"
         }
       },
       {
@@ -1626,7 +1766,8 @@
           "zh": "MTR 测试、全球延迟测试和封锁测试支持从全球可用探针中按大洲自选国家/地区",
           "zh-TW": "MTR 測試、全球延遲測試和封鎖測試支援從全球可用探針中依大洲自選國家/地區",
           "fr": "Les tests MTR, latence mondiale et censure permettent de choisir les pays parmi toutes les sondes Globalping disponibles, groupées par continent",
-          "ru": "В тестах MTR, глобальной задержки и цензуры можно выбирать страны из всех доступных зондов Globalping, сгруппированных по континентам"
+          "ru": "В тестах MTR, глобальной задержки и цензуры можно выбирать страны из всех доступных зондов Globalping, сгруппированных по континентам",
+          "pt-BR": "Os testes MTR, Latência Global e Censura agora permitem escolher países entre todas as sondas do Globalping disponíveis, agrupadas por continente"
         }
       },
       {
@@ -1636,7 +1777,8 @@
           "zh": "新增 AI 助手 IPilot：基于文档回答你的问题，并可在你授权后读取页面上的检测结果",
           "zh-TW": "新增 AI 助手 IPilot：依據文件回答你的問題，並可在你授權後讀取頁面上的測試結果",
           "fr": "Nouvel assistant IA : IPilot répond à vos questions à partir de la documentation et peut lire vos résultats affichés avec votre autorisation",
-          "ru": "Новый ИИ-помощник IPilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения"
+          "ru": "Новый ИИ-помощник IPilot: отвечает на вопросы по документации и может прочитать результаты на странице с вашего разрешения",
+          "pt-BR": "Novo assistente de IA: o IPilot responde às suas perguntas com base na documentação e pode ler os resultados exibidos na página com sua permissão."
         }
       },
       {
@@ -1646,7 +1788,8 @@
           "zh": "新增用户与开发帮助文档，包含工具使用说明、网络问题排查和自部署指南",
           "zh-TW": "新增使用者與開發說明文件，包含工具使用說明、網路問題排查和自行部署指南",
           "fr": "Nouveau site de documentation pour les utilisateurs et les développeurs : guides des outils, dépannage réseau et auto-hébergement",
-          "ru": "Новый сайт документации для пользователей и разработчиков: описания инструментов, диагностика сети и самостоятельный хостинг"
+          "ru": "Новый сайт документации для пользователей и разработчиков: описания инструментов, диагностика сети и самостоятельный хостинг",
+          "pt-BR": "Novo site de documentação para usuários e desenvolvedores, com guias de ferramentas, solução de problemas de rede e auto-hospedagem"
         }
       },
       {
@@ -1656,7 +1799,8 @@
           "zh": "提升「服务可用性」高级工具的稳定性",
           "zh-TW": "提升「服務可用性」進階工具的穩定性",
           "fr": "Amélioration de la stabilité de l'outil Disponibilité des services",
-          "ru": "Повышена стабильность инструмента «Статус сервисов»"
+          "ru": "Повышена стабильность инструмента «Статус сервисов»",
+          "pt-BR": "Estabilidade da ferramenta Status dos serviços aprimorada"
         }
       },
       {
@@ -1666,7 +1810,8 @@
           "zh": "修复了一些小问题",
           "zh-TW": "修正了一些小問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены некоторые мелкие проблемы"
+          "ru": "Исправлены некоторые мелкие проблемы",
+          "pt-BR": "Pequenos problemas corrigidos"
         }
       }
     ]
@@ -1682,7 +1827,8 @@
           "zh": "IP 信息卡片与 IP 查询新增时区显示，并附带当前 UTC 偏移",
           "zh-TW": "IP 資訊卡片與 IP 查詢新增時區顯示，並附上目前的 UTC 偏移",
           "fr": "Les cartes IP et la recherche d'IP affichent désormais le fuseau horaire de l'IP localisée, avec son décalage UTC actuel",
-          "ru": "На карточках IP и в поиске по IP теперь отображается часовой пояс найденного IP-адреса и его текущее смещение UTC"
+          "ru": "На карточках IP и в поиске по IP теперь отображается часовой пояс найденного IP-адреса и его текущее смещение UTC",
+          "pt-BR": "Os cartões IP e a pesquisa de IP agora mostram o fuso horário do IP localizado, com seu deslocamento UTC atual"
         }
       },
       {
@@ -1692,7 +1838,8 @@
           "zh": "网络连通性支持导入内置测试列表：伊朗、俄罗斯、中国等国家合集，以及 AI、社交、流媒体、游戏、开发者、云服务、加密交易所、新闻等主题合集",
           "zh-TW": "網路連通性支援匯入內建測試列表：伊朗、俄羅斯、中國等國家合集，以及 AI、社群、串流影音、遊戲、開發者、雲端服務、加密貨幣交易所、新聞等主題合集",
           "fr": "Connectivité : importez des listes de tests prêtes à l'emploi — packs pays (Iran, Russie, Chine) et ensembles IA, réseaux sociaux, streaming, jeux, développeurs, cloud, crypto et actualités",
-          "ru": "Проверка доступности: импорт готовых списков — наборы по странам (Иран, Россия, Китай), а также ИИ, соцсети, стриминг, игры, разработка, облака, криптобиржи и новости"
+          "ru": "Проверка доступности: импорт готовых списков — наборы по странам (Иран, Россия, Китай), а также ИИ, соцсети, стриминг, игры, разработка, облака, криптобиржи и новости",
+          "pt-BR": "Conectividade: importe listas de testes selecionadas — pacotes de países (Irã, Rússia, China), além de conjuntos de IA, redes sociais, streaming, jogos, desenvolvedores, nuvem, criptomoedas e notícias"
         }
       },
       {
@@ -1702,7 +1849,8 @@
           "zh": "地球在线：查看全球访客的状态、全球网络故障情况，以及分享自己的状态",
           "zh-TW": "地球線上：檢視全球訪客的狀態、全球網路故障情況，以及分享自己的狀態",
           "fr": "La Terre en ligne : voyez le statut des visiteurs, les pannes de réseau mondiales et partagez votre statut",
-          "ru": "Земля онлайн: смотрите статус посетителей, глобальные сбои сети и делитесь своим статусом"
+          "ru": "Земля онлайн: смотрите статус посетителей, глобальные сбои сети и делитесь своим статусом",
+          "pt-BR": "Earth Online: veja o status do visitante, interrupções na rede global e compartilhe seu próprio status"
         }
       },
       {
@@ -1712,7 +1860,8 @@
           "zh": "新增一批可以解锁的成就",
           "zh-TW": "新增一批可以解鎖的成就",
           "fr": "Nouveaux succès à débloquer",
-          "ru": "Новые достижения"
+          "ru": "Новые достижения",
+          "pt-BR": "Novas conquistas para desbloquear"
         }
       },
       {
@@ -1722,7 +1871,8 @@
           "zh": "连通性卡片改用网站真实图标显示，可测试数量上限提升至 60 个",
           "zh-TW": "連通性卡片改用網站真實圖示顯示，可測試數量上限提升至 60 個",
           "fr": "Les cartes de connectivité affichent désormais les vraies favicons des sites, et la capacité de test passe à 60",
-          "ru": "Карточки доступности теперь показывают настоящие favicon сайтов, а лимит тестов увеличен до 60"
+          "ru": "Карточки доступности теперь показывают настоящие favicon сайтов, а лимит тестов увеличен до 60",
+          "pt-BR": "Os cartões de conectividade agora mostram favicons reais do site e a capacidade de teste aumenta para 60"
         }
       },
       {
@@ -1732,7 +1882,8 @@
           "zh": "优化了一些程序逻辑，提高代码复用率",
           "zh-TW": "最佳化了一些程式邏輯，提高程式碼複用率",
           "fr": "Optimisation de certaines logiques de programmation pour augmenter le taux de réutilisation du code",
-          "ru": "Оптимизация некоторых логических программ для повышения коэффициента повторного использования кода"
+          "ru": "Оптимизация некоторых логических программ для повышения коэффициента повторного использования кода",
+          "pt-BR": "Lógica do programa otimizada para aumentar a reutilização do código"
         }
       },
       {
@@ -1742,7 +1893,8 @@
           "zh": "修复了一些问题",
           "zh-TW": "修正了一些問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены некоторые проблемы"
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
         }
       }
     ]
@@ -1758,7 +1910,8 @@
           "zh": "新增工具：深度画像检测——看看网站能读到的信息，有多少和你想被当成的国家对得上",
           "zh-TW": "新增工具：深度畫像檢測——看看網站能讀到的資訊，有多少和你想被當成的國家對得上",
           "fr": "Nouvel outil : Vérification de persona approfondie — voyez dans quelle mesure ce que lisent les sites correspond au pays pour lequel vous voulez passer",
-          "ru": "Новый инструмент: углублённая проверка портрета — насколько то, что видят сайты, совпадает со страной, за жителя которой вы хотите себя выдавать"
+          "ru": "Новый инструмент: углублённая проверка портрета — насколько то, что видят сайты, совпадает со страной, за жителя которой вы хотите себя выдавать",
+          "pt-BR": "Nova ferramenta: Verificação aprofundada de persona — veja em que medida o que os sites leem corresponde ao país cuja identidade você deseja apresentar"
         }
       },
       {
@@ -1768,7 +1921,8 @@
           "zh": "网络连通性测试可删除预设网站、新增国际电商平台、巴西常用网站导入列表",
           "zh-TW": "網路連通性測試可刪除預設網站、新增國際電商平台、巴西常用網站匯入列表",
           "fr": "Connectivité : les sites prédéfinis sont désormais supprimables, avec de nouvelles listes importables « E-commerce mondial » et « Essentiels Brésil »",
-          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлены импортируемые списки «Электронная коммерция» и «Бразилия: основные»"
+          "ru": "Проверка доступности: предустановленные сайты теперь можно удалять, добавлены импортируемые списки «Электронная коммерция» и «Бразилия: основные»",
+          "pt-BR": "Conectividade: sites predefinidos agora podem ser removidos, além das novas listas de importação Global E-commerce e Brazil Essentials"
         }
       },
       {
@@ -1778,7 +1932,8 @@
           "zh": "使用精美的柱状图展示多次刷新模式下的网络连通性测试结果",
           "zh-TW": "使用精美的長條圖展示多次重新整理模式下的網路連通性測試結果",
           "fr": "Connectivité : les résultats des tests multi-passes s'affichent désormais en élégantes barres de latence",
-          "ru": "Проверка доступности: результаты многократных тестов теперь отображаются изящными столбиками задержки"
+          "ru": "Проверка доступности: результаты многократных тестов теперь отображаются изящными столбиками задержки",
+          "pt-BR": "Conectividade: resultados de testes em várias rodadas agora são exibidos como barras de latência claras"
         }
       },
       {
@@ -1788,7 +1943,8 @@
           "zh": "优化了多个地方的用户体验",
           "zh-TW": "最佳化了多個地方的使用者體驗",
           "fr": "Optimisation de l'expérience utilisateur dans plusieurs endroits",
-          "ru": "Оптимизация пользовательского опыта в нескольких местах"
+          "ru": "Оптимизация пользовательского опыта в нескольких местах",
+          "pt-BR": "Diversos aspectos da experiência do usuário otimizados"
         }
       },
       {
@@ -1798,7 +1954,8 @@
           "zh": "优化多处日期格式显示",
           "zh-TW": "最佳化多處日期格式顯示",
           "fr": "Optimisation de l'affichage des dates dans plusieurs endroits",
-          "ru": "Оптимизация отображения дат в нескольких местах"
+          "ru": "Оптимизация отображения дат в нескольких местах",
+          "pt-BR": "Exibição de datas otimizada em vários pontos"
         }
       },
       {
@@ -1808,7 +1965,8 @@
           "zh": "修复了一些问题",
           "zh-TW": "修正了一些問題",
           "fr": "Correction de petits problèmes",
-          "ru": "Исправлены некоторые проблемы"
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
         }
       }
     ]
@@ -1824,7 +1982,8 @@
           "zh": "为开发者：重构多国语言架构，添加新语言变得更容易",
           "zh-TW": "為開發者：重構多國語言架構，新增語言變得更容易",
           "fr": "Pour les développeurs : refonte de l'architecture multi-langue, rendant plus facile l'ajout de nouvelles langues",
-          "ru": "Для разработчиков: переработана архитектура многоязычности, чтобы было легче добавлять новые языки"
+          "ru": "Для разработчиков: переработана архитектура многоязычности, чтобы было легче добавлять новые языки",
+          "pt-BR": "Para desenvolvedores: arquitetura multilíngue refatorada, facilitando a adição de novos idiomas"
         }
       },
       {
@@ -1834,7 +1993,8 @@
           "zh": "为开发者：新增 Section 推广位，可以根据需要，在不同的 Section 增加推广内容",
           "zh-TW": "為開發者：新增 Section 推廣位，可以依需要在不同的 Section 增加推廣內容",
           "fr": "Pour les développeurs : ajout de slots promotionnels par section, permettant d'ajouter du contenu promotionnel dans différentes sections selon les besoins",
-          "ru": "Для разработчиков: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей"
+          "ru": "Для разработчиков: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей",
+          "pt-BR": "Para desenvolvedores: slots de promoção por seção adicionados; conteúdo promocional pode ser inserido onde necessário"
         }
       },
       {
@@ -1844,7 +2004,8 @@
           "zh": "IPilot 现在可以帮使用者运行部分测试",
           "zh-TW": "IPilot 現在可以幫你執行部分測試",
           "fr": "IPilot peut désormais exécuter certains tests pour vous",
-          "ru": "IPilot теперь может запускать часть тестов за вас"
+          "ru": "IPilot теперь может запускать часть тестов за вас",
+          "pt-BR": "O IPilot agora pode executar alguns dos testes para você"
         }
       },
       {
@@ -1854,7 +2015,8 @@
           "zh": "DNS 解析器现在按国家分组显示结果",
           "zh-TW": "DNS 解析器現在依國家分組顯示結果",
           "fr": "Le DNS Resolver affiche désormais les résultats par pays",
-          "ru": "DNS Resolver теперь группирует результаты по странам"
+          "ru": "DNS Resolver теперь группирует результаты по странам",
+          "pt-BR": "O DNS Resolver agora agrupa resultados por país"
         }
       },
       {
@@ -1864,7 +2026,8 @@
           "zh": "修复了一些问题",
           "zh-TW": "修正了一些問題",
           "fr": "Correction de divers problèmes",
-          "ru": "Исправлены некоторые проблемы"
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
         }
       }
     ]

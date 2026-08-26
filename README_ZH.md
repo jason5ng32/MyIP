@@ -1,4 +1,7 @@
-# 🧰 IP 工具箱
+# 🧰 MyIP - 更好的 IP 工具箱
+
+> [!NOTE]
+> 这是由社区维护的翻译版本；英文版 README 为唯一权威来源，本页面内容可能滞后于英文版。
 
 <div align="center">
 
@@ -18,11 +21,13 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+
+一个开源的一站式 IP 工具箱：多来源 IP 查询、连通性测试、WebRTC 与 DNS 泄露检测、网速测试、MTR、封锁检测、Whois 等等 —— 一条 Docker 命令即可自行部署。
 
 👉 在这里体验：[https://ipcheck.ing](https://ipcheck.ing)
 
-你可以直接用我已经搭建好的服务，也可以自行搭建。
+欢迎收藏在线版本，也可以自行部署。
 
 [![Deploy with Docker](https://raw.githubusercontent.com/jason5ng32/MyIP/main/public/github/Docker.svg)](https://hub.docker.com/r/jason5ng32/myip)
 
@@ -30,53 +35,74 @@
 
 ## 👀 主要功能
 
-* 🛜 **看自己的 IP**：从多个 IPv4 和 IPv6 来源检测显示本机的 IP
-* 🔍 **查任意 IP 信息**：可以通过小工具查询任意 IP 的信息
-* 🕵️ **看 IP 信息**：显示所有 IP 的相关信息，包括国家、地区、ASN、地理位置等
-* 🛰️ **ASN 历史与上游拓扑**：查看 IP 前缀的历史 AS 宣告记录，以及该 ASN 到 Tier 1 骨干网的上游路径图
-* 🚦 **可用性检测**：检测一些网站的可用性：Google, Github, Youtube, 网易, 百度等
-* 📡 **服务可用性**：展示一些知名服务（Claude、OpenAI、GitHub、Cloudflare 等）的实时可用状态，数据来自它们的官方状态页，可查看各子服务状态与最近的事故
-* 🚥 **WebRTC 检测**：查看使用 WebRTC 连接时使用的 IP
-* 🛑 **DNS 泄露检测**：查看 DNS 出口信息，以便查看在 VPN/代理的情况下，是否存在 DNS 泄露隐私的风险
-* 🚀 **网速测试**：利用边缘网络进行网速测试
-* 🚏 **代理规则测试**：配合代理软件的规则设置，测试规则设置是否正常
-* ⏱️ **全球延迟测试**：从分布在全球的多个服务器进行延迟测试，了解你与全球网络的连接速度
-* 🚉 **MTR 测试**：从分布在全球的多个服务器进行 MTR 测试，了解你与全球的连接路径
-* 🔦 **DNS 解析器**：从多个渠道对域名进行 DNS 解析，获取实时的解析结果，可用于污染判断
-* 🚧 **封锁测试**：检查特定的网站在部分国家是否被封锁
-* 📓 **Whois 查询**：对域名或 IP 进行 whois 信息查询
-* 📀 **MAC 地址查询**：查询物理地址的归属信息
-* 🖥️ **浏览器指纹**：多种方式查看浏览器指纹
-* 📋 **网络安全检查清单**：一共有 258 项的，全面的网络安全检查清单
+### 🪪 你的 IP 与身份
 
-## 💪 同时还支持
+* 🛜 **IP 卡片**：从多个相互独立的来源并列检测你的 IPv4 和 IPv6 —— 国家、地区、城市、ASN、组织，以及该 IP 所在地的时区。
+* 🔍 **IP 查询**：查询任意一个你感兴趣的 IP 地址的同样详细的信息。
+* 🧾 **IP 历史记录**：在本地记录你使用过的 IP，可按类型和国家筛选 —— 数据只存在你的浏览器里。
+* 🖥️ **浏览器指纹**：用多种方式计算你的浏览器指纹，并展示是什么让你变得可被识别。
 
-* 🌗 **暗黑模式**：根据系统设置自动切换暗黑/白天模式，也可以手动切换
-* 📲 **支持 PWA**：可以添加为手机应用以及电脑里的桌面应用，方便使用
-* ⌨️ **支持快捷键**：可以随时输入 `?` 查看快捷键菜单
-* 🌍 根据可用性检测结果，返回目前是否可以访问全世界网络的提示
-* 🔤 支持多种语言
+### 🕵️ 泄露与隐私
+
+* 🚥 **WebRTC 检测**：揭示 WebRTC 连接过程中暴露的 IP 地址 —— 包括你的浏览器是否开启了隐私强化。
+* 🛑 **DNS 泄露测试**：展示是哪些 DNS 出口在解析你的请求，以便评估使用 VPN 或代理时 DNS 泄露的风险。
+* 📋 **安全检查清单**：一份覆盖 12 个领域、共 258 项的个人网络安全检查清单，进度保存在你的浏览器里。
+
+### 📡 网络测试
+
+* 🚦 **网络连通性**：检测最多 60 个你自选网站的可达性，多轮测试取最低延迟 —— 还提供精选导入列表，从国家套装到 AI、社交、流媒体、游戏、开发者等应有尽有。并根据检测结果，提示你当前能否访问全球互联网。
+* 🚀 **网速测试**：基于边缘网络测量你的下载、上传速度与延迟。
+* ⏱️ **全球延迟测试**：从遍布全球的探针 ping 你的目标 —— 可从所有可用的 Globalping 探针中按大洲分组选择国家。
+* 🚉 **MTR 测试**：从分布在全球的探针发起 MTR，查看数据包实际经过的路由。
+* 🚧 **封锁测试**：展示一个网站在全球哪些地方被封锁 —— 以及是通过什么手段封锁的。
+* 🚏 **分流测试**：验证你的代理软件的规则配置是否按你的预期工作。
+
+### 🔦 查询与基础设施
+
+* 📟 **DNS 解析**：同时通过多个解析器解析一个域名，并按国家分组 —— 轻松发现劫持或污染。
+* 📓 **Whois 查询**：对域名和 IP 地址进行 Whois 查询。
+* 🗄️ **MAC 地址查询**：识别一个物理地址背后的厂商与详细信息。
+* 🛰️ **ASN 信息与上游拓扑**：展示 AS 详情、IP 前缀的历史宣告记录，以及从某个 ASN 到 Tier 1 骨干网的上游路径。
+* 📶 **服务可用性**：知名服务的实时可用状态 —— Claude、OpenAI、GitHub、Cloudflare 等 —— 数据来自它们的官方状态页，并附最近的事故。
+
+### ✨ 平台能力
+
+* 📤 **诊断报告分享**：把你的测试结果生成一份诊断报告 —— 可选自动过期的只读链接、适合喂给 AI 的 Markdown，或 JSON。
+* ⌨️ **命令行 API**：在终端里用一条 `curl` 命令获取你的 IP。
+* 🌍 **地球在线**：一个实时播报全球断网事件的面板。
+* 🌗 **暗黑模式**：自动跟随系统，也可以手动切换。
+* 📲 **PWA**：可以安装为手机应用，也可以安装为桌面上的 Chrome 应用。
+* ⚡ **快捷键**：每个功能都有对应的快捷键 —— 按 `?` 查看列表。
+* 🔤 **多语言**：界面内置 6 种语言，添加你的语言只需一个语言包。
 
 ## 📕 如何使用
 
+### 使用 Docker
+
+一条命令即可运行：
+
+```bash
+docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+```
+
+或者点击本页顶部的「Deploy with Docker」按钮。
+
 ### 在 Node 环境部署
 
-确保你系统里已经有 Node.js 环境。
-
-克隆代码:
+确保你已经安装了 Node.js，然后克隆代码：
 
 ```bash
 git clone https://github.com/jason5ng32/MyIP.git
 ```
 
-安装与编译。本项目使用 pnpm，如果你还没有，请先安装（npm 随 Node 一起提供，这条命令一定能用）：
+安装与构建。本项目使用 pnpm —— 如果你还没有，请先安装（npm 随 Node 一起提供，这条命令一定能用）：
 
 ```bash
 npm install -g pnpm
 pnpm install && pnpm run build
 ```
 
-运行:
+运行：
 
 ```bash
 pnpm start
@@ -84,35 +110,13 @@ pnpm start
 
 程序会运行在 18966 端口。
 
-### 使用 Docker
-
-点击顶部的部署到 Docker 按钮，即可完成部署，又或者，直接输入下面的命令：
-
-```bash
-docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
-```
-
-## 📖 官方文档
-
-完整文档在 MyIP 文档中心：**[docs.ipcheck.ing](https://docs.ipcheck.ing)**（右上角可切换中文）
-
-* [开发者指南](https://docs.ipcheck.ing/developer/zh) —— 部署、配置、架构说明与参与贡献
-* [知识库](https://docs.ipcheck.ing/knowledge-base/zh) —— 每个工具的使用说明、网络问题排查指南、网络概念科普
-
-## 🤝 参与贡献
-
-欢迎参与贡献！我们维护着一批对新手友好的任务，每条都写明了具体文件、验收标准，并有测试引导你完成：
-
-* 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) —— 添加你所在国家的 DNS 解析服务、添加精选网站列表、把 README 翻译成你的语言、润色翻译等
-* 🌐 [TRANSLATING.md](TRANSLATING.md) —— 把 UI 带到你的语言：一个语言包加上一行注册表，以及 **部分翻译也是欢迎的首次 PR**
-* 📄 [CONTRIBUTING.md](CONTRIBUTING.md) —— 环境搭建、开发约定与 PR 流程（请将 PR 提交到 `dev` 分支）
-
 ## ⚙️ 配置
 
-开始之前，有两项配置最重要：
+> [!IMPORTANT]
+> **MaxMind GeoLite2 凭证是必需的。** 它为 IP 地理位置与 ASN 查询提供数据 —— 不配置时，MaxMind 数据源会返回 503。凭证是免费的：→ [MaxMind Setup](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
 
-* **MaxMind GeoLite2（必须）** —— 免费凭证，为 IP 地理位置与 ASN 查询提供数据。不配置时 MaxMind 数据源会返回 503。→ [MaxMind 配置指南](https://docs.ipcheck.ing/developer/getting-started/zh/maxmind-setup)
-* **`ALLOWED_DOMAINS`（使用真实域名时必须）** —— 后端 API 的域名白名单。不配置时，来自非 localhost 域名的请求都会收到 403。→ [反向代理与域名](https://docs.ipcheck.ing/developer/getting-started/zh/reverse-proxy-and-domains)
+> [!WARNING]
+> **在真实域名上部署时，`ALLOWED_DOMAINS` 是必需的。** 它是后端 API 的主机名白名单 —— 不配置时，来自非 localhost 域名的每个请求都会收到 403。→ [Reverse Proxy & Domains](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
 
 ```bash
 docker run -d -p 18966:18966 \
@@ -124,12 +128,29 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其余全部为可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、CURL API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/zh/environment-variables)。
+其余全部是可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
 
+## 📖 官方文档
+
+完整指南在 MyIP 文档中心：**[docs.ipcheck.ing](https://docs.ipcheck.ing)**
+
+* [开发者指南](https://docs.ipcheck.ing/developer) —— 部署、配置、架构说明与参与贡献
+* [知识库](https://docs.ipcheck.ing/knowledge-base) —— 每个工具的使用说明、网络问题排查步骤、网络概念科普
+
+## 🤝 参与贡献
+
+欢迎参与贡献！我们维护着一批对新手友好的任务，每条都写明了具体文件路径、验收标准，并有测试引导你完成一次绿色构建：
+
+* 🏷️ [Good first issues](https://github.com/jason5ng32/MyIP/labels/good%20first%20issue) —— 添加你所在国家的 DNS 解析服务、添加精选网站列表、把 README 翻译成你的语言、润色翻译等
+* 🌐 [TRANSLATING.md](TRANSLATING.md) —— 把 UI 带到你的语言：一个语言包加上一行注册表，而且**部分翻译也是欢迎的首次 PR**
+* 📄 [CONTRIBUTING.md](CONTRIBUTING.md) —— 环境搭建、开发约定与 PR 流程（请将 PR 提交到 `dev` 分支）
 
 ## 👩🏻‍💻 高级用法
 
-如果你在通过代理上网，可以考虑在你的代理配置里，增加下面的规则（请根据你使用的客户端进行修改），这样就可以实现同时查询真实 IP 和代理后的 IP：
+<details>
+<summary>同时查询真实 IP 与代理 IP 的代理规则</summary>
+
+如果你在通过代理上网，可以考虑在你的代理配置里增加下面的规则（请根据你使用的客户端进行修改）。这样就可以同时查询你的真实 IP 和使用代理时的 IP：
 
 ```ini
 # IP Testing
@@ -148,6 +169,8 @@ DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
 
+</details>
+
 ## 💖 赞助者
 
 作为一个开源项目，我非常感谢以下赞助者对我的支持：
@@ -162,6 +185,10 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 <a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" title="GitBook" width="240px" /></a>
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
+
+## 📄 开源协议
+
+[MIT](LICENSE) © Jason Ng

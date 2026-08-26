@@ -18,7 +18,7 @@ live in [CONTRIBUTING.md](CONTRIBUTING.md).
 ## The smallest useful PR
 
 ```bash
-pnpm i18n-new pt-BR      # your language's code — see "Naming the code" below
+pnpm i18n-new es-MX      # your language's code — see "Naming the code" below
 ```
 
 That writes the two files a language needs and tells you what to do next:
@@ -61,7 +61,7 @@ page. The gate rejects a `""` in either.
 When you're ready to do one, scaffold it the same way you scaffolded the main pack:
 
 ```bash
-pnpm i18n-new pt-BR --privacy --checklist    # either flag, or both
+pnpm i18n-new es-MX --privacy --checklist    # either flag, or both
 ```
 
 Both need the language registered already (the plain `pnpm i18n-new <code>` run). The
@@ -76,7 +76,7 @@ it, or delete it again.
 `common/locale-registry.js`:
 
 ```js
-{ code: 'pt-BR', nativeName: 'Português (Brasil)', flag: 'br', apiTag: 'pt-BR', htmlLang: 'pt-BR', status: 'beta' },
+{ code: 'es-MX', nativeName: 'Español (México)', flag: 'mx', apiTag: 'es', htmlLang: 'es-MX', status: 'beta' },
 ```
 
 | Column | What to put in it |

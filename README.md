@@ -18,7 +18,9 @@
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+
+An open-source, all-in-one IP toolbox: IP lookup from multiple sources, connectivity tests, WebRTC & DNS-leak detection, speed test, MTR, censorship checks, Whois, and more — self-hostable with one Docker command.
 
 👉 Demo: [https://ipcheck.ing](https://ipcheck.ing)
 
@@ -28,42 +30,63 @@ Feel free to bookmark the demo or deploy your own.
 
 </div>
 
-## 👀 Main Features
+## 👀 Features
 
-* 🛜 **View Your IPs**: Detects and displays your local IPs, sourcing from multiple IPv4 and IPv6 providers.
-* 🔍 **Search IP Information**: Provides a tool for querying information about any IP address. 
-* 🕵️ **IP Information**: Presents detailed information for all IP addresses, including country, region, ASN, geographic location, and more.
-* 🛰️ **ASN History & Upstream Topology**: View historical AS announcements for an IP prefix, and visualize the upstream paths from an ASN to the Tier 1 backbone networks.
-* 🚦 **Availability Check**: Tests the accessibility of various websites, such as Google, GitHub, YouTube, ChatGPT, and others.
-* 📡 **Service Status**: Shows the live availability of well-known services (Claude, OpenAI, GitHub, Cloudflare, and more) from their official status pages, with per-service status and recent incidents.
-* 🚥 **WebRTC Detection**: Identifies the IP address used during WebRTC connections.
-* 🛑 **DNS Leak Test**: Shows DNS endpoint data to evaluate the risk of DNS leaks when using VPNs or proxies.
-* 🚀 **Speed Test**：Test your network speed with edge networks.
-* 🚏 **Proxy Rule Testing**: Test the rule settings of proxy software to ensure their correctness.
-* ⏱️ **Global Latency Test**: Performe lantency tests on servers located in different regions around the world.
-* 🚉 **MTR Test**: Perform MTR tests on servers located in different regions around the world.
-* 🔦 **DNS Resolver**: Performs DNS resolution of a domain name from multiple sources and obtains real-time resolution results that can be used for contamination determination.
-* 🚧 **Censorship Check**: Check if a website is blocked in some countries.
-* 📓 **Whois Search**: Perform whois information search for domain names or IP addresses
-* 📀 **MAC Lookup**: Query information of a physical address
-* 🖥️ **Browser Fingerprints**：Multiple ways to caculate your browser fingerprint
-* 📋 **Cybersecurity Checklist**：A comprehensive cybersecurity checklist with a total of 258 items
+### 🪪 Your IP & Identity
 
-## 💪 Also
+* 🛜 **IP Cards**: Detects your IPv4 and IPv6 from multiple independent sources side by side — country, region, city, ASN, organization, and the IP's local time zone.
+* 🔍 **Query IP**: Looks up the same detailed information for any IP address you're curious about.
+* 🧾 **IP History**: Keeps a local record of the IPs you've been seen with, filterable by type and country — stored in your browser only.
+* 🖥️ **Browser Fingerprint**: Calculates your browser fingerprint in multiple ways and shows what makes you identifiable.
 
-* 🌗 **Dark Mode**: Automatically toggles between dark and daylight modes based on system settings, with an option for manual switching.
-* 📲 **PWA Supported**：Can be added as a desktop app on your phone as well as a Chrome app on your computer.
-* ⌨️ **Keyboard Shortcuts**: Supports keyboard shortcuts for all functions, press `?` to view the shortcut list.
-* 🌍 Based on availability test results, it indicates whether global internet access is currently feasible.
-* 🔤 Multiple languages supported.
+### 🕵️ Leaks & Privacy
+
+* 🚥 **WebRTC Detection**: Reveals the IP address exposed during WebRTC connections — including whether your browser's privacy hardening is on.
+* 🛑 **DNS Leak Test**: Shows which DNS endpoints resolve your queries, to evaluate the risk of DNS leaks when using VPNs or proxies.
+* 📋 **Security Checklist**: A 258-item personal cybersecurity checklist across 12 areas, with progress saved in your browser.
+
+### 📡 Network Tests
+
+* 🚦 **Connectivity Check**: Tests the reachability of up to 60 sites of your choice, with multi-round minimum-latency results — plus curated import lists, from country packs to AI, social, streaming, gaming, developer, and more. Based on the results, it signals whether global internet access is currently feasible for you.
+* 🚀 **Speed Test**: Measures your download, upload, and latency against edge networks.
+* ⏱️ **Global Latency Test**: Pings your target from probes all over the world — pick countries from all available Globalping probes, grouped by continent.
+* 🚉 **MTR Test**: Runs MTR from globally distributed probes to see the route packets actually take.
+* 🚧 **Censorship Check**: Shows where a website is blocked worldwide — and by what means.
+* 🚏 **Proxy Rule Test**: Verifies that your proxy software's rule configuration works the way you intended.
+
+### 🔦 Lookup & Infrastructure
+
+* 📟 **DNS Resolver**: Resolves a domain through multiple resolvers at once, grouped by country — an easy way to spot hijacking or contamination.
+* 📓 **Whois Search**: Performs Whois lookups for domain names and IP addresses.
+* 🗄️ **MAC Lookup**: Identifies the vendor and details behind a physical address.
+* 🛰️ **ASN Info & Upstream Topology**: Shows AS details, historical announcements for an IP prefix, and the upstream paths from an ASN to the Tier 1 backbone.
+* 📶 **Service Status**: Live availability of well-known services — Claude, OpenAI, GitHub, Cloudflare, and more — from their official status pages, with recent incidents.
+
+### ✨ Platform
+
+* 📤 **Shareable Reports**: Turn your test results into a diagnostic report — a read-only link with auto-expiry, AI-ready Markdown, or JSON.
+* ⌨️ **Curl API**: Get your IP from the terminal with a single `curl` command.
+* 🌍 **Earth Online**: A panel broadcasting global internet outage events as they happen.
+* 🌗 **Dark Mode**: Follows your system automatically, with a manual toggle.
+* 📲 **PWA**: Installable as an app on your phone and as a Chrome app on your desktop.
+* ⚡ **Keyboard Shortcuts**: Every function has one — press `?` to see the list.
+* 🔤 **Multiple Languages**: The UI ships in 6 languages, and adding yours takes one locale pack.
 
 ## 📕 How to Use
 
+### Using Docker
+
+One command and you're up:
+
+```bash
+docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+```
+
+Or click the "Deploy with Docker" button at the top of this page.
+
 ### Deploying in a Node Environment
 
-Make sure you have Node.js installed.
-
-Clone the code:
+Make sure you have Node.js installed, then clone the code:
 
 ```bash
 git clone https://github.com/jason5ng32/MyIP.git
@@ -84,13 +107,25 @@ pnpm start
 
 The program will run on port 18966.
 
-### Using Docker
+## ⚙️ Configuration
 
-Click the 'Deploy to Docker' button at the top to complete the deployment. Or, use the following shell:
+> [!IMPORTANT]
+> **MaxMind GeoLite2 credentials are required.** They power IP geolocation and ASN lookups — without them, the MaxMind source returns 503. They're free: → [MaxMind Setup](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
+
+> [!WARNING]
+> **`ALLOWED_DOMAINS` is required on a real domain.** It's the hostname allowlist for the backend API — without it, every request from a non-localhost domain gets 403. → [Reverse Proxy & Domains](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
 
 ```bash
-docker run -d -p 18966:18966 --name myip --restart always jason5ng32/myip:latest
+docker run -d -p 18966:18966 \
+  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
+  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
+  -e MAXMIND_AUTO_UPDATE="true" \
+  -e ALLOWED_DOMAINS="your-domain.com" \
+  --name myip --restart always \
+  jason5ng32/myip:latest
 ```
+
+Everything else — optional API keys, security & rate limiting, logging, Sentry, the curl API domains — is documented in the [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentation
 
@@ -107,27 +142,10 @@ Contributions are welcome! We keep a curated set of beginner-friendly tasks — 
 * 🌐 [TRANSLATING.md](TRANSLATING.md) — bring the UI to your language: a locale pack plus one registry line, and a **partial translation is a welcome first PR**
 * 📄 [CONTRIBUTING.md](CONTRIBUTING.md) — setup, conventions, and how PRs flow (target the `dev` branch)
 
-## ⚙️ Configuration
-
-Two settings matter before anything else:
-
-* **MaxMind GeoLite2 (required)** — free credentials that power IP geolocation and ASN lookups. Without them, the MaxMind source returns 503. → [MaxMind Setup](https://docs.ipcheck.ing/developer/getting-started/maxmind-setup)
-* **`ALLOWED_DOMAINS` (required on a real domain)** — hostname allowlist for the backend API. Without it, every request from a non-localhost domain gets 403. → [Reverse Proxy & Domains](https://docs.ipcheck.ing/developer/getting-started/reverse-proxy-and-domains)
-
-```bash
-docker run -d -p 18966:18966 \
-  -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
-  -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
-  -e MAXMIND_AUTO_UPDATE="true" \
-  -e ALLOWED_DOMAINS="your-domain.com" \
-  --name myip --restart always \
-  jason5ng32/myip:latest
-```
-
-Everything else — optional API keys, security & rate limiting, logging, Sentry, the curl API domains — is documented in the [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
-
-
 ## 👩🏻‍💻 Advanced Usage
+
+<details>
+<summary>Proxy rules for checking your real IP and your proxy IP at the same time</summary>
 
 If you're using a proxy for internet access, consider adding this rule to your proxy configuration (modify it according to your client). This setup lets you check both your real IP and the IP when using the proxy:
 
@@ -148,9 +166,11 @@ DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
 ```
 
+</details>
+
 ## 💖 Sponsors
 
-As a open source project, I'm very grateful to the following sponsors for their support:
+As an open source project, I'm very grateful to the following sponsors for their support:
 
 <a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
@@ -165,3 +185,7 @@ As a open source project, I'm very grateful to the following sponsors for their 
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
 
 <a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
+
+## 📄 License
+
+[MIT](LICENSE) © Jason Ng

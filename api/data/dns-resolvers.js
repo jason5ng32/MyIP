@@ -51,4 +51,5 @@ export const DNS_RESOLVERS = [
     { id: 'giga', name: 'GIGA', country: 'TW', udp: '203.133.1.6' },
     { id: 'dns4eu', name: 'DNS4EU', country: 'EU', udp: '86.54.11.1' },
     { id: 'cznic', name: 'CZ.NIC ODVR', country: 'CZ', udp: '193.17.47.1' },
+    { id: 'dnssb', name: 'DNS.SB', country: 'EU', udp: '185.222.222.222', doh: 'https://doh.dns.sb/dns-query?' },
 ];
