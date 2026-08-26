@@ -230,34 +230,8 @@
         :country-name="data.country_name" :timezone="data.timezone" :isDarkMode="isDarkMode" />
 
     <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
-    <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
-        <DialogContent :title="data.ip" class="max-w-2xl">
-            <DialogHeader>
-                <template #title>
-                    <span class="flex items-center gap-2 min-w-0">
-                        <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
-                            class="size-4 shrink-0" />
-                        <span class="truncate">{{ data.country_name }}<template v-if="data.city"> · {{ data.city
-                                }}
-                            </template>
-                        </span>
-                    </span>
-                </template>
-            </DialogHeader>
-            <div class="mb-2">
-                <span class="flex items-center gap-2 text-sm text-muted-foreground ">
-                    <Earth class="size-4" />
-                    <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
-                </span>
-                <span class="font-mono shrink-0 truncate whitespace-nowrap">{{ data.longitude }}, {{ data.latitude
-                    }}</span>
-            </div>
-            <span>
-                <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
-                    class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
-            </span>
-        </DialogContent>
-    </Dialog>
+    <LocationMap v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event" :data="data"
+        :isDarkMode="isDarkMode" />
 </template>
 
 <script setup>
@@ -275,6 +249,7 @@ import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import CountryTraffic from './CountryTraffic.vue';
+import LocationMap from './LocationMap.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it
 // only enters the bundle when a user opens the Connectivity panel.
 import { defineAsyncComponent } from 'vue';
@@ -282,10 +257,8 @@ const ASNConnectivity = defineAsyncComponent(() => import('./ASNConnectivity.vue
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { Earth } from '@lucide/vue';
 import {
     Activity,
     Building2,
