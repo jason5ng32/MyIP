@@ -1,6 +1,6 @@
 <template>
-  <!-- Location map dialog: the IP's coordinates and static map image,
-       opened from the map icon button beside the City field. -->
+  <!-- Dialog shell around LocationMapPanel — IPCard's hosting mode.
+       QueryIP embeds the panel inline instead (it is already a Dialog). -->
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent :title="data.ip" class="max-w-2xl">
       <DialogHeader>
@@ -15,29 +15,15 @@
           </span>
         </template>
       </DialogHeader>
-      <div class="mb-2">
-        <span class="flex items-center gap-2 text-sm text-muted-foreground ">
-          <Earth class="size-4" />
-          <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
-        </span>
-        <span class="font-mono shrink-0 truncate whitespace-nowrap">{{ data.longitude }}, {{ data.latitude
-          }}</span>
-      </div>
-      <span>
-        <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
-          class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
-      </span>
+      <LocationMapPanel :data="data" :is-dark-mode="isDarkMode" />
     </DialogContent>
   </Dialog>
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Icon } from '@iconify/vue';
-import { Earth } from '@lucide/vue';
-
-const { t } = useI18n();
+import LocationMapPanel from './LocationMapPanel.vue';
 
 defineProps({
   open: { type: Boolean, required: true },
