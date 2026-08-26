@@ -1998,6 +1998,17 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added new languages: Brazilian Portuguese, Traditional Chinese",
+          "zh": "增加新语言：巴西葡萄牙语、繁体中文",
+          "zh-TW": "增加新語言：巴西葡萄牙語、繁體中文",
+          "fr": "Ajout de nouvelles langues : portugais du Brésil et chinois traditionnel",
+          "ru": "Добавлены новые языки: португальский (Бразилия) и традиционный китайский",
+          "pt-BR": "Adição de novos idiomas: português do Brasil e chinês tradicional"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "IPilot can now run some of the tests for you",
