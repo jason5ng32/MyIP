@@ -239,6 +239,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'music',
+        emoji: '🎵',
+        members: [
+            { id: 'tidal', name: 'TIDAL', url: 'https://tidal.com/favicon.ico' },
+            { id: 'deezer', name: 'Deezer', url: 'https://www.deezer.com/favicon.ico' },
+            { id: 'tunein', name: 'TuneIn', url: 'https://tunein.com/favicon.ico' },
+            { id: 'youtube-music', name: 'YouTube Music', url: 'https://music.youtube.com/favicon.ico' },
+            { id: 'pandora', name: 'Pandora', url: 'https://www.pandora.com/favicon.ico' },
+            { id: 'lastfm', name: 'Last.fm', url: 'https://www.last.fm/favicon.ico' },
+            { id: 'audiomack', name: 'Audiomack', url: 'https://audiomack.com/favicon.ico' },
+            { id: 'genius', name: 'Genius', url: 'https://genius.com/favicon.ico' },
+            { id: 'apple-music', name: 'Apple Music', url: 'https://music.apple.com/favicon.ico' },
+            { id: 'mixcloud', name: 'Mixcloud', url: 'https://www.mixcloud.com/favicon.ico' },
+            { id: 'qobuz', name: 'Qobuz', url: 'https://www.qobuz.com/favicon.ico' },
+            { id: 'iheart', name: 'iHeartRadio', url: 'https://www.iheart.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'gaming',
         emoji: '🎮',
         members: [
