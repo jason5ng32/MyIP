@@ -15,7 +15,7 @@ export const LOCALES = [
     { code: 'zh-TW', nativeName: '繁體中文', flag: 'tw', apiTag: 'zh-CN', htmlLang: 'zh-TW', status: 'full' }, // Upstream APIs do not support zh-TW, so apiTag aliases to zh-CN
     { code: 'fr', nativeName: 'Français', flag: 'fr', apiTag: 'fr', htmlLang: 'fr', status: 'full' },
     { code: 'ru', nativeName: 'Русский', flag: 'ru', apiTag: 'ru', htmlLang: 'ru', status: 'full' },
-    { code: 'pt-BR', nativeName: 'Português (Brasil)', flag: 'br', apiTag: 'pt-BR', htmlLang: 'pt-BR', status: 'beta' },
+    { code: 'pt-BR', nativeName: 'Português (Brasil)', flag: 'br', apiTag: 'pt-BR', htmlLang: 'pt-BR', status: 'full' },
 ];
 
 // Registry order — also the order the language picker renders.
