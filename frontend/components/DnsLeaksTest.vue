@@ -17,7 +17,6 @@
       </div>
       <div class="text-base text-muted-foreground">
         <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note') }}</p>
-        <p v-if="!isSimpleMode">{{ t('dnsleaktest.Note2') }}</p>
       </div>
     </header>
 
