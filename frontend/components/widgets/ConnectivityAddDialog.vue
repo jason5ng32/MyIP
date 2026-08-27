@@ -127,9 +127,8 @@
           </div>
           <ul class="rounded-lg border bg-card divide-y max-h-[48vh] overflow-y-auto">
             <li v-for="(list, index) in lists" :key="list.id" class="flex items-center gap-2 p-3">
-              <!-- Rename mode swaps the name for an input + confirm/cancel. -->
               <template v-if="renamingId === list.id">
-                <Input v-model="renameDraft" class="h-8 flex-1" autocomplete="off" data-1p-ignore
+                <Input v-model="renameDraft" class="h-9 flex-1" autocomplete="off" data-1p-ignore
                   data-lpignore="true" :maxlength="CONNECTIVITY_LIST_NAME_LIMIT" @keyup.enter="confirmRename(list)"
                   @keyup.esc="renamingId = null" />
                 <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
