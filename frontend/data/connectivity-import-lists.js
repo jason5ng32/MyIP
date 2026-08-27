@@ -1,6 +1,6 @@
 // Curated importable target lists for the Connectivity section: country sets
 // (domestic reachability) and theme sets (global services). Importing
-// materializes members into the user's connectivityTargets preference, so
+// materializes members into a list in the connectivityLists preference, so
 // imported cards behave exactly like hand-added ones. Display names live in
 // the locale packs under `connectivity.importLists.<id>`; member names are
 // brand names and stay untranslated. Every member ships a committed 64px

@@ -1223,6 +1223,7 @@
       "AddCard": "Add Test",
       "Title": "Add a custom test",
       "Hint": "We test by loading the site's favicon over HTTPS. Some sites may not be reachable this way. Custom tests are saved locally in your browser.",
+      "ProbeBlockedNote": "Some sites' security policies block cross-origin probes — they can show as unreachable even though they open fine.",
       "NameLabel": "Name",
       "NamePlaceholder": "e.g. Wikipedia",
       "UrlLabel": "URL",

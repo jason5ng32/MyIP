@@ -97,7 +97,10 @@
                 </SelectContent>
               </Select>
             </div>
-            <p class="mb-2 text-xs text-muted-foreground leading-relaxed">{{ t('connectivity.addCustom.Hint') }}</p>
+            <div class="mb-2 space-y-1 text-xs text-muted-foreground leading-relaxed">
+              <p>{{ t('connectivity.addCustom.Hint') }}</p>
+              <p>{{ t('connectivity.addCustom.ProbeBlockedNote') }}</p>
+            </div>
             <!-- min-h-4 reserves space so the dialog height doesn't jump -->
             <p class="text-xs text-destructive min-h-4" aria-live="polite">{{ addError }}</p>
             <div class="flex justify-end gap-2 pt-2">

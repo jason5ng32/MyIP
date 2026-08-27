@@ -1223,6 +1223,7 @@
       "AddCard": "Adicionar teste",
       "Title": "Adicionar um teste personalizado",
       "Hint": "Testamos carregando o favicon do site via HTTPS. Alguns sites podem não ser acessíveis dessa forma. Testes personalizados são salvos localmente no seu navegador.",
+      "ProbeBlockedNote": "As políticas de segurança de alguns sites bloqueiam sondagens cross-origin — eles podem aparecer como inacessíveis mesmo abrindo normalmente.",
       "NameLabel": "Nome",
       "NamePlaceholder": "ex.: Wikipédia",
       "UrlLabel": "URL",

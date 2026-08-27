@@ -1223,6 +1223,7 @@
       "AddCard": "新增測試",
       "Title": "新增自訂測試",
       "Hint": "透過 HTTPS 載入站點 favicon 進行測試，部分站點可能無法以這種方式測試。自訂測試會儲存在瀏覽器本地。",
+      "ProbeBlockedNote": "部分網站的安全性原則會攔截跨來源探測——即使網站能正常開啟，也可能顯示為無法連線。",
       "NameLabel": "名稱",
       "NamePlaceholder": "例如：維基百科",
       "UrlLabel": "URL",
