@@ -494,7 +494,7 @@ const getASNInfo = async (asn) => {
     try {
         if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-        const response = await fetchWithTimeout(`/api/cfradar?asn=${asn}`);
+        const response = await fetchWithTimeout(`/api/cfradar?view=asn&asn=${asn}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {

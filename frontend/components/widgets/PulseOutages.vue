@@ -1,5 +1,5 @@
 <template>
-    <!-- Global internet outage broadcast via /api/outages,
+    <!-- Global internet outage broadcast via /api/cfradar?view=outages,
         rendered between the Pulse latest-events feed and the live map. 
         A successful fetch with zero events shows the quiet line ("no news is good news"); 
         a FAILED fetch hides the section entirely. -->
@@ -98,7 +98,7 @@ const cachedEvents = { value: [], at: 0, loaded: false };
 
 <script setup>
 // Outage broadcast section for the Pulse Sheet. Data comes from our backend
-// (/api/outages, edge-cached 1h), which merges Cloudflare Radar's verified
+// (/api/cfradar?view=outages, edge-cached 1h), which merges Cloudflare Radar's verified
 // outages and traffic anomalies. Cause/level vocabularies are translated for
 // the values Radar is known to emit; anything new falls back to a Title Case
 // rendering of the raw token (the fields carry no enum contract upstream).
@@ -160,7 +160,7 @@ const loadEvents = async () => {
         return;
     }
     try {
-        const res = await fetchWithTimeout('/api/outages', { timeoutMs: 10000 });
+        const res = await fetchWithTimeout('/api/cfradar?view=outages', { timeoutMs: 10000 });
         if (!res.ok) return;
         const data = await res.json();
         cachedEvents.value = Array.isArray(data.events) ? data.events : [];

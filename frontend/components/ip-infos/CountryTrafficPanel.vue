@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-// Fetches /api/cfradar-traffic per (country, scope) and renders the 7×24
+// Fetches /api/cfradar?view=country-traffic per (country, scope) and renders the 7×24
 // heatmap. Mounts only while visible, so fetching starts on mount; repeat
 // visits ride the browser's HTTP cache (long public max-age).
 import { computed, reactive, ref, watch, useId } from 'vue';
@@ -82,7 +82,7 @@ const fetchTraffic = async (key, countryCode, humanOnly) => {
   trafficCache[key] = 'loading';
   try {
     const response = await fetchWithTimeout(
-      `/api/cfradar-traffic?country=${countryCode}${humanOnly ? '&human=1' : ''}`,
+      `/api/cfradar?view=country-traffic&country=${countryCode}${humanOnly ? '&human=1' : ''}`,
       { timeoutMs: 15000 } // the Radar timeseries is slow on cold edge caches
     );
     if (!response.ok) {

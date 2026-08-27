@@ -2,7 +2,7 @@
 //
 // PULSE_BEACON_URL is the full URL of the pulse beacon backend from build-time env;
 // unset disables the social parts (status composer / latest feed / visitor
-// map / this beacon). The outage feed is independent — it rides /api/outages
+// map / this beacon). The outage feed is independent — it rides /api/cfradar?view=outages
 // and gates on the runtime `cloudFlare` configs flag.
 // The beacon fires once per page load from App.vue — an app-level concern,
 // deliberately NOT tied to any component: every route (homepage, standalone

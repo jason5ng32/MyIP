@@ -14,12 +14,18 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `cf-radar-traffic` / `net-outages` / `asn-history` / `asn-connectivity` /
+`cf-radar` / `asn-history` / `asn-connectivity` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
 (`configs` / `sentry-tunnel` / `share-report`). Each file's header comment
 states its route and purpose — read those for specifics.
+
+The exception to one-file-per-route is Cloudflare Radar: all Radar data
+rides the single `/api/cfradar` route, dispatched by `?view=` over the
+`RADAR_VIEWS` registry in `common/cf-radar.js`. Each view declares its
+guards, edge-cache TTL, and fetch function there — new Radar data means a
+view function plus a registry row, never a new route.
 
 `api/data/` holds contributor-editable static config consumed by handlers —
 currently `dns-resolvers.js`, the country-annotated resolver list behind
@@ -83,8 +89,7 @@ these checks:
   are reachable — that is what a DMARC or DKIM lookup needs.
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
-- `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric
-  (`cf-radar` predates it and still validates inline).
+- `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric.
 - `requireValidCountry()` — `?country=` (alpha-2), uppercases in place for one
   canonical edge-cache key. Syntactic only — an unassigned code just yields an
   empty upstream series.
@@ -135,8 +140,11 @@ Leave the gate in place when a test covers it.
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
-public routes opt in via the `cacheable(maxAgeSeconds)` middleware in
-`backend-server.js` — e.g. `app.get('/api/cfradar', cacheable(60 * 60), …)`.
+public routes opt in via the `cacheable(maxAge)` middleware in
+`backend-server.js` — e.g. `app.get('/api/whois', cacheable(24 * 60 * 60), …)`.
+`maxAge` also accepts a `(req) => seconds` resolver for routes whose TTL
+depends on the request (`/api/cfradar` reads it from the view registry); a
+falsy resolution keeps the no-store default, so unknown views never cache.
 Write TTLs as multiplied expressions (`24 * 60 * 60`), not raw seconds.
 The middleware only sets `public, max-age=N` on status < 400, so CF never
 caches error pages; handlers themselves never touch `Cache-Control`.
