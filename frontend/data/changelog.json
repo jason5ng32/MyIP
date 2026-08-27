@@ -1978,6 +1978,17 @@
       {
         "type": "add",
         "change": {
+          "en": "Connectivity: organize tests into multiple lists — create your own, import presets into any list or as a new one, retest a single site by clicking its latency, and optionally open sites from card titles",
+          "zh": "网络连通性支持多列表：可自建列表，预设列表可导入任意列表或导入为新列表，点击延迟数字可单独重测，还可在偏好设置中开启点击卡片标题打开网站",
+          "zh-TW": "網路連線支援多清單：可自建清單，預設清單可匯入任意清單或匯入為新清單，點擊延遲數字可單獨重測，還可在偏好設定中開啟點擊卡片標題開啟網站",
+          "fr": "Connectivité : organisez vos tests en plusieurs listes — créez les vôtres, importez des présélections dans n'importe quelle liste ou comme nouvelle liste, relancez un test en cliquant sur sa latence, et ouvrez un site depuis le titre de sa carte (option)",
+          "ru": "Проверка доступности: тесты можно распределять по нескольким спискам — создавайте свои, импортируйте наборы в любой список или как новый, повторяйте тест кликом по задержке и открывайте сайт по заголовку карточки (опционально)",
+          "pt-BR": "Conectividade: organize os testes em várias listas — crie as suas, importe conjuntos em qualquer lista ou como uma nova, repita um teste clicando na latência e, opcionalmente, abra o site pelo título do cartão"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
           "en": "Added a country online-activity heatmap: see when an IP's country is online by weekday and hour, with a human-only traffic switch",
           "zh": "新增国家/地区网络活跃时段热力图：按星期和小时查看 IP 所在国家的活跃分布，可切换仅看人类流量",
           "zh-TW": "新增國家/地區網路活躍時段熱力圖：依星期與小時查看 IP 所在國家的活躍分布，可切換僅看人類流量",

@@ -6,12 +6,38 @@
           class="m-0 flex min-w-0 flex-1 items-center gap-2 text-xl md:text-3xl font-semibold tracking-tight leading-tight">
           🚦 {{ t('connectivity.Title') }}
         </h2>
-        <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
-          <Button size="icon" variant="outline" class="shrink-0 cursor-pointer" @click="handelCheckStart('manual')"
-            aria-label="Refresh Connectivity Test">
-            <component :is="isStarted ? RotateCw : Play" />
-          </Button>
-        </JnTooltip>
+        <!-- List picker + refresh as one joined button group. The picker
+             half only exists once a second list does; list management
+             lives at the bottom of the menu. -->
+        <div class="flex shrink-0 items-center">
+          <DropdownMenu v-if="lists.length > 1">
+            <DropdownMenuTrigger as-child>
+              <Button variant="outline" class="max-w-40 cursor-pointer gap-1.5 rounded-r-none border-r-0 px-3">
+                <span class="min-w-0 truncate">{{ activeList ? listName(activeList) : '—' }}</span>
+                <ChevronDown class="size-4 shrink-0 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem v-for="list in lists" :key="list.id" class="cursor-pointer"
+                @select="switchList(list.id)">
+                <Check class="size-4" :class="list.id === activeListId ? '' : 'invisible'" />
+                <span class="min-w-0 max-w-48 truncate">{{ listName(list) }}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem class="cursor-pointer" @select="openAddDialog('lists')">
+                <Settings2 class="size-4" />
+                <span>{{ t('connectivity.lists.Manage') }}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <JnTooltip :text="t('Tooltips.RefreshConnectivityTests')" side="left">
+            <Button size="icon" variant="outline" class="shrink-0 cursor-pointer"
+              :class="lists.length > 1 ? 'rounded-l-none' : ''" @click="handelCheckStart('manual')"
+              aria-label="Refresh Connectivity Test">
+              <component :is="isStarted ? RotateCw : Play" />
+            </Button>
+          </JnTooltip>
+        </div>
       </div>
       <div class="text-base text-muted-foreground">
         <p v-if="!isSimpleMode">{{ t('connectivity.Note') }}</p>
@@ -35,12 +61,14 @@
           <span v-if="confirmingRemoveId === test.id" class="text-xs font-semibold leading-none">?</span>
         </button>
         <CardContent class="p-4">
-          <!-- Site favicon (default / imported) or first-letter tile (custom) + name.
-               Favicons are same-origin (public/favicons/), so they render even
-               when the tested site is unreachable; a load error falls back to
-               the letter tile. -->
-          <div class="flex items-center gap-2 mb-3 cursor-pointer"
-            @click.prevent="checkConnectivityHandler(test, () => { }, true)" :title="t('connectivity.RefreshThisTest')">
+          <!-- Favicon (letter-tile fallback) + name. With the open-website
+               preference on this is a real <a>; off it's plain text —
+               per-card refresh lives on the ms figure. Favicons are
+               same-origin, so they render even when the site is blocked. -->
+          <component :is="titleOpensSite ? 'a' : 'div'" v-bind="titleOpensSite ? {
+            href: siteUrlOf(test) || undefined, target: '_blank', rel: 'noopener noreferrer', 'data-card-open': '',
+            title: t('connectivity.OpenSite'),
+          } : {}" class="flex items-center gap-2 mb-3 min-w-0" :class="titleOpensSite ? 'cursor-pointer' : ''">
             <img v-if="test.favicon && !test.faviconFailed" :src="test.favicon" alt=""
               @error="test.faviconFailed = true"
               class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" loading="lazy" />
@@ -48,9 +76,12 @@
               class="size-6 shrink-0 rounded-lg inline-flex items-center justify-center text-xs font-semibold text-muted-foreground border">
               {{ (test.name || '?').charAt(0).toUpperCase() }}
             </span>
-            <span class="text-base font-medium truncate">{{ test.name }}</span>
-          </div>
-          <!-- Status + ms. Multi mode pins these to the best round (see checkConnectivityHandler). -->
+            <span class="text-base font-medium truncate"
+              :class="titleOpensSite ? 'hover:underline underline-offset-4' : ''">{{ test.name }}</span>
+          </component>
+          <!-- Status + ms (multi mode pins these to the best round). The ms
+               figure doubles as the per-card retest trigger; failed cards
+               get a retry icon in the same slot. -->
           <div class="flex items-center justify-between gap-2 text-sm md:text-base">
             <span class="flex items-center gap-1.5 min-w-0">
               <span v-if="toneOf(test) === 'wait'" class="relative flex shrink-0">
@@ -62,10 +93,19 @@
               <span :class="textClass(toneOf(test))" class="min-w-0 truncate" :title="test.status">{{ test.status
                 }}</span>
             </span>
-            <span v-if="test.time !== 0" class="shrink-0 font-mono tabular-nums text-muted-foreground"
-              :title="t('connectivity.minTestTime') + test.mintime + ' ms'">
+            <button v-if="test.time !== 0" type="button"
+              class="shrink-0 font-mono tabular-nums text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              @click="checkConnectivityHandler(test, () => { }, true)"
+              :aria-label="t('connectivity.RefreshThisTest')"
+              :title="t('connectivity.RefreshThisTest') + ' · ' + t('connectivity.minTestTime') + test.mintime + ' ms'">
               {{ test.time }}<span class="ml-0.5 text-xs md:text-sm">ms</span>
-            </span>
+            </button>
+            <button v-else-if="toneOf(test) === 'fail'" type="button"
+              class="shrink-0 p-1 -m-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+              @click="checkConnectivityHandler(test, () => { }, true)"
+              :aria-label="t('connectivity.RefreshThisTest')" :title="t('connectivity.RefreshThisTest')">
+              <RotateCw class="size-3.5" />
+            </button>
           </div>
           <!-- Multi-test per-round latency bars, all on one absolute scale
                (taller = slower, see barStyle); failed / pending rounds are
@@ -83,7 +123,7 @@
 
       <!-- "Add Test" tile: stacked flag/brand icons signal that curated
            lists live behind it, not just a blank form. -->
-      <Card @click="addDialogOpen = true"
+      <Card @click="openAddDialog('import')"
         class="cursor-pointer border-dashed bg-transparent hover:bg-muted/50 transition-colors"
         :title="t('connectivity.addCustom.AddCard')">
         <CardContent class="p-4 flex flex-col items-center justify-center gap-2 text-muted-foreground"
@@ -104,8 +144,8 @@
       </Card>
     </div>
 
-    <!-- Add / import dialog (custom form + curated list browser) -->
-    <ConnectivityAddDialog v-model:open="addDialogOpen" />
+    <!-- Add / import / manage-lists dialog -->
+    <ConnectivityAddDialog v-model:open="addDialogOpen" :initial-tab="dialogTab" :active-list-id="activeListId" />
 
     <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
     <InfoBanner section="connectivity" :settled="hasEverSettled" />
@@ -120,16 +160,19 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
-import { TILE_PREVIEW, faviconPath } from '@/data/connectivity-import-lists.js';
-import { removeTarget } from '@/utils/connectivity-import.js';
+import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
+import { siteUrlOf, removeMember } from '@/utils/connectivity-lists.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import ConnectivityAddDialog from '@/components/widgets/ConnectivityAddDialog.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
-  Play, Frown, Meh, Plus, RotateCw, Smile, X,
+  Check, ChevronDown, Play, Frown, Meh, Plus, RotateCw, Settings2, Smile, X,
 } from '@lucide/vue';
 
 const { t } = useI18n();
@@ -155,14 +198,43 @@ const totalRounds = computed(() => 1 + maxCounts.value);
 const allRoundsDone = ref(false);
 const alertFired = ref(false);
 
-// One reactive test entry per stored target (the connectivityTargets
-// preference holds the whole set, defaults included). `roundResults`
-// records per-round { tone, time } for the latency bars; icons come from
-// the committed favicon set, hand-added targets fall back to letter tiles.
+// ── Lists ──────────────────────────────────────────────────────────────────
+// One list renders (and tests) at a time.
+const lists = computed(() => userPreferences.value.connectivityLists?.lists || []);
+
+// Open on the preferred default list (in-page switching is per-visit
+// only); a stale preference falls back to Mine.
+const initialListId = () => {
+  const preferred = userPreferences.value.connectivityDefaultListId;
+  return lists.value.some((l) => l.id === preferred) ? preferred : MINE_LIST_ID;
+};
+const activeListId = ref(initialListId());
+const activeList = computed(() => lists.value.find((l) => l.id === activeListId.value));
+
+// Mine's stored name is null — its display name is localized.
+const listName = (list) => (list.id === MINE_LIST_ID ? t('connectivity.lists.Mine') : list.name);
+
+const switchList = (id) => {
+  if (id === activeListId.value) return;
+  activeListId.value = id;
+  trackEvent('Section', 'SwitchConnectivityList', 'Connectivity');
+};
+
+// A deleted active list falls back to Mine instead of an empty grid.
+watch(lists, (all) => {
+  if (!all.some((l) => l.id === activeListId.value)) activeListId.value = MINE_LIST_ID;
+});
+
+const titleOpensSite = computed(() => userPreferences.value.connectivityCardTitleOpensSite);
+
+// ── Test entries ───────────────────────────────────────────────────────────
+// One reactive entry per member of the active list. `roundResults` records
+// per-round { tone, time } for the latency bars.
 const targetEntry = (target) => reactive({
   id: target.id,
   name: target.name,
   url: target.url,
+  siteUrl: target.siteUrl || null,
   favicon: target.favicon || null,
   status: t('connectivity.StatusWait'),
   time: 0,
@@ -171,26 +243,33 @@ const targetEntry = (target) => reactive({
 });
 const connectivityTests = reactive([]);
 
-// Reconcile by id (not wipe-and-refill) so existing cards don't flash back
-// to "Awaiting Test" each time the user adds or removes another one.
+// Rebuild vs reconcile: a list switch replaces the whole grid (the same
+// member id can exist in two lists and must not carry results across); a
+// same-list change reconciles in place so existing cards don't flash back
+// to "Awaiting Test".
 watch(
-  () => userPreferences.value.connectivityTargets,
-  (newTargets) => {
-    const targets = newTargets || [];
-    const targetIds = new Set(targets.map((t) => t.id));
+  () => ({ listId: activeListId.value, members: activeList.value?.members || [] }),
+  ({ listId, members }, prev) => {
+    if (!prev || prev.listId !== listId) {
+      connectivityTests.splice(0, connectivityTests.length, ...members.map(targetEntry));
+      // A newly shown list runs a full pass right away, toast suppressed.
+      if (prev && isStarted.value) handelCheckStart('refresh');
+      return;
+    }
 
-    // Drop targets no longer in storage.
+    // Drop members no longer stored.
+    const memberIds = new Set(members.map((m) => m.id));
     for (let i = connectivityTests.length - 1; i >= 0; i--) {
-      if (!targetIds.has(connectivityTests[i].id)) {
+      if (!memberIds.has(connectivityTests[i].id)) {
         connectivityTests.splice(i, 1);
       }
     }
 
     // Push only newcomers.
     const existingIds = new Set(connectivityTests.map((entry) => entry.id));
-    for (const target of targets) {
-      if (existingIds.has(target.id)) continue;
-      const entry = targetEntry(target);
+    for (const member of members) {
+      if (existingIds.has(member.id)) continue;
+      const entry = targetEntry(member);
       connectivityTests.push(entry);
       // Cards added after the bootstrap pass (import / hand-add) test
       // themselves right away instead of sitting at "Awaiting Test".
@@ -424,26 +503,34 @@ const updateConnectivityAlert = (type) => {
   }
 };
 
-// ── Add/remove targets ─────────────────────────────────────────────────────
-// The add/import dialog itself lives in ConnectivityAddDialog.vue; this
-// component only owns the open flag and per-card removal.
+// ── Add / import / manage dialog + per-card removal ───────────────────────
+// The dialog lives in ConnectivityAddDialog.vue; this component owns the
+// open flag and the tab it opens on.
 const addDialogOpen = ref(false);
+const dialogTab = ref('import');
+const openAddDialog = (tab) => {
+  dialogTab.value = tab;
+  addDialogOpen.value = true;
+};
 
 const removeTargetById = (id) => {
-  const result = removeTarget(userPreferences.value.connectivityTargets || [], id);
+  const result = removeMember(lists.value, activeListId.value, id);
   if (result.error) return;
-  store.updatePreference('connectivityTargets', result.targets);
+  store.updatePreference('connectivityLists', {
+    ...userPreferences.value.connectivityLists,
+    lists: result.lists,
+  });
   trackEvent('Section', 'RemoveCustomTarget', 'Connectivity');
 };
 
 // Two-step removal: first click arms "X?" (self-reverting), second click
-// deletes. The last remaining target skips the dance — the set must never
-// go empty, so the click just explains itself via toast.
+// deletes. Mine's last remaining site just toasts — the default list must
+// never go empty (other lists may be emptied; deleting them requires it).
 const confirmingRemoveId = ref(null);
 let confirmResetTimer = null;
 const handleRemoveClick = (id) => {
   clearTimeout(confirmResetTimer);
-  if ((userPreferences.value.connectivityTargets || []).length <= 1) {
+  if (activeListId.value === MINE_LIST_ID && (activeList.value?.members.length || 0) <= 1) {
     confirmingRemoveId.value = null;
     store.setAlert(true, 'text-warning',
       t('connectivity.addCustom.LastTargetMessage'), t('connectivity.addCustom.LastTargetTitle'));
@@ -469,7 +556,7 @@ const finalizeMultiTestAlert = () => {
 // `trigger` selects three behaviors (arming the toast = setting alertToShow):
 //   'boot'    — startup auto-run: arm toast, no card reset
 //   'manual'  — section refresh button: arm toast, reset cards
-//   'refresh' — global "refresh everything": suppress toast (global alert covers it), reset cards
+//   'refresh' — global "refresh everything" + list switches: suppress toast, reset cards
 // Multi-round mode applies to every trigger, not just boot — with the
 // connectivity auto-run switch off, the manual/global refresh IS the user's
 // only entry point, and the rounds preference must still hold there.

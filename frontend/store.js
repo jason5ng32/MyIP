@@ -6,7 +6,7 @@ import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
 import { createDefaultPreferences, PREFS_STORAGE_KEY } from './data/default-preferences.js';
-import { sanitizeTargets } from './utils/connectivity-import.js';
+import { sanitizeLists } from './utils/connectivity-lists.js';
 import { createMountingStatus, createLoadingStatus, DEFAULT_SECTION } from './data/sections.js';
 import { fetchWithTimeout } from './utils/fetch-with-timeout.js';
 const { t } = i18n.global;
@@ -213,12 +213,12 @@ export const useMainStore = defineStore('main', {
       const storedPreferences = localStorage.getItem(PREFS_STORAGE_KEY);
       const currentPreferences = storedPreferences ? JSON.parse(storedPreferences) : {};
       const merged = { ...defaultPreferences, ...currentPreferences };
-      // Missing keys get their defaults from the spread above; the
-      // Connectivity target set additionally guards its structure — junk
-      // entries drop, and an absent/emptied set rebuilds from the defaults
-      // + legacy flat customs (the legacy key stays for rollback, never
-      // written). Persisted right back via setPreferences.
-      merged.connectivityTargets = sanitizeTargets(merged.connectivityTargets, merged.customConnectivityTargets);
+      // The Connectivity multi-list model guards its structure: junk drops,
+      // an absent/corrupted model migrates from the legacy flat keys (kept
+      // for rollback, never written).
+      merged.connectivityLists = sanitizeLists(
+        merged.connectivityLists, merged.connectivityTargets, merged.customConnectivityTargets,
+      );
       this.setPreferences(merged);
     },
     // fetch configs from server

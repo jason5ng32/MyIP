@@ -89,8 +89,8 @@
         </section>
 
         <!-- Auto Run on Startup — per-module switches only. IP info always
-                     runs (no switch). The Connectivity test options live in App
-                     Settings below: they apply to manual runs too, not just startup. -->
+                     runs (no switch). The Connectivity test options live in their own
+                     section below: they apply to manual runs too, not just startup. -->
         <section id="Pref_autoRun">
           <SectionTitle :icon="Play">{{ t('nav.preferences.autoRun') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
@@ -107,20 +107,53 @@
           <SectionTip>{{ t('nav.preferences.autoRunTips') }}</SectionTip>
         </section>
 
+        <!-- Connectivity Test: default list + its three switches. Labels
+                     stay terse; the section title carries the context. -->
+        <section id="Pref_connectivity">
+          <SectionTitle :icon="Activity">{{ t('nav.Connectivity') }}</SectionTitle>
+          <div class="rounded-lg border bg-card divide-y">
+            <!-- Default list: PrefRow's two-line rhythm with a Select. -->
+            <div class="p-3 pb-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.connectivity.defaultList') }}</span>
+                <Select :model-value="currentDefaultListId"
+                  @update:model-value="(v) => v && prefConnectivityDefaultList(v)">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none">
+                    <SelectValue><span class="truncate">{{ currentDefaultListName }}</span></SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="list in connectivityLists" :key="list.id" :value="list.id">
+                      <span class="block max-w-64 truncate">{{ connectivityListName(list) }}</span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p class="mt-1 text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.connectivity.defaultListTips') }}</p>
+            </div>
+
+            <PrefRow id="ConnectivityMultipleTests" :label="t('nav.preferences.connectivity.multipleTests')"
+              :tip="t('nav.preferences.connectivity.multipleTestsTips')"
+              :model-value="userPreferences.connectivityMultipleTests"
+              @update:model-value="prefConnectivityMultipleTests" />
+
+            <PrefRow id="ConnectivityNotifications" :label="t('nav.preferences.connectivity.notifications')"
+              :tip="t('nav.preferences.connectivity.notificationsTips')"
+              :model-value="userPreferences.popupConnectivityNotifications"
+              @update:model-value="prefconnectivityShowNoti" />
+
+            <PrefRow id="ConnectivityCardTitleOpensSite" :label="t('nav.preferences.connectivity.titleOpensSite')"
+              :tip="t('nav.preferences.connectivity.titleOpensSiteTips')"
+              :model-value="userPreferences.connectivityCardTitleOpensSite"
+              @update:model-value="prefConnectivityCardTitleOpensSite" />
+          </div>
+        </section>
+
         <!-- App Settings -->
         <section id="Pref_appSettings">
           <SectionTitle :icon="AppWindow">{{ t('nav.preferences.appSettings') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="ConnectivityMultipleTests" :label="t('nav.preferences.connectivityMultipleTests')"
-              :tip="t('nav.preferences.connectivityMultipleTestsTips')"
-              :model-value="userPreferences.connectivityMultipleTests"
-              @update:model-value="prefConnectivityMultipleTests" />
-
-            <PrefRow id="ConnectivityNotifications" :label="t('nav.preferences.popupConnectivityNotifications')"
-              :tip="t('nav.preferences.popupConnectivityNotificationsTips')"
-              :model-value="userPreferences.popupConnectivityNotifications"
-              @update:model-value="prefconnectivityShowNoti" />
-
             <PrefRow id="simpleMode" :label="t('nav.preferences.simpleMode')" :tip="t('nav.preferences.simpleModeTips')"
               :model-value="userPreferences.simpleMode" @update:model-value="prefSimpleMode" />
           </div>
@@ -165,6 +198,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { clampRetentionDays } from '@/utils/ip-history.js';
 import { LOCALES } from '@/utils/locale-registry.js';
+import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Slider } from '@/components/ui/slider';
@@ -172,6 +206,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
+  Activity,
   AppWindow,
   Database,
   History,
@@ -231,6 +266,23 @@ const prefLanguage = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'LanguageChange');
 };
 
+// Which Connectivity list the section opens on; a stale preference falls
+// back to Mine (whose display name is localized, never stored).
+const connectivityLists = computed(() => userPreferences.value.connectivityLists?.lists || []);
+const connectivityListName = (list) => (list.id === MINE_LIST_ID ? t('connectivity.lists.Mine') : list.name);
+const currentDefaultListId = computed(() => {
+  const preferred = userPreferences.value.connectivityDefaultListId;
+  return connectivityLists.value.some((l) => l.id === preferred) ? preferred : MINE_LIST_ID;
+});
+const currentDefaultListName = computed(() => {
+  const list = connectivityLists.value.find((l) => l.id === currentDefaultListId.value);
+  return list ? connectivityListName(list) : '—';
+});
+const prefConnectivityDefaultList = (value) => {
+  store.updatePreference('connectivityDefaultListId', value);
+  trackEvent('Nav', 'PrefereceClick', 'ConnectivityDefaultList');
+};
+
 const prefConnectivityMultipleTests = (value) => {
   store.updatePreference('connectivityMultipleTests', value);
   // Achievement rule (ResourceHog) lives in data/achievement-rules.js.
@@ -257,6 +309,11 @@ const prefAutoRun = (key, value) => {
 const prefconnectivityShowNoti = (value) => {
   store.updatePreference('popupConnectivityNotifications', value);
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityNotifications');
+};
+
+const prefConnectivityCardTitleOpensSite = (value) => {
+  store.updatePreference('connectivityCardTitleOpensSite', value);
+  trackEvent('Nav', 'PrefereceClick', 'ConnectivityCardTitleOpensSite');
 };
 
 // IP history recorder: on/off + retention days (1–90). The draft ref feeds the
@@ -302,23 +359,27 @@ SectionTitle.props = ['icon'];
 const SectionTip = (props, { slots }) =>
   h('p', { class: 'mt-2 text-xs text-muted-foreground leading-relaxed' }, slots.default?.());
 
-// App Settings switch row: label (+ optional tip) on left, Switch on right.
+// Preference switch row. Two stacked lines: label + Switch vertically
+// centered on the first, the optional tip full-width on the second (so it
+// runs under the control instead of wrapping beside it). Tip rows trim the
+// bottom padding — the tip's own line-height already provides visual air.
 const PrefRow = (props, { emit }) =>
-  h('div', { class: 'flex items-start justify-between gap-3 p-3' }, [
-    h('div', { class: 'flex-1 min-w-0' }, [
+  h('div', { class: props.tip ? 'p-3 pb-2' : 'p-3' }, [
+    h('div', { class: 'flex items-center justify-between gap-3' }, [
       h('label', {
         for: props.id,
-        class: 'text-sm font-medium cursor-pointer select-none',
+        class: 'min-w-0 flex-1 text-sm font-medium cursor-pointer select-none',
       }, props.label),
-      props.tip
-        ? h('p', { class: 'mt-0.5 text-xs text-muted-foreground leading-relaxed' }, props.tip)
-        : null,
+      h(Switch, {
+        id: props.id,
+        class: 'shrink-0',
+        modelValue: props.modelValue,
+        'onUpdate:modelValue': (v) => emit('update:modelValue', v),
+      }),
     ]),
-    h(Switch, {
-      id: props.id,
-      modelValue: props.modelValue,
-      'onUpdate:modelValue': (v) => emit('update:modelValue', v),
-    }),
+    props.tip
+      ? h('p', { class: 'mt-1 text-xs text-muted-foreground leading-relaxed' }, props.tip)
+      : null,
   ]);
 PrefRow.props = ['id', 'label', 'tip', 'modelValue'];
 PrefRow.emits = ['update:modelValue'];

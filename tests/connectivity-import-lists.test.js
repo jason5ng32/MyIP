@@ -117,6 +117,13 @@ describe('import lists data integrity', () => {
         }
     });
 
+    it('every siteUrl override (members + defaults) is HTTPS and parseable', () => {
+        for (const m of [...allMembers, ...DEFAULT_LIST_MEMBERS]) {
+            if (m.siteUrl === undefined) continue;
+            assert.equal(new URL(m.siteUrl).protocol, 'https:', m.id);
+        }
+    });
+
     it('every member and built-in target has a committed favicon PNG', () => {
         const builtinIds = BUILTIN_FAVICONS.map((b) => b.id);
         for (const id of [...allMembers.map((m) => m.id), ...builtinIds]) {
