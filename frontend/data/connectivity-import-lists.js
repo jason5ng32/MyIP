@@ -262,7 +262,7 @@ export const IMPORT_LISTS = [
             { id: 'pandora', name: 'Pandora', url: 'https://www.pandora.com/favicon.ico' },
             { id: 'lastfm', name: 'Last.fm', url: 'https://www.last.fm/favicon.ico' },
             { id: 'audiomack', name: 'Audiomack', url: 'https://audiomack.com/favicon.ico' },
-            { id: 'genius', name: 'Genius', url: 'https://genius.com/favicon.ico' },
+            { id: 'musixmatch', name: 'Musixmatch', url: 'https://www.musixmatch.com/favicon.ico' },
             { id: 'apple-music', name: 'Apple Music', url: 'https://music.apple.com/favicon.ico' },
             { id: 'mixcloud', name: 'Mixcloud', url: 'https://www.mixcloud.com/favicon.ico' },
             { id: 'qobuz', name: 'Qobuz', url: 'https://www.qobuz.com/favicon.ico' },
