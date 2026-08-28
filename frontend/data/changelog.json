@@ -2053,6 +2053,28 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "Enriched the ASN info panel: prefix counts, upstream / downstream / peering AS counts, and average connection quality",
+          "zh": "丰富了 ASN 信息面板：新增前缀数量、上游/下游/对等 AS 数量与平均连接质量",
+          "zh-TW": "豐富了 ASN 資訊面板：新增前綴數量、上游/下游/對等 AS 數量與平均連線品質",
+          "fr": "Panneau d'informations ASN enrichi : nombre de préfixes, nombre d'AS en amont / en aval / pairs et qualité de connexion moyenne",
+          "ru": "Расширена панель информации об AS: количество префиксов, число вышестоящих / нижестоящих / пиринговых AS и среднее качество соединения",
+          "pt-BR": "Painel de informações do ASN enriquecido: contagem de prefixos, número de ASes upstream / downstream / de peering e qualidade média da conexão"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the ASN connectivity graph: a more accurate topology that distinguishes peering from IP transit",
+          "zh": "优化了 ASN 连接图：拓扑更准确，并支持区分对等互联与 IP 转接",
+          "zh-TW": "優化了 ASN 連接圖：拓撲更準確，並支援區分對等互連與 IP 轉接",
+          "fr": "Graphe de connectivité ASN amélioré : topologie plus précise, distinguant le peering du transit IP",
+          "ru": "Улучшен граф связности AS: более точная топология с различием пиринга и IP-транзита",
+          "pt-BR": "Grafo de conectividade do ASN aprimorado: topologia mais precisa, distinguindo peering de trânsito IP"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",
