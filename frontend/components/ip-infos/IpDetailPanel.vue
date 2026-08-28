@@ -525,12 +525,16 @@ const getASNHistory = async (prefix) => {
     }
 };
 
+// Cache-buster: bump on graph algorithm / schema changes. The route sits
+// behind a 30-day max-age that caches in browsers too, where no purge reaches.
+const ASN_CONNECTIVITY_VERSION = 2;
+
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');
     try {
         if (props.asnConnectivityInfos[asn]) return;
         const response = await fetchWithTimeout(
-            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}`,
+            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}&v=${ASN_CONNECTIVITY_VERSION}`,
             { timeoutMs: 5000 } // backend is sub-ms local lookup; tight cap is fine
         );
         if (!response.ok) {
