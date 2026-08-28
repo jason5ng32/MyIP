@@ -23,7 +23,8 @@
                 </defs>
                 <g class="text-muted-foreground">
                     <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
-                        stroke-width="1.2" marker-end="url(#jn-arrow)" opacity="0.6" stroke-linejoin="miter" />
+                        stroke-width="1.2" marker-end="url(#jn-arrow)" opacity="0.6" stroke-linejoin="miter"
+                        :stroke-dasharray="e.kind === 'peering' ? '6 4' : null" />
                 </g>
                 <!-- Opaque fill-card base under the tinted type rect so edges behind don't bleed through. -->
                 <g v-for="n in layout.nodes" :key="n.asn" :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`">
@@ -44,7 +45,9 @@
             <div
                 class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
                 <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
-                    <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
+                    <span v-if="item.lineClass" class="inline-block w-4 border-t-2" :class="item.lineClass"
+                        aria-hidden="true"></span>
+                    <span v-else class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
                     {{ item.label }}
                 </span>
             </div>
@@ -129,7 +132,8 @@
                                 <path v-for="(e, i) in layout.edges" :key="i" :d="e.d" fill="none" stroke="currentColor"
                                     stroke-width="1.2" marker-end="url(#jn-arrow-lg)" stroke-linejoin="miter"
                                     class="transition-opacity duration-150"
-                                    :class="isDimmedEdge(i) ? 'opacity-10' : 'opacity-60'" />
+                                    :class="isDimmedEdge(i) ? 'opacity-10' : 'opacity-60'"
+                                    :stroke-dasharray="e.kind === 'peering' ? '6 4' : null" />
                             </g>
                             <g v-for="n in layout.nodes" :key="n.asn"
                                 :transform="`translate(${n.x - n.w / 2}, ${n.y - n.h / 2})`"
@@ -156,7 +160,9 @@
                 <div
                     class="shrink-0 px-4 py-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground border-t">
                     <span v-for="item in legendItems" :key="item.label" class="inline-flex items-center gap-1.5">
-                        <span class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
+                        <span v-if="item.lineClass" class="inline-block w-4 border-t-2" :class="item.lineClass"
+                            aria-hidden="true"></span>
+                        <span v-else class="inline-block size-3 rounded-sm" :class="item.swatchClass"></span>
                         {{ item.label }}
                     </span>
                 </div>
@@ -290,24 +296,30 @@ watch(isExpanded, (open) => {
 
 // Force the captured image to be the full 1:1 topology regardless of the
 // Drawer viewport or current zoom: reset zoom to 1 and drop every height /
-// overflow / max-* constraint that would otherwise clip the SVG. Teardown
-// restores the prior inline styles.
+// overflow / max-* constraint that would otherwise clip the SVG. The flex-1
+// hosts also need `flex: none`, or flex sizing keeps them at viewport height
+// and the capture comes out truncated. Teardown restores prior inline styles.
 const prepareGraphForCapture = async (cap) => {
     const scr = cap.querySelector('[data-svg-scroll]');
     const svg = scr?.querySelector('svg');
-    if (!scr || !svg) return;
+    const wrap = scr?.parentElement;  // the relative flex-1 zoom-controls host
+    if (!scr || !svg || !wrap) return;
 
     const prevZoom = zoom.value;
     const snapshot = [
         { el: cap, css: cap.style.cssText },
+        { el: wrap, css: wrap.style.cssText },
         { el: scr, css: scr.style.cssText },
         { el: svg, css: svg.style.cssText },
     ];
 
     zoom.value = 1;
     // `min-width: max-content` so wide topologies aren't clipped to Drawer width.
+    cap.style.flex = 'none';
     cap.style.height = 'auto';
     cap.style.minWidth = 'max-content';
+    wrap.style.flex = 'none';
+    wrap.style.height = 'auto';
     scr.style.height = 'auto';
     scr.style.overflow = 'visible';
     svg.style.maxHeight = 'none';
@@ -357,10 +369,13 @@ function isDimmedEdge(idx) {
 }
 
 // Shared by inline + drawer views so swatches and labels can't drift.
+// Node types render as swatches (swatchClass); edge kinds as line samples (lineClass).
 const legendItems = computed(() => [
     { swatchClass: 'border-2 border-success bg-success/10', label: t('ipInfos.ASNConnectivity.legendOrigin') },
     { swatchClass: 'border-2 border-info bg-info/10', label: t('ipInfos.ASNConnectivity.legendTier1') },
     { swatchClass: 'border bg-card', label: t('ipInfos.ASNConnectivity.legendIntermediate') },
+    { lineClass: 'border-muted-foreground', label: t('ipInfos.ASNConnectivity.legendTransit') },
+    { lineClass: 'border-dashed border-muted-foreground', label: t('ipInfos.ASNConnectivity.legendPeering') },
 ]);
 
 watch(
@@ -381,38 +396,34 @@ watch(
     { immediate: true },
 );
 
-// LR dagre layout + custom Manhattan routing. Three tricks keep edges from overlapping:
-//   1. Per-edge source/target ports — multi-edges on a node fan out across its vertical
-//      side instead of sharing one anchor (no overlapping initial/final horizontals).
-//   2. Per-edge channel lanes — each edge that bends in a corridor gets its own x lane
-//      (no overlapping verticals; replaces the old trunk-and-branches sharing).
-//   3. Ports sorted by other-end y, lanes sorted by source y — preserves geometric
-//      order so segments don't cross unnecessarily.
-// We bypass dagre's own spline points entirely; they produce diagonal-looking polylines.
+// Dagre layering/ordering + custom column placement + Manhattan trunk routing:
+//   1. Own coordinates — Tier 1s re-pinned to one terminal column (wrapped in
+//      two staggered sub-columns when tall), columns stacked tightly, centered.
+//   2. Target-bundled edges — all edges into a node share one corridor lane
+//      and one entry point: one trunk instead of N parallel lines.
+//   3. Geometric sorting (ports and lanes by target y) avoids trunk crossings.
 function computeLayout(dagre, graph) {
     const NODE_W = 130;
     const NODE_H = 46;
     const PORT_SPAN = NODE_H * 0.75;  // ports use middle 75% of node height
+    const NODE_SEP = 18;
+    const COL_GAP = 90;               // corridor between columns (lane space)
+    const SINK_SUBCOL_GAP = 80;       // corridor between the two terminal sub-columns
+    const MARGIN_X = 16;
+    const MARGIN_Y = 14;
+    const WRAP_MIN_ROWS = 10;         // terminal column wraps in two beyond this
 
+    // Dagre supplies layering and a crossing-minimizing vertical order only;
+    // its raw positions scatter Tier 1s across columns and leave holes.
     const g = new dagre.graphlib.Graph();
-    g.setGraph({
-        rankdir: 'LR',
-        ranksep: 90,    // wide enough to fit multiple lanes per corridor
-        nodesep: 18,
-        marginx: 16,
-        marginy: 14,
-    });
+    g.setGraph({ rankdir: 'LR', ranksep: COL_GAP, nodesep: NODE_SEP });
     g.setDefaultEdgeLabel(() => ({}));
-
     for (const n of graph.nodes) {
-        const opts = { width: NODE_W, height: NODE_H, _data: n };
-        // Pin Tier 1s to the rightmost column (bgp.tools look).
-        // Trade-off: direct origin → Tier 1 edges become long horizontals.
-        if (n.type === 'tier1') opts.rank = 'sink';
-        g.setNode(String(n.asn), opts);
+        g.setNode(String(n.asn), { width: NODE_W, height: NODE_H, _data: n });
     }
     for (const e of graph.edges) {
-        g.setEdge(String(e.from), String(e.to));
+        // kind ('transit' | 'peering') rides the edge label so it survives dagre.
+        g.setEdge(String(e.from), String(e.to), { kind: e.kind });
     }
 
     dagre.layout(g);
@@ -431,63 +442,126 @@ function computeLayout(dagre, graph) {
         return layoutNode;
     });
 
+    // --- Column assignment. Non-terminals keep their dagre layer (compacted);
+    // every tier1 node is re-pinned to one terminal column on the far right.
+    const dagreColXs = [...new Set(nodes.map(n => n.x))].sort((a, b) => a - b);
+    const dagreColOf = new Map(dagreColXs.map((x, i) => [x, i]));
+    const isTerminal = (n) => n.type === 'tier1';
+    const interCols = [...new Set(
+        nodes.filter(n => !isTerminal(n)).map(n => dagreColOf.get(n.x)),
+    )].sort((a, b) => a - b);
+    const compactCol = new Map(interCols.map((c, i) => [c, i]));
+    const sinkCol = interCols.length;
+
+    const columns = [];
+    for (const n of nodes) {
+        const c = isTerminal(n) ? sinkCol : compactCol.get(dagreColOf.get(n.x));
+        (columns[c] ??= []).push(n);
+    }
+    // Dagre's vertical order minimizes crossings — keep it per column.
+    columns.forEach(col => col.sort((a, b) => a.y - b.y));
+
+    // --- Stacking. Columns stack tightly, centered on the tallest. A big
+    // terminal column wraps into two half-row-staggered sub-columns, so
+    // trunks to the far one cross the near one at its row gaps.
+    const rowStep = NODE_H + NODE_SEP;
+    const colX = (c) => MARGIN_X + NODE_W / 2 + c * (NODE_W + COL_GAP);
+    const wrapSink = (columns[sinkCol]?.length ?? 0) >= WRAP_MIN_ROWS;
+    const heights = columns.map((col, c) =>
+        c === sinkCol && wrapSink
+            ? (Math.ceil(col.length / 2) - 1) * rowStep + rowStep / 2 + NODE_H
+            : (col.length - 1) * rowStep + NODE_H);
+    const graphH = Math.max(...heights);
+    columns.forEach((col, c) => {
+        const top = MARGIN_Y + (graphH - heights[c]) / 2 + NODE_H / 2;
+        col.forEach((n, i) => {
+            if (c === sinkCol && wrapSink) {
+                n.x = colX(c) + (i % 2) * (NODE_W + SINK_SUBCOL_GAP);
+                n.y = top + Math.floor(i / 2) * rowStep + (i % 2) * (rowStep / 2);
+            } else {
+                n.x = colX(c);
+                n.y = top + i * rowStep;
+            }
+        });
+    });
+    // --- Skip-edge stagger. A single-node column crossed by an edge between
+    // its neighbors (A → B → C plus a direct A → C) sits on that edge's line,
+    // hiding it under the node's box. Nudge such columns off center,
+    // alternating direction so consecutive nudged columns don't realign.
+    const colOfAsn = new Map();
+    columns.forEach((col, c) => col.forEach(n => colOfAsn.set(n.asn, c)));
+    let flip = 1;
+    columns.forEach((col, c) => {
+        if (col.length !== 1) return;
+        const crossed = graph.edges.some(e =>
+            colOfAsn.get(e.from) < c && colOfAsn.get(e.to) > c);
+        if (!crossed) return;
+        col[0].y += flip * rowStep * 0.75;
+        flip = -flip;
+    });
+    // Nudges can poke past the stacked extent — re-anchor and size off nodes.
+    const shiftY = MARGIN_Y - Math.min(...nodes.map(n => n.y - n.h / 2));
+    nodes.forEach(n => { n.y += shiftY; });
+    const frame = {
+        width: colX(columns.length - 1) + (wrapSink ? NODE_W + SINK_SUBCOL_GAP : 0)
+            + NODE_W / 2 + MARGIN_X,
+        height: Math.max(...nodes.map(n => n.y + n.h / 2)) + MARGIN_Y,
+    };
+
     const colXs = [...new Set(nodes.map(n => n.x))].sort((a, b) => a - b);
     const colIdxByX = new Map(colXs.map((x, i) => [x, i]));
-    const rawEdges = g.edges().map(e => ({ v: e.v, w: e.w }));
+    const rawEdges = g.edges().map(e => ({ v: e.v, w: e.w, kind: g.edge(e).kind }));
 
-    // --- Source/target ports.
-    // Group edges by source and by target, then distribute each group across PORT_SPAN.
-    // Sort by the OTHER end's y so port order matches geometric order — keeps edges from
-    // crossing each other right at the node attachment.
+    // --- Ports. Sources fan edges across PORT_SPAN sorted by target y;
+    // targets take every edge at their center (single bundled entry).
     const outgoing = new Map();
-    const incoming = new Map();
     rawEdges.forEach((e, i) => {
         if (!outgoing.has(e.v)) outgoing.set(e.v, []);
-        if (!incoming.has(e.w)) incoming.set(e.w, []);
         outgoing.get(e.v).push(i);
-        incoming.get(e.w).push(i);
     });
 
     const sourceY = new Array(rawEdges.length);
-    const targetY = new Array(rawEdges.length);
+    const targetY = rawEdges.map(e => nodeById.get(e.w).y);
 
-    function assignPorts(nodeId, edgeIdxs, otherEnd, store) {
-        const node = nodeById.get(nodeId);
+    for (const [id, edgeIdxs] of outgoing) {
+        const node = nodeById.get(id);
         const sorted = edgeIdxs.slice().sort((a, b) =>
-            nodeById.get(rawEdges[a][otherEnd]).y - nodeById.get(rawEdges[b][otherEnd]).y);
+            nodeById.get(rawEdges[a].w).y - nodeById.get(rawEdges[b].w).y);
         const n = sorted.length;
         sorted.forEach((idx, i) => {
             const t = n === 1 ? 0.5 : i / (n - 1);
-            store[idx] = node.y - PORT_SPAN / 2 + t * PORT_SPAN;
+            sourceY[idx] = node.y - PORT_SPAN / 2 + t * PORT_SPAN;
         });
     }
-    for (const [id, idxs] of outgoing) assignPorts(id, idxs, 'w', sourceY);
-    for (const [id, idxs] of incoming) assignPorts(id, idxs, 'v', targetY);
 
-    // --- Channel lanes.
-    // Every edge bends in the corridor immediately before its target column (so vertical
-    // segments never cut through intermediate columns). Within each corridor, give each
-    // edge its own x lane — sorted by source y so lanes don't cross inside the corridor.
-    const corridors = new Map();
+    // --- Channel lanes. Every edge bends in the corridor right after its
+    // source, so the long horizontal of a column-skipping edge runs at TARGET
+    // height — through the terminal column's brick gaps and clear of nudged
+    // columns — instead of at source-port height under whatever box it meets.
+    // Edges sharing a target share one x lane per corridor (the trunk), and
+    // lanes sort by target y so trunks don't cross inside a corridor.
+    const corridors = new Map();  // corridor idx → Map(target id → edge idxs)
     rawEdges.forEach((e, idx) => {
         const srcCol = colIdxByX.get(nodeById.get(e.v).x);
         const tgtCol = colIdxByX.get(nodeById.get(e.w).x);
         if (tgtCol > srcCol) {
-            const cIdx = tgtCol - 1;
-            if (!corridors.has(cIdx)) corridors.set(cIdx, []);
-            corridors.get(cIdx).push(idx);
+            if (!corridors.has(srcCol)) corridors.set(srcCol, new Map());
+            const byTarget = corridors.get(srcCol);
+            if (!byTarget.has(e.w)) byTarget.set(e.w, []);
+            byTarget.get(e.w).push(idx);
         }
     });
 
     const laneX = new Array(rawEdges.length);
-    for (const [cIdx, idxs] of corridors) {
+    for (const [cIdx, byTarget] of corridors) {
         const leftEdge = colXs[cIdx] + NODE_W / 2;
         const rightEdge = colXs[cIdx + 1] - NODE_W / 2;
-        const sorted = idxs.slice().sort((a, b) => sourceY[a] - sourceY[b]);
-        const n = sorted.length;
-        sorted.forEach((idx, i) => {
-            const t = (i + 1) / (n + 1);
-            laneX[idx] = leftEdge + t * (rightEdge - leftEdge);
+        const targets = [...byTarget.keys()].sort((a, b) =>
+            nodeById.get(a).y - nodeById.get(b).y);
+        const n = targets.length;
+        targets.forEach((id, i) => {
+            const x = leftEdge + ((i + 1) / (n + 1)) * (rightEdge - leftEdge);
+            for (const idx of byTarget.get(id)) laneX[idx] = x;
         });
     }
 
@@ -501,12 +575,13 @@ function computeLayout(dagre, graph) {
         const sy = sourceY[idx];
         const ty = targetY[idx];
         if (Math.abs(sy - ty) < 0.5) {
-            return { v: e.v, w: e.w, d: `M ${sourceRight} ${sy} L ${targetLeft} ${ty}` };
+            return { v: e.v, w: e.w, kind: e.kind, d: `M ${sourceRight} ${sy} L ${targetLeft} ${ty}` };
         }
         const cx = laneX[idx];
         return {
             v: e.v,
             w: e.w,
+            kind: e.kind,
             d: `M ${sourceRight} ${sy} `
                 + `L ${cx} ${sy} `
                 + `L ${cx} ${ty} `
@@ -514,8 +589,7 @@ function computeLayout(dagre, graph) {
         };
     });
 
-    const { width, height } = g.graph();
-    return { width, height, nodes, edges };
+    return { width: frame.width, height: frame.height, nodes, edges };
 }
 
 function nodeBoxClass(type) {

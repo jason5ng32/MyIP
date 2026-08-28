@@ -1139,6 +1139,8 @@
       "legendOrigin": "起源",
       "legendTier1": "Tier 1 骨干",
       "legendIntermediate": "中间 AS",
+      "legendTransit": "IP 转接",
+      "legendPeering": "对等互联",
       "zoomIn": "放大",
       "zoomOut": "缩小",
       "zoomReset": "重置缩放"

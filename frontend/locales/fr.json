@@ -1139,6 +1139,8 @@
       "legendOrigin": "Origine",
       "legendTier1": "FAI Tier 1",
       "legendIntermediate": "AS intermédiaire",
+      "legendTransit": "Transit",
+      "legendPeering": "Peering",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
       "zoomReset": "Réinitialiser le zoom"

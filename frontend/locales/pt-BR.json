@@ -1139,6 +1139,8 @@
       "legendOrigin": "Origem",
       "legendTier1": "ISP Tier 1",
       "legendIntermediate": "AS intermediário",
+      "legendTransit": "Trânsito",
+      "legendPeering": "Peering",
       "zoomIn": "Aproximar",
       "zoomOut": "Afastar",
       "zoomReset": "Redefinir zoom"

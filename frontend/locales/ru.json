@@ -1139,6 +1139,8 @@
       "legendOrigin": "Источник",
       "legendTier1": "ISP уровня Tier 1",
       "legendIntermediate": "Промежуточная AS",
+      "legendTransit": "Транзит",
+      "legendPeering": "Пиринг",
       "zoomIn": "Увеличить",
       "zoomOut": "Уменьшить",
       "zoomReset": "Сбросить масштаб"
