@@ -489,12 +489,16 @@ const onPanelOpenChange = (open) => {
     isPanelOpen.value = open;
 };
 
+// Cache-buster: bump on response-shape changes, same rationale as
+// ASN_CONNECTIVITY_VERSION below.
+const ASN_INFO_VERSION = 2;
+
 const getASNInfo = async (asn) => {
     trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
     try {
         if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-        const response = await fetchWithTimeout(`/api/cfradar?view=asn&asn=${asn}`);
+        const response = await fetchWithTimeout(`/api/cfradar?view=asn&asn=${asn}&v=${ASN_INFO_VERSION}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {
