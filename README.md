@@ -16,6 +16,7 @@
 ![PWA](https://img.shields.io/badge/PWA-Supported-blue)
 
 ![CodeQL](https://github.com/jason5ng32/MyIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)
+[![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 
 [English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH_TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
