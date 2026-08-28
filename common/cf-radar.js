@@ -8,6 +8,7 @@
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
+import { providersOf, peersOf, customerCountOf } from './as-rel-db.js';
 import logger from './logger.js';
 
 // -- shared Radar client ----------------------------------------------------
@@ -42,6 +43,9 @@ const SEGMENTS = {
     httpProtocol: (asn) => `/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`,
     deviceType: (asn) => `/radar/http/summary/device_type?asn=${asn}&dateRange=7d`,
     botType: (asn) => `/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`,
+    routesStats: (asn) => `/radar/bgp/routes/stats?asn=${asn}`,
+    rels: (asn) => `/radar/entities/asns/${asn}/rel`,
+    quality: (asn) => `/radar/quality/speed/summary?asn=${asn}`,
 };
 
 // Fetch all segments in parallel. A failed segment is dropped rather than
@@ -83,17 +87,65 @@ function cleanUpResponseData(data) {
         Mobile_Pct: data.deviceType?.result?.summary_0?.mobile,
         Bot_Pct: data.botType?.result?.summary_0?.bot,
         Human_Pct: data.botType?.result?.summary_0?.human,
+        prefixesV4: data.routesStats?.result?.stats?.distinct_prefixes_ipv4,
+        prefixesV6: data.routesStats?.result?.stats?.distinct_prefixes_ipv6,
+        speedDownload: data.quality?.result?.summary_0?.bandwidthDownload,
+        speedUpload: data.quality?.result?.summary_0?.bandwidthUpload,
+        latency: data.quality?.result?.summary_0?.latencyIdle,
+        jitter: data.quality?.result?.summary_0?.jitterIdle,
     };
+}
+
+// Distinct relationship partners from Radar /rel rows. A pair listed as both
+// transit and peer counts as transit only (same dedupe as asn-connectivity).
+export const countAsnRels = (rows, asn) => {
+    const upstreams = new Set();
+    const downstreams = new Set();
+    const peers = new Set();
+    for (const row of rows) {
+        if (row.rel === 'provider-customer') {
+            if (row.asn2 === asn) upstreams.add(row.asn1);
+            else if (row.asn1 === asn) downstreams.add(row.asn2);
+        } else if (row.rel === 'peer') {
+            peers.add(row.asn1 === asn ? row.asn2 : row.asn1);
+        }
+    }
+    for (const p of upstreams) peers.delete(p);
+    for (const p of downstreams) peers.delete(p);
+    return { upstreamCount: upstreams.size, downstreamCount: downstreams.size, peerCount: peers.size };
+};
+
+// Rel counts prefer Radar's path-observed rows; when the segment failed or
+// came back empty, fall back to the local CAIDA snapshot. All-zero counts
+// (AS unknown to both) are dropped so the frontend hides the fields.
+function resolveRelCounts(rows, asn) {
+    const counts = Array.isArray(rows) && rows.length > 0
+        ? countAsnRels(rows, asn)
+        : {
+            upstreamCount: providersOf(asn).length,
+            downstreamCount: customerCountOf(asn),
+            peerCount: peersOf(asn).length,
+        };
+    return Object.values(counts).every(v => v === 0) ? {} : counts;
 }
 
 // Format output
 function formatData(data) {
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
     return {
         asnName,
         asnCountryCode,
         asnOrgName,
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
+        prefixesV4: parseFloat(prefixesV4).toLocaleString(),
+        prefixesV6: parseFloat(prefixesV6).toLocaleString(),
+        upstreamCount: parseFloat(upstreamCount).toLocaleString(),
+        downstreamCount: parseFloat(downstreamCount).toLocaleString(),
+        peerCount: parseFloat(peerCount).toLocaleString(),
+        speedDownload: `${parseFloat(speedDownload).toFixed(1)} Mbps`,
+        speedUpload: `${parseFloat(speedUpload).toFixed(1)} Mbps`,
+        latency: `${Math.round(parseFloat(latency))} ms`,
+        jitter: `${parseFloat(jitter).toFixed(1)} ms`,
         IPv4_Pct: `${parseFloat(IPv4_Pct).toFixed(2)}%`,
         IPv6_Pct: `${parseFloat(IPv6_Pct).toFixed(2)}%`,
         HTTP_Pct: `${parseFloat(HTTP_Pct).toFixed(2)}%`,
@@ -105,10 +157,11 @@ function formatData(data) {
     };
 }
 
-// Filter out non-existent fields
+// Filter out non-existent fields — a missing upstream value formats into a
+// string leading with "NaN" whatever unit suffix it carries.
 function filterData(data) {
     for (const key in data) {
-        if (data[key] === 'NaN' || data[key] === 'NaN%') {
+        if (String(data[key]).startsWith('NaN')) {
             delete data[key];
         }
     }
@@ -125,7 +178,9 @@ const fetchAsnProfile = async ({ asn }) => {
     if (failed.length > 0) {
         logger.warn({ err: failed[0].reason, asn, segments: failed.map((f) => f.name) }, 'cf-radar: partial Radar segment failure');
     }
-    return filterData(formatData(cleanUpResponseData(data)));
+    const cleaned = cleanUpResponseData(data);
+    Object.assign(cleaned, resolveRelCounts(data.rels?.result?.rels, Number(asn)));
+    return filterData(formatData(cleaned));
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------

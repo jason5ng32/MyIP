@@ -21,6 +21,23 @@
                 </div>
             </dl>
 
+            <!-- Connection quality (Cloudflare speed test aggregates) -->
+            <div v-if="Object.keys(qualityInfo).length" class="space-y-2 pt-1">
+                <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span>{{ t('ipInfos.ASNInfo.connectionQuality') }}</span>
+                    <JnTooltip :text="t('ipInfos.ASNInfo.connectionQualityTooltip')" side="top"
+                        class="hidden md:block">
+                        <CircleQuestionMark class="size-3 cursor-help opacity-70" />
+                    </JnTooltip>
+                </div>
+                <dl class="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                    <div v-for="(item, key) in qualityInfo" :key="key">
+                        <dt class="text-xs text-muted-foreground mb-0.5">{{ t(`ipInfos.ASNInfo.${key}`) }}</dt>
+                        <dd class="font-normal wrap-break-word">{{ item }}</dd>
+                    </div>
+                </dl>
+            </div>
+
             <!-- Pair data visualization -->
             <div v-if="pairDataList.length" class="space-y-2.5 pt-1">
                 <div class="text-xs text-muted-foreground">
@@ -65,8 +82,9 @@ import { computed } from 'vue';
 import getCountryName from '@/data/country-name.js';
 import DataPairBar from './DataPairBar.vue';
 import { Badge } from '@/components/ui/badge';
+import { JnTooltip } from '@/components/ui/tooltip';
 import { Icon } from '@iconify/vue';
-import { Database, ExternalLink, Info } from '@lucide/vue';
+import { CircleQuestionMark, Database, ExternalLink } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -87,12 +105,26 @@ const props = defineProps({
 const basicInfo = computed(() => {
     const data = props.asnInfos[props.asn];
     if (!data) return {};
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers } = data;
     const info = {};
-    if (asnName) info.asnName = asnName;
-    if (asnCountryCode) info.asnCountryCode = asnCountryCode;
-    if (asnOrgName) info.asnOrgName = asnOrgName;
-    if (estimatedUsers) info.estimatedUsers = estimatedUsers;
+    const keys = [
+        'asnName', 'asnCountryCode', 'asnOrgName', 'estimatedUsers',
+        'prefixesV4', 'prefixesV6', 'upstreamCount', 'downstreamCount', 'peerCount',
+    ];
+    for (const key of keys) {
+        if (data[key]) info[key] = data[key];
+    }
+    return info;
+});
+
+// Cloudflare speed test aggregates for the AS, pre-formatted by the backend.
+const qualityInfo = computed(() => {
+    const data = props.asnInfos[props.asn];
+    if (!data) return {};
+    const info = {};
+    const keys = ['speedDownload', 'speedUpload', 'latency', 'jitter'];
+    for (const key of keys) {
+        if (data[key]) info[key] = data[key];
+    }
     return info;
 });
 

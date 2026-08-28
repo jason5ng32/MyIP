@@ -12,6 +12,7 @@ import {
     normalizeAnomalies,
     mergeEvents,
     buildTrafficMatrix,
+    countAsnRels,
 } from '../common/cf-radar.js';
 
 const outageFixture = {
@@ -221,5 +222,35 @@ describe('buildTrafficMatrix', () => {
         const matrix = buildTrafficMatrix(serie);
         assert.equal(matrix.length, 7);
         assert.equal(Math.max(...matrix.flat()), 1);
+    });
+});
+
+describe('countAsnRels', () => {
+    const rows = [
+        // 10 is provider of 906; 906 is provider of 20 and 21.
+        { asn1: 10, asn2: 906, rel: 'provider-customer' },
+        { asn1: 906, asn2: 20, rel: 'provider-customer' },
+        { asn1: 906, asn2: 21, rel: 'provider-customer' },
+        { asn1: 906, asn2: 30, rel: 'peer' },
+        { asn1: 31, asn2: 906, rel: 'peer' },
+        { asn1: 31, asn2: 906, rel: 'peer' },           // duplicate row
+        { asn1: 10, asn2: 906, rel: 'peer' },           // transit pair → not a peer
+        { asn1: 906, asn2: 21, rel: 'peer' },           // transit pair → not a peer
+    ];
+
+    it('counts distinct partners per bucket, transit winning over peer', () => {
+        assert.deepEqual(countAsnRels(rows, 906), {
+            upstreamCount: 1,
+            downstreamCount: 2,
+            peerCount: 2,
+        });
+    });
+
+    it('returns zeros on an empty row list', () => {
+        assert.deepEqual(countAsnRels([], 906), {
+            upstreamCount: 0,
+            downstreamCount: 0,
+            peerCount: 0,
+        });
     });
 });
