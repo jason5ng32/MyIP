@@ -1978,6 +1978,28 @@
       {
         "type": "add",
         "change": {
+          "en": "Connectivity: organize tests into multiple lists — create your own, import presets into any list or as a new one, retest a single site by clicking its latency, and optionally open sites from card titles",
+          "zh": "网络连通性支持多列表：可自建列表，预设列表可导入任意列表或导入为新列表，点击延迟数字可单独重测，还可在偏好设置中开启点击卡片标题打开网站",
+          "zh-TW": "網路連線支援多清單：可自建清單，預設清單可匯入任意清單或匯入為新清單，點擊延遲數字可單獨重測，還可在偏好設定中開啟點擊卡片標題開啟網站",
+          "fr": "Connectivité : organisez vos tests en plusieurs listes — créez les vôtres, importez des présélections dans n'importe quelle liste ou comme nouvelle liste, relancez un test en cliquant sur sa latence, et ouvrez un site depuis le titre de sa carte (option)",
+          "ru": "Проверка доступности: тесты можно распределять по нескольким спискам — создавайте свои, импортируйте наборы в любой список или как новый, повторяйте тест кликом по задержке и открывайте сайт по заголовку карточки (опционально)",
+          "pt-BR": "Conectividade: organize os testes em várias listas — crie as suas, importe conjuntos em qualquer lista ou como uma nova, repita um teste clicando na latência e, opcionalmente, abra o site pelo título do cartão"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added a country online-activity heatmap: see when an IP's country is online by weekday and hour, with a human-only traffic switch",
+          "zh": "新增国家/地区网络活跃时段热力图：按星期和小时查看 IP 所在国家的活跃分布，可切换仅看人类流量",
+          "zh-TW": "新增國家/地區網路活躍時段熱力圖：依星期與小時查看 IP 所在國家的活躍分布，可切換僅看人類流量",
+          "fr": "Ajout d'une carte thermique de l'activité en ligne par pays : répartition par jour de la semaine et par heure, avec option trafic humain uniquement",
+          "ru": "Добавлена тепловая карта онлайн-активности страны: распределение по дням недели и часам, с переключателем «только люди»",
+          "pt-BR": "Adicionado mapa de calor da atividade online por país: distribuição por dia da semana e hora, com opção de tráfego somente humano"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
           "en": "For developers: refactored the multi-language architecture, making it easier to add new languages",
           "zh": "为开发者：重构多国语言架构，添加新语言变得更容易",
           "zh-TW": "為開發者：重構多國語言架構，新增語言變得更容易",
@@ -1995,6 +2017,17 @@
           "fr": "Pour les développeurs : ajout de slots promotionnels par section, permettant d'ajouter du contenu promotionnel dans différentes sections selon les besoins",
           "ru": "Для разработчиков: добавлены слоты продвижения, чтобы можно было добавлять продвижение в разные секции в зависимости от потребностей",
           "pt-BR": "Para desenvolvedores: slots de promoção por seção adicionados; conteúdo promocional pode ser inserido onde necessário"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added new languages: Brazilian Portuguese, Traditional Chinese",
+          "zh": "增加新语言：巴西葡萄牙语、繁体中文",
+          "zh-TW": "增加新語言：巴西葡萄牙語、繁體中文",
+          "fr": "Ajout de nouvelles langues : portugais du Brésil et chinois traditionnel",
+          "ru": "Добавлены новые языки: португальский (Бразилия) и традиционный китайский",
+          "pt-BR": "Adição de novos idiomas: português do Brasil e chinês tradicional"
         }
       },
       {
@@ -2017,6 +2050,28 @@
           "fr": "Le DNS Resolver affiche désormais les résultats par pays",
           "ru": "DNS Resolver теперь группирует результаты по странам",
           "pt-BR": "O DNS Resolver agora agrupa resultados por país"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Enriched the ASN info panel: prefix counts, upstream / downstream / peering AS counts, and average connection quality",
+          "zh": "丰富了 ASN 信息面板：新增前缀数量、上游/下游/对等 AS 数量与平均连接质量",
+          "zh-TW": "豐富了 ASN 資訊面板：新增前綴數量、上游/下游/對等 AS 數量與平均連線品質",
+          "fr": "Panneau d'informations ASN enrichi : nombre de préfixes, nombre d'AS en amont / en aval / pairs et qualité de connexion moyenne",
+          "ru": "Расширена панель информации об AS: количество префиксов, число вышестоящих / нижестоящих / пиринговых AS и среднее качество соединения",
+          "pt-BR": "Painel de informações do ASN enriquecido: contagem de prefixos, número de ASes upstream / downstream / de peering e qualidade média da conexão"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the ASN connectivity graph: a more accurate topology that distinguishes peering from IP transit",
+          "zh": "优化了 ASN 连接图：拓扑更准确，并支持区分对等互联与 IP 转接",
+          "zh-TW": "優化了 ASN 連接圖：拓撲更準確，並支援區分對等互連與 IP 轉接",
+          "fr": "Graphe de connectivité ASN amélioré : topologie plus précise, distinguant le peering du transit IP",
+          "ru": "Улучшен граф связности AS: более точная топология с различием пиринга и IP-транзита",
+          "pt-BR": "Grafo de conectividade do ASN aprimorado: topologia mais precisa, distinguindo peering de trânsito IP"
         }
       },
       {

@@ -1,6 +1,6 @@
 // Curated importable target lists for the Connectivity section: country sets
 // (domestic reachability) and theme sets (global services). Importing
-// materializes members into the user's connectivityTargets preference, so
+// materializes members into a list in the connectivityLists preference, so
 // imported cards behave exactly like hand-added ones. Display names live in
 // the locale packs under `connectivity.importLists.<id>`; member names are
 // brand names and stay untranslated. Every member ships a committed 64px
@@ -8,25 +8,37 @@
 // same-origin, so icons render even when the tested site is blocked for
 // the visitor.
 
-// Total cap on stored targets, defaults included; enforced at add/import
-// time only, so an over-cap migrated set keeps working but can't grow.
+// Per-list cap on stored targets, defaults included; enforced at
+// add/import time only, so an over-cap migrated set keeps working but
+// can't grow.
 export const CONNECTIVITY_TARGET_LIMIT = 60;
+
+// How many lists a user can hold, the undeletable "Mine" list included.
+export const CONNECTIVITY_LIST_LIMIT = 10;
+
+// Max characters in a user-given list name; the UI truncates with an
+// ellipsis where space is tight.
+export const CONNECTIVITY_LIST_NAME_LIMIT = 40;
+
+// Fixed id of the seeded "Mine" list — localized display name, can't be
+// deleted or renamed.
+export const MINE_LIST_ID = 'mine';
 
 // Same-origin favicon path for a member id (fetched at dev time).
 export const faviconPath = (id) => `/favicons/${id}.png`;
 
-// Targets every fresh install starts with (migration appends legacy
-// customs); all removable once stored. Cloudflare tests
-// speed.cloudflare.com, not www: the marketing site attaches font-preload
-// headers to every response, and those preloads then fail CORS.
+// Targets every fresh install starts with. `siteUrl` overrides the card's
+// open-website link when the test URL's host isn't the right page to open.
+// Cloudflare tests speed.cloudflare.com, not www: the marketing site
+// attaches font-preload headers to every response, which then fail CORS.
 export const DEFAULT_LIST_MEMBERS = [
     { id: 'google', name: 'Google', url: 'https://www.google.com/favicon.ico' },
     { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com/favicon.ico' },
     { id: 'github', name: 'GitHub', url: 'https://github.com/favicon.ico' },
-    { id: 'cloudflare', name: 'Cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', iconDomain: 'www.cloudflare.com' },
+    { id: 'cloudflare', name: 'Cloudflare', url: 'https://speed.cloudflare.com/favicon.ico', iconDomain: 'www.cloudflare.com', siteUrl: 'https://www.cloudflare.com' },
     { id: 'claude', name: 'Claude', url: 'https://claude.com/favicon.ico' },
     { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/favicon.ico' },
-    { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', iconDomain: 'weixin.qq.com' },
+    { id: 'wechat', name: 'WeChat', url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico', iconDomain: 'weixin.qq.com', siteUrl: 'https://wx.qq.com' },
 ];
 
 // Favicon-fetch targets for the committed scripts/fetch-favicons.js
@@ -59,7 +71,8 @@ const builtinMember = (id) => {
 // Every list is fronted by an emoji (flag emoji for country lists) — one
 // uniform icon system, no icon-font dependency in this data.
 // Member shape: { id, name, url } (+ optional `iconDomain` when the test
-// URL's host would give the favicon fetcher a poor or missing icon).
+// URL's host would give the favicon fetcher a poor or missing icon, and
+// optional `siteUrl` when that host isn't the right page to open either).
 export const IMPORT_LISTS = [
     {
         id: 'iran',
@@ -147,6 +160,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'germany',
+        emoji: '🇩🇪',
+        members: [
+            { id: 'deutsche-bahn', name: 'Deutsche Bahn', url: 'https://www.bahn.de/favicon.ico' },
+            { id: 'dhl-de', name: 'DHL', url: 'https://www.dhl.de/favicon.ico' },
+            { id: 'otto', name: 'OTTO', url: 'https://www.otto.de/favicon.ico' },
+            { id: 'spiegel', name: 'DER SPIEGEL', url: 'https://www.spiegel.de/favicon.ico' },
+            { id: 'check24', name: 'CHECK24', url: 'https://www.check24.de/favicon.ico' },
+            { id: 'bund-de', name: 'Bund.de', url: 'https://www.bund.de/favicon.ico' },
+            { id: 'tagesschau', name: 'tagesschau', url: 'https://www.tagesschau.de/favicon.ico' },
+            { id: 'kleinanzeigen', name: 'Kleinanzeigen', url: 'https://www.kleinanzeigen.de/favicon.ico' },
+            { id: 'zdf', name: 'ZDF', url: 'https://www.zdf.de/favicon.ico' },
+            { id: 'telekom-de', name: 'Deutsche Telekom', url: 'https://www.telekom.de/favicon.ico' },
+            { id: 'amazon-de', name: 'Amazon.de', url: 'https://www.amazon.de/favicon.ico' },
+            { id: 'google-de', name: 'Google.de', url: 'https://www.google.de/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
@@ -221,6 +252,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'music',
+        emoji: '🎵',
+        members: [
+            { id: 'tidal', name: 'TIDAL', url: 'https://tidal.com/favicon.ico' },
+            { id: 'deezer', name: 'Deezer', url: 'https://www.deezer.com/favicon.ico' },
+            { id: 'tunein', name: 'TuneIn', url: 'https://tunein.com/favicon.ico' },
+            { id: 'youtube-music', name: 'YouTube Music', url: 'https://music.youtube.com/favicon.ico' },
+            { id: 'pandora', name: 'Pandora', url: 'https://www.pandora.com/favicon.ico' },
+            { id: 'lastfm', name: 'Last.fm', url: 'https://www.last.fm/favicon.ico' },
+            { id: 'audiomack', name: 'Audiomack', url: 'https://audiomack.com/favicon.ico' },
+            { id: 'musixmatch', name: 'Musixmatch', url: 'https://www.musixmatch.com/favicon.ico' },
+            { id: 'apple-music', name: 'Apple Music', url: 'https://music.apple.com/favicon.ico' },
+            { id: 'mixcloud', name: 'Mixcloud', url: 'https://www.mixcloud.com/favicon.ico' },
+            { id: 'qobuz', name: 'Qobuz', url: 'https://www.qobuz.com/favicon.ico' },
+            { id: 'iheart', name: 'iHeartRadio', url: 'https://www.iheart.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'gaming',
         emoji: '🎮',
         members: [
@@ -243,15 +292,15 @@ export const IMPORT_LISTS = [
         emoji: '👨‍💻',
         members: [
             builtinMember('github'),
-            { id: 'npm', name: 'npm', url: 'https://registry.npmjs.org/favicon.ico', iconDomain: 'www.npmjs.com' },
+            { id: 'npm', name: 'npm', url: 'https://registry.npmjs.org/favicon.ico', iconDomain: 'www.npmjs.com', siteUrl: 'https://www.npmjs.com' },
             { id: 'dockerhub', name: 'Docker Hub', url: 'https://hub.docker.com/favicon.ico', iconDomain: 'www.docker.com' },
             { id: 'stackoverflow', name: 'Stack Overflow', url: 'https://stackoverflow.com/favicon.ico' },
             { id: 'pypi', name: 'PyPI', url: 'https://pypi.org/favicon.ico' },
             { id: 'gitlab', name: 'GitLab', url: 'https://gitlab.com/favicon.ico' },
             { id: 'bitbucket', name: 'Bitbucket', url: 'https://bitbucket.org/favicon.ico' },
             { id: 'crates', name: 'crates.io', url: 'https://crates.io/favicon.ico' },
-            { id: 'maven', name: 'Maven Central', url: 'https://repo.maven.apache.org/favicon.ico', iconDomain: 'maven.apache.org' },
-            { id: 'goproxy', name: 'Go Proxy', url: 'https://proxy.golang.org/favicon.ico', iconDomain: 'go.dev' },
+            { id: 'maven', name: 'Maven Central', url: 'https://repo.maven.apache.org/favicon.ico', iconDomain: 'maven.apache.org', siteUrl: 'https://maven.apache.org' },
+            { id: 'goproxy', name: 'Go Proxy', url: 'https://proxy.golang.org/favicon.ico', iconDomain: 'go.dev', siteUrl: 'https://go.dev' },
             { id: 'homebrew', name: 'Homebrew', url: 'https://brew.sh/favicon.ico' },
             { id: 'jetbrains', name: 'JetBrains', url: 'https://www.jetbrains.com/favicon.ico' },
             { id: 'vscode-marketplace', name: 'VS Code Marketplace', url: 'https://marketplace.visualstudio.com/favicon.ico', iconDomain: 'code.visualstudio.com' },
@@ -271,7 +320,7 @@ export const IMPORT_LISTS = [
             { id: 'oraclecloud', name: 'Oracle Cloud', url: 'https://www.oracle.com/favicon.ico' },
             { id: 'akamai', name: 'Akamai', url: 'https://www.akamai.com/favicon.ico' },
             { id: 'fastly', name: 'Fastly', url: 'https://www.fastly.com/favicon.ico' },
-            { id: 'jsdelivr', name: 'jsDelivr', url: 'https://cdn.jsdelivr.net/favicon.ico', iconDomain: 'www.jsdelivr.com' },
+            { id: 'jsdelivr', name: 'jsDelivr', url: 'https://cdn.jsdelivr.net/favicon.ico', iconDomain: 'www.jsdelivr.com', siteUrl: 'https://www.jsdelivr.com' },
             { id: 'unpkg', name: 'unpkg', url: 'https://unpkg.com/favicon.ico' },
             { id: 'heroku', name: 'Heroku', url: 'https://www.heroku.com/favicon.ico' },
         ],

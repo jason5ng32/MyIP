@@ -304,6 +304,7 @@ describe('useShortcuts()', () => {
       if (sel === '.keyboard-shortcut-card[data-keyboard-hover="true"]') {
         return {
           getAttribute: (name) => name === 'data-adv-slug' ? 'mtrtest' : null,
+          querySelector: () => null,
         };
       }
       return null;
@@ -314,9 +315,28 @@ describe('useShortcuts()', () => {
     assert.deepEqual(calls.advancedNavigate, ['mtrtest']);
   });
 
-  it('"o" is a no-op when the highlighted card has no data-adv-slug (e.g. IP card)', () => {
+  it('"o" clicks the highlighted Connectivity card\'s site link (a[data-card-open])', () => {
     const { keyMap, calls } = loadAndGetKeyMap();
-    querySelectorImpl = () => ({ getAttribute: () => null });
+    let clicked = 0;
+    querySelectorImpl = (sel) => {
+      if (sel === '.keyboard-shortcut-card[data-keyboard-hover="true"]') {
+        return {
+          getAttribute: () => null,
+          querySelector: (inner) => (inner === 'a[data-card-open][href]' ? { click: () => { clicked += 1; } } : null),
+        };
+      }
+      return null;
+    };
+    const entry = keyMap.findLast((e) => e.keys === 'o');
+    entry.action();
+    querySelectorImpl = () => null;
+    assert.equal(clicked, 1);
+    assert.deepEqual(calls.advancedNavigate, []);
+  });
+
+  it('"o" is a no-op when the highlighted card has no slug and no site link (e.g. IP card)', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
+    querySelectorImpl = () => ({ getAttribute: () => null, querySelector: () => null });
     const entry = keyMap.findLast((e) => e.keys === 'o');
     entry.action();
     querySelectorImpl = () => null;

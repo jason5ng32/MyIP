@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId } from '../common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -140,6 +140,36 @@ describe('requireValidPrefix', () => {
         const res = makeRes();
         guard(makeReq({ query: { prefix: '8.8.8.0/33' } }), res, () => {});
         assert.equal(res.statusCode, 400);
+    });
+});
+
+describe('requireValidCountry', () => {
+    const guard = requireValidCountry();
+
+    it('calls next() and uppercases the code in place', () => {
+        let nextCalled = false;
+        const req = makeReq({ query: { country: 'iq' } });
+        guard(req, makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+        assert.equal(req.query.country, 'IQ');
+    });
+
+    it('returns 400 "No country provided" when country is missing', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: {} }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'No country provided');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 "Invalid country" for anything but two letters', () => {
+        for (const bad of ['USA', 'U', 'U1', 'us,de', 'ÜS']) {
+            const res = makeRes();
+            guard(makeReq({ query: { country: bad } }), res, () => {});
+            assert.equal(res.statusCode, 400, bad);
+            assert.equal(res.body.error, 'Invalid country', bad);
+        }
     });
 });
 

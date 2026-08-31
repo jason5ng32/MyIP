@@ -42,7 +42,8 @@
 
                 <IpDetailPanel :data="card" :index="index" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                     :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
-                    :configs="configs" :is-dark-mode="isDarkMode" :enable-map="true" />
+                    :configs="configs" :is-dark-mode="isDarkMode" map-mode="dialog"
+                    country-traffic-mode="dialog" />
             </template>
 
             <!-- Error state -->

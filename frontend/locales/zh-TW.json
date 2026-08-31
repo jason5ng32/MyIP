@@ -51,7 +51,7 @@
         "SignedIn": {
           "Name": "登入使用者",
           "Item1": "包含未登入使用者的所有權益",
-          "Item2": "可以檢視 IP 的品質分、代理判斷、型別、原生性等進階資訊",
+          "Item2": "可以檢視 IP 品質評分、代理判斷、網路類型、ASN 與地理位置一致性等進階資訊",
           "Item3": "可以使用隱身測試",
           "Item4": "可以使用深度 DNS 洩漏測試",
           "Item5": "可以看到自己獲得的成就勳章",
@@ -176,11 +176,11 @@
         },
         "PrettyDirty": {
           "Title": "你挺髒的",
-          "Meet": "任意一張 IP 卡片的 IP 品質分為 1"
+          "Meet": "任意一張 IP 卡片的 IP 品質評分為 1"
         },
         "SqueakyClean": {
           "Title": "清清白白",
-          "Meet": "任意一張 IP 卡片的 IP 品質分為 100"
+          "Meet": "任意一張 IP 卡片的 IP 品質評分為 100"
         },
         "WalkWithPenguins": {
           "Title": "與鵝同行",
@@ -331,10 +331,16 @@
       "autoRunTips": "頁面載入時一定會檢查 IP 資訊。你可以選擇其他模組是否在啟動時自動執行。",
       "simpleMode": "簡潔模式",
       "simpleModeTips": "隱藏每個模組的說明文字，適合已熟悉本應用程式的使用者。",
-      "connectivityMultipleTests": "多次重新整理連線測試",
-      "connectivityMultipleTestsTips": "啟用後，應用程式會在啟動時執行多次檢查，並顯示最低延遲。",
-      "popupConnectivityNotifications": "彈出連線通知",
-      "popupConnectivityNotificationsTips": "啟用後，初次檢查的結果會以彈出通知顯示。",
+      "connectivity": {
+        "defaultList": "預設清單",
+        "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",
+        "multipleTests": "多次重新整理",
+        "multipleTestsTips": "每輪檢測執行多次，並顯示最低延遲。",
+        "notifications": "彈出通知",
+        "notificationsTips": "初次檢查完成後，以彈出通知顯示結果。",
+        "titleOpensSite": "點擊標題開啟網站",
+        "titleOpensSiteTips": "開啟後，點擊卡片標題會在新視窗開啟對應網站；關閉時標題為純文字。"
+      },
       "ipHistory": "IP 歷史記錄",
       "ipHistoryEnabled": "記錄 IP 歷史",
       "ipHistoryDays": "保留天數",
@@ -485,7 +491,7 @@
   "invisibilitytest": {
     "Title": "隱身測試",
     "Note": "當你掛上代理或 VPN 之後，你造訪的網站真的不知道你掛著代理嗎？你真的隱身了嗎？我們會透過多種手段，嘗試找出偽裝後的漏洞，以及你正在使用代理的證據。儘管部分測試結果可能不完全準確，本測試依然有較高的參考價值。",
-    "Note2": "點選執行後，系統將會執行一個指令碼，通常在 10s 內將會完成所有的測試，在這個過程中，你的 IP 資訊、瀏覽器資訊等將會被收集並在後臺進行分析。",
+    "Note2": "按下「執行」後，系統會執行一段指令碼，通常可在 10 秒內完成所有測試。測試期間會收集你的 IP、瀏覽器等資訊，並在背景進行分析。",
     "fetchError": "無法取得測試結果",
     "scriptLoadError": "測試指令碼載入失敗，無法繼續測試。請檢查網路後重試。",
     "yourIP": "你的主測 IP 是",
@@ -854,11 +860,11 @@
     "OpenInNewTab": "在新標籤頁開啟",
     "BackToHome": "回到首頁",
     "Title": "進階工具",
-    "Note": "一些使用頻率相對較低，但在進行網路測試時，非常有用的工具。",
-    "PingTestNote": "全球的 Ping 值測試",
-    "MTRTestNote": "全球的 MTR 路由測試",
+    "Note": "對網路品質追求極致的人，往往會使用更多工具來最佳化自己的網路連線。",
+    "PingTestNote": "從世界各地 ping 你的 IP",
+    "MTRTestNote": "從世界各地追蹤你的網路路由",
     "DNSResolverNote": "即時多渠道 DNS 解析",
-    "EnhancedDnsLeakTest": "捕獲所有遞迴解析器，並分析 ECS 與 DNSSEC",
+    "EnhancedDnsLeakTest": "找出所有正在使用的遞迴 DNS 解析器，並分析 ECS 與 DNSSEC",
     "RuleTestNote": "檢查代理軟體的規則設定",
     "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
     "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
@@ -909,36 +915,36 @@
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 洩漏測試",
-    "Note": "你已經在首頁的 DNS 洩漏測試中大致了解了目前是否存在 DNS 洩漏，以及 DNS 請求的出口地理歸屬。在這個深度測試裡，我們會從更多維度進行檢測：捕獲更多 DNS 解析器出口 IP、檢查這些解析器是否透過 ECS 把你真實 IP 段的字首轉發給權威伺服器，以及它們是否支援 DNSSEC，從而協助你對自己的 DNS 鏈路安全性形成更完整的認識。",
-    "Note2": "點選「開始測試」即可開始，通常幾秒內就能得到結果。我們會在後臺發起多次 DNS 探測，由我們的權威 DNS 伺服器捕獲你所使用的遞迴解析器出口 IP，一次測試通常可以捕獲 20–40 條記錄。若完全沒有捕獲到解析器，可能是瀏覽器的 DNS 快取吃掉了請求，稍等片刻再試一次即可。",
-    "Note3": "由於這是深度測試，頁面裡會出現一些較為專業的概念（例如 ECS、DNSSEC 等）。不用擔心，執行測試後你可以參考下方的「欄位說明」來了解每個欄位的具體含義。",
+    "Note": "首頁的 DNS 洩漏測試已讓你初步了解是否發生洩漏，以及 DNS 流量從哪裡送出。這項進階測試會進一步偵測更多遞迴 DNS 解析器的出口 IP、檢查解析器是否透過 ECS 將你真實 IP 網段的前綴轉送至上游權威 DNS 伺服器，以及是否支援 DNSSEC，讓你更完整地了解 DNS 連線的安全狀況。",
+    "Note2": "按下「開始測試」後，系統會在背景執行多次 DNS 探測，通常幾秒內就能取得結果。我們的權威 DNS 伺服器會記錄你實際使用的遞迴解析器出口 IP；一次測試通常可取得 20–40 筆紀錄。如果完全沒有偵測到解析器，可能是瀏覽器沿用了先前的 DNS 查詢結果，因此這次測試沒有產生新的查詢紀錄。請稍候片刻再試一次。",
+    "Note3": "這是較深入的測試，因此頁面會出現 ECS、DNSSEC 等專業概念。執行測試後，可以參考下方的「欄位說明」，了解各欄位的意義。",
     "Run": "開始測試",
     "RunAgain": "再測一次",
     "RunningProbes": "正在發起 DNS 探測...",
     "PollingResult": "正在收集結果...",
     "FetchError": "取得 DNS 洩漏測試結果失敗，請稍後重試。",
-    "Empty": "本次會話沒有捕獲到任何 DNS 解析器，可能是瀏覽器的 DNS 快取吃掉了請求，請稍後重試。",
-    "TableTitle": "捕獲到的 DNS 查詢記錄",
+    "Empty": "本次測試未偵測到任何 DNS 解析器。可能是瀏覽器沿用了先前的 DNS 查詢結果，因此這次測試沒有產生新的查詢紀錄。請稍候片刻再試一次。",
+    "TableTitle": "偵測到的 DNS 查詢紀錄",
     "DedupeToggle": "隱藏重複項",
     "Flow": {
       "Probing": "正在發起第 {current} / {total} 次探測...",
       "Waiting": "等待遞迴 DNS 存取我們的權威伺服器（通常 1–3 秒）。",
-      "Fetching": "正在取得捕獲到的 DNS 查詢記錄...",
+      "Fetching": "正在取得 DNS 查詢紀錄...",
       "Done": "測試已完成。"
     },
     "DnssecChip": {
-      "Signed": "已請求 DNSSEC 簽名",
-      "Unsigned": "未請求 DNSSEC 簽名",
-      "Validated": "DNSSEC 校驗正常",
-      "CdSet": "DNSSEC 校驗被停用"
+      "Signed": "已要求 DNSSEC 簽章",
+      "Unsigned": "未要求 DNSSEC 簽章",
+      "Validated": "DNSSEC 驗證正常",
+      "CdSet": "DNSSEC 驗證已停用"
     },
     "Summary": {
       "ResolverCount": "去重後的解析器數量",
-      "RawCount": "原始捕獲記錄數",
+      "RawCount": "原始查詢紀錄數",
       "DnssecPosture": "DNSSEC 狀態",
-      "DnssecGood": "支援 DNSSEC —— 所有解析器都請求了簽名，並且沒有跳過校驗。",
-      "DnssecNoDo": "較弱 —— 至少有一個解析器沒有請求 DNSSEC 簽名。",
-      "DnssecCdSet": "可疑 —— 至少有一個解析器要求跳過 DNSSEC 校驗。",
+      "DnssecGood": "支援 DNSSEC —— 所有解析器都要求提供簽章，且沒有略過驗證。",
+      "DnssecNoDo": "較弱 —— 至少有一個解析器未要求 DNSSEC 簽章。",
+      "DnssecCdSet": "可疑 —— 至少有一個解析器要求略過 DNSSEC 驗證。",
       "DnssecNone": "暫無資料。"
     },
     "Fields": {
@@ -946,16 +952,16 @@
       "Location": "歸屬地",
       "ASN": "組織 / ASN",
       "QueryType": "請求記錄型別",
-      "Transport": "請求傳輸協議",
+      "Transport": "請求傳輸協定",
       "ECS": "ECS"
     },
     "Legend": {
       "Title": "欄位說明",
       "ResolverIP": "實際與我們權威 DNS 伺服器通訊的遞迴解析器出口 IP。如果你使用 VPN，把它的 ASN 與你目前 VPN 出口的 ASN 做對比，就能看出 DNS 請求是否繞過了 VPN 通道（即發生洩漏）。",
       "QueryType": "解析器向權威伺服器請求的記錄型別（A、AAAA、HTTPS 等）。瀏覽器通常會同時發起 A 與 AAAA 查詢。",
-      "Transport": "DNS 預設走 UDP；出現 TCP 通常意味著響應過大，而響應過大往往是因為帶上了 DNSSEC 相關記錄。",
-      "ECS": "EDNS Client Subnet —— 部分遞迴 DNS 會在向上遊轉發查詢時附帶你真實 IP 的一段字首（通常是 IPv4 的 /24 或 IPv6 的 /48）。這意味著你的 IP 段會被 DNS 鏈路上的權威伺服器獲知，可能用於 CDN 的就近排程，也可能在一定程度上削弱匿名性。",
-      "DO": "DNSSEC OK —— 標記為對勾時，表示遞迴解析器在查詢時主動請求了 DNSSEC 簽名，代表鏈路具備密碼學校驗能力；標記為叉時，表示本次查詢未請求籤名，響應在鏈路上被偽造或篡改時可能無法被察覺。",
+      "Transport": "DNS 預設使用 UDP。使用 TCP 通常表示回應內容較大，而這通常是因為回應中包含 DNSSEC 相關紀錄。",
+      "ECS": "EDNS Client Subnet —— 部分遞迴 DNS 解析器將查詢轉送至上游權威 DNS 伺服器時，會附上你真實 IP 的一段前綴（通常是 IPv4 的 /24 或 IPv6 的 /48）。這表示 DNS 連線中的權威伺服器會得知你的部分 IP 網段，可用於 CDN 的就近路由，但也可能降低匿名性。",
+      "DO": "DNSSEC OK —— 顯示勾號時，代表遞迴解析器在這次查詢中主動要求 DNSSEC 簽章，因此 DNS 連線具有密碼學驗證機制；顯示叉號時，代表這次查詢未要求簽章，傳輸中的回應若遭偽造或竄改，可能無法被偵測。",
       "CD": "Checking Disabled —— 標記為勾選時，表示呼叫方沒有要求跳過 DNSSEC 驗證，遞迴解析器會進行正常的簽章驗證；標記為叉號時，表示呼叫方明確要求跳過驗證，即使簽章不符也會接受結果。正常情況下應該為勾選；如果出現叉號，大多是由特定除錯工具或用戶端的安全降級造成的，在極少數情況下也可能是連線上存在中間人竄改的徵兆。"
     }
   },
@@ -993,6 +999,7 @@
     "CopyIP": "複製 IP 位址",
     "CopySdpLog": "複製 SDP 日誌",
     "ViewOnMap": "在地圖上檢視位置",
+    "ShowCountryTraffic": "查看網路活躍時段",
     "InfoMask": "隱藏資訊",
     "IPHistory": "檢視 IP 歷史記錄",
     "ShareReport": "產生診斷報告",
@@ -1032,11 +1039,11 @@
         "dnsleak": "實際回應瀏覽器查詢的 DNS 解析器出口 IP——解析器不屬於使用者的 ISP/VPN 供應商即為 DNS 洩漏跡象。",
         "speedtest": "對 Cloudflare 測得的頻寬、延遲與負載延遲（bufferbloat）；分數衡量流媒體/遊戲/即時通話體驗，越高越好。",
         "pingtest": "全球 Globalping 探針對使用者 IP 的 ICMP ping 統計。",
-        "mtrtest": "全球探針到使用者 IP 的逐跳 MTR 路由追蹤；中間跳的丟包可能只是 ICMP 限速，從某一跳起持續丟包才代表真實問題。",
+        "mtrtest": "全球探針針對使用者 IP 進行 MTR 路由追蹤。途中某些節點發生封包遺失，可能只是 ICMP 速率限制；如果從某個節點開始，後續都持續出現封包遺失，才較可能代表實際問題。",
         "ruletest": "存取 8 個測試端點時觀測到的出口 IP——出現多個不同 IP 表示流量被分流到不同線路（如代理規則）。",
         "browserinfo": "被測裝置的瀏覽器、作業系統與顯示環境。",
         "invisibility": "代理/VPN 檢測得分（0-100，越高越可能被識別）及各項命中的檢測訊號。",
-        "enhanceddnsleak": "解析器級 DNS 捕獲：向測試網域名稱發起查詢的每個解析器 IP，含傳輸協議、ECS 暴露與 DNSSEC 標誌（do/cd）。",
+        "enhanceddnsleak": "解析器層級的 DNS 查詢紀錄：包含向測試網域名稱發出查詢的每個解析器 IP、傳輸協定、ECS 暴露情況與 DNSSEC 標記（DO/CD）。",
         "persona": "瀏覽器與所選國家本地居民的相符程度：一個總體評級，加上每項檢查的結論。只有結論——各項檢查依據的具體數值刻意不寫入可分享的報告。"
       }
     }
@@ -1082,10 +1089,10 @@
   },
   "ipInfos": {
     "Title": "IP 資訊",
-    "Notes": "程式會先從多個不同的來源（包含 IPv4 和 IPv6）檢查你的 IP 位址，然後透過你選擇的 IP 地理位置資訊源查詢對應的地理資料。如果目前 IP 堆疊只有 1 個，則沒有資料的來源會顯示為空。",
-    "Source": "IP 來源",
+    "Notes": "程式會先透過多個不同的探針檢查你的 IP 位址（包括 IPv4 和 IPv6），再從你選擇的 IP 解析資料來源查詢相關位置資訊。如果目前只有 IPv4 或 IPv6，其中沒有資料的項目會顯示為空白。",
+    "Source": "IP 探針",
     "Country": "地區",
-    "Region": "省份",
+    "Region": "行政區",
     "City": "城市",
     "TimeZone": "時區",
     "ISP": "網路",
@@ -1095,7 +1102,7 @@
     "IPv6Error": "取得失敗或不存在 IPv6 位址",
     "type": "型別",
     "isProxy": "代理",
-    "qualityScore": "IP 品質分",
+    "qualityScore": "IP 品質評分",
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
     "advancedQuotaCta": "本月新 IP 查詢額度已用完",
@@ -1106,6 +1113,17 @@
       "asnOrgName": "AS 組織名稱：",
       "asnCountryCode": "AS 地區：",
       "estimatedUsers": "估計使用者數：",
+      "prefixesV4": "IPv4 前綴數：",
+      "prefixesV6": "IPv6 前綴數：",
+      "upstreamCount": "上游 AS 數：",
+      "downstreamCount": "下游 AS 數：",
+      "peerCount": "對等 AS 數：",
+      "connectionQuality": "平均連線品質：",
+      "connectionQualityTooltip": "基於該 ASN 的使用者與 Cloudflare 測速的彙總結果",
+      "speedDownload": "下載頻寬：",
+      "speedUpload": "上傳頻寬：",
+      "latency": "延遲：",
+      "jitter": "抖動：",
       "IPv4_Pct": "IPv4",
       "IPv6_Pct": "IPv6",
       "HTTP_Pct": "HTTP",
@@ -1132,6 +1150,8 @@
       "legendOrigin": "起源",
       "legendTier1": "Tier 1 骨幹",
       "legendIntermediate": "中間 AS",
+      "legendTransit": "IP 轉接",
+      "legendPeering": "對等互連",
       "zoomIn": "放大",
       "zoomOut": "縮小",
       "zoomReset": "重置縮放"
@@ -1148,10 +1168,16 @@
         "Hosting": "資料中心",
         "unknownType": "未知型別"
       },
-      "Nativeness": "原生性",
-      "NativeIPYes": "原生",
-      "NativeIPNo": "非原生",
+      "Nativeness": "ASN 與地理位置一致性",
+      "NativeIPYes": "一致",
+      "NativeIPNo": "不一致",
       "nativenessTooltip": "判斷 ASN 的註冊國家是否與 IP 的歸屬國家一致"
+    },
+    "countryTraffic": {
+      "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",
+      "human": "僅人類流量",
+      "loading": "載入中...",
+      "error": "載入網路活躍資料失敗。"
     }
   },
   "serviceStatus": {
@@ -1196,7 +1222,7 @@
   },
   "connectivity": {
     "Title": "網路連通性",
-    "Note": "本測試用於測試你是否能夠連線到某個網站。測試方法是透過載入對應網站上的小圖片進行。延遲值僅供參考，實際會更小。你可以將其他常用網站新增到測試清單中，方便快速測試。",
+    "Note": "測試你與網站之間的連線狀況，延遲數字越大，代表你與該網站的連線速度越慢。你可以匯入／新增其他常用網站到測試清單中，方便快速測試。",
     "StatusWait": "待檢測",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
@@ -1204,11 +1230,13 @@
     "checking": "檢查中...",
     "minTestTime": "最小測試時間：",
     "RefreshThisTest": "重新整理此測試",
+    "OpenSite": "開啟網站",
     "RoundCount": "第 {n} 次：",
     "addCustom": {
       "AddCard": "新增測試",
       "Title": "新增自訂測試",
       "Hint": "透過 HTTPS 載入站點 favicon 進行測試，部分站點可能無法以這種方式測試。自訂測試會儲存在瀏覽器本地。",
+      "ProbeBlockedNote": "部分網站的安全性原則會攔截跨來源探測——即使網站能正常開啟，也可能顯示為無法連線。",
       "NameLabel": "名稱",
       "NamePlaceholder": "例如：維基百科",
       "UrlLabel": "URL",
@@ -1228,8 +1256,26 @@
       "ImportOption": "匯入清單",
       "SiteCount": "{n} 個網站",
       "Import": "匯入",
-      "Capacity": "已用 {used}/{limit}",
-      "NotEnoughCapacity": "容量不足——該清單需要 {need} 個空位，僅剩 {free} 個"
+      "NotEnoughCapacity": "容量不足——該清單需要 {need} 個空位，僅剩 {free} 個",
+      "Destination": "加入到",
+      "ImportAsNew": "匯入為新清單"
+    },
+    "lists": {
+      "Tab": "清單",
+      "Mine": "我的",
+      "Manage": "管理清單",
+      "NewListPlaceholder": "新清單名稱",
+      "Create": "建立",
+      "LimitReached": "最多可建立 {limit} 個清單",
+      "Rename": "重新命名",
+      "Delete": "刪除",
+      "MoveUp": "上移",
+      "MoveDown": "下移",
+      "DeleteNotEmpty": "刪除清單前，請先移除其中的所有網站",
+      "MineUndeletable": "「我的」清單無法刪除",
+      "Save": "儲存",
+      "Cancel": "取消",
+      "Hint": "清單需要清空後才能刪除；「我的」清單會一直保留。"
     },
     "importLists": {
       "defaults": "系統預設",
@@ -1238,10 +1284,12 @@
       "india": "印度常用",
       "china": "中國常用",
       "brazil": "巴西常用",
+      "germany": "德國常用",
       "ai": "AI 服務",
       "social": "社交通訊",
       "productivity": "工作與生產力",
       "streaming": "流媒體",
+      "music": "音樂與音訊",
       "gaming": "遊戲平臺",
       "developer": "開發者",
       "cloud": "雲與 CDN",
@@ -1254,7 +1302,7 @@
     "id": "webrtc",
     "Title": "WebRTC 洩漏測試",
     "Name": "WebRTC 連線",
-    "Note": "WebRTC 往往透過 UDP 直連進行建立，如果測試回傳了真實 IP，則意味著你的代理設定沒有覆蓋這些連線。除了檢測你連線 WebRTC 時所使用的 IP，我們還會檢測你的 NAT 型別。然而，NAT 型別的檢測並不是 100% 準確的，僅供參考。",
+    "Note": "瀏覽器透過 WebRTC 取得網路位址時，有可能繞過 VPN 或代理，進而向網站暴露你的真實 IP。本測試會檢查你透過 WebRTC 連線時暴露出來的 IP，如果回傳的 IP 位址、地區與你預期的不一致，則可能存在 WebRTC 洩漏風險，你可能需要調整代理軟體的設定。除了偵測 WebRTC 連線使用的 IP，我們也會偵測你的 NAT 類型。",
     "StatusWait": "待檢測",
     "StatusError": "連線錯誤",
     "StatusUnavailable": "WebRTC 不可用",
@@ -1270,8 +1318,7 @@
   "dnsleaktest": {
     "Name": "DNS 出口檢測",
     "Title": "DNS 洩漏測試",
-    "Note": "DNS 洩漏（DNS Leak）是指當你連上 VPN/代理後，解析網域名稱時依然透過當地的網路服務供應商進行解析，此時就有 DNS 洩漏的風險。",
-    "Note2": "洩漏測試會透過造訪新產生的網域名稱，檢測你是經由哪個地區的 DNS 出口進行解析。如果回傳的出口區域和你當地的網路服務供應商區域相同，則有 DNS 洩漏風險，你可能需要修改 VPN/代理設定。",
+    "Note": "當你使用 VPN 或代理時，DNS 查詢仍可能透過本地網路送出，進而暴露你正在造訪的網站網域。線路中的網路服務供應商、防火牆、公共 Wi-Fi 提供者等，都可能直接攔截並得知你造訪的網域。本測試會透過造訪新產生的網域名稱，檢測你是經由哪個地區的 DNS 進行查詢，如果回傳的出口區域和你正在使用的 VPN/代理所屬地區不同，則可能存在 DNS 洩漏風險。",
     "EndpointCountry": "出口地區",
     "StatusWait": "待檢測",
     "StatusError": "測試出錯"
@@ -1328,9 +1375,9 @@
     "MaxDelay": "最大延遲（ms）",
     "AvgDelay": "平均延遲（ms）",
     "TotalPackets": "總包數",
-    "PacketLoss": "丟包率",
+    "PacketLoss": "封包遺失率",
     "ReceivedPackets": "收到",
-    "DroppedPackets": "丟失",
+    "DroppedPackets": "遺失",
     "Error": "測試失敗，看起來你的 IP 不允許進行 Ping 測試。"
   },
   "mtrtest": {
@@ -1339,7 +1386,7 @@
     "UseStored": "使用已知 IP",
     "Title": "MTR 測試",
     "Note": "MTR (My Traceroute) 測試會利用 Globalping 全球探針從遍佈全球不同大洲和地區的伺服器出發，對你的 IP 位址進行詳細的路由追蹤。MTR 結合了傳統 traceroute 和 ping 命令的功能，能夠即時地診斷網路連線的品質和效能。",
-    "Note2": "這個過程涵蓋了從各個地理位置到你的網路環境的完整路徑，提供關於每一跳的延遲和封包丟失資訊。無論是路由路徑的擁堵、某個特定節點的延遲問題，還是封包在傳輸過程中的丟失，MTR 測試都能提供關鍵的診斷資訊。",
+    "Note2": "這個過程涵蓋了從各個地理位置到你的網路環境的完整路徑，並提供沿途每個節點的延遲和封包遺失資訊。無論是路由壅塞、特定節點延遲，或封包在傳輸途中遺失，MTR 測試都能提供關鍵的診斷資訊。",
     "Note3": "請選取你的 IP 位址進行測試：",
     "SelectIP": "選擇一個 IP 位址",
     "Region": "地區",
@@ -1347,9 +1394,9 @@
     "ColHost": "主機",
     "ColIP": "IP",
     "ColASN": "ASN",
-    "ColLoss": "丟包",
+    "ColLoss": "遺失率",
     "ColSent": "傳送",
-    "ColDrop": "丟棄",
+    "ColDrop": "遺失",
     "ColRecv": "接收",
     "ColLast": "最近",
     "ColAvg": "平均",
@@ -1357,7 +1404,7 @@
     "ColWorst": "最差",
     "ColStDev": "標準差",
     "ColJitter": "抖動",
-    "NoReply": "無響應"
+    "NoReply": "無回應"
   },
   "ipcheck": {
     "Title": "IP 查詢",
@@ -1406,7 +1453,7 @@
     "HelpNote": "使用快捷鍵的人，是喜歡效率的人，你真棒！",
     "GoNext": "下一張卡片",
     "GoPrevious": "上一張卡片",
-    "OpenHighlightedTool": "開啟選中的進階工具",
+    "OpenHighlightedTool": "開啟選取的卡片（工具或網站）",
     "RefreshRuleTests": "重新整理規則測試",
     "CensorshipCheck": "開啟封鎖測試面板",
     "Pulse": "開啟地球線上面板",

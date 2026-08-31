@@ -45,8 +45,8 @@
 
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                         :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
-                        :configs="configs" :is-dark-mode="isDarkMode" :enable-map="false"
-                        @view-usage="onOpenChange(false)" />
+                        :configs="configs" :is-dark-mode="isDarkMode" map-mode="inline"
+                        country-traffic-mode="inline" @view-usage="onOpenChange(false)" />
                 </div>
             </div>
         </DialogContent>
@@ -57,7 +57,7 @@
 // QueryIP — manual IP lookup. Shares IpDetailPanel with IPCard so the info display stays in sync.
 // Differences from IPCard:
 // - No Copy button (the IP was typed by the user — copying it is pointless).
-// - No Map button (Dialog-in-Dialog stacking is avoided; enableMap=false).
+// - Map & country-traffic expand inline instead of opening dialogs (this IS a Dialog already).
 // - The panel's "view usage" link closes this dialog first, for the same reason.
 // - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
 import { ref, computed, watch, nextTick } from 'vue';

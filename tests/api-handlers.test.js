@@ -18,7 +18,6 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
-import netOutagesHandler from '../api/net-outages.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
@@ -343,37 +342,61 @@ describe('persona handler', () => {
 });
 
 // -- cf-radar handler -----------------------------------------------------
+// One dispatch route for all Radar views; params are validated by each
+// view's guards from common/guards.js, so per-view checks here only cover
+// the dispatch wiring. The pure transform pipeline (outage normalize/merge,
+// traffic matrix) is unit-tested in tests/cf-radar.test.js.
 
 describe('cf-radar handler', () => {
-    it('rejects missing ?asn', async () => {
+    it('rejects non-GET methods', async () => {
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ method: 'POST', query: { view: 'outages' } }), res);
+        assert.equal(res.statusCode, 405);
+    });
+
+    it('rejects missing ?view', async () => {
         const res = createResponse();
         await cfRadarHandler(createRequest(), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'No view provided' });
+    });
+
+    it('rejects an unknown ?view', async () => {
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'nope' } }), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'Invalid view' });
+    });
+
+    it("runs the asn view's guard: missing ?asn", async () => {
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'asn' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'No ASN provided' });
     });
 
-    it('rejects non-numeric ASN', async () => {
+    it("runs the asn view's guard: non-numeric ASN", async () => {
         const res = createResponse();
-        await cfRadarHandler(createRequest({ query: { asn: 'AS12345' } }), res);
+        await cfRadarHandler(createRequest({ query: { view: 'asn', asn: 'not-an-asn' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
     });
-});
 
-// -- net-outages handler ----------------------------------------------------
-
-describe('net-outages handler', () => {
-    it('rejects non-GET methods', async () => {
+    it("runs the country-traffic view's guard: missing ?country", async () => {
         const res = createResponse();
-        await netOutagesHandler(createRequest({ method: 'POST' }), res);
-        assert.equal(res.statusCode, 405);
+        await cfRadarHandler(createRequest({ query: { view: 'country-traffic' } }), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'No country provided' });
     });
 
     it('returns 500 when no Cloudflare API key is configured', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
         const res = createResponse();
-        await netOutagesHandler(createRequest(), res);
+        // 'AS15169' also pins the guard's normalization: the AS prefix is
+        // now accepted (stripped in place), so the request passes validation
+        // and stops at the key check — before any upstream call.
+        await cfRadarHandler(createRequest({ query: { view: 'asn', asn: 'AS15169' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
     });

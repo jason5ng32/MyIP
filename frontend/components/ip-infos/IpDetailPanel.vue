@@ -17,6 +17,15 @@
                 <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
                     class="shrink-0 size-4" />
                 <span class="wrap-break-word">{{ data.country_name }}</span>
+                <JnTooltip v-if="canShowCountryTraffic" :text="t('Tooltips.ShowCountryTraffic')" side="left">
+                    <button type="button"
+                        class="shrink-0 -my-0.5 p-1 rounded-md hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                        @click="onTrafficClick"
+                        :aria-expanded="countryTrafficMode === 'inline' ? isMetaPanelActive('traffic') : undefined"
+                        :aria-label="'Show online activity pattern of ' + data.country_name">
+                        <Activity class="size-3.5" />
+                    </button>
+                </JnTooltip>
             </dd>
         </div>
 
@@ -39,7 +48,9 @@
                     <JnTooltip v-if="canShowMap" :text="t('Tooltips.ViewOnMap')" side="left">
                         <button type="button"
                             class="shrink-0 -my-0.5 p-1 rounded-md hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                            @click="openMapDialog" :aria-label="'View ' + data.ip + ' on map'">
+                            @click="onMapClick"
+                            :aria-expanded="mapMode === 'inline' ? isMetaPanelActive('map') : undefined"
+                            :aria-label="'View ' + data.ip + ' on map'">
                             <Map class="size-3.5" />
                         </button>
                     </JnTooltip>
@@ -66,6 +77,20 @@
             </div>
         </template>
     </dl>
+
+    <!-- Inline expansion for the Map / Country-traffic panels ('inline' mode). -->
+    <Collapsible v-if="mapMode === 'inline' || countryTrafficMode === 'inline'" :open="isMetaPanelOpen"
+        @update:open="onMetaPanelOpenChange">
+        <CollapsibleContent>
+            <div class="px-4 pb-3">
+                <div class="rounded-md border bg-muted/40 p-3 text-sm">
+                    <LocationMapPanel v-if="activeMetaPanel === 'map'" :data="data" :isDarkMode="isDarkMode" />
+                    <CountryTrafficPanel v-else-if="activeMetaPanel === 'traffic'"
+                        :country-code="data.country_code || ''" :timezone="data.timezone" :isDarkMode="isDarkMode" />
+                </div>
+            </div>
+        </CollapsibleContent>
+    </Collapsible>
 
     <!-- Advanced block (IPCheck.ing source only): locked CTA for signed-out, label-value grid for signed-in. -->
     <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
@@ -216,39 +241,18 @@
         </Collapsible>
     </div>
 
-    <!-- Map Dialog. Only rendered when enableMap=true (IPCard opts in, QueryIP opts out to avoid nested dialogs). -->
-    <Dialog v-if="enableMap" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event">
-        <DialogContent :title="data.ip" class="max-w-2xl">
-            <DialogHeader>
-                <template #title>
-                    <span class="flex items-center gap-2 min-w-0">
-                        <Icon v-if="data.country_code" :icon="'circle-flags:' + data.country_code.toLowerCase()"
-                            class="size-4 shrink-0" />
-                        <span class="truncate">{{ data.country_name }}<template v-if="data.city"> · {{ data.city
-                                }}
-                            </template>
-                        </span>
-                    </span>
-                </template>
-            </DialogHeader>
-            <div class="mb-2">
-                <span class="flex items-center gap-2 text-sm text-muted-foreground ">
-                    <Earth class="size-4" />
-                    <span class="text-sm text-muted-foreground">{{ t('ipInfos.Coordinates') }}</span>
-                </span>
-                <span class="font-mono shrink-0 truncate whitespace-nowrap">{{ data.longitude }}, {{ data.latitude
-                    }}</span>
-            </div>
-            <span>
-                <img :src="isDarkMode ? data.mapUrl_dark : data.mapUrl"
-                    class="w-full rounded-md border bg-muted aspect-2/1 object-cover" alt="Map">
-            </span>
-        </DialogContent>
-    </Dialog>
+    <!-- Dialog-mode shells for the same two panels (IPCard). -->
+    <CountryTraffic v-if="countryTrafficMode === 'dialog'" :open="isTrafficDialogOpen"
+        @update:open="isTrafficDialogOpen = $event" :country-code="data.country_code || ''"
+        :country-name="data.country_name" :timezone="data.timezone" :isDarkMode="isDarkMode" />
+
+    <LocationMap v-if="mapMode === 'dialog'" :open="isMapDialogOpen" @update:open="isMapDialogOpen = $event"
+        :data="data" :isDarkMode="isDarkMode" />
 </template>
 
 <script setup>
-// Shared display panel for IP info: Metadata grid + Advanced block + ASN row + optional Map Dialog.
+// Shared display panel for IP info: Metadata grid + Advanced block + ASN row, plus the Map and
+// Country-traffic panels (per-consumer 'dialog' / 'inline' / 'off' via mapMode / countryTrafficMode).
 // Used by IPCard (homepage card grid) and QueryIP (manual IP lookup dialog).
 // Hero IP is NOT part of this panel — consumers render their own hero row since affordances
 // (copy button, etc.) differ.
@@ -261,6 +265,10 @@ import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
+import CountryTraffic from './CountryTraffic.vue';
+import CountryTrafficPanel from './CountryTrafficPanel.vue';
+import LocationMap from './LocationMap.vue';
+import LocationMapPanel from './LocationMapPanel.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it
 // only enters the bundle when a user opens the Connectivity panel.
 import { defineAsyncComponent } from 'vue';
@@ -268,11 +276,10 @@ const ASNConnectivity = defineAsyncComponent(() => import('./ASNConnectivity.vue
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { Earth } from '@lucide/vue';
 import {
+    Activity,
     Building2,
     CornerUpRight,
     Equal,
@@ -310,9 +317,12 @@ const props = defineProps({
     index: { type: Number, default: 0 },
     // IPCard on mobile with simpleMode enables this to hide everything but Country + hide ASN.
     collapsed: { type: Boolean, default: false },
-    // IPCard opts in to show the Map button (in the City cell) + the Map Dialog.
-    // QueryIP opts out — the parent is already a Dialog, stacking dialogs is confusing.
-    enableMap: { type: Boolean, default: false },
+    // How the Map (City cell) and Country-traffic (Country cell) affordances
+    // render: 'dialog' (IPCard), 'inline' — a Collapsible under the metadata
+    // grid (QueryIP, itself a Dialog; stacking dialogs is confusing) — or
+    // 'off' (default).
+    mapMode: { type: String, default: 'off' },
+    countryTrafficMode: { type: String, default: 'off' },
 });
 
 // Consumers rendering this panel inside a dialog listen to close themselves
@@ -330,6 +340,7 @@ const openUsageDialog = () => {
 const activePanel = ref(null);
 const isPanelOpen = ref(false);
 const isMapDialogOpen = ref(false);
+const isTrafficDialogOpen = ref(false);
 
 // The backend sends the zone name only; the offset follows DST, so it is
 // resolved here rather than travelling through the routes' 24h edge cache.
@@ -345,9 +356,8 @@ const refreshZoneLocalTime = () => {
 const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && Boolean(props.data));
 
 // Map button is gated on the deployment having a Google Maps key (configs.map) + location data.
-// enableMap is the consumer-level opt-in.
 const canShowMap = computed(() =>
-    props.enableMap && Boolean(props.configs.map) && Boolean(props.data.country_name)
+    props.mapMode !== 'off' && Boolean(props.configs.map) && Boolean(props.data.country_name)
 );
 
 // Backend gating sentinels for the advanced fields (see transform-ip-data.js).
@@ -400,9 +410,40 @@ const qualityTone = computed(() => {
     return 'fail';
 });
 
-const openMapDialog = () => {
-    isMapDialogOpen.value = true;
+// Consumer opt-in + a Cloudflare key on the deployment + a country to query.
+const canShowCountryTraffic = computed(() =>
+    props.countryTrafficMode !== 'off' && !props.collapsed
+    && Boolean(props.configs.cloudFlare) && Boolean(props.data.country_code)
+);
+
+// Single-select inline expansion under the metadata grid ('inline' mode) —
+// same open/content split as the ASN block below, so close animations keep
+// their content.
+const activeMetaPanel = ref(null);
+const isMetaPanelOpen = ref(false);
+const isMetaPanelActive = (name) => isMetaPanelOpen.value && activeMetaPanel.value === name;
+const toggleMetaPanel = (name) => {
+    if (isMetaPanelActive(name)) {
+        isMetaPanelOpen.value = false;
+        return;
+    }
+    activeMetaPanel.value = name;
+    isMetaPanelOpen.value = true;
+};
+const onMetaPanelOpenChange = (open) => {
+    isMetaPanelOpen.value = open;
+};
+
+const onMapClick = () => {
     trackEvent('IPCheck', 'ViewOnMapClick', props.data.source || 'unknown');
+    if (props.mapMode === 'inline') toggleMetaPanel('map');
+    else isMapDialogOpen.value = true;
+};
+
+const onTrafficClick = () => {
+    trackEvent('IPCheck', 'CountryTrafficClick', props.data.country_code || 'unknown');
+    if (props.countryTrafficMode === 'inline') toggleMetaPanel('traffic');
+    else isTrafficDialogOpen.value = true;
 };
 
 // BGP DFZ-floor prefix for the IP — /24 v4, /48 v6. Used both as the query
@@ -448,12 +489,16 @@ const onPanelOpenChange = (open) => {
     isPanelOpen.value = open;
 };
 
+// Cache-buster: bump on response-shape changes, same rationale as
+// ASN_CONNECTIVITY_VERSION below.
+const ASN_INFO_VERSION = 2;
+
 const getASNInfo = async (asn) => {
     trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
     try {
         if (props.asnInfos[asn]) return;
         asn = asn.replace('AS', '');
-        const response = await fetchWithTimeout(`/api/cfradar?asn=${asn}`);
+        const response = await fetchWithTimeout(`/api/cfradar?view=asn&asn=${asn}&v=${ASN_INFO_VERSION}`);
         const data = await response.json();
         props.asnInfos['AS' + asn] = data;
     } catch (error) {
@@ -484,12 +529,16 @@ const getASNHistory = async (prefix) => {
     }
 };
 
+// Cache-buster: bump on graph algorithm / schema changes. The route sits
+// behind a 30-day max-age that caches in browsers too, where no purge reaches.
+const ASN_CONNECTIVITY_VERSION = 2;
+
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');
     try {
         if (props.asnConnectivityInfos[asn]) return;
         const response = await fetchWithTimeout(
-            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}`,
+            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}&v=${ASN_CONNECTIVITY_VERSION}`,
             { timeoutMs: 5000 } // backend is sub-ms local lookup; tight cap is fine
         );
         if (!response.ok) {

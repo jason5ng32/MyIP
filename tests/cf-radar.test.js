@@ -1,11 +1,19 @@
-// Unit tests for the pure normalize/merge pipeline in api/net-outages.js:
-// Radar payload → flat event shape, anomaly-vs-outage dedupe, sort and cap.
+// Unit tests for the pure transform pipeline in common/cf-radar.js:
+// the outage feed (Radar payload → flat event shape, anomaly-vs-outage
+// dedupe, sort and cap) and the country-traffic matrix aggregation.
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
+// Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { normalizeOutages, normalizeAnomalies, mergeEvents } from '../api/net-outages.js';
+import {
+    normalizeOutages,
+    normalizeAnomalies,
+    mergeEvents,
+    buildTrafficMatrix,
+    countAsnRels,
+} from '../common/cf-radar.js';
 
 const outageFixture = {
     id: '1645',
@@ -166,5 +174,83 @@ describe('mergeEvents', () => {
             startDate: `2026-07-${String((i % 28) + 1).padStart(2, '0')}T00:00:00Z`,
         })));
         assert.equal(mergeEvents(many, []).length, 30);
+    });
+});
+
+describe('buildTrafficMatrix', () => {
+    // 28 days of hourly points from Monday 2024-01-01T00:00Z, Radar-style
+    // string values. `valueAt` receives the point's UTC date.
+    const makeSerie = (valueAt) => {
+        const start = Date.UTC(2024, 0, 1);
+        const timestamps = [];
+        const values = [];
+        for (let i = 0; i < 28 * 24; i++) {
+            const date = new Date(start + i * 60 * 60 * 1000);
+            timestamps.push(date.toISOString());
+            values.push(String(valueAt(date)));
+        }
+        return { timestamps, values };
+    };
+
+    it('returns null for a missing or malformed serie', () => {
+        assert.equal(buildTrafficMatrix(undefined), null);
+        assert.equal(buildTrafficMatrix({}), null);
+        assert.equal(buildTrafficMatrix({ timestamps: [], values: [] }), null);
+    });
+
+    it('returns null when the serie covers less than a full week', () => {
+        const serie = makeSerie(() => 0.5);
+        serie.timestamps = serie.timestamps.slice(0, 100);
+        serie.values = serie.values.slice(0, 100);
+        assert.equal(buildTrafficMatrix(serie), null);
+    });
+
+    it('aggregates into a Monday-first 7×24 matrix scaled to a max of 1', () => {
+        // Baseline 0.1 with a spike every Tuesday at 05:00 UTC.
+        const serie = makeSerie((date) => (date.getUTCDay() === 2 && date.getUTCHours() === 5 ? 1 : 0.1));
+        const matrix = buildTrafficMatrix(serie);
+        assert.equal(matrix.length, 7);
+        assert.ok(matrix.every((row) => row.length === 24));
+        assert.equal(matrix[1][5], 1); // Tuesday is row 1 when Monday-first
+        assert.equal(matrix[0][0], 0.1);
+        assert.equal(Math.max(...matrix.flat()), 1);
+    });
+
+    it('skips unparsable points without breaking the aggregate', () => {
+        const serie = makeSerie(() => 0.5);
+        serie.values[0] = 'not-a-number';
+        const matrix = buildTrafficMatrix(serie);
+        assert.equal(matrix.length, 7);
+        assert.equal(Math.max(...matrix.flat()), 1);
+    });
+});
+
+describe('countAsnRels', () => {
+    const rows = [
+        // 10 is provider of 906; 906 is provider of 20 and 21.
+        { asn1: 10, asn2: 906, rel: 'provider-customer' },
+        { asn1: 906, asn2: 20, rel: 'provider-customer' },
+        { asn1: 906, asn2: 21, rel: 'provider-customer' },
+        { asn1: 906, asn2: 30, rel: 'peer' },
+        { asn1: 31, asn2: 906, rel: 'peer' },
+        { asn1: 31, asn2: 906, rel: 'peer' },           // duplicate row
+        { asn1: 10, asn2: 906, rel: 'peer' },           // transit pair → not a peer
+        { asn1: 906, asn2: 21, rel: 'peer' },           // transit pair → not a peer
+    ];
+
+    it('counts distinct partners per bucket, transit winning over peer', () => {
+        assert.deepEqual(countAsnRels(rows, 906), {
+            upstreamCount: 1,
+            downstreamCount: 2,
+            peerCount: 2,
+        });
+    });
+
+    it('returns zeros on an empty row list', () => {
+        assert.deepEqual(countAsnRels([], 906), {
+            upstreamCount: 0,
+            downstreamCount: 0,
+            peerCount: 0,
+        });
     });
 });

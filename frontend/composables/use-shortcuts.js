@@ -74,19 +74,28 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             description: t('shortcutKeys.GoPrevious'),
         },
         {
-            // Open the currently J/K-highlighted card if it's an Advanced Tool
-            // (those carry data-adv-slug). No-op for any other card type —
-            // IP cards, Connectivity, WebRTC, etc. have their own refresh
-            // shortcuts rather than an "open" concept.
+            // Open the currently J/K-highlighted card: an Advanced Tool card
+            // (data-adv-slug) opens its tool; a Connectivity card opens its
+            // website via the card's own <a data-card-open> — which only
+            // exists with the open-website App Setting on, so target/rel and
+            // the preference gate all ride the real link. No-op for any
+            // other card type — IP cards, WebRTC, etc. have their own
+            // refresh shortcuts rather than an "open" concept.
             keys: 'o',
             action: () => {
                 const highlighted = document.querySelector(
                     '.keyboard-shortcut-card[data-keyboard-hover="true"]'
                 );
                 const slug = highlighted?.getAttribute('data-adv-slug');
-                if (!slug) return;
-                advancedToolsRef.value.openTool(slug);
-                trackEvent('ShortCut', 'ShortCut', 'OpenHighlightedTool');
+                if (slug) {
+                    advancedToolsRef.value.openTool(slug);
+                    trackEvent('ShortCut', 'ShortCut', 'OpenHighlightedTool');
+                    return;
+                }
+                const link = highlighted?.querySelector('a[data-card-open][href]');
+                if (!link) return;
+                link.click();
+                trackEvent('ShortCut', 'ShortCut', 'OpenHighlightedSite');
             },
             description: t('shortcutKeys.OpenHighlightedTool'),
         },

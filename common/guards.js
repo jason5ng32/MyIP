@@ -75,8 +75,8 @@ export const requireValidPrefix = (paramName = 'prefix') => (req, res, next) => 
 };
 
 // Reject requests without a valid ASN (numeric, with optional 'AS' prefix).
-// Used by /api/asn-connectivity; other ASN-taking handlers (cf-radar) still
-// validate inline for historical reasons.
+// Used by /api/asn-connectivity and, per-view, by the /api/cfradar
+// dispatcher (see RADAR_VIEWS in common/cf-radar.js).
 export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
     const raw = req.query[paramName];
     if (!raw) {
@@ -87,6 +87,21 @@ export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
     req.query[paramName] = numeric;
+    next();
+};
+
+// Reject requests without a two-letter country code; uppercases in place so
+// the edge cache sees one canonical key. Syntactic only — an unassigned code
+// just yields an empty upstream series.
+export const requireValidCountry = (paramName = 'country') => (req, res, next) => {
+    const raw = req.query[paramName];
+    if (!raw) {
+        return res.status(400).json({ error: 'No country provided' });
+    }
+    if (!/^[A-Za-z]{2}$/.test(raw)) {
+        return res.status(400).json({ error: 'Invalid country' });
+    }
+    req.query[paramName] = String(raw).toUpperCase();
     next();
 };
 

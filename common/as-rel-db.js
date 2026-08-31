@@ -2,8 +2,8 @@
 // by common/caida-updater.js; this module parses and serves.
 //
 // CAIDA as-rel2 row format: `<a>|<b>|<rel>|<source>`
-//   rel = -1 → p2c (a is provider of b)   ← we keep these
-//   rel =  0 → p2p (peering)              ← skipped
+//   rel = -1 → p2c (a is provider of b)   ← providers index
+//   rel =  0 → p2p (peering)              ← peers index
 //   rel =  1 → s2s (sibling)              ← skipped
 //
 // Source: https://publicdata.caida.org/datasets/as-relationships/serial-2/
@@ -19,6 +19,9 @@ export const AS_REL_FILE = 'as-rel2.txt';
 
 // customer ASN → Set<provider ASN>. Hot path of asn-connectivity.
 const providersIndex = new Map();
+
+// ASN → Set<peer ASN>, symmetric p2p. Feeds asn-connectivity's peering edges.
+const peersIndex = new Map();
 
 // ASN → number of distinct customers it provides transit for. Ranking
 // signal when an intermediate has more providers than MAX_INTERMEDIATE_BRANCH
@@ -50,22 +53,31 @@ function findSnapshot() {
     return withMtime[0].full;
 }
 
+function addToIndex(index, key, value) {
+    let set = index.get(key);
+    if (!set) {
+        set = new Set();
+        index.set(key, set);
+    }
+    set.add(value);
+}
+
 function parsePipeText(text) {
     for (const rawLine of text.split('\n')) {
         const line = rawLine.trim();
         if (!line || line.startsWith('#')) continue;
         const parts = line.split('|');
-        if (parts.length < 3 || parts[2] !== '-1') continue;
-        const provider = Number(parts[0]);
-        const customer = Number(parts[1]);
-        if (!provider || !customer) continue;
-        let set = providersIndex.get(customer);
-        if (!set) {
-            set = new Set();
-            providersIndex.set(customer, set);
+        if (parts.length < 3) continue;
+        const a = Number(parts[0]);
+        const b = Number(parts[1]);
+        if (!a || !b) continue;
+        if (parts[2] === '-1') {
+            addToIndex(providersIndex, b, a);
+            customerCount.set(a, (customerCount.get(a) || 0) + 1);
+        } else if (parts[2] === '0') {
+            addToIndex(peersIndex, a, b);
+            addToIndex(peersIndex, b, a);
         }
-        set.add(provider);
-        customerCount.set(provider, (customerCount.get(provider) || 0) + 1);
     }
 }
 
@@ -82,6 +94,7 @@ function loadDatabase() {
     if (!filePath) {
         logger.warn({ dir: AS_REL_DB_DIR }, '⚠️  CAIDA as-rel snapshot not found; asn-connectivity will return empty graphs until the updater downloads one');
         providersIndex.clear();
+        peersIndex.clear();
         customerCount.clear();
         tier1Set.clear();
         loadedFrom = null;
@@ -91,11 +104,12 @@ function loadDatabase() {
     try {
         const text = fs.readFileSync(filePath, 'utf8');
         providersIndex.clear();
+        peersIndex.clear();
         customerCount.clear();
         parsePipeText(text);
         rebuildTier1Set();
         loadedFrom = path.basename(filePath);
-        logger.info(`📦 CAIDA as-rel loaded (${loadedFrom}) — ${providersIndex.size} customers, ${customerCount.size} providers, ${tier1Set.size} Tier 1s in ${Date.now() - start}ms`);
+        logger.info(`📦 CAIDA as-rel loaded (${loadedFrom}) — ${providersIndex.size} customers, ${customerCount.size} providers, ${peersIndex.size} peering ASes, ${tier1Set.size} Tier 1s in ${Date.now() - start}ms`);
     } catch (error) {
         logger.warn({ err: error, path: filePath }, '⚠️  Failed to parse CAIDA as-rel snapshot');
     }
@@ -112,6 +126,12 @@ export function reloadAsRelDatabase(reason = 'reload') {
 /** Providers (transit upstreams) of an ASN. Empty array when not in dataset. */
 export function providersOf(asn) {
     const set = providersIndex.get(Number(asn));
+    return set ? [...set] : [];
+}
+
+/** Settlement-free peers of an ASN. Empty array when none observed. */
+export function peersOf(asn) {
+    const set = peersIndex.get(Number(asn));
     return set ? [...set] : [];
 }
 

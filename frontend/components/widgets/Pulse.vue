@@ -130,7 +130,7 @@
                     </p>
                 </section>
 
-                <!-- Global outage broadcast (/api/outages); collapses to
+                <!-- Global outage broadcast (/api/cfradar?view=outages); collapses to
                     nothing when empty. Its leading separator drops when the
                     social sections above it are absent. -->
                 <PulseOutages :leading-separator="hasPulseBackend" />
@@ -223,7 +223,7 @@
 //
 // Two-tier gating: the social sections (composer / feed / visitor map) need
 // the pulse beacon backend (VITE_PULSE_BEACON_URL, build-time); the outage feed
-// only needs /api/outages, gated on the runtime `cloudFlare` configs flag.
+// only needs /api/cfradar?view=outages, gated on the runtime `cloudFlare` configs flag.
 // The entry button shows when either half can render.
 // POST <PULSE_BEACON_URL>/status on pick; GET <PULSE_BEACON_URL>/stats on
 // open and after a send — uncached end to end. The visit beacon is app-level:

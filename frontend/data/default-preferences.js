@@ -27,12 +27,17 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   ipHistoryEnabled: true,
   ipHistoryDays: 90,
   lang: 'auto', // auto | zh | en | fr | ru
-  // The full Connectivity target set (defaults included). null until first
-  // load — store.loadPreferences() runs it through sanitizeTargets(), which
-  // also rebuilds a hand-emptied or corrupted stored value.
+  // Multi-list Connectivity model: { schemaVersion, lists }. null until
+  // first load — store.loadPreferences() runs it through sanitizeLists().
+  connectivityLists: null,
+  // Which list the Connectivity section opens on; a stale id falls back
+  // to "Mine".
+  connectivityDefaultListId: 'mine',
+  // On: card titles open the site in a new tab; off: plain text.
+  connectivityCardTitleOpensSite: false,
+  // Legacy pre-connectivityLists keys, oldest last. Read once by the
+  // migration; kept for rollback, never written.
   connectivityTargets: null,
-  // Legacy pre-connectivityTargets key. Read once by the build above, kept
-  // for rollback; never written.
   customConnectivityTargets: [],
 });
 

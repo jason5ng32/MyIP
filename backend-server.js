@@ -22,8 +22,8 @@ import ip2locationHandler from './api/ip2location-io.js';
 import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
-import cfHander from './api/cf-radar.js';
-import netOutagesHandler from './api/net-outages.js';
+import cfRadarHandler from './api/cf-radar.js';
+import { RADAR_VIEWS } from './common/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -217,15 +217,21 @@ app.use('/api', (req, res, next) => {
 // attached on 2xx — CF must not cache 4xx/5xx error pages. The intended cache
 // value is also stashed on res.locals.cacheControl so binary-stream handlers
 // (which bypass res.json) can apply it themselves on their own 2xx path.
-const cacheable = (maxAgeSeconds) => (req, res, next) => {
-    res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
-    const originalJson = res.json.bind(res);
-    res.json = function (body) {
-        if (res.statusCode < 400) {
-            res.setHeader('Cache-Control', res.locals.cacheControl);
-        }
-        return originalJson(body);
-    };
+// `maxAge` is a number of seconds, or a `(req) => seconds` resolver for
+// routes whose TTL depends on the request (the /api/cfradar view registry);
+// a falsy resolution keeps the /api-wide no-store default.
+const cacheable = (maxAge) => (req, res, next) => {
+    const maxAgeSeconds = typeof maxAge === 'function' ? maxAge(req) : maxAge;
+    if (maxAgeSeconds) {
+        res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
+        const originalJson = res.json.bind(res);
+        res.json = function (body) {
+            if (res.statusCode < 400) {
+                res.setHeader('Cache-Control', res.locals.cacheControl);
+            }
+            return originalJson(body);
+        };
+    }
     next();
 };
 
@@ -256,8 +262,6 @@ app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
 app.get('/api/configs', cacheable(ONE_HOUR_CACHE), validateConfigs);
-// Radar's outage feed moves on an hourly-ish cadence
-app.get('/api/outages', cacheable(ONE_HOUR_CACHE), netOutagesHandler);
 // OONI aggregates cover a 30-day window aligned to UTC days — the payload
 // only drifts as new measurements land, so 1 day of edge cache keeps us polite
 // to OONI's free API without the view going meaningfully stale.
@@ -265,10 +269,13 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // Which countries have online Globalping probes — coverage changes slowly,
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
+// All Cloudflare Radar data rides one route; `?view=` picks the dataset and
+// the TTL comes from that view's registry entry (common/cf-radar.js) — 30d
+// for the slow-moving ASN/traffic profiles, 1h for the outage feed.
+app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
-app.get('/api/cfradar', cacheable(THIRTY_DAYS_CACHE), cfHander);
 app.get('/api/asn-history', requireValidPrefix(), cacheable(THIRTY_DAYS_CACHE), asnHistoryHandler);
 app.get('/api/asn-connectivity', requireValidASN(), cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
 app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
