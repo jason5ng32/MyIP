@@ -52,4 +52,5 @@ export const DNS_RESOLVERS = [
     { id: 'dns4eu', name: 'DNS4EU', country: 'EU', udp: '86.54.11.1' },
     { id: 'cznic', name: 'CZ.NIC ODVR', country: 'CZ', udp: '193.17.47.1' },
     { id: 'dnssb', name: 'DNS.SB', country: 'EU', udp: '185.222.222.222', doh: 'https://doh.dns.sb/dns-query?' },
+    { id: 'kt', name: 'KT', country: 'KR', udp: '168.126.63.1' },
 ];
