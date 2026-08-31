@@ -62,13 +62,14 @@
         </button>
         <CardContent class="p-4">
           <!-- Favicon (letter-tile fallback) + name. With the open-website
-               preference on this is a real <a>; off it's plain text —
-               per-card refresh lives on the ms figure. Favicons are
-               same-origin, so they render even when the site is blocked. -->
-          <component :is="titleOpensSite ? 'a' : 'div'" v-bind="titleOpensSite ? {
-            href: siteUrlOf(test) || undefined, target: '_blank', rel: 'noopener noreferrer', 'data-card-open': '',
+               preference on and a resolvable site URL this is a real <a>;
+               otherwise plain text — per-card refresh lives on the ms figure.
+               Favicons are same-origin, so they render even when the site is
+               blocked. -->
+          <component :is="cardHref(test) ? 'a' : 'div'" v-bind="cardHref(test) ? {
+            href: cardHref(test), target: '_blank', rel: 'noopener noreferrer', 'data-card-open': '',
             title: t('connectivity.OpenSite'),
-          } : {}" class="flex items-center gap-2 mb-3 min-w-0" :class="titleOpensSite ? 'cursor-pointer' : ''">
+          } : {}" class="flex items-center gap-2 mb-3 min-w-0" :class="cardHref(test) ? 'cursor-pointer' : ''">
             <img v-if="test.favicon && !test.faviconFailed" :src="test.favicon" alt=""
               @error="test.faviconFailed = true"
               class="size-6 shrink-0 rounded-md border bg-background object-contain p-0.5" loading="lazy" />
@@ -77,7 +78,7 @@
               {{ (test.name || '?').charAt(0).toUpperCase() }}
             </span>
             <span class="text-base font-medium truncate"
-              :class="titleOpensSite ? 'hover:underline underline-offset-4' : ''">{{ test.name }}</span>
+              :class="cardHref(test) ? 'hover:underline underline-offset-4' : ''">{{ test.name }}</span>
           </component>
           <!-- Status + ms (multi mode pins these to the best round). The ms
                figure doubles as the per-card retest trigger; failed cards
@@ -226,6 +227,9 @@ watch(lists, (all) => {
 });
 
 const titleOpensSite = computed(() => userPreferences.value.connectivityCardTitleOpensSite);
+// Card title link target — null (render a plain div) when the preference is
+// off or the member's site URL can't be resolved.
+const cardHref = (test) => (titleOpensSite.value ? siteUrlOf(test) : null);
 
 // ── Test entries ───────────────────────────────────────────────────────────
 // One reactive entry per member of the active list. `roundResults` records
