@@ -234,6 +234,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'education',
+        emoji: '🎓',
+        members: [
+            { id: 'coursera', name: 'Coursera', url: 'https://www.coursera.org/favicon.ico' },
+            { id: 'edx', name: 'edX', url: 'https://www.edx.org/favicon.ico' },
+            { id: 'khan-academy', name: 'Khan Academy', url: 'https://www.khanacademy.org/favicon.ico' },
+            { id: 'udemy', name: 'Udemy', url: 'https://www.udemy.com/staticx/udemy/images/v8/favicon-32x32.png' },
+            { id: 'duolingo', name: 'Duolingo', url: 'https://www.duolingo.com/robots.txt' },
+            { id: 'codecademy', name: 'Codecademy', url: 'https://www.codecademy.com/favicon.ico' },
+            { id: 'brilliant', name: 'Brilliant', url: 'https://brilliant.org/favicon.ico' },
+            { id: 'skillshare', name: 'Skillshare', url: 'https://www.skillshare.com/favicon.ico' },
+            { id: 'futurelearn', name: 'FutureLearn', url: 'https://www.futurelearn.com/favicon.ico' },
+            { id: 'masterclass', name: 'MasterClass', url: 'https://www.masterclass.com/favicon-32x32.png' },
+            { id: 'leetcode', name: 'LeetCode', url: 'https://leetcode.com/favicon.ico', iconDomain: 'assets.leetcode.com' },
+            { id: 'mit-ocw', name: 'MIT OpenCourseWare', url: 'https://ocw.mit.edu/favicon.ico', iconDomain: 'mit.edu' },
+        ],
+    },
+    {
         id: 'streaming',
         emoji: '🎬',
         members: [
