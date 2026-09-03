@@ -234,6 +234,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'education',
+        emoji: '🎓',
+        members: [
+            { id: 'coursera', name: 'Coursera', url: 'https://www.coursera.org/favicon.ico' },
+            { id: 'edx', name: 'edX', url: 'https://www.edx.org/favicon.ico' },
+            { id: 'khan-academy', name: 'Khan Academy', url: 'https://www.khanacademy.org/favicon.ico' },
+            { id: 'udemy', name: 'Udemy', url: 'https://www.udemy.com/staticx/udemy/images/v8/favicon-32x32.png' },
+            { id: 'duolingo', name: 'Duolingo', url: 'https://www.duolingo.com/robots.txt' },
+            { id: 'codecademy', name: 'Codecademy', url: 'https://www.codecademy.com/favicon.ico' },
+            { id: 'brilliant', name: 'Brilliant', url: 'https://brilliant.org/favicon.ico' },
+            { id: 'skillshare', name: 'Skillshare', url: 'https://www.skillshare.com/favicon.ico' },
+            { id: 'futurelearn', name: 'FutureLearn', url: 'https://www.futurelearn.com/favicon.ico' },
+            { id: 'masterclass', name: 'MasterClass', url: 'https://www.masterclass.com/favicon-32x32.png' },
+            { id: 'leetcode', name: 'LeetCode', url: 'https://leetcode.com/favicon.ico', iconDomain: 'assets.leetcode.com' },
+            { id: 'mit-ocw', name: 'MIT OpenCourseWare', url: 'https://ocw.mit.edu/favicon.ico', iconDomain: 'mit.edu' },
+        ],
+    },
+    {
         id: 'streaming',
         emoji: '🎬',
         members: [
@@ -323,6 +341,22 @@ export const IMPORT_LISTS = [
             { id: 'jsdelivr', name: 'jsDelivr', url: 'https://cdn.jsdelivr.net/favicon.ico', iconDomain: 'www.jsdelivr.com', siteUrl: 'https://www.jsdelivr.com' },
             { id: 'unpkg', name: 'unpkg', url: 'https://unpkg.com/favicon.ico' },
             { id: 'heroku', name: 'Heroku', url: 'https://www.heroku.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'finance',
+        emoji: '💳',
+        members: [
+            { id: 'paypal', name: 'PayPal', url: 'https://www.paypal.com/favicon.ico' },
+            { id: 'wise', name: 'Wise', url: 'https://wise.com/robots.txt' },
+            { id: 'revolut', name: 'Revolut', url: 'https://www.revolut.com/robots.txt' },
+            { id: 'stripe', name: 'Stripe', url: 'https://stripe.com/favicon.ico' },
+            { id: 'visa', name: 'Visa', url: 'https://www.visa.com/robots.txt' },
+            { id: 'mastercard', name: 'Mastercard', url: 'https://developer.mastercard.com/favicon.ico', iconDomain: 'www.mastercard.com', siteUrl: 'https://www.mastercard.com' },
+            { id: 'western-union', name: 'Western Union', url: 'https://www.westernunion.com/robots.txt' },
+            { id: 'payoneer', name: 'Payoneer', url: 'https://www.payoneer.com/robots.txt' },
+            { id: 'klarna', name: 'Klarna', url: 'https://docs.klarna.com/favicon.ico', iconDomain: 'www.klarna.com', siteUrl: 'https://www.klarna.com' },
+            { id: 'monzo', name: 'Monzo', url: 'https://monzo.com/robots.txt' },
         ],
     },
     {

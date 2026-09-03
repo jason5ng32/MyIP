@@ -13,7 +13,7 @@ export const PREFS_STORAGE_KEY = 'userPreferences_v7';
 
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
-  connectivityMultipleTests: false,
+  connectivityMultipleTests: true,
   simpleMode: false,
   // Per-module startup auto-run switches. IP info has no switch — it always
   // runs on load. See use-refresh-orchestrator.js.

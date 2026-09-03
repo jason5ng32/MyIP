@@ -5,14 +5,18 @@
 //
 // Gated on SENTRY_DSN_BACKEND, same philosophy as the frontend: when the env
 // var is unset this module does nothing and @sentry/node is never even
-// loaded. backend-server.js attaches the matching Express error handler.
+// loaded. SENTRY_ENVIRONMENT=development skips init too, so a local run never
+// reports. backend-server.js attaches the matching Express error handler.
 import dotenv from 'dotenv';
 
 import { scrubBreadcrumb, scrubEventRequest, scrubSpan } from './common/sentry-scrub.js';
 
 dotenv.config({ quiet: true });
 
-if (process.env.SENTRY_DSN_BACKEND) {
+// SENTRY_ENVIRONMENT=development (a local `pnpm dev` machine) skips init:
+// experiments in progress are not production signal, same rule as the cron
+// check-ins in common/sentry-cron.js.
+if (process.env.SENTRY_DSN_BACKEND && process.env.SENTRY_ENVIRONMENT !== 'development') {
     const Sentry = await import('@sentry/node');
     Sentry.init({
         dsn: process.env.SENTRY_DSN_BACKEND,

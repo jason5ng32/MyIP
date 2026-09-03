@@ -66,16 +66,18 @@ const store = useMainStore(pinia);
 app.use(i18n);
 app.use(router);
 
-// Sentry — build-time env gate: without the DSN the chunk neither ships nor
-// loads. The SDK chunk stays OFF the boot critical path: it loads after
-// mount (see the mount chain's finally below) so it never competes with the
-// locale pack the first render waits on. Until init, a tiny buffer catches
-// uncaught errors / rejections — and any of them triggers an immediate
-// load, so a boot that never reaches mount still reports. Perf data
-// survives the late init (buffered observers, backdated pageload span).
+// Sentry — build-time env gate: without the DSN, or in a dev server run, the
+// chunk neither ships nor loads (local runs would otherwise report every
+// experiment against the production project). The SDK chunk stays OFF the
+// boot critical path: it loads after mount (see the mount chain's finally
+// below) so it never competes with the locale pack the first render waits
+// on. Until init, a tiny buffer catches uncaught errors / rejections — and
+// any of them triggers an immediate load, so a boot that never reaches mount
+// still reports. Perf data survives the late init (buffered observers,
+// backdated pageload span).
 const earlyErrors = [];
 let loadSentry = () => {};
-if (import.meta.env.VITE_SENTRY_DSN_FRONTEND) {
+if (import.meta.env.VITE_SENTRY_DSN_FRONTEND && !import.meta.env.DEV) {
     const onEarlyError = (event) => {
         earlyErrors.push(event);
         loadSentry();

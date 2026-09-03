@@ -221,9 +221,10 @@ export const useMainStore = defineStore('main', {
       );
       this.setPreferences(merged);
     },
-    // fetch configs from server
+    // Fetch configs from server. A longer timeout than the default: the boot
+    // request competes with every other first-render fetch on slow links.
     fetchConfigs() {
-      fetchWithTimeout('/api/configs')
+      fetchWithTimeout('/api/configs', { timeoutMs: 10000 })
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');

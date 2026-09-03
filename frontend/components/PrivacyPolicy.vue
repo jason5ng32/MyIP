@@ -47,7 +47,7 @@ import { useMainStore } from '@/store';
 import { isAnalyticsEnabled } from '@/utils/analytics';
 import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
-import { fallbackChain } from '@/utils/locale-registry.js';
+import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import Footer from '@/components/Footer.vue';
 import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
 import { Spinner } from '@/components/ui/spinner';
@@ -77,38 +77,28 @@ const isDocsAssistantEnabled = computed(() => isDocsConfigured && store.configs?
 // data/tools.js), which keeps the section off deployments without it.
 const isPersonaCheckEnabled = computed(() => store.configs?.originalSite === true);
 
-// Privacy copy is loaded on demand per locale (mirrors the security-checklist
-// dataset pattern), then merged into i18n so t() / tm() can resolve it.
-// Discovered by glob, keyed by locale code; a locale with no file of its own
-// resolves to the first one on its fallback chain that has one.
-const privacyPacks = import.meta.glob('../locales/privacy/*.json');
-const privacyLoaders = Object.fromEntries(
-  Object.entries(privacyPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
-);
-
-const loaded = new Set();
+// Privacy copy is loaded on demand per locale (same loader as the security
+// checklist dataset), then merged into i18n so t() / tm() can resolve it.
+// A pack is complete or absent (tests/locale-packs.test.js), so whichever
+// pack the chain resolves to is merged under the ACTIVE locale — the page
+// reveals with one language, never a mix, and never raw keys unless the whole
+// chain is unreachable.
+const privacyLoaders = datasetLoaders(import.meta.glob('../locales/privacy/*.json'));
+const privacyCache = new Map();
+const merged = new Set();
 const ready = ref(false);
 
-// Merge one locale's privacy copy into i18n (memoized). Does NOT touch `ready` —
-// the caller decides when to reveal, so a background fallback load can't race the
-// active locale and paint the wrong language.
-const loadPrivacy = async (loc) => {
-  if (loaded.has(loc)) return;
-  const load = fallbackChain(loc).map((code) => privacyLoaders[code]).find(Boolean);
-  const { default: msgs } = await load();
-  mergeLocaleMessage(loc, msgs);
-  loaded.add(loc);
-};
-
-// Reveal only after the ACTIVE locale's copy is merged — otherwise a fallback
-// load could resolve first and paint English (t() falling back) until the next
-// re-render. The rest of the chain (covering any key the active locale might
-// miss) loads in the background and doesn't gate the reveal.
 watch(locale, async (loc) => {
   ready.value = false;
-  await loadPrivacy(loc);
-  if (loc === locale.value) ready.value = true; // ignore a stale load if locale changed mid-flight
-  for (const code of fallbackChain(loc).slice(1)) loadPrivacy(code);
+  const pack = await loadLocaleDataset(privacyLoaders, loc, privacyCache);
+  if (loc !== locale.value) return; // stale load — the locale changed mid-flight
+  if (pack) {
+    if (!merged.has(loc)) mergeLocaleMessage(loc, pack.data);
+    merged.add(loc);
+  } else {
+    console.error('Privacy copy unavailable in every locale; rendering keys');
+  }
+  ready.value = true;
 }, { immediate: true });
 
 // Ordered section ids, gated on which collection actually happens here. The
