@@ -257,7 +257,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { fallbackChain } from '@/utils/locale-registry.js';
+import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import { CircleProgressBar } from 'circle-progress.vue';
 import VueMarkdown from 'vue-markdown-render';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -317,13 +317,11 @@ const { t, locale } = useI18n();
 
 // The checklist dataset is large (~30 KB gzipped per language) and only this tool
 // reads it, so it's loaded on demand for the active locale instead of being baked
-// into the initial i18n bundle (see frontend/locales/i18n.js).
-// Discovered by glob, keyed by locale code; a locale with no dataset of its
-// own resolves to the first one on its fallback chain that has one.
-const securityDataPacks = import.meta.glob('../../locales/security-checklist/*.json');
-const securityDataLoaders = Object.fromEntries(
-    Object.entries(securityDataPacks).map(([path, loader]) => [path.match(/([^/]+)\.json$/)[1], loader]),
-);
+// into the initial i18n bundle (see frontend/locales/i18n.js). The shared loader
+// walks the fallback chain, so a failed chunk degrades to the next language
+// instead of a spinner that never stops.
+const securityDataLoaders = datasetLoaders(import.meta.glob('../../locales/security-checklist/*.json'));
+const securityDataCache = new Map();
 
 const securityChecklist = ref(null);
 
@@ -331,10 +329,15 @@ const securityChecklist = ref(null);
 // surfaces the template's existing loading state during the swap.
 const loadSecurityChecklist = async () => {
     fullList.value = null;
-    const load = fallbackChain(locale.value).map((code) => securityDataLoaders[code]).find(Boolean);
-    const { default: data } = await load();
-    securityChecklist.value = data;
-    fullList.value = initSecurityList(securityChecklist.value);
+    const loc = locale.value;
+    const pack = await loadLocaleDataset(securityDataLoaders, loc, securityDataCache);
+    if (loc !== locale.value) return; // stale load — the locale changed mid-flight
+    if (!pack) {
+        console.error('Security checklist dataset unavailable in every locale');
+        return;
+    }
+    securityChecklist.value = pack.data;
+    fullList.value = initSecurityList(pack.data);
 };
 
 const store = useMainStore();
