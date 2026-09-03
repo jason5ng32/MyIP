@@ -63,6 +63,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 * 📟 **Resolução DNS**: Resolve um domínio por vários resolvedores de uma só vez, agrupados por país — um jeito fácil de detectar sequestro ou contaminação.
 * 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio e endereços IP.
 * 🗄️ **Consulta de MAC**: Identifica o fabricante e os detalhes por trás de um endereço físico.
+* 🧮 **Calculadora de IP**: Cálculo de sub-rede, conversões de notação e detalhes de interface IPv6 para qualquer IP, prefixo, intervalo ou lista, tudo localmente.
 * 🛰️ **Informações de ASN e topologia de upstream**: Mostra detalhes do AS, anúncios históricos de um prefixo IP e os caminhos de upstream de um ASN até o backbone Tier 1.
 * 📶 **Status dos serviços**: Disponibilidade em tempo real de serviços conhecidos — Claude, OpenAI, GitHub, Cloudflare e outros — a partir de suas páginas oficiais de status, com incidentes recentes.
 

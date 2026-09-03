@@ -63,6 +63,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 * 📟 **Résolveur DNS** : Résout un domaine via plusieurs résolveurs à la fois, regroupés par pays — un moyen simple de repérer un détournement ou une contamination.
 * 📓 **Recherche Whois** : Effectue des recherches Whois pour les noms de domaine et les adresses IP.
 * 🗄️ **Recherche MAC** : Identifie le fabricant et les détails derrière une adresse physique.
+* 🧮 **Calculateur IP** : Calcul de sous-réseau, conversions de notation et détails d'interface IPv6 pour toute IP, préfixe, plage ou liste, le tout en local.
 * 🛰️ **Infos ASN et topologie amont** : Affiche les détails d'un AS, l'historique des annonces d'un préfixe IP et les chemins amont d'un ASN vers la dorsale Tier 1.
 * 📶 **État des services** : Disponibilité en direct de services connus — Claude, OpenAI, GitHub, Cloudflare et d'autres — depuis leurs pages d'état officielles, avec les incidents récents.
 
