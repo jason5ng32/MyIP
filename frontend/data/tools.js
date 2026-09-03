@@ -27,6 +27,7 @@ export const ADVANCED_TOOLS = [
   { slug: 'censorshipcheck', emoji: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', component: () => import('@/components/advanced-tools/CensorshipCheck.vue') },
   { slug: 'whois', emoji: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', component: () => import('@/components/advanced-tools/Whois.vue') },
   { slug: 'macchecker', emoji: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', component: () => import('@/components/advanced-tools/MacChecker.vue') },
+  { slug: 'ipcalculator', emoji: '🧮', titleKey: 'ipcalculator.Title', noteKey: 'advancedtools.IpCalculator', component: () => import('@/components/advanced-tools/IpCalculator.vue') },
   { slug: 'browserinfo', emoji: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },
   { slug: 'securitychecklist', emoji: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
   { slug: 'servicestatus', emoji: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
