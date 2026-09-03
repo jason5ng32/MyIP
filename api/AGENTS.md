@@ -60,7 +60,9 @@ currently `dns-resolvers.js`, the country-annotated resolver list behind
   Root-level `sentry-instrument.js` (loaded via `node --import` *before*
   express, so ESM loader hooks can auto-instrument route tracing) does the
   init; `backend-server.js` attaches `setupExpressErrorHandler` after the
-  routes. No `SENTRY_DSN_BACKEND` → `@sentry/node` never loads. Handlers
+  routes. No `SENTRY_DSN_BACKEND` → `@sentry/node` never loads;
+  `SENTRY_ENVIRONMENT=development` skips the init, so a local run reports
+  nothing (same rule the cron check-ins already follow). Handlers
   never import Sentry or capture manually: uncaught throws and 5xx traces
   are automatic; caught failures stay on the logger — a hook in
   `common/logger.js` mirrors warn+ to Sentry Logs and elevates error+ to

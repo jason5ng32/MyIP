@@ -76,7 +76,9 @@ replaces the map, and Home clears it on unmount — shortcuts are home-route onl
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
 No `VITE_SENTRY_DSN_FRONTEND` → no Sentry code in the bundle at all
-(build-time-gated dynamic import, like `firebase-init.js`). Rules:
+(build-time-gated dynamic import, like `firebase-init.js`). The same gate in
+`main.js` skips the load under `import.meta.env.DEV`, so a `pnpm dev` run
+reports nothing even with a DSN in `.env`. Rules:
 
 - **Never import `@sentry/vue` in app code** — a static import drags the SDK
   into the main bundle. All config lives in `sentry-init.js`.
