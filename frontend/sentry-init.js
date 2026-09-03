@@ -12,6 +12,14 @@ import { isValidIP } from '@/utils/valid-ip.js';
 
 const env = import.meta.env ?? {};
 
+// html-to-image's webfont embedding console.errors on every stylesheet it
+// can't read, then continues without it — noise, not a failed capture.
+const SCREENSHOT_CSS_NOISE = [
+    'Error while reading CSS rules from',
+    'Error loading remote stylesheet',
+    'Error inlining remote css file',
+];
+
 // `earlyErrors` is main.js's pre-init buffer: ErrorEvent /
 // PromiseRejectionEvent entries from its temporary window listeners, plus
 // the raw Error from the mount chain's catch. Flushed right after init;
@@ -89,11 +97,15 @@ const initSentry = (app, router, earlyErrors = []) => {
             'auth/internal-error',
             'auth/cancelled-popup-request',
             'INTERNAL ASSERTION FAILED',
-            // firebase auth's indexedDB layer refuses writes while the page
-            // is hiding (its guard against sign-out on pagehide); the
-            // rejection escapes from the SDK's own init promise — benign,
-            // means "skipped a write", not user-visible.
-            'Database is closing/hidden',
+            // firebase auth's indexedDB persistence layer refuses writes once
+            // the page is hiding (its guard against sign-out on pagehide), and
+            // the browser itself rejects transactions on a closing connection.
+            // Both escape from the SDK's own init promise — benign, they mean
+            // "skipped a write", not user-visible. Three wordings, one per
+            // source; Sentry matches these as substrings.
+            'Database is closing',
+            'Database is hidden',
+            'The database connection is closing',
             // Stale-deploy chunk loads: a client from before the latest
             // deploy lazy-loads a hashed asset that no longer exists.
             // Self-heals on reload, not a defect. One entry per browser
@@ -130,6 +142,10 @@ const initSentry = (app, router, earlyErrors = []) => {
                     const msg = firstArg.trim();
                     // Filter out DNS-leak probe chain errors.
                     if (msg.startsWith('Error fetching leak test data:')) return null;
+                    // html-to-image logs these while walking a cross-origin
+                    // stylesheet it can't read, then carries on — the
+                    // screenshot still renders (see composables/use-screenshot.js).
+                    if (SCREENSHOT_CSS_NOISE.some((prefix) => msg.startsWith(prefix))) return null;
                     event.fingerprint = [msg.slice(0, 200)];
                 }
             }
