@@ -82,11 +82,15 @@ const i18n = createI18n({
   messages: {},
 });
 
-// Load one locale's messages into the instance (memoized).
+// Load one locale's messages into the instance (memoized). A chunk that
+// resolves without a default export leaves the locale unregistered rather
+// than throwing — keys resolve down the chain.
 const loaded = new Set();
 async function loadOne(locale) {
   if (loaded.has(locale) || !localeLoaders[locale]) return;
-  const { default: msgs } = await localeLoaders[locale]();
+  const mod = await localeLoaders[locale]();
+  const msgs = mod?.default;
+  if (!msgs) return;
   i18n.global.setLocaleMessage(locale, msgs);
   loaded.add(locale);
 }
@@ -94,8 +98,9 @@ async function loadOne(locale) {
 // Load the active locale's whole fallback chain — vue-i18n can only fall back
 // to messages that are actually in the instance. Awaited in main.js before
 // mount so the first render is already translated; the loads run in parallel.
+// allSettled: one unreachable pack leaves the UI partly translated, never blank.
 export async function loadActiveLocaleMessages() {
-  await Promise.all(fallbackChain(activeLocale).map((code) => loadOne(code)));
+  await Promise.allSettled(fallbackChain(activeLocale).map((code) => loadOne(code)));
   updateMeta();
 }
 

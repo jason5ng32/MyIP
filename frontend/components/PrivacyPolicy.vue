@@ -92,10 +92,15 @@ const ready = ref(false);
 // Merge one locale's privacy copy into i18n (memoized). Does NOT touch `ready` —
 // the caller decides when to reveal, so a background fallback load can't race the
 // active locale and paint the wrong language.
+// A chunk that resolves without a default export merges nothing instead of
+// throwing.
 const loadPrivacy = async (loc) => {
   if (loaded.has(loc)) return;
   const load = fallbackChain(loc).map((code) => privacyLoaders[code]).find(Boolean);
-  const { default: msgs } = await load();
+  if (!load) return;
+  const mod = await load();
+  const msgs = mod?.default;
+  if (!msgs) return;
   mergeLocaleMessage(loc, msgs);
   loaded.add(loc);
 };
@@ -104,11 +109,18 @@ const loadPrivacy = async (loc) => {
 // load could resolve first and paint English (t() falling back) until the next
 // re-render. The rest of the chain (covering any key the active locale might
 // miss) loads in the background and doesn't gate the reveal.
+// An unreachable pack still reveals the page: the sections then resolve down
+// the i18n fallback chain, which beats a spinner that never stops.
 watch(locale, async (loc) => {
   ready.value = false;
-  await loadPrivacy(loc);
-  if (loc === locale.value) ready.value = true; // ignore a stale load if locale changed mid-flight
-  for (const code of fallbackChain(loc).slice(1)) loadPrivacy(code);
+  try {
+    await loadPrivacy(loc);
+  } catch (err) {
+    console.warn('Privacy copy failed to load, rendering with fallback text:', err);
+  } finally {
+    if (loc === locale.value) ready.value = true; // ignore a stale load if locale changed mid-flight
+  }
+  for (const code of fallbackChain(loc).slice(1)) loadPrivacy(code).catch(() => {});
 }, { immediate: true });
 
 // Ordered section ids, gated on which collection actually happens here. The
