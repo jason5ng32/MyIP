@@ -39,7 +39,7 @@ minimumReleaseAgeExclude:
   - '@firebase/remote-config@0.9.0 || 0.9.2'
   - firebase@12.16.0 || 12.18.0
   - pinia@4.0.2 || 4.0.3
-  - vue-router@5.2.0
+  - vue-router@5.2.0 || 5.3.1
   - '@sentry/browser-utils@10.68.0'
   - '@sentry/browser@10.68.0'
   - '@sentry/core@10.68.0'
@@ -102,4 +102,4 @@ minimumReleaseAgeExclude:
   - '@firebase/storage@0.14.5'
   - '@firebase/util@1.15.3'
   - '@firebase/webchannel-wrapper@1.0.7'
-  - '@lucide/vue@1.33.0'
+  - '@lucide/vue@1.33.0 || 1.40.0'
