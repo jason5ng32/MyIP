@@ -2086,5 +2086,22 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.6.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "New tool: IP Calculator — paste any IP, prefix, range, list or number and get subnet math, notation conversions, address type and IPv6 interface details, all computed locally",
+          "zh": "新增工具：IP 计算器——粘贴任意 IP、前缀、范围、列表或数字，本地算出子网信息、进制转换、地址类型与 IPv6 接口详情",
+          "zh-TW": "新增工具：IP 計算器——貼上任意 IP、前綴、範圍、清單或數字，本機算出子網路資訊、進位轉換、位址類型與 IPv6 介面詳情",
+          "fr": "Nouvel outil : Calculateur IP — collez une IP, un préfixe, une plage, une liste ou un nombre et obtenez le calcul de sous-réseau, les conversions de notation, le type d'adresse et les détails d'interface IPv6, le tout calculé localement",
+          "ru": "Новый инструмент: IP-калькулятор — вставьте любой IP, префикс, диапазон, список или число и получите расчёт подсети, преобразование записей, тип адреса и сведения об интерфейсе IPv6, всё вычисляется локально",
+          "pt-BR": "Nova ferramenta: Calculadora de IP — cole qualquer IP, prefixo, intervalo, lista ou número e obtenha o cálculo de sub-rede, conversões de notação, tipo de endereço e detalhes de interface IPv6, tudo calculado localmente"
+        }
+      }
+    ]
   }
 ]
