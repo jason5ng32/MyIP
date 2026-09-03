@@ -5,8 +5,8 @@
 
      The query rides the URL as `?q=` on both /tools/ipcalculator and
      /?tool=ipcalculator, written back on every run so results are shareable.
-     Example pills under the input teach the accepted syntaxes; on the home
-     page the visitor's own IPs (store.allIPs) are offered the same way. -->
+     Two collapsed folds under the input hold example pills (one per accepted
+     syntax) and, on the home page, the visitor's own IPs (store.allIPs). -->
 <template>
     <div class="ip-calculator-section my-4 space-y-4">
         <!-- Top note -->
@@ -27,31 +27,44 @@
             </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
 
-            <!-- Example inputs: one per accepted syntax, tap to run -->
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs text-muted-foreground">{{ t('ipcalculator.Examples') }}</span>
-                <ToggleGroup :model-value="picked" type="single" variant="outline" :spacing="2"
-                    class="flex-wrap justify-start" @update:model-value="(v) => v && runPreset(v)">
-                    <ToggleGroupItem v-for="example in EXAMPLES" :key="example.input" :value="example.input"
-                        :class="tagClass" :aria-label="`${t(example.labelKey)}: ${example.input}`">
-                        <span class="text-muted-foreground">{{ t(example.labelKey) }}</span>
-                        <span class="font-mono">{{ example.input }}</span>
-                    </ToggleGroupItem>
-                </ToggleGroup>
-            </div>
+            <!-- Example inputs: one per accepted syntax, tap to run. Collapsed by
+                 default; the chevron turns from › to ⌄ via data-state. -->
+            <Collapsible>
+                <CollapsibleTrigger>
+                    <button type="button" :class="triggerClass">
+                        <ChevronRight class="size-4 transition-transform duration-200" />{{ t('ipcalculator.Examples') }}
+                    </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <ToggleGroup :model-value="picked" type="single" variant="outline" :spacing="2"
+                        class="mt-2 flex-wrap justify-start" @update:model-value="(v) => v && runPreset(v)">
+                        <ToggleGroupItem v-for="example in EXAMPLES" :key="example.input" :value="example.input"
+                            :class="tagClass" :aria-label="`${t(example.labelKey)}: ${example.input}`">
+                            <span class="text-muted-foreground">{{ t(example.labelKey) }}</span>
+                            <span class="font-mono">{{ example.input }}</span>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </CollapsibleContent>
+            </Collapsible>
 
-            <!-- The visitor's own IPs as one-tap pills (home page only) -->
-            <div v-if="myIPs.length" class="flex flex-wrap items-center gap-2">
-                <span class="text-xs text-muted-foreground">{{ t('ipcalculator.MyIPs') }}</span>
-                <ToggleGroup :model-value="picked" type="single" variant="outline" :spacing="2"
-                    class="flex-wrap justify-start" @update:model-value="(v) => v && runPreset(v)">
-                    <ToggleGroupItem v-for="item in myIPs" :key="item.ip" :value="item.ip" :class="tagClass"
-                        :aria-label="item.ip">
-                        <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()" class="size-3.5 shrink-0" />
-                        <span class="max-w-56 truncate font-mono">{{ item.ip }}</span>
-                    </ToggleGroupItem>
-                </ToggleGroup>
-            </div>
+            <!-- The visitor's own IPs as one-tap pills (home page only), same fold -->
+            <Collapsible v-if="myIPs.length">
+                <CollapsibleTrigger>
+                    <button type="button" :class="triggerClass">
+                        <ChevronRight class="size-4 transition-transform duration-200" />{{ t('ipcalculator.MyIPs') }}
+                    </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <ToggleGroup :model-value="picked" type="single" variant="outline" :spacing="2"
+                        class="mt-2 flex-wrap justify-start" @update:model-value="(v) => v && runPreset(v)">
+                        <ToggleGroupItem v-for="item in myIPs" :key="item.ip" :value="item.ip" :class="tagClass"
+                            :aria-label="item.ip">
+                            <Icon v-if="item.country" :icon="'circle-flags:' + item.country.toLowerCase()" class="size-3.5 shrink-0" />
+                            <span class="max-w-56 truncate font-mono">{{ item.ip }}</span>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </CollapsibleContent>
+            </Collapsible>
         </div>
 
         <!-- Result -->
@@ -76,7 +89,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
-import { Calculator } from '@lucide/vue';
+import { Calculator, ChevronRight } from '@lucide/vue';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { isValidIP } from '@/utils/valid-ip.js';
@@ -86,6 +99,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import Ipv4Result from './ip-calculator/Ipv4Result.vue';
 import Ipv6Result from './ip-calculator/Ipv6Result.vue';
@@ -116,6 +130,9 @@ const EXAMPLES = [
 
 // Pills match IPHistory / DnsResolver's tag row.
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
+
+// Fold triggers: reka puts `data-state` on the button, which rotates the chevron.
+const triggerClass = 'flex items-center gap-1 text-xs text-muted-foreground cursor-pointer hover:text-foreground [&[data-state=open]>svg]:rotate-90';
 
 // i18n keys are camelCase; classifier ids use hyphens (`ipv4-cidr`, `link-local`).
 const camel = (id) => id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
