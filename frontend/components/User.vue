@@ -192,18 +192,17 @@ const refreshUserInfo = async () => {
     }
 };
 
-// Fetch user info
+// Fetch user info. `remoteUserInfoFetched` flips only on success, so a failed
+// round stays refetchable from Nav / Achievements on their next open.
 const getUserInfo = async () => {
     if (remoteUserInfoFetched.value || !isSignedIn.value) return;
     try {
-        const response = await authenticatedFetch(`/api/getuserinfo`);
-        const data = response;
-        store.remoteUserInfo = data;
+        store.remoteUserInfo = await authenticatedFetch(`/api/getuserinfo`);
+        store.remoteUserInfoFetched = true;
         initUserAchievements();
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
-    store.remoteUserInfoFetched = true;
 };
 
 // Initialize user achievements
@@ -267,8 +266,12 @@ watch(() => triggerUserBenefits.value, (newVal) => {
     if (newVal) openUserBenefits();
 });
 
+// One-shot trigger: cleared here so the next request from Nav / Achievements
+// is a fresh false → true edge rather than a no-op write.
 watch(() => triggerRemoteUserInfo.value, (newVal) => {
-    if (newVal) getUserInfo();
+    if (!newVal) return;
+    store.triggerRemoteUserInfo = false;
+    getUserInfo();
 });
 
 watch(() => triggerUpdateAchievements.value, (newVal) => {
