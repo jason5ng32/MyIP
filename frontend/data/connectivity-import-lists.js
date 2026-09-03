@@ -344,6 +344,22 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'finance',
+        emoji: '💳',
+        members: [
+            { id: 'paypal', name: 'PayPal', url: 'https://www.paypal.com/favicon.ico' },
+            { id: 'wise', name: 'Wise', url: 'https://wise.com/robots.txt' },
+            { id: 'revolut', name: 'Revolut', url: 'https://www.revolut.com/robots.txt' },
+            { id: 'stripe', name: 'Stripe', url: 'https://stripe.com/favicon.ico' },
+            { id: 'visa', name: 'Visa', url: 'https://www.visa.com/robots.txt' },
+            { id: 'mastercard', name: 'Mastercard', url: 'https://developer.mastercard.com/favicon.ico', iconDomain: 'www.mastercard.com', siteUrl: 'https://www.mastercard.com' },
+            { id: 'western-union', name: 'Western Union', url: 'https://www.westernunion.com/robots.txt' },
+            { id: 'payoneer', name: 'Payoneer', url: 'https://www.payoneer.com/robots.txt' },
+            { id: 'klarna', name: 'Klarna', url: 'https://docs.klarna.com/favicon.ico', iconDomain: 'www.klarna.com', siteUrl: 'https://www.klarna.com' },
+            { id: 'monzo', name: 'Monzo', url: 'https://monzo.com/robots.txt' },
+        ],
+    },
+    {
         id: 'crypto',
         emoji: '💰',
         members: [
