@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'japan',
+        emoji: '🇯🇵',
+        members: [
+            { id: 'yahoo-jp', name: 'Yahoo! JAPAN', url: 'https://www.yahoo.co.jp/favicon.ico' },
+            { id: 'mercari', name: 'Mercari', url: 'https://jp.mercari.com/favicon.ico' },
+            { id: 'cookpad', name: 'Cookpad', url: 'https://cookpad.com/favicon.ico' },
+            { id: 'paypay', name: 'PayPay', url: 'https://paypay.ne.jp/favicon.ico' },
+            { id: 'niconico', name: 'niconico', url: 'https://www.nicovideo.jp/favicon.ico' },
+            { id: 'nhk', name: 'NHK', url: 'https://www.nhk.or.jp/favicon.ico' },
+            { id: 'kakaku', name: 'Kakaku.com', url: 'https://kakaku.com/favicon.ico' },
+            { id: 'ameba', name: 'Ameba', url: 'https://www.ameba.jp/favicon.ico' },
+            { id: 'tabelog', name: 'Tabelog', url: 'https://tabelog.com/favicon.ico' },
+            { id: 'hotpepper', name: 'Hot Pepper', url: 'https://www.hotpepper.jp/favicon.ico' },
+            { id: 'amazon-jp', name: 'Amazon.co.jp', url: 'https://www.amazon.co.jp/favicon.ico' },
+            { id: 'google-jp', name: 'Google.co.jp', url: 'https://www.google.co.jp/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
