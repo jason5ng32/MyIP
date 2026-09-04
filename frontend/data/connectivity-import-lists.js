@@ -295,7 +295,7 @@ export const IMPORT_LISTS = [
             { id: 'airbnb', name: 'Airbnb', url: 'https://www.airbnb.com/favicon.ico' },
             { id: 'expedia', name: 'Expedia', url: 'https://www.expedia.com/favicon.ico' },
             { id: 'skyscanner', name: 'Skyscanner', url: 'https://www.skyscanner.net/favicon.ico' },
-            { id: 'tripadvisor', name: 'Tripadvisor', url: 'https://www.tripadvisor.com/favicon.ico' },
+            { id: 'tripadvisor', name: 'TripAdvisor', url: 'https://www.tripadvisor.com/favicon.ico' },
             { id: 'agoda', name: 'Agoda', url: 'https://www.agoda.com/favicon.ico' },
             { id: 'kayak', name: 'KAYAK', url: 'https://www.kayak.com/favicon.ico' },
             { id: 'trip-com', name: 'Trip.com', url: 'https://www.trip.com/favicon.ico' },
