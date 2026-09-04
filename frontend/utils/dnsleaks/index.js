@@ -14,6 +14,8 @@ export { surfshark } from './surfshark.js';
 export { ipleak } from './ipleak.js';
 export { browserleaks } from './browserleaks.js';
 export { fastly } from './fastly.js';
+export { bashws } from './bashws.js';
+export { myipstack } from './myipstack.js';
 
 // Invoke `provider.run()` up to `attempts` times. Because each provider
 // regenerates its prefix internally on every call, retries trigger fresh

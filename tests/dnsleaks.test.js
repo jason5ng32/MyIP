@@ -152,3 +152,28 @@ describe('runWithFallback', () => {
     await assert.rejects(() => runWithFallback([]), /empty provider chain/);
   });
 });
+
+describe('provider response parsers', () => {
+  it('bash.ws: picks the first entry tagged as a resolver', async () => {
+    const { pickDnsIp } = await import('../frontend/utils/dnsleaks/bashws.js');
+    assert.equal(pickDnsIp([
+      { ip: '203.0.113.9', type: 'ip' },
+      { ip: '13.229.187.208', type: 'dns' },
+      { ip: '13.229.187.209', type: 'dns' },
+      { ip: 'DNS is not leaking.', type: 'conclusion' },
+    ]), '13.229.187.208');
+    assert.equal(pickDnsIp([{ ip: '203.0.113.9', type: 'ip' }]), null);
+    assert.equal(pickDnsIp({ ip: '1.1.1.1' }), null);
+    assert.equal(pickDnsIp(null), null);
+  });
+
+  it('myipstack: extracts the ip between proto and port, IPv6 included', async () => {
+    const { parseRemoteAddress } = await import('../frontend/utils/dnsleaks/myipstack.js');
+    assert.equal(parseRemoteAddress('udp:111.206.4.139:41321'), '111.206.4.139');
+    assert.equal(parseRemoteAddress('tcp:2001:4860:4860::8888:53\n'), '2001:4860:4860::8888');
+    assert.equal(parseRemoteAddress('udp:'), null);
+    assert.equal(parseRemoteAddress('garbage'), null);
+    assert.equal(parseRemoteAddress(''), null);
+    assert.equal(parseRemoteAddress(undefined), null);
+  });
+});

@@ -2101,6 +2101,28 @@
           "ru": "Новый инструмент: IP-калькулятор — вставьте любой IP, префикс, диапазон, список или число и получите расчёт подсети, преобразование записей, тип адреса и сведения об интерфейсе IPv6, всё вычисляется локально",
           "pt-BR": "Nova ferramenta: Calculadora de IP — cole qualquer IP, prefixo, intervalo, lista ou número e obtenha o cálculo de sub-rede, conversões de notação, tipo de endereço e detalhes de interface IPv6, tudo calculado localmente"
         }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the DNS Leak Test experience",
+          "zh": "优化了 DNS 泄露测试的体验",
+          "zh-TW": "優化了 DNS 洩漏測試的體驗",
+          "fr": "Amélioration de l'expérience du test de fuite DNS",
+          "ru": "Улучшен тест на утечку DNS",
+          "pt-BR": "Melhorada a experiência do Teste de Vazamento de DNS"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
       }
     ]
   }

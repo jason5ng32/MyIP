@@ -107,14 +107,14 @@ import FitText from '@/components/widgets/FitText.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
-  ipApi, surfshark, ipleak, fastly, browserleaks,
+  ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak,
   buildFallbackChain, runWithFallback,
 } from '@/utils/dnsleaks';
 
 // All providers in priority order: the first SLOT_COUNT hold a card each,
 // the rest are standbys. New provider = file under utils/dnsleaks + append.
-const PROVIDERS = [ipApi, surfshark, ipleak, fastly, browserleaks];
-const SLOT_COUNT = 4;
+const PROVIDERS = [ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak];
+const SLOT_COUNT = 7;
 const ACTIVE = PROVIDERS.slice(0, SLOT_COUNT);
 
 
