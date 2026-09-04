@@ -195,6 +195,7 @@ export const IMPORT_LISTS = [
             { id: 'kimi', name: 'Kimi', url: 'https://www.kimi.com/favicon.ico' },
             { id: 'poe', name: 'Poe', url: 'https://poe.com/favicon.ico' },
             { id: 'characterai', name: 'Character.ai', url: 'https://character.ai/favicon.ico' },
+            { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/favicon.ico' },
         ],
     },
     {
