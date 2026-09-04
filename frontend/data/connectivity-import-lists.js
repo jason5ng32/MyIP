@@ -288,6 +288,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'sports',
+        emoji: '🏆',
+        members: [
+            { id: 'espn', name: 'ESPN', url: 'https://www.espn.com/favicon.ico' },
+            { id: 'nba', name: 'NBA', url: 'https://www.nba.com/favicon.ico' },
+            { id: 'fifa', name: 'FIFA', url: 'https://www.fifa.com/favicon.ico' },
+            { id: 'premierleague', name: 'Premier League', url: 'https://www.premierleague.com/favicon.ico' },
+            { id: 'formula1', name: 'Formula 1', url: 'https://www.formula1.com/favicon.ico' },
+            { id: 'dazn', name: 'DAZN', url: 'https://www.dazn.com/favicon.ico' },
+            { id: 'flashscore', name: 'Flashscore', url: 'https://www.flashscore.com/favicon.ico' },
+            { id: 'sofascore', name: 'Sofascore', url: 'https://www.sofascore.com/favicon.ico' },
+            { id: 'skysports', name: 'Sky Sports', url: 'https://www.skysports.com/favicon.ico' },
+            { id: 'bein-sports', name: 'beIN Sports', url: 'https://www.beinsports.com/favicon.ico' },
+            { id: 'mlb', name: 'MLB', url: 'https://www.mlb.com/favicon.ico' },
+            { id: 'nfl', name: 'NFL', url: 'https://www.nfl.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'gaming',
         emoji: '🎮',
         members: [
