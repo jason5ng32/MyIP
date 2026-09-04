@@ -53,4 +53,5 @@ export const DNS_RESOLVERS = [
     { id: 'cznic', name: 'CZ.NIC ODVR', country: 'CZ', udp: '193.17.47.1' },
     { id: 'dnssb', name: 'DNS.SB', country: 'EU', udp: '185.222.222.222', doh: 'https://doh.dns.sb/dns-query?' },
     { id: 'kt', name: 'KT', country: 'KR', udp: '168.126.63.1' },
+    { id: 'dnswatch', name: 'DNS.WATCH', country: 'DE', udp: '84.200.69.80' },
 ];
