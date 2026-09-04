@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'france',
+        emoji: '🇫🇷',
+        members: [
+            { id: 'leboncoin', name: 'Leboncoin', url: 'https://www.leboncoin.fr/favicon.ico' },
+            { id: 'sncf', name: 'SNCF', url: 'https://www.sncf.com/favicon.ico' },
+            { id: 'service-public', name: 'Service-Public.fr', url: 'https://www.service-public.fr/favicon.ico', iconDomain: 'service-public.fr' },
+            { id: 'lemonde', name: 'Le Monde', url: 'https://www.lemonde.fr/favicon.ico' },
+            { id: 'lefigaro', name: 'Le Figaro', url: 'https://www.lefigaro.fr/favicon.ico' },
+            { id: 'cdiscount', name: 'Cdiscount', url: 'https://www.cdiscount.com/favicon.ico' },
+            { id: 'fnac', name: 'Fnac', url: 'https://www.fnac.com/favicon.ico' },
+            { id: 'orange-fr', name: 'Orange', url: 'https://www.orange.fr/favicon.ico' },
+            { id: 'tf1', name: 'TF1', url: 'https://www.tf1.fr/favicon.ico' },
+            { id: 'boursorama', name: 'Boursorama', url: 'https://www.boursorama.com/favicon.ico' },
+            { id: 'amazon-fr', name: 'Amazon.fr', url: 'https://www.amazon.fr/favicon.ico' },
+            { id: 'google-fr', name: 'Google.fr', url: 'https://www.google.fr/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
