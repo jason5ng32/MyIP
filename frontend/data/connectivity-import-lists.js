@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'turkey',
+        emoji: '🇹🇷',
+        members: [
+            { id: 'trendyol', name: 'Trendyol', url: 'https://www.trendyol.com/favicon.ico' },
+            { id: 'hepsiburada', name: 'Hepsiburada', url: 'https://www.hepsiburada.com/favicon.ico' },
+            { id: 'sahibinden', name: 'Sahibinden', url: 'https://www.sahibinden.com/favicon.ico' },
+            { id: 'eksisozluk', name: 'Eksi Sozluk', url: 'https://eksisozluk.com/favicon.ico' },
+            { id: 'n11', name: 'n11', url: 'https://www.n11.com/favicon.ico' },
+            { id: 'hurriyet', name: 'Hurriyet', url: 'https://www.hurriyet.com.tr/favicon.ico' },
+            { id: 'milliyet', name: 'Milliyet', url: 'https://www.milliyet.com.tr/favicon.ico' },
+            { id: 'yemeksepeti', name: 'Yemeksepeti', url: 'https://www.yemeksepeti.com/favicon.ico' },
+            { id: 'getir', name: 'Getir', url: 'https://getir.com/favicon.ico' },
+            { id: 'turkcell', name: 'Turkcell', url: 'https://www.turkcell.com.tr/favicon.ico' },
+            { id: 'sabah', name: 'Sabah', url: 'https://www.sabah.com.tr/favicon.ico' },
+            { id: 'akbank', name: 'Akbank', url: 'https://www.akbank.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
