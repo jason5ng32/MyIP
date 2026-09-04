@@ -6,11 +6,6 @@
 <template>
     <Card>
         <CardContent class="space-y-8 p-4 md:p-6">
-            <p v-if="analysis.number" class="m-0 text-sm text-muted-foreground">
-                {{ t('ipcalculator.InterpretedAs') }}
-                <span class="font-mono font-medium text-foreground">{{ address.compressed }}</span>
-            </p>
-
             <!-- Canonical forms -->
             <CalcSection :icon="Globe" :title="t('ipcalculator.section.Address')">
                 <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -89,7 +84,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Fingerprint, Globe, Network, Tag } from '@lucide/vue';
+import { Fingerprint, Globe, Network, Tag, Info } from '@lucide/vue';
 import { Card, CardContent } from '@/components/ui/card';
 import CalcSection from './CalcSection.vue';
 import ValueRow from './ValueRow.vue';
