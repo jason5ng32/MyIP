@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'mexico',
+        emoji: '🇲🇽',
+        members: [
+            { id: 'liverpool-mx', name: 'Liverpool', url: 'https://www.liverpool.com.mx/favicon.ico' },
+            { id: 'coppel', name: 'Coppel', url: 'https://www.coppel.com/favicon.ico' },
+            { id: 'gob-mx', name: 'gob.mx', url: 'https://www.gob.mx/favicon.ico' },
+            { id: 'eluniversal-mx', name: 'El Universal', url: 'https://www.eluniversal.com.mx/favicon.ico' },
+            { id: 'milenio', name: 'Milenio', url: 'https://www.milenio.com/favicon.ico' },
+            { id: 'cinepolis', name: 'Cinepolis', url: 'https://cinepolis.com/favicon.ico' },
+            { id: 'oxxo', name: 'OXXO', url: 'https://www.oxxo.com/favicon.ico' },
+            { id: 'banorte', name: 'Banorte', url: 'https://www.banorte.com/favicon.ico' },
+            { id: 'elektra', name: 'Elektra', url: 'https://www.elektra.com.mx/favicon.ico' },
+            { id: 'rappi', name: 'Rappi', url: 'https://www.rappi.com.mx/favicon.ico' },
+            { id: 'mercadolibre-mx', name: 'Mercado Libre Mexico', url: 'https://www.mercadolibre.com.mx/favicon.ico' },
+            { id: 'televisa', name: 'Televisa', url: 'https://www.televisa.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
