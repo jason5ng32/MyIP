@@ -160,6 +160,22 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'nigeria',
+        emoji: '🇳🇬',
+        members: [
+            { id: 'jumia', name: 'Jumia', url: 'https://www.jumia.com.ng/favicon.ico' },
+            { id: 'konga', name: 'Konga', url: 'https://www.konga.com/favicon.ico' },
+            { id: 'nairaland', name: 'Nairaland', url: 'https://www.nairaland.com/favicon.ico' },
+            { id: 'paystack', name: 'Paystack', url: 'https://paystack.com/favicon.ico' },
+            { id: 'flutterwave', name: 'Flutterwave', url: 'https://flutterwave.com/favicon.ico' },
+            { id: 'zenithbank', name: 'Zenith Bank', url: 'https://www.zenithbank.com/favicon.ico' },
+            { id: 'indrive', name: 'inDrive', url: 'https://indrive.com/favicon.ico' },
+            { id: 'chowdeck', name: 'Chowdeck', url: 'https://chowdeck.com/favicon.ico' },
+            { id: 'mtn', name: 'MTN', url: 'https://www.mtn.ng/favicon.ico' },
+            { id: 'boomplay', name: 'Boomplay', url: 'https://boomplay.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'germany',
         emoji: '🇩🇪',
         members: [
