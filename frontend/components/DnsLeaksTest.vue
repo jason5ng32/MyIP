@@ -22,7 +22,7 @@
 
     <!-- Card grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-      <Card v-for="(leak, index) in leakTest" :key="leak.id"
+      <Card v-for="(leak, index) in leakTest" :key="leak.slot"
         class="keyboard-shortcut-card jn-card min-w-0 overflow-hidden transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
         <CardContent class="p-4 min-w-0">
           <!-- Top: heartbeat icon + name + index -->
@@ -33,8 +33,7 @@
 
               <span class="font-mono text-muted-foreground shrink-0">#{{ index + 1 }}</span>
             </div>
-            <!-- Provider name (secondary information) — fixed per card, sourced
-                 from each provider's `name` export in utils/dnsleaks. -->
+            <!-- Provider that actually answered (changes on fallback). -->
             <p class="w-full min-w-0 mb-1 text-xs font-mono text-muted-foreground truncate" :title="leak.providerName">
               {{ leak.providerName }}
             </p>
@@ -108,13 +107,15 @@ import FitText from '@/components/widgets/FitText.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
-  ipApi, surfshark, ipleak, fastly, runWithRetry,
+  ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak,
+  buildFallbackChain, runWithFallback,
 } from '@/utils/dnsleaks';
 
-// One source of truth for which providers to run and in what order. Adding
-// a new provider = create the file under utils/dnsleaks and append it here.
-// (browserleaks stays available in utils/dnsleaks but is benched for now.)
-const PROVIDERS = [ipApi, surfshark, ipleak, fastly];
+// All providers in priority order: the first SLOT_COUNT hold a card each,
+// the rest are standbys. New provider = file under utils/dnsleaks + append.
+const PROVIDERS = [ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak];
+const SLOT_COUNT = 4;
+const ACTIVE = PROVIDERS.slice(0, SLOT_COUNT);
 
 
 const { t } = useI18n();
@@ -151,8 +152,11 @@ const createDefaultCard = () => ({
   org: t('dnsleaktest.StatusWait'),
 });
 
-const leakTest = reactive(PROVIDERS.map((p) => ({
+// `slot` is the card's stable key; `id` / `providerName` follow the
+// provider that actually answered.
+const leakTest = reactive(ACTIVE.map((p) => ({
   ...createDefaultCard(),
+  slot: p.id,
   id: p.id,
   providerName: p.name,
 })));
@@ -178,12 +182,14 @@ const markLeakCardError = (index) => {
   leakTest[index].org = t('dnsleaktest.StatusError');
 };
 
-// Run one provider against its card slot, with retry (3 attempts, fresh
-// prefix per attempt — see `runWithRetry` in utils/dnsleaks). On full
-// failure (all attempts threw) the card is flipped to the error state.
-const runProvider = async (index, provider) => {
+// Run one slot through its fallback chain (see utils/dnsleaks); the card
+// flips to error only when the whole chain fails.
+const runProvider = async (index) => {
+  const chain = buildFallbackChain(index, PROVIDERS, SLOT_COUNT);
   try {
-    const { ip } = await runWithRetry(provider);
+    const { ip, provider } = await runWithFallback(chain);
+    leakTest[index].id = provider.id;
+    leakTest[index].providerName = provider.name;
     leakTest[index].ip = ip;
     await applyMaxMindGeo(index, ip);
   } catch (error) {
@@ -198,7 +204,9 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
   if (isRefresh) {
     trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
-    leakTest.forEach((server) => {
+    leakTest.forEach((server, index) => {
+      server.id = ACTIVE[index].id;
+      server.providerName = ACTIVE[index].name;
       server.ip = t('dnsleaktest.StatusWait');
       server.country = t('dnsleaktest.StatusWait');
       server.country_code = '';
@@ -206,15 +214,13 @@ const checkAllDNSLeakTest = async (isRefresh) => {
     });
   }
 
-  const delayedRun = (provider, index, delay) => new Promise((resolve) => {
+  const delayedRun = (index, delay) => new Promise((resolve) => {
     setTimeout(() => {
-      runProvider(index, provider).then(resolve, resolve);
+      runProvider(index).then(resolve, resolve);
     }, delay);
   });
 
-  const promises = PROVIDERS.map((provider, index) =>
-    delayedRun(provider, index, index * 200),
-  );
+  const promises = ACTIVE.map((_, index) => delayedRun(index, index * 200));
 
   const allSettledPromise = Promise.allSettled(promises);
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));

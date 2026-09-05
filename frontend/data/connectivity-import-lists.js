@@ -160,6 +160,22 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'nigeria',
+        emoji: '🇳🇬',
+        members: [
+            { id: 'jumia', name: 'Jumia', url: 'https://www.jumia.com.ng/favicon.ico' },
+            { id: 'konga', name: 'Konga', url: 'https://www.konga.com/favicon.ico' },
+            { id: 'nairaland', name: 'Nairaland', url: 'https://www.nairaland.com/favicon.ico' },
+            { id: 'paystack', name: 'Paystack', url: 'https://paystack.com/favicon.ico' },
+            { id: 'flutterwave', name: 'Flutterwave', url: 'https://flutterwave.com/favicon.ico' },
+            { id: 'zenithbank', name: 'Zenith Bank', url: 'https://www.zenithbank.com/favicon.ico' },
+            { id: 'indrive', name: 'inDrive', url: 'https://indrive.com/favicon.ico' },
+            { id: 'chowdeck', name: 'Chowdeck', url: 'https://chowdeck.com/favicon.ico' },
+            { id: 'mtn', name: 'MTN', url: 'https://www.mtn.ng/favicon.ico' },
+            { id: 'boomplay', name: 'Boomplay', url: 'https://boomplay.com/favicon.ico' },
+        ],
+    },
+    {
         id: 'germany',
         emoji: '🇩🇪',
         members: [
@@ -195,6 +211,7 @@ export const IMPORT_LISTS = [
             { id: 'kimi', name: 'Kimi', url: 'https://www.kimi.com/favicon.ico' },
             { id: 'poe', name: 'Poe', url: 'https://poe.com/favicon.ico' },
             { id: 'characterai', name: 'Character.ai', url: 'https://character.ai/favicon.ico' },
+            { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/favicon.ico' },
         ],
     },
     {
@@ -285,6 +302,24 @@ export const IMPORT_LISTS = [
             { id: 'mixcloud', name: 'Mixcloud', url: 'https://www.mixcloud.com/favicon.ico' },
             { id: 'qobuz', name: 'Qobuz', url: 'https://www.qobuz.com/favicon.ico' },
             { id: 'iheart', name: 'iHeartRadio', url: 'https://www.iheart.com/favicon.ico' },
+        ],
+    },
+    {
+        id: 'sports',
+        emoji: '🏆',
+        members: [
+            { id: 'espn', name: 'ESPN', url: 'https://www.espn.com/favicon.ico' },
+            { id: 'nba', name: 'NBA', url: 'https://www.nba.com/favicon.ico' },
+            { id: 'fifa', name: 'FIFA', url: 'https://www.fifa.com/favicon.ico' },
+            { id: 'premierleague', name: 'Premier League', url: 'https://www.premierleague.com/favicon.ico' },
+            { id: 'formula1', name: 'Formula 1', url: 'https://www.formula1.com/favicon.ico' },
+            { id: 'dazn', name: 'DAZN', url: 'https://www.dazn.com/favicon.ico' },
+            { id: 'flashscore', name: 'Flashscore', url: 'https://www.flashscore.com/favicon.ico' },
+            { id: 'sofascore', name: 'Sofascore', url: 'https://www.sofascore.com/favicon.ico' },
+            { id: 'skysports', name: 'Sky Sports', url: 'https://www.skysports.com/favicon.ico' },
+            { id: 'bein-sports', name: 'beIN Sports', url: 'https://www.beinsports.com/favicon.ico' },
+            { id: 'mlb', name: 'MLB', url: 'https://www.mlb.com/favicon.ico' },
+            { id: 'nfl', name: 'NFL', url: 'https://www.nfl.com/favicon.ico' },
         ],
     },
     {

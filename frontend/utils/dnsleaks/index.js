@@ -1,4 +1,4 @@
-// Barrel + retry runner for the homepage DNS leak test providers.
+// Barrel + retry / fallback runners for the homepage DNS leak test providers.
 //
 // Each provider in this directory is a self-describing object:
 //   { id, name, run() }
@@ -14,6 +14,8 @@ export { surfshark } from './surfshark.js';
 export { ipleak } from './ipleak.js';
 export { browserleaks } from './browserleaks.js';
 export { fastly } from './fastly.js';
+export { bashws } from './bashws.js';
+export { myipstack } from './myipstack.js';
 
 // Invoke `provider.run()` up to `attempts` times. Because each provider
 // regenerates its prefix internally on every call, retries trigger fresh
@@ -21,7 +23,7 @@ export { fastly } from './fastly.js';
 // whose `ip` fails `isValidIP` counts as a failed attempt too — garbage
 // must never reach the MaxMind lookup downstream. Returns the first valid
 // result; throws the last error if every attempt failed.
-export async function runWithRetry(provider, attempts = 3) {
+export async function runWithRetry(provider, attempts = 2) {
     let lastError;
     for (let i = 0; i < attempts; i++) {
         try {
@@ -36,3 +38,30 @@ export async function runWithRetry(provider, attempts = 3) {
     }
     throw lastError;
 }
+
+// Try order for card slot `index`: own provider → standbys (index ≥
+// slotCount) → the other slots' providers from 0. Each call derives a fresh
+// hostname, so a neighbour's provider still yields an independent lookup.
+export const buildFallbackChain = (index, providers, slotCount) => {
+    const primary = providers[index];
+    if (!primary) return [];
+    const standbys = providers.slice(slotCount);
+    const neighbours = providers.slice(0, slotCount).filter((p) => p !== primary);
+    return [primary, ...standbys, ...neighbours];
+};
+
+// Walk the chain once, each provider through `runWithRetry`; resolves
+// `{ ip, provider }` so the caller can name the upstream that answered.
+// Throws the last error.
+export const runWithFallback = async (chain) => {
+    let lastError = new Error('dnsleak: empty provider chain');
+    for (const provider of chain) {
+        try {
+            const { ip } = await runWithRetry(provider);
+            return { ip, provider };
+        } catch (err) {
+            lastError = err;
+        }
+    }
+    throw lastError;
+};
