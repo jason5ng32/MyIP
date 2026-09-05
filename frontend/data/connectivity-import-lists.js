@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'argentina',
+        emoji: '🇦🇷',
+        members: [
+            { id: 'clarin', name: 'Clarin', url: 'https://www.clarin.com/favicon.ico' },
+            { id: 'lanacion', name: 'La Nacion', url: 'https://www.lanacion.com.ar/favicon.ico' },
+            { id: 'infobae', name: 'Infobae', url: 'https://www.infobae.com/favicon.ico' },
+            { id: 'tn', name: 'TN', url: 'https://tn.com.ar/favicon.ico' },
+            { id: 'despegar', name: 'Despegar', url: 'https://www.despegar.com.ar/favicon.ico' },
+            { id: 'afip', name: 'AFIP', url: 'https://www.afip.gob.ar/favicon.ico' },
+            { id: 'galicia', name: 'Banco Galicia', url: 'https://www.galicia.ar/favicon.ico' },
+            { id: 'mercadolibre-ar', name: 'Mercado Libre Argentina', url: 'https://www.mercadolibre.com.ar/favicon.ico' },
+            { id: 'fravega', name: 'Fravega', url: 'https://www.fravega.com/favicon.ico' },
+            { id: 'coto', name: 'Coto', url: 'https://www.coto.com.ar/favicon.ico' },
+            { id: 'olx-ar', name: 'OLX Argentina', url: 'https://www.olx.com.ar/favicon.ico', iconDomain: 'olx.com' },
+            { id: 'pedidosya', name: 'PedidosYa', url: 'https://www.pedidosya.com.ar/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
