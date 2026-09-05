@@ -21,8 +21,8 @@ importers:
         specifier: ^0.6.4
         version: 0.6.4(@lit/react@1.0.8(@types/react@19.2.14))(@types/dom-chromium-installation-events@101.0.4)(@types/web-app-manifest@1.0.9)(lit@3.3.3)
       '@lucide/vue':
-        specifier: ^1.40.0
-        version: 1.40.0(vue@3.5.42)
+        specifier: ^1.41.0
+        version: 1.41.0(vue@3.5.42)
       '@photostructure/tz-lookup':
         specifier: ^11.6.1
         version: 11.6.1
@@ -611,8 +611,8 @@ packages:
   '@lit/reactive-element@2.1.2':
     resolution: {integrity: sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A==}
 
-  '@lucide/vue@1.40.0':
-    resolution: {integrity: sha512-d4Qpgu0yn5SqebZm62ySuIWeXq1QFBfNcjhxIVspxa16OMQCnQGNpwim+pyj1CIz9DiTPhGLoIHRhgKV068j2A==}
+  '@lucide/vue@1.41.0':
+    resolution: {integrity: sha512-ciHtudHTeqMDzJKPI36AGboypCk8Jz3qFin3oU0nJfPc5MwXmqLXIEQvXE+yI6Sz5SnxVqREgm8rVN4KdDlnVQ==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -3362,7 +3362,7 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.5.1
 
-  '@lucide/vue@1.40.0(vue@3.5.42)':
+  '@lucide/vue@1.41.0(vue@3.5.42)':
     dependencies:
       vue: 3.5.42
 

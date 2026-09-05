@@ -29,7 +29,7 @@
     "@iconify-json/circle-flags": "^1.2.10",
     "@iconify/vue": "^5.0.1",
     "@khmyznikov/pwa-install": "^0.6.4",
-    "@lucide/vue": "^1.40.0",
+    "@lucide/vue": "^1.41.0",
     "@photostructure/tz-lookup": "^11.6.1",
     "@sentry/node": "^10.73.0",
     "@sentry/vue": "^10.73.0",
