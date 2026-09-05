@@ -1470,6 +1470,15 @@
     "connectionTo": " vers le serveur de test:",
     "connectionEnd": " .",
     "testFailed": "Impossible de joindre le serveur de test de vitesse. Vérifiez votre connexion et réessayez.",
+    "phases": {
+      "probe": "Test préliminaire",
+      "latency": "Test de latence",
+      "download": "Test de téléchargement",
+      "upload": "Test d’envoi"
+    },
+    "phasePaused": "{phase} — en pause",
+    "phaseFinished": "Test terminé",
+    "phaseFailed": "Échec du test",
     "quality": {
       "bad": "Mauvais",
       "poor": "Faible",

@@ -2114,6 +2114,17 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "Improved the speed test experience on slow connections",
+          "zh": "提升慢网用户测速体验",
+          "zh-TW": "提升慢速網路使用者的測速體驗",
+          "fr": "Amélioration de l’expérience du test de vitesse sur les connexions lentes",
+          "ru": "Улучшен процесс тестирования скорости при медленном соединении",
+          "pt-BR": "Melhorada a experiência do teste de velocidade em conexões lentas"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

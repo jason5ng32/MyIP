@@ -1470,6 +1470,15 @@
     "connectionTo": " to test server:",
     "connectionEnd": " .",
     "testFailed": "Could not reach the speed test server. Please check your connection and try again.",
+    "phases": {
+      "probe": "Preliminary test",
+      "latency": "Latency test",
+      "download": "Download test",
+      "upload": "Upload test"
+    },
+    "phasePaused": "{phase} — paused",
+    "phaseFinished": "Test complete",
+    "phaseFailed": "Test failed",
     "quality": {
       "bad": "Bad",
       "poor": "Poor",

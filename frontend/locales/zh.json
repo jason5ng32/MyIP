@@ -1470,6 +1470,15 @@
     "connectionTo": "与测速服务器：",
     "connectionEnd": " 的测试。",
     "testFailed": "无法连接测速服务器，请检查网络后重试。",
+    "phases": {
+      "probe": "预探测",
+      "latency": "延迟测试",
+      "download": "下载测试",
+      "upload": "上传测试"
+    },
+    "phasePaused": "{phase}（已暂停）",
+    "phaseFinished": "测试完成",
+    "phaseFailed": "测试失败",
     "quality": {
       "bad": "差",
       "poor": "较差",
