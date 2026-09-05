@@ -178,6 +178,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'indonesia',
+        emoji: '🇮🇩',
+        members: [
+            { id: 'tokopedia', name: 'Tokopedia', url: 'https://www.tokopedia.com/favicon.ico' },
+            { id: 'gojek', name: 'Gojek', url: 'https://www.gojek.com/favicon.ico' },
+            { id: 'traveloka', name: 'Traveloka', url: 'https://www.traveloka.com/favicon.ico' },
+            { id: 'bukalapak', name: 'Bukalapak', url: 'https://www.bukalapak.com/favicon.ico' },
+            { id: 'kompas', name: 'Kompas', url: 'https://www.kompas.com/favicon.ico', iconDomain: 'kompas.id' },
+            { id: 'detik', name: 'Detik', url: 'https://www.detik.com/favicon.ico' },
+            { id: 'blibli', name: 'Blibli', url: 'https://www.blibli.com/favicon.ico' },
+            { id: 'ovo', name: 'OVO', url: 'https://www.ovo.id/favicon.ico' },
+            { id: 'dana', name: 'DANA', url: 'https://www.dana.id/favicon.ico' },
+            { id: 'liputan6', name: 'Liputan6', url: 'https://www.liputan6.com/favicon.ico' },
+            { id: 'kaskus', name: 'Kaskus', url: 'https://www.kaskus.co.id/favicon.ico' },
+            { id: 'bca', name: 'BCA', url: 'https://www.bca.co.id/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
