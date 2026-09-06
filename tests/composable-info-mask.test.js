@@ -76,8 +76,8 @@ describe('createMaskGate()', () => {
 
   it('leaves waiting / error placeholders unmasked (undefined attr)', () => {
     for (const key of [
-      'webrtc.StatusWait', 'webrtc.StatusError',
-      'dnsleaktest.StatusWait', 'dnsleaktest.StatusError',
+      'webrtc.StatusWait', 'webrtc.StatusTesting', 'webrtc.StatusError',
+      'dnsleaktest.StatusWait', 'dnsleaktest.StatusTesting', 'dnsleaktest.StatusError',
       'ipInfos.IPv4Error', 'ipInfos.IPv6Error',
     ]) {
       assert.equal(maskAttr(t(key)), undefined, `${key} should not be masked`);

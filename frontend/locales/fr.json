@@ -1110,7 +1110,8 @@
     "Title": "Test de règles",
     "Name": "Test",
     "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy. Généralement, les paramètres de règles peuvent utiliser un format comme : DOMAIN, ptest-3.ipcheck.ing, POLICY. Le format spécifique peut varier en fonction du logiciel proxy que vous utilisez.",
-    "StatusWait": "En attente du test ou erreur de connexion",
+    "StatusWait": "En attente du test",
+    "StatusTesting": "Test en cours…",
     "StatusError": "Erreur de test",
     "Country": "Région de proxy",
     "RefreshAll": "Actualiser tout"
@@ -1353,6 +1354,7 @@
     "Title": "Connectivité réseau",
     "Note": "Ce test mesure votre connectivité avec un site web : plus la latence est élevée, plus votre connexion à ce site est lente. Vous pouvez importer ou ajouter d'autres sites que vous utilisez fréquemment à la liste de tests pour des vérifications rapides.",
     "StatusWait": "En attente du test",
+    "StatusTesting": "Test en cours…",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Non disponible",
     "StatusTimeout": "Délai dépassé",
@@ -1437,6 +1439,7 @@
     "Name": "Connexion WebRTC",
     "Note": "Lorsque le navigateur obtient des adresses réseau via WebRTC, il peut contourner votre VPN ou votre proxy et exposer votre véritable adresse IP aux sites web. Ce test vérifie quelle IP est exposée lors de vos connexions WebRTC ; si l'adresse IP ou la région renvoyée ne correspond pas à ce que vous attendez, il peut y avoir un risque de fuite WebRTC et vous devrez peut-être ajuster les paramètres de votre logiciel proxy. Outre l'adresse IP utilisée pour les connexions WebRTC, nous détectons également votre type de NAT.",
     "StatusWait": "En attente du test",
+    "StatusTesting": "Test en cours…",
     "StatusError": "Erreur de connexion",
     "StatusUnavailable": "WebRTC indisponible",
     "SdpLog": "Journal SDP",
@@ -1454,6 +1457,7 @@
     "Note": "Même lorsque vous utilisez un VPN ou un proxy, les requêtes DNS peuvent encore transiter par votre réseau local et révéler les noms de domaine des sites que vous consultez. Les fournisseurs d'accès, les pare-feux ou les opérateurs de Wi-Fi public présents sur le trajet peuvent les intercepter et savoir quels sites vous visitez. Ce test accède à un nom de domaine nouvellement généré pour détecter la région par laquelle vos requêtes DNS passent ; si la région renvoyée diffère de celle du VPN/proxy que vous utilisez, il peut y avoir un risque de fuite DNS.",
     "EndpointCountry": "Région de l'extrémité",
     "StatusWait": "En attente du test",
+    "StatusTesting": "Test en cours…",
     "StatusError": "Erreur de test"
   },
   "speedtest": {

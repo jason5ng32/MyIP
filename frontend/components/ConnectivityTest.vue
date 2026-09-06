@@ -277,7 +277,10 @@ watch(
       connectivityTests.push(entry);
       // Cards added after the bootstrap pass (import / hand-add) test
       // themselves right away instead of sitting at "Awaiting Test".
-      if (isStarted.value) checkConnectivityHandler(entry, () => { }, true);
+      if (isStarted.value) {
+        entry.status = t('connectivity.StatusTesting');
+        checkConnectivityHandler(entry, () => { }, true);
+      }
     }
   },
   { immediate: true, deep: true },
@@ -288,7 +291,7 @@ watch(
 const toneOf = (test) => {
   const okLabel = t('connectivity.StatusAvailable');
   return ipFieldTone(test.status, {
-    waitLabels: t('connectivity.StatusWait'),
+    waitLabels: [t('connectivity.StatusWait'), t('connectivity.StatusTesting')],
     errorLabels: [t('connectivity.StatusUnavailable'), t('connectivity.StatusTimeout')],
     isSuccess: (s) => typeof s === 'string' && s.includes(okLabel),
     time: test.time,
@@ -426,12 +429,16 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
   return new Promise((resolve) => {
     if (isRefresh) {
       connectivityTests.forEach((test) => {
-        test.status = t('connectivity.StatusWait');
         test.statusCode = undefined;
         test.time = 0;
       });
       trackEvent('Section', 'RefreshClick', 'Connectivity');
     }
+    // Unjudged cards flip from "Awaiting Test" to "Testing…"; later
+    // multi-round ticks leave cards that already carry a verdict alone.
+    connectivityTests.forEach((test) => {
+      if (test.statusCode === undefined) test.status = t('connectivity.StatusTesting');
+    });
 
     // The pass judges only the targets it schedules here — cards added
     // mid-pass (self-tested by the watcher) belong to the next pass.

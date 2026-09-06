@@ -1110,7 +1110,8 @@
     "Title": "Teste de regras",
     "Name": "Teste",
     "Note": "O Teste de regras é usado para determinar se as regras baseadas em domínio do software de proxy estão configuradas corretamente. Antes de executar o teste, consulte o cartão abaixo e configure regras de roteamento baseadas em domínio diferentes para as 8 URLs diferentes do IPCheck.ing no seu software de proxy. Normalmente, as regras podem usar um formato como: DOMAIN, ptest-3.ipcheck.ing, POLICY. O formato específico pode variar conforme o software de proxy usado.",
-    "StatusWait": "Aguardando teste ou erro no teste",
+    "StatusWait": "Aguardando teste",
+    "StatusTesting": "Testando…",
     "StatusError": "Erro no teste",
     "Country": "Região do proxy",
     "RefreshAll": "Atualizar tudo"
@@ -1353,6 +1354,7 @@
     "Title": "Conectividade de rede",
     "Note": "Este teste mede sua conectividade com um site: quanto maior a latência, mais lenta é sua conexão com ele. Você pode importar ou adicionar outros sites que usa com frequência à lista de testes para verificações rápidas.",
     "StatusWait": "Aguardando teste",
+    "StatusTesting": "Testando…",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Indisponível",
     "StatusTimeout": "Tempo esgotado ou indisponível",
@@ -1437,6 +1439,7 @@
     "Name": "Conexão WebRTC",
     "Note": "Quando o navegador obtém endereços de rede via WebRTC, ele pode contornar sua VPN ou proxy e expor seu IP real aos sites. Este teste verifica qual IP é exposto nas suas conexões WebRTC; se o endereço IP ou a região retornada não for o que você espera, pode haver risco de vazamento por WebRTC e talvez seja necessário ajustar as configurações do seu software de proxy. Além do IP usado nas conexões WebRTC, também detectamos seu tipo de NAT.",
     "StatusWait": "Aguardando teste",
+    "StatusTesting": "Testando…",
     "StatusError": "Erro de conexão",
     "StatusUnavailable": "WebRTC indisponível",
     "SdpLog": "Log SDP",
@@ -1454,6 +1457,7 @@
     "Note": "Mesmo usando uma VPN ou proxy, as consultas DNS ainda podem sair pela sua rede local, expondo os domínios dos sites que você acessa. Provedores, firewalls, operadores de Wi-Fi público e outros pontos no caminho podem interceptá-las e descobrir quais sites você visita. Este teste acessa um domínio recém-gerado para detectar por qual região suas consultas DNS passam; se a região retornada for diferente da região da VPN/proxy que você usa, pode haver risco de vazamento de DNS.",
     "EndpointCountry": "Região do endpoint",
     "StatusWait": "Aguardando teste",
+    "StatusTesting": "Testando…",
     "StatusError": "Erro no teste"
   },
   "speedtest": {

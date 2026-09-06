@@ -179,7 +179,7 @@ const isWebRtcAvailable = typeof RTCPeerConnection === 'function';
 const toneOf = (stun) => stun.ip === t('webrtc.StatusUnavailable')
   ? 'ok-fast'
   : ipFieldTone(stun.ip, {
-    waitLabels: t('webrtc.StatusWait'),
+    waitLabels: [t('webrtc.StatusWait'), t('webrtc.StatusTesting')],
     errorLabels: t('webrtc.StatusError'),
   });
 
@@ -187,7 +187,7 @@ const toneOf = (stun) => stun.ip === t('webrtc.StatusUnavailable')
 // Fields may fail independently (e.g. IP success but country lookup fails),
 // so the check is run per-field in the template.
 const isFieldPending = (value) => isFieldPendingShared(value, {
-  waitLabels: t('webrtc.StatusWait'),
+  waitLabels: [t('webrtc.StatusWait'), t('webrtc.StatusTesting')],
   errorLabels: [t('webrtc.StatusError'), t('webrtc.StatusUnavailable')],
 });
 
@@ -427,12 +427,12 @@ const checkAllWebRTC = async (isRefresh) => {
   }
 
   const promises = stunServers.map((server) => {
-    server.ip = t('webrtc.StatusWait');
-    server.natType = t('webrtc.StatusWait');
+    server.ip = t('webrtc.StatusTesting');
+    server.natType = t('webrtc.StatusTesting');
     server.natTypeCode = undefined;
-    server.country = t('webrtc.StatusWait');
+    server.country = t('webrtc.StatusTesting');
     server.country_code = '';
-    server.org = t('webrtc.StatusWait');
+    server.org = t('webrtc.StatusTesting');
     return checkSTUNServer(server);
   });
 

@@ -1110,7 +1110,8 @@
     "Title": "Rule Test",
     "Name": "Test",
     "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software. Usually, the rule settings may use a format like: DOMAIN, ptest-3.ipcheck.ing, POLICY. The specific format may vary depending on the proxy software you are using.",
-    "StatusWait": "Awaiting Test or Test Error",
+    "StatusWait": "Awaiting Test",
+    "StatusTesting": "Testing…",
     "StatusError": "Test Error",
     "Country": "Proxy region",
     "RefreshAll": "Refresh All"
@@ -1353,6 +1354,7 @@
     "Title": "Network Connectivity",
     "Note": "This test checks your connectivity to a website. The higher the latency, the slower your connection to that site. You can import or add other websites you frequently use to the test list for quick testing.",
     "StatusWait": "Awaiting Test",
+    "StatusTesting": "Testing…",
     "StatusAvailable": "OK",
     "StatusUnavailable": "Unavailable",
     "StatusTimeout": "Timeout or Unavailable",
@@ -1437,6 +1439,7 @@
     "Name": "WebRTC Connection",
     "Note": "When the browser obtains network addresses through WebRTC, it may bypass your VPN or proxy and expose your real IP to websites. This test checks which IP is exposed when you connect over WebRTC; if the returned IP address or region is not what you expect, there may be a risk of WebRTC leaks and you may need to adjust your proxy settings. Besides the IP used for WebRTC connections, we also detect your NAT type.",
     "StatusWait": "Awaiting Test",
+    "StatusTesting": "Testing…",
     "StatusError": "Connection Error",
     "StatusUnavailable": "WebRTC Unavailable",
     "SdpLog": "SDP Log",
@@ -1454,6 +1457,7 @@
     "Note": "Even while you are using a VPN or proxy, DNS queries may still be sent over your local network, exposing the domains of the sites you visit. ISPs, firewalls, public Wi-Fi providers and others along the path can intercept them and learn which sites you are visiting. This test visits a newly generated domain name to detect which region your DNS queries go through; if the returned region differs from the region of the VPN/proxy you are using, there may be a risk of DNS leaks.",
     "EndpointCountry": "Endpoint Region",
     "StatusWait": "Awaiting Test",
+    "StatusTesting": "Testing…",
     "StatusError": "Test Error"
   },
   "speedtest": {

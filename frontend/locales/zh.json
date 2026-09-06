@@ -1111,6 +1111,7 @@
     "Name": "检测",
     "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。通常，设置规则可能会使用类似于：DOMAIN, ptest-3.ipcheck.ing, POLICY 这样的写法，具体写法不同的代理软件可能会有所不同。",
     "StatusWait": "待检测",
+    "StatusTesting": "检测中…",
     "StatusError": "检测出错",
     "Country": "代理地区",
     "RefreshAll": "刷新所有"
@@ -1353,6 +1354,7 @@
     "Title": "网络连通性",
     "Note": "测试你与网站的连通性，延迟数字越大，意味着你与该网站的连接速度越慢。你可以导入/添加其它你常用的网站到测试列表中，方便快速测试。",
     "StatusWait": "待检测",
+    "StatusTesting": "检测中…",
     "StatusAvailable": "可用",
     "StatusUnavailable": "不可用",
     "StatusTimeout": "超时或不可用",
@@ -1437,6 +1439,7 @@
     "Name": "WebRTC 连接",
     "Note": "浏览器通过 WebRTC 获取网络地址时有可能绕过 VPN 或代理，从而向网站暴露你的真实 IP。本测试检查你通过 WebRTC 连接的时候暴露出来的 IP，如果返回的 IP 地址、地区与你预期的不一致，则可能存在 WebRTC 泄露风险，你可能需要调整你的代理软件设置。除了检测你连接 WebRTC 时所使用的 IP，我们还会检测你的 NAT 类型。",
     "StatusWait": "待检测",
+    "StatusTesting": "检测中…",
     "StatusError": "连接错误",
     "StatusUnavailable": "WebRTC 不可用",
     "SdpLog": "SDP 日志",
@@ -1454,6 +1457,7 @@
     "Note": "当你在使用 VPN 或代理时，DNS 查询仍可能通过本地网络发送，从而暴露你正在访问的网站域名。链路中的运营商、防火墙、公共 Wi-Fi 提供者等都可能直接截获并得知你访问的网站域名。本测试通过访问新生成的域名，检测你是通过哪个地区的 DNS 进行查询，如果返回的出口区域和你正在使用的 VPN/代理的地区归属地不同，则可能存在 DNS 泄露风险。",
     "EndpointCountry": "出口地区",
     "StatusWait": "待检测",
+    "StatusTesting": "检测中…",
     "StatusError": "测试出错"
   },
   "speedtest": {

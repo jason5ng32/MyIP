@@ -133,14 +133,14 @@ const { dotClass, textClass } = useStatusTone();
 
 // Business status → 4 tone levels
 const toneOf = (leak) => ipFieldTone(leak.ip, {
-  waitLabels: t('dnsleaktest.StatusWait'),
+  waitLabels: [t('dnsleaktest.StatusWait'), t('dnsleaktest.StatusTesting')],
   errorLabels: t('dnsleaktest.StatusError'),
 });
 
 
 // Status
 const isFieldPending = (value) => isFieldPendingShared(value, {
-  waitLabels: t('dnsleaktest.StatusWait'),
+  waitLabels: [t('dnsleaktest.StatusWait'), t('dnsleaktest.StatusTesting')],
   errorLabels: t('dnsleaktest.StatusError'),
 });
 
@@ -202,17 +202,17 @@ const runProvider = async (index) => {
 // herd on first paint.
 const checkAllDNSLeakTest = async (isRefresh) => {
   isStarted.value = true;
-  if (isRefresh) {
-    trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
-    leakTest.forEach((server, index) => {
-      server.id = ACTIVE[index].id;
-      server.providerName = ACTIVE[index].name;
-      server.ip = t('dnsleaktest.StatusWait');
-      server.country = t('dnsleaktest.StatusWait');
-      server.country_code = '';
-      server.org = t('dnsleaktest.StatusWait');
-    });
-  }
+  if (isRefresh) trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
+  // Every run starts from the primary provider and "Testing…" — on boot
+  // this is a no-op for the slot, on refresh it drops the fallback result.
+  leakTest.forEach((server, index) => {
+    server.id = ACTIVE[index].id;
+    server.providerName = ACTIVE[index].name;
+    server.ip = t('dnsleaktest.StatusTesting');
+    server.country = t('dnsleaktest.StatusTesting');
+    server.country_code = '';
+    server.org = t('dnsleaktest.StatusTesting');
+  });
 
   const delayedRun = (index, delay) => new Promise((resolve) => {
     setTimeout(() => {
