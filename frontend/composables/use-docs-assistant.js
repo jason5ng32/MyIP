@@ -70,6 +70,10 @@ export const isSettling = () => Date.now() - lastIntentAt < SETTLE_MS;
 const loadEmbedScript = () => {
     if (loadPromise) return loadPromise;
     loadPromise = new Promise((resolve, reject) => {
+        // The embed script derives its siteURL from the embedding page's
+        // origin, which points the iframe at this site instead of the docs.
+        // gitbookSettings is merged last there, so it pins the docs origin.
+        window.gitbookSettings = { ...(window.gitbookSettings || {}), siteURL: `${DOCS_URL}/` };
         const script = document.createElement('script');
         script.src = EMBED_SRC;
         script.async = true;
