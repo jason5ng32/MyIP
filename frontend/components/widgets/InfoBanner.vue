@@ -3,8 +3,9 @@
      decided purely by data: frontend/data/banners/<section>.js (contract in
      utils/banners.js), one banner per section. The directory is deploy-time
      data, never in git — placing a file there IS the decision to show that
-     banner on that deployment (self-promo of a built-in tool via `to`, or an
-     external advertiser via `url`); a missing file and a file
+     banner on that deployment (self-promo of a built-in tool via `to`, a
+     nudge into a side panel via `sheet`, or an external advertiser via
+     `url`); a missing file and a file
      default-exporting null both mean the slot renders nothing. Timing is
      data-driven: parents feed their section's completion into the `settled`
      prop, and
@@ -79,7 +80,9 @@ const openBanner = () => {
   // Section in the event name (GA4 reports list event names out of the box;
   // params would need registered custom dimensions), campaign id as label.
   trackEvent('Section', `BannerClick_${props.section}`, banner.track);
-  if (banner.to) {
+  if (banner.sheet) {
+    store.setOpenSheet(banner.sheet); // the store's exclusive side-panel slot
+  } else if (banner.to) {
     router.push(banner.to);
   } else {
     window.open(bannerLink(banner, lang.value), '_blank', 'noopener');

@@ -22,6 +22,8 @@
 //                                  // prefix — bannerLink adds it, plus
 //                                  // utm_content=<lang>
 //     to: '/?tool=invisibilitytest', // internal: router.push target, no utm
+//     sheet: 'pulse',              // internal: opens a store-managed side
+//                                  // panel (store.setOpenSheet name)
 //     requireSettled: true,        // default true when absent: wait for the
 //                                  // section's own tests (the parent's
 //                                  // `settled` prop) before showing; set
