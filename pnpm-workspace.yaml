@@ -103,3 +103,4 @@ minimumReleaseAgeExclude:
   - '@firebase/util@1.15.3'
   - '@firebase/webchannel-wrapper@1.0.7'
   - '@lucide/vue@1.33.0 || 1.40.0'
+  - tailwind-merge@3.7.0
