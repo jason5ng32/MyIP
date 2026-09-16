@@ -2,7 +2,7 @@
 // Picks a random API token (when configured) and normalizes the response
 // into the canonical geo shape via the shared makeGeoHandler factory.
 
-import countryLookup from 'country-code-lookup';
+import getCountryName from '../common/country-name.js';
 import { makeGeoHandler } from '../common/geo-handler.js';
 
 function buildUrl(req) {
@@ -33,8 +33,7 @@ const toCoordinate = (raw) => {
 export const modifyJson = (json) => {
     const { ip, city, region, country, loc, org } = json || {};
 
-    // byIso returns null for an unknown or absent code.
-    const countryName = countryLookup.byIso(country)?.country || 'Unknown Country';
+    const countryName = getCountryName(country, 'en') || 'Unknown Country';
 
     // "37.4056,-122.0775" — a partial or non-numeric pair degrades to null.
     const [rawLat, rawLon] = typeof loc === 'string' ? loc.split(',') : [];

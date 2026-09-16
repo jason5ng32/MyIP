@@ -217,9 +217,6 @@ importers:
       concurrently:
         specifier: ^10.0.5
         version: 10.0.5
-      country-code-lookup:
-        specifier: ^0.1.5
-        version: 0.1.5
       dagre:
         specifier: ^0.8.5
         version: 0.8.5
@@ -1681,9 +1678,6 @@ packages:
 
   core-js@3.49.0:
     resolution: {integrity: sha512-es1U2+YTtzpwkxVLwAFdSpaIMyQaq0PBgm3YD1W3Qpsn1NAmO3KSgZfu+oGSWVu6NvLHoHCV/aYcsE5wiB7ALg==}
-
-  country-code-lookup@0.1.5:
-    resolution: {integrity: sha512-pCpU/NixL5CvZyFwvjj9ub3BAHAb86zE94JSyZOb335efNtyQ4qZ1BEkCXPDuQcU2T+9deEW7D20V80kKw7KUA==}
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -4484,8 +4478,6 @@ snapshots:
   copy-text-to-clipboard@3.2.2: {}
 
   core-js@3.49.0: {}
-
-  country-code-lookup@0.1.5: {}
 
   csstype@3.2.3: {}
 
