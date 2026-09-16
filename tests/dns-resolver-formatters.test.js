@@ -3,7 +3,7 @@
 // envelope alike. No test performs a real lookup.
 
 import assert from 'node:assert/strict';
-import { Resolver } from 'node:dns';
+import { Resolver } from 'node:dns/promises';
 import { afterEach, describe, it } from 'node:test';
 
 import { dohRecords, formatCaaRecords, formatSoaRecord, resolveDns, resolveDoh, withRootDot } from '../api/dns-resolver.js';
@@ -14,6 +14,42 @@ const originalFetch = globalThis.fetch;
 afterEach(() => {
     Resolver.prototype.resolveCname = originalResolveCname;
     globalThis.fetch = originalFetch;
+});
+
+describe('UDP DNS Promise API', () => {
+    const cases = [
+        ['A', 'resolve4', ['192.0.2.1'], ['192.0.2.1']],
+        ['AAAA', 'resolve6', ['2001:db8::1'], ['2001:db8::1']],
+        ['TXT', 'resolveTxt', [['first', 'second'], ['third']], ['first', 'second', 'third']],
+        ['CNAME', 'resolveCname', ['alias.example.test'], ['alias.example.test.']],
+        ['NS', 'resolveNs', ['ns.example.test'], ['ns.example.test.']],
+        ['MX', 'resolveMx', [{ priority: 10, exchange: 'mail.example.test' }], '10 mail.example.test.'],
+        ['SOA', 'resolveSoa', {
+            nsname: 'ns.example.test', hostmaster: 'hostmaster.example.test',
+            serial: 1, refresh: 2, retry: 3, expire: 4, minttl: 5,
+        }, 'ns.example.test. hostmaster.example.test. 1 2 3 4 5'],
+        ['CAA', 'resolveCaa', [{ critical: 0, type: 'CAA', issue: 'ca.example.test' }], '0 issue "ca.example.test"'],
+    ];
+
+    for (const [type, method, records, expected] of cases) {
+        it(`preserves ${type} results and queries the configured server`, async (t) => {
+            for (const [, candidate] of cases) {
+                t.mock.method(Resolver.prototype, candidate, async () => {
+                    assert.fail(`Unexpected DNS method: ${candidate}`);
+                });
+            }
+            const query = t.mock.method(Resolver.prototype, method, async () => records);
+            assert.deepEqual(await resolveDns('example.test', type, 'Example DNS', '192.0.2.1'), expected);
+            assert.equal(query.mock.callCount(), 1);
+            assert.deepEqual(query.mock.calls[0].arguments, ['example.test']);
+            assert.deepEqual(query.mock.calls[0].this.getServers(), ['192.0.2.1']);
+        });
+    }
+
+    it('returns N/A for an empty result', async (t) => {
+        t.mock.method(Resolver.prototype, 'resolve4', async () => []);
+        assert.equal(await resolveDns('example.test', 'A', 'Example DNS', '192.0.2.1'), 'N/A');
+    });
 });
 
 describe('DNS resolver record formatting', () => {
@@ -97,7 +133,7 @@ describe('root-dot normalization', () => {
     });
 
     it('normalizes the UDP side, which Node returns bare', async () => {
-        Resolver.prototype.resolveCname = (_hostname, callback) => callback(null, ['github.com']);
+        Resolver.prototype.resolveCname = async () => ['github.com'];
         assert.deepEqual(
             await resolveDns('www.github.com', 'CNAME', 'Example DNS', '192.0.2.1'),
             ['github.com.'],

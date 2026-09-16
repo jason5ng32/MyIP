@@ -1,8 +1,7 @@
 // api/dns-resolver.js — GET /api/dnsresolver: resolve a hostname against every
 // resolver in api/data/dns-resolvers.js (UDP DNS + DoH) in parallel and return
 // one flat, country-annotated result list the frontend groups by country.
-import { Resolver } from 'dns';
-import { promisify } from 'util';
+import { Resolver } from 'node:dns/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../common/logger.js';
 import { DNS_RESOLVERS } from './data/dns-resolvers.js';
@@ -79,46 +78,38 @@ export const dohRecords = (data, type) => {
 const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
-    const resolve4Async = promisify(resolver.resolve4.bind(resolver));
-    const resolve6Async = promisify(resolver.resolve6.bind(resolver));
-    const resolveTxtAsync = promisify(resolver.resolveTxt.bind(resolver));
-    const resolveCnameAsync = promisify(resolver.resolveCname.bind(resolver));
-    const resolveNSAsync = promisify(resolver.resolveNs.bind(resolver));
-    const resolveMXAsync = promisify(resolver.resolveMx.bind(resolver));
-    const resolveSoaAsync = promisify(resolver.resolveSoa.bind(resolver));
-    const resolveCaaAsync = promisify(resolver.resolveCaa.bind(resolver));
     try {
         let addresses;
 
         // Select different parsing methods based on the type parameter
         switch (type) {
             case 'A':
-                addresses = await resolve4Async(hostname);
+                addresses = await resolver.resolve4(hostname);
                 break;
             case 'AAAA':
-                addresses = await resolve6Async(hostname);
+                addresses = await resolver.resolve6(hostname);
                 break;
             case 'TXT':
-                addresses = await resolveTxtAsync(hostname);
+                addresses = await resolver.resolveTxt(hostname);
                 // TXT record parsing results is a two-dimensional array, here we flatten the result
                 addresses = addresses.flat();
                 break;
             case 'CNAME':
-                addresses = await resolveCnameAsync(hostname);
+                addresses = await resolver.resolveCname(hostname);
                 break;
             case 'NS':
-                addresses = await resolveNSAsync(hostname);
+                addresses = await resolver.resolveNs(hostname);
                 break;
             case 'MX':
-                addresses = await resolveMXAsync(hostname);
+                addresses = await resolver.resolveMx(hostname);
                 addresses = addresses.map(item => `${item.priority} ${item.exchange}.`)
                 .join(', ');
                 break;
             case 'SOA':
-                addresses = formatSoaRecord(await resolveSoaAsync(hostname));
+                addresses = formatSoaRecord(await resolver.resolveSoa(hostname));
                 break;
             case 'CAA':
-                addresses = formatCaaRecords(await resolveCaaAsync(hostname));
+                addresses = formatCaaRecords(await resolver.resolveCaa(hostname));
                 break;
             default:
                 throw new Error('Unsupported type');
