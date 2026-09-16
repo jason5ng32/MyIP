@@ -113,7 +113,7 @@ import {
 
 // All providers in priority order: the first SLOT_COUNT hold a card each,
 // the rest are standbys. New provider = file under utils/dnsleaks + append.
-const PROVIDERS = [ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak];
+const PROVIDERS = [ipApi, surfshark, myipstack, fastly, bashws, browserleaks, ipleak];
 const SLOT_COUNT = 4;
 const ACTIVE = PROVIDERS.slice(0, SLOT_COUNT);
 

@@ -1,21 +1,7 @@
-// bash.ws — a client-chosen session id becomes a wildcard zone: loading any
-// `*.<id>.bash.ws` URL forces a DNS lookup (the fetch itself fails on TLS,
-// which is fine), then `/dnsleak/test/<id>?json` lists what its resolver
-// saw: `[{ ip, type: 'ip' | 'dns' | 'conclusion', ... }]`.
+// bash.ws — obtain a session from /id, probe ex.1.<id>.bash.ws once,
+// then read the resolvers recorded for that session. Protocol reference:
+// https://github.com/macvk/dnsleaktest/blob/master/dnsleaktest.py
 import { fetchWithTimeout } from '../fetch-with-timeout.js';
-
-const ID_LENGTH = 20;
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
-const generateId = () => {
-    const bytes = new Uint8Array(ID_LENGTH);
-    crypto.getRandomValues(bytes);
-    let id = '';
-    for (let i = 0; i < ID_LENGTH; i++) {
-        id += ALPHABET[bytes[i] % ALPHABET.length];
-    }
-    return id;
-};
 
 // First entry the upstream tagged as a resolver (`type: 'dns'`).
 export const pickDnsIp = (entries) => {
@@ -28,9 +14,13 @@ export const bashws = {
     id: 'bashws',
     name: 'bash.ws',
     async run() {
-        const id = generateId();
-        // Trigger only — the certificate does not cover this depth, so the
-        // request errors after the lookup has already reached upstream.
+        const idResponse = await fetchWithTimeout('https://bash.ws/id');
+        if (!idResponse.ok) throw new Error('bashws: ID response not ok');
+        const id = (await idResponse.text()).trim();
+        if (!/^[a-z0-9]{1,63}$/i.test(id)) throw new Error('bashws: invalid test ID');
+
+        // TLS may fail after DNS resolution; the result endpoint determines
+        // whether the probe actually reached the provider.
         await fetchWithTimeout(`https://ex.1.${id}.bash.ws/css/z.css`, {
             mode: 'no-cors',
             timeoutMs: 2500,
