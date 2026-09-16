@@ -211,7 +211,7 @@ const PROVIDERS = [
   { id: 'netlify', name: 'Netlify', icon: 'simple-icons:netlify' },
   { id: 'render', name: 'Render', icon: 'simple-icons:render' },
   { id: 'supabase', name: 'Supabase', icon: 'simple-icons:supabase' },
-  { id: 'replicate', name: 'Replicate', icon: 'simple-icons:replicate' },
+  { id: 'discord', name: 'Discord', icon: 'simple-icons:discord' },
   { id: 'figma', name: 'Figma', icon: 'simple-icons:figma' },
   { id: 'linear', name: 'Linear', icon: 'simple-icons:linear' },
   { id: 'stripe', name: 'Stripe', icon: 'simple-icons:stripe' },
