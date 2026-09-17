@@ -191,7 +191,13 @@ const onPrefix = (prefix) => {
 const onPrefixCommit = (prefix) => {
     onPrefix(prefix);
     const a = result.value?.analysis;
-    if (a?.cidr) a.split = a.cidr;
+    if (!a?.cidr || !a.address) return;
+    a.split = a.cidr;
+    // Preserve the host address, not the subnet's network address, in the URL.
+    const ip = a.address.family === 4 ? a.address.canonical : a.address.compressed;
+    query.value = `${ip}/${a.cidr.prefix}`;
+    picked.value = '';
+    syncQuery();
 };
 
 onMounted(() => {
