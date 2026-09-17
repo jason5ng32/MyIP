@@ -40,17 +40,17 @@ minimumReleaseAgeExclude:
   - firebase@12.16.0 || 12.18.0
   - pinia@4.0.2 || 4.0.3
   - vue-router@5.2.0 || 5.3.1
-  - '@sentry/browser-utils@10.68.0'
-  - '@sentry/browser@10.68.0'
-  - '@sentry/core@10.68.0'
-  - '@sentry/feedback@10.68.0'
-  - '@sentry/node-core@10.68.0'
-  - '@sentry/node@10.68.0'
-  - '@sentry/opentelemetry@10.68.0'
-  - '@sentry/replay-canvas@10.68.0'
-  - '@sentry/replay@10.68.0'
-  - '@sentry/server-utils@10.68.0'
-  - '@sentry/vue@10.68.0'
+  - '@sentry/browser-utils@10.68.0 || 10.75.0'
+  - '@sentry/browser@10.68.0 || 10.75.0'
+  - '@sentry/core@10.68.0 || 10.75.0'
+  - '@sentry/feedback@10.68.0 || 10.75.0'
+  - '@sentry/node-core@10.68.0 || 10.75.0'
+  - '@sentry/node@10.68.0 || 10.75.0'
+  - '@sentry/opentelemetry@10.68.0 || 10.75.0'
+  - '@sentry/replay-canvas@10.68.0 || 10.75.0'
+  - '@sentry/replay@10.68.0 || 10.75.0'
+  - '@sentry/server-utils@10.68.0 || 10.75.0'
+  - '@sentry/vue@10.68.0 || 10.75.0'
   - concurrently@10.0.4
   - '@vue/compiler-core@3.5.41'
   - '@vue/compiler-dom@3.5.41'
@@ -104,3 +104,12 @@ minimumReleaseAgeExclude:
   - '@firebase/webchannel-wrapper@1.0.7'
   - '@lucide/vue@1.33.0 || 1.40.0'
   - tailwind-merge@3.7.0
+  - '@intlify/core-base@11.4.12'
+  - '@intlify/devtools-types@11.4.12'
+  - '@intlify/message-compiler@11.4.12'
+  - '@intlify/shared@11.4.12'
+  - '@photostructure/tz-lookup@11.7.0'
+  - '@vueuse/core@15.0.0'
+  - '@vueuse/metadata@15.0.0'
+  - '@vueuse/shared@15.0.0'
+  - vue-i18n@11.4.12

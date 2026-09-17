@@ -23,7 +23,7 @@ export { myipstack } from './myipstack.js';
 // whose `ip` fails `isValidIP` counts as a failed attempt too — garbage
 // must never reach the MaxMind lookup downstream. Returns the first valid
 // result; throws the last error if every attempt failed.
-export async function runWithRetry(provider, attempts = 2) {
+export const runWithRetry = async (provider, attempts = 2) => {
     let lastError;
     for (let i = 0; i < attempts; i++) {
         try {
@@ -37,7 +37,7 @@ export async function runWithRetry(provider, attempts = 2) {
         }
     }
     throw lastError;
-}
+};
 
 // Try order for card slot `index`: own provider → standbys (index ≥
 // slotCount) → the other slots' providers from 0. A run shares each provider's
