@@ -12,8 +12,13 @@ import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain,
 const validAddresses = [
   '1.1.1.1',
   '8.8.8.8',
+  '0.0.0.0',
+  '10.100.101.200',
+  '9.10.99.100',
+  '199.200.249.250',
   '255.255.255.255',
   '2001:4860:4860::8888',
+  '2001:0486:0000:0000:0000:0000:0000:0001',
   '::1',
 ];
 
@@ -22,6 +27,12 @@ const invalidAddresses = [
   'hello',
   '256.1.1.1',
   '1.1.1',
+  '01.8.8.8',
+  '8.008.8.8',
+  '8.8.00.8',
+  '8.8.8.08',
+  '8.8.8.010',
+  '8.8.8.001',
   '2001:::8888',
 ];
 
@@ -177,7 +188,7 @@ describe('isUsablePublicIP', () => {
   }
 
   // Validation is folded in, so anything that isn't an IP is not usable.
-  for (const junk of ['', 'hello', '256.1.1.1', '1.1.1', null, undefined, 42]) {
+  for (const junk of [...invalidAddresses, null, undefined, 42]) {
     it(`rejects the non-address ${JSON.stringify(junk)}`, () => {
       assert.equal(isCommonUsablePublicIP(junk), false);
       assert.equal(isFrontendUsablePublicIP(junk), false);
