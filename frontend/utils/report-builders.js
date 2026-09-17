@@ -119,9 +119,9 @@ const buildWebrtc = (payload) => {
 
 // dnsleak:finished — { providers: [{ id, name, ip, country_code, org }] }
 const buildDnsleak = (payload) => {
+    const seen = new Set();
     const providers = (payload?.providers ?? [])
         .filter((provider) => isValidIP(provider?.ip))
-        .slice(0, 8)
         .map((provider) => {
             const cc = countryCode(provider.country_code);
             return compact({
@@ -131,7 +131,15 @@ const buildDnsleak = (payload) => {
                 countryCode: cc,
                 org: cc ? clip(provider.org, 128) : undefined,
             });
-        });
+        })
+        // Several homepage cards can share one fallback probe's result.
+        .filter((provider) => {
+            const key = `${provider.id}:${provider.ip}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .slice(0, 8);
     return providers.length ? { providers } : null;
 };
 

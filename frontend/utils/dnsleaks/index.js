@@ -40,8 +40,8 @@ export async function runWithRetry(provider, attempts = 2) {
 }
 
 // Try order for card slot `index`: own provider → standbys (index ≥
-// slotCount) → the other slots' providers from 0. Each call derives a fresh
-// hostname, so a neighbour's provider still yields an independent lookup.
+// slotCount) → the other slots' providers from 0. A run shares each provider's
+// probe across slots, including when it is reached through a neighbour.
 export const buildFallbackChain = (index, providers, slotCount) => {
     const primary = providers[index];
     if (!primary) return [];
@@ -53,15 +53,26 @@ export const buildFallbackChain = (index, providers, slotCount) => {
 // Walk the chain once, each provider through `runWithRetry`; resolves
 // `{ ip, provider }` so the caller can name the upstream that answered.
 // Throws the last error.
-export const runWithFallback = async (chain) => {
+export const runWithFallback = async (chain, runProvider = runWithRetry) => {
     let lastError = new Error('dnsleak: empty provider chain');
     for (const provider of chain) {
         try {
-            const { ip } = await runWithRetry(provider);
+            const { ip } = await runProvider(provider);
             return { ip, provider };
         } catch (err) {
             lastError = err;
         }
     }
     throw lastError;
+};
+
+// One cache per test run: pending, successful and exhausted probes all share
+// the same retry budget. A fresh runner makes refresh probe every provider anew.
+export const createDnsLeakRunner = (providers, slotCount) => {
+    const probes = new Map();
+    const probe = (provider) => {
+        if (!probes.has(provider.id)) probes.set(provider.id, runWithRetry(provider));
+        return probes.get(provider.id);
+    };
+    return (index) => runWithFallback(buildFallbackChain(index, providers, slotCount), probe);
 };

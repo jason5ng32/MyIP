@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-  runWithRetry, buildFallbackChain, runWithFallback,
+  runWithRetry, buildFallbackChain, runWithFallback, createDnsLeakRunner,
 } from '../frontend/utils/dnsleaks/index.js';
 
 const providerReturning = (results) => {
@@ -150,6 +150,53 @@ describe('runWithFallback', () => {
 
   it('rejects an empty chain', async () => {
     await assert.rejects(() => runWithFallback([]), /empty provider chain/);
+  });
+});
+
+describe('per-run shared probes', () => {
+  it('shares an in-flight standby across failed slots and reuses the settled result', async () => {
+    let resolve;
+    let calls = 0;
+    const pending = new Promise(yes => { resolve = yes; });
+    const spare = { id: 'spare', run: () => { calls++; return pending; } };
+    const dead = [provider('a', [new Error('down')]), provider('b', [new Error('down')])];
+    const run = createDnsLeakRunner([...dead, spare], 2);
+    const results = [run(0), run(1)];
+    await new Promise(yes => setImmediate(yes));
+    assert.equal(calls, 1, 'concurrent slots share the pending request');
+    resolve({ ip: '192.0.2.53' });
+    for (const result of await Promise.all(results)) {
+      assert.equal(result.provider, spare);
+      assert.equal(result.ip, '192.0.2.53');
+    }
+    await run(0);
+    assert.equal(calls, 1, 'the completed result is cached for the run');
+    assert.deepEqual(dead.map(p => p.calls()), [2, 2]);
+  });
+
+  it('shares exhausted failures and retries them only in a fresh run', async () => {
+    const registry = ['a', 'b', 'spare'].map(id => provider(id, [new Error(`${id} down`)]));
+    const first = createDnsLeakRunner(registry, 2);
+    const results = await Promise.allSettled([first(0), first(1)]);
+    assert(results.every(result => result.status === 'rejected'));
+    assert.deepEqual(registry.map(p => p.calls()), [2, 2, 2]);
+    await assert.rejects(first(0));
+    assert.deepEqual(registry.map(p => p.calls()), [2, 2, 2]);
+    await assert.rejects(createDnsLeakRunner(registry, 2)(0));
+    assert.deepEqual(registry.map(p => p.calls()), [4, 4, 4]);
+  });
+
+  it('shares a neighbour primary and refreshes successful results in a new run', async () => {
+    const dead = provider('dead', [new Error('down')]);
+    const live = provider('live', [{ ip: '192.0.2.1' }, { ip: '192.0.2.2' }]);
+    const spare = provider('spare', [new Error('down')]);
+    const registry = [dead, live, spare];
+    const first = createDnsLeakRunner(registry, 2);
+    const results = await Promise.all([first(0), first(1)]);
+    assert(results.every(result => result.provider === live && result.ip === '192.0.2.1'));
+    assert.equal(live.calls(), 1);
+    assert.equal((await createDnsLeakRunner(registry, 2)(1)).ip, '192.0.2.2');
+    assert.equal(live.calls(), 2);
   });
 });
 

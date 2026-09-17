@@ -238,6 +238,23 @@ describe('cleaning rules', () => {
         assert.equal('org' in errored, false);  // no geo lookup → org distrusted
     });
 
+    it('dnsleak collapses reused probes without dropping distinct providers or resolver IPs', () => {
+        const { build } = REPORT_EVENT_BUILDERS['dnsleak:finished'];
+        const shared = { id: 'spare', name: 'Standby', ip: '192.0.2.53', country_code: 'US', org: 'Example' };
+        const section = build({ providers: [
+            ...Array(9).fill(shared),
+            { ...shared, ip: '192.0.2.54' },
+            { ...shared, id: 'other' },
+            { ...shared, ip: 'Testing…' },
+        ] });
+        assert.deepEqual(section.providers.map(({ id, ip }) => ({ id, ip })), [
+            { id: 'spare', ip: '192.0.2.53' },
+            { id: 'spare', ip: '192.0.2.54' },
+            { id: 'other', ip: '192.0.2.53' },
+        ]);
+        assert.equal(validateReport(wrap('dnsleak', section)).ok, true);
+    });
+
     it('speedtest turns "-" placeholders into absent keys', () => {
         const { build } = REPORT_EVENT_BUILDERS['speedtest:finished'];
         const section = build(PAYLOADS['speedtest:finished']);

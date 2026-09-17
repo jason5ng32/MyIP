@@ -108,7 +108,7 @@ import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
 import {
   ipApi, bashws, myipstack, fastly, browserleaks, surfshark, ipleak,
-  buildFallbackChain, runWithFallback,
+  createDnsLeakRunner,
 } from '@/utils/dnsleaks';
 
 // All providers in priority order: the first SLOT_COUNT hold a card each,
@@ -128,6 +128,7 @@ const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
 // Sticky settled flag for the section's banner slot.
 const hasEverSettled = ref(false);
+let runId = 0;
 
 const { dotClass, textClass } = useStatusTone();
 
@@ -162,8 +163,9 @@ const leakTest = reactive(ACTIVE.map((p) => ({
 })));
 
 // Apply MaxMind lookup to a card that already has a resolved leak IP.
-const applyMaxMindGeo = async (index, ip) => {
+const applyMaxMindGeo = async (index, ip, currentRun) => {
   const geo = await lookupMaxmind(ip);
+  if (currentRun !== runId) return;
   if (geo) {
     leakTest[index].country_code = geo.country_code;
     leakTest[index].country = geo.country;
@@ -184,23 +186,27 @@ const markLeakCardError = (index) => {
 
 // Run one slot through its fallback chain (see utils/dnsleaks); the card
 // flips to error only when the whole chain fails.
-const runProvider = async (index) => {
-  const chain = buildFallbackChain(index, PROVIDERS, SLOT_COUNT);
+const runProvider = async (index, run, currentRun) => {
+  if (currentRun !== runId) return;
   try {
-    const { ip, provider } = await runWithFallback(chain);
+    const { ip, provider } = await run(index);
+    if (currentRun !== runId) return;
     leakTest[index].id = provider.id;
     leakTest[index].providerName = provider.name;
     leakTest[index].ip = ip;
-    await applyMaxMindGeo(index, ip);
+    await applyMaxMindGeo(index, ip, currentRun);
   } catch (error) {
+    if (currentRun !== runId) return;
     console.error('Error fetching leak test data:', error);
     markLeakCardError(index);
   }
 };
 
-// Check all. Staggers startup by 300ms per provider to avoid a thundering-
+// Check all. Staggers startup by 200ms per provider to avoid a thundering-
 // herd on first paint.
 const checkAllDNSLeakTest = async (isRefresh) => {
+  const currentRun = ++runId;
+  const run = createDnsLeakRunner(PROVIDERS, SLOT_COUNT);
   isStarted.value = true;
   if (isRefresh) trackEvent('Section', 'RefreshClick', 'DNSLeakTest');
   // Every run starts from the primary provider and "Testing…" — on boot
@@ -216,7 +222,7 @@ const checkAllDNSLeakTest = async (isRefresh) => {
 
   const delayedRun = (index, delay) => new Promise((resolve) => {
     setTimeout(() => {
-      runProvider(index).then(resolve, resolve);
+      runProvider(index, run, currentRun).then(resolve, resolve);
     }, delay);
   });
 
@@ -226,6 +232,7 @@ const checkAllDNSLeakTest = async (isRefresh) => {
   const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 6000));
 
   return Promise.race([allSettledPromise, timeoutPromise]).then(() => {
+    if (currentRun !== runId) return;
     store.setLoadingStatus('DNSLeakTest', true);
     // Local sticky flag for the Enhanced DNS Leak Test banner
     hasEverSettled.value = true;
