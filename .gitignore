@@ -53,6 +53,7 @@ common/as-rel-db/*.next
 .learnings/
 docs/
 .plan/
+.skills/
 
 # Local Scripts (the listed exceptions are public — contributors need
 # fetch-favicons.js for the Connectivity favicon pipeline, and the i18n pair
