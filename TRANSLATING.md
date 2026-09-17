@@ -44,7 +44,7 @@ can see at a glance which strings you actually wrote.
 | `frontend/locales/<code>.json` | The main pack — every string in the app UI (~1,150 keys) | **Yes** — all keys, values may be `""` |
 | `frontend/locales/privacy/<code>.json` | Privacy policy copy (~50 keys) | No — but whole or not at all |
 | `frontend/locales/security-checklist/<code>.json` | The Cybersecurity Checklist dataset (~1,080 keys, 258 items) | No — but whole or not at all |
-| `frontend/data/changelog.json` | Release history, one string per language per entry (163 entries) | No — beta languages are exempt |
+| `frontend/data/changelog.json` | Release history, one string per language per entry | No — beta languages are exempt |
 
 `en.json` is the reference for all of them: a translation may lag behind English, never
 contradict it.
@@ -201,7 +201,7 @@ maintainer decision, made when the language is actually complete:
 
 - Main pack, privacy copy and security checklist all at 100% against `en` — not a single
   `""` left (`pnpm i18n-status` shows this).
-- Changelog history back-filled — all 163 entries in `frontend/data/changelog.json`.
+- Changelog history back-filled — every entry in `frontend/data/changelog.json`.
 - Enough of a track record that copy changes will keep landing in it.
 
 Once `status` flips to `'full'`, `tests/locale-packs.test.js` and `tests/changelog.test.js`

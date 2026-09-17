@@ -1,4 +1,6 @@
+// Buffer speed-test samples independently of the asynchronously loaded charts.
 import { ref, reactive } from 'vue';
+import { getSpeedTestSampleCounts } from '../utils/speedtest-session.js';
 
 // Extract Chart.js related configurations
 const getChartConfig = (t) => ({
@@ -74,7 +76,11 @@ const getChartConfig = (t) => ({
     }
 });
 
-export default function useSpeedTestCharts(t) {
+const useSpeedTestCharts = (t, {
+    loadChart = () => import('chart.js/auto'),
+    scheduleFrame = (callback) => requestAnimationFrame(callback),
+    now = () => Date.now(),
+} = {}) => {
     // Chart references
     const downloadChart = ref(null);
     const uploadChart = ref(null);
@@ -92,6 +98,8 @@ export default function useSpeedTestCharts(t) {
     // Chart.js import): rapid double-starts must share one init instead of
     // racing two `new Chart()` calls onto the same canvas.
     let chartInitInFlight = null;
+    let generation = 0;
+    let sampleCounts = new WeakMap();
 
     const chartData = reactive({
         download: {
@@ -177,13 +185,28 @@ export default function useSpeedTestCharts(t) {
         }
     });
 
+    // Rendering consumes the buffer; it never owns or resets measurement data.
+    const renderCharts = () => {
+        Object.entries(charts).forEach(([type, chart]) => {
+            if (!chart) return;
+            const { labels, data } = chartData[type];
+            chart.data.labels = [...labels];
+            chart.data.datasets[0].data = type === 'download' || type === 'upload'
+                ? [...data]
+                : data.map((y, index) => ({ x: Number(labels[index]), y }));
+            chart.options.scales.x.max = labels.length ? Number(labels.at(-1)) : 0;
+            chart.update('none');
+        });
+    };
+
     // Initialize charts
     const initCharts = async () => {
         // Dynamically import Chart.js. On broken/blocked visitor networks
         // the chunk can fail or resolve null — bail and run chartless
         // (downstream already null-guards every charts.* access).
-        const mod = await import('chart.js/auto').catch(() => null);
-        if (!mod?.Chart) return;
+        const currentGeneration = generation;
+        const mod = await loadChart().catch(() => null);
+        if (currentGeneration !== generation || !mod?.Chart) return;
         const { Chart, registerables } = mod;
         Chart.register(...registerables);
 
@@ -240,109 +263,65 @@ export default function useSpeedTestCharts(t) {
                 options: getLineChartOptions(t('speedtest.Jitter') + ' (ms)')
             });
         }
+        renderCharts();
     };
 
-    // Update charts
+    // Raw result identity separates preview samples from formal-test samples.
+    // Completion events can contain new samples even when `finished` is true.
     const updateCharts = (downloadSpeed, uploadSpeed, latency, jitter, rawData) => {
-        if (!charts.download || !charts.upload || !charts.latency || !charts.jitter) return;
-
-        try {
-            const currentTime = Date.now();
-
-            const updateSingleChart = (type, value, started) => {
-                if (type === 'download' || type === 'upload') {
-                    if (value > 0 && started && !rawData[type]?.finished) {
-                        if (!chartData[type].started) {
-                            chartData[type].started = true;
-                            chartData[type].startTime = currentTime;
-                        }
-
-                        const relativeTime = (currentTime - chartData[type].startTime) / 1000;
-                        const newLabel = relativeTime.toFixed(1);
-
-                        chartData[type].labels.push(newLabel);
-                        chartData[type].data.push(value);
-
-                        charts[type].data.labels = [...chartData[type].labels];
-                        charts[type].data.datasets[0].data = [...chartData[type].data];
-
-                        const maxTime = Math.max(...chartData[type].labels.map(Number));
-                        charts[type].options.scales.x.max = maxTime;
-                    }
-                } else if (value >= 0 && started) {
-                    if (!chartData[type].started) {
-                        chartData[type].started = true;
-                        chartData[type].startTime = currentTime;
-                    }
-
-                    if ((type === 'latency' && !rawData.latency?.finished) ||
-                        (type === 'jitter' && !rawData.latency?.finished)) {
-
-                        const relativeTime = (currentTime - chartData[type].startTime) / 1000;
-                        const newLabel = relativeTime.toFixed(1);
-                        const newData = parseFloat(value.toFixed(2));
-
-                        chartData[type].labels.push(newLabel);
-                        chartData[type].data.push(newData);
-
-                        const scatterData = chartData[type].data.map((value, index) => ({
-                            x: parseFloat(chartData[type].labels[index]),
-                            y: value
-                        }));
-                        charts[type].data.datasets[0].data = scatterData;
-
-                        const maxTime = Math.max(...chartData[type].labels.map(Number));
-                        charts[type].options.scales.x.max = maxTime;
-                    }
-                }
-            };
-
-            updateSingleChart('latency', latency, rawData.latency?.started);
-            updateSingleChart('jitter', jitter, rawData.latency?.started);
-            updateSingleChart('download', downloadSpeed, rawData.download?.started);
-            updateSingleChart('upload', uploadSpeed, rawData.upload?.started);
-
-            requestAnimationFrame(() => {
-                Object.values(charts).forEach(chart => {
-                    if (chart) {
-                        chart.update('none');
-                    }
-                });
+        const counts = getSpeedTestSampleCounts(rawData);
+        const seen = sampleCounts.get(rawData) || {};
+        sampleCounts.set(rawData, seen);
+        const values = { download: downloadSpeed, upload: uploadSpeed, latency, jitter };
+        const currentTime = now();
+        let changed = false;
+        Object.entries(values).forEach(([type, value]) => {
+            const count = counts[type === 'jitter' ? 'latency' : type];
+            if (count < (type === 'jitter' ? 2 : 1) || count <= (seen[type] || 0)) return;
+            if (!Number.isFinite(value) || value < 0) return;
+            seen[type] = count;
+            const series = chartData[type];
+            if (!series.started) {
+                series.started = true;
+                series.startTime = currentTime;
+            }
+            series.labels.push(((currentTime - series.startTime) / 1000).toFixed(1));
+            series.data.push(value);
+            changed = true;
+        });
+        if (changed) {
+            const currentGeneration = generation;
+            scheduleFrame(() => {
+                if (currentGeneration === generation) renderCharts();
             });
-
-        } catch (error) {
-            console.error('Error updating charts:', error);
         }
     };
 
-    // Initialize starting points of charts
     const initStartingPoints = async () => {
-        // Ensure charts are initialized (shared across concurrent callers)
+        const currentTime = now();
+        ['download', 'upload'].forEach(type => {
+            const series = chartData[type];
+            if (series.started) return;
+            series.started = true;
+            series.startTime = currentTime;
+            series.labels = ['0.0'];
+            series.data = [0];
+        });
         if (!charts.download || !charts.upload) {
-            chartInitInFlight ||= initCharts().finally(() => {
-                chartInitInFlight = null;
-            });
+            if (!chartInitInFlight) {
+                const pending = initCharts().finally(() => {
+                    if (chartInitInFlight === pending) chartInitInFlight = null;
+                });
+                chartInitInFlight = pending;
+            }
             await chartInitInFlight;
         }
-
-        const currentTime = Date.now();
-        ['download', 'upload'].forEach(type => {
-            if (charts[type]) {  // Add additional check
-                chartData[type].started = true;
-                chartData[type].startTime = currentTime;
-                chartData[type].labels = ['0.0'];
-                chartData[type].data = [0];
-
-                charts[type].data.labels = ['0.0'];
-                charts[type].data.datasets[0].data = [0];
-                charts[type].options.scales.x.max = 0;
-                charts[type].update('none');
-            }
-        });
     };
 
     // Clean up charts
     const destroyCharts = () => {
+        generation += 1;
+        chartInitInFlight = null;
         Object.values(charts).forEach(chart => {
             if (chart) {
                 chart.destroy();
@@ -353,6 +332,7 @@ export default function useSpeedTestCharts(t) {
 
     // Reset chart data
     const resetChartData = () => {
+        sampleCounts = new WeakMap();
         ['download', 'upload', 'latency', 'jitter'].forEach(type => {
             chartData[type] = {
                 started: false,
@@ -376,4 +356,6 @@ export default function useSpeedTestCharts(t) {
         destroyCharts,
         resetChartData
     };
-} 
+};
+
+export default useSpeedTestCharts;

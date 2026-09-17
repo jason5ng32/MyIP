@@ -647,9 +647,15 @@ describe('ipinfo-io normalize', () => {
         assert.equal(out.org, '');
     });
 
-    it('falls back to Unknown Country for an absent or unlisted code', () => {
-        assert.equal(modifyJsonForIpinfo({}).country_name, 'Unknown Country');
-        assert.equal(modifyJsonForIpinfo({ country: 'XX' }).country_name, 'Unknown Country');
+    it('uses ICU country names and accepts lowercase upstream codes', () => {
+        assert.equal(modifyJsonForIpinfo({ country: 'TR' }).country_name, 'Türkiye');
+        assert.equal(modifyJsonForIpinfo({ country: 'us' }).country_name, 'United States');
+    });
+
+    it('falls back to Unknown Country for absent, unknown or malformed codes', () => {
+        for (const country of [undefined, null, '', 'XX', 'ZZ', 'T1', 'USA', 123, {}]) {
+            assert.equal(modifyJsonForIpinfo({ country }).country_name, 'Unknown Country');
+        }
     });
 
     it('survives a bogon payload and still emits the canonical shape', () => {

@@ -88,8 +88,13 @@
         </div>
 
         <!-- Progress Bar -->
-        <Progress :model-value="state.speedTest.progress" class="mb-6"
-          :class="[progressIndicatorClass, state.speedTest.status === 'idle' ? 'invisible' : '']" />
+        <div class="mb-6" :class="{ invisible: state.speedTest.status === 'idle' }">
+          <p class="mb-2 text-sm text-muted-foreground" role="status" aria-live="polite" aria-atomic="true">
+            {{ progressLabel }}
+          </p>
+          <Progress :model-value="state.speedTest.progress" :aria-label="progressLabel"
+            :class="progressIndicatorClass" />
+        </div>
 
         <!-- 4 Metrics Tiles -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -140,14 +145,14 @@
               </p>
               <p class="mb-2">
                 {{ t('speedtest.score') }}
-                {{ t('speedtest.videoStreaming') }} : 
+                {{ t('speedtest.videoStreaming') }} :
                 <span :class="qualityBadgeClass(state.speedTest.streamingQuality)">{{ t('speedtest.quality.' +
-                  state.speedTest.streamingQuality) }}</span> ; 
-                {{ t('speedtest.gaming') }}: 
+                  state.speedTest.streamingQuality) }}</span> ;
+                {{ t('speedtest.gaming') }}:
                 <span :class="qualityBadgeClass(state.speedTest.gamingQuality)">
                   {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
-                </span> ; 
-                {{ t('speedtest.rtc') }}: 
+                </span> ;
+                {{ t('speedtest.rtc') }}:
                 <span :class="qualityBadgeClass(state.speedTest.rtcQuality)">
                   {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
                 </span>
@@ -172,7 +177,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, markRaw, onUnmounted } from 'vue';
+import { reactive, ref, computed, onMounted, markRaw, onUnmounted, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -183,6 +188,7 @@ import { isValidIP } from '@/utils/valid-ip.js';
 import { parseTrace } from '@/utils/parse-trace.js';
 import getCountryName from '@/data/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
+import { createSpeedTestSession, getSpeedTestLiveValues } from '@/utils/speedtest-session.js';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
@@ -220,6 +226,7 @@ const state = reactive({
     rtcScore: '-',
     rtcQuality: '-',
     status: 'idle',
+    phase: 'probe',
     hasScores: false,
     progress: 0,
   },
@@ -228,7 +235,7 @@ const state = reactive({
     package: {
       download: { bytes: 50e6, count: 4 },
       upload: { bytes: 15e6, count: 4 },
-      latency: { count: 30 },
+      latency: { count: 20 },
     },
   },
 });
@@ -247,6 +254,13 @@ const isRunning = computed(() => state.speedTest.status === 'running');
 const isPaused = computed(() => state.speedTest.status === 'paused');
 const isFinished = computed(() => state.speedTest.status === 'finished');
 const isError = computed(() => state.speedTest.status === 'error');
+
+const progressLabel = computed(() => {
+  if (isFinished.value) return t('speedtest.phaseFinished');
+  if (isError.value) return t('speedtest.phaseFailed');
+  const phase = t(`speedtest.phases.${state.speedTest.phase}`);
+  return isPaused.value ? t('speedtest.phasePaused', { phase }) : phase;
+});
 
 // CTA Icon: running=Pause, finished/error=Retry, otherwise=Start
 const ctaIcon = computed(() => {
@@ -331,17 +345,11 @@ const connectionMethods = {
 // --- Test Engine ----------------------------------------------------------
 
 let testEngine;
+let runId = 0;
 const engineMethods = {
   // Build a fresh engine. State reset is owned by speedTestController.
   reset() {
-    return markRaw(new SpeedTestEngine({
-      autoStart: false,
-      measurements: [
-        { type: 'latency', numPackets: state.config.package.latency.count },
-        { type: 'download', bytes: state.config.package.download.bytes, count: state.config.package.download.count },
-        { type: 'upload', bytes: state.config.package.upload.bytes, count: state.config.package.upload.count },
-      ],
-    }));
+    return markRaw(createSpeedTestSession(SpeedTestEngine, state.config.package));
   },
 
   updateResults(results) {
@@ -363,33 +371,25 @@ const engineMethods = {
   // onUnmounted dropped the reference, so the engine may already be gone.
   updateProgress() {
     const rawData = testEngine?.results?.raw;
-    if (!rawData) return;
+    if (!rawData || testEngine.isProbe) return;
     // 3 stages: latency / download / upload.
     const perStage = 100 / 3;
     let progress = 0;
     if (rawData.latency?.started) progress += rawData.latency.finished ? perStage : perStage / 2;
     if (rawData.download?.started) progress += rawData.download.finished ? perStage : perStage / 2;
     if (rawData.upload?.started) progress += rawData.upload.finished ? perStage : perStage / 2;
-    state.speedTest.progress = Math.min(progress, 100);
+    state.speedTest.progress = Math.max(state.speedTest.progress, Math.min(progress, 100));
   },
 
-  // Live values via engine getters (supported API). Getters can briefly return
-  // `null` between "started" and "first datapoint", so guard with `!= null`.
+  // Keep preview readings until each formal metric has actual samples.
+  // CF bandwidth/latency getters can return zero for an empty sample set.
   updateSpeedInRealTime() {
     if (state.speedTest.status === 'finished' || state.speedTest.status === 'error') return;
     try {
       const results = testEngine?.results;
       if (!results) return;
 
-      const dl = results.getDownloadBandwidth();
-      const ul = results.getUploadBandwidth();
-      const lat = results.getUnloadedLatency();
-      const jit = results.getUnloadedJitter();
-
-      if (dl != null) state.speedTest.downloadSpeed = parseFloat((dl / 1e6).toFixed(2));
-      if (ul != null) state.speedTest.uploadSpeed = parseFloat((ul / 1e6).toFixed(2));
-      if (lat != null) state.speedTest.latency = parseFloat(lat.toFixed(2));
-      if (jit != null) state.speedTest.jitter = parseFloat(jit.toFixed(2));
+      Object.assign(state.speedTest, getSpeedTestLiveValues(results));
 
       updateCharts(
         state.speedTest.downloadSpeed,
@@ -406,17 +406,24 @@ const engineMethods = {
 
 // --- Test Control ----------------------------------------------------------
 
-const setupTestEngine = async () => {
+const loadConnection = async (currentRun) => {
   if (!state.connection.ip) {
     const connectionData = await connectionMethods.getIPFromSpeedTest();
-    if (connectionData) {
+    if (connectionData && currentRun === runId) {
       Object.assign(state.connection, connectionData);
       // Feed the Globalping picker + IP history.
       store.updateAllIPs([{ ip: connectionData.ip, country: connectionData.loc || '', location: connectionData.country || '' }]);
     }
   }
+};
 
-  testEngine.onRunningChange = () => { state.speedTest.status = 'running'; };
+const setupTestEngine = () => {
+  testEngine.onPhaseChange = (phase) => { state.speedTest.phase = phase; };
+  testEngine.onRunningChange = (running) => {
+    state.speedTest.status = running ? 'running' : 'paused';
+    // Show that startup is underway before the first measurement arrives.
+    if (running) state.speedTest.progress = Math.max(state.speedTest.progress, 5);
+  };
   testEngine.onResultsChange = () => {
     engineMethods.updateProgress();
     engineMethods.updateSpeedInRealTime();
@@ -514,23 +521,30 @@ const speedTestController = async () => {
       return;
     }
 
+    const currentRun = ++runId;
+    testEngine?.destroy();
     resetChartData();
     destroyCharts();
-    await initStartingPoints();
 
     Object.assign(state.speedTest, {
       downloadSpeed: 0, uploadSpeed: 0, latency: 0, jitter: 0,
       downLoadedLatency: '-', upLoadedLatency: '-',
       streamingScore: '-', gamingScore: '-', rtcScore: '-',
-      hasScores: false, progress: 0,
+      hasScores: false, progress: 0, phase: 'probe',
     });
 
     testEngine = engineMethods.reset();
     if (!testEngine) { console.error('Failed to initialize test engine'); return; }
 
-    await setupTestEngine();
-    trackEvent('Section', 'StartClick', 'SpeedTest');
+    setupTestEngine();
     testEngine.play();
+
+    // Resources enrich the running test; neither can delay the first request.
+    void nextTick().then(() => {
+      if (currentRun === runId) return initStartingPoints();
+    }).catch(error => console.error('Error initializing speed test charts:', error));
+    void loadConnection(currentRun).catch(error => console.error('Error loading speed test connection:', error));
+    trackEvent('Section', 'StartClick', 'SpeedTest');
   } catch (error) {
     console.error('Error in speedTestController:', error);
     state.speedTest.status = 'error';
@@ -549,11 +563,13 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
 // SpeedTestEngine would still try to write state refs that no longer exist.
 // No-ops, not null: the engine's queued timers call these unconditionally.
 onUnmounted(() => {
+  runId += 1;
   if (testEngine) {
     testEngine.onRunningChange = () => {};
     testEngine.onResultsChange = () => {};
     testEngine.onFinish = () => {};
     testEngine.onError = () => {};
+    testEngine.destroy();
     testEngine = null;
   }
   destroyCharts();

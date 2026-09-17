@@ -82,6 +82,15 @@ describe('requirePublicIP', () => {
         assert.equal(nextCalled, false);
     });
 
+    it('rejects leading-zero IPv4 input before reaching an upstream handler', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq({ query: { ip: '8.8.8.08' } }), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'Invalid IP address');
+        assert.equal(nextCalled, false);
+    });
+
     // Reserved space is well-formed but unanswerable by any upstream, so it
     // gets its own message — rejected before the handler, never fetched.
     for (const ip of ['10.0.0.1', '192.168.1.1', '127.0.0.1', '198.18.0.2', 'fd00::1', '::1']) {

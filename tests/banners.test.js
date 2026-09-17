@@ -120,10 +120,11 @@ describe('banner data files', () => {
                 assert.ok(typeof banner[field] === 'string' && banner[field].length > 0,
                     `${file}: ${field} must be a non-empty string`);
             }
-            // Click target: exactly one of external `url` / internal `to`.
+            // Click target: exactly one of external `url` / internal `to` /
+            // side panel `sheet`.
             const hasUrl = typeof banner.url === 'string';
-            const hasTo = typeof banner.to === 'string';
-            assert.ok(hasUrl !== hasTo, `${file}: exactly one of url | to`);
+            const targets = ['url', 'to', 'sheet'].filter((k) => typeof banner[k] === 'string');
+            assert.equal(targets.length, 1, `${file}: exactly one of url | to | sheet`);
             if (hasUrl) {
                 assert.doesNotThrow(() => new URL(banner.url), `${file}: url must parse`);
             } else {

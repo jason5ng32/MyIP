@@ -1,9 +1,15 @@
+// Shared country-name behavior and the frontend compatibility entry point.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import getCountryName from '../frontend/data/country-name.js';
+import getCountryName from '../common/country-name.js';
+import frontendCountryName from '../frontend/data/country-name.js';
 
 describe('getCountryName(abbr, lang)', () => {
+  it('shares the same helper with frontend consumers', () => {
+    assert.equal(frontendCountryName, getCountryName);
+  });
+
   it('returns English name for known code', () => {
     assert.equal(getCountryName('US', 'en'), 'United States');
     assert.equal(getCountryName('CN', 'en'), 'China');
@@ -40,9 +46,11 @@ describe('getCountryName(abbr, lang)', () => {
 
   it('returns empty string for unknown or malformed abbr', () => {
     assert.equal(getCountryName('ZZ', 'en'), '');
+    assert.equal(getCountryName('XX', 'en'), '');
     assert.equal(getCountryName('T1', 'en'), '');
     assert.equal(getCountryName('', 'en'), '');
     assert.equal(getCountryName(null, 'en'), '');
+    assert.equal(getCountryName(123, 'en'), '');
   });
 
   it('returns empty string for a malformed lang', () => {

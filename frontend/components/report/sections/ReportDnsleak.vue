@@ -10,7 +10,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y">
-                <tr v-for="provider in section.providers" :key="provider.id" class="hover:bg-muted/50 transition-colors">
+                <tr v-for="(provider, index) in section.providers" :key="`${provider.id}:${index}`" class="hover:bg-muted/50 transition-colors">
                     <td class="px-3 py-2 whitespace-nowrap">{{ provider.name }}</td>
                     <td class="px-3 py-2 font-mono whitespace-nowrap">{{ provider.ip }}</td>
                     <td class="px-3 py-2"><GeoCell :code="provider.countryCode" /></td>

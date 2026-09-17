@@ -164,6 +164,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         },
         { keys: 'l', action: () => goToAdvancedTool('pingtest', 'PingTest'), description: t('shortcutKeys.PingTest') },
         { keys: 'M', action: () => goToAdvancedTool('macchecker', 'MacChecker'), description: t('shortcutKeys.MacChecker') },
+        { keys: 'a', action: () => goToAdvancedTool('ipcalculator', 'IpCalculator'), description: t('shortcutKeys.IpCalculator') },
         { keys: 't', action: () => goToAdvancedTool('mtrtest', 'MTRTest'), description: t('shortcutKeys.MTRTest') },
         { keys: 'S', action: () => goToAdvancedTool('securitychecklist', 'SecurityChecklist'), description: t('shortcutKeys.SecurityChecklist') },
         { keys: 'r', action: () => goToAdvancedTool('ruletest', 'RuleTest'), description: t('shortcutKeys.RuleTest') },

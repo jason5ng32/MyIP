@@ -14,6 +14,9 @@ jobs:
   check:
     name: Test + Build
     runs-on: ubuntu-latest
+    # Normal run is ~1 min; a hosted runner that loses its connection would
+    # otherwise sit "in progress" for the 6h default before failing.
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -22,7 +25,7 @@ jobs:
       - name: Setup pnpm
         # Reads the `packageManager` field in package.json to pin the pnpm version,
         # so CI uses the exact same pnpm as local dev.
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node
         uses: actions/setup-node@v6

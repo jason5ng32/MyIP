@@ -60,6 +60,7 @@ Feel free to bookmark the demo or deploy your own.
 * 📟 **DNS Resolver**: Resolves a domain through multiple resolvers at once, grouped by country — an easy way to spot hijacking or contamination.
 * 📓 **Whois Search**: Performs Whois lookups for domain names and IP addresses.
 * 🗄️ **MAC Lookup**: Identifies the vendor and details behind a physical address.
+* 🧮 **IP Calculator**: Subnet math, notation conversions and IPv6 interface details for any IP, prefix, range or list, computed locally.
 * 🛰️ **ASN Info & Upstream Topology**: Shows AS details, historical announcements for an IP prefix, and the upstream paths from an ASN to the Tier 1 backbone.
 * 📶 **Service Status**: Live availability of well-known services — Claude, OpenAI, GitHub, Cloudflare, and more — from their official status pages, with recent incidents.
 

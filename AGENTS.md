@@ -3,12 +3,26 @@
 Single source of truth for anyone — human or AI — contributing to MyIP.
 Area-specific details: @frontend/AGENTS.md (Vue SPA) · @api/AGENTS.md (Express API).
 
+## Local skill discovery
+
+Before choosing a workflow for a project task, check the repository-root
+`.skills/` **directory**. It contains local skills at `.skills/<name>/SKILL.md`
+and may not appear in the agent's automatically supplied skill list.
+
+- If the directory exists, discover its skill files with
+  `rg --files --hidden --no-ignore .skills -g SKILL.md` (it is gitignored).
+- Read each skill's frontmatter `name` and `description`; read the full
+  `SKILL.md` for any skill that applies, then follow its workflow.
+- Complete this discovery before choosing a fallback tool or telling the
+  user that a project capability or service is unavailable. Load supporting
+  files only when the selected skill requires them.
+
 ## Overview
 
 **MyIP** (IPCheck.ing) is an open-source IP toolbox: IP lookup, connectivity
 tests, WebRTC / DNS-leak detection, speed test, MTR, Whois, security
-checklist, browser fingerprint, anonymity checks, persona check, and
-more. Single repo, two
+checklist, browser fingerprint, anonymity checks, persona check, IP
+calculator, and more. Single repo, two
 halves: a Vue 3 SPA front-end and an Express 5 back-end API.
 
 ## Stack

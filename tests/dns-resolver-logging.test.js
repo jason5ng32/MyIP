@@ -1,7 +1,7 @@
 // Verifies DNS resolver telemetry without contacting real upstream servers.
 
 import assert from 'node:assert/strict';
-import { Resolver } from 'node:dns';
+import { Resolver } from 'node:dns/promises';
 import { afterEach, describe, it } from 'node:test';
 
 import { resolveDns, resolveDoh } from '../api/dns-resolver.js';
@@ -25,10 +25,10 @@ describe('DNS resolver logging', () => {
         const debugCalls = [];
         logger.warn = (...args) => warnCalls.push(args);
         logger.debug = (...args) => debugCalls.push(args);
-        Resolver.prototype.resolve4 = (_hostname, callback) => {
+        Resolver.prototype.resolve4 = async () => {
             const error = new Error('resolver timed out');
             error.code = 'ETIMEOUT';
-            callback(error);
+            throw error;
         };
 
         assert.equal(await resolveDns('private.example.test', 'A', 'Example DNS', '192.0.2.1'), 'N/A');
@@ -45,10 +45,10 @@ describe('DNS resolver logging', () => {
         const debugCalls = [];
         logger.warn = (...args) => warnCalls.push(args);
         logger.debug = (...args) => debugCalls.push(args);
-        Resolver.prototype.resolve4 = (_hostname, callback) => {
+        Resolver.prototype.resolve4 = async () => {
             const error = new Error('missing record');
             error.code = 'ENOTFOUND';
-            callback(error);
+            throw error;
         };
 
         assert.equal(await resolveDns('private.example.test', 'A', 'Example DNS', '192.0.2.1'), 'N/A');

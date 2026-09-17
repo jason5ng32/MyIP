@@ -71,7 +71,7 @@
         <!-- Bottom RefreshAll button (action color + Spinner standard) -->
         <div class="flex justify-center pt-2">
             <Button variant="action" :disabled="!finishAll" class="cursor-pointer"
-                :class="[isMobile ? 'w-full' : 'w-64']" @click="checkAllRuleTest(true)">
+                :class="[isMobile ? 'w-full' : 'w-64']" @click="checkAllRuleTest">
                 <Spinner v-if="!finishAll" />
                 <RotateCw v-else />
                 {{ t('ruletest.RefreshAll') }}
@@ -125,12 +125,12 @@ const finishAll = ref(false);
 
 // Business status → 4 tone levels
 const toneOf = (test) => ipFieldTone(test.ip, {
-    waitLabels: t('ruletest.StatusWait'),
+    waitLabels: [t('ruletest.StatusWait'), t('ruletest.StatusTesting')],
     errorLabels: t('ruletest.StatusError'),
 });
 
 const isFieldPending = (value) => isFieldPendingShared(value, {
-    waitLabels: t('ruletest.StatusWait'),
+    waitLabels: [t('ruletest.StatusWait'), t('ruletest.StatusTesting')],
     errorLabels: t('ruletest.StatusError'),
 });
 
@@ -175,16 +175,14 @@ const fetchTrace = async (id, url) => {
     }
 };
 
-const checkAllRuleTest = async (refresh = false) => {
+const checkAllRuleTest = async () => {
     finishAll.value = false;
-    if (refresh) {
-        ruleTests.value.forEach((test) => {
-            test.ip = t('ruletest.StatusWait');
-            test.country = t('ruletest.StatusWait');
-            test.country_code = '';
-            test.org = t('ruletest.StatusWait');
-        });
-    }
+    ruleTests.value.forEach((test) => {
+        test.ip = t('ruletest.StatusTesting');
+        test.country = t('ruletest.StatusTesting');
+        test.country_code = '';
+        test.org = t('ruletest.StatusTesting');
+    });
 
     const processTest = async (index) => {
         if (index < testCount.value) {

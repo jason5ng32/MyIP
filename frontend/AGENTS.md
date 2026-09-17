@@ -144,6 +144,10 @@ Copy the named exemplar instead of re-inventing:
   pills, `h-7 rounded-full px-2.5 text-xs` (IPHistory, DnsResolver). Never the
   default `spacing=0` connected form: its `border-l-0` / `first:border-l` seam
   only reads as one bar on a single line, and breaks the moment it wraps.
+- **Shareable tool input** — a tool whose result is worth linking to reads its
+  query from `route.query.q` on mount and writes it back with `router.replace`
+  on every run (IpCalculator). Works on both `/tools/<slug>?q=` and
+  `/?tool=<slug>&q=`; `replace`, not `push`, so history doesn't grow per run.
 - **Fixed option sets** — a known, closed list of choices is a `Select`, not a
   toggle row, once it outgrows a comfortable single line (DnsResolver's record
   types, MtrTest's targets).

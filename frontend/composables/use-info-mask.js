@@ -24,8 +24,8 @@ const MASK_ATTR = 'data-mask-level';
 // "detecting…" / "error" states. The blur should skip these: masking them just
 // hides a status word and looks broken in a shared screenshot.
 const NON_SENSITIVE_KEYS = [
-    'webrtc.StatusWait', 'webrtc.StatusError', 'webrtc.StatusUnavailable',
-    'dnsleaktest.StatusWait', 'dnsleaktest.StatusError',
+    'webrtc.StatusWait', 'webrtc.StatusTesting', 'webrtc.StatusError', 'webrtc.StatusUnavailable',
+    'dnsleaktest.StatusWait', 'dnsleaktest.StatusTesting', 'dnsleaktest.StatusError',
     'ipInfos.IPv4Error', 'ipInfos.IPv6Error',
 ];
 

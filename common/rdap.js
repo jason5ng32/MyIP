@@ -20,7 +20,7 @@
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { isIPv6 } from './valid-ip.js';
-import { expandIPv6 } from './bgp-prefix.js';
+import { ipToBigInt, parseCidr, prefixContains } from './ip-math.js';
 import logger from './logger.js';
 
 const BOOTSTRAP_BASE = 'https://data.iana.org/rdap/';
@@ -77,35 +77,6 @@ export async function rdapDomain(domain, { timeoutMs = 5000 } = {}) {
 
 // -- IP lookup -------------------------------------------------------------
 
-// Numeric value of an IP for prefix math. Returns null on junk — callers
-// validate first, but bootstrap CIDR bases also pass through here.
-const ipToBigInt = (ip) => {
-    if (typeof ip !== 'string') return null;
-    if (!ip.includes(':')) {
-        const parts = ip.split('.');
-        if (parts.length !== 4) return null;
-        let n = 0n;
-        for (const p of parts) {
-            if (!/^\d{1,3}$/.test(p)) return null;
-            n = (n << 8n) | BigInt(p);
-        }
-        return n;
-    }
-    const hextets = expandIPv6(ip);
-    if (!hextets) return null;
-    let n = 0n;
-    for (const h of hextets) n = (n << 16n) | BigInt(parseInt(h, 16));
-    return n;
-};
-
-const cidrContains = (cidr, ipBig, v6) => {
-    const [base, lenStr] = cidr.split('/');
-    const baseBig = ipToBigInt(base);
-    if (baseBig === null) return false;
-    const shift = (v6 ? 128n : 32n) - BigInt(lenStr);
-    return (ipBig >> shift) === (baseBig >> shift);
-};
-
 // Longest-prefix match of `ip` against an IANA ipv4/ipv6 bootstrap
 // `services` array (entries: [[cidr, …], [url, …]]). Exported for tests.
 export const findIpEndpoint = (services, ip) => {
@@ -117,10 +88,11 @@ export const findIpEndpoint = (services, ip) => {
     let bestLen = -1;
     for (const [cidrs, urls] of services) {
         for (const cidr of cidrs) {
-            if (cidr.includes(':') !== v6) continue;
-            const len = Number(cidr.split('/')[1]);
-            if (len <= bestLen || !cidrContains(cidr, ipBig, v6)) continue;
-            bestLen = len;
+            const block = parseCidr(cidr);
+            if (!block || (block.family === 6) !== v6) continue;
+            if (block.prefix <= bestLen
+                || !prefixContains(block.network, block.prefix, block.family, ipBig)) continue;
+            bestLen = block.prefix;
             best = urls.find((u) => u.startsWith('https://')) || urls[0];
         }
     }

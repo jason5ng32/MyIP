@@ -33,7 +33,7 @@ export const STATUS_PROVIDERS = [
     { id: 'netlify', name: 'Netlify', api: 'https://www.netlifystatus.com', page: 'https://www.netlifystatus.com' },
     { id: 'render', name: 'Render', api: 'https://status.render.com', page: 'https://status.render.com' },
     { id: 'supabase', name: 'Supabase', api: 'https://status.supabase.com', page: 'https://status.supabase.com' },
-    { id: 'replicate', name: 'Replicate', api: 'https://replicatestatus.com', page: 'https://replicatestatus.com' },
+    { id: 'discord', name: 'Discord', api: 'https://discordstatus.com', page: 'https://discordstatus.com' },
     { id: 'figma', name: 'Figma', api: 'https://status.figma.com', page: 'https://status.figma.com' },
     { id: 'linear', name: 'Linear', api: 'https://linearstatus.com', page: 'https://linearstatus.com' },
     // Stripe's customer-facing status.stripe.com is a homegrown page with a
