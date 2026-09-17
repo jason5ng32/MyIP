@@ -476,7 +476,7 @@ const parseInetAton = (input) => {
     const notations = new Set();
     const numbers = parts.map((p) => {
         if (/^0x/i.test(p)) { notations.add('hex'); return BigInt(p); }
-        if (p.length > 1 && p.startsWith('0')) { notations.add('octal'); return BigInt(parseInt(p, 8)); }
+        if (p.length > 1 && p.startsWith('0')) { notations.add('octal'); return BigInt(`0o${p}`); }
         return BigInt(p);
     });
     const last = numbers.pop();
@@ -563,7 +563,7 @@ export const classifyInput = (raw) => {
 
     // A leading zero reads as octal, as inet_aton would.
     if (/^0[0-7]+$/.test(input)) {
-        const value = BigInt(parseInt(input, 8));
+        const value = BigInt(`0o${input}`);
         if (value > MAX_V4) return invalid(raw, input, 'integer-too-large');
         return { ...base, kind: 'ipv4', value, notation: 'octal', obfuscated: true };
     }

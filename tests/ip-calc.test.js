@@ -379,6 +379,37 @@ describe('classifyInput', () => {
         assert.equal(classifyInput('123456789012').kind, 'integer');
     });
 
+    it('rejects oversized octal inputs without passing through Number', () => {
+        for (const length of [20, 400, 10000]) {
+            const octal = `0${'7'.repeat(length)}`;
+            for (const [input, reason] of [
+                [octal, 'integer-too-large'],
+                [`${octal}.0.0.1`, 'unrecognized'],
+                [`127.${octal}`, 'unrecognized'],
+                [`0x7f.0.${octal}`, 'unrecognized'],
+            ]) {
+                for (const parse of [classifyInput, calculate]) {
+                    const result = parse(input);
+                    assert.equal(result.kind, 'invalid');
+                    assert.equal(result.reason, reason);
+                }
+            }
+        }
+    });
+
+    it('keeps octal boundaries and arbitrarily padded valid values exact', () => {
+        for (const [input, value] of [
+            ['037777777777', 0xffffffffn],
+            ['0377.0377.0377.0377', 0xffffffffn],
+            [`${'0'.repeat(400)}177`, 127n],
+            [`${'0'.repeat(400)}177.0.0.1`, 0x7f000001n],
+        ]) {
+            assert.equal(calculate(input).value, value);
+        }
+        assert.equal(calculate('040000000000').kind, 'invalid');
+        assert.equal(calculate('0400.0.0.1').kind, 'invalid');
+    });
+
     it('normalises ranges', () => {
         const r = classifyInput('192.0.2.100-192.0.2.1');
         assert.equal(r.reversed, true);
