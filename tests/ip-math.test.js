@@ -293,6 +293,29 @@ describe('containment & ordering', () => {
 });
 
 describe('splitCidr', () => {
+    it('rejects invalid limits and options without coercing them', () => {
+        const limits = [Infinity, -Infinity, NaN, 1.5, -1, Number.MAX_SAFE_INTEGER + 1,
+            Symbol('limit'), '4', 4n, null, true, {}, []];
+        for (const limit of limits) {
+            assert.equal(splitCidr('10.0.0.0/24', 26, { limit }), null);
+            assert.equal(splitCidr('2001:db8::/32', 48, { limit }), null);
+        }
+        for (const options of [null, false, 5, '4', 4n, Symbol('options'), []]) {
+            assert.equal(splitCidr('10.0.0.0/24', 26, options), null);
+        }
+    });
+    it('accepts zero, default and large safe limits without changing the exact total', () => {
+        const zero = splitCidr('10.0.0.0/24', 26, { limit: 0 });
+        assert.deepEqual(zero.subnets, []);
+        assert.equal(zero.total, 4n);
+        assert.equal(zero.truncated, true);
+        for (const limit of [undefined, 4, Number.MAX_SAFE_INTEGER]) {
+            const result = splitCidr('10.0.0.0/24', 26, { limit });
+            assert.equal(result.subnets.length, 4);
+            assert.equal(result.total, 4n);
+            assert.equal(result.truncated, false);
+        }
+    });
     it('splits a /24 into /26s', () => {
         const r = splitCidr('10.0.0.0/24', 26);
         assert.deepEqual(r.subnets, ['10.0.0.0/26', '10.0.0.64/26', '10.0.0.128/26', '10.0.0.192/26']);
