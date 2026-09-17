@@ -247,7 +247,8 @@ export const cidrInfo = (str) => {
 /* ------------------------------------------------------------------ */
 
 export const prefixContains = (network, prefix, family, value) => {
-    if (!isFamily(family) || !isPrefix(prefix, family) || !isBig(network) || !isBig(value)) return false;
+    if (!isFamily(family) || !isPrefix(prefix, family)
+        || !inFamily(network, family) || !inFamily(value, family)) return false;
     const shift = BigInt(BITS[family] - prefix);
     return (value >> shift) === (network >> shift);
 };
