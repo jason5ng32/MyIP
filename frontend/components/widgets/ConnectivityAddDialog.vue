@@ -2,7 +2,7 @@
   <Dialog :open="open" @update:open="(v) => emit('update:open', v)">
     <!-- One fixed desktop width (Help.vue precedent); the custom-form tab
          centers its narrower content instead of resizing the dialog. -->
-    <DialogContent class="md:max-w-2xl md:min-h-165">
+    <DialogContent class="md:max-w-2xl min-h-160">
       <DialogHeader :icon="CirclePlus" :title="t('connectivity.importDialog.Title')" />
 
       <Tabs v-model="tab" class="w-full">
@@ -20,7 +20,7 @@
              (inert once fully present) or a fresh list named after the
              curated one. -->
         <TabsContent value="import" class="space-y-3">
-          <ul class="grid gap-2 md:grid-cols-2 max-h-[55vh] overflow-y-auto pr-1">
+          <ul class="grid gap-2 md:grid-cols-2 max-h-110 overflow-y-auto pr-1">
             <li v-for="list in importableLists" :key="list.id"
               class="flex items-start gap-3 p-3 rounded-lg border bg-card">
               <span class="size-6 shrink-0 inline-flex items-center justify-center text-lg leading-none">
@@ -40,8 +40,7 @@
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
-                    :title="t('connectivity.importDialog.Import')"
-                    :aria-label="t('connectivity.importDialog.Import')">
+                    :title="t('connectivity.importDialog.Import')" :aria-label="t('connectivity.importDialog.Import')">
                     <Plus class="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -116,10 +115,9 @@
              in utils/connectivity-lists.js. -->
         <TabsContent value="lists" class="space-y-3">
           <div class="flex items-center gap-2">
-            <Input id="new-conn-list" v-model="newListName"
-              :placeholder="t('connectivity.lists.NewListPlaceholder')" autocomplete="off" autocorrect="off"
-              autocapitalize="off" spellcheck="false" data-1p-ignore data-lpignore="true"
-              @keyup.enter="handleCreateList" :maxlength="CONNECTIVITY_LIST_NAME_LIMIT" />
+            <Input id="new-conn-list" v-model="newListName" :placeholder="t('connectivity.lists.NewListPlaceholder')"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore
+              data-lpignore="true" @keyup.enter="handleCreateList" :maxlength="CONNECTIVITY_LIST_NAME_LIMIT" />
             <Button variant="action" type="button" class="shrink-0 cursor-pointer" @click="handleCreateList"
               :disabled="newListName.trim().length === 0 || lists.length >= CONNECTIVITY_LIST_LIMIT">
               {{ t('connectivity.lists.Create') }}
@@ -128,17 +126,16 @@
           <ul class="rounded-lg border bg-card divide-y max-h-[48vh] overflow-y-auto">
             <li v-for="(list, index) in lists" :key="list.id" class="flex items-center gap-2 p-3">
               <template v-if="renamingId === list.id">
-                <Input v-model="renameDraft" class="h-9 flex-1" autocomplete="off" data-1p-ignore
-                  data-lpignore="true" :maxlength="CONNECTIVITY_LIST_NAME_LIMIT" @keyup.enter="confirmRename(list)"
+                <Input v-model="renameDraft" class="h-9 flex-1" autocomplete="off" data-1p-ignore data-lpignore="true"
+                  :maxlength="CONNECTIVITY_LIST_NAME_LIMIT" @keyup.enter="confirmRename(list)"
                   @keyup.esc="renamingId = null" />
                 <Button size="icon" variant="outline" class="size-8 shrink-0 cursor-pointer"
                   @click="confirmRename(list)" :title="t('connectivity.lists.Save')"
                   :aria-label="t('connectivity.lists.Save')">
                   <Check class="size-4" />
                 </Button>
-                <Button size="icon" variant="ghost" class="size-8 shrink-0 cursor-pointer"
-                  @click="renamingId = null" :title="t('connectivity.lists.Cancel')"
-                  :aria-label="t('connectivity.lists.Cancel')">
+                <Button size="icon" variant="ghost" class="size-8 shrink-0 cursor-pointer" @click="renamingId = null"
+                  :title="t('connectivity.lists.Cancel')" :aria-label="t('connectivity.lists.Cancel')">
                   <X class="size-4" />
                 </Button>
               </template>
@@ -148,8 +145,8 @@
                   <span class="text-xs text-muted-foreground">
                     {{ t('connectivity.importDialog.SiteCount', { n: list.members.length }) }}</span>
                 </span>
-                <Button size="icon" variant="ghost" class="size-8 shrink-0 cursor-pointer"
-                  :disabled="index === 0" @click="handleMove(list, -1)" :title="t('connectivity.lists.MoveUp')"
+                <Button size="icon" variant="ghost" class="size-8 shrink-0 cursor-pointer" :disabled="index === 0"
+                  @click="handleMove(list, -1)" :title="t('connectivity.lists.MoveUp')"
                   :aria-label="t('connectivity.lists.MoveUp')">
                   <ChevronUp class="size-4" />
                 </Button>
