@@ -2136,5 +2136,33 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.7.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP History can now be viewed by IP or date",
+          "zh": "IP 历史记录可以按 IP/日期视图进行展示",
+          "zh-TW": "IP 歷史記錄可以按 IP/日期視圖進行展示",
+          "fr": "L'historique des IP peut être affiché par IP ou date",
+          "ru": "История IP может быть отображена по IP или дате",
+          "pt-BR": "O histórico de IP pode ser exibido por IP ou data"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]
