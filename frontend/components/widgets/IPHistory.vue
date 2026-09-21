@@ -35,11 +35,26 @@
                     {{ t('ipHistory.Empty') }}
                 </div>
 
+                <!-- View selection keeps the country/type filters intact. -->
+                <ToggleGroup v-if="hasHistory" :model-value="viewMode" type="single" variant="outline"
+                    class="w-full" :aria-label="t('ipHistory.ViewMode')"
+                    @update:model-value="(value) => { if (value) viewMode = value; }">
+                    <ToggleGroupItem value="ip" class="flex-1 cursor-pointer">
+                        {{ t('ipHistory.ByIP') }}
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="date" class="flex-1 cursor-pointer">
+                        {{ t('ipHistory.ByDate') }}
+                    </ToggleGroupItem>
+                </ToggleGroup>
+
                 <!-- Filters — flat toggle tags: highlight any combination.
                     Within a row selections OR together, the two rows AND.
                     Nothing highlighted = no filter. Tags and counts come from
                     the full history so the layout never shifts mid-combo. -->
                 <div v-if="hasHistory && (showTypeFilter || showCountryFilter)" class="space-y-2">
+                    <p class="text-xs text-muted-foreground">
+                        {{ t(viewMode === 'ip' ? 'ipHistory.UniqueIPCounts' : 'ipHistory.DailyRecordCounts') }}
+                    </p>
                     <!-- IP type tags -->
                     <ToggleGroup v-if="showTypeFilter" v-model="versionFilter" type="multiple" variant="outline"
                         :spacing="2" class="w-full flex-wrap justify-start"
@@ -69,15 +84,15 @@
                 </div>
 
                 <!-- Empty result for the selected tag combination -->
-                <div v-if="hasHistory && displayDays.length === 0"
+                <div v-if="hasHistory && displayGroups.length === 0"
                     class="flex flex-col items-center gap-2 py-10 text-center text-sm text-muted-foreground">
                     <ListFilter class="size-8 opacity-40" />
                     {{ t('ipHistory.NoMatch') }}
                 </div>
 
-                <!-- Day groups, newest first -->
-                <section v-for="group in displayDays" :key="group.day">
-                    <h3 class="text-xs uppercase tracking-wide text-muted-foreground mb-2">
+                <!-- IP summaries sort by last seen; date groups sort newest first. -->
+                <section v-for="group in displayGroups" :key="`${viewMode}:${group.day || 'ips'}`">
+                    <h3 v-if="group.day" class="text-xs uppercase tracking-wide text-muted-foreground mb-2">
                         {{ formatDay(group.day) }}
                     </h3>
                     <ul class="rounded-lg border bg-card divide-y">
@@ -97,6 +112,32 @@
                                 <Badge v-if="entry.asn" variant="secondary" class="font-mono shrink-0">
                                     {{ entry.asn }}
                                 </Badge>
+                            </div>
+                            <!-- Single-day records need no expandable date list. -->
+                            <div v-if="viewMode === 'ip'" class="mt-3 space-y-2">
+                                <p class="text-xs font-medium">
+                                    {{ t('ipHistory.LastSeen', { date: formatDay(entry.lastSeen) }) }}
+                                </p>
+                                <p class="text-xs text-muted-foreground">
+                                    {{ t('ipHistory.FirstSeen', { date: formatDay(entry.firstSeen) }) }}
+                                </p>
+                                <Collapsible v-if="entry.dayCount > 1">
+                                    <CollapsibleTrigger>
+                                        <Button type="button" variant="ghost" size="sm"
+                                            class="group h-auto max-w-full justify-start whitespace-normal px-0 py-1 text-xs text-muted-foreground cursor-pointer">
+                                            <ChevronDown class="size-3.5 transition-transform group-data-[state=open]:rotate-180" />
+                                            {{ t('ipHistory.RecordDates') }}
+                                            <span class="sr-only">{{ entry.ip }}</span>
+                                        </Button>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <ul class="grid grid-cols-2 gap-x-3 gap-y-2 pt-2 pb-1 text-xs text-muted-foreground">
+                                            <li v-for="day in entry.dates" :key="day">
+                                                <time :datetime="day">{{ formatDay(day) }}</time>
+                                            </li>
+                                        </ul>
+                                    </CollapsibleContent>
+                                </Collapsible>
                             </div>
                         </li>
                     </ul>
@@ -119,25 +160,26 @@
 <script setup>
 // IPHistory — local record of every IP detected while using the app.
 // Data comes from store.allIPs via use-ip-history (localStorage, grouped by
-// day, 90-day retention, never synced to the account). The panel mirrors the
-// Preferences left-sheet shell.
+// day, up to 90 days, never synced to the account). IP summaries are derived
+// from the matching daily records; the date view keeps those records accessible.
 import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { useIpHistory } from '@/composables/use-ip-history.js';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
-import { filterHistoryDays, countryFacets, ipVersionCounts } from '@/utils/ip-history.js';
+import { filterHistoryDays, groupHistoryByIP, countryFacets, ipVersionCounts } from '@/utils/ip-history.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@iconify/vue';
-import { Globe, History, ListFilter, Trash2 } from '@lucide/vue';
+import { ChevronDown, Globe, History, ListFilter, Trash2 } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -156,6 +198,7 @@ const openPanel = () => {
 };
 
 const lang = computed(() => store.lang);
+const viewMode = ref('ip');
 
 // Filters — flat toggle tags, any combination. Empty selection = that
 // dimension unfiltered. Country values are country codes plus the 'unknown'
@@ -170,15 +213,23 @@ const countryFilter = ref([]); // country codes + 'unknown'
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 const tagCountClass = 'text-muted-foreground group-data-[state=on]:text-primary-foreground/70';
 
-const versionCounts = computed(() => ipVersionCounts(sortedDays.value));
+// Facets always cover the full retained history, with units matching the view.
+// Country counts can overlap: one IP may have been recorded in multiple countries.
+const facetOptions = computed(() => ({ uniqueIPs: viewMode.value === 'ip' }));
+const versionCounts = computed(() => ipVersionCounts(sortedDays.value, facetOptions.value));
 const showTypeFilter = computed(() => versionCounts.value.v4 > 0 && versionCounts.value.v6 > 0);
-const countries = computed(() => countryFacets(sortedDays.value));
+const countries = computed(() => countryFacets(sortedDays.value, facetOptions.value));
 const showCountryFilter = computed(() => countries.value.length > 1);
 
 const displayDays = computed(() => filterHistoryDays(sortedDays.value, {
     versions: versionFilter.value.map((v) => (v === 'v6' ? 6 : 4)),
     countries: countryFilter.value.map((c) => (c === 'unknown' ? '' : c)),
 }));
+const displayGroups = computed(() => {
+    if (viewMode.value === 'date') return displayDays.value;
+    const entries = groupHistoryByIP(displayDays.value);
+    return entries.length ? [{ day: null, entries }] : [];
+});
 
 // Drop selections whose records vanished entirely (retention pruning,
 // clear-all), so stale hidden tags don't keep filtering the list.

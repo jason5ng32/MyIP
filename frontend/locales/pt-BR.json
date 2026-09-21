@@ -1215,7 +1215,15 @@
     "UnknownCountry": "Desconhecido",
     "NoMatch": "Nenhum registro corresponde aos filtros selecionados.",
     "ClearAll": "Limpar histórico",
-    "ClearConfirm": "Clique novamente para confirmar"
+    "ClearConfirm": "Clique novamente para confirmar",
+    "ViewMode": "Visualização do histórico",
+    "ByIP": "Por IP",
+    "ByDate": "Por data",
+    "UniqueIPCounts": "Contagens dos filtros: IPs únicos em todos os registros mantidos.",
+    "DailyRecordCounts": "Contagens dos filtros: registros de todas as datas mantidas (um por IP por dia).",
+    "LastSeen": "Última detecção: {date}",
+    "FirstSeen": "Primeira detecção: {date}",
+    "RecordDates": "Ver datas registradas"
   },
   "ipInfos": {
     "Title": "Informações de IP",

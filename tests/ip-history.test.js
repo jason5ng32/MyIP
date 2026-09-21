@@ -1,6 +1,6 @@
 // Tests for the pure IP-history helpers behind the local (browser-only)
 // IP detection history: parsing/sanitizing the localStorage payload, per-day
-// merge with field back-fill, retention pruning, and render-order sorting.
+// merge with field back-fill, retention pruning, aggregation, facets and filtering.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -14,6 +14,7 @@ import {
     mergeIntoHistory,
     pruneHistory,
     sortedHistoryDays,
+    groupHistoryByIP,
     countryFacets,
     distinctCountryCount,
     ipVersionCounts,
@@ -184,6 +185,108 @@ describe('sortedHistoryDays', () => {
         ({ history: state } = mergeIntoHistory(state, [{ ip: '8.8.8.8' }], '2026-07-08'));
         ({ history: state } = mergeIntoHistory(state, [{ ip: '9.9.9.9' }], '2026-07-07'));
         assert.deepEqual(sortedHistoryDays(state).map((g) => g.day), ['2026-07-08', '2026-07-07', '2026-07-06']);
+    });
+});
+
+describe('groupHistoryByIP', () => {
+    it('collapses 90 days of one stable IP to one summary without modifying records', () => {
+        const days = Array.from({ length: 90 }, (_, i) => ({
+            day: localDayKey(new Date(2026, 6, 1 + i)),
+            entries: [entry('192.0.2.1')],
+        }));
+        const before = structuredClone(days);
+        const result = groupHistoryByIP(days);
+        assert.equal(result.length, 1);
+        assert.equal(result[0].dayCount, 90);
+        assert.equal(result[0].firstSeen, days[0].day);
+        assert.equal(result[0].lastSeen, days[89].day);
+        assert.deepEqual(result[0].dates, days.map(({ day }) => day).reverse());
+        assert.deepEqual(days, before);
+    });
+
+    it('counts distinct observed dates, not duplicates or unobserved days in the span', () => {
+        const days = [
+            { day: '2026-07-01', entries: [entry('192.0.2.1'), entry('192.0.2.1')] },
+            { day: '2026-07-09', entries: [entry('192.0.2.1')] },
+        ];
+        assert.deepEqual(groupHistoryByIP(days)[0], {
+            ...entry('192.0.2.1'),
+            dates: ['2026-07-09', '2026-07-01'],
+            firstSeen: '2026-07-01', lastSeen: '2026-07-09', dayCount: 2,
+        });
+    });
+
+    it('sorts by last seen descending with a stable IP tie-breaker, regardless of input order', () => {
+        const days = [
+            { day: '2026-07-01', entries: [entry('192.0.2.1')] },
+            { day: '2026-07-09', entries: [entry('2001:db8::1'), entry('192.0.2.2')] },
+        ];
+        assert.deepEqual(groupHistoryByIP(days).map(({ ip }) => ip), [
+            '192.0.2.2', '2001:db8::1', '192.0.2.1',
+        ]);
+        assert.deepEqual(groupHistoryByIP([...days].reverse()), groupHistoryByIP(days));
+    });
+
+    it('uses the latest matching snapshot without borrowing older geographic details', () => {
+        const days = [
+            { day: '2026-07-01', entries: [entry('192.0.2.1', { country: 'US', location: 'New York', asn: 'AS1' })] },
+            { day: '2026-07-09', entries: [entry('192.0.2.1', { country: 'SG', asn: 'AS2' })] },
+        ];
+        const [summary] = groupHistoryByIP(days);
+        assert.equal(summary.country, 'SG');
+        assert.equal(summary.location, '');
+        assert.equal(summary.asn, 'AS2');
+        const [historical] = groupHistoryByIP(filterHistoryDays(days, { countries: ['US'] }));
+        assert.equal(historical.country, 'US');
+        assert.equal(historical.location, 'New York');
+        assert.equal(historical.lastSeen, '2026-07-01');
+        assert.equal(historical.dayCount, 1);
+    });
+
+    it('derives first seen and counts from retained records only', () => {
+        const history = { version: 1, days: {
+            '2026-07-01': [entry('192.0.2.1')],
+            '2026-07-09': [entry('192.0.2.1')],
+        } };
+        const retained = pruneHistory(history, '2026-07-09', 1).history;
+        const [summary] = groupHistoryByIP(sortedHistoryDays(retained));
+        assert.equal(summary.firstSeen, '2026-07-09');
+        assert.equal(summary.lastSeen, '2026-07-09');
+        assert.equal(summary.dayCount, 1);
+        assert.deepEqual(groupHistoryByIP([]), []);
+    });
+});
+
+describe('unique IP facets', () => {
+    const days = [
+        { day: '2026-07-09', entries: [entry('192.0.2.1', { country: 'SG' }), entry('2001:db8::1')] },
+        { day: '2026-07-08', entries: [entry('192.0.2.1', { country: 'SG' }), entry('2001:db8::1')] },
+        { day: '2026-07-01', entries: [entry('192.0.2.1', { country: 'US' })] },
+    ];
+
+    it('counts one IP per country while retaining every historical country', () => {
+        const facets = countryFacets(days, { uniqueIPs: true });
+        assert.deepEqual(facets, [
+            { code: '', count: 1 }, { code: 'SG', count: 1 }, { code: 'US', count: 1 },
+        ]);
+        for (const facet of facets) {
+            assert.equal(groupHistoryByIP(filterHistoryDays(days, { countries: [facet.code] })).length, facet.count);
+        }
+        assert.equal(countryFacets(days).find(({ code }) => code === 'SG').count, 2);
+        assert.deepEqual(countryFacets([], { uniqueIPs: true }), []);
+    });
+
+    it('deduplicates IP versions across days, with the original daily counts still available', () => {
+        assert.deepEqual(ipVersionCounts(days, { uniqueIPs: true }), { v4: 1, v6: 1 });
+        assert.deepEqual(ipVersionCounts(days), { v4: 3, v6: 2 });
+        assert.deepEqual(ipVersionCounts([], { uniqueIPs: true }), { v4: 0, v6: 0 });
+    });
+
+    it('combines country selections without counting a shared IP twice', () => {
+        const filtered = filterHistoryDays(days, { countries: ['SG', 'US'], versions: [4] });
+        const summaries = groupHistoryByIP(filtered);
+        assert.equal(summaries.length, 1);
+        assert.equal(summaries[0].dayCount, 3);
     });
 });
 

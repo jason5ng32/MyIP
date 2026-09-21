@@ -130,15 +130,50 @@ export const sortedHistoryDays = (history) =>
         .sort(([a], [b]) => (a < b ? 1 : -1))
         .map(([day, entries]) => ({ day, entries }));
 
+// Aggregate retained (optionally filtered) records without changing storage.
+// Keep the latest matching record's metadata together: combining fields from
+// different days could invent a country/location/ASN combination never seen.
+export const groupHistoryByIP = (days) => {
+    const byIp = new Map();
+    for (const { day, entries } of [...days].sort((a, b) => b.day.localeCompare(a.day))) {
+        for (const entry of entries) {
+            if (!byIp.has(entry.ip)) {
+                byIp.set(entry.ip, { ...entry, dates: new Set() });
+            }
+            byIp.get(entry.ip).dates.add(day);
+        }
+    }
+    return [...byIp.values()]
+        .map(({ dates, ...entry }) => {
+            const recordedDays = [...dates];
+            return {
+                ...entry,
+                dates: recordedDays,
+                firstSeen: recordedDays.at(-1),
+                lastSeen: recordedDays[0],
+                dayCount: recordedDays.length,
+            };
+        })
+        .sort((a, b) => b.lastSeen.localeCompare(a.lastSeen) || a.ip.localeCompare(b.ip));
+};
+
 // Aggregate entry counts per country over a sortedHistoryDays() list, most
 // entries first (code asc as tie-breaker). Entries without a country roll up
 // under ''. Takes the day list rather than the history object so facets can
 // be computed on an already-filtered view (e.g. after the IP-type filter).
-export const countryFacets = (days) => {
+// Unique mode counts each IP once per country it was recorded in, so a
+// historical country remains discoverable even if the latest record differs.
+export const countryFacets = (days, { uniqueIPs = false } = {}) => {
     const counts = new Map();
+    const seen = new Map();
     for (const { entries } of days) {
-        for (const { country } of entries) {
+        for (const { ip, country } of entries) {
             const code = country || '';
+            if (uniqueIPs) {
+                if (!seen.has(code)) seen.set(code, new Set());
+                if (seen.get(code).has(ip)) continue;
+                seen.get(code).add(ip);
+            }
             counts.set(code, (counts.get(code) || 0) + 1);
         }
     }
@@ -159,12 +194,15 @@ export const distinctCountryCount = (history) => {
     return codes.size;
 };
 
-// Entry counts per IP version over a sortedHistoryDays() list.
-export const ipVersionCounts = (days) => {
+// Entry counts per IP version, optionally deduplicated across all days.
+export const ipVersionCounts = (days, { uniqueIPs = false } = {}) => {
     let v4 = 0;
     let v6 = 0;
+    const seen = new Set();
     for (const { entries } of days) {
         for (const { ip } of entries) {
+            if (uniqueIPs && seen.has(ip)) continue;
+            seen.add(ip);
             if (isIPv6(ip)) v6 += 1;
             else v4 += 1;
         }

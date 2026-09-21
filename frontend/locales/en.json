@@ -1215,7 +1215,15 @@
     "UnknownCountry": "Unknown",
     "NoMatch": "No records match the selected filters.",
     "ClearAll": "Clear History",
-    "ClearConfirm": "Click again to confirm"
+    "ClearConfirm": "Click again to confirm",
+    "ViewMode": "History view",
+    "ByIP": "By IP",
+    "ByDate": "By date",
+    "UniqueIPCounts": "Tag counts: unique IPs across all retained records.",
+    "DailyRecordCounts": "Tag counts: records across all retained dates (one per IP per day).",
+    "LastSeen": "Last seen: {date}",
+    "FirstSeen": "First seen: {date}",
+    "RecordDates": "View recorded dates"
   },
   "ipInfos": {
     "Title": "IP Infos",

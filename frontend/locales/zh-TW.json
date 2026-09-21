@@ -1215,7 +1215,15 @@
     "UnknownCountry": "未知",
     "NoMatch": "沒有符合篩選條件的記錄。",
     "ClearAll": "清空記錄",
-    "ClearConfirm": "再次點選確認清空"
+    "ClearConfirm": "再次點選確認清空",
+    "ViewMode": "歷史記錄檢視方式",
+    "ByIP": "依 IP",
+    "ByDate": "依日期",
+    "UniqueIPCounts": "標籤數量：所有保留記錄中的不重複 IP 數。",
+    "DailyRecordCounts": "標籤數量：所有保留日期的記錄數（同一 IP 每天計一筆）。",
+    "LastSeen": "最近：{date}",
+    "FirstSeen": "首次：{date}",
+    "RecordDates": "檢視記錄日期"
   },
   "ipInfos": {
     "Title": "IP 資訊",
