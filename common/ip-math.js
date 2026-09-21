@@ -247,7 +247,8 @@ export const cidrInfo = (str) => {
 /* ------------------------------------------------------------------ */
 
 export const prefixContains = (network, prefix, family, value) => {
-    if (!isFamily(family) || !isPrefix(prefix, family) || !isBig(network) || !isBig(value)) return false;
+    if (!isFamily(family) || !isPrefix(prefix, family)
+        || !inFamily(network, family) || !inFamily(value, family)) return false;
     const shift = BigInt(BITS[family] - prefix);
     return (value >> shift) === (network >> shift);
 };
@@ -280,7 +281,10 @@ export const compareIps = (a, b) => {
 
 // Children of `cidrStr` at `newPrefix`. `total` is exact; `subnets` stops at
 // `limit` so a /8 → /32 request never materialises 16M strings.
-export const splitCidr = (cidrStr, newPrefix, { limit = 1024 } = {}) => {
+export const splitCidr = (cidrStr, newPrefix, options = {}) => {
+    if (!options || typeof options !== 'object' || Array.isArray(options)) return null;
+    const { limit = 1024 } = options;
+    if (!Number.isSafeInteger(limit) || limit < 0) return null;
     const cidr = parseCidr(cidrStr);
     if (!cidr || !isPrefix(newPrefix, cidr.family) || newPrefix < cidr.prefix) return null;
     const { family, network } = cidr;

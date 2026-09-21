@@ -1,39 +1,44 @@
-<!-- InfoBanner — the per-section info-banner slot. Every homepage section
-     permanently wires one of these at its bottom; what (if anything) shows is
-     decided purely by data: frontend/data/banners/<section>.js (contract in
-     utils/banners.js), one banner per section. The directory is deploy-time
-     data, never in git — placing a file there IS the decision to show that
-     banner on that deployment (self-promo of a built-in tool via `to`, a
-     nudge into a side panel via `sheet`, or an external advertiser via
-     `url`); a missing file and a file
-     default-exporting null both mean the slot renders nothing. Timing is
-     data-driven: parents feed their section's completion into the `settled`
-     prop, and
-     a banner waits for it unless its data sets requireSettled: false. The
-     fade-slide appear/disappear can be turned off per banner with
-     transition: false; with `sweep: true`, the banner announces itself with a
-     border light sweep whenever it scrolls into view. -->
+<!-- Per-section banner slot. Deploy-time data in data/banners/<section>.js
+     exports null, one campaign object, or up to two campaigns. Each campaign
+     keeps its own completion gate and animation; visible pairs use two columns. -->
 <template>
-  <Transition :name="transitionName">
-    <div v-if="banner && shown" ref="root" :class="{ 'jn-banner-sweep': sweep && visible }"
-      class="jn-banner mt-3 flex flex-col md:flex-row items-start gap-3 rounded-lg border border-info/30 bg-info/5 p-4 md:p-5">
-      <div class="flex-1 min-w-0 space-y-1.5">
-        <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
-          <component :is="icon" class="size-4 text-info shrink-0" />
-          {{ text.title }}
-        </h3>
-        <p class="text-sm text-muted-foreground leading-relaxed m-0">
-          {{ text.note }}
-        </p>
+  <div :class="[shownCount > 0 ? 'grid mt-3 gap-3' : 'contents', { 'md:grid-cols-2': paired }]">
+    <Transition v-for="({ banner, text, pricing, icon, theme, shown }, index) in banners" :key="banner.id"
+      :name="banner.transition === false ? 'jn-none' : 'fade-slide'">
+      <div v-if="shown" :ref="(element) => { slots[index].element.value = element; }" :style="theme"
+        :class="{ 'jn-banner-sweep': banner.sweep === true && slots[index].visible.value, 'md:flex-row md:items-center': !paired }"
+        class="jn-banner min-w-0 flex flex-col items-start gap-3 rounded-lg border p-4 md:p-5">
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <h3 class="text-sm font-semibold m-0 flex items-center gap-2 mb-2">
+            <component :is="icon" class="jn-banner-icon size-4 shrink-0" />
+            {{ text.title }}
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed m-0">
+            {{ text.note }}
+          </p>
+        </div>
+        <!-- Keep the offer next to its action, at the bottom of paired cards. -->
+        <div class="w-full flex flex-col justify-center items-center gap-2"
+          :class="paired ? 'mt-auto md:flex-row md:justify-between md:gap-3' : 'md:w-auto md:max-w-[45%] md:flex-row md:gap-4'">
+          <p v-if="pricing" class="jn-banner-price m-0 min-w-0 max-w-full flex flex-wrap items-baseline justify-center gap-x-1 text-center break-words"
+            :class="{ 'md:flex-1 md:justify-start md:text-left': paired }">
+            <span v-if="pricing.text" class="text-sm font-medium">{{ pricing.text }}</span>
+            <template v-else>
+              <span v-if="pricing.prefix" class="text-xs">{{ pricing.prefix }}</span>
+              <span class="text-xl leading-6 font-semibold tabular-nums tracking-tight">{{ pricing.amount }}</span>
+              <span v-if="pricing.suffix" class="text-xs">{{ pricing.suffix }}</span>
+            </template>
+          </p>
+          <Button variant="action" size="sm" @click="openBanner(banner)"
+            :class="{ 'jn-banner-cta': banner.color, 'md:ml-auto': paired, 'md:max-w-[55%]': pricing }"
+            class="w-full md:w-auto h-auto min-h-11 md:min-h-9 px-4 py-2 text-sm leading-5 whitespace-normal shrink-0 cursor-pointer">
+            <span>{{ text.cta }}</span>
+            <ArrowRight class="size-4 ml-1" />
+          </Button>
+        </div>
       </div>
-      <div class="w-full md:w-auto md:self-stretch flex justify-end items-end md:items-center">
-        <Button variant="action" size="sm" @click="openBanner" class="w-full md:w-auto shrink-0 cursor-pointer">
-          <span>{{ text.cta }}</span>
-          <ArrowRight class="size-4 ml-1" />
-        </Button>
-      </div>
-    </div>
-  </Transition>
+    </Transition>
+  </div>
 </template>
 
 <script setup>
@@ -44,57 +49,48 @@ import { useMainStore } from '@/store';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Globe, Megaphone, Server, Shield, Sparkles, Zap } from '@lucide/vue';
 import { trackEvent } from '@/utils/analytics';
-import { bannerCopy, bannerLink, pickBanner } from '@/utils/banners';
+import { bannerCopy, bannerLink, bannerPricing, bannerShown, bannerTheme, pickBanners } from '@/utils/banners';
 
 const props = defineProps({
   section: { type: String, required: true },
-  settled: { type: Boolean, default: true }, // parent's "section tests have completed a full pass" signal
+  settled: { type: Boolean, default: true },
 });
 
-// Data discovery — glob is resolved at build time; the slot's file is the one
-// named after the section, and null/absent both mean "render nothing".
-const modules = import.meta.glob('../../data/banners/*.js', { eager: true });
-const banner = pickBanner(modules, props.section);
-
-// Data files carry lucide icon NAMES so they stay pure (Node-loadable by the
-// data test); the component maps them onto imported components here.
+// Campaign data stays Node-loadable by using icon names instead of imports.
 const ICONS = { Globe, Megaphone, Server, Shield, Sparkles, Zap };
-const icon = ICONS[banner?.icon] ?? Megaphone;
-const sweep = banner?.sweep === true; // opt-in per banner, default off
-// transition: false in the data swaps to a name with no CSS hooks, so the
-// Transition finds no transition/animation styles and inserts/removes the
-// element instantly — no fade-slide.
-const transitionName = banner?.transition === false ? 'jn-none' : 'fade-slide';
-
+const modules = import.meta.glob('../../data/banners/*.js', { eager: true });
 const store = useMainStore();
 const router = useRouter();
 const lang = computed(() => store.lang);
-// requireSettled defaults to true — only an explicit false shows the banner
-// before the parent reports `settled`. Deployment placement is the only other
-// gate: whoever put the data file on this deployment wanted the banner shown.
-const shown = computed(() => banner?.requireSettled === false || props.settled);
-// Locale-reactive: the inline `copy` map resolves via the store language.
-const text = computed(() => bannerCopy(banner, lang.value));
+const banners = computed(() => pickBanners(modules, props.section).map((banner) => ({
+  banner,
+  text: bannerCopy(banner, lang.value),
+  pricing: bannerPricing(bannerCopy(banner, lang.value).pricing),
+  icon: ICONS[banner.icon] ?? Megaphone,
+  theme: bannerTheme(banner),
+  shown: bannerShown(banner, props.settled),
+})));
+const shownCount = computed(() => banners.value.filter(({ shown }) => shown).length);
+const paired = computed(() => shownCount.value > 1);
+// The slot holds at most two cards. Observe each independently so entering
+// the viewport replays only that card's sweep, including after a settled gate.
+const slots = Array.from({ length: 2 }, () => {
+  const element = ref(null);
+  const visible = useElementVisibility(element, { threshold: 0.5 });
+  return { element, visible };
+});
 
-const openBanner = () => {
-  // Section in the event name (GA4 reports list event names out of the box;
-  // params would need registered custom dimensions), campaign id as label.
+const openBanner = (banner) => {
+  // Section in the event name, campaign id as label for GA4 attribution.
   trackEvent('Section', `BannerClick_${props.section}`, banner.track);
   if (banner.sheet) {
-    store.setOpenSheet(banner.sheet); // the store's exclusive side-panel slot
+    store.setOpenSheet(banner.sheet);
   } else if (banner.to) {
     router.push(banner.to);
   } else {
     window.open(bannerLink(banner, lang.value), '_blank', 'noopener');
   }
 };
-
-// `shown` can flip while the banner is still below the fold, so entering the
-// viewport — not mounting — is what triggers the sweep. Leaving and coming
-// back replays it. Nothing is observed until the element exists, so a banner
-// without `sweep` only pays for one idle observer.
-const root = ref(null);
-const visible = useElementVisibility(root, { threshold: 0.5 });
 </script>
 
 <style scoped>
@@ -108,6 +104,22 @@ const visible = useElementVisibility(root, { threshold: 0.5 });
 
 .jn-banner {
   position: relative;
+  border-color: color-mix(in oklch, var(--banner-color) 30%, transparent);
+  background: color-mix(in oklch, var(--banner-color) 5%, transparent);
+}
+
+.jn-banner-icon,
+.jn-banner-price {
+  color: var(--banner-color);
+}
+
+.jn-banner-cta {
+  background: var(--banner-color);
+  color: var(--banner-foreground);
+}
+
+.jn-banner-cta:hover {
+  background: color-mix(in oklch, var(--banner-color) 90%, transparent);
 }
 
 .jn-banner-sweep::before {
@@ -118,8 +130,8 @@ const visible = useElementVisibility(root, { threshold: 0.5 });
   border-radius: inherit;
   background: conic-gradient(from var(--jn-sweep-angle),
       transparent 0deg 250deg,
-      color-mix(in oklch, var(--info) 60%, transparent) 320deg,
-      var(--info) 352deg,
+      color-mix(in oklch, var(--banner-color) 60%, transparent) 320deg,
+      var(--banner-color) 352deg,
       transparent 360deg);
   /* Keep only the 1px ring: full box minus content box. */
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
