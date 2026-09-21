@@ -1223,7 +1223,12 @@
     "DailyRecordCounts": "Compteurs des filtres : enregistrements de toutes les dates conservées (un par IP et par jour).",
     "LastSeen": "Dernière détection : {date}",
     "FirstSeen": "Première détection : {date}",
-    "RecordDates": "Voir les dates enregistrées"
+    "RecordDates": "Toutes les dates enregistrées",
+    "MapTitle": "Pays / régions des IP",
+    "MapUnavailable": "Carte indisponible. Les filtres par pays restent disponibles.",
+    "MapSelect": "Cliquer pour filtrer ce pays / cette région",
+    "MapUnselect": "Cliquer pour retirer le filtre de ce pays / cette région",
+    "ViewMap": "Voir la carte"
   },
   "ipInfos": {
     "Title": "Infos IP",

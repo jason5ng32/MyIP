@@ -1223,7 +1223,12 @@
     "DailyRecordCounts": "Tag counts: records across all retained dates (one per IP per day).",
     "LastSeen": "Last seen: {date}",
     "FirstSeen": "First seen: {date}",
-    "RecordDates": "View recorded dates"
+    "RecordDates": "All recorded dates",
+    "MapTitle": "IP countries / regions",
+    "MapUnavailable": "Map unavailable. You can still use the country filters.",
+    "MapSelect": "Click to filter this country / region",
+    "MapUnselect": "Click to remove this country / region filter",
+    "ViewMap": "View map"
   },
   "ipInfos": {
     "Title": "IP Infos",

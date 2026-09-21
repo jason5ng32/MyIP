@@ -1223,7 +1223,12 @@
     "DailyRecordCounts": "Contagens dos filtros: registros de todas as datas mantidas (um por IP por dia).",
     "LastSeen": "Última detecção: {date}",
     "FirstSeen": "Primeira detecção: {date}",
-    "RecordDates": "Ver datas registradas"
+    "RecordDates": "Todas as datas registradas",
+    "MapTitle": "Países / regiões dos IPs",
+    "MapUnavailable": "Mapa indisponível. Os filtros por país continuam disponíveis.",
+    "MapSelect": "Clique para filtrar este país / região",
+    "MapUnselect": "Clique para remover o filtro deste país / região",
+    "ViewMap": "Ver mapa"
   },
   "ipInfos": {
     "Title": "Informações de IP",

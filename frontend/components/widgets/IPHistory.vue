@@ -22,7 +22,7 @@
             </header>
 
             <!-- Content (scrollable) -->
-            <div class="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+            <div class="flex-1 overflow-y-auto px-5 py-5 space-y-4">
                 <!-- Local-only privacy note -->
                 <p class="text-xs text-muted-foreground leading-relaxed">
                     {{ t('ipHistory.Notes') }}
@@ -46,6 +46,11 @@
                         {{ t('ipHistory.ByDate') }}
                     </ToggleGroupItem>
                 </ToggleGroup>
+
+                <!-- Keep the complete country overview visible while filtering the list. -->
+                <IPHistoryMap v-if="isOpen && enabled && mapCountries.length" :countries="mapCountries"
+                    :selected="countryFilter" :interactive="showCountryFilter"
+                    @toggle-country="toggleCountry" />
 
                 <!-- Filters — flat toggle tags: highlight any combination.
                     Within a row selections OR together, the two rows AND.
@@ -113,7 +118,7 @@
                                     {{ entry.asn }}
                                 </Badge>
                             </div>
-                            <!-- Single-day records need no expandable date list. -->
+                            <!-- First/last dates already cover records seen on at most two days. -->
                             <div v-if="viewMode === 'ip'" class="mt-3 space-y-2">
                                 <p class="text-xs font-medium">
                                     {{ t('ipHistory.LastSeen', { date: formatDay(entry.lastSeen) }) }}
@@ -121,7 +126,7 @@
                                 <p class="text-xs text-muted-foreground">
                                     {{ t('ipHistory.FirstSeen', { date: formatDay(entry.firstSeen) }) }}
                                 </p>
-                                <Collapsible v-if="entry.dayCount > 1">
+                                <Collapsible v-if="entry.dayCount > 2">
                                     <CollapsibleTrigger>
                                         <Button type="button" variant="ghost" size="sm"
                                             class="group h-auto max-w-full justify-start whitespace-normal px-0 py-1 text-xs text-muted-foreground cursor-pointer">
@@ -142,17 +147,17 @@
                         </li>
                     </ul>
                 </section>
-            </div>
 
-            <!-- Bottom bar: clear-all with two-step confirm. A <div>, not
-                <footer> — style.css sizes the footer tag globally (100pt). -->
-            <div v-if="hasHistory" class="flex items-center px-4 py-6 border-t shrink-0">
-                <Button type="button" size="sm" :variant="confirmingClear ? 'destructive' : 'outline'"
+
+            <!-- Bottom bar: clear-all with two-step confirm. -->
+            <div v-if="hasHistory" class="flex items-center">
+                <Button type="button" size="sm" :variant="confirmingClear ? 'destructive' : 'ghost'"
                     class="w-full cursor-pointer" @click="onClearClick">
                     <Trash2 class="size-4" />
                     {{ confirmingClear ? t('ipHistory.ClearConfirm') : t('ipHistory.ClearAll') }}
                 </Button>
             </div>
+          </div>
         </SheetContent>
     </Sheet>
 </template>
@@ -172,6 +177,8 @@ import { filterHistoryDays, groupHistoryByIP, countryFacets, ipVersionCounts } f
 import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import FitText from '@/components/widgets/FitText.vue';
+import IPHistoryMap from '@/components/widgets/IPHistoryMap.vue';
+import { ALPHA2_TO_NUMERIC } from '@/data/country-numeric.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
@@ -220,6 +227,12 @@ const versionCounts = computed(() => ipVersionCounts(sortedDays.value, facetOpti
 const showTypeFilter = computed(() => versionCounts.value.v4 > 0 && versionCounts.value.v6 > 0);
 const countries = computed(() => countryFacets(sortedDays.value, facetOptions.value));
 const showCountryFilter = computed(() => countries.value.length > 1);
+const mapCountries = computed(() => countries.value.filter(({ code }) => Object.hasOwn(ALPHA2_TO_NUMERIC, code)));
+const toggleCountry = (code) => {
+    countryFilter.value = countryFilter.value.includes(code)
+        ? countryFilter.value.filter((selected) => selected !== code)
+        : [...countryFilter.value, code];
+};
 
 const displayDays = computed(() => filterHistoryDays(sortedDays.value, {
     versions: versionFilter.value.map((v) => (v === 'v6' ? 6 : 4)),

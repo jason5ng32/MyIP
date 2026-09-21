@@ -16,9 +16,13 @@
 //                      below the name; return a string array for multi-line
 //   tooltipOnMissing — default true; false hides the tooltip entirely on
 //                      countries that carry no value
-// }) → Promise<Chart|null>   (null only if the lazy modules failed to load)
-import { NUMERIC_TO_ALPHA2 } from '@/data/country-numeric.js';
-import getCountryName from '@/data/country-name.js';
+//   uniformColor    — true uses the info token for every recorded country
+//   selectedCountries — ISO alpha-2 codes to outline
+//   onCountryClick  — optional callback, only called for countries with data
+//   isActive        — optional guard checked after lazy loading
+// }) → Promise<Chart|null>   (null on load failure or a stale render)
+import { NUMERIC_TO_ALPHA2 } from '../data/country-numeric.js';
+import getCountryName from '../data/country-name.js';
 
 let chartCtor = null;
 let worldFeatures = null;
@@ -90,13 +94,49 @@ export const renderWorldMapChart = async ({
     canvas, chart, values, lang, colorFrom, colorTo, formatValue,
     tooltipOnMissing = true,
     projectionScale = 1.2, projectionOffset = [-18, 16],
+    uniformColor = false, selectedCountries = [], onCountryClick,
+    isActive = () => true,
 }) => {
     if (!(await loadModules()) || !canvas) return chart ?? null;
+    if (!isActive()) return null;
 
     const data = worldFeatures.map((feature) => ({
         feature,
         value: values[NUMERIC_TO_ALPHA2[feature.id]],
     }));
+
+    // Selection changes the outline only; IPv6 churn cannot change fill weight.
+    const selected = new Set(selectedCountries);
+    const border = cssColor('--border', '#e5e7eb');
+    const foreground = cssColor('--foreground', '#171717');
+    const fill = cssColor('--info', '#0ea5e9');
+    const missing = cssColor('--muted', '#f4f4f5');
+    const dataset = {
+        data,
+        borderColor: data.map(({ feature }) => selected.has(NUMERIC_TO_ALPHA2[feature.id]) ? foreground : border),
+        borderWidth: data.map(({ feature }) => selected.has(NUMERIC_TO_ALPHA2[feature.id]) ? 2 : 0.5),
+        ...(uniformColor ? { backgroundColor: data.map(({ value }) => value === undefined ? missing : fill) } : {}),
+    };
+    const clickedCountry = (elements, instance) => {
+        const hit = elements[0];
+        const item = hit && instance.data.datasets[hit.datasetIndex]?.data[hit.index];
+        return item?.value !== undefined ? NUMERIC_TO_ALPHA2[item.feature?.id] : undefined;
+    };
+    const onClick = onCountryClick ? (_event, elements, instance) => {
+        const code = clickedCountry(elements, instance);
+        if (code) onCountryClick(code);
+    } : undefined;
+    const onHover = onCountryClick ? (_event, elements, instance) => {
+        instance.canvas.style.cursor = clickedCountry(elements, instance) ? 'pointer' : 'default';
+    } : undefined;
+    const tooltip = {
+        displayColors: false,
+        filter: tooltipOnMissing ? undefined : (item) => item.raw?.value !== undefined,
+        callbacks: {
+            title: (items) => (items[0]?.raw?.feature ? featureName(items[0].raw.feature, lang) : ''),
+            label: (ctx) => formatValue(ctx.raw.value, NUMERIC_TO_ALPHA2[ctx.raw.feature?.id]),
+        },
+    };
 
     // A kept instance may point at an unmounted canvas (panels destroy their
     // content on close) — rebuild then; update in place otherwise.
@@ -105,13 +145,18 @@ export const renderWorldMapChart = async ({
         chart = null;
     }
     if (chart) {
-        chart.data.datasets[0].data = data;
+        chart.data.datasets[0] = dataset;
+        chart.options.onClick = onClick;
+        chart.options.onHover = onHover;
+        chart.options.plugins.tooltip = tooltip;
+        chart.options.scales.color.missing = missing;
+        chart.canvas.style.cursor = 'default';
         chart.update();
         return chart;
     }
 
-    const from = hexToRgb(colorFrom);
-    const to = hexToRgb(colorTo);
+    const from = hexToRgb(colorFrom || '#0ea5e9');
+    const to = hexToRgb(colorTo || '#0ea5e9');
     const interpolate = (v) => {
         const t = Math.min(1, Math.max(0, v));
         const mix = from.map((c, i) => Math.round(c + (to[i] - c) * t));
@@ -121,36 +166,18 @@ export const renderWorldMapChart = async ({
     return new chartCtor(canvas, {
         type: 'choropleth',
         data: {
-            datasets: [{
-                data,
-                borderColor: cssColor('--border', '#e5e7eb'),
-                borderWidth: 0.5,
-            }],
+            datasets: [dataset],
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             showOutline: false,
             showGraticule: false,
+            onClick,
+            onHover,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    displayColors: false,
-                    // With every item filtered out, Chart.js suppresses the
-                    // tooltip box — no-data countries then get no hover UI.
-                    filter: tooltipOnMissing
-                        ? undefined
-                        : (item) => item.raw?.value !== undefined,
-                    callbacks: {
-                        // Line 1: localized name (from the raw feature — the
-                        // tooltip item's own .label is unreliable for the
-                        // choropleth controller); below: caller-formatted.
-                        title: (items) => (items[0]?.raw?.feature
-                            ? featureName(items[0].raw.feature, lang)
-                            : ''),
-                        label: (ctx) => formatValue(ctx.raw.value, NUMERIC_TO_ALPHA2[ctx.raw.feature?.id]),
-                    },
-                },
+                tooltip,
             },
             scales: {
                 projection: {
@@ -164,7 +191,7 @@ export const renderWorldMapChart = async ({
                     display: false,
                     min: 0,
                     interpolate,
-                    missing: cssColor('--muted', '#f4f4f5'),
+                    missing,
                 },
             },
         },

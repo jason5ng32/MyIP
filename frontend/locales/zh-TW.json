@@ -1223,7 +1223,12 @@
     "DailyRecordCounts": "標籤數量：所有保留日期的記錄數（同一 IP 每天計一筆）。",
     "LastSeen": "最近：{date}",
     "FirstSeen": "首次：{date}",
-    "RecordDates": "檢視記錄日期"
+    "RecordDates": "所有記錄日期",
+    "MapTitle": "IP 所屬國家 / 地區",
+    "MapUnavailable": "地圖暫時無法使用，仍可使用國家篩選。",
+    "MapSelect": "點擊篩選此國家 / 地區",
+    "MapUnselect": "點擊取消此國家 / 地區篩選",
+    "ViewMap": "查看地圖"
   },
   "ipInfos": {
     "Title": "IP 資訊",
