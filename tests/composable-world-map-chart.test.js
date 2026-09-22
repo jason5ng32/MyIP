@@ -49,7 +49,7 @@ test('waits for a canvas, then serializes changes and renders only the latest st
     assert.equal(current.destroyed, true);
 });
 
-test('folding during load discards the render; reopening creates a fresh chart', async () => {
+test('folding during load discards the render; a live chart survives fold until the canvas leaves', async () => {
     const f = fixture();
     f.canvas.value = {};
     await flush();
@@ -68,7 +68,12 @@ test('folding during load discards the render; reopening creates a fresh chart',
     assert.equal(f.ready.value, true);
     f.visible.value = false;
     await flush();
+    assert.equal(current.destroyed, false);
+    assert.equal(f.ready.value, true);
+    f.canvas.value = null;
+    await flush();
     assert.equal(current.destroyed, true);
+    assert.equal(f.ready.value, false);
     f.scope.stop();
 });
 

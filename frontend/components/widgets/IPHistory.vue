@@ -129,7 +129,7 @@
                                 <Collapsible v-if="entry.dayCount > 2">
                                     <CollapsibleTrigger>
                                         <Button type="button" variant="ghost" size="sm"
-                                            class="group h-auto max-w-full justify-start whitespace-normal px-0 py-1 text-xs text-muted-foreground cursor-pointer">
+                                            class="group h-auto max-w-full justify-start whitespace-normal px-0 py-1 text-xs text-muted-foreground cursor-pointer hover:bg-transparent">
                                             <ChevronDown class="size-3.5 transition-transform group-data-[state=open]:rotate-180" />
                                             {{ t('ipHistory.RecordDates') }}
                                             <span class="sr-only">{{ entry.ip }}</span>

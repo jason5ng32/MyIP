@@ -15,10 +15,10 @@
             <div class="px-2 pb-2">
                 <div class="relative w-full aspect-[2.2/1] overflow-hidden rounded-md">
                     <canvas ref="canvas" role="img" :aria-label="t('ipHistory.MapTitle')"></canvas>
-                    <div v-if="!ready && !failed" class="absolute inset-0 flex items-center justify-center bg-card">
+                    <div v-if="expanded && !ready && !failed" class="absolute inset-0 flex items-center justify-center bg-card">
                         <Spinner class="size-4 text-muted-foreground" />
                     </div>
-                    <p v-if="failed" role="status"
+                    <p v-if="expanded && failed" role="status"
                         class="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-muted-foreground bg-card">
                         {{ t('ipHistory.MapUnavailable') }}
                     </p>

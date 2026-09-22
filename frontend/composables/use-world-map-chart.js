@@ -1,4 +1,6 @@
-// Serialize lazy world-map renders and discard work after hide or scope disposal.
+// Serialize lazy world-map renders. Hide skips new work but keeps a live
+// chart on its canvas so a closing animation can finish; destroy when the
+// canvas leaves or the scope is disposed.
 import { ref, watch, onScopeDispose, toValue } from 'vue';
 import { renderWorldMapChart } from '../utils/world-map-chart.js';
 
@@ -18,11 +20,13 @@ export const useWorldMapChart = ({ canvas, visible, options, theme }, { render =
 
     watch([canvas, visible, options, () => toValue(theme)], () => {
         const current = ++generation;
-        failed.value = false;
-        if (!toValue(visible) || !toValue(canvas)) {
+        if (!toValue(canvas)) {
+            failed.value = false;
             destroy();
             return;
         }
+        if (!toValue(visible)) return;
+        failed.value = false;
         queue = queue.then(async () => {
             const isActive = () => !disposed && current === generation;
             if (!isActive()) return;
