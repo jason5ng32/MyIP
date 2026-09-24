@@ -227,7 +227,13 @@ const versionCounts = computed(() => ipVersionCounts(sortedDays.value, facetOpti
 const showTypeFilter = computed(() => versionCounts.value.v4 > 0 && versionCounts.value.v6 > 0);
 const countries = computed(() => countryFacets(sortedDays.value, facetOptions.value));
 const showCountryFilter = computed(() => countries.value.length > 1);
-const mapCountries = computed(() => countries.value.filter(({ code }) => Object.hasOwn(ALPHA2_TO_NUMERIC, code)));
+// The map reads codes only; keep the same array while the code set is
+// unchanged, so switching views (which only moves counts) skips a redraw.
+const mapCountries = computed((previous) => {
+    const next = countries.value.filter(({ code }) => Object.hasOwn(ALPHA2_TO_NUMERIC, code));
+    const key = (list) => list.map(({ code }) => code).sort().join();
+    return previous && key(previous) === key(next) ? previous : next;
+});
 const toggleCountry = (code) => {
     countryFilter.value = countryFilter.value.includes(code)
         ? countryFilter.value.filter((selected) => selected !== code)
