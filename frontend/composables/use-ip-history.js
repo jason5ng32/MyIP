@@ -2,7 +2,7 @@
 // localStorage history grouped by day, and exposes it reactively for the
 // IPHistory panel. Local-only by design: the record never syncs to the user's
 // account. Gated by user preferences: ipHistoryEnabled stops recording,
-// ipHistoryDays (1–90) sets retention. Pure logic lives in utils/ip-history.js.
+// ipHistoryDays (1–30) sets retention. Pure logic lives in utils/ip-history.js.
 import { ref, computed, watch } from 'vue';
 import { emitAppEvent } from '@/utils/app-events.js';
 import {

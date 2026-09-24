@@ -177,7 +177,7 @@
                   {{ ipHistoryDaysDraft }}
                 </span>
               </div>
-              <Slider id="ipHistoryDays" :model-value="[ipHistoryDaysDraft]" :min="1" :max="90" :step="1"
+              <Slider id="ipHistoryDays" :model-value="[ipHistoryDaysDraft]" :min="1" :max="30" :step="1"
                 :disabled="!userPreferences.ipHistoryEnabled"
                 @update:model-value="(v) => { if (v?.[0] != null) ipHistoryDaysDraft = v[0]; }"
                 @value-commit="(v) => prefIpHistoryDays(v?.[0])" />
@@ -316,7 +316,7 @@ const prefConnectivityCardTitleOpensSite = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityCardTitleOpensSite');
 };
 
-// IP history recorder: on/off + retention days (1–90). The draft ref feeds the
+// IP history recorder: on/off + retention days (1–30). The draft ref feeds the
 // slider's live readout; the preference is written on value-commit only.
 const ipHistoryDaysDraft = ref(clampRetentionDays(userPreferences.value.ipHistoryDays));
 watch(() => userPreferences.value.ipHistoryDays, (v) => {

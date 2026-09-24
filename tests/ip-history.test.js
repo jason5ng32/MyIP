@@ -31,11 +31,11 @@ describe('localDayKey', () => {
 });
 
 describe('clampRetentionDays', () => {
-    it('clamps to [1, 90] and rounds to whole days', () => {
+    it('clamps to [1, 30] and rounds to whole days', () => {
         assert.equal(clampRetentionDays(30), 30);
         assert.equal(clampRetentionDays(0), 1);
         assert.equal(clampRetentionDays(-5), 1);
-        assert.equal(clampRetentionDays(365), 90);
+        assert.equal(clampRetentionDays(365), 30);
         assert.equal(clampRetentionDays(7.6), 8);
     });
 
@@ -155,11 +155,11 @@ describe('pruneHistory', () => {
     it('keeps days inside the retention window, today included', () => {
         let state = createEmptyHistory();
         ({ history: state } = mergeIntoHistory(state, [{ ip: '1.1.1.1' }], '2026-07-08'));
-        ({ history: state } = mergeIntoHistory(state, [{ ip: '8.8.8.8' }], '2026-04-10')); // 89 days before
-        ({ history: state } = mergeIntoHistory(state, [{ ip: '9.9.9.9' }], '2026-04-09')); // 90 days before
+        ({ history: state } = mergeIntoHistory(state, [{ ip: '8.8.8.8' }], '2026-06-09')); // 29 days before
+        ({ history: state } = mergeIntoHistory(state, [{ ip: '9.9.9.9' }], '2026-06-08')); // 30 days before
         const { history, changed } = pruneHistory(state, '2026-07-08', IP_HISTORY_RETENTION_DAYS);
         assert.equal(changed, true);
-        assert.deepEqual(Object.keys(history.days).sort(), ['2026-04-10', '2026-07-08']);
+        assert.deepEqual(Object.keys(history.days).sort(), ['2026-06-09', '2026-07-08']);
     });
 
     it('reports changed=false when nothing expires', () => {

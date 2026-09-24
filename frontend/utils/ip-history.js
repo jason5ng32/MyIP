@@ -6,12 +6,12 @@
 import { isValidIP, isIPv6 } from './valid-ip.js';
 
 export const IP_HISTORY_STORAGE_KEY = 'ipHistory';
-export const IP_HISTORY_RETENTION_DAYS = 90;
+export const IP_HISTORY_RETENTION_DAYS = 30;
 export const IP_HISTORY_MIN_DAYS = 1;
 const CURRENT_VERSION = 1;
 
-// Clamp a user-configured retention value to a whole day in [1, 90];
-// anything non-numeric falls back to the 90-day default.
+// Clamp a user-configured retention value to a whole day in [1, 30];
+// anything non-numeric falls back to the 30-day default.
 export const clampRetentionDays = (value) => {
     const n = Number(value);
     if (!Number.isFinite(n)) return IP_HISTORY_RETENTION_DAYS;

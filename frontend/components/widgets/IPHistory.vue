@@ -165,7 +165,7 @@
 <script setup>
 // IPHistory — local record of every IP detected while using the app.
 // Data comes from store.allIPs via use-ip-history (localStorage, grouped by
-// day, up to 90 days, never synced to the account). IP summaries are derived
+// day, up to 30 days, never synced to the account). IP summaries are derived
 // from the matching daily records; the date view keeps those records accessible.
 import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
