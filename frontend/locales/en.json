@@ -12,8 +12,9 @@
     "ViewUsage": "View usage",
     "Usage": {
       "Title": "Usage Stats",
-      "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). IP advanced data counts unique IPs only — looking up an IP you've already queried this month never consumes quota.",
-      "IpinfoFeature": "IP Advanced Data (unique IPs)",
+      "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). Repeat IP advanced data queries are served from cache and don't use your quota.",
+      "IpinfoFeature": "IP Advanced Data",
+      "PercentUsed": "{percent}% used",
       "SponsorNote": "Sponsoring on GitHub raises your monthly quotas."
     },
     "MyAchievements": "My Achievements",
@@ -1248,7 +1249,7 @@
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
     "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
-    "advancedQuotaCta": "Monthly quota for new IPs used up",
+    "advancedQuotaCta": "Monthly quota for IP advanced data used up",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",

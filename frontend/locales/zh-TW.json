@@ -12,8 +12,9 @@
     "ViewUsage": "檢視用量",
     "Usage": {
       "Title": "用量統計",
-      "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料僅按獨立 IP 計數——本月已查詢過的 IP 再次查詢不消耗額度。",
-      "IpinfoFeature": "IP 進階資料（按獨立 IP 計）",
+      "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料的重複查詢會命中快取，不消耗額度。",
+      "IpinfoFeature": "IP 進階資料",
+      "PercentUsed": "已用 {percent}%",
       "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。"
     },
     "MyAchievements": "我的成就",
@@ -1248,7 +1249,7 @@
     "qualityScore": "IP 品質評分",
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
-    "advancedQuotaCta": "本月新 IP 查詢額度已用完",
+    "advancedQuotaCta": "本月 IP 進階資料額度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相關資料：",

@@ -12,8 +12,9 @@
     "ViewUsage": "Ver uso",
     "Usage": {
       "Title": "Estatísticas de uso",
-      "Note": "Recursos avançados incluem uma cota mensal gratuita, redefinida automaticamente no início de cada mês (UTC). Dados avançados de IP contam apenas IPs únicos — consultar um IP que você já pesquisou neste mês nunca consome cota.",
-      "IpinfoFeature": "Dados avançados de IP (IPs únicos)",
+      "Note": "Recursos avançados incluem uma cota mensal gratuita, redefinida automaticamente no início de cada mês (UTC). Consultas repetidas de dados avançados de IP são atendidas pelo cache e não consomem cota.",
+      "IpinfoFeature": "Dados avançados de IP",
+      "PercentUsed": "{percent}% usado",
       "SponsorNote": "Patrocinar no GitHub aumenta suas cotas mensais."
     },
     "MyAchievements": "Minhas conquistas",
@@ -1248,7 +1249,7 @@
     "qualityScore": "Qualidade do IP",
     "qualityScoreUnknown": "Pontuação desconhecida",
     "advancedUnlockCta": "Para evitar abuso, faça login para ver as informações a seguir",
-    "advancedQuotaCta": "Cota mensal para novos IPs esgotada",
+    "advancedQuotaCta": "Cota mensal de dados avançados de IP esgotada",
     "ASNInfo": {
       "trafficPercentage": "Porcentagem de tráfego: ",
       "note": "Dados deste AS: ",

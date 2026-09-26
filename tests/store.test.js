@@ -321,3 +321,37 @@ describe('store — handleSignInError', () => {
     assert.equal(s.alert.alertStyle, 'text-danger');
   });
 });
+
+describe('store — quota snapshot', () => {
+  // The backend's /userinfo quota carries percentages only.
+  const snapshot = (features) => ({ quota: { isSponsor: false, features } });
+
+  it('quotaExceeded reads the exhausted flag, not the percentage', () => {
+    const s = useMainStore();
+    s.remoteUserInfo = snapshot({
+      ipinfo: { percent: 100, exhausted: true },
+      dns_leak_test: { percent: 99, exhausted: false },
+    });
+    assert.equal(s.quotaExceeded.ipinfo, true);
+    assert.equal(s.quotaExceeded.dns_leak_test, false);
+    // Absent features and a missing snapshot read as not exceeded.
+    assert.equal(s.quotaExceeded.persona_check, false);
+    s.remoteUserInfo = null;
+    assert.equal(s.quotaExceeded.ipinfo, false);
+  });
+
+  it('markQuotaExhausted pins a feature to exhausted after a 429', () => {
+    const s = useMainStore();
+    s.remoteUserInfo = snapshot({ invisibility_test: { percent: 42, exhausted: false } });
+    s.markQuotaExhausted('invisibility_test');
+    assert.deepEqual(s.remoteUserInfo.quota.features.invisibility_test, { percent: 100, exhausted: true });
+    assert.equal(s.quotaExceeded.invisibility_test, true);
+  });
+
+  it('markQuotaExhausted is a no-op without a snapshot for the feature', () => {
+    const s = useMainStore();
+    s.remoteUserInfo = snapshot({});
+    s.markQuotaExhausted('dns_leak_test');
+    assert.deepEqual(s.remoteUserInfo.quota.features, {});
+  });
+});

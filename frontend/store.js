@@ -119,10 +119,7 @@ export const useMainStore = defineStore('main', {
     // blocked and their components use this as a pre-flight gate.
     quotaExceeded: (state) => {
       const features = state.remoteUserInfo?.quota?.features || {};
-      const exceeded = (key) => {
-        const feature = features[key];
-        return Boolean(feature && feature.limit > 0 && feature.used >= feature.limit);
-      };
+      const exceeded = (key) => features[key]?.exhausted === true;
       return {
         ipinfo: exceeded('ipinfo'),
         invisibility_test: exceeded('invisibility_test'),
@@ -349,11 +346,12 @@ export const useMainStore = defineStore('main', {
       this.triggerUserBenefits = value;
     },
     // Backend replied 429 quota_exceeded for a feature: pin the local snapshot
-    // to its limit so the quotaExceeded getter flips without a refetch.
+    // to exhausted so the quotaExceeded getter flips without a refetch.
     markQuotaExhausted(feature) {
       const quotaFeature = this.remoteUserInfo?.quota?.features?.[feature];
-      if (quotaFeature && typeof quotaFeature.limit === 'number') {
-        quotaFeature.used = Math.max(quotaFeature.used ?? 0, quotaFeature.limit);
+      if (quotaFeature) {
+        quotaFeature.percent = 100;
+        quotaFeature.exhausted = true;
       }
     },
     // trigger remote fetch user info
