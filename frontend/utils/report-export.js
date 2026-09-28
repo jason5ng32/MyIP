@@ -72,7 +72,7 @@ const MTR_HOP_STATS = ['lossPct', 'sntCount', 'drop', 'rcv', 'lastMs', 'avgMs', 
 
 // ipinfo's IPCheck.ing enrichment columns only render when some card
 // carries them (other sources / signed-out runs never do).
-const IPINFO_EXTRA_COLS = ['isProxy', 'ipType', 'nativeIP', 'qualityScore', 'proxyProtocol', 'proxyProvider'];
+const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider'];
 
 const SECTION_RENDERERS = {
     ipinfo: (section) => {

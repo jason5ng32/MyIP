@@ -145,7 +145,8 @@ const loadReport = async () => {
         // The API serves { expiresAt, report }; expiresAt is best-effort.
         const payload = await response.json();
         const data = payload?.report;
-        // Older viewers can't know how to render a newer schema.
+        // A viewer renders only its own schema version; older and newer
+        // links both land in the unsupported state.
         if (data?.v !== REPORT_VERSION || !data.sections) {
             errorKey.value = 'reportPage.Unsupported';
             state.value = 'error';

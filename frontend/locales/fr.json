@@ -1184,7 +1184,7 @@
     "NotFound": "Rapport introuvable ou expiré",
     "NotFoundNote": "Les rapports partagés sont automatiquement supprimés à expiration.",
     "LoadFailed": "Échec du chargement du rapport, veuillez réessayer plus tard.",
-    "Unsupported": "Ce rapport a été créé avec une version plus récente et ne peut pas être affiché.",
+    "Unsupported": "Ce rapport a été créé avec une autre version du site et ne peut pas être affiché.",
     "GeneratedBy": "Rapport de diagnostic généré sur {origin} le {time}",
     "Stale": "Ce rapport date de plus de 3 jours — le réseau peut avoir changé depuis.",
     "TestMine": "Tester mon propre réseau",
@@ -1245,7 +1245,18 @@
     "IPv4Error": "Échec de récupération ou pas d'adresse IPv4",
     "IPv6Error": "Échec de récupération ou pas d'adresse IPv6",
     "type": "Type",
-    "isProxy": "Proxy",
+    "anonymity": {
+      "label": "Anonymisation",
+      "tor": "Nœud de sortie Tor",
+      "relay": "Relais privé iCloud",
+      "residential": "Proxy résidentiel",
+      "suspectedResidential": "Proxy résidentiel suspecté",
+      "proxy": "Proxy",
+      "proxySuspected": "Proxy probable",
+      "vpn": "VPN",
+      "vpnSuspected": "VPN probable",
+      "none": "Non détecté"
+    },
     "qualityScore": "Qualité IP",
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
@@ -1301,10 +1312,6 @@
       "zoomReset": "Réinitialiser le zoom"
     },
     "advancedData": {
-      "proxyYes": "Signalé comme proxy / VPN",
-      "proxyMaybe": "Probablement proxy / VPN",
-      "proxyNo": "Non signalé",
-      "proxyUnknown": "Type inconnu",
       "type": {
         "Residential": "Résidentiel",
         "Wireless": "Sans fil",
@@ -1316,6 +1323,71 @@
       "NativeIPYes": "Aligné",
       "NativeIPNo": "Décalé",
       "nativenessTooltip": "Indique si le pays d'enregistrement de l'ASN correspond au pays de géolocalisation de l'IP"
+    },
+    "scoreDetails": {
+      "toggle": "Détails du score",
+      "explainTitle": "Comment le score est obtenu",
+      "explain": {
+        "unknownOperator": "un opérateur non identifié",
+        "summary": {
+          "lowRisk": "L'adresse IP {ip} est exploitée par {operator} et obtient un score de qualité de {score}/100, ce que nous considérons comme un risque faible.",
+          "mediumRisk": "L'adresse IP {ip} est exploitée par {operator} et obtient un score de qualité de {score}/100, ce que nous considérons comme un risque modéré.",
+          "highRisk": "L'adresse IP {ip} est exploitée par {operator} et obtient un score de qualité de {score}/100, ce que nous considérons comme un risque élevé."
+        },
+        "network": {
+          "datacenter": "Elle appartient à un réseau d'hébergement / centre de données plutôt qu'à une connexion résidentielle ou mobile classique.",
+          "mobile": "Elle se trouve sur un réseau mobile, où une même adresse est souvent partagée par de nombreux utilisateurs.",
+          "isp": "Elle se trouve sur un réseau d'accès de FAI (haut débit résidentiel ou professionnel), et non chez un hébergeur."
+        },
+        "anonymity": {
+          "none": "Aucune utilisation de VPN, de proxy, de Tor ou de relais privé n'a été détectée.",
+          "tor": "Elle fait partie du réseau d'anonymisation Tor.",
+          "relay": "C'est une sortie du Relais privé iCloud, partagée par de nombreux utilisateurs Apple.",
+          "proxySingle": "Une seule source l'identifie comme un proxy.",
+          "proxyMulti": "Plusieurs sources indépendantes l'identifient comme un proxy.",
+          "residentialProxy": "Elle a été identifiée comme sortie de proxy résidentiel.",
+          "residentialProxySuspected": "Cette IP a été observée le {date} comme sortie suspectée d'un proxy résidentiel (domestique).",
+          "residentialProxySuspectedUndated": "Cette IP a été observée comme sortie suspectée d'un proxy résidentiel (domestique).",
+          "vpnSingle": "Une seule source l'identifie comme un VPN ou un service d'anonymisation.",
+          "vpnMulti": "Plusieurs sources indépendantes l'identifient comme un VPN ou un service d'anonymisation."
+        },
+        "anonymityLastSeen": "Dernière observation le {date}.",
+        "reputation": {
+          "none": "Aucun signalement d'abus ni aucune inscription significative sur liste de blocage n'a été trouvé.",
+          "low": "Il existe quelques indices d'abus (signalements ou listes de blocage).",
+          "lowDated": "Il existe quelques indices d'abus ; le dernier signalement date du {date}.",
+          "medium": "Il existe des indices d'abus notables (signalements ou listes de blocage).",
+          "mediumDated": "Il existe des indices d'abus notables ; le dernier signalement date du {date}.",
+          "high": "Il existe de forts indices d'abus (signalements ou listes de blocage).",
+          "highDated": "Il existe de forts indices d'abus ; le dernier signalement date du {date}."
+        },
+        "asn": {
+          "none": "Son réseau (ASN) ne présente pas plus d'activité abusive ou VPN que la moyenne d'Internet.",
+          "low": "Son réseau (ASN) présente un peu plus d'activité abusive ou VPN que la moyenne.",
+          "medium": "Son réseau (ASN) présente une activité abusive ou VPN nettement élevée.",
+          "high": "Son réseau (ASN) présente une activité abusive ou VPN très élevée."
+        }
+      },
+      "tagsTitle": "Tous les attributs",
+      "tagState": {
+        "yes": "Oui",
+        "no": "Non",
+        "suspected": "Suspecté"
+      },
+      "tags": {
+        "isDatacenter": "Centre de données",
+        "isResidential": "Ligne résidentielle",
+        "isMobile": "Réseau mobile",
+        "isSatellite": "Satellite",
+        "isProxy": "Proxy",
+        "isVPN": "VPN",
+        "isResidentialProxy": "Proxy résidentiel",
+        "isRelay": "Relais privé iCloud",
+        "isTor": "Tor",
+        "isAbuser": "Historique d'abus",
+        "isCrawler": "Robot d'indexation",
+        "isNative": "Correspondance ASN-Geo"
+      }
     },
     "countryTraffic": {
       "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",

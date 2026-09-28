@@ -7,7 +7,7 @@
 // holds nothing worth reporting.
 
 import { isValidIP } from './valid-ip.js';
-import { CONNECTIVITY_STATUS } from './report-schema.js';
+import { CONNECTIVITY_STATUS, ANONYMITY_CODES } from './report-schema.js';
 
 // --- small shared normalizers ----------------------------------------------
 
@@ -40,13 +40,14 @@ const compact = (obj) => {
 // --- per-section builders ---------------------------------------------------
 
 // ipinfo:finished — { cards: [{ source, ip, country_code, region, city,
-// timezone, asn, isp, proxyCode?, ipTypeCode?, isNativeIP?, qualityScore?,
-// proxyProtocol?, proxyProvider? }] }. Cards whose ip never resolved (placeholder text in the
-// slot) are dropped. The optional enrichments only exist on the IPCheck.ing
-// source and stay absent when gated ('sign_in_required' / 'quota_exceeded'
-// upstream values never turn into codes — see transform-ip-data.js). 'unknown' codes
-// are noise in a report ("Unknown type" says nothing) — dropped like absent.
-const PROXY_CODES = new Set(['yes', 'maybe', 'no']);
+// timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
+// anonymityProtocol?, anonymityProvider? }] }. Cards whose ip never resolved
+// (placeholder text in the slot) are dropped. The optional enrichments only
+// exist on the IPCheck.ing source and stay absent when gated
+// ('sign_in_required' / 'quota_exceeded' upstream values never turn into
+// codes — see transform-ip-data.js). An 'unknown' line type is noise in a
+// report ("Unknown type" says nothing) — dropped like absent.
+const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
 const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
 const buildIpinfo = (payload) => {
     const cards = (payload?.cards ?? [])
@@ -63,14 +64,12 @@ const buildIpinfo = (payload) => {
             timezone: card.timezone ? clip(card.timezone, 64) : undefined,
             asn: clip(card.asn, 16),
             isp: clip(card.isp, 128),
-            isProxy: PROXY_CODES.has(card.proxyCode) ? card.proxyCode : undefined,
+            anonymity: ANONYMITY_CODE_SET.has(card.anonymityCode) ? card.anonymityCode : undefined,
             ipType: IP_TYPE_CODES.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
             nativeIP: typeof card.isNativeIP === 'boolean' ? card.isNativeIP : undefined,
             qualityScore: finiteNum(Number(card.qualityScore), 0, 100),
-            proxyProtocol: card.proxyProtocol && card.proxyProtocol !== 'unknown'
-                ? clip(card.proxyProtocol, 32) : undefined,
-            proxyProvider: card.proxyProvider && card.proxyProvider !== 'unknown'
-                ? clip(card.proxyProvider, 64) : undefined,
+            anonymityProtocol: clip(card.anonymityProtocol || undefined, 32),
+            anonymityProvider: clip(card.anonymityProvider || undefined, 64),
         }));
     return cards.length ? { cards } : null;
 };

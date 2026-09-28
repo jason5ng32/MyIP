@@ -1184,7 +1184,7 @@
     "NotFound": "報告不存在或已過期",
     "NotFoundNote": "分享報告到期後會自動刪除。",
     "LoadFailed": "報告載入失敗，請稍後重試。",
-    "Unsupported": "此報告由更新版本產生，無法顯示。",
+    "Unsupported": "此報告由其他版本的網站產生，無法顯示。",
     "GeneratedBy": "由 {origin} 於 {time} 產生的診斷報告",
     "Stale": "此報告已超過 3 天，網路狀況可能已發生變化。",
     "TestMine": "測一測我自己的網路",
@@ -1245,7 +1245,18 @@
     "IPv4Error": "取得失敗或不存在 IPv4 位址",
     "IPv6Error": "取得失敗或不存在 IPv6 位址",
     "type": "型別",
-    "isProxy": "代理",
+    "anonymity": {
+      "label": "匿名網路",
+      "tor": "Tor 出口",
+      "relay": "iCloud 私密轉送",
+      "residential": "住宅代理",
+      "suspectedResidential": "疑似住宅代理",
+      "proxy": "代理",
+      "proxySuspected": "疑似代理",
+      "vpn": "VPN",
+      "vpnSuspected": "疑似 VPN",
+      "none": "未偵測到"
+    },
     "qualityScore": "IP 品質評分",
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
@@ -1301,10 +1312,6 @@
       "zoomReset": "重置縮放"
     },
     "advancedData": {
-      "proxyYes": "已識別為代理 / VPN",
-      "proxyMaybe": "疑似代理 / VPN",
-      "proxyNo": "未識別為代理",
-      "proxyUnknown": "未知型別",
       "type": {
         "Residential": "住宅線路",
         "Wireless": "無線網路",
@@ -1316,6 +1323,71 @@
       "NativeIPYes": "一致",
       "NativeIPNo": "不一致",
       "nativenessTooltip": "判斷 ASN 的註冊國家是否與 IP 的歸屬國家一致"
+    },
+    "scoreDetails": {
+      "toggle": "評分詳情",
+      "explainTitle": "評分依據",
+      "explain": {
+        "unknownOperator": "未知營運方",
+        "summary": {
+          "lowRisk": "IP 位址 {ip} 由 {operator} 營運，品質評分為 {score}/100，我們認為風險較低。",
+          "mediumRisk": "IP 位址 {ip} 由 {operator} 營運，品質評分為 {score}/100，我們認為存在一定風險。",
+          "highRisk": "IP 位址 {ip} 由 {operator} 營運，品質評分為 {score}/100，我們認為風險較高。"
+        },
+        "network": {
+          "datacenter": "它屬於託管 / 資料中心網路，而不是一般的家用或行動網路連線。",
+          "mobile": "它位於行動網路，這類網路中一個 IP 往往由許多使用者共用。",
+          "isp": "它位於電信業者的接取網路（家用或企業寬頻），而不是託管服務商。"
+        },
+        "anonymity": {
+          "none": "未偵測到它被用於 VPN、代理、Tor 或隱私轉送。",
+          "tor": "它屬於 Tor 匿名網路。",
+          "relay": "它是 iCloud 私密轉送的出口，由大量 Apple 使用者共用。",
+          "proxySingle": "單一來源將它識別為代理。",
+          "proxyMulti": "多個獨立來源將它識別為代理。",
+          "residentialProxy": "它被識別為住宅代理的出口。",
+          "residentialProxySuspected": "該 IP 曾在 {date} 被觀察到疑似作為住宅代理（家庭代理）的出口。",
+          "residentialProxySuspectedUndated": "該 IP 曾被觀察到疑似作為住宅代理（家庭代理）的出口。",
+          "vpnSingle": "單一來源將它識別為 VPN 或匿名服務。",
+          "vpnMulti": "多個獨立來源將它識別為 VPN 或匿名服務。"
+        },
+        "anonymityLastSeen": "最近一次觀測到是在 {date}。",
+        "reputation": {
+          "none": "未發現明顯的濫用檢舉或黑名單紀錄。",
+          "low": "它有少量濫用證據（檢舉或黑名單紀錄）。",
+          "lowDated": "它有少量濫用證據，最近一次濫用檢舉在 {date}。",
+          "medium": "它有較明顯的濫用證據（檢舉或黑名單紀錄）。",
+          "mediumDated": "它有較明顯的濫用證據，最近一次濫用檢舉在 {date}。",
+          "high": "它有嚴重的濫用證據（檢舉或黑名單紀錄）。",
+          "highDated": "它有嚴重的濫用證據，最近一次濫用檢舉在 {date}。"
+        },
+        "asn": {
+          "none": "它所在網路（ASN）的濫用與 VPN 活動不高於網際網路的一般水準。",
+          "low": "它所在網路（ASN）的濫用或 VPN 活動略高於一般水準。",
+          "medium": "它所在網路（ASN）的濫用或 VPN 活動明顯高於一般水準。",
+          "high": "它所在網路（ASN）的濫用或 VPN 活動遠高於一般水準。"
+        }
+      },
+      "tagsTitle": "全部屬性",
+      "tagState": {
+        "yes": "是",
+        "no": "否",
+        "suspected": "疑似"
+      },
+      "tags": {
+        "isDatacenter": "資料中心",
+        "isResidential": "住宅線路",
+        "isMobile": "行動網路",
+        "isSatellite": "衛星網路",
+        "isProxy": "代理",
+        "isVPN": "VPN",
+        "isResidentialProxy": "住宅代理",
+        "isRelay": "iCloud 私密轉送",
+        "isTor": "Tor",
+        "isAbuser": "濫用紀錄",
+        "isCrawler": "爬蟲",
+        "isNative": "ASN 與地理位置一致性"
+      }
     },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",

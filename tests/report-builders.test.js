@@ -186,35 +186,56 @@ describe('cleaning rules', () => {
         const section = build({
             cards: [{
                 source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'US',
-                proxyCode: 'no', ipTypeCode: 'residential', isNativeIP: true,
-                qualityScore: '85', proxyProtocol: 'unknown', proxyProvider: '',
+                anonymityCode: 'vpn', ipTypeCode: 'residential', isNativeIP: true,
+                qualityScore: '85', anonymityProtocol: 'OpenVPN', anonymityProvider: 'ACME VPN',
             }, {
                 // Signed-out run: locale-free codes stay undefined and raw
                 // 'sign_in_required' strings must never survive the builder.
                 source: 'IPCheck.ing IPv6', ip: '2001:db8::1', country_code: 'US',
-                proxyCode: undefined, ipTypeCode: undefined,
+                anonymityCode: undefined, ipTypeCode: undefined,
                 isNativeIP: 'sign_in_required', qualityScore: 'sign_in_required',
+                anonymityProvider: null, anonymityProtocol: null,
             }, {
-                // 'unknown' values carry no signal — dropped like absent.
+                // An unknown line type carries no signal; no service named.
                 source: 'IPCheck.ing IPv6/4', ip: '9.9.9.9', country_code: 'US',
-                proxyCode: 'unknown', ipTypeCode: 'unknown',
-                proxyProvider: 'unknown', proxyProtocol: 'unknown',
+                anonymityCode: 'none', ipTypeCode: 'unknown',
+                anonymityProvider: null, anonymityProtocol: '',
             }],
         });
-        const [enriched, gated, unknowns] = section.cards;
-        assert.equal('isProxy' in unknowns, false);
-        assert.equal('ipType' in unknowns, false);
-        assert.equal('proxyProvider' in unknowns, false);
-        assert.equal('proxyProtocol' in unknowns, false);
-        assert.equal(enriched.isProxy, 'no');
+        const [enriched, gated, plain] = section.cards;
+        assert.equal(enriched.anonymity, 'vpn');
+        assert.equal(enriched.anonymityProvider, 'ACME VPN');
+        assert.equal(enriched.anonymityProtocol, 'OpenVPN');
         assert.equal(enriched.ipType, 'residential');
         assert.equal(enriched.nativeIP, true);
         assert.equal(enriched.qualityScore, 85);
-        // 'unknown' protocol and empty provider stay out of the report.
-        assert.equal('proxyProtocol' in enriched, false);
-        assert.equal('proxyProvider' in enriched, false);
-        for (const key of ['isProxy', 'ipType', 'nativeIP', 'qualityScore']) {
+        assert.equal(plain.anonymity, 'none');
+        assert.equal('ipType' in plain, false);
+        assert.equal('anonymityProvider' in plain, false);
+        assert.equal('anonymityProtocol' in plain, false);
+        for (const key of ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProvider', 'anonymityProtocol']) {
             assert.equal(key in gated, false, `${key} should be absent on the gated card`);
+        }
+        // The old field names are gone from the report.
+        for (const card of section.cards) {
+            for (const key of ['isProxy', 'proxyProvider', 'proxyProtocol']) assert.equal(key in card, false, key);
+        }
+    });
+
+    it('ipinfo keeps every anonymity code and nothing else', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        const codes = [
+            'tor', 'relay', 'residential', 'suspected_residential',
+            'proxy', 'proxy_suspected', 'vpn', 'vpn_suspected', 'none',
+        ];
+        // One card per build: a section holds at most 8 cards.
+        const kept = codes.map((anonymityCode) => build({
+            cards: [{ source: 'IPCheck.ing', ip: '1.2.3.4', country_code: 'US', anonymityCode }],
+        }).cards[0].anonymity);
+        assert.deepEqual(kept, codes);
+        for (const legacy of ['yes', 'maybe', 'no', 'unknown']) {
+            const card = build({ cards: [{ source: 'IPCheck.ing', ip: '1.2.3.4', country_code: 'US', anonymityCode: legacy }] }).cards[0];
+            assert.equal('anonymity' in card, false, legacy);
         }
     });
 
