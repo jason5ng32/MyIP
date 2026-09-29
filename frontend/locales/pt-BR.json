@@ -1337,6 +1337,7 @@
         "network": {
           "datacenter": "Ele pertence a uma rede de hospedagem / data center, e não a uma conexão residencial ou móvel comum.",
           "mobile": "Ele está em uma rede móvel, onde um mesmo endereço costuma ser compartilhado por muitos usuários.",
+          "satellite": "Ele está em uma rede de internet via satélite, e não em uma banda larga residencial ou empresarial comum.",
           "isp": "Ele está em uma rede de acesso de provedor (banda larga residencial ou empresarial), e não em um provedor de hospedagem."
         },
         "anonymity": {

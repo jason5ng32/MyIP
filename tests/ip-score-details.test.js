@@ -138,6 +138,9 @@ describe('buildScoreExplanation()', () => {
         assert.ok(keysOf(dc).includes('network.datacenter'));
         const mobile = buildScoreExplanation(card({ scoreTags: { ...v3Tags, isMobile: true } }), { t });
         assert.ok(keysOf(mobile).includes('network.mobile'));
+        const satellite = buildScoreExplanation(card({ scoreTags: { ...v3Tags, isSatellite: true, isMobile: true } }), { t });
+        assert.ok(keysOf(satellite).includes('network.satellite'));
+        assert.ok(!keysOf(satellite).includes('network.isp'));
     });
 
     it('picks anonymity variants by class and source agreement', () => {
@@ -146,6 +149,8 @@ describe('buildScoreExplanation()', () => {
         }), { t }));
         assert.ok(withAnon({ class: null, sources: null, lastSeen: '2026-09-01' }).includes('anonymity.none'));
         assert.ok(!withAnon({ class: null, sources: null, lastSeen: '2026-09-01' }).includes('anonymityLastSeen'));
+        // An unknown future class renders nothing, so no orphaned date either.
+        assert.ok(!withAnon({ class: 'future_class', sources: 'multi', lastSeen: '2026-09-01' }).some((k) => k.startsWith('anonymity')));
         assert.ok(withAnon({ class: 'tor', sources: 'multi', lastSeen: null }).includes('anonymity.tor'));
         assert.ok(withAnon({ class: 'relay', sources: 'single', lastSeen: null }).includes('anonymity.relay'));
         assert.ok(withAnon({ class: 'proxy', sources: 'multi', lastSeen: null }).includes('anonymity.proxyMulti'));

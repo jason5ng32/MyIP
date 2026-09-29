@@ -1337,6 +1337,7 @@
         "network": {
           "datacenter": "It belongs to a hosting / data center network rather than a standard home or mobile connection.",
           "mobile": "It is on a mobile network, where one address is often shared by many users.",
+          "satellite": "It is on a satellite internet network, not ordinary home or business broadband.",
           "isp": "It is on an ISP access network (home or business broadband), not a hosting provider."
         },
         "anonymity": {

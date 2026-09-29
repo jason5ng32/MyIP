@@ -1337,6 +1337,7 @@
         "network": {
           "datacenter": "Elle appartient à un réseau d'hébergement / centre de données plutôt qu'à une connexion résidentielle ou mobile classique.",
           "mobile": "Elle se trouve sur un réseau mobile, où une même adresse est souvent partagée par de nombreux utilisateurs.",
+          "satellite": "Elle se trouve sur un réseau d'accès Internet par satellite, et non sur un haut débit résidentiel ou professionnel classique.",
           "isp": "Elle se trouve sur un réseau d'accès de FAI (haut débit résidentiel ou professionnel), et non chez un hébergeur."
         },
         "anonymity": {

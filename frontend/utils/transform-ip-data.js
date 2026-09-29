@@ -108,7 +108,7 @@ function extractAdvancedData(advancedData = {}, t) {
 // it). Tor and iCloud Private Relay first, then the public anonymity class,
 // flagged only when several independent sources agree ('multi'). A
 // residential proxy only our sighting history reports stays suspected.
-function determineAnonymityCode(advancedData) {
+const determineAnonymityCode = (advancedData) => {
     const tags = advancedData.tags;
     if (gatedSentinel(tags)) return undefined;
     const anonymity = advancedData.dimensions?.anonymity;
@@ -121,7 +121,7 @@ function determineAnonymityCode(advancedData) {
     if (cls === 'vpn') return multi ? 'vpn' : 'vpn_suspected';
     if (tags.isResidentialProxy) return 'suspected_residential';
     return 'none';
-}
+};
 
 // Locale-free code for determineType.
 function determineTypeCode(advancedData) {
