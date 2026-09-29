@@ -47,7 +47,7 @@ import { useElementVisibility } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Globe, Megaphone, Server, Shield, Sparkles, Zap } from '@lucide/vue';
+import { ArrowRight, Globe, Megaphone, Server, Shield, Sparkles, Zap, ShieldCheck } from '@lucide/vue';
 import { trackEvent } from '@/utils/analytics';
 import { bannerCopy, bannerLink, bannerPricing, bannerShown, bannerTheme, pickBanners } from '@/utils/banners';
 
@@ -57,7 +57,7 @@ const props = defineProps({
 });
 
 // Campaign data stays Node-loadable by using icon names instead of imports.
-const ICONS = { Globe, Megaphone, Server, Shield, Sparkles, Zap };
+const ICONS = { Globe, Megaphone, Server, Shield, Sparkles, Zap, ShieldCheck };
 const modules = import.meta.glob('../../data/banners/*.js', { eager: true });
 const store = useMainStore();
 const router = useRouter();
