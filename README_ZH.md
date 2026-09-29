@@ -177,7 +177,7 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 作为一个开源项目，我非常感谢以下赞助者对我的支持：
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服务，覆盖 9000万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 RAPID10 享 9 折优惠" /></a>
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服务，覆盖 9000万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 RAPID10 享 9 折优惠" alt="RapidProxy" /></a>
 
 <a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 

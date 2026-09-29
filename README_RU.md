@@ -177,7 +177,7 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 Как автор проекта с открытым исходным кодом, я очень благодарен следующим спонсорам за поддержку:
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — Глобальный сервис прокси-сервисов для домашнего использования, предоставляющий доступ к 90+ миллионам частных IP-адресов. Поддерживает интеллектуальную ротацию, стабильные сессии и точную геолокацию для тестирования прокси, автоматизации браузера и сбора данных. Начало с $0.55/GB, используйте RAPID10 для 10% скидки." /></a>
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — Глобальный сервис прокси-сервисов для домашнего использования, предоставляющий доступ к 90+ миллионам частных IP-адресов. Поддерживает интеллектуальную ротацию, стабильные сессии и точную геолокацию для тестирования прокси, автоматизации браузера и сбора данных. Начало с $0.55/GB, используйте RAPID10 для 10% скидки." alt="RapidProxy" /></a>
 
 <a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
