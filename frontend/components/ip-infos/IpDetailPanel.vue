@@ -127,66 +127,118 @@
             </dl>
         </template>
 
-        <!-- Signed-in: same vertical "label on top, value below" rhythm as the metadata grid. -->
-        <dl v-else class="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-3 text-sm items-start">
-            <div v-if="showTypeBadge">
-                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                    <SignalHigh class="size-3.5" />
-                    <span>{{ t('ipInfos.type') }}</span>
-                </dt>
-                <dd class="font-normal wrap-break-word">{{ data.type }}</dd>
-            </div>
+        <!-- Signed-in: same vertical "label on top, value below" rhythm as the metadata grid,
+             plus the collapsible score-details panel under it (one child for space-y). -->
+        <div v-else>
+            <dl class="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-3 text-sm items-start">
+                <div v-if="showTypeBadge">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <SignalHigh class="size-3.5" />
+                        <span>{{ t('ipInfos.type') }}</span>
+                    </dt>
+                    <dd class="font-normal wrap-break-word">{{ data.type }}</dd>
+                </div>
 
-            <div v-if="showProxyBadge">
-                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                    <ShieldCheck class="size-3.5" />
-                    <span>{{ t('ipInfos.isProxy') }}</span>
-                </dt>
-                <dd class="font-normal wrap-break-word">
-                    {{ data.isProxy }}
-                </dd>
-                <dd class="font-normal wrap-break-word">
-                    <span v-if="data.proxyProvider && data.proxyProvider !== 'unknown'"
-                        class="text-muted-foreground font-normal text-xs">{{ data.proxyProvider }} {{ data.proxyProtocol
-                        &&
-                        data.proxyProtocol !== 'unknown'
-                        ?
-                        '· ' + data.proxyProtocol : '' }}</span>
-                </dd>
-            </div>
+                <div v-if="showAnonymityBadge">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <ShieldCheck class="size-3.5" />
+                        <span>{{ t('ipInfos.anonymity.label') }}</span>
+                    </dt>
+                    <dd class="font-normal wrap-break-word">
+                        {{ data.anonymity }}
+                    </dd>
+                    <!-- Anonymizing service, when the API named one. -->
+                    <dd v-if="anonymityService" class="font-normal wrap-break-word">
+                        <span class="text-muted-foreground font-normal text-xs">{{ anonymityService }}</span>
+                    </dd>
+                </div>
 
-            <div v-if="showNativeBadge">
-                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                    <House class="size-3.5" />
-                    <span>{{ t('ipInfos.advancedData.Nativeness') }}</span>
-                    <JnTooltip :text="t('ipInfos.advancedData.nativenessTooltip')" side="top" class="hidden md:block">
-                        <CircleQuestionMark class="size-3 cursor-help opacity-70" />
-                    </JnTooltip>
-                </dt>
-                <dd class="font-normal flex items-center gap-1 wrap-break-word">
-                    <component :is="data.isNativeIP === true ? Equal : EqualNot" class="size-3.5 shrink-0" />
-                    <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
-                        t('ipInfos.advancedData.NativeIPNo') }}</span>
-                </dd>
-            </div>
+                <div v-if="showNativeBadge">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <House class="size-3.5" />
+                        <span>{{ t('ipInfos.advancedData.Nativeness') }}</span>
+                        <JnTooltip :text="t('ipInfos.advancedData.nativenessTooltip')" side="top" class="hidden md:block">
+                            <CircleQuestionMark class="size-3 cursor-help opacity-70" />
+                        </JnTooltip>
+                    </dt>
+                    <dd class="font-normal flex items-center gap-1 wrap-break-word">
+                        <component :is="data.isNativeIP === true ? Equal : EqualNot" class="size-3.5 shrink-0" />
+                        <span>{{ data.isNativeIP === true ? t('ipInfos.advancedData.NativeIPYes') :
+                            t('ipInfos.advancedData.NativeIPNo') }}</span>
+                    </dd>
+                </div>
 
-            <div v-if="showQualityScore">
-                <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
-                    <Gauge class="size-3.5" />
-                    <span>{{ t('ipInfos.qualityScore') }}</span>
-                </dt>
-                <dd>
-                    <span v-if="data.qualityScore === 'unknown'" class="font-normal text-muted-foreground">
-                        {{ t('ipInfos.qualityScoreUnknown') }}
-                    </span>
-                    <div v-else class="flex items-center gap-2">
-                        <Progress :model-value="Number(data.qualityScore) || 0" class="h-2 flex-1 min-w-12"
-                            :indicator-class="qualityTone === 'ok-fast' ? 'bg-success' : qualityTone === 'ok-slow' ? 'bg-warning' : 'bg-destructive'" />
-                        <span class="text-sm font-normal tabular-nums shrink-0">{{ data.qualityScore }}/100</span>
+                <div v-if="showQualityScore">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Gauge class="size-3.5" />
+                        <span>{{ t('ipInfos.qualityScore') }}</span>
+                    </dt>
+                    <dd class="flex items-center gap-2">
+                        <span v-if="data.qualityScore === 'unknown'" class="font-normal text-muted-foreground">
+                            {{ t('ipInfos.qualityScoreUnknown') }}
+                        </span>
+                        <template v-else>
+                            <Progress :model-value="Number(data.qualityScore) || 0" class="h-2 flex-1 min-w-12"
+                                :indicator-class="qualityTone === 'ok-fast' ? 'bg-success' : qualityTone === 'ok-slow' ? 'bg-warning' : 'bg-destructive'" />
+                            <span class="text-sm font-normal tabular-nums shrink-0">{{ data.qualityScore }}/100</span>
+                        </template>
+                        <!-- Score-details toggle -->
+                        <JnTooltip v-if="hasScoreDetails" :text="t('ipInfos.scoreDetails.toggle')" side="top">
+                            <Button variant="ghost" size="icon"
+                                :class="['size-6 -my-1 shrink-0 cursor-pointer', isScoreDetailsOpen && 'bg-muted text-foreground hover:bg-muted']"
+                                @click="toggleScoreDetails" :aria-expanded="isScoreDetailsOpen"
+                                :aria-label="t('ipInfos.scoreDetails.toggle')">
+                                <ChevronDown class="size-3.5 transition-transform duration-200"
+                                    :class="isScoreDetailsOpen && 'rotate-180'" />
+                            </Button>
+                        </JnTooltip>
+                    </dd>
+                </div>
+            </dl>
+
+            <!-- Score details: plain-language explanation (needs the `dimensions`
+                 block), then every attribute tag. Gated responses have neither. -->
+            <Collapsible v-if="hasScoreDetails" :open="isScoreDetailsOpen" @update:open="isScoreDetailsOpen = $event">
+                <CollapsibleContent>
+                    <div class="pt-3">
+                        <div class="rounded-md border bg-muted/40 p-3 space-y-3">
+                            <div v-if="scoreExplanation.length">
+                                <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.explainTitle') }}</p>
+                                <!-- One i18n template per sentence; slots keep the IP under the info-mask blur. -->
+                                <p class="text-xs leading-relaxed text-muted-foreground">
+                                    <template v-for="(sentence, i) in scoreExplanation" :key="sentence.key">
+                                        <I18nT :keypath="sentence.key" tag="span" scope="global">
+                                            <template #ip><span data-mask="ip" class="font-medium text-foreground">{{ sentence.params.ip }}</span></template>
+                                            <template #operator><span class="text-foreground">{{ sentence.params.operator }}</span></template>
+                                            <template #score><span class="font-medium text-foreground tabular-nums">{{ sentence.params.score }}</span></template>
+                                            <template #date>{{ sentence.params.date }}</template>
+                                        </I18nT>{{ i === scoreExplanation.length - 1 ? '' : sentenceGap }}
+                                    </template>
+                                </p>
+                            </div>
+
+                            <!-- All attributes: label + check / cross / question mark. -->
+                            <div v-if="scoreTagRows.length" :class="scoreExplanation.length && 'border-t pt-3'">
+                                <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.tagsTitle') }}</p>
+                                <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                                    <div v-for="tag in scoreTagRows" :key="tag.key"
+                                        class="flex items-center justify-between gap-2 min-w-0">
+                                        <dt class="text-muted-foreground min-w-0 wrap-break-word">
+                                            {{ t('ipInfos.scoreDetails.tags.' + tag.key) }}
+                                        </dt>
+                                        <!-- One neutral tone for every state: a tag is a fact, not a verdict. -->
+                                        <dd class="shrink-0 text-foreground">
+                                            <component :is="TAG_STATE_ICONS[tag.state]" class="size-3.5" aria-hidden="true" />
+                                            <span class="sr-only">{{ t('ipInfos.scoreDetails.tagState.' + tag.state) }}</span>
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
                     </div>
-                </dd>
-            </div>
-        </dl>
+                </CollapsibleContent>
+            </Collapsible>
+        </div>
     </div>
 
     <!-- ASN block -->
@@ -256,13 +308,14 @@
 // Used by IPCard (homepage card grid) and QueryIP (manual IP lookup dialog).
 // Hero IP is NOT part of this panel — consumers render their own hero row since affordances
 // (copy button, etc.) differ.
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
-import { useI18n } from 'vue-i18n';
+import { useI18n, I18nT } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
-import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
+import { getZoneUtcOffset, getZoneLocalTime, formatIsoDate } from '@/utils/time-utils.js';
+import { buildScoreExplanation, listScoreTags } from '@/utils/ip-score-details.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import CountryTraffic from './CountryTraffic.vue';
@@ -281,6 +334,8 @@ import { Icon } from '@iconify/vue';
 import {
     Activity,
     Building2,
+    Check,
+    ChevronDown,
     CornerUpRight,
     Equal,
     EqualNot,
@@ -295,6 +350,7 @@ import {
     MapPin,
     ShieldCheck,
     SignalHigh,
+    X,
     CircleQuestionMark,
     Clock,
     FolderClock,
@@ -367,13 +423,13 @@ const isGatedValue = (value) => value === 'sign_in_required' || value === 'quota
 // of rendering four individual gated rows. The two sentinels pick different copy.
 const allAdvancedLocked = computed(() =>
     props.data.type === 'sign_in_required' &&
-    props.data.isProxy === 'sign_in_required' &&
+    props.data.anonymity === 'sign_in_required' &&
     props.data.isNativeIP === 'sign_in_required' &&
     props.data.qualityScore === 'sign_in_required'
 );
 const allAdvancedQuotaExceeded = computed(() =>
     props.data.type === 'quota_exceeded' &&
-    props.data.isProxy === 'quota_exceeded' &&
+    props.data.anonymity === 'quota_exceeded' &&
     props.data.isNativeIP === 'quota_exceeded' &&
     props.data.qualityScore === 'quota_exceeded'
 );
@@ -382,9 +438,12 @@ const showTypeBadge = computed(() =>
     props.data.type && !isGatedValue(props.data.type)
     && props.data.type !== t('ipInfos.advancedData.type.unknownType')
 );
-const showProxyBadge = computed(() =>
-    props.data.isProxy && !isGatedValue(props.data.isProxy)
-    && props.data.isProxy !== t('ipInfos.advancedData.proxyUnknown')
+const showAnonymityBadge = computed(() =>
+    Boolean(props.data.anonymity) && !isGatedValue(props.data.anonymity)
+);
+// "Provider · protocol"; both are null unless the API named a service.
+const anonymityService = computed(() =>
+    [props.data.anonymityProvider, props.data.anonymityProtocol].filter(Boolean).join(' · ')
 );
 const showNativeBadge = computed(() =>
     props.data.isNativeIP !== undefined && !isGatedValue(props.data.isNativeIP)
@@ -396,7 +455,7 @@ const showQualityScore = computed(() =>
 // Locked field preview: the 4 advanced fields shown as "label + ***" for signed-out users.
 const lockedFieldList = computed(() => [
     { key: 'type', icon: SignalHigh, label: t('ipInfos.type') },
-    { key: 'proxy', icon: ShieldCheck, label: t('ipInfos.isProxy') },
+    { key: 'anonymity', icon: ShieldCheck, label: t('ipInfos.anonymity.label') },
     { key: 'native', icon: House, label: t('ipInfos.advancedData.Nativeness') },
     { key: 'quality', icon: Gauge, label: t('ipInfos.qualityScore') },
 ]);
@@ -409,6 +468,30 @@ const qualityTone = computed(() => {
     if (n >= 50) return 'ok-slow';
     return 'fail';
 });
+
+// Score-details panel (IPCheck.ing source): explanation sentences (need
+// `dimensions`) and attribute rows. Both are empty for gated data, and the
+// toggle only shows when either has content.
+const scoreExplanation = computed(() => buildScoreExplanation(props.data, {
+    t,
+    formatDate: (day) => formatIsoDate(day, locale.value),
+}));
+const scoreTagRows = computed(() => listScoreTags(props.data.scoreTags));
+// Row state → icon; the question mark marks a suspected residential proxy.
+const TAG_STATE_ICONS = { yes: Check, no: X, suspected: CircleQuestionMark };
+const hasScoreDetails = computed(() =>
+    showAdvancedBlock.value && (scoreExplanation.value.length > 0 || scoreTagRows.value.length > 0)
+);
+// CJK sentences run together; others take a space.
+const sentenceGap = computed(() => (/^(zh|ja|ko)/.test(locale.value) ? '' : ' '));
+
+const isScoreDetailsOpen = ref(false);
+const toggleScoreDetails = () => {
+    if (!isScoreDetailsOpen.value) trackEvent('IPCheck', 'ScoreDetailsClick', 'Show Score Details');
+    isScoreDetailsOpen.value = !isScoreDetailsOpen.value;
+};
+// A different IP starts collapsed.
+watch(() => props.data.ip, () => { isScoreDetailsOpen.value = false; });
 
 // Consumer opt-in + a Cloudflare key on the deployment + a country to query.
 const canShowCountryTraffic = computed(() =>

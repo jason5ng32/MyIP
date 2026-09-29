@@ -8,7 +8,10 @@
 
 import { isValidIP, isIPv6, isValidDomain } from './valid-ip.js';
 
-export const REPORT_VERSION = 1;
+// Bumped on breaking section changes; a viewer only renders its own version
+// (older links show the unsupported state — reports live at most 7 days).
+// 2: ipinfo cards' isProxy / proxy* fields became anonymity / anonymity*.
+export const REPORT_VERSION = 2;
 
 // TTL choices offered at creation time (days) — shared by the share dialog
 // and the backend. The first entry (1 day) is the default AND the value the
@@ -20,6 +23,14 @@ export const REPORT_TTL_DAYS = [1, 3, 7];
 // lands under ~100KB compact JSON; 256KB is ~3× that worst case while still
 // bounding what one KV key can cost. KV's own value limit (25MB) is far away.
 export const REPORT_MAX_BYTES = 256 * 1024;
+
+// Anonymity verdict codes for ipinfo cards — made by
+// utils/transform-ip-data.js, shared by the builder whitelist and the schema
+// enum below.
+export const ANONYMITY_CODES = [
+    'tor', 'relay', 'residential', 'suspected_residential',
+    'proxy', 'proxy_suspected', 'vpn', 'vpn_suspected', 'none',
+];
 
 // Connectivity status codes — single source shared by the recording component
 // (ConnectivityTest.vue), the builder whitelist (utils/report-builders.js)
@@ -142,13 +153,13 @@ const SECTION_SPECS = {
             isp: opt(str(128)),
             // IPCheck.ing-source enrichments — absent on other sources, when
             // the upstream sign-in-gates them, or when the value is 'unknown'
-            // (an unknown verdict carries no diagnostic signal).
-            isProxy: opt(oneOf('yes', 'maybe', 'no')),
+            // (an unknown line type carries no diagnostic signal).
+            anonymity: opt(oneOf(...ANONYMITY_CODES)),
             ipType: opt(oneOf('business', 'residential', 'wireless', 'hosting')),
             nativeIP: opt(bool()),
             qualityScore: opt(num(0, 100)),
-            proxyProtocol: opt(str(32)),
-            proxyProvider: opt(str(64)),
+            anonymityProtocol: opt(str(32)),
+            anonymityProvider: opt(str(64)),
         })),
     }),
     connectivity: obj({

@@ -333,4 +333,16 @@ describe('formatIsoDate', () => {
     assert.equal(formatIsoDate('', 'en'), '');
     assert.equal(formatIsoDate(undefined, 'en'), '');
   });
+
+  it('keeps locales apart across repeated (cached) calls', () => {
+    for (let i = 0; i < 3; i += 1) {
+      assert.equal(formatIsoDate('2020-11-06', 'en'), 'Nov 6, 2020');
+      assert.equal(formatIsoDate('2020-11-06', 'zh'), '2020年11月6日');
+    }
+  });
+
+  it('falls back to the raw string for a malformed locale', () => {
+    assert.equal(formatIsoDate('2020-11-06', 'not a locale!'), '2020-11-06');
+    assert.equal(formatIsoDate('2020-11-06', 'not a locale!'), '2020-11-06');
+  });
 });

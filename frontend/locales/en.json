@@ -12,8 +12,9 @@
     "ViewUsage": "View usage",
     "Usage": {
       "Title": "Usage Stats",
-      "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). IP advanced data counts unique IPs only — looking up an IP you've already queried this month never consumes quota.",
-      "IpinfoFeature": "IP Advanced Data (unique IPs)",
+      "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). Repeat IP advanced data queries are served from cache and don't use your quota.",
+      "IpinfoFeature": "IP Advanced Data",
+      "PercentUsed": "{percent}% used",
       "SponsorNote": "Sponsoring on GitHub raises your monthly quotas."
     },
     "MyAchievements": "My Achievements",
@@ -1183,7 +1184,7 @@
     "NotFound": "Report not found or expired",
     "NotFoundNote": "Shared reports auto-delete when they expire.",
     "LoadFailed": "Failed to load the report, please retry later.",
-    "Unsupported": "This report was created with a newer version and cannot be displayed.",
+    "Unsupported": "This report was created with a different version of the site and cannot be displayed.",
     "GeneratedBy": "Diagnostic report generated at {origin} on {time}",
     "Stale": "This report is more than 3 days old — the network may have changed since.",
     "TestMine": "Test my own network",
@@ -1215,7 +1216,20 @@
     "UnknownCountry": "Unknown",
     "NoMatch": "No records match the selected filters.",
     "ClearAll": "Clear History",
-    "ClearConfirm": "Click again to confirm"
+    "ClearConfirm": "Click again to confirm",
+    "ViewMode": "History view",
+    "ByIP": "By IP",
+    "ByDate": "By date",
+    "UniqueIPCounts": "Tag counts: unique IPs across all retained records.",
+    "DailyRecordCounts": "Tag counts: records across all retained dates (one per IP per day).",
+    "LastSeen": "Last seen: {date}",
+    "FirstSeen": "First seen: {date}",
+    "RecordDates": "All recorded dates",
+    "MapTitle": "IP countries / regions",
+    "MapUnavailable": "Map unavailable. You can still use the country filters.",
+    "MapSelect": "Click to filter this country / region",
+    "MapUnselect": "Click to remove this country / region filter",
+    "ViewMap": "View map"
   },
   "ipInfos": {
     "Title": "IP Infos",
@@ -1231,11 +1245,22 @@
     "IPv4Error": "Fetch Failed or No IPv4 Address",
     "IPv6Error": "Fetch Failed or No IPv6 Address",
     "type": "Type",
-    "isProxy": "Proxy",
+    "anonymity": {
+      "label": "Anonymizer",
+      "tor": "Tor exit",
+      "relay": "iCloud Private Relay",
+      "residential": "Residential proxy",
+      "suspectedResidential": "Suspected residential proxy",
+      "proxy": "Proxy",
+      "proxySuspected": "Possible proxy",
+      "vpn": "VPN",
+      "vpnSuspected": "Possible VPN",
+      "none": "Not detected"
+    },
     "qualityScore": "IP Quality",
     "qualityScoreUnknown": "Score Unknown",
     "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
-    "advancedQuotaCta": "Monthly quota for new IPs used up",
+    "advancedQuotaCta": "Monthly quota for IP advanced data used up",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
@@ -1287,10 +1312,6 @@
       "zoomReset": "Reset zoom"
     },
     "advancedData": {
-      "proxyYes": "Flagged as proxy / VPN",
-      "proxyMaybe": "Possible proxy / VPN",
-      "proxyNo": "Not flagged",
-      "proxyUnknown": "Unknown type",
       "type": {
         "Residential": "Residential",
         "Wireless": "Wireless",
@@ -1302,6 +1323,71 @@
       "NativeIPYes": "Aligned",
       "NativeIPNo": "Mismatched",
       "nativenessTooltip": "Whether the ASN's registered country matches the IP's geolocation country"
+    },
+    "scoreDetails": {
+      "toggle": "Score details",
+      "explainTitle": "How the score was reached",
+      "explain": {
+        "unknownOperator": "an unidentified operator",
+        "summary": {
+          "lowRisk": "IP address {ip} is operated by {operator} and has a quality score of {score}/100, which we consider low risk.",
+          "mediumRisk": "IP address {ip} is operated by {operator} and has a quality score of {score}/100, which we consider moderate risk.",
+          "highRisk": "IP address {ip} is operated by {operator} and has a quality score of {score}/100, which we consider high risk."
+        },
+        "network": {
+          "datacenter": "It belongs to a hosting / data center network rather than a standard home or mobile connection.",
+          "mobile": "It is on a mobile network, where one address is often shared by many users.",
+          "isp": "It is on an ISP access network (home or business broadband), not a hosting provider."
+        },
+        "anonymity": {
+          "none": "No VPN, proxy, Tor or private relay use has been detected on it.",
+          "tor": "It is part of the Tor anonymity network.",
+          "relay": "It is an iCloud Private Relay exit, shared by many Apple users.",
+          "proxySingle": "A single source identifies it as a proxy.",
+          "proxyMulti": "Multiple independent sources identify it as a proxy.",
+          "residentialProxy": "It has been identified as a residential proxy exit.",
+          "residentialProxySuspected": "This IP was observed on {date} as a suspected residential (home) proxy exit.",
+          "residentialProxySuspectedUndated": "This IP has been observed as a suspected residential (home) proxy exit.",
+          "vpnSingle": "A single source identifies it as a VPN or anonymizing service.",
+          "vpnMulti": "Multiple independent sources identify it as a VPN or anonymizing service."
+        },
+        "anonymityLastSeen": "This was last observed on {date}.",
+        "reputation": {
+          "none": "No significant abuse reports or blocklist entries were found for it.",
+          "low": "There is minor abuse evidence against it (reports or blocklist entries).",
+          "lowDated": "There is minor abuse evidence against it; the latest abuse report is from {date}.",
+          "medium": "There is notable abuse evidence against it (reports or blocklist entries).",
+          "mediumDated": "There is notable abuse evidence against it; the latest abuse report is from {date}.",
+          "high": "There is strong abuse evidence against it (reports or blocklist entries).",
+          "highDated": "There is strong abuse evidence against it; the latest abuse report is from {date}."
+        },
+        "asn": {
+          "none": "Its network (ASN) shows no more abuse or VPN activity than is typical across the Internet.",
+          "low": "Its network (ASN) shows somewhat more abuse or VPN activity than is typical.",
+          "medium": "Its network (ASN) shows clearly elevated abuse or VPN activity.",
+          "high": "Its network (ASN) shows very high abuse or VPN activity."
+        }
+      },
+      "tagsTitle": "All attributes",
+      "tagState": {
+        "yes": "Yes",
+        "no": "No",
+        "suspected": "Suspected"
+      },
+      "tags": {
+        "isDatacenter": "Data center",
+        "isResidential": "Residential line",
+        "isMobile": "Mobile network",
+        "isSatellite": "Satellite",
+        "isProxy": "Proxy",
+        "isVPN": "VPN",
+        "isResidentialProxy": "Residential proxy",
+        "isRelay": "iCloud Private Relay",
+        "isTor": "Tor",
+        "isAbuser": "Abuse history",
+        "isCrawler": "Crawler",
+        "isNative": "ASN-Geo match"
+      }
     },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",

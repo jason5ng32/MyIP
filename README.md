@@ -174,6 +174,8 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 As an open source project, I'm very grateful to the following sponsors for their support:
 
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — Global Residential Proxy Service, covering 90+ million residential IPs, supporting smart rotation, stable sessions, and precise geolocation for proxy testing, browser automation, and data collection. Starting at $0.55/GB, use RAPID10 for 10% off." /></a>
+
 <a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
 <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>

@@ -9,7 +9,7 @@
                     <th v-if="has.timezone" scope="col" :class="TH_LEFT">{{ t('ipInfos.TimeZone') }}</th>
                     <th scope="col" :class="TH_LEFT">ASN</th>
                     <th scope="col" :class="TH_LEFT">{{ t('reportPage.Col.ISP') }}</th>
-                    <th v-if="has.isProxy" scope="col" :class="TH_LEFT">{{ t('ipInfos.isProxy') }}</th>
+                    <th v-if="has.anonymity" scope="col" :class="TH_LEFT">{{ t('ipInfos.anonymity.label') }}</th>
                     <th v-if="has.ipType" scope="col" :class="TH_LEFT">{{ t('ipInfos.type') }}</th>
                     <th v-if="has.nativeIP" scope="col" :class="TH_LEFT">{{ t('ipInfos.advancedData.Nativeness') }}</th>
                     <th v-if="has.qualityScore" scope="col" :class="TH_RIGHT">{{ t('ipInfos.qualityScore') }}</th>
@@ -27,13 +27,13 @@
                     </td>
                     <td class="px-3 py-2 font-mono tabular-nums text-muted-foreground whitespace-nowrap">{{ card.asn || '—' }}</td>
                     <td class="px-3 py-2 text-muted-foreground">{{ card.isp || '—' }}</td>
-                    <td v-if="has.isProxy" class="px-3 py-2 whitespace-nowrap">
-                        <template v-if="card.isProxy">
-                            <span :class="card.isProxy === 'no' ? 'text-success' : 'text-warning'">
-                                {{ t(PROXY_KEYS[card.isProxy]) }}
+                    <td v-if="has.anonymity" class="px-3 py-2 whitespace-nowrap">
+                        <template v-if="card.anonymity">
+                            <span :class="card.anonymity === 'none' ? 'text-success' : 'text-warning'">
+                                {{ t(ANONYMITY_I18N_KEYS[card.anonymity]) }}
                             </span>
-                            <span v-if="card.proxyProvider || card.proxyProtocol" class="ml-1 text-muted-foreground">
-                                {{ [card.proxyProvider, card.proxyProtocol].filter(Boolean).join(' · ') }}
+                            <span v-if="card.anonymityProvider || card.anonymityProtocol" class="ml-1 text-muted-foreground">
+                                {{ [card.anonymityProvider, card.anonymityProtocol].filter(Boolean).join(' · ') }}
                             </span>
                         </template>
                         <span v-else class="text-muted-foreground">—</span>
@@ -58,24 +58,19 @@
 
 <script setup>
 // Read-only renderer for the ipinfo report section: one row per IP source.
-// The IPCheck.ing-source enrichment columns (proxy verdict, line type,
+// The IPCheck.ing-source enrichment columns (anonymity verdict, line type,
 // ASN-geo match, quality score) appear only when at least one card carries
 // them — enums map back to the IP card's own labels in the viewer's locale.
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
+// Anonymity verdict code → the IP card's own label.
+import { ANONYMITY_I18N_KEYS } from '@/utils/transform-ip-data.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();
 
-// 'unknown' never reaches a report (the builder drops it) — only the
-// verdicts that carry signal are mapped.
-const PROXY_KEYS = {
-    yes: 'ipInfos.advancedData.proxyYes',
-    maybe: 'ipInfos.advancedData.proxyMaybe',
-    no: 'ipInfos.advancedData.proxyNo',
-};
 const TYPE_KEYS = {
     business: 'ipInfos.advancedData.type.Business',
     residential: 'ipInfos.advancedData.type.Residential',
@@ -85,7 +80,7 @@ const TYPE_KEYS = {
 
 const has = computed(() => ({
     timezone: props.section.cards.some((card) => card.timezone !== undefined),
-    isProxy: props.section.cards.some((card) => card.isProxy !== undefined),
+    anonymity: props.section.cards.some((card) => card.anonymity !== undefined),
     ipType: props.section.cards.some((card) => card.ipType !== undefined),
     nativeIP: props.section.cards.some((card) => card.nativeIP !== undefined),
     qualityScore: props.section.cards.some((card) => card.qualityScore !== undefined),

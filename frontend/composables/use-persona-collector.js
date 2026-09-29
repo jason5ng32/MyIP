@@ -41,7 +41,6 @@ const normalizeIpinfo = (payload) => ({
             asn: card.asn || undefined,
             isp: card.isp || undefined,
             ipType: card.ipTypeCode || undefined,
-            isProxy: card.proxyCode || undefined,
             version: isIPv6(card.ip) ? 6 : 4,
         })),
 });

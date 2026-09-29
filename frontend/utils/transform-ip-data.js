@@ -56,48 +56,71 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 const gatedSentinel = (value) =>
     value === 'sign_in_required' || value === 'quota_exceeded' ? value : null;
 
-// Parse proxy data
+const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+// Anonymity verdict code → display text key: one map for the card and the
+// report renderer (ReportIpinfo.vue), so the two can't disagree. The codes
+// themselves live in the report schema (ANONYMITY_CODES).
+export const ANONYMITY_I18N_KEYS = {
+    tor: 'ipInfos.anonymity.tor',
+    relay: 'ipInfos.anonymity.relay',
+    residential: 'ipInfos.anonymity.residential',
+    suspected_residential: 'ipInfos.anonymity.suspectedResidential',
+    proxy: 'ipInfos.anonymity.proxy',
+    proxy_suspected: 'ipInfos.anonymity.proxySuspected',
+    vpn: 'ipInfos.anonymity.vpn',
+    vpn_suspected: 'ipInfos.anonymity.vpnSuspected',
+    none: 'ipInfos.anonymity.none',
+};
+
+// Anonymizing service / protocol the API named: null when absent or gated.
+const optionalName = (value) => (typeof value === 'string' && value && !gatedSentinel(value) ? value : null);
+
+// Parse the advanced (IPCheck.ing-only) fields
 function extractAdvancedData(advancedData = {}, t) {
-    const isProxy = determineIsProxy(advancedData, t);
+    const anonymityCode = determineAnonymityCode(advancedData);
+    const anonymity = gatedSentinel(advancedData.tags) || t(ANONYMITY_I18N_KEYS[anonymityCode]);
     const type = determineType(advancedData, t);
     const qualityScore = gatedSentinel(advancedData.score) || advancedData.score;
-    const proxyProtocol = advancedData.proxyProtocol || "";
-    const proxyProvider = advancedData.proxyProvider || "";
+    const anonymityProvider = optionalName(advancedData.anonymityProvider);
+    const anonymityProtocol = optionalName(advancedData.anonymityProtocol);
     const isNativeIP = gatedSentinel(advancedData.tags) || advancedData.tags.isNative;
 
-    // Locale-free twins of isProxy / type for the diagnostic report payload
+    // Locale-free twins of anonymity / type for the diagnostic report payload
     // (the display fields above are t()-localized at capture time; the report
     // schema only stores enums and renders in the VIEWER's language).
-    const proxyCode = determineProxyCode(advancedData);
     const ipTypeCode = determineTypeCode(advancedData);
 
-    return { isProxy, type, qualityScore, proxyProtocol, proxyProvider, isNativeIP, proxyCode, ipTypeCode };
+    // Raw inputs for the score-details panel (utils/ip-score-details.js);
+    // undefined when gated.
+    const scoreTags = isPlainObject(advancedData.tags) ? advancedData.tags : undefined;
+    const scoreDimensions = isPlainObject(advancedData.dimensions) ? advancedData.dimensions : undefined;
+    const scoreVersion = Number.isFinite(advancedData.scoreVersion) ? advancedData.scoreVersion : undefined;
+
+    return {
+        anonymity, anonymityCode, anonymityProvider, anonymityProtocol,
+        type, qualityScore, isNativeIP, ipTypeCode,
+        scoreTags, scoreDimensions, scoreVersion,
+    };
 }
 
-// Determine if it is a proxy
-function determineIsProxy(advancedData, t) {
-
-    if (gatedSentinel(advancedData.tags)) {
-        return advancedData.tags;
-    } else if (advancedData.tags.isProxyOrVPN && advancedData.proxyProtocol !== 'unknown') {
-        return t('ipInfos.advancedData.proxyYes');
-    } else if (advancedData.tags.isProxyOrVPN) {
-        return t('ipInfos.advancedData.proxyMaybe');
-    } else if (!advancedData.tags.isProxyOrVPN) {
-        return t('ipInfos.advancedData.proxyNo');
-    } else {
-        return t('ipInfos.advancedData.proxyUnknown');
-    }
-}
-
-// Locale-free code for determineIsProxy — same branch order, enum output.
-// undefined when the data is gated (the report then omits the field).
-function determineProxyCode(advancedData) {
-    if (gatedSentinel(advancedData.tags)) return undefined;
-    if (advancedData.tags.isProxyOrVPN && advancedData.proxyProtocol !== 'unknown') return 'yes';
-    if (advancedData.tags.isProxyOrVPN) return 'maybe';
-    if (!advancedData.tags.isProxyOrVPN) return 'no';
-    return 'unknown';
+// Locale-free anonymity verdict; undefined when gated (the report then omits
+// it). Tor and iCloud Private Relay first, then the public anonymity class,
+// flagged only when several independent sources agree ('multi'). A
+// residential proxy only our sighting history reports stays suspected.
+function determineAnonymityCode(advancedData) {
+    const tags = advancedData.tags;
+    if (gatedSentinel(tags)) return undefined;
+    const anonymity = advancedData.dimensions?.anonymity;
+    const cls = isPlainObject(anonymity) ? anonymity.class : null;
+    const multi = isPlainObject(anonymity) && anonymity.sources === 'multi';
+    if (tags.isTor) return 'tor';
+    if (tags.isRelay) return 'relay';
+    if (tags.isAnyAnonymizer && cls === 'residential_proxy') return 'residential';
+    if (cls === 'proxy') return multi ? 'proxy' : 'proxy_suspected';
+    if (cls === 'vpn') return multi ? 'vpn' : 'vpn_suspected';
+    if (tags.isResidentialProxy) return 'suspected_residential';
+    return 'none';
 }
 
 // Locale-free code for determineType.

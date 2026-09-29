@@ -58,8 +58,9 @@
                     </section>
                 </TabsContent>
 
-                <!-- Usage tab: current-month usage vs quota per advanced feature.
-                     Refetched on dialog open so the numbers are fresh. -->
+                <!-- Usage tab: share of the monthly quota used per advanced
+                     feature — percentages only, the backend never sends raw
+                     counts. Refetched on dialog open so the numbers are fresh. -->
                 <TabsContent value="usage" class="space-y-4 pt-3">
                     <div v-if="!isSignedIn"
                         class="flex items-start gap-2 p-3 rounded-md border border-info/30 bg-info/10 text-sm text-info">
@@ -75,7 +76,7 @@
                                 <div class="flex items-baseline justify-between gap-2 text-sm">
                                     <span>{{ t(row.labelKey) }}</span>
                                     <span class="font-mono tabular-nums text-muted-foreground">
-                                        {{ row.used }} / {{ row.limit }}
+                                        {{ t('user.Usage.PercentUsed', { percent: row.percent }) }}
                                     </span>
                                 </div>
                                 <Progress :model-value="row.percent" class="h-1.5"
@@ -141,9 +142,9 @@ const isOpen = ref(false);
 const activeTab = ref('benefits');
 
 // Three user tiers shown on the Benefits tab. `count` = number of ItemN keys
-// in the locale pack; `current` badges the visitor's own tier (sponsor is
-// detected from the quota multiplier the backend reports).
-const isSponsor = computed(() => (remoteUserInfo.value?.quota?.multiplier ?? 1) > 1);
+// in the locale pack; `current` badges the visitor's own tier (sponsor status
+// comes from the backend's quota snapshot).
+const isSponsor = computed(() => remoteUserInfo.value?.quota?.isSponsor === true);
 const benefitTiers = computed(() => [
     { key: 'Visitor', icon: UserRound, count: 6, current: !isSignedIn.value },
     { key: 'SignedIn', icon: UserRoundCheck, count: 7, current: isSignedIn.value && !isSponsor.value },
@@ -174,10 +175,9 @@ const USAGE_LABEL_KEYS = {
 const usageRows = computed(() => {
     const features = remoteUserInfo.value?.quota?.features;
     if (!features) return [];
-    return Object.entries(features).map(([key, { used, limit }]) => {
-        const percent = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
-        const tone = percent >= 100 ? 'fail' : percent >= 80 ? 'ok-slow' : 'ok-fast';
-        return { key, labelKey: USAGE_LABEL_KEYS[key] || key, used, limit, percent, tone };
+    return Object.entries(features).map(([key, { percent, exhausted }]) => {
+        const tone = exhausted ? 'fail' : percent >= 80 ? 'ok-slow' : 'ok-fast';
+        return { key, labelKey: USAGE_LABEL_KEYS[key] || key, percent, tone };
     });
 });
 

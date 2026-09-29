@@ -23,9 +23,9 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   popupConnectivityNotifications: false,
   ipCardsToShow: 2,
   ipGeoSource: 0,
-  // Local IP-history recorder (see use-ip-history.js). Days: 1–90.
+  // Local IP-history recorder (see use-ip-history.js). Days: 1–30.
   ipHistoryEnabled: true,
-  ipHistoryDays: 90,
+  ipHistoryDays: 30,
   lang: 'auto', // auto | zh | en | fr | ru
   // Multi-list Connectivity model: { schemaVersion, lists }. null until
   // first load — store.loadPreferences() runs it through sanitizeLists().

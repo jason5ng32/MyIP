@@ -23,7 +23,7 @@ describe('DEFAULT_PREFERENCES', () => {
       ipCardsToShow: 2,
       ipGeoSource: 0,
       ipHistoryEnabled: true,
-      ipHistoryDays: 90,
+      ipHistoryDays: 30,
       lang: 'auto',
       connectivityLists: null,
       connectivityDefaultListId: 'mine',

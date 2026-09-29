@@ -258,12 +258,12 @@ const trackFetchStatus = (status) => {
         isp: card.isp,
         // IPCheck.ing-source enrichments (locale-free codes; absent on other
         // sources or when the field is sign-in-gated).
-        proxyCode: card.proxyCode,
+        anonymityCode: card.anonymityCode,
         ipTypeCode: card.ipTypeCode,
         isNativeIP: card.isNativeIP,
         qualityScore: card.qualityScore,
-        proxyProtocol: card.proxyProtocol,
-        proxyProvider: card.proxyProvider,
+        anonymityProtocol: card.anonymityProtocol,
+        anonymityProvider: card.anonymityProvider,
       })),
     });
   }

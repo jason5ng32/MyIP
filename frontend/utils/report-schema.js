@@ -8,6 +8,7 @@ export {
     REPORT_MAX_BYTES,
     REPORT_SECTION_IDS,
     CONNECTIVITY_STATUS,
+    ANONYMITY_CODES,
     validateReport,
     maskIpTail,
     maskReportIps,

@@ -209,17 +209,25 @@ export const isoToDateTime = (iso, locale) => {
 // "YYYY-MM-DD" string — the changelog and every date-only ISO surface
 // (OONI windows, IP-history day headers). Formatted in UTC so the calendar
 // date never shifts a day for west-of-UTC viewers; non-ISO strings (the
-// changelog's "Beta" placeholder) pass through untouched.
+// changelog's "Beta" placeholder) pass through untouched. Formatters are
+// cached per locale: long lists (IP history) call this hundreds of times.
+const isoDateFormatters = new Map();
+
 export const formatIsoDate = (isoDate, locale) => {
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate || '');
     if (!match) return isoDate || '';
 
     const [, year, month, day] = match;
+    const key = locale || '';
     try {
-        return new Intl.DateTimeFormat(locale || undefined, {
-            dateStyle: 'medium',
-            timeZone: 'UTC',
-        }).format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
+        if (!isoDateFormatters.has(key)) {
+            isoDateFormatters.set(key, new Intl.DateTimeFormat(locale || undefined, {
+                dateStyle: 'medium',
+                timeZone: 'UTC',
+            }));
+        }
+        return isoDateFormatters.get(key)
+            .format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
     } catch {
         return isoDate;
     }

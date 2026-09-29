@@ -29,7 +29,7 @@ const makeValidReport = () => ({
         ipinfo: {
             testedAt: '2026-07-14T08:00:00.000Z',
             cards: [
-                { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', isProxy: 'no', ipType: 'residential', nativeIP: true, qualityScore: 85, proxyProtocol: 'SOCKS5', proxyProvider: 'ACME' },
+                { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 85, anonymityProtocol: 'SOCKS5', anonymityProvider: 'ACME' },
                 { source: 'Cloudflare IPv6', ip: '2001:db8::1', countryCode: '', city: '' },
             ],
         },
@@ -161,6 +161,13 @@ describe('validateReport', () => {
         assert.match(result.errors[0], /report\.v/);
     });
 
+    it('is on version 2 and rejects version-1 reports', () => {
+        assert.equal(REPORT_VERSION, 2);
+        const report = makeValidReport();
+        report.v = 1;
+        assert.equal(validateReport(report).ok, false);
+    });
+
     it('rejects unknown envelope keys, unknown sections and unknown fields', () => {
         const withEnvelopeKey = { ...makeValidReport(), smuggled: 'data' };
         assert.match(validateReport(withEnvelopeKey).errors[0], /smuggled: unknown key/);
@@ -193,9 +200,23 @@ describe('validateReport', () => {
         badEnum.sections.connectivity.targets[0].status = 'flaky';
         assert.equal(validateReport(badEnum).ok, false);
 
+        for (const code of ['tor', 'relay', 'residential', 'suspected_residential', 'proxy', 'proxy_suspected', 'vpn', 'vpn_suspected', 'none']) {
+            const okProxyEnum = makeValidReport();
+            okProxyEnum.sections.ipinfo.cards[0].anonymity = code;
+            assert.equal(validateReport(okProxyEnum).ok, true, code);
+        }
+
         const badProxyEnum = makeValidReport();
-        badProxyEnum.sections.ipinfo.cards[0].isProxy = 'sign_in_required';
+        badProxyEnum.sections.ipinfo.cards[0].anonymity = 'sign_in_required';
         assert.equal(validateReport(badProxyEnum).ok, false);
+
+        // v1 field names are unknown keys now.
+        const legacyField = makeValidReport();
+        legacyField.sections.ipinfo.cards[0].isProxy = 'no';
+        assert.equal(validateReport(legacyField).ok, false);
+        const legacyCode = makeValidReport();
+        legacyCode.sections.ipinfo.cards[0].anonymity = 'no';
+        assert.equal(validateReport(legacyCode).ok, false);
 
         const badRange = makeValidReport();
         badRange.sections.invisibility.scores.proxy = 101;
