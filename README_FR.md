@@ -179,8 +179,6 @@ En tant que projet open source, je suis très reconnaissant aux sponsors suivant
 
 <a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — Service de proxy résidentiel mondial, couvrant 90+ millions d'IP résidentielles, offrant la rotation intelligente, les sessions stables et la géolocalisation précise pour le test de proxy, l'automatisation du navigateur et la collecte de données. À partir de $0.55/GB, utilisez RAPID10 pour 10% de réduction." alt="RapidProxy" /></a>
 
-<a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
-
 <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
 
 <a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" title="Greptile" width="240px"  /></a>
