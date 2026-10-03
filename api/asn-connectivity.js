@@ -11,9 +11,13 @@
 // Data is fully local (common/as-rel-db.js + common/as-org-db.js), so the
 // whole BFS is synchronous. We only hit RIPEstat for as-overview as a
 // rare fallback when as2org doesn't have an ASN's org name.
+//
+// Alongside the graph, `neighbours` lists the origin's direct providers,
+// peers and customers from the same snapshot (names from as2org only).
 
 import { resolveAsnOrgName } from '../common/ripestat.js';
-import { providersOf, peersOf, customerCountOf, isTier1 } from '../common/as-rel-db.js';
+import { providersOf, peersOf, customersOf, customerCountOf, isTier1 } from '../common/as-rel-db.js';
+import { lookupAsOrgName } from '../common/as-org-db.js';
 import logger from '../common/logger.js';
 
 // How deep to recurse from the origin. 3 covers regional networks reaching
@@ -36,8 +40,12 @@ const TIER1_ADJACENCY_TRUSTED = 8;
 // just keeps name=null); asn-history is the one that warns.
 const resolveOrgName = (asn) => resolveAsnOrgName(asn);
 
-// Default adjacency API for buildTopology; tests inject a fixture instead.
-const asRelApi = { providersOf, peersOf, isTier1, customerCountOf };
+// Per-kind cap on the neighbour name lists; counts stay uncapped.
+const NEIGHBOUR_LIST_CAP = 50;
+
+// Default adjacency API for buildTopology / buildNeighbours; tests inject a
+// fixture instead.
+const asRelApi = { providersOf, peersOf, customersOf, isTier1, customerCountOf };
 
 // Pure synchronous topology walk — no org names, no I/O. Exported for tests.
 export const buildTopology = (origin, rel = asRelApi) => {
@@ -143,12 +151,34 @@ function pruneLeafIntermediates(nodes, edges) {
     }
 }
 
+// Direct neighbours of `origin`, each kind ranked by customer count (bigger
+// networks first, ASN as tie-break) and capped. A pair listed as both
+// transit and peering counts as transit only. Exported for tests.
+export const buildNeighbours = (origin, rel = asRelApi, lookupName = lookupAsOrgName) => {
+    const providers = [...new Set(rel.providersOf(origin))];
+    const customers = [...new Set(rel.customersOf(origin))];
+    const transit = new Set([...providers, ...customers]);
+    const peers = [...new Set(rel.peersOf(origin))].filter((asn) => !transit.has(asn));
+
+    const toList = (asns) => [...asns]
+        .sort((a, b) => rel.customerCountOf(b) - rel.customerCountOf(a) || a - b)
+        .slice(0, NEIGHBOUR_LIST_CAP)
+        .map((asn) => ({ asn, name: lookupName(asn) || null }));
+
+    return {
+        counts: { providers: providers.length, peers: peers.length, customers: customers.length },
+        providers: toList(providers),
+        peers: toList(peers),
+        customers: toList(customers),
+    };
+};
+
 export default async (req, res) => {
     // ASN presence + numeric validity guaranteed by requireValidASN middleware.
     const asn = parseInt(req.query.asn, 10);
     try {
         const graph = await buildGraph(asn);
-        res.json({ origin: asn, ...graph });
+        res.json({ origin: asn, ...graph, neighbours: buildNeighbours(asn) });
     } catch (error) {
         logger.error({ err: error, asn }, 'asn-connectivity handler failed');
         res.status(500).json({ error: error.message });

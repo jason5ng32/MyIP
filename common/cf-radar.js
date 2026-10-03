@@ -9,6 +9,8 @@
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
 import { providersOf, peersOf, customerCountOf } from './as-rel-db.js';
+import { lookupCountryCode } from './maxmind-service.js';
+import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
 // -- shared Radar client ----------------------------------------------------
@@ -89,6 +91,10 @@ function cleanUpResponseData(data) {
         Human_Pct: data.botType?.result?.summary_0?.human,
         prefixesV4: data.routesStats?.result?.stats?.distinct_prefixes_ipv4,
         prefixesV6: data.routesStats?.result?.stats?.distinct_prefixes_ipv6,
+        rpkiValid: data.routesStats?.result?.stats?.routes_valid,
+        rpkiInvalid: data.routesStats?.result?.stats?.routes_invalid,
+        rpkiUnknown: data.routesStats?.result?.stats?.routes_unknown,
+        rpkiTotal: data.routesStats?.result?.stats?.routes_total,
         speedDownload: data.quality?.result?.summary_0?.bandwidthDownload,
         speedUpload: data.quality?.result?.summary_0?.bandwidthUpload,
         latency: data.quality?.result?.summary_0?.latencyIdle,
@@ -129,9 +135,11 @@ function resolveRelCounts(rows, asn) {
     return Object.values(counts).every(v => v === 0) ? {} : counts;
 }
 
-// Format output
+// Format output. RPKI route counts stay plain numbers (the frontend computes
+// shares from them); parseFloat still turns a missing value into NaN, which
+// filterData drops like the pre-formatted strings.
 function formatData(data) {
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, rpkiValid, rpkiInvalid, rpkiUnknown, rpkiTotal, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
     return {
         asnName,
         asnCountryCode,
@@ -139,6 +147,10 @@ function formatData(data) {
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
         prefixesV4: parseFloat(prefixesV4).toLocaleString(),
         prefixesV6: parseFloat(prefixesV6).toLocaleString(),
+        rpkiValid: parseFloat(rpkiValid),
+        rpkiInvalid: parseFloat(rpkiInvalid),
+        rpkiUnknown: parseFloat(rpkiUnknown),
+        rpkiTotal: parseFloat(rpkiTotal),
         upstreamCount: parseFloat(upstreamCount).toLocaleString(),
         downstreamCount: parseFloat(downstreamCount).toLocaleString(),
         peerCount: parseFloat(peerCount).toLocaleString(),
@@ -168,6 +180,13 @@ function filterData(data) {
     return data;
 }
 
+// Settled segment payloads → response body. Exported for tests.
+export const shapeAsnProfile = (data, asn) => {
+    const cleaned = cleanUpResponseData(data);
+    Object.assign(cleaned, resolveRelCounts(data.rels?.result?.rels, Number(asn)));
+    return filterData(formatData(cleaned));
+};
+
 const fetchAsnProfile = async ({ asn }) => {
     const { data, failed } = await getAllASNData(asn);
     if (failed.length === Object.keys(SEGMENTS).length) {
@@ -178,9 +197,68 @@ const fetchAsnProfile = async ({ asn }) => {
     if (failed.length > 0) {
         logger.warn({ err: failed[0].reason, asn, segments: failed.map((f) => f.name) }, 'cf-radar: partial Radar segment failure');
     }
-    const cleaned = cleanUpResponseData(data);
-    Object.assign(cleaned, resolveRelCounts(data.rels?.result?.rels, Number(asn)));
-    return filterData(formatData(cleaned));
+    return shapeAsnProfile(data, asn);
+};
+
+// -- view: bgp-prefixes — announced prefixes + IPv4 country footprint -------
+
+// Per-prefix origination list from Radar's pfx2as. One row per announced
+// prefix (v4/v6 mixed): rpki passes through Radar's validation verdict
+// (Valid / Invalid / Unknown), peers is how many route collectors carry the
+// route. Exported for tests.
+export const normalizePrefixOrigins = (result) => {
+    if (!Array.isArray(result?.prefix_origins)) return [];
+    return result.prefix_origins.map((row) => ({
+        prefix: row.prefix,
+        rpki: row.rpki_validation,
+        peers: row.peer_count ?? 0,
+    }));
+};
+
+const GEO_TOP = 50;              // countries in the response
+const GEO_PREFIX_CAP = 20000;    // bound on per-request country lookups
+
+// Share of the ASN's announced IPv4 addresses per geolocated country, largest
+// first. v4-only and address-weighted (a /16 counts 256× a /24); prefixes
+// covered by another announced prefix are skipped so a covering route plus
+// its more-specifics isn't counted twice. Shares are of the addresses that
+// resolved to a country. `lookupCountry(ip) → ISO code | null` is injected
+// so tests need no MaxMind database. Exported for tests.
+export const buildCountryShares = (prefixes, lookupCountry) => {
+    const blocks = (prefixes || [])
+        .map((row) => parseCidr(row?.prefix))
+        .filter((cidr) => cidr?.family === 4)
+        .slice(0, GEO_PREFIX_CAP)
+        .map((cidr) => ({ start: cidr.network, size: 2n ** BigInt(32 - cidr.prefix) }))
+        .sort((a, b) => (a.start === b.start ? Number(b.size - a.size) : (a.start < b.start ? -1 : 1)));
+
+    const weightByCountry = new Map();
+    let total = 0;
+    let coveredUntil = -1n;
+    for (const { start, size } of blocks) {
+        // CIDR blocks nest or are disjoint: starting inside the last kept
+        // block means being inside it.
+        if (start <= coveredUntil) continue;
+        coveredUntil = start + size - 1n;
+        const country = lookupCountry(formatIPv4(start));
+        if (!country) continue;
+        const weight = Number(size);
+        weightByCountry.set(country, (weightByCountry.get(country) || 0) + weight);
+        total += weight;
+    }
+    if (!total) return [];
+    return [...weightByCountry.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, GEO_TOP)
+        .map(([country, weight]) => ({ country, share: Math.round((weight / total) * 10000) / 10000 }))
+        .filter((row) => row.share > 0);
+};
+
+const fetchBgpPrefixes = async ({ asn }) => {
+    const json = await fetchFromCloudflare(`/radar/bgp/routes/pfx2as?origin=${asn}`);
+    // An ASN originating nothing is a valid, cacheable answer: both lists empty.
+    const prefixes = normalizePrefixOrigins(json?.result);
+    return { prefixes, countries: buildCountryShares(prefixes, lookupCountryCode) };
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------
@@ -355,5 +433,12 @@ export const RADAR_VIEWS = {
         guards: [],
         ttl: 60 * 60,
         fetch: fetchOutages,
+    },
+    // Radar's routing tables refresh continuously; a day keeps the list close
+    // to current while absorbing repeat lookups of popular ASNs.
+    'bgp-prefixes': {
+        guards: [requireValidASN()],
+        ttl: 24 * 60 * 60,
+        fetch: fetchBgpPrefixes,
     },
 };

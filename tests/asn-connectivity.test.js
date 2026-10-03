@@ -1,16 +1,18 @@
-// Unit tests for the pure topology walk in api/asn-connectivity.js. The walk
-// takes an injected adjacency API, so fixtures need no snapshot on disk.
+// Unit tests for the pure topology walk and neighbour lists in
+// api/asn-connectivity.js. Both take an injected adjacency API, so fixtures
+// need no snapshot on disk.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { buildTopology } from '../api/asn-connectivity.js';
+import { buildTopology, buildNeighbours } from '../api/asn-connectivity.js';
 
 // Build a rel API from plain objects; ASNs 101+ are the Tier 1 clique.
-const makeRel = ({ providers = {}, peers = {}, tier1s = [], customerCounts = {} }) => {
+const makeRel = ({ providers = {}, peers = {}, customers = {}, tier1s = [], customerCounts = {} }) => {
     const t1 = new Set(tier1s);
     return {
         providersOf: (asn) => providers[asn] || [],
         peersOf: (asn) => peers[asn] || [],
+        customersOf: (asn) => customers[asn] || [],
         isTier1: (asn) => t1.has(asn),
         customerCountOf: (asn) => customerCounts[asn] || 0,
     };
@@ -143,5 +145,60 @@ describe('buildTopology', () => {
         });
         const graph = buildTopology(10, rel);
         assert.deepEqual(sortedEdges(graph), ['10->101:transit']);
+    });
+});
+
+describe('buildNeighbours', () => {
+    const names = { 20: 'Upstream One', 21: 'Upstream Two', 40: 'Peer Net' };
+    const lookupName = (asn) => names[asn] || null;
+
+    it('lists providers, peers and customers with names and counts', () => {
+        const rel = makeRel({
+            providers: { 10: [20, 21] },
+            peers: { 10: [40] },
+            customers: { 10: [50] },
+        });
+        assert.deepEqual(buildNeighbours(10, rel, lookupName), {
+            counts: { providers: 2, peers: 1, customers: 1 },
+            providers: [{ asn: 20, name: 'Upstream One' }, { asn: 21, name: 'Upstream Two' }],
+            peers: [{ asn: 40, name: 'Peer Net' }],
+            customers: [{ asn: 50, name: null }],
+        });
+    });
+
+    it('ranks by customer count, ASN breaking ties', () => {
+        const rel = makeRel({
+            providers: { 10: [23, 21, 22, 24] },
+            customerCounts: { 21: 5, 22: 900, 23: 5 },
+        });
+        assert.deepEqual(buildNeighbours(10, rel, lookupName).providers.map((n) => n.asn), [22, 21, 23, 24]);
+    });
+
+    it('caps each list at 50 while counts stay complete', () => {
+        const many = Array.from({ length: 120 }, (_, i) => 1000 + i);
+        const rel = makeRel({ customers: { 10: many }, peers: { 10: many.map((asn) => asn + 1000) } });
+        const result = buildNeighbours(10, rel, lookupName);
+        assert.equal(result.counts.customers, 120);
+        assert.equal(result.customers.length, 50);
+        assert.equal(result.counts.peers, 120);
+        assert.equal(result.peers.length, 50);
+    });
+
+    it('counts a pair seen as both transit and peering as transit only', () => {
+        const rel = makeRel({
+            providers: { 10: [20] },
+            customers: { 10: [50] },
+            peers: { 10: [20, 50, 40, 40] },
+        });
+        const result = buildNeighbours(10, rel, lookupName);
+        assert.deepEqual(result.counts, { providers: 1, peers: 1, customers: 1 });
+        assert.deepEqual(result.peers, [{ asn: 40, name: 'Peer Net' }]);
+    });
+
+    it('returns empty lists for an ASN unknown to the snapshot', () => {
+        assert.deepEqual(buildNeighbours(10, makeRel({}), lookupName), {
+            counts: { providers: 0, peers: 0, customers: 0 },
+            providers: [], peers: [], customers: [],
+        });
     });
 });

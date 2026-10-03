@@ -1,6 +1,7 @@
 // Unit tests for the pure transform pipeline in common/cf-radar.js:
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
-// dedupe, sort and cap) and the country-traffic matrix aggregation.
+// dedupe, sort and cap), the country-traffic matrix aggregation, the asn
+// view's response shaping, and the bgp-prefixes list + country shares.
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
 // Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
@@ -13,6 +14,9 @@ import {
     mergeEvents,
     buildTrafficMatrix,
     countAsnRels,
+    shapeAsnProfile,
+    normalizePrefixOrigins,
+    buildCountryShares,
 } from '../common/cf-radar.js';
 
 const outageFixture = {
@@ -252,5 +256,118 @@ describe('countAsnRels', () => {
             downstreamCount: 0,
             peerCount: 0,
         });
+    });
+});
+
+describe('shapeAsnProfile — RPKI route counts', () => {
+    // Radar /rel rows keep the rel counts off the local CAIDA fallback.
+    const rels = { result: { rels: [{ asn1: 174, asn2: 13335, rel: 'provider-customer' }] } };
+
+    it('passes the routes/stats RPKI mix through as plain numbers', () => {
+        const body = shapeAsnProfile({
+            routesStats: { result: { stats: {
+                distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953,
+                routes_total: 5299, routes_valid: 5162, routes_invalid: 6, routes_unknown: 131,
+            } } },
+            rels,
+        }, '13335');
+        assert.equal(body.prefixesV4, (2346).toLocaleString());
+        assert.equal(body.rpkiValid, 5162);
+        assert.equal(body.rpkiInvalid, 6);
+        assert.equal(body.rpkiUnknown, 131);
+        assert.equal(body.rpkiTotal, 5299);
+    });
+
+    it('keeps a zero count (zero invalid routes is the common case)', () => {
+        const body = shapeAsnProfile({
+            routesStats: { result: { stats: { routes_total: 10, routes_valid: 10, routes_invalid: 0, routes_unknown: 0 } } },
+            rels,
+        }, '13335');
+        assert.equal(body.rpkiInvalid, 0);
+        assert.equal(body.rpkiUnknown, 0);
+    });
+
+    it('drops the RPKI fields when the routes/stats segment is missing', () => {
+        const body = shapeAsnProfile({ rels }, '13335');
+        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal', 'prefixesV4']) {
+            assert.equal(Object.hasOwn(body, key), false, key);
+        }
+        assert.equal(body.upstreamCount, '1');
+    });
+});
+
+describe('normalizePrefixOrigins', () => {
+    it('maps pfx2as rows to the prefix/rpki/peers shape', () => {
+        assert.deepEqual(normalizePrefixOrigins({
+            prefix_origins: [
+                { origin: 13335, peer_count: 76, prefix: '104.22.21.0/24', rpki_validation: 'Valid' },
+                { origin: 13335, peer_count: 71, prefix: '2606:4700::/32', rpki_validation: 'Unknown' },
+            ],
+        }), [
+            { prefix: '104.22.21.0/24', rpki: 'Valid', peers: 76 },
+            { prefix: '2606:4700::/32', rpki: 'Unknown', peers: 71 },
+        ]);
+    });
+
+    it('defaults a missing peer_count to 0', () => {
+        const [row] = normalizePrefixOrigins({
+            prefix_origins: [{ origin: 13335, prefix: '104.22.21.0/24', rpki_validation: 'Invalid' }],
+        });
+        assert.deepEqual(row, { prefix: '104.22.21.0/24', rpki: 'Invalid', peers: 0 });
+    });
+
+    it('returns [] for malformed or missing results', () => {
+        assert.deepEqual(normalizePrefixOrigins(undefined), []);
+        assert.deepEqual(normalizePrefixOrigins({}), []);
+        assert.deepEqual(normalizePrefixOrigins({ prefix_origins: 'nope' }), []);
+    });
+});
+
+describe('buildCountryShares', () => {
+    const table = { '8.8.8.0': 'US', '8.8.4.0': 'US', '1.0.0.0': 'AU', '81.0.0.0': 'DE' };
+    const lookup = (ip) => table[ip] || null;
+    const rows = (...prefixes) => prefixes.map((prefix) => ({ prefix }));
+
+    it('weights countries by address count, not prefix count', () => {
+        // Two US /24s vs one AU /22 → AU holds twice the addresses.
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
+            { country: 'AU', share: 0.6667 },
+            { country: 'US', share: 0.3333 },
+        ]);
+    });
+
+    it('sorts largest first and ignores IPv6 prefixes', () => {
+        assert.deepEqual(buildCountryShares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
+            { country: 'DE', share: 0.8 },
+            { country: 'US', share: 0.2 },
+        ]);
+    });
+
+    it('skips more-specifics of a covering announced prefix', () => {
+        // 1.0.0.0/23 covers 1.0.0.0/24 and 1.0.1.0/24 — counted once, so the
+        // US /24 pair still balances it.
+        const shares = buildCountryShares(
+            rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
+        assert.deepEqual(shares.map((row) => row.share), [0.5, 0.5]);
+        assert.deepEqual(shares.map((row) => row.country).sort(), ['AU', 'US']);
+    });
+
+    it('leaves unresolvable addresses out of the denominator', () => {
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
+            { country: 'US', share: 1 },
+        ]);
+    });
+
+    it('returns [] with no IPv4 prefixes, no resolvable country, or junk rows', () => {
+        assert.deepEqual(buildCountryShares([], lookup), []);
+        assert.deepEqual(buildCountryShares(undefined, lookup), []);
+        assert.deepEqual(buildCountryShares(rows('9.9.9.0/24', '2606:4700::/32'), lookup), []);
+        assert.deepEqual(buildCountryShares([{ prefix: 'nope' }, null, {}], lookup), []);
+    });
+
+    it('caps the response at 50 countries', () => {
+        const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
+        const shares = buildCountryShares(many, (ip) => `C${ip.split('.')[1]}`);
+        assert.equal(shares.length, 50);
     });
 });

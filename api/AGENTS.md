@@ -14,7 +14,7 @@ services, service-status poller), parts of which the frontend also imports
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
-`cf-radar` / `asn-history` / `asn-connectivity` /
+`cf-radar` / `asn-history` / `asn-connectivity` / `asrank` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona`), user
 proxies (`get-user-info` / `update-user-achievement`), platform
@@ -25,7 +25,10 @@ The exception to one-file-per-route is Cloudflare Radar: all Radar data
 rides the single `/api/cfradar` route, dispatched by `?view=` over the
 `RADAR_VIEWS` registry in `common/cf-radar.js`. Each view declares its
 guards, edge-cache TTL, and fetch function there — new Radar data means a
-view function plus a registry row, never a new route.
+view function plus a registry row, never a new route. Current views: `asn`
+(entity + traffic profile + RPKI route counts), `bgp-prefixes` (pfx2as list
+plus IPv4 country shares from the local MaxMind City database via
+`lookupCountryCode`), `country-traffic`, `outages`.
 
 `/api/whois` takes three query shapes on one `?q=`: IPs (RDAP, whoiser
 fallback), domains (whoiser, RDAP fallback) and ASNs (`AS<n>`, prefix
@@ -157,6 +160,9 @@ public routes opt in via the `cacheable(maxAge)` middleware in
 `maxAge` also accepts a `(req) => seconds` resolver for routes whose TTL
 depends on the request (`/api/cfradar` reads it from the view registry); a
 falsy resolution keeps the no-store default, so unknown views never cache.
+An optional `{ cacheIf: (body) => boolean }` vetoes caching a 2xx body —
+for routes that answer a degraded upstream with 200 (`/api/asrank` caches
+only records with a rank; misses stay no-store).
 Write TTLs as multiplied expressions (`24 * 60 * 60`), not raw seconds.
 The middleware only sets `public, max-age=N` on status < 400, so CF never
 caches error pages; handlers themselves never touch `Cache-Control`.

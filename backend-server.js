@@ -39,6 +39,7 @@ import createReportHandler, { getReport as getReportHandler } from './api/share-
 import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
+import asrankHandler, { isAsRankHit } from './api/asrank.js';
 import personaEvaluateHandler from './api/persona.js';
 // User
 import validateConfigs from './api/configs.js';
@@ -219,14 +220,16 @@ app.use('/api', (req, res, next) => {
 // (which bypass res.json) can apply it themselves on their own 2xx path.
 // `maxAge` is a number of seconds, or a `(req) => seconds` resolver for
 // routes whose TTL depends on the request (the /api/cfradar view registry);
-// a falsy resolution keeps the /api-wide no-store default.
-const cacheable = (maxAge) => (req, res, next) => {
+// a falsy resolution keeps the /api-wide no-store default. `cacheIf(body)`
+// optionally vetoes caching a 2xx JSON body — for routes that answer a
+// degraded upstream with 200 (e.g. /api/asrank's all-null record).
+const cacheable = (maxAge, { cacheIf } = {}) => (req, res, next) => {
     const maxAgeSeconds = typeof maxAge === 'function' ? maxAge(req) : maxAge;
     if (maxAgeSeconds) {
         res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
         const originalJson = res.json.bind(res);
         res.json = function (body) {
-            if (res.statusCode < 400) {
+            if (res.statusCode < 400 && (!cacheIf || cacheIf(body))) {
                 res.setHeader('Cache-Control', res.locals.cacheControl);
             }
             return originalJson(body);
@@ -269,9 +272,13 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // Which countries have online Globalping probes — coverage changes slowly,
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
+// ASRank rankings move slowly, so a week of edge cache is fine. Misses
+// (unknown ASN or upstream failure) answer 200 all-null and stay no-store.
+app.get('/api/asrank', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isAsRankHit }), asrankHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 30d
-// for the slow-moving ASN/traffic profiles, 1h for the outage feed.
+// for the slow-moving ASN/traffic profiles, 1d for the prefix list, 1h for
+// the outage feed.
 app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,

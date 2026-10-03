@@ -18,6 +18,7 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
+import asrankHandler, { isAsRankHit } from '../api/asrank.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
@@ -325,6 +326,45 @@ describe('get-whois handler', () => {
     });
 });
 
+// -- asrank handler -------------------------------------------------------
+
+describe('asrank handler', () => {
+    it('answers the mapped ASRank record', async () => {
+        globalThis.fetch = async () => new Response(JSON.stringify({
+            data: { asn: { rank: 64, asnName: 'CLOUDFLARENET', cone: { numberAsns: 963, numberPrefixes: 35738, numberAddresses: 32408873 } } },
+        }));
+        const res = createResponse();
+        await asrankHandler(createRequest({ query: { asn: '13335' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.asn, 13335);
+        assert.equal(res.body.rank, 64);
+        assert.deepEqual(res.body.cone, { asns: 963, prefixes: 35738, addresses: 32408873 });
+        assert.equal(isAsRankHit(res.body), true);
+    });
+
+    for (const [label, stub] of [
+        ['an ASN unknown to ASRank', async () => new Response(JSON.stringify({ data: { asn: null } }))],
+        ['an upstream failure', async () => { throw new Error('connect timeout'); }],
+    ]) {
+        it(`answers 200 with null fields for ${label}, vetoing the edge cache`, async () => {
+            globalThis.fetch = stub;
+            const originalWarn = logger.warn;
+            logger.warn = () => {};
+            try {
+                const res = createResponse();
+                await asrankHandler(createRequest({ query: { asn: '64512' } }), res);
+                assert.equal(res.statusCode, 200);
+                assert.deepEqual(res.body, {
+                    asn: 64512, rank: null, asnName: null, orgName: null, country: null, degree: null, cone: null,
+                });
+                assert.equal(isAsRankHit(res.body), false);
+            } finally {
+                logger.warn = originalWarn;
+            }
+        });
+    }
+});
+
 // -- github-stars handler -------------------------------------------------
 
 describe('github-stars handler', () => {
@@ -451,6 +491,31 @@ describe('cf-radar handler', () => {
         await cfRadarHandler(createRequest({ query: { view: 'asn', asn: 'not-an-asn' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+
+    it("runs the bgp-prefixes view's guard: non-numeric ASN", async () => {
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: 'nope' } }), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+
+    it('serves bgp-prefixes from pfx2as with a countries list', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        const urls = [];
+        globalThis.fetch = async (url) => {
+            urls.push(String(url));
+            return new Response(JSON.stringify({ result: { prefix_origins: [
+                { origin: 13335, peer_count: 76, prefix: '104.22.21.0/24', rpki_validation: 'Valid' },
+            ] } }));
+        };
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: 'AS13335' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(urls, ['https://api.cloudflare.com/client/v4/radar/bgp/routes/pfx2as?origin=13335']);
+        assert.deepEqual(res.body.prefixes, [{ prefix: '104.22.21.0/24', rpki: 'Valid', peers: 76 }]);
+        // No MaxMind database is loaded in tests — countries degrade to [].
+        assert.deepEqual(res.body.countries, []);
     });
 
     it("runs the country-traffic view's guard: missing ?country", async () => {
