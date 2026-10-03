@@ -1839,7 +1839,8 @@
     "IpCalculator": "Abrir painel da Calculadora de IP",
     "BrowserInfo": "Abrir painel de informações do navegador",
     "SecurityChecklist": "Abrir painel de checklist de segurança",
-    "PersonaCheck": "Abrir painel de verificação aprofundada de persona"
+    "PersonaCheck": "Abrir painel de verificação aprofundada de persona",
+    "AsnProfile": "Abrir painel de consulta de perfil de ASN"
   },
   "page": {
     "title": "IPCheck.ing - Verifique meu IP e geolocalização - Teste de vazamento de IP - Teste de vazamento de DNS - Verificação de qualidade de IP - Teste de velocidade da rede - Caixa de ferramentas de IP tudo em um",

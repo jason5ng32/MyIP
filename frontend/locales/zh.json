@@ -1839,7 +1839,8 @@
     "IpCalculator": "打开 IP 计算器面板",
     "BrowserInfo": "打开浏览器信息面板",
     "SecurityChecklist": "打开安全检查清单",
-    "PersonaCheck": "打开深度画像检测面板"
+    "PersonaCheck": "打开深度画像检测面板",
+    "AsnProfile": "打开 ASN 档案查询面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址及归属地 - IP 泄露检测 - DNS 泄露检测 - IP 质量检查 - 网速测试 - 多合一 IP 工具箱",

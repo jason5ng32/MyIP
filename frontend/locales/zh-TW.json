@@ -1839,7 +1839,8 @@
     "IpCalculator": "開啟 IP 計算器面板",
     "BrowserInfo": "開啟瀏覽器資訊面板",
     "SecurityChecklist": "開啟安全檢查清單",
-    "PersonaCheck": "開啟深度畫像檢測面板"
+    "PersonaCheck": "開啟深度畫像檢測面板",
+    "AsnProfile": "開啟 ASN 檔案查詢面板"
   },
   "page": {
     "title": "IPCheck.ing - 查詢我的 IP 位址與地理位置 - IP 洩漏測試 - DNS 洩漏測試 - IP 品質檢查 - 網路速度測試 - 全方位 IP 工具箱",

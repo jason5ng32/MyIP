@@ -1839,7 +1839,8 @@
     "IpCalculator": "Open IP Calculator panel",
     "BrowserInfo": "Open Browser Info panel",
     "SecurityChecklist": "Open Security Checklist panel",
-    "PersonaCheck": "Open In-depth Persona Check panel"
+    "PersonaCheck": "Open In-depth Persona Check panel",
+    "AsnProfile": "Open ASN Profile Lookup panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - All-in-one IP Toolbox",

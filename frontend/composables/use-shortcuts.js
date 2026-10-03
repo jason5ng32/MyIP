@@ -236,6 +236,16 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         });
     }
 
+    // Uppercase A: lowercase `a` belongs to the IP calculator. Gated like the
+    // ASN Profile card itself (data/tools.js `requiresConfig`).
+    if (configs.value.cloudFlare) {
+        config.push({
+            keys: 'A',
+            action: () => goToAdvancedTool('asn', 'AsnProfile'),
+            description: t('shortcutKeys.AsnProfile'),
+        });
+    }
+
     // Mirrors the Earth Online entry's visibility (widgets/Pulse.vue).
     if (hasPulseBackend || configs.value.cloudFlare) {
         config.push({
