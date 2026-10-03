@@ -38,3 +38,8 @@ common/as-org-db/*.bak
 common/as-rel-db/*.bak
 common/as-org-db/*.next
 common/as-rel-db/*.next
+common/peeringdb-db/*.json
+common/peeringdb-db/.caida-update-state.json
+common/peeringdb-db/.caida-update.lock
+common/peeringdb-db/*.bak
+common/peeringdb-db/*.next

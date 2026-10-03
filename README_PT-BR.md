@@ -61,10 +61,11 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 ### 🔦 Consultas e infraestrutura
 
 * 📟 **Resolução DNS**: Resolve um domínio por vários resolvedores de uma só vez, agrupados por país — um jeito fácil de detectar sequestro ou contaminação.
-* 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio e endereços IP.
+* 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio, endereços IP e números de AS.
 * 🗄️ **Consulta de MAC**: Identifica o fabricante e os detalhes por trás de um endereço físico.
 * 🧮 **Calculadora de IP**: Cálculo de sub-rede, conversões de notação e detalhes de interface IPv6 para qualquer IP, prefixo, intervalo ou lista, tudo localmente.
-* 🛰️ **Informações de ASN e topologia de upstream**: Mostra detalhes do AS, anúncios históricos de um prefixo IP e os caminhos de upstream de um ASN até o backbone Tier 1.
+* 🛰️ **Informações de ASN e topologia de upstream**: Direto em cada cartão de IP — detalhes do AS, anúncios históricos do prefixo do IP e os caminhos de upstream do seu ASN até o backbone Tier 1.
+* 🛂 **Perfil de ASN**: O retrato completo de qualquer AS — dados de registro com o Whois bruto, ranking global e porte, tráfego e qualidade de conexão, os países onde seu espaço IPv4 é usado, cada prefixo anunciado com seu status RPKI, seus upstreams, peers e clientes, e os pontos de troca de tráfego e data centers em que está presente.
 * 📶 **Status dos serviços**: Disponibilidade em tempo real de serviços conhecidos — Claude, OpenAI, GitHub, Cloudflare e outros — a partir de suas páginas oficiais de status, com incidentes recentes.
 
 ### ✨ Plataforma

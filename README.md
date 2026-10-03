@@ -58,10 +58,11 @@ Feel free to bookmark the demo or deploy your own.
 ### 🔦 Lookup & Infrastructure
 
 * 📟 **DNS Resolver**: Resolves a domain through multiple resolvers at once, grouped by country — an easy way to spot hijacking or contamination.
-* 📓 **Whois Search**: Performs Whois lookups for domain names and IP addresses.
+* 📓 **Whois Search**: Performs Whois lookups for domain names, IP addresses, and AS numbers.
 * 🗄️ **MAC Lookup**: Identifies the vendor and details behind a physical address.
 * 🧮 **IP Calculator**: Subnet math, notation conversions and IPv6 interface details for any IP, prefix, range or list, computed locally.
-* 🛰️ **ASN Info & Upstream Topology**: Shows AS details, historical announcements for an IP prefix, and the upstream paths from an ASN to the Tier 1 backbone.
+* 🛰️ **ASN Info & Upstream Topology**: Right on each IP card — AS details, historical announcements for the IP's prefix, and the upstream paths from its ASN to the Tier 1 backbone.
+* 🛂 **ASN Profile**: The full picture of any AS — registration with the raw Whois record, global rank and size, traffic and connection quality, where its IPv4 space is used, every announced prefix with its RPKI status, its upstreams, peers and customers, and the internet exchanges and data centers where it is present.
 * 📶 **Service Status**: Live availability of well-known services — Claude, OpenAI, GitHub, Cloudflare, and more — from their official status pages, with recent incidents.
 
 ### ✨ Platform
