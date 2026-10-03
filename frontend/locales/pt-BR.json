@@ -870,7 +870,7 @@
     "CensorshipCheck": "Verifique em quais países um site está bloqueado",
     "ServiceStatus": "Verifique a disponibilidade ao vivo de serviços conhecidos de IA e desenvolvimento, e se um incidente recente explica a falha que você está vendo",
     "Whois": "Pesquise informações de registro de domínio/IP/AS",
-    "AsnProfile": "Quem opera um AS, seu porte, o que anuncia, onde ficam seus endereços e com quem se conecta",
+    "AsnProfile": "Veja o perfil completo de qualquer AS",
     "InvisibilityTest": "Verifique se você está usando proxy ou VPN",
     "MacChecker": "Consultar informações de um endereço físico",
     "IpCalculator": "Cálculo de sub-rede, conversão de notação e análise IPv6 para qualquer IP, prefixo ou intervalo",
@@ -1045,8 +1045,8 @@
     "Provider": "Provedor das informações"
   },
   "asnprofile": {
-    "Title": "Perfil de ASN",
-    "Note": "Um sistema autônomo (AS) é uma rede operada por uma única organização — um provedor de internet, uma empresa de nuvem ou hospedagem, uma universidade, uma grande empresa — que o restante da internet reconhece pelo número de AS e alcança por meio do roteamento BGP. Digite um número de AS para ver quem o registrou, qual o seu porte, quais blocos de endereços ele anuncia e se estão assinados com RPKI, onde fica o seu espaço IPv4 e de quem ele compra trânsito, com quem troca tráfego e para quem revende trânsito. Os dados vêm de várias fontes, incluindo o Cloudflare Radar e os serviços RDAP regionais.",
+    "Title": "Consulta de perfil de ASN",
+    "Note": "Um sistema autônomo (AS) é uma rede operada por uma única organização — um provedor de internet, uma empresa de nuvem ou hospedagem, uma universidade, uma grande empresa — que o restante da internet reconhece pelo número de AS e alcança por meio do roteamento BGP. Digite um número de AS para ver quem o registrou, qual o seu porte, quais blocos de endereços ele anuncia e se estão assinados com RPKI, onde fica o seu espaço IPv4 e de quem ele compra trânsito, com quem troca tráfego e para quem revende trânsito. Os dados vêm de várias fontes, incluindo o Cloudflare Radar, os serviços RDAP regionais e o PeeringDB.",
     "InputLabel": "Número de AS",
     "Placeholder": "ex.: AS13335",
     "Lookup": "Consultar",

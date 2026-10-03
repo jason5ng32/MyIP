@@ -870,7 +870,7 @@
     "CensorshipCheck": "Vérifier dans quels pays un site est bloqué",
     "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP/AS",
-    "AsnProfile": "Qui exploite un AS, sa taille, ce qu'il annonce, où se trouvent ses adresses et avec qui il est interconnecté",
+    "AsnProfile": "Consulter le profil complet de n'importe quel AS",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
@@ -1045,8 +1045,8 @@
     "Provider": "Fournisseur d'informations"
   },
   "asnprofile": {
-    "Title": "Profil ASN",
-    "Note": "Un système autonome (AS) est un réseau exploité par une seule organisation — fournisseur d'accès, hébergeur ou cloud, université, grande entreprise — que le reste d'Internet identifie par son numéro d'AS et atteint via le routage BGP. Saisissez un numéro d'AS pour voir qui l'a enregistré, quelle est sa taille, quels blocs d'adresses il annonce et s'ils sont signés RPKI, où se situe son espace IPv4, et auprès de qui il achète du transit, avec qui il échange du trafic et à qui il en revend. Les données proviennent de plusieurs sources, dont Cloudflare Radar et les services RDAP régionaux.",
+    "Title": "Recherche de profil ASN",
+    "Note": "Un système autonome (AS) est un réseau exploité par une seule organisation — fournisseur d'accès, hébergeur ou cloud, université, grande entreprise — que le reste d'Internet identifie par son numéro d'AS et atteint via le routage BGP. Saisissez un numéro d'AS pour voir qui l'a enregistré, quelle est sa taille, quels blocs d'adresses il annonce et s'ils sont signés RPKI, où se situe son espace IPv4, et auprès de qui il achète du transit, avec qui il échange du trafic et à qui il en revend. Les données proviennent de plusieurs sources, dont Cloudflare Radar, les services RDAP régionaux et PeeringDB.",
     "InputLabel": "Numéro d'AS",
     "Placeholder": "ex. AS13335",
     "Lookup": "Rechercher",

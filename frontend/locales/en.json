@@ -870,7 +870,7 @@
     "CensorshipCheck": "Check which countries a website is blocked in",
     "ServiceStatus": "Check the live availability of well-known AI and developer services, and whether a recent incident explains the outage you're seeing",
     "Whois": "Search for domain/IP/ASN registration information",
-    "AsnProfile": "Who runs any AS, how big it is, what it announces, where its addresses are and who it connects to",
+    "AsnProfile": "View the full profile of any AS",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
@@ -1045,8 +1045,8 @@
     "Provider": "Information Provider"
   },
   "asnprofile": {
-    "Title": "ASN Profile",
-    "Note": "An autonomous system (AS) is a network run by one organisation — an internet provider, a cloud or hosting company, a university or a large enterprise — that the rest of the internet knows by its AS number and reaches through BGP routing. Enter an AS number to see who registered it, how big it is, which address blocks it announces and whether they are RPKI-signed, where its IPv4 space is located, and which networks it buys transit from, exchanges traffic with or sells transit to. Data comes from multiple sources, including Cloudflare Radar and the regional RDAP services.",
+    "Title": "ASN Profile Lookup",
+    "Note": "An autonomous system (AS) is a network run by one organisation — an internet provider, a cloud or hosting company, a university or a large enterprise — that the rest of the internet knows by its AS number and reaches through BGP routing. Enter an AS number to see who registered it, how big it is, which address blocks it announces and whether they are RPKI-signed, where its IPv4 space is located, and which networks it buys transit from, exchanges traffic with or sells transit to. Data comes from multiple sources, including Cloudflare Radar, the regional RDAP services and PeeringDB.",
     "InputLabel": "AS number",
     "Placeholder": "e.g. AS13335",
     "Lookup": "Look up",
