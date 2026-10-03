@@ -24,6 +24,7 @@ import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler from '../api/asn-profile.js';
 import { isPeeringdbLoaded } from '../common/peeringdb-db.js';
+import { isCompleteProfile } from '../common/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -259,7 +260,7 @@ describe('get-whois handler', () => {
     // The first case fetches IANA's asn.json bootstrap through the stub; the
     // module caches it for the rest of the file.
     const ASN_BOOTSTRAP = { services: [[['13335', '64496-64511'], ['https://rdap.arin.net/registry/']]] };
-    const stubAutnum = (autnum) => async (url) => (String(url).includes('data.iana.org')
+    const stubAutnum = (autnum) => async (url) => (new URL(String(url)).hostname === 'data.iana.org'
         ? new Response(JSON.stringify(ASN_BOOTSTRAP))
         : autnum(String(url)));
 
@@ -455,6 +456,15 @@ describe('cf-radar handler', () => {
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
     });
 
+    for (const asn of ['AS0', '0', '4294967296', '00000000013335']) {
+        it(`runs the asn view's guard: out-of-range or overlong ASN ${asn}`, async () => {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'asn', asn } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Invalid ASN' });
+        });
+    }
+
     it("runs the bgp-prefixes view's guard: non-numeric ASN", async () => {
         const res = createResponse();
         await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: 'nope' } }), res);
@@ -478,6 +488,20 @@ describe('cf-radar handler', () => {
         assert.deepEqual(res.body.prefixes, [{ prefix: '104.22.21.0/24', rpki: 'Valid', peers: 76 }]);
         // No MaxMind database is loaded in tests — countries degrade to [].
         assert.deepEqual(res.body.countries, []);
+    });
+
+    it('answers 500, not an empty list, when pfx2as lacks prefix_origins', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        globalThis.fetch = async () => new Response(JSON.stringify({ success: true, result: {} }));
+        const originalError = logger.error;
+        logger.error = () => {};
+        try {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: '13335' } }), res);
+            assert.equal(res.statusCode, 500);
+        } finally {
+            logger.error = originalError;
+        }
     });
 
     it("runs the country-traffic view's guard: missing ?country", async () => {
@@ -697,8 +721,8 @@ describe('ipcheck-ing handler', () => {
 // -- asn-profile handler ---------------------------------------------------
 // Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
 // here: unconfigured sources read as disabled, failing upstreams as error,
-// the local PeeringDB section, and the private-API pass-through for the
-// reputation section.
+// a partial Radar answer, the local PeeringDB section, and the private-API
+// pass-through for the reputation section.
 
 describe('asn-profile handler', () => {
     it('answers 200 with per-section statuses when only some sources work', async () => {
@@ -726,6 +750,37 @@ describe('asn-profile handler', () => {
         else assert.equal(res.body.status.peeringdb, 'disabled');
     });
 
+    it('shows a partial Radar summary but flags it incomplete (not cacheable)', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_KEY;
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async (url) => {
+            const { hostname, pathname } = new URL(String(url));
+            if (hostname !== 'api.cloudflare.com') throw new Error('network down');
+            if (pathname.endsWith('/radar/entities/asns/64511')) {
+                return new Response(JSON.stringify({ result: { asn: { name: 'EXAMPLE-NET' } } }));
+            }
+            if (pathname.endsWith('/radar/bgp/routes/pfx2as')) {
+                return new Response(JSON.stringify({ result: { prefix_origins: [] } }));
+            }
+            return new Response('busy', { status: 503 });
+        };
+        const originalWarn = logger.warn;
+        logger.warn = () => {};
+        try {
+            const res = createResponse();
+            await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.body.status.radar, 'ok');
+            assert.equal(res.body.radar.asnName, 'EXAMPLE-NET');
+            assert.equal(res.body.status.prefixes, 'empty');
+            assert.deepEqual(res.body.incomplete, ['radar']);
+            assert.equal(isCompleteProfile(res.body), false);
+        } finally {
+            logger.warn = originalWarn;
+        }
+    });
+
     it('forwards the caller headers to the private API for reputation', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
@@ -737,7 +792,8 @@ describe('asn-profile handler', () => {
         };
         let requested;
         globalThis.fetch = async (url, options) => {
-            if (String(url).includes('/asnreputation')) {
+            const { hostname, pathname } = new URL(String(url));
+            if (hostname === 'upstream.invalid' && pathname === '/asnreputation') {
                 requested = { url: new URL(String(url)), options };
                 return { status: 200, ok: true, json: async () => payload };
             }

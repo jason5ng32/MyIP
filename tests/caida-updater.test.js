@@ -15,6 +15,7 @@ import {
     datasets, updateDataset, bootstrapDataset, findPeeringdbDump, isDatasetEnabled,
 } from '../common/caida-updater.js';
 import { PEERINGDB_FILE, readPeeringdbIndex, expandNet } from '../common/peeringdb-db.js';
+import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const realFetch = globalThis.fetch;
 const savedEnv = { key: process.env.CLOUDFLARE_API_KEY, legacy: process.env.CLOUDFLARE_API };
@@ -93,6 +94,27 @@ describe('findPeeringdbDump', () => {
         stubFetch({ [`${BASE}2025/12/`]: [200, LISTING.replaceAll('2026_10', '2025_12')] });
         assert.equal((await findPeeringdbDump({ now: new Date('2026-01-01T00:00:00Z') })).identifier,
             'peeringdb_2_dump_2025_12_02.json');
+    });
+
+    it('lists through fetchUpstream: project User-Agent, caller abort still honoured', async () => {
+        const seen = [];
+        globalThis.fetch = async (url, init = {}) => {
+            seen.push(init);
+            return new Response(LISTING);
+        };
+        setUpstreamUserAgent('MyIP/test');
+        try {
+            const caller = new AbortController();
+            await findPeeringdbDump({ signal: caller.signal, now: new Date('2026-10-20T00:00:00Z') });
+            assert.equal(seen.length, 1);
+            assert.equal(seen[0].headers['User-Agent'], 'MyIP/test');
+            assert.ok(seen[0].signal instanceof AbortSignal, 'a timeout-bearing signal is attached');
+            assert.equal(seen[0].signal.aborted, false);
+            caller.abort();
+            assert.equal(seen[0].signal.aborted, true, 'aborting the caller aborts the listing');
+        } finally {
+            setUpstreamUserAgent(null);
+        }
     });
 
     it('fails on a server error or when neither month has a dump', async () => {

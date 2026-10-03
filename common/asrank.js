@@ -48,8 +48,21 @@ export const mapAsRankResponse = (body) => {
     };
 };
 
+// A 200 body is only an answer once GraphQL says so: any `errors` entry
+// fails it, even beside a usable `data.asn` — fields a failed resolver left
+// null would read as "ASRank has no figure" and get cached. A body without a
+// `data` object is malformed. Exported for tests.
+export const checkAsRankBody = (body) => {
+    if (Array.isArray(body?.errors) && body.errors.length > 0) {
+        throw new Error(`ASRank GraphQL error: ${body.errors[0]?.message || 'unknown'}`);
+    }
+    if (!body?.data || typeof body.data !== 'object') throw new Error('ASRank returned a malformed body');
+    return body;
+};
+
 // ASRank record for an ASN; null when ASRank doesn't know it. Throws on an
-// upstream failure, so callers that need to tell the two apart can.
+// upstream failure (non-2xx, unparsable body, GraphQL errors), so callers
+// that need to tell the two apart can.
 export const queryAsRank = async (asn, { timeoutMs = 4000 } = {}) => {
     const res = await fetchUpstream(ASRANK_ENDPOINT, {
         method: 'POST',
@@ -58,5 +71,5 @@ export const queryAsRank = async (asn, { timeoutMs = 4000 } = {}) => {
         timeoutMs,
     });
     if (!res.ok) throw new Error(`ASRank responded ${res.status}`);
-    return mapAsRankResponse(await res.json());
+    return mapAsRankResponse(checkAsRankBody(await res.json()));
 };

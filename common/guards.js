@@ -9,6 +9,7 @@ import { isValidIP, isValidDomain, isUsablePublicIP } from './valid-ip.js';
 import { isValidBgpPrefix } from './bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 import { DNS_RECORD_TYPE_SET } from './dns-record-types.js';
+import { parseAsnInput } from './asn-input.js';
 
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
@@ -74,19 +75,21 @@ export const requireValidPrefix = (paramName = 'prefix') => (req, res, next) => 
     next();
 };
 
-// Reject requests without a valid ASN (numeric, with optional 'AS' prefix).
-// Used by /api/asn-connectivity and, per-view, by the /api/cfradar
-// dispatcher (see RADAR_VIEWS in common/cf-radar.js).
+// Reject requests without a valid ASN (AS1 … AS4294967295, up to ten
+// digits, optional 'AS' prefix — parseAsnInput in common/asn-input.js) and
+// rewrite it in place to the canonical number string (`AS013335` → `13335`),
+// so the edge cache sees one key. Used by /api/asn-connectivity,
+// /api/asn-profile and, per-view, the /api/cfradar dispatcher.
 export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
     const raw = req.query[paramName];
     if (!raw) {
         return res.status(400).json({ error: 'No ASN provided' });
     }
-    const numeric = String(raw).replace(/^AS/i, '');
-    if (!/^[0-9]+$/.test(numeric)) {
+    const asn = parseAsnInput(raw);
+    if (asn === null) {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
-    req.query[paramName] = numeric;
+    req.query[paramName] = String(asn);
     next();
 };
 
@@ -96,10 +99,9 @@ export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
 // /api/whois also takes IPs and domains, which its handler validates.
 export const normalizeAsnQuery = (paramName = 'q') => (req, res, next) => {
     const raw = req.query[paramName];
-    const match = typeof raw === 'string' ? /^AS(\d+)$/i.exec(raw.trim()) : null;
-    if (!match) return next();
-    const asn = Number(match[1]);
-    if (match[1].length > 10 || asn < 1 || asn > 4294967295) {
+    if (typeof raw !== 'string' || !/^AS\d+$/i.test(raw.trim())) return next();
+    const asn = parseAsnInput(raw, { requirePrefix: true });
+    if (asn === null) {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
     req.query[paramName] = `AS${asn}`;

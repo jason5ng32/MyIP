@@ -1,9 +1,18 @@
-// Tests for frontend/utils/asn-input.js — the AS-number grammar shared by
-// the Whois tool (prefix required) and ASN Profile (prefix optional).
+// Tests for common/asn-input.js — the AS-number grammar shared by the ASN
+// guards, the Whois tool (prefix required) and ASN Profile (prefix
+// optional) — and its frontend/utils/asn-input.js re-export.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { MAX_ASN, parseAsnInput } from '../frontend/utils/asn-input.js';
+import { MAX_ASN, parseAsnInput } from '../common/asn-input.js';
+import * as bridge from '../frontend/utils/asn-input.js';
+
+describe('frontend bridge', () => {
+  it('re-exports the shared implementation', () => {
+    assert.equal(bridge.parseAsnInput, parseAsnInput);
+    assert.equal(bridge.MAX_ASN, MAX_ASN);
+  });
+});
 
 describe('parseAsnInput', () => {
   it('accepts AS-prefixed and bare numbers, any case, trimmed', () => {

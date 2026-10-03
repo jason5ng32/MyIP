@@ -22,6 +22,7 @@ import path from 'path';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import logger from './logger.js';
+import { fetchUpstream } from './fetch-with-timeout.js';
 import { withCronMonitor } from './sentry-cron.js';
 import { createDecompressor } from './decompress.js';
 import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase } from './as-org-db.js';
@@ -36,6 +37,43 @@ const LOCK_STALE_MS = 2 * 60 * 60 * 1000;
 const BOOTSTRAP_TIMEOUT_MS = 2 * 60 * 1000;
 const STATE_FILE = '.caida-update-state.json';
 const LOCK_FILE = '.caida-update.lock';
+
+// ---------- PeeringDB row helpers ----------
+// Arrow consts, so declared ahead of the `datasets` registry that holds them.
+
+// Healthy index has ~33k networks; <20k indicates truncation or schema change.
+const validatePeeringdb = async (stagedPath) => {
+    const MIN_VALID = 20000;
+    const { nets } = readPeeringdbIndex(stagedPath);
+    if (nets.size < MIN_VALID) {
+        throw new Error(`Staged PeeringDB index has only ${nets.size} networks; refusing to publish`);
+    }
+};
+
+// CAIDA mirrors the full PeeringDB dump daily (a day late) under YYYY/MM/.
+// List the current UTC month, then the previous one for the days before the
+// month's first dump lands; the newest filename wins. The listing is small,
+// so it takes fetchUpstream's timeout and User-Agent (the caller's signal
+// still aborts it); the dump download itself does not. Exported for tests.
+export const findPeeringdbDump = async ({ signal, now = new Date() } = {}) => {
+    const base = 'https://publicdata.caida.org/datasets/peeringdb/';
+    for (const back of [0, 1]) {
+        const month = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1));
+        const dir = `${base}${month.getUTCFullYear()}/${String(month.getUTCMonth() + 1).padStart(2, '0')}/`;
+        const res = await fetchUpstream(dir, { signal });
+        if (res.status === 404) continue;
+        if (!res.ok) throw new Error(`Directory listing failed: HTTP ${res.status}`);
+        const html = await res.text();
+        const names = [...html.matchAll(/\bpeeringdb_2_dump_\d{4}_\d{2}_\d{2}\.json\b/g)].map(m => m[0]);
+        if (names.length === 0) continue;
+        names.sort((a, b) => b.localeCompare(a));
+        return { url: dir + names[0], identifier: names[0] };
+    }
+    throw new Error('No PeeringDB dump in the current or previous month listing');
+};
+
+// A row without `enabled` is always on. Exported for tests.
+export const isDatasetEnabled = (dataset) => !dataset.enabled || Boolean(dataset.enabled());
 
 // Exported for tests (rows are re-pointed at a temp dir there).
 export const datasets = [
@@ -324,37 +362,6 @@ async function validateAsRel(stagedPath) {
     }
 }
 
-// Healthy index has ~33k networks; <20k indicates truncation or schema change.
-async function validatePeeringdb(stagedPath) {
-    const MIN_VALID = 20000;
-    const { nets } = readPeeringdbIndex(stagedPath);
-    if (nets.size < MIN_VALID) {
-        throw new Error(`Staged PeeringDB index has only ${nets.size} networks; refusing to publish`);
-    }
-}
-
-// ---------- Remote lookups ----------
-
-// CAIDA mirrors the full PeeringDB dump daily (a day late) under YYYY/MM/.
-// List the current UTC month, then the previous one for the days before the
-// month's first dump lands; the newest filename wins. Exported for tests.
-export async function findPeeringdbDump({ signal, now = new Date() } = {}) {
-    const base = 'https://publicdata.caida.org/datasets/peeringdb/';
-    for (const back of [0, 1]) {
-        const month = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1));
-        const dir = `${base}${month.getUTCFullYear()}/${String(month.getUTCMonth() + 1).padStart(2, '0')}/`;
-        const res = await fetch(dir, { signal });
-        if (res.status === 404) continue;
-        if (!res.ok) throw new Error(`Directory listing failed: HTTP ${res.status}`);
-        const html = await res.text();
-        const names = [...html.matchAll(/\bpeeringdb_2_dump_\d{4}_\d{2}_\d{2}\.json\b/g)].map(m => m[0]);
-        if (names.length === 0) continue;
-        names.sort((a, b) => b.localeCompare(a));
-        return { url: dir + names[0], identifier: names[0] };
-    }
-    throw new Error('No PeeringDB dump in the current or previous month listing');
-}
-
 // ---------- Generic helpers ----------
 
 async function publishFile(stagedPath, targetPath) {
@@ -375,11 +382,6 @@ async function publishFile(stagedPath, targetPath) {
             fsp.rm(backupPath, { force: true }),
         ]);
     }
-}
-
-// A row without `enabled` is always on. Exported for tests.
-export function isDatasetEnabled(dataset) {
-    return !dataset.enabled || Boolean(dataset.enabled());
 }
 
 function isAutoUpdateEnabled() {

@@ -1,6 +1,6 @@
 // Tests for common/asn-profile.js — the /api/asn-profile composition:
 // per-section classification, deadlines, the all-failed verdict and the
-// edge-cache veto. Loaders are injected; nothing touches the network.
+// edge-cache veto (error and incomplete sections). Loaders are injected; nothing touches the network.
 // The frontend's request budget comes from frontend/utils/asn-profile-view.js.
 
 import assert from 'node:assert/strict';
@@ -13,6 +13,11 @@ import {
 import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/asn-profile-view.js';
 
 const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(value), ms));
+
+// loadAsnSummary's shape: Radar fields, plus local CAIDA counts in `summary`.
+const radarAnswer = (radarFields, { local = {}, failed = [] } = {}) => ({
+  summary: { ...radarFields, ...local }, radarFields, failedSegments: failed,
+});
 
 describe('deadlines', () => {
   it('every deadline sits above the inner timeouts of the source it wraps', () => {
@@ -39,8 +44,22 @@ describe('classification', () => {
     assert.equal(hasMeaningfulField({ asnName: 'X' }), true);
     assert.equal(hasMeaningfulField({ prefixesV4: '0', rpkiValid: 0, IPv6_Pct: '0.00%' }), false);
     assert.equal(hasMeaningfulField({ prefixesV4: '2,346' }), true);
-    assert.deepEqual(classifyRadar({}), { status: 'empty', data: null });
-    assert.deepEqual(classifyRadar({ asnName: 'X' }), { status: 'ok', data: { asnName: 'X' } });
+    assert.deepEqual(classifyRadar(radarAnswer({})), { status: 'empty', data: null });
+    assert.deepEqual(classifyRadar(radarAnswer({ asnName: 'X' })), { status: 'ok', data: { asnName: 'X' } });
+  });
+
+  it('radar: local CAIDA relationship counts alone are not Radar data', () => {
+    const local = { upstreamCount: '3', downstreamCount: '12', peerCount: '40' };
+    assert.deepEqual(classifyRadar(radarAnswer({ prefixesV4: '0' }, { local })), { status: 'empty', data: null });
+    // With Radar data, the section carries the whole summary, counts included.
+    assert.deepEqual(classifyRadar(radarAnswer({ asnName: 'X' }, { local })),
+      { status: 'ok', data: { asnName: 'X', ...local } });
+  });
+
+  it('radar: failed segments make data incomplete, and no data an error', () => {
+    assert.deepEqual(classifyRadar(radarAnswer({ asnName: 'X' }, { failed: ['quality'] })),
+      { status: 'ok', data: { asnName: 'X' }, incomplete: true });
+    assert.throws(() => classifyRadar(radarAnswer({}, { failed: ['asnInfo'] })), /Radar segments failed: asnInfo/);
   });
 
   it('prefixes: empty list is empty, a malformed body throws', () => {
@@ -70,6 +89,16 @@ describe('classification', () => {
     assert.throws(() => classifyReputation({ status: 503, data: { error: 'ASN data not loaded' } }));
   });
 
+  it('reputation: an error status or a malformed 200 is never empty', () => {
+    for (const status of [400, 404, 500, 502, 503]) {
+      assert.throws(() => classifyReputation({ status, data: null }), new RegExp(String(status)));
+      assert.throws(() => classifyReputation({ status, data: { found: false } }), new RegExp(String(status)));
+    }
+    for (const data of [null, {}, [], { found: 'no' }, { error: 'x' }]) {
+      assert.throws(() => classifyReputation({ status: 200, data }), /malformed/, JSON.stringify(data));
+    }
+  });
+
   it('peeringdb: no index is disabled, no record empty, a record ok', () => {
     assert.deepEqual(classifyPeeringdb(false, null), { status: 'disabled', data: null });
     assert.deepEqual(classifyPeeringdb(true, null), { status: 'empty', data: null });
@@ -80,7 +109,7 @@ describe('classification', () => {
 
 const deps = (overrides = {}) => ({
   hasRadarKey: () => true,
-  fetchRadarAsn: async () => ({ asnName: 'EXAMPLE' }),
+  fetchRadarAsn: async () => radarAnswer({ asnName: 'EXAMPLE' }),
   fetchRadarPrefixes: async () => ({ prefixes: [{ prefix: '192.0.2.0/24' }], countries: [] }),
   getConnectivity: async (asn) => ({ origin: asn, nodes: [], edges: [{ from: asn, to: 174 }], neighbours: { counts: {} } }),
   rdapAutnum: async (asn) => ({ asn, name: 'EXAMPLE', __raw: 'ASNumber: 1' }),
@@ -117,8 +146,45 @@ describe('composeAsnProfile', () => {
     assert.equal(body.peeringdb.policy, 'Open');
     assert.equal(body.radar.asnName, 'EXAMPLE');
     assert.equal(body.reputation, null);
+    assert.deepEqual(body.incomplete, []);
     assert.equal(isCompleteProfile(body), true);
     assert.equal(allSourcesFailed(body), false);
+  });
+
+  it('a partial Radar answer is shown but keeps the profile off the cache', async () => {
+    const loaders = buildSectionLoaders(deps({
+      fetchRadarAsn: async () => radarAnswer({ asnName: 'EXAMPLE' }, { failed: ['ipVersion', 'quality'] }),
+    }));
+    const body = await composeAsnProfile(13335, loaders);
+    assert.equal(body.status.radar, 'ok');
+    assert.equal(body.radar.asnName, 'EXAMPLE');
+    assert.deepEqual(body.incomplete, ['radar']);
+    assert.equal(allSourcesFailed(body), false);
+    assert.equal(isCompleteProfile(body), false);
+  });
+
+  it('a partial Radar answer without data is an error, never a cacheable empty', async () => {
+    const loaders = buildSectionLoaders(deps({
+      fetchRadarAsn: async () => radarAnswer({}, { local: { peerCount: '4' }, failed: ['asnInfo'] }),
+    }));
+    const body = await composeAsnProfile(13335, loaders);
+    assert.equal(body.status.radar, 'error');
+    assert.equal(body.radar, null);
+    assert.deepEqual(body.incomplete, []);
+    assert.equal(isCompleteProfile(body), false);
+  });
+
+  it('upstream faults that used to read as "nothing here" are errors', async () => {
+    const loaders = buildSectionLoaders(deps({
+      queryAsRank: async () => { throw new Error('ASRank GraphQL error: timeout'); },
+      requestReputation: async () => ({ status: 503, data: { error: 'ASN data not loaded' } }),
+      fetchRadarPrefixes: async () => { throw new Error('malformed pfx2as payload'); },
+    }));
+    const body = await composeAsnProfile(13335, loaders);
+    assert.equal(body.status.rank, 'error');
+    assert.equal(body.status.reputation, 'error');
+    assert.equal(body.status.prefixes, 'error');
+    assert.equal(isCompleteProfile(body), false);
   });
 
   it('a failing or slow source is absent with status error; the rest still arrive', async () => {
@@ -165,5 +231,13 @@ describe('allSourcesFailed / isCompleteProfile', () => {
     assert.equal(isCompleteProfile({ status }), true);
     assert.equal(isCompleteProfile({ status: { ...status, whois: 'error' } }), false);
     assert.equal(isCompleteProfile({ error: 'All sources failed' }), false);
+  });
+
+  it('an incomplete section vetoes the cache without counting as failed', () => {
+    const allOk = { radar: 'ok', prefixes: 'ok', connectivity: 'ok', whois: 'ok', rank: 'ok', reputation: 'disabled' };
+    assert.equal(isCompleteProfile({ status: allOk, incomplete: [] }), true);
+    assert.equal(isCompleteProfile({ status: allOk, incomplete: ['radar'] }), false);
+    const status = { radar: 'ok', prefixes: 'error', connectivity: 'error', whois: 'error', rank: 'error', reputation: 'disabled' };
+    assert.equal(allSourcesFailed({ status, incomplete: ['radar'] }), false);
   });
 });

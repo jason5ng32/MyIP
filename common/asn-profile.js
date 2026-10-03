@@ -4,12 +4,18 @@
 // its status set; the response is still whole. Pure apart from the injected
 // loaders, so tests need no network.
 //
-// Response shape (one key per section, plus `status`):
+// Response shape (one key per section, plus `status` and `incomplete`):
 //   { asn, status: { radar, prefixes, connectivity, whois, rank, reputation, peeringdb },
+//     incomplete: [section, …],
 //     radar, prefixes, connectivity, whois, rank, reputation, peeringdb }
 // status values: 'ok' (data present) · 'empty' (source answered, nothing
-// for this AS) · 'error' (failed / timed out) · 'disabled' (not configured
-// on this deployment). Section data is non-null only for 'ok'.
+// for this AS) · 'error' (failed / timed out, no data) · 'disabled' (not
+// configured on this deployment). Section data is non-null only for 'ok'.
+//
+// `incomplete` lists 'ok' sections whose source answered only in part (some
+// of its upstream calls failed — today Radar's segments): the data is still
+// shown, but the answer is not edge-cached (isCompleteProfile). A loader
+// signals it by resolving { status: 'ok', data, incomplete: true }.
 
 import logger from './logger.js';
 
@@ -76,7 +82,18 @@ export const hasMeaningfulField = (body) => Object.values(body || {}).some((valu
 
 // -- per-section classification of a source's answer ------------------------
 
-export const classifyRadar = (body) => result(hasMeaningfulField(body) ? 'ok' : 'empty', body);
+// `answer` is loadAsnSummary's (common/cf-radar.js). Only the Radar-originated
+// fields decide ok vs empty — the local CAIDA relationship counts in
+// `summary` say nothing about Radar knowing the AS. With failed segments,
+// data is ok but incomplete; no data is an error, as the missing segments
+// may have held it.
+export const classifyRadar = ({ summary, radarFields, failedSegments = [] } = {}) => {
+    if (hasMeaningfulField(radarFields)) {
+        return failedSegments.length > 0 ? { ...result('ok', summary), incomplete: true } : result('ok', summary);
+    }
+    if (failedSegments.length > 0) throw new Error(`Radar segments failed: ${failedSegments.join(', ')}`);
+    return result('empty');
+};
 
 export const classifyPrefixes = (body) => {
     if (!Array.isArray(body?.prefixes)) throw new Error('malformed bgp-prefixes payload');
@@ -92,11 +109,13 @@ export const classifyConnectivity = (body) => {
 
 export const classifyRank = (record) => result(record?.rank != null ? 'ok' : 'empty', record);
 
-// `answer` is requestAsnReputation's: null = not configured.
+// `answer` is requestAsnReputation's: null = not configured. Only a 200
+// with a boolean `found` is an answer; any other status or shape throws.
 export const classifyReputation = (answer) => {
     if (!answer) return result('disabled');
     if (answer.status !== 200) throw new Error(`reputation upstream responded ${answer.status}`);
-    return result(answer.data?.found === true ? 'ok' : 'empty', answer.data);
+    if (typeof answer.data?.found !== 'boolean') throw new Error('malformed reputation payload');
+    return result(answer.data.found ? 'ok' : 'empty', answer.data);
 };
 
 // `loaded` false = no PeeringDB index on this deployment; `record` is
@@ -109,10 +128,10 @@ export const classifyPeeringdb = (loaded, record) => {
 // -- loaders ------------------------------------------------------------------
 
 // Section loaders over the real data functions (injected — see
-// api/asn-profile.js). Each resolves { status, data } or throws.
-//   deps: { hasRadarKey(), fetchRadarAsn(asn), fetchRadarPrefixes(asn),
-//           getConnectivity(asn), rdapAutnum(asn), isAutnumMissing(err),
-//           queryAsRank(asn), requestReputation(asn),
+// api/asn-profile.js). Each resolves { status, data, incomplete? } or throws.
+//   deps: { hasRadarKey(), fetchRadarAsn(asn) (loadAsnSummary's shape),
+//           fetchRadarPrefixes(asn), getConnectivity(asn), rdapAutnum(asn),
+//           isAutnumMissing(err), queryAsRank(asn), requestReputation(asn),
 //           isPeeringdbLoaded(), lookupPeeringdb(asn) }
 export const buildSectionLoaders = (deps) => ({
     radar: async (asn) => (deps.hasRadarKey() ? classifyRadar(await deps.fetchRadarAsn(asn)) : result('disabled')),
@@ -136,12 +155,13 @@ export const composeAsnProfile = async (asn, loaders, { deadlines = DEADLINES } 
     const settled = await Promise.allSettled(
         SECTIONS.map((section) => withDeadline(Promise.resolve().then(() => loaders[section](asn)), deadlines[section])),
     );
-    const body = { asn, status: {} };
+    const body = { asn, status: {}, incomplete: [] };
     settled.forEach((outcome, i) => {
         const section = SECTIONS[i];
         if (outcome.status === 'fulfilled') {
             body.status[section] = outcome.value.status;
             body[section] = outcome.value.data;
+            if (outcome.value.incomplete && outcome.value.status === 'ok') body.incomplete.push(section);
         } else {
             logger.warn({ err: outcome.reason, asn, section }, 'asn-profile: section failed');
             body.status[section] = 'error';
@@ -157,7 +177,8 @@ export const allSourcesFailed = (body) => {
     return live.length > 0 && live.every((status) => status === 'error');
 };
 
-// Edge-cache veto: only a complete answer (no section in error) is cached,
-// so a degraded response is never pinned.
+// Edge-cache veto: only a complete answer (no section in error or
+// incomplete) is cached, so a degraded response is never pinned.
 export const isCompleteProfile = (body) => Boolean(body?.status)
-    && !Object.values(body.status).includes('error');
+    && !Object.values(body.status).includes('error')
+    && !(body.incomplete?.length > 0);

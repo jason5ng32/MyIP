@@ -142,10 +142,10 @@ export function peersOf(asn) {
 }
 
 /** Customers (transit downstreams) of an ASN. Empty array when it has none. */
-export function customersOf(asn) {
+export const customersOf = (asn) => {
     const set = customersIndex.get(Number(asn));
     return set ? [...set] : [];
-}
+};
 
 /** How many distinct ASes this one provides transit for. 0 when never a provider. */
 export function customerCountOf(asn) {
@@ -153,9 +153,7 @@ export function customerCountOf(asn) {
 }
 
 /** Whether a snapshot is loaded (false until the updater has fetched one). */
-export function isAsRelLoaded() {
-    return loadedFrom !== null;
-}
+export const isAsRelLoaded = () => loadedFrom !== null;
 
 /** Whether this ASN is in the CAIDA-derived Tier 1 set. */
 export function isTier1(asn) {

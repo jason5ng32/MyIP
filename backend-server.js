@@ -23,7 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS } from './common/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer } from './common/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -274,14 +274,15 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
 // ASN Profile aggregate: every source in one answer. Only a complete answer
-// (no section in error) is cached, so a degraded one is never pinned for a
-// week; reputation inside it is not per-user.
+// (no section in error or incomplete) is cached, so a degraded one is never
+// pinned for a week; reputation inside it is not per-user.
 app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
-// country traffic, 1h for the outage feed.
-app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl), cfRadarHandler);
+// country traffic, 1h for the outage feed. A partial answer (some upstream
+// calls failed) is served but not cached.
+app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.

@@ -1,11 +1,11 @@
 // Unit tests for the CAIDA ASRank client in common/asrank.js: the pure
-// GraphQL response mapper, and queryAsRank's request shape, null for an
-// unknown ASN and throw-on-failure contract (fetch stubbed; real network
+// GraphQL response mapper and body check, and queryAsRank's request shape,
+// null for an unknown ASN and throw-on-failure contract (fetch stubbed; real network
 // stays out of scope).
 import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 
-import { mapAsRankResponse, queryAsRank } from '../common/asrank.js';
+import { checkAsRankBody, mapAsRankResponse, queryAsRank } from '../common/asrank.js';
 
 const FULL_BODY = {
     data: {
@@ -45,6 +45,27 @@ describe('mapAsRankResponse', () => {
     });
 });
 
+describe('checkAsRankBody', () => {
+    it('passes a body with data and no errors', () => {
+        assert.equal(checkAsRankBody(FULL_BODY), FULL_BODY);
+        const unknown = { data: { asn: null } };
+        assert.equal(checkAsRankBody(unknown), unknown);
+        assert.equal(checkAsRankBody({ ...unknown, errors: [] }).data, unknown.data);
+    });
+
+    it('throws on GraphQL errors, with or without data', () => {
+        assert.throws(() => checkAsRankBody({ errors: [{ message: 'timeout' }], data: { asn: null } }), /GraphQL error: timeout/);
+        assert.throws(() => checkAsRankBody({ errors: [{ message: 'cone failed' }], data: FULL_BODY.data }), /cone failed/);
+        assert.throws(() => checkAsRankBody({ errors: [{}] }), /GraphQL error/);
+    });
+
+    it('throws on a body without a data object', () => {
+        for (const body of [null, undefined, {}, { data: null }, 'oops']) {
+            assert.throws(() => checkAsRankBody(body), /malformed/, String(body));
+        }
+    });
+});
+
 describe('queryAsRank', () => {
     const originalFetch = globalThis.fetch;
     afterEach(() => {
@@ -67,6 +88,13 @@ describe('queryAsRank', () => {
     it('resolves null for an ASN ASRank does not know', async () => {
         globalThis.fetch = async () => new Response(JSON.stringify({ data: { asn: null } }));
         assert.equal(await queryAsRank(64512), null);
+    });
+
+    it('throws on a 200 carrying GraphQL errors instead of reading it as unknown', async () => {
+        globalThis.fetch = async () => new Response(JSON.stringify({ errors: [{ message: 'upstream timeout' }], data: { asn: null } }));
+        await assert.rejects(queryAsRank(13335), /GraphQL error: upstream timeout/);
+        globalThis.fetch = async () => new Response('<html>oops</html>');
+        await assert.rejects(queryAsRank(13335));
     });
 
     it('throws on a non-2xx answer or a network failure', async () => {

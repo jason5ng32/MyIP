@@ -42,7 +42,7 @@ const isObject = (value) => value !== null && typeof value === 'object' && !Arra
 /* ------------------------------------------------------------------ */
 
 // Cache-buster: bump on response-shape changes (sent as `v=`).
-export const ASN_PROFILE_VERSION = 4;
+export const ASN_PROFILE_VERSION = 5;
 
 // Client budget for the one request: above the backend's largest
 // per-section deadline (DEADLINES in common/asn-profile.js).

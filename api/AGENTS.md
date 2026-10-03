@@ -31,11 +31,11 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 
 ### ASN data
 
-- **`/api/asn-profile`** (`common/asn-profile.js`) runs each ASN source's
-  existing core under its own deadline, set above the upstream timeouts it
-  wraps (`INNER_TIMEOUTS`) so a source degrading inside still answers; a failed
-  or late one is just absent. Always 200 `{ asn, status, …sections }` (`ok` /
-  `empty` / `error` / `disabled`); 502 only if all fail.
+- **`/api/asn-profile`** (`common/asn-profile.js`) runs each ASN source's core
+  under a deadline above the upstream timeouts it wraps (`INNER_TIMEOUTS`); a
+  failed or late one is just absent. Always 200 `{ asn, status, incomplete,
+  …sections }` (`ok` / `empty` / `error` / `disabled`; an upstream fault is
+  `error`, never `empty`; `incomplete` = `ok` but partial); 502 if all fail.
 - **Relationship counts follow the graph:** `asn-connectivity` neighbours and
   the Radar `asn` view's counts come from local CAIDA
   (`common/as-relationships.js`), dropping the providers the graph walk
@@ -92,9 +92,9 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   leading `_` is allowed below the TLD (RFC 8552 `_dmarc.…`).
 - `requireValidPrefix()` — `?prefix=` (CIDR); the frontend quantizes to the BGP
   DFZ floor (/24 v4, /48 v6) for edge-cache reuse.
-- `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric.
-  `normalizeAsnQuery()` — `/api/whois` `?q=`: `AS<n>` (prefix required, any
-  case) is range-checked and canonicalized; anything else passes through.
+- `requireValidASN()` — `?asn=` in AS1…AS4294967295, rewritten as bare digits.
+  `normalizeAsnQuery()` — `/api/whois` `?q=`: `AS<n>` (prefix required) is
+  canonicalized; anything else passes through. Both use `common/asn-input.js`.
 - `requireValidCountry()` — `?country=` (alpha-2), uppercased, syntactic only.
   `requireValidProviderId()` — `?id=` ∈ service-status slugs.
 - `requireValidRecordType()` — whitelists and uppercases `?type=` against
@@ -128,15 +128,15 @@ upstreams; those get only what's explicitly needed.
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
-public routes opt in via `cacheable(maxAge)` in `backend-server.js` — e.g.
-`app.get('/api/whois', cacheable(24 * 60 * 60), …)`. `maxAge` may be a `(req) =>
-seconds` resolver (`/api/cfradar` reads its view's TTL; falsy keeps no-store).
+public routes opt in via `cacheable(maxAge)` in `backend-server.js`, e.g.
+`cacheable(24 * 60 * 60)` (TTLs written that way, not raw seconds). `maxAge` may
+be a `(req) => seconds` resolver (cfradar: its view's TTL; falsy = no-store).
 `{ cacheIf }` vetoes caching a 2xx body: `/api/asn-profile` caches only complete
-answers (no section in `error`; its reputation is not per-user). The ASN family
-— `/api/asn-profile`, Radar `asn` / `bgp-prefixes` — shares 7 days. Write TTLs
-as `24 * 60 * 60`, not raw seconds. Only status < 400 is cached; handlers never
-touch `Cache-Control`. **Auth'd / per-user endpoints must not be wrapped** —
-their caching belongs to the upstream owning the auth context.
+answers (no section `error` / `incomplete`; reputation is not per-user), cfradar
+no partial view answer (`isCompleteRadarAnswer`). The ASN family (profile, Radar
+`asn` / `bgp-prefixes`) shares 7 days. Only status < 400 is cached; handlers
+never touch `Cache-Control`. **Auth'd / per-user endpoints must not be
+wrapped** — their caching belongs to the upstream owning the auth context.
 
 ## Testing
 

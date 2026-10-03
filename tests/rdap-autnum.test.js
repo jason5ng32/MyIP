@@ -133,7 +133,7 @@ describe('rdapAutnum', () => {
         const urls = [];
         globalThis.fetch = async (url) => {
             urls.push(String(url));
-            if (String(url).includes('data.iana.org')) {
+            if (new URL(String(url)).hostname === 'data.iana.org') {
                 return new Response(JSON.stringify({ services: [[['13335'], ['https://rdap.arin.net/registry/']]] }));
             }
             return new Response(JSON.stringify(AUTNUM_DOC));

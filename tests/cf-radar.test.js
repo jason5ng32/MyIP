@@ -1,12 +1,13 @@
 // Unit tests for the pure transform pipeline in common/cf-radar.js:
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
 // dedupe, sort and cap), the country-traffic matrix aggregation, the asn
-// view's response shaping, and the bgp-prefixes list + country shares.
+// view's response shaping and partial-segment reporting (fetch stubbed), and
+// the bgp-prefixes list + country shares.
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
 // Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { afterEach, describe, it } from 'node:test';
 
 import {
     normalizeOutages,
@@ -14,9 +15,13 @@ import {
     mergeEvents,
     buildTrafficMatrix,
     shapeAsnProfile,
+    loadAsnSummary,
+    isCompleteRadarAnswer,
+    RADAR_VIEWS,
     normalizePrefixOrigins,
     buildCountryShares,
 } from '../common/cf-radar.js';
+import logger from '../common/logger.js';
 
 const outageFixture = {
     id: '1645',
@@ -259,6 +264,86 @@ describe('shapeAsnProfile', () => {
     });
 });
 
+describe('loadAsnSummary / asn view', () => {
+    const originalFetch = globalThis.fetch;
+    const originalWarn = logger.warn;
+    afterEach(() => {
+        globalThis.fetch = originalFetch;
+        logger.warn = originalWarn;
+    });
+
+    // Radar segment bodies keyed by API path (after /client/v4); a path
+    // mapped to a number answers with that HTTP status.
+    const stubRadar = (byPath) => {
+        logger.warn = () => {};
+        globalThis.fetch = async (url) => {
+            const { hostname, pathname } = new URL(String(url));
+            assert.equal(hostname, 'api.cloudflare.com');
+            const answer = byPath[pathname.replace('/client/v4', '')];
+            if (typeof answer === 'number') return new Response('busy', { status: answer });
+            return new Response(JSON.stringify(answer ?? { result: {} }));
+        };
+    };
+    const KNOWN = {
+        '/radar/entities/asns/13335': { result: { asn: { name: 'CLOUDFLARENET', country: 'US' } } },
+        '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
+    };
+    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
+
+    it('reports a complete answer, with the local counts kept out of radarFields', async () => {
+        stubRadar(KNOWN);
+        const { summary, radarFields, failedSegments } = await loadAsnSummary('13335', counts);
+        assert.deepEqual(failedSegments, []);
+        assert.equal(summary.asnName, 'CLOUDFLARENET');
+        assert.equal(summary.peerCount, '7');
+        assert.equal(radarFields.asnName, 'CLOUDFLARENET');
+        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount']) {
+            assert.equal(Object.hasOwn(radarFields, key), false, key);
+        }
+    });
+
+    it('an AS Radar does not know has only local counts, none in radarFields', async () => {
+        stubRadar({ '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 0 } } } });
+        const { summary, radarFields } = await loadAsnSummary('64500', counts);
+        assert.equal(summary.upstreamCount, '2');
+        assert.deepEqual(JSON.parse(JSON.stringify(radarFields)), { prefixesV4: '0' });
+    });
+
+    it('names the failed segments and still shapes the rest', async () => {
+        stubRadar({ ...KNOWN, '/radar/http/summary/ip_version': 503, '/radar/quality/speed/summary': 500 });
+        const { summary, failedSegments } = await loadAsnSummary('13335', counts);
+        assert.deepEqual(failedSegments.sort(), ['ipVersion', 'quality']);
+        assert.equal(summary.asnName, 'CLOUDFLARENET');
+    });
+
+    it("a 404 is Radar's \"no such AS\", not a failed segment", async () => {
+        stubRadar({ '/radar/entities/asns/64511': 404, '/radar/bgp/routes/stats': { result: { stats: {} } } });
+        const { failedSegments } = await loadAsnSummary('64511', counts);
+        assert.equal(failedSegments.includes('asnInfo'), false);
+    });
+
+    it('throws when every segment failed', async () => {
+        stubRadar(new Proxy({}, { get: () => 502 }));
+        await assert.rejects(loadAsnSummary('13335', counts), /Radar responded 502/);
+    });
+
+    it('the asn view serves a partial answer unchanged but marks it uncacheable', async () => {
+        stubRadar(KNOWN);
+        const complete = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        assert.equal(isCompleteRadarAnswer(complete), true);
+
+        stubRadar({ ...KNOWN, '/radar/http/summary/bot_class': 503 });
+        const partial = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        assert.equal(partial.asnName, 'CLOUDFLARENET');
+        assert.equal(isCompleteRadarAnswer(partial), false);
+        assert.equal(JSON.stringify(partial), JSON.stringify({ ...partial }), 'no marker in the payload');
+        assert.deepEqual(Object.getOwnPropertySymbols(partial), []);
+        // Other views' answers and non-objects stay cacheable.
+        assert.equal(isCompleteRadarAnswer({ ...partial }), true);
+        assert.equal(isCompleteRadarAnswer(null), true);
+    });
+});
+
 describe('normalizePrefixOrigins', () => {
     it('maps pfx2as rows to the prefix/rpki/peers shape', () => {
         assert.deepEqual(normalizePrefixOrigins({
@@ -279,10 +364,14 @@ describe('normalizePrefixOrigins', () => {
         assert.deepEqual(row, { prefix: '104.22.21.0/24', rpki: 'Invalid', peers: 0 });
     });
 
-    it('returns [] for malformed or missing results', () => {
-        assert.deepEqual(normalizePrefixOrigins(undefined), []);
-        assert.deepEqual(normalizePrefixOrigins({}), []);
-        assert.deepEqual(normalizePrefixOrigins({ prefix_origins: 'nope' }), []);
+    it('returns [] only for a real empty list', () => {
+        assert.deepEqual(normalizePrefixOrigins({ prefix_origins: [] }), []);
+    });
+
+    it('throws on malformed or missing results instead of reading them as empty', () => {
+        for (const result of [undefined, null, {}, { prefix_origins: 'nope' }, { prefix_origins: null }]) {
+            assert.throws(() => normalizePrefixOrigins(result), /malformed pfx2as/, JSON.stringify(result));
+        }
     });
 });
 
