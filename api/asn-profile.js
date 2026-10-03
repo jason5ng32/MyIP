@@ -1,16 +1,20 @@
 // /api/asn-profile?asn=<n> — everything the ASN Profile page shows, in one
 // answer: Radar ASN summary + prefix list (common/cf-radar.js), CAIDA
 // topology and neighbours (./asn-connectivity.js), RDAP autnum
-// (common/rdap.js), ASRank (common/asrank.js) and, when the private API is
-// configured, reputation (common/asn-reputation.js). Composition, deadlines and
-// statuses live in common/asn-profile.js. `asn` arrives numeric
+// (common/rdap.js), ASRank (common/asrank.js), the local PeeringDB index
+// (common/peeringdb-db.js) and, when the private API is configured,
+// reputation (common/asn-reputation.js). Composition, deadlines and statuses
+// live in common/asn-profile.js. `asn` arrives numeric
 // (requireValidASN). 200 unless every configured source failed (502).
 
 import { RADAR_VIEWS, hasRadarApiKey } from '../common/cf-radar.js';
 import { rdapAutnum, isAutnumMissing } from '../common/rdap.js';
 import { queryAsRank } from '../common/asrank.js';
 import { requestAsnReputation } from '../common/asn-reputation.js';
-import { buildSectionLoaders, composeAsnProfile, allSourcesFailed } from '../common/asn-profile.js';
+import { isPeeringdbLoaded, lookupPeeringdb } from '../common/peeringdb-db.js';
+import {
+    SOURCE_TIMEOUTS, buildSectionLoaders, composeAsnProfile, allSourcesFailed,
+} from '../common/asn-profile.js';
 import { getAsnConnectivity } from './asn-connectivity.js';
 
 export default async (req, res) => {
@@ -20,11 +24,13 @@ export default async (req, res) => {
         fetchRadarAsn: (n) => RADAR_VIEWS.asn.fetch({ asn: String(n) }),
         fetchRadarPrefixes: (n) => RADAR_VIEWS['bgp-prefixes'].fetch({ asn: String(n) }),
         getConnectivity: getAsnConnectivity,
-        rdapAutnum,
+        rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,
-        queryAsRank,
+        queryAsRank: (n) => queryAsRank(n, { timeoutMs: SOURCE_TIMEOUTS.rank }),
         // Private-API pass-through: the caller's headers go upstream.
-        requestReputation: (n) => requestAsnReputation(n, req.headers),
+        requestReputation: (n) => requestAsnReputation(n, req.headers, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
+        isPeeringdbLoaded,
+        lookupPeeringdb,
     });
     const body = await composeAsnProfile(asn, loaders);
     if (allSourcesFailed(body)) {

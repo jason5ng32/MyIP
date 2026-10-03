@@ -1129,6 +1129,58 @@
       "peers": "Pairs",
       "customers": "Clients",
       "none": "Aucun observé"
+    },
+    "peering": {
+      "title": "Peering et centres de données",
+      "desc": "Informations déclarées par les opérateurs du réseau eux-mêmes dans PeeringDB. Les points d'échange internet sont les IXP auxquels il est raccordé, avec la capacité des ports additionnée par point d'échange ; RS signale une session avec les serveurs de routes du point d'échange. Les centres de données sont ceux où il est présent.",
+      "policy": "Politique de peering",
+      "traffic": "Volume de trafic",
+      "ratio": "Ratio de trafic",
+      "irr": "as-set IRR",
+      "website": "Site web",
+      "scope": "Couverture géographique",
+      "exchanges": "Points d'échange internet ({count})",
+      "facilities": "Centres de données ({count})",
+      "rs": "RS",
+      "rsTitle": "Pair des serveurs de routes du point d'échange",
+      "showAll": "Tout afficher ({count})",
+      "showLess": "Afficher moins",
+      "types": {
+        "isp": "Câble/DSL/FAI",
+        "nsp": "NSP",
+        "content": "Contenu",
+        "enterprise": "Entreprise",
+        "education": "Enseignement/Recherche",
+        "nonProfit": "Non lucratif",
+        "government": "Administration",
+        "routeServer": "Serveur de routes",
+        "routeCollector": "Collecteur de routes",
+        "networkServices": "Services réseau"
+      },
+      "scopes": {
+        "regional": "Régional",
+        "northAmerica": "Amérique du Nord",
+        "asiaPacific": "Asie-Pacifique",
+        "europe": "Europe",
+        "southAmerica": "Amérique du Sud",
+        "africa": "Afrique",
+        "australia": "Australie",
+        "middleEast": "Moyen-Orient",
+        "global": "Mondial"
+      },
+      "ratios": {
+        "balanced": "Équilibré",
+        "mostlyInbound": "Plutôt entrant",
+        "heavyInbound": "Fortement entrant",
+        "mostlyOutbound": "Plutôt sortant",
+        "heavyOutbound": "Fortement sortant"
+      },
+      "policies": {
+        "open": "Ouverte",
+        "selective": "Sélective",
+        "restrictive": "Restrictive",
+        "no": "Pas de peering"
+      }
     }
   },
   "enhanceddnsleaktest": {

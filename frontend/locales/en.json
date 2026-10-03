@@ -1129,6 +1129,58 @@
       "peers": "Peers",
       "customers": "Customers",
       "none": "None observed"
+    },
+    "peering": {
+      "title": "Peering & facilities",
+      "desc": "As registered by the network's own operators in PeeringDB. Internet exchanges are the IXPs it connects to, with port capacity summed per exchange; RS marks a session with the exchange's route servers. Facilities are the data centres it is present in.",
+      "policy": "Peering policy",
+      "traffic": "Traffic level",
+      "ratio": "Traffic ratio",
+      "irr": "IRR as-set",
+      "website": "Website",
+      "scope": "Geographic scope",
+      "exchanges": "Internet exchanges ({count})",
+      "facilities": "Facilities ({count})",
+      "rs": "RS",
+      "rsTitle": "Peers with the exchange's route servers",
+      "showAll": "Show all {count}",
+      "showLess": "Show fewer",
+      "types": {
+        "isp": "Cable/DSL/ISP",
+        "nsp": "NSP",
+        "content": "Content",
+        "enterprise": "Enterprise",
+        "education": "Educational/Research",
+        "nonProfit": "Non-profit",
+        "government": "Government",
+        "routeServer": "Route server",
+        "routeCollector": "Route collector",
+        "networkServices": "Network services"
+      },
+      "scopes": {
+        "regional": "Regional",
+        "northAmerica": "North America",
+        "asiaPacific": "Asia Pacific",
+        "europe": "Europe",
+        "southAmerica": "South America",
+        "africa": "Africa",
+        "australia": "Australia",
+        "middleEast": "Middle East",
+        "global": "Global"
+      },
+      "ratios": {
+        "balanced": "Balanced",
+        "mostlyInbound": "Mostly inbound",
+        "heavyInbound": "Heavy inbound",
+        "mostlyOutbound": "Mostly outbound",
+        "heavyOutbound": "Heavy outbound"
+      },
+      "policies": {
+        "open": "Open",
+        "selective": "Selective",
+        "restrictive": "Restrictive",
+        "no": "No peering"
+      }
     }
   },
   "enhanceddnsleaktest": {

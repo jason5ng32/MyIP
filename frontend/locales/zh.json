@@ -1129,6 +1129,58 @@
       "peers": "对等",
       "customers": "客户",
       "none": "未观察到"
+    },
+    "peering": {
+      "title": "对等与驻点",
+      "desc": "以下信息由该网络的运营者在 PeeringDB 中自行登记。互联网交换中心是它接入的 IX，端口速率按每个 IX 合计；RS 表示与该 IX 的路由服务器建立了会话。机房驻点是它入驻的数据中心。",
+      "policy": "对等策略",
+      "traffic": "流量规模",
+      "ratio": "流量方向",
+      "irr": "IRR as-set",
+      "website": "官网",
+      "scope": "覆盖范围",
+      "exchanges": "互联网交换中心（{count}）",
+      "facilities": "机房驻点（{count}）",
+      "rs": "RS",
+      "rsTitle": "与该交换中心的路由服务器对等",
+      "showAll": "显示全部 {count} 个",
+      "showLess": "收起",
+      "types": {
+        "isp": "有线/DSL/ISP",
+        "nsp": "NSP（网络服务商）",
+        "content": "内容",
+        "enterprise": "企业",
+        "education": "教育/科研",
+        "nonProfit": "非营利",
+        "government": "政府",
+        "routeServer": "路由服务器",
+        "routeCollector": "路由收集器",
+        "networkServices": "网络服务"
+      },
+      "scopes": {
+        "regional": "区域",
+        "northAmerica": "北美",
+        "asiaPacific": "亚太",
+        "europe": "欧洲",
+        "southAmerica": "南美",
+        "africa": "非洲",
+        "australia": "澳大利亚",
+        "middleEast": "中东",
+        "global": "全球"
+      },
+      "ratios": {
+        "balanced": "均衡",
+        "mostlyInbound": "以入站为主",
+        "heavyInbound": "大量入站",
+        "mostlyOutbound": "以出站为主",
+        "heavyOutbound": "大量出站"
+      },
+      "policies": {
+        "open": "开放",
+        "selective": "选择性",
+        "restrictive": "限制性",
+        "no": "不对等"
+      }
     }
   },
   "enhanceddnsleaktest": {

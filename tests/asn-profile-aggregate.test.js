@@ -1,20 +1,31 @@
 // Tests for common/asn-profile.js — the /api/asn-profile composition:
 // per-section classification, deadlines, the all-failed verdict and the
 // edge-cache veto. Loaders are injected; nothing touches the network.
+// The frontend's request budget comes from frontend/utils/asn-profile-view.js.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  SECTIONS, DEADLINES, withDeadline, hasMeaningfulField,
-  classifyRadar, classifyPrefixes, classifyConnectivity, classifyRank, classifyReputation,
+  SECTIONS, DEADLINES, INNER_TIMEOUTS, SOURCE_TIMEOUTS, withDeadline, hasMeaningfulField,
+  classifyRadar, classifyPrefixes, classifyConnectivity, classifyRank, classifyReputation, classifyPeeringdb,
   buildSectionLoaders, composeAsnProfile, allSourcesFailed, isCompleteProfile,
 } from '../common/asn-profile.js';
+import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/asn-profile-view.js';
 
 const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
 describe('deadlines', () => {
-  it('every section has a budget and the worst case stays under 8 s', () => {
-    for (const section of SECTIONS) assert.ok(DEADLINES[section] > 0 && DEADLINES[section] <= 8000, section);
+  it('every deadline sits above the inner timeouts of the source it wraps', () => {
+    for (const section of SECTIONS) {
+      assert.ok(Number.isFinite(INNER_TIMEOUTS[section]), section);
+      assert.ok(DEADLINES[section] > INNER_TIMEOUTS[section], section);
+    }
+    assert.equal(INNER_TIMEOUTS.whois, 8000 + SOURCE_TIMEOUTS.autnum, 'IANA bootstrap, then autnum');
+  });
+
+  it('the page waits longer than the slowest section, with headroom', () => {
+    const slowest = Math.max(...SECTIONS.map((section) => DEADLINES[section]));
+    assert.ok(ASN_PROFILE_TIMEOUT_MS >= slowest + 5000, `${ASN_PROFILE_TIMEOUT_MS} vs ${slowest}`);
   });
 
   it('withDeadline passes a fast result through and rejects a slow one', async () => {
@@ -58,6 +69,13 @@ describe('classification', () => {
     assert.deepEqual(classifyReputation({ status: 200, data: found }), { status: 'ok', data: found });
     assert.throws(() => classifyReputation({ status: 503, data: { error: 'ASN data not loaded' } }));
   });
+
+  it('peeringdb: no index is disabled, no record empty, a record ok', () => {
+    assert.deepEqual(classifyPeeringdb(false, null), { status: 'disabled', data: null });
+    assert.deepEqual(classifyPeeringdb(true, null), { status: 'empty', data: null });
+    const record = { policy: 'Open', types: [], ixs: [], facilities: [] };
+    assert.deepEqual(classifyPeeringdb(true, record), { status: 'ok', data: record });
+  });
 });
 
 const deps = (overrides = {}) => ({
@@ -69,6 +87,8 @@ const deps = (overrides = {}) => ({
   isAutnumMissing: (err) => err.message.startsWith('ASN not found'),
   queryAsRank: async () => ({ rank: 10 }),
   requestReputation: async () => null,
+  isPeeringdbLoaded: () => true,
+  lookupPeeringdb: (asn) => (asn === 13335 ? { policy: 'Open', types: ['Content'], ixs: [], facilities: [] } : null),
   ...overrides,
 });
 
@@ -91,9 +111,10 @@ describe('composeAsnProfile', () => {
   it('assembles every section with its status', async () => {
     const body = await composeAsnProfile(13335, buildSectionLoaders(deps()));
     assert.deepEqual(body.status, {
-      radar: 'ok', prefixes: 'ok', connectivity: 'ok', whois: 'ok', rank: 'ok', reputation: 'disabled',
+      radar: 'ok', prefixes: 'ok', connectivity: 'ok', whois: 'ok', rank: 'ok', reputation: 'disabled', peeringdb: 'ok',
     });
     assert.equal(body.asn, 13335);
+    assert.equal(body.peeringdb.policy, 'Open');
     assert.equal(body.radar.asnName, 'EXAMPLE');
     assert.equal(body.reputation, null);
     assert.equal(isCompleteProfile(body), true);
@@ -113,6 +134,16 @@ describe('composeAsnProfile', () => {
     assert.equal(body.status.prefixes, 'error');
     assert.equal(body.status.radar, 'ok');
     assert.equal(isCompleteProfile(body), false);
+  });
+
+  it('peeringdb never makes an answer incomplete or failed', async () => {
+    const missing = await composeAsnProfile(64500, buildSectionLoaders(deps()));
+    assert.equal(missing.status.peeringdb, 'empty');
+    assert.equal(isCompleteProfile(missing), true);
+    const unloaded = await composeAsnProfile(13335, buildSectionLoaders(deps({ isPeeringdbLoaded: () => false })));
+    assert.equal(unloaded.status.peeringdb, 'disabled');
+    assert.equal(unloaded.peeringdb, null);
+    assert.equal(isCompleteProfile(unloaded), true);
   });
 
   it('a loader that throws synchronously is contained', async () => {

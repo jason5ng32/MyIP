@@ -1129,6 +1129,58 @@
       "peers": "對等",
       "customers": "客戶",
       "none": "未觀察到"
+    },
+    "peering": {
+      "title": "對等與駐點",
+      "desc": "以下資訊由該網路的營運者在 PeeringDB 中自行登記。網際網路交換中心是它接入的 IX，連接埠速率按每個 IX 合計；RS 表示與該 IX 的路由伺服器建立了工作階段。機房駐點是它進駐的資料中心。",
+      "policy": "對等策略",
+      "traffic": "流量規模",
+      "ratio": "流量方向",
+      "irr": "IRR as-set",
+      "website": "官網",
+      "scope": "涵蓋範圍",
+      "exchanges": "網際網路交換中心（{count}）",
+      "facilities": "機房駐點（{count}）",
+      "rs": "RS",
+      "rsTitle": "與該交換中心的路由伺服器對等",
+      "showAll": "顯示全部 {count} 個",
+      "showLess": "收合",
+      "types": {
+        "isp": "有線/DSL/ISP",
+        "nsp": "NSP（網路服務商）",
+        "content": "內容",
+        "enterprise": "企業",
+        "education": "教育/學研",
+        "nonProfit": "非營利",
+        "government": "政府",
+        "routeServer": "路由伺服器",
+        "routeCollector": "路由收集器",
+        "networkServices": "網路服務"
+      },
+      "scopes": {
+        "regional": "區域",
+        "northAmerica": "北美",
+        "asiaPacific": "亞太",
+        "europe": "歐洲",
+        "southAmerica": "南美",
+        "africa": "非洲",
+        "australia": "澳洲",
+        "middleEast": "中東",
+        "global": "全球"
+      },
+      "ratios": {
+        "balanced": "均衡",
+        "mostlyInbound": "以入站為主",
+        "heavyInbound": "大量入站",
+        "mostlyOutbound": "以出站為主",
+        "heavyOutbound": "大量出站"
+      },
+      "policies": {
+        "open": "開放",
+        "selective": "選擇性",
+        "restrictive": "限制性",
+        "no": "不對等"
+      }
     }
   },
   "enhanceddnsleaktest": {

@@ -23,6 +23,7 @@ import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler from '../api/asn-profile.js';
+import { isPeeringdbLoaded } from '../common/peeringdb-db.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -696,7 +697,8 @@ describe('ipcheck-ing handler', () => {
 // -- asn-profile handler ---------------------------------------------------
 // Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
 // here: unconfigured sources read as disabled, failing upstreams as error,
-// and the private-API pass-through for the reputation section.
+// the local PeeringDB section, and the private-API pass-through for the
+// reputation section.
 
 describe('asn-profile handler', () => {
     it('answers 200 with per-section statuses when only some sources work', async () => {
@@ -718,6 +720,10 @@ describe('asn-profile handler', () => {
         assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
         assert.equal(res.body.whois, null);
         assert.equal(res.body.rank, null);
+        // Local and never an error: disabled without an index file (the
+        // checkout default), ok / empty once the updater has built one.
+        if (isPeeringdbLoaded()) assert.ok(['ok', 'empty'].includes(res.body.status.peeringdb));
+        else assert.equal(res.body.status.peeringdb, 'disabled');
     });
 
     it('forwards the caller headers to the private API for reputation', async () => {

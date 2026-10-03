@@ -5,26 +5,49 @@
 // loaders, so tests need no network.
 //
 // Response shape (one key per section, plus `status`):
-//   { asn, status: { radar, prefixes, connectivity, whois, rank, reputation },
-//     radar, prefixes, connectivity, whois, rank, reputation }
+//   { asn, status: { radar, prefixes, connectivity, whois, rank, reputation, peeringdb },
+//     radar, prefixes, connectivity, whois, rank, reputation, peeringdb }
 // status values: 'ok' (data present) · 'empty' (source answered, nothing
 // for this AS) · 'error' (failed / timed out) · 'disabled' (not configured
 // on this deployment). Section data is non-null only for 'ok'.
 
 import logger from './logger.js';
 
-export const SECTIONS = ['radar', 'prefixes', 'connectivity', 'whois', 'rank', 'reputation'];
+export const SECTIONS = ['radar', 'prefixes', 'connectivity', 'whois', 'rank', 'reputation', 'peeringdb'];
 
-// Per-section budget (ms). Each sits just above the source's own upstream
-// timeout where it has one (ASRank 4s, RDAP 5s), and cuts Radar's 8 s
-// per-segment default short, so the whole answer is bounded by the largest.
+// Upstream timeouts api/asn-profile.js hands to the sources that take one.
+export const SOURCE_TIMEOUTS = { autnum: 5000, rank: 4000, reputation: 4000 };
+
+const UPSTREAM_DEFAULT_MS = 8000; // fetchUpstream's default
+
+// Worst-case time (ms) each source's own upstream timeouts allow, so a
+// source that degrades internally still answers before its deadline:
+//   radar        7 parallel Radar calls at the fetchUpstream default
+//   prefixes     one Radar pfx2as call + local MaxMind
+//   whois        IANA bootstrap (default, cached 24 h), then RDAP autnum
+//   connectivity local CAIDA + RIPEstat name fallback (3 s, in parallel)
+//   rank / reputation  ASRank GraphQL / private API
+//   peeringdb    local index, no I/O
+export const INNER_TIMEOUTS = {
+    radar: UPSTREAM_DEFAULT_MS,
+    prefixes: UPSTREAM_DEFAULT_MS,
+    whois: UPSTREAM_DEFAULT_MS + SOURCE_TIMEOUTS.autnum,
+    connectivity: 3000,
+    rank: SOURCE_TIMEOUTS.rank,
+    reputation: SOURCE_TIMEOUTS.reputation,
+    peeringdb: 0,
+};
+
+// Per-section budget (ms): each sits above its source's worst case
+// (INNER_TIMEOUTS), so the whole answer is bounded by the largest.
 export const DEADLINES = {
-    radar: 6500,
-    prefixes: 6500,
+    radar: 10000,
+    prefixes: 10000,
     connectivity: 5000,
-    whois: 6500,
+    whois: 14000,
     rank: 5000,
     reputation: 5000,
+    peeringdb: 1000,
 };
 
 // Reject with a code 'deadline' error when `promise` outlives `ms`. The
@@ -76,13 +99,21 @@ export const classifyReputation = (answer) => {
     return result(answer.data?.found === true ? 'ok' : 'empty', answer.data);
 };
 
+// `loaded` false = no PeeringDB index on this deployment; `record` is
+// lookupPeeringdb's (null when the AS has none).
+export const classifyPeeringdb = (loaded, record) => {
+    if (!loaded) return result('disabled');
+    return result(record ? 'ok' : 'empty', record);
+};
+
 // -- loaders ------------------------------------------------------------------
 
 // Section loaders over the real data functions (injected — see
 // api/asn-profile.js). Each resolves { status, data } or throws.
 //   deps: { hasRadarKey(), fetchRadarAsn(asn), fetchRadarPrefixes(asn),
 //           getConnectivity(asn), rdapAutnum(asn), isAutnumMissing(err),
-//           queryAsRank(asn), requestReputation(asn) }
+//           queryAsRank(asn), requestReputation(asn),
+//           isPeeringdbLoaded(), lookupPeeringdb(asn) }
 export const buildSectionLoaders = (deps) => ({
     radar: async (asn) => (deps.hasRadarKey() ? classifyRadar(await deps.fetchRadarAsn(asn)) : result('disabled')),
     prefixes: async (asn) => (deps.hasRadarKey() ? classifyPrefixes(await deps.fetchRadarPrefixes(asn)) : result('disabled')),
@@ -97,6 +128,7 @@ export const buildSectionLoaders = (deps) => ({
     },
     rank: async (asn) => classifyRank(await deps.queryAsRank(asn)),
     reputation: async (asn) => classifyReputation(await deps.requestReputation(asn)),
+    peeringdb: async (asn) => classifyPeeringdb(deps.isPeeringdbLoaded(), deps.lookupPeeringdb(asn)),
 });
 
 // Run every loader under its deadline and assemble the response body.

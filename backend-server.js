@@ -336,10 +336,11 @@ if (process.env.SENTRY_DSN_BACKEND) {
 }
 
 
-// Bootstrap every offline dataset (MaxMind, CAIDA) before accepting traffic
-// so we never serve mid-download. Each step is non-fatal: a failure leaves
-// the dependent API in a degraded state (MaxMind → 503; CAIDA → empty graph
-// or RIPEstat fallback) but doesn't block the listener.
+// Bootstrap every offline dataset (MaxMind, CAIDA incl. the PeeringDB
+// mirror) before accepting traffic so we never serve mid-download. Each step
+// is non-fatal: a failure leaves the dependent API in a degraded state
+// (MaxMind → 503; CAIDA → empty graph, RIPEstat fallback or no peering
+// section) but doesn't block the listener.
 async function bootBackend() {
     await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
     await reloadMaxMindDatabases('startup').catch(() => {

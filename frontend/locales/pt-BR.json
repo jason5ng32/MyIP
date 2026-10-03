@@ -1129,6 +1129,58 @@
       "peers": "Peers",
       "customers": "Clientes",
       "none": "Nenhum observado"
+    },
+    "peering": {
+      "title": "Peering e data centers",
+      "desc": "Informações declaradas pelos próprios operadores da rede no PeeringDB. Os pontos de troca de tráfego são os IXPs aos quais ela se conecta, com a capacidade das portas somada por ponto de troca; RS indica sessão com os servidores de rota do ponto de troca. Os data centers são aqueles em que ela está presente.",
+      "policy": "Política de peering",
+      "traffic": "Volume de tráfego",
+      "ratio": "Proporção de tráfego",
+      "irr": "as-set IRR",
+      "website": "Site",
+      "scope": "Abrangência",
+      "exchanges": "Pontos de troca de tráfego ({count})",
+      "facilities": "Data centers ({count})",
+      "rs": "RS",
+      "rsTitle": "Faz peering com os servidores de rota do ponto de troca",
+      "showAll": "Mostrar todos ({count})",
+      "showLess": "Mostrar menos",
+      "types": {
+        "isp": "Cabo/DSL/ISP",
+        "nsp": "NSP",
+        "content": "Conteúdo",
+        "enterprise": "Empresa",
+        "education": "Educação/Pesquisa",
+        "nonProfit": "Sem fins lucrativos",
+        "government": "Governo",
+        "routeServer": "Servidor de rotas",
+        "routeCollector": "Coletor de rotas",
+        "networkServices": "Serviços de rede"
+      },
+      "scopes": {
+        "regional": "Regional",
+        "northAmerica": "América do Norte",
+        "asiaPacific": "Ásia-Pacífico",
+        "europe": "Europa",
+        "southAmerica": "América do Sul",
+        "africa": "África",
+        "australia": "Austrália",
+        "middleEast": "Oriente Médio",
+        "global": "Global"
+      },
+      "ratios": {
+        "balanced": "Equilibrado",
+        "mostlyInbound": "Principalmente de entrada",
+        "heavyInbound": "Fortemente de entrada",
+        "mostlyOutbound": "Principalmente de saída",
+        "heavyOutbound": "Fortemente de saída"
+      },
+      "policies": {
+        "open": "Aberta",
+        "selective": "Seletiva",
+        "restrictive": "Restritiva",
+        "no": "Sem peering"
+      }
     }
   },
   "enhanceddnsleaktest": {

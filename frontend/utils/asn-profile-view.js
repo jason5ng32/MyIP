@@ -2,7 +2,8 @@
 // the one `/api/asn-profile` response (sections + `status`, see
 // common/asn-profile.js): which sections render, hero identity, key facts,
 // registration rows, customer cone, RPKI summary, prefix rows, country
-// shares, neighbour groups and the reputation meters / verdict.
+// shares, neighbour groups, the reputation meters / verdict and the
+// PeeringDB hero line, facts and IX / facility lists.
 //
 // Relative imports keep this file importable from the Node test runner.
 import { parseCidr } from './ip-math.js';
@@ -41,7 +42,11 @@ const isObject = (value) => value !== null && typeof value === 'object' && !Arra
 /* ------------------------------------------------------------------ */
 
 // Cache-buster: bump on response-shape changes (sent as `v=`).
-export const ASN_PROFILE_VERSION = 3;
+export const ASN_PROFILE_VERSION = 4;
+
+// Client budget for the one request: above the backend's largest
+// per-section deadline (DEADLINES in common/asn-profile.js).
+export const ASN_PROFILE_TIMEOUT_MS = 20000;
 
 export const asnProfileUrl = (asn) => `/api/asn-profile?asn=${asn}&v=${ASN_PROFILE_VERSION}`;
 
@@ -60,6 +65,7 @@ const SECTION_SOURCE = {
     whois: 'RIR RDAP',
     rank: 'CAIDA AS Rank',
     reputation: 'IPCheck.ing',
+    peeringdb: 'PeeringDB',
 };
 
 export const failedSources = (profile) => [...new Set(Object.entries(profile?.status || {})
@@ -274,3 +280,94 @@ export const proxyListedCount = (rep) => {
 export const VERDICT_TONE = { none: 'ok-fast', low: 'ok-fast', medium: 'ok-slow', high: 'fail' };
 
 export const verdictLevel = (rep) => (rep?.found === true && rep.level in VERDICT_TONE ? rep.level : null);
+
+/* ------------------------------------------------------------------ */
+/* PeeringDB                                                           */
+/* ------------------------------------------------------------------ */
+
+// PeeringDB's fixed vocabularies → locale key slugs under
+// asnprofile.peering.*; a value outside them is shown as PeeringDB wrote it.
+export const PEERING_ENUMS = {
+    types: {
+        'Cable/DSL/ISP': 'isp', NSP: 'nsp', Content: 'content', Enterprise: 'enterprise',
+        'Educational/Research': 'education', 'Non-Profit': 'nonProfit', Government: 'government',
+        'Route Server': 'routeServer', 'Route Collector': 'routeCollector', 'Network Services': 'networkServices',
+    },
+    scopes: {
+        Regional: 'regional', 'North America': 'northAmerica', 'Asia Pacific': 'asiaPacific', Europe: 'europe',
+        'South America': 'southAmerica', Africa: 'africa', Australia: 'australia', 'Middle East': 'middleEast',
+        Global: 'global',
+    },
+    ratios: {
+        Balanced: 'balanced', 'Mostly Inbound': 'mostlyInbound', 'Heavy Inbound': 'heavyInbound',
+        'Mostly Outbound': 'mostlyOutbound', 'Heavy Outbound': 'heavyOutbound',
+    },
+    policies: { Open: 'open', Selective: 'selective', Restrictive: 'restrictive', No: 'no' },
+};
+
+// Locale key for a vocabulary value, or null when it isn't one.
+export const peeringEnumKey = (group, value) => {
+    const slug = PEERING_ENUMS[group]?.[value];
+    return slug ? `asnprofile.peering.${group}.${slug}` : null;
+};
+
+// An http(s) URL without userinfo as { href, label: host without "www." };
+// null otherwise.
+export const websiteLink = (value) => {
+    if (typeof value !== 'string') return null;
+    try {
+        const url = new URL(value.trim());
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+        if (url.username || url.password) return null;
+        return { href: url.href, label: url.hostname.replace(/^www\./i, '') };
+    } catch {
+        return null;
+    }
+};
+
+// Hero additions: network types, website, scope — each only when present.
+export const peeringHero = (pdb) => ({
+    types: Array.isArray(pdb?.types) ? pdb.types.filter((type) => typeof type === 'string' && type) : [],
+    website: websiteLink(pdb?.website),
+    scope: typeof pdb?.scope === 'string' && pdb.scope ? pdb.scope : null,
+});
+
+// The card's fact rows in display order, empties dropped. `group` names
+// the vocabulary a value is translated through.
+export const peeringFacts = (pdb) => [
+    { key: 'policy', value: pdb?.policy, group: 'policies' },
+    { key: 'traffic', value: pdb?.traffic },
+    { key: 'ratio', value: pdb?.ratio, group: 'ratios' },
+    { key: 'irr', value: pdb?.irrAsSet, mono: true },
+].filter((fact) => typeof fact.value === 'string' && fact.value);
+
+// Port capacity in Mbps → '100M' / '10G' / '1.2T' (one decimal at most).
+// `format` renders the number (the page passes a locale formatter).
+export const formatPortSpeed = (mbps, format = (n) => String(n)) => {
+    const value = Number(mbps);
+    if (!Number.isFinite(value) || value <= 0) return '';
+    const [amount, unit] = value >= 1e6 ? [value / 1e6, 'T'] : value >= 1000 ? [value / 1000, 'G'] : [value, 'M'];
+    return `${format(Math.round(amount * 10) / 10)}${unit}`;
+};
+
+const placeRow = (item) => ({
+    name: item.name,
+    city: typeof item.city === 'string' ? item.city : '',
+    cc: pickCountryCode(item.country),
+});
+
+// IX rows in the backend's order (capacity first); unnamed entries dropped.
+export const exchangeRows = (pdb) => (Array.isArray(pdb?.ixs) ? pdb.ixs : [])
+    .filter((item) => typeof item?.name === 'string' && item.name)
+    .map((item) => ({ ...placeRow(item), speed: Number(item.speed) || 0, rsPeer: item.rsPeer === true }));
+
+export const facilityRows = (pdb) => (Array.isArray(pdb?.facilities) ? pdb.facilities : [])
+    .filter((item) => typeof item?.name === 'string' && item.name)
+    .map(placeRow);
+
+// The Peering & facilities card needs at least one list entry; facts alone
+// don't carry it.
+export const hasPeeringCard = (pdb) => exchangeRows(pdb).length > 0 || facilityRows(pdb).length > 0;
+
+// First `first` rows unless expanded.
+export const visibleRows = (rows, expanded, first = 10) => (expanded ? rows : rows.slice(0, first));

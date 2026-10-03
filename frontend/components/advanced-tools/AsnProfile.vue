@@ -5,7 +5,8 @@
      failed is simply left out.
      Order: hero (identity, key facts, registration) beside a compact
      reputation card when there is one → traffic & quality beside top
-     countries → prefixes → connectivity (+ customer cone, topology).
+     countries → prefixes → connectivity (+ customer cone, topology) →
+     peering & facilities (PeeringDB, self-reported).
      One source per concept: relationships = local CAIDA (graph, counts and
      lists alike); prefixes, addresses and RPKI = the pfx2as list; identity =
      Radar → RDAP → ASRank. The query rides the URL as `?q=` (shareable,
@@ -73,8 +74,21 @@
                         </span>
                     </div>
 
-                    <div v-if="isTier1" class="flex flex-wrap items-center gap-1.5">
-                        <Badge variant="secondary">{{ t('asnprofile.tier1') }}</Badge>
+                    <!-- Tier 1 + PeeringDB network types, scope and website; each only when present -->
+                    <div v-if="isTier1 || peerHero.types.length || peerHero.scope || peerHero.website"
+                        class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+                        <div v-if="isTier1 || peerHero.types.length" class="flex flex-wrap items-center gap-1.5">
+                            <Badge v-if="isTier1" variant="secondary">{{ t('asnprofile.tier1') }}</Badge>
+                            <Badge v-for="type in peerHero.types" :key="type" variant="outline" class="font-normal">
+                                {{ enumLabel('types', type) }}</Badge>
+                        </div>
+                        <span v-if="peerHero.scope" class="inline-flex items-center gap-1.5 text-muted-foreground"
+                            :title="t('asnprofile.peering.scope')">
+                            <Globe class="size-3.5 shrink-0" />{{ enumLabel('scopes', peerHero.scope) }}</span>
+                        <a v-if="peerHero.website" :href="peerHero.website.href" target="_blank" rel="noopener"
+                            class="inline-flex min-w-0 items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                            :title="peerHero.website.href" :aria-label="t('asnprofile.peering.website')">
+                            <ExternalLink class="size-3.5 shrink-0" /><span class="truncate">{{ peerHero.website.label }}</span></a>
                     </div>
 
                     <!-- Key facts -->
@@ -334,8 +348,68 @@
                             <p v-else class="text-xs text-muted-foreground">{{ t('asnprofile.connectivity.none') }}</p>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Slot: IX / facility lists (PeeringDB). -->
+                <!-- ============ Peering & facilities (PeeringDB, self-reported) ============ -->
+                <div v-if="peeringCard" class="rounded-lg border bg-card p-4 space-y-4 min-w-0">
+                    <div class="space-y-1">
+                        <h2 class="text-base font-semibold">{{ t('asnprofile.peering.title') }}</h2>
+                        <p class="text-xs text-muted-foreground leading-relaxed">{{ t('asnprofile.peering.desc') }}</p>
+                    </div>
+
+                    <!-- Policy / traffic level / ratio / IRR as-set -->
+                    <dl v-if="peerFacts.length" class="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+                        <div v-for="fact in peerFacts" :key="fact.key" class="rounded-md bg-muted/40 p-3 min-w-0">
+                            <dt class="text-xs text-muted-foreground">{{ t(`asnprofile.peering.${fact.key}`) }}</dt>
+                            <dd class="mt-0.5 text-sm font-medium wrap-break-word" :class="fact.mono && 'font-mono text-xs'">
+                                {{ fact.label }}</dd>
+                        </div>
+                    </dl>
+
+                    <!-- IX | facility lists: side by side from lg up; a lone list spans the row -->
+                    <div v-if="exchanges.length || facilities.length" class="grid gap-4"
+                        :class="exchanges.length && facilities.length && 'lg:grid-cols-2'">
+                        <!-- Exchanges: flag, name, city, RS badge, port capacity summed per IX -->
+                        <section v-if="exchanges.length" class="space-y-2 min-w-0">
+                            <h3 class="text-xs font-medium text-muted-foreground">
+                                {{ t('asnprofile.peering.exchanges', { count: nf.format(exchanges.length) }) }}</h3>
+                            <ul class="rounded-lg border bg-card divide-y">
+                                <li v-for="(row, i) in shownExchanges" :key="i" class="flex items-center gap-2 px-3 py-1.5 text-sm">
+                                    <Icon v-if="row.cc" :icon="'circle-flags:' + row.cc.toLowerCase()" class="size-4 shrink-0" />
+                                    <span v-else class="size-4 shrink-0" />
+                                    <div class="min-w-0 flex-1">
+                                        <div class="truncate" :title="row.name">{{ row.name }}</div>
+                                        <div v-if="row.city" class="truncate text-xs text-muted-foreground" :title="row.city">{{ row.city }}</div>
+                                    </div>
+                                    <Badge v-if="row.rsPeer" variant="outline" :title="t('asnprofile.peering.rsTitle')"
+                                        class="shrink-0 px-1.5 text-[10px] font-medium text-muted-foreground">{{ t('asnprofile.peering.rs') }}</Badge>
+                                    <span class="w-14 shrink-0 text-right font-mono text-xs tabular-nums">{{ formatPortSpeed(row.speed, nf.format) }}</span>
+                                </li>
+                            </ul>
+                            <Button v-if="exchanges.length > FIRST_ROWS" variant="outline" size="sm" class="h-7 cursor-pointer text-xs"
+                                @click="showAllExchanges = !showAllExchanges">
+                                {{ showAllExchanges ? t('asnprofile.peering.showLess') : t('asnprofile.peering.showAll', { count: nf.format(exchanges.length) }) }}</Button>
+                        </section>
+
+                        <!-- Facilities: flag, name, city -->
+                        <section v-if="facilities.length" class="space-y-2 min-w-0">
+                            <h3 class="text-xs font-medium text-muted-foreground">
+                                {{ t('asnprofile.peering.facilities', { count: nf.format(facilities.length) }) }}</h3>
+                            <ul class="rounded-lg border bg-card divide-y">
+                                <li v-for="(row, i) in shownFacilities" :key="i" class="flex items-center gap-2 px-3 py-1.5 text-sm">
+                                    <Icon v-if="row.cc" :icon="'circle-flags:' + row.cc.toLowerCase()" class="size-4 shrink-0" />
+                                    <span v-else class="size-4 shrink-0" />
+                                    <div class="min-w-0 flex-1">
+                                        <div class="truncate" :title="row.name">{{ row.name }}</div>
+                                        <div v-if="row.city" class="truncate text-xs text-muted-foreground" :title="row.city">{{ row.city }}</div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <Button v-if="facilities.length > FIRST_ROWS" variant="outline" size="sm" class="h-7 cursor-pointer text-xs"
+                                @click="showAllFacilities = !showAllFacilities">
+                                {{ showAllFacilities ? t('asnprofile.peering.showLess') : t('asnprofile.peering.showAll', { count: nf.format(facilities.length) }) }}</Button>
+                        </section>
+                    </div>
                 </div>
             </template>
 
@@ -351,18 +425,19 @@ import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } fro
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
-import { ChevronRight, Download, Search, ShieldAlert, ShieldCheck, ShieldX } from '@lucide/vue';
+import { ChevronRight, Download, ExternalLink, Globe, Search, ShieldAlert, ShieldCheck, ShieldX } from '@lucide/vue';
 import { trackEvent } from '@/utils/analytics';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { parseAsnInput } from '@/utils/asn-input.js';
 import { buildTrafficPairs, pickConnectionQuality } from '@/utils/asn-metrics.js';
 import {
-    asnProfileUrl, sectionData, isProfileEmpty, failedSources,
+    asnProfileUrl, ASN_PROFILE_TIMEOUT_MS, sectionData, isProfileEmpty, failedSources,
     hasTopology, isTier1Origin, heroIdentity, registrationFields, keyFacts, coneAsns,
     RPKI_STATES, shapePrefixRows, familyCounts, filterPrefixRows, rpkiSummary, prefixListText,
     countryShareRows, neighbourGroups,
     BASELINE_POSITION, reputationMeters, proxyListedCount, verdictLevel, VERDICT_TONE,
+    peeringEnumKey, peeringHero, peeringFacts, formatPortSpeed, exchangeRows, facilityRows, hasPeeringCard, visibleRows,
 } from '@/utils/asn-profile-view.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
@@ -386,8 +461,6 @@ const route = useRoute();
 const router = useRouter();
 const { dotClass, textClass } = useStatusTone();
 
-// Well above the backend's worst case (its largest per-source deadline).
-const REQUEST_TIMEOUT_MS = 15000;
 
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 const nf = computed(() => new Intl.NumberFormat(locale.value, { maximumFractionDigits: 1 }));
@@ -409,6 +482,8 @@ const FIRST_ROWS = 10;
 const PAGE = 50;
 const familyFilter = ref('all');
 const limit = ref(FIRST_ROWS);
+const showAllExchanges = ref(false);
+const showAllFacilities = ref(false);
 
 const loading = computed(() => state.value === 'loading');
 
@@ -420,8 +495,10 @@ const run = async (asn) => {
     rawOpen.value = false;
     familyFilter.value = 'all';
     limit.value = FIRST_ROWS;
+    showAllExchanges.value = false;
+    showAllFacilities.value = false;
     try {
-        const response = await fetchWithTimeout(asnProfileUrl(asn), { timeoutMs: REQUEST_TIMEOUT_MS });
+        const response = await fetchWithTimeout(asnProfileUrl(asn), { timeoutMs: ASN_PROFILE_TIMEOUT_MS });
         const body = response.ok ? await response.json() : null;
         if (id !== runId) return;
         profile.value = body?.status ? body : null;
@@ -474,6 +551,7 @@ const graph = computed(() => sectionData(profile.value, 'connectivity'));
 const whois = computed(() => sectionData(profile.value, 'whois'));
 const rank = computed(() => sectionData(profile.value, 'rank'));
 const reputation = computed(() => sectionData(profile.value, 'reputation'));
+const peeringdb = computed(() => sectionData(profile.value, 'peeringdb'));
 
 const empty = computed(() => isProfileEmpty(profile.value));
 const failed = computed(() => failedSources(profile.value));
@@ -584,4 +662,21 @@ const groups = computed(() => neighbourGroups(graph.value?.neighbours, NAME_PREV
 const connectivityInfos = computed(() => (graph.value ? { [String(profileAsn.value)]: { graph: graph.value } } : {}));
 
 const cone = computed(() => coneAsns(rank.value));
+
+// ---- peering & facilities (PeeringDB) --------------------------------------
+
+// PeeringDB vocabulary → translated label; anything else as written.
+const enumLabel = (group, value) => {
+    const key = peeringEnumKey(group, value);
+    return key ? t(key) : value;
+};
+
+const peerHero = computed(() => peeringHero(peeringdb.value));
+const peerFacts = computed(() => peeringFacts(peeringdb.value)
+    .map((fact) => ({ ...fact, label: fact.group ? enumLabel(fact.group, fact.value) : fact.value })));
+const exchanges = computed(() => exchangeRows(peeringdb.value));
+const facilities = computed(() => facilityRows(peeringdb.value));
+const peeringCard = computed(() => hasPeeringCard(peeringdb.value));
+const shownExchanges = computed(() => visibleRows(exchanges.value, showAllExchanges.value, FIRST_ROWS));
+const shownFacilities = computed(() => visibleRows(facilities.value, showAllFacilities.value, FIRST_ROWS));
 </script>

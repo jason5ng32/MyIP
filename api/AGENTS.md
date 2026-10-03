@@ -32,15 +32,20 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 ### ASN data
 
 - **`/api/asn-profile`** (`common/asn-profile.js`) runs each ASN source's
-  existing core under its own deadline; a failed or late one is just absent.
-  Always 200 `{ asn, status, …sections }` (`ok` / `empty` / `error` /
-  `disabled`); 502 only if all fail.
+  existing core under its own deadline, set above the upstream timeouts it
+  wraps (`INNER_TIMEOUTS`) so a source degrading inside still answers; a failed
+  or late one is just absent. Always 200 `{ asn, status, …sections }` (`ok` /
+  `empty` / `error` / `disabled`); 502 only if all fail.
 - **Relationship counts follow the graph:** `asn-connectivity` neighbours and
   the Radar `asn` view's counts come from local CAIDA
   (`common/as-relationships.js`), dropping the providers the graph walk
   distrusts.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
+- **Offline datasets** (`common/caida-updater.js` rows): fetched when missing at
+  boot, refreshed daily with `CAIDA_AUTO_UPDATE=true`; PeeringDB only with a
+  Cloudflare key. Its 116 MB dump is stream-distilled (never parsed whole) to a
+  ~6 MB per-ASN index without contact data (`common/peeringdb-distill.js`).
 
 ## Conventions
 
@@ -98,8 +103,7 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   string to four third-party endpoints.
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
 
-New param shape → new guard in `common/guards.js`, attached in
-`backend-server.js`; never open-coded in the handler.
+New param shape → new guard there, attached in `backend-server.js`.
 
 ### Response enrichment lives in middleware too
 
@@ -121,11 +125,6 @@ tokens). `persona` strips the framing headers (`host` / `content-length` / …)
 first, as it re-serializes the body. Do **not** replicate for third-party
 upstreams; those get only what's explicitly needed.
 
-### Defensive method gates
-
-Some handlers keep a `req.method !== 'GET'` branch although the route already
-gates the method — smoke tests assert on it. Leave it when a test covers it.
-
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
@@ -143,7 +142,8 @@ their caching belongs to the upstream owning the auth context.
 
 - Handlers get smoke tests in `tests/api-handlers.test.js` (method gating, param
   branches, "API key missing" early returns); a new or touched handler ships its
-  block in the same change.
+  block in the same change. A `req.method !== 'GET'` branch the route already
+  gates stays when a test asserts on it.
 - Never hit real upstreams: assert before the first `fetchUpstream`, or stub
   `globalThis.fetch` (restored in the shared `afterEach`).
 - Middleware is covered by `tests/guards.test.js` (don't duplicate per handler);

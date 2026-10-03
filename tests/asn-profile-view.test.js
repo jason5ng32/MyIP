@@ -1,8 +1,8 @@
 // Tests for frontend/utils/asn-profile-view.js — the ASN Profile page's
 // pure shaping over the one /api/asn-profile response: which sections
 // render, hero identity and key facts, registration rows, customer cone,
-// RPKI summary, prefix rows, country shares, neighbour groups and the
-// reputation meters.
+// RPKI summary, prefix rows, country shares, neighbour groups, the
+// reputation meters and the PeeringDB hero / facts / lists.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -14,7 +14,10 @@ import {
   normalizeRpki, shapePrefixRows, familyCounts, filterPrefixRows, rpkiSummary, prefixListText,
   countryShareRows, neighbourGroups,
   ratioPosition, BASELINE_POSITION, reputationMeters, proxyListedCount, verdictLevel, VERDICT_TONE,
+  PEERING_ENUMS, peeringEnumKey, websiteLink, peeringHero, peeringFacts, formatPortSpeed,
+  exchangeRows, facilityRows, hasPeeringCard, visibleRows,
 } from '../frontend/utils/asn-profile-view.js';
+import en from '../frontend/locales/en.json' with { type: 'json' };
 
 describe('parseCount', () => {
   it('reads server-formatted integers', () => {
@@ -301,5 +304,89 @@ describe('reputation', () => {
     assert.equal(VERDICT_TONE.high, 'fail');
     assert.equal(verdictLevel({ ...rep, found: false }), null);
     assert.equal(verdictLevel({ ...rep, level: null }), null);
+  });
+});
+
+describe('PeeringDB', () => {
+  const pdb = {
+    website: 'https://www.example.net/about',
+    types: ['Content', 'NSP'],
+    scope: 'Global',
+    traffic: '1-5Tbps',
+    ratio: 'Mostly Outbound',
+    policy: 'Open',
+    irrAsSet: 'AS-EXAMPLE',
+    ixs: [
+      { name: 'IX.br (PTT.br) São Paulo', city: 'São Paulo/SP', country: 'BR', speed: 1800000, rsPeer: true },
+      { name: 'DE-CIX Frankfurt', city: 'Frankfurt', country: 'de', speed: 100000, rsPeer: false },
+      { name: '', city: 'x', country: 'US', speed: 1 },
+    ],
+    facilities: [{ name: 'Equinix FR5', city: null, country: 'XX1' }],
+  };
+
+  it('maps every PeeringDB vocabulary value to an English label', () => {
+    for (const [group, values] of Object.entries(PEERING_ENUMS)) {
+      for (const value of Object.keys(values)) {
+        const key = peeringEnumKey(group, value);
+        const label = key.split('.').reduce((node, part) => node?.[part], en);
+        assert.equal(typeof label, 'string', key);
+      }
+    }
+    assert.equal(peeringEnumKey('types', 'Something New'), null);
+    assert.equal(peeringEnumKey('nope', 'Open'), null);
+  });
+
+  it('website links are http(s) only, labelled by host', () => {
+    assert.deepEqual(websiteLink('https://www.example.net/about'), { href: 'https://www.example.net/about', label: 'example.net' });
+    assert.equal(websiteLink('http://ripe.net').label, 'ripe.net');
+    for (const bad of ['javascript:alert(1)', 'ftp://x.example', 'http://noc.isp@mail.example', 'not a url', null]) {
+      assert.equal(websiteLink(bad), null, String(bad));
+    }
+  });
+
+  it('hero carries only what is present', () => {
+    assert.deepEqual(peeringHero(pdb), { types: ['Content', 'NSP'], website: websiteLink(pdb.website), scope: 'Global' });
+    assert.deepEqual(peeringHero(null), { types: [], website: null, scope: null });
+  });
+
+  it('facts keep display order and drop empties', () => {
+    assert.deepEqual(peeringFacts(pdb).map((fact) => fact.key), ['policy', 'traffic', 'ratio', 'irr']);
+    assert.deepEqual(peeringFacts({ policy: 'Open', ratio: null }), [{ key: 'policy', value: 'Open', group: 'policies' }]);
+    assert.deepEqual(peeringFacts(null), []);
+  });
+
+  it('formats port capacity as M / G / T', () => {
+    assert.equal(formatPortSpeed(100), '100M');
+    assert.equal(formatPortSpeed(1000), '1G');
+    assert.equal(formatPortSpeed(10000), '10G');
+    assert.equal(formatPortSpeed(2500), '2.5G');
+    assert.equal(formatPortSpeed(1800000), '1.8T');
+    assert.equal(formatPortSpeed(1234567), '1.2T');
+    assert.equal(formatPortSpeed(0), '');
+    assert.equal(formatPortSpeed(400000, (n) => `<${n}>`), '<400>G');
+  });
+
+  it('list rows: unnamed entries dropped, country codes checked, city as written', () => {
+    assert.deepEqual(exchangeRows(pdb), [
+      { name: 'IX.br (PTT.br) São Paulo', city: 'São Paulo/SP', cc: 'BR', speed: 1800000, rsPeer: true },
+      { name: 'DE-CIX Frankfurt', city: 'Frankfurt', cc: 'DE', speed: 100000, rsPeer: false },
+    ]);
+    assert.deepEqual(facilityRows(pdb), [{ name: 'Equinix FR5', city: '', cc: null }]);
+    assert.deepEqual(exchangeRows(null), []);
+  });
+
+  it('the card shows only when a list has an entry', () => {
+    assert.equal(hasPeeringCard(pdb), true);
+    assert.equal(hasPeeringCard({ facilities: [{ name: 'F' }] }), true);
+    assert.equal(hasPeeringCard({ policy: 'Open', irr: 'AS-EXAMPLE' }), false);
+    assert.equal(hasPeeringCard({ website: 'https://x.example', types: ['NSP'], scope: 'Global' }), false);
+    assert.equal(hasPeeringCard(null), false);
+  });
+
+  it('lists show the first rows until expanded', () => {
+    const rows = Array.from({ length: 25 }, (_, i) => i);
+    assert.equal(visibleRows(rows, false).length, 10);
+    assert.equal(visibleRows(rows, true).length, 25);
+    assert.equal(visibleRows(rows.slice(0, 4), false).length, 4);
   });
 });

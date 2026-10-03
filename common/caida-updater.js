@@ -4,11 +4,16 @@
 // pattern.
 //
 // Registered datasets:
-//   - as2org   (AS → org-name mapping)    common/as-org-db
-//   - as-rel   (AS relationships, p2c)    common/as-rel-db
+//   - as2org    (AS → org-name mapping)            common/as-org-db
+//   - as-rel    (AS relationships, p2c)            common/as-rel-db
+//   - peeringdb (PeeringDB dump → per-ASN index)   common/peeringdb-db
 //
-// Both share CAIDA_AUTO_UPDATE=true to gate the periodic scheduler
-// (off by default); bootstrap always runs so a fresh checkout works.
+// All share CAIDA_AUTO_UPDATE=true to gate the periodic scheduler (off by
+// default); bootstrap always runs so a fresh checkout works. A row may add
+// `enabled()` (skipped by both when false — peeringdb needs the Cloudflare
+// key, as the ASN Profile is hidden without it), leave out `decompress`
+// (the download is used as is) and add `distill(rawPath, tempDir, { signal })`
+// (turns the download into the published file; the raw file is deleted).
 
 import fs from 'fs';
 import fsp from 'fs/promises';
@@ -21,6 +26,9 @@ import { withCronMonitor } from './sentry-cron.js';
 import { createDecompressor } from './decompress.js';
 import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase } from './as-org-db.js';
 import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase } from './as-rel-db.js';
+import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDatabase } from './peeringdb-db.js';
+import { distillPeeringdbDump } from './peeringdb-distill.js';
+import { hasRadarApiKey } from './cf-radar.js';
 
 const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const INITIAL_UPDATE_DELAY_MS = 60 * 1000;
@@ -29,7 +37,8 @@ const BOOTSTRAP_TIMEOUT_MS = 2 * 60 * 1000;
 const STATE_FILE = '.caida-update-state.json';
 const LOCK_FILE = '.caida-update.lock';
 
-const datasets = [
+// Exported for tests (rows are re-pointed at a temp dir there).
+export const datasets = [
     {
         id: 'as2org',
         dbDir: AS_ORG_DB_DIR,
@@ -68,6 +77,23 @@ const datasets = [
         validate: validateAsRel,
         reload: reloadAsRelDatabase,
     },
+    {
+        id: 'peeringdb',
+        dbDir: PEERINGDB_DB_DIR,
+        canonicalFile: PEERINGDB_FILE,
+        archiveExt: '.json',
+        enabled: hasRadarApiKey,
+        findRemote: findPeeringdbDump,
+        // ~116 MB raw dump → ~6 MB index; only the index is published.
+        distill: async (rawPath, tempDir, { signal } = {}) => {
+            const outPath = path.join(tempDir, PEERINGDB_FILE);
+            const counts = await distillPeeringdbDump(rawPath, outPath, { signal });
+            logger.info({ dataset: 'peeringdb', ...counts }, 'PeeringDB dump distilled');
+            return outPath;
+        },
+        validate: validatePeeringdb,
+        reload: reloadPeeringdbDatabase,
+    },
 ];
 
 let schedulerStarted = false;
@@ -82,7 +108,7 @@ const updateInProgress = new Set();
  * Never throws.
  */
 export async function bootstrapCaidaIfMissing() {
-    for (const dataset of datasets) {
+    for (const dataset of datasets.filter(isDatasetEnabled)) {
         try {
             await bootstrapDataset(dataset);
         } catch (error) {
@@ -113,13 +139,13 @@ export function startCaidaAutoUpdate() {
     setInterval(run, UPDATE_INTERVAL_MS).unref?.();
 
     const nextRunAt = new Date(Date.now() + INITIAL_UPDATE_DELAY_MS);
-    logger.info(`🗓️  CAIDA auto update plan: next check at ${nextRunAt.toLocaleString('en-US', { hour12: false })}, then every 24 hours (${datasets.length} datasets)`);
+    logger.info(`🗓️  CAIDA auto update plan: next check at ${nextRunAt.toLocaleString('en-US', { hour12: false })}, then every 24 hours (${datasets.filter(isDatasetEnabled).length} datasets)`);
 }
 
 // ---------- Orchestration ----------
 
 async function runAllUpdates() {
-    for (const dataset of datasets) {
+    for (const dataset of datasets.filter(isDatasetEnabled)) {
         try {
             await updateDataset(dataset);
         } catch (error) {
@@ -128,7 +154,8 @@ async function runAllUpdates() {
     }
 }
 
-async function bootstrapDataset(dataset) {
+// Exported for tests (with a temp-dir dataset row); not part of the API.
+export async function bootstrapDataset(dataset) {
     await fsp.mkdir(dataset.dbDir, { recursive: true });
     await clearOrphanedLock(dataset);
 
@@ -163,7 +190,8 @@ async function bootstrapDataset(dataset) {
     }
 }
 
-async function updateDataset(dataset, { signal, reloadReason = 'auto update' } = {}) {
+// Exported for tests, like bootstrapDataset.
+export async function updateDataset(dataset, { signal, reloadReason = 'auto update' } = {}) {
     if (updateInProgress.has(dataset.id)) {
         return { updated: false, reason: 'already-running' };
     }
@@ -201,7 +229,17 @@ async function downloadAndPublish(dataset, tempDir, { signal } = {}) {
         return { updated: false, reason: 'not-modified' };
     }
 
-    const stagedPath = await downloadAndDecompress(dataset, remote.url, tempDir, { signal });
+    let stagedPath = await downloadAndDecompress(dataset, remote.url, tempDir, { signal });
+    if (dataset.distill) {
+        const rawPath = stagedPath;
+        try {
+            stagedPath = await dataset.distill(rawPath, tempDir, { signal });
+        } catch (error) {
+            throw new Error(`${dataset.id} distill phase failed: ${error.message}`);
+        } finally {
+            await fsp.rm(rawPath, { force: true });
+        }
+    }
     await dataset.validate(stagedPath);
     await publishFile(stagedPath, targetPath);
 
@@ -214,8 +252,9 @@ async function downloadAndPublish(dataset, tempDir, { signal } = {}) {
     return { updated: true, identifier: remote.identifier };
 }
 
-// Stream archive to disk, then decompress to staged .txt. Split so errors
-// clearly identify which phase failed (network vs decompression).
+// Stream archive to disk, then decompress to staged .txt (a row without
+// `decompress` stages the download itself). Split so errors clearly
+// identify which phase failed (network vs decompression).
 async function downloadAndDecompress(dataset, url, tempDir, { signal } = {}) {
     const archivePath = path.join(tempDir, `archive${dataset.archiveExt}`);
     const stagedPath = path.join(tempDir, dataset.canonicalFile);
@@ -229,6 +268,7 @@ async function downloadAndDecompress(dataset, url, tempDir, { signal } = {}) {
     } catch (error) {
         throw new Error(`${dataset.id} download phase failed: ${error.message}`);
     }
+    if (!dataset.decompress) return archivePath;
 
     try {
         await pipeline(
@@ -284,6 +324,37 @@ async function validateAsRel(stagedPath) {
     }
 }
 
+// Healthy index has ~33k networks; <20k indicates truncation or schema change.
+async function validatePeeringdb(stagedPath) {
+    const MIN_VALID = 20000;
+    const { nets } = readPeeringdbIndex(stagedPath);
+    if (nets.size < MIN_VALID) {
+        throw new Error(`Staged PeeringDB index has only ${nets.size} networks; refusing to publish`);
+    }
+}
+
+// ---------- Remote lookups ----------
+
+// CAIDA mirrors the full PeeringDB dump daily (a day late) under YYYY/MM/.
+// List the current UTC month, then the previous one for the days before the
+// month's first dump lands; the newest filename wins. Exported for tests.
+export async function findPeeringdbDump({ signal, now = new Date() } = {}) {
+    const base = 'https://publicdata.caida.org/datasets/peeringdb/';
+    for (const back of [0, 1]) {
+        const month = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1));
+        const dir = `${base}${month.getUTCFullYear()}/${String(month.getUTCMonth() + 1).padStart(2, '0')}/`;
+        const res = await fetch(dir, { signal });
+        if (res.status === 404) continue;
+        if (!res.ok) throw new Error(`Directory listing failed: HTTP ${res.status}`);
+        const html = await res.text();
+        const names = [...html.matchAll(/\bpeeringdb_2_dump_\d{4}_\d{2}_\d{2}\.json\b/g)].map(m => m[0]);
+        if (names.length === 0) continue;
+        names.sort((a, b) => b.localeCompare(a));
+        return { url: dir + names[0], identifier: names[0] };
+    }
+    throw new Error('No PeeringDB dump in the current or previous month listing');
+}
+
 // ---------- Generic helpers ----------
 
 async function publishFile(stagedPath, targetPath) {
@@ -306,13 +377,21 @@ async function publishFile(stagedPath, targetPath) {
     }
 }
 
+// A row without `enabled` is always on. Exported for tests.
+export function isDatasetEnabled(dataset) {
+    return !dataset.enabled || Boolean(dataset.enabled());
+}
+
 function isAutoUpdateEnabled() {
     return process.env.CAIDA_AUTO_UPDATE === 'true';
 }
 
+// Any non-dot file with the canonical file's extension (.txt for the
+// CAIDA rows, so manual downloads under another name still count).
 function snapshotExists(dataset) {
     if (!fs.existsSync(dataset.dbDir)) return false;
-    return fs.readdirSync(dataset.dbDir).some(f => f.endsWith('.txt'));
+    const ext = path.extname(dataset.canonicalFile);
+    return fs.readdirSync(dataset.dbDir).some(f => f.endsWith(ext) && !f.startsWith('.'));
 }
 
 // At boot, any pre-existing lock is necessarily from a previous crashed run

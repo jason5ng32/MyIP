@@ -68,6 +68,9 @@ grid and the nav; deep links (`?tool=`, `/tools/:slug`) are never gated.
   section (reputation included — no `configs.originalSite` check) renders only
   when its `status` is `ok`. `ASNConnectivity.vue` gets `:expandable="false"
   :bordered="false"`; its defaults keep IPCard / QueryIP unchanged.
+- `peeringdb` is operator self-reporting: vocabularies → locale keys
+  (`PEERING_ENUMS`), names / cities as written. `ASN_PROFILE_TIMEOUT_MS` stays
+  above the largest backend section deadline (tested).
 - ASN Info's footer links `/tools/asn?q=AS<n>` (hidden when gated off); in
   QueryIP it emits `open-tool` via IpDetailPanel so the dialog closes first.
 
@@ -111,9 +114,7 @@ stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
 Every "business state → color" mapping goes through `use-status-tone.js`
 (`wait` / `ok-fast` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
 
-### Canonical patterns
-
-Copy the named exemplar instead of re-inventing:
+### Canonical patterns — copy the named exemplar, don't re-invent
 
 - **Trigger button** — `variant="action"` + `<Spinner v-if />` + `:disabled` (QueryIP, Whois).
 - **Input + icon trigger** — flex row, compact icon Button, no text label (QueryIP).
@@ -145,6 +146,5 @@ Copy the named exemplar instead of re-inventing:
 
 ## Testing
 
-Composables and utils are the target (`tests/composable-*.test.js`); Vue rendering
-and browser APIs are out of scope. Visual changes can't be self-tested — say so
-and let the user verify in `pnpm dev`.
+Composables and utils are the target (`tests/composable-*.test.js`); rendering /
+browser APIs are out of scope — visual changes need the user in `pnpm dev`.
