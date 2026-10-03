@@ -1,17 +1,11 @@
 // Tests for frontend/utils/asn-profile.js — per-prefix sizing (v4
-// addresses, v6 /48s) and announced-IPv4 totals / share. ASN input parsing
-// is covered in asn-input.test.js; here only its re-export.
+// addresses, v6 /48s) and announced-IPv4 totals / share.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  parseAsnInput, prefixSize, announcedIpv4, ipv4SharePercent,
+  prefixSize, announcedIpv4, ipv4SharePercent,
 } from '../frontend/utils/asn-profile.js';
-import { parseAsnInput as parseAsnInputDirect } from '../frontend/utils/asn-input.js';
-
-it('re-exports parseAsnInput from asn-input.js', () => {
-  assert.equal(parseAsnInput, parseAsnInputDirect);
-});
 
 describe('prefixSize', () => {
   it('counts IPv4 addresses', () => {

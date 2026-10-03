@@ -551,7 +551,7 @@ const filteredText = () => prefixListText(filtered.value);
 
 watch(familyFilter, () => { limit.value = FIRST_ROWS; });
 
-// Radar's route counts when present; the list is the fallback.
+// Counted over the prefix rows, so the bar always matches the table.
 const rpki = computed(() => rpkiSummary(rows.value));
 
 // v4 → address count; v6 → how many /48s the prefix spans.

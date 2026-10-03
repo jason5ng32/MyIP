@@ -606,8 +606,8 @@ const getASNHistory = async (prefix) => {
     }
 };
 
-// Fetch + versioning live in utils/asn-connectivity.js (shared with ASN
-// Profile); the cache is the owner's, handed down as asnConnectivityInfos.
+// Fetch + versioning live in utils/asn-connectivity.js; the cache is the
+// owner's, handed down as asnConnectivityInfos.
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');
     await loadAsnConnectivityInto(props.asnConnectivityInfos, asn);

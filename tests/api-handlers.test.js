@@ -725,7 +725,10 @@ describe('asn-profile handler', () => {
         delete process.env.CLOUDFLARE_API;
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        const payload = { asn: 64511, found: true, size: 256, level: 'none' };
+        const payload = {
+            found: true, ratio: { abuse: 1.2, vpn: 0.4 }, level: 'none',
+            dropListed: false, proxy: 0, updatedAt: '2026-10-03T11:54:33.740Z',
+        };
         let requested;
         globalThis.fetch = async (url, options) => {
             if (String(url).includes('/asnreputation')) {

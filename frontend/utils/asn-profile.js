@@ -1,11 +1,7 @@
-// Pure helpers for the ASN Profile tool: input parsing (re-exported) and
-// announced-space sizing over a prefix list. CIDR arithmetic comes from
-// ip-math.js.
+// Pure helpers for the ASN Profile tool: announced-space sizing over a
+// prefix list. CIDR arithmetic comes from ip-math.js.
 
 import { parseCidr, aggregateCidrs, addressCount } from './ip-math.js';
-
-// ASN input parsing lives in asn-input.js (shared with the Whois tool).
-export { MAX_ASN, parseAsnInput } from './asn-input.js';
 
 const IPV4_SPACE = 2 ** 32;
 

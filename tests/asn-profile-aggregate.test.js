@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  SECTIONS, DEADLINES, MAX_DEADLINE, withDeadline, hasMeaningfulField,
+  SECTIONS, DEADLINES, withDeadline, hasMeaningfulField,
   classifyRadar, classifyPrefixes, classifyConnectivity, classifyRank, classifyReputation,
   buildSectionLoaders, composeAsnProfile, allSourcesFailed, isCompleteProfile,
 } from '../common/asn-profile.js';
@@ -14,8 +14,7 @@ const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(v
 
 describe('deadlines', () => {
   it('every section has a budget and the worst case stays under 8 s', () => {
-    for (const section of SECTIONS) assert.ok(DEADLINES[section] > 0, section);
-    assert.ok(MAX_DEADLINE <= 8000);
+    for (const section of SECTIONS) assert.ok(DEADLINES[section] > 0 && DEADLINES[section] <= 8000, section);
   });
 
   it('withDeadline passes a fast result through and rejects a slow one', async () => {
@@ -55,8 +54,8 @@ describe('classification', () => {
   it('reputation: unconfigured is disabled, found:false empty, non-200 throws', () => {
     assert.deepEqual(classifyReputation(null), { status: 'disabled', data: null });
     assert.equal(classifyReputation({ status: 200, data: { found: false } }).status, 'empty');
-    assert.deepEqual(classifyReputation({ status: 200, data: { found: true, size: 1 } }),
-      { status: 'ok', data: { found: true, size: 1 } });
+    const found = { found: true, ratio: { abuse: 2, vpn: 0.5 }, level: 'low', dropListed: false, proxy: 0, updatedAt: '2026-10-03T11:54:33.740Z' };
+    assert.deepEqual(classifyReputation({ status: 200, data: found }), { status: 'ok', data: found });
     assert.throws(() => classifyReputation({ status: 503, data: { error: 'ASN data not loaded' } }));
   });
 });

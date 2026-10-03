@@ -2142,6 +2142,17 @@
     "date": "Beta",
     "content": [
       {
+        "type": "add",
+        "change": {
+          "en": "New tool: ASN Profile — a full profile of any autonomous system, covering identity and registration, scale, traffic, where its addresses are used, announced prefixes with RPKI status, and connectivity",
+          "zh": "新增工具：ASN 档案——任意自治系统的完整档案，涵盖身份与注册信息、规模、流量、地址的使用地区、宣告的前缀及其 RPKI 状态，以及互联关系",
+          "zh-TW": "新增工具：ASN 檔案——任意自治系統的完整檔案，涵蓋身分與註冊資訊、規模、流量、位址的使用地區、宣告的前綴及其 RPKI 狀態，以及互連關係",
+          "fr": "Nouvel outil : Profil ASN — le profil complet de n'importe quel système autonome : identité et enregistrement, taille, trafic, pays où ses adresses sont utilisées, préfixes annoncés avec leur statut RPKI et interconnexions",
+          "ru": "Новый инструмент: профиль ASN — полный профиль любой автономной системы: владелец и регистрация, масштаб, трафик, где используются её адреса, анонсируемые префиксы со статусом RPKI и связность",
+          "pt-BR": "Nova ferramenta: Perfil de ASN — o perfil completo de qualquer sistema autônomo: identidade e registro, porte, tráfego, onde seus endereços são usados, prefixos anunciados com status RPKI e conectividade"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "IP History can now be viewed by IP or date",

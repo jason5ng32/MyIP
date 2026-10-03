@@ -37,7 +37,7 @@ describe('requestAsnReputation', () => {
     it('forwards asn, key and caller headers; returns status and payload', async () => {
         process.env.IPCHECKING_API_KEY = 'test-key';
         process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
-        const payload = { asn: 64511, found: false, size: 0 };
+        const payload = { found: false, ratio: null, level: null, dropListed: false, proxy: 0, updatedAt: '2026-10-03T11:54:33.740Z' };
         let requested;
         globalThis.fetch = async (url, options) => {
             requested = { url: new URL(String(url)), options };

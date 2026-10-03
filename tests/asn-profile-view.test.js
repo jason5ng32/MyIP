@@ -269,9 +269,8 @@ describe('neighbourGroups', () => {
 
 describe('reputation', () => {
   const rep = {
-    asn: 13335, found: true, size: 1431808, abuse: 1569, vpn: 451, proxy: 502,
-    ratio: { abuse: 3.537, vpn: 0.8, proxy: null },
-    level: 'high', dropListed: false,
+    found: true, ratio: { abuse: 3.537, vpn: 0.8 }, level: 'high',
+    dropListed: false, proxy: 502, updatedAt: '2026-10-03T11:54:33.740Z',
   };
 
   it('log axis: 0 at 0, baseline near 15%, capped at 100', () => {
@@ -282,7 +281,7 @@ describe('reputation', () => {
   });
 
   it('meters cover abuse and VPN only, toned by the baseline side', () => {
-    const meters = reputationMeters({ ...rep, ratio: { ...rep.ratio, proxy: 2.5 } });
+    const meters = reputationMeters(rep);
     assert.deepEqual(meters.map((m) => [m.key, m.ratio, m.tone]), [['abuse', 3.537, 'ok-slow'], ['vpn', 0.8, 'ok-fast']]);
     assert.equal(meters[0].pos, ratioPosition(3.537));
     assert.equal(reputationMeters({ ratio: { abuse: 0, vpn: null } })[0].pos, 1);
@@ -290,11 +289,10 @@ describe('reputation', () => {
     assert.deepEqual(reputationMeters(null), []);
   });
 
-  it('proxies detected: the listed count when > 0, whatever the ratio', () => {
+  it('proxies detected: the listed count when > 0', () => {
     assert.equal(proxyListedCount(rep), 502);
-    assert.equal(proxyListedCount({ ...rep, ratio: { proxy: 2.5 } }), 502);
     assert.equal(proxyListedCount({ ...rep, proxy: 0 }), null);
-    assert.equal(proxyListedCount({ ratio: {} }), null);
+    assert.equal(proxyListedCount({ found: false, ratio: null }), null);
     assert.equal(proxyListedCount(null), null);
   });
 

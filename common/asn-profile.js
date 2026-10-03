@@ -27,8 +27,6 @@ export const DEADLINES = {
     reputation: 5000,
 };
 
-export const MAX_DEADLINE = Math.max(...Object.values(DEADLINES));
-
 // Reject with a code 'deadline' error when `promise` outlives `ms`. The
 // underlying work keeps running; its late result is ignored.
 export const withDeadline = (promise, ms) => {
