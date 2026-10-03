@@ -22,6 +22,9 @@ import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
+import asnProfileHandler from '../api/asn-profile.js';
+import { isPeeringdbLoaded } from '../common/peeringdb-db.js';
+import { isCompleteProfile } from '../common/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -252,6 +255,77 @@ describe('get-whois handler', () => {
             assert.deepEqual(res.body, { error: 'Not a public IP address' });
         });
     }
+
+    // ASN path (query already canonicalized to AS<n> by normalizeAsnQuery).
+    // The first case fetches IANA's asn.json bootstrap through the stub; the
+    // module caches it for the rest of the file.
+    const ASN_BOOTSTRAP = { services: [[['13335', '64496-64511'], ['https://rdap.arin.net/registry/']]] };
+    const stubAutnum = (autnum) => async (url) => (new URL(String(url)).hostname === 'data.iana.org'
+        ? new Response(JSON.stringify(ASN_BOOTSTRAP))
+        : autnum(String(url)));
+
+    it('answers an ASN query with parsed RDAP autnum fields plus __raw', async () => {
+        const urls = [];
+        globalThis.fetch = stubAutnum((url) => {
+            urls.push(url);
+            return new Response(JSON.stringify({
+                handle: 'AS13335', startAutnum: 13335, endAutnum: 13335, name: 'CLOUDFLARENET',
+                status: ['active'],
+                events: [{ eventAction: 'registration', eventDate: '2010-07-14T18:35:57-04:00' }],
+            }));
+        });
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS13335' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(urls, ['https://rdap.arin.net/registry/autnum/13335']);
+        assert.equal(res.body.asn, 13335);
+        assert.equal(res.body.name, 'CLOUDFLARENET');
+        assert.equal(res.body.rir, 'ARIN');
+        assert.equal(res.body.registered, '2010-07-14T18:35:57-04:00');
+        assert.match(res.body.__raw, /^ASNumber: 13335\nASName: CLOUDFLARENET/);
+    });
+
+    it('answers 404 for an ASN the registry does not know', async () => {
+        globalThis.fetch = stubAutnum(() => new Response('', { status: 404 }));
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS64500' } }), res);
+        assert.equal(res.statusCode, 404);
+        assert.deepEqual(res.body, { error: 'ASN not found: AS64500' });
+    });
+
+    it('answers 404 for an ASN outside every registry range', async () => {
+        globalThis.fetch = stubAutnum(() => { throw new Error('unexpected autnum call'); });
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS64512' } }), res);
+        assert.equal(res.statusCode, 404);
+        assert.deepEqual(res.body, { error: 'No RDAP endpoint for AS64512' });
+    });
+
+    // normalizeAsnQuery passes a bare number through untouched (the `AS`
+    // prefix is required), so the handler sees it raw and rejects it.
+    for (const q of ['13335', '0', '99999999999']) {
+        it(`rejects the bare number ${q} as neither IP nor domain, before any lookup`, async () => {
+            globalThis.fetch = async () => { throw new Error('unexpected upstream call'); };
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Invalid IP or address' });
+        });
+    }
+
+    it('answers 500 when the registry fails', async () => {
+        globalThis.fetch = stubAutnum(() => new Response('busy', { status: 503 }));
+        const originalError = logger.error;
+        logger.error = () => {};
+        try {
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q: 'AS13335' } }), res);
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.body, { error: 'RDAP autnum query failed: 503' });
+        } finally {
+            logger.error = originalError;
+        }
+    });
 });
 
 // -- github-stars handler -------------------------------------------------
@@ -380,6 +454,54 @@ describe('cf-radar handler', () => {
         await cfRadarHandler(createRequest({ query: { view: 'asn', asn: 'not-an-asn' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+
+    for (const asn of ['AS0', '0', '4294967296', '00000000013335']) {
+        it(`runs the asn view's guard: out-of-range or overlong ASN ${asn}`, async () => {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'asn', asn } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Invalid ASN' });
+        });
+    }
+
+    it("runs the bgp-prefixes view's guard: non-numeric ASN", async () => {
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: 'nope' } }), res);
+        assert.equal(res.statusCode, 400);
+        assert.deepEqual(res.body, { error: 'Invalid ASN' });
+    });
+
+    it('serves bgp-prefixes from pfx2as with a countries list', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        const urls = [];
+        globalThis.fetch = async (url) => {
+            urls.push(String(url));
+            return new Response(JSON.stringify({ result: { prefix_origins: [
+                { origin: 13335, peer_count: 76, prefix: '104.22.21.0/24', rpki_validation: 'Valid' },
+            ] } }));
+        };
+        const res = createResponse();
+        await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: 'AS13335' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(urls, ['https://api.cloudflare.com/client/v4/radar/bgp/routes/pfx2as?origin=13335']);
+        assert.deepEqual(res.body.prefixes, [{ prefix: '104.22.21.0/24', rpki: 'Valid', peers: 76 }]);
+        // No MaxMind database is loaded in tests — countries degrade to [].
+        assert.deepEqual(res.body.countries, []);
+    });
+
+    it('answers 500, not an empty list, when pfx2as lacks prefix_origins', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        globalThis.fetch = async () => new Response(JSON.stringify({ success: true, result: {} }));
+        const originalError = logger.error;
+        logger.error = () => {};
+        try {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'bgp-prefixes', asn: '13335' } }), res);
+            assert.equal(res.statusCode, 500);
+        } finally {
+            logger.error = originalError;
+        }
     });
 
     it("runs the country-traffic view's guard: missing ?country", async () => {
@@ -593,6 +715,101 @@ describe('ipcheck-ing handler', () => {
         await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+// -- asn-profile handler ---------------------------------------------------
+// Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
+// here: unconfigured sources read as disabled, failing upstreams as error,
+// a partial Radar answer, the local PeeringDB section, and the private-API
+// pass-through for the reputation section.
+
+describe('asn-profile handler', () => {
+    it('answers 200 with per-section statuses when only some sources work', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        delete process.env.IPCHECKING_API_KEY;
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => { throw new Error('network down'); };
+        const res = createResponse();
+        await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.asn, 64511);
+        assert.equal(res.body.status.radar, 'disabled');
+        assert.equal(res.body.status.prefixes, 'disabled');
+        assert.equal(res.body.status.reputation, 'disabled');
+        assert.equal(res.body.status.whois, 'error');
+        assert.equal(res.body.status.rank, 'error');
+        assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
+        assert.equal(res.body.whois, null);
+        assert.equal(res.body.rank, null);
+        // Local and never an error: disabled without an index file (the
+        // checkout default), ok / empty once the updater has built one.
+        if (isPeeringdbLoaded()) assert.ok(['ok', 'empty'].includes(res.body.status.peeringdb));
+        else assert.equal(res.body.status.peeringdb, 'disabled');
+    });
+
+    it('shows a partial Radar summary but flags it incomplete (not cacheable)', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        delete process.env.IPCHECKING_API_KEY;
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async (url) => {
+            const { hostname, pathname } = new URL(String(url));
+            if (hostname !== 'api.cloudflare.com') throw new Error('network down');
+            if (pathname.endsWith('/radar/entities/asns/64511')) {
+                return new Response(JSON.stringify({ result: { asn: { name: 'EXAMPLE-NET' } } }));
+            }
+            if (pathname.endsWith('/radar/bgp/routes/pfx2as')) {
+                return new Response(JSON.stringify({ result: { prefix_origins: [] } }));
+            }
+            return new Response('busy', { status: 503 });
+        };
+        const originalWarn = logger.warn;
+        logger.warn = () => {};
+        try {
+            const res = createResponse();
+            await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.body.status.radar, 'ok');
+            assert.equal(res.body.radar.asnName, 'EXAMPLE-NET');
+            assert.equal(res.body.status.prefixes, 'empty');
+            assert.deepEqual(res.body.incomplete, ['radar']);
+            assert.equal(isCompleteProfile(res.body), false);
+        } finally {
+            logger.warn = originalWarn;
+        }
+    });
+
+    it('forwards the caller headers to the private API for reputation', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        const payload = {
+            found: true, ratio: { abuse: 1.2, vpn: 0.4 }, level: 'none',
+            dropListed: false, proxy: 0, updatedAt: '2026-10-03T11:54:33.740Z',
+        };
+        let requested;
+        globalThis.fetch = async (url, options) => {
+            const { hostname, pathname } = new URL(String(url));
+            if (hostname === 'upstream.invalid' && pathname === '/asnreputation') {
+                requested = { url: new URL(String(url)), options };
+                return { status: 200, ok: true, json: async () => payload };
+            }
+            throw new Error('network down');
+        };
+        const req = createRequest({ query: { asn: '64511' } });
+        req.headers['accept-language'] = 'de-DE';
+        const res = createResponse();
+        await asnProfileHandler(req, res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.status.reputation, 'ok');
+        assert.deepEqual(res.body.reputation, payload);
+        assert.equal(requested.url.searchParams.get('asn'), '64511');
+        assert.equal(requested.url.searchParams.get('key'), 'test-key');
+        assert.equal(requested.options.headers['accept-language'], 'de-DE');
     });
 });
 

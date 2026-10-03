@@ -46,7 +46,8 @@
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                         :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
                         :configs="configs" :is-dark-mode="isDarkMode" map-mode="inline"
-                        country-traffic-mode="inline" @view-usage="onOpenChange(false)" />
+                        country-traffic-mode="inline" @view-usage="onOpenChange(false)"
+                        @open-tool="onOpenChange(false)" />
                 </div>
             </div>
         </DialogContent>
@@ -59,7 +60,8 @@
 // - No Copy button (the IP was typed by the user — copying it is pointless).
 // - Map & country-traffic expand inline instead of opening dialogs (this IS a Dialog already).
 // - The panel's "view usage" link closes this dialog first, for the same reason.
-// - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard).
+// - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard);
+//   asnInfos comes from useAsnInfo().
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
 import { isValidIP, isUsablePublicIP } from '@/utils/valid-ip.js';
@@ -76,6 +78,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
+import { useAsnInfo } from '@/composables/use-asn-info.js';
 import { Monitor, Search } from '@lucide/vue';
 
 const { t } = useI18n();
@@ -91,7 +94,7 @@ const modalQueryResult = ref(null);
 const modalQueryError = ref('');
 const isChecking = ref('idle');
 const ipGeoSource = ref(userPreferences.value.ipGeoSource);
-const asnInfos = ref({});
+const { asnInfos } = useAsnInfo();
 const asnHistoryInfos = ref({});
 const asnConnectivityInfos = ref({});
 

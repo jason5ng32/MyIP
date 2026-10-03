@@ -61,10 +61,11 @@
 ### 🔦 查询与基础设施
 
 * 📟 **DNS 解析**：同时通过多个解析器解析一个域名，并按国家分组 —— 轻松发现劫持或污染。
-* 📓 **Whois 查询**：对域名和 IP 地址进行 Whois 查询。
+* 📓 **Whois 查询**：对域名、IP 地址和 AS 号进行 Whois 查询。
 * 🗄️ **MAC 地址查询**：识别一个物理地址背后的厂商与详细信息。
 * 🧮 **IP 计算器**：对任意 IP、前缀、范围或列表做子网计算、进制转换与 IPv6 接口解读，全部本地完成。
-* 🛰️ **ASN 信息与上游拓扑**：展示 AS 详情、IP 前缀的历史宣告记录，以及从某个 ASN 到 Tier 1 骨干网的上游路径。
+* 🛰️ **ASN 信息与上游拓扑**：在每张 IP 卡片里直接展示 AS 详情、该 IP 前缀的历史宣告记录，以及其 ASN 到 Tier 1 骨干网的上游路径。
+* 🛂 **ASN 档案**：任意 AS 的完整档案 —— 注册信息与原始 Whois 记录、全球排名与规模、流量构成与连接质量、IPv4 地址分布在哪些国家、全部宣告前缀及其 RPKI 状态、上游 / 对等 / 客户网络，以及它接入的互联网交换中心和数据中心。
 * 📶 **服务可用性**：知名服务的实时可用状态 —— Claude、OpenAI、GitHub、Cloudflare 等 —— 数据来自它们的官方状态页，并附最近的事故。
 
 ### ✨ 平台能力
@@ -178,8 +179,6 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 作为一个开源项目，我非常感谢以下赞助者对我的支持：
 
 <a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服务，覆盖 9000万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 RAPID10 享 9 折优惠" alt="RapidProxy" /></a>
-
-<a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
 <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
 

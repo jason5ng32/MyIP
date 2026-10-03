@@ -47,17 +47,15 @@
                     </AccordionTrigger>
                     <AccordionContent>
                         <pre
-                            class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
-                    {{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
+                            class="mt-2 p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ filterDomainWhoisRawData(whoisResults[providers[index]].__raw) }}</pre>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
 
-            <!-- ip type: single block raw output -->
+            <!-- ip / asn type: single block raw output -->
             <div v-else>
                 <pre
-                    class="p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">
-            {{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
+                    class="p-4 rounded-md bg-muted font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap wrap-break-word">{{ filterIPWhoisRawData(whoisResults.__raw) }}</pre>
             </div>
         </div>
     </div>
@@ -69,6 +67,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { isValidIP, isValidDomain, isUsablePublicIP } from '@/utils/valid-ip.js';
+import { parseAsnInput } from '@/utils/asn-input.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -97,6 +96,12 @@ const formatURL = (domain) => {
 };
 
 const validInput = (input) => {
+    // `AS` + digits is an AS number; a bare number is not accepted.
+    const asn = parseAsnInput(input, { requirePrefix: true });
+    if (asn !== null) {
+        type.value = 'asn';
+        return `AS${asn}`;
+    }
     if (formatURL(input)) {
         type.value = 'domain';
         return formatURL(input);
@@ -145,7 +150,7 @@ const getWhoisResults = async (query) => {
             // data/achievement-rules.js.
             emitAppEvent('whois:lookup', { query });
             errorMsg.value = '';
-        } else if (type.value === 'ip' && data.__raw) {
+        } else if ((type.value === 'ip' || type.value === 'asn') && data.__raw) {
             whoisResults.value = data;
             errorMsg.value = '';
         } else {

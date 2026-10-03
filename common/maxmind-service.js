@@ -123,6 +123,19 @@ export function startMaxMindFileWatcher() {
 }
 
 /**
+ * Bare ISO country code for an IP — no formatting, no 503 throw: null when
+ * the City database isn't loaded or has no answer. For bulk aggregation
+ * (the bgp-prefixes Radar view runs thousands of these per request).
+ */
+export const lookupCountryCode = (ip) => {
+    try {
+        return cityLookup?.get(ip)?.country?.iso_code || null;
+    } catch {
+        return null;
+    }
+};
+
+/**
  * Look up an IP address and return the API response shape expected by the frontend.
  * `lang` is any raw tag — normalization happens here, so no caller can skip it.
  */

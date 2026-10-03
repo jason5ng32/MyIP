@@ -1,19 +1,27 @@
 // Unit tests for the pure transform pipeline in common/cf-radar.js:
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
-// dedupe, sort and cap) and the country-traffic matrix aggregation.
+// dedupe, sort and cap), the country-traffic matrix aggregation, the asn
+// view's response shaping and partial-segment reporting (fetch stubbed), and
+// the bgp-prefixes list + country shares.
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
 // Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { afterEach, describe, it } from 'node:test';
 
 import {
     normalizeOutages,
     normalizeAnomalies,
     mergeEvents,
     buildTrafficMatrix,
-    countAsnRels,
+    shapeAsnProfile,
+    loadAsnSummary,
+    isCompleteRadarAnswer,
+    RADAR_VIEWS,
+    normalizePrefixOrigins,
+    buildCountryShares,
 } from '../common/cf-radar.js';
+import logger from '../common/logger.js';
 
 const outageFixture = {
     id: '1645',
@@ -225,32 +233,193 @@ describe('buildTrafficMatrix', () => {
     });
 });
 
-describe('countAsnRels', () => {
-    const rows = [
-        // 10 is provider of 906; 906 is provider of 20 and 21.
-        { asn1: 10, asn2: 906, rel: 'provider-customer' },
-        { asn1: 906, asn2: 20, rel: 'provider-customer' },
-        { asn1: 906, asn2: 21, rel: 'provider-customer' },
-        { asn1: 906, asn2: 30, rel: 'peer' },
-        { asn1: 31, asn2: 906, rel: 'peer' },
-        { asn1: 31, asn2: 906, rel: 'peer' },           // duplicate row
-        { asn1: 10, asn2: 906, rel: 'peer' },           // transit pair → not a peer
-        { asn1: 906, asn2: 21, rel: 'peer' },           // transit pair → not a peer
-    ];
+describe('shapeAsnProfile', () => {
+    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
 
-    it('counts distinct partners per bucket, transit winning over peer', () => {
-        assert.deepEqual(countAsnRels(rows, 906), {
-            upstreamCount: 1,
-            downstreamCount: 2,
-            peerCount: 2,
-        });
+    it('takes prefix counts from routes/stats and relationship counts from the local reading', () => {
+        const body = shapeAsnProfile({
+            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953, routes_valid: 5162 } } },
+        }, '13335', counts);
+        assert.equal(body.prefixesV4, (2346).toLocaleString());
+        assert.equal(body.prefixesV6, (2953).toLocaleString());
+        assert.equal(body.upstreamCount, '2');
+        assert.equal(body.downstreamCount, '0');
+        assert.equal(body.peerCount, '7');
+        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal']) {
+            assert.equal(Object.hasOwn(body, key), false, key);
+        }
     });
 
-    it('returns zeros on an empty row list', () => {
-        assert.deepEqual(countAsnRels([], 906), {
-            upstreamCount: 0,
-            downstreamCount: 0,
-            peerCount: 0,
+    it('passes the AS number to the relationship reading', () => {
+        let asked;
+        shapeAsnProfile({}, '64500', (asn) => { asked = asn; return {}; });
+        assert.equal(asked, 64500);
+    });
+
+    it('drops relationship fields when the local snapshot has nothing', () => {
+        const body = shapeAsnProfile({ routesStats: { result: { stats: {} } } }, '13335', () => ({}));
+        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount', 'prefixesV4']) {
+            assert.equal(Object.hasOwn(body, key), false, key);
+        }
+    });
+});
+
+describe('loadAsnSummary / asn view', () => {
+    const originalFetch = globalThis.fetch;
+    const originalWarn = logger.warn;
+    afterEach(() => {
+        globalThis.fetch = originalFetch;
+        logger.warn = originalWarn;
+    });
+
+    // Radar segment bodies keyed by API path (after /client/v4); a path
+    // mapped to a number answers with that HTTP status.
+    const stubRadar = (byPath) => {
+        logger.warn = () => {};
+        globalThis.fetch = async (url) => {
+            const { hostname, pathname } = new URL(String(url));
+            assert.equal(hostname, 'api.cloudflare.com');
+            const answer = byPath[pathname.replace('/client/v4', '')];
+            if (typeof answer === 'number') return new Response('busy', { status: answer });
+            return new Response(JSON.stringify(answer ?? { result: {} }));
+        };
+    };
+    const KNOWN = {
+        '/radar/entities/asns/13335': { result: { asn: { name: 'CLOUDFLARENET', country: 'US' } } },
+        '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
+    };
+    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
+
+    it('reports a complete answer, with the local counts kept out of radarFields', async () => {
+        stubRadar(KNOWN);
+        const { summary, radarFields, failedSegments } = await loadAsnSummary('13335', counts);
+        assert.deepEqual(failedSegments, []);
+        assert.equal(summary.asnName, 'CLOUDFLARENET');
+        assert.equal(summary.peerCount, '7');
+        assert.equal(radarFields.asnName, 'CLOUDFLARENET');
+        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount']) {
+            assert.equal(Object.hasOwn(radarFields, key), false, key);
+        }
+    });
+
+    it('an AS Radar does not know has only local counts, none in radarFields', async () => {
+        stubRadar({ '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 0 } } } });
+        const { summary, radarFields } = await loadAsnSummary('64500', counts);
+        assert.equal(summary.upstreamCount, '2');
+        assert.deepEqual(JSON.parse(JSON.stringify(radarFields)), { prefixesV4: '0' });
+    });
+
+    it('names the failed segments and still shapes the rest', async () => {
+        stubRadar({ ...KNOWN, '/radar/http/summary/ip_version': 503, '/radar/quality/speed/summary': 500 });
+        const { summary, failedSegments } = await loadAsnSummary('13335', counts);
+        assert.deepEqual(failedSegments.sort(), ['ipVersion', 'quality']);
+        assert.equal(summary.asnName, 'CLOUDFLARENET');
+    });
+
+    it("a 404 is Radar's \"no such AS\", not a failed segment", async () => {
+        stubRadar({ '/radar/entities/asns/64511': 404, '/radar/bgp/routes/stats': { result: { stats: {} } } });
+        const { failedSegments } = await loadAsnSummary('64511', counts);
+        assert.equal(failedSegments.includes('asnInfo'), false);
+    });
+
+    it('throws when every segment failed', async () => {
+        stubRadar(new Proxy({}, { get: () => 502 }));
+        await assert.rejects(loadAsnSummary('13335', counts), /Radar responded 502/);
+    });
+
+    it('the asn view serves a partial answer unchanged but marks it uncacheable', async () => {
+        stubRadar(KNOWN);
+        const complete = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        assert.equal(isCompleteRadarAnswer(complete), true);
+
+        stubRadar({ ...KNOWN, '/radar/http/summary/bot_class': 503 });
+        const partial = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        assert.equal(partial.asnName, 'CLOUDFLARENET');
+        assert.equal(isCompleteRadarAnswer(partial), false);
+        assert.equal(JSON.stringify(partial), JSON.stringify({ ...partial }), 'no marker in the payload');
+        assert.deepEqual(Object.getOwnPropertySymbols(partial), []);
+        // Other views' answers and non-objects stay cacheable.
+        assert.equal(isCompleteRadarAnswer({ ...partial }), true);
+        assert.equal(isCompleteRadarAnswer(null), true);
+    });
+});
+
+describe('normalizePrefixOrigins', () => {
+    it('maps pfx2as rows to the prefix/rpki/peers shape', () => {
+        assert.deepEqual(normalizePrefixOrigins({
+            prefix_origins: [
+                { origin: 13335, peer_count: 76, prefix: '104.22.21.0/24', rpki_validation: 'Valid' },
+                { origin: 13335, peer_count: 71, prefix: '2606:4700::/32', rpki_validation: 'Unknown' },
+            ],
+        }), [
+            { prefix: '104.22.21.0/24', rpki: 'Valid', peers: 76 },
+            { prefix: '2606:4700::/32', rpki: 'Unknown', peers: 71 },
+        ]);
+    });
+
+    it('defaults a missing peer_count to 0', () => {
+        const [row] = normalizePrefixOrigins({
+            prefix_origins: [{ origin: 13335, prefix: '104.22.21.0/24', rpki_validation: 'Invalid' }],
         });
+        assert.deepEqual(row, { prefix: '104.22.21.0/24', rpki: 'Invalid', peers: 0 });
+    });
+
+    it('returns [] only for a real empty list', () => {
+        assert.deepEqual(normalizePrefixOrigins({ prefix_origins: [] }), []);
+    });
+
+    it('throws on malformed or missing results instead of reading them as empty', () => {
+        for (const result of [undefined, null, {}, { prefix_origins: 'nope' }, { prefix_origins: null }]) {
+            assert.throws(() => normalizePrefixOrigins(result), /malformed pfx2as/, JSON.stringify(result));
+        }
+    });
+});
+
+describe('buildCountryShares', () => {
+    const table = { '8.8.8.0': 'US', '8.8.4.0': 'US', '1.0.0.0': 'AU', '81.0.0.0': 'DE' };
+    const lookup = (ip) => table[ip] || null;
+    const rows = (...prefixes) => prefixes.map((prefix) => ({ prefix }));
+
+    it('weights countries by address count, not prefix count', () => {
+        // Two US /24s vs one AU /22 → AU holds twice the addresses.
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
+            { country: 'AU', share: 0.6667 },
+            { country: 'US', share: 0.3333 },
+        ]);
+    });
+
+    it('sorts largest first and ignores IPv6 prefixes', () => {
+        assert.deepEqual(buildCountryShares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
+            { country: 'DE', share: 0.8 },
+            { country: 'US', share: 0.2 },
+        ]);
+    });
+
+    it('skips more-specifics of a covering announced prefix', () => {
+        // 1.0.0.0/23 covers 1.0.0.0/24 and 1.0.1.0/24 — counted once, so the
+        // US /24 pair still balances it.
+        const shares = buildCountryShares(
+            rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
+        assert.deepEqual(shares.map((row) => row.share), [0.5, 0.5]);
+        assert.deepEqual(shares.map((row) => row.country).sort(), ['AU', 'US']);
+    });
+
+    it('leaves unresolvable addresses out of the denominator', () => {
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
+            { country: 'US', share: 1 },
+        ]);
+    });
+
+    it('returns [] with no IPv4 prefixes, no resolvable country, or junk rows', () => {
+        assert.deepEqual(buildCountryShares([], lookup), []);
+        assert.deepEqual(buildCountryShares(undefined, lookup), []);
+        assert.deepEqual(buildCountryShares(rows('9.9.9.0/24', '2606:4700::/32'), lookup), []);
+        assert.deepEqual(buildCountryShares([{ prefix: 'nope' }, null, {}], lookup), []);
+    });
+
+    it('caps the response at 50 countries', () => {
+        const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
+        const shares = buildCountryShares(many, (ip) => `C${ip.split('.')[1]}`);
+        assert.equal(shares.length, 50);
     });
 });

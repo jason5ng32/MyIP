@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId } from './common/guards.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './common/guards.js';
 import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
@@ -23,7 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS } from './common/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer } from './common/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -40,6 +40,8 @@ import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
 import personaEvaluateHandler from './api/persona.js';
+import asnProfileHandler from './api/asn-profile.js';
+import { isCompleteProfile } from './common/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
@@ -219,14 +221,16 @@ app.use('/api', (req, res, next) => {
 // (which bypass res.json) can apply it themselves on their own 2xx path.
 // `maxAge` is a number of seconds, or a `(req) => seconds` resolver for
 // routes whose TTL depends on the request (the /api/cfradar view registry);
-// a falsy resolution keeps the /api-wide no-store default.
-const cacheable = (maxAge) => (req, res, next) => {
+// a falsy resolution keeps the /api-wide no-store default. `cacheIf(body)`
+// optionally vetoes caching a 2xx JSON body — for routes that answer a
+// degraded upstream with 200 (e.g. /api/asn-profile with a failed section).
+const cacheable = (maxAge, { cacheIf } = {}) => (req, res, next) => {
     const maxAgeSeconds = typeof maxAge === 'function' ? maxAge(req) : maxAge;
     if (maxAgeSeconds) {
         res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
         const originalJson = res.json.bind(res);
         res.json = function (body) {
-            if (res.statusCode < 400) {
+            if (res.statusCode < 400 && (!cacheIf || cacheIf(body))) {
                 res.setHeader('Cache-Control', res.locals.cacheControl);
             }
             return originalJson(body);
@@ -257,7 +261,7 @@ app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE)
 app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
 app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
-app.get('/api/whois', cacheable(ONE_DAY_CACHE), getWhois);
+app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
@@ -269,10 +273,16 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // Which countries have online Globalping probes — coverage changes slowly,
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
+// ASN Profile aggregate: every source in one answer. Only a complete answer
+// (no section in error or incomplete) is cached, so a degraded one is never
+// pinned for a week; reputation inside it is not per-user.
+app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
-// the TTL comes from that view's registry entry (common/cf-radar.js) — 30d
-// for the slow-moving ASN/traffic profiles, 1h for the outage feed.
-app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl), cfRadarHandler);
+// the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
+// for the ASN summary and prefix list (same as /api/asn-profile), 30d for
+// country traffic, 1h for the outage feed. A partial answer (some upstream
+// calls failed) is served but not cached.
+app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
@@ -327,10 +337,11 @@ if (process.env.SENTRY_DSN_BACKEND) {
 }
 
 
-// Bootstrap every offline dataset (MaxMind, CAIDA) before accepting traffic
-// so we never serve mid-download. Each step is non-fatal: a failure leaves
-// the dependent API in a degraded state (MaxMind → 503; CAIDA → empty graph
-// or RIPEstat fallback) but doesn't block the listener.
+// Bootstrap every offline dataset (MaxMind, CAIDA incl. the PeeringDB
+// mirror) before accepting traffic so we never serve mid-download. Each step
+// is non-fatal: a failure leaves the dependent API in a degraded state
+// (MaxMind → 503; CAIDA → empty graph, RIPEstat fallback or no peering
+// section) but doesn't block the listener.
 async function bootBackend() {
     await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
     await reloadMaxMindDatabases('startup').catch(() => {

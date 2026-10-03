@@ -2,7 +2,7 @@
 // by common/caida-updater.js; this module parses and serves.
 //
 // CAIDA as-rel2 row format: `<a>|<b>|<rel>|<source>`
-//   rel = -1 → p2c (a is provider of b)   ← providers index
+//   rel = -1 → p2c (a is provider of b)   ← providers + customers indexes
 //   rel =  0 → p2p (peering)              ← peers index
 //   rel =  1 → s2s (sibling)              ← skipped
 //
@@ -22,6 +22,9 @@ const providersIndex = new Map();
 
 // ASN → Set<peer ASN>, symmetric p2p. Feeds asn-connectivity's peering edges.
 const peersIndex = new Map();
+
+// provider ASN → Set<customer ASN>. Feeds asn-connectivity's neighbour lists.
+const customersIndex = new Map();
 
 // ASN → number of distinct customers it provides transit for. Ranking
 // signal when an intermediate has more providers than MAX_INTERMEDIATE_BRANCH
@@ -73,6 +76,7 @@ function parsePipeText(text) {
         if (!a || !b) continue;
         if (parts[2] === '-1') {
             addToIndex(providersIndex, b, a);
+            addToIndex(customersIndex, a, b);
             customerCount.set(a, (customerCount.get(a) || 0) + 1);
         } else if (parts[2] === '0') {
             addToIndex(peersIndex, a, b);
@@ -95,6 +99,7 @@ function loadDatabase() {
         logger.warn({ dir: AS_REL_DB_DIR }, '⚠️  CAIDA as-rel snapshot not found; asn-connectivity will return empty graphs until the updater downloads one');
         providersIndex.clear();
         peersIndex.clear();
+        customersIndex.clear();
         customerCount.clear();
         tier1Set.clear();
         loadedFrom = null;
@@ -105,6 +110,7 @@ function loadDatabase() {
         const text = fs.readFileSync(filePath, 'utf8');
         providersIndex.clear();
         peersIndex.clear();
+        customersIndex.clear();
         customerCount.clear();
         parsePipeText(text);
         rebuildTier1Set();
@@ -135,10 +141,19 @@ export function peersOf(asn) {
     return set ? [...set] : [];
 }
 
+/** Customers (transit downstreams) of an ASN. Empty array when it has none. */
+export const customersOf = (asn) => {
+    const set = customersIndex.get(Number(asn));
+    return set ? [...set] : [];
+};
+
 /** How many distinct ASes this one provides transit for. 0 when never a provider. */
 export function customerCountOf(asn) {
     return customerCount.get(Number(asn)) || 0;
 }
+
+/** Whether a snapshot is loaded (false until the updater has fetched one). */
+export const isAsRelLoaded = () => loadedFrom !== null;
 
 /** Whether this ASN is in the CAIDA-derived Tier 1 set. */
 export function isTier1(asn) {

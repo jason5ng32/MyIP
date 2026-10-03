@@ -869,7 +869,8 @@
     "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
     "CensorshipCheck": "Vérifier dans quels pays un site est bloqué",
     "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
-    "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP",
+    "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP/AS",
+    "AsnProfile": "Consulter le profil complet de n'importe quel AS",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
@@ -1033,15 +1034,154 @@
   },
   "whois": {
     "Title": "Recherche Whois",
-    "Note": "La recherche Whois est un service utilisé pour récupérer des informations sur l'enregistrement d'un domaine. En entrant un nom de domaine ou une adresse IP, vous pouvez obtenir des informations telles que les détails d'enregistrement du domaine, le registraire, la date d'enregistrement, la date d'expiration, et plus encore. Les informations Whois pour les adresses IP et les noms de domaine peuvent avoir des champs différents. De plus, certains domaines de premier niveau (TLD) moins courants peuvent ne pas avoir d'informations disponibles pour les requêtes Whois.",
-    "Note2": "Veuillez entrer un nom de domaine ou une adresse IP pour démarrer la requête :",
+    "Note": "La recherche Whois est un service utilisé pour récupérer des informations d'enregistrement. En entrant un nom de domaine, une adresse IP ou un numéro d'AS (par ex. AS13335), vous pouvez obtenir des informations telles que les détails d'enregistrement, le registraire, la date d'enregistrement, la date d'expiration, et plus encore. Les informations Whois pour les noms de domaine, les adresses IP et les numéros d'AS peuvent avoir des champs différents. De plus, certains domaines de premier niveau (TLD) moins courants peuvent ne pas avoir d'informations disponibles pour les requêtes Whois.",
+    "Note2": "Veuillez entrer un nom de domaine, une IP ou un numéro d'AS (par ex. AS13335) pour démarrer la requête :",
     "Note3": "Whois informations contient plusieurs types de champs, voici le texte brut original",
-    "Placeholder": "Nom de domaine ou IP",
-    "invalidURL": "Nom de domaine ou IP invalide",
+    "Placeholder": "Nom de domaine, IP ou numéro d'AS",
+    "invalidURL": "Nom de domaine, IP ou numéro d'AS invalide",
     "reservedIP": "Les adresses IP privées ou réservées n'ont aucun enregistrement public, il n'y a donc rien à consulter.",
     "noData": "Aucune donnée Whois ou RDAP n'est publiée pour cette requête. Certains domaines de premier niveau ne proposent pas de service de consultation public.",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
+  },
+  "asnprofile": {
+    "Title": "Recherche de profil ASN",
+    "Note": "Un système autonome (AS) est un réseau exploité par une seule organisation — fournisseur d'accès, hébergeur ou cloud, université, grande entreprise — que le reste d'Internet identifie par son numéro d'AS et atteint via le routage BGP. Saisissez un numéro d'AS pour voir qui l'a enregistré, quelle est sa taille, quels blocs d'adresses il annonce et s'ils sont signés RPKI, où se situe son espace IPv4, et auprès de qui il achète du transit, avec qui il échange du trafic et à qui il en revend. Les données proviennent de plusieurs sources, dont Cloudflare Radar, les services RDAP régionaux et PeeringDB.",
+    "InputLabel": "Numéro d'AS",
+    "Placeholder": "ex. AS13335",
+    "Lookup": "Rechercher",
+    "invalidInput": "Saisissez un numéro d'AS valide, par ex. AS13335 ou 13335.",
+    "noData": "Aucune donnée trouvée pour AS{asn}. Il est peut-être non attribué, réservé à un usage privé ou non annoncé sur Internet.",
+    "loadError": "Impossible de charger cet AS pour le moment. Réessayez dans un instant.",
+    "partial": "Certaines sources n'ont pas répondu cette fois et sont omises : {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Rang mondial",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "IPv4 annoncé",
+      "ipv4Share": "≈{share} % de l'Internet IPv4",
+      "prefixes": "Préfixes v4 · v6",
+      "users": "Utilisateurs estimés"
+    },
+    "registration": {
+      "title": "Enregistrement",
+      "registry": "Registre",
+      "status": "Statut",
+      "registered": "Enregistré le",
+      "lastChanged": "Dernière modification",
+      "abuse": "Contact abus",
+      "raw": "Enregistrement whois brut",
+      "copyRaw": "Copier l'enregistrement brut"
+    },
+    "reputation": {
+      "title": "Réputation",
+      "source": "Données IPCheck.ing",
+      "desc": "Densité d'adresses IPv4 annoncées par ce réseau figurant sur des listes d'abus et de VPN, en multiple de la référence mondiale du score IPCheck.ing — le repère marque 1×, échelle logarithmique. « Proxys détectés » indique combien de ses adresses ont été repérées comme proxys publics.",
+      "abuse": "Densité d'IP abusives",
+      "vpn": "Densité de sorties VPN",
+      "proxy": "Proxys détectés",
+      "ratio": "{ratio}× la référence",
+      "belowBaseline": "Au niveau de la référence ou en dessous",
+      "drop": "Listé sur Spamhaus ASN-DROP",
+      "updated": "Données au {date}",
+      "level": {
+        "none": "Aucun risque notable",
+        "low": "Risque faible",
+        "medium": "Risque moyen",
+        "high": "Risque élevé"
+      }
+    },
+    "traffic": {
+      "title": "Trafic et qualité de connexion",
+      "desc": "Répartition du trafic HTTP que Cloudflare a observé depuis ce réseau au cours des 7 derniers jours (version IP, chiffrement, appareil, humain ou robot), et moyennes des tests de débit effectués par ses utilisateurs."
+    },
+    "map": {
+      "title": "Répartition mondiale des IP",
+      "desc": "Où les adresses IPv4 de ce réseau sont utilisées, pondéré par le nombre d'adresses."
+    },
+    "prefixes": {
+      "title": "Préfixes annoncés",
+      "desc": "Tous les blocs d'adresses dont cet AS est l'origine dans la table de routage mondiale. RPKI Valide signifie qu'un ROA signé autorise cet AS à l'annoncer, Invalide qu'il contredit un ROA, Inconnu qu'aucun ROA n'existe. La visibilité est le nombre de pairs des collecteurs de routes qui portent le préfixe.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "Origine de route RPKI",
+      "rpkiValid": "{pct} % valides",
+      "family": "Famille d'adresses",
+      "all": "Tous",
+      "copy": "Copier les préfixes listés",
+      "download": "Télécharger .txt",
+      "prefix": "Préfixe",
+      "size": "Taille",
+      "rpkiColumn": "RPKI",
+      "visibility": "Visibilité",
+      "shown": "{shown} sur {total} affichés",
+      "showMore": "Afficher {count} de plus"
+    },
+    "rpki": {
+      "valid": "Valide",
+      "invalid": "Invalide",
+      "unknown": "Inconnu"
+    },
+    "connectivity": {
+      "title": "Interconnexion",
+      "desc": "Les fournisseurs amont vendent du transit à cet AS, les pairs échangent du trafic directement avec lui, les clients lui achètent du transit — comptés à partir des données de relations du CAIDA, la même lecture que le graphe ci-dessous. Le cône client est le nombre d'AS joignables via ses clients (CAIDA AS Rank). Le graphe ne trace que les principaux chemins vers les réseaux Tier 1 : le nombre d'amont peut donc dépasser les nœuds dessinés.",
+      "cone": "Cône client (AS)",
+      "providers": "Amont",
+      "peers": "Pairs",
+      "customers": "Clients",
+      "none": "Aucun observé"
+    },
+    "peering": {
+      "title": "Peering et centres de données",
+      "desc": "Informations déclarées par les opérateurs du réseau eux-mêmes dans PeeringDB. Les points d'échange internet sont les IXP auxquels il est raccordé, avec la capacité des ports additionnée par point d'échange ; RS signale une session avec les serveurs de routes du point d'échange. Les centres de données sont ceux où il est présent.",
+      "policy": "Politique de peering",
+      "traffic": "Volume de trafic",
+      "ratio": "Ratio de trafic",
+      "irr": "as-set IRR",
+      "website": "Site web",
+      "scope": "Couverture géographique",
+      "exchanges": "Points d'échange internet ({count})",
+      "facilities": "Centres de données ({count})",
+      "rs": "RS",
+      "rsTitle": "Pair des serveurs de routes du point d'échange",
+      "showAll": "Tout afficher ({count})",
+      "showLess": "Afficher moins",
+      "types": {
+        "isp": "Câble/DSL/FAI",
+        "nsp": "NSP",
+        "content": "Contenu",
+        "enterprise": "Entreprise",
+        "education": "Enseignement/Recherche",
+        "nonProfit": "Non lucratif",
+        "government": "Administration",
+        "routeServer": "Serveur de routes",
+        "routeCollector": "Collecteur de routes",
+        "networkServices": "Services réseau"
+      },
+      "scopes": {
+        "regional": "Régional",
+        "northAmerica": "Amérique du Nord",
+        "asiaPacific": "Asie-Pacifique",
+        "europe": "Europe",
+        "southAmerica": "Amérique du Sud",
+        "africa": "Afrique",
+        "australia": "Australie",
+        "middleEast": "Moyen-Orient",
+        "global": "Mondial"
+      },
+      "ratios": {
+        "balanced": "Équilibré",
+        "mostlyInbound": "Plutôt entrant",
+        "heavyInbound": "Fortement entrant",
+        "mostlyOutbound": "Plutôt sortant",
+        "heavyOutbound": "Fortement sortant"
+      },
+      "policies": {
+        "open": "Ouverte",
+        "selective": "Sélective",
+        "restrictive": "Restrictive",
+        "no": "Pas de peering"
+      }
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "Test de fuite DNS approfondi",
@@ -1287,7 +1427,7 @@
       "Mobile_Pct": "Mobile : ",
       "Bot_Pct": "Robots : ",
       "Human_Pct": "Humain : ",
-      "moreData": "Plus de données : "
+      "openProfile": "Ouvrir le profil ASN complet"
     },
     "ASNHistory": {
       "announcedPrefixes": "Préfixes annoncés : ",
@@ -1699,7 +1839,8 @@
     "IpCalculator": "Ouvrir le Calculateur IP",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
-    "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie"
+    "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie",
+    "AsnProfile": "Ouvrir le panneau Recherche de profil ASN"
   },
   "page": {
     "title": "IPCheck.ing - Vérifier mon adresse IP et géolocalisation - Test de fuite IP - Test de fuite DNS - Vérification de la qualité IP - Test de vitesse réseau - Boîte à outils IP tout-en-un",

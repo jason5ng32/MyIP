@@ -61,10 +61,11 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 ### 🔦 Recherches et infrastructure
 
 * 📟 **Résolveur DNS** : Résout un domaine via plusieurs résolveurs à la fois, regroupés par pays — un moyen simple de repérer un détournement ou une contamination.
-* 📓 **Recherche Whois** : Effectue des recherches Whois pour les noms de domaine et les adresses IP.
+* 📓 **Recherche Whois** : Effectue des recherches Whois pour les noms de domaine, les adresses IP et les numéros d'AS.
 * 🗄️ **Recherche MAC** : Identifie le fabricant et les détails derrière une adresse physique.
 * 🧮 **Calculateur IP** : Calcul de sous-réseau, conversions de notation et détails d'interface IPv6 pour toute IP, préfixe, plage ou liste, le tout en local.
-* 🛰️ **Infos ASN et topologie amont** : Affiche les détails d'un AS, l'historique des annonces d'un préfixe IP et les chemins amont d'un ASN vers la dorsale Tier 1.
+* 🛰️ **Infos ASN et topologie amont** : Directement depuis chaque carte IP — les détails de l'AS, l'historique des annonces du préfixe de l'IP et les chemins amont de son ASN vers la dorsale Tier 1.
+* 🛂 **Profil ASN** : Le portrait complet de n'importe quel AS — enregistrement avec la fiche Whois brute, rang mondial et taille, trafic et qualité de connexion, pays où son espace IPv4 est utilisé, chaque préfixe annoncé avec son statut RPKI, ses fournisseurs amont, pairs et clients, ainsi que les points d'échange Internet et centres de données où il est présent.
 * 📶 **État des services** : Disponibilité en direct de services connus — Claude, OpenAI, GitHub, Cloudflare et d'autres — depuis leurs pages d'état officielles, avec les incidents récents.
 
 ### ✨ Plateforme
@@ -178,8 +179,6 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 En tant que projet open source, je suis très reconnaissant aux sponsors suivants pour leur soutien :
 
 <a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — Service de proxy résidentiel mondial, couvrant 90+ millions d'IP résidentielles, offrant la rotation intelligente, les sessions stables et la géolocalisation précise pour le test de proxy, l'automatisation du navigateur et la collecte de données. À partir de $0.55/GB, utilisez RAPID10 pour 10% de réduction." alt="RapidProxy" /></a>
-
-<a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
 
 <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
 

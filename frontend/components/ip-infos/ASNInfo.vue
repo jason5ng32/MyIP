@@ -22,48 +22,19 @@
             </dl>
 
             <!-- Connection quality (Cloudflare speed test aggregates) -->
-            <div v-if="Object.keys(qualityInfo).length" class="space-y-2 pt-1">
-                <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span>{{ t('ipInfos.ASNInfo.connectionQuality') }}</span>
-                    <JnTooltip :text="t('ipInfos.ASNInfo.connectionQualityTooltip')" side="top"
-                        class="hidden md:block">
-                        <CircleQuestionMark class="size-3 cursor-help opacity-70" />
-                    </JnTooltip>
-                </div>
-                <dl class="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-                    <div v-for="(item, key) in qualityInfo" :key="key">
-                        <dt class="text-xs text-muted-foreground mb-0.5">{{ t(`ipInfos.ASNInfo.${key}`) }}</dt>
-                        <dd class="font-normal wrap-break-word">{{ item }}</dd>
-                    </div>
-                </dl>
-            </div>
+            <AsnConnectionQuality :info="asnInfos[asn]" />
 
-            <!-- Pair data visualization -->
-            <div v-if="pairDataList.length" class="space-y-2.5 pt-1">
-                <div class="text-xs text-muted-foreground">
-                    {{ t('ipInfos.ASNInfo.trafficPercentage') }}
-                </div>
-                <DataPairBar v-for="pair in pairDataList" :key="pair.leftLabel" :leftLabel="pair.leftLabel"
-                    :leftValue="pair.leftValue" :rightLabel="pair.rightLabel" :rightValue="pair.rightValue" />
-            </div>
+            <!-- Traffic shares (pair bars) -->
+            <AsnTrafficShares :info="asnInfos[asn]" />
 
-            <!-- External links -->
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-                <span class="text-xs text-muted-foreground">{{ t('ipInfos.ASNInfo.moreData') }}</span>
-                <a class="inline-flex" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`" target="_blank"
-                    rel="noopener" title="BGP.Tools">
-                    <Badge variant="outline" class="gap-1 hover:bg-muted cursor-pointer">
-                        <Database class="size-3" /> BGPTools
-                        <ExternalLink class="size-3 opacity-60" />
-                    </Badge>
-                </a>
-                <a class="inline-flex" :href="`https://radar.cloudflare.com/${asn}`" target="_blank" rel="noopener"
-                    title="Cloudflare Radar">
-                    <Badge variant="outline" class="gap-1 hover:bg-muted cursor-pointer">
-                        <Database class="size-3" /> CF Radar
-                        <ExternalLink class="size-3 opacity-60" />
-                    </Badge>
-                </a>
+            <!-- Full profile: a real link to the standalone page (new tab on
+                 modifier clicks); a plain click opens the drawer instead -->
+            <div v-if="profileHref" class="pt-1">
+                <Button as-child variant="outline" size="sm" class="h-7 cursor-pointer gap-1.5 text-xs">
+                    <a :href="profileHref" @click="openProfile">
+                        <PanelBottomOpen class="size-3.5" />{{ t('ipInfos.ASNInfo.openProfile') }}
+                    </a>
+                </Button>
             </div>
         </div>
 
@@ -80,11 +51,16 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { computed } from 'vue';
 import getCountryName from '@/data/country-name.js';
-import DataPairBar from './DataPairBar.vue';
-import { Badge } from '@/components/ui/badge';
-import { JnTooltip } from '@/components/ui/tooltip';
+import AsnConnectionQuality from './AsnConnectionQuality.vue';
+import AsnTrafficShares from './AsnTrafficShares.vue';
+import { useRouter } from 'vue-router';
+import { trackEvent } from '@/utils/analytics';
+import { parseAsnInput } from '@/utils/asn-input.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { CircleQuestionMark, Database, ExternalLink } from '@lucide/vue';
+import { PanelBottomOpen } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -92,14 +68,16 @@ const lang = computed(() => store.lang);
 
 const placeholderSizes = [12, 8, 6, 8, 4];
 
-const removeASPrefix = (asn) => asn.replace('AS', '');
-
 const props = defineProps({
     index: { type: Number, required: true },
     isDarkMode: { type: Boolean, required: true },
     asn: { type: String, required: true },
     asnInfos: { type: Object, required: true }
 });
+
+// Fired before a plain-click open, so a host dialog (QueryIP) can close
+// first instead of stacking under the drawer.
+const emit = defineEmits(['open-profile']);
 
 // Extract basic information (non-pair data)
 const basicInfo = computed(() => {
@@ -116,64 +94,22 @@ const basicInfo = computed(() => {
     return info;
 });
 
-// Cloudflare speed test aggregates for the AS, pre-formatted by the backend.
-const qualityInfo = computed(() => {
-    const data = props.asnInfos[props.asn];
-    if (!data) return {};
-    const info = {};
-    const keys = ['speedDownload', 'speedUpload', 'latency', 'jitter'];
-    for (const key of keys) {
-        if (data[key]) info[key] = data[key];
-    }
-    return info;
+// ASN Profile entry: hidden when the tool is gated off (no Cloudflare key)
+// or the ASN doesn't parse. Opens like an Advanced Tools card: the `?tool=`
+// drawer, with `q` making the tool run the lookup on mount.
+const router = useRouter();
+const profileAsn = computed(() => {
+    if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.configs)) return null;
+    const asn = parseAsnInput(props.asn);
+    return asn === null ? null : `AS${asn}`;
 });
+const profileHref = computed(() => (profileAsn.value ? `/tools/asn?q=${profileAsn.value}` : ''));
 
-// Process pair data
-const pairData = computed(() => {
-    const data = props.asnInfos[props.asn];
-    if (!data) return {};
-
-    const parsePercentage = (str) => {
-        if (!str) return null;
-        const num = parseFloat(str.replace('%', ''));
-        return isNaN(num) ? null : parseFloat(num.toFixed(2));
-    };
-
-    const pairs = {};
-
-    const ipv4 = parsePercentage(data.IPv4_Pct);
-    const ipv6 = parsePercentage(data.IPv6_Pct);
-    if (ipv4 !== null && ipv6 !== null) pairs.ipVersion = { left: ipv4, right: ipv6 };
-
-    const http = parsePercentage(data.HTTP_Pct);
-    const https = parsePercentage(data.HTTPS_Pct);
-    if (http !== null && https !== null) pairs.httpProtocol = { left: http, right: https };
-
-    const desktop = parsePercentage(data.Desktop_Pct);
-    const mobile = parsePercentage(data.Mobile_Pct);
-    if (desktop !== null && mobile !== null) pairs.deviceType = { left: desktop, right: mobile };
-
-    const human = parsePercentage(data.Human_Pct);
-    const bot = parsePercentage(data.Bot_Pct);
-    if (human !== null && bot !== null) pairs.userType = { left: human, right: bot };
-
-    return pairs;
-});
-
-const pairDataList = computed(() => {
-    const list = [
-        { key: 'ipVersion', leftLabel: 'IPv4_Pct', rightLabel: 'IPv6_Pct' },
-        { key: 'httpProtocol', leftLabel: 'HTTP_Pct', rightLabel: 'HTTPS_Pct' },
-        { key: 'deviceType', leftLabel: 'Desktop_Pct', rightLabel: 'Mobile_Pct' },
-        { key: 'userType', leftLabel: 'Human_Pct', rightLabel: 'Bot_Pct' }
-    ];
-    return list
-        .filter(item => pairData.value[item.key])
-        .map(item => ({
-            leftLabel: item.leftLabel,
-            rightLabel: item.rightLabel,
-            leftValue: pairData.value[item.key].left,
-            rightValue: pairData.value[item.key].right
-        }));
-});
+const openProfile = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    e.preventDefault();
+    trackEvent('IPCheck', 'ASNProfileClick', 'Open ASN Profile');
+    emit('open-profile');
+    router.push({ path: '/', query: { tool: 'asn', q: profileAsn.value } });
+};
 </script>

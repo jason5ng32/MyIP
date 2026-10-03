@@ -869,7 +869,8 @@
     "RuleTestNote": "Check the rule settings of proxy software",
     "CensorshipCheck": "Check which countries a website is blocked in",
     "ServiceStatus": "Check the live availability of well-known AI and developer services, and whether a recent incident explains the outage you're seeing",
-    "Whois": "Search for domain/IP registration information",
+    "Whois": "Search for domain/IP/ASN registration information",
+    "AsnProfile": "View the full profile of any AS",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
@@ -1033,15 +1034,154 @@
   },
   "whois": {
     "Title": "Whois Search",
-    "Note": "Whois search is a service used to retrieve domain registration information. By entering a domain name or IP address, you can retrieve information such as the domain's registration details, registrar, registration date, expiration date, and more. The Whois information for IP addresses and domain names may have different fields. Additionally, some less common top-level domains (TLDs) may not have available information for Whois queries.",
-    "Note2": "Please enter a domain name or IP address to start the query:",
+    "Note": "Whois search is a service used to retrieve registration information. By entering a domain name, an IP address or an AS number (e.g. AS13335), you can retrieve information such as the registration details, registrar, registration date, expiration date, and more. The Whois information for domain names, IP addresses and AS numbers may have different fields. Additionally, some less common top-level domains (TLDs) may not have available information for Whois queries.",
+    "Note2": "Please enter a domain name, IP or AS number (e.g. AS13335) to start the query:",
     "Note3": "Whois information contains various types of fields. The following is the raw text information",
-    "Placeholder": "Domain Name or IP",
-    "invalidURL": "Invalid domain name or IP",
+    "Placeholder": "Domain, IP or AS number",
+    "invalidURL": "Invalid domain name, IP or AS number",
     "reservedIP": "Private or reserved IP addresses have no public registry record, so there is nothing to look up.",
     "noData": "No Whois or RDAP data is published for this query. Some top-level domains do not offer a public lookup service.",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
+  },
+  "asnprofile": {
+    "Title": "ASN Profile Lookup",
+    "Note": "An autonomous system (AS) is a network run by one organisation — an internet provider, a cloud or hosting company, a university or a large enterprise — that the rest of the internet knows by its AS number and reaches through BGP routing. Enter an AS number to see who registered it, how big it is, which address blocks it announces and whether they are RPKI-signed, where its IPv4 space is located, and which networks it buys transit from, exchanges traffic with or sells transit to. Data comes from multiple sources, including Cloudflare Radar, the regional RDAP services and PeeringDB.",
+    "InputLabel": "AS number",
+    "Placeholder": "e.g. AS13335",
+    "Lookup": "Look up",
+    "invalidInput": "Enter a valid AS number, e.g. AS13335 or 13335.",
+    "noData": "No data found for AS{asn}. It may be unassigned, reserved for private use, or not announced on the internet.",
+    "loadError": "This AS couldn't be loaded right now. Please try again in a moment.",
+    "partial": "Some sources didn't respond this time and are left out: {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Global rank",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "Announced IPv4",
+      "ipv4Share": "≈{share}% of the IPv4 internet",
+      "prefixes": "Prefixes v4 · v6",
+      "users": "Estimated users"
+    },
+    "registration": {
+      "title": "Registration",
+      "registry": "Registry",
+      "status": "Status",
+      "registered": "Registered",
+      "lastChanged": "Last changed",
+      "abuse": "Abuse contact",
+      "raw": "Raw whois record",
+      "copyRaw": "Copy raw record"
+    },
+    "reputation": {
+      "title": "Reputation",
+      "source": "IPCheck.ing data",
+      "desc": "How densely this network's announced IPv4 addresses appear on abuse and VPN lists, as a multiple of the global baseline IPCheck.ing scoring uses — the tick marks 1×, on a log scale. Proxies detected is how many of its addresses were found acting as public proxies.",
+      "abuse": "Abuse IP density",
+      "vpn": "VPN exit density",
+      "proxy": "Proxies detected",
+      "ratio": "{ratio}× baseline",
+      "belowBaseline": "At or below baseline",
+      "drop": "Listed on Spamhaus ASN-DROP",
+      "updated": "Data as of {date}",
+      "level": {
+        "none": "No elevated risk",
+        "low": "Low risk",
+        "medium": "Medium risk",
+        "high": "High risk"
+      }
+    },
+    "traffic": {
+      "title": "Traffic & connection quality",
+      "desc": "Shares of the HTTP traffic Cloudflare saw from this network over the last 7 days (IP version, encryption, device, human or bot), and averages of the speed tests its users ran."
+    },
+    "map": {
+      "title": "Global IP distribution",
+      "desc": "Where this network's IPv4 addresses are used, weighted by address count."
+    },
+    "prefixes": {
+      "title": "Announced prefixes",
+      "desc": "Every address block this AS originates in the global routing table. RPKI Valid means a signed record (ROA) authorises this AS to announce it, Invalid means it contradicts one, Unknown means none exists. Visibility is how many route-collector peers carry the prefix.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "RPKI route origin",
+      "rpkiValid": "{pct}% valid",
+      "family": "Address family",
+      "all": "All",
+      "copy": "Copy the listed prefixes",
+      "download": "Download .txt",
+      "prefix": "Prefix",
+      "size": "Size",
+      "rpkiColumn": "RPKI",
+      "visibility": "Visibility",
+      "shown": "{shown} of {total} shown",
+      "showMore": "Show {count} more"
+    },
+    "rpki": {
+      "valid": "Valid",
+      "invalid": "Invalid",
+      "unknown": "Unknown"
+    },
+    "connectivity": {
+      "title": "Connectivity",
+      "desc": "Upstreams sell this AS transit, peers exchange traffic with it directly, customers buy transit from it — counted from CAIDA's relationship data, the same reading the graph below uses. The customer cone is how many ASes it reaches through its customers (CAIDA AS Rank). The graph draws only the main paths to Tier 1 networks, so the upstream count can exceed the nodes drawn.",
+      "cone": "Customer cone (ASes)",
+      "providers": "Upstreams",
+      "peers": "Peers",
+      "customers": "Customers",
+      "none": "None observed"
+    },
+    "peering": {
+      "title": "Peering & facilities",
+      "desc": "As registered by the network's own operators in PeeringDB. Internet exchanges are the IXPs it connects to, with port capacity summed per exchange; RS marks a session with the exchange's route servers. Facilities are the data centres it is present in.",
+      "policy": "Peering policy",
+      "traffic": "Traffic level",
+      "ratio": "Traffic ratio",
+      "irr": "IRR as-set",
+      "website": "Website",
+      "scope": "Geographic scope",
+      "exchanges": "Internet exchanges ({count})",
+      "facilities": "Facilities ({count})",
+      "rs": "RS",
+      "rsTitle": "Peers with the exchange's route servers",
+      "showAll": "Show all {count}",
+      "showLess": "Show fewer",
+      "types": {
+        "isp": "Cable/DSL/ISP",
+        "nsp": "NSP",
+        "content": "Content",
+        "enterprise": "Enterprise",
+        "education": "Educational/Research",
+        "nonProfit": "Non-profit",
+        "government": "Government",
+        "routeServer": "Route server",
+        "routeCollector": "Route collector",
+        "networkServices": "Network services"
+      },
+      "scopes": {
+        "regional": "Regional",
+        "northAmerica": "North America",
+        "asiaPacific": "Asia Pacific",
+        "europe": "Europe",
+        "southAmerica": "South America",
+        "africa": "Africa",
+        "australia": "Australia",
+        "middleEast": "Middle East",
+        "global": "Global"
+      },
+      "ratios": {
+        "balanced": "Balanced",
+        "mostlyInbound": "Mostly inbound",
+        "heavyInbound": "Heavy inbound",
+        "mostlyOutbound": "Mostly outbound",
+        "heavyOutbound": "Heavy outbound"
+      },
+      "policies": {
+        "open": "Open",
+        "selective": "Selective",
+        "restrictive": "Restrictive",
+        "no": "No peering"
+      }
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "In-depth DNS Leak Test",
@@ -1287,7 +1427,7 @@
       "Mobile_Pct": "Mobile",
       "Bot_Pct": "Bot",
       "Human_Pct": "Human",
-      "moreData": "More Data : "
+      "openProfile": "Open full ASN Profile"
     },
     "ASNHistory": {
       "announcedPrefixes": "Announced Prefixes: ",
@@ -1699,7 +1839,8 @@
     "IpCalculator": "Open IP Calculator panel",
     "BrowserInfo": "Open Browser Info panel",
     "SecurityChecklist": "Open Security Checklist panel",
-    "PersonaCheck": "Open In-depth Persona Check panel"
+    "PersonaCheck": "Open In-depth Persona Check panel",
+    "AsnProfile": "Open ASN Profile Lookup panel"
   },
   "page": {
     "title": "IPCheck.ing - Check My IP Address and Geolocation - IP Leak Test - DNS Leak Test - IP Quality Check - Test Network Speed - All-in-one IP Toolbox",

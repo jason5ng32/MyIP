@@ -869,7 +869,8 @@
     "RuleTestNote": "检查代理软件的规则设置",
     "CensorshipCheck": "检查一个网站在全球哪些国家被封锁",
     "ServiceStatus": "查看知名 AI 与开发者服务的实时可用性，确认你遇到的中断是不是对方的故障",
-    "Whois": "对域名或 IP 进行 Whois 查询",
+    "Whois": "对域名、IP 或 AS 号进行 Whois 查询",
+    "AsnProfile": "查看任意 AS 的完整档案",
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
     "MacChecker": "查询物理地址的归属信息",
     "IpCalculator": "任意 IP、前缀或范围的子网计算、进制转换与 IPv6 解读",
@@ -1033,15 +1034,154 @@
   },
   "whois": {
     "Title": "Whois 查询",
-    "Note": "Whois 查询是一种用于查询域名注册信息的服务。通过输入域名或 IP 地址，可以查询到域名的注册信息、注册商、注册日期、过期日期等信息。IP 与域名的 Whois 信息字段不完全一致。同时，部分比较小众的域名（TLD）可能无法查询到相关信息。",
-    "Note2": "请输入域名或 IP，开始进行查询：",
+    "Note": "Whois 查询是一种用于查询注册信息的服务。通过输入域名、IP 地址或 AS 号（如 AS13335），可以查询到注册信息、注册商、注册日期、过期日期等信息。域名、IP 与 AS 号的 Whois 信息字段不完全一致。同时，部分比较小众的域名（TLD）可能无法查询到相关信息。",
+    "Note2": "请输入域名、IP 或 AS 号（如 AS13335），开始进行查询：",
     "Note3": "Whois 信息包含多种类型的字段，以下为原始文本信息",
-    "Placeholder": "域名或 IP",
-    "invalidURL": "无效的域名或 IP",
+    "Placeholder": "域名、IP 或 AS 号",
+    "invalidURL": "无效的域名、IP 或 AS 号",
     "reservedIP": "内网或保留地址没有公开的注册信息，无法查询。",
     "noData": "该查询没有公开的 Whois / RDAP 数据。部分顶级域名不提供公开查询服务。",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"
+  },
+  "asnprofile": {
+    "Title": "ASN 档案查询",
+    "Note": "自治系统（AS）是由单一机构运营的一张网络——可能是运营商、云服务或托管商、高校，也可能是大型企业——互联网上的其它网络通过 AS 号识别它，并经由 BGP 路由与它互通。输入一个 AS 号，即可看到它由谁注册、规模多大、宣告了哪些地址段以及这些地址段是否有 RPKI 签名、IPv4 地址分布在哪些国家，以及它向谁购买上游、与谁对等互联、又为谁提供转接。数据来自包括 Cloudflare Radar、各地区 RDAP 、PeeringDB 等多个渠道。",
+    "InputLabel": "AS 号",
+    "Placeholder": "例如 AS13335",
+    "Lookup": "查询",
+    "invalidInput": "请输入有效的 AS 号，例如 AS13335 或 13335。",
+    "noData": "未找到 AS{asn} 的任何数据。它可能尚未分配、属于私有保留范围，或未在互联网上宣告。",
+    "loadError": "暂时无法加载该 AS，请稍后再试。",
+    "partial": "部分数据源本次未响应，相关内容已省略：{list}。",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "全球排名",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "宣告的 IPv4",
+      "ipv4Share": "约占 IPv4 互联网的 {share}%",
+      "prefixes": "前缀 v4 · v6",
+      "users": "估计用户数"
+    },
+    "registration": {
+      "title": "注册信息",
+      "registry": "注册机构",
+      "status": "状态",
+      "registered": "注册时间",
+      "lastChanged": "最近更新",
+      "abuse": "滥用联系方式",
+      "raw": "原始 Whois 记录",
+      "copyRaw": "复制原始记录"
+    },
+    "reputation": {
+      "title": "信誉",
+      "source": "IPCheck.ing 数据",
+      "desc": "该网络宣告的 IPv4 地址被列入滥用与 VPN 名单的密度，以 IPCheck.ing 评分所用全网基线的倍数表示——刻度线为 1×，对数刻度。已被发现的代理数量是其中被发现充当公共代理的地址数。",
+      "abuse": "滥用 IP 密度",
+      "vpn": "VPN 出口密度",
+      "proxy": "已被发现的代理数量",
+      "ratio": "基线的 {ratio} 倍",
+      "belowBaseline": "不高于基线",
+      "drop": "已列入 Spamhaus ASN-DROP",
+      "updated": "数据日期：{date}",
+      "level": {
+        "none": "无明显风险",
+        "low": "低风险",
+        "medium": "中风险",
+        "high": "高风险"
+      }
+    },
+    "traffic": {
+      "title": "流量与连接质量",
+      "desc": "Cloudflare 在过去 7 天内观察到的、来自该网络的 HTTP 流量构成（IP 版本、是否加密、设备类型、真人或机器人），以及该网络用户测速结果的平均值。"
+    },
+    "map": {
+      "title": "全球 IP 分布",
+      "desc": "该网络的 IPv4 地址用在哪里，比例通过地址数量加权。"
+    },
+    "prefixes": {
+      "title": "宣告前缀",
+      "desc": "该 AS 在全球路由表中发起宣告的全部地址段。RPKI 有效表示有已签名的 ROA 授权该 AS 宣告它，无效表示与 ROA 冲突，未知表示没有 ROA。可见度是携带该前缀的路由收集器对等点数量。",
+      "counts": "{v4} 个 IPv4 · {v6} 个 IPv6",
+      "rpki": "RPKI 路由起源验证",
+      "rpkiValid": "{pct}% 有效",
+      "family": "地址族",
+      "all": "全部",
+      "copy": "复制列表中的前缀",
+      "download": "下载 .txt",
+      "prefix": "前缀",
+      "size": "大小",
+      "rpkiColumn": "RPKI",
+      "visibility": "可见度",
+      "shown": "已显示 {shown} / {total}",
+      "showMore": "再显示 {count} 条"
+    },
+    "rpki": {
+      "valid": "有效",
+      "invalid": "无效",
+      "unknown": "未知"
+    },
+    "connectivity": {
+      "title": "互联",
+      "desc": "上游向该 AS 出售转接，对等方与它直接交换流量，客户向它购买转接——数量来自 CAIDA 的 AS 关系数据，与下方拓扑图采用同一套判定。客户锥是经由其客户可以到达的 AS 数量（CAIDA AS Rank）。拓扑图只画出通往 Tier 1 网络的主要路径，因此上游数量可能多于图中的节点。",
+      "cone": "客户锥（AS 数）",
+      "providers": "上游",
+      "peers": "对等",
+      "customers": "客户",
+      "none": "未观察到"
+    },
+    "peering": {
+      "title": "对等与驻点",
+      "desc": "以下信息由该网络的运营者在 PeeringDB 中自行登记。互联网交换中心是它接入的 IX，端口速率按每个 IX 合计；RS 表示与该 IX 的路由服务器建立了会话。机房驻点是它入驻的数据中心。",
+      "policy": "对等策略",
+      "traffic": "流量规模",
+      "ratio": "流量方向",
+      "irr": "IRR as-set",
+      "website": "官网",
+      "scope": "覆盖范围",
+      "exchanges": "互联网交换中心（{count}）",
+      "facilities": "机房驻点（{count}）",
+      "rs": "RS",
+      "rsTitle": "与该交换中心的路由服务器对等",
+      "showAll": "显示全部 {count} 个",
+      "showLess": "收起",
+      "types": {
+        "isp": "有线/DSL/ISP",
+        "nsp": "NSP（网络服务商）",
+        "content": "内容",
+        "enterprise": "企业",
+        "education": "教育/科研",
+        "nonProfit": "非营利",
+        "government": "政府",
+        "routeServer": "路由服务器",
+        "routeCollector": "路由收集器",
+        "networkServices": "网络服务"
+      },
+      "scopes": {
+        "regional": "区域",
+        "northAmerica": "北美",
+        "asiaPacific": "亚太",
+        "europe": "欧洲",
+        "southAmerica": "南美",
+        "africa": "非洲",
+        "australia": "澳大利亚",
+        "middleEast": "中东",
+        "global": "全球"
+      },
+      "ratios": {
+        "balanced": "均衡",
+        "mostlyInbound": "以入站为主",
+        "heavyInbound": "大量入站",
+        "mostlyOutbound": "以出站为主",
+        "heavyOutbound": "大量出站"
+      },
+      "policies": {
+        "open": "开放",
+        "selective": "选择性",
+        "restrictive": "限制性",
+        "no": "不对等"
+      }
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 泄露测试",
@@ -1287,7 +1427,7 @@
       "Mobile_Pct": "移动设备",
       "Bot_Pct": "机器人",
       "Human_Pct": "人类",
-      "moreData": "更多数据："
+      "openProfile": "查看完整 ASN 档案"
     },
     "ASNHistory": {
       "announcedPrefixes": "公告前缀：",
@@ -1699,7 +1839,8 @@
     "IpCalculator": "打开 IP 计算器面板",
     "BrowserInfo": "打开浏览器信息面板",
     "SecurityChecklist": "打开安全检查清单",
-    "PersonaCheck": "打开深度画像检测面板"
+    "PersonaCheck": "打开深度画像检测面板",
+    "AsnProfile": "打开 ASN 档案查询面板"
   },
   "page": {
     "title": "IPCheck.ing - 查看我的 IP 地址及归属地 - IP 泄露检测 - DNS 泄露检测 - IP 质量检查 - 网速测试 - 多合一 IP 工具箱",
