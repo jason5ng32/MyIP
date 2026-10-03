@@ -2153,6 +2153,17 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "Whois Search can now look up AS numbers",
+          "zh": "Whois 查询支持查询 AS 号",
+          "zh-TW": "Whois 查詢支援查詢 AS 號碼",
+          "fr": "La recherche Whois prend désormais en charge les numéros d'AS",
+          "ru": "Поиск Whois теперь поддерживает номера AS",
+          "pt-BR": "A pesquisa Whois agora também consulta números de AS"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

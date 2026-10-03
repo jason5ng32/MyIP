@@ -90,6 +90,22 @@ export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
     next();
 };
 
+// Canonicalize an ASN-shaped value (`AS13335`, `as13335` — the `AS` prefix
+// is required) to `AS<n>` in place, rejecting AS0 and anything past 32 bits.
+// Any other value, a bare number included, passes through untouched —
+// /api/whois also takes IPs and domains, which its handler validates.
+export const normalizeAsnQuery = (paramName = 'q') => (req, res, next) => {
+    const raw = req.query[paramName];
+    const match = typeof raw === 'string' ? /^AS(\d+)$/i.exec(raw.trim()) : null;
+    if (!match) return next();
+    const asn = Number(match[1]);
+    if (match[1].length > 10 || asn < 1 || asn > 4294967295) {
+        return res.status(400).json({ error: 'Invalid ASN' });
+    }
+    req.query[paramName] = `AS${asn}`;
+    next();
+};
+
 // Reject requests without a two-letter country code; uppercases in place so
 // the edge cache sees one canonical key. Syntactic only — an unassigned code
 // just yields an empty upstream series.

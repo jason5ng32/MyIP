@@ -6,6 +6,7 @@
 //   - IPs: primary. RIR RDAP is plain HTTPS + JSON from the
 //     authoritative registry, with none of port-43's referral quirks
 //     (rwhois:// endpoints speak a protocol WHOIS clients can't follow).
+//   - ASNs: only source. RIR autnum objects, same bootstrap mechanism.
 //
 // Public API:
 //   rdapDomain(name)  →  { [host]: { __raw, ...rdapJson } }
@@ -13,6 +14,8 @@
 //     the result in without any frontend change.
 //   rdapIp(ip)        →  { __raw, ...rdapJson }
 //     Flat, like whoiser.ip() — the frontend only reads `__raw`.
+//   rdapAutnum(asn)   →  { asn, handle, name, rir, …, __raw }
+//     Flat like rdapIp, but parsed fields instead of the raw RDAP JSON.
 //
 // Bootstrap (IANA's TLD / address-space → RDAP endpoint maps) is cached
 // in-memory for 24h per file. Upstream calls go through `fetchUpstream`
@@ -123,6 +126,88 @@ export const rdapIp = async (ip, { timeoutMs = 5000 } = {}) => {
     return { ...data, __raw: formatIpNetwork(data) };
 };
 
+// -- Autnum lookup ---------------------------------------------------------
+
+// Match an ASN against IANA asn.json bootstrap services (entries:
+// [[range, …], [url, …]], ranges "N" or "N-M"). Exported for tests.
+export const findAutnumEndpoint = (services, asn) => {
+    for (const [ranges, urls] of services) {
+        for (const range of ranges) {
+            const [lo, hi] = range.split('-').map(Number);
+            if (asn >= lo && asn <= (hi ?? lo)) {
+                return urls.find((u) => u.startsWith('https://')) || urls[0];
+            }
+        }
+    }
+    return null;
+};
+
+// RDAP service host → registry display name. Unlisted hosts (an NIR, a
+// moved endpoint) fall back to the hostname itself.
+const RIR_BY_HOST = {
+    'rdap.arin.net': 'ARIN',
+    'rdap.db.ripe.net': 'RIPE NCC',
+    'rdap.apnic.net': 'APNIC',
+    'rdap.lacnic.net': 'LACNIC',
+    'rdap.afrinic.net': 'AFRINIC',
+};
+
+// Depth-first walk over an entity tree (RDAP nests contacts inside their
+// parent entity), returning the first entity carrying `role`.
+const findEntityByRole = (entities, role) => {
+    for (const e of entities || []) {
+        if (e.roles?.includes(role)) return e;
+        const nested = findEntityByRole(e.entities, role);
+        if (nested) return nested;
+    }
+    return null;
+};
+
+const vcardOrgName = (v) => (Array.isArray(v.org?.[0]) ? v.org[0].join(' ') : v.org?.[0]);
+
+// RDAP autnum document → the parsed fields plus the WHOIS-like `__raw`
+// block. `host` is the RDAP service that answered. Exported for tests.
+export const parseAutnum = (data, asn, host) => {
+    const events = {};
+    for (const e of data.events || []) events[e.eventAction] = e.eventDate;
+    const registrant = findEntityByRole(data.entities, 'registrant');
+    const registrantCard = registrant ? extractVcard(registrant) : {};
+    const abuseCard = extractVcard(findEntityByRole(data.entities, 'abuse'));
+    return {
+        asn,
+        handle: data.handle || null,
+        name: data.name || null,
+        rir: RIR_BY_HOST[host] || host || null,
+        status: data.status || [],
+        registered: events.registration || null,
+        lastChanged: events['last changed'] || null,
+        registrant: registrantCard.fn?.[0] || vcardOrgName(registrantCard) || null,
+        country: data.country || null,
+        abuse: abuseCard.email?.[0] || null,
+        __raw: formatAutnum(data),
+    };
+};
+
+export const rdapAutnum = async (asn, { timeoutMs = 5000 } = {}) => {
+    const n = Number(String(asn).replace(/^AS/i, ''));
+    const bootstrap = await loadBootstrap('asn.json');
+    const base = findAutnumEndpoint(bootstrap.services, n);
+    if (!base) {
+        throw new Error(`No RDAP endpoint for AS${n}`);
+    }
+
+    const url = `${trimSlash(base)}/autnum/${n}`;
+    const res = await fetchUpstream(url, { timeoutMs });
+    if (res.status === 404) {
+        throw new Error(`ASN not found: AS${n}`);
+    }
+    if (!res.ok) {
+        logger.error({ asn: n, status: res.status }, 'RDAP autnum query failed');
+        throw new Error(`RDAP autnum query failed: ${res.status}`);
+    }
+    return parseAutnum(await res.json(), n, new URL(base).hostname);
+};
+
 // -- Format RDAP JSON into a WHOIS-like text block ------------------------
 
 function extractVcard(entity) {
@@ -210,6 +295,44 @@ export const formatIpNetwork = (data) => {
     if (data.parentHandle) lines.push(`Parent: ${data.parentHandle}`);
     if (data.type)         lines.push(`NetType: ${data.type}`);
     if (data.country)      lines.push(`Country: ${data.country}`);
+
+    const ev = {};
+    for (const e of data.events || []) ev[e.eventAction] = e.eventDate;
+    if (ev.registration)    lines.push(`Created: ${ev.registration}`);
+    if (ev['last changed']) lines.push(`Updated: ${ev['last changed']}`);
+
+    if (data.status?.length) {
+        lines.push('Status:');
+        for (const s of data.status) lines.push(`  ${s}`);
+    }
+
+    lines.push(...formatEntitySections(
+        data.entities,
+        ['registrant', 'administrative', 'technical', 'abuse', 'noc', 'routing'],
+    ));
+
+    for (const remark of data.remarks || []) {
+        lines.push('');
+        lines.push(`${remark.title || 'Remarks'}:`);
+        for (const d of remark.description || []) lines.push(`  ${d}`);
+    }
+
+    return lines.join('\n');
+};
+
+// WHOIS-like text block for an RDAP autnum object, field names mirroring
+// RIR port-43 aut-num output. Exported for tests.
+export const formatAutnum = (data) => {
+    const lines = [];
+    const start = data.startAutnum;
+    const end = data.endAutnum;
+    if (start != null) {
+        lines.push(`ASNumber: ${end != null && end !== start ? `${start} - ${end}` : start}`);
+    }
+    if (data.name)   lines.push(`ASName: ${data.name}`);
+    if (data.handle) lines.push(`ASHandle: ${data.handle}`);
+    if (data.type)   lines.push(`Type: ${data.type}`);
+    if (data.country) lines.push(`Country: ${data.country}`);
 
     const ev = {};
     for (const e of data.events || []) ev[e.eventAction] = e.eventDate;

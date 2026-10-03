@@ -252,6 +252,77 @@ describe('get-whois handler', () => {
             assert.deepEqual(res.body, { error: 'Not a public IP address' });
         });
     }
+
+    // ASN path (query already canonicalized to AS<n> by normalizeAsnQuery).
+    // The first case fetches IANA's asn.json bootstrap through the stub; the
+    // module caches it for the rest of the file.
+    const ASN_BOOTSTRAP = { services: [[['13335', '64496-64511'], ['https://rdap.arin.net/registry/']]] };
+    const stubAutnum = (autnum) => async (url) => (String(url).includes('data.iana.org')
+        ? new Response(JSON.stringify(ASN_BOOTSTRAP))
+        : autnum(String(url)));
+
+    it('answers an ASN query with parsed RDAP autnum fields plus __raw', async () => {
+        const urls = [];
+        globalThis.fetch = stubAutnum((url) => {
+            urls.push(url);
+            return new Response(JSON.stringify({
+                handle: 'AS13335', startAutnum: 13335, endAutnum: 13335, name: 'CLOUDFLARENET',
+                status: ['active'],
+                events: [{ eventAction: 'registration', eventDate: '2010-07-14T18:35:57-04:00' }],
+            }));
+        });
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS13335' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(urls, ['https://rdap.arin.net/registry/autnum/13335']);
+        assert.equal(res.body.asn, 13335);
+        assert.equal(res.body.name, 'CLOUDFLARENET');
+        assert.equal(res.body.rir, 'ARIN');
+        assert.equal(res.body.registered, '2010-07-14T18:35:57-04:00');
+        assert.match(res.body.__raw, /^ASNumber: 13335\nASName: CLOUDFLARENET/);
+    });
+
+    it('answers 404 for an ASN the registry does not know', async () => {
+        globalThis.fetch = stubAutnum(() => new Response('', { status: 404 }));
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS64500' } }), res);
+        assert.equal(res.statusCode, 404);
+        assert.deepEqual(res.body, { error: 'ASN not found: AS64500' });
+    });
+
+    it('answers 404 for an ASN outside every registry range', async () => {
+        globalThis.fetch = stubAutnum(() => { throw new Error('unexpected autnum call'); });
+        const res = createResponse();
+        await getWhoisHandler(createRequest({ query: { q: 'AS64512' } }), res);
+        assert.equal(res.statusCode, 404);
+        assert.deepEqual(res.body, { error: 'No RDAP endpoint for AS64512' });
+    });
+
+    // normalizeAsnQuery passes a bare number through untouched (the `AS`
+    // prefix is required), so the handler sees it raw and rejects it.
+    for (const q of ['13335', '0', '99999999999']) {
+        it(`rejects the bare number ${q} as neither IP nor domain, before any lookup`, async () => {
+            globalThis.fetch = async () => { throw new Error('unexpected upstream call'); };
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q } }), res);
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(res.body, { error: 'Invalid IP or address' });
+        });
+    }
+
+    it('answers 500 when the registry fails', async () => {
+        globalThis.fetch = stubAutnum(() => new Response('busy', { status: 503 }));
+        const originalError = logger.error;
+        logger.error = () => {};
+        try {
+            const res = createResponse();
+            await getWhoisHandler(createRequest({ query: { q: 'AS13335' } }), res);
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.body, { error: 'RDAP autnum query failed: 503' });
+        } finally {
+            logger.error = originalError;
+        }
+    });
 });
 
 // -- github-stars handler -------------------------------------------------

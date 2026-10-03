@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId } from './common/guards.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './common/guards.js';
 import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
@@ -257,7 +257,7 @@ app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE)
 app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
 app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
-app.get('/api/whois', cacheable(ONE_DAY_CACHE), getWhois);
+app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.

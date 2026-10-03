@@ -27,6 +27,12 @@ rides the single `/api/cfradar` route, dispatched by `?view=` over the
 guards, edge-cache TTL, and fetch function there — new Radar data means a
 view function plus a registry row, never a new route.
 
+`/api/whois` takes three query shapes on one `?q=`: IPs (RDAP, whoiser
+fallback), domains (whoiser, RDAP fallback) and ASNs (`AS<n>`, prefix
+required in any case, RDAP autnum only — `rdapAutnum` in `common/rdap.js`).
+A bare number is none of these and gets a 400. Every shape answers with a
+WHOIS-like `__raw` block; the ASN path adds parsed registration fields.
+
 `api/data/` holds contributor-editable static config consumed by handlers —
 currently `dns-resolvers.js`, the country-annotated resolver list behind
 `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
@@ -92,6 +98,10 @@ these checks:
 - `requireValidPrefix()` — `?prefix=` (CIDR); lets the frontend quantize to
   the BGP DFZ floor (/24 v4, /48 v6) for maximal CF edge-cache reuse.
 - `requireValidASN()` — `?asn=`, strips `AS`, rewrites to numeric.
+- `normalizeAsnQuery()` — `/api/whois`'s `?q=`: an ASN-shaped value
+  (`AS13335` / `as13335`; the `AS` prefix is required) is range-checked and
+  rewritten to `AS<n>`; anything else, a bare number included, passes
+  through to the handler's IP / domain checks (which reject it).
 - `requireValidCountry()` — `?country=` (alpha-2), uppercases in place for one
   canonical edge-cache key. Syntactic only — an unassigned code just yields an
   empty upstream series.
