@@ -27,23 +27,14 @@
             <!-- Traffic shares (pair bars) -->
             <AsnTrafficShares :info="asnInfos[asn]" />
 
-            <!-- External links -->
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-                <span class="text-xs text-muted-foreground">{{ t('ipInfos.ASNInfo.moreData') }}</span>
-                <a class="inline-flex" :href="`https://bgp.tools/as/${removeASPrefix(asn)}`" target="_blank"
-                    rel="noopener" title="BGP.Tools">
-                    <Badge variant="outline" class="gap-1 hover:bg-muted cursor-pointer">
-                        <Database class="size-3" /> BGPTools
-                        <ExternalLink class="size-3 opacity-60" />
-                    </Badge>
-                </a>
-                <a class="inline-flex" :href="`https://radar.cloudflare.com/${asn}`" target="_blank" rel="noopener"
-                    title="Cloudflare Radar">
-                    <Badge variant="outline" class="gap-1 hover:bg-muted cursor-pointer">
-                        <Database class="size-3" /> CF Radar
-                        <ExternalLink class="size-3 opacity-60" />
-                    </Badge>
-                </a>
+            <!-- Full profile: a real link to the standalone page (new tab on
+                 modifier clicks); a plain click opens the drawer instead -->
+            <div v-if="profileHref" class="pt-1">
+                <Button as-child variant="outline" size="sm" class="h-7 cursor-pointer gap-1.5 text-xs">
+                    <a :href="profileHref" @click="openProfile">
+                        <PanelBottomOpen class="size-3.5" />{{ t('ipInfos.ASNInfo.openProfile') }}
+                    </a>
+                </Button>
             </div>
         </div>
 
@@ -62,9 +53,14 @@ import { computed } from 'vue';
 import getCountryName from '@/data/country-name.js';
 import AsnConnectionQuality from './AsnConnectionQuality.vue';
 import AsnTrafficShares from './AsnTrafficShares.vue';
-import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'vue-router';
+import { trackEvent } from '@/utils/analytics';
+import { parseAsnInput } from '@/utils/asn-input.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { Database, ExternalLink } from '@lucide/vue';
+import { PanelBottomOpen } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -72,14 +68,16 @@ const lang = computed(() => store.lang);
 
 const placeholderSizes = [12, 8, 6, 8, 4];
 
-const removeASPrefix = (asn) => asn.replace('AS', '');
-
 const props = defineProps({
     index: { type: Number, required: true },
     isDarkMode: { type: Boolean, required: true },
     asn: { type: String, required: true },
     asnInfos: { type: Object, required: true }
 });
+
+// Fired before a plain-click open, so a host dialog (QueryIP) can close
+// first instead of stacking under the drawer.
+const emit = defineEmits(['open-profile']);
 
 // Extract basic information (non-pair data)
 const basicInfo = computed(() => {
@@ -95,4 +93,23 @@ const basicInfo = computed(() => {
     }
     return info;
 });
+
+// ASN Profile entry: hidden when the tool is gated off (no Cloudflare key)
+// or the ASN doesn't parse. Opens like an Advanced Tools card: the `?tool=`
+// drawer, with `q` making the tool run the lookup on mount.
+const router = useRouter();
+const profileAsn = computed(() => {
+    if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.configs)) return null;
+    const asn = parseAsnInput(props.asn);
+    return asn === null ? null : `AS${asn}`;
+});
+const profileHref = computed(() => (profileAsn.value ? `/tools/asn?q=${profileAsn.value}` : ''));
+
+const openProfile = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    e.preventDefault();
+    trackEvent('IPCheck', 'ASNProfileClick', 'Open ASN Profile');
+    emit('open-profile');
+    router.push({ path: '/', query: { tool: 'asn', q: profileAsn.value } });
+};
 </script>

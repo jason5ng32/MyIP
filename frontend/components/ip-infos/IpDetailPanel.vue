@@ -283,7 +283,7 @@
             <CollapsibleContent>
                 <div class="pt-3">
                     <ASNInfo v-if="activePanel === 'info'" :index="index" :isDarkMode="isDarkMode" :asn="data.asn"
-                        :asnInfos="asnInfos" />
+                        :asnInfos="asnInfos" @open-profile="emit('open-tool')" />
                     <ASNHistory v-else-if="activePanel === 'history'" :prefix="ipPrefix"
                         :asnHistoryInfos="asnHistoryInfos" />
                     <ASNConnectivity v-else-if="activePanel === 'connectivity'" :asn="asnNumeric"
@@ -314,6 +314,7 @@ import { useI18n, I18nT } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { loadAsnInfoInto } from '@/composables/use-asn-info.js';
+import { loadAsnConnectivityInto } from '@/utils/asn-connectivity.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime, formatIsoDate } from '@/utils/time-utils.js';
 import { buildScoreExplanation, listScoreTags } from '@/utils/ip-score-details.js';
@@ -383,8 +384,10 @@ const props = defineProps({
 });
 
 // Consumers rendering this panel inside a dialog listen to close themselves
-// first — the Benefits & Usage dialog would otherwise stack on top of them.
-const emit = defineEmits(['view-usage']);
+// first — the Benefits & Usage dialog (`view-usage`) or an Advanced Tools
+// drawer (`open-tool`, from ASN Info's profile link) would otherwise stack
+// on top of them.
+const emit = defineEmits(['view-usage', 'open-tool']);
 
 const openUsageDialog = () => {
     emit('view-usage');
@@ -603,27 +606,10 @@ const getASNHistory = async (prefix) => {
     }
 };
 
-// Cache-buster: bump on graph algorithm / schema changes. The route sits
-// behind a 30-day max-age that caches in browsers too, where no purge reaches.
-const ASN_CONNECTIVITY_VERSION = 2;
-
+// Fetch + versioning live in utils/asn-connectivity.js (shared with ASN
+// Profile); the cache is the owner's, handed down as asnConnectivityInfos.
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');
-    try {
-        if (props.asnConnectivityInfos[asn]) return;
-        const response = await fetchWithTimeout(
-            `/api/asn-connectivity?asn=${encodeURIComponent(asn)}&v=${ASN_CONNECTIVITY_VERSION}`,
-            { timeoutMs: 5000 } // backend is sub-ms local lookup; tight cap is fine
-        );
-        if (!response.ok) {
-            props.asnConnectivityInfos[asn] = { error: true };
-            return;
-        }
-        const graph = await response.json();
-        props.asnConnectivityInfos[asn] = { graph };
-    } catch (error) {
-        console.error('Error fetching ASN connectivity:', error);
-        props.asnConnectivityInfos[asn] = { error: true };
-    }
+    await loadAsnConnectivityInto(props.asnConnectivityInfos, asn);
 };
 </script>

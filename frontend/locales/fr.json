@@ -870,7 +870,7 @@
     "CensorshipCheck": "Vérifier dans quels pays un site est bloqué",
     "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP/AS",
-    "AsnProfile": "Identité, taille, préfixes annoncés, présence mondiale, interconnexions et enregistrement de n'importe quel AS",
+    "AsnProfile": "Qui exploite un AS, sa taille, ce qu'il annonce, où se trouvent ses adresses et avec qui il est interconnecté",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
@@ -1045,7 +1045,91 @@
     "Provider": "Fournisseur d'informations"
   },
   "asnprofile": {
-    "Title": "Profil ASN"
+    "Title": "Profil ASN",
+    "Note": "Un système autonome (AS) est un réseau exploité par une seule organisation — fournisseur d'accès, hébergeur ou cloud, université, grande entreprise — que le reste d'Internet identifie par son numéro d'AS et atteint via le routage BGP. Saisissez un numéro d'AS pour voir qui l'a enregistré, quelle est sa taille, quels blocs d'adresses il annonce et s'ils sont signés RPKI, où se situe son espace IPv4, et auprès de qui il achète du transit, avec qui il échange du trafic et à qui il en revend. Les données proviennent de plusieurs sources, dont Cloudflare Radar et les services RDAP régionaux.",
+    "InputLabel": "Numéro d'AS",
+    "Placeholder": "ex. AS13335",
+    "Lookup": "Rechercher",
+    "invalidInput": "Saisissez un numéro d'AS valide, par ex. AS13335 ou 13335.",
+    "noData": "Aucune donnée trouvée pour AS{asn}. Il est peut-être non attribué, réservé à un usage privé ou non annoncé sur Internet.",
+    "loadError": "Impossible de charger cet AS pour le moment. Réessayez dans un instant.",
+    "partial": "Certaines sources n'ont pas répondu cette fois et sont omises : {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Rang mondial",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "IPv4 annoncé",
+      "ipv4Share": "≈{share} % de l'Internet IPv4",
+      "prefixes": "Préfixes v4 · v6",
+      "users": "Utilisateurs estimés"
+    },
+    "registration": {
+      "title": "Enregistrement",
+      "registry": "Registre",
+      "status": "Statut",
+      "registered": "Enregistré le",
+      "lastChanged": "Dernière modification",
+      "abuse": "Contact abus",
+      "raw": "Enregistrement whois brut",
+      "copyRaw": "Copier l'enregistrement brut"
+    },
+    "reputation": {
+      "title": "Réputation",
+      "source": "Données IPCheck.ing",
+      "desc": "Densité d'adresses IPv4 annoncées par ce réseau figurant sur des listes d'abus et de VPN, en multiple de la référence mondiale du score IPCheck.ing — le repère marque 1×, échelle logarithmique. « Proxys détectés » indique combien de ses adresses ont été repérées comme proxys publics.",
+      "abuse": "Densité d'IP abusives",
+      "vpn": "Densité de sorties VPN",
+      "proxy": "Proxys détectés",
+      "ratio": "{ratio}× la référence",
+      "belowBaseline": "Au niveau de la référence ou en dessous",
+      "drop": "Listé sur Spamhaus ASN-DROP",
+      "updated": "Données au {date}",
+      "level": {
+        "none": "Aucun risque notable",
+        "low": "Risque faible",
+        "medium": "Risque moyen",
+        "high": "Risque élevé"
+      }
+    },
+    "traffic": {
+      "title": "Trafic et qualité de connexion",
+      "desc": "Répartition du trafic HTTP que Cloudflare a observé depuis ce réseau au cours des 7 derniers jours (version IP, chiffrement, appareil, humain ou robot), et moyennes des tests de débit effectués par ses utilisateurs."
+    },
+    "map": {
+      "title": "Répartition mondiale des IP",
+      "desc": "Où les adresses IPv4 de ce réseau sont utilisées, pondéré par le nombre d'adresses."
+    },
+    "prefixes": {
+      "title": "Préfixes annoncés",
+      "desc": "Tous les blocs d'adresses dont cet AS est l'origine dans la table de routage mondiale. RPKI Valide signifie qu'un ROA signé autorise cet AS à l'annoncer, Invalide qu'il contredit un ROA, Inconnu qu'aucun ROA n'existe. La visibilité est le nombre de pairs des collecteurs de routes qui portent le préfixe.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "Origine de route RPKI",
+      "rpkiValid": "{pct} % valides",
+      "family": "Famille d'adresses",
+      "all": "Tous",
+      "copy": "Copier les préfixes listés",
+      "download": "Télécharger .txt",
+      "prefix": "Préfixe",
+      "size": "Taille",
+      "rpkiColumn": "RPKI",
+      "visibility": "Visibilité",
+      "shown": "{shown} sur {total} affichés",
+      "showMore": "Afficher {count} de plus"
+    },
+    "rpki": {
+      "valid": "Valide",
+      "invalid": "Invalide",
+      "unknown": "Inconnu"
+    },
+    "connectivity": {
+      "title": "Interconnexion",
+      "desc": "Les fournisseurs amont vendent du transit à cet AS, les pairs échangent du trafic directement avec lui, les clients lui achètent du transit — comptés à partir des données de relations du CAIDA, la même lecture que le graphe ci-dessous. Le cône client est le nombre d'AS joignables via ses clients (CAIDA AS Rank). Le graphe ne trace que les principaux chemins vers les réseaux Tier 1 : le nombre d'amont peut donc dépasser les nœuds dessinés.",
+      "cone": "Cône client (AS)",
+      "providers": "Amont",
+      "peers": "Pairs",
+      "customers": "Clients",
+      "none": "Aucun observé"
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "Test de fuite DNS approfondi",
@@ -1291,7 +1375,7 @@
       "Mobile_Pct": "Mobile : ",
       "Bot_Pct": "Robots : ",
       "Human_Pct": "Humain : ",
-      "moreData": "Plus de données : "
+      "openProfile": "Ouvrir le profil ASN complet"
     },
     "ASNHistory": {
       "announcedPrefixes": "Préfixes annoncés : ",

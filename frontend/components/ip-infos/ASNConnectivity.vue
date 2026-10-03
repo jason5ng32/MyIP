@@ -1,9 +1,9 @@
 <template>
     <!-- ASN Connectivity: layered upstream graph from origin AS to Tier 1 ISPs (lazy-loads dagre). -->
-    <div class="rounded-md border bg-muted/40 text-sm">
+    <div :class="['rounded-md bg-muted/40 text-sm', bordered && 'border']">
         <div class="px-3 pt-3 pb-2 flex items-start gap-2 text-xs text-muted-foreground">
             <span class="flex-1">{{ t('ipInfos.ASNConnectivity.note') }}</span>
-            <button v-if="layout" type="button" @click="isExpanded = true"
+            <button v-if="layout && expandable" type="button" @click="isExpanded = true"
                 class="shrink-0 rounded-sm p-0.5 hover:text-foreground hover:bg-muted-foreground/10 cursor-pointer transition-colors"
                 :aria-label="t('ipInfos.ASNConnectivity.expand')" :title="t('ipInfos.ASNConnectivity.expand')">
                 <Maximize2 class="size-3.5" />
@@ -189,6 +189,11 @@ const props = defineProps({
     // Numeric string — parent strips the "AS" prefix to keep cache keys consistent.
     asn: { type: String, required: true },
     asnConnectivityInfos: { type: Object, required: true },
+    // false hides the expand-to-drawer button (ASN Profile already sits in a drawer).
+    expandable: { type: Boolean, default: true },
+    // false drops only the outer border (tint and padding stay) — for a host
+    // card that already draws one (ASN Profile).
+    bordered: { type: Boolean, default: true },
 });
 
 const entry = computed(() => props.asnConnectivityInfos[props.asn]);

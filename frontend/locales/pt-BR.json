@@ -870,7 +870,7 @@
     "CensorshipCheck": "Verifique em quais países um site está bloqueado",
     "ServiceStatus": "Verifique a disponibilidade ao vivo de serviços conhecidos de IA e desenvolvimento, e se um incidente recente explica a falha que você está vendo",
     "Whois": "Pesquise informações de registro de domínio/IP/AS",
-    "AsnProfile": "Identidade, porte, prefixos anunciados, presença global, conectividade e registro de qualquer AS",
+    "AsnProfile": "Quem opera um AS, seu porte, o que anuncia, onde ficam seus endereços e com quem se conecta",
     "InvisibilityTest": "Verifique se você está usando proxy ou VPN",
     "MacChecker": "Consultar informações de um endereço físico",
     "IpCalculator": "Cálculo de sub-rede, conversão de notação e análise IPv6 para qualquer IP, prefixo ou intervalo",
@@ -1045,7 +1045,91 @@
     "Provider": "Provedor das informações"
   },
   "asnprofile": {
-    "Title": "Perfil de ASN"
+    "Title": "Perfil de ASN",
+    "Note": "Um sistema autônomo (AS) é uma rede operada por uma única organização — um provedor de internet, uma empresa de nuvem ou hospedagem, uma universidade, uma grande empresa — que o restante da internet reconhece pelo número de AS e alcança por meio do roteamento BGP. Digite um número de AS para ver quem o registrou, qual o seu porte, quais blocos de endereços ele anuncia e se estão assinados com RPKI, onde fica o seu espaço IPv4 e de quem ele compra trânsito, com quem troca tráfego e para quem revende trânsito. Os dados vêm de várias fontes, incluindo o Cloudflare Radar e os serviços RDAP regionais.",
+    "InputLabel": "Número de AS",
+    "Placeholder": "ex.: AS13335",
+    "Lookup": "Consultar",
+    "invalidInput": "Digite um número de AS válido, por exemplo AS13335 ou 13335.",
+    "noData": "Nenhum dado encontrado para AS{asn}. Ele pode não estar atribuído, ser reservado para uso privado ou não estar anunciado na internet.",
+    "loadError": "Não foi possível carregar este AS agora. Tente novamente em instantes.",
+    "partial": "Algumas fontes não responderam desta vez e foram omitidas: {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Posição global",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "IPv4 anunciado",
+      "ipv4Share": "≈{share}% da internet IPv4",
+      "prefixes": "Prefixos v4 · v6",
+      "users": "Usuários estimados"
+    },
+    "registration": {
+      "title": "Dados de registro",
+      "registry": "Registro (RIR)",
+      "status": "Status",
+      "registered": "Registrado em",
+      "lastChanged": "Última alteração",
+      "abuse": "Contato de abuso",
+      "raw": "Registro whois bruto",
+      "copyRaw": "Copiar registro bruto"
+    },
+    "reputation": {
+      "title": "Reputação",
+      "source": "Dados do IPCheck.ing",
+      "desc": "Densidade dos endereços IPv4 anunciados por esta rede em listas de abuso e VPN, como múltiplo da referência global usada na pontuação do IPCheck.ing — a marca indica 1×, em escala logarítmica. Proxies detectados é quantos dos seus endereços foram encontrados atuando como proxies públicos.",
+      "abuse": "Densidade de IPs de abuso",
+      "vpn": "Densidade de saídas VPN",
+      "proxy": "Proxies detectados",
+      "ratio": "{ratio}× a referência",
+      "belowBaseline": "Na referência ou abaixo",
+      "drop": "Listado no Spamhaus ASN-DROP",
+      "updated": "Dados de {date}",
+      "level": {
+        "none": "Sem risco relevante",
+        "low": "Risco baixo",
+        "medium": "Risco médio",
+        "high": "Risco alto"
+      }
+    },
+    "traffic": {
+      "title": "Tráfego e qualidade de conexão",
+      "desc": "Composição do tráfego HTTP que o Cloudflare observou desta rede nos últimos 7 dias (versão de IP, criptografia, dispositivo, humano ou robô) e médias dos testes de velocidade feitos por seus usuários."
+    },
+    "map": {
+      "title": "Distribuição global de IPs",
+      "desc": "Onde os endereços IPv4 desta rede são usados, ponderado pelo número de endereços."
+    },
+    "prefixes": {
+      "title": "Prefixos anunciados",
+      "desc": "Todos os blocos de endereços que este AS origina na tabela de roteamento global. RPKI Válido significa que um ROA assinado autoriza este AS a anunciá-lo, Inválido que contradiz um ROA e Desconhecido que não há ROA. Visibilidade é quantos pares de coletores de rotas carregam o prefixo.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "Origem de rota RPKI",
+      "rpkiValid": "{pct}% válidos",
+      "family": "Família de endereços",
+      "all": "Todos",
+      "copy": "Copiar os prefixos listados",
+      "download": "Baixar .txt",
+      "prefix": "Prefixo",
+      "size": "Tamanho",
+      "rpkiColumn": "RPKI",
+      "visibility": "Visibilidade",
+      "shown": "{shown} de {total} exibidos",
+      "showMore": "Mostrar mais {count}"
+    },
+    "rpki": {
+      "valid": "Válido",
+      "invalid": "Inválido",
+      "unknown": "Desconhecido"
+    },
+    "connectivity": {
+      "title": "Conectividade",
+      "desc": "Os upstreams vendem trânsito a este AS, os peers trocam tráfego diretamente com ele e os clientes compram trânsito dele — contados a partir dos dados de relacionamento do CAIDA, a mesma leitura do grafo abaixo. O cone de clientes é quantos ASes ele alcança pelos seus clientes (CAIDA AS Rank). O grafo mostra só os principais caminhos até redes Tier 1, então o número de upstreams pode ser maior que os nós desenhados.",
+      "cone": "Cone de clientes (ASes)",
+      "providers": "Upstreams",
+      "peers": "Peers",
+      "customers": "Clientes",
+      "none": "Nenhum observado"
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "Teste aprofundado de vazamento de DNS",
@@ -1291,7 +1375,7 @@
       "Mobile_Pct": "Mobile",
       "Bot_Pct": "Bot",
       "Human_Pct": "Humano",
-      "moreData": "Mais dados: "
+      "openProfile": "Abrir perfil completo do ASN"
     },
     "ASNHistory": {
       "announcedPrefixes": "Prefixos anunciados: ",

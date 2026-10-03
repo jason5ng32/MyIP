@@ -870,7 +870,7 @@
     "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
     "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
     "Whois": "對網域名稱、IP 或 AS 號碼進行 Whois 查詢",
-    "AsnProfile": "查看任意自治系統的身分、規模、宣告前綴、全球分布、互連關係和註冊資訊",
+    "AsnProfile": "查看任意 AS 由誰營運、規模多大、宣告了哪些位址區塊、IP 分布在哪裡、與誰互連",
     "InvisibilityTest": "猜猜看我是否知道你掛了代理",
     "MacChecker": "查詢實體位址的歸屬資訊",
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
@@ -1045,7 +1045,91 @@
     "Provider": "資訊服務商"
   },
   "asnprofile": {
-    "Title": "ASN 檔案"
+    "Title": "ASN 檔案",
+    "Note": "自治系統（AS）是由單一機構營運的網路——可能是電信業者、雲端或主機代管業者、大學，也可能是大型企業——網際網路上的其他網路透過 AS 號碼辨識它，並經由 BGP 路由與它互通。輸入一個 AS 號碼，即可看到它由誰註冊、規模多大、宣告了哪些位址區塊以及這些區塊是否有 RPKI 簽章、IPv4 位址分布在哪些國家，以及它向誰購買上游、與誰對等互連、又為誰提供轉接。資料來自包括 Cloudflare Radar、各地區RDAP 等多個管道。",
+    "InputLabel": "AS 號碼",
+    "Placeholder": "例如 AS13335",
+    "Lookup": "查詢",
+    "invalidInput": "請輸入有效的 AS 號碼，例如 AS13335 或 13335。",
+    "noData": "找不到 AS{asn} 的任何資料。它可能尚未分配、屬於私有保留範圍，或未在網際網路上宣告。",
+    "loadError": "暫時無法載入此 AS，請稍後再試。",
+    "partial": "部分資料來源這次沒有回應，相關內容已略過：{list}。",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "全球排名",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "宣告的 IPv4",
+      "ipv4Share": "約占 IPv4 網際網路的 {share}%",
+      "prefixes": "前綴 v4 · v6",
+      "users": "估計使用者數"
+    },
+    "registration": {
+      "title": "註冊資訊",
+      "registry": "註冊機構",
+      "status": "狀態",
+      "registered": "註冊時間",
+      "lastChanged": "最近更新",
+      "abuse": "濫用聯絡方式",
+      "raw": "原始 Whois 記錄",
+      "copyRaw": "複製原始記錄"
+    },
+    "reputation": {
+      "title": "信譽",
+      "source": "IPCheck.ing 資料",
+      "desc": "此網路宣告的 IPv4 位址被列入濫用與 VPN 名單的密度，以 IPCheck.ing 評分所用全網基線的倍數表示——刻度線為 1×，對數刻度。已被發現的代理數量是其中被發現充當公共代理的位址數。",
+      "abuse": "濫用 IP 密度",
+      "vpn": "VPN 出口密度",
+      "proxy": "已被發現的代理數量",
+      "ratio": "基線的 {ratio} 倍",
+      "belowBaseline": "不高於基線",
+      "drop": "已列入 Spamhaus ASN-DROP",
+      "updated": "資料日期：{date}",
+      "level": {
+        "none": "無明顯風險",
+        "low": "低風險",
+        "medium": "中風險",
+        "high": "高風險"
+      }
+    },
+    "traffic": {
+      "title": "流量與連線品質",
+      "desc": "Cloudflare 在過去 7 天觀察到、來自此網路的 HTTP 流量組成（IP 版本、是否加密、裝置類型、真人或機器人），以及此網路使用者測速結果的平均值。"
+    },
+    "map": {
+      "title": "全球 IP 分布",
+      "desc": "此網路的 IPv4 位址用在哪裡，比例依位址數量加權。"
+    },
+    "prefixes": {
+      "title": "宣告前綴",
+      "desc": "此 AS 在全球路由表中發起宣告的所有位址區塊。RPKI 有效表示有已簽章的 ROA 授權此 AS 宣告它，無效表示與 ROA 衝突，未知表示沒有 ROA。可見度是攜帶該前綴的路由收集器對等點數量。",
+      "counts": "{v4} 個 IPv4 · {v6} 個 IPv6",
+      "rpki": "RPKI 路由起源驗證",
+      "rpkiValid": "{pct}% 有效",
+      "family": "位址族",
+      "all": "全部",
+      "copy": "複製列表中的前綴",
+      "download": "下載 .txt",
+      "prefix": "前綴",
+      "size": "大小",
+      "rpkiColumn": "RPKI",
+      "visibility": "可見度",
+      "shown": "已顯示 {shown} / {total}",
+      "showMore": "再顯示 {count} 筆"
+    },
+    "rpki": {
+      "valid": "有效",
+      "invalid": "無效",
+      "unknown": "未知"
+    },
+    "connectivity": {
+      "title": "互連",
+      "desc": "上游向此 AS 出售轉接，對等方與它直接交換流量，客戶向它購買轉接——數量來自 CAIDA 的 AS 關係資料，與下方拓撲圖採用同一套判定。客戶錐是經由其客戶可以到達的 AS 數量（CAIDA AS Rank）。拓撲圖只畫出通往 Tier 1 網路的主要路徑，因此上游數量可能多於圖中的節點。",
+      "cone": "客戶錐（AS 數）",
+      "providers": "上游",
+      "peers": "對等",
+      "customers": "客戶",
+      "none": "未觀察到"
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 洩漏測試",
@@ -1291,7 +1375,7 @@
       "Mobile_Pct": "行動裝置",
       "Bot_Pct": "機器人",
       "Human_Pct": "人類",
-      "moreData": "更多資料："
+      "openProfile": "查看完整 ASN 檔案"
     },
     "ASNHistory": {
       "announcedPrefixes": "公告字首：",

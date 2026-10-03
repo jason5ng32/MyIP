@@ -1,14 +1,14 @@
 // ASN summary from Cloudflare Radar (`/api/cfradar?view=asn`) with a
-// per-owner session cache keyed 'AS<n>'. Owners (IpInfos, QueryIP, ASN
-// Profile) each create their own cache with useAsnInfo(); IpDetailPanel
-// fills whichever cache it is handed through loadAsnInfoInto().
+// per-owner session cache keyed 'AS<n>'. Owners (IpInfos, QueryIP) each
+// create their own cache with useAsnInfo(); IpDetailPanel fills whichever
+// cache it is handed through loadAsnInfoInto().
 //
 // Relative imports keep this file importable from the Node test runner.
 import { reactive } from 'vue';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 
 // Cache-buster: bump on response-shape changes (sent as `v=`).
-export const ASN_INFO_VERSION = 2;
+export const ASN_INFO_VERSION = 3;
 
 export const asnInfoUrl = (asnNumber) => `/api/cfradar?view=asn&asn=${asnNumber}&v=${ASN_INFO_VERSION}`;
 

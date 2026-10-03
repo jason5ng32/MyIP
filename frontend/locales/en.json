@@ -870,7 +870,7 @@
     "CensorshipCheck": "Check which countries a website is blocked in",
     "ServiceStatus": "Check the live availability of well-known AI and developer services, and whether a recent incident explains the outage you're seeing",
     "Whois": "Search for domain/IP/ASN registration information",
-    "AsnProfile": "Identity, scale, announced prefixes, global footprint, connectivity and registration of any AS",
+    "AsnProfile": "Who runs any AS, how big it is, what it announces, where its addresses are and who it connects to",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
@@ -1045,7 +1045,91 @@
     "Provider": "Information Provider"
   },
   "asnprofile": {
-    "Title": "ASN Profile"
+    "Title": "ASN Profile",
+    "Note": "An autonomous system (AS) is a network run by one organisation — an internet provider, a cloud or hosting company, a university or a large enterprise — that the rest of the internet knows by its AS number and reaches through BGP routing. Enter an AS number to see who registered it, how big it is, which address blocks it announces and whether they are RPKI-signed, where its IPv4 space is located, and which networks it buys transit from, exchanges traffic with or sells transit to. Data comes from multiple sources, including Cloudflare Radar and the regional RDAP services.",
+    "InputLabel": "AS number",
+    "Placeholder": "e.g. AS13335",
+    "Lookup": "Look up",
+    "invalidInput": "Enter a valid AS number, e.g. AS13335 or 13335.",
+    "noData": "No data found for AS{asn}. It may be unassigned, reserved for private use, or not announced on the internet.",
+    "loadError": "This AS couldn't be loaded right now. Please try again in a moment.",
+    "partial": "Some sources didn't respond this time and are left out: {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Global rank",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "Announced IPv4",
+      "ipv4Share": "≈{share}% of the IPv4 internet",
+      "prefixes": "Prefixes v4 · v6",
+      "users": "Estimated users"
+    },
+    "registration": {
+      "title": "Registration",
+      "registry": "Registry",
+      "status": "Status",
+      "registered": "Registered",
+      "lastChanged": "Last changed",
+      "abuse": "Abuse contact",
+      "raw": "Raw whois record",
+      "copyRaw": "Copy raw record"
+    },
+    "reputation": {
+      "title": "Reputation",
+      "source": "IPCheck.ing data",
+      "desc": "How densely this network's announced IPv4 addresses appear on abuse and VPN lists, as a multiple of the global baseline IPCheck.ing scoring uses — the tick marks 1×, on a log scale. Proxies detected is how many of its addresses were found acting as public proxies.",
+      "abuse": "Abuse IP density",
+      "vpn": "VPN exit density",
+      "proxy": "Proxies detected",
+      "ratio": "{ratio}× baseline",
+      "belowBaseline": "At or below baseline",
+      "drop": "Listed on Spamhaus ASN-DROP",
+      "updated": "Data as of {date}",
+      "level": {
+        "none": "No elevated risk",
+        "low": "Low risk",
+        "medium": "Medium risk",
+        "high": "High risk"
+      }
+    },
+    "traffic": {
+      "title": "Traffic & connection quality",
+      "desc": "Shares of the HTTP traffic Cloudflare saw from this network over the last 7 days (IP version, encryption, device, human or bot), and averages of the speed tests its users ran."
+    },
+    "map": {
+      "title": "Global IP distribution",
+      "desc": "Where this network's IPv4 addresses are used, weighted by address count."
+    },
+    "prefixes": {
+      "title": "Announced prefixes",
+      "desc": "Every address block this AS originates in the global routing table. RPKI Valid means a signed record (ROA) authorises this AS to announce it, Invalid means it contradicts one, Unknown means none exists. Visibility is how many route-collector peers carry the prefix.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "RPKI route origin",
+      "rpkiValid": "{pct}% valid",
+      "family": "Address family",
+      "all": "All",
+      "copy": "Copy the listed prefixes",
+      "download": "Download .txt",
+      "prefix": "Prefix",
+      "size": "Size",
+      "rpkiColumn": "RPKI",
+      "visibility": "Visibility",
+      "shown": "{shown} of {total} shown",
+      "showMore": "Show {count} more"
+    },
+    "rpki": {
+      "valid": "Valid",
+      "invalid": "Invalid",
+      "unknown": "Unknown"
+    },
+    "connectivity": {
+      "title": "Connectivity",
+      "desc": "Upstreams sell this AS transit, peers exchange traffic with it directly, customers buy transit from it — counted from CAIDA's relationship data, the same reading the graph below uses. The customer cone is how many ASes it reaches through its customers (CAIDA AS Rank). The graph draws only the main paths to Tier 1 networks, so the upstream count can exceed the nodes drawn.",
+      "cone": "Customer cone (ASes)",
+      "providers": "Upstreams",
+      "peers": "Peers",
+      "customers": "Customers",
+      "none": "None observed"
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "In-depth DNS Leak Test",
@@ -1291,7 +1375,7 @@
       "Mobile_Pct": "Mobile",
       "Bot_Pct": "Bot",
       "Human_Pct": "Human",
-      "moreData": "More Data : "
+      "openProfile": "Open full ASN Profile"
     },
     "ASNHistory": {
       "announcedPrefixes": "Announced Prefixes: ",

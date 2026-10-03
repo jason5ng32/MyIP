@@ -46,7 +46,8 @@
                     <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
                         :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
                         :configs="configs" :is-dark-mode="isDarkMode" map-mode="inline"
-                        country-traffic-mode="inline" @view-usage="onOpenChange(false)" />
+                        country-traffic-mode="inline" @view-usage="onOpenChange(false)"
+                        @open-tool="onOpenChange(false)" />
                 </div>
             </div>
         </DialogContent>

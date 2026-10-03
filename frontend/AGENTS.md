@@ -33,114 +33,83 @@ Every file opens with a header comment stating its purpose — read those.
 
 ### Achievements are event-driven
 
-Components never touch the achievement system — they emit domain events
-unconditionally (`emitAppEvent('speedtest:finished', {…})` on `utils/app-events.js`);
-`data/achievement-rules.js` maps events → slugs, `composables/use-achievement-engine.js`
-owns all guards (rules wait for the remote snapshot; pre-sync hits parked).
-New achievement = entry + rule + (only if no suitable event exists) a new event.
-
-The shareable report rides the same bus: tests emit `<domain>:finished`;
-`composables/use-report-collector.js` normalizes via `utils/report-builders.js`
-into sections whitelisted by `common/report-schema.js`. New reportable test =
-event + builder + schema entry, same change; changing result semantics means
-updating builder whitelist + schema enum too — builders fail soft and fixtures
-are frozen, so drift shows up as quietly missing fields, not errors.
-
-A report link is readable by anyone, so the builder — not the renderer — drops
-anything the visitor supplied: Persona Check ships only id / axis / verdict
-(never the per-check `detail`); Invisibility likewise key + flag only.
+Components never touch achievements — they emit domain events unconditionally
+(`emitAppEvent('speedtest:finished', {…})`); `data/achievement-rules.js` maps
+events → slugs, `composables/use-achievement-engine.js` owns all guards (rules
+wait for the remote snapshot; pre-sync hits parked). New achievement = entry +
+rule + (only if no suitable event exists) a new event. The shareable report
+rides the same bus: `<domain>:finished` → `use-report-collector.js` →
+`utils/report-builders.js` → sections whitelisted by `common/report-schema.js`.
+New reportable test = event + builder + schema entry in one change; new result
+semantics = builder whitelist + schema enum too (builders fail soft, fixtures
+are frozen: drift = quietly missing fields). Report links are public: the
+builder, not the renderer, drops visitor-supplied data (Persona Check: id / axis
+/ verdict, never `detail`; Invisibility: key + flag).
 
 ### Commands are the imperative twin of events
 
-`utils/app-commands.js`: events say "this happened" (any subscribers); a command
-says "do this" — exactly one owner, and `dispatchAppCommand` resolves when the
-work is done, with the owner's result. Owners register via
-`composables/use-app-command.js` (scope-bound, setup-time); payload = one plain
-JSON object whose shape the owner defines at its registration site. Handlers
-reject gated / invalid runs with `appCommandError(code, message)` and reserved
-codes `auth` / `quota` / `input` (the bus produces `unavailable` / `timeout`),
-so callers react programmatically. Cross-component triggers go through the bus —
-never template refs (refs stay for UI chrome). Future advanced tools register
-at setup (`?tool=` mount); callers `waitForAppCommand` + dispatch.
+`utils/app-commands.js`: events say "this happened"; a command says "do this" —
+one owner (`use-app-command.js`, scope-bound, setup-time), and
+`dispatchAppCommand` resolves with its result. Payload = one plain JSON object
+shaped at registration; rejections are `appCommandError(code, message)` with
+reserved `auth` / `quota` / `input` (the bus adds `unavailable` / `timeout`).
+Cross-component triggers use the bus, never template refs (refs stay for UI
+chrome); tools register at setup, callers `waitForAppCommand` first.
 
 ### Advanced Tools gates decide listing only
 
-`data/tools.js` entries opt into deployment gates: `requiresOriginalSite` and/or
-`requiresConfig: '<flag>'` (a `/api/configs` key, e.g. `'cloudFlare'` on `asn`).
-The card grid and the nav filter through `isToolAvailable()`
-(`utils/tool-availability.js`), never the flags directly; a gated tool stays
-unlisted until configs land. Deep links (`?tool=<slug>` drawer, `/tools/:slug`)
-are not gated and render immediately. Data that only some deployments have
-(e.g. ASN Profile's reputation / IXP sections) is not gated on
-`configs.originalSite` either: the page renders it when the backend response
-carries it.
+`data/tools.js` gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`,
+e.g. `asn` → `cloudFlare`) are read only via `isToolAvailable()`, by the card
+grid and the nav; deep links (`?tool=`, `/tools/:slug`) are never gated.
 
-### ASN data has one fetcher
+### ASN Profile
 
-The Radar ASN summary (`/api/cfradar?view=asn`) goes through
-`composables/use-asn-info.js` — URL, `ASN_INFO_VERSION` cache-buster, `AS<n>`
-cache key. Owners create their own session cache with `useAsnInfo()`
-(IpInfos and QueryIP deliberately don't share one); IpDetailPanel fills the
-cache it is handed via `loadAsnInfoInto()`. Its traffic-share and
-connection-quality blocks are `ip-infos/AsnTrafficShares.vue` /
-`AsnConnectionQuality.vue` (prop: the summary object), shaped by `utils/asn-metrics.js`.
+- One `/api/asn-profile` request, one loading state, then the whole page; a
+  section (reputation included — no `configs.originalSite` check) renders only
+  when its `status` is `ok`. `ASNConnectivity.vue` gets `:expandable="false"
+  :bordered="false"`; its defaults keep IPCard / QueryIP unchanged.
+- ASN Info's footer links `/tools/asn?q=AS<n>` (hidden when gated off); in
+  QueryIP it emits `open-tool` via IpDetailPanel so the dialog closes first.
 
 ### Overlays take no keyboard shortcuts
 
-One document-level dispatcher (`utils/shortcut.js`) over the map
-`composables/use-shortcuts.js` registers — all home-page actions, suspended
-while any overlay is open. The rule keys off form, not purpose: the `ui/`
-roots (`Dialog` / `Sheet` / `Drawer`) call `composables/use-overlay-shortcuts.js`,
-so anything built on them inherits it; overlays nest. Esc and native scrolling
-keys still work (reka-ui / vaul / the browser own those). `registerShortcuts()`
-replaces the map, and Home clears it on unmount — shortcuts are home-route only.
+One dispatcher (`utils/shortcut.js`) over the map `use-shortcuts.js` registers
+(home route only; Home clears it on unmount; `registerShortcuts()` replaces it),
+suspended while an overlay is open — keyed off form: the `ui/` roots `Dialog` /
+`Sheet` / `Drawer` call `use-overlay-shortcuts.js`, so anything built on them
+inherits it; overlays nest; Esc and native scrolling still work.
 
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
-No `VITE_SENTRY_DSN_FRONTEND` → no Sentry code in the bundle at all
-(build-time-gated dynamic import, like `firebase-init.js`). The same gate in
-`main.js` skips the load under `import.meta.env.DEV`, so a `pnpm dev` run
-reports nothing even with a DSN in `.env`. Rules:
-
-- **Never import `@sentry/vue` in app code** — a static import drags the SDK
-  into the main bundle. All config lives in `sentry-init.js`.
-- **Explicit signals go through the app-events bus**: component emits,
-  `sentry-init.js` subscribes. One signal: `ip-source:exhausted` (a card's whole
-  source chain failed) — emitted only when another card resolved a valid IP of
-  the same version; otherwise no-IPv6 / dead-network visitors = routine noise.
-
-Traps: `console.error` is captured, fingerprinted on the first argument — name
-the failure there; `utils/getips/` source failures stay `console.warn`,
-invisible by design. Replay leaves page text unmasked deliberately (on-screen
-network info IS the debugging context; typed input masked; in the privacy
-policy). Backend 5xx is NOT captured frontend-side. Envelopes ship through the
-first-party tunnel `/api/monitoring` to beat ad blockers.
+No `VITE_SENTRY_DSN_FRONTEND`, or a DEV build → no Sentry loaded (gated dynamic
+import, like `firebase-init.js`; all config in `sentry-init.js`). **Never import
+`@sentry/vue` in app code. Explicit signals go through the app-events bus**:
+`ip-source:exhausted` (a card's whole source chain failed), only when another
+card resolved a valid IP of that version. Traps: `console.error` is captured,
+fingerprinted on its first argument — name the failure there; `utils/getips/`
+failures stay `console.warn`. Replay shows page text unmasked by design (input
+masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitoring`.
 
 ## UI system
 
-**shadcn-vue first.** Check `components/ui/`, then the shadcn-vue docs for
-something to copy in; hand-rolled Tailwind only when neither fits. Keep when
-syncing upstream: `Spinner` + `ToolLoadingSkeleton` (project-specific),
-`toggle` / `toggle-group`'s deliberate `primary` pressed pair, the overlay
-roots' shortcut suspension, and `select`'s trigger geometry — `py-1` plus a
-flex (not `-webkit-box` line-clamp) value span, because Safari shifts button
-content up ~2px once it overflows the trigger's content box.
+**shadcn-vue first:** `components/ui/`, then the shadcn-vue docs; hand-rolled
+Tailwind only when neither fits. Keep on upstream syncs: `Spinner` +
+`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair, the
+overlay roots' shortcut suspension, `select`'s trigger geometry (`py-1` + flex
+value span, not `-webkit-box` — Safari shifts it ~2px).
 
 ### Design tokens
 
-Top of `style/style.css`; four business-semantic colors with paired `-foreground`:
-`--info` (waiting) · `--success` (ok-fast) · `--warning` (ok-slow) · `--action`
-(run / trigger). Semantic tokens only; never `dark:` dual pairs — tokens theme
-themselves. Button adds `action` / `success` variants; Badge adds `success`,
-hover globally disabled (display element — wrap it for interactivity). FAB colors
-are semantic, never decorative: `action` = trigger, `default` = stateless panel,
-`success` = protective state active, `secondary` = dock; max two accents at once.
+`style/style.css`: `--info` (waiting) · `--success` (ok-fast) · `--warning`
+(ok-slow) · `--action` (run), each with `-foreground`; semantic tokens only,
+never `dark:` pairs. Button adds `action` / `success`; Badge adds `success`,
+hover disabled (wrap it to interact). FAB colors: `action` trigger, `default`
+stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
 
 ### Status tones
 
-Every "business state → color" mapping goes through
-`composables/use-status-tone.js` (`wait` / `ok-fast` / `ok-slow` / `fail`),
-normally via `ipFieldTone()` — no hand-rolled state→color switches.
+Every "business state → color" mapping goes through `use-status-tone.js`
+(`wait` / `ok-fast` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
 
 ### Canonical patterns
 
@@ -148,47 +117,34 @@ Copy the named exemplar instead of re-inventing:
 
 - **Trigger button** — `variant="action"` + `<Spinner v-if />` + `:disabled` (QueryIP, Whois).
 - **Input + icon trigger** — flex row, compact icon Button, no text label (QueryIP).
-- **AutoFill-proof inputs** — all six on every free-form Input:
-  `autocomplete="off" autocorrect="off" autocapitalize="off"
-  spellcheck="false" data-1p-ignore data-lpignore="true"`; placeholder copy
-  avoids "address / 地址 / adresse / adresi" — iOS QuickType keys on the word.
-- **Status card** — `keyboard-shortcut-card jn-card` + hover lift (IPCard):
-  `jn-card` = shadow / border / outline; `keyboard-shortcut-card` = J/K target.
+- **AutoFill-proof inputs** — all six on every free-form Input: `autocomplete`
+  / `autocorrect` / `autocapitalize="off"`, `spellcheck="false"`,
+  `data-1p-ignore`, `data-lpignore="true"`; placeholders avoid "address / 地址
+  / adresse / adresi" (iOS QuickType keys on the word).
+- **Status card** — `keyboard-shortcut-card` (J/K target) `jn-card` (shadow /
+  border / outline) + hover lift (IPCard).
 - **Flag** — always `<Icon :icon="'circle-flags:' + code.toLowerCase()" />`.
-- **Dates & times** — every user-visible stamp renders through
-  `utils/time-utils.js` with the vue-i18n locale; no hand-rolled
-  `toLocaleDateString` / `Intl.DateTimeFormat` — deliberate exceptions carry a
-  why-comment (ASNHistory ISO columns, report-export intro, ServiceStatus clock).
-- **Fit-to-width tokens** — IP / MAC strings render in `<FitText>` (`HERO_TIERS` /
-  `INLINE_TIERS`; `:max-lines="2"` on heroes); never length-threshold helpers.
-- **Filter tags** — an open-ended facet row (regions, IP types) is a
-  `ToggleGroup :spacing="2" class="w-full flex-wrap justify-start"` of detached
-  pills, `h-7 rounded-full px-2.5 text-xs` (IPHistory, DnsResolver). Never the
-  default `spacing=0` connected form: its `border-l-0` / `first:border-l` seam
-  only reads as one bar on a single line, and breaks the moment it wraps.
-- **Shareable tool input** — a tool whose result is worth linking to reads its
-  query from `route.query.q` on mount and writes it back with `router.replace`
-  on every run (IpCalculator). Works on both `/tools/<slug>?q=` and
-  `/?tool=<slug>&q=`; `replace`, not `push`, so history doesn't grow per run.
-- **Fixed option sets** — a known, closed list of choices is a `Select`, not a
-  toggle row, once it outgrows a comfortable single line (DnsResolver's record
-  types, MtrTest's targets).
-- **Qualifier + input + run** — wrap the qualifying `Select` and the `Input` in
-  a `ButtonGroup` so they read as one bordered control (the trigger's own right
-  border becomes the divider), and nest a second `ButtonGroup` around the run
-  Button for the gap (DnsResolver). Pass the trigger `w-auto shrink-0` — our
-  `SelectTrigger` predates `data-slot`, so ButtonGroup's own width rule misses
-  it — and keep the row unwrapped at every width.
+- **Dates & times** — via `utils/time-utils.js` + the vue-i18n locale; no
+  hand-rolled `Intl` / `toLocaleDateString` without a why-comment.
+- **Fit-to-width tokens** — IP / MAC strings in `<FitText>` (`HERO_TIERS` /
+  `INLINE_TIERS`; `:max-lines="2"` on heroes); no length-threshold helpers.
+- **Filter tags** — `ToggleGroup :spacing="2"` of detached `h-7 rounded-full`
+  pills, `w-full flex-wrap` (IPHistory, DnsResolver); never `spacing=0`.
+- **Shareable tool input** — read `route.query.q` on mount, `router.replace` it
+  on every run (IpCalculator, AsnProfile); both `/tools/` and `?tool=` URLs.
+- **Fixed option sets** — a closed list wider than one line is a `Select`.
+- **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
+  Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
-- **Drawer vs Sheet** — vaul-vue bottom Drawer for the Advanced Tools panel
-  and full-bleed expansions of an inline visual; side panels use `Sheet`.
+- **Drawer vs Sheet** — bottom Drawer for Advanced Tools and full-bleed
+  expansions of an inline visual; side panels use `Sheet`.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
   hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dots.
 
 ## Testing
 
-Composables and utils are the target (`tests/composable-*.test.js`). Vue
-rendering / browser APIs are out of scope for the Node runner. Visual changes
-can't be self-tested — say so and let the user verify in `pnpm dev`.
+Composables and utils are the target (`tests/composable-*.test.js`); Vue rendering
+and browser APIs are out of scope. Visual changes can't be self-tested — say so
+and let the user verify in `pnpm dev`.
