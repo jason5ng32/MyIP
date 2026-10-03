@@ -4,7 +4,7 @@
 
 import whoiser from 'whoiser';
 import { isValidIP, isUsablePublicIP } from '../common/valid-ip.js';
-import { rdapDomain, rdapIp, rdapAutnum } from '../common/rdap.js';
+import { rdapDomain, rdapIp, rdapAutnum, isAutnumMissing } from '../common/rdap.js';
 import logger from '../common/logger.js';
 
 function isValidDomain(domain) {
@@ -38,7 +38,7 @@ export default async (req, res) => {
         try {
             return res.json(await rdapAutnum(Number(asnMatch[1])));
         } catch (e) {
-            if (e.message.startsWith('ASN not found') || e.message.startsWith('No RDAP endpoint for ')) {
+            if (isAutnumMissing(e)) {
                 return res.status(404).json({ error: e.message });
             }
             logger.error({ err: e, query }, 'Failed to get RDAP autnum info');

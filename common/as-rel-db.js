@@ -152,6 +152,11 @@ export function customerCountOf(asn) {
     return customerCount.get(Number(asn)) || 0;
 }
 
+/** Whether a snapshot is loaded (false until the updater has fetched one). */
+export function isAsRelLoaded() {
+    return loadedFrom !== null;
+}
+
 /** Whether this ASN is in the CAIDA-derived Tier 1 set. */
 export function isTier1(asn) {
     return tier1Set.has(Number(asn));

@@ -18,11 +18,11 @@ import dnsResolverHandler from '../api/dns-resolver.js';
 import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
-import asrankHandler, { isAsRankHit } from '../api/asrank.js';
 import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
+import asnProfileHandler from '../api/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -324,45 +324,6 @@ describe('get-whois handler', () => {
             logger.error = originalError;
         }
     });
-});
-
-// -- asrank handler -------------------------------------------------------
-
-describe('asrank handler', () => {
-    it('answers the mapped ASRank record', async () => {
-        globalThis.fetch = async () => new Response(JSON.stringify({
-            data: { asn: { rank: 64, asnName: 'CLOUDFLARENET', cone: { numberAsns: 963, numberPrefixes: 35738, numberAddresses: 32408873 } } },
-        }));
-        const res = createResponse();
-        await asrankHandler(createRequest({ query: { asn: '13335' } }), res);
-        assert.equal(res.statusCode, 200);
-        assert.equal(res.body.asn, 13335);
-        assert.equal(res.body.rank, 64);
-        assert.deepEqual(res.body.cone, { asns: 963, prefixes: 35738, addresses: 32408873 });
-        assert.equal(isAsRankHit(res.body), true);
-    });
-
-    for (const [label, stub] of [
-        ['an ASN unknown to ASRank', async () => new Response(JSON.stringify({ data: { asn: null } }))],
-        ['an upstream failure', async () => { throw new Error('connect timeout'); }],
-    ]) {
-        it(`answers 200 with null fields for ${label}, vetoing the edge cache`, async () => {
-            globalThis.fetch = stub;
-            const originalWarn = logger.warn;
-            logger.warn = () => {};
-            try {
-                const res = createResponse();
-                await asrankHandler(createRequest({ query: { asn: '64512' } }), res);
-                assert.equal(res.statusCode, 200);
-                assert.deepEqual(res.body, {
-                    asn: 64512, rank: null, asnName: null, orgName: null, country: null, degree: null, cone: null,
-                });
-                assert.equal(isAsRankHit(res.body), false);
-            } finally {
-                logger.warn = originalWarn;
-            }
-        });
-    }
 });
 
 // -- github-stars handler -------------------------------------------------
@@ -729,6 +690,61 @@ describe('ipcheck-ing handler', () => {
         await ipcheckIngHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
         assert.equal(res.statusCode, 500);
         assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+});
+
+// -- asn-profile handler ---------------------------------------------------
+// Composition and deadlines are covered in tests/asn-profile-aggregate.test.js;
+// here: unconfigured sources read as disabled, failing upstreams as error,
+// and the private-API pass-through for the reputation section.
+
+describe('asn-profile handler', () => {
+    it('answers 200 with per-section statuses when only some sources work', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        delete process.env.IPCHECKING_API_KEY;
+        delete process.env.IPCHECKING_API_ENDPOINT;
+        globalThis.fetch = async () => { throw new Error('network down'); };
+        const res = createResponse();
+        await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.asn, 64511);
+        assert.equal(res.body.status.radar, 'disabled');
+        assert.equal(res.body.status.prefixes, 'disabled');
+        assert.equal(res.body.status.reputation, 'disabled');
+        assert.equal(res.body.status.whois, 'error');
+        assert.equal(res.body.status.rank, 'error');
+        assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
+        assert.equal(res.body.whois, null);
+        assert.equal(res.body.rank, null);
+    });
+
+    it('forwards the caller headers to the private API for reputation', async () => {
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+        const payload = { asn: 64511, found: true, size: 256, level: 'none' };
+        let requested;
+        globalThis.fetch = async (url, options) => {
+            if (String(url).includes('/asnreputation')) {
+                requested = { url: new URL(String(url)), options };
+                return { status: 200, ok: true, json: async () => payload };
+            }
+            throw new Error('network down');
+        };
+        const req = createRequest({ query: { asn: '64511' } });
+        req.headers['accept-language'] = 'de-DE';
+        const res = createResponse();
+        await asnProfileHandler(req, res);
+
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.status.reputation, 'ok');
+        assert.deepEqual(res.body.reputation, payload);
+        assert.equal(requested.url.searchParams.get('asn'), '64511');
+        assert.equal(requested.url.searchParams.get('key'), 'test-key');
+        assert.equal(requested.options.headers['accept-language'], 'de-DE');
     });
 });
 

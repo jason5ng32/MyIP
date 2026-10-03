@@ -13,7 +13,6 @@ import {
     normalizeAnomalies,
     mergeEvents,
     buildTrafficMatrix,
-    countAsnRels,
     shapeAsnProfile,
     normalizePrefixOrigins,
     buildCountryShares,
@@ -229,70 +228,34 @@ describe('buildTrafficMatrix', () => {
     });
 });
 
-describe('countAsnRels', () => {
-    const rows = [
-        // 10 is provider of 906; 906 is provider of 20 and 21.
-        { asn1: 10, asn2: 906, rel: 'provider-customer' },
-        { asn1: 906, asn2: 20, rel: 'provider-customer' },
-        { asn1: 906, asn2: 21, rel: 'provider-customer' },
-        { asn1: 906, asn2: 30, rel: 'peer' },
-        { asn1: 31, asn2: 906, rel: 'peer' },
-        { asn1: 31, asn2: 906, rel: 'peer' },           // duplicate row
-        { asn1: 10, asn2: 906, rel: 'peer' },           // transit pair → not a peer
-        { asn1: 906, asn2: 21, rel: 'peer' },           // transit pair → not a peer
-    ];
+describe('shapeAsnProfile', () => {
+    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
 
-    it('counts distinct partners per bucket, transit winning over peer', () => {
-        assert.deepEqual(countAsnRels(rows, 906), {
-            upstreamCount: 1,
-            downstreamCount: 2,
-            peerCount: 2,
-        });
-    });
-
-    it('returns zeros on an empty row list', () => {
-        assert.deepEqual(countAsnRels([], 906), {
-            upstreamCount: 0,
-            downstreamCount: 0,
-            peerCount: 0,
-        });
-    });
-});
-
-describe('shapeAsnProfile — RPKI route counts', () => {
-    // Radar /rel rows keep the rel counts off the local CAIDA fallback.
-    const rels = { result: { rels: [{ asn1: 174, asn2: 13335, rel: 'provider-customer' }] } };
-
-    it('passes the routes/stats RPKI mix through as plain numbers', () => {
+    it('takes prefix counts from routes/stats and relationship counts from the local reading', () => {
         const body = shapeAsnProfile({
-            routesStats: { result: { stats: {
-                distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953,
-                routes_total: 5299, routes_valid: 5162, routes_invalid: 6, routes_unknown: 131,
-            } } },
-            rels,
-        }, '13335');
+            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953, routes_valid: 5162 } } },
+        }, '13335', counts);
         assert.equal(body.prefixesV4, (2346).toLocaleString());
-        assert.equal(body.rpkiValid, 5162);
-        assert.equal(body.rpkiInvalid, 6);
-        assert.equal(body.rpkiUnknown, 131);
-        assert.equal(body.rpkiTotal, 5299);
-    });
-
-    it('keeps a zero count (zero invalid routes is the common case)', () => {
-        const body = shapeAsnProfile({
-            routesStats: { result: { stats: { routes_total: 10, routes_valid: 10, routes_invalid: 0, routes_unknown: 0 } } },
-            rels,
-        }, '13335');
-        assert.equal(body.rpkiInvalid, 0);
-        assert.equal(body.rpkiUnknown, 0);
-    });
-
-    it('drops the RPKI fields when the routes/stats segment is missing', () => {
-        const body = shapeAsnProfile({ rels }, '13335');
-        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal', 'prefixesV4']) {
+        assert.equal(body.prefixesV6, (2953).toLocaleString());
+        assert.equal(body.upstreamCount, '2');
+        assert.equal(body.downstreamCount, '0');
+        assert.equal(body.peerCount, '7');
+        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal']) {
             assert.equal(Object.hasOwn(body, key), false, key);
         }
-        assert.equal(body.upstreamCount, '1');
+    });
+
+    it('passes the AS number to the relationship reading', () => {
+        let asked;
+        shapeAsnProfile({}, '64500', (asn) => { asked = asn; return {}; });
+        assert.equal(asked, 64500);
+    });
+
+    it('drops relationship fields when the local snapshot has nothing', () => {
+        const body = shapeAsnProfile({ routesStats: { result: { stats: {} } } }, '13335', () => ({}));
+        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount', 'prefixesV4']) {
+            assert.equal(Object.hasOwn(body, key), false, key);
+        }
     });
 });
 

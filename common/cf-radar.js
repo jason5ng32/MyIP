@@ -8,7 +8,7 @@
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { providersOf, peersOf, customerCountOf } from './as-rel-db.js';
+import { relationshipCounts } from './as-relationships.js';
 import { lookupCountryCode } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
@@ -37,8 +37,10 @@ export async function fetchFromCloudflare(endpoint) {
 
 // -- view: asn — per-ASN entity info + 7d HTTP traffic profile --------------
 
-// The five Radar segments backing one response, keyed by the field name
-// cleanUpResponseData expects.
+// The Radar segments backing one response, keyed by the field name
+// cleanUpResponseData expects. Relationship counts are not Radar's: they come
+// from the local CAIDA snapshot (relationshipCounts), the same reading the
+// ASN Profile's topology and neighbour lists use.
 const SEGMENTS = {
     asnInfo: (asn) => `/radar/entities/asns/${asn}`,
     ipVersion: (asn) => `/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`,
@@ -46,7 +48,6 @@ const SEGMENTS = {
     deviceType: (asn) => `/radar/http/summary/device_type?asn=${asn}&dateRange=7d`,
     botType: (asn) => `/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`,
     routesStats: (asn) => `/radar/bgp/routes/stats?asn=${asn}`,
-    rels: (asn) => `/radar/entities/asns/${asn}/rel`,
     quality: (asn) => `/radar/quality/speed/summary?asn=${asn}`,
 };
 
@@ -91,10 +92,6 @@ function cleanUpResponseData(data) {
         Human_Pct: data.botType?.result?.summary_0?.human,
         prefixesV4: data.routesStats?.result?.stats?.distinct_prefixes_ipv4,
         prefixesV6: data.routesStats?.result?.stats?.distinct_prefixes_ipv6,
-        rpkiValid: data.routesStats?.result?.stats?.routes_valid,
-        rpkiInvalid: data.routesStats?.result?.stats?.routes_invalid,
-        rpkiUnknown: data.routesStats?.result?.stats?.routes_unknown,
-        rpkiTotal: data.routesStats?.result?.stats?.routes_total,
         speedDownload: data.quality?.result?.summary_0?.bandwidthDownload,
         speedUpload: data.quality?.result?.summary_0?.bandwidthUpload,
         latency: data.quality?.result?.summary_0?.latencyIdle,
@@ -102,44 +99,9 @@ function cleanUpResponseData(data) {
     };
 }
 
-// Distinct relationship partners from Radar /rel rows. A pair listed as both
-// transit and peer counts as transit only (same dedupe as asn-connectivity).
-export const countAsnRels = (rows, asn) => {
-    const upstreams = new Set();
-    const downstreams = new Set();
-    const peers = new Set();
-    for (const row of rows) {
-        if (row.rel === 'provider-customer') {
-            if (row.asn2 === asn) upstreams.add(row.asn1);
-            else if (row.asn1 === asn) downstreams.add(row.asn2);
-        } else if (row.rel === 'peer') {
-            peers.add(row.asn1 === asn ? row.asn2 : row.asn1);
-        }
-    }
-    for (const p of upstreams) peers.delete(p);
-    for (const p of downstreams) peers.delete(p);
-    return { upstreamCount: upstreams.size, downstreamCount: downstreams.size, peerCount: peers.size };
-};
-
-// Rel counts prefer Radar's path-observed rows; when the segment failed or
-// came back empty, fall back to the local CAIDA snapshot. All-zero counts
-// (AS unknown to both) are dropped so the frontend hides the fields.
-function resolveRelCounts(rows, asn) {
-    const counts = Array.isArray(rows) && rows.length > 0
-        ? countAsnRels(rows, asn)
-        : {
-            upstreamCount: providersOf(asn).length,
-            downstreamCount: customerCountOf(asn),
-            peerCount: peersOf(asn).length,
-        };
-    return Object.values(counts).every(v => v === 0) ? {} : counts;
-}
-
-// Format output. RPKI route counts stay plain numbers (the frontend computes
-// shares from them); parseFloat still turns a missing value into NaN, which
-// filterData drops like the pre-formatted strings.
+// Format output; a missing value parses to NaN, which filterData drops.
 function formatData(data) {
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, rpkiValid, rpkiInvalid, rpkiUnknown, rpkiTotal, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
     return {
         asnName,
         asnCountryCode,
@@ -147,10 +109,6 @@ function formatData(data) {
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
         prefixesV4: parseFloat(prefixesV4).toLocaleString(),
         prefixesV6: parseFloat(prefixesV6).toLocaleString(),
-        rpkiValid: parseFloat(rpkiValid),
-        rpkiInvalid: parseFloat(rpkiInvalid),
-        rpkiUnknown: parseFloat(rpkiUnknown),
-        rpkiTotal: parseFloat(rpkiTotal),
         upstreamCount: parseFloat(upstreamCount).toLocaleString(),
         downstreamCount: parseFloat(downstreamCount).toLocaleString(),
         peerCount: parseFloat(peerCount).toLocaleString(),
@@ -180,10 +138,11 @@ function filterData(data) {
     return data;
 }
 
-// Settled segment payloads → response body. Exported for tests.
-export const shapeAsnProfile = (data, asn) => {
+// Settled segment payloads (+ local relationship counts) → response body.
+// `relCounts` is injectable for tests. Exported for tests.
+export const shapeAsnProfile = (data, asn, relCounts = relationshipCounts) => {
     const cleaned = cleanUpResponseData(data);
-    Object.assign(cleaned, resolveRelCounts(data.rels?.result?.rels, Number(asn)));
+    Object.assign(cleaned, relCounts(Number(asn)));
     return filterData(formatData(cleaned));
 };
 
@@ -419,9 +378,11 @@ const fetchOutages = async () => {
 // ttl:    edge-cache seconds, read by the /api/cfradar route middleware.
 // fetch:  async (req.query) => payload; throws on upstream failure.
 export const RADAR_VIEWS = {
+    // The ASN data family (this, bgp-prefixes, /api/asn-profile) shares one
+    // week of edge cache: the profile doesn't chase day-level precision.
     'asn': {
         guards: [requireValidASN()],
-        ttl: 30 * 24 * 60 * 60,
+        ttl: 7 * 24 * 60 * 60,
         fetch: fetchAsnProfile,
     },
     'country-traffic': {
@@ -434,11 +395,9 @@ export const RADAR_VIEWS = {
         ttl: 60 * 60,
         fetch: fetchOutages,
     },
-    // Radar's routing tables refresh continuously; a day keeps the list close
-    // to current while absorbing repeat lookups of popular ASNs.
     'bgp-prefixes': {
         guards: [requireValidASN()],
-        ttl: 24 * 60 * 60,
+        ttl: 7 * 24 * 60 * 60,
         fetch: fetchBgpPrefixes,
     },
 };

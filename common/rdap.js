@@ -188,6 +188,10 @@ export const parseAutnum = (data, asn, host) => {
     };
 };
 
+// True for rdapAutnum's "no record" failures (unregistered ASN, no RDAP
+// service for its range) as opposed to an upstream fault.
+export const isAutnumMissing = (error) => /^(ASN not found|No RDAP endpoint for )/.test(error?.message || '');
+
 export const rdapAutnum = async (asn, { timeoutMs = 5000 } = {}) => {
     const n = Number(String(asn).replace(/^AS/i, ''));
     const bootstrap = await loadBootstrap('asn.json');

@@ -13,11 +13,15 @@
 // rare fallback when as2org doesn't have an ASN's org name.
 //
 // Alongside the graph, `neighbours` lists the origin's direct providers,
-// peers and customers from the same snapshot (names from as2org only).
+// peers and customers from the same snapshot, counted by the walk's own
+// misinference rule (common/as-relationships.js) so the counts never show an
+// upstream the graph drops. List names come from as2org, gaps filled from the
+// graph's resolved names.
 
 import { resolveAsnOrgName } from '../common/ripestat.js';
 import { providersOf, peersOf, customersOf, customerCountOf, isTier1 } from '../common/as-rel-db.js';
 import { lookupAsOrgName } from '../common/as-org-db.js';
+import { TIER1_PEERING_TRUSTED, TIER1_ADJACENCY_TRUSTED, countedRelationships } from '../common/as-relationships.js';
 import logger from '../common/logger.js';
 
 // How deep to recurse from the origin. 3 covers regional networks reaching
@@ -28,12 +32,9 @@ const MAX_DEPTH = 3;
 // customerCount as a proxy for "primary transit".
 const MAX_INTERMEDIATE_BRANCH = 3;
 
-// Past either bar, a node's non-Tier-1 "providers" are treated as CAIDA
-// misinference and dropped. Peering-only bar: the hypergiant signature is
-// clique peering (Google 12, Cloudflare 7). Combined bar: multihomed hosters
-// with a real non-T1 upstream sit at ≤6 Tier-1 adjacencies.
-const TIER1_PEERING_TRUSTED = 5;
-const TIER1_ADJACENCY_TRUSTED = 8;
+// Past either bar (TIER1_PEERING_TRUSTED / TIER1_ADJACENCY_TRUSTED, defined
+// in common/as-relationships.js so the neighbour counts use the same ones), a
+// node's non-Tier-1 "providers" are treated as CAIDA misinference and dropped.
 
 // Two-tier org name resolver lives in common/ripestat.js. No onError hook
 // here — connectivity stays silent on as-overview fallback failures (a node
@@ -151,14 +152,12 @@ function pruneLeafIntermediates(nodes, edges) {
     }
 }
 
-// Direct neighbours of `origin`, each kind ranked by customer count (bigger
-// networks first, ASN as tie-break) and capped. A pair listed as both
-// transit and peering counts as transit only. Exported for tests.
+// Direct neighbours of `origin` as countedRelationships reads them (a
+// distrusted non-Tier-1 provider is not an upstream), each kind ranked by
+// customer count (bigger networks first, ASN as tie-break) and capped.
+// Exported for tests.
 export const buildNeighbours = (origin, rel = asRelApi, lookupName = lookupAsOrgName) => {
-    const providers = [...new Set(rel.providersOf(origin))];
-    const customers = [...new Set(rel.customersOf(origin))];
-    const transit = new Set([...providers, ...customers]);
-    const peers = [...new Set(rel.peersOf(origin))].filter((asn) => !transit.has(asn));
+    const { providers, peers, customers } = countedRelationships(origin, rel);
 
     const toList = (asns) => [...asns]
         .sort((a, b) => rel.customerCountOf(b) - rel.customerCountOf(a) || a - b)
@@ -173,12 +172,27 @@ export const buildNeighbours = (origin, rel = asRelApi, lookupName = lookupAsOrg
     };
 };
 
+// Fill list names as2org lacks from the graph's resolved names, so an AS
+// carries the same label in the graph and in the lists. Exported for tests.
+export const fillNeighbourNames = (neighbours, nodes) => {
+    const names = new Map(nodes.filter((n) => n.name).map((n) => [n.asn, n.name]));
+    for (const kind of ['providers', 'peers', 'customers']) {
+        for (const item of neighbours[kind]) item.name = item.name || names.get(item.asn) || null;
+    }
+    return neighbours;
+};
+
+// The full response body for one ASN — also composed into /api/asn-profile.
+export const getAsnConnectivity = async (asn) => {
+    const graph = await buildGraph(asn);
+    return { origin: asn, ...graph, neighbours: fillNeighbourNames(buildNeighbours(asn), graph.nodes) };
+};
+
 export default async (req, res) => {
     // ASN presence + numeric validity guaranteed by requireValidASN middleware.
     const asn = parseInt(req.query.asn, 10);
     try {
-        const graph = await buildGraph(asn);
-        res.json({ origin: asn, ...graph, neighbours: buildNeighbours(asn) });
+        res.json(await getAsnConnectivity(asn));
     } catch (error) {
         logger.error({ err: error, asn }, 'asn-connectivity handler failed');
         res.status(500).json({ error: error.message });

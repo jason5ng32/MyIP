@@ -1,7 +1,7 @@
 // CAIDA ASRank client — global rank, customer cone and degree for one ASN via
-// their GraphQL API. Academic service with no SLA: every failure path returns
-// null, and /api/asrank turns that into an all-null answer the ASN Profile
-// page simply hides.
+// their GraphQL API, for /api/asn-profile. Academic service with no SLA:
+// queryAsRank throws on any upstream failure, and the aggregate marks the
+// section failed (and keeps that answer off the edge cache).
 //
 // ASRank's customer cone is path-observed and is the citable number; a naive
 // transitive closure over as-rel p2c edges overestimates it badly for
@@ -10,7 +10,6 @@
 // Source: https://api.asrank.caida.org/v2/graphql (free, no auth)
 
 import { fetchUpstream } from './fetch-with-timeout.js';
-import logger from './logger.js';
 
 const ASRANK_ENDPOINT = 'https://api.asrank.caida.org/v2/graphql';
 
@@ -49,22 +48,15 @@ export const mapAsRankResponse = (body) => {
     };
 };
 
-// ASRank record for an ASN, or null on unknown ASN / any upstream failure.
-export const fetchAsRank = async (asn, { timeoutMs = 4000 } = {}) => {
-    try {
-        const res = await fetchUpstream(ASRANK_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: QUERY, variables: { asn: String(asn) } }),
-            timeoutMs,
-        });
-        if (!res.ok) {
-            logger.warn({ asn, status: res.status }, 'asrank query failed');
-            return null;
-        }
-        return mapAsRankResponse(await res.json());
-    } catch (error) {
-        logger.warn({ err: error, asn }, 'asrank query failed');
-        return null;
-    }
+// ASRank record for an ASN; null when ASRank doesn't know it. Throws on an
+// upstream failure, so callers that need to tell the two apart can.
+export const queryAsRank = async (asn, { timeoutMs = 4000 } = {}) => {
+    const res = await fetchUpstream(ASRANK_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: QUERY, variables: { asn: String(asn) } }),
+        timeoutMs,
+    });
+    if (!res.ok) throw new Error(`ASRank responded ${res.status}`);
+    return mapAsRankResponse(await res.json());
 };

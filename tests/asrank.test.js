@@ -1,11 +1,11 @@
 // Unit tests for the CAIDA ASRank client in common/asrank.js: the pure
-// GraphQL response mapper, and fetchAsRank's request shape and null-on-
-// failure contract (fetch stubbed; real network stays out of scope).
+// GraphQL response mapper, and queryAsRank's request shape, null for an
+// unknown ASN and throw-on-failure contract (fetch stubbed; real network
+// stays out of scope).
 import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 
-import { mapAsRankResponse, fetchAsRank } from '../common/asrank.js';
-import logger from '../common/logger.js';
+import { mapAsRankResponse, queryAsRank } from '../common/asrank.js';
 
 const FULL_BODY = {
     data: {
@@ -45,12 +45,10 @@ describe('mapAsRankResponse', () => {
     });
 });
 
-describe('fetchAsRank', () => {
+describe('queryAsRank', () => {
     const originalFetch = globalThis.fetch;
-    const originalWarn = logger.warn;
     afterEach(() => {
         globalThis.fetch = originalFetch;
-        logger.warn = originalWarn;
     });
 
     it('POSTs the GraphQL query with the ASN as a string variable', async () => {
@@ -59,18 +57,22 @@ describe('fetchAsRank', () => {
             request = { url: String(url), init };
             return new Response(JSON.stringify(FULL_BODY));
         };
-        const record = await fetchAsRank(13335);
+        const record = await queryAsRank(13335);
         assert.equal(request.url, 'https://api.asrank.caida.org/v2/graphql');
         assert.equal(request.init.method, 'POST');
         assert.deepEqual(JSON.parse(request.init.body).variables, { asn: '13335' });
         assert.equal(record.rank, 64);
     });
 
-    it('returns null on a non-2xx answer or a network failure', async () => {
-        logger.warn = () => {};
+    it('resolves null for an ASN ASRank does not know', async () => {
+        globalThis.fetch = async () => new Response(JSON.stringify({ data: { asn: null } }));
+        assert.equal(await queryAsRank(64512), null);
+    });
+
+    it('throws on a non-2xx answer or a network failure', async () => {
         globalThis.fetch = async () => new Response('busy', { status: 503 });
-        assert.equal(await fetchAsRank(13335), null);
+        await assert.rejects(queryAsRank(13335), /ASRank responded 503/);
         globalThis.fetch = async () => { throw new Error('connect timeout'); };
-        assert.equal(await fetchAsRank(13335), null);
+        await assert.rejects(queryAsRank(13335), /connect timeout/);
     });
 });
