@@ -313,6 +313,7 @@ import { useMainStore } from '@/store';
 import { useI18n, I18nT } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
+import { loadAsnInfoInto } from '@/composables/use-asn-info.js';
 import { toBgpPrefix } from '@/utils/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime, formatIsoDate } from '@/utils/time-utils.js';
 import { buildScoreExplanation, listScoreTags } from '@/utils/ip-score-details.js';
@@ -572,21 +573,11 @@ const onPanelOpenChange = (open) => {
     isPanelOpen.value = open;
 };
 
-// Cache-buster: bump on response-shape changes, same rationale as
-// ASN_CONNECTIVITY_VERSION below.
-const ASN_INFO_VERSION = 2;
-
+// Fetch + versioning live in composables/use-asn-info.js; the cache is the
+// owner's (IpInfos / QueryIP), handed down as the asnInfos prop.
 const getASNInfo = async (asn) => {
     trackEvent('IPCheck', 'ASNInfoClick', 'Show ASN Info');
-    try {
-        if (props.asnInfos[asn]) return;
-        asn = asn.replace('AS', '');
-        const response = await fetchWithTimeout(`/api/cfradar?view=asn&asn=${asn}&v=${ASN_INFO_VERSION}`);
-        const data = await response.json();
-        props.asnInfos['AS' + asn] = data;
-    } catch (error) {
-        console.error('Error fetching ASN info:', error);
-    }
+    await loadAsnInfoInto(props.asnInfos, asn);
 };
 
 const getASNHistory = async (prefix) => {

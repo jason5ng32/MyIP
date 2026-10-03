@@ -18,6 +18,11 @@
 //   component            — lazy import of the tool's .vue (drawer + standalone)
 //   requiresOriginalSite — gate: only shown on the original site (private API +
 //                          sign-in required); omitted == public tool
+//   requiresConfig       — gate: only shown when this `/api/configs` flag is
+//                          true (e.g. 'cloudFlare' for the Radar-backed tools)
+//
+// Gates decide listing only (card grid + nav), via isToolAvailable() in
+// utils/tool-availability.js; deep links (?tool= / /tools/:slug) ignore them.
 
 export const ADVANCED_TOOLS = [
   { slug: 'pingtest', emoji: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', component: () => import('@/components/advanced-tools/GlobalLatencyTest.vue') },
@@ -26,6 +31,7 @@ export const ADVANCED_TOOLS = [
   { slug: 'dnsresolver', emoji: '📟', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', component: () => import('@/components/advanced-tools/DnsResolver.vue') },
   { slug: 'censorshipcheck', emoji: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', component: () => import('@/components/advanced-tools/CensorshipCheck.vue') },
   { slug: 'whois', emoji: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', component: () => import('@/components/advanced-tools/Whois.vue') },
+  { slug: 'asn', emoji: '🛂', titleKey: 'asnprofile.Title', noteKey: 'advancedtools.AsnProfile', component: () => import('@/components/advanced-tools/AsnProfile.vue'), requiresConfig: 'cloudFlare' },
   { slug: 'macchecker', emoji: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', component: () => import('@/components/advanced-tools/MacChecker.vue') },
   { slug: 'ipcalculator', emoji: '🔢', titleKey: 'ipcalculator.Title', noteKey: 'advancedtools.IpCalculator', component: () => import('@/components/advanced-tools/IpCalculator.vue') },
   { slug: 'browserinfo', emoji: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },

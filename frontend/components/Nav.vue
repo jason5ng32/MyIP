@@ -292,6 +292,7 @@ import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
 import { ADVANCED_TOOLS } from '@/data/tools.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
@@ -311,12 +312,10 @@ const isPwa = isRunningAsPwa();
 
 const navItems = SECTION_IDS;
 
-// Tools shown in the nav, mirroring Advanced.vue's enabledCards: original-site-
-// only tools stay hidden on self-hosted instances. Reactive on configs.
+// Tools shown in the nav, mirroring Advanced.vue's enabledCards: gated tools
+// stay hidden where the deployment lacks them. Reactive on configs.
 const configs = computed(() => store.configs);
-const advancedTools = computed(() =>
-  ADVANCED_TOOLS.filter((tool) => !tool.requiresOriginalSite || configs.value.originalSite),
-);
+const advancedTools = computed(() => ADVANCED_TOOLS.filter((tool) => isToolAvailable(tool, configs.value)));
 
 // Mobile: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);

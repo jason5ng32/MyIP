@@ -63,6 +63,28 @@ so callers react programmatically. Cross-component triggers go through the bus â
 never template refs (refs stay for UI chrome). Future advanced tools register
 at setup (`?tool=` mount); callers `waitForAppCommand` + dispatch.
 
+### Advanced Tools gates decide listing only
+
+`data/tools.js` entries opt into deployment gates: `requiresOriginalSite` and/or
+`requiresConfig: '<flag>'` (a `/api/configs` key, e.g. `'cloudFlare'` on `asn`).
+The card grid and the nav filter through `isToolAvailable()`
+(`utils/tool-availability.js`), never the flags directly; a gated tool stays
+unlisted until configs land. Deep links (`?tool=<slug>` drawer, `/tools/:slug`)
+are not gated and render immediately. Data that only some deployments have
+(e.g. ASN Profile's reputation / IXP sections) is not gated on
+`configs.originalSite` either: the page renders it when the backend response
+carries it.
+
+### ASN data has one fetcher
+
+The Radar ASN summary (`/api/cfradar?view=asn`) goes through
+`composables/use-asn-info.js` â€” URL, `ASN_INFO_VERSION` cache-buster, `AS<n>`
+cache key. Owners create their own session cache with `useAsnInfo()`
+(IpInfos and QueryIP deliberately don't share one); IpDetailPanel fills the
+cache it is handed via `loadAsnInfoInto()`. Its traffic-share and
+connection-quality blocks are `ip-infos/AsnTrafficShares.vue` /
+`AsnConnectionQuality.vue` (prop: the summary object), shaped by `utils/asn-metrics.js`.
+
 ### Overlays take no keyboard shortcuts
 
 One document-level dispatcher (`utils/shortcut.js`) over the map

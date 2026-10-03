@@ -870,6 +870,7 @@
     "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
     "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
     "Whois": "對網域名稱、IP 或 AS 號碼進行 Whois 查詢",
+    "AsnProfile": "查看任意自治系統的身分、規模、宣告前綴、全球分布、互連關係和註冊資訊",
     "InvisibilityTest": "猜猜看我是否知道你掛了代理",
     "MacChecker": "查詢實體位址的歸屬資訊",
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
@@ -1042,6 +1043,9 @@
     "noData": "該查詢沒有公開的 Whois / RDAP 資料。部分頂級網域名稱不提供公開查詢服務。",
     "fetchError": "無法取得查詢結果或查詢結果為空",
     "Provider": "資訊服務商"
+  },
+  "asnprofile": {
+    "Title": "ASN 檔案"
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 洩漏測試",

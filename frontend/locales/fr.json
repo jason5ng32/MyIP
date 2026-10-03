@@ -870,6 +870,7 @@
     "CensorshipCheck": "Vérifier dans quels pays un site est bloqué",
     "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP/AS",
+    "AsnProfile": "Identité, taille, préfixes annoncés, présence mondiale, interconnexions et enregistrement de n'importe quel AS",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
@@ -1042,6 +1043,9 @@
     "noData": "Aucune donnée Whois ou RDAP n'est publiée pour cette requête. Certains domaines de premier niveau ne proposent pas de service de consultation public.",
     "fetchError": "Impossible de récupérer les résultats de la requête ou les résultats de la requête sont vides",
     "Provider": "Fournisseur d'informations"
+  },
+  "asnprofile": {
+    "Title": "Profil ASN"
   },
   "enhanceddnsleaktest": {
     "Title": "Test de fuite DNS approfondi",

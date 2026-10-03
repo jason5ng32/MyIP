@@ -870,6 +870,7 @@
     "CensorshipCheck": "检查一个网站在全球哪些国家被封锁",
     "ServiceStatus": "查看知名 AI 与开发者服务的实时可用性，确认你遇到的中断是不是对方的故障",
     "Whois": "对域名、IP 或 AS 号进行 Whois 查询",
+    "AsnProfile": "查看任意自治系统的身份、规模、宣告前缀、全球分布、互联关系和注册信息",
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
     "MacChecker": "查询物理地址的归属信息",
     "IpCalculator": "任意 IP、前缀或范围的子网计算、进制转换与 IPv6 解读",
@@ -1042,6 +1043,9 @@
     "noData": "该查询没有公开的 Whois / RDAP 数据。部分顶级域名不提供公开查询服务。",
     "fetchError": "无法获取查询结果或查询结果为空",
     "Provider": "信息服务商"
+  },
+  "asnprofile": {
+    "Title": "ASN 档案"
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 泄露测试",

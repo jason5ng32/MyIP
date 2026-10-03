@@ -96,6 +96,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '@/data/tools.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -121,12 +122,9 @@ const router = useRouter();
 // is mapped from the registry's `emoji` so the template key stays stable.
 const cards = ADVANCED_TOOLS.map((tool) => ({ ...tool, icon: tool.emoji }));
 
-// Gate: the invisibility + enhanced DNS-leak tools only show on the original
-// site (they need the private API + sign-in). Reactive on configs, so they
-// appear the moment configs land — no fixed timeout needed.
-const enabledCards = computed(() =>
-    cards.filter((c) => !c.requiresOriginalSite || configs.value.originalSite),
-);
+// Deployment gates (original site / configs flag, see utils/tool-availability.js).
+// Reactive on configs, so gated cards appear the moment configs land.
+const enabledCards = computed(() => cards.filter((card) => isToolAvailable(card, configs.value)));
 
 // ── Drawer state, driven by the `?tool=<slug>` query on the home route ───────
 // `?tool=whois` ⇒ the drawer is open showing Whois. Closing clears the query.

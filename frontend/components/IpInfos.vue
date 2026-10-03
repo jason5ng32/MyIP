@@ -41,6 +41,7 @@ import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
+import { useAsnInfo } from '@/composables/use-asn-info.js';
 import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';
 import IPCard from './ip-infos/IPCard.vue';
 import InfoBanner from './widgets/InfoBanner.vue';
@@ -109,8 +110,8 @@ const ipDataCards = reactive([
   },
 ]);
 
-// Default ASN information
-const asnInfos = ref({
+// ASN information (Radar summary) session cache, with a default entry.
+const { asnInfos } = useAsnInfo({
   "AS888888": {
     "asnName": "Google", "asnOrgName": "GOGL-ARIN", "estimatedUsers": "888888", "IPv4_Pct": "95.35", "IPv6_Pct": "4.65", "HTTP_Pct": "3.16", "HTTPS_Pct": "96.84", "Desktop_Pct": "58.88", "Mobile_Pct": "41.12", "Bot_Pct": "98.46", "Human_Pct": "1.54"
   }

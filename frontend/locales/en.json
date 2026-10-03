@@ -870,6 +870,7 @@
     "CensorshipCheck": "Check which countries a website is blocked in",
     "ServiceStatus": "Check the live availability of well-known AI and developer services, and whether a recent incident explains the outage you're seeing",
     "Whois": "Search for domain/IP/ASN registration information",
+    "AsnProfile": "Identity, scale, announced prefixes, global footprint, connectivity and registration of any AS",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
@@ -1042,6 +1043,9 @@
     "noData": "No Whois or RDAP data is published for this query. Some top-level domains do not offer a public lookup service.",
     "fetchError": "Unable to fetch query results or query results are empty",
     "Provider": "Information Provider"
+  },
+  "asnprofile": {
+    "Title": "ASN Profile"
   },
   "enhanceddnsleaktest": {
     "Title": "In-depth DNS Leak Test",

@@ -22,30 +22,10 @@
             </dl>
 
             <!-- Connection quality (Cloudflare speed test aggregates) -->
-            <div v-if="Object.keys(qualityInfo).length" class="space-y-2 pt-1">
-                <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span>{{ t('ipInfos.ASNInfo.connectionQuality') }}</span>
-                    <JnTooltip :text="t('ipInfos.ASNInfo.connectionQualityTooltip')" side="top"
-                        class="hidden md:block">
-                        <CircleQuestionMark class="size-3 cursor-help opacity-70" />
-                    </JnTooltip>
-                </div>
-                <dl class="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-                    <div v-for="(item, key) in qualityInfo" :key="key">
-                        <dt class="text-xs text-muted-foreground mb-0.5">{{ t(`ipInfos.ASNInfo.${key}`) }}</dt>
-                        <dd class="font-normal wrap-break-word">{{ item }}</dd>
-                    </div>
-                </dl>
-            </div>
+            <AsnConnectionQuality :info="asnInfos[asn]" />
 
-            <!-- Pair data visualization -->
-            <div v-if="pairDataList.length" class="space-y-2.5 pt-1">
-                <div class="text-xs text-muted-foreground">
-                    {{ t('ipInfos.ASNInfo.trafficPercentage') }}
-                </div>
-                <DataPairBar v-for="pair in pairDataList" :key="pair.leftLabel" :leftLabel="pair.leftLabel"
-                    :leftValue="pair.leftValue" :rightLabel="pair.rightLabel" :rightValue="pair.rightValue" />
-            </div>
+            <!-- Traffic shares (pair bars) -->
+            <AsnTrafficShares :info="asnInfos[asn]" />
 
             <!-- External links -->
             <div class="flex flex-wrap items-center gap-2 pt-1">
@@ -80,11 +60,11 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { computed } from 'vue';
 import getCountryName from '@/data/country-name.js';
-import DataPairBar from './DataPairBar.vue';
+import AsnConnectionQuality from './AsnConnectionQuality.vue';
+import AsnTrafficShares from './AsnTrafficShares.vue';
 import { Badge } from '@/components/ui/badge';
-import { JnTooltip } from '@/components/ui/tooltip';
 import { Icon } from '@iconify/vue';
-import { CircleQuestionMark, Database, ExternalLink } from '@lucide/vue';
+import { Database, ExternalLink } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -114,66 +94,5 @@ const basicInfo = computed(() => {
         if (data[key]) info[key] = data[key];
     }
     return info;
-});
-
-// Cloudflare speed test aggregates for the AS, pre-formatted by the backend.
-const qualityInfo = computed(() => {
-    const data = props.asnInfos[props.asn];
-    if (!data) return {};
-    const info = {};
-    const keys = ['speedDownload', 'speedUpload', 'latency', 'jitter'];
-    for (const key of keys) {
-        if (data[key]) info[key] = data[key];
-    }
-    return info;
-});
-
-// Process pair data
-const pairData = computed(() => {
-    const data = props.asnInfos[props.asn];
-    if (!data) return {};
-
-    const parsePercentage = (str) => {
-        if (!str) return null;
-        const num = parseFloat(str.replace('%', ''));
-        return isNaN(num) ? null : parseFloat(num.toFixed(2));
-    };
-
-    const pairs = {};
-
-    const ipv4 = parsePercentage(data.IPv4_Pct);
-    const ipv6 = parsePercentage(data.IPv6_Pct);
-    if (ipv4 !== null && ipv6 !== null) pairs.ipVersion = { left: ipv4, right: ipv6 };
-
-    const http = parsePercentage(data.HTTP_Pct);
-    const https = parsePercentage(data.HTTPS_Pct);
-    if (http !== null && https !== null) pairs.httpProtocol = { left: http, right: https };
-
-    const desktop = parsePercentage(data.Desktop_Pct);
-    const mobile = parsePercentage(data.Mobile_Pct);
-    if (desktop !== null && mobile !== null) pairs.deviceType = { left: desktop, right: mobile };
-
-    const human = parsePercentage(data.Human_Pct);
-    const bot = parsePercentage(data.Bot_Pct);
-    if (human !== null && bot !== null) pairs.userType = { left: human, right: bot };
-
-    return pairs;
-});
-
-const pairDataList = computed(() => {
-    const list = [
-        { key: 'ipVersion', leftLabel: 'IPv4_Pct', rightLabel: 'IPv6_Pct' },
-        { key: 'httpProtocol', leftLabel: 'HTTP_Pct', rightLabel: 'HTTPS_Pct' },
-        { key: 'deviceType', leftLabel: 'Desktop_Pct', rightLabel: 'Mobile_Pct' },
-        { key: 'userType', leftLabel: 'Human_Pct', rightLabel: 'Bot_Pct' }
-    ];
-    return list
-        .filter(item => pairData.value[item.key])
-        .map(item => ({
-            leftLabel: item.leftLabel,
-            rightLabel: item.rightLabel,
-            leftValue: pairData.value[item.key].left,
-            rightValue: pairData.value[item.key].right
-        }));
 });
 </script>
