@@ -13,13 +13,15 @@ export const ASN_INFO_VERSION = 3;
 export const asnInfoUrl = (asnNumber) => `/api/cfradar?view=asn&asn=${asnNumber}&v=${ASN_INFO_VERSION}`;
 
 // Fetch `asn` ('AS13335') into `cache` unless already there; resolves to the
-// cached body, or null on a network / parse failure (nothing cached, so the
-// next call retries). Any parsed body is cached, error bodies included.
+// cached body, or null on a network / parse failure or a 503 (the backend's
+// "data still loading" during boot) — nothing cached, so the next call
+// retries. Any other parsed body is cached, error bodies included.
 export const loadAsnInfoInto = async (cache, asn) => {
     try {
         if (cache[asn]) return cache[asn];
         const asnNumber = asn.replace('AS', '');
         const response = await fetchWithTimeout(asnInfoUrl(asnNumber));
+        if (response.status === 503) return null;
         const data = await response.json();
         cache['AS' + asnNumber] = data;
         return data;

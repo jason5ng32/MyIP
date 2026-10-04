@@ -62,6 +62,15 @@ describe('loadAsnConnectivityInto', () => {
     assert.deepEqual(cache, { 64501: { error: true } });
   });
 
+  it('a 503 (data loading at boot) answers { error: true } but stays retryable', async () => {
+    stubFetch(() => jsonResponse({ error: 'Offline data is loading' }, 503));
+    const cache = {};
+    assert.deepEqual(await loadAsnConnectivityInto(cache, '64503'), { error: true });
+    assert.deepEqual(cache, {});
+    stubFetch(() => jsonResponse({ origin: 64503 }));
+    assert.deepEqual(await loadAsnConnectivityInto(cache, '64503'), { graph: { origin: 64503 } });
+  });
+
   it('a network failure is cached as { error: true }', async () => {
     stubFetch(() => { throw new TypeError('offline'); });
     const cache = {};

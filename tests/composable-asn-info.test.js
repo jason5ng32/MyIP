@@ -61,6 +61,15 @@ describe('loadAsnInfoInto', () => {
     assert.deepEqual(cache.AS64501, { error: 'upstream' });
   });
 
+  it('a 503 (data loading at boot) resolves null, caches nothing and stays retryable', async () => {
+    stubFetch(() => jsonResponse({ error: 'Offline data is loading' }, 503));
+    const cache = {};
+    assert.equal(await loadAsnInfoInto(cache, 'AS64503'), null);
+    assert.deepEqual(cache, {});
+    stubFetch(() => jsonResponse({ asnName: 'Example' }));
+    assert.deepEqual(await loadAsnInfoInto(cache, 'AS64503'), { asnName: 'Example' });
+  });
+
   it('a network failure resolves null, caches nothing and stays retryable', async () => {
     stubFetch(() => { throw new TypeError('network down'); });
     const cache = {};
