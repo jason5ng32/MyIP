@@ -22,6 +22,7 @@ import {
     buildCountryShares,
 } from '../common/cf-radar.js';
 import logger from '../common/logger.js';
+import { parseCidr } from '../common/ip-math.js';
 
 const outageFixture = {
     id: '1645',
@@ -360,8 +361,18 @@ describe('normalizePrefixOrigins', () => {
 });
 
 describe('buildCountryShares', () => {
-    const table = { '8.8.8.0': 'US', '8.8.4.0': 'US', '1.0.0.0': 'AU', '81.0.0.0': 'DE' };
-    const lookup = (ip) => table[ip] || null;
+    // A stand-in for MaxMind: the most specific listed network holding the
+    // address answers; anything else is an unknown /24.
+    const rangeLookup = (networks) => {
+        const parsed = Object.entries(networks).map(([cidr, country]) => ({ ...parseCidr(cidr), country }))
+            .sort((a, b) => b.prefix - a.prefix);
+        return (ip) => {
+            const value = parseCidr(`${ip}/32`).network;
+            const hit = parsed.find((n) => value >= n.network && value < n.network + 2n ** BigInt(32 - n.prefix));
+            return hit ? { country: hit.country, prefixLength: hit.prefix } : { country: null, prefixLength: 24 };
+        };
+    };
+    const lookup = rangeLookup({ '8.8.8.0/24': 'US', '8.8.4.0/24': 'US', '1.0.0.0/22': 'AU', '81.0.0.0/22': 'DE' });
     const rows = (...prefixes) => prefixes.map((prefix) => ({ prefix }));
 
     it('weights countries by address count, not prefix count', () => {
@@ -370,6 +381,28 @@ describe('buildCountryShares', () => {
             { country: 'AU', share: 0.6667 },
             { country: 'US', share: 0.3333 },
         ]);
+    });
+
+    it('splits a prefix spanning several MaxMind networks among their countries', () => {
+        // One /15: its first /16 in SG, the second in US — not all SG.
+        const split = rangeLookup({ '3.0.0.0/16': 'SG', '3.1.0.0/16': 'US' });
+        assert.deepEqual(buildCountryShares(rows('3.0.0.0/15'), split), [
+            { country: 'SG', share: 0.5 },
+            { country: 'US', share: 0.5 },
+        ]);
+        // A network wider than the prefix answers for the whole prefix in one lookup.
+        let calls = 0;
+        const wide = (ip) => { calls++; return { country: 'US', prefixLength: 8 }; };
+        assert.deepEqual(buildCountryShares(rows('52.4.0.0/14'), wide), [{ country: 'US', share: 1 }]);
+        assert.equal(calls, 1);
+    });
+
+    it('past the lookup budget gives a block\'s remainder to its next address', () => {
+        // Every address its own /32: a /14 needs 262144 lookups, over budget.
+        let calls = 0;
+        const perAddress = (ip) => { calls++; return { country: 'US', prefixLength: 32 }; };
+        assert.deepEqual(buildCountryShares(rows('10.0.0.0/14'), perAddress), [{ country: 'US', share: 1 }]);
+        assert.equal(calls, 100000);
     });
 
     it('sorts largest first and ignores IPv6 prefixes', () => {
@@ -394,16 +427,17 @@ describe('buildCountryShares', () => {
         ]);
     });
 
-    it('returns [] with no IPv4 prefixes, no resolvable country, or junk rows', () => {
+    it('returns [] with no IPv4 prefixes, no resolvable country, junk rows, or no database', () => {
         assert.deepEqual(buildCountryShares([], lookup), []);
         assert.deepEqual(buildCountryShares(undefined, lookup), []);
         assert.deepEqual(buildCountryShares(rows('9.9.9.0/24', '2606:4700::/32'), lookup), []);
         assert.deepEqual(buildCountryShares([{ prefix: 'nope' }, null, {}], lookup), []);
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24'), () => null), []);
     });
 
     it('caps the response at 50 countries', () => {
         const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
-        const shares = buildCountryShares(many, (ip) => `C${ip.split('.')[1]}`);
+        const shares = buildCountryShares(many, (ip) => ({ country: `C${ip.split('.')[1]}`, prefixLength: 16 }));
         assert.equal(shares.length, 50);
     });
 });

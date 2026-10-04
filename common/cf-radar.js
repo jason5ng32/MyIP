@@ -13,7 +13,7 @@
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { lookupCountryCode } from './maxmind-service.js';
+import { lookupCountryRange } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
@@ -186,15 +186,18 @@ export const normalizePrefixOrigins = (result) => {
 };
 
 const GEO_TOP = 50;              // countries in the response
-const GEO_PREFIX_CAP = 20000;    // bound on per-request country lookups
+const GEO_PREFIX_CAP = 20000;    // bound on prefixes considered per request
+const GEO_LOOKUP_BUDGET = 100000; // MaxMind lookups per request (~0.3 s)
 
 // Share of the ASN's announced IPv4 addresses per geolocated country, largest
 // first. v4-only and address-weighted (a /16 counts 256× a /24); prefixes
 // covered by another announced prefix are skipped so a covering route plus
-// its more-specifics isn't counted twice. Shares are of the addresses that
-// resolved to a country. `lookupCountry(ip) → ISO code | null` is injected
-// so tests need no MaxMind database. Exported for tests.
-export const buildCountryShares = (prefixes, lookupCountry) => {
+// its more-specifics isn't counted twice. Each prefix is walked one MaxMind
+// network at a time, so one spanning several countries is split among them.
+// Shares are of the addresses that resolved to a country.
+// `lookupRange(ip) → { country, prefixLength } | null` (null = no database)
+// is injected so tests need no MaxMind database. Exported for tests.
+export const buildCountryShares = (prefixes, lookupRange) => {
     const blocks = (prefixes || [])
         .map((row) => parseCidr(row?.prefix))
         .filter((cidr) => cidr?.family === 4)
@@ -205,16 +208,29 @@ export const buildCountryShares = (prefixes, lookupCountry) => {
     const weightByCountry = new Map();
     let total = 0;
     let coveredUntil = -1n;
+    let budget = GEO_LOOKUP_BUDGET;
     for (const { start, size } of blocks) {
         // CIDR blocks nest or are disjoint: starting inside the last kept
         // block means being inside it.
         if (start <= coveredUntil) continue;
         coveredUntil = start + size - 1n;
-        const country = lookupCountry(formatIPv4(start));
-        if (!country) continue;
-        const weight = Number(size);
-        weightByCountry.set(country, (weightByCountry.get(country) || 0) + weight);
-        total += weight;
+        // IPv4 fits a Number. Each lookup answers for the aligned network
+        // holding the cursor; past the budget, a block's remainder goes to
+        // its next address's country.
+        const stop = Number(start + size);
+        let cursor = Number(start);
+        while (cursor < stop) {
+            const hit = lookupRange(formatIPv4(BigInt(cursor)));
+            if (!hit) return [];
+            const networkSize = 2 ** (32 - hit.prefixLength);
+            const next = --budget > 0 ? (Math.floor(cursor / networkSize) + 1) * networkSize : stop;
+            const weight = Math.min(next, stop) - cursor;
+            if (hit.country) {
+                weightByCountry.set(hit.country, (weightByCountry.get(hit.country) || 0) + weight);
+                total += weight;
+            }
+            cursor = next;
+        }
     }
     if (!total) return [];
     return [...weightByCountry.entries()]
@@ -229,7 +245,7 @@ const fetchBgpPrefixes = async ({ asn }) => {
     // An ASN originating nothing is a valid, cacheable answer: both lists
     // empty. A malformed result throws (500 here, `error` in the profile).
     const prefixes = normalizePrefixOrigins(json?.result);
-    return { prefixes, countries: buildCountryShares(prefixes, lookupCountryCode) };
+    return { prefixes, countries: buildCountryShares(prefixes, lookupCountryRange) };
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------

@@ -123,13 +123,17 @@ export function startMaxMindFileWatcher() {
 }
 
 /**
- * Bare ISO country code for an IP — no formatting, no 503 throw: null when
- * the City database isn't loaded or has no answer. For bulk aggregation
- * (the bgp-prefixes Radar view runs thousands of these per request).
+ * Bare ISO country code of an IP (null when unknown) plus the prefix length
+ * of the MaxMind network holding it, so a caller can walk a range one network
+ * at a time — the bgp-prefixes Radar view does, thousands of times per
+ * request. No formatting, no 503 throw: null when the City database isn't
+ * loaded.
  */
-export const lookupCountryCode = (ip) => {
+export const lookupCountryRange = (ip) => {
+    if (!cityLookup) return null;
     try {
-        return cityLookup?.get(ip)?.country?.iso_code || null;
+        const [record, prefixLength] = cityLookup.getWithPrefixLength(ip);
+        return { country: record?.country?.iso_code || null, prefixLength };
     } catch {
         return null;
     }
