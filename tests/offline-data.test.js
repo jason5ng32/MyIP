@@ -1,13 +1,10 @@
-// Tests for common/offline-data.js — the boot window and the per-route 503
-// gate, plus the Radar views' declared dependencies.
+// Tests for common/offline-data.js — the boot window, the per-route 503
+// gate and the per-part isStillLoading probe.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { runOfflineBootstrap, requireOfflineData } from '../common/offline-data.js';
-import { RADAR_VIEWS } from '../common/cf-radar.js';
-import { isAsRelLoaded } from '../common/as-rel-db.js';
-import { isMaxMindReady } from '../common/maxmind-service.js';
+import { runOfflineBootstrap, requireOfflineData, isStillLoading } from '../common/offline-data.js';
 
 const makeRes = () => ({
     statusCode: null,
@@ -62,13 +59,15 @@ describe('requireOfflineData', () => {
             assert.equal(passes(requireOfflineData([])).passed, true);
         });
     });
+});
 
-    it('resolves per-request checks; no checks (unknown view) passes', async () => {
-        const gate = requireOfflineData((req) => ({ a: [missing], b: [ready] })[req.query.view]);
+describe('isStillLoading', () => {
+    it('is true only inside the boot window, for unready data', async () => {
+        assert.equal(isStillLoading(missing), false, 'after boot a miss is a failed download');
         await duringBoot(() => {
-            assert.equal(passes(gate, { query: { view: 'a' } }).passed, false);
-            assert.equal(passes(gate, { query: { view: 'b' } }).passed, true);
-            assert.equal(passes(gate, { query: { view: 'nope' } }).passed, true);
+            assert.equal(isStillLoading(ready, missing), true);
+            assert.equal(isStillLoading(ready), false);
+            assert.equal(isStillLoading(), false);
         });
     });
 });
@@ -83,14 +82,5 @@ describe('runOfflineBootstrap', () => {
         ]);
         assert.equal(duringSteps, false);
         assert.equal(passes(gate).passed, true);
-    });
-});
-
-describe('Radar view dependencies', () => {
-    it('asn reads the CAIDA graph, bgp-prefixes MaxMind; the rest nothing local', () => {
-        assert.deepEqual(RADAR_VIEWS.asn.offlineData, [isAsRelLoaded]);
-        assert.deepEqual(RADAR_VIEWS['bgp-prefixes'].offlineData, [isMaxMindReady]);
-        assert.equal(RADAR_VIEWS.outages.offlineData, undefined);
-        assert.equal(RADAR_VIEWS['country-traffic'].offlineData, undefined);
     });
 });

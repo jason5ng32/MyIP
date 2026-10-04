@@ -6,10 +6,11 @@
 // dispatches over this registry — adding Radar data means one view function
 // plus one registry row here, never a new route.
 //
-// A view may answer despite failed upstream calls (asn: some segments). It
-// then registers the payload via markPartial; the route's cache middleware
-// asks isCompleteRadarAnswer and serves such an answer without edge-caching
-// it. The payload itself is unchanged.
+// A view may answer despite failed upstream calls (asn: some segments) or
+// without a local dataset it reads (not loaded yet at boot, or its download
+// failed). It then registers the payload via markPartial; the route's cache
+// middleware asks isCompleteRadarAnswer and serves such an answer without
+// edge-caching it. The payload itself is unchanged.
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
@@ -185,10 +186,12 @@ export const loadAsnSummary = async (asn, relCounts = relationshipCounts) => {
     };
 };
 
-// Partial summaries are served but not edge-cached.
-const fetchAsnProfile = async ({ asn }) => {
+// Partial summaries — failed segments, or no CAIDA snapshot behind the
+// relationship counts — are served but not edge-cached. `relLoaded` is
+// injectable for tests.
+const fetchAsnProfile = async ({ asn }, { relLoaded = isAsRelLoaded } = {}) => {
     const { summary, failedSegments } = await loadAsnSummary(asn);
-    return failedSegments.length > 0 ? markPartial(summary) : summary;
+    return failedSegments.length > 0 || !relLoaded() ? markPartial(summary) : summary;
 };
 
 // -- view: bgp-prefixes — announced prefixes + IPv4 country footprint -------
@@ -246,12 +249,16 @@ export const buildCountryShares = (prefixes, lookupCountry) => {
         .filter((row) => row.share > 0);
 };
 
-const fetchBgpPrefixes = async ({ asn }) => {
+// `maxMindReady` is injectable for tests.
+const fetchBgpPrefixes = async ({ asn }, { maxMindReady = isMaxMindReady } = {}) => {
     const json = await fetchFromCloudflare(`/radar/bgp/routes/pfx2as?origin=${asn}`);
     // An ASN originating nothing is a valid, cacheable answer: both lists
     // empty. A malformed result throws (500 here, `error` in the profile).
     const prefixes = normalizePrefixOrigins(json?.result);
-    return { prefixes, countries: buildCountryShares(prefixes, lookupCountryCode) };
+    const body = { prefixes, countries: buildCountryShares(prefixes, lookupCountryCode) };
+    // Without MaxMind the countries are empty for lack of data, not of
+    // addresses: served, never cached.
+    return maxMindReady() ? body : markPartial(body);
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------
@@ -410,17 +417,15 @@ const fetchOutages = async () => {
 // guards: run by the dispatcher before fetch — each 400s invalid input and
 //         normalizes params in place, so cache keys stay canonical.
 // ttl:    edge-cache seconds, read by the /api/cfradar route middleware.
-// offlineData: readiness probes of the local datasets the payload reads;
-//         the route answers 503 while one is still downloading at boot
-//         (common/offline-data.js). Absent = no local data.
-// fetch:  async (req.query) => payload; throws on upstream failure.
+// fetch:  async (req.query) => payload; throws on upstream failure. A view
+//         reading a local dataset marks its answer partial while that
+//         dataset isn't loaded, rather than gating the route.
 export const RADAR_VIEWS = {
     // The ASN data family (this, bgp-prefixes, /api/asn-profile) shares one
     // week of edge cache: the profile doesn't chase day-level precision.
     'asn': {
         guards: [requireValidASN()],
         ttl: 7 * 24 * 60 * 60,
-        offlineData: [isAsRelLoaded],
         fetch: fetchAsnProfile,
     },
     'country-traffic': {
@@ -436,7 +441,6 @@ export const RADAR_VIEWS = {
     'bgp-prefixes': {
         guards: [requireValidASN()],
         ttl: 7 * 24 * 60 * 60,
-        offlineData: [isMaxMindReady],
         fetch: fetchBgpPrefixes,
     },
 };

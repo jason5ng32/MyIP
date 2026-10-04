@@ -123,7 +123,10 @@ disk load first, so only a first boot waits on downloads. During that window
 route whose data is still missing — never edge-cached — and is a no-op after
 boot, when a missing dataset means a failed download served degraded. A route
 reading local data declares its probes (`isMaxMindReady`, `isAsRelLoaded`, …)
-in `backend-server.js`; a Radar view declares `offlineData` in `RADAR_VIEWS`.
+in `backend-server.js`. Answers assembled from parts don't gate: a Radar view
+missing its local dataset marks the answer partial (`markPartial`, uncached),
+and an ASN Profile section whose data is still loading (`isStillLoading`)
+answers `error`, leaving the other sections to answer.
 `pnpm fetch-offline-data` downloads everything ahead of a first start.
 
 ### Private-API header pass-through (intentional exception)

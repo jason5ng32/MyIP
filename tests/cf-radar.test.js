@@ -328,12 +328,13 @@ describe('loadAsnSummary / asn view', () => {
     });
 
     it('the asn view serves a partial answer unchanged but marks it uncacheable', async () => {
+        const loaded = { relLoaded: () => true };
         stubRadar(KNOWN);
-        const complete = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        const complete = await RADAR_VIEWS.asn.fetch({ asn: '13335' }, loaded);
         assert.equal(isCompleteRadarAnswer(complete), true);
 
         stubRadar({ ...KNOWN, '/radar/http/summary/bot_class': 503 });
-        const partial = await RADAR_VIEWS.asn.fetch({ asn: '13335' });
+        const partial = await RADAR_VIEWS.asn.fetch({ asn: '13335' }, loaded);
         assert.equal(partial.asnName, 'CLOUDFLARENET');
         assert.equal(isCompleteRadarAnswer(partial), false);
         assert.equal(JSON.stringify(partial), JSON.stringify({ ...partial }), 'no marker in the payload');
@@ -341,6 +342,22 @@ describe('loadAsnSummary / asn view', () => {
         // Other views' answers and non-objects stay cacheable.
         assert.equal(isCompleteRadarAnswer({ ...partial }), true);
         assert.equal(isCompleteRadarAnswer(null), true);
+    });
+
+    it('the asn view is partial without a CAIDA snapshot behind its counts', async () => {
+        stubRadar(KNOWN);
+        const answer = await RADAR_VIEWS.asn.fetch({ asn: '13335' }, { relLoaded: () => false });
+        assert.equal(answer.asnName, 'CLOUDFLARENET');
+        assert.equal(isCompleteRadarAnswer(answer), false);
+    });
+
+    it('the bgp-prefixes view is partial without MaxMind, complete with it', async () => {
+        stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [{ prefix: '192.0.2.0/24' }] } } });
+        const missing = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => false });
+        assert.deepEqual(missing.prefixes.map((row) => row.prefix), ['192.0.2.0/24']);
+        assert.equal(isCompleteRadarAnswer(missing), false);
+        const ready = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => true });
+        assert.equal(isCompleteRadarAnswer(ready), true);
     });
 });
 

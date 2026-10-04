@@ -3,6 +3,8 @@
 // is downloaded; runOfflineBootstrap marks that window, and requireOfflineData
 // answers 503 on a route whose data is still missing inside it. Outside the
 // window a missing dataset is a failed download, served degraded as before.
+// A response assembled from independent parts (the ASN Profile) instead asks
+// isStillLoading per part and leaves just that part out, uncached.
 //
 // Snapshots already on disk are loaded before the listener opens (CAIDA and
 // PeeringDB at import, MaxMind in backend-server.js), so an ordinary restart
@@ -21,14 +23,15 @@ export const runOfflineBootstrap = async (steps) => {
     }
 };
 
+// Whether any of `checks` is unready inside the boot window — data that is
+// on its way, as opposed to a download that already failed.
+export const isStillLoading = (...checks) => booting && checks.some((isReady) => !isReady());
+
 // `checks` are the route's `() => boolean` readiness probes (isMaxMindReady,
-// isAsRelLoaded, …), or a `(req) => checks` resolver for routes whose data
-// depends on the request (the /api/cfradar view registry). 503 is never
-// edge-cached (cacheable only stamps < 400), so nothing degraded is pinned.
+// isAsRelLoaded, …). 503 is never edge-cached (cacheable only stamps < 400),
+// so nothing degraded is pinned.
 export const requireOfflineData = (checks) => (req, res, next) => {
-    if (!booting) return next();
-    const list = typeof checks === 'function' ? checks(req) : checks;
-    if (list?.some((isReady) => !isReady())) {
+    if (isStillLoading(...checks)) {
         res.setHeader('Retry-After', '30');
         return res.status(503).json({ error: 'Offline data is loading' });
     }

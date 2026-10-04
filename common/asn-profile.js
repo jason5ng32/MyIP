@@ -132,10 +132,17 @@ export const classifyPeeringdb = (loaded, record) => {
 //   deps: { hasRadarKey(), fetchRadarAsn(asn) (loadAsnSummary's shape),
 //           fetchRadarPrefixes(asn), getConnectivity(asn), rdapAutnum(asn),
 //           isAutnumMissing(err), queryAsRank(asn), requestReputation(asn),
-//           isPeeringdbLoaded(), lookupPeeringdb(asn) }
+//           isPeeringdbLoaded(), lookupPeeringdb(asn),
+//           isPartialPrefixes(body)? — true marks an 'ok' prefixes section incomplete }
 export const buildSectionLoaders = (deps) => ({
     radar: async (asn) => (deps.hasRadarKey() ? classifyRadar(await deps.fetchRadarAsn(asn)) : result('disabled')),
-    prefixes: async (asn) => (deps.hasRadarKey() ? classifyPrefixes(await deps.fetchRadarPrefixes(asn)) : result('disabled')),
+    prefixes: async (asn) => {
+        if (!deps.hasRadarKey()) return result('disabled');
+        const body = await deps.fetchRadarPrefixes(asn);
+        const section = classifyPrefixes(body);
+        // e.g. countries missing for want of MaxMind: shown, not cached.
+        return section.status === 'ok' && deps.isPartialPrefixes?.(body) ? { ...section, incomplete: true } : section;
+    },
     connectivity: async (asn) => classifyConnectivity(await deps.getConnectivity(asn)),
     whois: async (asn) => {
         try {

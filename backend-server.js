@@ -53,7 +53,6 @@ import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxm
 import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
 import { isAsRelLoaded } from './common/as-rel-db.js';
 import { isAsOrgLoaded } from './common/as-org-db.js';
-import { isPeeringdbLoaded } from './common/peeringdb-db.js';
 import { runOfflineBootstrap, requireOfflineData } from './common/offline-data.js';
 import {
     bootstrapServiceStatus, startServiceStatusPolling, isServiceStatusPrimed,
@@ -290,17 +289,16 @@ app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesH
 // ASN Profile aggregate: every source in one answer. Only a complete answer
 // (no section in error or incomplete) is cached, so a degraded one is never
 // pinned for a week; reputation inside it is not per-user.
-app.get('/api/asn-profile', requireValidASN(),
-    requireOfflineData([isAsRelLoaded, isAsOrgLoaded, isPeeringdbLoaded, isMaxMindReady]),
-    cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
+// Not boot-gated: a section whose local data is still downloading answers
+// 'error' on its own (api/asn-profile.js), which also keeps it uncached.
+app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
 // country traffic, 1h for the outage feed. A partial answer (some upstream
-// calls failed) is served but not cached.
-app.get('/api/cfradar',
-    requireOfflineData((req) => RADAR_VIEWS[req.query.view]?.offlineData),
-    cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
+// calls failed, or a local dataset it reads isn't loaded) is served but not
+// cached.
+app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
