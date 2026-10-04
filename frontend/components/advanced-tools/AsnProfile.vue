@@ -421,7 +421,7 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
@@ -535,13 +535,15 @@ const onSubmit = () => {
     if (query.value.trim()) start(query.value);
 };
 
-onMounted(() => {
-    const q = route.query.q;
-    if (typeof q === 'string' && q.trim()) {
+// `?q=` on mount, and any later change while the drawer stays open (an ASN
+// link followed from inside it, history navigation). Our own write-back
+// equals `query` already, so it doesn't run twice.
+watch(() => route.query.q, (q) => {
+    if (typeof q === 'string' && q.trim() && q !== query.value) {
         query.value = q;
         start(q, { track: false });
     }
-});
+}, { immediate: true });
 
 // ---- sections --------------------------------------------------------------
 

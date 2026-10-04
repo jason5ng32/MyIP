@@ -131,8 +131,9 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `INLINE_TIERS`; `:max-lines="2"` on heroes); no length-threshold helpers.
 - **Filter tags** — `ToggleGroup :spacing="2"` of detached `h-7 rounded-full`
   pills, `w-full flex-wrap` (IPHistory, DnsResolver); never `spacing=0`.
-- **Shareable tool input** — read `route.query.q` on mount, `router.replace` it
-  on every run (IpCalculator, AsnProfile); both `/tools/` and `?tool=` URLs.
+- **Shareable tool input** — watch `route.query.q` (immediate, so mount and
+  later changes in an open drawer both run), `router.replace` it on every run
+  (AsnProfile); both `/tools/` and `?tool=` URLs.
 - **Fixed option sets** — a closed list wider than one line is a `Select`.
 - **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
   Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.

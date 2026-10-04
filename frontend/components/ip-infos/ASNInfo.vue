@@ -86,7 +86,6 @@ const basicInfo = computed(() => {
     const info = {};
     const keys = [
         'asnName', 'asnCountryCode', 'asnOrgName', 'estimatedUsers',
-        'prefixesV4', 'prefixesV6', 'upstreamCount', 'downstreamCount', 'peerCount',
     ];
     for (const key of keys) {
         if (data[key]) info[key] = data[key];

@@ -22,6 +22,7 @@ import {
     buildCountryShares,
 } from '../common/cf-radar.js';
 import logger from '../common/logger.js';
+import { parseCidr } from '../common/ip-math.js';
 
 const outageFixture = {
     id: '1645',
@@ -234,31 +235,24 @@ describe('buildTrafficMatrix', () => {
 });
 
 describe('shapeAsnProfile', () => {
-    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
-
-    it('takes prefix counts from routes/stats and relationship counts from the local reading', () => {
+    it('shapes the Radar segments and drops what Radar left out', () => {
         const body = shapeAsnProfile({
-            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953, routes_valid: 5162 } } },
-        }, '13335', counts);
-        assert.equal(body.prefixesV4, (2346).toLocaleString());
-        assert.equal(body.prefixesV6, (2953).toLocaleString());
-        assert.equal(body.upstreamCount, '2');
-        assert.equal(body.downstreamCount, '0');
-        assert.equal(body.peerCount, '7');
-        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal']) {
+            asnInfo: { result: { asn: { name: 'CLOUDFLARENET', estimatedUsers: { estimatedUsers: 1200 } } } },
+            ipVersion: { result: { summary_0: { IPv4: '61.5', IPv6: '38.5' } } },
+        });
+        assert.equal(body.asnName, 'CLOUDFLARENET');
+        assert.equal(body.estimatedUsers, (1200).toLocaleString());
+        assert.equal(body.IPv4_Pct, '61.50%');
+        for (const key of ['speedDownload', 'latency', 'Bot_Pct']) {
             assert.equal(Object.hasOwn(body, key), false, key);
         }
     });
 
-    it('passes the AS number to the relationship reading', () => {
-        let asked;
-        shapeAsnProfile({}, '64500', (asn) => { asked = asn; return {}; });
-        assert.equal(asked, 64500);
-    });
-
-    it('drops relationship fields when the local snapshot has nothing', () => {
-        const body = shapeAsnProfile({ routesStats: { result: { stats: {} } } }, '13335', () => ({}));
-        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount', 'prefixesV4']) {
+    it('carries no prefix or relationship counts (those live in the ASN Profile)', () => {
+        const body = shapeAsnProfile({
+            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
+        });
+        for (const key of ['prefixesV4', 'prefixesV6', 'upstreamCount', 'downstreamCount', 'peerCount']) {
             assert.equal(Object.hasOwn(body, key), false, key);
         }
     });
@@ -286,45 +280,36 @@ describe('loadAsnSummary / asn view', () => {
     };
     const KNOWN = {
         '/radar/entities/asns/13335': { result: { asn: { name: 'CLOUDFLARENET', country: 'US' } } },
-        '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
     };
-    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
 
-    it('reports a complete answer, with the local counts kept out of radarFields', async () => {
+    it('reports a complete answer, without asking routes/stats', async () => {
+        const asked = [];
         stubRadar(KNOWN);
-        const { summary, radarFields, failedSegments } = await loadAsnSummary('13335', counts);
+        const stubbed = globalThis.fetch;
+        globalThis.fetch = async (url) => { asked.push(new URL(String(url)).pathname); return stubbed(url); };
+        const { summary, failedSegments } = await loadAsnSummary('13335');
         assert.deepEqual(failedSegments, []);
         assert.equal(summary.asnName, 'CLOUDFLARENET');
-        assert.equal(summary.peerCount, '7');
-        assert.equal(radarFields.asnName, 'CLOUDFLARENET');
-        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount']) {
-            assert.equal(Object.hasOwn(radarFields, key), false, key);
-        }
-    });
-
-    it('an AS Radar does not know has only local counts, none in radarFields', async () => {
-        stubRadar({ '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 0 } } } });
-        const { summary, radarFields } = await loadAsnSummary('64500', counts);
-        assert.equal(summary.upstreamCount, '2');
-        assert.deepEqual(JSON.parse(JSON.stringify(radarFields)), { prefixesV4: '0' });
+        assert.equal(asked.length, 6);
+        assert.equal(asked.some((path) => path.includes('/bgp/routes/stats')), false);
     });
 
     it('names the failed segments and still shapes the rest', async () => {
         stubRadar({ ...KNOWN, '/radar/http/summary/ip_version': 503, '/radar/quality/speed/summary': 500 });
-        const { summary, failedSegments } = await loadAsnSummary('13335', counts);
+        const { summary, failedSegments } = await loadAsnSummary('13335');
         assert.deepEqual(failedSegments.sort(), ['ipVersion', 'quality']);
         assert.equal(summary.asnName, 'CLOUDFLARENET');
     });
 
     it("a 404 is Radar's \"no such AS\", not a failed segment", async () => {
-        stubRadar({ '/radar/entities/asns/64511': 404, '/radar/bgp/routes/stats': { result: { stats: {} } } });
-        const { failedSegments } = await loadAsnSummary('64511', counts);
+        stubRadar({ '/radar/entities/asns/64511': 404 });
+        const { failedSegments } = await loadAsnSummary('64511');
         assert.equal(failedSegments.includes('asnInfo'), false);
     });
 
     it('throws when every segment failed', async () => {
         stubRadar(new Proxy({}, { get: () => 502 }));
-        await assert.rejects(loadAsnSummary('13335', counts), /Radar responded 502/);
+        await assert.rejects(loadAsnSummary('13335'), /Radar responded 502/);
     });
 
     it('the asn view serves a partial answer unchanged but marks it uncacheable', async () => {
@@ -341,6 +326,25 @@ describe('loadAsnSummary / asn view', () => {
         // Other views' answers and non-objects stay cacheable.
         assert.equal(isCompleteRadarAnswer({ ...partial }), true);
         assert.equal(isCompleteRadarAnswer(null), true);
+    });
+
+    it('the bgp-prefixes view is partial when MaxMind could not answer, complete when it did', async () => {
+        stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [{ prefix: '192.0.2.0/24' }] } } });
+        const missing = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { lookupRange: () => null });
+        assert.deepEqual(missing.prefixes.map((row) => row.prefix), ['192.0.2.0/24']);
+        assert.deepEqual(missing.countries, []);
+        assert.equal(isCompleteRadarAnswer(missing), false);
+        const ready = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' },
+            { lookupRange: () => ({ country: 'US', prefixLength: 24 }) });
+        assert.deepEqual(ready.countries, [{ country: 'US', share: 1 }]);
+        assert.equal(isCompleteRadarAnswer(ready), true);
+    });
+
+    it('the bgp-prefixes view caches an AS with no prefixes even without MaxMind', async () => {
+        stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [] } } });
+        const empty = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { lookupRange: () => null });
+        assert.deepEqual(empty, { prefixes: [], countries: [] });
+        assert.equal(isCompleteRadarAnswer(empty), true);
     });
 });
 
@@ -376,20 +380,67 @@ describe('normalizePrefixOrigins', () => {
 });
 
 describe('buildCountryShares', () => {
-    const table = { '8.8.8.0': 'US', '8.8.4.0': 'US', '1.0.0.0': 'AU', '81.0.0.0': 'DE' };
-    const lookup = (ip) => table[ip] || null;
+    // A stand-in for MaxMind: the most specific listed network holding the
+    // address answers; anything else is an unknown /24.
+    const rangeLookup = (networks) => {
+        const parsed = Object.entries(networks).map(([cidr, country]) => ({ ...parseCidr(cidr), country }))
+            .sort((a, b) => b.prefix - a.prefix);
+        return (ip) => {
+            const value = parseCidr(`${ip}/32`).network;
+            const hit = parsed.find((n) => value >= n.network && value < n.network + 2n ** BigInt(32 - n.prefix));
+            return hit ? { country: hit.country, prefixLength: hit.prefix } : { country: null, prefixLength: 24 };
+        };
+    };
+    const lookup = rangeLookup({ '8.8.8.0/24': 'US', '8.8.4.0/24': 'US', '1.0.0.0/22': 'AU', '81.0.0.0/22': 'DE' });
     const rows = (...prefixes) => prefixes.map((prefix) => ({ prefix }));
+    // Shares of a walk that must have completed.
+    const shares = (prefixes, lookupRange) => {
+        const result = buildCountryShares(prefixes, lookupRange);
+        assert.equal(result.complete, true);
+        return result.shares;
+    };
 
     it('weights countries by address count, not prefix count', () => {
         // Two US /24s vs one AU /22 → AU holds twice the addresses.
-        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
+        assert.deepEqual(shares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
             { country: 'AU', share: 0.6667 },
             { country: 'US', share: 0.3333 },
         ]);
     });
 
+    it('splits a prefix spanning several MaxMind networks among their countries', () => {
+        // One /15: its first /16 in SG, the second in US — not all SG.
+        const split = rangeLookup({ '3.0.0.0/16': 'SG', '3.1.0.0/16': 'US' });
+        assert.deepEqual(shares(rows('3.0.0.0/15'), split), [
+            { country: 'SG', share: 0.5 },
+            { country: 'US', share: 0.5 },
+        ]);
+        // A network wider than the prefix answers for the whole prefix in one lookup.
+        let calls = 0;
+        const wide = () => { calls++; return { country: 'US', prefixLength: 8 }; };
+        assert.deepEqual(shares(rows('52.4.0.0/14'), wide), [{ country: 'US', share: 1 }]);
+        assert.equal(calls, 1);
+    });
+
+    it('stops at the lookup budget, across blocks, with no shares and the walk incomplete', () => {
+        // Every address its own /32: a /14 alone needs 262144 lookups.
+        let calls = 0;
+        const perAddress = () => { calls++; return { country: 'US', prefixLength: 32 }; };
+        const result = buildCountryShares(rows('10.0.0.0/14', '192.0.2.0/24'), perAddress);
+        assert.equal(calls, 100000, 'the cap holds; the later block is not looked up');
+        // A part-walked space would pass for the whole distribution.
+        assert.deepEqual(result, { shares: [], complete: false });
+    });
+
+    it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24'), () => null), { shares: [], complete: false });
+        let calls = 0;
+        const failsSecond = () => (++calls === 1 ? { country: 'US', prefixLength: 24 } : null);
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.9.0/24'), failsSecond), { shares: [], complete: false });
+    });
+
     it('sorts largest first and ignores IPv6 prefixes', () => {
-        assert.deepEqual(buildCountryShares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
+        assert.deepEqual(shares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
             { country: 'DE', share: 0.8 },
             { country: 'US', share: 0.2 },
         ]);
@@ -398,28 +449,29 @@ describe('buildCountryShares', () => {
     it('skips more-specifics of a covering announced prefix', () => {
         // 1.0.0.0/23 covers 1.0.0.0/24 and 1.0.1.0/24 — counted once, so the
         // US /24 pair still balances it.
-        const shares = buildCountryShares(
-            rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
-        assert.deepEqual(shares.map((row) => row.share), [0.5, 0.5]);
-        assert.deepEqual(shares.map((row) => row.country).sort(), ['AU', 'US']);
+        const result = shares(rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
+        assert.deepEqual(result.map((row) => row.share), [0.5, 0.5]);
+        assert.deepEqual(result.map((row) => row.country).sort(), ['AU', 'US']);
     });
 
     it('leaves unresolvable addresses out of the denominator', () => {
-        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
+        assert.deepEqual(shares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
             { country: 'US', share: 1 },
         ]);
     });
 
-    it('returns [] with no IPv4 prefixes, no resolvable country, or junk rows', () => {
-        assert.deepEqual(buildCountryShares([], lookup), []);
-        assert.deepEqual(buildCountryShares(undefined, lookup), []);
-        assert.deepEqual(buildCountryShares(rows('9.9.9.0/24', '2606:4700::/32'), lookup), []);
-        assert.deepEqual(buildCountryShares([{ prefix: 'nope' }, null, {}], lookup), []);
+    it('is complete and empty with no IPv4 prefixes, no resolvable country, or junk rows', () => {
+        const noLookups = () => { throw new Error('no lookup expected'); };
+        assert.deepEqual(shares([], noLookups), []);
+        assert.deepEqual(shares(undefined, noLookups), []);
+        assert.deepEqual(shares(rows('2606:4700::/32'), noLookups), []);
+        assert.deepEqual(shares([{ prefix: 'nope' }, null, {}], noLookups), []);
+        assert.deepEqual(shares(rows('9.9.9.0/24'), lookup), []);
     });
 
     it('caps the response at 50 countries', () => {
         const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
-        const shares = buildCountryShares(many, (ip) => `C${ip.split('.')[1]}`);
-        assert.equal(shares.length, 50);
+        const result = shares(many, (ip) => ({ country: `C${ip.split('.')[1]}`, prefixLength: 16 }));
+        assert.equal(result.length, 50);
     });
 });
