@@ -7,7 +7,7 @@
 // live in common/asn-profile.js. `asn` arrives as a canonical number string
 // (requireValidASN). 200 unless every configured source failed (502).
 
-import { RADAR_VIEWS, hasRadarApiKey, loadAsnSummary } from '../common/cf-radar.js';
+import { RADAR_VIEWS, hasRadarApiKey, loadAsnSummary, isCompleteRadarAnswer } from '../common/cf-radar.js';
 import { rdapAutnum, isAutnumMissing } from '../common/rdap.js';
 import { queryAsRank } from '../common/asrank.js';
 import { requestAsnReputation } from '../common/asn-reputation.js';
@@ -24,6 +24,7 @@ export default async (req, res) => {
         // The summary plus its failed segments, so a partial one isn't cached.
         fetchRadarAsn: (n) => loadAsnSummary(String(n)),
         fetchRadarPrefixes: (n) => RADAR_VIEWS['bgp-prefixes'].fetch({ asn: String(n) }),
+        isPartialPrefixes: (body) => !isCompleteRadarAnswer(body),
         getConnectivity: getAsnConnectivity,
         rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,

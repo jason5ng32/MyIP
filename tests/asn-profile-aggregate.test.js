@@ -112,6 +112,17 @@ const deps = (overrides = {}) => ({
 });
 
 describe('buildSectionLoaders', () => {
+  it('a prefixes answer the source calls partial is ok but incomplete', async () => {
+    const partial = buildSectionLoaders(deps({ isPartialPrefixes: () => true }));
+    assert.equal((await partial.prefixes(1)).incomplete, true);
+    assert.equal((await buildSectionLoaders(deps()).prefixes(1)).incomplete, undefined);
+    // An empty list stays a cacheable 'empty' whatever the flag says.
+    const empty = buildSectionLoaders(deps({
+      isPartialPrefixes: () => true, fetchRadarPrefixes: async () => ({ prefixes: [], countries: [] }),
+    }));
+    assert.deepEqual(await empty.prefixes(1), { status: 'empty', data: null });
+  });
+
   it('Radar sections are disabled without a key', async () => {
     const loaders = buildSectionLoaders(deps({ hasRadarKey: () => false }));
     assert.deepEqual(await loaders.radar(1), { status: 'disabled', data: null });

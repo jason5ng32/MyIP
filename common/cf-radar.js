@@ -6,14 +6,15 @@
 // dispatches over this registry — adding Radar data means one view function
 // plus one registry row here, never a new route.
 //
-// A view may answer despite failed upstream calls (asn: some segments). It
-// then registers the payload via markPartial; the route's cache middleware
-// asks isCompleteRadarAnswer and serves such an answer without edge-caching
-// it. The payload itself is unchanged.
+// A view may answer despite failed upstream calls (asn: some segments) or
+// without a local dataset it reads (bgp-prefixes: MaxMind). It then
+// registers the payload via markPartial; the route's cache middleware asks
+// isCompleteRadarAnswer and serves such an answer without edge-caching it.
+// The payload itself is unchanged.
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { lookupCountryRange } from './maxmind-service.js';
+import { lookupCountryRange, isMaxMindReady } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
@@ -240,12 +241,16 @@ export const buildCountryShares = (prefixes, lookupRange) => {
         .filter((row) => row.share > 0);
 };
 
-const fetchBgpPrefixes = async ({ asn }) => {
+// `maxMindReady` is injectable for tests.
+const fetchBgpPrefixes = async ({ asn }, { maxMindReady = isMaxMindReady } = {}) => {
     const json = await fetchFromCloudflare(`/radar/bgp/routes/pfx2as?origin=${asn}`);
     // An ASN originating nothing is a valid, cacheable answer: both lists
     // empty. A malformed result throws (500 here, `error` in the profile).
     const prefixes = normalizePrefixOrigins(json?.result);
-    return { prefixes, countries: buildCountryShares(prefixes, lookupCountryRange) };
+    const body = { prefixes, countries: buildCountryShares(prefixes, lookupCountryRange) };
+    // Without MaxMind the countries are empty for lack of data, not of
+    // addresses: served, never cached.
+    return maxMindReady() ? body : markPartial(body);
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------

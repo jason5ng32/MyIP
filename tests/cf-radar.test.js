@@ -327,6 +327,15 @@ describe('loadAsnSummary / asn view', () => {
         assert.equal(isCompleteRadarAnswer({ ...partial }), true);
         assert.equal(isCompleteRadarAnswer(null), true);
     });
+
+    it('the bgp-prefixes view is partial without MaxMind, complete with it', async () => {
+        stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [{ prefix: '192.0.2.0/24' }] } } });
+        const missing = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => false });
+        assert.deepEqual(missing.prefixes.map((row) => row.prefix), ['192.0.2.0/24']);
+        assert.equal(isCompleteRadarAnswer(missing), false);
+        const ready = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => true });
+        assert.equal(isCompleteRadarAnswer(ready), true);
+    });
 });
 
 describe('normalizePrefixOrigins', () => {
