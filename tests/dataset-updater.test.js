@@ -132,7 +132,7 @@ describe('updateDataset', () => {
 
         const fresh = makeRow();
         await failSecondRename(() => assert.rejects(updateDataset(fresh.row), /disk full/));
-        assert.deepEqual(fs.readdirSync(fresh.row.dir), [], 'no half-published dataset');
+        assert.deepEqual(fs.readdirSync(fresh.row.dir), [STATE_FILE], 'no half-published dataset');
 
         const { row, log } = makeRow();
         await updateDataset(row);
@@ -140,11 +140,14 @@ describe('updateDataset', () => {
         await failSecondRename(() => assert.rejects(updateDataset(row), /disk full/));
         assert.equal(read(row, 'a.txt'), 'a.txt v1\n');
         assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
-        assert.equal(state(row).identifier, 'v1');
         assert.deepEqual(log.reloads, ['auto update']);
+        // The state still says "in flux": the next run re-fetches.
+        assert.equal(state(row).identifier, null);
+        assert.equal((await updateDataset(row)).updated, true);
+        assert.equal(read(row, 'b.txt'), 'b.txt v2\n');
     });
 
-    it('an abort between renames (lock lost mid-publish) rolls back too', async () => {
+    it('a lock lost between renames touches nothing more; the next holder republishes', async () => {
         const { row, log } = makeRow();
         await updateDataset(row);
         row.version = 'v2';
@@ -159,10 +162,32 @@ describe('updateDataset', () => {
         } finally {
             fsp.rename = realRename;
         }
-        assert.equal(read(row, 'a.txt'), 'a.txt v1\n', 'first rename rolled back');
+        // No rollback: another process may own these paths now.
+        assert.equal(read(row, 'a.txt'), 'a.txt v2\n');
         assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
-        assert.equal(state(row).identifier, 'v1');
         assert.deepEqual(log.reloads, ['auto update']);
+        // The state names no version, so the next holder takes nothing for
+        // current and publishes a whole set — not a 'not-modified' over a mix.
+        assert.equal(state(row).identifier, null);
+        assert.deepEqual(await updateDataset(row), { updated: true, identifier: 'v2' });
+        assert.equal(read(row, 'a.txt'), 'a.txt v2\n');
+        assert.equal(read(row, 'b.txt'), 'b.txt v2\n');
+    });
+
+    it('a run that dies mid-publish leaves a state the next run does not trust', async () => {
+        const { row } = makeRow();
+        await updateDataset(row);
+        row.version = 'v2';
+        row.validate = async () => {}; // stands in for "got as far as publishing"
+        const realCopy = fsp.copyFile;
+        fsp.copyFile = async () => { throw new Error('process killed'); };
+        try {
+            await assert.rejects(updateDataset(row), /process killed/);
+        } finally {
+            fsp.copyFile = realCopy;
+        }
+        assert.equal(state(row).identifier, null);
+        assert.equal((await updateDataset(row)).updated, true);
     });
 
     it('reads an earlier updater\'s state, so an upgrade does not re-download', async () => {

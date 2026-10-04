@@ -160,10 +160,13 @@ const acquireLock = async (row, { wait = false, signal } = {}) => {
 
 // Copy every staged file next to its target, then rename them all into
 // place. A failed rename rolls back the ones already done: the previous
-// file restored from its backup, or a target that didn't exist removed —
-// never a half-published dataset. `signal` (the lock lost) is checked
-// before every step, an abort taking the same rollback.
+// file restored from its backup, or a target that didn't exist removed.
+// `signal` (the lock lost) is checked before every step; once it fires,
+// another process may be publishing into the same paths, so this one
+// touches nothing more — no rollback, no cleanup — and leaves the half-done
+// set to the next holder (updateDataset marked the state in flux first).
 const publish = async (row, staged, signal) => {
+    const lockLost = () => Boolean(signal?.aborted);
     const plan = row.files.map((file) => {
         const target = path.join(row.dir, file);
         return { source: staged[file], target, next: `${target}.next`, backup: `${target}.bak`, existed: false, renamed: false };
@@ -186,16 +189,20 @@ const publish = async (row, staged, signal) => {
                 step.renamed = true;
             }
         } catch (error) {
-            for (const step of plan.filter((s) => s.renamed)) {
-                await (step.existed ? fsp.copyFile(step.backup, step.target) : fsp.rm(step.target, { force: true }))
-                    .catch(() => {});
+            if (!lockLost()) {
+                for (const step of plan.filter((s) => s.renamed)) {
+                    await (step.existed ? fsp.copyFile(step.backup, step.target) : fsp.rm(step.target, { force: true }))
+                        .catch(() => {});
+                }
             }
             throw error;
         }
     } finally {
-        for (const step of plan) {
-            await fsp.rm(step.next, { force: true });
-            await fsp.rm(step.backup, { force: true });
+        if (!lockLost()) {
+            for (const step of plan) {
+                await fsp.rm(step.next, { force: true });
+                await fsp.rm(step.backup, { force: true });
+            }
         }
     }
 };
@@ -229,9 +236,13 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         const missing = row.files.filter((file) => !staged[file]);
         if (missing.length) throw new Error(`${row.id} fetch produced no ${missing.join(', ')}`);
         await row.validate(staged);
+        // Files in flux: until the final state below, the record names no
+        // version, so a run that dies or loses the lock mid-publish leaves
+        // nothing the next holder would take for current — it re-fetches and
+        // publishes a whole set.
+        work.throwIfAborted();
+        await writeState(row, { ...state, identifier: null });
         await publish(row, staged, work);
-        // Lost after the last rename: the files are new but the state isn't,
-        // so the next run re-fetches rather than trusting a mixed record.
         work.throwIfAborted();
         await writeState(row, { identifier: remote.identifier, updatedAt: now, checkedAt: now });
         logger.info({ dataset: row.id, identifier: remote.identifier }, 'dataset updated');
