@@ -14,7 +14,8 @@
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
 import { relationshipCounts } from './as-relationships.js';
-import { lookupCountryCode } from './maxmind-service.js';
+import { isAsRelLoaded } from './as-rel-db.js';
+import { lookupCountryCode, isMaxMindReady } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
@@ -409,6 +410,9 @@ const fetchOutages = async () => {
 // guards: run by the dispatcher before fetch — each 400s invalid input and
 //         normalizes params in place, so cache keys stay canonical.
 // ttl:    edge-cache seconds, read by the /api/cfradar route middleware.
+// offlineData: readiness probes of the local datasets the payload reads;
+//         the route answers 503 while one is still downloading at boot
+//         (common/offline-data.js). Absent = no local data.
 // fetch:  async (req.query) => payload; throws on upstream failure.
 export const RADAR_VIEWS = {
     // The ASN data family (this, bgp-prefixes, /api/asn-profile) shares one
@@ -416,6 +420,7 @@ export const RADAR_VIEWS = {
     'asn': {
         guards: [requireValidASN()],
         ttl: 7 * 24 * 60 * 60,
+        offlineData: [isAsRelLoaded],
         fetch: fetchAsnProfile,
     },
     'country-traffic': {
@@ -431,6 +436,7 @@ export const RADAR_VIEWS = {
     'bgp-prefixes': {
         guards: [requireValidASN()],
         ttl: 7 * 24 * 60 * 60,
+        offlineData: [isMaxMindReady],
         fetch: fetchBgpPrefixes,
     },
 };

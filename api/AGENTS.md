@@ -114,6 +114,18 @@ coordinates keep the zone consistent with the city beside it; only the name
 ships — the frontend renders the offset, as a 24h-cached offset breaks at every
 DST switch. A new geo source adds the middleware.
 
+### Offline data gates boot, not the listener
+
+The backend listens before any missing offline dataset (MaxMind, CAIDA,
+PeeringDB) or the service-status snapshot is fetched; snapshots already on
+disk load first, so only a first boot waits on downloads. During that window
+`requireOfflineData([...probes])` (`common/offline-data.js`) answers 503 on a
+route whose data is still missing — never edge-cached — and is a no-op after
+boot, when a missing dataset means a failed download served degraded. A route
+reading local data declares its probes (`isMaxMindReady`, `isAsRelLoaded`, …)
+in `backend-server.js`; a Radar view declares `offlineData` in `RADAR_VIEWS`.
+`pnpm fetch-offline-data` downloads everything ahead of a first start.
+
 ### Private-API header pass-through (intentional exception)
 
 Handlers proxying our private IPCheck.ing API (`ipcheck-ing`,

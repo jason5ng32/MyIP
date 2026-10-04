@@ -2175,6 +2175,17 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "Improved the experience while the server is starting up",
+          "zh": "提升程序冷启动时的体验",
+          "zh-TW": "提升程式冷啟動時的體驗",
+          "fr": "Amélioration de l'expérience pendant le démarrage du serveur",
+          "ru": "Улучшена работа во время запуска сервера",
+          "pt-BR": "Melhorada a experiência durante a inicialização do servidor"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

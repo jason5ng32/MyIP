@@ -46,10 +46,18 @@ import { isCompleteProfile } from './common/asn-profile.js';
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
-import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
+import {
+    reloadMaxMindDatabases, startMaxMindFileWatcher, isMaxMindReady, getMaxMindDbPaths,
+} from './common/maxmind-service.js';
 import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
 import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
-import { bootstrapServiceStatus, startServiceStatusPolling } from './common/service-status-store.js';
+import { isAsRelLoaded } from './common/as-rel-db.js';
+import { isAsOrgLoaded } from './common/as-org-db.js';
+import { isPeeringdbLoaded } from './common/peeringdb-db.js';
+import { runOfflineBootstrap, requireOfflineData } from './common/offline-data.js';
+import {
+    bootstrapServiceStatus, startServiceStatusPolling, isServiceStatusPrimed,
+} from './common/service-status-store.js';
 import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
 dotenv.config({ quiet: true });
@@ -243,6 +251,12 @@ const cacheable = (maxAge, { cacheIf } = {}) => (req, res, next) => {
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
 
+// Readiness gates for routes reading local data (common/offline-data.js):
+// 503 while that data is still downloading at boot, a no-op afterwards.
+const needsMaxMind = requireOfflineData([isMaxMindReady]);
+const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
+const needsServiceStatus = requireOfflineData([isServiceStatusPrimed]);
+
 const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
 const ONE_DAY_CACHE = 24 * 60 * 60;
@@ -252,15 +266,15 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 
 // Cacheable routes — TTLs picked against each upstream's natural refresh cadence.
 // Short Cache
-app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
-app.get('/api/service-status/detail', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
+app.get('/api/service-status', needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
+app.get('/api/service-status/detail', requireValidProviderId(), needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
 // Cache for 1 day
 app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
 app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
 app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
 app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+app.get('/api/maxmind', requirePublicIP(), needsMaxMind, withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
 app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
@@ -276,18 +290,22 @@ app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesH
 // ASN Profile aggregate: every source in one answer. Only a complete answer
 // (no section in error or incomplete) is cached, so a degraded one is never
 // pinned for a week; reputation inside it is not per-user.
-app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
+app.get('/api/asn-profile', requireValidASN(),
+    requireOfflineData([isAsRelLoaded, isAsOrgLoaded, isPeeringdbLoaded, isMaxMindReady]),
+    cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
 // country traffic, 1h for the outage feed. A partial answer (some upstream
 // calls failed) is served but not cached.
-app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
+app.get('/api/cfradar',
+    requireOfflineData((req) => RADAR_VIEWS[req.query.view]?.offlineData),
+    cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
 app.get('/api/asn-history', requireValidPrefix(), cacheable(THIRTY_DAYS_CACHE), asnHistoryHandler);
-app.get('/api/asn-connectivity', requireValidASN(), cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
+app.get('/api/asn-connectivity', requireValidASN(), needsAsGraph, cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
 app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
@@ -337,27 +355,39 @@ if (process.env.SENTRY_DSN_BACKEND) {
 }
 
 
-// Bootstrap every offline dataset (MaxMind, CAIDA incl. the PeeringDB
-// mirror) before accepting traffic so we never serve mid-download. Each step
-// is non-fatal: a failure leaves the dependent API in a degraded state
-// (MaxMind → 503; CAIDA → empty graph, RIPEstat fallback or no peering
-// section) but doesn't block the listener.
-async function bootBackend() {
-    await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
-    await reloadMaxMindDatabases('startup').catch(() => {
-        logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
+// Boot sequence. Snapshots already on disk are in memory before the listener
+// opens (CAIDA / PeeringDB load at import, MaxMind just below), so a restart
+// serves at once. Missing ones download behind the listener: meanwhile only
+// the routes reading them answer 503 (requireOfflineData above). A failed
+// download stays non-fatal — that route then serves degraded (MaxMind → 503;
+// CAIDA → empty graph, RIPEstat fallback or no peering section).
+// `pnpm fetch-offline-data` fetches everything ahead of a first start.
+const bootBackend = async () => {
+    const { cityDbPath, asnDbPath } = getMaxMindDbPaths();
+    if (fs.existsSync(cityDbPath) && fs.existsSync(asnDbPath)) {
+        await reloadMaxMindDatabases('startup').catch(() => {});
+    }
+
+    app.listen(backEndPort, () => {
+        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
     });
-    await bootstrapCaidaIfMissing();
-    await bootstrapServiceStatus();
+
+    await runOfflineBootstrap([
+        async () => {
+            await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
+            if (isMaxMindReady()) return;
+            await reloadMaxMindDatabases('startup').catch(() => {
+                logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
+            });
+        },
+        bootstrapCaidaIfMissing,
+        bootstrapServiceStatus,
+    ]);
 
     startMaxMindFileWatcher();
     startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
     startCaidaAutoUpdate();
     startServiceStatusPolling();
-
-    app.listen(backEndPort, () => {
-        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
-    });
-}
+};
 
 bootBackend();

@@ -87,6 +87,9 @@ export function reloadAsOrgDatabase(reason = 'reload') {
     loadDatabase();
 }
 
+/** Whether a snapshot is loaded (false until the updater has fetched one). */
+export const isAsOrgLoaded = () => loadedFrom !== null;
+
 /** Org name for an ASN, or null when the snapshot doesn't have it. */
 export function lookupAsOrgName(asn) {
     return asnToOrgName.get(Number(asn)) || null;
