@@ -281,8 +281,8 @@ app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cac
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
 // country traffic, 1h for the outage feed. A partial answer (some upstream
-// calls failed, or MaxMind missing behind the prefix countries) is served
-// but not cached.
+// calls failed, or prefix countries MaxMind couldn't fully work out) is
+// served but not cached.
 app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,

@@ -126,8 +126,9 @@ export function startMaxMindFileWatcher() {
  * Bare ISO country code of an IP (null when unknown) plus the prefix length
  * of the MaxMind network holding it, so a caller can walk a range one network
  * at a time — the bgp-prefixes Radar view does, thousands of times per
- * request. No formatting, no 503 throw: null when the City database isn't
- * loaded.
+ * request. No formatting, no 503 throw: null when there is no answer — the
+ * City database isn't loaded, or the lookup failed — so the caller can tell
+ * it from an address MaxMind places in no country ({ country: null }).
  */
 export const lookupCountryRange = (ip) => {
     if (!cityLookup) return null;

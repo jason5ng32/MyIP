@@ -7,14 +7,15 @@
 // plus one registry row here, never a new route.
 //
 // A view may answer despite failed upstream calls (asn: some segments) or
-// without a local dataset it reads (bgp-prefixes: MaxMind). It then
+// with local lookups left undone (bgp-prefixes: countries MaxMind couldn't
+// answer). It then
 // registers the payload via markPartial; the route's cache middleware asks
 // isCompleteRadarAnswer and serves such an answer without edge-caching it.
 // The payload itself is unchanged.
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { lookupCountryRange, isMaxMindReady } from './maxmind-service.js';
+import { lookupCountryRange } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
@@ -188,7 +189,7 @@ export const normalizePrefixOrigins = (result) => {
 
 const GEO_TOP = 50;              // countries in the response
 const GEO_PREFIX_CAP = 20000;    // bound on prefixes considered per request
-const GEO_LOOKUP_BUDGET = 100000; // MaxMind lookups per request (~0.3 s)
+const GEO_LOOKUP_BUDGET = 100000; // hard cap on MaxMind lookups per request (~0.3 s)
 
 // Share of the ASN's announced IPv4 addresses per geolocated country, largest
 // first. v4-only and address-weighted (a /16 counts 256× a /24); prefixes
@@ -196,8 +197,12 @@ const GEO_LOOKUP_BUDGET = 100000; // MaxMind lookups per request (~0.3 s)
 // its more-specifics isn't counted twice. Each prefix is walked one MaxMind
 // network at a time, so one spanning several countries is split among them.
 // Shares are of the addresses that resolved to a country.
-// `lookupRange(ip) → { country, prefixLength } | null` (null = no database)
-// is injected so tests need no MaxMind database. Exported for tests.
+// `lookupRange(ip) → { country, prefixLength } | null` is injected so tests
+// need no MaxMind database; null = no answer (no database, or the lookup
+// failed), unlike an address MaxMind places nowhere ({ country: null }).
+// Resolves { shares, complete }: complete is false when a null answer ended
+// the walk (shares: []) or the budget did (shares over the addresses walked
+// so far) — either way the caller must not cache it. Exported for tests.
 export const buildCountryShares = (prefixes, lookupRange) => {
     const blocks = (prefixes || [])
         .map((row) => parseCidr(row?.prefix))
@@ -210,21 +215,25 @@ export const buildCountryShares = (prefixes, lookupRange) => {
     let total = 0;
     let coveredUntil = -1n;
     let budget = GEO_LOOKUP_BUDGET;
-    for (const { start, size } of blocks) {
+    let complete = true;
+    walk: for (const { start, size } of blocks) {
         // CIDR blocks nest or are disjoint: starting inside the last kept
         // block means being inside it.
         if (start <= coveredUntil) continue;
         coveredUntil = start + size - 1n;
         // IPv4 fits a Number. Each lookup answers for the aligned network
-        // holding the cursor; past the budget, a block's remainder goes to
-        // its next address's country.
+        // holding the cursor.
         const stop = Number(start + size);
         let cursor = Number(start);
         while (cursor < stop) {
+            if (budget-- <= 0) {
+                complete = false;
+                break walk;
+            }
             const hit = lookupRange(formatIPv4(BigInt(cursor)));
-            if (!hit) return [];
+            if (!hit) return { shares: [], complete: false };
             const networkSize = 2 ** (32 - hit.prefixLength);
-            const next = --budget > 0 ? (Math.floor(cursor / networkSize) + 1) * networkSize : stop;
+            const next = (Math.floor(cursor / networkSize) + 1) * networkSize;
             const weight = Math.min(next, stop) - cursor;
             if (hit.country) {
                 weightByCountry.set(hit.country, (weightByCountry.get(hit.country) || 0) + weight);
@@ -233,24 +242,27 @@ export const buildCountryShares = (prefixes, lookupRange) => {
             cursor = next;
         }
     }
-    if (!total) return [];
-    return [...weightByCountry.entries()]
+    if (!total) return { shares: [], complete };
+    const shares = [...weightByCountry.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, GEO_TOP)
         .map(([country, weight]) => ({ country, share: Math.round((weight / total) * 10000) / 10000 }))
         .filter((row) => row.share > 0);
+    return { shares, complete };
 };
 
-// `maxMindReady` is injectable for tests.
-const fetchBgpPrefixes = async ({ asn }, { maxMindReady = isMaxMindReady } = {}) => {
+// `lookupRange` is injectable for tests.
+const fetchBgpPrefixes = async ({ asn }, { lookupRange = lookupCountryRange } = {}) => {
     const json = await fetchFromCloudflare(`/radar/bgp/routes/pfx2as?origin=${asn}`);
     // An ASN originating nothing is a valid, cacheable answer: both lists
     // empty. A malformed result throws (500 here, `error` in the profile).
     const prefixes = normalizePrefixOrigins(json?.result);
-    const body = { prefixes, countries: buildCountryShares(prefixes, lookupCountryRange) };
-    // Without MaxMind the countries are empty for lack of data, not of
-    // addresses: served, never cached.
-    return maxMindReady() ? body : markPartial(body);
+    const { shares, complete } = buildCountryShares(prefixes, lookupRange);
+    // Countries MaxMind couldn't fully work out (no database, a failed
+    // lookup, the budget) are served, never cached. No IPv4 prefixes means
+    // no lookups: complete, and cacheable.
+    const body = { prefixes, countries: shares };
+    return complete ? body : markPartial(body);
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------

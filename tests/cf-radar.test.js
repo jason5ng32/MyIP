@@ -328,13 +328,23 @@ describe('loadAsnSummary / asn view', () => {
         assert.equal(isCompleteRadarAnswer(null), true);
     });
 
-    it('the bgp-prefixes view is partial without MaxMind, complete with it', async () => {
+    it('the bgp-prefixes view is partial when MaxMind could not answer, complete when it did', async () => {
         stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [{ prefix: '192.0.2.0/24' }] } } });
-        const missing = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => false });
+        const missing = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { lookupRange: () => null });
         assert.deepEqual(missing.prefixes.map((row) => row.prefix), ['192.0.2.0/24']);
+        assert.deepEqual(missing.countries, []);
         assert.equal(isCompleteRadarAnswer(missing), false);
-        const ready = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { maxMindReady: () => true });
+        const ready = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' },
+            { lookupRange: () => ({ country: 'US', prefixLength: 24 }) });
+        assert.deepEqual(ready.countries, [{ country: 'US', share: 1 }]);
         assert.equal(isCompleteRadarAnswer(ready), true);
+    });
+
+    it('the bgp-prefixes view caches an AS with no prefixes even without MaxMind', async () => {
+        stubRadar({ '/radar/bgp/routes/pfx2as': { result: { prefix_origins: [] } } });
+        const empty = await RADAR_VIEWS['bgp-prefixes'].fetch({ asn: '64500' }, { lookupRange: () => null });
+        assert.deepEqual(empty, { prefixes: [], countries: [] });
+        assert.equal(isCompleteRadarAnswer(empty), true);
     });
 });
 
@@ -383,10 +393,16 @@ describe('buildCountryShares', () => {
     };
     const lookup = rangeLookup({ '8.8.8.0/24': 'US', '8.8.4.0/24': 'US', '1.0.0.0/22': 'AU', '81.0.0.0/22': 'DE' });
     const rows = (...prefixes) => prefixes.map((prefix) => ({ prefix }));
+    // Shares of a walk that must have completed.
+    const shares = (prefixes, lookupRange) => {
+        const result = buildCountryShares(prefixes, lookupRange);
+        assert.equal(result.complete, true);
+        return result.shares;
+    };
 
     it('weights countries by address count, not prefix count', () => {
         // Two US /24s vs one AU /22 → AU holds twice the addresses.
-        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
+        assert.deepEqual(shares(rows('8.8.8.0/24', '8.8.4.0/24', '1.0.0.0/22'), lookup), [
             { country: 'AU', share: 0.6667 },
             { country: 'US', share: 0.3333 },
         ]);
@@ -395,27 +411,36 @@ describe('buildCountryShares', () => {
     it('splits a prefix spanning several MaxMind networks among their countries', () => {
         // One /15: its first /16 in SG, the second in US — not all SG.
         const split = rangeLookup({ '3.0.0.0/16': 'SG', '3.1.0.0/16': 'US' });
-        assert.deepEqual(buildCountryShares(rows('3.0.0.0/15'), split), [
+        assert.deepEqual(shares(rows('3.0.0.0/15'), split), [
             { country: 'SG', share: 0.5 },
             { country: 'US', share: 0.5 },
         ]);
         // A network wider than the prefix answers for the whole prefix in one lookup.
         let calls = 0;
-        const wide = (ip) => { calls++; return { country: 'US', prefixLength: 8 }; };
-        assert.deepEqual(buildCountryShares(rows('52.4.0.0/14'), wide), [{ country: 'US', share: 1 }]);
+        const wide = () => { calls++; return { country: 'US', prefixLength: 8 }; };
+        assert.deepEqual(shares(rows('52.4.0.0/14'), wide), [{ country: 'US', share: 1 }]);
         assert.equal(calls, 1);
     });
 
-    it('past the lookup budget gives a block\'s remainder to its next address', () => {
-        // Every address its own /32: a /14 needs 262144 lookups, over budget.
+    it('stops at the lookup budget, across blocks, and reports the walk incomplete', () => {
+        // Every address its own /32: a /14 alone needs 262144 lookups.
         let calls = 0;
-        const perAddress = (ip) => { calls++; return { country: 'US', prefixLength: 32 }; };
-        assert.deepEqual(buildCountryShares(rows('10.0.0.0/14'), perAddress), [{ country: 'US', share: 1 }]);
-        assert.equal(calls, 100000);
+        const perAddress = () => { calls++; return { country: 'US', prefixLength: 32 }; };
+        const result = buildCountryShares(rows('10.0.0.0/14', '192.0.2.0/24'), perAddress);
+        assert.equal(calls, 100000, 'the cap holds; the later block is not looked up');
+        assert.equal(result.complete, false);
+        assert.deepEqual(result.shares, [{ country: 'US', share: 1 }]);
+    });
+
+    it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24'), () => null), { shares: [], complete: false });
+        let calls = 0;
+        const failsSecond = () => (++calls === 1 ? { country: 'US', prefixLength: 24 } : null);
+        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '8.8.9.0/24'), failsSecond), { shares: [], complete: false });
     });
 
     it('sorts largest first and ignores IPv6 prefixes', () => {
-        assert.deepEqual(buildCountryShares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
+        assert.deepEqual(shares(rows('2606:4700::/32', '8.8.8.0/24', '81.0.0.0/22'), lookup), [
             { country: 'DE', share: 0.8 },
             { country: 'US', share: 0.2 },
         ]);
@@ -424,29 +449,29 @@ describe('buildCountryShares', () => {
     it('skips more-specifics of a covering announced prefix', () => {
         // 1.0.0.0/23 covers 1.0.0.0/24 and 1.0.1.0/24 — counted once, so the
         // US /24 pair still balances it.
-        const shares = buildCountryShares(
-            rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
-        assert.deepEqual(shares.map((row) => row.share), [0.5, 0.5]);
-        assert.deepEqual(shares.map((row) => row.country).sort(), ['AU', 'US']);
+        const result = shares(rows('1.0.0.0/24', '1.0.1.0/24', '1.0.0.0/23', '8.8.8.0/24', '8.8.4.0/24'), lookup);
+        assert.deepEqual(result.map((row) => row.share), [0.5, 0.5]);
+        assert.deepEqual(result.map((row) => row.country).sort(), ['AU', 'US']);
     });
 
     it('leaves unresolvable addresses out of the denominator', () => {
-        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
+        assert.deepEqual(shares(rows('8.8.8.0/24', '9.9.9.0/24'), lookup), [
             { country: 'US', share: 1 },
         ]);
     });
 
-    it('returns [] with no IPv4 prefixes, no resolvable country, junk rows, or no database', () => {
-        assert.deepEqual(buildCountryShares([], lookup), []);
-        assert.deepEqual(buildCountryShares(undefined, lookup), []);
-        assert.deepEqual(buildCountryShares(rows('9.9.9.0/24', '2606:4700::/32'), lookup), []);
-        assert.deepEqual(buildCountryShares([{ prefix: 'nope' }, null, {}], lookup), []);
-        assert.deepEqual(buildCountryShares(rows('8.8.8.0/24'), () => null), []);
+    it('is complete and empty with no IPv4 prefixes, no resolvable country, or junk rows', () => {
+        const noLookups = () => { throw new Error('no lookup expected'); };
+        assert.deepEqual(shares([], noLookups), []);
+        assert.deepEqual(shares(undefined, noLookups), []);
+        assert.deepEqual(shares(rows('2606:4700::/32'), noLookups), []);
+        assert.deepEqual(shares([{ prefix: 'nope' }, null, {}], noLookups), []);
+        assert.deepEqual(shares(rows('9.9.9.0/24'), lookup), []);
     });
 
     it('caps the response at 50 countries', () => {
         const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
-        const shares = buildCountryShares(many, (ip) => ({ country: `C${ip.split('.')[1]}`, prefixLength: 16 }));
-        assert.equal(shares.length, 50);
+        const result = shares(many, (ip) => ({ country: `C${ip.split('.')[1]}`, prefixLength: 16 }));
+        assert.equal(result.length, 50);
     });
 });
