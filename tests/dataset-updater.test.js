@@ -15,7 +15,7 @@ import lockfile from 'proper-lockfile';
 import {
     STATE_FILE, LOCK_FILE, updateDataset, bootstrapDataset, readState, isPresent,
     isAutoUpdateEnabled, startDatasetScheduler, DEFAULT_UPDATE_CRON, rowsMissingACheck, watchDatasets,
-    updateDatasets, downloadToFile,
+    updateDatasets, downloadToFile, monitorConfigFor,
 } from '../common/dataset-updater.js';
 import logger from '../common/logger.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
@@ -299,6 +299,16 @@ describe('startDatasetScheduler', () => {
         } finally {
             job.stop();
         }
+    });
+});
+
+describe('monitorConfigFor', () => {
+    it('allows every scheduled row its full timeout, plus a margin', () => {
+        const config = monitorConfigFor('30 4 * * *', 4, 'Asia/Singapore');
+        assert.equal(config.maxRuntime, 4 * 30 + 10);
+        assert.deepEqual(config.schedule, { type: 'crontab', value: '30 4 * * *' });
+        assert.equal(config.timezone, 'Asia/Singapore');
+        assert.equal(monitorConfigFor('30 4 * * *', 1).maxRuntime, 40);
     });
 });
 

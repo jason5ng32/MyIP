@@ -341,6 +341,18 @@ export const rowsMissingACheck = async (rows, { pattern, now = new Date() }) => 
     return stale;
 };
 
+/**
+ * Sentry Crons settings for a run updating `rowCount` datasets in turn: its
+ * longest legitimate run is every row at its timeout, plus a margin, so a
+ * healthy run is never marked failed. Exported for tests.
+ */
+export const monitorConfigFor = (pattern, rowCount, timezone) => ({
+    schedule: { type: 'crontab', value: pattern },
+    timezone,
+    checkinMargin: 60,
+    maxRuntime: Math.ceil((rowCount * UPDATE_TIMEOUT_MS) / 60000) + 10,
+});
+
 let scheduler = null;
 
 /**
@@ -360,7 +372,7 @@ export const startDatasetScheduler = (rows) => {
     scheduler = new Cron(pattern, { protect: true, unref: true }, () => withCronMonitor(
         'dataset-update',
         () => updateDatasets(scheduled),
-        { schedule: { type: 'crontab', value: pattern }, timezone, checkinMargin: 60, maxRuntime: 60 },
+        monitorConfigFor(pattern, scheduled.length, timezone),
     ).catch((error) => logger.error({ err: error }, 'dataset update run failed')));
     const next = scheduler.nextRun()?.toLocaleString('en-US', { hour12: false });
     logger.info(`🗓️  Dataset auto update: ${scheduled.map((row) => row.id).join(', ')} at cron ${pattern} (next ${next})`);
