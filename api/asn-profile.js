@@ -12,10 +12,21 @@ import { rdapAutnum, isAutnumMissing } from '../common/rdap.js';
 import { queryAsRank } from '../common/asrank.js';
 import { requestAsnReputation } from '../common/asn-reputation.js';
 import { isPeeringdbLoaded, lookupPeeringdb } from '../common/peeringdb-db.js';
+import { isAsRelLoaded } from '../common/as-rel-db.js';
+import { isAsOrgLoaded } from '../common/as-org-db.js';
+import { isStillLoading } from '../common/offline-data.js';
 import {
     SOURCE_TIMEOUTS, buildSectionLoaders, composeAsnProfile, allSourcesFailed,
 } from '../common/asn-profile.js';
 import { getAsnConnectivity } from './asn-connectivity.js';
+
+// A section whose local dataset is still downloading at boot fails (status
+// 'error'): left out of the answer and keeping it uncached, while every
+// other section answers as usual.
+const unlessLoading = (checks, label, fn) => (...args) => {
+    if (isStillLoading(...checks)) throw new Error(`${label} still loading`);
+    return fn(...args);
+};
 
 export default async (req, res) => {
     const asn = Number(req.query.asn);
@@ -25,13 +36,15 @@ export default async (req, res) => {
         fetchRadarAsn: (n) => loadAsnSummary(String(n)),
         fetchRadarPrefixes: (n) => RADAR_VIEWS['bgp-prefixes'].fetch({ asn: String(n) }),
         isPartialPrefixes: (body) => !isCompleteRadarAnswer(body),
-        getConnectivity: getAsnConnectivity,
+        getConnectivity: unlessLoading([isAsRelLoaded, isAsOrgLoaded], 'CAIDA snapshot', getAsnConnectivity),
         rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,
         queryAsRank: (n) => queryAsRank(n, { timeoutMs: SOURCE_TIMEOUTS.rank }),
         // Private-API pass-through: the caller's headers go upstream.
         requestReputation: (n) => requestAsnReputation(n, req.headers, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
-        isPeeringdbLoaded,
+        // The index only downloads with the Cloudflare key; without it the
+        // section is 'disabled', never loading.
+        isPeeringdbLoaded: unlessLoading([() => !hasRadarApiKey() || isPeeringdbLoaded()], 'PeeringDB index', isPeeringdbLoaded),
         lookupPeeringdb,
     });
     const body = await composeAsnProfile(asn, loaders);
