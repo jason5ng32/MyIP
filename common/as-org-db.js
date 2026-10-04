@@ -72,6 +72,13 @@ function loadDatabase() {
         const text = fs.readFileSync(filePath, 'utf8');
         asnToOrgName.clear();
         parsePipeText(text);
+        // The parser skips what it can't read, so a corrupt file parses to
+        // nothing rather than throwing: that is not a loaded snapshot.
+        if (asnToOrgName.size === 0) {
+            loadedFrom = null;
+            logger.warn({ path: filePath }, '⚠️  CAIDA as2org snapshot holds no ASNs; treating it as missing');
+            return;
+        }
         loadedFrom = path.basename(filePath);
         logger.info(`📦 CAIDA as2org loaded (${loadedFrom}) — ${asnToOrgName.size} ASNs in ${Date.now() - start}ms`);
     } catch (error) {

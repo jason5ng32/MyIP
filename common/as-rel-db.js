@@ -114,6 +114,13 @@ function loadDatabase() {
         customerCount.clear();
         parsePipeText(text);
         rebuildTier1Set();
+        // A corrupt file parses to nothing rather than throwing: that is not
+        // a loaded snapshot.
+        if (providersIndex.size === 0 && peersIndex.size === 0) {
+            loadedFrom = null;
+            logger.warn({ path: filePath }, '⚠️  CAIDA as-rel snapshot holds no relationships; treating it as missing');
+            return;
+        }
         loadedFrom = path.basename(filePath);
         logger.info(`📦 CAIDA as-rel loaded (${loadedFrom}) — ${providersIndex.size} customers, ${customerCount.size} providers, ${peersIndex.size} peering ASes, ${tier1Set.size} Tier 1s in ${Date.now() - start}ms`);
     } catch (error) {

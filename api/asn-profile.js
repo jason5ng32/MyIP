@@ -20,12 +20,27 @@ import {
 } from '../common/asn-profile.js';
 import { getAsnConnectivity } from './asn-connectivity.js';
 
-// A section whose local dataset is still downloading at boot fails (status
-// 'error'): left out of the answer and keeping it uncached, while every
-// other section answers as usual.
-const unlessLoading = (checks, label, fn) => (...args) => {
-    if (isStillLoading(...checks)) throw new Error(`${label} still loading`);
-    return fn(...args);
+// A section whose local data isn't there fails (status 'error'): left out
+// of the answer and keeping it uncached, while every other section answers
+// as usual — never an 'empty' / 'disabled' that would be cached for a week.
+
+// Connectivity needs the as-rel snapshot (without it every graph is empty);
+// as2org only names the nodes, RIPEstat covers a failed download, so it
+// counts only while still downloading. Exported for tests.
+export const connectivityReadiness = ({ relLoaded = isAsRelLoaded, orgLoaded = isAsOrgLoaded, fetch = getAsnConnectivity } = {}) =>
+    (...args) => {
+        if (!relLoaded()) throw new Error('CAIDA as-rel snapshot not loaded');
+        if (isStillLoading(orgLoaded)) throw new Error('CAIDA as2org snapshot still loading');
+        return fetch(...args);
+    };
+
+// PeeringDB is 'disabled' only where it isn't configured (no Cloudflare key,
+// so never downloaded). Configured but not loaded — still downloading, or
+// the download failed — is an error. Exported for tests.
+export const peeringdbReadiness = ({ configured = hasRadarApiKey, loaded = isPeeringdbLoaded } = {}) => () => {
+    if (!configured()) return false;
+    if (!loaded()) throw new Error('PeeringDB index not loaded');
+    return true;
 };
 
 export default async (req, res) => {
@@ -36,15 +51,13 @@ export default async (req, res) => {
         fetchRadarAsn: (n) => loadAsnSummary(String(n)),
         fetchRadarPrefixes: (n) => RADAR_VIEWS['bgp-prefixes'].fetch({ asn: String(n) }),
         isPartialPrefixes: (body) => !isCompleteRadarAnswer(body),
-        getConnectivity: unlessLoading([isAsRelLoaded, isAsOrgLoaded], 'CAIDA snapshot', getAsnConnectivity),
+        getConnectivity: connectivityReadiness(),
         rdapAutnum: (n) => rdapAutnum(n, { timeoutMs: SOURCE_TIMEOUTS.autnum }),
         isAutnumMissing,
         queryAsRank: (n) => queryAsRank(n, { timeoutMs: SOURCE_TIMEOUTS.rank }),
         // Private-API pass-through: the caller's headers go upstream.
         requestReputation: (n) => requestAsnReputation(n, req.headers, { timeoutMs: SOURCE_TIMEOUTS.reputation }),
-        // The index only downloads with the Cloudflare key; without it the
-        // section is 'disabled', never loading.
-        isPeeringdbLoaded: unlessLoading([() => !hasRadarApiKey() || isPeeringdbLoaded()], 'PeeringDB index', isPeeringdbLoaded),
+        isPeeringdbLoaded: peeringdbReadiness(),
         lookupPeeringdb,
     });
     const body = await composeAsnProfile(asn, loaders);
