@@ -125,7 +125,7 @@ pnpm start
 docker run -d -p 18966:18966 \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
-  -e MAXMIND_AUTO_UPDATE="true" \
+  -e DATASET_AUTO_UPDATE="true" \
   -e ALLOWED_DOMAINS="your-domain.com" \
   --name myip --restart always \
   jason5ng32/myip:latest
