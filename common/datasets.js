@@ -22,8 +22,8 @@ import maxmind from 'maxmind';
 import logger from './logger.js';
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { downloadToFile, decompressFile } from './dataset-updater.js';
-import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase } from './as-org-db.js';
-import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase } from './as-rel-db.js';
+import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase, hasAsOrgSnapshot } from './as-org-db.js';
+import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase, hasAsRelSnapshot } from './as-rel-db.js';
 import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDatabase } from './peeringdb-db.js';
 import { distillPeeringdbDump } from './peeringdb-distill.js';
 import { hasRadarApiKey } from './cf-radar.js';
@@ -201,6 +201,8 @@ export const datasets = [
         id: 'as2org',
         dir: AS_ORG_DB_DIR,
         files: [AS_ORG_FILE],
+        // The reader takes the newest *.txt, whatever its name.
+        hasSnapshot: hasAsOrgSnapshot,
         legacyState: CAIDA_LEGACY_STATE,
         legacyAutoUpdateEnv: 'CAIDA_AUTO_UPDATE',
         // Stable 'latest' symlink server-side → HEAD + Last-Modified is enough
@@ -219,6 +221,8 @@ export const datasets = [
         id: 'as-rel',
         dir: AS_REL_DB_DIR,
         files: [AS_REL_FILE],
+        // The reader takes the newest *.txt, whatever its name.
+        hasSnapshot: hasAsRelSnapshot,
         legacyState: CAIDA_LEGACY_STATE,
         legacyAutoUpdateEnv: 'CAIDA_AUTO_UPDATE',
         // No 'latest' symlink — scrape the directory listing; YYYYMMDD

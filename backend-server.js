@@ -367,6 +367,11 @@ const bootBackend = async () => {
         logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
     });
 
+    // Watching from before the downloads: a dataset another process
+    // publishes (or someone places by hand) while a boot step is still
+    // running is reloaded, not taken as the watcher's baseline.
+    watchDatasets(datasets);
+
     await runOfflineBootstrap([
         async () => {
             await bootstrapDatasets(datasets);
@@ -379,7 +384,6 @@ const bootBackend = async () => {
         bootstrapServiceStatus,
     ]);
 
-    watchDatasets(datasets);
     startDatasetScheduler(datasets);
     startServiceStatusPolling();
 };

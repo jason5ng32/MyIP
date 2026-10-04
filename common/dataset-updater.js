@@ -26,6 +26,10 @@
 //                     name in `files`
 //   validate(staged)  throws to refuse a truncated or corrupt download
 //   reload(reason)    swaps the in-memory copy for the published files
+//   hasSnapshot()     optional; whether the reader already has a snapshot
+//                     to serve, when it accepts more than the published file
+//                     names (a hand-named CAIDA file) — the boot download
+//                     then skips. Default: every published file is present
 //   legacyState       optional { file, toState(json) → { identifier, updatedAt } }:
 //                     the state file an earlier updater wrote, read once so
 //                     an upgrade doesn't re-download
@@ -88,6 +92,9 @@ export const isRowEnabled = (row) => !row.enabled || Boolean(row.enabled());
 
 /** Whether every file the row publishes is on disk. */
 export const isPresent = (row) => row.files.every((file) => fs.existsSync(path.join(row.dir, file)));
+
+// Whether the boot download can skip the row: its reader has something.
+const hasSnapshot = (row) => (row.hasSnapshot ? row.hasSnapshot() : isPresent(row));
 
 /** The row's state, falling back to an earlier updater's state file; {} when neither exists. */
 export const readState = async (row) => {
@@ -262,7 +269,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
  */
 export const bootstrapDataset = async (row, { timeoutMs = BOOTSTRAP_TIMEOUT_MS } = {}) => {
     if (!isRowEnabled(row)) return { status: 'disabled' };
-    if (isPresent(row)) return { status: 'present' };
+    if (hasSnapshot(row)) return { status: 'present' };
 
     const minutes = Math.round(timeoutMs / 60000);
     logger.warn(`📥 Dataset ${row.id} missing; downloading (timeout ${minutes} min)...`);

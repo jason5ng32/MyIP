@@ -162,6 +162,9 @@ export function customerCountOf(asn) {
 /** Whether a snapshot is loaded (false until the updater has fetched one). */
 export const isAsRelLoaded = () => loadedFrom !== null;
 
+/** Whether a snapshot file is on disk under any name this reader accepts. */
+export const hasAsRelSnapshot = () => findSnapshot() !== null;
+
 /** Whether this ASN is in the CAIDA-derived Tier 1 set. */
 export function isTier1(asn) {
     return tier1Set.has(Number(asn));

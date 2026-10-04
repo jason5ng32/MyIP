@@ -205,6 +205,12 @@ describe('CAIDA rows', () => {
         assert.deepEqual(requested, []);
     });
 
+    it('count a hand-named *.txt as a snapshot at boot, as their readers do', async () => {
+        for (const id of ['as2org', 'as-rel']) {
+            assert.equal(typeof row(id).hasSnapshot, 'function', id);
+        }
+    });
+
     it('keep the pre-engine CAIDA_AUTO_UPDATE as their legacy schedule flag', () => {
         for (const id of ['as2org', 'as-rel', 'peeringdb']) {
             assert.equal(row(id).legacyAutoUpdateEnv, 'CAIDA_AUTO_UPDATE', id);

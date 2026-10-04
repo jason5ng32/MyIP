@@ -225,6 +225,12 @@ describe('bootstrapDataset', () => {
         assert.equal(log.fetches, 1);
     });
 
+    it('trusts a row\'s own snapshot probe (a reader that accepts other file names)', async () => {
+        const { row, log } = makeRow({ hasSnapshot: () => true });
+        assert.equal((await bootstrapDataset(row)).status, 'present');
+        assert.equal(log.fetches, 0, 'the published names are absent, the reader has a snapshot');
+    });
+
     it('downloads a missing dataset and reloads it as a bootstrap', async () => {
         const { row, log } = makeRow();
         assert.equal((await bootstrapDataset(row)).status, 'downloaded');
