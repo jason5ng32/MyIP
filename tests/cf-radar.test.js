@@ -422,14 +422,14 @@ describe('buildCountryShares', () => {
         assert.equal(calls, 1);
     });
 
-    it('stops at the lookup budget, across blocks, and reports the walk incomplete', () => {
+    it('stops at the lookup budget, across blocks, with no shares and the walk incomplete', () => {
         // Every address its own /32: a /14 alone needs 262144 lookups.
         let calls = 0;
         const perAddress = () => { calls++; return { country: 'US', prefixLength: 32 }; };
         const result = buildCountryShares(rows('10.0.0.0/14', '192.0.2.0/24'), perAddress);
         assert.equal(calls, 100000, 'the cap holds; the later block is not looked up');
-        assert.equal(result.complete, false);
-        assert.deepEqual(result.shares, [{ country: 'US', share: 1 }]);
+        // A part-walked space would pass for the whole distribution.
+        assert.deepEqual(result, { shares: [], complete: false });
     });
 
     it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {

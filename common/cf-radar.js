@@ -200,9 +200,10 @@ const GEO_LOOKUP_BUDGET = 100000; // hard cap on MaxMind lookups per request (~0
 // `lookupRange(ip) → { country, prefixLength } | null` is injected so tests
 // need no MaxMind database; null = no answer (no database, or the lookup
 // failed), unlike an address MaxMind places nowhere ({ country: null }).
-// Resolves { shares, complete }: complete is false when a null answer ended
-// the walk (shares: []) or the budget did (shares over the addresses walked
-// so far) — either way the caller must not cache it. Exported for tests.
+// Resolves { shares, complete }: a null answer or the budget ending the walk
+// gives { shares: [], complete: false } — shares over part of the space
+// would read as the whole distribution — and the caller must not cache it.
+// Exported for tests.
 export const buildCountryShares = (prefixes, lookupRange) => {
     const blocks = (prefixes || [])
         .map((row) => parseCidr(row?.prefix))
@@ -215,8 +216,7 @@ export const buildCountryShares = (prefixes, lookupRange) => {
     let total = 0;
     let coveredUntil = -1n;
     let budget = GEO_LOOKUP_BUDGET;
-    let complete = true;
-    walk: for (const { start, size } of blocks) {
+    for (const { start, size } of blocks) {
         // CIDR blocks nest or are disjoint: starting inside the last kept
         // block means being inside it.
         if (start <= coveredUntil) continue;
@@ -226,10 +226,7 @@ export const buildCountryShares = (prefixes, lookupRange) => {
         const stop = Number(start + size);
         let cursor = Number(start);
         while (cursor < stop) {
-            if (budget-- <= 0) {
-                complete = false;
-                break walk;
-            }
+            if (budget-- <= 0) return { shares: [], complete: false };
             const hit = lookupRange(formatIPv4(BigInt(cursor)));
             if (!hit) return { shares: [], complete: false };
             const networkSize = 2 ** (32 - hit.prefixLength);
@@ -242,13 +239,13 @@ export const buildCountryShares = (prefixes, lookupRange) => {
             cursor = next;
         }
     }
-    if (!total) return { shares: [], complete };
+    if (!total) return { shares: [], complete: true };
     const shares = [...weightByCountry.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, GEO_TOP)
         .map(([country, weight]) => ({ country, share: Math.round((weight / total) * 10000) / 10000 }))
         .filter((row) => row.share > 0);
-    return { shares, complete };
+    return { shares, complete: true };
 };
 
 // `lookupRange` is injectable for tests.
