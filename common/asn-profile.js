@@ -82,13 +82,11 @@ export const hasMeaningfulField = (body) => Object.values(body || {}).some((valu
 
 // -- per-section classification of a source's answer ------------------------
 
-// `answer` is loadAsnSummary's (common/cf-radar.js). Only the Radar-originated
-// fields decide ok vs empty — the local CAIDA relationship counts in
-// `summary` say nothing about Radar knowing the AS. With failed segments,
+// `answer` is loadAsnSummary's (common/cf-radar.js). With failed segments,
 // data is ok but incomplete; no data is an error, as the missing segments
 // may have held it.
-export const classifyRadar = ({ summary, radarFields, failedSegments = [] } = {}) => {
-    if (hasMeaningfulField(radarFields)) {
+export const classifyRadar = ({ summary, failedSegments = [] } = {}) => {
+    if (hasMeaningfulField(summary)) {
         return failedSegments.length > 0 ? { ...result('ok', summary), incomplete: true } : result('ok', summary);
     }
     if (failedSegments.length > 0) throw new Error(`Radar segments failed: ${failedSegments.join(', ')}`);

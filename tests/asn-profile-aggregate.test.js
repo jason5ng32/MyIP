@@ -14,10 +14,8 @@ import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/asn-profile-view.js';
 
 const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
-// loadAsnSummary's shape: Radar fields, plus local CAIDA counts in `summary`.
-const radarAnswer = (radarFields, { local = {}, failed = [] } = {}) => ({
-  summary: { ...radarFields, ...local }, radarFields, failedSegments: failed,
-});
+// loadAsnSummary's shape.
+const radarAnswer = (summary, { failed = [] } = {}) => ({ summary, failedSegments: failed });
 
 describe('deadlines', () => {
   it('every deadline sits above the inner timeouts of the source it wraps', () => {
@@ -46,14 +44,6 @@ describe('classification', () => {
     assert.equal(hasMeaningfulField({ prefixesV4: '2,346' }), true);
     assert.deepEqual(classifyRadar(radarAnswer({})), { status: 'empty', data: null });
     assert.deepEqual(classifyRadar(radarAnswer({ asnName: 'X' })), { status: 'ok', data: { asnName: 'X' } });
-  });
-
-  it('radar: local CAIDA relationship counts alone are not Radar data', () => {
-    const local = { upstreamCount: '3', downstreamCount: '12', peerCount: '40' };
-    assert.deepEqual(classifyRadar(radarAnswer({ prefixesV4: '0' }, { local })), { status: 'empty', data: null });
-    // With Radar data, the section carries the whole summary, counts included.
-    assert.deepEqual(classifyRadar(radarAnswer({ asnName: 'X' }, { local })),
-      { status: 'ok', data: { asnName: 'X', ...local } });
   });
 
   it('radar: failed segments make data incomplete, and no data an error', () => {
@@ -165,7 +155,7 @@ describe('composeAsnProfile', () => {
 
   it('a partial Radar answer without data is an error, never a cacheable empty', async () => {
     const loaders = buildSectionLoaders(deps({
-      fetchRadarAsn: async () => radarAnswer({}, { local: { peerCount: '4' }, failed: ['asnInfo'] }),
+      fetchRadarAsn: async () => radarAnswer({}, { failed: ['asnInfo'] }),
     }));
     const body = await composeAsnProfile(13335, loaders);
     assert.equal(body.status.radar, 'error');

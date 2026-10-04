@@ -1,14 +1,14 @@
 // Tests for common/as-relationships.js — relationship counts that follow
 // the /api/asn-connectivity graph's own misinference rule: a distrusted
 // non-Tier-1 provider is not counted (and not reclassified). The hypergiant
-// fixture checks tiles, lists and graph agree; the graph itself is
+// fixture checks lists and graph agree; the graph itself is
 // buildTopology, unchanged and covered in asn-connectivity.test.js.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
     TIER1_PEERING_TRUSTED, TIER1_ADJACENCY_TRUSTED, distrustsNonTier1Providers,
-    countedRelationships, relationshipCounts,
+    countedRelationships,
 } from '../common/as-relationships.js';
 import { buildTopology, buildNeighbours, fillNeighbourNames } from '../api/asn-connectivity.js';
 
@@ -84,28 +84,17 @@ describe('countedRelationships', () => {
     });
 });
 
-describe('tiles, lists and graph agree', () => {
+describe('lists and graph agree', () => {
     it('hypergiant: no upstream in the counts, none drawn', () => {
         const neighbours = buildNeighbours(HYPER, rel, () => null);
         assert.deepEqual(neighbours.counts, { providers: 0, peers: 8, customers: 1 });
         const graph = buildTopology(HYPER, rel);
         assert.equal(graph.nodes.some((n) => n.asn === REGIONAL), false);
         assert.ok(graph.edges.every((e) => e.kind === 'peering'));
-        assert.deepEqual(relationshipCounts(HYPER, { rel, loaded: () => true }),
-            { upstreamCount: 0, downstreamCount: 1, peerCount: 8 });
     });
 
     it('regional: counts match the lists', () => {
         assert.deepEqual(buildNeighbours(REGIONAL, rel, () => null).counts, { providers: 1, peers: 0, customers: 3 });
-        assert.deepEqual(relationshipCounts(REGIONAL, { rel, loaded: () => true }),
-            { upstreamCount: 1, downstreamCount: 3, peerCount: 0 });
-    });
-});
-
-describe('relationshipCounts', () => {
-    it('is absent without a snapshot or for an AS with no relationships', () => {
-        assert.deepEqual(relationshipCounts(HYPER, { rel, loaded: () => false }), {});
-        assert.deepEqual(relationshipCounts(64512, { rel, loaded: () => true }), {});
     });
 });
 

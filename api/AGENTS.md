@@ -36,10 +36,10 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   failed or late one is just absent. Always 200 `{ asn, status, incomplete,
   …sections }` (`ok` / `empty` / `error` / `disabled`; an upstream fault is
   `error`, never `empty`; `incomplete` = `ok` but partial); 502 if all fail.
-- **Relationship counts follow the graph:** `asn-connectivity` neighbours and
-  the Radar `asn` view's counts come from local CAIDA
-  (`common/as-relationships.js`), dropping the providers the graph walk
-  distrusts.
+- **Relationship counts follow the graph:** `asn-connectivity` neighbour
+  lists come from local CAIDA (`common/as-relationships.js`), dropping the
+  providers the graph walk distrusts. The Radar `asn` view (ASN Info) carries
+  no prefix or relationship counts — the ASN Profile has both.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
 - **Offline datasets** (`common/caida-updater.js` rows): fetched when missing at

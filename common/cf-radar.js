@@ -13,7 +13,6 @@
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { relationshipCounts } from './as-relationships.js';
 import { lookupCountryCode } from './maxmind-service.js';
 import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
@@ -52,16 +51,14 @@ export const isCompleteRadarAnswer = (body) => !partialAnswers.has(body);
 // -- view: asn — per-ASN entity info + 7d HTTP traffic profile --------------
 
 // The Radar segments backing one response, keyed by the field name
-// cleanUpResponseData expects. Relationship counts are not Radar's: they come
-// from the local CAIDA snapshot (relationshipCounts), the same reading the
-// ASN Profile's topology and neighbour lists use.
+// cleanUpResponseData expects. Prefix and relationship counts live in the
+// ASN Profile (pfx2as list, CAIDA graph), not here.
 const SEGMENTS = {
     asnInfo: (asn) => `/radar/entities/asns/${asn}`,
     ipVersion: (asn) => `/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`,
     httpProtocol: (asn) => `/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`,
     deviceType: (asn) => `/radar/http/summary/device_type?asn=${asn}&dateRange=7d`,
     botType: (asn) => `/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`,
-    routesStats: (asn) => `/radar/bgp/routes/stats?asn=${asn}`,
     quality: (asn) => `/radar/quality/speed/summary?asn=${asn}`,
 };
 
@@ -105,8 +102,6 @@ function cleanUpResponseData(data) {
         Mobile_Pct: data.deviceType?.result?.summary_0?.mobile,
         Bot_Pct: data.botType?.result?.summary_0?.bot,
         Human_Pct: data.botType?.result?.summary_0?.human,
-        prefixesV4: data.routesStats?.result?.stats?.distinct_prefixes_ipv4,
-        prefixesV6: data.routesStats?.result?.stats?.distinct_prefixes_ipv6,
         speedDownload: data.quality?.result?.summary_0?.bandwidthDownload,
         speedUpload: data.quality?.result?.summary_0?.bandwidthUpload,
         latency: data.quality?.result?.summary_0?.latencyIdle,
@@ -116,17 +111,12 @@ function cleanUpResponseData(data) {
 
 // Format output; a missing value parses to NaN, which filterData drops.
 function formatData(data) {
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, speedDownload, speedUpload, latency, jitter } = data;
     return {
         asnName,
         asnCountryCode,
         asnOrgName,
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
-        prefixesV4: parseFloat(prefixesV4).toLocaleString(),
-        prefixesV6: parseFloat(prefixesV6).toLocaleString(),
-        upstreamCount: parseFloat(upstreamCount).toLocaleString(),
-        downstreamCount: parseFloat(downstreamCount).toLocaleString(),
-        peerCount: parseFloat(peerCount).toLocaleString(),
         speedDownload: `${parseFloat(speedDownload).toFixed(1)} Mbps`,
         speedUpload: `${parseFloat(speedUpload).toFixed(1)} Mbps`,
         latency: `${Math.round(parseFloat(latency))} ms`,
@@ -153,21 +143,14 @@ function filterData(data) {
     return data;
 }
 
-// Settled segment payloads (+ local relationship counts) → response body.
-// `relCounts` is injectable for tests. Exported for tests.
-export const shapeAsnProfile = (data, asn, relCounts = relationshipCounts) => {
-    const cleaned = cleanUpResponseData(data);
-    Object.assign(cleaned, relCounts(Number(asn)));
-    return filterData(formatData(cleaned));
-};
+// Settled segment payloads → response body. Exported for tests.
+export const shapeAsnProfile = (data) => filterData(formatData(cleanUpResponseData(data)));
 
 // One AS's summary, for the asn view and /api/asn-profile:
-//   summary         the view's payload (Radar fields + local relationship counts)
-//   radarFields     the Radar-originated fields alone, to judge whether Radar
-//                   knows the AS
+//   summary         the view's payload
 //   failedSegments  names of the segments that failed; [] = complete
-// Throws when every segment failed. `relCounts` is injectable for tests.
-export const loadAsnSummary = async (asn, relCounts = relationshipCounts) => {
+// Throws when every segment failed.
+export const loadAsnSummary = async (asn) => {
     const { data, failed } = await getAllASNData(asn);
     if (failed.length === Object.keys(SEGMENTS).length) {
         throw failed[0].reason instanceof Error
@@ -177,11 +160,7 @@ export const loadAsnSummary = async (asn, relCounts = relationshipCounts) => {
     if (failed.length > 0) {
         logger.warn({ err: failed[0].reason, asn, segments: failed.map((f) => f.name) }, 'cf-radar: partial Radar segment failure');
     }
-    return {
-        summary: shapeAsnProfile(data, asn, relCounts),
-        radarFields: shapeAsnProfile(data, asn, () => ({})),
-        failedSegments: failed.map((f) => f.name),
-    };
+    return { summary: shapeAsnProfile(data), failedSegments: failed.map((f) => f.name) };
 };
 
 // Partial summaries are served but not edge-cached.

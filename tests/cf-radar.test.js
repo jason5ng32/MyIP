@@ -234,31 +234,24 @@ describe('buildTrafficMatrix', () => {
 });
 
 describe('shapeAsnProfile', () => {
-    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
-
-    it('takes prefix counts from routes/stats and relationship counts from the local reading', () => {
+    it('shapes the Radar segments and drops what Radar left out', () => {
         const body = shapeAsnProfile({
-            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346, distinct_prefixes_ipv6: 2953, routes_valid: 5162 } } },
-        }, '13335', counts);
-        assert.equal(body.prefixesV4, (2346).toLocaleString());
-        assert.equal(body.prefixesV6, (2953).toLocaleString());
-        assert.equal(body.upstreamCount, '2');
-        assert.equal(body.downstreamCount, '0');
-        assert.equal(body.peerCount, '7');
-        for (const key of ['rpkiValid', 'rpkiInvalid', 'rpkiUnknown', 'rpkiTotal']) {
+            asnInfo: { result: { asn: { name: 'CLOUDFLARENET', estimatedUsers: { estimatedUsers: 1200 } } } },
+            ipVersion: { result: { summary_0: { IPv4: '61.5', IPv6: '38.5' } } },
+        });
+        assert.equal(body.asnName, 'CLOUDFLARENET');
+        assert.equal(body.estimatedUsers, (1200).toLocaleString());
+        assert.equal(body.IPv4_Pct, '61.50%');
+        for (const key of ['speedDownload', 'latency', 'Bot_Pct']) {
             assert.equal(Object.hasOwn(body, key), false, key);
         }
     });
 
-    it('passes the AS number to the relationship reading', () => {
-        let asked;
-        shapeAsnProfile({}, '64500', (asn) => { asked = asn; return {}; });
-        assert.equal(asked, 64500);
-    });
-
-    it('drops relationship fields when the local snapshot has nothing', () => {
-        const body = shapeAsnProfile({ routesStats: { result: { stats: {} } } }, '13335', () => ({}));
-        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount', 'prefixesV4']) {
+    it('carries no prefix or relationship counts (those live in the ASN Profile)', () => {
+        const body = shapeAsnProfile({
+            routesStats: { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
+        });
+        for (const key of ['prefixesV4', 'prefixesV6', 'upstreamCount', 'downstreamCount', 'peerCount']) {
             assert.equal(Object.hasOwn(body, key), false, key);
         }
     });
@@ -286,45 +279,36 @@ describe('loadAsnSummary / asn view', () => {
     };
     const KNOWN = {
         '/radar/entities/asns/13335': { result: { asn: { name: 'CLOUDFLARENET', country: 'US' } } },
-        '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 2346 } } },
     };
-    const counts = () => ({ upstreamCount: 2, downstreamCount: 0, peerCount: 7 });
 
-    it('reports a complete answer, with the local counts kept out of radarFields', async () => {
+    it('reports a complete answer, without asking routes/stats', async () => {
+        const asked = [];
         stubRadar(KNOWN);
-        const { summary, radarFields, failedSegments } = await loadAsnSummary('13335', counts);
+        const stubbed = globalThis.fetch;
+        globalThis.fetch = async (url) => { asked.push(new URL(String(url)).pathname); return stubbed(url); };
+        const { summary, failedSegments } = await loadAsnSummary('13335');
         assert.deepEqual(failedSegments, []);
         assert.equal(summary.asnName, 'CLOUDFLARENET');
-        assert.equal(summary.peerCount, '7');
-        assert.equal(radarFields.asnName, 'CLOUDFLARENET');
-        for (const key of ['upstreamCount', 'downstreamCount', 'peerCount']) {
-            assert.equal(Object.hasOwn(radarFields, key), false, key);
-        }
-    });
-
-    it('an AS Radar does not know has only local counts, none in radarFields', async () => {
-        stubRadar({ '/radar/bgp/routes/stats': { result: { stats: { distinct_prefixes_ipv4: 0 } } } });
-        const { summary, radarFields } = await loadAsnSummary('64500', counts);
-        assert.equal(summary.upstreamCount, '2');
-        assert.deepEqual(JSON.parse(JSON.stringify(radarFields)), { prefixesV4: '0' });
+        assert.equal(asked.length, 6);
+        assert.equal(asked.some((path) => path.includes('/bgp/routes/stats')), false);
     });
 
     it('names the failed segments and still shapes the rest', async () => {
         stubRadar({ ...KNOWN, '/radar/http/summary/ip_version': 503, '/radar/quality/speed/summary': 500 });
-        const { summary, failedSegments } = await loadAsnSummary('13335', counts);
+        const { summary, failedSegments } = await loadAsnSummary('13335');
         assert.deepEqual(failedSegments.sort(), ['ipVersion', 'quality']);
         assert.equal(summary.asnName, 'CLOUDFLARENET');
     });
 
     it("a 404 is Radar's \"no such AS\", not a failed segment", async () => {
-        stubRadar({ '/radar/entities/asns/64511': 404, '/radar/bgp/routes/stats': { result: { stats: {} } } });
-        const { failedSegments } = await loadAsnSummary('64511', counts);
+        stubRadar({ '/radar/entities/asns/64511': 404 });
+        const { failedSegments } = await loadAsnSummary('64511');
         assert.equal(failedSegments.includes('asnInfo'), false);
     });
 
     it('throws when every segment failed', async () => {
         stubRadar(new Proxy({}, { get: () => 502 }));
-        await assert.rejects(loadAsnSummary('13335', counts), /Radar responded 502/);
+        await assert.rejects(loadAsnSummary('13335'), /Radar responded 502/);
     });
 
     it('the asn view serves a partial answer unchanged but marks it uncacheable', async () => {
