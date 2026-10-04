@@ -734,6 +734,15 @@ describe('asn-profile handler', () => {
         const res = createResponse();
         await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
 
+        // With the network down, the local CAIDA graph is the one source that
+        // can answer — when this checkout has an as-rel snapshot. Without one
+        // (CI, a fresh checkout) connectivity is an error too, every
+        // configured source has failed, and the answer is a 502.
+        if (!isAsRelLoaded()) {
+            assert.equal(res.statusCode, 502);
+            assert.equal(res.body.status.connectivity, 'error');
+            return;
+        }
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.asn, 64511);
         assert.equal(res.body.status.radar, 'disabled');
@@ -741,10 +750,7 @@ describe('asn-profile handler', () => {
         assert.equal(res.body.status.reputation, 'disabled');
         assert.equal(res.body.status.whois, 'error');
         assert.equal(res.body.status.rank, 'error');
-        // Local: ok / empty with an as-rel snapshot, an error (never a
-        // cacheable empty) without one — a fresh checkout.
-        if (isAsRelLoaded()) assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
-        else assert.equal(res.body.status.connectivity, 'error');
+        assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
         assert.equal(res.body.whois, null);
         assert.equal(res.body.rank, null);
         // No Cloudflare key: PeeringDB isn't configured here.
