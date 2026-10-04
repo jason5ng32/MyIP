@@ -277,6 +277,11 @@ describe('maxmind row', () => {
         assert.deepEqual(requested, ['HEAD City auth', 'HEAD ASN auth'], 'only the version checks');
     });
 
+    it('names no version when an edition omits Last-Modified (always fetched)', () => {
+        assert.equal(maxmindIdentifier(['Fri, 02 Oct 2026 16:46:10 GMT', null]), null);
+        assert.equal(maxmindIdentifier(['a', 'b']), 'a | b');
+    });
+
     it('keeps MAXMIND_AUTO_UPDATE as its legacy schedule flag', () => {
         assert.equal(row('maxmind').legacyAutoUpdateEnv, 'MAXMIND_AUTO_UPDATE');
     });

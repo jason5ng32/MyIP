@@ -14,7 +14,10 @@ import lockfile from 'proper-lockfile';
 import {
     STATE_FILE, LOCK_FILE, updateDataset, bootstrapDataset, readState, isPresent,
     isAutoUpdateEnabled, startDatasetScheduler, DEFAULT_UPDATE_CRON, rowsMissingACheck, watchDatasets,
+    updateDatasets, downloadToFile,
 } from '../common/dataset-updater.js';
+import logger from '../common/logger.js';
+import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'myip-dataset-test-'));
 after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -85,6 +88,13 @@ describe('updateDataset', () => {
         fs.rmSync(path.join(row.dir, 'a.txt'));
         assert.equal((await updateDataset(row)).updated, true);
         assert.equal(log.fetches, 3);
+    });
+
+    it('a remote that names no version is always fetched, never taken for unchanged', async () => {
+        const { row, log } = makeRow({ findRemote: async () => ({ identifier: null }) });
+        await updateDataset(row);
+        assert.equal((await updateDataset(row)).updated, true);
+        assert.equal(log.fetches, 2);
     });
 
     it('publishes nothing when validation refuses or a file is not produced', async () => {
@@ -216,22 +226,70 @@ describe('startDatasetScheduler', () => {
 });
 
 describe('rowsMissingACheck', () => {
-    const HOUR = 60 * 60 * 1000;
-    const now = Date.parse('2026-10-05T12:00:00Z');
+    const at = (day, hour, minute) => new Date(2026, 9, day, hour, minute); // local time, like the cron
+    const pattern = '30 4 * * *';
     const withState = (stateBody) => {
         const { row } = makeRow();
         if (stateBody) fs.writeFileSync(path.join(row.dir, STATE_FILE), JSON.stringify(stateBody));
         return row;
     };
 
-    it('picks rows not checked for over a day, or never', async () => {
-        const fresh = withState({ checkedAt: new Date(now - 3 * HOUR).toISOString() });
-        const missed = withState({ checkedAt: new Date(now - 30 * HOUR).toISOString() });
+    it('picks rows whose scheduled check fell inside a downtime, or that were never checked', async () => {
+        const now = at(5, 5, 5);
+        // Checked at 04:35 yesterday, down over today's 04:30: due, though only 24.5 h ago.
+        const missed = withState({ checkedAt: at(4, 4, 35).toISOString() });
+        const fresh = withState({ checkedAt: at(5, 4, 31).toISOString() });
         const never = withState(null);
         // A pre-engine state has no checkedAt: its publish time stands in.
-        const legacy = withState({ updatedAt: new Date(now - 2 * HOUR).toISOString() });
-        const stale = await rowsMissingACheck([fresh, missed, never, legacy], now);
+        const legacy = withState({ updatedAt: at(5, 4, 40).toISOString() });
+        const stale = await rowsMissingACheck([missed, fresh, never, legacy], { pattern, now });
         assert.deepEqual(stale, [missed, never]);
+    });
+
+    it('is not due before the next scheduled time comes round', async () => {
+        const row = withState({ checkedAt: at(4, 4, 35).toISOString() });
+        assert.deepEqual(await rowsMissingACheck([row], { pattern, now: at(5, 4, 29) }), []);
+    });
+});
+
+describe('updateDatasets', () => {
+    it('aborts a stalled row at its timeout and goes on to the next', async () => {
+        const originalError = logger.error;
+        const logged = [];
+        logger.error = (ctx) => logged.push(ctx.dataset);
+        try {
+            const stalled = makeRow({
+                id: 'stalled',
+                findRemote: ({ signal }) => new Promise((resolve, reject) => {
+                    signal.addEventListener('abort', () => reject(signal.reason));
+                }),
+            });
+            const next = makeRow();
+            await updateDatasets([stalled.row, next.row], { timeoutMs: 50 });
+            assert.deepEqual(logged, ['stalled']);
+            assert.ok(isPresent(next.row));
+        } finally {
+            logger.error = originalError;
+        }
+    });
+});
+
+describe('downloadToFile', () => {
+    it('goes through fetchUpstream: the project User-Agent, the caller\'s headers kept', async () => {
+        const realFetch = globalThis.fetch;
+        let seen;
+        globalThis.fetch = async (url, init) => { seen = init; return new Response('body'); };
+        setUpstreamUserAgent('MyIP/test');
+        try {
+            const dest = path.join(root, 'download.bin');
+            await downloadToFile('https://example.invalid/x', dest, { headers: { Authorization: 'Basic x' } });
+            assert.equal(fs.readFileSync(dest, 'utf8'), 'body');
+            assert.equal(seen.headers['User-Agent'], 'MyIP/test');
+            assert.equal(seen.headers.Authorization, 'Basic x');
+        } finally {
+            globalThis.fetch = realFetch;
+            setUpstreamUserAgent(null);
+        }
     });
 });
 
@@ -268,6 +326,29 @@ describe('watchDatasets', () => {
             fs.writeFileSync(path.join(row.dir, 'b.txt'), 'b');
             await sleep(150);
             assert.deepEqual(log.reloads, ['file change']);
+        } finally {
+            stop();
+        }
+    });
+
+    it('retries a reload that failed on the files\' next change, even with the same content', async () => {
+        let fail = true;
+        const { row, log } = makeRow({
+            reload: async (reason) => {
+                log.reloads.push(reason);
+                if (fail) throw new Error('cannot open');
+            },
+        });
+        const stop = watchDatasets([row], fast);
+        try {
+            for (const file of row.files) fs.writeFileSync(path.join(row.dir, file), `${file}\n`);
+            await sleep(150);
+            assert.equal(log.reloads.length, 1, 'tried once, failed');
+            fail = false;
+            // Fix permissions: mtime and size unchanged, ctime moves.
+            fs.chmodSync(path.join(row.dir, 'a.txt'), 0o600);
+            await sleep(150);
+            assert.equal(log.reloads.length, 2, 'retried');
         } finally {
             stop();
         }

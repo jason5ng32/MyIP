@@ -347,7 +347,7 @@ app.use(express.static(path.join(__dirname, './dist')));
 if (process.env.SENTRY_DSN_BACKEND) {
     const Sentry = await import('@sentry/node');
     Sentry.setupExpressErrorHandler(app);
-    logger.info('🛰️ Sentry backend monitoring enabled');
+    logger.info('🛰️  Sentry backend monitoring enabled');
 }
 
 

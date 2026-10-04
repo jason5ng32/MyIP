@@ -20,7 +20,8 @@
 //   enabled()         optional; false skips the row everywhere (a missing key
 //                     or credential), as if it weren't registered
 //   findRemote({ signal }) → { identifier, … } — identifier names the remote
-//                     version; the whole object is handed on to fetch
+//                     version (null when the remote doesn't say: always
+//                     fetched); the whole object is handed on to fetch
 //   fetch({ remote, tempDir, signal }) → { [file]: stagedPath } for every
 //                     name in `files`
 //   validate(staged)  throws to refuse a truncated or corrupt download
@@ -48,6 +49,7 @@ import { Cron } from 'croner';
 import logger from './logger.js';
 import { withCronMonitor } from './sentry-cron.js';
 import { createDecompressor } from './decompress.js';
+import { fetchUpstream } from './fetch-with-timeout.js';
 
 export const STATE_FILE = '.dataset-state.json';
 export const LOCK_FILE = '.dataset.lock';
@@ -56,17 +58,21 @@ export const LOCK_FILE = '.dataset.lock';
 const LOCK_OPTIONS = { stale: 10 * 60 * 1000, update: 60 * 1000 };
 const LOCK_RETRY_MS = 2000;
 const BOOTSTRAP_TIMEOUT_MS = 5 * 60 * 1000;
+// A scheduled or catch-up update of one dataset, download included; past
+// this it is aborted so a stalled upstream can't hold up the rest.
+const UPDATE_TIMEOUT_MS = 30 * 60 * 1000;
 export const DEFAULT_UPDATE_CRON = '30 4 * * *';
-// A dataset not checked for this long missed a daily run (the server was
-// down at the scheduled time): check it shortly after boot.
-const CATCH_UP_AFTER_MS = 25 * 60 * 60 * 1000;
 const CATCH_UP_DELAY_MS = 60 * 1000;
 
 // ---------- download helpers for rows ----------
 
-/** Stream `url` into `destPath`. Long downloads: no fetchUpstream timeout, the caller's signal bounds it. */
+/**
+ * Stream `url` into `destPath`. fetchUpstream (project User-Agent) times out
+ * the wait for a response; the body — a large archive — is bounded by the
+ * caller's signal instead.
+ */
 export const downloadToFile = async (url, destPath, { signal, headers } = {}) => {
-    const response = await fetch(url, { redirect: 'follow', signal, headers });
+    const response = await fetchUpstream(url, { signal, headers, timeoutMs: 30 * 1000 });
     if (!response.ok || !response.body) throw new Error(`download failed: HTTP ${response.status}`);
     await pipeline(Readable.fromWeb(response.body), fs.createWriteStream(destPath), { signal });
 };
@@ -113,9 +119,12 @@ const fingerprint = (row) => row.files.map((file) => {
         return '-';
     }
 }).join('|');
+// Recorded only once the reload succeeds, so a failed load is retried on
+// the files' next change.
 const reloadRow = async (row, reason) => {
-    loadedFingerprints.set(row.id, fingerprint(row));
+    const current = fingerprint(row);
     await row.reload(reason);
+    loadedFingerprints.set(row.id, current);
 };
 
 // ---------- lock ----------
@@ -189,7 +198,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         const state = await readState(row);
         const remote = await row.findRemote({ signal });
         const now = new Date().toISOString();
-        if (isPresent(row) && state.identifier === remote.identifier) {
+        if (remote.identifier && isPresent(row) && state.identifier === remote.identifier) {
             await writeState(row, { ...state, checkedAt: now });
             return { updated: false, reason: 'not-modified' };
         }
@@ -264,11 +273,14 @@ export const isAutoUpdateEnabled = (row, env = process.env) => {
     return true;
 };
 
-/** Update each row in turn; one failing doesn't stop the rest. */
-export const updateDatasets = async (rows) => {
+/**
+ * Update each row in turn, each under `timeoutMs`; one failing or stalling
+ * doesn't stop the rest. `timeoutMs` is injectable for tests.
+ */
+export const updateDatasets = async (rows, { timeoutMs = UPDATE_TIMEOUT_MS } = {}) => {
     for (const row of rows) {
         try {
-            await updateDataset(row);
+            await updateDataset(row, { signal: AbortSignal.timeout(timeoutMs) });
         } catch (error) {
             logger.error({ err: error, dataset: row.id }, 'dataset update failed');
         }
@@ -276,16 +288,18 @@ export const updateDatasets = async (rows) => {
 };
 
 /**
- * The rows of `rows` a downtime kept from their daily check: last checked
- * (or published, for a state from before checks were recorded) longer ago
- * than a day and a bit, or never. Exported for tests.
+ * The rows of `rows` a downtime kept from their check: a run of `pattern`
+ * fell between the last check (or publish, for a state from before checks
+ * were recorded) and `now` — or there was never one. Exported for tests.
  */
-export const rowsMissingACheck = async (rows, now = Date.now()) => {
+export const rowsMissingACheck = async (rows, { pattern, now = new Date() }) => {
+    const cron = new Cron(pattern, { paused: true });
     const stale = [];
     for (const row of rows) {
         const { checkedAt, updatedAt } = await readState(row).catch(() => ({}));
-        const last = Date.parse(checkedAt || updatedAt);
-        if (!(now - last < CATCH_UP_AFTER_MS)) stale.push(row);
+        const last = new Date(checkedAt || updatedAt);
+        const due = Number.isNaN(last.getTime()) ? null : cron.nextRun(last);
+        if (!due || due <= now) stale.push(row);
     }
     return stale;
 };
@@ -314,7 +328,7 @@ export const startDatasetScheduler = (rows) => {
     const next = scheduler.nextRun()?.toLocaleString('en-US', { hour12: false });
     logger.info(`🗓️  Dataset auto update: ${scheduled.map((row) => row.id).join(', ')} at cron ${pattern} (next ${next})`);
 
-    rowsMissingACheck(scheduled).then((stale) => {
+    rowsMissingACheck(scheduled, { pattern }).then((stale) => {
         if (!stale.length) return;
         logger.info(`🗓️  Dataset catch-up in ${CATCH_UP_DELAY_MS / 1000}s: ${stale.map((row) => row.id).join(', ')}`);
         setTimeout(() => updateDatasets(stale), CATCH_UP_DELAY_MS).unref?.();

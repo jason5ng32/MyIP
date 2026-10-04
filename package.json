@@ -72,7 +72,7 @@
     "vue-sonner": "^2.0.9",
     "whoiser": "^1.18.0",
     "world-atlas": "^2.0.2",
-    "write-file-atomic": "^8.0.0"
+    "write-file-atomic": "^7.0.1"
   },
   "devDependencies": {
     "@sentry/vite-plugin": "^5.4.0",

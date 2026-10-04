@@ -130,8 +130,11 @@ const maxmindAuth = () => ({
 });
 
 // Last-Modified of each edition, joined: either edition changing is a new
-// version. Exported for tests (and the legacy-state mapping below).
-export const maxmindIdentifier = (lastModifieds) => lastModifieds.map((value) => value || '?').join(' | ');
+// version. null when an edition doesn't say — an unknown version, always
+// fetched rather than taken for unchanged. Exported for tests (and the
+// legacy-state mapping below).
+export const maxmindIdentifier = (lastModifieds) =>
+    (lastModifieds.every(Boolean) ? lastModifieds.join(' | ') : null);
 
 // The pre-engine MaxMind updater kept { [editionId]: { lastModified, updatedAt } }.
 const MAXMIND_LEGACY_STATE = {
@@ -200,7 +203,8 @@ export const datasets = [
         files: [AS_ORG_FILE],
         legacyState: CAIDA_LEGACY_STATE,
         legacyAutoUpdateEnv: 'CAIDA_AUTO_UPDATE',
-        // Stable 'latest' symlink server-side → HEAD + Last-Modified is enough.
+        // Stable 'latest' symlink server-side → HEAD + Last-Modified is enough
+        // (no header → null identifier → always fetched).
         findRemote: async ({ signal } = {}) => {
             const url = 'https://publicdata.caida.org/datasets/as-organizations/latest.as-org2info.txt.gz';
             const res = await fetchUpstream(url, { method: 'HEAD', signal });
