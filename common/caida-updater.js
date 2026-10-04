@@ -192,6 +192,23 @@ async function runAllUpdates() {
     }
 }
 
+/**
+ * One dataset for `pnpm fetch-offline-data`: no network while the local
+ * snapshot is younger than `maxAgeMs` (the scheduler's own interval),
+ * otherwise a normal update, which still skips an unchanged remote. Resolves
+ * { status: 'disabled' | 'fresh' | 'downloaded' | 'not-modified' | 'locked'
+ * | 'already-running' }; throws when the update fails.
+ */
+export const syncDataset = async (dataset, { maxAgeMs = UPDATE_INTERVAL_MS, now = Date.now() } = {}) => {
+    if (!isDatasetEnabled(dataset)) return { status: 'disabled' };
+    if (snapshotExists(dataset)) {
+        const { updatedAt } = await readUpdateState(dataset);
+        if (now - Date.parse(updatedAt) < maxAgeMs) return { status: 'fresh', updatedAt };
+    }
+    const result = await updateDataset(dataset, { reload: false });
+    return result.updated ? { status: 'downloaded', identifier: result.identifier } : { status: result.reason };
+};
+
 // Exported for tests (with a temp-dir dataset row); not part of the API.
 export async function bootstrapDataset(dataset) {
     await fsp.mkdir(dataset.dbDir, { recursive: true });
@@ -228,8 +245,9 @@ export async function bootstrapDataset(dataset) {
     }
 }
 
-// Exported for tests, like bootstrapDataset.
-export async function updateDataset(dataset, { signal, reloadReason = 'auto update' } = {}) {
+// Exported for tests, like bootstrapDataset. `reload: false` publishes
+// without reloading this process (the offline-data CLI has no server).
+export async function updateDataset(dataset, { signal, reloadReason = 'auto update', reload = true } = {}) {
     if (updateInProgress.has(dataset.id)) {
         return { updated: false, reason: 'already-running' };
     }
@@ -247,7 +265,7 @@ export async function updateDataset(dataset, { signal, reloadReason = 'auto upda
 
     try {
         const result = await downloadAndPublish(dataset, tempDir, { signal });
-        if (result.updated && dataset.reload) {
+        if (result.updated && reload && dataset.reload) {
             dataset.reload(reloadReason);
         }
         return result;

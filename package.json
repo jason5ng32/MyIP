@@ -20,6 +20,7 @@
     "purge-index": "node scripts/purge-index-cache.js",
     "dns-check": "node scripts/check-dns-resolvers.js",
     "fetch-favicons": "node scripts/fetch-favicons.js",
+    "fetch-offline-data": "node scripts/fetch-offline-data.js",
     "i18n-status": "node scripts/i18n-status.js",
     "i18n-new": "node scripts/i18n-scaffold.js new",
     "i18n-sync": "node scripts/i18n-scaffold.js sync"

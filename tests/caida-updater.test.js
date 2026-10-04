@@ -12,7 +12,7 @@ import zlib from 'node:zlib';
 import { after, afterEach, describe, it } from 'node:test';
 
 import {
-    datasets, updateDataset, bootstrapDataset, findPeeringdbDump, isDatasetEnabled,
+    datasets, updateDataset, bootstrapDataset, findPeeringdbDump, isDatasetEnabled, syncDataset,
 } from '../common/caida-updater.js';
 import { PEERINGDB_FILE, readPeeringdbIndex, expandNet } from '../common/peeringdb-db.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
@@ -200,5 +200,54 @@ describe('decompressing rows', () => {
         assert.deepEqual(await updateDataset(dataset), { updated: true, identifier: 'v1' });
         assert.equal(fs.readFileSync(path.join(dataset.dbDir, dataset.canonicalFile), 'utf8'), text);
         assert.deepEqual(reloads, ['auto update']);
+    });
+});
+
+describe('syncDataset (pnpm fetch-offline-data)', () => {
+    const HOUR = 60 * 60 * 1000;
+    const now = Date.parse('2026-10-05T12:00:00Z');
+    // An as2org row with a snapshot published `ageMs` ago and remote `v2`.
+    const publishedRow = (ageMs) => {
+        const { dataset, reloads } = tempRow('as2org', {
+            findRemote: async () => ({ url: 'https://example.invalid/latest.txt.gz', identifier: 'v2' }),
+            validate: async () => {},
+        });
+        fs.writeFileSync(path.join(dataset.dbDir, dataset.canonicalFile), 'old\n');
+        fs.writeFileSync(path.join(dataset.dbDir, '.caida-update-state.json'),
+            JSON.stringify({ identifier: 'v1', updatedAt: new Date(now - ageMs).toISOString() }));
+        return { dataset, reloads };
+    };
+
+    it('skips a snapshot younger than a day without any network', async () => {
+        const requested = stubFetch({});
+        const { dataset } = publishedRow(2 * HOUR);
+        assert.equal((await syncDataset(dataset, { now })).status, 'fresh');
+        assert.deepEqual(requested, []);
+    });
+
+    it('updates an older snapshot, publishing without reloading this process', async () => {
+        stubFetch({ 'https://example.invalid/latest.txt.gz': [200, zlib.gzipSync('new\n')] });
+        const { dataset, reloads } = publishedRow(30 * HOUR);
+        assert.deepEqual(await syncDataset(dataset, { now }), { status: 'downloaded', identifier: 'v2' });
+        assert.equal(fs.readFileSync(path.join(dataset.dbDir, dataset.canonicalFile), 'utf8'), 'new\n');
+        assert.deepEqual(reloads, []);
+    });
+
+    it('reports an unchanged remote as not-modified', async () => {
+        const { dataset } = publishedRow(30 * HOUR);
+        fs.writeFileSync(path.join(dataset.dbDir, '.caida-update-state.json'),
+            JSON.stringify({ identifier: 'v2', updatedAt: new Date(now - 30 * HOUR).toISOString() }));
+        assert.equal((await syncDataset(dataset, { now })).status, 'not-modified');
+    });
+
+    it('downloads a missing snapshot whatever the state file says; skips a disabled row', async () => {
+        stubFetch({ 'https://example.invalid/latest.txt.gz': [200, zlib.gzipSync('new\n')] });
+        const { dataset } = publishedRow(0);
+        fs.rmSync(path.join(dataset.dbDir, dataset.canonicalFile));
+        assert.equal((await syncDataset(dataset, { now })).status, 'downloaded');
+
+        delete process.env.CLOUDFLARE_API_KEY;
+        delete process.env.CLOUDFLARE_API;
+        assert.equal((await syncDataset(tempRow('peeringdb').dataset, { now })).status, 'disabled');
     });
 });

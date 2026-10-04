@@ -65,6 +65,7 @@ docs/
 # to scaffold a locale pack and see how far along it is)
 scripts/*
 !scripts/fetch-favicons.js
+!scripts/fetch-offline-data.js
 !scripts/i18n-status.js
 !scripts/i18n-scaffold.js
 !scripts/check-dns-resolvers.js

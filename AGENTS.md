@@ -50,6 +50,7 @@ Express 5 back-end API.
 | `pnpm start` | Built front-end + backend |
 | `pnpm test` | Run all `tests/*.test.js` specs |
 | `pnpm check` | `test` + `build` — the pre-commit self-check |
+| `pnpm fetch-offline-data` | Download / refresh the backend's offline datasets (MaxMind, CAIDA, PeeringDB) per `.env`; skips anything published in the last 24 h |
 
 **pnpm only** (pinned via `packageManager`); `pnpm-lock.yaml` is committed and
 `pnpm-workspace.yaml` holds the `allowBuilds` install-script approvals. Never

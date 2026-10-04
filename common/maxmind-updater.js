@@ -160,6 +160,30 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
 }
 
 /**
+ * Both editions for `pnpm fetch-offline-data`, under the same gate as the
+ * boot download (credentials, not MAXMIND_AUTO_UPDATE). No network while
+ * both files exist and each was published within `maxAgeMs`; otherwise a
+ * normal update cycle, which still skips editions MaxMind hasn't changed.
+ * Resolves { status: 'missing-credentials' | 'present' | 'fresh' |
+ * 'downloaded' | 'not-modified' | 'locked' | 'already-running' } — 'present'
+ * = files on disk but no credentials to check them; throws on failure.
+ * `dbPaths` is injectable for tests.
+ */
+export const syncMaxMindDatabases = async ({
+    maxAgeMs = UPDATE_INTERVAL_MS, now = Date.now(), dbPaths = getMaxMindDbPaths(),
+} = {}) => {
+    const present = fs.existsSync(dbPaths.cityDbPath) && fs.existsSync(dbPaths.asnDbPath);
+    if (!hasDownloadCredentials()) return { status: present ? 'present' : 'missing-credentials' };
+    if (present) {
+        const state = await readUpdateState(dbPaths.dbDir);
+        const fresh = editions.every(({ editionId }) => now - Date.parse(state[editionId]?.updatedAt) < maxAgeMs);
+        if (fresh) return { status: 'fresh' };
+    }
+    const result = await updateMaxMindDatabases();
+    return result.updated ? { status: 'downloaded' } : { status: result.reason };
+};
+
+/**
  * Run one locked update cycle and reload readers only after a successful publish.
  *
  * `signal` is an optional AbortSignal that is threaded into every HTTP fetch
