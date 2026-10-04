@@ -144,6 +144,27 @@ describe('updateDataset', () => {
         assert.deepEqual(log.reloads, ['auto update']);
     });
 
+    it('an abort between renames (lock lost mid-publish) rolls back too', async () => {
+        const { row, log } = makeRow();
+        await updateDataset(row);
+        row.version = 'v2';
+        const controller = new AbortController();
+        const realRename = fsp.rename;
+        fsp.rename = async (...args) => {
+            await realRename(...args);
+            controller.abort(new Error('lock compromised'));
+        };
+        try {
+            await assert.rejects(updateDataset(row, { signal: controller.signal }), /lock compromised/);
+        } finally {
+            fsp.rename = realRename;
+        }
+        assert.equal(read(row, 'a.txt'), 'a.txt v1\n', 'first rename rolled back');
+        assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
+        assert.equal(state(row).identifier, 'v1');
+        assert.deepEqual(log.reloads, ['auto update']);
+    });
+
     it('reads an earlier updater\'s state, so an upgrade does not re-download', async () => {
         const { row, log } = makeRow({
             legacyState: { file: '.old-state.json', toState: (json) => ({ identifier: json.version }) },
