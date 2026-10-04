@@ -435,12 +435,13 @@ async function readUpdateState(dataset) {
     }
 }
 
+// Write-then-rename, so a reader without the lock (the offline-data CLI's
+// freshness check) never sees a half-written file.
 async function writeUpdateState(dataset, state) {
-    await fsp.writeFile(
-        path.join(dataset.dbDir, STATE_FILE),
-        `${JSON.stringify(state, null, 2)}\n`,
-        'utf8',
-    );
+    const statePath = path.join(dataset.dbDir, STATE_FILE);
+    const tempPath = `${statePath}.${process.pid}.tmp`;
+    await fsp.writeFile(tempPath, `${JSON.stringify(state, null, 2)}\n`, 'utf8');
+    await fsp.rename(tempPath, statePath);
 }
 
 async function acquireUpdateLock(dataset) {

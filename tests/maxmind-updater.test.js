@@ -70,9 +70,12 @@ describe('syncMaxMindDatabases', () => {
         process.env.MAXMIND_ACCOUNT_ID = 'id';
         process.env.MAXMIND_LICENSE_KEY = 'key';
         noNetwork();
-        // Past the freshness check the real update runs; the stub proves it was reached.
+        // Past the freshness check the update runs, inside the injected dir;
+        // the stub proves it was reached.
         for (const ages of [{ 'GeoLite2-City': 3 * HOUR, 'GeoLite2-ASN': 30 * HOUR }, { 'GeoLite2-City': 3 * HOUR }]) {
-            await assert.rejects(syncMaxMindDatabases({ now, dbPaths: makeDir({ ages }) }), /unexpected network call/);
+            const dbPaths = makeDir({ ages });
+            await assert.rejects(syncMaxMindDatabases({ now, dbPaths }), /unexpected network call/);
+            assert.equal(fs.existsSync(path.join(dbPaths.dbDir, '.maxmind-update.lock')), false, 'lock released');
         }
     });
 });

@@ -38,6 +38,7 @@ common/maxmind-db/.maxmind-update.lock
 common/maxmind-db/*.bak
 common/maxmind-db/*.next
 common/maxmind-db/*.mmdb
+common/maxmind-db/*.tmp
 
 # CAIDA datasets — Non-Commercial license, don't commit to public repo.
 common/as-org-db/*.txt
@@ -55,6 +56,9 @@ common/peeringdb-db/.caida-update-state.json
 common/peeringdb-db/.caida-update.lock
 common/peeringdb-db/*.bak
 common/peeringdb-db/*.next
+common/as-org-db/*.tmp
+common/as-rel-db/*.tmp
+common/peeringdb-db/*.tmp
 .learnings/
 docs/
 .plan/

@@ -11,7 +11,8 @@
 // last 24 hours is skipped without touching the network; an older one is
 // re-downloaded only when the remote has a newer version.
 //
-// Exits 1 when any dataset failed.
+// Exits 1 when any dataset failed or couldn't be checked (another process
+// held its lock).
 
 import dotenv from 'dotenv';
 
@@ -31,9 +32,13 @@ const NOTES = {
     fresh: 'up to date (published within 24 h)',
     'not-modified': 'up to date (remote unchanged)',
     downloaded: 'downloaded',
-    locked: 'skipped — another process is updating it',
-    'already-running': 'skipped — an update is already running',
+    locked: 'not checked — another process is updating it; re-run once it finishes',
+    'already-running': 'not checked — an update is already running; re-run once it finishes',
 };
+
+// Outcomes that leave the dataset unconfirmed: reported, and counted as a
+// failure so a scripted first start doesn't proceed as if it were ready.
+const UNCONFIRMED = new Set(['locked', 'already-running']);
 
 const jobs = [
     ['maxmind', syncMaxMindDatabases],
@@ -44,7 +49,12 @@ let failed = 0;
 for (const [id, run] of jobs) {
     try {
         const { status } = await run();
-        console.log(`✅ ${id}: ${NOTES[status] || status}`);
+        if (UNCONFIRMED.has(status)) {
+            failed++;
+            console.warn(`⚠️  ${id}: ${NOTES[status]}`);
+        } else {
+            console.log(`✅ ${id}: ${NOTES[status] || status}`);
+        }
     } catch (error) {
         failed++;
         console.error(`❌ ${id}: ${error.message}`);

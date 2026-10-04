@@ -167,7 +167,7 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
  * Resolves { status: 'missing-credentials' | 'present' | 'fresh' |
  * 'downloaded' | 'not-modified' | 'locked' | 'already-running' } — 'present'
  * = files on disk but no credentials to check them; throws on failure.
- * `dbPaths` is injectable for tests.
+ * `dbPaths` is injectable for tests and carries through the update.
  */
 export const syncMaxMindDatabases = async ({
     maxAgeMs = UPDATE_INTERVAL_MS, now = Date.now(), dbPaths = getMaxMindDbPaths(),
@@ -179,7 +179,7 @@ export const syncMaxMindDatabases = async ({
         const fresh = editions.every(({ editionId }) => now - Date.parse(state[editionId]?.updatedAt) < maxAgeMs);
         if (fresh) return { status: 'fresh' };
     }
-    const result = await updateMaxMindDatabases();
+    const result = await updateMaxMindDatabases({ dbDir: dbPaths.dbDir });
     return result.updated ? { status: 'downloaded' } : { status: result.reason };
 };
 
@@ -193,15 +193,18 @@ export const syncMaxMindDatabases = async ({
  *
  * `reloadReason` lets the caller tag the reload log line ("auto update" for
  * the scheduler, "bootstrap" for the startup download, etc.).
+ *
+ * `dbDir` defaults to the app's database directory; tests point it elsewhere.
  */
-export async function updateMaxMindDatabases({ reload, signal, reloadReason = 'auto update' } = {}) {
+export async function updateMaxMindDatabases({
+    reload, signal, reloadReason = 'auto update', dbDir = getMaxMindDbPaths().dbDir,
+} = {}) {
     if (updateInProgress) {
         return { updated: false, reason: 'already-running' };
     }
 
     updateInProgress = true;
 
-    const { dbDir } = getMaxMindDbPaths();
     await fsp.mkdir(dbDir, { recursive: true });
 
     const lock = await acquireUpdateLock(dbDir);
@@ -516,7 +519,12 @@ async function readUpdateState(dbDir) {
  * Persist the updater state after a successful database publish.
  */
 async function writeUpdateState(dbDir, state) {
-    await fsp.writeFile(path.join(dbDir, STATE_FILE), `${JSON.stringify(state, null, 2)}\n`, 'utf8');
+    // Write-then-rename, so a reader without the lock (the offline-data
+    // CLI's freshness check) never sees a half-written file.
+    const statePath = path.join(dbDir, STATE_FILE);
+    const tempPath = `${statePath}.${process.pid}.tmp`;
+    await fsp.writeFile(tempPath, `${JSON.stringify(state, null, 2)}\n`, 'utf8');
+    await fsp.rename(tempPath, statePath);
 }
 
 /**
