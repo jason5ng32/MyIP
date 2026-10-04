@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
+import { spawnSync } from 'node:child_process';
 import { after, afterEach, describe, it } from 'node:test';
 
 import {
@@ -186,6 +187,36 @@ describe('peeringdb row', () => {
         fs.writeFileSync(path.join(dataset.dbDir, PEERINGDB_FILE), '{}');
         assert.equal((await bootstrapDataset(dataset)).status, 'present');
         assert.deepEqual(requested, []);
+    });
+});
+
+describe('bootstrap beside the offline-data CLI', () => {
+    const lockOf = (dataset) => path.join(dataset.dbDir, '.caida-update.lock');
+
+    it('keeps a live owner\'s lock, waits for it, then loads what it published', async () => {
+        const requested = stubFetch({});
+        const { dataset, reloads } = tempRow('as2org');
+        fs.writeFileSync(lockOf(dataset), JSON.stringify({ pid: process.ppid }));
+        // The "CLI" publishes and releases a moment later.
+        setTimeout(() => {
+            fs.writeFileSync(path.join(dataset.dbDir, dataset.canonicalFile), 'snapshot\n');
+            fs.rmSync(lockOf(dataset));
+        }, 50);
+        assert.equal((await bootstrapDataset(dataset)).status, 'loaded');
+        assert.deepEqual(reloads, ['bootstrap']);
+        assert.deepEqual(requested, [], 'no second download');
+    });
+
+    it('clears a lock left by a crashed run and downloads', async () => {
+        stubFetch({ 'https://example.invalid/latest.txt.gz': [200, zlib.gzipSync('new\n')] });
+        const { dataset } = tempRow('as2org', {
+            findRemote: async () => ({ url: 'https://example.invalid/latest.txt.gz', identifier: 'v1' }),
+            validate: async () => {},
+        });
+        const crashed = spawnSync(process.execPath, ['-e', '']).pid;
+        fs.writeFileSync(lockOf(dataset), JSON.stringify({ pid: crashed }));
+        assert.equal((await bootstrapDataset(dataset)).status, 'downloaded');
+        assert.equal(fs.existsSync(lockOf(dataset)), false);
     });
 });
 

@@ -8,6 +8,7 @@ import * as tar from 'tar';
 import maxmind from 'maxmind';
 import logger from './logger.js';
 import { withCronMonitor } from './sentry-cron.js';
+import { isLockOwnerAlive, waitForUnlock } from './update-lock.js';
 import {
     getMaxMindDbPaths,
     MAXMIND_ASN_DB,
@@ -92,17 +93,20 @@ export function startMaxMindAutoUpdate({ reload } = {}) {
 }
 
 /**
- * One-shot "download the MaxMind databases at boot if they are missing" path.
+ * One-shot "download the MaxMind databases at boot if they are missing" path,
+ * run behind the already-open listener (see backend-server.js).
  *
  * The decision tree matches what we want the operator to experience on a
  * cold checkout:
  *   - Both mmdb files already on disk → do nothing, let reload handle it.
  *   - Files missing AND no MAXMIND_ACCOUNT_ID / MAXMIND_LICENSE_KEY configured
- *     → print a clear "how to fix this" warning and return; server will start
- *     anyway but the MaxMind API will 503 until DBs are provided.
+ *     → print a clear "how to fix this" warning and return; the MaxMind API
+ *     will 503 until DBs are provided.
  *   - Files missing AND credentials present → run a single download cycle,
  *     capped at BOOTSTRAP_TIMEOUT_MS. On failure (timeout, auth error, network
- *     block), log a warning and return; the server still starts.
+ *     block), log a warning and return; the server keeps running. If a live
+ *     process (the offline-data CLI) holds the update lock, wait for it and
+ *     load what it published.
  *
  * MAXMIND_AUTO_UPDATE is intentionally NOT consulted here — that flag only
  * gates the periodic scheduler. If the operator put valid credentials in .env,
@@ -110,7 +114,7 @@ export function startMaxMindAutoUpdate({ reload } = {}) {
  * second flag just to get the first download would be confusing.
  *
  * Never throws: the caller ({@link ./../backend-server.js}) treats this as
- * advisory and always proceeds to `app.listen`.
+ * advisory.
  */
 export async function bootstrapMaxMindIfMissing({ reload } = {}) {
     const { cityDbPath, asnDbPath } = getMaxMindDbPaths();
@@ -135,12 +139,24 @@ export async function bootstrapMaxMindIfMissing({ reload } = {}) {
     const timer = setTimeout(() => controller.abort(new Error('bootstrap timed out')), BOOTSTRAP_TIMEOUT_MS);
     timer.unref?.();
 
+    // A lock whose owner is gone was left by a crash; a live owner (the
+    // offline-data CLI) is waited out below.
+    const lockPath = path.join(getMaxMindDbPaths().dbDir, LOCK_FILE);
+    if (fs.existsSync(lockPath) && !(await isLockOwnerAlive(lockPath))) {
+        await fsp.rm(lockPath, { force: true });
+    }
+
     try {
-        await updateMaxMindDatabases({
+        const result = await updateMaxMindDatabases({
             reload,
             signal: controller.signal,
             reloadReason: 'bootstrap',
         });
+        if (result.reason === 'locked') {
+            await waitForUnlock(lockPath, { signal: controller.signal });
+            if (!fs.existsSync(cityDbPath) || !fs.existsSync(asnDbPath)) return { status: 'no-op', reason: 'locked' };
+            await reload?.('bootstrap');
+        }
         return { status: 'downloaded' };
     } catch (error) {
         // Disambiguate "we hit the 5-minute cap" from "the download itself

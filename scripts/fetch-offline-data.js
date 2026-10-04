@@ -1,9 +1,11 @@
 // scripts/fetch-offline-data.js — download every offline dataset the backend
 // reads (MaxMind GeoLite2, CAIDA as2org / as-rel, the PeeringDB index) ahead
 // of a first start, so the server boots with all of them in place. Runs as
-// `pnpm fetch-offline-data`; safe to repeat, and safe beside a running server
-// (the updaters' file locks serialize the two; the server's file watcher and
-// next scheduled tick pick up what this publishes).
+// `pnpm fetch-offline-data`; safe to repeat, and safe beside a running server:
+// the updaters' file locks serialize the two, and a server booting meanwhile
+// waits for this run and loads what it published. An already-running server
+// reloads new MaxMind files on its own (file watcher); new CAIDA / PeeringDB
+// snapshots load at its next restart.
 //
 // The same .env gates as the server's boot download decide what is fetched:
 // MaxMind needs MAXMIND_ACCOUNT_ID + MAXMIND_LICENSE_KEY, PeeringDB needs the

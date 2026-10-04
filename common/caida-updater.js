@@ -30,6 +30,7 @@ import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase } from './as-rel-db.js'
 import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDatabase } from './peeringdb-db.js';
 import { distillPeeringdbDump } from './peeringdb-distill.js';
 import { hasRadarApiKey } from './cf-radar.js';
+import { isLockOwnerAlive, waitForUnlock } from './update-lock.js';
 
 const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const INITIAL_UPDATE_DELAY_MS = 60 * 1000;
@@ -232,6 +233,17 @@ export async function bootstrapDataset(dataset) {
             logger.warn(`✅ CAIDA ${dataset.id} snapshot downloaded and ready`);
             return { status: 'downloaded' };
         }
+        if (result.reason === 'locked') {
+            // A live process (the offline-data CLI) holds the lock, likely
+            // fetching this very snapshot: wait it out within the budget,
+            // then load what it published.
+            await waitForUnlock(path.join(dataset.dbDir, LOCK_FILE), { signal: controller.signal });
+            if (snapshotExists(dataset)) {
+                dataset.reload?.('bootstrap');
+                logger.warn(`✅ CAIDA ${dataset.id} snapshot published by another process; loaded`);
+                return { status: 'loaded' };
+            }
+        }
         logger.warn(`⚠️  CAIDA ${dataset.id} bootstrap did not publish (${result.reason}).`);
         return { status: 'no-op', reason: result.reason };
     } catch (error) {
@@ -414,12 +426,12 @@ function snapshotExists(dataset) {
     return fs.readdirSync(dataset.dbDir).some(f => f.endsWith(ext) && !f.startsWith('.'));
 }
 
-// At boot, any pre-existing lock is necessarily from a previous crashed run
-// (we just started, no in-process updater can hold it). Clear it so a dead
-// Ctrl+C doesn't block restart for LOCK_STALE_MS.
+// At boot no in-process updater can hold a lock, so one whose owner is gone
+// was left by a crash: clear it, so a dead Ctrl+C doesn't block restart for
+// LOCK_STALE_MS. A live owner (the offline-data CLI) keeps its lock.
 async function clearOrphanedLock(dataset) {
     const lockPath = path.join(dataset.dbDir, LOCK_FILE);
-    if (fs.existsSync(lockPath)) {
+    if (fs.existsSync(lockPath) && !(await isLockOwnerAlive(lockPath))) {
         await fsp.rm(lockPath, { force: true });
         logger.warn(`🧹 Cleared orphaned CAIDA ${dataset.id} lock from previous boot`);
     }
