@@ -1,5 +1,5 @@
 // Local CAIDA AS Relationships lookup. Snapshot is downloaded
-// by common/caida-updater.js; this module parses and serves.
+// by the dataset updater (common/datasets.js); this module parses and serves.
 //
 // CAIDA as-rel2 row format: `<a>|<b>|<rel>|<source>`
 //   rel = -1 → p2c (a is provider of b)   ← providers + customers indexes
@@ -123,7 +123,7 @@ function loadDatabase() {
 
 loadDatabase();
 
-/** Reload the snapshot after caida-updater publishes a fresh file. */
+/** Reload the snapshot after the dataset updater publishes a fresh file. */
 export function reloadAsRelDatabase(reason = 'reload') {
     logger.info(`🔄 Reloading CAIDA as-rel snapshot (${reason})`);
     loadDatabase();

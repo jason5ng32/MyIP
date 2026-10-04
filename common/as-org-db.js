@@ -1,5 +1,5 @@
-// Local CAIDA as2org lookup. Snapshot file is auto-downloaded by
-// common/caida-updater.js; this module just parses and serves.
+// Local CAIDA as2org lookup. Snapshot file is auto-downloaded by the
+// dataset updater (common/datasets.js); this module just parses and serves.
 //
 // We use CAIDA's pipe-delimited TXT (~12MB) rather than the equivalent
 // JSONL (~28MB): identical content but split('|') beats JSON.parse per
@@ -81,7 +81,7 @@ function loadDatabase() {
 
 loadDatabase();
 
-/** Reload the snapshot after caida-updater publishes a fresh file. */
+/** Reload the snapshot after the dataset updater publishes a fresh file. */
 export function reloadAsOrgDatabase(reason = 'reload') {
     logger.info(`🔄 Reloading CAIDA as2org snapshot (${reason})`);
     loadDatabase();

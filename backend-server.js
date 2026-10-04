@@ -46,9 +46,9 @@ import { isCompleteProfile } from './common/asn-profile.js';
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
-import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
-import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
-import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
+import { reloadMaxMindDatabases, isMaxMindReady } from './common/maxmind-service.js';
+import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './common/dataset-updater.js';
+import { datasets } from './common/datasets.js';
 import { bootstrapServiceStatus, startServiceStatusPolling } from './common/service-status-store.js';
 import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
@@ -338,22 +338,24 @@ if (process.env.SENTRY_DSN_BACKEND) {
 }
 
 
-// Bootstrap every offline dataset (MaxMind, CAIDA incl. the PeeringDB
-// mirror) before accepting traffic so we never serve mid-download. Each step
-// is non-fatal: a failure leaves the dependent API in a degraded state
-// (MaxMind → 503; CAIDA → empty graph, RIPEstat fallback or no peering
-// section) but doesn't block the listener.
+// Bootstrap every offline dataset (common/datasets.js) before accepting
+// traffic so we never serve mid-download. Each step is non-fatal: a failure
+// leaves the dependent API in a degraded state (MaxMind → 503; CAIDA → empty
+// graph, RIPEstat fallback or no peering section) but doesn't block the
+// listener.
 async function bootBackend() {
-    await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
-    await reloadMaxMindDatabases('startup').catch(() => {
-        logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
-    });
-    await bootstrapCaidaIfMissing();
+    await bootstrapDatasets(datasets);
+    // A database already on disk was not loaded by the bootstrap.
+    if (!isMaxMindReady()) {
+        await reloadMaxMindDatabases('startup').catch(() => {
+            logger.error('❌ MaxMind API will return 503 until databases are available: set MAXMIND_ACCOUNT_ID + '
+                + 'MAXMIND_LICENSE_KEY, or drop GeoLite2-City.mmdb + GeoLite2-ASN.mmdb into common/maxmind-db/');
+        });
+    }
     await bootstrapServiceStatus();
 
-    startMaxMindFileWatcher();
-    startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
-    startCaidaAutoUpdate();
+    watchDatasets(datasets);
+    startDatasetScheduler(datasets);
     startServiceStatusPolling();
 
     app.listen(backEndPort, () => {
