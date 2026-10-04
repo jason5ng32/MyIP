@@ -129,19 +129,25 @@ const reloadRow = async (row, reason) => {
 
 // ---------- lock ----------
 
-// Resolves the release function, or null when another process holds the
-// lock and `wait` is off. With `wait`, polls until the lock frees or `signal`
-// aborts (which rejects).
+// Resolves { release, lost } — `lost` an AbortSignal that fires if the lock
+// is compromised mid-update (its heartbeat failed; another process may take
+// it over) — or null when another process holds the lock and `wait` is off.
+// With `wait`, polls until the lock frees or `signal` aborts (which rejects).
 const acquireLock = async (row, { wait = false, signal } = {}) => {
     for (;;) {
+        const lost = new AbortController();
         try {
-            return await lockfile.lock(row.dir, {
+            const release = await lockfile.lock(row.dir, {
                 ...LOCK_OPTIONS,
                 lockfilePath: path.join(row.dir, LOCK_FILE),
-                // Losing the heartbeat mid-update must not kill the server;
-                // the update finishes and the next one re-locks.
-                onCompromised: (error) => logger.warn({ err: error, dataset: row.id }, 'dataset lock compromised'),
+                // Never throw (that would kill the server): abort the update
+                // holding the lock instead, before it publishes.
+                onCompromised: (error) => {
+                    logger.warn({ err: error, dataset: row.id }, 'dataset lock compromised; aborting the update');
+                    lost.abort(error);
+                },
             });
+            return { release, lost: lost.signal };
         } catch (error) {
             if (error.code !== 'ELOCKED') throw error;
             if (!wait) return null;
@@ -153,23 +159,34 @@ const acquireLock = async (row, { wait = false, signal } = {}) => {
 // ---------- publish ----------
 
 // Copy every staged file next to its target, then rename them all into
-// place; a failed rename restores the previous files.
+// place. A failed rename rolls back the ones already done: the previous
+// file restored from its backup, or a target that didn't exist removed —
+// never a half-published dataset.
 const publish = async (row, staged) => {
     const plan = row.files.map((file) => {
         const target = path.join(row.dir, file);
-        return { source: staged[file], target, next: `${target}.next`, backup: `${target}.bak` };
+        return { source: staged[file], target, next: `${target}.next`, backup: `${target}.bak`, existed: false, renamed: false };
     });
     try {
         for (const step of plan) {
             await fsp.copyFile(step.source, step.next);
-            await fsp.copyFile(step.target, step.backup).catch((error) => {
+            try {
+                await fsp.copyFile(step.target, step.backup);
+                step.existed = true;
+            } catch (error) {
                 if (error.code !== 'ENOENT') throw error;
-            });
+            }
         }
         try {
-            for (const step of plan) await fsp.rename(step.next, step.target);
+            for (const step of plan) {
+                await fsp.rename(step.next, step.target);
+                step.renamed = true;
+            }
         } catch (error) {
-            for (const step of plan) await fsp.copyFile(step.backup, step.target).catch(() => {});
+            for (const step of plan.filter((s) => s.renamed)) {
+                await (step.existed ? fsp.copyFile(step.backup, step.target) : fsp.rm(step.target, { force: true }))
+                    .catch(() => {});
+            }
             throw error;
         }
     } finally {
@@ -191,21 +208,25 @@ const publish = async (row, staged) => {
  */
 export const updateDataset = async (row, { signal, reason = 'auto update', wait = false } = {}) => {
     await fsp.mkdir(row.dir, { recursive: true });
-    const release = await acquireLock(row, { wait, signal });
-    if (!release) return { updated: false, reason: 'locked' };
+    const lock = await acquireLock(row, { wait, signal });
+    if (!lock) return { updated: false, reason: 'locked' };
+    // Losing the lock stops the download as well as the publish.
+    const work = signal ? AbortSignal.any([signal, lock.lost]) : lock.lost;
     const tempDir = await fsp.mkdtemp(path.join(os.tmpdir(), `myip-dataset-${row.id}-`));
     try {
         const state = await readState(row);
-        const remote = await row.findRemote({ signal });
+        const remote = await row.findRemote({ signal: work });
         const now = new Date().toISOString();
         if (remote.identifier && isPresent(row) && state.identifier === remote.identifier) {
+            work.throwIfAborted();
             await writeState(row, { ...state, checkedAt: now });
             return { updated: false, reason: 'not-modified' };
         }
-        const staged = await row.fetch({ remote, tempDir, signal });
+        const staged = await row.fetch({ remote, tempDir, signal: work });
         const missing = row.files.filter((file) => !staged[file]);
         if (missing.length) throw new Error(`${row.id} fetch produced no ${missing.join(', ')}`);
         await row.validate(staged);
+        work.throwIfAborted();
         await publish(row, staged);
         await writeState(row, { identifier: remote.identifier, updatedAt: now, checkedAt: now });
         logger.info({ dataset: row.id, identifier: remote.identifier }, 'dataset updated');
@@ -213,7 +234,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         return { updated: true, identifier: remote.identifier };
     } finally {
         await fsp.rm(tempDir, { recursive: true, force: true });
-        await release().catch(() => {});
+        await lock.release().catch(() => {});
     }
 };
 
@@ -341,26 +362,44 @@ export const startDatasetScheduler = (rows) => {
 /**
  * Reload a row when its published files change under it — another process
  * published, or someone dropped files in by hand — but not after this
- * process's own publish (already reloaded). Polls every `intervalMs`; events
- * within `settleMs` coalesce (a publish renames several files). Watches every
- * row, enabled or not: hand-placed files need no credentials. Returns a
- * stop function. Options are injectable for tests.
+ * process's own publish (already reloaded). Polls every `intervalMs`; the
+ * files must then hold still for `settleMs` (a copy still being written
+ * keeps moving) and pass the row's validator before the reload, so a
+ * partial or corrupt file never replaces healthy in-memory data. Watches
+ * every row, enabled or not: hand-placed files need no credentials. Returns
+ * a stop function. Options are injectable for tests.
  */
 export const watchDatasets = (rows, { intervalMs = 5000, settleMs = 1000 } = {}) => {
     const stops = [];
     for (const row of rows) {
         if (!loadedFingerprints.has(row.id)) loadedFingerprints.set(row.id, fingerprint(row));
         let timer = null;
+        let seen = null;
+        const settle = async () => {
+            const current = fingerprint(row);
+            if (current !== seen) {
+                seen = current;
+                timer = setTimeout(settle, settleMs);
+                timer.unref?.();
+                return;
+            }
+            if (current === loadedFingerprints.get(row.id) || !isPresent(row)) return;
+            const published = Object.fromEntries(row.files.map((file) => [file, path.join(row.dir, file)]));
+            try {
+                await row.validate(published);
+            } catch (error) {
+                logger.warn({ err: error, dataset: row.id }, 'dataset files changed on disk but failed validation; not reloading');
+                return;
+            }
+            logger.info({ dataset: row.id }, 'dataset files changed on disk; reloading');
+            await reloadRow(row, 'file change').catch((error) => {
+                logger.warn({ err: error, dataset: row.id }, 'dataset reload after a file change failed');
+            });
+        };
         const check = () => {
             clearTimeout(timer);
-            timer = setTimeout(() => {
-                const current = fingerprint(row);
-                if (current === loadedFingerprints.get(row.id) || !isPresent(row)) return;
-                logger.info({ dataset: row.id }, 'dataset files changed on disk; reloading');
-                reloadRow(row, 'file change').catch((error) => {
-                    logger.warn({ err: error, dataset: row.id }, 'dataset reload after a file change failed');
-                });
-            }, settleMs);
+            seen = fingerprint(row);
+            timer = setTimeout(settle, settleMs);
             timer.unref?.();
         };
         for (const file of row.files) {

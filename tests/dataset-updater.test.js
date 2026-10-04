@@ -6,6 +6,7 @@
 
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { after, afterEach, describe, it } from 'node:test';
@@ -111,6 +112,36 @@ describe('updateDataset', () => {
         };
         await assert.rejects(updateDataset(row), /fetch produced no b\.txt/);
         assert.deepEqual(fs.readdirSync(row.dir), []);
+    });
+
+    it('rolls a failed publish back: previous files restored, new ones removed', async () => {
+        // Second rename fails, after the first one landed.
+        const failSecondRename = async (fn) => {
+            const realRename = fsp.rename;
+            let calls = 0;
+            fsp.rename = async (...args) => {
+                if (++calls === 2) throw Object.assign(new Error('disk full'), { code: 'ENOSPC' });
+                return realRename(...args);
+            };
+            try {
+                await fn();
+            } finally {
+                fsp.rename = realRename;
+            }
+        };
+
+        const fresh = makeRow();
+        await failSecondRename(() => assert.rejects(updateDataset(fresh.row), /disk full/));
+        assert.deepEqual(fs.readdirSync(fresh.row.dir), [], 'no half-published dataset');
+
+        const { row, log } = makeRow();
+        await updateDataset(row);
+        row.version = 'v2';
+        await failSecondRename(() => assert.rejects(updateDataset(row), /disk full/));
+        assert.equal(read(row, 'a.txt'), 'a.txt v1\n');
+        assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
+        assert.equal(state(row).identifier, 'v1');
+        assert.deepEqual(log.reloads, ['auto update']);
     });
 
     it('reads an earlier updater\'s state, so an upgrade does not re-download', async () => {
@@ -324,6 +355,24 @@ describe('watchDatasets', () => {
             await sleep(150);
             assert.deepEqual(log.reloads, [], 'not while a file is still missing');
             fs.writeFileSync(path.join(row.dir, 'b.txt'), 'b');
+            await sleep(150);
+            assert.deepEqual(log.reloads, ['file change']);
+        } finally {
+            stop();
+        }
+    });
+
+    it('does not reload files that fail the row\'s validator', async () => {
+        const { row, log } = makeRow({ validate: async (files) => {
+            if (fs.readFileSync(files['a.txt'], 'utf8').length < 5) throw new Error('truncated');
+        } });
+        const stop = watchDatasets([row], fast);
+        try {
+            fs.writeFileSync(path.join(row.dir, 'a.txt'), 'a');
+            fs.writeFileSync(path.join(row.dir, 'b.txt'), 'b');
+            await sleep(150);
+            assert.deepEqual(log.reloads, [], 'refused');
+            fs.writeFileSync(path.join(row.dir, 'a.txt'), 'complete');
             await sleep(150);
             assert.deepEqual(log.reloads, ['file change']);
         } finally {
