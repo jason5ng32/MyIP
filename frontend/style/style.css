@@ -278,11 +278,15 @@ footer {
    their own and shown in their new state at once, so only the page below
    moves; slides blend normally (no plus-lighter brightening where the two
    pages overlap). The pseudo-elements hang off <html> itself, hence no space
-   before `::view-transition-*`. */
-.jn-site-nav {
+   before `::view-transition-*`. The names apply only while a transition is in
+   flight (the attribute is set before the snapshot and removed after it
+   finishes), so outside one the Nav is an ordinary fixed element — a named
+   element is a captured, separately rendered group, and WebKit kept the Nav's
+   own animations (Pulse's spin and ping) janky after an iOS swipe-back. */
+html[data-page-transition] .jn-site-nav {
   view-transition-name: site-nav;
 }
-.jn-site-status-bar {
+html[data-page-transition] .jn-site-status-bar {
   view-transition-name: site-status-bar;
 }
 ::view-transition-old(site-nav),
