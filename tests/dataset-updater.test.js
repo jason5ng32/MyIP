@@ -407,6 +407,27 @@ describe('rowsMissingACheck', () => {
 });
 
 describe('updateDatasets', () => {
+    it('logs every row\'s outcome, so a run that changed nothing still shows', async () => {
+        const fresh = makeRow({ id: 'fresh' });
+        await updateDataset(fresh.row);
+        const held = makeRow({ id: 'held' });
+        const release = await lockfile.lock(held.row.dir, { lockfilePath: path.join(held.row.dir, LOCK_FILE) });
+        const originalInfo = logger.info;
+        const lines = [];
+        logger.info = (ctx, msg) => lines.push([ctx.dataset ?? ctx.datasets?.join(','), msg]);
+        try {
+            await updateDatasets([fresh.row, held.row]);
+        } finally {
+            logger.info = originalInfo;
+            await release();
+        }
+        assert.deepEqual(lines, [
+            ['fresh,held', 'dataset update run started'],
+            ['fresh', 'dataset up to date; nothing to download'],
+            ['held', 'dataset update skipped: another process holds the lock'],
+        ]);
+    });
+
     it('aborts a stalled row at its timeout and goes on to the next', async () => {
         const originalError = logger.error;
         const logged = [];

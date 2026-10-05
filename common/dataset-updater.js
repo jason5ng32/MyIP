@@ -333,14 +333,23 @@ export const isAutoUpdateEnabled = (row, env = process.env) => {
     return true;
 };
 
+// What a scheduled run logs for a row it left alone (a publish logs itself).
+const SKIP_MESSAGES = {
+    'not-modified': 'dataset up to date; nothing to download',
+    locked: 'dataset update skipped: another process holds the lock',
+};
+
 /**
  * Update each row in turn, each under `timeoutMs`; one failing or stalling
- * doesn't stop the rest. `timeoutMs` is injectable for tests.
+ * doesn't stop the rest. Every row logs its outcome, so a run that changed
+ * nothing still shows it ran. `timeoutMs` is injectable for tests.
  */
 export const updateDatasets = async (rows, { timeoutMs = UPDATE_TIMEOUT_MS } = {}) => {
+    logger.info({ datasets: rows.map((row) => row.id) }, 'dataset update run started');
     for (const row of rows) {
         try {
-            await updateDataset(row, { signal: AbortSignal.timeout(timeoutMs) });
+            const result = await updateDataset(row, { signal: AbortSignal.timeout(timeoutMs) });
+            if (!result.updated) logger.info({ dataset: row.id }, SKIP_MESSAGES[result.reason]);
         } catch (error) {
             logger.error({ err: error, dataset: row.id }, 'dataset update failed');
         }
