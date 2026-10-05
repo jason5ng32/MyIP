@@ -153,13 +153,17 @@ upstreams; those get only what's explicitly needed.
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
-public routes opt in via `cacheable(maxAge)` in `backend-server.js`, e.g.
-`cacheable(24 * 60 * 60)` (TTLs written that way, not raw seconds). `maxAge` may
-be a `(req) => seconds` resolver (cfradar: its view's TTL; falsy = no-store).
-`{ cacheIf }` vetoes caching a 2xx body: `/api/asn-profile` caches only complete
-answers (no section `error` / `incomplete`; reputation is not per-user), cfradar
-no partial view answer (`isCompleteRadarAnswer`). The ASN family (profile, Radar
-`asn` / `bgp-prefixes`) shares 7 days. Only status < 400 is cached; handlers
+public routes opt in via `cacheable(maxAge)` (`common/cache-control.js`) in
+`backend-server.js`, e.g. `cacheable(24 * 60 * 60)` (TTLs written that way, not
+raw seconds). `maxAge` may be a `(req) => seconds` resolver (cfradar: its view's
+TTL; falsy = no-store). `{ cacheIf }` vetoes the full TTL for a 2xx body,
+`{ degradedMaxAge }` gives a vetoed one a shorter TTL instead of no-store:
+`/api/asn-profile` caches a complete answer (no section `error` / `incomplete`;
+reputation is not per-user) for 7 days and a degraded one for 1 day — some
+upstreams fail for some ASes every time — except inside the boot window
+(`isOfflineBootstrapping`); cfradar caches no partial view answer
+(`isCompleteRadarAnswer`). The ASN family (profile, Radar `asn` /
+`bgp-prefixes`) shares 7 days. Only status < 400 is cached; handlers
 never touch `Cache-Control`. **Auth'd / per-user endpoints must not be
 wrapped** — their caching belongs to the upstream owning the auth context.
 

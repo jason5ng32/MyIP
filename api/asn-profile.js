@@ -21,8 +21,9 @@ import {
 import { getAsnConnectivity } from './asn-connectivity.js';
 
 // A section whose local data isn't there fails (status 'error'): left out
-// of the answer and keeping it uncached, while every other section answers
-// as usual — never an 'empty' / 'disabled' that would be cached for a week.
+// of the answer and keeping it out of the week-long cache, while every other
+// section answers as usual — never an 'empty' / 'disabled' that would be
+// cached for a week.
 
 // Connectivity needs the as-rel snapshot (without it every graph is empty);
 // as2org only names the nodes, RIPEstat covers a failed download, so it

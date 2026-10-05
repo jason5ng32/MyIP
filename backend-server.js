@@ -55,7 +55,8 @@ import {
 import { isAsRelLoaded } from './common/as-rel-db.js';
 import { isAsOrgLoaded } from './common/as-org-db.js';
 import { isOuiLoaded } from './common/oui-db.js';
-import { runOfflineBootstrap, requireOfflineData } from './common/offline-data.js';
+import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './common/offline-data.js';
+import { cacheable } from './common/cache-control.js';
 import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
 dotenv.config({ quiet: true });
@@ -215,35 +216,11 @@ if (speedLimitSet !== 0) {
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
-// declare it explicitly via the `cacheable(maxAge)` middleware below.
+// declare it explicitly via `cacheable(maxAge)` (common/cache-control.js).
 app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
     next();
 });
-
-// Cache-Control middleware factory. Hooks res.json so the header is only
-// attached on 2xx — CF must not cache 4xx/5xx error pages. The intended cache
-// value is also stashed on res.locals.cacheControl so binary-stream handlers
-// (which bypass res.json) can apply it themselves on their own 2xx path.
-// `maxAge` is a number of seconds, or a `(req) => seconds` resolver for
-// routes whose TTL depends on the request (the /api/cfradar view registry);
-// a falsy resolution keeps the /api-wide no-store default. `cacheIf(body)`
-// optionally vetoes caching a 2xx JSON body — for routes that answer a
-// degraded upstream with 200 (e.g. /api/asn-profile with a failed section).
-const cacheable = (maxAge, { cacheIf } = {}) => (req, res, next) => {
-    const maxAgeSeconds = typeof maxAge === 'function' ? maxAge(req) : maxAge;
-    if (maxAgeSeconds) {
-        res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
-        const originalJson = res.json.bind(res);
-        res.json = function (body) {
-            if (res.statusCode < 400 && (!cacheIf || cacheIf(body))) {
-                res.setHeader('Cache-Control', res.locals.cacheControl);
-            }
-            return originalJson(body);
-        };
-    }
-    next();
-};
 
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see common/guards.js.
@@ -286,12 +263,17 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // Which countries have online Globalping probes — coverage changes slowly,
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
-// ASN Profile aggregate: every source in one answer. Only a complete answer
-// (no section in error or incomplete) is cached, so a degraded one is never
-// pinned for a week; reputation inside it is not per-user. Not boot-gated: a
-// section whose local data is still downloading answers 'error' on its own
-// (api/asn-profile.js), which also keeps the answer uncached.
-app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, { cacheIf: isCompleteProfile }), asnProfileHandler);
+// ASN Profile aggregate: every source in one answer; reputation inside it is
+// not per-user. A complete answer is cached for a week; a degraded one (a
+// section in error or incomplete) for a day — an upstream that fails for
+// some ASes every time would otherwise send every visit back to all sources.
+// Not boot-gated: a section whose local data is still downloading answers
+// 'error' on its own (api/asn-profile.js), and nothing degraded is cached
+// during that window.
+app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
+    cacheIf: isCompleteProfile,
+    degradedMaxAge: () => (isOfflineBootstrapping() ? 0 : ONE_DAY_CACHE),
+}), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for

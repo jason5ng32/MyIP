@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { runOfflineBootstrap, requireOfflineData, isStillLoading } from '../common/offline-data.js';
+import { runOfflineBootstrap, requireOfflineData, isStillLoading, isOfflineBootstrapping } from '../common/offline-data.js';
 
 const makeRes = () => ({
     statusCode: null,
@@ -69,6 +69,14 @@ describe('isStillLoading', () => {
             assert.equal(isStillLoading(ready), false);
             assert.equal(isStillLoading(), false);
         });
+    });
+});
+
+describe('isOfflineBootstrapping', () => {
+    it('is true only inside the boot window', async () => {
+        assert.equal(isOfflineBootstrapping(), false);
+        await duringBoot(() => assert.equal(isOfflineBootstrapping(), true));
+        assert.equal(isOfflineBootstrapping(), false);
     });
 });
 

@@ -14,8 +14,9 @@
 //
 // `incomplete` lists 'ok' sections whose source answered only in part (some
 // of its upstream calls failed — today Radar's segments): the data is still
-// shown, but the answer is not edge-cached (isCompleteProfile). A loader
-// signals it by resolving { status: 'ok', data, incomplete: true }.
+// shown, but the answer gets only the short degraded TTL (isCompleteProfile,
+// backend-server.js). A loader signals it by resolving
+// { status: 'ok', data, incomplete: true }.
 
 import logger from './logger.js';
 
@@ -138,7 +139,7 @@ export const buildSectionLoaders = (deps) => ({
         if (!deps.hasRadarKey()) return result('disabled');
         const body = await deps.fetchRadarPrefixes(asn);
         const section = classifyPrefixes(body);
-        // e.g. countries missing for want of MaxMind: shown, not cached.
+        // e.g. countries missing for want of MaxMind: shown, not cached for a week.
         return section.status === 'ok' && deps.isPartialPrefixes?.(body) ? { ...section, incomplete: true } : section;
     },
     connectivity: async (asn) => classifyConnectivity(await deps.getConnectivity(asn)),
@@ -182,8 +183,9 @@ export const allSourcesFailed = (body) => {
     return live.length > 0 && live.every((status) => status === 'error');
 };
 
-// Edge-cache veto: only a complete answer (no section in error or
-// incomplete) is cached, so a degraded response is never pinned.
+// Whether an answer earns the full edge-cache TTL: no section in error or
+// incomplete. A degraded one gets a day (backend-server.js), so a failure is
+// never pinned for a week.
 export const isCompleteProfile = (body) => Boolean(body?.status)
     && !Object.values(body.status).includes('error')
     && !(body.incomplete?.length > 0);

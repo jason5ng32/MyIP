@@ -23,6 +23,9 @@ export const runOfflineBootstrap = async (steps) => {
     }
 };
 
+// Whether the boot window is open: some offline data may still be on its way.
+export const isOfflineBootstrapping = () => booting;
+
 // Whether any of `checks` is unready inside the boot window — data that is
 // on its way, as opposed to a download that already failed.
 export const isStillLoading = (...checks) => booting && checks.some((isReady) => !isReady());
