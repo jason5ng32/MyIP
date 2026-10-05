@@ -3,7 +3,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { reviveAnimations, installAnimationRevival, REVIVED_EVENT } from '../frontend/utils/revive-animations.js';
+import { reviveAnimations, installAnimationRevival } from '../frontend/utils/revive-animations.js';
 
 const fakeAnimation = ({ css = true, playState = 'running', currentTime = 1234 } = {}) => {
     const log = [];
@@ -42,21 +42,16 @@ describe('installAnimationRevival()', () => {
         const hooks = {};
         const router = { afterEach: (fn) => { hooks.afterEach = fn; } };
         const listeners = {};
-        const dispatched = [];
-        const win = {
-            addEventListener: (type, fn) => { listeners[type] = fn; },
-            dispatchEvent: (event) => dispatched.push(event.detail),
-            CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init.detail; } },
-        };
+        const win = { addEventListener: (type, fn) => { listeners[type] = fn; } };
         const spin = fakeAnimation();
         const doc = { getAnimations: () => [spin] };
         const scheduled = [];
         installAnimationRevival(router, { win, doc, schedule: (fn, delayMs) => scheduled.push({ fn, delayMs }) });
-        return { hooks, listeners, dispatched, spin, scheduled };
+        return { hooks, listeners, spin, scheduled };
     };
 
     it('schedules the passes only for a navigation that came from popstate', () => {
-        const { hooks, listeners, scheduled, spin, dispatched } = setup();
+        const { hooks, listeners, scheduled, spin } = setup();
         hooks.afterEach();
         assert.equal(scheduled.length, 0, 'a push schedules nothing');
         listeners.popstate();
@@ -64,17 +59,8 @@ describe('installAnimationRevival()', () => {
         assert.deepEqual(scheduled.map((s) => s.delayMs), [0, 400, 1200]);
         scheduled.forEach((s) => s.fn());
         assert.equal(spin.log.filter((l) => l === 'play').length, 3);
-        assert.deepEqual(dispatched.map((d) => d.revived), [1, 1, 1]);
         hooks.afterEach();
         assert.equal(scheduled.length, 3, 'the flag is consumed');
     });
 
-    it('dispatches the revived event under its name', () => {
-        const { hooks, listeners, scheduled, dispatched } = setup();
-        listeners.popstate();
-        hooks.afterEach();
-        scheduled[0].fn();
-        assert.equal(dispatched.length, 1);
-        assert.equal(REVIVED_EVENT, 'jn:animations-revived');
-    });
 });

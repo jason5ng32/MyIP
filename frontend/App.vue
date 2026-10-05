@@ -21,8 +21,6 @@
         <Alert />
         <DocsAssistant />
         <PWA v-if="offerPwaInstall" />
-        <!-- TEMPORARY: ?debug=nav diagnostic overlay (widgets/NavDebug.vue). -->
-        <NavDebug v-if="navDebug" />
     </TooltipProvider>
 </template>
 
@@ -47,16 +45,6 @@ const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
 const User = defineAsyncComponent(() => import('@/components/User.vue'));
 const Preferences = defineAsyncComponent(() => import('@/components/widgets/Preferences.vue'));
 const offerPwaInstall = ref(false);
-// TEMPORARY diagnostic overlay for the iOS Nav animation stall: ?debug=nav
-// turns it on (kept in localStorage), ?debug=off turns it off.
-const NavDebug = defineAsyncComponent(() => import('@/components/widgets/NavDebug.vue'));
-const navDebug = ref(false);
-try {
-    const asked = new URLSearchParams(window.location.search).get('debug');
-    if (asked === 'nav') localStorage.setItem('jn-debug', 'nav');
-    if (asked === 'off') localStorage.removeItem('jn-debug');
-    navDebug.value = localStorage.getItem('jn-debug') === 'nav';
-} catch { /* storage disabled */ }
 onMounted(() => {
     if (shouldOfferPwaInstall()) {
         setTimeout(() => { offerPwaInstall.value = true; }, 30 * 1000);

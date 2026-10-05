@@ -2,11 +2,10 @@
 //
 // On iOS, accelerated CSS animations that were running before a swipe-back
 // gesture stay visually frozen once the gesture lands on the previous page:
-// requestAnimationFrame keeps its rate, the animations' own time keeps
-// advancing and their iteration events keep firing, yet the compositor never
-// paints a new frame for them until their layer is rebuilt (measured on
-// iOS 26 with the ?debug=nav overlay: cancel + play, a display:none round
-// trip or a re-insert all revive them; style changes on an ancestor don't).
+// requestAnimationFrame keeps its rate and the animations' own time keeps
+// advancing, yet the compositor paints no new frame for them until their
+// layer is rebuilt (measured on iOS 26: cancel + play, a display:none round
+// trip or a re-insert revive them; style changes on an ancestor don't).
 // A navigation that commits a new animation (a push with its page
 // transition) revives them as a side effect, so only history steps — where
 // the browser's own gesture animation replaces ours — are affected.
@@ -20,7 +19,6 @@
 // dismisses its gesture snapshot late.
 
 const REVIVE_DELAYS_MS = [0, 400, 1200];
-export const REVIVED_EVENT = 'jn:animations-revived';
 
 const isCssAnimation = (animation) => typeof animation?.animationName === 'string';
 
@@ -59,10 +57,7 @@ export const installAnimationRevival = (router, {
         if (!historyStep) return;
         historyStep = false;
         for (const delayMs of REVIVE_DELAYS_MS) {
-            schedule(() => {
-                const revived = reviveAnimations(doc);
-                win.dispatchEvent?.(new win.CustomEvent(REVIVED_EVENT, { detail: { revived, delayMs } }));
-            }, delayMs);
+            schedule(() => reviveAnimations(doc), delayMs);
         }
     });
 };
