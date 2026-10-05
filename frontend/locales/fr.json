@@ -857,6 +857,123 @@
       "no": "Non"
     }
   },
+  "ipblocklist": {
+    "Title": "Vérification des listes noires IP",
+    "Note": "Vérifie une IP auprès d’environ 80 listes noires publiques, réparties en deux groupes. Les listes noires en temps réel (DNSBL) sont interrogées en direct par les serveurs de messagerie, les forums et les services en ligne pour décider d’accepter ou non une connexion ou un message ; les listes de renseignement sur les menaces sont des flux publics d’adresses abusives, de proxys ouverts, de serveurs VPN et de sorties Tor, chargés par les pare-feu et les services de sécurité. Figurer sur ces listes explique souvent des e-mails refusés, des inscriptions bloquées ou des CAPTCHA à répétition.",
+    "Note2": "Chaque inscription relève de l’un de trois types. Abus signifie qu’une liste a enregistré du spam, des attaques ou un appareil compromis à cette adresse. Anonymat signifie que l’adresse est connue comme proxy, VPN, relais ou sortie Tor, ce qui est normal si vous en utilisez un et ne constitue pas un mauvais antécédent en soi. Les indications visent le réseau plus large, comme une plage dynamique ou un fournisseur entier, plutôt que cette adresse. Les adresses partagées, cloud et VPN apparaissent souvent quelque part : voyez une inscription comme un signal plutôt qu’un verdict ; lorsqu’une liste propose une page de retrait, le lien figure à côté de l’inscription.",
+    "SelectIPLabel": "Choisissez une IP à vérifier",
+    "EnterIPLabel": "Saisissez une IP à vérifier",
+    "UseStored": "Utiliser une IP détectée",
+    "SelectIP": "Choisissez une IP",
+    "EnterIPPlaceholder": "ex. 1.1.1.1",
+    "InvalidIP": "Saisissez une adresse IPv4 ou IPv6 publique.",
+    "Checking": "Vérification d’environ 80 listes noires. Cela peut prendre jusqu’à 30 secondes.",
+    "FetchError": "La vérification n’a pas abouti. Réessayez dans un instant.",
+    "CheckedAt": "Vérifié le {time}",
+    "verdict": {
+      "abuse": "Cette IP a des antécédents d’abus sur certaines listes noires",
+      "anonymity": "Aucun antécédent d’abus, mais cette IP est marquée comme proxy, VPN, relais ou sortie Tor",
+      "notice": "Absente des listes noires, mais certaines listes signalent son réseau",
+      "clean": "Absente de toutes les listes noires vérifiées"
+    },
+    "count": {
+      "abuse": "Abus",
+      "anonymity": "Anonymat",
+      "notice": "Indication",
+      "clean": "Propre",
+      "error": "Échec"
+    },
+    "SomeFailed": "{n} listes n’ont pas pu être vérifiées cette fois ; le résultat peut être incomplet.",
+    "part": {
+      "dnsbl": {
+        "title": "Listes noires en temps réel (DNSBL)",
+        "desc": "Interrogées en direct par les serveurs de messagerie et les services en ligne"
+      },
+      "static": {
+        "title": "Listes de renseignement sur les menaces",
+        "desc": "Listes d’abus, de proxy et de VPN utilisées par les pare-feu et les services de sécurité"
+      }
+    },
+    "NoHits": "Aucune inscription ici.",
+    "ShowRest": "Afficher les {n} autres listes",
+    "HideRest": "Masquer",
+    "CheckFailed": "Échec de la vérification",
+    "LastSeen": "Vue pour la dernière fois le {date}",
+    "RequestRemoval": "Demander le retrait",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abus",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relais",
+      "tor": "Tor",
+      "scanner": "Scanner",
+      "backscatter": "Backscatter",
+      "mixed": "Mixte"
+    },
+    "reason": {
+      "socksProxy": "Proxy SOCKS",
+      "httpProxy": "Proxy HTTP",
+      "proxyChain": "Chaîne de proxys",
+      "webProxy": "Proxy web",
+      "wingateProxy": "Proxy WinGate",
+      "openProxy": "Proxy ouvert",
+      "torExit": "Nœud de sortie Tor",
+      "exploited": "Hôte exploité",
+      "compromisedHost": "Hôte compromis",
+      "compromisedRouter": "Routeur compromis",
+      "botnet": "Botnet",
+      "worm": "Infection par un ver",
+      "ircDrone": "Drone IRC",
+      "ddosDrone": "Drone DDoS",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Attaques par force brute",
+      "spamSource": "Source de spam",
+      "spamtrap": "Piège à spam déclenché",
+      "badReputation": "Mauvaise réputation",
+      "hijackedNetwork": "Réseau détourné",
+      "endUserRange": "Plage d’utilisateurs finaux",
+      "dynamicRange": "Plage d’adresses dynamiques",
+      "noMailRange": "Plage non destinée à envoyer du courrier",
+      "missingPtr": "Pas de DNS inverse",
+      "poorReputation": "Réputation faible",
+      "mixedReputation": "Réputation mitigée",
+      "rangeListed": "Plage d’adresses listée",
+      "networkListed": "Réseau entier listé",
+      "unaccountableOperator": "L’opérateur ne traite pas les abus",
+      "noMailService": "Pas de service de messagerie",
+      "unreliableAbuseDesk": "Contact abus peu fiable",
+      "reported1d": "Signalée au cours du dernier jour",
+      "reported7d": "Signalée au cours des 7 derniers jours",
+      "reported30d": "Signalée au cours des 30 derniers jours",
+      "reported90d": "Signalée au cours des 90 derniers jours",
+      "feeds": "Signalée par au moins {n} sources de menaces",
+      "testEntry": "Entrée de test"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abus",
+        "desc": "la liste a enregistré du spam, des attaques ou un appareil compromis à cette adresse"
+      },
+      "anonymity": {
+        "label": "Anonymat",
+        "desc": "proxy, VPN, relais ou sortie Tor connu, ce qui n’est pas un mauvais antécédent en soi"
+      },
+      "notice": {
+        "label": "Indication",
+        "desc": "vise le réseau ou le fournisseur plus large, pas cette adresse"
+      },
+      "clean": {
+        "label": "Non listée",
+        "desc": "cette IP ne figure pas sur la liste"
+      },
+      "error": {
+        "label": "Échec de la vérification",
+        "desc": "la liste n’a pas pu être vérifiée cette fois, ce qui ne signifie pas que l’IP n’y figure pas"
+      }
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "Ouvrir dans un nouvel onglet",
     "BackToHome": "Retour à l'accueil",
@@ -881,7 +998,8 @@
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
     "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
-    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant"
+    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant",
+    "IpBlocklist": "Vérifiez si une IP figure sur des listes noires de spam, d’abus, de proxy ou de VPN"
   },
   "macchecker": {
     "Title": "Recherche MAC",
@@ -1847,6 +1965,7 @@
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
     "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie",
+    "IpBlocklist": "Ouvrir la Vérification des listes noires IP",
     "AsnProfile": "Ouvrir le panneau Recherche de profil ASN"
   },
   "page": {

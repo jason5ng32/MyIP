@@ -37,6 +37,7 @@ import getWhois from './api/get-whois.js';
 import sentryTunnelHandler from './api/sentry-tunnel.js';
 import createReportHandler, { getReport as getReportHandler } from './api/share-report.js';
 import invisibilitytestHandler from './api/invisibility-test.js';
+import ipBlocklistHandler from './api/ip-blocklist.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
 import personaEvaluateHandler from './api/persona.js';
@@ -294,6 +295,7 @@ app.get('/api/ipchecking', requirePublicIP(), withTimeZone(), ipCheckingHandler)
 app.get('/api/dnsresolver', requireValidDomain('hostname'), requireValidRecordType(), dnsResolver);
 app.get('/api/dnsleaktest/session/:token', dnsLeakGetResult);
 app.get('/api/invisibility', invisibilitytestHandler);
+app.get('/api/ipblocklist', requirePublicIP(), ipBlocklistHandler);
 app.get('/api/getuserinfo', getUserinfo);
 app.put('/api/updateuserachievement', updateUserAchievement);
 // Shared reports stay no-store: an edge cache could serve a report past its
