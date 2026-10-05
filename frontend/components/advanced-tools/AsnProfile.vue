@@ -428,6 +428,7 @@ import { Icon } from '@iconify/vue';
 import { ChevronRight, Download, ExternalLink, Globe, Search, ShieldAlert, ShieldCheck, ShieldX } from '@lucide/vue';
 import { trackEvent } from '@/utils/analytics';
 import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useActiveValue } from '@/composables/use-route-active.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { parseAsnInput } from '@/utils/ip/asn-input.js';
 import { buildTrafficPairs, pickConnectionQuality } from '@/utils/ip/asn-metrics.js';
@@ -535,10 +536,12 @@ const onSubmit = () => {
     if (query.value.trim()) start(query.value);
 };
 
-// `?q=` on mount, and any later change while the drawer stays open (an ASN
-// link followed from inside it, history navigation). Our own write-back
-// equals `query` already, so it doesn't run twice.
-watch(() => route.query.q, (q) => {
+// `?q=` on mount, any later change while the tool is on screen (an ASN link
+// followed from inside it, history navigation), and a `?q=` that changed while
+// it was cached away (use-route-active.js). Our own write-back equals `query`
+// already, so it doesn't run twice.
+const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
+watch(sharedQuery, (q) => {
     if (typeof q === 'string' && q.trim() && q !== query.value) {
         query.value = q;
         start(q, { track: false });

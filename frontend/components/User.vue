@@ -109,6 +109,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { useStatusTone } from '@/composables/use-status-tone.js';
+import { useRouteActive } from '@/composables/use-route-active.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -126,6 +127,11 @@ const { dotClass } = useStatusTone();
 // Mounted on a /tools/:slug standalone page (vs the homepage) — these pages
 // skip the homepage loading pipeline, which changes when user info can load.
 const isStandalonePage = computed(() => route.path.startsWith('/tools/'));
+
+// Home and the tool page each host a User and both stay alive (App.vue's
+// KeepAlive): only the one on the page on screen answers the store triggers
+// below; a trigger raised while neither shows waits for the next activation.
+const active = useRouteActive();
 
 const isSignedIn = computed(() => store.isSignedIn);
 const remoteUserInfo = computed(() => store.remoteUserInfo);
@@ -259,23 +265,23 @@ watch(() => store.allHasLoaded, (newVal) => {
 // Standalone tool pages never run the homepage loading pipeline (allHasLoaded
 // stays false there), so sign-in alone is enough to fetch; immediate covers
 // auth having resolved before this component mounted.
-watch(isSignedIn, (signed) => {
+watch(() => active.value && isSignedIn.value, (signed) => {
     if (signed && (store.allHasLoaded || isStandalonePage.value)) getUserInfo();
 }, { immediate: true });
 
-watch(() => triggerUserBenefits.value, (newVal) => {
+watch(() => active.value && triggerUserBenefits.value, (newVal) => {
     if (newVal) openUserBenefits();
 });
 
 // One-shot trigger: cleared here so the next request from Nav / Achievements
 // is a fresh false → true edge rather than a no-op write.
-watch(() => triggerRemoteUserInfo.value, (newVal) => {
+watch(() => active.value && triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;
     store.triggerRemoteUserInfo = false;
     getUserInfo();
 });
 
-watch(() => triggerUpdateAchievements.value, (newVal) => {
+watch(() => active.value && triggerUpdateAchievements.value, (newVal) => {
     if (newVal) {
         updateUserAchievement(achievementToUpdate.value);
         store.triggerUpdateAchievements = false;

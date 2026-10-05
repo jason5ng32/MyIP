@@ -1,8 +1,10 @@
 // Scroll tracking: when page scrolls
 //   1) capture the first partially visible section, write to store.changeSection() (for Nav highlighting)
 //   2) send one JNScroll event when each section first fully enters the viewport (only once, deduplicated)
+// The listener runs only while the homepage is the page on screen (it stays
+// alive in a KeepAlive while a tool page shows).
 
-import { onMounted, onBeforeUnmount } from 'vue';
+import { useActiveEventListener } from './use-route-active.js';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { SECTION_IDS } from '@/data/sections';
@@ -48,11 +50,5 @@ export function useSectionTracking() {
         });
     };
 
-    onMounted(() => {
-        window.addEventListener('scroll', checkSectionsAndTrack);
-    });
-
-    onBeforeUnmount(() => {
-        window.removeEventListener('scroll', checkSectionsAndTrack);
-    });
+    useActiveEventListener(window, 'scroll', checkSectionsAndTrack);
 }

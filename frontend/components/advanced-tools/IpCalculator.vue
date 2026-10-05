@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
@@ -94,6 +94,7 @@ import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { selectableIPs } from '@/composables/use-globalping-measurement.js';
+import { useActiveValue } from '@/composables/use-route-active.js';
 import { analyzeCidr, calculate } from '@/utils/features/ip-calc.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -200,13 +201,17 @@ const onPrefixCommit = (prefix) => {
     syncQuery();
 };
 
-onMounted(() => {
-    const q = route.query.q;
-    if (typeof q === 'string' && q.trim()) {
+// `?q=` on mount, any later change while the tool is on screen (history
+// navigation), and a `?q=` that changed while it was cached away
+// (use-route-active.js). Our own write-back equals the trimmed input, so it
+// doesn't run twice.
+const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
+watch(sharedQuery, (q) => {
+    if (typeof q === 'string' && q.trim() && q !== query.value.trim()) {
         query.value = q;
         run(q);
     }
-});
+}, { immediate: true });
 
 /* ------------------------------------------------------------------ */
 /* Result dispatch                                                     */

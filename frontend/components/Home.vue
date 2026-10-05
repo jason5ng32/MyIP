@@ -70,6 +70,8 @@ import { useShortcuts } from '@/composables/use-shortcuts.js';
 import { useSectionTracking } from '@/composables/use-section-tracking.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 
+defineOptions({ name: 'Home' });
+
 const { t } = useI18n();
 const store = useMainStore();
 const configs = computed(() => store.configs);
@@ -113,8 +115,8 @@ useSectionTracking();
 // Localized homepage head. Provide title/description explicitly via t() rather
 // than leaning on use-document-meta's DEFAULT_META snapshot: that snapshot is
 // taken at module load, before the (now async) locale messages land, so it would
-// pin the head to index.html's English title. Reactive t() also re-applies the
-// right copy when SPA-navigating back from a /tools/:slug page.
+// pin the head to index.html's English title. Home is kept alive, so coming
+// back from another page re-applies this head on activation.
 useDocumentMeta(() => ({
     title: t('page.title'),
     description: t('page.description'),

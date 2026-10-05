@@ -81,10 +81,20 @@ grid and the nav; deep links (`?tool=`, `/tools/:slug`) are never gated.
 ### Overlays take no keyboard shortcuts
 
 One dispatcher (`utils/shortcut.js`) over the map `use-shortcuts.js` registers
-(home route only; Home clears it on unmount; `registerShortcuts()` replaces it),
+(home route only; Home clears it when left; `registerShortcuts()` replaces it),
 suspended while an overlay is open — keyed off form: the `ui/` roots `Dialog` /
 `Sheet` / `Drawer` call `use-overlay-shortcuts.js`, so anything built on them
 inherits it; overlays nest; Esc and native scrolling still work.
+
+### Kept-alive pages pause while hidden
+
+`App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up to
+8 tools alive per slug, dropped on sign-out / account switch
+(`utils/tool-cache.js`). A cached page never unmounts, so whatever acts on the
+route, the document head, window events or the store's one-shot triggers gates
+on `use-route-active.js` (`useRouteActive` / `useActiveValue` /
+`useActiveEventListener`), not on mount / unmount. Overlays on a page being left
+are closed by `use-overlay-shortcuts.js` — their portal would outlive it.
 
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
@@ -135,9 +145,10 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   `INLINE_TIERS`; `:max-lines="2"` on heroes); no length-threshold helpers.
 - **Filter tags** — `ToggleGroup :spacing="2"` of detached `h-7 rounded-full`
   pills, `w-full flex-wrap` (IPHistory, DnsResolver); never `spacing=0`.
-- **Shareable tool input** — watch `route.query.q` (immediate, so mount and
-  later changes in an open drawer both run), `router.replace` it on every run
-  (AsnProfile); both `/tools/` and `?tool=` URLs.
+- **Shareable tool input** — watch `useActiveValue(() => route.query.q, {
+  pathOf: () => route.path })` (immediate, so mount, later changes and a `q`
+  changed while cached all run; another page's `q` never does), `router.replace`
+  it on every run (AsnProfile); both `/tools/` and `?tool=` URLs.
 - **Fixed option sets** — a closed list wider than one line is a `Select`.
 - **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
   Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.

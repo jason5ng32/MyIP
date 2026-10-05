@@ -296,6 +296,7 @@ import { isToolAvailable } from '@/utils/tool-availability.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
+import { useRouteActive } from '@/composables/use-route-active.js';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
@@ -453,26 +454,32 @@ const onScroll = () => {
   });
 };
 
-watch(isMobile, (mobile) => {
-  if (!mobile) {
-    isNavHidden.value = false;
-    window.removeEventListener('scroll', onScroll);
-  } else {
+// The listener runs on mobile while the homepage is the page on screen (it
+// stays alive in a KeepAlive while a tool page shows); re-attaching resyncs
+// lastScrollY so the first scroll after coming back isn't a phantom jump.
+const navActive = useRouteActive();
+const tracksScroll = computed(() => isMobile.value && navActive.value);
+const setScrollListener = (on) => {
+  if (on) {
     lastScrollY = window.scrollY;
     window.addEventListener('scroll', onScroll, { passive: true });
+  } else {
+    window.removeEventListener('scroll', onScroll);
   }
-}, { immediate: false });
+};
+
+watch(isMobile, (mobile) => {
+  if (!mobile) isNavHidden.value = false;
+});
+watch(tracksScroll, setScrollListener);
 
 onMounted(() => {
-  if (isMobile.value) {
-    lastScrollY = window.scrollY;
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
+  if (tracksScroll.value) setScrollListener(true);
   fetchGithubStars();
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', onScroll);
+  setScrollListener(false);
   clearTimeout(openToolTimer);
 });
 </script>

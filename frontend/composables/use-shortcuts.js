@@ -17,6 +17,9 @@
 //   - scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug);
 //     test-running keys dispatch commands on utils/app-commands.js
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
+//   - the map is live only while Home is the page on screen: Home stays alive
+//     in App.vue's KeepAlive, so it is cleared on deactivation and rebuilt on
+//     activation (use-route-active.js).
 //   - every entry here is a home-page action. Overlays (Dialog / Sheet /
 //     Drawer) suspend the whole map while they are open — see
 //     utils/shortcut.js — so nothing needs a per-key "is something covering
@@ -28,6 +31,7 @@ import { emitAppEvent } from '../utils/app-events.js';
 import { dispatchAppCommand } from '../utils/app-commands.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
+import { useRouteActive } from './use-route-active.js';
 import { hasPulseBackend } from '../utils/features/pulse-beacon.js';
 
 // A shortcut only kicks the run off — completion is the owner's business —
@@ -271,10 +275,12 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     // Suspending the map behind an overlay is the primitives' job
     // (composables/use-overlay-shortcuts.js), so nothing is wired here.
     //
-    // Home is the only route that registers shortcuts; drop them when it
-    // unmounts, so keystrokes on /privacy or /r/:id can't reach refs that no
-    // longer point at anything.
+    // Home is the only route that registers shortcuts; drop them when it is
+    // left (cached away or unmounted), so keystrokes on another page can't
+    // drive the hidden homepage. Coming back rebuilds the map.
     let disposed = false;
+    let loaded = false;
+    const active = useRouteActive();
     if (getCurrentScope()) {
         onScopeDispose(() => {
             disposed = true;
@@ -286,15 +292,22 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
         registerShortcuts(buildShortcutConfig({ refs, store, t, configs, userPreferences }));
     };
 
+    watch(active, (isActive) => {
+        if (!loaded || disposed) return;
+        if (isActive) registerShortcutKeys();
+        else registerShortcuts([]);
+    });
+
     const loadShortcuts = () => {
         // Register immediately so the base keys work from the first paint;
         // config-gated keys (originalSite's i/D/P, pulse's p) fill in when
         // /api/configs lands (`{}` → data, once per page load) and the watcher
         // rebuilds the map. keyMap is mutated in place (utils/shortcut.js),
         // so the help modal's reference stays current across rebuilds.
-        registerShortcutKeys();
+        loaded = true;
+        if (active.value) registerShortcutKeys();
         watch(configs, () => {
-            if (!disposed) registerShortcutKeys();
+            if (!disposed && active.value) registerShortcutKeys();
         });
         // Help is an async component (Home.vue): on slow networks its chunk
         // may land later, so wait for the ref instead of silently skipping

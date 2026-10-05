@@ -2,19 +2,20 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { computed, ref } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { parse } from 'vue/compiler-sfc';
 import { analyzeCidr, calculate } from '../frontend/utils/features/ip-calc.js';
+import { useActiveValue } from '../frontend/composables/use-route-active.js';
 
 const source = readFileSync(new URL('../frontend/components/advanced-tools/IpCalculator.vue', import.meta.url), 'utf8');
 const script = parse(source).descriptor.scriptSetup.content.replace(/^import[\s\S]*?;$/gm, '');
-const fixture = (q, drawer = false) => {
-    const route = { query: { q, hl: 'en', ...(drawer ? { tool: 'ipcalculator' } : {}) } };
+// `active` stands in for the page's KeepAlive state (use-route-active.js).
+const fixture = (q, drawer = false, active = ref(true)) => {
+    const route = reactive({ path: '/tools/ipcalculator', query: { q, hl: 'en', ...(drawer ? { tool: 'ipcalculator' } : {}) } });
     const replacements = [];
-    let mount;
     const bindings = {
-        computed, ref, analyzeCidr, calculate,
-        onMounted: callback => { mount = callback; },
+        computed, ref, watch, analyzeCidr, calculate,
+        useActiveValue: (getter, options) => useActiveValue(getter, { ...options, active }),
         useRoute: () => route,
         useRouter: () => ({ replace: value => { replacements.push(value); route.query = value.query; } }),
         useI18n: () => ({ t: key => key }),
@@ -22,7 +23,6 @@ const fixture = (q, drawer = false) => {
     };
     const setup = new Function(...Object.keys(bindings), `${script}\nreturn { query, result, picked, onPrefix, onPrefixCommit };`);
     const component = setup(...Object.values(bindings));
-    mount();
     return { ...component, route, replacements };
 };
 
@@ -63,4 +63,42 @@ test('a prefix commit without an address result leaves the URL alone', () => {
         assert.equal(run.query.value, input);
         assert.equal(run.replacements.length, 0);
     }
+});
+
+test('?q= runs on mount, follows the route while active, and is ignored while cached away', async () => {
+    const active = ref(true);
+    const run = fixture('10.0.0.0/22', false, active);
+    assert.equal(run.query.value, '10.0.0.0/22');
+    assert.equal(run.result.value.analysis.cidr.prefix, 22);
+
+    // Navigating to another tool changes the route before this one is
+    // deactivated: the path already tells it the query isn't its own.
+    run.route.path = '/tools/asn';
+    run.route.query = { q: 'AS13335' };
+    await nextTick();
+    assert.equal(run.query.value, '10.0.0.0/22', 'another path\'s ?q= is ignored');
+
+    // Another page rewrites ?q= while the calculator is cached.
+    active.value = false;
+    run.route.query = { q: 'AS15169' };
+    await nextTick();
+    assert.equal(run.query.value, '10.0.0.0/22', 'a hidden tool ignores the route');
+    assert.equal(run.result.value.analysis.cidr.prefix, 22);
+
+    // Coming back to the same URL keeps an unsubmitted draft.
+    run.route.path = '/tools/ipcalculator';
+    run.route.query = { q: '10.0.0.0/22' };
+    run.query.value = '192.0.2.';
+    active.value = true;
+    await nextTick();
+    assert.equal(run.query.value, '192.0.2.', 'an unchanged ?q= does not overwrite the input');
+
+    // A different ?q= on arrival runs.
+    active.value = false;
+    run.route.query = { q: '192.0.2.0/24' };
+    active.value = true;
+    await nextTick();
+    assert.equal(run.query.value, '192.0.2.0/24');
+    assert.equal(run.result.value.analysis.cidr.prefix, 24);
+    assert.equal(run.replacements.length, 0, 'reading ?q= never writes it back');
 });

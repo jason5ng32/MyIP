@@ -1,9 +1,17 @@
 <template>
     <!-- Thin app shell: only the globals that must exist on every route live
-    here (tooltip context, toast host, PWA install prompt, theme). The
-    homepage and the standalone tool pages are swapped in via <router-view>. -->
+    here (tooltip context, toast host, PWA install prompt, theme). Pages swap
+    in via <router-view>; the homepage and the tool page stay alive in the
+    KeepAlive (never evicted), so leaving and coming back neither re-runs the
+    homepage tests nor loses a tool's state. Every tool route shares the one
+    ToolPage instance (key 'tool'), which caches each tool per slug itself.
+    Cached pages pause while hidden — see composables/use-route-active.js. -->
     <TooltipProvider :delay-duration="150">
-        <router-view />
+        <router-view v-slot="{ Component, route: viewRoute }">
+            <KeepAlive :include="['Home', 'ToolPage']">
+                <component :is="Component" :key="viewRoute.name === 'tool' ? 'tool' : viewRoute.name" />
+            </KeepAlive>
+        </router-view>
         <Alert />
         <DocsAssistant />
         <PWA v-if="offerPwaInstall" />

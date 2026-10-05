@@ -7,9 +7,15 @@
 //
 // Sync flush on purpose: a keystroke arriving in the same tick as the open
 // flip must already see the overlay.
+//
+// Overlays on a page kept alive by a KeepAlive (App.vue / ToolPage.vue) are
+// asked to close when that page is left: their portal sits in <body>, outside
+// the cached page, so an open one would otherwise stay on screen — scroll lock
+// and all — over the next page. Only an overlay on the page on screen counts.
 
-import { getCurrentScope, onScopeDispose, watch } from 'vue';
+import { getCurrentInstance, getCurrentScope, onDeactivated, onScopeDispose, toValue, watch } from 'vue';
 import { openOverlay, closeOverlay } from '@/utils/shortcut.js';
+import { useRouteActive } from './use-route-active.js';
 
 export const useOverlayShortcuts = (isOpen) => {
     let counted = false;
@@ -21,7 +27,16 @@ export const useOverlayShortcuts = (isOpen) => {
         (next ? openOverlay : closeOverlay)();
     };
 
-    watch(isOpen, sync, { immediate: true, flush: 'sync' });
+    const active = useRouteActive();
+    watch(() => active.value && toValue(isOpen), sync, { immediate: true, flush: 'sync' });
+
+    // The root declares `update:open`, so its v-model / handler closes it.
+    const instance = getCurrentInstance();
+    if (instance) {
+        onDeactivated(() => {
+            if (toValue(isOpen)) instance.emit('update:open', false);
+        });
+    }
 
     // An overlay torn down while still open (its parent unmounting) never
     // flips `open` back to false — release the count here instead of leaking.

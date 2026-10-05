@@ -1,15 +1,17 @@
 // Per-route document head (title / description / canonical / Open Graph).
 //
-// There's no SSR, so this runs client-side: each routed page (Home.vue and the
-// standalone tool pages) calls useDocumentMeta() with its own values. Because
-// those pages swap through <router-view>, whichever is mounted fully owns the
-// head — no restore bookkeeping needed. It's reactive (watchEffect), so locale
-// switches and slug changes re-apply automatically.
+// There's no SSR, so this runs client-side: each routed page (Home.vue, the
+// tool page, /privacy, /r/:id) calls useDocumentMeta() with its own values.
+// Only the page on screen writes: a page kept alive by App.vue's KeepAlive
+// stops writing while hidden and re-applies its head when it is activated
+// again (use-route-active.js) — no restore bookkeeping needed. It's reactive
+// (watchEffect), so locale switches and slug changes re-apply automatically.
 //
 // index.html ships sensible homepage defaults (used on first paint and as the
 // fallback here); this just overrides them once Vue is driving the page.
 
 import { watchEffect } from 'vue';
+import { useRouteActive } from './use-route-active.js';
 
 // Snapshot the index.html-provided values once, before any route overrides
 // them — Home.vue reuses these so SPA-navigating back to `/` restores the
@@ -47,7 +49,9 @@ function setLink(rel, href) {
 // back to the homepage defaults / the current origin. Read reactive sources
 // (t(), route params) inside it so the head tracks them.
 export function useDocumentMeta(getMeta) {
+    const active = useRouteActive();
     watchEffect(() => {
+        if (!active.value) return;
         const meta = getMeta() || {};
         const title = meta.title || DEFAULT_META.title;
         const description = meta.description || DEFAULT_META.description;
