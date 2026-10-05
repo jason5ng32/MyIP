@@ -22,12 +22,12 @@ import maxmind from 'maxmind';
 import logger from './logger.js';
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { downloadToFile, decompressFile } from './dataset-updater.js';
-import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase, hasAsOrgSnapshot } from './as-org-db.js';
-import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase, hasAsRelSnapshot } from './as-rel-db.js';
-import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDatabase } from './peeringdb-db.js';
+import { AS_ORG_DB_DIR, AS_ORG_FILE, reloadAsOrgDatabase, isAsOrgLoaded } from './as-org-db.js';
+import { AS_REL_DB_DIR, AS_REL_FILE, reloadAsRelDatabase, isAsRelLoaded } from './as-rel-db.js';
+import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDatabase, isPeeringdbLoaded } from './peeringdb-db.js';
 import { distillPeeringdbDump } from './peeringdb-distill.js';
 import { hasRadarApiKey } from './cf-radar.js';
-import { MAXMIND_DB_DIR, MAXMIND_CITY_DB, MAXMIND_ASN_DB, reloadMaxMindDatabases } from './maxmind-service.js';
+import { MAXMIND_DB_DIR, MAXMIND_CITY_DB, MAXMIND_ASN_DB, reloadMaxMindDatabases, isMaxMindReady } from './maxmind-service.js';
 
 // The pre-engine CAIDA updater's state: same { identifier, updatedAt } shape.
 const CAIDA_LEGACY_STATE = { file: '.caida-update-state.json', toState: (json) => json };
@@ -196,13 +196,14 @@ export const datasets = [
             await Promise.all(MAXMIND_EDITIONS.map(({ file }) => maxmind.open(staged[file])));
         },
         reload: reloadMaxMindDatabases,
+        isLoaded: isMaxMindReady,
     },
     {
         id: 'as2org',
         dir: AS_ORG_DB_DIR,
         files: [AS_ORG_FILE],
         // The reader takes the newest *.txt, whatever its name.
-        hasSnapshot: hasAsOrgSnapshot,
+        isLoaded: isAsOrgLoaded,
         legacyState: CAIDA_LEGACY_STATE,
         legacyAutoUpdateEnv: 'CAIDA_AUTO_UPDATE',
         // Stable 'latest' symlink server-side → HEAD + Last-Modified is enough
@@ -222,7 +223,7 @@ export const datasets = [
         dir: AS_REL_DB_DIR,
         files: [AS_REL_FILE],
         // The reader takes the newest *.txt, whatever its name.
-        hasSnapshot: hasAsRelSnapshot,
+        isLoaded: isAsRelLoaded,
         legacyState: CAIDA_LEGACY_STATE,
         legacyAutoUpdateEnv: 'CAIDA_AUTO_UPDATE',
         // No 'latest' symlink — scrape the directory listing; YYYYMMDD
@@ -267,5 +268,6 @@ export const datasets = [
         },
         validate: validatePeeringdb,
         reload: reloadPeeringdbDatabase,
+        isLoaded: isPeeringdbLoaded,
     },
 ];

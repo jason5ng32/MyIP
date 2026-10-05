@@ -7,7 +7,8 @@
 //     carries a heartbeat, so a crashed holder's lock goes stale on its own);
 //   - a state file per dataset, written atomically (write-file-atomic);
 //   - publishing a row's files together, rolled back if any rename fails;
-//   - the boot download of a missing snapshot, under a timeout;
+//   - the boot download of a snapshot that is missing, unusable or left
+//     half-published, under a timeout;
 //   - the daily schedule (croner), at a fixed wall-clock time, plus a
 //     catch-up run at boot for datasets a downtime kept from their check;
 //   - reloading files published by anyone else — another process, or an
@@ -26,10 +27,11 @@
 //                     name in `files`
 //   validate(staged)  throws to refuse a truncated or corrupt download
 //   reload(reason)    swaps the in-memory copy for the published files
-//   hasSnapshot()     optional; whether the reader already has a snapshot
-//                     to serve, when it accepts more than the published file
-//                     names (a hand-named CAIDA file) — the boot download
-//                     then skips. Default: every published file is present
+//   isLoaded()        optional; whether the reader holds a usable snapshot —
+//                     it may accept more than the published names (a
+//                     hand-named CAIDA file) or refuse a file it can't parse.
+//                     The boot download skips a loaded row. Default: every
+//                     published file is present
 //   legacyState       optional { file, toState(json) → { identifier, updatedAt } }:
 //                     the state file an earlier updater wrote, read once so
 //                     an upgrade doesn't re-download
@@ -38,7 +40,7 @@
 //
 // State file (`.dataset-state.json`): { identifier, updatedAt, checkedAt } —
 // the published version, when it was published, when the remote was last
-// asked about it.
+// asked about it — plus `publishing: true` while files are in flux.
 
 import fs from 'fs';
 import fsp from 'fs/promises';
@@ -94,7 +96,7 @@ export const isRowEnabled = (row) => !row.enabled || Boolean(row.enabled());
 export const isPresent = (row) => row.files.every((file) => fs.existsSync(path.join(row.dir, file)));
 
 // Whether the boot download can skip the row: its reader has something.
-const hasSnapshot = (row) => (row.hasSnapshot ? row.hasSnapshot() : isPresent(row));
+const isLoaded = (row) => (row.isLoaded ? row.isLoaded() : isPresent(row));
 
 /** The row's state, falling back to an earlier updater's state file; {} when neither exists. */
 export const readState = async (row) => {
@@ -222,9 +224,10 @@ const publish = async (row, staged, { signal, lockLost }) => {
  * state doesn't (or a file is missing) fetch, validate, publish, record and
  * reload. Resolves { updated: true, identifier } or { updated: false, reason:
  * 'not-modified' | 'locked' }; throws when a step fails (nothing published).
- * `wait` waits out another holder of the lock instead of answering 'locked'.
+ * `wait` waits out another holder of the lock instead of answering 'locked';
+ * `force` fetches even when the state already records the remote's version.
  */
-export const updateDataset = async (row, { signal, reason = 'auto update', wait = false } = {}) => {
+export const updateDataset = async (row, { signal, reason = 'auto update', wait = false, force = false } = {}) => {
     await fsp.mkdir(row.dir, { recursive: true });
     const lock = await acquireLock(row, { wait, signal });
     if (!lock) return { updated: false, reason: 'locked' };
@@ -235,7 +238,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         const state = await readState(row);
         const remote = await row.findRemote({ signal: work });
         const now = new Date().toISOString();
-        if (remote.identifier && isPresent(row) && state.identifier === remote.identifier) {
+        if (!force && remote.identifier && isPresent(row) && state.identifier === remote.identifier) {
             work.throwIfAborted();
             await writeState(row, { ...state, checkedAt: now });
             return { updated: false, reason: 'not-modified' };
@@ -247,9 +250,10 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         // Files in flux: until the final state below, the record names no
         // version, so a run that dies or loses the lock mid-publish leaves
         // nothing the next holder would take for current — it re-fetches and
-        // publishes a whole set.
+        // publishes a whole set, and the next boot does so before trusting
+        // the files.
         work.throwIfAborted();
-        await writeState(row, { ...state, identifier: null });
+        await writeState(row, { ...state, identifier: null, publishing: true });
         await publish(row, staged, { signal: work, lockLost: lock.lost });
         // A whole set is in place: record it unless the lock went meanwhile.
         lock.lost.throwIfAborted();
@@ -263,23 +267,33 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
     }
 };
 
+// Whether a run died or lost its lock mid-publish: the files on disk may
+// mix two versions. An unreadable state is not taken for one.
+const wasInterrupted = (row) => readState(row).then((state) => Boolean(state.publishing), () => false);
+
 /**
- * Boot: download `row` if a file it publishes is missing, under a timeout.
- * Another process (another backend, a manual run) holding the lock is waited
- * out, and what it published is loaded. Never throws; resolves { status:
- * 'disabled' | 'present' | 'downloaded' | 'loaded' | 'no-op' | 'failed' }.
+ * Boot: download `row` under a timeout unless its reader already holds a
+ * usable snapshot and no publish was interrupted. Another process (another
+ * backend, a manual run) holding the lock is waited out, and what it
+ * published is loaded. Never throws; resolves { status: 'disabled' |
+ * 'present' | 'downloaded' | 'loaded' | 'no-op' | 'failed' }.
  */
 export const bootstrapDataset = async (row, { timeoutMs = BOOTSTRAP_TIMEOUT_MS } = {}) => {
     if (!isRowEnabled(row)) return { status: 'disabled' };
-    if (hasSnapshot(row)) return { status: 'present' };
+    const interrupted = await wasInterrupted(row);
+    if (isLoaded(row) && !interrupted) return { status: 'present' };
+    // Files already under the published names are unusable or half-published:
+    // a state naming the remote's version is no reason to keep them.
+    const force = isPresent(row);
 
     const minutes = Math.round(timeoutMs / 60000);
-    logger.warn(`📥 Dataset ${row.id} missing; downloading (timeout ${minutes} min)...`);
+    const why = interrupted ? 'publish was interrupted' : force ? 'unusable' : 'missing';
+    logger.warn(`📥 Dataset ${row.id} ${why}; downloading (timeout ${minutes} min)...`);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(new Error('bootstrap timed out')), timeoutMs);
     timer.unref?.();
     try {
-        const result = await updateDataset(row, { signal: controller.signal, reason: 'bootstrap', wait: true });
+        const result = await updateDataset(row, { signal: controller.signal, reason: 'bootstrap', wait: true, force });
         if (result.updated) {
             logger.warn(`✅ Dataset ${row.id} downloaded and ready`);
             return { status: 'downloaded' };
@@ -293,8 +307,8 @@ export const bootstrapDataset = async (row, { timeoutMs = BOOTSTRAP_TIMEOUT_MS }
         logger.warn(`⚠️  Dataset ${row.id} bootstrap did not publish (${result.reason})`);
         return { status: 'no-op' };
     } catch (error) {
-        const why = controller.signal.aborted ? `did not complete within ${minutes} min` : error.message;
-        logger.warn({ err: error }, `⚠️  Dataset ${row.id} initial download failed: ${why}`);
+        const cause = controller.signal.aborted ? `did not complete within ${minutes} min` : error.message;
+        logger.warn({ err: error }, `⚠️  Dataset ${row.id} initial download failed: ${cause}`);
         return { status: 'failed', error };
     } finally {
         clearTimeout(timer);

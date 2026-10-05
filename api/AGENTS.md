@@ -47,7 +47,8 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   `common/dataset-updater.js` (lock, atomic state, publish, boot download,
   daily schedule). A row holds only its own logic — find the newest remote
   version, fetch / distill it, validate, reload; a new dataset is a new row,
-  never a new updater. Fetched when missing at boot; refreshed daily at
+  never a new updater. Fetched at boot when its reader has nothing usable
+  (missing, or a file it refuses) or a publish was cut short; refreshed daily at
   `DATASET_UPDATE_CRON` (default 04:30 local) unless `DATASET_AUTO_UPDATE=false`
   (a row's pre-engine flag, e.g. `CAIDA_AUTO_UPDATE`, still applies when that
   is unset), with a catch-up run at boot for a check a downtime skipped. Files

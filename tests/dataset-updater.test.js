@@ -201,6 +201,7 @@ describe('updateDataset', () => {
         // The state names no version, so the next holder takes nothing for
         // current and publishes a whole set — not a 'not-modified' over a mix.
         assert.equal(state(row).identifier, null);
+        assert.equal(state(row).publishing, true);
         assert.deepEqual(await updateDataset(row), { updated: true, identifier: 'v2' });
         assert.equal(read(row, 'a.txt'), 'a.txt v2\n');
         assert.equal(read(row, 'b.txt'), 'b.txt v2\n');
@@ -219,7 +220,16 @@ describe('updateDataset', () => {
             fsp.copyFile = realCopy;
         }
         assert.equal(state(row).identifier, null);
+        assert.equal(state(row).publishing, true);
         assert.equal((await updateDataset(row)).updated, true);
+        assert.equal(state(row).publishing, undefined, 'a finished publish clears the mark');
+    });
+
+    it('force fetches a version the state already records', async () => {
+        const { row, log } = makeRow();
+        await updateDataset(row);
+        assert.deepEqual(await updateDataset(row, { force: true }), { updated: true, identifier: 'v1' });
+        assert.equal(log.fetches, 2);
     });
 
     it('reads an earlier updater\'s state, so an upgrade does not re-download', async () => {
@@ -257,10 +267,29 @@ describe('bootstrapDataset', () => {
         assert.equal(log.fetches, 1);
     });
 
-    it('trusts a row\'s own snapshot probe (a reader that accepts other file names)', async () => {
-        const { row, log } = makeRow({ hasSnapshot: () => true });
+    it('trusts a row\'s own readiness probe (a reader that accepts other file names)', async () => {
+        const { row, log } = makeRow({ isLoaded: () => true });
         assert.equal((await bootstrapDataset(row)).status, 'present');
         assert.equal(log.fetches, 0, 'the published names are absent, the reader has a snapshot');
+    });
+
+    it('re-fetches files its reader refuses, even when the state names the remote\'s version', async () => {
+        const { row, log } = makeRow({ isLoaded: () => false });
+        await updateDataset(row);
+        assert.equal((await bootstrapDataset(row)).status, 'downloaded');
+        assert.equal(log.fetches, 2);
+    });
+
+    it('re-fetches a publish that was interrupted, though every file is present', async () => {
+        const { row, log } = makeRow();
+        await updateDataset(row);
+        // A mixed pair, left by a run that died between its renames.
+        fs.writeFileSync(path.join(row.dir, 'a.txt'), 'a.txt v2\n');
+        fs.writeFileSync(path.join(row.dir, STATE_FILE), JSON.stringify({ identifier: null, publishing: true }));
+        assert.equal((await bootstrapDataset(row)).status, 'downloaded');
+        assert.equal(read(row, 'a.txt'), 'a.txt v1\n');
+        assert.equal(log.fetches, 2);
+        assert.equal(state(row).publishing, undefined);
     });
 
     it('downloads a missing dataset and reloads it as a bootstrap', async () => {

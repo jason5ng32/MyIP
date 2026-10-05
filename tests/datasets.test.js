@@ -17,7 +17,10 @@ import * as tar from 'tar';
 
 import { datasets, findPeeringdbDump, maxmindIdentifier, hasMaxMindCredentials } from '../common/datasets.js';
 import { updateDataset, isRowEnabled } from '../common/dataset-updater.js';
-import { PEERINGDB_FILE, readPeeringdbIndex, expandNet } from '../common/peeringdb-db.js';
+import { PEERINGDB_FILE, readPeeringdbIndex, expandNet, isPeeringdbLoaded } from '../common/peeringdb-db.js';
+import { isAsOrgLoaded } from '../common/as-org-db.js';
+import { isAsRelLoaded } from '../common/as-rel-db.js';
+import { isMaxMindReady } from '../common/maxmind-service.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const realFetch = globalThis.fetch;
@@ -77,6 +80,13 @@ const stubFetch = (routes) => {
 const peeringdbRoutes = () => ({
     [`${BASE}2026/10/`]: [200, LISTING],
     [`${BASE}2026/10/peeringdb_2_dump_2026_10_02.json`]: [200, DUMP],
+});
+
+describe('every row', () => {
+    it('asks its reader whether a usable snapshot loaded, so the boot download repairs a refused file', () => {
+        assert.equal(row('maxmind').isLoaded, isMaxMindReady);
+        assert.equal(row('peeringdb').isLoaded, isPeeringdbLoaded);
+    });
 });
 
 describe('findPeeringdbDump', () => {
@@ -205,10 +215,9 @@ describe('CAIDA rows', () => {
         assert.deepEqual(requested, []);
     });
 
-    it('count a hand-named *.txt as a snapshot at boot, as their readers do', async () => {
-        for (const id of ['as2org', 'as-rel']) {
-            assert.equal(typeof row(id).hasSnapshot, 'function', id);
-        }
+    it('ask their readers whether a usable snapshot loaded (a hand-named *.txt counts, a corrupt one doesn\'t)', () => {
+        assert.equal(row('as2org').isLoaded, isAsOrgLoaded);
+        assert.equal(row('as-rel').isLoaded, isAsRelLoaded);
     });
 
     it('keep the pre-engine CAIDA_AUTO_UPDATE as their legacy schedule flag', () => {
