@@ -1,8 +1,9 @@
 // Tests for common/datasets.js — the dataset rows run through the engine
 // (common/dataset-updater.js): the MaxMind row (two editions published
 // together; the credential gate), the PeeringDB row (no decompression; a
-// distill step; the Cloudflare-key gate), a decompressing CAIDA row, and the
-// rows reading the pre-engine updaters' state. Every row is re-pointed at a temp dir
+// distill step; the Cloudflare-key gate), a decompressing CAIDA row, the IEEE
+// MAC registries row (five plain files published together), and the rows
+// reading the pre-engine updaters' state. Every row is re-pointed at a temp dir
 // and `fetch` is stubbed: no network, nothing written into the repo's
 // dataset directories.
 
@@ -15,12 +16,13 @@ import { after, afterEach, describe, it } from 'node:test';
 
 import * as tar from 'tar';
 
-import { datasets, findPeeringdbDump, maxmindIdentifier, hasMaxMindCredentials } from '../common/datasets.js';
+import { datasets, findPeeringdbDump, joinedIdentifier, hasMaxMindCredentials } from '../common/datasets.js';
 import { updateDataset, isRowEnabled } from '../common/dataset-updater.js';
 import { PEERINGDB_FILE, readPeeringdbIndex, expandNet, isPeeringdbLoaded } from '../common/peeringdb-db.js';
 import { isAsOrgLoaded } from '../common/as-org-db.js';
 import { isAsRelLoaded } from '../common/as-rel-db.js';
 import { isMaxMindReady } from '../common/maxmind-service.js';
+import { OUI_REGISTRIES, isOuiLoaded } from '../common/oui-db.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const realFetch = globalThis.fetch;
@@ -86,6 +88,7 @@ describe('every row', () => {
     it('asks its reader whether a usable snapshot loaded, so the boot download repairs a refused file', () => {
         assert.equal(row('maxmind').isLoaded, isMaxMindReady);
         assert.equal(row('peeringdb').isLoaded, isPeeringdbLoaded);
+        assert.equal(row('oui').isLoaded, isOuiLoaded);
     });
 });
 
@@ -271,7 +274,7 @@ describe('maxmind row', () => {
         });
         const { dataset, reloads } = tempRow('maxmind', { validate: async () => {} }); // real mmdb check needs real files
         const result = await updateDataset(dataset);
-        assert.equal(result.identifier, maxmindIdentifier(['Fri, 02 Oct 2026 16:46:10 GMT', 'Sun, 04 Oct 2026 08:30:32 GMT']));
+        assert.equal(result.identifier, joinedIdentifier(['Fri, 02 Oct 2026 16:46:10 GMT', 'Sun, 04 Oct 2026 08:30:32 GMT']));
         assert.equal(fs.readFileSync(path.join(dataset.dir, 'GeoLite2-City.mmdb'), 'utf8'), 'city-db');
         assert.equal(fs.readFileSync(path.join(dataset.dir, 'GeoLite2-ASN.mmdb'), 'utf8'), 'asn-db');
         assert.deepEqual(reloads, ['auto update']);
@@ -293,11 +296,57 @@ describe('maxmind row', () => {
     });
 
     it('names no version when an edition omits Last-Modified (always fetched)', () => {
-        assert.equal(maxmindIdentifier(['Fri, 02 Oct 2026 16:46:10 GMT', null]), null);
-        assert.equal(maxmindIdentifier(['a', 'b']), 'a | b');
+        assert.equal(joinedIdentifier(['Fri, 02 Oct 2026 16:46:10 GMT', null]), null);
+        assert.equal(joinedIdentifier(['a', 'b']), 'a | b');
     });
 
     it('keeps MAXMIND_AUTO_UPDATE as its legacy schedule flag', () => {
         assert.equal(row('maxmind').legacyAutoUpdateEnv, 'MAXMIND_AUTO_UPDATE');
+    });
+});
+
+describe('oui row', () => {
+    const csvOf = (registry) => `Registry,Assignment,Organization Name,Organization Address\n${registry},ABCDEF0,Vendor,City US 1\n`;
+
+    // HEAD answers each file's Last-Modified, GET its CSV; records the requests.
+    const stubIeee = () => {
+        const requested = [];
+        globalThis.fetch = async (url, init = {}) => {
+            const spec = OUI_REGISTRIES.find((entry) => entry.url === String(url));
+            requested.push(`${init.method || 'GET'} ${spec.file}${init.headers?.Range ? ' ranged' : ''}`);
+            if (init.method === 'HEAD') return new Response(null, { headers: { 'last-modified': `day of ${spec.file}` } });
+            return new Response(csvOf(spec.registry));
+        };
+        return requested;
+    };
+
+    it('is never gated: MAC Lookup needs no key', () => {
+        assert.equal(row('oui').enabled, undefined);
+        assert.equal(isRowEnabled(row('oui')), true);
+    });
+
+    it('downloads the five registries with plain GETs and publishes them together', async () => {
+        const requested = stubIeee();
+        const { dataset, reloads } = tempRow('oui', { validate: async () => {} }); // the real floors are tested below
+        const result = await updateDataset(dataset);
+        assert.equal(result.identifier, joinedIdentifier(OUI_REGISTRIES.map(({ file }) => `day of ${file}`)));
+        assert.deepEqual(fs.readdirSync(dataset.dir).sort(), ['.dataset-state.json', 'cid.csv', 'iab.csv', 'mam.csv', 'oui.csv', 'oui36.csv']);
+        assert.equal(fs.readFileSync(path.join(dataset.dir, 'mam.csv'), 'utf8'), csvOf('MA-M'));
+        assert.deepEqual(reloads, ['auto update']);
+        assert.deepEqual(requested.filter((entry) => entry.startsWith('GET')).sort(),
+            OUI_REGISTRIES.map(({ file }) => `GET ${file}`).sort(), 'one unranged GET per file');
+
+        // Same Last-Modifieds again → only the version checks.
+        requested.length = 0;
+        assert.deepEqual(await updateDataset(dataset), { updated: false, reason: 'not-modified' });
+        assert.ok(requested.every((entry) => entry.startsWith('HEAD')));
+    });
+
+    it('refuses to publish registries below their row floors', async () => {
+        stubIeee();
+        const { dataset, reloads } = tempRow('oui');
+        await assert.rejects(updateDataset(dataset), /MA-L has only 0 assignments/);
+        assert.deepEqual(fs.readdirSync(dataset.dir), []);
+        assert.deepEqual(reloads, []);
     });
 });

@@ -1,4 +1,4 @@
-// Boot-time readiness of the offline datasets (MaxMind, CAIDA, PeeringDB) and
+// Boot-time readiness of the offline datasets (common/datasets.js) and
 // the primed service-status snapshot. The backend listens before any of them
 // is downloaded; runOfflineBootstrap marks that window, and requireOfflineData
 // answers 503 on a route whose data is still missing inside it. Outside the
@@ -6,8 +6,8 @@
 // A response assembled from independent parts (the ASN Profile) instead asks
 // isStillLoading per part and leaves just that part out, uncached.
 //
-// Snapshots already on disk are loaded before the listener opens (CAIDA and
-// PeeringDB at import, MaxMind in backend-server.js), so an ordinary restart
+// Snapshots already on disk are loaded before the listener opens (CAIDA,
+// PeeringDB and IEEE at import, MaxMind in backend-server.js), so a restart
 // never hits the gate — only a first boot or a newly added dataset does.
 
 let booting = false;

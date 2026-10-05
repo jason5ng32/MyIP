@@ -24,6 +24,7 @@ import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '../api/asn-profile.js';
 import { isAsRelLoaded } from '../common/as-rel-db.js';
+import { isOuiLoaded } from '../common/oui-db.js';
 import { isCompleteProfile } from '../common/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
@@ -64,7 +65,7 @@ function createResponse() {
 // Back up env keys touched by any test here; restore after each case.
 const ENV_KEYS = [
     'IPCHECKING_API_KEY', 'IPCHECKING_API_ENDPOINT',
-    'MAC_LOOKUP_API_KEY', 'IPAPIIS_API_KEY',
+    'IPAPIIS_API_KEY',
     'IPINFO_API_KEY', 'IP2LOCATION_API_KEY',
     'CLOUDFLARE_API_KEY',
     'CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_KV_NAMESPACE_ID',
@@ -586,6 +587,27 @@ describe('mac-checker handler', () => {
         await macCheckerHandler(createRequest({ query: { mac: 'not-a-mac' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid MAC address' });
+    });
+
+    it('rejects a prefix shorter than 24 bits', async () => {
+        const res = createResponse();
+        await macCheckerHandler(createRequest({ query: { mac: '3C:5A' } }), res);
+        assert.equal(res.statusCode, 400);
+    });
+
+    // Reads the repo's local registries: answered when they're on disk,
+    // 503 when this checkout never downloaded them.
+    it('answers a vendor prefix from the local registries, or 503 without them', async () => {
+        const res = createResponse();
+        await macCheckerHandler(createRequest({ query: { mac: '3c:5a:b4' } }), res);
+        if (!isOuiLoaded()) {
+            assert.equal(res.statusCode, 503);
+            assert.deepEqual(res.body, { error: 'MAC database unavailable' });
+            return;
+        }
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.success, true);
+        assert.equal(res.body.macPrefix.slice(0, 8), '3C:5A:B4');
     });
 });
 

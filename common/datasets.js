@@ -11,9 +11,12 @@
 //   peeringdb PeeringDB dump (CAIDA mirror),    common/peeringdb-db.js
 //             distilled to a per-ASN index; only with the Cloudflare key,
 //             as the ASN Profile is hidden without it
+//   oui       IEEE MAC registries (MA-L / MA-M  common/oui-db.js
+//             / MA-S / IAB / CID), published together as downloaded
 //
 // Sources: https://dev.maxmind.com/geoip/geolite2-free-geolocation-data ·
-// https://publicdata.caida.org/datasets/ (CAIDA AUA) · https://www.peeringdb.com
+// https://publicdata.caida.org/datasets/ (CAIDA AUA) · https://www.peeringdb.com ·
+// https://standards.ieee.org/products-programs/regauth/
 
 import fsp from 'fs/promises';
 import path from 'path';
@@ -28,6 +31,7 @@ import { PEERINGDB_DB_DIR, PEERINGDB_FILE, readPeeringdbIndex, reloadPeeringdbDa
 import { distillPeeringdbDump } from './peeringdb-distill.js';
 import { hasRadarApiKey } from './cf-radar.js';
 import { MAXMIND_DB_DIR, MAXMIND_CITY_DB, MAXMIND_ASN_DB, reloadMaxMindDatabases, isMaxMindReady } from './maxmind-service.js';
+import { OUI_DB_DIR, OUI_REGISTRIES, OUI_FILES, readOuiRegistries, reloadOuiDatabase, isOuiLoaded } from './oui-db.js';
 
 // The pre-engine CAIDA updater's state: same { identifier, updatedAt } shape.
 const CAIDA_LEGACY_STATE = { file: '.caida-update-state.json', toState: (json) => json };
@@ -40,6 +44,13 @@ const fetchCompressed = (file, format) => async ({ remote, tempDir, signal }) =>
     await decompressFile(archive, staged, format);
     return { [file]: staged };
 };
+
+// Last-Modified of each file a row publishes together, joined: any one
+// changing is a new version. null when a file doesn't say — an unknown
+// version, always fetched rather than taken for unchanged. Exported for
+// tests (and the legacy MaxMind state mapping below).
+export const joinedIdentifier = (lastModifieds) =>
+    (lastModifieds.every(Boolean) ? lastModifieds.join(' | ') : null);
 
 // ---------- validators ----------
 
@@ -129,18 +140,11 @@ const maxmindAuth = () => ({
     Authorization: `Basic ${Buffer.from(`${process.env.MAXMIND_ACCOUNT_ID}:${process.env.MAXMIND_LICENSE_KEY}`).toString('base64')}`,
 });
 
-// Last-Modified of each edition, joined: either edition changing is a new
-// version. null when an edition doesn't say — an unknown version, always
-// fetched rather than taken for unchanged. Exported for tests (and the
-// legacy-state mapping below).
-export const maxmindIdentifier = (lastModifieds) =>
-    (lastModifieds.every(Boolean) ? lastModifieds.join(' | ') : null);
-
 // The pre-engine MaxMind updater kept { [editionId]: { lastModified, updatedAt } }.
 const MAXMIND_LEGACY_STATE = {
     file: '.maxmind-update-state.json',
     toState: (json) => ({
-        identifier: maxmindIdentifier(MAXMIND_EDITIONS.map(({ editionId }) => json[editionId]?.lastModified)),
+        identifier: joinedIdentifier(MAXMIND_EDITIONS.map(({ editionId }) => json[editionId]?.lastModified)),
         updatedAt: json['GeoLite2-City']?.updatedAt,
     }),
 };
@@ -176,7 +180,7 @@ export const datasets = [
                 if (!res.ok) throw new Error(`Failed to check ${editionId}: HTTP ${res.status}`);
                 lastModifieds.push(res.headers.get('last-modified'));
             }
-            return { identifier: maxmindIdentifier(lastModifieds) };
+            return { identifier: joinedIdentifier(lastModifieds) };
         },
         fetch: async ({ tempDir, signal }) => {
             const staged = {};
@@ -269,5 +273,35 @@ export const datasets = [
         validate: validatePeeringdb,
         reload: reloadPeeringdbDatabase,
         isLoaded: isPeeringdbLoaded,
+    },
+    {
+        id: 'oui',
+        dir: OUI_DB_DIR,
+        files: OUI_FILES,
+        // IEEE regenerates the files daily; a file's Last-Modified is its version.
+        findRemote: async ({ signal } = {}) => {
+            const lastModifieds = [];
+            for (const { file, url } of OUI_REGISTRIES) {
+                const res = await fetchUpstream(url, { method: 'HEAD', signal });
+                if (!res.ok) throw new Error(`Failed to check ${file}: HTTP ${res.status}`);
+                lastModifieds.push(res.headers.get('last-modified'));
+            }
+            return { identifier: joinedIdentifier(lastModifieds) };
+        },
+        // Plain GETs: the IEEE server rejects ranged requests.
+        fetch: async ({ tempDir, signal }) => {
+            const staged = {};
+            for (const { file, url } of OUI_REGISTRIES) {
+                staged[file] = path.join(tempDir, file);
+                await downloadToFile(url, staged[file], { signal });
+            }
+            return staged;
+        },
+        // Every file must parse as its registry, above its row floor.
+        validate: async (staged) => {
+            readOuiRegistries((file) => staged[file]);
+        },
+        reload: reloadOuiDatabase,
+        isLoaded: isOuiLoaded,
     },
 ];

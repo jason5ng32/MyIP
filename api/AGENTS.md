@@ -42,7 +42,7 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   no prefix or relationship counts — the ASN Profile has both.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
-- **Offline datasets** (MaxMind, CAIDA, PeeringDB) are rows in
+- **Offline datasets** (MaxMind, CAIDA, PeeringDB, IEEE MAC registries) are rows in
   `common/datasets.js`, run by one engine,
   `common/dataset-updater.js` (lock, atomic state, publish, boot download,
   daily schedule). A row holds only its own logic — find the newest remote
@@ -56,7 +56,9 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   reloaded by the engine's watcher. MaxMind only with its credentials (City + ASN publish together);
   PeeringDB only with a Cloudflare key; its 116 MB dump is
   stream-distilled (never parsed whole) to a ~6 MB per-ASN index without
-  contact data (`common/peeringdb-distill.js`).
+  contact data (`common/peeringdb-distill.js`). The IEEE row (MAC Lookup)
+  needs no key: five registry CSVs published as downloaded, answered by the
+  longest covering assignment (`common/oui-db.js`).
 
 ## Conventions
 
