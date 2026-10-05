@@ -64,11 +64,11 @@
 //   asnInfos comes from useAsnInfo().
 import { ref, computed, watch, nextTick } from 'vue';
 import { useMainStore } from '@/store';
-import { isValidIP, isUsablePublicIP } from '@/utils/valid-ip.js';
+import { isValidIP, isUsablePublicIP } from '@/utils/ip/valid-ip.js';
 import { toApiTag } from '@/utils/locale-registry.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
-import { transformDataFromIPapi } from '@/utils/transform-ip-data.js';
+import { transformDataFromIPapi } from '@/utils/ip/transform-ip-data.js';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';

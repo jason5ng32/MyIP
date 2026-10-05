@@ -1,11 +1,11 @@
 // Unit tests for the Globalping probe inventory aggregation
-// (common/globalping-inventory.js). Fixtures mirror the raw /v1/probes
+// (server/globalping-inventory.js). Fixtures mirror the raw /v1/probes
 // shape: one entry per online probe with location.country / .continent.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { buildProbeInventory } from '../common/globalping-inventory.js';
+import { buildProbeInventory } from '../server/globalping-inventory.js';
 
 const probe = (country, continent) => ({ location: { country, continent } });
 

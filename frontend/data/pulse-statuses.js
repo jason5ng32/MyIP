@@ -3,7 +3,7 @@
 // `effect` on festivals ('fireworks' | 'fall'; absent → the default emoji
 // pop). `effectEmoji` overrides the particle sprite when the status emoji
 // isn't the thing that should fall (christmas 🎄 snows ❄️). Recipes live in
-// utils/pulse-celebration.js.
+// utils/features/pulse-celebration.js.
 
 export const PRESET_STATUSES = [
     { id: 'fast', emoji: '🚀' },

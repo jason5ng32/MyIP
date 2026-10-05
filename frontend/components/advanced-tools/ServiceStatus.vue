@@ -178,7 +178,7 @@ import { useStatusTone } from '@/composables/use-status-tone.js';
 import { unixToDateTime } from '@/utils/time-utils.js';
 import {
   indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
-} from '@/utils/service-status-tone.js';
+} from '@/utils/features/service-status-tone.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';

@@ -14,7 +14,7 @@
 // where `source` is the display name of the winning provider, and never
 // throws — an exhausted chain resolves `{ ip: null, source }` carrying the
 // last provider's name.
-import { isValidIP } from '../valid-ip.js';
+import { isValidIP } from '../ip/valid-ip.js';
 import { ipChecking4 } from './ipchecking4.js';
 import { ipChecking6 } from './ipchecking6.js';
 import { ipChecking64 } from './ipchecking64.js';

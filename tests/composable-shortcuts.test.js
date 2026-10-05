@@ -29,7 +29,7 @@ globalThis.window = {
 
 registerHooks({
   load(url, context, nextLoad) {
-    if (url.includes('/utils/pulse-beacon.js')) {
+    if (url.includes('/utils/features/pulse-beacon.js')) {
       return {
         format: 'module',
         shortCircuit: true,

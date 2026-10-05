@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // Validate request legitimacy
 function isValidRequest(req) {

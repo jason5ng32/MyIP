@@ -1,5 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 export default async (req, res) => {
     // defensive; app.put() in backend-server.js already gates method

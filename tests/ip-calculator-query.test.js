@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { computed, ref } from 'vue';
 import { parse } from 'vue/compiler-sfc';
-import { analyzeCidr, calculate } from '../frontend/utils/ip-calc.js';
+import { analyzeCidr, calculate } from '../frontend/utils/features/ip-calc.js';
 
 const source = readFileSync(new URL('../frontend/components/advanced-tools/IpCalculator.vue', import.meta.url), 'utf8');
 const script = parse(source).descriptor.scriptSetup.content.replace(/^import[\s\S]*?;$/gm, '');

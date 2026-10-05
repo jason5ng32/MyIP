@@ -25,7 +25,7 @@ export const REPORT_TTL_DAYS = [1, 3, 7];
 export const REPORT_MAX_BYTES = 256 * 1024;
 
 // Anonymity verdict codes for ipinfo cards — made by
-// utils/transform-ip-data.js, shared by the builder whitelist and the schema
+// utils/ip/transform-ip-data.js, shared by the builder whitelist and the schema
 // enum below.
 export const ANONYMITY_CODES = [
     'tor', 'relay', 'residential', 'suspected_residential',
@@ -33,7 +33,7 @@ export const ANONYMITY_CODES = [
 ];
 
 // Connectivity status codes — single source shared by the recording component
-// (ConnectivityTest.vue), the builder whitelist (utils/report-builders.js)
+// (ConnectivityTest.vue), the builder whitelist (utils/report/report-builders.js)
 // and the schema enum below, so a rename can't drift them apart.
 export const CONNECTIVITY_STATUS = {
     OK: 'ok',
@@ -165,7 +165,7 @@ const SECTION_SPECS = {
     connectivity: obj({
         testedAt: isoDate(),
         // 72 = 7 built-in targets + the 60-target custom/import cap, plus
-        // headroom; matches the builder's slice in utils/report-builders.js.
+        // headroom; matches the builder's slice in utils/report/report-builders.js.
         targets: arr(72, obj({
             id: str(48),
             name: str(64),

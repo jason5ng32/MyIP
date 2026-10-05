@@ -16,7 +16,7 @@
         <SheetContent side="right" :title="t('nav.pulse.title')"
             class="flex w-full max-w-full flex-col gap-0 p-0 md:w-125 md:max-w-125">
             <!-- Celebration overlay: one canvas above the whole Sheet, drawn
-                by utils/pulse-celebration.js. Inert to input. -->
+                by utils/features/pulse-celebration.js. Inert to input. -->
             <canvas ref="fxCanvas" class="pointer-events-none absolute inset-0 z-10 size-full"
                 aria-hidden="true"></canvas>
             <header class="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-3">
@@ -227,17 +227,17 @@
 // The entry button shows when either half can render.
 // POST <PULSE_BEACON_URL>/status on pick; GET <PULSE_BEACON_URL>/stats on
 // open and after a send — uncached end to end. The visit beacon is app-level:
-// App.vue via utils/pulse-beacon.js, not this widget.
+// App.vue via utils/features/pulse-beacon.js, not this widget.
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/pulse-beacon.js';
+import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/features/pulse-beacon.js';
 import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
-import { playCelebration, resolveEffect } from '@/utils/pulse-celebration.js';
-import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/world-map-chart.js';
+import { playCelebration, resolveEffect } from '@/utils/features/pulse-celebration.js';
+import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/features/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
@@ -359,7 +359,7 @@ const showHint = (kind) => {
     hintKind.value = kind;
     hintStamp.value += 1;
 };
-// Celebration overlay (utils/pulse-celebration.js): one canvas over the
+// Celebration overlay (utils/features/pulse-celebration.js): one canvas over the
 // Sheet, played optimistically on click — delight belongs to the tap, not
 // the round-trip. A 429 stops it immediately (the send didn't count); a new
 // click restarts it. The engine no-ops under prefers-reduced-motion.
@@ -430,7 +430,7 @@ const sendStatus = async (id, evt) => {
     }
 };
 
-// World map via the shared choropleth util (utils/world-map-chart.js) —
+// World map via the shared choropleth util (utils/features/world-map-chart.js) —
 // heat ramp (warm orange → deep red), fitting the "heatmap" framing; T1 has
 // no territory to shade.
 const mapCanvas = ref(null);

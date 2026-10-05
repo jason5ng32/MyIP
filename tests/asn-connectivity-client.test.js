@@ -1,4 +1,4 @@
-// Tests for frontend/utils/asn-connectivity.js: the request URL (incl. the
+// Tests for frontend/utils/ip/asn-connectivity.js: the request URL (incl. the
 // `v=` cache-buster), cache hits skipping the network, and the
 // `{ graph }` / `{ error: true }` entry shapes ASNConnectivity.vue reads.
 // globalThis.fetch is stubbed per test.
@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import {
   ASN_CONNECTIVITY_VERSION, asnConnectivityUrl, loadAsnConnectivityInto,
-} from '../frontend/utils/asn-connectivity.js';
+} from '../frontend/utils/ip/asn-connectivity.js';
 
 const realFetch = globalThis.fetch;
 const realConsoleError = console.error;

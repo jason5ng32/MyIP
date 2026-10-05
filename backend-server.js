@@ -6,10 +6,10 @@ import { fileURLToPath } from 'url';
 import { slowDown } from 'express-slow-down'
 import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
-import logger from './common/logger.js';
+import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './common/guards.js';
-import { withTimeZone } from './common/ip-timezone.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
+import { withTimeZone } from './server/ip-timezone.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -23,7 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS, isCompleteRadarAnswer } from './common/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer } from './server/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -41,23 +41,23 @@ import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
 import personaEvaluateHandler from './api/persona.js';
 import asnProfileHandler from './api/asn-profile.js';
-import { isCompleteProfile } from './common/asn-profile.js';
+import { isCompleteProfile } from './server/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
-import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './common/maxmind-service.js';
-import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './common/dataset-updater.js';
-import { datasets } from './common/datasets.js';
+import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
+import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './server/datasets/dataset-updater.js';
+import { datasets } from './server/datasets/datasets.js';
 import {
     bootstrapServiceStatus, startServiceStatusPolling, isServiceStatusPrimed,
-} from './common/service-status-store.js';
-import { isAsRelLoaded } from './common/as-rel-db.js';
-import { isAsOrgLoaded } from './common/as-org-db.js';
-import { isOuiLoaded } from './common/oui-db.js';
-import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './common/offline-data.js';
-import { cacheable } from './common/cache-control.js';
-import { initUpstreamUserAgent } from './common/upstream-ua.js';
+} from './server/service-status-store.js';
+import { isAsRelLoaded } from './server/datasets/as-rel-db.js';
+import { isAsOrgLoaded } from './server/datasets/as-org-db.js';
+import { isOuiLoaded } from './server/datasets/oui-db.js';
+import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
+import { cacheable } from './server/cache-control.js';
+import { initUpstreamUserAgent } from './server/upstream-ua.js';
 
 dotenv.config({ quiet: true });
 initUpstreamUserAgent();
@@ -216,17 +216,17 @@ if (speedLimitSet !== 0) {
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
-// declare it explicitly via `cacheable(maxAge)` (common/cache-control.js).
+// declare it explicitly via `cacheable(maxAge)` (server/cache-control.js).
 app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
     next();
 });
 
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
-// check individually — see common/guards.js.
+// check individually — see server/guards.js.
 app.use('/api', requireReferer);
 
-// Readiness gates for routes reading local data (common/offline-data.js):
+// Readiness gates for routes reading local data (server/offline-data.js):
 // 503 while that data is still downloading at boot, a no-op afterwards.
 const needsMaxMind = requireOfflineData([isMaxMindReady]);
 const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
@@ -275,7 +275,7 @@ app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
     degradedMaxAge: () => (isOfflineBootstrapping() ? 0 : ONE_DAY_CACHE),
 }), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
-// the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
+// the TTL comes from that view's registry entry (server/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
 // country traffic, 1h for the outage feed. A partial answer (some upstream
 // calls failed, or prefix countries MaxMind couldn't fully work out) is

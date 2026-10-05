@@ -314,10 +314,10 @@ import { useI18n, I18nT } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { loadAsnInfoInto } from '@/composables/use-asn-info.js';
-import { loadAsnConnectivityInto } from '@/utils/asn-connectivity.js';
-import { toBgpPrefix } from '@/utils/bgp-prefix.js';
+import { loadAsnConnectivityInto } from '@/utils/ip/asn-connectivity.js';
+import { toBgpPrefix } from '@/utils/ip/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime, formatIsoDate } from '@/utils/time-utils.js';
-import { buildScoreExplanation, listScoreTags } from '@/utils/ip-score-details.js';
+import { buildScoreExplanation, listScoreTags } from '@/utils/ip/ip-score-details.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import CountryTraffic from './CountryTraffic.vue';
@@ -606,7 +606,7 @@ const getASNHistory = async (prefix) => {
     }
 };
 
-// Fetch + versioning live in utils/asn-connectivity.js; the cache is the
+// Fetch + versioning live in utils/ip/asn-connectivity.js; the cache is the
 // owner's, handed down as asnConnectivityInfos.
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');

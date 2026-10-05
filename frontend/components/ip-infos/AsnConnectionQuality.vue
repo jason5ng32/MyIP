@@ -23,7 +23,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { pickConnectionQuality } from '@/utils/asn-metrics.js';
+import { pickConnectionQuality } from '@/utils/ip/asn-metrics.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { CircleQuestionMark } from '@lucide/vue';
 

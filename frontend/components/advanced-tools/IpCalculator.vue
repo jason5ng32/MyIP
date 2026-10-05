@@ -1,7 +1,7 @@
 <!-- IP Calculator (advanced tool, slug `ipcalculator`): one smart input
      (IPv4 / IPv6, prefix, number, range, prefix list — never a MAC, that is
      MAC Lookup's job) dispatched to the matching card under ./ip-calculator/.
-     Pure local computation via utils/ip-calc.js.
+     Pure local computation via utils/features/ip-calc.js.
 
      The query rides the URL as `?q=` on both /tools/ipcalculator and
      /?tool=ipcalculator, written back on every run so results are shareable.
@@ -92,9 +92,9 @@ import { Icon } from '@iconify/vue';
 import { Calculator, ChevronRight } from '@lucide/vue';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { selectableIPs } from '@/composables/use-globalping-measurement.js';
-import { analyzeCidr, calculate } from '@/utils/ip-calc.js';
+import { analyzeCidr, calculate } from '@/utils/features/ip-calc.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

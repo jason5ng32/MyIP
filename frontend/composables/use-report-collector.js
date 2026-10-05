@@ -1,13 +1,13 @@
 // Report collector — subscribes to the test-completion events on the app bus
 // (utils/app-events.js), runs each payload through its report builder
-// (utils/report-builders.js) and keeps the latest schema-shaped snapshot per
+// (utils/report/report-builders.js) and keeps the latest schema-shaped snapshot per
 // section. This is the data source for the share-report dialog; components
 // stay report-agnostic, exactly like the achievement engine's pattern.
 // Call once from App.vue setup.
 
 import { reactive, computed, onScopeDispose } from 'vue';
 import { onAppEvent } from '../utils/app-events.js';
-import { REPORT_EVENT_BUILDERS } from '../utils/report-builders.js';
+import { REPORT_EVENT_BUILDERS } from '../utils/report/report-builders.js';
 
 // Module-level so later consumers (share dialog) see the same snapshots the
 // App.vue-mounted subscriber collected. Shape: sectionId → schema section

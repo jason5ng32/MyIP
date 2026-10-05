@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, afterEach, beforeEach } from 'node:test';
 
-import { refererCheck } from '../common/referer-check.js';
+import { refererCheck } from '../server/referer-check.js';
 
 // backup ALLOWED_DOMAINS before each test, restore after each test
 let backup;

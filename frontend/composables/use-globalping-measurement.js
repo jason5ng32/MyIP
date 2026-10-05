@@ -25,12 +25,12 @@
 
 import { ref, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../../common/fetch-with-timeout.js';
-import { isValidIP, isUsablePublicIP } from '../utils/valid-ip.js';
+import { isValidIP, isUsablePublicIP } from '../utils/ip/valid-ip.js';
 
 // Curated 28-country spread shared by the MtrTest and GlobalLatencyTest
 // tools: their picker's "suggested" section and default selection. The full
 // per-continent catalog comes from the live probe inventory
-// (utils/globalping-probes.js); CensorshipCheck keeps its own suggestion
+// (utils/features/globalping-probes.js); CensorshipCheck keeps its own suggestion
 // lists because its sections are censorship-oriented, not geographic.
 export const GLOBALPING_SUGGESTED_COUNTRIES = [
     'HK', 'TW', 'CN', 'JP', 'KR', 'MY', 'ID', 'SG', 'IN', 'SA',

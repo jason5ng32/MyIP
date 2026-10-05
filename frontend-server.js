@@ -4,7 +4,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import logger from './common/logger.js';
+import logger from './server/logger.js';
 
 dotenv.config({ quiet: true });
 

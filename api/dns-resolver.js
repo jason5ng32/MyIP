@@ -3,7 +3,7 @@
 // one flat, country-annotated result list the frontend groups by country.
 import { Resolver } from 'node:dns/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 import { DNS_RESOLVERS } from './data/dns-resolvers.js';
 import { NAME_VALUED_TYPES } from '../common/dns-record-types.js';
 

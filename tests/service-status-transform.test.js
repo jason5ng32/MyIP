@@ -4,10 +4,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { normalizeSummary, normalizeIncidents, assembleProvider } from '../common/service-status-transform.js';
+import { normalizeSummary, normalizeIncidents, assembleProvider } from '../server/service-status-transform.js';
 import {
     indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
-} from '../frontend/utils/service-status-tone.js';
+} from '../frontend/utils/features/service-status-tone.js';
 
 describe('normalizeSummary', () => {
     it('extracts indicator and component statuses', () => {

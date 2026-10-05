@@ -433,7 +433,7 @@ const run = async () => {
             { persona: persona.value, observation });
         runStatus.value = 'finished';
         // The shareable report keeps only each check's conclusion — the
-        // builder in utils/report-builders.js drops every detail field.
+        // builder in utils/report/report-builders.js drops every detail field.
         emitAppEvent('persona:finished', {
             country: persona.value.country,
             grade: report.value.grade,

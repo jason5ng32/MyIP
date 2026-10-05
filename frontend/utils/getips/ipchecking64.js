@@ -3,7 +3,7 @@
 // is preferred (trace as internal fallback); mirrors go straight to trace.
 // Runs as a single-hop chain in index.js — no external fallback.
 import { fetchWithTimeout } from '../fetch-with-timeout.js';
-import { parseTrace } from '../parse-trace.js';
+import { parseTrace } from '../ip/parse-trace.js';
 
 const getFromTrace = async () => {
     const response = await fetchWithTimeout('https://64.ipcheck.ing/cdn-cgi/trace');

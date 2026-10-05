@@ -42,7 +42,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Slider } from '@/components/ui/slider';
-import { toOctets, toHextets } from '@/utils/ip-math.js';
+import { toOctets, toHextets } from '@/utils/ip/ip-math.js';
 
 const props = defineProps({
     value: { type: BigInt, required: true },

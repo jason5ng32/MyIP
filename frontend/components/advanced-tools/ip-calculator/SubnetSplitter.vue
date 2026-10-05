@@ -39,8 +39,8 @@ import { Split } from '@lucide/vue';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 import CalcSection from './CalcSection.vue';
-import { splitCidr } from '@/utils/ip-math.js';
-import { countLabel, formatCount } from '@/utils/ip-calc.js';
+import { splitCidr } from '@/utils/ip/ip-math.js';
+import { countLabel, formatCount } from '@/utils/features/ip-calc.js';
 
 const props = defineProps({
     cidr: { type: String, required: true },

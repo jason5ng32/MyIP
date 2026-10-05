@@ -8,7 +8,7 @@
 // event on utils/app-events.js and subscribe to it here instead.
 import * as Sentry from '@sentry/vue';
 import { onAppEvent } from '@/utils/app-events';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP } from '@/utils/ip/valid-ip.js';
 
 const env = import.meta.env ?? {};
 

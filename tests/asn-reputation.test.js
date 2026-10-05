@@ -1,4 +1,4 @@
-// Tests for common/asn-reputation.js — the private-API request behind the
+// Tests for server/asn-reputation.js — the private-API request behind the
 // /api/asn-profile reputation section: no upstream call without a key or
 // endpoint, asn + system key + caller headers forwarded, upstream status and
 // body handed back, network failures and unparsable 2xx bodies thrown.
@@ -6,7 +6,7 @@
 
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, describe, it } from 'node:test';
-import { requestAsnReputation } from '../common/asn-reputation.js';
+import { requestAsnReputation } from '../server/asn-reputation.js';
 
 const ENV_KEYS = ['IPCHECKING_API_KEY', 'IPCHECKING_API_ENDPOINT'];
 const originalFetch = globalThis.fetch;

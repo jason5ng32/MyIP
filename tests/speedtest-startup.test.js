@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { reactive, ref, computed, markRaw, nextTick } from 'vue';
 import { parse } from 'vue/compiler-sfc';
-import { createSpeedTestSession, getSpeedTestLiveValues } from '../frontend/utils/speedtest-session.js';
+import { createSpeedTestSession, getSpeedTestLiveValues } from '../frontend/utils/features/speedtest-session.js';
 
 // Run setup logic without mounting a DOM or evaluating UI component imports.
 const source = readFileSync(new URL('../frontend/components/SpeedTest.vue', import.meta.url), 'utf8');

@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseMtrOutput } from '../frontend/utils/mtr-parse.js';
+import { parseMtrOutput } from '../frontend/utils/features/mtr-parse.js';
 
 // Globalping-style output: Loss% Drop Rcv Avg StDev Javg columns, AS-number
 // prefixes, hostname (ip) pairs, and an unresolved hop.

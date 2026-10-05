@@ -19,7 +19,7 @@ import {
     distinctCountryCount,
     ipVersionCounts,
     filterHistoryDays,
-} from '../frontend/utils/ip-history.js';
+} from '../frontend/utils/ip/ip-history.js';
 
 const entry = (ip, extra = {}) => ({ ip, country: '', location: '', asn: '', org: '', ...extra });
 

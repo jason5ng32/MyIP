@@ -196,7 +196,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { clampRetentionDays } from '@/utils/ip-history.js';
+import { clampRetentionDays } from '@/utils/ip/ip-history.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';

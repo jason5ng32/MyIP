@@ -16,7 +16,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Card, CardContent } from '@/components/ui/card';
-import { SECTION_TITLE_KEYS } from '@/utils/report-export.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
 import { isoToDateTime } from '@/utils/time-utils.js';
 
 const props = defineProps({
