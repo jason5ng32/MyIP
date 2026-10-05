@@ -1,14 +1,22 @@
 // Firebase Auth bootstrap — env-gated AND lazy: the SDK chunk only loads on
 // the first loadFirebaseAuth() call (signed-in boot, sign-in click, or the
 // background auth probe), never on the visitor-critical path.
-const env = import.meta.env ?? {};
-const firebaseConfig = {
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-};
+import { resolveAuthDomain } from './utils/auth-domain.js';
+import { isRunningAsPwa } from './utils/pwa.js';
 
-const isFireBaseSet = !!firebaseConfig.apiKey && !!firebaseConfig.authDomain && !!firebaseConfig.projectId;
+const env = import.meta.env ?? {};
+
+const isFireBaseSet = !!env.VITE_FIREBASE_API_KEY && !!env.VITE_FIREBASE_AUTH_DOMAIN && !!env.VITE_FIREBASE_PROJECT_ID;
+
+// Inputs for utils/auth-domain.js. Browsers sign in through the shared
+// default domain; the installed PWA may use VITE_FIREBASE_PWA_AUTH_DOMAIN
+// (the site's own host, whose /__/auth proxy keeps the redirect handler
+// same-origin). Read on demand: the display mode needs `window`.
+const authDomainInputs = () => ({
+    runningAsPwa: isRunningAsPwa(),
+    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+    pwaAuthDomain: env.VITE_FIREBASE_PWA_AUTH_DOMAIN,
+});
 
 let authModulePromise = null;
 
@@ -28,7 +36,11 @@ const loadFirebaseAuth = () => {
         }
         return {
             ...authModule,
-            auth: authModule.getAuth(appModule.initializeApp(firebaseConfig)),
+            auth: authModule.getAuth(appModule.initializeApp({
+                apiKey: env.VITE_FIREBASE_API_KEY,
+                authDomain: resolveAuthDomain(authDomainInputs()),
+                projectId: env.VITE_FIREBASE_PROJECT_ID,
+            })),
         };
     }).catch((error) => {
         // Don't memoize a transient chunk-load failure — the next auth
@@ -39,4 +51,4 @@ const loadFirebaseAuth = () => {
     return authModulePromise;
 };
 
-export { loadFirebaseAuth };
+export { loadFirebaseAuth, authDomainInputs };

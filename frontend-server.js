@@ -26,9 +26,10 @@ frontendApp.use('/api', createProxyMiddleware({
 // their scripts) is reverse-proxied to <projectId>.firebaseapp.com so the
 // sign-in handler runs first-party — inside the installed PWA's own webview
 // and within Safari's storage partition, where getRedirectResult can read the
-// result back. Switched on by VITE_FIREBASE_PROJECT_ID; VITE_FIREBASE_AUTH_DOMAIN
-// must then be this site's own host. Mounted ahead of the static layer and the
-// SPA fallback so the handler page never resolves to index.html.
+// result back. Switched on by VITE_FIREBASE_PROJECT_ID; the PWA uses it when
+// VITE_FIREBASE_PWA_AUTH_DOMAIN is this site's own host. Mounted ahead of the
+// static layer and the SPA fallback so the handler page never resolves to
+// index.html.
 const firebaseAuthTarget = firebaseAuthProxyTarget(process.env.VITE_FIREBASE_PROJECT_ID);
 if (firebaseAuthTarget) {
   frontendApp.use(FIREBASE_AUTH_PROXY_PATH, createProxyMiddleware({

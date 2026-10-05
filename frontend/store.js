@@ -1,6 +1,7 @@
 // store.js
 import { defineStore } from 'pinia';
-import { loadFirebaseAuth } from './firebase-init.js';
+import { loadFirebaseAuth, authDomainInputs } from './firebase-init.js';
+import { signInProvidersFor } from './utils/auth-domain.js';
 import { writeAuthHint } from './utils/auth-hint.js';
 import { resolveSignInFlow, shouldFallBackToRedirect } from './utils/auth-flow.js';
 import { markPendingRedirectSignIn, takePendingRedirectSignIn } from './utils/auth-redirect.js';
@@ -112,6 +113,9 @@ export const useMainStore = defineStore('main', {
         };
       });
     },
+    // Provider keys the sign-in menu offers: GitHub drops out in an installed
+    // PWA that signs in through its own auth domain (utils/auth-domain.js).
+    signInProviders: () => signInProvidersFor(authDomainInputs()),
     // Per-feature "monthly quota exhausted" booleans, derived from the
     // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
     // only — the backend enforces the same limits authoritatively; absent
@@ -279,6 +283,10 @@ export const useMainStore = defineStore('main', {
     // installed PWA, or when the popup can't open: mark the pending return
     // and leave the page — completeRedirectSignIn picks it up at boot.
     async signInWithProvider(providerKey) {
+      if (!this.signInProviders.includes(providerKey)) {
+        console.warn(`Sign-in with ${providerKey} is not offered here`);
+        return;
+      }
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
         const fb = await loadFirebaseAuth();

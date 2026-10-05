@@ -18,7 +18,8 @@ frontend/
 │                      sign-in: popup in a browser tab, redirect in the installed
 │                      PWA or on a blocked popup (utils/auth-flow.js); the return
 │                      is consumed at boot via a sessionStorage marker
-│                      (utils/auth-redirect.js)
+│                      (utils/auth-redirect.js); the PWA may use its own auth
+│                      domain, then Google only (utils/auth-domain.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
