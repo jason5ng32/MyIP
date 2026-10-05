@@ -432,15 +432,16 @@ describe('buildCountryShares', () => {
         assert.deepEqual(result, { shares: [], complete: false });
     });
 
-    it('more IPv4 prefixes than the cap is incomplete, with no lookups', () => {
-        // 20001 distinct /24s under 10.0.0.0/8.
-        const many = Array.from({ length: 20001 }, (_, i) => ({ prefix: `10.${i >> 8}.${i & 255}.0/24` }));
+    it('bounds the walk by lookups, not by how many prefixes Radar returns', () => {
+        // 30000 /24s under 10.0.0.0/8 (one per 256 addresses).
+        const specifics = Array.from({ length: 30000 }, (_, i) => ({ prefix: `10.${i >> 8}.${i & 255}.0/24` }));
+        // Under a covering /8 they are skipped: one lookup, complete.
         let calls = 0;
-        const result = buildCountryShares(many, () => { calls++; return { country: 'US', prefixLength: 24 }; });
-        assert.deepEqual(result, { shares: [], complete: false });
-        assert.equal(calls, 0);
-        // At the cap the walk still runs.
-        assert.equal(buildCountryShares(many.slice(0, 20000), () => ({ country: 'US', prefixLength: 24 })).complete, true);
+        const wide = () => { calls++; return { country: 'US', prefixLength: 8 }; };
+        assert.deepEqual(shares([{ prefix: '10.0.0.0/8' }, ...specifics], wide), [{ country: 'US', share: 1 }]);
+        assert.equal(calls, 1);
+        // Uncovered, each costs a lookup; well within the budget, complete.
+        assert.equal(buildCountryShares(specifics, () => ({ country: 'US', prefixLength: 24 })).complete, true);
     });
 
     it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {
