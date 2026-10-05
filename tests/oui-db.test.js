@@ -21,6 +21,10 @@ describe('parseCsv', () => {
         const text = 'a,"b, c","say ""hi"""\r\nd,,"multi\nline"';
         assert.deepEqual(parseCsv(text), [['a', 'b, c', 'say "hi"'], ['d', '', 'multi\nline']]);
     });
+
+    it('refuses text that ends inside a quoted field', () => {
+        assert.throws(() => parseCsv('a,"cut sh'), /inside a quoted field/);
+    });
 });
 
 describe('countryFromAddress', () => {
@@ -39,6 +43,12 @@ describe('countryFromAddress', () => {
         assert.equal(countryFromAddress('STRATUMSED K31 THE NL'), 'NL');
         assert.equal(countryFromAddress('1006, Block A, HONG HK KONG'), 'HK');
         assert.equal(countryFromAddress('7F., 116, HOU-KANG ST., TAIWAN TAIWAN TW R.O.C.'), 'TW');
+    });
+
+    it('prefers a country code after the postal code to a state before it', () => {
+        assert.equal(countryFromAddress('Dover DE 19901 US'), 'US');
+        assert.equal(countryFromAddress('PO Box 165, Goodwood SA 5034 AU'), 'AU');
+        assert.equal(countryFromAddress('Via Leini San Maurizio Canavese IT 10077 TO'), 'IT', 'Italian province after the CAP');
     });
 
     it('answers null when no country code is there', () => {
@@ -64,6 +74,12 @@ describe('parseRegistry', () => {
 
     it('refuses a file that is not an IEEE registry CSV', () => {
         assert.throws(() => parseRegistry('<html>Request Rejected</html>', spec('MA-L')), /unexpected CSV header/);
+    });
+
+    it('refuses a file cut short mid-row', () => {
+        const whole = `${HEADER}\r\nMA-L,F02F4B,"Apple, Inc.",1 Infinite Loop Cupertino CA US 95014\r\n`;
+        assert.equal(parseRegistry(whole, spec('MA-L')).length, 1);
+        assert.throws(() => parseRegistry(whole.slice(0, -10), spec('MA-L')), /truncated/);
     });
 });
 
@@ -161,10 +177,12 @@ describe('describeMac', () => {
         assert.equal(result.isRand, true);
     });
 
-    it('resolves a multicast address to the block it derives from, flags kept', () => {
+    it('resolves a multicast address to the block it derives from, shown as its multicast range', () => {
         const result = describeMac(blocks, '01005E0000FB');
         assert.equal(result.company, 'ICANN, IANA Department');
-        assert.equal(result.macPrefix, '00:00:5E');
+        assert.equal(result.macPrefix, '01:00:5E');
+        assert.equal(result.blockStart, '01:00:5E:00:00:00');
+        assert.equal(result.blockEnd, '01:00:5E:FF:FF:FF');
         assert.equal(result.isMulticast, true);
     });
 

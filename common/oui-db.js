@@ -47,7 +47,10 @@ const CSV_HEADER = 'Registry,Assignment,Organization Name,Organization Address';
 /* Parse                                                               */
 /* ------------------------------------------------------------------ */
 
-/** RFC 4180 CSV text → rows of fields (quoted fields may hold commas, `""`, newlines). */
+/**
+ * RFC 4180 CSV text → rows of fields (quoted fields may hold commas, `""`,
+ * newlines). Throws on text that ends inside a quoted field.
+ */
 export const parseCsv = (text) => {
     const rows = [];
     let row = [];
@@ -64,6 +67,7 @@ export const parseCsv = (text) => {
         else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
         else if (c !== '\r') field += c;
     }
+    if (quoted) throw new Error('CSV ends inside a quoted field');
     if (field || row.length) { row.push(field); rows.push(row); }
     return rows;
 };
@@ -72,17 +76,24 @@ const regionNames = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'n
 const isCountryCode = (token) => /^[A-Z]{2}$/.test(token || '') && Boolean(regionNames.of(token));
 const hasDigit = (token) => /\d/.test(token || '');
 
+// Countries whose postal code is followed by letters that can read as a
+// country code: Dutch postcodes ("5633 AD"), Italian CAP + province ("10077 TO").
+const LETTERED_POSTCODE = new Set(['NL', 'IT']);
+
 /**
  * ISO country code at the end of an IEEE address, or null. The address ends
  * `… <country> <postal code>`, where the postal code is zero to two tokens
  * of free text ("94568", "5633 AD", "R.O.C."). A code followed by a token
- * with a digit is taken first — Dutch postcodes end in letter pairs that
- * are themselves country codes — then the rightmost code.
+ * with a digit is the country — unless another code trails the postal code
+ * ("Dover DE 19901 US", a state before the country), which then wins, save
+ * after a lettered-postcode country. Otherwise the rightmost code.
  */
 export const countryFromAddress = (address) => {
     const tokens = String(address || '').trim().split(/\s+/).slice(-3);
     for (let i = 0; i < tokens.length - 1; i++) {
-        if (isCountryCode(tokens[i]) && hasDigit(tokens[i + 1])) return tokens[i];
+        if (!isCountryCode(tokens[i]) || !hasDigit(tokens[i + 1])) continue;
+        const trailing = tokens.slice(i + 2).find(isCountryCode);
+        return trailing && !LETTERED_POSTCODE.has(tokens[i]) ? trailing : tokens[i];
     }
     for (let i = tokens.length - 1; i >= 0; i--) {
         if (isCountryCode(tokens[i])) return tokens[i];
@@ -92,11 +103,15 @@ export const countryFromAddress = (address) => {
 
 /**
  * One registry's CSV text → [assignment, { registry, company, address,
- * country }] entries. Throws on a file that isn't an IEEE registry CSV.
+ * country }] entries. Throws on a file that isn't an IEEE registry CSV, or
+ * one cut short.
  */
 export const parseRegistry = (text, { registry, hexLength }) => {
-    const rows = parseCsv(text.replace(/^﻿/, ''));
+    const rows = parseCsv(text.replace(/^\uFEFF/, ''));
     if (rows[0]?.join(',').trim() !== CSV_HEADER) throw new Error(`${registry}: unexpected CSV header`);
+    // IEEE ends every row, the last included, with CRLF: a file that stops
+    // mid-row was cut short.
+    if (!text.endsWith('\n')) throw new Error(`${registry}: file ends mid-row (truncated)`);
     const entries = [];
     for (const [rowRegistry, assignment, company, address] of rows.slice(1)) {
         const hex = (assignment || '').trim().toUpperCase();
@@ -158,9 +173,10 @@ export const macFlags = (hex) => {
  * common/mac-input.js) against `blocks`: the longest assignment that
  * covers it, its address range, and the first-octet flags. The group bit is
  * not part of an assignment, so a multicast address (01:00:5E:…) resolves
- * to the block it derives from (00:00:5E, IANA). An address no block covers
- * is still answered (`found: false`) — its flags are the point for a
- * randomized one.
+ * to the block it derives from (00:00:5E, IANA), shown as that block's
+ * multicast range (01:00:5E:00:00:00–01:00:5E:FF:FF:FF). An address no
+ * block covers is still answered (`found: false`) — its flags are the point
+ * for a randomized one.
  */
 export const describeMac = (blocks, hex) => {
     const firstOctet = (parseInt(hex.slice(0, 2), 16) & 0xfe).toString(16).toUpperCase().padStart(2, '0');
@@ -182,16 +198,19 @@ export const describeMac = (blocks, hex) => {
             isPrivate: false, ...flags,
         };
     }
+    // Shown in the query's own form: a multicast query gets its block's
+    // multicast range, which holds the address asked about.
+    const shown = hex.slice(0, 2) + assignment.slice(2);
     const hostDigits = MAC_HEX_LENGTH - assignment.length;
     return {
         success: true,
         found: true,
-        macPrefix: pairs(assignment),
+        macPrefix: pairs(shown),
         company: block.company || NA,
         address: block.address || NA,
         country: block.country || NA,
-        blockStart: pairs(assignment + '0'.repeat(hostDigits)),
-        blockEnd: pairs(assignment + 'F'.repeat(hostDigits)),
+        blockStart: pairs(shown + '0'.repeat(hostDigits)),
+        blockEnd: pairs(shown + 'F'.repeat(hostDigits)),
         blockSize: 16 ** hostDigits,
         blockType: block.registry,
         isPrivate: block.company.toLowerCase() === 'private',
