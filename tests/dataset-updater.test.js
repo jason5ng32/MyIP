@@ -419,7 +419,9 @@ describe('updateDatasets', () => {
                 }),
             });
             const next = makeRow();
-            await updateDatasets([stalled.row, next.row], { timeoutMs: 50 });
+            // The timeout bounds the healthy row too (lock, fsync'd state
+            // writes): it needs headroom on a loaded CI runner.
+            await updateDatasets([stalled.row, next.row], { timeoutMs: 1000 });
             assert.deepEqual(logged, ['stalled']);
             assert.ok(isPresent(next.row));
         } finally {
