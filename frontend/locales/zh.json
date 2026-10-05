@@ -857,6 +857,123 @@
       "no": "否"
     }
   },
+  "ipblocklist": {
+    "Title": "IP 黑名单检查",
+    "Note": "用约 80 个公开黑名单检查一个 IP，分为两类。实时黑名单（DNSBL）由邮件服务器、论坛和各类网络服务在收到连接或邮件时实时查询，用来决定是否接受；威胁情报名单则是公开发布的滥用地址、开放代理、VPN 服务器和 Tor 出口清单，被防火墙和安全服务大量采用。邮件被拒收、注册被拦截、网站反复弹出验证码，常常就是因为 IP 出现在了这些名单上。",
+    "Note2": "每一条命中分为三种性质。「不良记录」表示名单记录过这个地址发送垃圾邮件、发起攻击或设备被入侵；「匿名标记」表示这个地址是已知的代理、VPN、中继或 Tor 出口，如果你正在使用这类服务，被标记是正常的，本身并不算不良记录；「参考」针对的是更大的网络范围，比如动态地址段或整个运营商，而不是这个地址本身。共享、云服务器和 VPN 的地址常常会出现在某些名单上，所以请把命中当作信号而不是定论；如果名单提供移除申请页面，会在命中条目旁给出链接。",
+    "SelectIPLabel": "选择要检查的 IP",
+    "EnterIPLabel": "输入要检查的 IP",
+    "UseStored": "使用检测到的 IP",
+    "SelectIP": "选择一个 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "InvalidIP": "请输入一个公网 IPv4 或 IPv6。",
+    "Checking": "正在检查约 80 个黑名单，最长可能需要 30 秒。",
+    "FetchError": "检查没能完成，请稍后再试。",
+    "CheckedAt": "检查于 {time}",
+    "verdict": {
+      "abuse": "该 IP 在部分黑名单上有不良记录",
+      "anonymity": "没有不良记录，但被标记为代理、VPN、中继或 Tor 出口",
+      "notice": "未被列入黑名单，但部分名单标记了它所在的网络",
+      "clean": "未出现在任何已检查的黑名单上"
+    },
+    "count": {
+      "abuse": "不良记录",
+      "anonymity": "匿名标记",
+      "notice": "参考",
+      "clean": "干净",
+      "error": "失败"
+    },
+    "SomeFailed": "本次有 {n} 个名单查询失败，结果可能不完整。",
+    "part": {
+      "dnsbl": {
+        "title": "实时黑名单（DNSBL）",
+        "desc": "邮件服务器和网络服务实时查询的黑名单"
+      },
+      "static": {
+        "title": "威胁情报名单",
+        "desc": "防火墙和安全服务常用的滥用、代理与 VPN 名单"
+      }
+    },
+    "NoHits": "这里没有命中。",
+    "ShowRest": "查看其余 {n} 个名单",
+    "HideRest": "收起",
+    "CheckFailed": "查询失败",
+    "LastSeen": "最近出现：{date}",
+    "RequestRemoval": "申请移除",
+    "category": {
+      "spam": "垃圾邮件",
+      "abuse": "滥用",
+      "proxy": "代理",
+      "vpn": "VPN",
+      "relay": "中继",
+      "tor": "Tor",
+      "scanner": "扫描",
+      "backscatter": "退信散射",
+      "mixed": "综合"
+    },
+    "reason": {
+      "socksProxy": "SOCKS 代理",
+      "httpProxy": "HTTP 代理",
+      "proxyChain": "代理链",
+      "webProxy": "Web 代理",
+      "wingateProxy": "WinGate 代理",
+      "openProxy": "开放代理",
+      "torExit": "Tor 出口节点",
+      "exploited": "被利用的主机",
+      "compromisedHost": "被入侵的主机",
+      "compromisedRouter": "被入侵的路由器",
+      "botnet": "僵尸网络",
+      "worm": "蠕虫感染",
+      "ircDrone": "IRC 傀儡机",
+      "ddosDrone": "DDoS 傀儡机",
+      "bottler": "Bottler 恶意程序",
+      "spambot": "垃圾邮件机器人",
+      "bruteForce": "暴力破解",
+      "spamSource": "垃圾邮件来源",
+      "spamtrap": "触发垃圾邮件陷阱",
+      "badReputation": "信誉差",
+      "hijackedNetwork": "被劫持的网络",
+      "endUserRange": "终端用户地址段",
+      "dynamicRange": "动态地址段",
+      "noMailRange": "不应发送邮件的地址段",
+      "missingPtr": "缺少反向解析",
+      "poorReputation": "信誉偏低",
+      "mixedReputation": "信誉参半",
+      "rangeListed": "所在网段被列入",
+      "networkListed": "所在网络整体被列入",
+      "unaccountableOperator": "运营者不处理滥用投诉",
+      "noMailService": "没有邮件服务",
+      "unreliableAbuseDesk": "滥用投诉渠道不可靠",
+      "reported1d": "近 1 天内被举报",
+      "reported7d": "近 7 天内被举报",
+      "reported30d": "近 30 天内被举报",
+      "reported90d": "近 90 天内被举报",
+      "feeds": "被至少 {n} 个威胁情报源报告",
+      "testEntry": "测试条目"
+    },
+    "legend": {
+      "abuse": {
+        "label": "不良记录",
+        "desc": "名单记录过这个地址的垃圾邮件、攻击或入侵行为"
+      },
+      "anonymity": {
+        "label": "匿名标记",
+        "desc": "已知的代理、VPN、中继或 Tor 出口，本身不算不良记录"
+      },
+      "notice": {
+        "label": "参考",
+        "desc": "标记的是所在网段或运营商，而不是这个地址"
+      },
+      "clean": {
+        "label": "未列入",
+        "desc": "名单上没有这个 IP"
+      },
+      "error": {
+        "label": "查询失败",
+        "desc": "本次没能查询这个名单，不代表没有列入"
+      }
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "在新标签页打开",
     "BackToHome": "回到首页",
@@ -881,7 +998,8 @@
     "IpCalculator": "任意 IP、前缀或范围的子网计算、进制转换与 IPv6 解读",
     "BrowserInfo": "检阅浏览器信息和指纹",
     "SecurityChecklist": "全面的数字生活安全检查清单",
-    "PersonaCheck": "把网站看到的你，和你想扮成的本地人做对照"
+    "PersonaCheck": "把网站看到的你，和你想扮成的本地人做对照",
+    "IpBlocklist": "查看 IP 是否出现在垃圾邮件、滥用、代理或 VPN 黑名单上"
   },
   "macchecker": {
     "Title": "MAC 地址查询",
@@ -1847,6 +1965,7 @@
     "BrowserInfo": "打开浏览器信息面板",
     "SecurityChecklist": "打开安全检查清单",
     "PersonaCheck": "打开深度画像检测面板",
+    "IpBlocklist": "打开 IP 黑名单检查面板",
     "AsnProfile": "打开 ASN 档案查询面板"
   },
   "page": {

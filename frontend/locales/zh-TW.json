@@ -857,6 +857,123 @@
       "no": "否"
     }
   },
+  "ipblocklist": {
+    "Title": "IP 黑名單檢查",
+    "Note": "用約 80 個公開黑名單檢查一個 IP，分為兩類。即時黑名單（DNSBL）由郵件伺服器、論壇和各類網路服務在收到連線或郵件時即時查詢，用來決定是否接受；威脅情報名單則是公開發布的濫用位址、開放代理、VPN 伺服器和 Tor 出口清單，被防火牆和安全服務大量採用。郵件被拒收、註冊被攔截、網站反覆跳出驗證碼，常常就是因為 IP 出現在了這些名單上。",
+    "Note2": "每一筆命中分為三種性質。「不良紀錄」表示名單記錄過這個位址發送垃圾郵件、發起攻擊或裝置被入侵；「匿名標記」表示這個位址是已知的代理、VPN、中繼或 Tor 出口，如果你正在使用這類服務，被標記是正常的，本身並不算不良紀錄；「參考」針對的是更大的網路範圍，例如動態位址段或整個營運商，而不是這個位址本身。共享、雲端伺服器和 VPN 的位址常常會出現在某些名單上，所以請把命中當作訊號而不是定論；如果名單提供移除申請頁面，會在命中條目旁給出連結。",
+    "SelectIPLabel": "選擇要檢查的 IP",
+    "EnterIPLabel": "輸入要檢查的 IP",
+    "UseStored": "使用偵測到的 IP",
+    "SelectIP": "選擇一個 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "InvalidIP": "請輸入一個公網 IPv4 或 IPv6。",
+    "Checking": "正在檢查約 80 個黑名單，最長可能需要 30 秒。",
+    "FetchError": "檢查沒能完成，請稍後再試。",
+    "CheckedAt": "檢查於 {time}",
+    "verdict": {
+      "abuse": "該 IP 在部分黑名單上有不良紀錄",
+      "anonymity": "沒有不良紀錄，但被標記為代理、VPN、中繼或 Tor 出口",
+      "notice": "未被列入黑名單，但部分名單標記了它所在的網路",
+      "clean": "未出現在任何已檢查的黑名單上"
+    },
+    "count": {
+      "abuse": "不良紀錄",
+      "anonymity": "匿名標記",
+      "notice": "參考",
+      "clean": "乾淨",
+      "error": "失敗"
+    },
+    "SomeFailed": "本次有 {n} 個名單查詢失敗，結果可能不完整。",
+    "part": {
+      "dnsbl": {
+        "title": "即時黑名單（DNSBL）",
+        "desc": "郵件伺服器和網路服務即時查詢的黑名單"
+      },
+      "static": {
+        "title": "威脅情報名單",
+        "desc": "防火牆和安全服務常用的濫用、代理與 VPN 名單"
+      }
+    },
+    "NoHits": "這裡沒有命中。",
+    "ShowRest": "查看其餘 {n} 個名單",
+    "HideRest": "收起",
+    "CheckFailed": "查詢失敗",
+    "LastSeen": "最近出現：{date}",
+    "RequestRemoval": "申請移除",
+    "category": {
+      "spam": "垃圾郵件",
+      "abuse": "濫用",
+      "proxy": "代理",
+      "vpn": "VPN",
+      "relay": "中繼",
+      "tor": "Tor",
+      "scanner": "掃描",
+      "backscatter": "退信散射",
+      "mixed": "綜合"
+    },
+    "reason": {
+      "socksProxy": "SOCKS 代理",
+      "httpProxy": "HTTP 代理",
+      "proxyChain": "代理鏈",
+      "webProxy": "Web 代理",
+      "wingateProxy": "WinGate 代理",
+      "openProxy": "開放代理",
+      "torExit": "Tor 出口節點",
+      "exploited": "被利用的主機",
+      "compromisedHost": "被入侵的主機",
+      "compromisedRouter": "被入侵的路由器",
+      "botnet": "殭屍網路",
+      "worm": "蠕蟲感染",
+      "ircDrone": "IRC 傀儡機",
+      "ddosDrone": "DDoS 傀儡機",
+      "bottler": "Bottler 惡意程式",
+      "spambot": "垃圾郵件機器人",
+      "bruteForce": "暴力破解",
+      "spamSource": "垃圾郵件來源",
+      "spamtrap": "觸發垃圾郵件陷阱",
+      "badReputation": "信譽差",
+      "hijackedNetwork": "被劫持的網路",
+      "endUserRange": "終端使用者位址段",
+      "dynamicRange": "動態位址段",
+      "noMailRange": "不應發送郵件的位址段",
+      "missingPtr": "缺少反向解析",
+      "poorReputation": "信譽偏低",
+      "mixedReputation": "信譽參半",
+      "rangeListed": "所在網段被列入",
+      "networkListed": "所在網路整體被列入",
+      "unaccountableOperator": "營運者不處理濫用投訴",
+      "noMailService": "沒有郵件服務",
+      "unreliableAbuseDesk": "濫用投訴管道不可靠",
+      "reported1d": "近 1 天內被檢舉",
+      "reported7d": "近 7 天內被檢舉",
+      "reported30d": "近 30 天內被檢舉",
+      "reported90d": "近 90 天內被檢舉",
+      "feeds": "被至少 {n} 個威脅情報來源回報",
+      "testEntry": "測試條目"
+    },
+    "legend": {
+      "abuse": {
+        "label": "不良紀錄",
+        "desc": "名單記錄過這個位址的垃圾郵件、攻擊或入侵行為"
+      },
+      "anonymity": {
+        "label": "匿名標記",
+        "desc": "已知的代理、VPN、中繼或 Tor 出口，本身不算不良紀錄"
+      },
+      "notice": {
+        "label": "參考",
+        "desc": "標記的是所在網段或營運商，而不是這個位址"
+      },
+      "clean": {
+        "label": "未列入",
+        "desc": "名單上沒有這個 IP"
+      },
+      "error": {
+        "label": "查詢失敗",
+        "desc": "本次沒能查詢這個名單，不代表沒有列入"
+      }
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "在新標籤頁開啟",
     "BackToHome": "回到首頁",
@@ -881,7 +998,8 @@
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
     "BrowserInfo": "檢閱瀏覽器資訊和指紋",
     "SecurityChecklist": "全面的數位生活安全檢查清單",
-    "PersonaCheck": "把網站看到的你，和你想扮成的本地人做對照"
+    "PersonaCheck": "把網站看到的你，和你想扮成的本地人做對照",
+    "IpBlocklist": "查看 IP 是否出現在垃圾郵件、濫用、代理或 VPN 黑名單上"
   },
   "macchecker": {
     "Title": "MAC 位址查詢",
@@ -1847,6 +1965,7 @@
     "BrowserInfo": "開啟瀏覽器資訊面板",
     "SecurityChecklist": "開啟安全檢查清單",
     "PersonaCheck": "開啟深度畫像檢測面板",
+    "IpBlocklist": "開啟 IP 黑名單檢查面板",
     "AsnProfile": "開啟 ASN 檔案查詢面板"
   },
   "page": {

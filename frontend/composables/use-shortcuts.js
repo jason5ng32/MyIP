@@ -228,6 +228,12 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             action: () => goToAdvancedTool('enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
             description: t('shortcutKeys.EnhancedDnsLeakTest'),
         });
+        // Uppercase B: lowercase `b` belongs to Browser Info.
+        config.push({
+            keys: 'B',
+            action: () => goToAdvancedTool('blocklist', 'IpBlocklist'),
+            description: t('shortcutKeys.IpBlocklist'),
+        });
         // Uppercase P: lowercase `p` belongs to Earth Online.
         config.push({
             keys: 'P',

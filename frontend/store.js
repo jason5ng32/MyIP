@@ -115,8 +115,8 @@ export const useMainStore = defineStore('main', {
     // data (signed out, old backend, fetch pending) reads as not exceeded.
     //
     // Metering differs per feature: invisibility_test / dns_leak_test /
-    // persona_check count requests, so exhausted means every further run is
-    // blocked and their components use this as a pre-flight gate.
+    // persona_check / ip_hitlist count requests, so exhausted means every
+    // further run is blocked and their components use this as a pre-flight gate.
     quotaExceeded: (state) => {
       const features = state.remoteUserInfo?.quota?.features || {};
       const exceeded = (key) => features[key]?.exhausted === true;
@@ -125,6 +125,7 @@ export const useMainStore = defineStore('main', {
         invisibility_test: exceeded('invisibility_test'),
         dns_leak_test: exceeded('dns_leak_test'),
         persona_check: exceeded('persona_check'),
+        ip_hitlist: exceeded('ip_hitlist'),
       };
     },
   },

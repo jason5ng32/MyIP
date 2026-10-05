@@ -857,6 +857,123 @@
       "no": "No"
     }
   },
+  "ipblocklist": {
+    "Title": "IP Blocklist Check",
+    "Note": "Checks an IP against about 80 public blocklists in two groups. Real-time blocklists (DNSBLs) are queried live by mail servers, forums and online services to decide whether to accept a connection or a message; threat intelligence lists are published feeds of abusive addresses, open proxies, VPN servers and Tor exits that firewalls and security services load. Being listed is often why emails get rejected, sign-ups get blocked or a site keeps asking for CAPTCHAs.",
+    "Note2": "Each listing falls into one of three kinds. Abuse means a list has recorded spam, attacks or a compromised device at this address. Anonymity means the address is known as a proxy, VPN, relay or Tor exit, which is expected when you use one and isn't a bad record by itself. Advisory entries flag the wider network, such as a dynamic range or a whole provider, rather than this address. Shared, cloud and VPN addresses often turn up somewhere, so treat a listing as a signal rather than a verdict; where a list offers a removal page, it's linked next to the listing.",
+    "SelectIPLabel": "Pick an IP to check",
+    "EnterIPLabel": "Enter an IP to check",
+    "UseStored": "Use a detected IP",
+    "SelectIP": "Select an IP",
+    "EnterIPPlaceholder": "e.g. 1.1.1.1",
+    "InvalidIP": "Enter a public IPv4 or IPv6 address.",
+    "Checking": "Checking about 80 blocklists. This can take up to 30 seconds.",
+    "FetchError": "Couldn't finish the check. Try again in a moment.",
+    "CheckedAt": "Checked {time}",
+    "verdict": {
+      "abuse": "This IP has a record of abuse on some blocklists",
+      "anonymity": "No abuse record, but this IP is marked as a proxy, VPN, relay or Tor exit",
+      "notice": "Not on any blocklist, though some lists flag its wider network",
+      "clean": "Not on any of the blocklists checked"
+    },
+    "count": {
+      "abuse": "Abuse",
+      "anonymity": "Anonymity",
+      "notice": "Advisory",
+      "clean": "Clean",
+      "error": "Failed"
+    },
+    "SomeFailed": "{n} of the lists couldn't be checked this time, so the result may be incomplete.",
+    "part": {
+      "dnsbl": {
+        "title": "Real-time blocklists (DNSBL)",
+        "desc": "Queried live by mail servers and online services"
+      },
+      "static": {
+        "title": "Threat intelligence lists",
+        "desc": "Abuse, proxy and VPN lists used by firewalls and security services"
+      }
+    },
+    "NoHits": "Not listed here.",
+    "ShowRest": "Show the other {n} lists",
+    "HideRest": "Hide",
+    "CheckFailed": "Check failed",
+    "LastSeen": "Last seen {date}",
+    "RequestRemoval": "Request removal",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abuse",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relay",
+      "tor": "Tor",
+      "scanner": "Scanner",
+      "backscatter": "Backscatter",
+      "mixed": "Mixed"
+    },
+    "reason": {
+      "socksProxy": "SOCKS proxy",
+      "httpProxy": "HTTP proxy",
+      "proxyChain": "Proxy chain",
+      "webProxy": "Web proxy",
+      "wingateProxy": "WinGate proxy",
+      "openProxy": "Open proxy",
+      "torExit": "Tor exit node",
+      "exploited": "Exploited host",
+      "compromisedHost": "Compromised host",
+      "compromisedRouter": "Compromised router",
+      "botnet": "Botnet",
+      "worm": "Worm infection",
+      "ircDrone": "IRC drone",
+      "ddosDrone": "DDoS drone",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Brute-force attacks",
+      "spamSource": "Spam source",
+      "spamtrap": "Hit a spam trap",
+      "badReputation": "Bad reputation",
+      "hijackedNetwork": "Hijacked network",
+      "endUserRange": "End-user address range",
+      "dynamicRange": "Dynamic address range",
+      "noMailRange": "Not meant to send mail",
+      "missingPtr": "No reverse DNS",
+      "poorReputation": "Poor reputation",
+      "mixedReputation": "Mixed reputation",
+      "rangeListed": "Address range listed",
+      "networkListed": "Whole network listed",
+      "unaccountableOperator": "Operator doesn't act on abuse",
+      "noMailService": "No mail service",
+      "unreliableAbuseDesk": "Unreliable abuse contact",
+      "reported1d": "Reported in the last day",
+      "reported7d": "Reported in the last 7 days",
+      "reported30d": "Reported in the last 30 days",
+      "reported90d": "Reported in the last 90 days",
+      "feeds": "Reported by {n}+ threat feeds",
+      "testEntry": "Test entry"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abuse",
+        "desc": "the list recorded spam, attacks or a compromised device at this address"
+      },
+      "anonymity": {
+        "label": "Anonymity",
+        "desc": "a known proxy, VPN, relay or Tor exit, which isn't a bad record by itself"
+      },
+      "notice": {
+        "label": "Advisory",
+        "desc": "flags the wider network or provider, not this address"
+      },
+      "clean": {
+        "label": "Not listed",
+        "desc": "this IP isn't on the list"
+      },
+      "error": {
+        "label": "Check failed",
+        "desc": "the list couldn't be checked this time, which doesn't mean the IP isn't on it"
+      }
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "Open in new tab",
     "BackToHome": "Back to Home",
@@ -881,7 +998,8 @@
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
     "BrowserInfo": "Check browser information and fingerprint",
     "SecurityChecklist": "Guide to securing your digital life",
-    "PersonaCheck": "Compare what sites see against the country you want to look local to"
+    "PersonaCheck": "Compare what sites see against the country you want to look local to",
+    "IpBlocklist": "See whether an IP is on spam, abuse, proxy or VPN blocklists"
   },
   "macchecker": {
     "Title": "MAC Lookup",
@@ -1847,6 +1965,7 @@
     "BrowserInfo": "Open Browser Info panel",
     "SecurityChecklist": "Open Security Checklist panel",
     "PersonaCheck": "Open In-depth Persona Check panel",
+    "IpBlocklist": "Open IP Blocklist Check panel",
     "AsnProfile": "Open ASN Profile Lookup panel"
   },
   "page": {

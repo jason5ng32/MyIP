@@ -156,13 +156,14 @@ describe('useShortcuts()', () => {
     assert.ok(distinctKeys.has('H'));
     assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off without a pulse backend or cloudFlare key');
     assert.equal(distinctKeys.has('P'), false, 'persona shortcut stays off a self-hosted instance');
+    assert.equal(distinctKeys.has('B'), false, 'blocklist shortcut stays off a self-hosted instance');
     assert.equal(distinctKeys.has('A'), false, 'ASN Profile shortcut stays off without a cloudFlare key');
     // Overlays take no keys at all (utils/shortcut.js), so there is no
     // drawer-only entry left to register.
     assert.equal(distinctKeys.has('f'), false, 'no shortcut acts on an open overlay');
   });
 
-  it('originalSite=true adds invisibility ("i"), enhanced DNS-leak ("D") and persona ("P") shortcuts', () => {
+  it('originalSite=true adds invisibility ("i"), enhanced DNS-leak ("D"), blocklist ("B") and persona ("P") shortcuts', () => {
     const { keyMap, calls } = loadAndGetKeyMap({ originalSite: true });
     const hasInvisibility = keyMap.some((e) => e.keys === 'i');
     assert.ok(hasInvisibility, 'key "i" should be present on originalSite');
@@ -170,11 +171,15 @@ describe('useShortcuts()', () => {
     assert.ok(D, 'key "D" should be present on originalSite');
     D.action();
     assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest']);
+    // Uppercase B is its own key — lowercase b is Browser Info's.
+    const B = keyMap.findLast((e) => e.keys === 'B');
+    assert.ok(B, 'key "B" should be present on originalSite');
+    B.action();
     // Uppercase P is its own key — lowercase p is Earth Online's.
     const P = keyMap.findLast((e) => e.keys === 'P');
     assert.ok(P, 'key "P" should be present on originalSite');
     P.action();
-    assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest', 'personacheck']);
+    assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest', 'blocklist', 'personacheck']);
   });
 
   it('configs.cloudFlare adds the ASN Profile shortcut ("A")', () => {
