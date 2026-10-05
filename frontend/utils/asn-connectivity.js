@@ -14,12 +14,15 @@ export const asnConnectivityUrl = (asn) =>
     `/api/asn-connectivity?asn=${encodeURIComponent(asn)}&v=${ASN_CONNECTIVITY_VERSION}`;
 
 // Fetch `asn` ('13335') into `cache` unless already there; resolves to the
-// cache entry. Failures are cached as `{ error: true }`.
+// cache entry. Failures are cached as `{ error: true }` — except a 503 (the
+// backend's "data still loading" during boot), answered the same but not
+// cached, so the next open retries.
 export const loadAsnConnectivityInto = async (cache, asn) => {
     if (cache[asn]) return cache[asn];
     try {
         // The backend is a sub-ms local lookup; a tight cap is fine.
         const response = await fetchWithTimeout(asnConnectivityUrl(asn), { timeoutMs: 5000 });
+        if (response.status === 503) return { error: true };
         cache[asn] = response.ok ? { graph: await response.json() } : { error: true };
     } catch (error) {
         console.error('Error fetching ASN connectivity:', error);

@@ -42,10 +42,21 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   no prefix or relationship counts — the ASN Profile has both.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
-- **Offline datasets** (`common/caida-updater.js` rows): fetched when missing at
-  boot, refreshed daily with `CAIDA_AUTO_UPDATE=true`; PeeringDB only with a
-  Cloudflare key. Its 116 MB dump is stream-distilled (never parsed whole) to a
-  ~6 MB per-ASN index without contact data (`common/peeringdb-distill.js`).
+- **Offline datasets** (MaxMind, CAIDA, PeeringDB) are rows in
+  `common/datasets.js`, run by one engine,
+  `common/dataset-updater.js` (lock, atomic state, publish, boot download,
+  daily schedule). A row holds only its own logic — find the newest remote
+  version, fetch / distill it, validate, reload; a new dataset is a new row,
+  never a new updater. Fetched at boot when its reader has nothing usable
+  (missing, or a file it refuses) or a publish was cut short; refreshed daily at
+  `DATASET_UPDATE_CRON` (default 04:30 local) unless `DATASET_AUTO_UPDATE=false`
+  (a row's pre-engine flag, e.g. `CAIDA_AUTO_UPDATE`, still applies when that
+  is unset), with a catch-up run at boot for a check a downtime skipped. Files
+  changed on disk by anyone else (another process, a hand-placed `.mmdb`) are
+  reloaded by the engine's watcher. MaxMind only with its credentials (City + ASN publish together);
+  PeeringDB only with a Cloudflare key; its 116 MB dump is
+  stream-distilled (never parsed whole) to a ~6 MB per-ASN index without
+  contact data (`common/peeringdb-distill.js`).
 
 ## Conventions
 
@@ -113,6 +124,18 @@ New param shape → new guard there, attached in `backend-server.js`.
 coordinates keep the zone consistent with the city beside it; only the name
 ships — the frontend renders the offset, as a 24h-cached offset breaks at every
 DST switch. A new geo source adds the middleware.
+
+### Offline data gates boot, not the listener
+
+The backend listens before any missing offline dataset or the service-status
+snapshot is fetched; snapshots already on disk load first, so only a first
+boot waits on downloads. During that window `requireOfflineData([...probes])`
+(`common/offline-data.js`) answers 503 on a route whose data is still missing
+— never edge-cached — and is a no-op after boot, when a missing dataset means
+a failed download served degraded. A route reading local data declares its
+probes (`isMaxMindReady`, `isAsRelLoaded`, …) in `backend-server.js`. Answers
+assembled from parts don't gate: an ASN Profile section whose data is still
+loading (`isStillLoading`) answers `error`, leaving the others to answer.
 
 ### Private-API header pass-through (intentional exception)
 

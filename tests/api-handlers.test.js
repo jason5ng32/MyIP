@@ -22,8 +22,8 @@ import invisibilityHandler from '../api/invisibility-test.js';
 import macCheckerHandler from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
-import asnProfileHandler from '../api/asn-profile.js';
-import { isPeeringdbLoaded } from '../common/peeringdb-db.js';
+import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '../api/asn-profile.js';
+import { isAsRelLoaded } from '../common/as-rel-db.js';
 import { isCompleteProfile } from '../common/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
@@ -734,6 +734,15 @@ describe('asn-profile handler', () => {
         const res = createResponse();
         await asnProfileHandler(createRequest({ query: { asn: '64511' } }), res);
 
+        // With the network down, the local CAIDA graph is the one source that
+        // can answer — when this checkout has an as-rel snapshot. Without one
+        // (CI, a fresh checkout) connectivity is an error too, every
+        // configured source has failed, and the answer is a 502.
+        if (!isAsRelLoaded()) {
+            assert.equal(res.statusCode, 502);
+            assert.equal(res.body.status.connectivity, 'error');
+            return;
+        }
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.asn, 64511);
         assert.equal(res.body.status.radar, 'disabled');
@@ -744,10 +753,23 @@ describe('asn-profile handler', () => {
         assert.ok(['ok', 'empty'].includes(res.body.status.connectivity));
         assert.equal(res.body.whois, null);
         assert.equal(res.body.rank, null);
-        // Local and never an error: disabled without an index file (the
-        // checkout default), ok / empty once the updater has built one.
-        if (isPeeringdbLoaded()) assert.ok(['ok', 'empty'].includes(res.body.status.peeringdb));
-        else assert.equal(res.body.status.peeringdb, 'disabled');
+        // No Cloudflare key: PeeringDB isn't configured here.
+        assert.equal(res.body.status.peeringdb, 'disabled');
+    });
+
+    it('PeeringDB: disabled only when unconfigured; configured but not loaded is an error', () => {
+        assert.equal(peeringdbReadiness({ configured: () => false, loaded: () => false })(), false);
+        assert.equal(peeringdbReadiness({ configured: () => true, loaded: () => true })(), true);
+        assert.throws(() => peeringdbReadiness({ configured: () => true, loaded: () => false })(), /not loaded/);
+    });
+
+    it('connectivity: no as-rel snapshot is an error; as2org matters only while loading', async () => {
+        const fetch = async () => 'graph';
+        const missingRel = connectivityReadiness({ relLoaded: () => false, orgLoaded: () => true, fetch });
+        assert.throws(() => missingRel(13335), /as-rel snapshot not loaded/);
+        // as2org failed after boot: RIPEstat names the nodes, the graph is served.
+        const noOrg = connectivityReadiness({ relLoaded: () => true, orgLoaded: () => false, fetch });
+        assert.equal(await noOrg(13335), 'graph');
     });
 
     it('shows a partial Radar summary but flags it incomplete (not cacheable)', async () => {

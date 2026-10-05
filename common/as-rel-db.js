@@ -1,5 +1,5 @@
 // Local CAIDA AS Relationships lookup. Snapshot is downloaded
-// by common/caida-updater.js; this module parses and serves.
+// by the dataset updater (common/datasets.js); this module parses and serves.
 //
 // CAIDA as-rel2 row format: `<a>|<b>|<rel>|<source>`
 //   rel = -1 → p2c (a is provider of b)   ← providers + customers indexes
@@ -114,6 +114,13 @@ function loadDatabase() {
         customerCount.clear();
         parsePipeText(text);
         rebuildTier1Set();
+        // A corrupt file parses to nothing rather than throwing: that is not
+        // a loaded snapshot.
+        if (providersIndex.size === 0 && peersIndex.size === 0) {
+            loadedFrom = null;
+            logger.warn({ path: filePath }, '⚠️  CAIDA as-rel snapshot holds no relationships; treating it as missing');
+            return;
+        }
         loadedFrom = path.basename(filePath);
         logger.info(`📦 CAIDA as-rel loaded (${loadedFrom}) — ${providersIndex.size} customers, ${customerCount.size} providers, ${peersIndex.size} peering ASes, ${tier1Set.size} Tier 1s in ${Date.now() - start}ms`);
     } catch (error) {
@@ -123,7 +130,7 @@ function loadDatabase() {
 
 loadDatabase();
 
-/** Reload the snapshot after caida-updater publishes a fresh file. */
+/** Reload the snapshot after the dataset updater publishes a fresh file. */
 export function reloadAsRelDatabase(reason = 'reload') {
     logger.info(`🔄 Reloading CAIDA as-rel snapshot (${reason})`);
     loadDatabase();

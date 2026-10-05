@@ -1,6 +1,6 @@
 // Local PeeringDB lookup: a network's self-reported peering profile (types,
 // website, scope, traffic, ratio, policy, IRR as-set), the exchanges it is
-// on and the facilities it is in. common/caida-updater.js downloads CAIDA's
+// on and the facilities it is in. common/datasets.js downloads CAIDA's
 // daily mirror of the full PeeringDB dump and distills it
 // (common/peeringdb-distill.js → buildPeeringdbIndex below); only the
 // compact per-ASN index ever lands in this directory. Contact data (poc,
@@ -234,7 +234,7 @@ const loadDatabase = () => {
 
 loadDatabase();
 
-/** Reload the index after caida-updater publishes a fresh one. */
+/** Reload the index after the dataset updater publishes a fresh one. */
 export const reloadPeeringdbDatabase = (reason = 'reload') => {
     logger.info(`🔄 Reloading PeeringDB index (${reason})`);
     loadDatabase();

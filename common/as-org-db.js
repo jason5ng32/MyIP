@@ -1,5 +1,5 @@
-// Local CAIDA as2org lookup. Snapshot file is auto-downloaded by
-// common/caida-updater.js; this module just parses and serves.
+// Local CAIDA as2org lookup. Snapshot file is auto-downloaded by the
+// dataset updater (common/datasets.js); this module just parses and serves.
 //
 // We use CAIDA's pipe-delimited TXT (~12MB) rather than the equivalent
 // JSONL (~28MB): identical content but split('|') beats JSON.parse per
@@ -72,6 +72,13 @@ function loadDatabase() {
         const text = fs.readFileSync(filePath, 'utf8');
         asnToOrgName.clear();
         parsePipeText(text);
+        // The parser skips what it can't read, so a corrupt file parses to
+        // nothing rather than throwing: that is not a loaded snapshot.
+        if (asnToOrgName.size === 0) {
+            loadedFrom = null;
+            logger.warn({ path: filePath }, '⚠️  CAIDA as2org snapshot holds no ASNs; treating it as missing');
+            return;
+        }
         loadedFrom = path.basename(filePath);
         logger.info(`📦 CAIDA as2org loaded (${loadedFrom}) — ${asnToOrgName.size} ASNs in ${Date.now() - start}ms`);
     } catch (error) {
@@ -81,11 +88,14 @@ function loadDatabase() {
 
 loadDatabase();
 
-/** Reload the snapshot after caida-updater publishes a fresh file. */
+/** Reload the snapshot after the dataset updater publishes a fresh file. */
 export function reloadAsOrgDatabase(reason = 'reload') {
     logger.info(`🔄 Reloading CAIDA as2org snapshot (${reason})`);
     loadDatabase();
 }
+
+/** Whether a snapshot is loaded (false until the updater has fetched one). */
+export const isAsOrgLoaded = () => loadedFrom !== null;
 
 /** Org name for an ASN, or null when the snapshot doesn't have it. */
 export function lookupAsOrgName(asn) {

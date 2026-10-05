@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import maxmind from 'maxmind';
@@ -33,11 +32,9 @@ export const normalizeLang = (tag) => {
 let cityLookup = null;
 let asnLookup = null;
 let reloadPromise = null;
-let watchersStarted = false;
-let reloadDebounceTimer = null;
 
 /**
- * Return the canonical MaxMind database paths used by the backend and updater.
+ * Return the canonical MaxMind database paths.
  */
 export function getMaxMindDbPaths() {
     return {
@@ -90,36 +87,6 @@ export async function reloadMaxMindDatabases(reason = 'manual') {
         });
 
     return reloadPromise;
-}
-
-/**
- * Watch database files and reload readers when another process publishes new files.
- */
-export function startMaxMindFileWatcher() {
-    if (watchersStarted) {
-        return;
-    }
-
-    watchersStarted = true;
-
-    // Debounce file events so City and ASN replacements are handled as one reload.
-    const scheduleReload = () => {
-        clearTimeout(reloadDebounceTimer);
-        reloadDebounceTimer = setTimeout(() => {
-            reloadMaxMindDatabases('file change').catch(() => {
-                // Keep the existing readers when a newly written database is invalid.
-            });
-        }, 1000);
-        reloadDebounceTimer.unref?.();
-    };
-
-    for (const filePath of [cityDbPath, asnDbPath]) {
-        fs.watchFile(filePath, { interval: 5000, persistent: false }, (current, previous) => {
-            if (current.mtimeMs !== previous.mtimeMs || current.size !== previous.size) {
-                scheduleReload();
-            }
-        });
-    }
 }
 
 /**
