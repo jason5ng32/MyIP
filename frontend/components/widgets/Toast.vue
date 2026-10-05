@@ -31,7 +31,9 @@ watch(alert, (newVal) => {
         description: newVal.alertMessage,
         duration: newVal.alertDuration || 2000,
     });
-}, { deep: true });
+// `immediate`: an alert raised before mount (a failed redirect sign-in is
+// handled in the boot sequence, store.completeRedirectSignIn) is shown too.
+}, { deep: true, immediate: true });
 </script>
 
 <!--

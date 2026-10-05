@@ -2,6 +2,9 @@
 import { defineStore } from 'pinia';
 import { loadFirebaseAuth } from './firebase-init.js';
 import { writeAuthHint } from './utils/auth-hint.js';
+import { resolveSignInFlow, shouldFallBackToRedirect } from './utils/auth-flow.js';
+import { markPendingRedirectSignIn, takePendingRedirectSignIn } from './utils/auth-redirect.js';
+import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
@@ -271,18 +274,53 @@ export const useMainStore = defineStore('main', {
     async signInWithGithub() {
       await this.signInWithProvider('github');
     },
-    // Shared sign-in path for both buttons.
+    // Shared sign-in path for both buttons (flow choice: utils/auth-flow.js).
+    // Popup in a browser tab: set the user, then reload. Redirect in the
+    // installed PWA, or when the popup can't open: mark the pending return
+    // and leave the page — completeRedirectSignIn picks it up at boot.
     async signInWithProvider(providerKey) {
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
         const fb = await loadFirebaseAuth();
-        const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
+        if (resolveSignInFlow({ runningAsPwa: isRunningAsPwa() }) === 'popup') {
+          try {
+            const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
+            this.user = result.user;
+            writeAuthHint(true);
+            // refresh browser after successful login
+            window.location.reload();
+            return;
+          } catch (error) {
+            if (!shouldFallBackToRedirect(error?.code)) throw error;
+          }
+        }
+        markPendingRedirectSignIn(providerKey);
+        await fb.signInWithRedirect(fb.auth, descriptor.build(fb));
+      } catch (error) {
+        takePendingRedirectSignIn(); // a redirect that never left mustn't replay at boot
+        this.handleSignInError(error, descriptor);
+      }
+    },
+    // Boot-time half of the redirect flow: consumes the pending marker and
+    // reads the provider's result. Resolves true when it signed the visitor
+    // in (state set before mount, no reload); false for no marker, no
+    // Firebase, a visitor who backed out at the provider, or an error.
+    async completeRedirectSignIn() {
+      const pending = takePendingRedirectSignIn();
+      if (!pending) return false;
+      const descriptor = SIGN_IN_PROVIDERS[pending.providerKey] ?? SIGN_IN_PROVIDERS.google;
+      try {
+        const fb = await loadFirebaseAuth();
+        if (!fb) return false;
+        const result = await fb.getRedirectResult(fb.auth);
+        if (!result?.user) return false;
         this.user = result.user;
+        this.isSignedIn = true;
         writeAuthHint(true);
-        // refresh browser after successful login
-        window.location.reload();
+        return true;
       } catch (error) {
         this.handleSignInError(error, descriptor);
+        return false;
       }
     },
     // Turns Firebase auth error codes into something a visitor can act on.
@@ -290,7 +328,7 @@ export const useMainStore = defineStore('main', {
       console.error(`${descriptor.label} sign-in failed:`, error);
 
       switch (error?.code) {
-        // Closing the popup is normal, not a failure worth a red toast.
+        // Closing the popup / backing out is normal, not a failure worth a red toast.
         case 'auth/popup-closed-by-user':
         case 'auth/cancelled-popup-request':
         case 'auth/user-cancelled':

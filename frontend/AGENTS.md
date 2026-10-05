@@ -15,6 +15,10 @@ frontend/
 ├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
 │                    (App.vue: the site Nav + User / Preferences, then the page)
 ├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js)
+│                      sign-in: popup in a browser tab, redirect in the installed
+│                      PWA or on a blocked popup (utils/auth-flow.js); the return
+│                      is consumed at boot via a sessionStorage marker
+│                      (utils/auth-redirect.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
