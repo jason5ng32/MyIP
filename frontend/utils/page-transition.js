@@ -52,6 +52,30 @@ export const NAMED_ELEMENTS_SELECTOR = '.jn-site-nav, .jn-site-status-bar';
 // Cancel + play recreates each running animation on the compositor; a paused
 // or finished one is left as it is. An infinite spin or ping restarting from
 // its first frame is not visible.
+// Device-side diagnostic switch for a rendering problem that only shows on
+// iOS (WebKit cannot run in the sandbox): `?vt=off` turns page transitions
+// off, `?vt=unnamed` keeps them but leaves the Nav un-named (it slides with
+// the page), `?vt=default` restores the normal behaviour. The choice is kept
+// in localStorage so it survives the reloads a test needs.
+export const TRANSITION_MODE_KEY = 'jn-page-transitions';
+const TRANSITION_MODES = new Set(['off', 'unnamed', 'default']);
+
+export const rememberTransitionMode = (win) => {
+    let mode = null;
+    try {
+        const asked = new URLSearchParams(win?.location?.search ?? '').get('vt');
+        if (TRANSITION_MODES.has(asked)) {
+            win.localStorage?.setItem(TRANSITION_MODE_KEY, asked);
+            mode = asked;
+        } else {
+            mode = win?.localStorage?.getItem(TRANSITION_MODE_KEY) ?? null;
+        }
+    } catch {
+        /* storage disabled: the default behaviour */
+    }
+    return TRANSITION_MODES.has(mode) ? mode : 'default';
+};
+
 export const restartAnimations = (element) => {
     const animations = element?.getAnimations?.({ subtree: true }) ?? [];
     for (const animation of animations) {
@@ -73,6 +97,8 @@ export const installPageTransitions = (router, {
 } = {}) => {
     if (!doc?.documentElement) return;
     const root = doc.documentElement;
+    const mode = rememberTransitionMode(win);
+    if (mode === 'unnamed') root.dataset.pageTransitionNames = 'off';
     let active = null;        // the ViewTransition until its `finished` settles
     let endUpdate = null;     // resolves the active transition's update callback
     let uaTransition = false; // the pending history step was animated by the browser
@@ -99,7 +125,7 @@ export const installPageTransitions = (router, {
         if (inFlight && direction) active.skipTransition?.();
         const animate = shouldAnimate({
             direction,
-            supported: typeof doc.startViewTransition === 'function',
+            supported: mode !== 'off' && typeof doc.startViewTransition === 'function',
             reducedMotion: Boolean(win?.matchMedia?.(REDUCED_MOTION_QUERY)?.matches),
             inFlight,
             uaTransition: viaBrowser,

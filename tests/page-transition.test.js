@@ -7,6 +7,7 @@ import { describe, it } from 'node:test';
 import {
     transitionDirection,
     shouldAnimate,
+    rememberTransitionMode,
     restartAnimations,
     installPageTransitions,
 } from '../frontend/utils/page-transition.js';
@@ -21,6 +22,34 @@ const fakeAnimated = (states) => {
     }));
     return { log, getAnimations: () => animations };
 };
+
+describe('rememberTransitionMode()', () => {
+    const fakeWin = (search, stored = null) => {
+        const store = new Map(stored ? [[ 'jn-page-transitions', stored ]] : []);
+        return {
+            location: { search },
+            localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) },
+            store,
+        };
+    };
+
+    it('defaults without a query or a stored choice', () => {
+        assert.equal(rememberTransitionMode(fakeWin('')), 'default');
+        assert.equal(rememberTransitionMode(undefined), 'default');
+    });
+
+    it('stores a valid ?vt= choice and reads it back without the query', () => {
+        const win = fakeWin('?vt=off');
+        assert.equal(rememberTransitionMode(win), 'off');
+        assert.equal(win.store.get('jn-page-transitions'), 'off');
+        assert.equal(rememberTransitionMode(fakeWin('', 'unnamed')), 'unnamed');
+    });
+
+    it('ignores an unknown value and a stored garbage value', () => {
+        assert.equal(rememberTransitionMode(fakeWin('?vt=sideways', 'unnamed')), 'unnamed');
+        assert.equal(rememberTransitionMode(fakeWin('', 'garbage')), 'default');
+    });
+});
 
 describe('restartAnimations()', () => {
     it('cancels and replays the running animations, leaves the others alone', () => {
@@ -96,7 +125,7 @@ describe('shouldAnimate()', () => {
 // A router stand-in recording the hooks, and a document whose
 // startViewTransition runs the update callback on the next task like a browser
 // does after snapshotting the old page.
-const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000 } = {}) => {
+const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000, search = '' } = {}) => {
     const hooks = { beforeResolve: null, afterEach: null, onError: null };
     const router = {
         beforeResolve: (fn) => { hooks.beforeResolve = fn; },
@@ -128,6 +157,7 @@ const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000 } = {
     const win = {
         matchMedia: () => ({ matches: reducedMotion }),
         addEventListener: (type, fn) => { if (type === 'popstate') popstate = fn; },
+        location: { search },
     };
     installPageTransitions(router, { doc, win, nextTick: () => Promise.resolve(), timeoutMs });
     return { hooks, calls, doc, nav, popstate: (event) => popstate(event) };
@@ -153,6 +183,15 @@ describe('installPageTransitions()', () => {
         assert.equal(await settled(calls[0].updateDone), true);
         await calls[0].finish();
         assert.equal(doc.documentElement.dataset.pageTransition, undefined);
+    });
+
+    it('honours the diagnostic switch: off never animates, unnamed un-names the Nav', () => {
+        const off = setup({ search: '?vt=off' });
+        assert.equal(off.hooks.beforeResolve(whois, home), undefined);
+        assert.equal(off.doc.documentElement.dataset.pageTransitionNames, undefined);
+        const unnamed = setup({ search: '?vt=unnamed' });
+        assert.equal(unnamed.doc.documentElement.dataset.pageTransitionNames, 'off');
+        assert.ok(unnamed.hooks.beforeResolve(whois, home) instanceof Promise);
     });
 
     it('restarts the named elements\' animations once the transition has finished', async () => {

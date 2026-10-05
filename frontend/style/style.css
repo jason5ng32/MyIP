@@ -284,10 +284,10 @@ footer {
    animations inside a captured element are restarted when the transition
    ends (utils/page-transition.js, NAMED_ELEMENTS_SELECTOR — keep the
    selector and these classes in step). */
-html[data-page-transition] .jn-site-nav {
+html[data-page-transition]:not([data-page-transition-names="off"]) .jn-site-nav {
   view-transition-name: site-nav;
 }
-html[data-page-transition] .jn-site-status-bar {
+html[data-page-transition]:not([data-page-transition-names="off"]) .jn-site-status-bar {
   view-transition-name: site-status-bar;
 }
 ::view-transition-old(site-nav),
