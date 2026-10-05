@@ -902,7 +902,14 @@
     "isLocal": "Локальный адрес",
     "property": "Свойство адреса",
     "value": "Значение",
-    "manufacturer": "Сведения о производителе"
+    "manufacturer": "Сведения о производителе",
+    "Examples": "Примеры",
+    "exampleFull": "Полный адрес",
+    "examplePrefix": "Префикс производителя",
+    "exampleSubBlock": "Малый блок",
+    "examplePrivate": "Скрытая регистрация",
+    "exampleMulticast": "Многоадресный",
+    "exampleRandom": "Случайный"
   },
   "ipcalculator": {
     "Title": "IP-калькулятор",

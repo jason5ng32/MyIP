@@ -54,6 +54,7 @@ import {
 } from './common/service-status-store.js';
 import { isAsRelLoaded } from './common/as-rel-db.js';
 import { isAsOrgLoaded } from './common/as-org-db.js';
+import { isOuiLoaded } from './common/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData } from './common/offline-data.js';
 import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
@@ -252,6 +253,7 @@ app.use('/api', requireReferer);
 // 503 while that data is still downloading at boot, a no-op afterwards.
 const needsMaxMind = requireOfflineData([isMaxMindReady]);
 const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
+const needsOui = requireOfflineData([isOuiLoaded]);
 const needsServiceStatus = requireOfflineData([isServiceStatusPrimed]);
 
 const FIVE_MIN_CACHE = 5 * 60;
@@ -302,7 +304,7 @@ app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { c
 // and append-only BGP routing history.
 app.get('/api/asn-history', requireValidPrefix(), cacheable(THIRTY_DAYS_CACHE), asnHistoryHandler);
 app.get('/api/asn-connectivity', requireValidASN(), needsAsGraph, cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
-app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
+app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
@@ -352,11 +354,12 @@ if (process.env.SENTRY_DSN_BACKEND) {
 
 
 // Boot sequence. Snapshots already on disk are in memory before the listener
-// opens (CAIDA / PeeringDB load at import, MaxMind just below), so a restart
-// serves at once. Missing ones download behind the listener: meanwhile only
-// the routes reading them answer 503 (requireOfflineData above). A failed
-// download stays non-fatal — that route then serves degraded (MaxMind → 503;
-// CAIDA → empty graph, RIPEstat fallback or no peering section).
+// opens (CAIDA / PeeringDB / IEEE load at import, MaxMind just below), so a
+// restart serves at once. Missing ones download behind the listener:
+// meanwhile only the routes reading them answer 503 (requireOfflineData
+// above). A failed download stays non-fatal — that route then serves degraded
+// (MaxMind / IEEE → 503; CAIDA → empty graph, RIPEstat fallback or no
+// peering section).
 const bootBackend = async () => {
     const { cityDbPath, asnDbPath } = getMaxMindDbPaths();
     if (fs.existsSync(cityDbPath) && fs.existsSync(asnDbPath)) {

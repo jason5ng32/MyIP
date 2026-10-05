@@ -902,7 +902,14 @@
     "isLocal": "本地地址",
     "property": "地址属性",
     "value": "值",
-    "manufacturer": "制造商信息"
+    "manufacturer": "制造商信息",
+    "Examples": "查看用例",
+    "exampleFull": "完整地址",
+    "examplePrefix": "厂商前缀",
+    "exampleSubBlock": "小区块",
+    "examplePrivate": "隐私注册",
+    "exampleMulticast": "多播",
+    "exampleRandom": "随机地址"
   },
   "ipcalculator": {
     "Title": "IP 计算器",

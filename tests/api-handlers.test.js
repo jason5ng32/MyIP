@@ -19,11 +19,12 @@ import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
 import invisibilityHandler from '../api/invisibility-test.js';
-import macCheckerHandler from '../api/mac-checker.js';
+import macCheckerHandler, { createMacChecker } from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '../api/asn-profile.js';
 import { isAsRelLoaded } from '../common/as-rel-db.js';
+import { describeMac } from '../common/oui-db.js';
 import { isCompleteProfile } from '../common/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
@@ -64,7 +65,7 @@ function createResponse() {
 // Back up env keys touched by any test here; restore after each case.
 const ENV_KEYS = [
     'IPCHECKING_API_KEY', 'IPCHECKING_API_ENDPOINT',
-    'MAC_LOOKUP_API_KEY', 'IPAPIIS_API_KEY',
+    'IPAPIIS_API_KEY',
     'IPINFO_API_KEY', 'IP2LOCATION_API_KEY',
     'CLOUDFLARE_API_KEY',
     'CLOUDFLARE_ACCOUNT_ID', 'CLOUDFLARE_KV_NAMESPACE_ID',
@@ -586,6 +587,34 @@ describe('mac-checker handler', () => {
         await macCheckerHandler(createRequest({ query: { mac: 'not-a-mac' } }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid MAC address' });
+    });
+
+    it('rejects a prefix shorter than 24 bits', async () => {
+        const res = createResponse();
+        await macCheckerHandler(createRequest({ query: { mac: '3C:5A' } }), res);
+        assert.equal(res.statusCode, 400);
+    });
+
+    // Over fixture registries, so the answer doesn't depend on a download.
+    const fixtureBlocks = new Map([
+        ['3C5AB4', { registry: 'MA-L', company: 'Google, Inc.', address: 'Mountain View US 94043', country: 'US' }],
+    ]);
+
+    it('answers a vendor prefix in any notation from the registries', async () => {
+        const handler = createMacChecker((hex) => describeMac(fixtureBlocks, hex));
+        const res = createResponse();
+        await handler(createRequest({ query: { mac: '3c5a.b4' } }), res);
+        assert.equal(res.statusCode, 200);
+        assert.equal(res.body.found, true);
+        assert.equal(res.body.company, 'Google, Inc.');
+        assert.equal(res.body.blockSize, 16777216);
+    });
+
+    it('answers 503 when no registries are loaded', async () => {
+        const res = createResponse();
+        await createMacChecker(() => null)(createRequest({ query: { mac: '3C:5A:B4' } }), res);
+        assert.equal(res.statusCode, 503);
+        assert.deepEqual(res.body, { error: 'MAC database unavailable' });
     });
 });
 

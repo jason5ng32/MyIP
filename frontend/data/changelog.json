@@ -2186,6 +2186,17 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "MAC Lookup now reads the official IEEE offline data",
+          "zh": "MAC 地址查询改用 IEEE 官方离线数据",
+          "zh-TW": "MAC 位址查詢改用 IEEE 官方離線資料",
+          "fr": "La recherche MAC s'appuie désormais sur les données offline de l'IEEE",
+          "ru": "Поиск MAC теперь использует официальные данные offline IEEE",
+          "pt-BR": "A consulta MAC agora usa os dados offline do IEEE"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

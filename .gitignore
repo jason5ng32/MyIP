@@ -55,6 +55,10 @@ common/peeringdb-db/.caida-update-state.json
 common/peeringdb-db/.caida-update.lock
 common/peeringdb-db/*.bak
 common/peeringdb-db/*.next
+# IEEE MAC registries — downloaded at boot, refreshed daily.
+common/oui-db/*.csv
+common/oui-db/*.bak
+common/oui-db/*.next
 # Dataset updater (common/dataset-updater.js): state (+ its atomic-write
 # temp files) and the lock directory, in every dataset directory.
 common/*-db/.dataset-state.json*
