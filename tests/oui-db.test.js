@@ -186,10 +186,12 @@ describe('describeMac', () => {
         assert.equal(result.isMulticast, true);
     });
 
-    it('matches a Company ID in locally administered space', () => {
+    it('matches a Company ID in locally administered space, which is assigned, not random', () => {
         const result = describeMac(blocks, 'EA2701000000');
         assert.equal(result.blockType, 'CID');
         assert.equal(result.isLocal, true);
+        assert.equal(result.isRand, false);
+        assert.equal(describeMac(blocks, 'EA2801000000').isRand, true, 'uncovered local unicast stays likely random');
     });
 });
 

@@ -152,8 +152,9 @@ const pairs = (hex) => hex.match(/.{1,2}/g).join(':');
 
 /**
  * Bits the first octet carries, valid for any query of at least two hex
- * digits. A randomized address (Wi-Fi privacy, VMs) is a locally
- * administered unicast one.
+ * digits. `isRand` is a likely-randomized address (Wi-Fi privacy, VMs):
+ * locally administered unicast, the only mark randomization leaves on an
+ * address. describeMac clears it for a registered Company ID's range.
  */
 export const macFlags = (hex) => {
     const firstOctet = parseInt(hex.slice(0, 2), 16);
@@ -215,6 +216,8 @@ export const describeMac = (blocks, hex) => {
         blockType: block.registry,
         isPrivate: block.company.toLowerCase() === 'private',
         ...flags,
+        // A CID range is assigned local space (IEEE 802c ELI), not random.
+        isRand: flags.isRand && block.registry !== 'CID',
     };
 };
 
