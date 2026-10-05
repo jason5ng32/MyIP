@@ -6,6 +6,7 @@
 //
 //   transitionDirection(from, to) → null | 'forward' | 'back' | 'fade'
 //   shouldAnimate({ direction, supported, reducedMotion, inFlight, uaTransition })
+//   restartAnimations(element)      — run on the named elements after each one
 //   installPageTransitions(router)  — registered once in router/index.js
 //
 // The direction lands on <html data-page-transition>, which style/style.css
@@ -40,6 +41,25 @@ export const transitionDirection = (from, to) => {
 // animated twice.
 export const shouldAnimate = ({ direction, supported, reducedMotion, inFlight, uaTransition }) =>
     Boolean(direction) && supported === true && !reducedMotion && !inFlight && !uaTransition;
+
+// The elements captured under their own view-transition-name (style.css):
+// the Nav and the iOS status-bar tint. WebKit leaves the accelerated CSS
+// animations inside a captured element stalled once the transition is over
+// (Pulse's spinning globe and ping only repainted in ~0.5s jumps afterwards,
+// measured on iOS 26), so every transition ends by restarting them.
+export const NAMED_ELEMENTS_SELECTOR = '.jn-site-nav, .jn-site-status-bar';
+
+// Cancel + play recreates each running animation on the compositor; a paused
+// or finished one is left as it is. An infinite spin or ping restarting from
+// its first frame is not visible.
+export const restartAnimations = (element) => {
+    const animations = element?.getAnimations?.({ subtree: true }) ?? [];
+    for (const animation of animations) {
+        if (animation.playState !== 'running') continue;
+        animation.cancel();
+        animation.play();
+    }
+};
 
 // Hooks the router: beforeResolve (after every guard, so a redirect never
 // starts a transition) snapshots the old page and lets the navigation proceed
@@ -108,6 +128,7 @@ export const installPageTransitions = (router, {
                 if (active !== transition) return;
                 active = null;
                 delete root.dataset.pageTransition;
+                doc.querySelectorAll?.(NAMED_ELEMENTS_SELECTOR)?.forEach?.(restartAnimations);
             });
         });
     });

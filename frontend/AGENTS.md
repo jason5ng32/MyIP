@@ -189,7 +189,9 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   back, page → page fades; keyframes in `style/style.css`), hooked in the
   router's `beforeResolve`; none on a query-only change, the first load, or
   under reduced motion. The Nav (bar + status-bar tint) opts out via
-  `view-transition-name`; nothing else gets one.
+  `view-transition-name` (only while one runs); nothing else gets one, and
+  the animations inside those named elements are restarted when a transition
+  ends — WebKit leaves them stalled after a capture (`restartAnimations`).
 - **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
   `hidden sm:flex` never shows: write `max-sm:hidden`.
 - **Drawer vs Sheet** — bottom Drawer only for a full-bleed expansion of an

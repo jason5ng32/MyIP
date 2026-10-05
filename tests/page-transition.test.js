@@ -7,8 +7,33 @@ import { describe, it } from 'node:test';
 import {
     transitionDirection,
     shouldAnimate,
+    restartAnimations,
     installPageTransitions,
 } from '../frontend/utils/page-transition.js';
+
+// An element with WAAPI-shaped animations; `log` records cancel / play calls.
+const fakeAnimated = (states) => {
+    const log = [];
+    const animations = states.map((playState, i) => ({
+        playState,
+        cancel: () => log.push(`cancel:${i}`),
+        play: () => log.push(`play:${i}`),
+    }));
+    return { log, getAnimations: () => animations };
+};
+
+describe('restartAnimations()', () => {
+    it('cancels and replays the running animations, leaves the others alone', () => {
+        const el = fakeAnimated(['running', 'paused', 'finished', 'running']);
+        restartAnimations(el);
+        assert.deepEqual(el.log, ['cancel:0', 'play:0', 'cancel:3', 'play:3']);
+    });
+
+    it('tolerates a missing element or getAnimations', () => {
+        restartAnimations(null);
+        restartAnimations({});
+    });
+});
 
 const home = { name: 'home', path: '/' };
 const whois = { name: 'tool', path: '/tools/whois' };
@@ -79,7 +104,8 @@ const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000 } = {
         onError: (fn) => { hooks.onError = fn; },
     };
     const calls = [];
-    const doc = { documentElement: { dataset: {} } };
+    const nav = fakeAnimated(['running']);
+    const doc = { documentElement: { dataset: {} }, querySelectorAll: () => [nav] };
     if (supported) {
         doc.startViewTransition = (update) => {
             const call = { skipped: false, updateDone: null, attr: doc.documentElement.dataset.pageTransition };
@@ -104,7 +130,7 @@ const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000 } = {
         addEventListener: (type, fn) => { if (type === 'popstate') popstate = fn; },
     };
     installPageTransitions(router, { doc, win, nextTick: () => Promise.resolve(), timeoutMs });
-    return { hooks, calls, doc, popstate: (event) => popstate(event) };
+    return { hooks, calls, doc, nav, popstate: (event) => popstate(event) };
 };
 
 const settled = async (promise) => {
@@ -127,6 +153,15 @@ describe('installPageTransitions()', () => {
         assert.equal(await settled(calls[0].updateDone), true);
         await calls[0].finish();
         assert.equal(doc.documentElement.dataset.pageTransition, undefined);
+    });
+
+    it('restarts the named elements\' animations once the transition has finished', async () => {
+        const { hooks, calls, nav } = setup();
+        await hooks.beforeResolve(whois, home);
+        await hooks.afterEach(whois, home);
+        assert.deepEqual(nav.log, [], 'nothing restarts while the transition runs');
+        await calls[0].finish();
+        assert.deepEqual(nav.log, ['cancel:0', 'play:0']);
     });
 
     it('ends the update when the navigation fails (afterEach with a failure)', async () => {
