@@ -1,3 +1,8 @@
+<!-- MAC Lookup (advanced tool, slug `macchecker`): a full address or a
+     vendor prefix (common/mac-input.js), answered by /api/macchecker from the
+     local IEEE registries. A collapsed fold under the input holds example
+     pills, one per kind of answer. Browsers expose no MAC address, so there
+     is no "my address" pill. -->
 <template>
     <div class="mac-checker-section my-4 space-y-4">
         <!-- Top note -->
@@ -22,6 +27,27 @@
                 </Button>
             </div>
             <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
+
+            <!-- Example inputs, tap to run. Collapsed by default; the chevron
+                 turns from › to ⌄ via data-state. -->
+            <Collapsible>
+                <CollapsibleTrigger>
+                    <button type="button" :class="triggerClass">
+                        <ChevronRight class="size-4 transition-transform duration-200" />{{ t('macchecker.Examples') }}
+                    </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <ToggleGroup :model-value="picked" type="single" variant="outline" :spacing="2"
+                        :disabled="macCheckStatus === 'running'"
+                        class="mt-2 flex-wrap justify-start" @update:model-value="(v) => v && runPreset(v)">
+                        <ToggleGroupItem v-for="example in EXAMPLES" :key="example.input" :value="example.input"
+                            :class="tagClass" :aria-label="`${t(example.labelKey)}: ${example.input}`">
+                            <span class="text-muted-foreground">{{ t(example.labelKey) }}</span>
+                            <span class="font-mono">{{ example.input }}</span>
+                        </ToggleGroupItem>
+                    </ToggleGroup>
+                </CollapsibleContent>
+            </Collapsible>
         </div>
 
         <!-- Result area -->
@@ -91,13 +117,16 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import getCountryName from '@/data/country-name.js';
-import { CircleCheck, CircleX, Factory, ListChecks, Search } from '@lucide/vue';
+import { normalizeMacQuery } from '@/utils/mac-input.js';
+import { ChevronRight, CircleCheck, CircleX, Factory, ListChecks, Search } from '@lucide/vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const { t } = useI18n();
 
@@ -108,6 +137,22 @@ const macCheckResult = ref({});
 const macCheckStatus = ref('idle');
 const queryMAC = ref('');
 const errorMsg = ref('');
+// Which example pill the current result came from, if any.
+const picked = ref('');
+
+// One example per kind of answer; the pills double as syntax documentation.
+const EXAMPLES = [
+    { labelKey: 'macchecker.exampleFull', input: 'F0:2F:4B:01:0A:AA' },
+    { labelKey: 'macchecker.examplePrefix', input: '3C:5A:B4' },
+    { labelKey: 'macchecker.exampleSubBlock', input: 'F0:40:AF:91:23:45' },
+    { labelKey: 'macchecker.examplePrivate', input: 'AC:DE:48:00:11:22' },
+    { labelKey: 'macchecker.exampleMulticast', input: '01:00:5E:00:00:FB' },
+    { labelKey: 'macchecker.exampleRandom', input: '42:9F:C3:15:7A:E0' },
+];
+
+// Pills and fold trigger match IpCalculator's.
+const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
+const triggerClass = 'flex items-center gap-1 text-xs text-muted-foreground cursor-pointer hover:text-foreground [&[data-state=open]>svg]:rotate-90';
 
 const leftItems = computed(() => [
     { key: 'macPrefix' },
@@ -127,21 +172,24 @@ const tableItems = computed(() => [
 ]);
 
 const validateInput = (input) => {
-    if (!input) return null;
-    const normalizedInput = input.replace(/[:-]/g, '').replace(/\s+/g, '');
-    if (normalizedInput.length !== 12 || !/^[0-9A-Fa-f]+$/.test(normalizedInput)) {
-        errorMsg.value = t('macchecker.invalidMAC');
-        return null;
-    }
-    return normalizedInput;
+    const hex = normalizeMacQuery(input);
+    if (!hex) errorMsg.value = t('macchecker.invalidMAC');
+    return hex;
 };
 
 const onSubmit = () => {
     trackEvent('Section', 'StartClick', 'MACChecker');
     errorMsg.value = '';
     macCheckResult.value = {};
-    const query = validateInput(queryMAC.value);
+    const raw = queryMAC.value.trim();
+    picked.value = EXAMPLES.some((e) => e.input === raw) ? raw : '';
+    const query = validateInput(raw);
     if (query) getMacInfo(query);
+};
+
+const runPreset = (input) => {
+    queryMAC.value = input;
+    onSubmit();
 };
 
 const getMacInfo = async (query) => {

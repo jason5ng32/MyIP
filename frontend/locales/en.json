@@ -902,7 +902,14 @@
     "isLocal": "Local address",
     "property": "Address property",
     "value": "Value",
-    "manufacturer": "Manufacturer details"
+    "manufacturer": "Manufacturer details",
+    "Examples": "See examples",
+    "exampleFull": "Full address",
+    "examplePrefix": "Vendor prefix",
+    "exampleSubBlock": "Small block",
+    "examplePrivate": "Private registration",
+    "exampleMulticast": "Multicast",
+    "exampleRandom": "Randomized"
   },
   "ipcalculator": {
     "Title": "IP Calculator",
