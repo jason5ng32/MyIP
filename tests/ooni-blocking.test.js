@@ -1,12 +1,12 @@
 // Unit tests for the OONI aggregation classification logic
-// (common/ooni-blocking.js). Fixtures mirror the real aggregation response
+// (server/ooni-blocking.js). Fixtures mirror the real aggregation response
 // shape: one row per probe_cc × blocking_type, where the empty blocking_type
 // row carries the ok / failure counts.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { classifyOoniCountries, OONI_WINDOW_DAYS } from '../common/ooni-blocking.js';
+import { classifyOoniCountries, OONI_WINDOW_DAYS } from '../server/ooni-blocking.js';
 
 const row = (cc, bt, { n = 0, ok = 0, anomaly = 0, confirmed = 0, failure = 0 } = {}) => ({
     probe_cc: cc,

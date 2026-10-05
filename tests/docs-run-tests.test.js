@@ -1,4 +1,4 @@
-// Tests for frontend/utils/docs-run-tests.js — the pure half of the docs
+// Tests for frontend/utils/report/docs-run-tests.js — the pure half of the docs
 // assistant's `run_my_tests` tool: the section → command-bus mapping and the
 // defensive normalization of GitBook's (unverified) tool-call arguments.
 
@@ -9,7 +9,7 @@ import {
     RUNNABLE_SECTION_COMMANDS,
     RUNNABLE_SECTION_IDS,
     normalizeRunSections,
-} from '../frontend/utils/docs-run-tests.js';
+} from '../frontend/utils/report/docs-run-tests.js';
 
 describe('runnable section commands', () => {
     it('covers exactly the four core tests', () => {

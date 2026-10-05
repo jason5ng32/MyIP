@@ -13,8 +13,8 @@
 import {
     fetchRoutingHistory,
     resolveAsnOrgName,
-} from '../common/ripestat.js';
-import logger from '../common/logger.js';
+} from '../server/ripestat.js';
+import logger from '../server/logger.js';
 
 const prefixLength = (prefix) => parseInt((prefix || '').split('/')[1], 10);
 
@@ -56,7 +56,7 @@ function summarizeOrigin(entry, minLen) {
     };
 }
 
-// Two-tier resolver lives in common/ripestat.js. Here we pass a warn hook so
+// Two-tier resolver lives in server/ripestat.js. Here we pass a warn hook so
 // a failed as-overview fallback stays observable (asn-connectivity omits it
 // and stays silent — keep that difference).
 const resolveOrgName = (asn) =>

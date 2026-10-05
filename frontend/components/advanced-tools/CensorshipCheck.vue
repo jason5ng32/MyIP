@@ -186,7 +186,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { useGlobalpingMeasurement } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
-import { isValidDomain } from '@/utils/valid-ip.js';
+import { isValidDomain } from '@/utils/ip/valid-ip.js';
 import getCountryName from '@/data/country-name.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import { Input } from '@/components/ui/input';
@@ -213,7 +213,7 @@ const MAX_TEST_COUNTRIES = 15;
 const PROBES_PER_COUNTRY = 2;
 
 // OONI tier / blocking-method display maps (tiers computed by the backend,
-// see common/ooni-blocking.js).
+// see server/ooni-blocking.js).
 const TIER_META = {
     confirmed: { labelKey: 'TierConfirmed', badgeClass: 'bg-destructive/15 text-destructive border-transparent' },
     likely: { labelKey: 'TierLikely', badgeClass: 'bg-warning/15 text-warning border-transparent' },

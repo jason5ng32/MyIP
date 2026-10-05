@@ -1,4 +1,4 @@
-// Tests for common/dataset-updater.js — the engine, over synthetic rows in a
+// Tests for server/datasets/dataset-updater.js — the engine, over synthetic rows in a
 // temp dir: publish + state + reload, not-modified, refusals, the earlier
 // updaters' state, the cross-process lock, the boot download, the schedule's
 // env resolution and catch-up, and the watcher. No network: rows fetch from
@@ -16,8 +16,8 @@ import {
     STATE_FILE, LOCK_FILE, updateDataset, bootstrapDataset, readState, isPresent,
     isAutoUpdateEnabled, startDatasetScheduler, DEFAULT_UPDATE_CRON, rowsMissingACheck, watchDatasets,
     updateDatasets, downloadToFile, monitorConfigFor,
-} from '../common/dataset-updater.js';
-import logger from '../common/logger.js';
+} from '../server/datasets/dataset-updater.js';
+import logger from '../server/logger.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'myip-dataset-test-'));

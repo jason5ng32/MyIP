@@ -4,8 +4,8 @@
 
 import whoiser from 'whoiser';
 import { isValidIP, isUsablePublicIP } from '../common/valid-ip.js';
-import { rdapDomain, rdapIp, rdapAutnum, isAutnumMissing } from '../common/rdap.js';
-import logger from '../common/logger.js';
+import { rdapDomain, rdapIp, rdapAutnum, isAutnumMissing } from '../server/rdap.js';
+import logger from '../server/logger.js';
 
 function isValidDomain(domain) {
     const domainPattern = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;

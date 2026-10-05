@@ -1,5 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 export default async (req, res) => {
     const key = process.env.IPCHECKING_API_KEY;

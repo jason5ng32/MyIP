@@ -33,7 +33,7 @@ localtest
 
 .VSCodeCounter
 
-# Offline datasets (common/datasets.js): every common/<name>-db/ directory
+# Offline datasets (server/datasets/datasets.js): every common/<name>-db/ directory
 # holds only downloaded data, its state and lock — created at runtime, never
 # committed (CAIDA's data is under a non-commercial license).
 common/*-db/

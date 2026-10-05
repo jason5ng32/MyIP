@@ -1,5 +1,5 @@
 // Tests for the multi-list Connectivity model
-// (frontend/utils/connectivity-lists.js): boot-time sanitize/migration from
+// (frontend/utils/features/connectivity-lists.js): boot-time sanitize/migration from
 // both legacy eras, list CRUD guard rules, member add/remove guards, import
 // planning (per-list hostname dedupe + all-or-nothing cap), the combined
 // import ops, and the card's open-website link derivation.
@@ -19,7 +19,7 @@ import {
     importIntoList,
     importAsNewList,
     siteUrlOf,
-} from '../frontend/utils/connectivity-lists.js';
+} from '../frontend/utils/features/connectivity-lists.js';
 import {
     CONNECTIVITY_TARGET_LIMIT,
     CONNECTIVITY_LIST_LIMIT,

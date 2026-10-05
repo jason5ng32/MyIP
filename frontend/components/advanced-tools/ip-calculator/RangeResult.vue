@@ -47,7 +47,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import CopyButton from '@/components/widgets/CopyButton.vue';
 import CalcSection from './CalcSection.vue';
 import ValueRow from './ValueRow.vue';
-import { countLabel } from '@/utils/ip-calc.js';
+import { countLabel } from '@/utils/features/ip-calc.js';
 
 const props = defineProps({
     analysis: { type: Object, required: true },

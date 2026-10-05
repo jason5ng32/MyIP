@@ -1,6 +1,6 @@
 <!-- ASN Profile (advanced tool, slug `asn`): everything known about one AS
      number, from one request to /api/asn-profile (the backend gathers every
-     source and answers once; see common/asn-profile.js). The page shows one
+     source and answers once; see server/asn-profile.js). The page shows one
      loading state, then renders whole; a section whose source had nothing or
      failed is simply left out.
      Order: hero (identity, key facts, registration) beside a compact
@@ -10,7 +10,7 @@
      One source per concept: relationships = local CAIDA (graph, counts and
      lists alike); prefixes, addresses and RPKI = the pfx2as list; identity =
      Radar → RDAP → ASRank. The query rides the URL as `?q=` (shareable,
-     written back on every run). Shaping lives in utils/asn-profile-view.js. -->
+     written back on every run). Shaping lives in utils/ip/asn-profile-view.js. -->
 <template>
     <div class="my-4 space-y-4">
         <!-- Top note -->
@@ -429,8 +429,8 @@ import { ChevronRight, Download, ExternalLink, Globe, Search, ShieldAlert, Shiel
 import { trackEvent } from '@/utils/analytics';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { parseAsnInput } from '@/utils/asn-input.js';
-import { buildTrafficPairs, pickConnectionQuality } from '@/utils/asn-metrics.js';
+import { parseAsnInput } from '@/utils/ip/asn-input.js';
+import { buildTrafficPairs, pickConnectionQuality } from '@/utils/ip/asn-metrics.js';
 import {
     asnProfileUrl, ASN_PROFILE_TIMEOUT_MS, sectionData, isProfileEmpty, failedSources,
     hasTopology, isTier1Origin, heroIdentity, registrationFields, keyFacts, coneAsns,
@@ -438,7 +438,7 @@ import {
     countryShareRows, neighbourGroups,
     BASELINE_POSITION, reputationMeters, proxyListedCount, verdictLevel, VERDICT_TONE,
     peeringEnumKey, peeringHero, peeringFacts, formatPortSpeed, exchangeRows, facilityRows, hasPeeringCard, visibleRows,
-} from '@/utils/asn-profile-view.js';
+} from '@/utils/ip/asn-profile-view.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import AsnConnectionQuality from '@/components/ip-infos/AsnConnectionQuality.vue';

@@ -28,7 +28,7 @@ import { emitAppEvent } from '../utils/app-events.js';
 import { dispatchAppCommand } from '../utils/app-commands.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
 import { scrollToElement } from '../utils/scroll-to.js';
-import { hasPulseBackend } from '../utils/pulse-beacon.js';
+import { hasPulseBackend } from '../utils/features/pulse-beacon.js';
 
 // A shortcut only kicks the run off — completion is the owner's business —
 // so a failed dispatch just logs.

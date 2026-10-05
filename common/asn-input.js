@@ -1,4 +1,4 @@
-// The AS-number grammar shared by the ASN guards (common/guards.js) and the
+// The AS-number grammar shared by the ASN guards (server/guards.js) and the
 // tools that take a typed AS number (Whois, ASN Profile — via the
 // frontend/utils/asn-input.js bridge): up to ten digits, AS1 … AS4294967295,
 // `AS` prefix case-insensitive.

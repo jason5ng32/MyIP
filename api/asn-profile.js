@@ -1,23 +1,23 @@
 // /api/asn-profile?asn=<n> — everything the ASN Profile page shows, in one
-// answer: Radar ASN summary + prefix list (common/cf-radar.js), CAIDA
+// answer: Radar ASN summary + prefix list (server/cf-radar.js), CAIDA
 // topology and neighbours (./asn-connectivity.js), RDAP autnum
-// (common/rdap.js), ASRank (common/asrank.js), the local PeeringDB index
-// (common/peeringdb-db.js) and, when the private API is configured,
-// reputation (common/asn-reputation.js). Composition, deadlines and statuses
-// live in common/asn-profile.js. `asn` arrives as a canonical number string
+// (server/rdap.js), ASRank (server/asrank.js), the local PeeringDB index
+// (server/datasets/peeringdb-db.js) and, when the private API is configured,
+// reputation (server/asn-reputation.js). Composition, deadlines and statuses
+// live in server/asn-profile.js. `asn` arrives as a canonical number string
 // (requireValidASN). 200 unless every configured source failed (502).
 
-import { RADAR_VIEWS, hasRadarApiKey, loadAsnSummary, isCompleteRadarAnswer } from '../common/cf-radar.js';
-import { rdapAutnum, isAutnumMissing } from '../common/rdap.js';
-import { queryAsRank } from '../common/asrank.js';
-import { requestAsnReputation } from '../common/asn-reputation.js';
-import { isPeeringdbLoaded, lookupPeeringdb } from '../common/peeringdb-db.js';
-import { isAsRelLoaded } from '../common/as-rel-db.js';
-import { isAsOrgLoaded } from '../common/as-org-db.js';
-import { isStillLoading } from '../common/offline-data.js';
+import { RADAR_VIEWS, hasRadarApiKey, loadAsnSummary, isCompleteRadarAnswer } from '../server/cf-radar.js';
+import { rdapAutnum, isAutnumMissing } from '../server/rdap.js';
+import { queryAsRank } from '../server/asrank.js';
+import { requestAsnReputation } from '../server/asn-reputation.js';
+import { isPeeringdbLoaded, lookupPeeringdb } from '../server/datasets/peeringdb-db.js';
+import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
+import { isAsOrgLoaded } from '../server/datasets/as-org-db.js';
+import { isStillLoading } from '../server/offline-data.js';
 import {
     SOURCE_TIMEOUTS, buildSectionLoaders, composeAsnProfile, allSourcesFailed,
-} from '../common/asn-profile.js';
+} from '../server/asn-profile.js';
 import { getAsnConnectivity } from './asn-connectivity.js';
 
 // A section whose local data isn't there fails (status 'error'): left out

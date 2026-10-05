@@ -26,10 +26,14 @@ Every file opens with a header comment stating its purpose — read those.
 
 - **Composition API** everywhere; no Options API. Alias `@` → `frontend/`.
 - **Shared-with-backend helpers live in `common/`**, re-exported through a thin
-  `utils/` bridge so consumers keep `@/utils/...` imports (`utils/valid-ip.js`).
+  `utils/` bridge so consumers keep `@/utils/...` imports (`utils/ip/valid-ip.js`).
 - **Helper placement:** Vue reactivity / lifecycle → `composables/` (`useXxx`);
   otherwise `utils/` (never `use-` prefixed). `lib/` stays shadcn-only. A pure
   function next to a composable exports from that composable's file.
+- **Inside `utils/`:** app-wide plumbing at its root; IP / ASN data shaping
+  and validation → `ip/`; the report pipeline → `report/`; the pure layer of
+  one feature (a tool, a section, Pulse) → `features/`; per-source probe
+  modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
 
 ### Achievements are event-driven
 
@@ -39,7 +43,7 @@ events → slugs, `composables/use-achievement-engine.js` owns all guards (rules
 wait for the remote snapshot; pre-sync hits parked). New achievement = entry +
 rule + (only if no suitable event exists) a new event. The shareable report
 rides the same bus: `<domain>:finished` → `use-report-collector.js` →
-`utils/report-builders.js` → sections whitelisted by `common/report-schema.js`.
+`utils/report/report-builders.js` → sections whitelisted by `common/report-schema.js`.
 New reportable test = event + builder + schema entry in one change; new result
 semantics = builder whitelist + schema enum too (builders fail soft, fixtures
 are frozen: drift = quietly missing fields). Report links are public: the

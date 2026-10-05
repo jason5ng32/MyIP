@@ -15,8 +15,8 @@ import {
     maskReportIps,
     isMaskedIP,
 } from '../common/report-schema.js';
-import { validateReport as validateViaBridge } from '../frontend/utils/report-schema.js';
-import { parseMtrOutput } from '../frontend/utils/mtr-parse.js';
+import { validateReport as validateViaBridge } from '../frontend/utils/report/report-schema.js';
+import { parseMtrOutput } from '../frontend/utils/features/mtr-parse.js';
 
 // A representative valid report touching every section — the fixture the
 // rejection cases below mutate.

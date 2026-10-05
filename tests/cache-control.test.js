@@ -1,11 +1,11 @@
-// Tests for common/cache-control.js — the cacheable() middleware: the full
+// Tests for server/cache-control.js — the cacheable() middleware: the full
 // TTL on a 2xx JSON body, nothing on an error, the cacheIf veto and the
 // degraded TTL it can fall back to.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { cacheable } from '../common/cache-control.js';
+import { cacheable } from '../server/cache-control.js';
 
 // Run the middleware, then answer `body` with `status`; returns the
 // Cache-Control header it left (undefined = the /api no-store default).

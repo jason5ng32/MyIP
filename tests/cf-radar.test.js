@@ -1,4 +1,4 @@
-// Unit tests for the pure transform pipeline in common/cf-radar.js:
+// Unit tests for the pure transform pipeline in server/cf-radar.js:
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
 // dedupe, sort and cap), the country-traffic matrix aggregation, the asn
 // view's response shaping and partial-segment reporting (fetch stubbed), and
@@ -20,8 +20,8 @@ import {
     RADAR_VIEWS,
     normalizePrefixOrigins,
     buildCountryShares,
-} from '../common/cf-radar.js';
-import logger from '../common/logger.js';
+} from '../server/cf-radar.js';
+import logger from '../server/logger.js';
 import { parseCidr } from '../common/ip-math.js';
 
 const outageFixture = {

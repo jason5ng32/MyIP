@@ -90,7 +90,7 @@ import CalcSection from './CalcSection.vue';
 import ValueRow from './ValueRow.vue';
 import PrefixBitmap from './PrefixBitmap.vue';
 import SubnetSplitter from './SubnetSplitter.vue';
-import { countLabel } from '@/utils/ip-calc.js';
+import { countLabel } from '@/utils/features/ip-calc.js';
 
 const props = defineProps({
     analysis: { type: Object, required: true },

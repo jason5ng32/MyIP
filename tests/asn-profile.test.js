@@ -1,11 +1,11 @@
-// Tests for frontend/utils/asn-profile.js — per-prefix sizing (v4
+// Tests for frontend/utils/ip/asn-profile.js — per-prefix sizing (v4
 // addresses, v6 /48s) and announced-IPv4 totals / share.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   prefixSize, announcedIpv4, ipv4SharePercent,
-} from '../frontend/utils/asn-profile.js';
+} from '../frontend/utils/ip/asn-profile.js';
 
 describe('prefixSize', () => {
   it('counts IPv4 addresses', () => {

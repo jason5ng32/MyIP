@@ -2,7 +2,7 @@
 // chart on its canvas so a closing animation can finish; destroy when the
 // canvas leaves or the scope is disposed.
 import { ref, watch, onScopeDispose, toValue } from 'vue';
-import { renderWorldMapChart } from '../utils/world-map-chart.js';
+import { renderWorldMapChart } from '../utils/features/world-map-chart.js';
 
 export const useWorldMapChart = ({ canvas, visible, options, theme }, { render = renderWorldMapChart } = {}) => {
     const ready = ref(false);

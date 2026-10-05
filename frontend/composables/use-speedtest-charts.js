@@ -1,6 +1,6 @@
 // Buffer speed-test samples independently of the asynchronously loaded charts.
 import { ref, reactive } from 'vue';
-import { getSpeedTestSampleCounts } from '../utils/speedtest-session.js';
+import { getSpeedTestSampleCounts } from '../utils/features/speedtest-session.js';
 
 // Extract Chart.js related configurations
 const getChartConfig = (t) => ({

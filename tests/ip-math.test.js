@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import * as common from '../common/ip-math.js';
-import * as bridge from '../frontend/utils/ip-math.js';
+import * as bridge from '../frontend/utils/ip/ip-math.js';
 
 const {
     parseIPv4, parseIPv6, parseIp, ipToBigInt, parseCidr,

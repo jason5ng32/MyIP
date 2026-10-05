@@ -14,7 +14,7 @@
 
 import { reactive, computed, onScopeDispose } from 'vue';
 import { onAppEvent } from '../utils/app-events.js';
-import { isValidIP, isIPv6 } from '../utils/valid-ip.js';
+import { isValidIP, isIPv6 } from '../utils/ip/valid-ip.js';
 import { observeBrowser } from '../utils/persona/observe-browser.js';
 import { probeFonts } from '../utils/persona/probe-fonts.js';
 import { probeVoices, probeKeyboard } from '../utils/persona/probe-locale.js';

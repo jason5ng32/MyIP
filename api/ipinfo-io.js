@@ -3,7 +3,7 @@
 // into the canonical geo shape via the shared makeGeoHandler factory.
 
 import getCountryName from '../common/country-name.js';
-import { makeGeoHandler } from '../common/geo-handler.js';
+import { makeGeoHandler } from '../server/geo-handler.js';
 
 function buildUrl(req) {
     const ipAddress = req.query.ip;

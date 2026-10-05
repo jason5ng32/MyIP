@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import CloudflareEngine from '@cloudflare/speedtest';
-import { createSpeedTestSession, getSpeedTestLiveValues } from '../frontend/utils/speedtest-session.js';
+import { createSpeedTestSession, getSpeedTestLiveValues } from '../frontend/utils/features/speedtest-session.js';
 
 const packages = () => ({
   latency: { count: 30 }, download: { bytes: 50e6, count: 4 }, upload: { bytes: 15e6, count: 4 },

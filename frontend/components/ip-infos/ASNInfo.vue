@@ -55,7 +55,7 @@ import AsnConnectionQuality from './AsnConnectionQuality.vue';
 import AsnTrafficShares from './AsnTrafficShares.vue';
 import { useRouter } from 'vue-router';
 import { trackEvent } from '@/utils/analytics';
-import { parseAsnInput } from '@/utils/asn-input.js';
+import { parseAsnInput } from '@/utils/ip/asn-input.js';
 import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { Button } from '@/components/ui/button';

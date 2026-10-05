@@ -17,7 +17,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import Alert from '@/components/widgets/Toast.vue';
 import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
-import { sendVisitBeacon } from '@/utils/pulse-beacon.js';
+import { sendVisitBeacon } from '@/utils/features/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
@@ -31,7 +31,7 @@ onMounted(() => {
         setTimeout(() => { offerPwaInstall.value = true; }, 30 * 1000);
     }
     // Earth Online visit tick — app-level so every route counts, once per
-    // page load; the backend dedups per IP (utils/pulse-beacon.js).
+    // page load; the backend dedups per IP (utils/features/pulse-beacon.js).
     sendVisitBeacon();
 });
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';

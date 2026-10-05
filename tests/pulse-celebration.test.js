@@ -1,4 +1,4 @@
-// Tests for frontend/utils/pulse-celebration.js: effect resolution against
+// Tests for frontend/utils/features/pulse-celebration.js: effect resolution against
 // the real status vocabulary, and the pure particle physics — spawn counts
 // stay within budget, every recipe self-terminates, shells explode into
 // sparks, delays hold particles back, and the engine-wide cap is enforced.
@@ -16,7 +16,7 @@ import {
     resolveEffect,
     createParticles,
     stepParticles,
-} from '../frontend/utils/pulse-celebration.js';
+} from '../frontend/utils/features/pulse-celebration.js';
 import { PRESET_STATUSES, FESTIVAL_STATUSES } from '../frontend/data/pulse-statuses.js';
 
 // Deterministic LCG so physics runs are reproducible.

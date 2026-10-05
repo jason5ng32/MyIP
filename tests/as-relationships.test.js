@@ -1,4 +1,4 @@
-// Tests for common/as-relationships.js — relationship counts that follow
+// Tests for server/as-relationships.js — relationship counts that follow
 // the /api/asn-connectivity graph's own misinference rule: a distrusted
 // non-Tier-1 provider is not counted (and not reclassified). The hypergiant
 // fixture checks lists and graph agree; the graph itself is
@@ -9,10 +9,10 @@ import { describe, it } from 'node:test';
 import {
     TIER1_PEERING_TRUSTED, TIER1_ADJACENCY_TRUSTED, distrustsNonTier1Providers,
     countedRelationships,
-} from '../common/as-relationships.js';
+} from '../server/as-relationships.js';
 import { buildTopology, buildNeighbours, fillNeighbourNames } from '../api/asn-connectivity.js';
 
-// p2c and p2p edges → an adjacency API like common/as-rel-db.js.
+// p2c and p2p edges → an adjacency API like server/datasets/as-rel-db.js.
 const makeRel = ({ p2c = [], p2p = [], tier1s = [] }) => {
     const providers = new Map();
     const customers = new Map();

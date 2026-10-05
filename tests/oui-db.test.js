@@ -1,4 +1,4 @@
-// Tests for common/oui-db.js — parsing the IEEE MAC registries (CSV, the
+// Tests for server/datasets/oui-db.js — parsing the IEEE MAC registries (CSV, the
 // country read off the address) and the longest-assignment lookup behind
 // /api/macchecker. Fixtures are written to a temp dir; the repo's
 // common/oui-db/ is never read.
@@ -11,7 +11,7 @@ import { after, describe, it } from 'node:test';
 
 import {
     OUI_REGISTRIES, parseCsv, countryFromAddress, parseRegistry, readOuiRegistries, describeMac, macFlags,
-} from '../common/oui-db.js';
+} from '../server/datasets/oui-db.js';
 
 const HEADER = 'Registry,Assignment,Organization Name,Organization Address';
 const spec = (registry) => OUI_REGISTRIES.find((entry) => entry.registry === registry);

@@ -15,7 +15,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { buildTrafficPairs } from '@/utils/asn-metrics.js';
+import { buildTrafficPairs } from '@/utils/ip/asn-metrics.js';
 import DataPairBar from './DataPairBar.vue';
 
 const props = defineProps({

@@ -1,4 +1,4 @@
-// Validates the shared IP parser. frontend/utils/valid-ip.js is a thin
+// Validates the shared IP parser. frontend/utils/ip/valid-ip.js is a thin
 // re-export of common/valid-ip.js; we import both paths and assert they
 // agree, which catches any regression where the re-export breaks (e.g.
 // someone duplicates the implementation again).
@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { isValidIP as isValidCommonIP, isValidDomain as isValidCommonDomain, isIPv6 as isCommonIPv6, isUsablePublicIP as isCommonUsablePublicIP } from '../common/valid-ip.js';
-import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isUsablePublicIP as isFrontendUsablePublicIP } from '../frontend/utils/valid-ip.js';
+import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isUsablePublicIP as isFrontendUsablePublicIP } from '../frontend/utils/ip/valid-ip.js';
 
 const validAddresses = [
   '1.1.1.1',

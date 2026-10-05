@@ -1,4 +1,4 @@
-// Exercises the report builders (frontend/utils/report-builders.js): every
+// Exercises the report builders (frontend/utils/report/report-builders.js): every
 // builder's output — wrapped in a report envelope — must pass the shared
 // schema validator, and the shape-based cleaning rules (invalid IPs dropped,
 // geo-less org distrusted, stat whitelists) must hold.
@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { REPORT_EVENT_BUILDERS } from '../frontend/utils/report-builders.js';
+import { REPORT_EVENT_BUILDERS } from '../frontend/utils/report/report-builders.js';
 import { validateReport, REPORT_VERSION } from '../common/report-schema.js';
 
 const wrap = (sectionId, section) => ({

@@ -1,7 +1,7 @@
-// Tests for common/asn-profile.js — the /api/asn-profile composition:
+// Tests for server/asn-profile.js — the /api/asn-profile composition:
 // per-section classification, deadlines, the all-failed verdict and the
 // edge-cache veto (error and incomplete sections). Loaders are injected; nothing touches the network.
-// The frontend's request budget comes from frontend/utils/asn-profile-view.js.
+// The frontend's request budget comes from frontend/utils/ip/asn-profile-view.js.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -9,8 +9,8 @@ import {
   SECTIONS, DEADLINES, INNER_TIMEOUTS, SOURCE_TIMEOUTS, withDeadline, hasMeaningfulField,
   classifyRadar, classifyPrefixes, classifyConnectivity, classifyRank, classifyReputation, classifyPeeringdb,
   buildSectionLoaders, composeAsnProfile, allSourcesFailed, isCompleteProfile,
-} from '../common/asn-profile.js';
-import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/asn-profile-view.js';
+} from '../server/asn-profile.js';
+import { ASN_PROFILE_TIMEOUT_MS } from '../frontend/utils/ip/asn-profile-view.js';
 
 const sleep = (ms, value) => new Promise((resolve) => setTimeout(() => resolve(value), ms));
 

@@ -29,8 +29,8 @@ const nodeModuleChunkGroups = {
 const sourceChunkGroups = {
   'utils-getips': [
     '/frontend/utils/getips/index',
-    '/frontend/utils/valid-ip',
-    '/frontend/utils/transform-ip-data'
+    '/frontend/utils/ip/valid-ip',
+    '/frontend/utils/ip/transform-ip-data'
   ],
   'utils-auth': [
     '/frontend/utils/authenticated-fetch'

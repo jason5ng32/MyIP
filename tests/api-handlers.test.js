@@ -5,7 +5,7 @@
 // any fetch fires.
 //
 // Referer + IP validation are enforced at the middleware layer now (see
-// common/guards.js, tests/guards.test.js); handlers themselves no longer
+// server/guards.js, tests/guards.test.js); handlers themselves no longer
 // repeat those checks, so this file focuses on handler-specific branches.
 
 import assert from 'node:assert/strict';
@@ -23,9 +23,9 @@ import macCheckerHandler, { createMacChecker } from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '../api/asn-profile.js';
-import { isAsRelLoaded } from '../common/as-rel-db.js';
-import { describeMac } from '../common/oui-db.js';
-import { isCompleteProfile } from '../common/asn-profile.js';
+import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
+import { describeMac } from '../server/datasets/oui-db.js';
+import { isCompleteProfile } from '../server/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -38,7 +38,7 @@ import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } 
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
 import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // -- shared test utilities ------------------------------------------------
 
@@ -418,7 +418,7 @@ describe('persona handler', () => {
 
 // -- cf-radar handler -----------------------------------------------------
 // One dispatch route for all Radar views; params are validated by each
-// view's guards from common/guards.js, so per-view checks here only cover
+// view's guards from server/guards.js, so per-view checks here only cover
 // the dispatch wiring. The pure transform pipeline (outage normalize/merge,
 // traffic matrix) is unit-tested in tests/cf-radar.test.js.
 

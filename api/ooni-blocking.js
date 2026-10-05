@@ -1,7 +1,7 @@
 // /api/ooni-blocking — per-country blocking view for a domain over the last
 // 30 days, built from OONI's open aggregation API (web_connectivity test,
 // probe_cc × blocking_type axes). Powers the default view of the frontend
-// CensorshipCheck tool; classification lives in common/ooni-blocking.js.
+// CensorshipCheck tool; classification lives in server/ooni-blocking.js.
 //
 // OONI matches `domain` against the exact tested hostname, so a single query
 // misses most of the dataset (e.g. `bbc.com` has ~6 rows while `www.bbc.com`
@@ -13,8 +13,8 @@
 // `cacheable()` and CF absorbs repeat lookups of popular domains.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import { classifyOoniCountries, OONI_WINDOW_DAYS } from '../common/ooni-blocking.js';
-import logger from '../common/logger.js';
+import { classifyOoniCountries, OONI_WINDOW_DAYS } from '../server/ooni-blocking.js';
+import logger from '../server/logger.js';
 
 const OONI_AGGREGATION_URL = 'https://api.ooni.io/api/v1/aggregation';
 

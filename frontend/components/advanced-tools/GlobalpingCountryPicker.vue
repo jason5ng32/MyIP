@@ -47,7 +47,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
-import { getProbeInventory } from '@/utils/globalping-probes.js';
+import { getProbeInventory } from '@/utils/features/globalping-probes.js';
 import getCountryName from '@/data/country-name.js';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icon } from '@iconify/vue';

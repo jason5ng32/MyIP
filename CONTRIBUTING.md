@@ -36,7 +36,8 @@ from building something that can't be merged.
 ```
 frontend/   Vue 3 SPA (Pinia, vue-router, vue-i18n, Tailwind v4 + shadcn-vue)
 api/        Express 5 handlers, one file per route (wired in backend-server.js)
-common/     Code shared by both halves (validators, fetch helper, logger, …)
+server/     Backend-only code (logger, guards, upstream clients, dataset engine, …)
+common/     Code both halves import (validators, fetch helper, report schema, …)
 tests/      Node test runner specs (node --test)
 ```
 
@@ -60,8 +61,8 @@ Details and rationale live in the AGENTS.md files; the headlines:
 - **The `full` locales land together** — user-visible copy ships in `en` / `zh` / `zh-TW` /
   `fr` / `ru` in the same PR (`frontend/locales/`; tests enforce it). `beta` locales are
   exempt — they fall back to English.
-- **Backend logging goes through the shared pino logger** (`common/logger.js`) —
-  no `console.*` in `api/` or `common/`.
+- **Backend logging goes through the shared pino logger** (`server/logger.js`) —
+  no `console.*` in `api/`, `server/` or `common/`.
 
 ## Good places to start
 

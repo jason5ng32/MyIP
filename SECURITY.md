@@ -18,8 +18,8 @@ Helpful things to include:
 
 - What an attacker can do with it, and what they'd need to start (a session? just a URL?).
 - Steps to reproduce — a request, a payload, or a short script.
-- Where the problem lives: front-end (`frontend/`), API handler (`api/`), or shared
-  code (`common/`).
+- Where the problem lives: front-end (`frontend/`), API handler (`api/`), backend
+  code (`server/`), or shared code (`common/`).
 - Whether you hit it on [ipcheck.ing](https://ipcheck.ing) or your own deployment, and
   the version if self-hosted.
 

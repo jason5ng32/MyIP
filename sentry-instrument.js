@@ -9,13 +9,13 @@
 // reports. backend-server.js attaches the matching Express error handler.
 import dotenv from 'dotenv';
 
-import { scrubBreadcrumb, scrubEventRequest, scrubSpan } from './common/sentry-scrub.js';
+import { scrubBreadcrumb, scrubEventRequest, scrubSpan } from './server/sentry-scrub.js';
 
 dotenv.config({ quiet: true });
 
 // SENTRY_ENVIRONMENT=development (a local `pnpm dev` machine) skips init:
 // experiments in progress are not production signal, same rule as the cron
-// check-ins in common/sentry-cron.js.
+// check-ins in server/sentry-cron.js.
 if (process.env.SENTRY_DSN_BACKEND && process.env.SENTRY_ENVIRONMENT !== 'development') {
     const Sentry = await import('@sentry/node');
     Sentry.init({
@@ -24,7 +24,7 @@ if (process.env.SENTRY_DSN_BACKEND && process.env.SENTRY_ENVIRONMENT !== 'develo
         // 100% trace sampling (per-route latency / throughput / error rate under Insights)
         tracesSampleRate: 1.0,
         // Sentry Logs — receives warn/error/fatal lines forwarded by the
-        // logMethod hook in common/logger.js
+        // logMethod hook in server/logger.js
         enableLogs: true,
         // Never attach caller IPs / headers to events (privacy tool)
         sendDefaultPii: false,

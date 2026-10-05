@@ -1,4 +1,4 @@
-// Tests for frontend/utils/asn-profile-view.js — the ASN Profile page's
+// Tests for frontend/utils/ip/asn-profile-view.js — the ASN Profile page's
 // pure shaping over the one /api/asn-profile response: which sections
 // render, hero identity and key facts, registration rows, customer cone,
 // RPKI summary, prefix rows, country shares, neighbour groups, the
@@ -16,7 +16,7 @@ import {
   ratioPosition, BASELINE_POSITION, reputationMeters, proxyListedCount, verdictLevel, VERDICT_TONE,
   PEERING_ENUMS, peeringEnumKey, websiteLink, peeringHero, peeringFacts, formatPortSpeed,
   exchangeRows, facilityRows, hasPeeringCard, visibleRows,
-} from '../frontend/utils/asn-profile-view.js';
+} from '../frontend/utils/ip/asn-profile-view.js';
 import en from '../frontend/locales/en.json' with { type: 'json' };
 
 describe('parseCount', () => {

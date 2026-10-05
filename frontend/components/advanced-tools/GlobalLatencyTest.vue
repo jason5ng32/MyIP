@@ -185,7 +185,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { Icon } from '@iconify/vue';
 import { Info, Play } from '@lucide/vue';
-import { renderWorldMapChart } from '@/utils/world-map-chart.js';
+import { renderWorldMapChart } from '@/utils/features/world-map-chart.js';
 
 const { t } = useI18n();
 

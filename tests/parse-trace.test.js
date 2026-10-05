@@ -1,10 +1,10 @@
-// Tests for frontend/utils/parse-trace.js — the shared /cdn-cgi/trace parser
+// Tests for frontend/utils/ip/parse-trace.js — the shared /cdn-cgi/trace parser
 // used by the getips/ sources, SpeedTest and RuleTest.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseTrace } from '../frontend/utils/parse-trace.js';
+import { parseTrace } from '../frontend/utils/ip/parse-trace.js';
 
 // Shape of a real trace response (LF-joined below where a test needs it).
 const TRACE_LINES = [

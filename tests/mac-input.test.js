@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { normalizeMacQuery } from '../common/mac-input.js';
-import { normalizeMacQuery as bridged } from '../frontend/utils/mac-input.js';
+import { normalizeMacQuery as bridged } from '../frontend/utils/features/mac-input.js';
 
 describe('normalizeMacQuery', () => {
     it('accepts a full address in every common notation, as upper-case bare hex', () => {

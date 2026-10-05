@@ -5,8 +5,8 @@
 // bytes, probe-country coverage changes slowly.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import { buildProbeInventory } from '../common/globalping-inventory.js';
-import logger from '../common/logger.js';
+import { buildProbeInventory } from '../server/globalping-inventory.js';
+import logger from '../server/logger.js';
 
 const GLOBALPING_PROBES_URL = 'https://api.globalping.io/v1/probes';
 
