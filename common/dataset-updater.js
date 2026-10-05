@@ -122,7 +122,7 @@ const writeState = (row, state) =>
 const loadedFingerprints = new Map();
 // Rows this process is publishing right now: from the first file move until
 // the reload has recorded the new fingerprints, the watcher must not take
-// the changing files for someone else's.
+// the changing files for someone else's — it defers its check instead.
 const ownPublishes = new Set();
 const fingerprint = (row) => row.files.map((file) => {
     try {
@@ -449,8 +449,13 @@ export const watchDatasets = (rows, { intervalMs = 5000, settleMs = 1000 } = {})
                 timer.unref?.();
                 return;
             }
-            // This process's own publish records its files once reloaded.
-            if (ownPublishes.has(row.id)) return;
+            // This process's own publish records its files once reloaded;
+            // look again after it, so a change made meanwhile still counts.
+            if (ownPublishes.has(row.id)) {
+                timer = setTimeout(settle, settleMs);
+                timer.unref?.();
+                return;
+            }
             if (current === loadedFingerprints.get(row.id) || !isPresent(row)) return;
             const published = Object.fromEntries(row.files.map((file) => [file, path.join(row.dir, file)]));
             try {

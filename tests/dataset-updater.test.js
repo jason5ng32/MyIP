@@ -510,6 +510,30 @@ describe('watchDatasets', () => {
         }
     });
 
+    it('still picks up files someone else replaces while this process is publishing', async () => {
+        const { row, log } = makeRow();
+        let replaceDuringReload = false;
+        row.reload = async (reason) => {
+            if (replaceDuringReload) {
+                replaceDuringReload = false;
+                for (const file of row.files) fs.writeFileSync(path.join(row.dir, file), `${file} by hand, longer\n`);
+                await sleep(120);
+            }
+            log.reloads.push(reason);
+        };
+        await updateDataset(row);
+        const stop = watchDatasets([row], fast);
+        try {
+            row.version = 'v2';
+            replaceDuringReload = true;
+            await updateDataset(row);
+            await sleep(200);
+            assert.deepEqual(log.reloads, ['auto update', 'auto update', 'file change']);
+        } finally {
+            stop();
+        }
+    });
+
     it('picks up files dropped into an empty dataset, once all are there', async () => {
         const { row, log } = makeRow({ enabled: () => false }); // no credentials: hand-placed only
         const stop = watchDatasets([row], fast);
