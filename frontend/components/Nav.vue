@@ -87,116 +87,8 @@
         <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
         <DocsSearch />
 
-        <!-- Preferences — standalone cog only for Firebase-less self-hosted
-             instances (no user menu to host it). With the user system on,
-             preferences lives inside the user dropdown for every state. -->
-        <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
-          <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
-            @click="OpenPreferences">
-            <Cog />
-          </Button>
-        </JnTooltip>
-
-        <!-- Sign In / User Dropdown -->
-        <DropdownMenu v-if="isFireBaseSet">
-          <DropdownMenuTrigger as-child>
-            <!-- Not signed in: the solid block reads as the "sign in"
-                 call-to-action, and the menu opens on the sign-in options, so
-                 the affordance is self-explaining one click deep. -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1.5 cursor-pointer"
-              aria-label="User menu">
-              <UserRound class="size-5" />
-              <ChevronDown class="opacity-60" />
-            </Button>
-            <!-- Signed in: avatar + chevron -->
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
-              aria-label="User menu">
-              <span class="inline-flex size-7 overflow-hidden rounded-full">
-                <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
-                  referrerpolicy="no-referrer">
-              </span>
-              <ChevronDown class="opacity-60" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" class="w-56 shadow-md">
-            <!-- Signed in -->
-            <template v-if="isSignedIn">
-              <div class="px-2 pt-2 pb-3">
-                <div class="flex items-center gap-3">
-                  <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
-                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover"
-                      referrerpolicy="no-referrer">
-                  </span>
-                  <div class="flex min-w-0 flex-1 flex-col gap-1">
-                    <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
-                    <span v-if="remoteUserInfoFetched && remoteUserInfo.userLevel">
-                      <Badge :class="levelBadgeClass"
-                        class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
-                        {{ t('user.Level.' + remoteUserInfo.userLevel) }}
-                      </Badge>
-                    </span>
-                    <span v-else-if="!remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
-                      t('user.Fields.Fetching') }}</span>
-                  </div>
-                </div>
-                <dl class="mt-3 space-y-1 text-xs">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.CreatedAt') }}</dt>
-                    <dd class="font-medium">{{ userCreatedAt }}</dd>
-                  </div>
-                  <!-- How this account signs in. One account per email
-                       address, so this is also the only way in. -->
-                  <div v-if="linkedProviders.length" class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.SignInMethods') }}</dt>
-                    <dd class="flex min-w-0 items-center gap-1.5 font-medium">
-                      <span v-for="provider in linkedProviders" :key="provider.providerId"
-                        class="inline-flex items-center gap-1" :title="provider.label">
-                        <Icon v-if="provider.icon" :icon="provider.icon" class="size-3.5 shrink-0" />
-                        <span>{{ provider.label }}</span>
-                      </span>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerAchievements(true)">
-                <Award />
-                <span>{{ t('user.MyAchievements') }}</span>
-              </DropdownMenuItem>
-            </template>
-
-            <!-- Not signed in -->
-            <template v-else>
-              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGoogle">
-                <Icon icon="ri:google-line" />
-                <span>{{ t('user.SignInWithGoogle') }}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGithub">
-                <Icon icon="ri:github-line" />
-                <span>{{ t('user.SignInWithGithub') }}</span>
-              </DropdownMenuItem>
-            </template>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
-              <Cog />
-              <span>{{ t('nav.preferences.title') }}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
-              <HeartHandshake />
-              <span>{{ t('user.Benefits.Title') }}</span>
-            </DropdownMenuItem>
-
-            <template v-if="isSignedIn">
-              <DropdownMenuSeparator />
-              <DropdownMenuItem class="cursor-pointer" @select="store.signOut">
-                <LogOut />
-                <span>{{ t('user.SignOut') }}</span>
-              </DropdownMenuItem>
-            </template>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <!-- Account menu: preferences cog (Firebase-less) or the user dropdown -->
+        <UserMenu />
       </div>
     </nav>
 
@@ -261,7 +153,6 @@ import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { unixToDateTime } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import {
@@ -274,31 +165,21 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { JnTooltip } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import {
-  Award, ChevronDown, UserRound, HeartHandshake,
-  LogOut, Menu, Cog,
-} from '@lucide/vue';
+import { ChevronDown, Menu } from '@lucide/vue';
 import DocsSearch from '@/components/widgets/DocsSearch.vue';
 import Pulse from '@/components/widgets/Pulse.vue';
+import UserMenu from '@/components/UserMenu.vue';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
 import { ADVANCED_TOOLS } from '@/data/tools.js';
-import { isToolAvailable } from '@/utils/tool-availability.js';
+import { listedTools } from '@/utils/tool-availability.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 import { useRouteActive } from '@/composables/use-route-active.js';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const store = useMainStore();
 const router = useRouter();
 
@@ -316,7 +197,7 @@ const navItems = SECTION_IDS;
 // Tools shown in the nav, mirroring Advanced.vue's enabledCards: gated tools
 // stay hidden where the deployment lacks them. Reactive on configs.
 const configs = computed(() => store.configs);
-const advancedTools = computed(() => ADVANCED_TOOLS.filter((tool) => isToolAvailable(tool, configs.value)));
+const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, configs.value));
 
 // Mobile: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);
@@ -345,45 +226,9 @@ const navLinkClass = (item, { block = false } = {}) => {
   return [base, state, block ? 'block' : ''].filter(Boolean).join(' ');
 };
 
-// Firebase / User
-const isFireBaseSet = computed(() => store.isFireBaseSet);
-const isSignedIn = computed(() => store.isSignedIn);
-const userName = computed(() => store.user?.displayName);
-const userPhotoURL = computed(() => store.user?.photoURL);
-const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt, locale.value));
-const remoteUserInfo = computed(() => store.remoteUserInfo);
-const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
-// Sign-in methods attached to this account.
-const linkedProviders = computed(() => store.linkedProviders);
-
-// Level Badge Color: mapped to semantic token, keep each level color distinction
-const levelBadgeClass = computed(() => {
-  const level = remoteUserInfo.value?.userLevel;
-  switch (level) {
-    case 'Premium': return 'bg-action text-action-foreground';
-    case 'Owner': return 'bg-foreground text-background';
-    case 'Developer': return 'bg-success text-success-foreground';
-    case 'HonoraryMember': return 'bg-warning text-warning-foreground';
-    case 'Standard':
-    default: return 'bg-muted-foreground text-background';
-  }
-});
-
-const getUserInfo = async () => {
-  if (remoteUserInfoFetched.value || !isSignedIn.value) return;
-  store.setTriggerRemoteUserInfo(true);
-};
-
-
 const isNavMenuOpen = computed(() => store.openSheet === 'navMenu');
 const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
-};
-
-// Opens the Preferences sheet
-const OpenPreferences = () => {
-  store.toggleSheet('preferences');
-  trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
 // At top → full refresh; mid-page → smooth scroll up. preventDefault

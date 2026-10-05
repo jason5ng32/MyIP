@@ -124,13 +124,15 @@ const store = useMainStore();
 const route = useRoute();
 const { dotClass } = useStatusTone();
 
-// Mounted on a /tools/:slug standalone page (vs the homepage) — these pages
-// skip the homepage loading pipeline, which changes when user info can load.
-const isStandalonePage = computed(() => route.path.startsWith('/tools/'));
+// Mounted on a page other than the homepage (by PageHeader.vue on the tool
+// pages, /privacy and /r/:id) — these pages skip the homepage loading
+// pipeline, which changes when user info can load.
+const isStandalonePage = computed(() => route.name !== 'home');
 
-// Home and the tool page each host a User and both stay alive (App.vue's
-// KeepAlive): only the one on the page on screen answers the store triggers
-// below; a trigger raised while neither shows waits for the next activation.
+// Home and every other page each host a User, and Home and the tool page stay
+// alive while hidden (App.vue's KeepAlive): only the one on the page on screen
+// answers the store triggers below; a trigger raised while none shows waits
+// for the next activation.
 const active = useRouteActive();
 
 const isSignedIn = computed(() => store.isSignedIn);

@@ -5,13 +5,11 @@
        the homepage + drawer. App.vue keeps this page alive, and the inner
        KeepAlive below keeps every visited tool alive per slug. -->
   <div class="flex min-h-screen flex-col">
-    <!-- User system dialogs host (Benefits & Usage) — the sign-in gated tools
-         link to it from their quota hints, and it fetches the user's usage
-         snapshot so their frontend quota gate works here too. -->
-    <User />
-
-    <!-- Slim header: brand → home, current tool breadcrumb, back link. -->
-    <StandalonePageHeader :title="tool ? `${tool.emoji} ${t(tool.titleKey)}` : ''" />
+    <!-- Page header: back, brand, tools menu, current tool, account menu. It
+         also hosts the User dialogs (Benefits & Usage) the sign-in gated
+         tools link to from their quota hints, and whose user-info fetch feeds
+         their frontend quota gate. -->
+    <PageHeader :title="tool ? `${tool.emoji} ${t(tool.titleKey)}` : ''" />
 
     <!-- Content: an <h1> for the tool (SEO), then the tool body itself -->
     <main class="flex-1">
@@ -41,8 +39,7 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { shouldDropToolCache } from '@/utils/tool-cache.js';
 import Footer from '@/components/Footer.vue';
-import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
-import User from '@/components/User.vue';
+import PageHeader from '@/components/PageHeader.vue';
 import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
 
 defineOptions({ name: 'ToolPage' });

@@ -191,11 +191,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, h } from 'vue';
+import { computed, ref, watch, h, onBeforeUnmount } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
+import { useRouteActive } from '@/composables/use-route-active.js';
 import { clampRetentionDays } from '@/utils/ip/ip-history.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
@@ -226,10 +227,19 @@ const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 
-const isOpen = computed(() => store.openSheet === 'preferences');
+// Every page with a header hosts one of these sheets (Home, the tool page,
+// /privacy, /r/:id), and Home and the tool page stay alive while hidden: only
+// the instance on the page on screen opens. Leaving the page closes it — a
+// cached page through the Sheet's own deactivation hook, a page torn down
+// here — so the next page's sheet doesn't open in its place.
+const active = useRouteActive();
+const isOpen = computed(() => active.value && store.openSheet === 'preferences');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);
 };
+onBeforeUnmount(() => {
+  if (isOpen.value) store.setOpenSheet(null);
+});
 
 // Text-only options — the picker deliberately shows no flags: a language
 // isn't a country (e.g. English under a US flag reads wrong to Brits).

@@ -63,8 +63,9 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 ### Advanced Tools gates decide listing only
 
 `data/tools.js` gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`,
-e.g. `asn` → `cloudFlare`) are read only via `isToolAvailable()`, by the card
-grid and the nav; deep links (`?tool=`, `/tools/:slug`) are never gated.
+e.g. `asn` → `cloudFlare`) are read only via `isToolAvailable()` /
+`listedTools()`, by the card grid, the nav and `ToolsMenu`; deep links
+(`?tool=`, `/tools/:slug`) are never gated.
 
 ### ASN Profile
 
@@ -155,6 +156,12 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
+- **Page header** — every page but Home opens with `<PageHeader :title />`
+  (back · brand · `ToolsMenu` · title · `UserMenu`, which Nav shares); it hosts
+  the `User` / `Preferences` dialogs its menus raise, each answering only on
+  the page on screen.
+- **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
+  `hidden sm:flex` never shows: write `max-sm:hidden`.
 - **Drawer vs Sheet** — bottom Drawer for Advanced Tools and full-bleed
   expansions of an inline visual; side panels use `Sheet`.
 - **Motion** — hover lift `transition-transform duration-300 ease-out

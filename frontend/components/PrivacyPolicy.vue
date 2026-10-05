@@ -1,8 +1,8 @@
 <template>
   <!-- Standalone privacy page at /privacy (shareable + crawlable) -->
   <div class="flex min-h-screen flex-col">
-    <!-- Slim header (shared with the standalone tool pages). -->
-    <StandalonePageHeader :title="t('about.Privacy')" />
+    <!-- Page header (shared with the tool pages and /r/:id). -->
+    <PageHeader :title="t('about.Privacy')" />
 
     <!-- Content -->
     <main class="flex-1">
@@ -49,7 +49,7 @@ import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import Footer from '@/components/Footer.vue';
-import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import PageHeader from '@/components/PageHeader.vue';
 import { Spinner } from '@/components/ui/spinner';
 
 const { t, tm, rt, locale, mergeLocaleMessage } = useI18n();

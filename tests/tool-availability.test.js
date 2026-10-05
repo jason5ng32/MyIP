@@ -1,10 +1,10 @@
 // Tests for frontend/utils/tool-availability.js — the listing gate the
-// Advanced Tools card grid and nav filter through — plus the gate fields the
-// registry in frontend/data/tools.js declares.
+// Advanced Tools card grid, nav and tools menu filter through — plus the gate
+// fields the registry in frontend/data/tools.js declares.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { isToolAvailable } from '../frontend/utils/tool-availability.js';
+import { isToolAvailable, listedTools } from '../frontend/utils/tool-availability.js';
 import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '../frontend/data/tools.js';
 
 const PUBLIC = { slug: 'public' };
@@ -53,6 +53,32 @@ describe('isToolAvailable', () => {
     assert.deepEqual(listed({}), ['public']);
     assert.deepEqual(listed({ originalSite: false, cloudFlare: true }), ['public', 'radar']);
     assert.deepEqual(listed({ originalSite: true, cloudFlare: true }), ['public', 'original', 'radar', 'both']);
+  });
+});
+
+describe('listedTools', () => {
+  const PAGELESS = { slug: 'pageless', noStandalone: true };
+  const GATED_PAGELESS = { slug: 'gated-pageless', requiresOriginalSite: true, noStandalone: true };
+  const tools = [PUBLIC, PAGELESS, ORIGINAL, GATED_PAGELESS];
+  const slugs = (list) => list.map((tool) => tool.slug);
+
+  it('applies the gates in registry order', () => {
+    assert.deepEqual(slugs(listedTools(tools, {})), ['public', 'pageless']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true })),
+      ['public', 'pageless', 'original', 'gated-pageless']);
+  });
+
+  it('standaloneOnly also drops the noStandalone tools', () => {
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true }, { standaloneOnly: true })),
+      ['public', 'original']);
+    assert.deepEqual(slugs(listedTools(tools, {}, { standaloneOnly: true })), ['public']);
+  });
+
+  it('the registry lists Persona Check only for callers that open the drawer', () => {
+    const configs = { originalSite: true, cloudFlare: true };
+    assert.ok(slugs(listedTools(ADVANCED_TOOLS, configs)).includes('personacheck'));
+    assert.ok(!slugs(listedTools(ADVANCED_TOOLS, configs, { standaloneOnly: true })).includes('personacheck'));
+    assert.equal(listedTools(ADVANCED_TOOLS, configs).length, ADVANCED_TOOLS.length);
   });
 });
 

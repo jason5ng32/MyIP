@@ -1,6 +1,6 @@
 <template>
     <div class="flex min-h-screen flex-col">
-        <StandalonePageHeader :title="t('report.Title')" />
+        <PageHeader :title="t('report.Title')" />
         <main class="flex-1 mx-auto w-full max-w-300 px-4 py-6 space-y-4">
         <!-- Loading -->
         <div v-if="state === 'loading'"
@@ -71,7 +71,7 @@ import { isoToDateTime } from '@/utils/time-utils.js';
 import { REPORT_VERSION, REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
 import { reportToMarkdown } from '@/utils/report/report-export.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
-import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import PageHeader from '@/components/PageHeader.vue';
 import Footer from '@/components/Footer.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
