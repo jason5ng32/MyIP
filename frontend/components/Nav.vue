@@ -2,17 +2,11 @@
   <!-- iOS PWA safe-area painter. Pairs with apple-mobile-web-app-status-bar-style=black-translucent
        in index.html — the only way to get a live status-bar tint on iOS PWA, since WebKit
        ignores JS theme-color writes and media-variant theme-color tags in standalone mode.
-       Color tracks --page-bg (style.css), which follows .dark class.
-       It and the header below stay put through page transitions (jn-site-* in style.css).
-       It stays hit-testable on purpose: iOS 26+ decides whether to draw its Liquid Glass
-       scroll-edge blur over the top of a Home Screen web app by hit-testing the top edge
-       for a fixed, viewport-wide box with a plain background colour (WebKit
-       LocalFrameView::fixedContainerEdges); pointer-events: none would hide this strip
-       from that first pass. -->
-  <div class="jn-site-status-bar fixed top-0 left-0 right-0 z-50 transition-colors duration-300"
+       Color tracks --page-bg (style.css), which follows .dark class. -->
+  <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-colors duration-300"
     style="height: env(safe-area-inset-top); background: var(--page-bg);" aria-hidden="true"></div>
   <header
-    class="jn-site-nav fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
+    class="fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
     'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isPwa || (isPwa && !isMobile),
     'bg-page-bg': isPwa && isMobile }">
