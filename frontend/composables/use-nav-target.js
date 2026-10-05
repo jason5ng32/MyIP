@@ -15,10 +15,7 @@
 import { nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { resolveNavTarget } from '../utils/nav-target.js';
-import { scrollToElement } from '../utils/scroll-to.js';
-
-// Room left above a section for the fixed Nav (h-14) plus a little air.
-export const SECTION_SCROLL_OFFSET = 70;
+import { scrollToElement, SECTION_SCROLL_OFFSET } from '../utils/scroll-to.js';
 
 const SETTLE_MS = 5000;
 const USER_SCROLL_EVENTS = ['wheel', 'touchstart', 'keydown', 'pointerdown'];

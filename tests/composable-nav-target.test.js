@@ -8,7 +8,8 @@
 import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import { nextTick } from 'vue';
-import { useNavTarget, SECTION_SCROLL_OFFSET } from '../frontend/composables/use-nav-target.js';
+import { useNavTarget } from '../frontend/composables/use-nav-target.js';
+import { SECTION_SCROLL_OFFSET } from '../frontend/utils/scroll-to.js';
 
 let log;
 let sectionTop;

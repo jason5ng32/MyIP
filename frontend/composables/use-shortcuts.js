@@ -31,7 +31,7 @@ import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { dispatchAppCommand } from '../utils/app-commands.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
-import { scrollToElement } from '../utils/scroll-to.js';
+import { scrollToElement, SECTION_SCROLL_OFFSET } from '../utils/scroll-to.js';
 import { useRouteActive } from './use-route-active.js';
 import { hasPulseBackend } from '../utils/features/pulse-beacon.js';
 
@@ -125,7 +125,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             type: 'regex',
             action: (num) => {
                 if (num > userPreferences.value.ipCardsToShow) return;
-                scrollToElement('IPInfoCard-' + num, 70);
+                scrollToElement('IPInfoCard-' + num, SECTION_SCROLL_OFFSET);
                 runCommand('ipinfo:refresh', { index: num - 1 });
                 trackEvent('ShortCut', 'ShortCut', 'IPCheck');
             },
@@ -134,7 +134,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'c',
             action: () => {
-                scrollToElement('Connectivity', 80);
+                scrollToElement('Connectivity', SECTION_SCROLL_OFFSET);
                 runCommand('connectivity:run', { trigger: 'manual' });
                 trackEvent('ShortCut', 'ShortCut', 'Connectivity');
             },
@@ -143,7 +143,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'w',
             action: () => {
-                scrollToElement('WebRTC', 80);
+                scrollToElement('WebRTC', SECTION_SCROLL_OFFSET);
                 runCommand('webrtc:run', { isRefresh: false });
                 trackEvent('ShortCut', 'ShortCut', 'WebRTC');
             },
@@ -152,7 +152,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'd',
             action: () => {
-                scrollToElement('DNSLeakTest', 80);
+                scrollToElement('DNSLeakTest', SECTION_SCROLL_OFFSET);
                 runCommand('dnsleak:run', { isRefresh: true });
                 trackEvent('ShortCut', 'ShortCut', 'DNSLeakTest');
             },
@@ -161,7 +161,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 's',
             action: () => {
-                scrollToElement('SpeedTest', 80);
+                scrollToElement('SpeedTest', SECTION_SCROLL_OFFSET);
                 runCommand('speedtest:toggle');
                 trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
             },
