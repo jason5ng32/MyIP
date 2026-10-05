@@ -120,6 +120,10 @@ const writeState = (row, state) =>
 // The published files as this process last loaded them (mtime + size per
 // file), so the watcher can tell someone else's publish from its own.
 const loadedFingerprints = new Map();
+// Rows this process is publishing right now: from the first file move until
+// the reload has recorded the new fingerprints, the watcher must not take
+// the changing files for someone else's.
+const ownPublishes = new Set();
 const fingerprint = (row) => row.files.map((file) => {
     try {
         const stat = fs.statSync(path.join(row.dir, file));
@@ -253,6 +257,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         // publishes a whole set, and the next boot does so before trusting
         // the files.
         work.throwIfAborted();
+        ownPublishes.add(row.id);
         await writeState(row, { ...state, identifier: null, publishing: true });
         await publish(row, staged, { signal: work, lockLost: lock.lost });
         // A whole set is in place: record it unless the lock went meanwhile.
@@ -262,6 +267,7 @@ export const updateDataset = async (row, { signal, reason = 'auto update', wait 
         await reloadRow(row, reason);
         return { updated: true, identifier: remote.identifier };
     } finally {
+        ownPublishes.delete(row.id);
         await fsp.rm(tempDir, { recursive: true, force: true });
         await lock.release().catch(() => {});
     }
@@ -443,6 +449,8 @@ export const watchDatasets = (rows, { intervalMs = 5000, settleMs = 1000 } = {})
                 timer.unref?.();
                 return;
             }
+            // This process's own publish records its files once reloaded.
+            if (ownPublishes.has(row.id)) return;
             if (current === loadedFingerprints.get(row.id) || !isPresent(row)) return;
             const published = Object.fromEntries(row.files.map((file) => [file, path.join(row.dir, file)]));
             try {

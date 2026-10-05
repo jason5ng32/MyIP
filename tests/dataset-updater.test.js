@@ -493,6 +493,23 @@ describe('watchDatasets', () => {
         }
     });
 
+    it('does not take its own publish for a foreign change while its reload is still running', async () => {
+        // A reload slower than the settle window: the watcher sees the new
+        // files before this process has recorded them as its own.
+        const { row, log } = makeRow();
+        row.reload = async (reason) => { await sleep(120); log.reloads.push(reason); };
+        await updateDataset(row);
+        const stop = watchDatasets([row], fast);
+        try {
+            row.version = 'v2';
+            await updateDataset(row);
+            await sleep(150);
+            assert.deepEqual(log.reloads, ['auto update', 'auto update']);
+        } finally {
+            stop();
+        }
+    });
+
     it('picks up files dropped into an empty dataset, once all are there', async () => {
         const { row, log } = makeRow({ enabled: () => false }); // no credentials: hand-placed only
         const stop = watchDatasets([row], fast);
