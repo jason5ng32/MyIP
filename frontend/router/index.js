@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/components/Home.vue';
 import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
+import { installPageTransitions } from '@/utils/page-transition.js';
 
 // Pages:
 //   /              → the homepage (tests, sections, Advanced Tools cards).
@@ -11,7 +12,8 @@ import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
 // App.vue keeps the homepage and the tool page alive across navigation, so
 // back / forward between them is plain history that restores both as left.
 // The drawer-era `/?tool=<slug>` links redirect to /tools/<slug>
-// (utils/legacy-tool-link.js).
+// (utils/legacy-tool-link.js). Page changes slide / fade as View Transitions
+// (utils/page-transition.js).
 //
 // Home is imported eagerly (it's the default landing); everything else is
 // lazy so it stays out of the homepage bundle.
@@ -44,5 +46,10 @@ const router = createRouter({
 // replaces the entry, so the legacy URL leaves no trace in history. null lets
 // every other navigation through.
 router.beforeEach((to) => resolveLegacyToolLink(to) ?? undefined);
+
+// Page changes animate as View Transitions (utils/page-transition.js). Hooked
+// here, not in a component, so the guards exist before the first navigation
+// and outlive any page.
+installPageTransitions(router);
 
 export default router;
