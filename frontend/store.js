@@ -3,8 +3,7 @@ import { defineStore } from 'pinia';
 import { loadFirebaseAuth, authDomainInputs } from './firebase-init.js';
 import { signInProvidersFor } from './utils/auth-domain.js';
 import { writeAuthHint } from './utils/auth-hint.js';
-import { resolveSignInFlow, shouldFallBackToRedirect } from './utils/auth-flow.js';
-import { markPendingRedirectSignIn, takePendingRedirectSignIn } from './utils/auth-redirect.js';
+import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirectSignIn } from './utils/auth-redirect.js';
 import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
@@ -278,24 +277,18 @@ export const useMainStore = defineStore('main', {
     async signInWithGithub() {
       await this.signInWithProvider('github');
     },
-    // Shared sign-in path for both buttons (flow choice: utils/auth-flow.js).
-    // Popup in a browser tab: set the user, then reload. Redirect in the
-    // installed PWA, or when the popup can't open: mark the pending return
-    // and leave the page — completeRedirectSignIn picks it up at boot.
+    // Shared sign-in path for both buttons: popup in a browser tab, then
+    // reload; redirect in the installed PWA or when the popup can't open
+    // (utils/auth-redirect.js), finished at boot by completeRedirectSignIn.
     async signInWithProvider(providerKey) {
-      if (!this.signInProviders.includes(providerKey)) {
-        console.warn(`Sign-in with ${providerKey} is not offered here`);
-        return;
-      }
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
         const fb = await loadFirebaseAuth();
-        if (resolveSignInFlow({ runningAsPwa: isRunningAsPwa() }) === 'popup') {
+        if (!isRunningAsPwa()) {
           try {
             const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
             this.user = result.user;
             writeAuthHint(true);
-            // refresh browser after successful login
             window.location.reload();
             return;
           } catch (error) {
@@ -309,10 +302,8 @@ export const useMainStore = defineStore('main', {
         this.handleSignInError(error, descriptor);
       }
     },
-    // Boot-time half of the redirect flow: consumes the pending marker and
-    // reads the provider's result. Resolves true when it signed the visitor
-    // in (state set before mount, no reload); false for no marker, no
-    // Firebase, a visitor who backed out at the provider, or an error.
+    // Boot half of the redirect flow: true when it signed the visitor in
+    // (state set before mount, no reload).
     async completeRedirectSignIn() {
       const pending = takePendingRedirectSignIn();
       if (!pending) return false;

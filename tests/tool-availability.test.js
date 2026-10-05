@@ -1,6 +1,6 @@
 // Tests for frontend/utils/tool-availability.js — the listing gate the
-// Advanced Tools card grid and nav filter through — plus the gate
-// fields the registry in frontend/data/tools.js declares.
+// Advanced Tools card grid and nav filter through — plus the gate fields the
+// registry in frontend/data/tools.js declares.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -46,14 +46,6 @@ describe('isToolAvailable', () => {
     assert.equal(isToolAvailable(null, { cloudFlare: true }), false);
     assert.equal(isToolAvailable(undefined, {}), false);
   });
-
-  it('filters a list in registry order', () => {
-    const tools = [PUBLIC, ORIGINAL, RADAR, BOTH];
-    const listed = (configs) => tools.filter((tool) => isToolAvailable(tool, configs)).map((tool) => tool.slug);
-    assert.deepEqual(listed({}), ['public']);
-    assert.deepEqual(listed({ originalSite: false, cloudFlare: true }), ['public', 'radar']);
-    assert.deepEqual(listed({ originalSite: true, cloudFlare: true }), ['public', 'original', 'radar', 'both']);
-  });
 });
 
 describe('listedTools', () => {
@@ -63,13 +55,13 @@ describe('listedTools', () => {
   it('applies the gates in registry order', () => {
     assert.deepEqual(slugs(listedTools(tools, {})), ['public']);
     assert.deepEqual(slugs(listedTools(tools, { originalSite: true })), ['public', 'original']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: false, cloudFlare: true })), ['public', 'radar']);
     assert.deepEqual(slugs(listedTools(tools, { originalSite: true, cloudFlare: true })),
       ['public', 'original', 'radar', 'both']);
   });
 
-  it('lists every registered tool, Persona Check included, once all gates pass', () => {
+  it('lists every registered tool once all gates pass', () => {
     const configs = { originalSite: true, cloudFlare: true };
-    assert.ok(slugs(listedTools(ADVANCED_TOOLS, configs)).includes('personacheck'));
     assert.equal(listedTools(ADVANCED_TOOLS, configs).length, ADVANCED_TOOLS.length);
   });
 });

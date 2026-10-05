@@ -8,10 +8,7 @@ const env = import.meta.env ?? {};
 
 const isFireBaseSet = !!env.VITE_FIREBASE_API_KEY && !!env.VITE_FIREBASE_AUTH_DOMAIN && !!env.VITE_FIREBASE_PROJECT_ID;
 
-// Inputs for utils/auth-domain.js. Browsers sign in through the shared
-// default domain; the installed PWA may use VITE_FIREBASE_PWA_AUTH_DOMAIN
-// (the site's own host, whose /__/auth proxy keeps the redirect handler
-// same-origin). Read on demand: the display mode needs `window`.
+// Inputs for utils/auth-domain.js, read on demand (display mode needs `window`).
 const authDomainInputs = () => ({
     runningAsPwa: isRunningAsPwa(),
     authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,

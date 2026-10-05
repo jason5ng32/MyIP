@@ -1,18 +1,9 @@
-// Legacy Advanced Tools links: tools once opened as a homepage drawer driven
-// by `/?tool=<slug>`, and those links live on in bookmarks, shares and search
-// results. The router's beforeEach (router/index.js) sends them to the tool's
-// page. The redirect keeps the navigation's own mode: a page load (the router's
-// first navigation) and a history step replace the entry, so back never
-// returns to the old URL; an in-app push stays a push, keeping the page it
-// left in history.
-//
-//   resolveLegacyToolLink({ path, query, hash })
-//     → null                 nothing to rewrite
-//     → { path, query, hash? }
-//
-// Only the homepage carries the param. A known slug lands on /tools/<slug>;
-// an unknown (or malformed: repeated, empty) one lands on the homepage. Every
-// other query param (e.g. `q`, utm tags) and the hash ride along.
+// Legacy `/?tool=<slug>` links (the drawer era; still in bookmarks, shares and
+// search results) → the tool's page, via the router's beforeEach. A known slug
+// lands on /tools/<slug>, an unknown or malformed one on the homepage; other
+// query params and the hash ride along. Returns null when there is nothing to
+// rewrite. The redirect keeps the navigation's mode: a page load or history
+// step replaces the entry, an in-app push stays a push.
 
 import { TOOL_BY_SLUG } from '../data/tools.js';
 

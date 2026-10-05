@@ -1,11 +1,4 @@
 <template>
-  <!-- Account menu at the right of the site Nav. Two shapes:
-       a Firebase-less self-hosted instance has no user system, so only the
-       preferences cog shows; otherwise a dropdown carries sign-in (signed
-       out) or the account card + achievements (signed in), then preferences,
-       benefits & usage and sign-out. The dialogs it opens are raised through
-       the store: Preferences and User live in App.vue, Achievements on the
-       homepage. -->
   <!-- Firebase-less: standalone preferences cog. -->
   <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
     <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
@@ -119,8 +112,9 @@
 </template>
 
 <script setup>
-// Account menu (preferences cog or user dropdown) for the site Nav.
-// Everything it opens goes through store triggers.
+// Account menu at the right of the site Nav: a preferences cog on a
+// Firebase-less instance, the user dropdown otherwise. What it opens is raised
+// through store triggers (Preferences / User live in App.vue, Achievements on Home).
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -176,14 +170,12 @@ const getUserInfo = async () => {
   store.setTriggerRemoteUserInfo(true);
 };
 
-// Preferences: the one site-wide sheet (App.vue).
 const openPreferences = () => {
   store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');
 };
 
-// Achievements live on the homepage only: from any other page, go home first
-// (the kept-alive Home comes back as it was left), then raise the sheet.
+// Achievements live on Home only, so go there first.
 const openAchievements = async () => {
   if (route.name !== 'home') {
     const failure = await router.push('/');

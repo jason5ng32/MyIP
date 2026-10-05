@@ -43,7 +43,7 @@
                 <span>
                     {{ t('user.QuotaExceeded') }}
                     <button type="button" class="underline underline-offset-2 cursor-pointer"
-                        @click="openUsageDialog">{{ t('user.ViewUsage') }}</button>
+                        @click="store.setTriggerUserBenefits(true)">{{ t('user.ViewUsage') }}</button>
                 </span>
             </div>
         </div>
@@ -187,11 +187,6 @@ import { CircleCheck, CircleX, Hourglass, Info, ListChecks, Lock, Shield, Play }
 const { t } = useI18n();
 
 const store = useMainStore();
-
-// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
-const openUsageDialog = () => {
-    store.setTriggerUserBenefits(true);
-};
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');

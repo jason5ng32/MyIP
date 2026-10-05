@@ -1,6 +1,4 @@
-// resolveBackTarget() — where the page breadcrumb's "Home" crumb goes:
-// a history step back when the previous in-app entry is the homepage, a push
-// of `/` otherwise (direct visit, another page before this one).
+// resolveBackTarget() — where the page breadcrumb's "Home" crumb goes.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

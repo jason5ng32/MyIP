@@ -1,16 +1,9 @@
 // Carries out a site-navigation click (utils/nav-target.js decides what it
-// means on the current route): scroll the homepage to a section, go home first
-// and then scroll, or open a tool's page.
-//
-// Going home is a push, so the router's scrollBehavior puts the homepage at
-// the top after the next tick; the section scroll waits for that tick and one
-// frame, so it runs last, on the activated and laid-out homepage. A homepage
-// this push mounted is still filling in (its tests and async parts resize
-// what sits above the section), so the scroll re-aims while #mainpart
-// resizes, for SETTLE_MS or until the visitor scrolls or presses a key.
-//
-//   const { navigateTo } = useNavTarget();   // { route, router } injectable
-//   navigateTo({ section: 'Connectivity' }) / navigateTo({ tool: 'whois' })
+// means on the current route): scroll the homepage, go home then scroll, or
+// open a tool's page. Going home, the scroll waits a tick and a frame so it
+// runs after the router's scrollBehavior; then, as a freshly mounted homepage
+// is still resizing above the section, it re-aims while #mainpart resizes,
+// for SETTLE_MS or until the visitor scrolls or presses a key.
 
 import { nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

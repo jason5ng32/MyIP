@@ -1,21 +1,17 @@
 <template>
-    <!-- Thin app shell: only the globals that must exist on every route live
-    here (the site Nav, the account and preferences dialogs, tooltip context,
-    toast host, PWA install prompt, theme). Pages swap in via <router-view>
-    below the fixed Nav (index.html pads the body for it); the homepage and
-    the tool page stay alive in the KeepAlive (never evicted), so leaving and
-    coming back neither re-runs the homepage tests nor loses a tool's state. Every tool route shares the one
-    ToolPage instance (key 'tool'), which caches each tool per slug itself.
-    Cached pages pause while hidden — see composables/use-route-active.js. -->
+    <!-- Thin app shell: the globals every route shares (Nav, account and
+    preferences dialogs, tooltip context, toast host, PWA prompt, theme).
+    Home and ToolPage stay alive, so coming back neither re-runs the tests nor
+    loses a tool's state; keyed by route name, every tool route shares one
+    ToolPage, which caches each tool per slug itself. -->
     <TooltipProvider :delay-duration="150">
         <NavBar />
         <router-view v-slot="{ Component, route: viewRoute }">
             <KeepAlive :include="['Home', 'ToolPage']">
-                <component :is="Component" :key="viewRoute.name === 'tool' ? 'tool' : viewRoute.name" />
+                <component :is="Component" :key="viewRoute.name" />
             </KeepAlive>
         </router-view>
-        <!-- Dialog hosts for the Nav's account menu and the sign-in tools'
-             quota hints: Benefits & Usage, Preferences. One each, site-wide. -->
+        <!-- Dialog hosts for the Nav's account menu and the tools' quota hints. -->
         <User />
         <Preferences />
         <Alert />
@@ -57,8 +53,7 @@ import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
-// A page change closes the sheet held in store.openSheet (preferences, Earth
-// Online, the nav menu, …): the site-wide ones would otherwise stay open over
+// A page change closes store.openSheet: a site-wide sheet would stay open over
 // the next page, and one a left page hosted would reopen when it returns.
 const store = useMainStore();
 const route = useRoute();
@@ -69,9 +64,7 @@ watch(() => route.path, () => {
 // Pre-Vue boot overlay → real app hand-off. CSS lives in index.html.
 // #app is revealed IMMEDIATELY at mount: it fades in underneath the opaque
 // overlay while the overlay plays its exit (text fade → logo shrink →
-// removal). 
-// Runs once at root mount, so it covers both the homepage and a fresh load of
-// a tool page.
+// removal). Runs once at root mount, whichever page loads first.
 const loadingElement = document.getElementById('jn-loading');
 const appElement = document.getElementById('app');
 

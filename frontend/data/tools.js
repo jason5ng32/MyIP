@@ -1,8 +1,5 @@
-// Single source of truth for the Advanced Tools.
-//
-// This one registry drives every place a tool is referenced: its page at
-// /tools/:slug (ToolPage.vue), the Advanced.vue card groups, the nav menu
-// and mobile nav sheet, the keyboard shortcuts (use-shortcuts.js) and the
+// Single source of truth for the Advanced Tools: their /tools/:slug pages
+// (ToolPage.vue), the card groups, the Nav, the keyboard shortcuts and the
 // legacy `/?tool=<slug>` redirect (utils/legacy-tool-link.js).
 //
 // Entry shape:
@@ -16,9 +13,8 @@
 //   requiresConfig       — gate: only shown when this `/api/configs` flag is
 //                          true (e.g. 'cloudFlare' for the Radar-backed tools)
 //
-// Gates decide listing only (card grid, nav), via
-// isToolAvailable() in utils/tool-availability.js; a /tools/:slug link opens
-// the tool regardless.
+// Gates decide listing only (utils/tool-availability.js); a /tools/:slug link
+// opens the tool regardless.
 
 export const ADVANCED_TOOLS = [
   { slug: 'pingtest', emoji: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', category: 'network', component: () => import('@/components/advanced-tools/GlobalLatencyTest.vue') },
@@ -39,8 +35,7 @@ export const ADVANCED_TOOLS = [
   { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
 ];
 
-// Fast slug → entry lookup (the tool page and the legacy redirect resolve a
-// tool by slug).
+// slug → entry.
 export const TOOL_BY_SLUG = new Map(ADVANCED_TOOLS.map((tool) => [tool.slug, tool]));
 
 // Card groups, in render order. On a self-hosted deployment the 'deep' tools

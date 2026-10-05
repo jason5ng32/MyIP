@@ -13,13 +13,9 @@ over copied-in shadcn-vue primitives. No TypeScript, no `dark:` dual pairs.
 ```
 frontend/
 ├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
-│                    (App.vue: the site Nav + User / Preferences, then the page)
-├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js)
-│                      sign-in: popup in a browser tab, redirect in the installed
-│                      PWA or on a blocked popup (utils/auth-flow.js); the return
-│                      is consumed at boot via a sessionStorage marker
-│                      (utils/auth-redirect.js); the PWA may use its own auth
-│                      domain, then Google only (utils/auth-domain.js)
+├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js;
+│                      PWA / blocked-popup redirect sign-in: utils/auth-redirect.js;
+│                      the PWA's own auth domain: utils/auth-domain.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
@@ -68,13 +64,11 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 
 ### Advanced Tools are pages, kept alive
 
-- Every tool is a page at `/tools/:slug` (`ToolPage.vue` over the
-  `data/tools.js` registry), and every opener routes there: cards are real
-  `<a href>` (a plain click `router.push`es, modifier clicks stay the
-  browser's), Nav, shortcuts (`Advanced.vue`'s exposed
-  `openTool`), in-app links. `/?tool=<slug>` survives only as a replace-redirect
-  in the router's `beforeEach` (`utils/legacy-tool-link.js`). No tool opens as
-  an overlay.
+- Every tool is a page at `/tools/:slug` (`ToolPage.vue` over `data/tools.js`),
+  and every opener routes there: cards are real `<a href>` (a plain click
+  `router.push`es, modified clicks stay the browser's), Nav, shortcuts
+  (`Advanced.vue`'s exposed `openTool`), in-app links. `/?tool=<slug>` is only
+  a replace-redirect in the router's `beforeEach` (`utils/legacy-tool-link.js`).
 - Gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`, e.g. `asn` →
   `cloudFlare`) decide listing only, via `isToolAvailable()` / `listedTools()`
   (card grid, Nav); a `/tools/:slug` link is never gated.
@@ -166,8 +160,7 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Shareable tool input** — watch `useActiveValue(() => route.query.q, {
   pathOf: () => route.path })` (immediate, so mount, later changes and a `q`
   changed while cached all run; another page's `q` never does), `router.replace`
-  it on every run (AsnProfile); the URL is `/tools/<slug>?q=`, which a legacy
-  `/?tool=<slug>&q=` redirects to with `q` kept.
+  it on every run (AsnProfile); the URL is `/tools/<slug>?q=`.
 - **Fixed option sets** — a closed list wider than one line is a `Select`.
 - **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
   Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.
@@ -176,28 +169,26 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
-  sit beside it, one each. Its sections and tools are peers: what a click
-  does on the current route is `resolveNavTarget()` (`utils/nav-target.js`:
-  scroll on Home, go home then scroll elsewhere, a tool → its page), carried
-  out by `use-nav-target.js`; no section is highlighted off Home.
+  sit beside it, one each. What a click does on the current route is
+  `resolveNavTarget()` (`utils/nav-target.js`: scroll on Home, go home then
+  scroll elsewhere, a tool → its page), carried out by `use-nav-target.js`;
+  no section is highlighted off Home.
 - **Page breadcrumb** — every page but Home opens its body with
   `<PageBreadcrumb :items />` above the `<h1>` (← Home / … / current page):
   real links, Home via `resolveBackTarget()`, section crumbs via the Nav's
   helper, the last crumb `aria-current="page"`.
-- **Page transitions** — View Transitions keyed by the direction
-  `utils/page-transition.js` resolves (Home → page slides forward, → Home
-  back, page → page fades; keyframes in `style/style.css`), hooked in the
-  router's `beforeResolve`; none on a query-only change, the first load, or
-  under reduced motion. The Nav opts out via
-  `view-transition-name`; nothing else gets one. After a history step the
-  page's running CSS animations are cancelled, replayed and set back to
-  their time (`utils/revive-animations.js`): on iOS the swipe-back gesture
-  leaves them visually frozen until their layer is rebuilt.
+- **Page transitions** — View Transitions hooked in the router's
+  `beforeResolve` (`utils/page-transition.js`: Home → page slides forward,
+  → Home back, page → page fades; keyframes in `style/style.css`); none on a
+  query-only change, the first load, reduced motion or a history step the
+  browser animated itself. Only the Nav has a `view-transition-name` (it
+  stays still). After a history step, `utils/revive-animations.js` replays
+  the page's running CSS animations: iOS swipe-back leaves them frozen.
 - **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
   `hidden sm:flex` never shows: write `max-sm:hidden`.
 - **Drawer vs Sheet** — bottom Drawer only for a full-bleed expansion of an
-  inline visual (ASNConnectivity's graph); side panels use `Sheet`; a tool is a
-  page, never either.
+  inline visual (ASNConnectivity's graph); side panels use `Sheet`; a tool is
+  a page, never an overlay.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
   hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dots.
 

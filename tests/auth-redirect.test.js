@@ -1,9 +1,10 @@
-// Tests for the pending-redirect sign-in marker (frontend/utils/auth-redirect.js),
-// driven through an injected fake sessionStorage.
+// Tests for frontend/utils/auth-redirect.js: the popup → redirect fallback
+// codes, and the pending-redirect marker driven through a fake sessionStorage.
 
 import assert from 'node:assert/strict';
 import { describe, it, beforeEach } from 'node:test';
 import {
+    shouldFallBackToRedirect,
     markPendingRedirectSignIn,
     hasPendingRedirectSignIn,
     takePendingRedirectSignIn,
@@ -22,15 +23,24 @@ beforeEach(() => {
     storage = createStorage();
 });
 
+describe('shouldFallBackToRedirect', () => {
+    it('falls back when the popup cannot open', () => {
+        assert.equal(shouldFallBackToRedirect('auth/popup-blocked'), true);
+        assert.equal(shouldFallBackToRedirect('auth/operation-not-supported-in-this-environment'), true);
+    });
+
+    it('does not fall back when the visitor closed the popup, or on other codes', () => {
+        assert.equal(shouldFallBackToRedirect('auth/popup-closed-by-user'), false);
+        assert.equal(shouldFallBackToRedirect('auth/cancelled-popup-request'), false);
+        assert.equal(shouldFallBackToRedirect('auth/network-request-failed'), false);
+        assert.equal(shouldFallBackToRedirect(undefined), false);
+    });
+});
+
 describe('auth-redirect marker', () => {
     it('reports nothing pending on a fresh storage', () => {
         assert.equal(hasPendingRedirectSignIn(storage), false);
         assert.equal(takePendingRedirectSignIn(storage), null);
-    });
-
-    it('marks a pending redirect with its provider', () => {
-        markPendingRedirectSignIn('github', storage);
-        assert.equal(hasPendingRedirectSignIn(storage), true);
     });
 
     it('has() reads without consuming', () => {

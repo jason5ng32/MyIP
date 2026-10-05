@@ -62,5 +62,4 @@ describe('installAnimationRevival()', () => {
         hooks.afterEach();
         assert.equal(scheduled.length, 3, 'the flag is consumed');
     });
-
 });

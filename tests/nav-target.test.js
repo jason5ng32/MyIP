@@ -1,6 +1,4 @@
-// resolveNavTarget() — what a site-navigation click does on the current route
-// (Nav, mobile nav sheet, page breadcrumb) — and isPlainClick(), which lets a
-// link's modified / non-primary clicks through to the browser.
+// resolveNavTarget() and isPlainClick() (utils/nav-target.js).
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

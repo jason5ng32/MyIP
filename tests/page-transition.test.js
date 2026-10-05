@@ -1,6 +1,5 @@
-// Page transitions: the direction a navigation animates in, the decision to
-// animate at all, and the router hook-up driven by a fake router and a fake
-// View Transitions document.
+// Spec for utils/page-transition.js, the router hook-up driven by a fake
+// router and View Transitions document.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -68,9 +67,7 @@ describe('shouldAnimate()', () => {
     });
 });
 
-// A router stand-in recording the hooks, and a document whose
-// startViewTransition runs the update callback on the next task like a browser
-// does after snapshotting the old page.
+// startViewTransition runs the update on the next task, as a browser does after the snapshot.
 const setup = ({ supported = true, reducedMotion = false, timeoutMs = 1000 } = {}) => {
     const hooks = { beforeResolve: null, afterEach: null, onError: null };
     const router = {

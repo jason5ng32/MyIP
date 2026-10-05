@@ -123,8 +123,6 @@ const store = useMainStore();
 const route = useRoute();
 const { dotClass } = useStatusTone();
 
-// One instance for the whole site (App.vue). The pages other than the
-// homepage skip its loading pipeline, which changes when user info can load;
 // `matched` is empty until the first navigation resolves the route.
 const isOffHome = computed(() => route.matched.length > 0 && route.name !== 'home');
 
@@ -250,12 +248,8 @@ const updateUserAchievement = async (achievementName) => {
     }
 };
 
-// User info loads once the visitor is signed in and, on the homepage, its
-// tests have finished (allHasLoaded); the other pages never run them, so
-// sign-in alone is enough there. Sign-in can land after allHasLoaded (the
-// unknown-auth-hint boot probes in the background, main.js) and auth can
-// resolve before this mounts (immediate). getUserInfo self-guards against
-// double fetches.
+// User info loads once signed in and, on Home, after its tests (allHasLoaded);
+// other pages never run them. getUserInfo self-guards against double fetches.
 watch(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value), (ready) => {
     if (ready) getUserInfo();
 }, { immediate: true });
@@ -264,12 +258,12 @@ watch(() => triggerUserBenefits.value, (newVal) => {
     if (newVal) openUserBenefits();
 });
 
-// The dialog belongs to the page it was opened on: a page change closes it.
+// A page change closes the dialog.
 watch(() => route.path, () => {
     isOpen.value = false;
 });
 
-// One-shot trigger: cleared here so the next request from Nav / Achievements
+// One-shot trigger: cleared here so the next request from UserMenu / Achievements
 // is a fresh false → true edge rather than a no-op write.
 watch(() => triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;

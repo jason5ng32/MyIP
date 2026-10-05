@@ -1,7 +1,5 @@
-// use-route-active.js — the KeepAlive-awareness helpers. Activation itself
-// needs a mounted component tree (covered in the browser); here: the
-// outside-a-component fallback and useActiveValue's hold-while-hidden rule
-// with an injected `active` ref.
+// use-route-active.js: activation itself needs a mounted tree; here the
+// outside-a-component fallback and useActiveValue with an injected `active`.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

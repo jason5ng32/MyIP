@@ -14,10 +14,8 @@
         </header>
 
         <!-- Card groups, one per category (data/tools.js TOOL_CATEGORIES). Each
-             card is a real <a> to the tool's /tools/:slug page, so ⌘/Ctrl-click,
-             middle-click and "open in new tab" stay with the browser; a plain
-             left-click (or Enter / Space) is routed in-app instead, which keeps
-             this page alive behind the tool. -->
+             card is a real <a> to /tools/:slug: modified clicks stay the
+             browser's, a plain click / Enter / Space routes in-app. -->
         <div class="mt-4 space-y-6">
             <div v-for="group in cardGroups" :key="group.id">
                 <h3 class="mb-3 text-sm font-medium tracking-wide text-muted-foreground">
@@ -46,7 +44,6 @@
                                 <span class="jn-emoji" aria-hidden="true">{{ card.emoji }}</span>
                             </CardContent>
                         </a>
-
                     </Card>
                 </div>
             </div>
@@ -64,7 +61,8 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { ADVANCED_TOOLS, groupToolsByCategory } from '@/data/tools.js';
-import { isToolAvailable } from '@/utils/tool-availability.js';
+import { listedTools } from '@/utils/tool-availability.js';
+import { isPlainClick } from '@/utils/nav-target.js';
 import { Card, CardContent } from '@/components/ui/card';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { ArrowRight } from '@lucide/vue';
@@ -81,7 +79,7 @@ const router = useRouter();
 // utils/tool-availability.js). Reactive on configs, so gated cards appear the
 // moment configs land.
 const cardGroups = computed(() => groupToolsByCategory(
-    ADVANCED_TOOLS.filter((tool) => isToolAvailable(tool, configs.value)),
+    listedTools(ADVANCED_TOOLS, configs.value),
 ));
 
 // Open a tool's page. Also the keyboard shortcuts' entry point (exposed below).
@@ -91,10 +89,8 @@ const openTool = (slug) => {
     trackEvent('Nav', 'NavClick', name);
 };
 
-// Card left-click: route in-app. Modifier / middle clicks fall through to the
-// <a href> default so the browser opens the page in a new tab.
 const onCardClick = (e, slug) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    if (!isPlainClick(e)) return;
     e.preventDefault();
     openTool(slug);
 };

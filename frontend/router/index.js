@@ -10,11 +10,6 @@ import { installAnimationRevival } from '@/utils/revive-animations.js';
 //                    cards, nav, shortcuts, in-app links — routes here.
 //   /privacy       → the privacy policy.
 //   /r/:id         → read-only shared diagnostic report (KV-backed, noindex).
-// App.vue keeps the homepage and the tool page alive across navigation, so
-// back / forward between them is plain history that restores both as left.
-// The drawer-era `/?tool=<slug>` links redirect to /tools/<slug>
-// (utils/legacy-tool-link.js). Page changes slide / fade as View Transitions
-// (utils/page-transition.js).
 //
 // Home is imported eagerly (it's the default landing); everything else is
 // lazy so it stays out of the homepage bundle.
@@ -43,17 +38,12 @@ const router = createRouter({
   },
 });
 
-// `/?tool=<slug>` → /tools/<slug> (or `/` for an unknown slug); a page load
-// replaces the entry, so the legacy URL leaves no trace in history. null lets
-// every other navigation through.
+// Legacy `/?tool=<slug>` links → /tools/<slug>, replacing the history entry.
 router.beforeEach((to) => resolveLegacyToolLink(to) ?? undefined);
 
-// Page changes animate as View Transitions (utils/page-transition.js). Hooked
-// here, not in a component, so the guards exist before the first navigation
+// Hooked here, not in a component, so they exist before the first navigation
 // and outlive any page.
 installPageTransitions(router);
-// History steps leave the page's running CSS animations frozen on iOS once
-// the browser's own gesture animation lands — see utils/revive-animations.js.
 installAnimationRevival(router);
 
 export default router;

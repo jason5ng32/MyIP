@@ -2,10 +2,8 @@
 //
 // There's no SSR, so this runs client-side: each routed page (Home.vue, the
 // tool page, /privacy, /r/:id) calls useDocumentMeta() with its own values.
-// Only the page on screen writes: a page kept alive by App.vue's KeepAlive
-// stops writing while hidden and re-applies its head when it is activated
-// again (use-route-active.js) — no restore bookkeeping needed. It's reactive
-// (watchEffect), so locale switches and slug changes re-apply automatically.
+// Only the active route writes, so a kept-alive page re-applies its head on
+// return. Reactive: locale switches and slug changes re-apply automatically.
 //
 // index.html ships sensible homepage defaults (used on first paint and as the
 // fallback here); this just overrides them once Vue is driving the page.
@@ -14,8 +12,7 @@ import { watchEffect } from 'vue';
 import { useRouteActive } from './use-route-active.js';
 
 // Snapshot the index.html-provided values once, before any route overrides
-// them — Home.vue reuses these so SPA-navigating back to `/` restores the
-// homepage head.
+// them: the fallback for fields a page leaves out.
 export const DEFAULT_META = {
     title: document.title,
     description: document.head.querySelector('meta[name="description"]')?.getAttribute('content') || '',

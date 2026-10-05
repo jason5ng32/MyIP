@@ -1,7 +1,6 @@
 <template>
   <!-- Standalone privacy page at /privacy (shareable + crawlable) -->
   <div class="flex min-h-[calc(100dvh_-_3.5rem_-_env(safe-area-inset-top))] flex-col">
-    <!-- Content: the breadcrumb, then the policy -->
     <main class="flex-1 mx-auto w-full max-w-[760px] px-4 md:px-6 py-8">
       <PageBreadcrumb :items="[{ label: t('about.Privacy') }]" />
 

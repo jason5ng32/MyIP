@@ -443,10 +443,8 @@ const changeList = (listName, shouldScroll = true) => {
         if (previousList !== currentList.value) {
             trackEvent('SecurityChecklist', 'SecurityChecklist', 'ChangeList');
         }
-        // Bring the details into view when switching category on a narrow
-        // screen, where they stack below the category list. `scroll-mt-*` on
-        // #checklist keeps them clear of the fixed Nav; on md+ they
-        // sit beside the list with their top on screen, so nothing moves.
+        // On a narrow screen the details stack below the list: bring them into
+        // view, clear of the fixed Nav (scroll-mt-* on #checklist).
         nextTick(() => {
             const el = document.getElementById('checklist');
             if (!el) return;

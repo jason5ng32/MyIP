@@ -3,10 +3,9 @@
      MAC Lookup's job) dispatched to the matching card under ./ip-calculator/.
      Pure local computation via utils/features/ip-calc.js.
 
-     The query rides the URL as `?q=` on /tools/ipcalculator, written back on
-     every run so results are shareable. Two collapsed folds under the input
-     hold example pills (one per accepted syntax) and, once the homepage has
-     detected them, the visitor's own IPs (store.allIPs). -->
+     The query rides the URL as `?q=`, written back on every run so results
+     are shareable. Two collapsed folds under the input hold example pills
+     (one per accepted syntax) and the visitor's own IPs (store.allIPs). -->
 <template>
     <div class="ip-calculator-section my-4 space-y-4">
         <!-- Top note -->
@@ -201,10 +200,8 @@ const onPrefixCommit = (prefix) => {
     syncQuery();
 };
 
-// `?q=` on mount, any later change while the tool is on screen (history
-// navigation), and a `?q=` that changed while it was cached away
-// (use-route-active.js). Our own write-back equals the trimmed input, so it
-// doesn't run twice.
+// Shareable `?q=` (use-route-active.js); our own write-back equals the
+// trimmed input, so it doesn't run twice.
 const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
 watch(sharedQuery, (q) => {
     if (typeof q === 'string' && q.trim() && q !== query.value.trim()) {

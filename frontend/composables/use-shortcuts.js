@@ -18,9 +18,6 @@
 //     through advancedToolsRef.openTool(slug);
 //     test-running keys dispatch commands on utils/app-commands.js
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
-//   - the map is live only while Home is the page on screen: Home stays alive
-//     in App.vue's KeepAlive, so it is cleared on deactivation and rebuilt on
-//     activation (use-route-active.js).
 //   - every entry here is a home-page action. Overlays (Dialog / Sheet /
 //     Drawer) suspend the whole map while they are open — see
 //     utils/shortcut.js — so nothing needs a per-key "is something covering
@@ -53,7 +50,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         toggleInfoMask,
     } = refs;
 
-    // Tool keys open the tool's page (Advanced.vue's openTool pushes the route).
     const goToAdvancedTool = (slug, trackName) => {
         advancedToolsRef.value.openTool(slug);
         trackEvent('Nav', 'NavClick', trackName);
@@ -276,9 +272,8 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     // Suspending the map behind an overlay is the primitives' job
     // (composables/use-overlay-shortcuts.js), so nothing is wired here.
     //
-    // Home is the only route that registers shortcuts; drop them when it is
-    // left (cached away or unmounted), so keystrokes on another page can't
-    // drive the hidden homepage. Coming back rebuilds the map.
+    // Home is the only route that registers shortcuts; the map is cleared
+    // when it is left (cached away or unmounted) and rebuilt on its return.
     let disposed = false;
     let loaded = false;
     const active = useRouteActive();

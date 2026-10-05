@@ -226,8 +226,7 @@ const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 
-// One sheet for the whole site (App.vue), open while store.openSheet says so;
-// App.vue clears that on a page change.
+// One site-wide sheet (App.vue, which closes it on a page change).
 const isOpen = computed(() => store.openSheet === 'preferences');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);

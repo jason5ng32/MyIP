@@ -1,9 +1,5 @@
-// useNavTarget() — carries out a site-navigation click. With an injected
-// route and router: the order of going home and scrolling (the router's own
-// scroll to the top of a pushed page runs after the next tick, so the section
-// scroll must come after that tick and a frame), the plain scroll on the
-// homepage, tool pages, a refused navigation scrolling nothing, and the
-// re-aiming while a freshly mounted homepage resizes.
+// useNavTarget() with an injected route and router: the section scroll must
+// land after the router's own scroll (next tick) and a frame.
 
 import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';

@@ -1,13 +1,8 @@
 <template>
-  <!-- Breadcrumb at the top of a page body, above its <h1>:
-         ← Home / Advanced Tools / 🛂 ASN Profile
-       Markup and classes follow shadcn-vue's Breadcrumb, written out here as
-       ui/ has no breadcrumb copy-in. Every crumb but the last is a real link
-       to / (modified clicks open a new tab); the last is the page itself. -->
+  <!-- Markup and classes follow shadcn-vue's Breadcrumb (ui/ has no copy-in). -->
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
-      <!-- Home: back in history when the homepage is the previous entry
-           (restores it as it was left), a push of / otherwise. -->
+      <!-- Home: back in history when Home is the previous entry, so it returns as left -->
       <li class="inline-flex items-center gap-1.5">
         <a :href="homeHref" class="inline-flex items-center gap-1 transition-colors hover:text-foreground"
           @click="onHome">
@@ -30,10 +25,9 @@
 </template>
 
 <script setup>
-// Page breadcrumb for the pages other than the homepage (tool pages, /privacy,
-// /r/:id). `items` are the crumbs after Home, already localized; the last one
-// is the current page, the others name a homepage section to scroll to
-// (`{ label, section }`, through the same helper as the Nav).
+// Breadcrumb above the <h1> of every page but Home: ← Home / … / current page.
+// `items` are the localized crumbs after Home; the last is the current page,
+// the others `{ label, section }` — a homepage section, reached as the Nav does.
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ArrowLeft } from '@lucide/vue';

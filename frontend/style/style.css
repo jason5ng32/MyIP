@@ -270,15 +270,10 @@ footer {
   max-height: calc(100dvh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
 }
 
-/* Page transitions (utils/page-transition.js) — View Transitions keyed by
-   <html data-page-transition>: "forward" (Home → a page) slides the new page
-   in from the right over the old one, which drifts left and dims; "back" is
-   the mirror, the old page sliding out right over the returning one; "fade"
-   (page → page) cross-fades. The Nav is captured on its own and shown in
-   its new state at once, so only the page below moves; slides blend
-   normally (no plus-lighter brightening where the two pages overlap). The
-   pseudo-elements hang off <html> itself, hence no space before
-   `::view-transition-*`. */
+/* Page transitions (utils/page-transition.js), keyed by <html
+   data-page-transition>: "forward" slides the new page in from the right,
+   "back" mirrors it, "fade" cross-fades. The Nav is captured on its own and
+   shown in its new state at once, so only the page moves. */
 .jn-site-nav {
   view-transition-name: site-nav;
 }
@@ -288,17 +283,13 @@ footer {
 ::view-transition-new(site-nav) {
   animation: none;
 }
-html:not([data-page-transition])::view-transition-old(root),
-html:not([data-page-transition])::view-transition-new(root) {
-  animation: none;
-}
 
 @media (prefers-reduced-motion: no-preference) {
   html[data-page-transition="forward"]::view-transition-old(root),
   html[data-page-transition="forward"]::view-transition-new(root),
   html[data-page-transition="back"]::view-transition-old(root),
   html[data-page-transition="back"]::view-transition-new(root) {
-    mix-blend-mode: normal;
+    mix-blend-mode: normal; /* no plus-lighter brightening where the pages overlap */
     animation-duration: 260ms;
     animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
     animation-fill-mode: both;

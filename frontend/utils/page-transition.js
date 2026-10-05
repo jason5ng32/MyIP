@@ -1,29 +1,17 @@
-// Page transitions: route changes between pages animate like native
-// navigation through the same-document View Transitions API. The browser
-// snapshots the old page, the router swaps the DOM (scroll restoration
-// included) inside the snapshot window, then the two snapshots animate — so
-// pages of different heights and scroll positions never overlap live.
-//
-//   transitionDirection(from, to) → null | 'forward' | 'back' | 'fade'
-//   shouldAnimate({ direction, supported, reducedMotion, inFlight, uaTransition })
-//   installPageTransitions(router)  — registered once in router/index.js
-//
-// The direction lands on <html data-page-transition>, which style/style.css
-// keys its keyframes on; no direction, no support or reduced motion is the
-// plain instant switch.
+// Page transitions: route changes animate through the same-document View
+// Transitions API, keyed by the direction set on <html data-page-transition>
+// (keyframes in style/style.css). The router swaps the DOM, scroll included,
+// inside the snapshot window, so pages of different heights never overlap live.
 
 import { nextTick as vueNextTick } from 'vue';
 
 const HOME = 'home';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-// Upper bound on how long the router may hold the DOM update once the old
-// page is snapshotted; past it the transition finishes whatever its state.
+// Cap on how long the router may hold the DOM update once the old page is snapshotted.
 export const UPDATE_TIMEOUT_MS = 1000;
 
-// Which animation a navigation gets. Nothing animates on the first navigation
-// (the router's START_LOCATION: no name, no matched records) or when only the
-// query / hash changes (a tool writing back its `?q=`). Home → a page slides
-// forward, a page → Home slides back, page → page cross-fades.
+// Nothing animates on the first navigation (the router's START_LOCATION) or a
+// query / hash-only change (a tool writing back its `?q=`).
 export const transitionDirection = (from, to) => {
     if (!from || !to) return null;
     const firstNavigation = from.name === undefined
@@ -34,10 +22,8 @@ export const transitionDirection = (from, to) => {
     return 'fade';
 };
 
-// Whether a navigation starts a view transition. A running one is never
-// stacked on (the caller skips it instead), and a history step the browser
-// already animated itself (iOS swipe-back: `hasUAVisualTransition`) is not
-// animated twice.
+// A running transition is never stacked on, and a history step the browser
+// already animated (iOS swipe-back: `hasUAVisualTransition`) is not animated twice.
 export const shouldAnimate = ({ direction, supported, reducedMotion, inFlight, uaTransition }) =>
     Boolean(direction) && supported === true && !reducedMotion && !inFlight && !uaTransition;
 
@@ -57,8 +43,7 @@ export const installPageTransitions = (router, {
     let endUpdate = null;     // resolves the active transition's update callback
     let uaTransition = false; // the pending history step was animated by the browser
 
-    // Capture phase on the target: runs before the router's own popstate
-    // listener starts the navigation.
+    // Capture phase: runs before the router's own popstate listener.
     win?.addEventListener?.('popstate', (event) => {
         uaTransition = event?.hasUAVisualTransition === true;
     }, { capture: true });
@@ -105,7 +90,6 @@ export const installPageTransitions = (router, {
             // `ready` rejects when the animation is skipped; nothing to report.
             transition.ready?.catch?.(() => {});
             Promise.resolve(transition.finished).catch(() => {}).finally(() => {
-                if (active !== transition) return;
                 active = null;
                 delete root.dataset.pageTransition;
             });

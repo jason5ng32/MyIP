@@ -1,11 +1,8 @@
 // Which Firebase auth domain this session signs in through, and which
-// providers that leaves usable.
-// The default domain (VITE_FIREBASE_AUTH_DOMAIN) is a login host shared with
-// other services, so browsers keep it. The installed PWA needs the auth
-// handler on the site's own origin (served by the /__/auth proxy) for the
-// redirect result to survive, so it may use VITE_FIREBASE_PWA_AUTH_DOMAIN
-// instead. GitHub's OAuth App allows a single callback URL, on the default
-// domain — a PWA on a different domain can only offer Google.
+// providers that leaves: browsers keep the shared default, the installed PWA
+// may use VITE_FIREBASE_PWA_AUTH_DOMAIN (why: api/AGENTS.md "Firebase Auth
+// handler proxy"). GitHub's single callback URL is on the default domain, so a
+// PWA on another domain offers only Google.
 
 const ALL_PROVIDERS = ['google', 'github'];
 const DEFAULT_DOMAIN_ONLY = new Set(['github']);

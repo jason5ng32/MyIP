@@ -268,10 +268,9 @@ export default defineConfig({
     port: frontEndPort,
     proxy: {
       '/api': `http://localhost:${backEndPort}`,
-      // Firebase Auth handler on the dev origin, as frontend-server.js does in
-      // production; only with VITE_FIREBASE_PROJECT_ID set
+      // Firebase Auth handler, as frontend-server.js serves it in production
       ...(firebaseAuthTarget && {
-        [FIREBASE_AUTH_PROXY_PATH]: { target: firebaseAuthTarget, changeOrigin: true, secure: true },
+        [FIREBASE_AUTH_PROXY_PATH]: { target: firebaseAuthTarget, changeOrigin: true },
       }),
     },
     allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],

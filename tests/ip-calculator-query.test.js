@@ -10,8 +10,8 @@ import { useActiveValue } from '../frontend/composables/use-route-active.js';
 const source = readFileSync(new URL('../frontend/components/advanced-tools/IpCalculator.vue', import.meta.url), 'utf8');
 const script = parse(source).descriptor.scriptSetup.content.replace(/^import[\s\S]*?;$/gm, '');
 // `active` stands in for the page's KeepAlive state (use-route-active.js).
-const fixture = (q, drawer = false, active = ref(true)) => {
-    const route = reactive({ path: '/tools/ipcalculator', query: { q, hl: 'en', ...(drawer ? { tool: 'ipcalculator' } : {}) } });
+const fixture = (q, active = ref(true)) => {
+    const route = reactive({ path: '/tools/ipcalculator', query: { q, hl: 'en' } });
     const replacements = [];
     const bindings = {
         computed, ref, watch, analyzeCidr, calculate,
@@ -35,24 +35,22 @@ for (const [input, prefix, expected] of [
     ['2001:db8::1/64', 128, '2001:db8::1/128'],
 ]) {
     test(`prefix commit preserves the host in the share URL: ${input}`, () => {
-        for (const drawer of [false, true]) {
-            const run = fixture(input, drawer);
-            const split = run.result.value.analysis.split;
-            run.picked.value = input;
-            run.onPrefix(prefix);
-            assert.equal(run.query.value, input, 'dragging leaves the input and URL untouched');
-            assert.equal(run.replacements.length, 0);
-            assert.equal(run.result.value.analysis.split, split, 'dragging preserves the subnet list');
-            run.onPrefixCommit(prefix);
-            assert.equal(run.query.value, expected);
-            assert.deepEqual(run.route.query, { q: expected, hl: 'en', ...(drawer ? { tool: 'ipcalculator' } : {}) });
-            assert.equal(run.replacements.length, 1);
-            assert.equal(run.picked.value, '');
-            assert.deepEqual(calculate(run.route.query.q).analysis.cidr, run.result.value.analysis.cidr);
-            assert.equal(run.result.value.analysis.split, run.result.value.analysis.cidr);
-            run.onPrefixCommit(prefix);
-            assert.equal(run.replacements.length, 1, 'an unchanged prefix does not replace the URL again');
-        }
+        const run = fixture(input);
+        const split = run.result.value.analysis.split;
+        run.picked.value = input;
+        run.onPrefix(prefix);
+        assert.equal(run.query.value, input, 'dragging leaves the input and URL untouched');
+        assert.equal(run.replacements.length, 0);
+        assert.equal(run.result.value.analysis.split, split, 'dragging preserves the subnet list');
+        run.onPrefixCommit(prefix);
+        assert.equal(run.query.value, expected);
+        assert.deepEqual(run.route.query, { q: expected, hl: 'en' });
+        assert.equal(run.replacements.length, 1);
+        assert.equal(run.picked.value, '');
+        assert.deepEqual(calculate(run.route.query.q).analysis.cidr, run.result.value.analysis.cidr);
+        assert.equal(run.result.value.analysis.split, run.result.value.analysis.cidr);
+        run.onPrefixCommit(prefix);
+        assert.equal(run.replacements.length, 1, 'an unchanged prefix does not replace the URL again');
     });
 }
 
@@ -67,25 +65,22 @@ test('a prefix commit without an address result leaves the URL alone', () => {
 
 test('?q= runs on mount, follows the route while active, and is ignored while cached away', async () => {
     const active = ref(true);
-    const run = fixture('10.0.0.0/22', false, active);
+    const run = fixture('10.0.0.0/22', active);
     assert.equal(run.query.value, '10.0.0.0/22');
     assert.equal(run.result.value.analysis.cidr.prefix, 22);
 
-    // Navigating to another tool changes the route before this one is
-    // deactivated: the path already tells it the query isn't its own.
+    // The route changes before this page is deactivated; the path tells them apart.
     run.route.path = '/tools/asn';
     run.route.query = { q: 'AS13335' };
     await nextTick();
     assert.equal(run.query.value, '10.0.0.0/22', 'another path\'s ?q= is ignored');
 
-    // Another page rewrites ?q= while the calculator is cached.
     active.value = false;
     run.route.query = { q: 'AS15169' };
     await nextTick();
     assert.equal(run.query.value, '10.0.0.0/22', 'a hidden tool ignores the route');
     assert.equal(run.result.value.analysis.cidr.prefix, 22);
 
-    // Coming back to the same URL keeps an unsubmitted draft.
     run.route.path = '/tools/ipcalculator';
     run.route.query = { q: '10.0.0.0/22' };
     run.query.value = '192.0.2.';
@@ -93,7 +88,6 @@ test('?q= runs on mount, follows the route while active, and is ignored while ca
     await nextTick();
     assert.equal(run.query.value, '192.0.2.', 'an unchanged ?q= does not overwrite the input');
 
-    // A different ?q= on arrival runs.
     active.value = false;
     run.route.query = { q: '192.0.2.0/24' };
     active.value = true;

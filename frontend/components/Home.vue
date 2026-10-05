@@ -23,14 +23,12 @@
 </template>
 
 <script setup>
-// The homepage. Holds every top-level section plus the Advanced Tools cards;
-// this component is what /'s <router-view> renders. What every route shares
-// (the Nav, the account and preferences dialogs, tooltip provider, toast, PWA,
-// theme) lives in App.vue.
+// The homepage (`/`): every top-level section plus the Advanced Tools cards;
+// what every route shares lives in App.vue.
 //
 // Components — the test sections and the always-visible chrome load
-// synchronously; everything the first paint can't show (dialogs, drawers,
-// the below-fold Additional/Footer) is an async component so its code stays
+// synchronously; everything the first paint can't show (dialogs, the
+// below-fold Additional/Footer) is an async component so its code stays
 // out of the route chunk and out of the mount's critical path. Their
 // template refs are null until the chunk lands — consumers (use-shortcuts)
 // must optional-chain.
@@ -108,8 +106,7 @@ useSectionTracking();
 // Localized homepage head. Provide title/description explicitly via t() rather
 // than leaning on use-document-meta's DEFAULT_META snapshot: that snapshot is
 // taken at module load, before the (now async) locale messages land, so it would
-// pin the head to index.html's English title. Home is kept alive, so coming
-// back from another page re-applies this head on activation.
+// pin the head to index.html's English title.
 useDocumentMeta(() => ({
     title: t('page.title'),
     description: t('page.description'),

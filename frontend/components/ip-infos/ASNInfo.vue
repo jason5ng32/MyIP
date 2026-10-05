@@ -27,8 +27,7 @@
             <!-- Traffic shares (pair bars) -->
             <AsnTrafficShares :info="asnInfos[asn]" />
 
-            <!-- Full profile: a real link to the ASN Profile page (new tab on
-                 modifier clicks); a plain click routes in-app -->
+            <!-- Full profile: a real link; a plain click routes in-app -->
             <div v-if="profileHref" class="pt-1">
                 <Button as-child variant="outline" size="sm" class="h-7 cursor-pointer gap-1.5 text-xs">
                     <a :href="profileHref" @click="openProfile">
@@ -58,6 +57,7 @@ import { trackEvent } from '@/utils/analytics';
 import { parseAsnInput } from '@/utils/ip/asn-input.js';
 import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { isPlainClick } from '@/utils/nav-target.js';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import { ArrowUpRight } from '@lucide/vue';
@@ -75,8 +75,7 @@ const props = defineProps({
     asnInfos: { type: Object, required: true }
 });
 
-// Fired before a plain-click open, so a host dialog (QueryIP) closes before
-// the page changes under it.
+// Fired before a plain-click open, so a host dialog (QueryIP) closes first.
 const emit = defineEmits(['open-profile']);
 
 // Extract basic information (non-pair data)
@@ -94,8 +93,7 @@ const basicInfo = computed(() => {
 });
 
 // ASN Profile entry: hidden when the tool is gated off (no Cloudflare key)
-// or the ASN doesn't parse. Opens like an Advanced Tools card: the tool's
-// page, with `q` making the tool run the lookup.
+// or the ASN doesn't parse; `q` makes the tool run the lookup.
 const router = useRouter();
 const profileAsn = computed(() => {
     if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.configs)) return null;
@@ -105,7 +103,7 @@ const profileAsn = computed(() => {
 const profileHref = computed(() => (profileAsn.value ? `/tools/asn?q=${profileAsn.value}` : ''));
 
 const openProfile = (e) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    if (!isPlainClick(e)) return;
     e.preventDefault();
     trackEvent('IPCheck', 'ASNProfileClick', 'Open ASN Profile');
     emit('open-profile');

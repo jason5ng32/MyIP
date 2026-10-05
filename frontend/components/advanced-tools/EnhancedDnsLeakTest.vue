@@ -33,7 +33,7 @@
             <span>
                 {{ t('user.QuotaExceeded') }}
                 <button type="button" class="underline underline-offset-2 cursor-pointer"
-                    @click="openUsageDialog">{{ t('user.ViewUsage') }}</button>
+                    @click="store.setTriggerUserBenefits(true)">{{ t('user.ViewUsage') }}</button>
             </span>
         </div>
 
@@ -294,11 +294,6 @@ import { Play, Check, X, Hourglass, Info, Server, Hash, Route, MapPin, ShieldChe
 const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
-
-// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
-const openUsageDialog = () => {
-    store.setTriggerUserBenefits(true);
-};
 
 // NS-capture session config. Token + probe FQDNs are generated client-side;
 // the NS passively captures any {nonce}.{token}.{DOMAIN} that shows up.

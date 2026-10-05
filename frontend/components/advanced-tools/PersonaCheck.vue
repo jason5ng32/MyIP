@@ -233,7 +233,7 @@
                                     <span>
                                         {{ t('user.QuotaExceeded') }}
                                         <button type="button" class="underline underline-offset-2 cursor-pointer"
-                                            @click="openUsageDialog">{{ t('user.ViewUsage') }}</button>
+                                            @click="store.setTriggerUserBenefits(true)">{{ t('user.ViewUsage') }}</button>
                                     </span>
                                 </div>
                             </div>
@@ -383,11 +383,8 @@ const runDependencies = async () => {
     if (!missing.length) return;
     runningDependencies.value = true;
     try {
-        // The owners are the homepage sections, registered while Home is
-        // mounted — kept alive behind this page once it has been visited, so
-        // the tests run in place and report back over the app-events bus.
-        // On a direct visit Home has never mounted: go home first, then wait
-        // for each command to be registered before dispatching.
+        // The owners are homepage sections: a cached Home runs them in place;
+        // one that never mounted (direct visit) needs a trip home first.
         const commands = missing.map((source) => DEPENDENCY_COMMANDS[source]);
         if (!commands.every(hasAppCommand)) await router.push('/');
         await Promise.allSettled(commands.map(async (command) => {
@@ -409,11 +406,6 @@ const quotaExceeded = ref(false);
 // test run — the run button is the rail's own summary of the three zones.
 const canRun = computed(() =>
     signedIn.value && hasProfile.value && !missingSources.value.length);
-
-// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
-const openUsageDialog = () => {
-    store.setTriggerUserBenefits(true);
-};
 
 const run = async () => {
     // Pre-flight gate, same as the other quota-metered tools: when the local

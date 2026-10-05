@@ -6,9 +6,7 @@
             <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>
         </div>
 
-        <!-- Input area. With stored IPs (the homepage's IP cards have run) the
-             user can pick one OR switch to manual entry; on a direct visit to
-             the tool's page allIPs is empty, so it's manual entry only. -->
+        <!-- Input area -->
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
                 <Label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="font-medium">
@@ -207,9 +205,8 @@ const pickerSections = computed(() => [
     { key: 'suggested', label: t('globalping.Suggested'), countries: GLOBALPING_SUGGESTED_COUNTRIES },
 ]);
 
-// Manual entry is forced when there are no stored IPs (the standalone page,
-// where the homepage never ran). When stored IPs exist, the "use stored IP"
-// switch (on by default) toggles between the dropdown and manual entry.
+// Manual entry is forced when no IPs are stored (the homepage never ran);
+// otherwise the switch (on by default) picks between dropdown and typing.
 const useStored = ref(true);
 const manualMode = computed(() => allIPs.value.length === 0 || !useStored.value);
 const manualIP = ref('');

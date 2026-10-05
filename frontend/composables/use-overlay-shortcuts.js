@@ -8,10 +8,8 @@
 // Sync flush on purpose: a keystroke arriving in the same tick as the open
 // flip must already see the overlay.
 //
-// Overlays on a page kept alive by a KeepAlive (App.vue / ToolPage.vue) are
-// asked to close when that page is left: their portal sits in <body>, outside
-// the cached page, so an open one would otherwise stay on screen — scroll lock
-// and all — over the next page. Only an overlay on the page on screen counts.
+// An overlay on a kept-alive page counts only while that page is on screen, and
+// is closed when the page is left: its <body> portal would outlive it.
 
 import { getCurrentInstance, getCurrentScope, onDeactivated, onScopeDispose, toValue, watch } from 'vue';
 import { openOverlay, closeOverlay } from '@/utils/shortcut.js';

@@ -1,8 +1,6 @@
 <template>
-  <!-- The iOS status bar is opaque system chrome (index.html sets no
-       apple-mobile-web-app-status-bar-style), so the safe-area inset is only
-       non-zero where the page really runs under it (landscape notch edges).
-       The header stays put through page transitions (jn-site-nav in style.css). -->
+  <!-- The iOS status bar is opaque (no apple-mobile-web-app-status-bar-style), so the
+       inset is non-zero only on landscape notch edges. jn-site-nav: see style.css. -->
   <header
     class="jn-site-nav fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
@@ -59,8 +57,7 @@
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-          <!-- All other sections: scroll there (from home first off the
-               homepage — utils/nav-target.js). -->
+          <!-- All other sections -->
           <a v-else href="#" :class="navLinkClass(item)" @click.prevent="goToSection(item)">
             {{ t(`nav.${item}`) }}
           </a>
@@ -146,10 +143,8 @@
 </template>
 
 <script setup>
-// The site navigation bar, rendered once by App.vue above every route. Its
-// entries act per route (utils/nav-target.js): a section link scrolls the
-// homepage, or goes home first from any other page; a tool entry opens the
-// tool's page.
+// The site navigation bar, rendered once by App.vue above every route; what a
+// section or tool entry does on the current route is utils/nav-target.js.
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
@@ -190,14 +185,13 @@ const { navigateTo } = useNavTarget();
 
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
-// Off the homepage no section is current (its tracker runs on Home only, so
-// store.currentSection keeps the last one seen there).
+// store.currentSection keeps Home's last section, so it's ignored elsewhere.
 const isHome = computed(() => route.name === 'home');
 const currentSection = computed(() => (isHome.value ? store.currentSection : null));
 const currentToolSlug = computed(() => (route.name === 'tool' ? String(route.params.slug) : ''));
 const homeHref = router.resolve('/').href;
 const loaded = computed(() => store.allHasLoaded);
-// The brand shimmers while the homepage tests run; the other pages run none.
+// The brand shimmers while the homepage tests run.
 const shimmer = computed(() => isHome.value && !loaded.value);
 
 // Running as an installed PWA (chromeless window) — see utils/pwa.js.
@@ -205,8 +199,7 @@ const isPwa = isRunningAsPwa();
 
 const navItems = SECTION_IDS;
 
-// Tools shown in the nav, mirroring Advanced.vue's enabledCards: gated tools
-// stay hidden where the deployment lacks them. Reactive on configs.
+// Gated tools stay hidden where the deployment lacks them, as in the card grid.
 const configs = computed(() => store.configs);
 const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, configs.value));
 
@@ -259,8 +252,7 @@ const handleLogoClick = (e) => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// Section and tool entries close the mobile nav Sheet first (a no-op on
-// desktop) so it isn't left open over where they land.
+// Section and tool entries close the mobile nav Sheet first (no-op on desktop).
 const goToSection = (section) => {
   store.setOpenSheet(null);
   navigateTo({ section });
@@ -305,8 +297,7 @@ const onScroll = () => {
   });
 };
 
-// The listener runs on mobile only, on every route; attaching resyncs
-// lastScrollY so the first scroll isn't a phantom jump.
+// Mobile only; attaching resyncs lastScrollY so the first scroll isn't a phantom jump.
 const setScrollListener = (on) => {
   if (on) {
     lastScrollY = window.scrollY;
@@ -319,12 +310,9 @@ const setScrollListener = (on) => {
 watch(isMobile, (mobile) => {
   if (!mobile) isNavHidden.value = false;
   setScrollListener(mobile);
-});
+}, { immediate: true });
 
-onMounted(() => {
-  if (isMobile.value) setScrollListener(true);
-  fetchGithubStars();
-});
+onMounted(fetchGithubStars);
 
 onBeforeUnmount(() => {
   setScrollListener(false);

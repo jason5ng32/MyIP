@@ -1,9 +1,20 @@
-// Pending-redirect sign-in marker: set right before signInWithRedirect leaves
-// the page, consumed at boot so only a return from the provider pays for
+// Redirect sign-in: when it replaces the popup, and the pending marker boot
+// uses to finish it. The installed PWA has no popup with a usable `opener`, so
+// it always redirects; a browser tab falls back to it only when the popup
+// can't open. The marker is set right before signInWithRedirect leaves the
+// page and consumed at boot, so only a return from the provider pays for
 // loading Firebase and calling getRedirectResult. sessionStorage-scoped — the
 // redirect comes back into the same tab / PWA webview. Value = provider key
 // ('google' / 'github'), for the error copy.
 const PENDING_REDIRECT_KEY = 'pendingRedirectSignIn';
+
+// Popup rejections meaning "no popups here", not the visitor closing one.
+const REDIRECT_FALLBACK_CODES = new Set([
+    'auth/popup-blocked',
+    'auth/operation-not-supported-in-this-environment',
+]);
+
+export const shouldFallBackToRedirect = (errorCode) => REDIRECT_FALLBACK_CODES.has(errorCode);
 
 const defaultStorage = () => {
     try {
