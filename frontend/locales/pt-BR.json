@@ -862,6 +862,11 @@
     "BackToHome": "Voltar para o início",
     "Title": "Ferramentas avançadas",
     "Note": "Quem exige o máximo da qualidade da rede costuma usar mais ferramentas para otimizar a própria conexão.",
+    "category": {
+      "network": "Diagnóstico de rede",
+      "lookup": "Consulta e cálculo",
+      "deep": "Verificações aprofundadas"
+    },
     "PingTestNote": "Faça ping no seu IP a partir de vários pontos do mundo",
     "MTRTestNote": "Trace sua rota de rede a partir de vários pontos do mundo",
     "DNSResolverNote": "Resolução DNS multicanal em tempo real",

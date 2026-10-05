@@ -862,6 +862,11 @@
     "BackToHome": "Back to Home",
     "Title": "Advanced Tools",
     "Note": "People who want the very best from their network usually reach for extra tools to fine-tune their connection.",
+    "category": {
+      "network": "Network Diagnostics",
+      "lookup": "Lookup & Calculation",
+      "deep": "In-depth Checks"
+    },
     "PingTestNote": "Ping your IP from around the world",
     "MTRTestNote": "Trace your network route from around the world",
     "DNSResolverNote": "Real-time multi-channel DNS resolution",

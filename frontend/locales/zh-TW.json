@@ -862,6 +862,11 @@
     "BackToHome": "回到首頁",
     "Title": "進階工具",
     "Note": "對網路品質追求極致的人，往往會使用更多工具來最佳化自己的網路連線。",
+    "category": {
+      "network": "網路診斷",
+      "lookup": "查詢與計算",
+      "deep": "深度檢測"
+    },
     "PingTestNote": "從世界各地 ping 你的 IP",
     "MTRTestNote": "從世界各地追蹤你的網路路由",
     "DNSResolverNote": "即時多渠道 DNS 解析",
