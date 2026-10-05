@@ -10,7 +10,11 @@
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Jason Ng" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- No apple-mobile-web-app-status-bar-style: the default keeps the iOS
+       status bar as opaque system chrome above the web view. A translucent
+       one lets the page run under the status bar, and since iOS 26 the system
+       then draws its Liquid Glass scroll-edge blur over the top of the
+       installed app, across the Nav. -->
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
   <meta name="background-color" content="#ffffff" />
@@ -111,10 +115,10 @@
     }
 
     /* Reserve space at the top of the body for: (a) the iOS safe-area
-       inset (the Nav sits below it; Nav.vue paints the strip), and (b) the
-       fixed Nav that App.vue renders above every route (3.5rem = h-14 in
-       Nav.vue). Being `fixed`, the Nav stays put while the body
-       rubber-bands on iOS, and takes no flow height of its own. */
+       inset (the Nav sits below it), and (b) the fixed Nav that App.vue
+       renders above every route (3.5rem = h-14 in Nav.vue). Being `fixed`,
+       the Nav stays put while the body rubber-bands on iOS, and takes no
+       flow height of its own. */
     body {
       padding-top: calc(env(safe-area-inset-top) + 3.5rem);
     }
