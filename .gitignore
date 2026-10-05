@@ -33,36 +33,10 @@ localtest
 
 .VSCodeCounter
 
-common/maxmind-db/.maxmind-update-*.json
-common/maxmind-db/.maxmind-update.lock
-common/maxmind-db/*.bak
-common/maxmind-db/*.next
-common/maxmind-db/*.mmdb
-
-# CAIDA datasets — Non-Commercial license, don't commit to public repo.
-common/as-org-db/*.txt
-common/as-rel-db/*.txt
-common/as-org-db/.caida-update-state.json
-common/as-rel-db/.caida-update-state.json
-common/as-org-db/.caida-update.lock
-common/as-rel-db/.caida-update.lock
-common/as-org-db/*.bak
-common/as-rel-db/*.bak
-common/as-org-db/*.next
-common/as-rel-db/*.next
-common/peeringdb-db/*.json
-common/peeringdb-db/.caida-update-state.json
-common/peeringdb-db/.caida-update.lock
-common/peeringdb-db/*.bak
-common/peeringdb-db/*.next
-# IEEE MAC registries — downloaded at boot, refreshed daily.
-common/oui-db/*.csv
-common/oui-db/*.bak
-common/oui-db/*.next
-# Dataset updater (common/dataset-updater.js): state (+ its atomic-write
-# temp files) and the lock directory, in every dataset directory.
-common/*-db/.dataset-state.json*
-common/*-db/.dataset.lock
+# Offline datasets (common/datasets.js): every common/<name>-db/ directory
+# holds only downloaded data, its state and lock — created at runtime, never
+# committed (CAIDA's data is under a non-commercial license).
+common/*-db/
 .learnings/
 docs/
 .plan/
