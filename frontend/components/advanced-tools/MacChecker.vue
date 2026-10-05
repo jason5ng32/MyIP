@@ -18,7 +18,7 @@
                     :placeholder="t('macchecker.Placeholder')"
                     v-model="queryMAC" @keyup.enter="onSubmit" :aria-invalid="errorMsg !== ''" />
                 <Button variant="action"
-                    :disabled="macCheckStatus === 'running' || !queryMAC"
+                    :disabled="macCheckStatus === 'running' || !queryMAC.trim()"
                     @click="onSubmit" class="cursor-pointer">
                     <Spinner v-if="macCheckStatus === 'running'" />
                     <template v-else>
@@ -178,11 +178,12 @@ const validateInput = (input) => {
 };
 
 const onSubmit = () => {
-    const raw = queryMAC.value.trim();
-    if (!raw) return;
-    trackEvent('Section', 'StartClick', 'MACChecker');
     errorMsg.value = '';
     macCheckResult.value = {};
+    const raw = queryMAC.value.trim();
+    // Empty input (Enter in a cleared field) just clears the last answer.
+    if (!raw) return;
+    trackEvent('Section', 'StartClick', 'MACChecker');
     picked.value = EXAMPLES.some((e) => e.input === raw) ? raw : '';
     const query = validateInput(raw);
     if (query) getMacInfo(query);
