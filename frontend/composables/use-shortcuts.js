@@ -14,7 +14,8 @@
 //     Config-gated keys fill in reactively when /api/configs lands
 //
 // Note:
-//   - scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug);
+//   - section keys scroll with scrollToElement; tool keys open the tool's page
+//     through advancedToolsRef.openTool(slug);
 //     test-running keys dispatch commands on utils/app-commands.js
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
 //   - the map is live only while Home is the page on screen: Home stays alive
@@ -52,8 +53,8 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         toggleInfoMask,
     } = refs;
 
+    // Tool keys open the tool's page (Advanced.vue's openTool pushes the route).
     const goToAdvancedTool = (slug, trackName) => {
-        scrollToElement('AdvancedTools', 80);
         advancedToolsRef.value.openTool(slug);
         trackEvent('Nav', 'NavClick', trackName);
     };

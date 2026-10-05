@@ -12,7 +12,7 @@ describe('resolveBackTarget()', () => {
     });
 
     it('treats a homepage entry with a query or hash as the homepage', () => {
-        assert.equal(resolveBackTarget({ back: '/?tool=whois' }), 'back');
+        assert.equal(resolveBackTarget({ back: '/?utm_source=x' }), 'back');
         assert.equal(resolveBackTarget({ back: '/#AdvancedTools' }), 'back');
     });
 

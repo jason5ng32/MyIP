@@ -27,8 +27,8 @@
             <!-- Traffic shares (pair bars) -->
             <AsnTrafficShares :info="asnInfos[asn]" />
 
-            <!-- Full profile: a real link to the standalone page (new tab on
-                 modifier clicks); a plain click opens the drawer instead -->
+            <!-- Full profile: a real link to the ASN Profile page (new tab on
+                 modifier clicks); a plain click routes in-app -->
             <div v-if="profileHref" class="pt-1">
                 <Button as-child variant="outline" size="sm" class="h-7 cursor-pointer gap-1.5 text-xs">
                     <a :href="profileHref" @click="openProfile">
@@ -75,8 +75,8 @@ const props = defineProps({
     asnInfos: { type: Object, required: true }
 });
 
-// Fired before a plain-click open, so a host dialog (QueryIP) can close
-// first instead of stacking under the drawer.
+// Fired before a plain-click open, so a host dialog (QueryIP) closes before
+// the page changes under it.
 const emit = defineEmits(['open-profile']);
 
 // Extract basic information (non-pair data)
@@ -94,8 +94,8 @@ const basicInfo = computed(() => {
 });
 
 // ASN Profile entry: hidden when the tool is gated off (no Cloudflare key)
-// or the ASN doesn't parse. Opens like an Advanced Tools card: the `?tool=`
-// drawer, with `q` making the tool run the lookup on mount.
+// or the ASN doesn't parse. Opens like an Advanced Tools card: the tool's
+// page, with `q` making the tool run the lookup.
 const router = useRouter();
 const profileAsn = computed(() => {
     if (!isToolAvailable(TOOL_BY_SLUG.get('asn'), store.configs)) return null;
@@ -109,6 +109,6 @@ const openProfile = (e) => {
     e.preventDefault();
     trackEvent('IPCheck', 'ASNProfileClick', 'Open ASN Profile');
     emit('open-profile');
-    router.push({ path: '/', query: { tool: 'asn', q: profileAsn.value } });
+    router.push({ path: '/tools/asn', query: { q: profileAsn.value } });
 };
 </script>

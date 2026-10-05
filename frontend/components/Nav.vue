@@ -92,7 +92,7 @@
       </div>
     </nav>
 
-    <!-- Mobile navigation drawer. Flex column so the link list scrolls instead
+    <!-- Mobile navigation sheet. Flex column so the link list scrolls instead
          of clipping on short screens when Advanced Tools is expanded. -->
     <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
       <SheetContent side="left" class="w-80 p-0 flex flex-col gap-0" :title="t('nav.Navigation')">
@@ -251,19 +251,11 @@ const scrollToSection = (el, offset = 70) => {
   window.scrollTo({ top: y, behavior: 'smooth' });
 };
 
-// Open a tool from the nav: scroll to the Advanced Tools section, then raise the
-// drawer (driven by the `?tool=` query Advanced.vue watches). Scrolls twice — the
-// mobile nav Sheet locks body scroll until it closes, so the first scroll is a
-// no-op there and the deferred one lands after the Sheet is gone.
-let openToolTimer = null;
+// Open a tool's page from the nav, closing the mobile nav Sheet first (a
+// no-op on desktop) so it isn't left open behind the tool.
 const openTool = (slug) => {
-  store.setOpenSheet(null);            // close the mobile nav Sheet (no-op on desktop)
-  scrollToSection('AdvancedTools');
-  clearTimeout(openToolTimer);
-  openToolTimer = setTimeout(() => {
-    scrollToSection('AdvancedTools');
-    router.push({ path: '/', query: { tool: slug } });
-  }, 300);
+  store.setOpenSheet(null);
+  router.push(`/tools/${slug}`);
   const name = slug.charAt(0).toUpperCase() + slug.slice(1);
   trackEvent('Nav', 'NavClick', name);
 };
@@ -286,7 +278,7 @@ const onScroll = () => {
     if (y <= SHOW_AT_TOP) {
       isNavHidden.value = false;
     } else if (Math.abs(dy) > SCROLL_DELTA) {
-      // Keep nav visible while the menu drawer is open so its close
+      // Keep nav visible while the menu sheet is open so its close
       // affordance stays in place.
       if (dy > 0 && !isNavMenuOpen.value) {
         isNavHidden.value = true;
@@ -325,7 +317,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   setScrollListener(false);
-  clearTimeout(openToolTimer);
 });
 </script>
 

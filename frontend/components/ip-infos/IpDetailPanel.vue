@@ -384,9 +384,9 @@ const props = defineProps({
 });
 
 // Consumers rendering this panel inside a dialog listen to close themselves
-// first — the Benefits & Usage dialog (`view-usage`) or an Advanced Tools
-// drawer (`open-tool`, from ASN Info's profile link) would otherwise stack
-// on top of them.
+// first — before the Benefits & Usage dialog would stack on top of them
+// (`view-usage`), or the ASN Profile page replaces the page under them
+// (`open-tool`, from ASN Info's profile link).
 const emit = defineEmits(['view-usage', 'open-tool']);
 
 const openUsageDialog = () => {

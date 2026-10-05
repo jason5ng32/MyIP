@@ -15,7 +15,7 @@ frontend/
 ├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
 ├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
-├── data/            ← static config (tools registry drives router+cards+drawer)
+├── data/            ← static config (tools registry drives pages+cards+menus)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
 └── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ ui/
 ```
@@ -60,12 +60,32 @@ reserved `auth` / `quota` / `input` (the bus adds `unavailable` / `timeout`).
 Cross-component triggers use the bus, never template refs (refs stay for UI
 chrome); tools register at setup, callers `waitForAppCommand` first.
 
-### Advanced Tools gates decide listing only
+### Advanced Tools are pages, kept alive
 
-`data/tools.js` gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`,
-e.g. `asn` → `cloudFlare`) are read only via `isToolAvailable()` /
-`listedTools()`, by the card grid, the nav and `ToolsMenu`; deep links
-(`?tool=`, `/tools/:slug`) are never gated.
+- Every tool is a page at `/tools/:slug` (`ToolPage.vue` over the
+  `data/tools.js` registry), and every opener routes there: cards are real
+  `<a href>` (a plain click `router.push`es, modifier clicks stay the
+  browser's), Nav, `ToolsMenu`, shortcuts (`Advanced.vue`'s exposed
+  `openTool`), in-app links. `/?tool=<slug>` survives only as a replace-redirect
+  in the router's `beforeEach` (`utils/legacy-tool-link.js`). No tool opens as
+  an overlay.
+- Gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`, e.g. `asn` →
+  `cloudFlare`) decide listing only, via `isToolAvailable()` / `listedTools()`
+  (card grid, Nav, `ToolsMenu`); a `/tools/:slug` link is never gated.
+- `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
+  to 8 tools alive per slug, dropped on sign-out / account switch
+  (`utils/tool-cache.js`). Back / forward is plain history; the header's back
+  steps back when the previous entry is Home (`utils/back-target.js`), so Home
+  returns as left, scroll included.
+- A cached page never unmounts, so whatever acts on the route, the document
+  head, window events or the store's one-shot triggers gates on
+  `use-route-active.js` (`useRouteActive` / `useActiveValue` /
+  `useActiveEventListener`), not on mount / unmount. Overlays on a page being
+  left are closed by `use-overlay-shortcuts.js` — their portal would outlive it.
+- Homepage state reaches a tool page through the store, the app-events
+  collectors and the command bus: a cached Home keeps its commands registered,
+  so a caller dispatches in place and goes home first only when
+  `hasAppCommand()` says Home never mounted (Persona Check).
 
 ### ASN Profile
 
@@ -86,16 +106,6 @@ One dispatcher (`utils/shortcut.js`) over the map `use-shortcuts.js` registers
 suspended while an overlay is open — keyed off form: the `ui/` roots `Dialog` /
 `Sheet` / `Drawer` call `use-overlay-shortcuts.js`, so anything built on them
 inherits it; overlays nest; Esc and native scrolling still work.
-
-### Kept-alive pages pause while hidden
-
-`App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up to
-8 tools alive per slug, dropped on sign-out / account switch
-(`utils/tool-cache.js`). A cached page never unmounts, so whatever acts on the
-route, the document head, window events or the store's one-shot triggers gates
-on `use-route-active.js` (`useRouteActive` / `useActiveValue` /
-`useActiveEventListener`), not on mount / unmount. Overlays on a page being left
-are closed by `use-overlay-shortcuts.js` — their portal would outlive it.
 
 ### Error monitoring (Sentry) is env-gated and invisible to app code
 
@@ -149,7 +159,8 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Shareable tool input** — watch `useActiveValue(() => route.query.q, {
   pathOf: () => route.path })` (immediate, so mount, later changes and a `q`
   changed while cached all run; another page's `q` never does), `router.replace`
-  it on every run (AsnProfile); both `/tools/` and `?tool=` URLs.
+  it on every run (AsnProfile); the URL is `/tools/<slug>?q=`, which a legacy
+  `/?tool=<slug>&q=` redirects to with `q` kept.
 - **Fixed option sets** — a closed list wider than one line is a `Select`.
 - **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
   Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.
@@ -162,8 +173,9 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   the page on screen.
 - **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
   `hidden sm:flex` never shows: write `max-sm:hidden`.
-- **Drawer vs Sheet** — bottom Drawer for Advanced Tools and full-bleed
-  expansions of an inline visual; side panels use `Sheet`.
+- **Drawer vs Sheet** — bottom Drawer only for a full-bleed expansion of an
+  inline visual (ASNConnectivity's graph); side panels use `Sheet`; a tool is a
+  page, never either.
 - **Motion** — hover lift `transition-transform duration-300 ease-out
   hover:-translate-y-1.5`; loading is `<Spinner />`, never pulse-dots.
 

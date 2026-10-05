@@ -8,9 +8,8 @@
 // Responsibilities:
 //   - wrap POST + polling via fetchWithTimeout (prevents indefinite hang)
 //   - track the pending setTimeout / AbortController so onScopeDispose can
-//     cancel in-flight work when the drawer / route unmounts — this fixes
-//     the previous bug where timers continued firing and mutating refs on
-//     unmounted components
+//     cancel in-flight work when the owning component unmounts, so no timer
+//     keeps firing and mutating refs of an unmounted component
 //
 // Callbacks (all optional):
 //   - onResults(data): called on every successful poll (including

@@ -44,7 +44,7 @@
 
       <!-- Tools menu: after the brand from `sm` up, at the right edge below. -->
       <div class="shrink-0 max-sm:order-1">
-        <ToolsMenu standalone-only :current="currentSlug" @select="openTool" />
+        <ToolsMenu :current="currentSlug" @select="openTool" />
       </div>
 
       <!-- Page title: the free width between the menus; empty pages keep the

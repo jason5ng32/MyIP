@@ -3,10 +3,10 @@
      MAC Lookup's job) dispatched to the matching card under ./ip-calculator/.
      Pure local computation via utils/features/ip-calc.js.
 
-     The query rides the URL as `?q=` on both /tools/ipcalculator and
-     /?tool=ipcalculator, written back on every run so results are shareable.
-     Two collapsed folds under the input hold example pills (one per accepted
-     syntax) and, on the home page, the visitor's own IPs (store.allIPs). -->
+     The query rides the URL as `?q=` on /tools/ipcalculator, written back on
+     every run so results are shareable. Two collapsed folds under the input
+     hold example pills (one per accepted syntax) and, once the homepage has
+     detected them, the visitor's own IPs (store.allIPs). -->
 <template>
     <div class="ip-calculator-section my-4 space-y-4">
         <!-- Top note -->

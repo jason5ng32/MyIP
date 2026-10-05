@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-// The homepage. Holds every top-level section plus the Advanced Tools drawer.
+// The homepage. Holds every top-level section plus the Advanced Tools cards.
 // Split out of App.vue when the app moved to history-mode routing: App is now a
 // thin shell, and this component is what /'s <router-view> renders. The truly
 // global widgets (tooltip provider, toast, PWA, theme) stay in App.

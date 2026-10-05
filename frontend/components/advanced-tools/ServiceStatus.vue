@@ -1,9 +1,9 @@
 <template>
   <!-- Service Status advanced tool: shows whether a set of well-known
        products are currently up, expandable per-card into sub-services and
-       recent incidents. Lives inside the Advanced Tools drawer (its title is
-       rendered by the drawer header), so this template starts at the note row
-       rather than a section <h2>. -->
+       recent incidents. Rendered by the tool page (ToolPage.vue owns the
+       title), so this template starts at the note row rather than a section
+       <h2>. -->
   <div class="service-status-section my-4 space-y-4">
     <!-- Top note -->
     <p class="text-sm text-muted-foreground leading-relaxed">{{ t('serviceStatus.Note') }}</p>
@@ -165,8 +165,8 @@
 //   /api/service-status/detail  → one provider's sub-services + incidents (on expand)
 // so the initial load stays light and detail is pulled only when a card opens.
 //
-// Moved out of the homepage into the Advanced Tools drawer: it mounts fresh
-// each time the tool is opened (loadOverview on mount) and is no longer wired
+// An Advanced Tool, not a homepage section: it loads on its first mount
+// (loadOverview), stays cached with its page afterwards, and is not wired
 // into the homepage's global-refresh orchestrator — the bottom Refresh button
 // here is the only re-pull path.
 import { ref, reactive, computed, onMounted } from 'vue';

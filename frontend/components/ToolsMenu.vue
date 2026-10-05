@@ -51,10 +51,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown, LayoutGrid } from '@lucide/vue';
 
-const props = defineProps({
-  // Hide the tools that have no /tools/:slug page (noStandalone), for callers
-  // that open a tool as a page.
-  standaloneOnly: { type: Boolean, default: false },
+defineProps({
   // Slug of the tool on screen, marked in the list.
   current: { type: String, default: '' },
   // Menu alignment against the trigger.
@@ -67,6 +64,6 @@ const { t } = useI18n();
 const store = useMainStore();
 
 const groups = computed(() => groupToolsByCategory(
-  listedTools(ADVANCED_TOOLS, store.configs, { standaloneOnly: props.standaloneOnly }),
+  listedTools(ADVANCED_TOOLS, store.configs),
 ));
 </script>

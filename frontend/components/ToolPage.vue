@@ -1,9 +1,8 @@
 <template>
-  <!-- Full page for a single advanced tool, reached at /tools/:slug
-       (new-window / shareable / crawlable). Renders the exact same tool
-       component the drawer does, just inside a minimal page chrome instead of
-       the homepage + drawer. App.vue keeps this page alive, and the inner
-       KeepAlive below keeps every visited tool alive per slug. -->
+  <!-- The page of one advanced tool, at /tools/:slug — where every opener
+       (cards, nav, tools menu, shortcuts, links) lands. App.vue keeps this
+       page alive, and the inner KeepAlive below keeps every visited tool
+       alive per slug. -->
   <div class="flex min-h-screen flex-col">
     <!-- Page header: back, brand, tools menu, current tool, account menu. It
          also hosts the User dialogs (Benefits & Usage) the sign-in gated
@@ -69,10 +68,7 @@ const store = useMainStore();
 const routeSlug = computed(() => (route.name === 'tool' ? route.params.slug : null));
 const slug = computed((previous) => routeSlug.value ?? previous ?? null);
 
-// noStandalone tools are blacklisted from this page entirely — they depend on
-// homepage state, so the drawer on the homepage is their only home.
-const registered = computed(() => TOOL_BY_SLUG.get(slug.value) || null);
-const tool = computed(() => (registered.value && !registered.value.noStandalone ? registered.value : null));
+const tool = computed(() => TOOL_BY_SLUG.get(slug.value) || null);
 const toolComponent = computed(() => (tool.value ? asyncToolFor(tool.value) : null));
 
 // Per-tool head: localized title + description, self-referential canonical.
@@ -85,14 +81,10 @@ useDocumentMeta(() => {
   };
 });
 
-// Unknown slug → bounce to the homepage rather than show an empty shell; a
-// blacklisted tool keeps its destination by reopening as the homepage drawer.
+// Unknown slug → bounce to the homepage rather than show an empty shell.
 // Runs on every arrival at a tool route, including a reused instance.
 watch(routeSlug, (next) => {
-    if (!next || tool.value) return;
-    router.replace(registered.value?.noStandalone
-        ? { path: '/', query: { tool: registered.value.slug } }
-        : '/');
+    if (next && !tool.value) router.replace('/');
 }, { immediate: true });
 
 // Auth epoch: bumped when the signed-in account goes away (utils/tool-cache.js),

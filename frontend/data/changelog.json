@@ -2225,6 +2225,17 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Tool pages have a header with a menu for switching straight to another tool",
+          "zh": "工具页面新增页头，可通过菜单直接切换到其他工具",
+          "zh-TW": "工具頁面新增頁首，可透過選單直接切換到其他工具",
+          "fr": "Les pages d'outils ont un en-tête avec un menu pour passer directement à un autre outil",
+          "ru": "На страницах инструментов появилась шапка с меню для быстрого перехода к другому инструменту",
+          "pt-BR": "As páginas de ferramentas têm um cabeçalho com um menu para ir direto a outra ferramenta"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Advanced Tools are now grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
@@ -2233,6 +2244,17 @@
           "fr": "Les Outils avancés sont désormais regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
           "ru": "Расширенные инструменты теперь разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
           "pt-BR": "As Ferramentas avançadas agora são agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools now open as pages of their own: browser back and forward move between them and the homepage, and returning restores each page as you left it, results included",
+          "zh": "高级工具改为以独立页面打开：可用浏览器的后退与前进在工具和首页之间切换，返回时页面保持离开时的样子，测试结果也一并保留",
+          "zh-TW": "進階工具改為以獨立頁面開啟：可用瀏覽器的上一頁與下一頁在工具和首頁之間切換，返回時頁面保持離開時的樣子，測試結果也一併保留",
+          "fr": "Les Outils avancés s'ouvrent désormais dans leur propre page : les boutons Précédent et Suivant du navigateur passent de l'un à l'autre et à la page d'accueil, et chaque page revient telle que vous l'avez laissée, résultats compris",
+          "ru": "Расширенные инструменты теперь открываются на отдельных страницах: кнопки браузера «Назад» и «Вперёд» переключают между ними и главной страницей, а при возвращении каждая страница остаётся такой, какой вы её оставили, вместе с результатами",
+          "pt-BR": "As Ferramentas avançadas agora abrem em páginas próprias: os botões Voltar e Avançar do navegador alternam entre elas e a página inicial, e cada página volta como você a deixou, com os resultados"
         }
       },
       {

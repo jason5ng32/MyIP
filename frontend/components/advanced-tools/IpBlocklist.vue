@@ -6,9 +6,9 @@
             <p>{{ t('ipblocklist.Note2') }}</p>
         </div>
 
-        <!-- Input area. With stored IPs (homepage drawer) the user can pick one
-             OR switch to manual entry; on the standalone page allIPs is empty,
-             so it's manual entry only. -->
+        <!-- Input area. With stored IPs (the homepage's IP cards have run) the
+             user can pick one OR switch to manual entry; on a direct visit to
+             the tool's page allIPs is empty, so it's manual entry only. -->
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
                 <Label :for="manualMode ? 'blocklistIPManual' : 'blocklistIP'" class="font-medium">
@@ -205,7 +205,6 @@
 // users, original site only). Verdict / row split live in
 // utils/features/ip-blocklist.js.
 import { ref, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -230,14 +229,9 @@ import {
 const { t, te } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
-const route = useRoute();
-const router = useRouter();
 
-// Open the Benefits & Usage dialog. Inside the Advanced Tools drawer the
-// dialog would stack on top of it — close the drawer first (it's driven by
-// the ?tool query; standalone pages don't carry it, nothing to close).
+// Open the Benefits & Usage dialog (hosted by the page header's User).
 const openUsageDialog = () => {
-    if (route.query.tool) router.push({ path: '/', query: {} });
     store.setTriggerUserBenefits(true);
 };
 

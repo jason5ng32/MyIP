@@ -264,12 +264,12 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { REGEXP_ONLY_DIGITS } from 'vue-input-otp';
 import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { dispatchAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
+import { dispatchAppCommand, hasAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
 import { authenticatedFetch, fetchErrorLabel } from '@/utils/authenticated-fetch';
 import { buildObservation, usePersonaSnapshots } from '@/composables/use-persona-collector.js';
 import { localProfile } from '@/utils/persona/local-profile.js';
@@ -286,7 +286,6 @@ import PersonaReport from '@/components/advanced-tools/PersonaReport.vue';
 
 const { t } = useI18n();
 const store = useMainStore();
-const route = useRoute();
 const router = useRouter();
 const { snapshots, missingSources } = usePersonaSnapshots();
 
@@ -384,11 +383,14 @@ const runDependencies = async () => {
     if (!missing.length) return;
     runningDependencies.value = true;
     try {
-        // Off the homepage, the owners aren't mounted yet — navigate first,
-        // then wait for each command to be registered before dispatching.
-        if (route.name !== 'home') await router.push('/');
-        await Promise.allSettled(missing.map(async (source) => {
-            const command = DEPENDENCY_COMMANDS[source];
+        // The owners are the homepage sections, registered while Home is
+        // mounted — kept alive behind this page once it has been visited, so
+        // the tests run in place and report back over the app-events bus.
+        // On a direct visit Home has never mounted: go home first, then wait
+        // for each command to be registered before dispatching.
+        const commands = missing.map((source) => DEPENDENCY_COMMANDS[source]);
+        if (!commands.every(hasAppCommand)) await router.push('/');
+        await Promise.allSettled(commands.map(async (command) => {
             await waitForAppCommand(command, { timeoutMs: DEPENDENCY_RUN_TIMEOUT });
             await dispatchAppCommand(command, {}, { timeoutMs: DEPENDENCY_RUN_TIMEOUT });
         }));
@@ -408,8 +410,8 @@ const quotaExceeded = ref(false);
 const canRun = computed(() =>
     signedIn.value && hasProfile.value && !missingSources.value.length);
 
+// Open the Benefits & Usage dialog (hosted by the page header's User).
 const openUsageDialog = () => {
-    if (route.query.tool) router.push({ path: '/', query: {} });
     store.setTriggerUserBenefits(true);
 };
 

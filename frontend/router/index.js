@@ -1,13 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/components/Home.vue';
+import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
 
-// Real pages:
-//   /              → the homepage. Advanced tools open as an in-page drawer,
-//                    driven by the `?tool=<slug>` query (handled in Advanced.vue).
-//   /tools/:slug   → a standalone full page for one tool (shareable + SEO).
+// Pages:
+//   /              → the homepage (tests, sections, Advanced Tools cards).
+//   /tools/:slug   → one Advanced Tool (shareable + crawlable). Every opener —
+//                    cards, nav, the page header's tools menu, shortcuts,
+//                    in-app links — routes here.
+//   /privacy       → the privacy policy.
 //   /r/:id         → read-only shared diagnostic report (KV-backed, noindex).
-// The tool pages render the SAME tool components as the drawer; only the
-// wrapper differs.
+// App.vue keeps the homepage and the tool page alive across navigation, so
+// back / forward between them is plain history that restores both as left.
+// The drawer-era `/?tool=<slug>` links redirect to /tools/<slug>
+// (utils/legacy-tool-link.js).
 //
 // Home is imported eagerly (it's the default landing); everything else is
 // lazy so it stays out of the homepage bundle.
@@ -28,12 +33,17 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    // Opening/closing the drawer only flips the query on the home route — don't
-    // scroll the homepage in that case. Genuine page changes go to the top.
+    // A query-only change on the same page (a tool writing back its `?q=`)
+    // keeps the scroll; history steps restore it; new pages start at the top.
     if (to.path === from.path) return false;
     if (savedPosition) return savedPosition;
     return { top: 0 };
   },
 });
+
+// `/?tool=<slug>` → /tools/<slug> (or `/` for an unknown slug); a page load
+// replaces the entry, so the legacy URL leaves no trace in history. null lets
+// every other navigation through.
+router.beforeEach((to) => resolveLegacyToolLink(to) ?? undefined);
 
 export default router;

@@ -266,7 +266,6 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -294,15 +293,10 @@ import { Play, Check, X, Hourglass, Info, Server, Hash, Route, MapPin, ShieldChe
 
 const { t } = useI18n();
 const store = useMainStore();
-const route = useRoute();
-const router = useRouter();
 const lang = computed(() => store.lang);
 
-// Open the Benefits & Usage dialog. Inside the Advanced Tools drawer the
-// dialog would stack on top of it — close the drawer first (it's driven by
-// the ?tool query; standalone pages don't carry it, nothing to close).
+// Open the Benefits & Usage dialog (hosted by the page header's User).
 const openUsageDialog = () => {
-    if (route.query.tool) router.push({ path: '/', query: {} });
     store.setTriggerUserBenefits(true);
 };
 

@@ -6,9 +6,9 @@
             <p v-if="!isMobile">{{ t('pingtest.Note2') }}</p>
         </div>
 
-        <!-- Input area. With stored IPs (homepage drawer) the user can pick one
-             OR switch to manual entry; on the standalone page allIPs is empty,
-             so it's manual entry only. -->
+        <!-- Input area. With stored IPs (the homepage's IP cards have run) the
+             user can pick one OR switch to manual entry; on a direct visit to
+             the tool's page allIPs is empty, so it's manual entry only. -->
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
                 <Label :for="manualMode ? 'pingIPManual' : 'pingIP'" class="font-medium">

@@ -57,27 +57,19 @@ describe('isToolAvailable', () => {
 });
 
 describe('listedTools', () => {
-  const PAGELESS = { slug: 'pageless', noStandalone: true };
-  const GATED_PAGELESS = { slug: 'gated-pageless', requiresOriginalSite: true, noStandalone: true };
-  const tools = [PUBLIC, PAGELESS, ORIGINAL, GATED_PAGELESS];
+  const tools = [PUBLIC, ORIGINAL, RADAR, BOTH];
   const slugs = (list) => list.map((tool) => tool.slug);
 
   it('applies the gates in registry order', () => {
-    assert.deepEqual(slugs(listedTools(tools, {})), ['public', 'pageless']);
-    assert.deepEqual(slugs(listedTools(tools, { originalSite: true })),
-      ['public', 'pageless', 'original', 'gated-pageless']);
+    assert.deepEqual(slugs(listedTools(tools, {})), ['public']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true })), ['public', 'original']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true, cloudFlare: true })),
+      ['public', 'original', 'radar', 'both']);
   });
 
-  it('standaloneOnly also drops the noStandalone tools', () => {
-    assert.deepEqual(slugs(listedTools(tools, { originalSite: true }, { standaloneOnly: true })),
-      ['public', 'original']);
-    assert.deepEqual(slugs(listedTools(tools, {}, { standaloneOnly: true })), ['public']);
-  });
-
-  it('the registry lists Persona Check only for callers that open the drawer', () => {
+  it('lists every registered tool, Persona Check included, once all gates pass', () => {
     const configs = { originalSite: true, cloudFlare: true };
     assert.ok(slugs(listedTools(ADVANCED_TOOLS, configs)).includes('personacheck'));
-    assert.ok(!slugs(listedTools(ADVANCED_TOOLS, configs, { standaloneOnly: true })).includes('personacheck'));
     assert.equal(listedTools(ADVANCED_TOOLS, configs).length, ADVANCED_TOOLS.length);
   });
 });
