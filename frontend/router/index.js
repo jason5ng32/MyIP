@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/components/Home.vue';
 import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
 import { installPageTransitions } from '@/utils/page-transition.js';
+import { installAnimationRevival } from '@/utils/revive-animations.js';
 
 // Pages:
 //   /              → the homepage (tests, sections, Advanced Tools cards).
@@ -51,5 +52,8 @@ router.beforeEach((to) => resolveLegacyToolLink(to) ?? undefined);
 // here, not in a component, so the guards exist before the first navigation
 // and outlive any page.
 installPageTransitions(router);
+// History steps leave the page's running CSS animations frozen on iOS once
+// the browser's own gesture animation lands — see utils/revive-animations.js.
+installAnimationRevival(router);
 
 export default router;

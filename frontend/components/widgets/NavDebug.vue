@@ -32,6 +32,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { REVIVED_EVENT } from '@/utils/revive-animations.js';
 
 const router = useRouter();
 
@@ -110,6 +111,7 @@ const onScroll = () => {
     setTimeout(() => { scrollLogged = false; }, 1000);
 };
 const onResize = () => log(`resize ${window.innerWidth}×${window.innerHeight}`);
+const onRevived = (e) => log(`revived ${e.detail.revived} animations (+${e.detail.delayMs}ms)`);
 const onIteration = (e) => {
     if (e.animationName && e.target === pingEl()) pingIterations.value += 1;
 };
@@ -191,6 +193,7 @@ onMounted(() => {
     window.addEventListener('touchstart', onTouch, { passive: true });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
+    window.addEventListener(REVIVED_EVENT, onRevived);
     document.addEventListener('animationiteration', onIteration, true);
     removeBefore = router.beforeEach((to, from) => { log(`route ${from.fullPath} → ${to.fullPath}`); });
     removeAfter = router.afterEach((to, from, failure) => { log(`afterEach ${to.path}${failure ? ' FAILED' : ''} y=${Math.round(window.scrollY)}`); });
@@ -215,6 +218,7 @@ onBeforeUnmount(() => {
     window.removeEventListener('touchstart', onTouch);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onResize);
+    window.removeEventListener(REVIVED_EVENT, onRevived);
     document.removeEventListener('animationiteration', onIteration, true);
     removeBefore?.(); removeAfter?.();
     document.getElementById('jn-debug-flow-spinner')?.remove();

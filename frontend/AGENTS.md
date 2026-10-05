@@ -189,7 +189,10 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   back, page → page fades; keyframes in `style/style.css`), hooked in the
   router's `beforeResolve`; none on a query-only change, the first load, or
   under reduced motion. The Nav opts out via
-  `view-transition-name`; nothing else gets one.
+  `view-transition-name`; nothing else gets one. After a history step the
+  page's running CSS animations are cancelled, replayed and set back to
+  their time (`utils/revive-animations.js`): on iOS the swipe-back gesture
+  leaves them visually frozen until their layer is rebuilt.
 - **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
   `hidden sm:flex` never shows: write `max-sm:hidden`.
 - **Drawer vs Sheet** — bottom Drawer only for a full-bleed expansion of an
