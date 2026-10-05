@@ -7,7 +7,8 @@
 import { normalizeMacQuery } from '../common/mac-input.js';
 import { lookupMac } from '../common/oui-db.js';
 
-export default async (req, res) => {
+// `lookup` is injectable so tests can run the handler over fixture registries.
+export const createMacChecker = (lookup) => async (req, res) => {
     const { mac } = req.query;
     if (!mac) {
         return res.status(400).json({ error: 'No MAC address provided' });
@@ -18,9 +19,11 @@ export default async (req, res) => {
     }
 
     // Past the boot window (requireOfflineData) only a failed download leaves this empty.
-    const result = lookupMac(hex);
+    const result = lookup(hex);
     if (!result) {
         return res.status(503).json({ error: 'MAC database unavailable' });
     }
     res.json(result);
 };
+
+export default createMacChecker(lookupMac);
