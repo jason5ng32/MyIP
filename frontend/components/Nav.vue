@@ -1,9 +1,10 @@
 <template>
   <!-- The iOS status bar is opaque system chrome (index.html sets no
        apple-mobile-web-app-status-bar-style), so the safe-area inset is only
-       non-zero where the page really runs under it (landscape notch edges). -->
+       non-zero where the page really runs under it (landscape notch edges).
+       The header stays put through page transitions (jn-site-nav in style.css). -->
   <header
-    class="fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
+    class="jn-site-nav fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
     'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isPwa || (isPwa && !isMobile),
     'bg-page-bg': isPwa && isMobile }">
