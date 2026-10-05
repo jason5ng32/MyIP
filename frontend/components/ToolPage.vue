@@ -1,18 +1,15 @@
 <template>
   <!-- The page of one advanced tool, at /tools/:slug — where every opener
-       (cards, nav, tools menu, shortcuts, links) lands. App.vue keeps this
-       page alive, and the inner KeepAlive below keeps every visited tool
-       alive per slug. -->
-  <div class="flex min-h-screen flex-col">
-    <!-- Page header: back, brand, tools menu, current tool, account menu. It
-         also hosts the User dialogs (Benefits & Usage) the sign-in gated
-         tools link to from their quota hints, and whose user-info fetch feeds
-         their frontend quota gate. -->
-    <PageHeader :title="tool ? `${tool.emoji} ${t(tool.titleKey)}` : ''" />
-
-    <!-- Content: an <h1> for the tool (SEO), then the tool body itself -->
+       (cards, nav, shortcuts, links) lands. App.vue keeps this page alive,
+       and the inner KeepAlive below keeps every visited tool alive per slug.
+       At least a viewport tall below the fixed Nav, so the footer sits at
+       the bottom of a short page. -->
+  <div class="flex min-h-[calc(100dvh_-_3.5rem_-_env(safe-area-inset-top))] flex-col">
+    <!-- Content: the breadcrumb, an <h1> for the tool (SEO), then the tool
+         body itself -->
     <main class="flex-1">
       <div class="mx-auto w-full max-w-[1400px] px-4 md:px-6 py-6">
+        <PageBreadcrumb v-if="tool" :items="breadcrumb" />
         <h1 v-if="tool" class="mb-4 flex items-center gap-2 text-2xl md:text-3xl font-semibold tracking-tight">
           <span aria-hidden="true">{{ tool.emoji }}</span>
           {{ t(tool.titleKey) }}
@@ -38,7 +35,7 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { shouldDropToolCache } from '@/utils/tool-cache.js';
 import Footer from '@/components/Footer.vue';
-import PageHeader from '@/components/PageHeader.vue';
+import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
 
 defineOptions({ name: 'ToolPage' });
@@ -70,6 +67,11 @@ const slug = computed((previous) => routeSlug.value ?? previous ?? null);
 
 const tool = computed(() => TOOL_BY_SLUG.get(slug.value) || null);
 const toolComponent = computed(() => (tool.value ? asyncToolFor(tool.value) : null));
+
+const breadcrumb = computed(() => [
+  { label: t('advancedtools.Title'), section: 'AdvancedTools' },
+  { label: `${tool.value.emoji} ${t(tool.value.titleKey)}` },
+]);
 
 // Per-tool head: localized title + description, self-referential canonical.
 useDocumentMeta(() => {

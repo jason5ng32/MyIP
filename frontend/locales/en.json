@@ -194,6 +194,7 @@
     "id": "nav",
     "Title": "IPCheck.ing",
     "Navigation": "Navigation",
+    "Home": "Home",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
     "ServiceStatus": "Service Status",
@@ -975,7 +976,6 @@
     }
   },
   "advancedtools": {
-    "BackToHome": "Back to Home",
     "Title": "Advanced Tools",
     "Note": "People who want the very best from their network usually reach for extra tools to fine-tune their connection.",
     "category": {

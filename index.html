@@ -111,24 +111,12 @@
     }
 
     /* Reserve space at the top of the body for: (a) the iOS safe-area
-       (transparent status bar) — `env()` resolves to 0 on non-notch
-       platforms, and (b) the fixed Nav (3.5rem = h-14 in Nav.vue). The Nav
-       used to be `position: sticky` and lived in the normal flow, so no
-       padding was needed; switching it to `fixed` lets the body rubber-band
-       bounce on iOS without dragging the Nav along, but now we have to
-       compensate for the Nav's lost flow height here. */
+       inset (the Nav sits below it; Nav.vue paints the strip), and (b) the
+       fixed Nav that App.vue renders above every route (3.5rem = h-14 in
+       Nav.vue). Being `fixed`, the Nav stays put while the body
+       rubber-bands on iOS, and takes no flow height of its own. */
     body {
       padding-top: calc(env(safe-area-inset-top) + 3.5rem);
-    }
-
-    /* Standalone pages (/tools/:slug, /privacy, /r/:id) have their own in-flow
-       sticky header instead of the homepage's fixed Nav, and that header carries
-       the iOS safe-area inset as its own padding (PageHeader.vue) so
-       it keeps clearing the Dynamic Island once sticky pins it to the viewport
-       top. The body therefore reserves nothing here. App.vue toggles this class
-       on the standalone routes. */
-    body.jn-standalone-page {
-      padding-top: 0;
     }
 
     html {

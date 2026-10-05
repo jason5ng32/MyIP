@@ -2227,12 +2227,12 @@
       {
         "type": "add",
         "change": {
-          "en": "Tool pages have a header with a menu for switching straight to another tool",
-          "zh": "工具页面新增页头，可通过菜单直接切换到其他工具",
-          "zh-TW": "工具頁面新增頁首，可透過選單直接切換到其他工具",
-          "fr": "Les pages d'outils ont un en-tête avec un menu pour passer directement à un autre outil",
-          "ru": "На страницах инструментов появилась шапка с меню для быстрого перехода к другому инструменту",
-          "pt-BR": "As páginas de ferramentas têm um cabeçalho com um menu para ir direto a outra ferramenta"
+          "en": "The navigation bar is on every page, so every tool is one click away wherever you are, and tool pages carry a breadcrumb back to the homepage",
+          "zh": "导航栏覆盖所有页面，在任何页面都能一键打开任意工具；工具页面新增返回首页的面包屑导航",
+          "zh-TW": "導覽列涵蓋所有頁面，在任何頁面都能一鍵開啟任一工具；工具頁面新增返回首頁的麵包屑導覽",
+          "fr": "La barre de navigation est présente sur toutes les pages : chaque outil est à un clic où que vous soyez, et les pages d'outils ont un fil d'Ariane vers l'accueil",
+          "ru": "Панель навигации есть на каждой странице — любой инструмент в одном клике откуда угодно, а на страницах инструментов появились «хлебные крошки» для возврата на главную",
+          "pt-BR": "A barra de navegação está em todas as páginas, então qualquer ferramenta fica a um clique de onde você estiver, e as páginas de ferramentas têm uma trilha de navegação de volta ao início"
         }
       },
       {

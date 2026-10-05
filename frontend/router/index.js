@@ -5,8 +5,7 @@ import { resolveLegacyToolLink } from '@/utils/legacy-tool-link.js';
 // Pages:
 //   /              → the homepage (tests, sections, Advanced Tools cards).
 //   /tools/:slug   → one Advanced Tool (shareable + crawlable). Every opener —
-//                    cards, nav, the page header's tools menu, shortcuts,
-//                    in-app links — routes here.
+//                    cards, nav, shortcuts, in-app links — routes here.
 //   /privacy       → the privacy policy.
 //   /r/:id         → read-only shared diagnostic report (KV-backed, noindex).
 // App.vue keeps the homepage and the tool page alive across navigation, so

@@ -188,7 +188,7 @@ const { t } = useI18n();
 
 const store = useMainStore();
 
-// Open the Benefits & Usage dialog (hosted by the page header's User).
+// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
 const openUsageDialog = () => {
     store.setTriggerUserBenefits(true);
 };

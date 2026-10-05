@@ -32,7 +32,7 @@
             <div v-if="profileHref" class="pt-1">
                 <Button as-child variant="outline" size="sm" class="h-7 cursor-pointer gap-1.5 text-xs">
                     <a :href="profileHref" @click="openProfile">
-                        <PanelBottomOpen class="size-3.5" />{{ t('ipInfos.ASNInfo.openProfile') }}
+                        <ArrowUpRight class="size-3.5" />{{ t('ipInfos.ASNInfo.openProfile') }}
                     </a>
                 </Button>
             </div>
@@ -60,7 +60,7 @@ import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
-import { PanelBottomOpen } from '@lucide/vue';
+import { ArrowUpRight } from '@lucide/vue';
 
 const { t } = useI18n();
 const store = useMainStore();

@@ -1,5 +1,5 @@
 // Tests for frontend/utils/tool-availability.js — the listing gate the
-// Advanced Tools card grid, nav and tools menu filter through — plus the gate
+// Advanced Tools card grid and nav filter through — plus the gate
 // fields the registry in frontend/data/tools.js declares.
 
 import assert from 'node:assert/strict';

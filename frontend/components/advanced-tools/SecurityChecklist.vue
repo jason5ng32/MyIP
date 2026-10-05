@@ -445,7 +445,7 @@ const changeList = (listName, shouldScroll = true) => {
         }
         // Bring the details into view when switching category on a narrow
         // screen, where they stack below the category list. `scroll-mt-*` on
-        // #checklist keeps them clear of the sticky page header; on md+ they
+        // #checklist keeps them clear of the fixed Nav; on md+ they
         // sit beside the list with their top on screen, so nothing moves.
         nextTick(() => {
             const el = document.getElementById('checklist');

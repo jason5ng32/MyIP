@@ -18,13 +18,13 @@
           aria-label="Toggle navigation menu" @click="store.toggleSheet('navMenu')">
           <Menu />
         </Button>
-        <a href="#" @click="handleLogoClick"
+        <a :href="isHome ? '#' : homeHref" @click="handleLogoClick"
           class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity">
           <brandIcon />
           <span class="tracking-tight truncate">
             <span class="font-bold">IP</span><span class="font-extralight">Check.</span>
             <span class="font-extralight"
-              :class="{ 'jn-shimmer-light': !loaded && !isDarkMode, 'jn-shimmer-dark': !loaded && isDarkMode }">ing</span>
+              :class="{ 'jn-shimmer-light': shimmer && !isDarkMode, 'jn-shimmer-dark': shimmer && isDarkMode }">ing</span>
           </span>
         </a>
       </div>
@@ -32,15 +32,16 @@
       <!-- Middle: Desktop nav links + GitHub star badge (left aligned, next to brand) -->
       <div v-if="!isMobile" class="flex items-center gap-0.5">
         <template v-for="item in navItems" :key="item">
-          <!-- Advanced Tools: hover reveals the sub-tools, click scrolls to the
-               section (disable-click-trigger frees the click from toggling the
-               menu; viewport=false anchors the panel under the trigger). -->
+          <!-- Advanced Tools: hover reveals the sub-tools, click goes to the
+               section like the other links (disable-click-trigger frees the
+               click from toggling the menu; viewport=false anchors the panel
+               under the trigger). -->
           <NavigationMenu v-if="item === 'AdvancedTools'" as="div" :viewport="false" :disable-click-trigger="true"
             class="flex-none">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger :class="['h-auto bg-transparent', navLinkClass(item)]"
-                  @click="scrollToSection('AdvancedTools'); trackEvent('Nav', 'NavClick', item)">
+                  @click="goToSection(item)">
                   {{ t(`nav.${item}`) }}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent class="z-50">
@@ -49,7 +50,7 @@
                     <span aria-hidden="true"
                       class="pointer-events-none absolute inset-y-1 left-1/2 w-px -translate-x-1/2 bg-border"></span>
                     <li v-for="tool in advancedTools" :key="tool.slug">
-                      <NavigationMenuLink as-child class="cursor-pointer">
+                      <NavigationMenuLink as-child class="cursor-pointer" :active="tool.slug === currentToolSlug">
                         <button type="button" class="w-full text-left leading-snug" @click="openTool(tool.slug)">
                           {{ t(tool.titleKey) }}
                         </button>
@@ -60,9 +61,9 @@
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-          <!-- All other sections stay plain smooth-scroll anchors. -->
-          <a v-else href="#" :class="navLinkClass(item)"
-            @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
+          <!-- All other sections: scroll there (from home first off the
+               homepage — utils/nav-target.js). -->
+          <a v-else href="#" :class="navLinkClass(item)" @click.prevent="goToSection(item)">
             {{ t(`nav.${item}`) }}
           </a>
         </template>
@@ -116,16 +117,15 @@
               <CollapsibleContent>
                 <div class="my-0.5 ml-3 flex flex-col gap-0.5 border-l pl-3">
                   <button v-for="tool in advancedTools" :key="tool.slug" type="button"
-                    class="block w-full rounded-md px-3 py-1.5 text-left text-sm leading-snug text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
-                    @click="openTool(tool.slug)">
+                    class="block w-full rounded-md px-3 py-1.5 text-left text-sm leading-snug text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground aria-[current=page]:bg-accent/50 aria-[current=page]:text-foreground"
+                    :aria-current="tool.slug === currentToolSlug ? 'page' : undefined" @click="openTool(tool.slug)">
                     {{ t(tool.titleKey) }}
                   </button>
                 </div>
               </CollapsibleContent>
             </Collapsible>
-            <!-- All other sections stay plain smooth-scroll anchors. -->
-            <a v-else href="#" :class="navLinkClass(item, { block: true })"
-              @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
+            <!-- All other sections, as on desktop. -->
+            <a v-else href="#" :class="navLinkClass(item, { block: true })" @click.prevent="goToSection(item)">
               {{ t(`nav.${item}`) }}
             </a>
           </template>
@@ -148,8 +148,12 @@
 </template>
 
 <script setup>
+// The site navigation bar, rendered once by App.vue above every route. Its
+// entries act per route (utils/nav-target.js): a section link scrolls the
+// homepage, or goes home first from any other page; a tool entry opens the
+// tool's page.
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -177,19 +181,28 @@ import { listedTools } from '@/utils/tool-availability.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
-import { useRouteActive } from '@/composables/use-route-active.js';
+import { isPlainClick } from '@/utils/nav-target.js';
+import { useNavTarget } from '@/composables/use-nav-target.js';
 
 const { t } = useI18n();
 const store = useMainStore();
+const route = useRoute();
 const router = useRouter();
+const { navigateTo } = useNavTarget();
 
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
-const currentSection = computed(() => store.currentSection);
+// Off the homepage no section is current (its tracker runs on Home only, so
+// store.currentSection keeps the last one seen there).
+const isHome = computed(() => route.name === 'home');
+const currentSection = computed(() => (isHome.value ? store.currentSection : null));
+const currentToolSlug = computed(() => (route.name === 'tool' ? String(route.params.slug) : ''));
+const homeHref = router.resolve('/').href;
 const loaded = computed(() => store.allHasLoaded);
+// The brand shimmers while the homepage tests run; the other pages run none.
+const shimmer = computed(() => isHome.value && !loaded.value);
 
-// Running as an installed PWA (chromeless window). Distinct from the app's
-// "standalone tool pages" — see utils/pwa.js.
+// Running as an installed PWA (chromeless window) — see utils/pwa.js.
 const isPwa = isRunningAsPwa();
 
 const navItems = SECTION_IDS;
@@ -231,10 +244,15 @@ const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
 };
 
-// At top → full refresh; mid-page → smooth scroll up. preventDefault
-// avoids the native instant-jump of <a href="#">.
+// Off the homepage → home (a real link there, so modified clicks open a new
+// tab). On it: at top → full refresh; mid-page → smooth scroll up.
+// preventDefault avoids the native instant-jump of <a href="#">.
 const handleLogoClick = (e) => {
-  if (window.scrollY === 0) {
+  if (!isHome.value) {
+    if (!isPlainClick(e)) return;
+    e.preventDefault();
+    router.push('/');
+  } else if (window.scrollY === 0) {
     store.setRefreshEveryThing(true);
   } else {
     e.preventDefault();
@@ -243,19 +261,17 @@ const handleLogoClick = (e) => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// Menu scroll (leave space for sticky header)
-const scrollToSection = (el, offset = 70) => {
-  const element = typeof el === 'string' ? document.getElementById(el) : el;
-  if (!element) return;
-  const y = element.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top: y, behavior: 'smooth' });
+// Section and tool entries close the mobile nav Sheet first (a no-op on
+// desktop) so it isn't left open over where they land.
+const goToSection = (section) => {
+  store.setOpenSheet(null);
+  navigateTo({ section });
+  trackEvent('Nav', 'NavClick', section);
 };
 
-// Open a tool's page from the nav, closing the mobile nav Sheet first (a
-// no-op on desktop) so it isn't left open behind the tool.
 const openTool = (slug) => {
   store.setOpenSheet(null);
-  router.push(`/tools/${slug}`);
+  navigateTo({ tool: slug });
   const name = slug.charAt(0).toUpperCase() + slug.slice(1);
   trackEvent('Nav', 'NavClick', name);
 };
@@ -291,11 +307,8 @@ const onScroll = () => {
   });
 };
 
-// The listener runs on mobile while the homepage is the page on screen (it
-// stays alive in a KeepAlive while a tool page shows); re-attaching resyncs
-// lastScrollY so the first scroll after coming back isn't a phantom jump.
-const navActive = useRouteActive();
-const tracksScroll = computed(() => isMobile.value && navActive.value);
+// The listener runs on mobile only, on every route; attaching resyncs
+// lastScrollY so the first scroll isn't a phantom jump.
 const setScrollListener = (on) => {
   if (on) {
     lastScrollY = window.scrollY;
@@ -307,11 +320,11 @@ const setScrollListener = (on) => {
 
 watch(isMobile, (mobile) => {
   if (!mobile) isNavHidden.value = false;
+  setScrollListener(mobile);
 });
-watch(tracksScroll, setScrollListener);
 
 onMounted(() => {
-  if (tracksScroll.value) setScrollListener(true);
+  if (isMobile.value) setScrollListener(true);
   fetchGithubStars();
 });
 

@@ -410,7 +410,7 @@ const quotaExceeded = ref(false);
 const canRun = computed(() =>
     signedIn.value && hasProfile.value && !missingSources.value.length);
 
-// Open the Benefits & Usage dialog (hosted by the page header's User).
+// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
 const openUsageDialog = () => {
     store.setTriggerUserBenefits(true);
 };

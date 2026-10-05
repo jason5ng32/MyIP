@@ -1,17 +1,23 @@
 <template>
     <!-- Thin app shell: only the globals that must exist on every route live
-    here (tooltip context, toast host, PWA install prompt, theme). Pages swap
-    in via <router-view>; the homepage and the tool page stay alive in the
-    KeepAlive (never evicted), so leaving and coming back neither re-runs the
-    homepage tests nor loses a tool's state. Every tool route shares the one
+    here (the site Nav, the account and preferences dialogs, tooltip context,
+    toast host, PWA install prompt, theme). Pages swap in via <router-view>
+    below the fixed Nav (index.html pads the body for it); the homepage and
+    the tool page stay alive in the KeepAlive (never evicted), so leaving and
+    coming back neither re-runs the homepage tests nor loses a tool's state. Every tool route shares the one
     ToolPage instance (key 'tool'), which caches each tool per slug itself.
     Cached pages pause while hidden — see composables/use-route-active.js. -->
     <TooltipProvider :delay-duration="150">
+        <NavBar />
         <router-view v-slot="{ Component, route: viewRoute }">
             <KeepAlive :include="['Home', 'ToolPage']">
                 <component :is="Component" :key="viewRoute.name === 'tool' ? 'tool' : viewRoute.name" />
             </KeepAlive>
         </router-view>
+        <!-- Dialog hosts for the Nav's account menu and the sign-in tools'
+             quota hints: Benefits & Usage, Preferences. One each, site-wide. -->
+        <User />
+        <Preferences />
         <Alert />
         <DocsAssistant />
         <PWA v-if="offerPwaInstall" />
@@ -22,17 +28,22 @@
 import { watch, ref, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import NavBar from '@/components/Nav.vue';
 import Alert from '@/components/widgets/Toast.vue';
 import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/features/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
+import { useMainStore } from '@/store';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
 // few 12h-deduped uses, prompt cap reached, already installed) never load
 // pwa-install or trigger its manifest fetch; eligible ones load it at the
 // prompt's 30s mark.
 const PWA = defineAsyncComponent(() => import('@/components/widgets/PWA.vue'));
+// Dialogs nothing shows on first paint: their code stays off the boot path.
+const User = defineAsyncComponent(() => import('@/components/User.vue'));
+const Preferences = defineAsyncComponent(() => import('@/components/widgets/Preferences.vue'));
 const offerPwaInstall = ref(false);
 onMounted(() => {
     if (shouldOfferPwaInstall()) {
@@ -46,27 +57,21 @@ import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
-// The standalone pages (/tools/:slug, /privacy) carry their own header, so they
-// drop the homepage's fixed-Nav body padding (see the `body.jn-standalone-page`
-// rule in index.html) — otherwise a blank strip shows above their header. Toggle
-// the marker class as the route changes. NB: "standalone" here is unrelated to
-// PWA display mode — that's `isRunningAsPwa()` in utils/pwa.js.
-const STANDALONE_ROUTES = new Set(['tool', 'privacy', 'report']);
+// A page change closes the sheet held in store.openSheet (preferences, Earth
+// Online, the nav menu, …): the site-wide ones would otherwise stay open over
+// the next page, and one a left page hosted would reopen when it returns.
+const store = useMainStore();
 const route = useRoute();
-watch(
-    () => STANDALONE_ROUTES.has(route.name),
-    (isStandalone) => {
-        document.body.classList.toggle('jn-standalone-page', isStandalone);
-    },
-    { immediate: true },
-);
+watch(() => route.path, () => {
+    if (store.openSheet) store.setOpenSheet(null);
+});
 
 // Pre-Vue boot overlay → real app hand-off. CSS lives in index.html.
 // #app is revealed IMMEDIATELY at mount: it fades in underneath the opaque
 // overlay while the overlay plays its exit (text fade → logo shrink →
 // removal). 
 // Runs once at root mount, so it covers both the homepage and a fresh load of
-// a standalone tool page.
+// a tool page.
 const loadingElement = document.getElementById('jn-loading');
 const appElement = document.getElementById('app');
 

@@ -109,7 +109,6 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { useRouteActive } from '@/composables/use-route-active.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -124,16 +123,10 @@ const store = useMainStore();
 const route = useRoute();
 const { dotClass } = useStatusTone();
 
-// Mounted on a page other than the homepage (by PageHeader.vue on the tool
-// pages, /privacy and /r/:id) — these pages skip the homepage loading
-// pipeline, which changes when user info can load.
-const isStandalonePage = computed(() => route.name !== 'home');
-
-// Home and every other page each host a User, and Home and the tool page stay
-// alive while hidden (App.vue's KeepAlive): only the one on the page on screen
-// answers the store triggers below; a trigger raised while none shows waits
-// for the next activation.
-const active = useRouteActive();
+// One instance for the whole site (App.vue). The pages other than the
+// homepage skip its loading pipeline, which changes when user info can load;
+// `matched` is empty until the first navigation resolves the route.
+const isOffHome = computed(() => route.matched.length > 0 && route.name !== 'home');
 
 const isSignedIn = computed(() => store.isSignedIn);
 const remoteUserInfo = computed(() => store.remoteUserInfo);
@@ -257,33 +250,34 @@ const updateUserAchievement = async (achievementName) => {
     }
 };
 
-watch(() => store.allHasLoaded, (newVal) => {
-    if (newVal) getUserInfo();
-});
-
-// The unknown-auth-hint boot resolves sign-in AFTER allHasLoaded (background
-// probe in main.js), so the watcher above already ran and skipped; retry when
-// the signed-in state lands. getUserInfo self-guards against double fetches.
-// Standalone tool pages never run the homepage loading pipeline (allHasLoaded
-// stays false there), so sign-in alone is enough to fetch; immediate covers
-// auth having resolved before this component mounted.
-watch(() => active.value && isSignedIn.value, (signed) => {
-    if (signed && (store.allHasLoaded || isStandalonePage.value)) getUserInfo();
+// User info loads once the visitor is signed in and, on the homepage, its
+// tests have finished (allHasLoaded); the other pages never run them, so
+// sign-in alone is enough there. Sign-in can land after allHasLoaded (the
+// unknown-auth-hint boot probes in the background, main.js) and auth can
+// resolve before this mounts (immediate). getUserInfo self-guards against
+// double fetches.
+watch(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value), (ready) => {
+    if (ready) getUserInfo();
 }, { immediate: true });
 
-watch(() => active.value && triggerUserBenefits.value, (newVal) => {
+watch(() => triggerUserBenefits.value, (newVal) => {
     if (newVal) openUserBenefits();
+});
+
+// The dialog belongs to the page it was opened on: a page change closes it.
+watch(() => route.path, () => {
+    isOpen.value = false;
 });
 
 // One-shot trigger: cleared here so the next request from Nav / Achievements
 // is a fresh false → true edge rather than a no-op write.
-watch(() => active.value && triggerRemoteUserInfo.value, (newVal) => {
+watch(() => triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;
     store.triggerRemoteUserInfo = false;
     getUserInfo();
 });
 
-watch(() => active.value && triggerUpdateAchievements.value, (newVal) => {
+watch(() => triggerUpdateAchievements.value, (newVal) => {
     if (newVal) {
         updateUserAchievement(achievementToUpdate.value);
         store.triggerUpdateAchievements = false;

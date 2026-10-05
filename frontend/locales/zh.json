@@ -194,6 +194,7 @@
     "id": "nav",
     "Title": "IPCheck.ing",
     "Navigation": "导航",
+    "Home": "首页",
     "IPInfo": "IP 信息",
     "Connectivity": "网络连通性",
     "ServiceStatus": "服务可用性",
@@ -975,7 +976,6 @@
     }
   },
   "advancedtools": {
-    "BackToHome": "回到首页",
     "Title": "高级工具",
     "Note": "对网络质量追求极致的人，往往会使用更多工具来优化自己的网络连接。",
     "category": {

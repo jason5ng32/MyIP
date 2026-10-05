@@ -1,7 +1,7 @@
 <template>
-    <div class="flex min-h-screen flex-col">
-        <PageHeader :title="t('report.Title')" />
+    <div class="flex min-h-[calc(100dvh_-_3.5rem_-_env(safe-area-inset-top))] flex-col">
         <main class="flex-1 mx-auto w-full max-w-300 px-4 py-6 space-y-4">
+        <PageBreadcrumb :items="[{ label: t('report.Title') }]" />
         <!-- Loading -->
         <div v-if="state === 'loading'"
             class="flex items-center justify-center gap-2 py-24 text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ import { isoToDateTime } from '@/utils/time-utils.js';
 import { REPORT_VERSION, REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
 import { reportToMarkdown } from '@/utils/report/report-export.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
-import PageHeader from '@/components/PageHeader.vue';
+import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import Footer from '@/components/Footer.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';

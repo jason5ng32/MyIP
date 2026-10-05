@@ -194,6 +194,7 @@
     "id": "nav",
     "Title": "IPCheck.ing",
     "Navigation": "Navegação",
+    "Home": "Início",
     "IPInfo": "Dados de IP",
     "Connectivity": "Conectividade",
     "ServiceStatus": "Status dos serviços",
@@ -975,7 +976,6 @@
     }
   },
   "advancedtools": {
-    "BackToHome": "Voltar para o início",
     "Title": "Ferramentas avançadas",
     "Note": "Quem exige o máximo da qualidade da rede costuma usar mais ferramentas para otimizar a própria conexão.",
     "category": {

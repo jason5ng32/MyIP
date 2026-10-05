@@ -13,9 +13,10 @@ over copied-in shadcn-vue primitives. No TypeScript, no `dark:` dual pairs.
 ```
 frontend/
 ├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
+│                    (App.vue: the site Nav + User / Preferences, then the page)
 ├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
-├── data/            ← static config (tools registry drives pages+cards+menus)
+├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
 └── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ ui/
 ```
@@ -65,23 +66,24 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 - Every tool is a page at `/tools/:slug` (`ToolPage.vue` over the
   `data/tools.js` registry), and every opener routes there: cards are real
   `<a href>` (a plain click `router.push`es, modifier clicks stay the
-  browser's), Nav, `ToolsMenu`, shortcuts (`Advanced.vue`'s exposed
+  browser's), Nav, shortcuts (`Advanced.vue`'s exposed
   `openTool`), in-app links. `/?tool=<slug>` survives only as a replace-redirect
   in the router's `beforeEach` (`utils/legacy-tool-link.js`). No tool opens as
   an overlay.
 - Gates (`requiresOriginalSite`, `requiresConfig: '<configs key>'`, e.g. `asn` →
   `cloudFlare`) decide listing only, via `isToolAvailable()` / `listedTools()`
-  (card grid, Nav, `ToolsMenu`); a `/tools/:slug` link is never gated.
+  (card grid, Nav); a `/tools/:slug` link is never gated.
 - `App.vue` keeps Home and `ToolPage` alive (`KeepAlive`); `ToolPage` keeps up
   to 8 tools alive per slug, dropped on sign-out / account switch
-  (`utils/tool-cache.js`). Back / forward is plain history; the header's back
-  steps back when the previous entry is Home (`utils/back-target.js`), so Home
-  returns as left, scroll included.
+  (`utils/tool-cache.js`). Back / forward is plain history; the breadcrumb's
+  Home steps back when the previous entry is Home (`utils/back-target.js`), so
+  Home returns as left, scroll included.
 - A cached page never unmounts, so whatever acts on the route, the document
   head, window events or the store's one-shot triggers gates on
   `use-route-active.js` (`useRouteActive` / `useActiveValue` /
   `useActiveEventListener`), not on mount / unmount. Overlays on a page being
-  left are closed by `use-overlay-shortcuts.js` — their portal would outlive it.
+  left are closed by `use-overlay-shortcuts.js` — their portal would outlive it;
+  App.vue's own (store `openSheet`, the `User` dialog) close on a path change.
 - Homepage state reaches a tool page through the store, the app-events
   collectors and the command bus: a cached Home keeps its commands registered,
   so a caller dispatches in place and goes home first only when
@@ -167,10 +169,16 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
-- **Page header** — every page but Home opens with `<PageHeader :title />`
-  (back · brand · `ToolsMenu` · title · `UserMenu`, which Nav shares); it hosts
-  the `User` / `Preferences` dialogs its menus raise, each answering only on
-  the page on screen.
+- **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
+  `index.html` pads the body for it), never per page; `User` / `Preferences`
+  sit beside it, one each. Its sections and tools are peers: what a click
+  does on the current route is `resolveNavTarget()` (`utils/nav-target.js`:
+  scroll on Home, go home then scroll elsewhere, a tool → its page), carried
+  out by `use-nav-target.js`; no section is highlighted off Home.
+- **Page breadcrumb** — every page but Home opens its body with
+  `<PageBreadcrumb :items />` above the `<h1>` (← Home / … / current page):
+  real links, Home via `resolveBackTarget()`, section crumbs via the Nav's
+  helper, the last crumb `aria-current="page"`.
 - **Responsive hide** — `.hidden` is `!important` (`style/style.css`), so
   `hidden sm:flex` never shows: write `max-sm:hidden`.
 - **Drawer vs Sheet** — bottom Drawer only for a full-bleed expansion of an

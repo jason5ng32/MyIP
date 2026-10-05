@@ -194,6 +194,7 @@
     "id": "nav",
     "Title": "IPCheck.ing",
     "Navigation": "導覽",
+    "Home": "首頁",
     "IPInfo": "IP 資訊",
     "Connectivity": "網路連線",
     "ServiceStatus": "服務狀態",
@@ -975,7 +976,6 @@
     }
   },
   "advancedtools": {
-    "BackToHome": "回到首頁",
     "Title": "進階工具",
     "Note": "對網路品質追求極致的人，往往會使用更多工具來最佳化自己的網路連線。",
     "category": {

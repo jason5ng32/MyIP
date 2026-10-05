@@ -1,10 +1,11 @@
 <template>
-  <!-- Account menu shared by the homepage Nav and the page header. Two shapes:
+  <!-- Account menu at the right of the site Nav. Two shapes:
        a Firebase-less self-hosted instance has no user system, so only the
        preferences cog shows; otherwise a dropdown carries sign-in (signed
        out) or the account card + achievements (signed in), then preferences,
-       benefits & usage and sign-out. The dialogs it opens are hosted by the
-       page (Preferences / User / Achievements) and raised through the store. -->
+       benefits & usage and sign-out. The dialogs it opens are raised through
+       the store: Preferences and User live in App.vue, Achievements on the
+       homepage. -->
   <!-- Firebase-less: standalone preferences cog. -->
   <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
     <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
@@ -117,9 +118,8 @@
 </template>
 
 <script setup>
-// Account menu (preferences cog or user dropdown) for the homepage Nav and
-// the page header. Everything it opens goes through store triggers; the host
-// page mounts the matching dialogs.
+// Account menu (preferences cog or user dropdown) for the site Nav.
+// Everything it opens goes through store triggers.
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -173,8 +173,7 @@ const getUserInfo = async () => {
   store.setTriggerRemoteUserInfo(true);
 };
 
-// Preferences: every page that shows this menu hosts a <Preferences /> sheet,
-// and only the one on the page on screen answers.
+// Preferences: the one site-wide sheet (App.vue).
 const openPreferences = () => {
   store.toggleSheet('preferences');
   trackEvent('Nav', 'NavClick', 'Preferences');

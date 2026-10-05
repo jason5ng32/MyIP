@@ -34,7 +34,7 @@
                             @keydown.space.prevent="openTool(card.slug)">
                             <CardContent class="p-4">
                                 <h4 class="text-xl font-medium text-primary mb-2 pr-10">
-                                    <PanelBottomOpen
+                                    <ArrowRight
                                         class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
                                     {{ t(card.titleKey) }}
                                 </h4>
@@ -67,7 +67,7 @@ import { ADVANCED_TOOLS, groupToolsByCategory } from '@/data/tools.js';
 import { isToolAvailable } from '@/utils/tool-availability.js';
 import { Card, CardContent } from '@/components/ui/card';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
-import { PanelBottomOpen } from '@lucide/vue';
+import { ArrowRight } from '@lucide/vue';
 
 const { t } = useI18n();
 

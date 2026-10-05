@@ -1,4 +1,4 @@
-// resolveBackTarget() — where the page header's "back to home" button goes:
+// resolveBackTarget() — where the page breadcrumb's "Home" crumb goes:
 // a history step back when the previous in-app entry is the homepage, a push
 // of `/` otherwise (direct visit, another page before this one).
 

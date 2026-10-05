@@ -1,8 +1,5 @@
 <template>
-  <NavBar />
-  <User ref="userRef" />
   <Achievements ref="achievementsRef" />
-  <Preferences />
   <main id="mainpart" class="mx-auto w-full px-4 jn-container">
     <div class="rounded-md">
       <IPCheck />
@@ -26,10 +23,10 @@
 </template>
 
 <script setup>
-// The homepage. Holds every top-level section plus the Advanced Tools cards.
-// Split out of App.vue when the app moved to history-mode routing: App is now a
-// thin shell, and this component is what /'s <router-view> renders. The truly
-// global widgets (tooltip provider, toast, PWA, theme) stay in App.
+// The homepage. Holds every top-level section plus the Advanced Tools cards;
+// this component is what /'s <router-view> renders. What every route shares
+// (the Nav, the account and preferences dialogs, tooltip provider, toast, PWA,
+// theme) lives in App.vue.
 //
 // Components — the test sections and the always-visible chrome load
 // synchronously; everything the first paint can't show (dialogs, drawers,
@@ -37,7 +34,6 @@
 // out of the route chunk and out of the mount's critical path. Their
 // template refs are null until the chunk lands — consumers (use-shortcuts)
 // must optional-chain.
-import NavBar from './Nav.vue';
 import IPCheck from './IpInfos.vue';
 import Connectivity from './ConnectivityTest.vue';
 import WebRTC from './WebRtcTest.vue';
@@ -53,9 +49,7 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 // Async (off-critical-path) components
 const Additional = defineAsyncComponent(() => import('./Additional.vue'));
 const Footer = defineAsyncComponent(() => import('./Footer.vue'));
-const User = defineAsyncComponent(() => import('./User.vue'));
 const Achievements = defineAsyncComponent(() => import('./Achievements.vue'));
-const Preferences = defineAsyncComponent(() => import('./widgets/Preferences.vue'));
 const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));
 const HelpModal = defineAsyncComponent(() => import('./widgets/Help.vue'));
 const IPHistory = defineAsyncComponent(() => import('./widgets/IPHistory.vue'));
@@ -79,7 +73,6 @@ const userPreferences = computed(() => store.userPreferences);
 
 // Template refs — UI chrome only; the test sections are reached through the
 // command bus (utils/app-commands.js), not refs.
-const userRef = ref(null);
 const achievementsRef = ref(null);
 const queryIPRef = ref(null);
 const helpModalRef = ref(null);

@@ -230,7 +230,7 @@ const { t, te } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
 
-// Open the Benefits & Usage dialog (hosted by the page header's User).
+// Open the Benefits & Usage dialog (App.vue hosts the User dialogs).
 const openUsageDialog = () => {
     store.setTriggerUserBenefits(true);
 };

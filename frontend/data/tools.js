@@ -1,9 +1,9 @@
 // Single source of truth for the Advanced Tools.
 //
 // This one registry drives every place a tool is referenced: its page at
-// /tools/:slug (ToolPage.vue), the Advanced.vue card groups, the nav menu,
-// the page header's tools menu, the keyboard shortcuts (use-shortcuts.js) and
-// the legacy `/?tool=<slug>` redirect (utils/legacy-tool-link.js).
+// /tools/:slug (ToolPage.vue), the Advanced.vue card groups, the nav menu
+// and mobile nav sheet, the keyboard shortcuts (use-shortcuts.js) and the
+// legacy `/?tool=<slug>` redirect (utils/legacy-tool-link.js).
 //
 // Entry shape:
 //   slug                 — stable URL/identifier (/tools/:slug)
@@ -16,7 +16,7 @@
 //   requiresConfig       — gate: only shown when this `/api/configs` flag is
 //                          true (e.g. 'cloudFlare' for the Radar-backed tools)
 //
-// Gates decide listing only (card grid, nav, tools menu), via
+// Gates decide listing only (card grid, nav), via
 // isToolAvailable() in utils/tool-availability.js; a /tools/:slug link opens
 // the tool regardless.
 

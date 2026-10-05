@@ -1,5 +1,5 @@
 // Deployment gates for the Advanced Tools registry (data/tools.js): decides
-// whether a tool is listed in the card grid, the nav and the tools menu. A
+// whether a tool is listed in the card grid and the nav. A
 // tool can require the original site (`requiresOriginalSite`) and/or one
 // `/api/configs` flag (`requiresConfig`). Configs arrive asynchronously (`{}` until the fetch
 // lands), so a gated tool reads as unavailable until then. A /tools/:slug
