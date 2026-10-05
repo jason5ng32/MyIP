@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import logger from './server/logger.js';
+import { FIREBASE_AUTH_PROXY_PATH, firebaseAuthProxyTarget } from './common/firebase-auth-proxy.js';
 
 dotenv.config({ quiet: true });
 
@@ -20,6 +21,22 @@ frontendApp.use('/api', createProxyMiddleware({
   target: `http://localhost:${backEndPort}/api`,
   changeOrigin: true
 }));
+
+// Firebase Auth handler on our own origin. `/__/auth/*` (handler, iframe and
+// their scripts) is reverse-proxied to <projectId>.firebaseapp.com so the
+// sign-in handler runs first-party — inside the installed PWA's own webview
+// and within Safari's storage partition, where getRedirectResult can read the
+// result back. Switched on by VITE_FIREBASE_PROJECT_ID; VITE_FIREBASE_AUTH_DOMAIN
+// must then be this site's own host. Mounted ahead of the static layer and the
+// SPA fallback so the handler page never resolves to index.html.
+const firebaseAuthTarget = firebaseAuthProxyTarget(process.env.VITE_FIREBASE_PROJECT_ID);
+if (firebaseAuthTarget) {
+  frontendApp.use(FIREBASE_AUTH_PROXY_PATH, createProxyMiddleware({
+    target: `${firebaseAuthTarget}${FIREBASE_AUTH_PROXY_PATH}`,
+    changeOrigin: true
+  }));
+  logger.info(`🛡️ Firebase Auth handler proxied: ${FIREBASE_AUTH_PROXY_PATH}/* → ${firebaseAuthTarget}`);
+}
 
 // Set static file directory.
 // Cache-Control is set per-asset class so the static layer behaves well

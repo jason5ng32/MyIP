@@ -157,6 +157,16 @@ tokens). `persona` strips the framing headers (`host` / `content-length` / …)
 first, as it re-serializes the body. Do **not** replicate for third-party
 upstreams; those get only what's explicitly needed.
 
+### Firebase Auth handler proxy
+
+`frontend-server.js` (production) and `vite.config.js` (dev) reverse-proxy
+`/__/auth/*` to `<projectId>.firebaseapp.com` (target from
+`common/firebase-auth-proxy.js`), mounted only when `VITE_FIREBASE_PROJECT_ID`
+is set and with `VITE_FIREBASE_AUTH_DOMAIN` set to the site's own host. The
+sign-in handler then runs first-party — inside the installed PWA's webview and
+Safari's storage partition — so `getRedirectResult` finds the result. It is not
+an `/api` route: no guards, no caching, nothing logged per request.
+
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing
