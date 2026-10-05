@@ -178,10 +178,11 @@ const validateInput = (input) => {
 };
 
 const onSubmit = () => {
+    const raw = queryMAC.value.trim();
+    if (!raw) return;
     trackEvent('Section', 'StartClick', 'MACChecker');
     errorMsg.value = '';
     macCheckResult.value = {};
-    const raw = queryMAC.value.trim();
     picked.value = EXAMPLES.some((e) => e.input === raw) ? raw : '';
     const query = validateInput(raw);
     if (query) getMacInfo(query);
