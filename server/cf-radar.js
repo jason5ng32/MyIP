@@ -188,8 +188,9 @@ export const normalizePrefixOrigins = (result) => {
 };
 
 const GEO_TOP = 50;              // countries in the response
-const GEO_PREFIX_CAP = 20000;    // bound on prefixes considered per request
-const GEO_LOOKUP_BUDGET = 100000; // hard cap on MaxMind lookups per request (~0.3 s)
+// Hard cap on MaxMind lookups per request (~0.3 s). Every uncovered prefix
+// costs at least one, so this bounds the walk however many Radar returns.
+const GEO_LOOKUP_BUDGET = 100000;
 
 // Share of the ASN's announced IPv4 addresses per geolocated country, largest
 // first. v4-only and address-weighted (a /16 counts 256× a /24); prefixes
@@ -208,7 +209,6 @@ export const buildCountryShares = (prefixes, lookupRange) => {
     const blocks = (prefixes || [])
         .map((row) => parseCidr(row?.prefix))
         .filter((cidr) => cidr?.family === 4)
-        .slice(0, GEO_PREFIX_CAP)
         .map((cidr) => ({ start: cidr.network, size: 2n ** BigInt(32 - cidr.prefix) }))
         .sort((a, b) => (a.start === b.start ? Number(b.size - a.size) : (a.start < b.start ? -1 : 1)));
 
