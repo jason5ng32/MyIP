@@ -2208,5 +2208,55 @@
         }
       }
     ]
+  },
+  {
+    "version": "v7.8.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "New tool: IP Blocklist Check — see whether an IP is on about 80 real-time DNSBLs and threat intelligence lists",
+          "zh": "新增工具：IP 黑名单检查——查看 IP 是否出现在约 80 个实时 DNSBL 与威胁情报名单上",
+          "zh-TW": "新增工具：IP 黑名單檢查——查看 IP 是否出現在約 80 個即時 DNSBL 與威脅情報名單上",
+          "fr": "Nouvel outil : Vérification des listes noires IP — vérifiez si une IP figure sur environ 80 DNSBL en temps réel et listes de renseignement sur les menaces",
+          "ru": "Новый инструмент: проверка IP по чёрным спискам — узнайте, есть ли IP примерно в 80 DNSBL реального времени и списках киберразведки",
+          "pt-BR": "Nova ferramenta: Verificação de listas negras de IP — veja se um IP está em cerca de 80 DNSBLs em tempo real e listas de inteligência de ameaças"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools are now grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
+          "zh": "高级工具改为按网络诊断、查询与计算、深度检测分组展示",
+          "zh-TW": "進階工具改為按網路診斷、查詢與計算、深度檢測分組展示",
+          "fr": "Les Outils avancés sont désormais regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
+          "ru": "Расширенные инструменты теперь разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
+          "pt-BR": "As Ferramentas avançadas agora são agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reorganized the project's directory structure for easier maintenance",
+          "zh": "重构了程序的目录结构，提高可维护性",
+          "zh-TW": "重構了程式的目錄結構，提高可維護性",
+          "fr": "Réorganisation de la structure des répertoires du projet pour faciliter la maintenance",
+          "ru": "Реорганизована структура каталогов проекта для упрощения поддержки",
+          "pt-BR": "Reorganizada a estrutura de diretórios do projeto para facilitar a manutenção"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]
