@@ -69,6 +69,7 @@ export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (da
 
     // Network type.
     if (tags.isDatacenter === true) add('network.datacenter');
+    else if (tags.isSatellite === true) add('network.satellite');
     else if (tags.isMobile === true) add('network.mobile');
     else add('network.isp');
 
@@ -78,6 +79,7 @@ export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (da
     if (anonymity) {
         const cls = anonymity.class;
         const suspected = cls === 'residential_proxy' && isSuspectedResidentialProxy(tags);
+        const before = sentences.length;
         if (suspected) {
             if (isIsoDay(anonymity.lastSeen)) {
                 add('anonymity.residentialProxySuspected', { date: formatDate(anonymity.lastSeen) });
@@ -92,7 +94,9 @@ export const buildScoreExplanation = (data, { t = (key) => key, formatDate = (da
         } else if (cls == null) {
             add('anonymity.none');
         }
-        if (cls != null && !suspected && isIsoDay(anonymity.lastSeen)) {
+        // Date only a rendered class sentence; unknown classes add nothing.
+        const classAdded = sentences.length > before;
+        if (cls != null && !suspected && classAdded && isIsoDay(anonymity.lastSeen)) {
             add('anonymityLastSeen', { date: formatDate(anonymity.lastSeen) });
         }
     }

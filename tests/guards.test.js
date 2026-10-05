@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry } from '../common/guards.js';
+import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../common/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -322,6 +322,88 @@ describe('requireValidDomain', () => {
             guard(makeReq({ query: { domain: bad } }), res, () => { nextCalled = true; });
             assert.equal(res.statusCode, 400, `should reject "${bad}"`);
             assert.equal(nextCalled, false);
+        }
+    });
+});
+
+describe('requireValidASN', () => {
+    const guard = requireValidASN();
+
+    it('canonicalizes to the bare number string in place', () => {
+        for (const [input, expected] of [['13335', '13335'], ['AS13335', '13335'], ['as13335', '13335'],
+            ['AS013335', '13335'], ['0013335', '13335'], [' 13335 ', '13335'], ['1', '1'],
+            ['4294967295', '4294967295'], ['AS4294967295', '4294967295']]) {
+            const req = makeReq({ query: { asn: input } });
+            let nextCalled = false;
+            guard(req, makeRes(), () => { nextCalled = true; });
+            assert.equal(nextCalled, true, input);
+            assert.equal(req.query.asn, expected, input);
+        }
+    });
+
+    it('returns 400 "No ASN provided" when the param is missing', () => {
+        const res = makeRes();
+        let nextCalled = false;
+        guard(makeReq(), res, () => { nextCalled = true; });
+        assert.equal(res.statusCode, 400);
+        assert.equal(res.body.error, 'No ASN provided');
+        assert.equal(nextCalled, false);
+    });
+
+    it('returns 400 for AS0, values past 32 bits, overlong digit strings and non-ASNs', () => {
+        for (const bad of ['0', 'AS0', '000', '4294967296', 'AS99999999999', '00000000013335', '9'.repeat(400),
+            'ASN13335', '13335a', '-1', '1.5', 'AS 13335', 'not-an-asn', ['1', '2']]) {
+            const res = makeRes();
+            let nextCalled = false;
+            guard(makeReq({ query: { asn: bad } }), res, () => { nextCalled = true; });
+            assert.equal(res.statusCode, 400, `should reject "${bad}"`);
+            assert.equal(res.body.error, 'Invalid ASN');
+            assert.equal(nextCalled, false);
+        }
+    });
+
+    it('honours a custom param name', () => {
+        const req = makeReq({ query: { origin: 'AS64500' } });
+        let nextCalled = false;
+        requireValidASN('origin')(req, makeRes(), () => { nextCalled = true; });
+        assert.equal(nextCalled, true);
+        assert.equal(req.query.origin, '64500');
+    });
+});
+
+describe('normalizeAsnQuery', () => {
+    const guard = normalizeAsnQuery();
+
+    it('canonicalizes ASN-shaped values to AS<n> in place', () => {
+        for (const [input, expected] of [['AS13335', 'AS13335'], ['as13335', 'AS13335'], ['As13335', 'AS13335'],
+            ['AS013335', 'AS13335'], [' AS13335 ', 'AS13335'], ['AS4294967295', 'AS4294967295']]) {
+            const req = makeReq({ query: { q: input } });
+            let nextCalled = false;
+            guard(req, makeRes(), () => { nextCalled = true; });
+            assert.equal(nextCalled, true, input);
+            assert.equal(req.query.q, expected, input);
+        }
+    });
+
+    it('returns 400 for AS0 and values past 32 bits', () => {
+        for (const bad of ['AS0', 'as0', 'AS4294967296', 'AS99999999999']) {
+            const res = makeRes();
+            let nextCalled = false;
+            guard(makeReq({ query: { q: bad } }), res, () => { nextCalled = true; });
+            assert.equal(res.statusCode, 400, `should reject "${bad}"`);
+            assert.equal(res.body.error, 'Invalid ASN');
+            assert.equal(nextCalled, false);
+        }
+    });
+
+    it('passes IPs, domains, bare numbers, missing and array values through untouched', () => {
+        for (const query of [{ q: '1.1.1.1' }, { q: 'example.com' }, { q: 'ASN13335' }, {}, { q: ['AS1', 'AS2'] },
+            { q: '13335' }, { q: '0' }, { q: '99999999999' }]) {
+            const req = makeReq({ query: { ...query } });
+            let nextCalled = false;
+            guard(req, makeRes(), () => { nextCalled = true; });
+            assert.equal(nextCalled, true);
+            assert.deepEqual(req.query, query);
         }
     });
 });

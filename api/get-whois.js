@@ -1,6 +1,10 @@
+// /api/whois — registry record for an IP, a domain or an ASN. IPs and ASNs
+// go to RIR RDAP, domains to port-43 WHOIS with an RDAP fallback; every
+// path answers with a WHOIS-like `__raw` text block for the Whois tool.
+
 import whoiser from 'whoiser';
 import { isValidIP, isUsablePublicIP } from '../common/valid-ip.js';
-import { rdapDomain, rdapIp } from '../common/rdap.js';
+import { rdapDomain, rdapIp, rdapAutnum, isAutnumMissing } from '../common/rdap.js';
 import logger from '../common/logger.js';
 
 function isValidDomain(domain) {
@@ -25,6 +29,21 @@ export default async (req, res) => {
     // typeof check also rejects the array form (?q=a&q=b) express produces.
     if (!query || typeof query !== 'string') {
         return res.status(400).json({ error: 'No address provided' });
+    }
+
+    // ASN path: RDAP autnum only — no port-43 fallback. The route's
+    // normalizeAsnQuery guard has already canonicalized the query to AS<n>.
+    const asnMatch = /^AS(\d+)$/.exec(query);
+    if (asnMatch) {
+        try {
+            return res.json(await rdapAutnum(Number(asnMatch[1])));
+        } catch (e) {
+            if (isAutnumMissing(e)) {
+                return res.status(404).json({ error: e.message });
+            }
+            logger.error({ err: e, query }, 'Failed to get RDAP autnum info');
+            return res.status(500).json({ error: e.message });
+        }
     }
     if (!isValidIP(query) && !isValidDomain(query)) {
         return res.status(400).json({ error: 'Invalid IP or address' });

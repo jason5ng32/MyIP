@@ -156,6 +156,7 @@ describe('useShortcuts()', () => {
     assert.ok(distinctKeys.has('H'));
     assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off without a pulse backend or cloudFlare key');
     assert.equal(distinctKeys.has('P'), false, 'persona shortcut stays off a self-hosted instance');
+    assert.equal(distinctKeys.has('A'), false, 'ASN Profile shortcut stays off without a cloudFlare key');
     // Overlays take no keys at all (utils/shortcut.js), so there is no
     // drawer-only entry left to register.
     assert.equal(distinctKeys.has('f'), false, 'no shortcut acts on an open overlay');
@@ -174,6 +175,15 @@ describe('useShortcuts()', () => {
     assert.ok(P, 'key "P" should be present on originalSite');
     P.action();
     assert.deepEqual(calls.advancedNavigate, ['enhanceddnsleaktest', 'personacheck']);
+  });
+
+  it('configs.cloudFlare adds the ASN Profile shortcut ("A")', () => {
+    const { keyMap, calls } = loadAndGetKeyMap({ cloudFlare: true });
+    // Uppercase A is its own key — lowercase a is the IP calculator's.
+    const A = keyMap.findLast((e) => e.keys === 'A');
+    assert.ok(A, 'key "A" should be present when configs.cloudFlare is set');
+    A.action();
+    assert.deepEqual(calls.advancedNavigate, ['asn']);
   });
 
   it('"R" action triggers store.setRefreshEveryThing(true)', () => {

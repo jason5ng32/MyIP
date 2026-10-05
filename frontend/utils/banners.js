@@ -9,7 +9,8 @@
 //     id: 'vps',                   // unique across all data files
 //     icon: 'Server',              // lucide icon NAME (string, no import);
 //                                  // dict in InfoBanner.vue: Globe, Megaphone,
-//                                  // Server, Shield, Sparkles, Zap —
+//                                  // Server, Shield, ShieldCheck, Sparkles,
+//                                  // Zap —
 //                                  // unknown/absent falls back to Megaphone
 //     track: 'IPInfoVPS',          // campaign id — the label on the
 //                                  // BannerClick_<section> analytics event

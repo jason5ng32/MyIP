@@ -62,8 +62,7 @@ async function refreshProvider(provider, previous) {
     return entry;
 }
 
-// Refresh every provider in parallel and publish a new snapshot. Exported so
-// boot can await an initial fill before the server starts serving.
+// Refresh every provider in parallel and publish a new snapshot.
 export async function refreshServiceStatus() {
     const prevById = new Map(snapshot.providers.map((p) => [p.id, p]));
     const providers = await Promise.all(
@@ -90,6 +89,9 @@ export function getServiceStatusOverview() {
 export function getProviderDetail(id) {
     return snapshot.providers.find((p) => p.id === id) || null;
 }
+
+// Whether a refresh has completed — false until the boot fill lands.
+export const isServiceStatusPrimed = () => snapshot.updatedAt !== null;
 
 // Populate the cache once at boot. Non-fatal: a failure leaves an empty
 // snapshot that the next scheduled tick will fill.

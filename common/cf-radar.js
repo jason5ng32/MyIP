@@ -5,10 +5,18 @@
 // fetch function that produces the response payload. api/cf-radar.js
 // dispatches over this registry — adding Radar data means one view function
 // plus one registry row here, never a new route.
+//
+// A view may answer despite failed upstream calls (asn: some segments) or
+// with local lookups left undone (bgp-prefixes: countries MaxMind couldn't
+// answer). It then
+// registers the payload via markPartial; the route's cache middleware asks
+// isCompleteRadarAnswer and serves such an answer without edge-caching it.
+// The payload itself is unchanged.
 
 import { fetchUpstream } from './fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
-import { providersOf, peersOf, customerCountOf } from './as-rel-db.js';
+import { lookupCountryRange } from './maxmind-service.js';
+import { parseCidr, formatIPv4 } from './ip-math.js';
 import logger from './logger.js';
 
 // -- shared Radar client ----------------------------------------------------
@@ -28,30 +36,38 @@ export async function fetchFromCloudflare(endpoint) {
     });
     // Outage pages come back as HTML — fail on status instead of JSON.parse.
     if (!response.ok) {
-        throw new Error(`Cloudflare Radar responded ${response.status}`);
+        throw Object.assign(new Error(`Cloudflare Radar responded ${response.status}`), { status: response.status });
     }
     return response.json();
 }
 
+// Payloads served despite failed upstream calls (see the header). Keyed by
+// object identity, so nothing leaks into the JSON.
+const partialAnswers = new WeakSet();
+const markPartial = (body) => {
+    partialAnswers.add(body);
+    return body;
+};
+export const isCompleteRadarAnswer = (body) => !partialAnswers.has(body);
+
 // -- view: asn — per-ASN entity info + 7d HTTP traffic profile --------------
 
-// The five Radar segments backing one response, keyed by the field name
-// cleanUpResponseData expects.
+// The Radar segments backing one response, keyed by the field name
+// cleanUpResponseData expects. Prefix and relationship counts live in the
+// ASN Profile (pfx2as list, CAIDA graph), not here.
 const SEGMENTS = {
     asnInfo: (asn) => `/radar/entities/asns/${asn}`,
     ipVersion: (asn) => `/radar/http/summary/ip_version?asn=${asn}&dateRange=7d`,
     httpProtocol: (asn) => `/radar/http/summary/http_protocol?asn=${asn}&dateRange=7d`,
     deviceType: (asn) => `/radar/http/summary/device_type?asn=${asn}&dateRange=7d`,
     botType: (asn) => `/radar/http/summary/bot_class?asn=${asn}&dateRange=7d`,
-    routesStats: (asn) => `/radar/bgp/routes/stats?asn=${asn}`,
-    rels: (asn) => `/radar/entities/asns/${asn}/rel`,
     quality: (asn) => `/radar/quality/speed/summary?asn=${asn}`,
 };
 
 // Fetch all segments in parallel. A failed segment is dropped rather than
 // failing the whole response — cleanUpResponseData / filterData already
 // tolerate sparse data (small ASNs), so partial results degrade to missing
-// fields. Only a full wipe-out is an error (fetchAsnProfile throws).
+// fields. Only a full wipe-out is an error (loadAsnSummary throws).
 const getAllASNData = async (asn) => {
     const names = Object.keys(SEGMENTS);
     const settled = await Promise.allSettled(names.map((name) => fetchFromCloudflare(SEGMENTS[name](asn))));
@@ -60,7 +76,8 @@ const getAllASNData = async (asn) => {
     settled.forEach((result, i) => {
         if (result.status === 'fulfilled') {
             data[names[i]] = result.value;
-        } else {
+        } else if (result.reason?.status !== 404) {
+            // A 404 is Radar's "no such AS" — an empty answer, not a fault.
             failed.push({ name: names[i], reason: result.reason });
         }
     });
@@ -87,8 +104,6 @@ function cleanUpResponseData(data) {
         Mobile_Pct: data.deviceType?.result?.summary_0?.mobile,
         Bot_Pct: data.botType?.result?.summary_0?.bot,
         Human_Pct: data.botType?.result?.summary_0?.human,
-        prefixesV4: data.routesStats?.result?.stats?.distinct_prefixes_ipv4,
-        prefixesV6: data.routesStats?.result?.stats?.distinct_prefixes_ipv6,
         speedDownload: data.quality?.result?.summary_0?.bandwidthDownload,
         speedUpload: data.quality?.result?.summary_0?.bandwidthUpload,
         latency: data.quality?.result?.summary_0?.latencyIdle,
@@ -96,52 +111,14 @@ function cleanUpResponseData(data) {
     };
 }
 
-// Distinct relationship partners from Radar /rel rows. A pair listed as both
-// transit and peer counts as transit only (same dedupe as asn-connectivity).
-export const countAsnRels = (rows, asn) => {
-    const upstreams = new Set();
-    const downstreams = new Set();
-    const peers = new Set();
-    for (const row of rows) {
-        if (row.rel === 'provider-customer') {
-            if (row.asn2 === asn) upstreams.add(row.asn1);
-            else if (row.asn1 === asn) downstreams.add(row.asn2);
-        } else if (row.rel === 'peer') {
-            peers.add(row.asn1 === asn ? row.asn2 : row.asn1);
-        }
-    }
-    for (const p of upstreams) peers.delete(p);
-    for (const p of downstreams) peers.delete(p);
-    return { upstreamCount: upstreams.size, downstreamCount: downstreams.size, peerCount: peers.size };
-};
-
-// Rel counts prefer Radar's path-observed rows; when the segment failed or
-// came back empty, fall back to the local CAIDA snapshot. All-zero counts
-// (AS unknown to both) are dropped so the frontend hides the fields.
-function resolveRelCounts(rows, asn) {
-    const counts = Array.isArray(rows) && rows.length > 0
-        ? countAsnRels(rows, asn)
-        : {
-            upstreamCount: providersOf(asn).length,
-            downstreamCount: customerCountOf(asn),
-            peerCount: peersOf(asn).length,
-        };
-    return Object.values(counts).every(v => v === 0) ? {} : counts;
-}
-
-// Format output
+// Format output; a missing value parses to NaN, which filterData drops.
 function formatData(data) {
-    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, prefixesV4, prefixesV6, upstreamCount, downstreamCount, peerCount, speedDownload, speedUpload, latency, jitter } = data;
+    const { asnName, asnCountryCode, asnOrgName, estimatedUsers, IPv4_Pct, IPv6_Pct, HTTP_Pct, HTTPS_Pct, Desktop_Pct, Mobile_Pct, Bot_Pct, Human_Pct, speedDownload, speedUpload, latency, jitter } = data;
     return {
         asnName,
         asnCountryCode,
         asnOrgName,
         estimatedUsers: parseFloat(estimatedUsers).toLocaleString(),
-        prefixesV4: parseFloat(prefixesV4).toLocaleString(),
-        prefixesV6: parseFloat(prefixesV6).toLocaleString(),
-        upstreamCount: parseFloat(upstreamCount).toLocaleString(),
-        downstreamCount: parseFloat(downstreamCount).toLocaleString(),
-        peerCount: parseFloat(peerCount).toLocaleString(),
         speedDownload: `${parseFloat(speedDownload).toFixed(1)} Mbps`,
         speedUpload: `${parseFloat(speedUpload).toFixed(1)} Mbps`,
         latency: `${Math.round(parseFloat(latency))} ms`,
@@ -168,7 +145,14 @@ function filterData(data) {
     return data;
 }
 
-const fetchAsnProfile = async ({ asn }) => {
+// Settled segment payloads → response body. Exported for tests.
+export const shapeAsnProfile = (data) => filterData(formatData(cleanUpResponseData(data)));
+
+// One AS's summary, for the asn view and /api/asn-profile:
+//   summary         the view's payload
+//   failedSegments  names of the segments that failed; [] = complete
+// Throws when every segment failed.
+export const loadAsnSummary = async (asn) => {
     const { data, failed } = await getAllASNData(asn);
     if (failed.length === Object.keys(SEGMENTS).length) {
         throw failed[0].reason instanceof Error
@@ -178,9 +162,104 @@ const fetchAsnProfile = async ({ asn }) => {
     if (failed.length > 0) {
         logger.warn({ err: failed[0].reason, asn, segments: failed.map((f) => f.name) }, 'cf-radar: partial Radar segment failure');
     }
-    const cleaned = cleanUpResponseData(data);
-    Object.assign(cleaned, resolveRelCounts(data.rels?.result?.rels, Number(asn)));
-    return filterData(formatData(cleaned));
+    return { summary: shapeAsnProfile(data), failedSegments: failed.map((f) => f.name) };
+};
+
+// Partial summaries are served but not edge-cached.
+const fetchAsnProfile = async ({ asn }) => {
+    const { summary, failedSegments } = await loadAsnSummary(asn);
+    return failedSegments.length > 0 ? markPartial(summary) : summary;
+};
+
+// -- view: bgp-prefixes — announced prefixes + IPv4 country footprint -------
+
+// Per-prefix origination list from Radar's pfx2as. One row per announced
+// prefix (v4/v6 mixed): rpki passes through Radar's validation verdict
+// (Valid / Invalid / Unknown), peers is how many route collectors carry the
+// route. A result without a `prefix_origins` array throws: only a real empty
+// list means "originates nothing". Exported for tests.
+export const normalizePrefixOrigins = (result) => {
+    if (!Array.isArray(result?.prefix_origins)) throw new Error('malformed pfx2as payload');
+    return result.prefix_origins.map((row) => ({
+        prefix: row.prefix,
+        rpki: row.rpki_validation,
+        peers: row.peer_count ?? 0,
+    }));
+};
+
+const GEO_TOP = 50;              // countries in the response
+const GEO_PREFIX_CAP = 20000;    // bound on prefixes considered per request
+const GEO_LOOKUP_BUDGET = 100000; // hard cap on MaxMind lookups per request (~0.3 s)
+
+// Share of the ASN's announced IPv4 addresses per geolocated country, largest
+// first. v4-only and address-weighted (a /16 counts 256× a /24); prefixes
+// covered by another announced prefix are skipped so a covering route plus
+// its more-specifics isn't counted twice. Each prefix is walked one MaxMind
+// network at a time, so one spanning several countries is split among them.
+// Shares are of the addresses that resolved to a country.
+// `lookupRange(ip) → { country, prefixLength } | null` is injected so tests
+// need no MaxMind database; null = no answer (no database, or the lookup
+// failed), unlike an address MaxMind places nowhere ({ country: null }).
+// Resolves { shares, complete }: a null answer or the budget ending the walk
+// gives { shares: [], complete: false } — shares over part of the space
+// would read as the whole distribution — and the caller must not cache it.
+// Exported for tests.
+export const buildCountryShares = (prefixes, lookupRange) => {
+    const blocks = (prefixes || [])
+        .map((row) => parseCidr(row?.prefix))
+        .filter((cidr) => cidr?.family === 4)
+        .slice(0, GEO_PREFIX_CAP)
+        .map((cidr) => ({ start: cidr.network, size: 2n ** BigInt(32 - cidr.prefix) }))
+        .sort((a, b) => (a.start === b.start ? Number(b.size - a.size) : (a.start < b.start ? -1 : 1)));
+
+    const weightByCountry = new Map();
+    let total = 0;
+    let coveredUntil = -1n;
+    let budget = GEO_LOOKUP_BUDGET;
+    for (const { start, size } of blocks) {
+        // CIDR blocks nest or are disjoint: starting inside the last kept
+        // block means being inside it.
+        if (start <= coveredUntil) continue;
+        coveredUntil = start + size - 1n;
+        // IPv4 fits a Number. Each lookup answers for the aligned network
+        // holding the cursor.
+        const stop = Number(start + size);
+        let cursor = Number(start);
+        while (cursor < stop) {
+            if (budget-- <= 0) return { shares: [], complete: false };
+            const hit = lookupRange(formatIPv4(BigInt(cursor)));
+            if (!hit) return { shares: [], complete: false };
+            const networkSize = 2 ** (32 - hit.prefixLength);
+            const next = (Math.floor(cursor / networkSize) + 1) * networkSize;
+            const weight = Math.min(next, stop) - cursor;
+            if (hit.country) {
+                weightByCountry.set(hit.country, (weightByCountry.get(hit.country) || 0) + weight);
+                total += weight;
+            }
+            cursor = next;
+        }
+    }
+    if (!total) return { shares: [], complete: true };
+    const shares = [...weightByCountry.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, GEO_TOP)
+        .map(([country, weight]) => ({ country, share: Math.round((weight / total) * 10000) / 10000 }))
+        .filter((row) => row.share > 0);
+    return { shares, complete: true };
+};
+
+// `lookupRange` is injectable for tests.
+const fetchBgpPrefixes = async ({ asn }, { lookupRange = lookupCountryRange } = {}) => {
+    const json = await fetchFromCloudflare(`/radar/bgp/routes/pfx2as?origin=${asn}`);
+    // An ASN originating nothing is a valid, cacheable answer: both lists
+    // empty. A malformed result throws (500 here, `error` in the profile).
+    const prefixes = normalizePrefixOrigins(json?.result);
+    const { shares, complete } = buildCountryShares(prefixes, lookupRange);
+    // Countries MaxMind couldn't fully work out (no database, a failed
+    // lookup, the budget) are served, never cached. No IPv4 prefixes means
+    // no lookups: complete, and cacheable.
+    const body = { prefixes, countries: shares };
+    return complete ? body : markPartial(body);
 };
 
 // -- view: country-traffic — country online-activity heatmap ----------------
@@ -341,9 +420,11 @@ const fetchOutages = async () => {
 // ttl:    edge-cache seconds, read by the /api/cfradar route middleware.
 // fetch:  async (req.query) => payload; throws on upstream failure.
 export const RADAR_VIEWS = {
+    // The ASN data family (this, bgp-prefixes, /api/asn-profile) shares one
+    // week of edge cache: the profile doesn't chase day-level precision.
     'asn': {
         guards: [requireValidASN()],
-        ttl: 30 * 24 * 60 * 60,
+        ttl: 7 * 24 * 60 * 60,
         fetch: fetchAsnProfile,
     },
     'country-traffic': {
@@ -355,5 +436,10 @@ export const RADAR_VIEWS = {
         guards: [],
         ttl: 60 * 60,
         fetch: fetchOutages,
+    },
+    'bgp-prefixes': {
+        guards: [requireValidASN()],
+        ttl: 7 * 24 * 60 * 60,
+        fetch: fetchBgpPrefixes,
     },
 };

@@ -1,5 +1,5 @@
-// Sentry Cron check-in wrapper for the backend's periodic jobs (MaxMind /
-// CAIDA / service-status). Same gating as sentry-instrument.js: without
+// Sentry Cron check-in wrapper for the backend's periodic jobs (the dataset
+// updater, service-status). Same gating as sentry-instrument.js: without
 // SENTRY_DSN_BACKEND this is a pure passthrough and @sentry/node is never
 // loaded, so job modules can call it unconditionally.
 //

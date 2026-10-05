@@ -8,7 +8,7 @@ import rateLimit from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import logger from './common/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
-    requireValidRecordType, requireValidReportId } from './common/guards.js';
+    requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './common/guards.js';
 import { withTimeZone } from './common/ip-timezone.js';
 
 // Backend APIs
@@ -23,7 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS } from './common/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer } from './common/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -40,14 +40,23 @@ import invisibilitytestHandler from './api/invisibility-test.js';
 import macChecker from './api/mac-checker.js';
 import githubStarsHandler from './api/github-stars.js';
 import personaEvaluateHandler from './api/persona.js';
+import asnProfileHandler from './api/asn-profile.js';
+import { isCompleteProfile } from './common/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
-import { reloadMaxMindDatabases, startMaxMindFileWatcher } from './common/maxmind-service.js';
-import { startMaxMindAutoUpdate, bootstrapMaxMindIfMissing } from './common/maxmind-updater.js';
-import { startCaidaAutoUpdate, bootstrapCaidaIfMissing } from './common/caida-updater.js';
-import { bootstrapServiceStatus, startServiceStatusPolling } from './common/service-status-store.js';
+import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './common/maxmind-service.js';
+import { bootstrapDatasets, startDatasetScheduler, watchDatasets } from './common/dataset-updater.js';
+import { datasets } from './common/datasets.js';
+import {
+    bootstrapServiceStatus, startServiceStatusPolling, isServiceStatusPrimed,
+} from './common/service-status-store.js';
+import { isAsRelLoaded } from './common/as-rel-db.js';
+import { isAsOrgLoaded } from './common/as-org-db.js';
+import { isOuiLoaded } from './common/oui-db.js';
+import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './common/offline-data.js';
+import { cacheable } from './common/cache-control.js';
 import { initUpstreamUserAgent } from './common/upstream-ua.js';
 
 dotenv.config({ quiet: true });
@@ -207,37 +216,22 @@ if (speedLimitSet !== 0) {
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
-// declare it explicitly via the `cacheable(maxAge)` middleware below.
+// declare it explicitly via `cacheable(maxAge)` (common/cache-control.js).
 app.use('/api', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
     next();
 });
 
-// Cache-Control middleware factory. Hooks res.json so the header is only
-// attached on 2xx — CF must not cache 4xx/5xx error pages. The intended cache
-// value is also stashed on res.locals.cacheControl so binary-stream handlers
-// (which bypass res.json) can apply it themselves on their own 2xx path.
-// `maxAge` is a number of seconds, or a `(req) => seconds` resolver for
-// routes whose TTL depends on the request (the /api/cfradar view registry);
-// a falsy resolution keeps the /api-wide no-store default.
-const cacheable = (maxAge) => (req, res, next) => {
-    const maxAgeSeconds = typeof maxAge === 'function' ? maxAge(req) : maxAge;
-    if (maxAgeSeconds) {
-        res.locals.cacheControl = `public, max-age=${maxAgeSeconds}`;
-        const originalJson = res.json.bind(res);
-        res.json = function (body) {
-            if (res.statusCode < 400) {
-                res.setHeader('Cache-Control', res.locals.cacheControl);
-            }
-            return originalJson(body);
-        };
-    }
-    next();
-};
-
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see common/guards.js.
 app.use('/api', requireReferer);
+
+// Readiness gates for routes reading local data (common/offline-data.js):
+// 503 while that data is still downloading at boot, a no-op afterwards.
+const needsMaxMind = requireOfflineData([isMaxMindReady]);
+const needsAsGraph = requireOfflineData([isAsRelLoaded, isAsOrgLoaded]);
+const needsOui = requireOfflineData([isOuiLoaded]);
+const needsServiceStatus = requireOfflineData([isServiceStatusPrimed]);
 
 const FIVE_MIN_CACHE = 5 * 60;
 const ONE_HOUR_CACHE = 60 * 60;
@@ -248,16 +242,16 @@ const ONE_YEAR_CACHE = 365 * 24 * 60 * 60;
 
 // Cacheable routes — TTLs picked against each upstream's natural refresh cadence.
 // Short Cache
-app.get('/api/service-status', cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
-app.get('/api/service-status/detail', requireValidProviderId(), cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
+app.get('/api/service-status', needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusHandler);
+app.get('/api/service-status/detail', requireValidProviderId(), needsServiceStatus, cacheable(FIVE_MIN_CACHE), serviceStatusDetailHandler);
 // Cache for 1 day
 app.get('/api/ipinfo', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipinfoHandler);
 app.get('/api/ipapicom', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapicomHandler);
 app.get('/api/ipsb', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipsbHandler);
 app.get('/api/ipapiis', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ipapiisHandler);
 app.get('/api/ip2location', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), ip2locationHandler);
-app.get('/api/maxmind', requirePublicIP(), withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
-app.get('/api/whois', cacheable(ONE_DAY_CACHE), getWhois);
+app.get('/api/maxmind', requirePublicIP(), needsMaxMind, withTimeZone(), cacheable(ONE_DAY_CACHE), maxmindHandler);
+app.get('/api/whois', normalizeAsnQuery(), cacheable(ONE_DAY_CACHE), getWhois);
 app.get('/api/github-stars', cacheable(ONE_DAY_CACHE), githubStarsHandler);
 // Feature flags derived from env vars — they only change on a redeploy, so
 // an hour of caching is safe.
@@ -269,16 +263,30 @@ app.get('/api/ooni-blocking', requireValidDomain(), cacheable(ONE_DAY_CACHE), oo
 // Which countries have online Globalping probes — coverage changes slowly,
 // and the pickers fail open anyway, so a week of edge cache is fine.
 app.get('/api/globalping-probes', cacheable(SEVEN_DAYS_CACHE), globalpingProbesHandler);
+// ASN Profile aggregate: every source in one answer; reputation inside it is
+// not per-user. A complete answer is cached for a week; a degraded one (a
+// section in error or incomplete) for a day — an upstream that fails for
+// some ASes every time would otherwise send every visit back to all sources.
+// Not boot-gated: a section whose local data is still downloading answers
+// 'error' on its own (api/asn-profile.js), and nothing degraded is cached
+// during that window.
+app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
+    cacheIf: isCompleteProfile,
+    degradedMaxAge: () => (isOfflineBootstrapping() ? 0 : ONE_DAY_CACHE),
+}), asnProfileHandler);
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
-// the TTL comes from that view's registry entry (common/cf-radar.js) — 30d
-// for the slow-moving ASN/traffic profiles, 1h for the outage feed.
-app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl), cfRadarHandler);
+// the TTL comes from that view's registry entry (common/cf-radar.js) — 7d
+// for the ASN summary and prefix list (same as /api/asn-profile), 30d for
+// country traffic, 1h for the outage feed. A partial answer (some upstream
+// calls failed, or prefix countries MaxMind couldn't fully work out) is
+// served but not cached.
+app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
 // and append-only BGP routing history.
 app.get('/api/asn-history', requireValidPrefix(), cacheable(THIRTY_DAYS_CACHE), asnHistoryHandler);
-app.get('/api/asn-connectivity', requireValidASN(), cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
-app.get('/api/macchecker', cacheable(THIRTY_DAYS_CACHE), macChecker);
+app.get('/api/asn-connectivity', requireValidASN(), needsAsGraph, cacheable(THIRTY_DAYS_CACHE), asnConnectivityHandler);
+app.get('/api/macchecker', needsOui, cacheable(THIRTY_DAYS_CACHE), macChecker);
 // Long Cache
 app.get('/api/map', cacheable(ONE_YEAR_CACHE), mapHandler);
 // Non-cacheable routes — auth-context, debug tools, or per-request lookups.
@@ -323,30 +331,46 @@ app.use(express.static(path.join(__dirname, './dist')));
 if (process.env.SENTRY_DSN_BACKEND) {
     const Sentry = await import('@sentry/node');
     Sentry.setupExpressErrorHandler(app);
-    logger.info('🛰️ Sentry backend monitoring enabled');
+    logger.info('🛰️  Sentry backend monitoring enabled');
 }
 
 
-// Bootstrap every offline dataset (MaxMind, CAIDA) before accepting traffic
-// so we never serve mid-download. Each step is non-fatal: a failure leaves
-// the dependent API in a degraded state (MaxMind → 503; CAIDA → empty graph
-// or RIPEstat fallback) but doesn't block the listener.
-async function bootBackend() {
-    await bootstrapMaxMindIfMissing({ reload: reloadMaxMindDatabases });
-    await reloadMaxMindDatabases('startup').catch(() => {
-        logger.error('❌ MaxMind API will return 503 until databases are loaded successfully');
-    });
-    await bootstrapCaidaIfMissing();
-    await bootstrapServiceStatus();
-
-    startMaxMindFileWatcher();
-    startMaxMindAutoUpdate({ reload: reloadMaxMindDatabases });
-    startCaidaAutoUpdate();
-    startServiceStatusPolling();
+// Boot sequence. Snapshots already on disk are in memory before the listener
+// opens (CAIDA / PeeringDB / IEEE load at import, MaxMind just below), so a
+// restart serves at once. Missing ones download behind the listener:
+// meanwhile only the routes reading them answer 503 (requireOfflineData
+// above). A failed download stays non-fatal — that route then serves degraded
+// (MaxMind / IEEE → 503; CAIDA → empty graph, RIPEstat fallback or no
+// peering section).
+const bootBackend = async () => {
+    const { cityDbPath, asnDbPath } = getMaxMindDbPaths();
+    if (fs.existsSync(cityDbPath) && fs.existsSync(asnDbPath)) {
+        await reloadMaxMindDatabases('startup').catch(() => {});
+    }
 
     app.listen(backEndPort, () => {
         logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
     });
-}
+
+    // Watching from before the downloads: a dataset another process
+    // publishes (or someone places by hand) while a boot step is still
+    // running is reloaded, not taken as the watcher's baseline.
+    watchDatasets(datasets);
+
+    await runOfflineBootstrap([
+        async () => {
+            await bootstrapDatasets(datasets);
+            if (isMaxMindReady()) return;
+            await reloadMaxMindDatabases('startup').catch(() => {
+                logger.error('❌ MaxMind API will return 503 until databases are available: set MAXMIND_ACCOUNT_ID + '
+                    + 'MAXMIND_LICENSE_KEY, or drop GeoLite2-City.mmdb + GeoLite2-ASN.mmdb into common/maxmind-db/');
+            });
+        },
+        bootstrapServiceStatus,
+    ]);
+
+    startDatasetScheduler(datasets);
+    startServiceStatusPolling();
+};
 
 bootBackend();

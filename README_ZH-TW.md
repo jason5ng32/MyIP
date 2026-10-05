@@ -61,10 +61,11 @@
 ### 🔦 查詢與基礎設施
 
 * 📟 **DNS 解析**：同時透過多個解析器解析網域，並依國家分組——輕鬆看出是否存在劫持或污染。
-* 📓 **Whois 查詢**：對網域名稱與 IP 位址進行 Whois 查詢。
+* 📓 **Whois 查詢**：對網域名稱、IP 位址與 AS 編號進行 Whois 查詢。
 * 🗄️ **MAC 位址查詢**：識別實體位址背後的廠商與詳細資訊。
 * 🧮 **IP 計算器**：對任意 IP、前綴、範圍或清單做子網路計算、進位轉換與 IPv6 介面解讀，全部本機完成。
-* 🛰️ **ASN 資訊與上游拓撲**：顯示 AS 詳細資訊、IP 前綴的歷史宣告記錄，以及該 ASN 到 Tier 1 骨幹網路的上游路徑。
+* 🛰️ **ASN 資訊與上游拓撲**：直接在每張 IP 卡片中顯示 AS 詳細資訊、該 IP 前綴的歷史宣告記錄，以及其 ASN 到 Tier 1 骨幹網路的上游路徑。
+* 🛂 **ASN 檔案**：任意 AS 的完整檔案——註冊資訊與原始 Whois 記錄、全球排名與規模、流量組成與連線品質、IPv4 位址分布在哪些國家、所有宣告前綴及其 RPKI 狀態、上游／對等／客戶網路，以及它進駐的網際網路交換中心與資料中心。
 * 📶 **服務可用性**：知名服務（Claude、OpenAI、GitHub、Cloudflare 等）的即時可用狀態，資料來自它們的官方狀態頁，並附最近的事故。
 
 ### ✨ 平台功能
@@ -124,7 +125,7 @@ pnpm start
 docker run -d -p 18966:18966 \
   -e MAXMIND_ACCOUNT_ID="YOUR_ACCOUNT_ID" \
   -e MAXMIND_LICENSE_KEY="YOUR_LICENSE_KEY" \
-  -e MAXMIND_AUTO_UPDATE="true" \
+  -e DATASET_AUTO_UPDATE="true" \
   -e ALLOWED_DOMAINS="your-domain.com" \
   --name myip --restart always \
   jason5ng32/myip:latest
@@ -177,9 +178,7 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 作為一個開源專案，我非常感謝以下贊助者對我的支持：
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服務，覆蓋 9000 萬+ 住宅 IP，支持智能輪換、穩定會話和精確地理定位，適用於代理測試、瀏覽器自動化及數據採集等場景。低至 $0.55/GB，使用 RAPID10 享 9 折優惠" /></a>
-
-<a href="https://www.digitalocean.com/?refcode=fd2634a3981b&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge"><img src="https://res.ipcheck.ing/img/digitalocean_logo.png" width="240px"  title="DigitalOcean" /></a>
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服務，覆蓋 9000 萬+ 住宅 IP，支持智能輪換、穩定會話和精確地理定位，適用於代理測試、瀏覽器自動化及數據採集等場景。低至 $0.55/GB，使用 RAPID10 享 9 折優惠" alt="RapidProxy" /></a>
 
 <a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
 

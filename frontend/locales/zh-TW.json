@@ -869,7 +869,8 @@
     "RuleTestNote": "檢查代理軟體的規則設定",
     "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
     "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
-    "Whois": "對網域名稱或 IP 進行 Whois 查詢",
+    "Whois": "對網域名稱、IP 或 AS 號碼進行 Whois 查詢",
+    "AsnProfile": "查看任意 AS 的完整檔案",
     "InvisibilityTest": "猜猜看我是否知道你掛了代理",
     "MacChecker": "查詢實體位址的歸屬資訊",
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
@@ -901,7 +902,14 @@
     "isLocal": "本地位址",
     "property": "位址屬性",
     "value": "值",
-    "manufacturer": "製造商資訊"
+    "manufacturer": "製造商資訊",
+    "Examples": "查看用例",
+    "exampleFull": "完整位址",
+    "examplePrefix": "廠商字首",
+    "exampleSubBlock": "小區塊",
+    "examplePrivate": "隱私註冊",
+    "exampleMulticast": "多播",
+    "exampleRandom": "隨機位址"
   },
   "ipcalculator": {
     "Title": "IP 計算器",
@@ -1033,15 +1041,154 @@
   },
   "whois": {
     "Title": "Whois 查詢",
-    "Note": "Whois 查詢是一種用於查詢網域名稱註冊資訊的服務。透過輸入網域名稱或 IP 位址，可以查詢到網域名稱的註冊資訊、註冊商、註冊日期、過期日期等資訊。IP 與網域名稱的 Whois 資訊欄位不完全一致。同時，部分比較小眾的網域名稱（TLD）可能無法查詢到相關資訊。",
-    "Note2": "請輸入網域名稱或 IP，開始進行查詢：",
+    "Note": "Whois 查詢是一種用於查詢註冊資訊的服務。透過輸入網域名稱、IP 位址或 AS 號碼（如 AS13335），可以查詢到註冊資訊、註冊商、註冊日期、過期日期等資訊。網域名稱、IP 與 AS 號碼的 Whois 資訊欄位不完全一致。同時，部分比較小眾的網域名稱（TLD）可能無法查詢到相關資訊。",
+    "Note2": "請輸入網域名稱、IP 或 AS 號碼（如 AS13335），開始進行查詢：",
     "Note3": "Whois 資訊包含多種型別的欄位，以下為原始文字內容",
-    "Placeholder": "網域名稱或 IP",
-    "invalidURL": "無效的網域名稱或 IP",
+    "Placeholder": "網域名稱、IP 或 AS 號碼",
+    "invalidURL": "無效的網域名稱、IP 或 AS 號碼",
     "reservedIP": "內網或保留位址沒有公開的註冊資訊，無法查詢。",
     "noData": "該查詢沒有公開的 Whois / RDAP 資料。部分頂級網域名稱不提供公開查詢服務。",
     "fetchError": "無法取得查詢結果或查詢結果為空",
     "Provider": "資訊服務商"
+  },
+  "asnprofile": {
+    "Title": "ASN 檔案查詢",
+    "Note": "自治系統（AS）是由單一機構營運的網路——可能是電信業者、雲端或主機代管業者、大學，也可能是大型企業——網際網路上的其他網路透過 AS 號碼辨識它，並經由 BGP 路由與它互通。輸入一個 AS 號碼，即可看到它由誰註冊、規模多大、宣告了哪些位址區塊以及這些區塊是否有 RPKI 簽章、IPv4 位址分布在哪些國家，以及它向誰購買上游、與誰對等互連、又為誰提供轉接。資料來自包括 Cloudflare Radar、各地區 RDAP 、PeeringDB 等多個管道。",
+    "InputLabel": "AS 號碼",
+    "Placeholder": "例如 AS13335",
+    "Lookup": "查詢",
+    "invalidInput": "請輸入有效的 AS 號碼，例如 AS13335 或 13335。",
+    "noData": "找不到 AS{asn} 的任何資料。它可能尚未分配、屬於私有保留範圍，或未在網際網路上宣告。",
+    "loadError": "暫時無法載入此 AS，請稍後再試。",
+    "partial": "部分資料來源這次沒有回應，相關內容已略過：{list}。",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "全球排名",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "宣告的 IPv4",
+      "ipv4Share": "約占 IPv4 網際網路的 {share}%",
+      "prefixes": "前綴 v4 · v6",
+      "users": "估計使用者數"
+    },
+    "registration": {
+      "title": "註冊資訊",
+      "registry": "註冊機構",
+      "status": "狀態",
+      "registered": "註冊時間",
+      "lastChanged": "最近更新",
+      "abuse": "濫用聯絡方式",
+      "raw": "原始 Whois 記錄",
+      "copyRaw": "複製原始記錄"
+    },
+    "reputation": {
+      "title": "信譽",
+      "source": "IPCheck.ing 資料",
+      "desc": "此網路宣告的 IPv4 位址被列入濫用與 VPN 名單的密度，以 IPCheck.ing 評分所用全網基線的倍數表示——刻度線為 1×，對數刻度。已被發現的代理數量是其中被發現充當公共代理的位址數。",
+      "abuse": "濫用 IP 密度",
+      "vpn": "VPN 出口密度",
+      "proxy": "已被發現的代理數量",
+      "ratio": "基線的 {ratio} 倍",
+      "belowBaseline": "不高於基線",
+      "drop": "已列入 Spamhaus ASN-DROP",
+      "updated": "資料日期：{date}",
+      "level": {
+        "none": "無明顯風險",
+        "low": "低風險",
+        "medium": "中風險",
+        "high": "高風險"
+      }
+    },
+    "traffic": {
+      "title": "流量與連線品質",
+      "desc": "Cloudflare 在過去 7 天觀察到、來自此網路的 HTTP 流量組成（IP 版本、是否加密、裝置類型、真人或機器人），以及此網路使用者測速結果的平均值。"
+    },
+    "map": {
+      "title": "全球 IP 分布",
+      "desc": "此網路的 IPv4 位址用在哪裡，比例依位址數量加權。"
+    },
+    "prefixes": {
+      "title": "宣告前綴",
+      "desc": "此 AS 在全球路由表中發起宣告的所有位址區塊。RPKI 有效表示有已簽章的 ROA 授權此 AS 宣告它，無效表示與 ROA 衝突，未知表示沒有 ROA。可見度是攜帶該前綴的路由收集器對等點數量。",
+      "counts": "{v4} 個 IPv4 · {v6} 個 IPv6",
+      "rpki": "RPKI 路由起源驗證",
+      "rpkiValid": "{pct}% 有效",
+      "family": "位址族",
+      "all": "全部",
+      "copy": "複製列表中的前綴",
+      "download": "下載 .txt",
+      "prefix": "前綴",
+      "size": "大小",
+      "rpkiColumn": "RPKI",
+      "visibility": "可見度",
+      "shown": "已顯示 {shown} / {total}",
+      "showMore": "再顯示 {count} 筆"
+    },
+    "rpki": {
+      "valid": "有效",
+      "invalid": "無效",
+      "unknown": "未知"
+    },
+    "connectivity": {
+      "title": "互連",
+      "desc": "上游向此 AS 出售轉接，對等方與它直接交換流量，客戶向它購買轉接——數量來自 CAIDA 的 AS 關係資料，與下方拓撲圖採用同一套判定。客戶錐是經由其客戶可以到達的 AS 數量（CAIDA AS Rank）。拓撲圖只畫出通往 Tier 1 網路的主要路徑，因此上游數量可能多於圖中的節點。",
+      "cone": "客戶錐（AS 數）",
+      "providers": "上游",
+      "peers": "對等",
+      "customers": "客戶",
+      "none": "未觀察到"
+    },
+    "peering": {
+      "title": "對等與駐點",
+      "desc": "以下資訊由該網路的營運者在 PeeringDB 中自行登記。網際網路交換中心是它接入的 IX，連接埠速率按每個 IX 合計；RS 表示與該 IX 的路由伺服器建立了工作階段。機房駐點是它進駐的資料中心。",
+      "policy": "對等策略",
+      "traffic": "流量規模",
+      "ratio": "流量方向",
+      "irr": "IRR as-set",
+      "website": "官網",
+      "scope": "涵蓋範圍",
+      "exchanges": "網際網路交換中心（{count}）",
+      "facilities": "機房駐點（{count}）",
+      "rs": "RS",
+      "rsTitle": "與該交換中心的路由伺服器對等",
+      "showAll": "顯示全部 {count} 個",
+      "showLess": "收合",
+      "types": {
+        "isp": "有線/DSL/ISP",
+        "nsp": "NSP（網路服務商）",
+        "content": "內容",
+        "enterprise": "企業",
+        "education": "教育/學研",
+        "nonProfit": "非營利",
+        "government": "政府",
+        "routeServer": "路由伺服器",
+        "routeCollector": "路由收集器",
+        "networkServices": "網路服務"
+      },
+      "scopes": {
+        "regional": "區域",
+        "northAmerica": "北美",
+        "asiaPacific": "亞太",
+        "europe": "歐洲",
+        "southAmerica": "南美",
+        "africa": "非洲",
+        "australia": "澳洲",
+        "middleEast": "中東",
+        "global": "全球"
+      },
+      "ratios": {
+        "balanced": "均衡",
+        "mostlyInbound": "以入站為主",
+        "heavyInbound": "大量入站",
+        "mostlyOutbound": "以出站為主",
+        "heavyOutbound": "大量出站"
+      },
+      "policies": {
+        "open": "開放",
+        "selective": "選擇性",
+        "restrictive": "限制性",
+        "no": "不對等"
+      }
+    }
   },
   "enhanceddnsleaktest": {
     "Title": "深度 DNS 洩漏測試",
@@ -1268,11 +1415,6 @@
       "asnOrgName": "AS 組織名稱：",
       "asnCountryCode": "AS 地區：",
       "estimatedUsers": "估計使用者數：",
-      "prefixesV4": "IPv4 前綴數：",
-      "prefixesV6": "IPv6 前綴數：",
-      "upstreamCount": "上游 AS 數：",
-      "downstreamCount": "下游 AS 數：",
-      "peerCount": "對等 AS 數：",
       "connectionQuality": "平均連線品質：",
       "connectionQualityTooltip": "基於該 ASN 的使用者與 Cloudflare 測速的彙總結果",
       "speedDownload": "下載頻寬：",
@@ -1287,7 +1429,7 @@
       "Mobile_Pct": "行動裝置",
       "Bot_Pct": "機器人",
       "Human_Pct": "人類",
-      "moreData": "更多資料："
+      "openProfile": "查看完整 ASN 檔案"
     },
     "ASNHistory": {
       "announcedPrefixes": "公告字首：",
@@ -1337,6 +1479,7 @@
         "network": {
           "datacenter": "它屬於託管 / 資料中心網路，而不是一般的家用或行動網路連線。",
           "mobile": "它位於行動網路，這類網路中一個 IP 往往由許多使用者共用。",
+          "satellite": "它位於衛星網際網路，而不是一般的家用或企業寬頻。",
           "isp": "它位於電信業者的接取網路（家用或企業寬頻），而不是託管服務商。"
         },
         "anonymity": {
@@ -1698,7 +1841,8 @@
     "IpCalculator": "開啟 IP 計算器面板",
     "BrowserInfo": "開啟瀏覽器資訊面板",
     "SecurityChecklist": "開啟安全檢查清單",
-    "PersonaCheck": "開啟深度畫像檢測面板"
+    "PersonaCheck": "開啟深度畫像檢測面板",
+    "AsnProfile": "開啟 ASN 檔案查詢面板"
   },
   "page": {
     "title": "IPCheck.ing - 查詢我的 IP 位址與地理位置 - IP 洩漏測試 - DNS 洩漏測試 - IP 品質檢查 - 網路速度測試 - 全方位 IP 工具箱",

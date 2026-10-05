@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import maxmind from 'maxmind';
@@ -33,11 +32,9 @@ export const normalizeLang = (tag) => {
 let cityLookup = null;
 let asnLookup = null;
 let reloadPromise = null;
-let watchersStarted = false;
-let reloadDebounceTimer = null;
 
 /**
- * Return the canonical MaxMind database paths used by the backend and updater.
+ * Return the canonical MaxMind database paths.
  */
 export function getMaxMindDbPaths() {
     return {
@@ -93,34 +90,22 @@ export async function reloadMaxMindDatabases(reason = 'manual') {
 }
 
 /**
- * Watch database files and reload readers when another process publishes new files.
+ * Bare ISO country code of an IP (null when unknown) plus the prefix length
+ * of the MaxMind network holding it, so a caller can walk a range one network
+ * at a time — the bgp-prefixes Radar view does, thousands of times per
+ * request. No formatting, no 503 throw: null when there is no answer — the
+ * City database isn't loaded, or the lookup failed — so the caller can tell
+ * it from an address MaxMind places in no country ({ country: null }).
  */
-export function startMaxMindFileWatcher() {
-    if (watchersStarted) {
-        return;
+export const lookupCountryRange = (ip) => {
+    if (!cityLookup) return null;
+    try {
+        const [record, prefixLength] = cityLookup.getWithPrefixLength(ip);
+        return { country: record?.country?.iso_code || null, prefixLength };
+    } catch {
+        return null;
     }
-
-    watchersStarted = true;
-
-    // Debounce file events so City and ASN replacements are handled as one reload.
-    const scheduleReload = () => {
-        clearTimeout(reloadDebounceTimer);
-        reloadDebounceTimer = setTimeout(() => {
-            reloadMaxMindDatabases('file change').catch(() => {
-                // Keep the existing readers when a newly written database is invalid.
-            });
-        }, 1000);
-        reloadDebounceTimer.unref?.();
-    };
-
-    for (const filePath of [cityDbPath, asnDbPath]) {
-        fs.watchFile(filePath, { interval: 5000, persistent: false }, (current, previous) => {
-            if (current.mtimeMs !== previous.mtimeMs || current.size !== previous.size) {
-                scheduleReload();
-            }
-        });
-    }
-}
+};
 
 /**
  * Look up an IP address and return the API response shape expected by the frontend.
