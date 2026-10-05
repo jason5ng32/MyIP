@@ -1,6 +1,6 @@
 // Tests for common/asn-input.js — the AS-number grammar shared by the ASN
 // guards, the Whois tool (prefix required) and ASN Profile (prefix
-// optional) — and its frontend/utils/asn-input.js re-export.
+// optional) — and its frontend/utils/ip/asn-input.js re-export.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';

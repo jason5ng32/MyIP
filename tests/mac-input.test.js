@@ -1,5 +1,6 @@
 // Tests for common/mac-input.js — the MAC Lookup query parser shared by
-// /api/macchecker and the MacChecker form (through frontend/utils/mac-input.js).
+// /api/macchecker and the MacChecker form (through
+// frontend/utils/features/mac-input.js).
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
