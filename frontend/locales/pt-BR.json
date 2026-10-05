@@ -857,6 +857,123 @@
       "no": "Não"
     }
   },
+  "ipblocklist": {
+    "Title": "Verificação de listas negras de IP",
+    "Note": "Verifica um IP em cerca de 80 listas negras públicas, divididas em dois grupos. As listas negras em tempo real (DNSBLs) são consultadas ao vivo por servidores de e-mail, fóruns e serviços online para decidir se aceitam uma conexão ou mensagem; as listas de inteligência de ameaças são feeds públicos de endereços abusivos, proxies abertos, servidores VPN e saídas Tor, carregados por firewalls e serviços de segurança. Estar nessas listas costuma explicar e-mails recusados, cadastros bloqueados ou CAPTCHAs sem fim.",
+    "Note2": "Cada ocorrência se encaixa em um de três tipos. Abuso significa que uma lista registrou spam, ataques ou um dispositivo comprometido neste endereço. Anonimato significa que o endereço é conhecido como proxy, VPN, relay ou saída Tor, o que é esperado se você usa um e não é, por si só, um registro ruim. Avisos apontam para a rede mais ampla, como uma faixa dinâmica ou uma operadora inteira, e não para este endereço. Endereços compartilhados, de nuvem e de VPN costumam aparecer em alguma lista, então trate uma ocorrência como um sinal, não como um veredito; quando a lista oferece uma página de remoção, o link aparece ao lado da ocorrência.",
+    "SelectIPLabel": "Escolha um IP para verificar",
+    "EnterIPLabel": "Digite um IP para verificar",
+    "UseStored": "Usar um IP detectado",
+    "SelectIP": "Selecionar um IP",
+    "EnterIPPlaceholder": "ex.: 1.1.1.1",
+    "InvalidIP": "Digite um endereço IPv4 ou IPv6 público.",
+    "Checking": "Verificando cerca de 80 listas negras. Isso pode levar até 30 segundos.",
+    "FetchError": "Não foi possível concluir a verificação. Tente novamente em instantes.",
+    "CheckedAt": "Verificado em {time}",
+    "verdict": {
+      "abuse": "Este IP tem registro de abuso em algumas listas negras",
+      "anonymity": "Sem registro de abuso, mas este IP está marcado como proxy, VPN, relay ou saída Tor",
+      "notice": "Fora das listas negras, mas algumas listas sinalizam a rede dele",
+      "clean": "Não está em nenhuma das listas negras verificadas"
+    },
+    "count": {
+      "abuse": "Abuso",
+      "anonymity": "Anonimato",
+      "notice": "Aviso",
+      "clean": "Limpo",
+      "error": "Falhou"
+    },
+    "SomeFailed": "Não foi possível verificar {n} das listas desta vez; o resultado pode estar incompleto.",
+    "part": {
+      "dnsbl": {
+        "title": "Listas negras em tempo real (DNSBL)",
+        "desc": "Consultadas ao vivo por servidores de e-mail e serviços online"
+      },
+      "static": {
+        "title": "Listas de inteligência de ameaças",
+        "desc": "Listas de abuso, proxy e VPN usadas por firewalls e serviços de segurança"
+      }
+    },
+    "NoHits": "Nenhuma ocorrência aqui.",
+    "ShowRest": "Mostrar as outras {n} listas",
+    "HideRest": "Ocultar",
+    "CheckFailed": "Falha na verificação",
+    "LastSeen": "Visto pela última vez em {date}",
+    "RequestRemoval": "Pedir remoção",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abuso",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relay",
+      "tor": "Tor",
+      "scanner": "Scanner",
+      "backscatter": "Backscatter",
+      "mixed": "Misto"
+    },
+    "reason": {
+      "socksProxy": "Proxy SOCKS",
+      "httpProxy": "Proxy HTTP",
+      "proxyChain": "Cadeia de proxies",
+      "webProxy": "Proxy web",
+      "wingateProxy": "Proxy WinGate",
+      "openProxy": "Proxy aberto",
+      "torExit": "Nó de saída Tor",
+      "exploited": "Host explorado",
+      "compromisedHost": "Host comprometido",
+      "compromisedRouter": "Roteador comprometido",
+      "botnet": "Botnet",
+      "worm": "Infecção por worm",
+      "ircDrone": "Drone IRC",
+      "ddosDrone": "Drone DDoS",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Ataques de força bruta",
+      "spamSource": "Origem de spam",
+      "spamtrap": "Caiu em armadilha de spam",
+      "badReputation": "Má reputação",
+      "hijackedNetwork": "Rede sequestrada",
+      "endUserRange": "Faixa de usuários finais",
+      "dynamicRange": "Faixa de endereços dinâmicos",
+      "noMailRange": "Não deveria enviar e-mail",
+      "missingPtr": "Sem DNS reverso",
+      "poorReputation": "Reputação baixa",
+      "mixedReputation": "Reputação mista",
+      "rangeListed": "Faixa de endereços listada",
+      "networkListed": "Rede inteira listada",
+      "unaccountableOperator": "Operadora não trata abusos",
+      "noMailService": "Sem serviço de e-mail",
+      "unreliableAbuseDesk": "Contato de abuso pouco confiável",
+      "reported1d": "Denunciado no último dia",
+      "reported7d": "Denunciado nos últimos 7 dias",
+      "reported30d": "Denunciado nos últimos 30 dias",
+      "reported90d": "Denunciado nos últimos 90 dias",
+      "feeds": "Denunciado por pelo menos {n} fontes de ameaças",
+      "testEntry": "Entrada de teste"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abuso",
+        "desc": "a lista registrou spam, ataques ou um dispositivo comprometido neste endereço"
+      },
+      "anonymity": {
+        "label": "Anonimato",
+        "desc": "proxy, VPN, relay ou saída Tor conhecido, o que não é um registro ruim por si só"
+      },
+      "notice": {
+        "label": "Aviso",
+        "desc": "aponta para a rede ou operadora mais ampla, não para este endereço"
+      },
+      "clean": {
+        "label": "Não listado",
+        "desc": "este IP não está na lista"
+      },
+      "error": {
+        "label": "Falha na verificação",
+        "desc": "não foi possível verificar a lista desta vez, o que não significa que o IP não esteja nela"
+      }
+    }
+  },
   "advancedtools": {
     "OpenInNewTab": "Abrir em nova aba",
     "BackToHome": "Voltar para o início",
@@ -881,7 +998,8 @@
     "IpCalculator": "Cálculo de sub-rede, conversão de notação e análise IPv6 para qualquer IP, prefixo ou intervalo",
     "BrowserInfo": "Verificar informações e impressão digital do navegador",
     "SecurityChecklist": "Guia para proteger sua vida digital",
-    "PersonaCheck": "Compare o que os sites veem com o país no qual você quer parecer local"
+    "PersonaCheck": "Compare o que os sites veem com o país no qual você quer parecer local",
+    "IpBlocklist": "Veja se um IP está em listas negras de spam, abuso, proxy ou VPN"
   },
   "macchecker": {
     "Title": "Consulta de MAC",
@@ -1847,6 +1965,7 @@
     "BrowserInfo": "Abrir painel de informações do navegador",
     "SecurityChecklist": "Abrir painel de checklist de segurança",
     "PersonaCheck": "Abrir painel de verificação aprofundada de persona",
+    "IpBlocklist": "Abrir painel de verificação de listas negras de IP",
     "AsnProfile": "Abrir painel de consulta de perfil de ASN"
   },
   "page": {

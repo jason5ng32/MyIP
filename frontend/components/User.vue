@@ -167,6 +167,7 @@ const USAGE_LABEL_KEYS = {
     invisibility_test: 'invisibilitytest.Title',
     dns_leak_test: 'enhanceddnsleaktest.Title',
     persona_check: 'personacheck.Title',
+    ip_hitlist: 'ipblocklist.Title',
 };
 
 // Rows for the usage dialog. Empty until the (re)fetched user info lands or

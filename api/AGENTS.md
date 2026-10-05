@@ -22,7 +22,8 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `maxmind`), tool backends (`get-whois` / `dns-resolver` / `mac-checker` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
-`github-stars` / `invisibility-test` / `dns-leak-test` / `persona`), user
+`github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
+`ip-blocklist`), user
 proxies (`get-user-info` / `update-user-achievement`), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
@@ -149,7 +150,7 @@ loading (`isStillLoading`) answers `error`, leaving the others to answer.
 
 Handlers proxying our private IPCheck.ing API (`ipcheck-ing`,
 `invisibility-test`, `update-user-achievement`, `get-user-info`,
-`dns-leak-test`, `persona`, and `asn-profile`'s reputation via
+`dns-leak-test`, `persona`, `ip-blocklist`, and `asn-profile`'s reputation via
 `server/asn-reputation.js`) forward the caller's headers upstream (`headers: {
 ...req.headers }`) — the upstream needs caller context (Accept-Language, auth
 tokens). `persona` strips the framing headers (`host` / `content-length` / …)
