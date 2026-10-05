@@ -147,7 +147,7 @@ describe('updateDataset', () => {
         assert.equal(read(row, 'b.txt'), 'b.txt v2\n');
     });
 
-    it('a lock lost between renames touches nothing more; the next holder republishes', async () => {
+    it('a timeout between renames rolls back and cleans up, as the lock is still held', async () => {
         const { row, log } = makeRow();
         await updateDataset(row);
         row.version = 'v2';
@@ -155,17 +155,49 @@ describe('updateDataset', () => {
         const realRename = fsp.rename;
         fsp.rename = async (...args) => {
             await realRename(...args);
-            controller.abort(new Error('lock compromised'));
+            controller.abort(new Error('update timed out'));
         };
         try {
-            await assert.rejects(updateDataset(row, { signal: controller.signal }), /lock compromised/);
+            await assert.rejects(updateDataset(row, { signal: controller.signal }), /update timed out/);
         } finally {
+            fsp.rename = realRename;
+        }
+        assert.equal(read(row, 'a.txt'), 'a.txt v1\n');
+        assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
+        assert.deepEqual(log.reloads, ['auto update']);
+        assert.deepEqual(fs.readdirSync(row.dir).sort(), [STATE_FILE, 'a.txt', 'b.txt'], 'no .next / .bak left');
+        assert.equal(state(row).identifier, null);
+        assert.equal((await updateDataset(row)).updated, true);
+        assert.equal(read(row, 'b.txt'), 'b.txt v2\n');
+    });
+
+    it('a lock lost between renames touches nothing more; the next holder republishes', async () => {
+        const { row, log } = makeRow();
+        await updateDataset(row);
+        row.version = 'v2';
+        // Capture the engine's compromise handler, as proper-lockfile would call it.
+        const realLock = lockfile.lock;
+        const realRename = fsp.rename;
+        let compromise = null;
+        lockfile.lock = async (dir, options) => {
+            compromise = options.onCompromised;
+            return realLock(dir, options);
+        };
+        fsp.rename = async (...args) => {
+            await realRename(...args);
+            compromise(new Error('lock compromised'));
+        };
+        try {
+            await assert.rejects(updateDataset(row), /lock compromised/);
+        } finally {
+            lockfile.lock = realLock;
             fsp.rename = realRename;
         }
         // No rollback: another process may own these paths now.
         assert.equal(read(row, 'a.txt'), 'a.txt v2\n');
         assert.equal(read(row, 'b.txt'), 'b.txt v1\n');
         assert.deepEqual(log.reloads, ['auto update']);
+        assert.ok(fs.existsSync(path.join(row.dir, 'b.txt.next')), 'left to the next holder');
         // The state names no version, so the next holder takes nothing for
         // current and publishes a whole set — not a 'not-modified' over a mix.
         assert.equal(state(row).identifier, null);
