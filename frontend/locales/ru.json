@@ -192,7 +192,6 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Навигация",
     "Home": "Главная",
     "IPInfo": "Сведения об IP",
@@ -201,9 +200,6 @@
     "WebRTC": "Тест утечки WebRTC",
     "DNSLeakTest": "Тест утечки DNS",
     "SpeedTest": "Тест скорости",
-    "PingTest": "Глобальная задержка",
-    "MTRTest": "Тест MTR",
-    "RuleTest": "Проверка правил",
     "AdvancedTools": "Расширенные инструменты",
     "SearchDocs": "Поиск по документации…",
     "DocsToolConfirm": "Показать ваши текущие результаты?",

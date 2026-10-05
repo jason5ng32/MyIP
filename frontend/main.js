@@ -127,8 +127,6 @@ analytics.setUserProperties({
 });
 unregisterLegacyServiceWorker();
 
-// Check Firebase environment
-store.checkFirebaseEnv();
 
 // Backend configs load fire-and-forget: components read `store.configs`
 // reactively, so the first render never waits on this round trip.

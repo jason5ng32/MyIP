@@ -68,10 +68,9 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.5rem;
-  /* Canonical page background (the installed app's Nav in its mobile
-     `bg-page-bg` variant reads it). Must stay in sync with the literal
-     hex values in: index.html inline `html { background }`, index.html
-     <meta theme-color>, public/manifest.webmanifest. */
+  /* Canonical page background: the installed app's Nav (`bg-page-bg`) and
+     the manifest's theme_color use it. index.html's html background and
+     theme-color are tuned separately on purpose. */
   --page-bg: #f4f4f4;
 }
 

@@ -192,7 +192,6 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "导航",
     "Home": "首页",
     "IPInfo": "IP 信息",
@@ -201,9 +200,6 @@
     "WebRTC": "WebRTC 泄露测试",
     "DNSLeakTest": "DNS 泄露测试",
     "SpeedTest": "网速测试",
-    "PingTest": "全球延迟",
-    "MTRTest": "MTR 测试",
-    "RuleTest": "分流测试",
     "AdvancedTools": "高级工具",
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",

@@ -1,6 +1,6 @@
 // store.js
 import { defineStore } from 'pinia';
-import { loadFirebaseAuth, authDomainInputs } from './firebase-init.js';
+import { isFireBaseSet, loadFirebaseAuth, authDomainInputs } from './firebase-init.js';
 import { signInProvidersFor } from './utils/auth-domain.js';
 import { writeAuthHint } from './utils/auth-hint.js';
 import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirectSignIn } from './utils/auth-redirect.js';
@@ -67,7 +67,7 @@ export const useMainStore = defineStore('main', {
       ipv6Domain: import.meta.env?.VITE_CURL_IPV6_DOMAIN,
       ipv64Domain: import.meta.env?.VITE_CURL_IPV64_DOMAIN,
     },
-    isFireBaseSet: false,
+    isFireBaseSet,
     openSheet: null,
     loadingStatus: createLoadingStatus(),
     isDarkMode: false,
@@ -258,16 +258,6 @@ export const useMainStore = defineStore('main', {
     // Change Section
     changeSection(section) {
       this.currentSection = section;
-    },
-    // check Firebase environment
-    checkFirebaseEnv() {
-      const env = import.meta.env ?? {};
-      const envConfigs = {
-        key: env.VITE_FIREBASE_API_KEY,
-        domain: env.VITE_FIREBASE_AUTH_DOMAIN,
-        project: env.VITE_FIREBASE_PROJECT_ID,
-      }
-      this.isFireBaseSet = !!envConfigs.key && !!envConfigs.domain && !!envConfigs.project;
     },
     // sign in with Google
     async signInWithGoogle() {

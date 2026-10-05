@@ -192,7 +192,6 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Navegação",
     "Home": "Início",
     "IPInfo": "Dados de IP",
@@ -201,9 +200,6 @@
     "WebRTC": "Vazamento WebRTC",
     "DNSLeakTest": "Vazamento de DNS",
     "SpeedTest": "Velocidade",
-    "PingTest": "Latência global",
-    "MTRTest": "Teste MTR",
-    "RuleTest": "Teste de regras",
     "AdvancedTools": "Ferramentas avançadas",
     "SearchDocs": "Pesquisar na documentação…",
     "DocsToolConfirm": "Compartilhar seus resultados atuais dos testes?",
