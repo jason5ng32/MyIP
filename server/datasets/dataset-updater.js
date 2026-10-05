@@ -391,6 +391,20 @@ export const monitorConfigFor = (pattern, rowCount, timezone) => ({
     maxRuntime: Math.ceil((rowCount * UPDATE_TIMEOUT_MS) / 60000) + 10,
 });
 
+// DATASET_UPDATE_CRON when it parses, else the default: a typo must not
+// throw out of boot and take the jobs started after the scheduler with it.
+// Exported for tests.
+export const resolveUpdateCron = (value = process.env.DATASET_UPDATE_CRON) => {
+    if (!value) return DEFAULT_UPDATE_CRON;
+    try {
+        new Cron(value, { paused: true }).stop();
+        return value;
+    } catch (error) {
+        logger.error({ err: error }, `❌ Invalid DATASET_UPDATE_CRON "${value}"; using ${DEFAULT_UPDATE_CRON}`);
+        return DEFAULT_UPDATE_CRON;
+    }
+};
+
 let scheduler = null;
 
 /**
@@ -405,7 +419,7 @@ export const startDatasetScheduler = (rows) => {
         logger.info('🗓️  Dataset auto update: off');
         return null;
     }
-    const pattern = process.env.DATASET_UPDATE_CRON || DEFAULT_UPDATE_CRON;
+    const pattern = resolveUpdateCron();
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     scheduler = new Cron(pattern, { protect: true, unref: true }, () => withCronMonitor(
         'dataset-update',

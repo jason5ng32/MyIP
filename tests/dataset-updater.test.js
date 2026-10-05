@@ -14,7 +14,7 @@ import lockfile from 'proper-lockfile';
 
 import {
     STATE_FILE, LOCK_FILE, updateDataset, bootstrapDataset, readState, isPresent,
-    isAutoUpdateEnabled, startDatasetScheduler, DEFAULT_UPDATE_CRON, rowsMissingACheck, watchDatasets,
+    isAutoUpdateEnabled, startDatasetScheduler, DEFAULT_UPDATE_CRON, resolveUpdateCron, rowsMissingACheck, watchDatasets,
     updateDatasets, downloadToFile, monitorConfigFor,
 } from '../server/datasets/dataset-updater.js';
 import logger from '../server/logger.js';
@@ -366,6 +366,15 @@ describe('startDatasetScheduler', () => {
         } finally {
             job.stop();
         }
+    });
+});
+
+describe('resolveUpdateCron', () => {
+    it('keeps a valid pattern and falls back to the default on an unset or invalid one', () => {
+        assert.equal(resolveUpdateCron('15 5 * * *'), '15 5 * * *');
+        assert.equal(resolveUpdateCron(''), DEFAULT_UPDATE_CRON);
+        assert.equal(resolveUpdateCron('bad cron'), DEFAULT_UPDATE_CRON);
+        assert.equal(resolveUpdateCron('99 4 * * *'), DEFAULT_UPDATE_CRON);
     });
 });
 

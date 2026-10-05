@@ -432,6 +432,17 @@ describe('buildCountryShares', () => {
         assert.deepEqual(result, { shares: [], complete: false });
     });
 
+    it('more IPv4 prefixes than the cap is incomplete, with no lookups', () => {
+        // 20001 distinct /24s under 10.0.0.0/8.
+        const many = Array.from({ length: 20001 }, (_, i) => ({ prefix: `10.${i >> 8}.${i & 255}.0/24` }));
+        let calls = 0;
+        const result = buildCountryShares(many, () => { calls++; return { country: 'US', prefixLength: 24 }; });
+        assert.deepEqual(result, { shares: [], complete: false });
+        assert.equal(calls, 0);
+        // At the cap the walk still runs.
+        assert.equal(buildCountryShares(many.slice(0, 20000), () => ({ country: 'US', prefixLength: 24 })).complete, true);
+    });
+
     it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {
         assert.deepEqual(buildCountryShares(rows('8.8.8.0/24'), () => null), { shares: [], complete: false });
         let calls = 0;

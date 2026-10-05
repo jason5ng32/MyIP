@@ -200,15 +200,16 @@ const GEO_LOOKUP_BUDGET = 100000; // hard cap on MaxMind lookups per request (~0
 // `lookupRange(ip) → { country, prefixLength } | null` is injected so tests
 // need no MaxMind database; null = no answer (no database, or the lookup
 // failed), unlike an address MaxMind places nowhere ({ country: null }).
-// Resolves { shares, complete }: a null answer or the budget ending the walk
-// gives { shares: [], complete: false } — shares over part of the space
+// Resolves { shares, complete }: more IPv4 prefixes than the cap, a null
+// answer or the budget ending the walk gives { shares: [], complete: false } — shares over part of the space
 // would read as the whole distribution — and the caller must not cache it.
 // Exported for tests.
 export const buildCountryShares = (prefixes, lookupRange) => {
-    const blocks = (prefixes || [])
+    const v4 = (prefixes || [])
         .map((row) => parseCidr(row?.prefix))
-        .filter((cidr) => cidr?.family === 4)
-        .slice(0, GEO_PREFIX_CAP)
+        .filter((cidr) => cidr?.family === 4);
+    if (v4.length > GEO_PREFIX_CAP) return { shares: [], complete: false };
+    const blocks = v4
         .map((cidr) => ({ start: cidr.network, size: 2n ** BigInt(32 - cidr.prefix) }))
         .sort((a, b) => (a.start === b.start ? Number(b.size - a.size) : (a.start < b.start ? -1 : 1)));
 
