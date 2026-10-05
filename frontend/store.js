@@ -1,7 +1,6 @@
 // store.js
 import { defineStore } from 'pinia';
-import { isFireBaseSet, loadFirebaseAuth, authDomainInputs } from './firebase-init.js';
-import { signInProvidersFor } from './utils/auth-domain.js';
+import { isFireBaseSet, loadFirebaseAuth } from './firebase-init.js';
 import { writeAuthHint } from './utils/auth-hint.js';
 import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirectSignIn } from './utils/auth-redirect.js';
 import { isRunningAsPwa } from './utils/pwa.js';
@@ -112,9 +111,6 @@ export const useMainStore = defineStore('main', {
         };
       });
     },
-    // Provider keys the sign-in menu offers: GitHub drops out in an installed
-    // PWA that signs in through its own auth domain (utils/auth-domain.js).
-    signInProviders: () => signInProvidersFor(authDomainInputs()),
     // Per-feature "monthly quota exhausted" booleans, derived from the
     // /api/getuserinfo quota snapshot in remoteUserInfo. Frontend first line
     // only — the backend enforces the same limits authoritatively; absent

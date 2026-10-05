@@ -82,8 +82,7 @@
           <Icon icon="ri:google-line" />
           <span>{{ t('user.SignInWithGoogle') }}</span>
         </DropdownMenuItem>
-        <DropdownMenuItem v-if="signInProviders.includes('github')" class="cursor-pointer"
-          @select="store.signInWithGithub">
+        <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGithub">
           <Icon icon="ri:github-line" />
           <span>{{ t('user.SignInWithGithub') }}</span>
         </DropdownMenuItem>
@@ -149,8 +148,6 @@ const remoteUserInfo = computed(() => store.remoteUserInfo);
 const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
 // Sign-in methods attached to this account.
 const linkedProviders = computed(() => store.linkedProviders);
-// Sign-in methods offered here (no GitHub in a PWA on its own auth domain).
-const signInProviders = computed(() => store.signInProviders);
 
 // Level Badge Color: mapped to semantic token, keep each level color distinction
 const levelBadgeClass = computed(() => {

@@ -48,4 +48,4 @@ const loadFirebaseAuth = () => {
     return authModulePromise;
 };
 
-export { isFireBaseSet, loadFirebaseAuth, authDomainInputs };
+export { isFireBaseSet, loadFirebaseAuth };

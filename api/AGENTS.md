@@ -165,9 +165,9 @@ when `VITE_FIREBASE_PROJECT_ID` is set. `VITE_FIREBASE_PWA_AUTH_DOMAIN` points
 the installed PWA at the site's own host, so its sign-in handler runs
 first-party — inside the PWA's webview and Safari's storage partition — and
 `getRedirectResult` finds the result; browsers keep the shared
-`VITE_FIREBASE_AUTH_DOMAIN` (GitHub's single callback lives there, so the PWA
-then offers Google only). Not an `/api` route: no guards, caching or
-per-request logs.
+`VITE_FIREBASE_AUTH_DOMAIN`. Every OAuth provider must accept
+`https://<host>/__/auth/handler` for both domains. Not an `/api` route: no
+guards, caching or per-request logs.
 
 ## Edge caching
 
