@@ -1,17 +1,15 @@
 <template>
   <!-- Standalone privacy page at /privacy (shareable + crawlable) -->
-  <div class="flex min-h-screen flex-col">
-    <!-- Slim header (shared with the standalone tool pages). -->
-    <StandalonePageHeader :title="t('about.Privacy')" />
+  <div class="flex min-h-[calc(100dvh_-_3.5rem_-_env(safe-area-inset-top))] flex-col">
+    <main class="flex-1 mx-auto w-full max-w-[760px] px-4 md:px-6 py-8">
+      <PageBreadcrumb :items="[{ label: t('about.Privacy') }]" />
 
-    <!-- Content -->
-    <main class="flex-1">
       <!-- Brief loading state while the locale pack is fetched on first paint. -->
       <div v-if="!ready" class="flex justify-center py-20">
         <Spinner />
       </div>
 
-      <article v-else class="mx-auto w-full max-w-[760px] px-4 md:px-6 py-8">
+      <article v-else>
         <h1 class="mb-1 text-2xl md:text-3xl font-semibold tracking-tight">{{ t('privacy.Title') }}</h1>
         <p class="mb-6 text-xs text-muted-foreground">{{ t('privacy.UpdatedLabel') }}: {{ LAST_UPDATED }}</p>
 
@@ -49,7 +47,7 @@ import { isDocsConfigured } from '@/composables/use-docs-assistant.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 import { datasetLoaders, loadLocaleDataset } from '@/utils/locale-datasets.js';
 import Footer from '@/components/Footer.vue';
-import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import { Spinner } from '@/components/ui/spinner';
 
 const { t, tm, rt, locale, mergeLocaleMessage } = useI18n();

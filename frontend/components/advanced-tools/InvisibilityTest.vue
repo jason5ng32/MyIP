@@ -43,7 +43,7 @@
                 <span>
                     {{ t('user.QuotaExceeded') }}
                     <button type="button" class="underline underline-offset-2 cursor-pointer"
-                        @click="openUsageDialog">{{ t('user.ViewUsage') }}</button>
+                        @click="store.setTriggerUserBenefits(true)">{{ t('user.ViewUsage') }}</button>
                 </span>
             </div>
         </div>
@@ -174,7 +174,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -188,16 +187,6 @@ import { CircleCheck, CircleX, Hourglass, Info, ListChecks, Lock, Shield, Play }
 const { t } = useI18n();
 
 const store = useMainStore();
-const route = useRoute();
-const router = useRouter();
-
-// Open the Benefits & Usage dialog. Inside the Advanced Tools drawer the
-// dialog would stack on top of it — close the drawer first (it's driven by
-// the ?tool query; standalone pages don't carry it, nothing to close).
-const openUsageDialog = () => {
-    if (route.query.tool) router.push({ path: '/', query: {} });
-    store.setTriggerUserBenefits(true);
-};
 
 const checkingStatus = ref('idle');
 const errorMsg = ref('');

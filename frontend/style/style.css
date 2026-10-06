@@ -68,10 +68,9 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --radius: 0.5rem;
-  /* Canonical page background. Single source of truth for the iOS PWA
-     safe-area painter (Nav.vue). Must stay in sync with the literal
-     hex values in: index.html inline `html { background }`, index.html
-     <meta theme-color>, public/manifest.webmanifest. */
+  /* Canonical page background: the installed app's Nav (`bg-page-bg`) and
+     the manifest's theme_color use it. index.html's html background and
+     theme-color are tuned separately on purpose. */
   --page-bg: #f4f4f4;
 }
 
@@ -268,4 +267,72 @@ footer {
   bottom: calc(var(--jn-gb-anchor) + 3.25rem) !important;
   max-height: calc(100vh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
   max-height: calc(100dvh - var(--jn-gb-anchor) - 3.25rem - env(safe-area-inset-top) - 1rem) !important;
+}
+
+/* Page transitions (utils/page-transition.js), keyed by <html
+   data-page-transition>: "forward" slides the new page in from the right,
+   "back" mirrors it, "fade" cross-fades. The Nav is captured on its own and
+   shown in its new state at once, so only the page moves. */
+.jn-site-nav {
+  view-transition-name: site-nav;
+}
+::view-transition-old(site-nav) {
+  display: none;
+}
+::view-transition-new(site-nav) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-page-transition="forward"]::view-transition-old(root),
+  html[data-page-transition="forward"]::view-transition-new(root),
+  html[data-page-transition="back"]::view-transition-old(root),
+  html[data-page-transition="back"]::view-transition-new(root) {
+    mix-blend-mode: normal; /* no plus-lighter brightening where the pages overlap */
+    animation-duration: 260ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    animation-fill-mode: both;
+  }
+  html[data-page-transition="forward"]::view-transition-old(root) {
+    animation-name: jn-page-drift-left;
+  }
+  html[data-page-transition="forward"]::view-transition-new(root) {
+    animation-name: jn-page-enter-right;
+  }
+  html[data-page-transition="back"]::view-transition-old(root) {
+    z-index: 1;
+    animation-name: jn-page-exit-right;
+  }
+  html[data-page-transition="back"]::view-transition-new(root) {
+    animation-name: jn-page-return-left;
+  }
+  html[data-page-transition="fade"]::view-transition-old(root) {
+    animation: jn-page-fade-out 180ms ease both;
+  }
+  html[data-page-transition="fade"]::view-transition-new(root) {
+    animation: jn-page-fade-in 180ms ease both;
+  }
+}
+
+@keyframes jn-page-enter-right {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+@keyframes jn-page-drift-left {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(-25%); opacity: 0.4; }
+}
+@keyframes jn-page-exit-right {
+  from { transform: none; }
+  to { transform: translateX(100%); }
+}
+@keyframes jn-page-return-left {
+  from { transform: translateX(-25%); opacity: 0.4; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes jn-page-fade-out {
+  to { opacity: 0; }
+}
+@keyframes jn-page-fade-in {
+  from { opacity: 0; }
 }

@@ -22,6 +22,7 @@ const STYLE_TO_TOAST = {
     'text-info': toast.info,
 };
 
+// immediate: an alert raised before mount (a failed redirect sign-in at boot) shows too.
 watch(alert, (newVal) => {
     if (!newVal || !newVal.alertToShow) {
         return;
@@ -31,7 +32,7 @@ watch(alert, (newVal) => {
         description: newVal.alertMessage,
         duration: newVal.alertDuration || 2000,
     });
-}, { deep: true });
+}, { deep: true, immediate: true });
 </script>
 
 <!--

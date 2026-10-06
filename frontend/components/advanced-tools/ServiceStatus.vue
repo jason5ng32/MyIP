@@ -1,9 +1,8 @@
 <template>
   <!-- Service Status advanced tool: shows whether a set of well-known
        products are currently up, expandable per-card into sub-services and
-       recent incidents. Lives inside the Advanced Tools drawer (its title is
-       rendered by the drawer header), so this template starts at the note row
-       rather than a section <h2>. -->
+       recent incidents. ToolPage.vue owns the title, so this starts at the
+       note row. -->
   <div class="service-status-section my-4 space-y-4">
     <!-- Top note -->
     <p class="text-sm text-muted-foreground leading-relaxed">{{ t('serviceStatus.Note') }}</p>
@@ -165,11 +164,10 @@
 //   /api/service-status/detail  → one provider's sub-services + incidents (on expand)
 // so the initial load stays light and detail is pulled only when a card opens.
 //
-// Moved out of the homepage into the Advanced Tools drawer: it mounts fresh
-// each time the tool is opened (loadOverview on mount) and is no longer wired
-// into the homepage's global-refresh orchestrator — the bottom Refresh button
-// here is the only re-pull path.
-import { ref, reactive, computed, onMounted } from 'vue';
+// Not wired into the homepage's global-refresh orchestrator: it loads on
+// mount, again when shown after a backend refresh cycle (the page is kept
+// alive), and on the bottom Refresh button.
+import { ref, reactive, computed, onMounted, onActivated } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -326,9 +324,12 @@ const floorDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Lazy per-provider detail loader: one request returns both the sub-services
 // and the recent incidents (a user who opens a card looks at both). Guards
 // against duplicate fetches; a successful result is cached until refresh, while
-// an error leaves `loaded` false so re-expanding retries.
+// an error leaves `loaded` false so re-expanding retries. An answer from
+// before a reload is dropped: stored, a reopened card would skip its fetch.
+let detailEpoch = 0;
 const loadDetail = async (id) => {
   if (detailState[id]?.loading || detailState[id]?.loaded) return;
+  const epoch = detailEpoch;
   detailState[id] = { loading: true, error: false, loaded: false, components: [], incidents: [] };
   try {
     const [res] = await Promise.all([
@@ -337,12 +338,14 @@ const loadDetail = async (id) => {
     ]);
     if (!res.ok) throw new Error(`status ${res.status}`);
     const json = await res.json();
+    if (epoch !== detailEpoch) return;
     detailState[id] = {
       loading: false, error: false, loaded: true,
       components: json.components || [],
       incidents: json.incidents || [],
     };
   } catch {
+    if (epoch !== detailEpoch) return;
     detailState[id] = { loading: false, error: true, loaded: false, components: [], incidents: [] };
   }
 };
@@ -356,16 +359,29 @@ const onToggle = (p) => {
   }
 };
 
-const refresh = () => {
-  trackEvent('Section', 'RefreshClick', 'ServiceStatus');
-  // Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
-  // cached detail so a reopened card refetches the fresh snapshot.
+// Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
+// cached detail so a reopened card refetches the fresh snapshot.
+const reload = () => {
+  detailEpoch += 1;
   for (const k of Object.keys(openState)) openState[k] = false;
   for (const k of Object.keys(detailState)) delete detailState[k];
   loadOverview();
 };
 
+const refresh = () => {
+  trackEvent('Section', 'RefreshClick', 'ServiceStatus');
+  reload();
+};
+
 onMounted(() => {
   loadOverview();
+});
+
+// The backend republishes its snapshot every 5 minutes; a cached page shown
+// again after that long is as stale as a fresh mount would be. The first
+// activation follows the mount, when no pull has completed yet.
+const SNAPSHOT_INTERVAL_MS = 5 * 60 * 1000;
+onActivated(() => {
+  if (lastRefreshedAt.value && Date.now() - lastRefreshedAt.value >= SNAPSHOT_INTERVAL_MS) reload();
 });
 </script>

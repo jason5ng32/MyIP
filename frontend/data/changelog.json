@@ -2210,7 +2210,7 @@
     ]
   },
   {
-    "version": "v7.8.0",
+    "version": "v8.0.0",
     "date": "Beta",
     "content": [
       {
@@ -2227,12 +2227,12 @@
       {
         "type": "improve",
         "change": {
-          "en": "Advanced Tools are now grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
-          "zh": "高级工具改为按网络诊断、查询与计算、深度检测分组展示",
-          "zh-TW": "進階工具改為按網路診斷、查詢與計算、深度檢測分組展示",
-          "fr": "Les Outils avancés sont désormais regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
-          "ru": "Расширенные инструменты теперь разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
-          "pt-BR": "As Ferramentas avançadas agora são agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+          "en": "Advanced Tools now open as pages of their own, sliding in like an app, data is not lost when switching",
+          "zh": "高级工具改为以独立页面打开，像应用一样滑入，切换到时候数据不丢失",
+          "zh-TW": "進階工具改為以獨立頁面開啟，像 App 一樣滑入，切換的時候數據不丟失",
+          "fr": "Les Outils avancés s'ouvrent désormais dans leur propre page, qui glisse à l'écran comme dans une app, les données ne sont pas perdues lors du changement",
+          "ru": "Расширенные инструменты теперь открываются на отдельных страницах, которые выезжают, как в приложении, данные не теряются при переключении",
+          "pt-BR": "As Ferramentas avançadas agora abrem em páginas próprias, que deslizam como num app, os dados não são perdidos ao mudar"
         }
       },
       {
@@ -2244,6 +2244,39 @@
           "fr": "Réorganisation de la structure des répertoires du projet pour faciliter la maintenance",
           "ru": "Реорганизована структура каталогов проекта для упрощения поддержки",
           "pt-BR": "Reorganizada a estrutura de diretórios do projeto para facilitar a manutenção"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "The navigation bar is on every page, so every tool is one click away wherever you are",
+          "zh": "导航栏覆盖所有页面，方便在任何页面都能一键打开任意工具",
+          "zh-TW": "導覽列涵蓋所有頁面，方便在任何頁面都能一鍵開啟任一工具",
+          "fr": "La barre de navigation est présente sur toutes les pages : chaque outil est à un clic où que vous soyez",
+          "ru": "Панель навигации есть на каждой странице — любой инструмент в одном клике откуда угодно",
+          "pt-BR": "A barra de navegação está em todas as páginas, então qualquer ferramenta fica a um clique de onde você estiver"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools are now grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
+          "zh": "高级工具改为按网络诊断、查询与计算、深度检测分组展示",
+          "zh-TW": "進階工具改為按網路診斷、查詢與計算、深度檢測分組展示",
+          "fr": "Les Outils avancés sont désormais regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
+          "ru": "Расширенные инструменты теперь разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
+          "pt-BR": "As Ferramentas avançadas agora são agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the PWA experience on iOS",
+          "zh": "优化 iOS 系统中，PWA 的体验",
+          "zh-TW": "優化 iOS 系統中，PWA 的體驗",
+          "fr": "Amélioration de l'expérience PWA sur iOS",
+          "ru": "Улучшение работы PWA в iOS",
+          "pt-BR": "Melhoria da experiência PWA no iOS"
         }
       },
       {

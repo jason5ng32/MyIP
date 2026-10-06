@@ -14,11 +14,8 @@
         </header>
 
         <!-- Card groups, one per category (data/tools.js TOOL_CATEGORIES). Each
-             card is a real <a> to the standalone /tools/:slug
-             page, so ⌘/Ctrl-click, middle-click and "open in new tab" all work.
-             A plain left-click (or Enter / Space) is intercepted to open the
-             in-page drawer instead. A dedicated ↗ corner button always opens the
-             standalone page in a new tab. -->
+             card is a real <a> to /tools/:slug: modified clicks stay the
+             browser's, a plain click / Enter / Space routes in-app. -->
         <div class="mt-4 space-y-6">
             <div v-for="group in cardGroups" :key="group.id">
                 <h3 class="mb-3 text-sm font-medium tracking-wide text-muted-foreground">
@@ -28,14 +25,14 @@
                     <Card v-for="card in group.tools" :key="card.slug"
                         :data-adv-slug="card.slug"
                         class="keyboard-shortcut-card jn-card jn-adv-card group relative overflow-visible transition-transform duration-300 ease-out hover:-translate-y-1.5 data-[keyboard-hover=true]:ring-2 data-[keyboard-hover=true]:ring-green-500/50">
-                        <a :href="card.noStandalone ? `/?tool=${card.slug}` : `/tools/${card.slug}`"
+                        <a :href="`/tools/${card.slug}`"
                             class="block cursor-pointer no-underline text-inherit"
                             @click="onCardClick($event, card.slug)"
                             @keydown.enter.prevent="openTool(card.slug)"
                             @keydown.space.prevent="openTool(card.slug)">
                             <CardContent class="p-4">
                                 <h4 class="text-xl font-medium text-primary mb-2 pr-10">
-                                    <PanelBottomOpen
+                                    <ArrowRight
                                         class="inline size-[1em] align-[-0.15em] mr-1.5 transition-colors duration-300" />
                                     {{ t(card.titleKey) }}
                                 </h4>
@@ -47,50 +44,10 @@
                                 <span class="jn-emoji" aria-hidden="true">{{ card.emoji }}</span>
                             </CardContent>
                         </a>
-
                     </Card>
                 </div>
             </div>
         </div>
-
-        <!-- Tool details Drawer -->
-        <Drawer :open="isOpen" @update:open="onOpenChange" :dismissible="true">
-            <DrawerContent :title="activeTool ? t(activeTool.titleKey) : t('advancedtools.Title')"
-                :safe-area-top="isMobile || isFullScreen"
-                :class="['jn-tools-drawer overflow-hidden', (isMobile || isFullScreen) ? 'h-full rounded-none' : 'h-[85vh]']">
-                <!-- Drawer internal header -->
-                <div class="flex items-center gap-2 px-4 pt-1 pb-3 jn-drawer-header shrink-0">
-                    <button v-if="!isMobile" type="button"
-                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        @click="fullScreen" :aria-label="isFullScreen ? 'Exit full screen' : 'Full screen'">
-                        <Maximize v-if="!isFullScreen" class="size-4" />
-                        <Minimize v-else class="size-4" />
-                    </button>
-                    <span v-if="activeTool" class="flex-1 text-base md:text-lg font-medium truncate"
-                        :class="isMobile ? 'text-left' : 'text-center'">
-                        <span class="mr-1">{{ activeTool.emoji }}</span>{{ t(activeTool.titleKey) }}
-                    </span>
-                    <span v-else class="flex-1" />
-                    <!-- Open the current tool as a standalone page (hidden in a
-                         PWA window, which has no new-tab affordance, and for
-                         noStandalone tools, which have no such page) -->
-                    <a v-if="activeTool && !isPwa && !activeTool.noStandalone" :href="`/tools/${activeTool.slug}`"
-                        target="_blank" rel="noopener"
-                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        :title="t('advancedtools.OpenInNewTab')" :aria-label="t('advancedtools.OpenInNewTab')">
-                        <SquareArrowOutUpRight class="size-4" />
-                    </a>
-                    <DrawerClose
-                        class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" />
-                </div>
-                <!-- Content area (scrollable) -->
-                <div class="flex-1 overflow-y-auto px-1 md:px-2 pb-6" ref="scrollContainer">
-                    <div :class="isMobile ? 'w-full px-3' : 'jn-canvas-width px-6'">
-                        <component :is="activeComponent" v-if="activeComponent" />
-                    </div>
-                </div>
-            </DrawerContent>
-        </Drawer>
 
         <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
         <InfoBanner section="advanced" />
@@ -98,94 +55,44 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { ADVANCED_TOOLS, TOOL_BY_SLUG, groupToolsByCategory } from '@/data/tools.js';
-import { isToolAvailable } from '@/utils/tool-availability.js';
-import { isRunningAsPwa } from '@/utils/pwa.js';
-import { Drawer, DrawerContent, DrawerClose } from '@/components/ui/drawer';
+import { ADVANCED_TOOLS, groupToolsByCategory } from '@/data/tools.js';
+import { listedTools } from '@/utils/tool-availability.js';
+import { isPlainClick } from '@/utils/nav-target.js';
 import { Card, CardContent } from '@/components/ui/card';
-import { ToolLoadingSkeleton } from '@/components/ui/tool-loading-skeleton';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
-import { Maximize, Minimize, PanelBottomOpen, SquareArrowOutUpRight } from '@lucide/vue';
+import { ArrowRight } from '@lucide/vue';
 
 const { t } = useI18n();
 
 const store = useMainStore();
-const isMobile = computed(() => store.isMobile);
-// Running as an installed PWA → hide the "open in new tab" affordance (a PWA
-// window has no tab strip; it would pop out to the browser). See utils/pwa.js.
-const isPwa = isRunningAsPwa();
 const configs = computed(() => store.configs);
 const userPreferences = computed(() => store.userPreferences);
 const isSimpleMode = computed(() => userPreferences.value.simpleMode);
-const scrollContainer = ref(null);
-const route = useRoute();
 const router = useRouter();
 
 // Card groups behind the deployment gates (original site / configs flag, see
 // utils/tool-availability.js). Reactive on configs, so gated cards appear the
 // moment configs land.
 const cardGroups = computed(() => groupToolsByCategory(
-    ADVANCED_TOOLS.filter((tool) => isToolAvailable(tool, configs.value)),
+    listedTools(ADVANCED_TOOLS, configs.value),
 ));
 
-// ── Drawer state, driven by the `?tool=<slug>` query on the home route ───────
-// `?tool=whois` ⇒ the drawer is open showing Whois. Closing clears the query.
-const activeTool = computed(() => {
-    const slug = route.query.tool;
-    return (typeof slug === 'string' && TOOL_BY_SLUG.get(slug)) || null;
-});
-const isOpen = computed(() => !!activeTool.value);
-
-// Resolve each tool's lazy component once and cache it, so re-renders don't
-// rebuild the async wrapper (which would remount the tool). The skeleton
-// covers the chunk download; `delay` keeps fast loads flash-free.
-const asyncToolCache = new Map();
-const activeComponent = computed(() => {
-    const tool = activeTool.value;
-    if (!tool) return null;
-    if (!asyncToolCache.has(tool.slug)) {
-        asyncToolCache.set(tool.slug, defineAsyncComponent({
-            loader: tool.component,
-            loadingComponent: ToolLoadingSkeleton,
-            delay: 200,
-        }));
-    }
-    return asyncToolCache.get(tool.slug);
-});
-
-const isFullScreen = ref(false);
-
-// Open a tool in the in-page drawer (just sets the query; isOpen reacts).
+// Open a tool's page. Also the keyboard shortcuts' entry point (exposed below).
 const openTool = (slug) => {
-    router.push({ path: '/', query: { tool: slug } });
+    router.push(`/tools/${slug}`);
     const name = slug.charAt(0).toUpperCase() + slug.slice(1);
     trackEvent('Nav', 'NavClick', name);
 };
 
-// Card left-click: open the drawer. Modifier / middle clicks fall through to
-// the <a href> default so the browser opens the standalone page in a new tab.
 const onCardClick = (e, slug) => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1) return;
+    if (!isPlainClick(e)) return;
     e.preventDefault();
     openTool(slug);
-};
-
-const onOpenChange = (val) => {
-    // Drawer closed (drag / overlay / Esc / close button) → drop the ?tool query.
-    if (!val) {
-        if (route.query.tool) router.push({ path: '/', query: {} });
-        isFullScreen.value = false;
-    }
-};
-
-// Full screen toggle: height determined by DrawerContent's class
-const fullScreen = () => {
-    isFullScreen.value = !isFullScreen.value;
 };
 
 onMounted(() => {
@@ -193,7 +100,7 @@ onMounted(() => {
 });
 
 defineExpose({
-    openTool, fullScreen,
+    openTool,
 });
 
 </script>
@@ -216,29 +123,5 @@ defineExpose({
 
 :global(.dark) .jn-adv-card:hover .jn-emoji {
     text-shadow: 0 0 10pt rgb(255 255 255 / 0.15);
-}
-
-/* Drawer content area width (desktop) */
-.jn-canvas-width {
-    width: fit-content;
-    margin: auto;
-    max-width: 1400px;
-}
-
-.jn-drawer-header {
-    border-bottom: 1px solid var(--border);
-}
-
-/* Drawer root container needs flex-col, so that the header is fixed + content scrollable */
-.jn-tools-drawer {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Full screen toggle height transition */
-:global(.jn-tools-drawer) {
-    transition:
-        transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-        height 0.3s cubic-bezier(0.32, 0.72, 0, 1) !important;
 }
 </style>

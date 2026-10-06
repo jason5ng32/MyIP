@@ -120,7 +120,7 @@
                 </nav>
 
                 <!-- Right 2/3: current category details -->
-                <div id="checklist" class="md:col-span-2">
+                <div id="checklist" class="md:col-span-2 scroll-mt-[calc(4rem+env(safe-area-inset-top))]">
                     <Card>
                         <CardContent class="p-4 md:p-6 space-y-4">
                             <!-- Category title + description + expandable intro -->
@@ -443,45 +443,15 @@ const changeList = (listName, shouldScroll = true) => {
         if (previousList !== currentList.value) {
             trackEvent('SecurityChecklist', 'SecurityChecklist', 'ChangeList');
         }
-        // Scroll the details area into view when switching category — but *only*
-        // by moving the drawer's own scroll container, never by letting the
-        // scroll request bubble to <body>.
-        //
-        // The earlier version used `scrollIntoView({ block: 'nearest' })`. On
-        // desktop the target element (#checklist) was already visible in the
-        // md 3-column grid, so the call no-op'd and everything worked. On iOS
-        // Safari however, the drawer library (vaul) scroll-locks the page by
-        // setting `body { position: fixed; top: -Npx }`. When scrollIntoView
-        // walked up past the drawer's own scrollable div to any ancestor that
-        // still negotiated with the browser's root scroller, its implicit
-        // side-effect of "settle page scroll" knocked vaul's recorded offset
-        // out of sync — the entire drawer visually slid up by the scroll
-        // distance (header disappearing off the top, blank space at bottom).
-        //
-        // Manually walking to the nearest scrollable ancestor and calling
-        // `scrollBy` on that element keeps the effect fully contained inside
-        // the drawer, and the PC path still short-circuits via the
-        // "already-visible" check.
+        // On a narrow screen the details stack below the list: bring them into
+        // view, clear of the fixed Nav (scroll-mt-* on #checklist).
         nextTick(() => {
             const el = document.getElementById('checklist');
             if (!el) return;
-            let scrollParent = el.parentElement;
-            while (scrollParent) {
-                const { overflowY } = getComputedStyle(scrollParent);
-                if (overflowY === 'auto' || overflowY === 'scroll') break;
-                scrollParent = scrollParent.parentElement;
-            }
-            if (!scrollParent) return;
-            const containerRect = scrollParent.getBoundingClientRect();
-            const elRect = el.getBoundingClientRect();
-            const alreadyVisible =
-                elRect.top >= containerRect.top &&
-                elRect.bottom <= containerRect.bottom;
-            if (alreadyVisible) return;
-            scrollParent.scrollBy({
-                top: elRect.top - containerRect.top - 8,
-                behavior: 'smooth',
-            });
+            const { top } = el.getBoundingClientRect();
+            const headerBottom = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+            if (top >= headerBottom && top < window.innerHeight * 0.75) return;
+            el.scrollIntoView({ block: 'start', behavior: 'smooth' });
         });
     }
 };

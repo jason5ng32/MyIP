@@ -1,23 +1,20 @@
-// Single source of truth for the Advanced Tools.
-//
-// This one registry drives every place a tool is referenced: the vue-router
-// routes (router/index.js), the Advanced.vue card groups + bottom drawer, the
-// standalone /tools/:slug pages, the nav menu and the keyboard shortcuts
-// (use-shortcuts.js).
+// Single source of truth for the Advanced Tools: their /tools/:slug pages
+// (ToolPage.vue), the card groups, the Nav, the keyboard shortcuts and the
+// legacy `/?tool=<slug>` redirect (utils/legacy-tool-link.js).
 //
 // Entry shape:
-//   slug                 — stable URL/identifier (drawer query + /tools/:slug)
-//   emoji                — card glyph + drawer header glyph
+//   slug                 — stable URL/identifier (/tools/:slug)
+//   emoji                — card glyph + page / menu glyph
 //   titleKey / noteKey   — i18n keys for the tool title and one-line description
 //   category             — TOOL_CATEGORIES id: the card group it renders in
-//   component            — lazy import of the tool's .vue (drawer + standalone)
+//   component            — lazy import of the tool's .vue (rendered by ToolPage)
 //   requiresOriginalSite — gate: only shown on the original site (private API +
 //                          sign-in required); omitted == public tool
 //   requiresConfig       — gate: only shown when this `/api/configs` flag is
 //                          true (e.g. 'cloudFlare' for the Radar-backed tools)
 //
-// Gates decide listing only (card grid + nav), via isToolAvailable() in
-// utils/tool-availability.js; deep links (?tool= / /tools/:slug) ignore them.
+// Gates decide listing only (utils/tool-availability.js); a /tools/:slug link
+// opens the tool regardless.
 
 export const ADVANCED_TOOLS = [
   { slug: 'pingtest', emoji: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', category: 'network', component: () => import('@/components/advanced-tools/GlobalLatencyTest.vue') },
@@ -35,12 +32,10 @@ export const ADVANCED_TOOLS = [
   { slug: 'invisibilitytest', emoji: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', category: 'deep', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresOriginalSite: true },
   { slug: 'enhanceddnsleaktest', emoji: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
   { slug: 'blocklist', emoji: '🚫', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresOriginalSite: true },
-  // noStandalone: the check requires the homepage tests' results, and running
-  // them navigates home — a /tools/ page for it would immediately bounce away.
-  { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true, noStandalone: true },
+  { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
 ];
 
-// Fast slug → entry lookup (drawer + standalone page resolve a tool by slug).
+// slug → entry.
 export const TOOL_BY_SLUG = new Map(ADVANCED_TOOLS.map((tool) => [tool.slug, tool]));
 
 // Card groups, in render order. On a self-hosted deployment the 'deep' tools

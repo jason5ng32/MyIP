@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import logger from './server/logger.js';
+import { FIREBASE_AUTH_PROXY_PATH, firebaseAuthProxyTarget } from './common/firebase-auth-proxy.js';
 
 dotenv.config({ quiet: true });
 
@@ -20,6 +21,18 @@ frontendApp.use('/api', createProxyMiddleware({
   target: `http://localhost:${backEndPort}/api`,
   changeOrigin: true
 }));
+
+// Firebase's auth handler served first-party (api/AGENTS.md "Firebase Auth
+// handler proxy"); ahead of the static layer and SPA fallback so it never
+// resolves to index.html.
+const firebaseAuthTarget = firebaseAuthProxyTarget(process.env.VITE_FIREBASE_PROJECT_ID);
+if (firebaseAuthTarget) {
+  frontendApp.use(FIREBASE_AUTH_PROXY_PATH, createProxyMiddleware({
+    target: `${firebaseAuthTarget}${FIREBASE_AUTH_PROXY_PATH}`,
+    changeOrigin: true
+  }));
+  logger.info(`🛡️ Firebase Auth handler proxied: ${FIREBASE_AUTH_PROXY_PATH}/* → ${firebaseAuthTarget}`);
+}
 
 // Set static file directory.
 // Cache-Control is set per-asset class so the static layer behaves well

@@ -7,6 +7,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { PREFS_STORAGE_KEY } from './frontend/data/default-preferences.js';
 import { LOCALE_CODES } from './common/locale-registry.js';
 import { stripPack } from './common/locale-pack.js';
+import { FIREBASE_AUTH_PROXY_PATH, firebaseAuthProxyTarget } from './common/firebase-auth-proxy.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const sentryUploadEnabled = !!process.env.SENTRY_AUTH_TOKEN
 
 const backEndPort = parseInt(process.env.BACKEND_PORT || 11966, 10);
 const frontEndPort = parseInt(process.env.FRONTEND_PORT || 18966, 10);
+const firebaseAuthTarget = firebaseAuthProxyTarget(process.env.VITE_FIREBASE_PROJECT_ID);
 const nodeModuleChunkGroups = {
   vendor: ['vue', 'vue-router', 'vue-i18n'],
   chart: ['chart.js'],
@@ -265,7 +267,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: frontEndPort,
     proxy: {
-      '/api': `http://localhost:${backEndPort}`
+      '/api': `http://localhost:${backEndPort}`,
+      // Firebase Auth handler, as frontend-server.js serves it in production
+      ...(firebaseAuthTarget && {
+        [FIREBASE_AUTH_PROXY_PATH]: { target: firebaseAuthTarget, changeOrigin: true },
+      }),
     },
     allowedHosts: ['dev.ipcheck.ing', 'test.ipcheck.ing'],
   }

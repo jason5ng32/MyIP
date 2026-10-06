@@ -1,5 +1,5 @@
 <template>
-  <footer class="pb-6 text-sm text-muted-foreground">
+  <footer class="pb-6 text-sm text-muted-foreground" :class="!isInHomePage ? 'border-t border-secondary' : ''">
     <!-- Primary footer links: Sponsor / Privacy / About / Changelog / Special
          Thanks. The last three open the same About sheet on their own tab.
          Text-only (no per-button icons) to keep the row calm. -->
@@ -174,13 +174,15 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
+import { useRoute } from 'vue-router';
 
 const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
-
+const route = useRoute();
+const isInHomePage = computed(() => route.path === '/');
 const tabs = ['about', 'changelog', 'acknowledgement'];
 const content = ref('about');
 // Static data from JSON — reverse once via computed so the template stays tidy.

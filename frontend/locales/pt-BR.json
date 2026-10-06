@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Navegação",
+    "Home": "Início",
     "IPInfo": "Dados de IP",
     "Connectivity": "Conectividade",
     "ServiceStatus": "Status dos serviços",
     "WebRTC": "Vazamento WebRTC",
     "DNSLeakTest": "Vazamento de DNS",
     "SpeedTest": "Velocidade",
-    "PingTest": "Latência global",
-    "MTRTest": "Teste MTR",
-    "RuleTest": "Teste de regras",
     "AdvancedTools": "Ferramentas avançadas",
     "SearchDocs": "Pesquisar na documentação…",
     "DocsToolConfirm": "Compartilhar seus resultados atuais dos testes?",
@@ -975,8 +972,6 @@
     }
   },
   "advancedtools": {
-    "OpenInNewTab": "Abrir em nova aba",
-    "BackToHome": "Voltar para o início",
     "Title": "Ferramentas avançadas",
     "Note": "Quem exige o máximo da qualidade da rede costuma usar mais ferramentas para otimizar a própria conexão.",
     "category": {

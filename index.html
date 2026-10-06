@@ -10,7 +10,9 @@
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Jason Ng" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- No apple-mobile-web-app-status-bar-style: the default keeps the iOS
+       status bar opaque system chrome. A translucent one lets the page run
+       under it, and since iOS 26 its scroll-edge blur then covers the Nav. -->
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)" />
   <meta name="background-color" content="#ffffff" />
@@ -110,25 +112,11 @@
       padding: 0;
     }
 
-    /* Reserve space at the top of the body for: (a) the iOS safe-area
-       (transparent status bar) — `env()` resolves to 0 on non-notch
-       platforms, and (b) the fixed Nav (3.5rem = h-14 in Nav.vue). The Nav
-       used to be `position: sticky` and lived in the normal flow, so no
-       padding was needed; switching it to `fixed` lets the body rubber-band
-       bounce on iOS without dragging the Nav along, but now we have to
-       compensate for the Nav's lost flow height here. */
+    /* Room for the safe-area inset and the fixed Nav (3.5rem = h-14 in
+       Nav.vue), which takes no flow height so it stays put while the body
+       rubber-bands on iOS. */
     body {
       padding-top: calc(env(safe-area-inset-top) + 3.5rem);
-    }
-
-    /* Standalone pages (/tools/:slug, /privacy, /r/:id) have their own in-flow
-       sticky header instead of the homepage's fixed Nav, and that header carries
-       the iOS safe-area inset as its own padding (StandalonePageHeader.vue) so
-       it keeps clearing the Dynamic Island once sticky pins it to the viewport
-       top. The body therefore reserves nothing here. App.vue toggles this class
-       on the standalone routes. */
-    body.jn-standalone-page {
-      padding-top: 0;
     }
 
     html {
@@ -469,7 +457,8 @@
   </noscript>
 
   <!-- Vue mounts here. `vaul-drawer-wrapper` is the marker vaul-vue uses to scale
-      the page background when a bottom drawer is open (Advanced Tools panel). -->
+      the page background when a bottom drawer is open (the expanded ASN
+      connectivity graph, ip-infos/ASNConnectivity.vue). -->
   <div id="app" vaul-drawer-wrapper></div>
   <script type="module" src="/frontend/main.js"></script>
 </body>

@@ -1,12 +1,8 @@
 <template>
-  <!-- iOS PWA safe-area painter. Pairs with apple-mobile-web-app-status-bar-style=black-translucent
-       in index.html — the only way to get a live status-bar tint on iOS PWA, since WebKit
-       ignores JS theme-color writes and media-variant theme-color tags in standalone mode.
-       Color tracks --page-bg (style.css), which follows .dark class. -->
-  <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none transition-colors duration-300"
-    style="height: env(safe-area-inset-top); background: var(--page-bg);" aria-hidden="true"></div>
+  <!-- The iOS status bar is opaque (no apple-mobile-web-app-status-bar-style), so the
+       inset is non-zero only on landscape notch edges. jn-site-nav: see style.css. -->
   <header
-    class="fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
+    class="jn-site-nav fixed top-[env(safe-area-inset-top)] left-0 right-0 z-40 w-full border-b transition-transform duration-300 ease-out will-change-transform"
     :class="{ '-translate-y-full': isNavHidden,
     'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isPwa || (isPwa && !isMobile),
     'bg-page-bg': isPwa && isMobile }">
@@ -18,13 +14,13 @@
           aria-label="Toggle navigation menu" @click="store.toggleSheet('navMenu')">
           <Menu />
         </Button>
-        <a href="#" @click="handleLogoClick"
+        <a :href="isHome ? '#' : homeHref" @click="handleLogoClick"
           class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity">
           <brandIcon />
           <span class="tracking-tight truncate">
             <span class="font-bold">IP</span><span class="font-extralight">Check.</span>
             <span class="font-extralight"
-              :class="{ 'jn-shimmer-light': !loaded && !isDarkMode, 'jn-shimmer-dark': !loaded && isDarkMode }">ing</span>
+              :class="{ 'jn-shimmer-light': shimmer && !isDarkMode, 'jn-shimmer-dark': shimmer && isDarkMode }">ing</span>
           </span>
         </a>
       </div>
@@ -32,15 +28,16 @@
       <!-- Middle: Desktop nav links + GitHub star badge (left aligned, next to brand) -->
       <div v-if="!isMobile" class="flex items-center gap-0.5">
         <template v-for="item in navItems" :key="item">
-          <!-- Advanced Tools: hover reveals the sub-tools, click scrolls to the
-               section (disable-click-trigger frees the click from toggling the
-               menu; viewport=false anchors the panel under the trigger). -->
+          <!-- Advanced Tools: hover reveals the sub-tools, click goes to the
+               section like the other links (disable-click-trigger frees the
+               click from toggling the menu; viewport=false anchors the panel
+               under the trigger). -->
           <NavigationMenu v-if="item === 'AdvancedTools'" as="div" :viewport="false" :disable-click-trigger="true"
             class="flex-none">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <NavigationMenuTrigger :class="['h-auto bg-transparent', navLinkClass(item)]"
-                  @click="scrollToSection('AdvancedTools'); trackEvent('Nav', 'NavClick', item)">
+                  @click="goToSection(item)">
                   {{ t(`nav.${item}`) }}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent class="z-50">
@@ -49,7 +46,7 @@
                     <span aria-hidden="true"
                       class="pointer-events-none absolute inset-y-1 left-1/2 w-px -translate-x-1/2 bg-border"></span>
                     <li v-for="tool in advancedTools" :key="tool.slug">
-                      <NavigationMenuLink as-child class="cursor-pointer">
+                      <NavigationMenuLink as-child class="cursor-pointer" :active="tool.slug === currentToolSlug">
                         <button type="button" class="w-full text-left leading-snug" @click="openTool(tool.slug)">
                           {{ t(tool.titleKey) }}
                         </button>
@@ -60,9 +57,8 @@
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-          <!-- All other sections stay plain smooth-scroll anchors. -->
-          <a v-else href="#" :class="navLinkClass(item)"
-            @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item)">
+          <!-- All other sections -->
+          <a v-else href="#" :class="navLinkClass(item)" @click.prevent="goToSection(item)">
             {{ t(`nav.${item}`) }}
           </a>
         </template>
@@ -87,120 +83,12 @@
         <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
         <DocsSearch />
 
-        <!-- Preferences — standalone cog only for Firebase-less self-hosted
-             instances (no user menu to host it). With the user system on,
-             preferences lives inside the user dropdown for every state. -->
-        <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
-          <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
-            @click="OpenPreferences">
-            <Cog />
-          </Button>
-        </JnTooltip>
-
-        <!-- Sign In / User Dropdown -->
-        <DropdownMenu v-if="isFireBaseSet">
-          <DropdownMenuTrigger as-child>
-            <!-- Not signed in: the solid block reads as the "sign in"
-                 call-to-action, and the menu opens on the sign-in options, so
-                 the affordance is self-explaining one click deep. -->
-            <Button v-if="!isSignedIn" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1.5 cursor-pointer"
-              aria-label="User menu">
-              <UserRound class="size-5" />
-              <ChevronDown class="opacity-60" />
-            </Button>
-            <!-- Signed in: avatar + chevron -->
-            <Button v-else variant="ghost" size="sm" @click="getUserInfo" class="h-8 gap-1 px-1 cursor-pointer"
-              aria-label="User menu">
-              <span class="inline-flex size-7 overflow-hidden rounded-full">
-                <img :src="userPhotoURL" :alt="userName" :title="userName" class="size-full object-cover"
-                  referrerpolicy="no-referrer">
-              </span>
-              <ChevronDown class="opacity-60" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" class="w-56 shadow-md">
-            <!-- Signed in -->
-            <template v-if="isSignedIn">
-              <div class="px-2 pt-2 pb-3">
-                <div class="flex items-center gap-3">
-                  <span class="inline-flex size-10 overflow-hidden rounded-full shrink-0">
-                    <img :src="userPhotoURL" :alt="userName" class="size-full object-cover"
-                      referrerpolicy="no-referrer">
-                  </span>
-                  <div class="flex min-w-0 flex-1 flex-col gap-1">
-                    <span class="truncate text-sm font-semibold leading-none">{{ userName }}</span>
-                    <span v-if="remoteUserInfoFetched && remoteUserInfo.userLevel">
-                      <Badge :class="levelBadgeClass"
-                        class="border-transparent text-[10px] font-medium px-1.5 py-0 h-4">
-                        {{ t('user.Level.' + remoteUserInfo.userLevel) }}
-                      </Badge>
-                    </span>
-                    <span v-else-if="!remoteUserInfoFetched" class="text-xs text-muted-foreground">{{
-                      t('user.Fields.Fetching') }}</span>
-                  </div>
-                </div>
-                <dl class="mt-3 space-y-1 text-xs">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.CreatedAt') }}</dt>
-                    <dd class="font-medium">{{ userCreatedAt }}</dd>
-                  </div>
-                  <!-- How this account signs in. One account per email
-                       address, so this is also the only way in. -->
-                  <div v-if="linkedProviders.length" class="flex items-baseline justify-between gap-2">
-                    <dt class="text-muted-foreground">{{ t('user.Fields.SignInMethods') }}</dt>
-                    <dd class="flex min-w-0 items-center gap-1.5 font-medium">
-                      <span v-for="provider in linkedProviders" :key="provider.providerId"
-                        class="inline-flex items-center gap-1" :title="provider.label">
-                        <Icon v-if="provider.icon" :icon="provider.icon" class="size-3.5 shrink-0" />
-                        <span>{{ provider.label }}</span>
-                      </span>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerAchievements(true)">
-                <Award />
-                <span>{{ t('user.MyAchievements') }}</span>
-              </DropdownMenuItem>
-            </template>
-
-            <!-- Not signed in -->
-            <template v-else>
-              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGoogle">
-                <Icon icon="ri:google-line" />
-                <span>{{ t('user.SignInWithGoogle') }}</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" @select="store.signInWithGithub">
-                <Icon icon="ri:github-line" />
-                <span>{{ t('user.SignInWithGithub') }}</span>
-              </DropdownMenuItem>
-            </template>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem class="cursor-pointer" @select="OpenPreferences">
-              <Cog />
-              <span>{{ t('nav.preferences.title') }}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem class="cursor-pointer" @select="store.setTriggerUserBenefits(true)">
-              <HeartHandshake />
-              <span>{{ t('user.Benefits.Title') }}</span>
-            </DropdownMenuItem>
-
-            <template v-if="isSignedIn">
-              <DropdownMenuSeparator />
-              <DropdownMenuItem class="cursor-pointer" @select="store.signOut">
-                <LogOut />
-                <span>{{ t('user.SignOut') }}</span>
-              </DropdownMenuItem>
-            </template>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <!-- Account menu: preferences cog (Firebase-less) or the user dropdown -->
+        <UserMenu />
       </div>
     </nav>
 
-    <!-- Mobile navigation drawer. Flex column so the link list scrolls instead
+    <!-- Mobile navigation sheet. Flex column so the link list scrolls instead
          of clipping on short screens when Advanced Tools is expanded. -->
     <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
       <SheetContent side="left" class="w-80 p-0 flex flex-col gap-0" :title="t('nav.Navigation')">
@@ -224,16 +112,15 @@
               <CollapsibleContent>
                 <div class="my-0.5 ml-3 flex flex-col gap-0.5 border-l pl-3">
                   <button v-for="tool in advancedTools" :key="tool.slug" type="button"
-                    class="block w-full rounded-md px-3 py-1.5 text-left text-sm leading-snug text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
-                    @click="openTool(tool.slug)">
+                    class="block w-full rounded-md px-3 py-1.5 text-left text-sm leading-snug text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground aria-[current=page]:bg-accent/50 aria-[current=page]:text-foreground"
+                    :aria-current="tool.slug === currentToolSlug ? 'page' : undefined" @click="openTool(tool.slug)">
                     {{ t(tool.titleKey) }}
                   </button>
                 </div>
               </CollapsibleContent>
             </Collapsible>
-            <!-- All other sections stay plain smooth-scroll anchors. -->
-            <a v-else href="#" :class="navLinkClass(item, { block: true })"
-              @click.prevent="scrollToSection(item); trackEvent('Nav', 'NavClick', item); store.setOpenSheet(null)">
+            <!-- All other sections, as on desktop. -->
+            <a v-else href="#" :class="navLinkClass(item, { block: true })" @click.prevent="goToSection(item)">
               {{ t(`nav.${item}`) }}
             </a>
           </template>
@@ -256,12 +143,13 @@
 </template>
 
 <script setup>
+// The site navigation bar, rendered once by App.vue above every route; what a
+// section or tool entry does on the current route is utils/nav-target.js.
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
-import { unixToDateTime } from '@/utils/time-utils';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import {
@@ -274,48 +162,46 @@ import {
 } from '@/components/ui/navigation-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { JnTooltip } from '@/components/ui/tooltip';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import {
-  Award, ChevronDown, UserRound, HeartHandshake,
-  LogOut, Menu, Cog,
-} from '@lucide/vue';
+import { ChevronDown, Menu } from '@lucide/vue';
 import DocsSearch from '@/components/widgets/DocsSearch.vue';
 import Pulse from '@/components/widgets/Pulse.vue';
+import UserMenu from '@/components/UserMenu.vue';
 import { Icon } from '@iconify/vue';
 import brandIcon from './svgicons/Brand.vue';
 import { SECTION_IDS } from '@/data/sections';
 import { ADVANCED_TOOLS } from '@/data/tools.js';
-import { isToolAvailable } from '@/utils/tool-availability.js';
+import { listedTools } from '@/utils/tool-availability.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
+import { isPlainClick } from '@/utils/nav-target.js';
+import { useNavTarget } from '@/composables/use-nav-target.js';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const store = useMainStore();
+const route = useRoute();
 const router = useRouter();
+const { navigateTo } = useNavTarget();
 
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
-const currentSection = computed(() => store.currentSection);
+// store.currentSection keeps Home's last section, so it's ignored elsewhere.
+const isHome = computed(() => route.name === 'home');
+const currentSection = computed(() => (isHome.value ? store.currentSection : null));
+const currentToolSlug = computed(() => (route.name === 'tool' ? String(route.params.slug) : ''));
+const homeHref = router.resolve('/').href;
 const loaded = computed(() => store.allHasLoaded);
+// The brand shimmers while the homepage tests run.
+const shimmer = computed(() => isHome.value && !loaded.value);
 
-// Running as an installed PWA (chromeless window). Distinct from the app's
-// "standalone tool pages" — see utils/pwa.js.
+// Running as an installed PWA (chromeless window) — see utils/pwa.js.
 const isPwa = isRunningAsPwa();
 
 const navItems = SECTION_IDS;
 
-// Tools shown in the nav, mirroring Advanced.vue's enabledCards: gated tools
-// stay hidden where the deployment lacks them. Reactive on configs.
+// Gated tools stay hidden where the deployment lacks them, as in the card grid.
 const configs = computed(() => store.configs);
-const advancedTools = computed(() => ADVANCED_TOOLS.filter((tool) => isToolAvailable(tool, configs.value)));
+const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, configs.value));
 
 // Mobile: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);
@@ -344,51 +230,20 @@ const navLinkClass = (item, { block = false } = {}) => {
   return [base, state, block ? 'block' : ''].filter(Boolean).join(' ');
 };
 
-// Firebase / User
-const isFireBaseSet = computed(() => store.isFireBaseSet);
-const isSignedIn = computed(() => store.isSignedIn);
-const userName = computed(() => store.user?.displayName);
-const userPhotoURL = computed(() => store.user?.photoURL);
-const userCreatedAt = computed(() => unixToDateTime(store.user?.metadata.createdAt, locale.value));
-const remoteUserInfo = computed(() => store.remoteUserInfo);
-const remoteUserInfoFetched = computed(() => store.remoteUserInfoFetched);
-// Sign-in methods attached to this account.
-const linkedProviders = computed(() => store.linkedProviders);
-
-// Level Badge Color: mapped to semantic token, keep each level color distinction
-const levelBadgeClass = computed(() => {
-  const level = remoteUserInfo.value?.userLevel;
-  switch (level) {
-    case 'Premium': return 'bg-action text-action-foreground';
-    case 'Owner': return 'bg-foreground text-background';
-    case 'Developer': return 'bg-success text-success-foreground';
-    case 'HonoraryMember': return 'bg-warning text-warning-foreground';
-    case 'Standard':
-    default: return 'bg-muted-foreground text-background';
-  }
-});
-
-const getUserInfo = async () => {
-  if (remoteUserInfoFetched.value || !isSignedIn.value) return;
-  store.setTriggerRemoteUserInfo(true);
-};
-
-
 const isNavMenuOpen = computed(() => store.openSheet === 'navMenu');
 const onNavMenuChange = (val) => {
   store.setOpenSheet(val ? 'navMenu' : null);
 };
 
-// Opens the Preferences sheet
-const OpenPreferences = () => {
-  store.toggleSheet('preferences');
-  trackEvent('Nav', 'NavClick', 'Preferences');
-};
-
-// At top → full refresh; mid-page → smooth scroll up. preventDefault
-// avoids the native instant-jump of <a href="#">.
+// Off the homepage → home (a real link there, so modified clicks open a new
+// tab). On it: at top → full refresh; mid-page → smooth scroll up.
+// preventDefault avoids the native instant-jump of <a href="#">.
 const handleLogoClick = (e) => {
-  if (window.scrollY === 0) {
+  if (!isHome.value) {
+    if (!isPlainClick(e)) return;
+    e.preventDefault();
+    router.push('/');
+  } else if (window.scrollY === 0) {
     store.setRefreshEveryThing(true);
   } else {
     e.preventDefault();
@@ -397,27 +252,23 @@ const handleLogoClick = (e) => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// Menu scroll (leave space for sticky header)
-const scrollToSection = (el, offset = 70) => {
-  const element = typeof el === 'string' ? document.getElementById(el) : el;
-  if (!element) return;
-  const y = element.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top: y, behavior: 'smooth' });
+// Section and tool entries close the mobile nav Sheet first and navigate once
+// its slide-out is over: WebKit records the back/forward snapshot of a page
+// as it navigates away, and a swipe back would show the sheet still open.
+const SHEET_CLOSE_MS = 300; // ui/sheet data-[state=closed]:duration-300
+const afterSheetClosed = (fn) => {
+  if (!isNavMenuOpen.value) return fn();
+  store.setOpenSheet(null);
+  setTimeout(fn, SHEET_CLOSE_MS);
 };
 
-// Open a tool from the nav: scroll to the Advanced Tools section, then raise the
-// drawer (driven by the `?tool=` query Advanced.vue watches). Scrolls twice — the
-// mobile nav Sheet locks body scroll until it closes, so the first scroll is a
-// no-op there and the deferred one lands after the Sheet is gone.
-let openToolTimer = null;
+const goToSection = (section) => {
+  afterSheetClosed(() => navigateTo({ section }));
+  trackEvent('Nav', 'NavClick', section);
+};
+
 const openTool = (slug) => {
-  store.setOpenSheet(null);            // close the mobile nav Sheet (no-op on desktop)
-  scrollToSection('AdvancedTools');
-  clearTimeout(openToolTimer);
-  openToolTimer = setTimeout(() => {
-    scrollToSection('AdvancedTools');
-    router.push({ path: '/', query: { tool: slug } });
-  }, 300);
+  afterSheetClosed(() => navigateTo({ tool: slug }));
   const name = slug.charAt(0).toUpperCase() + slug.slice(1);
   trackEvent('Nav', 'NavClick', name);
 };
@@ -440,7 +291,7 @@ const onScroll = () => {
     if (y <= SHOW_AT_TOP) {
       isNavHidden.value = false;
     } else if (Math.abs(dy) > SCROLL_DELTA) {
-      // Keep nav visible while the menu drawer is open so its close
+      // Keep nav visible while the menu sheet is open so its close
       // affordance stays in place.
       if (dy > 0 && !isNavMenuOpen.value) {
         isNavHidden.value = true;
@@ -453,27 +304,25 @@ const onScroll = () => {
   });
 };
 
-watch(isMobile, (mobile) => {
-  if (!mobile) {
-    isNavHidden.value = false;
-    window.removeEventListener('scroll', onScroll);
+// Mobile only; attaching resyncs lastScrollY so the first scroll isn't a phantom jump.
+const setScrollListener = (on) => {
+  if (on) {
+    lastScrollY = window.scrollY;
+    window.addEventListener('scroll', onScroll, { passive: true });
   } else {
-    lastScrollY = window.scrollY;
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.removeEventListener('scroll', onScroll);
   }
-}, { immediate: false });
+};
 
-onMounted(() => {
-  if (isMobile.value) {
-    lastScrollY = window.scrollY;
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
-  fetchGithubStars();
-});
+watch(isMobile, (mobile) => {
+  if (!mobile) isNavHidden.value = false;
+  setScrollListener(mobile);
+}, { immediate: true });
+
+onMounted(fetchGithubStars);
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', onScroll);
-  clearTimeout(openToolTimer);
+  setScrollListener(false);
 });
 </script>
 

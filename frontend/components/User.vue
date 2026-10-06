@@ -123,9 +123,8 @@ const store = useMainStore();
 const route = useRoute();
 const { dotClass } = useStatusTone();
 
-// Mounted on a /tools/:slug standalone page (vs the homepage) — these pages
-// skip the homepage loading pipeline, which changes when user info can load.
-const isStandalonePage = computed(() => route.path.startsWith('/tools/'));
+// `matched` is empty until the first navigation resolves the route.
+const isOffHome = computed(() => route.matched.length > 0 && route.name !== 'home');
 
 const isSignedIn = computed(() => store.isSignedIn);
 const remoteUserInfo = computed(() => store.remoteUserInfo);
@@ -249,25 +248,22 @@ const updateUserAchievement = async (achievementName) => {
     }
 };
 
-watch(() => store.allHasLoaded, (newVal) => {
-    if (newVal) getUserInfo();
-});
-
-// The unknown-auth-hint boot resolves sign-in AFTER allHasLoaded (background
-// probe in main.js), so the watcher above already ran and skipped; retry when
-// the signed-in state lands. getUserInfo self-guards against double fetches.
-// Standalone tool pages never run the homepage loading pipeline (allHasLoaded
-// stays false there), so sign-in alone is enough to fetch; immediate covers
-// auth having resolved before this component mounted.
-watch(isSignedIn, (signed) => {
-    if (signed && (store.allHasLoaded || isStandalonePage.value)) getUserInfo();
+// User info loads once signed in and, on Home, after its tests (allHasLoaded);
+// other pages never run them. getUserInfo self-guards against double fetches.
+watch(() => isSignedIn.value && (store.allHasLoaded || isOffHome.value), (ready) => {
+    if (ready) getUserInfo();
 }, { immediate: true });
 
 watch(() => triggerUserBenefits.value, (newVal) => {
     if (newVal) openUserBenefits();
 });
 
-// One-shot trigger: cleared here so the next request from Nav / Achievements
+// A page change closes the dialog.
+watch(() => route.path, () => {
+    isOpen.value = false;
+});
+
+// One-shot trigger: cleared here so the next request from UserMenu / Achievements
 // is a fresh false → true edge rather than a no-op write.
 watch(() => triggerRemoteUserInfo.value, (newVal) => {
     if (!newVal) return;

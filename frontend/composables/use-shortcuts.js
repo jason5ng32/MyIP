@@ -14,7 +14,8 @@
 //     Config-gated keys fill in reactively when /api/configs lands
 //
 // Note:
-//   - scrolling + navigation actions use scrollToElement + advancedToolsRef.openTool(slug);
+//   - section keys scroll with scrollToElement; tool keys open the tool's page
+//     through advancedToolsRef.openTool(slug);
 //     test-running keys dispatch commands on utils/app-commands.js
 //   - `h` key infoMask switch only executes when isInfosLoaded is true
 //   - every entry here is a home-page action. Overlays (Dialog / Sheet /
@@ -27,7 +28,8 @@ import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { dispatchAppCommand } from '../utils/app-commands.js';
 import { registerShortcuts, keyMap, navigateCards } from '../utils/shortcut.js';
-import { scrollToElement } from '../utils/scroll-to.js';
+import { scrollToElement, SECTION_SCROLL_OFFSET } from '../utils/scroll-to.js';
+import { useRouteActive } from './use-route-active.js';
 import { hasPulseBackend } from '../utils/features/pulse-beacon.js';
 
 // A shortcut only kicks the run off — completion is the owner's business —
@@ -49,7 +51,6 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     } = refs;
 
     const goToAdvancedTool = (slug, trackName) => {
-        scrollToElement('AdvancedTools', 80);
         advancedToolsRef.value.openTool(slug);
         trackEvent('Nav', 'NavClick', trackName);
     };
@@ -120,7 +121,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             type: 'regex',
             action: (num) => {
                 if (num > userPreferences.value.ipCardsToShow) return;
-                scrollToElement('IPInfoCard-' + num, 70);
+                scrollToElement('IPInfoCard-' + num, SECTION_SCROLL_OFFSET);
                 runCommand('ipinfo:refresh', { index: num - 1 });
                 trackEvent('ShortCut', 'ShortCut', 'IPCheck');
             },
@@ -129,7 +130,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'c',
             action: () => {
-                scrollToElement('Connectivity', 80);
+                scrollToElement('Connectivity', SECTION_SCROLL_OFFSET);
                 runCommand('connectivity:run', { trigger: 'manual' });
                 trackEvent('ShortCut', 'ShortCut', 'Connectivity');
             },
@@ -138,7 +139,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'w',
             action: () => {
-                scrollToElement('WebRTC', 80);
+                scrollToElement('WebRTC', SECTION_SCROLL_OFFSET);
                 runCommand('webrtc:run', { isRefresh: false });
                 trackEvent('ShortCut', 'ShortCut', 'WebRTC');
             },
@@ -147,7 +148,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 'd',
             action: () => {
-                scrollToElement('DNSLeakTest', 80);
+                scrollToElement('DNSLeakTest', SECTION_SCROLL_OFFSET);
                 runCommand('dnsleak:run', { isRefresh: true });
                 trackEvent('ShortCut', 'ShortCut', 'DNSLeakTest');
             },
@@ -156,7 +157,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         {
             keys: 's',
             action: () => {
-                scrollToElement('SpeedTest', 80);
+                scrollToElement('SpeedTest', SECTION_SCROLL_OFFSET);
                 runCommand('speedtest:toggle');
                 trackEvent('ShortCut', 'ShortCut', 'SpeedTest');
             },
@@ -271,10 +272,11 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
     // Suspending the map behind an overlay is the primitives' job
     // (composables/use-overlay-shortcuts.js), so nothing is wired here.
     //
-    // Home is the only route that registers shortcuts; drop them when it
-    // unmounts, so keystrokes on /privacy or /r/:id can't reach refs that no
-    // longer point at anything.
+    // Home is the only route that registers shortcuts; the map is cleared
+    // when it is left (cached away or unmounted) and rebuilt on its return.
     let disposed = false;
+    let loaded = false;
+    const active = useRouteActive();
     if (getCurrentScope()) {
         onScopeDispose(() => {
             disposed = true;
@@ -286,15 +288,22 @@ export const useShortcuts = ({ refs, store, t, configs, userPreferences }) => {
         registerShortcuts(buildShortcutConfig({ refs, store, t, configs, userPreferences }));
     };
 
+    watch(active, (isActive) => {
+        if (!loaded || disposed) return;
+        if (isActive) registerShortcutKeys();
+        else registerShortcuts([]);
+    });
+
     const loadShortcuts = () => {
         // Register immediately so the base keys work from the first paint;
         // config-gated keys (originalSite's i/D/P, pulse's p) fill in when
         // /api/configs lands (`{}` → data, once per page load) and the watcher
         // rebuilds the map. keyMap is mutated in place (utils/shortcut.js),
         // so the help modal's reference stays current across rebuilds.
-        registerShortcutKeys();
+        loaded = true;
+        if (active.value) registerShortcutKeys();
         watch(configs, () => {
-            if (!disposed) registerShortcutKeys();
+            if (!disposed && active.value) registerShortcutKeys();
         });
         // Help is an async component (Home.vue): on slow networks its chunk
         // may land later, so wait for the ref instead of silently skipping

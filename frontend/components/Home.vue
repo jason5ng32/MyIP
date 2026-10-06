@@ -1,8 +1,5 @@
 <template>
-  <NavBar />
-  <User ref="userRef" />
   <Achievements ref="achievementsRef" />
-  <Preferences />
   <main id="mainpart" class="mx-auto w-full px-4 jn-container">
     <div class="rounded-md">
       <IPCheck />
@@ -26,18 +23,15 @@
 </template>
 
 <script setup>
-// The homepage. Holds every top-level section plus the Advanced Tools drawer.
-// Split out of App.vue when the app moved to history-mode routing: App is now a
-// thin shell, and this component is what /'s <router-view> renders. The truly
-// global widgets (tooltip provider, toast, PWA, theme) stay in App.
+// The homepage (`/`): every top-level section plus the Advanced Tools cards;
+// what every route shares lives in App.vue.
 //
 // Components — the test sections and the always-visible chrome load
-// synchronously; everything the first paint can't show (dialogs, drawers,
-// the below-fold Additional/Footer) is an async component so its code stays
+// synchronously; everything the first paint can't show (dialogs, the
+// below-fold Additional/Footer) is an async component so its code stays
 // out of the route chunk and out of the mount's critical path. Their
 // template refs are null until the chunk lands — consumers (use-shortcuts)
 // must optional-chain.
-import NavBar from './Nav.vue';
 import IPCheck from './IpInfos.vue';
 import Connectivity from './ConnectivityTest.vue';
 import WebRTC from './WebRtcTest.vue';
@@ -53,9 +47,7 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 // Async (off-critical-path) components
 const Additional = defineAsyncComponent(() => import('./Additional.vue'));
 const Footer = defineAsyncComponent(() => import('./Footer.vue'));
-const User = defineAsyncComponent(() => import('./User.vue'));
 const Achievements = defineAsyncComponent(() => import('./Achievements.vue'));
-const Preferences = defineAsyncComponent(() => import('./widgets/Preferences.vue'));
 const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));
 const HelpModal = defineAsyncComponent(() => import('./widgets/Help.vue'));
 const IPHistory = defineAsyncComponent(() => import('./widgets/IPHistory.vue'));
@@ -70,6 +62,8 @@ import { useShortcuts } from '@/composables/use-shortcuts.js';
 import { useSectionTracking } from '@/composables/use-section-tracking.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
 
+defineOptions({ name: 'Home' });
+
 const { t } = useI18n();
 const store = useMainStore();
 const configs = computed(() => store.configs);
@@ -77,7 +71,6 @@ const userPreferences = computed(() => store.userPreferences);
 
 // Template refs — UI chrome only; the test sections are reached through the
 // command bus (utils/app-commands.js), not refs.
-const userRef = ref(null);
 const achievementsRef = ref(null);
 const queryIPRef = ref(null);
 const helpModalRef = ref(null);
@@ -113,8 +106,7 @@ useSectionTracking();
 // Localized homepage head. Provide title/description explicitly via t() rather
 // than leaning on use-document-meta's DEFAULT_META snapshot: that snapshot is
 // taken at module load, before the (now async) locale messages land, so it would
-// pin the head to index.html's English title. Reactive t() also re-applies the
-// right copy when SPA-navigating back from a /tools/:slug page.
+// pin the head to index.html's English title.
 useDocumentMeta(() => ({
     title: t('page.title'),
     description: t('page.description'),

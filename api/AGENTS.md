@@ -157,6 +157,17 @@ tokens). `persona` strips the framing headers (`host` / `content-length` / …)
 first, as it re-serializes the body. Do **not** replicate for third-party
 upstreams; those get only what's explicitly needed.
 
+### Firebase Auth handler proxy
+
+`frontend-server.js` (production) and `vite.config.js` (dev) reverse-proxy
+`/__/auth/*` to `<projectId>.firebaseapp.com` (`common/firebase-auth-proxy.js`)
+when `VITE_FIREBASE_PROJECT_ID` is set, so `VITE_FIREBASE_AUTH_DOMAIN` can be
+the deployment's own host and the sign-in handler runs first-party — inside
+the installed PWA's webview and Safari's storage partition, where
+`getRedirectResult` finds the result. Every OAuth provider must accept
+`https://<host>/__/auth/handler` per environment. Not an `/api` route: no
+guards, caching or per-request logs.
+
 ## Edge caching
 
 Every `/api/*` response defaults to `Cache-Control: no-store`; slowly-changing

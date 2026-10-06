@@ -3,10 +3,9 @@
      MAC Lookup's job) dispatched to the matching card under ./ip-calculator/.
      Pure local computation via utils/features/ip-calc.js.
 
-     The query rides the URL as `?q=` on both /tools/ipcalculator and
-     /?tool=ipcalculator, written back on every run so results are shareable.
-     Two collapsed folds under the input hold example pills (one per accepted
-     syntax) and, on the home page, the visitor's own IPs (store.allIPs). -->
+     The query rides the URL as `?q=`, written back on every run so results
+     are shareable. Two collapsed folds under the input hold example pills
+     (one per accepted syntax) and the visitor's own IPs (store.allIPs). -->
 <template>
     <div class="ip-calculator-section my-4 space-y-4">
         <!-- Top note -->
@@ -85,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
@@ -94,6 +93,7 @@ import { useMainStore } from '@/store';
 import { trackEvent } from '@/utils/analytics';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { selectableIPs } from '@/composables/use-globalping-measurement.js';
+import { useActiveValue } from '@/composables/use-route-active.js';
 import { analyzeCidr, calculate } from '@/utils/features/ip-calc.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -200,13 +200,15 @@ const onPrefixCommit = (prefix) => {
     syncQuery();
 };
 
-onMounted(() => {
-    const q = route.query.q;
-    if (typeof q === 'string' && q.trim()) {
+// Shareable `?q=` (use-route-active.js); our own write-back equals the
+// trimmed input, so it doesn't run twice.
+const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
+watch(sharedQuery, (q) => {
+    if (typeof q === 'string' && q.trim() && q !== query.value.trim()) {
         query.value = q;
         run(q);
     }
-});
+}, { immediate: true });
 
 /* ------------------------------------------------------------------ */
 /* Result dispatch                                                     */

@@ -1,7 +1,9 @@
 // store.js
 import { defineStore } from 'pinia';
-import { loadFirebaseAuth } from './firebase-init.js';
+import { isFireBaseSet, loadFirebaseAuth } from './firebase-init.js';
 import { writeAuthHint } from './utils/auth-hint.js';
+import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirectSignIn } from './utils/auth-redirect.js';
+import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
 import { createInitialAchievementsState } from './data/achievements.js';
 import { createInitialIpDBs, buildDbUrl, applyConfigAvailability, nearestEnabledId } from './data/ip-databases.js';
@@ -64,7 +66,7 @@ export const useMainStore = defineStore('main', {
       ipv6Domain: import.meta.env?.VITE_CURL_IPV6_DOMAIN,
       ipv64Domain: import.meta.env?.VITE_CURL_IPV64_DOMAIN,
     },
-    isFireBaseSet: false,
+    isFireBaseSet,
     openSheet: null,
     loadingStatus: createLoadingStatus(),
     isDarkMode: false,
@@ -253,16 +255,6 @@ export const useMainStore = defineStore('main', {
     changeSection(section) {
       this.currentSection = section;
     },
-    // check Firebase environment
-    checkFirebaseEnv() {
-      const env = import.meta.env ?? {};
-      const envConfigs = {
-        key: env.VITE_FIREBASE_API_KEY,
-        domain: env.VITE_FIREBASE_AUTH_DOMAIN,
-        project: env.VITE_FIREBASE_PROJECT_ID,
-      }
-      this.isFireBaseSet = !!envConfigs.key && !!envConfigs.domain && !!envConfigs.project;
-    },
     // sign in with Google
     async signInWithGoogle() {
       await this.signInWithProvider('google');
@@ -271,18 +263,49 @@ export const useMainStore = defineStore('main', {
     async signInWithGithub() {
       await this.signInWithProvider('github');
     },
-    // Shared sign-in path for both buttons.
+    // Shared sign-in path for both buttons: popup in a browser tab, then
+    // reload; redirect in the installed PWA or when the popup can't open
+    // (utils/auth-redirect.js), finished at boot by completeRedirectSignIn.
     async signInWithProvider(providerKey) {
       const descriptor = SIGN_IN_PROVIDERS[providerKey];
       try {
         const fb = await loadFirebaseAuth();
-        const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
+        if (!isRunningAsPwa()) {
+          try {
+            const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
+            this.user = result.user;
+            writeAuthHint(true);
+            window.location.reload();
+            return;
+          } catch (error) {
+            if (!shouldFallBackToRedirect(error?.code)) throw error;
+          }
+        }
+        markPendingRedirectSignIn(providerKey);
+        await fb.signInWithRedirect(fb.auth, descriptor.build(fb));
+      } catch (error) {
+        takePendingRedirectSignIn(); // a redirect that never left mustn't replay at boot
+        this.handleSignInError(error, descriptor);
+      }
+    },
+    // Boot half of the redirect flow: true when it signed the visitor in
+    // (state set before mount, no reload).
+    async completeRedirectSignIn() {
+      const pending = takePendingRedirectSignIn();
+      if (!pending) return false;
+      const descriptor = SIGN_IN_PROVIDERS[pending.providerKey] ?? SIGN_IN_PROVIDERS.google;
+      try {
+        const fb = await loadFirebaseAuth();
+        if (!fb) return false;
+        const result = await fb.getRedirectResult(fb.auth);
+        if (!result?.user) return false;
         this.user = result.user;
+        this.isSignedIn = true;
         writeAuthHint(true);
-        // refresh browser after successful login
-        window.location.reload();
+        return true;
       } catch (error) {
         this.handleSignInError(error, descriptor);
+        return false;
       }
     },
     // Turns Firebase auth error codes into something a visitor can act on.
@@ -290,7 +313,7 @@ export const useMainStore = defineStore('main', {
       console.error(`${descriptor.label} sign-in failed:`, error);
 
       switch (error?.code) {
-        // Closing the popup is normal, not a failure worth a red toast.
+        // Closing the popup / backing out is normal, not a failure worth a red toast.
         case 'auth/popup-closed-by-user':
         case 'auth/cancelled-popup-request':
         case 'auth/user-cancelled':

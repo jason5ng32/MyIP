@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Navigation",
+    "Home": "Accueil",
     "IPInfo": "Infos IP",
     "Connectivity": "Connectivité",
     "ServiceStatus": "État des services",
     "WebRTC": "Test WebRTC Leak",
     "DNSLeakTest": "Test de fuite DNS",
     "SpeedTest": "Test de vitesse",
-    "PingTest": "Latence mondiale",
-    "MTRTest": "Test MTR",
-    "RuleTest": "Test de règles",
     "AdvancedTools": "Outils avancés",
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
@@ -975,8 +972,6 @@
     }
   },
   "advancedtools": {
-    "OpenInNewTab": "Ouvrir dans un nouvel onglet",
-    "BackToHome": "Retour à l'accueil",
     "Title": "Outils avancés",
     "Note": "Ceux qui exigent le meilleur de leur réseau utilisent souvent davantage d'outils pour optimiser leur connexion.",
     "category": {

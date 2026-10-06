@@ -383,10 +383,8 @@ const props = defineProps({
     countryTrafficMode: { type: String, default: 'off' },
 });
 
-// Consumers rendering this panel inside a dialog listen to close themselves
-// first — the Benefits & Usage dialog (`view-usage`) or an Advanced Tools
-// drawer (`open-tool`, from ASN Info's profile link) would otherwise stack
-// on top of them.
+// A host dialog listens to close itself first: before the Benefits & Usage
+// dialog stacks on it (`view-usage`) or ASN Info's profile link changes page (`open-tool`).
 const emit = defineEmits(['view-usage', 'open-tool']);
 
 const openUsageDialog = () => {

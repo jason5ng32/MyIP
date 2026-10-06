@@ -2,13 +2,8 @@
 // the first loadFirebaseAuth() call (signed-in boot, sign-in click, or the
 // background auth probe), never on the visitor-critical path.
 const env = import.meta.env ?? {};
-const firebaseConfig = {
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-};
 
-const isFireBaseSet = !!firebaseConfig.apiKey && !!firebaseConfig.authDomain && !!firebaseConfig.projectId;
+const isFireBaseSet = !!env.VITE_FIREBASE_API_KEY && !!env.VITE_FIREBASE_AUTH_DOMAIN && !!env.VITE_FIREBASE_PROJECT_ID;
 
 let authModulePromise = null;
 
@@ -28,7 +23,11 @@ const loadFirebaseAuth = () => {
         }
         return {
             ...authModule,
-            auth: authModule.getAuth(appModule.initializeApp(firebaseConfig)),
+            auth: authModule.getAuth(appModule.initializeApp({
+                apiKey: env.VITE_FIREBASE_API_KEY,
+                authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+                projectId: env.VITE_FIREBASE_PROJECT_ID,
+            })),
         };
     }).catch((error) => {
         // Don't memoize a transient chunk-load failure — the next auth
@@ -39,4 +38,4 @@ const loadFirebaseAuth = () => {
     return authModulePromise;
 };
 
-export { loadFirebaseAuth };
+export { isFireBaseSet, loadFirebaseAuth };
