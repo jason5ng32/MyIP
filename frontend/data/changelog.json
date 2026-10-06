@@ -2227,12 +2227,12 @@
       {
         "type": "improve",
         "change": {
-          "en": "Advanced Tools now open as pages of their own, sliding in like an app, data is not lost when switching",
-          "zh": "高级工具改为以独立页面打开，像应用一样滑入，切换到时候数据不丢失",
-          "zh-TW": "進階工具改為以獨立頁面開啟，像 App 一樣滑入，切換的時候數據不丟失",
-          "fr": "Les Outils avancés s'ouvrent désormais dans leur propre page, qui glisse à l'écran comme dans une app, les données ne sont pas perdues lors du changement",
-          "ru": "Расширенные инструменты теперь открываются на отдельных страницах, которые выезжают, как в приложении, данные не теряются при переключении",
-          "pt-BR": "As Ferramentas avançadas agora abrem em páginas próprias, que deslizam como num app, os dados não são perdidos ao mudar"
+          "en": "Advanced Tools open as pages of their own, sliding in like an app, data is not lost when switching",
+          "zh": "高级工具以独立页面打开，像应用一样滑入，切换时数据不丢失",
+          "zh-TW": "進階工具以獨立頁面開啟，像 App 一樣滑入，切換時數據不丟失",
+          "fr": "Les Outils avancés ouvrent dans leur propre page, qui glisse à l'écran comme dans une app, les données ne sont pas perdues lors du changement",
+          "ru": "Расширенные инструменты открываются на отдельных страницах, которые выезжают, как в приложении, данные не теряются при переключении",
+          "pt-BR": "As Ferramentas avançadas abrem em páginas próprias, que deslizam como num app, os dados não são perdidos ao mudar"
         }
       },
       {
@@ -2260,12 +2260,12 @@
       {
         "type": "improve",
         "change": {
-          "en": "Advanced Tools are now grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
-          "zh": "高级工具改为按网络诊断、查询与计算、深度检测分组展示",
-          "zh-TW": "進階工具改為按網路診斷、查詢與計算、深度檢測分組展示",
-          "fr": "Les Outils avancés sont désormais regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
-          "ru": "Расширенные инструменты теперь разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
-          "pt-BR": "As Ferramentas avançadas agora são agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+          "en": "Advanced Tools grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
+          "zh": "高级工具以分组形式展示",
+          "zh-TW": "進階工具以分組形式展示",
+          "fr": "Les Outils avancés regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
+          "ru": "Расширенные инструменты разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
+          "pt-BR": "As Ferramentas avançadas agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
         }
       },
       {
