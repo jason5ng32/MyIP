@@ -2247,7 +2247,7 @@
         }
       },
       {
-        "type": "add",
+        "type": "improve",
         "change": {
           "en": "The navigation bar is on every page, so every tool is one click away wherever you are",
           "zh": "导航栏覆盖所有页面，方便在任何页面都能一键打开任意工具",
