@@ -108,7 +108,7 @@
                 </Card>
             </Transition>
 
-            <!-- Detailed list: 14 items, divide-y list -->
+            <!-- Detailed list: one row per detection item, divide-y list -->
             <Transition name="fade-slide">
                 <Card>
                     <CardContent class="p-0">
@@ -155,6 +155,16 @@
                                                     item.extras.tcp }}ms</strong>,
                                                 {{ t('invisibilitytest.latencyVSWS.fromWS') }}<strong>{{ item.extras.ws
                                                     }}ms</strong>
+                                            </template>
+                                            <template v-else-if="item.key === 'tlsRtt'">
+                                                {{ t('invisibilitytest.tlsRtt.fromTCP') }}<strong>{{
+                                                    item.extras.tcp }}ms</strong>,
+                                                {{ t('invisibilitytest.tlsRtt.fromTLS') }}<strong>{{ item.extras.tls
+                                                    }}ms</strong>
+                                            </template>
+                                            <template v-else-if="item.key === 'proxyAi'">
+                                                {{ t('invisibilitytest.proxyAi.score') }}<strong>{{ item.extras.score
+                                                    }}</strong>
                                             </template>
                                             <template v-else-if="item.key === 'webrtc'">
                                                 {{ t('invisibilitytest.webrtc.ipsAre') }}
@@ -203,7 +213,7 @@ const scoreToneClass = (score) => {
     return 'text-destructive';
 };
 
-// 14 items detection data: label goes i18n {key}.title; positive/negative text is also
+// Detection items: label goes i18n {key}.title; positive/negative text is also
 // key determined will be used by template to pull t(`invisibilitytest.${key}.title|positive|negative`) from i18n.
 const detectionItems = computed(() => {
     const r = testResults.value;
@@ -231,6 +241,13 @@ const detectionItems = computed(() => {
             extras: r.latency_vs_ws.proxy ? { tcp: r.latency_vs_ws.tcpTime, ws: r.latency_vs_ws.wsTime } : null,
         },
         {
+            key: 'tlsRtt',
+            flagged: Boolean(r.tls_rtt.proxy),
+            extras: r.tls_rtt.proxy && r.tls_rtt.tcpRtt != null && r.tls_rtt.tlsMs != null
+                ? { tcp: r.tls_rtt.tcpRtt, tls: r.tls_rtt.tlsMs }
+                : null,
+        },
+        {
             key: 'timezone',
             flagged: Boolean(r.timezone.proxy || r.timezone.vpn),
             extras: (r.timezone.proxy || r.timezone.vpn)
@@ -241,10 +258,15 @@ const detectionItems = computed(() => {
         {
             key: 'webrtc',
             flagged: Boolean(r.webrtc.proxy),
-            extras: r.webrtc.proxy ? { ips: [...(r.webrtc.allips || []), r.webrtc.ip].filter(Boolean) } : null,
+            extras: r.webrtc.proxy ? { ips: [...new Set([...(r.webrtc.allips || []), r.webrtc.ip].filter(Boolean))] } : null,
         },
         { key: 'flow', flagged: Boolean(r.flow.proxy) },
         { key: 'highlatency', flagged: Boolean(r.highlatency.proxy) },
+        {
+            key: 'proxyAi',
+            flagged: Boolean(r.proxy_ai.proxy),
+            extras: r.proxy_ai.proxy && r.proxy_ai.score != null ? { score: r.proxy_ai.score.toFixed(2) } : null,
+        },
     ];
 });
 
@@ -323,7 +345,7 @@ const getResult = async () => {
         } else {
             testResults.value = data;
             // Achievement rules (HiddenWell / SlipUp) live in data/achievement-rules.js;
-            // the report collector consumes ip + the 14 detection flags.
+            // the report collector consumes ip + the detection flags.
             emitAppEvent('invisibility:result', {
                 proxyScore: Math.floor(data.score.proxy),
                 vpnScore: Math.floor(data.score.vpn),

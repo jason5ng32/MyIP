@@ -579,10 +579,23 @@
       "fromPing": "Valeur de latence Ping : ",
       "negative": "La différence entre la latence TCP et le Ping n'est pas importante, indiquant que vous n'utilisez peut-être pas de proxy ou de VPN."
     },
+    "tlsRtt": {
+      "title": "Latence TCP vs poignée de main TLS",
+      "positive": "La poignée de main TLS prend bien plus de temps que l'aller-retour TCP, comme si elle était effectuée plus loin. Vous utilisez peut-être un proxy ou un VPN.",
+      "fromTCP": "Aller-retour TCP : ",
+      "fromTLS": "Poignée de main TLS : ",
+      "negative": "La durée de la poignée de main TLS correspond à l'aller-retour TCP, sans indice clair d'un proxy ou d'un VPN."
+    },
     "highlatency": {
       "title": "Analyse de Haute Latence",
       "positive": "L'analyse de haute latence indique que vous utilisez peut-être un proxy ou un VPN.",
       "negative": "Aucune preuve de votre utilisation d'un proxy ou d'un VPN n'a été trouvée lors de l'analyse de haute latence."
+    },
+    "proxyAi": {
+      "title": "Évaluation par IA",
+      "positive": "Un modèle d'IA qui combine tous les signaux estime que vous utilisez peut-être un proxy.",
+      "score": "Score du modèle IA : ",
+      "negative": "Un modèle d'IA qui combine tous les signaux n'a trouvé aucun indice d'utilisation d'un proxy."
     }
   },
   "personacheck": {

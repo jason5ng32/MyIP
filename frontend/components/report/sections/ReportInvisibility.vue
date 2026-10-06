@@ -14,7 +14,7 @@
                 <span class="font-mono font-semibold" :class="scoreTone(section.scores.vpn)">{{ section.scores.vpn }}</span>
             </span>
         </div>
-        <!-- The 14 detection signals -->
+        <!-- One row per detection signal -->
         <ul class="divide-y text-xs">
             <li v-for="flag in section.flags" :key="flag.key" class="flex items-center justify-between gap-4 px-4 py-2">
                 <span>{{ t(`invisibilitytest.${flag.key}.title`) }}</span>

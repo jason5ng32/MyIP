@@ -579,10 +579,23 @@
       "fromPing": "Ping 延遲值：",
       "negative": "TCP 延遲與 Ping 差值不大，沒有明顯的使用了 VPN 的證據。"
     },
+    "tlsRtt": {
+      "title": "TCP vs TLS 握手延遲",
+      "positive": "TLS 握手耗時明顯長於 TCP 往返延遲，握手像是在更遠的地方完成的，看起來你使用了代理或 VPN。",
+      "fromTCP": "TCP 往返延遲：",
+      "fromTLS": "TLS 握手耗時：",
+      "negative": "TLS 握手耗時與 TCP 往返延遲相符，沒有明顯的使用了代理或 VPN 的證據。"
+    },
     "highlatency": {
       "title": "高延遲分析",
       "positive": "高延遲分析發現你可能使用了代理或 VPN。",
       "negative": "高延遲分析未發現你使用代理或 VPN 的證據。"
+    },
+    "proxyAi": {
+      "title": "AI 綜合判定",
+      "positive": "AI 模型綜合各項特徵，判斷你可能使用了代理。",
+      "score": "AI 模型評分：",
+      "negative": "AI 模型綜合各項特徵，未發現你使用代理的證據。"
     }
   },
   "personacheck": {

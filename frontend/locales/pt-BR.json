@@ -579,10 +579,23 @@
       "fromPing": "Valor de latência Ping: ",
       "negative": "A diferença entre a latência TCP e Ping não é grande, indicando que talvez você não esteja usando proxy nem VPN."
     },
+    "tlsRtt": {
+      "title": "Latência TCP vs handshake TLS",
+      "positive": "O handshake TLS demora muito mais que o tempo de ida e volta do TCP, como se fosse concluído em um lugar mais distante. Você pode estar usando proxy ou VPN.",
+      "fromTCP": "Ida e volta TCP: ",
+      "fromTLS": "Handshake TLS: ",
+      "negative": "O tempo do handshake TLS é compatível com o tempo de ida e volta do TCP, sem indícios claros de proxy ou VPN."
+    },
     "highlatency": {
       "title": "Análise de alta latência",
       "positive": "A análise de alta latência indica que você pode estar usando proxy ou VPN.",
       "negative": "Nenhuma evidência de uso de proxy ou VPN foi encontrada na análise de alta latência."
+    },
+    "proxyAi": {
+      "title": "Avaliação por IA",
+      "positive": "Um modelo de IA que combina todos os sinais avalia que você pode estar usando proxy.",
+      "score": "Pontuação do modelo de IA: ",
+      "negative": "Um modelo de IA que combina todos os sinais não encontrou indícios de que você esteja usando proxy."
     }
   },
   "personacheck": {
