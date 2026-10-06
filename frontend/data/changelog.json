@@ -2210,7 +2210,7 @@
     ]
   },
   {
-    "version": "v7.8.0",
+    "version": "v8.0.0",
     "date": "Beta",
     "content": [
       {
@@ -2225,14 +2225,36 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools now open as pages of their own, sliding in like an app, data is not lost when switching",
+          "zh": "高级工具改为以独立页面打开，像应用一样滑入，切换到时候数据不丢失",
+          "zh-TW": "進階工具改為以獨立頁面開啟，像 App 一樣滑入，切換的時候數據不丟失",
+          "fr": "Les Outils avancés s'ouvrent désormais dans leur propre page, qui glisse à l'écran comme dans une app, les données ne sont pas perdues lors du changement",
+          "ru": "Расширенные инструменты теперь открываются на отдельных страницах, которые выезжают, как в приложении, данные не теряются при переключении",
+          "pt-BR": "As Ferramentas avançadas agora abrem em páginas próprias, que deslizam como num app, os dados não são perdidos ao mudar"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reorganized the project's directory structure for easier maintenance",
+          "zh": "重构了程序的目录结构，提高可维护性",
+          "zh-TW": "重構了程式的目錄結構，提高可維護性",
+          "fr": "Réorganisation de la structure des répertoires du projet pour faciliter la maintenance",
+          "ru": "Реорганизована структура каталогов проекта для упрощения поддержки",
+          "pt-BR": "Reorganizada a estrutura de diretórios do projeto para facilitar a manutenção"
+        }
+      },
+      {
         "type": "add",
         "change": {
-          "en": "The navigation bar is on every page, so every tool is one click away wherever you are, and tool pages carry a breadcrumb back to the homepage",
-          "zh": "导航栏覆盖所有页面，在任何页面都能一键打开任意工具；工具页面新增返回首页的面包屑导航",
-          "zh-TW": "導覽列涵蓋所有頁面，在任何頁面都能一鍵開啟任一工具；工具頁面新增返回首頁的麵包屑導覽",
-          "fr": "La barre de navigation est présente sur toutes les pages : chaque outil est à un clic où que vous soyez, et les pages d'outils ont un fil d'Ariane vers l'accueil",
-          "ru": "Панель навигации есть на каждой странице — любой инструмент в одном клике откуда угодно, а на страницах инструментов появились «хлебные крошки» для возврата на главную",
-          "pt-BR": "A barra de navegação está em todas as páginas, então qualquer ferramenta fica a um clique de onde você estiver, e as páginas de ferramentas têm uma trilha de navegação de volta ao início"
+          "en": "The navigation bar is on every page, so every tool is one click away wherever you are",
+          "zh": "导航栏覆盖所有页面，方便在任何页面都能一键打开任意工具",
+          "zh-TW": "導覽列涵蓋所有頁面，方便在任何頁面都能一鍵開啟任一工具",
+          "fr": "La barre de navigation est présente sur toutes les pages : chaque outil est à un clic où que vous soyez",
+          "ru": "Панель навигации есть на каждой странице — любой инструмент в одном клике откуда угодно",
+          "pt-BR": "A barra de navegação está em todas as páginas, então qualquer ferramenta fica a um clique de onde você estiver"
         }
       },
       {
@@ -2249,23 +2271,12 @@
       {
         "type": "improve",
         "change": {
-          "en": "Advanced Tools now open as pages of their own, sliding in like an app: browser back and forward move between them and the homepage, and returning restores each page as you left it, results included",
-          "zh": "高级工具改为以独立页面打开，像应用一样滑入：可用浏览器的后退与前进在工具和首页之间切换，返回时页面保持离开时的样子，测试结果也一并保留",
-          "zh-TW": "進階工具改為以獨立頁面開啟，像 App 一樣滑入：可用瀏覽器的上一頁與下一頁在工具和首頁之間切換，返回時頁面保持離開時的樣子，測試結果也一併保留",
-          "fr": "Les Outils avancés s'ouvrent désormais dans leur propre page, qui glisse à l'écran comme dans une app : les boutons Précédent et Suivant du navigateur passent de l'un à l'autre et à la page d'accueil, et chaque page revient telle que vous l'avez laissée, résultats compris",
-          "ru": "Расширенные инструменты теперь открываются на отдельных страницах, которые выезжают, как в приложении: кнопки браузера «Назад» и «Вперёд» переключают между ними и главной страницей, а при возвращении каждая страница остаётся такой, какой вы её оставили, вместе с результатами",
-          "pt-BR": "As Ferramentas avançadas agora abrem em páginas próprias, que deslizam como num app: os botões Voltar e Avançar do navegador alternam entre elas e a página inicial, e cada página volta como você a deixou, com os resultados"
-        }
-      },
-      {
-        "type": "improve",
-        "change": {
-          "en": "Reorganized the project's directory structure for easier maintenance",
-          "zh": "重构了程序的目录结构，提高可维护性",
-          "zh-TW": "重構了程式的目錄結構，提高可維護性",
-          "fr": "Réorganisation de la structure des répertoires du projet pour faciliter la maintenance",
-          "ru": "Реорганизована структура каталогов проекта для упрощения поддержки",
-          "pt-BR": "Reorganizada a estrutura de diretórios do projeto para facilitar a manutenção"
+          "en": "Improved the PWA experience on iOS",
+          "zh": "优化 iOS 系统中，PWA 的体验",
+          "zh-TW": "優化 iOS 系統中，PWA 的體驗",
+          "fr": "Amélioration de l'expérience PWA sur iOS",
+          "ru": "Улучшение работы PWA в iOS",
+          "pt-BR": "Melhoria da experiência PWA no iOS"
         }
       },
       {
