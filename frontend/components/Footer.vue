@@ -181,7 +181,8 @@ const { t, tm, rt, locale } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
 const configs = computed(() => store.configs);
-const isInHomePage = computed(() => useRoute().path === '/');
+const route = useRoute();
+const isInHomePage = computed(() => route.path === '/');
 const tabs = ['about', 'changelog', 'acknowledgement'];
 const content = ref('about');
 // Static data from JSON — reverse once via computed so the template stays tidy.
