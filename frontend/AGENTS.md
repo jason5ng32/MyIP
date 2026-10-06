@@ -14,8 +14,7 @@ over copied-in shadcn-vue primitives. No TypeScript, no `dark:` dual pairs.
 frontend/
 ├── App.vue / main.js / store.js / router/ / locales/ / style/style.css
 ├── firebase-init.js ← env-gated lazy Firebase Auth (boot path: utils/auth-hint.js;
-│                      PWA / blocked-popup redirect sign-in: utils/auth-redirect.js;
-│                      the PWA's own auth domain: utils/auth-domain.js)
+│                      PWA / blocked-popup redirect sign-in: utils/auth-redirect.js)
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"

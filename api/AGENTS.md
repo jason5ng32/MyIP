@@ -161,12 +161,11 @@ upstreams; those get only what's explicitly needed.
 
 `frontend-server.js` (production) and `vite.config.js` (dev) reverse-proxy
 `/__/auth/*` to `<projectId>.firebaseapp.com` (`common/firebase-auth-proxy.js`)
-when `VITE_FIREBASE_PROJECT_ID` is set. `VITE_FIREBASE_PWA_AUTH_DOMAIN` points
-the installed PWA at the site's own host, so its sign-in handler runs
-first-party — inside the PWA's webview and Safari's storage partition — and
-`getRedirectResult` finds the result; browsers keep the shared
-`VITE_FIREBASE_AUTH_DOMAIN`. Every OAuth provider must accept
-`https://<host>/__/auth/handler` for both domains. Not an `/api` route: no
+when `VITE_FIREBASE_PROJECT_ID` is set, so `VITE_FIREBASE_AUTH_DOMAIN` can be
+the deployment's own host and the sign-in handler runs first-party — inside
+the installed PWA's webview and Safari's storage partition, where
+`getRedirectResult` finds the result. Every OAuth provider must accept
+`https://<host>/__/auth/handler` per environment. Not an `/api` route: no
 guards, caching or per-request logs.
 
 ## Edge caching
