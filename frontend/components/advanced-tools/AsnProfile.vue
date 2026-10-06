@@ -333,7 +333,7 @@
                          contract, borderless (this card draws the border) and
                          without its expand-to-drawer (the page has the room). -->
                     <ASNConnectivity v-if="hasTopology(graph)" :asn="String(profileAsn)"
-                        :asnConnectivityInfos="connectivityInfos" :expandable="false" :bordered="false" />
+                        :asnConnectivityInfos="connectivityInfos" :expandable="true" :bordered="false" />
 
                     <div v-if="graph" class="grid gap-4 md:grid-cols-3">
                         <div v-for="group in groups" :key="group.kind" class="min-w-0">
