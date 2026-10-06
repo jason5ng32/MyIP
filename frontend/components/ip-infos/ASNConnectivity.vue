@@ -189,7 +189,7 @@ const props = defineProps({
     // Numeric string — parent strips the "AS" prefix to keep cache keys consistent.
     asn: { type: String, required: true },
     asnConnectivityInfos: { type: Object, required: true },
-    // false hides the expand-to-drawer button (ASN Profile's page has the room).
+    // false hides the expand-to-drawer button.
     expandable: { type: Boolean, default: true },
     // false drops only the outer border (tint and padding stay) — for a host
     // card that already draws one (ASN Profile).

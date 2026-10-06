@@ -330,8 +330,8 @@
                     </div>
 
                     <!-- Upstream topology: the IP-card component on its cache
-                         contract, borderless (this card draws the border) and
-                         without its expand-to-drawer (the page has the room). -->
+                         contract, borderless (this card draws the border), with
+                         its expand-to-drawer for the full-width graph. -->
                     <ASNConnectivity v-if="hasTopology(graph)" :asn="String(profileAsn)"
                         :asnConnectivityInfos="connectivityInfos" :expandable="true" :bordered="false" />
 

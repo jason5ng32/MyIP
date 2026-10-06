@@ -91,8 +91,9 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 
 - One `/api/asn-profile` request, one loading state, then the whole page; a
   section (reputation included — no `configs.originalSite` check) renders only
-  when its `status` is `ok`. `ASNConnectivity.vue` gets `:expandable="false"
-  :bordered="false"`; its defaults keep IPCard / QueryIP unchanged.
+  when its `status` is `ok`. `ASNConnectivity.vue` gets `:bordered="false"`
+  (the card draws the border) and keeps its expand-to-drawer; its defaults
+  keep IPCard / QueryIP unchanged.
 - `peeringdb` is operator self-reporting: vocabularies → locale keys
   (`PEERING_ENUMS`), names / cities as written. `ASN_PROFILE_TIMEOUT_MS` stays
   above the largest backend section deadline (tested).
