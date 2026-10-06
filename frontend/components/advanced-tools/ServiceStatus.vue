@@ -324,9 +324,12 @@ const floorDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 // Lazy per-provider detail loader: one request returns both the sub-services
 // and the recent incidents (a user who opens a card looks at both). Guards
 // against duplicate fetches; a successful result is cached until refresh, while
-// an error leaves `loaded` false so re-expanding retries.
+// an error leaves `loaded` false so re-expanding retries. An answer from
+// before a reload is dropped: stored, a reopened card would skip its fetch.
+let detailEpoch = 0;
 const loadDetail = async (id) => {
   if (detailState[id]?.loading || detailState[id]?.loaded) return;
+  const epoch = detailEpoch;
   detailState[id] = { loading: true, error: false, loaded: false, components: [], incidents: [] };
   try {
     const [res] = await Promise.all([
@@ -335,12 +338,14 @@ const loadDetail = async (id) => {
     ]);
     if (!res.ok) throw new Error(`status ${res.status}`);
     const json = await res.json();
+    if (epoch !== detailEpoch) return;
     detailState[id] = {
       loading: false, error: false, loaded: true,
       components: json.components || [],
       incidents: json.incidents || [],
     };
   } catch {
+    if (epoch !== detailEpoch) return;
     detailState[id] = { loading: false, error: true, loaded: false, components: [], incidents: [] };
   }
 };
@@ -357,6 +362,7 @@ const onToggle = (p) => {
 // Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
 // cached detail so a reopened card refetches the fresh snapshot.
 const reload = () => {
+  detailEpoch += 1;
   for (const k of Object.keys(openState)) openState[k] = false;
   for (const k of Object.keys(detailState)) delete detailState[k];
   loadOverview();
