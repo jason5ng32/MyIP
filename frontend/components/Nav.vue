@@ -252,16 +252,23 @@ const handleLogoClick = (e) => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// Section and tool entries close the mobile nav Sheet first (no-op on desktop).
-const goToSection = (section) => {
+// Section and tool entries close the mobile nav Sheet first and navigate once
+// its slide-out is over: WebKit records the back/forward snapshot of a page
+// as it navigates away, and a swipe back would show the sheet still open.
+const SHEET_CLOSE_MS = 300; // ui/sheet data-[state=closed]:duration-300
+const afterSheetClosed = (fn) => {
+  if (!isNavMenuOpen.value) return fn();
   store.setOpenSheet(null);
-  navigateTo({ section });
+  setTimeout(fn, SHEET_CLOSE_MS);
+};
+
+const goToSection = (section) => {
+  afterSheetClosed(() => navigateTo({ section }));
   trackEvent('Nav', 'NavClick', section);
 };
 
 const openTool = (slug) => {
-  store.setOpenSheet(null);
-  navigateTo({ tool: slug });
+  afterSheetClosed(() => navigateTo({ tool: slug }));
   const name = slug.charAt(0).toUpperCase() + slug.slice(1);
   trackEvent('Nav', 'NavClick', name);
 };
