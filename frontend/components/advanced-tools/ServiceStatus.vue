@@ -165,8 +165,9 @@
 // so the initial load stays light and detail is pulled only when a card opens.
 //
 // Not wired into the homepage's global-refresh orchestrator: it loads on
-// mount, and the bottom Refresh button is the only re-pull path.
-import { ref, reactive, computed, onMounted } from 'vue';
+// mount, again when shown after a backend refresh cycle (the page is kept
+// alive), and on the bottom Refresh button.
+import { ref, reactive, computed, onMounted, onActivated } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -353,16 +354,28 @@ const onToggle = (p) => {
   }
 };
 
-const refresh = () => {
-  trackEvent('Section', 'RefreshClick', 'ServiceStatus');
-  // Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
-  // cached detail so a reopened card refetches the fresh snapshot.
+// Collapse any open cards (mirrors IPCard / WebRTC refresh behavior) and drop
+// cached detail so a reopened card refetches the fresh snapshot.
+const reload = () => {
   for (const k of Object.keys(openState)) openState[k] = false;
   for (const k of Object.keys(detailState)) delete detailState[k];
   loadOverview();
 };
 
+const refresh = () => {
+  trackEvent('Section', 'RefreshClick', 'ServiceStatus');
+  reload();
+};
+
 onMounted(() => {
   loadOverview();
+});
+
+// The backend republishes its snapshot every 5 minutes; a cached page shown
+// again after that long is as stale as a fresh mount would be. The first
+// activation follows the mount, when no pull has completed yet.
+const SNAPSHOT_INTERVAL_MS = 5 * 60 * 1000;
+onActivated(() => {
+  if (lastRefreshedAt.value && Date.now() - lastRefreshedAt.value >= SNAPSHOT_INTERVAL_MS) reload();
 });
 </script>
