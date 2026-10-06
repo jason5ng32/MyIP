@@ -1,5 +1,6 @@
 <template>
-  <!-- Markup and classes follow shadcn-vue's Breadcrumb (ui/ has no copy-in). -->
+  <!-- Breadcrumb above the <h1> of every page but Home: ← Home / … / current page.
+       Markup and classes follow shadcn-vue's Breadcrumb (ui/ has no copy-in). -->
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5">
       <!-- Home: back in history when Home is the previous entry, so it returns as left -->
@@ -25,7 +26,6 @@
 </template>
 
 <script setup>
-// Breadcrumb above the <h1> of every page but Home: ← Home / … / current page.
 // `items` are the localized crumbs after Home: `{ label, section }` links to a
 // homepage section, reached as the Nav does; a bare `{ label }` is the current
 // page. A trail may end on a section when the <h1> beside it names the page.

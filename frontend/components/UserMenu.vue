@@ -1,4 +1,6 @@
 <template>
+  <!-- Account menu at the right of the site Nav: a preferences cog on a
+       Firebase-less instance, the user dropdown otherwise. -->
   <!-- Firebase-less: standalone preferences cog. -->
   <JnTooltip v-if="!isFireBaseSet" :text="t('nav.preferences.title')">
     <Button variant="ghost" size="icon" class="size-8 cursor-pointer" aria-label="Open preferences"
@@ -111,9 +113,8 @@
 </template>
 
 <script setup>
-// Account menu at the right of the site Nav: a preferences cog on a
-// Firebase-less instance, the user dropdown otherwise. What it opens is raised
-// through store triggers (Preferences / User live in App.vue, Achievements on Home).
+// What the menu opens is raised through store triggers (Preferences / User
+// live in App.vue, Achievements on Home).
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
