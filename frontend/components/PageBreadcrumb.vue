@@ -14,10 +14,10 @@
       <template v-for="(crumb, index) in items" :key="index">
         <li role="presentation" aria-hidden="true">/</li>
         <li class="inline-flex min-w-0 items-center gap-1.5">
-          <span v-if="index === items.length - 1" role="link" aria-disabled="true" aria-current="page"
-            class="font-normal text-foreground">{{ crumb.label }}</span>
-          <a v-else :href="homeHref" class="transition-colors hover:text-foreground"
+          <a v-if="crumb.section" :href="homeHref" class="transition-colors hover:text-foreground"
             @click="onSection($event, crumb.section)">{{ crumb.label }}</a>
+          <span v-else role="link" aria-disabled="true" aria-current="page"
+            class="font-normal text-foreground">{{ crumb.label }}</span>
         </li>
       </template>
     </ol>
@@ -26,8 +26,9 @@
 
 <script setup>
 // Breadcrumb above the <h1> of every page but Home: ← Home / … / current page.
-// `items` are the localized crumbs after Home; the last is the current page,
-// the others `{ label, section }` — a homepage section, reached as the Nav does.
+// `items` are the localized crumbs after Home: `{ label, section }` links to a
+// homepage section, reached as the Nav does; a bare `{ label }` is the current
+// page. A trail may end on a section when the <h1> beside it names the page.
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { ArrowLeft } from '@lucide/vue';

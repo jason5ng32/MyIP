@@ -175,7 +175,8 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Page breadcrumb** — every page but Home opens its body with
   `<PageBreadcrumb :items />` above the `<h1>` (← Home / … / current page):
   real links, Home via `resolveBackTarget()`, section crumbs via the Nav's
-  helper, the last crumb `aria-current="page"`.
+  helper, a bare last crumb `aria-current="page"`. A tool page ends on the
+  Advanced Tools crumb: its `<h1>` already names the tool.
 - **Page transitions** — View Transitions hooked in the router's
   `beforeResolve` (`utils/page-transition.js`: Home → page slides forward,
   → Home back, page → page fades; keyframes in `style/style.css`); none on a
