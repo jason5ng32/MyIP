@@ -175,6 +175,7 @@ import { Separator } from '@/components/ui/separator';
 import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile } from '@lucide/vue';
 import { Icon } from '@iconify/vue';
 import { useRoute } from 'vue-router';
+import { useRouteActive } from '@/composables/use-route-active.js';
 
 const { t, tm, rt, locale } = useI18n();
 
@@ -240,8 +241,10 @@ const changelogBadgeClass = (type) => {
   return '';
 };
 
-// Sheet toggle and store.openSheet bidirectional binding
-const isOpen = computed(() => store.openSheet === 'about');
+// Sheet toggle and store.openSheet bidirectional binding. Home and ToolPage are
+// both cached with a Footer each; only the page on screen opens its sheet.
+const routeActive = useRouteActive();
+const isOpen = computed(() => routeActive.value && store.openSheet === 'about');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'about' : null);
 };
