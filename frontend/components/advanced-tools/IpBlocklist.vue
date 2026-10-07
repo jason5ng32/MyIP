@@ -201,8 +201,10 @@
 // IP Blocklist Check: which blocklists an IP is on — live DNSBLs and static
 // threat lists — via /api/ipblocklist (the private API's /iphitlist; signed-in
 // users, original site only). Verdict / row split live in
-// utils/features/ip-blocklist.js.
-import { ref, computed } from 'vue';
+// utils/features/ip-blocklist.js. A `?q=` IP is prefilled, never run: the
+// visitor may be signed out or out of quota.
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -210,6 +212,7 @@ import { authenticatedFetch } from '@/utils/authenticated-fetch';
 import { isoToDateTime, formatIsoDate } from '@/utils/time-utils.js';
 import { blocklistVerdict, listedCounts, splitPart, itemTone, reasonMessage } from '@/utils/features/ip-blocklist.js';
 import { selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
+import { useActiveValue } from '@/composables/use-route-active.js';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -226,6 +229,8 @@ import {
 
 const { t, te } = useI18n();
 const store = useMainStore();
+const route = useRoute();
+const router = useRouter();
 const lang = computed(() => store.lang);
 
 // The backend waits up to 30s on the upstream; give it room to answer first.
@@ -253,6 +258,29 @@ const manualIP = ref('');
 // until the next run.
 const inputInvalid = ref(false);
 const targetIP = computed(() => (manualMode.value ? manualIP.value.trim() : selectedIP.value));
+
+// Shareable `?q=` (use-route-active.js): a stored IP is picked in the
+// dropdown, any other goes to manual entry.
+const prefill = (ip) => {
+    inputInvalid.value = false;
+    if (allIPs.value.some((item) => item.ip === ip)) {
+        useStored.value = true;
+        selectedIP.value = ip;
+    } else {
+        useStored.value = false;
+        manualIP.value = ip;
+    }
+};
+const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
+watch(sharedQuery, (q) => {
+    if (typeof q === 'string' && q.trim() && q.trim() !== targetIP.value) prefill(q.trim());
+}, { immediate: true });
+
+// Keep `?q=` in step with the last run without growing history.
+const syncQuery = (q) => {
+    if (route.query.q === q) return;
+    router.replace({ query: { ...route.query, q } });
+};
 
 const status = ref('idle'); // 'idle' | 'running'
 const isRunning = computed(() => status.value === 'running');
@@ -316,6 +344,7 @@ const runCheck = async () => {
         quotaExceeded.value = true;
         return;
     }
+    syncQuery(targetIP.value);
     status.value = 'running';
     errorMsg.value = '';
     quotaExceeded.value = false;

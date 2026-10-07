@@ -160,7 +160,9 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Shareable tool input** — watch `useActiveValue(() => route.query.q, {
   pathOf: () => route.path })` (immediate, so mount, later changes and a `q`
   changed while cached all run; another page's `q` never does), `router.replace`
-  it on every run (AsnProfile); the URL is `/tools/<slug>?q=`.
+  it on every run (AsnProfile); the URL is `/tools/<slug>?q=`. A `q` runs
+  the tool only when a run needs no sign-in or quota (AsnProfile,
+  IpCalculator); otherwise it just prefills (IpBlocklist).
 - **Fixed option sets** — a closed list wider than one line is a `Select`.
 - **Qualifier + input + run** — `Select` + `Input` in one `ButtonGroup`, the run
   Button in a second (DnsResolver); trigger `w-auto shrink-0`; never wraps.

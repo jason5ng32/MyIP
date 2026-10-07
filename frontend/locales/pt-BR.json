@@ -1643,6 +1643,8 @@
         }
       },
       "tagsTitle": "Todos os atributos",
+      "blocklistHint": "A pontuação reflete o perfil geral deste IP. Quer saber se ele está em alguma lista negra agora?",
+      "blocklistLink": "Verificar listas negras em tempo real",
       "tagState": {
         "yes": "Sim",
         "no": "Não",

@@ -1643,6 +1643,8 @@
         }
       },
       "tagsTitle": "All attributes",
+      "blocklistHint": "The score is an overall profile of this IP. Want to know if it's blocklisted right now?",
+      "blocklistLink": "Check blocklists live",
       "tagState": {
         "yes": "Yes",
         "no": "No",

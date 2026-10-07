@@ -1643,6 +1643,8 @@
         }
       },
       "tagsTitle": "全部屬性",
+      "blocklistHint": "評分反映的是這個 IP 的綜合輪廓。想知道它此刻有沒有上黑名單？",
+      "blocklistLink": "即時檢查黑名單",
       "tagState": {
         "yes": "是",
         "no": "否",

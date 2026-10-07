@@ -1643,6 +1643,8 @@
         }
       },
       "tagsTitle": "全部属性",
+      "blocklistHint": "评分反映的是这个 IP 的综合画像。想知道它此刻有没有上黑名单？",
+      "blocklistLink": "实时检查黑名单",
       "tagState": {
         "yes": "是",
         "no": "否",
