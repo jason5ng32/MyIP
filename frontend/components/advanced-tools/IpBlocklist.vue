@@ -259,8 +259,22 @@ const manualIP = ref('');
 const inputInvalid = ref(false);
 const targetIP = computed(() => (manualMode.value ? manualIP.value.trim() : selectedIP.value));
 
-// Shareable `?q=` (use-route-active.js): a stored IP is picked in the
-// dropdown, any other goes to manual entry.
+const status = ref('idle'); // 'idle' | 'running'
+const isRunning = computed(() => status.value === 'running');
+const canRun = computed(() => !isRunning.value && !!store.user && !!targetIP.value);
+
+// ── Result ───────────────────────────────────────────────────────────────
+const result = ref(null);
+const errorMsg = ref('');
+const quotaExceeded = ref(false);
+const openRest = ref({});
+
+// The IP the last run asked about; `result` and `errorMsg` belong to it.
+let lastRunIP = '';
+
+// ── Shareable `?q=` (use-route-active.js) ────────────────────────────────
+// A stored IP is picked in the dropdown, any other goes to manual entry.
+// Another IP's result is cleared: a link means "check this one".
 const prefill = (ip) => {
     inputInvalid.value = false;
     if (allIPs.value.some((item) => item.ip === ip)) {
@@ -269,6 +283,10 @@ const prefill = (ip) => {
     } else {
         useStored.value = false;
         manualIP.value = ip;
+    }
+    if (ip !== lastRunIP) {
+        result.value = null;
+        errorMsg.value = '';
     }
 };
 const sharedQuery = useActiveValue(() => route.query.q, { pathOf: () => route.path });
@@ -281,16 +299,6 @@ const syncQuery = (q) => {
     if (route.query.q === q) return;
     router.replace({ query: { ...route.query, q } });
 };
-
-const status = ref('idle'); // 'idle' | 'running'
-const isRunning = computed(() => status.value === 'running');
-const canRun = computed(() => !isRunning.value && !!store.user && !!targetIP.value);
-
-// ── Result ───────────────────────────────────────────────────────────────
-const result = ref(null);
-const errorMsg = ref('');
-const quotaExceeded = ref(false);
-const openRest = ref({});
 
 const verdict = computed(() => blocklistVerdict(result.value?.summary));
 const tiles = computed(() => {
@@ -351,9 +359,14 @@ const runCheck = async () => {
     result.value = null;
     openRest.value = {};
     trackEvent('Section', 'StartClick', 'IpBlocklist');
+    const ip = targetIP.value;
+    lastRunIP = ip;
+    // A link can swap the IP mid-run (inputs are disabled, `?q=` isn't);
+    // the old IP's answer is then dropped.
+    const isStale = () => targetIP.value !== ip;
     try {
-        const ip = encodeURIComponent(targetIP.value);
-        result.value = await authenticatedFetch(`/api/ipblocklist?ip=${ip}`, 'GET', null, CLIENT_TIMEOUT_MS);
+        const body = await authenticatedFetch(`/api/ipblocklist?ip=${encodeURIComponent(ip)}`, 'GET', null, CLIENT_TIMEOUT_MS);
+        if (!isStale()) result.value = body;
     } catch (error) {
         // 429: monthly quota exhausted — show the quota hint, not an error.
         if (error.status === 429) {
@@ -362,6 +375,7 @@ const runCheck = async () => {
             return;
         }
         console.error('IP blocklist check failed:', error);
+        if (isStale()) return;
         // 401/403: the visitor's sign-in state, not a failure to retry.
         if (error.status === 401 || error.status === 403) {
             errorMsg.value = error.message.includes('Invalid token') ? t('user.InvalidUserToken') : t('user.SignInToUse');
