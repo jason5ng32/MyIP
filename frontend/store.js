@@ -1,7 +1,7 @@
 // store.js
 import { defineStore } from 'pinia';
 import { isFireBaseSet, loadFirebaseAuth } from './firebase-init.js';
-import { writeAuthHint } from './utils/auth-hint.js';
+import { rememberAccountId, writeAuthHint } from './utils/auth-hint.js';
 import { markPendingRedirectSignIn, shouldFallBackToRedirect, takePendingRedirectSignIn } from './utils/auth-redirect.js';
 import { isRunningAsPwa } from './utils/pwa.js';
 import i18n from './locales/i18n.js';
@@ -275,6 +275,7 @@ export const useMainStore = defineStore('main', {
             const result = await fb.signInWithPopup(fb.auth, descriptor.build(fb));
             this.user = result.user;
             writeAuthHint(true);
+            rememberAccountId(result.user?.uid);
             window.location.reload();
             return;
           } catch (error) {
@@ -302,6 +303,7 @@ export const useMainStore = defineStore('main', {
         this.user = result.user;
         this.isSignedIn = true;
         writeAuthHint(true);
+        rememberAccountId(result.user.uid);
         return true;
       } catch (error) {
         this.handleSignInError(error, descriptor);
@@ -354,6 +356,7 @@ export const useMainStore = defineStore('main', {
           this.user = currentUser;
           if (currentUser) {
             this.isSignedIn = true;
+            rememberAccountId(currentUser.uid);
           }
           writeAuthHint(!!currentUser);
           unsubscribe(); // unsubscribe immediately after getting user state
