@@ -174,23 +174,31 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 </details>
 
-## 💖 贊助者
+## 💖 贊助商與支持者
 
 作為一個開源專案，我非常感謝以下贊助者對我的支持：
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服務，覆蓋 9000 萬+ 住宅 IP，支持智能輪換、穩定會話和精確地理定位，適用於代理測試、瀏覽器自動化及數據採集等場景。低至 $0.55/GB，使用 RAPID10 享 9 折優惠" alt="RapidProxy" /></a>
+**贊助商**
 
-<a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
+<sub>↳ **RapidProxy** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
 
-<a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" title="Greptile" width="240px"  /></a>
+<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
+<sub>↳ **SwiftProxy** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
+</sub>
 
-<a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" title="Sentry" width="240px" /></a>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh-TW"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
+<sub>↳ **V.PS** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
 
-<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" title="GitBook" width="240px" /></a>
+**支持者**
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
+<a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a>
 
-<a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
+有意贊助 MyIP？[成為贊助者](https://github.com/sponsors/jason5ng32)
 
 ## 📄 授權條款
 

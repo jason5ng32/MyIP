@@ -174,23 +174,31 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 
 </details>
 
-## 💖 赞助者
+## 💖 赞助商与支持者
 
 作为一个开源项目，我非常感谢以下赞助者对我的支持：
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" width="240px"  title="RapidProxy — 全球住宅代理服务，覆盖 9000万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 RAPID10 享 9 折优惠" alt="RapidProxy" /></a>
+**赞助商**
 
-<a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" title="1Password" width="240px"  /></a>
+<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
+<sub>↳ **RapidProxy** — 全球住宅代理服务，覆盖 9000 万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 `RAPID10` 享 9 折优惠。</sub>
 
-<a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" title="Greptile" width="240px"  /></a>
+<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
+<sub>↳ **SwiftProxy** — 提供高质量动态和静态住宅代理，拥有 9000 万+住宅 IP，覆盖全球 220+ 个地区，支持 HTTP(S)、SOCKS5 协议及动态轮换和粘性会话。动态住宅代理低至 $0.7/GB，使用优惠码 `PROXY90` 再享九折优惠。
+</sub>
 
-<a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" title="Sentry" width="240px" /></a>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=zh"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
+<sub>↳ **V.PS** — 高性能 KVM VPS，覆盖全球多个地区。日本与新加坡线路更有三网优化，提供极高速网络连接。支持 IPv4 与 IPv6。</sub>
 
-<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" title="GitBook" width="240px" /></a>
+**支持者**
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="v.ps" title="v.ps" width="240px" /></a>
+<a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.1password.com"><img src="https://res.ipcheck.ing/img/1password_logo.png" alt="1Password" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.greptile.com/"><img src="https://res.ipcheck.ing/img/greptile_logo.png" alt="Greptile" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.sentry.io"><img src="https://res.ipcheck.ing/img/sentry_logo.png" alt="Sentry" height="32" /></a>&nbsp;&nbsp;
+<a href="https://www.gitbook.com"><img src="https://res.ipcheck.ing/img/gitbook_logo.png" alt="GitBook" height="32" /></a>
 
-<a href="https://www.cloudflare.com/lp/project-alexandria/"><img src="https://res.ipcheck.ing/img/cloudflare_logo.png" alt="Cloudflare Project Alexandria" title="Cloudflare Project Alexandria" width="240px" /></a>
+有意赞助 MyIP？[成为赞助者](https://github.com/sponsors/jason5ng32)
 
 ## 📄 开源协议
 

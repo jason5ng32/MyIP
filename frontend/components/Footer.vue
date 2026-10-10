@@ -216,6 +216,7 @@ const acknowledgementsList = [
   { name: 'Cloudflare Speedtest', link: 'https://github.com/cloudflare/speedtest' },
   { name: 'V.PS', link: 'https://v.ps/?utm_source=ipcheck.ing&utm_medium=acknowledgement&utm_campaign=footer' },
   { name: 'RapidProxy', link: 'https://www.rapidproxy.io/?ref=myip' },
+  { name: 'SwiftProxy', link: 'https://www.swiftproxy.net/?ref=myip' },
   { name: 'Sentry', link: 'https://www.sentry.io/' },
   { name: '1Password', link: 'https://www.1password.com/' },
   { name: 'Greptile', link: 'https://www.greptile.com/' },
