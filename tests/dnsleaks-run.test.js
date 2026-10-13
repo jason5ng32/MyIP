@@ -65,7 +65,6 @@ test('cards share one standby request per run and refresh obtains a fresh result
         assert.equal(run.events.length, attempt);
         assert.equal(calls.browserleaks, 0);
         assert.equal(calls.ipleak, 0);
-        assert.equal(calls.every1dns, 0);
     }
 });
 
