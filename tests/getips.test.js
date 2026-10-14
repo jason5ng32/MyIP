@@ -84,6 +84,22 @@ describe('runChain', () => {
     assert.deepEqual(first.calls, [true]);
     assert.deepEqual(second.calls, [true]);
   });
+
+  it('respects a custom validator to reject mismatched IP versions', async () => {
+    const isV6 = (ip) => typeof ip === 'string' && ip.includes(':');
+    const first = stubProvider('a', 'Source A', '104.28.163.235');
+    const second = stubProvider('b', 'Source B', '2606:4700::1111');
+    const result = await runChain([first, second], undefined, isV6);
+    assert.deepEqual(result, { ip: '2606:4700::1111', source: 'Source B' });
+  });
+
+  it('exhausts when validator rejects every candidate', async () => {
+    const isV6 = (ip) => typeof ip === 'string' && ip.includes(':');
+    const first = stubProvider('a', 'Source A', '104.28.163.235');
+    const second = stubProvider('b', 'Source B', '1.1.1.1');
+    const result = await runChain([first, second], undefined, isV6);
+    assert.deepEqual(result, { ip: null, source: 'Source B' });
+  });
 });
 
 describe('getips public entry points', () => {
