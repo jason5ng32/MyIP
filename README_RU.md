@@ -181,14 +181,18 @@ DOMAIN,ptest-8.ipcheck.ing,Proxy8
 **Спонсоры**
 
 <a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **RapidProxy** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
+<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
 
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **SwiftProxy** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
+<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
+</sub>
+
+<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
+<sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — приватные резидентские, мобильные (4G/5G/LTE), ISP и датацентр IPv4/IPv6 прокси с поддержкой HTTP(S) и SOCKS5. Более 47 млн резидентских IP в 220+ локациях, точный таргетинг по стране, городу и провайдеру, аптайм 99,7% и поддержка 24/7. Пользователям MyIP — промокод `CHECKINGIP15` со скидкой 15%.
 </sub>
 
 <a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **V.PS** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
+<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=ru">V.PS</a>** — High-performance KVM VPS with global locations, fast connectivity, and IPv4 & IPv6 included.</sub>
 
 ----
 
