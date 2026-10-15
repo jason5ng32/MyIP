@@ -1,17 +1,15 @@
 // Exercises `runChain` from frontend/utils/getips — the single funnel every
 // IP-card source result flows through. Providers are stubbed; the behaviors
-// under test are the per-hop isValidIP gate, fallback advancement on both
+// under test are the per-hop `accept` gate, fallback advancement on both
 // throw and garbage response, the never-throws exhaustion contract, and the
-// originalSite passthrough. Real provider modules are only asserted for
-// shape — their network behavior is out of scope.
+// originalSite passthrough. The single-version entry points run their real
+// providers against a stubbed fetch, to pin which version each one accepts.
 
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { afterEach, describe, it } from 'node:test';
 
 import {
   runChain,
-  isIPv4,
-  isOnlyIPv6,
   getIPFromIPChecking4,
   getIPFromIPChecking6,
   getIPFromIPChecking64,
@@ -19,6 +17,7 @@ import {
   getIPFromCloudflare_V6,
   getIPFromIPIP,
 } from '../frontend/utils/getips/index.js';
+import { isValidIPv6 } from '../frontend/utils/ip/valid-ip.js';
 
 const stubProvider = (id, name, behavior) => {
   const calls = [];
@@ -38,29 +37,6 @@ const stubProvider = (id, name, behavior) => {
 const originalWarn = console.warn;
 console.warn = () => {};
 process.on('exit', () => { console.warn = originalWarn; });
-
-describe('version validators', () => {
-  it('isIPv4 accepts valid IPv4 and rejects IPv6 / garbage', () => {
-    assert.equal(isIPv4('1.1.1.1'), true);
-    assert.equal(isIPv4('104.28.163.235'), true);
-    assert.equal(isIPv4('2001:4860:4860::8888'), false);
-    assert.equal(isIPv4('::1'), false);
-    assert.equal(isIPv4('not-an-ip'), false);
-    assert.equal(isIPv4(''), false);
-    assert.equal(isIPv4(null), false);
-  });
-
-  it('isOnlyIPv6 accepts valid IPv6 and rejects IPv4 / garbage', () => {
-    assert.equal(isOnlyIPv6('2001:4860:4860::8888'), true);
-    assert.equal(isOnlyIPv6('2606:4700::1111'), true);
-    assert.equal(isOnlyIPv6('::1'), true);
-    assert.equal(isOnlyIPv6('1.1.1.1'), false);
-    assert.equal(isOnlyIPv6('104.28.163.235'), false);
-    assert.equal(isOnlyIPv6('not-an-ip'), false);
-    assert.equal(isOnlyIPv6(''), false);
-    assert.equal(isOnlyIPv6(null), false);
-  });
-});
 
 describe('runChain', () => {
   it('returns the first hop when its IP is valid, without touching later hops', async () => {
@@ -105,22 +81,22 @@ describe('runChain', () => {
   it('passes originalSite through to every hop', async () => {
     const first = stubProvider('a', 'Source A', 'nope');
     const second = stubProvider('b', 'Source B', '3.3.3.3');
-    await runChain([first, second], true);
+    await runChain([first, second], { originalSite: true });
     assert.deepEqual(first.calls, [true]);
     assert.deepEqual(second.calls, [true]);
   });
 
-  it('respects a custom validator to reject mismatched IP versions', async () => {
+  it('advances past a hop whose IP fails a custom accept check', async () => {
     const first = stubProvider('a', 'Source A', '104.28.163.235');
     const second = stubProvider('b', 'Source B', '2606:4700::1111');
-    const result = await runChain([first, second], undefined, isOnlyIPv6);
+    const result = await runChain([first, second], { accept: isValidIPv6 });
     assert.deepEqual(result, { ip: '2606:4700::1111', source: 'Source B' });
   });
 
-  it('exhausts when validator rejects every candidate', async () => {
+  it('exhausts when the accept check rejects every hop', async () => {
     const first = stubProvider('a', 'Source A', '104.28.163.235');
     const second = stubProvider('b', 'Source B', '1.1.1.1');
-    const result = await runChain([first, second], undefined, isOnlyIPv6);
+    const result = await runChain([first, second], { accept: isValidIPv6 });
     assert.deepEqual(result, { ip: null, source: 'Source B' });
   });
 });
@@ -138,4 +114,39 @@ describe('getips public entry points', () => {
       assert.equal(typeof fn, 'function');
     }
   });
+});
+
+// The single-version chains, each with a host only its first hop calls and
+// the display name of its fallback hop.
+const VERSION_CHAINS = [
+  { fn: getIPFromIPChecking4, firstHost: '4.ipcheck.ing', fallback: 'IPify IPv4', right: '1.1.1.1', wrong: '2606:4700::1111' },
+  { fn: getIPFromIPChecking6, firstHost: '6.ipcheck.ing', fallback: 'IPify IPv6', right: '2606:4700::1111', wrong: '1.1.1.1' },
+  { fn: getIPFromCloudflare_V4, firstHost: '1.0.0.1', fallback: 'MyExternalIP IPv4', right: '1.1.1.1', wrong: '2606:4700::1111' },
+  { fn: getIPFromCloudflare_V6, firstHost: '[2606:4700:4700::1111]', fallback: 'MyExternalIP IPv6', right: '2606:4700::1111', wrong: '1.1.1.1' },
+];
+
+// Answer every provider request with the IP `ipFor(url)` picks, shaped as a
+// trace body or JSON to match the endpoint.
+const stubFetch = (ipFor) => {
+  globalThis.fetch = async (url) => {
+    const ip = ipFor(String(url));
+    return new Response(url.includes('/cdn-cgi/trace') ? `ip=${ip}\n` : JSON.stringify({ ip }));
+  };
+};
+
+describe('single-version entry points', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => { globalThis.fetch = originalFetch; });
+
+  for (const { fn, firstHost, fallback, right, wrong } of VERSION_CHAINS) {
+    it(`${fn.name} skips a wrong-version answer for the fallback's`, async () => {
+      stubFetch((url) => (url.includes(firstHost) ? wrong : right));
+      assert.deepEqual(await fn(), { ip: right, source: fallback });
+    });
+
+    it(`${fn.name} exhausts when every hop answers the wrong version`, async () => {
+      stubFetch(() => wrong);
+      assert.deepEqual(await fn(), { ip: null, source: fallback });
+    });
+  }
 });

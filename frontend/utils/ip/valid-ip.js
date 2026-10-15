@@ -3,4 +3,4 @@
 // `import { isValidIP } from '@/utils/ip/valid-ip.js'` without caring where
 // the implementation lives. tests/valid-ip.test.js imports both paths and
 // asserts they return the same verdict — that keeps the re-export honest.
-export { isValidIP, isIPv6, isValidDomain, isUsablePublicIP } from '../../../common/valid-ip.js';
+export { isValidIP, isValidIPv4, isValidIPv6, isIPv6, isValidDomain, isUsablePublicIP } from '../../../common/valid-ip.js';
