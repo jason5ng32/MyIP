@@ -14,7 +14,7 @@
 // where `source` is the display name of the winning provider, and never
 // throws — an exhausted chain resolves `{ ip: null, source }` carrying the
 // last provider's name.
-import { isValidIP } from '../ip/valid-ip.js';
+import { isValidIP, isIPv6 } from '../ip/valid-ip.js';
 import { ipChecking4 } from './ipchecking4.js';
 import { ipChecking6 } from './ipchecking6.js';
 import { ipChecking64 } from './ipchecking64.js';
@@ -27,12 +27,15 @@ import { myExternalIPV6 } from './myexternalip-v6.js';
 import { ipipNet } from './ipipnet.js';
 import { upai } from './upai.js';
 
-// Walk the providers in order; first hop whose IP passes isValidIP wins.
-export const runChain = async (providers, originalSite) => {
+export const isIPv4 = (ip) => isValidIP(ip) && !isIPv6(ip);
+export const isOnlyIPv6 = (ip) => isValidIP(ip) && isIPv6(ip);
+
+// Walk the providers in order; first hop whose IP passes validator wins.
+export const runChain = async (providers, originalSite, validator = isValidIP) => {
     for (const provider of providers) {
         try {
             const ip = await provider.run(originalSite);
-            if (isValidIP(ip)) return { ip, source: provider.name };
+            if (validator(ip)) return { ip, source: provider.name };
             console.warn(`Invalid IP from ${provider.name}:`, ip);
         } catch (error) {
             console.warn(`Error fetching IP from ${provider.name}:`, error);
@@ -41,9 +44,9 @@ export const runChain = async (providers, originalSite) => {
     return { ip: null, source: providers[providers.length - 1].name };
 };
 
-export const getIPFromIPChecking4 = (originalSite) => runChain([ipChecking4, ipifyV4], originalSite);
-export const getIPFromIPChecking6 = (originalSite) => runChain([ipChecking6, ipifyV6], originalSite);
+export const getIPFromIPChecking4 = (originalSite) => runChain([ipChecking4, ipifyV4], originalSite, isIPv4);
+export const getIPFromIPChecking6 = (originalSite) => runChain([ipChecking6, ipifyV6], originalSite, isOnlyIPv6);
 export const getIPFromIPChecking64 = (originalSite) => runChain([ipChecking64], originalSite);
-export const getIPFromCloudflare_V4 = () => runChain([cloudflareV4, myExternalIPV4]);
-export const getIPFromCloudflare_V6 = () => runChain([cloudflareV6, myExternalIPV6]);
+export const getIPFromCloudflare_V4 = () => runChain([cloudflareV4, myExternalIPV4], undefined, isIPv4);
+export const getIPFromCloudflare_V6 = () => runChain([cloudflareV6, myExternalIPV6], undefined, isOnlyIPv6);
 export const getIPFromIPIP = () => runChain([ipipNet, upai]);
