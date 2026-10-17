@@ -70,8 +70,8 @@ const createDefaultCard = () => ({
   isp: "",
   asn: "",
   asnlink: "",
-  mapUrl: '/res/defaultMap.webp',
-  mapUrl_dark: '/res/defaultMap_dark.webp',
+  mapUrl: "",
+  mapUrl_dark: "",
 });
 
 // IP data cards
