@@ -159,6 +159,35 @@ describe('google-map handler', () => {
         assert.deepEqual(res.body, { error: 'Invalid request' });
     });
 
+    it('passes region-tagged UI locales through to Static Maps', async () => {
+        for (const language of ['zh-TW', 'pt-BR']) {
+            let upstreamUrl;
+            globalThis.fetch = async (url) => {
+                upstreamUrl = new URL(String(url));
+                return jpegUpstream({ start(controller) { controller.close(); } })();
+            };
+            const res = createStreamResponse();
+            await googleMapHandler(createRequest({
+                query: { latitude: '1', longitude: '2', language },
+            }), res);
+            assert.equal(res.statusCode, undefined);
+            assert.deepEqual(upstreamUrl.searchParams.getAll('language'), [language]);
+        }
+    });
+
+    it('rejects a language that is not tag-shaped without calling the external API', () => {
+        let fetchCalled = false;
+        globalThis.fetch = async () => { fetchCalled = true; };
+        for (const language of ['', 'en&zoom=20', 'en-', 'x'.repeat(40), ['en', 'fr'], undefined]) {
+            const res = createResponse();
+            googleMapHandler(createRequest({
+                query: { latitude: '1', longitude: '2', language },
+            }), res);
+            assert.equal(res.statusCode, 400, `language=${JSON.stringify(language)}`);
+        }
+        assert.equal(fetchCalled, false);
+    });
+
     it('streams the upstream image through to completion', async () => {
         globalThis.fetch = jpegUpstream({
             start(controller) {

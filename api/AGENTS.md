@@ -84,7 +84,9 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 - **`?lang` is never validated in a handler.** Pass the raw tag through:
   `lookupMaxMind` normalizes it onto the languages its data carries
   (`SUPPORTED_LANGS` in `server/datasets/maxmind-service.js`); the private-API proxies
-  forward it for the upstream's own resolution. No allow-lists.
+  forward it for the upstream's own resolution. No allow-lists; `/api/map`'s
+  `language` only gets a tag-shape check, as each value is a year-cached
+  Static Maps call.
 - **Logging.** Shared logger only, `logger.error({ err, ...ctx }, 'msg')`; no
   `console.*`, no "received request" lines (`pino-http` covers those).
 - **Error monitoring (Sentry) is env-gated and invisible to handlers.**

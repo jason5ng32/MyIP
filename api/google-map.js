@@ -4,12 +4,15 @@ import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
 
 // Validate request legitimacy. `language` is the UI locale code, region
-// subtag included (`pt-BR`, `zh-TW`); like every `?lang` it is passed through
-// rather than allow-listed, and URL-encoded where the upstream URL is built.
+// subtag included (`pt-BR`, `zh-TW`); like every `?lang` it is not
+// allow-listed, but it must be tag-shaped: every distinct value is an
+// uncached Static Maps call whose answer is edge-cached for a year.
+const LANGUAGE_TAG = /^[a-z]{2,3}(-[A-Za-z0-9]{2,4}){0,2}$/;
+
 function isValidRequest(req) {
     const isLatitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.latitude);
     const isLongitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.longitude);
-    const isLanguageValid = typeof req.query.language === 'string' && req.query.language !== '';
+    const isLanguageValid = typeof req.query.language === 'string' && LANGUAGE_TAG.test(req.query.language);
 
     if (!isLatitudeValid || !isLongitudeValid || !isLanguageValid) {
         return false;
