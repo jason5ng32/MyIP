@@ -3,11 +3,13 @@ import { pipeline } from 'node:stream/promises';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import logger from '../server/logger.js';
 
-// Validate request legitimacy
+// Validate request legitimacy. `language` is the UI locale code, region
+// subtag included (`pt-BR`, `zh-TW`); like every `?lang` it is passed through
+// rather than allow-listed, and URL-encoded where the upstream URL is built.
 function isValidRequest(req) {
     const isLatitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.latitude);
     const isLongitudeValid = /^-?\d+(\.\d+)?$/.test(req.query.longitude);
-    const isLanguageValid = /^[a-z]{2}$/.test(req.query.language);
+    const isLanguageValid = typeof req.query.language === 'string' && req.query.language !== '';
 
     if (!isLatitudeValid || !isLongitudeValid || !isLanguageValid) {
         return false;
@@ -69,7 +71,7 @@ export default async (req, res) => {
         styleParam = styles.Dark.join('&style=');
     }
 
-    const url = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&markers=color:blue%7C${latitude},${longitude}&scale=${scale}&zoom=${zoom}&maptype=roadmap&language=${language}&format=${fmt}&size=${mapSize}&style=${styleParam}&key=${apiKey}`;
+    const url = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&markers=color:blue%7C${latitude},${longitude}&scale=${scale}&zoom=${zoom}&maptype=roadmap&language=${encodeURIComponent(language)}&format=${fmt}&size=${mapSize}&style=${styleParam}&key=${apiKey}`;
 
     // Unlike the JSON handlers, the Static Maps response is a binary JPEG
     // and must be passed through to the client. pipeline() propagates errors
