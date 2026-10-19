@@ -125,7 +125,9 @@ masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitor
 Tailwind only when neither fits. Keep on upstream syncs: `Spinner` +
 `ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair, the
 overlay roots' shortcut suspension, `select`'s trigger geometry (`py-1` + flex
-value span, not `-webkit-box` — Safari shifts it ~2px).
+value span, not `-webkit-box` — Safari shifts it ~2px). CLI trap: `shadcn-vue
+add` here writes `import { cn } from "cn"` and installs the unrelated `cn`
+package — drop the dependency, import from `@/lib/utils`.
 
 ### Design tokens
 
