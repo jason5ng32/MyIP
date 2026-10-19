@@ -984,6 +984,84 @@
       }
     }
   },
+  "adblocktest": {
+    "Title": "Test de blocage des pubs et traceurs",
+    "Note": "Pour toute personne qui utilise un bloqueur de publicités ou de traceurs : une extension comme uBlock Origin ou Privacy Badger, un navigateur avec blocage intégré, ou le filtrage d'un service DNS, d'un VPN ou d'un routeur. Le test demande à votre navigateur de contacter des adresses connues de régies publicitaires, d'outils de statistiques, de réseaux sociaux et de fabricants d'appareils, récupère des scripts de pistage courants sans les exécuter et place des éléments leurres que les filtres cosmétiques masquent, puis indique ce qui est passé.",
+    "Note2": "Un score plus élevé n'est pas forcément meilleur. Tous les traceurs ne jouent pas contre vous : le signalement d'erreurs aide les sites à corriger les plantages, les statistiques les aident à s'améliorer, et la publicité finance une grande partie du web gratuit ; certaines adresses des fabricants servent aussi aux mises à jour ou aux notifications. Lisez le résultat comme une carte de ce que votre configuration laisse passer, et décidez vous-même de ce qui mérite d'être bloqué.",
+    "Note3": "Les requêtes non bloquées atteignent bien ces services, sans cookies ni référent. Les résultats restent dans votre navigateur et ne nous sont pas envoyés. Une adresse injoignable depuis votre réseau pour une autre raison apparaît aussi comme bloquée.",
+    "Selected": "Tests sélectionnés :",
+    "SelectAll": "Tout sélectionner",
+    "Invert": "Inverser",
+    "Run": "Lancer le test",
+    "Hint": "Choisissez à gauche ce qu'il faut tester, puis cliquez sur Lancer le test.",
+    "Score": "Part bloquée",
+    "Progress": "{done} / {total} vérifiés",
+    "GroupCount": "{blocked} / {total} bloqués",
+    "NothingOpen": "Tout ce que vous avez testé a été bloqué.",
+    "NothingBlocked": "Rien de ce que vous avez testé n'a été bloqué.",
+    "Version": "Version de la liste de test : {version}",
+    "count": {
+      "blocked": "Bloqués",
+      "open": "Non bloqués",
+      "unknown": "Sans réponse"
+    },
+    "filter": {
+      "all": "Tout",
+      "open": "Non bloqués uniquement",
+      "blocked": "Bloqués uniquement"
+    },
+    "status": {
+      "blocked": "Bloqué",
+      "open": "Non bloqué",
+      "unknown": "Sans réponse",
+      "pending": "En attente"
+    },
+    "cosmeticStatus": {
+      "blocked": "Masqué",
+      "open": "Visible",
+      "unknown": "Sans réponse",
+      "pending": "En attente"
+    },
+    "cosmetic": {
+      "ad-container": "Conteneur publicitaire",
+      "adsense-slot": "Emplacement AdSense"
+    },
+    "group": {
+      "ads": {
+        "title": "Régies publicitaires",
+        "desc": "Serveurs et plateformes d'échange publicitaires, testés par domaine."
+      },
+      "analytics": {
+        "title": "Statistiques et enregistrement de sessions",
+        "desc": "Services de statistiques de visite, de cartes de chaleur et de relecture de sessions."
+      },
+      "social": {
+        "title": "Traceurs des réseaux sociaux",
+        "desc": "Pixels et traceurs de conversion des plateformes sociales."
+      },
+      "errors": {
+        "title": "Suivi des erreurs et des performances",
+        "desc": "Services de signalement de plantages et de mesure auprès des utilisateurs réels."
+      },
+      "oem": {
+        "title": "Télémétrie des fabricants d'appareils",
+        "desc": "Adresses de télémétrie et de publicité des fabricants de téléphones, téléviseurs et autres appareils. Votre navigateur ne les contacte jamais de lui-même ; ce sont surtout les filtres DNS, VPN et routeur qui les répertorient."
+      },
+      "scripts": {
+        "title": "Scripts de pistage",
+        "desc": "URL exactes de scripts de balises et de pixels courants, téléchargés mais jamais exécutés. Les filtres qui agissent sur le chemin peuvent les bloquer même quand le domaine est autorisé."
+      },
+      "cosmetic": {
+        "title": "Masquage d'éléments",
+        "desc": "Éléments leurres en forme d'emplacements publicitaires. Seul un bloqueur intégré au navigateur peut les masquer ; les filtres DNS, VPN et routeur n'y parviennent pas, cette partie est donc exclue du score."
+      }
+    },
+    "layer": {
+      "browser": "Les éléments leurres ont été masqués : un bloqueur agit dans votre navigateur, qu'il s'agisse d'une extension ou d'une fonction intégrée.",
+      "network": "Des requêtes ont été bloquées mais les éléments leurres n'ont pas été masqués : le blocage a très probablement lieu hors de la page, au niveau d'un service DNS, d'un VPN, d'un routeur ou de la protection contre le pistage du navigateur.",
+      "none": "Rien n'a été bloqué : aucun blocage de publicités ou de traceurs n'a été détecté dans ce navigateur ni sur ce réseau."
+    }
+  },
   "advancedtools": {
     "Title": "Outils avancés",
     "Note": "Ceux qui exigent le meilleur de leur réseau utilisent souvent davantage d'outils pour optimiser leur connexion.",
@@ -1005,6 +1083,7 @@
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
+    "AdblockTest": "Vérifiez ce que votre bloqueur de pubs, filtre DNS ou VPN bloque vraiment",
     "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
     "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant",
     "IpBlocklist": "Vérifiez si une IP figure sur des listes noires de spam, d’abus, de proxy ou de VPN"
@@ -1973,6 +2052,7 @@
     "MacChecker": "Ouvrir le Recherche de MAC",
     "IpCalculator": "Ouvrir le Calculateur IP",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
+    "AdblockTest": "Ouvrir le Test de blocage des pubs et traceurs",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
     "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie",
     "IpBlocklist": "Ouvrir la Vérification des listes noires IP",

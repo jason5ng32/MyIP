@@ -154,6 +154,7 @@ describe('useShortcuts()', () => {
     assert.ok(distinctKeys.has('g'));
     assert.ok(distinctKeys.has('o'));
     assert.ok(distinctKeys.has('H'));
+    assert.ok(distinctKeys.has('x'), 'Ad & Tracker Blocking Test is a public tool');
     assert.equal(distinctKeys.has('p'), false, 'pulse shortcut stays off without a pulse backend or cloudFlare key');
     assert.equal(distinctKeys.has('P'), false, 'persona shortcut stays off a self-hosted instance');
     assert.equal(distinctKeys.has('B'), false, 'blocklist shortcut stays off a self-hosted instance');
