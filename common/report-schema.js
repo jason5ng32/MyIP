@@ -268,6 +268,19 @@ const SECTION_SPECS = {
             rtt: opt(int(0, 600000)),
         }))),
     }),
+    // Ad & Tracker Blocking Test: per-category request counts only. Group
+    // ids stay capped strings — the probe list lives in the front end and
+    // changes with it.
+    adblocktest: obj({
+        testedAt: isoDate(),
+        groups: arr(16, obj({
+            id: str(16),
+            total: int(0, 1024),
+            blocked: int(0, 1024),
+            open: int(0, 1024),
+            unknown: int(0, 1024),
+        })),
+    }),
     invisibility: obj({
         testedAt: isoDate(),
         ip: opt(ipValue()),

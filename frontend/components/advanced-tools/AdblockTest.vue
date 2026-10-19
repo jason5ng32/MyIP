@@ -189,6 +189,7 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
+import { emitAppEvent } from '@/utils/app-events.js';
 import { ADBLOCK_PROBE_GROUPS, ADBLOCK_PROBES_VERSION } from '@/data/adblock-probes.js';
 import {
     COSMETIC_BAITS, COSMETIC_POLL_MS, COSMETIC_WAIT_MS,
@@ -364,5 +365,9 @@ const startTest = async () => {
         runWithConcurrency(tasks, concurrency),
     ]);
     status.value = 'finished';
+    // Domain event: per-address outcome for the report collector.
+    emitAppEvent('adblocktest:finished', {
+        items: plan.map((p) => ({ groupId: p.groupId, kind: p.kind, status: statusOf(p) })),
+    });
 };
 </script>

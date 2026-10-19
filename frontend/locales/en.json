@@ -1060,6 +1060,10 @@
       "browser": "Bait elements were hidden: a blocker is working inside your browser, either an extension or the browser's own.",
       "network": "Requests were blocked but the bait elements were not hidden: the blocking most likely happens outside the page, at a DNS service, VPN or router, or in the browser's tracking protection.",
       "none": "Nothing was blocked: no ad or tracker blocking was found in this browser or on this network."
+    },
+    "report": {
+      "Category": "Category",
+      "Total": "Total"
     }
   },
   "advancedtools": {
@@ -1530,6 +1534,7 @@
         "mtrtest": "Per-hop MTR traceroutes toward the user's IP from probes around the world; loss at intermediate hops can be mere ICMP rate-limiting, sustained loss from one hop onward indicates a real problem.",
         "ruletest": "Egress IPs observed when fetching 8 test endpoints — more than one unique IP means traffic is split across different routes (e.g. proxy rules).",
         "browserinfo": "Browser, OS and display environment of the tested device.",
+        "adblocktest": "Ad & tracker blocking check run in the browser: per category (ad networks, analytics, social trackers, error monitoring, device-maker telemetry, tracking scripts), how many requests to well-known endpoints were blocked, got through, or timed out (noAnswer). Not blocking everything can be a deliberate choice, not a fault.",
         "invisibility": "Proxy/VPN detection scores (0-100, higher = more likely detected) with the individual detection signals that flagged.",
         "enhanceddnsleak": "Resolver-level DNS capture: every resolver IP that queried the test domain, with transport, ECS exposure and DNSSEC flags (do/cd).",
         "persona": "How closely the browser matches a local resident of the chosen country: an overall grade plus each check's verdict. Verdicts only — the underlying values are deliberately not stored in a shared report."

@@ -1060,6 +1060,10 @@
       "browser": "Les éléments leurres ont été masqués : un bloqueur agit dans votre navigateur, qu'il s'agisse d'une extension ou d'une fonction intégrée.",
       "network": "Des requêtes ont été bloquées mais les éléments leurres n'ont pas été masqués : le blocage a très probablement lieu hors de la page, au niveau d'un service DNS, d'un VPN, d'un routeur ou de la protection contre le pistage du navigateur.",
       "none": "Rien n'a été bloqué : aucun blocage de publicités ou de traceurs n'a été détecté dans ce navigateur ni sur ce réseau."
+    },
+    "report": {
+      "Category": "Catégorie",
+      "Total": "Total"
     }
   },
   "advancedtools": {
@@ -1530,6 +1534,7 @@
         "mtrtest": "Traceroutes MTR saut par saut vers l'IP de l'utilisateur depuis des sondes mondiales ; la perte sur des sauts intermédiaires peut n'être que du rate-limiting ICMP, une perte continue à partir d'un saut indique un vrai problème.",
         "ruletest": "IP de sortie observées en accédant à 8 points de test — plusieurs IP distinctes signifient que le trafic est réparti sur différentes routes (règles de proxy, par ex.).",
         "browserinfo": "Navigateur, système et environnement d'affichage de l'appareil testé.",
+        "adblocktest": "Test de blocage des publicités et traceurs exécuté dans le navigateur : par catégorie (régies publicitaires, statistiques, traceurs sociaux, suivi des erreurs, télémétrie des fabricants d'appareils, scripts de pistage), le nombre de requêtes vers des adresses connues qui ont été bloquées, sont passées ou ont expiré (noAnswer). Ne pas tout bloquer peut être un choix délibéré, pas une panne.",
         "invisibility": "Scores de détection proxy/VPN (0-100, plus haut = plus probablement détecté) avec les signaux de détection déclenchés.",
         "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd).",
         "persona": "À quel point le navigateur correspond à un habitant du pays choisi : une note globale et le verdict de chaque vérification. Verdicts uniquement — les valeurs sous-jacentes ne sont volontairement pas stockées dans un rapport partagé."

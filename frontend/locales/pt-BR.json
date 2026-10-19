@@ -1060,6 +1060,10 @@
       "browser": "Os elementos-isca foram ocultados: há um bloqueador funcionando dentro do seu navegador, seja uma extensão ou o próprio navegador.",
       "network": "Requisições foram bloqueadas, mas os elementos-isca não foram ocultados: o bloqueio provavelmente acontece fora da página, em um serviço de DNS, VPN, roteador ou na proteção contra rastreamento do navegador.",
       "none": "Nada foi bloqueado: nenhum bloqueio de anúncios ou rastreadores foi encontrado neste navegador ou nesta rede."
+    },
+    "report": {
+      "Category": "Categoria",
+      "Total": "Total"
     }
   },
   "advancedtools": {
@@ -1530,6 +1534,7 @@
         "mtrtest": "Traceroutes MTR por salto até o IP do usuário a partir de sondas pelo mundo; perda em saltos intermediários pode ser apenas limitação de ICMP, mas perda sustentada a partir de um salto indica problema real.",
         "ruletest": "IPs de saída observados ao buscar 8 endpoints de teste — mais de um IP único significa que o tráfego está dividido entre rotas diferentes (ex.: regras de proxy).",
         "browserinfo": "Ambiente de navegador, sistema operacional e tela do dispositivo testado.",
+        "adblocktest": "Teste de bloqueio de anúncios e rastreadores executado no navegador: por categoria (redes de anúncios, análise, rastreadores sociais, monitoramento de erros, telemetria de fabricantes de dispositivos, scripts de rastreamento), quantas requisições a endereços conhecidos foram bloqueadas, passaram ou esgotaram o tempo (noAnswer). Não bloquear tudo pode ser uma escolha deliberada, não uma falha.",
         "invisibility": "Pontuações de detecção de proxy/VPN (0–100, maior = mais provável de ser detectado) com os sinais individuais de detecção que foram sinalizados.",
         "enhanceddnsleak": "Captura DNS em nível de resolvedor: cada IP de resolvedor que consultou o domínio de teste, com transporte, exposição ECS e flags DNSSEC (do/cd).",
         "persona": "O quão próximo o navegador está de uma pessoa local do país escolhido: uma nota geral mais o veredito de cada verificação. Apenas vereditos — os valores subjacentes deliberadamente não são armazenados em relatórios compartilhados."

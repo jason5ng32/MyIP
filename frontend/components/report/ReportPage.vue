@@ -85,6 +85,7 @@ import ReportPingtest from './sections/ReportPingtest.vue';
 import ReportMtrtest from './sections/ReportMtrtest.vue';
 import ReportRuletest from './sections/ReportRuletest.vue';
 import ReportBrowserinfo from './sections/ReportBrowserinfo.vue';
+import ReportAdblocktest from './sections/ReportAdblocktest.vue';
 import ReportInvisibility from './sections/ReportInvisibility.vue';
 import ReportEnhanceddnsleak from './sections/ReportEnhanceddnsleak.vue';
 import ReportPersona from './sections/ReportPersona.vue';
@@ -100,6 +101,7 @@ const SECTION_COMPONENTS = {
     mtrtest: ReportMtrtest,
     ruletest: ReportRuletest,
     browserinfo: ReportBrowserinfo,
+    adblocktest: ReportAdblocktest,
     invisibility: ReportInvisibility,
     enhanceddnsleak: ReportEnhanceddnsleak,
     persona: ReportPersona,
