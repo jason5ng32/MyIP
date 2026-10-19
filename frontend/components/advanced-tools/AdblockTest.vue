@@ -174,7 +174,7 @@
             <p class="text-xs text-muted-foreground m-0">
                 {{ t('adblocktest.Version', { version: ADBLOCK_PROBES_VERSION }) }}
             </p>
-            <p class="text-xs text-muted-foreground m-0">{{ t('adblocktest.Limitation') }}</p>
+            <p class="text-xs text-muted-foreground mt-1">{{ t('adblocktest.Limitation') }}</p>
         </div>
 
         <!-- Cosmetic baits live here during a run, off-screen but laid out -->
