@@ -997,9 +997,10 @@
     "Score": "Parcela bloqueada",
     "Progress": "{done} / {total} verificados",
     "GroupCount": "{blocked} / {total} bloqueados",
-    "NothingOpen": "Tudo o que foi testado foi bloqueado.",
-    "NothingBlocked": "Nada do que foi testado foi bloqueado.",
+    "NothingOpen": "Nenhuma requisição foi confirmada como não bloqueada.",
+    "NothingBlocked": "Nenhuma requisição foi confirmada como bloqueada.",
     "Version": "Versão da lista de teste: {version}",
+    "Limitation": "Estas sondagens são requisições simples enviadas por esta página, não a forma como um site realmente carrega anúncios ou scripts: regras de filtro voltadas só a um tipo de requisição (como scripts ou imagens) podem deixar uma sondagem passar e ainda assim bloquear o conteúdo real em um site.",
     "count": {
       "blocked": "Bloqueados",
       "open": "Não bloqueados",

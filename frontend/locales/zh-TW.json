@@ -997,9 +997,10 @@
     "Score": "阻擋比例",
     "Progress": "已檢測 {done} / {total}",
     "GroupCount": "已阻擋 {blocked} / {total}",
-    "NothingOpen": "檢測的項目全部被阻擋了。",
-    "NothingBlocked": "檢測的項目都沒有被阻擋。",
+    "NothingOpen": "沒有確認未被阻擋的請求。",
+    "NothingBlocked": "沒有確認被阻擋的請求。",
     "Version": "檢測清單版本：{version}",
+    "Limitation": "這些檢測是由本頁面直接送出的一般請求，並不是網站真正載入廣告或腳本的方式：只針對特定請求類型（例如腳本或圖片）的過濾規則，可能放行這裡的檢測請求，卻仍會在真實網站上阻擋對應內容。",
     "count": {
       "blocked": "已阻擋",
       "open": "未阻擋",

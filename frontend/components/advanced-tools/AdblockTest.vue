@@ -169,11 +169,12 @@
             </CardContent>
         </Card>
 
-        <!-- Probe list version -->
-        <div v-if="hasResults" class="text-xs text-muted-foreground m-0">
+        <!-- Probe list version + what the probes cannot tell -->
+        <div v-if="hasResults" class="text-xs text-muted-foreground m-0 space-y-1">
             <p class="text-xs text-muted-foreground m-0">
                 {{ t('adblocktest.Version', { version: ADBLOCK_PROBES_VERSION }) }}
             </p>
+            <p class="text-xs text-muted-foreground m-0">{{ t('adblocktest.Limitation') }}</p>
         </div>
 
         <!-- Cosmetic baits live here during a run, off-screen but laid out -->

@@ -997,9 +997,10 @@
     "Score": "Blocked share",
     "Progress": "{done} / {total} checked",
     "GroupCount": "{blocked} / {total} blocked",
-    "NothingOpen": "Everything you tested was blocked.",
-    "NothingBlocked": "Nothing you tested was blocked.",
+    "NothingOpen": "No request was confirmed as not blocked.",
+    "NothingBlocked": "No request was confirmed as blocked.",
     "Version": "Test list version: {version}",
+    "Limitation": "These probes are plain requests sent by this page, not the way a website actually loads ads or scripts: filter rules aimed only at a specific request type (such as scripts or images) may let a probe through yet still block the real thing on a website.",
     "count": {
       "blocked": "Blocked",
       "open": "Not blocked",

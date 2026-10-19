@@ -997,9 +997,10 @@
     "Score": "拦截比例",
     "Progress": "已检测 {done} / {total}",
     "GroupCount": "已拦截 {blocked} / {total}",
-    "NothingOpen": "检测的项目全部被拦截了。",
-    "NothingBlocked": "检测的项目都没有被拦截。",
+    "NothingOpen": "没有确认未被拦截的请求。",
+    "NothingBlocked": "没有确认被拦截的请求。",
     "Version": "检测名单版本：{version}",
+    "Limitation": "这些检测是由本页面直接发出的普通请求，并不是网站真正加载广告或脚本的方式：只针对特定请求类型（例如脚本或图片）的过滤规则，可能放行这里的检测请求，却仍会在真实网站上拦截对应内容。",
     "count": {
       "blocked": "已拦截",
       "open": "未拦截",

@@ -997,9 +997,10 @@
     "Score": "Part bloquée",
     "Progress": "{done} / {total} vérifiés",
     "GroupCount": "{blocked} / {total} bloqués",
-    "NothingOpen": "Tout ce que vous avez testé a été bloqué.",
-    "NothingBlocked": "Rien de ce que vous avez testé n'a été bloqué.",
+    "NothingOpen": "Aucune requête n'a été confirmée comme non bloquée.",
+    "NothingBlocked": "Aucune requête n'a été confirmée comme bloquée.",
     "Version": "Version de la liste de test : {version}",
+    "Limitation": "Ces sondes sont de simples requêtes envoyées par cette page, et non la façon dont un site charge réellement publicités ou scripts : une règle de filtrage visant un type de requête précis (scripts, images…) peut laisser passer une sonde tout en bloquant le vrai contenu sur un site.",
     "count": {
       "blocked": "Bloqués",
       "open": "Non bloqués",
