@@ -59,21 +59,15 @@
                         </div>
                     </div>
 
-                    <!-- Right: toolbar (filter tags / hint + run), then results -->
+                    <!-- Right: toolbar (hint + run / run again), then results -->
                     <div class="col-span-3 min-w-0 flex flex-col">
                         <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b">
-                            <ToggleGroup v-if="hasResults" :model-value="filter" type="single" variant="outline"
-                                :spacing="2" class="flex-wrap justify-start"
-                                @update:model-value="(v) => v && (filter = v)">
-                                <ToggleGroupItem v-for="f in FILTERS" :key="f" :value="f" :class="tagClass">
-                                    {{ t(`adblocktest.filter.${f}`) }}
-                                </ToggleGroupItem>
-                            </ToggleGroup>
-                            <span v-else class="text-sm text-muted-foreground">{{ t('adblocktest.Hint') }}</span>
+                            <span class="text-sm text-muted-foreground">{{ t('adblocktest.Hint') }}</span>
                             <Button variant="action" :disabled="!canRun" class="cursor-pointer ml-auto" @click="startTest">
                                 <Spinner v-if="isRunning" />
+                                <RotateCw v-else-if="hasFinished" class="size-4 shrink-0" />
                                 <Play v-else class="size-4 shrink-0" />
-                                {{ t('adblocktest.Run') }}
+                                {{ t(hasFinished ? 'adblocktest.Rerun' : 'adblocktest.Run') }}
                             </Button>
                         </div>
 
@@ -107,6 +101,15 @@
                                     <AlertDescription>{{ t(`adblocktest.layer.${layer}`) }}</AlertDescription>
                                 </Alert>
                             </div>
+
+                            <!-- Filter tags -->
+                            <ToggleGroup :model-value="filter" type="single" variant="outline" :spacing="2"
+                                class="w-full flex-wrap justify-start"
+                                @update:model-value="(v) => v && (filter = v)">
+                                <ToggleGroupItem v-for="f in FILTERS" :key="f" :value="f" :class="tagClass">
+                                    {{ t(`adblocktest.filter.${f}`) }}
+                                </ToggleGroupItem>
+                            </ToggleGroup>
 
                             <!-- One block per tested group -->
                             <section v-for="group in visibleGroups" :key="group.id" class="space-y-2">
@@ -205,7 +208,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {
-    Ban, Check, ChevronDown, CircleArrowRight, CircleQuestionMark, Info, Minus, Play,
+    Ban, Check, ChevronDown, CircleArrowRight, CircleQuestionMark, Info, Minus, Play, RotateCw,
 } from '@lucide/vue';
 
 const { t } = useI18n();
@@ -258,6 +261,8 @@ const status = ref('idle');
 const isRunning = computed(() => status.value === 'running');
 const canRun = computed(() => !isRunning.value && selectedTargetCount.value > 0);
 const runPlan = ref([]);
+// Set by the first completed run; the run button then reads "run again".
+const hasFinished = ref(false);
 const statuses = ref({}); // plan item id → probe status
 const hasResults = computed(() => runPlan.value.length > 0);
 
@@ -366,6 +371,7 @@ const startTest = async () => {
         runWithConcurrency(tasks, concurrency),
     ]);
     status.value = 'finished';
+    hasFinished.value = true;
     // Domain event: per-address outcome for the report collector.
     emitAppEvent('adblocktest:finished', {
         items: plan.map((p) => ({ groupId: p.groupId, kind: p.kind, status: statusOf(p) })),
