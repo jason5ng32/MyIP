@@ -81,6 +81,17 @@ const PAYLOADS = {
             { id: 3, ip: '检测失败', country_code: '', org: '检测失败' },
         ],
     },
+    'adblocktest:finished': {
+        items: [
+            { groupId: 'ads', kind: 'domain', status: 'blocked' },
+            { groupId: 'ads', kind: 'domain', status: 'open' },
+            { groupId: 'ads', kind: 'domain', status: 'blocked' },
+            { groupId: 'social', kind: 'domain', status: 'unknown' },
+            { groupId: 'scripts', kind: 'script', status: 'open' },
+            { groupId: 'scripts', kind: 'script', status: 'pending' },
+            { groupId: 'cosmetic', kind: 'cosmetic', status: 'blocked' },
+        ],
+    },
     'browserinfo:finished': {
         userAgent: {
             ua: 'Mozilla/5.0 …',
@@ -160,6 +171,26 @@ describe('report builders produce schema-valid sections', () => {
 });
 
 describe('cleaning rules', () => {
+    it('adblocktest keeps per-category request counts only', () => {
+        const { build } = REPORT_EVENT_BUILDERS['adblocktest:finished'];
+        // Pending items and cosmetic baits never reach the counts.
+        assert.deepEqual(build(PAYLOADS['adblocktest:finished']), {
+            groups: [
+                { id: 'ads', total: 3, blocked: 2, open: 1, unknown: 0 },
+                { id: 'social', total: 1, blocked: 0, open: 0, unknown: 1 },
+                { id: 'scripts', total: 1, blocked: 0, open: 1, unknown: 0 },
+            ],
+        });
+    });
+
+    it('adblocktest reports nothing when only baits or unanswered items came back', () => {
+        const { build } = REPORT_EVENT_BUILDERS['adblocktest:finished'];
+        assert.equal(build({ items: [
+            { groupId: 'cosmetic', kind: 'cosmetic', status: 'blocked' },
+            { groupId: 'ads', kind: 'domain', status: 'pending' },
+        ] }), null);
+    });
+
     it('ipinfo drops cards whose ip slot holds a placeholder', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const section = build(PAYLOADS['ipinfo:finished']);

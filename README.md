@@ -44,6 +44,7 @@ Feel free to bookmark the demo or deploy your own.
 
 * 🚥 **WebRTC Detection**: Reveals the IP address exposed during WebRTC connections — including whether your browser's privacy hardening is on.
 * 🛑 **DNS Leak Test**: Shows which DNS endpoints resolve your queries, to evaluate the risk of DNS leaks when using VPNs or proxies.
+* 🛡️ **Ad & Tracker Blocking Test**: Checks what your ad blocker, browser, DNS filter, VPN or router actually blocks — ad networks, analytics, social trackers, error monitoring, device-maker telemetry, tracking scripts and element hiding.
 * 📋 **Security Checklist**: A 258-item personal cybersecurity checklist across 12 areas, with progress saved in your browser.
 
 ### 📡 Network Tests

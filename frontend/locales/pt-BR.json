@@ -984,6 +984,89 @@
       }
     }
   },
+  "adblocktest": {
+    "Title": "Teste de bloqueio de anúncios e rastreadores",
+    "Note": "Feito para quem usa bloqueio de anúncios ou rastreadores: uma extensão como uBlock Origin ou Privacy Badger, um navegador com bloqueio integrado, ou filtragem em um serviço de DNS, VPN ou roteador. O teste faz seu navegador acessar endereços conhecidos de redes de anúncios, análise, redes sociais e fabricantes de dispositivos, busca scripts de rastreamento populares sem executá-los e coloca elementos-isca que os filtros cosméticos ocultam; depois mostra o que passou.",
+    "Note2": "Uma pontuação maior não é automaticamente melhor. Nem todo rastreador age contra você: o relato de erros ajuda os sites a corrigir falhas, a análise os ajuda a melhorar e os anúncios bancam boa parte da web gratuita; alguns endereços de fabricantes também entregam atualizações ou notificações. Leia o resultado como um mapa do que sua configuração deixa passar e decida por conta própria o que vale a pena bloquear.",
+    "Note3": "As requisições não bloqueadas chegam de fato a esses serviços, sem cookies nem referenciador. Os resultados ficam no seu navegador e não são enviados para nós. Um endereço inacessível na sua rede por outro motivo também aparece como bloqueado.",
+    "Selected": "Testes selecionados:",
+    "SelectAll": "Selecionar tudo",
+    "Invert": "Inverter",
+    "Run": "Iniciar teste",
+    "Hint": "Escolha à esquerda o que testar e clique em Iniciar teste.",
+    "Score": "Parcela bloqueada",
+    "Progress": "{done} / {total} verificados",
+    "GroupCount": "{blocked} / {total} bloqueados",
+    "NothingOpen": "Nenhuma requisição foi confirmada como não bloqueada.",
+    "NothingBlocked": "Nenhuma requisição foi confirmada como bloqueada.",
+    "Version": "Versão da lista de teste: {version}",
+    "Limitation": "Estas sondagens são requisições simples enviadas por esta página, não a forma como um site realmente carrega anúncios ou scripts: regras de filtro voltadas só a um tipo de requisição (como scripts ou imagens) podem deixar uma sondagem passar e ainda assim bloquear o conteúdo real em um site.",
+    "count": {
+      "blocked": "Bloqueados",
+      "open": "Não bloqueados",
+      "unknown": "Sem resposta"
+    },
+    "filter": {
+      "all": "Todos",
+      "open": "Só não bloqueados",
+      "blocked": "Só bloqueados"
+    },
+    "status": {
+      "blocked": "Bloqueado",
+      "open": "Não bloqueado",
+      "unknown": "Sem resposta",
+      "pending": "Aguardando"
+    },
+    "cosmeticStatus": {
+      "blocked": "Oculto",
+      "open": "Visível",
+      "unknown": "Sem resposta",
+      "pending": "Aguardando"
+    },
+    "cosmetic": {
+      "ad-container": "Contêiner de anúncio",
+      "adsense-slot": "Espaço do AdSense"
+    },
+    "group": {
+      "ads": {
+        "title": "Redes de anúncios",
+        "desc": "Servidores e plataformas de troca de anúncios, verificados por domínio."
+      },
+      "analytics": {
+        "title": "Análise e gravação de sessões",
+        "desc": "Serviços de estatísticas de visitas, mapas de calor e reprodução de sessões."
+      },
+      "social": {
+        "title": "Rastreadores de redes sociais",
+        "desc": "Pixels e rastreadores de conversão das plataformas sociais."
+      },
+      "errors": {
+        "title": "Monitoramento de erros e desempenho",
+        "desc": "Serviços de relato de falhas e monitoramento de usuários reais."
+      },
+      "oem": {
+        "title": "Telemetria de fabricantes de dispositivos",
+        "desc": "Endereços de telemetria e anúncios de fabricantes de celulares, TVs e outros dispositivos. O navegador nunca os acessa por conta própria, então eles aparecem principalmente nas listas de filtros de DNS, VPN e roteador."
+      },
+      "scripts": {
+        "title": "Scripts de rastreamento",
+        "desc": "URLs exatas de scripts populares de tags e pixels, buscados mas nunca executados. Filtros que agem pelo caminho podem bloqueá-los mesmo quando o domínio é permitido."
+      },
+      "cosmetic": {
+        "title": "Ocultação de elementos",
+        "desc": "Elementos-isca com cara de espaço de anúncio. Só um bloqueador dentro do navegador consegue ocultá-los; filtros de DNS, VPN e roteador não fazem isso, então esta parte fica fora da pontuação."
+      }
+    },
+    "layer": {
+      "browser": "Os elementos-isca foram ocultados: há um bloqueador funcionando dentro do seu navegador, seja uma extensão ou o próprio navegador.",
+      "network": "Requisições foram bloqueadas, mas os elementos-isca não foram ocultados: o bloqueio provavelmente acontece fora da página, em um serviço de DNS, VPN, roteador ou na proteção contra rastreamento do navegador.",
+      "none": "Nada foi bloqueado: nenhum bloqueio de anúncios ou rastreadores foi encontrado neste navegador ou nesta rede."
+    },
+    "report": {
+      "Category": "Categoria",
+      "Total": "Total"
+    }
+  },
   "advancedtools": {
     "Title": "Ferramentas avançadas",
     "Note": "Quem exige o máximo da qualidade da rede costuma usar mais ferramentas para otimizar a própria conexão.",
@@ -1005,6 +1088,7 @@
     "MacChecker": "Consultar informações de um endereço físico",
     "IpCalculator": "Cálculo de sub-rede, conversão de notação e análise IPv6 para qualquer IP, prefixo ou intervalo",
     "BrowserInfo": "Verificar informações e impressão digital do navegador",
+    "AdblockTest": "Veja o que seu bloqueador de anúncios, filtro de DNS ou VPN realmente bloqueia",
     "SecurityChecklist": "Guia para proteger sua vida digital",
     "PersonaCheck": "Compare o que os sites veem com o país no qual você quer parecer local",
     "IpBlocklist": "Veja se um IP está em listas negras de spam, abuso, proxy ou VPN"
@@ -1451,6 +1535,7 @@
         "mtrtest": "Traceroutes MTR por salto até o IP do usuário a partir de sondas pelo mundo; perda em saltos intermediários pode ser apenas limitação de ICMP, mas perda sustentada a partir de um salto indica problema real.",
         "ruletest": "IPs de saída observados ao buscar 8 endpoints de teste — mais de um IP único significa que o tráfego está dividido entre rotas diferentes (ex.: regras de proxy).",
         "browserinfo": "Ambiente de navegador, sistema operacional e tela do dispositivo testado.",
+        "adblocktest": "Teste de bloqueio de anúncios e rastreadores executado no navegador: por categoria (redes de anúncios, análise, rastreadores sociais, monitoramento de erros, telemetria de fabricantes de dispositivos, scripts de rastreamento), quantas requisições a endereços conhecidos foram bloqueadas, passaram ou esgotaram o tempo (noAnswer). Não bloquear tudo pode ser uma escolha deliberada, não uma falha.",
         "invisibility": "Pontuações de detecção de proxy/VPN (0–100, maior = mais provável de ser detectado) com os sinais individuais de detecção que foram sinalizados.",
         "enhanceddnsleak": "Captura DNS em nível de resolvedor: cada IP de resolvedor que consultou o domínio de teste, com transporte, exposição ECS e flags DNSSEC (do/cd).",
         "persona": "O quão próximo o navegador está de uma pessoa local do país escolhido: uma nota geral mais o veredito de cada verificação. Apenas vereditos — os valores subjacentes deliberadamente não são armazenados em relatórios compartilhados."
@@ -1973,6 +2058,7 @@
     "MacChecker": "Abrir painel de consulta MAC",
     "IpCalculator": "Abrir painel da Calculadora de IP",
     "BrowserInfo": "Abrir painel de informações do navegador",
+    "AdblockTest": "Abrir painel do Teste de bloqueio de anúncios e rastreadores",
     "SecurityChecklist": "Abrir painel de checklist de segurança",
     "PersonaCheck": "Abrir painel de verificação aprofundada de persona",
     "IpBlocklist": "Abrir painel de verificação de listas negras de IP",

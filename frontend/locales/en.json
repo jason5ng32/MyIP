@@ -984,6 +984,89 @@
       }
     }
   },
+  "adblocktest": {
+    "Title": "Ad & Tracker Blocking Test",
+    "Note": "Built for anyone who runs an ad or tracker blocker: an extension such as uBlock Origin or Privacy Badger, a browser with built-in blocking, or filtering on a DNS service, VPN or router. The test has your browser contact well-known ad, analytics, social and device-maker endpoints, fetches popular tracking scripts without running them, and places bait elements that cosmetic filters hide, then shows what got through.",
+    "Note2": "A higher score is not automatically better. Not every tracker works against you: error reporting helps sites fix crashes, analytics helps them improve, and ads pay for much of the free web; some device-maker endpoints also deliver updates or notifications. Read the result as a map of what your setup lets through, and decide for yourself what is worth blocking.",
+    "Note3": "Requests that are not blocked do reach those services, without cookies or a referrer. Results stay in your browser and are not sent to us. An endpoint your network cannot reach for any other reason also shows as blocked.",
+    "Selected": "Selected checks:",
+    "SelectAll": "Select all",
+    "Invert": "Invert",
+    "Run": "Start test",
+    "Hint": "Choose what to test on the left, then press Start test.",
+    "Score": "Blocked share",
+    "Progress": "{done} / {total} checked",
+    "GroupCount": "{blocked} / {total} blocked",
+    "NothingOpen": "No request was confirmed as not blocked.",
+    "NothingBlocked": "No request was confirmed as blocked.",
+    "Version": "Test list version: {version}",
+    "Limitation": "These probes are plain requests sent by this page, not the way a website actually loads ads or scripts: filter rules aimed only at a specific request type (such as scripts or images) may let a probe through yet still block the real thing on a website.",
+    "count": {
+      "blocked": "Blocked",
+      "open": "Not blocked",
+      "unknown": "No answer"
+    },
+    "filter": {
+      "all": "All",
+      "open": "Not blocked only",
+      "blocked": "Blocked only"
+    },
+    "status": {
+      "blocked": "Blocked",
+      "open": "Not blocked",
+      "unknown": "No answer",
+      "pending": "Waiting"
+    },
+    "cosmeticStatus": {
+      "blocked": "Hidden",
+      "open": "Visible",
+      "unknown": "No answer",
+      "pending": "Waiting"
+    },
+    "cosmetic": {
+      "ad-container": "Ad container",
+      "adsense-slot": "AdSense slot"
+    },
+    "group": {
+      "ads": {
+        "title": "Ad networks",
+        "desc": "Ad servers and ad exchanges, checked by domain."
+      },
+      "analytics": {
+        "title": "Analytics & session recording",
+        "desc": "Visitor statistics, heatmap and session replay services."
+      },
+      "social": {
+        "title": "Social network trackers",
+        "desc": "Pixels and conversion trackers run by social platforms."
+      },
+      "errors": {
+        "title": "Error & performance monitoring",
+        "desc": "Crash reporting and real-user monitoring services."
+      },
+      "oem": {
+        "title": "Device maker telemetry",
+        "desc": "Telemetry and ad endpoints of phone, TV and device makers. Your browser never calls them on its own, so mainly DNS, VPN and router filters list them."
+      },
+      "scripts": {
+        "title": "Tracking scripts",
+        "desc": "Exact URLs of popular tag and pixel scripts, fetched but never run. Filters that match by path can catch these even where the domain itself is allowed."
+      },
+      "cosmetic": {
+        "title": "Element hiding",
+        "desc": "Bait elements shaped like ad slots. Only a blocker inside the browser can hide them; DNS, VPN and router filters never do, so this part is left out of the score."
+      }
+    },
+    "layer": {
+      "browser": "Bait elements were hidden: a blocker is working inside your browser, either an extension or the browser's own.",
+      "network": "Requests were blocked but the bait elements were not hidden: the blocking most likely happens outside the page, at a DNS service, VPN or router, or in the browser's tracking protection.",
+      "none": "Nothing was blocked: no ad or tracker blocking was found in this browser or on this network."
+    },
+    "report": {
+      "Category": "Category",
+      "Total": "Total"
+    }
+  },
   "advancedtools": {
     "Title": "Advanced Tools",
     "Note": "People who want the very best from their network usually reach for extra tools to fine-tune their connection.",
@@ -1005,6 +1088,7 @@
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
     "BrowserInfo": "Check browser information and fingerprint",
+    "AdblockTest": "Check what your ad blocker, DNS filter or VPN actually blocks",
     "SecurityChecklist": "Guide to securing your digital life",
     "PersonaCheck": "Compare what sites see against the country you want to look local to",
     "IpBlocklist": "See whether an IP is on spam, abuse, proxy or VPN blocklists"
@@ -1451,6 +1535,7 @@
         "mtrtest": "Per-hop MTR traceroutes toward the user's IP from probes around the world; loss at intermediate hops can be mere ICMP rate-limiting, sustained loss from one hop onward indicates a real problem.",
         "ruletest": "Egress IPs observed when fetching 8 test endpoints — more than one unique IP means traffic is split across different routes (e.g. proxy rules).",
         "browserinfo": "Browser, OS and display environment of the tested device.",
+        "adblocktest": "Ad & tracker blocking check run in the browser: per category (ad networks, analytics, social trackers, error monitoring, device-maker telemetry, tracking scripts), how many requests to well-known endpoints were blocked, got through, or timed out (noAnswer). Not blocking everything can be a deliberate choice, not a fault.",
         "invisibility": "Proxy/VPN detection scores (0-100, higher = more likely detected) with the individual detection signals that flagged.",
         "enhanceddnsleak": "Resolver-level DNS capture: every resolver IP that queried the test domain, with transport, ECS exposure and DNSSEC flags (do/cd).",
         "persona": "How closely the browser matches a local resident of the chosen country: an overall grade plus each check's verdict. Verdicts only — the underlying values are deliberately not stored in a shared report."
@@ -1973,6 +2058,7 @@
     "MacChecker": "Open MAC lookup panel",
     "IpCalculator": "Open IP Calculator panel",
     "BrowserInfo": "Open Browser Info panel",
+    "AdblockTest": "Open Ad & Tracker Blocking Test panel",
     "SecurityChecklist": "Open Security Checklist panel",
     "PersonaCheck": "Open In-depth Persona Check panel",
     "IpBlocklist": "Open IP Blocklist Check panel",

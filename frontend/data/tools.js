@@ -25,6 +25,7 @@ export const ADVANCED_TOOLS = [
   { slug: 'servicestatus', emoji: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', category: 'network', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
   { slug: 'browserinfo', emoji: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', category: 'network', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },
   { slug: 'securitychecklist', emoji: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'network', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
+  { slug: 'adblocktest', emoji: '🛡️', titleKey: 'adblocktest.Title', noteKey: 'advancedtools.AdblockTest', category: 'network', component: () => import('@/components/advanced-tools/AdblockTest.vue') },
   { slug: 'whois', emoji: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', category: 'lookup', component: () => import('@/components/advanced-tools/Whois.vue') },
   { slug: 'asn', emoji: '🛂', titleKey: 'asnprofile.Title', noteKey: 'advancedtools.AsnProfile', category: 'lookup', component: () => import('@/components/advanced-tools/AsnProfile.vue'), requiresConfig: 'cloudFlare' },
   { slug: 'macchecker', emoji: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', category: 'lookup', component: () => import('@/components/advanced-tools/MacChecker.vue') },

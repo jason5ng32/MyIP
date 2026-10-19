@@ -19,6 +19,7 @@ export const SECTION_TITLE_KEYS = {
     mtrtest: 'mtrtest.Title',
     ruletest: 'ruletest.Title',
     browserinfo: 'browserinfo.Title',
+    adblocktest: 'adblocktest.Title',
     invisibility: 'invisibilitytest.Title',
     enhanceddnsleak: 'enhanceddnsleaktest.Title',
     persona: 'personacheck.Title',
@@ -157,6 +158,8 @@ const SECTION_RENDERERS = {
         ['display', section.display && `${section.display.width}x${section.display.height} @${section.display.pixelRatio}x`],
         ['connection', section.connection && `${section.connection.effectiveType ?? ''} downlink=${section.connection.downlink ?? '—'}Mbps rtt=${section.connection.rtt ?? '—'}ms`.trim()],
     ]),
+    adblocktest: (section) => mdTable(['group', 'total', 'blocked', 'notBlocked', 'noAnswer'],
+        section.groups.map((g) => [g.id, g.total, g.blocked, g.open, g.unknown])),
     invisibility: (section) => [
         kvLines([
             ['ip', section.ip],

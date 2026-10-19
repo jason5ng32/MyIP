@@ -172,6 +172,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         { keys: 'n', action: () => goToAdvancedTool('dnsresolver', 'DNSResolver'), description: t('shortcutKeys.DNSResolver') },
         { keys: 'C', action: () => goToAdvancedTool('censorshipcheck', 'CensorshipCheck'), description: t('shortcutKeys.CensorshipCheck') },
         { keys: 'b', action: () => goToAdvancedTool('browserinfo', 'BrowserInfo'), description: t('shortcutKeys.BrowserInfo') },
+        { keys: 'x', action: () => goToAdvancedTool('adblocktest', 'AdblockTest'), description: t('shortcutKeys.AdblockTest') },
         { keys: 'W', action: () => goToAdvancedTool('whois', 'Whois'), description: t('shortcutKeys.Whois') },
         { keys: 'v', action: () => goToAdvancedTool('servicestatus', 'ServiceStatus'), description: t('shortcutKeys.ServiceStatus') },
         {

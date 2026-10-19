@@ -47,6 +47,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 
 * 🚥 **Detecção de WebRTC**: Revela o endereço IP exposto durante conexões WebRTC — inclusive se as proteções de privacidade do seu navegador estão ativas.
 * 🛑 **Teste de vazamento de DNS**: Mostra quais endpoints DNS resolvem suas consultas, para avaliar o risco de vazamentos de DNS ao usar VPNs ou proxies.
+* 🛡️ **Teste de bloqueio de anúncios e rastreadores**: Verifica o que seu bloqueador de anúncios, navegador, filtro de DNS, VPN ou roteador realmente bloqueia — redes de anúncios, análise, rastreadores sociais, monitoramento de erros, telemetria de fabricantes de dispositivos, scripts de rastreamento e ocultação de elementos.
 * 📋 **Checklist de segurança**: Um checklist pessoal de cibersegurança com 258 itens em 12 áreas, com progresso salvo no seu navegador.
 
 ### 📡 Testes de rede

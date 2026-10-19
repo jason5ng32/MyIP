@@ -2225,6 +2225,17 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "New tool: Ad & Tracker Blocking Test — see which ad, analytics, social and device-maker endpoints, tracking scripts and ad-shaped elements your blocker, DNS filter or VPN lets through",
+          "zh": "新增工具：广告与跟踪屏蔽检测——查看你的拦截器、DNS 过滤或 VPN 放行了哪些广告、统计、社交平台与设备厂商端点、跟踪脚本和广告样式元素",
+          "zh-TW": "新增工具：廣告與追蹤封鎖檢測——查看你的阻擋器、DNS 過濾或 VPN 放行了哪些廣告、統計、社群平台與裝置廠商端點、追蹤腳本和廣告樣式元素",
+          "fr": "Nouvel outil : Test de blocage des pubs et traceurs — voyez quelles adresses publicitaires, de statistiques, de réseaux sociaux et de fabricants d'appareils, quels scripts de pistage et quels éléments publicitaires votre bloqueur, filtre DNS ou VPN laisse passer",
+          "ru": "Новый инструмент: проверка блокировки рекламы и трекеров — узнайте, какие адреса рекламных сетей, аналитики, соцсетей и производителей устройств, скрипты отслеживания и рекламные элементы пропускает ваш блокировщик, DNS-фильтр или VPN",
+          "pt-BR": "Nova ferramenta: Teste de bloqueio de anúncios e rastreadores — veja quais endereços de anúncios, análise, redes sociais e fabricantes de dispositivos, scripts de rastreamento e elementos com cara de anúncio seu bloqueador, filtro de DNS ou VPN deixa passar"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "Advanced Tools open as pages of their own, sliding in like an app, data is not lost when switching",

@@ -283,6 +283,28 @@ const buildBrowserinfo = (payload) => {
     return Object.keys(section).length ? section : null;
 };
 
+// adblocktest:finished — { items: [{ groupId, kind, status }] }, one item
+// per probed address. Only the per-category request counts travel; cosmetic
+// baits and unanswered (pending) items are dropped.
+const ADBLOCK_STATUSES = new Set(['blocked', 'open', 'unknown']);
+const buildAdblocktest = (payload) => {
+    const groups = new Map(); // first-appearance order = the probe list's
+    for (const item of Array.isArray(payload?.items) ? payload.items : []) {
+        if (typeof item?.groupId !== 'string' || item.kind === 'cosmetic'
+            || !ADBLOCK_STATUSES.has(item?.status)) continue;
+        const id = clip(item.groupId, 16);
+        if (!groups.has(id)) {
+            if (groups.size >= 16) continue;
+            groups.set(id, { id, total: 0, blocked: 0, open: 0, unknown: 0 });
+        }
+        const counts = groups.get(id);
+        if (counts.total >= 1024) continue;
+        counts.total += 1;
+        counts[item.status] += 1;
+    }
+    return groups.size ? { groups: [...groups.values()] } : null;
+};
+
 // invisibility:result — { proxyScore, vpnScore, ip, flags: [{ key, flagged }] }
 const buildInvisibility = (payload) => {
     const proxy = finiteNum(payload?.proxyScore, 0, 100);
@@ -381,6 +403,7 @@ export const REPORT_EVENT_BUILDERS = {
     'mtrtest:finished': { section: 'mtrtest', build: buildMtrtest },
     'ruletest:finished': { section: 'ruletest', build: buildRuletest },
     'browserinfo:finished': { section: 'browserinfo', build: buildBrowserinfo },
+    'adblocktest:finished': { section: 'adblocktest', build: buildAdblocktest },
     'invisibility:result': { section: 'invisibility', build: buildInvisibility },
     'enhanceddnsleak:finished': { section: 'enhanceddnsleak', build: buildEnhanceddnsleak },
     'persona:finished': { section: 'persona', build: buildPersona },

@@ -47,6 +47,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 
 * 🚥 **Détection WebRTC** : Révèle l'adresse IP exposée lors des connexions WebRTC — y compris si les protections de confidentialité de votre navigateur sont actives.
 * 🛑 **Test de fuite DNS** : Montre quels points de terminaison DNS résolvent vos requêtes, afin d'évaluer le risque de fuite DNS lors de l'utilisation d'un VPN ou d'un proxy.
+* 🛡️ **Test de blocage des pubs et traceurs** : Vérifie ce que votre bloqueur de pubs, navigateur, filtre DNS, VPN ou routeur bloque vraiment — régies publicitaires, statistiques, traceurs sociaux, suivi des erreurs, télémétrie des fabricants d'appareils, scripts de pistage et masquage d'éléments.
 * 📋 **Liste de contrôle de cybersécurité** : Une liste personnelle de 258 points de cybersécurité répartis en 12 domaines, avec progression sauvegardée dans votre navigateur.
 
 ### 📡 Tests réseau
