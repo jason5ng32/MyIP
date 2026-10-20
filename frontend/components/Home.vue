@@ -18,7 +18,6 @@
     <QueryIP ref="queryIPRef" />
   </FloatingDock>
   <HelpModal ref="helpModalRef" />
-  <Additional />
   <Footer />
 </template>
 
@@ -28,7 +27,7 @@
 //
 // Components — the test sections and the always-visible chrome load
 // synchronously; everything the first paint can't show (dialogs, the
-// below-fold Additional/Footer) is an async component so its code stays
+// below-fold Footer) is an async component so its code stays
 // out of the route chunk and out of the mount's critical path. Their
 // template refs are null until the chunk lands — consumers (use-shortcuts)
 // must optional-chain.
@@ -45,7 +44,6 @@ import FloatingDock from './widgets/FloatingDock.vue';
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 
 // Async (off-critical-path) components
-const Additional = defineAsyncComponent(() => import('./Additional.vue'));
 const Footer = defineAsyncComponent(() => import('./Footer.vue'));
 const Achievements = defineAsyncComponent(() => import('./Achievements.vue'));
 const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));

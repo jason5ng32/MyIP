@@ -384,11 +384,9 @@
     "Note2_1": "你可以在終端裡，透過",
     "Note2_2": "命令取得本機的 IP 位址",
     "Note3": "是可選路徑，新增後可取得到 IP 的地理資訊",
-    "Note4": "請使用你申請的 IPCheck.ing API 金鑰",
     "getIPv4": "取得本機 IPv4 位址",
     "getIPv6": "取得本機 IPv6 位址",
-    "get6and4": "取得本機優先網路出口的 IP 位址",
-    "notAvailable": "此功能暫未開放，敬請期待"
+    "get6and4": "取得本機優先網路出口的 IP 位址"
   },
   "browserinfo": {
     "Title": "瀏覽器資訊",
@@ -2077,13 +2075,25 @@
   "helpModal": {
     "Title": "鍵盤快速鍵"
   },
+  "footer": {
+    "Tagline": "免費、開源、一站式的隱私工具箱",
+    "Project": "專案",
+    "Support": "文件與支援",
+    "DeveloperDocs": "開發者文件",
+    "SelfHosting": "自行架設指南",
+    "ReportIssue": "回報問題",
+    "License": "MIT 授權條款",
+    "Clients": "用戶端",
+    "Raycast": "Raycast 擴充功能",
+    "Lite": "Lite 版"
+  },
   "about": {
     "Title": "關於",
     "project": [
       "IPCheck.ing 是一個免費的多合一 IP 工具箱，可以協助你檢視自己的 IP 資訊，檢測網站的可用性，檢視 DNS 出口資訊，進行網速測試，全球延遲測試，MTR 測試等。",
       "這是一個開源專案，你可以點選頁面底部的 GitHub 圖示檢視原始碼。",
       "如果你對於產品中功能使用不理解，可以透過底部的「說明中心」取得協助，我們已經寫了非常詳細的協助文件，除了功能介紹，也能協助你理解各種網路概念和如何排查網路問題。",
-      "如果你有興趣參與到開源專案中，可以點選頁面底部的「貢獻程式碼」按鈕，檢視如何貢獻程式碼。"
+      "如果你有興趣參與到開源專案中，可以點選頁面底部的「開發者文件」，檢視如何貢獻程式碼。"
     ],
     "founderTitle": "關於專案發起人",
     "founder": [
@@ -2104,7 +2114,6 @@
     "Sponsor": "贊助我們",
     "Privacy": "隱私政策",
     "HelpCenter": "說明中心",
-    "Contribute": "貢獻程式碼",
     "Close": "關閉"
   },
   "acknowledgement": {

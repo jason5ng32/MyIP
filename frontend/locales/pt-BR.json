@@ -384,11 +384,9 @@
     "Note2_1": "Você pode usar o comando",
     "Note2_2": "para obter o IP da sua máquina no terminal",
     "Note3": "é um caminho opcional; adicioná-lo obtém as informações geográficas do IP",
-    "Note4": "é sua chave de API do IPCheck.ing",
     "getIPv4": "Obter o endereço IPv4 da máquina local",
     "getIPv6": "Obter o endereço IPv6 da máquina local",
-    "get6and4": "Obter o IP de saída de rede preferencial da máquina local",
-    "notAvailable": "Este recurso ainda não está disponível"
+    "get6and4": "Obter o IP de saída de rede preferencial da máquina local"
   },
   "browserinfo": {
     "Title": "Informações do navegador",
@@ -2077,13 +2075,25 @@
   "helpModal": {
     "Title": "Atalhos de teclado"
   },
+  "footer": {
+    "Tagline": "Uma caixa de ferramentas de privacidade tudo em um, gratuita e de código aberto.",
+    "Project": "Projeto",
+    "Support": "Documentação e suporte",
+    "DeveloperDocs": "Documentação para desenvolvedores",
+    "SelfHosting": "Guia de auto-hospedagem",
+    "ReportIssue": "Relatar um problema",
+    "License": "Licença MIT",
+    "Clients": "Clientes",
+    "Raycast": "Extensão para Raycast",
+    "Lite": "Edição Lite"
+  },
   "about": {
     "Title": "Sobre",
     "project": [
       "IPCheck.ing é uma caixa de ferramentas de IP gratuita e tudo em um que ajuda você a verificar suas próprias informações de IP, testar disponibilidade de sites, examinar informações de saída DNS e executar testes de velocidade, latência global, MTR e muito mais.",
       "Este é um projeto de código aberto — clique no ícone do GitHub no rodapé para navegar pelo código-fonte.",
       "Se você não tiver certeza de como um recurso funciona, abra o link \"Central de ajuda\" no rodapé. A documentação é completa: além de descrever cada recurso, ela também explica conceitos de rede e como solucionar problemas de rede.",
-      "Se quiser participar do projeto de código aberto, clique no botão \"Contribuir com código\" no rodapé para ver como."
+      "Se quiser participar do projeto de código aberto, abra o link \"Documentação para desenvolvedores\" no rodapé para ver como."
     ],
     "founderTitle": "Sobre o fundador",
     "founder": [
@@ -2104,7 +2114,6 @@
     "Sponsor": "Patrocine-nos",
     "Privacy": "Privacidade",
     "HelpCenter": "Central de ajuda",
-    "Contribute": "Contribuir com código",
     "Close": "Fechar"
   },
   "acknowledgement": {

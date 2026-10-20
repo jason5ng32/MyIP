@@ -218,17 +218,6 @@
   max-width: 1400px;
 }
 
-footer {
-  height: 100pt;
-  padding-top: 20pt;
-}
-
-@media only screen and (max-width: 768px) {
-  footer {
-    height: 140pt;
-  }
-}
-
 .body-dark-mode {
   background-color: rgb(19, 21, 21) !important;
   color: #e3e3e3 !important;

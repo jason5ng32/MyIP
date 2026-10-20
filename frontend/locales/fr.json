@@ -384,11 +384,9 @@
     "Note2_1": "Tu peux, dans le terminal, via",
     "Note2_2": "commande, obtenir l'adresse IP de cette machine",
     "Note3": "est un chemin optionnel, son ajout permettra d'obtenir les informations géographiques de l'IP",
-    "Note4": "est votre clé API IPCheck.ing",
     "getIPv4": "Obtenir l'adresse IPv4 de la machine locale",
     "getIPv6": "Obtenir l'adresse IPv6 de la machine locale",
-    "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale",
-    "notAvailable": "Cette fonctionnalité n'est pas encore disponible"
+    "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale"
   },
   "browserinfo": {
     "Title": "Informations du Navigateur",
@@ -2077,13 +2075,25 @@
   "helpModal": {
     "Title": "Raccourcis"
   },
+  "footer": {
+    "Tagline": "Une boîte à outils de confidentialité tout-en-un, gratuite et open source.",
+    "Project": "Projet",
+    "Support": "Documentation et support",
+    "DeveloperDocs": "Documentation développeur",
+    "SelfHosting": "Guide d'auto-hébergement",
+    "ReportIssue": "Signaler un problème",
+    "License": "Licence MIT",
+    "Clients": "Clients",
+    "Raycast": "Extension Raycast",
+    "Lite": "Édition Lite"
+  },
   "about": {
     "Title": "À propos",
     "project": [
       "IPCheck.ing est une boîte à outils IP tout-en-un et gratuite : elle vous aide à consulter vos informations IP, à tester la disponibilité des sites web, à examiner les informations de sortie DNS, à mesurer votre débit, à tester la latence mondiale, à lancer des tests MTR, et bien plus encore.",
       "Il s'agit d'un projet open source : cliquez sur l'icône GitHub en bas de la page pour consulter le code source.",
       "Si vous ne comprenez pas comment utiliser une fonctionnalité, ouvrez le « Centre d'aide » en bas de la page. Notre documentation est très détaillée : en plus de présenter chaque fonctionnalité, elle vous aide à comprendre les différents concepts réseau et à diagnostiquer vos problèmes de connexion.",
-      "Si vous souhaitez participer au projet open source, cliquez sur le bouton « Contribuer au code » en bas de la page pour découvrir comment faire."
+      "Si vous souhaitez participer au projet open source, ouvrez le lien « Documentation développeur » en bas de la page pour découvrir comment faire."
     ],
     "founderTitle": "À propos du fondateur",
     "founder": [
@@ -2104,7 +2114,6 @@
     "Sponsor": "Nous soutenir",
     "Privacy": "Confidentialité",
     "HelpCenter": "Centre d'aide",
-    "Contribute": "Contribuer au code",
     "Close": "Fermer"
   },
   "acknowledgement": {
