@@ -6,11 +6,13 @@
     :class="{ '-translate-y-full': isNavHidden,
     'bg-background/80 supports-[backdrop-filter:blur(0px)]:bg-background/60 backdrop-blur': !isPwa || (isPwa && !isMobile),
     'bg-page-bg': isPwa && isMobile }">
-    <nav id="navbar-top" class="mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
+    <nav id="navbar-top" ref="navEl"
+      class="relative mx-auto flex w-full max-w-[1600px] items-center gap-2 px-3 sm:px-4 h-14">
 
-      <!-- Left: Hamburger (only mobile) + Brand -->
-      <div class="flex items-center gap-2">
-        <Button v-if="isMobile" variant="ghost" size="icon" class="size-8" :aria-expanded="isNavMenuOpen"
+      <!-- Left: Hamburger (collapsed nav only) + Brand. Expanded, every group
+           keeps its natural width so use-nav-overflow measures true sizes. -->
+      <div ref="brandEl" class="flex items-center gap-2" :class="{ 'shrink-0': !isNavCollapsed }">
+        <Button v-if="isNavCollapsed" variant="ghost" size="icon" class="size-8" :aria-expanded="isNavMenuOpen"
           aria-label="Toggle navigation menu" @click="store.toggleSheet('navMenu')">
           <Menu />
         </Button>
@@ -25,8 +27,12 @@
         </a>
       </div>
 
-      <!-- Middle: Desktop nav links + GitHub star badge (left aligned, next to brand) -->
-      <div v-if="!isMobile" class="flex items-center gap-0.5">
+      <!-- Middle: nav links + GitHub star badge (left aligned, next to brand).
+           Always rendered so its width stays measurable; collapsed, it is
+           invisible, out of flow and out of the a11y tree / tab order. -->
+      <div ref="linksEl" class="flex w-max shrink-0 items-center gap-0.5"
+        :class="{ 'invisible absolute left-0 top-0 pointer-events-none': isNavCollapsed }"
+        :aria-hidden="isNavCollapsed ? 'true' : undefined" :inert="isNavCollapsed || undefined">
         <template v-for="item in navItems" :key="item">
           <!-- Advanced Tools: hover reveals the sub-tools, click goes to the
                section like the other links (disable-click-trigger frees the
@@ -36,7 +42,7 @@
             class="flex-none">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger :class="['h-auto bg-transparent', navLinkClass(item)]"
+                <NavigationMenuTrigger :class="['h-auto bg-transparent whitespace-nowrap', navLinkClass(item)]"
                   @click="goToSection(item)">
                   {{ t(`nav.${item}`) }}
                 </NavigationMenuTrigger>
@@ -58,7 +64,7 @@
             </NavigationMenuList>
           </NavigationMenu>
           <!-- All other sections -->
-          <a v-else href="#" :class="navLinkClass(item)" @click.prevent="goToSection(item)">
+          <a v-else href="#" :class="[navLinkClass(item), 'whitespace-nowrap']" @click.prevent="goToSection(item)">
             {{ t(`nav.${item}`) }}
           </a>
         </template>
@@ -76,11 +82,11 @@
       </div>
 
       <!-- Right: Action area (ml-auto push to the right) -->
-      <div class="ml-auto flex items-center gap-2">
+      <div ref="actionsEl" class="ml-auto flex items-center gap-2" :class="{ 'shrink-0': !isNavCollapsed }">
         <!-- Earth Online entry (code name: pulse) -->
         <Pulse />
 
-        <!-- Docs assistant entry point (ask box on desktop, icon on mobile) -->
+        <!-- Docs assistant entry point (ask box from xl up, icon below) -->
         <DocsSearch />
 
         <!-- Account menu: preferences cog (Firebase-less) or the user dropdown -->
@@ -88,9 +94,10 @@
       </div>
     </nav>
 
-    <!-- Mobile navigation sheet. Flex column so the link list scrolls instead
-         of clipping on short screens when Advanced Tools is expanded. -->
-    <Sheet v-if="isMobile" :open="isNavMenuOpen" @update:open="onNavMenuChange">
+    <!-- Navigation sheet of the collapsed nav (a phone, or a viewport where the
+         links don't fit). Flex column so the link list scrolls instead of
+         clipping on short screens when Advanced Tools is expanded. -->
+    <Sheet v-if="isNavCollapsed" :open="isNavMenuOpen" @update:open="onNavMenuChange">
       <SheetContent side="left" class="w-80 p-0 flex flex-col gap-0" :title="t('nav.Navigation')">
         <div class="flex shrink-0 items-center justify-between border-b px-4 py-3">
           <h5 class="m-0 text-base font-semibold">{{ t('nav.Navigation') }}</h5>
@@ -119,7 +126,7 @@
                 </div>
               </CollapsibleContent>
             </Collapsible>
-            <!-- All other sections, as on desktop. -->
+            <!-- All other sections, as in the expanded nav. -->
             <a v-else href="#" :class="navLinkClass(item, { block: true })" @click.prevent="goToSection(item)">
               {{ t(`nav.${item}`) }}
             </a>
@@ -176,6 +183,7 @@ import { formatStarCount } from '@/utils/format-star-count.js';
 import { isRunningAsPwa } from '@/utils/pwa.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { useNavTarget } from '@/composables/use-nav-target.js';
+import { useNavOverflow } from '@/composables/use-nav-overflow.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -185,6 +193,19 @@ const { navigateTo } = useNavTarget();
 
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+
+// The link row collapses into the hamburger + Sheet on a phone, or wherever
+// it doesn't fit beside the brand and actions. isMobile alone drives phone
+// behaviour (scroll-hide, PWA background).
+const NAV_GAP_PX = 8; // the nav's gap-2
+const navEl = ref(null);
+const brandEl = ref(null);
+const linksEl = ref(null);
+const actionsEl = ref(null);
+const { overflow } = useNavOverflow({
+  nav: navEl, brand: brandEl, links: linksEl, actions: actionsEl, gap: NAV_GAP_PX,
+});
+const isNavCollapsed = computed(() => isMobile.value || overflow.value);
 // store.currentSection keeps Home's last section, so it's ignored elsewhere.
 const isHome = computed(() => route.name === 'home');
 const currentSection = computed(() => (isHome.value ? store.currentSection : null));
@@ -203,7 +224,7 @@ const navItems = SECTION_IDS;
 const configs = computed(() => store.configs);
 const advancedTools = computed(() => listedTools(ADVANCED_TOOLS, configs.value));
 
-// Mobile: Advanced Tools sub-list expanded by default for discoverability.
+// Sheet: Advanced Tools sub-list expanded by default for discoverability.
 const mobileToolsOpen = ref(true);
 
 // GitHub star count for the repo badge. Fetched from our own edge-cached
@@ -252,7 +273,7 @@ const handleLogoClick = (e) => {
   trackEvent('Nav', 'NavClick', 'Logo');
 };
 
-// Section and tool entries close the mobile nav Sheet first and navigate once
+// Section and tool entries close the nav Sheet first and navigate once
 // its slide-out is over: WebKit records the back/forward snapshot of a page
 // as it navigates away, and a swipe back would show the sheet still open.
 const SHEET_CLOSE_MS = 300; // ui/sheet data-[state=closed]:duration-300
