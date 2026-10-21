@@ -260,7 +260,8 @@
         "level": {
           "NATIONWIDE": "全国范围",
           "REGIONAL": "区域范围",
-          "NETWORK": "单一网络"
+          "NETWORK": "单一网络",
+          "PLATFORM": "单一平台"
         }
       },
       "statuses": {

@@ -61,6 +61,7 @@ describe('normalizeOutages', () => {
             endDate: null,
             locations: ['CO'],
             asns: [],
+            origins: [],
             cause: 'NATURAL_DISASTER',
             level: 'NATIONWIDE',
             description: 'A 7.4-magnitude earthquake in western Colombia',
@@ -111,6 +112,17 @@ describe('normalizeAnomalies', () => {
         assert.deepEqual(event.locations, []);
         assert.deepEqual(event.asns, [{ asn: 27653, name: 'Comteco' }]);
     });
+
+    it('maps an ORIGIN anomaly to an origins entry', () => {
+        const [event] = normalizeAnomalies([{
+            ...anomalyFixture,
+            type: 'ORIGIN',
+            locationDetails: null,
+            originDetails: { origin: 'google-europe-west2', name: 'Google Cloud europe-west2' },
+        }]);
+        assert.deepEqual(event.locations, []);
+        assert.deepEqual(event.origins, [{ id: 'google-europe-west2', name: 'Google Cloud europe-west2' }]);
+    });
 });
 
 describe('mergeEvents', () => {
@@ -145,6 +157,34 @@ describe('mergeEvents', () => {
         const merged = mergeEvents(cubaOutage, anomalies);
         assert.equal(merged.length, 1);
         assert.equal(merged[0].kind, 'outage');
+    });
+
+    it('drops an anomaly that shares a cloud origin with an outage', () => {
+        const gcpOutage = normalizeOutages([{
+            ...outageFixture,
+            id: '1727',
+            locationsDetails: [],
+            originsDetails: [{ origin: 'google-europe-west2', name: 'Google Cloud europe-west2' }],
+            startDate: '2026-10-20T05:45:00Z',
+            endDate: '2026-10-20T14:00:00Z',
+        }]);
+        const anomalies = normalizeAnomalies([{
+            ...anomalyFixture,
+            type: 'ORIGIN',
+            locationDetails: null,
+            originDetails: { origin: 'google-europe-west2', name: 'Google Cloud europe-west2' },
+            startDate: '2026-10-20T05:45:00Z',
+            endDate: null,
+        }]);
+        assert.deepEqual(mergeEvents(gcpOutage, anomalies).map((e) => e.id), ['o-1727']);
+    });
+
+    it('drops an event with no subject and no text, keeps one with a description', () => {
+        const [stub, described] = normalizeOutages([
+            { ...outageFixture, id: 'stub', locationsDetails: [], description: null },
+            { ...outageFixture, id: 'text', locationsDetails: [] },
+        ]);
+        assert.deepEqual(mergeEvents([stub, described], []).map((e) => e.id), ['o-text']);
     });
 
     it('keeps an anomaly whose subject matches but starts outside the window', () => {

@@ -320,11 +320,14 @@ const fetchCountryTraffic = async (query) => {
 //   - /radar/traffic_anomalies     (auto-detected drops, all statuses)
 // A verified anomaly is often promoted to an outage entry for the same event,
 // so anomalies that match an outage's subject and start time are dropped.
+// A subject is a location, an ASN, or an origin (a cloud region such as
+// "Google Cloud europe-west2"); an event with none of them and no text has
+// nothing to show and is dropped too (Radar files bare stub annotations).
 
 const DATE_RANGE = '30d';
 const MAX_EVENTS = 30;
 // An anomaly counts as a duplicate of an outage when they share a subject
-// (location or ASN) and start within this window of each other.
+// (location, ASN or origin) and start within this window of each other.
 const DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 // Both kinds normalize to one flat shape; anomaly-only fields stay null on
@@ -337,6 +340,7 @@ export const normalizeOutages = (annotations) => annotations.map((entry) => ({
     endDate: entry.endDate || null,
     locations: (entry.locationsDetails || []).map((loc) => loc.code),
     asns: (entry.asnsDetails || []).map((detail) => ({ asn: Number(detail.asn), name: detail.name })),
+    origins: (entry.originsDetails || []).map((detail) => ({ id: detail.origin, name: detail.name })),
     cause: entry.outage?.outageCause || 'UNKNOWN',
     level: entry.outage?.outageType || null,
     description: entry.description || null,
@@ -361,6 +365,9 @@ export const normalizeAnomalies = (anomalies) => anomalies
         asns: entry.asnDetails?.asn
             ? [{ asn: Number(entry.asnDetails.asn), name: entry.asnDetails.name }]
             : [],
+        origins: entry.originDetails?.origin
+            ? [{ id: entry.originDetails.origin, name: entry.originDetails.name }]
+            : [],
         cause: null,
         level: null,
         description: null,
@@ -368,10 +375,14 @@ export const normalizeAnomalies = (anomalies) => anomalies
         linkedUrl: null,
     }));
 
+const hasContent = (event) => event.locations.length > 0 || event.asns.length > 0
+    || event.origins.length > 0 || Boolean(event.description || event.scope);
+
 export const mergeEvents = (outages, anomalies) => {
     const isDuplicate = (anomaly) => outages.some((outage) => {
         const sharesSubject = anomaly.locations.some((code) => outage.locations.includes(code))
-            || anomaly.asns.some((a) => outage.asns.some((o) => o.asn === a.asn));
+            || anomaly.asns.some((a) => outage.asns.some((o) => o.asn === a.asn))
+            || anomaly.origins.some((a) => outage.origins.some((o) => o.id === a.id));
         if (!sharesSubject) return false;
         return Math.abs(Date.parse(anomaly.startDate) - Date.parse(outage.startDate)) <= DEDUPE_WINDOW_MS;
     });
@@ -379,6 +390,7 @@ export const mergeEvents = (outages, anomalies) => {
     // (endDate null), ended ones after, newest-first inside each group. The
     // cap then favors ongoing events by construction.
     return [...outages, ...anomalies.filter((anomaly) => !isDuplicate(anomaly))]
+        .filter(hasContent)
         .sort((a, b) => {
             const aOngoing = a.endDate === null;
             const bOngoing = b.endDate === null;

@@ -260,7 +260,8 @@
         "level": {
           "NATIONWIDE": "Nationwide",
           "REGIONAL": "Regional",
-          "NETWORK": "Network"
+          "NETWORK": "Network",
+          "PLATFORM": "Platform"
         }
       },
       "statuses": {

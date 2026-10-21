@@ -260,7 +260,8 @@
         "level": {
           "NATIONWIDE": "По всей стране",
           "REGIONAL": "Региональный",
-          "NETWORK": "Сеть"
+          "NETWORK": "Сеть",
+          "PLATFORM": "Платформа"
         }
       },
       "statuses": {
