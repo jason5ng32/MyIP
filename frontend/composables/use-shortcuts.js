@@ -50,10 +50,8 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         toggleInfoMask,
     } = refs;
 
-    const goToAdvancedTool = (slug, trackName) => {
-        advancedToolsRef.value.openTool(slug);
-        trackEvent('Nav', 'NavClick', trackName);
-    };
+    // openTool tracks the NavClick itself.
+    const goToAdvancedTool = (slug) => advancedToolsRef.value.openTool(slug);
 
     const config = [
         {
@@ -163,18 +161,18 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             },
             description: t('shortcutKeys.SpeedTestButton'),
         },
-        { keys: 'l', action: () => goToAdvancedTool('pingtest', 'PingTest'), description: t('shortcutKeys.PingTest') },
-        { keys: 'M', action: () => goToAdvancedTool('macchecker', 'MacChecker'), description: t('shortcutKeys.MacChecker') },
-        { keys: 'a', action: () => goToAdvancedTool('ipcalculator', 'IpCalculator'), description: t('shortcutKeys.IpCalculator') },
-        { keys: 't', action: () => goToAdvancedTool('mtrtest', 'MTRTest'), description: t('shortcutKeys.MTRTest') },
-        { keys: 'S', action: () => goToAdvancedTool('securitychecklist', 'SecurityChecklist'), description: t('shortcutKeys.SecurityChecklist') },
-        { keys: 'r', action: () => goToAdvancedTool('ruletest', 'RuleTest'), description: t('shortcutKeys.RuleTest') },
-        { keys: 'n', action: () => goToAdvancedTool('dnsresolver', 'DNSResolver'), description: t('shortcutKeys.DNSResolver') },
-        { keys: 'C', action: () => goToAdvancedTool('censorshipcheck', 'CensorshipCheck'), description: t('shortcutKeys.CensorshipCheck') },
-        { keys: 'b', action: () => goToAdvancedTool('browserinfo', 'BrowserInfo'), description: t('shortcutKeys.BrowserInfo') },
-        { keys: 'x', action: () => goToAdvancedTool('adblocktest', 'AdblockTest'), description: t('shortcutKeys.AdblockTest') },
-        { keys: 'W', action: () => goToAdvancedTool('whois', 'Whois'), description: t('shortcutKeys.Whois') },
-        { keys: 'v', action: () => goToAdvancedTool('servicestatus', 'ServiceStatus'), description: t('shortcutKeys.ServiceStatus') },
+        { keys: 'l', action: () => goToAdvancedTool('pingtest'), description: t('shortcutKeys.PingTest') },
+        { keys: 'M', action: () => goToAdvancedTool('macchecker'), description: t('shortcutKeys.MacChecker') },
+        { keys: 'a', action: () => goToAdvancedTool('ipcalculator'), description: t('shortcutKeys.IpCalculator') },
+        { keys: 't', action: () => goToAdvancedTool('mtrtest'), description: t('shortcutKeys.MTRTest') },
+        { keys: 'S', action: () => goToAdvancedTool('securitychecklist'), description: t('shortcutKeys.SecurityChecklist') },
+        { keys: 'r', action: () => goToAdvancedTool('ruletest'), description: t('shortcutKeys.RuleTest') },
+        { keys: 'n', action: () => goToAdvancedTool('dnsresolver'), description: t('shortcutKeys.DNSResolver') },
+        { keys: 'C', action: () => goToAdvancedTool('censorshipcheck'), description: t('shortcutKeys.CensorshipCheck') },
+        { keys: 'b', action: () => goToAdvancedTool('browserinfo'), description: t('shortcutKeys.BrowserInfo') },
+        { keys: 'x', action: () => goToAdvancedTool('adblocktest'), description: t('shortcutKeys.AdblockTest') },
+        { keys: 'W', action: () => goToAdvancedTool('whois'), description: t('shortcutKeys.Whois') },
+        { keys: 'v', action: () => goToAdvancedTool('servicestatus'), description: t('shortcutKeys.ServiceStatus') },
         {
             keys: 'q',
             // Async components (see Home.vue): ref is null until the chunk
@@ -219,7 +217,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     if (configs.value.originalSite) {
         config.push({
             keys: 'i',
-            action: () => goToAdvancedTool('invisibilitytest', 'InvisibilityTest'),
+            action: () => goToAdvancedTool('invisibilitytest'),
             description: t('shortcutKeys.InvisibilityTest'),
         });
         // Uppercase D mirrors lowercase `d` (refresh homepage DNS leak test) —
@@ -227,19 +225,19 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         // originalSite since the advanced card itself is gated the same way.
         config.push({
             keys: 'D',
-            action: () => goToAdvancedTool('enhanceddnsleaktest', 'EnhancedDnsLeakTest'),
+            action: () => goToAdvancedTool('enhanceddnsleaktest'),
             description: t('shortcutKeys.EnhancedDnsLeakTest'),
         });
         // Uppercase B: lowercase `b` belongs to Browser Info.
         config.push({
             keys: 'B',
-            action: () => goToAdvancedTool('blocklist', 'IpBlocklist'),
+            action: () => goToAdvancedTool('blocklist'),
             description: t('shortcutKeys.IpBlocklist'),
         });
         // Uppercase P: lowercase `p` belongs to Earth Online.
         config.push({
             keys: 'P',
-            action: () => goToAdvancedTool('personacheck', 'PersonaCheck'),
+            action: () => goToAdvancedTool('personacheck'),
             description: t('shortcutKeys.PersonaCheck'),
         });
     }
@@ -249,7 +247,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
     if (configs.value.cloudFlare) {
         config.push({
             keys: 'A',
-            action: () => goToAdvancedTool('asn', 'AsnProfile'),
+            action: () => goToAdvancedTool('asn'),
             description: t('shortcutKeys.AsnProfile'),
         });
     }

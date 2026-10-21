@@ -290,8 +290,7 @@ const goToSection = (section) => {
 
 const openTool = (slug) => {
   afterSheetClosed(() => navigateTo({ tool: slug }));
-  const name = slug.charAt(0).toUpperCase() + slug.slice(1);
-  trackEvent('Nav', 'NavClick', name);
+  trackEvent('Nav', 'NavClick', slug);
 };
 
 // Mobile: hide nav on scroll-down, show on scroll-up.

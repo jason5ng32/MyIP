@@ -85,8 +85,7 @@ const cardGroups = computed(() => groupToolsByCategory(
 // Open a tool's page. Also the keyboard shortcuts' entry point (exposed below).
 const openTool = (slug) => {
     router.push(`/tools/${slug}`);
-    const name = slug.charAt(0).toUpperCase() + slug.slice(1);
-    trackEvent('Nav', 'NavClick', name);
+    trackEvent('Nav', 'NavClick', slug);
 };
 
 const onCardClick = (e, slug) => {
