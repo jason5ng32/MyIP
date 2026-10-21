@@ -24,7 +24,6 @@ export const ADVANCED_TOOLS = [
   { slug: 'censorshipcheck', emoji: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', category: 'network', component: () => import('@/components/advanced-tools/CensorshipCheck.vue') },
   { slug: 'servicestatus', emoji: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', category: 'network', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
   { slug: 'browserinfo', emoji: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', category: 'network', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },
-  { slug: 'securitychecklist', emoji: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'network', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
   { slug: 'adblocktest', emoji: '🛡️', titleKey: 'adblocktest.Title', noteKey: 'advancedtools.AdblockTest', category: 'network', component: () => import('@/components/advanced-tools/AdblockTest.vue') },
   { slug: 'whois', emoji: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', category: 'lookup', component: () => import('@/components/advanced-tools/Whois.vue') },
   { slug: 'asn', emoji: '🛂', titleKey: 'asnprofile.Title', noteKey: 'advancedtools.AsnProfile', category: 'lookup', component: () => import('@/components/advanced-tools/AsnProfile.vue'), requiresConfig: 'cloudFlare' },
@@ -34,6 +33,7 @@ export const ADVANCED_TOOLS = [
   { slug: 'enhanceddnsleaktest', emoji: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
   { slug: 'blocklist', emoji: '🚫', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresOriginalSite: true },
   { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
+  { slug: 'securitychecklist', emoji: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'reference', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
 ];
 
 // slug → entry.
@@ -41,10 +41,12 @@ export const TOOL_BY_SLUG = new Map(ADVANCED_TOOLS.map((tool) => [tool.slug, too
 
 // Card groups, in render order. On a self-hosted deployment the 'deep' tools
 // (IPCheck.ing's private API) all fail their gates, and the group disappears.
+// 'reference' holds content to read and work through, not tools that test.
 export const TOOL_CATEGORIES = [
   { id: 'network', titleKey: 'advancedtools.category.network' },
   { id: 'lookup', titleKey: 'advancedtools.category.lookup' },
   { id: 'deep', titleKey: 'advancedtools.category.deep' },
+  { id: 'reference', titleKey: 'advancedtools.category.reference' },
 ];
 
 // Tools grouped by category in TOOL_CATEGORIES order (each keeping registry

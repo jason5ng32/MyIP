@@ -1073,7 +1073,8 @@
     "category": {
       "network": "网络诊断",
       "lookup": "查询与计算",
-      "deep": "深度检测"
+      "deep": "深度检测",
+      "reference": "参考资料"
     },
     "PingTestNote": "从世界各地 ping 你的 IP",
     "MTRTestNote": "从世界各地追踪你的网络路由",

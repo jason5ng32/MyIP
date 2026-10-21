@@ -1,7 +1,8 @@
 // Tests for the category layer of the Advanced Tools registry
 // (frontend/data/tools.js): every tool sits in a known category, the 'deep'
-// tools are exactly the original-site-only ones, and groupToolsByCategory
-// builds the card groups Advanced.vue renders.
+// tools are exactly the original-site-only ones, the 'reference' group holds
+// the Security Checklist, and groupToolsByCategory builds the card groups
+// Advanced.vue renders.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -24,6 +25,11 @@ describe('tool categories', () => {
     assert.deepEqual(deep, original);
   });
 
+  it('the reference group holds the Security Checklist', () => {
+    const reference = ADVANCED_TOOLS.filter((t) => t.category === 'reference').map((t) => t.slug);
+    assert.deepEqual(reference, ['securitychecklist']);
+  });
+
   it('the registry lists tools grouped by category, in TOOL_CATEGORIES order', () => {
     const order = ADVANCED_TOOLS.map((t) => CATEGORY_IDS.indexOf(t.category));
     assert.deepEqual(order, [...order].sort((a, b) => a - b));
@@ -41,7 +47,7 @@ describe('groupToolsByCategory', () => {
   it('drops a group whose tools were all filtered out', () => {
     const fork = ADVANCED_TOOLS.filter((t) => isToolAvailable(t, { originalSite: false, cloudFlare: false }));
     const groups = slugsByGroup(groupToolsByCategory(fork));
-    assert.deepEqual(Object.keys(groups), ['network', 'lookup']);
+    assert.deepEqual(Object.keys(groups), ['network', 'lookup', 'reference']);
     assert.ok(!groups.lookup.includes('asn'));
   });
 

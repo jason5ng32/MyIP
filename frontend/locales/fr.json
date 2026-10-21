@@ -1073,7 +1073,8 @@
     "category": {
       "network": "Diagnostic réseau",
       "lookup": "Recherche et calcul",
-      "deep": "Contrôles approfondis"
+      "deep": "Contrôles approfondis",
+      "reference": "Ressources"
     },
     "PingTestNote": "Pinguez votre IP depuis le monde entier",
     "MTRTestNote": "Tracez votre route réseau depuis le monde entier",

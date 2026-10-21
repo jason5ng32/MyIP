@@ -1073,7 +1073,8 @@
     "category": {
       "network": "Diagnóstico de rede",
       "lookup": "Consulta e cálculo",
-      "deep": "Verificações aprofundadas"
+      "deep": "Verificações aprofundadas",
+      "reference": "Material de referência"
     },
     "PingTestNote": "Faça ping no seu IP a partir de vários pontos do mundo",
     "MTRTestNote": "Trace sua rota de rede a partir de vários pontos do mundo",
