@@ -168,6 +168,10 @@ DOMAIN,ptest-5.ipcheck.ing,Proxy5
 DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
+DOMAIN,ptest-9.ipcheck.ing,Proxy9
+DOMAIN,ptest-10.ipcheck.ing,Proxy10
+DOMAIN,ptest-11.ipcheck.ing,Proxy11
+DOMAIN,ptest-12.ipcheck.ing,Proxy12
 ```
 
 </details>

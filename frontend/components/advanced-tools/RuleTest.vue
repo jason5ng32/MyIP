@@ -1,7 +1,7 @@
 <template>
     <div class="rule-test-section my-4 space-y-4">
         <!-- Top note -->
-        <p class="text-sm text-muted-foreground">{{ t('ruletest.Note') }}</p>
+        <p class="text-sm text-muted-foreground">{{ t('ruletest.Note', { n: ruleTests.length }) }}</p>
 
         <!-- Card grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -113,7 +113,7 @@ const createDefaultCard = () => ({
     org: t('ruletest.StatusWait'),
 });
 
-const ruleTests = ref(Array.from({ length: 8 }, (_, index) => ({
+const ruleTests = ref(Array.from({ length: 12 }, (_, index) => ({
     id: index + 1,
     url: `ptest-${index + 1}.ipcheck.ing`,
     ...createDefaultCard(),

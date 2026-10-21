@@ -1473,7 +1473,7 @@
   "ruletest": {
     "Title": "Teste de regras",
     "Name": "Teste",
-    "Note": "O Teste de regras é usado para determinar se as regras baseadas em domínio do software de proxy estão configuradas corretamente. Antes de executar o teste, consulte o cartão abaixo e configure regras de roteamento baseadas em domínio diferentes para as 8 URLs diferentes do IPCheck.ing no seu software de proxy. Normalmente, as regras podem usar um formato como: DOMAIN, ptest-3.ipcheck.ing, POLICY. O formato específico pode variar conforme o software de proxy usado.",
+    "Note": "O Teste de regras é usado para determinar se as regras baseadas em domínio do software de proxy estão configuradas corretamente. Antes de executar o teste, consulte o cartão abaixo e configure regras de roteamento baseadas em domínio diferentes para as {n} URLs diferentes do IPCheck.ing no seu software de proxy. Normalmente, as regras podem usar um formato como: DOMAIN, ptest-3.ipcheck.ing, POLICY. O formato específico pode variar conforme o software de proxy usado.",
     "StatusWait": "Aguardando teste",
     "StatusTesting": "Testando…",
     "StatusError": "Erro no teste",
