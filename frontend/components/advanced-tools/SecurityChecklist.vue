@@ -130,7 +130,7 @@
                                         class="size-5 text-muted-foreground" />
                                     {{ fullList[currentList].title }}
                                 </h2>
-                                <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
+                                <Collapsible :open="isCategoryIntroOpen" @update:open="toggleCategoryIntro">
                                     <span class="flex items-center">
                                         <span class="text-sm text-muted-foreground leading-relaxed">
                                             {{ fullList[currentList].description }}
@@ -310,10 +310,17 @@ const checklistIconMap = {
 };
 const getChecklistIcon = (slug) => checklistIconMap[slug] || Info;
 
+// GA labels read as a funnel: ChangeList → ItemInfo / CategoryIntro → Check / Ignore.
 const isCategoryIntroOpen = ref(false);
+const toggleCategoryIntro = (open) => {
+    isCategoryIntroOpen.value = open;
+    if (open) trackEvent('SecurityChecklist', 'SecurityChecklist', 'CategoryIntro');
+};
+
 const checklistInfoOpen = ref({});
 const toggleChecklistInfo = (index) => {
     checklistInfoOpen.value[index] = !checklistInfoOpen.value[index];
+    if (checklistInfoOpen.value[index]) trackEvent('SecurityChecklist', 'SecurityChecklist', 'ItemInfo');
 };
 
 const { t, locale } = useI18n();
@@ -479,12 +486,14 @@ const ignoreItem = (item) => {
     item.ignored = !item.ignored;
     item.checked = false;
     updateSlugs(item.slug, item.ignored ? 'ignored' : '');
+    if (item.ignored) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Ignore');
 };
 
 const checkItem = (item) => {
     if (item.ignored) return;
     item.checked = !item.checked;
     updateSlugs(item.slug, item.checked ? 'checked' : '');
+    if (item.checked) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Check');
     // Achievement rules (SurfaceCheck / HalfwayThere / FullySecured) live in
     // data/achievement-rules.js.
     emitAppEvent('securitychecklist:progress', {
