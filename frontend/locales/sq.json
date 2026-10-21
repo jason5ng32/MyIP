@@ -1,0 +1,2136 @@
+{
+  "user": {
+    "SignIn": "Hyr",
+    "SignInWithGoogle": "Hyr me Google",
+    "SignInWithGithub": "Hyr me GitHub",
+    "SignOut": "Dil",
+    "SignInToView": "Hyr për ta parë",
+    "SignInToUse": "Ju lutem hyni për ta përdorur",
+    "InvalidUserToken": "Token i pavlefshëm përdoruesi",
+    "QuotaExceeded": "E keni shpenzuar kuotën falas të këtij muaji për këtë veçori. Ajo rivendoset automatikisht muajin e ardhshëm.",
+    "QuotaSponsorCta": "Na sponsorizoni",
+    "ViewUsage": "Shiko përdorimin",
+    "Usage": {
+      "Title": "Statistikat e përdorimit",
+      "Note": "Veçoritë e avancuara vijnë me një kuotë mujore falas, e cila rivendoset automatikisht në fillim të çdo muaji (UTC). Kërkimet e përsëritura të të dhënave të avancuara të IP-së shërbehen nga memoria e përkohshme dhe nuk e shpenzojnë kuotën tuaj.",
+      "IpinfoFeature": "Të dhëna të avancuara të IP-së",
+      "PercentUsed": "{percent}% e përdorur",
+      "SponsorNote": "Sponsorizimi në GitHub i rrit kuotat tuaja mujore."
+    },
+    "MyAchievements": "Arritjet e mia",
+    "Fields": {
+      "User": "Përdoruesi",
+      "CreatedAt": "Krijuar më",
+      "LastLogin": "Hyrja e fundit",
+      "Level": "Niveli i përdoruesit",
+      "Fetching": "Duke marrë...",
+      "SignInMethods": "Hyrja"
+    },
+    "Level": {
+      "Standard": "Përdorues standard",
+      "Premium": "Përdorues premium",
+      "Owner": "Administrator",
+      "Developer": "Zhvillues",
+      "HonoraryMember": "Anëtar nderi"
+    },
+    "Benefits": {
+      "Title": "Përfitimet dhe përdorimi",
+      "Benefit": "Përfitimet",
+      "Note1": "Si produkt me burim të hapur, IPCheck.ing është falas për t'u përdorur. Mirëmbajtja e tij kërkon përpjekje dhe kosto të konsiderueshme.",
+      "Note2": "Për ta mbajtur projektin në funksion në mënyrë të qëndrueshme dhe për të parandaluar abuzimin, disa veçori të avancuara kërkojnë hyrjen. Çdo përdorues i kyçur merr një kuotë mujore bujare — nëse nuk ju mjafton, mendoni të na sponsorizoni për të zhbllokuar kufij më të lartë.",
+      "Current": "Aktual",
+      "Tiers": {
+        "Visitor": {
+          "Name": "Vizitorët",
+          "Item1": "Kërkim IP me krahasim nga shumë burime",
+          "Item2": "Kontrolle të lidhshmërisë dhe disponueshmërisë së shërbimeve",
+          "Item3": "Teste të rrjedhjes WebRTC / DNS",
+          "Item4": "Test shpejtësie, vonesë globale dhe MTR",
+          "Item5": "Whois, zgjidhës DNS dhe mjete të tjera të avancuara",
+          "Item6": "Pa regjistrim — me burim të hapur dhe i vetë-strehueshëm"
+        },
+        "SignedIn": {
+          "Name": "Përdoruesit e kyçur",
+          "Item1": "Gjithçka që kanë Vizitorët",
+          "Item2": "Shikoni të dhënat e avancuara të IP-së: pikët e cilësisë, zbulimin e proxy-t, llojin e rrjetit dhe përputhjen vendase",
+          "Item3": "Përdorni testin e padukshmërisë",
+          "Item4": "Përdorni testin e thelluar të rrjedhjes DNS",
+          "Item5": "Shikoni distinktivët e arritjeve tuaja",
+          "Item6": "Pyetni IPilot, asistentin tonë AI",
+          "Item7": "Veçoritë e avancuara vijnë me një kuotë mujore falas që rivendoset çdo muaj"
+        },
+        "Sponsor": {
+          "Name": "Sponsorët",
+          "Item1": "Gjithçka që kanë Përdoruesit e kyçur",
+          "Item2": "Kuota mujore më të larta për veçoritë e avancuara",
+          "Item3": "Mbështetni zhvillimin e vazhdueshëm të këtij projekti me burim të hapur"
+        }
+      }
+    },
+    "Achievements": {
+      "Title": "Arritjet",
+      "Note": "Gjatë përdorimit të IPCheck.ing mund të aktivizoni disa arritje. Këtu mund t'i shihni të gjitha arritjet tuaja.",
+      "Get": "Të fituara",
+      "GetCount": "Arritje të fituara",
+      "NotGet": "Ende jo",
+      "NotGetCount": "Arritje ende të pafituara",
+      "FooterNote": "Ndonjëherë mund të ketë arritje me kohë të kufizuar.",
+      "Congrats": "🎉 Urime",
+      "CongratsMessage": "Keni fituar një arritje të re!",
+      "NewAchievementIs": "Arritja e re është:",
+      "Type": {
+        "IAmHuman": {
+          "Title": "Jam njeri",
+          "Meet": "Përdorni IPCheck.ing pasi të hyni në llogari"
+        },
+        "BarelyEnough": {
+          "Title": "Mezi mjafton",
+          "Meet": "Shpejtësia e shkarkimit kalon 100Mb/s"
+        },
+        "RapidPace": {
+          "Title": "Ritëm i shpejtë",
+          "Meet": "Shpejtësia e shkarkimit kalon 500Mb/s"
+        },
+        "TorrentFlow": {
+          "Title": "Rrjedhë e furishme",
+          "Meet": "Shpejtësia e shkarkimit kalon 1000Mb/s"
+        },
+        "SteadyGoing": {
+          "Title": "Ecje e qëndrueshme",
+          "Meet": "Shpejtësia e ngarkimit kalon 50Mb/s"
+        },
+        "TooFastTooSimple": {
+          "Title": "Shumë shpejt, shumë thjesht",
+          "Meet": "Shpejtësia e ngarkimit kalon 200Mb/s"
+        },
+        "SwiftAscent": {
+          "Title": "Ngjitje e shpejtë",
+          "Meet": "Shpejtësia e ngarkimit kalon 1000Mb/s"
+        },
+        "SurfaceCheck": {
+          "Title": "Kontroll sipërfaqësor",
+          "Meet": "Përfundoni një pikë të listës së sigurisë"
+        },
+        "HalfwayThere": {
+          "Title": "Në gjysmë të rrugës",
+          "Meet": "Përfundoni 50% të listës së sigurisë"
+        },
+        "FullySecured": {
+          "Title": "Plotësisht i siguruar",
+          "Meet": "Përfundoni të gjithë listën e sigurisë"
+        },
+        "JustInCase": {
+          "Title": "Për çdo rast",
+          "Meet": "Përfundoni një test fshehtësie"
+        },
+        "HiddenWell": {
+          "Title": "Mirë i fshehur",
+          "Meet": "Probabiliteti i proxy-t dhe i VPN-së janë të dyja 0 në testin e fshehtësisë"
+        },
+        "SlipUp": {
+          "Title": "Gabim i vogël",
+          "Meet": "Probabiliteti i proxy-t ose i VPN-së është mbi 50% në testin e fshehtësisë"
+        },
+        "CleverTrickery": {
+          "Title": "Dinakëri e zgjuar",
+          "Meet": "Patë të gjitha shkurtoret e tastierës"
+        },
+        "EnergySaver": {
+          "Title": "Kursyes energjie",
+          "Meet": "Caktoni programin të mos ekzekutohet automatikisht"
+        },
+        "ResourceHog": {
+          "Title": "Gllabërues burimesh",
+          "Meet": "Caktoni rifreskime të shumëfishta për disponueshmërinë"
+        },
+        "MakingBigNews": {
+          "Title": "Bëj bujë",
+          "Meet": "Thirrjet e funksioneve të avancuara kalojnë 1000 herë"
+        },
+        "GenerousDonor": {
+          "Title": "Dhurues bujar",
+          "Meet": "Dhuruat për projektin IPCheck.ing"
+        },
+        "ItIsOpen": {
+          "Title": "Është e hapur",
+          "Meet": "Gjetët një faqe të bllokuar te Kontrolli i censurës"
+        },
+        "CuriousCat": {
+          "Title": "Mace kureshtare",
+          "Meet": "Kërkoni informacionin e IPCheck.ing te Kërkimi Whois"
+        },
+        "CrossingTheWall": {
+          "Title": "Kalimi i murit",
+          "Meet": "Të 8 IP-të e testit janë të ndryshme te Testi i rregullave"
+        },
+        "GlobeTrotter": {
+          "Title": "Udhëtar i botës",
+          "Meet": "Arrini 10 shtete ose rajone në historikun e IP-ve"
+        },
+        "HelloWorld": {
+          "Title": "Hello World",
+          "Meet": "Ndani një gjendje te Toka Online"
+        },
+        "AddSweetAdd": {
+          "Title": "Shto, ëmbël shto",
+          "Meet": "Shtoni një objektiv të personalizuar te testi i Lidhshmërisë"
+        },
+        "PrettyDirty": {
+          "Title": "Mjaft e pistë",
+          "Meet": "Një kartë IP tregon pikë cilësie 1"
+        },
+        "SqueakyClean": {
+          "Title": "E pastër si loti",
+          "Meet": "Një kartë IP tregon pikë cilësie 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Shëtitje me pinguinët",
+          "Meet": "Një kartë IP ju vendos në Antarktidë"
+        }
+      }
+    }
+  },
+  "nav": {
+    "id": "nav",
+    "Navigation": "Navigimi",
+    "Home": "Kreu",
+    "IPInfo": "Informacioni i IP-së",
+    "Connectivity": "Lidhshmëria",
+    "ServiceStatus": "Gjendja e shërbimeve",
+    "WebRTC": "Testi i rrjedhjes WebRTC",
+    "DNSLeakTest": "Testi i rrjedhjes DNS",
+    "SpeedTest": "Testi i shpejtësisë",
+    "AdvancedTools": "Mjete të avancuara",
+    "SearchDocs": "Kërko në dokumentacion…",
+    "DocsToolConfirm": "Të ndahen rezultatet aktuale të testeve?",
+    "DocsToolSummary": "Lexova rezultatet në faqen tuaj",
+    "DocsToolRunConfirm": "Të ekzekutohen testet në faqen tuaj?",
+    "DocsToolRunSummary": "Ekzekutova testet e rrjetit",
+    "AskIPilot": "Pyet IPilot",
+    "OpenDocs": "Hap dokumentacionin",
+    "DocsGreetingTitle": "Si mund t'ju ndihmoj?",
+    "DocsGreetingSubtitle": "Më pyetni çfarëdo për MyIP — mjetet, rezultatet tuaja ose vetë-strehimin.",
+    "DocsQuestions": [
+      "A po e zbulon VPN-ja IP-në time të vërtetë?",
+      "Pse është e gabuar vendndodhja e IP-së sime?",
+      "Krahaso rezultatet e testit WebRTC dhe të testit të rrjedhjes DNS dhe më jep sugjerime",
+      "Si t'i lexoj rezultatet e MTR?",
+      "Si ta vendos instancën time të MyIP?",
+      "Dua të sponsorizoj projektin MyIP"
+    ],
+    "pulse": {
+      "title": "Toka Online",
+      "tooltip": "Vizitorë nga e gjithë bota",
+      "others": "Të tjerë",
+      "shareStatus": "Ndani gjendjen tuaj",
+      "liveMap": "Harta e nxehtësisë së vizitorëve në kohë reale",
+      "noVisitors": "Ende nuk ka vizitorë",
+      "quiet": "Gjithçka e qetë tani — bëhuni të parët që ndajnë gjendjen",
+      "loadError": "Aktiviteti i fundit nuk u ngarkua — provoni sërish pas pak",
+      "share": "Pjesa e vizitorëve",
+      "latest": "Më të fundit",
+      "sent": "U dërgua",
+      "alreadySent": "Kjo gjendje është dërguar tashmë",
+      "rateLimited": "Mund të ndani vetëm një gjendje brenda një periudhe të shkurtër",
+      "limitedTitle": "Gjendje me kohë të kufizuar",
+      "outages": {
+        "title": "Ndërprerjet globale",
+        "outage": "Ndërprerje e internetit",
+        "anomaly": "Anomali trafiku",
+        "ongoing": "Në vazhdim",
+        "ended": "U rikthye",
+        "started": "Filloi {time}",
+        "lasted": "Zgjati {duration}",
+        "quiet": "Gjithçka e qetë — asnjë ndërprerje në 30 ditët e fundit",
+        "loadMore": "Ngarko më shumë",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Me urdhër të qeverisë",
+          "POWER_OUTAGE": "Ndërprerje e energjisë",
+          "CABLE_CUT": "Kabllo e prerë",
+          "TECHNICAL_PROBLEM": "Problem teknik",
+          "MECHANICAL": "Problem mekanik",
+          "UNKNOWN": "Shkak i panjohur",
+          "WEATHER": "Mot i rëndë",
+          "FIRE": "Zjarr",
+          "CYBERATTACK": "Sulm kibernetik",
+          "NATURAL_DISASTER": "Fatkeqësi natyrore",
+          "MAINTENANCE": "Mirëmbajtje",
+          "MILITARY_ACTION": "Veprim ushtarak"
+        },
+        "level": {
+          "NATIONWIDE": "Mbarëkombëtare",
+          "REGIONAL": "Rajonale",
+          "NETWORK": "Rrjet",
+          "PLATFORM": "Platformë"
+        }
+      },
+      "statuses": {
+        "fast": "Rrjet tepër i shpejtë",
+        "ok": "Gjithçka në rregull këtu",
+        "slow": "Rrjeti duket i ngadaltë",
+        "flaky": "Lidhja shkëputet vazhdimisht",
+        "blocked": "Një faqe nuk hapet",
+        "good": "Ndihem mirë sot",
+        "bad": "Ditë e vështirë sot",
+        "passing": "Thjesht kalimthi",
+        "lag": "Vonesa në lojë është e pabesueshme",
+        "newip": "Sapo mora një IP të re",
+        "vpn": "Duke lundruar përmes VPN-së",
+        "night": "Zgjuar vonë sonte",
+        "vibing": "Vibe coding",
+        "fixing": "Duke rregulluar sërish Wi-Fi-në e familjes",
+        "tuning": "Edhe 10ms më pak",
+        "prgday": "Gëzuar ditën e 0x100-të!",
+        "internetday": "LO dhe ja, gëzuar Ditën e Internetit",
+        "halloween": "Trick or ping!",
+        "diwali": "Festa e dritave (dhe e fibrës)",
+        "christmas": "Babadimri është në një rrugë me vonesë të ulët",
+        "newyear": "Vit i ri, IP e re!",
+        "privacyday": "Kjo gjendje është e enkriptuar skaj-më-skaj",
+        "lunar": "U mbërrifshin të gjitha zarfet e kuqe",
+        "valentine": "Në kërkim të një lidhjeje të qëndrueshme",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "Bajram Mubarek, botë!",
+        "aprilfools": "IP-ja ime është 127.0.0.1",
+        "earthday": "Po shkëputem për të prekur barin",
+        "turing": "Kjo gjendje u dërgua nga një njeri. Ndoshta.",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "Gëzuar ditëlindjen, IPCheck.ing!"
+      },
+      "festivalDesc": {
+        "prgday": "Dita e Programuesve — dita e 256-të e vitit, 0x100 në heksadecimal",
+        "internetday": "29 tetor 1969: ARPANET provoi të dërgonte LOGIN — u rrëzua pas “LO”",
+        "halloween": "Halloween (31 tetor) — gjëja më e frikshme mbetet humbja e paketave",
+        "diwali": "Diwali — u ndriçofshin si llambat, ashtu edhe fibra juaj",
+        "christmas": "Krishtlindjet — sajë në linjë të dedikuar, zero luhatje",
+        "newyear": "Viti i Ri — fishekzjarrët të përfshirë, pa gjerësi brezi shtesë",
+        "privacyday": "Dita e Privatësisë së të Dhënave (28 janar) — po, e kuptojmë ironinë e transmetimit të kësaj",
+        "lunar": "Viti i Ri Hënor — zero humbje paketash te zarfet e kuqe",
+        "valentine": "Dita e Shën Valentinit — si TCP, ashtu edhe dashuria e vërtetë nisin me një shtrëngim duarsh",
+        "jobs": "Ditëlindja e Steve Jobs (24 shkurt 1955) — nga fjalimi i tij në Stanford në 2005",
+        "eid": "Bajrami i Ramazanit — urime të ngrohta nga ky cep i Tokës Online",
+        "aprilfools": "Dita e Gënjeshtrave — s'ka vend si 127.0.0.1",
+        "earthday": "Dita e Tokës (22 prill) — edhe Toka Online rekomandon pak Tokë Offline",
+        "turing": "Ditëlindja e Alan Turing (23 qershor 1912) — babai i testit të Turingut",
+        "emojiday": "Dita Botërore e Emoji-ve (17 korrik) — fjalët janë kaq shekullin e kaluar",
+        "birthday": "Ditëlindja e IPCheck.ing — v1.0 doli më 6 nëntor 2020"
+      }
+    },
+    "preferences": {
+      "title": "Preferencat",
+      "preferenceTips": "Këto cilësime ruhen në shfletuesin tuaj për t'u ripërdorur lehtë. Disa opsione kërkojnë rifreskimin e faqes që të hyjnë në fuqi.",
+      "colorScheme": "Skema e ngjyrave",
+      "systemAuto": "Automatike",
+      "colorLight": "Ditë",
+      "colorDark": "Natë",
+      "ipSourcesToCheck": "Serverët për kontrollin e IP-ve",
+      "ipSourcesToCheckTips": "Zgjidhni numrin e serverëve për të kontrolluar adresën tuaj IP. Sa më shumë serverë të zgjidhni, aq më shumë kohë do të duhet për të përfunduar kontrollin.",
+      "appSettings": "Cilësimet e programit",
+      "autoRun": "Ekzekutim automatik",
+      "autoRunTips": "Informacioni i IP-së kontrollohet gjithmonë kur ngarkohet faqja. Zgjidhni cilat module të tjera të ekzekutohen automatikisht në nisje.",
+      "simpleMode": "Modaliteti i thjeshtë",
+      "simpleModeTips": "Fsheh tekstin përshkrues të çdo moduli, i përshtatshëm për përdoruesit që e njohin tashmë aplikacionin.",
+      "connectivity": {
+        "defaultList": "Lista e parazgjedhur",
+        "defaultListTips": "Lista me të cilën hapet seksioni kur ngarkohet faqja.",
+        "multipleTests": "Rifreskime të shumëfishta",
+        "multipleTestsTips": "Kryen disa kontrolle për çdo kalim dhe shfaq vonesën më të ulët.",
+        "notifications": "Njoftime që shfaqen",
+        "notificationsTips": "Rezultatet e kontrollit fillestar shfaqen si njoftim.",
+        "titleOpensSite": "Titulli i kartës hap faqen",
+        "titleOpensSiteTips": "Klikimi mbi titullin e një karte e hap faqen në një skedë të re; kur është i çaktivizuar, titulli mbetet tekst i thjeshtë."
+      },
+      "ipHistory": "Historiku i IP-ve",
+      "ipHistoryEnabled": "Regjistro historikun e IP-ve",
+      "ipHistoryDays": "Ditët e ruajtjes",
+      "ipHistoryTips": "Kur është aktivizuar, IP-të e zbuluara regjistrohen vetëm në këtë shfletues dhe ruhen për numrin e zgjedhur të ditëve. Çaktivizimi ndalon regjistrimin; të dhënat ekzistuese mbeten derisa t'i fshini te paneli i Historikut të IP-ve.",
+      "ipDB": "Baza e të dhënave të gjeolokacionit të IP-së",
+      "ipDBTips": "Mund të zgjidhni burimin e parazgjedhur të gjeolokacionit të IP-së. Nëse burimi i zgjedhur nuk është i disponueshëm, sistemi do të përdorë burimet pasuese sipas radhës.",
+      "language": "Cilësimi i gjuhës",
+      "languageTips": "Hyn në fuqi pas rifreskimit të shfletuesit. Gjuhët në beta mund të kenë përkthime të paplota."
+    },
+    "DocsPrompt": "Shkruani pyetjen tuaj…",
+    "DocsSignInTitle": "Kërkohet hyrja",
+    "DocsSignInMessage": "Hyni për të pyetur IPilot"
+  },
+  "securitychecklist": {
+    "Title": "Lista e sigurisë",
+    "Note": "Kjo është një listë shumë e plotë kontrolli për sigurinë kibernetike, që mbulon aspekte si siguria e fjalëkalimeve, siguria e shfletimit dhe siguria e pajisjeve celulare. Në mjedisin e sotëm, rrjedhjet e informacionit mund të sjellin humbje të mëdha, ndaj është e nevojshme të sigurohemi që e mbrojmë privatësinë tonë dhe e forcojmë sigurinë e aksesit kur jemi të lidhur në internet.",
+    "Note2": "Kjo listë përmban shumë pika; nuk keni nevojë t'i kontrolloni të gjitha njëherësh. Progresi ruhet në shfletues dhe mund të ktheheni kurdo për të vazhduar kontrollet.",
+    "Progress": "Progresi i kontrollit",
+    "Item": "Pikë",
+    "Items": "Pikë ",
+    "Priority": "Prioriteti",
+    "Ignore": "Shpërfill",
+    "alert-total": "Kontrolli i sigurisë ka gjithsej",
+    "alert-checked": "Keni përfunduar",
+    "alert-ignored": "Shpërfillur",
+    "alert-unchecked": "Pa kontrolluar.",
+    "Checked": "Kontrolluar",
+    "Ignored": "Shpërfillur",
+    "Unchecked": "Pa kontrolluar",
+    "Basic": "Bazë",
+    "Optional": "Opsionale",
+    "Essential": "Thelbësore",
+    "Advanced": "E avancuar",
+    "Reset": "Rivendos listën",
+    "ShowAll": "Shfaq të gjitha",
+    "ShowUnchecked": "Shfaq të pakontrolluarat",
+    "ShowIgnored": "Shfaq të shpërfillurat",
+    "ShowChecked": "Shfaq të kontrolluarat"
+  },
+  "curl": {
+    "Title": "API për rreshtin e komandave",
+    "Note1": "Hej, del që edhe juve ju pëlqen terminali?",
+    "Note2_1": "Mund të përdorni komandën",
+    "Note2_2": "për të marrë adresën IP të pajisjes suaj në terminal",
+    "Note3": "është një shteg opsional; nëse e shtoni, merrni informacionin gjeografik të IP-së",
+    "getIPv4": "Merr adresën IPv4 të pajisjes lokale",
+    "getIPv6": "Merr adresën IPv6 të pajisjes lokale",
+    "get6and4": "Merr adresën IP të daljes së preferuar të rrjetit të pajisjes lokale"
+  },
+  "browserinfo": {
+    "Title": "Informacioni i shfletuesit",
+    "Note": "Kjo faqe shfaq dy lloje informacioni për shfletuesin: informacion bazë që nxirret nga User Agent-i i shfletuesit dhe një gjurmë shfletuesi që llogaritet përmes metrikave të ndryshme. Gjurmët e shfletuesit janë si shenjat e gishtave në dorën tuaj; sa më shumë informacion ekspozon shfletuesi, aq më unik jeni për faqet e internetit dhe aq më lehtë ju gjurmojnë. Ndonjëherë, edhe kalimi në modalitetin inkognito ose ndërrimi i shfletuesit mund të mos e ndryshojë gjurmën tuaj.",
+    "Note2": "Metodat për llogaritjen e gjurmës së shfletuesit janë të shumëllojshme dhe qasje të ndryshme teknike mund të japin rezultate jo të njëjta. Këtu përdorim një metodë relativisht të thjeshtë për llogaritjen.",
+    "browser": {
+      "Infos": "Informacioni i shfletuesit",
+      "browserName": "Emri i shfletuesit",
+      "engineName": "Motori",
+      "osName": "Sistemi operativ",
+      "deviceVendor": "Prodhuesi",
+      "cpuArchitecture": "Arkitektura e CPU-së",
+      "gpu": "GPU",
+      "cpuCores": "Bërthamat e CPU-së",
+      "languages": "Gjuhët",
+      "timezone": "Zona kohore",
+      "display": "Ekrani",
+      "connection": "Lidhja",
+      "touchPoints": "Pikat e prekjes",
+      "doNotTrack": "Do Not Track",
+      "doNotTrackOn": "Aktiv",
+      "doNotTrackOff": "Joaktiv",
+      "doNotTrackUnset": "I pacaktuar",
+      "pdfViewer": "Shikuesi i PDF-ve",
+      "pdfViewerYes": "Po",
+      "pdfViewerNo": "Jo",
+      "cookieEnabled": "Cookies të aktivizuara",
+      "cookieEnabledTrue": "Po",
+      "cookieEnabledFalse": "Jo"
+    },
+    "fingerprint": {
+      "Infos": "Informacioni i gjurmës",
+      "fingerprint": "Kodi i gjurmës",
+      "changeOption": "Mund të provoni të ndryshoni të dhënat që përdoren për llogaritjen e gjurmës së shfletuesit për të vëzhguar ndryshimet (mos harroni ta krahasoni në modalitetin inkognito).",
+      "browserTips": "Disa shfletues, si Safari, i mbrojnë përdoruesit nga gjurmimi duke krijuar vlera të ndryshme gjurme çdo herë, edhe kur zgjidhen të njëjtat të dhëna."
+    },
+    "options": {
+      "audio": "Audio",
+      "canvas": "Canvas",
+      "fonts": "Fontet",
+      "hardware": "Hardueri",
+      "locales": "Gjuhët",
+      "permissions": "Lejet",
+      "plugins": "Shtojcat",
+      "screen": "Ekrani",
+      "system": "Versioni i shfletuesit",
+      "webgl": "WebGL",
+      "math": "Matematika",
+      "intl": "Formatuesit Intl",
+      "mediaDevices": "Pajisjet e medias",
+      "speech": "Sinteza e të folurit",
+      "mathml": "MathML",
+      "webrtc": "WebRTC"
+    },
+    "components": {
+      "title": "Përbërësit e gjurmës",
+      "note": "Secili përbërës më poshtë kontribuon në hash-in më sipër. Ndryshoni pikat te paneli i Gjurmës për t'i përjashtuar nga gjurma."
+    },
+    "calError": "Llogaritja e informacionit të shfletuesit dështoi, ju lutem rifreskoni dhe provoni sërish.",
+    "calculating": "Duke llogaritur..."
+  },
+  "censorshipcheck": {
+    "Title": "Kontrolli i censurës",
+    "Note": "Shikoni ku është bllokuar ose ndërhyrë një faqe interneti gjatë 30 ditëve të fundit — dhe si — bazuar në të dhënat e hapura të rrjetit global të vullnetarëve të OONI. Pastaj mund t'i verifikoni rajonet e dyshimta me një test sondash në kohë reale të Globalping. Në disa shtete, censura e internetit është e përcaktuar qartë me ligj, ndërsa në të tjera është më e paqartë.",
+    "Note2": "Ju lutem shkruani një URL ose emër domeni për të nisur kërkimin:",
+    "Placeholder": "URL ose emër domeni",
+    "Country": "Rajoni",
+    "Status": "Gjendja",
+    "City": "Qyteti",
+    "Network": "Rrjeti",
+    "invalidURL": "URL ose emër domeni i pavlefshëm",
+    "fetchError": "Rezultatet e testit nuk u morën dot",
+    "HistoryTitle": "Vëzhgime globale, 30 ditët e fundit",
+    "SummaryFlagged": "Shenja bllokimi ose ndërhyrjeje u vunë re në {n} shtete/rajone gjatë 30 ditëve të fundit.",
+    "SummaryClean": "Nuk u vunë re shenja të qarta bllokimi në {n} shtete/rajone gjatë 30 ditëve të fundit.",
+    "SummarySparseFlagged": "Gjatë 30 ditëve të fundit, vetëm {total} shtete/rajone e vëzhguan këtë faqe, nga të cilat {n} treguan shenja bllokimi ose ndërhyrjeje.",
+    "SummarySparseClean": "Gjatë 30 ditëve të fundit, vetëm {total} shtete/rajone e vëzhguan këtë faqe ({m} matje) — shumë pak të dhëna për të thënë nëse është e bllokuar.",
+    "NoData": "Nuk ka matje për këtë faqe në 30 ditët e fundit — gjë që nuk do të thotë se nuk është e bllokuar. Mund të zgjidhni më poshtë shtetet me censurë të rëndë dhe të kryeni një test në kohë reale.",
+    "OoniError": "Të dhënat historike të vëzhgimit janë përkohësisht të padisponueshme — API-ja e burimit mund të ketë probleme. Mund të zgjidhni ende shtete më poshtë dhe të kryeni një test në kohë reale.",
+    "TierConfirmed": "Bllokim i konfirmuar",
+    "TierLikely": "Bllokim i mundshëm",
+    "TierSigns": "Ndërhyrje e pjesshme",
+    "Measurements": "{n} matje",
+    "AnomalyShare": "{pct}% anomale",
+    "MethodDns": "Manipulim i DNS",
+    "MethodTcpIp": "Bllokim TCP",
+    "MethodHttpFailure": "Dështim i lidhjes",
+    "MethodHttpDiff": "Manipulim i përmbajtjes",
+    "RealtimeTitle": "Test në kohë reale",
+    "ResultsHint": "Rezultatet do të shfaqen këtu pasi të zgjidhni sondat dhe të kryeni testin.",
+    "SectionFlagged": "Shtetet e shënuara",
+    "PresetHighRisk": "Shtete me censurë të rëndë",
+    "PresetOpen": "Shtete zakonisht të hapura",
+    "RunVerify": "Kryej testin në kohë reale",
+    "RealtimeNote": "Mund të zgjidhni disa sonda për testim të lidhshmërisë në kohë reale, për të vlerësuar plotësisht gjendjen e bllokimit të faqes. Gjatë testit ekzekutohen 2 sonda për çdo shtet; rezultatet që përputhen nga të dyja sondat tregojnë besueshmëri më të lartë.",
+    "RealtimeFooterNote": "Sondat në kohë reale ekzekutohen kryesisht nga rrjete qendrash të dhënash; rezultatet e tyre mund të ndryshojnë nga vëzhgimet reale në rrjetet shtëpiake, pasi disa faqe mund ta bllokojnë aksesin nga rrjetet e qendrave të të dhënave. Ju lutem lexojini së bashku dhe gjykoni sipas situatës reale."
+  },
+  "invisibilitytest": {
+    "Title": "Testi i padukshmërisë",
+    "Note": "Kur përdorni një proxy ose VPN, a nuk e dinë vërtet faqet që vizitoni se po përdorni proxy? A jeni vërtet të padukshëm? Do të përdorim metoda të ndryshme për të gjetur dobësitë e maskimit tuaj dhe prova që po përdorni proxy. Edhe pse disa rezultate të testit mund të mos jenë plotësisht të sakta, ky test mbetet shumë informues.",
+    "Note2": "Pasi të klikoni Ekzekuto, sistemi do të ekzekutojë një skript që zakonisht i përfundon të gjitha testet brenda 10 sekondave. Gjatë këtij procesi, informacioni i IP-së, informacioni i shfletuesit etj. do të mblidhen dhe analizohen në sfond.",
+    "fetchError": "Rezultatet e testit nuk u morën dot",
+    "scriptLoadError": "Skripti i testit nuk u ngarkua, ndaj testi nuk mund të vazhdojë. Ju lutem kontrolloni rrjetin dhe provoni sërish.",
+    "yourIP": "IP-ja juaj kryesore e testit është",
+    "proxyScore": "Përqindja e proxy-t",
+    "VPNScore": "Përqindja e VPN-së",
+    "isProxy": "Mund të jeni duke përdorur një proxy.",
+    "notProxy": "Nuk u gjet asnjë provë që po përdorni proxy.",
+    "isVPN": "Mund të jeni duke përdorur një VPN.",
+    "notVPN": "Nuk u gjet asnjë provë që po përdorni VPN.",
+    "itemName": "Pika e testit",
+    "itemProxyResult": "Rezultati i testit",
+    "itemComment": "Analiza",
+    "agreement": "Pajtohem",
+    "blocklist": {
+      "proxy": {
+        "title": "Lista e proxy-ve",
+        "positive": "IP-ja juaj është në listën e proxy-ve.",
+        "negative": "IP-ja juaj nuk është në listën e proxy-ve."
+      },
+      "vpn": {
+        "title": "Lista e VPN-ve",
+        "positive": "IP-ja juaj është në listën e VPN-ve.",
+        "negative": "IP-ja juaj nuk është në listën e VPN-ve."
+      },
+      "vpnExitNode": {
+        "title": "Lista e nyjeve dalëse VPN",
+        "positive": "IP-ja juaj është në listën e nyjeve dalëse VPN.",
+        "negative": "IP-ja juaj nuk është në listën e nyjeve dalëse VPN."
+      }
+    },
+    "tor": {
+      "title": "Nyje dalëse TOR",
+      "positive": "IP-ja juaj është në listën e nyjeve dalëse TOR.",
+      "negative": "IP-ja juaj nuk është në listën e nyjeve dalëse TOR."
+    },
+    "headers": {
+      "title": "Kokat HTTP",
+      "positive": "Kokat tuaja HTTP përmbajnë informacion proxy-je, që tregon se mund të jeni duke përdorur një proxy.",
+      "negative": "Kokat tuaja HTTP nuk përmbajnë informacion proxy-je."
+    },
+    "datacenter": {
+      "title": "IP qendre të dhënash",
+      "positive": "IP-ja juaj është IP qendre të dhënash, e cila zakonisht nuk përdoret nga përdoruesit e rregullt.",
+      "negative": "IP-ja juaj nuk është IP qendre të dhënash."
+    },
+    "tcp": {
+      "title": "Gjurma TCP",
+      "positive": "Sistemi me të cilin po lidheni ndryshon nga sistemi i kompjuterit tuaj, që tregon se mund të jeni duke përdorur një proxy. Edhe pse gjykimi i sistemit mund të mos jetë i saktë, është e sigurt që të dy sistemet janë të ndryshëm.",
+      "computer": "Sistemi i kompjuterit tuaj është: ",
+      "server": "Sistemi me të cilin po lidheni mund të jetë: ",
+      "negative": "Sistemi me të cilin po lidheni është i njëjtë me sistemin e kompjuterit tuaj."
+    },
+    "timezone": {
+      "title": "Ndryshimi i zonës kohore",
+      "positive": "Zona juaj kohore nuk përputhet me zonën kohore të gjeolokacionit të IP-së suaj, që tregon se mund të jeni duke përdorur një proxy.",
+      "computer": "Zona juaj kohore është: ",
+      "server": "Zona kohore e gjeolokacionit të IP-së suaj është: ",
+      "negative": "Zona juaj kohore përputhet me zonën kohore të gjeolokacionit të IP-së suaj."
+    },
+    "net": {
+      "title": "Sjellja e rrjetit",
+      "positive": "Bazuar në sjelljen e rrjetit të klientit, rezulton se mund të jeni duke përdorur proxy ose VPN.",
+      "negative": "Bazuar në sjelljen e rrjetit të klientit, rezulton se nuk po përdorni proxy ose VPN."
+    },
+    "webrtc": {
+      "title": "Zbulimi WebRTC",
+      "positive": "WebRTC zbuloi disa adresa IP nga rajone të ndryshme, që tregon se mund të jeni duke përdorur proxy ose VPN.",
+      "ipsAre": "Adresat IP janë: ",
+      "negative": "Zbulimi WebRTC nuk gjeti prova për disa adresa IP nga rajone të ndryshme."
+    },
+    "flow": {
+      "title": "Karakteristikat e trafikut",
+      "positive": "Bazuar në karakteristikat e trafikut TCP/IP, rezulton se mund të jeni duke përdorur proxy ose VPN.",
+      "negative": "Bazuar në karakteristikat e trafikut TCP/IP, rezulton se nuk po përdorni proxy ose VPN."
+    },
+    "latencyVSWS": {
+      "title": "Vonesa TCP kundrejt WebSocket",
+      "positive": "Ndryshimi mes vonesës TCP dhe WebSocket është i madh, që tregon se mund të jeni duke përdorur proxy ose VPN.",
+      "fromTCP": "Vlera e vonesës TCP: ",
+      "fromWS": "Vlera e vonesës WebSocket: ",
+      "negative": "Ndryshimi mes vonesës TCP dhe WebSocket nuk është i madh, që tregon se ndoshta nuk po përdorni proxy ose VPN."
+    },
+    "latencyVSPing": {
+      "title": "Vonesa TCP kundrejt Ping",
+      "positive": "Ndryshimi mes vonesës TCP dhe Ping është i madh, që tregon se mund të jeni duke përdorur proxy ose VPN.",
+      "fromTCP": "Vlera e vonesës TCP: ",
+      "fromPing": "Vlera e vonesës Ping: ",
+      "negative": "Ndryshimi mes vonesës TCP dhe Ping nuk është i madh, që tregon se ndoshta nuk po përdorni proxy ose VPN."
+    },
+    "tlsRtt": {
+      "title": "Vonesa TCP kundrejt shtrëngimit të duarve TLS",
+      "positive": "Shtrëngimi i duarve TLS zgjat shumë më tepër se vajtje-ardhja TCP, sikur të ishte kryer diku më larg. Mund të jeni duke përdorur proxy ose VPN.",
+      "fromTCP": "Vajtje-ardhja TCP: ",
+      "fromTLS": "Shtrëngimi i duarve TLS: ",
+      "negative": "Koha e shtrëngimit të duarve TLS përputhet me vajtje-ardhjen TCP, pa prova të qarta për proxy ose VPN."
+    },
+    "highlatency": {
+      "title": "Analiza e vonesës së lartë",
+      "positive": "Analiza e vonesës së lartë tregon se mund të jeni duke përdorur proxy ose VPN.",
+      "negative": "Analiza e vonesës së lartë nuk gjeti prova që po përdorni proxy ose VPN."
+    },
+    "proxyAi": {
+      "title": "Vlerësimi me AI",
+      "positive": "Një model AI që peshon të gjitha sinjalet gjykon se mund të jeni duke përdorur një proxy.",
+      "score": "Pikët e modelit AI: ",
+      "negative": "Një model AI që peshon të gjitha sinjalet nuk gjeti prova që po përdorni proxy."
+    }
+  },
+  "personacheck": {
+    "Title": "Kontrolli i thelluar i personës",
+    "Note": "Ka një test të vjetër: nëse duket si rosë, noton si rosë dhe bën si rosë, ka shumë mundësi të jetë rosë. Faqet ju lexojnë në të njëjtën mënyrë — IP-ja juaj mund të pretendojë se jeni në shtetin A, por zona kohore, gjuhët, fontet e instaluara, tastiera dhe një duzinë sinjalesh të tjera tregojnë secili historinë e vet, dhe së bashku përbëjnë personën që një faqe sheh realisht. Ky mjet e mat atë personë, e krahason me banorin vendas si i cili doni të lexoheni dhe tregon saktësisht ku ndryshojnë të dyja.",
+    "NoteVs": "Bën një pyetje tjetër nga Testi i padukshmërisë. Ai kontrollon nëse vetë proxy-ja juaj mund të zbulohet; ky kontrollon kë mendojnë faqet se po shohin — dhe sa larg është ajo tablo nga ajo që prisni të paraqisni.",
+    "Note2": "Filloni duke zgjedhur shtetin ku doni të lexoheni si vendas.",
+    "axis": {
+      "match": "Përputhja me objektivin",
+      "coherence": "Qëndrueshmëria e brendshme",
+      "leak": "Rrjedhja e identitetit"
+    },
+    "zone": {
+      "expected": "Identiteti i pritur",
+      "optional": "Sinjale më të mprehta (opsionale)",
+      "run": "Kryej kontrollin"
+    },
+    "selectCountry": "Kërko një shtet",
+    "noCountryMatch": "Asnjë shtet që përputhet",
+    "noProfile": "Ky territor nuk ka profil vendas për krahasim.",
+    "languageSingle": "Ky shtet ka një gjuhë kryesore të vetme.",
+    "languageMulti": "Ky shtet ka disa gjuhë — zgjidhni atë që doni të paraqisni.",
+    "timezoneMulti": "Ky shtet shtrihet në disa zona kohore — zgjidhni atë që doni të paraqisni.",
+    "hourCycle": {
+      "h11": "Ora 12-orëshe (0–11)",
+      "h12": "Ora 12-orëshe",
+      "h23": "Ora 24-orëshe",
+      "h24": "Ora 24-orëshe (1–24)"
+    },
+    "profile": {
+      "timezone": "Zona kohore"
+    },
+    "runCompare": "Kryej kontrollin",
+    "runError": "Kontrolli nuk u përfundua dot.",
+    "source": {
+      "ipinfo": "Kërkimi IP",
+      "webrtc": "WebRTC",
+      "dnsleak": "Rrjedhja DNS"
+    },
+    "report": {
+      "grade": {
+        "A": "🎉 Dukeni plotësisht si vendas i {country}",
+        "B": "😊 Dukeni disi si vendas i {country}",
+        "C": "🤔 Nuk dukeni fort si vendas i {country}",
+        "D": "😅 Nuk dukeni si vendas i {country}",
+        "unknown": "🤷 Sinjal i pamjaftueshëm për vlerësim"
+      },
+      "gradeNote": {
+        "A": "Çdo sinjal që mund të lexojmë përputhet me personën që zgjodhët.",
+        "B": "Persona kryesisht qëndron, por disa sinjale tregojnë diku tjetër.",
+        "C": "Disa sinjale nuk përputhen me personën ose me njëri-tjetrin — rezultatet më poshtë tregojnë cilat.",
+        "D": "Shumica e sinjaleve tregojnë diku tjetër nga kjo personë.",
+        "unknown": "Kryeni së pari testet bazë — ka shumë pak për t'u mbështetur."
+      },
+      "counts": {
+        "leak": "{n} ekspozojnë",
+        "warning": "{n} të paqëndrueshme",
+        "match": "{n} kalojnë",
+        "unknown": "{n} të pamatura",
+        "notApplicable": "{n} nuk zbatohen"
+      },
+      "nothingActionable": "S'ka asgjë për të rregulluar — çdo sinjal i matshëm përshtatet me personën.",
+      "howToFix": "Si ta rregulloni",
+      "verdict": {
+        "match": "Përshtatet me personën.",
+        "mismatch": "Bie ndesh me personën.",
+        "leak": "Ekspozon mjedisin tuaj të vërtetë.",
+        "unnatural": "E paqëndrueshme brenda vetes — dy sinjale që duhet të përputheshin tregojnë histori të ndryshme, gjë që tërheq më shumë vëmendje se një mospërputhje e thjeshtë.",
+        "unknown": "Nuk matet dot tani.",
+        "not-applicable": "Këtu nuk mund të nxirret përfundim."
+      },
+      "visibility": {
+        "public": "E sheh çdo faqe",
+        "probed": "Faqet që e kërkojnë",
+        "risk-engine": "Sistemet kundër mashtrimit"
+      },
+      "profileTitle": "Detajet e matjes",
+      "state": {
+        "match": "Kaloi",
+        "mismatch": "Jo vendase",
+        "unnatural": "E paqëndrueshme",
+        "leak": "E ekspozuar",
+        "unknown": "E pamatur",
+        "not-applicable": "N/A"
+      }
+    },
+    "detail": {
+      "expected": "E pritur",
+      "actual": "Reale",
+      "disputed": "Burimet nuk përputhen",
+      "v4": "IPv4",
+      "v6": "IPv6",
+      "candidateCount": "Kandidatët",
+      "matching": "Përputhet me të priturën",
+      "ipType": "Lloji i adresës",
+      "expectedOffset": "Zhvendosja e pritur",
+      "actualOffset": "Zhvendosja reale",
+      "sameOffset": "E njëjta zhvendosje",
+      "primary": "Gjuha kryesore",
+      "primaryExpected": "Kryesorja e pritur",
+      "demoted": "E listuar, por jo e para",
+      "timeZone": "Zona kohore",
+      "reportedOffset": "Zhvendosja nga Date",
+      "zoneOffset": "Zhvendosja nga zona",
+      "samples": "Mostrat",
+      "expectedScripts": "Sistemet e shkrimit të pritura",
+      "installedScripts": "Sistemet e shkrimit të instaluara",
+      "expectedLanguages": "Gjuhët e pritura",
+      "voiceLanguages": "Gjuhët e zërave",
+      "voiceCount": "Zërat",
+      "expectedLayout": "Paraqitja e pritur",
+      "actualLayout": "Paraqitja reale",
+      "headerPrimary": "Kryesorja te koka",
+      "scriptPrimary": "Kryesorja te skripti",
+      "headerLanguages": "Gjuhët te koka",
+      "ipZone": "Zona kohore e IP-së",
+      "browserZone": "Zona kohore e shfletuesit",
+      "ipOffset": "Zhvendosja e IP-së",
+      "browserOffset": "Zhvendosja e shfletuesit",
+      "colo": "PoP i Cloudflare",
+      "gpsTimezone": "Zona kohore në pozicionin tuaj",
+      "accuracyMetres": "Saktësia (m)",
+      "cardIssuer": "Banka lëshuese",
+      "cardNetwork": "Rrjeti i kartës",
+      "cardTier": "Niveli i kartës",
+      "cardType": "Lloji i kartës"
+    },
+    "checks": {
+      "ip-country": {
+        "title": "Shteti i IP-së",
+        "fix": "Një pjesë e daljeve tuaja bien jashtë shtetit objektiv — me disa dalje proxy, karta të ndryshme tregojnë vërtet shtete të ndryshme, dhe secila dalje është ajo që do ta shohë ndonjë faqe. Thyesat më sipër tregojnë sa dalje përputhen. Kalojeni gjithçka përmes nyjeve në shtetin objektiv; nëse vetëm një burim nuk pajtohet për një IP, ajo nyje mund të jetë thjesht e etiketuar gabim në bazën e tij të të dhënave, gjë që nuk rregullohet dot nga ana juaj.",
+        "what": "Në cilin shtet e vendosin adresën tuaj dalëse kartat e kërkimit IP në faqen kryesore — lexohet çdo burim dhe çdo dalje duhet të ndodhet në shtetin objektiv."
+      },
+      "webrtc-leak": {
+        "title": "Ekspozimi WebRTC",
+        "fix": "Bllokoni WebRTC ose përdorni një konfigurim ku ai mund të shohë vetëm adresën e proxy-t. Kostoja është reale: thirrjet video dhe konferencat zanore ndalojnë së punuari. Një shtesë shfletuesi që filtron WebRTC është më e butë se çaktivizimi i plotë, por vetë shtesa lë gjurmët e veta.",
+        "what": "Nëse WebRTC jep një adresë nga një shtet tjetër nga persona juaj."
+      },
+      "dns-resolver-country": {
+        "title": "Shteti i zgjidhësit DNS",
+        "fix": "Përdorni një zgjidhës në shtetin objektiv ose lëreni proxy-n të merret me zgjidhjen DNS. Kini parasysh se një zgjidhës publik si 1.1.1.1 nuk do ta ekspozojë vendndodhjen tuaj, por as nuk do ta mbështesë personën tuaj — është njësoj neutral për çdo shtet.",
+        "what": "Në cilin shtet ndodhen zgjidhësit DNS që përgjigjen për ju."
+      },
+      "asn-type": {
+        "title": "Lloji i adresës",
+        "fix": "Një varg qendre të dhënash është sinjali më i zhurmshëm “ky është proxy” që mbart një adresë. Një dalje rezidenciale e rregullon menjëherë, por kushton shumë më tepër dhe ndryshon shumë në cilësi.",
+        "what": "Nëse adresa juaj i përket një ISP-je rezidenciale apo një vargu qendre të dhënash."
+      },
+      "timezone-vs-persona": {
+        "title": "Zona kohore kundrejt personës",
+        "fix": "Ndryshoni zonën kohore në nivelin e sistemit operativ — kështu çdo API e shfletuesit mbetet e qëndrueshme me veten. Shtesat që e mbishkruajnë zonën kohore shpesh ndryshojnë vetëm një pjesë të saj, duke krijuar kundërthëniet që shënohen te kontrollet e qëndrueshmërisë, gjë që është më keq se mos ta ndryshoni fare.",
+        "what": "Nëse zona kohore e shfletuesit tuaj është ajo që do të kishte një vendas."
+      },
+      "language-match": {
+        "title": "Gjuha e shfletuesit",
+        "fix": "Ndryshoni gjuhën te cilësimet e sistemit ose të shfletuesit në vend që të rishkruani një kokë të vetme HTTP. Edhe renditja ka rëndësi: faqet lexojnë gjithë listën dhe një vendas rrallë do të fillonte me një gjuhë të huaj.",
+        "what": "Nëse gjuha me të cilën fillon shfletuesi juaj është një që do ta përdorte një vendas."
+      },
+      "script-fonts": {
+        "title": "Fontet e sistemit të shkrimit",
+        "fix": "Një pajisje e konfiguruar për këtë lokalizim vjen me fontet e atij sistemi shkrimi. Instalimi i tyre me dorë është i mundur, por rrallë ia vlen: ndryshon një sinjal ndërsa pjesa tjetër e sistemit mbetet në gjuhën e saj origjinale, gjë që zakonisht krijon më shumë kundërthënie sesa zgjidh. Nëse kjo duhet të qëndrojë, ajo që duhet ndryshuar është vetë gjuha e sistemit.",
+        "what": "Nëse në pajisje janë të instaluara fontet për sistemin e shkrimit të këtij shteti."
+      },
+      "speech-voices": {
+        "title": "Zërat e sintezës së të folurit",
+        "fix": "Paketat tekst-në-të-folur ndjekin gjuhën me të cilën u instalua sistemi juaj operativ, dhe praktikisht asnjë proxy apo shtesë maskimi nuk i prek. Shtimi i një pakete zëri për gjuhën objektiv është rregullim i vërtetë, me të njëjtin paralajmërim si fontet: një sinjal i ndryshuar brenda një sistemi ndryshe të pandryshuar duket i qëllimshëm.",
+        "what": "Cilat gjuhë mbulojnë paketat tekst-në-të-folur në sistemin tuaj."
+      },
+      "keyboard-layout": {
+        "title": "Paraqitja e tastierës",
+        "fix": "Paraqitja e tastierës suaj fizike nuk është ajo tipike për shtetin objektiv. Vetëm shfletuesit Chromium e ekspozojnë këtë, ndaj është sinjal më i ngushtë se të tjerët — por kudo që lexohet, është e vështirë të falsifikohet pa ndryshuar tastierën e vërtetë.",
+        "what": "Çfarë paraqitjeje të tastierës fizike raporton pajisja juaj."
+      },
+      "edge-geo-consensus": {
+        "title": "Gjeolokacioni në edge",
+        "fix": "Leximi i vetë Cloudflare për adresën tuaj dalëse nuk përputhet me shtetin objektiv. Kur ky dhe kërkimi IP kundërshtojnë njëri-tjetrin, ka më shumë gjasa që adresa të jetë etiketuar gabim në një bazë të dhënash sesa të jetë duke lëvizur realisht — por çdo faqe pas Cloudflare e sheh këtë vendim, jo tjetrin.",
+        "what": "Leximi i vetë Cloudflare për adresën tuaj dalëse, i formuar në mënyrë të pavarur nga bazat e të dhënave më sipër."
+      },
+      "accept-language-header": {
+        "title": "Koka e gjuhës kundrejt skriptit",
+        "fix": "Koka Accept-Language që dërgon shfletuesi juaj në rrjet nuk përputhet me atë që navigator.languages u raporton skripteve. Pothuajse asgjë nuk e shkakton këtë përveç një shtese që rishkroi njërën dhe la tjetrën. Ndryshoni gjuhën te cilësimet e shfletuesit ose të sistemit — kështu lëvizin të dyja njëherësh.",
+        "what": "Nëse koka e gjuhës e dërguar në rrjet përputhet me atë që u thuhet skripteve. Qëllimisht e pavarur nga shteti objektiv: kalimi tregon vetëm se dy kanalet tuaja të gjuhës përputhen — nëse vetë gjuha përshtatet është detyrë e kontrollit të Gjuhës së shfletuesit. Maskimet e gjuhës të zbatuara përgjysmë dështojnë pikërisht këtu."
+      },
+      "ip-timezone-vs-browser": {
+        "title": "Zona kohore e IP-së kundrejt shfletuesit",
+        "fix": "Zona kohore e IP-së suaj dalëse dhe ajo që raporton shfletuesi juaj janë vende të ndryshme. Kjo vlen për cilindo shtet që synoni: një pajisje reale ndodhet diku dhe të dyja duhet të tregojnë të njëjtin vend. Zakonisht do të thotë se proxy-ja e zhvendosi adresën tuaj, por jo orën e sistemit.",
+        "what": "Nëse zona kohore e IP-së suaj dhe ajo që raporton shfletuesi juaj përputhen."
+      },
+      "gps-location": {
+        "title": "Vendndodhja e pajisjes (GPS)",
+        "fix": "Pajisja juaj raporton se ndodhet fizikisht në një shtet tjetër nga ai që synoni. Asnjë proxy nuk e prek këtë: çdo faqe që kërkon vendndodhjen tuaj merr përgjigjen e vërtetë, dhe shtesat e shfletuesit që e falsifikojnë zakonisht i lënë të paprekura modelet e saktësisë dhe të kohës. Opsionet realiste janë të refuzoni lejen e vendndodhjes për faqet që e kërkojnë, ose të pranoni që ky sinjal nuk do të qëndrojë.",
+        "what": "Në cilin shtet raporton pajisja juaj se ndodhet fizikisht."
+      },
+      "payment-region": {
+        "title": "Shteti lëshues i kartës",
+        "fix": "Karta juaj është lëshuar në një shtet tjetër nga ai si i cili po paraqiteni. Tregtarët e shohin shtetin lëshues përpara pothuajse çdo gjëje tjetër, dhe sistemet e rrezikut të pagesave e peshojnë shumë kundrejt adresës dhe IP-së. Nuk ka rregullim nga ana e shfletuesit për këtë — është veti e vetë kartës.",
+        "what": "Cili shtet e lëshoi kartën pas prefiksit që shkruat."
+      },
+      "intl-number-format": {
+        "title": "Formati i numrave",
+        "what": "Si i grupon shifrat dhe si i shënon dhjetoret shfletuesi juaj.",
+        "fix": "Shfletuesi juaj i grupon numrat si rajoni i tij dhe jo si shteti objektiv. Kjo është e ndarë nga gjuha: një pajisje mund të ketë etiketën e duhur të gjuhës ndërsa rajoni i saj tregon diku tjetër. Ndryshoni rajonin — jo vetëm gjuhën — te cilësimet e sistemit: Region në Windows, Language & Region në macOS."
+      },
+      "intl-date-format": {
+        "title": "Formati i datës",
+        "what": "Renditja dhe ndarësit që përdor shfletuesi juaj kur shkruan një datë.",
+        "fix": "Shfletuesi juaj i shkruan datat me renditje ose ndarës të ndryshëm nga një vendas. Ashtu si formati i numrave, kjo ndjek rajonin e sistemit dhe jo gjuhën, dhe ndryshimi i rajonit është ai që e lëviz."
+      },
+      "intl-hour-cycle": {
+        "title": "Formati i orës",
+        "what": "Nëse shfletuesi juaj paraqet orë 12-orëshe apo 24-orëshe — konventa që shohin faqet kur formatojnë kohët.",
+        "fix": "Formati i orës ndjek gjuhën e shfletuesit, jo çelësin 24-orësh të sistemit — shumica e shfletuesve e shpërfillin plotësisht atë çelës (Safari është përjashtimi kryesor). Për të paraqitur konventën e shtetit objektiv, ndërroni gjuhën ose rajonin e shfletuesit në një lokalizim të atij shteti."
+      },
+      "timezone-authenticity": {
+        "title": "Vërtetësia e zonës kohore",
+        "what": "Nëse zona kohore që raporton shfletuesi juaj është ajo e vërteta e pajisjes.",
+        "fix": "Zona që raporton shfletuesi juaj nuk është ajo me të cilën punon realisht pajisja: Intl dhe Date nuk përputhen, ose datat e kaluara nuk ndjekin rregullat e orës verore të asaj zone. Kjo ka rëndësi sepse do të thotë se kontrolli i zonës kohore më sipër kaloi me një vlerë që nuk është reale — një faqe që lexon orën drejtpërdrejt e kupton. Caktojeni zonën në sistemin operativ dhe jo me një shtesë, dhe si zhvendosja aktuale, ashtu edhe rregullat historike lëvizin së bashku."
+      }
+    },
+    "reason": {
+      "no-marker-script": "Pa sistem shkrimi tregues",
+      "bin-lookup-failed": "Shërbimi i kërkimit të kartës nuk u arrit — shifrat mund të jenë fare mirë në rregull; provoni më vonë.",
+      "bin-not-recognized": "Baza e të dhënave të kartave nuk e njohu këtë prefiks — gabimi i shtypit është shkaku më i zakonshëm; kontrolloni shifrat dhe provoni sërish.",
+      "font-probe-unavailable": "Canvas i padisponueshëm",
+      "no-voice-packs": "Nuk ka paketa zëri të instaluara",
+      "keyboard-api-unavailable": "Nuk ekspozohet nga ky shfletues",
+      "no-layout-expectation": "Nuk ka paraqitje të pritur për këtë shtet",
+      "no-persona-languages": "Persona nuk ka gjuhë të caktuar",
+      "geolocation-unsupported": "Gjeolokacioni nuk mbështetet",
+      "ip-no-country": "Kërkimi IP nuk ktheu asnjë shtet",
+      "ip-no-type": "Asnjë burim nuk raportoi llojin e rrjetit",
+      "ip-no-timezone": "Asnjë burim nuk raportoi zonë kohore",
+      "webrtc-no-candidates": "WebRTC nuk dha asnjë kandidat",
+      "dns-no-country": "Asnjë zgjidhës nuk u lokalizua dot"
+    },
+    "optional": {
+      "gpsNote": "Pozicioni GPS është një nga dimensionet që mund të masë kontrolli — ndajeni nëse doni që të krahasohet edhe ai.",
+      "gpsButton": "Ndaj vendndodhjen",
+      "gpsGranted": "Vendndodhja u mor.",
+      "gpsFailed": {
+        "denied": "Leja u refuzua — ky kontroll do të raportohet si i pamatur.",
+        "timeout": "Kërkesa për vendndodhjen skadoi.",
+        "unavailable": "Pajisja juaj nuk e përcaktoi dot pozicionin.",
+        "unsupported": "Ky shfletues nuk mbështet gjeolokacionin."
+      },
+      "cardNote": "Ndonjëherë doni edhe të paguani si vendas. Shkruani 6-8 shifrat e para të kartës dhe kontrolli ju tregon nëse karta duket e lëshuar në atë shtet.",
+      "cardError": "Nevojiten 6 deri në 8 shifra — shkruani të paktën 6 për të kërkuar lëshuesin.",
+      "cardReady": "Prefiksi gati — shteti lëshues kërkohet kur kryhet kontrolli."
+    },
+    "dependencies": {
+      "note": "Kontrolli ka nevojë për rezultatet e të gjitha këtyre testeve bazë — kryeni ato që mungojnë përpara se të nisni:",
+      "runButton": "Kryej testet që mungojnë",
+      "runButtonRunning": "Po kryhen testet që mungojnë…",
+      "measured": "{n} nga {total} të matura",
+      "allReady": "Të gjitha testet janë kryer"
+    },
+    "step": {
+      "country": "Shteti objektiv",
+      "language": "Gjuha kryesore",
+      "location": "Vendndodhja",
+      "card": "Prefiksi i kartës",
+      "awaitingCountry": "Zgjidhni së pari një shtet",
+      "otherTests": "Testet bazë"
+    },
+    "emptyHint": "Zgjidhni shtetin ku doni të dukeni si vendas, pastaj kryeni kontrollin.",
+    "readyHint": "Gati. Kryeni kontrollin për të parë sa vendas dukeni.",
+    "value": {
+      "yes": "Po",
+      "no": "Jo"
+    }
+  },
+  "ipblocklist": {
+    "Title": "Kontrolli i listave të bllokimit IP",
+    "Note": "Kontrollon një IP kundrejt rreth 80 listave publike bllokimi, në dy grupe. Listat e bllokimit në kohë reale (DNSBL) pyeten live nga serverët e postës, forumet dhe shërbimet online për të vendosur nëse do ta pranojnë një lidhje apo mesazh; listat e inteligjencës për kërcënimet janë burime të publikuara me adresa abuzive, proxy të hapura, serverë VPN dhe dalje Tor që i ngarkojnë firewall-et dhe shërbimet e sigurisë. Të qenit në listë është shpesh arsyeja pse emailet refuzohen, regjistrimet bllokohen ose një faqe kërkon vazhdimisht CAPTCHA.",
+    "Note2": "Çdo regjistrim bën pjesë në një nga tre llojet. Abuzim do të thotë se një listë ka regjistruar spam, sulme ose një pajisje të komprometuar në këtë adresë. Anonimitet do të thotë se adresa njihet si proxy, VPN, relay ose dalje Tor, gjë që pritet kur përdorni një të tillë dhe nuk është e dhënë e keqe në vetvete. Regjistrimet këshilluese shënojnë rrjetin më të gjerë, si një varg dinamik ose një ofrues të tërë, dhe jo këtë adresë. Adresat e përbashkëta, të cloud-it dhe të VPN-ve shpesh dalin diku, ndaj trajtojeni një regjistrim si sinjal dhe jo si vendim; kur një listë ofron faqe heqjeje, ajo lidhet pranë regjistrimit.",
+    "SelectIPLabel": "Zgjidh një IP për të kontrolluar",
+    "EnterIPLabel": "Shkruaj një IP për të kontrolluar",
+    "UseStored": "Përdor një IP të zbuluar",
+    "SelectIP": "Zgjidh një IP",
+    "EnterIPPlaceholder": "p.sh. 1.1.1.1",
+    "InvalidIP": "Shkruani një adresë publike IPv4 ose IPv6.",
+    "Checking": "Po kontrollohen rreth 80 lista bllokimi. Kjo mund të zgjasë deri në 30 sekonda.",
+    "FetchError": "Kontrolli nuk u përfundua. Provoni sërish pas pak.",
+    "CheckedAt": "Kontrolluar {time}",
+    "verdict": {
+      "abuse": "Kjo IP ka të dhëna abuzimi në disa lista bllokimi",
+      "anonymity": "Pa të dhëna abuzimi, por kjo IP është shënuar si proxy, VPN, relay ose dalje Tor",
+      "notice": "Nuk është në asnjë listë bllokimi, edhe pse disa lista shënojnë rrjetin e saj më të gjerë",
+      "clean": "Nuk është në asnjë nga listat e bllokimit të kontrolluara"
+    },
+    "count": {
+      "abuse": "Abuzim",
+      "anonymity": "Anonimitet",
+      "notice": "Këshillues",
+      "clean": "E pastër",
+      "error": "Dështoi"
+    },
+    "SomeFailed": "{n} nga listat nuk u kontrolluan dot këtë herë, ndaj rezultati mund të jetë i paplotë.",
+    "part": {
+      "dnsbl": {
+        "title": "Lista bllokimi në kohë reale (DNSBL)",
+        "desc": "Pyeten live nga serverët e postës dhe shërbimet online"
+      },
+      "static": {
+        "title": "Lista të inteligjencës për kërcënimet",
+        "desc": "Lista abuzimi, proxy-sh dhe VPN-sh që përdoren nga firewall-et dhe shërbimet e sigurisë"
+      }
+    },
+    "NoHits": "Nuk është në listë këtu.",
+    "ShowRest": "Shfaq {n} listat e tjera",
+    "HideRest": "Fshih",
+    "CheckFailed": "Kontrolli dështoi",
+    "LastSeen": "Parë së fundi {date}",
+    "RequestRemoval": "Kërko heqjen",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abuzim",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relay",
+      "tor": "Tor",
+      "scanner": "Skaner",
+      "backscatter": "Backscatter",
+      "mixed": "Të përziera"
+    },
+    "reason": {
+      "socksProxy": "Proxy SOCKS",
+      "httpProxy": "Proxy HTTP",
+      "proxyChain": "Zinxhir proxy-sh",
+      "webProxy": "Proxy web",
+      "wingateProxy": "Proxy WinGate",
+      "openProxy": "Proxy i hapur",
+      "torExit": "Nyje dalëse Tor",
+      "exploited": "Host i shfrytëzuar",
+      "compromisedHost": "Host i komprometuar",
+      "compromisedRouter": "Router i komprometuar",
+      "botnet": "Botnet",
+      "worm": "Infektim me worm",
+      "ircDrone": "Dron IRC",
+      "ddosDrone": "Dron DDoS",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Sulme brute-force",
+      "spamSource": "Burim spami",
+      "spamtrap": "Ra në një kurth spami",
+      "badReputation": "Reputacion i keq",
+      "hijackedNetwork": "Rrjet i rrëmbyer",
+      "endUserRange": "Varg adresash për përdorues fundorë",
+      "dynamicRange": "Varg adresash dinamike",
+      "noMailRange": "Nuk është menduar për dërgim poste",
+      "missingPtr": "Pa DNS të kundërt",
+      "poorReputation": "Reputacion i dobët",
+      "mixedReputation": "Reputacion i përzier",
+      "rangeListed": "Vargu i adresave në listë",
+      "networkListed": "I gjithë rrjeti në listë",
+      "unaccountableOperator": "Operatori nuk vepron ndaj abuzimit",
+      "noMailService": "Pa shërbim poste",
+      "unreliableAbuseDesk": "Kontakt i pabesueshëm për abuzimet",
+      "reported1d": "Raportuar ditën e fundit",
+      "reported7d": "Raportuar në 7 ditët e fundit",
+      "reported30d": "Raportuar në 30 ditët e fundit",
+      "reported90d": "Raportuar në 90 ditët e fundit",
+      "feeds": "Raportuar nga {n}+ burime kërcënimesh",
+      "testEntry": "Regjistrim testues"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abuzim",
+        "desc": "lista ka regjistruar spam, sulme ose një pajisje të komprometuar në këtë adresë"
+      },
+      "anonymity": {
+        "label": "Anonimitet",
+        "desc": "një proxy, VPN, relay ose dalje Tor e njohur, që nuk është e dhënë e keqe në vetvete"
+      },
+      "notice": {
+        "label": "Këshillues",
+        "desc": "shënon rrjetin ose ofruesin më të gjerë, jo këtë adresë"
+      },
+      "clean": {
+        "label": "Jo në listë",
+        "desc": "kjo IP nuk është në listë"
+      },
+      "error": {
+        "label": "Kontrolli dështoi",
+        "desc": "lista nuk u kontrollua dot këtë herë, gjë që nuk do të thotë se IP-ja nuk është në të"
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "Testi i bllokimit të reklamave dhe gjurmuesve",
+    "Note": "I krijuar për këdo që përdor një bllokues reklamash ose gjurmuesish: një shtesë si uBlock Origin ose Privacy Badger, një shfletues me bllokim të integruar, ose filtrim në një shërbim DNS, VPN ose router. Testi e bën shfletuesin tuaj të kontaktojë pika fundore të njohura reklamash, analitike, sociale dhe të prodhuesve të pajisjeve, merr skripte të njohura gjurmimi pa i ekzekutuar dhe vendos elemente karremi që filtrat kozmetikë i fshehin, pastaj tregon çfarë kaloi.",
+    "Note2": "Pikët më të larta nuk janë automatikisht më të mira. Jo çdo gjurmues punon kundër jush: raportimi i gabimeve i ndihmon faqet të rregullojnë rrëzimet, analitika i ndihmon të përmirësohen dhe reklamat paguajnë për pjesën më të madhe të uebit falas; disa pika fundore të prodhuesve të pajisjeve ofrojnë edhe përditësime ose njoftime. Lexojeni rezultatin si hartë të asaj që lejon konfigurimi juaj dhe vendosni vetë çfarë ia vlen të bllokohet.",
+    "Note3": "Kërkesat që nuk bllokohen arrijnë te ato shërbime, pa cookies ose referues. Rezultatet mbeten në shfletuesin tuaj dhe nuk na dërgohen. Një pikë fundore që rrjeti juaj nuk e arrin për ndonjë arsye tjetër shfaqet gjithashtu si e bllokuar.",
+    "Selected": "Kontrollet e zgjedhura:",
+    "SelectAll": "Zgjidh të gjitha",
+    "Invert": "Përmbys",
+    "Run": "Nis testin",
+    "Rerun": "Ekzekuto sërish",
+    "Hint": "Zgjidhni çfarë doni të testoni, pastaj nisni",
+    "Score": "Pjesa e bllokuar",
+    "Progress": "{done} / {total} të kontrolluara",
+    "GroupCount": "{blocked} / {total} të bllokuara",
+    "NothingOpen": "Asnjë kërkesë nuk u konfirmua si e pabllokuar.",
+    "NothingBlocked": "Asnjë kërkesë nuk u konfirmua si e bllokuar.",
+    "Version": "Versioni i listës së testit: {version}",
+    "Limitation": "Këto sonda janë kërkesa të thjeshta të dërguara nga kjo faqe, jo mënyra si një faqe interneti ngarkon realisht reklama ose skripte: rregullat e filtrave që synojnë vetëm një lloj të caktuar kërkese (si skriptet ose imazhet) mund ta lënë të kalojë një sondë, por ta bllokojnë gjënë e vërtetë në një faqe interneti.",
+    "count": {
+      "blocked": "Të bllokuara",
+      "open": "Të pabllokuara",
+      "unknown": "Pa përgjigje"
+    },
+    "filter": {
+      "all": "Të gjitha",
+      "open": "Vetëm të pabllokuarat",
+      "blocked": "Vetëm të bllokuarat"
+    },
+    "status": {
+      "blocked": "E bllokuar",
+      "open": "E pabllokuar",
+      "unknown": "Pa përgjigje",
+      "pending": "Në pritje"
+    },
+    "cosmeticStatus": {
+      "blocked": "E fshehur",
+      "open": "E dukshme",
+      "unknown": "Pa përgjigje",
+      "pending": "Në pritje"
+    },
+    "cosmetic": {
+      "ad-container": "Kontejner reklame",
+      "adsense-slot": "Vend AdSense"
+    },
+    "group": {
+      "ads": {
+        "title": "Rrjete reklamash",
+        "desc": "Serverë reklamash dhe bursa reklamash, të kontrolluara sipas domenit."
+      },
+      "analytics": {
+        "title": "Analitikë dhe regjistrim sesionesh",
+        "desc": "Shërbime statistikash për vizitorët, hartash nxehtësie dhe riprodhimi sesionesh."
+      },
+      "social": {
+        "title": "Gjurmues të rrjeteve sociale",
+        "desc": "Piksele dhe gjurmues konvertimi të platformave sociale."
+      },
+      "errors": {
+        "title": "Monitorim gabimesh dhe performance",
+        "desc": "Shërbime raportimi rrëzimesh dhe monitorimi të përdoruesve realë."
+      },
+      "oem": {
+        "title": "Telemetria e prodhuesve të pajisjeve",
+        "desc": "Pika fundore telemetrie dhe reklamash të prodhuesve të telefonave, televizorëve dhe pajisjeve. Shfletuesi juaj nuk i thërret kurrë vetë, ndaj kryesisht filtrat DNS, VPN dhe të router-it i listojnë."
+      },
+      "scripts": {
+        "title": "Skripte gjurmimi",
+        "desc": "URL të sakta të skripteve të njohura të etiketave dhe pikseleve, të marra por kurrë të ekzekutuara. Filtrat që përputhen sipas shtegut mund t'i kapin edhe kur vetë domeni lejohet."
+      },
+      "cosmetic": {
+        "title": "Fshehja e elementeve",
+        "desc": "Elemente karrem në formën e vendeve të reklamave. Vetëm një bllokues brenda shfletuesit mund t'i fshehë; filtrat DNS, VPN dhe të router-it nuk e bëjnë kurrë, ndaj kjo pjesë nuk llogaritet në pikë."
+      }
+    },
+    "layer": {
+      "browser": "Elementet karrem u fshehën: një bllokues po punon brenda shfletuesit tuaj, qoftë shtesë apo vetë shfletuesi.",
+      "network": "Kërkesat u bllokuan, por elementet karrem nuk u fshehën: bllokimi ka shumë mundësi të ndodhë jashtë faqes, te një shërbim DNS, VPN ose router, ose te mbrojtja nga gjurmimi e shfletuesit.",
+      "none": "Asgjë nuk u bllokua: nuk u gjet bllokim reklamash ose gjurmuesish në këtë shfletues ose në këtë rrjet."
+    },
+    "report": {
+      "Category": "Kategoria",
+      "Total": "Gjithsej"
+    }
+  },
+  "advancedtools": {
+    "Title": "Mjete të avancuara",
+    "Note": "Ata që duan më të mirën nga rrjeti i tyre zakonisht përdorin mjete shtesë për ta rregulluar imët lidhjen.",
+    "category": {
+      "network": "Diagnostikimi i rrjetit",
+      "lookup": "Kërkim dhe llogaritje",
+      "deep": "Kontrolle të thelluara",
+      "reference": "Referencë"
+    },
+    "PingTestNote": "Bëni ping IP-së suaj nga e gjithë bota",
+    "MTRTestNote": "Gjurmoni rrugën e rrjetit tuaj nga e gjithë bota",
+    "DNSResolverNote": "Zgjidhje DNS shumëkanalëshe në kohë reale",
+    "EnhancedDnsLeakTest": "Kap çdo zgjidhës rekursiv, me analizë ECS dhe DNSSEC",
+    "RuleTestNote": "Kontrolloni cilësimet e rregullave të softuerit proxy",
+    "CensorshipCheck": "Kontrolloni në cilat shtete është bllokuar një faqe",
+    "ServiceStatus": "Kontrolloni disponueshmërinë live të shërbimeve të njohura AI dhe për zhvilluesit, dhe nëse një incident i fundit e shpjegon ndërprerjen që po shihni",
+    "Whois": "Kërkoni informacionin e regjistrimit të domenit/IP-së/ASN",
+    "AsnProfile": "Shikoni profilin e plotë të çdo AS",
+    "InvisibilityTest": "Kontrolloni nëse po përdorni proxy ose VPN",
+    "MacChecker": "Kërkoni informacion për një adresë fizike",
+    "IpCalculator": "Llogaritje subneti, konvertim shënimesh dhe njohuri IPv6 për çdo IP, prefiks ose varg",
+    "BrowserInfo": "Kontrolloni informacionin dhe gjurmën e shfletuesit",
+    "AdblockTest": "Kontrolloni çfarë bllokon vërtet bllokuesi i reklamave, filtri DNS ose VPN-ja juaj",
+    "SecurityChecklist": "Udhëzues për të siguruar jetën tuaj dixhitale",
+    "PersonaCheck": "Krahasoni çfarë shohin faqet me shtetin ku doni të dukeni si vendas",
+    "IpBlocklist": "Shikoni nëse një IP është në lista bllokimi për spam, abuzim, proxy ose VPN"
+  },
+  "macchecker": {
+    "Title": "Kërkimi MAC",
+    "Note": "Kërkoni prodhuesin e një adrese fizike (adresë MAC), nëse është unicast/multicast, globale/lokale etj. Mbështet kërkimin me adresën e plotë 12-shifrore ose vetëm me prefiksin. Mund ta përdorni këtë mjet edhe për të verifikuar nëse adresa fizike që keni krijuar i plotëson nevojat tuaja.",
+    "Note2": "Ju lutem shkruani një adresë fizike për të nisur kërkimin:",
+    "Placeholder": "F0:2F:4B:01:0A:AA",
+    "invalidMAC": "Adresë fizike e pavlefshme",
+    "fetchError": "Rezultatet e kërkimit nuk u morën dot",
+    "company": "Prodhuesi",
+    "macPrefix": "Prefiksi i adresës fizike",
+    "address": "Adresa e regjistruar",
+    "country": "Shteti/rajoni i regjistruar",
+    "blockStart": "Blloku fillestar",
+    "blockEnd": "Blloku përfundimtar",
+    "blockSize": "Madhësia e bllokut",
+    "blockType": "Lloji i bllokut",
+    "blockRange": "Vargu i bllokut",
+    "isRand": "Adresë e rastësishme",
+    "isPrivate": "Të dhëna private",
+    "isMulticast": "Adresë multicast",
+    "isUnicast": "Adresë unicast",
+    "isGlobal": "Adresë globale",
+    "isLocal": "Adresë lokale",
+    "property": "Vetia e adresës",
+    "value": "Vlera",
+    "manufacturer": "Detajet e prodhuesit",
+    "Examples": "Shiko shembuj",
+    "exampleFull": "Adresë e plotë",
+    "examplePrefix": "Prefiksi i prodhuesit",
+    "exampleSubBlock": "Bllok i vogël",
+    "examplePrivate": "Regjistrim privat",
+    "exampleMulticast": "Multicast",
+    "exampleRandom": "E rastësishme"
+  },
+  "ipcalculator": {
+    "Title": "Kalkulatori IP",
+    "Note": "Ngjitni një adresë IPv4 ose IPv6, një prefiks CIDR, një varg adresash, një listë prefiksesh, një numër të thjeshtë ose një nga shkrimet e çuditshme që shfletuesit ende i pranojnë — kalkulatori e njeh vetë hyrjen dhe shfaq vetëm atë që vlen. Përdoreni kur ndani një subnet (rrjeti, broadcast, hostet e përdorshëm, maska e rrjetit, maska wildcard, ndarja në blloqe më të vogla), kur doni të kuptoni një adresë IPv6 (llojin, një IPv4 të ngulitur, nëse identifikuesi i ndërfaqes zbulon një MAC), kur një firewall ose ACL kërkon një varg të shprehur me sa më pak blloqe CIDR ose një listë e gjatë prefiksesh duhet bashkuar, ose kur një numër i zhveshur në një regjistër apo një URL e dyshimtë duhet kthyer në adresë normale. Gjithçka llogaritet në shfletuesin tuaj; asgjë nuk dërgohet askund.",
+    "Note2": "Shkruani një IP, prefiks, varg, listë ose numër për të llogaritur:",
+    "Placeholder": "2001:db8::1/64",
+    "Calculate": "Llogarit",
+    "Examples": "Shiko shembuj",
+    "exampleObfuscated": "I maskuar",
+    "exampleEui64": "EUI-64",
+    "MyIPs": "IP-të e mia",
+    "copy": "Kopjo",
+    "copyAll": "Kopjo të gjitha",
+    "yes": "Po",
+    "no": "Jo",
+    "kind": {
+      "ipv4": "IPv4",
+      "ipv4Cidr": "Prefiks IPv4",
+      "ipv6": "IPv6",
+      "ipv6Cidr": "Prefiks IPv6",
+      "integer": "Numër i plotë",
+      "hex": "Heksadecimal",
+      "range": "Varg",
+      "cidrList": "Listë prefiksesh"
+    },
+    "scope": {
+      "global": "I rrugëzueshëm globalisht",
+      "private": "Privat",
+      "shared": "I përbashkët (CGNAT)",
+      "loopback": "Loopback",
+      "linkLocal": "Link-local",
+      "multicast": "Multicast",
+      "documentation": "Dokumentim",
+      "reserved": "I rezervuar",
+      "unspecified": "I papërcaktuar",
+      "broadcast": "Broadcast"
+    },
+    "invalid": {
+      "empty": "Shkruani diçka për të llogaritur",
+      "listNoValid": "Asnjë nga elementet nuk është IP ose prefiks i vlefshëm",
+      "cidrPrefix": "Gjatësia e prefiksit pas / është jashtë kufijve për këtë familje",
+      "cidrAddress": "Pjesa para / nuk është IP e vlefshme",
+      "ipv6Syntax": "Nuk është adresë e vlefshme IPv6",
+      "hexTooLarge": "Vlera heksadecimale është më e gjatë se 128 bit",
+      "integerTooLarge": "Numri i plotë është më i madh se 128 bit",
+      "badOctal": "Një numër që fillon me 0 lexohet si oktal, dhe 8 e 9 nuk janë shifra oktale",
+      "range": "Të dy skajet e një vargu duhet të jenë IP të vlefshme të së njëjtës familje",
+      "unrecognized": "Hyrje e panjohur"
+    },
+    "section": {
+      "Network": "Rrjeti",
+      "Representations": "Paraqitjet",
+      "Obfuscated": "Shënime të maskuara",
+      "AsIPv6": "Si IPv6",
+      "Split": "Ndaj në subnete",
+      "Address": "Adresa",
+      "Type": "Detajet e llojit",
+      "InterfaceId": "Identifikuesi i ndërfaqes",
+      "Prefix": "Prefiksi",
+      "Range": "Vargu",
+      "Cidrs": "Blloqet CIDR",
+      "IPv4Blocks": "Blloqet IPv4",
+      "IPv6Blocks": "Blloqet IPv6"
+    },
+    "network": "Rrjeti",
+    "broadcast": "Broadcast",
+    "netmask": "Maska e rrjetit",
+    "wildcard": "Maska wildcard",
+    "firstHost": "Hosti i parë",
+    "lastHost": "Hosti i fundit",
+    "firstAddress": "E para",
+    "lastAddress": "E fundit",
+    "usable": "Hostet e përdorshëm",
+    "total": "Gjithsej",
+    "ptr": "Regjistrimi PTR",
+    "ptrZone": "Zona e kundërt",
+    "class": "Klasa",
+    "rfc3021Note": "Një /31 (RFC 3021) ose /32 nuk ka adresë të veçantë rrjeti ose broadcast; çdo adresë është e përdorshme.",
+    "networkBits": "Bitet e rrjetit",
+    "hostBits": "Bitet e hostit",
+    "prefixLength": "Gjatësia e prefiksit",
+    "decimal": "Dhjetor",
+    "hex": "Heksadecimal",
+    "octal": "Oktal",
+    "binary": "Binar",
+    "obfuscatedNote": "Shfletuesit dhe shumica e librarive i pranojnë edhe këto shkrime — arsyeja pse filtrat naivë të IP-ve mund të anashkalohen.",
+    "dottedHex": "Heksadecimal me pika",
+    "dottedOctal": "Oktal me pika",
+    "shortForm": "Formë e shkurtër ({parts} pjesë)",
+    "mapped": "IPv4-mapped",
+    "mappedHex": "IPv4-mapped (heks)",
+    "compat": "IPv4-compatible",
+    "nat64": "NAT64",
+    "sixToFour": "Prefiks 6to4",
+    "splitTo": "Ndaj në",
+    "showingFirst": "Po shfaqen {shown} të parat nga {total} subnete",
+    "subnetCount": "{count} subnete",
+    "compressed": "E ngjeshur",
+    "expanded": "E zgjeruar",
+    "zone": "Zona",
+    "embeddedIPv4": "IPv4 e ngulitur",
+    "teredoServer": "Serveri Teredo",
+    "teredoClient": "Klienti Teredo",
+    "teredoPort": "Porta Teredo",
+    "teredoCone": "Cone NAT",
+    "locallyAssigned": "E caktuar lokalisht (fd00::/8)",
+    "globalId": "ID globale",
+    "subnetId": "ID e subnetit",
+    "mcastScope": "Shtrirja multicast",
+    "flags": "Flamujt",
+    "flagT": "T (kalimtar)",
+    "flagP": "P (bazuar në prefiks)",
+    "flagR": "R (RP e ngulitur)",
+    "noFlags": "Asnjë",
+    "solicitedNodeSuffix": "Prapashtesa solicited-node",
+    "iid": "ID e ndërfaqes",
+    "mac": "MAC nga EUI-64",
+    "solicitedNode": "Multicast solicited-node",
+    "universalMac": "ID-ja e ndërfaqes është një EUI-64 e modifikuar që rrjedh nga një MAC unike globalisht, ndaj e identifikon harduerin kudo që të shkojë pajisja.",
+    "localMac": "ID-ja e ndërfaqes është një EUI-64 e modifikuar e ndërtuar nga një MAC e administruar lokalisht.",
+    "privacyIid": "ID-ja e ndërfaqes nuk ka formën EUI-64: një shtesë privatësie, një identifikues i rastësishëm ose i zgjedhur manualisht.",
+    "subnetRouterAnycast": "ID ndërfaqeje me të gjitha zero: adresa anycast subnet-router e këtij prefiksi.",
+    "slash64s": "Subnete /64",
+    "start": "Fillimi",
+    "end": "Fundi",
+    "aggregated": "Bllok i vetëm",
+    "aggregationSummary": "{input} blloqe hyrëse, {output} dalëse, {addresses} adresa",
+    "invalidTokens": "U shpërfillën: {list}"
+  },
+  "whois": {
+    "Title": "Kërkimi Whois",
+    "Note": "Kërkimi Whois është një shërbim që përdoret për të marrë informacionin e regjistrimit. Duke shkruar një emër domeni, një adresë IP ose një numër AS (p.sh. AS13335), mund të merrni informacione si detajet e regjistrimit, regjistruesin, datën e regjistrimit, datën e skadimit e të tjera. Informacioni Whois për emrat e domeneve, adresat IP dhe numrat AS mund të ketë fusha të ndryshme. Për më tepër, disa domene të nivelit të lartë (TLD) më pak të zakonshme mund të mos kenë informacion të disponueshëm për kërkimet Whois.",
+    "Note2": "Ju lutem shkruani një emër domeni, IP ose numër AS (p.sh. AS13335) për të nisur kërkimin:",
+    "Note3": "Informacioni Whois përmban lloje të ndryshme fushash. Më poshtë është teksti i papërpunuar",
+    "Placeholder": "Domen, IP ose numër AS",
+    "invalidURL": "Emër domeni, IP ose numër AS i pavlefshëm",
+    "reservedIP": "Adresat IP private ose të rezervuara nuk kanë regjistrim publik, ndaj s'ka asgjë për të kërkuar.",
+    "noData": "Nuk publikohen të dhëna Whois ose RDAP për këtë kërkim. Disa domene të nivelit të lartë nuk ofrojnë shërbim publik kërkimi.",
+    "fetchError": "Rezultatet e kërkimit nuk u morën dot ose janë bosh",
+    "Provider": "Ofruesi i informacionit"
+  },
+  "asnprofile": {
+    "Title": "Kërkimi i profilit ASN",
+    "Note": "Një sistem autonom (AS) është një rrjet i drejtuar nga një organizatë — një ofrues interneti, një kompani cloud ose hostingu, një universitet ose një ndërmarrje e madhe — që pjesa tjetër e internetit e njeh nga numri i tij AS dhe e arrin përmes rrugëzimit BGP. Shkruani një numër AS për të parë kush e ka regjistruar, sa i madh është, cilat blloqe adresash shpall dhe nëse janë të nënshkruara me RPKI, ku ndodhet hapësira e tij IPv4 dhe nga cilat rrjete blen tranzit, me cilat shkëmben trafik ose cilave u shet tranzit. Të dhënat vijnë nga disa burime, përfshirë Cloudflare Radar, shërbimet rajonale RDAP dhe PeeringDB.",
+    "InputLabel": "Numri AS",
+    "Placeholder": "p.sh. AS13335",
+    "Lookup": "Kërko",
+    "invalidInput": "Shkruani një numër të vlefshëm AS, p.sh. AS13335 ose 13335.",
+    "noData": "Nuk u gjetën të dhëna për AS{asn}. Mund të jetë i pacaktuar, i rezervuar për përdorim privat ose i pashpallur në internet.",
+    "loadError": "Ky AS nuk u ngarkua dot tani. Ju lutem provoni sërish pas pak.",
+    "partial": "Disa burime nuk u përgjigjën këtë herë dhe janë lënë jashtë: {list}.",
+    "tier1": "Tier 1",
+    "facts": {
+      "rank": "Renditja globale",
+      "rankSource": "CAIDA AS Rank",
+      "announcedIpv4": "IPv4 e shpallur",
+      "ipv4Share": "≈{share}% e internetit IPv4",
+      "prefixes": "Prefikset v4 · v6",
+      "users": "Përdorues të vlerësuar"
+    },
+    "registration": {
+      "title": "Regjistrimi",
+      "registry": "Regjistri",
+      "status": "Gjendja",
+      "registered": "Regjistruar",
+      "lastChanged": "Ndryshuar së fundi",
+      "abuse": "Kontakti për abuzime",
+      "raw": "Regjistrimi i papërpunuar whois",
+      "copyRaw": "Kopjo regjistrimin e papërpunuar"
+    },
+    "reputation": {
+      "title": "Reputacioni",
+      "source": "Të dhëna të IPCheck.ing",
+      "desc": "Sa dendur shfaqen adresat IPv4 të shpallura të këtij rrjeti në listat e abuzimit dhe të VPN-ve, si shumëfish i bazës globale që përdor vlerësimi i IPCheck.ing — shenja tregon 1×, në shkallë logaritmike. Proxy-të e zbuluara janë sa nga adresat e tij u gjetën duke vepruar si proxy publikë.",
+      "abuse": "Dendësia e IP-ve abuzive",
+      "vpn": "Dendësia e daljeve VPN",
+      "proxy": "Proxy të zbuluar",
+      "ratio": "{ratio}× baza",
+      "belowBaseline": "Në nivelin e bazës ose më poshtë",
+      "drop": "Në listën Spamhaus ASN-DROP",
+      "updated": "Të dhëna deri më {date}",
+      "level": {
+        "none": "Pa rrezik të shtuar",
+        "low": "Rrezik i ulët",
+        "medium": "Rrezik mesatar",
+        "high": "Rrezik i lartë"
+      }
+    },
+    "traffic": {
+      "title": "Trafiku dhe cilësia e lidhjes",
+      "desc": "Pjesët e trafikut HTTP që Cloudflare pa nga ky rrjet në 7 ditët e fundit (versioni IP, enkriptimi, pajisja, njeri apo bot) dhe mesataret e testeve të shpejtësisë që kryen përdoruesit e tij."
+    },
+    "map": {
+      "title": "Shpërndarja globale e IP-ve",
+      "desc": "Ku përdoren adresat IPv4 të këtij rrjeti, të peshuara sipas numrit të adresave."
+    },
+    "prefixes": {
+      "title": "Prefikset e shpallura",
+      "desc": "Çdo bllok adresash që ky AS e nis në tabelën globale të rrugëzimit. RPKI Valid do të thotë se një regjistrim i nënshkruar (ROA) e autorizon këtë AS ta shpallë, Invalid do të thotë se bie ndesh me një të tillë, Unknown do të thotë se nuk ekziston asnjë. Dukshmëria është sa peer-a të mbledhësve të rrugëve e mbartin prefiksin.",
+      "counts": "{v4} IPv4 · {v6} IPv6",
+      "rpki": "Origjina e rrugës RPKI",
+      "rpkiValid": "{pct}% të vlefshme",
+      "family": "Familja e adresave",
+      "all": "Të gjitha",
+      "copy": "Kopjo prefikset e listuara",
+      "download": "Shkarko .txt",
+      "prefix": "Prefiksi",
+      "size": "Madhësia",
+      "rpkiColumn": "RPKI",
+      "visibility": "Dukshmëria",
+      "shown": "{shown} nga {total} të shfaqura",
+      "showMore": "Shfaq edhe {count}"
+    },
+    "rpki": {
+      "valid": "E vlefshme",
+      "invalid": "E pavlefshme",
+      "unknown": "E panjohur"
+    },
+    "connectivity": {
+      "title": "Lidhshmëria",
+      "desc": "Furnizuesit i shesin tranzit këtij AS, peer-at shkëmbejnë trafik drejtpërdrejt me të, klientët blejnë tranzit prej tij — të numëruar nga të dhënat e marrëdhënieve të CAIDA, i njëjti lexim që përdor grafiku më poshtë. Koni i klientëve është sa AS arrin përmes klientëve të tij (CAIDA AS Rank). Grafiku vizaton vetëm shtigjet kryesore drejt rrjeteve Tier 1, ndaj numri i furnizuesve mund të jetë më i madh se nyjet e vizatuara.",
+      "cone": "Koni i klientëve (AS)",
+      "providers": "Furnizuesit",
+      "peers": "Peer-at",
+      "customers": "Klientët",
+      "none": "Asnjë i vëzhguar"
+    },
+    "peering": {
+      "title": "Peering dhe objektet",
+      "desc": "Siç janë regjistruar nga vetë operatorët e rrjetit në PeeringDB. Pikat e shkëmbimit të internetit janë IXP-të me të cilat lidhet, me kapacitetin e portave të mbledhur për çdo pikë shkëmbimi; RS shënon një sesion me serverët e rrugëve të pikës së shkëmbimit. Objektet janë qendrat e të dhënave ku është i pranishëm.",
+      "policy": "Politika e peering",
+      "traffic": "Niveli i trafikut",
+      "ratio": "Raporti i trafikut",
+      "irr": "IRR as-set",
+      "website": "Faqja e internetit",
+      "scope": "Shtrirja gjeografike",
+      "exchanges": "Pikat e shkëmbimit të internetit ({count})",
+      "facilities": "Objektet ({count})",
+      "rs": "RS",
+      "rsTitle": "Bën peering me serverët e rrugëve të pikës së shkëmbimit",
+      "showAll": "Shfaq të gjitha {count}",
+      "showLess": "Shfaq më pak",
+      "types": {
+        "isp": "Kabllo/DSL/ISP",
+        "nsp": "NSP",
+        "content": "Përmbajtje",
+        "enterprise": "Ndërmarrje",
+        "education": "Arsim/Kërkim",
+        "nonProfit": "Jofitimprurës",
+        "government": "Qeveri",
+        "routeServer": "Server rrugësh",
+        "routeCollector": "Mbledhës rrugësh",
+        "networkServices": "Shërbime rrjeti"
+      },
+      "scopes": {
+        "regional": "Rajonale",
+        "northAmerica": "Amerika e Veriut",
+        "asiaPacific": "Azi-Paqësor",
+        "europe": "Evropa",
+        "southAmerica": "Amerika e Jugut",
+        "africa": "Afrika",
+        "australia": "Australia",
+        "middleEast": "Lindja e Mesme",
+        "global": "Globale"
+      },
+      "ratios": {
+        "balanced": "I balancuar",
+        "mostlyInbound": "Kryesisht hyrës",
+        "heavyInbound": "Shumë hyrës",
+        "mostlyOutbound": "Kryesisht dalës",
+        "heavyOutbound": "Shumë dalës"
+      },
+      "policies": {
+        "open": "E hapur",
+        "selective": "Selektive",
+        "restrictive": "Kufizuese",
+        "no": "Pa peering"
+      }
+    }
+  },
+  "enhanceddnsleaktest": {
+    "Title": "Testi i thelluar i rrjedhjes DNS",
+    "Note": "Testi i rrjedhjes DNS në faqen kryesore ju ka dhënë tashmë një ide të përafërt nëse po rrjedhni dhe ku del trafiku juaj DNS. Ky test më i thellë shton më shumë dimensione: kap më shumë nga IP-të dalëse të zgjidhësve tuaj, kontrollon nëse ndonjëri prej tyre ia përcjell më lart një prefiks të IP-së suaj të vërtetë përmes ECS dhe kontrollon nëse mbështesin DNSSEC — kështu dilni me një tablo më të plotë të gjendjes së sigurisë së zinxhirit tuaj DNS.",
+    "Note2": "Klikoni Ekzekuto për të nisur. Testi zakonisht përfundon brenda pak sekondash. Dërgojmë disa sonda DNS në sfond dhe e lëmë serverin tonë autoritativ DNS të kapë IP-të dalëse të zgjidhësve rekursivë që po përdorni realisht — një ekzekutim tipik kap 20–40 regjistrime. Nëse nuk shfaqet asnjë zgjidhës, ka shumë mundësi që memoria e përkohshme DNS e shfletuesit t'i ketë thithur kërkesat; prisni pak dhe provoni sërish.",
+    "Note3": "Meqë ky është një test i thelluar, në këtë faqe do të hasni disa koncepte të specializuara (ECS, DNSSEC etj.). Mos u shqetësoni — pasi të kryeni testin, shikoni “Referenca e fushave” në fund të faqes për një shpjegim të shkurtër të çdo kolone.",
+    "Run": "Ekzekuto testin",
+    "RunAgain": "Ekzekuto sërish",
+    "RunningProbes": "Po dërgohen sondat DNS...",
+    "PollingResult": "Po mblidhen rezultatet...",
+    "FetchError": "Rezultatet e testit të rrjedhjes DNS nuk u morën. Ju lutem provoni më vonë.",
+    "Empty": "Nuk u kap asnjë zgjidhës DNS për këtë sesion. Kjo zakonisht do të thotë se memoria e përkohshme DNS e shfletuesit e thithi kërkesën — provoni sërish pas pak.",
+    "TableTitle": "Kërkesat DNS të kapura",
+    "DedupeToggle": "Fshih dublikatat",
+    "Flow": {
+      "Probing": "Po dërgohet sonda {current} / {total}...",
+      "Waiting": "Në pritje që DNS-ja rekursive të arrijë serverin tonë të emrave (zakonisht 1–3 s).",
+      "Fetching": "Po merren kërkesat DNS të kapura...",
+      "Done": "Testi përfundoi."
+    },
+    "DnssecChip": {
+      "Signed": "U kërkuan nënshkrime DNSSEC",
+      "Unsigned": "Nuk u kërkuan nënshkrime DNSSEC",
+      "Validated": "Vërtetimi DNSSEC normal",
+      "CdSet": "Vërtetimi DNSSEC i çaktivizuar"
+    },
+    "Summary": {
+      "ResolverCount": "Zgjidhës unikë",
+      "RawCount": "Kapje të papërpunuara",
+      "DnssecPosture": "Gjendja DNSSEC",
+      "DnssecGood": "Me njohje të DNSSEC — çdo zgjidhës kërkoi nënshkrime dhe asnjëri nuk e anashkaloi vërtetimin.",
+      "DnssecNoDo": "E dobët — të paktën një zgjidhës nuk kërkoi nënshkrime DNSSEC.",
+      "DnssecCdSet": "E dyshimtë — të paktën një zgjidhës kërkoi të anashkalohej vërtetimi DNSSEC.",
+      "DnssecNone": "Ende pa sinjal."
+    },
+    "Fields": {
+      "ResolverIP": "IP e zgjidhësit",
+      "Location": "Vendndodhja",
+      "ASN": "Organizata / ASN",
+      "QueryType": "Lloji i regjistrimit",
+      "Transport": "Protokolli i transportit",
+      "ECS": "ECS"
+    },
+    "Legend": {
+      "Title": "Referenca e fushave",
+      "ResolverIP": "IP-ja dalëse e zgjidhësit rekursiv DNS që arriti realisht serverin tonë autoritativ të emrave. Nëse përdorni VPN, krahasoni ASN-në e tij me ASN-në e daljes së VPN-së — mospërputhja do të thotë se kërkesat tuaja DNS po e anashkalojnë tunelin VPN (d.m.th. po rrjedhin).",
+      "QueryType": "Lloji i regjistrimit që zgjidhësi kërkoi në emër të shfletuesit tuaj (A, AAAA, HTTPS etj.). Shfletuesit zakonisht dërgojnë kërkesat A dhe AAAA së bashku.",
+      "Transport": "DNS përdor si parazgjedhje UDP. TCP zakonisht do të thotë se përgjigjja ishte e madhe — dhe përgjigjet priren të jenë të mëdha sepse mbartin regjistrime DNSSEC.",
+      "ECS": "EDNS Client Subnet — disa zgjidhës rekursivë bashkëngjitin një prefiks të IP-së suaj të vërtetë (zakonisht IPv4 /24 ose IPv6 /48) kur ua përcjellin kërkesat serverëve autoritativë më lart. Kjo do të thotë se një pjesë e IP-së suaj bëhet e njohur për serverët përgjatë zinxhirit DNS, gjë që mund të përdoret për gjeo-rrugëzimin e CDN-ve, por edhe e gërryen anonimitetin tuaj.",
+      "DO": "DNSSEC OK — një shenjë kontrolli do të thotë se zgjidhësi rekursiv kërkoi në mënyrë aktive nënshkrime DNSSEC për këtë kërkesë, ndaj zinxhiri mbart verifikim kriptografik; një kryq do të thotë se kërkesa doli pa nënshkrime, ndaj një përgjigje e manipuluar gjatë rrugës mund të mbetet e pazbuluar.",
+      "CD": "Checking Disabled — një shenjë kontrolli do të thotë se thirrësi nuk kërkoi të anashkalohej vërtetimi DNSSEC, ndaj zgjidhësi rekursiv kryen verifikimin normal të nënshkrimeve; një kryq do të thotë se thirrësi kërkoi shprehimisht të anashkalohej vërtetimi dhe do të pranojë përgjigje edhe kur nënshkrimet nuk përputhen. Normalisht kjo duhet të jetë shenjë kontrolli; nëse shihni një kryq, zakonisht është për shkak të një mjeti debugimi ose sjelljes së një klienti që ul sigurinë, dhe në raste të rralla sinjal i manipulimit man-in-the-middle gjatë rrugës."
+    }
+  },
+  "dnsresolver": {
+    "Title": "Zgjidhja DNS",
+    "Note": "Zgjidhni një domen njëkohësisht te ofrues të njohur publikë DNS në mbarë botën — si me DNS klasik, ashtu edhe me DNS-over-HTTPS — dhe krahasoni çfarë përgjigjet secili. Kur përgjigjet ndryshojnë mes ofruesve ose rajoneve, zakonisht do të thotë se një CDN po e drejton trafikun te një nyje afër, një memorie e përkohshme diku është e vjetruar ose regjistrimi po filtrohet apo ridrejtohet gjatë rrugës. Zgjidhni një lloj regjistrimi, shkruani një domen ose URL dhe kryeni kërkimin: çdo rresht tregon në cilin shtet ndodhet zgjidhësi, dhe tabela mund të filtrohet sipas rajonit.",
+    "Note2": "Ju lutem shkruani një URL ose emër domeni për të nisur zgjidhjen:",
+    "Placeholder": "URL ose emër domeni",
+    "invalidURL": "URL ose emër domeni i pavlefshëm",
+    "fetchError": "Rezultatet e zgjidhjes nuk u morën dot",
+    "Provider": "Ofruesi DNS",
+    "Result": "Rezultati i zgjidhjes",
+    "Record": "Regjistrimi",
+    "AllRegions": "Të gjitha rajonet"
+  },
+  "ruletest": {
+    "Title": "Testi i rregullave",
+    "Name": "Testi",
+    "Note": "Testi i rregullave përdoret për të përcaktuar nëse rregullat e bazuara në domen të softuerit proxy janë vendosur saktë. Përpara testit, duhet t'u referoheni kartave më poshtë dhe të vendosni rregulla të ndryshme drejtimi sipas domenit për 8 URL-të e ndryshme të IPCheck.ing në softuerin tuaj proxy. Zakonisht, cilësimet e rregullave mund të përdorin një format si: DOMAIN, ptest-3.ipcheck.ing, POLICY. Formati i saktë mund të ndryshojë sipas softuerit proxy që përdorni.",
+    "StatusWait": "Në pritje të testit",
+    "StatusTesting": "Duke testuar…",
+    "StatusError": "Gabim në test",
+    "Country": "Rajoni i proxy-t",
+    "RefreshAll": "Rifresko të gjitha"
+  },
+  "Tooltips": {
+    "RefreshIPCard": "Rifresko kartën e IP-së",
+    "SaveAsImage": "Ruaje si imazh",
+    "RefreshConnectivityTests": "Rifresko testet e lidhshmërisë",
+    "RefreshWebRTC": "Rifresko testin e rrjedhjes WebRTC",
+    "RefreshDNSLeakTest": "Rifresko testin e rrjedhjes DNS",
+    "SpeedTestButton": "Nis/Ndalo testin e shpejtësisë",
+    "ShowASNInfo": "Shfaq detajet e AS",
+    "ShowASNHistory": "Shfaq historikun e ASN",
+    "ShowASNConnectivity": "Shfaq lidhshmërinë e ASN",
+    "CopyIP": "Kopjo adresën IP",
+    "CopySdpLog": "Kopjo regjistrin SDP",
+    "ViewOnMap": "Shiko vendndodhjen në hartë",
+    "ShowCountryTraffic": "Shfaq modelin e aktivitetit online",
+    "InfoMask": "Fshih informacionin e IP-së",
+    "IPHistory": "Shiko historikun e IP-ve",
+    "ShareReport": "Krijo raport diagnostikues",
+    "QueryIP": "Kërko adresën IP",
+    "GithubLink": "Shiko kodin burimor në GitHub"
+  },
+  "report": {
+    "Title": "Raporti diagnostikues",
+    "Note": "Bashkoni rezultatet e testeve të përfunduara në një raport dhe ndajeni me një mik ose me një asistent AI për diagnostikimin e rrjetit. Asgjë nuk largohet nga kjo pajisje derisa të kopjoni, shkarkoni ose krijoni një lidhje.",
+    "SectionsLabel": "Testet që do të përfshihen",
+    "NotTested": "pa testuar",
+    "MaskTail": "Maskimi i fundit të IP-ve",
+    "TtlLabel": "Fshi automatikisht pas",
+    "Ttl1": "1 dite",
+    "Ttl3": "3 ditësh",
+    "Ttl7": "7 ditësh",
+    "Preview": "Parapamje e përmbajtjes së ndarë",
+    "CreateLink": "Krijo lidhje ndarjeje",
+    "CopyAI": "Kopjo për t'i pyetur AI",
+    "DownloadJson": "Shkarko JSON",
+    "CopyLink": "Kopjo lidhjen",
+    "NoSelection": "Zgjidhni së pari të paktën një test.",
+    "CreateFailed": "Krijimi i lidhjes së ndarjes dështoi, ju lutem provoni më vonë.",
+    "LinkOnce": "Kjo lidhje shfaqet vetëm një herë — kopjojeni tani. Kushdo me lidhjen mund ta shohë raportin derisa të skadojë.",
+    "ExpiresAt": "Raporti fshihet automatikisht më {time}.",
+    "CopiedTitle": "U kopjua",
+    "CopiedMessage": "Raporti u kopjua — ngjiteni te çdo asistent AI.",
+    "ai": {
+      "Heading": "Raporti diagnostikues i rrjetit MyIP",
+      "Intro": "Ky raport u krijua nga MyIP ({origin}) më {time} nga testet e rrjetit të kryera në shfletuesin e përdoruesit. Emrat e fushave janë identifikues të qëndrueshëm skeme; të gjitha vlerat e vonesës janë në milisekonda.",
+      "Masked": "Shënim: Adresat IP janë maskuar pjesërisht për privatësi (IPv4: okteti i fundit, IPv6: gjysma e ndërfaqes, të shfaqura si “x”).",
+      "Instruction": "Bazuar në të dhënat më sipër, analizo shëndetin e këtij rrjeti. Trego anomalitë (rrjedhje DNS, ekspozim WebRTC, karakteristika proxy/VPN, humbje paketash, vonesë e lartë, probleme rrugëzimi) dhe jep sugjerime konkrete për zgjidhjen e problemeve.",
+      "Sections": {
+        "ipinfo": "Adresat publike IP siç shihen nga disa burime të pavarura (burimet mund të mos përputhen kur përfshihet një proxy ose rrugëzim i ndarë).",
+        "connectivity": "Sonda arritshmërie të shfletuesit drejt faqeve të njohura; timeMs është vajtje-ardhja e shfaqur, minTimeMs më e mira nga raundet e përsëritura.",
+        "webrtc": "IP-të e ekspozuara përmes WebRTC STUN — nëse ndryshojnë nga IP-ja kryesore publike, adresa e vërtetë mund të jetë duke rrjedhur përtej proxy-t/VPN-së.",
+        "dnsleak": "IP-të dalëse të zgjidhësve DNS që iu përgjigjën realisht kërkimeve të shfletuesit — zgjidhësit që nuk i përkasin ISP-së/ofruesit VPN të përdoruesit tregojnë rrjedhje DNS.",
+        "speedtest": "Gjerësia e brezit, vonesa dhe vonesa nën ngarkesë (bufferbloat) të matura kundrejt Cloudflare; pikët vlerësojnë përvojën e transmetimit/lojërave/RTC, sa më lart aq më mirë.",
+        "pingtest": "Statistikat e ping-ut ICMP drejt IP-së së përdoruesit nga sondat e Globalping në mbarë botën.",
+        "mtrtest": "Traceroute MTR për çdo hop drejt IP-së së përdoruesit nga sonda në mbarë botën; humbja në hop-et e ndërmjetme mund të jetë thjesht kufizim i shpejtësisë ICMP, ndërsa humbja e vazhdueshme nga një hop e tutje tregon problem real.",
+        "ruletest": "IP-të dalëse të vëzhguara gjatë marrjes së 8 pikave fundore të testit — më shumë se një IP unike do të thotë se trafiku ndahet në rrugë të ndryshme (p.sh. rregulla proxy).",
+        "browserinfo": "Mjedisi i shfletuesit, sistemit operativ dhe ekranit të pajisjes së testuar.",
+        "adblocktest": "Kontroll i bllokimit të reklamave dhe gjurmuesve i kryer në shfletues: për çdo kategori (rrjete reklamash, analitikë, gjurmues socialë, monitorim gabimesh, telemetri e prodhuesve të pajisjeve, skripte gjurmimi), sa kërkesa drejt pikave fundore të njohura u bllokuan, kaluan ose skaduan (noAnswer). Mosbllokimi i gjithçkaje mund të jetë zgjedhje e qëllimshme, jo defekt.",
+        "invisibility": "Pikët e zbulimit të proxy-t/VPN-së (0-100, sa më lart = aq më e mundshme që të zbulohet) me sinjalet individuale të zbulimit që u aktivizuan.",
+        "enhanceddnsleak": "Kapje DNS në nivel zgjidhësi: çdo IP zgjidhësi që pyeti domenin e testit, me transportin, ekspozimin ECS dhe flamujt DNSSEC (do/cd).",
+        "persona": "Sa ngjan shfletuesi me një banor vendas të shtetit të zgjedhur: një notë e përgjithshme plus vendimi i çdo kontrolli. Vetëm vendimet — vlerat bazë qëllimisht nuk ruhen në një raport të ndarë."
+      }
+    }
+  },
+  "reportPage": {
+    "Loading": "Duke ngarkuar raportin…",
+    "NotFound": "Raporti nuk u gjet ose ka skaduar",
+    "NotFoundNote": "Raportet e ndara fshihen automatikisht kur skadojnë.",
+    "LoadFailed": "Raporti nuk u ngarkua, ju lutem provoni më vonë.",
+    "Unsupported": "Ky raport u krijua me një version tjetër të faqes dhe nuk mund të shfaqet.",
+    "GeneratedBy": "Raport diagnostikues i krijuar në {origin} më {time}",
+    "Stale": "Ky raport është më i vjetër se 3 ditë — rrjeti mund të ketë ndryshuar që atëherë.",
+    "TestMine": "Testo rrjetin tim",
+    "Col": {
+      "Source": "Burimi",
+      "Name": "Emri",
+      "IP": "IP",
+      "Location": "Vendndodhja",
+      "ISP": "ISP",
+      "Status": "Gjendja",
+      "Server": "Serveri",
+      "Provider": "Ofruesi",
+      "Target": "Objektivi",
+      "UniqueIPs": "IP unike dalëse",
+      "Resolvers": "Zgjidhësit"
+    },
+    "Dnssec": {
+      "ok": "DNSSEC i aktivizuar",
+      "partial": "DNSSEC pjesërisht i aktivizuar",
+      "none": "DNSSEC i paaktivizuar"
+    }
+  },
+  "ipHistory": {
+    "Title": "Historiku i IP-ve",
+    "Notes": "IP-të e zbuluara gjatë përdorimit të kësaj faqeje regjistrohen këtu. Të dhënat ruhen vetëm në këtë shfletues — nuk sinkronizohen kurrë me llogarinë tuaj dhe nuk largohen nga pajisja juaj. Kohën e ruajtjes së të dhënave mund ta ndryshoni te “Preferencat”.",
+    "Empty": "Ende nuk ka të dhëna. IP-të do të shfaqen këtu sapo t'i zbulojnë testet e faqes kryesore.",
+    "FilterByType": "Filtro sipas llojit të IP-së",
+    "FilterByCountry": "Filtro sipas shtetit / rajonit",
+    "UnknownCountry": "I panjohur",
+    "NoMatch": "Asnjë e dhënë nuk përputhet me filtrat e zgjedhur.",
+    "ClearAll": "Pastro historikun",
+    "ClearConfirm": "Klikoni sërish për të konfirmuar",
+    "ViewMode": "Pamja e historikut",
+    "ByIP": "Sipas IP-së",
+    "ByDate": "Sipas datës",
+    "UniqueIPCounts": "Numri i etiketave: IP unike në të gjitha të dhënat e ruajtura.",
+    "DailyRecordCounts": "Numri i etiketave: të dhëna në të gjitha datat e ruajtura (një për IP në ditë).",
+    "LastSeen": "Parë së fundi: {date}",
+    "FirstSeen": "Parë për herë të parë: {date}",
+    "RecordDates": "Të gjitha datat e regjistruara",
+    "MapTitle": "Shtetet / rajonet e IP-ve",
+    "MapUnavailable": "Harta nuk është e disponueshme. Mund të përdorni ende filtrat e shteteve.",
+    "MapSelect": "Klikoni për të filtruar këtë shtet / rajon",
+    "MapUnselect": "Klikoni për të hequr filtrin e këtij shteti / rajoni",
+    "ViewMap": "Shiko hartën"
+  },
+  "ipInfos": {
+    "Title": "Informacioni i IP-së",
+    "Notes": "Programi fillimisht kontrollon adresën tuaj IP nga disa sonda të ndryshme (përfshirë IPv4 dhe IPv6), pastaj kërkon të dhënat gjeografike përkatëse nga burimi i të dhënave IP që keni zgjedhur. Nëse ka vetëm 1 stack IP, burimi pa të dhëna do të shfaqet bosh.",
+    "Source": "Sonda IP",
+    "Country": "Rajoni",
+    "Region": "Krahina",
+    "City": "Qyteti",
+    "TimeZone": "Zona kohore",
+    "ISP": "ISP",
+    "ASN": "ASN",
+    "Coordinates": "Koordinatat",
+    "IPv4Error": "Marrja dështoi ose s'ka adresë IPv4",
+    "IPv6Error": "Marrja dështoi ose s'ka adresë IPv6",
+    "type": "Lloji",
+    "anonymity": {
+      "label": "Anonimizues",
+      "tor": "Dalje Tor",
+      "relay": "iCloud Private Relay",
+      "residential": "Proxy rezidencial",
+      "suspectedResidential": "Proxy rezidencial i dyshuar",
+      "proxy": "Proxy",
+      "proxySuspected": "Proxy i mundshëm",
+      "vpn": "VPN",
+      "vpnSuspected": "VPN e mundshme",
+      "none": "Nuk u zbulua"
+    },
+    "qualityScore": "Cilësia e IP-së",
+    "qualityScoreUnknown": "Pikët të panjohura",
+    "advancedUnlockCta": "Për të shmangur abuzimin, hyni për të parë informacionin e mëposhtëm",
+    "advancedQuotaCta": "Kuota mujore për të dhënat e avancuara të IP-së u shpenzua",
+    "ASNInfo": {
+      "trafficPercentage": "Përqindja e trafikut: ",
+      "note": "Të dhëna për këtë AS : ",
+      "asnName": "Emri i AS : ",
+      "asnOrgName": "Organizata e AS : ",
+      "asnCountryCode": "Shteti i AS : ",
+      "estimatedUsers": "Përdorues të vlerësuar : ",
+      "connectionQuality": "Cilësia mesatare e lidhjes: ",
+      "connectionQualityTooltip": "E përmbledhur nga testet e shpejtësisë së Cloudflare të kryera nga përdoruesit në këtë ASN",
+      "speedDownload": "Shkarkimi : ",
+      "speedUpload": "Ngarkimi : ",
+      "latency": "Vonesa : ",
+      "jitter": "Luhatja : ",
+      "IPv4_Pct": "IPv4",
+      "IPv6_Pct": "IPv6",
+      "HTTP_Pct": "HTTP",
+      "HTTPS_Pct": "HTTPS",
+      "Desktop_Pct": "Desktop",
+      "Mobile_Pct": "Celular",
+      "Bot_Pct": "Bot",
+      "Human_Pct": "Njeri",
+      "openProfile": "Hap profilin e plotë të ASN"
+    },
+    "ASNHistory": {
+      "announcedPrefixes": "Prefikset e shpallura: ",
+      "note": "Shpalljet historike të ASN për këtë IP: ",
+      "empty": "Nuk u gjetën të dhëna historike rrugëzimi për këtë IP.",
+      "error": "Historiku i ASN nuk u ngarkua.",
+      "seenBy": "Dukshmëria në RIPE RIS: {pct}% — maksimumi {peers} peer-a me feed të plotë"
+    },
+    "ASNConnectivity": {
+      "note": "Shtigjet drejt furnizuesve nga ky AS te ofruesit globalë të tranzitit Tier 1: ",
+      "empty": "Nuk ka të dhëna për lidhshmërinë drejt furnizuesve për këtë AS.",
+      "error": "Lidhshmëria e ASN nuk u ngarkua.",
+      "expand": "Zgjero",
+      "dialogTitle": "Lidhshmëria e rrjetit për AS{asn}",
+      "legendOrigin": "Origjina",
+      "legendTier1": "ISP Tier 1",
+      "legendIntermediate": "AS i ndërmjetëm",
+      "legendTransit": "Tranzit",
+      "legendPeering": "Peering",
+      "zoomIn": "Zmadho",
+      "zoomOut": "Zvogëlo",
+      "zoomReset": "Rivendos zmadhimin"
+    },
+    "advancedData": {
+      "type": {
+        "Residential": "Rezidenciale",
+        "Wireless": "Pa tel",
+        "Business": "Biznes",
+        "Hosting": "Hosting",
+        "unknownType": "Lloj i panjohur"
+      },
+      "Nativeness": "Përputhja ASN-Gjeo",
+      "NativeIPYes": "Përputhet",
+      "NativeIPNo": "Nuk përputhet",
+      "nativenessTooltip": "Nëse shteti i regjistruar i ASN përputhet me shtetin e gjeolokacionit të IP-së"
+    },
+    "scoreDetails": {
+      "toggle": "Detajet e pikëve",
+      "explainTitle": "Si u arrit te pikët",
+      "explain": {
+        "unknownOperator": "një operator i paidentifikuar",
+        "summary": {
+          "lowRisk": "Adresa IP {ip} operohet nga {operator} dhe ka pikë cilësie {score}/100, që ne e konsiderojmë rrezik të ulët.",
+          "mediumRisk": "Adresa IP {ip} operohet nga {operator} dhe ka pikë cilësie {score}/100, që ne e konsiderojmë rrezik të moderuar.",
+          "highRisk": "Adresa IP {ip} operohet nga {operator} dhe ka pikë cilësie {score}/100, që ne e konsiderojmë rrezik të lartë."
+        },
+        "network": {
+          "datacenter": "I përket një rrjeti hostingu / qendre të dhënash dhe jo një lidhjeje të zakonshme shtëpiake ose celulare.",
+          "mobile": "Është në një rrjet celular, ku një adresë shpesh ndahet nga shumë përdorues.",
+          "satellite": "Është në një rrjet interneti satelitor, jo në brezgjerë të zakonshëm shtëpiak ose biznesi.",
+          "isp": "Është në një rrjet aksesi të një ISP-je (brezgjerë shtëpiak ose biznesi), jo te një ofrues hostingu."
+        },
+        "anonymity": {
+          "none": "Nuk është zbuluar përdorim VPN-je, proxy-je, Tor-i apo private relay në të.",
+          "tor": "Është pjesë e rrjetit anonim Tor.",
+          "relay": "Është një dalje e iCloud Private Relay, e ndarë nga shumë përdorues të Apple.",
+          "proxySingle": "Një burim i vetëm e identifikon si proxy.",
+          "proxyMulti": "Disa burime të pavarura e identifikojnë si proxy.",
+          "residentialProxy": "Është identifikuar si dalje e një proxy-je rezidenciale.",
+          "residentialProxySuspected": "Kjo IP u vu re më {date} si dalje e dyshuar e një proxy-je rezidenciale (shtëpiake).",
+          "residentialProxySuspectedUndated": "Kjo IP është vënë re si dalje e dyshuar e një proxy-je rezidenciale (shtëpiake).",
+          "vpnSingle": "Një burim i vetëm e identifikon si VPN ose shërbim anonimizimi.",
+          "vpnMulti": "Disa burime të pavarura e identifikojnë si VPN ose shërbim anonimizimi."
+        },
+        "anonymityLastSeen": "Kjo u vu re për herë të fundit më {date}.",
+        "reputation": {
+          "none": "Nuk u gjetën raporte të rëndësishme abuzimi ose regjistrime në lista bllokimi për të.",
+          "low": "Ka prova të vogla abuzimi kundër saj (raporte ose regjistrime në lista bllokimi).",
+          "lowDated": "Ka prova të vogla abuzimi kundër saj; raporti i fundit i abuzimit është nga {date}.",
+          "medium": "Ka prova të dukshme abuzimi kundër saj (raporte ose regjistrime në lista bllokimi).",
+          "mediumDated": "Ka prova të dukshme abuzimi kundër saj; raporti i fundit i abuzimit është nga {date}.",
+          "high": "Ka prova të forta abuzimi kundër saj (raporte ose regjistrime në lista bllokimi).",
+          "highDated": "Ka prova të forta abuzimi kundër saj; raporti i fundit i abuzimit është nga {date}."
+        },
+        "asn": {
+          "none": "Rrjeti i saj (ASN) nuk tregon më shumë aktivitet abuzimi ose VPN se sa është tipike në internet.",
+          "low": "Rrjeti i saj (ASN) tregon pak më shumë aktivitet abuzimi ose VPN se sa është tipike.",
+          "medium": "Rrjeti i saj (ASN) tregon aktivitet qartësisht të shtuar abuzimi ose VPN.",
+          "high": "Rrjeti i saj (ASN) tregon aktivitet shumë të lartë abuzimi ose VPN."
+        }
+      },
+      "tagsTitle": "Të gjitha atributet",
+      "blocklistHint": "Pikët janë një profil i përgjithshëm i kësaj IP-je. Doni të dini nëse është në ndonjë listë bllokimi tani?",
+      "blocklistLink": "Kontrollo listat e bllokimit live",
+      "tagState": {
+        "yes": "Po",
+        "no": "Jo",
+        "suspected": "E dyshuar"
+      },
+      "tags": {
+        "isDatacenter": "Qendër të dhënash",
+        "isResidential": "Linjë rezidenciale",
+        "isMobile": "Rrjet celular",
+        "isSatellite": "Satelitor",
+        "isProxy": "Proxy",
+        "isVPN": "VPN",
+        "isResidentialProxy": "Proxy rezidencial",
+        "isRelay": "iCloud Private Relay",
+        "isTor": "Tor",
+        "isAbuser": "Histori abuzimi",
+        "isCrawler": "Crawler",
+        "isNative": "Përputhja ASN-Gjeo"
+      }
+    },
+    "countryTraffic": {
+      "subtitle": "Aktiviteti tipik javor online në këtë shtet/rajon — shikoni vetëm trafikun e krijuar nga njerëzit ose gjithë trafikun (përfshirë trafikun e botëve/të automatizuar).",
+      "human": "Vetëm njerëz",
+      "loading": "Duke u ngarkuar...",
+      "error": "Aktiviteti online nuk u ngarkua."
+    }
+  },
+  "serviceStatus": {
+    "Title": "Gjendja e shërbimeve",
+    "Note": "Kur një shërbim nuk hapet, problemi mund të mos jetë te ju — vetë shërbimi mund të jetë jashtë funksionit. Sot njerëzit përdorin shumë produkte AI dhe, kur një produkt AI nuk përgjigjet, nuk e dinë nëse problemi është te ata apo te shërbimi. Ky seksion tregon disponueshmërinë live të shërbimeve të njohura AI; zgjeroni një kartë për të parë gjendjen e çdo nënshërbimi dhe incidentet e fundit.",
+    "Refresh": "Rifresko gjendjen e shërbimeve",
+    "LastChecked": "Kontrolluar së fundi",
+    "AllOperational": "Të gjitha sistemet funksionojnë",
+    "ComponentsTitle": "Shërbimet",
+    "IncidentsTitle": "Incidentet e fundit",
+    "NoComponents": "Nuk ka detaje për shërbimet.",
+    "NoRecentIncidents": "Nuk ka incidente të fundit.",
+    "Loading": "Duke u ngarkuar…",
+    "Checking": "Duke kontrolluar…",
+    "IncidentsError": "Incidentet nuk u ngarkuan.",
+    "ComponentsError": "Shërbimet nuk u ngarkuan.",
+    "indicator": {
+      "minor": "Probleme të vogla",
+      "major": "Ndërprerje e madhe",
+      "critical": "Ndërprerje kritike",
+      "maintenance": "Në mirëmbajtje",
+      "unknown": "Gjendja e padisponueshme"
+    },
+    "component": {
+      "operational": "Funksional",
+      "degraded_performance": "I degraduar",
+      "partial_outage": "Ndërprerje e pjesshme",
+      "major_outage": "Ndërprerje e madhe",
+      "under_maintenance": "Mirëmbajtje"
+    },
+    "incidentStatus": {
+      "investigating": "Duke u hetuar",
+      "identified": "Identifikuar",
+      "monitoring": "Nën monitorim",
+      "resolved": "Zgjidhur",
+      "postmortem": "Analizë pas incidentit",
+      "scheduled": "Planifikuar",
+      "in_progress": "Në vazhdim",
+      "verifying": "Duke u verifikuar",
+      "completed": "Përfunduar"
+    }
+  },
+  "connectivity": {
+    "Title": "Lidhshmëria e rrjetit",
+    "Note": "Ky test kontrollon lidhjen tuaj me një faqe interneti. Sa më e lartë vonesa, aq më e ngadaltë është lidhja juaj me atë faqe. Mund të importoni ose të shtoni në listën e testimit faqe të tjera që përdorni shpesh për testim të shpejtë.",
+    "StatusWait": "Në pritje të testit",
+    "StatusTesting": "Duke testuar…",
+    "StatusAvailable": "OK",
+    "StatusUnavailable": "E padisponueshme",
+    "StatusTimeout": "Kohë e skaduar ose e padisponueshme",
+    "checking": "Duke kontrolluar...",
+    "minTestTime": "Koha min. e testit: ",
+    "RefreshThisTest": "Rifresko këtë test",
+    "OpenSite": "Hap faqen",
+    "RoundCount": "Raundi {n}: ",
+    "addCustom": {
+      "AddCard": "Shto test",
+      "Title": "Shto një test të personalizuar",
+      "Hint": "Testojmë duke ngarkuar favicon-in e faqes përmes HTTPS. Disa faqe mund të mos arrihen në këtë mënyrë. Testet e personalizuara ruhen lokalisht në shfletuesin tuaj.",
+      "ProbeBlockedNote": "Politikat e sigurisë së disa faqeve bllokojnë sondat cross-origin — mund të shfaqen si të paarritshme edhe pse hapen pa problem.",
+      "NameLabel": "Emri",
+      "NamePlaceholder": "p.sh. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "p.sh. wikipedia.org",
+      "Add": "Shto",
+      "Remove": "Hiq testin",
+      "NameRequired": "Ju lutem shkruani një emër.",
+      "UrlRequired": "Ju lutem shkruani një URL.",
+      "InvalidUrl": "Kjo nuk duket si URL e vlefshme.",
+      "LimitReached": "Keni arritur kufirin prej 60 testesh.",
+      "LastTargetTitle": "Nuk mund të hiqet",
+      "LastTargetMessage": "Duhet të mbetet të paktën një faqe testimi."
+    },
+    "importDialog": {
+      "Title": "Shto / Importo teste",
+      "CustomOption": "Shto të personalizuar",
+      "ImportOption": "Importo një listë",
+      "SiteCount": "{n} faqe",
+      "Import": "Importo",
+      "NotEnoughCapacity": "Kapacitet i pamjaftueshëm — kjo listë kërkon {need} vende, kanë mbetur vetëm {free}.",
+      "Destination": "Shto te",
+      "ImportAsNew": "Importo si listë të re"
+    },
+    "lists": {
+      "Tab": "Listat",
+      "Mine": "Faqet e mia",
+      "Manage": "Menaxho listat",
+      "NewListPlaceholder": "Emri i listës së re",
+      "Create": "Krijo",
+      "LimitReached": "Mund të mbani deri në {limit} lista.",
+      "Rename": "Riemërto",
+      "Delete": "Fshi",
+      "MoveUp": "Lëviz lart",
+      "MoveDown": "Lëviz poshtë",
+      "DeleteNotEmpty": "Hiqni të gjitha faqet e saj përpara se ta fshini këtë listë.",
+      "MineUndeletable": "Lista e parazgjedhur nuk mund të fshihet.",
+      "Save": "Ruaj",
+      "Cancel": "Anulo",
+      "Hint": "Një listë duhet zbrazur përpara se të fshihet; “Faqet e mia” mbetet gjithmonë."
+    },
+    "importLists": {
+      "defaults": "Parazgjedhjet e sistemit",
+      "iran": "Thelbësoret e Iranit",
+      "russia": "Thelbësoret e Rusisë",
+      "india": "Thelbësoret e Indisë",
+      "china": "Thelbësoret e Kinës",
+      "brazil": "Thelbësoret e Brazilit",
+      "nigeria": "Thelbësoret e Nigerisë",
+      "germany": "Thelbësoret e Gjermanisë",
+      "ai": "Shërbime AI",
+      "social": "Rrjete sociale dhe mesazhe",
+      "productivity": "Punë dhe produktivitet",
+      "education": "Arsim online",
+      "streaming": "Transmetim",
+      "music": "Muzikë dhe audio",
+      "sports": "Sport",
+      "travel": "Udhëtime dhe rezervime",
+      "gaming": "Lojëra",
+      "developer": "Zhvillues",
+      "cloud": "Cloud dhe CDN",
+      "finance": "Financa dhe pagesa",
+      "crypto": "Bursa kripto",
+      "ecommerce": "E-commerce global",
+      "news": "Lajme dhe Wiki"
+    }
+  },
+  "webrtc": {
+    "id": "webrtc",
+    "Title": "Testi i rrjedhjes WebRTC",
+    "Name": "Lidhja WebRTC",
+    "Note": "Kur shfletuesi merr adresa rrjeti përmes WebRTC, mund ta anashkalojë VPN-në ose proxy-n tuaj dhe ta ekspozojë IP-në tuaj të vërtetë te faqet e internetit. Ky test kontrollon cila IP ekspozohet kur lidheni përmes WebRTC; nëse adresa IP ose rajoni i kthyer nuk është ai që prisni, mund të ketë rrezik rrjedhjeje WebRTC dhe mund t'ju duhet të rregulloni cilësimet e proxy-t. Përveç IP-së që përdoret për lidhjet WebRTC, zbulojmë edhe llojin e NAT-it tuaj.",
+    "StatusWait": "Në pritje të testit",
+    "StatusTesting": "Duke testuar…",
+    "StatusError": "Gabim lidhjeje",
+    "StatusUnavailable": "WebRTC i padisponueshëm",
+    "SdpLog": "Regjistri SDP",
+    "NATType": {
+      "srflx": "Port Restricted Cone ose Symmetric",
+      "prflx": "Port Restricted Cone",
+      "relay": "Symmetric",
+      "host": "Full Cone",
+      "unknown": "Lloj i panjohur"
+    }
+  },
+  "dnsleaktest": {
+    "Name": "Testi i pikës fundore DNS",
+    "Title": "Testi i rrjedhjes DNS",
+    "Note": "Edhe kur përdorni një VPN ose proxy, kërkesat DNS mund të dërgohen ende përmes rrjetit tuaj lokal, duke ekspozuar domenet e faqeve që vizitoni. ISP-të, firewall-et, ofruesit e Wi-Fi publik dhe të tjerë përgjatë rrugës mund t'i përgjojnë dhe të mësojnë cilat faqe po vizitoni. Ky test viziton një emër domeni të sapokrijuar për të zbuluar përmes cilit rajon kalojnë kërkesat tuaja DNS; nëse rajoni i kthyer ndryshon nga rajoni i VPN-së/proxy-t që po përdorni, mund të ketë rrezik rrjedhjeje DNS.",
+    "EndpointCountry": "Rajoni i pikës fundore",
+    "StatusWait": "Në pritje të testit",
+    "StatusTesting": "Duke testuar…",
+    "StatusError": "Gabim në test"
+  },
+  "speedtest": {
+    "Title": "Testi i shpejtësisë",
+    "Note": "Testi i shpejtësisë do të kryhet duke përdorur rrjetin edge të Cloudflare. Mund të zgjidhni madhësinë e paketave për shkarkim dhe ngarkim sipas nevojave tuaja. Gjatë testit, paketat do të ngarkohen dhe shkarkohen 4 herë — kini parasysh konsumin e të dhënave. Meqë Cloudflare nuk ka nyje edge në çdo shtet të botës, rezultatet janë vetëm orientuese; shpejtësitë reale mund të jenë më të larta.",
+    "Download": "Shkarkimi",
+    "Upload": "Ngarkimi",
+    "Latency": "Vonesa",
+    "Jitter": "Luhatja",
+    "loadedLatency": "Vonesa nën ngarkesë: ",
+    "videoStreaming": "Transmetim video",
+    "gaming": "Lojëra",
+    "rtc": "Biseda video",
+    "score": "Bazuar në testin e shpejtësisë, u morën pikët e mëposhtme të cilësisë:",
+    "connectionFrom": "Testi i shpejtësisë përfundoi nga pajisja juaj, IP: ",
+    "connectionTo": " drejt serverit të testit:",
+    "connectionEnd": " .",
+    "testFailed": "Serveri i testit të shpejtësisë nuk u arrit. Ju lutem kontrolloni lidhjen dhe provoni sërish.",
+    "phases": {
+      "probe": "Test paraprak",
+      "latency": "Testi i vonesës",
+      "download": "Testi i shkarkimit",
+      "upload": "Testi i ngarkimit"
+    },
+    "phasePaused": "{phase} — në pauzë",
+    "phaseFinished": "Testi përfundoi",
+    "phaseFailed": "Testi dështoi",
+    "quality": {
+      "bad": "Keq",
+      "poor": "Dobët",
+      "average": "Mesatar",
+      "good": "Mirë",
+      "great": "Shkëlqyeshëm"
+    },
+    "ToolHint": "Gjerësia e brezit është vetëm gjysma e tablosë: shikoni si e arrin rrjeti juaj pjesën tjetër të botës me {ping} dhe {mtr}."
+  },
+  "globalping": {
+    "Selected": "Rajonet e zgjedhura: ",
+    "Suggested": "Rajonet e sugjeruara",
+    "NoProbe": "Nuk ka sonda të disponueshme në këtë shtet/rajon",
+    "GroupFull": "Deri në {max} shtete/rajone — hiqni disa së pari",
+    "UnreachableTarget": "Sondat ekzekutohen në internetin publik, ndaj adresat private dhe të rezervuara nuk mund të arrihen nga asnjë shtet.",
+    "ResultsHint": "Rezultatet do të shfaqen këtu pasi të zgjidhni sondat dhe të kryeni testin.",
+    "Asia": "Azia",
+    "Europe": "Evropa",
+    "Africa": "Afrika",
+    "Americas": "Amerikat",
+    "Oceania": "Oqeania"
+  },
+  "pingtest": {
+    "EnterIPLabel": "Shkruaj një IP për të testuar",
+    "EnterIPPlaceholder": "p.sh. 1.1.1.1",
+    "UseStored": "Përdor një IP të ruajtur",
+    "id": "pingtest",
+    "Title": "Testi global i vonesës",
+    "Note": "Testi Ping është një mjet rrjeti që përdoret për të matur kohën e vajtje-ardhjes së paketave të të dhënave mes dy pikave fundore (serverëve). Është një metrikë kyçe për vlerësimin e performancës së rrjetit.",
+    "Note2": "Në testin më poshtë, IPCheck.ing përdor sondat botërore të Globalping për të dërguar paketa të vogla të dhënash nga serverë në mbarë botën drejt adresës suaj IP, duke matur kohën që u duhet këtyre paketave për të shkuar nga serveri te pajisja juaj dhe për t'u kthyer. Përmes këtyre testeve Ping nga vendndodhje të ndryshme gjeografike, mund të keni një pamje të plotë të shpejtësisë dhe qëndrueshmërisë së lidhjes së pajisjes suaj me rrjetin global.",
+    "Note3": "Ju lutem zgjidhni adresën tuaj IP për testim.",
+    "SelectIP": "Zgjidh një adresë IP",
+    "Region": "Rajoni",
+    "MinDelay": "Vonesa min. (ms)",
+    "MaxDelay": "Vonesa maks. (ms)",
+    "AvgDelay": "Vonesa mes. (ms)",
+    "TotalPackets": "Paketat gjithsej",
+    "PacketLoss": "Humbja e paketave",
+    "ReceivedPackets": "Të marra",
+    "DroppedPackets": "Të humbura",
+    "Error": "Testi dështoi, duket se IP-së suaj nuk i lejohet të kryejë testin Ping."
+  },
+  "mtrtest": {
+    "EnterIPLabel": "Shkruaj një IP për të testuar",
+    "EnterIPPlaceholder": "p.sh. 1.1.1.1",
+    "UseStored": "Përdor një IP të ruajtur",
+    "Title": "Testi MTR",
+    "Note": "Testi MTR (My Traceroute) përdor sondat botërore të Globalping për të kryer gjurmim të detajuar të rrugës drejt adresës suaj IP nga serverë të vendosur në kontinente dhe rajone të ndryshme të botës. MTR kombinon funksionalitetin e komandave tradicionale traceroute dhe ping për të diagnostikuar në kohë reale cilësinë dhe performancën e lidhjeve të rrjetit.",
+    "Note2": "Ky proces mbulon shtegun e plotë nga vendndodhje të ndryshme gjeografike deri te mjedisi i rrjetit tuaj, duke dhënë informacion për vonesën dhe humbjen e paketave në çdo hop. Qoftë mbingarkesë në shtegun e rrugëzimit, probleme vonese në një nyje të caktuar apo humbje paketash gjatë transmetimit, testi MTR jep informacion diagnostikues kritik.",
+    "Note3": "Ju lutem zgjidhni adresën tuaj IP për testim.",
+    "SelectIP": "Zgjidh një adresë IP",
+    "Region": "Rajoni",
+    "Error": "Testi dështoi, duket se IP-së suaj nuk i lejohet të kryejë testin MTR.",
+    "ColHost": "Hosti",
+    "ColIP": "IP",
+    "ColASN": "ASN",
+    "ColLoss": "Humbja",
+    "ColSent": "Dërguar",
+    "ColDrop": "Humbur",
+    "ColRecv": "Marrë",
+    "ColLast": "E fundit",
+    "ColAvg": "Mes.",
+    "ColBest": "Më e mira",
+    "ColWorst": "Më e keqja",
+    "ColStDev": "Dev. std.",
+    "ColJitter": "Luhatja",
+    "NoReply": "Pa përgjigje"
+  },
+  "ipcheck": {
+    "Title": "Kontrolli i IP-së",
+    "Placeholder": "p.sh. 1.1.1.1",
+    "Error": "Ju lutem shkruani një adresë të vlefshme IPv4 ose IPv6.",
+    "reservedIP": "Adresat private, loopback dhe të tjera të rezervuara nuk kanë gjeolokacion, ndaj s'ka asgjë për të kërkuar.",
+    "NoData": "Informacioni për këtë IP nuk u mor dot. Mund të jetë e parrugëzueshme (p.sh. 0.0.0.0, adresë private) ose burimi nuk ka të dhëna për të."
+  },
+  "alert": {
+    "refreshEverythingMessage": "Po rifreskohen të gjitha të dhënat, ju lutem prisni...",
+    "refreshEverythingTitle": "Duke rifreskuar",
+    "OhNo": "Oh jo!",
+    "Congrats": "Urime!",
+    "OhNo_Message": "Testi i lidhshmërisë dështoi, disa faqe interneti nuk janë të aksesueshme.",
+    "Congrats_Message": "Të gjitha testet e lidhshmërisë kaluan, mund t'i aksesoni të gjitha faqet e internetit.",
+    "maskedInfoTitle": "IP-të u maskuan",
+    "maskedInfoMessage": "Ndarja e pamjeve të ekranit nuk do t'i zbulojë IP-të tuaja.",
+    "unmaskedInfoTitle": "IP-të u shfaqën",
+    "unmaskedInfoMessage": "Kini kujdes kur ndani pamje të ekranit.",
+    "SignInFailed": "Hyrja dështoi",
+    "SignInFailedReason": "Arsyeja",
+    "IpGeoSourceFallbackTitle": "Burimi i gjeolokacionit të IP-së u ndryshua",
+    "IpGeoSourceFallbackMessage": "{from} nuk është përkohësisht i disponueshëm — për momentin ky rezultat vjen nga {to}.",
+    "SignInEmailTakenTitle": "Ky email është tashmë në përdorim",
+    "SignInEmailTakenMessage": "Ekziston tashmë një llogari për këtë adresë emaili. Ju lutem hyni me {other}."
+  },
+  "shortcutKeys": {
+    "GoToTop": "Shko në krye",
+    "GoToBottom": "Shko në fund",
+    "ToggleDarkMode": "Ndrysho modalitetin e errët",
+    "RefreshEverything": "Rifresko gjithçka",
+    "RefreshIPCard": "Rifresko kartën e IP-së",
+    "RefreshConnectivityTests": "Rifresko testet e lidhshmërisë",
+    "RefreshWebRTC": "Rifresko testin e rrjedhjes WebRTC",
+    "RefreshDNSLeakTest": "Rifresko testin e rrjedhjes DNS",
+    "SpeedTestButton": "Nis/Ndalo testin e shpejtësisë",
+    "PingTest": "Hap panelin e Testit global të vonesës",
+    "MTRTest": "Hap panelin e Testit MTR",
+    "RuleTest": "Hap panelin e Testit të rregullave",
+    "DNSResolver": "Hap panelin e Zgjidhjes DNS",
+    "IPCheck": "Kërko adresën IP",
+    "ToggleInfoMask": "Ndrysho maskimin e informacionit",
+    "IPHistory": "Hap panelin e Historikut të IP-ve",
+    "ShareReport": "Hap dritaren e ndarjes së raportit",
+    "Help": "Shfaq shkurtoret e tastierës",
+    "HelpNote": "Ata që përdorin shkurtore janë vërtet të mrekullueshëm!",
+    "GoNext": "Karta tjetër",
+    "GoPrevious": "Karta e mëparshme",
+    "OpenHighlightedTool": "Hap kartën e theksuar (mjet ose faqe)",
+    "RefreshRuleTests": "Rifresko testet e rregullave",
+    "CensorshipCheck": "Hap panelin e Kontrollit të censurës",
+    "Pulse": "Hap panelin e Tokës Online",
+    "Whois": "Hap panelin e Kërkimit Whois",
+    "ServiceStatus": "Hap panelin e Gjendjes së shërbimeve",
+    "InvisibilityTest": "Hap panelin e Testit të padukshmërisë",
+    "EnhancedDnsLeakTest": "Hap panelin e Testit të thelluar të rrjedhjes DNS",
+    "MacChecker": "Hap panelin e kërkimit MAC",
+    "IpCalculator": "Hap panelin e Kalkulatorit IP",
+    "BrowserInfo": "Hap panelin e Informacionit të shfletuesit",
+    "AdblockTest": "Hap panelin e Testit të bllokimit të reklamave dhe gjurmuesve",
+    "SecurityChecklist": "Hap panelin e Listës së sigurisë",
+    "PersonaCheck": "Hap panelin e Kontrollit të thelluar të personës",
+    "IpBlocklist": "Hap panelin e Kontrollit të listave të bllokimit IP",
+    "AsnProfile": "Hap panelin e Kërkimit të profilit ASN"
+  },
+  "page": {
+    "title": "IPCheck.ing - Kontrollo adresën dhe gjeolokacionin e IP-së - Testi i rrjedhjes së IP-së - Testi i rrjedhjes DNS - Kontrolli i cilësisë së IP-së - Testo shpejtësinë e rrjetit - Kuti mjetesh IP gjithëpërfshirëse",
+    "description": "Një kuti mjetesh IP më e mirë dhe me burim të hapur: kontrolloni adresën dhe gjeolokacionin e IP-së, testoni rrjedhjet e IP-së përmes WebRTC dhe DNS, kontrolloni cilësinë e IP-së dhe gjurmën e shfletuesit, si dhe testin e shpejtësisë, testin global të vonesës, testin MTR, kërkimin Whois e shumë të tjera.",
+    "keywords": "MyIP, mjet IP, kontroll IP, kontroll i rrjedhjes së IP-së, kontroll i cilësisë së IP-së, kërkim IP, test i rrjedhjes DNS, test i rrjedhjes WebRTC, kontroll i gjurmës së shfletuesit, test shpejtësie, test global i vonesës, test MTR, kërkim DNS, kërkim Whois",
+    "footerLink": "https://github.com/jason5ng32/MyIP",
+    "copyRightName": "Fillimisht nga ",
+    "copyRightLink": "https://ipcheck.ing",
+    "copyRightLinkName": "IPCheck.ing"
+  },
+  "helpModal": {
+    "Title": "Shkurtoret e tastierës"
+  },
+  "footer": {
+    "Tagline": "Një kuti mjetesh privatësie falas, me burim të hapur dhe gjithëpërfshirëse.",
+    "Project": "Projekti",
+    "Support": "Dokumentacioni dhe mbështetja",
+    "DeveloperDocs": "Dokumentacioni për zhvilluesit",
+    "SelfHosting": "Udhëzuesi i vetë-strehimit",
+    "ReportIssue": "Raporto një problem",
+    "License": "Licenca MIT",
+    "Clients": "Klientët",
+    "Raycast": "Shtesa për Raycast",
+    "Lite": "Versioni Lite"
+  },
+  "about": {
+    "Title": "Rreth nesh",
+    "project": [
+      "IPCheck.ing është një kuti mjetesh IP falas dhe gjithëpërfshirëse që ju ndihmon të kontrolloni informacionin e IP-së suaj, të testoni disponueshmërinë e faqeve të internetit, të shqyrtoni informacionin e daljes DNS dhe të kryeni teste shpejtësie, teste globale të vonesës, teste MTR e shumë të tjera.",
+      "Ky është një projekt me burim të hapur — klikoni ikonën e GitHub në fund të faqes për të shfletuar kodin burimor.",
+      "Nëse nuk jeni të sigurt si funksionon një veçori, hapni lidhjen “Qendra e ndihmës” në fund të faqes. Dokumentacioni është i detajuar: përveç përshkrimit të çdo veçorie, shpjegon edhe konceptet e rrjetit dhe si të zgjidhni problemet e rrjetit.",
+      "Nëse dëshironi të merrni pjesë në projektin me burim të hapur, hapni lidhjen “Dokumentacioni për zhvilluesit” në fund të faqes për të parë si."
+    ],
+    "founderTitle": "Rreth themeluesit",
+    "founder": [
+      "Ky nisi si një projekt anësor i Jason Ng (阿禅) për të mësuar Vue.js dhe si të shkruajë kod me AI. Teksa mblodhi gjithnjë e më shumë yje në GitHub, ai e rishkroi në masë të madhe dhe shtoi shumë veçori vërtet të dobishme. Shpresojmë t'ju pëlqejë.",
+      "Ai nuk është programues profesionist. Shumicën e kohës punon si menaxher produkti, bloger, motoçiklist dhe geek — por e do kodimin, burimin e hapur dhe ndarjen.",
+      "Një prezantim më të detajuar për të mund ta gjeni në lidhjet më poshtë:"
+    ],
+    "contactTitle": "Na kontaktoni",
+    "contact": [
+      "Nëse hasni vështirësi gjatë përdorimit të IPCheck.ing ose vendosjes së projektit MyIP, shkoni së pari te “Qendra e ndihmës”. Nëse nuk e gjeni përgjigjen atje dhe keni ngecur, hapni një issue në GitHub ose na shkruani me email.",
+      "Dhe nëse hasni një gabim dhe ju pëlqen të kodoni (ose të kodoni me AI), jeni shumë të mirëpritur të na dërgoni një PR me rregullimin tuaj.",
+      "Emaili ynë: i[AT]ipcheck.ing."
+    ],
+    "personal": "Faqja personale",
+    "blog": "Postimet në blog",
+    "linkedIn": "LinkedIn",
+    "twitter": "Twitter",
+    "Sponsor": "Na sponsorizoni",
+    "Privacy": "Privatësia",
+    "HelpCenter": "Qendra e ndihmës",
+    "Close": "Mbyll"
+  },
+  "acknowledgement": {
+    "Title": "Falënderime",
+    "Note1": "Ky projekt nuk do të ishte realizuar pa mbështetjen dhe ndihmën e disa individëve dhe organizatave entuziaste, si dhe të atyre që dhanë frymëzim ose e publikuan kodin e tyre me burim të hapur. Shumë faleminderit:"
+  },
+  "changelog": {
+    "Title": "Ndryshimet",
+    "add": "Shtuar",
+    "improve": "Përmirësuar",
+    "fix": "Rregulluar"
+  },
+  "pwa": {
+    "appDescription": "Kuti mjetesh IP gjithëpërfshirëse",
+    "installDescription": "E keni përdorur IPCheck.ing tashmë {count} herë — instalojeni si aplikacion për një përvojë më të rrjedhshme dhe akses më të shpejtë."
+  }
+}
