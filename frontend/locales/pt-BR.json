@@ -1940,7 +1940,8 @@
       "average": "Média",
       "good": "Boa",
       "great": "Excelente"
-    }
+    },
+    "ToolHint": "A largura de banda é só metade da história: veja como sua rede alcança o resto do mundo com o {ping} e o {mtr}."
   },
   "globalping": {
     "Selected": "Regiões selecionadas: ",

@@ -1940,7 +1940,8 @@
       "average": "一般",
       "good": "良好",
       "great": "優秀"
-    }
+    },
+    "ToolHint": "頻寬只說明了一半：用 {ping} 和 {mtr} 看看你的網路連到世界各地的表現。"
   },
   "globalping": {
     "Selected": "已選地區：",

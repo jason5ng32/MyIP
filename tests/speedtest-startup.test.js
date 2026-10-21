@@ -35,6 +35,8 @@ const fixture = () => {
     onUnmounted: callback => { unmount = callback; },
     useMainStore: () => ({ lang: 'en', userPreferences: {}, updateAllIPs: value => ips.push(value) }),
     useI18n: () => ({ t: (key, params) => params ? `${key}: ${params.phase}` : key }),
+    useRouter: () => ({ push: () => {} }),
+    isPlainClick: () => true,
     useAppCommand: () => {},
     trackEvent: () => {},
     SpeedTestEngine: Engine,

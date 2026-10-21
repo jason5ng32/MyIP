@@ -1940,7 +1940,8 @@
       "average": "一般",
       "good": "良好",
       "great": "优秀"
-    }
+    },
+    "ToolHint": "带宽只说明了一半：用 {ping} 和 {mtr} 看看你的网络连到世界各地的表现。"
   },
   "globalping": {
     "Selected": "已选地区：",

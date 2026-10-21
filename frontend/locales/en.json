@@ -1940,7 +1940,8 @@
       "average": "Average",
       "good": "Good",
       "great": "Great"
-    }
+    },
+    "ToolHint": "Bandwidth is only half the picture: see how your network reaches the rest of the world with {ping} and {mtr}."
   },
   "globalping": {
     "Selected": "Regions selected: ",

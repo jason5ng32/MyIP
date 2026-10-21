@@ -157,6 +157,19 @@
                   {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
                 </span>
               </p>
+              <!-- Next step: the latency / route tools. Real links (modified
+                   clicks stay the browser's); break-normal undoes the block's
+                   break-all for prose. -->
+              <i18n-t keypath="speedtest.ToolHint" tag="p" scope="global" class="m-0 break-normal">
+                <template #ping>
+                  <a href="/tools/pingtest" :class="toolLinkClass" @click="openTool($event, 'pingtest')">
+                    {{ t('pingtest.Title') }}</a>
+                </template>
+                <template #mtr>
+                  <a href="/tools/mtrtest" :class="toolLinkClass" @click="openTool($event, 'mtrtest')">
+                    {{ t('mtrtest.Title') }}</a>
+                </template>
+              </i18n-t>
             </span>
           </div>
         </div>
@@ -179,8 +192,10 @@
 <script setup>
 import { reactive, ref, computed, onMounted, markRaw, onUnmounted, nextTick } from 'vue';
 import { useMainStore } from '@/store';
+import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
+import { isPlainClick } from '@/utils/nav-target.js';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
@@ -203,6 +218,18 @@ import {
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
+const router = useRouter();
+
+// Tool links in the result copy. A plain click routes in-app and sends
+// ToolEntry (category = this section, label = slug), which is how GA tells
+// this entrance apart from the card grid's NavClick.
+const toolLinkClass = 'font-medium underline underline-offset-4 decoration-current/40 hover:decoration-current';
+const openTool = (event, slug) => {
+  if (!isPlainClick(event)) return;
+  event.preventDefault();
+  trackEvent('SpeedTest', 'ToolEntry', slug);
+  router.push({ path: `/tools/${slug}` });
+};
 const store = useMainStore();
 const lang = computed(() => store.lang);
 const userPreferences = computed(() => store.userPreferences);

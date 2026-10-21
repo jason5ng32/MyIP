@@ -1940,7 +1940,8 @@
       "average": "Moyen",
       "good": "Bon",
       "great": "Excellent"
-    }
+    },
+    "ToolHint": "La bande passante n'est que la moitié de l'histoire : découvrez comment votre réseau atteint le reste du monde avec {ping} et {mtr}."
   },
   "globalping": {
     "Selected": "Régions sélectionnées: ",
