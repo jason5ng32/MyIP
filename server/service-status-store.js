@@ -3,8 +3,8 @@
 // Rather than fetch upstream status pages on each visitor request, a single
 // background timer refreshes all providers every REFRESH_INTERVAL and keeps
 // the latest normalized snapshot in memory. Request handlers just read the
-// snapshot — upstream load is constant (16 providers × 2 endpoints / 5 min)
-// no matter how much traffic the site gets.
+// snapshot — upstream load is constant (16 providers × 2 endpoints / 5 min,
+// +1 per incident.io page) no matter how much traffic the site gets.
 //
 // Mirrors the bootstrap-at-boot + start-scheduler shape of the MaxMind / CAIDA
 // updaters, but kept deliberately lean: memory only, no files, no locks.
@@ -38,12 +38,17 @@ async function fetchJson(url) {
 // unavailable". Only the genuinely-degraded case (no prior good data) is a
 // warn; recoverable blips drop to debug to keep the prod log quiet.
 async function refreshProvider(provider, previous) {
-    const [summary, incidents] = await Promise.allSettled([
+    const structureUrl = provider.platform === 'incident.io'
+        ? `${provider.api}/proxy/${new URL(provider.api).host}`
+        : null;
+    const [summary, incidents, structure] = await Promise.allSettled([
         fetchJson(`${provider.api}/api/v2/summary.json`),
         fetchJson(`${provider.api}/api/v2/incidents.json`),
+        structureUrl ? fetchJson(structureUrl) : null,
     ]);
     const summaryJson = summary.status === 'fulfilled' ? summary.value : null;
     const incidentsJson = incidents.status === 'fulfilled' ? incidents.value : null;
+    const structureJson = structure.status === 'fulfilled' ? structure.value : null;
 
     if (!summaryJson) {
         const hadGood = previous && previous.indicator !== 'unknown';
@@ -54,7 +59,12 @@ async function refreshProvider(provider, previous) {
         logger.warn({ err: summary.reason, provider: provider.id }, 'service-status summary fetch failed (no prior data)');
     }
 
-    const entry = assembleProvider(provider, summaryJson, incidentsJson);
+    // A failed structure fetch falls back to the summary's own components.
+    if (structureUrl && !structureJson && summaryJson) {
+        logger.debug({ err: structure.reason, provider: provider.id }, 'service-status structure fetch failed; using summary components');
+    }
+
+    const entry = assembleProvider(provider, summaryJson, incidentsJson, structureJson);
     // Keep prior incidents if only the incidents endpoint blipped this tick.
     if (!incidentsJson && previous?.incidents?.length) {
         entry.incidents = previous.incidents;

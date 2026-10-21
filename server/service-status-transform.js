@@ -15,6 +15,7 @@ const COMPONENT_LIMIT = 40;
 //   { flatten: true }    every leaf, group headers dropped
 //   { include: [names] } ordered whitelist by component name
 //   { exclude: [id|name] } final filter on top of any mode (drops junk rows)
+//   { indicator: 'components' } card light from the selected rows, not the page's
 function selectComponents(raw, selector = {}) {
     let picked;
     if (Array.isArray(selector.include)) {
@@ -33,18 +34,69 @@ function selectComponents(raw, selector = {}) {
     return picked;
 }
 
+// Severity order for "worst status"; an unknown string ranks below operational.
+const STATUS_RANK = { operational: 0, under_maintenance: 1, degraded_performance: 2, partial_outage: 3, major_outage: 4 };
+
+const worstStatus = (statuses) => statuses.reduce(
+    (worst, s) => ((STATUS_RANK[s] ?? -1) > STATUS_RANK[worst] ? s : worst),
+    'operational',
+);
+
+// Worst component status → page indicator, matching the frontend tone map.
+export const indicatorFromComponents = (components) => {
+    if (!Array.isArray(components) || !components.length) return 'unknown';
+    switch (worstStatus(components.map((c) => c?.status))) {
+        case 'major_outage':
+            return 'major';
+        case 'partial_outage':
+        case 'degraded_performance':
+            return 'minor';
+        case 'under_maintenance':
+            return 'maintenance';
+        default:
+            return 'none';
+    }
+};
+
+// incident.io's native `/proxy/<host>` payload → Statuspage-style top-level rows
+// `{ id, name, status }`; a group takes its worst visible child. Only
+// non-operational components are listed in `affected_components`.
+export const componentsFromStructure = (proxyJson) => {
+    const items = proxyJson?.summary?.structure?.items;
+    if (!Array.isArray(items)) return [];
+    const affected = proxyJson.summary.affected_components;
+    const statusById = new Map((Array.isArray(affected) ? affected : []).map((a) => [a?.component_id, a?.status]));
+    const statusOf = (id) => statusById.get(id) || 'operational';
+
+    return items.flatMap((item) => {
+        if (item?.group) {
+            const { id, name, hidden, components } = item.group;
+            if (hidden) return [];
+            const visible = (Array.isArray(components) ? components : []).filter((c) => c && !c.hidden);
+            return [{ id, name, status: worstStatus(visible.map((c) => statusOf(c.component_id))) }];
+        }
+        const c = item?.component;
+        if (!c || c.hidden) return [];
+        return [{ id: c.component_id, name: c.name, status: statusOf(c.component_id) }];
+    });
+};
+
 // Normalize a `/api/v2/summary.json` payload to
 //   { indicator, components: [{ name, status }] }
 // where indicator is 'none' | 'minor' | 'major' | 'critical' | 'maintenance' | 'unknown'.
-// `selector` chooses which components to keep (see selectComponents).
-export function normalizeSummary(json, selector = {}) {
-    const raw = Array.isArray(json?.components) ? json.components : [];
+// `selector` chooses which components to keep (see selectComponents);
+// `rawComponents` replaces `json.components` as the rows to select from.
+export function normalizeSummary(json, selector = {}, rawComponents = null) {
+    const raw = Array.isArray(rawComponents) ? rawComponents
+        : Array.isArray(json?.components) ? json.components : [];
     const components = selectComponents(raw, selector)
         .slice(0, COMPONENT_LIMIT)
         .map((c) => ({ name: c?.name ?? '', status: c?.status ?? 'operational' }));
 
     return {
-        indicator: json?.status?.indicator || 'unknown',
+        indicator: selector?.indicator === 'components'
+            ? indicatorFromComponents(components)
+            : json?.status?.indicator || 'unknown',
         components,
     };
 }
@@ -96,8 +148,10 @@ function incidentTimestamp(incident) {
 // fetch) degrades gracefully — normalizeSummary(null) → indicator 'unknown'
 // with no components, normalizeIncidents(null) → []. Keeps the poller's
 // per-provider error handling free of shape-building logic.
-export function assembleProvider(provider, summaryJson, incidentsJson) {
-    const { indicator, components } = normalizeSummary(summaryJson, provider.components);
+// `structureJson` (incident.io `/proxy/<host>`) supplies the rows when it yields any.
+export function assembleProvider(provider, summaryJson, incidentsJson, structureJson = null) {
+    const rows = structureJson ? componentsFromStructure(structureJson) : [];
+    const { indicator, components } = normalizeSummary(summaryJson, provider.components, rows.length ? rows : null);
     return {
         id: provider.id,
         name: provider.name,

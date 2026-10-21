@@ -4,7 +4,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { normalizeSummary, normalizeIncidents, assembleProvider } from '../server/service-status-transform.js';
+import {
+    normalizeSummary, normalizeIncidents, assembleProvider,
+    componentsFromStructure, indicatorFromComponents,
+} from '../server/service-status-transform.js';
 import {
     indicatorToTone, componentStatusToTone, impactLevel, incidentStatusTone,
 } from '../frontend/utils/features/service-status-tone.js';
@@ -74,6 +77,112 @@ describe('normalizeSummary', () => {
         const out = normalizeSummary({});
         assert.equal(out.indicator, 'unknown');
         assert.deepEqual(out.components, []);
+    });
+
+    it('indicator "components" derives the light from the selected rows', () => {
+        const json = {
+            status: { indicator: 'major' },
+            components: [
+                { id: 'a', name: 'CDN', status: 'operational' },
+                { id: 'b', name: 'DNS', status: 'operational' },
+                { id: 'c', name: 'Workers', status: 'partial_outage' },
+                { id: 'd', name: 'Europe PoP', status: 'major_outage' },
+            ],
+        };
+        const healthy = normalizeSummary(json, { include: ['CDN', 'DNS'], indicator: 'components' });
+        assert.equal(healthy.indicator, 'none');
+        const partial = normalizeSummary(json, { include: ['CDN', 'Workers'], indicator: 'components' });
+        assert.equal(partial.indicator, 'minor');
+        // Without the flag, the page's own indicator wins.
+        assert.equal(normalizeSummary(json, { include: ['CDN'] }).indicator, 'major');
+    });
+});
+
+describe('componentsFromStructure', () => {
+    const proxy = (items, affected = []) => ({
+        summary: { structure: { items }, affected_components: affected },
+    });
+
+    it('rolls a group up to its worst child; bare components carry their own status', () => {
+        const out = componentsFromStructure(proxy([
+            { group: { id: 'g1', name: 'APIs', hidden: false, components: [
+                { component_id: 'c1', name: 'Chat', hidden: false },
+                { component_id: 'c2', name: 'Files', hidden: false },
+                { component_id: 'c3', name: 'Batch', hidden: false },
+            ] } },
+            { component: { component_id: 'c4', name: 'Auth', hidden: false } },
+            { component: { component_id: 'c5', name: 'Billing', hidden: false } },
+        ], [
+            { component_id: 'c1', status: 'degraded_performance' },
+            { component_id: 'c2', status: 'major_outage' },
+            { component_id: 'c3', status: 'under_maintenance' },
+            { component_id: 'c5', status: 'partial_outage' },
+        ]));
+        assert.deepEqual(out, [
+            { id: 'g1', name: 'APIs', status: 'major_outage' },
+            { id: 'c4', name: 'Auth', status: 'operational' },
+            { id: 'c5', name: 'Billing', status: 'partial_outage' },
+        ]);
+    });
+
+    it('skips hidden items and hidden children', () => {
+        const out = componentsFromStructure(proxy([
+            { group: { id: 'g1', name: 'Core', hidden: false, components: [
+                { component_id: 'c1', name: 'Visible', hidden: false },
+                { component_id: 'c2', name: 'Secret', hidden: true },
+            ] } },
+            { group: { id: 'g2', name: 'Hidden group', hidden: true, components: [] } },
+            { component: { component_id: 'c3', name: 'Hidden leaf', hidden: true } },
+        ], [{ component_id: 'c2', status: 'major_outage' }]));
+        assert.deepEqual(out, [{ id: 'g1', name: 'Core', status: 'operational' }]);
+    });
+
+    it('treats unlisted children, empty groups and unknown statuses as operational', () => {
+        const out = componentsFromStructure(proxy([
+            { group: { id: 'g1', name: 'Quiet', hidden: false, components: [
+                { component_id: 'c1', name: 'A', hidden: false },
+                { component_id: 'c2', name: 'B', hidden: false },
+            ] } },
+            { group: { id: 'g2', name: 'Empty', hidden: false, components: [] } },
+            { group: { id: 'g3', name: 'Odd', hidden: false, components: [
+                { component_id: 'c3', name: 'C', hidden: false },
+            ] } },
+        ], [{ component_id: 'c3', status: 'full_meltdown' }]));
+        assert.deepEqual(out.map((c) => c.status), ['operational', 'operational', 'operational']);
+    });
+
+    it('keeps the structure order', () => {
+        const out = componentsFromStructure(proxy([
+            { component: { component_id: 'z', name: 'Zeta' } },
+            { group: { id: 'a', name: 'Alpha', components: [] } },
+            { component: { component_id: 'm', name: 'Mu' } },
+        ]));
+        assert.deepEqual(out.map((c) => c.name), ['Zeta', 'Alpha', 'Mu']);
+    });
+
+    it('returns [] on null or malformed input', () => {
+        assert.deepEqual(componentsFromStructure(null), []);
+        assert.deepEqual(componentsFromStructure({}), []);
+        assert.deepEqual(componentsFromStructure({ summary: { structure: { items: 'x' } } }), []);
+        assert.deepEqual(componentsFromStructure(proxy([null, {}, { group: null }])), []);
+    });
+});
+
+describe('indicatorFromComponents', () => {
+    const rows = (...statuses) => statuses.map((status, i) => ({ name: `c${i}`, status }));
+
+    it('maps the worst status to a page indicator', () => {
+        assert.equal(indicatorFromComponents(rows('operational', 'major_outage', 'partial_outage')), 'major');
+        assert.equal(indicatorFromComponents(rows('operational', 'partial_outage')), 'minor');
+        assert.equal(indicatorFromComponents(rows('degraded_performance', 'under_maintenance')), 'minor');
+        assert.equal(indicatorFromComponents(rows('operational', 'under_maintenance')), 'maintenance');
+        assert.equal(indicatorFromComponents(rows('operational', 'operational')), 'none');
+        assert.equal(indicatorFromComponents(rows('operational', 'mystery')), 'none');
+    });
+
+    it('is "unknown" for an empty list', () => {
+        assert.equal(indicatorFromComponents([]), 'unknown');
+        assert.equal(indicatorFromComponents(null), 'unknown');
     });
 });
 
@@ -171,6 +280,41 @@ describe('assembleProvider', () => {
         const out = assembleProvider(withSelector, summaryJson, null);
         // flatten drops the header, keeps the leaf.
         assert.deepEqual(out.components.map((c) => c.name), ['Leaf']);
+    });
+
+    describe('with an incident.io structure payload', () => {
+        const summaryJson = {
+            status: { indicator: 'minor' },
+            components: [{ id: 'x', name: 'Flattened leaf', status: 'operational' }],
+        };
+        const structureJson = {
+            summary: {
+                structure: { items: [
+                    { group: { id: 'g1', name: 'APIs', components: [{ component_id: 'c1', name: 'Chat' }] } },
+                    { component: { component_id: 'c2', name: 'Codex' } },
+                ] },
+                affected_components: [{ component_id: 'c1', status: 'degraded_performance' }],
+            },
+        };
+
+        it('takes the rows from the structure, the indicator from the summary', () => {
+            const out = assembleProvider(provider, summaryJson, null, structureJson);
+            assert.deepEqual(out.components, [
+                { name: 'APIs', status: 'degraded_performance' },
+                { name: 'Codex', status: 'operational' },
+            ]);
+            assert.equal(out.indicator, 'minor');
+        });
+
+        it('still applies the include selector by name', () => {
+            const out = assembleProvider({ ...provider, components: { include: ['Codex'] } }, summaryJson, null, structureJson);
+            assert.deepEqual(out.components.map((c) => c.name), ['Codex']);
+        });
+
+        it('falls back to the summary components when the structure yields no rows', () => {
+            const out = assembleProvider(provider, summaryJson, null, { summary: {} });
+            assert.deepEqual(out.components.map((c) => c.name), ['Flattened leaf']);
+        });
     });
 });
 
