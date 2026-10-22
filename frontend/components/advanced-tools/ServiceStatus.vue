@@ -212,6 +212,7 @@ const PROVIDERS = [
   { id: 'discord', name: 'Discord', icon: 'simple-icons:discord' },
   { id: 'figma', name: 'Figma', icon: 'simple-icons:figma' },
   { id: 'linear', name: 'Linear', icon: 'simple-icons:linear' },
+  { id: 'twilio', name: 'Twilio', icon: 'simple-icons:twilio' },
   { id: 'stripe', name: 'Stripe', icon: 'simple-icons:stripe' },
 ];
 

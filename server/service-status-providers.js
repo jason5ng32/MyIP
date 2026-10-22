@@ -52,6 +52,7 @@ export const STATUS_PROVIDERS = [
     { id: 'discord', name: 'Discord', api: 'https://discordstatus.com', page: 'https://discordstatus.com' },
     { id: 'figma', name: 'Figma', api: 'https://status.figma.com', page: 'https://status.figma.com' },
     { id: 'linear', name: 'Linear', api: 'https://linearstatus.com', page: 'https://linearstatus.com', platform: 'incident.io' },
+    { id: 'twilio', name: 'Twilio', api: 'https://status.twilio.com', page: 'https://status.twilio.com' },
     // Stripe's customer-facing status.stripe.com is a homegrown page with a
     // non-Statuspage schema; www.stripestatus.com is its Statuspage mirror,
     // which exposes the /api/v2 endpoints this poller needs.
