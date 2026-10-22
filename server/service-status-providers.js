@@ -56,6 +56,7 @@ export const STATUS_PROVIDERS = [
     // non-Statuspage schema; www.stripestatus.com is its Statuspage mirror,
     // which exposes the /api/v2 endpoints this poller needs.
     { id: 'stripe', name: 'Stripe', api: 'https://www.stripestatus.com', page: 'https://www.stripestatus.com' },
+    { id: 'npm', name: 'npm', api: 'https://status.npmjs.org', page: 'https://status.npmjs.org' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail
