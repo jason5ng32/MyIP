@@ -84,10 +84,18 @@ const initSentry = (app, router, earlyErrors = []) => {
         // gets flushed when an error occurs
         replaysSessionSampleRate: 0,
         replaysOnErrorSampleRate: 1.0,
-        // No IP / headers attached to event data. Debugging context that
-        // needs the visitor's network info comes from the unmasked
-        // error-replays instead — the page itself displays those details.
-        sendDefaultPii: false,
+        // No IP, cookies or request bodies attached to event data; the
+        // visitor's network info is on the page itself, so an unmasked
+        // error-replay already carries it. `userInfo: false` also tells
+        // Sentry never to infer an IP from the connection — through the
+        // tunnel that would be our server's. Headers stay at the default:
+        // the browser SDK only collects User-Agent and Referer, which Sentry
+        // needs for its browser / OS tags.
+        dataCollection: {
+            userInfo: false,
+            cookies: false,
+            httpBodies: [],
+        },
         // Relay envelopes through our own backend (api/sentry-tunnel.js)
         tunnel: '/api/monitoring',
         // Force a Content-Type on every envelope POST.
