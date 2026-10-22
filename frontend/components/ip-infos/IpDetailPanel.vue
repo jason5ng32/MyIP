@@ -234,6 +234,16 @@
                                     </div>
                                 </dl>
                             </div>
+
+                            <!-- Point to a blocklist check of this IP. -->
+                            <p v-if="blocklistHref"
+                                class="border-t pt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-muted-foreground">
+                                <span>{{ t('ipInfos.scoreDetails.blocklistHint') }}</span>
+                                <a :href="blocklistHref" @click="openBlocklist"
+                                    class="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline">
+                                    {{ t('ipInfos.scoreDetails.blocklistLink') }}<ArrowRight class="size-3" />
+                                </a>
+                            </p>
                         </div>
                     </div>
                 </CollapsibleContent>
@@ -311,13 +321,17 @@
 import { ref, computed, watch } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n, I18nT } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { trackEvent } from '@/utils/analytics';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { loadAsnInfoInto } from '@/composables/use-asn-info.js';
-import { loadAsnConnectivityInto } from '@/utils/asn-connectivity.js';
-import { toBgpPrefix } from '@/utils/bgp-prefix.js';
+import { loadAsnConnectivityInto } from '@/utils/ip/asn-connectivity.js';
+import { toBgpPrefix } from '@/utils/ip/bgp-prefix.js';
 import { getZoneUtcOffset, getZoneLocalTime, formatIsoDate } from '@/utils/time-utils.js';
-import { buildScoreExplanation, listScoreTags } from '@/utils/ip-score-details.js';
+import { buildScoreExplanation, listScoreTags } from '@/utils/ip/ip-score-details.js';
+import { isToolAvailable } from '@/utils/tool-availability.js';
+import { TOOL_BY_SLUG } from '@/data/tools.js';
+import { isPlainClick } from '@/utils/nav-target.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import CountryTraffic from './CountryTraffic.vue';
@@ -335,6 +349,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/vue';
 import {
     Activity,
+    ArrowRight,
     Building2,
     Check,
     ChevronDown,
@@ -383,10 +398,8 @@ const props = defineProps({
     countryTrafficMode: { type: String, default: 'off' },
 });
 
-// Consumers rendering this panel inside a dialog listen to close themselves
-// first — the Benefits & Usage dialog (`view-usage`) or an Advanced Tools
-// drawer (`open-tool`, from ASN Info's profile link) would otherwise stack
-// on top of them.
+// A host dialog listens to close itself first: before the Benefits & Usage
+// dialog stacks on it (`view-usage`) or a tool link (ASN Profile, Blocklist Check) changes page (`open-tool`).
 const emit = defineEmits(['view-usage', 'open-tool']);
 
 const openUsageDialog = () => {
@@ -497,6 +510,21 @@ const toggleScoreDetails = () => {
 // A different IP starts collapsed.
 watch(() => props.data.ip, () => { isScoreDetailsOpen.value = false; });
 
+// Blocklist Check entry: hidden when the tool is gated off; `q` only prefills.
+const router = useRouter();
+const blocklistHref = computed(() => (
+    isToolAvailable(TOOL_BY_SLUG.get('blocklist'), props.configs) && props.data.ip
+        ? `/tools/blocklist?q=${encodeURIComponent(props.data.ip)}`
+        : ''
+));
+const openBlocklist = (e) => {
+    if (!isPlainClick(e)) return;
+    e.preventDefault();
+    trackEvent('IPCheck', 'BlocklistCTAClick', 'Open Blocklist Check');
+    emit('open-tool');
+    router.push({ path: '/tools/blocklist', query: { q: props.data.ip } });
+};
+
 // Consumer opt-in + a Cloudflare key on the deployment + a country to query.
 const canShowCountryTraffic = computed(() =>
     props.countryTrafficMode !== 'off' && !props.collapsed
@@ -606,7 +634,7 @@ const getASNHistory = async (prefix) => {
     }
 };
 
-// Fetch + versioning live in utils/asn-connectivity.js; the cache is the
+// Fetch + versioning live in utils/ip/asn-connectivity.js; the cache is the
 // owner's, handed down as asnConnectivityInfos.
 const getASNConnectivity = async (asn) => {
     trackEvent('IPCheck', 'ASNConnectivityClick', 'Show ASN Connectivity');

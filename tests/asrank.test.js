@@ -1,11 +1,11 @@
-// Unit tests for the CAIDA ASRank client in common/asrank.js: the pure
+// Unit tests for the CAIDA ASRank client in server/asrank.js: the pure
 // GraphQL response mapper and body check, and queryAsRank's request shape,
 // null for an unknown ASN and throw-on-failure contract (fetch stubbed; real network
 // stays out of scope).
 import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 
-import { checkAsRankBody, mapAsRankResponse, queryAsRank } from '../common/asrank.js';
+import { checkAsRankBody, mapAsRankResponse, queryAsRank } from '../server/asrank.js';
 
 const FULL_BODY = {
     data: {

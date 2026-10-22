@@ -11,7 +11,7 @@ import {
     buildShareReport,
     reportToMarkdown,
     reportFileName,
-} from '../frontend/utils/report-export.js';
+} from '../frontend/utils/report/report-export.js';
 import { REPORT_SECTION_IDS, REPORT_VERSION, validateReport } from '../common/report-schema.js';
 
 // t() stub: returns the key, with params appended so interpolation is visible.
@@ -31,6 +31,10 @@ const makeSections = () => ({
             { id: 'ip-country', axis: 'match', verdict: 'match' },
             { id: 'gps-location', axis: 'leak', verdict: 'leak' },
         ],
+    },
+    adblocktest: {
+        testedAt: '2026-07-14T08:25:00.000Z',
+        groups: [{ id: 'ads', total: 3, blocked: 2, open: 1, unknown: 0 }],
     },
     ipinfo: {
         testedAt: '2026-07-14T08:00:00.000Z',
@@ -142,6 +146,20 @@ describe('reportToMarkdown', () => {
         assert.ok(md.includes('| gps-location | leak | leak |'));
         assert.ok(md.includes('grade: C'));
         assert.ok(md.includes('score: 72/100'));
+    });
+
+    it('renders the adblocktest section as its per-category table', () => {
+        const report = buildShareReport({
+            sections: makeSections(),
+            selectedIds: ['adblocktest'],
+            maskTail: false,
+            locale: 'en',
+            origin: 'ipcheck.ing',
+        });
+        assert.deepEqual(validateReport(report), { ok: true, errors: [] });
+        const md = reportToMarkdown(report, t);
+        assert.ok(md.includes('| group | total | blocked | notBlocked | noAnswer |'));
+        assert.ok(md.includes('| ads | 3 | 2 | 1 | 0 |'));
     });
 
     it('renders heading, intro, per-section blocks and the closing instruction', () => {

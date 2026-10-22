@@ -1,4 +1,4 @@
-// Tests for frontend/utils/ip-score-details.js — the score-details panel's
+// Tests for frontend/utils/ip/ip-score-details.js — the score-details panel's
 // explanation sentences (i18n keys + params) and attribute rows, including
 // responses without dimensions and gated ones.
 
@@ -12,7 +12,7 @@ import {
     listScoreTags,
     scoreRiskTier,
     buildScoreExplanation,
-} from '../frontend/utils/ip-score-details.js';
+} from '../frontend/utils/ip/ip-score-details.js';
 
 const t = (key) => `<${key}>`;
 const P = 'ipInfos.scoreDetails.explain.';

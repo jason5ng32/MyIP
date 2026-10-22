@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import {
   transformDataFromIPapi,
   extractAdvancedData,
-} from '../frontend/utils/transform-ip-data.js';
+} from '../frontend/utils/ip/transform-ip-data.js';
 
 // simple i18n translation stub: return key with prefix for assertions, to verify template references rather than hardcoded translation text
 const t = (key) => `<${key}>`;
@@ -213,7 +213,7 @@ describe('extractAdvancedData()', () => {
     });
 
     it('every code has a label in the en pack and is a report code', async () => {
-      const { ANONYMITY_I18N_KEYS } = await import('../frontend/utils/transform-ip-data.js');
+      const { ANONYMITY_I18N_KEYS } = await import('../frontend/utils/ip/transform-ip-data.js');
       const { ANONYMITY_CODES } = await import('../common/report-schema.js');
       const fs = await import('node:fs');
       const en = JSON.parse(fs.readFileSync(new URL('../frontend/locales/en.json', import.meta.url), 'utf8'));

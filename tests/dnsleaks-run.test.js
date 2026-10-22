@@ -18,7 +18,7 @@ const flush = () => new Promise(resolve => setImmediate(resolve));
 const fixture = (lookupMaxmind = async () => null) => {
     const events = [];
     const timers = [];
-    const providers = Object.fromEntries(['ipApi', 'surfshark', 'myipstack', 'fastly', 'bashws', 'browserleaks', 'ipleak']
+    const providers = Object.fromEntries(['ipApi', 'surfshark', 'myipstack', 'fastly', 'bashws', 'browserleaks', 'ipleak', 'every1dns']
         .map(id => [id, { id, name: id, run: async () => ({ ip: '192.0.2.53' }) }]));
     const bindings = {
         computed, reactive, ref, createDnsLeakRunner, ...providers,

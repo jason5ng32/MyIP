@@ -1,9 +1,9 @@
-// Tests for frontend/utils/asn-metrics.js — percentage parsing, traffic-pair
+// Tests for frontend/utils/ip/asn-metrics.js — percentage parsing, traffic-pair
 // building and connection-quality picking over the Radar ASN summary.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { parsePercentage, buildTrafficPairs, pickConnectionQuality } from '../frontend/utils/asn-metrics.js';
+import { parsePercentage, buildTrafficPairs, pickConnectionQuality } from '../frontend/utils/ip/asn-metrics.js';
 
 describe('parsePercentage', () => {
   it('parses backend strings with or without the % sign', () => {

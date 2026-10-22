@@ -30,7 +30,7 @@ const external = {
 const internal = {
     id: 'invisibility',
     icon: 'Shield',
-    to: '/?tool=invisibilitytest',
+    to: '/tools/invisibilitytest',
     copy: { en: { title: 'Go deeper', note: 'A note.', cta: 'Try it' } },
     track: 'WebRTCInvisibility',
 };

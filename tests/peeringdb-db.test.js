@@ -1,4 +1,4 @@
-// Tests for common/peeringdb-db.js — the pure distill from projected dump
+// Tests for server/datasets/peeringdb-db.js — the pure distill from projected dump
 // rows to the per-ASN index (IX join, non-operational ports dropped, port
 // speeds summed per IX, "Not Disclosed" as empty, multiple network types,
 // no contact data), and reading an index file back into lookups.
@@ -12,7 +12,7 @@ import { after, describe, it, mock } from 'node:test';
 import {
     PEERINGDB_DB_DIR, PEERINGDB_FILE, PEERINGDB_INDEX_VERSION, cleanText, projectRow, buildPeeringdbIndex,
     readPeeringdbIndex, expandNet, reloadPeeringdbDatabase, isPeeringdbLoaded, lookupPeeringdb,
-} from '../common/peeringdb-db.js';
+} from '../server/datasets/peeringdb-db.js';
 
 // Raw rows as the dump has them (only a few of their many fields).
 const RAW = {

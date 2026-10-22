@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "导航",
+    "Home": "首页",
     "IPInfo": "IP 信息",
     "Connectivity": "网络连通性",
     "ServiceStatus": "服务可用性",
     "WebRTC": "WebRTC 泄露测试",
     "DNSLeakTest": "DNS 泄露测试",
     "SpeedTest": "网速测试",
-    "PingTest": "全球延迟",
-    "MTRTest": "MTR 测试",
-    "RuleTest": "分流测试",
     "AdvancedTools": "高级工具",
     "SearchDocs": "搜索文档…",
     "DocsToolConfirm": "把当前的检测结果给助手看？",
@@ -263,7 +260,8 @@
         "level": {
           "NATIONWIDE": "全国范围",
           "REGIONAL": "区域范围",
-          "NETWORK": "单一网络"
+          "NETWORK": "单一网络",
+          "PLATFORM": "单一平台"
         }
       },
       "statuses": {
@@ -387,11 +385,9 @@
     "Note2_1": "你可以在终端里，通过",
     "Note2_2": "命令获取本机的 IP 地址",
     "Note3": "是可选路径，添加后可获取到 IP 的地理信息",
-    "Note4": "请使用你申请的 IPCheck.ing API 密钥",
     "getIPv4": "获取本机 IPv4 地址",
     "getIPv6": "获取本机 IPv6 地址",
-    "get6and4": "获取本机优先网络出口的 IP 地址",
-    "notAvailable": "此功能暂未开放，敬请期待"
+    "get6and4": "获取本机优先网络出口的 IP 地址"
   },
   "browserinfo": {
     "Title": "浏览器信息",
@@ -582,10 +578,23 @@
       "fromPing": "Ping 延迟值：",
       "negative": "TCP 延迟与 Ping 差值不大，没有明显的使用了 VPN 的证据。"
     },
+    "tlsRtt": {
+      "title": "TCP vs TLS 握手延迟",
+      "positive": "TLS 握手耗时明显长于 TCP 往返延迟，握手像是在更远的地方完成的，看起来你使用了代理或 VPN。",
+      "fromTCP": "TCP 往返延迟：",
+      "fromTLS": "TLS 握手耗时：",
+      "negative": "TLS 握手耗时与 TCP 往返延迟相符，没有明显的使用了代理或 VPN 的证据。"
+    },
     "highlatency": {
       "title": "高延迟分析",
       "positive": "高延迟分析发现你可能使用了代理或 VPN。",
       "negative": "高延迟分析未发现你使用代理或 VPN 的证据。"
+    },
+    "proxyAi": {
+      "title": "AI 综合判定",
+      "positive": "AI 模型综合各项特征，判断你可能使用了代理。",
+      "score": "AI 模型评分：",
+      "negative": "AI 模型综合各项特征，未发现你使用代理的证据。"
     }
   },
   "personacheck": {
@@ -857,11 +866,216 @@
       "no": "否"
     }
   },
+  "ipblocklist": {
+    "Title": "IP 黑名单检查",
+    "Note": "用约 80 个公开黑名单检查一个 IP，分为两类。实时黑名单（DNSBL）由邮件服务器、论坛和各类网络服务在收到连接或邮件时实时查询，用来决定是否接受；威胁情报名单则是公开发布的滥用地址、开放代理、VPN 服务器和 Tor 出口清单，被防火墙和安全服务大量采用。邮件被拒收、注册被拦截、网站反复弹出验证码，常常就是因为 IP 出现在了这些名单上。",
+    "Note2": "每一条命中分为三种性质。「不良记录」表示名单记录过这个地址发送垃圾邮件、发起攻击或设备被入侵；「匿名标记」表示这个地址是已知的代理、VPN、中继或 Tor 出口，如果你正在使用这类服务，被标记是正常的，本身并不算不良记录；「参考」针对的是更大的网络范围，比如动态地址段或整个运营商，而不是这个地址本身。共享、云服务器和 VPN 的地址常常会出现在某些名单上，所以请把命中当作信号而不是定论；如果名单提供移除申请页面，会在命中条目旁给出链接。",
+    "SelectIPLabel": "选择要检查的 IP",
+    "EnterIPLabel": "输入要检查的 IP",
+    "UseStored": "使用检测到的 IP",
+    "SelectIP": "选择一个 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "InvalidIP": "请输入一个公网 IPv4 或 IPv6。",
+    "Checking": "正在检查约 80 个黑名单，最长可能需要 30 秒。",
+    "FetchError": "检查没能完成，请稍后再试。",
+    "CheckedAt": "检查于 {time}",
+    "verdict": {
+      "abuse": "该 IP 在部分黑名单上有不良记录",
+      "anonymity": "没有不良记录，但被标记为代理、VPN、中继或 Tor 出口",
+      "notice": "未被列入黑名单，但部分名单标记了它所在的网络",
+      "clean": "未出现在任何已检查的黑名单上"
+    },
+    "count": {
+      "abuse": "不良记录",
+      "anonymity": "匿名标记",
+      "notice": "参考",
+      "clean": "干净",
+      "error": "失败"
+    },
+    "SomeFailed": "本次有 {n} 个名单查询失败，结果可能不完整。",
+    "part": {
+      "dnsbl": {
+        "title": "实时黑名单（DNSBL）",
+        "desc": "邮件服务器和网络服务实时查询的黑名单"
+      },
+      "static": {
+        "title": "威胁情报名单",
+        "desc": "防火墙和安全服务常用的滥用、代理与 VPN 名单"
+      }
+    },
+    "NoHits": "这里没有命中。",
+    "ShowRest": "查看其余 {n} 个名单",
+    "HideRest": "收起",
+    "CheckFailed": "查询失败",
+    "LastSeen": "最近出现：{date}",
+    "RequestRemoval": "申请移除",
+    "category": {
+      "spam": "垃圾邮件",
+      "abuse": "滥用",
+      "proxy": "代理",
+      "vpn": "VPN",
+      "relay": "中继",
+      "tor": "Tor",
+      "scanner": "扫描",
+      "backscatter": "退信散射",
+      "mixed": "综合"
+    },
+    "reason": {
+      "socksProxy": "SOCKS 代理",
+      "httpProxy": "HTTP 代理",
+      "proxyChain": "代理链",
+      "webProxy": "Web 代理",
+      "wingateProxy": "WinGate 代理",
+      "openProxy": "开放代理",
+      "torExit": "Tor 出口节点",
+      "exploited": "被利用的主机",
+      "compromisedHost": "被入侵的主机",
+      "compromisedRouter": "被入侵的路由器",
+      "botnet": "僵尸网络",
+      "worm": "蠕虫感染",
+      "ircDrone": "IRC 傀儡机",
+      "ddosDrone": "DDoS 傀儡机",
+      "bottler": "Bottler 恶意程序",
+      "spambot": "垃圾邮件机器人",
+      "bruteForce": "暴力破解",
+      "spamSource": "垃圾邮件来源",
+      "spamtrap": "触发垃圾邮件陷阱",
+      "badReputation": "信誉差",
+      "hijackedNetwork": "被劫持的网络",
+      "endUserRange": "终端用户地址段",
+      "dynamicRange": "动态地址段",
+      "noMailRange": "不应发送邮件的地址段",
+      "missingPtr": "缺少反向解析",
+      "poorReputation": "信誉偏低",
+      "mixedReputation": "信誉参半",
+      "rangeListed": "所在网段被列入",
+      "networkListed": "所在网络整体被列入",
+      "unaccountableOperator": "运营者不处理滥用投诉",
+      "noMailService": "没有邮件服务",
+      "unreliableAbuseDesk": "滥用投诉渠道不可靠",
+      "reported1d": "近 1 天内被举报",
+      "reported7d": "近 7 天内被举报",
+      "reported30d": "近 30 天内被举报",
+      "reported90d": "近 90 天内被举报",
+      "feeds": "被至少 {n} 个威胁情报源报告",
+      "testEntry": "测试条目"
+    },
+    "legend": {
+      "abuse": {
+        "label": "不良记录",
+        "desc": "名单记录过这个地址的垃圾邮件、攻击或入侵行为"
+      },
+      "anonymity": {
+        "label": "匿名标记",
+        "desc": "已知的代理、VPN、中继或 Tor 出口，本身不算不良记录"
+      },
+      "notice": {
+        "label": "参考",
+        "desc": "标记的是所在网段或运营商，而不是这个地址"
+      },
+      "clean": {
+        "label": "未列入",
+        "desc": "名单上没有这个 IP"
+      },
+      "error": {
+        "label": "查询失败",
+        "desc": "本次没能查询这个名单，不代表没有列入"
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "广告与跟踪屏蔽检测",
+    "Note": "适用于正在使用广告或跟踪屏蔽的人：uBlock Origin、隐私獾（Privacy Badger）等浏览器扩展，自带拦截功能的浏览器，或 DNS 服务、VPN、路由器上的过滤功能。测试会让浏览器访问常见的广告、统计、社交平台和设备厂商的服务端点，请求常见的跟踪脚本（只请求不执行），并在页面中放置会被元素隐藏规则命中的诱饵元素，然后展示哪些被放行了。",
+    "Note2": "拦截比例越高不一定越好。并不是所有跟踪都在损害你：错误监控帮助网站修复崩溃，统计分析帮助网站改进，广告支撑着大量免费内容；部分设备厂商的端点也承担着系统更新或消息推送。请把结果当作一份「你的配置放行了什么」的地图，再自行决定哪些值得屏蔽。",
+    "Note3": "没有被拦截的请求会真实到达这些服务，但不会携带 Cookie 或来源页面信息。检测结果只保留在你的浏览器中，不会发送给我们。如果某个端点因为其他原因在你的网络中无法访问，也会显示为已拦截。",
+    "Selected": "已选检测项：",
+    "SelectAll": "全选",
+    "Invert": "反选",
+    "Run": "开始检测",
+    "Rerun": "重新检测",
+    "Hint": "选择要检测的项目开始检测",
+    "Score": "拦截比例",
+    "Progress": "已检测 {done} / {total}",
+    "GroupCount": "已拦截 {blocked} / {total}",
+    "NothingOpen": "没有确认未被拦截的请求。",
+    "NothingBlocked": "没有确认被拦截的请求。",
+    "Version": "检测名单版本：{version}",
+    "Limitation": "这些检测是由本页面直接发出的普通请求，并不是网站真正加载广告或脚本的方式：只针对特定请求类型（例如脚本或图片）的过滤规则，可能放行这里的检测请求，却仍会在真实网站上拦截对应内容。",
+    "count": {
+      "blocked": "已拦截",
+      "open": "未拦截",
+      "unknown": "无响应"
+    },
+    "filter": {
+      "all": "全部",
+      "open": "仅看未拦截",
+      "blocked": "仅看已拦截"
+    },
+    "status": {
+      "blocked": "已拦截",
+      "open": "未拦截",
+      "unknown": "无响应",
+      "pending": "等待中"
+    },
+    "cosmeticStatus": {
+      "blocked": "已隐藏",
+      "open": "可见",
+      "unknown": "无响应",
+      "pending": "等待中"
+    },
+    "cosmetic": {
+      "ad-container": "广告容器",
+      "adsense-slot": "AdSense 广告位"
+    },
+    "group": {
+      "ads": {
+        "title": "广告网络",
+        "desc": "广告服务器与广告交易平台，按域名检测。"
+      },
+      "analytics": {
+        "title": "统计分析与会话录制",
+        "desc": "访客统计、热力图与会话回放服务。"
+      },
+      "social": {
+        "title": "社交平台跟踪",
+        "desc": "社交平台的像素与转化跟踪。"
+      },
+      "errors": {
+        "title": "错误与性能监控",
+        "desc": "崩溃上报与真实用户监控服务。"
+      },
+      "oem": {
+        "title": "设备厂商遥测",
+        "desc": "手机、电视等设备厂商的遥测与广告端点。浏览器本身不会主动访问它们，主要由 DNS、VPN 和路由器的过滤名单收录。"
+      },
+      "scripts": {
+        "title": "跟踪脚本",
+        "desc": "常见统计代码与像素脚本的完整地址，只请求不执行。按路径匹配的规则即使在域名放行时也可能拦住它们。"
+      },
+      "cosmetic": {
+        "title": "元素隐藏",
+        "desc": "外形类似广告位的诱饵元素。只有运行在浏览器内的拦截器才能隐藏它们，DNS、VPN 和路由器的过滤做不到，所以这一部分不计入拦截比例。"
+      }
+    },
+    "layer": {
+      "browser": "诱饵元素被隐藏了：浏览器内有拦截器在工作，可能是扩展，也可能是浏览器自带的功能。",
+      "network": "请求被拦截，但诱饵元素没有被隐藏：拦截很可能发生在页面之外，例如 DNS 服务、VPN、路由器，或浏览器的防跟踪功能。",
+      "none": "没有任何拦截：在这个浏览器和网络中没有发现广告或跟踪屏蔽。"
+    },
+    "report": {
+      "Category": "类别",
+      "Total": "总数"
+    }
+  },
   "advancedtools": {
-    "OpenInNewTab": "在新标签页打开",
-    "BackToHome": "回到首页",
     "Title": "高级工具",
     "Note": "对网络质量追求极致的人，往往会使用更多工具来优化自己的网络连接。",
+    "category": {
+      "network": "网络诊断",
+      "lookup": "查询与计算",
+      "deep": "深度检测",
+      "reference": "参考资料"
+    },
     "PingTestNote": "从世界各地 ping 你的 IP",
     "MTRTestNote": "从世界各地追踪你的网络路由",
     "DNSResolverNote": "实时多渠道 DNS 解析",
@@ -875,8 +1089,10 @@
     "MacChecker": "查询物理地址的归属信息",
     "IpCalculator": "任意 IP、前缀或范围的子网计算、进制转换与 IPv6 解读",
     "BrowserInfo": "检阅浏览器信息和指纹",
+    "AdblockTest": "检查你的广告拦截器、DNS 过滤或 VPN 实际拦住了什么",
     "SecurityChecklist": "全面的数字生活安全检查清单",
-    "PersonaCheck": "把网站看到的你，和你想扮成的本地人做对照"
+    "PersonaCheck": "把网站看到的你，和你想扮成的本地人做对照",
+    "IpBlocklist": "查看 IP 是否出现在垃圾邮件、滥用、代理或 VPN 黑名单上"
   },
   "macchecker": {
     "Title": "MAC 地址查询",
@@ -1257,7 +1473,7 @@
   "ruletest": {
     "Title": "分流测试",
     "Name": "检测",
-    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 8 个不同的 URL 设置不同的域名分流规则。通常，设置规则可能会使用类似于：DOMAIN, ptest-3.ipcheck.ing, POLICY 这样的写法，具体写法不同的代理软件可能会有所不同。",
+    "Note": "分流测试用于判断代理软件基于域名的规则设置是否正确。在进行测试之前，你需要先参考下方的卡片，在你的代理软件里对 IPCheck.ing 的 {n} 个不同的 URL 设置不同的域名分流规则。通常，设置规则可能会使用类似于：DOMAIN, ptest-3.ipcheck.ing, POLICY 这样的写法，具体写法不同的代理软件可能会有所不同。",
     "StatusWait": "待检测",
     "StatusTesting": "检测中…",
     "StatusError": "检测出错",
@@ -1320,6 +1536,7 @@
         "mtrtest": "全球探针到用户 IP 的逐跳 MTR 路由追踪；中间跳的丢包可能只是 ICMP 限速，从某一跳起持续丢包才代表真实问题。",
         "ruletest": "访问 8 个测试端点时观测到的出口 IP——出现多个不同 IP 说明流量被分流到不同线路（如代理规则）。",
         "browserinfo": "被测设备的浏览器、操作系统与显示环境。",
+        "adblocktest": "在浏览器中运行的广告与跟踪屏蔽检测：按类别（广告网络、统计分析、社交平台跟踪、错误监控、设备厂商遥测、跟踪脚本）统计发往常见端点的请求中，被拦截、未被拦截和超时（noAnswer）的数量。没有全部拦截可能是用户的主动选择，并不代表故障。",
         "invisibility": "代理/VPN 检测得分（0-100，越高越可能被识别）及各项命中的检测信号。",
         "enhanceddnsleak": "解析器级 DNS 捕获：向测试域名发起查询的每个解析器 IP，含传输协议、ECS 暴露与 DNSSEC 标志（do/cd）。",
         "persona": "浏览器与所选国家本地居民的相符程度：一个总体评级，加上每项检查的结论。只有结论——各项检查依据的具体数值刻意不写入可分享的报告。"
@@ -1512,6 +1729,8 @@
         }
       },
       "tagsTitle": "全部属性",
+      "blocklistHint": "评分反映的是这个 IP 的综合画像。想知道它此刻有没有上黑名单？",
+      "blocklistLink": "实时检查黑名单",
       "tagState": {
         "yes": "是",
         "no": "否",
@@ -1641,11 +1860,13 @@
       "defaults": "系统预设",
       "iran": "伊朗常用",
       "russia": "俄罗斯常用",
-      "india": "印度常用",
       "china": "中国常用",
       "brazil": "巴西常用",
+      "india": "印度常用",
       "nigeria": "尼日利亚常用",
       "germany": "德国常用",
+      "albania": "阿尔巴尼亚常用",
+      "kosovo": "科索沃常用",
       "ai": "AI 服务",
       "social": "社交通讯",
       "productivity": "工作与生产力",
@@ -1721,7 +1942,8 @@
       "average": "一般",
       "good": "良好",
       "great": "优秀"
-    }
+    },
+    "ToolHint": "带宽只说明了一半：用 {ping} 和 {mtr} 看看你的网络连到世界各地的表现。"
   },
   "globalping": {
     "Selected": "已选地区：",
@@ -1840,8 +2062,10 @@
     "MacChecker": "打开物理地址查询面板",
     "IpCalculator": "打开 IP 计算器面板",
     "BrowserInfo": "打开浏览器信息面板",
+    "AdblockTest": "打开广告与跟踪屏蔽检测面板",
     "SecurityChecklist": "打开安全检查清单",
     "PersonaCheck": "打开深度画像检测面板",
+    "IpBlocklist": "打开 IP 黑名单检查面板",
     "AsnProfile": "打开 ASN 档案查询面板"
   },
   "page": {
@@ -1856,13 +2080,25 @@
   "helpModal": {
     "Title": "快捷键"
   },
+  "footer": {
+    "Tagline": "免费、开源、一站式的隐私工具箱",
+    "Project": "项目",
+    "Support": "文档与支持",
+    "DeveloperDocs": "开发者文档",
+    "SelfHosting": "自托管指南",
+    "ReportIssue": "报告问题",
+    "License": "MIT 许可证",
+    "Clients": "客户端",
+    "Raycast": "Raycast 扩展",
+    "Lite": "Lite 版"
+  },
   "about": {
     "Title": "关于",
     "project": [
       "IPCheck.ing 是一个免费的多合一 IP 工具箱，可以帮助你查看自己的 IP 信息，检测网站的可用性，查看 DNS 出口信息，进行网速测试，全球延迟测试，MTR 测试等。",
       "这是一个开源项目，你可以点击页面底部的 GitHub 图标查看源代码。",
       "如果你对于产品中功能使用不理解，可以通过底部的「帮助中心」获取帮助，我们已经写了非常详细的帮助文档，除了功能介绍，也能帮助你理解各种网络概念和如何排查网络问题。",
-      "如果你有兴趣参与到开源项目中，可以点击页面底部的「贡献代码」按钮，查看如何贡献代码。"
+      "如果你有兴趣参与到开源项目中，可以点击页面底部的「开发者文档」，查看如何贡献代码。"
     ],
     "founderTitle": "关于项目发起人",
     "founder": [
@@ -1883,7 +2119,6 @@
     "Sponsor": "赞助我们",
     "Privacy": "隐私政策",
     "HelpCenter": "帮助中心",
-    "Contribute": "贡献代码",
     "Close": "关闭"
   },
   "acknowledgement": {

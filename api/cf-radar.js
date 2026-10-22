@@ -1,12 +1,12 @@
 // /api/cfradar — single dispatch route for all Cloudflare Radar data.
-// `?view=` selects an entry in RADAR_VIEWS (common/cf-radar.js): the view's
+// `?view=` selects an entry in RADAR_VIEWS (server/cf-radar.js): the view's
 // guards validate and normalize its params, its fetch builds the payload,
 // and the route's cache middleware in backend-server.js reads the view's
 // per-view TTL. Guards run before the API-key check so param errors stay
 // 400s on keyless deployments (and tests never reach an upstream call).
 
-import { RADAR_VIEWS, hasRadarApiKey } from '../common/cf-radar.js';
-import logger from '../common/logger.js';
+import { RADAR_VIEWS, hasRadarApiKey } from '../server/cf-radar.js';
+import logger from '../server/logger.js';
 
 // Run a view's guard middlewares outside an Express chain. Each guard either
 // calls next() or writes its own 4xx response — so "didn't pass" means the

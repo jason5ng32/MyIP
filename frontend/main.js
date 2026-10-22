@@ -8,6 +8,7 @@ import { analytics } from './utils/analytics';
 import { getTimezoneInfo } from './utils/time-utils';
 import { isRunningAsPwa } from './utils/pwa';
 import { readAuthHint } from './utils/auth-hint';
+import { hasPendingRedirectSignIn } from './utils/auth-redirect';
 import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
 import { addCollection } from '@iconify/vue';
 
@@ -126,8 +127,6 @@ analytics.setUserProperties({
 });
 unregisterLegacyServiceWorker();
 
-// Check Firebase environment
-store.checkFirebaseEnv();
 
 // Backend configs load fire-and-forget: components read `store.configs`
 // reactively, so the first render never waits on this round trip.
@@ -136,11 +135,20 @@ store.fetchConfigs();
 // Gate the first render only on what it actually needs; the legs all run in
 // parallel. Auth is hint-gated (utils/auth-hint.js): only a previously
 // signed-in visitor loads Firebase and waits for it before first render, so
-// the first authenticatedFetch round carries their token. Everyone else
-// mounts without the SDK.
+// the first authenticatedFetch round carries their token. A return from a
+// redirect sign-in (utils/auth-redirect.js marker) is consumed before mount
+// for the same reason; if it signs no one in, a signed-in hint still gets the
+// listener. Everyone else mounts without the SDK.
 const authHint = readAuthHint();
+const resolveBootAuth = () => {
+    if (hasPendingRedirectSignIn()) {
+        return store.completeRedirectSignIn()
+            .then((ok) => (ok || authHint !== '1') ? undefined : store.initializeAuthListener());
+    }
+    return store.isFireBaseSet && authHint === '1' ? store.initializeAuthListener() : Promise.resolve();
+};
 Promise.all([
-    store.isFireBaseSet && authHint === '1' ? store.initializeAuthListener() : Promise.resolve(),
+    resolveBootAuth(),
     store.loadPreferences(),
     loadActiveLocaleMessages(),
 ]).then(() => {

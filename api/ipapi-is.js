@@ -2,7 +2,7 @@
 // Picks a random API key and normalizes the response into the canonical
 // geo shape (plus isHosting / isProxy) via the shared makeGeoHandler factory.
 
-import { makeGeoHandler } from '../common/geo-handler.js';
+import { makeGeoHandler } from '../server/geo-handler.js';
 
 function buildUrl(req) {
     const ipAddress = req.query.ip;

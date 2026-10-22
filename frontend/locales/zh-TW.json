@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "導覽",
+    "Home": "首頁",
     "IPInfo": "IP 資訊",
     "Connectivity": "網路連線",
     "ServiceStatus": "服務狀態",
     "WebRTC": "WebRTC 洩漏測試",
     "DNSLeakTest": "DNS 洩漏測試",
     "SpeedTest": "網速測試",
-    "PingTest": "全球延遲",
-    "MTRTest": "MTR 測試",
-    "RuleTest": "分流測試",
     "AdvancedTools": "進階工具",
     "SearchDocs": "搜尋文件…",
     "DocsToolConfirm": "要讓助手查看目前的測試結果嗎？",
@@ -263,7 +260,8 @@
         "level": {
           "NATIONWIDE": "全國範圍",
           "REGIONAL": "區域範圍",
-          "NETWORK": "單一網路"
+          "NETWORK": "單一網路",
+          "PLATFORM": "單一平台"
         }
       },
       "statuses": {
@@ -387,11 +385,9 @@
     "Note2_1": "你可以在終端裡，透過",
     "Note2_2": "命令取得本機的 IP 位址",
     "Note3": "是可選路徑，新增後可取得到 IP 的地理資訊",
-    "Note4": "請使用你申請的 IPCheck.ing API 金鑰",
     "getIPv4": "取得本機 IPv4 位址",
     "getIPv6": "取得本機 IPv6 位址",
-    "get6and4": "取得本機優先網路出口的 IP 位址",
-    "notAvailable": "此功能暫未開放，敬請期待"
+    "get6and4": "取得本機優先網路出口的 IP 位址"
   },
   "browserinfo": {
     "Title": "瀏覽器資訊",
@@ -582,10 +578,23 @@
       "fromPing": "Ping 延遲值：",
       "negative": "TCP 延遲與 Ping 差值不大，沒有明顯的使用了 VPN 的證據。"
     },
+    "tlsRtt": {
+      "title": "TCP vs TLS 握手延遲",
+      "positive": "TLS 握手耗時明顯長於 TCP 往返延遲，握手像是在更遠的地方完成的，看起來你使用了代理或 VPN。",
+      "fromTCP": "TCP 往返延遲：",
+      "fromTLS": "TLS 握手耗時：",
+      "negative": "TLS 握手耗時與 TCP 往返延遲相符，沒有明顯的使用了代理或 VPN 的證據。"
+    },
     "highlatency": {
       "title": "高延遲分析",
       "positive": "高延遲分析發現你可能使用了代理或 VPN。",
       "negative": "高延遲分析未發現你使用代理或 VPN 的證據。"
+    },
+    "proxyAi": {
+      "title": "AI 綜合判定",
+      "positive": "AI 模型綜合各項特徵，判斷你可能使用了代理。",
+      "score": "AI 模型評分：",
+      "negative": "AI 模型綜合各項特徵，未發現你使用代理的證據。"
     }
   },
   "personacheck": {
@@ -857,11 +866,216 @@
       "no": "否"
     }
   },
+  "ipblocklist": {
+    "Title": "IP 黑名單檢查",
+    "Note": "用約 80 個公開黑名單檢查一個 IP，分為兩類。即時黑名單（DNSBL）由郵件伺服器、論壇和各類網路服務在收到連線或郵件時即時查詢，用來決定是否接受；威脅情報名單則是公開發布的濫用位址、開放代理、VPN 伺服器和 Tor 出口清單，被防火牆和安全服務大量採用。郵件被拒收、註冊被攔截、網站反覆跳出驗證碼，常常就是因為 IP 出現在了這些名單上。",
+    "Note2": "每一筆命中分為三種性質。「不良紀錄」表示名單記錄過這個位址發送垃圾郵件、發起攻擊或裝置被入侵；「匿名標記」表示這個位址是已知的代理、VPN、中繼或 Tor 出口，如果你正在使用這類服務，被標記是正常的，本身並不算不良紀錄；「參考」針對的是更大的網路範圍，例如動態位址段或整個營運商，而不是這個位址本身。共享、雲端伺服器和 VPN 的位址常常會出現在某些名單上，所以請把命中當作訊號而不是定論；如果名單提供移除申請頁面，會在命中條目旁給出連結。",
+    "SelectIPLabel": "選擇要檢查的 IP",
+    "EnterIPLabel": "輸入要檢查的 IP",
+    "UseStored": "使用偵測到的 IP",
+    "SelectIP": "選擇一個 IP",
+    "EnterIPPlaceholder": "例如 1.1.1.1",
+    "InvalidIP": "請輸入一個公網 IPv4 或 IPv6。",
+    "Checking": "正在檢查約 80 個黑名單，最長可能需要 30 秒。",
+    "FetchError": "檢查沒能完成，請稍後再試。",
+    "CheckedAt": "檢查於 {time}",
+    "verdict": {
+      "abuse": "該 IP 在部分黑名單上有不良紀錄",
+      "anonymity": "沒有不良紀錄，但被標記為代理、VPN、中繼或 Tor 出口",
+      "notice": "未被列入黑名單，但部分名單標記了它所在的網路",
+      "clean": "未出現在任何已檢查的黑名單上"
+    },
+    "count": {
+      "abuse": "不良紀錄",
+      "anonymity": "匿名標記",
+      "notice": "參考",
+      "clean": "乾淨",
+      "error": "失敗"
+    },
+    "SomeFailed": "本次有 {n} 個名單查詢失敗，結果可能不完整。",
+    "part": {
+      "dnsbl": {
+        "title": "即時黑名單（DNSBL）",
+        "desc": "郵件伺服器和網路服務即時查詢的黑名單"
+      },
+      "static": {
+        "title": "威脅情報名單",
+        "desc": "防火牆和安全服務常用的濫用、代理與 VPN 名單"
+      }
+    },
+    "NoHits": "這裡沒有命中。",
+    "ShowRest": "查看其餘 {n} 個名單",
+    "HideRest": "收起",
+    "CheckFailed": "查詢失敗",
+    "LastSeen": "最近出現：{date}",
+    "RequestRemoval": "申請移除",
+    "category": {
+      "spam": "垃圾郵件",
+      "abuse": "濫用",
+      "proxy": "代理",
+      "vpn": "VPN",
+      "relay": "中繼",
+      "tor": "Tor",
+      "scanner": "掃描",
+      "backscatter": "退信散射",
+      "mixed": "綜合"
+    },
+    "reason": {
+      "socksProxy": "SOCKS 代理",
+      "httpProxy": "HTTP 代理",
+      "proxyChain": "代理鏈",
+      "webProxy": "Web 代理",
+      "wingateProxy": "WinGate 代理",
+      "openProxy": "開放代理",
+      "torExit": "Tor 出口節點",
+      "exploited": "被利用的主機",
+      "compromisedHost": "被入侵的主機",
+      "compromisedRouter": "被入侵的路由器",
+      "botnet": "殭屍網路",
+      "worm": "蠕蟲感染",
+      "ircDrone": "IRC 傀儡機",
+      "ddosDrone": "DDoS 傀儡機",
+      "bottler": "Bottler 惡意程式",
+      "spambot": "垃圾郵件機器人",
+      "bruteForce": "暴力破解",
+      "spamSource": "垃圾郵件來源",
+      "spamtrap": "觸發垃圾郵件陷阱",
+      "badReputation": "信譽差",
+      "hijackedNetwork": "被劫持的網路",
+      "endUserRange": "終端使用者位址段",
+      "dynamicRange": "動態位址段",
+      "noMailRange": "不應發送郵件的位址段",
+      "missingPtr": "缺少反向解析",
+      "poorReputation": "信譽偏低",
+      "mixedReputation": "信譽參半",
+      "rangeListed": "所在網段被列入",
+      "networkListed": "所在網路整體被列入",
+      "unaccountableOperator": "營運者不處理濫用投訴",
+      "noMailService": "沒有郵件服務",
+      "unreliableAbuseDesk": "濫用投訴管道不可靠",
+      "reported1d": "近 1 天內被檢舉",
+      "reported7d": "近 7 天內被檢舉",
+      "reported30d": "近 30 天內被檢舉",
+      "reported90d": "近 90 天內被檢舉",
+      "feeds": "被至少 {n} 個威脅情報來源回報",
+      "testEntry": "測試條目"
+    },
+    "legend": {
+      "abuse": {
+        "label": "不良紀錄",
+        "desc": "名單記錄過這個位址的垃圾郵件、攻擊或入侵行為"
+      },
+      "anonymity": {
+        "label": "匿名標記",
+        "desc": "已知的代理、VPN、中繼或 Tor 出口，本身不算不良紀錄"
+      },
+      "notice": {
+        "label": "參考",
+        "desc": "標記的是所在網段或營運商，而不是這個位址"
+      },
+      "clean": {
+        "label": "未列入",
+        "desc": "名單上沒有這個 IP"
+      },
+      "error": {
+        "label": "查詢失敗",
+        "desc": "本次沒能查詢這個名單，不代表沒有列入"
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "廣告與追蹤封鎖檢測",
+    "Note": "適用於正在使用廣告或追蹤封鎖的人：uBlock Origin、隱私獾（Privacy Badger）等瀏覽器擴充功能，內建阻擋功能的瀏覽器，或 DNS 服務、VPN、路由器上的過濾功能。測試會讓瀏覽器連線到常見的廣告、統計、社群平台與裝置廠商的服務端點，請求常見的追蹤腳本（只請求不執行），並在頁面中放置會被元素隱藏規則命中的誘餌元素，然後顯示哪些被放行了。",
+    "Note2": "阻擋比例越高不一定越好。並非所有追蹤都在損害你：錯誤監控幫助網站修復當機，統計分析幫助網站改進，廣告支撐著大量免費內容；部分裝置廠商的端點也負責系統更新或訊息推播。請把結果當作一份「你的設定放行了什麼」的地圖，再自行決定哪些值得封鎖。",
+    "Note3": "沒有被阻擋的請求會真實到達這些服務，但不會攜帶 Cookie 或來源頁面資訊。檢測結果只保留在你的瀏覽器中，不會傳送給我們。如果某個端點因為其他原因在你的網路中無法連線，也會顯示為已阻擋。",
+    "Selected": "已選檢測項目：",
+    "SelectAll": "全選",
+    "Invert": "反選",
+    "Run": "開始檢測",
+    "Rerun": "重新檢測",
+    "Hint": "選擇要檢測的項目開始檢測",
+    "Score": "阻擋比例",
+    "Progress": "已檢測 {done} / {total}",
+    "GroupCount": "已阻擋 {blocked} / {total}",
+    "NothingOpen": "沒有確認未被阻擋的請求。",
+    "NothingBlocked": "沒有確認被阻擋的請求。",
+    "Version": "檢測清單版本：{version}",
+    "Limitation": "這些檢測是由本頁面直接送出的一般請求，並不是網站真正載入廣告或腳本的方式：只針對特定請求類型（例如腳本或圖片）的過濾規則，可能放行這裡的檢測請求，卻仍會在真實網站上阻擋對應內容。",
+    "count": {
+      "blocked": "已阻擋",
+      "open": "未阻擋",
+      "unknown": "無回應"
+    },
+    "filter": {
+      "all": "全部",
+      "open": "只看未阻擋",
+      "blocked": "只看已阻擋"
+    },
+    "status": {
+      "blocked": "已阻擋",
+      "open": "未阻擋",
+      "unknown": "無回應",
+      "pending": "等待中"
+    },
+    "cosmeticStatus": {
+      "blocked": "已隱藏",
+      "open": "可見",
+      "unknown": "無回應",
+      "pending": "等待中"
+    },
+    "cosmetic": {
+      "ad-container": "廣告容器",
+      "adsense-slot": "AdSense 廣告欄位"
+    },
+    "group": {
+      "ads": {
+        "title": "廣告網路",
+        "desc": "廣告伺服器與廣告交易平台，依網域檢測。"
+      },
+      "analytics": {
+        "title": "統計分析與工作階段錄製",
+        "desc": "訪客統計、熱點圖與工作階段重播服務。"
+      },
+      "social": {
+        "title": "社群平台追蹤",
+        "desc": "社群平台的像素與轉換追蹤。"
+      },
+      "errors": {
+        "title": "錯誤與效能監控",
+        "desc": "當機回報與真實使用者監控服務。"
+      },
+      "oem": {
+        "title": "裝置廠商遙測",
+        "desc": "手機、電視等裝置廠商的遙測與廣告端點。瀏覽器本身不會主動連線到它們，主要由 DNS、VPN 和路由器的過濾清單收錄。"
+      },
+      "scripts": {
+        "title": "追蹤腳本",
+        "desc": "常見統計代碼與像素腳本的完整網址，只請求不執行。依路徑比對的規則即使在網域放行時也可能擋下它們。"
+      },
+      "cosmetic": {
+        "title": "元素隱藏",
+        "desc": "外觀類似廣告欄位的誘餌元素。只有在瀏覽器內執行的阻擋器才能隱藏它們，DNS、VPN 和路由器的過濾做不到，所以這一部分不計入阻擋比例。"
+      }
+    },
+    "layer": {
+      "browser": "誘餌元素被隱藏了：瀏覽器內有阻擋器在運作，可能是擴充功能，也可能是瀏覽器內建的功能。",
+      "network": "請求被阻擋，但誘餌元素沒有被隱藏：阻擋很可能發生在頁面之外，例如 DNS 服務、VPN、路由器，或瀏覽器的防追蹤功能。",
+      "none": "沒有任何阻擋：在這個瀏覽器和網路中沒有發現廣告或追蹤封鎖。"
+    },
+    "report": {
+      "Category": "類別",
+      "Total": "總數"
+    }
+  },
   "advancedtools": {
-    "OpenInNewTab": "在新標籤頁開啟",
-    "BackToHome": "回到首頁",
     "Title": "進階工具",
     "Note": "對網路品質追求極致的人，往往會使用更多工具來最佳化自己的網路連線。",
+    "category": {
+      "network": "網路診斷",
+      "lookup": "查詢與計算",
+      "deep": "深度檢測",
+      "reference": "參考資料"
+    },
     "PingTestNote": "從世界各地 ping 你的 IP",
     "MTRTestNote": "從世界各地追蹤你的網路路由",
     "DNSResolverNote": "即時多渠道 DNS 解析",
@@ -875,8 +1089,10 @@
     "MacChecker": "查詢實體位址的歸屬資訊",
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
     "BrowserInfo": "檢閱瀏覽器資訊和指紋",
+    "AdblockTest": "檢查你的廣告阻擋器、DNS 過濾或 VPN 實際擋下了什麼",
     "SecurityChecklist": "全面的數位生活安全檢查清單",
-    "PersonaCheck": "把網站看到的你，和你想扮成的本地人做對照"
+    "PersonaCheck": "把網站看到的你，和你想扮成的本地人做對照",
+    "IpBlocklist": "查看 IP 是否出現在垃圾郵件、濫用、代理或 VPN 黑名單上"
   },
   "macchecker": {
     "Title": "MAC 位址查詢",
@@ -1257,7 +1473,7 @@
   "ruletest": {
     "Title": "分流測試",
     "Name": "檢測",
-    "Note": "分流測試用於判斷代理軟體基於網域名稱的規則設定是否正確。在進行測試之前，你需要先參考下方的卡片，在你的代理軟體裡對 IPCheck.ing 的 8 個不同的 URL 設定不同的網域名稱分流規則。通常，設定規則可能會使用類似於：DOMAIN, ptest-3.ipcheck.ing, POLICY 這樣的寫法，具體寫法不同的代理軟體可能會有所不同。",
+    "Note": "分流測試用於判斷代理軟體基於網域名稱的規則設定是否正確。在進行測試之前，你需要先參考下方的卡片，在你的代理軟體裡對 IPCheck.ing 的 {n} 個不同的 URL 設定不同的網域名稱分流規則。通常，設定規則可能會使用類似於：DOMAIN, ptest-3.ipcheck.ing, POLICY 這樣的寫法，具體寫法不同的代理軟體可能會有所不同。",
     "StatusWait": "待檢測",
     "StatusTesting": "檢測中…",
     "StatusError": "檢測出錯",
@@ -1320,6 +1536,7 @@
         "mtrtest": "全球探針針對使用者 IP 進行 MTR 路由追蹤。途中某些節點發生封包遺失，可能只是 ICMP 速率限制；如果從某個節點開始，後續都持續出現封包遺失，才較可能代表實際問題。",
         "ruletest": "存取 8 個測試端點時觀測到的出口 IP——出現多個不同 IP 表示流量被分流到不同線路（如代理規則）。",
         "browserinfo": "被測裝置的瀏覽器、作業系統與顯示環境。",
+        "adblocktest": "在瀏覽器中執行的廣告與追蹤封鎖檢測：依類別（廣告網路、統計分析、社群平台追蹤、錯誤監控、裝置廠商遙測、追蹤腳本）統計送往常見端點的請求中，被阻擋、未被阻擋和逾時（noAnswer）的數量。沒有全部阻擋可能是使用者的主動選擇，並不代表故障。",
         "invisibility": "代理/VPN 檢測得分（0-100，越高越可能被識別）及各項命中的檢測訊號。",
         "enhanceddnsleak": "解析器層級的 DNS 查詢紀錄：包含向測試網域名稱發出查詢的每個解析器 IP、傳輸協定、ECS 暴露情況與 DNSSEC 標記（DO/CD）。",
         "persona": "瀏覽器與所選國家本地居民的相符程度：一個總體評級，加上每項檢查的結論。只有結論——各項檢查依據的具體數值刻意不寫入可分享的報告。"
@@ -1512,6 +1729,8 @@
         }
       },
       "tagsTitle": "全部屬性",
+      "blocklistHint": "評分反映的是這個 IP 的綜合輪廓。想知道它此刻有沒有上黑名單？",
+      "blocklistLink": "即時檢查黑名單",
       "tagState": {
         "yes": "是",
         "no": "否",
@@ -1641,11 +1860,13 @@
       "defaults": "系統預設",
       "iran": "伊朗常用",
       "russia": "俄羅斯常用",
-      "india": "印度常用",
       "china": "中國常用",
       "brazil": "巴西常用",
+      "india": "印度常用",
       "nigeria": "奈及利亞常用",
       "germany": "德國常用",
+      "albania": "阿爾巴尼亞常用",
+      "kosovo": "科索沃常用",
       "ai": "AI 服務",
       "social": "社交通訊",
       "productivity": "工作與生產力",
@@ -1721,7 +1942,8 @@
       "average": "一般",
       "good": "良好",
       "great": "優秀"
-    }
+    },
+    "ToolHint": "頻寬只說明了一半：用 {ping} 和 {mtr} 看看你的網路連到世界各地的表現。"
   },
   "globalping": {
     "Selected": "已選地區：",
@@ -1840,8 +2062,10 @@
     "MacChecker": "開啟實體位址查詢面板",
     "IpCalculator": "開啟 IP 計算器面板",
     "BrowserInfo": "開啟瀏覽器資訊面板",
+    "AdblockTest": "開啟廣告與追蹤封鎖檢測面板",
     "SecurityChecklist": "開啟安全檢查清單",
     "PersonaCheck": "開啟深度畫像檢測面板",
+    "IpBlocklist": "開啟 IP 黑名單檢查面板",
     "AsnProfile": "開啟 ASN 檔案查詢面板"
   },
   "page": {
@@ -1856,13 +2080,25 @@
   "helpModal": {
     "Title": "鍵盤快速鍵"
   },
+  "footer": {
+    "Tagline": "免費、開源、一站式的隱私工具箱",
+    "Project": "專案",
+    "Support": "文件與支援",
+    "DeveloperDocs": "開發者文件",
+    "SelfHosting": "自行架設指南",
+    "ReportIssue": "回報問題",
+    "License": "MIT 授權條款",
+    "Clients": "用戶端",
+    "Raycast": "Raycast 擴充功能",
+    "Lite": "Lite 版"
+  },
   "about": {
     "Title": "關於",
     "project": [
       "IPCheck.ing 是一個免費的多合一 IP 工具箱，可以協助你檢視自己的 IP 資訊，檢測網站的可用性，檢視 DNS 出口資訊，進行網速測試，全球延遲測試，MTR 測試等。",
       "這是一個開源專案，你可以點選頁面底部的 GitHub 圖示檢視原始碼。",
       "如果你對於產品中功能使用不理解，可以透過底部的「說明中心」取得協助，我們已經寫了非常詳細的協助文件，除了功能介紹，也能協助你理解各種網路概念和如何排查網路問題。",
-      "如果你有興趣參與到開源專案中，可以點選頁面底部的「貢獻程式碼」按鈕，檢視如何貢獻程式碼。"
+      "如果你有興趣參與到開源專案中，可以點選頁面底部的「開發者文件」，檢視如何貢獻程式碼。"
     ],
     "founderTitle": "關於專案發起人",
     "founder": [
@@ -1883,7 +2119,6 @@
     "Sponsor": "贊助我們",
     "Privacy": "隱私政策",
     "HelpCenter": "說明中心",
-    "Contribute": "貢獻程式碼",
     "Close": "關閉"
   },
   "acknowledgement": {

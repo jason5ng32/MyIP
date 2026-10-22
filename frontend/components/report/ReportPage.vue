@@ -1,7 +1,7 @@
 <template>
-    <div class="flex min-h-screen flex-col">
-        <StandalonePageHeader :title="t('report.Title')" />
+    <div class="flex min-h-[calc(100dvh_-_3.5rem_-_env(safe-area-inset-top))] flex-col">
         <main class="flex-1 mx-auto w-full max-w-300 px-4 py-6 space-y-4">
+        <PageBreadcrumb :items="[{ label: t('report.Title') }]" />
         <!-- Loading -->
         <div v-if="state === 'loading'"
             class="flex items-center justify-center gap-2 py-24 text-sm text-muted-foreground">
@@ -68,10 +68,10 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isoToDateTime } from '@/utils/time-utils.js';
-import { REPORT_VERSION, REPORT_SECTION_IDS } from '@/utils/report-schema.js';
-import { reportToMarkdown } from '@/utils/report-export.js';
+import { REPORT_VERSION, REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
+import { reportToMarkdown } from '@/utils/report/report-export.js';
 import { useDocumentMeta } from '@/composables/use-document-meta.js';
-import StandalonePageHeader from '@/components/StandalonePageHeader.vue';
+import PageBreadcrumb from '@/components/PageBreadcrumb.vue';
 import Footer from '@/components/Footer.vue';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -85,6 +85,7 @@ import ReportPingtest from './sections/ReportPingtest.vue';
 import ReportMtrtest from './sections/ReportMtrtest.vue';
 import ReportRuletest from './sections/ReportRuletest.vue';
 import ReportBrowserinfo from './sections/ReportBrowserinfo.vue';
+import ReportAdblocktest from './sections/ReportAdblocktest.vue';
 import ReportInvisibility from './sections/ReportInvisibility.vue';
 import ReportEnhanceddnsleak from './sections/ReportEnhanceddnsleak.vue';
 import ReportPersona from './sections/ReportPersona.vue';
@@ -100,6 +101,7 @@ const SECTION_COMPONENTS = {
     mtrtest: ReportMtrtest,
     ruletest: ReportRuletest,
     browserinfo: ReportBrowserinfo,
+    adblocktest: ReportAdblocktest,
     invisibility: ReportInvisibility,
     enhanceddnsleak: ReportEnhanceddnsleak,
     persona: ReportPersona,

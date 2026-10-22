@@ -7,7 +7,7 @@
 // only when VITE_SENTRY_DSN_FRONTEND is set.
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import { isValidIP } from '../common/valid-ip.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // The envelope header is the first newline-delimited JSON line and carries
 // the DSN the SDK was configured with. Returns a URL or null. Exported for

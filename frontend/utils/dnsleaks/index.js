@@ -7,7 +7,7 @@
 // store dependency — the consuming component (DnsLeaksTest.vue) iterates a
 // list of them, wires results into its reactive `leakTest[]`, and runs the
 // MaxMind geo lookup separately.
-import { isValidIP } from '../valid-ip.js';
+import { isValidIP } from '../ip/valid-ip.js';
 
 export { ipApi } from './ipapi.js';
 export { surfshark } from './surfshark.js';
@@ -16,6 +16,7 @@ export { browserleaks } from './browserleaks.js';
 export { fastly } from './fastly.js';
 export { bashws } from './bashws.js';
 export { myipstack } from './myipstack.js';
+export { every1dns } from './every1dns.js';
 
 // Invoke `provider.run()` up to `attempts` times. Because each provider
 // regenerates its prefix internally on every call, retries trigger fresh

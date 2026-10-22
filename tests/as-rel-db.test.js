@@ -1,4 +1,4 @@
-// Coverage for common/as-rel-db.js lookups over a fixture snapshot. The module
+// Coverage for server/datasets/as-rel-db.js lookups over a fixture snapshot. The module
 // reads its snapshot directory through `fs` at load/reload time, so the test
 // points those calls at an in-memory fixture and reloads — no files written.
 import assert from 'node:assert/strict';
@@ -9,7 +9,7 @@ import { after, before, describe, it, mock } from 'node:test';
 import {
     AS_REL_DB_DIR, reloadAsRelDatabase,
     providersOf, peersOf, customersOf, customerCountOf, isTier1,
-} from '../common/as-rel-db.js';
+} from '../server/datasets/as-rel-db.js';
 
 const FIXTURE_FILE = path.join(AS_REL_DB_DIR, 'fixture.txt');
 

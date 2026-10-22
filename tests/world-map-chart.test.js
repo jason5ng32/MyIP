@@ -49,7 +49,7 @@ after(() => {
     delete globalThis.getComputedStyle;
 });
 
-const { renderWorldMapChart } = await import('../frontend/utils/world-map-chart.js');
+const { renderWorldMapChart } = await import('../frontend/utils/features/world-map-chart.js');
 const options = () => ({
     canvas: { style: {} }, values: { US: 1 }, lang: 'en',
     colorFrom: '#000000', colorTo: '#ffffff', formatValue: (value) => `value:${value}`,

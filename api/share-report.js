@@ -17,7 +17,7 @@
 import crypto from 'node:crypto';
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import { validateReport, REPORT_TTL_DAYS, REPORT_MAX_BYTES } from '../common/report-schema.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // --- env / KV plumbing -------------------------------------------------------
 

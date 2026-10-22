@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
 
 Une boîte à outils IP tout-en-un et open source : recherche d'IP depuis plusieurs sources, tests de connectivité, détection WebRTC et de fuites DNS, test de vitesse, MTR, vérification de la censure, Whois et plus encore — auto-hébergeable en une seule commande Docker.
 
@@ -47,6 +47,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 
 * 🚥 **Détection WebRTC** : Révèle l'adresse IP exposée lors des connexions WebRTC — y compris si les protections de confidentialité de votre navigateur sont actives.
 * 🛑 **Test de fuite DNS** : Montre quels points de terminaison DNS résolvent vos requêtes, afin d'évaluer le risque de fuite DNS lors de l'utilisation d'un VPN ou d'un proxy.
+* 🛡️ **Test de blocage des pubs et traceurs** : Vérifie ce que votre bloqueur de pubs, navigateur, filtre DNS, VPN ou routeur bloque vraiment — régies publicitaires, statistiques, traceurs sociaux, suivi des erreurs, télémétrie des fabricants d'appareils, scripts de pistage et masquage d'éléments.
 * 📋 **Liste de contrôle de cybersécurité** : Une liste personnelle de 258 points de cybersécurité répartis en 12 domaines, avec progression sauvegardée dans votre navigateur.
 
 ### 📡 Tests réseau
@@ -170,6 +171,10 @@ DOMAIN,ptest-5.ipcheck.ing,Proxy5
 DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
+DOMAIN,ptest-9.ipcheck.ing,Proxy9
+DOMAIN,ptest-10.ipcheck.ing,Proxy10
+DOMAIN,ptest-11.ipcheck.ing,Proxy11
+DOMAIN,ptest-12.ipcheck.ing,Proxy12
 ```
 
 </details>

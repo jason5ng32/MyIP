@@ -1,4 +1,4 @@
-// Validates the shared IP parser. frontend/utils/valid-ip.js is a thin
+// Validates the shared IP parser. frontend/utils/ip/valid-ip.js is a thin
 // re-export of common/valid-ip.js; we import both paths and assert they
 // agree, which catches any regression where the re-export breaks (e.g.
 // someone duplicates the implementation again).
@@ -6,8 +6,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { isValidIP as isValidCommonIP, isValidDomain as isValidCommonDomain, isIPv6 as isCommonIPv6, isUsablePublicIP as isCommonUsablePublicIP } from '../common/valid-ip.js';
-import { isValidIP as isValidFrontendIP, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isUsablePublicIP as isFrontendUsablePublicIP } from '../frontend/utils/valid-ip.js';
+import { isValidIP as isValidCommonIP, isValidIPv4 as isValidCommonIPv4, isValidIPv6 as isValidCommonIPv6, isValidDomain as isValidCommonDomain, isIPv6 as isCommonIPv6, isUsablePublicIP as isCommonUsablePublicIP } from '../common/valid-ip.js';
+import { isValidIP as isValidFrontendIP, isValidIPv4 as isValidFrontendIPv4, isValidIPv6 as isValidFrontendIPv6, isValidDomain as isValidFrontendDomain, isIPv6 as isFrontendIPv6, isUsablePublicIP as isFrontendUsablePublicIP } from '../frontend/utils/ip/valid-ip.js';
 
 const validAddresses = [
   '1.1.1.1',
@@ -114,6 +114,28 @@ describe('isIPv6', () => {
   it('is false for non-strings (it does not validate, only discriminates)', () => {
     assert.equal(isCommonIPv6(null), false);
     assert.equal(isCommonIPv6(42), false);
+  });
+});
+
+describe('isValidIPv4 / isValidIPv6', () => {
+  it('accept only a valid IP of their own version, both import paths agreeing', () => {
+    for (const [ip, v4, v6] of [
+      ['1.1.1.1', true, false],
+      ['255.255.255.255', true, false],
+      ['2001:4860:4860::8888', false, true],
+      ['::1', false, true],
+      ['256.1.1.1', false, false],
+      ['2001:::8888', false, false],
+      ['hello:world', false, false],
+      ['hello', false, false],
+      ['', false, false],
+      [null, false, false],
+    ]) {
+      assert.equal(isValidCommonIPv4(ip), v4);
+      assert.equal(isValidFrontendIPv4(ip), v4);
+      assert.equal(isValidCommonIPv6(ip), v6);
+      assert.equal(isValidFrontendIPv6(ip), v6);
+    }
   });
 });
 

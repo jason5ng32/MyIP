@@ -2,7 +2,7 @@
 // and reads `ip=` from the trace body. Chained ahead of MyExternalIP IPv6
 // in index.js.
 import { fetchWithTimeout } from '../fetch-with-timeout.js';
-import { parseTrace } from '../parse-trace.js';
+import { parseTrace } from '../ip/parse-trace.js';
 
 export const cloudflareV6 = {
     id: 'cloudflare-v6',

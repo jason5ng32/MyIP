@@ -36,7 +36,7 @@ export async function fetchWithTimeout(url, init = {}) {
 }
 
 // Optional User-Agent for fetchUpstream calls. Backend boot injects a
-// project-identifying UA (see common/upstream-ua.js) because some upstream
+// project-identifying UA (see server/upstream-ua.js) because some upstream
 // WAFs hard-block undici's default `User-Agent: node`. Injection keeps this
 // file browser-safe: the frontend bundle never touches fs / process.
 let upstreamUserAgent = null;

@@ -66,7 +66,7 @@ import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
 // Anonymity verdict code → the IP card's own label.
-import { ANONYMITY_I18N_KEYS } from '@/utils/transform-ip-data.js';
+import { ANONYMITY_I18N_KEYS } from '@/utils/ip/transform-ip-data.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();

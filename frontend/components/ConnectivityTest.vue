@@ -160,9 +160,9 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
-import { CONNECTIVITY_STATUS } from '@/utils/report-schema.js';
+import { CONNECTIVITY_STATUS } from '@/utils/report/report-schema.js';
 import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
-import { siteUrlOf, removeMember } from '@/utils/connectivity-lists.js';
+import { siteUrlOf, removeMember } from '@/utils/features/connectivity-lists.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -386,7 +386,7 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     const testTime = Math.round(performance.now() - beginTime);
     test.status = t('connectivity.StatusAvailable');
     // Locale-free twin of the localized status label, consumed by the report
-    // builder (utils/report-builders.js) — the label itself can't be mapped
+    // builder (utils/report/report-builders.js) — the label itself can't be mapped
     // back to an enum without string comparison against t() output.
     test.statusCode = CONNECTIVITY_STATUS.OK;
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);

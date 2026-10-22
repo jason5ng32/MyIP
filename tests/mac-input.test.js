@@ -1,11 +1,12 @@
 // Tests for common/mac-input.js — the MAC Lookup query parser shared by
-// /api/macchecker and the MacChecker form (through frontend/utils/mac-input.js).
+// /api/macchecker and the MacChecker form (through
+// frontend/utils/features/mac-input.js).
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { normalizeMacQuery } from '../common/mac-input.js';
-import { normalizeMacQuery as bridged } from '../frontend/utils/mac-input.js';
+import { normalizeMacQuery as bridged } from '../frontend/utils/features/mac-input.js';
 
 describe('normalizeMacQuery', () => {
     it('accepts a full address in every common notation, as upper-case bare hex', () => {

@@ -30,7 +30,7 @@
 //     utm: { source: '…', … },     // with `url` only; keys WITHOUT the utm_
 //                                  // prefix — bannerLink adds it, plus
 //                                  // utm_content=<lang>
-//     to: '/?tool=invisibilitytest', // internal: router.push target, no utm
+//     to: '/tools/invisibilitytest', // internal: router.push target, no utm
 //     sheet: 'pulse',              // internal: opens a store-managed side
 //                                  // panel (store.setOpenSheet name)
 //     requireSettled: true,        // default true when absent: wait for the

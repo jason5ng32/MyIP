@@ -15,8 +15,8 @@ import {
     maskReportIps,
     isMaskedIP,
 } from '../common/report-schema.js';
-import { validateReport as validateViaBridge } from '../frontend/utils/report-schema.js';
-import { parseMtrOutput } from '../frontend/utils/mtr-parse.js';
+import { validateReport as validateViaBridge } from '../frontend/utils/report/report-schema.js';
+import { parseMtrOutput } from '../frontend/utils/features/mtr-parse.js';
 
 // A representative valid report touching every section — the fixture the
 // rejection cases below mutate.
@@ -94,6 +94,10 @@ const makeValidReport = () => ({
             languages: ['zh-CN', 'en'],
             display: { width: 1512, height: 982, pixelRatio: 2 },
             connection: null,
+        },
+        adblocktest: {
+            testedAt: '2026-07-14T08:00:00.000Z',
+            groups: [{ id: 'ads', total: 3, blocked: 2, open: 1, unknown: 0 }],
         },
         invisibility: {
             testedAt: '2026-07-14T08:00:00.000Z',
@@ -299,7 +303,7 @@ describe('constants', () => {
         assert.deepEqual(REPORT_TTL_DAYS, [1, 3, 7]);
         assert.ok(REPORT_SECTION_IDS.includes('ipinfo'));
         assert.ok(REPORT_SECTION_IDS.includes('enhanceddnsleak'));
-        assert.equal(REPORT_SECTION_IDS.length, 12);
+        assert.equal(REPORT_SECTION_IDS.length, 13);
     });
 });
 

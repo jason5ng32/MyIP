@@ -1,4 +1,4 @@
-// Tests for common/peeringdb-distill.js — the streaming dump scanner and the
+// Tests for server/datasets/peeringdb-distill.js — the streaming dump scanner and the
 // batched index writer, over synthetic dumps written to a temp dir: only the
 // four wanted tables are read (contact tables never reach the index), rows
 // and keys straddling the 1 MB read boundary, escaped quotes / brackets /
@@ -11,8 +11,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { after, describe, it } from 'node:test';
 
-import { scanDumpRows, writeIndexFile, distillPeeringdbDump } from '../common/peeringdb-distill.js';
-import { buildPeeringdbIndex, projectRow, readPeeringdbIndex, expandNet } from '../common/peeringdb-db.js';
+import { scanDumpRows, writeIndexFile, distillPeeringdbDump } from '../server/datasets/peeringdb-distill.js';
+import { buildPeeringdbIndex, projectRow, readPeeringdbIndex, expandNet } from '../server/datasets/peeringdb-db.js';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'myip-pdb-distill-'));
 after(() => fs.rmSync(dir, { recursive: true, force: true }));

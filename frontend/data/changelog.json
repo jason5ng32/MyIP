@@ -2208,5 +2208,99 @@
         }
       }
     ]
+  },
+  {
+    "version": "v8.0.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "New tool: IP Blocklist Check — see whether an IP is on about 80 real-time DNSBLs and threat intelligence lists",
+          "zh": "新增工具：IP 黑名单检查——查看 IP 是否出现在约 80 个实时 DNSBL 与威胁情报名单上",
+          "zh-TW": "新增工具：IP 黑名單檢查——查看 IP 是否出現在約 80 個即時 DNSBL 與威脅情報名單上",
+          "fr": "Nouvel outil : Vérification des listes noires IP — vérifiez si une IP figure sur environ 80 DNSBL en temps réel et listes de renseignement sur les menaces",
+          "ru": "Новый инструмент: проверка IP по чёрным спискам — узнайте, есть ли IP примерно в 80 DNSBL реального времени и списках киберразведки",
+          "pt-BR": "Nova ferramenta: Verificação de listas negras de IP — veja se um IP está em cerca de 80 DNSBLs em tempo real e listas de inteligência de ameaças"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "New tool: Ad & Tracker Blocking Test — see which ad, analytics, social and device-maker endpoints, tracking scripts and ad-shaped elements your blocker, DNS filter or VPN lets through",
+          "zh": "新增工具：广告与跟踪屏蔽检测——查看你的拦截器、DNS 过滤或 VPN 放行了哪些广告、统计、社交平台与设备厂商端点、跟踪脚本和广告样式元素",
+          "zh-TW": "新增工具：廣告與追蹤封鎖檢測——查看你的阻擋器、DNS 過濾或 VPN 放行了哪些廣告、統計、社群平台與裝置廠商端點、追蹤腳本和廣告樣式元素",
+          "fr": "Nouvel outil : Test de blocage des pubs et traceurs — voyez quelles adresses publicitaires, de statistiques, de réseaux sociaux et de fabricants d'appareils, quels scripts de pistage et quels éléments publicitaires votre bloqueur, filtre DNS ou VPN laisse passer",
+          "ru": "Новый инструмент: проверка блокировки рекламы и трекеров — узнайте, какие адреса рекламных сетей, аналитики, соцсетей и производителей устройств, скрипты отслеживания и рекламные элементы пропускает ваш блокировщик, DNS-фильтр или VPN",
+          "pt-BR": "Nova ferramenta: Teste de bloqueio de anúncios e rastreadores — veja quais endereços de anúncios, análise, redes sociais e fabricantes de dispositivos, scripts de rastreamento e elementos com cara de anúncio seu bloqueador, filtro de DNS ou VPN deixa passar"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools open as pages of their own, sliding in like an app, data is not lost when switching",
+          "zh": "高级工具以独立页面打开，像应用一样滑入，切换时数据不丢失",
+          "zh-TW": "進階工具以獨立頁面開啟，像 App 一樣滑入，切換時數據不丟失",
+          "fr": "Les Outils avancés ouvrent dans leur propre page, qui glisse à l'écran comme dans une app, les données ne sont pas perdues lors du changement",
+          "ru": "Расширенные инструменты открываются на отдельных страницах, которые выезжают, как в приложении, данные не теряются при переключении",
+          "pt-BR": "As Ferramentas avançadas abrem em páginas próprias, que deslizam como num app, os dados não são perdidos ao mudar"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Reorganized the project's directory structure for easier maintenance",
+          "zh": "重构了程序的目录结构，提高可维护性",
+          "zh-TW": "重構了程式的目錄結構，提高可維護性",
+          "fr": "Réorganisation de la structure des répertoires du projet pour faciliter la maintenance",
+          "ru": "Реорганизована структура каталогов проекта для упрощения поддержки",
+          "pt-BR": "Reorganizada a estrutura de diretórios do projeto para facilitar a manutenção"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "The navigation bar is on every page, so every tool is one click away wherever you are",
+          "zh": "导航栏覆盖所有页面，方便在任何页面都能一键打开任意工具",
+          "zh-TW": "導覽列涵蓋所有頁面，方便在任何頁面都能一鍵開啟任一工具",
+          "fr": "La barre de navigation est présente sur toutes les pages : chaque outil est à un clic où que vous soyez",
+          "ru": "Панель навигации есть на каждой странице — любой инструмент в одном клике откуда угодно",
+          "pt-BR": "A barra de navegação está em todas as páginas, então qualquer ferramenta fica a um clique de onde você estiver"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Advanced Tools grouped into Network Diagnostics, Lookup & Calculation and In-depth Checks",
+          "zh": "高级工具以分组形式展示",
+          "zh-TW": "進階工具以分組形式展示",
+          "fr": "Les Outils avancés regroupés en Diagnostic réseau, Recherche et calcul et Contrôles approfondis",
+          "ru": "Расширенные инструменты разделены на группы: «Диагностика сети», «Поиск и расчёты» и «Углублённые проверки»",
+          "pt-BR": "As Ferramentas avançadas agrupadas em Diagnóstico de rede, Consulta e cálculo e Verificações aprofundadas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Improved the PWA experience on iOS",
+          "zh": "优化 iOS 系统中，PWA 的体验",
+          "zh-TW": "優化 iOS 系統中，PWA 的體驗",
+          "fr": "Amélioration de l'expérience PWA sur iOS",
+          "ru": "Улучшение работы PWA в iOS",
+          "pt-BR": "Melhoria da experiência PWA no iOS"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]

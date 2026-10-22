@@ -8,7 +8,8 @@
 // event on utils/app-events.js and subscribe to it here instead.
 import * as Sentry from '@sentry/vue';
 import { onAppEvent } from '@/utils/app-events';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP } from '@/utils/ip/valid-ip.js';
+import { readAccountId } from '@/utils/auth-hint.js';
 
 const env = import.meta.env ?? {};
 
@@ -19,6 +20,13 @@ const SCREENSHOT_CSS_NOISE = [
     'Error loading remote stylesheet',
     'Error inlining remote css file',
 ];
+
+// Direct captures carry the FirebaseError as originalException; console
+// captures (`console.error('… sign-in failed:', error)`) surface it as the
+// event's exception type.
+const isFirebaseError = (event, hint) =>
+    hint?.originalException?.name === 'FirebaseError'
+    || (event.exception?.values ?? []).some((value) => value?.type === 'FirebaseError');
 
 // `earlyErrors` is main.js's pre-init buffer: ErrorEvent /
 // PromiseRejectionEvent entries from its temporary window listeners, plus
@@ -106,6 +114,14 @@ const initSentry = (app, router, earlyErrors = []) => {
             'Database is closing',
             'Database is hidden',
             'The database connection is closing',
+            // WebKit tearing down IndexedDB under a live page: the host wiped
+            // site data (in-app browsers do this) or its storage process
+            // died. Escapes from Firebase's own IndexedDB opens, same as above.
+            'Database deleted by request of the user',
+            'Connection to Indexed Database server lost',
+            // Reader-mode script that Firefox-iOS-based browsers (Brave iOS
+            // among them) inject into the page — not our code.
+            '__firefox__',
             // Stale-deploy chunk loads: a client from before the latest
             // deploy lazy-loads a hashed asset that no longer exists.
             // Self-heals on reload, not a defect. One entry per browser
@@ -136,6 +152,11 @@ const initSentry = (app, router, earlyErrors = []) => {
             // per-source console.error lines remain the health signal.
             if (String(hint?.originalException?.message ?? '')
                 .startsWith('All sources failed to fetch IP details')) return null;
+            // Firebase errors carry account id
+            if (isFirebaseError(event, hint)) {
+                const accountId = readAccountId();
+                if (accountId) event.user = { ...event.user, id: accountId };
+            }
             if (event.logger === 'console') {
                 const firstArg = event.extra?.arguments?.[0];
                 if (typeof firstArg === 'string' && firstArg.trim()) {

@@ -7,7 +7,7 @@
 // ids and enums, and the front end renders its own four-language copy.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // Headers that describe *this* hop rather than the caller, dropped before the
 // request is rebuilt. 

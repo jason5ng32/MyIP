@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Navigation",
+    "Home": "Home",
     "IPInfo": "IP Infos",
     "Connectivity": "Connectivity",
     "ServiceStatus": "Service Status",
     "WebRTC": "WebRTC Leak Test",
     "DNSLeakTest": "DNS Leak Test",
     "SpeedTest": "Speed Test",
-    "PingTest": "Global Latency",
-    "MTRTest": "MTR Test",
-    "RuleTest": "Rule Test",
     "AdvancedTools": "Advanced Tools",
     "SearchDocs": "Search docs…",
     "DocsToolConfirm": "Share your current test results?",
@@ -263,7 +260,8 @@
         "level": {
           "NATIONWIDE": "Nationwide",
           "REGIONAL": "Regional",
-          "NETWORK": "Network"
+          "NETWORK": "Network",
+          "PLATFORM": "Platform"
         }
       },
       "statuses": {
@@ -387,11 +385,9 @@
     "Note2_1": "You can use",
     "Note2_2": "command, get the IP address of your machine in terminal",
     "Note3": "is an optional path, adding it will obtain the geographical information of the IP",
-    "Note4": "is your IPCheck.ing API key",
     "getIPv4": "Get local machine's IPv4 address",
     "getIPv6": "Get local machine's IPv6 address",
-    "get6and4": "Get the preferred network exit IP address of the local machine",
-    "notAvailable": "This feature is not available yet"
+    "get6and4": "Get the preferred network exit IP address of the local machine"
   },
   "browserinfo": {
     "Title": "Browser Information",
@@ -582,10 +578,23 @@
       "fromPing": "Ping latency value: ",
       "negative": "TCP latency and Ping difference is not large, indicating that you may not be using a proxy or VPN."
     },
+    "tlsRtt": {
+      "title": "TCP vs TLS Handshake Latency",
+      "positive": "The TLS handshake takes far longer than the TCP round trip, as if it were completed somewhere farther away. You may be using a proxy or VPN.",
+      "fromTCP": "TCP round trip: ",
+      "fromTLS": "TLS handshake: ",
+      "negative": "The TLS handshake time is in line with the TCP round trip, with no clear evidence of a proxy or VPN."
+    },
     "highlatency": {
       "title": "High Latency Analysis",
       "positive": "High latency analysis indicates that you may be using a proxy or VPN.",
       "negative": "No evidence of you using a proxy or VPN was found in high latency analysis."
+    },
+    "proxyAi": {
+      "title": "AI Assessment",
+      "positive": "An AI model weighing all the signals judges that you may be using a proxy.",
+      "score": "AI model score: ",
+      "negative": "An AI model weighing all the signals found no evidence that you are using a proxy."
     }
   },
   "personacheck": {
@@ -857,11 +866,216 @@
       "no": "No"
     }
   },
+  "ipblocklist": {
+    "Title": "IP Blocklist Check",
+    "Note": "Checks an IP against about 80 public blocklists in two groups. Real-time blocklists (DNSBLs) are queried live by mail servers, forums and online services to decide whether to accept a connection or a message; threat intelligence lists are published feeds of abusive addresses, open proxies, VPN servers and Tor exits that firewalls and security services load. Being listed is often why emails get rejected, sign-ups get blocked or a site keeps asking for CAPTCHAs.",
+    "Note2": "Each listing falls into one of three kinds. Abuse means a list has recorded spam, attacks or a compromised device at this address. Anonymity means the address is known as a proxy, VPN, relay or Tor exit, which is expected when you use one and isn't a bad record by itself. Advisory entries flag the wider network, such as a dynamic range or a whole provider, rather than this address. Shared, cloud and VPN addresses often turn up somewhere, so treat a listing as a signal rather than a verdict; where a list offers a removal page, it's linked next to the listing.",
+    "SelectIPLabel": "Pick an IP to check",
+    "EnterIPLabel": "Enter an IP to check",
+    "UseStored": "Use a detected IP",
+    "SelectIP": "Select an IP",
+    "EnterIPPlaceholder": "e.g. 1.1.1.1",
+    "InvalidIP": "Enter a public IPv4 or IPv6 address.",
+    "Checking": "Checking about 80 blocklists. This can take up to 30 seconds.",
+    "FetchError": "Couldn't finish the check. Try again in a moment.",
+    "CheckedAt": "Checked {time}",
+    "verdict": {
+      "abuse": "This IP has a record of abuse on some blocklists",
+      "anonymity": "No abuse record, but this IP is marked as a proxy, VPN, relay or Tor exit",
+      "notice": "Not on any blocklist, though some lists flag its wider network",
+      "clean": "Not on any of the blocklists checked"
+    },
+    "count": {
+      "abuse": "Abuse",
+      "anonymity": "Anonymity",
+      "notice": "Advisory",
+      "clean": "Clean",
+      "error": "Failed"
+    },
+    "SomeFailed": "{n} of the lists couldn't be checked this time, so the result may be incomplete.",
+    "part": {
+      "dnsbl": {
+        "title": "Real-time blocklists (DNSBL)",
+        "desc": "Queried live by mail servers and online services"
+      },
+      "static": {
+        "title": "Threat intelligence lists",
+        "desc": "Abuse, proxy and VPN lists used by firewalls and security services"
+      }
+    },
+    "NoHits": "Not listed here.",
+    "ShowRest": "Show the other {n} lists",
+    "HideRest": "Hide",
+    "CheckFailed": "Check failed",
+    "LastSeen": "Last seen {date}",
+    "RequestRemoval": "Request removal",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abuse",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relay",
+      "tor": "Tor",
+      "scanner": "Scanner",
+      "backscatter": "Backscatter",
+      "mixed": "Mixed"
+    },
+    "reason": {
+      "socksProxy": "SOCKS proxy",
+      "httpProxy": "HTTP proxy",
+      "proxyChain": "Proxy chain",
+      "webProxy": "Web proxy",
+      "wingateProxy": "WinGate proxy",
+      "openProxy": "Open proxy",
+      "torExit": "Tor exit node",
+      "exploited": "Exploited host",
+      "compromisedHost": "Compromised host",
+      "compromisedRouter": "Compromised router",
+      "botnet": "Botnet",
+      "worm": "Worm infection",
+      "ircDrone": "IRC drone",
+      "ddosDrone": "DDoS drone",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Brute-force attacks",
+      "spamSource": "Spam source",
+      "spamtrap": "Hit a spam trap",
+      "badReputation": "Bad reputation",
+      "hijackedNetwork": "Hijacked network",
+      "endUserRange": "End-user address range",
+      "dynamicRange": "Dynamic address range",
+      "noMailRange": "Not meant to send mail",
+      "missingPtr": "No reverse DNS",
+      "poorReputation": "Poor reputation",
+      "mixedReputation": "Mixed reputation",
+      "rangeListed": "Address range listed",
+      "networkListed": "Whole network listed",
+      "unaccountableOperator": "Operator doesn't act on abuse",
+      "noMailService": "No mail service",
+      "unreliableAbuseDesk": "Unreliable abuse contact",
+      "reported1d": "Reported in the last day",
+      "reported7d": "Reported in the last 7 days",
+      "reported30d": "Reported in the last 30 days",
+      "reported90d": "Reported in the last 90 days",
+      "feeds": "Reported by {n}+ threat feeds",
+      "testEntry": "Test entry"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abuse",
+        "desc": "the list recorded spam, attacks or a compromised device at this address"
+      },
+      "anonymity": {
+        "label": "Anonymity",
+        "desc": "a known proxy, VPN, relay or Tor exit, which isn't a bad record by itself"
+      },
+      "notice": {
+        "label": "Advisory",
+        "desc": "flags the wider network or provider, not this address"
+      },
+      "clean": {
+        "label": "Not listed",
+        "desc": "this IP isn't on the list"
+      },
+      "error": {
+        "label": "Check failed",
+        "desc": "the list couldn't be checked this time, which doesn't mean the IP isn't on it"
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "Ad & Tracker Blocking Test",
+    "Note": "Built for anyone who runs an ad or tracker blocker: an extension such as uBlock Origin or Privacy Badger, a browser with built-in blocking, or filtering on a DNS service, VPN or router. The test has your browser contact well-known ad, analytics, social and device-maker endpoints, fetches popular tracking scripts without running them, and places bait elements that cosmetic filters hide, then shows what got through.",
+    "Note2": "A higher score is not automatically better. Not every tracker works against you: error reporting helps sites fix crashes, analytics helps them improve, and ads pay for much of the free web; some device-maker endpoints also deliver updates or notifications. Read the result as a map of what your setup lets through, and decide for yourself what is worth blocking.",
+    "Note3": "Requests that are not blocked do reach those services, without cookies or a referrer. Results stay in your browser and are not sent to us. An endpoint your network cannot reach for any other reason also shows as blocked.",
+    "Selected": "Selected checks:",
+    "SelectAll": "Select all",
+    "Invert": "Invert",
+    "Run": "Start test",
+    "Rerun": "Run again",
+    "Hint": "Choose what to test, then start",
+    "Score": "Blocked share",
+    "Progress": "{done} / {total} checked",
+    "GroupCount": "{blocked} / {total} blocked",
+    "NothingOpen": "No request was confirmed as not blocked.",
+    "NothingBlocked": "No request was confirmed as blocked.",
+    "Version": "Test list version: {version}",
+    "Limitation": "These probes are plain requests sent by this page, not the way a website actually loads ads or scripts: filter rules aimed only at a specific request type (such as scripts or images) may let a probe through yet still block the real thing on a website.",
+    "count": {
+      "blocked": "Blocked",
+      "open": "Not blocked",
+      "unknown": "No answer"
+    },
+    "filter": {
+      "all": "All",
+      "open": "Not blocked only",
+      "blocked": "Blocked only"
+    },
+    "status": {
+      "blocked": "Blocked",
+      "open": "Not blocked",
+      "unknown": "No answer",
+      "pending": "Waiting"
+    },
+    "cosmeticStatus": {
+      "blocked": "Hidden",
+      "open": "Visible",
+      "unknown": "No answer",
+      "pending": "Waiting"
+    },
+    "cosmetic": {
+      "ad-container": "Ad container",
+      "adsense-slot": "AdSense slot"
+    },
+    "group": {
+      "ads": {
+        "title": "Ad networks",
+        "desc": "Ad servers and ad exchanges, checked by domain."
+      },
+      "analytics": {
+        "title": "Analytics & session recording",
+        "desc": "Visitor statistics, heatmap and session replay services."
+      },
+      "social": {
+        "title": "Social network trackers",
+        "desc": "Pixels and conversion trackers run by social platforms."
+      },
+      "errors": {
+        "title": "Error & performance monitoring",
+        "desc": "Crash reporting and real-user monitoring services."
+      },
+      "oem": {
+        "title": "Device maker telemetry",
+        "desc": "Telemetry and ad endpoints of phone, TV and device makers. Your browser never calls them on its own, so mainly DNS, VPN and router filters list them."
+      },
+      "scripts": {
+        "title": "Tracking scripts",
+        "desc": "Exact URLs of popular tag and pixel scripts, fetched but never run. Filters that match by path can catch these even where the domain itself is allowed."
+      },
+      "cosmetic": {
+        "title": "Element hiding",
+        "desc": "Bait elements shaped like ad slots. Only a blocker inside the browser can hide them; DNS, VPN and router filters never do, so this part is left out of the score."
+      }
+    },
+    "layer": {
+      "browser": "Bait elements were hidden: a blocker is working inside your browser, either an extension or the browser's own.",
+      "network": "Requests were blocked but the bait elements were not hidden: the blocking most likely happens outside the page, at a DNS service, VPN or router, or in the browser's tracking protection.",
+      "none": "Nothing was blocked: no ad or tracker blocking was found in this browser or on this network."
+    },
+    "report": {
+      "Category": "Category",
+      "Total": "Total"
+    }
+  },
   "advancedtools": {
-    "OpenInNewTab": "Open in new tab",
-    "BackToHome": "Back to Home",
     "Title": "Advanced Tools",
     "Note": "People who want the very best from their network usually reach for extra tools to fine-tune their connection.",
+    "category": {
+      "network": "Network Diagnostics",
+      "lookup": "Lookup & Calculation",
+      "deep": "In-depth Checks",
+      "reference": "Reference"
+    },
     "PingTestNote": "Ping your IP from around the world",
     "MTRTestNote": "Trace your network route from around the world",
     "DNSResolverNote": "Real-time multi-channel DNS resolution",
@@ -875,8 +1089,10 @@
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
     "BrowserInfo": "Check browser information and fingerprint",
+    "AdblockTest": "Check what your ad blocker, DNS filter or VPN actually blocks",
     "SecurityChecklist": "Guide to securing your digital life",
-    "PersonaCheck": "Compare what sites see against the country you want to look local to"
+    "PersonaCheck": "Compare what sites see against the country you want to look local to",
+    "IpBlocklist": "See whether an IP is on spam, abuse, proxy or VPN blocklists"
   },
   "macchecker": {
     "Title": "MAC Lookup",
@@ -1257,7 +1473,7 @@
   "ruletest": {
     "Title": "Rule Test",
     "Name": "Test",
-    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the 8 different URLs of IPCheck.ing in your proxy software. Usually, the rule settings may use a format like: DOMAIN, ptest-3.ipcheck.ing, POLICY. The specific format may vary depending on the proxy software you are using.",
+    "Note": "Rule test is used to determine if the proxy software's domain-based rules are set correctly. Before conducting the test, you need to refer to the card below and set different domain-based routing rules for the {n} different URLs of IPCheck.ing in your proxy software. Usually, the rule settings may use a format like: DOMAIN, ptest-3.ipcheck.ing, POLICY. The specific format may vary depending on the proxy software you are using.",
     "StatusWait": "Awaiting Test",
     "StatusTesting": "Testing…",
     "StatusError": "Test Error",
@@ -1320,6 +1536,7 @@
         "mtrtest": "Per-hop MTR traceroutes toward the user's IP from probes around the world; loss at intermediate hops can be mere ICMP rate-limiting, sustained loss from one hop onward indicates a real problem.",
         "ruletest": "Egress IPs observed when fetching 8 test endpoints — more than one unique IP means traffic is split across different routes (e.g. proxy rules).",
         "browserinfo": "Browser, OS and display environment of the tested device.",
+        "adblocktest": "Ad & tracker blocking check run in the browser: per category (ad networks, analytics, social trackers, error monitoring, device-maker telemetry, tracking scripts), how many requests to well-known endpoints were blocked, got through, or timed out (noAnswer). Not blocking everything can be a deliberate choice, not a fault.",
         "invisibility": "Proxy/VPN detection scores (0-100, higher = more likely detected) with the individual detection signals that flagged.",
         "enhanceddnsleak": "Resolver-level DNS capture: every resolver IP that queried the test domain, with transport, ECS exposure and DNSSEC flags (do/cd).",
         "persona": "How closely the browser matches a local resident of the chosen country: an overall grade plus each check's verdict. Verdicts only — the underlying values are deliberately not stored in a shared report."
@@ -1512,6 +1729,8 @@
         }
       },
       "tagsTitle": "All attributes",
+      "blocklistHint": "The score is an overall profile of this IP. Want to know if it's blocklisted right now?",
+      "blocklistLink": "Check blocklists live",
       "tagState": {
         "yes": "Yes",
         "no": "No",
@@ -1641,11 +1860,13 @@
       "defaults": "System Defaults",
       "iran": "Iran Essentials",
       "russia": "Russia Essentials",
-      "india": "India Essentials",
       "china": "China Essentials",
       "brazil": "Brazil Essentials",
+      "india": "India Essentials",
       "nigeria": "Nigeria Essentials",
       "germany": "Germany Essentials",
+      "albania": "Albania Essentials",
+      "kosovo": "Kosovo Essentials",
       "ai": "AI Services",
       "social": "Social & Messaging",
       "productivity": "Work & Productivity",
@@ -1721,7 +1942,8 @@
       "average": "Average",
       "good": "Good",
       "great": "Great"
-    }
+    },
+    "ToolHint": "Bandwidth is only half the picture: see how your network reaches the rest of the world with {ping} and {mtr}."
   },
   "globalping": {
     "Selected": "Regions selected: ",
@@ -1840,8 +2062,10 @@
     "MacChecker": "Open MAC lookup panel",
     "IpCalculator": "Open IP Calculator panel",
     "BrowserInfo": "Open Browser Info panel",
+    "AdblockTest": "Open Ad & Tracker Blocking Test panel",
     "SecurityChecklist": "Open Security Checklist panel",
     "PersonaCheck": "Open In-depth Persona Check panel",
+    "IpBlocklist": "Open IP Blocklist Check panel",
     "AsnProfile": "Open ASN Profile Lookup panel"
   },
   "page": {
@@ -1856,13 +2080,25 @@
   "helpModal": {
     "Title": "Keyboard Shortcuts"
   },
+  "footer": {
+    "Tagline": "A free, open-source, all-in-one privacy toolbox.",
+    "Project": "Project",
+    "Support": "Docs & Support",
+    "DeveloperDocs": "Developer Docs",
+    "SelfHosting": "Self-hosting Guide",
+    "ReportIssue": "Report an Issue",
+    "License": "MIT License",
+    "Clients": "Clients",
+    "Raycast": "Raycast Extension",
+    "Lite": "Lite Edition"
+  },
   "about": {
     "Title": "About",
     "project": [
       "IPCheck.ing is a free all-in-one IP toolbox that helps you check your own IP information, test website availability, examine DNS exit information, and run speed tests, global latency tests, MTR tests and more.",
       "This is an open-source project — click the GitHub icon at the bottom of the page to browse the source code.",
       "If you are unsure how a feature works, open the \"Help Center\" link at the bottom of the page. The documentation is thorough: beyond describing each feature, it also explains networking concepts and how to troubleshoot network problems.",
-      "If you would like to take part in the open-source project, click the \"Contribute Code\" button at the bottom of the page to see how."
+      "If you would like to take part in the open-source project, open the \"Developer Docs\" link at the bottom of the page to see how."
     ],
     "founderTitle": "About the Founder",
     "founder": [
@@ -1883,7 +2119,6 @@
     "Sponsor": "Sponsor Us",
     "Privacy": "Privacy",
     "HelpCenter": "Help Center",
-    "Contribute": "Contribute Code",
     "Close": "Close"
   },
   "acknowledgement": {

@@ -192,17 +192,14 @@
   },
   "nav": {
     "id": "nav",
-    "Title": "IPCheck.ing",
     "Navigation": "Navigation",
+    "Home": "Accueil",
     "IPInfo": "Infos IP",
     "Connectivity": "Connectivité",
     "ServiceStatus": "État des services",
     "WebRTC": "Test WebRTC Leak",
     "DNSLeakTest": "Test de fuite DNS",
     "SpeedTest": "Test de vitesse",
-    "PingTest": "Latence mondiale",
-    "MTRTest": "Test MTR",
-    "RuleTest": "Test de règles",
     "AdvancedTools": "Outils avancés",
     "SearchDocs": "Rechercher dans la doc…",
     "DocsToolConfirm": "Partager vos résultats actuels ?",
@@ -263,7 +260,8 @@
         "level": {
           "NATIONWIDE": "National",
           "REGIONAL": "Régional",
-          "NETWORK": "Réseau"
+          "NETWORK": "Réseau",
+          "PLATFORM": "Plateforme"
         }
       },
       "statuses": {
@@ -387,11 +385,9 @@
     "Note2_1": "Tu peux, dans le terminal, via",
     "Note2_2": "commande, obtenir l'adresse IP de cette machine",
     "Note3": "est un chemin optionnel, son ajout permettra d'obtenir les informations géographiques de l'IP",
-    "Note4": "est votre clé API IPCheck.ing",
     "getIPv4": "Obtenir l'adresse IPv4 de la machine locale",
     "getIPv6": "Obtenir l'adresse IPv6 de la machine locale",
-    "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale",
-    "notAvailable": "Cette fonctionnalité n'est pas encore disponible"
+    "get6and4": "Obtenir l'adresse IP de sortie de réseau préférée de la machine locale"
   },
   "browserinfo": {
     "Title": "Informations du Navigateur",
@@ -582,10 +578,23 @@
       "fromPing": "Valeur de latence Ping : ",
       "negative": "La différence entre la latence TCP et le Ping n'est pas importante, indiquant que vous n'utilisez peut-être pas de proxy ou de VPN."
     },
+    "tlsRtt": {
+      "title": "Latence TCP vs poignée de main TLS",
+      "positive": "La poignée de main TLS prend bien plus de temps que l'aller-retour TCP, comme si elle était effectuée plus loin. Vous utilisez peut-être un proxy ou un VPN.",
+      "fromTCP": "Aller-retour TCP : ",
+      "fromTLS": "Poignée de main TLS : ",
+      "negative": "La durée de la poignée de main TLS correspond à l'aller-retour TCP, sans indice clair d'un proxy ou d'un VPN."
+    },
     "highlatency": {
       "title": "Analyse de Haute Latence",
       "positive": "L'analyse de haute latence indique que vous utilisez peut-être un proxy ou un VPN.",
       "negative": "Aucune preuve de votre utilisation d'un proxy ou d'un VPN n'a été trouvée lors de l'analyse de haute latence."
+    },
+    "proxyAi": {
+      "title": "Évaluation par IA",
+      "positive": "Un modèle d'IA qui combine tous les signaux estime que vous utilisez peut-être un proxy.",
+      "score": "Score du modèle IA : ",
+      "negative": "Un modèle d'IA qui combine tous les signaux n'a trouvé aucun indice d'utilisation d'un proxy."
     }
   },
   "personacheck": {
@@ -857,11 +866,216 @@
       "no": "Non"
     }
   },
+  "ipblocklist": {
+    "Title": "Vérification des listes noires IP",
+    "Note": "Vérifie une IP auprès d’environ 80 listes noires publiques, réparties en deux groupes. Les listes noires en temps réel (DNSBL) sont interrogées en direct par les serveurs de messagerie, les forums et les services en ligne pour décider d’accepter ou non une connexion ou un message ; les listes de renseignement sur les menaces sont des flux publics d’adresses abusives, de proxys ouverts, de serveurs VPN et de sorties Tor, chargés par les pare-feu et les services de sécurité. Figurer sur ces listes explique souvent des e-mails refusés, des inscriptions bloquées ou des CAPTCHA à répétition.",
+    "Note2": "Chaque inscription relève de l’un de trois types. Abus signifie qu’une liste a enregistré du spam, des attaques ou un appareil compromis à cette adresse. Anonymat signifie que l’adresse est connue comme proxy, VPN, relais ou sortie Tor, ce qui est normal si vous en utilisez un et ne constitue pas un mauvais antécédent en soi. Les indications visent le réseau plus large, comme une plage dynamique ou un fournisseur entier, plutôt que cette adresse. Les adresses partagées, cloud et VPN apparaissent souvent quelque part : voyez une inscription comme un signal plutôt qu’un verdict ; lorsqu’une liste propose une page de retrait, le lien figure à côté de l’inscription.",
+    "SelectIPLabel": "Choisissez une IP à vérifier",
+    "EnterIPLabel": "Saisissez une IP à vérifier",
+    "UseStored": "Utiliser une IP détectée",
+    "SelectIP": "Choisissez une IP",
+    "EnterIPPlaceholder": "ex. 1.1.1.1",
+    "InvalidIP": "Saisissez une adresse IPv4 ou IPv6 publique.",
+    "Checking": "Vérification d’environ 80 listes noires. Cela peut prendre jusqu’à 30 secondes.",
+    "FetchError": "La vérification n’a pas abouti. Réessayez dans un instant.",
+    "CheckedAt": "Vérifié le {time}",
+    "verdict": {
+      "abuse": "Cette IP a des antécédents d’abus sur certaines listes noires",
+      "anonymity": "Aucun antécédent d’abus, mais cette IP est marquée comme proxy, VPN, relais ou sortie Tor",
+      "notice": "Absente des listes noires, mais certaines listes signalent son réseau",
+      "clean": "Absente de toutes les listes noires vérifiées"
+    },
+    "count": {
+      "abuse": "Abus",
+      "anonymity": "Anonymat",
+      "notice": "Indication",
+      "clean": "Propre",
+      "error": "Échec"
+    },
+    "SomeFailed": "{n} listes n’ont pas pu être vérifiées cette fois ; le résultat peut être incomplet.",
+    "part": {
+      "dnsbl": {
+        "title": "Listes noires en temps réel (DNSBL)",
+        "desc": "Interrogées en direct par les serveurs de messagerie et les services en ligne"
+      },
+      "static": {
+        "title": "Listes de renseignement sur les menaces",
+        "desc": "Listes d’abus, de proxy et de VPN utilisées par les pare-feu et les services de sécurité"
+      }
+    },
+    "NoHits": "Aucune inscription ici.",
+    "ShowRest": "Afficher les {n} autres listes",
+    "HideRest": "Masquer",
+    "CheckFailed": "Échec de la vérification",
+    "LastSeen": "Vue pour la dernière fois le {date}",
+    "RequestRemoval": "Demander le retrait",
+    "category": {
+      "spam": "Spam",
+      "abuse": "Abus",
+      "proxy": "Proxy",
+      "vpn": "VPN",
+      "relay": "Relais",
+      "tor": "Tor",
+      "scanner": "Scanner",
+      "backscatter": "Backscatter",
+      "mixed": "Mixte"
+    },
+    "reason": {
+      "socksProxy": "Proxy SOCKS",
+      "httpProxy": "Proxy HTTP",
+      "proxyChain": "Chaîne de proxys",
+      "webProxy": "Proxy web",
+      "wingateProxy": "Proxy WinGate",
+      "openProxy": "Proxy ouvert",
+      "torExit": "Nœud de sortie Tor",
+      "exploited": "Hôte exploité",
+      "compromisedHost": "Hôte compromis",
+      "compromisedRouter": "Routeur compromis",
+      "botnet": "Botnet",
+      "worm": "Infection par un ver",
+      "ircDrone": "Drone IRC",
+      "ddosDrone": "Drone DDoS",
+      "bottler": "Bottler",
+      "spambot": "Spambot",
+      "bruteForce": "Attaques par force brute",
+      "spamSource": "Source de spam",
+      "spamtrap": "Piège à spam déclenché",
+      "badReputation": "Mauvaise réputation",
+      "hijackedNetwork": "Réseau détourné",
+      "endUserRange": "Plage d’utilisateurs finaux",
+      "dynamicRange": "Plage d’adresses dynamiques",
+      "noMailRange": "Plage non destinée à envoyer du courrier",
+      "missingPtr": "Pas de DNS inverse",
+      "poorReputation": "Réputation faible",
+      "mixedReputation": "Réputation mitigée",
+      "rangeListed": "Plage d’adresses listée",
+      "networkListed": "Réseau entier listé",
+      "unaccountableOperator": "L’opérateur ne traite pas les abus",
+      "noMailService": "Pas de service de messagerie",
+      "unreliableAbuseDesk": "Contact abus peu fiable",
+      "reported1d": "Signalée au cours du dernier jour",
+      "reported7d": "Signalée au cours des 7 derniers jours",
+      "reported30d": "Signalée au cours des 30 derniers jours",
+      "reported90d": "Signalée au cours des 90 derniers jours",
+      "feeds": "Signalée par au moins {n} sources de menaces",
+      "testEntry": "Entrée de test"
+    },
+    "legend": {
+      "abuse": {
+        "label": "Abus",
+        "desc": "la liste a enregistré du spam, des attaques ou un appareil compromis à cette adresse"
+      },
+      "anonymity": {
+        "label": "Anonymat",
+        "desc": "proxy, VPN, relais ou sortie Tor connu, ce qui n’est pas un mauvais antécédent en soi"
+      },
+      "notice": {
+        "label": "Indication",
+        "desc": "vise le réseau ou le fournisseur plus large, pas cette adresse"
+      },
+      "clean": {
+        "label": "Non listée",
+        "desc": "cette IP ne figure pas sur la liste"
+      },
+      "error": {
+        "label": "Échec de la vérification",
+        "desc": "la liste n’a pas pu être vérifiée cette fois, ce qui ne signifie pas que l’IP n’y figure pas"
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "Test de blocage des pubs et traceurs",
+    "Note": "Pour toute personne qui utilise un bloqueur de publicités ou de traceurs : une extension comme uBlock Origin ou Privacy Badger, un navigateur avec blocage intégré, ou le filtrage d'un service DNS, d'un VPN ou d'un routeur. Le test demande à votre navigateur de contacter des adresses connues de régies publicitaires, d'outils de statistiques, de réseaux sociaux et de fabricants d'appareils, récupère des scripts de pistage courants sans les exécuter et place des éléments leurres que les filtres cosmétiques masquent, puis indique ce qui est passé.",
+    "Note2": "Un score plus élevé n'est pas forcément meilleur. Tous les traceurs ne jouent pas contre vous : le signalement d'erreurs aide les sites à corriger les plantages, les statistiques les aident à s'améliorer, et la publicité finance une grande partie du web gratuit ; certaines adresses des fabricants servent aussi aux mises à jour ou aux notifications. Lisez le résultat comme une carte de ce que votre configuration laisse passer, et décidez vous-même de ce qui mérite d'être bloqué.",
+    "Note3": "Les requêtes non bloquées atteignent bien ces services, sans cookies ni référent. Les résultats restent dans votre navigateur et ne nous sont pas envoyés. Une adresse injoignable depuis votre réseau pour une autre raison apparaît aussi comme bloquée.",
+    "Selected": "Tests sélectionnés :",
+    "SelectAll": "Tout sélectionner",
+    "Invert": "Inverser",
+    "Run": "Lancer le test",
+    "Rerun": "Relancer le test",
+    "Hint": "Choisissez ce qu'il faut tester, puis lancez le test",
+    "Score": "Part bloquée",
+    "Progress": "{done} / {total} vérifiés",
+    "GroupCount": "{blocked} / {total} bloqués",
+    "NothingOpen": "Aucune requête n'a été confirmée comme non bloquée.",
+    "NothingBlocked": "Aucune requête n'a été confirmée comme bloquée.",
+    "Version": "Version de la liste de test : {version}",
+    "Limitation": "Ces sondes sont de simples requêtes envoyées par cette page, et non la façon dont un site charge réellement publicités ou scripts : une règle de filtrage visant un type de requête précis (scripts, images…) peut laisser passer une sonde tout en bloquant le vrai contenu sur un site.",
+    "count": {
+      "blocked": "Bloqués",
+      "open": "Non bloqués",
+      "unknown": "Sans réponse"
+    },
+    "filter": {
+      "all": "Tout",
+      "open": "Non bloqués uniquement",
+      "blocked": "Bloqués uniquement"
+    },
+    "status": {
+      "blocked": "Bloqué",
+      "open": "Non bloqué",
+      "unknown": "Sans réponse",
+      "pending": "En attente"
+    },
+    "cosmeticStatus": {
+      "blocked": "Masqué",
+      "open": "Visible",
+      "unknown": "Sans réponse",
+      "pending": "En attente"
+    },
+    "cosmetic": {
+      "ad-container": "Conteneur publicitaire",
+      "adsense-slot": "Emplacement AdSense"
+    },
+    "group": {
+      "ads": {
+        "title": "Régies publicitaires",
+        "desc": "Serveurs et plateformes d'échange publicitaires, testés par domaine."
+      },
+      "analytics": {
+        "title": "Statistiques et enregistrement de sessions",
+        "desc": "Services de statistiques de visite, de cartes de chaleur et de relecture de sessions."
+      },
+      "social": {
+        "title": "Traceurs des réseaux sociaux",
+        "desc": "Pixels et traceurs de conversion des plateformes sociales."
+      },
+      "errors": {
+        "title": "Suivi des erreurs et des performances",
+        "desc": "Services de signalement de plantages et de mesure auprès des utilisateurs réels."
+      },
+      "oem": {
+        "title": "Télémétrie des fabricants d'appareils",
+        "desc": "Adresses de télémétrie et de publicité des fabricants de téléphones, téléviseurs et autres appareils. Votre navigateur ne les contacte jamais de lui-même ; ce sont surtout les filtres DNS, VPN et routeur qui les répertorient."
+      },
+      "scripts": {
+        "title": "Scripts de pistage",
+        "desc": "URL exactes de scripts de balises et de pixels courants, téléchargés mais jamais exécutés. Les filtres qui agissent sur le chemin peuvent les bloquer même quand le domaine est autorisé."
+      },
+      "cosmetic": {
+        "title": "Masquage d'éléments",
+        "desc": "Éléments leurres en forme d'emplacements publicitaires. Seul un bloqueur intégré au navigateur peut les masquer ; les filtres DNS, VPN et routeur n'y parviennent pas, cette partie est donc exclue du score."
+      }
+    },
+    "layer": {
+      "browser": "Les éléments leurres ont été masqués : un bloqueur agit dans votre navigateur, qu'il s'agisse d'une extension ou d'une fonction intégrée.",
+      "network": "Des requêtes ont été bloquées mais les éléments leurres n'ont pas été masqués : le blocage a très probablement lieu hors de la page, au niveau d'un service DNS, d'un VPN, d'un routeur ou de la protection contre le pistage du navigateur.",
+      "none": "Rien n'a été bloqué : aucun blocage de publicités ou de traceurs n'a été détecté dans ce navigateur ni sur ce réseau."
+    },
+    "report": {
+      "Category": "Catégorie",
+      "Total": "Total"
+    }
+  },
   "advancedtools": {
-    "OpenInNewTab": "Ouvrir dans un nouvel onglet",
-    "BackToHome": "Retour à l'accueil",
     "Title": "Outils avancés",
     "Note": "Ceux qui exigent le meilleur de leur réseau utilisent souvent davantage d'outils pour optimiser leur connexion.",
+    "category": {
+      "network": "Diagnostic réseau",
+      "lookup": "Recherche et calcul",
+      "deep": "Contrôles approfondis",
+      "reference": "Ressources"
+    },
     "PingTestNote": "Pinguez votre IP depuis le monde entier",
     "MTRTestNote": "Tracez votre route réseau depuis le monde entier",
     "DNSResolverNote": "Résolution DNS multi-canal en temps réel",
@@ -875,8 +1089,10 @@
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
+    "AdblockTest": "Vérifiez ce que votre bloqueur de pubs, filtre DNS ou VPN bloque vraiment",
     "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
-    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant"
+    "PersonaCheck": "Comparez ce que voient les sites avec le pays dont vous voulez avoir l'air d'être un habitant",
+    "IpBlocklist": "Vérifiez si une IP figure sur des listes noires de spam, d’abus, de proxy ou de VPN"
   },
   "macchecker": {
     "Title": "Recherche MAC",
@@ -1257,7 +1473,7 @@
   "ruletest": {
     "Title": "Test de règles",
     "Name": "Test",
-    "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les 8 URL différentes d'IPCheck.ing dans votre logiciel proxy. Généralement, les paramètres de règles peuvent utiliser un format comme : DOMAIN, ptest-3.ipcheck.ing, POLICY. Le format spécifique peut varier en fonction du logiciel proxy que vous utilisez.",
+    "Note": "Le test de règles est utilisé pour déterminer si les paramètres de règles basées sur le nom de domaine de votre logiciel proxy sont corrects. Avant de procéder au test, veuillez vous référer à la carte ci-dessous et configurer des règles de redirection de domaine différentes pour les {n} URL différentes d'IPCheck.ing dans votre logiciel proxy. Généralement, les paramètres de règles peuvent utiliser un format comme : DOMAIN, ptest-3.ipcheck.ing, POLICY. Le format spécifique peut varier en fonction du logiciel proxy que vous utilisez.",
     "StatusWait": "En attente du test",
     "StatusTesting": "Test en cours…",
     "StatusError": "Erreur de test",
@@ -1320,6 +1536,7 @@
         "mtrtest": "Traceroutes MTR saut par saut vers l'IP de l'utilisateur depuis des sondes mondiales ; la perte sur des sauts intermédiaires peut n'être que du rate-limiting ICMP, une perte continue à partir d'un saut indique un vrai problème.",
         "ruletest": "IP de sortie observées en accédant à 8 points de test — plusieurs IP distinctes signifient que le trafic est réparti sur différentes routes (règles de proxy, par ex.).",
         "browserinfo": "Navigateur, système et environnement d'affichage de l'appareil testé.",
+        "adblocktest": "Test de blocage des publicités et traceurs exécuté dans le navigateur : par catégorie (régies publicitaires, statistiques, traceurs sociaux, suivi des erreurs, télémétrie des fabricants d'appareils, scripts de pistage), le nombre de requêtes vers des adresses connues qui ont été bloquées, sont passées ou ont expiré (noAnswer). Ne pas tout bloquer peut être un choix délibéré, pas une panne.",
         "invisibility": "Scores de détection proxy/VPN (0-100, plus haut = plus probablement détecté) avec les signaux de détection déclenchés.",
         "enhanceddnsleak": "Capture DNS au niveau résolveur : chaque IP de résolveur ayant interrogé le domaine de test, avec transport, exposition ECS et indicateurs DNSSEC (do/cd).",
         "persona": "À quel point le navigateur correspond à un habitant du pays choisi : une note globale et le verdict de chaque vérification. Verdicts uniquement — les valeurs sous-jacentes ne sont volontairement pas stockées dans un rapport partagé."
@@ -1512,6 +1729,8 @@
         }
       },
       "tagsTitle": "Tous les attributs",
+      "blocklistHint": "Le score reflète le profil global de cette IP. Vous voulez savoir si elle figure sur une liste noire en ce moment ?",
+      "blocklistLink": "Vérifier les listes noires en direct",
       "tagState": {
         "yes": "Oui",
         "no": "Non",
@@ -1641,11 +1860,13 @@
       "defaults": "Sites par défaut",
       "iran": "Essentiels Iran",
       "russia": "Essentiels Russie",
-      "india": "Essentiels Inde",
       "china": "Essentiels Chine",
       "brazil": "Essentiels Brésil",
+      "india": "Essentiels Inde",
       "nigeria": "Essentiels Nigéria",
       "germany": "Essentiels Allemagne",
+      "albania": "Essentiels Albanie",
+      "kosovo": "Essentiels Kosovo",
       "ai": "Services IA",
       "social": "Réseaux sociaux",
       "productivity": "Travail et productivité",
@@ -1721,7 +1942,8 @@
       "average": "Moyen",
       "good": "Bon",
       "great": "Excellent"
-    }
+    },
+    "ToolHint": "La bande passante n'est que la moitié de l'histoire : découvrez comment votre réseau atteint le reste du monde avec {ping} et {mtr}."
   },
   "globalping": {
     "Selected": "Régions sélectionnées: ",
@@ -1840,8 +2062,10 @@
     "MacChecker": "Ouvrir le Recherche de MAC",
     "IpCalculator": "Ouvrir le Calculateur IP",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
+    "AdblockTest": "Ouvrir le Test de blocage des pubs et traceurs",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
     "PersonaCheck": "Ouvrir le panneau Vérification de persona approfondie",
+    "IpBlocklist": "Ouvrir la Vérification des listes noires IP",
     "AsnProfile": "Ouvrir le panneau Recherche de profil ASN"
   },
   "page": {
@@ -1856,13 +2080,25 @@
   "helpModal": {
     "Title": "Raccourcis"
   },
+  "footer": {
+    "Tagline": "Une boîte à outils de confidentialité tout-en-un, gratuite et open source.",
+    "Project": "Projet",
+    "Support": "Documentation et support",
+    "DeveloperDocs": "Documentation développeur",
+    "SelfHosting": "Guide d'auto-hébergement",
+    "ReportIssue": "Signaler un problème",
+    "License": "Licence MIT",
+    "Clients": "Clients",
+    "Raycast": "Extension Raycast",
+    "Lite": "Édition Lite"
+  },
   "about": {
     "Title": "À propos",
     "project": [
       "IPCheck.ing est une boîte à outils IP tout-en-un et gratuite : elle vous aide à consulter vos informations IP, à tester la disponibilité des sites web, à examiner les informations de sortie DNS, à mesurer votre débit, à tester la latence mondiale, à lancer des tests MTR, et bien plus encore.",
       "Il s'agit d'un projet open source : cliquez sur l'icône GitHub en bas de la page pour consulter le code source.",
       "Si vous ne comprenez pas comment utiliser une fonctionnalité, ouvrez le « Centre d'aide » en bas de la page. Notre documentation est très détaillée : en plus de présenter chaque fonctionnalité, elle vous aide à comprendre les différents concepts réseau et à diagnostiquer vos problèmes de connexion.",
-      "Si vous souhaitez participer au projet open source, cliquez sur le bouton « Contribuer au code » en bas de la page pour découvrir comment faire."
+      "Si vous souhaitez participer au projet open source, ouvrez le lien « Documentation développeur » en bas de la page pour découvrir comment faire."
     ],
     "founderTitle": "À propos du fondateur",
     "founder": [
@@ -1883,7 +2119,6 @@
     "Sponsor": "Nous soutenir",
     "Privacy": "Confidentialité",
     "HelpCenter": "Centre d'aide",
-    "Contribute": "Contribuer au code",
     "Close": "Fermer"
   },
   "acknowledgement": {

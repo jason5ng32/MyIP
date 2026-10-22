@@ -9,7 +9,7 @@
 //   GET /api/dnsleaktest/session/:token
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 const TOKEN_RE = /^[0-9a-f]{32}$/;
 

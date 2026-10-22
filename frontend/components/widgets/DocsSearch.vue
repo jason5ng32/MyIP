@@ -1,10 +1,11 @@
 <template>
-  <!-- Nav entry point for the docs assistant. Desktop gets an ask box, mobile
-       the same entry as a single icon. Both are inert while the panel itself
-       is open (it owns the conversation then).
+  <!-- Nav entry point for the docs assistant: an ask box from xl up, the same
+       entry as a single icon below it (both rendered, CSS picks one, so the
+       nav's action group never changes width with its own collapse). Both are
+       inert while the panel itself is open (it owns the conversation then).
        The embed lives in widgets/DocsAssistant.vue; the loading and
        configuration in composables/use-docs-assistant.js. -->
-  <form v-if="enabled && !isMobile" class="relative" @submit.prevent="submitDocsSearch">
+  <form v-if="enabled" class="relative max-xl:hidden" @submit.prevent="submitDocsSearch">
     <Sparkle class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground z-10" />
     <!-- Focused, the native placeholder prompts for a question; idle, the
          rotating overlay below advertises what can be asked. -->
@@ -27,8 +28,8 @@
     </div>
   </form>
 
-  <JnTooltip v-else-if="enabled" :text="t('nav.AskIPilot')">
-    <Button variant="ghost" size="icon" class="size-8 cursor-pointer" :aria-label="t('nav.AskIPilot')"
+  <JnTooltip v-if="enabled" :text="t('nav.AskIPilot')">
+    <Button variant="ghost" size="icon" class="size-8 cursor-pointer xl:hidden" :aria-label="t('nav.AskIPilot')"
       :disabled="isDocsOpen" @click="openAssistant">
       <Sparkle />
     </Button>
@@ -50,7 +51,6 @@ const ROTATE_MS = 4000;
 
 const { t } = useI18n();
 const store = useMainStore();
-const isMobile = computed(() => store.isMobile);
 
 // Two gates for visibility: a docs site to answer from (build time) and the
 // canonical deployment (same as the original-site-only advanced tools).

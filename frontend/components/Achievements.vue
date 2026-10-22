@@ -151,12 +151,15 @@ const flipCard = (achievementName) => {
     }
 };
 
+// Immediate: UserMenu raises the request from another page and goes Home
+// first, and this async component can mount after the flag is already set.
 watch(() => triggerAchievements.value, (newVal) => {
-    if (newVal) openAchievements();
+    if (!newVal) return;
+    openAchievements();
     if (!remoteUserInfoFetched.value) {
         store.setTriggerRemoteUserInfo(true);
     }
-});
+}, { immediate: true });
 </script>
 
 <style scoped>

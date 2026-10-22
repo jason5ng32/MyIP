@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
 
 一个开源的一站式 IP 工具箱：多来源 IP 查询、连通性测试、WebRTC 与 DNS 泄露检测、网速测试、MTR、封锁检测、Whois 等等 —— 一条 Docker 命令即可自行部署。
 
@@ -47,6 +47,7 @@
 
 * 🚥 **WebRTC 检测**：揭示 WebRTC 连接过程中暴露的 IP 地址 —— 包括你的浏览器是否开启了隐私强化。
 * 🛑 **DNS 泄露测试**：展示是哪些 DNS 出口在解析你的请求，以便评估使用 VPN 或代理时 DNS 泄露的风险。
+* 🛡️ **广告与跟踪屏蔽检测**：检查你的广告拦截器、浏览器、DNS 过滤、VPN 或路由器实际拦住了什么——涵盖广告网络、统计分析、社交平台跟踪、错误监控、设备厂商遥测、跟踪脚本与元素隐藏。
 * 📋 **安全检查清单**：一份覆盖 12 个领域、共 258 项的个人网络安全检查清单，进度保存在你的浏览器里。
 
 ### 📡 网络测试
@@ -170,6 +171,10 @@ DOMAIN,ptest-5.ipcheck.ing,Proxy5
 DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
+DOMAIN,ptest-9.ipcheck.ing,Proxy9
+DOMAIN,ptest-10.ipcheck.ing,Proxy10
+DOMAIN,ptest-11.ipcheck.ing,Proxy11
+DOMAIN,ptest-12.ipcheck.ing,Proxy12
 ```
 
 </details>

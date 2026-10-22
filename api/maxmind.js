@@ -1,5 +1,5 @@
-import { lookupMaxMind } from '../common/maxmind-service.js';
-import logger from '../common/logger.js';
+import { lookupMaxMind } from '../server/datasets/maxmind-service.js';
+import logger from '../server/logger.js';
 
 export default (req, res) => {
     // Presence, validity and public routability guaranteed by the

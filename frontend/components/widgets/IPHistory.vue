@@ -173,7 +173,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { useIpHistory } from '@/composables/use-ip-history.js';
 import { INLINE_TIERS } from '@/composables/use-fit-text.js';
-import { filterHistoryDays, groupHistoryByIP, countryFacets, ipVersionCounts } from '@/utils/ip-history.js';
+import { filterHistoryDays, groupHistoryByIP, countryFacets, ipVersionCounts } from '@/utils/ip/ip-history.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
 import getCountryName from '@/data/country-name.js';
 import FitText from '@/components/widgets/FitText.vue';

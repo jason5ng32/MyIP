@@ -1,11 +1,11 @@
-// Contract tests for common/ip-timezone — the coordinate → IANA zone
+// Contract tests for server/ip-timezone — the coordinate → IANA zone
 // derivation behind the withTimeZone() middleware. Distinct from
 // frontend/utils/time-utils.js, which reads the visitor's own browser timezone.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { lookupTimeZone, attachTimeZone, withTimeZone } from '../common/ip-timezone.js';
+import { lookupTimeZone, attachTimeZone, withTimeZone } from '../server/ip-timezone.js';
 
 // Minimal res stub — enough to observe what the res.json hook does, and to
 // prove the original json() still runs and still returns res for chaining.

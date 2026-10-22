@@ -112,7 +112,7 @@
         </TabsContent>
 
         <!-- List management: create, rename, reorder, delete. Guards live
-             in utils/connectivity-lists.js. -->
+             in utils/features/connectivity-lists.js. -->
         <TabsContent value="lists" class="space-y-3">
           <div class="flex items-center gap-2">
             <Input id="new-conn-list" v-model="newListName" :placeholder="t('connectivity.lists.NewListPlaceholder')"
@@ -184,7 +184,7 @@
 // Tabbed dialog behind the Connectivity "Add Test" tile and the header
 // menu's manage entry: import a curated list, hand-add a custom target, or
 // manage the lists themselves. All mutations go through the pure ops in
-// utils/connectivity-lists.js and persist into connectivityLists.
+// utils/features/connectivity-lists.js and persist into connectivityLists.
 import { ref, computed, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
@@ -195,7 +195,7 @@ import {
 } from '@/data/connectivity-import-lists.js';
 import {
   isListFullyPresent, importIntoList, importAsNewList, addMember, createList, renameList, moveList, deleteList,
-} from '@/utils/connectivity-lists.js';
+} from '@/utils/features/connectivity-lists.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

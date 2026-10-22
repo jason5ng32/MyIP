@@ -65,7 +65,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { isValidIP } from '@/utils/valid-ip.js';
+import { isValidIP } from '@/utils/ip/valid-ip.js';
 import FitText from '@/components/widgets/FitText.vue';
 import { HERO_TIERS } from '@/composables/use-fit-text.js';
 import { createMaskGate } from '@/composables/use-info-mask.js';

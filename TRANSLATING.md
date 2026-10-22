@@ -1,9 +1,9 @@
 # Translating MyIP
 
 MyIP (demo website: [IPCheck.ing](https://ipcheck.ing)) ships its UI in English, 简体中文, 繁體中文,
-Français and Русский. Adding a sixth — or a seventh — is a two-file change, and **a partial
-translation is a welcome first PR**. You do not need to translate everything, and you do not
-need to know Vue.
+Français, Русский and Português (Brasil). Adding a language is a two-file change, and **a
+partial translation is a welcome first PR**. You do not need to translate everything, and you
+do not need to know Vue.
 
 Anything you leave untranslated falls back to English, so a pack with a hundred strings in
 it is genuinely useful on day one and can grow over several PRs. Untranslated strings stay
@@ -12,6 +12,19 @@ in your pack as `""`, which is what keeps a translation PR readable: every diff 
 
 General contribution rules (fork, branch from `dev`, `pnpm check` before you open the PR)
 live in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Which languages we take
+
+**New languages are added by visitor demand, not on request.** Every pack has to follow
+every UI change — the English pack grew by roughly 45% over two months in 2026, and each
+shipped language followed in the same commits — and each language is one more variant of
+the docs site to look after. So a language opens only once it has a meaningful share of
+IPCheck.ing's visitors. The open **Translations wanted** issue lists the languages
+currently up for claiming; a pack for a language that isn't on it won't be merged, however
+good it is. Right-to-left languages also need layout work the app doesn't have yet.
+
+If your language isn't on the list, a README translation is welcome in any language — that
+is a single file and costs nothing to keep (see CONTRIBUTING.md).
 
 ---
 
@@ -41,7 +54,7 @@ can see at a glance which strings you actually wrote.
 
 | File | What it is | Required? |
 |---|---|---|
-| `frontend/locales/<code>.json` | The main pack — every string in the app UI (~1,150 keys) | **Yes** — all keys, values may be `""` |
+| `frontend/locales/<code>.json` | The main pack — every string in the app UI (~1,650 keys) | **Yes** — all keys, values may be `""` |
 | `frontend/locales/privacy/<code>.json` | Privacy policy copy (~50 keys) | No — but whole or not at all |
 | `frontend/locales/security-checklist/<code>.json` | The Cybersecurity Checklist dataset (~1,080 keys, 258 items) | No — but whole or not at all |
 | `frontend/data/changelog.json` | Release history, one string per language per entry | No — beta languages are exempt |
@@ -184,8 +197,8 @@ them would fail the gate on your behalf. Translate the new keys, or drop the fil
 
 ## Improving an existing language
 
-Fixes and better phrasings for `en` / `zh` / `zh-TW` / `fr` / `ru` are just as welcome as new
-languages — edit the JSON and open the PR. Two things to keep in mind:
+Fixes and better phrasings for `en` / `zh` / `zh-TW` / `fr` / `ru` / `pt-BR` are just as
+welcome as new languages — edit the JSON and open the PR. Two things to keep in mind:
 
 - Prefer natural phrasing over literal translation; this is a networking tool, and the
   jargon most users know is often the English term.

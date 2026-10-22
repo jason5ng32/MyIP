@@ -6,9 +6,7 @@
             <p v-if="!isMobile">{{ t('mtrtest.Note2') }}</p>
         </div>
 
-        <!-- Input area. With stored IPs (homepage drawer) the user can pick one
-             OR switch to manual entry; on the standalone page allIPs is empty,
-             so it's manual entry only. -->
+        <!-- Input area -->
         <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
                 <Label :for="manualMode ? 'mtrIPManual' : 'mtrIP'" class="font-medium">
@@ -201,7 +199,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
-import { parseMtrOutput } from '@/utils/mtr-parse.js';
+import { parseMtrOutput } from '@/utils/features/mtr-parse.js';
 import getCountryName from '@/data/country-name.js';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -235,9 +233,8 @@ const pickerSections = computed(() => [
     { key: 'suggested', label: t('globalping.Suggested'), countries: GLOBALPING_SUGGESTED_COUNTRIES },
 ]);
 
-// Manual entry is forced when there are no stored IPs (the standalone page,
-// where the homepage never ran). When stored IPs exist, the "use stored IP"
-// switch (on by default) toggles between the dropdown and manual entry.
+// Manual entry is forced when no IPs are stored (the homepage never ran);
+// otherwise the switch (on by default) picks between dropdown and typing.
 const useStored = ref(true);
 const manualMode = computed(() => allIPs.value.length === 0 || !useStored.value);
 const manualIP = ref('');

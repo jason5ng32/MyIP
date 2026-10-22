@@ -1,4 +1,4 @@
-// Specs for common/upstream-ua.js — the backend User-Agent bootstrap.
+// Specs for server/upstream-ua.js — the backend User-Agent bootstrap.
 // Asserts the `MyIP/v<version>/<site>` format and its graceful degradation
 // when VITE_SITE_URL is absent. Version is read from the real package.json,
 // so the assertions match on shape rather than a hardcoded number.
@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
 
-import { initUpstreamUserAgent } from '../common/upstream-ua.js';
+import { initUpstreamUserAgent } from '../server/upstream-ua.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const ORIGINAL_SITE_URL = process.env.VITE_SITE_URL;

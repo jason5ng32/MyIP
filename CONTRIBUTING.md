@@ -36,7 +36,8 @@ from building something that can't be merged.
 ```
 frontend/   Vue 3 SPA (Pinia, vue-router, vue-i18n, Tailwind v4 + shadcn-vue)
 api/        Express 5 handlers, one file per route (wired in backend-server.js)
-common/     Code shared by both halves (validators, fetch helper, logger, …)
+server/     Backend-only code (logger, guards, upstream clients, dataset engine, …)
+common/     Code both halves import (validators, fetch helper, report schema, …)
 tests/      Node test runner specs (node --test)
 ```
 
@@ -58,10 +59,10 @@ Details and rationale live in the AGENTS.md files; the headlines:
 - **New functions use `const` arrow syntax** (`const fn = async () => {}`).
 - **Every new file opens with a header comment** stating its purpose.
 - **The `full` locales land together** — user-visible copy ships in `en` / `zh` / `zh-TW` /
-  `fr` / `ru` in the same PR (`frontend/locales/`; tests enforce it). `beta` locales are
-  exempt — they fall back to English.
-- **Backend logging goes through the shared pino logger** (`common/logger.js`) —
-  no `console.*` in `api/` or `common/`.
+  `fr` / `ru` / `pt-BR` in the same PR (`frontend/locales/`; tests enforce it). `beta`
+  locales are exempt — they fall back to English.
+- **Backend logging goes through the shared pino logger** (`server/logger.js`) —
+  no `console.*` in `api/`, `server/` or `common/`.
 
 ## Good places to start
 
@@ -80,19 +81,22 @@ runnable directly as `pnpm fetch-favicons`). Only if auto-fetch can't find a usa
 PNG do you hand-source one (on macOS, `sips` handles ICO→PNG). Remember to commit
 the PNGs with your change — CI stays offline and only checks they exist.
 
-**README translations** — beyond the five READMEs we maintain (`en` / `zh` / `zh-TW` / `fr` /
-`ru`), community-maintained translations in any language are welcome. Create
+**README translations** — beyond the READMEs we maintain (`en` / `zh` / `zh-TW` / `fr` /
+`ru`) and the community-maintained `pt-BR` one, translations in any language are welcome. Create
 `README_<LANG>.md` from the English [README.md](README.md) (the canonical source),
 open it with a one-line "community-maintained translation — English is canonical"
 note in your language, and add your language to the switcher row near the top of the
 existing READMEs. Keep code blocks, URLs, and badges unchanged. Check open issues
 for requested languages before starting.
 
-**UI translations** — improvements to the existing `en` / `zh` / `zh-TW` / `fr` / `ru` packs
-are welcome, and so is a whole new language. Adding one is two files: a locale pack under
-`frontend/locales/` and a line in `common/locale-registry.js`. **A partial pack is a
-welcome first PR** — anything you don't translate falls back to English, and the language
-ships as `beta` until it's complete. Full walkthrough: **[TRANSLATING.md](TRANSLATING.md)**.
+**UI translations** — improvements to the existing `en` / `zh` / `zh-TW` / `fr` / `ru` /
+`pt-BR` packs are always welcome. New languages are added by visitor demand, not on request:
+the open **Translations wanted** issue lists the ones currently up for claiming, and a pack
+for any other language won't be merged. For a listed language, adding it is two files: a
+locale pack under `frontend/locales/` and a line in `common/locale-registry.js`. **A partial
+pack is a welcome first PR** — anything you don't translate falls back to English, and the
+language ships as `beta` until it's complete. Full walkthrough:
+**[TRANSLATING.md](TRANSLATING.md)**.
 
 ## Bugs & feature requests
 

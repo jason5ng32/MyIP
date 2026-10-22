@@ -348,6 +348,12 @@ describe('store — quota snapshot', () => {
     assert.equal(s.quotaExceeded.invisibility_test, true);
   });
 
+  it('quotaExceeded covers the IP Blocklist Check (ip_hitlist)', () => {
+    const s = useMainStore();
+    s.remoteUserInfo = snapshot({ ip_hitlist: { percent: 100, exhausted: true } });
+    assert.equal(s.quotaExceeded.ip_hitlist, true);
+  });
+
   it('markQuotaExhausted is a no-op without a snapshot for the feature', () => {
     const s = useMainStore();
     s.remoteUserInfo = snapshot({});

@@ -196,7 +196,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { clampRetentionDays } from '@/utils/ip-history.js';
+import { clampRetentionDays } from '@/utils/ip/ip-history.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
@@ -226,6 +226,7 @@ const store = useMainStore();
 const userPreferences = computed(() => store.userPreferences);
 const ipDBs = computed(() => store.ipDBs);
 
+// One site-wide sheet (App.vue, which closes it on a page change).
 const isOpen = computed(() => store.openSheet === 'preferences');
 const onOpenChange = (val) => {
   store.setOpenSheet(val ? 'preferences' : null);

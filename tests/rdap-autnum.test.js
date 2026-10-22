@@ -1,4 +1,4 @@
-// Coverage for the autnum half of common/rdap.js — bootstrap endpoint
+// Coverage for the autnum half of server/rdap.js — bootstrap endpoint
 // selection (ASN range match), parsing an RDAP autnum document into the
 // /api/whois ASN fields, the WHOIS-like `__raw` formatter, and rdapAutnum's
 // query URL and error mapping (fetch stubbed; real network stays out of scope).
@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { afterEach, describe, it } from 'node:test';
 
-import { findAutnumEndpoint, parseAutnum, formatAutnum, rdapAutnum } from '../common/rdap.js';
+import { findAutnumEndpoint, parseAutnum, formatAutnum, rdapAutnum } from '../server/rdap.js';
 
 // Shaped like IANA's asn.json `services` array: [[range, …], [url, …]].
 const SERVICES = [

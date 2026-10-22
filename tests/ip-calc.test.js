@@ -1,4 +1,4 @@
-// Guards frontend/utils/ip-calc.js — the classifier and its rule order, the
+// Guards frontend/utils/features/ip-calc.js — the classifier and its rule order, the
 // IANA block tables, the IPv6 decoders, PTR names, obfuscated / embedded
 // forms, count formatting, and the never-throws contract of `calculate()`.
 // MAC input is asserted absent (MAC Lookup's job).
@@ -12,7 +12,7 @@ import {
     analyzeIPv4, analyzeIPv6, analyzeCidr, analyzeRange, analyzeList, analyzeInteger,
     extractEmbeddedIPv4, decodeTeredo, iidToMac, solicitedNode,
     ptrName, ptrZone, obfuscatedForms, ipv4ToEmbeddedForms, formatCount, countLabel,
-} from '../frontend/utils/ip-calc.js';
+} from '../frontend/utils/features/ip-calc.js';
 import { parseIp, parseCidr, formatIPv4 } from '../common/ip-math.js';
 
 const v = (ip) => parseIp(ip).value;

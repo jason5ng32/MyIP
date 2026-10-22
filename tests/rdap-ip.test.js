@@ -1,4 +1,4 @@
-// Coverage for the IP half of common/rdap.js — bootstrap endpoint
+// Coverage for the IP half of server/rdap.js — bootstrap endpoint
 // selection (longest-prefix CIDR match), the RDAP-JSON → WHOIS-like
 // `__raw` text formatter, and rdapIp's query-URL shape (fetch stubbed;
 // real network stays out of scope).
@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, mock } from 'node:test';
 
-import { findIpEndpoint, formatIpNetwork, rdapIp } from '../common/rdap.js';
+import { findIpEndpoint, formatIpNetwork, rdapIp } from '../server/rdap.js';
 
 // Shaped like IANA's ipv4.json / ipv6.json `services` arrays:
 // [[cidr, …], [url, …]] per registry.

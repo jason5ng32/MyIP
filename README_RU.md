@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
 
 Универсальный набор IP-инструментов с открытым исходным кодом: определение IP по нескольким источникам, проверка доступности сайтов, обнаружение утечек WebRTC и DNS, тест скорости, MTR, проверка цензуры, Whois и многое другое — разворачивается на своём сервере одной командой Docker.
 
@@ -47,6 +47,7 @@
 
 * 🚥 **Обнаружение WebRTC**: показывает IP-адрес, раскрываемый при подключениях WebRTC, — в том числе включена ли в вашем браузере усиленная защита приватности.
 * 🛑 **Тест утечки DNS**: показывает, какие конечные точки DNS обрабатывают ваши запросы, чтобы оценить риск утечки DNS при использовании VPN или прокси.
+* 🛡️ **Проверка блокировки рекламы и трекеров**: показывает, что на самом деле блокирует ваш блокировщик рекламы, браузер, DNS-фильтр, VPN или роутер, — рекламные сети, аналитику, трекеры соцсетей, мониторинг ошибок, телеметрию производителей устройств, скрипты отслеживания и скрытие элементов.
 * 📋 **Контрольный список безопасности**: 258 рекомендаций по личной кибербезопасности в 12 разделах; прогресс сохраняется в браузере.
 
 ### 📡 Сетевые тесты
@@ -170,6 +171,10 @@ DOMAIN,ptest-5.ipcheck.ing,Proxy5
 DOMAIN,ptest-6.ipcheck.ing,Proxy6
 DOMAIN,ptest-7.ipcheck.ing,Proxy7
 DOMAIN,ptest-8.ipcheck.ing,Proxy8
+DOMAIN,ptest-9.ipcheck.ing,Proxy9
+DOMAIN,ptest-10.ipcheck.ing,Proxy10
+DOMAIN,ptest-11.ipcheck.ing,Proxy11
+DOMAIN,ptest-12.ipcheck.ing,Proxy12
 ```
 
 </details>

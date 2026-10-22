@@ -57,6 +57,8 @@
                             class="size-4 shrink-0 rounded-full" />
                         <Network v-else-if="event.asns.length > 0"
                             class="size-4 shrink-0 text-muted-foreground" />
+                        <Cloud v-else-if="event.origins?.length > 0"
+                            class="size-4 shrink-0 text-muted-foreground" />
                         <Icon v-else icon="circle-flags:earth" class="size-4 shrink-0 rounded-full" />
                         <span class="truncate">{{ subjectName(event) }}</span>
                     </div>
@@ -112,7 +114,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Icon } from '@iconify/vue';
-import { CircleCheck, Network, RadioTower } from '@lucide/vue';
+import { CircleCheck, Cloud, Network } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 
@@ -128,7 +130,7 @@ const KNOWN_CAUSES = new Set([
     'MECHANICAL', 'UNKNOWN', 'WEATHER', 'FIRE', 'CYBERATTACK', 'NATURAL_DISASTER',
     'MAINTENANCE', 'MILITARY_ACTION',
 ]);
-const KNOWN_LEVELS = new Set(['NATIONWIDE', 'REGIONAL', 'NETWORK']);
+const KNOWN_LEVELS = new Set(['NATIONWIDE', 'REGIONAL', 'NETWORK', 'PLATFORM']);
 
 const LIST_TOP = 8;
 const CACHE_TTL_MS = 10 * 60 * 1000;
@@ -195,10 +197,10 @@ const flagIcon = (code) =>
     `circle-flags:${/^[A-Za-z]{2}$/.test(code) ? code.toLowerCase() : 'xx'}`;
 
 // Subject line: localized country names first, ASN entities second
-// ("AS136442: OCEANWAVE-AS-AP"), and the scope text as a last resort (Radar
-// occasionally files an event with no locations or ASNs at all — e.g.
-// regional earthquake annotations; those still carry their story in the
-// description paragraph).
+// ("AS136442: OCEANWAVE-AS-AP"), cloud origins third ("Google Cloud
+// europe-west2"), and the scope text as a last resort (an event with no
+// subject still carries its story in the description paragraph; the backend
+// drops those with neither).
 const subjectName = (event) => {
     if (event.locations.length > 0) {
         return event.locations
@@ -209,6 +211,9 @@ const subjectName = (event) => {
         return event.asns
             .map((a) => (a.name ? `AS${a.asn}: ${a.name}` : `AS${a.asn}`))
             .join(', ');
+    }
+    if (event.origins?.length > 0) {
+        return event.origins.map((o) => o.name || o.id).join(', ');
     }
     return event.scope || '—';
 };

@@ -1,4 +1,4 @@
-// Unit tests for the pure transform pipeline in common/cf-radar.js:
+// Unit tests for the pure transform pipeline in server/cf-radar.js:
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
 // dedupe, sort and cap), the country-traffic matrix aggregation, the asn
 // view's response shaping and partial-segment reporting (fetch stubbed), and
@@ -20,8 +20,8 @@ import {
     RADAR_VIEWS,
     normalizePrefixOrigins,
     buildCountryShares,
-} from '../common/cf-radar.js';
-import logger from '../common/logger.js';
+} from '../server/cf-radar.js';
+import logger from '../server/logger.js';
 import { parseCidr } from '../common/ip-math.js';
 
 const outageFixture = {
@@ -61,6 +61,7 @@ describe('normalizeOutages', () => {
             endDate: null,
             locations: ['CO'],
             asns: [],
+            origins: [],
             cause: 'NATURAL_DISASTER',
             level: 'NATIONWIDE',
             description: 'A 7.4-magnitude earthquake in western Colombia',
@@ -111,6 +112,17 @@ describe('normalizeAnomalies', () => {
         assert.deepEqual(event.locations, []);
         assert.deepEqual(event.asns, [{ asn: 27653, name: 'Comteco' }]);
     });
+
+    it('maps an ORIGIN anomaly to an origins entry', () => {
+        const [event] = normalizeAnomalies([{
+            ...anomalyFixture,
+            type: 'ORIGIN',
+            locationDetails: null,
+            originDetails: { origin: 'google-europe-west2', name: 'Google Cloud europe-west2' },
+        }]);
+        assert.deepEqual(event.locations, []);
+        assert.deepEqual(event.origins, [{ id: 'google-europe-west2', name: 'Google Cloud europe-west2' }]);
+    });
 });
 
 describe('mergeEvents', () => {
@@ -145,6 +157,34 @@ describe('mergeEvents', () => {
         const merged = mergeEvents(cubaOutage, anomalies);
         assert.equal(merged.length, 1);
         assert.equal(merged[0].kind, 'outage');
+    });
+
+    it('drops an anomaly that shares a cloud origin with an outage', () => {
+        const gcpOutage = normalizeOutages([{
+            ...outageFixture,
+            id: '1727',
+            locationsDetails: [],
+            originsDetails: [{ origin: 'google-europe-west2', name: 'Google Cloud europe-west2' }],
+            startDate: '2026-10-20T05:45:00Z',
+            endDate: '2026-10-20T14:00:00Z',
+        }]);
+        const anomalies = normalizeAnomalies([{
+            ...anomalyFixture,
+            type: 'ORIGIN',
+            locationDetails: null,
+            originDetails: { origin: 'google-europe-west2', name: 'Google Cloud europe-west2' },
+            startDate: '2026-10-20T05:45:00Z',
+            endDate: null,
+        }]);
+        assert.deepEqual(mergeEvents(gcpOutage, anomalies).map((e) => e.id), ['o-1727']);
+    });
+
+    it('drops an event with no subject and no text, keeps one with a description', () => {
+        const [stub, described] = normalizeOutages([
+            { ...outageFixture, id: 'stub', locationsDetails: [], description: null },
+            { ...outageFixture, id: 'text', locationsDetails: [] },
+        ]);
+        assert.deepEqual(mergeEvents([stub, described], []).map((e) => e.id), ['o-text']);
     });
 
     it('keeps an anomaly whose subject matches but starts outside the window', () => {
@@ -430,6 +470,18 @@ describe('buildCountryShares', () => {
         assert.equal(calls, 100000, 'the cap holds; the later block is not looked up');
         // A part-walked space would pass for the whole distribution.
         assert.deepEqual(result, { shares: [], complete: false });
+    });
+
+    it('bounds the walk by lookups, not by how many prefixes Radar returns', () => {
+        // 30000 /24s under 10.0.0.0/8 (one per 256 addresses).
+        const specifics = Array.from({ length: 30000 }, (_, i) => ({ prefix: `10.${i >> 8}.${i & 255}.0/24` }));
+        // Under a covering /8 they are skipped: one lookup, complete.
+        let calls = 0;
+        const wide = () => { calls++; return { country: 'US', prefixLength: 8 }; };
+        assert.deepEqual(shares([{ prefix: '10.0.0.0/8' }, ...specifics], wide), [{ country: 'US', share: 1 }]);
+        assert.equal(calls, 1);
+        // Uncovered, each costs a lookup; well within the budget, complete.
+        assert.equal(buildCountryShares(specifics, () => ({ country: 'US', prefixLength: 24 })).complete, true);
     });
 
     it('a lookup without an answer (no database, failed lookup) is incomplete, not "no countries"', () => {

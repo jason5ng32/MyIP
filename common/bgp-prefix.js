@@ -10,7 +10,7 @@ const HEX_GROUP = /^[0-9a-fA-F]{1,4}$/;
 
 // Expand an IPv6 address (with optional `::` compression) into 8 hextet
 // strings. Returns null on any structural failure. Also consumed by
-// common/rdap.js for CIDR containment math.
+// server/rdap.js for CIDR containment math.
 export function expandIPv6(ip) {
     const halves = ip.split('::');
     if (halves.length > 2) return null;

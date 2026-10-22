@@ -1,4 +1,4 @@
-// Contract tests for common/maxmind-service.
+// Contract tests for server/datasets/maxmind-service.
 //
 // The repo ships real GeoLite2-ASN.mmdb + GeoLite2-City.mmdb binaries, so we
 // exercise openMaxMindReaders() / reloadMaxMindDatabases() against the actual
@@ -22,7 +22,7 @@ import {
   lookupMaxMind,
   SUPPORTED_LANGS,
   normalizeLang,
-} from '../common/maxmind-service.js';
+} from '../server/datasets/maxmind-service.js';
 
 // The repo should ship maxmind database files; if not on CI, skip related tests
 const cityPath = path.join(MAXMIND_DB_DIR, MAXMIND_CITY_DB);

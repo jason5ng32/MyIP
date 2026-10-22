@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { DNS_RECORD_TYPES, DNS_RECORD_TYPE_SET, NAME_VALUED_TYPES } from '../common/dns-record-types.js';
-import { DNS_RECORD_TYPES as bridgedTypes } from '../frontend/utils/dns-record-types.js';
+import { DNS_RECORD_TYPES as bridgedTypes } from '../frontend/utils/features/dns-record-types.js';
 
 describe('DNS record types', () => {
     it('re-exports the same list through the frontend bridge', () => {

@@ -4,7 +4,7 @@
 // Cloudflare the origin hits GitHub at most once per cache window — well under
 // the 60 req/hour unauthenticated limit.
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // The project's own repository. GitHub requires a User-Agent on every
 // request; fetchUpstream's default project UA satisfies that.

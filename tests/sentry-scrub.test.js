@@ -1,10 +1,10 @@
-// Specs for common/sentry-scrub.js — the pure helpers that redact API-key
+// Specs for server/sentry-scrub.js — the pure helpers that redact API-key
 // params from backend Sentry telemetry while keeping the rest of the
 // query (e.g. ?ip=) as debugging context.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { redactQueryString, redactUrlQuery, scrubBreadcrumb, scrubEventRequest, scrubSpan } from '../common/sentry-scrub.js';
+import { redactQueryString, redactUrlQuery, scrubBreadcrumb, scrubEventRequest, scrubSpan } from '../server/sentry-scrub.js';
 
 describe('redactQueryString', () => {
     it('redacts sensitive params and keeps the rest', () => {

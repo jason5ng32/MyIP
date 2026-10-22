@@ -120,7 +120,7 @@
                 </nav>
 
                 <!-- Right 2/3: current category details -->
-                <div id="checklist" class="md:col-span-2">
+                <div id="checklist" class="md:col-span-2 scroll-mt-[calc(4rem+env(safe-area-inset-top))]">
                     <Card>
                         <CardContent class="p-4 md:p-6 space-y-4">
                             <!-- Category title + description + expandable intro -->
@@ -130,7 +130,7 @@
                                         class="size-5 text-muted-foreground" />
                                     {{ fullList[currentList].title }}
                                 </h2>
-                                <Collapsible :open="isCategoryIntroOpen" @update:open="isCategoryIntroOpen = $event">
+                                <Collapsible :open="isCategoryIntroOpen" @update:open="toggleCategoryIntro">
                                     <span class="flex items-center">
                                         <span class="text-sm text-muted-foreground leading-relaxed">
                                             {{ fullList[currentList].description }}
@@ -171,25 +171,20 @@
                                 </span>
                             </div>
 
-                            <!-- Filter Toggle -->
+                            <!-- Filter Toggle: each tooltip sits inside its item on a full-bleed span.
+                                 Wrapping the item instead would overwrite its data-state, and the
+                                 mobile wrapper span would break the segmented first/last borders. -->
                             <div class="flex justify-start">
                                 <ToggleGroup v-model="filterTag" type="single" variant="outline"
                                     @update:model-value="(v) => v && filterChecklist(v)">
-                                    <ToggleGroupItem value="all" class="flex-1 gap-1.5"
-                                        :aria-label="t('securitychecklist.ShowAll')">
-                                        <ListChecks class="size-4" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="unchecked" class="flex-1 gap-1.5"
-                                        :aria-label="t('securitychecklist.ShowUnchecked')">
-                                        <Circle class="size-4" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="checked" class="flex-1 gap-1.5"
-                                        :aria-label="t('securitychecklist.ShowChecked')">
-                                        <CircleCheck class="size-4" />
-                                    </ToggleGroupItem>
-                                    <ToggleGroupItem value="ignored" class="flex-1 gap-1.5"
-                                        :aria-label="t('securitychecklist.ShowIgnored')">
-                                        <CirclePause class="size-4" />
+                                    <ToggleGroupItem v-for="filter in filterOptions" :key="filter.value"
+                                        :value="filter.value" class="flex-1 gap-1.5"
+                                        :aria-label="t(filter.label)">
+                                        <JnTooltip :text="t(filter.label)">
+                                            <span class="-mx-3 flex items-center self-stretch px-3">
+                                                <component :is="filter.icon" class="size-4" />
+                                            </span>
+                                        </JnTooltip>
                                     </ToggleGroupItem>
                                 </ToggleGroup>
                             </div>
@@ -199,10 +194,10 @@
                                 <li v-for="(item, index) in filterList" :key="item.slug" class="transition-colors"
                                     :class="item.checked ? 'bg-success/10' : 'hover:bg-muted/30'">
                                     <div class="flex items-start gap-3 px-3 py-2.5">
-                                        <!-- Status switch button -->
+                                        <!-- Status switch button (h-5 = the text's first line) -->
                                         <button type="button" @click="checkItem(item)"
-                                            class="shrink-0 mt-0.5 text-muted-foreground  cursor-pointer"
-                                            :class="{ 'text-success': item.checked, 'text-muted-foreground/60 cursor-not-allowed': item.ignored }"
+                                            class="flex h-5 shrink-0 items-center text-muted-foreground cursor-pointer"
+                                            :class="{ 'text-success': item.checked, 'text-info cursor-not-allowed': item.ignored }"
                                             :disabled="item.ignored" :aria-label="item.checked ? 'Uncheck' : 'Check'">
                                             <component
                                                 :is="item.checked ? CircleCheck : item.ignored ? CirclePause : Circle"
@@ -223,16 +218,24 @@
                                             </div>
                                         </div>
 
-                                        <!-- Priority Badge -->
-                                        <Badge class="shrink-0 rounded-full font-normal shadow-none"
+                                        <!-- Priority Badge (22px, centred on the 20px first line) -->
+                                        <Badge class="-my-px shrink-0 rounded-full font-normal shadow-none"
                                             :class="priorityBadgeClass(item.priority)">
                                             {{ t('securitychecklist.' + item.priority) }}
                                         </Badge>
 
-                                        <!-- Ignore Switch -->
-                                        <Switch class="shrink-0" :model-value="item.ignored"
-                                            @update:model-value="() => ignoreItem(item)"
-                                            :aria-label="t('securitychecklist.Ignore')" />
+                                        <!-- Ignore toggle (24px, centred on the first line). The span is the
+                                             tooltip trigger, so the trigger's data-state can't hide the pressed state. -->
+                                        <JnTooltip :text="t('securitychecklist.Ignore')">
+                                            <span class="-my-0.5 inline-flex shrink-0">
+                                                <Toggle :model-value="item.ignored"
+                                                    @update:model-value="() => ignoreItem(item)"
+                                                    class="h-6 min-w-6 px-0 text-muted-foreground cursor-pointer data-[state=on]:bg-info/10 data-[state=on]:text-info data-[state=on]:hover:bg-info/15 data-[state=on]:hover:text-info"
+                                                    :aria-label="t('securitychecklist.Ignore')">
+                                                    <CirclePause class="size-4" />
+                                                </Toggle>
+                                            </span>
+                                        </JnTooltip>
                                     </div>
 
                                     <!-- Info details expand -->
@@ -265,7 +268,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Spinner } from '@/components/ui/spinner';
 import {
@@ -307,10 +310,17 @@ const checklistIconMap = {
 };
 const getChecklistIcon = (slug) => checklistIconMap[slug] || Info;
 
+// GA labels read as a funnel: ChangeList → ItemInfo / CategoryIntro → Check / Ignore.
 const isCategoryIntroOpen = ref(false);
+const toggleCategoryIntro = (open) => {
+    isCategoryIntroOpen.value = open;
+    if (open) trackEvent('SecurityChecklist', 'SecurityChecklist', 'CategoryIntro');
+};
+
 const checklistInfoOpen = ref({});
 const toggleChecklistInfo = (index) => {
     checklistInfoOpen.value[index] = !checklistInfoOpen.value[index];
+    if (checklistInfoOpen.value[index]) trackEvent('SecurityChecklist', 'SecurityChecklist', 'ItemInfo');
 };
 
 const { t, locale } = useI18n();
@@ -433,6 +443,14 @@ const filterList = ref({});
 const listToShow = ref([]);
 const filterTag = ref('all');
 
+// Filter toggle items: value, icon, and the key shared by aria-label and tooltip
+const filterOptions = [
+    { value: 'all', icon: ListChecks, label: 'securitychecklist.ShowAll' },
+    { value: 'unchecked', icon: Circle, label: 'securitychecklist.ShowUnchecked' },
+    { value: 'checked', icon: CircleCheck, label: 'securitychecklist.ShowChecked' },
+    { value: 'ignored', icon: CirclePause, label: 'securitychecklist.ShowIgnored' },
+];
+
 const changeList = (listName, shouldScroll = true) => {
     const previousList = currentList.value;
     listToShow.value = fullList.value[listName];
@@ -443,45 +461,15 @@ const changeList = (listName, shouldScroll = true) => {
         if (previousList !== currentList.value) {
             trackEvent('SecurityChecklist', 'SecurityChecklist', 'ChangeList');
         }
-        // Scroll the details area into view when switching category — but *only*
-        // by moving the drawer's own scroll container, never by letting the
-        // scroll request bubble to <body>.
-        //
-        // The earlier version used `scrollIntoView({ block: 'nearest' })`. On
-        // desktop the target element (#checklist) was already visible in the
-        // md 3-column grid, so the call no-op'd and everything worked. On iOS
-        // Safari however, the drawer library (vaul) scroll-locks the page by
-        // setting `body { position: fixed; top: -Npx }`. When scrollIntoView
-        // walked up past the drawer's own scrollable div to any ancestor that
-        // still negotiated with the browser's root scroller, its implicit
-        // side-effect of "settle page scroll" knocked vaul's recorded offset
-        // out of sync — the entire drawer visually slid up by the scroll
-        // distance (header disappearing off the top, blank space at bottom).
-        //
-        // Manually walking to the nearest scrollable ancestor and calling
-        // `scrollBy` on that element keeps the effect fully contained inside
-        // the drawer, and the PC path still short-circuits via the
-        // "already-visible" check.
+        // On a narrow screen the details stack below the list: bring them into
+        // view, clear of the fixed Nav (scroll-mt-* on #checklist).
         nextTick(() => {
             const el = document.getElementById('checklist');
             if (!el) return;
-            let scrollParent = el.parentElement;
-            while (scrollParent) {
-                const { overflowY } = getComputedStyle(scrollParent);
-                if (overflowY === 'auto' || overflowY === 'scroll') break;
-                scrollParent = scrollParent.parentElement;
-            }
-            if (!scrollParent) return;
-            const containerRect = scrollParent.getBoundingClientRect();
-            const elRect = el.getBoundingClientRect();
-            const alreadyVisible =
-                elRect.top >= containerRect.top &&
-                elRect.bottom <= containerRect.bottom;
-            if (alreadyVisible) return;
-            scrollParent.scrollBy({
-                top: elRect.top - containerRect.top - 8,
-                behavior: 'smooth',
-            });
+            const { top } = el.getBoundingClientRect();
+            const headerBottom = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+            if (top >= headerBottom && top < window.innerHeight * 0.75) return;
+            el.scrollIntoView({ block: 'start', behavior: 'smooth' });
         });
     }
 };
@@ -498,12 +486,14 @@ const ignoreItem = (item) => {
     item.ignored = !item.ignored;
     item.checked = false;
     updateSlugs(item.slug, item.ignored ? 'ignored' : '');
+    if (item.ignored) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Ignore');
 };
 
 const checkItem = (item) => {
     if (item.ignored) return;
     item.checked = !item.checked;
     updateSlugs(item.slug, item.checked ? 'checked' : '');
+    if (item.checked) trackEvent('SecurityChecklist', 'SecurityChecklist', 'Check');
     // Achievement rules (SurfaceCheck / HalfwayThere / FullySecured) live in
     // data/achievement-rules.js.
     emitAppEvent('securitychecklist:progress', {

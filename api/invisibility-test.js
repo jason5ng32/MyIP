@@ -1,5 +1,5 @@
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // If length is not 28 and is not a combination of letters and numbers, return false
 function isValidUserID(userID) {

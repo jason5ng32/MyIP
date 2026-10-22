@@ -8,21 +8,21 @@
 // backbone connectivity is settlement-free peering with the Tier 1 clique,
 // invisible to a p2c-only walk.
 //
-// Data is fully local (common/as-rel-db.js + common/as-org-db.js), so the
+// Data is fully local (server/datasets/as-rel-db.js + server/datasets/as-org-db.js), so the
 // whole BFS is synchronous. We only hit RIPEstat for as-overview as a
 // rare fallback when as2org doesn't have an ASN's org name.
 //
 // Alongside the graph, `neighbours` lists the origin's direct providers,
 // peers and customers from the same snapshot, counted by the walk's own
-// misinference rule (common/as-relationships.js) so the counts never show an
+// misinference rule (server/as-relationships.js) so the counts never show an
 // upstream the graph drops. List names come from as2org, gaps filled from the
 // graph's resolved names.
 
-import { resolveAsnOrgName } from '../common/ripestat.js';
-import { providersOf, peersOf, customersOf, customerCountOf, isTier1 } from '../common/as-rel-db.js';
-import { lookupAsOrgName } from '../common/as-org-db.js';
-import { TIER1_PEERING_TRUSTED, TIER1_ADJACENCY_TRUSTED, countedRelationships } from '../common/as-relationships.js';
-import logger from '../common/logger.js';
+import { resolveAsnOrgName } from '../server/ripestat.js';
+import { providersOf, peersOf, customersOf, customerCountOf, isTier1 } from '../server/datasets/as-rel-db.js';
+import { lookupAsOrgName } from '../server/datasets/as-org-db.js';
+import { TIER1_PEERING_TRUSTED, TIER1_ADJACENCY_TRUSTED, countedRelationships } from '../server/as-relationships.js';
+import logger from '../server/logger.js';
 
 // How deep to recurse from the origin. 3 covers regional networks reaching
 // Tier 1s through 1-2 intermediates; deeper just adds noise at the periphery.
@@ -33,10 +33,10 @@ const MAX_DEPTH = 3;
 const MAX_INTERMEDIATE_BRANCH = 3;
 
 // Past either bar (TIER1_PEERING_TRUSTED / TIER1_ADJACENCY_TRUSTED, defined
-// in common/as-relationships.js so the neighbour counts use the same ones), a
+// in server/as-relationships.js so the neighbour counts use the same ones), a
 // node's non-Tier-1 "providers" are treated as CAIDA misinference and dropped.
 
-// Two-tier org name resolver lives in common/ripestat.js. No onError hook
+// Two-tier org name resolver lives in server/ripestat.js. No onError hook
 // here — connectivity stays silent on as-overview fallback failures (a node
 // just keeps name=null); asn-history is the one that warns.
 const resolveOrgName = (asn) => resolveAsnOrgName(asn);

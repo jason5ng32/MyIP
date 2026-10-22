@@ -4,7 +4,7 @@
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { isToolAvailable } from '../frontend/utils/tool-availability.js';
+import { isToolAvailable, listedTools } from '../frontend/utils/tool-availability.js';
 import { ADVANCED_TOOLS, TOOL_BY_SLUG } from '../frontend/data/tools.js';
 
 const PUBLIC = { slug: 'public' };
@@ -46,13 +46,23 @@ describe('isToolAvailable', () => {
     assert.equal(isToolAvailable(null, { cloudFlare: true }), false);
     assert.equal(isToolAvailable(undefined, {}), false);
   });
+});
 
-  it('filters a list in registry order', () => {
-    const tools = [PUBLIC, ORIGINAL, RADAR, BOTH];
-    const listed = (configs) => tools.filter((tool) => isToolAvailable(tool, configs)).map((tool) => tool.slug);
-    assert.deepEqual(listed({}), ['public']);
-    assert.deepEqual(listed({ originalSite: false, cloudFlare: true }), ['public', 'radar']);
-    assert.deepEqual(listed({ originalSite: true, cloudFlare: true }), ['public', 'original', 'radar', 'both']);
+describe('listedTools', () => {
+  const tools = [PUBLIC, ORIGINAL, RADAR, BOTH];
+  const slugs = (list) => list.map((tool) => tool.slug);
+
+  it('applies the gates in registry order', () => {
+    assert.deepEqual(slugs(listedTools(tools, {})), ['public']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true })), ['public', 'original']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: false, cloudFlare: true })), ['public', 'radar']);
+    assert.deepEqual(slugs(listedTools(tools, { originalSite: true, cloudFlare: true })),
+      ['public', 'original', 'radar', 'both']);
+  });
+
+  it('lists every registered tool once all gates pass', () => {
+    const configs = { originalSite: true, cloudFlare: true };
+    assert.equal(listedTools(ADVANCED_TOOLS, configs).length, ADVANCED_TOOLS.length);
   });
 });
 

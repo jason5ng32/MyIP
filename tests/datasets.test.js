@@ -1,5 +1,5 @@
-// Tests for common/datasets.js — the dataset rows run through the engine
-// (common/dataset-updater.js): the MaxMind row (two editions published
+// Tests for server/datasets/datasets.js — the dataset rows run through the engine
+// (server/datasets/dataset-updater.js): the MaxMind row (two editions published
 // together; the credential gate), the PeeringDB row (no decompression; a
 // distill step; the Cloudflare-key gate), a decompressing CAIDA row, the IEEE
 // MAC registries row (five plain files published together), and the rows
@@ -16,13 +16,13 @@ import { after, afterEach, describe, it } from 'node:test';
 
 import * as tar from 'tar';
 
-import { datasets, findPeeringdbDump, joinedIdentifier, hasMaxMindCredentials } from '../common/datasets.js';
-import { updateDataset, isRowEnabled } from '../common/dataset-updater.js';
-import { PEERINGDB_FILE, readPeeringdbIndex, expandNet, isPeeringdbLoaded } from '../common/peeringdb-db.js';
-import { isAsOrgLoaded } from '../common/as-org-db.js';
-import { isAsRelLoaded } from '../common/as-rel-db.js';
-import { isMaxMindReady } from '../common/maxmind-service.js';
-import { OUI_REGISTRIES, isOuiLoaded } from '../common/oui-db.js';
+import { datasets, findPeeringdbDump, joinedIdentifier, hasMaxMindCredentials } from '../server/datasets/datasets.js';
+import { updateDataset, isRowEnabled } from '../server/datasets/dataset-updater.js';
+import { PEERINGDB_FILE, readPeeringdbIndex, expandNet, isPeeringdbLoaded } from '../server/datasets/peeringdb-db.js';
+import { isAsOrgLoaded } from '../server/datasets/as-org-db.js';
+import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
+import { isMaxMindReady } from '../server/datasets/maxmind-service.js';
+import { OUI_REGISTRIES, isOuiLoaded } from '../server/datasets/oui-db.js';
 import { setUpstreamUserAgent } from '../common/fetch-with-timeout.js';
 
 const realFetch = globalThis.fetch;

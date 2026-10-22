@@ -5,7 +5,7 @@
 // any fetch fires.
 //
 // Referer + IP validation are enforced at the middleware layer now (see
-// common/guards.js, tests/guards.test.js); handlers themselves no longer
+// server/guards.js, tests/guards.test.js); handlers themselves no longer
 // repeat those checks, so this file focuses on handler-specific branches.
 
 import assert from 'node:assert/strict';
@@ -19,13 +19,14 @@ import getUserInfoHandler from '../api/get-user-info.js';
 import getWhoisHandler from '../api/get-whois.js';
 import cfRadarHandler from '../api/cf-radar.js';
 import invisibilityHandler from '../api/invisibility-test.js';
+import ipBlocklistHandler, { IP_BLOCKLIST_TIMEOUT_MS } from '../api/ip-blocklist.js';
 import macCheckerHandler, { createMacChecker } from '../api/mac-checker.js';
 import githubStarsHandler from '../api/github-stars.js';
 import personaEvaluateHandler from '../api/persona.js';
 import asnProfileHandler, { peeringdbReadiness, connectivityReadiness } from '../api/asn-profile.js';
-import { isAsRelLoaded } from '../common/as-rel-db.js';
-import { describeMac } from '../common/oui-db.js';
-import { isCompleteProfile } from '../common/asn-profile.js';
+import { isAsRelLoaded } from '../server/datasets/as-rel-db.js';
+import { describeMac } from '../server/datasets/oui-db.js';
+import { isCompleteProfile } from '../server/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
@@ -38,7 +39,7 @@ import createReportHandler, { getReport as getReportHandler, normalizeTtlDays } 
 import { modifyJsonForIPAPI } from '../api/ipapi-is.js';
 import { modifyJson as modifyJsonForIpinfo } from '../api/ipinfo-io.js';
 import { REPORT_VERSION } from '../common/report-schema.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 // -- shared test utilities ------------------------------------------------
 
@@ -156,6 +157,35 @@ describe('google-map handler', () => {
         }), res);
         assert.equal(res.statusCode, 400);
         assert.deepEqual(res.body, { error: 'Invalid request' });
+    });
+
+    it('passes region-tagged UI locales through to Static Maps', async () => {
+        for (const language of ['zh-TW', 'pt-BR']) {
+            let upstreamUrl;
+            globalThis.fetch = async (url) => {
+                upstreamUrl = new URL(String(url));
+                return jpegUpstream({ start(controller) { controller.close(); } })();
+            };
+            const res = createStreamResponse();
+            await googleMapHandler(createRequest({
+                query: { latitude: '1', longitude: '2', language },
+            }), res);
+            assert.equal(res.statusCode, undefined);
+            assert.deepEqual(upstreamUrl.searchParams.getAll('language'), [language]);
+        }
+    });
+
+    it('rejects a language that is not tag-shaped without calling the external API', () => {
+        let fetchCalled = false;
+        globalThis.fetch = async () => { fetchCalled = true; };
+        for (const language of ['', 'en&zoom=20', 'en-', 'x'.repeat(40), ['en', 'fr'], undefined]) {
+            const res = createResponse();
+            googleMapHandler(createRequest({
+                query: { latitude: '1', longitude: '2', language },
+            }), res);
+            assert.equal(res.statusCode, 400, `language=${JSON.stringify(language)}`);
+        }
+        assert.equal(fetchCalled, false);
     });
 
     it('streams the upstream image through to completion', async () => {
@@ -418,7 +448,7 @@ describe('persona handler', () => {
 
 // -- cf-radar handler -----------------------------------------------------
 // One dispatch route for all Radar views; params are validated by each
-// view's guards from common/guards.js, so per-view checks here only cover
+// view's guards from server/guards.js, so per-view checks here only cover
 // the dispatch wiring. The pure transform pipeline (outage normalize/merge,
 // traffic matrix) is unit-tested in tests/cf-radar.test.js.
 
@@ -569,6 +599,79 @@ describe('invisibility-test handler', () => {
         await invisibilityHandler(createRequest({ query: { id: 'a'.repeat(28) } }), res);
         assert.equal(res.statusCode, 403);
         assert.deepEqual(res.body, { error: 'Authorization header is missing.' });
+    });
+});
+
+// -- ip-blocklist handler -------------------------------------------------
+
+describe('ip-blocklist handler', () => {
+    const configure = () => {
+        process.env.IPCHECKING_API_KEY = 'test-key';
+        process.env.IPCHECKING_API_ENDPOINT = 'https://upstream.invalid';
+    };
+
+    it('reports a missing API key before any upstream call', async () => {
+        delete process.env.IPCHECKING_API_KEY;
+        globalThis.fetch = async () => assert.fail('no upstream call');
+        const res = createResponse();
+        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 500);
+        assert.deepEqual(res.body, { error: 'API key is missing' });
+    });
+
+    it('asks /iphitlist for the ip with the system key and forwards the caller headers', async () => {
+        configure();
+        let called;
+        globalThis.fetch = async (url, init) => {
+            called = { url: new URL(url), init };
+            return { status: 200, ok: true, json: async () => ({ ip: '1.1.1.1', summary: { listed: 0 } }) };
+        };
+        const req = createRequest({ query: { ip: '1.1.1.1' } });
+        req.headers.authorization = 'Bearer t';
+        const res = createResponse();
+        await ipBlocklistHandler(req, res);
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body, { ip: '1.1.1.1', summary: { listed: 0 } });
+        assert.equal(called.url.pathname, '/iphitlist');
+        assert.equal(called.url.searchParams.get('ip'), '1.1.1.1');
+        assert.equal(called.url.searchParams.get('key'), 'test-key');
+        assert.equal(called.init.headers.authorization, 'Bearer t');
+    });
+
+    it('passes an upstream sign-in rejection through as its own 4xx', async () => {
+        configure();
+        globalThis.fetch = async () => ({ status: 403, ok: false, json: async () => ({ message: 'Sign in required' }) });
+        const res = createResponse();
+        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 403);
+        assert.deepEqual(res.body, { error: 'Sign in required' });
+    });
+
+    it('passes an exhausted monthly quota through as 429 quota_exceeded', async () => {
+        configure();
+        globalThis.fetch = async () => ({ status: 429, ok: false, json: async () => ({ error: 'Monthly quota exceeded' }) });
+        const res = createResponse();
+        await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        assert.equal(res.statusCode, 429);
+        assert.deepEqual(res.body, { error: 'Monthly quota exceeded', code: 'quota_exceeded' });
+    });
+
+    it('turns any other upstream failure into a 500', async () => {
+        configure();
+        globalThis.fetch = async () => ({ status: 502, ok: false, json: async () => ({}) });
+        const res = createResponse();
+        const restore = logger.level;
+        logger.level = 'silent';
+        try {
+            await ipBlocklistHandler(createRequest({ query: { ip: '1.1.1.1' } }), res);
+        } finally {
+            logger.level = restore;
+        }
+        assert.equal(res.statusCode, 500);
+    });
+
+    it('waits well past the default 8s upstream timeout', () => {
+        assert.ok(IP_BLOCKLIST_TIMEOUT_MS >= 30000);
     });
 });
 

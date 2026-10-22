@@ -35,6 +35,10 @@ function isIPv6(ip) {
     return typeof ip === 'string' && ip.includes(':');
 }
 
+// Validate an IP of one specific version — safe on untrusted input.
+const isValidIPv4 = (ip) => isValidIP(ip) && !isIPv6(ip);
+const isValidIPv6 = (ip) => isValidIP(ip) && isIPv6(ip);
+
 // Validate if a string is a syntactically plausible domain name.
 // Matches the hostname pattern used by DnsResolver / Whois / CensorshipCheck:
 // labels of [a-z0-9-], at least one dot, and a TLD of 2+ letters. Any label
@@ -119,4 +123,4 @@ const isUsablePublicIP = (ip) => {
     return !(isIPv6(ip) ? isReservedV6(ip) : isReservedV4(ip));
 };
 
-export { isValidIP, isIPv6, isValidDomain, isUsablePublicIP };
+export { isValidIP, isValidIPv4, isValidIPv6, isIPv6, isValidDomain, isUsablePublicIP };

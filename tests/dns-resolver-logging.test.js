@@ -5,7 +5,7 @@ import { Resolver } from 'node:dns/promises';
 import { afterEach, describe, it } from 'node:test';
 
 import { resolveDns, resolveDoh } from '../api/dns-resolver.js';
-import logger from '../common/logger.js';
+import logger from '../server/logger.js';
 
 const originalResolve4 = Resolver.prototype.resolve4;
 const originalFetch = globalThis.fetch;

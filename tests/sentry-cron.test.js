@@ -1,7 +1,7 @@
-// Passthrough behavior of common/sentry-cron.js when no backend DSN is set —
+// Passthrough behavior of server/sentry-cron.js when no backend DSN is set —
 // the wrapper must be a transparent no-op (result and rejection both flow
 // through) so periodic jobs behave identically on Sentry-less deployments.
-// Also covers common/logger.js's flattenLogAttributes (the pino-context →
+// Also covers server/logger.js's flattenLogAttributes (the pino-context →
 // Sentry-log-attributes normalizer used by the forwarding hook).
 import { test } from 'node:test';
 import assert from 'node:assert';
@@ -9,8 +9,8 @@ import assert from 'node:assert';
 // Ensure the gate is closed regardless of the shell environment, then import
 // (both modules evaluate the gate once at load).
 delete process.env.SENTRY_DSN_BACKEND;
-const { withCronMonitor } = await import('../common/sentry-cron.js');
-const { flattenLogAttributes } = await import('../common/logger.js');
+const { withCronMonitor } = await import('../server/sentry-cron.js');
+const { flattenLogAttributes } = await import('../server/logger.js');
 
 test('returns the job result unchanged when Sentry is not configured', async () => {
     const result = await withCronMonitor('test-job', async () => 42, {

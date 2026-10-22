@@ -40,10 +40,10 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
-import { REPORT_SECTION_IDS } from '@/utils/report-schema.js';
-import { SECTION_TITLE_KEYS } from '@/utils/report-export.js';
+import { REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
 import { dispatchAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
-import { RUNNABLE_SECTION_COMMANDS, RUNNABLE_SECTION_IDS, normalizeRunSections } from '@/utils/docs-run-tests.js';
+import { RUNNABLE_SECTION_COMMANDS, RUNNABLE_SECTION_IDS, normalizeRunSections } from '@/utils/report/docs-run-tests.js';
 
 export const DOCS_URL = (import.meta.env?.VITE_DOCS_URL || '').replace(/\/+$/, '');
 export const isDocsConfigured = !!DOCS_URL;

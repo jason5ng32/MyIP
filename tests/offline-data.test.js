@@ -1,10 +1,10 @@
-// Tests for common/offline-data.js — the boot window, the per-route 503
+// Tests for server/offline-data.js — the boot window, the per-route 503
 // gate and the per-part isStillLoading probe.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { runOfflineBootstrap, requireOfflineData, isStillLoading, isOfflineBootstrapping } from '../common/offline-data.js';
+import { runOfflineBootstrap, requireOfflineData, isStillLoading, isOfflineBootstrapping } from '../server/offline-data.js';
 
 const makeRes = () => ({
     statusCode: null,

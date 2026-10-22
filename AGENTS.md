@@ -33,7 +33,7 @@ Express 5 back-end API.
 | Build | Vite + `@vitejs/plugin-vue`; Tailwind CSS v4 + `tw-animate-css` |
 | UI | shadcn-vue copy-in primitives (reka-ui) · lucide icons · circle-flags via `@iconify/vue` · vaul-vue drawer · vue-sonner toast |
 | Backend | Express 5 |
-| Logger | `pino` singleton at `common/logger.js` (+ `pino-http`, opt-in) |
+| Logger | `pino` singleton at `server/logger.js` (+ `pino-http`, opt-in) |
 | Auth | Firebase Auth (optional, env-gated) |
 | Error monitoring | Sentry — optional & env-gated on both halves: `@sentry/vue` (no `VITE_SENTRY_DSN_FRONTEND`, no Sentry in the build — see frontend/AGENTS.md) + `@sentry/node` (no `SENTRY_DSN_BACKEND`, never loaded — see api/AGENTS.md) |
 | PWA | `manifest.webmanifest` only — installable but online-only, no service worker |
@@ -62,8 +62,11 @@ use npm / yarn — they'd produce a competing lockfile.
 ├── AGENTS.md / CLAUDE.md        ← this file + Claude pointer to it
 ├── frontend/                    ← Vue 3 SPA (see frontend/AGENTS.md)
 ├── api/                         ← Express handlers (see api/AGENTS.md)
-├── common/                      ← code shared by both halves (valid-ip /
-│                                  fetch-with-timeout / guards / logger / …)
+├── server/                      ← backend-only code (logger / guards / …;
+│                                  datasets/ = the offline dataset engine)
+├── common/                      ← code the frontend or build imports too
+│                                  (valid-ip / fetch-with-timeout / …) + the
+│                                  dataset dirs (`*-db/`, a self-host mount point)
 ├── tests/                       ← Node test runner specs
 ├── backend-server.js            ← Express app (default port 11966)
 ├── sentry-instrument.js         ← backend Sentry bootstrap via `node --import`;
@@ -112,7 +115,7 @@ use npm / yarn — they'd produce a competing lockfile.
 
 ### Logging (backend)
 
-- **Always the shared logger** (`common/logger.js`) in backend files; bare
+- **Always the shared logger** (`server/logger.js`) in backend files; bare
   `console.*` is banned there (frontend keeps using `console.*`).
 - Pino first-arg-is-context: `logger.error({ err, ip }, 'short message')`.
 - Env knobs: `LOG_LEVEL` (default info), `LOG_FORMAT=json` for shippers,
