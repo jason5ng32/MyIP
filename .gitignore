@@ -62,6 +62,7 @@ public/llms-full.txt
 public/tools/
 public/robots.txt
 public/ads.txt
+public/funding.json
 
 # Private AI context (per-machine, not for the public repo)
 local-context.md
