@@ -213,6 +213,7 @@ const PROVIDERS = [
   { id: 'figma', name: 'Figma', icon: 'simple-icons:figma' },
   { id: 'linear', name: 'Linear', icon: 'simple-icons:linear' },
   { id: 'stripe', name: 'Stripe', icon: 'simple-icons:stripe' },
+  { id: 'npm', name: 'npm', icon: 'ri:npmjs-line' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
