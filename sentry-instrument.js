@@ -23,11 +23,17 @@ if (process.env.SENTRY_DSN_BACKEND && process.env.SENTRY_ENVIRONMENT !== 'develo
         environment: process.env.SENTRY_ENVIRONMENT || 'production',
         // 100% trace sampling (per-route latency / throughput / error rate under Insights)
         tracesSampleRate: 1.0,
-        // Sentry Logs — receives warn/error/fatal lines forwarded by the
-        // logMethod hook in server/logger.js
-        enableLogs: true,
-        // Never attach caller IPs / headers to events (privacy tool)
-        sendDefaultPii: false,
+        // Sentry Logs need no switch: the logMethod hook in server/logger.js
+        // forwards warn/error/fatal lines on its own.
+        // Never attach caller IPs, headers, cookies or bodies to events
+        // (privacy tool). The SDK collects all of them unless each category
+        // is switched off here; query strings stay and are redacted below.
+        dataCollection: {
+            userInfo: false,
+            cookies: false,
+            httpHeaders: false,
+            httpBodies: [],
+        },
         // Upstream query strings carry API keys — redact those params in
         // breadcrumbs, spans, and request contexts (the rest of the query
         // stays: it's debugging context).
