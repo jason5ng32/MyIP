@@ -46,17 +46,27 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Get the version and release notes
+    - name: Get the version
       if: github.event_name == 'release'
-      run: |
-        printf "RELEASE_VERSION=%s\n" "${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-        printf "RELEASE_NOTES<<EOF\n%s\nEOF\n" "${{ github.event.release.body }}" >> $GITHUB_ENV
+      env:
+        TAG_NAME: ${{ github.event.release.tag_name }}
+      run: echo "RELEASE_VERSION=$TAG_NAME" >> "$GITHUB_ENV"
 
     - name: Set version for manual dispatch
       if: github.event_name == 'workflow_dispatch'
-      run: |
-        echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-        echo "RELEASE_NOTES=Manually triggered build" >> $GITHUB_ENV
+      env:
+        DISPATCH_VERSION: ${{ github.event.inputs.version }}
+      run: echo "RELEASE_VERSION=$DISPATCH_VERSION" >> "$GITHUB_ENV"
+
+    # OCI labels (title / description / source / revision / …) from the repo;
+    # tags stay hand-written below. A manual dispatch runs on `main`, so the
+    # version label is pinned to RELEASE_VERSION.
+    - name: Docker metadata
+      id: meta
+      uses: docker/metadata-action@v6
+      with:
+        labels: |
+          org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
 
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v7
@@ -67,7 +77,5 @@ jobs:
           jason5ng32/myip:${{ env.RELEASE_VERSION }}
           ghcr.io/${{ github.repository_owner }}/myip:latest
           ghcr.io/${{ github.repository_owner }}/myip:${{ env.RELEASE_VERSION }}
-        labels: |
-          org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
-          org.opencontainers.image.description=${{ env.RELEASE_NOTES }}
+        labels: ${{ steps.meta.outputs.labels }}
         platforms: linux/amd64,linux/arm64
