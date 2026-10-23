@@ -13,7 +13,7 @@
 // to http:// or in a loop: any of those fails like a block and reads as
 // "blocked". Bump ADBLOCK_PROBES_VERSION whenever the list changes.
 
-export const ADBLOCK_PROBES_VERSION = '2026-10-19';
+export const ADBLOCK_PROBES_VERSION = '2026-10-23';
 
 export const ADBLOCK_PROBE_GROUPS = [
     {
@@ -37,6 +37,11 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'unity-ads', name: 'Unity Ads', targets: ['auction.unityads.unity3d.com', 'config.unityads.unity3d.com', 'adserver.unityads.unity3d.com'] },
             { id: 'ironsource', name: 'ironSource', targets: ['outcome-ssp.supersonicads.com', 'init.supersonicads.com'] },
             { id: 'pangle', name: 'Pangle', targets: ['api16-access-sg.pangle.io', 'pangolin16.isnssdk.com'] },
+            { id: 'pubmatic-hb', name: 'PubMatic Header Bidding', targets: ['hbopenbid.pubmatic.com'] },
+            { id: 'id5', name: 'ID5 Sync', targets: ['api.id5-sync.com'] },
+            { id: 'casalemedia-exchange', name: 'Criteo/Casale Exchange', targets: ['htlb.casalemedia.com'] },
+            { id: 'teads-sync', name: 'Teads', targets: ['sync.teads.tv'] },
+            { id: 'nextmill', name: 'NextMill', targets: ['pbs.nextmillmedia.com'] },
         ],
     },
     {
