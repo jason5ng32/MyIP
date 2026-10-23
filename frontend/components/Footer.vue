@@ -32,7 +32,7 @@
           </div>
         </div>
 
-        <!-- Project: the About sheet's tabs, privacy and license -->
+        <!-- Project: the About sheet's tabs, privacy, license and contributing -->
         <nav :aria-label="t('footer.Project')">
           <h3 :class="headingClass">{{ t('footer.Project') }}</h3>
           <ul class="space-y-2">
@@ -60,6 +60,12 @@
               <a :href="`${t('page.footerLink')}/blob/main/LICENSE`" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'License')">
                 {{ t('footer.License') }}
+              </a>
+            </li>
+            <li>
+              <a :href="`${t('page.footerLink')}/contribute`" target="_blank" rel="noopener" :class="linkClass"
+                @click="trackEvent('Footer', 'FooterClick', 'Contribute')">
+                {{ t('footer.Contribute') }}
               </a>
             </li>
           </ul>
