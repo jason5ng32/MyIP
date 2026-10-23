@@ -1837,7 +1837,9 @@
       "Import": "Importer",
       "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants.",
       "Destination": "Ajouter à",
-      "ImportAsNew": "Importer comme nouvelle liste"
+      "ImportAsNew": "Importer comme nouvelle liste",
+      "MissingCountry": "Votre pays n'y figure pas ? {link}",
+      "MissingCountryLink": "Ajoutez une liste pour lui"
     },
     "lists": {
       "Tab": "Listes",

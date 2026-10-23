@@ -1837,7 +1837,9 @@
       "Import": "导入",
       "NotEnoughCapacity": "容量不足——该列表需要 {need} 个空位，仅剩 {free} 个",
       "Destination": "添加到",
-      "ImportAsNew": "导入为新列表"
+      "ImportAsNew": "导入为新列表",
+      "MissingCountry": "没有你所在国家的列表？{link}",
+      "MissingCountryLink": "来添加一个"
     },
     "lists": {
       "Tab": "列表",

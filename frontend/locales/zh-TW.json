@@ -1837,7 +1837,9 @@
       "Import": "匯入",
       "NotEnoughCapacity": "容量不足——該清單需要 {need} 個空位，僅剩 {free} 個",
       "Destination": "加入到",
-      "ImportAsNew": "匯入為新清單"
+      "ImportAsNew": "匯入為新清單",
+      "MissingCountry": "沒有你所在國家的清單？{link}",
+      "MissingCountryLink": "來新增一個"
     },
     "lists": {
       "Tab": "清單",

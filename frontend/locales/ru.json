@@ -1837,7 +1837,9 @@
       "Import": "Импорт",
       "NotEnoughCapacity": "Недостаточно места — для списка нужно слотов: {need}, свободно: {free}.",
       "Destination": "Добавить в",
-      "ImportAsNew": "Импортировать как новый список"
+      "ImportAsNew": "Импортировать как новый список",
+      "MissingCountry": "Нет вашей страны? {link}",
+      "MissingCountryLink": "Добавьте для неё список"
     },
     "lists": {
       "Tab": "Списки",
