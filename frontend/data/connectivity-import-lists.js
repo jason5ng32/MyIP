@@ -258,6 +258,28 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'mexico',
+        emoji: '🇲🇽',
+        members: [
+            { id: 'google-mx', name: 'Google México', url: 'https://www.google.com.mx/favicon.ico' },
+            { id: 'amazon-mx', name: 'Amazon México', url: 'https://www.amazon.com.mx/favicon.ico' },
+            { id: 'mercadolibre-mx', name: 'Mercado Libre', url: 'https://www.mercadolibre.com.mx/favicon.ico' },
+            { id: 'walmart-mx', name: 'Walmart México', url: 'https://www.walmart.com.mx/favicon.ico' },
+            { id: 'gob-mx', name: 'Gob.mx', url: 'https://framework-gb.cdn.gob.mx/gm/v3/assets/images/favicon.ico', iconDomain: 'www.gob.mx', siteUrl: 'https://www.gob.mx' },
+            { id: 'sat-mx', name: 'SAT', url: 'https://www.sat.gob.mx/favicon.ico' },
+            { id: 'imss', name: 'IMSS', url: 'https://www.imss.gob.mx/favicon.ico' },
+            { id: 'telcel', name: 'Telcel', url: 'https://www.telcel.com/favicon.ico' },
+            { id: 'telmex', name: 'Telmex', url: 'https://telmex.com/favicon.ico' },
+            { id: 'totalplay', name: 'Totalplay', url: 'https://www.totalplay.com.mx/favicon.ico' },
+            { id: 'bbva-mx', name: 'BBVA México', url: 'https://www.bbva.mx/favicon.ico' },
+            { id: 'banorte', name: 'Banorte', url: 'https://www.banorte.com/favicon.ico' },
+            { id: 'el-universal', name: 'El Universal', url: 'https://www.eluniversal.com.mx/favicon.ico' },
+            { id: 'milenio', name: 'Milenio', url: 'https://www.milenio.com/favicon.ico' },
+            { id: 'liverpool-mx', name: 'Liverpool', url: 'https://www.liverpool.com.mx/favicon.ico' },
+            { id: 'unam', name: 'UNAM', url: 'https://www.unam.mx/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
