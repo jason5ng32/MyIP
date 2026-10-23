@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import express from 'express';
 
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
 
@@ -405,5 +406,49 @@ describe('normalizeAsnQuery', () => {
             assert.equal(nextCalled, true);
             assert.deepEqual(req.query, query);
         }
+    });
+});
+
+// Express 5 defines req.query as a prototype getter that re-parses the URL
+// on every read; a real request (never listening) catches rewrites that a
+// plain-object stub would keep.
+describe('guard rewrites on a real Express request', () => {
+    const app = express();
+    const makeExpressReq = (url) => {
+        const req = Object.create(app.request);
+        req.url = url;
+        req.headers = {};
+        return req;
+    };
+
+    it('reproduces the re-parsing getter', () => {
+        const req = makeExpressReq('/x?type=caa');
+        assert.notEqual(req.query, req.query);
+    });
+
+    for (const [name, guard, url, param, expected] of [
+        ['requireValidRecordType', requireValidRecordType(), '/x?type=caa', 'type', 'CAA'],
+        ['requireValidDomain', requireValidDomain(), '/x?domain=Example.COM', 'domain', 'example.com'],
+        ['requireValidASN', requireValidASN(), '/x?asn=AS013335', 'asn', '13335'],
+        ['normalizeAsnQuery', normalizeAsnQuery(), '/x?q=as13335', 'q', 'AS13335'],
+        ['requireValidCountry', requireValidCountry(), '/x?country=us', 'country', 'US'],
+    ]) {
+        it(`${name} rewrite survives a later req.query read`, () => {
+            const req = makeExpressReq(url);
+            let nextCalled = false;
+            guard(req, makeRes(), () => { nextCalled = true; });
+            assert.equal(nextCalled, true);
+            assert.equal(req.query[param], expected);
+        });
+    }
+
+    it('keeps both rewrites when chained like /api/dnsresolver', () => {
+        const req = makeExpressReq('/x?type=caa&hostname=Example.COM');
+        let calls = 0;
+        requireValidDomain('hostname')(req, makeRes(), () => { calls++; });
+        requireValidRecordType()(req, makeRes(), () => { calls++; });
+        assert.equal(calls, 2);
+        assert.deepEqual({ ...req.query }, { type: 'CAA', hostname: 'example.com' });
+        assert.equal(req.query, req.query);
     });
 });

@@ -11,6 +11,18 @@ import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
 import { DNS_RECORD_TYPE_SET } from '../common/dns-record-types.js';
 import { parseAsnInput } from '../common/asn-input.js';
 
+// Express 5's req.query is a prototype getter that re-parses the URL on every
+// read, so a direct write is lost. Pin the parsed object as an own property
+// first; later guards, cacheable resolvers and the handler then share it.
+const setQueryParam = (req, name, value) => {
+    if (!Object.hasOwn(req, 'query')) {
+        Object.defineProperty(req, 'query', {
+            value: req.query, writable: true, configurable: true, enumerable: true,
+        });
+    }
+    req.query[name] = value;
+};
+
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
 export const requireReferer = (req, res, next) => {
@@ -57,7 +69,7 @@ export const requireValidDomain = (paramName = 'domain') => (req, res, next) => 
     if (!isValidDomain(domain)) {
         return res.status(400).json({ error: 'Invalid domain' });
     }
-    req.query[paramName] = domain;
+    setQueryParam(req, paramName, domain);
     next();
 };
 
@@ -89,7 +101,7 @@ export const requireValidASN = (paramName = 'asn') => (req, res, next) => {
     if (asn === null) {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
-    req.query[paramName] = String(asn);
+    setQueryParam(req, paramName, String(asn));
     next();
 };
 
@@ -104,7 +116,7 @@ export const normalizeAsnQuery = (paramName = 'q') => (req, res, next) => {
     if (asn === null) {
         return res.status(400).json({ error: 'Invalid ASN' });
     }
-    req.query[paramName] = `AS${asn}`;
+    setQueryParam(req, paramName, `AS${asn}`);
     next();
 };
 
@@ -119,7 +131,7 @@ export const requireValidCountry = (paramName = 'country') => (req, res, next) =
     if (!/^[A-Za-z]{2}$/.test(raw)) {
         return res.status(400).json({ error: 'Invalid country' });
     }
-    req.query[paramName] = String(raw).toUpperCase();
+    setQueryParam(req, paramName, String(raw).toUpperCase());
     next();
 };
 
@@ -145,7 +157,7 @@ export const requireValidRecordType = (paramName = 'type') => (req, res, next) =
     if (!DNS_RECORD_TYPE_SET.has(String(type).toUpperCase())) {
         return res.status(400).json({ error: 'Invalid record type' });
     }
-    req.query[paramName] = String(type).toUpperCase();
+    setQueryParam(req, paramName, String(type).toUpperCase());
     next();
 };
 
