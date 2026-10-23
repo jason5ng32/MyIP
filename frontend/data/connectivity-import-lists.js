@@ -236,6 +236,28 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'thailand',
+        emoji: '🇹🇭',
+        members: [
+            { id: 'pantip', name: 'Pantip', url: 'https://pantip.com/fav-icon.ico' },
+            { id: 'sanook', name: 'Sanook', url: 'https://www.sanook.com/favicon.ico' },
+            { id: 'thairath', name: 'Thairath', url: 'https://www.thairath.co.th/static/img/favicon/favicon-32x32.png' },
+            { id: 'thaipbs', name: 'Thai PBS', url: 'https://www.thaipbs.or.th/favicon.ico' },
+            { id: 'ch3plus', name: 'CH3Plus', url: 'https://www.ch3plus.com/favicon.ico' },
+            { id: 'shopee-th', name: 'Shopee', url: 'https://shopee.co.th/favicon.ico' },
+            { id: 'lazada-th', name: 'Lazada', url: 'https://www.lazada.co.th/favicon.ico' },
+            { id: 'wongnai', name: 'Wongnai', url: 'https://www.wongnai.com/favicon.ico' },
+            { id: 'kbank', name: 'KBank', url: 'https://www.kasikornbank.com/favicon.ico' },
+            { id: 'scb', name: 'SCB', url: 'https://www.scb.co.th/favicon.ico' },
+            { id: 'bangkokbank', name: 'Bangkok Bank', url: 'https://www.bangkokbank.com/favicon.ico' },
+            { id: 'ais', name: 'AIS', url: 'https://www.ais.th/favicon.ico' },
+            { id: 'true-th', name: 'True', url: 'https://www.true.th/favicon.ico' },
+            { id: 'rd-go-th', name: 'Revenue Department', url: 'https://www.rd.go.th/typo3conf/ext/rdinter_theme13/Resources/Public/Icons/favicon-32x32.png' },
+            { id: 'mea', name: 'MEA', url: 'https://www.mea.or.th/favicon.ico' },
+            { id: 'pea', name: 'PEA', url: 'https://www.pea.co.th/favicon.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [

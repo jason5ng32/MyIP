@@ -126,6 +126,8 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
 
 New param shape → new guard there, attached in `backend-server.js`.
+Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
+on every read, so a direct write is lost.
 
 ### Response enrichment lives in middleware too
 

@@ -2211,7 +2211,7 @@
   },
   {
     "version": "v8.0.0",
-    "date": "Beta",
+    "date": "2026-10-23",
     "content": [
       {
         "type": "add",
@@ -2288,6 +2288,17 @@
           "fr": "Amélioration de l'expérience PWA sur iOS",
           "ru": "Улучшение работы PWA в iOS",
           "pt-BR": "Melhoria da experiência PWA no iOS"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Service Status now covers more well-known internet products",
+          "zh": "「服务可用性」高级工具新增更多知名互联网产品",
+          "zh-TW": "「服務可用性」進階工具新增更多知名網路產品",
+          "fr": "L'outil État des services couvre davantage de produits Internet connus",
+          "ru": "Инструмент «Состояние сервисов» охватывает больше известных интернет-продуктов",
+          "pt-BR": "A ferramenta Status dos serviços agora cobre mais produtos conhecidos da internet"
         }
       },
       {

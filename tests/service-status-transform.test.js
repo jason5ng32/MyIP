@@ -65,6 +65,22 @@ describe('normalizeSummary', () => {
         assert.deepEqual(byName.components.map((c) => c.name), ['Login', 'Standalone']);
     });
 
+    it('rename relabels rows by id after selection, leaving the input untouched', () => {
+        const snapshot = structuredClone(GROUPED);
+        const out = normalizeSummary(GROUPED, { rename: { s1: 'Solo', nope: 'Ignored' } });
+        assert.deepEqual(out.components.map((c) => c.name), ['Core', 'Solo']);
+        assert.deepEqual(GROUPED, snapshot);
+    });
+
+    it('include / exclude still match the upstream names when rename is set', () => {
+        const excluded = normalizeSummary(GROUPED, {
+            flatten: true, exclude: ['Search'], rename: { c1: 'Sign-in', c2: 'Find' },
+        });
+        assert.deepEqual(excluded.components.map((c) => c.name), ['Sign-in', 'Standalone']);
+        const included = normalizeSummary(GROUPED, { include: ['Search'], rename: { c2: 'Find' } });
+        assert.deepEqual(included.components, [{ name: 'Find', status: 'partial_outage' }]);
+    });
+
     it('caps the component list at the internal limit', () => {
         const components = Array.from({ length: 50 }, (_, i) => ({
             id: `c${i}`, name: `svc${i}`, status: 'operational',
@@ -309,6 +325,11 @@ describe('assembleProvider', () => {
         it('still applies the include selector by name', () => {
             const out = assembleProvider({ ...provider, components: { include: ['Codex'] } }, summaryJson, null, structureJson);
             assert.deepEqual(out.components.map((c) => c.name), ['Codex']);
+        });
+
+        it('applies rename to structure rows by id', () => {
+            const out = assembleProvider({ ...provider, components: { rename: { g1: 'Platform APIs' } } }, summaryJson, null, structureJson);
+            assert.deepEqual(out.components.map((c) => c.name), ['Platform APIs', 'Codex']);
         });
 
         it('falls back to the summary components when the structure yields no rows', () => {
