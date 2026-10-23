@@ -13,7 +13,7 @@
 // to http:// or in a loop: any of those fails like a block and reads as
 // "blocked". Bump ADBLOCK_PROBES_VERSION whenever the list changes.
 
-export const ADBLOCK_PROBES_VERSION = '2026-10-19';
+export const ADBLOCK_PROBES_VERSION = '2026-10-23';
 
 export const ADBLOCK_PROBE_GROUPS = [
     {
@@ -49,6 +49,7 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'clarity', name: 'Microsoft Clarity', targets: ['www.clarity.ms', 'c.clarity.ms'] },
             { id: 'hotjar', name: 'Hotjar', targets: ['static.hotjar.com', 'script.hotjar.com', 'insights.hotjar.com'] },
             { id: 'adobe-analytics', name: 'Adobe Analytics', targets: ['assets.adobedtm.com', 'dpm.demdex.net'] },
+            { id: 'hubspot', name: 'HubSpot', targets: ['js.hs-analytics.net', 'track.hubspot.com'] },
             { id: 'mixpanel', name: 'Mixpanel', targets: ['api-js.mixpanel.com', 'cdn.mxpnl.com'] },
             { id: 'segment', name: 'Segment', targets: ['api.segment.io', 'cdn.segment.com'] },
             { id: 'amplitude', name: 'Amplitude', targets: ['api2.amplitude.com', 'cdn.amplitude.com'] },
