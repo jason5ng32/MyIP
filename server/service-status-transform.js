@@ -16,6 +16,7 @@ const COMPONENT_LIMIT = 40;
 //   { include: [names] } ordered whitelist by component name
 //   { exclude: [id|name] } final filter on top of any mode (drops junk rows)
 //   { indicator: 'components' } card light from the selected rows, not the page's
+//   { rename: { id: label } } display label by component id, after selection
 function selectComponents(raw, selector = {}) {
     let picked;
     if (Array.isArray(selector.include)) {
@@ -30,6 +31,12 @@ function selectComponents(raw, selector = {}) {
     if (Array.isArray(selector.exclude) && selector.exclude.length) {
         const blocked = new Set(selector.exclude);
         picked = picked.filter((c) => !blocked.has(c?.id) && !blocked.has(c?.name));
+    }
+
+    const rename = selector.rename;
+    if (rename && typeof rename === 'object') {
+        // Copies, so the upstream rows stay untouched.
+        picked = picked.map((c) => (Object.hasOwn(rename, c?.id) ? { ...c, name: rename[c.id] } : c));
     }
     return picked;
 }
