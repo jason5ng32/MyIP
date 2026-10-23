@@ -214,6 +214,9 @@ const PROVIDERS = [
   { id: 'linear', name: 'Linear', icon: 'simple-icons:linear' },
   { id: 'stripe', name: 'Stripe', icon: 'simple-icons:stripe' },
   { id: 'npm', name: 'npm', icon: 'ri:npmjs-line' },
+  { id: 'perplexity', name: 'Perplexity', icon: 'ri:perplexity-line' },
+  { id: 'canva', name: 'Canva', icon: 'simple-icons:canva' },
+  { id: 'docker', name: 'Docker', icon: 'simple-icons:docker' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];

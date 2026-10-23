@@ -63,6 +63,9 @@ export const STATUS_PROVIDERS = [
         id: 'npm', name: 'npm', api: 'https://status.npmjs.org', page: 'https://status.npmjs.org',
         components: { rename: { mvm98gtxvb9b: 'Official Website' } },
     },
+    { id: 'perplexity', name: 'Perplexity', api: 'https://status.perplexity.com', page: 'https://status.perplexity.com', platform: 'incident.io' },
+    { id: 'canva', name: 'Canva', api: 'https://www.canvastatus.com', page: 'https://www.canvastatus.com' },
+    { id: 'docker', name: 'Docker', api: 'https://www.dockerstatus.com', page: 'https://www.dockerstatus.com', platform: 'incident.io' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

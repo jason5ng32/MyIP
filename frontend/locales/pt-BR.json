@@ -1082,7 +1082,7 @@
     "EnhancedDnsLeakTest": "Captura todos os resolvedores recursivos, com análise de ECS e DNSSEC",
     "RuleTestNote": "Verifique as regras do software de proxy",
     "CensorshipCheck": "Verifique em quais países um site está bloqueado",
-    "ServiceStatus": "Verifique a disponibilidade ao vivo de serviços conhecidos de IA e desenvolvimento, e se um incidente recente explica a falha que você está vendo",
+    "ServiceStatus": "Verifique a disponibilidade ao vivo de produtos conhecidos da internet, e se um incidente recente explica a falha que você está vendo",
     "Whois": "Pesquise informações de registro de domínio/IP/AS",
     "AsnProfile": "Veja o perfil completo de qualquer AS",
     "InvisibilityTest": "Verifique se você está usando proxy ou VPN",
@@ -1760,7 +1760,7 @@
   },
   "serviceStatus": {
     "Title": "Status dos serviços",
-    "Note": "Quando um serviço não abre, talvez o problema não seja seu — o próprio serviço pode estar fora do ar. Atualmente, muitas pessoas usam produtos de IA, e quando o produto de IA não responde, elas não sabem se é problema delas ou do serviço. Esta seção mostra a disponibilidade ao vivo de serviços conhecidos de IA; expanda um cartão para ver o status de cada subserviço e incidentes recentes.",
+    "Note": "Quando um serviço não abre, talvez o problema não seja seu — o próprio serviço pode estar fora do ar. Esta seção mostra a disponibilidade ao vivo de produtos conhecidos da internet, de assistentes de IA a plataformas para desenvolvedores; expanda um cartão para ver o status de cada subserviço e incidentes recentes.",
     "Refresh": "Atualizar status dos serviços",
     "LastChecked": "Última verificação",
     "AllOperational": "Sistemas operando normalmente",
