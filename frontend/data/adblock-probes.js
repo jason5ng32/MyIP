@@ -58,6 +58,7 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'plausible', name: 'Plausible', targets: ['plausible.io'] },
             { id: 'cloudflare-analytics', name: 'Cloudflare Web Analytics', targets: ['cloudflareinsights.com'] },
             { id: 'yandex-metrica', name: 'Yandex Metrica', targets: ['mc.yandex.ru', 'mc.yandex.com'] },
+            { id: 'truehits', name: 'Truehits', targets: ['lvs.truehits.in.th', 'lvs2.truehits.in.th'] },
             { id: 'comscore', name: 'Comscore', targets: ['sb.scorecardresearch.com', 'b.scorecardresearch.com'] },
             { id: 'adjust', name: 'Adjust', targets: ['app.adjust.com'] },
             { id: 'appsflyer', name: 'AppsFlyer', targets: ['t.appsflyer.com', 'events.appsflyer.com'] },
