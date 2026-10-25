@@ -1,6 +1,6 @@
 <!-- Scenario friction details: how it was estimated, then one row per scenario in the card
      dots' order, smoothest first (name + tone dot + verdict). Root blocks sit directly in the
-     IpDetailPanel details frame, which spaces them like the score details and draws the border
+     IpAdvancedBlock details frame, which spaces them like the score details and draws the border
      and the closing Persona Check line. -->
 <template>
     <div>

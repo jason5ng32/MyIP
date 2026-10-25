@@ -1,5 +1,5 @@
 // Client for `/api/asn-connectivity` (CAIDA topology + neighbour lists),
-// used by IpDetailPanel. Fills an owner's session cache keyed by the numeric ASN
+// used by IpAsnBlock. Fills an owner's session cache keyed by the numeric ASN
 // string: `{ graph }` on success, `{ error: true }` on failure — the shape
 // ASNConnectivity.vue reads.
 //

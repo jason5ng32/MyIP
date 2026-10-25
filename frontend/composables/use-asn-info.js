@@ -1,6 +1,6 @@
 // ASN summary from Cloudflare Radar (`/api/cfradar?view=asn`) with a
 // per-owner session cache keyed 'AS<n>'. Owners (IpInfos, QueryIP) each
-// create their own cache with useAsnInfo(); IpDetailPanel fills whichever
+// create their own cache with useAsnInfo(); IpAsnBlock fills whichever
 // cache it is handed through loadAsnInfoInto().
 //
 // Relative imports keep this file importable from the Node test runner.
