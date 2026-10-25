@@ -196,8 +196,8 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 <sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
 </sub>
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
+<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
 
 ----
 
