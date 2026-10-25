@@ -128,7 +128,7 @@
         </template>
 
         <!-- Signed-in: same vertical "label on top, value below" rhythm as the metadata grid,
-             plus the collapsible score-details panel under it (one child for space-y). -->
+             plus the collapsible score / friction details panel under it (one child for space-y). -->
         <div v-else>
             <dl class="grid grid-cols-2 md:grid-cols-2 gap-x-3 gap-y-3 text-sm items-start">
                 <div v-if="showTypeBadge">
@@ -185,65 +185,119 @@
                         <!-- Score-details toggle -->
                         <JnTooltip v-if="hasScoreDetails" :text="t('ipInfos.scoreDetails.toggle')" side="top">
                             <Button variant="ghost" size="icon"
-                                :class="['size-6 -my-1 shrink-0 cursor-pointer', isScoreDetailsOpen && 'bg-muted text-foreground hover:bg-muted']"
-                                @click="toggleScoreDetails" :aria-expanded="isScoreDetailsOpen"
+                                :class="['size-6 -my-1 shrink-0 cursor-pointer', isDetailActive('score') && 'bg-muted text-foreground hover:bg-muted']"
+                                @click="toggleDetail('score')" :aria-expanded="isDetailActive('score')"
                                 :aria-label="t('ipInfos.scoreDetails.toggle')">
                                 <ChevronDown class="size-3.5 transition-transform duration-200"
-                                    :class="isScoreDetailsOpen && 'rotate-180'" />
+                                    :class="isDetailActive('score') && 'rotate-180'" />
+                            </Button>
+                        </JnTooltip>
+                    </dd>
+                </div>
+
+                <div v-if="abuseLevel">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Flag class="size-3.5" />
+                        <span>{{ t('ipInfos.abuseLevel.label') }}</span>
+                    </dt>
+                    <dd class="font-normal wrap-break-word">{{ t('ipInfos.abuseLevel.' + abuseLevel) }}</dd>
+                </div>
+
+                <!-- Scenario friction: one tone dot per scenario, low → high (deliberately not a score
+                     bar); hidden when the answer carries no scenarios. -->
+                <div v-if="hasFriction">
+                    <dt class="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Compass class="size-3.5" />
+                        <span>{{ t('ipInfos.scenarioFriction.label') }}</span>
+                    </dt>
+                    <!-- min-h-5 matches the quality-score row's text line. Dots + chevron form one
+                         left-aligned group: 8px dots at a 4px gap (10 → 116px) that close up rather
+                         than overflow a narrow cell; free space trails, like the text cells. -->
+                    <dd class="flex min-h-5 items-center gap-2">
+                        <div role="img" :aria-label="frictionBreakdown" :title="frictionBreakdown"
+                            class="flex min-w-0 flex-nowrap items-center justify-between"
+                            :style="{ width: `${frictionDotList.length * 12 - 4}px` }">
+                            <span v-for="dot in frictionDotList" :key="dot.id"
+                                class="size-2 shrink-0 rounded-full" :class="dotClass(dot.tone)" />
+                        </div>
+                        <JnTooltip :text="t('ipInfos.scenarioFriction.toggle')" side="top">
+                            <Button variant="ghost" size="icon"
+                                :class="['size-6 -my-1 shrink-0 cursor-pointer', isDetailActive('friction') && 'bg-muted text-foreground hover:bg-muted']"
+                                @click="toggleDetail('friction')" :aria-expanded="isDetailActive('friction')"
+                                :aria-label="t('ipInfos.scenarioFriction.toggle')">
+                                <ChevronDown class="size-3.5 transition-transform duration-200"
+                                    :class="isDetailActive('friction') && 'rotate-180'" />
                             </Button>
                         </JnTooltip>
                     </dd>
                 </div>
             </dl>
 
-            <!-- Score details: plain-language explanation (needs the `dimensions`
-                 block), then every attribute tag. Gated responses have neither. -->
-            <Collapsible v-if="hasScoreDetails" :open="isScoreDetailsOpen" @update:open="isScoreDetailsOpen = $event">
+            <!-- Details frame, one at a time. Score: plain-language explanation (needs the
+                 `dimensions` block), then every attribute tag. Friction: the scenario list. -->
+            <Collapsible :open="isDetailOpen" @update:open="isDetailOpen = $event">
                 <CollapsibleContent>
                     <div class="pt-3">
                         <div class="rounded-md border bg-muted/40 p-3 space-y-3">
-                            <div v-if="scoreExplanation.length">
-                                <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.explainTitle') }}</p>
-                                <!-- One i18n template per sentence; slots keep the IP under the info-mask blur. -->
-                                <p class="text-xs leading-relaxed text-muted-foreground">
-                                    <template v-for="(sentence, i) in scoreExplanation" :key="sentence.key">
-                                        <I18nT :keypath="sentence.key" tag="span" scope="global">
-                                            <template #ip><span data-mask="ip" class="font-medium text-foreground">{{ sentence.params.ip }}</span></template>
-                                            <template #operator><span class="text-foreground">{{ sentence.params.operator }}</span></template>
-                                            <template #score><span class="font-medium text-foreground tabular-nums">{{ sentence.params.score }}</span></template>
-                                            <template #date>{{ sentence.params.date }}</template>
-                                        </I18nT>{{ i === scoreExplanation.length - 1 ? '' : sentenceGap }}
-                                    </template>
+                            <template v-if="openDetail === 'score'">
+                                <div v-if="scoreExplanation.length">
+                                    <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.explainTitle') }}</p>
+                                    <!-- One i18n template per sentence; slots keep the IP under the info-mask blur. -->
+                                    <p class="text-xs leading-relaxed text-muted-foreground">
+                                        <template v-for="(sentence, i) in scoreExplanation" :key="sentence.key">
+                                            <I18nT :keypath="sentence.key" tag="span" scope="global">
+                                                <template #ip><span data-mask="ip" class="font-medium text-foreground">{{ sentence.params.ip }}</span></template>
+                                                <template #operator><span class="text-foreground">{{ sentence.params.operator }}</span></template>
+                                                <template #score><span class="font-medium text-foreground tabular-nums">{{ sentence.params.score }}</span></template>
+                                                <template #date>{{ sentence.params.date }}</template>
+                                            </I18nT>{{ i === scoreExplanation.length - 1 ? '' : sentenceGap }}
+                                        </template>
+                                    </p>
+                                </div>
+
+                                <!-- All attributes: label + check / cross / question mark. -->
+                                <div v-if="scoreTagRows.length" :class="scoreExplanation.length && 'border-t pt-3'">
+                                    <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.tagsTitle') }}</p>
+                                    <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                                        <div v-for="tag in scoreTagRows" :key="tag.key"
+                                            class="flex items-center justify-between gap-2 min-w-0">
+                                            <dt class="text-muted-foreground min-w-0 wrap-break-word">
+                                                {{ t('ipInfos.scoreDetails.tags.' + tag.key) }}
+                                            </dt>
+                                            <!-- One neutral tone for every state: a tag is a fact, not a verdict. -->
+                                            <dd class="shrink-0 text-foreground">
+                                                <component :is="TAG_STATE_ICONS[tag.state]" class="size-3.5" aria-hidden="true" />
+                                                <span class="sr-only">{{ t('ipInfos.scoreDetails.tagState.' + tag.state) }}</span>
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+
+                                <!-- Point to a blocklist check of this IP. -->
+                                <p v-if="blocklistHref"
+                                    class="border-t pt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-muted-foreground">
+                                    <span>{{ t('ipInfos.scoreDetails.blocklistHint') }}</span>
+                                    <a :href="blocklistHref" @click="openBlocklist"
+                                        class="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline">
+                                        {{ t('ipInfos.scoreDetails.blocklistLink') }}<ArrowRight class="size-3" />
+                                    </a>
                                 </p>
-                            </div>
+                            </template>
 
-                            <!-- All attributes: label + check / cross / question mark. -->
-                            <div v-if="scoreTagRows.length" :class="scoreExplanation.length && 'border-t pt-3'">
-                                <p class="text-xs text-muted-foreground mb-1.5">{{ t('ipInfos.scoreDetails.tagsTitle') }}</p>
-                                <dl class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-                                    <div v-for="tag in scoreTagRows" :key="tag.key"
-                                        class="flex items-center justify-between gap-2 min-w-0">
-                                        <dt class="text-muted-foreground min-w-0 wrap-break-word">
-                                            {{ t('ipInfos.scoreDetails.tags.' + tag.key) }}
-                                        </dt>
-                                        <!-- One neutral tone for every state: a tag is a fact, not a verdict. -->
-                                        <dd class="shrink-0 text-foreground">
-                                            <component :is="TAG_STATE_ICONS[tag.state]" class="size-3.5" aria-hidden="true" />
-                                            <span class="sr-only">{{ t('ipInfos.scoreDetails.tagState.' + tag.state) }}</span>
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </div>
+                            <template v-else-if="openDetail === 'friction' && hasFriction">
+                                <ScenarioFrictionPanel :scenarios="data.frictionScenarios"
+                                    :country-name="data.country_name || ''" />
 
-                            <!-- Point to a blocklist check of this IP. -->
-                            <p v-if="blocklistHref"
-                                class="border-t pt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-muted-foreground">
-                                <span>{{ t('ipInfos.scoreDetails.blocklistHint') }}</span>
-                                <a :href="blocklistHref" @click="openBlocklist"
-                                    class="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline">
-                                    {{ t('ipInfos.scoreDetails.blocklistLink') }}<ArrowRight class="size-3" />
-                                </a>
-                            </p>
+                                <!-- Point to a Persona Check of this browser. -->
+                                <p v-if="personacheckHref"
+                                    class="border-t pt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs leading-relaxed text-muted-foreground">
+                                    <span>{{ t('ipInfos.scenarioFriction.personaHint') }}</span>
+                                    <a :href="personacheckHref" @click="openPersonacheck"
+                                        class="inline-flex items-center gap-0.5 font-medium text-foreground underline-offset-2 hover:underline">
+                                        {{ t('ipInfos.scenarioFriction.personaLink') }}<ArrowRight class="size-3" />
+                                    </a>
+                                </p>
+                            </template>
                         </div>
                     </div>
                 </CollapsibleContent>
@@ -332,12 +386,15 @@ import { buildScoreExplanation, listScoreTags } from '@/utils/ip/ip-score-detail
 import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { isPlainClick } from '@/utils/nav-target.js';
+import { useStatusTone } from '@/composables/use-status-tone.js';
+import { frictionDots, frictionShares } from '@/utils/features/scenario-friction.js';
 import ASNInfo from './ASNInfo.vue';
 import ASNHistory from './ASNHistory.vue';
 import CountryTraffic from './CountryTraffic.vue';
 import CountryTrafficPanel from './CountryTrafficPanel.vue';
 import LocationMap from './LocationMap.vue';
 import LocationMapPanel from './LocationMapPanel.vue';
+import ScenarioFrictionPanel from './ScenarioFrictionPanel.vue';
 // ASNConnectivity is heavy (dagre + SVG render); async-import so it
 // only enters the bundle when a user opens the Connectivity panel.
 import { defineAsyncComponent } from 'vue';
@@ -365,8 +422,10 @@ import {
     Lock,
     Map,
     MapPin,
+    Compass,
     ShieldCheck,
     SignalHigh,
+    Flag,
     X,
     CircleQuestionMark,
     Clock,
@@ -399,7 +458,7 @@ const props = defineProps({
 });
 
 // A host dialog listens to close itself first: before the Benefits & Usage
-// dialog stacks on it (`view-usage`) or a tool link (ASN Profile, Blocklist Check) changes page (`open-tool`).
+// dialog stacks on it (`view-usage`) or a tool link (ASN Profile, Blocklist Check, Persona Check) changes page (`open-tool`).
 const emit = defineEmits(['view-usage', 'open-tool']);
 
 const openUsageDialog = () => {
@@ -502,13 +561,46 @@ const hasScoreDetails = computed(() =>
 // CJK sentences run together; others take a space.
 const sentenceGap = computed(() => (/^(zh|ja|ko)/.test(locale.value) ? '' : ' '));
 
-const isScoreDetailsOpen = ref(false);
-const toggleScoreDetails = () => {
-    if (!isScoreDetailsOpen.value) trackEvent('IPCheck', 'ScoreDetailsClick', 'Show Score Details');
-    isScoreDetailsOpen.value = !isScoreDetailsOpen.value;
+// Abuse level from the v3 reputation dimension (`ipInfos.abuseLevel.*`); anything else hides the cell.
+const ABUSE_LEVELS = ['none', 'low', 'medium', 'high'];
+const abuseLevel = computed(() => {
+    const level = props.data.scoreDimensions?.reputation?.level;
+    return ABUSE_LEVELS.includes(level) ? level : '';
+});
+
+// Scenario friction: normalized scenarios (transform-ip-data.js), one dot each.
+const { dotClass } = useStatusTone();
+const hasFriction = computed(() =>
+    Array.isArray(props.data.frictionScenarios) && props.data.frictionScenarios.length > 0
+);
+const frictionList = computed(() => (hasFriction.value ? props.data.frictionScenarios : []));
+const frictionCounts = computed(() => frictionShares(frictionList.value));
+const frictionDotList = computed(() => frictionDots(frictionList.value));
+const frictionBreakdown = computed(() => t('ipInfos.scenarioFriction.breakdown', {
+    smooth: frictionCounts.value.smooth,
+    checks: frictionCounts.value.checks,
+    restricted: frictionCounts.value.restricted,
+}));
+
+// Single-select details frame ('score' | 'friction') — same open/content split as
+// the ASN block, so the close animation keeps its content.
+const openDetail = ref(null);
+const isDetailOpen = ref(false);
+const isDetailActive = (name) => isDetailOpen.value && openDetail.value === name;
+const toggleDetail = (name) => {
+    if (isDetailActive(name)) {
+        isDetailOpen.value = false;
+        return;
+    }
+    if (name === 'score') trackEvent('IPCheck', 'ScoreDetailsClick', 'Show Score Details');
+    else trackEvent('IPCheck', 'ScenarioFrictionClick', 'Show Scenario Friction');
+    openDetail.value = name;
+    isDetailOpen.value = true;
 };
 // A different IP starts collapsed.
-watch(() => props.data.ip, () => { isScoreDetailsOpen.value = false; });
+watch(() => props.data.ip, () => { isDetailOpen.value = false; });
+// A refresh without scenarios closes their frame instead of leaving it empty.
+watch(hasFriction, (has) => { if (!has && openDetail.value === 'friction') isDetailOpen.value = false; });
 
 // Blocklist Check entry: hidden when the tool is gated off; `q` only prefills.
 const router = useRouter();
@@ -523,6 +615,18 @@ const openBlocklist = (e) => {
     trackEvent('IPCheck', 'BlocklistCTAClick', 'Open Blocklist Check');
     emit('open-tool');
     router.push({ path: '/tools/blocklist', query: { q: props.data.ip } });
+};
+
+// Persona Check invitation closing the friction details: dropped when the tool is gated off.
+const personacheckHref = computed(() => (
+    isToolAvailable(TOOL_BY_SLUG.get('personacheck'), props.configs) ? '/tools/personacheck' : ''
+));
+const openPersonacheck = (e) => {
+    if (!isPlainClick(e)) return;
+    e.preventDefault();
+    trackEvent('IPCheck', 'PersonaCheckCTAClick', 'Open Persona Check');
+    emit('open-tool');
+    router.push({ path: '/tools/personacheck' });
 };
 
 // Consumer opt-in + a Cloudflare key on the deployment + a country to query.

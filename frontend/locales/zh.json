@@ -1751,6 +1751,48 @@
         "isNative": "原生性"
       }
     },
+    "abuseLevel": {
+      "label": "滥用行为",
+      "none": "未检测到",
+      "low": "较少",
+      "medium": "中等",
+      "high": "较多"
+    },
+    "scenarioFriction": {
+      "label": "场景摩擦",
+      "toggle": "场景摩擦详情",
+      "breakdown": "{smooth} 项顺畅 · {checks} 项需额外验证 · {restricted} 项可能被限制",
+      "introTitle": "场景摩擦解析",
+      "intro": "你可能会用这个 IP 进行各种浏览或工作，不同场景下，它与平台之间的摩擦程度可能不同。我们综合这个 IP 的网络类型、匿名性、滥用记录和所在地，估算各类平台可能会如何对待它。",
+      "listTitle": "各场景",
+      "scenarios": {
+        "signup": "账号注册与登录",
+        "payments": "购物与支付",
+        "finance": "银行与金融",
+        "streaming": "流媒体与区域内容",
+        "availability": "国际服务可用性",
+        "browsing": "日常浏览",
+        "posting": "发帖与评论",
+        "localSocial": "以本地身份运营社交媒体",
+        "localSocialIn": "以{country}本地身份运营社交媒体",
+        "automation": "自动化与爬虫",
+        "email": "自建邮件发信"
+      },
+      "verdict": {
+        "default": {
+          "low": "顺畅",
+          "medium": "需额外验证",
+          "high": "可能被限制"
+        },
+        "availability": {
+          "low": "可用",
+          "medium": "受限",
+          "high": "可能被封锁"
+        }
+      },
+      "personaHint": "除了 IP，平台还会参考多个因素来判断触发何种限制。想知道你当前综合画像和你预期的是否一致？",
+      "personaLink": "运行深度画像检测"
+    },
     "countryTraffic": {
       "subtitle": "该国家/地区的每周网络活跃分布—— 你可以选择仅看人类所产生的流量或全部流量（包含机器人/自动化流量）。",
       "human": "仅人类流量",

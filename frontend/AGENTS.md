@@ -132,7 +132,7 @@ package — drop the dependency, import from `@/lib/utils`.
 ### Design tokens
 
 `style/style.css`: `--info` (waiting) · `--success` (ok-fast) · `--warning`
-(ok-slow) · `--action` (run), each with `-foreground`; semantic tokens only,
+(ok-slow; `/50` for ok-mild) · `--action` (run), each with `-foreground`; semantic tokens only,
 never `dark:` pairs. Button adds `action` / `success`; Badge adds `success`,
 hover disabled (wrap it to interact). FAB colors: `action` trigger, `default`
 stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
@@ -140,7 +140,7 @@ stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
 ### Status tones
 
 Every "business state → color" mapping goes through `use-status-tone.js`
-(`wait` / `ok-fast` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
+(`wait` / `ok-fast` / `ok-mild` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
 
 ### Canonical patterns — copy the named exemplar, don't re-invent
 

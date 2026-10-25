@@ -1751,6 +1751,48 @@
         "isNative": "ASN 與地理位置一致性"
       }
     },
+    "abuseLevel": {
+      "label": "濫用行為",
+      "none": "未偵測到",
+      "low": "較少",
+      "medium": "中等",
+      "high": "較多"
+    },
+    "scenarioFriction": {
+      "label": "場景摩擦",
+      "toggle": "場景摩擦詳情",
+      "breakdown": "{smooth} 項順暢 · {checks} 項需額外驗證 · {restricted} 項可能被限制",
+      "introTitle": "場景摩擦解析",
+      "intro": "你可能會用這個 IP 進行各種瀏覽或工作，不同場景下，它與平台之間的摩擦程度可能不同。我們綜合這個 IP 的網路類型、匿名性、濫用紀錄和所在地，估算各類平台可能會如何對待它。",
+      "listTitle": "各場景",
+      "scenarios": {
+        "signup": "帳號註冊與登入",
+        "payments": "購物與支付",
+        "finance": "銀行與金融",
+        "streaming": "串流與區域內容",
+        "availability": "國際服務可用性",
+        "browsing": "日常瀏覽",
+        "posting": "發文與留言",
+        "localSocial": "以在地身分經營社群媒體",
+        "localSocialIn": "以{country}在地身分經營社群媒體",
+        "automation": "自動化與爬蟲",
+        "email": "自架郵件寄信"
+      },
+      "verdict": {
+        "default": {
+          "low": "順暢",
+          "medium": "需額外驗證",
+          "high": "可能被限制"
+        },
+        "availability": {
+          "low": "可用",
+          "medium": "受限",
+          "high": "可能被封鎖"
+        }
+      },
+      "personaHint": "除了 IP，平台還會參考多個因素來判斷觸發何種限制。想知道你目前的綜合畫像是否與你的預期一致？",
+      "personaLink": "執行深度畫像檢測"
+    },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",
       "human": "僅人類流量",

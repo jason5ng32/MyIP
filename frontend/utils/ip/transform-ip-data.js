@@ -1,4 +1,5 @@
 import getCountryName from '../../data/country-name.js';
+import { normalizeScenarios } from '../features/scenario-friction.js';
 
 // The static map renders at zoom 3 (continent scale), where ~0.176° spans a
 // single pixel. Quantizing the request coords to 1 decimal (~0.1°, sub-pixel)
@@ -96,11 +97,13 @@ function extractAdvancedData(advancedData = {}, t) {
     const scoreTags = isPlainObject(advancedData.tags) ? advancedData.tags : undefined;
     const scoreDimensions = isPlainObject(advancedData.dimensions) ? advancedData.dimensions : undefined;
     const scoreVersion = Number.isFinite(advancedData.scoreVersion) ? advancedData.scoreVersion : undefined;
+    // Scenario friction items; null when the answer carries none.
+    const frictionScenarios = normalizeScenarios(advancedData.scenarios);
 
     return {
         anonymity, anonymityCode, anonymityProvider, anonymityProtocol,
         type, qualityScore, isNativeIP, ipTypeCode,
-        scoreTags, scoreDimensions, scoreVersion,
+        scoreTags, scoreDimensions, scoreVersion, frictionScenarios,
     };
 }
 

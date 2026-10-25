@@ -1751,6 +1751,48 @@
         "isNative": "Alinhamento ASN-Geo"
       }
     },
+    "abuseLevel": {
+      "label": "Atividade abusiva",
+      "none": "Não detectada",
+      "low": "Ocasional",
+      "medium": "Moderada",
+      "high": "Frequente"
+    },
+    "scenarioFriction": {
+      "label": "Atrito por cenário",
+      "toggle": "Detalhes do atrito",
+      "breakdown": "Sem problemas: {smooth} · Verificações extras: {checks} · Pode ser restrito: {restricted}",
+      "introTitle": "Atrito por cenário, em detalhe",
+      "intro": "Você pode usar este IP para todo tipo de navegação ou trabalho, e o atrito entre ele e as plataformas pode variar de um cenário para outro. Combinamos o tipo de rede, o anonimato, o histórico de abuso e a localização deste IP para estimar como as plataformas devem tratá-lo.",
+      "listTitle": "Por cenário",
+      "scenarios": {
+        "signup": "Cadastro e login",
+        "payments": "Compras e pagamentos",
+        "finance": "Bancos e finanças",
+        "streaming": "Streaming e conteúdo regional",
+        "availability": "Disponibilidade de serviços internacionais",
+        "browsing": "Navegação no dia a dia",
+        "posting": "Publicações e comentários",
+        "localSocial": "Redes sociais como usuário local",
+        "localSocialIn": "Redes sociais como usuário local ({country})",
+        "automation": "Automação e scraping",
+        "email": "Envio de e-mail auto-hospedado"
+      },
+      "verdict": {
+        "default": {
+          "low": "Sem problemas",
+          "medium": "Verificações extras",
+          "high": "Pode ser restrito"
+        },
+        "availability": {
+          "low": "Disponível",
+          "medium": "Limitado",
+          "high": "Pode ser bloqueado"
+        }
+      },
+      "personaHint": "Além do IP, as plataformas consideram vários outros fatores para decidir quais limites aplicar. Quer saber se o seu perfil geral corresponde ao que você espera?",
+      "personaLink": "Fazer a verificação de persona"
+    },
     "countryTraffic": {
       "subtitle": "Distribuição semanal da atividade online deste país/região — veja apenas o tráfego gerado por humanos ou todo o tráfego (incluindo bots/tráfego automatizado).",
       "human": "Somente humanos",

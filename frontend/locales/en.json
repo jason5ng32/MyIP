@@ -1751,6 +1751,48 @@
         "isNative": "ASN-Geo match"
       }
     },
+    "abuseLevel": {
+      "label": "Abuse activity",
+      "none": "Not detected",
+      "low": "Occasional",
+      "medium": "Moderate",
+      "high": "Frequent"
+    },
+    "scenarioFriction": {
+      "label": "Scenario friction",
+      "toggle": "Friction details",
+      "breakdown": "{smooth} smooth · {checks} extra checks · {restricted} may be restricted",
+      "introTitle": "Scenario friction explained",
+      "intro": "You may use this IP for all kinds of browsing and work, and the friction between this IP and platforms can differ from one scenario to the next. We combine this IP's network type, anonymity, abuse history and location to estimate how platforms are likely to treat it.",
+      "listTitle": "By scenario",
+      "scenarios": {
+        "signup": "Account sign-up & login",
+        "payments": "Shopping & payments",
+        "finance": "Banking & finance",
+        "streaming": "Streaming & regional content",
+        "availability": "International service availability",
+        "browsing": "Everyday browsing",
+        "posting": "Posting & comments",
+        "localSocial": "Social media as a local user",
+        "localSocialIn": "Social media as a local in {country}",
+        "automation": "Automation & scraping",
+        "email": "Self-hosted email sending"
+      },
+      "verdict": {
+        "default": {
+          "low": "Smooth",
+          "medium": "Extra checks",
+          "high": "May be restricted"
+        },
+        "availability": {
+          "low": "Available",
+          "medium": "Limited",
+          "high": "May be blocked"
+        }
+      },
+      "personaHint": "Besides the IP, platforms weigh several other factors when deciding which limits to apply. Want to know whether your overall profile matches what you expect?",
+      "personaLink": "Run Persona Check"
+    },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",
       "human": "Human Only",

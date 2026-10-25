@@ -1751,6 +1751,48 @@
         "isNative": "Correspondance ASN-Geo"
       }
     },
+    "abuseLevel": {
+      "label": "Activité abusive",
+      "none": "Non détectée",
+      "low": "Occasionnelle",
+      "medium": "Modérée",
+      "high": "Fréquente"
+    },
+    "scenarioFriction": {
+      "label": "Friction par scénario",
+      "toggle": "Détails de la friction",
+      "breakdown": "Fluide : {smooth} · Vérifications en plus : {checks} · Peut être restreint : {restricted}",
+      "introTitle": "Friction par scénario, en détail",
+      "intro": "Vous utilisez peut-être cette IP pour toutes sortes de navigation et de travail ; selon le scénario, la friction entre cette IP et les plateformes peut varier. Nous combinons le type de réseau, l'anonymisation, l'historique d'abus et la localisation de cette IP pour estimer comment les plateformes sont susceptibles de la traiter.",
+      "listTitle": "Par scénario",
+      "scenarios": {
+        "signup": "Inscription et connexion",
+        "payments": "Achats et paiements",
+        "finance": "Banque et finance",
+        "streaming": "Streaming et contenus régionaux",
+        "availability": "Disponibilité des services internationaux",
+        "browsing": "Navigation courante",
+        "posting": "Publications et commentaires",
+        "localSocial": "Réseaux sociaux en tant qu'utilisateur local",
+        "localSocialIn": "Réseaux sociaux en tant qu'utilisateur local ({country})",
+        "automation": "Automatisation et scraping",
+        "email": "Envoi d'e-mails auto-hébergé"
+      },
+      "verdict": {
+        "default": {
+          "low": "Fluide",
+          "medium": "Vérifications en plus",
+          "high": "Peut être restreint"
+        },
+        "availability": {
+          "low": "Disponible",
+          "medium": "Limité",
+          "high": "Peut être bloqué"
+        }
+      },
+      "personaHint": "Au-delà de l'IP, les plateformes tiennent compte de plusieurs facteurs pour décider des restrictions à appliquer. Vous voulez savoir si votre profil global correspond à ce que vous attendez ?",
+      "personaLink": "Lancer la vérification de persona"
+    },
     "countryTraffic": {
       "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",
       "human": "Humains uniquement",
