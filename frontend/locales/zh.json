@@ -1776,7 +1776,7 @@
         "localSocial": "以本地身份运营社交媒体",
         "localSocialIn": "以{country}本地身份运营社交媒体",
         "automation": "自动化与爬虫",
-        "email": "自建邮件发信"
+        "email": "自建邮件发信服务"
       },
       "verdict": {
         "default": {
