@@ -1,0 +1,2186 @@
+{
+  "user": {
+    "SignIn": "Anmelden",
+    "SignInWithGoogle": "Mit Google anmelden",
+    "SignInWithGithub": "Mit GitHub anmelden",
+    "SignOut": "Abmelden",
+    "SignInToView": "Zum Anzeigen anmelden",
+    "SignInToUse": "Bitte melden Sie sich an, um diese Funktion zu nutzen",
+    "InvalidUserToken": "Ungültiges Benutzer-Token",
+    "QuotaExceeded": "Sie haben das kostenlose Monatskontingent für diese Funktion aufgebraucht. Es wird nächsten Monat automatisch zurückgesetzt.",
+    "QuotaSponsorCta": "Sponsern",
+    "ViewUsage": "Nutzung anzeigen",
+    "Usage": {
+      "Title": "Nutzungsstatistik",
+      "Note": "Erweiterte Funktionen haben ein kostenloses Monatskontingent, das zu Beginn jedes Monats (UTC) automatisch zurückgesetzt wird. Wiederholte Abfragen erweiterter IP-Daten werden aus dem Cache bedient und belasten Ihr Kontingent nicht.",
+      "IpinfoFeature": "Erweiterte IP-Daten",
+      "PercentUsed": "{percent} % genutzt",
+      "SponsorNote": "Sponsoring auf GitHub erhöht Ihre Monatskontingente."
+    },
+    "MyAchievements": "Meine Erfolge",
+    "Fields": {
+      "User": "Benutzer",
+      "CreatedAt": "Erstellt am",
+      "LastLogin": "Letzte Anmeldung",
+      "Level": "Benutzerstufe",
+      "Fetching": "Wird abgerufen...",
+      "SignInMethods": "Anmeldung"
+    },
+    "Level": {
+      "Standard": "Standardbenutzer",
+      "Premium": "Premium-Benutzer",
+      "Owner": "Administrator",
+      "Developer": "Entwickler",
+      "HonoraryMember": "Ehrenmitglied"
+    },
+    "Benefits": {
+      "Title": "Vorteile & Nutzung",
+      "Benefit": "Vorteile",
+      "Note1": "Als Open-Source-Produkt ist IPCheck.ing kostenlos nutzbar. Der Betrieb kostet jedoch viel Aufwand und Geld.",
+      "Note2": "Damit das Projekt nachhaltig weiterläuft und Missbrauch verhindert wird, erfordern einige erweiterte Funktionen eine Anmeldung. Jeder angemeldete Benutzer erhält ein großzügiges Monatskontingent – reicht es Ihnen nicht, können Sie uns sponsern und höhere Limits freischalten.",
+      "Current": "Aktuell",
+      "Tiers": {
+        "Visitor": {
+          "Name": "Besucher",
+          "Item1": "IP-Abfrage mit Vergleich mehrerer Quellen",
+          "Item2": "Prüfung von Konnektivität und Dienstverfügbarkeit",
+          "Item3": "WebRTC-/DNS-Leak-Tests",
+          "Item4": "Speedtest, globale Latenz und MTR",
+          "Item5": "Whois, DNS-Resolver und weitere erweiterte Tools",
+          "Item6": "Keine Registrierung nötig – Open Source und selbst hostbar"
+        },
+        "SignedIn": {
+          "Name": "Angemeldete Benutzer",
+          "Item1": "Alles aus „Besucher“",
+          "Item2": "Erweiterte IP-Daten ansehen: Qualitätsscore, Proxy-Erkennung, Netzwerktyp und Nativität",
+          "Item3": "Unsichtbarkeitstest nutzen",
+          "Item4": "Ausführlichen DNS-Leak-Test nutzen",
+          "Item5": "Ihre Erfolgsabzeichen ansehen",
+          "Item6": "IPilot fragen, unseren KI-Assistenten",
+          "Item7": "Erweiterte Funktionen mit kostenlosem Monatskontingent, das jeden Monat zurückgesetzt wird"
+        },
+        "Sponsor": {
+          "Name": "Sponsoren",
+          "Item1": "Alles aus „Angemeldete Benutzer“",
+          "Item2": "Höhere Monatskontingente für erweiterte Funktionen",
+          "Item3": "Unterstützen Sie die Weiterentwicklung dieses Open-Source-Projekts"
+        }
+      }
+    },
+    "Achievements": {
+      "Title": "Erfolge",
+      "Note": "Während Sie IPCheck.ing nutzen, können Sie Erfolge freischalten. Hier sehen Sie alle Ihre Erfolge.",
+      "Get": "Erreicht",
+      "GetCount": "Erreichte Erfolge",
+      "NotGet": "Noch offen",
+      "NotGetCount": "Offene Erfolge",
+      "FooterNote": "Gelegentlich gibt es zeitlich begrenzte Erfolge.",
+      "Congrats": "🎉 Glückwunsch",
+      "CongratsMessage": "Sie haben einen neuen Erfolg freigeschaltet!",
+      "NewAchievementIs": "Der neue Erfolg lautet:",
+      "Type": {
+        "IAmHuman": {
+          "Title": "Ich bin ein Mensch",
+          "Meet": "IPCheck.ing angemeldet nutzen"
+        },
+        "BarelyEnough": {
+          "Title": "Gerade so genug",
+          "Meet": "Download-Geschwindigkeit über 100 Mbit/s"
+        },
+        "RapidPace": {
+          "Title": "Rasantes Tempo",
+          "Meet": "Download-Geschwindigkeit über 500 Mbit/s"
+        },
+        "TorrentFlow": {
+          "Title": "Reißender Strom",
+          "Meet": "Download-Geschwindigkeit über 1000 Mbit/s"
+        },
+        "SteadyGoing": {
+          "Title": "Stetig voran",
+          "Meet": "Upload-Geschwindigkeit über 50 Mbit/s"
+        },
+        "TooFastTooSimple": {
+          "Title": "Too Fast Too Simple",
+          "Meet": "Upload-Geschwindigkeit über 200 Mbit/s"
+        },
+        "SwiftAscent": {
+          "Title": "Steiler Aufstieg",
+          "Meet": "Upload-Geschwindigkeit über 1000 Mbit/s"
+        },
+        "SurfaceCheck": {
+          "Title": "Oberflächencheck",
+          "Meet": "Einen Punkt der Sicherheits-Checkliste abschließen"
+        },
+        "HalfwayThere": {
+          "Title": "Halbzeit",
+          "Meet": "50 % der Sicherheits-Checkliste abschließen"
+        },
+        "FullySecured": {
+          "Title": "Rundum abgesichert",
+          "Meet": "Die gesamte Sicherheits-Checkliste abschließen"
+        },
+        "JustInCase": {
+          "Title": "Sicher ist sicher",
+          "Meet": "Einen Tarnungstest abschließen"
+        },
+        "HiddenWell": {
+          "Title": "Gut versteckt",
+          "Meet": "Proxy- und VPN-Wahrscheinlichkeit im Tarnungstest beide bei 0"
+        },
+        "SlipUp": {
+          "Title": "Ausgerutscht",
+          "Meet": "Proxy- oder VPN-Wahrscheinlichkeit im Tarnungstest über 50 %"
+        },
+        "CleverTrickery": {
+          "Title": "Trickkiste",
+          "Meet": "Alle Tastenkürzel angesehen"
+        },
+        "EnergySaver": {
+          "Title": "Energiesparer",
+          "Meet": "Autostart des Programms deaktiviert"
+        },
+        "ResourceHog": {
+          "Title": "Ressourcenfresser",
+          "Meet": "Mehrfache Prüfung für die Verfügbarkeit aktiviert"
+        },
+        "MakingBigNews": {
+          "Title": "Ganz groß raus",
+          "Meet": "Mehr als 1000 Aufrufe erweiterter Funktionen"
+        },
+        "GenerousDonor": {
+          "Title": "Großzügiger Spender",
+          "Meet": "Für das Projekt IPCheck.ing gespendet"
+        },
+        "ItIsOpen": {
+          "Title": "Hier ist offen",
+          "Meet": "Eine gesperrte Website im Zensur-Check gefunden"
+        },
+        "CuriousCat": {
+          "Title": "Neugierige Katze",
+          "Meet": "IPCheck.ing in der Whois-Abfrage nachgeschlagen"
+        },
+        "CrossingTheWall": {
+          "Title": "Über die Mauer",
+          "Meet": "Alle 8 Test-IPs im Regeltest sind unterschiedlich"
+        },
+        "GlobeTrotter": {
+          "Title": "Weltenbummler",
+          "Meet": "10 Länder oder Regionen im IP-Verlauf erreichen"
+        },
+        "HelloWorld": {
+          "Title": "Hallo Welt",
+          "Meet": "Einen Status auf Earth Online teilen"
+        },
+        "AddSweetAdd": {
+          "Title": "Add Sweet Add",
+          "Meet": "Ein eigenes Ziel im Konnektivitätstest hinzufügen"
+        },
+        "PrettyDirty": {
+          "Title": "Ganz schön schmutzig",
+          "Meet": "Eine IP-Karte zeigt einen Qualitätsscore von 1"
+        },
+        "SqueakyClean": {
+          "Title": "Blitzsauber",
+          "Meet": "Eine IP-Karte zeigt einen Qualitätsscore von 100"
+        },
+        "WalkWithPenguins": {
+          "Title": "Unter Pinguinen",
+          "Meet": "Eine IP-Karte verortet Sie in der Antarktis"
+        }
+      }
+    }
+  },
+  "nav": {
+    "id": "nav",
+    "Navigation": "Navigation",
+    "Home": "Start",
+    "IPInfo": "IP-Infos",
+    "Connectivity": "Konnektivität",
+    "ServiceStatus": "Dienststatus",
+    "WebRTC": "WebRTC-Leak-Test",
+    "DNSLeakTest": "DNS-Leak-Test",
+    "SpeedTest": "Speedtest",
+    "AdvancedTools": "Erweiterte Tools",
+    "SearchDocs": "Doku durchsuchen…",
+    "DocsToolConfirm": "Ihre aktuellen Testergebnisse teilen?",
+    "DocsToolSummary": "Ihre Ergebnisse auf der Seite gelesen",
+    "DocsToolRunConfirm": "Tests auf Ihrer Seite ausführen?",
+    "DocsToolRunSummary": "Ihre Netzwerktests ausgeführt",
+    "AskIPilot": "IPilot fragen",
+    "OpenDocs": "Doku öffnen",
+    "DocsGreetingTitle": "Wie kann ich helfen?",
+    "DocsGreetingSubtitle": "Fragen Sie mich alles zu MyIP – zu den Tools, Ihren Ergebnissen oder zum Self-Hosting.",
+    "DocsQuestions": [
+      "Verrät mein VPN meine echte IP?",
+      "Warum ist mein IP-Standort falsch?",
+      "Vergleiche meine Ergebnisse aus WebRTC-Test und DNS-Leak-Test und gib mir Empfehlungen",
+      "Wie lese ich MTR-Ergebnisse?",
+      "Wie betreibe ich mein eigenes MyIP?",
+      "Ich möchte das MyIP-Projekt sponsern"
+    ],
+    "pulse": {
+      "title": "Earth Online",
+      "tooltip": "Besucher aus aller Welt",
+      "others": "Andere",
+      "shareStatus": "Status teilen",
+      "liveMap": "Live-Heatmap der Besucher",
+      "noVisitors": "Noch keine Besucher",
+      "quiet": "Gerade alles ruhig – machen Sie den Anfang und teilen Sie Ihren Status",
+      "loadError": "Die neuesten Aktivitäten konnten nicht geladen werden – bitte gleich noch einmal versuchen",
+      "share": "Besucheranteil",
+      "latest": "Neueste",
+      "sent": "Gesendet",
+      "alreadySent": "Dieser Status wurde bereits gesendet",
+      "rateLimited": "In kurzer Zeit kann nur ein Status geteilt werden",
+      "limitedTitle": "Zeitlich begrenzter Status",
+      "outages": {
+        "title": "Weltweite Ausfälle",
+        "outage": "Internetausfall",
+        "anomaly": "Traffic-Anomalie",
+        "ongoing": "Andauernd",
+        "ended": "Behoben",
+        "started": "Begonnen {time}",
+        "lasted": "Dauer: {duration}",
+        "quiet": "Alles ruhig – keine Ausfälle in den letzten 30 Tagen",
+        "loadMore": "Mehr laden",
+        "cause": {
+          "GOVERNMENT_DIRECTED": "Staatlich angeordnet",
+          "POWER_OUTAGE": "Stromausfall",
+          "CABLE_CUT": "Kabelbruch",
+          "TECHNICAL_PROBLEM": "Technisches Problem",
+          "MECHANICAL": "Mechanisches Problem",
+          "UNKNOWN": "Unbekannte Ursache",
+          "WEATHER": "Unwetter",
+          "FIRE": "Brand",
+          "CYBERATTACK": "Cyberangriff",
+          "NATURAL_DISASTER": "Naturkatastrophe",
+          "MAINTENANCE": "Wartung",
+          "MILITARY_ACTION": "Militärische Handlung"
+        },
+        "level": {
+          "NATIONWIDE": "Landesweit",
+          "REGIONAL": "Regional",
+          "NETWORK": "Netzwerk",
+          "PLATFORM": "Plattform"
+        }
+      },
+      "statuses": {
+        "fast": "Rasend schnelles Netz",
+        "ok": "Hier läuft alles",
+        "slow": "Das Netz fühlt sich lahm an",
+        "flaky": "Die Verbindung bricht ständig ab",
+        "blocked": "Eine Website lädt nicht",
+        "good": "Heute gut drauf",
+        "bad": "Heute ein harter Tag",
+        "passing": "Nur auf der Durchreise",
+        "lag": "Der Lag im Spiel ist unglaublich",
+        "newip": "Gerade eine neue IP bekommen",
+        "vpn": "Unterwegs per VPN",
+        "night": "Heute Nacht noch wach",
+        "vibing": "Vibe Coding",
+        "fixing": "Repariere mal wieder das WLAN der Familie",
+        "tuning": "Wieder 10 ms rausgeholt",
+        "prgday": "Frohen 0x100. Tag!",
+        "internetday": "LO and behold – frohen Tag des Internets",
+        "halloween": "Süßes oder Ping!",
+        "diwali": "Fest der Lichter (und Glasfaser)",
+        "christmas": "Der Weihnachtsmann nimmt die Route mit niedriger Latenz",
+        "newyear": "Neues Jahr, neue IP!",
+        "privacyday": "Dieser Status ist Ende-zu-Ende-verschlüsselt",
+        "lunar": "Mögen all Ihre roten Umschläge ankommen",
+        "valentine": "Suche eine stabile Verbindung",
+        "jobs": "Stay hungry, stay foolish.",
+        "eid": "Eid Mubarak, Welt!",
+        "aprilfools": "Meine IP ist 127.0.0.1",
+        "earthday": "Ich logge mich aus und gehe raus ins Grüne",
+        "turing": "Dieser Status wurde von einem Menschen gesendet. Wahrscheinlich.",
+        "emojiday": "📶🌍🎉✨",
+        "birthday": "Alles Gute zum Geburtstag, IPCheck.ing!"
+      },
+      "festivalDesc": {
+        "prgday": "Tag der Programmierer – der 256. Tag des Jahres, hexadezimal 0x100",
+        "internetday": "29. Okt. 1969: Das ARPANET wollte LOGIN senden – und stürzte nach „LO“ ab",
+        "halloween": "Halloween (31. Okt.) – das Gruseligste ist immer noch Paketverlust",
+        "diwali": "Diwali – mögen Ihre Lampen und Ihre Glasfaser gleichermaßen leuchten",
+        "christmas": "Weihnachten – der Schlitten auf einer Standleitung, null Jitter",
+        "newyear": "Neujahr – Feuerwerk inklusive, keine zusätzliche Bandbreite nötig",
+        "privacyday": "Europäischer Datenschutztag (28. Jan.) – ja, die Ironie, das hier zu verbreiten, ist uns bewusst",
+        "lunar": "Mondneujahr – null Paketverlust bei den roten Umschlägen",
+        "valentine": "Valentinstag – TCP und wahre Liebe beginnen beide mit einem Handshake",
+        "jobs": "Geburtstag von Steve Jobs (24. Feb. 1955) – aus seiner Stanford-Rede von 2005",
+        "eid": "Eid al-Fitr – herzliche Grüße aus dieser Ecke von Earth Online",
+        "aprilfools": "1. April – there's no place like 127.0.0.1",
+        "earthday": "Tag der Erde (22. Apr.) – selbst Earth Online empfiehlt ein bisschen Earth Offline",
+        "turing": "Geburtstag von Alan Turing (23. Juni 1912) – Vater des Turing-Tests",
+        "emojiday": "Welt-Emoji-Tag (17. Juli) – Wörter sind sowas von letztes Jahrhundert",
+        "birthday": "Geburtstag von IPCheck.ing – v1.0 erschien am 6. Nov. 2020"
+      }
+    },
+    "preferences": {
+      "title": "Einstellungen",
+      "preferenceTips": "Diese Einstellungen werden in Ihrem Browser gespeichert. Einige Optionen werden erst nach dem Neuladen der Seite wirksam.",
+      "colorScheme": "Farbschema",
+      "systemAuto": "Auto",
+      "colorLight": "Hell",
+      "colorDark": "Dunkel",
+      "ipSourcesToCheck": "Server für die IP-Prüfung",
+      "ipSourcesToCheckTips": "Wählen Sie, wie viele Server Ihre IP-Adresse prüfen. Je mehr Server, desto länger dauert die Prüfung.",
+      "appSettings": "Programmeinstellungen",
+      "autoRun": "Autostart",
+      "autoRunTips": "IP-Infos werden beim Laden der Seite immer geprüft. Wählen Sie, welche weiteren Module beim Start automatisch laufen.",
+      "simpleMode": "Einfacher Modus",
+      "simpleModeTips": "Blendet die Beschreibungstexte der Module aus – für alle, die die Anwendung bereits kennen.",
+      "connectivity": {
+        "defaultList": "Standardliste",
+        "defaultListTips": "Die Liste, die der Bereich beim Laden der Seite anzeigt.",
+        "multipleTests": "Mehrfache Prüfung",
+        "multipleTestsTips": "Pro Durchlauf mehrere Prüfungen ausführen und die niedrigste Latenz anzeigen.",
+        "notifications": "Pop-up-Hinweise",
+        "notificationsTips": "Die Ergebnisse der ersten Prüfung als Pop-up-Hinweis anzeigen.",
+        "titleOpensSite": "Kartentitel öffnet Website",
+        "titleOpensSiteTips": "Ein Klick auf den Kartentitel öffnet die Website in einem neuen Tab; ausgeschaltet bleibt der Titel reiner Text."
+      },
+      "ipHistory": "IP-Verlauf",
+      "ipHistoryEnabled": "IP-Verlauf aufzeichnen",
+      "ipHistoryDays": "Aufbewahrung (Tage)",
+      "ipHistoryTips": "Wenn aktiviert, werden erkannte IPs nur in diesem Browser gespeichert und für die gewählte Anzahl Tage aufbewahrt. Beim Ausschalten endet die Aufzeichnung; vorhandene Einträge bleiben, bis Sie sie im IP-Verlauf löschen.",
+      "ipDB": "IP-Geolocation-Datenbank",
+      "ipDBTips": "Sie können die Standardquelle für die IP-Geolocation wählen. Ist die gewählte Quelle nicht verfügbar, werden die übrigen Quellen der Reihe nach verwendet.",
+      "language": "Sprache",
+      "languageTips": "Wird nach dem Neuladen des Browsers wirksam. Sprachen im Beta-Stadium können unvollständig übersetzt sein."
+    },
+    "DocsPrompt": "Ihre Frage eingeben…",
+    "DocsSignInTitle": "Anmeldung erforderlich",
+    "DocsSignInMessage": "Melden Sie sich an, um IPilot zu fragen"
+  },
+  "securitychecklist": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Progress": "",
+    "Item": "",
+    "Items": "",
+    "Priority": "",
+    "Ignore": "",
+    "alert-total": "",
+    "alert-checked": "",
+    "alert-ignored": "",
+    "alert-unchecked": "",
+    "Checked": "",
+    "Ignored": "",
+    "Unchecked": "",
+    "Basic": "",
+    "Optional": "",
+    "Essential": "",
+    "Advanced": "",
+    "Reset": "",
+    "ShowAll": "",
+    "ShowUnchecked": "",
+    "ShowIgnored": "",
+    "ShowChecked": ""
+  },
+  "curl": {
+    "Title": "",
+    "Note1": "",
+    "Note2_1": "",
+    "Note2_2": "",
+    "Note3": "",
+    "getIPv4": "",
+    "getIPv6": "",
+    "get6and4": ""
+  },
+  "browserinfo": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "browser": {
+      "Infos": "",
+      "browserName": "",
+      "engineName": "",
+      "osName": "",
+      "deviceVendor": "",
+      "cpuArchitecture": "",
+      "gpu": "",
+      "cpuCores": "",
+      "languages": "",
+      "timezone": "",
+      "display": "",
+      "connection": "",
+      "touchPoints": "",
+      "doNotTrack": "",
+      "doNotTrackOn": "",
+      "doNotTrackOff": "",
+      "doNotTrackUnset": "",
+      "pdfViewer": "",
+      "pdfViewerYes": "",
+      "pdfViewerNo": "",
+      "cookieEnabled": "",
+      "cookieEnabledTrue": "",
+      "cookieEnabledFalse": ""
+    },
+    "fingerprint": {
+      "Infos": "",
+      "fingerprint": "",
+      "changeOption": "",
+      "browserTips": ""
+    },
+    "options": {
+      "audio": "",
+      "canvas": "",
+      "fonts": "",
+      "hardware": "",
+      "locales": "",
+      "permissions": "",
+      "plugins": "",
+      "screen": "",
+      "system": "",
+      "webgl": "",
+      "math": "",
+      "intl": "",
+      "mediaDevices": "",
+      "speech": "",
+      "mathml": "",
+      "webrtc": ""
+    },
+    "components": {
+      "title": "",
+      "note": ""
+    },
+    "calError": "",
+    "calculating": ""
+  },
+  "censorshipcheck": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "Country": "",
+    "Status": "",
+    "City": "",
+    "Network": "",
+    "invalidURL": "",
+    "fetchError": "",
+    "HistoryTitle": "",
+    "SummaryFlagged": "",
+    "SummaryClean": "",
+    "SummarySparseFlagged": "",
+    "SummarySparseClean": "",
+    "NoData": "",
+    "OoniError": "",
+    "TierConfirmed": "",
+    "TierLikely": "",
+    "TierSigns": "",
+    "Measurements": "",
+    "AnomalyShare": "",
+    "MethodDns": "",
+    "MethodTcpIp": "",
+    "MethodHttpFailure": "",
+    "MethodHttpDiff": "",
+    "RealtimeTitle": "",
+    "ResultsHint": "",
+    "SectionFlagged": "",
+    "PresetHighRisk": "",
+    "PresetOpen": "",
+    "RunVerify": "",
+    "RealtimeNote": "",
+    "RealtimeFooterNote": ""
+  },
+  "invisibilitytest": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "fetchError": "",
+    "scriptLoadError": "",
+    "yourIP": "",
+    "proxyScore": "",
+    "VPNScore": "",
+    "isProxy": "",
+    "notProxy": "",
+    "isVPN": "",
+    "notVPN": "",
+    "itemName": "",
+    "itemProxyResult": "",
+    "itemComment": "",
+    "agreement": "",
+    "blocklist": {
+      "proxy": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      },
+      "vpn": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      },
+      "vpnExitNode": {
+        "title": "",
+        "positive": "",
+        "negative": ""
+      }
+    },
+    "tor": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "headers": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "datacenter": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "tcp": {
+      "title": "",
+      "positive": "",
+      "computer": "",
+      "server": "",
+      "negative": ""
+    },
+    "timezone": {
+      "title": "",
+      "positive": "",
+      "computer": "",
+      "server": "",
+      "negative": ""
+    },
+    "net": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "webrtc": {
+      "title": "",
+      "positive": "",
+      "ipsAre": "",
+      "negative": ""
+    },
+    "flow": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "latencyVSWS": {
+      "title": "",
+      "positive": "",
+      "fromTCP": "",
+      "fromWS": "",
+      "negative": ""
+    },
+    "latencyVSPing": {
+      "title": "",
+      "positive": "",
+      "fromTCP": "",
+      "fromPing": "",
+      "negative": ""
+    },
+    "tlsRtt": {
+      "title": "",
+      "positive": "",
+      "fromTCP": "",
+      "fromTLS": "",
+      "negative": ""
+    },
+    "highlatency": {
+      "title": "",
+      "positive": "",
+      "negative": ""
+    },
+    "proxyAi": {
+      "title": "",
+      "positive": "",
+      "score": "",
+      "negative": ""
+    }
+  },
+  "personacheck": {
+    "Title": "",
+    "Note": "",
+    "NoteVs": "",
+    "Note2": "",
+    "axis": {
+      "match": "",
+      "coherence": "",
+      "leak": ""
+    },
+    "zone": {
+      "expected": "",
+      "optional": "",
+      "run": ""
+    },
+    "selectCountry": "",
+    "noCountryMatch": "",
+    "noProfile": "",
+    "languageSingle": "",
+    "languageMulti": "",
+    "timezoneMulti": "",
+    "hourCycle": {
+      "h11": "",
+      "h12": "",
+      "h23": "",
+      "h24": ""
+    },
+    "profile": {
+      "timezone": ""
+    },
+    "runCompare": "",
+    "runError": "",
+    "source": {
+      "ipinfo": "",
+      "webrtc": "",
+      "dnsleak": ""
+    },
+    "report": {
+      "grade": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": "",
+        "unknown": ""
+      },
+      "gradeNote": {
+        "A": "",
+        "B": "",
+        "C": "",
+        "D": "",
+        "unknown": ""
+      },
+      "counts": {
+        "leak": "",
+        "warning": "",
+        "match": "",
+        "unknown": "",
+        "notApplicable": ""
+      },
+      "nothingActionable": "",
+      "howToFix": "",
+      "verdict": {
+        "match": "",
+        "mismatch": "",
+        "leak": "",
+        "unnatural": "",
+        "unknown": "",
+        "not-applicable": ""
+      },
+      "visibility": {
+        "public": "",
+        "probed": "",
+        "risk-engine": ""
+      },
+      "profileTitle": "",
+      "state": {
+        "match": "",
+        "mismatch": "",
+        "unnatural": "",
+        "leak": "",
+        "unknown": "",
+        "not-applicable": ""
+      }
+    },
+    "detail": {
+      "expected": "",
+      "actual": "",
+      "disputed": "",
+      "v4": "",
+      "v6": "",
+      "candidateCount": "",
+      "matching": "",
+      "ipType": "",
+      "expectedOffset": "",
+      "actualOffset": "",
+      "sameOffset": "",
+      "primary": "",
+      "primaryExpected": "",
+      "demoted": "",
+      "timeZone": "",
+      "reportedOffset": "",
+      "zoneOffset": "",
+      "samples": "",
+      "expectedScripts": "",
+      "installedScripts": "",
+      "expectedLanguages": "",
+      "voiceLanguages": "",
+      "voiceCount": "",
+      "expectedLayout": "",
+      "actualLayout": "",
+      "headerPrimary": "",
+      "scriptPrimary": "",
+      "headerLanguages": "",
+      "ipZone": "",
+      "browserZone": "",
+      "ipOffset": "",
+      "browserOffset": "",
+      "colo": "",
+      "gpsTimezone": "",
+      "accuracyMetres": "",
+      "cardIssuer": "",
+      "cardNetwork": "",
+      "cardTier": "",
+      "cardType": ""
+    },
+    "checks": {
+      "ip-country": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "webrtc-leak": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "dns-resolver-country": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "asn-type": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "timezone-vs-persona": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "language-match": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "script-fonts": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "speech-voices": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "keyboard-layout": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "edge-geo-consensus": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "accept-language-header": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "ip-timezone-vs-browser": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "gps-location": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "payment-region": {
+        "title": "",
+        "fix": "",
+        "what": ""
+      },
+      "intl-number-format": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "intl-date-format": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "intl-hour-cycle": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      },
+      "timezone-authenticity": {
+        "title": "",
+        "what": "",
+        "fix": ""
+      }
+    },
+    "reason": {
+      "no-marker-script": "",
+      "bin-lookup-failed": "",
+      "bin-not-recognized": "",
+      "font-probe-unavailable": "",
+      "no-voice-packs": "",
+      "keyboard-api-unavailable": "",
+      "no-layout-expectation": "",
+      "no-persona-languages": "",
+      "geolocation-unsupported": "",
+      "ip-no-country": "",
+      "ip-no-type": "",
+      "ip-no-timezone": "",
+      "webrtc-no-candidates": "",
+      "dns-no-country": ""
+    },
+    "optional": {
+      "gpsNote": "",
+      "gpsButton": "",
+      "gpsGranted": "",
+      "gpsFailed": {
+        "denied": "",
+        "timeout": "",
+        "unavailable": "",
+        "unsupported": ""
+      },
+      "cardNote": "",
+      "cardError": "",
+      "cardReady": ""
+    },
+    "dependencies": {
+      "note": "",
+      "runButton": "",
+      "runButtonRunning": "",
+      "measured": "",
+      "allReady": ""
+    },
+    "step": {
+      "country": "",
+      "language": "",
+      "location": "",
+      "card": "",
+      "awaitingCountry": "",
+      "otherTests": ""
+    },
+    "emptyHint": "",
+    "readyHint": "",
+    "value": {
+      "yes": "",
+      "no": ""
+    }
+  },
+  "ipblocklist": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "SelectIPLabel": "",
+    "EnterIPLabel": "",
+    "UseStored": "",
+    "SelectIP": "",
+    "EnterIPPlaceholder": "",
+    "InvalidIP": "",
+    "Checking": "",
+    "FetchError": "",
+    "CheckedAt": "",
+    "verdict": {
+      "abuse": "",
+      "anonymity": "",
+      "notice": "",
+      "clean": ""
+    },
+    "count": {
+      "abuse": "",
+      "anonymity": "",
+      "notice": "",
+      "clean": "",
+      "error": ""
+    },
+    "SomeFailed": "",
+    "part": {
+      "dnsbl": {
+        "title": "",
+        "desc": ""
+      },
+      "static": {
+        "title": "",
+        "desc": ""
+      }
+    },
+    "NoHits": "",
+    "ShowRest": "",
+    "HideRest": "",
+    "CheckFailed": "",
+    "LastSeen": "",
+    "RequestRemoval": "",
+    "category": {
+      "spam": "",
+      "abuse": "",
+      "proxy": "",
+      "vpn": "",
+      "relay": "",
+      "tor": "",
+      "scanner": "",
+      "backscatter": "",
+      "mixed": ""
+    },
+    "reason": {
+      "socksProxy": "",
+      "httpProxy": "",
+      "proxyChain": "",
+      "webProxy": "",
+      "wingateProxy": "",
+      "openProxy": "",
+      "torExit": "",
+      "exploited": "",
+      "compromisedHost": "",
+      "compromisedRouter": "",
+      "botnet": "",
+      "worm": "",
+      "ircDrone": "",
+      "ddosDrone": "",
+      "bottler": "",
+      "spambot": "",
+      "bruteForce": "",
+      "spamSource": "",
+      "spamtrap": "",
+      "badReputation": "",
+      "hijackedNetwork": "",
+      "endUserRange": "",
+      "dynamicRange": "",
+      "noMailRange": "",
+      "missingPtr": "",
+      "poorReputation": "",
+      "mixedReputation": "",
+      "rangeListed": "",
+      "networkListed": "",
+      "unaccountableOperator": "",
+      "noMailService": "",
+      "unreliableAbuseDesk": "",
+      "reported1d": "",
+      "reported7d": "",
+      "reported30d": "",
+      "reported90d": "",
+      "feeds": "",
+      "testEntry": ""
+    },
+    "legend": {
+      "abuse": {
+        "label": "",
+        "desc": ""
+      },
+      "anonymity": {
+        "label": "",
+        "desc": ""
+      },
+      "notice": {
+        "label": "",
+        "desc": ""
+      },
+      "clean": {
+        "label": "",
+        "desc": ""
+      },
+      "error": {
+        "label": "",
+        "desc": ""
+      }
+    }
+  },
+  "adblocktest": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "Selected": "",
+    "SelectAll": "",
+    "Invert": "",
+    "Run": "",
+    "Rerun": "",
+    "Hint": "",
+    "Score": "",
+    "Progress": "",
+    "GroupCount": "",
+    "NothingOpen": "",
+    "NothingBlocked": "",
+    "Version": "",
+    "Limitation": "",
+    "count": {
+      "blocked": "",
+      "open": "",
+      "unknown": ""
+    },
+    "filter": {
+      "all": "",
+      "open": "",
+      "blocked": ""
+    },
+    "status": {
+      "blocked": "",
+      "open": "",
+      "unknown": "",
+      "pending": ""
+    },
+    "cosmeticStatus": {
+      "blocked": "",
+      "open": "",
+      "unknown": "",
+      "pending": ""
+    },
+    "cosmetic": {
+      "ad-container": "",
+      "adsense-slot": ""
+    },
+    "group": {
+      "ads": {
+        "title": "",
+        "desc": ""
+      },
+      "analytics": {
+        "title": "",
+        "desc": ""
+      },
+      "social": {
+        "title": "",
+        "desc": ""
+      },
+      "errors": {
+        "title": "",
+        "desc": ""
+      },
+      "oem": {
+        "title": "",
+        "desc": ""
+      },
+      "scripts": {
+        "title": "",
+        "desc": ""
+      },
+      "cosmetic": {
+        "title": "",
+        "desc": ""
+      }
+    },
+    "layer": {
+      "browser": "",
+      "network": "",
+      "none": ""
+    },
+    "report": {
+      "Category": "",
+      "Total": ""
+    }
+  },
+  "advancedtools": {
+    "Title": "",
+    "Note": "",
+    "category": {
+      "network": "",
+      "lookup": "",
+      "deep": "",
+      "reference": ""
+    },
+    "PingTestNote": "",
+    "MTRTestNote": "",
+    "DNSResolverNote": "",
+    "EnhancedDnsLeakTest": "",
+    "RuleTestNote": "",
+    "CensorshipCheck": "",
+    "ServiceStatus": "",
+    "Whois": "",
+    "AsnProfile": "",
+    "InvisibilityTest": "",
+    "MacChecker": "",
+    "IpCalculator": "",
+    "BrowserInfo": "",
+    "AdblockTest": "",
+    "SecurityChecklist": "",
+    "PersonaCheck": "",
+    "IpBlocklist": ""
+  },
+  "macchecker": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "invalidMAC": "",
+    "fetchError": "",
+    "company": "",
+    "macPrefix": "",
+    "address": "",
+    "country": "",
+    "blockStart": "",
+    "blockEnd": "",
+    "blockSize": "",
+    "blockType": "",
+    "blockRange": "",
+    "isRand": "",
+    "isPrivate": "",
+    "isMulticast": "",
+    "isUnicast": "",
+    "isGlobal": "",
+    "isLocal": "",
+    "property": "",
+    "value": "",
+    "manufacturer": "",
+    "Examples": "",
+    "exampleFull": "",
+    "examplePrefix": "",
+    "exampleSubBlock": "",
+    "examplePrivate": "",
+    "exampleMulticast": "",
+    "exampleRandom": ""
+  },
+  "ipcalculator": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "Calculate": "",
+    "Examples": "",
+    "exampleObfuscated": "",
+    "exampleEui64": "",
+    "MyIPs": "",
+    "copy": "",
+    "copyAll": "",
+    "yes": "",
+    "no": "",
+    "kind": {
+      "ipv4": "",
+      "ipv4Cidr": "",
+      "ipv6": "",
+      "ipv6Cidr": "",
+      "integer": "",
+      "hex": "",
+      "range": "",
+      "cidrList": ""
+    },
+    "scope": {
+      "global": "",
+      "private": "",
+      "shared": "",
+      "loopback": "",
+      "linkLocal": "",
+      "multicast": "",
+      "documentation": "",
+      "reserved": "",
+      "unspecified": "",
+      "broadcast": ""
+    },
+    "invalid": {
+      "empty": "",
+      "listNoValid": "",
+      "cidrPrefix": "",
+      "cidrAddress": "",
+      "ipv6Syntax": "",
+      "hexTooLarge": "",
+      "integerTooLarge": "",
+      "badOctal": "",
+      "range": "",
+      "unrecognized": ""
+    },
+    "section": {
+      "Network": "",
+      "Representations": "",
+      "Obfuscated": "",
+      "AsIPv6": "",
+      "Split": "",
+      "Address": "",
+      "Type": "",
+      "InterfaceId": "",
+      "Prefix": "",
+      "Range": "",
+      "Cidrs": "",
+      "IPv4Blocks": "",
+      "IPv6Blocks": ""
+    },
+    "network": "",
+    "broadcast": "",
+    "netmask": "",
+    "wildcard": "",
+    "firstHost": "",
+    "lastHost": "",
+    "firstAddress": "",
+    "lastAddress": "",
+    "usable": "",
+    "total": "",
+    "ptr": "",
+    "ptrZone": "",
+    "class": "",
+    "rfc3021Note": "",
+    "networkBits": "",
+    "hostBits": "",
+    "prefixLength": "",
+    "decimal": "",
+    "hex": "",
+    "octal": "",
+    "binary": "",
+    "obfuscatedNote": "",
+    "dottedHex": "",
+    "dottedOctal": "",
+    "shortForm": "",
+    "mapped": "",
+    "mappedHex": "",
+    "compat": "",
+    "nat64": "",
+    "sixToFour": "",
+    "splitTo": "",
+    "showingFirst": "",
+    "subnetCount": "",
+    "compressed": "",
+    "expanded": "",
+    "zone": "",
+    "embeddedIPv4": "",
+    "teredoServer": "",
+    "teredoClient": "",
+    "teredoPort": "",
+    "teredoCone": "",
+    "locallyAssigned": "",
+    "globalId": "",
+    "subnetId": "",
+    "mcastScope": "",
+    "flags": "",
+    "flagT": "",
+    "flagP": "",
+    "flagR": "",
+    "noFlags": "",
+    "solicitedNodeSuffix": "",
+    "iid": "",
+    "mac": "",
+    "solicitedNode": "",
+    "universalMac": "",
+    "localMac": "",
+    "privacyIid": "",
+    "subnetRouterAnycast": "",
+    "slash64s": "",
+    "start": "",
+    "end": "",
+    "aggregated": "",
+    "aggregationSummary": "",
+    "invalidTokens": ""
+  },
+  "whois": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "Placeholder": "",
+    "invalidURL": "",
+    "reservedIP": "",
+    "noData": "",
+    "fetchError": "",
+    "Provider": ""
+  },
+  "asnprofile": {
+    "Title": "",
+    "Note": "",
+    "InputLabel": "",
+    "Placeholder": "",
+    "Lookup": "",
+    "invalidInput": "",
+    "noData": "",
+    "loadError": "",
+    "partial": "",
+    "tier1": "",
+    "facts": {
+      "rank": "",
+      "rankSource": "",
+      "announcedIpv4": "",
+      "ipv4Share": "",
+      "prefixes": "",
+      "users": ""
+    },
+    "registration": {
+      "title": "",
+      "registry": "",
+      "status": "",
+      "registered": "",
+      "lastChanged": "",
+      "abuse": "",
+      "raw": "",
+      "copyRaw": ""
+    },
+    "reputation": {
+      "title": "",
+      "source": "",
+      "desc": "",
+      "abuse": "",
+      "vpn": "",
+      "proxy": "",
+      "ratio": "",
+      "belowBaseline": "",
+      "drop": "",
+      "updated": "",
+      "level": {
+        "none": "",
+        "low": "",
+        "medium": "",
+        "high": ""
+      }
+    },
+    "traffic": {
+      "title": "",
+      "desc": ""
+    },
+    "map": {
+      "title": "",
+      "desc": ""
+    },
+    "prefixes": {
+      "title": "",
+      "desc": "",
+      "counts": "",
+      "rpki": "",
+      "rpkiValid": "",
+      "family": "",
+      "all": "",
+      "copy": "",
+      "download": "",
+      "prefix": "",
+      "size": "",
+      "rpkiColumn": "",
+      "visibility": "",
+      "shown": "",
+      "showMore": ""
+    },
+    "rpki": {
+      "valid": "",
+      "invalid": "",
+      "unknown": ""
+    },
+    "connectivity": {
+      "title": "",
+      "desc": "",
+      "cone": "",
+      "providers": "",
+      "peers": "",
+      "customers": "",
+      "none": ""
+    },
+    "peering": {
+      "title": "",
+      "desc": "",
+      "policy": "",
+      "traffic": "",
+      "ratio": "",
+      "irr": "",
+      "website": "",
+      "scope": "",
+      "exchanges": "",
+      "facilities": "",
+      "rs": "",
+      "rsTitle": "",
+      "showAll": "",
+      "showLess": "",
+      "types": {
+        "isp": "",
+        "nsp": "",
+        "content": "",
+        "enterprise": "",
+        "education": "",
+        "nonProfit": "",
+        "government": "",
+        "routeServer": "",
+        "routeCollector": "",
+        "networkServices": ""
+      },
+      "scopes": {
+        "regional": "",
+        "northAmerica": "",
+        "asiaPacific": "",
+        "europe": "",
+        "southAmerica": "",
+        "africa": "",
+        "australia": "",
+        "middleEast": "",
+        "global": ""
+      },
+      "ratios": {
+        "balanced": "",
+        "mostlyInbound": "",
+        "heavyInbound": "",
+        "mostlyOutbound": "",
+        "heavyOutbound": ""
+      },
+      "policies": {
+        "open": "",
+        "selective": "",
+        "restrictive": "",
+        "no": ""
+      }
+    }
+  },
+  "enhanceddnsleaktest": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "Run": "",
+    "RunAgain": "",
+    "RunningProbes": "",
+    "PollingResult": "",
+    "FetchError": "",
+    "Empty": "",
+    "TableTitle": "",
+    "DedupeToggle": "",
+    "Flow": {
+      "Probing": "",
+      "Waiting": "",
+      "Fetching": "",
+      "Done": ""
+    },
+    "DnssecChip": {
+      "Signed": "",
+      "Unsigned": "",
+      "Validated": "",
+      "CdSet": ""
+    },
+    "Summary": {
+      "ResolverCount": "",
+      "RawCount": "",
+      "DnssecPosture": "",
+      "DnssecGood": "",
+      "DnssecNoDo": "",
+      "DnssecCdSet": "",
+      "DnssecNone": ""
+    },
+    "Fields": {
+      "ResolverIP": "",
+      "Location": "",
+      "ASN": "",
+      "QueryType": "",
+      "Transport": "",
+      "ECS": ""
+    },
+    "Legend": {
+      "Title": "",
+      "ResolverIP": "",
+      "QueryType": "",
+      "Transport": "",
+      "ECS": "",
+      "DO": "",
+      "CD": ""
+    }
+  },
+  "dnsresolver": {
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Placeholder": "",
+    "invalidURL": "",
+    "fetchError": "",
+    "Provider": "",
+    "Result": "",
+    "Record": "",
+    "AllRegions": ""
+  },
+  "ruletest": {
+    "Title": "",
+    "Name": "",
+    "Note": "",
+    "StatusWait": "",
+    "StatusTesting": "",
+    "StatusError": "",
+    "Country": "",
+    "RefreshAll": ""
+  },
+  "Tooltips": {
+    "RefreshIPCard": "IP-Karte aktualisieren",
+    "SaveAsImage": "Als Bild speichern",
+    "RefreshConnectivityTests": "Konnektivitätstests aktualisieren",
+    "RefreshWebRTC": "WebRTC-Leak-Test aktualisieren",
+    "RefreshDNSLeakTest": "DNS-Leak-Test aktualisieren",
+    "SpeedTestButton": "Speedtest starten/pausieren",
+    "ShowASNInfo": "AS-Details anzeigen",
+    "ShowASNHistory": "ASN-Verlauf anzeigen",
+    "ShowASNConnectivity": "ASN-Konnektivität anzeigen",
+    "CopyIP": "IP-Adresse kopieren",
+    "CopySdpLog": "SDP-Log kopieren",
+    "ViewOnMap": "Standort auf Karte anzeigen",
+    "ShowCountryTraffic": "Muster der Online-Aktivität anzeigen",
+    "InfoMask": "IP-Informationen ausblenden",
+    "IPHistory": "IP-Verlauf anzeigen",
+    "ShareReport": "Diagnosebericht erstellen",
+    "QueryIP": "IP-Adresse abfragen",
+    "GithubLink": "Quellcode auf GitHub ansehen"
+  },
+  "report": {
+    "Title": "",
+    "Note": "",
+    "SectionsLabel": "",
+    "NotTested": "",
+    "MaskTail": "",
+    "TtlLabel": "",
+    "Ttl1": "",
+    "Ttl3": "",
+    "Ttl7": "",
+    "Preview": "",
+    "CreateLink": "",
+    "CopyAI": "",
+    "DownloadJson": "",
+    "CopyLink": "",
+    "NoSelection": "",
+    "CreateFailed": "",
+    "LinkOnce": "",
+    "ExpiresAt": "",
+    "CopiedTitle": "",
+    "CopiedMessage": "",
+    "ai": {
+      "Heading": "",
+      "Intro": "",
+      "Masked": "",
+      "Instruction": "",
+      "Sections": {
+        "ipinfo": "",
+        "connectivity": "",
+        "webrtc": "",
+        "dnsleak": "",
+        "speedtest": "",
+        "pingtest": "",
+        "mtrtest": "",
+        "ruletest": "",
+        "browserinfo": "",
+        "adblocktest": "",
+        "invisibility": "",
+        "enhanceddnsleak": "",
+        "persona": ""
+      }
+    }
+  },
+  "reportPage": {
+    "Loading": "Bericht wird geladen…",
+    "NotFound": "Bericht nicht gefunden oder abgelaufen",
+    "NotFoundNote": "Geteilte Berichte werden nach Ablauf automatisch gelöscht.",
+    "LoadFailed": "Der Bericht konnte nicht geladen werden, bitte versuchen Sie es später erneut.",
+    "Unsupported": "Dieser Bericht wurde mit einer anderen Version der Website erstellt und kann nicht angezeigt werden.",
+    "GeneratedBy": "Diagnosebericht erstellt auf {origin} am {time}",
+    "Stale": "Dieser Bericht ist älter als 3 Tage – das Netzwerk hat sich seitdem möglicherweise verändert.",
+    "TestMine": "Mein eigenes Netzwerk testen",
+    "Col": {
+      "Source": "Quelle",
+      "Name": "Name",
+      "IP": "IP",
+      "Location": "Standort",
+      "ISP": "Provider",
+      "Status": "Status",
+      "Server": "Server",
+      "Provider": "Anbieter",
+      "Target": "Ziel",
+      "UniqueIPs": "Eindeutige Ausgangs-IPs",
+      "Resolvers": "Resolver"
+    },
+    "Dnssec": {
+      "ok": "DNSSEC aktiviert",
+      "partial": "DNSSEC teilweise aktiviert",
+      "none": "DNSSEC nicht aktiviert"
+    }
+  },
+  "ipHistory": {
+    "Title": "IP-Verlauf",
+    "Notes": "IPs, die bei der Nutzung dieser Website erkannt werden, werden hier gespeichert. Die Daten liegen nur in diesem Browser – sie werden nie mit Ihrem Konto synchronisiert und verlassen Ihr Gerät nicht. Die Aufbewahrungsdauer können Sie unter „Einstellungen“ anpassen.",
+    "Empty": "Noch keine Einträge. IPs erscheinen hier, sobald die Tests auf der Startseite sie erkennen.",
+    "FilterByType": "Nach IP-Typ filtern",
+    "FilterByCountry": "Nach Land / Region filtern",
+    "UnknownCountry": "Unbekannt",
+    "NoMatch": "Keine Einträge entsprechen den gewählten Filtern.",
+    "ClearAll": "Verlauf löschen",
+    "ClearConfirm": "Zum Bestätigen erneut klicken",
+    "ViewMode": "Verlaufsansicht",
+    "ByIP": "Nach IP",
+    "ByDate": "Nach Datum",
+    "UniqueIPCounts": "Zahlen an den Tags: eindeutige IPs über alle gespeicherten Einträge.",
+    "DailyRecordCounts": "Zahlen an den Tags: Einträge über alle gespeicherten Tage (einer pro IP und Tag).",
+    "LastSeen": "Zuletzt gesehen: {date}",
+    "FirstSeen": "Zuerst gesehen: {date}",
+    "RecordDates": "Alle erfassten Tage",
+    "MapTitle": "Länder / Regionen der IPs",
+    "MapUnavailable": "Karte nicht verfügbar. Die Länderfilter funktionieren trotzdem.",
+    "MapSelect": "Klicken, um nach diesem Land / dieser Region zu filtern",
+    "MapUnselect": "Klicken, um den Filter für dieses Land / diese Region zu entfernen",
+    "ViewMap": "Karte anzeigen"
+  },
+  "ipInfos": {
+    "Title": "IP-Infos",
+    "Notes": "Das Programm ermittelt Ihre IP-Adresse zunächst über mehrere verschiedene Probes (IPv4 und IPv6) und fragt dann die zugehörigen Standortdaten bei der gewählten IP-Datenquelle ab. Gibt es nur einen IP-Stack, bleibt die Quelle ohne Daten leer.",
+    "Source": "IP-Probe",
+    "Country": "Region",
+    "Region": "Bundesland",
+    "City": "Stadt",
+    "TimeZone": "Zeitzone",
+    "ISP": "Provider",
+    "ASN": "ASN",
+    "Coordinates": "Koordinaten",
+    "IPv4Error": "Abruf fehlgeschlagen oder keine IPv4-Adresse",
+    "IPv6Error": "Abruf fehlgeschlagen oder keine IPv6-Adresse",
+    "type": "Typ",
+    "anonymity": {
+      "label": "Anonymisierung",
+      "tor": "Tor-Exit",
+      "relay": "iCloud Privat-Relay",
+      "residential": "Residential Proxy",
+      "suspectedResidential": "Vermutlich Residential Proxy",
+      "proxy": "Proxy",
+      "proxySuspected": "Möglicher Proxy",
+      "vpn": "VPN",
+      "vpnSuspected": "Mögliches VPN",
+      "none": "Nicht erkannt"
+    },
+    "qualityScore": "IP-Qualität",
+    "qualityScoreUnknown": "Score unbekannt",
+    "advancedUnlockCta": "Zum Schutz vor Missbrauch melden Sie sich an, um die folgenden Informationen zu sehen",
+    "advancedQuotaCta": "Monatskontingent für erweiterte IP-Daten aufgebraucht",
+    "ASNInfo": {
+      "trafficPercentage": "Traffic-Anteile: ",
+      "note": "Daten zu diesem AS : ",
+      "asnName": "AS-Name : ",
+      "asnOrgName": "AS-Organisation : ",
+      "asnCountryCode": "AS-Land : ",
+      "estimatedUsers": "Geschätzte Nutzer : ",
+      "connectionQuality": "Durchschnittliche Verbindungsqualität: ",
+      "connectionQualityTooltip": "Aggregiert aus Cloudflare-Speedtests von Nutzern in diesem ASN",
+      "speedDownload": "Download : ",
+      "speedUpload": "Upload : ",
+      "latency": "Latenz : ",
+      "jitter": "Jitter : ",
+      "IPv4_Pct": "IPv4",
+      "IPv6_Pct": "IPv6",
+      "HTTP_Pct": "HTTP",
+      "HTTPS_Pct": "HTTPS",
+      "Desktop_Pct": "Desktop",
+      "Mobile_Pct": "Mobil",
+      "Bot_Pct": "Bot",
+      "Human_Pct": "Mensch",
+      "openProfile": "Vollständiges ASN-Profil öffnen"
+    },
+    "ASNHistory": {
+      "announcedPrefixes": "Announcte Präfixe: ",
+      "note": "Bisherige ASN-Announcements für diese IP: ",
+      "empty": "Keine historischen Routing-Daten für diese IP gefunden.",
+      "error": "ASN-Verlauf konnte nicht geladen werden.",
+      "seenBy": "Sichtbarkeit in RIPE RIS: {pct} % – maximal {peers} Full-Feed-Peers"
+    },
+    "ASNConnectivity": {
+      "note": "Upstream-Pfade von diesem AS zu den globalen Tier-1-Transitanbietern: ",
+      "empty": "Keine Upstream-Konnektivitätsdaten für dieses AS verfügbar.",
+      "error": "ASN-Konnektivität konnte nicht geladen werden.",
+      "expand": "Erweitern",
+      "dialogTitle": "Netzwerk-Konnektivität von AS{asn}",
+      "legendOrigin": "Ursprung",
+      "legendTier1": "Tier-1-ISP",
+      "legendIntermediate": "Zwischen-AS",
+      "legendTransit": "Transit",
+      "legendPeering": "Peering",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "zoomReset": "Zoom zurücksetzen"
+    },
+    "advancedData": {
+      "type": {
+        "Residential": "Privatanschluss",
+        "Wireless": "Mobilfunk",
+        "Business": "Geschäftlich",
+        "Hosting": "Hosting",
+        "unknownType": "Unbekannter Typ"
+      },
+      "Nativeness": "ASN-Geo-Übereinstimmung",
+      "NativeIPYes": "Stimmt überein",
+      "NativeIPNo": "Abweichend",
+      "nativenessTooltip": "Ob das Registrierungsland des ASN mit dem Geolocation-Land der IP übereinstimmt"
+    },
+    "scoreDetails": {
+      "toggle": "Score-Details",
+      "explainTitle": "So kommt der Score zustande",
+      "explain": {
+        "unknownOperator": "einem nicht identifizierten Betreiber",
+        "summary": {
+          "lowRisk": "Die IP-Adresse {ip} wird von {operator} betrieben und hat einen Qualitätsscore von {score}/100 – das werten wir als geringes Risiko.",
+          "mediumRisk": "Die IP-Adresse {ip} wird von {operator} betrieben und hat einen Qualitätsscore von {score}/100 – das werten wir als mittleres Risiko.",
+          "highRisk": "Die IP-Adresse {ip} wird von {operator} betrieben und hat einen Qualitätsscore von {score}/100 – das werten wir als hohes Risiko."
+        },
+        "network": {
+          "datacenter": "Sie gehört zu einem Hosting- bzw. Rechenzentrumsnetz statt zu einem normalen Privat- oder Mobilfunkanschluss.",
+          "mobile": "Sie liegt in einem Mobilfunknetz, in dem sich oft viele Nutzer eine Adresse teilen.",
+          "satellite": "Sie liegt in einem Satelliten-Internetnetz, nicht in einem gewöhnlichen Privat- oder Geschäftsbreitbandnetz.",
+          "isp": "Sie liegt im Zugangsnetz eines Providers (Privat- oder Geschäftsbreitband), nicht bei einem Hosting-Anbieter."
+        },
+        "anonymity": {
+          "none": "Es wurde keine Nutzung von VPN, Proxy, Tor oder Privat-Relay erkannt.",
+          "tor": "Sie ist Teil des Tor-Anonymisierungsnetzwerks.",
+          "relay": "Sie ist ein Exit von iCloud Privat-Relay, den sich viele Apple-Nutzer teilen.",
+          "proxySingle": "Eine einzelne Quelle stuft sie als Proxy ein.",
+          "proxyMulti": "Mehrere unabhängige Quellen stufen sie als Proxy ein.",
+          "residentialProxy": "Sie wurde als Exit eines Residential Proxys identifiziert.",
+          "residentialProxySuspected": "Diese IP wurde am {date} als vermutlicher Exit eines Residential Proxys (Privatanschluss) beobachtet.",
+          "residentialProxySuspectedUndated": "Diese IP wurde als vermutlicher Exit eines Residential Proxys (Privatanschluss) beobachtet.",
+          "vpnSingle": "Eine einzelne Quelle stuft sie als VPN oder Anonymisierungsdienst ein.",
+          "vpnMulti": "Mehrere unabhängige Quellen stufen sie als VPN oder Anonymisierungsdienst ein."
+        },
+        "anonymityLastSeen": "Zuletzt beobachtet am {date}.",
+        "reputation": {
+          "none": "Es wurden keine nennenswerten Missbrauchsmeldungen oder Blocklisten-Einträge gefunden.",
+          "low": "Es gibt geringe Hinweise auf Missbrauch (Meldungen oder Blocklisten-Einträge).",
+          "lowDated": "Es gibt geringe Hinweise auf Missbrauch; die jüngste Missbrauchsmeldung stammt vom {date}.",
+          "medium": "Es gibt deutliche Hinweise auf Missbrauch (Meldungen oder Blocklisten-Einträge).",
+          "mediumDated": "Es gibt deutliche Hinweise auf Missbrauch; die jüngste Missbrauchsmeldung stammt vom {date}.",
+          "high": "Es gibt starke Hinweise auf Missbrauch (Meldungen oder Blocklisten-Einträge).",
+          "highDated": "Es gibt starke Hinweise auf Missbrauch; die jüngste Missbrauchsmeldung stammt vom {date}."
+        },
+        "asn": {
+          "none": "Ihr Netz (ASN) zeigt nicht mehr Missbrauchs- oder VPN-Aktivität als im Internet üblich.",
+          "low": "Ihr Netz (ASN) zeigt etwas mehr Missbrauchs- oder VPN-Aktivität als üblich.",
+          "medium": "Ihr Netz (ASN) zeigt deutlich erhöhte Missbrauchs- oder VPN-Aktivität.",
+          "high": "Ihr Netz (ASN) zeigt sehr hohe Missbrauchs- oder VPN-Aktivität."
+        }
+      },
+      "tagsTitle": "Alle Merkmale",
+      "blocklistHint": "Der Score ist ein Gesamtprofil dieser IP. Möchten Sie wissen, ob sie gerade auf einer Blocklist steht?",
+      "blocklistLink": "Blocklisten live prüfen",
+      "tagState": {
+        "yes": "Ja",
+        "no": "Nein",
+        "suspected": "Vermutet"
+      },
+      "tags": {
+        "isDatacenter": "Rechenzentrum",
+        "isResidential": "Privatanschluss",
+        "isMobile": "Mobilfunknetz",
+        "isSatellite": "Satellit",
+        "isProxy": "Proxy",
+        "isVPN": "VPN",
+        "isResidentialProxy": "Residential Proxy",
+        "isRelay": "iCloud Privat-Relay",
+        "isTor": "Tor",
+        "isAbuser": "Missbrauchshistorie",
+        "isCrawler": "Crawler",
+        "isNative": "ASN-Geo-Übereinstimmung"
+      }
+    },
+    "abuseLevel": {
+      "label": "Missbrauchsaktivität",
+      "none": "Nicht erkannt",
+      "low": "Gelegentlich",
+      "medium": "Mäßig",
+      "high": "Häufig"
+    },
+    "scenarioFriction": {
+      "label": "Hürden je Szenario",
+      "toggle": "Details zu Hürden",
+      "breakdown": "{smooth} reibungslos · {checks} zusätzliche Prüfungen · {restricted} evtl. eingeschränkt",
+      "introTitle": "Hürden je Szenario erklärt",
+      "intro": "Sie nutzen diese IP vielleicht für ganz unterschiedliches Surfen und Arbeiten – und wie reibungslos Plattformen sie behandeln, kann je nach Szenario unterschiedlich sein. Aus Netzwerktyp, Anonymität, Missbrauchshistorie und Standort dieser IP schätzen wir ab, wie Plattformen voraussichtlich mit ihr umgehen.",
+      "listTitle": "Nach Szenario",
+      "scenarios": {
+        "signup": "Kontoregistrierung & Login",
+        "payments": "Shopping & Zahlungen",
+        "finance": "Banking & Finanzen",
+        "streaming": "Streaming & regionale Inhalte",
+        "availability": "Verfügbarkeit internationaler Dienste",
+        "browsing": "Alltägliches Surfen",
+        "posting": "Posts & Kommentare",
+        "localSocial": "Social Media als lokaler Nutzer",
+        "localSocialIn": "Social Media als lokaler Nutzer in {country}",
+        "automation": "Automatisierung & Scraping",
+        "email": "E-Mail-Versand vom eigenen Server"
+      },
+      "verdict": {
+        "default": {
+          "low": "Reibungslos",
+          "medium": "Zusätzliche Prüfungen",
+          "high": "Evtl. eingeschränkt"
+        },
+        "availability": {
+          "low": "Verfügbar",
+          "medium": "Eingeschränkt",
+          "high": "Evtl. gesperrt"
+        }
+      },
+      "personaHint": "Neben der IP berücksichtigen Plattformen weitere Faktoren, wenn sie über Einschränkungen entscheiden. Möchten Sie wissen, ob Ihr Gesamtprofil Ihren Erwartungen entspricht?",
+      "personaLink": "Persona-Check starten"
+    },
+    "countryTraffic": {
+      "subtitle": "Typische wöchentliche Online-Aktivität in diesem Land / dieser Region – nur von Menschen erzeugten Traffic anzeigen oder den gesamten Traffic (inklusive Bots und automatisiertem Traffic).",
+      "human": "Nur Menschen",
+      "loading": "Wird geladen...",
+      "error": "Online-Aktivität konnte nicht geladen werden."
+    }
+  },
+  "serviceStatus": {
+    "Title": "",
+    "Note": "",
+    "Refresh": "",
+    "LastChecked": "",
+    "AllOperational": "",
+    "ComponentsTitle": "",
+    "IncidentsTitle": "",
+    "NoComponents": "",
+    "NoRecentIncidents": "",
+    "Loading": "",
+    "Checking": "",
+    "IncidentsError": "",
+    "ComponentsError": "",
+    "indicator": {
+      "minor": "",
+      "major": "",
+      "critical": "",
+      "maintenance": "",
+      "unknown": ""
+    },
+    "component": {
+      "operational": "",
+      "degraded_performance": "",
+      "partial_outage": "",
+      "major_outage": "",
+      "under_maintenance": ""
+    },
+    "incidentStatus": {
+      "investigating": "",
+      "identified": "",
+      "monitoring": "",
+      "resolved": "",
+      "postmortem": "",
+      "scheduled": "",
+      "in_progress": "",
+      "verifying": "",
+      "completed": ""
+    }
+  },
+  "connectivity": {
+    "Title": "Netzwerk-Konnektivität",
+    "Note": "Dieser Test prüft Ihre Verbindung zu einer Website. Je höher die Latenz, desto langsamer ist Ihre Verbindung zu dieser Seite. Sie können weitere häufig genutzte Websites importieren oder zur Testliste hinzufügen, um sie schnell zu testen.",
+    "StatusWait": "Wartet auf Test",
+    "StatusTesting": "Wird getestet…",
+    "StatusAvailable": "OK",
+    "StatusUnavailable": "Nicht erreichbar",
+    "StatusTimeout": "Timeout oder nicht erreichbar",
+    "checking": "Wird geprüft...",
+    "minTestTime": "Min. Testzeit: ",
+    "RefreshThisTest": "Diesen Test wiederholen",
+    "OpenSite": "Website öffnen",
+    "RoundCount": "Runde {n}: ",
+    "addCustom": {
+      "AddCard": "Test hinzufügen",
+      "Title": "Eigenen Test hinzufügen",
+      "Hint": "Wir testen, indem wir das Favicon der Website über HTTPS laden. Manche Websites sind so nicht erreichbar. Eigene Tests werden lokal in Ihrem Browser gespeichert.",
+      "ProbeBlockedNote": "Die Sicherheitsrichtlinien mancher Websites blockieren Cross-Origin-Abfragen – sie erscheinen dann als nicht erreichbar, obwohl sie sich normal öffnen lassen.",
+      "NameLabel": "Name",
+      "NamePlaceholder": "z. B. Wikipedia",
+      "UrlLabel": "URL",
+      "UrlPlaceholder": "z. B. wikipedia.org",
+      "Add": "Hinzufügen",
+      "Remove": "Test entfernen",
+      "NameRequired": "Bitte geben Sie einen Namen ein.",
+      "UrlRequired": "Bitte geben Sie eine URL ein.",
+      "InvalidUrl": "Das sieht nicht nach einer gültigen URL aus.",
+      "LimitReached": "Sie haben das Limit von 60 Tests erreicht.",
+      "LastTargetTitle": "Entfernen nicht möglich",
+      "LastTargetMessage": "Mindestens eine Test-Website muss bleiben."
+    },
+    "importDialog": {
+      "Title": "Tests hinzufügen / importieren",
+      "CustomOption": "Eigene hinzufügen",
+      "ImportOption": "Liste importieren",
+      "SiteCount": "{n} Websites",
+      "Import": "Importieren",
+      "NotEnoughCapacity": "Nicht genug Platz – diese Liste braucht {need} Plätze, nur {free} sind frei.",
+      "Destination": "Hinzufügen zu",
+      "ImportAsNew": "Als neue Liste importieren",
+      "MissingCountry": "Ihr Land fehlt? {link}",
+      "MissingCountryLink": "Eine Liste dafür beitragen"
+    },
+    "lists": {
+      "Tab": "Listen",
+      "Mine": "Meine Websites",
+      "Manage": "Listen verwalten",
+      "NewListPlaceholder": "Name der neuen Liste",
+      "Create": "Erstellen",
+      "LimitReached": "Sie können bis zu {limit} Listen anlegen.",
+      "Rename": "Umbenennen",
+      "Delete": "Löschen",
+      "MoveUp": "Nach oben",
+      "MoveDown": "Nach unten",
+      "DeleteNotEmpty": "Entfernen Sie alle Websites, bevor Sie diese Liste löschen.",
+      "MineUndeletable": "Die Standardliste kann nicht gelöscht werden.",
+      "Save": "Speichern",
+      "Cancel": "Abbrechen",
+      "Hint": "Eine Liste muss leer sein, bevor sie gelöscht werden kann; „Meine Websites“ bleibt immer erhalten."
+    },
+    "importLists": {
+      "defaults": "Systemstandard",
+      "iran": "Iran-Grundausstattung",
+      "russia": "Russland-Grundausstattung",
+      "china": "China-Grundausstattung",
+      "brazil": "Brasilien-Grundausstattung",
+      "india": "Indien-Grundausstattung",
+      "nigeria": "Nigeria-Grundausstattung",
+      "germany": "Deutschland-Grundausstattung",
+      "albania": "Albanien-Grundausstattung",
+      "kosovo": "Kosovo-Grundausstattung",
+      "thailand": "Thailand-Grundausstattung",
+      "mexico": "Mexiko-Grundausstattung",
+      "ai": "KI-Dienste",
+      "social": "Social Media & Messenger",
+      "productivity": "Arbeit & Produktivität",
+      "education": "Online-Bildung",
+      "streaming": "Streaming",
+      "music": "Musik & Audio",
+      "sports": "Sport",
+      "travel": "Reisen & Buchung",
+      "gaming": "Gaming",
+      "developer": "Entwickler",
+      "cloud": "Cloud & CDN",
+      "finance": "Finanzen & Zahlungen",
+      "crypto": "Krypto-Börsen",
+      "ecommerce": "Globaler E-Commerce",
+      "news": "Nachrichten & Wiki"
+    }
+  },
+  "webrtc": {
+    "id": "webrtc",
+    "Title": "WebRTC-Leak-Test",
+    "Name": "WebRTC-Verbindung",
+    "Note": "Wenn der Browser Netzwerkadressen über WebRTC ermittelt, kann er Ihr VPN oder Ihren Proxy umgehen und Websites Ihre echte IP verraten. Dieser Test prüft, welche IP bei einer WebRTC-Verbindung sichtbar wird. Entspricht die zurückgegebene IP-Adresse oder Region nicht Ihren Erwartungen, besteht möglicherweise ein WebRTC-Leak und Sie sollten Ihre Proxy-Einstellungen anpassen. Neben der IP für WebRTC-Verbindungen ermitteln wir auch Ihren NAT-Typ.",
+    "StatusWait": "Wartet auf Test",
+    "StatusTesting": "Wird getestet…",
+    "StatusError": "Verbindungsfehler",
+    "StatusUnavailable": "WebRTC nicht verfügbar",
+    "SdpLog": "SDP-Log",
+    "NATType": {
+      "srflx": "Port Restricted Cone oder Symmetric",
+      "prflx": "Port Restricted Cone",
+      "relay": "Symmetric",
+      "host": "Full Cone",
+      "unknown": "Unbekannter Typ"
+    }
+  },
+  "dnsleaktest": {
+    "Name": "DNS-Endpunkt-Test",
+    "Title": "DNS-Leak-Test",
+    "Note": "Auch wenn Sie ein VPN oder einen Proxy nutzen, können DNS-Anfragen weiterhin über Ihr lokales Netzwerk laufen und die Domains der besuchten Websites preisgeben. Provider, Firewalls, Betreiber öffentlicher WLANs und andere auf dem Weg können sie abfangen und so sehen, welche Websites Sie besuchen. Dieser Test ruft eine neu generierte Domain auf, um festzustellen, über welche Region Ihre DNS-Anfragen laufen. Weicht die zurückgegebene Region von der Ihres VPNs/Proxys ab, besteht möglicherweise ein DNS-Leak.",
+    "EndpointCountry": "Endpunkt-Region",
+    "StatusWait": "Wartet auf Test",
+    "StatusTesting": "Wird getestet…",
+    "StatusError": "Testfehler"
+  },
+  "speedtest": {
+    "Title": "Speedtest",
+    "Note": "Der Speedtest läuft über das Edge-Netzwerk von Cloudflare. Sie können die Paketgröße für Download und Upload nach Bedarf wählen. Während des Tests werden 4-mal Pakete hoch- und heruntergeladen – bitte achten Sie auf Ihr Datenvolumen. Da Cloudflare nicht in jedem Land Edge-Knoten betreibt, dienen die Ergebnisse nur als Orientierung; die tatsächliche Geschwindigkeit kann höher sein.",
+    "Download": "Download",
+    "Upload": "Upload",
+    "Latency": "Latenz",
+    "Jitter": "Jitter",
+    "loadedLatency": "Latenz unter Last: ",
+    "videoStreaming": "Video-Streaming",
+    "gaming": "Gaming",
+    "rtc": "Videochat",
+    "score": "Aus dem Speedtest ergeben sich folgende Qualitätswerte:",
+    "connectionFrom": "Speedtest abgeschlossen – von Ihrem Gerät, IP: ",
+    "connectionTo": " zum Testserver:",
+    "connectionEnd": " .",
+    "testFailed": "Der Speedtest-Server ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "phases": {
+      "probe": "Vortest",
+      "latency": "Latenztest",
+      "download": "Download-Test",
+      "upload": "Upload-Test"
+    },
+    "phasePaused": "{phase} – pausiert",
+    "phaseFinished": "Test abgeschlossen",
+    "phaseFailed": "Test fehlgeschlagen",
+    "quality": {
+      "bad": "Schlecht",
+      "poor": "Mangelhaft",
+      "average": "Durchschnittlich",
+      "good": "Gut",
+      "great": "Sehr gut"
+    },
+    "ToolHint": "Bandbreite ist nur die halbe Wahrheit: Sehen Sie mit {ping} und {mtr}, wie Ihr Netz den Rest der Welt erreicht."
+  },
+  "globalping": {
+    "Selected": "",
+    "Suggested": "",
+    "NoProbe": "",
+    "GroupFull": "",
+    "UnreachableTarget": "",
+    "ResultsHint": "",
+    "Asia": "",
+    "Europe": "",
+    "Africa": "",
+    "Americas": "",
+    "Oceania": ""
+  },
+  "pingtest": {
+    "EnterIPLabel": "",
+    "EnterIPPlaceholder": "",
+    "UseStored": "",
+    "id": "",
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "SelectIP": "",
+    "Region": "",
+    "MinDelay": "",
+    "MaxDelay": "",
+    "AvgDelay": "",
+    "TotalPackets": "",
+    "PacketLoss": "",
+    "ReceivedPackets": "",
+    "DroppedPackets": "",
+    "Error": ""
+  },
+  "mtrtest": {
+    "EnterIPLabel": "",
+    "EnterIPPlaceholder": "",
+    "UseStored": "",
+    "Title": "",
+    "Note": "",
+    "Note2": "",
+    "Note3": "",
+    "SelectIP": "",
+    "Region": "",
+    "Error": "",
+    "ColHost": "",
+    "ColIP": "",
+    "ColASN": "",
+    "ColLoss": "",
+    "ColSent": "",
+    "ColDrop": "",
+    "ColRecv": "",
+    "ColLast": "",
+    "ColAvg": "",
+    "ColBest": "",
+    "ColWorst": "",
+    "ColStDev": "",
+    "ColJitter": "",
+    "NoReply": ""
+  },
+  "ipcheck": {
+    "Title": "IP-Check",
+    "Placeholder": "z. B. 1.1.1.1",
+    "Error": "Bitte geben Sie eine gültige IPv4- oder IPv6-Adresse ein.",
+    "reservedIP": "Private, Loopback- und andere reservierte Adressen haben keine Geolocation – hier gibt es nichts nachzuschlagen.",
+    "NoData": "Für diese IP konnten keine Informationen abgerufen werden. Sie ist möglicherweise nicht routbar (z. B. 0.0.0.0, private Adresse) oder die Quelle hat keine Daten dazu."
+  },
+  "alert": {
+    "refreshEverythingMessage": "Alle Daten werden aktualisiert, bitte warten...",
+    "refreshEverythingTitle": "Aktualisierung",
+    "OhNo": "Oh nein!",
+    "Congrats": "Glückwunsch!",
+    "OhNo_Message": "Konnektivitätstest fehlgeschlagen, einige Websites sind nicht erreichbar.",
+    "Congrats_Message": "Alle Konnektivitätstests bestanden, alle Websites sind erreichbar.",
+    "maskedInfoTitle": "IPs maskiert",
+    "maskedInfoMessage": "Geteilte Screenshots verraten Ihre IPs nicht.",
+    "unmaskedInfoTitle": "IPs sichtbar",
+    "unmaskedInfoMessage": "Vorsicht beim Teilen von Screenshots.",
+    "SignInFailed": "Anmeldung fehlgeschlagen",
+    "SignInFailedReason": "Grund",
+    "IpGeoSourceFallbackTitle": "IP-Geolocation-Quelle gewechselt",
+    "IpGeoSourceFallbackMessage": "{from} ist vorübergehend nicht verfügbar – dieses Ergebnis stammt vorerst von {to}.",
+    "SignInEmailTakenTitle": "Diese E-Mail wird bereits verwendet",
+    "SignInEmailTakenMessage": "Für diese E-Mail-Adresse gibt es bereits ein Konto. Bitte melden Sie sich stattdessen mit {other} an."
+  },
+  "shortcutKeys": {
+    "GoToTop": "Nach oben",
+    "GoToBottom": "Nach unten",
+    "ToggleDarkMode": "Dunkelmodus umschalten",
+    "RefreshEverything": "Alles aktualisieren",
+    "RefreshIPCard": "IP-Karte aktualisieren",
+    "RefreshConnectivityTests": "Konnektivitätstests aktualisieren",
+    "RefreshWebRTC": "WebRTC-Leak-Test aktualisieren",
+    "RefreshDNSLeakTest": "DNS-Leak-Test aktualisieren",
+    "SpeedTestButton": "Speedtest starten/pausieren",
+    "PingTest": "Globalen Latenztest öffnen",
+    "MTRTest": "MTR-Test öffnen",
+    "RuleTest": "Regeltest öffnen",
+    "DNSResolver": "DNS-Auflösung öffnen",
+    "IPCheck": "IP-Adresse abfragen",
+    "ToggleInfoMask": "Info-Maskierung umschalten",
+    "IPHistory": "IP-Verlauf öffnen",
+    "ShareReport": "Dialog „Bericht teilen“ öffnen",
+    "Help": "Tastenkürzel anzeigen",
+    "HelpNote": "Wer Tastenkürzel nutzt, ist einfach großartig!",
+    "GoNext": "Nächste Karte",
+    "GoPrevious": "Vorherige Karte",
+    "OpenHighlightedTool": "Markierte Karte öffnen (Tool oder Website)",
+    "RefreshRuleTests": "Regeltests aktualisieren",
+    "CensorshipCheck": "Zensur-Check öffnen",
+    "Pulse": "Earth Online öffnen",
+    "Whois": "Whois-Abfrage öffnen",
+    "ServiceStatus": "Dienststatus öffnen",
+    "InvisibilityTest": "Unsichtbarkeitstest öffnen",
+    "EnhancedDnsLeakTest": "Ausführlichen DNS-Leak-Test öffnen",
+    "MacChecker": "MAC-Abfrage öffnen",
+    "IpCalculator": "IP-Rechner öffnen",
+    "BrowserInfo": "Browser-Infos öffnen",
+    "AdblockTest": "Werbe- & Tracker-Blocker-Test öffnen",
+    "SecurityChecklist": "Sicherheits-Checkliste öffnen",
+    "PersonaCheck": "Ausführlichen Persona-Check öffnen",
+    "IpBlocklist": "IP-Blocklisten-Check öffnen",
+    "AsnProfile": "ASN-Profilabfrage öffnen"
+  },
+  "page": {
+    "title": "IPCheck.ing - Meine IP-Adresse und Geolocation prüfen - IP-Leak-Test - DNS-Leak-Test - IP-Qualitätsprüfung - Netzwerk-Speedtest - All-in-one IP-Toolbox",
+    "description": "Eine bessere Open-Source-IP-Toolbox: Prüfen Sie Ihre IP-Adresse und Geolocation, testen Sie auf WebRTC- und DNS-IP-Leaks, führen Sie eine IP-Qualitätsprüfung und einen Browser-Fingerprint-Check durch – dazu Speedtest, globaler Latenztest, MTR-Test, Whois-Abfrage und mehr.",
+    "keywords": "MyIP, IP-Tool, IP-Check, IP-Leak-Test, IP-Qualitätsprüfung, IP-Lookup, DNS-Leak-Test, WebRTC-Leak-Test, Browser-Fingerprint, Speedtest, globaler Latenztest, MTR-Test, DNS-Lookup, Whois-Abfrage",
+    "footerLink": "https://github.com/jason5ng32/MyIP",
+    "copyRightName": "Ursprünglich von ",
+    "copyRightLink": "https://ipcheck.ing",
+    "copyRightLinkName": "IPCheck.ing"
+  },
+  "helpModal": {
+    "Title": "Tastenkürzel"
+  },
+  "footer": {
+    "Tagline": "Eine kostenlose Open-Source-Privacy-Toolbox – alles in einem.",
+    "Project": "Projekt",
+    "Support": "Doku & Support",
+    "DeveloperDocs": "Entwickler-Doku",
+    "SelfHosting": "Self-Hosting-Anleitung",
+    "ReportIssue": "Problem melden",
+    "FeatureRequest": "Feature anfragen",
+    "License": "MIT-Lizenz",
+    "Contribute": "Mitwirken",
+    "Clients": "Clients",
+    "Raycast": "Raycast-Erweiterung",
+    "Lite": "Lite-Edition"
+  },
+  "about": {
+    "Title": "Über",
+    "project": [
+      "IPCheck.ing ist eine kostenlose All-in-one-IP-Toolbox: Prüfen Sie Ihre eigenen IP-Informationen, testen Sie die Erreichbarkeit von Websites, untersuchen Sie Ihren DNS-Ausgang und führen Sie Speedtests, globale Latenztests, MTR-Tests und mehr durch.",
+      "Dies ist ein Open-Source-Projekt – klicken Sie auf das GitHub-Symbol unten auf der Seite, um den Quellcode anzusehen.",
+      "Wenn Sie nicht sicher sind, wie eine Funktion funktioniert, öffnen Sie den Link „Hilfe-Center“ unten auf der Seite. Die Dokumentation ist ausführlich: Neben jeder Funktion erklärt sie auch Netzwerkkonzepte und wie Sie Netzwerkprobleme beheben.",
+      "Wenn Sie am Open-Source-Projekt mitwirken möchten, finden Sie unter dem Link „Entwickler-Doku“ unten auf der Seite, wie das geht."
+    ],
+    "founderTitle": "Über den Gründer",
+    "founder": [
+      "Angefangen hat alles als Nebenprojekt von Jason Ng (阿禅), um Vue.js zu lernen und mit KI programmieren zu üben. Als es auf GitHub immer mehr Sterne sammelte, hat er es grundlegend überarbeitet und viele wirklich nützliche Funktionen ergänzt. Wir hoffen, es gefällt Ihnen.",
+      "Er ist kein professioneller Programmierer. Meist ist er als Produktmanager, Blogger, Motorradfahrer und Geek unterwegs – aber er liebt Programmieren, Open Source und das Teilen.",
+      "Eine ausführlichere Vorstellung finden Sie unter diesen Links:"
+    ],
+    "contactTitle": "Kontakt",
+    "contact": [
+      "Wenn Sie bei der Nutzung von IPCheck.ing oder beim Deployment des MyIP-Projekts auf Probleme stoßen, schauen Sie zuerst ins „Hilfe-Center“. Finden Sie dort keine Antwort, eröffnen Sie ein Issue auf GitHub oder schreiben Sie uns eine E-Mail.",
+      "Und wenn Sie auf einen Bug stoßen und gerne programmieren (oder mit KI programmieren), freuen wir uns sehr über einen PR mit Ihrem Fix.",
+      "Unsere E-Mail: i[AT]ipcheck.ing."
+    ],
+    "personal": "Persönliche Website",
+    "blog": "Blogartikel",
+    "linkedIn": "LinkedIn",
+    "twitter": "Twitter",
+    "Sponsor": "Sponsern",
+    "Privacy": "Datenschutz",
+    "HelpCenter": "Hilfe-Center",
+    "Close": "Schließen"
+  },
+  "acknowledgement": {
+    "Title": "Danksagung",
+    "Note1": "Dieses Projekt wäre ohne die Unterstützung und Hilfe engagierter Einzelpersonen und Organisationen – sowie all jener, die Inspiration geliefert oder ihren Code veröffentlicht haben – nicht möglich gewesen. Vielen Dank an sie:"
+  },
+  "changelog": {
+    "Title": "Änderungsprotokoll",
+    "add": "Neu",
+    "improve": "Verbessert",
+    "fix": "Behoben"
+  },
+  "pwa": {
+    "appDescription": "All-in-one IP-Toolbox",
+    "installDescription": "Sie haben IPCheck.ing bereits {count}-mal genutzt – installieren Sie es als App für eine flüssigere Bedienung und schnelleren Zugriff."
+  }
+}
