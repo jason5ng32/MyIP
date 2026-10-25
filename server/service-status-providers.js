@@ -66,6 +66,9 @@ export const STATUS_PROVIDERS = [
     { id: 'perplexity', name: 'Perplexity', api: 'https://status.perplexity.com', page: 'https://status.perplexity.com', platform: 'incident.io' },
     { id: 'canva', name: 'Canva', api: 'https://www.canvastatus.com', page: 'https://www.canvastatus.com' },
     { id: 'docker', name: 'Docker', api: 'https://www.dockerstatus.com', page: 'https://www.dockerstatus.com', platform: 'incident.io' },
+    { id: 'bitbucket', name: 'Bitbucket', api: 'https://bitbucket.status.atlassian.com', page: 'https://bitbucket.status.atlassian.com' },
+    { id: 'digitalocean', name: 'DigitalOcean', api: 'https://status.digitalocean.com', page: 'https://status.digitalocean.com' },
+    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

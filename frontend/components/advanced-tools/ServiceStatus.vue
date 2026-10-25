@@ -217,6 +217,9 @@ const PROVIDERS = [
   { id: 'perplexity', name: 'Perplexity', icon: 'ri:perplexity-line' },
   { id: 'canva', name: 'Canva', icon: 'simple-icons:canva' },
   { id: 'docker', name: 'Docker', icon: 'simple-icons:docker' },
+  { id: 'bitbucket', name: 'Bitbucket', icon: 'simple-icons:bitbucket' },
+  { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
+  { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
