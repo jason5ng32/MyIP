@@ -2313,5 +2313,33 @@
         }
       }
     ]
+  },
+  {
+    "version": "v8.1.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "IP cards add Scenario friction: an estimate of the extra checks or restrictions this IP may meet across 10 scenarios such as sign-up, payments and streaming",
+          "zh": "IP 卡片新增「场景摩擦」：估算这个 IP 在注册、支付、流媒体等 10 类场景中可能遇到的额外验证或限制",
+          "zh-TW": "IP 卡片新增「場景摩擦」：估算這個 IP 在註冊、支付、串流媒體等 10 類場景中可能遇到的額外驗證或限制",
+          "fr": "Les cartes IP ajoutent la Friction par scénario : une estimation des vérifications ou restrictions supplémentaires que cette IP peut rencontrer dans 10 scénarios, comme l'inscription, les paiements et le streaming",
+          "ru": "В карточках IP появились «Сложности по сценариям»: оценка дополнительных проверок или ограничений, с которыми этот IP может столкнуться в 10 сценариях, например при регистрации, оплате и стриминге",
+          "pt-BR": "Os cartões de IP ganham o Atrito por cenário: uma estimativa das verificações extras ou restrições que este IP pode encontrar em 10 cenários, como cadastro, pagamentos e streaming"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]

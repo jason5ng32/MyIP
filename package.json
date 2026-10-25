@@ -1,7 +1,7 @@
 {
   "name": "myip",
   "private": true,
-  "version": "8.0.0",
+  "version": "8.1.0",
   "type": "module",
   "packageManager": "pnpm@12.14.0",
   "engines": {
