@@ -1649,7 +1649,7 @@
       "openProfile": "Vollständiges ASN-Profil öffnen"
     },
     "ASNHistory": {
-      "announcedPrefixes": "Announcte Präfixe: ",
+      "announcedPrefixes": "Angekündigte Präfixe: ",
       "note": "Bisherige ASN-Announcements für diese IP: ",
       "empty": "Keine historischen Routing-Daten für diese IP gefunden.",
       "error": "ASN-Verlauf konnte nicht geladen werden.",
