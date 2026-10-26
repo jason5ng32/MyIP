@@ -533,6 +533,7 @@ export const IMPORT_LISTS = [
             { id: 'shopify', name: 'Shopify', url: 'https://www.shopify.com/favicon.ico' },
             { id: 'walmart', name: 'Walmart', url: 'https://www.walmart.com/favicon.ico' },
             { id: 'shopee', name: 'Shopee', url: 'https://shopee.com/favicon.ico' },
+            { id: 'lazada', name: 'Lazada', url: 'https://www.lazada.sg/favicon.ico' },
             { id: 'mercadolibre', name: 'Mercado Libre', url: 'https://www.mercadolibre.com/favicon.ico' },
             { id: 'rakuten', name: 'Rakuten', url: 'https://www.rakuten.co.jp/favicon.ico' },
         ],
