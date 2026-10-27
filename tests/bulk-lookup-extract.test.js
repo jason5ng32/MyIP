@@ -23,6 +23,16 @@ describe('bulk-lookup-extract — separators', () => {
         assert.deepEqual(ipsOf('ip:1.1.1.1 src:8.8.8.8 id:9.9.9.9'), ['1.1.1.1', '8.8.8.8', '9.9.9.9']);
     });
 
+    it('takes a key ending in a digit', () => {
+        assert.deepEqual(ipsOf('ipv4:8.8.8.8 ipv6:2606:4700:4700::1111 h2:1.1.1.1 peer10:9.9.9.9 key2=4.4.4.4'),
+            ['8.8.8.8', '2606:4700:4700::1111', '1.1.1.1', '9.9.9.9', '4.4.4.4']);
+    });
+
+    it('still reads a word glued to digits without a colon as no IP', () => {
+        assert.deepEqual(extractIPs('Version17.4.1.2 Build17.4.1.2 ipv41.2.3.4').summary,
+            { found: 0, unique: 0, reserved: 0, cidr: 0 });
+    });
+
     it('accepts a sentence-ending dot', () => {
         assert.deepEqual(ipsOf('Blocked 1.1.1.1.'), ['1.1.1.1']);
     });

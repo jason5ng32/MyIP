@@ -55,9 +55,9 @@ const readRun = (line, run, start) => {
     let token = run;
     if (before === '/') return null; // Chrome/120.0.0.0, Safari/537.36
     if (LETTER.test(before) && !/^:(?!:)/.test(token)) {
-        // `src:1.2.3.4` scans as `c:1.2.3.4` (c is hex): drop that hex tail of
-        // the key. Anything else glued to a word — Version17.4.1.2 — is not an IP.
-        const keyTail = /^[A-Fa-f]+:(?!:)/.exec(token);
+        // `src:1.2.3.4` / `ipv4:1.2.3.4` scan as `c:…` / `4:…`: drop that tail
+        // of the key. Anything else glued to a word — Version17.4.1.2 — is not an IP.
+        const keyTail = /^[0-9A-Fa-f]+:(?!:)/.exec(token);
         if (!keyTail) return null;
         token = token.slice(keyTail[0].length);
     }
