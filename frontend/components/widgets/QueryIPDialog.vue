@@ -71,6 +71,7 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
 import { useAsnInfo } from '@/composables/use-asn-info.js';
+import { createLatestRequest } from '@/utils/latest-request.js';
 import { Monitor, Search } from '@lucide/vue';
 
 const props = defineProps({
@@ -95,6 +96,8 @@ const ipGeoSource = ref(userPreferences.value.ipGeoSource);
 const { asnInfos } = useAsnInfo();
 const asnHistoryInfos = ref({});
 const asnConnectivityInfos = ref({});
+// Latest query wins: a superseded one (another IP opened mid-fetch) writes nothing.
+const request = createLatestRequest();
 
 watch(() => userPreferences.value.ipGeoSource, (newVal) => {
     ipGeoSource.value = newVal;
@@ -107,6 +110,7 @@ watch(inputIP, (value) => {
 });
 
 const rejectQuery = (message) => {
+    request.cancel();
     modalQueryError.value = message;
     modalQueryResult.value = null;
     isChecking.value = 'idle';
@@ -127,6 +131,7 @@ const submitQuery = async () => {
 const setOpen = (val) => emit('update:open', val);
 
 const fetchIPForModal = async (ip) => {
+    const call = request.start(ip);
     const selectedLang = toApiTag(lang.value);
     const sources = store.ipDBs.filter(s => s.enabled);
 
@@ -144,11 +149,14 @@ const fetchIPForModal = async (ip) => {
         try {
             const url = store.getDbUrl(source.id, ip, selectedLang);
             const response = await authenticatedFetch(url);
+            if (!call.isCurrent()) return;
             modalQueryResult.value = { ...transformDataFromIPapi(response, source.id, t, lang.value), ip };
             isChecking.value = 'idle';
+            call.done();
             emit('result', { ip, sourceId: source.id, data: modalQueryResult.value });
             return;
         } catch (error) {
+            if (!call.isCurrent()) return;
             logSourceFetchFailure(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
             currentIdx = (currentIdx + 1) % sources.length;
             attempts++;
@@ -157,17 +165,18 @@ const fetchIPForModal = async (ip) => {
 
     // Every source exhausted with real failures — surface a user-facing
     // error instead of leaving the spinner running forever.
+    call.done();
     isChecking.value = 'idle';
     modalQueryError.value = t('ipcheck.NoData');
 };
 
-// On open: a given IP is queried (unless already on screen), otherwise the
-// input takes focus.
+// On open: a given IP is queried (unless already on screen or in flight),
+// otherwise the input takes focus.
 watch(() => [props.open, props.ip], ([open, ip]) => {
     if (!open) return;
     if (ip) {
         inputIP.value = ip;
-        if (modalQueryResult.value?.ip !== ip && isChecking.value !== 'running') submitQuery();
+        if (modalQueryResult.value?.ip !== ip && request.pendingKey() !== ip) submitQuery();
         return;
     }
     nextTick(() => {
