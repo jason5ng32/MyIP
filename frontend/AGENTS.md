@@ -99,6 +99,14 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   above the largest backend section deadline (tested).
 - ASN Info's footer links `/tools/asn?q=AS<n>` (hidden when gated off); in
   QueryIP it emits `open-tool` via IpDetailPanel so the dialog closes first.
+  The dialog is `widgets/QueryIPDialog.vue` (v-model `open`, optional `ip` to
+  run): Home's FAB and tool pages (Bulk IP Lookup) each mount their own.
+
+### Bulk IP Lookup
+
+Rows live in localStorage (`use-bulk-lookup.js`), geography from
+`/api/bulk-lookup` only. Anything per IP stays single-IP: a row opens the
+QueryIP dialog or links to the Blocklist tool — no bulk path to the private API.
 
 ### Overlays take no keyboard shortcuts
 
