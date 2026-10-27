@@ -213,4 +213,4 @@ MyIP को स्पॉन्सर करना चाहते हैं? [�
 
 ## 📄 लाइसेंस
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

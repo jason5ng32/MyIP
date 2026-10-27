@@ -2,6 +2,7 @@
   "name": "myip",
   "private": true,
   "version": "8.1.0",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "packageManager": "pnpm@12.14.0",
   "engines": {

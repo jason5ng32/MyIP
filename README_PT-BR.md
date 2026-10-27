@@ -214,4 +214,4 @@ Quer patrocinar o MyIP? [Seja um patrocinador](https://github.com/sponsors/jason
 
 ## 📄 Licença
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

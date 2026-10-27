@@ -116,6 +116,11 @@ private channel in [SECURITY.md](SECURITY.md), never a public issue.
 - UI rendering and browser APIs are out of scope for the Node runner; visual changes
   are verified by the maintainer during review, so mention in your PR what to look at.
 
+## License
+
+MyIP is licensed under [AGPL-3.0](LICENSE). By submitting a contribution, you
+agree that it is licensed under the same terms.
+
 ## Code of Conduct
 
 This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). By participating,

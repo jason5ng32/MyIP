@@ -213,4 +213,4 @@ Envie de soutenir MyIP ? [Devenir sponsor](https://github.com/sponsors/jason5ng3
 
 ## 📄 Licence
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

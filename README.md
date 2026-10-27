@@ -210,4 +210,4 @@ Interested in sponsoring MyIP? [Become a sponsor](https://github.com/sponsors/ja
 
 ## 📄 License
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

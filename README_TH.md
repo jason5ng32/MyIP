@@ -213,4 +213,4 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 📄 สัญญาอนุญาต
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

@@ -213,4 +213,4 @@ Jeni të interesuar të sponsorizoni MyIP? [Bëhu sponsor](https://github.com/sp
 
 ## 📄 Licenca
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng
