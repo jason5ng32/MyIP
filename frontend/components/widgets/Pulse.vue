@@ -59,9 +59,13 @@
                         </button>
                     </div>
                     <p v-for="fest in activeFestivals" :key="'desc-' + fest.id"
-                        class="m-0 my-1.5 text-xs text-muted-foreground flex items-center gap-1">
-                        <ClockFading class="size-3" />{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
-                        t('nav.pulse.festivalDesc.' + fest.id) }}
+                        class="m-0 my-1.5 flex items-start gap-1 text-xs text-muted-foreground">
+                        <!-- One text-xs line box (h-4), so the icon sits on the first line when the copy wraps. -->
+                        <span class="flex h-4 shrink-0 items-center">
+                            <ClockFading class="size-3" />
+                        </span>
+                        <span>{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
+                            t('nav.pulse.festivalDesc.' + fest.id) }}</span>
                     </p>
                     <!-- Fixed-height hint slot (no layout shift). Auto-hide after 3 seconds. -->
                     <div class="mt-1 flex h-4 items-center text-xs" aria-live="polite">
@@ -79,7 +83,7 @@
                         </span>
                     </div>
                 </section>
-                
+
                 <!-- Latest events: IPs arrive pre-masked; status ids render in
                     the viewer's language. No local echo — the post-send
                     refetch shows the sender in the real feed.
@@ -115,10 +119,11 @@
                                     <span class="shrink-0 text-xs tabular-nums text-muted-foreground/70">{{
                                         relTime(entry.min) }}</span>
                                 </div>
-                                <div class="truncate text-sm text-muted-foreground">
-                                    {{ statusById(entry.status).emoji }} {{ t('nav.pulse.statuses.' + entry.status) }}
+                                <div class="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <span class="truncate">{{ statusById(entry.status).emoji }} {{
+                                        t('nav.pulse.statuses.' + entry.status) }}</span>
                                     <ClockFading v-if="FESTIVAL_IDS.has(entry.status)"
-                                        class="inline size-3 text-primary" />
+                                        class="size-3 shrink-0 text-primary" />
                                 </div>
                             </div>
                         </li>
