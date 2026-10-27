@@ -1,6 +1,6 @@
 // Guards frontend/utils/features/bulk-lookup-extract.js — IP extraction from
 // pasted lists and raw logs: separators, ports, defanged notation, IPv6
-// canonicalization, CIDR / reserved skips, firstPerLine, and the false
+// canonicalization, URL hosts, CIDR / reserved skips, firstPerLine, and the false
 // positives logs are full of (UA versions, timestamps, MACs, hashes).
 
 import assert from 'node:assert/strict';
@@ -49,6 +49,24 @@ describe('bulk-lookup-extract — ports', () => {
 
     it('reads ip/port when the number is past the prefix range', () => {
         assert.deepEqual(ipsOf('outside:8.8.8.8/443'), ['8.8.8.8']);
+    });
+});
+
+describe('bulk-lookup-extract — URLs', () => {
+    it('reads the host of a URL, port and userinfo stripped', () => {
+        assert.deepEqual(ipsOf('http://8.8.8.8/path https://1.1.1.1:8443/x //8.8.4.4/ Referer: "http://9.9.9.9/" https://user@4.4.4.4/'),
+            ['8.8.8.8', '1.1.1.1', '8.8.4.4', '9.9.9.9', '4.4.4.4']);
+    });
+
+    it('never reads a URL host followed by a number as a CIDR', () => {
+        const { entries, summary } = extractIPs('http://8.8.8.8/24');
+        assert.deepEqual(entries.map((e) => e.ip), ['8.8.8.8']);
+        assert.equal(summary.cidr, 0);
+    });
+
+    it('still skips a version after a single slash', () => {
+        assert.deepEqual(extractIPs('Chrome/120.0.0.0 Safari/537.36 Version/17.4.1.2').summary,
+            { found: 0, unique: 0, reserved: 0, cidr: 0 });
     });
 });
 

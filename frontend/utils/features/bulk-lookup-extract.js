@@ -53,7 +53,10 @@ const readRun = (line, run, start) => {
     if (LETTER.test(after)) return null;
 
     let token = run;
-    if (before === '/') return null; // Chrome/120.0.0.0, Safari/537.36
+    // `//` opens a URL authority (http://1.2.3.4/); a lone `/` is a product
+    // version (Chrome/120.0.0.0, Safari/537.36).
+    const urlHost = before === '/' && line[start - 2] === '/';
+    if (before === '/' && !urlHost) return null;
     if (LETTER.test(before) && !/^:(?!:)/.test(token)) {
         // `src:1.2.3.4` / `ipv4:1.2.3.4` scan as `c:…` / `4:…`: drop that tail
         // of the key. Anything else glued to a word — Version17.4.1.2 — is not an IP.
@@ -67,8 +70,8 @@ const readRun = (line, run, start) => {
     if (!ip) return null;
 
     // `/n` within the family's prefix range is a CIDR; a larger number is a
-    // port in `ip/port` notation (firewall logs).
-    if (after === '/') {
+    // port in `ip/port` notation (firewall logs). A URL host is never a CIDR.
+    if (after === '/' && !urlHost) {
         const prefix = /^\/(\d{1,3})(?!\d)/.exec(line.slice(start + run.length))?.[1];
         if (prefix !== undefined && Number(prefix) <= (ip.includes(':') ? 128 : 32)) {
             return { cidr: `${ip}/${Number(prefix)}` };
