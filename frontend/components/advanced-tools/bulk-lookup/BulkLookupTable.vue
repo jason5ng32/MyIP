@@ -5,8 +5,9 @@
     <div class="space-y-3">
         <!-- `relative` makes the scroller the containing block of the header's
              sr-only (absolute) labels; otherwise they resolve against the page
-             and drag the document wide whenever the table outgrows it. -->
-        <div class="relative overflow-x-auto rounded-lg border">
+             and drag the document wide whenever the table outgrows it.
+             data-sentry-block keeps the rows (third parties' IPs) out of replays. -->
+        <div class="relative overflow-x-auto rounded-lg border" data-sentry-block>
             <table class="w-full text-sm">
                 <thead class="bg-muted/40">
                     <tr class="text-left text-xs text-muted-foreground">

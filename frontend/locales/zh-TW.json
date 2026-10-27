@@ -1285,6 +1285,7 @@
     "RunIdle": "查詢",
     "Unanswered": "{n} 個 IP 查詢失敗。",
     "RunFailed": "查詢失敗，請稍後再試。",
+    "RunRateLimited": "查詢太頻繁，請稍後再試。",
     "StorageError": "瀏覽器未能儲存清單（儲存空間已滿或遭停用）。離開本頁前清單仍可使用。",
     "stat": {
       "rows": "IP",

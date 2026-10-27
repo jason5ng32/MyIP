@@ -1285,6 +1285,7 @@
     "RunIdle": "查询",
     "Unanswered": "{n} 个 IP 查询失败。",
     "RunFailed": "查询失败，请稍后再试。",
+    "RunRateLimited": "查询太频繁，请稍后再试。",
     "StorageError": "浏览器未能保存列表（存储空间已满或被禁用）。离开本页前列表仍然可用。",
     "stat": {
       "rows": "IP",

@@ -1285,6 +1285,7 @@
     "RunIdle": "Rechercher",
     "Unanswered": "{n} IP n'ont pas pu être recherchées.",
     "RunFailed": "La recherche a échoué. Veuillez réessayer plus tard.",
+    "RunRateLimited": "Trop de recherches en peu de temps. Veuillez réessayer plus tard.",
     "StorageError": "Ce navigateur n'a pas enregistré la liste (stockage plein ou bloqué). Elle reste disponible jusqu'à ce que vous quittiez la page.",
     "stat": {
       "rows": "IP",

@@ -155,6 +155,7 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import getCountryName from '@/data/country-name.js';
 import {
     useBulkLookup, MAX_NEW_PER_RUN, compareRows, filterRows, summarizeRows, listBatches, buildCsv, downloadCsv,
+    runFailureKind,
 } from '@/composables/use-bulk-lookup.js';
 import BulkLookupInput from './bulk-lookup/BulkLookupInput.vue';
 import BulkLookupTable from './bulk-lookup/BulkLookupTable.vue';
@@ -204,8 +205,10 @@ const onRun = async (entries) => {
         inputRef.value?.reset();
         if (outcome.unanswered) runNotice.value = t('bulklookup.Unanswered', { n: outcome.unanswered });
     } catch (error) {
-        console.error('Bulk lookup failed:', error);
-        runError.value = t('bulklookup.RunFailed');
+        const kind = runFailureKind(error);
+        if (kind === 'error') console.error(`Bulk lookup failed: HTTP ${error.status}`);
+        else console.warn('Bulk lookup failed:', error);
+        runError.value = t(kind === 'rateLimited' ? 'bulklookup.RunRateLimited' : 'bulklookup.RunFailed');
     } finally {
         isRunning.value = false;
     }

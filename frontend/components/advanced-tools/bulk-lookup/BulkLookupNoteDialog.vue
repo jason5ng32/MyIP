@@ -4,7 +4,7 @@
     <Dialog :open="open" @update:open="(v) => emit('update:open', v)">
         <DialogContent :title="t('bulklookup.EditNote')" class="max-w-md">
             <DialogHeader class="border-b border-border pb-2" :icon="PencilLine" :title="t('bulklookup.EditNote')" />
-            <div class="space-y-4">
+            <div class="space-y-4" data-sentry-block>
                 <p class="font-mono text-sm break-all mb-2">{{ ip }}</p>
                 <Textarea id="bulkLookupNote" v-model="draft" rows="3" :maxlength="NOTE_MAX"
                     class="min-h-20 max-h-48 text-sm" :placeholder="t('bulklookup.NotePlaceholder')"

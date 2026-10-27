@@ -94,6 +94,16 @@ export const planRun = (rows, entries, { maxNew = MAX_NEW_PER_RUN, maxRows = MAX
     return { existing, toQuery: blocked ? [] : fresh, fresh: fresh.length, room, blocked };
 };
 
+// A failed run, by who can act on it: 'rateLimited' (429 from the edge),
+// 'transient' (network, timeout, 503 while data loads) or 'error' — only the
+// last is our defect and worth a console.error (which Sentry captures).
+export const runFailureKind = (error) => {
+    const status = error?.status;
+    if (status === 429) return 'rateLimited';
+    if (!status || status === 503) return 'transient';
+    return 'error';
+};
+
 // What the input's status bar says and what its button offers, from the
 // extraction summary and the plan. One state each; `extras` are the non-zero
 // side counts (already listed, skipped private, skipped CIDR).

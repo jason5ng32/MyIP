@@ -9,7 +9,7 @@ import { effectScope } from 'vue';
 
 import {
     BULK_LOOKUP_STORAGE_KEY, MAX_ROWS, MAX_NEW_PER_RUN,
-    createEmptyState, sanitizeRow, parseState, planRun, inputStatus, mergeRun, compareRows, filterRows,
+    createEmptyState, sanitizeRow, parseState, planRun, runFailureKind, inputStatus, mergeRun, compareRows, filterRows,
     queryTerms, matchesTerms, aggregateRows, summarizeRows, listBatches, pageCount, showPaging, clampPage, pageSlice, pageRange,
     csvCell, buildCsv, useBulkLookup,
 } from '../frontend/composables/use-bulk-lookup.js';
@@ -440,5 +440,16 @@ describe('use-bulk-lookup — composable', () => {
         assert.equal(events.listeners.size, 1);
         scope.stop();
         assert.equal(events.listeners.size, 0);
+    });
+});
+
+describe('runFailureKind', () => {
+    it('sorts a failed run by who can act on it', () => {
+        assert.equal(runFailureKind({ status: 429 }), 'rateLimited');
+        assert.equal(runFailureKind({ status: 503 }), 'transient');
+        assert.equal(runFailureKind(new TypeError('Failed to fetch')), 'transient');
+        assert.equal(runFailureKind(undefined), 'transient');
+        assert.equal(runFailureKind({ status: 400 }), 'error');
+        assert.equal(runFailureKind({ status: 500 }), 'error');
     });
 });

@@ -1285,6 +1285,7 @@
     "RunIdle": "Look up",
     "Unanswered": "{n} IPs could not be looked up.",
     "RunFailed": "The lookup failed. Please try again later.",
+    "RunRateLimited": "Too many lookups in a short time. Please try again later.",
     "StorageError": "This browser didn't save the list (storage full or blocked). It stays here until you leave the page.",
     "stat": {
       "rows": "IPs",

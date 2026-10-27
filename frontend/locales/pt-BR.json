@@ -1285,6 +1285,7 @@
     "RunIdle": "Consultar",
     "Unanswered": "Não foi possível consultar {n} IPs.",
     "RunFailed": "A consulta falhou. Tente novamente mais tarde.",
+    "RunRateLimited": "Muitas consultas em pouco tempo. Tente novamente mais tarde.",
     "StorageError": "Este navegador não salvou a lista (armazenamento cheio ou bloqueado). Ela continua aqui até você sair da página.",
     "stat": {
       "rows": "IPs",
