@@ -29,6 +29,8 @@ import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
+import { createBulkLookup, BULK_LOOKUP_MAX_IPS } from '../api/bulk-lookup.js';
+import { resolveBulkLookupSource, DEFAULT_BULK_LOOKUP_SOURCE } from '../server/bulk-lookup-sources.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
 import ooniBlockingHandler from '../api/ooni-blocking.js';
 import globalpingProbesHandler from '../api/globalping-probes.js';
@@ -109,6 +111,12 @@ describe('configs handler', () => {
             assert.equal(typeof res.body[key], 'boolean');
         }
         assert.equal(res.body.originalSite, false);
+    });
+
+    it('names the bulk lookup source as a string', () => {
+        const res = createResponse();
+        configsHandler(createRequest(), res);
+        assert.equal(res.body.bulkLookupSource, 'maxmind');
     });
 
     it('honors the pre-rename env spellings as fallbacks', () => {
@@ -718,6 +726,116 @@ describe('mac-checker handler', () => {
         await createMacChecker(() => null)(createRequest({ query: { mac: '3C:5A:B4' } }), res);
         assert.equal(res.statusCode, 503);
         assert.deepEqual(res.body, { error: 'MAC database unavailable' });
+    });
+});
+
+// -- bulk-lookup handler --------------------------------------------------
+
+describe('bulk-lookup handler', () => {
+    // A fixture source, so no dataset needs to be loaded.
+    const lookups = [];
+    const fixtureSource = {
+        id: 'fixture',
+        build: () => '2026-10-20',
+        lookup: (ip, lang) => {
+            lookups.push([ip, lang]);
+            if (ip === '9.9.9.9') throw new Error('corrupt record');
+            return {
+                ip, city: 'Mountain View', region: 'California', country: 'US', country_name: 'United States',
+                country_code: 'US', latitude: 37.4, longitude: -122.1, asn: 'AS15169', org: 'GOOGLE',
+            };
+        },
+    };
+    const handler = createBulkLookup(() => fixtureSource);
+    const post = (body) => {
+        const res = createResponse();
+        handler(createRequest({ method: 'POST', body }), res);
+        return res;
+    };
+    beforeEach(() => { lookups.length = 0; });
+
+    it('rejects non-POST with 405', () => {
+        const res = createResponse();
+        handler(createRequest(), res);
+        assert.equal(res.statusCode, 405);
+    });
+
+    it('rejects a missing body, a non-array or an empty ips', () => {
+        assert.equal(post(undefined).statusCode, 400);
+        assert.equal(post({ ips: '8.8.8.8' }).statusCode, 400);
+        assert.equal(post({ ips: [] }).statusCode, 400);
+    });
+
+    it(`rejects more than ${BULK_LOOKUP_MAX_IPS} entries`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS + 1 }, (_, i) => `8.8.8.${i + 1}`);
+        assert.equal(BULK_LOOKUP_MAX_IPS, 100);
+        assert.equal(post({ ips }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it('rejects the whole request over one bad entry', () => {
+        for (const bad of [42, null, { ip: '8.8.8.8' }, `8.8.8.8${' '.repeat(40)}`, 'not-an-ip', '10.0.0.1', '2001:db8::1', ' 8.8.8.8']) {
+            assert.equal(post({ ips: ['1.1.1.1', bad] }).statusCode, 400, `accepted ${JSON.stringify(bad)}`);
+        }
+        assert.equal(lookups.length, 0);
+    });
+
+    it('rejects a non-string or overlong lang', () => {
+        assert.equal(post({ ips: ['8.8.8.8'], lang: 7 }).statusCode, 400);
+        assert.equal(post({ ips: ['8.8.8.8'], lang: 'x'.repeat(36) }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it(`accepts exactly ${BULK_LOOKUP_MAX_IPS} distinct IPs`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS }, (_, i) => `8.8.8.${i + 1}`);
+        assert.equal(post({ ips }).statusCode, 200);
+        assert.deepEqual(lookups.map(([ip]) => ip), ips);
+    });
+
+    it('rejects a repeated entry instead of deduping it', () => {
+        assert.equal(post({ ips: ['8.8.8.8', '1.1.1.1', '8.8.8.8'] }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it('passes lang through raw and answers the compact shape', () => {
+        const res = post({ ips: ['8.8.8.8'], lang: 'zh' });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(lookups, [['8.8.8.8', 'zh']]);
+        assert.deepEqual(res.body, {
+            source: { id: 'fixture', build: '2026-10-20' },
+            results: [{
+                ip: '8.8.8.8', country: 'US', city: 'Mountain View', region: 'California',
+                latitude: 37.4, longitude: -122.1, asn: 'AS15169', org: 'GOOGLE',
+            }],
+        });
+    });
+
+    it('leaves out an IP whose lookup throws, keeping the rest', () => {
+        const res = post({ ips: ['9.9.9.9', '1.1.1.1'] });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body.results.map((r) => r.ip), ['1.1.1.1']);
+    });
+
+    it('answers 503 when the source has no data loaded', () => {
+        const notReady = createBulkLookup(() => ({
+            id: 'fixture',
+            lookup: () => { const e = new Error('not ready'); e.statusCode = 503; throw e; },
+        }));
+        const res = createResponse();
+        notReady(createRequest({ method: 'POST', body: { ips: ['8.8.8.8'] } }), res);
+        assert.equal(res.statusCode, 503);
+    });
+
+    it('resolves BULK_LOOKUP_SOURCE, falling back to maxmind on unknown values', () => {
+        assert.equal(resolveBulkLookupSource(undefined).source.id, DEFAULT_BULK_LOOKUP_SOURCE);
+        assert.deepEqual(
+            { ...resolveBulkLookupSource(' MaxMind '), source: undefined },
+            { name: 'maxmind', known: true, source: undefined },
+        );
+        const unknown = resolveBulkLookupSource('ipinfo');
+        assert.equal(unknown.known, false);
+        assert.equal(unknown.source.id, 'maxmind');
+        assert.equal(resolveBulkLookupSource('constructor').known, false);
     });
 });
 

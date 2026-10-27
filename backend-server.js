@@ -45,6 +45,8 @@ import asnProfileHandler from './api/asn-profile.js';
 import { isCompleteProfile } from './server/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
+import bulkLookupHandler from './api/bulk-lookup.js';
+import { bulkLookupSource } from './server/bulk-lookup-sources.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
@@ -214,6 +216,9 @@ if (speedLimitSet !== 0) {
 // own tighter cap (REPORT_MAX_BYTES) after schema validation.
 // Must stay above REPORT_MAX_BYTES (common/report-schema.js) or report
 // uploads die here with a raw 413 before the handler's own size check.
+// Bulk lookup carries at most 100 IPs: its own tight parser runs first, and
+// the global one skips a body that is already parsed.
+app.use('/api/bulk-lookup', express.json({ limit: '8kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -304,6 +309,10 @@ app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
 app.post('/api/persona/evaluate', personaEvaluateHandler);
+// Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
+// warns at boot rather than on the first request.
+bulkLookupSource();
+app.post('/api/bulk-lookup', needsMaxMind, bulkLookupHandler);
 
 // Sentry tunnel — first-party relay for the frontend SDK's envelopes
 // Mounted only when this deployment actually built the frontend with a DSN.
