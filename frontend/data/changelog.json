@@ -2330,6 +2330,17 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added Bulk IP Lookup: paste IP lists or raw server logs to geolocate up to 100 IPs at a time, then sort, filter, star, summarize by country and ASN, map and export them",
+          "zh": "新增「IP 批量查询」：粘贴 IP 列表或服务器日志，每次最多查询 100 个 IP 的地理位置，并可排序、筛选、加星标、按国家和 ASN 汇总、查看地图和导出",
+          "zh-TW": "新增「IP 批次查詢」：貼上 IP 清單或伺服器日誌，每次最多查詢 100 個 IP 的地理位置，並可排序、篩選、加上星號、依國家和 ASN 彙總、查看地圖和匯出",
+          "fr": "Ajout de la Recherche IP groupée : collez des listes d'IP ou des journaux de serveur bruts pour géolocaliser jusqu'à 100 IP à la fois, puis triez, filtrez, ajoutez une étoile, résumez par pays et par ASN, affichez sur une carte et exportez",
+          "ru": "Добавлена «Массовая проверка IP»: вставьте список IP или сырые журналы сервера, чтобы определить местоположение до 100 IP за раз, а затем сортируйте, фильтруйте, отмечайте звёздочкой, сводите по странам и ASN, смотрите на карте и экспортируйте",
+          "pt-BR": "Nova Consulta de IPs em lote: cole listas de IPs ou logs brutos de servidor para geolocalizar até 100 IPs por vez e depois ordenar, filtrar, marcar com estrela, resumir por país e ASN, ver no mapa e exportar"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

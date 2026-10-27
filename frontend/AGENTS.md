@@ -99,6 +99,14 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   above the largest backend section deadline (tested).
 - ASN Info's footer links `/tools/asn?q=AS<n>` (hidden when gated off); in
   QueryIP it emits `open-tool` via IpDetailPanel so the dialog closes first.
+  The dialog is `widgets/QueryIPDialog.vue` (v-model `open`, optional `ip` to
+  run): Home's FAB and tool pages (Bulk IP Lookup) each mount their own.
+
+### Bulk IP Lookup
+
+Rows live in localStorage (`use-bulk-lookup.js`), geography from
+`/api/bulk-lookup` only. Anything per IP stays single-IP: a row opens the
+QueryIP dialog or links to the Blocklist tool — no bulk path to the private API.
 
 ### Overlays take no keyboard shortcuts
 
@@ -123,7 +131,8 @@ masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitor
 
 **shadcn-vue first:** `components/ui/`, then the shadcn-vue docs; hand-rolled
 Tailwind only when neither fits. Keep on upstream syncs: `Spinner` +
-`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair, the
+`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair,
+`pagination`'s `max-sm:hidden` labels (upstream `hidden sm:block`), the
 overlay roots' shortcut suspension, `select`'s trigger geometry (`py-1` + flex
 value span, not `-webkit-box` — Safari shifts it ~2px). CLI trap: `shadcn-vue
 add` here writes `import { cn } from "cn"` and installs the unrelated `cn`

@@ -23,7 +23,7 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
-`ip-blocklist`), user
+`ip-blocklist` / `bulk-lookup`), user
 proxies (`get-user-info` / `update-user-achievement`), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
@@ -47,6 +47,11 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   lists come from local CAIDA (`server/as-relationships.js`), dropping the
   providers the graph walk distrusts. The Radar `asn` view (ASN Info) carries
   no prefix or relationship counts — the ASN Profile has both.
+- **`/api/bulk-lookup`** (POST, ≤ 100 IPs, own 8 KB body limit) takes only a
+  clean list of distinct public IPs — the page extracts and dedupes; one bad
+  or repeated entry rejects the request, nothing is cleaned server-side. Local
+  data only: the source is a `server/bulk-lookup-sources.js` row picked by
+  `BULK_LOOKUP_SOURCE`, never a metered upstream.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
 - **Offline datasets** (MaxMind, CAIDA, PeeringDB, IEEE MAC registries) are rows in
