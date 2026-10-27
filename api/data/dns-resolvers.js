@@ -54,4 +54,5 @@ export const DNS_RESOLVERS = [
     { id: 'hinet', name: 'HiNet', country: 'TW', udp: '168.95.1.1' },
     { id: 'giga', name: 'GIGA', country: 'TW', udp: '203.133.1.6' },
     { id: 'kt', name: 'KT', country: 'KR', udp: '168.126.63.1' },
+    { id: 'thains', name: 'ThaiNS', country: 'TH', udp: '203.159.77.77' },
 ];

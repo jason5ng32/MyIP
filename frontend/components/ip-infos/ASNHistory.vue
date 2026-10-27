@@ -1,5 +1,5 @@
 <template>
-    <!-- ASN History Panel: embedded in IpDetailPanel's Collapsible.
+    <!-- ASN History Panel: embedded in IpAsnBlock's Collapsible.
         Lists every ASN that has announced (a prefix covering) this IP over
         time, per RIPEstat routing-history. -->
     <div class="rounded-md border bg-muted/40 text-sm">

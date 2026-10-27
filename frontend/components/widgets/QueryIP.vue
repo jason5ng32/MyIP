@@ -35,7 +35,7 @@
                 <!-- Query result: Hero IP (no Copy / Map) + shared IpDetailPanel -->
                 <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
                     <div class="px-4 py-3 flex items-start gap-2 min-w-0 border-b mb-4">
-                        <FitText :text="inputIP" :tiers="HERO_TIERS" :title="inputIP" :max-lines="2"
+                        <FitText :text="modalQueryResult.ip" :tiers="HERO_TIERS" :title="modalQueryResult.ip" :max-lines="2"
                             class="font-mono font-semibold min-w-0">
                             <template #prefix>
                                 <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />

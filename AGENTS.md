@@ -25,6 +25,8 @@ security checklist, browser fingerprint, anonymity checks, persona check, IP
 calculator, and more. Single repo, two halves: a Vue 3 SPA front-end and an
 Express 5 back-end API.
 
+Licensed under AGPL-3.0-only (`LICENSE`).
+
 ## Stack
 
 | Layer | Technology |

@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
 
 กล่องเครื่องมือ IP แบบโอเพนซอร์สที่รวมทุกอย่างไว้ในที่เดียว: ตรวจ IP จากหลายแหล่ง, ทดสอบการเชื่อมต่อ, ตรวจจับ WebRTC และ DNS รั่ว, ทดสอบความเร็ว, MTR, ตรวจการเซ็นเซอร์, Whois และอีกมากมาย ติดตั้งบนเซิร์ฟเวอร์ของคุณเองได้ด้วยคำสั่ง Docker เพียงคำสั่งเดียว
 
@@ -196,8 +196,8 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 <sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ให้บริการพร็อกซีส่วนตัวแบบ residential, mobile (4G/5G/LTE), ISP และดาต้าเซ็นเตอร์ทั้ง IPv4/IPv6 รองรับ HTTP(S) และ SOCKS5 มี IP residential มากกว่า 47 ล้าน IP ในกว่า 220 พื้นที่ เลือกประเทศ/เมือง/ISP ได้แม่นยำ uptime 99.7% และซัพพอร์ตตลอด 24 ชั่วโมง ผู้ใช้ MyIP ใช้โค้ด `CHECKINGIP15` รับส่วนลด 15%
 </sub>
 
-<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
-<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=en">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
+<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th"><img src="https://res.ipcheck.ing/img/vps_logo.png" alt="V.PS" height="48" /></a><br />
+<sub>↳ **<a href="https://v.ps/?utm_source=ipcheck.ing&utm_medium=referral&utm_campaign=github_readme&utm_content=th">V.PS</a>** — VPS แบบ KVM ประสิทธิภาพสูง มีหลายพื้นที่ทั่วโลก เชื่อมต่อเร็ว ให้ทั้ง IPv4 และ IPv6</sub>
 
 ----
 
@@ -213,4 +213,4 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 📄 สัญญาอนุญาต
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

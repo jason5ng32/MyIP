@@ -245,4 +245,25 @@ describe('extractAdvancedData()', () => {
     assert.equal(gated.scoreDimensions, undefined);
     assert.equal(gated.scoreVersion, undefined);
   });
+
+  it('carries normalized friction scenarios when the API sent them', () => {
+    const scenarios = {
+      version: 1,
+      items: [
+        { id: 'email', level: 'high' },
+        { id: 'signup', level: 'low' },
+      ],
+    };
+    const out = extractAdvancedData({ tags: { ...cleanTags }, operatorType: 'Residential', score: 90, scenarios }, t);
+    assert.deepEqual(out.frictionScenarios, [{ id: 'signup', level: 'low' }, { id: 'email', level: 'high' }]);
+  });
+
+  it('leaves friction scenarios null without them, gated or malformed', () => {
+    const none = extractAdvancedData({ tags: { ...cleanTags }, operatorType: 'Residential', score: 90 }, t);
+    assert.equal(none.frictionScenarios, null);
+    const gated = extractAdvancedData({ tags: 'sign_in_required', score: 'sign_in_required', operatorType: 'sign_in_required', scenarios: 'sign_in_required' }, t);
+    assert.equal(gated.frictionScenarios, null);
+    const malformed = extractAdvancedData({ tags: { ...cleanTags }, operatorType: 'Residential', score: 90, scenarios: { version: '1', items: [{ id: 'email', level: 'high' }] } }, t);
+    assert.equal(malformed.frictionScenarios, null);
+  });
 });

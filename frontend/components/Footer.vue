@@ -32,7 +32,7 @@
           </div>
         </div>
 
-        <!-- Project: the About sheet's tabs, privacy and license -->
+        <!-- Project: the About sheet's tabs, privacy, license and contributing -->
         <nav :aria-label="t('footer.Project')">
           <h3 :class="headingClass">{{ t('footer.Project') }}</h3>
           <ul class="space-y-2">
@@ -42,13 +42,13 @@
               </button>
             </li>
             <li>
-              <button type="button" :class="linkClass" @click="openAboutTab('changelog', 'Changelog')">
-                {{ t('changelog.Title') }}
+              <button type="button" :class="linkClass" @click="openAboutTab('acknowledgement', 'Acknowledgement')">
+                {{ t('acknowledgement.Title') }}
               </button>
             </li>
             <li>
-              <button type="button" :class="linkClass" @click="openAboutTab('acknowledgement', 'Acknowledgement')">
-                {{ t('acknowledgement.Title') }}
+              <button type="button" :class="linkClass" @click="openAboutTab('changelog', 'Changelog')">
+                {{ t('changelog.Title') }}
               </button>
             </li>
             <li>
@@ -60,6 +60,12 @@
               <a :href="`${t('page.footerLink')}/blob/main/LICENSE`" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'License')">
                 {{ t('footer.License') }}
+              </a>
+            </li>
+            <li>
+              <a :href="`${t('page.footerLink')}/contribute`" target="_blank" rel="noopener" :class="linkClass"
+                @click="trackEvent('Footer', 'FooterClick', 'Contribute')">
+                {{ t('footer.Contribute') }}
               </a>
             </li>
           </ul>
@@ -91,6 +97,12 @@
               <a :href="`${t('page.footerLink')}/issues`" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'ReportIssue')">
                 {{ t('footer.ReportIssue') }}
+              </a>
+            </li>
+            <li>
+              <a :href="`${t('page.footerLink')}/issues/new?template=feature_request.md`" target="_blank" rel="noopener"
+                :class="linkClass" @click="trackEvent('Footer', 'FooterClick', 'FeatureRequest')">
+                {{ t('footer.FeatureRequest') }}
               </a>
             </li>
           </ul>
@@ -305,7 +317,7 @@ const store = useMainStore();
 const configs = computed(() => store.configs);
 const curl = computed(() => store.curl);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
-const tabs = ['about', 'changelog', 'acknowledgement'];
+const tabs = ['about', 'acknowledgement', 'changelog'];
 const content = ref('about');
 
 const headingClass = 'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground';
