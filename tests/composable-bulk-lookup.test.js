@@ -1,10 +1,11 @@
 // Guards frontend/composables/use-bulk-lookup.js — the stored shape, run
 // planning (accumulation, per-run and list caps), merging, sorting, filters,
 // aggregation, paging, CSV, and the composable's run / storage wiring over a
-// stubbed fetch and storage.
+// stubbed fetch and storage, including two tabs sharing one list.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { effectScope } from 'vue';
 
 import {
     BULK_LOOKUP_STORAGE_KEY, MAX_ROWS, MAX_NEW_PER_RUN,
@@ -375,5 +376,69 @@ describe('use-bulk-lookup — composable', () => {
         await lookup.run([{ ip: '8.8.8.8', count: 1 }], 'en');
         assert.equal(lookup.rows.value.length, 1);
         assert.equal(lookup.storageError.value, true);
+        // Memory holds the only copy: the next change builds on it.
+        await lookup.run([{ ip: '1.1.1.1', count: 1 }], 'en');
+        assert.deepEqual(lookup.rows.value.map((r) => r.ip), ['8.8.8.8', '1.1.1.1']);
+    });
+
+    it('applies each change to the stored list, keeping another tab\'s writes', async () => {
+        const storage = memoryStorage();
+        const tabA = useBulkLookup({ storage, fetcher: okFetch([]) });
+        await tabA.run([{ ip: '8.8.8.8', count: 1 }, { ip: '1.1.1.1', count: 1 }], 'en');
+        const tabB = useBulkLookup({ storage, fetcher: okFetch([]) });
+        tabB.setNote('8.8.8.8', 'from B');
+
+        // Tab A never saw B's note, yet neither a run nor a star loses it.
+        await tabA.run([{ ip: '9.9.9.9', count: 1 }], 'en');
+        tabA.toggleStar('1.1.1.1');
+        const stored = parseState(storage.data[BULK_LOOKUP_STORAGE_KEY]);
+        assert.deepEqual(stored.rows.map((r) => [r.ip, r.note, r.starred]),
+            [['8.8.8.8', 'from B', false], ['1.1.1.1', '', true], ['9.9.9.9', '', false]]);
+        assert.deepEqual(tabA.rows.value, stored.rows);
+    });
+
+    it('plans a run against the stored list', async () => {
+        const storage = memoryStorage();
+        const calls = [];
+        const tabA = useBulkLookup({ storage, fetcher: okFetch(calls) });
+        const tabB = useBulkLookup({ storage, fetcher: okFetch([]) });
+        await tabB.run([{ ip: '8.8.8.8', count: 1 }], 'en');
+        const outcome = await tabA.run([{ ip: '8.8.8.8', count: 2 }], 'en');
+        assert.deepEqual(calls, []);
+        assert.equal(outcome.updated, 1);
+        assert.equal(tabA.rows.value[0].count, 3);
+    });
+
+    const eventTarget = () => ({
+        listeners: new Set(),
+        addEventListener(type, fn) { if (type === 'storage') this.listeners.add(fn); },
+        removeEventListener(type, fn) { if (type === 'storage') this.listeners.delete(fn); },
+        fire(key) { for (const fn of this.listeners) fn({ key }); },
+    });
+
+    it('reloads when another tab writes the list or clears storage', async () => {
+        const storage = memoryStorage();
+        const events = eventTarget();
+        const tabA = useBulkLookup({ storage, fetcher: okFetch([]), events });
+        const tabB = useBulkLookup({ storage, fetcher: okFetch([]) });
+        await tabB.run([{ ip: '8.8.8.8', count: 1 }], 'en');
+
+        events.fire('somethingElse');
+        assert.equal(tabA.rows.value.length, 0);
+        events.fire(BULK_LOOKUP_STORAGE_KEY);
+        assert.deepEqual(tabA.rows.value.map((r) => r.ip), ['8.8.8.8']);
+
+        storage.data = {};
+        events.fire(null);
+        assert.equal(tabA.rows.value.length, 0);
+    });
+
+    it('drops its storage listener with its scope', () => {
+        const events = eventTarget();
+        const scope = effectScope();
+        scope.run(() => useBulkLookup({ storage: memoryStorage(), fetcher: okFetch([]), events }));
+        assert.equal(events.listeners.size, 1);
+        scope.stop();
+        assert.equal(events.listeners.size, 0);
     });
 });

@@ -1,8 +1,9 @@
 // use-bulk-lookup.js — state of the Bulk IP Lookup tool: the looked-up rows,
-// kept in localStorage (this browser only, never synced), and the run against
-// /api/bulk-lookup. Pasting again only bumps counts of IPs already stored;
-// new ones are queried. The pure helpers below are exported for tests.
-import { ref, computed } from 'vue';
+// kept in localStorage (this browser only, never synced; shared by its tabs),
+// and the run against /api/bulk-lookup. Pasting again only bumps counts of IPs
+// already stored; new ones are queried. The pure helpers below are exported
+// for tests.
+import { ref, computed, getCurrentScope, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { isUsablePublicIP } from '../utils/ip/valid-ip.js';
 import { parseIp, compareIps } from '../utils/ip/ip-math.js';
@@ -321,23 +322,30 @@ const defaultStorage = () => {
     }
 };
 
-export const useBulkLookup = ({ storage = defaultStorage(), fetcher = fetchWithTimeout } = {}) => {
+export const useBulkLookup = ({
+    storage = defaultStorage(), fetcher = fetchWithTimeout, events = globalThis.window,
+} = {}) => {
     const storageError = ref(false);
 
-    const load = () => {
+    // The stored state, or null when there is no readable storage.
+    const read = () => {
         try {
-            return parseState(storage?.getItem(BULK_LOOKUP_STORAGE_KEY));
+            return parseState(storage.getItem(BULK_LOOKUP_STORAGE_KEY));
         } catch {
-            return createEmptyState();
+            return null;
         }
     };
 
-    const state = ref(load());
+    const state = ref(read() ?? createEmptyState());
     const rows = computed(() => state.value.rows);
     const source = computed(() => state.value.source);
 
-    // Every change lands here. A refused write (quota, private mode) keeps the
-    // rows for this page view and says so.
+    // The stored list is the truth (another tab may have written it), unless
+    // this tab's last write was refused: then only memory has its rows.
+    const latest = () => (storageError.value ? null : read()) ?? state.value;
+
+    // A refused write (quota, private mode) keeps the rows for this page view
+    // and says so.
     const commit = (next) => {
         state.value = next;
         try {
@@ -348,19 +356,32 @@ export const useBulkLookup = ({ storage = defaultStorage(), fetcher = fetchWithT
         }
     };
 
-    const updateRow = (ip, patch) => {
-        commit({ ...state.value, rows: rows.value.map((row) => (row.ip === ip ? { ...row, ...patch } : row)) });
+    // Every change lands here, applied to the freshest state.
+    const mutate = (change) => commit(change(latest()));
+
+    const updateRow = (ip, patch) => mutate((current) => ({
+        ...current, rows: current.rows.map((row) => (row.ip === ip ? { ...row, ...patch } : row)),
+    }));
+
+    // Another tab wrote the list (or cleared storage: key null). State sync,
+    // not UI, so it stays attached while the kept-alive tool page is inactive.
+    const onStorage = (event) => {
+        if (event.key !== null && event.key !== BULK_LOOKUP_STORAGE_KEY) return;
+        if (storageError.value) return;
+        state.value = read() ?? state.value;
     };
+    events?.addEventListener?.('storage', onStorage);
+    if (getCurrentScope()) onScopeDispose(() => events?.removeEventListener?.('storage', onStorage));
 
     // Look up the new IPs of `entries` (already extracted and canonical) and
     // fold everything into the list. A blocked plan or a failed request
     // stores nothing.
     const run = async (entries, lang) => {
-        const plan = planRun(rows.value, entries);
+        const plan = planRun(latest().rows, entries);
         if (plan.blocked) return { blocked: plan.blocked, added: 0, updated: 0, unanswered: 0 };
         const ips = plan.toQuery.map((entry) => entry.ip);
         const results = [];
-        let nextSource = state.value.source;
+        let fetchedSource = null;
         if (ips.length) {
             const response = await fetcher('/api/bulk-lookup', {
                 method: 'POST',
@@ -375,34 +396,34 @@ export const useBulkLookup = ({ storage = defaultStorage(), fetcher = fetchWithT
             }
             const body = await response.json();
             if (Array.isArray(body?.results)) results.push(...body.results);
-            if (isObject(body?.source)) nextSource = { id: str(body.source.id), build: str(body.source.build) };
+            if (isObject(body?.source)) fetchedSource = { id: str(body.source.id), build: str(body.source.build) };
         }
 
         const at = Date.now();
-        const before = rows.value.length;
-        commit({
-            ...state.value,
-            source: nextSource,
-            rows: mergeRun(rows.value, {
+        let added = 0;
+        mutate((current) => {
+            const merged = mergeRun(current.rows, {
                 existing: plan.existing,
                 results,
                 counts: new Map(plan.toQuery.map((entry) => [entry.ip, entry.count])),
                 batchId: `b${at.toString(36)}`,
                 at,
-            }),
+            });
+            added = merged.length - current.rows.length;
+            return { ...current, source: fetchedSource ?? current.source, rows: merged };
         });
-        const added = rows.value.length - before;
-        return { blocked: null, added, updated: plan.existing.length, unanswered: ips.length - added };
+        const listed = new Set(rows.value.map((row) => row.ip));
+        const unanswered = ips.filter((ip) => !listed.has(ip)).length;
+        return { blocked: null, added, updated: plan.existing.length, unanswered };
     };
 
-    const removeRow = (ip) => commit({ ...state.value, rows: rows.value.filter((row) => row.ip !== ip) });
-    const clearRows = ({ keepStarred = false } = {}) => {
-        commit({ ...state.value, rows: keepStarred ? rows.value.filter((row) => row.starred) : [] });
-    };
-    const toggleStar = (ip) => {
-        const row = rows.value.find((r) => r.ip === ip);
-        if (row) updateRow(ip, { starred: !row.starred });
-    };
+    const removeRow = (ip) => mutate((current) => ({ ...current, rows: current.rows.filter((row) => row.ip !== ip) }));
+    const clearRows = ({ keepStarred = false } = {}) => mutate((current) => ({
+        ...current, rows: keepStarred ? current.rows.filter((row) => row.starred) : [],
+    }));
+    const toggleStar = (ip) => mutate((current) => ({
+        ...current, rows: current.rows.map((row) => (row.ip === ip ? { ...row, starred: !row.starred } : row)),
+    }));
     const setNote = (ip, note) => updateRow(ip, { note: String(note ?? '').slice(0, NOTE_MAX) });
 
     return {
