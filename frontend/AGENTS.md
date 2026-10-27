@@ -123,7 +123,8 @@ masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitor
 
 **shadcn-vue first:** `components/ui/`, then the shadcn-vue docs; hand-rolled
 Tailwind only when neither fits. Keep on upstream syncs: `Spinner` +
-`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair, the
+`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair,
+`pagination`'s `max-sm:hidden` labels (upstream `hidden sm:block`), the
 overlay roots' shortcut suspension, `select`'s trigger geometry (`py-1` + flex
 value span, not `-webkit-box` — Safari shifts it ~2px). CLI trap: `shadcn-vue
 add` here writes `import { cn } from "cn"` and installs the unrelated `cn`
