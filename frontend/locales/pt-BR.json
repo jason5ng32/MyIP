@@ -2227,12 +2227,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Atalhos de teclado"
+    "Title": "Atalhos de teclado",
+    "HomeOnly": "Todos os atalhos funcionam apenas na página inicial."
   },
   "footer": {
     "Tagline": "Uma caixa de ferramentas de privacidade tudo em um, gratuita e de código aberto.",
     "Project": "Projeto",
     "Support": "Documentação e suporte",
+    "ShortcutGuide": "Atalhos de teclado",
     "DeveloperDocs": "Documentação para desenvolvedores",
     "SelfHosting": "Guia de auto-hospedagem",
     "ReportIssue": "Relatar um problema",

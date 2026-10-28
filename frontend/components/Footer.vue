@@ -71,10 +71,16 @@
           </ul>
         </nav>
 
-        <!-- Docs & Support: locale-aware docs.ipcheck.ing links + issue tracker -->
+        <!-- Docs & Support: the shortcut guide (Home only, where the keys
+             work), locale-aware docs.ipcheck.ing links + issue tracker -->
         <nav :aria-label="t('footer.Support')">
           <h3 :class="headingClass">{{ t('footer.Support') }}</h3>
           <ul class="space-y-2">
+            <li v-if="shortcutGuide">
+              <button type="button" :class="linkClass" @click="openShortcutGuide">
+                {{ t('footer.ShortcutGuide') }}
+              </button>
+            </li>
             <li>
               <a :href="docsUrl('knowledge-base', locale)" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
@@ -311,6 +317,10 @@ import brandIcon from './svgicons/Brand.vue';
 import { Icon } from '@iconify/vue';
 import { useRouteActive } from '@/composables/use-route-active.js';
 
+// Home passes `shortcut-guide` and owns the Help dialog the link opens.
+defineProps({ shortcutGuide: { type: Boolean, default: false } });
+const emit = defineEmits(['open-shortcut-guide']);
+
 const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
@@ -400,6 +410,11 @@ const openAboutTab = (tab, trackLabel) => {
   content.value = tab;
   store.setOpenSheet('about');
   trackEvent('Footer', 'FooterClick', trackLabel);
+};
+
+const openShortcutGuide = () => {
+  emit('open-shortcut-guide');
+  trackEvent('Footer', 'FooterClick', 'ShortcutGuide');
 };
 
 const isCurlOpen = ref(false);

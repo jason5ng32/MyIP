@@ -2227,12 +2227,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Raccourcis"
+    "Title": "Raccourcis",
+    "HomeOnly": "Tous les raccourcis ne fonctionnent que sur la page d'accueil."
   },
   "footer": {
     "Tagline": "Une boîte à outils de confidentialité tout-en-un, gratuite et open source.",
     "Project": "Projet",
     "Support": "Documentation et support",
+    "ShortcutGuide": "Raccourcis clavier",
     "DeveloperDocs": "Documentation développeur",
     "SelfHosting": "Guide d'auto-hébergement",
     "ReportIssue": "Signaler un problème",

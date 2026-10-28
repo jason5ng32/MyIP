@@ -2227,12 +2227,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "鍵盤快速鍵"
+    "Title": "鍵盤快速鍵",
+    "HomeOnly": "所有快速鍵僅在首頁生效。"
   },
   "footer": {
     "Tagline": "免費、開源、一站式的隱私工具箱",
     "Project": "專案",
     "Support": "文件與支援",
+    "ShortcutGuide": "快速鍵指南",
     "DeveloperDocs": "開發者文件",
     "SelfHosting": "自行架設指南",
     "ReportIssue": "回報問題",

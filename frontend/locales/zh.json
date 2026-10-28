@@ -2227,12 +2227,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "快捷键"
+    "Title": "快捷键",
+    "HomeOnly": "所有快捷键仅在首页生效。"
   },
   "footer": {
     "Tagline": "免费、开源、一站式的隐私工具箱",
     "Project": "项目",
     "Support": "文档与支持",
+    "ShortcutGuide": "快捷键指南",
     "DeveloperDocs": "开发者文档",
     "SelfHosting": "自托管指南",
     "ReportIssue": "报告问题",

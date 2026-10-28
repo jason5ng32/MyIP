@@ -2227,12 +2227,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Keyboard Shortcuts"
+    "Title": "Keyboard Shortcuts",
+    "HomeOnly": "All shortcuts work on the homepage only."
   },
   "footer": {
     "Tagline": "A free, open-source, all-in-one privacy toolbox.",
     "Project": "Project",
     "Support": "Docs & Support",
+    "ShortcutGuide": "Keyboard Shortcuts",
     "DeveloperDocs": "Developer Docs",
     "SelfHosting": "Self-hosting Guide",
     "ReportIssue": "Report an Issue",

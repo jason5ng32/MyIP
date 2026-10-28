@@ -18,7 +18,7 @@
     <QueryIP ref="queryIPRef" />
   </FloatingDock>
   <HelpModal ref="helpModalRef" />
-  <Footer />
+  <Footer shortcut-guide @open-shortcut-guide="helpModalRef?.openModal()" />
 </template>
 
 <script setup>
