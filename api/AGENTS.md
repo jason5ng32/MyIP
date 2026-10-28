@@ -77,7 +77,9 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 - **Handler shape.** Single default export `async (req, res) => …`: read
   `req.query` / `req.body`, call upstream, write one response.
 - **Every upstream call uses `fetchUpstream`** (`common/fetch-with-timeout.js`,
-  8s timeout), never a bare `fetch()` / `https.get()` — a hanging provider must
+  8s timeout; its own timeout is an `AbortError` reading `Timed out after
+  <ms>ms: <host>`, host only — keys ride paths and queries), never a bare
+  `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`
   (`server/upstream-ua.js`; some WAFs block undici's `node` UA); caller-supplied
   ones, incl. the private-API `{ ...req.headers }` pass-through, win.
