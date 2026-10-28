@@ -1,6 +1,6 @@
 // server/logger.js — shared pino logger for all backend code.
 //
-// LOG_LEVEL defaults to 'warn'; LOG_FORMAT=json switches off pino-pretty
+// LOG_LEVEL defaults to 'info'; LOG_FORMAT=json switches off pino-pretty
 // for log shippers. No NODE_ENV dependency.
 //
 // When SENTRY_DSN_BACKEND is set, the logMethod hook below mirrors log lines

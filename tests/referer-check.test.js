@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it, afterEach, beforeEach } from 'node:test';
 
-import { refererCheck } from '../server/referer-check.js';
+import { refererCheck, refererHostname, inspectAllowedDomains } from '../server/referer-check.js';
 
 // backup ALLOWED_DOMAINS before each test, restore after each test
 let backup;
@@ -82,5 +82,40 @@ describe('refererCheck — malformed inputs', () => {
     assert.equal(refererCheck('not-a-url'), false);
     assert.equal(refererCheck('http://'), false);
     assert.equal(refererCheck('%%%'), false);
+  });
+});
+
+describe('refererHostname', () => {
+  it('returns the hostname, or null for a missing or unparseable Referer', () => {
+    assert.equal(refererHostname('https://Ip.Example.com:8443/x?y=1'), 'ip.example.com');
+    assert.equal(refererHostname(undefined), null);
+    assert.equal(refererHostname(''), null);
+    assert.equal(refererHostname('not-a-url'), null);
+  });
+});
+
+describe('inspectAllowedDomains', () => {
+  it('lists the entries and ignores empty ones', () => {
+    assert.deepEqual(inspectAllowedDomains('a.com,,192.168.1.10,'), {
+      domains: ['a.com', '192.168.1.10'],
+      problems: [],
+    });
+    assert.deepEqual(inspectAllowedDomains(undefined), { domains: [], problems: [] });
+    assert.deepEqual(inspectAllowedDomains(''), { domains: [], problems: [] });
+  });
+
+  it('flags entries no Referer hostname can ever equal', () => {
+    const { problems } = inspectAllowedDomains('a.com, b.com,https://c.com,d.com/x,e.com:8080,F.com');
+    assert.deepEqual(problems.map((p) => p.entry), [' b.com', 'https://c.com', 'd.com/x', 'e.com:8080', 'F.com']);
+    // Each flagged entry really is rejected by refererCheck.
+    process.env.ALLOWED_DOMAINS = 'a.com, b.com,https://c.com,d.com/x,e.com:8080,F.com';
+    for (const host of ['b.com', 'c.com', 'd.com', 'e.com', 'f.com']) {
+      assert.equal(refererCheck(`https://${host}/`), false, host);
+    }
+    assert.equal(refererCheck('https://a.com/'), true);
+  });
+
+  it('does not flag IPv6 literals as ports', () => {
+    assert.deepEqual(inspectAllowedDomains('[2001:db8::1]').problems, []);
   });
 });

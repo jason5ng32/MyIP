@@ -15,7 +15,9 @@ The **[MyIP Docs Center](https://docs.ipcheck.ing)** covers most questions, in E
 
 Two settings account for most self-hosting problems: MaxMind credentials (without them
 the MaxMind source returns 503) and `ALLOWED_DOMAINS` (without it every request from a
-non-localhost domain gets 403).
+non-localhost domain gets 403). The backend prints its `ALLOWED_DOMAINS` allowlist at
+startup, flags entries that can never match, and logs the first rejected host — check its
+terminal output first.
 
 ## Where to ask
 

@@ -110,7 +110,10 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 
 `server/guards.js`, attached in `backend-server.js`; handlers never repeat them:
 
-- `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
+- `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost). For
+  self-hosters it logs the allowlist (and entries that can never match) at
+  boot, and the first rejection per Referer host at info — below the Sentry
+  mirror, capped at 50 hosts.
 - `requirePublicIP()` — per-route `?ip=`: well-formed and publicly routable;
   reserved space (RFC 1918, loopback, CGNAT, link-local, documentation, …) never
   reaches a geo source. `isUsablePublicIP` (`common/valid-ip.js`) is the one

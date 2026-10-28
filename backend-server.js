@@ -10,6 +10,7 @@ import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
     requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
 import { withTimeZone } from './server/ip-timezone.js';
+import { inspectAllowedDomains } from './server/referer-check.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -231,6 +232,17 @@ app.use('/api', (req, res, next) => {
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see server/guards.js.
 app.use('/api', requireReferer);
+
+// The allowlist at startup, so a self-hoster sees why every request 403s.
+const allowlist = inspectAllowedDomains(process.env.ALLOWED_DOMAINS);
+if (allowlist.domains.length) {
+    logger.info(`🛡️  API referer allowlist: localhost, ${allowlist.domains.join(', ')}`);
+} else {
+    logger.info('⚠️  ALLOWED_DOMAINS not set — only localhost may call the API; any other host gets 403');
+}
+for (const { entry, reason } of allowlist.problems) {
+    logger.warn(`⚠️  ALLOWED_DOMAINS entry "${entry}" can never match: ${reason}`);
+}
 
 // Readiness gates for routes reading local data (server/offline-data.js):
 // 503 while that data is still downloading at boot, a no-op afterwards.
