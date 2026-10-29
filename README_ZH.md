@@ -186,9 +186,6 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **赞助商**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — 全球住宅代理服务，覆盖 9000 万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 `RAPID10` 享 9 折优惠。</sub>
-
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
 <sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — 提供高质量动态和静态住宅代理，拥有 9000 万+住宅 IP，覆盖全球 220+ 个地区，支持 HTTP(S)、SOCKS5 协议及动态轮换和粘性会话。动态住宅代理低至 $0.7/GB，使用优惠码 `PROXY90` 再享九折优惠。
 </sub>
