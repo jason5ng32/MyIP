@@ -40,7 +40,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 
 * 🛜 **Kartat e IP-së**: Zbulojnë IPv4 dhe IPv6 tuaj nga disa burime të pavarura krah për krah — shtetin, rajonin, qytetin, ASN-në, organizatën dhe zonën kohore lokale të IP-së.
 * 🔍 **Kërkimi i IP-së**: Kërkon të njëjtin informacion të detajuar për çdo adresë IP për të cilën jeni kureshtarë.
-* 🧾 **Kërkim IP në grup**: Ngjitni lista IP-sh ose regjistra të papërpunuar serveri (Nginx, Apache, firewall, CDN…) për të gjeolokalizuar menjëherë të gjitha IP-të.
+* 🧾 **Historiku i IP-ve**: Mban një regjistër lokal të IP-ve me të cilat jeni parë, të filtrueshëm sipas llojit dhe shtetit — i ruajtur vetëm në shfletuesin tuaj.
 * 🖥️ **Gjurma e shfletuesit**: Llogarit gjurmën e shfletuesit tuaj në disa mënyra dhe tregon çfarë ju bën të identifikueshëm.
 
 ### 🕵️ Rrjedhjet dhe privatësia
@@ -65,7 +65,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 * 📓 **Kërkimi Whois**: Kryen kërkime Whois për emra domenesh, adresa IP dhe numra AS.
 * 🗄️ **Kërkimi MAC**: Identifikon prodhuesin dhe detajet pas një adrese fizike.
 * 🧮 **Kalkulatori IP**: Llogaritje subnetesh, konvertime shënimesh dhe detaje të ndërfaqes IPv6 për çdo IP, prefiks, varg ose listë, të llogaritura lokalisht.
-* 🧾 **Kërkim IP në grup**: Ngjitni lista IP-sh ose regjistra të papërpunuar serveri (Nginx, Apache, firewall, CDN…) për të gjeolokalizuar IP-të e tyre — deri në 2.000 në listë — nga baza lokale MaxMind, pastaj renditini, filtroni, shënojini me yll, përmblidhini sipas shtetit dhe ASN-së, shihini në hartë dhe eksportojini.
+* 🧾 **Kërkim IP në grup**: Ngjitni lista IP-sh ose regjistra të papërpunuar serveri (Nginx, Apache, firewall, CDN…) për të gjeolokalizuar menjëherë të gjitha IP-të.
 * 🛰️ **Informacioni ASN dhe topologjia drejt furnizuesve**: Direkt në çdo kartë IP — detajet e AS-së, shpalljet historike për prefiksin e IP-së dhe shtigjet nga ASN-ja e saj drejt shtyllës kurrizore Tier 1.
 * 🛂 **Profili ASN**: Tabloja e plotë e çdo AS — regjistrimi me të dhënat e papërpunuara Whois, renditja dhe madhësia globale, trafiku dhe cilësia e lidhjes, ku përdoret hapësira e saj IPv4, çdo prefiks i shpallur me gjendjen RPKI, furnizuesit, peer-at dhe klientët e saj, si dhe pikat e shkëmbimit të internetit dhe qendrat e të dhënave ku është e pranishme.
 * 📶 **Gjendja e shërbimeve**: Disponueshmëria live e shërbimeve të njohura — Claude, OpenAI, GitHub, Cloudflare e të tjera — nga faqet e tyre zyrtare të gjendjes, me incidentet e fundit.

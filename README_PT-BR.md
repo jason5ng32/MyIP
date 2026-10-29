@@ -40,7 +40,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 
 * 🛜 **Cartões de IP**: Detecta seus IPv4 e IPv6 a partir de várias fontes independentes, lado a lado — país, região, cidade, ASN, organização e o fuso horário local do IP.
 * 🔍 **Verificação de IP**: Consulta as mesmas informações detalhadas de qualquer endereço IP que despertar sua curiosidade.
-* 🧾 **Consulta de IPs em lote**: Cole listas de IPs ou logs brutos de servidor (Nginx, Apache, firewall, CDN…) para geolocalizar todos os IPs de uma vez.
+* 🧾 **Histórico de IP**: Mantém um registro local dos IPs com os quais você já foi visto, filtrável por tipo e país — armazenado apenas no seu navegador.
 * 🖥️ **Impressão digital do navegador**: Calcula a impressão digital do seu navegador de várias formas e mostra o que torna você identificável.
 
 ### 🕵️ Vazamentos e privacidade
@@ -65,7 +65,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 * 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio, endereços IP e números de AS.
 * 🗄️ **Consulta de MAC**: Identifica o fabricante e os detalhes por trás de um endereço físico.
 * 🧮 **Calculadora de IP**: Cálculo de sub-rede, conversões de notação e detalhes de interface IPv6 para qualquer IP, prefixo, intervalo ou lista, tudo localmente.
-* 🧾 **Consulta de IPs em lote**: Cole listas de IPs ou logs brutos de servidor (Nginx, Apache, firewall, CDN…) para geolocalizar os IPs — até 2.000 na lista — com o banco MaxMind local e depois ordenar, filtrar, marcar com estrela, resumir por país e ASN, ver no mapa e exportar.
+* 🧾 **Consulta de IPs em lote**: Cole listas de IPs ou logs brutos de servidor (Nginx, Apache, firewall, CDN…) para geolocalizar todos os IPs de uma vez.
 * 🛰️ **Informações de ASN e topologia de upstream**: Direto em cada cartão de IP — detalhes do AS, anúncios históricos do prefixo do IP e os caminhos de upstream do seu ASN até o backbone Tier 1.
 * 🛂 **Perfil de ASN**: O retrato completo de qualquer AS — dados de registro com o Whois bruto, ranking global e porte, tráfego e qualidade de conexão, os países onde seu espaço IPv4 é usado, cada prefixo anunciado com seu status RPKI, seus upstreams, peers e clientes, e os pontos de troca de tráfego e data centers em que está presente.
 * 📶 **Status dos serviços**: Disponibilidade em tempo real de serviços conhecidos — Claude, OpenAI, GitHub, Cloudflare e outros — a partir de suas páginas oficiais de status, com incidentes recentes.
