@@ -37,7 +37,7 @@ Feel free to bookmark the demo or deploy your own.
 
 * 🛜 **IP Cards**: Detects your IPv4 and IPv6 from multiple independent sources side by side — country, region, city, ASN, organization, and the IP's local time zone.
 * 🔍 **Query IP**: Looks up the same detailed information for any IP address you're curious about.
-* 🧾 **IP History**: Keeps a local record of the IPs you've been seen with, filterable by type and country — stored in your browser only.
+* 🧾 **Bulk IP Lookup**: Paste IP lists or raw server logs (Nginx, Apache, firewall, CDN…) to geolocate all their IPs at once.
 * 🖥️ **Browser Fingerprint**: Calculates your browser fingerprint in multiple ways and shows what makes you identifiable.
 
 ### 🕵️ Leaks & Privacy

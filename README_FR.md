@@ -40,7 +40,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 
 * 🛜 **Cartes IP** : Détecte vos adresses IPv4 et IPv6 depuis plusieurs sources indépendantes, présentées côte à côte — pays, région, ville, ASN, organisation et fuseau horaire local de l'IP.
 * 🔍 **Recherche d'IP** : Affiche les mêmes informations détaillées pour n'importe quelle adresse IP qui vous intrigue.
-* 🧾 **Historique des IP** : Conserve un enregistrement local des IP sous lesquelles vous avez été vu, filtrable par type et par pays — stocké uniquement dans votre navigateur.
+* 🧾 **Recherche IP groupée** : Collez des listes d'IP ou des journaux de serveur bruts (Nginx, Apache, pare-feu, CDN…) pour géolocaliser toutes leurs IP d'un coup.
 * 🖥️ **Empreinte du navigateur** : Calcule l'empreinte de votre navigateur de plusieurs manières et montre ce qui vous rend identifiable.
 
 ### 🕵️ Fuites et vie privée

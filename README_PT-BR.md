@@ -40,7 +40,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 
 * 🛜 **Cartões de IP**: Detecta seus IPv4 e IPv6 a partir de várias fontes independentes, lado a lado — país, região, cidade, ASN, organização e o fuso horário local do IP.
 * 🔍 **Verificação de IP**: Consulta as mesmas informações detalhadas de qualquer endereço IP que despertar sua curiosidade.
-* 🧾 **Histórico de IP**: Mantém um registro local dos IPs com os quais você já foi visto, filtrável por tipo e país — armazenado apenas no seu navegador.
+* 🧾 **Consulta de IPs em lote**: Cole listas de IPs ou logs brutos de servidor (Nginx, Apache, firewall, CDN…) para geolocalizar todos os IPs de uma vez.
 * 🖥️ **Impressão digital do navegador**: Calcula a impressão digital do seu navegador de várias formas e mostra o que torna você identificável.
 
 ### 🕵️ Vazamentos e privacidade
