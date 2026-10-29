@@ -1,20 +1,40 @@
 <!-- Bulk IP Lookup (advanced tool, slug `bulklookup`): IPs pasted or picked out
      of raw logs are geolocated in bulk from the server's local data
      (/api/bulk-lookup) and kept in this browser (composables/use-bulk-lookup.js).
-     Table / Summary / Starred / Map views over the same rows; a row opens the
-     QueryIP dialog or, where listed, the Blocklist tool. -->
+     The overview and Clear all cover the whole stored list; the toolbar
+     below them scopes both tabs, IP (the table) and Analysis (statistics
+     over the scoped rows, whose entries narrow the scope by adding a token
+     to the search). Its search carries free text beside exact `country:` /
+     `asn:` / `block:` tokens; a row opens the QueryIP dialog or, where
+     listed, the Blocklist tool. With no stored rows, the
+     page ends at the input and its run notices. -->
 <template>
     <div class="bulk-lookup-section my-4 space-y-4">
         <!-- Top note: what it is for, then how it works and where data comes from -->
         <div class="text-sm text-muted-foreground space-y-1.5 leading-relaxed">
             <p>{{ t('bulklookup.Note') }}</p>
-            <p>{{ t('bulklookup.Note2', { max: MAX_NEW_PER_RUN, source: sourceLabel }) }}</p>
+            <p>{{ t('bulklookup.Note2', { max: MAX_ROWS.toLocaleString(lang), source: sourceLabel }) }}</p>
         </div>
 
-        <BulkLookupInput ref="inputRef" :rows="rows" :running="isRunning" @run="onRun" />
+        <BulkLookupInput ref="inputRef" :rows="rows" :running="isRunning" :progress="progress" @run="onRun" />
 
         <!-- Outcome of the last run -->
         <p v-if="runError" class="text-sm text-destructive">{{ runError }}</p>
+        <!-- A run cut short after part of it was stored: what landed, why it
+             stopped, and the button that queries only the rest -->
+        <div v-if="paused && !isRunning"
+            class="flex flex-col gap-3 p-3 rounded-md border border-warning/30 bg-warning/10 text-sm text-warning sm:flex-row sm:items-center">
+            <div class="flex flex-1 min-w-0 items-start gap-2">
+                <CirclePause class="size-4 mt-0.5 shrink-0" />
+                <div class="min-w-0 space-y-0.5">
+                    <p class="m-0">{{ t('bulklookup.Paused', pausedParams) }}</p>
+                    <p class="m-0 text-xs">{{ t(paused.kind === 'rateLimited' ? 'bulklookup.PausedRateLimited' : 'bulklookup.PausedFailed') }}</p>
+                </div>
+            </div>
+            <Button variant="action" size="sm" class="h-8 w-full shrink-0 cursor-pointer sm:w-auto" @click="onResume">
+                <Play class="size-4 shrink-0" />{{ t('bulklookup.Continue', { n: pausedParams.n }) }}
+            </Button>
+        </div>
         <div v-if="runNotice"
             class="flex items-start gap-2 p-3 rounded-md border border-warning/30 bg-warning/10 text-sm text-warning">
             <TriangleAlert class="size-4 mt-0.5 shrink-0" />
@@ -22,101 +42,95 @@
         </div>
         <p v-if="storageError" class="text-sm text-destructive">{{ t('bulklookup.StorageError') }}</p>
 
-        <!-- Overview: four stat tiles, Clear all as a secondary action. Like
-             everything below, laid out before the first run, which only fills it in. -->
-        <section class="rounded-lg border bg-card p-4 space-y-3 min-w-0">
-            <div class="flex items-center justify-between gap-3">
-                <h2 class="flex items-center gap-2 text-base font-semibold m-0">
-                    <ListChecks class="size-4 text-muted-foreground" />{{ t('bulklookup.OverviewTitle') }}
-                </h2>
-                <Button variant="ghost" size="sm"
-                    class="h-7 gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-destructive"
-                    :disabled="!rows.length" @click="openClear">
-                    <Trash2 class="size-3.5" />{{ t('bulklookup.ClearAll') }}
+        <!-- Everything below needs stored rows: an empty list shows none of it -->
+        <template v-if="rows.length">
+            <!-- Overview: IPs, countries/regions, ASNs, total frequency, and how
+                 concentrated it is (top-10 and once-only shares), with Clear all
+                 as a secondary action -->
+            <section class="rounded-lg border bg-card p-4 space-y-3 min-w-0">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="flex items-center gap-2 text-base font-semibold m-0">
+                        <ListChecks class="size-4 text-muted-foreground" />{{ t('bulklookup.OverviewTitle') }}
+                    </h2>
+                    <Button variant="ghost" size="sm"
+                        class="h-7 gap-1.5 text-xs text-muted-foreground cursor-pointer hover:text-destructive"
+                        :disabled="isRunning" @click="openClear">
+                        <Trash2 class="size-3.5" />{{ t('bulklookup.ClearAll') }}
+                    </Button>
+                </div>
+                <!-- `title` repeats a value a narrow tile may truncate -->
+                <div class="grid grid-cols-2 gap-2.5 md:grid-cols-3">
+                    <div v-for="stat in stats" :key="stat.key" class="rounded-md bg-muted/40 p-3 min-w-0">
+                        <div class="text-lg font-semibold tabular-nums truncate" :title="stat.value">{{ stat.value }}</div>
+                        <div class="text-xs text-muted-foreground">{{ t(`bulklookup.stat.${stat.key}`) }}</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scope of both tabs: fixed tracks, so no selection, language,
+                 batch or star count moves it. Mobile: search on its own row. -->
+            <div class="grid grid-cols-[minmax(0,1fr)_5rem_auto] gap-2 md:grid-cols-[minmax(0,1fr)_14rem_5rem_auto]">
+                <div class="relative col-span-3 md:col-span-1">
+                    <Search class="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                    <Input v-model="query" type="text" class="pl-8 pr-8 h-8 text-sm"
+                        :placeholder="t('bulklookup.FilterPlaceholder')" :aria-label="t('bulklookup.FilterPlaceholder')"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        data-1p-ignore data-lpignore="true" />
+                    <!-- Our clear control, in place of the browser's search one -->
+                    <button v-if="query" type="button"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                        :aria-label="t('bulklookup.ClearSearch')" @click="query = ''">
+                        <X class="size-4" />
+                    </button>
+                </div>
+                <Select v-model="batchId" :disabled="batches.length < 2">
+                    <SelectTrigger class="h-8 w-full min-w-0 text-xs" :aria-label="t('bulklookup.BatchFilter')">
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{{ t('bulklookup.AllBatches') }}</SelectItem>
+                        <SelectItem v-for="batch in batches" :key="batch.id" :value="batch.id">
+                            {{ t('bulklookup.BatchLabel', { time: batchTime(batch.at), n: batch.size }) }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <!-- Star filter; the span carries the tooltip so it still
+                     shows while the toggle is disabled -->
+                <JnTooltip :text="t('bulklookup.StarredOnly')" side="top">
+                    <span class="flex min-w-0">
+                        <Toggle v-model="starredOnly" variant="outline" size="sm" :disabled="!starredCount"
+                            class="h-8 w-full min-w-0 gap-1.5 px-2 text-xs tabular-nums cursor-pointer data-[state=on]:border-warning/40 data-[state=on]:bg-warning/10 data-[state=on]:text-warning data-[state=on]:hover:bg-warning/15 data-[state=on]:hover:text-warning"
+                            :aria-label="t('bulklookup.StarredOnly')">
+                            <Star class="size-3.5" :class="{ 'fill-current': starredOnly }" />
+                            <span class="truncate">{{ starredCount.toLocaleString(lang) }}</span>
+                        </Toggle>
+                    </span>
+                </JnTooltip>
+                <Button variant="outline" size="sm" class="h-8 cursor-pointer" :disabled="!tableRows.length"
+                    @click="exportCsv">
+                    <Download class="size-4" />{{ t('bulklookup.ExportCsv') }}
                 </Button>
             </div>
-            <div class="grid grid-cols-2 gap-2.5 md:grid-cols-4">
-                <div v-for="stat in stats" :key="stat.key" class="rounded-md bg-muted/40 p-3 min-w-0">
-                    <div class="text-lg font-semibold tabular-nums truncate">{{ stat.value }}</div>
-                    <div class="text-xs text-muted-foreground">{{ t(`bulklookup.stat.${stat.key}`) }}</div>
-                </div>
-            </div>
-        </section>
 
-        <Tabs v-model="activeTab">
-            <TabsList class="grid w-full grid-cols-4">
-                <TabsTrigger value="table" class="min-w-0 cursor-pointer"><span class="truncate">{{ t('bulklookup.tab.table') }}</span></TabsTrigger>
-                <TabsTrigger value="summary" class="min-w-0 cursor-pointer"><span class="truncate">{{ t('bulklookup.tab.summary') }}</span></TabsTrigger>
-                <TabsTrigger value="starred" class="min-w-0 cursor-pointer"><span class="truncate">{{ t('bulklookup.tab.starred', { n: starredRows.length }) }}</span></TabsTrigger>
-                <TabsTrigger value="map" class="min-w-0 cursor-pointer"><span class="truncate">{{ t('bulklookup.tab.map') }}</span></TabsTrigger>
-            </TabsList>
+            <Tabs v-model="activeTab">
+                <TabsList class="grid w-full grid-cols-2">
+                    <!-- The IP tab counts the rows the table shows -->
+                    <TabsTrigger value="ips" class="min-w-0 cursor-pointer">
+                        <span class="truncate">{{ t('bulklookup.tab.ips') }}<span
+                            class="text-muted-foreground tabular-nums"> · {{ formatCount(tableRows.length) }}</span></span>
+                    </TabsTrigger>
+                    <TabsTrigger value="analysis" class="min-w-0 cursor-pointer"><span class="truncate">{{ t('bulklookup.tab.analysis') }}</span></TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="table" class="mt-3">
-                <section class="rounded-lg border bg-card p-4 space-y-3 min-w-0">
-                    <h2 class="flex items-center gap-2 text-base font-semibold mb-2">
-                        <TableIcon class="size-4 text-muted-foreground" />{{ t('bulklookup.TableTitle') }}
-                    </h2>
+                <TabsContent value="ips" class="mt-3 min-w-0">
+                    <BulkLookupTable :rows="tableRows" v-bind="tableProps" :reset-key="tableResetKey" v-on="tableEvents" />
+                </TabsContent>
 
-                    <!-- Toolbar: fixed tracks, so no selection, language or batch
-                         count moves it. Mobile: search on its own row. -->
-                    <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 md:grid-cols-[minmax(0,1fr)_14rem_auto]">
-                        <div class="relative col-span-2 md:col-span-1">
-                            <Search class="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                            <Input v-model="query" type="search" class="pl-8 h-8 text-sm"
-                                :placeholder="t('bulklookup.FilterPlaceholder')" :aria-label="t('bulklookup.FilterPlaceholder')"
-                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                                data-1p-ignore data-lpignore="true" />
-                        </div>
-                        <Select v-model="batchId" :disabled="batches.length < 2">
-                            <SelectTrigger class="h-8 w-full min-w-0 text-xs" :aria-label="t('bulklookup.BatchFilter')">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">{{ t('bulklookup.AllBatches') }}</SelectItem>
-                                <SelectItem v-for="batch in batches" :key="batch.id" :value="batch.id">
-                                    {{ t('bulklookup.BatchLabel', { time: batchTime(batch.at), n: batch.size }) }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button variant="outline" size="sm" class="h-8 cursor-pointer" :disabled="!tableRows.length"
-                            @click="exportCsv">
-                            <Download class="size-4" />{{ t('bulklookup.ExportCsv') }}
-                        </Button>
-                    </div>
-                    <div v-if="chips.length" class="flex flex-wrap items-center gap-2">
-                        <span v-for="chip in chips" :key="chip.field"
-                            class="inline-flex items-center gap-1.5 h-7 rounded-full border bg-muted/50 px-2.5 text-xs max-w-full">
-                            <span class="truncate">{{ chip.label }}</span>
-                            <button type="button" class="shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
-                                :aria-label="t('bulklookup.RemoveFilter')" @click="clearChip(chip.field)">
-                                <X class="size-3.5" />
-                            </button>
-                        </span>
-                    </div>
-
-                    <BulkLookupTable :rows="tableRows" v-bind="tableProps" :reset-key="tableResetKey"
-                        :empty-text="t(rows.length ? 'bulklookup.NoMatches' : 'bulklookup.NoRows')" v-on="tableEvents" />
-                </section>
-            </TabsContent>
-
-            <TabsContent value="summary" class="mt-3">
-                <BulkLookupSummary :rows="rows" @pick="onPick" />
-            </TabsContent>
-
-            <TabsContent value="starred" class="mt-3">
-                <section class="rounded-lg border bg-card p-4 space-y-3 min-w-0">
-                    <h2 class="flex items-center gap-2 text-base font-semibold m-0">
-                        <Star class="size-4 text-muted-foreground" />{{ t('bulklookup.StarredTitle') }}
-                    </h2>
-                    <BulkLookupTable :rows="starredRows" v-bind="tableProps" :reset-key="sortResetKey"
-                        :empty-text="t('bulklookup.NoStarred')" v-on="tableEvents" />
-                </section>
-            </TabsContent>
-
-            <TabsContent value="map" class="mt-3">
-                <BulkLookupMap :rows="rows" @pick="onPick" />
-            </TabsContent>
-        </Tabs>
+                <TabsContent value="analysis" class="mt-3">
+                    <BulkLookupSummary v-model:weight="analysisWeight" :rows="scopedRows" :query="query" @pick="onPick" />
+                </TabsContent>
+            </Tabs>
+        </template>
 
         <QueryIPDialog v-model:open="detailsOpen" :ip="detailsIP" />
         <BulkLookupNoteDialog v-model:open="noteOpen" :ip="noteIP" :note="noteText" @save="setNote" />
@@ -127,10 +141,10 @@
                 <DialogHeader class="border-b border-border pb-2" :icon="Trash2" :title="t('bulklookup.ClearTitle')" />
                 <div class="space-y-4">
                     <p class="text-sm text-muted-foreground mb-2">{{ t('bulklookup.ClearBody', { n: clearCount }) }}</p>
-                    <div v-if="starredRows.length" class="flex items-center gap-2">
+                    <div v-if="starredCount" class="flex items-center gap-2">
                         <Checkbox id="bulkLookupKeepStarred" v-model="keepStarred" />
                         <Label for="bulkLookupKeepStarred" class="font-normal cursor-pointer">
-                            {{ t('bulklookup.KeepStarred', { n: starredRows.length }) }}
+                            {{ t('bulklookup.KeepStarred', { n: starredCount }) }}
                         </Label>
                     </div>
                     <div class="flex justify-end gap-2 mt-2">
@@ -154,13 +168,12 @@ import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
 import getCountryName from '@/data/country-name.js';
 import {
-    useBulkLookup, MAX_NEW_PER_RUN, compareRows, filterRows, summarizeRows, listBatches, buildCsv, downloadCsv,
-    runFailureKind,
+    useBulkLookup, MAX_ROWS, compareRows, filterRows, summarizeRows,
+    listBatches, buildCsv, downloadCsv, runFailureKind, toggleQueryPick,
 } from '@/composables/use-bulk-lookup.js';
 import BulkLookupInput from './bulk-lookup/BulkLookupInput.vue';
 import BulkLookupTable from './bulk-lookup/BulkLookupTable.vue';
 import BulkLookupSummary from './bulk-lookup/BulkLookupSummary.vue';
-import BulkLookupMap from './bulk-lookup/BulkLookupMap.vue';
 import BulkLookupNoteDialog from './bulk-lookup/BulkLookupNoteDialog.vue';
 import QueryIPDialog from '@/components/widgets/QueryIPDialog.vue';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -170,15 +183,19 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Download, ListChecks, Search, Star, Table as TableIcon, Trash2, TriangleAlert, X } from '@lucide/vue';
+import { Toggle } from '@/components/ui/toggle';
+import { JnTooltip } from '@/components/ui/tooltip';
+import {
+    CirclePause, Download, ListChecks, Play, Search, Star, Trash2, TriangleAlert, X,
+} from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
 const lang = computed(() => locale.value);
 
 const {
-    rows, source, storageError,
-    run, removeRow, clearRows, toggleStar, setNote,
+    rows, source, storageError, progress, paused,
+    run, resume, removeRow, clearRows, toggleStar, setNote,
 } = useBulkLookup();
 
 const SOURCE_NAMES = { maxmind: 'MaxMind GeoLite2' };
@@ -193,45 +210,92 @@ const isRunning = ref(false);
 const runError = ref('');
 const runNotice = ref('');
 
-const onRun = async (entries) => {
+// A failed request: logged by kind (only our own defects as errors).
+const logFailure = (error, kind) => {
+    if (kind === 'error') console.error(`Bulk lookup failed: HTTP ${error.status}`);
+    else console.warn('Bulk lookup failed:', error);
+};
+
+// The outcome of a run or a resume that stored something.
+const settle = (outcome) => {
+    if (outcome.paused) logFailure(outcome.error, outcome.paused.kind);
+    if (outcome.unanswered) runNotice.value = t('bulklookup.Unanswered', { n: outcome.unanswered });
+};
+
+const startRun = async (task) => {
     isRunning.value = true;
     runError.value = '';
     runNotice.value = '';
-    trackEvent('Section', 'StartClick', 'BulkLookup');
     try {
-        const outcome = await run(entries, toApiTag(lang.value));
-        // A blocked plan is already explained under the input.
-        if (outcome.blocked) return;
-        inputRef.value?.reset();
-        if (outcome.unanswered) runNotice.value = t('bulklookup.Unanswered', { n: outcome.unanswered });
+        return await task();
     } catch (error) {
         const kind = runFailureKind(error);
-        if (kind === 'error') console.error(`Bulk lookup failed: HTTP ${error.status}`);
-        else console.warn('Bulk lookup failed:', error);
+        logFailure(error, kind);
         runError.value = t(kind === 'rateLimited' ? 'bulklookup.RunRateLimited' : 'bulklookup.RunFailed');
+        return null;
     } finally {
         isRunning.value = false;
     }
 };
 
+// A run that stored anything clears the input: pasting it again would count
+// its frequency twice. A paused remainder continues from the notice.
+const onRun = async (entries) => {
+    trackEvent('Section', 'StartClick', 'BulkLookup');
+    const outcome = await startRun(() => run(entries, toApiTag(lang.value)));
+    // A blocked plan is already explained under the input; a cancelled run
+    // (Clear all meanwhile) has nothing to report.
+    if (!outcome || outcome.blocked || outcome.cancelled) return;
+    inputRef.value?.reset();
+    settle(outcome);
+};
+
+const onResume = async () => {
+    const outcome = await startRun(() => resume(toApiTag(lang.value)));
+    if (!outcome || outcome.cancelled) return;
+    if (outcome.blocked) {
+        runNotice.value = t('bulklookup.status.noRoom', {
+            n: outcome.fresh.toLocaleString(lang.value), room: outcome.room.toLocaleString(lang.value), max: MAX_ROWS.toLocaleString(lang.value),
+        });
+        return;
+    }
+    settle(outcome);
+};
+
+const pausedParams = computed(() => ({
+    done: (paused.value?.done ?? 0).toLocaleString(lang.value),
+    total: (paused.value?.total ?? 0).toLocaleString(lang.value),
+    n: (paused.value?.remaining.length ?? 0).toLocaleString(lang.value),
+}));
+
 // ── Overview ─────────────────────────────────────────────────────────────
+const formatCount = (n) => n.toLocaleString(lang.value);
+// A share in the UI locale; "—" where it isn't meaningful (null).
+const formatShare = (share) => {
+    if (share === null) return '—';
+    try {
+        return new Intl.NumberFormat(lang.value, { style: 'percent', maximumFractionDigits: 1 }).format(share);
+    } catch {
+        return `${(share * 100).toFixed(1)}%`;
+    }
+};
+
+const STAT_FORMATS = {
+    rows: formatCount, countries: formatCount, asns: formatCount, frequency: formatCount,
+    topShare: formatShare, onceShare: formatShare,
+};
 const stats = computed(() => {
     const summary = summarizeRows(rows.value);
-    const format = (n) => n.toLocaleString(lang.value);
-    return [
-        { key: 'rows', value: format(summary.rows) },
-        { key: 'countries', value: format(summary.countries) },
-        { key: 'asns', value: format(summary.asns) },
-        { key: 'occurrences', value: format(summary.occurrences) },
-    ];
+    return Object.entries(STAT_FORMATS).map(([key, format]) => ({ key, value: format(summary[key]) }));
 });
 
 // ── Views: filters, sort, tabs ───────────────────────────────────────────
-const activeTab = ref('table');
+const activeTab = ref('ips');
+const analysisWeight = ref('ips'); // the Analysis toggle: 'ips' | 'hits'
+// The scope's search: free text plus the structured filters (see parseQuery).
 const query = ref('');
 const batchId = ref('all');
-const countryFilter = ref(null); // code, '' = unknown, null = any
-const asnFilter = ref(null);
+const starredOnly = ref(false);
 const sortKey = ref('count');
 const sortDir = ref('desc');
 
@@ -247,19 +311,30 @@ const sortRows = (list) => [...list].sort(compareRows(sortKey.value, sortDir.val
     countryName, compareText: collator.value.compare,
 }));
 
-const tableRows = computed(() => sortRows(filterRows(rows.value, {
+// What both tabs show: the stored rows the toolbar keeps.
+const scopedRows = computed(() => filterRows(rows.value, {
     query: query.value,
     batchId: batchId.value === 'all' ? null : batchId.value,
-    country: countryFilter.value,
-    asn: asnFilter.value,
+    starredOnly: starredOnly.value,
     countryNames,
-})));
-const starredRows = computed(() => sortRows(rows.value.filter((row) => row.starred)));
+}));
+const tableRows = computed(() => sortRows(scopedRows.value));
+
+// An Analysis entry drills the shared scope down through the query's
+// tokens, so the user's own words and the other filters stay.
+const onPick = ({ field, key }) => {
+    query.value = toggleQueryPick(query.value, field, key);
+};
+
+const starredCount = computed(() => rows.value.filter((row) => row.starred).length);
+// The last star gone: a filter left on would show nothing behind a disabled toggle.
+watch(starredCount, (n) => {
+    if (!n) starredOnly.value = false;
+});
 
 // Back to page 1 whenever what the table shows is re-chosen.
-const sortResetKey = computed(() => `${sortKey.value}|${sortDir.value}`);
 const tableResetKey = computed(() => [
-    sortResetKey.value, query.value, batchId.value, countryFilter.value, asnFilter.value,
+    sortKey.value, sortDir.value, query.value, batchId.value, starredOnly.value,
 ].join('|'));
 
 const onSort = (key) => {
@@ -269,30 +344,6 @@ const onSort = (key) => {
         sortKey.value = key;
         sortDir.value = key === 'count' ? 'desc' : 'asc';
     }
-};
-
-// Summary / Map entry → filter chip, then the table.
-const onPick = ({ field, key }) => {
-    if (field === 'country') countryFilter.value = key;
-    else asnFilter.value = key;
-    activeTab.value = 'table';
-};
-
-const chips = computed(() => [
-    countryFilter.value !== null && {
-        field: 'country',
-        label: t('bulklookup.FilterCountry', {
-            name: countryFilter.value ? countryName(countryFilter.value) || countryFilter.value : t('bulklookup.Unknown'),
-        }),
-    },
-    asnFilter.value !== null && {
-        field: 'asn',
-        label: t('bulklookup.FilterAsn', { asn: asnFilter.value || t('bulklookup.Unknown') }),
-    },
-].filter(Boolean));
-const clearChip = (field) => {
-    if (field === 'country') countryFilter.value = null;
-    else asnFilter.value = null;
 };
 
 // ── Row actions ──────────────────────────────────────────────────────────
@@ -334,9 +385,9 @@ const openClear = () => {
     keepStarred.value = true;
     clearOpen.value = true;
 };
-const clearCount = computed(() => rows.value.length - (keepStarred.value ? starredRows.value.length : 0));
+const clearCount = computed(() => rows.value.length - (keepStarred.value ? starredCount.value : 0));
 const confirmClear = () => {
-    clearRows({ keepStarred: keepStarred.value && starredRows.value.length > 0 });
+    clearRows({ keepStarred: keepStarred.value && starredCount.value > 0 });
     clearOpen.value = false;
 };
 

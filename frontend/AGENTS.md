@@ -105,8 +105,14 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
 ### Bulk IP Lookup
 
 Rows live in localStorage (`use-bulk-lookup.js`), geography from
-`/api/bulk-lookup` only. Anything per IP stays single-IP: a row opens the
-QueryIP dialog or links to the Blocklist tool — no bulk path to the private API.
+`/api/bulk-lookup` only: a run is split into requests of `BULK_LOOKUP_MAX_IPS`
+(`common/bulk-lookup-limits.js`), stored as each lands, the rest parked in
+`paused` when a later one fails (Continue sends only those). Overview and
+Clear all cover the whole list; the toolbar under them scopes both tabs
+(`scopedRows`): search with `country:` / `asn:` / `block:` tokens, batch,
+starred. Analysis entries toggle those tokens (`toggleQueryPick`), never a tab
+switch. Anything per IP stays single-IP: a row opens the QueryIP dialog or
+links to the Blocklist tool — no bulk path to the private API.
 
 ### Overlays take no keyboard shortcuts
 

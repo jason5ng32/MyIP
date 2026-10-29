@@ -217,9 +217,10 @@ if (speedLimitSet !== 0) {
 // own tighter cap (REPORT_MAX_BYTES) after schema validation.
 // Must stay above REPORT_MAX_BYTES (common/report-schema.js) or report
 // uploads die here with a raw 413 before the handler's own size check.
-// Bulk lookup carries at most 100 IPs: its own tight parser runs first, and
-// the global one skips a body that is already parsed.
-app.use('/api/bulk-lookup', express.json({ limit: '8kb' }));
+// Bulk lookup carries at most 200 IPs (~10KB as the longest IPv6 text forms):
+// its own tight parser runs first, and the global one skips a body that is
+// already parsed.
+app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching

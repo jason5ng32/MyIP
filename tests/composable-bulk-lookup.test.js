@@ -1,21 +1,35 @@
 // Guards frontend/composables/use-bulk-lookup.js — the stored shape, run
-// planning (accumulation, per-run and list caps), merging, sorting, filters,
-// aggregation, paging, CSV, and the composable's run / storage wiring over a
-// stubbed fetch and storage, including two tabs sharing one list.
+// planning (accumulation, chunking, the list cap), merging, pause / resume,
+// address blocks, sorting, filters, the search query's filter tokens (and
+// toggling one from an Analysis entry),
+// aggregation, top-N group share, the overview numbers (top-10 and once-only
+// shares) and the full-list check, paging, CSV, and the composable's run /
+// storage wiring over a stubbed fetch and storage, including two tabs sharing
+// one list.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { effectScope } from 'vue';
 
 import {
-    BULK_LOOKUP_STORAGE_KEY, MAX_ROWS, MAX_NEW_PER_RUN,
-    createEmptyState, sanitizeRow, parseState, planRun, runFailureKind, inputStatus, mergeRun, compareRows, filterRows,
-    queryTerms, matchesTerms, aggregateRows, summarizeRows, listBatches, pageCount, showPaging, clampPage, pageSlice, pageRange,
+    BULK_LOOKUP_STORAGE_KEY, MAX_ROWS, CHUNK_SIZE,
+    createEmptyState, sanitizeRow, parseState, planRun, requestCount, chunkEntries, pauseRun, planResume,
+    runFailureKind, inputStatus, mergeRun, ipBlock, compareRows, filterRows,
+    matchesTerms, aggregateRows, topShare, summarizeRows, listBatches,
+    normalizePick, parseQuery, matchesPicks, toggleQueryPick, queryPick,
+    onceShare, topGroupShare,
+    pageCount, showPaging, clampPage, pageSlice, pageRange,
     csvCell, buildCsv, useBulkLookup,
 } from '../frontend/composables/use-bulk-lookup.js';
+import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
 import getCountryName from '../common/country-name.js';
 
 const row = (ip, fields = {}) => sanitizeRow({ ip, count: 1, batchId: 'b1', addedAt: 1000, ...fields });
+// `n` distinct public IPv4 entries.
+const manyIps = (n, from = 0) => Array.from({ length: n }, (_, i) => {
+    const k = i + from;
+    return { ip: `8.${Math.floor(k / 62500) + 1}.${Math.floor(k / 250) % 250}.${(k % 250) + 1}`, count: 1 };
+});
 
 describe('use-bulk-lookup — stored shape', () => {
     it('sanitizes rows and drops unusable IPs', () => {
@@ -69,23 +83,34 @@ describe('use-bulk-lookup — runs', () => {
         assert.equal(plan.blocked, null);
     });
 
-    it('blocks the whole run past the per-run cap — never a partial set', () => {
-        assert.equal(MAX_NEW_PER_RUN, 100);
-        const entries = Array.from({ length: 101 }, (_, i) => ({ ip: `8.8.8.${i + 1}`, count: 1 }));
-        const plan = planRun([], entries);
-        assert.equal(plan.blocked, 'perRun');
-        assert.equal(plan.fresh, 101);
-        assert.equal(planRun([], entries.slice(0, 100)).blocked, null);
-        assert.deepEqual(plan.toQuery, []);
-        // Known IPs don't count toward the cap.
-        const stored = entries.slice(0, 1).map((e) => row(e.ip));
-        assert.equal(planRun(stored, entries).blocked, null);
+    it('requests chunks of the backend limit', () => {
+        assert.equal(CHUNK_SIZE, 200);
+        assert.equal(CHUNK_SIZE, BULK_LOOKUP_MAX_IPS);
+        assert.deepEqual([0, 1, 200, 201, 400, 401].map((n) => requestCount(n)), [0, 1, 1, 2, 2, 3]);
+        const entries = manyIps(450);
+        const chunks = chunkEntries(entries);
+        assert.deepEqual(chunks.map((c) => c.length), [200, 200, 50]);
+        assert.deepEqual(chunks.flat(), entries, 'order kept, nothing lost');
+        assert.deepEqual(chunkEntries([]), []);
+        assert.deepEqual(chunkEntries(manyIps(5), 2).map((c) => c.length), [2, 2, 1]);
+    });
+
+    it('splits a large run instead of blocking it', () => {
+        const plan = planRun([], manyIps(1500));
+        assert.deepEqual([plan.blocked, plan.fresh, plan.toQuery.length, plan.requests], [null, 1500, 1500, 8]);
+        assert.equal(planRun([], manyIps(200)).requests, 1);
+        assert.equal(planRun([], []).requests, 0);
+        // Known IPs need no request.
+        const entries = manyIps(201);
+        assert.equal(planRun([row(entries[0].ip)], entries).requests, 1);
     });
 
     it('blocks a run the list has no room for', () => {
         assert.equal(MAX_ROWS, 2000);
         const plan = planRun([row('8.8.8.8')], [{ ip: '1.1.1.1', count: 1 }, { ip: '9.9.9.9', count: 1 }], { maxRows: 2 });
-        assert.deepEqual([plan.blocked, plan.room, plan.toQuery.length], ['listFull', 1, 0]);
+        assert.deepEqual([plan.blocked, plan.room, plan.toQuery.length, plan.requests], ['listFull', 1, 0, 0]);
+        assert.equal(planRun([], manyIps(MAX_ROWS + 1)).blocked, 'listFull');
+        assert.equal(planRun([], manyIps(MAX_ROWS)).blocked, null);
         assert.equal(planRun([row('8.8.8.8')], [{ ip: '8.8.8.8', count: 1 }], { maxRows: 1 }).blocked, null);
     });
 
@@ -103,6 +128,22 @@ describe('use-bulk-lookup — runs', () => {
         assert.equal(next[0].country, 'US');
         assert.deepEqual([next[1].count, next[1].country, next[1].batchId, next[1].addedAt], [7, 'AU', 'b2', 2000]);
         assert.equal(stored[0].count, 1, 'input untouched');
+    });
+
+    it('parks the unqueried rest of a run from the failed request on', () => {
+        const chunks = chunkEntries(manyIps(5).map((e, i) => ({ ...e, count: i + 1 })), 2);
+        const paused = pauseRun({ chunks, failedAt: 1, batchId: 'b9', done: 2, total: 5, kind: 'rateLimited' });
+        assert.deepEqual(paused.remaining.map((e) => e.count), [3, 4, 5], 'counts ride along');
+        assert.deepEqual([paused.batchId, paused.done, paused.total, paused.kind], ['b9', 2, 5, 'rateLimited']);
+    });
+
+    it('resumes only what is still not stored, with no count bumps', () => {
+        const entries = manyIps(3);
+        const paused = { remaining: entries, batchId: 'b9', done: 1, total: 4, kind: 'transient' };
+        const plan = planResume([row(entries[0].ip)], paused);
+        assert.deepEqual(plan.toQuery, entries.slice(1));
+        assert.deepEqual(plan.existing, []);
+        assert.equal(planResume([row('1.1.1.1')], paused, { maxRows: 2 }).blocked, 'listFull');
     });
 });
 
@@ -141,10 +182,16 @@ describe('use-bulk-lookup — input status', () => {
         assert.deepEqual([s.state, s.params.n, s.button.key], ['known', 2, 'counts']);
     });
 
-    it('over the per-run cap: one warning with the numbers, idle button', () => {
-        const s = status([], ips(MAX_NEW_PER_RUN + 1));
-        assert.deepEqual([s.state, s.tone, s.button.key], ['tooMany', 'warning', 'idle']);
-        assert.deepEqual(s.params, { n: MAX_NEW_PER_RUN + 1, max: MAX_NEW_PER_RUN });
+    it('a run needing several requests says so up front, still runnable', () => {
+        const entries = manyIps(450);
+        const s = inputStatus({
+            hasText: true, summary: summaryOf(450, 2), plan: planRun([row(entries[0].ip)], entries),
+        });
+        assert.deepEqual([s.state, s.tone], ['ready', 'neutral']);
+        assert.deepEqual(s.params, { n: 450, fresh: 449 });
+        assert.deepEqual(s.extras, [{ key: 'split', n: 3 }, { key: 'existing', n: 1 }, { key: 'reserved', n: 2 }]);
+        assert.deepEqual(s.button, { key: 'run', n: 449 });
+        assert.ok(!status([], manyIps(CHUNK_SIZE)).extras.some((e) => e.key === 'split'), 'one request: no split note');
     });
 
     it('over the list cap: one warning with the numbers', () => {
@@ -161,6 +208,18 @@ describe('use-bulk-lookup — input status', () => {
         assert.deepEqual(status([], ips(4), { running: true }).params, { n: 4 });
         const known = ips(1);
         assert.equal(status([row(known[0].ip)], known, { running: true }).state, 'updating');
+    });
+
+    it('while running, the run\'s progress beats the (shifting) plan', () => {
+        const progress = { request: 2, requests: 3, done: 200, total: 450 };
+        const s = status([], ips(4), { running: true, progress });
+        assert.deepEqual([s.state, s.params], ['runningSplit', progress]);
+        assert.deepEqual(status([], [], { running: true, progress: { request: 1, requests: 1, done: 0, total: 7 } }).params, { n: 7 });
+        // A resume from an emptied input still shows its progress.
+        assert.equal(inputStatus({
+            hasText: false, summary: summaryOf(0), plan: planRun([], []), running: true, progress,
+        }).state, 'runningSplit');
+        assert.equal(status([], [], { running: true, progress: { request: 0, requests: 0, done: 0, total: 0 } }).state, 'updating');
     });
 });
 
@@ -188,22 +247,54 @@ describe('use-bulk-lookup — views', () => {
         assert.deepEqual(sortBy('count', 'desc').slice(0, 2), ['1.1.1.1', '8.8.8.8']);
     });
 
-    it('filters by text, batch, country, ASN and star', () => {
+    it('groups IPs by /24 (IPv4) and /48 (IPv6), canonically', () => {
+        assert.equal(ipBlock('8.8.8.8'), '8.8.8.0/24');
+        assert.equal(ipBlock('1.2.3.0'), '1.2.3.0/24');
+        assert.equal(ipBlock('223.255.255.255'), '223.255.255.0/24');
+        assert.equal(ipBlock('2606:4700:4700::1111'), '2606:4700:4700::/48');
+        assert.equal(ipBlock('2001:DB8:ABCD:12::1'), '2001:db8:abcd::/48', 'lowercased, host bits cleared');
+        assert.equal(ipBlock('2a00:1450:4001:0820:0000:0000:0000:200e'), '2a00:1450:4001::/48', 'expanded input');
+        assert.equal(ipBlock('2001:0:0:1::1'), '2001::/48', 'zero groups compress');
+        assert.equal(ipBlock('nope'), null);
+        assert.equal(ipBlock(null), null);
+    });
+
+    it('filters by text, batch, tokens and star', () => {
         const ips = (opts) => filterRows(rows, opts).map((r) => r.ip);
         assert.deepEqual(ips({ query: 'cloudflare' }), ['1.1.1.1', '2606:4700:4700::1111']);
         assert.deepEqual(ips({ query: 'EDGE' }), ['1.1.1.1']);
         assert.deepEqual(ips({ query: 'austral', countryNames: [(c) => (c === 'AU' ? 'Australia' : '')] }), ['1.1.1.1']);
         assert.deepEqual(ips({ batchId: 'b2' }), ['2606:4700:4700::1111']);
-        assert.deepEqual(ips({ country: 'US', asn: 'AS13335' }), ['2606:4700:4700::1111']);
-        assert.deepEqual(ips({ country: '' }), ['9.9.9.9']);
+        assert.deepEqual(ips({ query: 'country:US asn:AS13335' }), ['2606:4700:4700::1111']);
         assert.deepEqual(ips({ starredOnly: true }), ['1.1.1.1']);
+        assert.deepEqual(ips({ query: 'block:2606:4700:4700::/48' }), ['2606:4700:4700::1111']);
+        assert.deepEqual(ips({ query: 'block:8.8.8.0/24' }), ['8.8.8.8']);
+        assert.deepEqual(ips({ query: 'block:8.8.8.0/24', starredOnly: true }), []);
+        assert.deepEqual(ips({ query: 'block:10.0.0.0/24' }), []);
+        assert.deepEqual(ips({ query: 'asn:AS13335 cloudflare', batchId: 'b1' }), ['1.1.1.1'], 'token, text and batch AND');
+    });
+
+    it('matches tokens exactly: country and ASN case-insensitive, blocks canonical', () => {
+        const ips = (query) => filterRows(rows, { query }).map((r) => r.ip);
+        assert.deepEqual(ips('country:us'), ips('COUNTRY:US'));
+        assert.deepEqual(ips('country:us'), ['8.8.8.8', '2606:4700:4700::1111']);
+        assert.deepEqual(ips('asn:as13335'), ['1.1.1.1', '2606:4700:4700::1111']);
+        assert.deepEqual(ips('asn:13335'), ips('asn:AS13335'), 'bare digits gain AS');
+        assert.deepEqual(ips('asn:AS1333'), [], 'exact, not a substring');
+        assert.deepEqual(ips('country:U'), []);
+        assert.deepEqual(ips('block:2606:4700:4700:0000::/48'), ['2606:4700:4700::1111'], 'IPv6 canonicalized');
+        assert.deepEqual(ips('block:2606:4700:4700::1111'), ['2606:4700:4700::1111'], 'a bare IP means its block');
+        assert.deepEqual(ips('block:8.8.8.77/24'), ['8.8.8.8'], 'host bits cleared');
+        assert.deepEqual(ips('block:8.8.0.0/16'), [], 'only /24 and /48 blocks exist');
+        assert.equal(matchesPicks(rows[3], { country: null, asn: 'AS19281', block: null }), true, 'null = any');
+        assert.equal(matchesPicks(rows[3], parseQuery('country:US').picks), false, 'an unknown country never matches');
     });
 
     it('searches with every term hitting some field', () => {
         const zh = (code) => getCountryName(code, 'zh');
         const en = (code) => getCountryName(code, 'en');
         const search = (query, names = [zh, en]) => filterRows(rows, { query, countryNames: names }).map((r) => r.ip);
-        assert.deepEqual(queryTerms('  美国\t 13335  '), ['美国', '13335']);
+        assert.deepEqual(parseQuery('  美国\t 13335  ').terms, ['美国', '13335']);
         assert.deepEqual(search('美国'), ['8.8.8.8', '2606:4700:4700::1111']);
         assert.deepEqual(search('美国 13335'), ['2606:4700:4700::1111'], 'AND across terms');
         assert.deepEqual(search('united states'), ['8.8.8.8', '2606:4700:4700::1111']);
@@ -211,16 +302,85 @@ describe('use-bulk-lookup — views', () => {
         assert.deepEqual(search('Australia'), ['1.1.1.1'], 'English name while the UI is Chinese');
         assert.deepEqual(search('as13335'), search('13335'));
         assert.deepEqual(search('edge'), ['1.1.1.1'], 'note');
+        assert.deepEqual(search('2606:4700'), ['2606:4700:4700::1111'], 'an IPv6 fragment is no token');
         assert.deepEqual(search(''), rows.map((r) => r.ip));
         assert.deepEqual(search('   '), rows.map((r) => r.ip));
     });
 
     it('never matches the occurrence count', () => {
         const only = [row('8.8.4.4', { count: 35, country: 'GB' })];
-        assert.equal(matchesTerms(only[0], queryTerms('35')), false);
-        assert.equal(matchesTerms(only[0], queryTerms('8.4')), true);
-        assert.equal(matchesTerms(only[0], queryTerms('英国 8.8'), [(c) => getCountryName(c, 'zh')]), true);
-        assert.equal(matchesTerms(only[0], queryTerms('英国 35'), [(c) => getCountryName(c, 'zh')]), false);
+        const terms = (query) => parseQuery(query).terms;
+        assert.equal(matchesTerms(only[0], terms('35')), false);
+        assert.equal(matchesTerms(only[0], terms('8.4')), true);
+        assert.equal(matchesTerms(only[0], terms('英国 8.8'), [(c) => getCountryName(c, 'zh')]), true);
+        assert.equal(matchesTerms(only[0], terms('英国 35'), [(c) => getCountryName(c, 'zh')]), false);
+    });
+
+    it('parses tokens out of the query, the rest is free text', () => {
+        assert.deepEqual(parseQuery(''), { picks: { country: null, asn: null, block: null }, terms: [] });
+        assert.deepEqual(parseQuery('Germany Country:de asn:as3320 note BLOCK:2001:DB8:1::/48'), {
+            picks: { country: 'DE', asn: 'AS3320', block: '2001:db8:1::/48' },
+            terms: ['germany', 'note'],
+        });
+        assert.deepEqual(parseQuery('country:US country:au').picks.country, 'AU', 'last token of a field wins');
+        // Unknown keyword: free text; a keyword with no value yet: ignored.
+        assert.deepEqual(parseQuery('city:Paris country: asn:').terms, ['city:paris']);
+        assert.deepEqual(parseQuery('country:').picks, { country: null, asn: null, block: null });
+        assert.deepEqual(parseQuery('city:Paris country: asn:').picks, { country: null, asn: null, block: null });
+        assert.deepEqual(parseQuery('block:nope').picks.block, 'nope', 'kept as typed: matches nothing');
+    });
+
+    it('toggles a pick on from an empty query', () => {
+        assert.equal(toggleQueryPick('', 'country', 'US'), 'country:US');
+        assert.equal(toggleQueryPick('  ', 'block', '203.0.113.0/24'), 'block:203.0.113.0/24');
+    });
+
+    it('appends a pick after the free text', () => {
+        assert.equal(toggleQueryPick('Germany 3320', 'country', 'DE'), 'Germany 3320 country:DE');
+        assert.equal(toggleQueryPick('  Germany \t 3320 ', 'country', 'DE'), 'Germany 3320 country:DE', 'single spaces, trimmed');
+    });
+
+    it('replaces a field\'s pick, keeping the other fields', () => {
+        assert.equal(toggleQueryPick('country:US asn:AS13335 cloud', 'country', 'DE'), 'asn:AS13335 cloud country:DE');
+        assert.equal(toggleQueryPick('country:US note country:AU', 'country', 'FR'), 'note country:FR', 'every token of the field goes');
+        assert.equal(toggleQueryPick('paris country:', 'country', 'FR'), 'paris country:FR', 'a bare keyword of the field goes too');
+    });
+
+    it('toggles the current pick off, keeping the rest', () => {
+        assert.equal(toggleQueryPick('Germany country:DE asn:AS3320', 'country', 'DE'), 'Germany asn:AS3320');
+        assert.equal(toggleQueryPick('block:203.0.113.0/24', 'block', '203.0.113.0/24'), '');
+        // The last token is the pick: an earlier, overridden one is no match.
+        assert.equal(toggleQueryPick('country:DE country:US', 'country', 'DE'), 'country:DE');
+    });
+
+    it('recognizes a token keyword in any case', () => {
+        assert.equal(toggleQueryPick('Country:de x', 'country', 'DE'), 'x');
+        assert.equal(toggleQueryPick('Country:de x', 'country', 'US'), 'x country:US');
+        assert.equal(toggleQueryPick('ASN:as3320', 'asn', 'AS3320'), '');
+    });
+
+    it('normalizes the value before toggling', () => {
+        assert.equal(toggleQueryPick('', 'asn', '13335'), 'asn:AS13335');
+        assert.equal(toggleQueryPick('asn:AS13335', 'asn', '13335'), '');
+        assert.equal(toggleQueryPick('', 'country', 'us'), 'country:US');
+        assert.equal(toggleQueryPick(' a  b ', 'country', ''), 'a b', 'a blank value changes nothing');
+    });
+
+    it('reads one field\'s current pick', () => {
+        assert.equal(queryPick('Germany country:de', 'country'), 'DE');
+        assert.equal(queryPick('asn:13335', 'asn'), 'AS13335');
+        assert.equal(queryPick('Germany', 'block'), null);
+        assert.equal(queryPick('country:', 'country'), null);
+    });
+
+    it('normalizes pick values', () => {
+        assert.equal(normalizePick('country', ' us '), 'US');
+        assert.equal(normalizePick('asn', 'as13335'), 'AS13335');
+        assert.equal(normalizePick('asn', '13335'), 'AS13335');
+        assert.equal(normalizePick('block', '2001:DB8:ABCD:12::1/48'), '2001:db8:abcd::/48');
+        assert.equal(normalizePick('block', '203.0.113.9'), '203.0.113.0/24');
+        assert.equal(normalizePick('country', ''), '');
+        assert.equal(normalizePick('asn', null), '');
     });
 
     it('aggregates by IP count or by occurrences, unknown last on ties', () => {
@@ -233,8 +393,67 @@ describe('use-bulk-lookup — views', () => {
         assert.deepEqual(asns[0], { key: 'AS13335', value: 2, label: 'CLOUDFLARENET', share: 0.5 });
     });
 
-    it('summarizes the header strip and lists batches newest first', () => {
-        assert.deepEqual(summarizeRows(rows), { rows: 4, countries: 2, asns: 3, occurrences: 15 });
+    it('feeds the map: known countries weighted by IPs or by frequency', () => {
+        const values = (weight) => Object.fromEntries(aggregateRows(rows, 'country', { weight })
+            .filter((g) => g.key).map((g) => [g.key, g.value]));
+        assert.deepEqual(values('ips'), { US: 2, AU: 1 });
+        assert.deepEqual(values('hits'), { AU: 10, US: 4 });
+    });
+
+    it('top-N group share: known groups over the whole weight', () => {
+        const groups = [
+            { key: 'US', value: 4, share: 0.4 }, { key: '', value: 3, share: 0.3 },
+            { key: 'DE', value: 1, share: 0.1 }, { key: 'FR', value: 1, share: 0.1 }, { key: 'JP', value: 1, share: 0.1 },
+        ];
+        // US + DE + FR; the unknown group stays only in the denominator.
+        assert.equal(topGroupShare(groups), 0.6);
+        assert.equal(topGroupShare(groups.slice(0, 4)), null, 'three known groups or fewer');
+        assert.equal(topGroupShare(groups, 4), null);
+        assert.equal(topGroupShare(groups, 2), 0.5);
+        assert.equal(topGroupShare([]), null);
+        const countries = aggregateRows([...rows, row('8.8.4.4', { country: 'DE' }), row('8.8.4.5', { country: 'FR' })], 'country');
+        // US 2 + AU 1 + DE 1 of 6 (the unknown row counts in the total).
+        assert.equal(topGroupShare(countries), 4 / 6);
+    });
+
+    it('once-only share: IPs seen exactly once over all IPs', () => {
+        assert.equal(onceShare(rows), 0.5);
+        assert.equal(onceShare([row('8.8.4.4', { count: 2 })]), 0);
+        assert.equal(onceShare([]), null);
+    });
+
+    it('aggregates address blocks, by IP or by occurrences', () => {
+        const list = [...rows, row('8.8.8.4', { count: 2 }), row('2606:4700:4700::64', { count: 5 })];
+        assert.deepEqual(aggregateRows(list, 'block').map((g) => [g.key, g.value]),
+            [['2606:4700:4700::/48', 2], ['8.8.8.0/24', 2], ['1.1.1.0/24', 1], ['9.9.9.0/24', 1]]);
+        assert.deepEqual(aggregateRows(list, 'block', { weight: 'hits' }).slice(0, 2).map((g) => [g.key, g.value]),
+            [['1.1.1.0/24', 10], ['2606:4700:4700::/48', 6]]);
+    });
+
+    it('top-10 share: occurrences of the ten most frequent IPs over all', () => {
+        assert.equal(topShare(rows), null, 'ten rows or fewer: trivially all');
+        const list = manyIps(12).map((e, i) => row(e.ip, { count: i === 0 ? 89 : 1 }));
+        // 89 + 9 of 100 occurrences.
+        assert.equal(topShare(list), 0.98);
+        assert.equal(topShare(list.slice(0, 10)), null);
+        assert.equal(topShare(list.slice(0, 11)), 98 / 99);
+    });
+
+    it('summarizes the overview and lists batches newest first', () => {
+        // Unknown country / ASN values aren't counted.
+        assert.deepEqual(summarizeRows(rows), {
+            rows: 4, countries: 2, asns: 3, frequency: 15, topShare: null, onceShare: 0.5,
+        });
+        assert.deepEqual(summarizeRows([row('8.8.4.4')]), {
+            rows: 1, countries: 0, asns: 0, frequency: 1, topShare: null, onceShare: 1,
+        });
+        assert.deepEqual(summarizeRows([]), {
+            rows: 0, countries: 0, asns: 0, frequency: 0, topShare: null, onceShare: null,
+        });
+        // Past ten rows the top-10 share is defined.
+        const many = manyIps(12).map((e, i) => row(e.ip, { count: i === 0 ? 89 : 1 }));
+        assert.equal(summarizeRows(many).topShare, 0.98);
+        assert.equal(summarizeRows(many).onceShare, 11 / 12);
         assert.deepEqual(listBatches(rows), [{ id: 'b2', at: 3000, size: 1 }, { id: 'b1', at: 1000, size: 3 }]);
     });
 });
@@ -334,11 +553,197 @@ describe('use-bulk-lookup — composable', () => {
     it('neither queries nor stores a blocked run', async () => {
         const calls = [];
         const lookup = useBulkLookup({ storage: memoryStorage(), fetcher: okFetch(calls) });
-        const entries = Array.from({ length: 101 }, (_, i) => ({ ip: `8.8.8.${i + 1}`, count: 1 }));
-        const outcome = await lookup.run(entries, 'en');
-        assert.equal(outcome.blocked, 'perRun');
+        const outcome = await lookup.run(manyIps(MAX_ROWS + 1), 'en');
+        assert.equal(outcome.blocked, 'listFull');
         assert.deepEqual(calls, []);
         assert.equal(lookup.rows.value.length, 0);
+    });
+
+    it('splits a large run into sequential requests under one batch', async () => {
+        const calls = [];
+        let inFlight = 0;
+        let maxInFlight = 0;
+        const seen = [];
+        const base = okFetch(calls);
+        let lookup;
+        const fetcher = async (url, options) => {
+            inFlight += 1;
+            maxInFlight = Math.max(maxInFlight, inFlight);
+            seen.push({ ...lookup.progress.value, stored: lookup.rows.value.length });
+            await new Promise((resolve) => { setTimeout(resolve, 0); });
+            inFlight -= 1;
+            return base(url, options);
+        };
+        lookup = useBulkLookup({ storage: memoryStorage(), fetcher });
+        await lookup.run([{ ip: '1.1.1.1', count: 1 }], 'en');
+        calls.length = 0;
+        seen.length = 0;
+
+        const entries = [{ ip: '1.1.1.1', count: 4 }, ...manyIps(450)];
+        const outcome = await lookup.run(entries, 'en');
+        assert.deepEqual(calls.map((ips) => ips.length), [200, 200, 50]);
+        assert.equal(maxInFlight, 1, 'never in parallel');
+        assert.deepEqual(seen.map((p) => [p.request, p.requests, p.done, p.total]), [[1, 3, 0, 450], [2, 3, 200, 450], [3, 3, 400, 450]]);
+        assert.deepEqual(seen.map((p) => p.stored), [1, 201, 401], 'each chunk stored as it lands');
+        assert.equal(lookup.progress.value, null);
+        assert.deepEqual([outcome.added, outcome.updated, outcome.paused], [450, 1, null]);
+        assert.equal(lookup.rows.value.find((r) => r.ip === '1.1.1.1').count, 5, 'bumped once');
+        const batchIds = new Set(lookup.rows.value.slice(1).map((r) => r.batchId));
+        assert.equal(batchIds.size, 1);
+    });
+
+    // Answers `fail` (a status, or a thrown error) on the given request numbers.
+    const failingFetch = (calls, failOn) => {
+        const base = okFetch(calls);
+        let n = 0;
+        return async (url, options) => {
+            n += 1;
+            const fail = failOn[n];
+            if (fail instanceof Error) throw fail;
+            if (fail) return { ok: false, status: fail };
+            return base(url, options);
+        };
+    };
+
+    it('a failure before anything landed stores nothing, bumps included', async () => {
+        const storage = memoryStorage();
+        const calls = [];
+        const lookup = useBulkLookup({ storage, fetcher: failingFetch(calls, { 2: 429 }) });
+        await lookup.run([{ ip: '1.1.1.1', count: 1 }], 'en');
+        await assert.rejects(lookup.run([{ ip: '1.1.1.1', count: 3 }, ...manyIps(300)], 'en'), (e) => e.status === 429);
+        assert.deepEqual(lookup.rows.value.map((r) => [r.ip, r.count]), [['1.1.1.1', 1]]);
+        assert.equal(lookup.paused.value, null);
+    });
+
+    it('a failure mid-run keeps what landed and parks the rest; continue finishes it', async () => {
+        const calls = [];
+        const lookup = useBulkLookup({ storage: memoryStorage(), fetcher: failingFetch(calls, { 3: 429, 4: new TypeError('Failed to fetch') }) });
+        const fresh = manyIps(450).map((e, i) => ({ ...e, count: (i % 3) + 1 }));
+        await lookup.run([{ ip: '1.1.1.1', count: 1 }], 'en');
+
+        const outcome = await lookup.run([{ ip: '1.1.1.1', count: 2 }, ...fresh], 'en');
+        assert.equal(lookup.rows.value.length, 201);
+        assert.equal(lookup.rows.value[0].count, 3, 'bumps rode with the first chunk');
+        assert.equal(outcome.error.status, 429);
+        assert.deepEqual([outcome.paused.kind, outcome.paused.done, outcome.paused.total, outcome.paused.remaining.length],
+            ['rateLimited', 200, 450, 250]);
+        assert.deepEqual(lookup.paused.value, outcome.paused);
+        const batchId = lookup.rows.value[1].batchId;
+
+        // The first continue fails at once: the remainder stays parked, counts untouched.
+        const again = await lookup.resume('en');
+        assert.equal(again.paused.kind, 'transient');
+        assert.equal(again.paused.remaining.length, 250);
+        assert.equal(lookup.rows.value.length, 201);
+
+        const done = await lookup.resume('en');
+        assert.deepEqual([done.added, done.updated, done.paused], [250, 0, null]);
+        assert.equal(lookup.paused.value, null);
+        assert.equal(lookup.rows.value.length, 451);
+        assert.equal(lookup.rows.value[0].count, 3, 'no further bumps');
+        assert.ok(lookup.rows.value.slice(1).every((r) => r.batchId === batchId), 'one batch across the pause');
+        const counts = new Map(fresh.map((e) => [e.ip, e.count]));
+        assert.ok(lookup.rows.value.slice(1).every((r) => r.count === counts.get(r.ip)), 'extracted counts kept');
+        assert.equal(await lookup.resume('en'), null, 'nothing left to continue');
+    });
+
+    it('a new run or Clear all drops the parked remainder', async () => {
+        const lookup = useBulkLookup({ storage: memoryStorage(), fetcher: failingFetch([], { 2: 503, 5: 503 }) });
+        await lookup.run(manyIps(300), 'en');
+        assert.ok(lookup.paused.value);
+        await lookup.run([{ ip: '1.1.1.1', count: 1 }], 'en');
+        assert.equal(lookup.paused.value, null);
+        await lookup.run(manyIps(300, 1000), 'en');
+        assert.ok(lookup.paused.value);
+        lookup.clearRows();
+        assert.equal(lookup.paused.value, null);
+    });
+
+    // A fetcher whose request `n` waits for `release()`, answering `answer`
+    // (default: okFetch's). `started` resolves once that request is in flight.
+    const gatedFetch = (calls, n, answer = null) => {
+        const base = okFetch(calls);
+        let count = 0;
+        let markStarted;
+        let release;
+        const started = new Promise((resolve) => { markStarted = resolve; });
+        const gate = new Promise((resolve) => { release = resolve; });
+        const fetcher = async (url, options) => {
+            count += 1;
+            if (count === n) {
+                markStarted();
+                await gate;
+                if (answer) return answer;
+            }
+            return base(url, options);
+        };
+        return { fetcher, started, release };
+    };
+
+    it('clearRows during a run stops the remaining chunks from being stored', async () => {
+        const calls = [];
+        const { fetcher, started, release } = gatedFetch(calls, 2);
+        const lookup = useBulkLookup({ storage: memoryStorage(), fetcher });
+        const pending = lookup.run(manyIps(450), 'en');
+        await started;
+        assert.equal(lookup.rows.value.length, 200, 'first chunk stored');
+        lookup.clearRows();
+        release();
+        const outcome = await pending;
+        assert.equal(outcome.cancelled, true);
+        assert.equal(calls.length, 2, 'no request after the clear');
+        assert.deepEqual(lookup.rows.value, []);
+        assert.equal(lookup.paused.value, null);
+        assert.equal(lookup.progress.value, null);
+    });
+
+    it('a request failing after clearRows neither parks the rest nor throws', async () => {
+        const { fetcher, started, release } = gatedFetch([], 2, { ok: false, status: 429 });
+        const lookup = useBulkLookup({ storage: memoryStorage(), fetcher });
+        const pending = lookup.run(manyIps(450), 'en');
+        await started;
+        lookup.clearRows();
+        release();
+        const outcome = await pending;
+        assert.deepEqual([outcome.cancelled, outcome.paused, outcome.error], [true, null, undefined]);
+        assert.equal(lookup.paused.value, null);
+        assert.deepEqual(lookup.rows.value, []);
+    });
+
+    it('counts unanswered IPs per chunk, not rows missing from the list', async () => {
+        const calls = [];
+        const base = okFetch(calls);
+        let lookup;
+        // Each answer leaves out its chunk's first IP; before the second
+        // request the user deletes a stored row.
+        const fetcher = async (url, options) => {
+            if (calls.length === 1) lookup.removeRow(lookup.rows.value[0].ip);
+            const response = await base(url, options);
+            const body = await response.json();
+            return { ok: true, json: async () => ({ ...body, results: body.results.slice(1) }) };
+        };
+        lookup = useBulkLookup({ storage: memoryStorage(), fetcher });
+        const outcome = await lookup.run(manyIps(450), 'en');
+        assert.equal(calls.length, 3);
+        assert.equal(outcome.unanswered, 3, 'one per chunk; the deleted row is not counted');
+        assert.equal(lookup.rows.value.length, 446);
+    });
+
+    it('a resume the list has no room for keeps the remainder parked', async () => {
+        const storage = memoryStorage();
+        const tabA = useBulkLookup({ storage, fetcher: failingFetch([], { 2: 503 }) });
+        await tabA.run(manyIps(300), 'en');
+        const job = tabA.paused.value;
+        assert.equal(job.remaining.length, 100);
+        // Another tab fills the list to 50 short of the cap.
+        const tabB = useBulkLookup({ storage, fetcher: okFetch([]) });
+        await tabB.run(manyIps(MAX_ROWS - 250, 5000), 'en');
+
+        const outcome = await tabA.resume('en');
+        assert.deepEqual([outcome.blocked, outcome.fresh, outcome.room], ['listFull', 100, 50]);
+        assert.equal(outcome.paused, job);
+        assert.equal(tabA.paused.value, job, 'still parked');
+        assert.equal(parseState(storage.data[BULK_LOOKUP_STORAGE_KEY]).rows.length, MAX_ROWS - 50, 'nothing stored');
     });
 
     it('a re-paste of known IPs only bumps counts, with no request', async () => {

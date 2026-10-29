@@ -1,11 +1,11 @@
-// POST /api/bulk-lookup — geolocation for up to 100 IPs per call, for the Bulk
+// POST /api/bulk-lookup — geolocation for up to 200 IPs per call, for the Bulk
 // IP Lookup tool. Body `{ ips, lang }`; answers `{ source: { id, build },
 // results }` from the local source in server/bulk-lookup-sources.js.
 import { isUsablePublicIP } from '../common/valid-ip.js';
+import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
 import { bulkLookupSource } from '../server/bulk-lookup-sources.js';
 import logger from '../server/logger.js';
 
-export const BULK_LOOKUP_MAX_IPS = 100;
 const MAX_IP_LENGTH = 45; // longest IPv6 text form (IPv4-mapped, full)
 const MAX_LANG_LENGTH = 35;
 

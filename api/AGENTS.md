@@ -47,9 +47,10 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   lists come from local CAIDA (`server/as-relationships.js`), dropping the
   providers the graph walk distrusts. The Radar `asn` view (ASN Info) carries
   no prefix or relationship counts — the ASN Profile has both.
-- **`/api/bulk-lookup`** (POST, ≤ 100 IPs, own 8 KB body limit) takes only a
-  clean list of distinct public IPs — the page extracts and dedupes; one bad
-  or repeated entry rejects the request, nothing is cleaned server-side. Local
+- **`/api/bulk-lookup`** (POST, ≤ 200 IPs, own 16 KB body limit) takes only a
+  clean list of distinct public IPs — the page extracts, dedupes and splits a
+  larger run into requests of that size (`common/bulk-lookup-limits.js`); one
+  bad or repeated entry rejects the request, nothing is cleaned server-side. Local
   data only: the source is a `server/bulk-lookup-sources.js` row picked by
   `BULK_LOOKUP_SOURCE`, never a metered upstream.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP

@@ -10,6 +10,7 @@
 
 import assert from 'node:assert/strict';
 import { Writable } from 'node:stream';
+import fs from 'node:fs';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
@@ -29,7 +30,8 @@ import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
-import { createBulkLookup, BULK_LOOKUP_MAX_IPS } from '../api/bulk-lookup.js';
+import { createBulkLookup } from '../api/bulk-lookup.js';
+import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
 import { resolveBulkLookupSource, DEFAULT_BULK_LOOKUP_SOURCE } from '../server/bulk-lookup-sources.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
 import ooniBlockingHandler from '../api/ooni-blocking.js';
@@ -768,7 +770,7 @@ describe('bulk-lookup handler', () => {
 
     it(`rejects more than ${BULK_LOOKUP_MAX_IPS} entries`, () => {
         const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS + 1 }, (_, i) => `8.8.8.${i + 1}`);
-        assert.equal(BULK_LOOKUP_MAX_IPS, 100);
+        assert.equal(BULK_LOOKUP_MAX_IPS, 200);
         assert.equal(post({ ips }).statusCode, 400);
         assert.equal(lookups.length, 0);
     });
@@ -790,6 +792,22 @@ describe('bulk-lookup handler', () => {
         const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS }, (_, i) => `8.8.8.${i + 1}`);
         assert.equal(post({ ips }).statusCode, 200);
         assert.deepEqual(lookups.map(([ip]) => ip), ips);
+    });
+
+    it(`accepts ${BULK_LOOKUP_MAX_IPS} IPv6 in their longest canonical form`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS }, (_, i) => `2a00:1450:4001:abcd:1234:5678:9abc:${(0x1000 + i).toString(16)}`);
+        assert.ok(ips.every((ip) => ip.length === 39));
+        assert.equal(post({ ips, lang: 'pt-BR' }).statusCode, 200);
+        assert.equal(lookups.length, BULK_LOOKUP_MAX_IPS);
+    });
+
+    it('a full request fits the route\'s own body limit in backend-server.js', () => {
+        const server = fs.readFileSync(new URL('../backend-server.js', import.meta.url), 'utf8');
+        const match = /'\/api\/bulk-lookup', express\.json\(\{ limit: '(\d+)kb' \}\)/.exec(server);
+        assert.ok(match, 'bulk-lookup body parser not found');
+        // Even at the handler's per-entry maximum, with the longest lang.
+        const body = JSON.stringify({ ips: Array(BULK_LOOKUP_MAX_IPS).fill('f'.repeat(45)), lang: 'x'.repeat(35) });
+        assert.ok(Buffer.byteLength(body) < Number(match[1]) * 1024, `${Buffer.byteLength(body)} bytes over ${match[1]}kb`);
     });
 
     it('rejects a repeated entry instead of deduping it', () => {

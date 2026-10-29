@@ -1,12 +1,13 @@
 // use-bulk-lookup.js — state of the Bulk IP Lookup tool: the looked-up rows,
 // kept in localStorage (this browser only, never synced; shared by its tabs),
-// and the run against /api/bulk-lookup. Pasting again only bumps counts of IPs
-// already stored; new ones are queried. The pure helpers below are exported
-// for tests.
+// and the run against /api/bulk-lookup, one request per chunk of new IPs.
+// Pasting again only bumps counts of IPs already stored; new ones are
+// queried. The pure helpers below are exported for tests.
 import { ref, computed, getCurrentScope, onScopeDispose } from 'vue';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { isUsablePublicIP } from '../utils/ip/valid-ip.js';
-import { parseIp, compareIps } from '../utils/ip/ip-math.js';
+import { parseIp, parseCidr, formatCidr, compareIps } from '../utils/ip/ip-math.js';
+import { BULK_LOOKUP_MAX_IPS } from '../utils/features/bulk-lookup-limits.js';
 
 export const BULK_LOOKUP_STORAGE_KEY = 'bulkLookup';
 // v1 also carried per-row enrichment (dropped on read); v1–v2 named the star
@@ -14,7 +15,8 @@ export const BULK_LOOKUP_STORAGE_KEY = 'bulkLookup';
 const STATE_VERSION = 3;
 const READABLE_VERSIONS = [1, 2, 3];
 export const MAX_ROWS = 2000;
-export const MAX_NEW_PER_RUN = 100;
+// IPs per request: a larger run is split into sequential requests this size.
+export const CHUNK_SIZE = BULK_LOOKUP_MAX_IPS;
 const REQUEST_TIMEOUT_MS = 10000;
 export const NOTE_MAX = 500;
 
@@ -80,23 +82,47 @@ export const parseState = (raw) => {
 /* Runs                                                                */
 /* ------------------------------------------------------------------ */
 
+// Requests a run of `n` new IPs takes.
+export const requestCount = (n, size = CHUNK_SIZE) => Math.ceil(Math.max(0, n) / size);
+
+// `entries` in request-sized chunks, order kept.
+export const chunkEntries = (entries, size = CHUNK_SIZE) => {
+    const chunks = [];
+    for (let i = 0; i < entries.length; i += size) chunks.push(entries.slice(i, i + size));
+    return chunks;
+};
+
 // Split extracted entries against the stored rows: known IPs only bump their
-// count, new ones are queried. Never a partial set: more new IPs than one run
-// takes (`perRun`) or than the list has room for (`listFull`) blocks the run.
-export const planRun = (rows, entries, { maxNew = MAX_NEW_PER_RUN, maxRows = MAX_ROWS } = {}) => {
+// count, new ones are queried over `requests` requests. Never a partial set:
+// more new IPs than the list has room for (`listFull`) blocks the run.
+export const planRun = (rows, entries, { maxRows = MAX_ROWS, chunkSize = CHUNK_SIZE } = {}) => {
     const known = new Set(rows.map((row) => row.ip));
     const existing = entries.filter((entry) => known.has(entry.ip));
     const fresh = entries.filter((entry) => !known.has(entry.ip));
+    // Checked once, at the start: another tab filling the list meanwhile
+    // leaves mergeRun to cut the overflow.
     const room = Math.max(0, maxRows - rows.length);
-    let blocked = null;
-    if (fresh.length > maxNew) blocked = 'perRun';
-    else if (fresh.length > room) blocked = 'listFull';
-    return { existing, toQuery: blocked ? [] : fresh, fresh: fresh.length, room, blocked };
+    const blocked = fresh.length > room ? 'listFull' : null;
+    const toQuery = blocked ? [] : fresh;
+    return {
+        existing, toQuery, fresh: fresh.length, room, blocked, requests: requestCount(toQuery.length, chunkSize),
+    };
 };
 
-// A failed run, by who can act on it: 'rateLimited' (429 from the edge),
-// 'transient' (network, timeout, 503 while data loads) or 'error' — only the
-// last is our defect and worth a console.error (which Sentry captures).
+// The paused remainder of a run whose request `failedAt` failed after earlier
+// ones landed: the unqueried entries (with their counts) under the same batch.
+export const pauseRun = ({ chunks, failedAt, batchId, done, total, kind }) => {
+    const remaining = chunks.slice(failedAt).flat();
+    return { batchId, remaining, done, total, kind };
+};
+
+// Plan for continuing a paused run: only its IPs still not stored, and no
+// count bumps (the first part of the run already applied them).
+export const planResume = (rows, paused, options) => ({ ...planRun(rows, paused.remaining, options), existing: [] });
+
+// A failed run, by who can act on it: 'rateLimited' (429), 'transient'
+// (network, timeout, 503 while data loads) or 'error' — only the last is our
+// defect and worth a console.error (which Sentry captures).
 export const runFailureKind = (error) => {
     const status = error?.status;
     if (status === 429) return 'rateLimited';
@@ -105,24 +131,30 @@ export const runFailureKind = (error) => {
 };
 
 // What the input's status bar says and what its button offers, from the
-// extraction summary and the plan. One state each; `extras` are the non-zero
-// side counts (already listed, skipped private, skipped CIDR).
+// extraction summary and the plan (or, while running, the run's `progress`:
+// { request, requests, done, total }). One state each; `extras` are the side
+// notes (requests a split run takes, already listed, skipped private, skipped CIDR).
 export const inputStatus = ({
-    hasText, summary, plan, running = false, maxNew = MAX_NEW_PER_RUN, maxRows = MAX_ROWS,
+    hasText, summary, plan, running = false, progress = null, maxRows = MAX_ROWS,
 }) => {
     const skipped = [['reserved', summary.reserved], ['cidr', summary.cidr]]
         .filter(([, n]) => n > 0)
         .map(([key, n]) => ({ key, n }));
     const make = (state, tone, params = {}, extras = [], button = { key: 'idle' }) => ({ state, tone, params, extras, button });
 
-    if (running) return make(plan.fresh ? 'running' : 'updating', 'neutral', { n: plan.fresh });
+    if (running) {
+        const total = progress ? progress.total : plan.fresh;
+        if (!total) return make('updating', 'neutral');
+        if (progress?.requests > 1) return make('runningSplit', 'neutral', { ...progress });
+        return make('running', 'neutral', { n: total });
+    }
     if (!hasText) return make('empty', 'neutral');
     if (!summary.unique) return make('none', 'neutral', {}, skipped);
-    if (plan.blocked === 'perRun') return make('tooMany', 'warning', { n: plan.fresh, max: maxNew });
     if (plan.blocked === 'listFull') return make('noRoom', 'warning', { n: plan.fresh, room: plan.room, max: maxRows });
     if (!plan.fresh) return make('known', 'neutral', { n: summary.unique }, skipped, { key: 'counts' });
+    const split = plan.requests > 1 ? [{ key: 'split', n: plan.requests }] : [];
     const existing = plan.existing.length ? [{ key: 'existing', n: plan.existing.length }] : [];
-    return make('ready', 'neutral', { n: summary.unique, fresh: plan.fresh }, [...existing, ...skipped],
+    return make('ready', 'neutral', { n: summary.unique, fresh: plan.fresh }, [...split, ...existing, ...skipped],
         { key: 'run', n: plan.fresh });
 };
 
@@ -152,6 +184,14 @@ const asnNumber = (asn) => {
     return match ? Number(match[1]) : null;
 };
 
+// The address block an IP is grouped under: its /24 (IPv4) or /48 (IPv6),
+// canonical. A grouping of addresses, not a network or an owner.
+export const ipBlock = (ip) => {
+    const parsed = parseIp(ip);
+    if (!parsed) return null;
+    return formatCidr(parseCidr(`${ip}/${parsed.family === 4 ? 24 : 48}`));
+};
+
 const defaultCompareText = (a, b) => a.localeCompare(b);
 
 // Comparator for one column. Missing values sort last in either direction;
@@ -177,8 +217,73 @@ export const compareRows = (key, dir = 'asc', { countryName = (code) => code, co
     };
 };
 
-// Search terms: whitespace-separated, lowercased.
-export const queryTerms = (query) => String(query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+/* Structured filters ride the search query as `country:US`, `asn:AS13335`
+   and `block:203.0.113.0/24` tokens (keywords case-insensitive and English in
+   every locale). Picks hold one canonical value per field (null = any), ANDed
+   across fields; within a field the last token wins. A word that is no token
+   (unknown keyword, no value) is free text. */
+
+const PICK_FIELDS = ['country', 'asn', 'block'];
+
+const TOKEN = /^(country|asn|block):(\S+)$/i;
+// A keyword still waiting for its value (`country:` mid-typing).
+const BARE_KEYWORD = /^(country|asn|block):$/i;
+
+// A token value in the form rows are matched on: country codes and ASNs
+// uppercased (bare digits gain `AS`), blocks canonical (a bare IP stands for
+// its block, see ipBlock).
+export const normalizePick = (field, value) => {
+    const text = String(value ?? '').trim();
+    if (!text) return '';
+    if (field === 'asn') return /^\d+$/.test(text) ? `AS${text}` : text.toUpperCase();
+    if (field === 'block') return formatCidr(parseCidr(text)) ?? ipBlock(text) ?? text.toLowerCase();
+    return text.toUpperCase();
+};
+
+// One query word as { field, value }, or null when it is free text.
+const readToken = (word) => {
+    const match = TOKEN.exec(word);
+    if (!match) return null;
+    const field = match[1].toLowerCase();
+    return { field, value: normalizePick(field, match[2]) };
+};
+
+const queryWords = (query) => String(query ?? '').split(/\s+/).filter(Boolean);
+
+// The query as its picks and its free-text terms (lowercased); a bare
+// keyword filters nothing, so a token being typed never empties the table.
+export const parseQuery = (query) => {
+    const picks = { country: null, asn: null, block: null };
+    const terms = [];
+    for (const word of queryWords(query)) {
+        const token = readToken(word);
+        if (token) picks[token.field] = token.value;
+        else if (!BARE_KEYWORD.test(word)) terms.push(word.toLowerCase());
+    }
+    return { picks, terms };
+};
+
+/* Clicking an Analysis entry edits the query in place: the field's tokens
+   (and a bare keyword of it) go, then the value is appended unless it was
+   already the pick, which toggles it off. Other words keep their order. */
+
+// The current pick for `field`, normalized; null when none.
+export const queryPick = (query, field) => parseQuery(query).picks[field] ?? null;
+
+// A word that sets (or is starting to set) `field`.
+const isFieldWord = (word, field) => {
+    const match = TOKEN.exec(word) ?? BARE_KEYWORD.exec(word);
+    return Boolean(match) && match[1].toLowerCase() === field;
+};
+
+export const toggleQueryPick = (query, field, value) => {
+    const pick = normalizePick(field, value);
+    const words = queryWords(query);
+    if (!pick) return words.join(' ');
+    const kept = words.filter((word) => !isFieldWord(word, field));
+    if (queryPick(query, field) !== pick) kept.push(`${field}:${pick}`);
+    return kept.join(' ');
+};
 
 // What a row is searchable by: every shown field but the row number and the
 // count. Country by code and by its name in each given language.
@@ -194,30 +299,46 @@ export const matchesTerms = (row, terms, countryNames = []) => {
     return terms.every((term) => fields.some((field) => field.includes(term)));
 };
 
-// Filters: free-text `query` (see matchesTerms; `countryNames` are name
-// functions, e.g. UI language + English), plus exact `batchId`, `country`
-// and `asn` ('' = unknown, null = any) and `starredOnly`.
+// A row's value per pick field, in normalizePick's form; '' when unknown.
+const PICK_VALUES = {
+    country: (row) => row.country ?? '',
+    asn: (row) => normalizePick('asn', row.asn),
+    block: (row) => ipBlock(row.ip) ?? '',
+};
+
+// Every set pick matches exactly.
+export const matchesPicks = (row, picks) => PICK_FIELDS.every((field) => (picks[field] ?? null) === null
+    || PICK_VALUES[field](row) === picks[field]);
+
+// The page's scope filters: the `query` (its tokens, see parseQuery, and its terms,
+// see matchesTerms; `countryNames` are name functions, e.g. UI language +
+// English), plus exact `batchId` and `starredOnly`.
 export const filterRows = (rows, {
-    query = '', batchId = null, country = null, asn = null, starredOnly = false, countryNames = [],
+    query = '', batchId = null, starredOnly = false, countryNames = [],
 } = {}) => {
-    const terms = queryTerms(query);
+    const { picks, terms } = parseQuery(query);
     return rows.filter((row) => {
         if (starredOnly && !row.starred) return false;
         if (batchId !== null && row.batchId !== batchId) return false;
-        if (country !== null && (row.country ?? '') !== country) return false;
-        if (asn !== null && (row.asn ?? '') !== asn) return false;
-        return matchesTerms(row, terms, countryNames);
+        return matchesPicks(row, picks) && matchesTerms(row, terms, countryNames);
     });
 };
 
-// Ranked groups of `field` ('country' | 'asn'), weighted by IP ('ips') or by
-// occurrence count ('hits'). Unknown values group under ''. ASN groups carry
-// their org as `label`.
+const GROUP_KEYS = {
+    country: (row) => row.country,
+    asn: (row) => row.asn,
+    block: (row) => ipBlock(row.ip),
+};
+
+// Ranked groups of `field` ('country' | 'asn' | 'block'), weighted by IP
+// ('ips') or by frequency ('hits'). Unknown values group under ''. ASN groups
+// carry their org as `label`.
 export const aggregateRows = (rows, field, { weight = 'ips' } = {}) => {
     const groups = new Map();
+    const keyOf = GROUP_KEYS[field] ?? ((row) => row[field]);
     let total = 0;
     for (const row of rows) {
-        const key = row[field] ?? '';
+        const key = keyOf(row) ?? '';
         const value = weight === 'hits' ? row.count : 1;
         const group = groups.get(key) ?? { key, value: 0, label: null };
         group.value += value;
@@ -232,13 +353,31 @@ export const aggregateRows = (rows, field, { weight = 'ips' } = {}) => {
             || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
 };
 
-// Header-strip numbers.
-export const summarizeRows = (rows) => ({
-    rows: rows.length,
-    countries: new Set(rows.map((row) => row.country).filter(Boolean)).size,
-    asns: new Set(rows.map((row) => row.asn).filter(Boolean)).size,
-    occurrences: rows.reduce((sum, row) => sum + row.count, 0),
-});
+export const TOP_SHARE_N = 10;
+
+// Share of all occurrences held by the `n` most frequent IPs; null when there
+// are no more than `n` rows (trivially all of it) or no occurrences.
+export const topShare = (rows, n = TOP_SHARE_N) => {
+    if (rows.length <= n) return null;
+    const counts = rows.map((row) => row.count).sort((a, b) => b - a);
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    if (!total) return null;
+    return counts.slice(0, n).reduce((sum, count) => sum + count, 0) / total;
+};
+
+export const TOP_GROUPS_N = 3;
+
+// Share of the whole weight held by the `n` largest known groups of an
+// aggregateRows list (unknown counts in the total only); null with no more
+// than `n` known groups.
+export const topGroupShare = (groups, n = TOP_GROUPS_N) => {
+    const known = groups.filter((group) => group.key !== '');
+    if (known.length <= n) return null;
+    return known.slice(0, n).reduce((sum, group) => sum + group.share, 0);
+};
+
+// Share of IPs seen exactly once — the long tail; null with no rows.
+export const onceShare = (rows) => (rows.length ? rows.filter((row) => row.count === 1).length / rows.length : null);
 
 // One entry per paste, newest first.
 export const listBatches = (rows) => {
@@ -251,6 +390,17 @@ export const listBatches = (rows) => {
     }
     return [...batches.values()].sort((a, b) => b.at - a.at);
 };
+
+// Overview numbers: IPs, known countries and ASNs, total frequency, and the
+// top-10 and once-only shares (see topShare / onceShare for their nulls).
+export const summarizeRows = (rows) => ({
+    rows: rows.length,
+    countries: new Set(rows.map((row) => row.country).filter(Boolean)).size,
+    asns: new Set(rows.map((row) => row.asn).filter(Boolean)).size,
+    frequency: rows.reduce((sum, row) => sum + row.count, 0),
+    topShare: topShare(rows),
+    onceShare: onceShare(rows),
+});
 
 /* ------------------------------------------------------------------ */
 /* Paging                                                              */
@@ -383,61 +533,130 @@ export const useBulkLookup = ({
     events?.addEventListener?.('storage', onStorage);
     if (getCurrentScope()) onScopeDispose(() => events?.removeEventListener?.('storage', onStorage));
 
-    // Look up the new IPs of `entries` (already extracted and canonical) and
-    // fold everything into the list. A blocked plan or a failed request
-    // stores nothing.
-    const run = async (entries, lang) => {
-        const plan = planRun(latest().rows, entries);
-        if (plan.blocked) return { blocked: plan.blocked, added: 0, updated: 0, unanswered: 0 };
-        const ips = plan.toQuery.map((entry) => entry.ip);
-        const results = [];
-        let fetchedSource = null;
-        if (ips.length) {
-            const response = await fetcher('/api/bulk-lookup', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ips, lang }),
-                timeoutMs: REQUEST_TIMEOUT_MS,
-            });
-            if (!response.ok) {
-                const error = new Error(`Bulk lookup failed: HTTP ${response.status}`);
-                error.status = response.status;
-                throw error;
-            }
-            const body = await response.json();
-            if (Array.isArray(body?.results)) results.push(...body.results);
-            if (isObject(body?.source)) fetchedSource = { id: str(body.source.id), build: str(body.source.build) };
-        }
-
-        const at = Date.now();
-        let added = 0;
-        mutate((current) => {
-            const merged = mergeRun(current.rows, {
-                existing: plan.existing,
-                results,
-                counts: new Map(plan.toQuery.map((entry) => [entry.ip, entry.count])),
-                batchId: `b${at.toString(36)}`,
-                at,
-            });
-            added = merged.length - current.rows.length;
-            return { ...current, source: fetchedSource ?? current.source, rows: merged };
+    // One request: the answered results and the source they came from.
+    const fetchChunk = async (ips, lang) => {
+        const response = await fetcher('/api/bulk-lookup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ips, lang }),
+            timeoutMs: REQUEST_TIMEOUT_MS,
         });
-        const listed = new Set(rows.value.map((row) => row.ip));
-        const unanswered = ips.filter((ip) => !listed.has(ip)).length;
-        return { blocked: null, added, updated: plan.existing.length, unanswered };
+        if (!response.ok) {
+            const error = new Error(`Bulk lookup failed: HTTP ${response.status}`);
+            error.status = response.status;
+            throw error;
+        }
+        const body = await response.json();
+        return {
+            results: Array.isArray(body?.results) ? body.results : [],
+            source: isObject(body?.source) ? { id: str(body.source.id), build: str(body.source.build) } : null,
+        };
+    };
+
+    // While a run is in flight: { request, requests, done, total } over the IPs
+    // this call queries.
+    const progress = ref(null);
+    // The unqueried rest of a run a failed request cut short (see pauseRun).
+    // Memory only; dropped by a new run and by Clear all.
+    const paused = ref(null);
+    // Bumped by Clear all: a run started under an older generation is stale.
+    let generation = 0;
+
+    // Query `plan.toQuery` chunk by chunk, sequentially. Each answered chunk is
+    // stored at once; the count bumps ride with the first (or land alone when
+    // nothing is new). A failure before anything of the run was stored throws;
+    // after, the rest is parked in `paused` and the outcome says so. `done` /
+    // `total` count the whole run's new IPs, across a resume. A run gone stale
+    // (Clear all meanwhile) stops where it is: nothing more stored or parked,
+    // no throw, `cancelled` in the outcome. `unanswered` counts the queried IPs
+    // missing from their chunk's answer.
+    const execute = async (plan, { lang, batchId, done: doneBefore = 0, total = plan.toQuery.length }) => {
+        const runGeneration = generation;
+        const isStale = () => runGeneration !== generation;
+        const chunks = chunkEntries(plan.toQuery);
+        const counts = new Map(plan.toQuery.map((entry) => [entry.ip, entry.count]));
+        let bumps = plan.existing;
+        let done = doneBefore;
+        let added = 0;
+        let unanswered = 0;
+        const store = (results, fetchedSource) => {
+            const at = Date.now();
+            mutate((current) => {
+                const merged = mergeRun(current.rows, { existing: bumps, results, counts, batchId, at });
+                added += merged.length - current.rows.length;
+                return { ...current, source: fetchedSource ?? current.source, rows: merged };
+            });
+            bumps = [];
+        };
+        const outcome = (extra = {}) => ({
+            blocked: null, added, updated: plan.existing.length, unanswered, paused: null, cancelled: false, ...extra,
+        });
+
+        try {
+            if (!chunks.length) store([], null);
+            for (const [index, chunk] of chunks.entries()) {
+                progress.value = {
+                    request: index + 1, requests: chunks.length, done: done - doneBefore, total: plan.toQuery.length,
+                };
+                const ips = chunk.map((entry) => entry.ip);
+                let answer;
+                try {
+                    answer = await fetchChunk(ips, lang);
+                } catch (error) {
+                    if (isStale()) return outcome({ cancelled: true });
+                    if (done === 0) throw error;
+                    paused.value = pauseRun({ chunks, failedAt: index, batchId, done, total, kind: runFailureKind(error) });
+                    return outcome({ paused: paused.value, error });
+                }
+                if (isStale()) return outcome({ cancelled: true });
+                store(answer.results, answer.source);
+                const answered = new Set(answer.results.map((result) => result?.ip));
+                unanswered += ips.filter((ip) => !answered.has(ip)).length;
+                done += ips.length;
+            }
+            return outcome();
+        } finally {
+            progress.value = null;
+        }
+    };
+
+    // Look up the new IPs of `entries` (already extracted and canonical) and
+    // fold everything into the list, as one batch. A blocked plan stores nothing.
+    const run = async (entries, lang) => {
+        paused.value = null;
+        const plan = planRun(latest().rows, entries);
+        if (plan.blocked) return { blocked: plan.blocked, added: 0, updated: 0, unanswered: 0, paused: null };
+        return execute(plan, { lang, batchId: `b${Date.now().toString(36)}` });
+    };
+
+    // Continue the paused run: its remaining IPs, same batch, no count bumps.
+    const resume = async (lang) => {
+        const job = paused.value;
+        if (!job) return null;
+        const plan = planResume(latest().rows, job);
+        if (plan.blocked) {
+            return { blocked: plan.blocked, added: 0, updated: 0, unanswered: 0, paused: job, fresh: plan.fresh, room: plan.room };
+        }
+        paused.value = null;
+        // job.done > 0, so a failure parks the rest again instead of throwing.
+        return execute(plan, { lang, batchId: job.batchId, done: job.done, total: job.total });
     };
 
     const removeRow = (ip) => mutate((current) => ({ ...current, rows: current.rows.filter((row) => row.ip !== ip) }));
-    const clearRows = ({ keepStarred = false } = {}) => mutate((current) => ({
-        ...current, rows: keepStarred ? current.rows.filter((row) => row.starred) : [],
-    }));
+    const clearRows = ({ keepStarred = false } = {}) => {
+        generation += 1;
+        paused.value = null;
+        mutate((current) => ({
+            ...current, rows: keepStarred ? current.rows.filter((row) => row.starred) : [],
+        }));
+    };
     const toggleStar = (ip) => mutate((current) => ({
         ...current, rows: current.rows.map((row) => (row.ip === ip ? { ...row, starred: !row.starred } : row)),
     }));
     const setNote = (ip, note) => updateRow(ip, { note: String(note ?? '').slice(0, NOTE_MAX) });
 
     return {
-        rows, source, storageError,
-        run, removeRow, clearRows, toggleStar, setNote,
+        rows, source, storageError, progress, paused,
+        run, resume, removeRow, clearRows, toggleStar, setNote,
     };
 };

@@ -1,7 +1,7 @@
 <!-- Bulk IP Lookup input card: pasted text, the firstPerLine switch, and one
      status bar beside the run button. Extraction and normalization finish
-     here; `run` carries the clean entries. A paste with more new IPs than one
-     run takes (or than the list has room for) is refused whole. -->
+     here; `run` carries the clean entries. A paste with more new IPs than the
+     list has room for is refused whole; one needing several requests says so. -->
 <template>
     <Card>
         <CardContent class="p-4 md:p-6 space-y-3">
@@ -29,18 +29,18 @@
             <div class="flex flex-col gap-2 sm:flex-row sm:items-stretch">
                 <div class="flex flex-1 min-w-0 min-h-9 items-center gap-2 rounded-md border px-3 py-1.5 text-xs"
                     :class="TONE_CLASS[status.tone]" aria-live="polite">
-                    <Spinner v-if="status.state === 'running' || status.state === 'updating'" class="size-3.5 shrink-0" />
+                    <Spinner v-if="BUSY_STATES.includes(status.state)" class="size-3.5 shrink-0" />
                     <component :is="STATE_ICON[status.state]" v-else class="size-3.5 shrink-0" />
                     <span class="min-w-0">
                         <i18n-t v-if="status.state === 'ready'" keypath="bulklookup.status.ready" tag="span" scope="global">
-                            <template #n>{{ status.params.n }}</template>
+                            <template #n>{{ formatCount(status.params.n) }}</template>
                             <template #fresh>
-                                <strong class="font-medium text-foreground">{{ t('bulklookup.status.new', { n: status.params.fresh }) }}</strong>
+                                <strong class="font-medium text-foreground">{{ t('bulklookup.status.new', { n: formatCount(status.params.fresh) }) }}</strong>
                             </template>
                         </i18n-t>
-                        <template v-else>{{ t(`bulklookup.status.${status.state}`, status.params) }}</template>
+                        <template v-else>{{ t(`bulklookup.status.${status.state}`, formatParams(status.params)) }}</template>
                         <template v-for="extra in status.extras" :key="extra.key">
-                            · {{ t(`bulklookup.status.${extra.key}`, { n: extra.n }) }}
+                            · {{ t(`bulklookup.status.${extra.key}`, formatParams({ n: extra.n })) }}
                         </template>
                     </span>
                 </div>
@@ -72,18 +72,24 @@ const props = defineProps({
     // Stored rows, for the new / already-listed split and the caps.
     rows: { type: Array, required: true },
     running: { type: Boolean, default: false },
+    // The run's { request, requests, done, total } while one is in flight.
+    progress: { type: Object, default: null },
 });
 const emit = defineEmits(['run']);
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const TONE_CLASS = {
     neutral: 'bg-muted/40 text-muted-foreground',
     warning: 'border-warning/30 bg-warning/10 text-warning',
 };
 const STATE_ICON = {
-    empty: ClipboardPaste, none: SearchX, ready: ListChecks, known: RefreshCw, tooMany: TriangleAlert, noRoom: TriangleAlert,
+    empty: ClipboardPaste, none: SearchX, ready: ListChecks, known: RefreshCw, noRoom: TriangleAlert,
 };
+const BUSY_STATES = ['running', 'runningSplit', 'updating'];
+
+const formatCount = (n) => (typeof n === 'number' ? n.toLocaleString(locale.value) : n);
+const formatParams = (params) => Object.fromEntries(Object.entries(params).map(([key, value]) => [key, formatCount(value)]));
 
 const text = ref('');
 const firstPerLine = ref(false);
@@ -111,12 +117,13 @@ const status = computed(() => inputStatus({
     summary: extraction.value.summary,
     plan: plan.value,
     running: props.running,
+    progress: props.progress,
 }));
 
 const canRun = computed(() => !props.running && ['run', 'counts'].includes(status.value.button.key));
 const runLabel = computed(() => {
     const { key, n } = status.value.button;
-    if (key === 'run') return t('bulklookup.Run', { n });
+    if (key === 'run') return t('bulklookup.Run', { n: formatCount(n) });
     if (key === 'counts') return t('bulklookup.RunCountsOnly');
     return t('bulklookup.RunIdle');
 });

@@ -26,8 +26,9 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y">
+                    <!-- Only filters can empty it: the page hides an empty list -->
                     <tr v-if="!rows.length">
-                        <td :colspan="COLUMNS.length + 4" class="px-4 py-8 text-center text-sm text-muted-foreground">{{ emptyText }}</td>
+                        <td :colspan="COLUMNS.length + 4" class="px-4 py-8 text-center text-sm text-muted-foreground">{{ t('bulklookup.NoMatches') }}</td>
                     </tr>
                     <tr v-for="(row, index) in pageRows" :key="row.ip" class="hover:bg-muted/50 transition-colors">
                         <td :class="tdClass" class="text-right font-mono text-xs text-muted-foreground tabular-nums">
@@ -172,7 +173,6 @@ const props = defineProps({
     // Any change (sort, filter, batch) sends the table back to page 1.
     resetKey: { type: String, default: '' },
     blocklistAvailable: { type: Boolean, default: false },
-    emptyText: { type: String, default: '' },
 });
 const emit = defineEmits(['sort', 'star', 'remove', 'details', 'edit-note']);
 

@@ -1,6 +1,7 @@
 // Data sources the Bulk IP Lookup (POST /api/bulk-lookup) can run on, picked
-// by BULK_LOOKUP_SOURCE. Local data only: one request carries up to 100 IPs,
-// so a source here never calls a metered upstream.
+// by BULK_LOOKUP_SOURCE. Local data only: one request carries up to
+// BULK_LOOKUP_MAX_IPS (200, common/bulk-lookup-limits.js), so a source here
+// never calls a metered upstream.
 import { lookupMaxMind, getMaxMindBuild } from './datasets/maxmind-service.js';
 import logger from './logger.js';
 
