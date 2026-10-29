@@ -123,6 +123,13 @@ export const IMPORT_LISTS = [
             { id: 'netease', name: 'NetEase', url: 'https://www.163.com/favicon.ico' },
             { id: 'xiaohongshu', name: 'Xiaohongshu', url: 'https://www.xiaohongshu.com/favicon.ico' },
             { id: 'douban', name: 'Douban', url: 'https://www.douban.com/favicon.ico' },
+            { id: 'alipay', name: 'Alipay', url: 'https://www.alipay.com/favicon.ico' },
+            { id: 'meituan', name: 'Meituan', url: 'https://www.meituan.com/favicon.ico' },
+            { id: 'ctrip', name: 'Ctrip', url: 'https://www.ctrip.com/favicon.ico' },
+            { id: 'railway12306', name: '12306', url: 'https://www.12306.cn/mormhweb/images/favicon.ico', siteUrl: 'https://www.12306.cn' },
+            { id: 'kuaishou', name: 'Kuaishou', url: 'https://www.kuaishou.com/favicon.ico' },
+            { id: 'chinamobile', name: 'China Mobile', url: 'https://www.10086.cn/favicon.ico' },
+            { id: 'toutiao', name: 'Toutiao', url: 'https://www.toutiao.com/favicon.ico' },
         ],
     },
     {
