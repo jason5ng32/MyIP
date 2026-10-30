@@ -100,8 +100,10 @@
       </div>
     </nav>
 
-    <!-- Festival trim hanging below the bar; hides with it. -->
-    <div v-if="festivalNavTrim" aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-full">
+    <!-- Festival trim hanging below the bar; hides with it. Off on phones,
+         where it would cover the breadcrumb. -->
+    <div v-if="festivalNavTrim && !isMobile" aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-full">
       <component :is="festivalNavTrim" />
     </div>
 

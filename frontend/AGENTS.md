@@ -159,7 +159,8 @@ With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
 site's chrome and nothing else: the Pulse entry shows its emoji instead of
 the globe, and its folder `components/festival/<festival id>/` (if any) supplies
 lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
-below the Nav: corners + sparse hanging pieces, never full-width) and
+below the Nav: corners + sparse hanging pieces, never full-width; not on
+`isMobile`, where it covers the breadcrumb) and
 `FooterTrim.vue` (a full-width garland in the footer's top padding, drawn
 per scallop through `components/festival/Garland.vue`; traits cycle over
 coprime-length lists so no repeat shows). No page effects, no token / color
