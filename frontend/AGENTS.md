@@ -18,7 +18,7 @@ frontend/
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
-└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ ui/
+└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
 ```
 
 Every file opens with a header comment stating its purpose — read those.
@@ -151,6 +151,17 @@ package — drop the dependency, import from `@/lib/utils`.
 never `dark:` pairs. Button adds `action` / `success`; Badge adds `success`,
 hover disabled (wrap it to interact). FAB colors: `action` trigger, `default`
 stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
+
+### Festival theme rides the Pulse festivals, three things only
+
+With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
+(`data/pulse-statuses.js`; overlap → the most recently opened) dresses exactly three
+things: the Pulse entry shows its emoji instead of the globe, and its folder
+`components/festival/<festival id>/` (if any) supplies a lazy `Logo.vue`
+(over the brand icon, in its viewBox) and `NavTrim.vue` (hangs below the Nav:
+corners + sparse hanging pieces, never full-width). Nothing else changes — no
+page effects, no token / color changes, no copy. New skin = that folder
+(tested against the festival ids). `?festival=<id>` previews in DEV only.
 
 ### Status tones
 

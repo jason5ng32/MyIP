@@ -30,6 +30,7 @@ import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/features/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
+import { startFestivalSkin } from '@/composables/use-festival-skin.js';
 import { useMainStore } from '@/store';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
@@ -84,6 +85,9 @@ if (loadingElement) {
 
 // Theme orchestration: initial apply, OS flip listener, preference watcher.
 useTheme();
+
+// Festival skin: logo, Pulse icon and nav trim while one is in window.
+startFestivalSkin();
 
 // Achievement engine: listens for domain events emitted across the app and
 // evaluates the rules in data/achievement-rules.js.

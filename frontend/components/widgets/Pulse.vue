@@ -2,7 +2,9 @@
     <JnTooltip v-if="pulseVisible" :text="t('nav.pulse.tooltip')">
         <Button variant="ghost" :size="isMobile ? 'icon' : 'sm'" class="relative cursor-pointer"
             :class="isMobile ? 'size-8' : 'h-8 gap-1.5 px-2'" :aria-label="t('nav.pulse.title')" @click="openPulse">
-            <Earth class="size-4 animate-spin animation-duration-[8s]" />
+            <span v-if="festivalEmoji" class="inline-flex size-4 items-center justify-center text-sm leading-none"
+                aria-hidden="true">{{ festivalEmoji }}</span>
+            <Earth v-else class="size-4 animate-spin animation-duration-[8s]" />
             <span v-if="!isMobile">{{ t('nav.pulse.title') }}</span>
             <span class="flex size-1.5" :class="isMobile ? 'absolute right-1 top-1' : 'relative'" aria-hidden="true">
                 <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
@@ -253,12 +255,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import PulseOutages from '@/components/widgets/PulseOutages.vue';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
 import { Icon } from '@iconify/vue';
 import { Check, Earth, ClockFading } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+// The active festival's emoji stands in for the entry button's globe.
+const { pulseEmoji: festivalEmoji } = useFestivalSkin();
 
 // Entry visibility: either half of the panel can carry it (see header).
 // `cloudFlare` lands with the /api/configs fetch, so the button may appear late.

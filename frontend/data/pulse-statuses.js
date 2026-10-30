@@ -101,22 +101,27 @@ const isoTime = (iso) => Date.parse(`${iso}T00:00:00Z`);
 
 const inWindow = (t, fromMs, toMs) => t >= fromMs - LEAD_MS && t < toMs + DAY_MS + TRAIL_MS;
 
-const isActiveAt = (festival, t) => {
-    if (festival.windows) {
-        return festival.windows.some((w) => inWindow(t, isoTime(w.from), isoTime(w.to)));
-    }
-    // Yearly: materialize last, this and next year's range (a window reaches
-    // across Jan 1); from > to wraps into the following year.
+// Calendar ranges of a festival: its explicit windows, or last, this and
+// next year's yearly range (a window reaches across Jan 1; from > to wraps
+// into the following year). [fromMs, toMs] as UTC midnights.
+const rangesAround = (festival, t) => {
+    if (festival.windows) return festival.windows.map((w) => [isoTime(w.from), isoTime(w.to)]);
     const year = new Date(t).getUTCFullYear();
-    return [year - 1, year, year + 1].some((y) => {
+    return [year - 1, year, year + 1].map((y) => {
         const fromMs = mdTime(y, festival.yearly.from);
         let toMs = mdTime(y, festival.yearly.to);
         if (toMs < fromMs) toMs = mdTime(y + 1, festival.yearly.to);
-        return inWindow(t, fromMs, toMs);
+        return [fromMs, toMs];
     });
+};
+
+// When the window containing t opened (ms), or null when none does.
+export const festivalWindowStartAt = (festival, t) => {
+    const range = rangesAround(festival, t).find(([fromMs, toMs]) => inWindow(t, fromMs, toMs));
+    return range ? range[0] - LEAD_MS : null;
 };
 
 export const festivalsActiveAt = (now = new Date()) => {
     const t = now.getTime();
-    return FESTIVAL_STATUSES.filter((f) => isActiveAt(f, t));
+    return FESTIVAL_STATUSES.filter((f) => festivalWindowStartAt(f, t) !== null);
 };

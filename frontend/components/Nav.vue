@@ -18,7 +18,13 @@
         </Button>
         <a :href="isHome ? '#' : homeHref" @click="handleLogoClick"
           class="inline-flex items-center gap-1.5 rounded-md px-1 py-1 text-lg font-semibold text-foreground no-underline hover:opacity-80 transition-opacity">
-          <brandIcon />
+          <span class="relative inline-flex">
+            <brandIcon />
+            <!-- Festival logo overlay, drawn in the icon's 23px box. -->
+            <span v-if="festivalLogo" aria-hidden="true" class="pointer-events-none absolute left-0 top-0 size-[23px]">
+              <component :is="festivalLogo" />
+            </span>
+          </span>
           <span class="tracking-tight truncate">
             <span class="font-bold">IP</span><span class="font-extralight">Check.</span>
             <span class="font-extralight"
@@ -93,6 +99,11 @@
         <UserMenu />
       </div>
     </nav>
+
+    <!-- Festival trim hanging below the bar; hides with it. -->
+    <div v-if="festivalNavTrim" aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-full">
+      <component :is="festivalNavTrim" />
+    </div>
 
     <!-- Navigation sheet of the collapsed nav (a phone, or a viewport where the
          links don't fit). Flex column so the link list scrolls instead of
@@ -184,6 +195,7 @@ import { isRunningAsPwa } from '@/utils/pwa.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { useNavTarget } from '@/composables/use-nav-target.js';
 import { useNavOverflow } from '@/composables/use-nav-overflow.js';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -193,6 +205,7 @@ const { navigateTo } = useNavTarget();
 
 const isDarkMode = computed(() => store.isDarkMode);
 const isMobile = computed(() => store.isMobile);
+const { logo: festivalLogo, navTrim: festivalNavTrim } = useFestivalSkin();
 
 // The link row collapses into the hamburger + Sheet on a phone, or wherever
 // it doesn't fit beside the brand and actions. isMobile alone drives phone
