@@ -122,8 +122,11 @@
                                 <div class="flex items-center gap-1 text-sm text-muted-foreground">
                                     <span class="truncate">{{ statusById(entry.status).emoji }} {{
                                         t('nav.pulse.statuses.' + entry.status) }}</span>
-                                    <ClockFading v-if="FESTIVAL_IDS.has(entry.status)"
-                                        class="size-3 shrink-0 text-primary" />
+                                    <!-- SVGs show no native tooltip: the span carries the title. -->
+                                    <span v-if="FESTIVAL_IDS.has(entry.status)" class="flex shrink-0 text-primary"
+                                        :title="t('nav.pulse.limitedTitle') + ': ' + t('nav.pulse.festivalDesc.' + entry.status)">
+                                        <ClockFading class="size-3" />
+                                    </span>
                                 </div>
                             </div>
                         </li>
@@ -240,7 +243,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/features/pulse-beacon.js';
-import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
+import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveAt } from '@/data/pulse-statuses.js';
 import { playCelebration, resolveEffect } from '@/utils/features/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/features/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
@@ -272,10 +275,10 @@ const FESTIVAL_IDS = new Set(FESTIVAL_STATUSES.map((s) => s.id));
 const statusById = (id) => ALL_STATUSES.find((s) => s.id === id);
 
 // Active festival windows, re-evaluated on every Sheet open (a session can
-// straddle midnight).
+// outlive a window edge).
 const activeFestivals = ref([]);
 const refreshFestivals = () => {
-    activeFestivals.value = festivalsActiveOn(localDateString());
+    activeFestivals.value = festivalsActiveAt();
 };
 
 // Stats: fetched fresh on every open and after each send; previous data

@@ -1,6 +1,7 @@
 // Tests for frontend/data/pulse-statuses.js: vocabulary integrity (unique
-// ids and emoji across preset + festival lists), festival window shape and
-// activation logic (yearly recurrence incl. year-boundary wrap, explicit
+// ids and emoji across preset + festival lists), festival range shape and
+// the global activation window (UTC+14 entering the first day → UTC−12
+// leaving the last; yearly recurrence incl. year-boundary wrap, explicit
 // windows for lunar-calendar festivals), and full locale coverage. Also
 // acts as the maintenance reminder: explicit windows must keep ≥90 days of
 // runway, so `pnpm check` starts failing well before they run out.
@@ -11,8 +12,7 @@ import fs from 'node:fs';
 import {
     PRESET_STATUSES,
     FESTIVAL_STATUSES,
-    festivalsActiveOn,
-    localDateString,
+    festivalsActiveAt,
 } from '../frontend/data/pulse-statuses.js';
 import { FULL_LOCALE_CODES } from '../common/locale-registry.js';
 
@@ -88,7 +88,7 @@ describe('festival windows', () => {
         // Deliberately time-dependent: when this fails, append the next few
         // years of dates in frontend/data/pulse-statuses.js (see its header).
         const deadline = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
-        const deadlineStr = localDateString(deadline);
+        const deadlineStr = deadline.toISOString().slice(0, 10);
         for (const f of FESTIVAL_STATUSES.filter((s) => s.windows)) {
             const latest = f.windows.map((w) => w.to).sort().at(-1);
             assert.ok(latest >= deadlineStr,
@@ -96,37 +96,45 @@ describe('festival windows', () => {
         }
     });
 
-    it('festivalsActiveOn matches yearly festivals in any year', () => {
-        const ids = (d) => festivalsActiveOn(d).map((f) => f.id);
-        assert.deepEqual(ids('2026-10-31'), ['halloween']);
-        assert.deepEqual(ids('2031-10-31'), ['halloween']);
-        assert.deepEqual(ids('2026-08-10'), []);
+    const ids = (iso) => festivalsActiveAt(new Date(iso)).map((f) => f.id);
+
+    it('a single day is active from UTC+14 entering it to UTC−12 leaving it', () => {
+        assert.deepEqual(ids('2026-10-30T09:59:59Z'), ['internetday']);
+        assert.ok(ids('2026-10-30T10:00:00Z').includes('halloween'));
+        assert.deepEqual(ids('2026-11-01T11:59:59Z'), ['halloween']);
+        assert.deepEqual(ids('2026-11-01T12:00:00Z'), []);
+    });
+
+    it('yearly festivals recur in any year', () => {
+        assert.deepEqual(ids('2031-10-31T12:00:00Z'), ['halloween']);
+        assert.deepEqual(ids('2026-08-10T12:00:00Z'), []);
         // Overlapping windows both stay visible.
-        assert.deepEqual(ids('2026-10-30'), ['internetday', 'halloween']);
-        // prgday's window covers leap years, where day 256 is Sep 12.
-        assert.ok(ids('2028-09-12').includes('prgday'));
+        assert.deepEqual(ids('2026-10-30T11:00:00Z'), ['internetday', 'halloween']);
+        // prgday covers leap years, where day 256 is Sep 12.
+        assert.ok(ids('2028-09-11T10:00:00Z').includes('prgday'));
         // IPCheck.ing's own birthday (v1.0 shipped Nov 6, 2020).
-        assert.ok(ids('2031-11-06').includes('birthday'));
+        assert.ok(ids('2031-11-06T12:00:00Z').includes('birthday'));
     });
 
     it('the newyear window wraps the year boundary', () => {
-        const ids = (d) => festivalsActiveOn(d).map((f) => f.id);
-        assert.deepEqual(ids('2026-12-30'), ['newyear']);
-        assert.deepEqual(ids('2031-01-02'), ['newyear']);
-        assert.deepEqual(ids('2027-01-03'), []);
+        assert.deepEqual(ids('2026-12-30T10:00:00Z'), ['newyear']);
+        assert.deepEqual(ids('2031-01-02T11:59:00Z'), ['newyear']);
+        assert.deepEqual(ids('2027-01-02T12:00:00Z'), []);
     });
 
-    it('festivalsActiveOn matches explicit windows only inside their dates', () => {
-        const ids = (d) => festivalsActiveOn(d).map((f) => f.id);
-        assert.deepEqual(ids('2028-01-26'), ['lunar']);
-        assert.deepEqual(ids('2026-11-08'), ['diwali']);
-        assert.deepEqual(ids('2030-02-05'), ['eid']);
-        assert.deepEqual(ids('2026-02-17'), []); // before the list shipped
+    it('explicit windows are active only around their dates', () => {
+        assert.deepEqual(ids('2028-01-26T12:00:00Z'), ['lunar']);
+        assert.deepEqual(ids('2026-11-08T12:00:00Z'), ['diwali']);
+        assert.deepEqual(ids('2030-02-05T12:00:00Z'), ['eid']);
+        // eid 2030 (02-05..02-06) opens 02-04T10:00Z, closes 02-07T12:00Z.
+        assert.ok(!ids('2030-02-04T09:59:59Z').includes('eid'));
+        assert.deepEqual(ids('2030-02-07T11:59:59Z'), ['eid']);
+        assert.deepEqual(ids('2030-02-07T12:00:00Z'), []);
+        assert.deepEqual(ids('2026-02-17T12:00:00Z'), []); // before the list shipped
     });
 
-    it('localDateString formats as YYYY-MM-DD with zero padding', () => {
-        assert.equal(localDateString(new Date(2026, 0, 5)), '2026-01-05');
-        assert.equal(localDateString(new Date(2026, 11, 31)), '2026-12-31');
+    it('defaults to the current instant', () => {
+        assert.ok(Array.isArray(festivalsActiveAt()));
     });
 });
 
