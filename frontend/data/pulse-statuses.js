@@ -59,7 +59,7 @@ export const FESTIVAL_STATUSES = [
         ],
     },
     { id: 'christmas', emoji: '🎄', effect: 'fall', effectEmoji: '❄️', yearly: { from: '12-25', to: '12-25' } },
-    { id: 'newyear', emoji: '🎆', effect: 'fireworks', yearly: { from: '12-31', to: '01-01' } },
+    { id: 'newyear', emoji: '🎉', effect: 'fireworks', yearly: { from: '12-31', to: '01-01' } },
     { id: 'privacyday', emoji: '🕵️', yearly: { from: '01-28', to: '01-28' } },
     {
         id: 'lunar', emoji: '🧧', effect: 'fall',
