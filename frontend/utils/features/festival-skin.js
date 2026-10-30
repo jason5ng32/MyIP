@@ -4,7 +4,7 @@
 import { festivalWindowStartAt, festivalsActiveAt } from '../../data/pulse-statuses.js';
 
 // A skin is a folder named after a Pulse festival id holding any of these.
-export const SKIN_SLOTS = ['Logo', 'NavTrim'];
+export const SKIN_SLOTS = ['Logo', 'NavTrim', 'FooterTrim'];
 export const skinPartPath = (festivalId, slot) => `../components/festival/${festivalId}/${slot}.vue`;
 
 // VITE_FESTIVAL_SKINS="true" turns the theme on; anything else leaves it off.

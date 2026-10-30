@@ -152,16 +152,19 @@ never `dark:` pairs. Button adds `action` / `success`; Badge adds `success`,
 hover disabled (wrap it to interact). FAB colors: `action` trigger, `default`
 stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
 
-### Festival theme rides the Pulse festivals, three things only
+### Festival theme rides the Pulse festivals, chrome only
 
 With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
-(`data/pulse-statuses.js`; overlap → the most recently opened) dresses exactly three
-things: the Pulse entry shows its emoji instead of the globe, and its folder
-`components/festival/<festival id>/` (if any) supplies a lazy `Logo.vue`
-(over the brand icon, in its viewBox) and `NavTrim.vue` (hangs below the Nav:
-corners + sparse hanging pieces, never full-width). Nothing else changes — no
-page effects, no token / color changes, no copy. New skin = that folder
-(tested against the festival ids). `?festival=<id>` previews in DEV only.
+(`data/pulse-statuses.js`; overlap → the most recently opened) dresses the
+site's chrome and nothing else: the Pulse entry shows its emoji instead of
+the globe, and its folder `components/festival/<festival id>/` (if any) supplies
+lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
+below the Nav: corners + sparse hanging pieces, never full-width) and
+`FooterTrim.vue` (a full-width garland in the footer's top padding, drawn
+per scallop through `components/festival/Garland.vue`; traits cycle over
+coprime-length lists so no repeat shows). No page effects, no token / color
+changes, no new copy. New skin = that folder (tested against the festival
+ids). `?festival=<id>` previews in DEV only.
 
 ### Status tones
 

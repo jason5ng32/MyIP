@@ -1,6 +1,6 @@
 // Festival theme, shared app-wide: while a Pulse festival is in its window,
 // the Pulse entry shows its emoji and its skin folder (components/festival/
-// <id>/) dresses the logo and nav. App.vue calls startFestivalSkin() once;
+// <id>/) dresses the logo, nav and footer. App.vue calls startFestivalSkin() once;
 // it evaluates now, then re-checks on a coarse timer and on tab return.
 import { computed, defineAsyncComponent, shallowRef } from 'vue';
 import { FESTIVAL_STATUSES } from '@/data/pulse-statuses.js';
@@ -45,8 +45,10 @@ export const startFestivalSkin = () => {
     });
 };
 
-const logo = computed(() => (festival.value ? partComponent(festival.value.id, 'Logo') : null));
-const navTrim = computed(() => (festival.value ? partComponent(festival.value.id, 'NavTrim') : null));
+const part = (slot) => computed(() => (festival.value ? partComponent(festival.value.id, slot) : null));
+const logo = part('Logo');
+const navTrim = part('NavTrim');
+const footerTrim = part('FooterTrim');
 const pulseEmoji = computed(() => festival.value?.emoji ?? '');
 
-export const useFestivalSkin = () => ({ logo, navTrim, pulseEmoji });
+export const useFestivalSkin = () => ({ logo, navTrim, footerTrim, pulseEmoji });

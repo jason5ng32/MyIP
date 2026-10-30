@@ -2,9 +2,14 @@
      columns, plus a signature bar (with the copyright on self-hosted
      deployments). About / Changelog / Acknowledgement open in its About
      sheet, the CLI in its own dialog; nothing already on the page (tools,
-     sections) repeats here. -->
+     sections) repeats here. A festival theme hangs its garland. -->
 <template>
-  <footer class="border-t border-secondary text-sm text-muted-foreground">
+  <footer class="relative border-t border-secondary text-sm text-muted-foreground">
+    <!-- Festival garland across the empty top padding. -->
+    <div v-if="festivalFooterTrim" aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 h-12 overflow-hidden">
+      <component :is="festivalFooterTrim" />
+    </div>
     <div class="mx-auto w-full px-4 jn-container">
       <!-- Link columns: four tracks on md+, matching the Advanced Tools grid;
            on phones the brand spans the top and the rest flow two per row. -->
@@ -316,6 +321,7 @@ import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile, 
 import brandIcon from './svgicons/Brand.vue';
 import { Icon } from '@iconify/vue';
 import { useRouteActive } from '@/composables/use-route-active.js';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
 
 // Home passes `shortcut-guide` and owns the Help dialog the link opens.
 defineProps({ shortcutGuide: { type: Boolean, default: false } });
@@ -325,6 +331,9 @@ const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const configs = computed(() => store.configs);
+
+// Festival theme's footer trim, if the active festival has one.
+const { footerTrim: festivalFooterTrim } = useFestivalSkin();
 const curl = computed(() => store.curl);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 const tabs = ['about', 'acknowledgement', 'changelog'];
