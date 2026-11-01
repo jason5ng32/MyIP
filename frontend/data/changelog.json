@@ -2341,6 +2341,28 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added special decorations for some festivals",
+          "zh": "为某些节日添加了特殊的装饰",
+          "zh-TW": "為某些節日新增了特別的裝飾",
+          "fr": "Ajout de décorations spéciales pour certaines fêtes",
+          "ru": "Добавлено особое оформление для некоторых праздников",
+          "pt-BR": "Adicionadas decorações especiais para algumas datas comemorativas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "More troubleshooting logs for self-hosted deployments",
+          "zh": "为自托管用户提供了更多排障日志",
+          "zh-TW": "為自架使用者提供了更多疑難排解日誌",
+          "fr": "Davantage de journaux de diagnostic pour les instances auto-hébergées",
+          "ru": "Больше журналов для диагностики в самостоятельно размещённых установках",
+          "pt-BR": "Mais logs de diagnóstico para quem hospeda a própria instância"
+        }
+      },
+      {
         "type": "improve",
         "change": {
           "en": "The DNS Resolution tool returns more detailed results",
