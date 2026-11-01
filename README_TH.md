@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 กล่องเครื่องมือ IP แบบโอเพนซอร์สที่รวมทุกอย่างไว้ในที่เดียว: ตรวจ IP จากหลายแหล่ง, ทดสอบการเชื่อมต่อ, ตรวจจับ WebRTC และ DNS รั่ว, ทดสอบความเร็ว, MTR, ตรวจการเซ็นเซอร์, Whois และอีกมากมาย ติดตั้งบนเซิร์ฟเวอร์ของคุณเองได้ด้วยคำสั่ง Docker เพียงคำสั่งเดียว
 
