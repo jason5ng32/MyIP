@@ -1582,7 +1582,38 @@
     "Provider": "Fournisseur DNS",
     "Result": "Résultat de la Résolution",
     "Record": "Enregistrement",
-    "AllRegions": "Toutes les régions"
+    "AllRegions": "Toutes les régions",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "Aucun enregistrement de ce type",
+        "Hint": "Le domaine existe, mais n'a aucun enregistrement de ce type"
+      },
+      "nxdomain": {
+        "Label": "Domaine introuvable",
+        "Hint": "Le résolveur indique que ce domaine n'existe pas"
+      },
+      "servfail": {
+        "Label": "Échec de la résolution",
+        "Hint": "Le résolveur n'a pas pu mener la requête à bien — souvent à cause d'un échec de validation DNSSEC ou de serveurs faisant autorité injoignables"
+      },
+      "refused": {
+        "Label": "Requête refusée",
+        "Hint": "Le résolveur a refusé cette requête ou ne la prend pas en charge, généralement en raison de sa propre politique ou d'un filtrage"
+      },
+      "timeout": {
+        "Label": "Délai dépassé",
+        "Hint": "Le résolveur n'a pas répondu à temps"
+      },
+      "unavailable": {
+        "Label": "Résolveur indisponible",
+        "Hint": "Le résolveur est injoignable ou a renvoyé une erreur"
+      },
+      "malformed": {
+        "Label": "Réponse invalide",
+        "Hint": "La réponse du résolveur est illisible"
+      }
+    }
   },
   "ruletest": {
     "Title": "Test de règles",

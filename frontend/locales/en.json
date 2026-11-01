@@ -1582,7 +1582,38 @@
     "Provider": "DNS Provider",
     "Result": "Resolution Result",
     "Record": "Record",
-    "AllRegions": "All Regions"
+    "AllRegions": "All Regions",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "No such record",
+        "Hint": "The domain exists but has no record of this type"
+      },
+      "nxdomain": {
+        "Label": "Domain not found",
+        "Hint": "The resolver reports that this domain does not exist"
+      },
+      "servfail": {
+        "Label": "Resolution failed",
+        "Hint": "The resolver couldn't complete the lookup — often a DNSSEC validation failure or unreachable authoritative servers"
+      },
+      "refused": {
+        "Label": "Query refused",
+        "Hint": "The resolver declined or doesn't support this query, usually because of its own policy or filtering"
+      },
+      "timeout": {
+        "Label": "Timed out",
+        "Hint": "The resolver didn't answer in time"
+      },
+      "unavailable": {
+        "Label": "Resolver unavailable",
+        "Hint": "The resolver couldn't be reached or returned an error"
+      },
+      "malformed": {
+        "Label": "Invalid response",
+        "Hint": "The resolver's reply couldn't be read"
+      }
+    }
   },
   "ruletest": {
     "Title": "Rule Test",

@@ -1582,7 +1582,38 @@
     "Provider": "DNS 服务商",
     "Result": "解析结果",
     "Record": "记录",
-    "AllRegions": "全部地区"
+    "AllRegions": "全部地区",
+    "HintWithCode": "{hint}（{code}）",
+    "Failure": {
+      "nodata": {
+        "Label": "无此类型记录",
+        "Hint": "该域名存在，但没有这一类型的记录"
+      },
+      "nxdomain": {
+        "Label": "域名不存在",
+        "Hint": "解析器报告该域名不存在"
+      },
+      "servfail": {
+        "Label": "解析失败",
+        "Hint": "解析器未能完成查询，常见原因是 DNSSEC 校验失败或权威服务器无法访问"
+      },
+      "refused": {
+        "Label": "拒绝查询",
+        "Hint": "解析器拒绝或不支持这次查询，通常出于其自身的策略或过滤规则"
+      },
+      "timeout": {
+        "Label": "超时",
+        "Hint": "解析器未能在限定时间内响应"
+      },
+      "unavailable": {
+        "Label": "服务不可用",
+        "Hint": "无法连接到解析器，或解析器返回了错误"
+      },
+      "malformed": {
+        "Label": "响应格式异常",
+        "Hint": "无法读取解析器返回的响应"
+      }
+    }
   },
   "ruletest": {
     "Title": "分流测试",

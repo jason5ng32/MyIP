@@ -11,6 +11,7 @@
 import assert from 'node:assert/strict';
 import { Writable } from 'node:stream';
 import fs from 'node:fs';
+import { Resolver } from 'node:dns/promises';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
@@ -268,6 +269,27 @@ describe('dns-resolver handler', () => {
         await dnsResolverHandler(createRequest({ method: 'POST' }), res);
         assert.equal(res.statusCode, 405);
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
+    });
+
+    it('carries each row\'s status, and the failure code on N/A rows', async (t) => {
+        t.mock.method(Resolver.prototype, 'resolve4', async () => {
+            throw Object.assign(new Error('servfail'), { code: 'ESERVFAIL' });
+        });
+        globalThis.fetch = async () => new Response(JSON.stringify({
+            Status: 0, Answer: [{ type: 1, data: '192.0.2.1' }],
+        }), { status: 200 });
+        const res = createResponse();
+        await dnsResolverHandler(createRequest({ query: { hostname: 'example.test', type: 'A' } }), res);
+        assert.equal(res.statusCode, 200);
+        const udp = res.body.results.find((row) => row.type === 'udp');
+        const doh = res.body.results.find((row) => row.type === 'doh');
+        assert.deepEqual(
+            { result: udp.result, status: udp.status, code: udp.code },
+            { result: 'N/A', status: 'servfail', code: 'SERVFAIL' },
+        );
+        assert.deepEqual({ result: doh.result, status: doh.status }, { result: ['192.0.2.1'], status: 'ok' });
+        assert.equal('code' in doh, false);
+        for (const key of ['id', 'provider', 'country']) assert.ok(udp[key] && doh[key], key);
     });
 });
 

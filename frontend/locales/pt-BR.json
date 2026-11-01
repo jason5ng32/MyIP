@@ -1582,7 +1582,38 @@
     "Provider": "Provedor DNS",
     "Result": "Resultado da resolução",
     "Record": "Registro",
-    "AllRegions": "Todas as regiões"
+    "AllRegions": "Todas as regiões",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "Registro inexistente",
+        "Hint": "O domínio existe, mas não tem registro deste tipo"
+      },
+      "nxdomain": {
+        "Label": "Domínio não encontrado",
+        "Hint": "O resolvedor informa que este domínio não existe"
+      },
+      "servfail": {
+        "Label": "Falha na resolução",
+        "Hint": "O resolvedor não conseguiu concluir a consulta — geralmente por falha na validação DNSSEC ou por servidores autoritativos inacessíveis"
+      },
+      "refused": {
+        "Label": "Consulta recusada",
+        "Hint": "O resolvedor recusou ou não oferece suporte a esta consulta, geralmente por política própria ou filtragem"
+      },
+      "timeout": {
+        "Label": "Tempo esgotado",
+        "Hint": "O resolvedor não respondeu a tempo"
+      },
+      "unavailable": {
+        "Label": "Resolvedor indisponível",
+        "Hint": "Não foi possível alcançar o resolvedor, ou ele retornou um erro"
+      },
+      "malformed": {
+        "Label": "Resposta inválida",
+        "Hint": "Não foi possível ler a resposta do resolvedor"
+      }
+    }
   },
   "ruletest": {
     "Title": "Teste de regras",

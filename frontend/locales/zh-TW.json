@@ -1582,7 +1582,38 @@
     "Provider": "DNS 服務商",
     "Result": "解析結果",
     "Record": "記錄",
-    "AllRegions": "全部地區"
+    "AllRegions": "全部地區",
+    "HintWithCode": "{hint}（{code}）",
+    "Failure": {
+      "nodata": {
+        "Label": "無此類型記錄",
+        "Hint": "該網域名稱存在，但沒有這一類型的記錄"
+      },
+      "nxdomain": {
+        "Label": "網域名稱不存在",
+        "Hint": "解析器回報該網域名稱不存在"
+      },
+      "servfail": {
+        "Label": "解析失敗",
+        "Hint": "解析器未能完成查詢，常見原因是 DNSSEC 驗證失敗或權威伺服器無法連線"
+      },
+      "refused": {
+        "Label": "拒絕查詢",
+        "Hint": "解析器拒絕或不支援這次查詢，通常出於其自身的政策或過濾規則"
+      },
+      "timeout": {
+        "Label": "逾時",
+        "Hint": "解析器未能在限定時間內回應"
+      },
+      "unavailable": {
+        "Label": "服務無法使用",
+        "Hint": "無法連線到解析器，或解析器回傳了錯誤"
+      },
+      "malformed": {
+        "Label": "回應格式異常",
+        "Hint": "無法讀取解析器回傳的回應"
+      }
+    }
   },
   "ruletest": {
     "Title": "分流測試",

@@ -2341,6 +2341,17 @@
         }
       },
       {
+        "type": "improve",
+        "change": {
+          "en": "The DNS Resolution tool returns more detailed results",
+          "zh": "DNS 解析工具提供更详细的数据返回",
+          "zh-TW": "DNS 解析工具提供更詳細的回傳資料",
+          "fr": "L'outil Résolution DNS renvoie des résultats plus détaillés",
+          "ru": "Инструмент «Разрешение DNS» возвращает более подробные результаты",
+          "pt-BR": "A ferramenta Resolução DNS retorna resultados mais detalhados"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",
