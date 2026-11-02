@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -63,7 +62,6 @@ import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from 
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
 
-dotenv.config({ quiet: true });
 initUpstreamUserAgent();
 
 const app = express();

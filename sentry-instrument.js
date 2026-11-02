@@ -7,11 +7,7 @@
 // var is unset this module does nothing and @sentry/node is never even
 // loaded. SENTRY_ENVIRONMENT=development skips init too, so a local run never
 // reports. backend-server.js attaches the matching Express error handler.
-import dotenv from 'dotenv';
-
 import { scrubBreadcrumb, scrubEventRequest, scrubSpan } from './server/sentry-scrub.js';
-
-dotenv.config({ quiet: true });
 
 // SENTRY_ENVIRONMENT=development (a local `pnpm dev` machine) skips init:
 // experiments in progress are not production signal, same rule as the cron

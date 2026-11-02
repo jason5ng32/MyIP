@@ -19,7 +19,7 @@ export const resolveBulkLookupSource = (value) => {
     return { name, known, source: BULK_LOOKUP_SOURCES[known ? name : DEFAULT_BULK_LOOKUP_SOURCE] };
 };
 
-// Resolved once — env is read after dotenv, and an unknown value warns once.
+// Resolved once on first use, so an unknown value warns once.
 let active = null;
 export const bulkLookupSource = () => {
     if (active) return active;

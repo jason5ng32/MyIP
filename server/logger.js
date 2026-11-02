@@ -13,15 +13,8 @@
 //              not just a log line
 // Without the DSN, @sentry/node is never loaded and the hook is not
 // installed at all — the usual gating philosophy.
-//
-// ES module imports are hoisted, so backend-server.js's dotenv.config()
-// runs after this file — we load .env ourselves here so LOG_LEVEL is
-// honored. dotenv is idempotent; `quiet: true` avoids double banners.
 
-import dotenv from 'dotenv';
 import pino from 'pino';
-
-dotenv.config({ quiet: true });
 
 const useJson = process.env.LOG_FORMAT === 'json';
 
