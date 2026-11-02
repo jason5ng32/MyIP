@@ -1,8 +1,8 @@
 # Build stage
-FROM node:24-alpine AS build-stage
-# corepack ships with the node image and provisions pnpm at the version pinned
-# by the `packageManager` field in package.json — no global npm install needed.
-RUN corepack enable
+FROM node:26-alpine AS build-stage
+# pnpm comes from npm (the node image has no corepack), at the version pinned
+# by the `packageManager` field in package.json.
+RUN npm install -g pnpm@12.16.1
 # node-gyp toolchain for native deps without musl prebuilds (node-pty, pulled
 # in by the code-inspector dev plugin) — build stage only, the production
 # stage below stays toolchain-free.
@@ -17,7 +17,7 @@ COPY . .
 RUN pnpm run build
 
 # Production stage
-FROM node:24-alpine AS production-stage
+FROM node:26-alpine AS production-stage
 WORKDIR /app
 # node_modules is copied as-is from the build stage (pnpm's symlink farm into
 # .pnpm is preserved within /app), so the runtime needs no install step.
