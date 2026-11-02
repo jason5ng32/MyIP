@@ -104,14 +104,15 @@ minimumReleaseAgeExclude:
   - '@firebase/webchannel-wrapper@1.0.7'
   - '@lucide/vue@1.33.0 || 1.40.0 || 1.61.0'
   - tailwind-merge@3.7.0
-  - '@intlify/core-base@11.4.12'
-  - '@intlify/devtools-types@11.4.12'
-  - '@intlify/message-compiler@11.4.12'
-  - '@intlify/shared@11.4.12'
+  - '@intlify/core-base@11.4.12 || 11.4.17'
+  - '@intlify/devtools-types@11.4.12 || 11.4.17'
+  - '@intlify/message-compiler@11.4.12 || 11.4.17'
+  - '@intlify/shared@11.4.12 || 11.4.17'
   - '@photostructure/tz-lookup@11.7.0'
   - '@vueuse/core@15.0.0'
   - '@vueuse/metadata@15.0.0'
   - '@vueuse/shared@15.0.0'
-  - vue-i18n@11.4.12
+  - vue-i18n@11.4.12 || 11.4.17
   - express-rate-limit@8.7.1
   - reka-ui@2.11.0
+  - maxmind@5.0.8
