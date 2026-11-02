@@ -292,6 +292,24 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'greece',
+        emoji: '🇬🇷',
+        members: [
+            { id: 'gov-gr', name: 'Gov.gr', url: 'https://www.gov.gr/favicon.ico' },
+            { id: 'ertnews', name: 'ERT News', url: 'https://www.ertnews.gr/wp-content/uploads/2025/09/cropped-ertnews-logo-favicon-512x512-1-32x32.png' },
+            { id: 'kathimerini', name: 'Kathimerini', url: 'https://www.kathimerini.gr/favicon.ico' },
+            { id: 'in-gr', name: 'in.gr', url: 'https://www.in.gr/favicon.ico' },
+            { id: 'skroutz', name: 'Skroutz', url: 'https://statics.scdn.gr/favicon.ico', iconDomain: 'www.skroutz.gr', siteUrl: 'https://www.skroutz.gr' },
+            { id: 'box', name: 'BOX', url: 'https://box.gr/assets/favicon/favicon-32x32.png' },
+            { id: 'xe', name: 'xe.gr', url: 'https://www.xe.gr/images/favicon.ico' },
+            { id: 'vodafone-gr', name: 'Vodafone', url: 'https://www.vodafone.gr/favicon.ico' },
+            { id: 'nova-gr', name: 'Nova', url: 'https://nova.gr/img/icons/favicon.png' },
+            { id: 'nbg', name: 'NBG', url: 'https://www.nbg.gr/dist/nbgportal/browser/assets/images/favicon.ico' },
+            { id: 'eurobank', name: 'Eurobank', url: 'https://www.eurobank.gr/favicon.ico' },
+            { id: 'dei', name: 'DEI', url: 'https://www.dei.gr/imgs/favicons/favicon-32x32.png' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
