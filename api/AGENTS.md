@@ -83,7 +83,8 @@ resolver list behind `dns-resolver` (gated by
 - **Handler shape.** Single default export `async (req, res) => …`: read
   `req.query` / `req.body`, call upstream, write one response.
 - **Every upstream call uses `fetchUpstream`** (`common/fetch-with-timeout.js`,
-  8s timeout; its own timeout is an `AbortError` reading `Timed out after
+  8s timeout — Radar's client raises it to 12 s, `RADAR_TIMEOUT_MS`; its own
+  timeout is an `AbortError` reading `Timed out after
   <ms>ms: <host>`, host only — keys ride paths and queries), never a bare
   `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`

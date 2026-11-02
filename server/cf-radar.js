@@ -31,10 +31,15 @@ import { withCronMonitor } from './sentry-cron.js';
 export const hasRadarApiKey = () =>
     Boolean(process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API);
 
-// `init` passes through to fetchUpstream (e.g. a longer `timeoutMs`).
+// Cold Radar queries routinely run past fetchUpstream's 8 s default; a
+// caller's `init.timeoutMs` still wins (the outage poll allows more).
+export const RADAR_TIMEOUT_MS = 12 * 1000;
+
+// `init` passes through to fetchUpstream.
 export async function fetchFromCloudflare(endpoint, init = {}) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
     const response = await fetchUpstream(url, {
+        timeoutMs: RADAR_TIMEOUT_MS,
         ...init,
         headers: {
             'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API}`,

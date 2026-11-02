@@ -4,12 +4,12 @@
 // view's response shaping and partial-segment reporting (fetch stubbed), and
 // the bgp-prefixes list + country shares, and the outage feed's background
 // refresh (per-source last-known-good, readiness, partial marking,
-// single-flight, on-demand fill).
+// single-flight, on-demand fill), and the Radar client's timeout default.
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
 // Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
 import assert from 'node:assert/strict';
-import { afterEach, describe, it } from 'node:test';
+import { afterEach, describe, it, mock } from 'node:test';
 
 import {
     normalizeOutages,
@@ -23,6 +23,8 @@ import {
     normalizePrefixOrigins,
     buildCountryShares,
     createOutageFeed,
+    fetchFromCloudflare,
+    RADAR_TIMEOUT_MS,
 } from '../server/cf-radar.js';
 import logger from '../server/logger.js';
 import { parseCidr } from '../common/ip-math.js';
@@ -658,5 +660,38 @@ describe('createOutageFeed', () => {
             '/client/v4/radar/traffic_anomalies',
         ]);
         assert.deepEqual(ids(feed.payload()), [`a-${anomalyFixture.uuid}`, 'o-1645']);
+    });
+});
+
+describe('fetchFromCloudflare timeout', () => {
+    const originalFetch = globalThis.fetch;
+    afterEach(() => {
+        globalThis.fetch = originalFetch;
+        mock.timers.reset();
+    });
+
+    // A fetch that hangs until aborted; the mocked clock runs out its timer
+    // as soon as it is called, so the rejection names the timeout in force.
+    const hangUntilTimeout = () => {
+        mock.timers.enable({ apis: ['setTimeout'] });
+        globalThis.fetch = (url, { signal }) => {
+            const pending = new Promise((resolve, reject) => {
+                signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })));
+            });
+            mock.timers.tick(60 * 1000);
+            return pending;
+        };
+    };
+
+    it('defaults to the Radar timeout, above fetchUpstream\'s 8 s', async () => {
+        assert.equal(RADAR_TIMEOUT_MS, 12000);
+        hangUntilTimeout();
+        await assert.rejects(fetchFromCloudflare('/radar/entities/asns/13335'), /Timed out after 12000ms/);
+    });
+
+    it("a caller's timeoutMs wins", async () => {
+        hangUntilTimeout();
+        await assert.rejects(fetchFromCloudflare('/radar/traffic_anomalies', { timeoutMs: 30000 }),
+            /Timed out after 30000ms/);
     });
 });
