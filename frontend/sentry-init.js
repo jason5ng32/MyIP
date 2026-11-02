@@ -10,6 +10,8 @@ import * as Sentry from '@sentry/vue';
 import { onAppEvent } from '@/utils/app-events';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { readAccountId } from '@/utils/auth-hint.js';
+import { pageTranslationState } from '@/utils/page-translation.js';
+import i18n from '@/locales/i18n';
 
 const env = import.meta.env ?? {};
 
@@ -160,6 +162,16 @@ const initSentry = (app, router, earlyErrors = []) => {
             // per-source console.error lines remain the health signal.
             if (String(hint?.originalException?.message ?? '')
                 .startsWith('All sources failed to fetch IP details')) return null;
+            // TEMPORARY — verifies the boot <html lang> fix in index.html;
+            // remove (with utils/page-translation.js and its spec) once a few
+            // days of production data show `same` near zero. Tags the UI
+            // language and whether a browser translator rewrote the page.
+            const uiLocale = i18n.global.locale.value;
+            event.tags = {
+                ...event.tags,
+                ui_locale: uiLocale,
+                page_translated: pageTranslationState(document.documentElement.lang, uiLocale),
+            };
             // Firebase errors carry account id
             if (isFirebaseError(event, hint)) {
                 const accountId = readAccountId();
