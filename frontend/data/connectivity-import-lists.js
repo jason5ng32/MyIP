@@ -292,6 +292,28 @@ export const IMPORT_LISTS = [
         ],
     },
     {
+        id: 'indonesia',
+        emoji: '🇮🇩',
+        members: [
+            { id: 'tokopedia', name: 'Tokopedia', url: 'https://www.tokopedia.com/favicon.ico' },
+            { id: 'shopee-id', name: 'Shopee', url: 'https://shopee.co.id/favicon.ico' },
+            { id: 'blibli', name: 'Blibli', url: 'https://www.blibli.com/favicon.ico' },
+            { id: 'gojek', name: 'Gojek', url: 'https://www.gojek.com/icon.png' },
+            { id: 'traveloka', name: 'Traveloka', url: 'https://www.traveloka.com/favicon.ico' },
+            { id: 'detik', name: 'detikcom', url: 'https://www.detik.com/favicon.ico' },
+            { id: 'kompas', name: 'Kompas', url: 'https://www.kompas.com/favicon.ico' },
+            { id: 'tribunnews', name: 'Tribunnews', url: 'https://www.tribunnews.com/favicon.ico' },
+            { id: 'vidio', name: 'Vidio', url: 'https://www.vidio.com/favicon.ico' },
+            { id: 'bca', name: 'BCA', url: 'https://www.bca.co.id/favicon.ico' },
+            { id: 'bri', name: 'BRI', url: 'https://bri.co.id/favicon.ico' },
+            { id: 'mandiri', name: 'Bank Mandiri', url: 'https://bankmandiri.co.id/favicon.ico' },
+            { id: 'telkomsel', name: 'Telkomsel', url: 'https://www.telkomsel.com/sites/default/files/2021-12/APP-Icon.png' },
+            { id: 'xl', name: 'XL', url: 'https://www.xl.co.id/favicon.ico' },
+            { id: 'indonesia-go-id', name: 'Indonesia.go.id', url: 'https://indonesia.go.id/favicon.ico' },
+            { id: 'pajak', name: 'DJP', url: 'https://www.pajak.go.id/sites/default/files/djp.ico' },
+        ],
+    },
+    {
         id: 'ai',
         emoji: '🤖',
         members: [
