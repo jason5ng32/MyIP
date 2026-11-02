@@ -1,6 +1,5 @@
-// dotenv.config() is called once in backend-server.js before any handler
-// imports this module, so process.env.ALLOWED_DOMAINS is already populated.
-// Avoid the duplicate call to keep this a pure, fast function.
+// .env is loaded by `--env-file-if-exists=.env` on the node command line,
+// so process.env.ALLOWED_DOMAINS is populated before this module loads.
 
 // The Referer's hostname, or null when it is missing or unparseable —
 // scanners send garbage Referer headers, never a thrown 500.
