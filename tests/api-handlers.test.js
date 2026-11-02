@@ -574,6 +574,32 @@ describe('cf-radar handler', () => {
         assert.deepEqual(res.body, { error: 'No country provided' });
     });
 
+    // Leaves the module-level outage feed empty: no other case here reads it.
+    it('answers 500 when an empty outage feed cannot fill on demand', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        const asked = [];
+        globalThis.fetch = async (url) => {
+            asked.push(new URL(String(url)).pathname);
+            return new Response('busy', { status: 503 });
+        };
+        const originalError = logger.error;
+        const logged = [];
+        logger.error = (ctx, msg) => logged.push(msg);
+        try {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'outages' } }), res);
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.body, { error: 'Internal server error' });
+            assert.deepEqual(logged, ['cf-radar view failed']);
+            assert.deepEqual(asked.sort(), [
+                '/client/v4/radar/annotations/outages',
+                '/client/v4/radar/traffic_anomalies',
+            ]);
+        } finally {
+            logger.error = originalError;
+        }
+    });
+
     it('returns 500 when no Cloudflare API key is configured', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;

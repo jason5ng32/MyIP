@@ -12,12 +12,17 @@
 // registers the payload via markPartial; the route's cache middleware asks
 // isCompleteRadarAnswer and serves such an answer without edge-caching it.
 // The payload itself is unchanged.
+//
+// The outages view is the exception to fetch-per-request: cold Radar queries
+// outrun the request timeout, so a 30-minute background poll keeps the feed
+// in memory; a request that finds it empty fills it on demand.
 
 import { fetchUpstream } from '../common/fetch-with-timeout.js';
 import { requireValidASN, requireValidCountry } from './guards.js';
 import { lookupCountryRange } from './datasets/maxmind-service.js';
 import { parseCidr, formatIPv4 } from '../common/ip-math.js';
 import logger from './logger.js';
+import { withCronMonitor } from './sentry-cron.js';
 
 // -- shared Radar client ----------------------------------------------------
 
@@ -26,9 +31,11 @@ import logger from './logger.js';
 export const hasRadarApiKey = () =>
     Boolean(process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API);
 
-export async function fetchFromCloudflare(endpoint) {
+// `init` passes through to fetchUpstream (e.g. a longer `timeoutMs`).
+export async function fetchFromCloudflare(endpoint, init = {}) {
     const url = `https://api.cloudflare.com/client/v4${endpoint}`;
     const response = await fetchUpstream(url, {
+        ...init,
         headers: {
             'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API}`,
             'Content-Type': 'application/json',
@@ -400,29 +407,85 @@ export const mergeEvents = (outages, anomalies) => {
         .slice(0, MAX_EVENTS);
 };
 
-const fetchOutages = async () => {
-    // One failed source degrades to a partial feed; both failing is an error.
-    const [outagesResult, anomaliesResult] = await Promise.allSettled([
-        fetchFromCloudflare(`/radar/annotations/outages?dateRange=${DATE_RANGE}&limit=50`),
-        fetchFromCloudflare(`/radar/traffic_anomalies?dateRange=${DATE_RANGE}&limit=100`),
-    ]);
+// The two Radar sources, each fetched and normalized on its own. Cold Radar
+// queries take 7–21 s, so each call is allowed 30 s.
+const OUTAGE_FETCH_TIMEOUT_MS = 30 * 1000;
+const OUTAGE_SOURCES = {
+    outages: async () => normalizeOutages((await fetchFromCloudflare(
+        `/radar/annotations/outages?dateRange=${DATE_RANGE}&limit=50`,
+        { timeoutMs: OUTAGE_FETCH_TIMEOUT_MS }))?.result?.annotations || []),
+    anomalies: async () => normalizeAnomalies((await fetchFromCloudflare(
+        `/radar/traffic_anomalies?dateRange=${DATE_RANGE}&limit=100`,
+        { timeoutMs: OUTAGE_FETCH_TIMEOUT_MS }))?.result?.trafficAnomalies || []),
+};
 
-    if (outagesResult.status === 'rejected' && anomaliesResult.status === 'rejected') {
-        throw outagesResult.reason instanceof Error
-            ? outagesResult.reason
-            : new Error('both Radar sources failed');
-    }
-    if (outagesResult.status === 'rejected' || anomaliesResult.status === 'rejected') {
-        const failed = outagesResult.status === 'rejected' ? outagesResult : anomaliesResult;
-        logger.warn({ err: failed.reason }, 'cf-radar: one outage source failed');
-    }
+// In-memory outage feed. Each source keeps its last successful events; a
+// refresh updates whichever sources answered and re-merges. Ready once any
+// source has answered; partial (not edge-cached) while one never has. Both
+// failing in one refresh throws and leaves the payload as it was. Refreshes
+// are single-flight: callers during one share its promise. read() answers
+// from memory, refreshing first when it is empty.
+// `loadSource(name) → events[]` is injectable for tests. Exported for tests.
+export const createOutageFeed = (loadSource = (name) => OUTAGE_SOURCES[name]()) => {
+    const kept = { outages: null, anomalies: null };
+    let payload = null;
+    let inFlight = null;
 
-    const outages = normalizeOutages(
-        outagesResult.status === 'fulfilled' ? outagesResult.value?.result?.annotations || [] : []);
-    const anomalies = normalizeAnomalies(
-        anomaliesResult.status === 'fulfilled' ? anomaliesResult.value?.result?.trafficAnomalies || [] : []);
+    const runRefresh = async () => {
+        const names = Object.keys(kept);
+        const settled = await Promise.allSettled(names.map((name) => loadSource(name)));
+        const failed = [];
+        settled.forEach((result, i) => {
+            if (result.status === 'fulfilled') kept[names[i]] = result.value;
+            else failed.push({ name: names[i], reason: result.reason });
+        });
+        if (failed.length === names.length) {
+            throw failed[0].reason instanceof Error ? failed[0].reason : new Error('both Radar sources failed');
+        }
+        if (failed.length > 0) {
+            logger.warn({ err: failed[0].reason, source: failed[0].name }, 'cf-radar: one outage source failed');
+        }
+        const body = { events: mergeEvents(kept.outages || [], kept.anomalies || []) };
+        payload = names.every((name) => kept[name]) ? body : markPartial(body);
+        return payload;
+    };
 
-    return { events: mergeEvents(outages, anomalies) };
+    const refresh = () => {
+        inFlight ??= runRefresh().finally(() => { inFlight = null; });
+        return inFlight;
+    };
+
+    return {
+        refresh,
+        read: async () => payload ?? refresh(),
+        payload: () => payload,
+        isReady: () => payload !== null,
+    };
+};
+
+const outageFeed = createOutageFeed();
+const OUTAGE_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
+let outagePollingStarted = false;
+
+// Fill the feed now, then every 30 minutes. Idempotent; the timer is
+// unref'd. A failed first fill is non-fatal — the next tick retries.
+export const startOutagePolling = () => {
+    if (outagePollingStarted) return;
+    outagePollingStarted = true;
+    outageFeed.refresh()
+        .then(() => logger.info('📦 Outage feed primed'))
+        .catch((error) => logger.warn({ err: error }, '⚠️  Outage feed initial refresh failed; will retry on schedule'));
+    const tick = () => {
+        withCronMonitor('cf-radar-outages-refresh', outageFeed.refresh, {
+            schedule: { type: 'interval', value: OUTAGE_REFRESH_INTERVAL_MS / (60 * 1000), unit: 'minute' },
+            checkinMargin: 5,
+            maxRuntime: 5,
+        }).catch((error) => {
+            logger.error({ err: error }, 'cf-radar: outage feed refresh tick failed');
+        });
+    };
+    setInterval(tick, OUTAGE_REFRESH_INTERVAL_MS).unref?.();
+    logger.info(`🗓️  Outage feed auto refresh every ${OUTAGE_REFRESH_INTERVAL_MS / 60000} minutes`);
 };
 
 // -- view registry ----------------------------------------------------------
@@ -444,10 +507,12 @@ export const RADAR_VIEWS = {
         ttl: 30 * 24 * 60 * 60,
         fetch: fetchCountryTraffic,
     },
+    // Origin is normally a memory read, so a short TTL costs nothing and
+    // keeps the feed close to the poll.
     'outages': {
         guards: [],
-        ttl: 60 * 60,
-        fetch: fetchOutages,
+        ttl: 15 * 60,
+        fetch: outageFeed.read,
     },
     'bgp-prefixes': {
         guards: [requireValidASN()],

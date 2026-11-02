@@ -24,7 +24,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS, isCompleteRadarAnswer } from './server/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer, hasRadarApiKey, startOutagePolling } from './server/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -296,9 +296,10 @@ app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (server/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
-// country traffic, 1h for the outage feed. A partial answer (some upstream
-// calls failed, or prefix countries MaxMind couldn't fully work out) is
-// served but not cached.
+// country traffic, 15min for the outage feed (served from memory, see
+// startOutagePolling below). A partial answer (some upstream calls failed,
+// or prefix countries MaxMind couldn't fully work out) is served but not
+// cached.
 app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
@@ -380,6 +381,11 @@ const bootBackend = async () => {
     // publishes (or someone places by hand) while a boot step is still
     // running is reloaded, not taken as the watcher's baseline.
     watchDatasets(datasets);
+
+    // The Radar outage feed fills on its own, outside the boot window
+    // (asn-profile's degraded caching keys on it); a request that finds it
+    // still empty fills it on demand.
+    if (hasRadarApiKey()) startOutagePolling();
 
     await runOfflineBootstrap([
         async () => {

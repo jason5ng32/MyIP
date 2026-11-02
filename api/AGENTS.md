@@ -31,10 +31,15 @@ and purpose — read those for specifics.
 The exception to one-file-per-route is Cloudflare Radar: all Radar data rides
 `/api/cfradar`, dispatched by `?view=` over `RADAR_VIEWS` in
 `server/cf-radar.js`, where each view declares its guards, edge-cache TTL and
-fetch function — new Radar data is a view function plus a registry row, never
-a new route. `api/data/` holds contributor-editable static config consumed by
-handlers — currently `dns-resolvers.js`, the country-annotated resolver list
-behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
+fetch function — new Radar data is a view function plus a registry row,
+never a new route. `outages` is served from a 30-minute in-memory poll
+(cold Radar queries outrun the request timeout), started at boot with a
+Radar key, outside the boot window, and filled on demand by a request that
+finds it empty; each source keeps its last good answer, partial until both
+have answered once. `api/data/` holds contributor-editable static config
+consumed by handlers — currently `dns-resolvers.js`, the country-annotated
+resolver list behind `dns-resolver` (gated by
+`tests/dns-resolvers-data.test.js`).
 
 ### ASN data
 
@@ -160,6 +165,9 @@ a failed download served degraded. A route reading local data declares its
 probes (`isMaxMindReady`, `isAsRelLoaded`, …) in `backend-server.js`. Answers
 assembled from parts don't gate: an ASN Profile section whose data is still
 loading (`isStillLoading`) answers `error`, leaving the others to answer.
+The Radar outage poll stays out of that window (it would stretch the ASN
+Profile's no-degraded-caching span); a request that finds it empty fills it
+on demand.
 
 ### Private-API header pass-through (intentional exception)
 

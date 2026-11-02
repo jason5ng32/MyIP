@@ -2,7 +2,9 @@
 // the outage feed (Radar payload → flat event shape, anomaly-vs-outage
 // dedupe, sort and cap), the country-traffic matrix aggregation, the asn
 // view's response shaping and partial-segment reporting (fetch stubbed), and
-// the bgp-prefixes list + country shares.
+// the bgp-prefixes list + country shares, and the outage feed's background
+// refresh (per-source last-known-good, readiness, partial marking,
+// single-flight, on-demand fill).
 // Fixtures mirror real /radar/annotations/outages and /radar/traffic_anomalies
 // responses (see the field names — they are the upstream contract).
 // Dispatch behavior of the /api/cfradar route lives in api-handlers.test.js.
@@ -20,6 +22,7 @@ import {
     RADAR_VIEWS,
     normalizePrefixOrigins,
     buildCountryShares,
+    createOutageFeed,
 } from '../server/cf-radar.js';
 import logger from '../server/logger.js';
 import { parseCidr } from '../common/ip-math.js';
@@ -525,5 +528,135 @@ describe('buildCountryShares', () => {
         const many = Array.from({ length: 60 }, (_, i) => ({ prefix: `10.${i}.0.0/16` }));
         const result = shares(many, (ip) => ({ country: `C${ip.split('.')[1]}`, prefixLength: 16 }));
         assert.equal(result.length, 50);
+    });
+});
+
+describe('createOutageFeed', () => {
+    const originalFetch = globalThis.fetch;
+    const originalWarn = logger.warn;
+    afterEach(() => {
+        globalThis.fetch = originalFetch;
+        logger.warn = originalWarn;
+    });
+
+    const outageEvents = normalizeOutages([outageFixture]);
+    const anomalyEvents = normalizeAnomalies([anomalyFixture]);
+    const ids = (payload) => payload.events.map((event) => event.id).sort();
+
+    // A feed whose sources answer from `answers` (an Error rejects).
+    const feedOver = (answers) => createOutageFeed(async (name) => {
+        const answer = answers[name];
+        if (answer instanceof Error) throw answer;
+        return answer;
+    });
+
+    it('is not ready before any source has answered', () => {
+        const feed = feedOver({});
+        assert.equal(feed.isReady(), false);
+        assert.equal(feed.payload(), null);
+    });
+
+    it('is ready but partial after only one source answered, complete after both', async () => {
+        logger.warn = () => {};
+        const answers = { outages: outageEvents, anomalies: new Error('cold query') };
+        const feed = feedOver(answers);
+        await feed.refresh();
+        assert.equal(feed.isReady(), true);
+        assert.deepEqual(ids(feed.payload()), ['o-1645']);
+        assert.equal(isCompleteRadarAnswer(feed.payload()), false);
+
+        answers.anomalies = anomalyEvents;
+        await feed.refresh();
+        assert.deepEqual(ids(feed.payload()), [`a-${anomalyFixture.uuid}`, 'o-1645']);
+        assert.equal(isCompleteRadarAnswer(feed.payload()), true);
+    });
+
+    it("keeps a failed source's last-good events and stays complete", async () => {
+        const warned = [];
+        logger.warn = (ctx) => warned.push(ctx.source);
+        const answers = { outages: outageEvents, anomalies: anomalyEvents };
+        const feed = feedOver(answers);
+        await feed.refresh();
+        answers.outages = new Error('timed out');
+        answers.anomalies = [];
+        await feed.refresh();
+        assert.deepEqual(ids(feed.payload()), ['o-1645']);
+        assert.equal(isCompleteRadarAnswer(feed.payload()), true);
+        assert.deepEqual(warned, ['outages']);
+    });
+
+    it('throws when both sources fail and leaves the previous payload intact', async () => {
+        const answers = { outages: outageEvents, anomalies: anomalyEvents };
+        const feed = feedOver(answers);
+        const before = await feed.refresh();
+        answers.outages = new Error('timed out');
+        answers.anomalies = new Error('timed out');
+        await assert.rejects(feed.refresh(), /timed out/);
+        assert.equal(feed.payload(), before);
+        assert.equal(isCompleteRadarAnswer(feed.payload()), true);
+    });
+
+    it('shares one in-flight refresh between concurrent callers', async () => {
+        const loads = [];
+        const feed = createOutageFeed(async (name) => {
+            loads.push(name);
+            await new Promise((resolve) => setImmediate(resolve));
+            return name === 'outages' ? outageEvents : anomalyEvents;
+        });
+        const first = feed.refresh();
+        const second = feed.refresh();
+        assert.equal(first, second);
+        const [a, b] = await Promise.all([first, second]);
+        assert.equal(a, b);
+        assert.deepEqual(loads.sort(), ['anomalies', 'outages']);
+        // Settled: the next call starts a new round.
+        await feed.refresh();
+        assert.equal(loads.length, 4);
+    });
+
+    it('read() fills an empty feed on demand, then answers from memory', async () => {
+        let loads = 0;
+        const feed = createOutageFeed(async (name) => {
+            loads += 1;
+            return name === 'outages' ? outageEvents : anomalyEvents;
+        });
+        const body = await feed.read();
+        assert.equal(body, feed.payload());
+        assert.deepEqual(ids(body), [`a-${anomalyFixture.uuid}`, 'o-1645']);
+        assert.equal(await feed.read(), body);
+        assert.equal(loads, 2);
+    });
+
+    it('read() on an empty feed rejects when both sources fail', async () => {
+        const feed = feedOver({ outages: new Error('timed out'), anomalies: new Error('timed out') });
+        await assert.rejects(feed.read(), /timed out/);
+        assert.equal(feed.isReady(), false);
+    });
+
+    it('read() on an empty feed serves a partial answer when one source fails', async () => {
+        logger.warn = () => {};
+        const feed = feedOver({ outages: outageEvents, anomalies: new Error('cold query') });
+        const body = await feed.read();
+        assert.deepEqual(ids(body), ['o-1645']);
+        assert.equal(isCompleteRadarAnswer(body), false);
+    });
+
+    it('the default loader reads both Radar endpoints and normalizes them', async () => {
+        const asked = [];
+        globalThis.fetch = async (url) => {
+            const { pathname } = new URL(String(url));
+            asked.push(pathname);
+            if (pathname.endsWith('/radar/annotations/outages')) {
+                return new Response(JSON.stringify({ result: { annotations: [outageFixture] } }));
+            }
+            return new Response(JSON.stringify({ result: { trafficAnomalies: [anomalyFixture] } }));
+        };
+        const feed = createOutageFeed();
+        await feed.refresh();
+        assert.deepEqual(asked.sort(), [
+            '/client/v4/radar/annotations/outages',
+            '/client/v4/radar/traffic_anomalies',
+        ]);
+        assert.deepEqual(ids(feed.payload()), [`a-${anomalyFixture.uuid}`, 'o-1645']);
     });
 });
