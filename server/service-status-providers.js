@@ -69,6 +69,7 @@ export const STATUS_PROVIDERS = [
     { id: 'bitbucket', name: 'Bitbucket', api: 'https://bitbucket.status.atlassian.com', page: 'https://bitbucket.status.atlassian.com' },
     { id: 'digitalocean', name: 'DigitalOcean', api: 'https://status.digitalocean.com', page: 'https://status.digitalocean.com' },
     { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
+    { id: 'twitch', name: 'Twitch', api: 'https://status.twitch.com', page: 'https://status.twitch.com' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail
