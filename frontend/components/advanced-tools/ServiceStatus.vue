@@ -220,6 +220,7 @@ const PROVIDERS = [
   { id: 'bitbucket', name: 'Bitbucket', icon: 'simple-icons:bitbucket' },
   { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
   { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
+  { id: 'twitch', name: 'Twitch', icon: 'simple-icons:twitch' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
