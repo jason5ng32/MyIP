@@ -221,6 +221,7 @@ const PROVIDERS = [
   { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
   { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
   { id: 'twitch', name: 'Twitch', icon: 'simple-icons:twitch' },
+  { id: 'epicgames', name: 'Epic Games', icon: 'simple-icons:epicgames' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];
