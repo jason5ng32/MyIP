@@ -231,9 +231,15 @@ describe('cleaning rules', () => {
                 source: 'IPCheck.ing IPv6/4', ip: '9.9.9.9', country_code: 'US',
                 anonymityCode: 'none', ipTypeCode: 'unknown',
                 anonymityProvider: null, anonymityProtocol: '',
+            }, {
+                // Cooldown run: same shape as signed-out, its own sentinel.
+                source: 'IPCheck.ing IPv4', ip: '5.6.7.8', country_code: 'US',
+                anonymityCode: undefined, ipTypeCode: undefined,
+                isNativeIP: 'cooldown', qualityScore: 'cooldown',
+                anonymityProvider: null, anonymityProtocol: null,
             }],
         });
-        const [enriched, gated, plain] = section.cards;
+        const [enriched, gated, plain, cooldown] = section.cards;
         assert.equal(enriched.anonymity, 'vpn');
         assert.equal(enriched.anonymityProvider, 'ACME VPN');
         assert.equal(enriched.anonymityProtocol, 'OpenVPN');
@@ -246,6 +252,7 @@ describe('cleaning rules', () => {
         assert.equal('anonymityProtocol' in plain, false);
         for (const key of ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProvider', 'anonymityProtocol']) {
             assert.equal(key in gated, false, `${key} should be absent on the gated card`);
+            assert.equal(key in cooldown, false, `${key} should be absent on the cooldown card`);
         }
         // The old field names are gone from the report.
         for (const card of section.cards) {

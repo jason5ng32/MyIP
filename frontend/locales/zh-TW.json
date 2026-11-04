@@ -15,7 +15,10 @@
       "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料的重複查詢會命中快取，不消耗額度。",
       "IpinfoFeature": "IP 進階資料",
       "PercentUsed": "已用 {percent}%",
-      "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。"
+      "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。",
+      "DailyTitle": "24 小時額度",
+      "MonthlyTitle": "每月額度",
+      "AvailableAgainAt": "{time} 後可繼續查詢"
     },
     "MyAchievements": "我的成就",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "贊助使用者",
           "Item1": "包含登入使用者的所有權益",
           "Item2": "進階功能獲得更高的每月額度",
-          "Item3": "支援這個開源專案的持續開發與營運"
+          "Item3": "支援這個開源專案的持續開發與營運",
+          "Item4": "更寬鬆的 24 小時額度"
         }
       }
     },
@@ -1770,6 +1774,7 @@
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
     "advancedQuotaCta": "本月 IP 進階資料額度已用完",
+    "advancedCooldownCta": "IP 進階資料 24 小時額度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相關資料：",

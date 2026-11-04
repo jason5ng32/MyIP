@@ -15,7 +15,10 @@
       "Note": "高级功能设有每月免费额度，每月（UTC）自动重置。IP 高级数据的重复查询会命中缓存，不消耗额度。",
       "IpinfoFeature": "IP 高级数据",
       "PercentUsed": "已用 {percent}%",
-      "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。"
+      "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。",
+      "DailyTitle": "24 小时额度",
+      "MonthlyTitle": "月度额度",
+      "AvailableAgainAt": "{time} 后可继续查询"
     },
     "MyAchievements": "我的成就",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "赞助用户",
           "Item1": "包含登录用户的所有权益",
           "Item2": "高级功能获得更高的每月额度",
-          "Item3": "支持这个开源项目的持续开发与运营"
+          "Item3": "支持这个开源项目的持续开发与运营",
+          "Item4": "更宽松的 24 小时额度"
         }
       }
     },
@@ -1770,6 +1774,7 @@
     "qualityScoreUnknown": "未知分数",
     "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
     "advancedQuotaCta": "本月 IP 高级数据额度已用完",
+    "advancedCooldownCta": "IP 高级数据 24 小时额度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",

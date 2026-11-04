@@ -15,7 +15,10 @@
       "Note": "Recursos avançados incluem uma cota mensal gratuita, redefinida automaticamente no início de cada mês (UTC). Consultas repetidas de dados avançados de IP são atendidas pelo cache e não consomem cota.",
       "IpinfoFeature": "Dados avançados de IP",
       "PercentUsed": "{percent}% usado",
-      "SponsorNote": "Patrocinar no GitHub aumenta suas cotas mensais."
+      "SponsorNote": "Patrocinar no GitHub aumenta suas cotas mensais.",
+      "DailyTitle": "Limite de 24 horas",
+      "MonthlyTitle": "Cota mensal",
+      "AvailableAgainAt": "Disponível novamente às {time}"
     },
     "MyAchievements": "Minhas conquistas",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Patrocinadores",
           "Item1": "Tudo em Usuários autenticados",
           "Item2": "Cotas mensais maiores para recursos avançados",
-          "Item3": "Apoio ao desenvolvimento contínuo deste projeto de código aberto"
+          "Item3": "Apoio ao desenvolvimento contínuo deste projeto de código aberto",
+          "Item4": "Limite de 24 horas mais generoso"
         }
       }
     },
@@ -1770,6 +1774,7 @@
     "qualityScoreUnknown": "Pontuação desconhecida",
     "advancedUnlockCta": "Para evitar abuso, faça login para ver as informações a seguir",
     "advancedQuotaCta": "Cota mensal de dados avançados de IP esgotada",
+    "advancedCooldownCta": "Limite de 24 horas de dados avançados de IP atingido",
     "ASNInfo": {
       "trafficPercentage": "Porcentagem de tráfego: ",
       "note": "Dados deste AS: ",

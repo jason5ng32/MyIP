@@ -15,7 +15,10 @@
       "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC). Les requêtes répétées de données IP avancées sont servies depuis le cache et ne consomment pas de quota.",
       "IpinfoFeature": "Données IP avancées",
       "PercentUsed": "{percent} % utilisé",
-      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels."
+      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels.",
+      "DailyTitle": "Limite de 24 heures",
+      "MonthlyTitle": "Quota mensuel",
+      "AvailableAgainAt": "De nouveau disponible à {time}"
     },
     "MyAchievements": "Succès",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Sponsors",
           "Item1": "Tous les avantages des utilisateurs connectés",
           "Item2": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
-          "Item3": "Soutenez le développement continu de ce projet open source"
+          "Item3": "Soutenez le développement continu de ce projet open source",
+          "Item4": "Limite de 24 heures plus généreuse"
         }
       }
     },
@@ -1770,6 +1774,7 @@
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
     "advancedQuotaCta": "Quota mensuel de données IP avancées épuisé",
+    "advancedCooldownCta": "Limite de 24 heures des données IP avancées atteinte",
     "ASNInfo": {
       "trafficPercentage": "Pourcentage de trafic : ",
       "note": "Données associées à cet AS : ",

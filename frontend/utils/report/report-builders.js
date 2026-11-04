@@ -44,8 +44,8 @@ const compact = (obj) => {
 // anonymityProtocol?, anonymityProvider? }] }. Cards whose ip never resolved
 // (placeholder text in the slot) are dropped. The optional enrichments only
 // exist on the IPCheck.ing source and stay absent when gated
-// ('sign_in_required' / 'quota_exceeded' upstream values never turn into
-// codes — see transform-ip-data.js). An 'unknown' line type is noise in a
+// ('sign_in_required' / 'quota_exceeded' / 'cooldown' upstream values never
+// turn into codes — see transform-ip-data.js). An 'unknown' line type is noise in a
 // report ("Unknown type" says nothing) — dropped like absent.
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
 const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
