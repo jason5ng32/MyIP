@@ -9,7 +9,6 @@ import { getTimezoneInfo } from './utils/time-utils';
 import { isRunningAsPwa } from './utils/pwa';
 import { readAuthHint } from './utils/auth-hint';
 import { hasPendingRedirectSignIn } from './utils/auth-redirect';
-import { unregisterLegacyServiceWorker } from './utils/unregister-service-worker';
 import { addCollection } from '@iconify/vue';
 
 import { detectOS } from './utils/system-detect';
@@ -125,8 +124,6 @@ analytics.setUserProperties({
     ...(timezone || offset ? { timezone, tz_offset: offset } : {}),
     app_mode: isRunningAsPwa() ? 'pwa' : 'web',
 });
-unregisterLegacyServiceWorker();
-
 
 // Backend configs load fire-and-forget: components read `store.configs`
 // reactively, so the first render never waits on this round trip.
