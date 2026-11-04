@@ -38,16 +38,16 @@ if (import.meta.env.DEV) {
 // Stale-deploy self-heal. After a deploy, pages loaded before it lazy-import
 // hashed assets that no longer exist; Vite surfaces every such failure
 // (module or CSS) as `vite:preloadError`. Reload once to pick up the fresh
-// index.html. The timestamp latch (per-tab) stops a reload loop when the
-// real cause is elsewhere (offline, blocked CDN): within the window the
-// event just propagates as before. Registered at module eval so it's in
-// place before any lazy import can fail.
-window.addEventListener('vite:preloadError', (event) => {
+// index.html. The event is not prevented, so the import still rejects and
+// its caller fails as it would without this listener; Sentry ignores the
+// chunk-load wording (`sentry-init.js`). The timestamp latch (per-tab) stops
+// a reload loop when the real cause is elsewhere (offline, blocked CDN).
+// Registered at module eval so it's in place before any lazy import can fail.
+window.addEventListener('vite:preloadError', () => {
     const LATCH_KEY = 'preloadReloadAt';
     const lastReload = Number(sessionStorage.getItem(LATCH_KEY) || 0);
     if (Date.now() - lastReload < 60 * 1000) return;
     sessionStorage.setItem(LATCH_KEY, String(Date.now()));
-    event.preventDefault();
     window.location.reload();
 });
 
