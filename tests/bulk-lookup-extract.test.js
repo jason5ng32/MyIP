@@ -92,6 +92,16 @@ describe('bulk-lookup-extract — IPv6', () => {
         assert.equal(extractIPs('::ffff:1.2.3.4 ::FFFF:1.2.3.4').entries[0].count, 2);
     });
 
+    it('takes a key glued to an address opening on ::', () => {
+        for (const text of ['src:::ffff:8.8.8.8', 'ip:::ffff:8.8.8.8', 'client:::ffff:8.8.8.8', 'src:::ffff:8.8.8.8:443']) {
+            assert.deepEqual(ipsOf(text), ['8.8.8.8'], text);
+        }
+    });
+
+    it('still reads a word glued to :: or digits as no IP', () => {
+        assert.deepEqual(extractIPs('xabc::1 Version17.4.1.2').summary, { found: 0, unique: 0, reserved: 0, cidr: 0 });
+    });
+
     it('never reads timestamps, MACs or hashes as IPv6', () => {
         const text = '10:12:01 23:59:59.999 aa:bb:cc:dd:ee:ff 00-1A-2B-3C-4D-5E 00:1a:2b:3c:4d:5e '
             + 'd41d8cd98f00b204e9800998ecf8427e da39a3ee5e6b4b0d3255bfef95601890afd80709';
