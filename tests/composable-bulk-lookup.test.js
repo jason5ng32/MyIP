@@ -130,6 +130,17 @@ describe('use-bulk-lookup — runs', () => {
         assert.equal(stored[0].count, 1, 'input untouched');
     });
 
+    it('adds a run\'s count to an IP stored while its request was out, keeping the row', () => {
+        const stored = [row('8.8.8.8', { count: 3, country: 'US', note: 'keep', starred: true })];
+        const next = mergeRun(stored, {
+            results: [{ ip: '8.8.8.8', country: 'DE' }],
+            counts: new Map([['8.8.8.8', 5]]),
+            batchId: 'b2',
+            at: 2000,
+        });
+        assert.deepEqual(next, [{ ...stored[0], count: 8 }]);
+    });
+
     it('parks the unqueried rest of a run from the failed request on', () => {
         const chunks = chunkEntries(manyIps(5).map((e, i) => ({ ...e, count: i + 1 })), 2);
         const paused = pauseRun({ chunks, failedAt: 1, batchId: 'b9', done: 2, total: 5, kind: 'rateLimited' });
@@ -137,12 +148,12 @@ describe('use-bulk-lookup — runs', () => {
         assert.deepEqual([paused.batchId, paused.done, paused.total, paused.kind], ['b9', 2, 5, 'rateLimited']);
     });
 
-    it('resumes only what is still not stored, with no count bumps', () => {
+    it('resumes querying only what is still not stored, bumping the rest', () => {
         const entries = manyIps(3);
         const paused = { remaining: entries, batchId: 'b9', done: 1, total: 4, kind: 'transient' };
         const plan = planResume([row(entries[0].ip)], paused);
         assert.deepEqual(plan.toQuery, entries.slice(1));
-        assert.deepEqual(plan.existing, []);
+        assert.deepEqual(plan.existing, entries.slice(0, 1));
         assert.equal(planResume([row('1.1.1.1')], paused, { maxRows: 2 }).blocked, 'listFull');
     });
 });
@@ -746,6 +757,42 @@ describe('use-bulk-lookup — composable', () => {
         assert.equal(parseState(storage.data[BULK_LOOKUP_STORAGE_KEY]).rows.length, MAX_ROWS - 50, 'nothing stored');
     });
 
+    // Parks 100 of 300 entries (count 2 each), then a second tab stores the
+    // first parked IP with count 5.
+    const pausedWithTakenIp = async (storage, fetcher) => {
+        const tabA = useBulkLookup({ storage, fetcher });
+        await tabA.run(manyIps(300).map((e) => ({ ...e, count: 2 })), 'en');
+        const { ip } = tabA.paused.value.remaining[0];
+        const tabB = useBulkLookup({ storage, fetcher: okFetch([]) });
+        await tabB.run([{ ip, count: 5 }], 'en');
+        return { tabA, ip };
+    };
+
+    it('a resume bumps a parked IP another tab stored during the pause', async () => {
+        const calls = [];
+        const { tabA, ip } = await pausedWithTakenIp(memoryStorage(), failingFetch(calls, { 2: 503 }));
+        calls.length = 0;
+
+        const outcome = await tabA.resume('en');
+        assert.deepEqual([outcome.added, outcome.updated, outcome.paused], [99, 1, null]);
+        assert.equal(calls.flat().includes(ip), false, 'not queried again');
+        assert.equal(tabA.rows.value.find((r) => r.ip === ip).count, 7);
+    });
+
+    it('a resume whose first request fails keeps its bump, once', async () => {
+        const { tabA, ip } = await pausedWithTakenIp(memoryStorage(), failingFetch([], { 2: 503, 3: 429 }));
+
+        const failed = await tabA.resume('en');
+        assert.equal(failed.paused.kind, 'rateLimited');
+        assert.equal(failed.paused.remaining.length, 99);
+        assert.equal(failed.paused.remaining.some((e) => e.ip === ip), false);
+        assert.equal(tabA.rows.value.find((r) => r.ip === ip).count, 7);
+
+        const done = await tabA.resume('en');
+        assert.deepEqual([done.added, done.updated, done.paused], [99, 0, null]);
+        assert.equal(tabA.rows.value.find((r) => r.ip === ip).count, 7);
+    });
+
     it('a re-paste of known IPs only bumps counts, with no request', async () => {
         const calls = [];
         const lookup = useBulkLookup({ storage: memoryStorage(), fetcher: okFetch(calls) });
@@ -800,6 +847,25 @@ describe('use-bulk-lookup — composable', () => {
         assert.deepEqual(stored.rows.map((r) => [r.ip, r.note, r.starred]),
             [['8.8.8.8', 'from B', false], ['1.1.1.1', '', true], ['9.9.9.9', '', false]]);
         assert.deepEqual(tabA.rows.value, stored.rows);
+    });
+
+    it('adds up an IP two overlapping tabs both imported as new', async () => {
+        const storage = memoryStorage();
+        const gateA = gatedFetch([], 1);
+        const gateB = gatedFetch([], 1);
+        const tabA = useBulkLookup({ storage, fetcher: gateA.fetcher });
+        const tabB = useBulkLookup({ storage, fetcher: gateB.fetcher });
+        const runA = tabA.run([{ ip: '8.8.8.8', count: 3 }], 'en');
+        const runB = tabB.run([{ ip: '8.8.8.8', count: 5 }], 'en');
+        await Promise.all([gateA.started, gateB.started]);
+
+        gateA.release();
+        await runA;
+        gateB.release();
+        const outcome = await runB;
+        assert.equal(outcome.added, 0);
+        const stored = parseState(storage.data[BULK_LOOKUP_STORAGE_KEY]);
+        assert.deepEqual(stored.rows.map((r) => [r.ip, r.count]), [['8.8.8.8', 8]]);
     });
 
     it('plans a run against the stored list', async () => {
