@@ -216,6 +216,7 @@ const PROVIDERS = [
   { id: 'npm', name: 'npm', icon: 'ri:npmjs-line' },
   { id: 'perplexity', name: 'Perplexity', icon: 'ri:perplexity-line' },
   { id: 'canva', name: 'Canva', icon: 'simple-icons:canva' },
+  { id: 'dropbox', name: 'Dropbox', icon: 'simple-icons:dropbox' },
   { id: 'docker', name: 'Docker', icon: 'simple-icons:docker' },
   { id: 'bitbucket', name: 'Bitbucket', icon: 'simple-icons:bitbucket' },
   { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
