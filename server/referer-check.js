@@ -12,11 +12,11 @@ const refererHostname = (referer) => {
     }
 };
 
-function refererCheck(referer) {
+const refererCheck = (referer) => {
     const allowedDomains = ['localhost', ...(process.env.ALLOWED_DOMAINS || '').split(',')];
     const domain = refererHostname(referer);
     return domain !== null && allowedDomains.includes(domain);
-}
+};
 
 // Startup diagnostics for ALLOWED_DOMAINS: the entries as matched, plus the
 // ones that can never equal a Referer hostname (which URL parsing lowercases
