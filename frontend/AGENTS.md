@@ -158,8 +158,9 @@ With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
 (`data/pulse-statuses.js`; overlap → the most recently opened festival that
 has a skin folder, else the most recently opened) dresses the site's chrome
 and nothing else: the Pulse entry shows its emoji instead of the globe, and
-its folder `components/festival/<festival id>/` (if any) supplies
-lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
+its folder `components/festival/<festival id>/`, when it exists, supplies all
+three parts (a skin is all-or-nothing; without the folder the festival is
+emoji-only): lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
 below the Nav: corners + sparse hanging pieces, never full-width; not on
 `isMobile`, where it covers the breadcrumb) and
 `FooterTrim.vue` (a full-width garland in the footer's top padding, drawn

@@ -1,6 +1,6 @@
 // Tests for the festival theme: the VITE_FESTIVAL_SKINS switch, which Pulse
 // festival is active (most recently opened wins), and that every skin folder under
-// components/festival/ names a Pulse festival and holds only known parts.
+// components/festival/ names a Pulse festival and holds all three parts.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import fs from 'node:fs';
@@ -103,13 +103,14 @@ describe('skin folders', () => {
     const festivalIds = new Set(FESTIVAL_STATUSES.map((f) => f.id));
     const folders = fs.readdirSync(SKINS_DIR, { withFileTypes: true }).filter((d) => d.isDirectory());
 
-    it('each folder is a Pulse festival id with only known parts', () => {
+    it('each folder is a Pulse festival id holding exactly the three parts', () => {
+        // A skin is all-or-nothing: a folder that exists supplies every slot,
+        // so a festival is either fully dressed or emoji-only.
         assert.ok(folders.length > 0);
         for (const dir of folders) {
             assert.ok(festivalIds.has(dir.name), `unknown festival folder: ${dir.name}`);
-            for (const file of fs.readdirSync(new URL(`${dir.name}/`, SKINS_DIR))) {
-                assert.ok(SKIN_SLOTS.includes(file.replace(/\.vue$/, '')), `${dir.name}/${file}`);
-            }
+            const parts = fs.readdirSync(new URL(`${dir.name}/`, SKINS_DIR)).map((f) => f.replace(/\.vue$/, ''));
+            assert.deepEqual(parts.sort(), [...SKIN_SLOTS].sort(), `${dir.name} must hold exactly ${SKIN_SLOTS.join(', ')}`);
         }
     });
 
