@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 Uma caixa de ferramentas de IP completa e de código aberto: consulta de IP a partir de múltiplas fontes, testes de conectividade, detecção de WebRTC e de vazamento de DNS, teste de velocidade, MTR, verificação de censura, Whois e muito mais — auto-hospedável com um único comando Docker.
 
@@ -65,6 +65,7 @@ Adicione a demonstração aos favoritos ou faça sua própria implantação.
 * 📓 **Pesquisa Whois**: Realiza consultas Whois para nomes de domínio, endereços IP e números de AS.
 * 🗄️ **Consulta de MAC**: Identifica o fabricante e os detalhes por trás de um endereço físico.
 * 🧮 **Calculadora de IP**: Cálculo de sub-rede, conversões de notação e detalhes de interface IPv6 para qualquer IP, prefixo, intervalo ou lista, tudo localmente.
+* 🧾 **Consulta de IPs em lote**: Cole listas de IPs ou logs brutos de servidor (Nginx, Apache, firewall, CDN…) para geolocalizar todos os IPs de uma vez.
 * 🛰️ **Informações de ASN e topologia de upstream**: Direto em cada cartão de IP — detalhes do AS, anúncios históricos do prefixo do IP e os caminhos de upstream do seu ASN até o backbone Tier 1.
 * 🛂 **Perfil de ASN**: O retrato completo de qualquer AS — dados de registro com o Whois bruto, ranking global e porte, tráfego e qualidade de conexão, os países onde seu espaço IPv4 é usado, cada prefixo anunciado com seu status RPKI, seus upstreams, peers e clientes, e os pontos de troca de tráfego e data centers em que está presente.
 * 📶 **Status dos serviços**: Disponibilidade em tempo real de serviços conhecidos — Claude, OpenAI, GitHub, Cloudflare e outros — a partir de suas páginas oficiais de status, com incidentes recentes.

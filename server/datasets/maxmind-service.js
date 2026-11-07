@@ -89,6 +89,12 @@ export async function reloadMaxMindDatabases(reason = 'manual') {
     return reloadPromise;
 }
 
+// Build date of the loaded City database ('YYYY-MM-DD'), null until it loads.
+export const getMaxMindBuild = () => {
+    const epoch = cityLookup?.metadata?.buildEpoch;
+    return epoch instanceof Date && !Number.isNaN(epoch.getTime()) ? epoch.toISOString().slice(0, 10) : null;
+};
+
 /**
  * Bare ISO country code of an IP (null when unknown) plus the prefix length
  * of the MaxMind network holding it, so a caller can walk a range one network

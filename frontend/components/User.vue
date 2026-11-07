@@ -58,7 +58,8 @@
                     </section>
                 </TabsContent>
 
-                <!-- Usage tab: share of the monthly quota used per advanced
+                <!-- Usage tab: the 24-hour limit (IP advanced data only, when the
+                     backend sends it) above the monthly quota per advanced
                      feature — percentages only, the backend never sends raw
                      counts. Refetched on dialog open so the numbers are fresh. -->
                 <TabsContent value="usage" class="space-y-4 pt-3">
@@ -69,20 +70,45 @@
                     </div>
 
                     <template v-else-if="usageRows.length">
-                        <p class="text-sm text-muted-foreground leading-relaxed">{{ t('user.Usage.Note') }}</p>
+                        <!-- 24-hour limit: one row; once it is used up, when the
+                             next lookup becomes possible (the oldest target in the
+                             window ages out — a rolling window never resets as a whole). -->
+                        <section v-if="dailyRow" class="space-y-2">
+                            <h4 class="text-sm font-semibold mb-0">{{ t('user.Usage.DailyTitle') }}</h4>
+                            <ul class="rounded-lg border bg-card divide-y list-none mt-2">
+                                <li class="p-3 space-y-1.5">
+                                    <div class="flex items-baseline justify-between gap-2 text-sm">
+                                        <span>{{ t('user.Usage.IpinfoFeature') }}</span>
+                                        <span class="font-mono tabular-nums text-muted-foreground">
+                                            {{ t('user.Usage.PercentUsed', { percent: dailyRow.percent }) }}
+                                        </span>
+                                    </div>
+                                    <Progress :model-value="dailyRow.percent" class="h-1.5"
+                                        :indicator-class="dotClass(dailyRow.tone)" />
+                                    <p v-if="dailyRow.exhausted && dailyRow.availableAt" class="text-xs text-muted-foreground m-0">
+                                        {{ t('user.Usage.AvailableAgainAt', { time: dailyRow.availableAt }) }}
+                                    </p>
+                                </li>
+                            </ul>
+                        </section>
 
-                        <ul class="rounded-lg border bg-card divide-y list-none">
-                            <li v-for="row in usageRows" :key="row.key" class="p-3 space-y-1.5">
-                                <div class="flex items-baseline justify-between gap-2 text-sm">
-                                    <span>{{ t(row.labelKey) }}</span>
-                                    <span class="font-mono tabular-nums text-muted-foreground">
-                                        {{ t('user.Usage.PercentUsed', { percent: row.percent }) }}
-                                    </span>
-                                </div>
-                                <Progress :model-value="row.percent" class="h-1.5"
-                                    :indicator-class="dotClass(row.tone)" />
-                            </li>
-                        </ul>
+                        <!-- Monthly quota: one row per advanced feature. -->
+                        <section class="space-y-2">
+                            <h4 class="text-sm font-semibold m-0">{{ t('user.Usage.MonthlyTitle') }}</h4>
+                            <p class="text-sm text-muted-foreground leading-relaxed">{{ t('user.Usage.Note') }}</p>
+                            <ul class="rounded-lg border bg-card divide-y list-none">
+                                <li v-for="row in usageRows" :key="row.key" class="p-3 space-y-1.5">
+                                    <div class="flex items-baseline justify-between gap-2 text-sm">
+                                        <span>{{ t(row.labelKey) }}</span>
+                                        <span class="font-mono tabular-nums text-muted-foreground">
+                                            {{ t('user.Usage.PercentUsed', { percent: row.percent }) }}
+                                        </span>
+                                    </div>
+                                    <Progress :model-value="row.percent" class="h-1.5"
+                                        :indicator-class="dotClass(row.tone)" />
+                                </li>
+                            </ul>
+                        </section>
                         <p class="text-xs text-muted-foreground leading-relaxed">
                             {{ t('user.Usage.SponsorNote') }}
                             <a href="https://github.com/sponsors/jason5ng32" target="_blank" rel="noopener"
@@ -108,6 +134,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { authenticatedFetch } from '@/utils/authenticated-fetch';
+import { formatClockTime } from '@/utils/time-utils.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -117,7 +144,7 @@ import { Progress } from '@/components/ui/progress';
 import { Spinner } from '@/components/ui/spinner';
 import { Check, Heart, HeartHandshake, Info, Plus, UserRound, UserRoundCheck } from '@lucide/vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const store = useMainStore();
 const route = useRoute();
@@ -147,7 +174,7 @@ const isSponsor = computed(() => remoteUserInfo.value?.quota?.isSponsor === true
 const benefitTiers = computed(() => [
     { key: 'Visitor', icon: UserRound, count: 6, current: !isSignedIn.value },
     { key: 'SignedIn', icon: UserRoundCheck, count: 7, current: isSignedIn.value && !isSponsor.value },
-    { key: 'Sponsor', icon: HeartHandshake, count: 3, current: isSignedIn.value && isSponsor.value },
+    { key: 'Sponsor', icon: HeartHandshake, count: 4, current: isSignedIn.value && isSponsor.value },
 ]);
 
 const openUserBenefits = () => {
@@ -172,13 +199,29 @@ const USAGE_LABEL_KEYS = {
 // Rows for the usage dialog. Empty until the (re)fetched user info lands or
 // when the backend predates the quota field — the template then shows the
 // fetching placeholder instead of a broken table.
+const usageTone = (percent, exhausted) => exhausted ? 'fail' : percent >= 80 ? 'ok-slow' : 'ok-fast';
+
 const usageRows = computed(() => {
     const features = remoteUserInfo.value?.quota?.features;
     if (!features) return [];
-    return Object.entries(features).map(([key, { percent, exhausted }]) => {
-        const tone = exhausted ? 'fail' : percent >= 80 ? 'ok-slow' : 'ok-fast';
-        return { key, labelKey: USAGE_LABEL_KEYS[key] || key, percent, tone };
-    });
+    return Object.entries(features).map(([key, { percent, exhausted }]) => ({
+        key, labelKey: USAGE_LABEL_KEYS[key] || key, percent, tone: usageTone(percent, exhausted),
+    }));
+});
+
+// The IP advanced data 24-hour limit; null when the backend doesn't send it.
+// `availableAt` is when the next lookup frees up, shown only while used up; a
+// null or unparseable `resetsAt` formats to '', which hides that line.
+const dailyRow = computed(() => {
+    const daily = remoteUserInfo.value?.quota?.features?.ipinfo?.daily;
+    if (!daily) return null;
+    const { percent, exhausted, resetsAt } = daily;
+    return {
+        percent,
+        exhausted,
+        tone: usageTone(percent, exhausted),
+        availableAt: formatClockTime(resetsAt, locale.value),
+    };
 });
 
 // Refetch on every open (bypassing the one-shot page-load guard) so the

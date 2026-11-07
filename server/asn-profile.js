@@ -19,6 +19,7 @@
 // { status: 'ok', data, incomplete: true }.
 
 import logger from './logger.js';
+import { RADAR_TIMEOUT_MS } from './cf-radar.js';
 
 export const SECTIONS = ['radar', 'prefixes', 'connectivity', 'whois', 'rank', 'reputation', 'peeringdb'];
 
@@ -29,15 +30,15 @@ const UPSTREAM_DEFAULT_MS = 8000; // fetchUpstream's default
 
 // Worst-case time (ms) each source's own upstream timeouts allow, so a
 // source that degrades internally still answers before its deadline:
-//   radar        7 parallel Radar calls at the fetchUpstream default
-//   prefixes     one Radar pfx2as call + local MaxMind
+//   radar        parallel Radar segment calls at the Radar timeout
+//   prefixes     one Radar pfx2as call (Radar timeout) + local MaxMind
 //   whois        IANA bootstrap (default, cached 24 h), then RDAP autnum
 //   connectivity local CAIDA + RIPEstat name fallback (3 s, in parallel)
 //   rank / reputation  ASRank GraphQL / private API
 //   peeringdb    local index, no I/O
 export const INNER_TIMEOUTS = {
-    radar: UPSTREAM_DEFAULT_MS,
-    prefixes: UPSTREAM_DEFAULT_MS,
+    radar: RADAR_TIMEOUT_MS,
+    prefixes: RADAR_TIMEOUT_MS,
     whois: UPSTREAM_DEFAULT_MS + SOURCE_TIMEOUTS.autnum,
     connectivity: 3000,
     rank: SOURCE_TIMEOUTS.rank,
@@ -48,8 +49,8 @@ export const INNER_TIMEOUTS = {
 // Per-section budget (ms): each sits above its source's worst case
 // (INNER_TIMEOUTS), so the whole answer is bounded by the largest.
 export const DEADLINES = {
-    radar: 10000,
-    prefixes: 10000,
+    radar: 14000,
+    prefixes: 14000,
     connectivity: 5000,
     whois: 14000,
     rank: 5000,

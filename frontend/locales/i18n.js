@@ -106,11 +106,11 @@ export async function loadActiveLocaleMessages() {
 
 // Update meta tags (depends on messages, so call after loadActiveLocaleMessages).
 function updateMeta() {
-  // Keep the declared page language in step with the rendered one.
-  // index.html ships lang="en"; leaving that stale on a zh/fr/ru UI makes
-  // browser auto-translate mis-detect the page and offer to re-translate
-  // already-translated content (Chrome-iOS translate churn crashes on the
-  // home page's high-frequency DOM updates). Also what screen readers key on.
+  // Keep the declared page language in step with the rendered one. The
+  // index.html boot script already set it from its own pick, which covers
+  // full locales only; a stale lang makes browser auto-translate re-translate
+  // already-localized content (and its DOM rewrites break Vue's patching).
+  // Also what screen readers key on.
   // htmlLang is the precise tag: zh declares zh-CN so Han glyph fallback stays
   // Simplified on ja / zh-TW systems.
   document.documentElement.lang = toHtmlLang(activeLocale);

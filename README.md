@@ -19,7 +19,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 An open-source, all-in-one IP toolbox: IP lookup from multiple sources, connectivity tests, WebRTC & DNS-leak detection, speed test, MTR, censorship checks, Whois, and more — self-hostable with one Docker command.
 
@@ -62,6 +62,7 @@ Feel free to bookmark the demo or deploy your own.
 * 📓 **Whois Search**: Performs Whois lookups for domain names, IP addresses, and AS numbers.
 * 🗄️ **MAC Lookup**: Identifies the vendor and details behind a physical address.
 * 🧮 **IP Calculator**: Subnet math, notation conversions and IPv6 interface details for any IP, prefix, range or list, computed locally.
+* 🧾 **Bulk IP Lookup**: Paste IP lists or raw server logs (Nginx, Apache, firewall, CDN…) to geolocate all their IPs at once.
 * 🛰️ **ASN Info & Upstream Topology**: Right on each IP card — AS details, historical announcements for the IP's prefix, and the upstream paths from its ASN to the Tier 1 backbone.
 * 🛂 **ASN Profile**: The full picture of any AS — registration with the raw Whois record, global rank and size, traffic and connection quality, where its IPv4 space is used, every announced prefix with its RPKI status, its upstreams, peers and customers, and the internet exchanges and data centers where it is present.
 * 📶 **Service Status**: Live availability of well-known services — Claude, OpenAI, GitHub, Cloudflare, and more — from their official status pages, with recent incidents.

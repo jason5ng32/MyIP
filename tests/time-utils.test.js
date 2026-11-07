@@ -19,6 +19,7 @@ import {
     formatDuration,
     unixToDateTime,
     isoToDateTime,
+    formatClockTime,
     formatIsoDate,
 } from '../frontend/utils/time-utils.js';
 import { LOCALE_CODES } from '../common/locale-registry.js';
@@ -312,6 +313,37 @@ describe('isoToDateTime', () => {
     assert.equal(isoToDateTime('', 'en'), '');
     assert.equal(isoToDateTime(undefined, 'en'), '');
     assert.equal(isoToDateTime('not-a-date', 'en'), '');
+  });
+});
+
+// Host-TZ-dependent output → structural assertions only.
+describe('formatClockTime', () => {
+  it('renders an instant as a localized clock time, no date', () => {
+    const out = formatClockTime('2026-08-15T09:23:41Z', 'en');
+    assert.match(out, /^\d{1,2}:\d{2}\s?[AP]M$/);
+    assert.doesNotMatch(out, /2026/);
+  });
+
+  it('accepts a Date, epoch ms or an ISO string alike', () => {
+    const iso = '2026-08-15T09:23:41Z';
+    const expected = formatClockTime(iso, 'en');
+    assert.equal(formatClockTime(new Date(iso), 'en'), expected);
+    assert.equal(formatClockTime(Date.parse(iso), 'en'), expected);
+  });
+
+  it('follows the app locale', () => {
+    assert.match(formatClockTime('2026-08-15T09:23:41Z', 'zh'), /^\d{2}:\d{2}$/); // 24-hour clock
+    assert.notEqual(
+      formatClockTime('2026-08-15T09:23:41Z', 'zh'),
+      formatClockTime('2026-08-15T09:23:41Z', 'en'),
+    );
+  });
+
+  it("returns '' for a missing or unparseable input", () => {
+    assert.equal(formatClockTime(null, 'en'), ''); // not the epoch
+    assert.equal(formatClockTime(undefined, 'en'), '');
+    assert.equal(formatClockTime('', 'en'), '');
+    assert.equal(formatClockTime('not-a-date', 'en'), '');
   });
 });
 

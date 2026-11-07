@@ -216,10 +216,13 @@ const PROVIDERS = [
   { id: 'npm', name: 'npm', icon: 'ri:npmjs-line' },
   { id: 'perplexity', name: 'Perplexity', icon: 'ri:perplexity-line' },
   { id: 'canva', name: 'Canva', icon: 'simple-icons:canva' },
+  { id: 'dropbox', name: 'Dropbox', icon: 'simple-icons:dropbox' },
   { id: 'docker', name: 'Docker', icon: 'simple-icons:docker' },
   { id: 'bitbucket', name: 'Bitbucket', icon: 'simple-icons:bitbucket' },
   { id: 'digitalocean', name: 'DigitalOcean', icon: 'simple-icons:digitalocean' },
   { id: 'reddit', name: 'Reddit', icon: 'ri:reddit-line' },
+  { id: 'twitch', name: 'Twitch', icon: 'simple-icons:twitch' },
+  { id: 'epicgames', name: 'Epic Games', icon: 'simple-icons:epicgames' },
 ];
 
 const placeholderSizes = [10, 7, 9, 6, 8];

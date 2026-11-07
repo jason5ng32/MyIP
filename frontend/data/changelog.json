@@ -2330,6 +2330,50 @@
         }
       },
       {
+        "type": "add",
+        "change": {
+          "en": "Added Bulk IP Lookup: paste IP lists or raw server logs to geolocate all IPs — then sort, filter, star, summarize by country and ASN, map and export them",
+          "zh": "新增「IP 批量查询」：粘贴 IP 列表或服务器日志，查询所有 IP 的地理位置，并可排序、筛选、加星标、按国家和 ASN 汇总、查看地图和导出",
+          "zh-TW": "新增「IP 批次查詢」：貼上 IP 清單或伺服器日誌，查詢其中 IP 的地理位置，並可排序、篩選、加上星號、依國家和 ASN 彙總、查看地圖和匯出",
+          "fr": "Ajout de la Recherche IP groupée : collez des listes d'IP ou des journaux de serveur bruts pour géolocaliser leurs IP, puis triez, filtrez, ajoutez une étoile, résumez par pays et par ASN, affichez sur une carte et exportez",
+          "ru": "Добавлена «Массовая проверка IP»: вставьте список IP или сырые журналы сервера, чтобы определить местоположение их IP, а затем сортируйте, фильтруйте, отмечайте звёздочкой, сводите по странам и ASN, смотрите на карте и экспортируйте",
+          "pt-BR": "Nova Consulta de IPs em lote: cole listas de IPs ou logs brutos de servidor para geolocalizar os IPs — e depois ordenar, filtrar, marcar com estrela, resumir por país e ASN, ver no mapa e exportar"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added special decorations for some festivals",
+          "zh": "为某些节日添加了特殊的装饰",
+          "zh-TW": "為某些節日新增了特別的裝飾",
+          "fr": "Ajout de décorations spéciales pour certaines fêtes",
+          "ru": "Добавлено особое оформление для некоторых праздников",
+          "pt-BR": "Adicionadas decorações especiais para algumas datas comemorativas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "More troubleshooting logs for self-hosted deployments",
+          "zh": "为自托管用户提供了更多排障日志",
+          "zh-TW": "為自架使用者提供了更多疑難排解日誌",
+          "fr": "Davantage de journaux de diagnostic pour les instances auto-hébergées",
+          "ru": "Больше журналов для диагностики в самостоятельно размещённых установках",
+          "pt-BR": "Mais logs de diagnóstico para quem hospeda a própria instância"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "The DNS Resolution tool returns more detailed results",
+          "zh": "DNS 解析工具提供更详细的数据返回",
+          "zh-TW": "DNS 解析工具提供更詳細的回傳資料",
+          "fr": "L'outil Résolution DNS renvoie des résultats plus détaillés",
+          "ru": "Инструмент «Разрешение DNS» возвращает более подробные результаты",
+          "pt-BR": "A ferramenta Resolução DNS retorna resultados mais detalhados"
+        }
+      },
+      {
         "type": "fix",
         "change": {
           "en": "Fixed some issues",

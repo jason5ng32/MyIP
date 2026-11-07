@@ -2,9 +2,14 @@
      columns, plus a signature bar (with the copyright on self-hosted
      deployments). About / Changelog / Acknowledgement open in its About
      sheet, the CLI in its own dialog; nothing already on the page (tools,
-     sections) repeats here. -->
+     sections) repeats here. A festival theme hangs its garland. -->
 <template>
-  <footer class="border-t border-secondary text-sm text-muted-foreground">
+  <footer class="relative border-t border-secondary text-sm text-muted-foreground">
+    <!-- Festival garland across the empty top padding. -->
+    <div v-if="festivalFooterTrim" aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 h-12 overflow-hidden">
+      <component :is="festivalFooterTrim" />
+    </div>
     <div class="mx-auto w-full px-4 jn-container">
       <!-- Link columns: four tracks on md+, matching the Advanced Tools grid;
            on phones the brand spans the top and the rest flow two per row. -->
@@ -71,10 +76,16 @@
           </ul>
         </nav>
 
-        <!-- Docs & Support: locale-aware docs.ipcheck.ing links + issue tracker -->
+        <!-- Docs & Support: the shortcut guide (Home only, where the keys
+             work), locale-aware docs.ipcheck.ing links + issue tracker -->
         <nav :aria-label="t('footer.Support')">
           <h3 :class="headingClass">{{ t('footer.Support') }}</h3>
           <ul class="space-y-2">
+            <li v-if="shortcutGuide">
+              <button type="button" :class="linkClass" @click="openShortcutGuide">
+                {{ t('footer.ShortcutGuide') }}
+              </button>
+            </li>
             <li>
               <a :href="docsUrl('knowledge-base', locale)" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
@@ -310,11 +321,19 @@ import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile, 
 import brandIcon from './svgicons/Brand.vue';
 import { Icon } from '@iconify/vue';
 import { useRouteActive } from '@/composables/use-route-active.js';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
+
+// Home passes `shortcut-guide` and owns the Help dialog the link opens.
+defineProps({ shortcutGuide: { type: Boolean, default: false } });
+const emit = defineEmits(['open-shortcut-guide']);
 
 const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const configs = computed(() => store.configs);
+
+// Festival theme's footer trim, if the active festival has one.
+const { footerTrim: festivalFooterTrim } = useFestivalSkin();
 const curl = computed(() => store.curl);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
 const tabs = ['about', 'acknowledgement', 'changelog'];
@@ -399,6 +418,11 @@ const openAboutTab = (tab, trackLabel) => {
   content.value = tab;
   store.setOpenSheet('about');
   trackEvent('Footer', 'FooterClick', trackLabel);
+};
+
+const openShortcutGuide = () => {
+  emit('open-shortcut-guide');
+  trackEvent('Footer', 'FooterClick', 'ShortcutGuide');
 };
 
 const isCurlOpen = ref(false);

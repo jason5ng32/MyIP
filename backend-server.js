@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -10,6 +9,7 @@ import logger from './server/logger.js';
 import { requireReferer, requirePublicIP, requireValidPrefix, requireValidASN, requireValidDomain, requireValidProviderId,
     requireValidRecordType, requireValidReportId, normalizeAsnQuery } from './server/guards.js';
 import { withTimeZone } from './server/ip-timezone.js';
+import { inspectAllowedDomains } from './server/referer-check.js';
 
 // Backend APIs
 import mapHandler from './api/google-map.js';
@@ -23,7 +23,7 @@ import ipsbHandler from './api/ip-sb.js';
 import maxmindHandler from './api/maxmind.js';
 // Others
 import cfRadarHandler from './api/cf-radar.js';
-import { RADAR_VIEWS, isCompleteRadarAnswer } from './server/cf-radar.js';
+import { RADAR_VIEWS, isCompleteRadarAnswer, hasRadarApiKey, startOutagePolling } from './server/cf-radar.js';
 import asnHistoryHandler from './api/asn-history.js';
 import asnConnectivityHandler from './api/asn-connectivity.js';
 import ooniBlockingHandler from './api/ooni-blocking.js';
@@ -45,6 +45,8 @@ import asnProfileHandler from './api/asn-profile.js';
 import { isCompleteProfile } from './server/asn-profile.js';
 // User
 import validateConfigs from './api/configs.js';
+import bulkLookupHandler from './api/bulk-lookup.js';
+import { bulkLookupSource } from './server/bulk-lookup-sources.js';
 import getUserinfo from './api/get-user-info.js';
 import updateUserAchievement from './api/update-user-achievement.js';
 import { reloadMaxMindDatabases, isMaxMindReady, getMaxMindDbPaths } from './server/datasets/maxmind-service.js';
@@ -59,8 +61,8 @@ import { isOuiLoaded } from './server/datasets/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
+import { createListenCallback } from './server/listen-callback.js';
 
-dotenv.config({ quiet: true });
 initUpstreamUserAgent();
 
 const app = express();
@@ -214,6 +216,10 @@ if (speedLimitSet !== 0) {
 // own tighter cap (REPORT_MAX_BYTES) after schema validation.
 // Must stay above REPORT_MAX_BYTES (common/report-schema.js) or report
 // uploads die here with a raw 413 before the handler's own size check.
+// Bulk lookup carries at most 200 IPs (~10KB as the longest IPv6 text forms):
+// its own tight parser runs first, and the global one skips a body that is
+// already parsed.
+app.use('/api/bulk-lookup', express.json({ limit: '16kb' }));
 app.use(express.json({ limit: '500kb' }));
 
 // Default every /api/* response to no-store. Routes that want edge caching
@@ -226,6 +232,17 @@ app.use('/api', (req, res, next) => {
 // Global referer gate for all /api/* routes. Handlers no longer repeat this
 // check individually — see server/guards.js.
 app.use('/api', requireReferer);
+
+// The allowlist at startup, so a self-hoster sees why every request 403s.
+const allowlist = inspectAllowedDomains(process.env.ALLOWED_DOMAINS);
+if (allowlist.domains.length) {
+    logger.info(`🛡️  API referer allowlist: localhost, ${allowlist.domains.join(', ')}`);
+} else {
+    logger.info('⚠️  ALLOWED_DOMAINS not set — only localhost may call the API; any other host gets 403');
+}
+for (const { entry, reason } of allowlist.problems) {
+    logger.warn(`⚠️  ALLOWED_DOMAINS entry "${entry}" can never match: ${reason}`);
+}
 
 // Readiness gates for routes reading local data (server/offline-data.js):
 // 503 while that data is still downloading at boot, a no-op afterwards.
@@ -278,9 +295,10 @@ app.get('/api/asn-profile', requireValidASN(), cacheable(SEVEN_DAYS_CACHE, {
 // All Cloudflare Radar data rides one route; `?view=` picks the dataset and
 // the TTL comes from that view's registry entry (server/cf-radar.js) — 7d
 // for the ASN summary and prefix list (same as /api/asn-profile), 30d for
-// country traffic, 1h for the outage feed. A partial answer (some upstream
-// calls failed, or prefix countries MaxMind couldn't fully work out) is
-// served but not cached.
+// country traffic, 15min for the outage feed (served from memory, see
+// startOutagePolling below). A partial answer (some upstream calls failed,
+// or prefix countries MaxMind couldn't fully work out) is served but not
+// cached.
 app.get('/api/cfradar', cacheable((req) => RADAR_VIEWS[req.query.view]?.ttl, { cacheIf: isCompleteRadarAnswer }), cfRadarHandler);
 // Cache for 30 days — registry / historical data that changes on a monthly
 // (or slower) cadence: IEEE OUI assignments, ASN metadata, ASN interconnection,
@@ -304,6 +322,10 @@ app.get('/api/report/:id', requireValidReportId(), getReportHandler);
 app.post('/api/report', createReportHandler);
 // One observation in, one graded report out — per-visitor by definition.
 app.post('/api/persona/evaluate', personaEvaluateHandler);
+// Bulk IP Lookup: local data only. Resolved here so a bad BULK_LOOKUP_SOURCE
+// warns at boot rather than on the first request.
+bulkLookupSource();
+app.post('/api/bulk-lookup', needsMaxMind, bulkLookupHandler);
 
 // Sentry tunnel — first-party relay for the frontend SDK's envelopes
 // Mounted only when this deployment actually built the frontend with a DSN.
@@ -350,14 +372,18 @@ const bootBackend = async () => {
         await reloadMaxMindDatabases('startup').catch(() => {});
     }
 
-    app.listen(backEndPort, () => {
-        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
-    });
+    // A failed bind (port in use, …) exits non-zero rather than draining.
+    app.listen(backEndPort, createListenCallback({ port: backEndPort, logger }));
 
     // Watching from before the downloads: a dataset another process
     // publishes (or someone places by hand) while a boot step is still
     // running is reloaded, not taken as the watcher's baseline.
     watchDatasets(datasets);
+
+    // The Radar outage feed fills on its own, outside the boot window
+    // (asn-profile's degraded caching keys on it); a request that finds it
+    // still empty fills it on demand.
+    if (hasRadarApiKey()) startOutagePolling();
 
     await runOfflineBootstrap([
         async () => {

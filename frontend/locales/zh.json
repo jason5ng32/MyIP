@@ -15,7 +15,10 @@
       "Note": "高级功能设有每月免费额度，每月（UTC）自动重置。IP 高级数据的重复查询会命中缓存，不消耗额度。",
       "IpinfoFeature": "IP 高级数据",
       "PercentUsed": "已用 {percent}%",
-      "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。"
+      "SponsorNote": "在 GitHub 赞助本项目可获得更高额度。",
+      "DailyTitle": "24 小时额度",
+      "MonthlyTitle": "月度额度",
+      "AvailableAgainAt": "{time} 后可继续查询"
     },
     "MyAchievements": "我的成就",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "赞助用户",
           "Item1": "包含登录用户的所有权益",
           "Item2": "高级功能获得更高的每月额度",
-          "Item3": "支持这个开源项目的持续开发与运营"
+          "Item3": "支持这个开源项目的持续开发与运营",
+          "Item4": "更宽松的 24 小时额度"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "临时下线，摸草去了",
         "turing": "本状态由人类发送（大概）",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "IPCheck.ing 生日快乐"
+        "birthday": "IPCheck.ing 生日快乐",
+        "adaday": "算法由 Ada 提供，始于 1843",
+        "dayofdead": "怀念那些已经下线的人",
+        "thanksgiving": "感谢每一个成功抵达的数据包",
+        "piday": "3.14159265358979…仍在加载",
+        "holi": "全 RGB 色彩泼洒中",
+        "shannon": "这条状态一个比特一个比特地发",
+        "wtisd": "全球信号满格",
+        "ipv6day": "地址池已扩容至 2¹²⁸",
+        "sysadmin": "重启试过了吗？",
+        "linux": "只是个爱好，不会做大做专业",
+        "tomatina": "正在遭受番茄洪水攻击"
       },
       "festivalDesc": {
         "prgday": "程序员节 · 一年的第 256 天，十六进制写作 0x100",
@@ -313,7 +328,18 @@
         "earthday": "世界地球日（4 月 22 日）· 地球在线也建议你偶尔地球离线",
         "turing": "艾伦·图灵诞辰（1912 年 6 月 23 日）· 图灵测试之父",
         "emojiday": "世界 Emoji 日（7 月 17 日）· 文字是上个世纪的事了",
-        "birthday": "IPCheck.ing 生日 · v1.0 发布于 2020 年 11 月 6 日"
+        "birthday": "IPCheck.ing 生日 · v1.0 发布于 2020 年 11 月 6 日",
+        "adaday": "阿达·洛芙莱斯日（10 月第二个星期二）· 致敬 STEM 领域的女性，阿达写下了第一个公开发表的算法",
+        "dayofdead": "亡灵节（11 月 1–2 日）· 墨西哥人怀念逝去亲人的节日，爱永不下线",
+        "thanksgiving": "感恩节（11 月第四个星期四）· 感谢路径上的每一台路由器",
+        "piday": "圆周率日（3 月 14 日，3.14）· 也是联合国教科文组织的国际数学日",
+        "holi": "洒红节 · 印度教的色彩节，用每一种十六进制颜色迎接春天",
+        "shannon": "克劳德·香农诞辰（1916 年 4 月 30 日）· 信息论之父，比特由此而来",
+        "wtisd": "世界电信和信息社会日（5 月 17 日）· 国际电信联盟于 1865 年的这一天成立",
+        "ipv6day": "世界 IPv6 启动日（2012 年 6 月 6 日）· IPv6 从这天起正式开启，再没关过",
+        "sysadmin": "系统管理员日（7 月最后一个星期五）· 谢谢那个守护你在线时长的人",
+        "linux": "1991 年 8 月 25 日，林纳斯·托瓦兹在 comp.os.minix 宣布了他“只是个爱好”的系统",
+        "tomatina": "番茄节（8 月最后一个星期三）· 西班牙布尼奥尔的番茄大战，唯一没人想过滤的洪水"
       }
     },
     "preferences": {
@@ -1088,6 +1114,7 @@
     "InvisibilityTest": "猜猜看我是否知道你挂了代理",
     "MacChecker": "查询物理地址的归属信息",
     "IpCalculator": "任意 IP、前缀或范围的子网计算、进制转换与 IPv6 解读",
+    "BulkLookup": "批量查询 IP，可直接粘贴日志",
     "BrowserInfo": "检阅浏览器信息和指纹",
     "AdblockTest": "检查你的广告拦截器、DNS 过滤或 VPN 实际拦住了什么",
     "SecurityChecklist": "全面的数字生活安全检查清单",
@@ -1254,6 +1281,119 @@
     "aggregated": "等价单一块",
     "aggregationSummary": "输入 {input} 个块，输出 {output} 个，共 {addresses} 个地址",
     "invalidTokens": "已忽略：{list}"
+  },
+  "bulklookup": {
+    "Title": "IP 批量查询",
+    "Note": "从 Nginx、Apache、防火墙、CDN 或应用日志（或任意粘贴的列表）中提取 IP，一眼看清流量来自哪里：哪些国家和网络（ASN），哪些 IP 反复出现；再深入查看任意单个 IP。",
+    "Note2": "粘贴任意文本即可：IP 在浏览器内提取，内网和保留地址会被跳过，重复出现的会被计数。可以多次粘贴，列表最多保存 {max} 个 IP，较多的 IP 会分成多次请求查询。地理位置数据来自 {source}。结果只保存在当前浏览器中。",
+    "SourceWithBuild": "{source}（数据库版本 {date}）",
+    "SourceFallback": "服务器本地的地理位置数据库",
+    "InputLabel": "粘贴 IP 或日志内容：",
+    "Placeholder": "1.1.1.1, 8.8.8.8 或整行日志…",
+    "FirstPerLine": "每行只取第一个 IP",
+    "FirstPerLineHint": "适用于 CDN 或反向代理日志：客户端 IP 与代理、边缘节点的 IP 出现在同一行。",
+    "status": {
+      "empty": "粘贴后会在这里显示识别结果",
+      "none": "没有识别到公网 IP",
+      "ready": "识别到 {n} 个 IP：{fresh}",
+      "new": "新增 {n} 个",
+      "existing": "已在列表 {n} 个",
+      "reserved": "跳过内网 {n} 个",
+      "cidr": "跳过 CIDR {n} 个",
+      "split": "分 {n} 次请求查询",
+      "known": "这 {n} 个 IP 都已在列表中，将只更新频次",
+      "noRoom": "新增 {n} 个，但列表只能再加入 {room} 个（上限 {max} 个），请先删除一些",
+      "running": "正在查询 {n} 个 IP…",
+      "runningSplit": "正在查询：第 {request}/{requests} 次请求，已完成 {done}/{total} 个 IP…",
+      "updating": "正在更新频次…"
+    },
+    "Run": "查询 {n} 个新 IP",
+    "RunCountsOnly": "更新频次",
+    "RunIdle": "查询",
+    "Unanswered": "{n} 个 IP 查询失败。",
+    "RunFailed": "查询失败，请稍后再试。",
+    "RunRateLimited": "查询太频繁，请稍后再试。",
+    "Paused": "已查询 {done}/{total} 个新 IP，剩余 {n} 个已暂停。",
+    "PausedRateLimited": "查询太频繁，请稍等片刻再继续。",
+    "PausedFailed": "查询中断了，请稍后继续。",
+    "Continue": "继续查询剩余 {n} 个",
+    "StorageError": "浏览器未能保存列表（存储空间已满或被禁用）。离开本页前列表仍然可用。",
+    "stat": {
+      "rows": "IP",
+      "countries": "国家/地区",
+      "asns": "ASN",
+      "frequency": "总频次",
+      "topShare": "前 10 个 IP 的频次占比",
+      "onceShare": "仅出现一次的 IP 占比"
+    },
+    "ClearAll": "全部清空",
+    "OverviewTitle": "概览",
+    "MapTitle": "世界地图",
+    "tab": {
+      "ips": "IP",
+      "analysis": "分析"
+    },
+    "FilterPlaceholder": "按 IP、国家、城市、ASN、组织或备注筛选，可用空格组合多个词，如“德国 3320”",
+    "ClearSearch": "清除搜索",
+    "BatchFilter": "粘贴批次",
+    "AllBatches": "全部批次",
+    "BatchLabel": "{time} · {n} 个 IP",
+    "ExportCsv": "导出 CSV",
+    "StarredOnly": "只看星标 IP",
+    "NoMatches": "没有符合筛选条件的结果。",
+    "ClearTitle": "清空列表",
+    "ClearBody": "将从当前浏览器中删除 {n} 个 IP，此操作无法撤销。",
+    "KeepStarred": "保留星标的 IP（{n}）",
+    "Cancel": "取消",
+    "Save": "保存",
+    "ClearConfirm": "清空",
+    "Unknown": "未知",
+    "col": {
+      "star": "星标",
+      "ip": "IP",
+      "country": "国家/地区",
+      "city": "城市",
+      "asn": "ASN",
+      "org": "组织",
+      "count": "频次",
+      "note": "备注",
+      "actions": "操作"
+    },
+    "Star": "加星标",
+    "Unstar": "取消星标",
+    "Delete": "删除",
+    "IpDetails": "IP 详情",
+    "CheckBlocklist": "检查黑名单",
+    "EditNote": "编辑备注",
+    "NotePlaceholder": "添加备注",
+    "PageRange": "第 {from}–{to} 条，共 {total} 条",
+    "PageSize": "每页行数",
+    "PagePrev": "上一页",
+    "PageNext": "下一页",
+    "PickHint": "点击按此筛选，再次点击取消筛选",
+    "PanelHint": {
+      "country": "各国家/地区在列表中的占比，从高到低排列。",
+      "asn": "各网络（ASN）及其所属组织在列表中的占比，从高到低排列。",
+      "block": "IP 按 /24（IPv4）和 /48（IPv6）分组，按在列表中的占比从高到低排列。"
+    },
+    "WeightLabel": "统计维度：",
+    "ByIps": "按 IP 数",
+    "ByHits": "按频次",
+    "PanelCountry": "国家/地区",
+    "PanelAsn": "ASN · 组织",
+    "PanelBlock": "地址段（/24 · /48）",
+    "ShowLess": "收起",
+    "MoreEntries": "还有 {n} 项",
+    "TopGroupsShare": "前 {n}：{share}",
+    "MapHint": {
+      "ips": "颜色深浅代表 IP 数量。",
+      "hits": "颜色深浅代表频次。"
+    },
+    "MapUnavailable": "地图加载失败。",
+    "MapTooltip": {
+      "ips": "{n} 个 IP",
+      "hits": "频次：{n}"
+    }
   },
   "whois": {
     "Title": "Whois 查询",
@@ -1468,7 +1608,38 @@
     "Provider": "DNS 服务商",
     "Result": "解析结果",
     "Record": "记录",
-    "AllRegions": "全部地区"
+    "AllRegions": "全部地区",
+    "HintWithCode": "{hint}（{code}）",
+    "Failure": {
+      "nodata": {
+        "Label": "无此类型记录",
+        "Hint": "该域名存在，但没有这一类型的记录"
+      },
+      "nxdomain": {
+        "Label": "域名不存在",
+        "Hint": "解析器报告该域名不存在"
+      },
+      "servfail": {
+        "Label": "解析失败",
+        "Hint": "解析器未能完成查询，常见原因是 DNSSEC 校验失败或权威服务器无法访问"
+      },
+      "refused": {
+        "Label": "拒绝查询",
+        "Hint": "解析器拒绝或不支持这次查询，通常出于其自身的策略或过滤规则"
+      },
+      "timeout": {
+        "Label": "超时",
+        "Hint": "解析器未能在限定时间内响应"
+      },
+      "unavailable": {
+        "Label": "服务不可用",
+        "Hint": "无法连接到解析器，或解析器返回了错误"
+      },
+      "malformed": {
+        "Label": "响应格式异常",
+        "Hint": "无法读取解析器返回的响应"
+      }
+    }
   },
   "ruletest": {
     "Title": "分流测试",
@@ -1625,6 +1796,7 @@
     "qualityScoreUnknown": "未知分数",
     "advancedUnlockCta": "为避免滥用，登录后可查看以下信息",
     "advancedQuotaCta": "本月 IP 高级数据额度已用完",
+    "advancedCooldownCta": "IP 高级数据 24 小时额度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相关数据：",
@@ -1913,6 +2085,7 @@
       "kosovo": "科索沃常用",
       "thailand": "泰国常用",
       "mexico": "墨西哥常用",
+      "greece": "希腊常用",
       "ai": "AI 服务",
       "social": "社交通讯",
       "productivity": "工作与生产力",
@@ -2107,6 +2280,7 @@
     "EnhancedDnsLeakTest": "打开深度 DNS 泄露测试面板",
     "MacChecker": "打开物理地址查询面板",
     "IpCalculator": "打开 IP 计算器面板",
+    "BulkLookup": "打开 IP 批量查询面板",
     "BrowserInfo": "打开浏览器信息面板",
     "AdblockTest": "打开广告与跟踪屏蔽检测面板",
     "SecurityChecklist": "打开安全检查清单",
@@ -2124,12 +2298,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "快捷键"
+    "Title": "快捷键",
+    "HomeOnly": "所有快捷键仅在首页生效。"
   },
   "footer": {
     "Tagline": "免费、开源、一站式的隐私工具箱",
     "Project": "项目",
     "Support": "文档与支持",
+    "ShortcutGuide": "快捷键指南",
     "DeveloperDocs": "开发者文档",
     "SelfHosting": "自托管指南",
     "ReportIssue": "报告问题",

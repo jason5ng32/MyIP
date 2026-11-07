@@ -21,7 +21,7 @@ import logger from '../server/logger.js';
 
 // --- env / KV plumbing -------------------------------------------------------
 
-// Read at request time (not module load) so tests and late-loaded dotenv both work.
+// Read at request time (not module load) so tests can set the env per case.
 const kvConfig = () => {
     const apiKey = process.env.CLOUDFLARE_API_KEY || process.env.CLOUDFLARE_API;
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;

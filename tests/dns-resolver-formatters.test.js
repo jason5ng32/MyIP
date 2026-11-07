@@ -39,16 +39,19 @@ describe('UDP DNS Promise API', () => {
                 });
             }
             const query = t.mock.method(Resolver.prototype, method, async () => records);
-            assert.deepEqual(await resolveDns('example.test', type, 'Example DNS', '192.0.2.1'), expected);
+            assert.deepEqual(await resolveDns('example.test', type, 'Example DNS', '192.0.2.1'), { result: expected, status: 'ok' });
             assert.equal(query.mock.callCount(), 1);
             assert.deepEqual(query.mock.calls[0].arguments, ['example.test']);
             assert.deepEqual(query.mock.calls[0].this.getServers(), ['192.0.2.1']);
         });
     }
 
-    it('returns N/A for an empty result', async (t) => {
+    it('reports an empty result as nodata', async (t) => {
         t.mock.method(Resolver.prototype, 'resolve4', async () => []);
-        assert.equal(await resolveDns('example.test', 'A', 'Example DNS', '192.0.2.1'), 'N/A');
+        assert.deepEqual(
+            await resolveDns('example.test', 'A', 'Example DNS', '192.0.2.1'),
+            { result: 'N/A', status: 'nodata', code: 'NODATA' },
+        );
     });
 });
 
@@ -136,27 +139,29 @@ describe('root-dot normalization', () => {
         Resolver.prototype.resolveCname = async () => ['github.com'];
         assert.deepEqual(
             await resolveDns('www.github.com', 'CNAME', 'Example DNS', '192.0.2.1'),
-            ['github.com.'],
+            { result: ['github.com.'], status: 'ok' },
         );
     });
 
     it('normalizes the DoH side, whichever way the endpoint writes it', async () => {
         globalThis.fetch = async () => new Response(JSON.stringify({
+            Status: 0,
             Answer: [{ type: 5, data: 'github.com' }, { type: 5, data: 'other.example.' }],
         }), { status: 200 });
         assert.deepEqual(
             await resolveDoh('www.github.com', 'CNAME', 'Example DoH', 'https://doh.example.test/resolve?'),
-            ['github.com.', 'other.example.'],
+            { result: ['github.com.', 'other.example.'], status: 'ok' },
         );
     });
 
     it('leaves address- and text-valued answers untouched', async () => {
         globalThis.fetch = async () => new Response(JSON.stringify({
+            Status: 0,
             Answer: [{ type: 1, data: '192.0.2.1' }],
         }), { status: 200 });
         assert.deepEqual(
             await resolveDoh('example.com', 'A', 'Example DoH', 'https://doh.example.test/resolve?'),
-            ['192.0.2.1'],
+            { result: ['192.0.2.1'], status: 'ok' },
         );
     });
 });

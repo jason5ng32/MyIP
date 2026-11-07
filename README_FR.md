@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 Une boîte à outils IP tout-en-un et open source : recherche d'IP depuis plusieurs sources, tests de connectivité, détection WebRTC et de fuites DNS, test de vitesse, MTR, vérification de la censure, Whois et plus encore — auto-hébergeable en une seule commande Docker.
 
@@ -65,6 +65,7 @@ N'hésitez pas à mettre la démo en favori ou à déployer votre propre instanc
 * 📓 **Recherche Whois** : Effectue des recherches Whois pour les noms de domaine, les adresses IP et les numéros d'AS.
 * 🗄️ **Recherche MAC** : Identifie le fabricant et les détails derrière une adresse physique.
 * 🧮 **Calculateur IP** : Calcul de sous-réseau, conversions de notation et détails d'interface IPv6 pour toute IP, préfixe, plage ou liste, le tout en local.
+* 🧾 **Recherche IP groupée** : Collez des listes d'IP ou des journaux de serveur bruts (Nginx, Apache, pare-feu, CDN…) pour géolocaliser toutes leurs IP d'un coup.
 * 🛰️ **Infos ASN et topologie amont** : Directement depuis chaque carte IP — les détails de l'AS, l'historique des annonces du préfixe de l'IP et les chemins amont de son ASN vers la dorsale Tier 1.
 * 🛂 **Profil ASN** : Le portrait complet de n'importe quel AS — enregistrement avec la fiche Whois brute, rang mondial et taille, trafic et qualité de connexion, pays où son espace IPv4 est utilisé, chaque préfixe annoncé avec son statut RPKI, ses fournisseurs amont, pairs et clients, ainsi que les points d'échange Internet et centres de données où il est présent.
 * 📶 **État des services** : Disponibilité en direct de services connus — Claude, OpenAI, GitHub, Cloudflare et d'autres — depuis leurs pages d'état officielles, avec les incidents récents.

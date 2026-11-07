@@ -15,7 +15,10 @@
       "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). Repeat IP advanced data queries are served from cache and don't use your quota.",
       "IpinfoFeature": "IP Advanced Data",
       "PercentUsed": "{percent}% used",
-      "SponsorNote": "Sponsoring on GitHub raises your monthly quotas."
+      "SponsorNote": "Sponsoring on GitHub raises your monthly quotas.",
+      "DailyTitle": "24-hour limit",
+      "MonthlyTitle": "Monthly quota",
+      "AvailableAgainAt": "Available again at {time}"
     },
     "MyAchievements": "My Achievements",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Sponsors",
           "Item1": "Everything in Signed-in Users",
           "Item2": "Higher monthly quotas for advanced features",
-          "Item3": "Support the ongoing development of this open-source project"
+          "Item3": "Support the ongoing development of this open-source project",
+          "Item4": "More generous 24-hour limit"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "Logging off to touch grass",
         "turing": "This status was sent by a human. Probably.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Happy birthday, IPCheck.ing!"
+        "birthday": "Happy birthday, IPCheck.ing!",
+        "adaday": "Algorithm by Ada, since 1843",
+        "dayofdead": "Remembering those who've logged off",
+        "thanksgiving": "Grateful for every packet that made it",
+        "piday": "3.14159265358979… still loading",
+        "holi": "Splashing colors in full RGB",
+        "shannon": "Sending this one bit at a time",
+        "wtisd": "Full bars, worldwide",
+        "ipv6day": "Now with 2¹²⁸ addresses",
+        "sysadmin": "Have you tried turning it off and on again?",
+        "linux": "Just a hobby, won't be big and professional",
+        "tomatina": "Under a tomato flood attack"
       },
       "festivalDesc": {
         "prgday": "Programmers' Day — the 256th day of the year, 0x100 in hex",
@@ -313,7 +328,18 @@
         "earthday": "Earth Day (Apr 22) — even Earth Online recommends a little Earth Offline",
         "turing": "Alan Turing's birthday (Jun 23, 1912) — father of the Turing test",
         "emojiday": "World Emoji Day (Jul 17) — words are so last century",
-        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020"
+        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020",
+        "adaday": "Ada Lovelace Day (2nd Tuesday of October) — celebrating women in STEM; Ada wrote the first published algorithm",
+        "dayofdead": "Día de los Muertos (Nov 1–2) — Mexico remembers loved ones who are never truly offline",
+        "thanksgiving": "Thanksgiving (4th Thursday of November) — thanks to every router along the path",
+        "piday": "Pi Day (Mar 14, 3.14) — also UNESCO's International Day of Mathematics",
+        "holi": "Holi — the Hindu festival of colors welcomes spring in every hex code",
+        "shannon": "Claude Shannon's birthday (Apr 30, 1916) — father of information theory, who gave us the bit",
+        "wtisd": "World Telecommunication and Information Society Day (May 17) — the ITU was founded on this day in 1865",
+        "ipv6day": "World IPv6 Launch (Jun 6, 2012) — the day IPv6 switched on for good",
+        "sysadmin": "System Administrator Appreciation Day (last Friday of July) — thank whoever keeps your uptime up",
+        "linux": "Aug 25, 1991: Linus Torvalds announced his “just a hobby” OS on comp.os.minix",
+        "tomatina": "La Tomatina (last Wednesday of August) — Buñol, Spain's tomato fight; the one flood nobody wants to filter"
       }
     },
     "preferences": {
@@ -1088,6 +1114,7 @@
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
+    "BulkLookup": "Look up IPs in bulk, straight from pasted logs",
     "BrowserInfo": "Check browser information and fingerprint",
     "AdblockTest": "Check what your ad blocker, DNS filter or VPN actually blocks",
     "SecurityChecklist": "Guide to securing your digital life",
@@ -1254,6 +1281,119 @@
     "aggregated": "Single block",
     "aggregationSummary": "{input} blocks in, {output} out, {addresses} addresses",
     "invalidTokens": "Ignored: {list}"
+  },
+  "bulklookup": {
+    "Title": "Bulk IP Lookup",
+    "Note": "Pull the IPs out of Nginx, Apache, firewall, CDN or application logs — or any pasted list — and see at a glance where the traffic comes from: which countries and networks (ASNs), and which IPs keep coming back. Then drill into any single IP.",
+    "Note2": "Paste any text: the IPs are extracted in your browser, private and reserved ones are skipped, and repeats are counted. Paste as often as you like — the list holds up to {max} IPs, and a large paste is looked up in several requests. Geolocation comes from {source}. Results are kept only in this browser.",
+    "SourceWithBuild": "{source} (database of {date})",
+    "SourceFallback": "the server's local geolocation database",
+    "InputLabel": "Paste IPs or log lines:",
+    "Placeholder": "1.1.1.1, 8.8.8.8 or whole log lines…",
+    "FirstPerLine": "Only the first IP on each line",
+    "FirstPerLineHint": "For CDN or reverse-proxy logs, where the client IP shares a line with proxy or edge IPs.",
+    "status": {
+      "empty": "What's found appears here once you paste.",
+      "none": "No public IPs found",
+      "ready": "Found {n} IPs: {fresh}",
+      "new": "{n} new",
+      "existing": "{n} already listed",
+      "reserved": "{n} private skipped",
+      "cidr": "{n} CIDR skipped",
+      "split": "queried in {n} requests",
+      "known": "All {n} IPs are already listed; only their frequency will be updated",
+      "noRoom": "{n} new IPs, but the list only has room for {room} more (limit {max}) — delete some rows first",
+      "running": "Looking up {n} IPs…",
+      "runningSplit": "Looking up — request {request} of {requests}, {done} of {total} IPs done…",
+      "updating": "Updating frequency…"
+    },
+    "Run": "Look up {n} new",
+    "RunCountsOnly": "Update frequency",
+    "RunIdle": "Look up",
+    "Unanswered": "{n} IPs could not be looked up.",
+    "RunFailed": "The lookup failed. Please try again later.",
+    "RunRateLimited": "Too many lookups in a short time. Please try again later.",
+    "Paused": "{done} of {total} new IPs looked up; {n} remaining paused.",
+    "PausedRateLimited": "Too many lookups in a short time. Wait a moment, then continue.",
+    "PausedFailed": "The lookup was interrupted. Try continuing in a moment.",
+    "Continue": "Continue remaining {n}",
+    "StorageError": "This browser didn't save the list (storage full or blocked). It stays here until you leave the page.",
+    "stat": {
+      "rows": "IPs",
+      "countries": "Countries/regions",
+      "asns": "ASNs",
+      "frequency": "Total frequency",
+      "topShare": "Top 10 IPs' share of frequency",
+      "onceShare": "Share of IPs seen only once"
+    },
+    "ClearAll": "Clear all",
+    "OverviewTitle": "Overview",
+    "MapTitle": "World map",
+    "tab": {
+      "ips": "IPs",
+      "analysis": "Analysis"
+    },
+    "FilterPlaceholder": "Filter by IP, country, city, ASN, organization or note — combine words, e.g. “Germany 3320”",
+    "ClearSearch": "Clear search",
+    "BatchFilter": "Paste batch",
+    "AllBatches": "All pastes",
+    "BatchLabel": "{time} · {n} IPs",
+    "ExportCsv": "Export CSV",
+    "StarredOnly": "Starred IPs only",
+    "NoMatches": "Nothing matches the filters.",
+    "ClearTitle": "Clear the list",
+    "ClearBody": "This removes {n} IPs from this browser. It can't be undone.",
+    "KeepStarred": "Keep starred IPs ({n})",
+    "Cancel": "Cancel",
+    "Save": "Save",
+    "ClearConfirm": "Clear",
+    "Unknown": "Unknown",
+    "col": {
+      "star": "Star",
+      "ip": "IP",
+      "country": "Country/region",
+      "city": "City",
+      "asn": "ASN",
+      "org": "Organization",
+      "count": "Frequency",
+      "note": "Note",
+      "actions": "Actions"
+    },
+    "Star": "Star",
+    "Unstar": "Unstar",
+    "Delete": "Delete",
+    "IpDetails": "IP details",
+    "CheckBlocklist": "Check blocklists",
+    "EditNote": "Edit note",
+    "NotePlaceholder": "Add a note",
+    "PageRange": "{from}–{to} of {total}",
+    "PageSize": "Rows per page",
+    "PagePrev": "Previous",
+    "PageNext": "Next",
+    "PickHint": "Click to filter by this; click again to remove the filter",
+    "PanelHint": {
+      "country": "Countries/regions, ranked by their share of the list.",
+      "asn": "Networks (ASNs) and the organizations behind them, ranked by their share of the list.",
+      "block": "IPs grouped by /24 (IPv4) and /48 (IPv6), ranked by their share of the list."
+    },
+    "WeightLabel": "Weighting:",
+    "ByIps": "By IPs",
+    "ByHits": "By frequency",
+    "PanelCountry": "Country/region",
+    "PanelAsn": "ASN · Organization",
+    "PanelBlock": "Address blocks (/24 · /48)",
+    "ShowLess": "Show less",
+    "MoreEntries": "+ {n} more",
+    "TopGroupsShare": "top {n}: {share}",
+    "MapHint": {
+      "ips": "Countries are shaded by number of IPs.",
+      "hits": "Countries are shaded by frequency."
+    },
+    "MapUnavailable": "The map couldn't be loaded.",
+    "MapTooltip": {
+      "ips": "{n} IPs",
+      "hits": "Frequency: {n}"
+    }
   },
   "whois": {
     "Title": "Whois Search",
@@ -1468,7 +1608,38 @@
     "Provider": "DNS Provider",
     "Result": "Resolution Result",
     "Record": "Record",
-    "AllRegions": "All Regions"
+    "AllRegions": "All Regions",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "No such record",
+        "Hint": "The domain exists but has no record of this type"
+      },
+      "nxdomain": {
+        "Label": "Domain not found",
+        "Hint": "The resolver reports that this domain does not exist"
+      },
+      "servfail": {
+        "Label": "Resolution failed",
+        "Hint": "The resolver couldn't complete the lookup — often a DNSSEC validation failure or unreachable authoritative servers"
+      },
+      "refused": {
+        "Label": "Query refused",
+        "Hint": "The resolver declined or doesn't support this query, usually because of its own policy or filtering"
+      },
+      "timeout": {
+        "Label": "Timed out",
+        "Hint": "The resolver didn't answer in time"
+      },
+      "unavailable": {
+        "Label": "Resolver unavailable",
+        "Hint": "The resolver couldn't be reached or returned an error"
+      },
+      "malformed": {
+        "Label": "Invalid response",
+        "Hint": "The resolver's reply couldn't be read"
+      }
+    }
   },
   "ruletest": {
     "Title": "Rule Test",
@@ -1625,6 +1796,7 @@
     "qualityScoreUnknown": "Score Unknown",
     "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
     "advancedQuotaCta": "Monthly quota for IP advanced data used up",
+    "advancedCooldownCta": "24-hour limit for IP advanced data reached",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
@@ -1913,6 +2085,7 @@
       "kosovo": "Kosovo Essentials",
       "thailand": "Thailand Essentials",
       "mexico": "Mexico Essentials",
+      "greece": "Greece Essentials",
       "ai": "AI Services",
       "social": "Social & Messaging",
       "productivity": "Work & Productivity",
@@ -2107,6 +2280,7 @@
     "EnhancedDnsLeakTest": "Open In-depth DNS Leak Test panel",
     "MacChecker": "Open MAC lookup panel",
     "IpCalculator": "Open IP Calculator panel",
+    "BulkLookup": "Open Bulk IP Lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "AdblockTest": "Open Ad & Tracker Blocking Test panel",
     "SecurityChecklist": "Open Security Checklist panel",
@@ -2124,12 +2298,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Keyboard Shortcuts"
+    "Title": "Keyboard Shortcuts",
+    "HomeOnly": "All shortcuts work on the homepage only."
   },
   "footer": {
     "Tagline": "A free, open-source, all-in-one privacy toolbox.",
     "Project": "Project",
     "Support": "Docs & Support",
+    "ShortcutGuide": "Keyboard Shortcuts",
     "DeveloperDocs": "Developer Docs",
     "SelfHosting": "Self-hosting Guide",
     "ReportIssue": "Report an Issue",

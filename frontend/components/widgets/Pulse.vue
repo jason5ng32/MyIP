@@ -2,7 +2,9 @@
     <JnTooltip v-if="pulseVisible" :text="t('nav.pulse.tooltip')">
         <Button variant="ghost" :size="isMobile ? 'icon' : 'sm'" class="relative cursor-pointer"
             :class="isMobile ? 'size-8' : 'h-8 gap-1.5 px-2'" :aria-label="t('nav.pulse.title')" @click="openPulse">
-            <Earth class="size-4 animate-spin animation-duration-[8s]" />
+            <span v-if="festivalEmoji" class="inline-flex size-4 items-center justify-center text-sm leading-none"
+                aria-hidden="true">{{ festivalEmoji }}</span>
+            <Earth v-else class="size-4 animate-spin animation-duration-[8s]" />
             <span v-if="!isMobile">{{ t('nav.pulse.title') }}</span>
             <span class="flex size-1.5" :class="isMobile ? 'absolute right-1 top-1' : 'relative'" aria-hidden="true">
                 <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
@@ -59,9 +61,13 @@
                         </button>
                     </div>
                     <p v-for="fest in activeFestivals" :key="'desc-' + fest.id"
-                        class="m-0 my-1.5 text-xs text-muted-foreground flex items-center gap-1">
-                        <ClockFading class="size-3" />{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
-                        t('nav.pulse.festivalDesc.' + fest.id) }}
+                        class="m-0 my-1.5 flex items-start gap-1 text-xs text-muted-foreground">
+                        <!-- One text-xs line box (h-4), so the icon sits on the first line when the copy wraps. -->
+                        <span class="flex h-4 shrink-0 items-center">
+                            <ClockFading class="size-3" />
+                        </span>
+                        <span>{{ t('nav.pulse.limitedTitle') }} : {{ fest.emoji }} {{
+                            t('nav.pulse.festivalDesc.' + fest.id) }}</span>
                     </p>
                     <!-- Fixed-height hint slot (no layout shift). Auto-hide after 3 seconds. -->
                     <div class="mt-1 flex h-4 items-center text-xs" aria-live="polite">
@@ -79,7 +85,7 @@
                         </span>
                     </div>
                 </section>
-                
+
                 <!-- Latest events: IPs arrive pre-masked; status ids render in
                     the viewer's language. No local echo — the post-send
                     refetch shows the sender in the real feed.
@@ -115,10 +121,14 @@
                                     <span class="shrink-0 text-xs tabular-nums text-muted-foreground/70">{{
                                         relTime(entry.min) }}</span>
                                 </div>
-                                <div class="truncate text-sm text-muted-foreground">
-                                    {{ statusById(entry.status).emoji }} {{ t('nav.pulse.statuses.' + entry.status) }}
-                                    <ClockFading v-if="FESTIVAL_IDS.has(entry.status)"
-                                        class="inline size-3 text-primary" />
+                                <div class="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <span class="truncate">{{ statusById(entry.status).emoji }} {{
+                                        t('nav.pulse.statuses.' + entry.status) }}</span>
+                                    <!-- SVGs show no native tooltip: the span carries the title. -->
+                                    <span v-if="FESTIVAL_IDS.has(entry.status)" class="flex shrink-0 text-primary"
+                                        :title="t('nav.pulse.limitedTitle') + ': ' + t('nav.pulse.festivalDesc.' + entry.status)">
+                                        <ClockFading class="size-3" />
+                                    </span>
                                 </div>
                             </div>
                         </li>
@@ -235,7 +245,8 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/features/pulse-beacon.js';
-import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveOn, localDateString } from '@/data/pulse-statuses.js';
+import { PRESET_STATUSES, FESTIVAL_STATUSES } from '@/data/pulse-statuses.js';
+import { festivalsForComposer } from '@/utils/features/festival-skin.js';
 import { playCelebration, resolveEffect } from '@/utils/features/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/features/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
@@ -245,12 +256,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { JnTooltip } from '@/components/ui/tooltip';
 import PulseOutages from '@/components/widgets/PulseOutages.vue';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
 import { Icon } from '@iconify/vue';
 import { Check, Earth, ClockFading } from '@lucide/vue';
 
 const { t, locale } = useI18n();
 const store = useMainStore();
 const isMobile = computed(() => store.isMobile);
+// The active festival's emoji stands in for the entry button's globe.
+const { pulseEmoji: festivalEmoji } = useFestivalSkin();
 
 // Entry visibility: either half of the panel can carry it (see header).
 // `cloudFlare` lands with the /api/configs fetch, so the button may appear late.
@@ -267,10 +281,10 @@ const FESTIVAL_IDS = new Set(FESTIVAL_STATUSES.map((s) => s.id));
 const statusById = (id) => ALL_STATUSES.find((s) => s.id === id);
 
 // Active festival windows, re-evaluated on every Sheet open (a session can
-// straddle midnight).
+// outlive a window edge); the DEV ?festival= preview joins them.
 const activeFestivals = ref([]);
 const refreshFestivals = () => {
-    activeFestivals.value = festivalsActiveOn(localDateString());
+    activeFestivals.value = festivalsForComposer();
 };
 
 // Stats: fetched fresh on every open and after each send; previous data

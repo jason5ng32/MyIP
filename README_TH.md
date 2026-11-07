@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 กล่องเครื่องมือ IP แบบโอเพนซอร์สที่รวมทุกอย่างไว้ในที่เดียว: ตรวจ IP จากหลายแหล่ง, ทดสอบการเชื่อมต่อ, ตรวจจับ WebRTC และ DNS รั่ว, ทดสอบความเร็ว, MTR, ตรวจการเซ็นเซอร์, Whois และอีกมากมาย ติดตั้งบนเซิร์ฟเวอร์ของคุณเองได้ด้วยคำสั่ง Docker เพียงคำสั่งเดียว
 
@@ -65,6 +65,7 @@
 * 📓 **ค้นหา Whois**: ค้น Whois ของชื่อโดเมน IP และหมายเลข AS
 * 🗄️ **ค้นหา MAC**: ระบุผู้ผลิตและรายละเอียดของ MAC address
 * 🧮 **IP Calculator**: คำนวณ subnet แปลงรูปแบบการเขียน และดูรายละเอียด interface ของ IPv6 สำหรับ IP, prefix, ช่วง หรือรายการ IP ใดก็ได้ คำนวณในเครื่องทั้งหมด
+* 🧾 **Bulk IP Lookup**: วางรายการ IP หรือ log ดิบของเซิร์ฟเวอร์ (Nginx, Apache, firewall, CDN…) เพื่อหาตำแหน่งของ IP ทั้งหมดได้ในครั้งเดียว
 * 🛰️ **ข้อมูล ASN และโทโพโลยีต้นทาง**: อยู่บน IP Card ทุกใบ มีรายละเอียด AS ประวัติการประกาศ prefix ของ IP นั้น และเส้นทางต้นทางจาก ASN ไปจนถึงแกนหลัก Tier 1
 * 🛂 **โปรไฟล์ ASN**: ภาพรวมครบถ้วนของ AS ใดก็ได้ ทั้งข้อมูลการจดทะเบียนพร้อม Whois ดิบ อันดับและขนาดระดับโลก ปริมาณทราฟฟิกและคุณภาพการเชื่อมต่อ พื้นที่ใช้งาน IPv4 ทุก prefix ที่ประกาศพร้อมสถานะ RPKI ผู้ให้บริการต้นทาง peer และลูกค้า รวมถึงจุดแลกเปลี่ยนอินเทอร์เน็ตและดาต้าเซ็นเตอร์ที่ AS นั้นตั้งอยู่
 * 📶 **สถานะบริการ**: สถานะการใช้งานแบบเรียลไทม์ของบริการดัง ๆ เช่น Claude, OpenAI, GitHub, Cloudflare และอื่น ๆ ดึงจากหน้าสถานะทางการ พร้อมเหตุขัดข้องล่าสุด

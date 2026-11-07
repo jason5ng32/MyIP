@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 एक ओपन-सोर्स, ऑल-इन-वन IP टूलबॉक्स: कई स्रोतों से IP की जानकारी, कनेक्टिविटी जांच, WebRTC और DNS लीक की पहचान, स्पीड टेस्ट, MTR, सेंसरशिप जांच, Whois और बहुत कुछ — Docker की एक कमांड से अपने सर्वर पर चलाएं.
 
@@ -65,6 +65,7 @@
 * 📓 **Whois खोज**: डोमेन नाम, IP पते और AS नंबर के लिए Whois लुकअप करता है.
 * 🗄️ **MAC लुकअप**: किसी हार्डवेयर (MAC) पते के पीछे की कंपनी और जानकारी बताता है.
 * 🧮 **IP कैलकुलेटर**: किसी भी IP, प्रीफ़िक्स, रेंज या सूची के लिए सबनेट का हिसाब, फ़ॉर्मैट बदलना और IPv6 इंटरफ़ेस की जानकारी — सब कुछ आपके डिवाइस पर ही.
+* 🧾 **बल्क IP लुकअप**: IP सूचियाँ या सर्वर के कच्चे लॉग (Nginx, Apache, फ़ायरवॉल, CDN…) पेस्ट करें और उनमें मौजूद सभी IP की लोकेशन एक साथ देखें.
 * 🛰️ **ASN जानकारी और अपस्ट्रीम टोपोलॉजी**: हर IP कार्ड पर ही — AS की जानकारी, IP के प्रीफ़िक्स की पिछली घोषणाएं, और उसके ASN से Tier 1 बैकबोन तक के अपस्ट्रीम रास्ते.
 * 🛂 **ASN प्रोफ़ाइल**: किसी भी AS की पूरी तस्वीर — मूल Whois रिकॉर्ड के साथ रजिस्ट्रेशन, दुनिया में रैंक और आकार, ट्रैफ़िक और कनेक्शन की गुणवत्ता, उसका IPv4 स्पेस कहां इस्तेमाल होता है, RPKI स्थिति के साथ हर घोषित प्रीफ़िक्स, उसके अपस्ट्रीम, पीयर और ग्राहक, और वे इंटरनेट एक्सचेंज और डेटा सेंटर जहां वह मौजूद है.
 * 📶 **सेवा की स्थिति**: जानी-मानी सेवाओं — Claude, OpenAI, GitHub, Cloudflare और दूसरी — की लाइव स्थिति, उनके आधिकारिक स्टेटस पेज से, हाल की घटनाओं के साथ.
