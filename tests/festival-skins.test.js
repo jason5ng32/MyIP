@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import fs from 'node:fs';
 
-import { FESTIVAL_STATUSES, festivalsActiveAt } from '../frontend/data/pulse-statuses.js';
+import { FESTIVAL_STATUSES, festivalWindowStartAt, festivalsActiveAt } from '../frontend/data/pulse-statuses.js';
 import {
     SKIN_SLOTS,
     activeFestivalAt,
@@ -82,20 +82,31 @@ describe('previewFestivalFrom()', () => {
 
 describe('festivalsForComposer()', () => {
     const byId = (id) => FESTIVAL_STATUSES.find((f) => f.id === id);
-    const halloweenNight = new Date('2026-10-31T09:00:00Z');
+    const ids = (iso, preview = null) => festivalsForComposer(new Date(iso), preview).map((f) => f.id);
+    // halloween opened Oct 30 10:00Z, internetday Oct 28 10:00Z; both still on.
+    const overlap = '2026-10-30T11:00:00Z';
 
-    it('an out-of-window preview goes first, the active ones stay', () => {
-        const ids = festivalsForComposer(halloweenNight, byId('thanksgiving')).map((f) => f.id);
-        assert.deepEqual(ids, ['thanksgiving', ...festivalsActiveAt(halloweenNight).map((f) => f.id)]);
-        assert.ok(ids.includes('halloween'));
+    it('overlapping windows → the most recently opened first', () => {
+        assert.deepEqual(ids('2026-10-31T11:00:00Z'), ['dayofdead', 'halloween']);
+        assert.deepEqual(ids('2026-10-30T11:00:00Z'), ['halloween', 'internetday']);
+    });
+
+    it('an out-of-window preview goes first, ahead of the sorted active ones', () => {
+        assert.deepEqual(ids(overlap, byId('thanksgiving')), ['thanksgiving', 'halloween', 'internetday']);
+        assert.deepEqual(ids('2026-10-31T11:00:00Z', byId('thanksgiving')), ['thanksgiving', 'dayofdead', 'halloween']);
     });
 
     it('an active preview is not duplicated', () => {
-        assert.deepEqual(festivalsForComposer(halloweenNight, byId('halloween')), festivalsActiveAt(halloweenNight));
+        assert.deepEqual(ids(overlap, byId('internetday')), ['halloween', 'internetday']);
     });
 
-    it('no preview → exactly the active ones', () => {
-        assert.deepEqual(festivalsForComposer(halloweenNight, null), festivalsActiveAt(halloweenNight));
+    it('no preview → exactly the active ones, sorted', () => {
+        const now = new Date(overlap);
+        const t = now.getTime();
+        const expected = [...festivalsActiveAt(now)]
+            .sort((a, b) => festivalWindowStartAt(b, t) - festivalWindowStartAt(a, t));
+        assert.deepEqual(festivalsForComposer(now, null), expected);
+        assert.deepEqual(ids(overlap), ['halloween', 'internetday']);
     });
 });
 

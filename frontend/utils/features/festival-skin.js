@@ -23,10 +23,18 @@ export const previewFestivalFrom = (search, isDev) => {
 export const previewFestival = () =>
     previewFestivalFrom(globalThis.location?.search ?? '', (import.meta.env ?? {}).DEV);
 
-// The Pulse composer's festivals: the active ones, the preview first if it
-// isn't among them (it never hides a genuinely active one).
+// Festivals ordered most recently opened first, a tie keeping list order.
+const byMostRecentlyOpened = (festivals, t) =>
+    festivals
+        .map((f) => ({ f, start: festivalWindowStartAt(f, t) }))
+        .sort((a, b) => b.start - a.start)
+        .map(({ f }) => f);
+
+// The Pulse composer's festivals: the active ones, most recently opened
+// first; the preview leads if it isn't among them (it never hides a
+// genuinely active one).
 export const festivalsForComposer = (now = new Date(), preview = previewFestival()) => {
-    const active = festivalsActiveAt(now);
+    const active = byMostRecentlyOpened(festivalsActiveAt(now), now.getTime());
     if (!preview || active.some((f) => f.id === preview.id)) return active;
     return [preview, ...active];
 };
@@ -35,17 +43,7 @@ export const festivalsForComposer = (now = new Date(), preview = previewFestival
 // skin (hasSkin(id)) go first, else all active ones; within that group the
 // most recently opened wins, a tie goes to the first listed.
 export const activeFestivalAt = (now = new Date(), hasSkin = () => false) => {
-    const t = now.getTime();
     const active = festivalsActiveAt(now);
     const skinned = active.filter((f) => hasSkin(f.id));
-    let best = null;
-    let bestStart = -Infinity;
-    for (const f of skinned.length ? skinned : active) {
-        const start = festivalWindowStartAt(f, t);
-        if (start > bestStart) {
-            best = f;
-            bestStart = start;
-        }
-    }
-    return best;
+    return byMostRecentlyOpened(skinned.length ? skinned : active, now.getTime())[0] ?? null;
 };
