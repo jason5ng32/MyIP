@@ -28,12 +28,15 @@ export const PRESET_STATUSES = [
 // global — open from the moment the first timezone (UTC+14) enters the
 // first day until the last one (UTC−12) leaves the last day, ~50h for a
 // single day. Whenever anyone on Earth can post a festival, every viewer
-// sees its chip. The Pulse worker checks the same window. Two range shapes:
+// sees its chip. The Pulse worker checks the same window. Three range shapes:
 //
 //   yearly:  { from: 'MM-DD', to: 'MM-DD' } — recurs every year forever,
 //            zero maintenance. from > to means the range wraps the year
 //            boundary (newyear). prgday spans Sep 12–13: day 256 is Sep 13,
 //            or Sep 12 in leap years.
+//   nth:     { month: 1–12, weekday: 0–6 (Sun = 0), n } — the n-th such
+//            weekday of the month, a single day; n ≤ −1 counts from the end
+//            (−1 = last). Recurs forever, zero maintenance.
 //   windows: [{ from/to: 'YYYY-MM-DD' }] — for lunar-calendar festivals
 //            that land on different dates every year (no computable rule).
 //            Filled through 2031; extending = appending one line per year
@@ -44,8 +47,10 @@ export const PRESET_STATUSES = [
 // Ordered chronologically from the season this list first shipped.
 export const FESTIVAL_STATUSES = [
     { id: 'prgday', emoji: '⌨️', yearly: { from: '09-12', to: '09-13' } },
+    { id: 'adaday', emoji: '🧮', nth: { month: 10, weekday: 2, n: 2 } },
     { id: 'internetday', emoji: '🌐', yearly: { from: '10-29', to: '10-29' } },
     { id: 'halloween', emoji: '🎃', effect: 'fall', yearly: { from: '10-31', to: '10-31' } },
+    { id: 'dayofdead', emoji: '💀', yearly: { from: '11-01', to: '11-02' } },
     { id: 'birthday', emoji: '🎂', effect: 'fireworks', yearly: { from: '11-06', to: '11-06' } },
     {
         id: 'diwali', emoji: '🪔', effect: 'fireworks',
@@ -58,6 +63,7 @@ export const FESTIVAL_STATUSES = [
             { from: '2031-11-14', to: '2031-11-14' },
         ],
     },
+    { id: 'thanksgiving', emoji: '🦃', nth: { month: 11, weekday: 4, n: 4 } },
     { id: 'christmas', emoji: '🎄', effect: 'fall', effectEmoji: '❄️', yearly: { from: '12-25', to: '12-25' } },
     { id: 'newyear', emoji: '🎉', effect: 'fireworks', yearly: { from: '12-31', to: '01-01' } },
     { id: 'privacyday', emoji: '🕵️', yearly: { from: '01-28', to: '01-28' } },
@@ -83,10 +89,29 @@ export const FESTIVAL_STATUSES = [
             { from: '2031-01-25', to: '2031-01-26' },
         ],
     },
+    { id: 'piday', emoji: '🥧', yearly: { from: '03-14', to: '03-14' } },
+    {
+        // Holika Dahan eve + Rangwali Holi: sources disagree by a day in some
+        // years, the two-day window covers both.
+        id: 'holi', emoji: '🎨', effect: 'fireworks',
+        windows: [
+            { from: '2027-03-21', to: '2027-03-22' },
+            { from: '2028-03-10', to: '2028-03-11' },
+            { from: '2029-02-28', to: '2029-03-01' },
+            { from: '2030-03-19', to: '2030-03-20' },
+            { from: '2031-03-09', to: '2031-03-10' },
+        ],
+    },
     { id: 'aprilfools', emoji: '🤡', yearly: { from: '04-01', to: '04-01' } },
     { id: 'earthday', emoji: '🌍', yearly: { from: '04-22', to: '04-22' } },
+    { id: 'shannon', emoji: '📡', yearly: { from: '04-30', to: '04-30' } },
+    { id: 'wtisd', emoji: '📶', yearly: { from: '05-17', to: '05-17' } },
+    { id: 'ipv6day', emoji: '🔢', yearly: { from: '06-06', to: '06-06' } },
     { id: 'turing', emoji: '🤖', yearly: { from: '06-23', to: '06-23' } },
     { id: 'emojiday', emoji: '😀', yearly: { from: '07-17', to: '07-17' } },
+    { id: 'sysadmin', emoji: '🖥️', nth: { month: 7, weekday: 5, n: -1 } },
+    { id: 'linux', emoji: '🐧', yearly: { from: '08-25', to: '08-25' } },
+    { id: 'tomatina', emoji: '🍅', effect: 'fall', nth: { month: 8, weekday: 3, n: -1 } },
 ];
 
 // Global window of a calendar range: from UTC+14 entering its first day
@@ -99,15 +124,30 @@ const TRAIL_MS = 12 * 60 * 60 * 1000;
 const mdTime = (year, md) => Date.UTC(year, Number(md.slice(0, 2)) - 1, Number(md.slice(3)));
 const isoTime = (iso) => Date.parse(`${iso}T00:00:00Z`);
 
+// UTC midnight of the nth rule's day in a given year.
+export const nthWeekdayOf = (year, { month, weekday, n }) => {
+    if (n > 0) {
+        const firstDow = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+        return Date.UTC(year, month - 1, 1 + ((weekday - firstDow + 7) % 7) + (n - 1) * 7);
+    }
+    const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const lastDow = new Date(Date.UTC(year, month - 1, lastDay)).getUTCDay();
+    return Date.UTC(year, month - 1, lastDay - ((lastDow - weekday + 7) % 7) + (n + 1) * 7);
+};
+
 const inWindow = (t, fromMs, toMs) => t >= fromMs - LEAD_MS && t < toMs + DAY_MS + TRAIL_MS;
 
 // Calendar ranges of a festival: its explicit windows, or last, this and
-// next year's yearly range (a window reaches across Jan 1; from > to wraps
-// into the following year). [fromMs, toMs] as UTC midnights.
+// next year's yearly / nth range (a window reaches across Jan 1; from > to
+// wraps into the following year). [fromMs, toMs] as UTC midnights.
 const rangesAround = (festival, t) => {
     if (festival.windows) return festival.windows.map((w) => [isoTime(w.from), isoTime(w.to)]);
     const year = new Date(t).getUTCFullYear();
     return [year - 1, year, year + 1].map((y) => {
+        if (festival.nth) {
+            const dayMs = nthWeekdayOf(y, festival.nth);
+            return [dayMs, dayMs];
+        }
         const fromMs = mdTime(y, festival.yearly.from);
         let toMs = mdTime(y, festival.yearly.to);
         if (toMs < fromMs) toMs = mdTime(y + 1, festival.yearly.to);

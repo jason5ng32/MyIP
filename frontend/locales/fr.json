@@ -299,7 +299,18 @@
         "earthday": "Déconnexion — je vais toucher de l'herbe",
         "turing": "Ce statut a été envoyé par un humain. Probablement.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Joyeux anniversaire IPCheck.ing !"
+        "birthday": "Joyeux anniversaire IPCheck.ing !",
+        "adaday": "Algorithme signé Ada, depuis 1843",
+        "dayofdead": "En pensée avec ceux qui se sont déconnectés",
+        "thanksgiving": "Reconnaissant pour chaque paquet arrivé à bon port",
+        "piday": "3,14159265358979… chargement en cours",
+        "holi": "J'éclabousse tout en RVB",
+        "shannon": "Ce statut part un bit à la fois",
+        "wtisd": "Toutes les barres, partout dans le monde",
+        "ipv6day": "Désormais avec 2¹²⁸ adresses",
+        "sysadmin": "Vous avez essayé de l'éteindre et de le rallumer ?",
+        "linux": "Juste un hobby, rien de gros ni de professionnel",
+        "tomatina": "Sous une attaque par inondation de tomates"
       },
       "festivalDesc": {
         "prgday": "Jour du programmeur — le 256ᵉ jour de l'année, 0x100 en hexadécimal",
@@ -317,7 +328,18 @@
         "earthday": "Jour de la Terre (22 avril) — même la Terre en ligne conseille un peu de Terre hors ligne",
         "turing": "Anniversaire d'Alan Turing (23 juin 1912) — le père du test de Turing",
         "emojiday": "Journée mondiale des emojis (17 juillet) — les mots, c'était le siècle dernier",
-        "birthday": "Anniversaire d'IPCheck.ing — la v1.0 est sortie le 6 novembre 2020"
+        "birthday": "Anniversaire d'IPCheck.ing — la v1.0 est sortie le 6 novembre 2020",
+        "adaday": "Journée Ada Lovelace (2ᵉ mardi d'octobre) — elle célèbre les femmes en STEM ; Ada a écrit le premier algorithme publié",
+        "dayofdead": "Día de los Muertos (1ᵉʳ–2 novembre) — le Mexique honore ses proches, jamais vraiment hors ligne",
+        "thanksgiving": "Thanksgiving (4ᵉ jeudi de novembre) — merci à chaque routeur sur le chemin",
+        "piday": "Journée de Pi (14 mars, 3.14 à l'américaine) — aussi la Journée internationale des mathématiques de l'UNESCO",
+        "holi": "Holi — la fête hindoue des couleurs accueille le printemps dans tous les codes hexadécimaux",
+        "shannon": "Anniversaire de Claude Shannon (30 avril 1916) — père de la théorie de l'information, qui nous a donné le bit",
+        "wtisd": "Journée mondiale des télécommunications et de la société de l'information (17 mai) — l'UIT a été fondée ce jour-là en 1865",
+        "ipv6day": "World IPv6 Launch (6 juin 2012) — le jour où l'IPv6 a été activé pour de bon",
+        "sysadmin": "Journée des administrateurs système (dernier vendredi de juillet) — merci à qui maintient votre uptime",
+        "linux": "25 août 1991 : Linus Torvalds annonce sur comp.os.minix son OS, « juste un hobby »",
+        "tomatina": "La Tomatina (dernier mercredi d'août) — la bataille de tomates de Buñol, en Espagne ; la seule inondation que personne ne veut filtrer"
       }
     },
     "preferences": {

@@ -299,7 +299,18 @@
         "earthday": "Logging off to touch grass",
         "turing": "This status was sent by a human. Probably.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Happy birthday, IPCheck.ing!"
+        "birthday": "Happy birthday, IPCheck.ing!",
+        "adaday": "Algorithm by Ada, since 1843",
+        "dayofdead": "Remembering those who've logged off",
+        "thanksgiving": "Grateful for every packet that made it",
+        "piday": "3.14159265358979… still loading",
+        "holi": "Splashing colors in full RGB",
+        "shannon": "Sending this one bit at a time",
+        "wtisd": "Full bars, worldwide",
+        "ipv6day": "Now with 2¹²⁸ addresses",
+        "sysadmin": "Have you tried turning it off and on again?",
+        "linux": "Just a hobby, won't be big and professional",
+        "tomatina": "Under a tomato flood attack"
       },
       "festivalDesc": {
         "prgday": "Programmers' Day — the 256th day of the year, 0x100 in hex",
@@ -317,7 +328,18 @@
         "earthday": "Earth Day (Apr 22) — even Earth Online recommends a little Earth Offline",
         "turing": "Alan Turing's birthday (Jun 23, 1912) — father of the Turing test",
         "emojiday": "World Emoji Day (Jul 17) — words are so last century",
-        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020"
+        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020",
+        "adaday": "Ada Lovelace Day (2nd Tuesday of October) — celebrating women in STEM; Ada wrote the first published algorithm",
+        "dayofdead": "Día de los Muertos (Nov 1–2) — Mexico remembers loved ones who are never truly offline",
+        "thanksgiving": "Thanksgiving (4th Thursday of November) — thanks to every router along the path",
+        "piday": "Pi Day (Mar 14, 3.14) — also UNESCO's International Day of Mathematics",
+        "holi": "Holi — the Hindu festival of colors welcomes spring in every hex code",
+        "shannon": "Claude Shannon's birthday (Apr 30, 1916) — father of information theory, who gave us the bit",
+        "wtisd": "World Telecommunication and Information Society Day (May 17) — the ITU was founded on this day in 1865",
+        "ipv6day": "World IPv6 Launch (Jun 6, 2012) — the day IPv6 switched on for good",
+        "sysadmin": "System Administrator Appreciation Day (last Friday of July) — thank whoever keeps your uptime up",
+        "linux": "Aug 25, 1991: Linus Torvalds announced his “just a hobby” OS on comp.os.minix",
+        "tomatina": "La Tomatina (last Wednesday of August) — Buñol, Spain's tomato fight; the one flood nobody wants to filter"
       }
     },
     "preferences": {

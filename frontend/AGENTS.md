@@ -155,9 +155,10 @@ stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
 ### Festival theme rides the Pulse festivals, chrome only
 
 With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
-(`data/pulse-statuses.js`; overlap → the most recently opened) dresses the
-site's chrome and nothing else: the Pulse entry shows its emoji instead of
-the globe, and its folder `components/festival/<festival id>/` (if any) supplies
+(`data/pulse-statuses.js`; overlap → the most recently opened festival that
+has a skin folder, else the most recently opened) dresses the site's chrome
+and nothing else: the Pulse entry shows its emoji instead of the globe, and
+its folder `components/festival/<festival id>/` (if any) supplies
 lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
 below the Nav: corners + sparse hanging pieces, never full-width; not on
 `isMobile`, where it covers the breadcrumb) and
@@ -165,7 +166,8 @@ below the Nav: corners + sparse hanging pieces, never full-width; not on
 per scallop through `components/festival/Garland.vue`; traits cycle over
 coprime-length lists so no repeat shows). No page effects, no token / color
 changes, no new copy. New skin = that folder (tested against the festival
-ids). `?festival=<id>` previews in DEV only.
+ids). `?festival=<id>` previews in DEV only, the Pulse panel's composer chip
+and description included.
 
 ### Status tones
 

@@ -245,7 +245,8 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { PULSE_BEACON_URL, hasPulseBackend } from '@/utils/features/pulse-beacon.js';
-import { PRESET_STATUSES, FESTIVAL_STATUSES, festivalsActiveAt } from '@/data/pulse-statuses.js';
+import { PRESET_STATUSES, FESTIVAL_STATUSES } from '@/data/pulse-statuses.js';
+import { festivalsForComposer } from '@/utils/features/festival-skin.js';
 import { playCelebration, resolveEffect } from '@/utils/features/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/features/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
@@ -280,10 +281,10 @@ const FESTIVAL_IDS = new Set(FESTIVAL_STATUSES.map((s) => s.id));
 const statusById = (id) => ALL_STATUSES.find((s) => s.id === id);
 
 // Active festival windows, re-evaluated on every Sheet open (a session can
-// outlive a window edge).
+// outlive a window edge); the DEV ?festival= preview joins them.
 const activeFestivals = ref([]);
 const refreshFestivals = () => {
-    activeFestivals.value = festivalsActiveAt();
+    activeFestivals.value = festivalsForComposer();
 };
 
 // Stats: fetched fresh on every open and after each send; previous data
