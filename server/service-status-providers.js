@@ -65,6 +65,7 @@ export const STATUS_PROVIDERS = [
     },
     { id: 'perplexity', name: 'Perplexity', api: 'https://status.perplexity.com', page: 'https://status.perplexity.com', platform: 'incident.io' },
     { id: 'canva', name: 'Canva', api: 'https://www.canvastatus.com', page: 'https://www.canvastatus.com' },
+    { id: 'dropbox', name: 'Dropbox', api: 'https://status.dropbox.com', page: 'https://status.dropbox.com' },
     { id: 'docker', name: 'Docker', api: 'https://www.dockerstatus.com', page: 'https://www.dockerstatus.com', platform: 'incident.io' },
     { id: 'bitbucket', name: 'Bitbucket', api: 'https://bitbucket.status.atlassian.com', page: 'https://bitbucket.status.atlassian.com' },
     { id: 'digitalocean', name: 'DigitalOcean', api: 'https://status.digitalocean.com', page: 'https://status.digitalocean.com' },
