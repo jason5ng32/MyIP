@@ -61,6 +61,7 @@ import { isOuiLoaded } from './server/datasets/oui-db.js';
 import { runOfflineBootstrap, requireOfflineData, isOfflineBootstrapping } from './server/offline-data.js';
 import { cacheable } from './server/cache-control.js';
 import { initUpstreamUserAgent } from './server/upstream-ua.js';
+import { createListenCallback } from './server/listen-callback.js';
 
 initUpstreamUserAgent();
 
@@ -371,9 +372,8 @@ const bootBackend = async () => {
         await reloadMaxMindDatabases('startup').catch(() => {});
     }
 
-    app.listen(backEndPort, () => {
-        logger.info(`🚀 Backend server ready on http://localhost:${backEndPort}`);
-    });
+    // A failed bind (port in use, …) exits non-zero rather than draining.
+    app.listen(backEndPort, createListenCallback({ port: backEndPort, logger }));
 
     // Watching from before the downloads: a dataset another process
     // publishes (or someone places by hand) while a boot step is still
