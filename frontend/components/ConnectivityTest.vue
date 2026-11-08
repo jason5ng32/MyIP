@@ -96,14 +96,14 @@
             </span>
             <button v-if="test.time !== 0" type="button"
               class="shrink-0 font-mono tabular-nums text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              @click="checkConnectivityHandler(test, () => { }, true)"
+              @click="testTarget(test)"
               :aria-label="t('connectivity.RefreshThisTest')"
               :title="t('connectivity.RefreshThisTest') + ' · ' + t('connectivity.minTestTime') + test.mintime + ' ms'">
               {{ test.time }}<span class="ml-0.5 text-xs md:text-sm">ms</span>
             </button>
             <button v-else-if="toneOf(test) === 'fail'" type="button"
               class="shrink-0 p-1 -m-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-              @click="checkConnectivityHandler(test, () => { }, true)"
+              @click="testTarget(test)"
               :aria-label="t('connectivity.RefreshThisTest')" :title="t('connectivity.RefreshThisTest')">
               <RotateCw class="size-3.5" />
             </button>
@@ -163,6 +163,7 @@ import { useAppCommand } from '@/composables/use-app-command.js';
 import { CONNECTIVITY_STATUS } from '@/utils/codes/connectivity.js';
 import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { siteUrlOf, removeMember } from '@/utils/features/connectivity-lists.js';
+import { createGridPublisher } from '@/utils/features/connectivity-grid.js';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -263,9 +264,11 @@ watch(
 
     // Drop members no longer stored.
     const memberIds = new Set(members.map((m) => m.id));
+    let removed = false;
     for (let i = connectivityTests.length - 1; i >= 0; i--) {
       if (!memberIds.has(connectivityTests[i].id)) {
         connectivityTests.splice(i, 1);
+        removed = true;
       }
     }
 
@@ -279,9 +282,11 @@ watch(
       // themselves right away instead of sitting at "Awaiting Test".
       if (isStarted.value) {
         entry.status = t('connectivity.StatusTesting');
-        checkConnectivityHandler(entry, () => { }, true);
+        testTarget(entry);
       }
     }
+    // A removal changes the grid's results: publish it once testing started.
+    if (removed && isStarted.value) grid.publish();
   },
   { immediate: true, deep: true },
 );
@@ -382,7 +387,9 @@ const probeOnce = async (url) => {
   }
 };
 
-const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
+// One target's request(s), written into its card; resolves with its verdict.
+// A check from an earlier run writes nothing.
+const probeTarget = async (test, isManualRun) => {
   manualRun.value = isManualRun;
   const runId = runSeq;
   // Only multi-cycle passes feed the dot history; per-card refreshes skip it.
@@ -392,17 +399,11 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
   try {
     if (discardFirst) {
       await probeOnce(test.url);
-      if (runId !== runSeq) {
-        onTestComplete(true);
-        return;
-      }
+      if (runId !== runSeq) return true;
     }
     const beginTime = performance.now();
     await probeOnce(test.url);
-    if (runId !== runSeq) {
-      onTestComplete(true);
-      return;
-    }
+    if (runId !== runSeq) return true;
     const testTime = Math.round(performance.now() - beginTime);
     test.status = t('connectivity.StatusAvailable');
     // Locale-free twin of the localized status label, consumed by the report
@@ -412,12 +413,9 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     test.mintime = test.mintime === 0 ? testTime : Math.min(test.mintime, testTime);
     test.time = recordRound ? test.mintime : testTime;
     if (recordRound) test.roundResults.push({ tone: testTime < 200 ? 'ok-fast' : 'ok-slow', time: testTime });
-    onTestComplete(true);
+    return true;
   } catch {
-    if (runId !== runSeq) {
-      onTestComplete(false);
-      return;
-    }
+    if (runId !== runSeq) return false;
     // Best-of-N: in multi mode a later failure doesn't downgrade a card
     // that already succeeded (mintime > 0). The dot row still records the
     // real 'fail' — it's per-round history, separate from the face/text.
@@ -431,17 +429,47 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
       test.statusCode = CONNECTIVITY_STATUS.UNREACHABLE;
     }
     if (recordRound) test.roundResults.push({ tone: 'fail', time: 0 });
-    onTestComplete(false);
+    return false;
   }
+};
+
+// Grid publisher (utils/features/connectivity-grid.js): counts the target
+// requests in flight, holds whether rounds are left, emits the whole grid
+// as `connectivity:finished` with `settled` = neither.
+const grid = createGridPublisher({
+  readTests: () => connectivityTests,
+  emit: (payload) => emitAppEvent('connectivity:finished', payload),
+});
+
+// Every target request, pass or single card, is counted in flight until its
+// verdict lands (success, failure or timeout), then reported.
+const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
+  grid.requestStarted();
+  let isSuccess = false;
+  try {
+    isSuccess = await probeTarget(test, isManualRun);
+  } finally {
+    grid.requestFinished();
+  }
+  onTestComplete(isSuccess);
+  return isSuccess;
+};
+
+// A single card's test (its retest button, or a card added after start)
+// publishes the grid once it lands.
+const testTarget = async (test) => {
+  await checkConnectivityHandler(test, () => { }, true);
+  grid.publish();
 };
 
 // Pass generation counter: overlapping passes (a manual refresh over a
 // still-running boot pass, or multi-round ticks outlasting their interval)
-// share the per-target state, so only the newest pass may judge and report
-// it — a superseded pass just resolves.
+// share the per-target state, so only the newest pass may judge and publish
+// it — a superseded pass publishes only a grid it leaves settled.
+// `onSettle` (round bookkeeping) runs for every pass, before it publishes.
 let passSeq = 0;
 
-const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
+const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun, onSettle = () => { }) => {
   // Sticky false→true; interval ticks must not overwrite the bootstrap's `true`.
   if (isAlertToShow) alertToShow.value = true;
   const passId = ++passSeq;
@@ -477,6 +505,8 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
 
     Promise.allSettled(testPromises).then(() => {
       if (passId !== passSeq) {
+        onSettle();
+        grid.settleIfIdle();
         resolve();
         return;
       }
@@ -490,19 +520,11 @@ const checkAllConnectivity = (isAlertToShow, isRefresh, isManualRun) => {
       const allOk = finished.every((test) => test.statusCode === CONNECTIVITY_STATUS.OK);
       updateConnectivityAlert(allOk ? 'success' : 'error');
       hasEverSettled.value = true;
+      onSettle();
       // Domain event: deliberately the whole grid, not just this pass —
       // the report is a latest-wins snapshot, and a mid-pass addition with
       // a real result is accurate information there.
-      emitAppEvent('connectivity:finished', {
-        targets: connectivityTests.map((test) => ({
-          id: test.id,
-          name: test.name,
-          custom: test.id.startsWith('custom-'),
-          statusCode: test.statusCode,
-          time: test.time,
-          mintime: test.mintime,
-        })),
-      });
+      grid.publish();
       resolve();
     });
 
@@ -592,6 +614,7 @@ const finalizeMultiTestAlert = () => {
 // only entry point, and the rounds preference must still hold there.
 const handelCheckStart = async (trigger = 'boot') => {
   runSeq += 1;
+  const runId = runSeq;
   const multi = multipleTests.value;
   const isAuto = trigger === 'boot';
   const showToast = trigger !== 'refresh';
@@ -611,25 +634,42 @@ const handelCheckStart = async (trigger = 'boot') => {
       test.mintime = 0;
     });
   }
+  // Rounds are left from round 1 until the loop ends (final count or a
+  // card click); single mode has none.
+  grid.setRoundsLeft(multi);
   await checkAllConnectivity(showToast, resetCards, !multi && !isAuto);
+  // A run started meanwhile owns the loop and its bookkeeping.
+  if (runId !== runSeq) return;
   store.setLoadingStatus('Connectivity', true);
   if (multi) {
     if (intervalId.value !== null) clearInterval(intervalId.value);
+    // Ends this run's loop; a later run's loop is not this one's to end.
+    const stopRounds = () => {
+      if (runId !== runSeq) return;
+      clearInterval(intervalId.value);
+      intervalId.value = null;
+      grid.setRoundsLeft(false);
+    };
+    // Counts a round as its pass settles, before the pass publishes, so the
+    // final round's grid goes out settled.
+    const countRound = () => {
+      if (runId !== runSeq) return;
+      counter.value++;
+      if (counter.value >= maxCounts.value) {
+        // Final round — re-aggregate and unlock the toast pipeline.
+        finalizeMultiTestAlert();
+        allRoundsDone.value = true;
+        stopRounds();
+      }
+    };
     intervalId.value = setInterval(async () => {
       if (counter.value < maxCounts.value && !manualRun.value) {
-        await checkAllConnectivity(false, false, false);
-        counter.value++;
-        if (counter.value >= maxCounts.value) {
-          // Final round — re-aggregate and unlock the toast pipeline.
-          finalizeMultiTestAlert();
-          allRoundsDone.value = true;
-          clearInterval(intervalId.value);
-          intervalId.value = null;
-        }
+        await checkAllConnectivity(false, false, false, countRound);
       } else {
         // User took over (card click) — stop and suppress the auto-toast.
-        clearInterval(intervalId.value);
-        intervalId.value = null;
+        // Still in flight: the last one to land publishes the settled grid.
+        stopRounds();
+        grid.settleIfIdle();
       }
     }, 500);
   } else {
@@ -639,7 +679,8 @@ const handelCheckStart = async (trigger = 'boot') => {
 
 // Command owner: run the connectivity pass. `trigger` keeps handelCheckStart's
 // toast / card-reset semantics; resolves with the next connectivity:finished
-// snapshot (the first pass in multi-round mode).
+// snapshot — normally this run's first pass (unsettled in multi-round mode),
+// unless another grid change (a card test, a removal) lands first.
 useAppCommand('connectivity:run', ({ trigger = 'manual' } = {}) => {
   const finished = waitForAppEvent('connectivity:finished');
   handelCheckStart(trigger);

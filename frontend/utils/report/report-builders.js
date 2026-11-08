@@ -97,7 +97,10 @@ const buildIpinfo = (payload) => {
     return cards.length ? { cards } : null;
 };
 
-// connectivity:finished — { targets: [{ id, name, custom, statusCode, time, mintime }] }
+// connectivity:finished — { settled, targets: [{ id, name, custom, statusCode, time, mintime }] }
+// The whole grid, on every change to its results; `settled` (false while
+// requests are in flight or rounds are left) is the snapshot recorder's;
+// the report ignores it.
 // statusCode is the locale-free enum the component records next to its
 // localized status label; targets still waiting carry none and are dropped.
 const CONNECTIVITY_STATUSES = new Set(Object.values(CONNECTIVITY_STATUS));
