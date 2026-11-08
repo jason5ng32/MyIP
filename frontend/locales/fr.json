@@ -361,6 +361,8 @@
         "defaultListTips": "La liste affichée par la section au chargement de la page.",
         "multipleTests": "Rafraîchissements multiples",
         "multipleTestsTips": "Effectue plusieurs vérifications par passage et affiche le délai le plus bas.",
+        "discardFirstResult": "Ignorer le premier résultat",
+        "discardFirstResultTips": "Envoie d'abord une requête de préchauffage non chronométrée, pour que le délai affiché exclue la résolution DNS et l'établissement de la connexion.",
         "notifications": "Alertes pop-up",
         "notificationsTips": "Affiche les résultats de la première vérification sous forme d'alerte pop-up.",
         "titleOpensSite": "Le titre de la carte ouvre le site",

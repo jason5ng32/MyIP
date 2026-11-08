@@ -361,6 +361,8 @@
         "defaultListTips": "A lista exibida pela seção quando a página carrega.",
         "multipleTests": "Múltiplas atualizações",
         "multipleTestsTips": "Executa várias verificações por rodada e exibe a menor latência.",
+        "discardFirstResult": "Descartar primeiro resultado",
+        "discardFirstResultTips": "Envia primeiro uma requisição de aquecimento não cronometrada, para que a latência exibida não inclua a consulta DNS e o estabelecimento da conexão.",
         "notifications": "Alertas pop-up",
         "notificationsTips": "Mostra os resultados da verificação inicial como alerta pop-up.",
         "titleOpensSite": "Título do cartão abre o site",

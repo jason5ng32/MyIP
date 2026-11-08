@@ -361,6 +361,8 @@
         "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",
         "multipleTests": "多次重新整理",
         "multipleTestsTips": "每輪檢測執行多次，並顯示最低延遲。",
+        "discardFirstResult": "捨棄首次結果",
+        "discardFirstResultTips": "先送出一次不計時的預熱請求，顯示的延遲不再包含 DNS 解析與建立連線的時間。",
         "notifications": "彈出通知",
         "notificationsTips": "初次檢查完成後，以彈出通知顯示結果。",
         "titleOpensSite": "點擊標題開啟網站",

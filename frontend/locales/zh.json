@@ -361,6 +361,8 @@
         "defaultListTips": "打开页面时，连通性测试默认显示的列表。",
         "multipleTests": "多次刷新",
         "multipleTestsTips": "每轮检测运行多次，并显示最小延迟值。",
+        "discardFirstResult": "丢弃首次结果",
+        "discardFirstResultTips": "先发一次不计时的预热请求，显示的延迟不再包含 DNS 解析与建立连接的耗时。",
         "notifications": "气泡提示",
         "notificationsTips": "首次检测完成后，以气泡形式提示结果。",
         "titleOpensSite": "点击标题打开网站",

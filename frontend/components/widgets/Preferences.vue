@@ -107,8 +107,9 @@
           <SectionTip>{{ t('nav.preferences.autoRunTips') }}</SectionTip>
         </section>
 
-        <!-- Connectivity Test: default list + its three switches. Labels
-                     stay terse; the section title carries the context. -->
+        <!-- Connectivity Test: default list + its switches (Discard First
+                     Result only in single-refresh mode). Labels stay terse;
+                     the section title carries the context. -->
         <section id="Pref_connectivity">
           <SectionTitle :icon="Activity">{{ t('nav.Connectivity') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
@@ -137,6 +138,12 @@
               :tip="t('nav.preferences.connectivity.multipleTestsTips')"
               :model-value="userPreferences.connectivityMultipleTests"
               @update:model-value="prefConnectivityMultipleTests" />
+
+            <PrefRow v-if="!userPreferences.connectivityMultipleTests" id="ConnectivityDiscardFirstResult"
+              :label="t('nav.preferences.connectivity.discardFirstResult')"
+              :tip="t('nav.preferences.connectivity.discardFirstResultTips')"
+              :model-value="userPreferences.connectivityDiscardFirstResult"
+              @update:model-value="prefConnectivityDiscardFirstResult" />
 
             <PrefRow id="ConnectivityNotifications" :label="t('nav.preferences.connectivity.notifications')"
               :tip="t('nav.preferences.connectivity.notificationsTips')"
@@ -340,6 +347,11 @@ const prefconnectivityShowNoti = (value) => {
 const prefConnectivityCardTitleOpensSite = (value) => {
   store.updatePreference('connectivityCardTitleOpensSite', value);
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityCardTitleOpensSite');
+};
+
+const prefConnectivityDiscardFirstResult = (value) => {
+  store.updatePreference('connectivityDiscardFirstResult', value);
+  trackEvent('Nav', 'PrefereceClick', 'ConnectivityDiscardFirstResult');
 };
 
 // Snapshots: automatic recording, its label card and retention (options

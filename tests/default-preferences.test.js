@@ -15,6 +15,7 @@ describe('DEFAULT_PREFERENCES', () => {
     assert.deepEqual(DEFAULT_PREFERENCES, {
       theme: 'auto',
       connectivityMultipleTests: true,
+      connectivityDiscardFirstResult: true,
       simpleMode: false,
       autoRunConnectivity: true,
       autoRunWebRTC: true,

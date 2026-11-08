@@ -361,6 +361,8 @@
         "defaultListTips": "The list the section opens on when the page loads.",
         "multipleTests": "Multiple Refreshes",
         "multipleTestsTips": "Run several checks per pass and show the lowest latency.",
+        "discardFirstResult": "Discard First Result",
+        "discardFirstResultTips": "Send an untimed warm-up request first, so the latency shown leaves out DNS lookup and connection setup.",
         "notifications": "Pop-up Alerts",
         "notificationsTips": "Show the initial check's results as a pop-up alert.",
         "titleOpensSite": "Card Title Opens Website",
