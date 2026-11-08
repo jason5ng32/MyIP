@@ -310,8 +310,9 @@
   <!-- Boot quips + fake progress. The copy lives inline (not in vue-i18n)
       because it runs before Vue loads; every full locale ships here (beta ones
       are welcome but not required) and the language pick mirrors
-      frontend/locales/i18n.js (stored prefs → ?hl= → browser language → en).
-      tests/index-html-i18n.test.js holds both to common/locale-registry.js.
+      frontend/locales/i18n.js (stored prefs → ?hl= → browser language → en);
+      it also sets <html lang>. tests/index-html-i18n.test.js holds both to
+      common/locale-registry.js.
       The progress is time-driven make-believe: one
       quip every 1.5s, width easing toward a 92% cap. App.vue's hand-off
       removes the overlay the moment Vue mounts and is never delayed by the
@@ -413,6 +414,10 @@
       // among them and then resolve to a neighbour or to English.
       const QUIP_LANGS = Object.keys(QUIPS);
 
+      // A boot language's <html lang>, where it isn't the code itself
+      // (htmlLang in common/locale-registry.js).
+      const HTML_LANGS = { zh: 'zh-CN' };
+
       const pickLang = () => {
         const prefs = window.jnReadPrefs ? window.jnReadPrefs() : {};
         const hl = new URLSearchParams(window.location.search).get('hl');
@@ -424,6 +429,11 @@
 
       const lang = pickLang();
       const quips = QUIPS[lang];
+
+      // Declared before the browser reads it for its translate offer: on the
+      // shipped lang="en", Chromium takes the localized UI for English and
+      // translates it. i18n.js sets it again once the locale pack loads.
+      document.documentElement.lang = HTML_LANGS[lang] ?? lang;
 
       const hintEl = document.getElementById('jn-loading-slow-hint');
       if (hintEl) hintEl.innerHTML = SLOW_HINTS[lang];

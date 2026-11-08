@@ -15,6 +15,58 @@ const DNS_TIMEOUT_MS = 3000;
 const DOH_TIMEOUT_MS = 5000;
 const DNS_AVAILABILITY_ERRORS = new Set(['ETIMEOUT', 'ECONNREFUSED', 'EREFUSED']);
 
+// A row with no answer: `result` stays 'N/A' for existing consumers, `status`
+// is the failure class the UI labels, `code` the raw identifier it shows.
+const failure = ({ status, code }) => ({ result: 'N/A', status, code });
+
+// c-ares error code → failure class. Codes that are DNS RCODEs display under
+// their RCODE name; the rest show the Node code as-is.
+const UDP_ERROR_CLASSES = {
+    ENODATA: { status: 'nodata', code: 'NODATA' },
+    ENOTFOUND: { status: 'nxdomain', code: 'NXDOMAIN' },
+    ESERVFAIL: { status: 'servfail', code: 'SERVFAIL' },
+    EREFUSED: { status: 'refused', code: 'REFUSED' },
+    ENOTIMP: { status: 'refused', code: 'NOTIMP' },
+    ETIMEOUT: { status: 'timeout', code: 'TIMEOUT' },
+    EFORMERR: { status: 'malformed', code: 'FORMERR' },
+    EBADRESP: { status: 'malformed', code: 'EBADRESP' },
+    EOF: { status: 'malformed', code: 'EOF' },
+    EBADQUERY: { status: 'malformed', code: 'EBADQUERY' },
+    EBADNAME: { status: 'malformed', code: 'EBADNAME' },
+    EBADSTR: { status: 'malformed', code: 'EBADSTR' },
+};
+
+// Anything unlisted (ECONNREFUSED, ECANCELLED, a code-less throw) means the
+// resolver itself couldn't serve the query.
+export const classifyDnsError = (error) => {
+    const code = typeof error?.code === 'string' ? error.code : '';
+    return UDP_ERROR_CLASSES[code] ?? { status: 'unavailable', code: code || 'ERROR' };
+};
+
+// DoH JSON `Status` (the DNS RCODE) → failure class. Status 0 is decided by
+// whether records came back (see classifyDohEnvelope); RCODEs outside this
+// table (YXDOMAIN, NOTAUTH, …) never answer a plain query, so they read as
+// the resolver misbehaving.
+const DOH_RCODE_CLASSES = {
+    1: { status: 'malformed', code: 'FORMERR' },
+    2: { status: 'servfail', code: 'SERVFAIL' },
+    3: { status: 'nxdomain', code: 'NXDOMAIN' },
+    4: { status: 'refused', code: 'NOTIMP' },
+    5: { status: 'refused', code: 'REFUSED' },
+};
+
+export const classifyDohHttpStatus = (httpStatus) => ({ status: 'unavailable', code: `HTTP ${httpStatus}` });
+
+// undici's own timeouts surface as a `fetch failed` TypeError whose cause
+// carries one of these; fetchUpstream's deadline is an AbortError.
+const FETCH_TIMEOUT_CODES = new Set(['UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT', 'ETIMEDOUT']);
+
+export const classifyDohFetchError = (error) => {
+    const code = error?.cause?.code ?? error?.code;
+    if (error?.name === 'AbortError' || FETCH_TIMEOUT_CODES.has(code)) return { status: 'timeout', code: 'TIMEOUT' };
+    return { status: 'unavailable', code: typeof code === 'string' && code ? code : 'FETCH' };
+};
+
 const logDnsFailure = (error, server, provider) => {
     // warn+ mirrors to telemetry and a DNS err.message carries the queried
     // hostname, so the availability branch logs the code alone; the local-only
@@ -73,8 +125,28 @@ export const dohRecords = (data, type) => {
     return (data.Authority ?? []).filter((record) => record.type === SOA_RECORD_TYPE);
 };
 
-// Resolve via classic UDP DNS. Returns the raw result value: an array of
-// strings, a formatted record string, or 'N/A' on empty/failure.
+const isSection = (value) => value === undefined
+    || (Array.isArray(value) && value.every((record) => record && typeof record === 'object'));
+
+// A parsed DoH JSON body → `{ status: 'ok', records }` or a failure class.
+// A body that isn't a JSON-API envelope (no numeric Status, sections that
+// aren't arrays of records, answers without a `data` string) is `malformed`.
+export const classifyDohEnvelope = (data, type) => {
+    const malformed = { status: 'malformed', code: 'BADRESP' };
+    if (!data || typeof data !== 'object' || Array.isArray(data)
+        || !Number.isInteger(data.Status) || !isSection(data.Answer) || !isSection(data.Authority)) {
+        return malformed;
+    }
+    if (data.Status !== 0) {
+        return DOH_RCODE_CLASSES[data.Status] ?? { status: 'unavailable', code: `RCODE ${data.Status}` };
+    }
+    const records = dohRecords(data, type);
+    if (!records.every((record) => typeof record?.data === 'string')) return malformed;
+    return records.length ? { status: 'ok', records } : { status: 'nodata', code: 'NODATA' };
+};
+
+// Resolve via classic UDP DNS. Resolves to `{ result, status: 'ok' }` with an
+// array of strings or a formatted record string, or a failure row.
 const resolveDns = async (hostname, type, name, server) => {
     const resolver = new Resolver({ timeout: DNS_TIMEOUT_MS, tries: 1 });
     resolver.setServers([server]);
@@ -118,36 +190,53 @@ const resolveDns = async (hostname, type, name, server) => {
         if (NAME_VALUED_TYPES.has(type)) addresses = addresses.map(withRootDot);
 
         if (addresses.length === 0 || addresses === '' || addresses === null) {
-            return 'N/A';
+            return failure({ status: 'nodata', code: 'NODATA' });
         }
 
-        return addresses;
+        return { result: addresses, status: 'ok' };
     } catch (error) {
         logDnsFailure(error, server, name);
-        return 'N/A';
+        return failure(classifyDnsError(error));
     }
 };
 
-// Resolve via the DNS-over-HTTPS JSON API. Same return semantics as
-// resolveDns. `url` is a prefix ending in '?' or '&' (see the data file).
+// Resolve via the DNS-over-HTTPS JSON API. Same return shape as resolveDns.
+// `url` is a prefix ending in '?' or '&' (see the data file). Only transport
+// failures warn; an RCODE or unreadable body depends on the queried name or is
+// the provider's own answer, so it stays at debug.
 const resolveDoh = async (hostname, type, name, url) => {
+    let body;
     try {
         const response = await fetchUpstream(`${url}name=${hostname}&type=${type}`, {
             timeoutMs: DOH_TIMEOUT_MS,
             headers: { 'Accept': 'application/dns-json' }
         });
         if (!response.ok) {
-            logger.warn({ server: name, code: response.status }, 'DoH resolver: upstream returned a non-2xx response');
-            return 'N/A';
+            const outcome = classifyDohHttpStatus(response.status);
+            logger.warn({ server: name, code: outcome.code }, 'DoH resolver: upstream returned a non-2xx response');
+            return failure(outcome);
         }
-        const records = dohRecords(await response.json(), type);
-        if (records.length === 0) return 'N/A';
-        const addresses = records.map((record) => record.data);
-        return NAME_VALUED_TYPES.has(type) ? addresses.map(withRootDot) : addresses;
+        body = await response.text();
     } catch (error) {
-        logger.warn({ err: error, server: name, code: error?.code }, 'DoH resolver: lookup failed, returning N/A');
-        return 'N/A';
+        const outcome = classifyDohFetchError(error);
+        logger.warn({ err: error, server: name, code: outcome.code }, 'DoH resolver: lookup failed, returning N/A');
+        return failure(outcome);
     }
+
+    let data;
+    try {
+        data = JSON.parse(body);
+    } catch {
+        logger.debug({ server: name, code: 'BADJSON' }, 'DoH resolver: response is not JSON, returning N/A');
+        return failure({ status: 'malformed', code: 'BADJSON' });
+    }
+    const outcome = classifyDohEnvelope(data, type);
+    if (outcome.status !== 'ok') {
+        logger.debug({ server: name, code: outcome.code }, 'DoH resolver: no answer, returning N/A');
+        return failure(outcome);
+    }
+    const addresses = outcome.records.map((record) => record.data);
+    return { result: NAME_VALUED_TYPES.has(type) ? addresses.map(withRootDot) : addresses, status: 'ok' };
 };
 
 const dnsResolver = async (req, res) => {
@@ -163,26 +252,26 @@ const dnsResolver = async (req, res) => {
 
     // One lookup task per entry × protocol, in stable order: data-file order,
     // udp before doh within a provider. Each task resolves to one row of the
-    // response; failures collapse to result 'N/A' inside the resolvers, so
-    // Promise.all never rejects here.
+    // response; failures become a classified 'N/A' row inside the resolvers,
+    // so Promise.all never rejects here.
     const lookups = DNS_RESOLVERS.flatMap((server) => {
         const tasks = [];
         if (server.udp) {
-            tasks.push(resolveDns(hostname, type, server.name, server.udp).then((result) => ({
+            tasks.push(resolveDns(hostname, type, server.name, server.udp).then((outcome) => ({
                 id: server.id,
                 provider: server.name,
                 country: server.country,
                 type: 'udp',
-                result,
+                ...outcome,
             })));
         }
         if (server.doh) {
-            tasks.push(resolveDoh(hostname, type, server.name, server.doh).then((result) => ({
+            tasks.push(resolveDoh(hostname, type, server.name, server.doh).then((outcome) => ({
                 id: server.id,
                 provider: server.name,
                 country: server.country,
                 type: 'doh',
-                result,
+                ...outcome,
             })));
         }
         return tasks;

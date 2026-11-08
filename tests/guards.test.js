@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import express from 'express';
+import logger from '../server/logger.js';
 
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -47,6 +48,46 @@ describe('requireReferer', () => {
         assert.equal(res.statusCode, 403);
         assert.equal(res.body.error, 'Access denied');
         assert.equal(nextCalled, false);
+    });
+
+    it('logs the first rejection per host at info, then stays quiet', () => {
+        const lines = [];
+        const originalInfo = logger.info;
+        logger.info = (...args) => lines.push(args);
+        resetRefererRejectionLog();
+        try {
+            const hit = (referer) => requireReferer(makeReq({ referer }), makeRes(), () => {});
+            hit('http://192.168.1.10:18966/');
+            hit('http://192.168.1.10:18966/tools');
+            hit('http://other.example/');
+            hit(undefined);
+            hit(undefined);
+            hit('http://localhost/');
+            assert.equal(lines.length, 3);
+            assert.deepEqual(lines[0][0], { host: '192.168.1.10' });
+            assert.match(lines[0][1], /"192\.168\.1\.10".*ALLOWED_DOMAINS/);
+            assert.deepEqual(lines[1][0], { host: 'other.example' });
+            assert.match(lines[2][0], /without a Referer/);
+        } finally {
+            logger.info = originalInfo;
+            resetRefererRejectionLog();
+        }
+    });
+
+    it('caps the hosts it remembers', () => {
+        let count = 0;
+        const originalInfo = logger.info;
+        logger.info = () => { count += 1; };
+        resetRefererRejectionLog();
+        try {
+            for (let i = 0; i < 80; i += 1) {
+                requireReferer(makeReq({ referer: `http://scan${i}.example/` }), makeRes(), () => {});
+            }
+            assert.equal(count, 50);
+        } finally {
+            logger.info = originalInfo;
+            resetRefererRejectionLog();
+        }
     });
 });
 

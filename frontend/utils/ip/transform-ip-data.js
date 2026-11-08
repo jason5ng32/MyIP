@@ -53,9 +53,10 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 
 // Gated sentinels the backend may substitute for the real advanced fields:
 // signed-out visitors get 'sign_in_required', over-quota users get
-// 'quota_exceeded'. Both propagate as-is so the UI can pick the right CTA.
-const gatedSentinel = (value) =>
-    value === 'sign_in_required' || value === 'quota_exceeded' ? value : null;
+// 'quota_exceeded', and an account whose advanced data is paused for a while
+// gets 'cooldown'. All propagate as-is so the UI can pick the right CTA.
+const GATED_SENTINELS = new Set(['sign_in_required', 'quota_exceeded', 'cooldown']);
+const gatedSentinel = (value) => (GATED_SENTINELS.has(value) ? value : null);
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 

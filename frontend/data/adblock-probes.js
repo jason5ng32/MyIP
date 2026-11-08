@@ -13,7 +13,7 @@
 // to http:// or in a loop: any of those fails like a block and reads as
 // "blocked". Bump ADBLOCK_PROBES_VERSION whenever the list changes.
 
-export const ADBLOCK_PROBES_VERSION = '2026-10-23';
+export const ADBLOCK_PROBES_VERSION = '2026-11-05';
 
 export const ADBLOCK_PROBE_GROUPS = [
     {
@@ -37,6 +37,8 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'unity-ads', name: 'Unity Ads', targets: ['auction.unityads.unity3d.com', 'config.unityads.unity3d.com', 'adserver.unityads.unity3d.com'] },
             { id: 'ironsource', name: 'ironSource', targets: ['outcome-ssp.supersonicads.com', 'init.supersonicads.com'] },
             { id: 'pangle', name: 'Pangle', targets: ['api16-access-sg.pangle.io', 'pangolin16.isnssdk.com'] },
+            { id: 'baidu-union', name: 'Baidu Union', targets: ['cpro.baidustatic.com', 'pos.baidu.com', 'eclick.baidu.com'] },
+            { id: 'tencent-gdt', name: 'Tencent GDT', targets: ['t.gdt.qq.com', 'mi.gdt.qq.com'] },
         ],
     },
     {
@@ -63,6 +65,10 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'adjust', name: 'Adjust', targets: ['app.adjust.com'] },
             { id: 'appsflyer', name: 'AppsFlyer', targets: ['t.appsflyer.com', 'events.appsflyer.com'] },
             { id: 'branch', name: 'Branch', targets: ['api2.branch.io', 'cdn.branch.io'] },
+            { id: 'baidu-tongji', name: 'Baidu Tongji', targets: ['hm.baidu.com'] },
+            { id: 'cnzz', name: 'CNZZ', targets: ['w.cnzz.com', 's11.cnzz.com', 's4.cnzz.com'] },
+            { id: '51la', name: '51.LA', targets: ['js.users.51.la'] },
+            { id: 'growingio', name: 'GrowingIO', targets: ['api.growingio.com', 'assets.growingio.com'] },
         ],
     },
     {

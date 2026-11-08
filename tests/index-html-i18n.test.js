@@ -141,11 +141,31 @@ describe('index.html markup — declared languages', () => {
     });
 
     it('<html lang> ships the fallback locale', () => {
-        // Pre-Vue default only — i18n.js rewrites it to the active locale once
-        // the bundle boots.
+        // Default only — the boot script rewrites it to its pick during
+        // parsing, i18n.js to the active locale once the bundle boots.
         const match = html.match(/<html lang="([^"]+)"/);
         assert.ok(match, 'index.html: <html> has no lang attribute');
         assert.equal(match[1], toHtmlLang(FALLBACK_LOCALE));
+    });
+});
+
+describe('index.html HTML_LANGS — the boot <html lang>', () => {
+    // The boot script declares `HTML_LANGS[lang] ?? lang` for the language it
+    // picked from QUIPS, before the bundle's i18n.js can.
+    const HTML_LANGS = evalDeclaration('HTML_LANGS');
+
+    for (const code of Object.keys(QUIPS)) {
+        it(`declares ${code} as its registry htmlLang`, () => {
+            assert.equal(HTML_LANGS[code] ?? code, toHtmlLang(code),
+                `index.html HTML_LANGS: "${code}" must map to its htmlLang in common/locale-registry.js`);
+        });
+    }
+
+    it('only lists boot languages whose htmlLang differs from the code', () => {
+        for (const [code, htmlLang] of Object.entries(HTML_LANGS)) {
+            assert.ok(code in QUIPS, `index.html HTML_LANGS: "${code}" has no boot copy`);
+            assert.notEqual(htmlLang, code, `index.html HTML_LANGS: "${code}" maps to itself — drop it`);
+        }
     });
 });
 

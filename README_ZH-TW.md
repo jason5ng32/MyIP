@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 一個開源的多合一 IP 工具箱：多來源 IP 查詢、連通性測試、WebRTC 與 DNS 洩漏偵測、網速測試、MTR、審查封鎖檢查、Whois 等——一條 Docker 指令即可自行架設。
 
@@ -65,6 +65,7 @@
 * 📓 **Whois 查詢**：對網域名稱、IP 位址與 AS 編號進行 Whois 查詢。
 * 🗄️ **MAC 位址查詢**：識別實體位址背後的廠商與詳細資訊。
 * 🧮 **IP 計算器**：對任意 IP、前綴、範圍或清單做子網路計算、進位轉換與 IPv6 介面解讀，全部本機完成。
+* 🧾 **IP 批次查詢**：貼上 IP 清單或伺服器原始日誌（Nginx、Apache、防火牆、CDN 等），快速查詢所有 IP 的地理位置。
 * 🛰️ **ASN 資訊與上游拓撲**：直接在每張 IP 卡片中顯示 AS 詳細資訊、該 IP 前綴的歷史宣告記錄，以及其 ASN 到 Tier 1 骨幹網路的上游路徑。
 * 🛂 **ASN 檔案**：任意 AS 的完整檔案——註冊資訊與原始 Whois 記錄、全球排名與規模、流量組成與連線品質、IPv4 位址分布在哪些國家、所有宣告前綴及其 RPKI 狀態、上游／對等／客戶網路，以及它進駐的網際網路交換中心與資料中心。
 * 📶 **服務可用性**：知名服務（Claude、OpenAI、GitHub、Cloudflare 等）的即時可用狀態，資料來自它們的官方狀態頁，並附最近的事故。

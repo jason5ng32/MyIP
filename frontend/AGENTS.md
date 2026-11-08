@@ -18,7 +18,7 @@ frontend/
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
-└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ ui/
+└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
 ```
 
 Every file opens with a header comment stating its purpose — read those.
@@ -99,6 +99,20 @@ chrome); tools register at setup, callers `waitForAppCommand` first.
   above the largest backend section deadline (tested).
 - ASN Info's footer links `/tools/asn?q=AS<n>` (hidden when gated off); in
   QueryIP it emits `open-tool` via IpDetailPanel so the dialog closes first.
+  The dialog is `widgets/QueryIPDialog.vue` (v-model `open`, optional `ip` to
+  run): Home's FAB and tool pages (Bulk IP Lookup) each mount their own.
+
+### Bulk IP Lookup
+
+Rows live in localStorage (`use-bulk-lookup.js`), geography from
+`/api/bulk-lookup` only: a run is split into requests of `BULK_LOOKUP_MAX_IPS`
+(`common/bulk-lookup-limits.js`), stored as each lands, the rest parked in
+`paused` when a later one fails (Continue sends only those). Overview and
+Clear all cover the whole list; the toolbar under them scopes both tabs
+(`scopedRows`): search with `country:` / `asn:` / `block:` tokens, batch,
+starred. Analysis entries toggle those tokens (`toggleQueryPick`), never a tab
+switch. Anything per IP stays single-IP: a row opens the QueryIP dialog or
+links to the Blocklist tool — no bulk path to the private API.
 
 ### Overlays take no keyboard shortcuts
 
@@ -123,7 +137,8 @@ masked; in the privacy policy). No backend 5xx capture; envelopes: `/api/monitor
 
 **shadcn-vue first:** `components/ui/`, then the shadcn-vue docs; hand-rolled
 Tailwind only when neither fits. Keep on upstream syncs: `Spinner` +
-`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair, the
+`ToolLoadingSkeleton`, `toggle` / `toggle-group`'s `primary` pressed pair,
+`pagination`'s `max-sm:hidden` labels (upstream `hidden sm:block`), the
 overlay roots' shortcut suspension, `select`'s trigger geometry (`py-1` + flex
 value span, not `-webkit-box` — Safari shifts it ~2px). CLI trap: `shadcn-vue
 add` here writes `import { cn } from "cn"` and installs the unrelated `cn`
@@ -136,6 +151,24 @@ package — drop the dependency, import from `@/lib/utils`.
 never `dark:` pairs. Button adds `action` / `success`; Badge adds `success`,
 hover disabled (wrap it to interact). FAB colors: `action` trigger, `default`
 stateless panel, `success` protective state on, `secondary` dock; ≤ 2 accents.
+
+### Festival theme rides the Pulse festivals, chrome only
+
+With build-time `VITE_FESTIVAL_SKINS="true"`, a Pulse festival in its window
+(`data/pulse-statuses.js`; overlap → the most recently opened festival that
+has a skin folder, else the most recently opened) dresses the site's chrome
+and nothing else: the Pulse entry shows its emoji instead of the globe, and
+its folder `components/festival/<festival id>/`, when it exists, supplies all
+three parts (a skin is all-or-nothing; without the folder the festival is
+emoji-only): lazy `Logo.vue` (over the brand icon, in its viewBox), `NavTrim.vue` (hangs
+below the Nav: corners + sparse hanging pieces, never full-width; not on
+`isMobile`, where it covers the breadcrumb) and
+`FooterTrim.vue` (a full-width garland in the footer's top padding, drawn
+per scallop through `components/festival/Garland.vue`; traits cycle over
+coprime-length lists so no repeat shows). No page effects, no token / color
+changes, no new copy. New skin = that folder (tested against the festival
+ids). `?festival=<id>` previews in DEV only, the Pulse panel's composer chip
+and description included.
 
 ### Status tones
 

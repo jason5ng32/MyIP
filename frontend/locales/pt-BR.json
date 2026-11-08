@@ -15,7 +15,10 @@
       "Note": "Recursos avançados incluem uma cota mensal gratuita, redefinida automaticamente no início de cada mês (UTC). Consultas repetidas de dados avançados de IP são atendidas pelo cache e não consomem cota.",
       "IpinfoFeature": "Dados avançados de IP",
       "PercentUsed": "{percent}% usado",
-      "SponsorNote": "Patrocinar no GitHub aumenta suas cotas mensais."
+      "SponsorNote": "Patrocinar no GitHub aumenta suas cotas mensais.",
+      "DailyTitle": "Limite de 24 horas",
+      "MonthlyTitle": "Cota mensal",
+      "AvailableAgainAt": "Disponível novamente às {time}"
     },
     "MyAchievements": "Minhas conquistas",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Patrocinadores",
           "Item1": "Tudo em Usuários autenticados",
           "Item2": "Cotas mensais maiores para recursos avançados",
-          "Item3": "Apoio ao desenvolvimento contínuo deste projeto de código aberto"
+          "Item3": "Apoio ao desenvolvimento contínuo deste projeto de código aberto",
+          "Item4": "Limite de 24 horas mais generoso"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "Fazendo logoff para tocar na grama",
         "turing": "Este status foi enviado por um humano. Provavelmente.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Feliz aniversário, IPCheck.ing!"
+        "birthday": "Feliz aniversário, IPCheck.ing!",
+        "adaday": "Algoritmo assinado por Ada, desde 1843",
+        "dayofdead": "Lembrando de quem já fez logoff",
+        "thanksgiving": "Grato por cada pacote que chegou",
+        "piday": "3,14159265358979… ainda carregando",
+        "holi": "Espalhando cores em RGB total",
+        "shannon": "Enviando este status um bit por vez",
+        "wtisd": "Sinal cheio no mundo todo",
+        "ipv6day": "Agora com 2¹²⁸ endereços",
+        "sysadmin": "Já tentou desligar e ligar de novo?",
+        "linux": "Só um hobby, nada grande e profissional",
+        "tomatina": "Sob ataque de inundação de tomates"
       },
       "festivalDesc": {
         "prgday": "Dia dos Programadores — o 256º dia do ano, 0x100 em hexadecimal",
@@ -313,7 +328,18 @@
         "earthday": "Dia da Terra (22 de abril) — até o Earth Online recomenda um pouco de Earth Offline",
         "turing": "Aniversário de Alan Turing (23 de junho de 1912) — pai do teste de Turing",
         "emojiday": "Dia Mundial do Emoji (17 de julho) — palavras são coisa do século passado",
-        "birthday": "Aniversário do IPCheck.ing — a v1.0 foi lançada em 6 de novembro de 2020"
+        "birthday": "Aniversário do IPCheck.ing — a v1.0 foi lançada em 6 de novembro de 2020",
+        "adaday": "Dia de Ada Lovelace (2ª terça-feira de outubro) — celebra as mulheres em STEM; Ada escreveu o primeiro algoritmo publicado",
+        "dayofdead": "Día de los Muertos (1º e 2 de novembro) — o México lembra quem ama e nunca fica offline de verdade",
+        "thanksgiving": "Dia de Ação de Graças (4ª quinta-feira de novembro) — obrigado a cada roteador no caminho",
+        "piday": "Dia do Pi (14 de março, 3.14 no formato americano) — também o Dia Internacional da Matemática da UNESCO",
+        "holi": "Holi — o festival hindu das cores recebe a primavera em todos os códigos hexadecimais",
+        "shannon": "Aniversário de Claude Shannon (30 de abril de 1916) — pai da teoria da informação, que nos deu o bit",
+        "wtisd": "Dia Mundial das Telecomunicações e da Sociedade da Informação (17 de maio) — a UIT foi fundada neste dia em 1865",
+        "ipv6day": "World IPv6 Launch (6 de junho de 2012) — o dia em que o IPv6 foi ativado para valer",
+        "sysadmin": "Dia do Administrador de Sistemas (última sexta-feira de julho) — agradeça a quem mantém seu uptime em dia",
+        "linux": "25 de agosto de 1991: Linus Torvalds anunciou no comp.os.minix seu SO, “só um hobby”",
+        "tomatina": "La Tomatina (última quarta-feira de agosto) — a guerra de tomates de Buñol, na Espanha; a única inundação que ninguém quer filtrar"
       }
     },
     "preferences": {
@@ -1088,6 +1114,7 @@
     "InvisibilityTest": "Verifique se você está usando proxy ou VPN",
     "MacChecker": "Consultar informações de um endereço físico",
     "IpCalculator": "Cálculo de sub-rede, conversão de notação e análise IPv6 para qualquer IP, prefixo ou intervalo",
+    "BulkLookup": "Consulte IPs em lote, direto de logs colados",
     "BrowserInfo": "Verificar informações e impressão digital do navegador",
     "AdblockTest": "Veja o que seu bloqueador de anúncios, filtro de DNS ou VPN realmente bloqueia",
     "SecurityChecklist": "Guia para proteger sua vida digital",
@@ -1254,6 +1281,119 @@
     "aggregated": "Bloco único",
     "aggregationSummary": "{input} blocos de entrada, {output} de saída, {addresses} endereços",
     "invalidTokens": "Ignorado: {list}"
+  },
+  "bulklookup": {
+    "Title": "Consulta de IPs em lote",
+    "Note": "Extraia os IPs de logs do Nginx, Apache, firewall, CDN ou de aplicações — ou de qualquer lista colada — e veja de relance de onde vem o tráfego: quais países e redes (ASNs), e quais IPs voltam sempre. Depois, aprofunde-se em qualquer IP.",
+    "Note2": "Cole qualquer texto: os IPs são extraídos no seu navegador, os privados e reservados são ignorados e as repetições são contadas. Cole quantas vezes precisar: a lista guarda até {max} IPs, e uma colagem grande é consultada em várias requisições. A geolocalização vem de {source}. Os resultados ficam só neste navegador.",
+    "SourceWithBuild": "{source} (base de {date})",
+    "SourceFallback": "a base de geolocalização local do servidor",
+    "InputLabel": "Cole IPs ou linhas de log:",
+    "Placeholder": "1.1.1.1, 8.8.8.8 ou linhas de log inteiras…",
+    "FirstPerLine": "Só o primeiro IP de cada linha",
+    "FirstPerLineHint": "Para logs de CDN ou de proxy reverso, em que o IP do cliente divide a linha com IPs de proxy ou de borda.",
+    "status": {
+      "empty": "O resultado da análise aparece aqui depois que você colar.",
+      "none": "Nenhum IP público encontrado",
+      "ready": "{n} IPs encontrados: {fresh}",
+      "new": "{n} novos",
+      "existing": "{n} já na lista",
+      "reserved": "{n} privados ignorados",
+      "cidr": "{n} CIDR ignorados",
+      "split": "consultados em {n} requisições",
+      "known": "Todos os {n} IPs já estão na lista; só a frequência deles será atualizada",
+      "noRoom": "{n} IPs novos, mas a lista só tem espaço para mais {room} (limite {max}) — exclua algumas linhas antes",
+      "running": "Consultando {n} IPs…",
+      "runningSplit": "Consultando — requisição {request} de {requests}, {done} de {total} IPs prontos…",
+      "updating": "Atualizando frequência…"
+    },
+    "Run": "Consultar {n} novos",
+    "RunCountsOnly": "Atualizar frequência",
+    "RunIdle": "Consultar",
+    "Unanswered": "Não foi possível consultar {n} IPs.",
+    "RunFailed": "A consulta falhou. Tente novamente mais tarde.",
+    "RunRateLimited": "Muitas consultas em pouco tempo. Tente novamente mais tarde.",
+    "Paused": "{done} de {total} IPs novos consultados; os {n} restantes estão pausados.",
+    "PausedRateLimited": "Muitas consultas em pouco tempo. Aguarde um momento e continue.",
+    "PausedFailed": "A consulta foi interrompida. Tente continuar em instantes.",
+    "Continue": "Continuar os {n} restantes",
+    "StorageError": "Este navegador não salvou a lista (armazenamento cheio ou bloqueado). Ela continua aqui até você sair da página.",
+    "stat": {
+      "rows": "IPs",
+      "countries": "Países/regiões",
+      "asns": "ASNs",
+      "frequency": "Frequência total",
+      "topShare": "Participação dos 10 IPs principais na frequência",
+      "onceShare": "Parcela de IPs vistos uma única vez"
+    },
+    "ClearAll": "Limpar tudo",
+    "OverviewTitle": "Visão geral",
+    "MapTitle": "Mapa-múndi",
+    "tab": {
+      "ips": "IPs",
+      "analysis": "Análise"
+    },
+    "FilterPlaceholder": "Filtrar por IP, país, cidade, ASN, organização ou nota — combine palavras, ex.: “Alemanha 3320”",
+    "ClearSearch": "Limpar busca",
+    "BatchFilter": "Lote colado",
+    "AllBatches": "Todos os lotes",
+    "BatchLabel": "{time} · {n} IPs",
+    "ExportCsv": "Exportar CSV",
+    "StarredOnly": "Só IPs com estrela",
+    "NoMatches": "Nada corresponde aos filtros.",
+    "ClearTitle": "Limpar a lista",
+    "ClearBody": "Isso remove {n} IPs deste navegador. Não é possível desfazer.",
+    "KeepStarred": "Manter IPs com estrela ({n})",
+    "Cancel": "Cancelar",
+    "Save": "Salvar",
+    "ClearConfirm": "Limpar",
+    "Unknown": "Desconhecido",
+    "col": {
+      "star": "Estrela",
+      "ip": "IP",
+      "country": "País/região",
+      "city": "Cidade",
+      "asn": "ASN",
+      "org": "Organização",
+      "count": "Frequência",
+      "note": "Nota",
+      "actions": "Ações"
+    },
+    "Star": "Marcar com estrela",
+    "Unstar": "Remover estrela",
+    "Delete": "Excluir",
+    "IpDetails": "Detalhes do IP",
+    "CheckBlocklist": "Verificar listas negras",
+    "EditNote": "Editar nota",
+    "NotePlaceholder": "Adicionar uma nota",
+    "PageRange": "{from}–{to} de {total}",
+    "PageSize": "Linhas por página",
+    "PagePrev": "Anterior",
+    "PageNext": "Próxima",
+    "PickHint": "Clique para filtrar por este item; clique novamente para remover o filtro",
+    "PanelHint": {
+      "country": "Países/regiões, ordenados pela participação na lista.",
+      "asn": "Redes (ASNs) e as organizações por trás delas, ordenadas pela participação na lista.",
+      "block": "IPs agrupados por /24 (IPv4) e /48 (IPv6), ordenados pela participação na lista."
+    },
+    "WeightLabel": "Ponderação:",
+    "ByIps": "Por IPs",
+    "ByHits": "Por frequência",
+    "PanelCountry": "País/região",
+    "PanelAsn": "ASN · Organização",
+    "PanelBlock": "Blocos de endereços (/24 · /48)",
+    "ShowLess": "Mostrar menos",
+    "MoreEntries": "+ {n} itens",
+    "TopGroupsShare": "top {n}: {share}",
+    "MapHint": {
+      "ips": "Os países são coloridos pelo número de IPs.",
+      "hits": "Os países são coloridos pela frequência."
+    },
+    "MapUnavailable": "Não foi possível carregar o mapa.",
+    "MapTooltip": {
+      "ips": "{n} IPs",
+      "hits": "Frequência: {n}"
+    }
   },
   "whois": {
     "Title": "Pesquisa Whois",
@@ -1468,7 +1608,38 @@
     "Provider": "Provedor DNS",
     "Result": "Resultado da resolução",
     "Record": "Registro",
-    "AllRegions": "Todas as regiões"
+    "AllRegions": "Todas as regiões",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "Registro inexistente",
+        "Hint": "O domínio existe, mas não tem registro deste tipo"
+      },
+      "nxdomain": {
+        "Label": "Domínio não encontrado",
+        "Hint": "O resolvedor informa que este domínio não existe"
+      },
+      "servfail": {
+        "Label": "Falha na resolução",
+        "Hint": "O resolvedor não conseguiu concluir a consulta — geralmente por falha na validação DNSSEC ou por servidores autoritativos inacessíveis"
+      },
+      "refused": {
+        "Label": "Consulta recusada",
+        "Hint": "O resolvedor recusou ou não oferece suporte a esta consulta, geralmente por política própria ou filtragem"
+      },
+      "timeout": {
+        "Label": "Tempo esgotado",
+        "Hint": "O resolvedor não respondeu a tempo"
+      },
+      "unavailable": {
+        "Label": "Resolvedor indisponível",
+        "Hint": "Não foi possível alcançar o resolvedor, ou ele retornou um erro"
+      },
+      "malformed": {
+        "Label": "Resposta inválida",
+        "Hint": "Não foi possível ler a resposta do resolvedor"
+      }
+    }
   },
   "ruletest": {
     "Title": "Teste de regras",
@@ -1625,6 +1796,7 @@
     "qualityScoreUnknown": "Pontuação desconhecida",
     "advancedUnlockCta": "Para evitar abuso, faça login para ver as informações a seguir",
     "advancedQuotaCta": "Cota mensal de dados avançados de IP esgotada",
+    "advancedCooldownCta": "Limite de 24 horas de dados avançados de IP atingido",
     "ASNInfo": {
       "trafficPercentage": "Porcentagem de tráfego: ",
       "note": "Dados deste AS: ",
@@ -1913,6 +2085,7 @@
       "kosovo": "Essenciais do Kosovo",
       "thailand": "Essenciais da Tailândia",
       "mexico": "Essenciais do México",
+      "greece": "Essenciais da Grécia",
       "ai": "Serviços de IA",
       "social": "Redes sociais e mensagens",
       "productivity": "Trabalho e produtividade",
@@ -2107,6 +2280,7 @@
     "EnhancedDnsLeakTest": "Abrir painel de teste aprofundado de vazamento de DNS",
     "MacChecker": "Abrir painel de consulta MAC",
     "IpCalculator": "Abrir painel da Calculadora de IP",
+    "BulkLookup": "Abrir painel da Consulta de IPs em lote",
     "BrowserInfo": "Abrir painel de informações do navegador",
     "AdblockTest": "Abrir painel do Teste de bloqueio de anúncios e rastreadores",
     "SecurityChecklist": "Abrir painel de checklist de segurança",
@@ -2124,12 +2298,14 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Atalhos de teclado"
+    "Title": "Atalhos de teclado",
+    "HomeOnly": "Todos os atalhos funcionam apenas na página inicial."
   },
   "footer": {
     "Tagline": "Uma caixa de ferramentas de privacidade tudo em um, gratuita e de código aberto.",
     "Project": "Projeto",
     "Support": "Documentação e suporte",
+    "ShortcutGuide": "Atalhos de teclado",
     "DeveloperDocs": "Documentação para desenvolvedores",
     "SelfHosting": "Guia de auto-hospedagem",
     "ReportIssue": "Relatar um problema",

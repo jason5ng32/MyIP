@@ -155,6 +155,27 @@ describe('extractAdvancedData()', () => {
     assert.equal(out.ipTypeCode, undefined);
   });
 
+  it('propagates cooldown sentinel verbatim, and drops the report codes', () => {
+    const out = extractAdvancedData({
+      tags: 'cooldown',
+      score: 'cooldown',
+      operatorType: 'cooldown',
+      anonymityProvider: 'cooldown',
+      anonymityProtocol: 'cooldown',
+      scenarios: 'cooldown',
+    }, t);
+    assert.equal(out.anonymity, 'cooldown');
+    assert.equal(out.type, 'cooldown');
+    assert.equal(out.qualityScore, 'cooldown');
+    assert.equal(out.isNativeIP, 'cooldown');
+    assert.equal(out.anonymityProvider, null);
+    assert.equal(out.anonymityProtocol, null);
+    assert.equal(out.anonymityCode, undefined);
+    assert.equal(out.ipTypeCode, undefined);
+    assert.equal(out.scoreTags, undefined);
+    assert.equal(out.frictionScenarios, null);
+  });
+
   it('keeps provider / protocol null when the API named no service', () => {
     const out = extractAdvancedData({
       tags: { ...cleanTags }, operatorType: 'Residential', score: 80,

@@ -19,7 +19,8 @@ export const loadAsnInfoInto = async (cache, asn) => {
     try {
         if (cache[asn]) return cache[asn];
         const asnNumber = asn.replace('AS', '');
-        const response = await fetchWithTimeout(asnInfoUrl(asnNumber));
+        // Above the backend's 12 s Radar timeout, so a cold ASN still answers.
+        const response = await fetchWithTimeout(asnInfoUrl(asnNumber), { timeoutMs: 15000 });
         const data = await response.json();
         cache['AS' + asnNumber] = data;
         return data;

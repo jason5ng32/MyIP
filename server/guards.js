@@ -4,7 +4,8 @@
 // handlers stop carrying the defensive checks and can't accidentally forget
 // them.
 
-import { refererCheck } from './referer-check.js';
+import logger from './logger.js';
+import { refererCheck, refererHostname } from './referer-check.js';
 import { isValidIP, isValidDomain, isUsablePublicIP } from '../common/valid-ip.js';
 import { isValidBgpPrefix } from '../common/bgp-prefix.js';
 import { STATUS_PROVIDER_IDS } from './service-status-providers.js';
@@ -23,11 +24,34 @@ const setQueryParam = (req, name, value) => {
     req.query[name] = value;
 };
 
+// Self-hosting diagnostics: the first rejection per Referer host is logged at
+// info (below the warn+ Sentry mirror), capped so scanners' made-up hosts
+// can't grow the set without bound.
+const REFERER_REJECTION_LOG_CAP = 50;
+const loggedRefererRejections = new Set();
+
+export const resetRefererRejectionLog = () => loggedRefererRejections.clear();
+
+const logRefererRejection = (referer) => {
+    const host = refererHostname(referer);
+    const key = referer ? host ?? '(unparseable)' : '(none)';
+    if (loggedRefererRejections.has(key) || loggedRefererRejections.size >= REFERER_REJECTION_LOG_CAP) return;
+    loggedRefererRejections.add(key);
+    if (!referer) {
+        logger.info('API request without a Referer rejected (403) — a reverse proxy or Referrer-Policy may be stripping it; logged once');
+    } else if (!host) {
+        logger.info('API request with an unparseable Referer rejected (403); logged once');
+    } else {
+        logger.info({ host }, `API request from "${host}" rejected (403): not in ALLOWED_DOMAINS; logged once per host`);
+    }
+};
+
 // Reject requests without an allowed referer. The error message variant
 // preserves the existing user-facing wording.
 export const requireReferer = (req, res, next) => {
     const referer = req.headers.referer;
     if (!refererCheck(referer)) {
+        logRefererRejection(referer);
         return res.status(403).json({
             error: referer ? 'Access denied' : 'What are you doing?',
         });

@@ -5,20 +5,19 @@
     <div v-if="!collapsed" v-show="showAdvancedBlock" class="px-4 pb-3 border-t pt-3 space-y-2.5">
 
         <!-- Gated: single CTA banner + 4-field preview grid with *** values.
-             Signed-out shows the sign-in copy; over-quota shows the monthly
-             quota copy + sponsor link instead. -->
-        <template v-if="allAdvancedLocked || allAdvancedQuotaExceeded">
+             Signed-out shows the sign-in copy; over the monthly quota or the
+             24-hour limit shows that limit's copy + a usage link. -->
+        <template v-if="allAdvancedLocked || allAdvancedQuotaExceeded || allAdvancedCooldown">
             <span
                 class="w-full flex items-center justify-between gap-2 text-xs px-2.5 py-1.5 rounded-md bg-muted/60 text-muted-foreground transition-colors group">
                 <span class="flex items-center gap-1.5 min-w-0">
-                    <component :is="allAdvancedQuotaExceeded ? Hourglass : Lock" class="size-3.5 shrink-0" />
-                    <span class="truncate">
-                        {{ allAdvancedQuotaExceeded ? t('ipInfos.advancedQuotaCta') : t('ipInfos.advancedUnlockCta') }}
-                    </span>
+                    <component :is="allAdvancedLocked ? Lock : Hourglass" class="size-3.5 shrink-0" />
+                    <span class="truncate">{{ gatedCta }}</span>
                 </span>
                 <!-- Opens the Benefits & Usage dialog (usage tab for signed-in
-                     users) — the sponsor path lives there, not a direct jump. -->
-                <button v-if="allAdvancedQuotaExceeded" type="button"
+                     users), which shows both limits — the sponsor path lives
+                     there, not a direct jump. -->
+                <button v-if="allAdvancedQuotaExceeded || allAdvancedCooldown" type="button"
                     class="shrink-0 underline underline-offset-2 hover:text-foreground cursor-pointer"
                     @click="openUsageDialog">
                     {{ t('user.ViewUsage') }}
@@ -241,10 +240,11 @@ const openUsageDialog = () => {
 const showAdvancedBlock = computed(() => props.ipGeoSource === 0 && Boolean(props.data));
 
 // Backend gating sentinels for the advanced fields (see transform-ip-data.js).
-const isGatedValue = (value) => value === 'sign_in_required' || value === 'quota_exceeded';
+const GATED_VALUES = new Set(['sign_in_required', 'quota_exceeded', 'cooldown']);
+const isGatedValue = (value) => GATED_VALUES.has(value);
 
 // If every advanced field is masked → show the single CTA + preview grid instead
-// of rendering four individual gated rows. The two sentinels pick different copy.
+// of rendering four individual gated rows. Each sentinel picks its own copy.
 const allAdvancedLocked = computed(() =>
     props.data.type === 'sign_in_required' &&
     props.data.anonymity === 'sign_in_required' &&
@@ -257,6 +257,17 @@ const allAdvancedQuotaExceeded = computed(() =>
     props.data.isNativeIP === 'quota_exceeded' &&
     props.data.qualityScore === 'quota_exceeded'
 );
+const allAdvancedCooldown = computed(() =>
+    props.data.type === 'cooldown' &&
+    props.data.anonymity === 'cooldown' &&
+    props.data.isNativeIP === 'cooldown' &&
+    props.data.qualityScore === 'cooldown'
+);
+const gatedCta = computed(() => {
+    if (allAdvancedQuotaExceeded.value) return t('ipInfos.advancedQuotaCta');
+    if (allAdvancedCooldown.value) return t('ipInfos.advancedCooldownCta');
+    return t('ipInfos.advancedUnlockCta');
+});
 
 const showTypeBadge = computed(() =>
     props.data.type && !isGatedValue(props.data.type)

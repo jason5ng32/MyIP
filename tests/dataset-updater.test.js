@@ -481,6 +481,14 @@ describe('downloadToFile', () => {
 
 describe('watchDatasets', () => {
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Polls until the predicate holds: the watcher's timing varies on slow runners.
+    const waitFor = async (predicate, { timeoutMs = 2000, stepMs = 10 } = {}) => {
+        const deadline = Date.now() + timeoutMs;
+        while (!predicate()) {
+            if (Date.now() > deadline) throw new Error(`waitFor: condition not met within ${timeoutMs}ms`);
+            await sleep(stepMs);
+        }
+    };
     const fast = { intervalMs: 20, settleMs: 30 };
 
     it('reloads when someone else changes the files, not after its own publish', async () => {
@@ -495,7 +503,7 @@ describe('watchDatasets', () => {
 
             // Another process (or a hand) replaces the files.
             for (const file of row.files) fs.writeFileSync(path.join(row.dir, file), `${file} by hand, longer\n`);
-            await sleep(150);
+            await waitFor(() => log.reloads.length >= 3);
             assert.deepEqual(log.reloads, ['auto update', 'auto update', 'file change']);
         } finally {
             stop();
@@ -536,7 +544,7 @@ describe('watchDatasets', () => {
             row.version = 'v2';
             replaceDuringReload = true;
             await updateDataset(row);
-            await sleep(200);
+            await waitFor(() => log.reloads.length >= 3);
             assert.deepEqual(log.reloads, ['auto update', 'auto update', 'file change']);
         } finally {
             stop();
@@ -551,7 +559,7 @@ describe('watchDatasets', () => {
             await sleep(150);
             assert.deepEqual(log.reloads, [], 'not while a file is still missing');
             fs.writeFileSync(path.join(row.dir, 'b.txt'), 'b');
-            await sleep(150);
+            await waitFor(() => log.reloads.length >= 1);
             assert.deepEqual(log.reloads, ['file change']);
         } finally {
             stop();
@@ -569,7 +577,7 @@ describe('watchDatasets', () => {
             await sleep(150);
             assert.deepEqual(log.reloads, [], 'refused');
             fs.writeFileSync(path.join(row.dir, 'a.txt'), 'complete');
-            await sleep(150);
+            await waitFor(() => log.reloads.length >= 1);
             assert.deepEqual(log.reloads, ['file change']);
         } finally {
             stop();
@@ -587,12 +595,13 @@ describe('watchDatasets', () => {
         const stop = watchDatasets([row], fast);
         try {
             for (const file of row.files) fs.writeFileSync(path.join(row.dir, file), `${file}\n`);
-            await sleep(150);
+            await waitFor(() => log.reloads.length >= 1);
+            await sleep(150); // and no retry without a change
             assert.equal(log.reloads.length, 1, 'tried once, failed');
             fail = false;
             // Fix permissions: mtime and size unchanged, ctime moves.
             fs.chmodSync(path.join(row.dir, 'a.txt'), 0o600);
-            await sleep(150);
+            await waitFor(() => log.reloads.length >= 2);
             assert.equal(log.reloads.length, 2, 'retried');
         } finally {
             stop();

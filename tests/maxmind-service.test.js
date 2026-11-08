@@ -20,6 +20,7 @@ import {
   openMaxMindReaders,
   reloadMaxMindDatabases,
   lookupMaxMind,
+  getMaxMindBuild,
   SUPPORTED_LANGS,
   normalizeLang,
 } from '../server/datasets/maxmind-service.js';
@@ -116,6 +117,11 @@ describe('maxmind-service — end-to-end with real DB (skipped if files missing)
   it('reloadMaxMindDatabases flips isMaxMindReady() to true', () => {
     if (!dbsAvailable) return;
     assert.equal(isMaxMindReady(), true);
+  });
+
+  it('getMaxMindBuild dates the loaded City database', () => {
+    if (!dbsAvailable) return;
+    assert.match(getMaxMindBuild(), /^\d{4}-\d{2}-\d{2}$/);
   });
 
   it('openMaxMindReaders returns both city + asn readers', async () => {

@@ -205,6 +205,21 @@ export const isoToDateTime = (iso, locale) => {
     }
 };
 
+// Localized clock time ("3:04 PM" / "15:04") of an instant (a Date, epoch ms
+// or anything Date.parse accepts), in the viewer's own zone — the 24-hour
+// limit's reset moment. '' for a missing or unparseable input.
+export const formatClockTime = (date, locale) => {
+    // new Date(null) is the epoch — treat "no data" as unusable, not 00:00 UTC.
+    if (date == null || date === '') return '';
+    const ms = new Date(date).getTime();
+    if (!Number.isFinite(ms)) return '';
+    try {
+        return new Intl.DateTimeFormat(locale || undefined, { timeStyle: 'short' }).format(ms);
+    } catch {
+        return '';
+    }
+};
+
 // Localized absolute date ("Nov 6, 2020" / "2020年11月6日") from an ISO
 // "YYYY-MM-DD" string — the changelog and every date-only ISO surface
 // (OONI windows, IP-history day headers). Formatted in UTC so the calendar
