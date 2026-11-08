@@ -39,14 +39,15 @@ const compact = (obj) => {
 
 // --- per-section builders ---------------------------------------------------
 
-// ipinfo:finished — { cards: [{ source, ip, country_code, region, city,
+// ipinfo:finished — { cards: [{ id, source, ip, country_code, region, city,
 // timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
 // anonymityProtocol?, anonymityProvider? }] }. Cards whose ip never resolved
 // (placeholder text in the slot) are dropped. The optional enrichments only
 // exist on the IPCheck.ing source and stay absent when gated
 // ('sign_in_required' / 'quota_exceeded' / 'cooldown' upstream values never
 // turn into codes — see transform-ip-data.js). An 'unknown' line type is noise in a
-// report ("Unknown type" says nothing) — dropped like absent.
+// report ("Unknown type" says nothing) — dropped like absent. `id` is the
+// card's fixed slot (`source` follows the provider that answered).
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
 const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
 const buildIpinfo = (payload) => {
@@ -54,6 +55,7 @@ const buildIpinfo = (payload) => {
         .filter((card) => isValidIP(card?.ip))
         .slice(0, 8)
         .map((card) => compact({
+            id: clip(card.id, 32),
             source: clip(card.source, 64) ?? '',
             ip: card.ip,
             countryCode: countryCode(card.country_code),

@@ -29,7 +29,7 @@ const makeValidReport = () => ({
         ipinfo: {
             testedAt: '2026-07-14T08:00:00.000Z',
             cards: [
-                { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 85, anonymityProtocol: 'SOCKS5', anonymityProvider: 'ACME' },
+                { id: 'ipchecking_v4', source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 85, anonymityProtocol: 'SOCKS5', anonymityProvider: 'ACME' },
                 { source: 'Cloudflare IPv6', ip: '2001:db8::1', countryCode: '', city: '' },
             ],
         },
@@ -233,6 +233,17 @@ describe('validateReport', () => {
         const badNaN = makeValidReport();
         badNaN.sections.speedtest.downloadMbps = NaN;
         assert.equal(validateReport(badNaN).ok, false);
+    });
+
+    it('takes an ipinfo card id as an optional short string', () => {
+        const report = makeValidReport();
+        assert.equal(validateReport(report).ok, true);
+        assert.ok(!('id' in report.sections.ipinfo.cards[1]), 'links made before it existed lack it');
+        for (const bad of ['x'.repeat(33), 4]) {
+            const broken = makeValidReport();
+            broken.sections.ipinfo.cards[0].id = bad;
+            assert.equal(validateReport(broken).ok, false, String(bad));
+        }
     });
 
     it('rejects over-long strings and over-long arrays', () => {

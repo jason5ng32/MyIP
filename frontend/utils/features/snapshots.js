@@ -19,8 +19,8 @@ export const SNAPSHOTS_STORE_VERSION = 1;
 // The homepage tests a snapshot records, in homepage order.
 export const HOME_SECTION_IDS = Object.freeze(['ipinfo', 'connectivity', 'webrtc', 'dnsleak', 'speedtest']);
 
-// The longest `labelSource` (an ipinfo card's `source`) kept.
-export const SNAPSHOT_LABEL_SOURCE_MAX = 64;
+// The longest `labelCardId` (an ipinfo card's fixed `id`) kept; the schema's cap.
+export const SNAPSHOT_LABEL_CARD_ID_MAX = 32;
 
 // Retention of unkept snapshots: the newest `snapshotsKeepLast` survive.
 export const SNAPSHOTS_KEEP_LAST_OPTIONS = Object.freeze([10, 50, 100]);
@@ -57,17 +57,17 @@ export const clampKeepLast = (value) =>
 // One stored snapshot → a clean copy, or null when anything is off: wrong
 // schema version, a missing or mistyped field, a section outside the
 // homepage five, or sections the report schema rejects.
-// `labelSource` is optional (older snapshots lack it). Unknown fields
-// (`seq`, `ips`, `visits`, `sealed` included) are dropped.
+// `labelCardId` is optional. Unknown fields (`seq`, `ips`, `visits`,
+// `sealed` included) are dropped.
 export const sanitizeSnapshot = (value) => {
     if (!isPlainObject(value) || value.v !== REPORT_VERSION) return null;
-    const { id, firstSeenAt, lastSeenAt, name, kept, sections, labelSource } = value;
+    const { id, firstSeenAt, lastSeenAt, name, kept, sections, labelCardId } = value;
     if (typeof id !== 'string' || !ID_PATTERN.test(id)) return null;
     if (!isIsoDate(firstSeenAt) || !isIsoDate(lastSeenAt)) return null;
     if (typeof name !== 'string' || name.length > SNAPSHOT_NAME_MAX) return null;
     if (typeof kept !== 'boolean') return null;
-    if (labelSource !== undefined
-        && (typeof labelSource !== 'string' || labelSource.length > SNAPSHOT_LABEL_SOURCE_MAX)) return null;
+    if (labelCardId !== undefined
+        && (typeof labelCardId !== 'string' || labelCardId.length > SNAPSHOT_LABEL_CARD_ID_MAX)) return null;
     if (!isPlainObject(sections) || !sections.ipinfo) return null;
     if (Object.keys(sections).some((key) => !HOME_SECTION_IDS.includes(key))) return null;
     const { ok } = validateReport({
@@ -75,7 +75,7 @@ export const sanitizeSnapshot = (value) => {
     });
     if (!ok) return null;
     const clean = { id, v: REPORT_VERSION, firstSeenAt, lastSeenAt, name, kept, sections };
-    return labelSource === undefined ? clean : { ...clean, labelSource };
+    return labelCardId === undefined ? clean : { ...clean, labelCardId };
 };
 
 // A localStorage string → store, newest first. A broken envelope (bad JSON,
@@ -119,17 +119,17 @@ export const restoreStore = (raw) => {
 
 // The card a new snapshot's auto label names, from an ipinfo event's cards in
 // homepage order: the card at 1-based `position` when it holds a valid IP,
-// else the first card that does → its `source`; '' when none.
-export const labelSourceOf = (cards, position = 1) => {
+// else the first card that does → its `id`; '' when none.
+export const labelCardIdOf = (cards, position = 1) => {
     const list = Array.isArray(cards) ? cards : [];
     const at = Number.isInteger(position) ? list[position - 1] : undefined;
     const card = isValidIP(at?.ip) ? at : list.find((item) => isValidIP(item?.ip));
-    const source = typeof card?.source === 'string' ? card.source : '';
-    return source.slice(0, SNAPSHOT_LABEL_SOURCE_MAX);
+    const cardId = typeof card?.id === 'string' ? card.id : '';
+    return cardId.slice(0, SNAPSHOT_LABEL_CARD_ID_MAX);
 };
 
-export const createSnapshot = ({ id, now, labelSource = '' }) => ({
-    id, v: REPORT_VERSION, firstSeenAt: now, lastSeenAt: now, name: '', kept: false, sections: {}, labelSource,
+export const createSnapshot = ({ id, now, labelCardId = '' }) => ({
+    id, v: REPORT_VERSION, firstSeenAt: now, lastSeenAt: now, name: '', kept: false, sections: {}, labelCardId,
 });
 
 // Latest wins; ids outside the homepage five are ignored.
@@ -174,12 +174,12 @@ export const pruneStore = (store, keepLast) => {
 export const primaryCardOf = (snapshot) =>
     (snapshot?.sections?.ipinfo?.cards ?? []).find((card) => isValidIP(card?.ip)) ?? null;
 
-// The card the auto label names: the one whose `source` is the snapshot's
-// `labelSource` (set at creation), else the primary card.
+// The card the auto label names: the one whose `id` is the snapshot's
+// `labelCardId` (set at creation), else the primary card.
 export const labelCardOf = (snapshot) => {
-    const source = snapshot?.labelSource;
-    const match = source
-        ? (snapshot?.sections?.ipinfo?.cards ?? []).find((card) => card?.source === source && isValidIP(card?.ip))
+    const cardId = snapshot?.labelCardId;
+    const match = cardId
+        ? (snapshot?.sections?.ipinfo?.cards ?? []).find((card) => card?.id === cardId && isValidIP(card?.ip))
         : null;
     return match ?? primaryCardOf(snapshot);
 };

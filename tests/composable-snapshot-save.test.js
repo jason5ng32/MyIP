@@ -1,9 +1,9 @@
 // Tests for frontend/composables/use-snapshot-save.js — "Save snapshot now"
 // over a stubbed command bus, router and recorder API: filing this visit's
 // results directly, running a cached Home's tests in place (the command set
-// per `autoRun*` preference; the automatic snapshot vs a manual one), the
-// trip through a Home that never mounted and back, failures and the one-run
-// guard.
+// per `autoRun*` preference; always a manual snapshot once the sections
+// settle, automatic recording or not), the trip through a Home that never
+// mounted and back, failures and the one-run guard.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -28,7 +28,7 @@ const deferred = () => {
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
-// The recorder's read / action API.
+// The recorder's read / action API; `currentId` is the automatic snapshot.
 const fakeSnapshots = ({ canTake = false, taken = 'manual-1' } = {}) => {
     const calls = [];
     return {
@@ -132,17 +132,19 @@ describe('useSnapshotSave', () => {
         await run;
     });
 
-    it('selects the automatic snapshot the ipinfo result resolved, without a duplicate', async () => {
-        const { snapshots, bus, save } = setup();
+    it('takes a frozen manual snapshot even when the recorder made an automatic one', async () => {
+        const { snapshots, bus, save } = setup({ prefs: { autoRunWebRTC: true } });
         const run = save();
         snapshots.currentId.value = 'auto-1'; // the recorder ran on ipinfo:finished
         bus.settle('ipinfo:refresh').resolve({});
-        // The other sections update it in place later; no need to wait.
-        assert.deepEqual(await run, { status: 'saved', id: 'auto-1' });
-        assert.deepEqual(snapshots.calls, []);
+        await flush();
+        assert.deepEqual(snapshots.calls, [], 'waits for the sections');
+        bus.settle('webrtc:run').resolve();
+        assert.deepEqual(await run, { status: 'saved', id: 'manual-1' });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
     });
 
-    it('takes a manual snapshot once the other sections settle when recording is off', async () => {
+    it('takes a manual snapshot once the other sections settle, failed ones included', async () => {
         const { snapshots, bus, save } = setup();
         const run = save();
         bus.settle('ipinfo:refresh').resolve({});
@@ -168,18 +170,23 @@ describe('useSnapshotSave', () => {
             ['push', '/'],
         ]);
         assert.deepEqual(dispatched(bus), []);
-        snapshots.currentId.value = 'auto-2';
+        snapshots.currentId.value = 'auto-2'; // Home's load recorded one
         bus.settle('ipinfo:finished').resolve({});
-        assert.deepEqual(await run, { status: 'returned', id: 'auto-2' });
-        assert.deepEqual(router.pushes.at(-1), { path: SNAPSHOTS_PATH, query: { q: 'auto-2' } });
-        assert.deepEqual(snapshots.calls, []);
+        bus.settle('connectivity:finished').resolve({});
+        bus.settle('webrtc:finished').resolve({});
+        bus.settle('dnsleak:finished').reject(appCommandError('timeout', 'slow'));
+        assert.deepEqual(await run, { status: 'returned', id: 'manual-1' });
+        assert.deepEqual(router.pushes.at(-1), { path: SNAPSHOTS_PATH, query: { q: 'manual-1' } });
+        assert.deepEqual(snapshots.calls, ['takeSnapshot']);
     });
 
-    it('takes a manual snapshot on Home when recording is off, then returns', async () => {
+    it('waits on Home for the sections before the manual snapshot, then returns', async () => {
         const { snapshots, bus, router, save } = setup({ mounted: false, prefs: { autoRunDnsLeak: true } });
         const run = save();
         await flush();
         bus.settle('ipinfo:finished').resolve({});
+        await flush();
+        assert.deepEqual(snapshots.calls, [], 'waits for the sections');
         bus.settle('dnsleak:finished').resolve({});
         assert.deepEqual(await run, { status: 'returned', id: 'manual-1' });
         assert.deepEqual(snapshots.calls, ['takeSnapshot']);
@@ -187,13 +194,12 @@ describe('useSnapshotSave', () => {
     });
 
     it('stays put when the visitor left Home meanwhile', async () => {
-        const { snapshots, bus, router, save } = setup({ mounted: false, prefs: {} });
+        const { bus, router, save } = setup({ mounted: false, prefs: {} });
         const run = save();
         await flush();
         router.currentRoute.value = { path: '/tools/whois' };
-        snapshots.currentId.value = 'auto-3';
         bus.settle('ipinfo:finished').resolve({});
-        assert.deepEqual(await run, { status: 'returned', id: 'auto-3' });
+        assert.deepEqual(await run, { status: 'returned', id: 'manual-1' });
         assert.deepEqual(router.pushes, ['/']);
     });
 

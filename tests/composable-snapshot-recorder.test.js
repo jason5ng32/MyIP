@@ -3,7 +3,7 @@
 // session (created by its first ipinfo:finished, updated in place by every
 // later result, never merged across loads), buffering of sections that
 // arrive first, the auto switch, manual takeSnapshot (never the session's
-// snapshot), the label card (labelSource), count retention, the
+// snapshot), the label card (labelCardId), count retention, the
 // snapshot:created event, untrusted storage, write failures, two tabs, and
 // the useSnapshots actions.
 
@@ -30,11 +30,12 @@ const memoryStorage = (initial = {}) => ({
 });
 
 // Event payloads as the homepage components emit them.
-// Each card: an IP (source `src<index>`) or [source, ip]; 'error' = a failed card.
+// Each card (id `card<index>`): an IP (source `src<index>`) or [source, ip];
+// 'error' = a failed card.
 const ipinfoPayload = (...cards) => ({
     cards: cards.map((card, i) => {
         const [source, ip] = Array.isArray(card) ? card : [`src${i}`, card];
-        return { source, ip, country_code: 'sg', isp: 'Singtel', asn: 'AS4773' };
+        return { id: `card${i}`, source, ip, country_code: 'sg', isp: 'Singtel', asn: 'AS4773' };
     }),
 });
 const connectivityPayload = (time = 40) => ({
@@ -337,28 +338,30 @@ describe('snapshot recorder — label card', () => {
     it('records the card at snapshotsLabelCard, else the first card with a valid IP', () => {
         const { storage } = start();
         emitAppEvent('ipinfo:finished', ipinfoPayload('error', '8.8.8.8', '1.1.1.1'));
-        assert.equal(stored(storage)[0].labelSource, 'src1', 'card 1 has no valid IP');
+        assert.equal(stored(storage)[0].labelCardId, 'card1', 'card 1 has no valid IP');
         visit(storage, ipinfoPayload('9.9.9.9', '8.8.8.8', '2.2.2.2'), { snapshotsLabelCard: 3 });
-        assert.equal(stored(storage)[0].labelSource, 'src2');
+        assert.equal(stored(storage)[0].labelCardId, 'card2');
         visit(storage, ipinfoPayload('9.9.9.9', '8.8.8.8'), { snapshotsLabelCard: 5 });
-        assert.equal(stored(storage)[0].labelSource, 'src0', 'out of range');
+        assert.equal(stored(storage)[0].labelCardId, 'card0', 'out of range');
     });
 
     it('keeps the label card the snapshot was created with through in-place updates', () => {
         const { storage, store } = start({ prefs: { snapshotsLabelCard: 2 } });
         emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8', '1.1.1.1'));
         store.userPreferences.snapshotsLabelCard = 1;
-        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8', '1.1.1.1'));
+        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8', ['fallback', '1.1.1.1'])); // provider fallback
         const list = stored(storage);
         assert.equal(list.length, 1);
-        assert.equal(list[0].labelSource, 'src1');
+        assert.equal(list[0].labelCardId, 'card1');
+        assert.deepEqual(list[0].sections.ipinfo.cards.map((card) => [card.id, card.source]),
+            [['card0', 'src0'], ['card1', 'fallback']]);
     });
 
     it('a manual snapshot follows the same rule, from the latest ipinfo cards', () => {
         const { api, storage } = start({ prefs: { snapshotsAuto: false, snapshotsLabelCard: 2 } });
         emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8', '1.1.1.1'));
         api.takeSnapshot();
-        assert.equal(stored(storage)[0].labelSource, 'src1');
+        assert.equal(stored(storage)[0].labelCardId, 'card1');
     });
 });
 

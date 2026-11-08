@@ -4,8 +4,9 @@
 // runs ipinfo plus the `autoRun*` sections in place (never the speed test);
 // a Home that never mounted is visited — its own initial load runs them — and
 // the page comes back to `/tools/snapshots?q=<id>` while still on Home.
-// Either way the session's snapshot is the automatic one when the recorder
-// resolved it (`snapshotsAuto`), else a manual one once the tests settle.
+// Either way, once ipinfo resolves and the other sections settle, it files a
+// manual snapshot: a frozen copy, whatever `snapshotsAuto` (the recorder's
+// automatic snapshot of the same load keeps updating beside it).
 // One run at a time, app-wide.
 
 import { ref } from 'vue';
@@ -30,13 +31,11 @@ const running = ref(false);
 export const useSnapshotSave = ({
     store, router, snapshots = useSnapshots(), bus = DEFAULT_BUS, timeoutMs = SNAPSHOT_SAVE_TIMEOUT_MS,
 }) => {
-    const { canTakeSnapshot, currentId, takeSnapshot } = snapshots;
+    const { canTakeSnapshot, takeSnapshot } = snapshots;
     const sectionRuns = () => SECTION_RUNS.filter(({ pref }) => store.userPreferences?.[pref]);
 
-    // The recorder's automatic snapshot if it resolved one, else a manual one
-    // after the other sections settle (so it holds them too).
+    // A manual snapshot once the other sections settle, so it holds them too.
     const resolveSnapshot = async (rest) => {
-        if (currentId.value) return currentId.value;
         await Promise.allSettled(rest);
         return takeSnapshot();
     };

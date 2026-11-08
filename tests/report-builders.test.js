@@ -22,9 +22,9 @@ const wrap = (sectionId, section) => ({
 const PAYLOADS = {
     'ipinfo:finished': {
         cards: [
-            { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'us', region: 'CA', city: 'SF', asn: 'AS15169', isp: 'Google LLC' },
-            { source: 'IPCheck.ing IPv6', ip: 'IPv6 检测失败' },
-            { source: 'Cloudflare IPv6', ip: '2001:db8::1', country_code: '' },
+            { id: 'ipchecking_v4', source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'us', region: 'CA', city: 'SF', asn: 'AS15169', isp: 'Google LLC' },
+            { id: 'ipchecking_v6', source: 'IPCheck.ing IPv6', ip: 'IPv6 检测失败' },
+            { id: 'cloudflare_v6', source: 'Cloudflare IPv6', ip: '2001:db8::1', country_code: '' },
         ],
     },
     'connectivity:finished': {
@@ -197,6 +197,22 @@ describe('cleaning rules', () => {
         assert.equal(section.cards.length, 2);
         assert.deepEqual(section.cards.map((c) => c.ip), ['1.2.3.4', '2001:db8::1']);
         assert.equal(section.cards[0].countryCode, 'US'); // normalized to upper
+    });
+
+    it('ipinfo carries the card id beside the source, clipped, absent when not a string', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        assert.deepEqual(build(PAYLOADS['ipinfo:finished']).cards.map((c) => [c.id, c.source]),
+            [['ipchecking_v4', 'IPCheck.ing IPv4'], ['cloudflare_v6', 'Cloudflare IPv6']]);
+        const section = build({
+            cards: [
+                { id: 'x'.repeat(40), source: 'A', ip: '1.2.3.4' },
+                { id: 7, source: 'B', ip: '1.2.3.5' },
+                { source: 'C', ip: '1.2.3.6' },
+            ],
+        });
+        assert.equal(section.cards[0].id.length, 32);
+        assert.ok(!('id' in section.cards[1]));
+        assert.ok(!('id' in section.cards[2]));
     });
 
     it('ipinfo carries the timezone through, absent when the source had no coordinates', () => {

@@ -119,33 +119,35 @@ links to the Blocklist tool — no bulk path to the private API.
 Snapshot History (slug `snapshots`) records the five homepage sections per
 visit, in this browser only: `use-snapshot-recorder.js` (App level) files
 each `<domain>:finished` through the report builders as report-schema
-sections (`utils/features/snapshots.js`, localStorage key `snapshots`).
-With `snapshotsAuto`, a page load's first `ipinfo:finished` creates that
-load's snapshot (earlier sections buffer) and every later result of the
-load updates it in place; loads never merge. A manual save
+sections (`utils/features/snapshots.js`, localStorage key `snapshots`). With
+`snapshotsAuto`, a page load's first `ipinfo:finished` creates that load's
+snapshot (earlier sections buffer) and every later result of the load
+updates it in place; loads never merge. A manual save
 (`use-snapshot-save.js`; with no results this visit it runs the homepage
-tests over the command bus like Persona Check) is a frozen copy of the live
-sections. The auto label is "country · IP" of the `snapshotsLabelCard` card
-(1-based, default 1, a Select in Preferences; fallback the first valid
-card); a name replaces it. Retention is by count only (10 / 50 / 100,
-default 50); pinned snapshots (`kept`, UI "Pin") are exempt, capped at 20.
-Every creation emits `snapshot:created`; no toast. Stored snapshots are
-re-validated against `common/report-schema.js` on every read: a
-`REPORT_VERSION` bump or a tightened section silently drops them.
+tests over the command bus like Persona Check, waiting for every section it
+started) is always a frozen copy of the live sections, beside the automatic
+one. The auto label is "country · IP" of the `snapshotsLabelCard` card
+(1-based, default 1, a Select in Preferences; recorded as its card `id`;
+fallback the first valid card); a name replaces it. Retention is by count
+only (10 / 50 / 100, default 50); pinned snapshots (`kept`, UI "Pin") are
+exempt, capped at 20. Every creation emits `snapshot:created`; no toast.
+Stored snapshots are re-validated against `common/report-schema.js` on every
+read: a `REPORT_VERSION` bump or a tightened section silently drops them.
 
 The page (`advanced-tools/Snapshots.vue`) is list + detail: the list
 (`snapshots/SnapshotList.vue`) is the left column on ≥1024px and a Sheet
-below; rows are numbered by position, with Pin and "Compare with this"
-only. Compare is one Select ("Previous snapshot", then every other,
-`vs=<id>`). The diff (`snapshot-diff.js`, aligned by source / id, never by
-position) states facts only — no leak / safe / better / worse wording, no
+below; rows are numbered by position, with Pin and "Compare with this" only.
+Compare is one Select ("Previous snapshot", then every other, `vs=<id>`).
+The diff (`snapshot-diff.js`, aligned by id — an IP card's fixed `id`, not
+its fallback-dependent `source` — never by position; numbers compare as
+displayed) states facts only — no leak / safe / better / worse wording, no
 summary chips — and renders as a code diff (`snapshot-diff-format.js` →
-`snapshots/SnapshotDiff*.vue`): a block per section, a hunk per item, a
-line per field, split by default on ≥1024px; changed fields are −/+ pairs
-on `--diff-removed` / `--diff-added`, their differing segments on the
-`-strong` pair (removed / added, never bad / good; those tokens nowhere
-else); measurement drift folds into one `±` line while "Show measurement
-changes" is off. Share Report and `Report*.vue` are untouched.
+`snapshots/SnapshotDiff*.vue`): a block per section, a hunk per item, a line
+per field, split by default on ≥1024px; changed fields are −/+ pairs on
+`--diff-removed` / `--diff-added`, their differing segments on the `-strong`
+pair (removed / added, never bad / good; those tokens nowhere else);
+measurement drift folds into one `±` line while "Show measurement changes"
+is off. Share Report and `Report*.vue` are untouched.
 
 ### Overlays take no keyboard shortcuts
 
@@ -223,6 +225,7 @@ Every "business state → color" mapping goes through `use-status-tone.js`
   hand-rolled `Intl` / `toLocaleDateString` without a why-comment.
 - **Fit-to-width tokens** — IP / MAC strings in `<FitText>` (`HERO_TIERS` /
   `INLINE_TIERS`; `:max-lines="2"` on heroes); no length-threshold helpers.
+  The Snapshot diff's mono, segment-highlighted lines excepted.
 - **Filter tags** — `ToggleGroup :spacing="2"` of detached `h-7 rounded-full`
   pills, `w-full flex-wrap` (DnsResolver, IpCalculator); never `spacing=0`.
 - **Shareable tool input** — watch `useActiveValue(() => route.query.q, {

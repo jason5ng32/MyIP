@@ -1,22 +1,24 @@
 // Tests for frontend/utils/features/snapshot-diff.js — keyed alignment
-// (cards by source, targets / servers / providers by id), one-sided items
-// kept apart from changes, semantic vs drift rows, the speed tier as a noise
-// gate, one-sided sections as "not run", and rows that carry no verdict.
-// keyedItems hands renderers the same keys.
+// (cards, targets / servers / providers all by id), one-sided items kept
+// apart from changes, semantic vs drift rows, numbers compared at display
+// precision, the speed tier as a noise gate, one-sided sections as "not
+// run", and rows that carry no verdict. keyedItems hands renderers the same keys.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
     diffSnapshots, fieldKind, speedTier, SPEED_TIER_THRESHOLDS_MBPS, keyedItems,
+    atDisplayPrecision, sameValue, DISPLAY_FRACTION_DIGITS,
 } from '../frontend/utils/features/snapshot-diff.js';
 import { createSnapshot } from '../frontend/utils/features/snapshots.js';
 import { REPORT_VERSION, validateReport } from '../common/report-schema.js';
 
 const T0 = '2026-11-08T10:00:00.000Z';
 
-const card = (source, ip, fields = {}) => ({
-    source, ip, countryCode: 'SG', region: 'Central', city: 'Singapore', asn: 'AS4773', isp: 'Singtel', ...fields,
+// An IP card: its fixed `id`, the provider that answered as `source`.
+const card = (id, ip, fields = {}) => ({
+    id, source: `${id} provider`, ip, countryCode: 'SG', region: 'Central', city: 'Singapore', asn: 'AS4773', isp: 'Singtel', ...fields,
 });
 const target = (id, status = 'ok', fields = {}) => ({ id, name: id, status, ...(status === 'ok' ? { timeMs: 40 } : {}), ...fields });
 const server = (id, ip, fields = {}) => ({ id, url: `stun:${id}.example.com:3478`, ip, natType: 'srflx', countryCode: 'SG', org: 'Singtel', ...fields });
@@ -59,10 +61,17 @@ describe('snapshot diff — alignment', () => {
         assert.deepEqual(Object.keys(result), ['sections']);
     });
 
-    it('aligns IP cards by source, not position', () => {
+    it('aligns IP cards by id, not position', () => {
         const right = snap({ ...BASE, cards: [...BASE.cards].reverse() });
         const result = diffSnapshots(snap(BASE), right);
         assert.equal(result.sections.ipinfo.rows.some((row) => row.changed), false);
+    });
+
+    it('keeps an IP card aligned when a fallback provider answered it', () => {
+        const right = snap({ ...BASE, cards: [{ ...BASE.cards[0], source: 'Fallback' }, BASE.cards[1]] });
+        const { ipinfo } = diffSnapshots(snap(BASE), right).sections;
+        assert.equal(ipinfo.listChanged, false);
+        assert.equal(ipinfo.rows.some((row) => row.changed), false);
     });
 
     it('aligns connectivity targets, STUN servers and DNS providers by id', () => {
@@ -153,7 +162,8 @@ describe('snapshot diff — speed tier', () => {
     it('buckets download speed by the documented thresholds', () => {
         assert.deepEqual([...SPEED_TIER_THRESHOLDS_MBPS], [10, 50, 200]);
         assert.equal(speedTier(0), 0);
-        assert.equal(speedTier(9.99), 0);
+        assert.equal(speedTier(9.94), 0);
+        assert.equal(speedTier(9.96), 1, 'reads 10');
         assert.equal(speedTier(10), 1);
         assert.equal(speedTier(49), 1);
         assert.equal(speedTier(50), 2);
@@ -178,6 +188,44 @@ describe('snapshot diff — speed tier', () => {
         const noDown = snap({ ...BASE, speed: { latencyMs: 10 } });
         const tier = diffSnapshots(snap(BASE), noDown).sections.speedtest.rows.find((row) => row.field === 'tier');
         assert.deepEqual([tier.from, tier.to], [2, undefined]);
+    });
+});
+
+describe('snapshot diff — display precision', () => {
+    it('rounds numbers to the shown fraction digits, nothing else', () => {
+        assert.equal(DISPLAY_FRACTION_DIGITS, 1);
+        assert.equal(atDisplayPrecision(95.04), 95);
+        assert.equal(atDisplayPrecision(95.06), 95.1);
+        assert.equal(atDisplayPrecision('95.04'), '95.04');
+        assert.equal(atDisplayPrecision(undefined), undefined);
+        assert.equal(sameValue(95.03, 95.04), true);
+        assert.equal(sameValue(95.04, 95.06), false);
+        assert.equal(sameValue(0, undefined), false);
+    });
+
+    it('measurements that read the same are not changed rows', () => {
+        const left = snap({ ...BASE, cards: [card('ipcheck', '8.8.8.8', { qualityScore: 87.51 }), BASE.cards[1]],
+            speed: { ...BASE.speed, downloadMbps: 95.03, latencyMs: 12.04 } });
+        const right = snap({ ...BASE, cards: [card('ipcheck', '8.8.8.8', { qualityScore: 87.54 }), BASE.cards[1]],
+            speed: { ...BASE.speed, downloadMbps: 95.04, latencyMs: 12.01 } });
+        const { sections } = diffSnapshots(left, right);
+        assert.equal(sections.ipinfo.rows.find((row) => row.field === 'qualityScore').changed, false);
+        for (const field of ['downloadMbps', 'latencyMs']) {
+            assert.equal(sections.speedtest.rows.find((row) => row.field === field).changed, false, field);
+        }
+    });
+
+    it('measurements that read differently are changed rows', () => {
+        const right = snap({ ...BASE, speed: { ...BASE.speed, downloadMbps: 120.1 } });
+        const download = diffSnapshots(snap(BASE), right).sections.speedtest.rows.find((row) => row.field === 'downloadMbps');
+        assert.deepEqual([download.from, download.to, download.changed], [120, 120.1, true]);
+    });
+
+    it('the speed tier follows the shown value', () => {
+        const left = snap({ ...BASE, speed: { downloadMbps: 9.97 } });
+        const right = snap({ ...BASE, speed: { downloadMbps: 10.02 } });
+        const tier = diffSnapshots(left, right).sections.speedtest.rows.find((row) => row.field === 'tier');
+        assert.deepEqual([tier.from, tier.to, tier.changed], [1, 1, false], 'both read 10');
     });
 });
 

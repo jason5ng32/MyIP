@@ -1,12 +1,14 @@
 // Snapshots diff view, pure layer: turns one homepage section of two
-// snapshots into code-diff hunks — a hunk per keyed item (IP card by source,
-// connectivity target / STUN server / DNS provider by id; the speed test is
+// snapshots into code-diff hunks — a hunk per keyed item (IP card,
+// connectivity target / STUN server / DNS provider, all by id; the speed test is
 // one item), a line per field — and formats the recorded values. Marks mean
 // removed / added like any code diff, never worse / better (plan red line).
 // `viewed` is the snapshot shown, `compared` the baseline. Also the inline
 // (word-level) segments of a changed value.
 
-import { keyedItems, sectionFields, fieldKind, speedTier } from './snapshot-diff.js';
+import {
+    keyedItems, sectionFields, fieldKind, speedTier, sameValue, DISPLAY_FRACTION_DIGITS,
+} from './snapshot-diff.js';
 import { IP_TYPE_KEYS, CONNECTIVITY_STATUS_KEYS, natTypeKey } from './snapshot-view.js';
 import { ANONYMITY_I18N_KEYS } from '../ip/transform-ip-data.js';
 
@@ -49,7 +51,7 @@ export const fieldFlag = (field, value) =>
 // value is a dash. `t` and `countryName` come from the caller.
 export const formatFieldValue = (field, value, { t = (key) => key, countryName, locale } = {}) => {
     if (isEmpty(value)) return EMPTY_VALUE;
-    const number = (n) => n.toLocaleString(locale || undefined, { maximumFractionDigits: 1 });
+    const number = (n) => n.toLocaleString(locale || undefined, { maximumFractionDigits: DISPLAY_FRACTION_DIGITS });
     const label = (keys) => (keys[value] ? t(keys[value]) : String(value));
 
     if (COUNTRY_FIELDS.has(field)) return countryName?.(value) || String(value);
@@ -88,10 +90,11 @@ const contextLines = (sectionId, item) => {
         .map((field) => ({ field, kind: fieldKind(field), mark: ' ', value: readField(item, field), otherValue: undefined }));
 };
 
-// Both sides' fields. A changed field is a −/+ pair; a drifting measurement
-// is one `±` context line unless `showDrift`, except the download when it
-// crossed a speed tier (the diff's noise gate). The name field is the hunk
-// header and only gets lines when it changed.
+// Both sides' fields, numbers compared as displayed. A changed field is a
+// −/+ pair; a drifting measurement is one `±` context line unless
+// `showDrift`, except the download when it crossed a speed tier (the diff's
+// noise gate). The name field is the hunk header and only gets lines when
+// it changed.
 const compareLines = (sectionId, viewed, compared, showDrift) => {
     const nameField = ITEM_NAME_FIELDS[sectionId];
     const fromTier = speedTier(compared?.downloadMbps);
@@ -103,7 +106,7 @@ const compareLines = (sectionId, viewed, compared, showDrift) => {
         const to = readField(viewed, field);
         if (from === undefined && to === undefined) return [];
         const kind = fieldKind(field);
-        if (from === to) {
+        if (sameValue(from, to)) {
             return field === nameField ? [] : [{ field, kind, mark: ' ', value: to, otherValue: from }];
         }
         const gated = tierCrossed && field === 'downloadMbps';

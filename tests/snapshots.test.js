@@ -14,7 +14,7 @@ import {
     createEmptyStore, clampKeepLast,
     sanitizeSnapshot, restoreStore,
     createSnapshot, applySection, touchSnapshot, addSnapshot, pruneStore, primaryCardOf, autoLabel,
-    labelSourceOf, labelCardOf, formatAutoLabel, SNAPSHOT_LABEL_SOURCE_MAX,
+    labelCardIdOf, labelCardOf, formatAutoLabel, SNAPSHOT_LABEL_CARD_ID_MAX,
     snapshotLabel, renameSnapshot, keepSnapshot, keptCountOf, removeSnapshot, findSnapshot,
 } from '../frontend/utils/features/snapshots.js';
 import { REPORT_VERSION, validateReport } from '../common/report-schema.js';
@@ -26,7 +26,7 @@ const at = (minutes) => new Date(Date.parse(T0) + minutes * 60000).toISOString()
 const ipinfo = (...ips) => ({
     testedAt: T0,
     cards: ips.map((ip, i) => ({
-        source: `src${i}`, ip, countryCode: 'SG', city: 'Singapore', asn: 'AS4773', isp: 'Singtel',
+        id: `card${i}`, source: `src${i}`, ip, countryCode: 'SG', city: 'Singapore', asn: 'AS4773', isp: 'Singtel',
     })),
 });
 const connectivity = { testedAt: T0, targets: [{ id: 'google', name: 'Google', status: 'ok', timeMs: 30 }] };
@@ -88,6 +88,7 @@ describe('snapshots — untrusted restore', () => {
             name: 'n'.repeat(SNAPSHOT_NAME_MAX), kept: i < MAX_KEPT_SNAPSHOTS,
             sections: {
                 ipinfo: { testedAt: T0, cards: Array.from({ length: 8 }, (_, c) => ({
+                    id: `ipchecking_v64_${c}`.padEnd(SNAPSHOT_LABEL_CARD_ID_MAX, 'x'),
                     source: `source-${c}`, ip: v6(c), countryCode: 'SG', region: 'Central Singapore',
                     city: 'Singapore', timezone: 'Asia/Singapore', asn: 'AS4294967295',
                     isp: 'Example Telecommunications Holdings Pte Ltd', anonymity: 'suspected_residential',
@@ -133,8 +134,8 @@ describe('snapshots — untrusted restore', () => {
             (s) => { s.name = 42; },
             (s) => { s.name = 'x'.repeat(SNAPSHOT_NAME_MAX + 1); },
             (s) => { s.kept = 'yes'; },
-            (s) => { s.labelSource = 7; },
-            (s) => { s.labelSource = 'x'.repeat(SNAPSHOT_LABEL_SOURCE_MAX + 1); },
+            (s) => { s.labelCardId = 7; },
+            (s) => { s.labelCardId = 'x'.repeat(SNAPSHOT_LABEL_CARD_ID_MAX + 1); },
             (s) => { delete s.sections; },
             (s) => { s.sections = { connectivity }; }, // no ipinfo
             (s) => { s.sections.pingtest = { testedAt: T0, target: '1.1.1.1', probes: [] }; }, // not a homepage section
@@ -150,14 +151,14 @@ describe('snapshots — untrusted restore', () => {
         assert.deepEqual(store.snapshots.map((s) => s.id), ['ok']);
     });
 
-    it('keeps a stored labelSource and accepts older snapshots without one', () => {
-        const withSource = snapshot('a', 0, { labelSource: 'src0' });
-        assert.equal(sanitizeSnapshot(withSource).labelSource, 'src0');
-        const older = snapshot('b', 0);
-        delete older.labelSource;
-        const clean = sanitizeSnapshot(older);
+    it('keeps a stored labelCardId, which is optional', () => {
+        const withId = snapshot('a', 0, { labelCardId: 'card0' });
+        assert.equal(sanitizeSnapshot(withId).labelCardId, 'card0');
+        const without = snapshot('b', 0);
+        delete without.labelCardId;
+        const clean = sanitizeSnapshot(without);
         assert.ok(clean);
-        assert.equal('labelSource' in clean, false);
+        assert.equal('labelCardId' in clean, false);
     });
 
     it('drops unknown keys, duplicate ids, and orders newest first', () => {
@@ -240,41 +241,49 @@ describe('snapshots — labels', () => {
     const names = { SG: 'Singapore', JP: 'Japan', NL: 'Netherlands' };
     const fmt = { countryName: (code) => names[code] };
     const cards = [
-        { source: 'masked', ip: '1.2.3.x', isp: 'Masked', countryCode: 'US' },
-        { source: 'b', ip: '1.1.1.1', isp: 'Cloudflare', countryCode: 'JP' },
-        { source: 'c', ip: '185.107.56.201', isp: 'NForce', countryCode: 'NL' },
+        { id: 'masked', source: 'Masked', ip: '1.2.3.x', isp: 'Masked', countryCode: 'US' },
+        { id: 'b', source: 'Cloudflare IPv4', ip: '1.1.1.1', isp: 'Cloudflare', countryCode: 'JP' },
+        { id: 'c', source: 'IPCheck.ing IPv4', ip: '185.107.56.201', isp: 'NForce', countryCode: 'NL' },
     ];
     const withCards = (fields = {}) => snapshot('a', 0, { sections: { ipinfo: { testedAt: T0, cards } }, ...fields });
 
     it('picks the label card at its 1-based position, else the first card with a valid IP', () => {
-        assert.equal(labelSourceOf(cards, 3), 'c');
-        assert.equal(labelSourceOf(cards, 2), 'b');
-        assert.equal(labelSourceOf(cards, 1), 'b', 'card 1 has no valid IP');
-        assert.equal(labelSourceOf(cards), 'b', 'defaults to card 1');
-        assert.equal(labelSourceOf(cards, 9), 'b', 'out of range');
-        assert.equal(labelSourceOf(cards, 0), 'b');
-        assert.equal(labelSourceOf(cards, '3'), 'b', 'not an integer');
-        assert.equal(labelSourceOf([cards[0]], 1), '', 'no valid IP anywhere');
-        assert.equal(labelSourceOf([], 1), '');
-        assert.equal(labelSourceOf(undefined, 1), '');
-        assert.equal(labelSourceOf([{ source: 'x'.repeat(80), ip: '9.9.9.9' }]).length, SNAPSHOT_LABEL_SOURCE_MAX);
+        assert.equal(labelCardIdOf(cards, 3), 'c');
+        assert.equal(labelCardIdOf(cards, 2), 'b');
+        assert.equal(labelCardIdOf(cards, 1), 'b', 'card 1 has no valid IP');
+        assert.equal(labelCardIdOf(cards), 'b', 'defaults to card 1');
+        assert.equal(labelCardIdOf(cards, 9), 'b', 'out of range');
+        assert.equal(labelCardIdOf(cards, 0), 'b');
+        assert.equal(labelCardIdOf(cards, '3'), 'b', 'not an integer');
+        assert.equal(labelCardIdOf([cards[0]], 1), '', 'no valid IP anywhere');
+        assert.equal(labelCardIdOf([], 1), '');
+        assert.equal(labelCardIdOf(undefined, 1), '');
+        assert.equal(labelCardIdOf([{ source: 'IPCheck.ing IPv4', ip: '9.9.9.9' }]), '', 'no id');
+        assert.equal(labelCardIdOf([{ id: 'x'.repeat(80), ip: '9.9.9.9' }]).length, SNAPSHOT_LABEL_CARD_ID_MAX);
     });
 
-    it('createSnapshot records the labelSource', () => {
-        assert.equal(createSnapshot({ id: 'a', now: T0, labelSource: 'c' }).labelSource, 'c');
-        assert.equal(createSnapshot({ id: 'a', now: T0 }).labelSource, '');
+    it('createSnapshot records the labelCardId', () => {
+        assert.equal(createSnapshot({ id: 'a', now: T0, labelCardId: 'c' }).labelCardId, 'c');
+        assert.equal(createSnapshot({ id: 'a', now: T0 }).labelCardId, '');
     });
 
-    it('uses the labelSource card, else the first card with a valid IP', () => {
-        assert.equal(primaryCardOf(withCards()).source, 'b');
-        assert.equal(labelCardOf(withCards({ labelSource: 'c' })).source, 'c');
-        assert.equal(labelCardOf(withCards({ labelSource: 'gone' })).source, 'b');
-        assert.equal(labelCardOf(withCards({ labelSource: 'masked' })).source, 'b', 'its IP is not valid');
-        assert.equal(labelCardOf(withCards({ labelSource: undefined })).source, 'b', 'older snapshots');
+    it('uses the labelCardId card, else the first card with a valid IP', () => {
+        assert.equal(primaryCardOf(withCards()).id, 'b');
+        assert.equal(labelCardOf(withCards({ labelCardId: 'c' })).id, 'c');
+        assert.equal(labelCardOf(withCards({ labelCardId: 'gone' })).id, 'b');
+        assert.equal(labelCardOf(withCards({ labelCardId: 'masked' })).id, 'b', 'its IP is not valid');
+        assert.equal(labelCardOf(withCards({ labelCardId: undefined })).id, 'b');
+    });
+
+    it('matches the label card by id, whichever provider answered it', () => {
+        const fallback = cards.map((card) => (card.id === 'c' ? { ...card, source: 'Fallback provider' } : card));
+        const snap = snapshot('a', 0, { sections: { ipinfo: { testedAt: T0, cards: fallback } }, labelCardId: 'c' });
+        assert.equal(labelCardOf(snap).ip, '185.107.56.201');
+        assert.equal(labelCardOf(withCards({ labelCardId: 'IPCheck.ing IPv4' })).id, 'b', 'a source is not an id');
     });
 
     it('autoLabel returns the country and IP of the label card', () => {
-        assert.deepEqual(autoLabel(withCards({ labelSource: 'c' })), { countryCode: 'NL', ip: '185.107.56.201' });
+        assert.deepEqual(autoLabel(withCards({ labelCardId: 'c' })), { countryCode: 'NL', ip: '185.107.56.201' });
         assert.deepEqual(autoLabel(withCards()), { countryCode: 'JP', ip: '1.1.1.1' });
         assert.deepEqual(autoLabel(createSnapshot({ id: 'e', now: T0 })), { countryCode: '', ip: '' });
         assert.equal(autoLabel(null), null);
@@ -290,8 +299,8 @@ describe('snapshots — labels', () => {
     });
 
     it('a given name replaces the whole label', () => {
-        assert.equal(snapshotLabel(withCards({ name: 'Office VPN', labelSource: 'c' }), fmt), 'Office VPN');
-        assert.equal(snapshotLabel(withCards({ name: '  ', labelSource: 'c' }), fmt), 'Netherlands · 185.107.56.201');
+        assert.equal(snapshotLabel(withCards({ name: 'Office VPN', labelCardId: 'c' }), fmt), 'Office VPN');
+        assert.equal(snapshotLabel(withCards({ name: '  ', labelCardId: 'c' }), fmt), 'Netherlands · 185.107.56.201');
     });
 });
 

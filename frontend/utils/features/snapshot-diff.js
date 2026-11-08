@@ -1,8 +1,9 @@
 // Snapshot diff: compares two snapshots' homepage sections item by item,
-// aligned by stable keys (cards by source, connectivity targets / STUN
+// aligned by stable keys (cards by their fixed id, connectivity targets / STUN
 // servers / DNS providers by id), never by position. Items present on one
 // side only are listed apart and are not changes. Produces per-field rows,
-// no verdicts: the visitor reads what changed.
+// no verdicts: the visitor reads what changed. Numbers compare at display
+// precision: values that read the same are not a change.
 // `left` is the baseline ("from"), `right` the snapshot being viewed ("to").
 
 import { HOME_SECTION_IDS } from './snapshots.js';
@@ -30,16 +31,32 @@ export const fieldKind = (field) => {
     return 'info';
 };
 
+// --- display precision ------------------------------------------------------
+
+// Fraction digits a recorded number is shown with (snapshot-diff-format.js).
+export const DISPLAY_FRACTION_DIGITS = 1;
+
+// A number as it reads once shown (toFixed rounds like Intl's default);
+// anything else as is.
+export const atDisplayPrecision = (value) =>
+    (typeof value === 'number' && Number.isFinite(value)
+        ? Number(value.toFixed(DISPLAY_FRACTION_DIGITS)) : value);
+
+// Equal as displayed: 95.03 and 95.04 both read 95.
+export const sameValue = (a, b) => atDisplayPrecision(a) === atDisplayPrecision(b);
+
 // --- speed tier -------------------------------------------------------------
 
 // Download Mbps bounds of the coarse speed tiers: tier 0 is < 10, 1 is
 // < 50, 2 is < 200, 3 is ≥ 200. A noise gate: run-to-run jitter rarely
-// crosses one, so only a crossing highlights the row.
+// crosses one, so only a crossing highlights the row. Read at display
+// precision, so the tier follows the shown value (9.96 reads 10: tier 1).
 export const SPEED_TIER_THRESHOLDS_MBPS = Object.freeze([10, 50, 200]);
 
 export const speedTier = (mbps) => {
     if (typeof mbps !== 'number' || !Number.isFinite(mbps)) return null;
-    const index = SPEED_TIER_THRESHOLDS_MBPS.findIndex((bound) => mbps < bound);
+    const shown = atDisplayPrecision(mbps);
+    const index = SPEED_TIER_THRESHOLDS_MBPS.findIndex((bound) => shown < bound);
     return index === -1 ? SPEED_TIER_THRESHOLDS_MBPS.length : index;
 };
 
@@ -49,7 +66,7 @@ export const speedTier = (mbps) => {
 const KEYED_SECTIONS = {
     ipinfo: {
         list: 'cards',
-        key: 'source',
+        key: 'id',
         fields: ['ip', 'countryCode', 'region', 'city', 'timezone', 'asn', 'isp', 'anonymity',
             'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider'],
     },
@@ -94,7 +111,7 @@ export const keyedItems = (id, section) => {
 
 const makeRow = (key, field, from, to) => {
     const kind = fieldKind(field);
-    const changed = from !== to;
+    const changed = !sameValue(from, to);
     return { key, field, from, to, kind, changed, highlight: changed && kind === 'semantic' };
 };
 

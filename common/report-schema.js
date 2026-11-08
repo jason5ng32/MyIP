@@ -143,6 +143,9 @@ const SECTION_SPECS = {
     ipinfo: obj({
         testedAt: isoDate(),
         cards: arr(8, obj({
+            // The card's fixed slot (e.g. `ipchecking_v4`); optional, as
+            // links made before it existed lack it.
+            id: opt(str(32)),
             source: str(64),
             ip: opt(ipValue()),
             countryCode: opt(countryCode()),

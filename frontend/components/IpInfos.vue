@@ -249,6 +249,7 @@ const trackFetchStatus = (status) => {
     // collector normalizes it (drops cards whose ip slot holds an error label).
     emitAppEvent('ipinfo:finished', {
       cards: ipDataCards.slice(0, ipCardsToShow.value).map((card) => ({
+        id: card.id, // fixed per card; `source` names the provider that answered
         source: card.source,
         ip: card.ip,
         country_code: card.country_code,

@@ -2398,7 +2398,7 @@
           "zh-TW": "新增「快照記錄」：首頁各項測試結果每次造訪儲存一份在目前的瀏覽器中，可任選兩份快照比較，查看有哪些不同",
           "fr": "Ajout de l'Historique des instantanés : les résultats des tests de la page d'accueil sont enregistrés à chaque visite dans ce navigateur, pour comparer deux instantanés et voir ce qui diffère",
           "ru": "Добавлена «История снимков»: результаты тестов главной страницы сохраняются в этом браузере при каждом посещении, и любые два снимка можно сравнить, чтобы увидеть различия",
-          "pt-BR": "Novo Histórico de instantâneos: os resultados dos testes da página inicial são salvos por rede neste navegador, para você comparar dois instantâneos quaisquer e ver o que difere"
+          "pt-BR": "Novo Histórico de instantâneos: os resultados dos testes da página inicial são salvos por visita neste navegador, para você comparar dois instantâneos quaisquer e ver o que difere"
         }
       },
       {

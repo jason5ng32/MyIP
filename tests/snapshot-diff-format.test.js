@@ -1,7 +1,8 @@
 // Tests for frontend/utils/features/snapshot-diff-format.js — the Snapshots
 // diff view's hunks (collapse rule, drift on / off, one-side items as plain
-// context, the single speedtest hunk with its dotted fields), split rows,
-// block counts / notices, and value formatting with units.
+// context, IP cards by id, the single speedtest hunk with its dotted
+// fields, numbers compared as displayed), split rows, block counts /
+// notices, and value formatting with units.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -14,7 +15,8 @@ import { diffSnapshots } from '../frontend/utils/features/snapshot-diff.js';
 
 const T0 = '2026-11-08T10:00:00.000Z';
 const snap = (sections) => ({ id: 'x', sections });
-const card = (source, ip, fields = {}) => ({ source, ip, countryCode: 'SG', isp: 'Singtel', asn: 'AS4773', ...fields });
+// An IP card keyed by its fixed `id`; `source` (the hunk header) defaults to it.
+const card = (id, ip, fields = {}) => ({ id, source: id, ip, countryCode: 'SG', isp: 'Singtel', asn: 'AS4773', ...fields });
 const hunksOf = (id, compared, viewed, opts) =>
     buildHunks(id, diffSnapshots(compared, viewed).sections[id], viewed.sections[id], compared.sections[id], opts);
 const marks = (hunk) => hunk.lines.map((line) => `${line.mark}${line.field}`);
@@ -52,6 +54,12 @@ describe('snapshot diff format — hunks', () => {
         }
         assert.equal(hunks[3].lines.find((l) => l.field === 'ip').value, '3.3.3.3');
         assert.deepEqual(hunkCounts(hunks), { changed: 1, onlyViewed: 1, onlyCompared: 1 });
+    });
+
+    it('keeps one hunk for a card a fallback provider answered, named as viewed', () => {
+        const fallback = snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { source: 'Fallback' })] } });
+        const hunks = hunksOf('ipinfo', snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1')] } }), fallback);
+        assert.deepEqual(hunks.map((h) => [h.name, h.status, h.changedCount]), [['Fallback', 'both', 0]]);
     });
 
     it('folds drift into one ± line unless shown', () => {
@@ -109,6 +117,31 @@ describe('snapshot diff format — speedtest', () => {
         assert.ok(!sectionFieldOrder('speedtest').includes('tier'));
         assert.equal(readField({ connection: { ip: 'x' } }, 'connection.ip'), 'x');
         assert.equal(readField({ downloadMbps: null }, 'downloadMbps'), undefined);
+    });
+
+    it('takes numbers that display the same as unchanged, drift shown or not', () => {
+        const a = speed({ downloadMbps: 95.03, uploadMbps: 20.01, latencyMs: 12.04 });
+        const b = speed({ downloadMbps: 95.04, uploadMbps: 20.04, latencyMs: 12.01 });
+        for (const showDrift of [false, true]) {
+            const [hunk] = hunksOf('speedtest', a, b, { showDrift });
+            assert.deepEqual(marks(hunk), [' downloadMbps', ' uploadMbps', ' latencyMs'], `showDrift ${showDrift}`);
+            assert.equal(hunk.changedCount, 0);
+        }
+        const score = (qualityScore) => snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { qualityScore })] } });
+        const [same] = hunksOf('ipinfo', score(87.51), score(87.54), { showDrift: true });
+        assert.ok(same.lines.some((line) => line.field === 'qualityScore' && line.mark === ' '));
+    });
+
+    it('marks numbers that display differently', () => {
+        const a = speed({ downloadMbps: 95.04 });
+        const b = speed({ downloadMbps: 95.06 });
+        assert.deepEqual(marks(hunksOf('speedtest', a, b)[0]), ['±downloadMbps']);
+        assert.deepEqual(marks(hunksOf('speedtest', a, b, { showDrift: true })[0]), ['-downloadMbps', '+downloadMbps']);
+    });
+
+    it('gates the tier on the shown download: 9.97 and 10.02 both read 10', () => {
+        const hunk = hunksOf('speedtest', speed({ downloadMbps: 9.97 }), speed({ downloadMbps: 10.02 }))[0];
+        assert.deepEqual(marks(hunk), [' downloadMbps']);
     });
 
     it('marks the download when it crosses a speed tier, drift off', () => {

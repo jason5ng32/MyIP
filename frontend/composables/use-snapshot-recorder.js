@@ -10,7 +10,7 @@
 // it undecided again: the next `ipinfo:finished` creates a new one.
 // `takeSnapshot` files the live sections as a manual snapshot, which never
 // becomes the session's one and so never changes. A new snapshot records
-// its label card (`labelSource`, from `snapshotsLabelCard`); every creation
+// its label card (`labelCardId`, from `snapshotsLabelCard`); every creation
 // emits `snapshot:created`. `useSnapshotRecorder` is called once at App
 // level; `useSnapshots` is the read / action API over the same state.
 
@@ -19,7 +19,7 @@ import { onAppEvent, emitAppEvent } from '../utils/app-events.js';
 import { REPORT_EVENT_BUILDERS } from '../utils/report/report-builders.js';
 import {
     SNAPSHOTS_STORAGE_KEY, HOME_SECTION_IDS, SNAPSHOT_NAME_MAX,
-    restoreStore, createEmptyStore, createSnapshot, applySection, labelSourceOf, touchSnapshot, addSnapshot,
+    restoreStore, createEmptyStore, createSnapshot, applySection, labelCardIdOf, touchSnapshot, addSnapshot,
     replaceSnapshot, pruneStore, clampKeepLast, findSnapshot, renameSnapshot, keepSnapshot, removeSnapshot,
 } from '../utils/features/snapshots.js';
 
@@ -80,8 +80,8 @@ const prune = (store) => pruneStore(store, prefs().snapshotsKeepLast);
 // Adds a snapshot holding `sections` at the front, prunes, and announces it.
 // Only an automatic one becomes the session's snapshot.
 const create = (store, sections, { now, name = '', auto }) => {
-    const labelSource = labelSourceOf(liveCards, prefs().snapshotsLabelCard);
-    let snapshot = { ...createSnapshot({ id: nextId(), now, labelSource }), name };
+    const labelCardId = labelCardIdOf(liveCards, prefs().snapshotsLabelCard);
+    let snapshot = { ...createSnapshot({ id: nextId(), now, labelCardId }), name };
     for (const [id, section] of Object.entries(sections)) snapshot = applySection(snapshot, id, section);
     if (auto) {
         state.currentId = snapshot.id;
