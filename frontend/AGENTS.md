@@ -136,7 +136,9 @@ read: a `REPORT_VERSION` bump or a tightened section silently drops them.
 
 The page (`advanced-tools/Snapshots.vue`) is list + detail: the list
 (`snapshots/SnapshotList.vue`) is the left column on ≥1024px and a Sheet
-below; rows are numbered by position, with Pin and "Compare with this" only.
+below; rows are numbered by position, with Pin and "Compare with this" only
+(in the column, shown on row hover / focus; Pin stays while pinned); the
+compared row carries a static marker instead of the compare button.
 Compare is one Select ("Previous snapshot", then every other, `vs=<id>`).
 The diff (`snapshot-diff.js`, aligned by id — an IP card's fixed `id`, not
 its fallback-dependent `source` — never by position; numbers compare as
