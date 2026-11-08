@@ -13,9 +13,10 @@ handlers share is split by who imports it:
   poller, …), flat; `server/datasets/` is the offline dataset engine and its
   readers (see "Offline datasets").
 - **`common/`** — only what the frontend or the build imports too
-  (`valid-ip.js`, `fetch-with-timeout.js`, `report-schema.js`, …); it never
-  imports from `server/`. It also holds the dataset directories (`*-db/`),
-  which self-hosting docs and Docker volumes mount — they stay put.
+  (`valid-ip.js`, `fetch-with-timeout.js`, `report-schema.js`, the report's
+  code lists in `codes/`, …); it imports nothing outside `common/`. It also
+  holds the dataset directories (`*-db/`), which self-hosting docs and Docker
+  volumes mount — they stay put.
 
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /

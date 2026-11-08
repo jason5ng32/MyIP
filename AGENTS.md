@@ -95,6 +95,25 @@ use npm / yarn — they'd produce a competing lockfile.
   aren't hoisted — declare before use. Applies to new / rewritten code only;
   don't mass-convert existing declarations.
 
+### Dependency direction
+
+Imports point one way; `tests/dependency-direction.test.js` enforces it (its
+allowlist names each known exception, and fails once one is gone):
+
+- `common/` imports only `common/`; `common/codes/` imports nothing;
+  `server/` never imports `api/` or `frontend/`.
+- In `frontend/`, only `utils/` imports `common/` — through thin re-export
+  bridges (`utils/ip/valid-ip.js`). `utils/` imports no app layer
+  (composables, components, store, router, entry points); `data/` only `data/`.
+- Inside `utils/`: `codes/` ← `ip/` ← `features/` · `report/`. `codes/`
+  imports only `common/codes/` and itself; `ip/` never imports `features/`
+  or `report/`; `report/` never imports `features/`.
+- A locale-free code list the report validator checks is written once, in
+  `common/codes/<domain>.js`, bridged by `utils/codes/<domain>.js`; the
+  recording module, `report-schema.js` and the report builders only import
+  it. Its code → i18n-key map lives once in `utils/codes/<domain>-labels.js`,
+  used by every view (live card, report page, Snapshots diff).
+
 ### Comments
 
 - **Every new file opens with a header comment** stating its purpose —
