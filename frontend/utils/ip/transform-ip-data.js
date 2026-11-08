@@ -1,5 +1,6 @@
 import getCountryName from '../country-name.js';
-import { normalizeScenarios } from '../features/scenario-friction.js';
+import { normalizeScenarios } from './scenario-friction.js';
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY } from '../codes/ip-labels.js';
 
 // The static map renders at zoom 3 (continent scale), where ~0.176° spans a
 // single pixel. Quantizing the request coords to 1 decimal (~0.1°, sub-pixel)
@@ -59,21 +60,6 @@ const GATED_SENTINELS = new Set(['sign_in_required', 'quota_exceeded', 'cooldown
 const gatedSentinel = (value) => (GATED_SENTINELS.has(value) ? value : null);
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-
-// Anonymity verdict code → display text key: one map for the card and the
-// report renderer (ReportIpinfo.vue), so the two can't disagree. The codes
-// themselves live in the report schema (ANONYMITY_CODES).
-export const ANONYMITY_I18N_KEYS = {
-    tor: 'ipInfos.anonymity.tor',
-    relay: 'ipInfos.anonymity.relay',
-    residential: 'ipInfos.anonymity.residential',
-    suspected_residential: 'ipInfos.anonymity.suspectedResidential',
-    proxy: 'ipInfos.anonymity.proxy',
-    proxy_suspected: 'ipInfos.anonymity.proxySuspected',
-    vpn: 'ipInfos.anonymity.vpn',
-    vpn_suspected: 'ipInfos.anonymity.vpnSuspected',
-    none: 'ipInfos.anonymity.none',
-};
 
 // Anonymizing service / protocol the API named: null when absent or gated.
 const optionalName = (value) => (typeof value === 'string' && value && !gatedSentinel(value) ? value : null);
@@ -139,18 +125,7 @@ function determineType(advancedData, t) {
     if (gatedSentinel(advancedData.operatorType)) {
         return advancedData.operatorType;
     }
-    switch (advancedData.operatorType) {
-        case 'Business':
-            return t('ipInfos.advancedData.type.Business');
-        case 'Residential':
-            return t('ipInfos.advancedData.type.Residential');
-        case 'Wireless':
-            return t('ipInfos.advancedData.type.Wireless');
-        case 'Hosting':
-            return t('ipInfos.advancedData.type.Hosting');
-        default:
-            return t('ipInfos.advancedData.type.unknownType');
-    }
+    return t(IP_TYPE_I18N_KEYS[determineTypeCode(advancedData)] ?? IP_TYPE_UNKNOWN_KEY);
 }
 
 export { transformDataFromIPapi, extractAdvancedData };

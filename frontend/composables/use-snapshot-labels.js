@@ -1,9 +1,8 @@
 // Snapshots tool page: the viewer-locale text of recorded values — country
 // names (Intl), dates, snapshot labels ("country · IP" unless named),
 // diff-view field labels and values — shared by the page, its dialogs, its
-// diff blocks. Codes and keys live in
-// utils/features/snapshot-view.js and snapshot-diff-format.js; this only
-// binds vue-i18n.
+// diff blocks. Codes and keys live in the utils (snapshot-diff-format.js,
+// utils/codes/*-labels.js, report-sections.js); this only binds vue-i18n.
 
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';

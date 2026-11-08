@@ -7,9 +7,14 @@
 // holds nothing worth reporting.
 
 import { isValidIP } from '../ip/valid-ip.js';
+// Code lists, each from the domain that records it (bridges over common/).
 import {
-    CONNECTIVITY_STATUS, ANONYMITY_CODES, ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS,
-} from './report-schema.js';
+    ANONYMITY_CODES, IP_TYPE_CODES, ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS,
+} from '../codes/ip.js';
+import { CONNECTIVITY_STATUS } from '../codes/connectivity.js';
+import { NAT_TYPE_CODES } from '../codes/webrtc.js';
+import { SPEEDTEST_QUALITIES } from '../codes/speedtest.js';
+import { PERSONA_VERDICT, PERSONA_AXIS, PERSONA_GRADE } from '../codes/persona.js';
 
 // --- small shared normalizers ----------------------------------------------
 
@@ -51,7 +56,7 @@ const compact = (obj) => {
 // report ("Unknown type" says nothing) — dropped like absent. `id` is the
 // card's fixed slot (`source` follows the provider that answered).
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
-const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
+const IP_TYPE_CODE_SET = new Set(IP_TYPE_CODES);
 // Scenario friction `[{ id, level }]` → `{ [id]: level }`, known ids and levels
 // only; absent when none survive. Local-only: Snapshots keep it, the share
 // export strips it.
@@ -81,7 +86,7 @@ const buildIpinfo = (payload) => {
             asn: clip(card.asn, 16),
             isp: clip(card.isp, 128),
             anonymity: ANONYMITY_CODE_SET.has(card.anonymityCode) ? card.anonymityCode : undefined,
-            ipType: IP_TYPE_CODES.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
+            ipType: IP_TYPE_CODE_SET.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
             nativeIP: typeof card.isNativeIP === 'boolean' ? card.isNativeIP : undefined,
             qualityScore: finiteNum(Number(card.qualityScore), 0, 100),
             anonymityProtocol: clip(card.anonymityProtocol || undefined, 32),
@@ -115,7 +120,7 @@ const buildConnectivity = (payload) => {
 
 // webrtc:finished — { servers: [{ id, url, ip, natTypeCode, country_code, org }] }
 // org is only trusted when a geo lookup landed (country_code recorded with it).
-const NAT_TYPES = new Set(['host', 'srflx', 'prflx', 'relay', 'unknown', 'unavailable', 'error']);
+const NAT_TYPES = new Set(NAT_TYPE_CODES);
 const buildWebrtc = (payload) => {
     const servers = (payload?.servers ?? [])
         .filter((server) => NAT_TYPES.has(server?.natTypeCode))
@@ -162,7 +167,7 @@ const buildDnsleak = (payload) => {
 
 // speedtest:finished — thickened payload; numeric fields may be '-' until
 // measured, which finiteNum turns into an absent key.
-const QUALITIES = new Set(['bad', 'poor', 'average', 'good', 'great']);
+const QUALITIES = new Set(SPEEDTEST_QUALITIES);
 const quality = (value) => (QUALITIES.has(value) ? value : undefined);
 const buildSpeedtest = (payload) => {
     if (!payload) return null;
@@ -371,11 +376,9 @@ const buildEnhanceddnsleak = (payload) => {
 // a `detail` object per check (issuing bank, the country a shared position
 // resolved to, the zone and languages), which has no place behind a link
 // anyone can open, so it is dropped here rather than at render time.
-const PERSONA_GRADES = new Set(['A', 'B', 'C', 'D', 'unknown']);
-const PERSONA_AXES = new Set(['match', 'coherence', 'leak']);
-const PERSONA_VERDICTS = new Set([
-    'match', 'mismatch', 'leak', 'unnatural', 'unknown', 'not-applicable',
-]);
+const PERSONA_GRADES = new Set(Object.values(PERSONA_GRADE));
+const PERSONA_AXES = new Set(Object.values(PERSONA_AXIS));
+const PERSONA_VERDICTS = new Set(Object.values(PERSONA_VERDICT));
 const personaCount = (value) => clampInt(value, 0, 64) ?? 0;
 
 const buildPersona = (payload) => {

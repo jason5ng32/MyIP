@@ -1,9 +1,9 @@
 // Scenario friction: validates the IPCheck.ing `advancedData.scenarios` block and maps
 // it onto display order, tones and locale keys (`ipInfos.scenarioFriction.*`).
 
-import { SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS } from '../report/report-schema.js';
+import { SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS } from '../codes/ip.js';
 
-// Display order (ids and levels owned by the report schema); `kind` picks the verdict wording.
+// Display order (ids and levels from utils/codes/ip.js); `kind` picks the verdict wording.
 export const SCENARIOS = Object.freeze(SCENARIO_FRICTION_IDS
     .map((id) => Object.freeze(id === 'availability' ? { id, kind: 'availability' } : { id })));
 

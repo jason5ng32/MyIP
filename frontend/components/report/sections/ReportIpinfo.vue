@@ -40,7 +40,7 @@
                         <span v-else class="text-muted-foreground">—</span>
                     </td>
                     <td v-if="has.ipType" class="px-3 py-2 whitespace-nowrap">
-                        {{ card.ipType ? t(TYPE_KEYS[card.ipType]) : '—' }}
+                        {{ card.ipType ? t(IP_TYPE_I18N_KEYS[card.ipType]) : '—' }}
                     </td>
                     <td v-if="has.nativeIP" class="px-3 py-2 whitespace-nowrap">
                         <span v-if="card.nativeIP === undefined" class="text-muted-foreground">—</span>
@@ -70,18 +70,11 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
-// Anonymity verdict code → the IP card's own label.
-import { ANONYMITY_I18N_KEYS } from '@/utils/ip/transform-ip-data.js';
+// Anonymity / line type codes → the IP card's own labels.
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();
-
-const TYPE_KEYS = {
-    business: 'ipInfos.advancedData.type.Business',
-    residential: 'ipInfos.advancedData.type.Residential',
-    wireless: 'ipInfos.advancedData.type.Wireless',
-    hosting: 'ipInfos.advancedData.type.Hosting',
-};
 
 const has = computed(() => ({
     timezone: props.section.cards.some((card) => card.timezone !== undefined),

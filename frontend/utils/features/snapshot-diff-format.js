@@ -9,9 +9,10 @@
 import {
     keyedItems, sectionFields, fieldKind, speedTier, sameValue, DISPLAY_FRACTION_DIGITS,
 } from './snapshot-diff.js';
-import { IP_TYPE_KEYS, CONNECTIVITY_STATUS_KEYS, natTypeKey } from './snapshot-view.js';
-import { ANONYMITY_I18N_KEYS } from '../ip/transform-ip-data.js';
-import { SCENARIOS, scenarioNameKey, verdictKey } from './scenario-friction.js';
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS } from '../codes/ip-labels.js';
+import { SCENARIOS, scenarioNameKey, verdictKey } from '../ip/scenario-friction.js';
+import { CONNECTIVITY_STATUS_KEYS } from '../codes/connectivity-labels.js';
+import { natTypeKey } from '../codes/webrtc-labels.js';
 
 const SCENARIO_BY_FIELD = new Map(SCENARIOS.map((scenario) => [`scenarios.${scenario.id}`, scenario]));
 
@@ -65,7 +66,7 @@ export const formatFieldValue = (field, value, { t = (key) => key, countryName, 
     if (COUNTRY_FIELDS.has(field)) return countryName?.(value) || String(value);
     if (BOOLEAN_FIELDS.has(field)) return t(value ? 'snapshots.Yes' : 'snapshots.No');
     if (field === 'anonymity') return label(ANONYMITY_I18N_KEYS);
-    if (field === 'ipType') return label(IP_TYPE_KEYS);
+    if (field === 'ipType') return label(IP_TYPE_I18N_KEYS);
     if (field === 'status') return label(CONNECTIVITY_STATUS_KEYS);
     if (field === 'natType') return t(natTypeKey(value));
     if (field === 'abuseLevel') return t(`ipInfos.abuseLevel.${value}`);

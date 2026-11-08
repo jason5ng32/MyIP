@@ -7,7 +7,7 @@
 // `left` is the baseline ("from"), `right` the snapshot being viewed ("to").
 
 import { HOME_SECTION_IDS } from './snapshots.js';
-import { SCENARIO_FRICTION_IDS } from '../report/report-schema.js';
+import { SCENARIO_FRICTION_IDS } from '../codes/ip.js';
 
 // An ipinfo card's scenario friction, one dotted field per scenario.
 const SCENARIO_FIELDS = SCENARIO_FRICTION_IDS.map((id) => `scenarios.${id}`);

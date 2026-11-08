@@ -185,6 +185,7 @@ import { useStatusTone } from '@/composables/use-status-tone.js';
 import {
     VERDICT, GRADE, AXIS, VISIBILITY, PERSONA_CHECK_IDS, PERSONA_UNKNOWN_REASONS,
 } from '@/utils/persona/check-ids.js';
+import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY } from '@/utils/codes/ip-labels.js';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Icon } from '@iconify/vue';
@@ -341,13 +342,6 @@ const nothingActionable = computed(() => {
 // to plain text on its own.
 const COUNTRY_FIELDS = new Set(['expected', 'actual', 'v4', 'v6']);
 
-// The IP type enum already has copy elsewhere in the app — reuse it rather
-// than translating "hosting" a second time.
-const IP_TYPE_KEYS = {
-    residential: 'Residential', wireless: 'Wireless',
-    business: 'Business', hosting: 'Hosting',
-};
-
 const isCountryCode = (value) => typeof value === 'string' && /^[A-Z]{2}$/.test(value);
 
 // Intl's hour-cycle enums (h11/h12/h23/h24) are opaque to anyone who has not
@@ -362,11 +356,9 @@ const renderValue = (key, value, detail) => {
         return { kind: 'text', text: t(value ? 'personacheck.value.yes' : 'personacheck.value.no') };
     }
     if (key === 'ipType') {
-        const suffix = IP_TYPE_KEYS[String(value).toLowerCase()];
-        return {
-            kind: 'text',
-            text: suffix ? t(`ipInfos.advancedData.type.${suffix}`) : t('ipInfos.advancedData.type.unknownType'),
-        };
+        // The IP card's own copy, rather than translating "hosting" a second time.
+        const key = IP_TYPE_I18N_KEYS[String(value).toLowerCase()];
+        return { kind: 'text', text: t(key || IP_TYPE_UNKNOWN_KEY) };
     }
     if (isHourCycle(value)) {
         return { kind: 'text', text: t(`personacheck.hourCycle.${value}`) };

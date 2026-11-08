@@ -1,4 +1,4 @@
-// Tests for frontend/utils/features/scenario-friction.js — scenario normalization,
+// Tests for frontend/utils/ip/scenario-friction.js — scenario normalization,
 // display order, level sorting, card dot order, tones, locale keys and level shares.
 
 import assert from 'node:assert/strict';
@@ -15,8 +15,8 @@ import {
     verdictKey,
     frictionShares,
     frictionDots,
-} from '../frontend/utils/features/scenario-friction.js';
-import { SCENARIO_FRICTION_IDS } from '../common/report-schema.js';
+} from '../frontend/utils/ip/scenario-friction.js';
+import { SCENARIO_FRICTION_IDS } from '../common/codes/ip.js';
 
 const ORDER = ['signup', 'payments', 'finance', 'streaming', 'availability',
     'browsing', 'posting', 'crossBorderSocial', 'automation', 'email'];

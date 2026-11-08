@@ -27,7 +27,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { scenarioNameKey, scenarioTone, sortByLevel, verdictKey } from '@/utils/features/scenario-friction.js';
+import { scenarioNameKey, scenarioTone, sortByLevel, verdictKey } from '@/utils/ip/scenario-friction.js';
 
 const props = defineProps({
     scenarios: { type: Array, required: true },
