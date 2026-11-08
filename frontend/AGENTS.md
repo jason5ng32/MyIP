@@ -129,7 +129,9 @@ sections. The auto label is "country · IP" of the `snapshotsLabelCard` card
 (1-based, default 1, a Select in Preferences; fallback the first valid
 card); a name replaces it. Retention is by count only (10 / 50 / 100,
 default 50); pinned snapshots (`kept`, UI "Pin") are exempt, capped at 20.
-Every creation emits `snapshot:created`; no toast.
+Every creation emits `snapshot:created`; no toast. Stored snapshots are
+re-validated against `common/report-schema.js` on every read: a
+`REPORT_VERSION` bump or a tightened section silently drops them.
 
 The page (`advanced-tools/Snapshots.vue`) is list + detail: the list
 (`snapshots/SnapshotList.vue`) is the left column on ≥1024px and a Sheet
