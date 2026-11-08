@@ -37,7 +37,7 @@ const sectionsOf = ({ cards, targets, servers, providers, speed } = {}) => {
 // A schema-checked snapshot fixture.
 const snap = (parts) => {
     const sections = sectionsOf(parts);
-    const { errors } = validateReport({ v: REPORT_VERSION, generatedAt: T0, origin: 'test', locale: 'en', sections });
+    const { errors } = validateReport({ v: REPORT_VERSION, generatedAt: T0, origin: 'test', locale: 'en', sections }, { local: true });
     assert.deepEqual(errors, [], 'fixture must be a legal report');
     return { ...createSnapshot({ id: 'x', now: T0 }), sections };
 };
@@ -287,6 +287,22 @@ describe('snapshot diff — no verdicts', () => {
         const rows = Object.values(diffSnapshots(snap(BASE), right).sections).flatMap((section) => section.rows);
         assert.ok(rows.filter((row) => row.changed).length >= 6);
         for (const row of rows) assert.equal('tone' in row, false, row.field);
+    });
+});
+
+describe('snapshot diff — abuse and scenario friction', () => {
+    it('compares abuse level and each scenario as its own semantic row', () => {
+        const left = snap({ cards: [card('ipcheck', '8.8.8.8', { abuseLevel: 'none', scenarios: { signup: 'low', email: 'high' } })] });
+        const right = snap({ cards: [card('ipcheck', '8.8.8.8', { abuseLevel: 'low', scenarios: { signup: 'medium', email: 'high', finance: 'low' } })] });
+        const rows = diffSnapshots(left, right).sections.ipinfo.rows;
+        const pick = (field) => rows.find((row) => row.field === field);
+        assert.deepEqual([pick('abuseLevel').from, pick('abuseLevel').to, pick('abuseLevel').highlight], ['none', 'low', true]);
+        assert.deepEqual([pick('scenarios.signup').from, pick('scenarios.signup').to, pick('scenarios.signup').highlight],
+            ['low', 'medium', true]);
+        assert.equal(pick('scenarios.email').changed, false);
+        assert.deepEqual([pick('scenarios.finance').from, pick('scenarios.finance').to], [undefined, 'low']);
+        assert.equal(pick('scenarios.payments'), undefined, 'absent on both sides: no row');
+        assert.equal(fieldKind('scenarios.availability'), 'semantic');
     });
 });
 

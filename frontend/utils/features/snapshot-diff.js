@@ -7,12 +7,17 @@
 // `left` is the baseline ("from"), `right` the snapshot being viewed ("to").
 
 import { HOME_SECTION_IDS } from './snapshots.js';
+import { SCENARIO_FRICTION_IDS } from '../report/report-schema.js';
+
+// An ipinfo card's scenario friction, one dotted field per scenario.
+const SCENARIO_FIELDS = SCENARIO_FRICTION_IDS.map((id) => `scenarios.${id}`);
 
 // --- field classes ----------------------------------------------------------
 
 // Highlighted when changed.
 const SEMANTIC_FIELDS = new Set([
     'ip', 'countryCode', 'region', 'city', 'asn', 'isp', 'anonymity', 'ipType', 'nativeIP',
+    'abuseLevel', ...SCENARIO_FIELDS,
     'natType', 'org', 'status', 'tier', 'connection.ip',
     'qualities.streaming', 'qualities.gaming', 'qualities.rtc',
 ]);
@@ -68,7 +73,8 @@ const KEYED_SECTIONS = {
         list: 'cards',
         key: 'id',
         fields: ['ip', 'countryCode', 'region', 'city', 'timezone', 'asn', 'isp', 'anonymity',
-            'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider'],
+            'ipType', 'nativeIP', 'qualityScore', 'abuseLevel', 'anonymityProtocol', 'anonymityProvider',
+            ...SCENARIO_FIELDS],
     },
     connectivity: { list: 'targets', key: 'id', fields: ['name', 'status', 'timeMs', 'minTimeMs', 'custom'] },
     webrtc: { list: 'servers', key: 'id', fields: ['url', 'ip', 'natType', 'countryCode', 'org'] },
@@ -82,8 +88,8 @@ const SPEEDTEST_FIELDS = [
     'connection.ip', 'connection.colo', 'connection.coloCountryCode', 'connection.coloCity',
 ];
 
-// A section's compared fields in display order (speedtest's dotted, its
-// derived `tier` included); [] for an unknown id.
+// A section's compared fields in display order (dotted ones read one level
+// down; speedtest's derived `tier` included); [] for an unknown id.
 export const sectionFields = (id) => {
     if (id === 'speedtest') return [...SPEEDTEST_FIELDS];
     return KEYED_SECTIONS[id] ? [...KEYED_SECTIONS[id].fields] : [];
@@ -115,18 +121,21 @@ const makeRow = (key, field, from, to) => {
     return { key, field, from, to, kind, changed, highlight: changed && kind === 'semantic' };
 };
 
+// One field of an item; dotted fields read one level down, null reads as absent.
+const readDotted = (item, field) => {
+    const [head, tail] = field.split('.');
+    const value = tail ? item?.[head]?.[tail] : item?.[head];
+    return value ?? undefined;
+};
+
 // Rows for every compared field either side holds.
-const fieldRows = (key, fields, left, right, read = (item, field) => item?.[field]) => fields
+const fieldRows = (key, fields, left, right, read = readDotted) => fields
     .map((field) => [field, read(left, field), read(right, field)])
     .filter(([, from, to]) => from !== undefined || to !== undefined)
     .map(([field, from, to]) => makeRow(key, field, from, to));
 
-const readSpeed = (section, field) => {
-    if (field === 'tier') return speedTier(section?.downloadMbps) ?? undefined;
-    const [head, tail] = field.split('.');
-    const value = tail ? section?.[head]?.[tail] : section?.[head];
-    return value ?? undefined;
-};
+const readSpeed = (section, field) => (field === 'tier'
+    ? speedTier(section?.downloadMbps) ?? undefined : readDotted(section, field));
 
 const emptySection = (status) => ({ status, rows: [], onlyLeft: [], onlyRight: [], listChanged: false });
 

@@ -5,7 +5,9 @@
 // via the caller's t(); data tables keep the schema's English field names on
 // purpose (stable identifiers for AI consumption).
 
-import { REPORT_VERSION, REPORT_SECTION_IDS, maskReportIps } from './report-schema.js';
+import {
+    REPORT_VERSION, REPORT_SECTION_IDS, maskReportIps, stripLocalOnly,
+} from './report-schema.js';
 
 // Section id → the site's existing i18n title key (dialog checklist and
 // Markdown headings reuse the same titles the homepage sections show).
@@ -28,8 +30,9 @@ export const SECTION_TITLE_KEYS = {
 // Assemble the envelope from collected snapshots. Sections keep homepage
 // order regardless of selection order; snapshots are deep-copied (they're
 // JSON-safe by construction) so later test re-runs can't mutate an already
-// exported report; masking applies at this boundary so all outputs share
-// the exact same data.
+// exported report; local-only fields (Snapshots' scenario friction) are
+// dropped and masking applies at this boundary, so all outputs share the
+// exact same data.
 export const buildShareReport = ({ sections, selectedIds, maskTail, locale, origin }) => {
     const picked = {};
     for (const id of REPORT_SECTION_IDS) {
@@ -37,13 +40,13 @@ export const buildShareReport = ({ sections, selectedIds, maskTail, locale, orig
             picked[id] = JSON.parse(JSON.stringify(sections[id]));
         }
     }
-    const report = {
+    const report = stripLocalOnly({
         v: REPORT_VERSION,
         generatedAt: new Date().toISOString(),
         origin,
         locale,
         sections: picked,
-    };
+    });
     return maskTail ? maskReportIps(report) : report;
 };
 
@@ -73,7 +76,7 @@ const MTR_HOP_STATS = ['lossPct', 'sntCount', 'drop', 'rcv', 'lastMs', 'avgMs', 
 
 // ipinfo's IPCheck.ing enrichment columns only render when some card
 // carries them (other sources / signed-out runs never do).
-const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider'];
+const IPINFO_EXTRA_COLS = ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProtocol', 'anonymityProvider', 'abuseLevel'];
 
 const SECTION_RENDERERS = {
     ipinfo: (section) => {

@@ -201,6 +201,26 @@ describe('snapshot diff format — values', () => {
         assert.equal(fieldFlag('countryCode', undefined), '');
         assert.equal(fieldLabelKey('connection.ip'), 'snapshots.fields.connection.ip');
     });
+
+    it('labels abuse and scenario friction with the IP card\'s own wording', () => {
+        assert.equal(fieldLabelKey('abuseLevel'), 'ipInfos.abuseLevel.label');
+        assert.equal(fieldLabelKey('scenarios.signup'), 'ipInfos.scenarioFriction.scenarios.signup');
+        assert.equal(fieldLabelKey('scenarios.crossBorderSocial'), 'ipInfos.scenarioFriction.scenarios.localSocial');
+        assert.equal(formatFieldValue('abuseLevel', 'medium', opts), 't:ipInfos.abuseLevel.medium');
+        assert.equal(formatFieldValue('scenarios.payments', 'medium', opts), 't:ipInfos.scenarioFriction.verdict.default.medium');
+        assert.equal(formatFieldValue('scenarios.availability', 'high', opts), 't:ipInfos.scenarioFriction.verdict.availability.high');
+    });
+
+    it('lists the scenario lines last, in display order, after abuse level', () => {
+        const order = sectionFieldOrder('ipinfo');
+        assert.equal(order[order.indexOf('qualityScore') + 1], 'abuseLevel');
+        assert.deepEqual(order.slice(-10), ['signup', 'payments', 'finance', 'streaming', 'availability',
+            'browsing', 'posting', 'crossBorderSocial', 'automation', 'email'].map((id) => `scenarios.${id}`));
+        const viewed = snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { scenarios: { email: 'high', signup: 'low' } })] } });
+        const compared = snap({ ipinfo: { testedAt: T0, cards: [card('A', '1.1.1.1', { scenarios: { email: 'medium', signup: 'low' } })] } });
+        const [hunk] = hunksOf('ipinfo', compared, viewed);
+        assert.deepEqual(marks(hunk).slice(-3), [' scenarios.signup', '-scenarios.email', '+scenarios.email']);
+    });
 });
 
 describe('snapshot diff format — inline segments', () => {

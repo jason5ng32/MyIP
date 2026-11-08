@@ -16,6 +16,7 @@ import {
     frictionShares,
     frictionDots,
 } from '../frontend/utils/features/scenario-friction.js';
+import { SCENARIO_FRICTION_IDS } from '../common/report-schema.js';
 
 const ORDER = ['signup', 'payments', 'finance', 'streaming', 'availability',
     'browsing', 'posting', 'crossBorderSocial', 'automation', 'email'];
@@ -27,6 +28,12 @@ const item = (id, level = 'low') => ({ id, level });
 const full = (level = 'low') => ({ version: 1, items: ORDER.map((id) => item(id, level)) });
 
 describe('scenario-friction', () => {
+    describe('report schema', () => {
+        it('shares its ids with the report schema', () => {
+            assert.deepEqual(SCENARIOS.map((s) => s.id), SCENARIO_FRICTION_IDS);
+        });
+    });
+
     describe('SCENARIOS', () => {
         it('lists the ten ids in display order with one availability kind', () => {
             assert.deepEqual(SCENARIOS.map((s) => s.id), ORDER);

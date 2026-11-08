@@ -13,6 +13,7 @@
                     <th v-if="has.ipType" scope="col" :class="TH_LEFT">{{ t('ipInfos.type') }}</th>
                     <th v-if="has.nativeIP" scope="col" :class="TH_LEFT">{{ t('ipInfos.advancedData.Nativeness') }}</th>
                     <th v-if="has.qualityScore" scope="col" :class="TH_RIGHT">{{ t('ipInfos.qualityScore') }}</th>
+                    <th v-if="has.abuseLevel" scope="col" :class="TH_LEFT">{{ t('ipInfos.abuseLevel.label') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y">
@@ -50,6 +51,9 @@
                     <td v-if="has.qualityScore" :class="TD_NUM">
                         {{ card.qualityScore != null ? `${card.qualityScore}/100` : '—' }}
                     </td>
+                    <td v-if="has.abuseLevel" class="px-3 py-2 whitespace-nowrap">
+                        {{ card.abuseLevel ? t('ipInfos.abuseLevel.' + card.abuseLevel) : '—' }}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -59,8 +63,9 @@
 <script setup>
 // Read-only renderer for the ipinfo report section: one row per IP source.
 // The IPCheck.ing-source enrichment columns (anonymity verdict, line type,
-// ASN-geo match, quality score) appear only when at least one card carries
-// them — enums map back to the IP card's own labels in the viewer's locale.
+// ASN-geo match, quality score, abuse activity) appear only when at least
+// one card carries them — enums map back to the IP card's own labels in the
+// viewer's locale.
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
@@ -84,5 +89,6 @@ const has = computed(() => ({
     ipType: props.section.cards.some((card) => card.ipType !== undefined),
     nativeIP: props.section.cards.some((card) => card.nativeIP !== undefined),
     qualityScore: props.section.cards.some((card) => card.qualityScore !== undefined),
+    abuseLevel: props.section.cards.some((card) => card.abuseLevel !== undefined),
 }));
 </script>

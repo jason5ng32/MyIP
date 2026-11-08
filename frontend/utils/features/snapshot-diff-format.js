@@ -11,6 +11,9 @@ import {
 } from './snapshot-diff.js';
 import { IP_TYPE_KEYS, CONNECTIVITY_STATUS_KEYS, natTypeKey } from './snapshot-view.js';
 import { ANONYMITY_I18N_KEYS } from '../ip/transform-ip-data.js';
+import { SCENARIOS, scenarioNameKey, verdictKey } from './scenario-friction.js';
+
+const SCENARIO_BY_FIELD = new Map(SCENARIOS.map((scenario) => [`scenarios.${scenario.id}`, scenario]));
 
 // --- fields -----------------------------------------------------------------
 
@@ -21,8 +24,13 @@ const ITEM_NAME_FIELDS = { ipinfo: 'source', connectivity: 'name', webrtc: 'url'
 // noise gate, not a line.
 export const sectionFieldOrder = (sectionId) => sectionFields(sectionId).filter((field) => field !== 'tier');
 
-// i18n key of a field's label (dotted speedtest fields nest).
-export const fieldLabelKey = (field) => `snapshots.fields.${field}`;
+// i18n key of a field's label (dotted speedtest fields nest); abuse and
+// scenario friction reuse the IP card's own labels.
+export const fieldLabelKey = (field) => {
+    if (field === 'abuseLevel') return 'ipInfos.abuseLevel.label';
+    if (SCENARIO_BY_FIELD.has(field)) return scenarioNameKey(SCENARIO_BY_FIELD.get(field));
+    return `snapshots.fields.${field}`;
+};
 
 // One field of an item; dotted fields read one level down, null reads as absent.
 export const readField = (item, field) => {
@@ -60,6 +68,8 @@ export const formatFieldValue = (field, value, { t = (key) => key, countryName, 
     if (field === 'ipType') return label(IP_TYPE_KEYS);
     if (field === 'status') return label(CONNECTIVITY_STATUS_KEYS);
     if (field === 'natType') return t(natTypeKey(value));
+    if (field === 'abuseLevel') return t(`ipInfos.abuseLevel.${value}`);
+    if (SCENARIO_BY_FIELD.has(field)) return t(verdictKey({ ...SCENARIO_BY_FIELD.get(field), level: value }));
     if (field.startsWith('qualities.')) return t(`speedtest.quality.${value}`);
     if (typeof value !== 'number') return String(value);
     if (MS_FIELDS.has(field)) return `${number(value)} ms`;

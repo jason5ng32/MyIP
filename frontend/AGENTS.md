@@ -49,7 +49,9 @@ New reportable test = event + builder + schema entry in one change; new result
 semantics = builder whitelist + schema enum too (builders fail soft, fixtures
 are frozen: drift = quietly missing fields). Report links are public: the
 builder, not the renderer, drops visitor-supplied data (Persona Check: id / axis
-/ verdict, never `detail`; Invisibility: key + flag).
+/ verdict, never `detail`; Invisibility: key + flag). A `localOnly` schema field
+(scenario friction) is Snapshots-only: the share validator rejects it and
+`buildShareReport` strips it.
 
 ### Commands are the imperative twin of events
 

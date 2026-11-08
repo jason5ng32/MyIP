@@ -1,21 +1,13 @@
 // Scenario friction: validates the IPCheck.ing `advancedData.scenarios` block and maps
 // it onto display order, tones and locale keys (`ipInfos.scenarioFriction.*`).
 
-// Display order; `kind` picks the verdict wording.
-export const SCENARIOS = Object.freeze([
-    { id: 'signup' },
-    { id: 'payments' },
-    { id: 'finance' },
-    { id: 'streaming' },
-    { id: 'availability', kind: 'availability' },
-    { id: 'browsing' },
-    { id: 'posting' },
-    { id: 'crossBorderSocial' },
-    { id: 'automation' },
-    { id: 'email' },
-].map((s) => Object.freeze(s)));
+import { SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS } from '../report/report-schema.js';
 
-const LEVELS = ['low', 'medium', 'high'];
+// Display order (ids and levels owned by the report schema); `kind` picks the verdict wording.
+export const SCENARIOS = Object.freeze(SCENARIO_FRICTION_IDS
+    .map((id) => Object.freeze(id === 'availability' ? { id, kind: 'availability' } : { id })));
+
+const LEVELS = SCENARIO_FRICTION_LEVELS;
 
 // Green and yellow only, never red: medium is the light yellow, high the full one.
 export const LEVEL_TONE = Object.freeze({ low: 'ok-fast', medium: 'ok-mild', high: 'ok-slow' });

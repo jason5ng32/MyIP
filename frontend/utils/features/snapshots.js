@@ -72,7 +72,7 @@ export const sanitizeSnapshot = (value) => {
     if (Object.keys(sections).some((key) => !HOME_SECTION_IDS.includes(key))) return null;
     const { ok } = validateReport({
         v: REPORT_VERSION, generatedAt: lastSeenAt, origin: 'snapshot', locale: 'en', sections,
-    });
+    }, { local: true });
     if (!ok) return null;
     const clean = { id, v: REPORT_VERSION, firstSeenAt, lastSeenAt, name, kept, sections };
     return labelCardId === undefined ? clean : { ...clean, labelCardId };

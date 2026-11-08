@@ -266,6 +266,8 @@ const trackFetchStatus = (status) => {
         qualityScore: card.qualityScore,
         anonymityProtocol: card.anonymityProtocol,
         anonymityProvider: card.anonymityProvider,
+        abuseLevel: card.scoreDimensions?.reputation?.level,
+        frictionScenarios: card.frictionScenarios,
       })),
     });
   }

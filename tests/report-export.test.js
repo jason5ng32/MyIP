@@ -148,6 +148,26 @@ describe('reportToMarkdown', () => {
         assert.ok(md.includes('score: 72/100'));
     });
 
+    it('renders ipinfo abuse as a column and never carries scenario friction', () => {
+        const sections = makeSections();
+        sections.ipinfo.cards = [
+            { ...sections.ipinfo.cards[0], abuseLevel: 'low', scenarios: { signup: 'low', email: 'high' } },
+            { source: 'Cloudflare IPv4', ip: '1.2.3.4', countryCode: 'US' },
+        ];
+        for (const maskTail of [false, true]) {
+            const report = buildShareReport({ sections, selectedIds: ['ipinfo'], maskTail, locale: 'en', origin: 'ipcheck.ing' });
+            assert.deepEqual(validateReport(report), { ok: true, errors: [] }, 'passes the share validator');
+            assert.ok(report.sections.ipinfo.cards.every((card) => !('scenarios' in card)), 'link / JSON payload');
+            const md = reportToMarkdown(report, t);
+            assert.ok(md.includes('| source | ip | countryCode | region | city | timezone | asn | isp | abuseLevel |'));
+            assert.ok(!/scenario|signup/i.test(md), 'AI copy');
+        }
+        assert.deepEqual(sections.ipinfo.cards[0].scenarios, { signup: 'low', email: 'high' }, 'collector data untouched');
+
+        const plain = reportToMarkdown(makeReport(), t);
+        assert.ok(!plain.includes('abuseLevel'));
+    });
+
     it('renders the adblocktest section as its per-category table', () => {
         const report = buildShareReport({
             sections: makeSections(),

@@ -7,7 +7,9 @@
 // holds nothing worth reporting.
 
 import { isValidIP } from '../ip/valid-ip.js';
-import { CONNECTIVITY_STATUS, ANONYMITY_CODES } from './report-schema.js';
+import {
+    CONNECTIVITY_STATUS, ANONYMITY_CODES, ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS,
+} from './report-schema.js';
 
 // --- small shared normalizers ----------------------------------------------
 
@@ -41,7 +43,7 @@ const compact = (obj) => {
 
 // ipinfo:finished — { cards: [{ id, source, ip, country_code, region, city,
 // timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
-// anonymityProtocol?, anonymityProvider? }] }. Cards whose ip never resolved
+// anonymityProtocol?, anonymityProvider?, abuseLevel?, frictionScenarios? }] }. Cards whose ip never resolved
 // (placeholder text in the slot) are dropped. The optional enrichments only
 // exist on the IPCheck.ing source and stay absent when gated
 // ('sign_in_required' / 'quota_exceeded' / 'cooldown' upstream values never
@@ -50,6 +52,18 @@ const compact = (obj) => {
 // card's fixed slot (`source` follows the provider that answered).
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
 const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
+// Scenario friction `[{ id, level }]` → `{ [id]: level }`, known ids and levels
+// only; absent when none survive. Local-only: Snapshots keep it, the share
+// export strips it.
+const frictionLevels = (scenarios) => {
+    if (!Array.isArray(scenarios)) return undefined;
+    const levels = {};
+    for (const item of scenarios) {
+        if (SCENARIO_FRICTION_IDS.includes(item?.id) && SCENARIO_FRICTION_LEVELS.includes(item?.level)
+            && !(item.id in levels)) levels[item.id] = item.level;
+    }
+    return Object.keys(levels).length ? levels : undefined;
+};
 const buildIpinfo = (payload) => {
     const cards = (payload?.cards ?? [])
         .filter((card) => isValidIP(card?.ip))
@@ -72,6 +86,8 @@ const buildIpinfo = (payload) => {
             qualityScore: finiteNum(Number(card.qualityScore), 0, 100),
             anonymityProtocol: clip(card.anonymityProtocol || undefined, 32),
             anonymityProvider: clip(card.anonymityProvider || undefined, 64),
+            abuseLevel: ABUSE_LEVELS.includes(card.abuseLevel) ? card.abuseLevel : undefined,
+            scenarios: frictionLevels(card.frictionScenarios),
         }));
     return cards.length ? { cards } : null;
 };

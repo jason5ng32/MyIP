@@ -276,6 +276,39 @@ describe('cleaning rules', () => {
         }
     });
 
+    it('ipinfo keeps abuse level and scenario friction levels, nothing else', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        const section = build({
+            cards: [{
+                source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'US', abuseLevel: 'medium',
+                frictionScenarios: [
+                    { id: 'signup', kind: undefined, level: 'low' },
+                    { id: 'availability', kind: 'availability', level: 'high' },
+                    { id: 'email', level: 'medium', reasons: ['x'] },
+                    { id: 'signup', level: 'high' }, // repeat: first wins
+                    { id: 'bogus', level: 'low' },
+                    { id: 'finance', level: 'severe' },
+                ],
+            }, {
+                source: 'IPCheck.ing IPv6', ip: '2001:db8::1', country_code: 'US',
+                abuseLevel: 'sign_in_required', frictionScenarios: null,
+            }, {
+                source: 'IPCheck.ing IPv4', ip: '5.6.7.8', country_code: 'US',
+                abuseLevel: undefined, frictionScenarios: [{ id: 'bogus', level: 'low' }],
+            }],
+        });
+        const [enriched, gated, empty] = section.cards;
+        assert.equal(enriched.abuseLevel, 'medium');
+        assert.deepEqual(enriched.scenarios, { signup: 'low', availability: 'high', email: 'medium' });
+        for (const card of [gated, empty]) {
+            assert.equal('abuseLevel' in card, false);
+            assert.equal('scenarios' in card, false);
+        }
+        const report = { v: REPORT_VERSION, generatedAt: '2026-11-08T00:00:00.000Z', origin: 'test', locale: 'en',
+            sections: { ipinfo: { testedAt: '2026-11-08T00:00:00.000Z', ...section } } };
+        assert.deepEqual(validateReport(report, { local: true }).errors, []);
+    });
+
     it('ipinfo keeps every anonymity code and nothing else', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const codes = [

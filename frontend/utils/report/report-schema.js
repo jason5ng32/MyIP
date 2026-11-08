@@ -9,8 +9,12 @@ export {
     REPORT_SECTION_IDS,
     CONNECTIVITY_STATUS,
     ANONYMITY_CODES,
+    ABUSE_LEVELS,
+    SCENARIO_FRICTION_IDS,
+    SCENARIO_FRICTION_LEVELS,
     validateReport,
     maskIpTail,
     maskReportIps,
+    stripLocalOnly,
     isMaskedIP,
 } from '../../../common/report-schema.js';

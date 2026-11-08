@@ -196,6 +196,7 @@ import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { frictionDots, frictionShares } from '@/utils/features/scenario-friction.js';
+import { ABUSE_LEVELS } from '@/utils/report/report-schema.js';
 import ScenarioFrictionPanel from './ScenarioFrictionPanel.vue';
 import ScoreDetailsPanel from './ScoreDetailsPanel.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -317,7 +318,6 @@ const hasScoreDetails = computed(() =>
 );
 
 // Abuse level from the v3 reputation dimension (`ipInfos.abuseLevel.*`); anything else hides the cell.
-const ABUSE_LEVELS = ['none', 'low', 'medium', 'high'];
 const abuseLevel = computed(() => {
     const level = props.data.scoreDimensions?.reputation?.level;
     return ABUSE_LEVELS.includes(level) ? level : '';
