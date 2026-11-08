@@ -29,13 +29,14 @@
 // the viewer's language.
 import { useI18n } from 'vue-i18n';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
+import { CONNECTIVITY_STATUS_KEYS } from '@/utils/codes/connectivity-labels.js';
 
 defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();
 
 const STATUS_META = {
-    ok: { key: 'connectivity.StatusAvailable', tone: 'text-success' },
-    unreachable: { key: 'connectivity.StatusUnavailable', tone: 'text-destructive' },
-    timeout: { key: 'connectivity.StatusTimeout', tone: 'text-destructive' },
+    ok: { key: CONNECTIVITY_STATUS_KEYS.ok, tone: 'text-success' },
+    unreachable: { key: CONNECTIVITY_STATUS_KEYS.unreachable, tone: 'text-destructive' },
+    timeout: { key: CONNECTIVITY_STATUS_KEYS.timeout, tone: 'text-destructive' },
 };
 </script>

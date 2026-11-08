@@ -49,7 +49,7 @@
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import { computed } from 'vue';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import AsnConnectionQuality from './AsnConnectionQuality.vue';
 import AsnTrafficShares from './AsnTrafficShares.vue';
 import { useRouter } from 'vue-router';

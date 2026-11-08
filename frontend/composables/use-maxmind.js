@@ -15,7 +15,7 @@ import { useMainStore } from '../store.js';
 import { useI18n } from 'vue-i18n';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
 import { transformDataFromIPapi } from '../utils/ip/transform-ip-data.js';
-import getCountryName from '../data/country-name.js';
+import getCountryName from '../utils/country-name.js';
 import { toApiTag } from '../utils/locale-registry.js';
 
 // key → resolved result (successes only) / key → in-flight promise.

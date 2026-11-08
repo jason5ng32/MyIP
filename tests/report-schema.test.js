@@ -14,6 +14,7 @@ import {
     maskIpTail,
     maskReportIps,
     isMaskedIP,
+    stripLocalOnly,
 } from '../common/report-schema.js';
 import { validateReport as validateViaBridge } from '../frontend/utils/report/report-schema.js';
 import { parseMtrOutput } from '../frontend/utils/features/mtr-parse.js';
@@ -29,7 +30,7 @@ const makeValidReport = () => ({
         ipinfo: {
             testedAt: '2026-07-14T08:00:00.000Z',
             cards: [
-                { id: 'ipchecking_v4', source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 85, anonymityProtocol: 'SOCKS5', anonymityProvider: 'ACME' },
+                { id: 'ipchecking_v4', source: 'IPCheck.ing IPv4', ip: '1.2.3.4', countryCode: 'US', region: 'California', city: 'Mountain View', timezone: 'America/Los_Angeles', asn: 'AS15169', isp: 'Google LLC', anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 85, anonymityProtocol: 'SOCKS5', anonymityProvider: 'ACME', abuseLevel: 'low' },
                 { source: 'Cloudflare IPv6', ip: '2001:db8::1', countryCode: '', city: '' },
             ],
         },
@@ -244,6 +245,50 @@ describe('validateReport', () => {
             broken.sections.ipinfo.cards[0].id = bad;
             assert.equal(validateReport(broken).ok, false, String(bad));
         }
+    });
+
+    it('takes abuse level as a closed enum', () => {
+        for (const level of ['none', 'low', 'medium', 'high']) {
+            const ok = makeValidReport();
+            ok.sections.ipinfo.cards[0].abuseLevel = level;
+            assert.equal(validateReport(ok).ok, true, level);
+        }
+        const broken = makeValidReport();
+        broken.sections.ipinfo.cards[0].abuseLevel = 'sign_in_required';
+        assert.equal(validateReport(broken).ok, false);
+    });
+
+    it('keeps scenario friction local: Snapshots validate it, a shared report rejects it', () => {
+        const withScenarios = () => {
+            const report = makeValidReport();
+            report.sections.ipinfo.cards[0].scenarios = { signup: 'low', availability: 'medium', email: 'high' };
+            return report;
+        };
+        assert.deepEqual(validateReport(withScenarios(), { local: true }).errors, []);
+        assert.deepEqual(validateReport(withScenarios()).errors, ['report.sections.ipinfo.cards[0].scenarios: unknown key']);
+        const mutations = [
+            (card) => { card.scenarios.signup = 'none'; },
+            (card) => { card.scenarios.bogus = 'low'; },
+            (card) => { card.scenarios = [{ id: 'signup', level: 'low' }]; },
+            (card) => { card.scenarios.email = { level: 'high', reason: 'x' }; },
+        ];
+        for (const mutate of mutations) {
+            const broken = withScenarios();
+            mutate(broken.sections.ipinfo.cards[0]);
+            assert.equal(validateReport(broken, { local: true }).ok, false, mutate.toString());
+        }
+    });
+
+    it('stripLocalOnly drops local-only fields without mutating the input', () => {
+        const report = makeValidReport();
+        report.sections.ipinfo.cards[0].scenarios = { signup: 'low' };
+        const stripped = stripLocalOnly(report);
+        assert.equal('scenarios' in stripped.sections.ipinfo.cards[0], false);
+        assert.equal(stripped.sections.ipinfo.cards[0].abuseLevel, 'low');
+        assert.deepEqual(report.sections.ipinfo.cards[0].scenarios, { signup: 'low' });
+        assert.deepEqual(validateReport(stripped).errors, []);
+        const plain = makeValidReport();
+        assert.deepEqual(stripLocalOnly(plain).sections, plain.sections, 'nothing else changes');
     });
 
     it('rejects over-long strings and over-long arrays', () => {

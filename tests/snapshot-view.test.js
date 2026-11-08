@@ -1,12 +1,12 @@
 // Tests for frontend/utils/features/snapshot-view.js — the Snapshots page's
 // route state (`q` / `vs` with their fallbacks, the previous / specific
-// compare modes), the time span and the enum label keys.
+// compare modes) and the time span.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-    COMPARE_PREVIOUS, COMPARE_SPECIFIC, resolveSnapshotView, snapshotViewQuery, seenSpan, seenSpanText, natTypeKey,
+    COMPARE_PREVIOUS, COMPARE_SPECIFIC, resolveSnapshotView, snapshotViewQuery, seenSpan, seenSpanText,
 } from '../frontend/utils/features/snapshot-view.js';
 
 const T0 = '2026-11-08T10:00:00.000Z';
@@ -81,13 +81,5 @@ describe('snapshot view — time span', () => {
         const later = snap({}, { lastSeenAt: '2026-11-10T10:00:00.000Z' });
         assert.deepEqual(seenSpanText(later, minute), { first: '2026-11-08T10:00', last: '2026-11-10T10:00' });
         assert.deepEqual(seenSpanText(snap({}), minute), { first: '2026-11-08T10:00' });
-    });
-});
-
-describe('snapshot view — value labels', () => {
-    it('maps NAT codes onto the homepage keys', () => {
-        assert.equal(natTypeKey('srflx'), 'webrtc.NATType.srflx');
-        assert.equal(natTypeKey('unavailable'), 'webrtc.StatusUnavailable');
-        assert.equal(natTypeKey('error'), 'webrtc.StatusError');
     });
 });

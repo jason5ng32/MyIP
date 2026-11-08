@@ -160,7 +160,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
-import { CONNECTIVITY_STATUS } from '@/utils/report/report-schema.js';
+import { CONNECTIVITY_STATUS } from '@/utils/codes/connectivity.js';
 import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { siteUrlOf, removeMember } from '@/utils/features/connectivity-lists.js';
 import { JnTooltip } from '@/components/ui/tooltip';

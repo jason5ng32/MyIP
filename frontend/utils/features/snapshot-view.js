@@ -1,7 +1,6 @@
 // Snapshots tool page, pure layer: which snapshot is shown and which one it
-// is compared with (from the `?q=` / `?vs=` query), a snapshot's time span, and the
-// homepage i18n keys of recorded enum codes. Formatting that needs Intl or
-// vue-i18n is passed in.
+// is compared with (from the `?q=` / `?vs=` query) and a snapshot's time span.
+// Formatting that needs Intl or vue-i18n is passed in.
 
 // The "Compare with" choices: the next older snapshot, or one picked by id.
 export const COMPARE_PREVIOUS = 'previous';
@@ -55,26 +54,4 @@ export const seenSpanText = (snapshot, format) => {
     if (!span.range) return { first };
     const last = format(span.last);
     return last === first ? { first } : { first, last };
-};
-
-// --- value labels -----------------------------------------------------------
-
-// Enum codes → the homepage's own i18n keys.
-export const IP_TYPE_KEYS = Object.freeze({
-    business: 'ipInfos.advancedData.type.Business',
-    residential: 'ipInfos.advancedData.type.Residential',
-    wireless: 'ipInfos.advancedData.type.Wireless',
-    hosting: 'ipInfos.advancedData.type.Hosting',
-});
-
-export const CONNECTIVITY_STATUS_KEYS = Object.freeze({
-    ok: 'connectivity.StatusAvailable',
-    unreachable: 'connectivity.StatusUnavailable',
-    timeout: 'connectivity.StatusTimeout',
-});
-
-export const natTypeKey = (natType) => {
-    if (natType === 'unavailable') return 'webrtc.StatusUnavailable';
-    if (natType === 'error') return 'webrtc.StatusError';
-    return `webrtc.NATType.${natType}`;
 };

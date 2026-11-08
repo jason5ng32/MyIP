@@ -150,7 +150,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { Icon } from '@iconify/vue';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { trackEvent } from '@/utils/analytics';
 import {

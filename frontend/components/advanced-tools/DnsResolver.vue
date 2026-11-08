@@ -122,7 +122,7 @@ import { trackEvent } from '@/utils/analytics';
 import { isValidDomain } from '@/utils/ip/valid-ip.js';
 import { DNS_RECORD_TYPES } from '@/utils/features/dns-record-types.js';
 import { dnsFailureKeys, dnsRowStatus } from '@/utils/features/dns-resolver-status.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';

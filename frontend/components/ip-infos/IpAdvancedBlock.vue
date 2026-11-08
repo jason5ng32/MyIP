@@ -108,7 +108,7 @@
                         <Flag class="size-3.5" />
                         <span>{{ t('ipInfos.abuseLevel.label') }}</span>
                     </dt>
-                    <dd class="font-normal wrap-break-word">{{ t('ipInfos.abuseLevel.' + abuseLevel) }}</dd>
+                    <dd class="font-normal wrap-break-word">{{ t(ABUSE_LEVEL_I18N_KEYS[abuseLevel]) }}</dd>
                 </div>
 
                 <!-- Scenario friction: one tone dot per scenario, low → high (deliberately not a score
@@ -195,7 +195,9 @@ import { isToolAvailable } from '@/utils/tool-availability.js';
 import { TOOL_BY_SLUG } from '@/data/tools.js';
 import { isPlainClick } from '@/utils/nav-target.js';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import { frictionDots, frictionShares } from '@/utils/features/scenario-friction.js';
+import { frictionDots, frictionShares } from '@/utils/ip/scenario-friction.js';
+import { ABUSE_LEVELS } from '@/utils/codes/ip.js';
+import { ABUSE_LEVEL_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 import ScenarioFrictionPanel from './ScenarioFrictionPanel.vue';
 import ScoreDetailsPanel from './ScoreDetailsPanel.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -316,8 +318,7 @@ const hasScoreDetails = computed(() =>
     showAdvancedBlock.value && (scoreExplanation.value.length > 0 || scoreTagRows.value.length > 0)
 );
 
-// Abuse level from the v3 reputation dimension (`ipInfos.abuseLevel.*`); anything else hides the cell.
-const ABUSE_LEVELS = ['none', 'low', 'medium', 'high'];
+// Abuse level from the v3 reputation dimension (ABUSE_LEVELS); anything else hides the cell.
 const abuseLevel = computed(() => {
     const level = props.data.scoreDimensions?.reputation?.level;
     return ABUSE_LEVELS.includes(level) ? level : '';

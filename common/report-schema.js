@@ -7,6 +7,14 @@
 // text, every field is typed/capped, unknown keys are rejected outright.
 
 import { isValidIP, isIPv6, isValidDomain } from './valid-ip.js';
+// Code lists are owned by the domain that records them.
+import {
+    ANONYMITY_CODES, IP_TYPE_CODES, ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS,
+} from './codes/ip.js';
+import { CONNECTIVITY_STATUS } from './codes/connectivity.js';
+import { NAT_TYPE_CODES } from './codes/webrtc.js';
+import { SPEEDTEST_QUALITIES } from './codes/speedtest.js';
+import { PERSONA_VERDICT, PERSONA_AXIS, PERSONA_GRADE } from './codes/persona.js';
 
 // Bumped on breaking section changes; a viewer only renders its own version
 // (older links show the unsupported state — reports live at most 7 days).
@@ -23,23 +31,6 @@ export const REPORT_TTL_DAYS = [1, 3, 7];
 // lands under ~100KB compact JSON; 256KB is ~3× that worst case while still
 // bounding what one KV key can cost. KV's own value limit (25MB) is far away.
 export const REPORT_MAX_BYTES = 256 * 1024;
-
-// Anonymity verdict codes for ipinfo cards — made by
-// utils/ip/transform-ip-data.js, shared by the builder whitelist and the schema
-// enum below.
-export const ANONYMITY_CODES = [
-    'tor', 'relay', 'residential', 'suspected_residential',
-    'proxy', 'proxy_suspected', 'vpn', 'vpn_suspected', 'none',
-];
-
-// Connectivity status codes — single source shared by the recording component
-// (ConnectivityTest.vue), the builder whitelist (utils/report/report-builders.js)
-// and the schema enum below, so a rename can't drift them apart.
-export const CONNECTIVITY_STATUS = {
-    OK: 'ok',
-    UNREACHABLE: 'unreachable',
-    TIMEOUT: 'timeout',
-};
 
 // ---------------------------------------------------------------------------
 // IP masking (data-level, applied at export time — distinct from the CSS-only
@@ -101,6 +92,9 @@ const arr = (max, items) => ({ kind: 'array', max, items });
 const obj = (fields) => ({ kind: 'object', fields });
 const opt = (spec) => ({ ...spec, optional: true });
 const nullable = (spec) => ({ ...spec, nullable: true });
+// Kept by Snapshots (this browser only), never in a shared report: an unknown
+// key to the share validator, stripped by `stripLocalOnly` at export.
+const localOnly = (spec) => ({ ...spec, localOnly: true });
 
 // Shared sub-shapes.
 const pingStats = obj({
@@ -158,11 +152,15 @@ const SECTION_SPECS = {
             // the upstream sign-in-gates them, or when the value is 'unknown'
             // (an unknown line type carries no diagnostic signal).
             anonymity: opt(oneOf(...ANONYMITY_CODES)),
-            ipType: opt(oneOf('business', 'residential', 'wireless', 'hosting')),
+            ipType: opt(oneOf(...IP_TYPE_CODES)),
             nativeIP: opt(bool()),
             qualityScore: opt(num(0, 100)),
             anonymityProtocol: opt(str(32)),
             anonymityProvider: opt(str(64)),
+            abuseLevel: opt(oneOf(...ABUSE_LEVELS)),
+            // Scenario friction, Snapshots only: scenario id → level, never reasons.
+            scenarios: opt(localOnly(obj(Object.fromEntries(SCENARIO_FRICTION_IDS
+                .map((id) => [id, opt(oneOf(...SCENARIO_FRICTION_LEVELS))]))))),
         })),
     }),
     connectivity: obj({
@@ -184,7 +182,7 @@ const SECTION_SPECS = {
             id: str(32),
             url: str(128),
             ip: opt(ipValue()),
-            natType: oneOf('host', 'srflx', 'prflx', 'relay', 'unknown', 'unavailable', 'error'),
+            natType: oneOf(...NAT_TYPE_CODES),
             countryCode: opt(countryCode()),
             org: opt(str(128)),
         })),
@@ -213,9 +211,9 @@ const SECTION_SPECS = {
             rtc: opt(int(0, 10000)),
         })),
         qualities: opt(obj({
-            streaming: opt(oneOf('bad', 'poor', 'average', 'good', 'great')),
-            gaming: opt(oneOf('bad', 'poor', 'average', 'good', 'great')),
-            rtc: opt(oneOf('bad', 'poor', 'average', 'good', 'great')),
+            streaming: opt(oneOf(...SPEEDTEST_QUALITIES)),
+            gaming: opt(oneOf(...SPEEDTEST_QUALITIES)),
+            rtc: opt(oneOf(...SPEEDTEST_QUALITIES)),
         })),
         connection: opt(obj({
             ip: opt(ipValue()),
@@ -322,7 +320,7 @@ const SECTION_SPECS = {
     persona: obj({
         testedAt: isoDate(),
         country: countryCode(),
-        grade: oneOf('A', 'B', 'C', 'D', 'unknown'),
+        grade: oneOf(...Object.values(PERSONA_GRADE)),
         // Null whenever there was too little signal to grade at all.
         score: nullable(int(0, 100)),
         counts: obj({
@@ -340,8 +338,8 @@ const SECTION_SPECS = {
         // second list to keep in step for no validation gain.
         results: arr(32, obj({
             id: str(48),
-            axis: oneOf('match', 'coherence', 'leak'),
-            verdict: oneOf('match', 'mismatch', 'leak', 'unnatural', 'unknown', 'not-applicable'),
+            axis: oneOf(...Object.values(PERSONA_AXIS)),
+            verdict: oneOf(...Object.values(PERSONA_VERDICT)),
         })),
     }),
 };
@@ -413,7 +411,8 @@ const checkLeaf = (value, spec) => {
     }
 };
 
-const validateValue = (value, spec, path, errors) => {
+// `local`: local-only fields are allowed (Snapshots); off, they are unknown keys.
+const validateValue = (value, spec, path, errors, local) => {
     if (errors.length >= MAX_ERRORS) return;
     if (value === null) {
         if (!spec.nullable) errors.push(`${path}: unexpected null`);
@@ -422,25 +421,28 @@ const validateValue = (value, spec, path, errors) => {
     if (spec.kind === 'array') {
         if (!Array.isArray(value)) { errors.push(`${path}: expected array`); return; }
         if (value.length > spec.max) { errors.push(`${path}: too many items (max ${spec.max})`); return; }
-        value.forEach((item, i) => validateValue(item, spec.items, `${path}[${i}]`, errors));
+        value.forEach((item, i) => validateValue(item, spec.items, `${path}[${i}]`, errors, local));
         return;
     }
     if (spec.kind === 'object') {
         if (!isPlainObject(value)) { errors.push(`${path}: expected object`); return; }
+        const known = (key) => Object.prototype.hasOwnProperty.call(spec.fields, key)
+            && (local || !spec.fields[key].localOnly);
         for (const key of Object.keys(value)) {
-            if (!Object.prototype.hasOwnProperty.call(spec.fields, key)) {
+            if (!known(key)) {
                 errors.push(`${path}.${key}: unknown key`);
                 if (errors.length >= MAX_ERRORS) return;
             }
         }
         for (const [key, fieldSpec] of Object.entries(spec.fields)) {
+            if (!known(key)) continue;
             const present = Object.prototype.hasOwnProperty.call(value, key)
                 && value[key] !== undefined;
             if (!present) {
                 if (!fieldSpec.optional) errors.push(`${path}.${key}: missing required key`);
                 continue;
             }
-            validateValue(value[key], fieldSpec, `${path}.${key}`, errors);
+            validateValue(value[key], fieldSpec, `${path}.${key}`, errors, local);
             if (errors.length >= MAX_ERRORS) return;
         }
         return;
@@ -455,7 +457,7 @@ const validateValue = (value, spec, path, errors) => {
                 if (errors.length >= MAX_ERRORS) return;
                 continue;
             }
-            validateValue(value[key], SECTION_SPECS[key], `${path}.${key}`, errors);
+            validateValue(value[key], SECTION_SPECS[key], `${path}.${key}`, errors, local);
             if (errors.length >= MAX_ERRORS) return;
         }
         return;
@@ -465,12 +467,13 @@ const validateValue = (value, spec, path, errors) => {
 };
 
 // Validate a full report envelope. Returns { ok: boolean, errors: string[] }.
-export const validateReport = (report) => {
+// `{ local: true }` (Snapshots) also accepts the local-only fields.
+export const validateReport = (report, { local = false } = {}) => {
     const errors = [];
     if (!isPlainObject(report)) {
         return { ok: false, errors: ['report: expected object'] };
     }
-    validateValue(report, ENVELOPE_SPEC, 'report', errors);
+    validateValue(report, ENVELOPE_SPEC, 'report', errors, local);
     return { ok: errors.length === 0, errors };
 };
 
@@ -514,4 +517,35 @@ const maskValue = (value, spec) => {
 export const maskReportIps = (report) => {
     if (!isPlainObject(report)) return report;
     return { ...report, sections: maskValue(report.sections, { kind: 'sections' }) };
+};
+
+// ---------------------------------------------------------------------------
+// Local-only stripping — walks the same specs and drops every local-only
+// field, so a shared report (link, JSON, AI copy) never carries one. Returns
+// a new object; the input is never mutated.
+// ---------------------------------------------------------------------------
+
+const stripValue = (value, spec) => {
+    if (value === null || value === undefined) return value;
+    if (spec.kind === 'array') {
+        return Array.isArray(value) ? value.map((item) => stripValue(item, spec.items)) : value;
+    }
+    if (spec.kind === 'object' || spec.kind === 'sections') {
+        if (!isPlainObject(value)) return value;
+        const fields = spec.kind === 'sections' ? SECTION_SPECS : spec.fields;
+        const out = {};
+        for (const [key, item] of Object.entries(value)) {
+            const fieldSpec = Object.prototype.hasOwnProperty.call(fields, key) ? fields[key] : null;
+            if (fieldSpec?.localOnly) continue;
+            out[key] = fieldSpec ? stripValue(item, fieldSpec) : item;
+        }
+        return out;
+    }
+    return value;
+};
+
+// A report envelope without its local-only fields.
+export const stripLocalOnly = (report) => {
+    if (!isPlainObject(report)) return report;
+    return { ...report, sections: stripValue(report.sections, { kind: 'sections' }) };
 };

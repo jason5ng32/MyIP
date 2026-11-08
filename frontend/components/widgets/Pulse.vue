@@ -250,7 +250,7 @@ import { festivalsForComposer } from '@/utils/features/festival-skin.js';
 import { playCelebration, resolveEffect } from '@/utils/features/pulse-celebration.js';
 import { renderWorldMapChart, preloadWorldMapChart } from '@/utils/features/world-map-chart.js';
 import { relativeTimeFromMinutes } from '@/utils/time-utils.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -345,7 +345,7 @@ const barWidth = (share) => {
 // "no visitors" (the map tooltip's undefined branch).
 const shareLabel = (share) => (share < 0.1 ? '<0.1%' : `${share.toFixed(1)}%`);
 
-// Country names via the shared Intl helper (data/country-name.js).
+// Country names via the shared Intl helper (utils/country-name.js).
 // "T1" is the backend's pseudo-code for Tor exit traffic — no ISO name, no
 // territory on the map. Any non-two-letter code (T1 included) falls back to
 // the international flag (circle-flags:xx).

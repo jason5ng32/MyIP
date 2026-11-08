@@ -27,14 +27,18 @@ Every file opens with a header comment stating its purpose — read those.
 
 - **Composition API** everywhere; no Options API. Alias `@` → `frontend/`.
 - **Shared-with-backend helpers live in `common/`**, re-exported through a thin
-  `utils/` bridge so consumers keep `@/utils/...` imports (`utils/ip/valid-ip.js`).
+  `utils/` bridge so consumers keep `@/utils/...` imports (`utils/ip/valid-ip.js`,
+  `utils/country-name.js`); a bridge only re-exports. Report code lists and
+  their labels: `utils/codes/` (`ip.js` → `ip-labels.js`). Import direction:
+  root AGENTS.md "Dependency direction".
 - **Helper placement:** Vue reactivity / lifecycle → `composables/` (`useXxx`);
   otherwise `utils/` (never `use-` prefixed). `lib/` stays shadcn-only. A pure
   function next to a composable exports from that composable's file.
 - **Inside `utils/`:** app-wide plumbing at its root; IP / ASN data shaping
-  and validation → `ip/`; the report pipeline → `report/`; the pure layer of
-  one feature (a tool, a section, Pulse) → `features/`; per-source probe
-  modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
+  and validation → `ip/` (the IP card's scenario friction included); the
+  report pipeline → `report/` (section titles: `report-sections.js`); the pure
+  layer of one feature (a tool, a section, Pulse) → `features/`; per-source
+  probe modules keep their own dirs (`getips/`, `dnsleaks/`, `persona/`).
 
 ### Achievements are event-driven
 
@@ -46,10 +50,15 @@ rule + (only if no suitable event exists) a new event. The shareable report
 rides the same bus: `<domain>:finished` → `use-report-collector.js` →
 `utils/report/report-builders.js` → sections whitelisted by `common/report-schema.js`.
 New reportable test = event + builder + schema entry in one change; new result
-semantics = builder whitelist + schema enum too (builders fail soft, fixtures
-are frozen: drift = quietly missing fields). Report links are public: the
-builder, not the renderer, drops visitor-supplied data (Persona Check: id / axis
-/ verdict, never `detail`; Invisibility: key + flag).
+semantics = a code in `common/codes/<domain>.js`, which builder whitelist and
+schema enum both import (builders fail soft, fixtures are frozen: drift =
+quietly missing fields); its label goes in the domain's one code → key map
+(`utils/codes/<domain>-labels.js`), shared by the live view, the report page
+and the Snapshots diff. Report links are public: the builder, not the
+renderer, drops visitor-supplied data (Persona Check: id / axis / verdict,
+never `detail`; Invisibility: key + flag). A `localOnly` schema field
+(scenario friction) is Snapshots-only: the share validator rejects it and
+`buildShareReport` strips it.
 
 ### Commands are the imperative twin of events
 

@@ -22,7 +22,7 @@
 //   isActive        — optional guard checked after lazy loading
 // }) → Promise<Chart|null>   (null on load failure or a stale render)
 import { NUMERIC_TO_ALPHA2 } from '../../data/country-numeric.js';
-import getCountryName from '../../data/country-name.js';
+import getCountryName from '../country-name.js';
 
 let chartCtor = null;
 let worldFeatures = null;

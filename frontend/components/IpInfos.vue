@@ -37,7 +37,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { isUsablePublicIP } from '@/utils/ip/valid-ip.js';
 import { toApiTag } from '@/utils/locale-registry.js';
-import { transformDataFromIPapi } from '@/utils/ip/transform-ip-data.js';
+import { transformDataFromIPapi, ADVANCED_CARD_FIELDS } from '@/utils/ip/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
@@ -72,6 +72,8 @@ const createDefaultCard = () => ({
   asnlink: "",
   mapUrl: "",
   mapUrl_dark: "",
+  // IPCheck.ing-only fields, cleared so a refresh or source switch drops them.
+  ...Object.fromEntries(ADVANCED_CARD_FIELDS.map((field) => [field, undefined])),
 });
 
 // IP data cards
@@ -266,6 +268,8 @@ const trackFetchStatus = (status) => {
         qualityScore: card.qualityScore,
         anonymityProtocol: card.anonymityProtocol,
         anonymityProvider: card.anonymityProvider,
+        abuseLevel: card.scoreDimensions?.reputation?.level,
+        frictionScenarios: card.frictionScenarios,
       })),
     });
   }
@@ -279,6 +283,9 @@ const checkAllIPs = async () => {
   // ipinfo:finished (and the ipinfo:refresh command riding on it) waits for
   // every card to land again, instead of re-firing on the first one.
   fetchStatus.splice(0);
+  // Reset each card as refreshCard does, so a new IP never keeps the last
+  // one's fields; an unchanged IP refills from ipDataCache.
+  ipDataCards.slice(0, ipCardsToShow.value).forEach(clearCardData);
   const ipSources = [
     [0, getIPFromIPChecking4],
     [1, getIPFromIPChecking6],

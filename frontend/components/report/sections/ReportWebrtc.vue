@@ -15,7 +15,7 @@
                     <td class="px-3 py-2 font-mono whitespace-nowrap">{{ server.url }}</td>
                     <td class="px-3 py-2 font-mono whitespace-nowrap">{{ server.ip || '—' }}</td>
                     <td class="px-3 py-2 whitespace-nowrap" :class="natTone(server.natType)">
-                        {{ t(natKey(server.natType)) }}
+                        {{ t(natTypeKey(server.natType)) }}
                     </td>
                     <td class="px-3 py-2"><GeoCell :code="server.countryCode" /></td>
                     <td class="px-3 py-2 text-muted-foreground">{{ server.org || '—' }}</td>
@@ -31,15 +31,11 @@
 import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT } from './table-classes.js';
+import { natTypeKey } from '@/utils/codes/webrtc-labels.js';
 
 defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();
 
-const natKey = (natType) => {
-    if (natType === 'unavailable') return 'webrtc.StatusUnavailable';
-    if (natType === 'error') return 'webrtc.StatusError';
-    return `webrtc.NATType.${natType}`;
-};
 // An exposed address is the finding here — anything that resolved reads
 // as attention-worthy, unavailable (protective) as success-toned.
 const natTone = (natType) => {

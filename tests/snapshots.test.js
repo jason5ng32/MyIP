@@ -161,6 +161,15 @@ describe('snapshots — untrusted restore', () => {
         assert.equal('labelCardId' in clean, false);
     });
 
+    it('keeps scenario friction, which only Snapshots hold', () => {
+        const sections = { ipinfo: ipinfo('8.8.8.8') };
+        sections.ipinfo.cards[0].scenarios = { signup: 'low', email: 'high' };
+        const clean = sanitizeSnapshot(snapshot('a', 0, { sections }));
+        assert.deepEqual(clean.sections.ipinfo.cards[0].scenarios, { signup: 'low', email: 'high' });
+        sections.ipinfo.cards[0].scenarios = { signup: 'blocked' };
+        assert.equal(sanitizeSnapshot(snapshot('b', 0, { sections })), null);
+    });
+
     it('drops unknown keys, duplicate ids, and orders newest first', () => {
         const store = restoreStore(raw(storeOf(
             { ...snapshot('a', 0), extra: true }, snapshot('c', 10), snapshot('a', 20), snapshot('b', 5),
