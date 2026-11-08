@@ -40,7 +40,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 
 * 🛜 **Kartat e IP-së**: Zbulojnë IPv4 dhe IPv6 tuaj nga disa burime të pavarura krah për krah — shtetin, rajonin, qytetin, ASN-në, organizatën dhe zonën kohore lokale të IP-së.
 * 🔍 **Kërkimi i IP-së**: Kërkon të njëjtin informacion të detajuar për çdo adresë IP për të cilën jeni kureshtarë.
-* 🧾 **Historiku i IP-ve**: Mban një regjistër lokal të IP-ve me të cilat jeni parë, të filtrueshëm sipas llojit dhe shtetit — i ruajtur vetëm në shfletuesin tuaj.
+* 📸 **Historiku i fotografive të çastit**: Sa herë që faqja kryesore hapet, ruan rezultatet e testeve të saj — informacionin e IP-së, lidhshmërinë, WebRTC, testin e rrjedhjes DNS, testin e shpejtësisë — si një fotografi të çastit. Krahasoni çdo dy prej tyre dhe lexoni ndryshimet rresht pas rreshti, si një diff kodi; emërtoni ose fiksoni ato që kanë rëndësi — të ruajtura vetëm në shfletuesin tuaj.
 * 🖥️ **Gjurma e shfletuesit**: Llogarit gjurmën e shfletuesit tuaj në disa mënyra dhe tregon çfarë ju bën të identifikueshëm.
 
 ### 🕵️ Rrjedhjet dhe privatësia

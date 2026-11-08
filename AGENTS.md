@@ -22,8 +22,8 @@ and may not appear in the agent's automatically supplied skill list.
 **MyIP** (IPCheck.ing) is an open-source IP toolbox: IP lookup, connectivity
 tests, WebRTC / DNS-leak detection, speed test, MTR, Whois, ASN profile,
 security checklist, browser fingerprint, anonymity checks, persona check, IP
-calculator, and more. Single repo, two halves: a Vue 3 SPA front-end and an
-Express 5 back-end API.
+calculator, snapshot history, and more. Single repo, two halves: a Vue 3 SPA
+front-end and an Express 5 back-end API.
 
 Licensed under AGPL-3.0-only (`LICENSE`).
 
