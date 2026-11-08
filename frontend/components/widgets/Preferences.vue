@@ -159,31 +159,56 @@
           </div>
         </section>
 
-        <!-- IP History -->
-        <section id="Pref_ipHistory">
-          <SectionTitle :icon="History">{{ t('nav.preferences.ipHistory') }}</SectionTitle>
+        <!-- Snapshots: automatic recording, its label card, retention. -->
+        <section id="Pref_snapshots">
+          <SectionTitle :icon="Camera">{{ t('nav.preferences.snapshots') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="ipHistoryEnabled" :label="t('nav.preferences.ipHistoryEnabled')"
-              :model-value="userPreferences.ipHistoryEnabled" @update:model-value="prefIpHistoryEnabled" />
+            <PrefRow id="snapshotsAuto" :label="t('nav.preferences.snapshotsAuto')"
+              :tip="t('nav.preferences.snapshotsAutoTips')"
+              :model-value="userPreferences.snapshotsAuto !== false" @update:model-value="prefSnapshotsAuto" />
 
-            <!-- Retention slider: live number while dragging, preference
-                             committed on release so pruning never fires mid-drag. -->
-            <div class="p-3" :class="{ 'opacity-50': !userPreferences.ipHistoryEnabled }">
-              <div class="flex items-center justify-between gap-3 mb-3">
-                <label for="ipHistoryDays" class="text-sm font-medium select-none">
-                  {{ t('nav.preferences.ipHistoryDays') }}
-                </label>
-                <span class="text-sm font-mono tabular-nums text-muted-foreground">
-                  {{ ipHistoryDaysDraft }}
-                </span>
+            <!-- Label card: one 1-based IP card position, picked from a Select. -->
+            <div v-if="userPreferences.snapshotsAuto !== false" class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsLabelCard') }}</span>
+                <Select :model-value="snapshotLabelValue"
+                  @update:model-value="(v) => v && prefSnapshotsLabelCard(Number(v))">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsLabelCard')">
+                    <SelectValue>{{ t('nav.preferences.snapshotsLabelCardName', { index: snapshotLabelValue }) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="num in snapshotCardPositions" :key="num" :value="String(num)">
+                      {{ t('nav.preferences.snapshotsLabelCardName', { index: num }) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Slider id="ipHistoryDays" :model-value="[ipHistoryDaysDraft]" :min="1" :max="30" :step="1"
-                :disabled="!userPreferences.ipHistoryEnabled"
-                @update:model-value="(v) => { if (v?.[0] != null) ipHistoryDaysDraft = v[0]; }"
-                @value-commit="(v) => prefIpHistoryDays(v?.[0])" />
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsLabelCardTips') }}</p>
+            </div>
+
+            <!-- Retention: the number of unpinned snapshots kept. -->
+            <div class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsKeepLast') }}</span>
+                <Select :model-value="String(snapshotKeepLast)"
+                  @update:model-value="(v) => v && prefSnapshotsKeepLast(Number(v))">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsKeepLast')">
+                    <SelectValue>{{ t('nav.preferences.snapshotsCountOption', { n: snapshotKeepLast }) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="n in SNAPSHOTS_KEEP_LAST_OPTIONS" :key="n" :value="String(n)">
+                      {{ t('nav.preferences.snapshotsCountOption', { n }) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsKeepLastTips') }}</p>
             </div>
           </div>
-          <SectionTip>{{ t('nav.preferences.ipHistoryTips') }}</SectionTip>
         </section>
       </div>
     </SheetContent>
@@ -191,25 +216,25 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, h } from 'vue';
+import { computed, watch, h } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { clampRetentionDays } from '@/utils/ip/ip-history.js';
+import { SNAPSHOTS_KEEP_LAST_OPTIONS, clampKeepLast } from '@/utils/features/snapshots.js';
+import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   Activity,
   AppWindow,
+  Camera,
   Database,
-  History,
   Languages,
   LaptopMinimal,
   LayoutGrid,
@@ -317,25 +342,37 @@ const prefConnectivityCardTitleOpensSite = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityCardTitleOpensSite');
 };
 
-// IP history recorder: on/off + retention days (1–30). The draft ref feeds the
-// slider's live readout; the preference is written on value-commit only.
-const ipHistoryDaysDraft = ref(clampRetentionDays(userPreferences.value.ipHistoryDays));
-watch(() => userPreferences.value.ipHistoryDays, (v) => {
-  ipHistoryDaysDraft.value = clampRetentionDays(v);
-});
+// Snapshots: automatic recording, its label card and retention (options
+// and defaults in utils/features/snapshots.js).
+const snapshotKeepLast = computed(() => clampKeepLast(userPreferences.value.snapshotsKeepLast));
+const snapshotCardPositions = computed(() =>
+  Array.from({ length: userPreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
+const snapshotLabelValue = computed(() =>
+  String(clampLabelCard(userPreferences.value.snapshotsLabelCard, userPreferences.value.ipCardsToShow)));
 
-const prefIpHistoryEnabled = (value) => {
-  store.updatePreference('ipHistoryEnabled', value);
-  trackEvent('Nav', 'PrefereceClick', 'IpHistoryEnabled');
+const prefSnapshotsAuto = (value) => {
+  store.updatePreference('snapshotsAuto', value);
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsAuto');
 };
 
-const prefIpHistoryDays = (value) => {
-  if (value == null) return;
-  const days = clampRetentionDays(value);
-  ipHistoryDaysDraft.value = days;
-  store.updatePreference('ipHistoryDays', days);
-  trackEvent('Nav', 'PrefereceClick', 'IpHistoryDays');
+// An empty pick is ignored: the stored card stays.
+const prefSnapshotsLabelCard = (value) => {
+  if (!value) return;
+  store.updatePreference('snapshotsLabelCard', clampLabelCard(Number(value), userPreferences.value.ipCardsToShow));
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsLabelCard');
 };
+
+const prefSnapshotsKeepLast = (value) => {
+  store.updatePreference('snapshotsKeepLast', value);
+  trackEvent('Nav', 'PrefereceClick', 'snapshotsKeepLast');
+};
+
+// Fewer IP cards shown: a label card past them falls back to card 1.
+watch(() => [userPreferences.value.ipCardsToShow, userPreferences.value.snapshotsLabelCard], ([count, stored]) => {
+  if (!Number.isInteger(count)) return;
+  const clamped = clampLabelCard(stored, count);
+  if (clamped !== stored) store.updatePreference('snapshotsLabelCard', clamped);
+}, { immediate: true });
 
 const prefipCards = (value) => {
   store.updatePreference('ipCardsToShow', value);

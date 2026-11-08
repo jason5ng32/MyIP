@@ -122,7 +122,6 @@ after(() => {
 
 function loadAndGetKeyMap({
   originalSite = false,
-  ipHistoryEnabled = true,
   pulseBackend = false,
   cloudFlare = false,
 } = {}) {
@@ -131,7 +130,7 @@ function loadAndGetKeyMap({
   const store = makeStoreStub();
   const { refs, calls } = makeRefs();
   const configs = computed(() => ({ originalSite, map: true, cloudFlare }));
-  const userPreferences = computed(() => ({ ipCardsToShow: 2, ipHistoryEnabled }));
+  const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
 
   const { loadShortcuts } = useShortcuts({
     refs, store, t, configs, userPreferences,
@@ -263,19 +262,12 @@ describe('useShortcuts()', () => {
     assert.equal(calls.mask, 1);
   });
 
-  it('"H" opens the IP history sheet when ipHistoryEnabled', () => {
-    const { keyMap, store } = loadAndGetKeyMap({ ipHistoryEnabled: true });
+  it('"H" opens the Snapshots tool page', () => {
+    const { keyMap, calls } = loadAndGetKeyMap();
     const entry = keyMap.findLast((e) => e.keys === 'H');
     assert.ok(entry, '"H" key should be registered');
     entry.action();
-    assert.deepEqual(store.state.toggledSheets, ['ipHistory']);
-  });
-
-  it('"H" is a no-op when ipHistoryEnabled is false', () => {
-    const { keyMap, store } = loadAndGetKeyMap({ ipHistoryEnabled: false });
-    const entry = keyMap.findLast((e) => e.keys === 'H');
-    entry.action();
-    assert.deepEqual(store.state.toggledSheets, []);
+    assert.deepEqual(calls.advancedNavigate, ['snapshots']);
   });
 
   it('the pulse backend flag adds the pulse shortcut (key "p")', () => {
@@ -301,7 +293,7 @@ describe('useShortcuts()', () => {
     // Reactive configs source so the watcher inside useShortcuts can fire.
     const configsData = ref({ originalSite: false, map: true });
     const configs = computed(() => configsData.value);
-    const userPreferences = computed(() => ({ ipCardsToShow: 2, ipHistoryEnabled: true }));
+    const userPreferences = computed(() => ({ ipCardsToShow: 2 }));
 
     const { loadShortcuts } = useShortcuts({ refs, store, t, configs, userPreferences });
     loadShortcuts();

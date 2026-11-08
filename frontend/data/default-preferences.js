@@ -23,9 +23,13 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   popupConnectivityNotifications: false,
   ipCardsToShow: 2,
   ipGeoSource: 0,
-  // Local IP-history recorder (see use-ip-history.js). Days: 1–30.
-  ipHistoryEnabled: true,
-  ipHistoryDays: 30,
+  // Snapshots of the homepage tests (see use-snapshot-recorder.js; options in
+  // utils/features/snapshots.js). Auto: one per page load. Label card: the
+  // 1-based IP card position an auto label names. Retention keeps the last
+  // N (10 / 50 / 100); kept snapshots are exempt.
+  snapshotsAuto: true,
+  snapshotsLabelCard: 1,
+  snapshotsKeepLast: 50,
   lang: 'auto', // auto | zh | en | fr | ru
   // Multi-list Connectivity model: { schemaVersion, lists }. null until
   // first load — store.loadPreferences() runs it through sanitizeLists().

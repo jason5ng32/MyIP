@@ -189,15 +189,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             },
             description: t('shortcutKeys.ToggleInfoMask'),
         },
-        {
-            keys: 'H',
-            action: () => {
-                if (userPreferences.value.ipHistoryEnabled === false) return;
-                store.toggleSheet('ipHistory');
-                trackEvent('ShortCut', 'ShortCut', 'IPHistory');
-            },
-            description: t('shortcutKeys.IPHistory'),
-        },
+        { keys: 'H', action: () => goToAdvancedTool('snapshots'), description: t('shortcutKeys.Snapshots') },
         {
             keys: 'e',
             action: () => { shareReportRef.value?.openDialog(); trackEvent('ShortCut', 'ShortCut', 'ShareReport'); },
