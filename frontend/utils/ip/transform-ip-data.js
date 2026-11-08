@@ -129,11 +129,11 @@ function determineTypeCode(advancedData) {
 }
 
 // Determine proxy type
-function determineType(advancedData, t) {
+const determineType = (advancedData, t) => {
     if (gatedSentinel(advancedData.operatorType)) {
         return advancedData.operatorType;
     }
     return t(IP_TYPE_I18N_KEYS[determineTypeCode(advancedData)] ?? IP_TYPE_UNKNOWN_KEY);
-}
+};
 
 export { transformDataFromIPapi, extractAdvancedData };

@@ -9,7 +9,7 @@
 import {
     keyedItems, sectionFields, fieldKind, speedTier, sameValue, DISPLAY_FRACTION_DIGITS,
 } from './snapshot-diff.js';
-import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS } from '../codes/ip-labels.js';
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, ABUSE_LEVEL_I18N_KEYS } from '../codes/ip-labels.js';
 import { SCENARIOS, scenarioNameKey, verdictKey } from '../ip/scenario-friction.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../codes/connectivity-labels.js';
 import { natTypeKey } from '../codes/webrtc-labels.js';
@@ -69,7 +69,7 @@ export const formatFieldValue = (field, value, { t = (key) => key, countryName, 
     if (field === 'ipType') return label(IP_TYPE_I18N_KEYS);
     if (field === 'status') return label(CONNECTIVITY_STATUS_KEYS);
     if (field === 'natType') return t(natTypeKey(value));
-    if (field === 'abuseLevel') return t(`ipInfos.abuseLevel.${value}`);
+    if (field === 'abuseLevel') return label(ABUSE_LEVEL_I18N_KEYS);
     if (SCENARIO_BY_FIELD.has(field)) return t(verdictKey({ ...SCENARIO_BY_FIELD.get(field), level: value }));
     if (field.startsWith('qualities.')) return t(`speedtest.quality.${value}`);
     if (typeof value !== 'number') return String(value);

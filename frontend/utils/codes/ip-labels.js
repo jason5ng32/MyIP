@@ -23,3 +23,11 @@ export const IP_TYPE_I18N_KEYS = Object.freeze({
     hosting: 'ipInfos.advancedData.type.Hosting',
 });
 export const IP_TYPE_UNKNOWN_KEY = 'ipInfos.advancedData.type.unknownType';
+
+// Abuse activity levels.
+export const ABUSE_LEVEL_I18N_KEYS = Object.freeze({
+    none: 'ipInfos.abuseLevel.none',
+    low: 'ipInfos.abuseLevel.low',
+    medium: 'ipInfos.abuseLevel.medium',
+    high: 'ipInfos.abuseLevel.high',
+});

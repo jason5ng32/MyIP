@@ -52,7 +52,7 @@
                         {{ card.qualityScore != null ? `${card.qualityScore}/100` : '—' }}
                     </td>
                     <td v-if="has.abuseLevel" class="px-3 py-2 whitespace-nowrap">
-                        {{ card.abuseLevel ? t('ipInfos.abuseLevel.' + card.abuseLevel) : '—' }}
+                        {{ card.abuseLevel ? t(ABUSE_LEVEL_I18N_KEYS[card.abuseLevel]) : '—' }}
                     </td>
                 </tr>
             </tbody>
@@ -71,7 +71,7 @@ import { useI18n } from 'vue-i18n';
 import GeoCell from './GeoCell.vue';
 import { TH_LEFT, TH_RIGHT, TD_NUM } from './table-classes.js';
 // Anonymity / line type codes → the IP card's own labels.
-import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS } from '@/utils/codes/ip-labels.js';
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, ABUSE_LEVEL_I18N_KEYS } from '@/utils/codes/ip-labels.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 const { t } = useI18n();

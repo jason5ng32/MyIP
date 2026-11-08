@@ -18,7 +18,7 @@ import * as webrtcCodesBridge from '../frontend/utils/codes/webrtc.js';
 import * as speedtestCodesBridge from '../frontend/utils/codes/speedtest.js';
 import * as personaCodesBridge from '../frontend/utils/codes/persona.js';
 import { VERDICT, AXIS, GRADE } from '../frontend/utils/persona/check-ids.js';
-import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY } from '../frontend/utils/codes/ip-labels.js';
+import { IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY, ABUSE_LEVEL_I18N_KEYS } from '../frontend/utils/codes/ip-labels.js';
 import { CONNECTIVITY_STATUS_KEYS } from '../frontend/utils/codes/connectivity-labels.js';
 import { natTypeKey } from '../frontend/utils/codes/webrtc-labels.js';
 import { extractAdvancedData } from '../frontend/utils/ip/transform-ip-data.js';
@@ -58,6 +58,13 @@ describe('code label maps', () => {
         assert.deepEqual(Object.keys(IP_TYPE_I18N_KEYS).sort(), [...ipCodes.IP_TYPE_CODES].sort());
         for (const key of [...Object.values(IP_TYPE_I18N_KEYS), IP_TYPE_UNKNOWN_KEY]) {
             assert.equal(typeof lookup(key), 'string', key);
+        }
+    });
+
+    it('abuse levels: one key per code, each in the en pack', () => {
+        assert.deepEqual(Object.keys(ABUSE_LEVEL_I18N_KEYS), ipCodes.ABUSE_LEVELS);
+        for (const code of ipCodes.ABUSE_LEVELS) {
+            assert.equal(typeof lookup(ABUSE_LEVEL_I18N_KEYS[code]), 'string', code);
         }
     });
 
