@@ -7,7 +7,7 @@
 
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { isoToDateTime } from '@/utils/time-utils.js';
 import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
 import { autoLabel, formatAutoLabel, snapshotLabel } from '@/utils/features/snapshots.js';

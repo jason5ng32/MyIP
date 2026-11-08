@@ -52,7 +52,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
 import { useStatusTone } from '@/composables/use-status-tone.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 
 const props = defineProps({ section: { type: Object, required: true } });
 

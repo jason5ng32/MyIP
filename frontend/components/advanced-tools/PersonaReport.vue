@@ -188,7 +188,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Icon } from '@iconify/vue';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { ShieldAlert, ShieldCheck, TriangleAlert, CircleHelp, CircleX, CircleSlash, Eye, Wrench } from '@lucide/vue';
 
 const props = defineProps({

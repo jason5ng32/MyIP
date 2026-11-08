@@ -1,7 +1,7 @@
 <!--
   Searchable country selector over the full ISO 3166-1 alpha-2 set, built on
   the shadcn-vue Combobox primitives. Names come from Intl.DisplayNames via
-  data/country-name.js. All 249 countries are offered, virtualized — only the
+  utils/country-name.js. All 249 countries are offered, virtualized — only the
   rows in view mount, so 249 inline flag SVGs never exist at once.
 -->
 
@@ -49,7 +49,7 @@ import {
     ComboboxList, ComboboxItem, ComboboxEmpty,
 } from '@/components/ui/combobox';
 import { ALPHA2_TO_NUMERIC } from '@/data/country-numeric.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 
 const props = defineProps({
     modelValue: { type: String, default: '' },

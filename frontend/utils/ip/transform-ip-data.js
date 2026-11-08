@@ -1,4 +1,4 @@
-import getCountryName from '../../data/country-name.js';
+import getCountryName from '../country-name.js';
 import { normalizeScenarios } from '../features/scenario-friction.js';
 
 // The static map renders at zoom 3 (continent scale), where ~0.176° spans a

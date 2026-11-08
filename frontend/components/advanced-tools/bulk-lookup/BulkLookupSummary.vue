@@ -80,7 +80,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
 import { cn } from '@/lib/utils';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import {
     aggregateRows, topGroupShare, TOP_GROUPS_N, normalizePick, queryPick,
 } from '@/composables/use-bulk-lookup.js';

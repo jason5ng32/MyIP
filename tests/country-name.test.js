@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import getCountryName from '../common/country-name.js';
-import frontendCountryName from '../frontend/data/country-name.js';
+import frontendCountryName from '../frontend/utils/country-name.js';
 
 describe('getCountryName(abbr, lang)', () => {
   it('shares the same helper with frontend consumers', () => {

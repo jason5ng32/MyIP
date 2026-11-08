@@ -86,7 +86,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { parseTrace } from '@/utils/ip/parse-trace.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
