@@ -37,7 +37,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { isUsablePublicIP } from '@/utils/ip/valid-ip.js';
 import { toApiTag } from '@/utils/locale-registry.js';
-import { transformDataFromIPapi } from '@/utils/ip/transform-ip-data.js';
+import { transformDataFromIPapi, ADVANCED_CARD_FIELDS } from '@/utils/ip/transform-ip-data.js';
 import { getIPFromIPIP, getIPFromCloudflare_V4, getIPFromCloudflare_V6, getIPFromIPChecking64, getIPFromIPChecking4, getIPFromIPChecking6 } from '@/utils/getips';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
@@ -72,6 +72,8 @@ const createDefaultCard = () => ({
   asnlink: "",
   mapUrl: "",
   mapUrl_dark: "",
+  // IPCheck.ing-only fields, cleared so a refresh or source switch drops them.
+  ...Object.fromEntries(ADVANCED_CARD_FIELDS.map((field) => [field, undefined])),
 });
 
 // IP data cards

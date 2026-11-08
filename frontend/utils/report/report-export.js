@@ -1,6 +1,7 @@
 // Turns collected section snapshots into the share outputs: the versioned
-// report envelope (POSTed for the /r/:id link and offered as JSON download)
-// and the self-describing Markdown handed to AI assistants. Pure functions —
+// report envelope (POSTed for the /r/:id link and offered as JSON download),
+// the self-describing Markdown handed to AI assistants and the Docs
+// Assistant's results payload. Pure functions —
 // the share dialog owns all interaction state. Markdown prose is localized
 // via the caller's t(); data tables keep the schema's English field names on
 // purpose (stable identifiers for AI consumption).
@@ -31,6 +32,20 @@ export const buildShareReport = ({ sections, selectedIds, maskTail, locale, orig
         sections: picked,
     });
     return maskTail ? maskReportIps(report) : report;
+};
+
+// The Docs Assistant's results payload: each collected section deep-copied
+// without its local-only fields and tagged with its localized name
+// (`sectionName(id)`), plus the sections not collected yet.
+export const buildDocsResults = (sections, sectionName) => {
+    const available = Object.keys(sections);
+    const copied = Object.fromEntries(available.map((id) => [id, JSON.parse(JSON.stringify(sections[id]))]));
+    const shared = stripLocalOnly({ sections: copied }).sections;
+    return {
+        results: Object.fromEntries(available.map((id) => [id, { name: sectionName(id), ...shared[id] }])),
+        missingSections: REPORT_SECTION_IDS.filter((id) => !available.includes(id))
+            .map((id) => ({ id, name: sectionName(id) })),
+    };
 };
 
 // --- Markdown rendering -------------------------------------------------------

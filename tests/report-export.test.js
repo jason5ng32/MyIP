@@ -8,6 +8,7 @@ import { describe, it } from 'node:test';
 
 import {
     buildShareReport,
+    buildDocsResults,
     reportToMarkdown,
     reportFileName,
 } from '../frontend/utils/report/report-export.js';
@@ -115,6 +116,37 @@ describe('buildShareReport', () => {
         });
         sections.ipinfo.cards[0].ip = '9.9.9.9';
         assert.equal(report.sections.ipinfo.cards[0].ip, '1.2.3.4');
+    });
+});
+
+describe('buildDocsResults', () => {
+    const withLocalOnly = () => {
+        const sections = makeSections();
+        sections.ipinfo.cards[0] = {
+            ...sections.ipinfo.cards[0], abuseLevel: 'low', scenarios: { signup: 'high', email: 'low' },
+        };
+        return sections;
+    };
+
+    it('drops local-only fields and keeps the rest', () => {
+        const { results } = buildDocsResults(withLocalOnly(), (id) => `name:${id}`);
+        const card = results.ipinfo.cards[0];
+        assert.equal('scenarios' in card, false);
+        assert.equal(card.abuseLevel, 'low');
+        assert.equal(card.ip, '1.2.3.4');
+        assert.equal(results.ipinfo.name, 'name:ipinfo');
+        assert.deepEqual(results.speedtest.qualities, makeSections().speedtest.qualities);
+    });
+
+    it('lists uncollected sections and never mutates the collected ones', () => {
+        const sections = withLocalOnly();
+        const { results, missingSections } = buildDocsResults(sections, (id) => `name:${id}`);
+        assert.deepEqual(missingSections.map((s) => s.id),
+            REPORT_SECTION_IDS.filter((id) => !(id in sections)));
+        assert.deepEqual(missingSections[0], { id: missingSections[0].id, name: `name:${missingSections[0].id}` });
+        assert.ok(sections.ipinfo.cards[0].scenarios);
+        results.speedtest.qualities.gaming = 'bad';
+        assert.equal(sections.speedtest.qualities.gaming, 'good');
     });
 });
 

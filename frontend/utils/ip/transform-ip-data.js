@@ -61,6 +61,14 @@ const gatedSentinel = (value) => (GATED_SENTINELS.has(value) ? value : null);
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
+// Every key extractAdvancedData adds to a card: a card reset to its defaults
+// clears them, so a later answer from another source can't inherit them.
+export const ADVANCED_CARD_FIELDS = Object.freeze([
+    'anonymity', 'anonymityCode', 'anonymityProvider', 'anonymityProtocol',
+    'type', 'qualityScore', 'isNativeIP', 'ipTypeCode',
+    'scoreTags', 'scoreDimensions', 'scoreVersion', 'frictionScenarios',
+]);
+
 // Anonymizing service / protocol the API named: null when absent or gated.
 const optionalName = (value) => (typeof value === 'string' && value && !gatedSentinel(value) ? value : null);
 
