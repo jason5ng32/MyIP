@@ -201,7 +201,7 @@ const loadCardDetails = async (cardID, ip) => {
     await fetchIPDetails(cardID, ip);
     const card = ipDataCards[cardID];
     if (card.country_code) {
-      // Full detail entry for the Globalping picker + IP history.
+      // Full detail entry for the Globalping picker.
       IPArray.value = [...IPArray.value, {
         ip,
         country: card.country_code,

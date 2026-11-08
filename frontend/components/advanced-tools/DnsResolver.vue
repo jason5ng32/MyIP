@@ -148,7 +148,7 @@ const countryFilter = ref('all');
 
 const recordTypes = DNS_RECORD_TYPES;
 
-// Region filter pills, matching IPHistory's tag row.
+// Region filter pills, matching IpCalculator's tag row.
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 
 const validateInput = (input) => {

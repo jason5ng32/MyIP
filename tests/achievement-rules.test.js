@@ -186,12 +186,9 @@ describe('ipinfo:finished card rules', () => {
   });
 });
 
-describe('iphistory:updated', () => {
-  it('GlobeTrotter needs 10 distinct countries', () => {
-    const rule = rulesFor('iphistory:updated').GlobeTrotter;
-    assert.equal(fires(rule, { countryCount: 9 }), false);
-    assert.equal(fires(rule, { countryCount: 10 }), true);
-    assert.equal(fires(rule, {}), false);
+describe('retired rules', () => {
+  it('GlobeTrotter has no unlock rule (retired with IP History)', () => {
+    assert.equal(ACHIEVEMENT_RULES.some((rule) => rule.slug === 'GlobeTrotter'), false);
   });
 });
 

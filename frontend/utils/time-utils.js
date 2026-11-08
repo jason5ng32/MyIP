@@ -222,10 +222,9 @@ export const formatClockTime = (date, locale) => {
 
 // Localized absolute date ("Nov 6, 2020" / "2020年11月6日") from an ISO
 // "YYYY-MM-DD" string — the changelog and every date-only ISO surface
-// (OONI windows, IP-history day headers). Formatted in UTC so the calendar
-// date never shifts a day for west-of-UTC viewers; non-ISO strings (the
-// changelog's "Beta" placeholder) pass through untouched. Formatters are
-// cached per locale: long lists (IP history) call this hundreds of times.
+// (OONI windows). Formatted in UTC so the calendar date never shifts a day
+// for west-of-UTC viewers; non-ISO strings (the changelog's "Beta"
+// placeholder) pass through untouched. Formatters are cached per locale.
 const isoDateFormatters = new Map();
 
 export const formatIsoDate = (isoDate, locale) => {

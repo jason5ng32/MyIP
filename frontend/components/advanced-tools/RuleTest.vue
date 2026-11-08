@@ -156,7 +156,7 @@ const fetchTrace = async (id, url) => {
             const geo = await lookupMaxmind(ip);
             ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
             if (geo) {
-                // Back-fill details for the Globalping picker + IP history.
+                // Back-fill details for the Globalping picker.
                 IPArray.value = [...IPArray.value, {
                     ip,
                     country,
