@@ -2,14 +2,20 @@
 // localStorage (model in utils/features/snapshots.js). It subscribes to the
 // five homepage events on the app bus, runs each payload through its report
 // builder and keeps the session's latest sections live. A session is one
-// App setup (a page load) and, with `snapshotsAuto` on, gets one automatic
-// snapshot: its first `ipinfo:finished` creates it (sections arriving before
-// that wait in a buffer), and every later result of the session — ipinfo
-// re-runs included — overwrites it in place and moves its lastSeenAt.
-// Nothing is merged across sessions. Removing the session's snapshot leaves
-// it undecided again: the next `ipinfo:finished` creates a new one.
+// App setup (a page load) and gets at most one automatic snapshot. Until it
+// exists every result waits in a buffer, in any mode, and the
+// `snapshotsAuto` mode (snapshotsAutoMode) decides: 'every' — created once
+// the buffer holds an ipinfo; 'smart' — from then on each result checks the
+// buffer against the newest stored snapshot (utils/features/snapshot-trigger.js)
+// until one fires, an unsettled connectivity result (requests still in
+// flight or rounds left) left out of the check; 'off' — none.
+// Once created, every later result of the session — ipinfo re-runs included
+// — overwrites it in place and moves its lastSeenAt. Nothing is merged
+// across sessions, and older snapshots are never touched. Removing the
+// session's snapshot leaves it undecided again, with an empty buffer.
 // `takeSnapshot` files the live sections as a manual snapshot, which never
-// becomes the session's one and so never changes. A new snapshot records
+// becomes the session's one and so never changes; after one, the session
+// no longer reports a smart skip. A new snapshot records
 // its label card (`labelCardId`, from `snapshotsLabelCard`); every creation
 // emits `snapshot:created`. `useSnapshotRecorder` is called once at App
 // level; `useSnapshots` is the read / action API over the same state.
@@ -18,10 +24,11 @@ import { reactive, computed, watch, onScopeDispose } from 'vue';
 import { onAppEvent, emitAppEvent } from '../utils/app-events.js';
 import { REPORT_EVENT_BUILDERS } from '../utils/report/report-builders.js';
 import {
-    SNAPSHOTS_STORAGE_KEY, HOME_SECTION_IDS, SNAPSHOT_NAME_MAX,
+    SNAPSHOTS_STORAGE_KEY, HOME_SECTION_IDS, SNAPSHOT_NAME_MAX, snapshotsAutoMode,
     restoreStore, createEmptyStore, createSnapshot, applySection, labelCardIdOf, touchSnapshot, addSnapshot,
     replaceSnapshot, pruneStore, clampKeepLast, findSnapshot, renameSnapshot, keepSnapshot, removeSnapshot,
 } from '../utils/features/snapshots.js';
+import { shouldRecordSnapshot } from '../utils/features/snapshot-trigger.js';
 
 // --- module state -----------------------------------------------------------
 
@@ -31,12 +38,15 @@ const state = reactive({
     createdThisSession: false,
     storageFailed: false,
     hasLiveIpinfo: false, // takeSnapshot has something to file
+    smartSkipped: false, // smart mode checked this session's results and recorded nothing
+    savedThisSession: false, // takeSnapshot ran this session
 });
 
 let storage = null;
 let live = {}; // section id → this session's latest section
 let liveCards = []; // the latest ipinfo event's cards, in homepage order
 let buffered = {}; // section id → section, waiting for the session's snapshot
+let connectivitySettled = true; // the latest connectivity:finished was settled
 let prefs = () => ({});
 let clock = () => new Date().toISOString();
 let nextId = () => '';
@@ -86,6 +96,7 @@ const create = (store, sections, { now, name = '', auto }) => {
     if (auto) {
         state.currentId = snapshot.id;
         state.createdThisSession = true;
+        state.smartSkipped = false;
         buffered = {};
     }
     commit(prune(addSnapshot(store, snapshot)).store);
@@ -104,19 +115,37 @@ const updateInPlace = (store, current, id, section, now) =>
 
 const currentOf = (store) => (state.currentId ? findSnapshot(store, state.currentId) : null);
 
-// The session's snapshot: updated once it exists, created by the first ipinfo.
-const recordIpinfo = (section, now) => {
-    const store = latest();
-    const current = currentOf(store);
-    if (current) commit(updateInPlace(store, current, 'ipinfo', section, now));
-    else create(store, { ...buffered, ipinfo: section }, { now, auto: true });
+// The sections the smart check sees: an unsettled connectivity result stays
+// out until a settled one lands.
+const triggerSections = () => {
+    if (connectivitySettled || !buffered.connectivity) return buffered;
+    const rest = { ...buffered };
+    delete rest.connectivity;
+    return rest;
 };
 
-const recordSection = (id, section, now) => {
+// The session's snapshot is updated once it exists (not while 'off'). Before
+// that every result waits in the buffer, whatever the mode, so a mode switch
+// mid-load starts from the current results: 'every' creates it once the
+// buffer holds an ipinfo; 'smart' checks the buffer against the newest
+// stored snapshot until a result fires.
+const record = (id, section, now, mode) => {
     const store = latest();
     const current = currentOf(store);
-    if (current) commit(updateInPlace(store, current, id, section, now));
-    else buffered[id] = section;
+    if (current) {
+        if (mode !== 'off') commit(updateInPlace(store, current, id, section, now));
+        return;
+    }
+    buffered[id] = section;
+    if (mode === 'every' && buffered.ipinfo) {
+        create(store, buffered, { now, auto: true });
+    } else if (mode === 'smart' && buffered.ipinfo
+        && shouldRecordSnapshot(store.snapshots[0]?.sections ?? null, triggerSections())) {
+        create(store, buffered, { now, auto: true });
+    } else {
+        state.store = store; // memory only: the list matches what was compared against
+        if (mode === 'smart' && buffered.ipinfo) state.smartSkipped = true;
+    }
 };
 
 export const useSnapshotRecorder = ({
@@ -126,7 +155,7 @@ export const useSnapshotRecorder = ({
     prefs = () => store.userPreferences ?? {};
     clock = now;
     nextId = makeId;
-    const auto = () => prefs().snapshotsAuto !== false;
+    const mode = () => snapshotsAutoMode(prefs().snapshotsAuto);
 
     const { store: loaded, removed } = prune(latest());
     if (removed.length) commit(loaded);
@@ -143,9 +172,9 @@ export const useSnapshotRecorder = ({
             state.hasLiveIpinfo = true;
             liveCards = Array.isArray(payload?.cards) ? payload.cards : [];
         }
-        if (!auto()) return;
-        if (id === 'ipinfo') recordIpinfo(section, testedAt);
-        else recordSection(id, section, testedAt);
+        // A payload without `settled` counts as settled.
+        if (id === 'connectivity') connectivitySettled = payload?.settled !== false;
+        record(id, section, testedAt, mode());
     }));
 
     // A changed retention applies at once.
@@ -172,11 +201,12 @@ export const useSnapshots = () => {
         return index === -1 ? null : list[index + 1] ?? null;
     };
 
-    // A manual snapshot of this session's live sections, whatever
-    // `snapshotsAuto`; null before the first ipinfo result.
+    // A manual snapshot of this session's live sections, whatever the
+    // `snapshotsAuto` mode; null before the first ipinfo result.
     const takeSnapshot = ({ name } = {}) => {
         if (!live.ipinfo) return null;
         const clean = typeof name === 'string' ? name.trim().slice(0, SNAPSHOT_NAME_MAX) : '';
+        state.savedThisSession = true;
         return create(latest(), live, { now: clock(), name: clean, auto: false });
     };
 
@@ -195,12 +225,18 @@ export const useSnapshots = () => {
         if (state.currentId === id) state.currentId = null;
     };
 
+    // Smart mode found nothing notable in this session's results: it has
+    // live IP results but no automatic snapshot, and no manual save either.
+    const skippedThisSession = computed(() => state.smartSkipped && state.hasLiveIpinfo && !state.currentId
+        && !state.savedThisSession && snapshotsAutoMode(prefs().snapshotsAuto) === 'smart');
+
     return {
         snapshots,
         currentId: computed(() => state.currentId),
         createdThisSession: computed(() => state.createdThisSession),
         storageFailed: computed(() => state.storageFailed),
         canTakeSnapshot: computed(() => state.hasLiveIpinfo),
+        skippedThisSession,
         previousOf,
         takeSnapshot,
         rename,
@@ -216,10 +252,13 @@ export const resetSnapshots = () => {
     state.createdThisSession = false;
     state.storageFailed = false;
     state.hasLiveIpinfo = false;
+    state.smartSkipped = false;
+    state.savedThisSession = false;
     storage = null;
     live = {};
     liveCards = [];
     buffered = {};
+    connectivitySettled = true;
     prefs = () => ({});
     clock = () => new Date().toISOString();
     nextId = () => '';

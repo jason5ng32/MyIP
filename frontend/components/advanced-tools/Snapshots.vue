@@ -10,7 +10,8 @@
      removed / added, never worse / better (plan red line). Snapshots can be
      renamed (a dialog), pinned or deleted (a second click confirms), or
      saved on demand from this visit's results (running the homepage tests first when there
-     are none yet; use-snapshot-save.js).
+     are none yet; use-snapshot-save.js). In smart mode, a visit the recorder
+     found no notable change in gets a note under the save button.
 
      The view rides the URL: `?q=<id>` is the snapshot shown, `?vs=<id>` a
      specific one compared (absent: the previous one); written back on every
@@ -36,9 +37,11 @@
     </Card>
 
     <div v-else class="lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start lg:gap-6">
-      <!-- Left column (≥1024px): the save button over the snapshot list -->
+      <!-- Left column (≥1024px): the save button (and the smart-mode note) over the snapshot list -->
       <aside class="max-lg:hidden lg:sticky lg:top-20 lg:flex lg:flex-col lg:gap-3">
         <SnapshotSaveButton :running="saving" class="w-full" @save="onSaveNow" />
+        <p v-if="skippedThisSession" class="m-0 text-xs leading-relaxed text-muted-foreground">
+          {{ t('snapshots.SmartSkipped') }}</p>
         <SnapshotList :snapshots="snapshots" :selected-id="selected?.id ?? null" :current-id="currentId"
           :compared-id="compared?.id ?? null" keyboard reveal-actions-on-hover
           class="jn-card rounded-xl border bg-card p-2 lg:max-h-[calc(100dvh-9.5rem)] lg:overflow-y-auto"
@@ -48,13 +51,18 @@
       <!-- Main column: the selected snapshot -->
       <div v-if="selected" class="min-w-0 space-y-4">
         <!-- Action row (below 1024px): "All snapshots" (opens the list Sheet)
-                     beside a stretching save; from 1024px the left column has both -->
-        <div class="flex items-center gap-2 lg:hidden">
-          <Button variant="outline" class="shrink-0 cursor-pointer" @click="listSheetOpen = true">
-            <List />
-            {{ t('snapshots.AllSnapshots') }}
-          </Button>
-          <SnapshotSaveButton :running="saving" class="flex-1" @save="onSaveNow" />
+                     beside a stretching save, the smart-mode note under them;
+                     from 1024px the left column has all three -->
+        <div class="space-y-2 lg:hidden">
+          <div class="flex items-center gap-2">
+            <Button variant="outline" class="shrink-0 cursor-pointer" @click="listSheetOpen = true">
+              <List />
+              {{ t('snapshots.AllSnapshots') }}
+            </Button>
+            <SnapshotSaveButton :running="saving" class="flex-1" @save="onSaveNow" />
+          </div>
+          <p v-if="skippedThisSession" class="m-0 text-xs leading-relaxed text-muted-foreground">
+            {{ t('snapshots.SmartSkipped') }}</p>
         </div>
 
         <!-- The snapshot card: label + actions, when, then the compare controls -->
@@ -230,7 +238,7 @@ const route = useRoute();
 const router = useRouter();
 const labels = useSnapshotLabels();
 const {
-  snapshots, currentId, storageFailed, rename, keep, remove,
+  snapshots, currentId, storageFailed, skippedThisSession, rename, keep, remove,
 } = useSnapshots();
 const { saving, save } = useSnapshotSave({ store, router });
 

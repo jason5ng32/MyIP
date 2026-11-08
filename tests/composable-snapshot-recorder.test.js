@@ -1,11 +1,14 @@
 // Tests for frontend/composables/use-snapshot-recorder.js — the recorder over
 // the app-events bus and a stubbed storage: one automatic snapshot per
-// session (created by its first ipinfo:finished, updated in place by every
-// later result, never merged across loads), buffering of sections that
-// arrive first, the auto switch, manual takeSnapshot (never the session's
-// snapshot), the label card (labelCardId), count retention, the
-// snapshot:created event, untrusted storage, write failures, two tabs, and
-// the useSnapshots actions.
+// session (in 'every' mode, the default here: created by its first
+// ipinfo:finished, updated in place by every later result, never merged
+// across loads), buffering of sections that arrive first (in any mode, so a
+// mid-load mode switch starts from them), the auto modes ('smart' checked
+// against the newest snapshot — a section it lacks included — unsettled
+// connectivity rounds left out, the skipped note; 'off'; the old booleans),
+// manual takeSnapshot (never the session's snapshot), the label card
+// (labelCardId), count retention, the snapshot:created event, untrusted
+// storage, write failures, two tabs, and the useSnapshots actions.
 
 import assert from 'node:assert/strict';
 import { describe, it, beforeEach, afterEach } from 'node:test';
@@ -50,7 +53,7 @@ let ids = 0;
 const makeId = () => `id${(ids += 1)}`;
 
 const start = ({ storage = memoryStorage(), prefs = {} } = {}) => {
-    const store = reactive({ userPreferences: { snapshotsAuto: true, snapshotsLabelCard: 1, ...prefs } });
+    const store = reactive({ userPreferences: { snapshotsAuto: 'every', snapshotsLabelCard: 1, ...prefs } });
     const scope = effectScope();
     scope.run(() => useSnapshotRecorder({ store, storage, now, makeId }));
     scopes.push(scope);
@@ -203,13 +206,25 @@ describe('snapshot recorder — sections', () => {
         assert.deepEqual(Object.keys(snapshots[0].sections), ['ipinfo']);
     });
 
-    it('writes nothing automatically while snapshotsAuto is off', () => {
+    it('writes nothing automatically while snapshotsAuto is off, but still buffers', () => {
         const { storage, store } = start({ prefs: { snapshotsAuto: false } });
         emitAppEvent('connectivity:finished', connectivityPayload());
         assert.equal(storage.data[SNAPSHOTS_STORAGE_KEY], undefined);
-        store.userPreferences.snapshotsAuto = true;
+        store.userPreferences.snapshotsAuto = 'every';
         emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
-        assert.deepEqual(Object.keys(stored(storage)[0].sections), ['ipinfo'], 'nothing buffered while off');
+        assert.deepEqual(Object.keys(stored(storage)[0].sections).sort(), ['connectivity', 'ipinfo']);
+    });
+
+    it('off → every mid-load creates on the next result, from the current ipinfo', () => {
+        const { storage, store, api } = start({ prefs: { snapshotsAuto: 'off' } });
+        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        store.userPreferences.snapshotsAuto = 'every';
+        emitAppEvent('connectivity:finished', connectivityPayload());
+        const [snapshot] = stored(storage);
+        assert.deepEqual(snapshot.sections.ipinfo.cards.map((c) => c.ip), ['1.1.1.1']);
+        assert.ok(snapshot.sections.connectivity);
+        assert.equal(api.currentId.value, snapshot.id);
     });
 
     it('stops listening when its scope is disposed', () => {
@@ -217,6 +232,250 @@ describe('snapshot recorder — sections', () => {
         scopes.forEach((scope) => scope.stop());
         emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
         assert.equal(storage.data[SNAPSHOTS_STORAGE_KEY], undefined);
+    });
+});
+
+describe('snapshot recorder — smart mode', () => {
+    const SMART = { snapshotsAuto: 'smart' };
+    const webrtcPayload = (ip) => ({ servers: [{ id: 'google', url: 'stun:stun.l.google.com', ip, natTypeCode: 'srflx', country_code: 'sg', org: 'Singtel' }] });
+    const dnsPayload = (ip, org = 'Singtel') => ({ providers: [{ id: 'p1', name: 'P1', ip, country_code: 'sg', org }] });
+
+    // A first load (always recorded) with ipinfo, connectivity, webrtc and dnsleak.
+    const seeded = () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        emitAppEvent('connectivity:finished', connectivityPayload(40));
+        emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+        emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9'));
+        return storage;
+    };
+
+    it('always records the first snapshot, at the first ipinfo', () => {
+        const { storage, api } = start({ prefs: SMART });
+        emitAppEvent('connectivity:finished', connectivityPayload());
+        assert.equal(storage.data[SNAPSHOTS_STORAGE_KEY], undefined, 'no ipinfo yet');
+        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
+        assert.deepEqual(Object.keys(stored(storage)[0].sections).sort(), ['connectivity', 'ipinfo']);
+        assert.equal(api.currentId.value, 'id1');
+        assert.equal(api.skippedThisSession.value, false);
+    });
+
+    it('records nothing for an unchanged load and leaves the previous snapshot as stored', () => {
+        const storage = seeded();
+        const before = storage.data[SNAPSHOTS_STORAGE_KEY];
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        emitAppEvent('connectivity:finished', connectivityPayload(55)); // small drift
+        emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+        emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.10')); // resolver IP rotation
+        assert.equal(storage.data[SNAPSHOTS_STORAGE_KEY], before);
+        assert.equal(api.currentId.value, null);
+        assert.equal(api.createdThisSession.value, false);
+        assert.equal(api.skippedThisSession.value, true);
+        assert.equal(api.canTakeSnapshot.value, true);
+    });
+
+    it('creates on the first firing result, with every buffered section, then updates in place', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        emitAppEvent('connectivity:finished', connectivityPayload(45));
+        assert.equal(stored(storage).length, 1);
+        emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9', 'Quad9'));
+        let list = stored(storage);
+        assert.deepEqual(list.map((s) => s.id), ['id2', 'id1']);
+        assert.deepEqual(Object.keys(list[0].sections).sort(), ['connectivity', 'dnsleak', 'ipinfo']);
+        assert.equal(list[0].sections.connectivity.targets[0].timeMs, 45);
+        assert.equal(api.currentId.value, 'id2');
+        assert.equal(api.skippedThisSession.value, false);
+        const older = list[1];
+        // From here on, as 'every': unchanged results update it in place.
+        emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+        emitAppEvent('connectivity:finished', connectivityPayload(50));
+        list = stored(storage);
+        assert.deepEqual(list.map((s) => s.id), ['id2', 'id1']);
+        assert.equal(list[0].sections.connectivity.targets[0].timeMs, 50);
+        assert.ok(list[0].sections.webrtc);
+        assert.deepEqual(list[1], older);
+    });
+
+    it('an ipinfo change creates it; sections before ipinfo wait for it', () => {
+        const storage = seeded();
+        visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        reload(storage, SMART);
+        emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9', 'Quad9'));
+        assert.equal(stored(storage).length, 1, 'no ipinfo yet');
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        const [snapshot] = stored(storage);
+        assert.equal(snapshot.id, 'id2');
+        assert.deepEqual(Object.keys(snapshot.sections).sort(), ['dnsleak', 'ipinfo']);
+    });
+
+    it('a speed test always records', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        assert.equal(api.skippedThisSession.value, true);
+        emitAppEvent('speedtest:finished', speedPayload(100));
+        assert.equal(stored(storage)[0].sections.speedtest.downloadMbps, 100);
+        assert.equal(api.currentId.value, 'id2');
+        assert.equal(api.skippedThisSession.value, false);
+    });
+
+    it('compares with the newest snapshot, a manual one included', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('1.1.1.1'), SMART); // fires: id2
+        api.remove('id2');
+        api.takeSnapshot(); // id3, the new IP
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        assert.deepEqual(stored(storage).map((s) => s.id), ['id3', 'id1'], 'same as the manual one');
+        assert.equal(api.currentId.value, null);
+    });
+
+    it('a manual save hides the skipped note for the rest of the session', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+        assert.equal(api.skippedThisSession.value, true);
+        api.takeSnapshot(); // id2: ipinfo + webrtc
+        assert.equal(api.skippedThisSession.value, false);
+        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
+        assert.equal(api.currentId.value, null, 'nothing notable against the manual copy');
+        assert.equal(api.skippedThisSession.value, false);
+        emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9')); // the manual copy has none
+        assert.equal(api.currentId.value, 'id3');
+    });
+
+    it('a skipped check syncs the list from storage another tab wrote', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        const other = restoreStore(storage.data[SNAPSHOTS_STORAGE_KEY]);
+        const written = JSON.stringify({ ...other, snapshots: [{ ...other.snapshots[0], id: 'tabB' }, ...other.snapshots] });
+        storage.data[SNAPSHOTS_STORAGE_KEY] = written;
+        emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+        assert.equal(api.skippedThisSession.value, true);
+        assert.equal(storage.data[SNAPSHOTS_STORAGE_KEY], written, 'nothing written');
+        assert.deepEqual(api.snapshots.value.map((s) => s.id), ['tabB', 'id1']);
+    });
+
+    it('off → smart mid-load records the current ipinfo when a speed test lands', () => {
+        const storage = seeded();
+        const { api, store } = visit(storage, ipinfoPayload('8.8.8.8'), { snapshotsAuto: 'off' });
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        assert.equal(stored(storage).length, 1);
+        store.userPreferences.snapshotsAuto = 'smart';
+        emitAppEvent('speedtest:finished', speedPayload(100));
+        const [snapshot] = stored(storage);
+        assert.equal(snapshot.id, 'id2');
+        assert.deepEqual(snapshot.sections.ipinfo.cards.map((c) => c.ip), ['1.1.1.1']);
+        assert.equal(snapshot.sections.speedtest.downloadMbps, 100);
+        assert.equal(api.currentId.value, 'id2');
+    });
+
+    describe('multi-round connectivity', () => {
+        const round = (time, settled) => ({ ...connectivityPayload(time), settled });
+
+        it('an unsettled pass never takes part in the check, whichever result runs it', () => {
+            const storage = seeded();
+            const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+            emitAppEvent('connectivity:finished', round(400, false)); // x10 on a cold round
+            emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+            assert.equal(api.currentId.value, null);
+            emitAppEvent('connectivity:finished', round(45, true));
+            emitAppEvent('connectivity:finished', round(400, false)); // a new run's round 1
+            emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9'));
+            assert.equal(api.currentId.value, null);
+            assert.equal(stored(storage).length, 1);
+            emitAppEvent('connectivity:finished', round(400, true));
+            const [snapshot] = stored(storage);
+            assert.equal(snapshot.id, 'id2');
+            assert.equal(snapshot.sections.connectivity.targets[0].timeMs, 400);
+        });
+
+        it('another firing result files the buffered unsettled pass with it', () => {
+            const storage = seeded();
+            visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+            emitAppEvent('connectivity:finished', round(400, false));
+            emitAppEvent('dnsleak:finished', dnsPayload('9.9.9.9', 'Quad9'));
+            const [snapshot] = stored(storage);
+            assert.equal(snapshot.id, 'id2');
+            assert.equal(snapshot.sections.connectivity.targets[0].timeMs, 400);
+        });
+
+        it('a connectivity section the previous snapshot lacks fires only once settled', () => {
+            const storage = memoryStorage();
+            visit(storage, ipinfoPayload('8.8.8.8'), SMART); // id1: no connectivity
+            emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+            const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+            emitAppEvent('webrtc:finished', webrtcPayload('8.8.8.8'));
+            emitAppEvent('connectivity:finished', round(40, false));
+            assert.equal(api.currentId.value, null);
+            assert.equal(stored(storage).length, 1);
+            emitAppEvent('connectivity:finished', round(45, true));
+            const [snapshot] = stored(storage);
+            assert.equal(snapshot.id, 'id2');
+            assert.equal(snapshot.sections.connectivity.targets[0].timeMs, 45);
+        });
+
+        it('a payload without settled counts as settled', () => {
+            const storage = seeded();
+            visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+            emitAppEvent('connectivity:finished', connectivityPayload(400));
+            assert.equal(stored(storage)[0].id, 'id2');
+        });
+
+        it('unsettled rounds update the session snapshot in place once it exists', () => {
+            const storage = seeded();
+            const { api } = visit(storage, ipinfoPayload('1.1.1.1'), SMART); // fires: id2
+            emitAppEvent('connectivity:finished', round(90, false));
+            emitAppEvent('connectivity:finished', round(70, false));
+            const list = stored(storage);
+            assert.deepEqual(list.map((s) => s.id), ['id2', 'id1']);
+            assert.equal(list[0].sections.connectivity.targets[0].timeMs, 70);
+            assert.equal(api.currentId.value, 'id2');
+        });
+    });
+
+    it('removing the session snapshot leaves the load undecided, with an empty buffer', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        emitAppEvent('speedtest:finished', speedPayload(100)); // id2
+        api.remove('id2');
+        assert.equal(api.skippedThisSession.value, false);
+        emitAppEvent('connectivity:finished', connectivityPayload(45));
+        assert.deepEqual(stored(storage).map((s) => s.id), ['id1'], 'waits for an ipinfo');
+        emitAppEvent('ipinfo:finished', ipinfoPayload('8.8.8.8'));
+        assert.deepEqual(stored(storage).map((s) => s.id), ['id1'], 'nothing notable against id1');
+        assert.equal(api.skippedThisSession.value, true);
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        const [snapshot] = stored(storage);
+        assert.equal(snapshot.id, 'id3');
+        assert.deepEqual(Object.keys(snapshot.sections).sort(), ['connectivity', 'ipinfo']);
+    });
+
+    it('treats the old boolean true as smart', () => {
+        const storage = seeded();
+        const { api } = visit(storage, ipinfoPayload('8.8.8.8'), { snapshotsAuto: true });
+        assert.equal(stored(storage).length, 1);
+        assert.equal(api.skippedThisSession.value, true);
+    });
+
+    it('\'every\' records an unchanged load; \'off\' and false record nothing', () => {
+        const storage = seeded();
+        const every = visit(storage, ipinfoPayload('8.8.8.8'), { snapshotsAuto: 'every' });
+        assert.equal(stored(storage).length, 2);
+        assert.equal(every.api.skippedThisSession.value, false);
+        for (const snapshotsAuto of ['off', false]) {
+            const { api } = visit(storage, ipinfoPayload('1.1.1.1'), { snapshotsAuto });
+            emitAppEvent('speedtest:finished', speedPayload(100));
+            assert.equal(stored(storage).length, 2, String(snapshotsAuto));
+            assert.equal(api.skippedThisSession.value, false);
+        }
+    });
+
+    it('the skipped flag follows the mode', () => {
+        const storage = seeded();
+        const { api, store } = visit(storage, ipinfoPayload('8.8.8.8'), SMART);
+        assert.equal(api.skippedThisSession.value, true);
+        store.userPreferences.snapshotsAuto = 'off';
+        assert.equal(api.skippedThisSession.value, false);
     });
 });
 

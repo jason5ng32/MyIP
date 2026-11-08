@@ -17,7 +17,7 @@ const SCENARIO_FIELDS = SCENARIO_FRICTION_IDS.map((id) => `scenarios.${id}`);
 // Highlighted when changed.
 const SEMANTIC_FIELDS = new Set([
     'ip', 'countryCode', 'region', 'city', 'asn', 'isp', 'anonymity', 'ipType', 'nativeIP',
-    'abuseLevel', ...SCENARIO_FIELDS,
+    'qualityScore', 'abuseLevel', ...SCENARIO_FIELDS,
     'natType', 'org', 'status', 'tier', 'connection.ip',
     'qualities.streaming', 'qualities.gaming', 'qualities.rtc',
 ]);
@@ -25,7 +25,7 @@ const SEMANTIC_FIELDS = new Set([
 // Measurements that move on every run: shown, never highlighted.
 const DRIFT_FIELDS = new Set([
     'timeMs', 'minTimeMs', 'latencyMs', 'jitterMs', 'downloadMbps', 'uploadMbps',
-    'loadedLatencyDownMs', 'loadedLatencyUpMs', 'qualityScore',
+    'loadedLatencyDownMs', 'loadedLatencyUpMs',
     'scores.streaming', 'scores.gaming', 'scores.rtc',
 ]);
 

@@ -1,9 +1,9 @@
 // Snapshots: the pure store model behind the records of the homepage tests.
 // A snapshot holds the latest schema-shaped section of each homepage test:
-// one per page load (updated in place while that load runs tests), or one
-// saved by hand (never updated). Everything here is pure: storage, events
-// and Intl stay with the caller (composables/use-snapshot-recorder.js and
-// the UI).
+// at most one per page load, recorded automatically per the `snapshotsAuto`
+// mode (updated in place while that load runs tests), or one saved by hand
+// (never updated). Everything here is pure: storage, events and Intl stay
+// with the caller (composables/use-snapshot-recorder.js and the UI).
 
 import { isValidIP } from '../ip/valid-ip.js';
 import { REPORT_VERSION, validateReport } from '../report/report-schema.js';
@@ -25,6 +25,12 @@ export const SNAPSHOT_LABEL_CARD_ID_MAX = 32;
 // Retention of unkept snapshots: the newest `snapshotsKeepLast` survive.
 export const SNAPSHOTS_KEEP_LAST_OPTIONS = Object.freeze([10, 50, 100]);
 export const SNAPSHOTS_KEEP_LAST_DEFAULT = 50;
+
+// Automatic recording (`snapshotsAuto`): 'smart' records a load that differs
+// notably from the newest snapshot (utils/features/snapshot-trigger.js),
+// 'every' records every load, 'off' none.
+export const SNAPSHOTS_AUTO_MODES = Object.freeze(['smart', 'every', 'off']);
+export const SNAPSHOTS_AUTO_DEFAULT = 'smart';
 
 // Kept snapshots are never pruned, so their number is capped instead.
 export const MAX_KEPT_SNAPSHOTS = 20;
@@ -51,6 +57,13 @@ export const createEmptyStore = () => ({ v: SNAPSHOTS_STORE_VERSION, snapshots: 
 
 export const clampKeepLast = (value) =>
     (SNAPSHOTS_KEEP_LAST_OPTIONS.includes(value) ? value : SNAPSHOTS_KEEP_LAST_DEFAULT);
+
+// A stored `snapshotsAuto` → its mode; the boolean of older versions maps
+// false → 'off', true → the default.
+export const snapshotsAutoMode = (value) => {
+    if (value === false) return 'off';
+    return SNAPSHOTS_AUTO_MODES.includes(value) ? value : SNAPSHOTS_AUTO_DEFAULT;
+};
 
 // --- reading untrusted storage ----------------------------------------------
 

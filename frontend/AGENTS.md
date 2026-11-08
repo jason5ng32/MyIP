@@ -128,10 +128,25 @@ links to the Blocklist tool — no bulk path to the private API.
 Snapshot History (slug `snapshots`) records the five homepage sections per
 visit, in this browser only: `use-snapshot-recorder.js` (App level) files
 each `<domain>:finished` through the report builders as report-schema
-sections (`utils/features/snapshots.js`, localStorage key `snapshots`). With
-`snapshotsAuto`, a page load's first `ipinfo:finished` creates that load's
-snapshot (earlier sections buffer) and every later result of the load
-updates it in place; loads never merge. A manual save
+sections (`utils/features/snapshots.js`, localStorage key `snapshots`).
+`snapshotsAuto` is a mode, read through `snapshotsAutoMode()` (old booleans:
+false → off, true → smart). Until a page load has its snapshot, every result
+buffers in any mode (a mid-load switch starts from them): `every` — the
+buffer holding an ipinfo creates it; `smart` (default) — each result from
+then on checks the buffer against the newest stored snapshot
+(`utils/features/snapshot-trigger.js`: a speed test, a homepage section
+the snapshot lacks, an ipinfo / WebRTC ip-NAT / DNS org-country change by
+id, WebRTC going from some server IP to none or back, a connectivity
+target-set or status change, or a median log-ratio latency shift past both
+thresholds; a section only the snapshot holds, one-sided items or fields
+(`''` counts as absent) never fire; a `settled: false` connectivity result
+stays out), the first that fires
+creating it — none: the page notes it (`skippedThisSession`, not after a
+manual save); `off` — none. `connectivity:finished` carries the whole grid
+on every change (a pass, a card's own test, a removal); `settled` = no
+request in flight and no round left (`utils/features/connectivity-grid.js`).
+Once created, every later result of the load updates it in place; loads
+never merge, older snapshots are never touched. A manual save
 (`use-snapshot-save.js`; with no results this visit it runs the homepage
 tests over the command bus like Persona Check, waiting for every section it
 started) is always a frozen copy of the live sections, beside the automatic

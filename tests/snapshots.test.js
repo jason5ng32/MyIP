@@ -2,7 +2,7 @@
 // untrusted restore (bad JSON, wrong versions, missing fields, oversized,
 // schema-invalid sections, legacy fields), applying sections and in-place
 // updates, retention by count (kept snapshots exempt), the kept cap, the
-// label card, labels and user actions.
+// auto mode, the label card, labels and user actions.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -11,7 +11,7 @@ import {
     SNAPSHOTS_STORE_VERSION, SNAPSHOTS_KEEP_LAST_DEFAULT,
     SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_MAX_BYTES,
     MAX_KEPT_SNAPSHOTS, HOME_SECTION_IDS, SNAPSHOT_NAME_MAX,
-    createEmptyStore, clampKeepLast,
+    createEmptyStore, clampKeepLast, SNAPSHOTS_AUTO_MODES, SNAPSHOTS_AUTO_DEFAULT, snapshotsAutoMode,
     sanitizeSnapshot, restoreStore,
     createSnapshot, applySection, touchSnapshot, addSnapshot, pruneStore, primaryCardOf, autoLabel,
     labelCardIdOf, labelCardOf, formatAutoLabel, SNAPSHOT_LABEL_CARD_ID_MAX,
@@ -44,7 +44,9 @@ describe('snapshots — constants', () => {
         assert.deepEqual([...SNAPSHOTS_KEEP_LAST_OPTIONS], [10, 50, 100]);
         assert.equal(SNAPSHOTS_KEEP_LAST_DEFAULT, 50);
         assert.equal(MAX_KEPT_SNAPSHOTS, 20);
-        assert.equal(DEFAULT_PREFERENCES.snapshotsAuto, true);
+        assert.deepEqual([...SNAPSHOTS_AUTO_MODES], ['smart', 'every', 'off']);
+        assert.equal(SNAPSHOTS_AUTO_DEFAULT, 'smart');
+        assert.equal(DEFAULT_PREFERENCES.snapshotsAuto, SNAPSHOTS_AUTO_DEFAULT);
         assert.equal(DEFAULT_PREFERENCES.snapshotsLabelCard, 1);
         assert.equal(DEFAULT_PREFERENCES.snapshotsKeepLast, SNAPSHOTS_KEEP_LAST_DEFAULT);
     });
@@ -64,6 +66,15 @@ describe('snapshots — constants', () => {
         assert.equal(clampKeepLast(7), SNAPSHOTS_KEEP_LAST_DEFAULT);
         assert.equal(clampKeepLast('10'), SNAPSHOTS_KEEP_LAST_DEFAULT);
         assert.equal(clampKeepLast(undefined), SNAPSHOTS_KEEP_LAST_DEFAULT);
+    });
+
+    it('normalizes snapshotsAuto onto a mode, the old booleans included', () => {
+        for (const mode of ['smart', 'every', 'off']) assert.equal(snapshotsAutoMode(mode), mode);
+        assert.equal(snapshotsAutoMode(false), 'off');
+        assert.equal(snapshotsAutoMode(true), 'smart');
+        for (const junk of [undefined, null, '', 'always', 'SMART', 0, 1, {}]) {
+            assert.equal(snapshotsAutoMode(junk), 'smart', String(junk));
+        }
     });
 });
 

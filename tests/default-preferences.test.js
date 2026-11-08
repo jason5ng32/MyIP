@@ -23,7 +23,7 @@ describe('DEFAULT_PREFERENCES', () => {
       popupConnectivityNotifications: false,
       ipCardsToShow: 2,
       ipGeoSource: 0,
-      snapshotsAuto: true,
+      snapshotsAuto: 'smart',
       snapshotsLabelCard: 1,
       snapshotsKeepLast: 50,
       lang: 'auto',

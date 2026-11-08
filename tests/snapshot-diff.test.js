@@ -116,7 +116,7 @@ describe('snapshot diff — alignment', () => {
 describe('snapshot diff — rows', () => {
     it('classifies semantic, drift and info fields', () => {
         for (const field of ['ip', 'countryCode', 'region', 'city', 'asn', 'isp', 'anonymity', 'ipType',
-            'nativeIP', 'natType', 'org', 'status', 'tier', 'qualities.gaming']) {
+            'nativeIP', 'qualityScore', 'natType', 'org', 'status', 'tier', 'qualities.gaming']) {
             assert.equal(fieldKind(field), 'semantic', field);
         }
         for (const field of ['timeMs', 'minTimeMs', 'latencyMs', 'jitterMs', 'downloadMbps', 'uploadMbps',
@@ -146,6 +146,13 @@ describe('snapshot diff — rows', () => {
         assert.equal(download.highlight, false);
         const tier = sections.speedtest.rows.find((row) => row.field === 'tier');
         assert.equal(tier.changed, false, '120 and 150 share a tier');
+    });
+
+    it('highlights a changed IP quality score', () => {
+        const left = snap({ ...BASE, cards: [card('ipcheck', '8.8.8.8', { qualityScore: 90 }), BASE.cards[1]] });
+        const right = snap({ ...BASE, cards: [card('ipcheck', '8.8.8.8', { qualityScore: 40 }), BASE.cards[1]] });
+        const score = diffSnapshots(left, right).sections.ipinfo.rows.find((row) => row.field === 'qualityScore');
+        assert.deepEqual(score, { key: 'ipcheck', field: 'qualityScore', from: 90, to: 40, kind: 'semantic', changed: true, highlight: true });
     });
 
     it('a field present on one side only is a changed row', () => {

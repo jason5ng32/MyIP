@@ -170,12 +170,28 @@
         <section id="Pref_snapshots">
           <SectionTitle :icon="Camera">{{ t('nav.preferences.snapshots') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
-            <PrefRow id="snapshotsAuto" :label="t('nav.preferences.snapshotsAuto')"
-              :tip="t('nav.preferences.snapshotsAutoTips')"
-              :model-value="userPreferences.snapshotsAuto !== false" @update:model-value="prefSnapshotsAuto" />
+            <!-- Automatic recording: one of the three modes, picked from a Select. -->
+            <div class="p-3 pb-2 space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <span class="min-w-0 flex-1 text-sm font-medium select-none">
+                  {{ t('nav.preferences.snapshotsAuto') }}</span>
+                <Select :model-value="snapshotAutoMode" @update:model-value="(v) => v && prefSnapshotsAuto(v)">
+                  <SelectTrigger class="w-40 shrink-0 shadow-none" :aria-label="t('nav.preferences.snapshotsAuto')">
+                    <SelectValue>{{ t(SNAPSHOT_AUTO_MODE_KEYS[snapshotAutoMode]) }}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="mode in SNAPSHOTS_AUTO_MODES" :key="mode" :value="mode">
+                      {{ t(SNAPSHOT_AUTO_MODE_KEYS[mode]) }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p class="text-xs text-muted-foreground leading-relaxed">
+                {{ t('nav.preferences.snapshotsAutoTips') }}</p>
+            </div>
 
             <!-- Label card: one 1-based IP card position, picked from a Select. -->
-            <div v-if="userPreferences.snapshotsAuto !== false" class="p-3 pb-2 space-y-2">
+            <div v-if="snapshotAutoMode !== 'off'" class="p-3 pb-2 space-y-2">
               <div class="flex items-center justify-between gap-3">
                 <span class="min-w-0 flex-1 text-sm font-medium select-none">
                   {{ t('nav.preferences.snapshotsLabelCard') }}</span>
@@ -228,7 +244,9 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
-import { SNAPSHOTS_KEEP_LAST_OPTIONS, clampKeepLast } from '@/utils/features/snapshots.js';
+import {
+  SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES, clampKeepLast, snapshotsAutoMode,
+} from '@/utils/features/snapshots.js';
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
 import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
@@ -357,13 +375,19 @@ const prefConnectivityDiscardFirstResult = (value) => {
 // Snapshots: automatic recording, its label card and retention (options
 // and defaults in utils/features/snapshots.js).
 const snapshotKeepLast = computed(() => clampKeepLast(userPreferences.value.snapshotsKeepLast));
+const snapshotAutoMode = computed(() => snapshotsAutoMode(userPreferences.value.snapshotsAuto));
+const SNAPSHOT_AUTO_MODE_KEYS = {
+  smart: 'nav.preferences.snapshotsAutoSmart',
+  every: 'nav.preferences.snapshotsAutoEvery',
+  off: 'nav.preferences.snapshotsAutoOff',
+};
 const snapshotCardPositions = computed(() =>
   Array.from({ length: userPreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
 const snapshotLabelValue = computed(() =>
   String(clampLabelCard(userPreferences.value.snapshotsLabelCard, userPreferences.value.ipCardsToShow)));
 
 const prefSnapshotsAuto = (value) => {
-  store.updatePreference('snapshotsAuto', value);
+  store.updatePreference('snapshotsAuto', snapshotsAutoMode(value));
   trackEvent('Nav', 'PrefereceClick', 'SnapshotsAuto');
 };
 
