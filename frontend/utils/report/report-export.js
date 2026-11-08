@@ -8,24 +8,7 @@
 import {
     REPORT_VERSION, REPORT_SECTION_IDS, maskReportIps, stripLocalOnly,
 } from './report-schema.js';
-
-// Section id → the site's existing i18n title key (dialog checklist and
-// Markdown headings reuse the same titles the homepage sections show).
-export const SECTION_TITLE_KEYS = {
-    ipinfo: 'ipInfos.Title',
-    connectivity: 'connectivity.Title',
-    webrtc: 'webrtc.Title',
-    dnsleak: 'dnsleaktest.Title',
-    speedtest: 'speedtest.Title',
-    pingtest: 'pingtest.Title',
-    mtrtest: 'mtrtest.Title',
-    ruletest: 'ruletest.Title',
-    browserinfo: 'browserinfo.Title',
-    adblocktest: 'adblocktest.Title',
-    invisibility: 'invisibilitytest.Title',
-    enhanceddnsleak: 'enhanceddnsleaktest.Title',
-    persona: 'personacheck.Title',
-};
+import { SECTION_TITLE_KEYS } from './report-sections.js';
 
 // Assemble the envelope from collected snapshots. Sections keep homepage
 // order regardless of selection order; snapshots are deep-copied (they're

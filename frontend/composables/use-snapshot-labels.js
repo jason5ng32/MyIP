@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/store';
 import getCountryName from '@/utils/country-name.js';
 import { isoToDateTime } from '@/utils/time-utils.js';
-import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-sections.js';
 import { autoLabel, formatAutoLabel, snapshotLabel } from '@/utils/features/snapshots.js';
 import { seenSpanText } from '@/utils/features/snapshot-view.js';
 import { formatFieldValue, fieldLabelKey } from '@/utils/features/snapshot-diff-format.js';

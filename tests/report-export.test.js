@@ -7,11 +7,11 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-    SECTION_TITLE_KEYS,
     buildShareReport,
     reportToMarkdown,
     reportFileName,
 } from '../frontend/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '../frontend/utils/report/report-sections.js';
 import { REPORT_SECTION_IDS, REPORT_VERSION, validateReport } from '../common/report-schema.js';
 
 // t() stub: returns the key, with params appended so interpolation is visible.

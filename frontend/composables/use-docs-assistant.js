@@ -41,7 +41,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useCollectedReport } from '@/composables/use-report-collector.js';
 import { REPORT_SECTION_IDS } from '@/utils/report/report-schema.js';
-import { SECTION_TITLE_KEYS } from '@/utils/report/report-export.js';
+import { SECTION_TITLE_KEYS } from '@/utils/report/report-sections.js';
 import { dispatchAppCommand, waitForAppCommand } from '@/utils/app-commands.js';
 import { RUNNABLE_SECTION_COMMANDS, RUNNABLE_SECTION_IDS, normalizeRunSections } from '@/utils/report/docs-run-tests.js';
 
