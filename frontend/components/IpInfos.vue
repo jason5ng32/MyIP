@@ -283,6 +283,9 @@ const checkAllIPs = async () => {
   // ipinfo:finished (and the ipinfo:refresh command riding on it) waits for
   // every card to land again, instead of re-firing on the first one.
   fetchStatus.splice(0);
+  // Reset each card as refreshCard does, so a new IP never keeps the last
+  // one's fields; an unchanged IP refills from ipDataCache.
+  ipDataCards.slice(0, ipCardsToShow.value).forEach(clearCardData);
   const ipSources = [
     [0, getIPFromIPChecking4],
     [1, getIPFromIPChecking6],
