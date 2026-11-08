@@ -355,30 +355,50 @@ const statusFaceIcon = (test) => {
 
 // no-cors GET so any reachable origin resolves the promise — HEAD and <img>
 // both have failure modes that mis-flag reachable sites as down.
-// cache: 'no-store' avoids cached near-zero RTTs. AbortController lets us
-// distinguish a completed request from a timeout without double-firing.
+// cache: 'no-store' avoids cached near-zero RTTs. Each request has its own
+// AbortController timeout, cleared whichever way it settles.
+// With connectivityDiscardFirstResult in single-refresh mode, an untimed
+// warm-up request goes first (DNS + connection setup); its failure fails
+// the card, otherwise the second request is the one timed.
 // Run generation: bumped per handelCheckStart cycle. Checks still in
 // flight from a previous run must not write into the fresh grid; rounds
 // overlapping within one run keep writing by design — slow sites' round
 // results land after the next tick starts.
 let runSeq = 0;
 
-const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
-  manualRun.value = isManualRun;
-  const runId = runSeq;
-  // Only multi-cycle passes feed the dot history; per-card refreshes skip it.
-  const recordRound = multipleTests.value && !isManualRun;
+// One GET; resolves on any response, throws on failure or timeout.
+const probeOnce = async (url) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 3 * 1200);
-  const beginTime = performance.now();
   try {
-    await fetch(test.url, {
+    await fetch(url, {
       mode: 'no-cors',
       method: 'GET',
       cache: 'no-store',
       signal: controller.signal,
     });
+  } finally {
     clearTimeout(timeoutId);
+  }
+};
+
+const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManualRun) => {
+  manualRun.value = isManualRun;
+  const runId = runSeq;
+  // Only multi-cycle passes feed the dot history; per-card refreshes skip it.
+  const recordRound = multipleTests.value && !isManualRun;
+  // Mode is the mount-time snapshot; the discard switch is read live.
+  const discardFirst = !multipleTests.value && userPreferences.value.connectivityDiscardFirstResult;
+  try {
+    if (discardFirst) {
+      await probeOnce(test.url);
+      if (runId !== runSeq) {
+        onTestComplete(true);
+        return;
+      }
+    }
+    const beginTime = performance.now();
+    await probeOnce(test.url);
     if (runId !== runSeq) {
       onTestComplete(true);
       return;
@@ -394,7 +414,6 @@ const checkConnectivityHandler = async (test, onTestComplete = () => { }, isManu
     if (recordRound) test.roundResults.push({ tone: testTime < 200 ? 'ok-fast' : 'ok-slow', time: testTime });
     onTestComplete(true);
   } catch {
-    clearTimeout(timeoutId);
     if (runId !== runSeq) {
       onTestComplete(false);
       return;

@@ -2385,5 +2385,55 @@
         }
       }
     ]
+  },
+  {
+    "version": "v8.2.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Snapshot History: the homepage test results are saved per visit in this browser, so you can compare any two snapshots and see what differs",
+          "zh": "新增「快照记录」：首页各项测试结果每次访问保存一份在当前浏览器中，可任选两份快照对比，查看有哪些不同",
+          "zh-TW": "新增「快照記錄」：首頁各項測試結果每次造訪儲存一份在目前的瀏覽器中，可任選兩份快照比較，查看有哪些不同",
+          "fr": "Ajout de l'Historique des instantanés : les résultats des tests de la page d'accueil sont enregistrés à chaque visite dans ce navigateur, pour comparer deux instantanés et voir ce qui diffère",
+          "ru": "Добавлена «История снимков»: результаты тестов главной страницы сохраняются в этом браузере при каждом посещении, и любые два снимка можно сравнить, чтобы увидеть различия",
+          "pt-BR": "Novo Histórico de instantâneos: os resultados dos testes da página inicial são salvos por visita neste navegador, para você comparar dois instantâneos quaisquer e ver o que difere"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity: in single-refresh mode, you can set to discard the first result so the latency leaves out DNS lookup and connection setup",
+          "zh": "网络连通性：单次刷新模式下可设置丢弃首次结果，使延迟不包含 DNS 解析与建立连接的耗时",
+          "zh-TW": "網路連通性：單次重新整理模式下可設定捨棄首次結果，使延遲不包含 DNS 解析與建立連線的時間",
+          "fr": "Connectivité : en mode rafraîchissement unique, vous pouvez définir pour ignorer le premier résultat pour que la latence exclue la résolution DNS et l'établissement de la connexion",
+          "ru": "Проверка доступности: в режиме одной проверки вы можете установить игнорировать первый результат, чтобы задержка не включала DNS-запрос и установку соединения",
+          "pt-BR": "Conectividade: no modo de atualização única, você pode definir para ignorar o primeiro resultado para que a latência não inclua a consulta DNS e o estabelecimento da conexão"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP History is retired; Snapshot History now covers its role",
+          "zh": "「IP 历史记录」已下线，其作用由「快照记录」接替",
+          "zh-TW": "「IP 歷史記錄」已下線，其作用由「快照記錄」接替",
+          "fr": "L'Historique des IP est retiré ; l'Historique des instantanés prend le relais",
+          "ru": "«История IP» удалена: её роль теперь выполняет «История снимков»",
+          "pt-BR": "O Histórico de IP foi descontinuado; o Histórico de instantâneos assume o seu papel"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
   }
 ]

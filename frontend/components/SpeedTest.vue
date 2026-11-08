@@ -438,7 +438,7 @@ const loadConnection = async (currentRun) => {
     const connectionData = await connectionMethods.getIPFromSpeedTest();
     if (connectionData && currentRun === runId) {
       Object.assign(state.connection, connectionData);
-      // Feed the Globalping picker + IP history.
+      // Feed the Globalping picker.
       store.updateAllIPs([{ ip: connectionData.ip, country: connectionData.loc || '', location: connectionData.country || '' }]);
     }
   }

@@ -52,6 +52,7 @@ onMounted(() => {
 });
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
+import { useSnapshotRecorder } from '@/composables/use-snapshot-recorder.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
 // A page change closes store.openSheet: a site-wide sheet would stay open over
@@ -96,6 +97,10 @@ useAchievementEngine();
 // Report collector: keeps the latest schema-shaped snapshot of every finished
 // test for the shareable diagnostic report.
 useReportCollector();
+
+// Snapshot recorder: files the homepage sections into one snapshot per page
+// load (the Snapshots tool page reads them).
+useSnapshotRecorder({ store });
 
 // Persona collector: same bus, different consumer — keeps the normalized
 // snapshots the Persona Check cross-references, so opening the tool costs no

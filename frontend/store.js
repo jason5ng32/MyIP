@@ -72,10 +72,10 @@ export const useMainStore = defineStore('main', {
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
-    // Collected user IPs, consumed by the Globalping tools' picker and the
-    // IP-history recorder. Shape: Array<{ ip, country, location, asn, org }>
-    // — country is a 2-letter code; location / asn / org are display strings
-    // ('' when unknown). Populated by IpInfos / WebRTC / RuleTest / SpeedTest.
+    // Collected user IPs, consumed by the Globalping tools' picker. Shape:
+    // Array<{ ip, country, location, asn, org }> — country is a 2-letter code;
+    // location / asn / org are display strings ('' when unknown). Populated
+    // by IpInfos / WebRTC / RuleTest / SpeedTest.
     allIPs: [],
     configs: {},
     userPreferences: {},

@@ -26,6 +26,7 @@ export const ACHIEVEMENTS_DEFINITIONS = [
   { name: 'ItIsOpen', img: '/achievements/itisopen.webp' },
   { name: 'CuriousCat', img: '/achievements/curiouscat.webp' },
   { name: 'CrossingTheWall', img: '/achievements/crossingthewall.webp' },
+  // No unlock rule: retired with IP History on 2026-11-08; kept so accounts that earned it still show it.
   { name: 'GlobeTrotter', img: '/achievements/globetrotter.webp' },
   { name: 'HelloWorld', img: '/achievements/helloworld.webp' },
   { name: 'AddSweetAdd', img: '/achievements/addsweetadd.webp' },

@@ -201,7 +201,7 @@ const loadCardDetails = async (cardID, ip) => {
     await fetchIPDetails(cardID, ip);
     const card = ipDataCards[cardID];
     if (card.country_code) {
-      // Full detail entry for the Globalping picker + IP history.
+      // Full detail entry for the Globalping picker.
       IPArray.value = [...IPArray.value, {
         ip,
         country: card.country_code,
@@ -249,6 +249,7 @@ const trackFetchStatus = (status) => {
     // collector normalizes it (drops cards whose ip slot holds an error label).
     emitAppEvent('ipinfo:finished', {
       cards: ipDataCards.slice(0, ipCardsToShow.value).map((card) => ({
+        id: card.id, // fixed per card; `source` names the provider that answered
         source: card.source,
         ip: card.ip,
         country_code: card.country_code,

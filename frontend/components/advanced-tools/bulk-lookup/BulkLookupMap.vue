@@ -1,6 +1,6 @@
-<!-- Bulk IP Lookup map (Analysis tab): a per-country choropleth (the
-     IPHistoryMap renderer) over the scoped rows, by IP count or by frequency
-     as `weight` says. Display only. -->
+<!-- Bulk IP Lookup map (Analysis tab): a per-country choropleth
+     (use-world-map-chart.js) over the scoped rows, by IP count or by
+     frequency as `weight` says. Display only. -->
 <template>
     <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 min-w-0">
         <!-- Header: title, then the hint — the ranked panels' rhythm -->
