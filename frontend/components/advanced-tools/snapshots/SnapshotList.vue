@@ -44,9 +44,9 @@
                             <span class="min-w-0 truncate text-xs text-muted-foreground"
                                 :title="labels.when(snap)">{{ labels.when(snap) }}</span>
                             <JnTooltip v-if="snap.id === comparedId" :text="t('snapshots.SideCompared')" side="left">
-                                <span role="img" :aria-label="t('snapshots.SideCompared')"
-                                    class="inline-flex h-6 shrink-0 items-center rounded-md bg-muted px-2 text-xs font-medium text-foreground">
-                                    {{ t('snapshots.Compare') }}
+                                <span role="img" :aria-label="t('snapshots.Comparing')"
+                                    class="inline-flex h-6 shrink-0 items-center whitespace-nowrap rounded-md bg-muted px-2 text-xs font-medium text-foreground">
+                                    {{ t('snapshots.Comparing') }}
                                 </span>
                             </JnTooltip>
                             <div v-else-if="snap.id !== selectedId" class="flex shrink-0 transition-opacity"
