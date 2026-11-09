@@ -45,7 +45,7 @@
         <SnapshotList :snapshots="snapshots" :selected-id="selected?.id ?? null" :current-id="currentId"
           :compared-id="compared?.id ?? null" keyboard reveal-actions-on-hover
           class="jn-card rounded-xl border bg-card p-2 lg:max-h-[calc(100dvh-9.5rem)] lg:overflow-y-auto"
-          @select="select" @compare="compareWith" @pin="onKeep" />
+          @select="select" @compare="compareWith" />
       </aside>
 
       <!-- Main column: the selected snapshot -->
@@ -190,7 +190,7 @@
         <div class="flex-1 overflow-y-auto p-2">
           <SnapshotList :snapshots="snapshots" :selected-id="selected?.id ?? null" :current-id="currentId"
             :compared-id="compared?.id ?? null" id-prefix="snapshot-sheet-row-" @select="onSheetSelect"
-            @compare="onSheetCompare" @pin="onKeep" />
+            @compare="onSheetCompare" />
         </div>
       </SheetContent>
     </Sheet>

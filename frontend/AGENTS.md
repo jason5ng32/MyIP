@@ -125,55 +125,24 @@ links to the Blocklist tool — no bulk path to the private API.
 
 ### Snapshots
 
-Snapshot History (slug `snapshots`) records the five homepage sections per
-visit, in this browser only: `use-snapshot-recorder.js` (App level) files
-each `<domain>:finished` through the report builders as report-schema
-sections (`utils/features/snapshots.js`, localStorage key `snapshots`).
-`snapshotsAuto` is a mode, read through `snapshotsAutoMode()` (old booleans:
-false → off, true → smart). Until a page load has its snapshot, every result
-buffers in any mode (a mid-load switch starts from them): `every` — the
-buffer holding an ipinfo creates it; `smart` (default) — each result from
-then on checks the buffer against the newest stored snapshot
-(`utils/features/snapshot-trigger.js`: a speed test, a homepage section
-the snapshot lacks, an ipinfo / WebRTC ip-NAT / DNS org-country change by
-id, WebRTC going from some server IP to none or back, a connectivity
-target-set or status change, or a median log-ratio latency shift past both
-thresholds; a section only the snapshot holds, one-sided items or fields
-(`''` counts as absent) never fire; a `settled: false` connectivity result
-stays out), the first that fires
-creating it — none: the page notes it (`skippedThisSession`, not after a
-manual save); `off` — none. `connectivity:finished` carries the whole grid
-on every change (a pass, a card's own test, a removal); `settled` = no
-request in flight and no round left (`utils/features/connectivity-grid.js`).
-Once created, every later result of the load updates it in place; loads
-never merge, older snapshots are never touched. A manual save
-(`use-snapshot-save.js`; with no results this visit it runs the homepage
-tests over the command bus like Persona Check, waiting for every section it
-started) is always a frozen copy of the live sections, beside the automatic
-one. The auto label is "country · IP" of the `snapshotsLabelCard` card
-(1-based, default 1, a Select in Preferences; recorded as its card `id`;
-fallback the first valid card); a name replaces it. Retention is by count
-only (10 / 50 / 100, default 50); pinned snapshots (`kept`, UI "Pin") are
-exempt, capped at 20. Every creation emits `snapshot:created`; no toast.
-Stored snapshots are re-validated against `common/report-schema.js` on every
-read: a `REPORT_VERSION` bump or a tightened section silently drops them.
+Browser-local, per-visit homepage records: `use-snapshot-recorder.js` consumes
+`<domain>:finished` through the report builders; `utils/features/snapshots.js`
+owns storage, retention and schema validation. Read `snapshotsAuto` through
+`snapshotsAutoMode()`; smart-mode rules live in `snapshot-trigger.js`.
+Later results update only this visit's automatic snapshot; visits never
+merge. Manual saves (`use-snapshot-save.js`) are frozen copies; pinned
+snapshots (`kept`) are exempt from retention. Every creation emits
+`snapshot:created` without a toast. Schema changes can invalidate stored data.
 
-The page (`advanced-tools/Snapshots.vue`) is list + detail: the list
-(`snapshots/SnapshotList.vue`) is the left column on ≥1024px and a Sheet
-below; rows are numbered by position, with Pin and "Compare with this" only
-(in the column, shown on row hover / focus; Pin stays while pinned); the
-compared row carries a static marker instead of the compare button.
-Compare is one Select ("Previous snapshot", then every other, `vs=<id>`).
-The diff (`snapshot-diff.js`, aligned by id — an IP card's fixed `id`, not
-its fallback-dependent `source` — never by position; numbers compare as
-displayed) states facts only — no leak / safe / better / worse wording, no
-summary chips — and renders as a code diff (`snapshot-diff-format.js` →
-`snapshots/SnapshotDiff*.vue`): a block per section, a hunk per item, a line
-per field, split by default on ≥1024px; changed fields are −/+ pairs on
-`--diff-removed` / `--diff-added`, their differing segments on the `-strong`
-pair (removed / added, never bad / good; those tokens nowhere else);
-measurement drift folds into one `±` line while "Show measurement changes"
-is off. Share Report and `Report*.vue` are untouched.
+`advanced-tools/Snapshots.vue` owns list + detail and URL selection (`q` / `vs`).
+`SnapshotList.vue` is a desktop column / mobile Sheet: static pinned markers,
+text Compare actions; pinning only in the detail panel.
+`snapshot-diff.js` aligns by stable item id, never position or IP source;
+numbers compare as displayed. `snapshot-diff-format.js` → `SnapshotDiff*.vue`
+renders factual −/+ differences, never leak / safe / better / worse verdicts
+or summary chips. Use `--diff-removed` / `--diff-added` and their `-strong`
+variants only here; measurement drift folds while hidden. Keep this pipeline
+separate from Share Report and `Report*.vue`.
 
 ### Overlays take no keyboard shortcuts
 

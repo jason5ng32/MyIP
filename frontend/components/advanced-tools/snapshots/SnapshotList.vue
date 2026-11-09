@@ -1,14 +1,14 @@
 <!-- Snapshots page: the snapshot list — list rows only (the save button
      lives in the page's action row), one per snapshot (newest first): its
      position (1 at the top), this visit's live dot, label, full date-time,
-     a Pin toggle (its pressed state is the only pinned marker) and an
-     `Anchor` compare slot underneath (a highlighted `Anchor` marker on the
-     snapshot being compared against; a ghost `Anchor` button on other rows,
-     not on the viewed row). The viewed row carries a solid border + muted
+     a static pinned marker beside the label and a text compare slot beside
+     the time (a highlighted marker on the snapshot being compared against;
+     a ghost button on other rows, not on the viewed row). Pinning lives in
+     the detail panel. The viewed row carries a solid border + muted
      fill, the compared row a dashed border. Shown as the left column on
      ≥1024px and inside the list Sheet below that; `keyboard` lets ↑ / ↓ move
      the selection while the list has focus, `revealActionsOnHover` shows the
-     actions only on row hover / focus (Pin stays while pinned, the compare
+     actions only on row hover / focus (the compare
      marker stays on the compared row). The selected row is kept in view. No
      chrome of its own: a caller's class (card, height cap, scrolling) lands
      on the root. -->
@@ -33,41 +33,33 @@
                                 :aria-label="t('snapshots.ThisVisit')" :title="t('snapshots.ThisVisit')">
                                 <SnapshotLiveDot />
                             </span>
-                            <span class="min-w-0 truncate text-sm font-semibold">{{ labels.label(snap) }}</span>
-                        </div>
-                        <div class="mt-1 truncate text-xs text-muted-foreground">{{ labels.when(snap) }}</div>
-                    </div>
-
-                    <!-- Row actions: pin toggle, compare button / active compared marker;
-                         faded out (still focusable) until hover / focus with revealActionsOnHover -->
-                    <div class="flex shrink-0 flex-col items-center gap-0.5" @click.stop>
-                        <div class="flex transition-opacity" :class="revealClass(snap.kept)">
-                            <JnTooltip :text="t('snapshots.Pin')" side="left">
-                                <Button variant="ghost" size="icon" class="size-7 cursor-pointer"
-                                    :class="snap.kept ? 'text-foreground' : 'text-muted-foreground'"
-                                    :aria-label="t(snap.kept ? 'snapshots.Unpin' : 'snapshots.Pin')"
-                                    :aria-pressed="snap.kept" @click="emit('pin', snap)">
-                                    <Pin :class="snap.kept ? 'fill-current' : ''" />
-                                </Button>
-                            </JnTooltip>
-                        </div>
-                        <JnTooltip v-if="snap.id === comparedId" :text="t('snapshots.SideCompared')" side="left">
-                            <span role="img" :aria-label="t('snapshots.SideCompared')"
-                                class="inline-flex size-7 items-center justify-center text-foreground">
-                                <Anchor class="size-4" :stroke-width="2.5" />
+                            <span class="min-w-0 flex-1 truncate text-sm font-semibold">{{ labels.label(snap) }}</span>
+                            <span v-if="snap.kept" role="img" class="inline-flex shrink-0 text-muted-foreground"
+                                :aria-label="t('snapshots.Pinned')" :title="t('snapshots.Pinned')">
+                                <Pin class="size-3.5 fill-current" aria-hidden="true" />
                             </span>
-                        </JnTooltip>
-                        <div v-else-if="snap.id !== selectedId" class="flex transition-opacity"
-                            :class="revealClass(false)">
-                            <JnTooltip :text="t('snapshots.CompareWithThis')" side="left">
-                                <Button variant="ghost" size="icon"
-                                    class="size-7 cursor-pointer text-muted-foreground hover:text-foreground"
-                                    :aria-label="t('snapshots.CompareWithThis')" @click="emit('compare', snap.id)">
-                                    <Anchor />
-                                </Button>
-                            </JnTooltip>
                         </div>
-                        <span v-else class="size-7" aria-hidden="true" />
+                        <!-- Time and compare share a fixed-height row, including on the viewed snapshot. -->
+                        <div class="mt-0.5 flex min-h-6 items-center justify-between gap-2">
+                            <span class="min-w-0 truncate text-xs text-muted-foreground"
+                                :title="labels.when(snap)">{{ labels.when(snap) }}</span>
+                            <JnTooltip v-if="snap.id === comparedId" :text="t('snapshots.SideCompared')" side="left">
+                                <span role="img" :aria-label="t('snapshots.SideCompared')"
+                                    class="inline-flex h-6 shrink-0 items-center rounded-md bg-muted px-2 text-xs font-medium text-foreground">
+                                    {{ t('snapshots.Compare') }}
+                                </span>
+                            </JnTooltip>
+                            <div v-else-if="snap.id !== selectedId" class="flex shrink-0 transition-opacity"
+                                :class="revealClass(false)" @click.stop>
+                                <JnTooltip :text="t('snapshots.CompareWithThis')" side="left">
+                                    <Button variant="ghost" size="sm"
+                                        class="h-6 cursor-pointer px-2 text-xs text-muted-foreground hover:text-foreground"
+                                        :aria-label="t('snapshots.CompareWithThis')" @click="emit('compare', snap.id)">
+                                        {{ t('snapshots.Compare') }}
+                                    </Button>
+                                </JnTooltip>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </li>
@@ -78,7 +70,7 @@
 <script setup>
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Pin, Anchor } from '@lucide/vue';
+import { Pin } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { useSnapshotLabels } from '@/composables/use-snapshot-labels.js';
@@ -97,7 +89,7 @@ const props = defineProps({
     // Row ids stay unique while two copies are mounted (column + Sheet).
     idPrefix: { type: String, default: 'snapshot-row-' },
 });
-const emit = defineEmits(['select', 'compare', 'pin']);
+const emit = defineEmits(['select', 'compare']);
 
 const { t } = useI18n();
 const labels = useSnapshotLabels();
