@@ -2,10 +2,10 @@
 // true after `delayMs` (in a background tab, when it is next shown) or once
 // the element `reach` (an id) has scrolled into view or past, whichever comes
 // first; without either it is true at once. The element is looked up at
-// creation and on every scroll, so one outside the document then (a cached
-// page) still counts once it is back. `createAttentionGate` is for gates
-// made on demand and is stopped by its caller; `useAttentionGate` stops with
-// the calling scope.
+// creation and on every scroll or resize, so one outside the document then
+// (a cached page) still counts once it is back. `createAttentionGate` is for
+// gates made on demand and is stopped by its caller; `useAttentionGate`
+// stops with the calling scope.
 
 import { ref, onScopeDispose } from 'vue';
 
@@ -21,7 +21,7 @@ export const createAttentionGate = ({ delayMs, reach } = {}) => {
         const target = document.getElementById(reach);
         return !!target && target.getBoundingClientRect().top < window.innerHeight;
     };
-    const onScroll = () => {
+    const onMove = () => {
         if (frame) return;
         frame = requestAnimationFrame(() => {
             frame = 0;
@@ -32,7 +32,8 @@ export const createAttentionGate = ({ delayMs, reach } = {}) => {
         clearTimeout(timer);
         if (typeof window === 'undefined') return;
         cancelAnimationFrame(frame);
-        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('scroll', onMove);
+        window.removeEventListener('resize', onMove);
         document.removeEventListener('visibilitychange', onVisible);
     };
     const open = () => {
@@ -54,7 +55,10 @@ export const createAttentionGate = ({ delayMs, reach } = {}) => {
             else open();
         }, delayMs);
     }
-    if (reach) window.addEventListener('scroll', onScroll, { passive: true });
+    if (reach) {
+        window.addEventListener('scroll', onMove, { passive: true });
+        window.addEventListener('resize', onMove, { passive: true });
+    }
     return { ready, stop };
 };
 
