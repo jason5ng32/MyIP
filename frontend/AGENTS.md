@@ -132,7 +132,14 @@ owns storage, retention and schema validation. Read `snapshotsAuto` through
 Later results update only this visit's automatic snapshot; visits never
 merge. Manual saves (`use-snapshot-save.js`) are frozen copies; pinned
 snapshots (`kept`) are exempt from retention. Every creation emits
-`snapshot:created` without a toast. Schema changes can invalidate stored data.
+`snapshot:created` without a toast. The one toast is the change notice:
+the recorder emits `snapshot:changed` when this visit's snapshot differs
+from the previous one in what both carry (`notableChanges`, stricter than
+the smart trigger: no new section / target / field; WebRTC going dark
+counts); `use-snapshot-notice.js` (called in App.vue) queues it while
+`snapshotsNotifyOn()` (off with recording off) as a `once` toast waiting for
+50 s or the Speed Test section (away from the IP cards' actions). Schema
+changes can invalidate stored data.
 
 `advanced-tools/Snapshots.vue` owns list + detail and URL selection (`q` / `vs`).
 `SnapshotList.vue` is a desktop column / mobile Sheet: static pinned markers,

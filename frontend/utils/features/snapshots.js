@@ -65,6 +65,11 @@ export const snapshotsAutoMode = (value) => {
     return SNAPSHOTS_AUTO_MODES.includes(value) ? value : SNAPSHOTS_AUTO_DEFAULT;
 };
 
+// The change notice (`snapshotsNotify`, on unless false) needs automatic
+// recording: with 'off' it is off whatever is stored.
+export const snapshotsNotifyOn = (prefs) =>
+    snapshotsAutoMode(prefs?.snapshotsAuto) !== 'off' && prefs?.snapshotsNotify !== false;
+
 // --- reading untrusted storage ----------------------------------------------
 
 // One stored snapshot → a clean copy, or null when anything is off: wrong

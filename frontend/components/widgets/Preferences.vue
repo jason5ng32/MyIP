@@ -166,7 +166,7 @@
           </div>
         </section>
 
-        <!-- Snapshots: automatic recording, its label card, retention. -->
+        <!-- Snapshots: automatic recording, its label card, the change notice, retention. -->
         <section id="Pref_snapshots">
           <SectionTitle :icon="Camera">{{ t('nav.preferences.snapshots') }}</SectionTitle>
           <div class="rounded-lg border bg-card divide-y">
@@ -211,6 +211,11 @@
                 {{ t('nav.preferences.snapshotsLabelCardTips') }}</p>
             </div>
 
+            <!-- Change notice: needs automatic recording, hidden (and off) without it. -->
+            <PrefRow v-if="snapshotAutoMode !== 'off'" id="snapshotsNotify"
+              :label="t('nav.preferences.snapshotsNotify')" :tip="t('nav.preferences.snapshotsNotifyTips')"
+              :model-value="snapshotNotifyOn" @update:model-value="prefSnapshotsNotify" />
+
             <!-- Retention: the number of unpinned snapshots kept. -->
             <div class="p-3 pb-2 space-y-2">
               <div class="flex items-center justify-between gap-3">
@@ -245,7 +250,7 @@ import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events.js';
 import {
-  SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES, clampKeepLast, snapshotsAutoMode,
+  SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_AUTO_MODES, clampKeepLast, snapshotsAutoMode, snapshotsNotifyOn,
 } from '@/utils/features/snapshots.js';
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
@@ -372,8 +377,8 @@ const prefConnectivityDiscardFirstResult = (value) => {
   trackEvent('Nav', 'PrefereceClick', 'ConnectivityDiscardFirstResult');
 };
 
-// Snapshots: automatic recording, its label card and retention (options
-// and defaults in utils/features/snapshots.js).
+// Snapshots: automatic recording, its label card, the change notice and
+// retention (options and defaults in utils/features/snapshots.js).
 const snapshotKeepLast = computed(() => clampKeepLast(userPreferences.value.snapshotsKeepLast));
 const snapshotAutoMode = computed(() => snapshotsAutoMode(userPreferences.value.snapshotsAuto));
 const SNAPSHOT_AUTO_MODE_KEYS = {
@@ -385,6 +390,12 @@ const snapshotCardPositions = computed(() =>
   Array.from({ length: userPreferences.value.ipCardsToShow || 0 }, (_, i) => i + 1));
 const snapshotLabelValue = computed(() =>
   String(clampLabelCard(userPreferences.value.snapshotsLabelCard, userPreferences.value.ipCardsToShow)));
+
+const snapshotNotifyOn = computed(() => snapshotsNotifyOn(userPreferences.value));
+const prefSnapshotsNotify = (value) => {
+  store.updatePreference('snapshotsNotify', value);
+  trackEvent('Nav', 'PrefereceClick', 'SnapshotsNotify');
+};
 
 const prefSnapshotsAuto = (value) => {
   store.updatePreference('snapshotsAuto', snapshotsAutoMode(value));

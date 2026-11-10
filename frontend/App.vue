@@ -23,6 +23,7 @@
 <script setup>
 import { watch, ref, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NavBar from '@/components/Nav.vue';
 import Alert from '@/components/widgets/Toast.vue';
@@ -53,6 +54,7 @@ onMounted(() => {
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
 import { useSnapshotRecorder } from '@/composables/use-snapshot-recorder.js';
+import { useSnapshotNotice } from '@/composables/use-snapshot-notice.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
 // A page change closes store.openSheet: a site-wide sheet would stay open over
@@ -101,6 +103,11 @@ useReportCollector();
 // Snapshot recorder: files the homepage sections into one snapshot per page
 // load (the Snapshots tool page reads them).
 useSnapshotRecorder({ store });
+
+// Snapshot change notice: a notable change from the previous snapshot, as a
+// queued toast that waits until the visitor is past the IP cards.
+const { t, locale } = useI18n();
+useSnapshotNotice({ store, t, locale });
 
 // Persona collector: same bus, different consumer — keeps the normalized
 // snapshots the Persona Check cross-references, so opening the tool costs no
