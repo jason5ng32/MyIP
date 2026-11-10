@@ -13,7 +13,7 @@
 // to http:// or in a loop: any of those fails like a block and reads as
 // "blocked". Bump ADBLOCK_PROBES_VERSION whenever the list changes.
 
-export const ADBLOCK_PROBES_VERSION = '2026-11-05';
+export const ADBLOCK_PROBES_VERSION = '2026-11-09';
 
 export const ADBLOCK_PROBE_GROUPS = [
     {
@@ -30,7 +30,7 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'media-net', name: 'Media.net', targets: ['static.media.net', 'contextual.media.net'] },
             { id: 'trade-desk', name: 'The Trade Desk', targets: ['js.adsrvr.org', 'insight.adsrvr.org', 'match.adsrvr.org'] },
             { id: 'magnite', name: 'Magnite', targets: ['fastlane.rubiconproject.com', 'pixel.rubiconproject.com'] },
-            { id: 'pubmatic', name: 'PubMatic', targets: ['ads.pubmatic.com', 'image6.pubmatic.com'] },
+            { id: 'pubmatic', name: 'PubMatic', targets: ['ads.pubmatic.com', 'image6.pubmatic.com', 'hbopenbid.pubmatic.com'] },
             { id: 'adroll', name: 'AdRoll', targets: ['d.adroll.com', 's.adroll.com'] },
             { id: 'yahoo', name: 'Yahoo', targets: ['ads.yahoo.com', 'analytics.yahoo.com', 'gemini.yahoo.com'] },
             { id: 'applovin', name: 'AppLovin', targets: ['d.applovin.com', 'ms.applovin.com', 'rt.applovin.com'] },
@@ -39,6 +39,9 @@ export const ADBLOCK_PROBE_GROUPS = [
             { id: 'pangle', name: 'Pangle', targets: ['api16-access-sg.pangle.io', 'pangolin16.isnssdk.com'] },
             { id: 'baidu-union', name: 'Baidu Union', targets: ['cpro.baidustatic.com', 'pos.baidu.com', 'eclick.baidu.com'] },
             { id: 'tencent-gdt', name: 'Tencent GDT', targets: ['t.gdt.qq.com', 'mi.gdt.qq.com'] },
+            { id: 'index-exchange', name: 'Index Exchange', targets: ['htlb.casalemedia.com'] },
+            { id: 'id5', name: 'ID5', targets: ['api.id5-sync.com'] },
+            { id: 'teads', name: 'Teads', targets: ['sync.teads.tv'] },
         ],
     },
     {
