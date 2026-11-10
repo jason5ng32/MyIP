@@ -4,7 +4,7 @@
   "version": "8.2.0",
   "license": "AGPL-3.0-only",
   "type": "module",
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
     "node": ">=26.0.0"
   },
@@ -26,7 +26,7 @@
     "i18n-sync": "node scripts/i18n-scaffold.js sync"
   },
   "dependencies": {
-    "@cloudflare/speedtest": "^1.16.0",
+    "@cloudflare/speedtest": "^1.17.0",
     "@iconify-json/circle-flags": "^1.2.14",
     "@iconify/vue": "^5.0.5",
     "@khmyznikov/pwa-install": "^0.7.0",
@@ -42,11 +42,11 @@
     "circle-progress.vue": "^3.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "concurrently": "^10.0.6",
+    "concurrently": "^10.0.7",
     "croner": "^11.0.0",
     "dagre": "^0.8.5",
     "express": "^5.3.0",
-    "express-rate-limit": "^8.7.3",
+    "express-rate-limit": "^8.7.4",
     "express-slow-down": "^3.1.1",
     "firebase": "^13.2.0",
     "html-to-image": "^1.11.13",
@@ -82,6 +82,6 @@
     "nodemon": "^3.1.14",
     "tailwindcss": "^4.3.5",
     "vconsole": "^3.15.1",
-    "vite": "^8.3.6"
+    "vite": "^8.3.7"
   }
 }

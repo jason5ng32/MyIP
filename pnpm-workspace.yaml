@@ -7,7 +7,7 @@ allowBuilds:
   protobufjs: true
   vue-demi: true
 minimumReleaseAgeExclude:
-  - vite@8.1.0 || 8.1.4 || 8.3.5
+  - vite@8.1.0 || 8.1.4 || 8.3.5 || 8.3.7
   - tar@7.5.19 || 7.5.22
   - '@code-inspector/core@1.6.3 || 1.6.6 || 2.0.5'
   - '@code-inspector/esbuild@1.6.3 || 1.6.6 || 2.0.5'
@@ -113,6 +113,23 @@ minimumReleaseAgeExclude:
   - '@vueuse/metadata@15.0.0'
   - '@vueuse/shared@15.0.0'
   - vue-i18n@11.4.12 || 11.4.17
-  - express-rate-limit@8.7.1
+  - express-rate-limit@8.7.1 || 8.7.4
   - reka-ui@2.11.0
   - maxmind@5.0.8
+  - '@cloudflare/speedtest@1.17.0'
+  - '@rolldown/binding-android-arm-eabi@1.2.18'
+  - '@rolldown/binding-android-arm64@1.2.18'
+  - '@rolldown/binding-darwin-arm64@1.2.18'
+  - '@rolldown/binding-darwin-x64@1.2.18'
+  - '@rolldown/binding-freebsd-x64@1.2.18'
+  - '@rolldown/binding-linux-arm-gnueabihf@1.2.18'
+  - '@rolldown/binding-linux-arm64-gnu@1.2.18'
+  - '@rolldown/binding-linux-arm64-musl@1.2.18'
+  - '@rolldown/binding-linux-ppc64-gnu@1.2.18'
+  - '@rolldown/binding-linux-s390x-gnu@1.2.18'
+  - '@rolldown/binding-linux-x64-gnu@1.2.18'
+  - '@rolldown/binding-linux-x64-musl@1.2.18'
+  - '@rolldown/binding-openharmony-arm64@1.2.18'
+  - '@rolldown/binding-win32-arm64-msvc@1.2.18'
+  - '@rolldown/binding-win32-x64-msvc@1.2.18'
+  - rolldown@1.2.18
