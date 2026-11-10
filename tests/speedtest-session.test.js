@@ -151,15 +151,18 @@ test('installed CF engine delivers a fast preview and all selected formal reques
   t.mock.method(globalThis, 'fetch', async (url, options = {}) => {
     const bytes = Number(new URL(url).searchParams.get('bytes'));
     requests.push({ bytes, method: options.method || 'GET' });
-    return { ok: true, headers: { get: () => null }, text: async () => {
+    // The engine drains the body through a stream reader; its end is when the
+    // resource timing entry exists.
+    const reader = { read: async () => {
       await new Promise(resolve => setTimeout(resolve, 2));
       timings.set(url, {
         startTime: 0, transferSize: bytes + 300, requestStart: 0, responseStart: 1,
         responseEnd: bytes === 1e5 ? 2 : bytes ? 2001 : 1,
         connectStart: 0, connectEnd: 0, secureConnectionStart: 0, nextHopProtocol: 'h2',
       });
-      return '';
+      return { done: true };
     } };
+    return { ok: true, headers: { get: () => null }, body: { getReader: () => reader } };
   });
   class Engine extends CloudflareEngine {
     constructor(config) {
