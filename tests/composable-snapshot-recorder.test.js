@@ -7,7 +7,8 @@
 // against the newest snapshot — a section it lacks included — unsettled
 // connectivity rounds left out, the skipped note; 'off'; the old booleans),
 // manual takeSnapshot (never the session's snapshot), the label card
-// (labelCardId), count retention, the snapshot:created event, untrusted
+// (labelCardId), count retention, the snapshot:created and snapshot:changed
+// events (shared fields only, unsettled rounds left out, not while 'off'), untrusted
 // storage, write failures, two tabs, and the useSnapshots actions.
 
 import assert from 'node:assert/strict';
@@ -732,5 +733,71 @@ describe('snapshot recorder — snapshot:created', () => {
         const first = api.takeSnapshot();
         const second = api.takeSnapshot();
         assert.deepEqual(events, [{ id: first, auto: false }, { id: second, auto: false }]);
+    });
+});
+
+describe('snapshot recorder — snapshot:changed', () => {
+    const dnsPayload = (org) => ({ providers: [{ id: 'p1', name: 'P1', ip: '9.9.9.9', country_code: 'sg', org }] });
+    const webrtcPayload = () => ({ servers: [{ id: 'google', url: 'stun:stun.l.google.com', ip: '8.8.8.8', natTypeCode: 'srflx', country_code: 'sg', org: 'Singtel' }] });
+    let events;
+    let off;
+    beforeEach(() => {
+        events = [];
+        off = onAppEvent('snapshot:changed', (payload) => events.push(payload));
+    });
+    afterEach(() => off());
+
+    it('needs a previous snapshot', () => {
+        visit(memoryStorage(), ipinfoPayload('8.8.8.8'));
+        emitAppEvent('dnsleak:finished', dnsPayload('Singtel'));
+        assert.deepEqual(events, []);
+    });
+
+    it('announces each changed section once, with every one changed so far', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        emitAppEvent('dnsleak:finished', dnsPayload('Singtel'));
+        visit(storage, ipinfoPayload('1.1.1.1'));
+        assert.deepEqual(events, [{ id: 'id2', sections: ['ipinfo'] }]);
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.2'));
+        emitAppEvent('dnsleak:finished', dnsPayload('Quad9'));
+        assert.deepEqual(events, [{ id: 'id2', sections: ['ipinfo'] }, { id: 'id2', sections: ['ipinfo', 'dnsleak'] }]);
+    });
+
+    it('a section the previous snapshot lacks is no change', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        emitAppEvent('webrtc:finished', webrtcPayload());
+        assert.deepEqual(events, []);
+    });
+
+    it('leaves an unsettled connectivity pass out', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        emitAppEvent('connectivity:finished', connectivityPayload(40));
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        emitAppEvent('connectivity:finished', { ...connectivityPayload(400), settled: false });
+        assert.deepEqual(events, []);
+        emitAppEvent('connectivity:finished', { ...connectivityPayload(400), settled: true });
+        assert.deepEqual(events, [{ id: 'id2', sections: ['connectivity'] }]);
+    });
+
+    it('a snapshot replacing the removed session one announces afresh', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        const { api } = visit(storage, ipinfoPayload('1.1.1.1'));
+        api.remove('id2');
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        assert.deepEqual(events, [{ id: 'id2', sections: ['ipinfo'] }, { id: 'id3', sections: ['ipinfo'] }]);
+    });
+
+    it('comes with the snapshot a smart change creates; nothing while off', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'), { snapshotsAuto: 'smart' });
+        visit(storage, ipinfoPayload('1.1.1.1'), { snapshotsAuto: 'off' });
+        assert.deepEqual(events, []);
+        visit(storage, ipinfoPayload('1.1.1.1'), { snapshotsAuto: 'smart' });
+        assert.deepEqual(events, [{ id: 'id2', sections: ['ipinfo'] }]);
     });
 });

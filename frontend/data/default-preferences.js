@@ -29,8 +29,10 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   // utils/features/snapshots.js). Auto: 'smart' (a page load that differs
   // notably from the latest snapshot) | 'every' (each page load) | 'off'.
   // Label card: the 1-based IP card position an auto label names. Retention
-  // keeps the last N (10 / 50 / 100); kept snapshots are exempt.
+  // keeps the last N (10 / 50 / 100); kept snapshots are exempt. Notify: a
+  // toast when this visit differs notably from the previous snapshot.
   snapshotsAuto: 'smart',
+  snapshotsNotify: true,
   snapshotsLabelCard: 1,
   snapshotsKeepLast: 50,
   lang: 'auto', // auto | zh | en | fr | ru

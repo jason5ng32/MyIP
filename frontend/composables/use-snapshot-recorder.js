@@ -17,8 +17,13 @@
 // becomes the session's one and so never changes; after one, the session
 // no longer reports a smart skip. A new snapshot records
 // its label card (`labelCardId`, from `snapshotsLabelCard`); every creation
-// emits `snapshot:created`. `useSnapshotRecorder` is called once at App
-// level; `useSnapshots` is the read / action API over the same state.
+// emits `snapshot:created`. While recording is on, each result also checks
+// the session's snapshot against the next older one (notableChanges, an
+// unsettled connectivity result left out) and emits `snapshot:changed`
+// with every section changed so far, again only when one joins (afresh for
+// a snapshot that replaces a removed one).
+// `useSnapshotRecorder` is called once at App level; `useSnapshots` is the
+// read / action API over the same state.
 
 import { reactive, computed, watch, onScopeDispose } from 'vue';
 import { onAppEvent, emitAppEvent } from '../utils/app-events.js';
@@ -28,7 +33,7 @@ import {
     restoreStore, createEmptyStore, createSnapshot, applySection, labelCardIdOf, touchSnapshot, addSnapshot,
     replaceSnapshot, pruneStore, clampKeepLast, findSnapshot, renameSnapshot, keepSnapshot, removeSnapshot,
 } from '../utils/features/snapshots.js';
-import { shouldRecordSnapshot } from '../utils/features/snapshot-trigger.js';
+import { shouldRecordSnapshot, notableChanges } from '../utils/features/snapshot-trigger.js';
 
 // --- module state -----------------------------------------------------------
 
@@ -47,6 +52,7 @@ let live = {}; // section id → this session's latest section
 let liveCards = []; // the latest ipinfo event's cards, in homepage order
 let buffered = {}; // section id → section, waiting for the session's snapshot
 let connectivitySettled = true; // the latest connectivity:finished was settled
+let noticed = new Set(); // sections snapshot:changed has announced this session
 let prefs = () => ({});
 let clock = () => new Date().toISOString();
 let nextId = () => '';
@@ -148,6 +154,23 @@ const record = (id, section, now, mode) => {
     }
 };
 
+// The session's snapshot against the next older one; announces the changed
+// sections when a new one joins them.
+const noticeChanges = () => {
+    const list = state.store.snapshots;
+    const index = state.currentId ? list.findIndex((snapshot) => snapshot.id === state.currentId) : -1;
+    const previous = index === -1 ? null : list[index + 1];
+    if (!previous) return;
+    const sections = { ...list[index].sections };
+    if (!connectivitySettled) delete sections.connectivity;
+    const changed = notableChanges(previous.sections, sections);
+    if (changed.every((id) => noticed.has(id))) return;
+    changed.forEach((id) => noticed.add(id));
+    emitAppEvent('snapshot:changed', {
+        id: state.currentId, sections: HOME_SECTION_IDS.filter((id) => noticed.has(id)),
+    });
+};
+
 export const useSnapshotRecorder = ({
     store, storage: injected = defaultStorage(), now = () => new Date().toISOString(), makeId = defaultId,
 }) => {
@@ -174,7 +197,9 @@ export const useSnapshotRecorder = ({
         }
         // A payload without `settled` counts as settled.
         if (id === 'connectivity') connectivitySettled = payload?.settled !== false;
-        record(id, section, testedAt, mode());
+        const current = mode();
+        record(id, section, testedAt, current);
+        if (current !== 'off') noticeChanges();
     }));
 
     // A changed retention applies at once.
@@ -219,10 +244,14 @@ export const useSnapshots = () => {
         return ok;
     };
 
-    // Removing the session's snapshot sends later sections back to the buffer.
+    // Removing the session's snapshot sends later sections back to the buffer;
+    // a snapshot created in its place announces its changes afresh.
     const remove = (id) => {
         commit(removeSnapshot(latest(), id));
-        if (state.currentId === id) state.currentId = null;
+        if (state.currentId === id) {
+            state.currentId = null;
+            noticed = new Set();
+        }
     };
 
     // Smart mode found nothing notable in this session's results: it has
@@ -259,6 +288,7 @@ export const resetSnapshots = () => {
     liveCards = [];
     buffered = {};
     connectivitySettled = true;
+    noticed = new Set();
     prefs = () => ({});
     clock = () => new Date().toISOString();
     nextId = () => '';

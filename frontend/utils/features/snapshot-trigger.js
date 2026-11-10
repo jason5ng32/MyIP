@@ -9,6 +9,9 @@
 // fires: connectivity latency drift below the thresholds, rotating DNS
 // resolver IPs, a card missing this time, one STUN server failing, advanced
 // IP fields absent while their source is on cooldown or fallback.
+// `notableChanges` is the stricter check behind the change notice: only
+// what both sides carry counts (no new section, target or field), plus
+// WebRTC going from some IP to none.
 
 import { isValidIP } from '../ip/valid-ip.js';
 import { HOME_SECTION_IDS } from './snapshots.js';
@@ -89,18 +92,24 @@ export const latencyShifted = (pairs) => {
     return Math.abs(logRatio) >= Math.log2(CONNECTIVITY_LATENCY_RATIO) && delta >= CONNECTIVITY_LATENCY_DELTA_MS;
 };
 
-// 'connectivity.targets' | 'connectivity.status' | 'connectivity.latency' | null
-const connectivityChange = (previous, current) => {
-    const before = keyedItems('connectivity', previous);
-    const after = keyedItems('connectivity', current);
-    if (before.size !== after.size || [...after.keys()].some((key) => !before.has(key))) return 'connectivity.targets';
-    const common = [...after].map(([key, item]) => [before.get(key), item]);
+// Over the targets both sides carry:
+// 'connectivity.status' | 'connectivity.latency' | null
+const sharedTargetsChange = (before, after) => {
+    const common = [...after].filter(([key]) => before.has(key)).map(([key, item]) => [before.get(key), item]);
     if (common.some(([from, to]) => from?.status !== to?.status)) return 'connectivity.status';
     const pairs = common
         .filter(([from]) => from?.status === CONNECTIVITY_STATUS.OK)
         .map(([from, to]) => latencyPair(from, to))
         .filter(Boolean);
     return latencyShifted(pairs) ? 'connectivity.latency' : null;
+};
+
+// 'connectivity.targets' | 'connectivity.status' | 'connectivity.latency' | null
+const connectivityChange = (previous, current) => {
+    const before = keyedItems('connectivity', previous);
+    const after = keyedItems('connectivity', current);
+    if (before.size !== after.size || [...after.keys()].some((key) => !before.has(key))) return 'connectivity.targets';
+    return sharedTargetsChange(before, after);
 };
 
 // --- entry point ------------------------------------------------------------
@@ -127,3 +136,22 @@ export const snapshotTrigger = (previous, current) => {
 };
 
 export const shouldRecordSnapshot = (previous, current) => snapshotTrigger(previous, current) !== null;
+
+// --- change notice ----------------------------------------------------------
+
+// Per section, whether what both sides carry changed notably.
+const SHARED_CHANGED = {
+    ipinfo: (before, after) => keyedChanged('ipinfo', before, after),
+    connectivity: (before, after) => sharedTargetsChange(
+        keyedItems('connectivity', before), keyedItems('connectivity', after)) !== null,
+    webrtc: (before, after) => keyedChanged('webrtc', before, after)
+        || (hasWebrtcIp(before) && !hasWebrtcIp(after)),
+    dnsleak: (before, after) => keyedChanged('dnsleak', before, after),
+};
+
+// The homepage sections (in homepage order) where `current` differs notably
+// from `previous` in what both carry; [] without both.
+export const notableChanges = (previous, current) => (previous && current
+    ? HOME_SECTION_IDS.filter((id) => SHARED_CHANGED[id] && previous[id] && current[id]
+        && SHARED_CHANGED[id](previous[id], current[id]))
+    : []);

@@ -24,6 +24,7 @@ describe('DEFAULT_PREFERENCES', () => {
       ipCardsToShow: 2,
       ipGeoSource: 0,
       snapshotsAuto: 'smart',
+      snapshotsNotify: true,
       snapshotsLabelCard: 1,
       snapshotsKeepLast: 50,
       lang: 'auto',

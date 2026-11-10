@@ -86,6 +86,9 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
       alertDuration: 2000,
     },
+    // Toasts that may wait or update in place, drained by Toast.vue
+    // (composables/use-toast-queue.js has the request shape).
+    toastRequests: [],
     currentSection: DEFAULT_SECTION,
     ipDBs: createInitialIpDBs(),
   }),
@@ -149,6 +152,12 @@ export const useMainStore = defineStore('main', {
     // set Toast
     setAlert(alertToShow, alertStyle, alertMessage, alertTitle, alertDuration) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle, alertDuration };
+    },
+    queueToast(request) {
+      this.toastRequests.push(request);
+    },
+    cancelToast(id) {
+      this.toastRequests.push({ id, cancel: true });
     },
     // Collect and merge IP data from different components. Entries are
     // { ip, country, location, asn, org } objects (bare strings are tolerated

@@ -11,7 +11,7 @@ import {
     SNAPSHOTS_STORE_VERSION, SNAPSHOTS_KEEP_LAST_DEFAULT,
     SNAPSHOTS_KEEP_LAST_OPTIONS, SNAPSHOTS_MAX_BYTES,
     MAX_KEPT_SNAPSHOTS, HOME_SECTION_IDS, SNAPSHOT_NAME_MAX,
-    createEmptyStore, clampKeepLast, SNAPSHOTS_AUTO_MODES, SNAPSHOTS_AUTO_DEFAULT, snapshotsAutoMode,
+    createEmptyStore, clampKeepLast, SNAPSHOTS_AUTO_MODES, SNAPSHOTS_AUTO_DEFAULT, snapshotsAutoMode, snapshotsNotifyOn,
     sanitizeSnapshot, restoreStore,
     createSnapshot, applySection, touchSnapshot, addSnapshot, pruneStore, primaryCardOf, autoLabel,
     labelCardIdOf, labelCardOf, formatAutoLabel, SNAPSHOT_LABEL_CARD_ID_MAX,
@@ -74,6 +74,16 @@ describe('snapshots — constants', () => {
         assert.equal(snapshotsAutoMode(true), 'smart');
         for (const junk of [undefined, null, '', 'always', 'SMART', 0, 1, {}]) {
             assert.equal(snapshotsAutoMode(junk), 'smart', String(junk));
+        }
+    });
+
+    it('turns the change notice on unless set false, and off whenever recording is', () => {
+        assert.equal(snapshotsNotifyOn({}), true);
+        assert.equal(snapshotsNotifyOn(undefined), true);
+        assert.equal(snapshotsNotifyOn({ snapshotsAuto: 'every', snapshotsNotify: true }), true);
+        assert.equal(snapshotsNotifyOn({ snapshotsAuto: 'smart', snapshotsNotify: false }), false);
+        for (const snapshotsAuto of ['off', false]) {
+            assert.equal(snapshotsNotifyOn({ snapshotsAuto, snapshotsNotify: true }), false, String(snapshotsAuto));
         }
     });
 });

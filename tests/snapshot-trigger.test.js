@@ -5,13 +5,14 @@
 // dark or coming back, connectivity target sets, statuses and the median
 // log-ratio latency shift; one-sided or unusable items,
 // one-sided or empty fields, one STUN server failing and small drift never
-// fire.
+// fire. notableChanges, the change notice's stricter check: only what both
+// sides carry, plus WebRTC going dark.
 
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
-    snapshotTrigger, shouldRecordSnapshot, latencyShifted,
+    snapshotTrigger, shouldRecordSnapshot, latencyShifted, notableChanges,
     CONNECTIVITY_LATENCY_RATIO, CONNECTIVITY_LATENCY_DELTA_MS,
 } from '../frontend/utils/features/snapshot-trigger.js';
 import { SCENARIO_FRICTION_IDS } from '../frontend/utils/codes/ip.js';
@@ -322,5 +323,50 @@ describe('snapshot trigger — one-sided sections', () => {
     it('a speed test only on the previous side does not fire', () => {
         const previous = with_({ speed: { downloadMbps: 100 } });
         assert.equal(snapshotTrigger(previous, sections(BASE)), null);
+    });
+});
+
+describe('notable changes — the change notice', () => {
+    const changes = (current, previous = sections(BASE)) => notableChanges(previous, current);
+    const dark = BASE.servers.map((item) => server(item.id, null, { natType: 'error', countryCode: '' }));
+
+    it('is empty without both sides, or with nothing changed', () => {
+        assert.deepEqual(notableChanges(null, sections(BASE)), []);
+        assert.deepEqual(notableChanges(sections(BASE), null), []);
+        assert.deepEqual(changes(sections(BASE)), []);
+        assert.deepEqual(changes(with_({ providers: [provider('p1', '9.9.9.99'), provider('p2', '9.9.9.100')] })), [], 'resolver IP rotation');
+    });
+
+    it('lists the sections whose shared fields changed, in homepage order', () => {
+        const current = with_({
+            providers: [provider('p1', '9.9.9.9', { org: 'Quad9' }), BASE.providers[1]],
+            cards: [card('ipcheck', '1.1.1.1', { anonymity: 'none', ipType: 'residential', nativeIP: true, qualityScore: 90 }), BASE.cards[1]],
+            servers: [server('google', '8.8.4.4'), BASE.servers[1]],
+        });
+        assert.deepEqual(changes(current), ['ipinfo', 'webrtc', 'dnsleak']);
+    });
+
+    it('never counts what the previous snapshot lacks', () => {
+        const previous = sections({ cards: BASE.cards });
+        assert.deepEqual(changes(sections(BASE), previous), [], 'sections it lacks');
+        assert.deepEqual(changes(with_({ targets: [...BASE.targets, target('custom1', 'timeout', { custom: true })] })), [], 'a new target');
+        assert.deepEqual(changes(with_({ targets: BASE.targets.slice(0, 3) })), [], 'a missing target');
+        assert.deepEqual(changes(with_({ cards: [BASE.cards[0], card('ipsb', '2001:4860::1', { anonymity: 'vpn' })] })), [], 'a one-sided field');
+        assert.deepEqual(changes(with_({ cards: [...BASE.cards, card('extra', '1.1.1.1')] })), [], 'a new card');
+        const speed = with_({ speed: { downloadMbps: 100 } });
+        assert.deepEqual(changes(with_({ speed: { downloadMbps: 5 } }), speed), [], 'speed tests');
+    });
+
+    it('counts a shared target\'s status or latency, whatever else the target set does', () => {
+        const extra = target('custom1', 'ok', { custom: true });
+        assert.deepEqual(changes(with_({ targets: [target('google', 'unreachable'), ...BASE.targets.slice(1, 3), extra] })), ['connectivity']);
+        const slow = BASE.targets.slice(0, 3).map((item) => ({ ...item, timeMs: 410, minTimeMs: 400 }));
+        assert.deepEqual(changes(with_({ targets: [...slow, extra] })), ['connectivity'], 'x13, +370 ms');
+        assert.deepEqual(changes(with_({ targets: [...BASE.targets.slice(0, 3).map((item) => ({ ...item, timeMs: 60, minTimeMs: 45 })), extra] })), [], 'drift');
+    });
+
+    it('counts WebRTC going dark, not coming back', () => {
+        assert.deepEqual(changes(with_({ servers: dark })), ['webrtc']);
+        assert.deepEqual(changes(sections(BASE), with_({ servers: dark })), []);
     });
 });
