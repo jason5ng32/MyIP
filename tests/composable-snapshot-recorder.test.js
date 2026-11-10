@@ -783,6 +783,15 @@ describe('snapshot recorder — snapshot:changed', () => {
         assert.deepEqual(events, [{ id: 'id2', sections: ['connectivity'] }]);
     });
 
+    it('a snapshot replacing the removed session one announces afresh', () => {
+        const storage = memoryStorage();
+        visit(storage, ipinfoPayload('8.8.8.8'));
+        const { api } = visit(storage, ipinfoPayload('1.1.1.1'));
+        api.remove('id2');
+        emitAppEvent('ipinfo:finished', ipinfoPayload('1.1.1.1'));
+        assert.deepEqual(events, [{ id: 'id2', sections: ['ipinfo'] }, { id: 'id3', sections: ['ipinfo'] }]);
+    });
+
     it('comes with the snapshot a smart change creates; nothing while off', () => {
         const storage = memoryStorage();
         visit(storage, ipinfoPayload('8.8.8.8'), { snapshotsAuto: 'smart' });

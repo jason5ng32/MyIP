@@ -20,7 +20,8 @@
 // emits `snapshot:created`. While recording is on, each result also checks
 // the session's snapshot against the next older one (notableChanges, an
 // unsettled connectivity result left out) and emits `snapshot:changed`
-// with every section changed so far, again only when one joins.
+// with every section changed so far, again only when one joins (afresh for
+// a snapshot that replaces a removed one).
 // `useSnapshotRecorder` is called once at App level; `useSnapshots` is the
 // read / action API over the same state.
 
@@ -243,10 +244,14 @@ export const useSnapshots = () => {
         return ok;
     };
 
-    // Removing the session's snapshot sends later sections back to the buffer.
+    // Removing the session's snapshot sends later sections back to the buffer;
+    // a snapshot created in its place announces its changes afresh.
     const remove = (id) => {
         commit(removeSnapshot(latest(), id));
-        if (state.currentId === id) state.currentId = null;
+        if (state.currentId === id) {
+            state.currentId = null;
+            noticed = new Set();
+        }
     };
 
     // Smart mode found nothing notable in this session's results: it has

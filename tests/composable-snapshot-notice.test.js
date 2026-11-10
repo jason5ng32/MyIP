@@ -1,8 +1,10 @@
 // Tests for frontend/composables/use-snapshot-notice.js — `snapshot:changed`
 // becomes one queued toast request (fixed id, `once`, the 50 s / Speed Test
 // timing, a View action to the snapshot) only while the notice is on
-// (snapshotsNotify, and never with automatic recording off); empty payloads
-// are ignored; turning the notice off cancels it; disposing stops it.
+// (snapshotsNotify, and never with automatic recording off); the delay counts
+// from page entry; empty payloads are ignored; turning the notice off cancels
+// it and on again re-queues the latest change; deleting its snapshot cancels
+// it; disposing stops it.
 
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
@@ -18,7 +20,7 @@ let scope = null;
 const TITLES = { 'ipInfos.Title': 'IP Infos', 'dnsleaktest.Title': 'DNS Leak Test', 'connectivity.Title': 'Connectivity' };
 const t = (key, params) => (params ? `${key}:${JSON.stringify(params)}` : TITLES[key] ?? key);
 
-const start = (prefs) => {
+const start = (prefs, { clock = { now: 0 }, ids = reactive(new Set(['id2', 'id3'])) } = {}) => {
     const requests = [];
     const store = reactive({
         userPreferences: { snapshotsAuto: 'smart', snapshotsNotify: true, ...prefs },
@@ -26,8 +28,10 @@ const start = (prefs) => {
         cancelToast: (id) => requests.push({ id, cancel: true }),
     });
     scope = effectScope();
-    scope.run(() => useSnapshotNotice({ store, t, locale: ref('en') }));
-    return { store, requests };
+    scope.run(() => useSnapshotNotice({
+        store, t, locale: ref('en'), now: () => clock.now, hasSnapshot: (id) => ids.has(id),
+    }));
+    return { store, requests, clock, ids };
 };
 
 afterEach(() => {
@@ -54,6 +58,40 @@ describe('snapshot notice', () => {
             },
         }]);
         assert.deepEqual(SNAPSHOT_NOTICE_WHEN, { delayMs: 50000, reach: 'SpeedTest' });
+    });
+
+    it('counts the delay from page entry', () => {
+        const { requests, clock } = start();
+        clock.now = 20000;
+        emitAppEvent('snapshot:changed', { id: 'id2', sections: ['ipinfo'] });
+        clock.now = 90000;
+        emitAppEvent('snapshot:changed', { id: 'id2', sections: ['ipinfo', 'dnsleak'] });
+        assert.deepEqual(requests.map((r) => r.when), [
+            { delayMs: 30000, reach: 'SpeedTest' }, { delayMs: 0, reach: 'SpeedTest' },
+        ]);
+    });
+
+    it('off then on again re-queues the latest change', async () => {
+        const { store, requests } = start({ snapshotsNotify: false });
+        emitAppEvent('snapshot:changed', { id: 'id2', sections: ['ipinfo'] });
+        assert.deepEqual(requests, []);
+        store.userPreferences.snapshotsNotify = true;
+        await nextTick();
+        assert.equal(requests.length, 1);
+        assert.equal(requests[0].action.to.query.q, 'id2');
+    });
+
+    it('deleting its snapshot cancels it, and on again queues nothing', async () => {
+        const { store, requests, ids } = start();
+        emitAppEvent('snapshot:changed', { id: 'id2', sections: ['ipinfo'] });
+        ids.delete('id2');
+        await nextTick();
+        assert.deepEqual(requests.slice(1), [{ id: SNAPSHOT_NOTICE_ID, cancel: true }]);
+        store.userPreferences.snapshotsNotify = false;
+        await nextTick();
+        store.userPreferences.snapshotsNotify = true;
+        await nextTick();
+        assert.equal(requests.filter((r) => !r.cancel).length, 1);
     });
 
     it('queues nothing while the notice is off, or recording is', () => {
