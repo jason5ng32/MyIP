@@ -2,9 +2,14 @@
      columns, plus a signature bar (with the copyright on self-hosted
      deployments). About / Changelog / Acknowledgement open in its About
      sheet, the CLI in its own dialog; nothing already on the page (tools,
-     sections) repeats here. -->
+     sections) repeats here. A festival theme hangs its garland. -->
 <template>
-  <footer class="border-t border-secondary text-sm text-muted-foreground">
+  <footer class="relative border-t border-secondary text-sm text-muted-foreground">
+    <!-- Festival garland across the empty top padding. -->
+    <div v-if="festivalFooterTrim" aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 h-12 overflow-hidden">
+      <component :is="festivalFooterTrim" />
+    </div>
     <div class="mx-auto w-full px-4 jn-container">
       <!-- Link columns: four tracks on md+, matching the Advanced Tools grid;
            on phones the brand spans the top and the rest flow two per row. -->
@@ -32,7 +37,7 @@
           </div>
         </div>
 
-        <!-- Project: the About sheet's tabs, privacy and license -->
+        <!-- Project: the About sheet's tabs, privacy, license and contributing -->
         <nav :aria-label="t('footer.Project')">
           <h3 :class="headingClass">{{ t('footer.Project') }}</h3>
           <ul class="space-y-2">
@@ -42,13 +47,13 @@
               </button>
             </li>
             <li>
-              <button type="button" :class="linkClass" @click="openAboutTab('changelog', 'Changelog')">
-                {{ t('changelog.Title') }}
+              <button type="button" :class="linkClass" @click="openAboutTab('acknowledgement', 'Acknowledgement')">
+                {{ t('acknowledgement.Title') }}
               </button>
             </li>
             <li>
-              <button type="button" :class="linkClass" @click="openAboutTab('acknowledgement', 'Acknowledgement')">
-                {{ t('acknowledgement.Title') }}
+              <button type="button" :class="linkClass" @click="openAboutTab('changelog', 'Changelog')">
+                {{ t('changelog.Title') }}
               </button>
             </li>
             <li>
@@ -62,13 +67,25 @@
                 {{ t('footer.License') }}
               </a>
             </li>
+            <li>
+              <a :href="`${t('page.footerLink')}/contribute`" target="_blank" rel="noopener" :class="linkClass"
+                @click="trackEvent('Footer', 'FooterClick', 'Contribute')">
+                {{ t('footer.Contribute') }}
+              </a>
+            </li>
           </ul>
         </nav>
 
-        <!-- Docs & Support: locale-aware docs.ipcheck.ing links + issue tracker -->
+        <!-- Docs & Support: the shortcut guide (Home only, where the keys
+             work), locale-aware docs.ipcheck.ing links + issue tracker -->
         <nav :aria-label="t('footer.Support')">
           <h3 :class="headingClass">{{ t('footer.Support') }}</h3>
           <ul class="space-y-2">
+            <li v-if="shortcutGuide">
+              <button type="button" :class="linkClass" @click="openShortcutGuide">
+                {{ t('footer.ShortcutGuide') }}
+              </button>
+            </li>
             <li>
               <a :href="docsUrl('knowledge-base', locale)" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'HelpCenter')">
@@ -91,6 +108,12 @@
               <a :href="`${t('page.footerLink')}/issues`" target="_blank" rel="noopener" :class="linkClass"
                 @click="trackEvent('Footer', 'FooterClick', 'ReportIssue')">
                 {{ t('footer.ReportIssue') }}
+              </a>
+            </li>
+            <li>
+              <a :href="`${t('page.footerLink')}/issues/new?template=feature_request.md`" target="_blank" rel="noopener"
+                :class="linkClass" @click="trackEvent('Footer', 'FooterClick', 'FeatureRequest')">
+                {{ t('footer.FeatureRequest') }}
               </a>
             </li>
           </ul>
@@ -298,14 +321,22 @@ import { Compass, ExternalLink, CircleFadingArrowUp, CirclePlus, BugOff, Smile, 
 import brandIcon from './svgicons/Brand.vue';
 import { Icon } from '@iconify/vue';
 import { useRouteActive } from '@/composables/use-route-active.js';
+import { useFestivalSkin } from '@/composables/use-festival-skin.js';
+
+// Home passes `shortcut-guide` and owns the Help dialog the link opens.
+defineProps({ shortcutGuide: { type: Boolean, default: false } });
+const emit = defineEmits(['open-shortcut-guide']);
 
 const { t, tm, rt, locale } = useI18n();
 
 const store = useMainStore();
 const configs = computed(() => store.configs);
+
+// Festival theme's footer trim, if the active festival has one.
+const { footerTrim: festivalFooterTrim } = useFestivalSkin();
 const curl = computed(() => store.curl);
 const curlDomainsHadSet = computed(() => store.curlDomainsHadSet);
-const tabs = ['about', 'changelog', 'acknowledgement'];
+const tabs = ['about', 'acknowledgement', 'changelog'];
 const content = ref('about');
 
 const headingClass = 'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground';
@@ -342,7 +373,6 @@ const acknowledgementsList = [
   { name: 'Project Alexandria (Cloudflare)', link: 'https://www.cloudflare.com/lp/project-alexandria/' },
   { name: 'Cloudflare Speedtest', link: 'https://github.com/cloudflare/speedtest' },
   { name: 'V.PS', link: 'https://v.ps/?utm_source=ipcheck.ing&utm_medium=acknowledgement&utm_campaign=footer' },
-  { name: 'RapidProxy', link: 'https://www.rapidproxy.io/?ref=myip' },
   { name: 'SwiftProxy', link: 'https://www.swiftproxy.net/?ref=myip' },
   { name: 'Proxy-Seller', link: 'https://proxy-seller.com/?partner=4FEC1644D12240F4' },
   { name: 'Sentry', link: 'https://www.sentry.io/' },
@@ -388,6 +418,11 @@ const openAboutTab = (tab, trackLabel) => {
   content.value = tab;
   store.setOpenSheet('about');
   trackEvent('Footer', 'FooterClick', trackLabel);
+};
+
+const openShortcutGuide = () => {
+  emit('open-shortcut-guide');
+  trackEvent('Footer', 'FooterClick', 'ShortcutGuide');
 };
 
 const isCurlOpen = ref(false);

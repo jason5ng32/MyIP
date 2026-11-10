@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 一個開源的多合一 IP 工具箱：多來源 IP 查詢、連通性測試、WebRTC 與 DNS 洩漏偵測、網速測試、MTR、審查封鎖檢查、Whois 等——一條 Docker 指令即可自行架設。
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP 卡片**：從多個獨立來源並列偵測你的 IPv4 與 IPv6——包括國家、地區、城市、ASN、組織，以及該 IP 所在地的當地時區。
 * 🔍 **IP 查詢**：查詢任何一個你感興趣的 IP 位址的同樣詳細資訊。
-* 🧾 **IP 歷史記錄**：在本機記錄你曾被偵測到的 IP，可依類型與國家篩選——只儲存在你的瀏覽器裡。
+* 📸 **快照記錄**：每次開啟首頁時，把首頁各項測試的結果（IP 資訊、網路連通性、WebRTC、DNS 洩漏測試、網速測試）儲存為一份快照。任選兩份比較，像程式碼 diff 一樣逐行查看差異；重要的快照可以命名或釘選——只儲存在你的瀏覽器裡。
 * 🖥️ **瀏覽器指紋**：以多種方式計算你的瀏覽器指紋，並顯示是哪些特徵讓你可被識別。
 
 ### 🕵️ 洩漏與隱私
@@ -65,6 +65,7 @@
 * 📓 **Whois 查詢**：對網域名稱、IP 位址與 AS 編號進行 Whois 查詢。
 * 🗄️ **MAC 位址查詢**：識別實體位址背後的廠商與詳細資訊。
 * 🧮 **IP 計算器**：對任意 IP、前綴、範圍或清單做子網路計算、進位轉換與 IPv6 介面解讀，全部本機完成。
+* 🧾 **IP 批次查詢**：貼上 IP 清單或伺服器原始日誌（Nginx、Apache、防火牆、CDN 等），快速查詢所有 IP 的地理位置。
 * 🛰️ **ASN 資訊與上游拓撲**：直接在每張 IP 卡片中顯示 AS 詳細資訊、該 IP 前綴的歷史宣告記錄，以及其 ASN 到 Tier 1 骨幹網路的上游路徑。
 * 🛂 **ASN 檔案**：任意 AS 的完整檔案——註冊資訊與原始 Whois 記錄、全球排名與規模、流量組成與連線品質、IPv4 位址分布在哪些國家、所有宣告前綴及其 RPKI 狀態、上游／對等／客戶網路，以及它進駐的網際網路交換中心與資料中心。
 * 📶 **服務可用性**：知名服務（Claude、OpenAI、GitHub、Cloudflare 等）的即時可用狀態，資料來自它們的官方狀態頁，並附最近的事故。
@@ -185,9 +186,6 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **贊助商**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
-
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
 <sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
 </sub>
@@ -213,4 +211,4 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 📄 授權條款
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

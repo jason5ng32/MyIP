@@ -171,7 +171,7 @@ describe('ipinfo:finished card rules', () => {
     assert.equal(fires(rules.PrettyDirty, cards('1')), true);
     assert.equal(fires(rules.SqueakyClean, cards('100')), true);
     for (const rule of [rules.PrettyDirty, rules.SqueakyClean]) {
-      assert.equal(fires(rule, cards('sign_in_required', 'unknown', undefined)), false);
+      assert.equal(fires(rule, cards('sign_in_required', 'quota_exceeded', 'cooldown', 'unknown', undefined)), false);
       assert.equal(fires(rule, { cards: [] }), false);
       assert.equal(fires(rule, {}), false);
     }
@@ -186,12 +186,9 @@ describe('ipinfo:finished card rules', () => {
   });
 });
 
-describe('iphistory:updated', () => {
-  it('GlobeTrotter needs 10 distinct countries', () => {
-    const rule = rulesFor('iphistory:updated').GlobeTrotter;
-    assert.equal(fires(rule, { countryCount: 9 }), false);
-    assert.equal(fires(rule, { countryCount: 10 }), true);
-    assert.equal(fires(rule, {}), false);
+describe('retired rules', () => {
+  it('GlobeTrotter has no unlock rule (retired with IP History)', () => {
+    assert.equal(ACHIEVEMENT_RULES.some((rule) => rule.slug === 'GlobeTrotter'), false);
   });
 });
 

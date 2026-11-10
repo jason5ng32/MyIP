@@ -2211,7 +2211,7 @@
   },
   {
     "version": "v8.0.0",
-    "date": "Beta",
+    "date": "2026-10-23",
     "content": [
       {
         "type": "add",
@@ -2288,6 +2288,139 @@
           "fr": "Amélioration de l'expérience PWA sur iOS",
           "ru": "Улучшение работы PWA в iOS",
           "pt-BR": "Melhoria da experiência PWA no iOS"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Service Status now covers more well-known internet products",
+          "zh": "「服务可用性」高级工具新增更多知名互联网产品",
+          "zh-TW": "「服務可用性」進階工具新增更多知名網路產品",
+          "fr": "L'outil État des services couvre davantage de produits Internet connus",
+          "ru": "Инструмент «Состояние сервисов» охватывает больше известных интернет-продуктов",
+          "pt-BR": "A ferramenta Status dos serviços agora cobre mais produtos conhecidos da internet"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v8.1.0",
+    "date": "2026-11-08",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "IP cards add Scenario friction: an estimate of the extra checks or restrictions this IP may meet across 10 scenarios such as sign-up, payments and streaming",
+          "zh": "IP 卡片新增「场景摩擦」：估算这个 IP 在注册、支付、流媒体等 10 类场景中可能遇到的额外验证或限制",
+          "zh-TW": "IP 卡片新增「場景摩擦」：估算這個 IP 在註冊、支付、串流媒體等 10 類場景中可能遇到的額外驗證或限制",
+          "fr": "Les cartes IP ajoutent la Friction par scénario : une estimation des vérifications ou restrictions supplémentaires que cette IP peut rencontrer dans 10 scénarios, comme l'inscription, les paiements et le streaming",
+          "ru": "В карточках IP появились «Сложности по сценариям»: оценка дополнительных проверок или ограничений, с которыми этот IP может столкнуться в 10 сценариях, например при регистрации, оплате и стриминге",
+          "pt-BR": "Os cartões de IP ganham o Atrito por cenário: uma estimativa das verificações extras ou restrições que este IP pode encontrar em 10 cenários, como cadastro, pagamentos e streaming"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Bulk IP Lookup: paste IP lists or raw server logs to geolocate all IPs — then sort, filter, star, summarize by country and ASN, map and export them",
+          "zh": "新增「IP 批量查询」：粘贴 IP 列表或服务器日志，查询所有 IP 的地理位置，并可排序、筛选、加星标、按国家和 ASN 汇总、查看地图和导出",
+          "zh-TW": "新增「IP 批次查詢」：貼上 IP 清單或伺服器日誌，查詢其中 IP 的地理位置，並可排序、篩選、加上星號、依國家和 ASN 彙總、查看地圖和匯出",
+          "fr": "Ajout de la Recherche IP groupée : collez des listes d'IP ou des journaux de serveur bruts pour géolocaliser leurs IP, puis triez, filtrez, ajoutez une étoile, résumez par pays et par ASN, affichez sur une carte et exportez",
+          "ru": "Добавлена «Массовая проверка IP»: вставьте список IP или сырые журналы сервера, чтобы определить местоположение их IP, а затем сортируйте, фильтруйте, отмечайте звёздочкой, сводите по странам и ASN, смотрите на карте и экспортируйте",
+          "pt-BR": "Nova Consulta de IPs em lote: cole listas de IPs ou logs brutos de servidor para geolocalizar os IPs — e depois ordenar, filtrar, marcar com estrela, resumir por país e ASN, ver no mapa e exportar"
+        }
+      },
+      {
+        "type": "add",
+        "change": {
+          "en": "Added special decorations for some festivals",
+          "zh": "为某些节日添加了特殊的装饰",
+          "zh-TW": "為某些節日新增了特別的裝飾",
+          "fr": "Ajout de décorations spéciales pour certaines fêtes",
+          "ru": "Добавлено особое оформление для некоторых праздников",
+          "pt-BR": "Adicionadas decorações especiais para algumas datas comemorativas"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "More troubleshooting logs for self-hosted deployments",
+          "zh": "为自托管用户提供了更多排障日志",
+          "zh-TW": "為自架使用者提供了更多疑難排解日誌",
+          "fr": "Davantage de journaux de diagnostic pour les instances auto-hébergées",
+          "ru": "Больше журналов для диагностики в самостоятельно размещённых установках",
+          "pt-BR": "Mais logs de diagnóstico para quem hospeda a própria instância"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "The DNS Resolution tool returns more detailed results",
+          "zh": "DNS 解析工具提供更详细的数据返回",
+          "zh-TW": "DNS 解析工具提供更詳細的回傳資料",
+          "fr": "L'outil Résolution DNS renvoie des résultats plus détaillés",
+          "ru": "Инструмент «Разрешение DNS» возвращает более подробные результаты",
+          "pt-BR": "A ferramenta Resolução DNS retorna resultados mais detalhados"
+        }
+      },
+      {
+        "type": "fix",
+        "change": {
+          "en": "Fixed some issues",
+          "zh": "修复了一些问题",
+          "zh-TW": "修正了一些問題",
+          "fr": "Correction de divers problèmes",
+          "ru": "Исправлены некоторые проблемы",
+          "pt-BR": "Corrigidos alguns problemas"
+        }
+      }
+    ]
+  },
+  {
+    "version": "v8.2.0",
+    "date": "Beta",
+    "content": [
+      {
+        "type": "add",
+        "change": {
+          "en": "Added Snapshot History: the homepage test results are saved per visit in this browser, so you can compare any two snapshots and see what differs",
+          "zh": "新增「快照记录」：首页各项测试结果每次访问保存一份在当前浏览器中，可任选两份快照对比，查看有哪些不同",
+          "zh-TW": "新增「快照記錄」：首頁各項測試結果每次造訪儲存一份在目前的瀏覽器中，可任選兩份快照比較，查看有哪些不同",
+          "fr": "Ajout de l'Historique des instantanés : les résultats des tests de la page d'accueil sont enregistrés à chaque visite dans ce navigateur, pour comparer deux instantanés et voir ce qui diffère",
+          "ru": "Добавлена «История снимков»: результаты тестов главной страницы сохраняются в этом браузере при каждом посещении, и любые два снимка можно сравнить, чтобы увидеть различия",
+          "pt-BR": "Novo Histórico de instantâneos: os resultados dos testes da página inicial são salvos por visita neste navegador, para você comparar dois instantâneos quaisquer e ver o que difere"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "Connectivity: in single-refresh mode, you can set to discard the first result so the latency leaves out DNS lookup and connection setup",
+          "zh": "网络连通性：单次刷新模式下可设置丢弃首次结果，使延迟不包含 DNS 解析与建立连接的耗时",
+          "zh-TW": "網路連通性：單次重新整理模式下可設定捨棄首次結果，使延遲不包含 DNS 解析與建立連線的時間",
+          "fr": "Connectivité : en mode rafraîchissement unique, vous pouvez définir pour ignorer le premier résultat pour que la latence exclue la résolution DNS et l'établissement de la connexion",
+          "ru": "Проверка доступности: в режиме одной проверки вы можете установить игнорировать первый результат, чтобы задержка не включала DNS-запрос и установку соединения",
+          "pt-BR": "Conectividade: no modo de atualização única, você pode definir para ignorar o primeiro resultado para que a latência não inclua a consulta DNS e o estabelecimento da conexão"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
+          "en": "IP History is retired; Snapshot History now covers its role",
+          "zh": "「IP 历史记录」已下线，其作用由「快照记录」接替",
+          "zh-TW": "「IP 歷史記錄」已下線，其作用由「快照記錄」接替",
+          "fr": "L'Historique des IP est retiré ; l'Historique des instantanés prend le relais",
+          "ru": "«История IP» удалена: её роль теперь выполняет «История снимков»",
+          "pt-BR": "O Histórico de IP foi descontinuado; o Histórico de instantâneos assume o seu papel"
         }
       },
       {

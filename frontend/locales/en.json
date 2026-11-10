@@ -15,7 +15,10 @@
       "Note": "Advanced features come with a free monthly quota, which resets automatically at the start of each month (UTC). Repeat IP advanced data queries are served from cache and don't use your quota.",
       "IpinfoFeature": "IP Advanced Data",
       "PercentUsed": "{percent}% used",
-      "SponsorNote": "Sponsoring on GitHub raises your monthly quotas."
+      "SponsorNote": "Sponsoring on GitHub raises your monthly quotas.",
+      "DailyTitle": "24-hour limit",
+      "MonthlyTitle": "Monthly quota",
+      "AvailableAgainAt": "Available again at {time}"
     },
     "MyAchievements": "My Achievements",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Sponsors",
           "Item1": "Everything in Signed-in Users",
           "Item2": "Higher monthly quotas for advanced features",
-          "Item3": "Support the ongoing development of this open-source project"
+          "Item3": "Support the ongoing development of this open-source project",
+          "Item4": "More generous 24-hour limit"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "Logging off to touch grass",
         "turing": "This status was sent by a human. Probably.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Happy birthday, IPCheck.ing!"
+        "birthday": "Happy birthday, IPCheck.ing!",
+        "adaday": "Algorithm by Ada, since 1843",
+        "dayofdead": "Remembering those who've logged off",
+        "thanksgiving": "Grateful for every packet that made it",
+        "piday": "3.14159265358979… still loading",
+        "holi": "Splashing colors in full RGB",
+        "shannon": "Sending this one bit at a time",
+        "wtisd": "Full bars, worldwide",
+        "ipv6day": "Now with 2¹²⁸ addresses",
+        "sysadmin": "Have you tried turning it off and on again?",
+        "linux": "Just a hobby, won't be big and professional",
+        "tomatina": "Under a tomato flood attack"
       },
       "festivalDesc": {
         "prgday": "Programmers' Day — the 256th day of the year, 0x100 in hex",
@@ -313,7 +328,18 @@
         "earthday": "Earth Day (Apr 22) — even Earth Online recommends a little Earth Offline",
         "turing": "Alan Turing's birthday (Jun 23, 1912) — father of the Turing test",
         "emojiday": "World Emoji Day (Jul 17) — words are so last century",
-        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020"
+        "birthday": "IPCheck.ing's birthday — v1.0 shipped on Nov 6, 2020",
+        "adaday": "Ada Lovelace Day (2nd Tuesday of October) — celebrating women in STEM; Ada wrote the first published algorithm",
+        "dayofdead": "Día de los Muertos (Nov 1–2) — Mexico remembers loved ones who are never truly offline",
+        "thanksgiving": "Thanksgiving (4th Thursday of November) — thanks to every router along the path",
+        "piday": "Pi Day (Mar 14, 3.14) — also UNESCO's International Day of Mathematics",
+        "holi": "Holi — the Hindu festival of colors welcomes spring in every hex code",
+        "shannon": "Claude Shannon's birthday (Apr 30, 1916) — father of information theory, who gave us the bit",
+        "wtisd": "World Telecommunication and Information Society Day (May 17) — the ITU was founded on this day in 1865",
+        "ipv6day": "World IPv6 Launch (Jun 6, 2012) — the day IPv6 switched on for good",
+        "sysadmin": "System Administrator Appreciation Day (last Friday of July) — thank whoever keeps your uptime up",
+        "linux": "Aug 25, 1991: Linus Torvalds announced his “just a hobby” OS on comp.os.minix",
+        "tomatina": "La Tomatina (last Wednesday of August) — Buñol, Spain's tomato fight; the one flood nobody wants to filter"
       }
     },
     "preferences": {
@@ -335,15 +361,27 @@
         "defaultListTips": "The list the section opens on when the page loads.",
         "multipleTests": "Multiple Refreshes",
         "multipleTestsTips": "Run several checks per pass and show the lowest latency.",
+        "discardFirstResult": "Discard First Result",
+        "discardFirstResultTips": "Send an untimed warm-up request first, so the latency shown leaves out DNS lookup and connection setup.",
         "notifications": "Pop-up Alerts",
         "notificationsTips": "Show the initial check's results as a pop-up alert.",
         "titleOpensSite": "Card Title Opens Website",
         "titleOpensSiteTips": "Clicking a card's title opens the site in a new tab; off leaves the title as plain text."
       },
-      "ipHistory": "IP History",
-      "ipHistoryEnabled": "Record IP History",
-      "ipHistoryDays": "Retention Days",
-      "ipHistoryTips": "When enabled, detected IPs are recorded in this browser only and kept for the selected number of days. Turning it off stops recording; existing records stay until you clear them in the IP History panel.",
+      "snapshots": "Snapshot History",
+      "snapshotsAuto": "Automatic recording",
+      "snapshotsAutoSmart": "Smart",
+      "snapshotsAutoEvery": "Every visit",
+      "snapshotsAutoOff": "Off",
+      "snapshotsAutoTips": "With Smart, the app decides when to record a snapshot. With Off, snapshots are saved only by hand on the Snapshot History page.",
+      "snapshotsLabelCard": "IP card used to name snapshots automatically",
+      "snapshotsLabelCardName": "IP card {index}",
+      "snapshotsLabelCardTips": "Snapshots are named after this card's country and IP; when it has no valid IP, the first card with an IP is used.",
+      "snapshotsNotify": "Notify on changes",
+      "snapshotsNotifyTips": "Show a pop-up when this visit differs notably from the previous snapshot in what both recorded.",
+      "snapshotsKeepLast": "Number of snapshots",
+      "snapshotsCountOption": "Last {n}",
+      "snapshotsKeepLastTips": "Older snapshots beyond this number are removed. Pinned snapshots never expire and don't count toward it.",
       "ipDB": "IP Geolocation Database",
       "ipDBTips": "You can select the default IP geolocation source to use. If the selected source is unavailable, the system will use the subsequent sources in order.",
       "language": "Language Setting",
@@ -1082,12 +1120,14 @@
     "EnhancedDnsLeakTest": "Captures every recursive resolver, with ECS and DNSSEC analysis",
     "RuleTestNote": "Check the rule settings of proxy software",
     "CensorshipCheck": "Check which countries a website is blocked in",
-    "ServiceStatus": "Check the live availability of well-known AI and developer services, and whether a recent incident explains the outage you're seeing",
+    "ServiceStatus": "Check the live availability of well-known internet products, and whether a recent incident explains the outage you're seeing",
     "Whois": "Search for domain/IP/ASN registration information",
     "AsnProfile": "View the full profile of any AS",
     "InvisibilityTest": "Check if you are using a proxy or VPN",
     "MacChecker": "Query information of a physical address",
     "IpCalculator": "Subnet math, notation conversion and IPv6 insight for any IP, prefix or range",
+    "BulkLookup": "Look up IPs in bulk, straight from pasted logs",
+    "Snapshots": "View and compare the differences between multiple test results",
     "BrowserInfo": "Check browser information and fingerprint",
     "AdblockTest": "Check what your ad blocker, DNS filter or VPN actually blocks",
     "SecurityChecklist": "Guide to securing your digital life",
@@ -1254,6 +1294,221 @@
     "aggregated": "Single block",
     "aggregationSummary": "{input} blocks in, {output} out, {addresses} addresses",
     "invalidTokens": "Ignored: {list}"
+  },
+  "bulklookup": {
+    "Title": "Bulk IP Lookup",
+    "Note": "Pull the IPs out of Nginx, Apache, firewall, CDN or application logs — or any pasted list — and see at a glance where the traffic comes from: which countries and networks (ASNs), and which IPs keep coming back. Then drill into any single IP.",
+    "Note2": "Paste any text: the IPs are extracted in your browser, private and reserved ones are skipped, and repeats are counted. Paste as often as you like — the list holds up to {max} IPs, and a large paste is looked up in several requests. Geolocation comes from {source}. Results are kept only in this browser.",
+    "SourceWithBuild": "{source} (database of {date})",
+    "SourceFallback": "the server's local geolocation database",
+    "InputLabel": "Paste IPs or log lines:",
+    "Placeholder": "1.1.1.1, 8.8.8.8 or whole log lines…",
+    "FirstPerLine": "Only the first IP on each line",
+    "FirstPerLineHint": "For CDN or reverse-proxy logs, where the client IP shares a line with proxy or edge IPs.",
+    "status": {
+      "empty": "What's found appears here once you paste.",
+      "none": "No public IPs found",
+      "ready": "Found {n} IPs: {fresh}",
+      "new": "{n} new",
+      "existing": "{n} already listed",
+      "reserved": "{n} private skipped",
+      "cidr": "{n} CIDR skipped",
+      "split": "queried in {n} requests",
+      "known": "All {n} IPs are already listed; only their frequency will be updated",
+      "noRoom": "{n} new IPs, but the list only has room for {room} more (limit {max}) — delete some rows first",
+      "running": "Looking up {n} IPs…",
+      "runningSplit": "Looking up — request {request} of {requests}, {done} of {total} IPs done…",
+      "updating": "Updating frequency…"
+    },
+    "Run": "Look up {n} new",
+    "RunCountsOnly": "Update frequency",
+    "RunIdle": "Look up",
+    "Unanswered": "{n} IPs could not be looked up.",
+    "RunFailed": "The lookup failed. Please try again later.",
+    "RunRateLimited": "Too many lookups in a short time. Please try again later.",
+    "Paused": "{done} of {total} new IPs looked up; {n} remaining paused.",
+    "PausedRateLimited": "Too many lookups in a short time. Wait a moment, then continue.",
+    "PausedFailed": "The lookup was interrupted. Try continuing in a moment.",
+    "Continue": "Continue remaining {n}",
+    "StorageError": "This browser didn't save the list (storage full or blocked). It stays here until you leave the page.",
+    "stat": {
+      "rows": "IPs",
+      "countries": "Countries/regions",
+      "asns": "ASNs",
+      "frequency": "Total frequency",
+      "topShare": "Top 10 IPs' share of frequency",
+      "onceShare": "Share of IPs seen only once"
+    },
+    "ClearAll": "Clear all",
+    "OverviewTitle": "Overview",
+    "MapTitle": "World map",
+    "tab": {
+      "ips": "IPs",
+      "analysis": "Analysis"
+    },
+    "FilterPlaceholder": "Filter by IP, country, city, ASN, organization or note — combine words, e.g. “Germany 3320”",
+    "ClearSearch": "Clear search",
+    "BatchFilter": "Paste batch",
+    "AllBatches": "All pastes",
+    "BatchLabel": "{time} · {n} IPs",
+    "ExportCsv": "Export CSV",
+    "StarredOnly": "Starred IPs only",
+    "NoMatches": "Nothing matches the filters.",
+    "ClearTitle": "Clear the list",
+    "ClearBody": "This removes {n} IPs from this browser. It can't be undone.",
+    "KeepStarred": "Keep starred IPs ({n})",
+    "Cancel": "Cancel",
+    "Save": "Save",
+    "ClearConfirm": "Clear",
+    "Unknown": "Unknown",
+    "col": {
+      "star": "Star",
+      "ip": "IP",
+      "country": "Country/region",
+      "city": "City",
+      "asn": "ASN",
+      "org": "Organization",
+      "count": "Frequency",
+      "note": "Note",
+      "actions": "Actions"
+    },
+    "Star": "Star",
+    "Unstar": "Unstar",
+    "Delete": "Delete",
+    "IpDetails": "IP details",
+    "CheckBlocklist": "Check blocklists",
+    "EditNote": "Edit note",
+    "NotePlaceholder": "Add a note",
+    "PageRange": "{from}–{to} of {total}",
+    "PageSize": "Rows per page",
+    "PagePrev": "Previous",
+    "PageNext": "Next",
+    "PickHint": "Click to filter by this; click again to remove the filter",
+    "PanelHint": {
+      "country": "Countries/regions, ranked by their share of the list.",
+      "asn": "Networks (ASNs) and the organizations behind them, ranked by their share of the list.",
+      "block": "IPs grouped by /24 (IPv4) and /48 (IPv6), ranked by their share of the list."
+    },
+    "WeightLabel": "Weighting:",
+    "ByIps": "By IPs",
+    "ByHits": "By frequency",
+    "PanelCountry": "Country/region",
+    "PanelAsn": "ASN · Organization",
+    "PanelBlock": "Address blocks (/24 · /48)",
+    "ShowLess": "Show less",
+    "MoreEntries": "+ {n} more",
+    "TopGroupsShare": "top {n}: {share}",
+    "MapHint": {
+      "ips": "Countries are shaded by number of IPs.",
+      "hits": "Countries are shaded by frequency."
+    },
+    "MapUnavailable": "The map couldn't be loaded.",
+    "MapTooltip": {
+      "ips": "{n} IPs",
+      "hits": "Frequency: {n}"
+    }
+  },
+  "snapshots": {
+    "Title": "Snapshot History",
+    "Note": "Every change in your network environment can affect test results, sometimes subtly and sometimes significantly. Your homepage test results are saved here as snapshots, with IPCheck.ing using smart recording by default. Pick any two snapshots to compare each field line by line and identify differences between network environments. Important snapshots can be named or pinned for long-term comparisons. You can adjust automatic recording and the number of snapshots kept in Preferences. Snapshots are stored only in your local browser.",
+    "SaveNow": "Save snapshot now",
+    "SmartSkipped": "This visit shows no notable change from the latest snapshot, so it wasn't recorded automatically.",
+    "ChangedTitle": "Different from the previous snapshot",
+    "ChangedNote": "Changed: {sections}.",
+    "ChangedView": "View",
+    "SaveNowRunning": "Running homepage tests…",
+    "SaveNowFailed": "Could not run the homepage tests; open the homepage and try again.",
+    "StorageFailed": "This browser refused to store snapshots; the ones shown last until this tab is closed.",
+    "EmptyTitle": "No snapshots yet",
+    "EmptyNote": "Snapshots are recorded automatically from the homepage tests, as set in Preferences. You can also save one now with the button below.",
+    "ListLabel": "Snapshots",
+    "ThisVisit": "This visit",
+    "TimeRange": "{first} – {last}",
+    "Pin": "Pin",
+    "Pinned": "Pinned",
+    "Unpin": "Unpin",
+    "PinLimitTitle": "Pin limit reached",
+    "PinLimit": "Up to {max} snapshots can be pinned. Unpin one first.",
+    "Rename": "Rename",
+    "RenameTitle": "Rename snapshot",
+    "NameLabel": "Snapshot name",
+    "RenameHint": "Leave empty to use the automatic label.",
+    "Save": "Save",
+    "Delete": "Delete",
+    "AllSnapshots": "All snapshots",
+    "Cancel": "Cancel",
+    "CompareWithThis": "Compare with this",
+    "Compare": "Compare",
+    "Comparing": "Comparing",
+    "CompareWith": "Compare with",
+    "ComparePrevious": "Previous snapshot",
+    "OldestNote": "This is the oldest snapshot; nothing to compare with.",
+    "NotRun": "Not run in this snapshot",
+    "NotRunNote": "This test did not finish while this snapshot was recorded.",
+    "NotRunSpeedNote": "The speed test runs only when started on the homepage.",
+    "LayoutLabel": "Diff layout",
+    "LayoutUnified": "Unified",
+    "LayoutSplit": "Split",
+    "ShowDrift": "Show measurement changes",
+    "DriftHint": "Measured value differs",
+    "ExpandAll": "Expand all",
+    "CollapseAll": "Collapse all",
+    "NoChanges": "No changes",
+    "OnlyHere": "Only in this snapshot (not compared)",
+    "OnlyThere": "Only in the compared snapshot (not compared)",
+    "CountChanged": "{n} changed",
+    "CountOnlyHere": "{n} only here",
+    "CountOnlyThere": "{n} only there",
+    "NotRunThere": "Not run in the compared snapshot",
+    "SideCompared": "Compared snapshot",
+    "SideViewed": "This snapshot",
+    "Yes": "Yes",
+    "No": "No",
+    "fields": {
+      "ip": "IP",
+      "countryCode": "Country",
+      "region": "Region",
+      "city": "City",
+      "timezone": "Time zone",
+      "asn": "ASN",
+      "isp": "ISP",
+      "anonymity": "Anonymizer",
+      "ipType": "Line type",
+      "nativeIP": "Native IP",
+      "qualityScore": "Quality score",
+      "anonymityProtocol": "Protocol",
+      "anonymityProvider": "Provider",
+      "name": "Name",
+      "status": "Status",
+      "timeMs": "Latency",
+      "minTimeMs": "Min latency",
+      "custom": "Custom",
+      "url": "Server",
+      "natType": "NAT type",
+      "org": "Organization",
+      "downloadMbps": "Download",
+      "uploadMbps": "Upload",
+      "latencyMs": "Latency",
+      "jitterMs": "Jitter",
+      "loadedLatencyDownMs": "Loaded latency ↓",
+      "loadedLatencyUpMs": "Loaded latency ↑",
+      "qualities": {
+        "streaming": "Streaming",
+        "gaming": "Gaming",
+        "rtc": "Video calls"
+      },
+      "scores": {
+        "streaming": "Streaming score",
+        "gaming": "Gaming score",
+        "rtc": "Video calls score"
+      },
+      "connection": {
+        "ip": "Client IP",
+        "colo": "Cloudflare colo",
+        "coloCountryCode": "Colo country",
+        "coloCity": "Colo city"
+      }
+    }
   },
   "whois": {
     "Title": "Whois Search",
@@ -1468,7 +1723,38 @@
     "Provider": "DNS Provider",
     "Result": "Resolution Result",
     "Record": "Record",
-    "AllRegions": "All Regions"
+    "AllRegions": "All Regions",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "No such record",
+        "Hint": "The domain exists but has no record of this type"
+      },
+      "nxdomain": {
+        "Label": "Domain not found",
+        "Hint": "The resolver reports that this domain does not exist"
+      },
+      "servfail": {
+        "Label": "Resolution failed",
+        "Hint": "The resolver couldn't complete the lookup — often a DNSSEC validation failure or unreachable authoritative servers"
+      },
+      "refused": {
+        "Label": "Query refused",
+        "Hint": "The resolver declined or doesn't support this query, usually because of its own policy or filtering"
+      },
+      "timeout": {
+        "Label": "Timed out",
+        "Hint": "The resolver didn't answer in time"
+      },
+      "unavailable": {
+        "Label": "Resolver unavailable",
+        "Hint": "The resolver couldn't be reached or returned an error"
+      },
+      "malformed": {
+        "Label": "Invalid response",
+        "Hint": "The resolver's reply couldn't be read"
+      }
+    }
   },
   "ruletest": {
     "Title": "Rule Test",
@@ -1495,7 +1781,7 @@
     "ViewOnMap": "View location on map",
     "ShowCountryTraffic": "Show Online Activity Pattern",
     "InfoMask": "Hide IP Information",
-    "IPHistory": "View IP History",
+    "Snapshots": "View Snapshot History",
     "ShareReport": "Create Diagnostic Report",
     "QueryIP": "Query IP Address",
     "GithubLink": "View Source Code on GitHub"
@@ -1571,30 +1857,6 @@
       "none": "DNSSEC not enabled"
     }
   },
-  "ipHistory": {
-    "Title": "IP History",
-    "Notes": "IPs detected while you use this site are recorded here. The data is stored only in this browser — it never syncs to your account or leaves your device. You can adjust the record retention time in the \"Preferences\".",
-    "Empty": "No records yet. IPs will appear here once the homepage tests detect them.",
-    "FilterByType": "Filter by IP type",
-    "FilterByCountry": "Filter by country / region",
-    "UnknownCountry": "Unknown",
-    "NoMatch": "No records match the selected filters.",
-    "ClearAll": "Clear History",
-    "ClearConfirm": "Click again to confirm",
-    "ViewMode": "History view",
-    "ByIP": "By IP",
-    "ByDate": "By date",
-    "UniqueIPCounts": "Tag counts: unique IPs across all retained records.",
-    "DailyRecordCounts": "Tag counts: records across all retained dates (one per IP per day).",
-    "LastSeen": "Last seen: {date}",
-    "FirstSeen": "First seen: {date}",
-    "RecordDates": "All recorded dates",
-    "MapTitle": "IP countries / regions",
-    "MapUnavailable": "Map unavailable. You can still use the country filters.",
-    "MapSelect": "Click to filter this country / region",
-    "MapUnselect": "Click to remove this country / region filter",
-    "ViewMap": "View map"
-  },
   "ipInfos": {
     "Title": "IP Infos",
     "Notes": "The program will first check your IP address from several different probes (including IPv4 and IPv6), and then query the corresponding geographical data from the IP lookup data source you selected. If there is only 1 IP stack, the source without data will be displayed as empty.",
@@ -1625,6 +1887,7 @@
     "qualityScoreUnknown": "Score Unknown",
     "advancedUnlockCta": "To avoid abuse, sign in to view the following information",
     "advancedQuotaCta": "Monthly quota for IP advanced data used up",
+    "advancedCooldownCta": "24-hour limit for IP advanced data reached",
     "ASNInfo": {
       "trafficPercentage": "Traffic Percentage: ",
       "note": "Data for this AS : ",
@@ -1751,6 +2014,48 @@
         "isNative": "ASN-Geo match"
       }
     },
+    "abuseLevel": {
+      "label": "Abuse activity",
+      "none": "Not detected",
+      "low": "Occasional",
+      "medium": "Moderate",
+      "high": "Frequent"
+    },
+    "scenarioFriction": {
+      "label": "Scenario friction",
+      "toggle": "Friction details",
+      "breakdown": "{smooth} smooth · {checks} extra checks · {restricted} may be restricted",
+      "introTitle": "Scenario friction explained",
+      "intro": "You may use this IP for all kinds of browsing and work, and the friction between this IP and platforms can differ from one scenario to the next. We combine this IP's network type, anonymity, abuse history and location to estimate how platforms are likely to treat it.",
+      "listTitle": "By scenario",
+      "scenarios": {
+        "signup": "Account sign-up & login",
+        "payments": "Shopping & payments",
+        "finance": "Banking & finance",
+        "streaming": "Streaming & regional content",
+        "availability": "International service availability",
+        "browsing": "Everyday browsing",
+        "posting": "Posting & comments",
+        "localSocial": "Social media as a local user",
+        "localSocialIn": "Social media as a local in {country}",
+        "automation": "Automation & scraping",
+        "email": "Self-hosted email sending"
+      },
+      "verdict": {
+        "default": {
+          "low": "Smooth",
+          "medium": "Extra checks",
+          "high": "May be restricted"
+        },
+        "availability": {
+          "low": "Available",
+          "medium": "Limited",
+          "high": "May be blocked"
+        }
+      },
+      "personaHint": "Besides the IP, platforms weigh several other factors when deciding which limits to apply. Want to know whether your overall profile matches what you expect?",
+      "personaLink": "Run Persona Check"
+    },
     "countryTraffic": {
       "subtitle": "Typical weekly online activity in this country/region — view human-generated traffic only, or all traffic (including bot/automated traffic).",
       "human": "Human Only",
@@ -1760,7 +2065,7 @@
   },
   "serviceStatus": {
     "Title": "Service Status",
-    "Note": "When a service won't open, it might not be your problem — the service itself could be down. Currently, people are using a lot of AI products, and when the AI product doesn't reply, they don't know if it's their problem or the service's problem. This section shows the live availability of well-known AI services; expand a card to see each sub-service's status and recent incidents.",
+    "Note": "When a service won't open, the problem might not be on your end — the service itself could be down. This section shows the live availability of well-known internet products, from AI assistants to developer platforms; expand a card to see each sub-service's status and recent incidents.",
     "Refresh": "Refresh Service Status",
     "LastChecked": "Last checked",
     "AllOperational": "All Systems Operational",
@@ -1837,7 +2142,9 @@
       "Import": "Import",
       "NotEnoughCapacity": "Not enough capacity — this list needs {need} slots, only {free} left.",
       "Destination": "Add to",
-      "ImportAsNew": "Import as a new list"
+      "ImportAsNew": "Import as a new list",
+      "MissingCountry": "Don't see your country? {link}",
+      "MissingCountryLink": "Add a list for it"
     },
     "lists": {
       "Tab": "Lists",
@@ -1867,6 +2174,9 @@
       "germany": "Germany Essentials",
       "albania": "Albania Essentials",
       "kosovo": "Kosovo Essentials",
+      "thailand": "Thailand Essentials",
+      "mexico": "Mexico Essentials",
+      "greece": "Greece Essentials",
       "ai": "AI Services",
       "social": "Social & Messaging",
       "productivity": "Work & Productivity",
@@ -2045,7 +2355,7 @@
     "DNSResolver": "Open DNS Resolution panel",
     "IPCheck": "Query IP Address",
     "ToggleInfoMask": "Toggle Info Masking",
-    "IPHistory": "Open IP History panel",
+    "Snapshots": "Open Snapshot History page",
     "ShareReport": "Open Share Report dialog",
     "Help": "Show Shortcut Keys",
     "HelpNote": "People who use shortcuts are really awesome!",
@@ -2061,6 +2371,7 @@
     "EnhancedDnsLeakTest": "Open In-depth DNS Leak Test panel",
     "MacChecker": "Open MAC lookup panel",
     "IpCalculator": "Open IP Calculator panel",
+    "BulkLookup": "Open Bulk IP Lookup panel",
     "BrowserInfo": "Open Browser Info panel",
     "AdblockTest": "Open Ad & Tracker Blocking Test panel",
     "SecurityChecklist": "Open Security Checklist panel",
@@ -2078,16 +2389,20 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Keyboard Shortcuts"
+    "Title": "Keyboard Shortcuts",
+    "HomeOnly": "All shortcuts work on the homepage only."
   },
   "footer": {
     "Tagline": "A free, open-source, all-in-one privacy toolbox.",
     "Project": "Project",
     "Support": "Docs & Support",
+    "ShortcutGuide": "Keyboard Shortcuts",
     "DeveloperDocs": "Developer Docs",
     "SelfHosting": "Self-hosting Guide",
     "ReportIssue": "Report an Issue",
-    "License": "MIT License",
+    "FeatureRequest": "Request a Feature",
+    "License": "AGPL-3.0 License",
+    "Contribute": "Contribute",
     "Clients": "Clients",
     "Raycast": "Raycast Extension",
     "Lite": "Lite Edition"

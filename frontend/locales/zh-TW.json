@@ -15,7 +15,10 @@
       "Note": "進階功能設有每月免費額度，每月（UTC）自動重置。IP 進階資料的重複查詢會命中快取，不消耗額度。",
       "IpinfoFeature": "IP 進階資料",
       "PercentUsed": "已用 {percent}%",
-      "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。"
+      "SponsorNote": "在 GitHub 贊助本專案可獲得更高額度。",
+      "DailyTitle": "24 小時額度",
+      "MonthlyTitle": "每月額度",
+      "AvailableAgainAt": "{time} 後可繼續查詢"
     },
     "MyAchievements": "我的成就",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "贊助使用者",
           "Item1": "包含登入使用者的所有權益",
           "Item2": "進階功能獲得更高的每月額度",
-          "Item3": "支援這個開源專案的持續開發與營運"
+          "Item3": "支援這個開源專案的持續開發與營運",
+          "Item4": "更寬鬆的 24 小時額度"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "臨時下線，摸草去了",
         "turing": "本狀態由人類傳送（大概）",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "IPCheck.ing 生日快樂"
+        "birthday": "IPCheck.ing 生日快樂",
+        "adaday": "演算法由 Ada 提供，始於 1843",
+        "dayofdead": "懷念那些已經離線的人",
+        "thanksgiving": "感謝每一個順利抵達的封包",
+        "piday": "3.14159265358979…仍在載入",
+        "holi": "全 RGB 色彩潑灑中",
+        "shannon": "這則狀態一個位元一個位元地送出",
+        "wtisd": "全球訊號滿格",
+        "ipv6day": "位址池已擴充至 2¹²⁸",
+        "sysadmin": "重開機試過了嗎？",
+        "linux": "只是個興趣，不會搞得很大很專業",
+        "tomatina": "正在遭受番茄洪水攻擊"
       },
       "festivalDesc": {
         "prgday": "程式設計師節 · 一年的第 256 天，十六進位制寫作 0x100",
@@ -313,7 +328,18 @@
         "earthday": "世界地球日（4 月 22 日）· 地球線上也建議你偶爾地球離線",
         "turing": "艾倫·圖靈誕辰（1912 年 6 月 23 日）· 圖靈測試之父",
         "emojiday": "世界 Emoji 日（7 月 17 日）· 文字是上個世紀的事了",
-        "birthday": "IPCheck.ing 生日 · v1.0 釋出於 2020 年 11 月 6 日"
+        "birthday": "IPCheck.ing 生日 · v1.0 釋出於 2020 年 11 月 6 日",
+        "adaday": "愛達·勒芙蕾絲日（10 月第二個星期二）· 向 STEM 領域的女性致敬，愛達寫下了第一個公開發表的演算法",
+        "dayofdead": "亡靈節（11 月 1–2 日）· 墨西哥人緬懷逝去親人的節日，愛永不離線",
+        "thanksgiving": "感恩節（11 月第四個星期四）· 感謝路徑上的每一台路由器",
+        "piday": "圓周率日（3 月 14 日，3.14）· 也是聯合國教科文組織的國際數學日",
+        "holi": "侯麗節 · 印度教的色彩節，用每一種十六進位色碼迎接春天",
+        "shannon": "克勞德·夏農誕辰（1916 年 4 月 30 日）· 資訊理論之父，位元由此而來",
+        "wtisd": "世界電信暨資訊社會日（5 月 17 日）· 國際電信聯盟於 1865 年的這一天成立",
+        "ipv6day": "世界 IPv6 啟動日（2012 年 6 月 6 日）· IPv6 從這天起正式啟用，再也沒關過",
+        "sysadmin": "系統管理員日（7 月最後一個星期五）· 感謝守護你上線時間的那個人",
+        "linux": "1991 年 8 月 25 日，林納斯·托瓦茲在 comp.os.minix 宣布了他「只是個興趣」的作業系統",
+        "tomatina": "番茄節（8 月最後一個星期三）· 西班牙布紐爾的番茄大戰，唯一沒人想過濾的洪水"
       }
     },
     "preferences": {
@@ -335,15 +361,27 @@
         "defaultListTips": "開啟頁面時，連線測試預設顯示的清單。",
         "multipleTests": "多次重新整理",
         "multipleTestsTips": "每輪檢測執行多次，並顯示最低延遲。",
+        "discardFirstResult": "捨棄首次結果",
+        "discardFirstResultTips": "先送出一次不計時的預熱請求，顯示的延遲不再包含 DNS 解析與建立連線的時間。",
         "notifications": "彈出通知",
         "notificationsTips": "初次檢查完成後，以彈出通知顯示結果。",
         "titleOpensSite": "點擊標題開啟網站",
         "titleOpensSiteTips": "開啟後，點擊卡片標題會在新視窗開啟對應網站；關閉時標題為純文字。"
       },
-      "ipHistory": "IP 歷史記錄",
-      "ipHistoryEnabled": "記錄 IP 歷史",
-      "ipHistoryDays": "保留天數",
-      "ipHistoryTips": "啟用後，偵測到的 IP 只會記錄在此瀏覽器中，並保留所選天數。關閉後會停止記錄；現有記錄會保留，直到你在 IP 歷史面板中清除。",
+      "snapshots": "快照記錄",
+      "snapshotsAuto": "記錄時機",
+      "snapshotsAutoSmart": "智慧判斷",
+      "snapshotsAutoEvery": "每次造訪",
+      "snapshotsAutoOff": "關閉",
+      "snapshotsAutoTips": "選擇智慧判斷時，程式會自動決定記錄快照的時機。選擇關閉時，只能在快照記錄頁面手動儲存。",
+      "snapshotsLabelCard": "自動命名快照時的 IP 依據",
+      "snapshotsLabelCardName": "IP 卡片 {index}",
+      "snapshotsLabelCardTips": "快照自動命名為該卡片的國家與 IP；該卡片沒有有效 IP 時，使用第一張有 IP 的卡片。",
+      "snapshotsNotify": "變化提醒",
+      "snapshotsNotifyTips": "本次造訪與上一份快照相比，兩者都有的檢測結果出現明顯變化時，彈出提示。",
+      "snapshotsKeepLast": "保留份數",
+      "snapshotsCountOption": "最近 {n} 份",
+      "snapshotsKeepLastTips": "超出份數的較早快照會被刪除。釘選的快照永不過期，也不計入份數。",
       "ipDB": "IP 地理位置資料庫",
       "ipDBTips": "你可以選擇預設使用的 IP 地理位置資料來源。如果選定的來源無法使用，系統會依序使用後續來源。",
       "language": "語言設定",
@@ -1082,12 +1120,14 @@
     "EnhancedDnsLeakTest": "找出所有正在使用的遞迴 DNS 解析器，並分析 ECS 與 DNSSEC",
     "RuleTestNote": "檢查代理軟體的規則設定",
     "CensorshipCheck": "檢查一個網站在全球哪些國家被封鎖",
-    "ServiceStatus": "檢視知名 AI 與開發者服務的即時可用性，確認你遇到的中斷是不是對方的故障",
+    "ServiceStatus": "檢視知名網路產品的即時可用性，確認你遇到的中斷是不是對方的故障",
     "Whois": "對網域名稱、IP 或 AS 號碼進行 Whois 查詢",
     "AsnProfile": "查看任意 AS 的完整檔案",
     "InvisibilityTest": "猜猜看我是否知道你掛了代理",
     "MacChecker": "查詢實體位址的歸屬資訊",
     "IpCalculator": "任意 IP、前綴或範圍的子網路計算、進位轉換與 IPv6 解讀",
+    "BulkLookup": "批次查詢 IP，可直接貼上日誌",
+    "Snapshots": "查看與比較多次測試結果之間的差異",
     "BrowserInfo": "檢閱瀏覽器資訊和指紋",
     "AdblockTest": "檢查你的廣告阻擋器、DNS 過濾或 VPN 實際擋下了什麼",
     "SecurityChecklist": "全面的數位生活安全檢查清單",
@@ -1254,6 +1294,221 @@
     "aggregated": "等價單一區塊",
     "aggregationSummary": "輸入 {input} 個區塊，輸出 {output} 個，共 {addresses} 個位址",
     "invalidTokens": "已忽略：{list}"
+  },
+  "bulklookup": {
+    "Title": "IP 批次查詢",
+    "Note": "從 Nginx、Apache、防火牆、CDN 或應用程式日誌（或任何貼上的清單）中擷取 IP，一眼看清流量來自哪裡：哪些國家和網路（ASN），哪些 IP 反覆出現；再深入查看任一單一 IP。",
+    "Note2": "貼上任何文字即可：IP 在瀏覽器內擷取，內網與保留位址會被略過，重複出現的會被計數。可以多次貼上，清單最多儲存 {max} 個 IP，較多的 IP 會分成多次請求查詢。地理位置資料來自 {source}。結果只儲存在目前的瀏覽器中。",
+    "SourceWithBuild": "{source}（資料庫版本 {date}）",
+    "SourceFallback": "伺服器本機的地理位置資料庫",
+    "InputLabel": "貼上 IP 或日誌內容：",
+    "Placeholder": "1.1.1.1, 8.8.8.8 或整行日誌…",
+    "FirstPerLine": "每行只取第一個 IP",
+    "FirstPerLineHint": "適用於 CDN 或反向代理日誌：用戶端 IP 與代理、邊緣節點的 IP 出現在同一行。",
+    "status": {
+      "empty": "貼上後會在這裡顯示識別結果",
+      "none": "沒有識別到公用 IP",
+      "ready": "識別到 {n} 個 IP：{fresh}",
+      "new": "新增 {n} 個",
+      "existing": "已在清單 {n} 個",
+      "reserved": "略過內網 {n} 個",
+      "cidr": "略過 CIDR {n} 個",
+      "split": "分 {n} 次請求查詢",
+      "known": "這 {n} 個 IP 都已在清單中，只會更新頻次",
+      "noRoom": "新增 {n} 個，但清單只能再加入 {room} 個（上限 {max} 個），請先刪除一些",
+      "running": "正在查詢 {n} 個 IP…",
+      "runningSplit": "正在查詢：第 {request}/{requests} 次請求，已完成 {done}/{total} 個 IP…",
+      "updating": "正在更新頻次…"
+    },
+    "Run": "查詢 {n} 個新 IP",
+    "RunCountsOnly": "更新頻次",
+    "RunIdle": "查詢",
+    "Unanswered": "{n} 個 IP 查詢失敗。",
+    "RunFailed": "查詢失敗，請稍後再試。",
+    "RunRateLimited": "查詢太頻繁，請稍後再試。",
+    "Paused": "已查詢 {done}/{total} 個新 IP，剩餘 {n} 個已暫停。",
+    "PausedRateLimited": "查詢太頻繁，請稍候片刻再繼續。",
+    "PausedFailed": "查詢中斷了，請稍後繼續。",
+    "Continue": "繼續查詢剩餘 {n} 個",
+    "StorageError": "瀏覽器未能儲存清單（儲存空間已滿或遭停用）。離開本頁前清單仍可使用。",
+    "stat": {
+      "rows": "IP",
+      "countries": "國家/地區",
+      "asns": "ASN",
+      "frequency": "總頻次",
+      "topShare": "前 10 個 IP 的頻次占比",
+      "onceShare": "僅出現一次的 IP 占比"
+    },
+    "ClearAll": "全部清除",
+    "OverviewTitle": "概覽",
+    "MapTitle": "世界地圖",
+    "tab": {
+      "ips": "IP",
+      "analysis": "分析"
+    },
+    "FilterPlaceholder": "依 IP、國家、城市、ASN、組織或備註篩選，可用空格組合多個詞，如「德國 3320」",
+    "ClearSearch": "清除搜尋",
+    "BatchFilter": "貼上批次",
+    "AllBatches": "全部批次",
+    "BatchLabel": "{time} · {n} 個 IP",
+    "ExportCsv": "匯出 CSV",
+    "StarredOnly": "只看已加星號的 IP",
+    "NoMatches": "沒有符合篩選條件的結果。",
+    "ClearTitle": "清除清單",
+    "ClearBody": "將從目前的瀏覽器中刪除 {n} 個 IP，此操作無法復原。",
+    "KeepStarred": "保留已加星號的 IP（{n}）",
+    "Cancel": "取消",
+    "Save": "儲存",
+    "ClearConfirm": "清除",
+    "Unknown": "未知",
+    "col": {
+      "star": "星號",
+      "ip": "IP",
+      "country": "國家/地區",
+      "city": "城市",
+      "asn": "ASN",
+      "org": "組織",
+      "count": "頻次",
+      "note": "備註",
+      "actions": "操作"
+    },
+    "Star": "加上星號",
+    "Unstar": "移除星號",
+    "Delete": "刪除",
+    "IpDetails": "IP 詳細資料",
+    "CheckBlocklist": "檢查黑名單",
+    "EditNote": "編輯備註",
+    "NotePlaceholder": "新增備註",
+    "PageRange": "第 {from}–{to} 筆，共 {total} 筆",
+    "PageSize": "每頁列數",
+    "PagePrev": "上一頁",
+    "PageNext": "下一頁",
+    "PickHint": "點擊依此篩選，再次點擊取消篩選",
+    "PanelHint": {
+      "country": "各國家/地區在清單中的占比，由高到低排列。",
+      "asn": "各網路（ASN）及其所屬組織在清單中的占比，由高到低排列。",
+      "block": "IP 依 /24（IPv4）和 /48（IPv6）分組，依在清單中的占比由高到低排列。"
+    },
+    "WeightLabel": "統計維度：",
+    "ByIps": "依 IP 數",
+    "ByHits": "依頻次",
+    "PanelCountry": "國家/地區",
+    "PanelAsn": "ASN · 組織",
+    "PanelBlock": "位址區段（/24 · /48）",
+    "ShowLess": "收合",
+    "MoreEntries": "還有 {n} 項",
+    "TopGroupsShare": "前 {n}：{share}",
+    "MapHint": {
+      "ips": "顏色深淺代表 IP 數量。",
+      "hits": "顏色深淺代表頻次。"
+    },
+    "MapUnavailable": "地圖載入失敗。",
+    "MapTooltip": {
+      "ips": "{n} 個 IP",
+      "hits": "頻次：{n}"
+    }
+  },
+  "snapshots": {
+    "Title": "快照記錄",
+    "Note": "每一次網路環境的變化，都可能對測試結果帶來或大或小的影響。你在首頁各項測試的結果會在這裡儲存為快照，預設情況下，IPCheck.ing 採用智慧記錄的方式為你建立快照。任選兩份快照，可以逐行比較每個欄位的差異，方便找出不同網路環境下的差異。重要的快照可以命名或釘選，以便進行長期比較。你可以在偏好設定中調整快照的自動記錄方式與保留數量。快照僅儲存在本機瀏覽器中。",
+    "SaveNow": "立即儲存快照",
+    "SmartSkipped": "本次造訪與最近一份快照相比沒有明顯變化，因此沒有自動記錄。",
+    "ChangedTitle": "本次訪問與上次相比有較大的變化",
+    "ChangedNote": "有變化的部分：{sections}。",
+    "ChangedView": "查看",
+    "SaveNowRunning": "正在執行首頁測試…",
+    "SaveNowFailed": "無法執行首頁測試，請開啟首頁後再試一次。",
+    "StorageFailed": "瀏覽器拒絕儲存快照；目前顯示的快照在關閉此分頁後不會保留。",
+    "EmptyTitle": "還沒有快照",
+    "EmptyNote": "快照會依偏好設定，根據首頁測試的結果自動記錄。你也可以用下方的按鈕現在手動儲存一份。",
+    "ListLabel": "快照清單",
+    "ThisVisit": "本次造訪",
+    "TimeRange": "{first} – {last}",
+    "Pin": "釘選",
+    "Pinned": "已釘選",
+    "Unpin": "取消釘選",
+    "PinLimitTitle": "釘選數量已達上限",
+    "PinLimit": "最多可釘選 {max} 份快照，請先取消釘選其中一份。",
+    "Rename": "重新命名",
+    "RenameTitle": "重新命名快照",
+    "NameLabel": "快照名稱",
+    "RenameHint": "留空則使用自動標籤。",
+    "Save": "儲存",
+    "Delete": "刪除",
+    "AllSnapshots": "所有快照",
+    "Cancel": "取消",
+    "CompareWithThis": "與此快照比較",
+    "Compare": "對比",
+    "Comparing": "對比中",
+    "CompareWith": "比較對象",
+    "ComparePrevious": "上一份快照",
+    "OldestNote": "這是最早的一份快照，沒有可比較的對象。",
+    "NotRun": "這份快照中沒有執行此項測試",
+    "NotRunNote": "記錄這份快照時，這項測試沒有完成。",
+    "NotRunSpeedNote": "測速只在首頁手動開始時執行。",
+    "LayoutLabel": "對比版面",
+    "LayoutUnified": "合併",
+    "LayoutSplit": "並排",
+    "ShowDrift": "顯示測量值變化",
+    "DriftHint": "測量值不同",
+    "ExpandAll": "全部展開",
+    "CollapseAll": "全部收合",
+    "NoChanges": "無變化",
+    "OnlyHere": "僅在此快照中（未參與對比）",
+    "OnlyThere": "僅在對比快照中（未參與對比）",
+    "CountChanged": "{n} 項變化",
+    "CountOnlyHere": "{n} 項僅在此處",
+    "CountOnlyThere": "{n} 項僅在對方",
+    "NotRunThere": "對比快照中未執行",
+    "SideCompared": "對比快照",
+    "SideViewed": "此快照",
+    "Yes": "是",
+    "No": "否",
+    "fields": {
+      "ip": "IP",
+      "countryCode": "國家",
+      "region": "地區",
+      "city": "城市",
+      "timezone": "時區",
+      "asn": "ASN",
+      "isp": "ISP",
+      "anonymity": "匿名服務",
+      "ipType": "線路類型",
+      "nativeIP": "原生 IP",
+      "qualityScore": "品質分",
+      "anonymityProtocol": "協定",
+      "anonymityProvider": "服務商",
+      "name": "名稱",
+      "status": "狀態",
+      "timeMs": "延遲",
+      "minTimeMs": "最低延遲",
+      "custom": "自訂",
+      "url": "伺服器",
+      "natType": "NAT 類型",
+      "org": "組織",
+      "downloadMbps": "下載",
+      "uploadMbps": "上傳",
+      "latencyMs": "延遲",
+      "jitterMs": "抖動",
+      "loadedLatencyDownMs": "負載延遲 ↓",
+      "loadedLatencyUpMs": "負載延遲 ↑",
+      "qualities": {
+        "streaming": "串流媒體",
+        "gaming": "遊戲",
+        "rtc": "視訊通話"
+      },
+      "scores": {
+        "streaming": "串流媒體分數",
+        "gaming": "遊戲分數",
+        "rtc": "視訊通話分數"
+      },
+      "connection": {
+        "ip": "用戶端 IP",
+        "colo": "Cloudflare 節點",
+        "coloCountryCode": "節點國家",
+        "coloCity": "節點城市"
+      }
+    }
   },
   "whois": {
     "Title": "Whois 查詢",
@@ -1468,7 +1723,38 @@
     "Provider": "DNS 服務商",
     "Result": "解析結果",
     "Record": "記錄",
-    "AllRegions": "全部地區"
+    "AllRegions": "全部地區",
+    "HintWithCode": "{hint}（{code}）",
+    "Failure": {
+      "nodata": {
+        "Label": "無此類型記錄",
+        "Hint": "該網域名稱存在，但沒有這一類型的記錄"
+      },
+      "nxdomain": {
+        "Label": "網域名稱不存在",
+        "Hint": "解析器回報該網域名稱不存在"
+      },
+      "servfail": {
+        "Label": "解析失敗",
+        "Hint": "解析器未能完成查詢，常見原因是 DNSSEC 驗證失敗或權威伺服器無法連線"
+      },
+      "refused": {
+        "Label": "拒絕查詢",
+        "Hint": "解析器拒絕或不支援這次查詢，通常出於其自身的政策或過濾規則"
+      },
+      "timeout": {
+        "Label": "逾時",
+        "Hint": "解析器未能在限定時間內回應"
+      },
+      "unavailable": {
+        "Label": "服務無法使用",
+        "Hint": "無法連線到解析器，或解析器回傳了錯誤"
+      },
+      "malformed": {
+        "Label": "回應格式異常",
+        "Hint": "無法讀取解析器回傳的回應"
+      }
+    }
   },
   "ruletest": {
     "Title": "分流測試",
@@ -1495,7 +1781,7 @@
     "ViewOnMap": "在地圖上檢視位置",
     "ShowCountryTraffic": "查看網路活躍時段",
     "InfoMask": "隱藏資訊",
-    "IPHistory": "檢視 IP 歷史記錄",
+    "Snapshots": "查看快照記錄",
     "ShareReport": "產生診斷報告",
     "QueryIP": "查詢 IP 資訊",
     "GithubLink": "檢視原始碼"
@@ -1571,30 +1857,6 @@
       "none": "DNSSEC 未啟用"
     }
   },
-  "ipHistory": {
-    "Title": "IP 歷史記錄",
-    "Notes": "這裡記錄你使用本站時被偵測到的 IP。資料僅儲存在目前瀏覽器本地，不會同步到帳號，也不會離開你的裝置。你可以在「偏好設定」中調整記錄保留時間。",
-    "Empty": "暫無記錄。首頁檢測到 IP 後會自動記錄在這裡。",
-    "FilterByType": "按 IP 型別篩選",
-    "FilterByCountry": "按國家或地區篩選",
-    "UnknownCountry": "未知",
-    "NoMatch": "沒有符合篩選條件的記錄。",
-    "ClearAll": "清空記錄",
-    "ClearConfirm": "再次點選確認清空",
-    "ViewMode": "歷史記錄檢視方式",
-    "ByIP": "依 IP",
-    "ByDate": "依日期",
-    "UniqueIPCounts": "標籤數量：所有保留記錄中的不重複 IP 數。",
-    "DailyRecordCounts": "標籤數量：所有保留日期的記錄數（同一 IP 每天計一筆）。",
-    "LastSeen": "最近：{date}",
-    "FirstSeen": "首次：{date}",
-    "RecordDates": "所有記錄日期",
-    "MapTitle": "IP 所屬國家 / 地區",
-    "MapUnavailable": "地圖暫時無法使用，仍可使用國家篩選。",
-    "MapSelect": "點擊篩選此國家 / 地區",
-    "MapUnselect": "點擊取消此國家 / 地區篩選",
-    "ViewMap": "查看地圖"
-  },
   "ipInfos": {
     "Title": "IP 資訊",
     "Notes": "程式會先透過多個不同的探針檢查你的 IP 位址（包括 IPv4 和 IPv6），再從你選擇的 IP 解析資料來源查詢相關位置資訊。如果目前只有 IPv4 或 IPv6，其中沒有資料的項目會顯示為空白。",
@@ -1625,6 +1887,7 @@
     "qualityScoreUnknown": "未知分數",
     "advancedUnlockCta": "為避免濫用，登入後可檢視以下資訊",
     "advancedQuotaCta": "本月 IP 進階資料額度已用完",
+    "advancedCooldownCta": "IP 進階資料 24 小時額度已用完",
     "ASNInfo": {
       "trafficPercentage": "流量比例：",
       "note": "此 AS 的相關資料：",
@@ -1751,6 +2014,48 @@
         "isNative": "ASN 與地理位置一致性"
       }
     },
+    "abuseLevel": {
+      "label": "濫用行為",
+      "none": "未偵測到",
+      "low": "較少",
+      "medium": "中等",
+      "high": "較多"
+    },
+    "scenarioFriction": {
+      "label": "場景摩擦",
+      "toggle": "場景摩擦詳情",
+      "breakdown": "{smooth} 項順暢 · {checks} 項需額外驗證 · {restricted} 項可能被限制",
+      "introTitle": "場景摩擦解析",
+      "intro": "你可能會用這個 IP 進行各種瀏覽或工作，不同場景下，它與平台之間的摩擦程度可能不同。我們綜合這個 IP 的網路類型、匿名性、濫用紀錄和所在地，估算各類平台可能會如何對待它。",
+      "listTitle": "各場景",
+      "scenarios": {
+        "signup": "帳號註冊與登入",
+        "payments": "購物與支付",
+        "finance": "銀行與金融",
+        "streaming": "串流與區域內容",
+        "availability": "國際服務可用性",
+        "browsing": "日常瀏覽",
+        "posting": "發文與留言",
+        "localSocial": "以在地身分經營社群媒體",
+        "localSocialIn": "以{country}在地身分經營社群媒體",
+        "automation": "自動化與爬蟲",
+        "email": "自架郵件寄信"
+      },
+      "verdict": {
+        "default": {
+          "low": "順暢",
+          "medium": "需額外驗證",
+          "high": "可能被限制"
+        },
+        "availability": {
+          "low": "可用",
+          "medium": "受限",
+          "high": "可能被封鎖"
+        }
+      },
+      "personaHint": "除了 IP，平台還會參考多個因素來判斷觸發何種限制。想知道你目前的綜合畫像是否與你的預期一致？",
+      "personaLink": "執行深度畫像檢測"
+    },
     "countryTraffic": {
       "subtitle": "該國家/地區的每週網路活躍分布——你可以選擇僅看人類所產生的流量或全部流量（包含機器人/自動化流量）。",
       "human": "僅人類流量",
@@ -1760,7 +2065,7 @@
   },
   "serviceStatus": {
     "Title": "服務可用性",
-    "Note": "當你打不開某些服務的時候，可能並不是你的問題，而是這些服務出故障了。目前，人們大量使用 AI 產品，並在 AI 產品沒有回覆的時候，不確定是自己的問題還是服務的問題。本板塊展示一些知名 AI 服務的即時可用狀態，展開卡片可檢視各子服務的狀態與最近的事故。",
+    "Note": "當你打不開某些服務的時候，問題可能並不在你這邊，而是服務本身出了故障。本板塊展示知名網路產品（從 AI 助理到開發者平台）的即時可用狀態；展開卡片可檢視各子服務的狀態與最近的事故。",
     "Refresh": "重新整理服務狀態",
     "LastChecked": "最後檢查",
     "AllOperational": "所有系統正常",
@@ -1837,7 +2142,9 @@
       "Import": "匯入",
       "NotEnoughCapacity": "容量不足——該清單需要 {need} 個空位，僅剩 {free} 個",
       "Destination": "加入到",
-      "ImportAsNew": "匯入為新清單"
+      "ImportAsNew": "匯入為新清單",
+      "MissingCountry": "沒有你所在國家的清單？{link}",
+      "MissingCountryLink": "來新增一個"
     },
     "lists": {
       "Tab": "清單",
@@ -1867,6 +2174,9 @@
       "germany": "德國常用",
       "albania": "阿爾巴尼亞常用",
       "kosovo": "科索沃常用",
+      "thailand": "泰國常用",
+      "mexico": "墨西哥常用",
+      "greece": "希臘常用",
       "ai": "AI 服務",
       "social": "社交通訊",
       "productivity": "工作與生產力",
@@ -2045,7 +2355,7 @@
     "DNSResolver": "開啟 DNS 解析器面板",
     "IPCheck": "IP 查詢",
     "ToggleInfoMask": "切換資訊隱藏",
-    "IPHistory": "開啟 IP 歷史記錄面板",
+    "Snapshots": "開啟快照記錄頁面",
     "ShareReport": "開啟分享報告面板",
     "Help": "顯示快捷鍵",
     "HelpNote": "使用快捷鍵的人，是喜歡效率的人，你真棒！",
@@ -2061,6 +2371,7 @@
     "EnhancedDnsLeakTest": "開啟深度 DNS 洩漏測試面板",
     "MacChecker": "開啟實體位址查詢面板",
     "IpCalculator": "開啟 IP 計算器面板",
+    "BulkLookup": "開啟 IP 批次查詢面板",
     "BrowserInfo": "開啟瀏覽器資訊面板",
     "AdblockTest": "開啟廣告與追蹤封鎖檢測面板",
     "SecurityChecklist": "開啟安全檢查清單",
@@ -2078,16 +2389,20 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "鍵盤快速鍵"
+    "Title": "鍵盤快速鍵",
+    "HomeOnly": "所有快速鍵僅在首頁生效。"
   },
   "footer": {
     "Tagline": "免費、開源、一站式的隱私工具箱",
     "Project": "專案",
     "Support": "文件與支援",
+    "ShortcutGuide": "快速鍵指南",
     "DeveloperDocs": "開發者文件",
     "SelfHosting": "自行架設指南",
     "ReportIssue": "回報問題",
-    "License": "MIT 授權條款",
+    "FeatureRequest": "功能請求",
+    "License": "AGPL-3.0 授權條款",
+    "Contribute": "貢獻程式碼",
     "Clients": "用戶端",
     "Raycast": "Raycast 擴充功能",
     "Lite": "Lite 版"

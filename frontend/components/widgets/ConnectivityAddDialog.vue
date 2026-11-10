@@ -59,6 +59,16 @@
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
+            <!-- Closing invite to contribute a country list; scrolls with the grid. -->
+            <li class="md:col-span-2 px-1 py-1 text-xs text-muted-foreground leading-relaxed">
+              <i18n-t keypath="connectivity.importDialog.MissingCountry" tag="p" scope="global" class="m-0">
+                <template #link>
+                  <a href="https://github.com/jason5ng32/MyIP/issues/452" target="_blank" rel="noopener noreferrer"
+                    class="underline underline-offset-4 decoration-current/40 hover:text-foreground hover:decoration-current">
+                    {{ t('connectivity.importDialog.MissingCountryLink') }}</a>
+                </template>
+              </i18n-t>
+            </li>
           </ul>
           <!-- Success stays quiet; only cap / list-limit errors show here. -->
           <div class="flex items-center justify-end min-h-4 text-xs">

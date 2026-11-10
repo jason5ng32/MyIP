@@ -164,6 +164,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
         { keys: 'l', action: () => goToAdvancedTool('pingtest'), description: t('shortcutKeys.PingTest') },
         { keys: 'M', action: () => goToAdvancedTool('macchecker'), description: t('shortcutKeys.MacChecker') },
         { keys: 'a', action: () => goToAdvancedTool('ipcalculator'), description: t('shortcutKeys.IpCalculator') },
+        { keys: 'L', action: () => goToAdvancedTool('bulklookup'), description: t('shortcutKeys.BulkLookup') },
         { keys: 't', action: () => goToAdvancedTool('mtrtest'), description: t('shortcutKeys.MTRTest') },
         { keys: 'S', action: () => goToAdvancedTool('securitychecklist'), description: t('shortcutKeys.SecurityChecklist') },
         { keys: 'r', action: () => goToAdvancedTool('ruletest'), description: t('shortcutKeys.RuleTest') },
@@ -188,15 +189,7 @@ const buildShortcutConfig = ({ refs, store, t, configs, userPreferences }) => {
             },
             description: t('shortcutKeys.ToggleInfoMask'),
         },
-        {
-            keys: 'H',
-            action: () => {
-                if (userPreferences.value.ipHistoryEnabled === false) return;
-                store.toggleSheet('ipHistory');
-                trackEvent('ShortCut', 'ShortCut', 'IPHistory');
-            },
-            description: t('shortcutKeys.IPHistory'),
-        },
+        { keys: 'H', action: () => goToAdvancedTool('snapshots'), description: t('shortcutKeys.Snapshots') },
         {
             keys: 'e',
             action: () => { shareReportRef.value?.openDialog(); trackEvent('ShortCut', 'ShortCut', 'ShareReport'); },

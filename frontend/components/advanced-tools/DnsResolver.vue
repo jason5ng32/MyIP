@@ -91,8 +91,17 @@
                                             {{ result.provider }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2.5 font-mono wrap-break-word"
-                                        :class="result.address === 'N/A' ? 'text-muted-foreground/60' : ''">
+                                    <!-- Answer, or why there is none: localized label;
+                                         on desktop a help icon explains it, raw code in brackets. -->
+                                    <td v-if="result.failure" class="px-4 py-2.5 text-muted-foreground">
+                                        <span class="inline-flex items-center gap-1.5">
+                                            {{ t(result.failure.label) }}
+                                            <JnTooltip v-if="!isMobile" :text="failureHint(result)" side="top">
+                                                <CircleQuestionMark class="size-3 shrink-0 cursor-help opacity-70" />
+                                            </JnTooltip>
+                                        </span>
+                                    </td>
+                                    <td v-else class="px-4 py-2.5 font-mono wrap-break-word">
                                         {{ result.address }}
                                     </td>
                                 </tr>
@@ -112,7 +121,8 @@ import { Icon } from '@iconify/vue';
 import { trackEvent } from '@/utils/analytics';
 import { isValidDomain } from '@/utils/ip/valid-ip.js';
 import { DNS_RECORD_TYPES } from '@/utils/features/dns-record-types.js';
-import getCountryName from '@/data/country-name.js';
+import { dnsFailureKeys, dnsRowStatus } from '@/utils/features/dns-resolver-status.js';
+import getCountryName from '@/utils/country-name.js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
@@ -120,10 +130,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { Play } from '@lucide/vue';
+import { JnTooltip } from '@/components/ui/tooltip';
+import { CircleQuestionMark, Play } from '@lucide/vue';
 import { Label } from '@/components/ui/label';
+import { useMainStore } from '@/store';
 
 const { t, locale } = useI18n();
+const store = useMainStore();
+const isMobile = computed(() => store.isMobile);
 
 const queryURL = ref('');
 const queryType = ref('A');
@@ -134,7 +148,7 @@ const countryFilter = ref('all');
 
 const recordTypes = DNS_RECORD_TYPES;
 
-// Region filter pills, matching IPHistory's tag row.
+// Region filter pills, matching IpCalculator's tag row.
 const tagClass = 'group h-7 rounded-full px-2.5 text-xs cursor-pointer';
 
 const validateInput = (input) => {
@@ -177,19 +191,31 @@ const getDNSResults = async (hostname, type) => {
     }
 };
 
-// Flatten the API's { id, provider, country, type, result } rows into
-// display rows; the protocol keeps its label suffix on the provider name.
+// Flatten the API's { id, provider, country, type, result, status, code }
+// rows into display rows; the protocol keeps its label suffix on the provider
+// name, and a row without an answer carries its failure keys and raw code.
 const processResults = (data) => {
     if (!Array.isArray(data.results)) return;
-    combinedResults.value = data.results.map(entry => ({
-        country: entry.country,
-        provider: `${entry.provider} (${entry.type === 'doh' ? 'DoH 🔒' : 'DNS'})`,
-        address: Array.isArray(entry.result) ? entry.result.join(', ') : entry.result,
-    }));
+    combinedResults.value = data.results.map((entry) => {
+        const failure = dnsFailureKeys(dnsRowStatus(entry));
+        return {
+            country: entry.country,
+            provider: `${entry.provider} (${entry.type === 'doh' ? 'DoH 🔒' : 'DNS'})`,
+            address: Array.isArray(entry.result) ? entry.result.join(', ') : entry.result,
+            failure,
+            code: failure ? (entry.code ?? '') : '',
+        };
+    });
     // A previously selected region may be absent from the new result set.
     if (countryFilter.value !== 'all' && !resultCountries.value.includes(countryFilter.value)) {
         countryFilter.value = 'all';
     }
+};
+
+// Tooltip for a row with no answer: the explanation, raw code in brackets.
+const failureHint = (row) => {
+    const hint = t(row.failure.hint);
+    return row.code ? t('dnsresolver.HintWithCode', { hint, code: row.code }) : hint;
 };
 
 // Countries present in the results, first-appearance order.

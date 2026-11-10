@@ -22,9 +22,9 @@ const wrap = (sectionId, section) => ({
 const PAYLOADS = {
     'ipinfo:finished': {
         cards: [
-            { source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'us', region: 'CA', city: 'SF', asn: 'AS15169', isp: 'Google LLC' },
-            { source: 'IPCheck.ing IPv6', ip: 'IPv6 检测失败' },
-            { source: 'Cloudflare IPv6', ip: '2001:db8::1', country_code: '' },
+            { id: 'ipchecking_v4', source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'us', region: 'CA', city: 'SF', asn: 'AS15169', isp: 'Google LLC' },
+            { id: 'ipchecking_v6', source: 'IPCheck.ing IPv6', ip: 'IPv6 检测失败' },
+            { id: 'cloudflare_v6', source: 'Cloudflare IPv6', ip: '2001:db8::1', country_code: '' },
         ],
     },
     'connectivity:finished': {
@@ -199,6 +199,22 @@ describe('cleaning rules', () => {
         assert.equal(section.cards[0].countryCode, 'US'); // normalized to upper
     });
 
+    it('ipinfo carries the card id beside the source, clipped, absent when not a string', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        assert.deepEqual(build(PAYLOADS['ipinfo:finished']).cards.map((c) => [c.id, c.source]),
+            [['ipchecking_v4', 'IPCheck.ing IPv4'], ['cloudflare_v6', 'Cloudflare IPv6']]);
+        const section = build({
+            cards: [
+                { id: 'x'.repeat(40), source: 'A', ip: '1.2.3.4' },
+                { id: 7, source: 'B', ip: '1.2.3.5' },
+                { source: 'C', ip: '1.2.3.6' },
+            ],
+        });
+        assert.equal(section.cards[0].id.length, 32);
+        assert.ok(!('id' in section.cards[1]));
+        assert.ok(!('id' in section.cards[2]));
+    });
+
     it('ipinfo carries the timezone through, absent when the source had no coordinates', () => {
         const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
         const section = build({
@@ -231,9 +247,15 @@ describe('cleaning rules', () => {
                 source: 'IPCheck.ing IPv6/4', ip: '9.9.9.9', country_code: 'US',
                 anonymityCode: 'none', ipTypeCode: 'unknown',
                 anonymityProvider: null, anonymityProtocol: '',
+            }, {
+                // Cooldown run: same shape as signed-out, its own sentinel.
+                source: 'IPCheck.ing IPv4', ip: '5.6.7.8', country_code: 'US',
+                anonymityCode: undefined, ipTypeCode: undefined,
+                isNativeIP: 'cooldown', qualityScore: 'cooldown',
+                anonymityProvider: null, anonymityProtocol: null,
             }],
         });
-        const [enriched, gated, plain] = section.cards;
+        const [enriched, gated, plain, cooldown] = section.cards;
         assert.equal(enriched.anonymity, 'vpn');
         assert.equal(enriched.anonymityProvider, 'ACME VPN');
         assert.equal(enriched.anonymityProtocol, 'OpenVPN');
@@ -246,11 +268,45 @@ describe('cleaning rules', () => {
         assert.equal('anonymityProtocol' in plain, false);
         for (const key of ['anonymity', 'ipType', 'nativeIP', 'qualityScore', 'anonymityProvider', 'anonymityProtocol']) {
             assert.equal(key in gated, false, `${key} should be absent on the gated card`);
+            assert.equal(key in cooldown, false, `${key} should be absent on the cooldown card`);
         }
         // The old field names are gone from the report.
         for (const card of section.cards) {
             for (const key of ['isProxy', 'proxyProvider', 'proxyProtocol']) assert.equal(key in card, false, key);
         }
+    });
+
+    it('ipinfo keeps abuse level and scenario friction levels, nothing else', () => {
+        const { build } = REPORT_EVENT_BUILDERS['ipinfo:finished'];
+        const section = build({
+            cards: [{
+                source: 'IPCheck.ing IPv4', ip: '1.2.3.4', country_code: 'US', abuseLevel: 'medium',
+                frictionScenarios: [
+                    { id: 'signup', kind: undefined, level: 'low' },
+                    { id: 'availability', kind: 'availability', level: 'high' },
+                    { id: 'email', level: 'medium', reasons: ['x'] },
+                    { id: 'signup', level: 'high' }, // repeat: first wins
+                    { id: 'bogus', level: 'low' },
+                    { id: 'finance', level: 'severe' },
+                ],
+            }, {
+                source: 'IPCheck.ing IPv6', ip: '2001:db8::1', country_code: 'US',
+                abuseLevel: 'sign_in_required', frictionScenarios: null,
+            }, {
+                source: 'IPCheck.ing IPv4', ip: '5.6.7.8', country_code: 'US',
+                abuseLevel: undefined, frictionScenarios: [{ id: 'bogus', level: 'low' }],
+            }],
+        });
+        const [enriched, gated, empty] = section.cards;
+        assert.equal(enriched.abuseLevel, 'medium');
+        assert.deepEqual(enriched.scenarios, { signup: 'low', availability: 'high', email: 'medium' });
+        for (const card of [gated, empty]) {
+            assert.equal('abuseLevel' in card, false);
+            assert.equal('scenarios' in card, false);
+        }
+        const report = { v: REPORT_VERSION, generatedAt: '2026-11-08T00:00:00.000Z', origin: 'test', locale: 'en',
+            sections: { ipinfo: { testedAt: '2026-11-08T00:00:00.000Z', ...section } } };
+        assert.deepEqual(validateReport(report, { local: true }).errors, []);
     });
 
     it('ipinfo keeps every anonymity code and nothing else', () => {

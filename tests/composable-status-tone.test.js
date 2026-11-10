@@ -72,9 +72,16 @@ describe('useStatusTone() (existing contract still holds)', () => {
     const { dotClass } = useStatusTone();
     assert.equal(dotClass('wait'), 'bg-info');
     assert.equal(dotClass('ok-fast'), 'bg-success');
+    assert.equal(dotClass('ok-mild'), 'bg-warning/50');
     assert.equal(dotClass('ok-slow'), 'bg-warning');
     assert.equal(dotClass('fail'), 'bg-destructive');
     // unknown tone falls back to wait
     assert.equal(dotClass('bogus'), 'bg-info');
+  });
+
+  it('textClass maps ok-mild to a lighter text-warning', () => {
+    const { textClass } = useStatusTone();
+    assert.equal(textClass('ok-mild'), 'text-warning/75');
+    assert.equal(textClass('ok-slow'), 'text-warning');
   });
 });

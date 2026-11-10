@@ -1,5 +1,6 @@
 // Validate environment variables exist to enable/disable frontend features
 import { isReportSharingConfigured } from './share-report.js';
+import { bulkLookupSource } from '../server/bulk-lookup-sources.js';
 
 export default (req, res) => {
     // defensive; app.get() in backend-server.js already gates method, but a
@@ -33,5 +34,7 @@ export default (req, res) => {
     for (const key in envConfigs) {
         result[key] = !!envConfigs[key];
     }
+    // The one non-boolean: which source the Bulk IP Lookup page names.
+    result.bulkLookupSource = bulkLookupSource().id;
     res.status(200).json(result);
 };

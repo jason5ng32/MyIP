@@ -14,11 +14,11 @@
     <InfoMask :showMaskButton.value="showMaskButton" :infoMaskLevel.value="infoMaskLevel"
       :toggleInfoMask="toggleInfoMask" />
     <ShareReport ref="shareReportRef" />
-    <IPHistory />
+    <SnapshotsDockButton />
     <QueryIP ref="queryIPRef" />
   </FloatingDock>
   <HelpModal ref="helpModalRef" />
-  <Footer />
+  <Footer shortcut-guide @open-shortcut-guide="helpModalRef?.openModal()" />
 </template>
 
 <script setup>
@@ -48,7 +48,7 @@ const Footer = defineAsyncComponent(() => import('./Footer.vue'));
 const Achievements = defineAsyncComponent(() => import('./Achievements.vue'));
 const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));
 const HelpModal = defineAsyncComponent(() => import('./widgets/Help.vue'));
-const IPHistory = defineAsyncComponent(() => import('./widgets/IPHistory.vue'));
+const SnapshotsDockButton = defineAsyncComponent(() => import('./widgets/SnapshotsDockButton.vue'));
 const ShareReport = defineAsyncComponent(() => import('./report/ShareReportDialog.vue'));
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';

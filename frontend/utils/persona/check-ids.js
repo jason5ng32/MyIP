@@ -26,22 +26,13 @@ export const PERSONA_CHECK_IDS = [
     'timezone-authenticity',
 ];
 
-// What a check concluded. Rendered as the row's state label and colour.
-export const VERDICT = {
-    MATCH: 'match',           // observed value fits the declared persona
-    MISMATCH: 'mismatch',     // observed value contradicts the persona
-    LEAK: 'leak',             // a channel exposed the real identity outright
-    UNNATURAL: 'unnatural',   // internally inconsistent — reads as "being spoofed"
-    UNKNOWN: 'unknown',       // the data is missing but obtainable — run the test
-    NOT_APPLICABLE: 'not-applicable', // no conclusion is possible or needed here
-};
-
-// Which of the three questions a check answers.
-export const AXIS = {
-    MATCH: 'match',           // do I look like the target country?
-    COHERENCE: 'coherence',   // does my browser contradict itself?
-    LEAK: 'leak',             // is my real identity escaping?
-};
+// What a check concluded (VERDICT), which of the three questions it answers
+// (AXIS) and the report's grade (GRADE) — shared with the report validator.
+export {
+    PERSONA_VERDICT as VERDICT,
+    PERSONA_AXIS as AXIS,
+    PERSONA_GRADE as GRADE,
+} from '../codes/persona.js';
 
 // Who actually gets to see the signal — what a finding's priority hangs on.
 export const VISIBILITY = {
@@ -49,8 +40,6 @@ export const VISIBILITY = {
     PROBED: 'probed',         // needs an active probe (WebRTC, font enumeration)
     RISK_ENGINE: 'risk-engine', // only anti-fraud stacks look this deep
 };
-
-export const GRADE = { A: 'A', B: 'B', C: 'C', D: 'D', UNKNOWN: 'unknown' };
 
 // Scalar fields a result's `detail` can carry. The report renders each one as
 // a labelled badge, so each needs a `personacheck.detail.<key>` entry.

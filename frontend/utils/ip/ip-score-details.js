@@ -1,4 +1,4 @@
-// Score-details panel for IPCheck.ing results (IpDetailPanel): a plain-
+// Score-details panel for IPCheck.ing results (ScoreDetailsPanel): a plain-
 // language explanation of the quality score, built as a list of i18n
 // sentences, and the attribute rows below it. Pure — no Vue, no fetch.
 //

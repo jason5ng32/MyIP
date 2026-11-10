@@ -72,10 +72,10 @@ export const useMainStore = defineStore('main', {
     isDarkMode: false,
     isMobile: false,
     shouldRefreshEveryThing: false,
-    // Collected user IPs, consumed by the Globalping tools' picker and the
-    // IP-history recorder. Shape: Array<{ ip, country, location, asn, org }>
-    // — country is a 2-letter code; location / asn / org are display strings
-    // ('' when unknown). Populated by IpInfos / WebRTC / RuleTest / SpeedTest.
+    // Collected user IPs, consumed by the Globalping tools' picker. Shape:
+    // Array<{ ip, country, location, asn, org }> — country is a 2-letter code;
+    // location / asn / org are display strings ('' when unknown). Populated
+    // by IpInfos / WebRTC / RuleTest / SpeedTest.
     allIPs: [],
     configs: {},
     userPreferences: {},
@@ -86,6 +86,9 @@ export const useMainStore = defineStore('main', {
       alertTitle: "",
       alertDuration: 2000,
     },
+    // Toasts that may wait or update in place, drained by Toast.vue
+    // (composables/use-toast-queue.js has the request shape).
+    toastRequests: [],
     currentSection: DEFAULT_SECTION,
     ipDBs: createInitialIpDBs(),
   }),
@@ -149,6 +152,12 @@ export const useMainStore = defineStore('main', {
     // set Toast
     setAlert(alertToShow, alertStyle, alertMessage, alertTitle, alertDuration) {
       this.alert = { alertToShow, alertStyle, alertMessage, alertTitle, alertDuration };
+    },
+    queueToast(request) {
+      this.toastRequests.push(request);
+    },
+    cancelToast(id) {
+      this.toastRequests.push({ id, cancel: true });
     },
     // Collect and merge IP data from different components. Entries are
     // { ip, country, location, asn, org } objects (bare strings are tolerated

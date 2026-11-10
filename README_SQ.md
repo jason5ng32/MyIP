@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 Një kuti mjetesh IP gjithëpërfshirëse dhe me burim të hapur: kërkim IP nga shumë burime, teste lidhshmërie, zbulim i rrjedhjeve WebRTC dhe DNS, test shpejtësie, MTR, kontrolle censure, Whois e shumë të tjera — e vetë-strehueshme me një komandë të vetme Docker.
 
@@ -40,7 +40,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 
 * 🛜 **Kartat e IP-së**: Zbulojnë IPv4 dhe IPv6 tuaj nga disa burime të pavarura krah për krah — shtetin, rajonin, qytetin, ASN-në, organizatën dhe zonën kohore lokale të IP-së.
 * 🔍 **Kërkimi i IP-së**: Kërkon të njëjtin informacion të detajuar për çdo adresë IP për të cilën jeni kureshtarë.
-* 🧾 **Historiku i IP-ve**: Mban një regjistër lokal të IP-ve me të cilat jeni parë, të filtrueshëm sipas llojit dhe shtetit — i ruajtur vetëm në shfletuesin tuaj.
+* 📸 **Historiku i fotografive të çastit**: Sa herë që faqja kryesore hapet, ruan rezultatet e testeve të saj — informacionin e IP-së, lidhshmërinë, WebRTC, testin e rrjedhjes DNS, testin e shpejtësisë — si një fotografi të çastit. Krahasoni çdo dy prej tyre dhe lexoni ndryshimet rresht pas rreshti, si një diff kodi; emërtoni ose fiksoni ato që kanë rëndësi — të ruajtura vetëm në shfletuesin tuaj.
 * 🖥️ **Gjurma e shfletuesit**: Llogarit gjurmën e shfletuesit tuaj në disa mënyra dhe tregon çfarë ju bën të identifikueshëm.
 
 ### 🕵️ Rrjedhjet dhe privatësia
@@ -65,6 +65,7 @@ Mund ta ruani demon te faqeshënuesit ose të vendosni instancën tuaj.
 * 📓 **Kërkimi Whois**: Kryen kërkime Whois për emra domenesh, adresa IP dhe numra AS.
 * 🗄️ **Kërkimi MAC**: Identifikon prodhuesin dhe detajet pas një adrese fizike.
 * 🧮 **Kalkulatori IP**: Llogaritje subnetesh, konvertime shënimesh dhe detaje të ndërfaqes IPv6 për çdo IP, prefiks, varg ose listë, të llogaritura lokalisht.
+* 🧾 **Kërkim IP në grup**: Ngjitni lista IP-sh ose regjistra të papërpunuar serveri (Nginx, Apache, firewall, CDN…) për të gjeolokalizuar menjëherë të gjitha IP-të.
 * 🛰️ **Informacioni ASN dhe topologjia drejt furnizuesve**: Direkt në çdo kartë IP — detajet e AS-së, shpalljet historike për prefiksin e IP-së dhe shtigjet nga ASN-ja e saj drejt shtyllës kurrizore Tier 1.
 * 🛂 **Profili ASN**: Tabloja e plotë e çdo AS — regjistrimi me të dhënat e papërpunuara Whois, renditja dhe madhësia globale, trafiku dhe cilësia e lidhjes, ku përdoret hapësira e saj IPv4, çdo prefiks i shpallur me gjendjen RPKI, furnizuesit, peer-at dhe klientët e saj, si dhe pikat e shkëmbimit të internetit dhe qendrat e të dhënave ku është e pranishme.
 * 📶 **Gjendja e shërbimeve**: Disponueshmëria live e shërbimeve të njohura — Claude, OpenAI, GitHub, Cloudflare e të tjera — nga faqet e tyre zyrtare të gjendjes, me incidentet e fundit.
@@ -185,9 +186,6 @@ Si projekt me burim të hapur, jam shumë mirënjohës për mbështetjen e spons
 
 **Sponsorët**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
-
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
 <sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
 </sub>
@@ -213,4 +211,4 @@ Jeni të interesuar të sponsorizoni MyIP? [Bëhu sponsor](https://github.com/sp
 
 ## 📄 Licenca
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

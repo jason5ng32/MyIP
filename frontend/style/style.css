@@ -64,6 +64,13 @@
   --warning-foreground: oklch(0.145 0 0);
   --action: oklch(0.623 0.214 259.815);       /* blue-500 —— for "run action" */
   --action-foreground: oklch(0.985 0 0);
+  /* Snapshots diff view only: removed / added lines, like any code diff (never bad / good) */
+  --diff-removed: oklch(0.936 0.032 17.717);  /* red-100 */
+  --diff-removed-foreground: oklch(0.444 0.177 26.899); /* red-800 */
+  --diff-added: oklch(0.962 0.044 156.743);   /* green-100 */
+  --diff-added-foreground: oklch(0.448 0.119 151.328);  /* green-800 */
+  --diff-removed-strong: oklch(0.808 0.114 19.571 / 0.6);  /* red-300, inline */
+  --diff-added-strong: oklch(0.871 0.15 154.449 / 0.7);    /* green-300, inline */
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -101,6 +108,12 @@
   --warning-foreground: oklch(0.145 0 0);
   --action: oklch(0.623 0.214 259.815);       /* blue-500 (same as light mode) */
   --action-foreground: oklch(0.985 0 0);      /* white text */
+  --diff-removed: oklch(0.637 0.237 25.331 / 0.18);   /* red-500, faint */
+  --diff-removed-foreground: oklch(0.808 0.114 19.571); /* red-300 */
+  --diff-added: oklch(0.723 0.219 149.579 / 0.16);    /* green-500, faint */
+  --diff-added-foreground: oklch(0.871 0.15 154.449);   /* green-300 */
+  --diff-removed-strong: oklch(0.637 0.237 25.331 / 0.4);  /* red-500, inline */
+  --diff-added-strong: oklch(0.723 0.219 149.579 / 0.36);  /* green-500, inline */
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
@@ -132,6 +145,12 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-action: var(--action);
   --color-action-foreground: var(--action-foreground);
+  --color-diff-removed: var(--diff-removed);
+  --color-diff-removed-foreground: var(--diff-removed-foreground);
+  --color-diff-added: var(--diff-added);
+  --color-diff-added-foreground: var(--diff-added-foreground);
+  --color-diff-removed-strong: var(--diff-removed-strong);
+  --color-diff-added-strong: var(--diff-added-strong);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

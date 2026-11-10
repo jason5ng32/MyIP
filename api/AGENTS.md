@@ -13,9 +13,10 @@ handlers share is split by who imports it:
   poller, …), flat; `server/datasets/` is the offline dataset engine and its
   readers (see "Offline datasets").
 - **`common/`** — only what the frontend or the build imports too
-  (`valid-ip.js`, `fetch-with-timeout.js`, `report-schema.js`, …); it never
-  imports from `server/`. It also holds the dataset directories (`*-db/`),
-  which self-hosting docs and Docker volumes mount — they stay put.
+  (`valid-ip.js`, `fetch-with-timeout.js`, `report-schema.js`, the report's
+  code lists in `codes/`, …); it imports nothing outside `common/`. It also
+  holds the dataset directories (`*-db/`), which self-hosting docs and Docker
+  volumes mount — they stay put.
 
 Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `ipapi-com` / `ipapi-is` / `ip2location-io` / `ip-sb` / `ipcheck-ing` /
@@ -23,7 +24,7 @@ Roughly one handler file per route: IP-geolocation sources (`ipinfo-io` /
 `cf-radar` / `asn-history` / `asn-connectivity` / `asn-profile` /
 `ooni-blocking` / `globalping-probes` / `service-status` / `google-map` /
 `github-stars` / `invisibility-test` / `dns-leak-test` / `persona` /
-`ip-blocklist`), user
+`ip-blocklist` / `bulk-lookup`), user
 proxies (`get-user-info` / `update-user-achievement`), platform (`configs` /
 `sentry-tunnel` / `share-report`). Each file's header comment states its route
 and purpose — read those for specifics.
@@ -31,10 +32,15 @@ and purpose — read those for specifics.
 The exception to one-file-per-route is Cloudflare Radar: all Radar data rides
 `/api/cfradar`, dispatched by `?view=` over `RADAR_VIEWS` in
 `server/cf-radar.js`, where each view declares its guards, edge-cache TTL and
-fetch function — new Radar data is a view function plus a registry row, never
-a new route. `api/data/` holds contributor-editable static config consumed by
-handlers — currently `dns-resolvers.js`, the country-annotated resolver list
-behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
+fetch function — new Radar data is a view function plus a registry row,
+never a new route. `outages` is served from a 30-minute in-memory poll
+(cold Radar queries outrun the request timeout), started at boot with a
+Radar key, outside the boot window, and filled on demand by a request that
+finds it empty; each source keeps its last good answer, partial until both
+have answered once. `api/data/` holds contributor-editable static config
+consumed by handlers — currently `dns-resolvers.js`, the country-annotated
+resolver list behind `dns-resolver` (gated by
+`tests/dns-resolvers-data.test.js`).
 
 ### ASN data
 
@@ -47,6 +53,12 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
   lists come from local CAIDA (`server/as-relationships.js`), dropping the
   providers the graph walk distrusts. The Radar `asn` view (ASN Info) carries
   no prefix or relationship counts — the ASN Profile has both.
+- **`/api/bulk-lookup`** (POST, ≤ 200 IPs, own 16 KB body limit) takes only a
+  clean list of distinct public IPs — the page extracts, dedupes and splits a
+  larger run into requests of that size (`common/bulk-lookup-limits.js`); one
+  bad or repeated entry rejects the request, nothing is cleaned server-side. Local
+  data only: the source is a `server/bulk-lookup-sources.js` row picked by
+  `BULK_LOOKUP_SOURCE`, never a metered upstream.
 - **`/api/whois` `?q=`:** IPs (RDAP, whoiser fallback), domains (whoiser, RDAP
   fallback), `AS<n>` (RDAP autnum); all carry a `__raw` block.
 - **Offline datasets** (MaxMind, CAIDA, PeeringDB, IEEE MAC registries) are rows in
@@ -72,7 +84,10 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 - **Handler shape.** Single default export `async (req, res) => …`: read
   `req.query` / `req.body`, call upstream, write one response.
 - **Every upstream call uses `fetchUpstream`** (`common/fetch-with-timeout.js`,
-  8s timeout), never a bare `fetch()` / `https.get()` — a hanging provider must
+  8s timeout — Radar's client raises it to 12 s, `RADAR_TIMEOUT_MS`; its own
+  timeout is an `AbortError` reading `Timed out after
+  <ms>ms: <host>`, host only — keys ride paths and queries), never a bare
+  `fetch()` / `https.get()` — a hanging provider must
   time out. It injects a default `User-Agent` `MyIP/v<version>/<VITE_SITE_URL>`
   (`server/upstream-ua.js`; some WAFs block undici's `node` UA); caller-supplied
   ones, incl. the private-API `{ ...req.headers }` pass-through, win.
@@ -105,7 +120,10 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 
 `server/guards.js`, attached in `backend-server.js`; handlers never repeat them:
 
-- `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost).
+- `requireReferer` — global on `/api/*` (ALLOWED_DOMAINS + localhost). For
+  self-hosters it logs the allowlist (and entries that can never match) at
+  boot, and the first rejection per Referer host at info — below the Sentry
+  mirror, capped at 50 hosts.
 - `requirePublicIP()` — per-route `?ip=`: well-formed and publicly routable;
   reserved space (RFC 1918, loopback, CGNAT, link-local, documentation, …) never
   reaches a geo source. `isUsablePublicIP` (`common/valid-ip.js`) is the one
@@ -126,6 +144,8 @@ behind `dns-resolver` (gated by `tests/dns-resolvers-data.test.js`).
 - `requireValidReportId()` — `/api/report/:id` route param (22-char base64url).
 
 New param shape → new guard there, attached in `backend-server.js`.
+Rewrites go through `setQueryParam()` there: Express 5's `req.query` re-parses
+on every read, so a direct write is lost.
 
 ### Response enrichment lives in middleware too
 
@@ -147,6 +167,9 @@ a failed download served degraded. A route reading local data declares its
 probes (`isMaxMindReady`, `isAsRelLoaded`, …) in `backend-server.js`. Answers
 assembled from parts don't gate: an ASN Profile section whose data is still
 loading (`isStillLoading`) answers `error`, leaving the others to answer.
+The Radar outage poll stays out of that window (it would stretch the ASN
+Profile's no-degraded-caching span); a request that finds it empty fills it
+on demand.
 
 ### Private-API header pass-through (intentional exception)
 

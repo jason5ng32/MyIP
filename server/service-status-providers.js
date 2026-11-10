@@ -11,6 +11,8 @@
 // `page` — public status page; also the base for incident detail links
 //          (`${page}/incidents/${incidentId}`), since incident.io's feed omits
 //          a usable shortlink.
+// `components` — optional row selector (include / exclude / flatten / rename /
+//                indicator); see selectComponents in service-status-transform.js.
 // `platform` — 'incident.io': components come from the native `/proxy/<host>`
 //              structure, since the compat summary flattens groups away.
 //
@@ -56,6 +58,20 @@ export const STATUS_PROVIDERS = [
     // non-Statuspage schema; www.stripestatus.com is its Statuspage mirror,
     // which exposes the /api/v2 endpoints this poller needs.
     { id: 'stripe', name: 'Stripe', api: 'https://www.stripestatus.com', page: 'https://www.stripestatus.com' },
+    // rename: "www.npmjs.com website" repeats the domain inside the npm card.
+    {
+        id: 'npm', name: 'npm', api: 'https://status.npmjs.org', page: 'https://status.npmjs.org',
+        components: { rename: { mvm98gtxvb9b: 'Official Website' } },
+    },
+    { id: 'perplexity', name: 'Perplexity', api: 'https://status.perplexity.com', page: 'https://status.perplexity.com', platform: 'incident.io' },
+    { id: 'canva', name: 'Canva', api: 'https://www.canvastatus.com', page: 'https://www.canvastatus.com' },
+    { id: 'dropbox', name: 'Dropbox', api: 'https://status.dropbox.com', page: 'https://status.dropbox.com' },
+    { id: 'docker', name: 'Docker', api: 'https://www.dockerstatus.com', page: 'https://www.dockerstatus.com', platform: 'incident.io' },
+    { id: 'bitbucket', name: 'Bitbucket', api: 'https://bitbucket.status.atlassian.com', page: 'https://bitbucket.status.atlassian.com' },
+    { id: 'digitalocean', name: 'DigitalOcean', api: 'https://status.digitalocean.com', page: 'https://status.digitalocean.com' },
+    { id: 'reddit', name: 'Reddit', api: 'https://www.redditstatus.com', page: 'https://www.redditstatus.com' },
+    { id: 'twitch', name: 'Twitch', api: 'https://status.twitch.com', page: 'https://status.twitch.com' },
+    { id: 'epicgames', name: 'Epic Games', api: 'https://status.epicgames.com', page: 'https://status.epicgames.com' },
 ];
 
 // Whitelist used by requireValidProviderId() — the per-provider detail

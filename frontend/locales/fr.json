@@ -15,7 +15,10 @@
       "Note": "Les fonctionnalités avancées disposent d'un quota mensuel gratuit, réinitialisé automatiquement au début de chaque mois (UTC). Les requêtes répétées de données IP avancées sont servies depuis le cache et ne consomment pas de quota.",
       "IpinfoFeature": "Données IP avancées",
       "PercentUsed": "{percent} % utilisé",
-      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels."
+      "SponsorNote": "Sponsoriser le projet sur GitHub augmente vos quotas mensuels.",
+      "DailyTitle": "Limite de 24 heures",
+      "MonthlyTitle": "Quota mensuel",
+      "AvailableAgainAt": "De nouveau disponible à {time}"
     },
     "MyAchievements": "Succès",
     "Fields": {
@@ -63,7 +66,8 @@
           "Name": "Sponsors",
           "Item1": "Tous les avantages des utilisateurs connectés",
           "Item2": "Quotas mensuels plus élevés pour les fonctionnalités avancées",
-          "Item3": "Soutenez le développement continu de ce projet open source"
+          "Item3": "Soutenez le développement continu de ce projet open source",
+          "Item4": "Limite de 24 heures plus généreuse"
         }
       }
     },
@@ -295,7 +299,18 @@
         "earthday": "Déconnexion — je vais toucher de l'herbe",
         "turing": "Ce statut a été envoyé par un humain. Probablement.",
         "emojiday": "📶🌍🎉✨",
-        "birthday": "Joyeux anniversaire IPCheck.ing !"
+        "birthday": "Joyeux anniversaire IPCheck.ing !",
+        "adaday": "Algorithme signé Ada, depuis 1843",
+        "dayofdead": "En pensée avec ceux qui se sont déconnectés",
+        "thanksgiving": "Reconnaissant pour chaque paquet arrivé à bon port",
+        "piday": "3,14159265358979… chargement en cours",
+        "holi": "J'éclabousse tout en RVB",
+        "shannon": "Ce statut part un bit à la fois",
+        "wtisd": "Toutes les barres, partout dans le monde",
+        "ipv6day": "Désormais avec 2¹²⁸ adresses",
+        "sysadmin": "Vous avez essayé de l'éteindre et de le rallumer ?",
+        "linux": "Juste un hobby, rien de gros ni de professionnel",
+        "tomatina": "Sous une attaque par inondation de tomates"
       },
       "festivalDesc": {
         "prgday": "Jour du programmeur — le 256ᵉ jour de l'année, 0x100 en hexadécimal",
@@ -313,7 +328,18 @@
         "earthday": "Jour de la Terre (22 avril) — même la Terre en ligne conseille un peu de Terre hors ligne",
         "turing": "Anniversaire d'Alan Turing (23 juin 1912) — le père du test de Turing",
         "emojiday": "Journée mondiale des emojis (17 juillet) — les mots, c'était le siècle dernier",
-        "birthday": "Anniversaire d'IPCheck.ing — la v1.0 est sortie le 6 novembre 2020"
+        "birthday": "Anniversaire d'IPCheck.ing — la v1.0 est sortie le 6 novembre 2020",
+        "adaday": "Journée Ada Lovelace (2ᵉ mardi d'octobre) — elle célèbre les femmes en STEM ; Ada a écrit le premier algorithme publié",
+        "dayofdead": "Día de los Muertos (1ᵉʳ–2 novembre) — le Mexique honore ses proches, jamais vraiment hors ligne",
+        "thanksgiving": "Thanksgiving (4ᵉ jeudi de novembre) — merci à chaque routeur sur le chemin",
+        "piday": "Journée de Pi (14 mars, 3.14 à l'américaine) — aussi la Journée internationale des mathématiques de l'UNESCO",
+        "holi": "Holi — la fête hindoue des couleurs accueille le printemps dans tous les codes hexadécimaux",
+        "shannon": "Anniversaire de Claude Shannon (30 avril 1916) — père de la théorie de l'information, qui nous a donné le bit",
+        "wtisd": "Journée mondiale des télécommunications et de la société de l'information (17 mai) — l'UIT a été fondée ce jour-là en 1865",
+        "ipv6day": "World IPv6 Launch (6 juin 2012) — le jour où l'IPv6 a été activé pour de bon",
+        "sysadmin": "Journée des administrateurs système (dernier vendredi de juillet) — merci à qui maintient votre uptime",
+        "linux": "25 août 1991 : Linus Torvalds annonce sur comp.os.minix son OS, « juste un hobby »",
+        "tomatina": "La Tomatina (dernier mercredi d'août) — la bataille de tomates de Buñol, en Espagne ; la seule inondation que personne ne veut filtrer"
       }
     },
     "preferences": {
@@ -335,15 +361,27 @@
         "defaultListTips": "La liste affichée par la section au chargement de la page.",
         "multipleTests": "Rafraîchissements multiples",
         "multipleTestsTips": "Effectue plusieurs vérifications par passage et affiche le délai le plus bas.",
+        "discardFirstResult": "Ignorer le premier résultat",
+        "discardFirstResultTips": "Envoie d'abord une requête de préchauffage non chronométrée, pour que le délai affiché exclue la résolution DNS et l'établissement de la connexion.",
         "notifications": "Alertes pop-up",
         "notificationsTips": "Affiche les résultats de la première vérification sous forme d'alerte pop-up.",
         "titleOpensSite": "Le titre de la carte ouvre le site",
         "titleOpensSiteTips": "Cliquer sur le titre d'une carte ouvre le site dans un nouvel onglet ; désactivé, le titre reste du texte simple."
       },
-      "ipHistory": "Historique des IP",
-      "ipHistoryEnabled": "Enregistrer l'historique des IP",
-      "ipHistoryDays": "Jours de conservation",
-      "ipHistoryTips": "Activé, les IP détectées sont enregistrées uniquement dans ce navigateur et conservées pendant le nombre de jours choisi. Désactivé, l'enregistrement s'arrête ; les enregistrements existants restent jusqu'à ce que vous les effaciez dans le panneau Historique des IP.",
+      "snapshots": "Historique des instantanés",
+      "snapshotsAuto": "Enregistrement automatique",
+      "snapshotsAutoSmart": "Intelligent",
+      "snapshotsAutoEvery": "À chaque visite",
+      "snapshotsAutoOff": "Désactivé",
+      "snapshotsAutoTips": "En mode Intelligent, l'application choisit elle-même quand enregistrer un instantané. En mode Désactivé, les instantanés ne sont enregistrés que manuellement, à la page Historique des instantanés.",
+      "snapshotsLabelCard": "Carte IP utilisée pour nommer les instantanés automatiquement",
+      "snapshotsLabelCardName": "IP-carte {index}",
+      "snapshotsLabelCardTips": "Les instantanés sont nommés d'après le pays et l'IP de cette carte ; si elle n'a pas d'IP valide, la première carte avec une IP est utilisée.",
+      "snapshotsNotify": "Signaler les changements",
+      "snapshotsNotifyTips": "Affiche une alerte pop-up lorsque cette visite diffère nettement de l'instantané précédent, sur ce que les deux ont enregistré.",
+      "snapshotsKeepLast": "Nombre d'instantanés",
+      "snapshotsCountOption": "Les {n} derniers",
+      "snapshotsKeepLastTips": "Les instantanés plus anciens au-delà de ce nombre sont supprimés. Les instantanés épinglés n'expirent jamais et ne sont pas comptés.",
       "ipDB": "Base de données de géolocalisation IP",
       "ipDBTips": "Vous pouvez sélectionner la source de données de géolocalisation IP par défaut. Si la source sélectionnée n'est pas disponible, le système utilisera les sources suivantes.",
       "language": "Paramètres de langue",
@@ -1082,12 +1120,14 @@
     "EnhancedDnsLeakTest": "Capture tous les résolveurs récursifs avec analyse ECS et DNSSEC",
     "RuleTestNote": "Vérifiez les paramètres de règles du logiciel de proxy",
     "CensorshipCheck": "Vérifier dans quels pays un site est bloqué",
-    "ServiceStatus": "Vérifiez la disponibilité en temps réel des services d'IA et de développement connus, et si un incident récent explique la panne que vous constatez",
+    "ServiceStatus": "Vérifiez la disponibilité en temps réel de produits Internet connus, et si un incident récent explique la panne que vous constatez",
     "Whois": "Recherche d'informations sur l'enregistrement de domaine/IP/AS",
     "AsnProfile": "Consulter le profil complet de n'importe quel AS",
     "InvisibilityTest": "Vérifiez si vous utilisez un proxy ou un VPN",
     "MacChecker": "Requête d'informations d'une adresse physique",
     "IpCalculator": "Calcul de sous-réseau, conversion de notation et analyse IPv6 pour toute IP, préfixe ou plage",
+    "BulkLookup": "Rechercher des IP en lot, directement depuis des journaux collés",
+    "Snapshots": "Voir et comparer les différences entre plusieurs résultats de tests",
     "BrowserInfo": "Vérifier les informations du navigateur et l'empreinte digitale",
     "AdblockTest": "Vérifiez ce que votre bloqueur de pubs, filtre DNS ou VPN bloque vraiment",
     "SecurityChecklist": "Guide pour sécuriser votre vie numérique",
@@ -1254,6 +1294,221 @@
     "aggregated": "Bloc unique",
     "aggregationSummary": "{input} blocs en entrée, {output} en sortie, {addresses} adresses",
     "invalidTokens": "Ignoré : {list}"
+  },
+  "bulklookup": {
+    "Title": "Recherche IP groupée",
+    "Note": "Extrayez les IP de journaux Nginx, Apache, pare-feu, CDN ou applicatifs — ou de n'importe quelle liste collée — et voyez d'un coup d'œil d'où vient le trafic : quels pays et réseaux (ASN), et quelles IP reviennent sans cesse. Puis examinez n'importe quelle IP en détail.",
+    "Note2": "Collez n'importe quel texte : les IP sont extraites dans votre navigateur, les adresses privées et réservées sont ignorées et les répétitions sont comptées. Collez autant de fois que nécessaire : la liste contient jusqu'à {max} IP, et un gros collage est recherché en plusieurs requêtes. La géolocalisation provient de {source}. Les résultats sont conservés uniquement dans ce navigateur.",
+    "SourceWithBuild": "{source} (base du {date})",
+    "SourceFallback": "la base de géolocalisation locale du serveur",
+    "InputLabel": "Collez des IP ou des lignes de journal :",
+    "Placeholder": "1.1.1.1, 8.8.8.8 ou des lignes de journal entières…",
+    "FirstPerLine": "Uniquement la première IP de chaque ligne",
+    "FirstPerLineHint": "Pour les journaux de CDN ou de proxy inverse, où l'IP du client partage la ligne avec des IP de proxy ou de périphérie.",
+    "status": {
+      "empty": "Le résultat de l'analyse s'affichera ici une fois le texte collé.",
+      "none": "Aucune IP publique trouvée",
+      "ready": "{n} IP trouvées : {fresh}",
+      "new": "{n} nouvelles",
+      "existing": "{n} déjà dans la liste",
+      "reserved": "{n} privées ignorées",
+      "cidr": "{n} CIDR ignorées",
+      "split": "recherchées en {n} requêtes",
+      "known": "Ces {n} IP sont déjà dans la liste ; seule leur fréquence sera mise à jour",
+      "noRoom": "{n} nouvelles IP, mais la liste n'a de place que pour {room} de plus (limite {max}) — supprimez d'abord quelques lignes",
+      "running": "Recherche de {n} IP…",
+      "runningSplit": "Recherche en cours — requête {request} sur {requests}, {done} IP sur {total} traitées…",
+      "updating": "Mise à jour de la fréquence…"
+    },
+    "Run": "Rechercher {n} nouvelles",
+    "RunCountsOnly": "Mettre à jour la fréquence",
+    "RunIdle": "Rechercher",
+    "Unanswered": "{n} IP n'ont pas pu être recherchées.",
+    "RunFailed": "La recherche a échoué. Veuillez réessayer plus tard.",
+    "RunRateLimited": "Trop de recherches en peu de temps. Veuillez réessayer plus tard.",
+    "Paused": "{done} nouvelles IP sur {total} recherchées ; les {n} restantes sont en pause.",
+    "PausedRateLimited": "Trop de recherches en peu de temps. Patientez un instant, puis continuez.",
+    "PausedFailed": "La recherche a été interrompue. Essayez de continuer dans un instant.",
+    "Continue": "Continuer les {n} restantes",
+    "StorageError": "Ce navigateur n'a pas enregistré la liste (stockage plein ou bloqué). Elle reste disponible jusqu'à ce que vous quittiez la page.",
+    "stat": {
+      "rows": "IP",
+      "countries": "Pays/régions",
+      "asns": "ASN",
+      "frequency": "Fréquence totale",
+      "topShare": "Part de la fréquence des 10 IP les plus fréquentes",
+      "onceShare": "Part des IP vues une seule fois"
+    },
+    "ClearAll": "Tout effacer",
+    "OverviewTitle": "Vue d'ensemble",
+    "MapTitle": "Carte du monde",
+    "tab": {
+      "ips": "IP",
+      "analysis": "Analyse"
+    },
+    "FilterPlaceholder": "Filtrer par IP, pays, ville, ASN, organisation ou note — combinez plusieurs mots, p. ex. « Allemagne 3320 »",
+    "ClearSearch": "Effacer la recherche",
+    "BatchFilter": "Lot collé",
+    "AllBatches": "Tous les lots",
+    "BatchLabel": "{time} · {n} IP",
+    "ExportCsv": "Exporter en CSV",
+    "StarredOnly": "IP marquées d'une étoile uniquement",
+    "NoMatches": "Aucun résultat ne correspond aux filtres.",
+    "ClearTitle": "Effacer la liste",
+    "ClearBody": "Cela supprime {n} IP de ce navigateur. Cette action est irréversible.",
+    "KeepStarred": "Conserver les IP marquées d'une étoile ({n})",
+    "Cancel": "Annuler",
+    "Save": "Enregistrer",
+    "ClearConfirm": "Effacer",
+    "Unknown": "Inconnu",
+    "col": {
+      "star": "Étoile",
+      "ip": "IP",
+      "country": "Pays/région",
+      "city": "Ville",
+      "asn": "ASN",
+      "org": "Organisation",
+      "count": "Fréquence",
+      "note": "Note",
+      "actions": "Actions"
+    },
+    "Star": "Ajouter une étoile",
+    "Unstar": "Retirer l'étoile",
+    "Delete": "Supprimer",
+    "IpDetails": "Détails de l'IP",
+    "CheckBlocklist": "Vérifier les listes noires",
+    "EditNote": "Modifier la note",
+    "NotePlaceholder": "Ajouter une note",
+    "PageRange": "{from}–{to} sur {total}",
+    "PageSize": "Lignes par page",
+    "PagePrev": "Précédent",
+    "PageNext": "Suivant",
+    "PickHint": "Cliquez pour filtrer sur cet élément ; cliquez à nouveau pour retirer le filtre",
+    "PanelHint": {
+      "country": "Pays/régions, classés selon leur part de la liste.",
+      "asn": "Réseaux (ASN) et organisations qui les exploitent, classés selon leur part de la liste.",
+      "block": "IP regroupées par /24 (IPv4) et /48 (IPv6), classées selon leur part de la liste."
+    },
+    "WeightLabel": "Pondération :",
+    "ByIps": "Par IP",
+    "ByHits": "Par fréquence",
+    "PanelCountry": "Pays/région",
+    "PanelAsn": "ASN · Organisation",
+    "PanelBlock": "Blocs d'adresses (/24 · /48)",
+    "ShowLess": "Afficher moins",
+    "MoreEntries": "+ {n} de plus",
+    "TopGroupsShare": "top {n} : {share}",
+    "MapHint": {
+      "ips": "Les pays sont colorés selon le nombre d'IP.",
+      "hits": "Les pays sont colorés selon la fréquence."
+    },
+    "MapUnavailable": "La carte n'a pas pu être chargée.",
+    "MapTooltip": {
+      "ips": "{n} IP",
+      "hits": "Fréquence : {n}"
+    }
+  },
+  "snapshots": {
+    "Title": "Historique des instantanés",
+    "Note": "Chaque changement de votre environnement réseau peut avoir un effet plus ou moins important sur les résultats des tests. Les résultats de vos tests sur la page d'accueil sont enregistrés ici sous forme d'instantanés ; IPCheck.ing utilise par défaut l'enregistrement intelligent. Choisissez deux instantanés pour comparer chaque champ ligne par ligne et repérer les différences entre les environnements réseau. Vous pouvez nommer ou épingler les instantanés importants pour les comparer sur le long terme. Le mode d'enregistrement automatique et le nombre d'instantanés conservés sont réglables dans les Préférences. Les instantanés sont stockés uniquement dans votre navigateur local.",
+    "SaveNow": "Enregistrer un instantané",
+    "SmartSkipped": "Cette visite ne présente aucun changement notable par rapport au dernier instantané ; elle n'a donc pas été enregistrée automatiquement.",
+    "ChangedTitle": "Différent de l'instantané précédent",
+    "ChangedNote": "Changements : {sections}.",
+    "ChangedView": "Voir",
+    "SaveNowRunning": "Tests de la page d'accueil en cours…",
+    "SaveNowFailed": "Impossible de lancer les tests de la page d'accueil ; ouvrez la page d'accueil et réessayez.",
+    "StorageFailed": "Ce navigateur refuse d'enregistrer les instantanés ; ceux affichés disparaîtront à la fermeture de cet onglet.",
+    "EmptyTitle": "Aucun instantané pour l'instant",
+    "EmptyNote": "Les instantanés sont enregistrés automatiquement à partir des tests de la page d'accueil, selon les Préférences. Vous pouvez aussi en enregistrer un maintenant avec le bouton ci-dessous.",
+    "ListLabel": "Instantanés",
+    "ThisVisit": "Cette visite",
+    "TimeRange": "{first} – {last}",
+    "Pin": "Épingler",
+    "Pinned": "Épinglé",
+    "Unpin": "Désépingler",
+    "PinLimitTitle": "Limite d'épinglage atteinte",
+    "PinLimit": "Vous pouvez épingler jusqu'à {max} instantanés. Désépinglez-en un d'abord.",
+    "Rename": "Renommer",
+    "RenameTitle": "Renommer l'instantané",
+    "NameLabel": "Nom de l'instantané",
+    "RenameHint": "Laissez vide pour utiliser le libellé automatique.",
+    "Save": "Enregistrer",
+    "Delete": "Supprimer",
+    "AllSnapshots": "Tous les instantanés",
+    "Cancel": "Annuler",
+    "CompareWithThis": "Comparer avec celui-ci",
+    "Compare": "Comparer",
+    "Comparing": "En comparaison",
+    "CompareWith": "Comparer avec",
+    "ComparePrevious": "L'instantané précédent",
+    "OldestNote": "C'est l'instantané le plus ancien ; rien à comparer.",
+    "NotRun": "Non exécuté dans cet instantané",
+    "NotRunNote": "Ce test ne s'est pas terminé pendant l'enregistrement de cet instantané.",
+    "NotRunSpeedNote": "Le test de débit ne s'exécute que lorsqu'on le lance sur la page d'accueil.",
+    "LayoutLabel": "Disposition",
+    "LayoutUnified": "Unifiée",
+    "LayoutSplit": "Côte à côte",
+    "ShowDrift": "Afficher les écarts de mesure",
+    "DriftHint": "La valeur mesurée diffère",
+    "ExpandAll": "Tout déplier",
+    "CollapseAll": "Tout replier",
+    "NoChanges": "Aucun changement",
+    "OnlyHere": "Uniquement dans cet instantané (non comparé)",
+    "OnlyThere": "Uniquement dans l’instantané comparé (non comparé)",
+    "CountChanged": "{n} modifié(s)",
+    "CountOnlyHere": "{n} uniquement ici",
+    "CountOnlyThere": "{n} uniquement en face",
+    "NotRunThere": "Non exécuté dans l’instantané comparé",
+    "SideCompared": "Instantané comparé",
+    "SideViewed": "Cet instantané",
+    "Yes": "Oui",
+    "No": "Non",
+    "fields": {
+      "ip": "IP",
+      "countryCode": "Pays",
+      "region": "Région",
+      "city": "Ville",
+      "timezone": "Fuseau horaire",
+      "asn": "ASN",
+      "isp": "FAI",
+      "anonymity": "Anonymiseur",
+      "ipType": "Type de ligne",
+      "nativeIP": "IP native",
+      "qualityScore": "Score de qualité",
+      "anonymityProtocol": "Protocole",
+      "anonymityProvider": "Fournisseur",
+      "name": "Nom",
+      "status": "Statut",
+      "timeMs": "Latence",
+      "minTimeMs": "Latence min.",
+      "custom": "Personnalisé",
+      "url": "Serveur",
+      "natType": "Type de NAT",
+      "org": "Organisation",
+      "downloadMbps": "Téléchargement",
+      "uploadMbps": "Envoi",
+      "latencyMs": "Latence",
+      "jitterMs": "Gigue",
+      "loadedLatencyDownMs": "Latence en charge ↓",
+      "loadedLatencyUpMs": "Latence en charge ↑",
+      "qualities": {
+        "streaming": "Streaming",
+        "gaming": "Jeu",
+        "rtc": "Appels vidéo"
+      },
+      "scores": {
+        "streaming": "Score streaming",
+        "gaming": "Score jeu",
+        "rtc": "Score appels vidéo"
+      },
+      "connection": {
+        "ip": "IP client",
+        "colo": "Colo Cloudflare",
+        "coloCountryCode": "Pays du colo",
+        "coloCity": "Ville du colo"
+      }
+    }
   },
   "whois": {
     "Title": "Recherche Whois",
@@ -1468,7 +1723,38 @@
     "Provider": "Fournisseur DNS",
     "Result": "Résultat de la Résolution",
     "Record": "Enregistrement",
-    "AllRegions": "Toutes les régions"
+    "AllRegions": "Toutes les régions",
+    "HintWithCode": "{hint} ({code})",
+    "Failure": {
+      "nodata": {
+        "Label": "Aucun enregistrement de ce type",
+        "Hint": "Le domaine existe, mais n'a aucun enregistrement de ce type"
+      },
+      "nxdomain": {
+        "Label": "Domaine introuvable",
+        "Hint": "Le résolveur indique que ce domaine n'existe pas"
+      },
+      "servfail": {
+        "Label": "Échec de la résolution",
+        "Hint": "Le résolveur n'a pas pu mener la requête à bien — souvent à cause d'un échec de validation DNSSEC ou de serveurs faisant autorité injoignables"
+      },
+      "refused": {
+        "Label": "Requête refusée",
+        "Hint": "Le résolveur a refusé cette requête ou ne la prend pas en charge, généralement en raison de sa propre politique ou d'un filtrage"
+      },
+      "timeout": {
+        "Label": "Délai dépassé",
+        "Hint": "Le résolveur n'a pas répondu à temps"
+      },
+      "unavailable": {
+        "Label": "Résolveur indisponible",
+        "Hint": "Le résolveur est injoignable ou a renvoyé une erreur"
+      },
+      "malformed": {
+        "Label": "Réponse invalide",
+        "Hint": "La réponse du résolveur est illisible"
+      }
+    }
   },
   "ruletest": {
     "Title": "Test de règles",
@@ -1495,7 +1781,7 @@
     "ViewOnMap": "Voir l'emplacement sur la carte",
     "ShowCountryTraffic": "Voir le rythme d'activité en ligne",
     "InfoMask": "Masquer les informations IP",
-    "IPHistory": "Voir l'historique des IP",
+    "Snapshots": "Voir l'historique des instantanés",
     "ShareReport": "Créer un rapport de diagnostic",
     "QueryIP": "Interroger l'adresse IP",
     "GithubLink": "Voir le code source sur GitHub"
@@ -1571,30 +1857,6 @@
       "none": "DNSSEC non activé"
     }
   },
-  "ipHistory": {
-    "Title": "Historique des IP",
-    "Notes": "Les IP détectées lors de votre utilisation du site sont enregistrées ici. Les données sont stockées uniquement dans ce navigateur — elles ne sont jamais synchronisées avec votre compte et ne quittent pas votre appareil. Vous pouvez ajuster le délai de conservation des enregistrements dans les \"Préférences\".",
-    "Empty": "Aucun enregistrement pour le moment. Les IP apparaîtront ici dès que les tests de la page d'accueil les détecteront.",
-    "FilterByType": "Filtrer par type d'IP",
-    "FilterByCountry": "Filtrer par pays / région",
-    "UnknownCountry": "Inconnu",
-    "NoMatch": "Aucun enregistrement ne correspond aux filtres sélectionnés.",
-    "ClearAll": "Effacer l'historique",
-    "ClearConfirm": "Cliquez à nouveau pour confirmer",
-    "ViewMode": "Vue de l’historique",
-    "ByIP": "Par IP",
-    "ByDate": "Par date",
-    "UniqueIPCounts": "Compteurs des filtres : IP uniques dans l’ensemble des enregistrements conservés.",
-    "DailyRecordCounts": "Compteurs des filtres : enregistrements de toutes les dates conservées (un par IP et par jour).",
-    "LastSeen": "Dernière détection : {date}",
-    "FirstSeen": "Première détection : {date}",
-    "RecordDates": "Toutes les dates enregistrées",
-    "MapTitle": "Pays / régions des IP",
-    "MapUnavailable": "Carte indisponible. Les filtres par pays restent disponibles.",
-    "MapSelect": "Cliquer pour filtrer ce pays / cette région",
-    "MapUnselect": "Cliquer pour retirer le filtre de ce pays / cette région",
-    "ViewMap": "Voir la carte"
-  },
   "ipInfos": {
     "Title": "Infos IP",
     "Notes": "Le programme vérifie d'abord votre adresse IP à partir de plusieurs sondes différentes (y compris IPv4 et IPv6), puis interroge les données géographiques correspondantes auprès de la source de données de localisation IP que vous avez sélectionnée. Si vous n'avez qu'une seule pile IP active, les sources de données non disponibles seront affichées comme vides.",
@@ -1625,6 +1887,7 @@
     "qualityScoreUnknown": "Score inconnu",
     "advancedUnlockCta": "Pour éviter l'abus, connectez-vous pour voir les informations suivantes",
     "advancedQuotaCta": "Quota mensuel de données IP avancées épuisé",
+    "advancedCooldownCta": "Limite de 24 heures des données IP avancées atteinte",
     "ASNInfo": {
       "trafficPercentage": "Pourcentage de trafic : ",
       "note": "Données associées à cet AS : ",
@@ -1751,6 +2014,48 @@
         "isNative": "Correspondance ASN-Geo"
       }
     },
+    "abuseLevel": {
+      "label": "Activité abusive",
+      "none": "Non détectée",
+      "low": "Occasionnelle",
+      "medium": "Modérée",
+      "high": "Fréquente"
+    },
+    "scenarioFriction": {
+      "label": "Friction par scénario",
+      "toggle": "Détails de la friction",
+      "breakdown": "Fluide : {smooth} · Vérifications en plus : {checks} · Peut être restreint : {restricted}",
+      "introTitle": "Friction par scénario, en détail",
+      "intro": "Vous utilisez peut-être cette IP pour toutes sortes de navigation et de travail ; selon le scénario, la friction entre cette IP et les plateformes peut varier. Nous combinons le type de réseau, l'anonymisation, l'historique d'abus et la localisation de cette IP pour estimer comment les plateformes sont susceptibles de la traiter.",
+      "listTitle": "Par scénario",
+      "scenarios": {
+        "signup": "Inscription et connexion",
+        "payments": "Achats et paiements",
+        "finance": "Banque et finance",
+        "streaming": "Streaming et contenus régionaux",
+        "availability": "Disponibilité des services internationaux",
+        "browsing": "Navigation courante",
+        "posting": "Publications et commentaires",
+        "localSocial": "Réseaux sociaux en tant qu'utilisateur local",
+        "localSocialIn": "Réseaux sociaux en tant qu'utilisateur local ({country})",
+        "automation": "Automatisation et scraping",
+        "email": "Envoi d'e-mails auto-hébergé"
+      },
+      "verdict": {
+        "default": {
+          "low": "Fluide",
+          "medium": "Vérifications en plus",
+          "high": "Peut être restreint"
+        },
+        "availability": {
+          "low": "Disponible",
+          "medium": "Limité",
+          "high": "Peut être bloqué"
+        }
+      },
+      "personaHint": "Au-delà de l'IP, les plateformes tiennent compte de plusieurs facteurs pour décider des restrictions à appliquer. Vous voulez savoir si votre profil global correspond à ce que vous attendez ?",
+      "personaLink": "Lancer la vérification de persona"
+    },
     "countryTraffic": {
       "subtitle": "Répartition hebdomadaire de l'activité en ligne de ce pays/région — affichez uniquement le trafic généré par des humains, ou tout le trafic (bots et trafic automatisé inclus).",
       "human": "Humains uniquement",
@@ -1760,7 +2065,7 @@
   },
   "serviceStatus": {
     "Title": "État des services",
-    "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Actuellement, les gens utilisent beaucoup de produits AI, et quand le produit AI ne répond pas, ils ne savent pas si c'est leur problème ou celui du service. Cette section affiche la disponibilité en temps réel de services AI populaires ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
+    "Note": "Quand un service ne s'ouvre pas, le problème ne vient pas forcément de vous — le service lui-même peut être en panne. Cette section affiche la disponibilité en temps réel de produits Internet connus, des assistants IA aux plateformes pour développeurs ; dépliez une carte pour voir l'état de chaque sous-service et les incidents récents.",
     "Refresh": "Actualiser l'état des services",
     "LastChecked": "Dernière vérification",
     "AllOperational": "Tous les systèmes sont opérationnels",
@@ -1837,7 +2142,9 @@
       "Import": "Importer",
       "NotEnoughCapacity": "Capacité insuffisante — cette liste nécessite {need} emplacements, seulement {free} restants.",
       "Destination": "Ajouter à",
-      "ImportAsNew": "Importer comme nouvelle liste"
+      "ImportAsNew": "Importer comme nouvelle liste",
+      "MissingCountry": "Votre pays n'y figure pas ? {link}",
+      "MissingCountryLink": "Ajoutez une liste pour lui"
     },
     "lists": {
       "Tab": "Listes",
@@ -1867,6 +2174,9 @@
       "germany": "Essentiels Allemagne",
       "albania": "Essentiels Albanie",
       "kosovo": "Essentiels Kosovo",
+      "thailand": "Essentiels Thaïlande",
+      "mexico": "Essentiels Mexique",
+      "greece": "Essentiels Grèce",
       "ai": "Services IA",
       "social": "Réseaux sociaux",
       "productivity": "Travail et productivité",
@@ -2045,7 +2355,7 @@
     "DNSResolver": "Ouvrir le Résolution DNS",
     "IPCheck": "Vérification IP",
     "ToggleInfoMask": "Masquer/Démasquer les informations",
-    "IPHistory": "Ouvrir l'historique des IP",
+    "Snapshots": "Ouvrir la page Historique des instantanés",
     "ShareReport": "Ouvrir le partage de rapport",
     "Help": "Afficher les raccourcis clavier",
     "HelpNote": "Les personnes qui utilisent des raccourcis clavier sont vraiment géniales !",
@@ -2061,6 +2371,7 @@
     "EnhancedDnsLeakTest": "Ouvrir le Test de fuite DNS approfondi",
     "MacChecker": "Ouvrir le Recherche de MAC",
     "IpCalculator": "Ouvrir le Calculateur IP",
+    "BulkLookup": "Ouvrir la Recherche IP groupée",
     "BrowserInfo": "Ouvrir l'Info du navigateur",
     "AdblockTest": "Ouvrir le Test de blocage des pubs et traceurs",
     "SecurityChecklist": "Ouvrir la Liste de sécurité",
@@ -2078,16 +2389,20 @@
     "copyRightLinkName": "IPCheck.ing"
   },
   "helpModal": {
-    "Title": "Raccourcis"
+    "Title": "Raccourcis",
+    "HomeOnly": "Tous les raccourcis ne fonctionnent que sur la page d'accueil."
   },
   "footer": {
     "Tagline": "Une boîte à outils de confidentialité tout-en-un, gratuite et open source.",
     "Project": "Projet",
     "Support": "Documentation et support",
+    "ShortcutGuide": "Raccourcis clavier",
     "DeveloperDocs": "Documentation développeur",
     "SelfHosting": "Guide d'auto-hébergement",
     "ReportIssue": "Signaler un problème",
-    "License": "Licence MIT",
+    "FeatureRequest": "Suggérer une fonctionnalité",
+    "License": "Licence AGPL-3.0",
+    "Contribute": "Contribuer",
     "Clients": "Clients",
     "Raycast": "Extension Raycast",
     "Lite": "Édition Lite"

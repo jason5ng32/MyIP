@@ -441,7 +441,7 @@ import {
     peeringEnumKey, peeringHero, peeringFacts, formatPortSpeed, exchangeRows, facilityRows, hasPeeringCard, visibleRows,
 } from '@/utils/ip/asn-profile-view.js';
 import { formatIsoDate } from '@/utils/time-utils.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import AsnConnectionQuality from '@/components/ip-infos/AsnConnectionQuality.vue';
 import AsnTrafficShares from '@/components/ip-infos/AsnTrafficShares.vue';
 import CopyButton from '@/components/widgets/CopyButton.vue';
@@ -454,7 +454,7 @@ import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-// Heavy (dagre + SVG) — async, as IpDetailPanel loads it.
+// Heavy (dagre + SVG) — async, as IpAsnBlock loads it.
 const ASNConnectivity = defineAsyncComponent(() => import('@/components/ip-infos/ASNConnectivity.vue'));
 
 const { t, locale } = useI18n();

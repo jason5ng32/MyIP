@@ -1,6 +1,6 @@
 // ASN summary from Cloudflare Radar (`/api/cfradar?view=asn`) with a
 // per-owner session cache keyed 'AS<n>'. Owners (IpInfos, QueryIP) each
-// create their own cache with useAsnInfo(); IpDetailPanel fills whichever
+// create their own cache with useAsnInfo(); IpAsnBlock fills whichever
 // cache it is handed through loadAsnInfoInto().
 //
 // Relative imports keep this file importable from the Node test runner.
@@ -19,7 +19,8 @@ export const loadAsnInfoInto = async (cache, asn) => {
     try {
         if (cache[asn]) return cache[asn];
         const asnNumber = asn.replace('AS', '');
-        const response = await fetchWithTimeout(asnInfoUrl(asnNumber));
+        // Above the backend's 12 s Radar timeout, so a cold ASN still answers.
+        const response = await fetchWithTimeout(asnInfoUrl(asnNumber), { timeoutMs: 15000 });
         const data = await response.json();
         cache['AS' + asnNumber] = data;
         return data;

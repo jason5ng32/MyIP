@@ -1,0 +1,187 @@
+<template>
+    <Dialog :open="open" @update:open="setOpen">
+        <DialogContent :title="t('ipcheck.Title')" class="max-w-2xl min-h-50">
+            <DialogHeader :icon="Search" :title="t('ipcheck.Title')" />
+
+            <div class="space-y-4">
+                <!-- Input Group -->
+                <div class="flex items-center gap-2">
+                    <Input type="text" id="inputIP" name="inputIP" :placeholder="t('ipcheck.Placeholder')"
+                        v-model="inputIP" @keyup.enter="submitQuery" :aria-invalid="modalQueryError !== ''"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-1p-ignore
+                        data-lpignore="true" class="font-mono" />
+                    <Button id="sumitQueryButton" type="button" variant="action"
+                        :disabled="!isValidIP(inputIP) || isChecking === 'running'" @click="submitQuery"
+                        class="cursor-pointer">
+                        <Spinner v-if="isChecking === 'running'" />
+                        <template v-else>
+                            <Search class="size-4 shrink-0" />
+                        </template>
+                    </Button>
+                </div>
+
+                <!-- Error message -->
+                <p v-if="modalQueryError" class="text-sm text-destructive">{{ modalQueryError }}</p>
+
+                <!-- Query result: Hero IP (no Copy / Map) + shared IpDetailPanel -->
+                <div v-if="modalQueryResult" class="rounded-lg border bg-card overflow-hidden">
+                    <div class="px-4 py-3 flex items-start gap-2 min-w-0 border-b mb-4">
+                        <FitText :text="modalQueryResult.ip" :tiers="HERO_TIERS" :title="modalQueryResult.ip" :max-lines="2"
+                            class="font-mono font-semibold min-w-0">
+                            <template #prefix>
+                                <Monitor class="inline size-5 align-middle text-muted-foreground mr-2 mb-1" />
+                            </template>
+                        </FitText>
+                    </div>
+
+                    <IpDetailPanel :data="modalQueryResult" :ip-geo-source="ipGeoSource" :asn-infos="asnInfos"
+                        :asn-history-infos="asnHistoryInfos" :asn-connectivity-infos="asnConnectivityInfos"
+                        :configs="configs" :is-dark-mode="isDarkMode" map-mode="inline"
+                        country-traffic-mode="inline" @view-usage="setOpen(false)"
+                        @open-tool="setOpen(false)" />
+                </div>
+            </div>
+        </DialogContent>
+    </Dialog>
+</template>
+
+<script setup>
+// QueryIPDialog — manual IP lookup dialog, opened by Home's QueryIP FAB and by
+// tool pages (Bulk IP Lookup's row details). Shares IpDetailPanel with IPCard
+// so the info display stays in sync. Differences from IPCard:
+// - No Copy button (the IP was typed by the user — copying it is pointless).
+// - Map & country-traffic expand inline instead of opening dialogs (this IS a Dialog already).
+// - The panel's "view usage" / open-tool links close this dialog first, for the same reason.
+// - Own asnInfos / asnHistoryInfos caches (local to this component; not shared with IPCard);
+//   asnInfos comes from useAsnInfo().
+// An `ip` prop prefills and runs the query on open; each answer is emitted as
+// `result` ({ ip, sourceId, data }).
+import { ref, computed, watch, nextTick } from 'vue';
+import { useMainStore } from '@/store';
+import { isValidIP, isUsablePublicIP } from '@/utils/ip/valid-ip.js';
+import { toApiTag } from '@/utils/locale-registry.js';
+import FitText from '@/components/widgets/FitText.vue';
+import { HERO_TIERS } from '@/composables/use-fit-text.js';
+import { transformDataFromIPapi } from '@/utils/ip/transform-ip-data.js';
+import { useI18n } from 'vue-i18n';
+import { authenticatedFetch, fetchErrorLabel, logSourceFetchFailure } from '@/utils/authenticated-fetch';
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import IpDetailPanel from '../ip-infos/IpDetailPanel.vue';
+import { useAsnInfo } from '@/composables/use-asn-info.js';
+import { createLatestRequest } from '@/utils/latest-request.js';
+import { Monitor, Search } from '@lucide/vue';
+
+const props = defineProps({
+    open: { type: Boolean, default: false },
+    ip: { type: String, default: '' },
+});
+const emit = defineEmits(['update:open', 'result']);
+
+const { t } = useI18n();
+
+const store = useMainStore();
+const userPreferences = computed(() => store.userPreferences);
+const configs = computed(() => store.configs);
+const isDarkMode = computed(() => store.isDarkMode);
+const lang = computed(() => store.lang);
+
+const inputIP = ref('');
+const modalQueryResult = ref(null);
+const modalQueryError = ref('');
+const isChecking = ref('idle');
+const ipGeoSource = ref(userPreferences.value.ipGeoSource);
+const { asnInfos } = useAsnInfo();
+const asnHistoryInfos = ref({});
+const asnConnectivityInfos = ref({});
+// Latest query wins: a superseded one (another IP opened mid-fetch) writes nothing.
+const request = createLatestRequest();
+
+watch(() => userPreferences.value.ipGeoSource, (newVal) => {
+    ipGeoSource.value = newVal;
+}, { deep: true });
+
+// Emptying the box retracts whatever the last attempt complained about —
+// the message no longer describes anything on screen.
+watch(inputIP, (value) => {
+    if (value.trim() === '') modalQueryError.value = '';
+});
+
+const rejectQuery = (message) => {
+    request.cancel();
+    modalQueryError.value = message;
+    modalQueryResult.value = null;
+    isChecking.value = 'idle';
+};
+
+const submitQuery = async () => {
+    if (!isValidIP(inputIP.value)) return rejectQuery(t('ipcheck.Error'));
+    // Only publicly routable space has geolocation, so answer here rather
+    // than walking every geo source to collect the same "no data" from each.
+    if (!isUsablePublicIP(inputIP.value)) return rejectQuery(t('ipcheck.reservedIP'));
+
+    modalQueryError.value = '';
+    modalQueryResult.value = null;
+    isChecking.value = 'running';
+    await fetchIPForModal(inputIP.value);
+};
+
+const setOpen = (val) => emit('update:open', val);
+
+const fetchIPForModal = async (ip) => {
+    const call = request.start(ip);
+    const selectedLang = toApiTag(lang.value);
+    const sources = store.ipDBs.filter(s => s.enabled);
+
+    // Cyclic walk from the user's preferred source
+    // Fallback fires only on real failures (network error, 4xx/5xx,
+    // transform throwing). A 200 response that contains "N/A" fields
+    // means the upstream is healthy but doesn't know the IP — display
+    // those as-is rather than walking to the next source.
+    const startIdx = Math.max(0, sources.findIndex(s => s.id === ipGeoSource.value));
+    let currentIdx = startIdx;
+    let attempts = 0;
+
+    while (attempts < sources.length) {
+        const source = sources[currentIdx];
+        try {
+            const url = store.getDbUrl(source.id, ip, selectedLang);
+            const response = await authenticatedFetch(url);
+            if (!call.isCurrent()) return;
+            modalQueryResult.value = { ...transformDataFromIPapi(response, source.id, t, lang.value), ip };
+            isChecking.value = 'idle';
+            call.done();
+            emit('result', { ip, sourceId: source.id, data: modalQueryResult.value });
+            return;
+        } catch (error) {
+            if (!call.isCurrent()) return;
+            logSourceFetchFailure(`Error fetching IP details from source ${source.id} (${fetchErrorLabel(error)}):`, error);
+            currentIdx = (currentIdx + 1) % sources.length;
+            attempts++;
+        }
+    }
+
+    // Every source exhausted with real failures — surface a user-facing
+    // error instead of leaving the spinner running forever.
+    call.done();
+    isChecking.value = 'idle';
+    modalQueryError.value = t('ipcheck.NoData');
+};
+
+// On open: a given IP is queried (unless already on screen or in flight),
+// otherwise the input takes focus.
+watch(() => [props.open, props.ip], ([open, ip]) => {
+    if (!open) return;
+    if (ip) {
+        inputIP.value = ip;
+        if (modalQueryResult.value?.ip !== ip && request.pendingKey() !== ip) submitQuery();
+        return;
+    }
+    nextTick(() => {
+        const inputElement = document.getElementById('inputIP');
+        if (inputElement) inputElement.focus();
+    });
+}, { immediate: true });
+</script>

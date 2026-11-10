@@ -173,7 +173,7 @@ import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent } from '@/utils/app-events';
 import { useGlobalpingMeasurement, GLOBALPING_SUGGESTED_COUNTRIES, GLOBALPING_MAX_COUNTRIES, selectableIPs, classifyTarget } from '@/composables/use-globalping-measurement';
 import GlobalpingCountryPicker from './GlobalpingCountryPicker.vue';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

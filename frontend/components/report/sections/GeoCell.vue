@@ -8,11 +8,11 @@
 <script setup>
 // Flag + localized country name (+ optional "region · city" detail) — the
 // standard geo cell used across the report tables. Country names resolve in
-// the VIEWER's locale via Intl (data/country-name.js).
+// the VIEWER's locale via Intl (utils/country-name.js).
 import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 import { useMainStore } from '@/store';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 
 const props = defineProps({
     code: { type: String, default: '' },

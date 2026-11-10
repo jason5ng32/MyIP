@@ -1,4 +1,6 @@
-import getCountryName from '../../data/country-name.js';
+import getCountryName from '../country-name.js';
+import { normalizeScenarios } from './scenario-friction.js';
+import { ANONYMITY_I18N_KEYS, IP_TYPE_I18N_KEYS, IP_TYPE_UNKNOWN_KEY } from '../codes/ip-labels.js';
 
 // The static map renders at zoom 3 (continent scale), where ~0.176° spans a
 // single pixel. Quantizing the request coords to 1 decimal (~0.1°, sub-pixel)
@@ -52,26 +54,20 @@ function transformDataFromIPapi(data, ipGeoSource, t, mapLanguage) {
 
 // Gated sentinels the backend may substitute for the real advanced fields:
 // signed-out visitors get 'sign_in_required', over-quota users get
-// 'quota_exceeded'. Both propagate as-is so the UI can pick the right CTA.
-const gatedSentinel = (value) =>
-    value === 'sign_in_required' || value === 'quota_exceeded' ? value : null;
+// 'quota_exceeded', and an account whose advanced data is paused for a while
+// gets 'cooldown'. All propagate as-is so the UI can pick the right CTA.
+const GATED_SENTINELS = new Set(['sign_in_required', 'quota_exceeded', 'cooldown']);
+const gatedSentinel = (value) => (GATED_SENTINELS.has(value) ? value : null);
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
-// Anonymity verdict code → display text key: one map for the card and the
-// report renderer (ReportIpinfo.vue), so the two can't disagree. The codes
-// themselves live in the report schema (ANONYMITY_CODES).
-export const ANONYMITY_I18N_KEYS = {
-    tor: 'ipInfos.anonymity.tor',
-    relay: 'ipInfos.anonymity.relay',
-    residential: 'ipInfos.anonymity.residential',
-    suspected_residential: 'ipInfos.anonymity.suspectedResidential',
-    proxy: 'ipInfos.anonymity.proxy',
-    proxy_suspected: 'ipInfos.anonymity.proxySuspected',
-    vpn: 'ipInfos.anonymity.vpn',
-    vpn_suspected: 'ipInfos.anonymity.vpnSuspected',
-    none: 'ipInfos.anonymity.none',
-};
+// Every key extractAdvancedData adds to a card: a card reset to its defaults
+// clears them, so a later answer from another source can't inherit them.
+export const ADVANCED_CARD_FIELDS = Object.freeze([
+    'anonymity', 'anonymityCode', 'anonymityProvider', 'anonymityProtocol',
+    'type', 'qualityScore', 'isNativeIP', 'ipTypeCode',
+    'scoreTags', 'scoreDimensions', 'scoreVersion', 'frictionScenarios',
+]);
 
 // Anonymizing service / protocol the API named: null when absent or gated.
 const optionalName = (value) => (typeof value === 'string' && value && !gatedSentinel(value) ? value : null);
@@ -96,11 +92,13 @@ function extractAdvancedData(advancedData = {}, t) {
     const scoreTags = isPlainObject(advancedData.tags) ? advancedData.tags : undefined;
     const scoreDimensions = isPlainObject(advancedData.dimensions) ? advancedData.dimensions : undefined;
     const scoreVersion = Number.isFinite(advancedData.scoreVersion) ? advancedData.scoreVersion : undefined;
+    // Scenario friction items; null when the answer carries none.
+    const frictionScenarios = normalizeScenarios(advancedData.scenarios);
 
     return {
         anonymity, anonymityCode, anonymityProvider, anonymityProtocol,
         type, qualityScore, isNativeIP, ipTypeCode,
-        scoreTags, scoreDimensions, scoreVersion,
+        scoreTags, scoreDimensions, scoreVersion, frictionScenarios,
     };
 }
 
@@ -131,22 +129,11 @@ function determineTypeCode(advancedData) {
 }
 
 // Determine proxy type
-function determineType(advancedData, t) {
+const determineType = (advancedData, t) => {
     if (gatedSentinel(advancedData.operatorType)) {
         return advancedData.operatorType;
     }
-    switch (advancedData.operatorType) {
-        case 'Business':
-            return t('ipInfos.advancedData.type.Business');
-        case 'Residential':
-            return t('ipInfos.advancedData.type.Residential');
-        case 'Wireless':
-            return t('ipInfos.advancedData.type.Wireless');
-        case 'Hosting':
-            return t('ipInfos.advancedData.type.Hosting');
-        default:
-            return t('ipInfos.advancedData.type.unknownType');
-    }
-}
+    return t(IP_TYPE_I18N_KEYS[determineTypeCode(advancedData)] ?? IP_TYPE_UNKNOWN_KEY);
+};
 
 export { transformDataFromIPapi, extractAdvancedData };

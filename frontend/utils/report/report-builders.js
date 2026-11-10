@@ -7,7 +7,14 @@
 // holds nothing worth reporting.
 
 import { isValidIP } from '../ip/valid-ip.js';
-import { CONNECTIVITY_STATUS, ANONYMITY_CODES } from './report-schema.js';
+// Code lists, each from the domain that records it (bridges over common/).
+import {
+    ANONYMITY_CODES, IP_TYPE_CODES, ABUSE_LEVELS, SCENARIO_FRICTION_IDS, SCENARIO_FRICTION_LEVELS,
+} from '../codes/ip.js';
+import { CONNECTIVITY_STATUS } from '../codes/connectivity.js';
+import { NAT_TYPE_CODES } from '../codes/webrtc.js';
+import { SPEEDTEST_QUALITIES } from '../codes/speedtest.js';
+import { PERSONA_VERDICT, PERSONA_AXIS, PERSONA_GRADE } from '../codes/persona.js';
 
 // --- small shared normalizers ----------------------------------------------
 
@@ -39,21 +46,35 @@ const compact = (obj) => {
 
 // --- per-section builders ---------------------------------------------------
 
-// ipinfo:finished — { cards: [{ source, ip, country_code, region, city,
+// ipinfo:finished — { cards: [{ id, source, ip, country_code, region, city,
 // timezone, asn, isp, anonymityCode?, ipTypeCode?, isNativeIP?, qualityScore?,
-// anonymityProtocol?, anonymityProvider? }] }. Cards whose ip never resolved
+// anonymityProtocol?, anonymityProvider?, abuseLevel?, frictionScenarios? }] }. Cards whose ip never resolved
 // (placeholder text in the slot) are dropped. The optional enrichments only
 // exist on the IPCheck.ing source and stay absent when gated
-// ('sign_in_required' / 'quota_exceeded' upstream values never turn into
-// codes — see transform-ip-data.js). An 'unknown' line type is noise in a
-// report ("Unknown type" says nothing) — dropped like absent.
+// ('sign_in_required' / 'quota_exceeded' / 'cooldown' upstream values never
+// turn into codes — see transform-ip-data.js). An 'unknown' line type is noise in a
+// report ("Unknown type" says nothing) — dropped like absent. `id` is the
+// card's fixed slot (`source` follows the provider that answered).
 const ANONYMITY_CODE_SET = new Set(ANONYMITY_CODES);
-const IP_TYPE_CODES = new Set(['business', 'residential', 'wireless', 'hosting']);
+const IP_TYPE_CODE_SET = new Set(IP_TYPE_CODES);
+// Scenario friction `[{ id, level }]` → `{ [id]: level }`, known ids and levels
+// only; absent when none survive. Local-only: Snapshots keep it, the share
+// export strips it.
+const frictionLevels = (scenarios) => {
+    if (!Array.isArray(scenarios)) return undefined;
+    const levels = {};
+    for (const item of scenarios) {
+        if (SCENARIO_FRICTION_IDS.includes(item?.id) && SCENARIO_FRICTION_LEVELS.includes(item?.level)
+            && !(item.id in levels)) levels[item.id] = item.level;
+    }
+    return Object.keys(levels).length ? levels : undefined;
+};
 const buildIpinfo = (payload) => {
     const cards = (payload?.cards ?? [])
         .filter((card) => isValidIP(card?.ip))
         .slice(0, 8)
         .map((card) => compact({
+            id: clip(card.id, 32),
             source: clip(card.source, 64) ?? '',
             ip: card.ip,
             countryCode: countryCode(card.country_code),
@@ -65,16 +86,21 @@ const buildIpinfo = (payload) => {
             asn: clip(card.asn, 16),
             isp: clip(card.isp, 128),
             anonymity: ANONYMITY_CODE_SET.has(card.anonymityCode) ? card.anonymityCode : undefined,
-            ipType: IP_TYPE_CODES.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
+            ipType: IP_TYPE_CODE_SET.has(card.ipTypeCode) ? card.ipTypeCode : undefined,
             nativeIP: typeof card.isNativeIP === 'boolean' ? card.isNativeIP : undefined,
             qualityScore: finiteNum(Number(card.qualityScore), 0, 100),
             anonymityProtocol: clip(card.anonymityProtocol || undefined, 32),
             anonymityProvider: clip(card.anonymityProvider || undefined, 64),
+            abuseLevel: ABUSE_LEVELS.includes(card.abuseLevel) ? card.abuseLevel : undefined,
+            scenarios: frictionLevels(card.frictionScenarios),
         }));
     return cards.length ? { cards } : null;
 };
 
-// connectivity:finished — { targets: [{ id, name, custom, statusCode, time, mintime }] }
+// connectivity:finished — { settled, targets: [{ id, name, custom, statusCode, time, mintime }] }
+// The whole grid, on every change to its results; `settled` (false while
+// requests are in flight or rounds are left) is the snapshot recorder's;
+// the report ignores it.
 // statusCode is the locale-free enum the component records next to its
 // localized status label; targets still waiting carry none and are dropped.
 const CONNECTIVITY_STATUSES = new Set(Object.values(CONNECTIVITY_STATUS));
@@ -97,7 +123,7 @@ const buildConnectivity = (payload) => {
 
 // webrtc:finished — { servers: [{ id, url, ip, natTypeCode, country_code, org }] }
 // org is only trusted when a geo lookup landed (country_code recorded with it).
-const NAT_TYPES = new Set(['host', 'srflx', 'prflx', 'relay', 'unknown', 'unavailable', 'error']);
+const NAT_TYPES = new Set(NAT_TYPE_CODES);
 const buildWebrtc = (payload) => {
     const servers = (payload?.servers ?? [])
         .filter((server) => NAT_TYPES.has(server?.natTypeCode))
@@ -144,7 +170,7 @@ const buildDnsleak = (payload) => {
 
 // speedtest:finished — thickened payload; numeric fields may be '-' until
 // measured, which finiteNum turns into an absent key.
-const QUALITIES = new Set(['bad', 'poor', 'average', 'good', 'great']);
+const QUALITIES = new Set(SPEEDTEST_QUALITIES);
 const quality = (value) => (QUALITIES.has(value) ? value : undefined);
 const buildSpeedtest = (payload) => {
     if (!payload) return null;
@@ -353,11 +379,9 @@ const buildEnhanceddnsleak = (payload) => {
 // a `detail` object per check (issuing bank, the country a shared position
 // resolved to, the zone and languages), which has no place behind a link
 // anyone can open, so it is dropped here rather than at render time.
-const PERSONA_GRADES = new Set(['A', 'B', 'C', 'D', 'unknown']);
-const PERSONA_AXES = new Set(['match', 'coherence', 'leak']);
-const PERSONA_VERDICTS = new Set([
-    'match', 'mismatch', 'leak', 'unnatural', 'unknown', 'not-applicable',
-]);
+const PERSONA_GRADES = new Set(Object.values(PERSONA_GRADE));
+const PERSONA_AXES = new Set(Object.values(PERSONA_AXIS));
+const PERSONA_VERDICTS = new Set(Object.values(PERSONA_VERDICT));
 const personaCount = (value) => clampInt(value, 0, 64) ?? 0;
 
 const buildPersona = (payload) => {

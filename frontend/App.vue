@@ -23,6 +23,7 @@
 <script setup>
 import { watch, ref, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NavBar from '@/components/Nav.vue';
 import Alert from '@/components/widgets/Toast.vue';
@@ -30,6 +31,7 @@ import DocsAssistant from '@/components/widgets/DocsAssistant.vue';
 import { shouldOfferPwaInstall } from '@/utils/pwa.js';
 import { sendVisitBeacon } from '@/utils/features/pulse-beacon.js';
 import { useTheme } from '@/composables/use-theme.js';
+import { startFestivalSkin } from '@/composables/use-festival-skin.js';
 import { useMainStore } from '@/store';
 
 // PWA install prompt — async and eligibility-gated: ineligible visits (too
@@ -51,6 +53,8 @@ onMounted(() => {
 });
 import { useAchievementEngine } from '@/composables/use-achievement-engine.js';
 import { useReportCollector } from '@/composables/use-report-collector.js';
+import { useSnapshotRecorder } from '@/composables/use-snapshot-recorder.js';
+import { useSnapshotNotice } from '@/composables/use-snapshot-notice.js';
 import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 
 // A page change closes store.openSheet: a site-wide sheet would stay open over
@@ -85,6 +89,9 @@ if (loadingElement) {
 // Theme orchestration: initial apply, OS flip listener, preference watcher.
 useTheme();
 
+// Festival skin: logo, Pulse icon and nav trim while one is in window.
+startFestivalSkin();
+
 // Achievement engine: listens for domain events emitted across the app and
 // evaluates the rules in data/achievement-rules.js.
 useAchievementEngine();
@@ -92,6 +99,15 @@ useAchievementEngine();
 // Report collector: keeps the latest schema-shaped snapshot of every finished
 // test for the shareable diagnostic report.
 useReportCollector();
+
+// Snapshot recorder: files the homepage sections into one snapshot per page
+// load (the Snapshots tool page reads them).
+useSnapshotRecorder({ store });
+
+// Snapshot change notice: a notable change from the previous snapshot, as a
+// queued toast that waits until the visitor is past the IP cards.
+const { t, locale } = useI18n();
+useSnapshotNotice({ store, t, locale });
 
 // Persona collector: same bus, different consumer — keeps the normalized
 // snapshots the Persona Check cross-references, so opening the tool costs no

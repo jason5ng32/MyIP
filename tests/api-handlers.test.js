@@ -10,6 +10,8 @@
 
 import assert from 'node:assert/strict';
 import { Writable } from 'node:stream';
+import fs from 'node:fs';
+import { Resolver } from 'node:dns/promises';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
 import configsHandler from '../api/configs.js';
@@ -29,6 +31,9 @@ import { describeMac } from '../server/datasets/oui-db.js';
 import { isCompleteProfile } from '../server/asn-profile.js';
 import updateAchievementHandler from '../api/update-user-achievement.js';
 import ipcheckIngHandler from '../api/ipcheck-ing.js';
+import { createBulkLookup } from '../api/bulk-lookup.js';
+import { BULK_LOOKUP_MAX_IPS } from '../common/bulk-lookup-limits.js';
+import { resolveBulkLookupSource, DEFAULT_BULK_LOOKUP_SOURCE } from '../server/bulk-lookup-sources.js';
 import { getSessionResult as dnsLeakGetResult } from '../api/dns-leak-test.js';
 import ooniBlockingHandler from '../api/ooni-blocking.js';
 import globalpingProbesHandler from '../api/globalping-probes.js';
@@ -109,6 +114,12 @@ describe('configs handler', () => {
             assert.equal(typeof res.body[key], 'boolean');
         }
         assert.equal(res.body.originalSite, false);
+    });
+
+    it('names the bulk lookup source as a string', () => {
+        const res = createResponse();
+        configsHandler(createRequest(), res);
+        assert.equal(res.body.bulkLookupSource, 'maxmind');
     });
 
     it('honors the pre-rename env spellings as fallbacks', () => {
@@ -258,6 +269,27 @@ describe('dns-resolver handler', () => {
         await dnsResolverHandler(createRequest({ method: 'POST' }), res);
         assert.equal(res.statusCode, 405);
         assert.deepEqual(res.body, { message: 'Method Not Allowed' });
+    });
+
+    it('carries each row\'s status, and the failure code on N/A rows', async (t) => {
+        t.mock.method(Resolver.prototype, 'resolve4', async () => {
+            throw Object.assign(new Error('servfail'), { code: 'ESERVFAIL' });
+        });
+        globalThis.fetch = async () => new Response(JSON.stringify({
+            Status: 0, Answer: [{ type: 1, data: '192.0.2.1' }],
+        }), { status: 200 });
+        const res = createResponse();
+        await dnsResolverHandler(createRequest({ query: { hostname: 'example.test', type: 'A' } }), res);
+        assert.equal(res.statusCode, 200);
+        const udp = res.body.results.find((row) => row.type === 'udp');
+        const doh = res.body.results.find((row) => row.type === 'doh');
+        assert.deepEqual(
+            { result: udp.result, status: udp.status, code: udp.code },
+            { result: 'N/A', status: 'servfail', code: 'SERVFAIL' },
+        );
+        assert.deepEqual({ result: doh.result, status: doh.status }, { result: ['192.0.2.1'], status: 'ok' });
+        assert.equal('code' in doh, false);
+        for (const key of ['id', 'provider', 'country']) assert.ok(udp[key] && doh[key], key);
     });
 });
 
@@ -542,6 +574,32 @@ describe('cf-radar handler', () => {
         assert.deepEqual(res.body, { error: 'No country provided' });
     });
 
+    // Leaves the module-level outage feed empty: no other case here reads it.
+    it('answers 500 when an empty outage feed cannot fill on demand', async () => {
+        process.env.CLOUDFLARE_API_KEY = 'test-key';
+        const asked = [];
+        globalThis.fetch = async (url) => {
+            asked.push(new URL(String(url)).pathname);
+            return new Response('busy', { status: 503 });
+        };
+        const originalError = logger.error;
+        const logged = [];
+        logger.error = (ctx, msg) => logged.push(msg);
+        try {
+            const res = createResponse();
+            await cfRadarHandler(createRequest({ query: { view: 'outages' } }), res);
+            assert.equal(res.statusCode, 500);
+            assert.deepEqual(res.body, { error: 'Internal server error' });
+            assert.deepEqual(logged, ['cf-radar view failed']);
+            assert.deepEqual(asked.sort(), [
+                '/client/v4/radar/annotations/outages',
+                '/client/v4/radar/traffic_anomalies',
+            ]);
+        } finally {
+            logger.error = originalError;
+        }
+    });
+
     it('returns 500 when no Cloudflare API key is configured', async () => {
         delete process.env.CLOUDFLARE_API_KEY;
         delete process.env.CLOUDFLARE_API;
@@ -718,6 +776,132 @@ describe('mac-checker handler', () => {
         await createMacChecker(() => null)(createRequest({ query: { mac: '3C:5A:B4' } }), res);
         assert.equal(res.statusCode, 503);
         assert.deepEqual(res.body, { error: 'MAC database unavailable' });
+    });
+});
+
+// -- bulk-lookup handler --------------------------------------------------
+
+describe('bulk-lookup handler', () => {
+    // A fixture source, so no dataset needs to be loaded.
+    const lookups = [];
+    const fixtureSource = {
+        id: 'fixture',
+        build: () => '2026-10-20',
+        lookup: (ip, lang) => {
+            lookups.push([ip, lang]);
+            if (ip === '9.9.9.9') throw new Error('corrupt record');
+            return {
+                ip, city: 'Mountain View', region: 'California', country: 'US', country_name: 'United States',
+                country_code: 'US', latitude: 37.4, longitude: -122.1, asn: 'AS15169', org: 'GOOGLE',
+            };
+        },
+    };
+    const handler = createBulkLookup(() => fixtureSource);
+    const post = (body) => {
+        const res = createResponse();
+        handler(createRequest({ method: 'POST', body }), res);
+        return res;
+    };
+    beforeEach(() => { lookups.length = 0; });
+
+    it('rejects non-POST with 405', () => {
+        const res = createResponse();
+        handler(createRequest(), res);
+        assert.equal(res.statusCode, 405);
+    });
+
+    it('rejects a missing body, a non-array or an empty ips', () => {
+        assert.equal(post(undefined).statusCode, 400);
+        assert.equal(post({ ips: '8.8.8.8' }).statusCode, 400);
+        assert.equal(post({ ips: [] }).statusCode, 400);
+    });
+
+    it(`rejects more than ${BULK_LOOKUP_MAX_IPS} entries`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS + 1 }, (_, i) => `8.8.8.${i + 1}`);
+        assert.equal(BULK_LOOKUP_MAX_IPS, 200);
+        assert.equal(post({ ips }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it('rejects the whole request over one bad entry', () => {
+        for (const bad of [42, null, { ip: '8.8.8.8' }, `8.8.8.8${' '.repeat(40)}`, 'not-an-ip', '10.0.0.1', '2001:db8::1', ' 8.8.8.8']) {
+            assert.equal(post({ ips: ['1.1.1.1', bad] }).statusCode, 400, `accepted ${JSON.stringify(bad)}`);
+        }
+        assert.equal(lookups.length, 0);
+    });
+
+    it('rejects a non-string or overlong lang', () => {
+        assert.equal(post({ ips: ['8.8.8.8'], lang: 7 }).statusCode, 400);
+        assert.equal(post({ ips: ['8.8.8.8'], lang: 'x'.repeat(36) }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it(`accepts exactly ${BULK_LOOKUP_MAX_IPS} distinct IPs`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS }, (_, i) => `8.8.8.${i + 1}`);
+        assert.equal(post({ ips }).statusCode, 200);
+        assert.deepEqual(lookups.map(([ip]) => ip), ips);
+    });
+
+    it(`accepts ${BULK_LOOKUP_MAX_IPS} IPv6 in their longest canonical form`, () => {
+        const ips = Array.from({ length: BULK_LOOKUP_MAX_IPS }, (_, i) => `2a00:1450:4001:abcd:1234:5678:9abc:${(0x1000 + i).toString(16)}`);
+        assert.ok(ips.every((ip) => ip.length === 39));
+        assert.equal(post({ ips, lang: 'pt-BR' }).statusCode, 200);
+        assert.equal(lookups.length, BULK_LOOKUP_MAX_IPS);
+    });
+
+    it('a full request fits the route\'s own body limit in backend-server.js', () => {
+        const server = fs.readFileSync(new URL('../backend-server.js', import.meta.url), 'utf8');
+        const match = /'\/api\/bulk-lookup', express\.json\(\{ limit: '(\d+)kb' \}\)/.exec(server);
+        assert.ok(match, 'bulk-lookup body parser not found');
+        // Even at the handler's per-entry maximum, with the longest lang.
+        const body = JSON.stringify({ ips: Array(BULK_LOOKUP_MAX_IPS).fill('f'.repeat(45)), lang: 'x'.repeat(35) });
+        assert.ok(Buffer.byteLength(body) < Number(match[1]) * 1024, `${Buffer.byteLength(body)} bytes over ${match[1]}kb`);
+    });
+
+    it('rejects a repeated entry instead of deduping it', () => {
+        assert.equal(post({ ips: ['8.8.8.8', '1.1.1.1', '8.8.8.8'] }).statusCode, 400);
+        assert.equal(lookups.length, 0);
+    });
+
+    it('passes lang through raw and answers the compact shape', () => {
+        const res = post({ ips: ['8.8.8.8'], lang: 'zh' });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(lookups, [['8.8.8.8', 'zh']]);
+        assert.deepEqual(res.body, {
+            source: { id: 'fixture', build: '2026-10-20' },
+            results: [{
+                ip: '8.8.8.8', country: 'US', city: 'Mountain View', region: 'California',
+                latitude: 37.4, longitude: -122.1, asn: 'AS15169', org: 'GOOGLE',
+            }],
+        });
+    });
+
+    it('leaves out an IP whose lookup throws, keeping the rest', () => {
+        const res = post({ ips: ['9.9.9.9', '1.1.1.1'] });
+        assert.equal(res.statusCode, 200);
+        assert.deepEqual(res.body.results.map((r) => r.ip), ['1.1.1.1']);
+    });
+
+    it('answers 503 when the source has no data loaded', () => {
+        const notReady = createBulkLookup(() => ({
+            id: 'fixture',
+            lookup: () => { const e = new Error('not ready'); e.statusCode = 503; throw e; },
+        }));
+        const res = createResponse();
+        notReady(createRequest({ method: 'POST', body: { ips: ['8.8.8.8'] } }), res);
+        assert.equal(res.statusCode, 503);
+    });
+
+    it('resolves BULK_LOOKUP_SOURCE, falling back to maxmind on unknown values', () => {
+        assert.equal(resolveBulkLookupSource(undefined).source.id, DEFAULT_BULK_LOOKUP_SOURCE);
+        assert.deepEqual(
+            { ...resolveBulkLookupSource(' MaxMind '), source: undefined },
+            { name: 'maxmind', known: true, source: undefined },
+        );
+        const unknown = resolveBulkLookupSource('ipinfo');
+        assert.equal(unknown.known, false);
+        assert.equal(unknown.source.id, 'maxmind');
+        assert.equal(resolveBulkLookupSource('constructor').known, false);
     });
 });
 

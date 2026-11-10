@@ -1,17 +1,19 @@
-// Unified "state → visual" mapping: 4 tone levels share the same color scheme
+// Unified "state → visual" mapping: 5 tone levels share the same color scheme
 //
 //   wait     waiting/not executed     sky
 //   ok-fast  success + fast       green
+//   ok-mild  between fast and slow    light amber (half-strength --warning)
 //   ok-slow  success + slow       amber
 //   fail     failure/timeout       red
 //
 // Each module maps its business status (e.g. test.status === 'Available' && test.time < 200)
-// to these 4 tone levels, then calls dotClass(tone) / textClass(tone) to get the corresponding
+// to these tone levels, then calls dotClass(tone) / textClass(tone) to get the corresponding
 // Tailwind class. This way Connectivity / WebRTC / DnsLeak / future similar modules
 // all use the same visual language, and the color scheme is applied throughout the site.
 const dotColorMap = {
     'wait':    'bg-info',
     'ok-fast': 'bg-success',
+    'ok-mild': 'bg-warning/50',
     'ok-slow': 'bg-warning',
     'fail':    'bg-destructive',
 };
@@ -19,6 +21,7 @@ const dotColorMap = {
 const textColorMap = {
     'wait':    'text-muted-foreground',
     'ok-fast': 'text-success',
+    'ok-mild': 'text-warning/75',
     'ok-slow': 'text-warning',
     'fail':    'text-destructive',
 };

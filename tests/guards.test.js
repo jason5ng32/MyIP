@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import express from 'express';
+import logger from '../server/logger.js';
 
-import { requireReferer, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
+import { requireReferer, resetRefererRejectionLog, requirePublicIP, requireValidPrefix, requireValidDomain, requireValidProviderId, requireValidRecordType, requireValidReportId, requireValidCountry, requireValidASN, normalizeAsnQuery } from '../server/guards.js';
 
 // Minimal (req, res, next) stubs — just enough to observe what the
 // middleware does.
@@ -46,6 +48,46 @@ describe('requireReferer', () => {
         assert.equal(res.statusCode, 403);
         assert.equal(res.body.error, 'Access denied');
         assert.equal(nextCalled, false);
+    });
+
+    it('logs the first rejection per host at info, then stays quiet', () => {
+        const lines = [];
+        const originalInfo = logger.info;
+        logger.info = (...args) => lines.push(args);
+        resetRefererRejectionLog();
+        try {
+            const hit = (referer) => requireReferer(makeReq({ referer }), makeRes(), () => {});
+            hit('http://192.168.1.10:18966/');
+            hit('http://192.168.1.10:18966/tools');
+            hit('http://other.example/');
+            hit(undefined);
+            hit(undefined);
+            hit('http://localhost/');
+            assert.equal(lines.length, 3);
+            assert.deepEqual(lines[0][0], { host: '192.168.1.10' });
+            assert.match(lines[0][1], /"192\.168\.1\.10".*ALLOWED_DOMAINS/);
+            assert.deepEqual(lines[1][0], { host: 'other.example' });
+            assert.match(lines[2][0], /without a Referer/);
+        } finally {
+            logger.info = originalInfo;
+            resetRefererRejectionLog();
+        }
+    });
+
+    it('caps the hosts it remembers', () => {
+        let count = 0;
+        const originalInfo = logger.info;
+        logger.info = () => { count += 1; };
+        resetRefererRejectionLog();
+        try {
+            for (let i = 0; i < 80; i += 1) {
+                requireReferer(makeReq({ referer: `http://scan${i}.example/` }), makeRes(), () => {});
+            }
+            assert.equal(count, 50);
+        } finally {
+            logger.info = originalInfo;
+            resetRefererRejectionLog();
+        }
     });
 });
 
@@ -405,5 +447,49 @@ describe('normalizeAsnQuery', () => {
             assert.equal(nextCalled, true);
             assert.deepEqual(req.query, query);
         }
+    });
+});
+
+// Express 5 defines req.query as a prototype getter that re-parses the URL
+// on every read; a real request (never listening) catches rewrites that a
+// plain-object stub would keep.
+describe('guard rewrites on a real Express request', () => {
+    const app = express();
+    const makeExpressReq = (url) => {
+        const req = Object.create(app.request);
+        req.url = url;
+        req.headers = {};
+        return req;
+    };
+
+    it('reproduces the re-parsing getter', () => {
+        const req = makeExpressReq('/x?type=caa');
+        assert.notEqual(req.query, req.query);
+    });
+
+    for (const [name, guard, url, param, expected] of [
+        ['requireValidRecordType', requireValidRecordType(), '/x?type=caa', 'type', 'CAA'],
+        ['requireValidDomain', requireValidDomain(), '/x?domain=Example.COM', 'domain', 'example.com'],
+        ['requireValidASN', requireValidASN(), '/x?asn=AS013335', 'asn', '13335'],
+        ['normalizeAsnQuery', normalizeAsnQuery(), '/x?q=as13335', 'q', 'AS13335'],
+        ['requireValidCountry', requireValidCountry(), '/x?country=us', 'country', 'US'],
+    ]) {
+        it(`${name} rewrite survives a later req.query read`, () => {
+            const req = makeExpressReq(url);
+            let nextCalled = false;
+            guard(req, makeRes(), () => { nextCalled = true; });
+            assert.equal(nextCalled, true);
+            assert.equal(req.query[param], expected);
+        });
+    }
+
+    it('keeps both rewrites when chained like /api/dnsresolver', () => {
+        const req = makeExpressReq('/x?type=caa&hostname=Example.COM');
+        let calls = 0;
+        requireValidDomain('hostname')(req, makeRes(), () => { calls++; });
+        requireValidRecordType()(req, makeRes(), () => { calls++; });
+        assert.equal(calls, 2);
+        assert.deepEqual({ ...req.query }, { type: 'CAA', hostname: 'example.com' });
+        assert.equal(req.query, req.query);
     });
 });

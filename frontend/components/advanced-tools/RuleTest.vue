@@ -86,7 +86,7 @@ import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { emitAppEvent } from '@/utils/app-events.js';
 import { parseTrace } from '@/utils/ip/parse-trace.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
@@ -156,7 +156,7 @@ const fetchTrace = async (id, url) => {
             const geo = await lookupMaxmind(ip);
             ruleTests.value[id].org = geo ? geo.org : t('ruletest.StatusError');
             if (geo) {
-                // Back-fill details for the Globalping picker + IP history.
+                // Back-fill details for the Globalping picker.
                 IPArray.value = [...IPArray.value, {
                     ip,
                     country,

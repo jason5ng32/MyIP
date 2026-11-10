@@ -19,7 +19,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 An open-source, all-in-one IP toolbox: IP lookup from multiple sources, connectivity tests, WebRTC & DNS-leak detection, speed test, MTR, censorship checks, Whois, and more — self-hostable with one Docker command.
 
@@ -37,7 +37,7 @@ Feel free to bookmark the demo or deploy your own.
 
 * 🛜 **IP Cards**: Detects your IPv4 and IPv6 from multiple independent sources side by side — country, region, city, ASN, organization, and the IP's local time zone.
 * 🔍 **Query IP**: Looks up the same detailed information for any IP address you're curious about.
-* 🧾 **IP History**: Keeps a local record of the IPs you've been seen with, filterable by type and country — stored in your browser only.
+* 📸 **Snapshot History**: Each time the homepage opens, saves the results of its tests — IP information, connectivity, WebRTC, DNS leak test, speed test — as a snapshot. Compare any two and read the differences line by line, like a code diff; name or pin the ones that matter — stored in your browser only.
 * 🖥️ **Browser Fingerprint**: Calculates your browser fingerprint in multiple ways and shows what makes you identifiable.
 
 ### 🕵️ Leaks & Privacy
@@ -62,6 +62,7 @@ Feel free to bookmark the demo or deploy your own.
 * 📓 **Whois Search**: Performs Whois lookups for domain names, IP addresses, and AS numbers.
 * 🗄️ **MAC Lookup**: Identifies the vendor and details behind a physical address.
 * 🧮 **IP Calculator**: Subnet math, notation conversions and IPv6 interface details for any IP, prefix, range or list, computed locally.
+* 🧾 **Bulk IP Lookup**: Paste IP lists or raw server logs (Nginx, Apache, firewall, CDN…) to geolocate all their IPs at once.
 * 🛰️ **ASN Info & Upstream Topology**: Right on each IP card — AS details, historical announcements for the IP's prefix, and the upstream paths from its ASN to the Tier 1 backbone.
 * 🛂 **ASN Profile**: The full picture of any AS — registration with the raw Whois record, global rank and size, traffic and connection quality, where its IPv4 space is used, every announced prefix with its RPKI status, its upstreams, peers and customers, and the internet exchanges and data centers where it is present.
 * 📶 **Service Status**: Live availability of well-known services — Claude, OpenAI, GitHub, Cloudflare, and more — from their official status pages, with recent incidents.
@@ -182,9 +183,6 @@ As an open source project, I'm very grateful to the following sponsors for their
 
 **Sponsors**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — Residential proxies with 90M+ IPs, smart rotation and precise geo-targeting. From $0.55/GB, 10% off with code `RAPID10`</sub>
-
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
 <sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — High-quality rotating and static residential proxies, with 90M+ residential IPs across 220+ locations worldwide. It supports HTTP(S), SOCKS5, rotating and sticky sessions, with residential proxy plans starting at just $0.7/GB. Use code `PROXY90` for an additional 10% off.
 </sub>
@@ -210,4 +208,4 @@ Interested in sponsoring MyIP? [Become a sponsor](https://github.com/sponsors/ja
 
 ## 📄 License
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

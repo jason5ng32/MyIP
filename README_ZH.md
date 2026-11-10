@@ -22,7 +22,7 @@
 ![Docker Build and Push](https://github.com/jason5ng32/MyIP/actions/workflows/docker-image.yml/badge.svg?branch=main)
 [![CI](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jason5ng32/MyIP/actions/workflows/ci.yml)
 
-[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md)
+[English](README.md) | [简体中文](README_ZH.md) | [繁體中文](README_ZH-TW.md) | [Русский](README_RU.md) | [Français](README_FR.md) | [Português (BR)](README_PT-BR.md) | [Shqip](README_SQ.md) | [ไทย](README_TH.md) | [हिन्दी](README_HI.md) | [Türkçe](README_TR.md)
 
 一个开源的一站式 IP 工具箱：多来源 IP 查询、连通性测试、WebRTC 与 DNS 泄露检测、网速测试、MTR、封锁检测、Whois 等等 —— 一条 Docker 命令即可自行部署。
 
@@ -40,7 +40,7 @@
 
 * 🛜 **IP 卡片**：从多个相互独立的来源并列检测你的 IPv4 和 IPv6 —— 国家、地区、城市、ASN、组织，以及该 IP 所在地的时区。
 * 🔍 **IP 查询**：查询任意一个你感兴趣的 IP 地址的同样详细的信息。
-* 🧾 **IP 历史记录**：在本地记录你使用过的 IP，可按类型和国家筛选 —— 数据只存在你的浏览器里。
+* 📸 **快照记录**：每次打开首页时，把首页各项测试的结果（IP 信息、网络连通性、WebRTC、DNS 泄露测试、网速测试）保存为一份快照。任选两份对比，像代码 diff 一样逐行查看差异；重要的快照可以命名或固定 —— 数据只存在你的浏览器里。
 * 🖥️ **浏览器指纹**：用多种方式计算你的浏览器指纹，并展示是什么让你变得可被识别。
 
 ### 🕵️ 泄露与隐私
@@ -65,6 +65,7 @@
 * 📓 **Whois 查询**：对域名、IP 地址和 AS 号进行 Whois 查询。
 * 🗄️ **MAC 地址查询**：识别一个物理地址背后的厂商与详细信息。
 * 🧮 **IP 计算器**：对任意 IP、前缀、范围或列表做子网计算、进制转换与 IPv6 接口解读，全部本地完成。
+* 🧾 **IP 批量查询**：粘贴 IP 列表或服务器原始日志（Nginx、Apache、防火墙、CDN 等），快速查询所有 IP 的地理位置。
 * 🛰️ **ASN 信息与上游拓扑**：在每张 IP 卡片里直接展示 AS 详情、该 IP 前缀的历史宣告记录，以及其 ASN 到 Tier 1 骨干网的上游路径。
 * 🛂 **ASN 档案**：任意 AS 的完整档案 —— 注册信息与原始 Whois 记录、全球排名与规模、流量构成与连接质量、IPv4 地址分布在哪些国家、全部宣告前缀及其 RPKI 状态、上游 / 对等 / 客户网络，以及它接入的互联网交换中心和数据中心。
 * 📶 **服务可用性**：知名服务的实时可用状态 —— Claude、OpenAI、GitHub、Cloudflare 等 —— 数据来自它们的官方状态页，并附最近的事故。
@@ -185,9 +186,6 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **赞助商**
 
-<a href="https://www.rapidproxy.io/?ref=myip"><img src="https://res.ipcheck.ing/img/rapid_proxy_logo.png" alt="RapidProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.rapidproxy.io/?ref=myip">RapidProxy</a>** — 全球住宅代理服务，覆盖 9000 万+ 住宅 IP，支持智能轮换、稳定会话和精准地理定位，适用于代理测试、浏览器自动化及数据采集等场景。低至 $0.55/GB，使用 `RAPID10` 享 9 折优惠。</sub>
-
 <a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
 <sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — 提供高质量动态和静态住宅代理，拥有 9000 万+住宅 IP，覆盖全球 220+ 个地区，支持 HTTP(S)、SOCKS5 协议及动态轮换和粘性会话。动态住宅代理低至 $0.7/GB，使用优惠码 `PROXY90` 再享九折优惠。
 </sub>
@@ -213,4 +211,4 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 ## 📄 开源协议
 
-[MIT](LICENSE) © Jason Ng
+[AGPL-3.0](LICENSE) © Jason Ng

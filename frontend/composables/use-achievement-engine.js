@@ -44,7 +44,7 @@ export const useAchievementEngine = () => {
         if (!draining) drain();
     };
 
-    // Boot events (ipinfo:finished, iphistory:updated, …) can beat the remote
+    // Boot events (ipinfo:finished, user:info-loaded, …) can beat the remote
     // achievements snapshot (/api/getuserinfo). Evaluating the already-achieved
     // guard against the all-false initial state would re-toast and re-report
     // badges the account holds, so slugs whose rule fired pre-sync park here

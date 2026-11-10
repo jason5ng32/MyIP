@@ -201,7 +201,7 @@ import { useAppCommand } from '@/composables/use-app-command.js';
 import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { parseTrace } from '@/utils/ip/parse-trace.js';
-import getCountryName from '@/data/country-name.js';
+import getCountryName from '@/utils/country-name.js';
 import SpeedTestEngine from '@cloudflare/speedtest';
 import { createSpeedTestSession, getSpeedTestLiveValues } from '@/utils/features/speedtest-session.js';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
@@ -438,7 +438,7 @@ const loadConnection = async (currentRun) => {
     const connectionData = await connectionMethods.getIPFromSpeedTest();
     if (connectionData && currentRun === runId) {
       Object.assign(state.connection, connectionData);
-      // Feed the Globalping picker + IP history.
+      // Feed the Globalping picker.
       store.updateAllIPs([{ ip: connectionData.ip, country: connectionData.loc || '', location: connectionData.country || '' }]);
     }
   }

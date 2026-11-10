@@ -8,11 +8,15 @@
 
 <script setup>
 import { computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { useMainStore } from '@/store';
 import { Sonner, toast } from '@/components/ui/sonner';
+import { useToastQueue } from '@/composables/use-toast-queue.js';
+import { trackEvent } from '@/utils/analytics';
 
 const store = useMainStore();
 const alert = computed(() => store.alert);
+const router = useRouter();
 
 // Map old alertStyle (Bootstrap text-* class names) to sonner methods
 const STYLE_TO_TOAST = {
@@ -33,6 +37,35 @@ watch(alert, (newVal) => {
         duration: newVal.alertDuration || 2000,
     });
 }, { deep: true, immediate: true });
+
+// Queued toasts (store.queueToast): timing, in-place updates and `once` live
+// in use-toast-queue.js; this draws them. An action runs onClose itself —
+// sonner closes the toast after one without calling onDismiss.
+useToastQueue({
+    store,
+    dismiss: (id) => toast.dismiss(id),
+    show: (request, { onClose }) => {
+        const fn = STYLE_TO_TOAST[request.style] || toast.message;
+        const { action } = request;
+        fn(request.title, {
+            ...(request.id !== undefined ? { id: request.id } : {}),
+            description: request.message,
+            duration: request.duration || 2000,
+            onDismiss: onClose,
+            onAutoClose: onClose,
+            ...(action ? {
+                action: {
+                    label: action.label,
+                    onClick: () => {
+                        onClose();
+                        if (action.track) trackEvent(...action.track);
+                        if (action.to) router.push(action.to);
+                    },
+                },
+            } : {}),
+        });
+    },
+});
 </script>
 
 <!--

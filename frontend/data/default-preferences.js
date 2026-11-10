@@ -14,6 +14,8 @@ export const PREFS_STORAGE_KEY = 'userPreferences_v7';
 export const DEFAULT_PREFERENCES = Object.freeze({
   theme: 'auto', // auto | light | dark
   connectivityMultipleTests: true,
+  // Single-refresh mode only: on = an untimed warm-up request precedes the timed one.
+  connectivityDiscardFirstResult: true,
   simpleMode: false,
   // Per-module startup auto-run switches. IP info has no switch — it always
   // runs on load. See use-refresh-orchestrator.js.
@@ -23,9 +25,16 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   popupConnectivityNotifications: false,
   ipCardsToShow: 2,
   ipGeoSource: 0,
-  // Local IP-history recorder (see use-ip-history.js). Days: 1–30.
-  ipHistoryEnabled: true,
-  ipHistoryDays: 30,
+  // Snapshots of the homepage tests (see use-snapshot-recorder.js; options in
+  // utils/features/snapshots.js). Auto: 'smart' (a page load that differs
+  // notably from the latest snapshot) | 'every' (each page load) | 'off'.
+  // Label card: the 1-based IP card position an auto label names. Retention
+  // keeps the last N (10 / 50 / 100); kept snapshots are exempt. Notify: a
+  // toast when this visit differs notably from the previous snapshot.
+  snapshotsAuto: 'smart',
+  snapshotsNotify: true,
+  snapshotsLabelCard: 1,
+  snapshotsKeepLast: 50,
   lang: 'auto', // auto | zh | en | fr | ru
   // Multi-list Connectivity model: { schemaVersion, lists }. null until
   // first load — store.loadPreferences() runs it through sanitizeLists().
