@@ -5,8 +5,9 @@
 // attention gate (use-attention-gate.js); one whose id is already pending or
 // up replaces it (updating the toast in place); a `once` id that has closed
 // takes nothing more this page load; a cancel drops a pending one and
-// dismisses one that is up. `show(request, { onClose })` draws the toast and
-// calls onClose when it goes away; Toast.vue supplies it, with `dismiss(id)`.
+// dismisses one that is up (a `once` one then counts as closed).
+// `show(request, { onClose })` draws the toast and calls onClose when it
+// goes away; Toast.vue supplies it, with `dismiss(id)`.
 
 import { watch, onScopeDispose } from 'vue';
 import { createAttentionGate } from './use-attention-gate.js';
@@ -43,7 +44,10 @@ export const useToastQueue = ({ store, show, dismiss = () => {}, createGate = cr
         }
         if (request.cancel) {
             const entry = release(id);
-            if (entry?.up) dismiss(id);
+            if (entry?.up) {
+                if (entry.request.once) closed.add(id);
+                dismiss(id);
+            }
             return;
         }
         if (closed.has(id)) return;

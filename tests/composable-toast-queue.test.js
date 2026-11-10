@@ -2,8 +2,9 @@
 // drained in order; no `when` shows at once, a `when` waits for its gate;
 // the same id replaces a pending request and updates one that is up; a
 // closed `once` id takes nothing more, other ids show again; a cancel drops
-// a pending request (its gate stopped) and dismisses one that is up; requests
-// without an id just show. The browser gate itself is out of scope.
+// a pending request (its gate stopped) and dismisses one that is up (closing
+// a `once` one); requests without an id just show. The browser gate itself
+// is out of scope.
 
 import assert from 'node:assert/strict';
 import { describe, it, afterEach } from 'node:test';
@@ -95,6 +96,15 @@ describe('toast queue', () => {
         queue({ id: 'u', title: 'up' });
         queue({ id: 'u', cancel: true });
         assert.deepEqual(dismissed, ['u']);
+    });
+
+    it('a cancelled `once` toast that was up counts as closed', () => {
+        const { shown, dismissed, queue } = start();
+        queue({ id: 'n', title: 'once', once: true });
+        queue({ id: 'n', cancel: true });
+        queue({ id: 'n', title: 'again', once: true });
+        assert.deepEqual(shown, ['once']);
+        assert.deepEqual(dismissed, ['n']);
     });
 
     it('stops pending gates when its scope is disposed', () => {
