@@ -235,6 +235,10 @@ Every "business state → color" mapping goes through `use-status-tone.js`
 - **Tables vs lists** — real per-column header semantics → `<table>`;
   otherwise a bordered `<ul class="rounded-lg border bg-card divide-y">`.
 - **Dialog header** — the `<DialogHeader :icon :title />` primitive.
+- **Toasts** — an immediate one is `store.setAlert`; one that waits, updates
+  in place or shows once per page load is `store.queueToast` (plain object;
+  `when: { delayMs, reach }` = `use-attention-gate.js`, `action.to` a route),
+  run by `use-toast-queue.js` in `Toast.vue` — never feature code there.
 - **Site navigation** — one `Nav.vue` in `App.vue` above every route (fixed;
   `index.html` pads the body for it), never per page; `User` / `Preferences`
   sit beside it, one each. What a click does on the current route is
