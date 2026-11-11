@@ -254,7 +254,7 @@ import {
 } from '@/utils/features/snapshots.js';
 import { clampLabelCard } from '@/utils/features/snapshot-entry.js';
 import { LOCALES } from '@/utils/locale-registry.js';
-import { MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
+import { MINE_LIST_ID } from '@/data/connectivity-defaults.js';
 import { Sheet, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Switch } from '@/components/ui/switch';
