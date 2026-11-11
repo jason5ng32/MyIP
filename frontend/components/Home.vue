@@ -25,18 +25,18 @@
 // The homepage (`/`): every top-level section plus the Advanced Tools cards;
 // what every route shares lives in App.vue.
 //
-// Components — the test sections and the always-visible chrome load
-// synchronously; everything the first paint can't show (dialogs, the
-// below-fold Footer) is an async component so its code stays
-// out of the route chunk and out of the mount's critical path. Their
-// template refs are null until the chunk lands — consumers (use-shortcuts)
-// must optional-chain.
+// Components — the test sections and the always-visible chrome (including
+// the static Footer shell) load synchronously; dialogs and non-blocking dock
+// helpers are async components so their code stays out of the route chunk and
+// out of the mount's critical path. Their template refs are null until the
+// chunk lands — consumers (use-shortcuts) must optional-chain.
 import IPCheck from './IpInfos.vue';
 import Connectivity from './ConnectivityTest.vue';
 import WebRTC from './WebRtcTest.vue';
 import DNSLeaks from './DnsLeaksTest.vue';
 import SpeedTest from './SpeedTest.vue';
 import AdvancedTools from './Advanced.vue';
+import Footer from './Footer.vue';
 import InfoMask from './widgets/InfoMask.vue';
 import FloatingDock from './widgets/FloatingDock.vue';
 
@@ -44,7 +44,6 @@ import FloatingDock from './widgets/FloatingDock.vue';
 import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 
 // Async (off-critical-path) components
-const Footer = defineAsyncComponent(() => import('./Footer.vue'));
 const Achievements = defineAsyncComponent(() => import('./Achievements.vue'));
 const QueryIP = defineAsyncComponent(() => import('./widgets/QueryIP.vue'));
 const HelpModal = defineAsyncComponent(() => import('./widgets/Help.vue'));
