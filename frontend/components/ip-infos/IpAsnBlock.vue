@@ -61,15 +61,14 @@ import { loadAsnInfoInto } from '@/composables/use-asn-info.js';
 import { loadAsnHistoryInto } from '@/utils/ip/asn-history.js';
 import { loadAsnConnectivityInto } from '@/utils/ip/asn-connectivity.js';
 import { toBgpPrefix } from '@/utils/ip/bgp-prefix.js';
-import ASNInfo from './ASNInfo.vue';
-import ASNHistory from './ASNHistory.vue';
 import { JnTooltip } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { Building2, FolderClock, Info, Network } from '@lucide/vue';
 
-// ASNConnectivity is heavy (dagre + SVG render); async-import so it
-// only enters the bundle when a user opens the Connectivity panel.
+// ASN sub-panels only mount when the user expands Info / History / Connectivity.
+const ASNInfo = defineAsyncComponent(() => import('./ASNInfo.vue'));
+const ASNHistory = defineAsyncComponent(() => import('./ASNHistory.vue'));
 const ASNConnectivity = defineAsyncComponent(() => import('./ASNConnectivity.vue'));
 
 const { t } = useI18n();
