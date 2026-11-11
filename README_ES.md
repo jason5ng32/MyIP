@@ -186,10 +186,6 @@ Como proyecto de código abierto, estoy muy agradecido a los siguientes patrocin
 
 **Patrocinadores**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — Proxies residenciales rotativos y estáticos de alta calidad, con más de 90M de IP residenciales en más de 220 ubicaciones de todo el mundo. Admite HTTP(S), SOCKS5, sesiones rotativas y fijas, con planes de proxy residencial desde solo 0,7 $/GB. Usa el código `PROXY90` para un 10 % de descuento adicional.
-</sub>
-
 <a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
 <sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — ofrece proxies IPv4/IPv6 privados residenciales, móviles (4G/5G/LTE), de ISP y de centro de datos con soporte HTTP(S) y SOCKS5, más de 47M de IP residenciales en más de 220 ubicaciones, segmentación precisa por país/ciudad/ISP, un 99,7 % de tiempo de actividad y soporte 24/7. Los usuarios de MyIP pueden usar el código promocional `CHECKINGIP15` para obtener un 15 % de descuento.
 </sub>
