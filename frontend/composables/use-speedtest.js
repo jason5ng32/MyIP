@@ -2,6 +2,7 @@
 import {
   computed, getCurrentScope, markRaw, nextTick, onScopeDispose, reactive, ref, toValue,
 } from 'vue';
+import { useStatusTone } from './use-status-tone.js';
 import { trackEvent } from '../utils/analytics.js';
 import { emitAppEvent } from '../utils/app-events.js';
 import { fetchWithTimeout } from '../utils/fetch-with-timeout.js';
@@ -87,22 +88,30 @@ export const useSpeedTest = ({
     return 'ping';
   });
 
-  const metricColorClass = computed(() => {
-    if (isIdle.value || state.speedTest.isDrawing) return 'text-muted-foreground/45';
-    if (isPaused.value) return 'text-warning';
-    if (isRunning.value) return 'text-info';
-    if (isFinished.value) return 'text-success';
-    if (isError.value) return 'text-destructive';
-    return '';
+  const { dotClass, textClass } = useStatusTone();
+
+  const runTone = computed(() => {
+    if (isFinished.value) return 'ok-fast';
+    if (isError.value) return 'fail';
+    if (isPaused.value) return 'ok-slow';
+    if (isRunning.value) return 'wait';
+    return null;
   });
 
-  const progressIndicatorClass = computed(() => {
-    if (isFinished.value) return 'bg-success';
-    if (isError.value) return 'bg-destructive';
-    if (isPaused.value) return 'bg-warning';
-    if (isRunning.value) return 'bg-info';
-    return 'bg-border';
+  const statusDotClass = computed(() => (
+    runTone.value ? dotClass(runTone.value) : 'bg-muted-foreground/35'
+  ));
+
+  const metricColorClass = computed(() => {
+    if (isIdle.value || state.speedTest.isDrawing) return 'text-muted-foreground/45';
+    // `textClass('wait')` is muted for static text placeholders; live numeric readouts stay `text-info`.
+    if (isRunning.value) return 'text-info';
+    return runTone.value ? textClass(runTone.value) : '';
   });
+
+  const progressIndicatorClass = computed(() => (
+    runTone.value ? dotClass(runTone.value) : 'bg-border'
+  ));
 
   const isMetricActive = (key) => {
     if (!isRunning.value || state.speedTest.isDrawing) return false;
@@ -114,13 +123,34 @@ export const useSpeedTest = ({
     return false;
   };
 
+  const metricDotClass = (key) => {
+    if (isMetricActive(key)) return dotClass('wait');
+    if (isPaused.value) return dotClass('ok-slow');
+    if (isFinished.value && state.speedTest[key] !== '-') return dotClass('ok-fast');
+    return 'bg-border';
+  };
+
   // --- Connection & Engine Methods ------------------------------------------
 
   const connectionMethods = {
     async getIPFromSpeedTest() {
+      // Browser privacy extensions frequently block /cdn-cgi/trace while still
+      // allowing __down / __up; keep network/block failures at console.warn so
+      // visitor-side filters do not trigger Sentry error captures.
+      let data;
       try {
         const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
-        const data = await response.text();
+        if (!response.ok) {
+          console.warn(`Error fetching IP from SpeedTest Server: HTTP ${response.status}`);
+          return null;
+        }
+        data = await response.text();
+      } catch (error) {
+        console.warn('Error fetching IP from SpeedTest Server:', error);
+        return null;
+      }
+
+      try {
         const { ip, colo, loc } = parseTrace(data);
 
         if (!isValidIP(ip)) {
@@ -277,12 +307,8 @@ export const useSpeedTest = ({
         ?? summary.totalDurationMs
         ?? 0;
 
-      // Inject optimistic 0% packet loss since TURN packetLoss is not run.
-      const origGetSummary = results.getSummary.bind(results);
-      const summaryForScores = () => ({ ...origGetSummary(), packetLoss: 0 });
-      results.getSummary = summaryForScores;
       const scores = results.getScores();
-      const cloudSync = computeCloudSyncScore(summaryForScores(), {
+      const cloudSync = computeCloudSyncScore(summary, {
         includePacketLoss: Boolean(results?.raw?.packetLoss),
       });
       if (scores?.streaming) {
@@ -433,8 +459,10 @@ export const useSpeedTest = ({
     isError,
     estimatedTotalMB,
     progressLabel,
+    statusDotClass,
     progressIndicatorClass,
     metricColorClass,
+    metricDotClass,
     linkFlow,
     isMetricActive,
     connectionMethods,

@@ -77,7 +77,7 @@
 
           <Transition name="st-meta-swap">
             <SpeedTestTopology
-              v-if="!isIdle && !state.speedTest.isDrawing && state.connection.colo"
+              v-if="!isIdle && !state.speedTest.isDrawing"
               class="order-2 md:order-1 w-full md:w-auto md:pt-1"
               :connection="state.connection"
               :flow="linkFlow" />
@@ -90,9 +90,10 @@
             <div class="flex items-center gap-2 min-w-0">
               <span class="relative inline-flex size-2 shrink-0" aria-hidden="true">
                 <span v-if="isRunning && !state.speedTest.isDrawing"
-                  class="absolute inline-flex size-full animate-ping rounded-full bg-info opacity-75"></span>
+                  class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+                  :class="statusDotClass"></span>
                 <span class="relative inline-flex size-2 rounded-full transition-colors duration-300"
-                  :class="isRunning ? 'bg-info' : isPaused ? 'bg-warning' : isFinished ? 'bg-success' : isError ? 'bg-destructive' : 'bg-muted-foreground/35'"></span>
+                  :class="statusDotClass"></span>
               </span>
               <p class="m-0 truncate" role="status" aria-live="polite" aria-atomic="true">
                 {{ progressLabel }}
@@ -117,9 +118,10 @@
               <span>0{{ idx + 1 }}</span>
               <span class="relative inline-flex size-1.5">
                 <span v-if="isMetricActive(m.key)"
-                  class="absolute inline-flex size-full animate-ping rounded-full bg-info opacity-75"></span>
+                  class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+                  :class="metricDotClass(m.key)"></span>
                 <span class="relative inline-flex size-1.5 rounded-full transition-colors duration-300"
-                  :class="isMetricActive(m.key) ? 'bg-info' : isPaused ? 'bg-warning' : (isFinished && state.speedTest[m.key] !== '-' ? 'bg-success' : 'bg-border')"></span>
+                  :class="metricDotClass(m.key)"></span>
               </span>
             </div>
             <p class="text-base md:text-lg uppercase tracking-wider text-primary mb-1">{{ m.label }}</p>
@@ -146,7 +148,7 @@
 
         <!-- Scenario Performance & Load Details -->
         <SpeedTestResultPanel
-          v-if="isFinished && state.speedTest.hasScores && state.connection.colo"
+          v-if="isFinished && state.speedTest.hasScores"
           class="jn-slide-in"
           :speed-test="state.speedTest"
           :connection="state.connection" />
@@ -195,8 +197,8 @@ const {
 const {
   state, hasEverSettled, sizeOptions,
   isIdle, isRunning, isPaused, isFinished, isError,
-  estimatedTotalMB, progressLabel, progressIndicatorClass,
-  metricColorClass, linkFlow, isMetricActive, speedTestController,
+  estimatedTotalMB, progressLabel, statusDotClass, progressIndicatorClass,
+  metricColorClass, metricDotClass, linkFlow, isMetricActive, speedTestController,
 } = useSpeedTest({
   t,
   lang,

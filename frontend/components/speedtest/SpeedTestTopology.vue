@@ -6,7 +6,8 @@
       <UserRound class="jn-st-node is-client size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       <Icon v-if="connection.loc" :icon="'circle-flags:' + connection.loc.toLowerCase()"
         class="size-3.5 shrink-0" />
-      <span class="text-xs font-medium text-foreground truncate max-w-24 sm:max-w-36">
+      <span v-if="connection.country || connection.loc"
+        class="text-xs font-medium text-foreground truncate max-w-24 sm:max-w-36">
         {{ connection.country || connection.loc }}
       </span>
     </div>
@@ -25,9 +26,9 @@
       <Icon v-if="connection.coloCountryCode"
         :icon="'circle-flags:' + connection.coloCountryCode.toLowerCase()" class="size-3.5 shrink-0" />
       <span class="text-xs font-medium text-foreground truncate max-w-24 sm:max-w-36">
-        {{ connection.coloCountry || connection.colo }}
+        {{ connection.coloCountry || connection.colo || 'Cloudflare' }}
       </span>
-      <span v-if="connection.coloCountry"
+      <span v-if="connection.coloCountry && connection.colo"
         class="font-mono text-[10px] text-muted-foreground uppercase shrink-0">
         {{ connection.colo }}
       </span>
@@ -48,6 +49,7 @@ const props = defineProps({
 
 const edgeTitle = computed(() => {
   const { coloCity, colo } = props.connection;
+  if (!colo) return 'Cloudflare';
   return coloCity ? `Cloudflare · ${coloCity} (${colo})` : `Cloudflare · ${colo}`;
 });
 </script>

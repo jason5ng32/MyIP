@@ -112,7 +112,9 @@ test('progress appears immediately, never regresses across handoff or resume, an
 test('progress text follows phases and preserves the paused phase', async () => {
   const run = fixture();
   assert.equal(run.progressLabel.value, 'speedtest.phaseStandby');
+  assert.equal(run.statusDotClass.value, 'bg-muted-foreground/35');
   assert.equal(run.progressIndicatorClass.value, 'bg-border');
+  assert.equal(run.metricDotClass('downloadSpeed'), 'bg-border');
   assert.equal(run.linkFlow.value, 'idle');
   assert.equal(run.estimatedTotalMB.value, 260);
   run.state.config.package.download.bytes = 100e6;
@@ -120,7 +122,10 @@ test('progress text follows phases and preserves the paused phase', async () => 
 
   await run.speedTestController();
   assert.equal(run.progressLabel.value, 'speedtest.phases.probe');
+  assert.equal(run.statusDotClass.value, 'bg-info');
   assert.equal(run.progressIndicatorClass.value, 'bg-info');
+  assert.equal(run.metricDotClass('downloadSpeed'), 'bg-info');
+  assert.equal(run.metricDotClass('uploadSpeed'), 'bg-border');
   assert.equal(run.linkFlow.value, 'ping');
   run.engines[0].onPhaseChange({ measurement: { type: 'download' } });
   assert.equal(run.progressLabel.value, 'speedtest.phases.probe');
@@ -132,22 +137,28 @@ test('progress text follows phases and preserves the paused phase', async () => 
   assert.equal(run.linkFlow.value, 'download');
   await run.speedTestController();
   assert.equal(run.progressLabel.value, 'speedtest.phasePaused: speedtest.phases.download');
+  assert.equal(run.statusDotClass.value, 'bg-warning');
   assert.equal(run.progressIndicatorClass.value, 'bg-warning');
   assert.equal(run.metricColorClass.value, 'text-warning');
+  assert.equal(run.metricDotClass('uploadSpeed'), 'bg-warning');
   assert.equal(run.linkFlow.value, 'paused');
   await run.speedTestController();
   run.engines[1].onPhaseChange({ measurement: { type: 'upload' } });
   assert.equal(run.progressLabel.value, 'speedtest.phases.upload');
+  assert.equal(run.statusDotClass.value, 'bg-info');
   assert.equal(run.progressIndicatorClass.value, 'bg-info');
   assert.equal(run.metricColorClass.value, 'text-info');
   assert.equal(run.linkFlow.value, 'upload');
   run.state.speedTest.status = 'finished';
   assert.equal(run.progressLabel.value, 'speedtest.phaseFinished');
+  assert.equal(run.statusDotClass.value, 'bg-success');
   assert.equal(run.progressIndicatorClass.value, 'bg-success');
   assert.equal(run.metricColorClass.value, 'text-success');
+  assert.equal(run.metricDotClass('downloadSpeed'), 'bg-success');
   assert.equal(run.linkFlow.value, 'done');
   run.state.speedTest.status = 'error';
   assert.equal(run.progressLabel.value, 'speedtest.phaseFailed');
+  assert.equal(run.statusDotClass.value, 'bg-destructive');
   assert.equal(run.progressIndicatorClass.value, 'bg-destructive');
   assert.equal(run.metricColorClass.value, 'text-destructive');
   assert.equal(run.linkFlow.value, 'error');
@@ -329,6 +340,7 @@ test('post-run helpers map 5-tier quality levels, bufferbloat deltas, and 4th cl
 
   assert.equal(run.state.speedTest.status, 'finished');
   assert.equal(run.state.speedTest.hasScores, true);
+  assert.equal(run.state.connection.colo, '');
   assert.equal(run.state.speedTest.streamingQuality, 'good');
   assert.equal(run.state.speedTest.cloudSyncQuality, 'average');
   assert.equal(run.state.speedTest.downLoadedJitter, 3.45);
@@ -336,4 +348,36 @@ test('post-run helpers map 5-tier quality levels, bufferbloat deltas, and 4th cl
   assert.equal(run.state.speedTest.transferredBytes, 100_200 + 50_000_500 + 15_000_250);
   assert(Number.isFinite(run.state.speedTest.activeDurationMs));
   run.unmount();
+});
+
+test('getIPFromSpeedTest warns on blocked trace requests without triggering console.error', async (t) => {
+  const warns = [];
+  const errors = [];
+  t.mock.method(console, 'warn', (...args) => warns.push(args));
+  t.mock.method(console, 'error', (...args) => errors.push(args));
+
+  const scope = effectScope();
+  const runner = scope.run(() => useSpeedTest({
+    t: (k) => k,
+    lang: 'en',
+  }));
+
+  // 1. Privacy extension blocking /cdn-cgi/trace (TypeError: Failed to fetch) -> console.warn, null.
+  t.mock.method(globalThis, 'fetch', () => Promise.reject(new TypeError('Failed to fetch')));
+  assert.equal(await runner.connectionMethods.getIPFromSpeedTest(), null);
+  assert.equal(warns.length, 1);
+  assert.equal(errors.length, 0);
+
+  // 2. Non-2xx block page -> console.warn, null.
+  t.mock.method(globalThis, 'fetch', () => Promise.resolve({ ok: false, status: 403 }));
+  assert.equal(await runner.connectionMethods.getIPFromSpeedTest(), null);
+  assert.equal(warns.length, 2);
+  assert.equal(errors.length, 0);
+
+  // 3. 200 OK with malformed trace body -> console.error preserved for format diagnostics.
+  t.mock.method(globalThis, 'fetch', () => Promise.resolve({ ok: true, text: () => Promise.resolve('colo=SJC\n') }));
+  assert.equal(await runner.connectionMethods.getIPFromSpeedTest(), null);
+  assert.equal(errors.length, 1);
+
+  scope.stop();
 });

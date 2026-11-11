@@ -86,7 +86,7 @@
           <div class="flex items-baseline justify-between gap-3">
             <dt class="text-muted-foreground shrink-0">{{ t('speedtest.duration') }}</dt>
             <dd class="m-0 font-mono tabular-nums text-foreground">
-              {{ formatDurationMs(speedTest.activeDurationMs) }}
+              {{ formattedDuration }}
             </dd>
           </div>
         </dl>
@@ -95,15 +95,16 @@
 
     <!-- Full-width Route Readout & Follow-up Latency/Route Tools -->
     <div class="mt-4 pt-3 border-t border-dashed border-border/60 space-y-2">
-      <div
+      <div v-if="connection.colo"
         class="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-1.5 sm:gap-y-1 text-xs text-muted-foreground">
-        <div class="flex items-baseline gap-1 min-w-0 max-w-full">
+        <div v-if="connection.ip" class="flex items-baseline gap-1 min-w-0 max-w-full">
           <span class="shrink-0">{{ t('speedtest.route') }}</span>
-          <FitText v-if="connection.ip" :text="connection.ip" :tiers="ROUTE_IP_TIERS" :title="connection.ip"
+          <FitText :text="connection.ip" :tiers="ROUTE_IP_TIERS" :title="connection.ip"
             data-mask="ip" class="font-mono text-foreground/85 min-w-0" />
         </div>
         <div class="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 min-w-0">
-          <span v-if="connection.ip" aria-hidden="true" class="font-mono">→</span>
+          <span v-if="!connection.ip" class="shrink-0">{{ t('speedtest.route') }}</span>
+          <span v-else aria-hidden="true" class="font-mono">→</span>
           <i18n-t keypath="speedtest.cloudflareNode" tag="span" scope="global" class="text-foreground/85">
             <template #colo>
               <span class="font-mono">{{ connection.colo }}</span>
@@ -137,8 +138,9 @@ import FitText from '@/components/widgets/FitText.vue';
 import { useStatusTone } from '@/composables/use-status-tone.js';
 import { trackEvent } from '@/utils/analytics';
 import { isPlainClick } from '@/utils/nav-target.js';
+import { formatElapsedSeconds } from '@/utils/time-utils.js';
 import {
-  formatDurationMs, formatLoadedDelta, formatTransferredBytes,
+  formatLoadedDelta, formatTransferredBytes,
   loadedLatencyDelta, qualityLevel,
 } from '@/utils/features/speedtest-session.js';
 
@@ -149,7 +151,7 @@ const props = defineProps({
   connection: { type: Object, required: true },
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const router = useRouter();
 const { dotClass, textClass } = useStatusTone();
 
@@ -183,6 +185,7 @@ const scenarioItems = computed(() => [
 ]);
 
 const loadedLatencyTitle = computed(() => t('speedtest.loadedLatency').replace(/[:：\s]+$/, ''));
+const formattedDuration = computed(() => formatElapsedSeconds(props.speedTest.activeDurationMs, locale.value) || '-');
 const downDelta = computed(() => loadedLatencyDelta(props.speedTest.latency, props.speedTest.downLoadedLatency));
 const upDelta = computed(() => loadedLatencyDelta(props.speedTest.latency, props.speedTest.upLoadedLatency));
 const coloLocation = computed(() => (

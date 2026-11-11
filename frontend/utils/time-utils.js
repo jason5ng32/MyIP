@@ -167,6 +167,37 @@ export const formatDuration = (ms, locale) => {
     }
 };
 
+// Sub-minute tenths ("12.9s" / "12.9 秒") and minute+second spans ("1m 25s" /
+// "1 分钟 25 秒") from a millisecond runtime, localized for run diagnostics.
+export const formatElapsedSeconds = (ms, locale) => {
+    if (!Number.isFinite(ms) || ms <= 0) return '';
+    if (ms < 59_950) {
+        const tenths = Math.max(0.1, Math.round(ms / 100) / 10);
+        try {
+            return spaceNumerals(new Intl.NumberFormat(locale || undefined, {
+                style: 'unit',
+                unit: 'second',
+                unitDisplay: 'narrow',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+            }).format(tenths));
+        } catch {
+            return `${tenths.toFixed(1)}s`;
+        }
+    }
+    const totalSec = Math.round(ms / 1000);
+    const minutes = Math.floor(totalSec / 60);
+    const seconds = totalSec % 60;
+    try {
+        return spaceNumerals(
+            new Intl.DurationFormat(locale || undefined, { style: 'narrow', secondsDisplay: 'always' })
+                .format({ minutes, seconds }),
+        );
+    } catch {
+        return `${minutes}m ${seconds}s`;
+    }
+};
+
 /* ------------------------------------------------------------------ */
 /* Absolute dates                                                      */
 /* ------------------------------------------------------------------ */

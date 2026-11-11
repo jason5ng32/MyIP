@@ -115,15 +115,6 @@ export const formatTransferredBytes = (bytes) => {
   return `${Number((bytes / 1e9).toFixed(2))} GB`;
 };
 
-// Format active runtime (ms) while keeping sub-minute precision and clean minute rollovers.
-export const formatDurationMs = (ms) => {
-  if (!Number.isFinite(ms) || ms <= 0) return '-';
-  const sec = ms / 1000;
-  if (sec < 59.95) return `${Math.max(0.1, Math.round(sec * 10) / 10).toFixed(1)} s`;
-  const totalSec = Math.round(sec);
-  return `${Math.floor(totalSec / 60)}m ${totalSec % 60}s`;
-};
-
 // Map Cloudflare's 5-tier classification name onto a 1..5 segment count (0 when unmeasured).
 export const qualityLevel = (classification) => {
   const idx = CLASSIFICATION_NAMES.indexOf(classification);

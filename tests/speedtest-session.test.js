@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import CloudflareEngine from '@cloudflare/speedtest';
 import {
-  computeCloudSyncScore, createSpeedTestSession, formatDurationMs,
+  computeCloudSyncScore, createSpeedTestSession,
   formatTransferredBytes, getSpeedTestLiveValues, sumSpeedTestTransferredBytes,
 } from '../frontend/utils/features/speedtest-session.js';
 
@@ -153,13 +153,14 @@ test('installed CF engine delivers a fast preview and all selected formal reques
   t.mock.method(console, 'log', () => {});
   t.mock.method(globalThis, 'fetch', async (url, options = {}) => {
     const bytes = Number(new URL(url).searchParams.get('bytes'));
-    requests.push({ bytes, method: options.method || 'GET' });
+    const method = options.method || 'GET';
+    requests.push({ bytes, method });
     // The engine drains the body through a stream reader; its end is when the
-    // resource timing entry exists.
+    // resource timing entry exists. W3C transferSize reflects response octets only.
     const reader = { read: async () => {
       await new Promise(resolve => setTimeout(resolve, 2));
       timings.set(url, {
-        startTime: 0, transferSize: bytes + 300, requestStart: 0, responseStart: 1,
+        startTime: 0, transferSize: (method === 'POST' ? 0 : bytes) + 300, requestStart: 0, responseStart: 1,
         responseEnd: bytes === 1e5 ? 2 : bytes ? 2001 : 1,
         connectStart: 0, connectEnd: 0, secureConnectionStart: 0, nextHopProtocol: 'h2',
       });
@@ -195,6 +196,11 @@ test('installed CF engine delivers a fast preview and all selected formal reques
   assert.equal(result.getUnloadedLatencyPoints().length, 30);
   assert.equal(result.getDownloadBandwidthPoints().length, 4);
   assert(result.getDownloadBandwidth() / 1e6 < previewSpeed, 'the final result excludes the preview');
+  // 1x100KB probe + 4x50MB download + 4x15MB upload, each carrying 300B mock wire overhead.
+  assert.equal(
+    session.getTransferredBytes(),
+    (1e5 + 300) + 4 * (50e6 + 300) + 4 * (15e6 + 300),
+  );
 });
 
 test('computeCloudSyncScore mirrors Cloudflare AIM streaming formula using upload bandwidth', () => {
@@ -292,15 +298,22 @@ test('session tracks active duration without paused intervals and sums transferr
   assert.equal(session.getActiveDurationMs(), 12_900);
   assert.equal(session.getTransferredBytes(), 100_300 + 50_000_400 + 50_000_000 + 15_000_300);
   assert.equal(sumSpeedTestTransferredBytes({}), 0);
+  assert.equal(sumSpeedTestTransferredBytes({
+    download: {
+      parallelResults: {
+        2: { 25e6: { bytes: 25e6, timings: [{ transferSize: 25_000_100 }, { transferSize: 0 }] } },
+      },
+    },
+    upload: {
+      parallelResults: {
+        2: { 10e6: { bytes: 10e6, timings: [{ transferSize: 200 }] } },
+      },
+    },
+  }), 25_000_100 + 25_000_000 + 10_000_200);
 
   assert.equal(formatTransferredBytes(0), '-');
   assert.equal(formatTransferredBytes(512_000), '512 KB');
   assert.equal(formatTransferredBytes(65_140_000), '65.1 MB');
   assert.equal(formatTransferredBytes(260_100_000), '260 MB');
   assert.equal(formatTransferredBytes(1_060_000_000), '1.06 GB');
-
-  assert.equal(formatDurationMs(0), '-');
-  assert.equal(formatDurationMs(12_900), '12.9 s');
-  assert.equal(formatDurationMs(59_980), '1m 0s');
-  assert.equal(formatDurationMs(85_200), '1m 25s');
 });
