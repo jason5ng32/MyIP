@@ -28,9 +28,14 @@ export const useOverlayShortcuts = (isOpen) => {
     const active = useRouteActive();
     watch(() => active.value && toValue(isOpen), sync, { immediate: true, flush: 'sync' });
 
-    // The root declares `update:open`, so its v-model / handler closes it.
+    // The root declares `update:open`, so its v-model / handler closes it —
+    // both on page deactivation and when a lazy overlay finishes downloading
+    // after its cached page was already left.
     const instance = getCurrentInstance();
     if (instance) {
+        if (!active.value && toValue(isOpen)) {
+            instance.emit('update:open', false);
+        }
         onDeactivated(() => {
             if (toValue(isOpen)) instance.emit('update:open', false);
         });

@@ -13,7 +13,7 @@
         </router-view>
         <!-- Dialog hosts for the Nav's account menu and the tools' quota hints. -->
         <User />
-        <Preferences />
+        <Preferences v-if="hasOpenedPreferences" />
         <Alert />
         <DocsAssistant />
         <PWA v-if="offerPwaInstall" />
@@ -60,6 +60,11 @@ import { useAppPersonaCollector } from '@/composables/use-persona-collector.js';
 // A page change closes store.openSheet: a site-wide sheet would stay open over
 // the next page, and one a left page hosted would reopen when it returns.
 const store = useMainStore();
+const hasOpenedPreferences = ref(false);
+watch(() => store.openSheet === 'preferences', (open) => {
+    if (open) hasOpenedPreferences.value = true;
+}, { immediate: true });
+
 const route = useRoute();
 watch(() => route.path, () => {
     if (store.openSheet) store.setOpenSheet(null);

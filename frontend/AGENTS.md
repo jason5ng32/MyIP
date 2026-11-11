@@ -256,9 +256,9 @@ Every "business state → color" mapping goes through `use-status-tone.js`
     measures it doesn't fit (no breakpoint); `isMobile` only drives phone behaviour.
 - **Footer** — four columns on the Advanced Tools grid: brand / Project / Docs
   & Support / Clients (only the CLI entry is gated, on the curl domains);
-  never repeats on-page content (tools, sections); About / Changelog /
-  Acknowledgement open in its About sheet, the CLI in its own dialog
-  (`Footer.vue`).
+  never repeats on-page content (tools, sections); the static shell renders in
+  `Footer.vue`, while About / Changelog / Acknowledgement and the CLI dialog
+  load lazily in `widgets/Footer*.vue` when opened.
 - **Page breadcrumb** — every page but Home opens its body with
   `<PageBreadcrumb :items />` above the `<h1>` (← Home / … / current page):
   real links, Home via `resolveBackTarget()`, section crumbs via the Nav's

@@ -1,115 +1,126 @@
-// Import Google Analytics configuration
-// import.meta.env only exists in Vite; Node / test environment may not have it, use optional chaining to fallback
-// Use optional chaining to fallback, avoid TypeError when evaluating at module top level
-const MEASUREMENT_ID = import.meta.env?.VITE_GOOGLE_ANALYTICS_ID || '';
+// Google Analytics 4 wrapper. Events recorded during boot buffer in memory
+// until `startAnalytics()` runs after the app's first render, so `gtag.js`
+// never competes for bandwidth or main-thread time on the initial paint path.
+
+export const createAnalytics = ({
+    measurementId = '',
+    isDev = false,
+} = {}) => {
+    const enabled = Boolean(measurementId);
+    let started = false;
+    let scriptInjected = false;
+    const eventQueue = [];
+
+    const flushQueue = () => {
+        if (typeof window === 'undefined' || !window.gtag) return;
+        eventQueue.forEach((args) => window.gtag(...args));
+        eventQueue.length = 0;
+    };
+
+    const initialiseGtag = () => {
+        if (typeof window === 'undefined') return;
+        if (window.gtag) {
+            flushQueue();
+            return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        // gtag.js inspects `Arguments` objects in dataLayer, not plain arrays.
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = gtag;
+
+        gtag('js', new Date());
+        // debug_mode surfaces events in GA's DebugView — keep it to Vite dev.
+        gtag('config', measurementId, { debug_mode: isDev });
+
+        flushQueue();
+    };
+
+    const injectGAScript = () => {
+        if (scriptInjected || !enabled || typeof window === 'undefined') return;
+        scriptInjected = true;
+
+        // Reuse an existing gtag script tag (e.g. GTM) if already present.
+        if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+            initialiseGtag();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+
+        script.onload = initialiseGtag;
+        script.onerror = () => {
+            console.warn('[GA] Failed to load gtag.js');
+            script.remove?.();
+            scriptInjected = false; // allow subsequent events to retry
+        };
+
+        document.head.appendChild(script);
+    };
+
+    const startAnalytics = () => {
+        started = true;
+        injectGAScript();
+    };
+
+    const pushEvent = (...args) => {
+        if (!enabled || typeof window === 'undefined') return;
+        if (started && !scriptInjected) injectGAScript();
+
+        if (window.gtag) {
+            window.gtag(...args);
+        } else {
+            eventQueue.push(args);
+        }
+    };
+
+    const client = {
+        track(action, properties = {}) {
+            pushEvent('event', action, {
+                event_category: properties.category ?? 'general',
+                event_label: properties.label ?? '',
+                ...properties,
+            });
+        },
+
+        page(url) {
+            pushEvent('config', measurementId, { page_path: url });
+        },
+
+        identify(userId, traits = {}) {
+            pushEvent('config', measurementId, { user_id: userId, ...traits });
+        },
+
+        // GA4 user-scoped properties that persist across the session's events.
+        setUserProperties(props = {}) {
+            pushEvent('set', 'user_properties', props);
+        },
+    };
+
+    const track = (category, action, label) => {
+        client.track(action, { category, label });
+    };
+
+    return {
+        isAnalyticsEnabled: enabled,
+        analytics: client,
+        trackEvent: track,
+        startAnalytics,
+    };
+};
+
+// `import.meta.env` only exists under Vite; optional chaining keeps Node test
+// imports safe at module evaluation time.
+const defaultInstance = createAnalytics({
+    measurementId: import.meta.env?.VITE_GOOGLE_ANALYTICS_ID || '',
+    isDev: import.meta.env?.DEV === true,
+});
 
 // True only when a GA measurement id is configured. The privacy page reads this
 // so self-hosted deployments without GA don't show an inaccurate analytics notice.
-export const isAnalyticsEnabled = !!MEASUREMENT_ID;
-
-// Global state
-let scriptInjected = false;
-let eventQueue = [];
-
-// Inject gtag.js
-function injectGAScript() {
-    if (scriptInjected || !MEASUREMENT_ID || typeof window === 'undefined') return;
-    scriptInjected = true;
-
-    // If the page already has a gtag script (e.g. GTM), initialize directly
-    if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
-        initialiseGtag();
-        return;
-    }
-
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-
-    script.onload = initialiseGtag;
-    script.onerror = () => {
-        console.warn('[GA] Failed to load gtag.js');
-        scriptInjected = false;               // Allow subsequent retries
-    };
-
-    document.head.appendChild(script);
-}
-
-// Initialize gtag & flush queue
-function initialiseGtag() {
-    if (window.gtag) { flushQueue(); return; }
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { window.dataLayer.push(arguments); }
-    window.gtag = gtag;
-
-    gtag('js', new Date());
-    // debug_mode surfaces events in GA's DebugView — keep it to the Vite dev
-    gtag('config', MEASUREMENT_ID, { debug_mode: import.meta.env?.DEV === true });
-
-    flushQueue();
-}
-
-function flushQueue() {
-    if (!window.gtag) return;
-    eventQueue.forEach(args => window.gtag(...args));
-    eventQueue.length = 0;                    // Clear queue
-}
-
-// Internal helper: push or queue
-function pushEvent(...args) {
-    if (typeof window === 'undefined') return; // SSR safe
-    if (!scriptInjected) injectGAScript();     // Lazy load script
-
-    if (window.gtag) {
-        window.gtag(...args);
-    } else {
-        eventQueue.push(args);
-    }
-}
-
-// Public API
-const analytics = {
-    /** analytics.track(action, { category, label, ... }) */
-    track(action, properties = {}) {
-        pushEvent('event', action, {
-            event_category: properties.category ?? 'general',
-            event_label: properties.label ?? '',
-            ...properties
-        });
-    },
-
-    /** analytics.page(url) */
-    page(url) {
-        pushEvent('config', MEASUREMENT_ID, { page_path: url });
-    },
-
-    /** analytics.identify(userId, traits) */
-    identify(userId, traits = {}) {
-        pushEvent('config', MEASUREMENT_ID, { user_id: userId, ...traits });
-    },
-
-    /**
-     * analytics.setUserProperties({ key: value, ... })
-     * Sets GA4 user-scoped properties that persist across the session's events.
-     */
-    setUserProperties(props = {}) {
-        pushEvent('set', 'user_properties', props);
-    }
-};
-
-// Compatible with MyIP old version helper
-function trackEvent(category, action, label) {
-    analytics.track(action, { category, label });
-}
-
-// First screen initialization
-if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', injectGAScript);
-    } else {
-        injectGAScript();
-    }
-}
-
-export { analytics, trackEvent };
+export const isAnalyticsEnabled = defaultInstance.isAnalyticsEnabled;
+export const analytics = defaultInstance.analytics;
+export const trackEvent = defaultInstance.trackEvent;
+export const startAnalytics = defaultInstance.startAnalytics;

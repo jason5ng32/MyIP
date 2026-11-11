@@ -146,7 +146,8 @@
     </div>
 
     <!-- Add / import / manage-lists dialog -->
-    <ConnectivityAddDialog v-model:open="addDialogOpen" :initial-tab="dialogTab" :active-list-id="activeListId" />
+    <ConnectivityAddDialog v-if="hasOpenedAddDialog" v-model:open="addDialogOpen" :initial-tab="dialogTab"
+      :active-list-id="activeListId" />
 
     <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
     <InfoBanner section="connectivity" :settled="hasEverSettled" />
@@ -154,14 +155,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, onDeactivated, reactive, watch, defineAsyncComponent } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { emitAppEvent, waitForAppEvent } from '@/utils/app-events';
 import { useAppCommand } from '@/composables/use-app-command.js';
 import { CONNECTIVITY_STATUS } from '@/utils/codes/connectivity.js';
-import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-import-lists.js';
+import { TILE_PREVIEW, faviconPath, MINE_LIST_ID } from '@/data/connectivity-defaults.js';
 import { siteUrlOf, removeMember } from '@/utils/features/connectivity-lists.js';
 import { createGridPublisher } from '@/utils/features/connectivity-grid.js';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -170,12 +171,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import ConnectivityAddDialog from '@/components/widgets/ConnectivityAddDialog.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
 import { useStatusTone, ipFieldTone } from '@/composables/use-status-tone.js';
 import {
   Check, ChevronDown, Play, Frown, Meh, Plus, RotateCw, Settings2, Smile, X,
 } from '@lucide/vue';
+
+const ConnectivityAddDialog = defineAsyncComponent(() => import('@/components/widgets/ConnectivityAddDialog.vue'));
 
 const { t } = useI18n();
 const store = useMainStore();
@@ -557,13 +559,19 @@ const updateConnectivityAlert = (type) => {
 
 // ── Add / import / manage dialog + per-card removal ───────────────────────
 // The dialog lives in ConnectivityAddDialog.vue; this component owns the
-// open flag and the tab it opens on.
+// open flag and the tab it opens on. Once opened, the async chunk stays
+// mounted so close animations complete cleanly.
+const hasOpenedAddDialog = ref(false);
 const addDialogOpen = ref(false);
 const dialogTab = ref('import');
 const openAddDialog = (tab) => {
   dialogTab.value = tab;
+  hasOpenedAddDialog.value = true;
   addDialogOpen.value = true;
 };
+onDeactivated(() => {
+  addDialogOpen.value = false;
+});
 
 const removeTargetById = (id) => {
   const result = removeMember(lists.value, activeListId.value, id);

@@ -248,6 +248,12 @@ const importableLists = [...IMPORT_LISTS, SYSTEM_IMPORT_LIST];
 const tab = ref('import');
 const importResult = ref('');
 const listError = ref('');
+const addName = ref('');
+const addUrl = ref('');
+const addError = ref('');
+const newListName = ref('');
+const renamingId = ref(null);
+const renameDraft = ref('');
 
 // The custom form's destination. Falls back to Mine when the selected list
 // disappears (deleted from the lists tab while open).
@@ -270,7 +276,7 @@ watch(() => props.open, (v) => {
   addError.value = '';
   newListName.value = '';
   renamingId.value = null;
-});
+}, { immediate: true });
 watch(tab, (v) => {
   if (v !== 'custom') return;
   nextTick(() => document.getElementById('custom-conn-name')?.focus());
@@ -306,9 +312,6 @@ const importToNewList = (curated) => {
 };
 
 // ── Custom add ─────────────────────────────────────────────────────────────
-const addName = ref('');
-const addUrl = ref('');
-const addError = ref('');
 
 // Map the shared addError back to its field so aria-invalid only flags the
 // offending Input (shadcn-vue's Input paints the red ring from that attr).
@@ -374,9 +377,6 @@ const handleAdd = () => {
 };
 
 // ── List management ────────────────────────────────────────────────────────
-const newListName = ref('');
-const renamingId = ref(null);
-const renameDraft = ref('');
 
 // Op error code → localized message (only the codes the buttons can't
 // prevent).
