@@ -202,7 +202,6 @@ import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
 import { isValidIP } from '@/utils/ip/valid-ip.js';
 import { parseTrace } from '@/utils/ip/parse-trace.js';
 import getCountryName from '@/utils/country-name.js';
-import SpeedTestEngine from '@cloudflare/speedtest';
 import { createSpeedTestSession, getSpeedTestLiveValues } from '@/utils/features/speedtest-session.js';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
 import { JnTooltip } from '@/components/ui/tooltip';
@@ -371,12 +370,29 @@ const connectionMethods = {
 
 // --- Test Engine ----------------------------------------------------------
 
+let SpeedTestEngineClass = null;
+let speedTestEnginePromise = null;
 let testEngine;
 let runId = 0;
 const engineMethods = {
+  // Loaded on first run so the engine chunk stays off the homepage critical path.
+  loadEngine() {
+    if (SpeedTestEngineClass) return Promise.resolve(SpeedTestEngineClass);
+    speedTestEnginePromise ??= import('@cloudflare/speedtest')
+      .then((mod) => {
+        SpeedTestEngineClass = mod.default;
+        return SpeedTestEngineClass;
+      })
+      .catch((error) => {
+        speedTestEnginePromise = null;
+        throw error;
+      });
+    return speedTestEnginePromise;
+  },
+
   // Build a fresh engine. State reset is owned by speedTestController.
-  reset() {
-    return markRaw(createSpeedTestSession(SpeedTestEngine, state.config.package));
+  reset(Engine) {
+    return markRaw(createSpeedTestSession(Engine, state.config.package));
   },
 
   updateResults(results) {
@@ -537,19 +553,26 @@ const setupTestEngine = () => {
 };
 
 const speedTestController = async () => {
+  let currentRun = runId;
   try {
     if (state.speedTest.status === 'running') {
-      testEngine.pause();
+      if (testEngine) {
+        testEngine.pause();
+      } else {
+        // Still fetching the engine chunk — cancel that pending start.
+        runId += 1;
+      }
       state.speedTest.status = 'paused';
       return;
     }
-    if (state.speedTest.status === 'paused') {
+    if (state.speedTest.status === 'paused' && testEngine) {
       testEngine.play();
       return;
     }
 
-    const currentRun = ++runId;
+    currentRun = ++runId;
     testEngine?.destroy();
+    testEngine = null;
     resetChartData();
     destroyCharts();
 
@@ -557,24 +580,32 @@ const speedTestController = async () => {
       downloadSpeed: 0, uploadSpeed: 0, latency: 0, jitter: 0,
       downLoadedLatency: '-', upLoadedLatency: '-',
       streamingScore: '-', gamingScore: '-', rtcScore: '-',
-      hasScores: false, progress: 0, phase: 'probe',
+      hasScores: false, progress: 5, phase: 'probe', status: 'running',
     });
 
-    testEngine = engineMethods.reset();
-    if (!testEngine) { console.error('Failed to initialize test engine'); return; }
-
-    setupTestEngine();
-    testEngine.play();
-
-    // Resources enrich the running test; neither can delay the first request.
+    // Resources enrich the running test in parallel with the engine chunk load;
+    // none of them block each other.
     void nextTick().then(() => {
-      if (currentRun === runId) return initStartingPoints();
+      if (currentRun === runId && state.speedTest.status !== 'error') return initStartingPoints();
     }).catch(error => console.error('Error initializing speed test charts:', error));
     void loadConnection(currentRun).catch(error => console.error('Error loading speed test connection:', error));
     trackEvent('Section', 'StartClick', 'SpeedTest');
+
+    const Engine = await engineMethods.loadEngine();
+    if (currentRun !== runId) return;
+
+    testEngine = engineMethods.reset(Engine);
+    if (!testEngine) {
+      state.speedTest.status = 'error';
+      console.error('Failed to initialize test engine');
+      return;
+    }
+
+    setupTestEngine();
+    testEngine.play();
   } catch (error) {
     console.error('Error in speedTestController:', error);
-    state.speedTest.status = 'error';
+    if (currentRun === runId) state.speedTest.status = 'error';
   }
 };
 

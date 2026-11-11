@@ -39,20 +39,20 @@ const fixture = () => {
     isPlainClick: () => true,
     useAppCommand: () => {},
     trackEvent: () => {},
-    SpeedTestEngine: Engine,
     useSpeedTestCharts: () => ({
       updateCharts: () => {}, destroyCharts: () => {}, resetChartData: () => {},
       initStartingPoints: () => { chartLoads++; return chartLoad.promise; },
     }),
   };
-  const setup = new Function(...Object.keys(bindings), `${script}\nreturn { state, speedTestController, connectionMethods, progressLabel };`);
+  const setup = new Function(...Object.keys(bindings), `${script}\nreturn { state, speedTestController, connectionMethods, engineMethods, progressLabel };`);
   const component = setup(...Object.values(bindings));
+  component.engineMethods.loadEngine = () => Promise.resolve(Engine);
   component.connectionMethods.getIPFromSpeedTest = () => {
     const request = deferred();
     connectionLoads.push(request);
     return request.promise;
   };
-  return { ...component, engines, ips, chartLoad, connectionLoads,
+  return { ...component, Engine, engines, ips, chartLoad, connectionLoads,
     unmount: () => unmount(), get chartLoads() { return chartLoads; } };
 };
 
@@ -150,4 +150,38 @@ test('connection information can arrive later, but stale runs and unmount cannot
   await nextTick();
   assert.equal(abandoned.state.connection.ip, '');
   assert.equal(abandoned.ips.length, 0);
+});
+
+test('lazy engine chunk supports mid-load pause/resume and surfaces load failure', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  const run = fixture();
+  const engineChunk = deferred();
+  run.engineMethods.loadEngine = () => engineChunk.promise;
+
+  // Start kicks off the async engine import and immediately enters running state.
+  const pendingStart = run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'running');
+  assert.equal(run.state.speedTest.progress, 5);
+  assert.equal(run.engines.length, 0);
+
+  // Pausing before the chunk arrives cancels that pending start.
+  await run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'paused');
+  engineChunk.resolve(run.Engine);
+  await pendingStart;
+  assert.equal(run.engines.length, 0);
+
+  // Resuming after a mid-load pause builds and starts a fresh engine.
+  await run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'running');
+  assert.equal(run.engines.length, 1);
+  assert.equal(run.engines[0].plays, 1);
+  run.unmount();
+
+  // Engine chunk load failure transitions cleanly to error.
+  const broken = fixture();
+  broken.engineMethods.loadEngine = () => Promise.reject(new Error('chunk failed'));
+  await broken.speedTestController();
+  assert.equal(broken.state.speedTest.status, 'error');
+  broken.unmount();
 });
