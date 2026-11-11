@@ -186,10 +186,6 @@ DOMAIN,ptest-12.ipcheck.ing,Proxy12
 
 **赞助商**
 
-<a href="https://www.swiftproxy.net/?ref=myip"><img src="https://res.ipcheck.ing/img/swiftproxy_logo.png" alt="SwiftProxy" height="48" /></a><br />
-<sub>↳ **<a href="https://www.swiftproxy.net/?ref=myip">SwiftProxy</a>** — 提供高质量动态和静态住宅代理，拥有 9000 万+住宅 IP，覆盖全球 220+ 个地区，支持 HTTP(S)、SOCKS5 协议及动态轮换和粘性会话。动态住宅代理低至 $0.7/GB，使用优惠码 `PROXY90` 再享九折优惠。
-</sub>
-
 <a href="https://proxy-seller.com/?partner=4FEC1644D12240F4"><img src="https://res.ipcheck.ing/img/proxyseller_logo.png" alt="Proxy-Seller" height="48" /></a><br />
 <sub>↳ **<a href="https://proxy-seller.com/?partner=4FEC1644D12240F4">Proxy-Seller</a>** — 提供私有住宅、移动（4G/5G/LTE）、静态 ISP 以及数据中心 IPv4/IPv6 代理，支持 HTTP(S) 与 SOCKS5 协议，拥有 4700 万+ 住宅 IP，覆盖全球 220+ 地区，可精准定位国家、城市及运营商，具备 99.7% 可用性与 24/7 技术支持。MyIP 用户使用优惠码 `CHECKINGIP15` 可享 15% 折扣。
 </sub>
