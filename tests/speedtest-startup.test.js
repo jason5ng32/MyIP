@@ -125,7 +125,9 @@ test('progress text follows phases and preserves the paused phase', async () => 
   assert.equal(run.statusDotClass.value, 'bg-info');
   assert.equal(run.progressIndicatorClass.value, 'bg-info');
   assert.equal(run.metricDotClass('downloadSpeed'), 'bg-info');
+  assert.equal(run.metricToneVar('downloadSpeed'), 'var(--info)');
   assert.equal(run.metricDotClass('uploadSpeed'), 'bg-border');
+  assert.equal(run.metricToneVar('uploadSpeed'), undefined);
   assert.equal(run.linkFlow.value, 'ping');
   run.engines[0].onPhaseChange({ measurement: { type: 'download' } });
   assert.equal(run.progressLabel.value, 'speedtest.phases.probe');
@@ -141,6 +143,7 @@ test('progress text follows phases and preserves the paused phase', async () => 
   assert.equal(run.progressIndicatorClass.value, 'bg-warning');
   assert.equal(run.metricColorClass.value, 'text-warning');
   assert.equal(run.metricDotClass('uploadSpeed'), 'bg-warning');
+  assert.equal(run.metricToneVar('uploadSpeed'), 'var(--warning)');
   assert.equal(run.linkFlow.value, 'paused');
   await run.speedTestController();
   run.engines[1].onPhaseChange({ measurement: { type: 'upload' } });
@@ -155,6 +158,7 @@ test('progress text follows phases and preserves the paused phase', async () => 
   assert.equal(run.progressIndicatorClass.value, 'bg-success');
   assert.equal(run.metricColorClass.value, 'text-success');
   assert.equal(run.metricDotClass('downloadSpeed'), 'bg-success');
+  assert.equal(run.metricToneVar('downloadSpeed'), 'var(--success)');
   assert.equal(run.linkFlow.value, 'done');
   run.state.speedTest.status = 'error';
   assert.equal(run.progressLabel.value, 'speedtest.phaseFailed');

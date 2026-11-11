@@ -109,10 +109,9 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div v-for="(m, idx) in metrics" :key="m.key"
             class="jn-st-metric-cell relative overflow-hidden rounded-md px-3 pt-2.5 pb-4 text-center"
-            :style="{ '--st-col': idx }"
+            :style="{ '--st-col': idx, '--st-cell-tone': metricToneVar(m.key) }"
             :data-active="isMetricActive(m.key) || undefined"
-            :data-paused="isPaused || undefined"
-            :data-done="(isFinished && state.speedTest[m.key] !== '-') || undefined">
+            :data-toned="Boolean(metricToneVar(m.key)) || undefined">
             <div class="jn-st-cell-head flex items-center justify-between text-[10px] font-mono leading-none text-muted-foreground/70 mb-1.5"
               aria-hidden="true">
               <span>0{{ idx + 1 }}</span>
@@ -198,7 +197,7 @@ const {
   state, hasEverSettled, sizeOptions,
   isIdle, isRunning, isPaused, isFinished, isError,
   estimatedTotalMB, progressLabel, statusDotClass, progressIndicatorClass,
-  metricColorClass, metricDotClass, linkFlow, isMetricActive, speedTestController,
+  metricColorClass, metricDotClass, metricToneVar, linkFlow, isMetricActive, speedTestController,
 } = useSpeedTest({
   t,
   lang,
@@ -352,17 +351,13 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
   opacity: 1;
 }
 
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-toned='true'] {
+  border-color: color-mix(in oklab, var(--st-cell-tone) 34%, var(--border));
+}
+
 .jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-active='true'] {
-  border-color: color-mix(in oklab, var(--info) 50%, var(--border));
-  background-color: color-mix(in oklab, var(--info) 4%, var(--card));
-}
-
-.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-paused='true'] {
-  border-color: color-mix(in oklab, var(--warning) 35%, var(--border));
-}
-
-.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-done='true'] {
-  border-color: color-mix(in oklab, var(--success) 32%, var(--border));
+  border-color: color-mix(in oklab, var(--st-cell-tone) 50%, var(--border));
+  background-color: color-mix(in oklab, var(--st-cell-tone) 4%, var(--card));
 }
 
 .jn-st-ruler {

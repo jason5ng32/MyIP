@@ -210,7 +210,7 @@ and description included.
 ### Status tones
 
 Every "business state → color" mapping goes through `use-status-tone.js`
-(`wait` / `ok-fast` / `ok-mild` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
+(`wait` / `active` / `ok-fast` / `ok-mild` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
 
 ### Canonical patterns — copy the named exemplar, don't re-invent
 

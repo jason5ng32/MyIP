@@ -88,13 +88,13 @@ export const useSpeedTest = ({
     return 'ping';
   });
 
-  const { dotClass, textClass } = useStatusTone();
+  const { dotClass, textClass, toneVar } = useStatusTone();
 
   const runTone = computed(() => {
     if (isFinished.value) return 'ok-fast';
     if (isError.value) return 'fail';
     if (isPaused.value) return 'ok-slow';
-    if (isRunning.value) return 'wait';
+    if (isRunning.value) return state.speedTest.isDrawing ? 'wait' : 'active';
     return null;
   });
 
@@ -104,8 +104,6 @@ export const useSpeedTest = ({
 
   const metricColorClass = computed(() => {
     if (isIdle.value || state.speedTest.isDrawing) return 'text-muted-foreground/45';
-    // `textClass('wait')` is muted for static text placeholders; live numeric readouts stay `text-info`.
-    if (isRunning.value) return 'text-info';
     return runTone.value ? textClass(runTone.value) : '';
   });
 
@@ -123,11 +121,21 @@ export const useSpeedTest = ({
     return false;
   };
 
+  const metricTone = (key) => {
+    if (isMetricActive(key)) return 'active';
+    if (isPaused.value) return 'ok-slow';
+    if (isFinished.value && state.speedTest[key] !== '-') return 'ok-fast';
+    return null;
+  };
+
   const metricDotClass = (key) => {
-    if (isMetricActive(key)) return dotClass('wait');
-    if (isPaused.value) return dotClass('ok-slow');
-    if (isFinished.value && state.speedTest[key] !== '-') return dotClass('ok-fast');
-    return 'bg-border';
+    const tone = metricTone(key);
+    return tone ? dotClass(tone) : 'bg-border';
+  };
+
+  const metricToneVar = (key) => {
+    const tone = metricTone(key);
+    return tone ? toneVar(tone) : undefined;
   };
 
   // --- Connection & Engine Methods ------------------------------------------
@@ -463,6 +471,7 @@ export const useSpeedTest = ({
     progressIndicatorClass,
     metricColorClass,
     metricDotClass,
+    metricToneVar,
     linkFlow,
     isMetricActive,
     connectionMethods,
