@@ -2,7 +2,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import CloudflareEngine from '@cloudflare/speedtest';
-import { createSpeedTestSession, getSpeedTestLiveValues } from '../frontend/utils/features/speedtest-session.js';
+import {
+  computeCloudSyncScore, createSpeedTestSession,
+  formatTransferredBytes, getSpeedTestLiveValues, sumSpeedTestTransferredBytes,
+} from '../frontend/utils/features/speedtest-session.js';
 
 const packages = () => ({
   latency: { count: 30 }, download: { bytes: 50e6, count: 4 }, upload: { bytes: 15e6, count: 4 },
@@ -150,13 +153,14 @@ test('installed CF engine delivers a fast preview and all selected formal reques
   t.mock.method(console, 'log', () => {});
   t.mock.method(globalThis, 'fetch', async (url, options = {}) => {
     const bytes = Number(new URL(url).searchParams.get('bytes'));
-    requests.push({ bytes, method: options.method || 'GET' });
+    const method = options.method || 'GET';
+    requests.push({ bytes, method });
     // The engine drains the body through a stream reader; its end is when the
-    // resource timing entry exists.
+    // resource timing entry exists. W3C transferSize reflects response octets only.
     const reader = { read: async () => {
       await new Promise(resolve => setTimeout(resolve, 2));
       timings.set(url, {
-        startTime: 0, transferSize: bytes + 300, requestStart: 0, responseStart: 1,
+        startTime: 0, transferSize: (method === 'POST' ? 0 : bytes) + 300, requestStart: 0, responseStart: 1,
         responseEnd: bytes === 1e5 ? 2 : bytes ? 2001 : 1,
         connectStart: 0, connectEnd: 0, secureConnectionStart: 0, nextHopProtocol: 'h2',
       });
@@ -192,4 +196,124 @@ test('installed CF engine delivers a fast preview and all selected formal reques
   assert.equal(result.getUnloadedLatencyPoints().length, 30);
   assert.equal(result.getDownloadBandwidthPoints().length, 4);
   assert(result.getDownloadBandwidth() / 1e6 < previewSpeed, 'the final result excludes the preview');
+  // 1x100KB probe + 4x50MB download + 4x15MB upload, each carrying 300B mock wire overhead.
+  assert.equal(
+    session.getTransferredBytes(),
+    (1e5 + 300) + 4 * (50e6 + 300) + 4 * (15e6 + 300),
+  );
+});
+
+test('computeCloudSyncScore mirrors Cloudflare AIM streaming formula using upload bandwidth', () => {
+  const probeStreaming = (summary) => {
+    const engine = new CloudflareEngine({ autoStart: false, logAimApiUrl: null });
+    engine.results.getSummary = () => summary;
+    return engine.results.getScores().streaming;
+  };
+
+  const cases = [
+    { latency: 8, bw: 150e6, downLoadedLatency: 14, upLoadedLatency: 16, packetLoss: 0 },
+    { latency: 18, bw: 15e6, downLoadedLatency: 45, upLoadedLatency: 55, packetLoss: 0 },
+    { latency: 65, bw: 0.8e6, downLoadedLatency: 140, upLoadedLatency: 210, packetLoss: 0 },
+    { latency: 32, bw: 60e6, downLoadedLatency: 60, upLoadedLatency: 90, packetLoss: 0.02 },
+  ];
+
+  for (const c of cases) {
+    const cfStreaming = probeStreaming({
+      latency: c.latency,
+      download: c.bw,
+      downLoadedLatency: c.downLoadedLatency,
+      upLoadedLatency: c.upLoadedLatency,
+      packetLoss: c.packetLoss,
+    });
+    const cloudSync = computeCloudSyncScore({
+      latency: c.latency,
+      upload: c.bw,
+      downLoadedLatency: c.downLoadedLatency,
+      upLoadedLatency: c.upLoadedLatency,
+      packetLoss: c.packetLoss,
+    });
+    assert.deepEqual(cloudSync, cfStreaming);
+  }
+
+  // Asymmetric cable differentiates upload cloudSync from faster download streaming.
+  const asymmetricUpload = computeCloudSyncScore({
+    latency: 18, upload: 12e6, downLoadedLatency: 45, upLoadedLatency: 55, packetLoss: 0,
+  });
+  assert.equal(asymmetricUpload.classificationName, 'average');
+  assert.equal(computeCloudSyncScore({ latency: 0, upload: 50e6 }), null);
+});
+
+test('session tracks active duration without paused intervals and sums transferred bytes across probe + formal runs', () => {
+  let currentNow = 1000;
+  const engines = [];
+  class Engine {
+    constructor(config) {
+      this.config = config;
+      this.results = { raw: {} };
+      engines.push(this);
+    }
+    play() {}
+    pause() {}
+    finish() { this.onFinish(this.results); }
+  }
+
+  const session = createSpeedTestSession(Engine, packages(), { now: () => currentNow });
+  session.play(); // active starts at 1000ms
+
+  // Probe downloads 100 KB (100,300 wire bytes) and finishes at 1400ms (+400ms active).
+  engines[0].results.raw.download = {
+    results: { 1e5: { timings: [{ transferSize: 100_300 }] } },
+  };
+  currentNow = 1400;
+  engines[0].finish();
+  assert.equal(session.getActiveDurationMs(), 400);
+  assert.equal(session.getTransferredBytes(), 100_300);
+
+  // Formal run progresses for 4000ms, then pauses at 5400ms (+4000ms -> 4400ms active).
+  currentNow = 5400;
+  session.pause();
+  assert.equal(session.getActiveDurationMs(), 4400);
+
+  // User stays paused for 45 seconds — paused wall time must not count.
+  currentNow = 50_400;
+  assert.equal(session.getActiveDurationMs(), 4400);
+
+  // Resume at 50,400ms and finish 8,500ms later (total active = 12,900ms).
+  session.play();
+  engines[1].results.raw = {
+    download: {
+      results: {
+        50e6: { timings: [{ transferSize: 50_000_400 }, { transferSize: 0 }] },
+      },
+    },
+    upload: {
+      results: {
+        15e6: { timings: [{ transferSize: 300 }] },
+      },
+    },
+  };
+  currentNow = 58_900;
+  engines[1].finish();
+
+  assert.equal(session.getActiveDurationMs(), 12_900);
+  assert.equal(session.getTransferredBytes(), 100_300 + 50_000_400 + 50_000_000 + 15_000_300);
+  assert.equal(sumSpeedTestTransferredBytes({}), 0);
+  assert.equal(sumSpeedTestTransferredBytes({
+    download: {
+      parallelResults: {
+        2: { 25e6: { bytes: 25e6, timings: [{ transferSize: 25_000_100 }, { transferSize: 0 }] } },
+      },
+    },
+    upload: {
+      parallelResults: {
+        2: { 10e6: { bytes: 10e6, timings: [{ transferSize: 200 }] } },
+      },
+    },
+  }), 25_000_100 + 25_000_000 + 10_000_200);
+
+  assert.equal(formatTransferredBytes(0), '-');
+  assert.equal(formatTransferredBytes(512_000), '512 KB');
+  assert.equal(formatTransferredBytes(65_140_000), '65.1 MB');
+  assert.equal(formatTransferredBytes(260_100_000), '260 MB');
+  assert.equal(formatTransferredBytes(1_060_000_000), '1.06 GB');
 });

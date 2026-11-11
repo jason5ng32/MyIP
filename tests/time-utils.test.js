@@ -17,6 +17,7 @@ import {
     relativeTimeFromMinutes,
     relativeTimeSince,
     formatDuration,
+    formatElapsedSeconds,
     unixToDateTime,
     isoToDateTime,
     formatClockTime,
@@ -244,6 +245,30 @@ describe('formatDuration', () => {
         assert.equal(formatDuration(0, 'en'), '');
         assert.equal(formatDuration(-1000, 'en'), '');
         assert.equal(formatDuration(NaN, 'en'), '');
+    });
+});
+
+describe('formatElapsedSeconds', () => {
+    it('formats sub-minute spans to tenths and rolls cleanly into minutes + seconds', () => {
+        assert.match(formatElapsedSeconds(12_900, 'en'), /^12\.9\s*s$/);
+        assert.match(formatElapsedSeconds(59_980, 'en'), /1m.*0s/);
+        assert.match(formatElapsedSeconds(85_200, 'en'), /1m.*25s/);
+    });
+
+    it('localizes units and spaces numerals against CJK characters across shipped locales', () => {
+        for (const locale of LOCALE_CODES) {
+            assertCjkSpacing(formatElapsedSeconds(12_900, locale));
+            assertCjkSpacing(formatElapsedSeconds(85_200, locale));
+        }
+        assert.match(formatElapsedSeconds(12_900, 'zh'), /12\.9 秒/);
+        assert.match(formatElapsedSeconds(85_200, 'zh'), /1.*25 秒/);
+        assert.notEqual(formatElapsedSeconds(12_900, 'ru'), formatElapsedSeconds(12_900, 'en'));
+    });
+
+    it('returns empty for non-positive or unusable inputs', () => {
+        assert.equal(formatElapsedSeconds(0, 'en'), '');
+        assert.equal(formatElapsedSeconds(-50, 'en'), '');
+        assert.equal(formatElapsedSeconds(NaN, 'en'), '');
     });
 });
 

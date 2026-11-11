@@ -79,6 +79,11 @@
      the manifest's theme_color use it. index.html's html background and
      theme-color are tuned separately on purpose. */
   --page-bg: #f4f4f4;
+  /* SpeedTest CAD blueprint grid & ruler tokens (light mode — crisp neutral lines, no tint wash) */
+  --jn-cad-grid: oklch(0.145 0 0 / 0.048);
+  --jn-cad-grid-active: transparent;
+  --jn-cad-tick: oklch(0.145 0 0 / 0.14);
+  --jn-cad-tick-major: oklch(0.145 0 0 / 0.28);
 }
 
 .dark {
@@ -118,6 +123,11 @@
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.556 0 0);
   --page-bg: #0e0e0e;
+  /* SpeedTest CAD blueprint grid & ruler tokens (dark mode) */
+  --jn-cad-grid: oklch(1 0 0 / 0.048);
+  --jn-cad-grid-active: oklch(0.746 0.16 232.661 / 0.12);
+  --jn-cad-tick: oklch(1 0 0 / 0.14);
+  --jn-cad-tick-major: oklch(1 0 0 / 0.3);
 }
 
 @theme inline {

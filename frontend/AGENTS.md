@@ -18,7 +18,7 @@ frontend/
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
-└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
+└── components/      ← sections + ip-infos/ speedtest/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
 ```
 
 Every file opens with a header comment stating its purpose — read those.
@@ -210,7 +210,7 @@ and description included.
 ### Status tones
 
 Every "business state → color" mapping goes through `use-status-tone.js`
-(`wait` / `ok-fast` / `ok-mild` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
+(`wait` / `active` / `ok-fast` / `ok-mild` / `ok-slow` / `fail`), normally via `ipFieldTone()`.
 
 ### Canonical patterns — copy the named exemplar, don't re-invent
 

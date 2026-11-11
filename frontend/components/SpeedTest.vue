@@ -1,5 +1,5 @@
+<!-- Homepage SpeedTest section: packet controls, boot-draw telemetry cells, live charts, and results. -->
 <template>
-  <!-- Speed Test -->
   <section class="mb-10">
     <!-- Header -->
     <header class="mb-2 flex flex-col items-start justify-between gap-4">
@@ -14,104 +14,129 @@
       </div>
     </header>
 
-    <Card class="keyboard-shortcut-card jn-card">
-      <CardContent class="p-4 md:p-6">
-        <!-- Control Area -->
-        <div class="flex justify-end mb-5">
-          <div class="inline-flex items-stretch">
-            <!-- Download addon -->
-            <span class="flex items-center px-3 border border-input rounded-l-md bg-muted" aria-hidden="true">
-              <CloudDownload class="size-4 text-muted-foreground" />
-            </span>
-            <!-- Download select -->
-            <Select :model-value="String(state.config.package.download.bytes)"
-              @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
-              :disabled="isRunning || isPaused">
-              <SelectTrigger aria-label="Download size"
-                class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
-                  {{ size / 1e6 }} MB
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <!-- Upload addon -->
-            <span class="flex items-center px-3 border border-input border-l-0 bg-muted" aria-hidden="true">
-              <CloudUpload class="size-4 text-muted-foreground" />
-            </span>
-            <!-- Upload select -->
-            <Select :model-value="String(state.config.package.upload.bytes)"
-              @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
-              :disabled="isRunning || isPaused">
-              <SelectTrigger aria-label="Upload size"
-                class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[100px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
-                  {{ size / 1e6 }} MB
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <!-- Start/Pause/Restart button -->
-            <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
-              <Button size="icon" variant="outline" class="rounded-l-none border-l-0 shadow-none cursor-pointer"
-                @click="speedTestController" aria-label="Start/Pause Speed Test">
-                <component :is="ctaIcon" />
-              </Button>
-            </JnTooltip>
-          </div>
-        </div>
+    <Card class="keyboard-shortcut-card jn-card jn-speedtest-card relative overflow-hidden"
+      :data-st-status="state.speedTest.status"
+      :data-st-drawing="state.speedTest.isDrawing || undefined"
+      :data-st-drawn="state.speedTest.hasDrawn || undefined">
+      <!-- Engineering CAD grid, drafting sweep cursor, and active horizon scanline -->
+      <div class="jn-st-backdrop" aria-hidden="true">
+        <div class="jn-st-grid"></div>
+        <div class="jn-st-draw-line"></div>
+        <div class="jn-st-scan"></div>
+      </div>
 
-        <!-- Connection Information -->
-        <div class="min-h-6 mb-3">
-          <Transition name="slide-fade">
-            <div v-if="state.speedTest.status !== 'idle' && state.connection.colo"
-              class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm">
-              <span class="inline-flex items-center gap-1.5">
-                <PersonStanding class="size-4 text-muted-foreground" />
-                {{ state.connection.country }}
-                <Icon v-if="state.connection.country" :icon="'circle-flags:' + state.connection.loc.toLowerCase()"
-                  class="size-4" />
+      <CardContent class="p-4 md:p-6 relative z-[1]">
+        <!-- Top Bar: Dynamic Client <-> Edge topology on top-left + Joined control group & Estimated data on top-right -->
+        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-4">
+          <div class="order-1 md:order-2 self-end md:self-auto md:ml-auto flex flex-col items-end gap-1.5 shrink-0">
+            <div class="inline-flex items-stretch">
+              <span class="flex items-center px-3 border border-input rounded-l-md bg-muted" aria-hidden="true">
+                <CloudDownload class="size-4 text-muted-foreground" />
               </span>
-              <ArrowLeftRight class="size-4 text-muted-foreground" />
-              <span class="inline-flex items-center gap-1.5">
-                <Globe class="size-4 text-muted-foreground" />
-                {{ state.connection.colo }}, {{ state.connection.coloCountry }}
-                <Icon v-if="state.connection.coloCountry"
-                  :icon="'circle-flags:' + state.connection.coloCountryCode.toLowerCase()" class="size-4" />
+              <Select :model-value="String(state.config.package.download.bytes)"
+                @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
+                :disabled="isRunning || isPaused">
+                <SelectTrigger aria-label="Download size"
+                  class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[88px] sm:min-w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
+                    {{ size / 1e6 }} MB
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <span class="flex items-center px-3 border border-input border-l-0 bg-muted" aria-hidden="true">
+                <CloudUpload class="size-4 text-muted-foreground" />
               </span>
+              <Select :model-value="String(state.config.package.upload.bytes)"
+                @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
+                :disabled="isRunning || isPaused">
+                <SelectTrigger aria-label="Upload size"
+                  class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[88px] sm:min-w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="size in sizeOptions" :key="size" :value="String(size)">
+                    {{ size / 1e6 }} MB
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <JnTooltip :text="t('Tooltips.SpeedTestButton')" side="top">
+                <Button size="icon" variant="outline" class="rounded-l-none border-l-0 shadow-none cursor-pointer"
+                  @click="speedTestController" aria-label="Start/Pause Speed Test">
+                  <component :is="ctaIcon" />
+                </Button>
+              </JnTooltip>
             </div>
+
+            <p class="m-0 text-xs text-muted-foreground font-mono tabular-nums">
+              {{ t('speedtest.estimatedData', { mb: estimatedTotalMB }) }}
+            </p>
+          </div>
+
+          <Transition name="st-meta-swap">
+            <SpeedTestTopology
+              v-if="!isIdle && !state.speedTest.isDrawing"
+              class="order-2 md:order-1 w-full md:w-auto md:pt-1"
+              :connection="state.connection"
+              :flow="linkFlow" />
           </Transition>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="mb-6" :class="{ invisible: state.speedTest.status === 'idle' }">
-          <p class="mb-2 text-sm text-muted-foreground" role="status" aria-live="polite" aria-atomic="true">
-            {{ progressLabel }}
-          </p>
-          <Progress :model-value="state.speedTest.progress" :aria-label="progressLabel"
-            :class="progressIndicatorClass" />
+        <!-- Standby & Live Status Rail -->
+        <div class="mb-5">
+          <div class="mb-2 flex items-center justify-between gap-2 text-sm text-muted-foreground">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="relative inline-flex size-2 shrink-0" aria-hidden="true">
+                <span v-if="isRunning && !state.speedTest.isDrawing"
+                  class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+                  :class="statusDotClass"></span>
+                <span class="relative inline-flex size-2 rounded-full transition-colors duration-300"
+                  :class="statusDotClass"></span>
+              </span>
+              <p class="m-0 truncate" role="status" aria-live="polite" aria-atomic="true">
+                {{ progressLabel }}
+              </p>
+            </div>
+            <span class="font-mono text-xs tabular-nums shrink-0">{{ Math.round(state.speedTest.progress) }}%</span>
+          </div>
+          <Progress :model-value="state.speedTest.progress" :aria-label="progressLabel" class="h-1.5"
+            :indicator-class="progressIndicatorClass" />
         </div>
 
-        <!-- 4 Metrics Tiles -->
+        <!-- 4 Engineered Metric Readout Cells -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          <div v-for="m in metrics" :key="m.key" class="text-center">
-            <p class="text-lg uppercase tracking-wider text-primary mb-1">{{ m.label }}</p>
-            <p class="text-2xl md:text-3xl font-mono font-light tabular-nums" :class="metricColorClass">
-              <span>{{ state.speedTest[m.key] }}</span>
-              <span v-if="state.speedTest.status !== 'idle'" class="ml-1 text-sm font-normal text-muted-foreground">{{
-                m.unit }}</span>
+          <div v-for="(m, idx) in metrics" :key="m.key"
+            class="jn-st-metric-cell relative overflow-hidden rounded-md px-3 pt-2.5 pb-4 text-center"
+            :style="{ '--st-col': idx, '--st-cell-tone': metricToneVar(m.key) }"
+            :data-active="isMetricActive(m.key) || undefined"
+            :data-toned="Boolean(metricToneVar(m.key)) || undefined">
+            <div class="jn-st-cell-head flex items-center justify-between text-[10px] font-mono leading-none text-muted-foreground/70 mb-1.5"
+              aria-hidden="true">
+              <span>0{{ idx + 1 }}</span>
+              <span class="relative inline-flex size-1.5">
+                <span v-if="isMetricActive(m.key)"
+                  class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+                  :class="metricDotClass(m.key)"></span>
+                <span class="relative inline-flex size-1.5 rounded-full transition-colors duration-300"
+                  :class="metricDotClass(m.key)"></span>
+              </span>
+            </div>
+            <p class="text-base md:text-lg uppercase tracking-wider text-primary mb-1">{{ m.label }}</p>
+            <p class="text-2xl md:text-3xl font-mono font-light tabular-nums m-0 transition-colors duration-200"
+              :class="metricColorClass">
+              <span>{{ state.speedTest[m.key] === '-' ? '--' : state.speedTest[m.key] }}</span>
+              <span class="ml-1 text-sm font-normal text-muted-foreground/70">{{ m.unit }}</span>
             </p>
+            <div class="jn-st-ruler" aria-hidden="true"></div>
           </div>
         </div>
 
         <div id="result"></div>
 
-        <!-- Charts Area -->
-        <div v-show="state.speedTest.status !== 'idle'" class="speed-charts-container jn-slide-in">
+        <!-- Charts Area (hidden while idle, drawing, or when the run failed without data) -->
+        <div v-show="!isIdle && !isError && !state.speedTest.isDrawing" class="speed-charts-container jn-slide-in">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             <div class="chart-wrapper"><canvas ref="downloadChart"></canvas></div>
             <div class="chart-wrapper"><canvas ref="uploadChart"></canvas></div>
@@ -120,198 +145,75 @@
           </div>
         </div>
 
-        <!-- Result Block -->
-        <div v-if="isFinished && state.speedTest.hasScores && state.connection.colo"
-          class="jn-slide-in rounded-md border border-success/30 bg-success/10 p-4">
-          <div class="flex items-start gap-2">
-            <CalendarCheck2 class="size-5 text-success shrink-0 mt-0.5" />
-            <span class="text-base text-success break-all" v-if="state.connection.colo">
-              <p class="mb-2">
-                {{ t('speedtest.connectionFrom') }}
-                <span class="font-mono">{{ state.connection.ip }}</span>
-                ( {{ state.connection.country }} )
-                {{ t('speedtest.connectionTo') }}
-                {{ state.connection.colo }}
-                ( {{ state.connection.coloCity }}, {{ state.connection.coloCountry }} )
-                {{ t('speedtest.connectionEnd') }}
-              </p>
-              <!-- Loaded latency = ping under full saturation, the "bufferbloat" signal. -->
-              <p v-if="state.speedTest.downLoadedLatency !== '-' || state.speedTest.upLoadedLatency !== '-'"
-                class="mb-2">
-                {{ t('speedtest.loadedLatency') }}
-                <span class="font-mono">↓ {{ state.speedTest.downLoadedLatency }} ms</span>
-                ·
-                <span class="font-mono">↑ {{ state.speedTest.upLoadedLatency }} ms</span>
-              </p>
-              <p class="mb-2">
-                {{ t('speedtest.score') }}
-                {{ t('speedtest.videoStreaming') }} :
-                <span :class="qualityBadgeClass(state.speedTest.streamingQuality)">{{ t('speedtest.quality.' +
-                  state.speedTest.streamingQuality) }}</span> ;
-                {{ t('speedtest.gaming') }}:
-                <span :class="qualityBadgeClass(state.speedTest.gamingQuality)">
-                  {{ t('speedtest.quality.' + state.speedTest.gamingQuality) }}
-                </span> ;
-                {{ t('speedtest.rtc') }}:
-                <span :class="qualityBadgeClass(state.speedTest.rtcQuality)">
-                  {{ t('speedtest.quality.' + state.speedTest.rtcQuality) }}
-                </span>
-              </p>
-              <!-- Next step: the latency / route tools. Real links (modified
-                   clicks stay the browser's); break-normal undoes the block's
-                   break-all for prose. -->
-              <i18n-t keypath="speedtest.ToolHint" tag="p" scope="global" class="m-0 break-normal">
-                <template #ping>
-                  <a href="/tools/pingtest" :class="toolLinkClass" @click="openTool($event, 'pingtest')">
-                    {{ t('pingtest.Title') }}</a>
-                </template>
-                <template #mtr>
-                  <a href="/tools/mtrtest" :class="toolLinkClass" @click="openTool($event, 'mtrtest')">
-                    {{ t('mtrtest.Title') }}</a>
-                </template>
-              </i18n-t>
-            </span>
-          </div>
-        </div>
+        <!-- Scenario Performance & Load Details -->
+        <SpeedTestResultPanel
+          v-if="isFinished && state.speedTest.hasScores"
+          class="jn-slide-in"
+          :speed-test="state.speedTest"
+          :connection="state.connection" />
 
-        <!-- Error Block — the engine gave up (e.g. speed test server unreachable). -->
-        <div v-else-if="isError" class="jn-slide-in rounded-md border border-destructive/30 bg-destructive/10 p-4">
-          <div class="flex items-start gap-2">
-            <CircleAlert class="size-5 text-destructive shrink-0 mt-0.5" />
-            <span class="text-base text-destructive">{{ t('speedtest.testFailed') }}</span>
+        <!-- Error Block -->
+        <div v-else-if="isError" class="jn-slide-in rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3">
+          <div class="flex items-center gap-2">
+            <CircleAlert class="size-4 text-destructive shrink-0" />
+            <span class="text-sm text-destructive">{{ t('speedtest.testFailed') }}</span>
           </div>
         </div>
       </CardContent>
     </Card>
 
-    <!-- Section banner slot (data-driven; see InfoBanner.vue) -->
     <InfoBanner section="speedtest" :settled="hasEverSettled" />
   </section>
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, markRaw, onUnmounted, nextTick } from 'vue';
-import { useMainStore } from '@/store';
-import { useRouter } from 'vue-router';
+import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { trackEvent } from '@/utils/analytics';
-import { isPlainClick } from '@/utils/nav-target.js';
-import { emitAppEvent } from '@/utils/app-events.js';
+import { CircleAlert, CloudDownload, CloudUpload, Pause, Play, RotateCw } from '@lucide/vue';
+import { useMainStore } from '@/store';
 import { useAppCommand } from '@/composables/use-app-command.js';
-import { fetchWithTimeout } from '@/utils/fetch-with-timeout.js';
-import { isValidIP } from '@/utils/ip/valid-ip.js';
-import { parseTrace } from '@/utils/ip/parse-trace.js';
-import getCountryName from '@/utils/country-name.js';
-import { createSpeedTestSession, getSpeedTestLiveValues } from '@/utils/features/speedtest-session.js';
+import useSpeedTest from '@/composables/use-speedtest.js';
 import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
-import { JnTooltip } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { JnTooltip } from '@/components/ui/tooltip';
+import SpeedTestResultPanel from '@/components/speedtest/SpeedTestResultPanel.vue';
+import SpeedTestTopology from '@/components/speedtest/SpeedTestTopology.vue';
 import InfoBanner from '@/components/widgets/InfoBanner.vue';
-import {
-  ArrowLeftRight, CalendarCheck2, CircleAlert, Play, CloudDownload, CloudUpload,
-  Globe, Pause, PersonStanding, RotateCw,
-} from '@lucide/vue';
-import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
-const router = useRouter();
-
-// Tool links in the result copy. A plain click routes in-app and sends
-// ToolEntry (category = this section, label = slug), which is how GA tells
-// this entrance apart from the card grid's NavClick.
-const toolLinkClass = 'font-medium underline underline-offset-4 decoration-current/40 hover:decoration-current';
-const openTool = (event, slug) => {
-  if (!isPlainClick(event)) return;
-  event.preventDefault();
-  trackEvent('SpeedTest', 'ToolEntry', slug);
-  router.push({ path: `/tools/${slug}` });
-};
 const store = useMainStore();
 const lang = computed(() => store.lang);
-const userPreferences = computed(() => store.userPreferences);
-const isSimpleMode = computed(() => userPreferences.value.simpleMode);
-// Sticky settled flag for the section's banner slot: true once a run finishes.
-const hasEverSettled = ref(false);
-// State Management
-const state = reactive({
-  speedTest: {
-    id: 'speedTest',
-    downloadSpeed: '-',
-    uploadSpeed: '-',
-    latency: '-',
-    jitter: '-',
-    downLoadedLatency: '-',
-    upLoadedLatency: '-',
-    streamingScore: '-',
-    streamingQuality: '-',
-    gamingScore: '-',
-    gamingQuality: '-',
-    rtcScore: '-',
-    rtcQuality: '-',
-    status: 'idle',
-    phase: 'probe',
-    hasScores: false,
-    progress: 0,
-  },
-  connection: { ip: '', colo: '', loc: '', country: '', coloCountry: '', coloCountryCode: '', coloCity: '' },
-  config: {
-    package: {
-      download: { bytes: 50e6, count: 4 },
-      upload: { bytes: 15e6, count: 4 },
-      latency: { count: 20 },
-    },
-  },
-});
+const isSimpleMode = computed(() => store.userPreferences.simpleMode);
 
 const {
   downloadChart, uploadChart, latencyChart, jitterChart,
   updateCharts, initStartingPoints, destroyCharts, resetChartData,
 } = useSpeedTestCharts(t);
 
-// Optional speed test sizes (bytes) for ToggleGroup
-const sizeOptions = [1e6, 10e6, 15e6, 50e6, 100e6];
-
-// --- Derived State ----------------------------------------------------------
-
-const isRunning = computed(() => state.speedTest.status === 'running');
-const isPaused = computed(() => state.speedTest.status === 'paused');
-const isFinished = computed(() => state.speedTest.status === 'finished');
-const isError = computed(() => state.speedTest.status === 'error');
-
-const progressLabel = computed(() => {
-  if (isFinished.value) return t('speedtest.phaseFinished');
-  if (isError.value) return t('speedtest.phaseFailed');
-  const phase = t(`speedtest.phases.${state.speedTest.phase}`);
-  return isPaused.value ? t('speedtest.phasePaused', { phase }) : phase;
+const {
+  state, hasEverSettled, sizeOptions,
+  isIdle, isRunning, isPaused, isFinished, isError,
+  estimatedTotalMB, progressLabel, statusDotClass, progressIndicatorClass,
+  metricColorClass, metricDotClass, metricToneVar, linkFlow, isMetricActive, speedTestController,
+} = useSpeedTest({
+  t,
+  lang,
+  updateAllIPs: (items) => store.updateAllIPs(items),
+  initStartingPoints,
+  updateCharts,
+  resetChartData,
+  destroyCharts,
 });
 
-// CTA Icon: running=Pause, finished/error=Retry, otherwise=Start
 const ctaIcon = computed(() => {
   if (isRunning.value) return Pause;
   if (isFinished.value || isError.value) return RotateCw;
   return Play;
 });
 
-
-// Color Class for Metrics
-const metricColorClass = computed(() => {
-  if (isRunning.value || isPaused.value) return 'text-info';
-  if (isFinished.value) return 'text-success';
-  if (isError.value) return 'text-destructive';
-  return '';
-});
-
-const progressIndicatorClass = computed(() => {
-  if (isFinished.value) return '[&>*]:bg-success';
-  if (isError.value) return '[&>*]:bg-destructive';
-  if (isRunning.value || isPaused.value) return '[&>*]:bg-info';
-  return '';
-});
-
-// 4 Metrics Metadata
 const metrics = computed(() => [
   { key: 'downloadSpeed', label: t('speedtest.Download'), unit: 'Mb/s' },
   { key: 'uploadSpeed', label: t('speedtest.Upload'), unit: 'Mb/s' },
@@ -319,338 +221,227 @@ const metrics = computed(() => [
   { key: 'jitter', label: t('speedtest.Jitter'), unit: 'ms' },
 ]);
 
-// 5-tier classification → 3 color tokens (label carries the 5-way distinction).
-const qualityBadgeClass = (classification) => {
-  switch (classification) {
-    case 'bad':
-    case 'poor':
-      return 'text-destructive';
-    case 'average':
-      return 'text-warning';
-    case 'good':
-    case 'great':
-      return 'text-success';
-    default:
-      return 'text-muted-foreground';
-  }
-};
-
-// --- Connection Data ----------------------------------------------------------
-
-const connectionMethods = {
-  async getIPFromSpeedTest() {
-    try {
-      const response = await fetchWithTimeout('https://speed.cloudflare.com/cdn-cgi/trace');
-      const data = await response.text();
-      const { ip, colo, loc } = parseTrace(data);
-
-      if (!isValidIP(ip)) {
-        // Self-describing diagnostic.
-        const detail = ip == null ? 'no-ip-line'
-          : ip === '' ? 'empty-value'
-            : `len=${ip.length} tail=0x${ip.charCodeAt(ip.length - 1).toString(16)}`;
-        throw new Error(`Invalid IP from SpeedTest Server (${detail})`);
-      }
-
-      const { default: getColoCountry } = await import('@/data/speedtest-colos.js');
-
-      return {
-        ip, colo, loc,
-        country: getCountryName(loc, lang.value) || '',
-        coloCountryCode: getColoCountry(colo).country || '',
-        coloCity: getColoCountry(colo).city || '',
-        coloCountry: getCountryName(getColoCountry(colo).country, lang.value) || '',
-      };
-    } catch (error) {
-      console.error('Error fetching IP from SpeedTest Server:', error);
-      return null;
-    }
-  },
-};
-
-// --- Test Engine ----------------------------------------------------------
-
-let SpeedTestEngineClass = null;
-let speedTestEnginePromise = null;
-let testEngine;
-let runId = 0;
-const engineMethods = {
-  // Loaded on first run so the engine chunk stays off the homepage critical path.
-  loadEngine() {
-    if (SpeedTestEngineClass) return Promise.resolve(SpeedTestEngineClass);
-    speedTestEnginePromise ??= import('@cloudflare/speedtest')
-      .then((mod) => {
-        SpeedTestEngineClass = mod.default;
-        return SpeedTestEngineClass;
-      })
-      .catch((error) => {
-        speedTestEnginePromise = null;
-        throw error;
-      });
-    return speedTestEnginePromise;
-  },
-
-  // Build a fresh engine. State reset is owned by speedTestController.
-  reset(Engine) {
-    return markRaw(createSpeedTestSession(Engine, state.config.package));
-  },
-
-  updateResults(results) {
-    const summary = results.getSummary();
-    // Any field can be null when its measurement produced no samples.
-    const fmt = (v, div = 1) => (v == null ? 0 : parseFloat((v / div).toFixed(2)));
-    Object.assign(state.speedTest, {
-      downloadSpeed: fmt(summary.download, 1000000),
-      uploadSpeed: fmt(summary.upload, 1000000),
-      latency: fmt(summary.latency),
-      jitter: fmt(summary.jitter),
-      // Loaded latency only present when the engine measured it.
-      downLoadedLatency: summary.downLoadedLatency == null ? '-' : fmt(summary.downLoadedLatency),
-      upLoadedLatency: summary.upLoadedLatency == null ? '-' : fmt(summary.upLoadedLatency),
-    });
-  },
-
-  // The engine's queued timers deliver one last measurement after onFinish /
-  // onUnmounted dropped the reference, so the engine may already be gone.
-  updateProgress() {
-    const rawData = testEngine?.results?.raw;
-    if (!rawData || testEngine.isProbe) return;
-    // 3 stages: latency / download / upload.
-    const perStage = 100 / 3;
-    let progress = 0;
-    if (rawData.latency?.started) progress += rawData.latency.finished ? perStage : perStage / 2;
-    if (rawData.download?.started) progress += rawData.download.finished ? perStage : perStage / 2;
-    if (rawData.upload?.started) progress += rawData.upload.finished ? perStage : perStage / 2;
-    state.speedTest.progress = Math.max(state.speedTest.progress, Math.min(progress, 100));
-  },
-
-  // Keep preview readings until each formal metric has actual samples.
-  // CF bandwidth/latency getters can return zero for an empty sample set.
-  updateSpeedInRealTime() {
-    if (state.speedTest.status === 'finished' || state.speedTest.status === 'error') return;
-    try {
-      const results = testEngine?.results;
-      if (!results) return;
-
-      Object.assign(state.speedTest, getSpeedTestLiveValues(results));
-
-      updateCharts(
-        state.speedTest.downloadSpeed,
-        state.speedTest.uploadSpeed,
-        state.speedTest.latency,
-        state.speedTest.jitter,
-        results.raw,
-      );
-    } catch (error) {
-      console.error('Error in updateSpeedInRealTime:', error);
-    }
-  },
-};
-
-// --- Test Control ----------------------------------------------------------
-
-const loadConnection = async (currentRun) => {
-  if (!state.connection.ip) {
-    const connectionData = await connectionMethods.getIPFromSpeedTest();
-    if (connectionData && currentRun === runId) {
-      Object.assign(state.connection, connectionData);
-      // Feed the Globalping picker.
-      store.updateAllIPs([{ ip: connectionData.ip, country: connectionData.loc || '', location: connectionData.country || '' }]);
-    }
-  }
-};
-
-const setupTestEngine = () => {
-  testEngine.onPhaseChange = (phase) => { state.speedTest.phase = phase; };
-  testEngine.onRunningChange = (running) => {
-    state.speedTest.status = running ? 'running' : 'paused';
-    // Show that startup is underway before the first measurement arrives.
-    if (running) state.speedTest.progress = Math.max(state.speedTest.progress, 5);
-  };
-  testEngine.onResultsChange = () => {
-    engineMethods.updateProgress();
-    engineMethods.updateSpeedInRealTime();
-  };
-  testEngine.onFinish = (results) => {
-    // The engine fires onFinish even after giving up (e.g. every request to
-    // the test server failed). An error already reported by onError is final,
-    // and a run with no positive measurement (the engine reports 0 for zero
-    // samples) is a failure — never flip either to a green all-zero result.
-    const summary = results?.getSummary?.() ?? {};
-    const measured = (v) => Number.isFinite(v) && v > 0;
-    const hasData = [summary.download, summary.upload, summary.latency].some(measured);
-    if (state.speedTest.status === 'error' || !hasData) {
-      state.speedTest.status = 'error';
-      testEngine.onRunningChange = () => {};
-      testEngine.onResultsChange = () => {};
-      testEngine.onError = () => {};
-      testEngine = null;
-      return;
-    }
-    state.speedTest.status = 'finished';
-    state.speedTest.progress = 100;
-    // No-op, not null: the engine's queued timers call these unconditionally.
-    testEngine.onRunningChange = () => {};
-    testEngine.onResultsChange = () => {};
-    testEngine.onError = () => {};
-    engineMethods.updateResults(results);
-
-    // Engine's getScores() reads getSummary() internally; when packetLoss is
-    // unmeasured it falls back to defaultPoints.packetLoss=0, which costs every
-    // experience a flat 10 points vs. an actually-measured 0% loss (+10 from
-    // the scaleThreshold formula). That single delta pushes gaming/rtc one or
-    // two tiers down. Since we don't run packetLoss (would need TURN setup),
-    // inject the optimistic 0 — matches Cloudflare's own UI behavior whenever
-    // the user's network has near-zero loss, which is the common case.
-    const origGetSummary = results.getSummary.bind(results);
-    results.getSummary = () => ({ ...origGetSummary(), packetLoss: 0 });
-    const scores = results.getScores();
-    if (scores?.streaming) {
-      state.speedTest.hasScores = true;
-      state.speedTest.streamingScore = scores.streaming.points;
-      state.speedTest.gamingScore = scores.gaming.points;
-      state.speedTest.rtcScore = scores.rtc.points;
-      state.speedTest.streamingQuality = scores.streaming.classificationName;
-      state.speedTest.gamingQuality = scores.gaming.classificationName;
-      state.speedTest.rtcQuality = scores.rtc.classificationName;
-    }
-
-    testEngine = null;
-    // Achievement rules for speed thresholds live in data/achievement-rules.js;
-    // the report collector consumes the full result (unmeasured fields keep
-    // their '-' placeholder — the builder drops non-numbers).
-    hasEverSettled.value = true;
-    emitAppEvent('speedtest:finished', {
-      downloadSpeed: state.speedTest.downloadSpeed,
-      uploadSpeed: state.speedTest.uploadSpeed,
-      latency: state.speedTest.latency,
-      jitter: state.speedTest.jitter,
-      downLoadedLatency: state.speedTest.downLoadedLatency,
-      upLoadedLatency: state.speedTest.upLoadedLatency,
-      scores: state.speedTest.hasScores
-        ? {
-          streaming: state.speedTest.streamingScore,
-          gaming: state.speedTest.gamingScore,
-          rtc: state.speedTest.rtcScore,
-        }
-        : null,
-      qualities: state.speedTest.hasScores
-        ? {
-          streaming: state.speedTest.streamingQuality,
-          gaming: state.speedTest.gamingQuality,
-          rtc: state.speedTest.rtcQuality,
-        }
-        : null,
-      connection: { ...state.connection },
-    });
-  };
-  testEngine.onError = (e) => {
-    if (typeof e === 'string' && !e.includes('ICE')) {
-      state.speedTest.status = 'error';
-    }
-    console.error('Speed Test Error: ', e);
-  };
-};
-
-const speedTestController = async () => {
-  let currentRun = runId;
-  try {
-    if (state.speedTest.status === 'running') {
-      if (testEngine) {
-        testEngine.pause();
-      } else {
-        // Still fetching the engine chunk — cancel that pending start.
-        runId += 1;
-      }
-      state.speedTest.status = 'paused';
-      return;
-    }
-    if (state.speedTest.status === 'paused' && testEngine) {
-      testEngine.play();
-      return;
-    }
-
-    currentRun = ++runId;
-    testEngine?.destroy();
-    testEngine = null;
-    resetChartData();
-    destroyCharts();
-
-    Object.assign(state.speedTest, {
-      downloadSpeed: 0, uploadSpeed: 0, latency: 0, jitter: 0,
-      downLoadedLatency: '-', upLoadedLatency: '-',
-      streamingScore: '-', gamingScore: '-', rtcScore: '-',
-      hasScores: false, progress: 5, phase: 'probe', status: 'running',
-    });
-
-    // Resources enrich the running test in parallel with the engine chunk load;
-    // none of them block each other.
-    void nextTick().then(() => {
-      if (currentRun === runId && state.speedTest.status !== 'error') return initStartingPoints();
-    }).catch(error => console.error('Error initializing speed test charts:', error));
-    void loadConnection(currentRun).catch(error => console.error('Error loading speed test connection:', error));
-    trackEvent('Section', 'StartClick', 'SpeedTest');
-
-    const Engine = await engineMethods.loadEngine();
-    if (currentRun !== runId) return;
-
-    testEngine = engineMethods.reset(Engine);
-    if (!testEngine) {
-      state.speedTest.status = 'error';
-      console.error('Failed to initialize test engine');
-      return;
-    }
-
-    setupTestEngine();
-    testEngine.play();
-  } catch (error) {
-    console.error('Error in speedTestController:', error);
-    if (currentRun === runId) state.speedTest.status = 'error';
-  }
-};
-
-// Command owner: run / pause / resume toggle, same semantics as the section's
-// own button. Resolves when the toggle applies, not when the test finishes.
 useAppCommand('speedtest:toggle', () => speedTestController());
-
-// --- Lifecycle ----------------------------------------------------------
-
 onMounted(() => { store.setMountingStatus('SpeedTest', true); });
-// If the user navigates away mid-test, detach the engine's callbacks before
-// dropping the reference — otherwise any in-flight async work inside the
-// SpeedTestEngine would still try to write state refs that no longer exist.
-// No-ops, not null: the engine's queued timers call these unconditionally.
-onUnmounted(() => {
-  runId += 1;
-  if (testEngine) {
-    testEngine.onRunningChange = () => {};
-    testEngine.onResultsChange = () => {};
-    testEngine.onFinish = () => {};
-    testEngine.onError = () => {};
-    testEngine.destroy();
-    testEngine = null;
-  }
-  destroyCharts();
-});
 </script>
 
 <style scoped>
-/* Vue transition: Connection information line fade-in/out slide */
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+/* Engineering telemetry backdrop: pure blank while idle; draws left-to-right on start */
+.jn-st-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+.jn-st-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--jn-cad-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--jn-cad-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 92% 85% at 50% 45%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 92% 85% at 50% 45%, #000 35%, transparent 100%);
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateX(20px);
+.jn-speedtest-card[data-st-drawing='true'] .jn-st-grid {
+  animation: jn-st-grid-draw 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-grid {
+  opacity: 0.85;
+  clip-path: inset(0 0% 0 0);
+  transition: opacity 400ms ease;
+}
+
+.jn-speedtest-card[data-st-drawn='true'][data-st-status='running'] .jn-st-grid {
+  opacity: 1;
+  background-image:
+    radial-gradient(ellipse 65% 55% at 50% 55%, var(--jn-cad-grid-active), transparent 75%),
+    linear-gradient(to right, var(--jn-cad-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--jn-cad-grid) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 24px 24px;
+}
+
+.jn-st-draw-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in oklab, var(--info) 55%, transparent) 20%,
+    color-mix(in oklab, var(--info) 55%, transparent) 80%,
+    transparent
+  );
   opacity: 0;
 }
 
-/* Charts container: Chart.js canvas needs a parent container with a clear height */
+.jn-speedtest-card[data-st-drawing='true'] .jn-st-draw-line {
+  animation: jn-st-cursor-sweep 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes jn-st-grid-draw {
+  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0% 0 0); }
+}
+
+@keyframes jn-st-cursor-sweep {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  88% { opacity: 0.9; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.jn-st-scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--info), transparent);
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 250ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .jn-speedtest-card[data-st-drawn='true'][data-st-status='running'] .jn-st-scan {
+    opacity: 0.9;
+    animation: jn-st-horizon-scan 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+}
+
+@keyframes jn-st-horizon-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(320%); }
+}
+
+/* Metric gauge cells: dashed standby slots while idle; staggered L->R solidification & tick draw on start */
+.jn-st-metric-cell {
+  border: 1px dashed var(--border);
+  background-color: transparent;
+}
+
+.jn-st-cell-head {
+  opacity: 0.55;
+}
+
+.jn-speedtest-card[data-st-drawing='true'] .jn-st-metric-cell {
+  animation: jn-st-cell-draw 300ms ease calc(var(--st-col, 0) * 95ms + 40ms) forwards;
+}
+
+.jn-speedtest-card[data-st-drawing='true'] .jn-st-cell-head {
+  animation: jn-st-head-draw 240ms ease calc(var(--st-col, 0) * 95ms + 50ms) forwards;
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell {
+  border-style: solid;
+  border-color: var(--border);
+  background-color: color-mix(in oklab, var(--card) 80%, transparent);
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-cell-head {
+  opacity: 1;
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-toned='true'] {
+  border-color: color-mix(in oklab, var(--st-cell-tone) 34%, var(--border));
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-active='true'] {
+  border-color: color-mix(in oklab, var(--st-cell-tone) 50%, var(--border));
+  background-color: color-mix(in oklab, var(--st-cell-tone) 4%, var(--card));
+}
+
+.jn-st-ruler {
+  position: absolute;
+  inset-inline: 10px;
+  bottom: 5px;
+  height: 5px;
+  background-image:
+    repeating-linear-gradient(to right, var(--jn-cad-tick-major) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(to right, var(--jn-cad-tick) 0 1px, transparent 1px 6px);
+  background-size: 100% 5px, 100% 3px;
+  background-position: left bottom, left bottom;
+  background-repeat: no-repeat;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+}
+
+.jn-speedtest-card[data-st-drawing='true'] .jn-st-ruler {
+  animation: jn-st-ruler-draw 310ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--st-col, 0) * 95ms + 65ms) forwards;
+}
+
+.jn-speedtest-card[data-st-drawn='true'] .jn-st-ruler {
+  opacity: 1;
+  clip-path: inset(0 0% 0 0);
+}
+
+@keyframes jn-st-head-draw {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@keyframes jn-st-cell-draw {
+  0% {
+    border-style: dashed;
+    border-color: var(--border);
+    background-color: transparent;
+  }
+  35% {
+    border-style: solid;
+    border-color: color-mix(in oklab, var(--info) 38%, var(--border));
+    background-color: color-mix(in oklab, var(--card) 80%, transparent);
+  }
+  100% {
+    border-style: solid;
+    border-color: var(--border);
+    background-color: color-mix(in oklab, var(--card) 80%, transparent);
+  }
+}
+
+@keyframes jn-st-ruler-draw {
+  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0% 0 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-active='true'] .jn-st-ruler::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--info) 65%, transparent), transparent);
+    animation: jn-st-ruler-sweep 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes jn-st-ruler-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.st-meta-swap-enter-active,
+.st-meta-swap-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.st-meta-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.st-meta-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
 .speed-charts-container {
   margin: 20pt 0;
 }
@@ -676,7 +467,6 @@ onUnmounted(() => {
   }
 }
 
-/* Test start / finish slide-in animation */
 .jn-slide-in {
   animation: jn-slide-in 0.2s ease-in forwards;
 }

@@ -2404,6 +2404,17 @@
       {
         "type": "improve",
         "change": {
+          "en": "SpeedTest becomes more informative and shows more details",
+          "zh": "网速测试变得更好看并展示更多的测速细节",
+          "zh-TW": "SpeedTest 變得更好看並展示更多的測速細節",
+          "fr": "SpeedTest devient plus informatif et montre plus de détails",
+          "ru": "SpeedTest стал более информативным и показывает больше деталей",
+          "pt-BR": "SpeedTest se tornou mais informativo e mostra mais detalhes"
+        }
+      },
+      {
+        "type": "improve",
+        "change": {
           "en": "Connectivity: in single-refresh mode, you can set to discard the first result so the latency leaves out DNS lookup and connection setup",
           "zh": "网络连通性：单次刷新模式下可设置丢弃首次结果，使延迟不包含 DNS 解析与建立连接的耗时",
           "zh-TW": "網路連通性：單次重新整理模式下可設定捨棄首次結果，使延遲不包含 DNS 解析與建立連線的時間",
