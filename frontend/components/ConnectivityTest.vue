@@ -155,7 +155,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, reactive, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, onDeactivated, reactive, watch, defineAsyncComponent } from 'vue';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -569,6 +569,9 @@ const openAddDialog = (tab) => {
   hasOpenedAddDialog.value = true;
   addDialogOpen.value = true;
 };
+onDeactivated(() => {
+  addDialogOpen.value = false;
+});
 
 const removeTargetById = (id) => {
   const result = removeMember(lists.value, activeListId.value, id);

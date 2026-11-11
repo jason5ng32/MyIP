@@ -169,7 +169,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, defineAsyncComponent } from 'vue';
+import { ref, computed, watch, onDeactivated, defineAsyncComponent } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMainStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
@@ -242,4 +243,14 @@ const openCurl = () => {
   isCurlOpen.value = true;
   trackEvent('Footer', 'FooterClick', 'Curl');
 };
+
+// Clear pending or open CLI dialog state when leaving the cached page or
+// switching between tools inside the shared ToolPage shell.
+const route = useRoute();
+watch(() => route.path, () => {
+  if (isCurlOpen.value) isCurlOpen.value = false;
+});
+onDeactivated(() => {
+  isCurlOpen.value = false;
+});
 </script>

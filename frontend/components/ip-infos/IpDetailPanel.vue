@@ -116,7 +116,7 @@
 // via mapMode / countryTrafficMode). Used by IPCard (homepage card grid) and QueryIP (manual IP
 // lookup dialog). Hero IP is NOT part of this panel — consumers render their own hero row since
 // affordances (copy button, etc.) differ.
-import { ref, computed, defineAsyncComponent } from 'vue';
+import { ref, computed, onDeactivated, defineAsyncComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { trackEvent } from '@/utils/analytics';
 import { getZoneUtcOffset, getZoneLocalTime } from '@/utils/time-utils.js';
@@ -172,6 +172,10 @@ const hasOpenedMapDialog = ref(false);
 const hasOpenedTrafficDialog = ref(false);
 const isMapDialogOpen = ref(false);
 const isTrafficDialogOpen = ref(false);
+onDeactivated(() => {
+    isMapDialogOpen.value = false;
+    isTrafficDialogOpen.value = false;
+});
 
 // The backend sends the zone name only; the offset follows DST, so it is
 // resolved here rather than travelling through the routes' 24h edge cache.
