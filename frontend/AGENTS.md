@@ -18,7 +18,7 @@ frontend/
 ├── sentry-init.js   ← env-gated Sentry (see "Error monitoring")
 ├── data/            ← static config (tools registry drives pages+cards+nav)
 ├── lib/ · utils/ · composables/  ← see "Helper placement"
-└── components/      ← sections + ip-infos/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
+└── components/      ← sections + ip-infos/ speedtest/ advanced-tools/ report/ widgets/ svgicons/ festival/ ui/
 ```
 
 Every file opens with a header comment stating its purpose — read those.
