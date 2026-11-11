@@ -53,6 +53,7 @@ export const createAnalytics = ({
         script.onload = initialiseGtag;
         script.onerror = () => {
             console.warn('[GA] Failed to load gtag.js');
+            script.remove?.();
             scriptInjected = false; // allow subsequent events to retry
         };
 

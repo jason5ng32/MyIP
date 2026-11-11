@@ -8,16 +8,42 @@ import { describe, it, beforeEach, afterEach } from 'node:test';
 import { createAnalytics } from '../frontend/utils/analytics.js';
 
 const installDomStub = ({ existingScript = false } = {}) => {
+    const headChildren = existingScript
+        ? [{ tag: 'script', src: 'https://www.googletagmanager.com/gtag/js?id=GTM-EXT' }]
+        : [];
     const appendedScripts = [];
     globalThis.window = {};
     globalThis.document = {
-        querySelector: () => (existingScript ? {} : null),
-        createElement: (tag) => ({ tag, async: false, src: '', onload: null, onerror: null }),
+        querySelector: (selector) => {
+            if (selector === 'script[src*="googletagmanager.com/gtag/js"]') {
+                return headChildren.find(
+                    (el) => el.tag === 'script' && el.src.includes('googletagmanager.com/gtag/js')
+                ) ?? null;
+            }
+            return null;
+        },
+        createElement: (tag) => {
+            const el = {
+                tag,
+                async: false,
+                src: '',
+                onload: null,
+                onerror: null,
+                remove() {
+                    const idx = headChildren.indexOf(el);
+                    if (idx !== -1) headChildren.splice(idx, 1);
+                },
+            };
+            return el;
+        },
         head: {
-            appendChild: (el) => { appendedScripts.push(el); },
+            appendChild: (el) => {
+                headChildren.push(el);
+                appendedScripts.push(el);
+            },
         },
     };
-    return appendedScripts;
+    return { appendedScripts, headChildren };
 };
 
 const teardownDomStub = () => {
@@ -35,7 +61,7 @@ describe('analytics', () => {
     });
 
     it('buffers boot events without injecting gtag.js until startAnalytics() runs', () => {
-        const scripts = installDomStub();
+        const { appendedScripts: scripts } = installDomStub();
         const { analytics, trackEvent, startAnalytics, isAnalyticsEnabled } = createAnalytics({
             measurementId: 'G-TEST123',
             isDev: false,
@@ -88,17 +114,21 @@ describe('analytics', () => {
     });
 
     it('retries script injection on the next event after an onerror failure', () => {
-        const scripts = installDomStub();
+        const { appendedScripts: scripts, headChildren } = installDomStub();
         const origWarn = console.warn;
         console.warn = () => {};
         try {
             const { trackEvent, startAnalytics } = createAnalytics({ measurementId: 'G-RETRY1' });
             startAnalytics();
             assert.equal(scripts.length, 1);
+            assert.equal(headChildren.length, 1);
 
             scripts[0].onerror();
+            assert.equal(headChildren.length, 0, 'failed script tag is removed so querySelector will not reuse it');
+
             trackEvent('Section', 'RetryClick', 'Connectivity');
             assert.equal(scripts.length, 2);
+            assert.equal(headChildren.length, 1);
 
             scripts[1].onload();
             const calls = Array.from(globalThis.window.dataLayer, (entry) => Array.from(entry));
@@ -110,7 +140,7 @@ describe('analytics', () => {
     });
 
     it('reuses an already-present gtag script tag without appending another', () => {
-        const scripts = installDomStub({ existingScript: true });
+        const { appendedScripts: scripts } = installDomStub({ existingScript: true });
         const { analytics, startAnalytics } = createAnalytics({ measurementId: 'G-EXISTING', isDev: true });
 
         analytics.page('/');
@@ -124,7 +154,7 @@ describe('analytics', () => {
 
     it('is a complete no-op when measurementId is empty or window is absent', () => {
         // Unconfigured with DOM present
-        const scripts = installDomStub();
+        const { appendedScripts: scripts } = installDomStub();
         const disabled = createAnalytics({ measurementId: '' });
         assert.equal(disabled.isAnalyticsEnabled, false);
         disabled.analytics.page('/');
