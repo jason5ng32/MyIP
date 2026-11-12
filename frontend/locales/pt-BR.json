@@ -2229,6 +2229,8 @@
     "Latency": "Latência",
     "Jitter": "Jitter",
     "phaseStandby": "Em espera — pronto",
+    "clientNode": "Seu dispositivo",
+    "edgeAuto": "Borda Cloudflare",
     "estimatedData": "Dados est. ≈ {mb} MB",
     "scenarioTitle": "Desempenho por cenário",
     "detailsTitle": "Detalhes de carga",

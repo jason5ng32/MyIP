@@ -27,17 +27,17 @@
 
       <CardContent class="p-4 md:p-6 relative z-[1]">
         <!-- Top Bar: Dynamic Client <-> Edge topology on top-left + Joined control group & Estimated data on top-right -->
-        <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-4">
-          <div class="order-1 md:order-2 self-end md:self-auto md:ml-auto flex flex-col items-end gap-1.5 shrink-0">
-            <div class="inline-flex items-stretch">
-              <span class="flex items-center px-3 border border-input rounded-l-md bg-muted" aria-hidden="true">
+        <div class="flex flex-col gap-3.5 md:flex-row md:items-start md:justify-between mb-3 md:mb-4">
+          <div class="order-1 md:order-2 w-full md:w-auto md:ml-auto flex flex-col items-end gap-1.5 shrink-0">
+            <div class="flex w-full md:inline-flex md:w-auto items-stretch">
+              <span class="flex shrink-0 items-center px-3 border border-input rounded-l-md bg-muted" aria-hidden="true">
                 <CloudDownload class="size-4 text-muted-foreground" />
               </span>
               <Select :model-value="String(state.config.package.download.bytes)"
                 @update:model-value="(v) => v && (state.config.package.download.bytes = Number(v))"
                 :disabled="isRunning || isPaused">
                 <SelectTrigger aria-label="Download size"
-                  class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[88px] sm:min-w-[100px]">
+                  class="rounded-none border-l-0 shadow-none gap-1.5 flex-1 min-w-0 md:flex-none md:w-auto md:min-w-[100px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -46,14 +46,14 @@
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <span class="flex items-center px-3 border border-input border-l-0 bg-muted" aria-hidden="true">
+              <span class="flex shrink-0 items-center px-3 border border-input border-l-0 bg-muted" aria-hidden="true">
                 <CloudUpload class="size-4 text-muted-foreground" />
               </span>
               <Select :model-value="String(state.config.package.upload.bytes)"
                 @update:model-value="(v) => v && (state.config.package.upload.bytes = Number(v))"
                 :disabled="isRunning || isPaused">
                 <SelectTrigger aria-label="Upload size"
-                  class="rounded-none border-l-0 shadow-none gap-1.5 w-auto min-w-[88px] sm:min-w-[100px]">
+                  class="rounded-none border-l-0 shadow-none gap-1.5 flex-1 min-w-0 md:flex-none md:w-auto md:min-w-[100px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -75,13 +75,13 @@
             </p>
           </div>
 
-          <Transition name="st-meta-swap">
-            <SpeedTestTopology
-              v-if="!isIdle && !state.speedTest.isDrawing"
-              class="order-2 md:order-1 w-full md:w-auto md:pt-1"
-              :connection="state.connection"
-              :flow="linkFlow" />
-          </Transition>
+          <Separator class="order-2 bg-border/70 md:hidden" />
+
+          <SpeedTestTopology
+            class="order-3 md:order-1 w-full md:w-auto md:pt-2"
+            :connection="state.connection"
+            :flow="linkFlow"
+            :paused="isPaused" />
         </div>
 
         <!-- Standby & Live Status Rail -->
@@ -89,7 +89,7 @@
           <div class="mb-2 flex items-center justify-between gap-2 text-sm text-muted-foreground">
             <div class="flex items-center gap-2 min-w-0">
               <span class="relative inline-flex size-2 shrink-0" aria-hidden="true">
-                <span v-if="isRunning && !state.speedTest.isDrawing"
+                <span v-if="isRunning && !isCeremony"
                   class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
                   :class="statusDotClass"></span>
                 <span class="relative inline-flex size-2 rounded-full transition-colors duration-300"
@@ -112,7 +112,7 @@
             :style="{ '--st-col': idx, '--st-cell-tone': metricToneVar(m.key) }"
             :data-active="isMetricActive(m.key) || undefined"
             :data-toned="Boolean(metricToneVar(m.key)) || undefined">
-            <div class="jn-st-cell-head flex items-center justify-between text-[10px] font-mono leading-none text-muted-foreground/70 mb-1.5"
+            <div class="jn-st-cell-head flex items-center justify-between text-[10px] font-mono leading-none text-muted-foreground/75 mb-1.5"
               aria-hidden="true">
               <span>0{{ idx + 1 }}</span>
               <span class="relative inline-flex size-1.5">
@@ -135,8 +135,8 @@
 
         <div id="result"></div>
 
-        <!-- Charts Area (hidden while idle, drawing, or when the run failed without data) -->
-        <div v-show="!isIdle && !isError && !state.speedTest.isDrawing" class="speed-charts-container jn-slide-in">
+        <!-- Charts Area (hidden while idle, during handshake/calibration, or when the run failed without data) -->
+        <div v-show="!isIdle && !isError && !isCeremony" class="speed-charts-container jn-slide-in">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             <div class="chart-wrapper"><canvas ref="downloadChart"></canvas></div>
             <div class="chart-wrapper"><canvas ref="uploadChart"></canvas></div>
@@ -177,6 +177,7 @@ import useSpeedTestCharts from '@/composables/use-speedtest-charts.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { JnTooltip } from '@/components/ui/tooltip';
 import SpeedTestResultPanel from '@/components/speedtest/SpeedTestResultPanel.vue';
@@ -187,6 +188,7 @@ const { t } = useI18n();
 const store = useMainStore();
 const lang = computed(() => store.lang);
 const isSimpleMode = computed(() => store.userPreferences.simpleMode);
+const isMobile = computed(() => store.isMobile);
 
 const {
   downloadChart, uploadChart, latencyChart, jitterChart,
@@ -195,7 +197,7 @@ const {
 
 const {
   state, hasEverSettled, sizeOptions,
-  isIdle, isRunning, isPaused, isFinished, isError,
+  isIdle, isRunning, isPaused, isFinished, isError, isCeremony,
   estimatedTotalMB, progressLabel, statusDotClass, progressIndicatorClass,
   metricColorClass, metricDotClass, metricToneVar, linkFlow, isMetricActive, speedTestController,
 } = useSpeedTest({
@@ -226,7 +228,7 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
 </script>
 
 <style scoped>
-/* Engineering telemetry backdrop: pure blank while idle; draws left-to-right on start */
+/* Powered-on telemetry backdrop: subtle CAD grid visible in standby; brightens on calibration/run */
 .jn-st-backdrop {
   position: absolute;
   inset: 0;
@@ -243,18 +245,12 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
   background-size: 24px 24px;
   -webkit-mask-image: radial-gradient(ellipse 92% 85% at 50% 45%, #000 35%, transparent 100%);
   mask-image: radial-gradient(ellipse 92% 85% at 50% 45%, #000 35%, transparent 100%);
-  opacity: 0;
-  clip-path: inset(0 100% 0 0);
-}
-
-.jn-speedtest-card[data-st-drawing='true'] .jn-st-grid {
-  animation: jn-st-grid-draw 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0.62;
+  transition: opacity 400ms ease;
 }
 
 .jn-speedtest-card[data-st-drawn='true'] .jn-st-grid {
   opacity: 0.85;
-  clip-path: inset(0 0% 0 0);
-  transition: opacity 400ms ease;
 }
 
 .jn-speedtest-card[data-st-drawn='true'][data-st-status='running'] .jn-st-grid {
@@ -268,34 +264,23 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
 
 .jn-st-draw-line {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 1px;
+  inset: 0;
   background: linear-gradient(
     180deg,
     transparent,
-    color-mix(in oklab, var(--info) 55%, transparent) 20%,
-    color-mix(in oklab, var(--info) 55%, transparent) 80%,
+    color-mix(in oklab, var(--info) 60%, transparent) 20%,
+    color-mix(in oklab, var(--info) 60%, transparent) 80%,
     transparent
-  );
+  ) no-repeat 0 0 / 1px 100%;
   opacity: 0;
-}
-
-.jn-speedtest-card[data-st-drawing='true'] .jn-st-draw-line {
-  animation: jn-st-cursor-sweep 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@keyframes jn-st-grid-draw {
-  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
-  100% { opacity: 1; clip-path: inset(0 0% 0 0); }
+  transform: translateX(0%);
 }
 
 @keyframes jn-st-cursor-sweep {
-  0% { left: 0%; opacity: 0; }
+  0% { transform: translateX(0%); opacity: 0; }
   10% { opacity: 1; }
   88% { opacity: 0.9; }
-  100% { left: 100%; opacity: 0; }
+  100% { transform: translateX(100%); opacity: 0; }
 }
 
 .jn-st-scan {
@@ -310,41 +295,16 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
   transition: opacity 250ms ease;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .jn-speedtest-card[data-st-drawn='true'][data-st-status='running'] .jn-st-scan {
-    opacity: 0.9;
-    animation: jn-st-horizon-scan 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  }
-}
-
-@keyframes jn-st-horizon-scan {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(320%); }
-}
-
-/* Metric gauge cells: dashed standby slots while idle; staggered L->R solidification & tick draw on start */
+/* Metric gauge cells: solid standby instrument slots; staggered L->R calibration sweep on first start */
 .jn-st-metric-cell {
-  border: 1px dashed var(--border);
-  background-color: transparent;
+  border: 1px solid var(--border);
+  background-color: color-mix(in oklab, var(--card) 82%, transparent);
+  transition: border-color 300ms ease, background-color 300ms ease;
 }
 
 .jn-st-cell-head {
-  opacity: 0.55;
-}
-
-.jn-speedtest-card[data-st-drawing='true'] .jn-st-metric-cell {
-  animation: jn-st-cell-draw 300ms ease calc(var(--st-col, 0) * 95ms + 40ms) forwards;
-}
-
-.jn-speedtest-card[data-st-drawing='true'] .jn-st-cell-head {
-  animation: jn-st-head-draw 240ms ease calc(var(--st-col, 0) * 95ms + 50ms) forwards;
-}
-
-.jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell {
-  border-style: solid;
-  border-color: var(--border);
-  background-color: color-mix(in oklab, var(--card) 80%, transparent);
-  transition: border-color 300ms ease, background-color 300ms ease;
+  opacity: 0.82;
+  transition: opacity 250ms ease;
 }
 
 .jn-speedtest-card[data-st-drawn='true'] .jn-st-cell-head {
@@ -371,55 +331,28 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
   background-size: 100% 5px, 100% 3px;
   background-position: left bottom, left bottom;
   background-repeat: no-repeat;
-  opacity: 0;
-  clip-path: inset(0 100% 0 0);
-}
-
-.jn-speedtest-card[data-st-drawing='true'] .jn-st-ruler {
-  animation: jn-st-ruler-draw 310ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--st-col, 0) * 95ms + 65ms) forwards;
+  opacity: 0.72;
+  transition: opacity 300ms ease;
 }
 
 .jn-speedtest-card[data-st-drawn='true'] .jn-st-ruler {
   opacity: 1;
-  clip-path: inset(0 0% 0 0);
 }
 
-@keyframes jn-st-head-draw {
-  from { opacity: 0.55; }
-  to { opacity: 1; }
-}
-
-@keyframes jn-st-cell-draw {
-  0% {
-    border-style: dashed;
+@keyframes jn-st-cell-calibrate {
+  0%, 100% {
     border-color: var(--border);
-    background-color: transparent;
+    background-color: color-mix(in oklab, var(--card) 82%, transparent);
   }
-  35% {
-    border-style: solid;
-    border-color: color-mix(in oklab, var(--info) 38%, var(--border));
-    background-color: color-mix(in oklab, var(--card) 80%, transparent);
-  }
-  100% {
-    border-style: solid;
-    border-color: var(--border);
-    background-color: color-mix(in oklab, var(--card) 80%, transparent);
+  40% {
+    border-color: color-mix(in oklab, var(--info) 45%, var(--border));
+    background-color: color-mix(in oklab, var(--info) 4%, var(--card));
   }
 }
 
-@keyframes jn-st-ruler-draw {
-  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
-  100% { opacity: 1; clip-path: inset(0 0% 0 0); }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-active='true'] .jn-st-ruler::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--info) 65%, transparent), transparent);
-    animation: jn-st-ruler-sweep 1.6s ease-in-out infinite;
-  }
+@keyframes jn-st-horizon-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(320%); }
 }
 
 @keyframes jn-st-ruler-sweep {
@@ -427,19 +360,27 @@ onMounted(() => { store.setMountingStatus('SpeedTest', true); });
   100% { transform: translateX(100%); }
 }
 
-.st-meta-swap-enter-active,
-.st-meta-swap-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
+@media (prefers-reduced-motion: no-preference) {
+  .jn-speedtest-card[data-st-drawing='true'] .jn-st-draw-line {
+    animation: jn-st-cursor-sweep 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
 
-.st-meta-swap-enter-from {
-  opacity: 0;
-  transform: translateY(4px);
-}
+  .jn-speedtest-card[data-st-drawing='true'] .jn-st-metric-cell {
+    animation: jn-st-cell-calibrate 320ms ease calc(var(--st-col, 0) * 95ms + 40ms);
+  }
 
-.st-meta-swap-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+  .jn-speedtest-card[data-st-drawn='true'][data-st-status='running'] .jn-st-scan {
+    opacity: 0.9;
+    animation: jn-st-horizon-scan 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .jn-speedtest-card[data-st-drawn='true'] .jn-st-metric-cell[data-active='true'] .jn-st-ruler::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--info) 65%, transparent), transparent);
+    animation: jn-st-ruler-sweep 1.6s ease-in-out infinite;
+  }
 }
 
 .speed-charts-container {

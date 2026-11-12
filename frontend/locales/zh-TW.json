@@ -2229,6 +2229,8 @@
     "Latency": "延遲",
     "Jitter": "抖動",
     "phaseStandby": "待命就緒",
+    "clientNode": "你的裝置",
+    "edgeAuto": "Cloudflare 就近節點",
     "estimatedData": "預計流量 ≈ {mb} MB",
     "scenarioTitle": "網路場景表現",
     "detailsTitle": "負載與運行詳情",

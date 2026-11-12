@@ -2229,6 +2229,8 @@
     "Latency": "Latency",
     "Jitter": "Jitter",
     "phaseStandby": "Standby — ready to start",
+    "clientNode": "Your device",
+    "edgeAuto": "Cloudflare edge",
     "estimatedData": "Est. data ≈ {mb} MB",
     "scenarioTitle": "Scenario Performance",
     "detailsTitle": "Load & Run Details",

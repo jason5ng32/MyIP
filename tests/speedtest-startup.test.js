@@ -138,13 +138,14 @@ test('progress text follows phases and preserves the paused phase', async () => 
   run.engines[1].onPhaseChange({ measurement: { type: 'download' } });
   assert.equal(run.linkFlow.value, 'download');
   await run.speedTestController();
+  assert.equal(run.isPaused.value, true);
   assert.equal(run.progressLabel.value, 'speedtest.phasePaused: speedtest.phases.download');
   assert.equal(run.statusDotClass.value, 'bg-warning');
   assert.equal(run.progressIndicatorClass.value, 'bg-warning');
   assert.equal(run.metricColorClass.value, 'text-warning');
   assert.equal(run.metricDotClass('uploadSpeed'), 'bg-warning');
   assert.equal(run.metricToneVar('uploadSpeed'), 'var(--warning)');
-  assert.equal(run.linkFlow.value, 'paused');
+  assert.equal(run.linkFlow.value, 'download', 'keeps active flow when paused so animation freezes in place');
   await run.speedTestController();
   run.engines[1].onPhaseChange({ measurement: { type: 'upload' } });
   assert.equal(run.progressLabel.value, 'speedtest.phases.upload');
@@ -296,6 +297,53 @@ test('boot draw ceremony sweeps before revealing numbers, animations, charts, or
   assert.equal(run.isMetricActive('downloadSpeed'), true);
   assert.equal(run.chartLoads, 1);
   assert.equal(run.engines.length, 1);
+  assert.equal(run.engines[0].plays, 1);
+  run.unmount();
+});
+
+test('handshake merges disconnected dots directly into continuous ping motion without intermediate pause', async () => {
+  const run = fixture();
+  let mergeBeat = deferred();
+  let bootDraw = deferred();
+  run.engineMethods.waitForHandshake = () => mergeBeat.promise;
+  run.engineMethods.waitForBootDraw = () => bootDraw.promise;
+
+  // 1. Cancelling mid-handshake returns cleanly to disconnected idle.
+  const cancelled = run.speedTestController();
+  assert.equal(run.linkFlow.value, 'handshake');
+  assert.equal(run.isCeremony.value, true);
+  await run.speedTestController();
+  assert.equal(run.state.speedTest.status, 'idle');
+  assert.equal(run.linkFlow.value, 'idle');
+  assert.equal(run.isCeremony.value, false);
+  mergeBeat.resolve();
+  await cancelled;
+
+  // 2. Seamless sequence: 'handshake' merge -> immediate 'ping' shuttle (no center freeze) + card bootDraw -> live run.
+  mergeBeat = deferred();
+  bootDraw = deferred();
+  const fullStart = run.speedTestController();
+  assert.equal(run.linkFlow.value, 'handshake');
+  assert.equal(run.statusDotClass.value, 'bg-info');
+  assert.equal(run.progressIndicatorClass.value, 'bg-info');
+  assert.equal(run.state.speedTest.isDrawing, false);
+
+  // Early trace stays buffered until the two dots finish merging.
+  run.connectionLoads[1].resolve({ ip: '198.51.100.7', colo: 'HKG', loc: 'SG', country: 'Singapore' });
+  await nextTick();
+  assert.equal(run.state.connection.colo, '');
+
+  mergeBeat.resolve();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(run.state.connection.colo, 'HKG');
+  assert.equal(run.state.speedTest.isDrawing, true);
+  assert.equal(run.linkFlow.value, 'ping', 'fused dot enters ping shuttle immediately with zero pause');
+
+  bootDraw.resolve();
+  await fullStart;
+  await nextTick();
+  assert.equal(run.isCeremony.value, false);
+  assert.equal(run.linkFlow.value, 'ping');
   assert.equal(run.engines[0].plays, 1);
   run.unmount();
 });

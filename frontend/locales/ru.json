@@ -2229,6 +2229,8 @@
     "Latency": "Задержка",
     "Jitter": "Джиттер",
     "phaseStandby": "Готов к запуску",
+    "clientNode": "Ваше устройство",
+    "edgeAuto": "Узел Cloudflare",
     "estimatedData": "Трафик ≈ {mb} МБ",
     "scenarioTitle": "Оценка по сценариям",
     "detailsTitle": "Нагрузка и параметры",

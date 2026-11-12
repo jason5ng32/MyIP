@@ -2229,6 +2229,8 @@
     "Latency": "Latence",
     "Jitter": "Gigue",
     "phaseStandby": "En attente — prêt",
+    "clientNode": "Votre appareil",
+    "edgeAuto": "Nœud Cloudflare",
     "estimatedData": "Données est. ≈ {mb} Mo",
     "scenarioTitle": "Performance par usage",
     "detailsTitle": "Détails sous charge",

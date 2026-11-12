@@ -14,20 +14,17 @@ import {
   getSpeedTestLiveValues, sumSpeedTestTransferredBytes,
 } from '../utils/features/speedtest-session.js';
 
-const BOOT_DRAW_MS = 680;
+const HANDSHAKE_MERGE_MS = 320;
+const BOOT_DRAW_MS = 580;
 export const SPEEDTEST_SIZE_OPTIONS = [1e6, 10e6, 15e6, 50e6, 100e6];
 
 let SpeedTestEngineClass = null;
 let speedTestEnginePromise = null;
 
 export const useSpeedTest = ({
-  t,
-  lang,
-  updateAllIPs = () => {},
+  t, lang, updateAllIPs = () => {},
   initStartingPoints = () => Promise.resolve(),
-  updateCharts = () => {},
-  resetChartData = () => {},
-  destroyCharts = () => {},
+  updateCharts = () => {}, resetChartData = () => {}, destroyCharts = () => {},
 }) => {
   const hasEverSettled = ref(false);
 
@@ -40,7 +37,7 @@ export const useSpeedTest = ({
       streamingQuality: '-', gamingQuality: '-', rtcQuality: '-', cloudSyncQuality: '-',
       transferredBytes: 0, activeDurationMs: 0,
       status: 'idle', phase: 'probe', hasScores: false, progress: 0,
-      isDrawing: false, hasDrawn: false,
+      handshakeStage: '', isDrawing: false, hasDrawn: false,
     },
     connection: {
       ip: '', colo: '', loc: '', country: '', coloCountry: '', coloCountryCode: '', coloCity: '',
@@ -61,6 +58,7 @@ export const useSpeedTest = ({
   const isPaused = computed(() => state.speedTest.status === 'paused');
   const isFinished = computed(() => state.speedTest.status === 'finished');
   const isError = computed(() => state.speedTest.status === 'error');
+  const isCeremony = computed(() => Boolean(state.speedTest.handshakeStage || state.speedTest.isDrawing));
 
   // Estimated payload across all configured download + upload rounds (in MB).
   const estimatedTotalMB = computed(() => {
@@ -77,11 +75,12 @@ export const useSpeedTest = ({
   });
 
   // Drives the directional packet stream on the Client <-> Edge Server link.
+  // Keeps the active flow when paused so CSS animation-play-state freezes in place.
   const linkFlow = computed(() => {
     if (isFinished.value) return 'done';
     if (isError.value) return 'error';
-    if (isPaused.value) return 'paused';
-    if (!isRunning.value || state.speedTest.isDrawing) return 'idle';
+    if (isIdle.value) return 'idle';
+    if (state.speedTest.handshakeStage === 'sending') return 'handshake';
     const { phase } = state.speedTest;
     if (phase === 'download') return 'download';
     if (phase === 'upload') return 'upload';
@@ -94,7 +93,7 @@ export const useSpeedTest = ({
     if (isFinished.value) return 'ok-fast';
     if (isError.value) return 'fail';
     if (isPaused.value) return 'ok-slow';
-    if (isRunning.value) return state.speedTest.isDrawing ? 'wait' : 'active';
+    if (isRunning.value) return 'active';
     return null;
   });
 
@@ -103,7 +102,7 @@ export const useSpeedTest = ({
   ));
 
   const metricColorClass = computed(() => {
-    if (isIdle.value || state.speedTest.isDrawing) return 'text-muted-foreground/45';
+    if (isIdle.value || isCeremony.value) return 'text-muted-foreground/45';
     return runTone.value ? textClass(runTone.value) : '';
   });
 
@@ -112,7 +111,7 @@ export const useSpeedTest = ({
   ));
 
   const isMetricActive = (key) => {
-    if (!isRunning.value || state.speedTest.isDrawing) return false;
+    if (!isRunning.value || isCeremony.value) return false;
     const { phase } = state.speedTest;
     if (phase === 'probe') return key === 'latency' || key === 'downloadSpeed';
     if (phase === 'latency') return key === 'latency' || key === 'jitter';
@@ -190,12 +189,20 @@ export const useSpeedTest = ({
 
   let testEngine = null;
   let runId = 0;
+  let releasePendingGate = null;
+
+  const canAnimate = () => (
+    typeof window !== 'undefined' && !window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+  );
+  const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
   const engineMethods = {
+    waitForHandshake() {
+      return canAnimate() ? sleep(HANDSHAKE_MERGE_MS) : null;
+    },
+
     waitForBootDraw() {
-      if (typeof window === 'undefined') return null;
-      if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return null;
-      return new Promise((resolve) => { setTimeout(resolve, BOOT_DRAW_MS); });
+      return canAnimate() ? sleep(BOOT_DRAW_MS) : null;
     },
 
     loadEngine() {
@@ -263,9 +270,12 @@ export const useSpeedTest = ({
 
   // --- Orchestration --------------------------------------------------------
 
-  const loadConnection = async (currentRun) => {
-    if (!state.connection.ip) {
-      const connectionData = await connectionMethods.getIPFromSpeedTest();
+  const startConnectionLoad = (currentRun, releaseGate = null) => {
+    if (state.connection.ip) return Promise.resolve(null);
+    const tracePromise = connectionMethods.getIPFromSpeedTest();
+    void (async () => {
+      const connectionData = await tracePromise;
+      if (releaseGate) await releaseGate;
       if (connectionData && currentRun === runId) {
         Object.assign(state.connection, connectionData);
         updateAllIPs([{
@@ -274,7 +284,8 @@ export const useSpeedTest = ({
           location: connectionData.country || '',
         }]);
       }
-    }
+    })().catch((err) => console.error('Error loading speed test connection:', err));
+    return tracePromise.catch(() => null);
   };
 
   const detachEngineCallbacks = () => {
@@ -320,40 +331,28 @@ export const useSpeedTest = ({
         includePacketLoss: Boolean(results?.raw?.packetLoss),
       });
       if (scores?.streaming) {
-        state.speedTest.hasScores = true;
-        state.speedTest.streamingScore = scores.streaming.points;
-        state.speedTest.gamingScore = scores.gaming.points;
-        state.speedTest.rtcScore = scores.rtc.points;
-        state.speedTest.cloudSyncScore = cloudSync?.points ?? '-';
-        state.speedTest.streamingQuality = scores.streaming.classificationName;
-        state.speedTest.gamingQuality = scores.gaming.classificationName;
-        state.speedTest.rtcQuality = scores.rtc.classificationName;
-        state.speedTest.cloudSyncQuality = cloudSync?.classificationName ?? '-';
+        Object.assign(state.speedTest, {
+          hasScores: true,
+          streamingScore: scores.streaming.points,
+          gamingScore: scores.gaming.points,
+          rtcScore: scores.rtc.points,
+          cloudSyncScore: cloudSync?.points ?? '-',
+          streamingQuality: scores.streaming.classificationName,
+          gamingQuality: scores.gaming.classificationName,
+          rtcQuality: scores.rtc.classificationName,
+          cloudSyncQuality: cloudSync?.classificationName ?? '-',
+        });
       }
 
       testEngine = null;
       hasEverSettled.value = true;
+      const st = state.speedTest;
       emitAppEvent('speedtest:finished', {
-        downloadSpeed: state.speedTest.downloadSpeed,
-        uploadSpeed: state.speedTest.uploadSpeed,
-        latency: state.speedTest.latency,
-        jitter: state.speedTest.jitter,
-        downLoadedLatency: state.speedTest.downLoadedLatency,
-        upLoadedLatency: state.speedTest.upLoadedLatency,
-        scores: state.speedTest.hasScores
-          ? {
-            streaming: state.speedTest.streamingScore,
-            gaming: state.speedTest.gamingScore,
-            rtc: state.speedTest.rtcScore,
-          }
-          : null,
-        qualities: state.speedTest.hasScores
-          ? {
-            streaming: state.speedTest.streamingQuality,
-            gaming: state.speedTest.gamingQuality,
-            rtc: state.speedTest.rtcQuality,
-          }
-          : null,
+        downloadSpeed: st.downloadSpeed, uploadSpeed: st.uploadSpeed,
+        latency: st.latency, jitter: st.jitter,
+        downLoadedLatency: st.downLoadedLatency, upLoadedLatency: st.upLoadedLatency,
+        scores: st.hasScores ? { streaming: st.streamingScore, gaming: st.gamingScore, rtc: st.rtcScore } : null,
+        qualities: st.hasScores ? { streaming: st.streamingQuality, gaming: st.gamingQuality, rtc: st.rtcQuality } : null,
         connection: { ...state.connection },
       });
     };
@@ -365,7 +364,7 @@ export const useSpeedTest = ({
     };
   };
 
-  const resetSpeedTestReadings = (initialValue, progress, isDrawing) => {
+  const resetSpeedTestReadings = (initialValue, progress, isDrawing, handshakeStage = '') => {
     Object.assign(state.speedTest, {
       downloadSpeed: initialValue, uploadSpeed: initialValue,
       latency: initialValue, jitter: initialValue,
@@ -373,7 +372,7 @@ export const useSpeedTest = ({
       streamingScore: '-', gamingScore: '-', rtcScore: '-', cloudSyncScore: '-',
       streamingQuality: '-', gamingQuality: '-', rtcQuality: '-', cloudSyncQuality: '-',
       transferredBytes: 0, activeDurationMs: 0,
-      hasScores: false, progress, phase: 'probe', status: 'running', isDrawing,
+      hasScores: false, progress, phase: 'probe', status: 'running', isDrawing, handshakeStage,
     });
   };
 
@@ -383,7 +382,10 @@ export const useSpeedTest = ({
       if (state.speedTest.status === 'running') {
         if (testEngine) testEngine.pause();
         else runId += 1;
-        if (state.speedTest.isDrawing) {
+        if (isCeremony.value) {
+          releasePendingGate?.();
+          releasePendingGate = null;
+          state.speedTest.handshakeStage = '';
           state.speedTest.isDrawing = false;
           state.speedTest.status = 'idle';
           return;
@@ -397,24 +399,39 @@ export const useSpeedTest = ({
       }
 
       currentRun = ++runId;
+      releasePendingGate?.();
+      releasePendingGate = null;
       testEngine?.destroy();
       testEngine = null;
       resetChartData();
       destroyCharts();
 
-      const bootDraw = !state.speedTest.hasDrawn ? engineMethods.waitForBootDraw() : null;
+      const handshake = !state.speedTest.hasDrawn ? engineMethods.waitForHandshake() : null;
       const engineLoad = engineMethods.loadEngine();
       engineLoad.catch(() => {});
-      void loadConnection(currentRun).catch((err) => console.error('Error loading speed test connection:', err));
+
+      const connectionGate = handshake
+        ? new Promise((resolve) => { releasePendingGate = resolve; })
+        : null;
+      startConnectionLoad(currentRun, connectionGate);
       trackEvent('Section', 'StartClick', 'SpeedTest');
 
+      if (handshake) {
+        resetSpeedTestReadings('-', 0, false, 'sending');
+        await handshake;
+        releasePendingGate?.();
+        releasePendingGate = null;
+        if (currentRun !== runId) return;
+      }
+
+      const bootDraw = !state.speedTest.hasDrawn ? engineMethods.waitForBootDraw() : null;
       if (bootDraw) {
-        resetSpeedTestReadings('-', 0, true);
+        resetSpeedTestReadings('-', 0, true, '');
         await bootDraw;
         if (currentRun !== runId) return;
       }
 
-      resetSpeedTestReadings(0, 5, false);
+      resetSpeedTestReadings(0, 5, false, '');
       state.speedTest.hasDrawn = true;
 
       void nextTick().then(() => {
@@ -436,6 +453,7 @@ export const useSpeedTest = ({
     } catch (error) {
       console.error('Error in speedTestController:', error);
       if (currentRun === runId) {
+        state.speedTest.handshakeStage = '';
         state.speedTest.isDrawing = false;
         state.speedTest.hasDrawn = true;
         state.speedTest.status = 'error';
@@ -445,6 +463,8 @@ export const useSpeedTest = ({
 
   const cleanup = () => {
     runId += 1;
+    releasePendingGate?.();
+    releasePendingGate = null;
     if (testEngine) {
       detachEngineCallbacks();
       testEngine.onFinish = () => {};
@@ -457,27 +477,11 @@ export const useSpeedTest = ({
   if (getCurrentScope()) onScopeDispose(cleanup);
 
   return {
-    state,
-    hasEverSettled,
-    sizeOptions: SPEEDTEST_SIZE_OPTIONS,
-    isIdle,
-    isRunning,
-    isPaused,
-    isFinished,
-    isError,
-    estimatedTotalMB,
-    progressLabel,
-    statusDotClass,
-    progressIndicatorClass,
-    metricColorClass,
-    metricDotClass,
-    metricToneVar,
-    linkFlow,
-    isMetricActive,
-    connectionMethods,
-    engineMethods,
-    speedTestController,
-    cleanup,
+    state, hasEverSettled, sizeOptions: SPEEDTEST_SIZE_OPTIONS,
+    isIdle, isRunning, isPaused, isFinished, isError, isCeremony,
+    estimatedTotalMB, progressLabel, statusDotClass, progressIndicatorClass,
+    metricColorClass, metricDotClass, metricToneVar, linkFlow, isMetricActive,
+    connectionMethods, engineMethods, speedTestController, cleanup,
   };
 };
 export default useSpeedTest;
