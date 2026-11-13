@@ -5,6 +5,9 @@
 // Entry shape:
 //   slug                 — stable URL/identifier (/tools/:slug)
 //   emoji                — card glyph + page / menu glyph
+//   motion / fx / tone / angle — optional `<EmojiMotion>` preset overrides
+//                          (utils/emoji-motion.js); omitted `motion` falls back
+//                          to `'pop'`, omitted `fx` plays pure glyph motion
 //   titleKey / noteKey   — i18n keys for the tool title and one-line description
 //   category             — TOOL_CATEGORIES id: the card group it renders in
 //   component            — lazy import of the tool's .vue (rendered by ToolPage)
@@ -17,25 +20,25 @@
 // opens the tool regardless.
 
 export const ADVANCED_TOOLS = [
-  { slug: 'pingtest', emoji: '⏱️', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', category: 'network', component: () => import('@/components/advanced-tools/GlobalLatencyTest.vue') },
-  { slug: 'mtrtest', emoji: '🚉', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', category: 'network', component: () => import('@/components/advanced-tools/MtrTest.vue') },
-  { slug: 'ruletest', emoji: '🚏', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', category: 'network', component: () => import('@/components/advanced-tools/RuleTest.vue') },
-  { slug: 'dnsresolver', emoji: '📟', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', category: 'network', component: () => import('@/components/advanced-tools/DnsResolver.vue') },
-  { slug: 'censorshipcheck', emoji: '🚧', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', category: 'network', component: () => import('@/components/advanced-tools/CensorshipCheck.vue') },
-  { slug: 'servicestatus', emoji: '📡', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', category: 'network', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
-  { slug: 'browserinfo', emoji: '🖥️', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', category: 'network', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },
-  { slug: 'adblocktest', emoji: '🛡️', titleKey: 'adblocktest.Title', noteKey: 'advancedtools.AdblockTest', category: 'network', component: () => import('@/components/advanced-tools/AdblockTest.vue') },
-  { slug: 'snapshots', emoji: '📸', titleKey: 'snapshots.Title', noteKey: 'advancedtools.Snapshots', category: 'network', component: () => import('@/components/advanced-tools/Snapshots.vue') },
-  { slug: 'whois', emoji: '📓', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', category: 'lookup', component: () => import('@/components/advanced-tools/Whois.vue') },
-  { slug: 'asn', emoji: '🛂', titleKey: 'asnprofile.Title', noteKey: 'advancedtools.AsnProfile', category: 'lookup', component: () => import('@/components/advanced-tools/AsnProfile.vue'), requiresConfig: 'cloudFlare' },
-  { slug: 'macchecker', emoji: '🗄️', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', category: 'lookup', component: () => import('@/components/advanced-tools/MacChecker.vue') },
-  { slug: 'ipcalculator', emoji: '🔢', titleKey: 'ipcalculator.Title', noteKey: 'advancedtools.IpCalculator', category: 'lookup', component: () => import('@/components/advanced-tools/IpCalculator.vue') },
-  { slug: 'bulklookup', emoji: '🧾', titleKey: 'bulklookup.Title', noteKey: 'advancedtools.BulkLookup', category: 'lookup', component: () => import('@/components/advanced-tools/BulkLookup.vue') },
-  { slug: 'invisibilitytest', emoji: '🫣', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', category: 'deep', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresOriginalSite: true },
-  { slug: 'enhanceddnsleaktest', emoji: '🌀', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
-  { slug: 'blocklist', emoji: '🚫', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresOriginalSite: true },
-  { slug: 'personacheck', emoji: '🎭', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
-  { slug: 'securitychecklist', emoji: '📋', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'reference', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
+  { slug: 'pingtest', emoji: '⏱️', motion: 'ring', fx: 'ripple', tone: 'info', titleKey: 'pingtest.Title', noteKey: 'advancedtools.PingTestNote', category: 'network', component: () => import('@/components/advanced-tools/GlobalLatencyTest.vue') },
+  { slug: 'mtrtest', emoji: '🚉', motion: 'dash', angle: 180, fx: 'streaks', tone: 'info', titleKey: 'mtrtest.Title', noteKey: 'advancedtools.MTRTestNote', category: 'network', component: () => import('@/components/advanced-tools/MtrTest.vue') },
+  { slug: 'ruletest', emoji: '🚏', motion: 'swing', fx: 'spark', tone: 'success', titleKey: 'ruletest.Title', noteKey: 'advancedtools.RuleTestNote', category: 'network', component: () => import('@/components/advanced-tools/RuleTest.vue') },
+  { slug: 'dnsresolver', emoji: '📟', motion: 'ring', fx: 'ripple', tone: 'success', titleKey: 'dnsresolver.Title', noteKey: 'advancedtools.DNSResolverNote', category: 'network', component: () => import('@/components/advanced-tools/DnsResolver.vue') },
+  { slug: 'censorshipcheck', emoji: '🚧', motion: 'slam', fx: 'ripple', tone: 'warning', titleKey: 'censorshipcheck.Title', noteKey: 'advancedtools.CensorshipCheck', category: 'network', component: () => import('@/components/advanced-tools/CensorshipCheck.vue') },
+  { slug: 'servicestatus', emoji: '📡', motion: 'swing', fx: 'ripple', tone: 'success', titleKey: 'serviceStatus.Title', noteKey: 'advancedtools.ServiceStatus', category: 'network', component: () => import('@/components/advanced-tools/ServiceStatus.vue') },
+  { slug: 'browserinfo', emoji: '🖥️', motion: 'peek', fx: 'scan', tone: 'info', titleKey: 'browserinfo.Title', noteKey: 'advancedtools.BrowserInfo', category: 'network', component: () => import('@/components/advanced-tools/BrowserInfo.vue') },
+  { slug: 'adblocktest', emoji: '🛡️', motion: 'dash', angle:30, fx: 'ripple', tone: 'warning', titleKey: 'adblocktest.Title', noteKey: 'advancedtools.AdblockTest', category: 'network', component: () => import('@/components/advanced-tools/AdblockTest.vue') },
+  { slug: 'snapshots', emoji: '📸', motion: 'pop', fx: 'spark', tone: 'warning', titleKey: 'snapshots.Title', noteKey: 'advancedtools.Snapshots', category: 'network', component: () => import('@/components/advanced-tools/Snapshots.vue') },
+  { slug: 'whois', emoji: '📓', motion: 'flip', fx: 'scan', tone: 'info', titleKey: 'whois.Title', noteKey: 'advancedtools.Whois', category: 'lookup', component: () => import('@/components/advanced-tools/Whois.vue') },
+  { slug: 'asn', emoji: '🛂', motion: 'slam', fx: 'spark', tone: 'info', titleKey: 'asnprofile.Title', noteKey: 'advancedtools.AsnProfile', category: 'lookup', component: () => import('@/components/advanced-tools/AsnProfile.vue'), requiresConfig: 'cloudFlare' },
+  { slug: 'macchecker', emoji: '🗄️', motion: 'peek', titleKey: 'macchecker.Title', noteKey: 'advancedtools.MacChecker', category: 'lookup', component: () => import('@/components/advanced-tools/MacChecker.vue') },
+  { slug: 'ipcalculator', emoji: '🔢', motion: 'toss', fx: 'spark', tone: 'info', titleKey: 'ipcalculator.Title', noteKey: 'advancedtools.IpCalculator', category: 'lookup', component: () => import('@/components/advanced-tools/IpCalculator.vue') },
+  { slug: 'bulklookup', emoji: '🧾', motion: 'toss', titleKey: 'bulklookup.Title', noteKey: 'advancedtools.BulkLookup', category: 'lookup', component: () => import('@/components/advanced-tools/BulkLookup.vue') },
+  { slug: 'invisibilitytest', emoji: '🫣', motion: 'peek', fx: 'scan', tone: 'muted', titleKey: 'invisibilitytest.Title', noteKey: 'advancedtools.InvisibilityTest', category: 'deep', component: () => import('@/components/advanced-tools/InvisibilityTest.vue'), requiresOriginalSite: true },
+  { slug: 'enhanceddnsleaktest', emoji: '🌀', motion: 'spin', fx: 'ripple', tone: 'info', titleKey: 'enhanceddnsleaktest.Title', noteKey: 'advancedtools.EnhancedDnsLeakTest', category: 'deep', component: () => import('@/components/advanced-tools/EnhancedDnsLeakTest.vue'), requiresOriginalSite: true },
+  { slug: 'blocklist', emoji: '🚫', motion: 'slam', fx: 'ripple', tone: 'destructive', titleKey: 'ipblocklist.Title', noteKey: 'advancedtools.IpBlocklist', category: 'deep', component: () => import('@/components/advanced-tools/IpBlocklist.vue'), requiresOriginalSite: true },
+  { slug: 'personacheck', emoji: '🎭', motion: 'flip', fx: 'spark', tone: 'warning', titleKey: 'personacheck.Title', noteKey: 'advancedtools.PersonaCheck', category: 'deep', component: () => import('@/components/advanced-tools/PersonaCheck.vue'), requiresOriginalSite: true },
+  { slug: 'securitychecklist', emoji: '📋', motion: 'toss', fx: 'spark', tone: 'success', titleKey: 'securitychecklist.Title', noteKey: 'advancedtools.SecurityChecklist', category: 'reference', component: () => import('@/components/advanced-tools/SecurityChecklist.vue') },
 ];
 
 // slug → entry.
