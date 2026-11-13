@@ -113,7 +113,6 @@ minimumReleaseAgeExclude:
   - '@vueuse/metadata@15.0.0'
   - '@vueuse/shared@15.0.0'
   - vue-i18n@11.4.12 || 11.4.17
-  - express-rate-limit@8.7.1 || 8.7.4
   - reka-ui@2.11.0
   - maxmind@5.0.8
   - '@cloudflare/speedtest@1.17.0'

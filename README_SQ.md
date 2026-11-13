@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Gjithçka tjetër — çelësat opsionalë API, siguria dhe kufizimi i shpejtësisë, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Gjithçka tjetër — çelësat opsionalë API, siguria, regjistrimi, Sentry, domenet e API-së curl — është dokumentuar te [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Dokumentacioni
 

@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-其余全部是可选配置 —— 第三方 API Key、安全与限流、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
+其余全部是可选配置 —— 第三方 API Key、安全、日志、Sentry、curl API 域名等，详见[环境变量参考](https://docs.ipcheck.ing/developer/reference/environment-variables)。
 
 ## 📖 官方文档
 

@@ -226,12 +226,6 @@ importers:
       express:
         specifier: ^5.3.0
         version: 5.3.0(supports-color@5.5.0)
-      express-rate-limit:
-        specifier: ^8.7.4
-        version: 8.7.4(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0)
-      express-slow-down:
-        specifier: ^3.1.1
-        version: 3.1.1(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0)
       firebase:
         specifier: ^13.2.0
         version: 13.2.0(@types/react@19.3.0)(supports-color@5.5.0)
@@ -1847,18 +1841,6 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  express-rate-limit@8.7.4:
-    resolution: {integrity: sha512-LKBXzX700wz3zAGNNmVnjRI5mEbYkLv7UbMI4+9Xa+JPcg2UZh6AgY/2CZh9RrJjFM5ttC/N1lD+KzyFoZITCw==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      express: '>= 4.11'
-
-  express-slow-down@3.1.1:
-    resolution: {integrity: sha512-u0qGu2aIt+ZKj/vPhJ510YorAou5r/NTeinDRg+R9SAEOGlLgADnif6tOV2F3bVrM75t2VfeCdOwGLwILGDJvQ==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      express: 4 || 5 || ^5.0.0-beta.1
-
   express@5.3.0:
     resolution: {integrity: sha512-qCqy1xSoaugxOD4IVHb1ZWdkvCF2W3aE2okKouWj8VwJ+ztskSiXoBnCSJqfKT+cVPJhuJqe9YLbY425+Zh00g==}
     engines: {node: '>= 18'}
@@ -2011,10 +1993,6 @@ packages:
   internmap@2.0.3:
     resolution: {integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==}
     engines: {node: '>=12'}
-
-  ip-address@10.7.6:
-    resolution: {integrity: sha512-00LYkM6byILa9eQIx6qoaXCM40xTLd56AZ4vyaPW3YTyb49VZYPo5xsiAq4tuQ54GH4R7gVdYScJ1B7B77PuTg==}
-    engines: {node: '>= 12'}
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -4467,21 +4445,6 @@ snapshots:
 
   etag@1.8.1: {}
 
-  express-rate-limit@8.7.4(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0):
-    dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
-      express: 5.3.0(supports-color@5.5.0)
-      ip-address: 10.7.6
-    transitivePeerDependencies:
-      - supports-color
-
-  express-slow-down@3.1.1(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0):
-    dependencies:
-      express: 5.3.0(supports-color@5.5.0)
-      express-rate-limit: 8.7.4(express@5.3.0(supports-color@5.5.0))(supports-color@5.5.0)
-    transitivePeerDependencies:
-      - supports-color
-
   express@5.3.0(supports-color@5.5.0):
     dependencies:
       accepts: 2.0.0
@@ -4693,8 +4656,6 @@ snapshots:
   inherits@2.0.4: {}
 
   internmap@2.0.3: {}
-
-  ip-address@10.7.6: {}
 
   ipaddr.js@1.9.1: {}
 

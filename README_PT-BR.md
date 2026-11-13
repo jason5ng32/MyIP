@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Todo o restante — chaves de API opcionais, segurança e limitação de taxa, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Todo o restante — chaves de API opcionais, segurança, registros, Sentry e os domínios da API curl — está documentado na [referência de variáveis de ambiente](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentação
 

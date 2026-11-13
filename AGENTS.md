@@ -143,7 +143,7 @@ allowlist names each known exception, and fails once one is gone):
   `LOG_HTTP=true` to mount `pino-http` on `/api` (off by default; handlers
   never log "received request" lines themselves). No `NODE_ENV` anywhere.
 - Startup-only lines lead with an emoji (🚀 listening · 📦 ready ·
-  📥 downloading · 🛡️ security · 🐢 throttling · 🗓️ schedule · ⚠️ recoverable
+  📥 downloading · 🛡️ security · 🗓️ schedule · ⚠️ recoverable
   · ❌ failure); per-request logs stay plain.
 
 ## Testing
