@@ -30,6 +30,7 @@ import {
     REPLAY_COOLDOWN_MS,
     playEmojiMotion,
     resolveEmojiMotion,
+    shouldPlayOnFocusIn,
 } from '@/utils/emoji-motion.js';
 
 const props = defineProps({
@@ -105,6 +106,11 @@ const onPointerEnter = (event) => {
     play();
 };
 
+const onFocusIn = (event) => {
+    if (!shouldPlayOnFocusIn(event, triggerEl)) return;
+    play();
+};
+
 const resolveTriggerElement = () => {
     const el = rootRef.value;
     if (!el || !props.trigger || props.trigger === 'none') return null;
@@ -118,6 +124,7 @@ onMounted(() => {
     if (!triggerEl) return;
 
     triggerEl.addEventListener('pointerenter', onPointerEnter, { passive: true });
+    triggerEl.addEventListener('focusin', onFocusIn);
 
     // Mirror J/K keyboard card navigation (`data-keyboard-hover="true"`) when
     // mounted inside a shortcut-navigable card.
@@ -137,6 +144,7 @@ onMounted(() => {
 onDeactivated(stop);
 onBeforeUnmount(() => {
     triggerEl?.removeEventListener('pointerenter', onPointerEnter);
+    triggerEl?.removeEventListener('focusin', onFocusIn);
     triggerEl = null;
     keyHoverObserver?.disconnect();
     keyHoverObserver = null;

@@ -227,6 +227,23 @@ export const EMOJI_FX = Object.freeze({
 export const prefersReducedMotion = (win = globalThis.window) =>
     Boolean(win?.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
 
+// Play on `focusin` only when focus enters `triggerEl` from outside via keyboard
+// navigation (`:focus-visible`), ignoring mouse clicks, touch taps, and internal
+// focus transfers within the same trigger container.
+export const shouldPlayOnFocusIn = (event, triggerEl) => {
+    if (!triggerEl || !event) return false;
+    if (event.relatedTarget && triggerEl.contains?.(event.relatedTarget)) return false;
+    const target = event.target;
+    if (typeof target?.matches === 'function') {
+        try {
+            return target.matches(':focus-visible');
+        } catch {
+            return true;
+        }
+    }
+    return true;
+};
+
 export const resolveEmojiMotion = ({
     motion = DEFAULT_EMOJI_MOTION,
     fx = '',

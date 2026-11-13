@@ -113,8 +113,9 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Keep acting / hovered cards above upper neighbors while their emoji motion plays */
+/* Keep acting / hovered / focused cards above upper neighbors while their emoji motion plays */
 .jn-adv-card:hover,
+.jn-adv-card:focus-within,
 .jn-adv-card:has([data-acting='true']) {
     z-index: 10;
 }

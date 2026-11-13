@@ -13,6 +13,7 @@ import {
     MOTION_DURATION_MS,
     playEmojiMotion,
     resolveEmojiMotion,
+    shouldPlayOnFocusIn,
 } from '../frontend/utils/emoji-motion.js';
 
 const makeWin = ({ reducedMotion = false } = {}) => ({
@@ -172,5 +173,39 @@ describe('playEmojiMotion (WAAPI runner)', () => {
         assert.equal(playback.animations.length, 0);
         assert.equal(emojiEl.calls.length, 0);
         await playback.finished;
+    });
+});
+
+describe('shouldPlayOnFocusIn (Tab keyboard focus trigger)', () => {
+    it('triggers on external :focus-visible entry, skipping pointer clicks and internal focus moves', () => {
+        const insideLink = { matches: (sel) => sel === ':focus-visible' };
+        const clickedLink = { matches: () => false };
+        const siblingControl = {};
+        const outsideLink = {};
+        const cardEl = {
+            contains: (node) => node === insideLink || node === clickedLink || node === siblingControl,
+        };
+
+        // Tabbing into the card's <a> from outside plays the animation
+        assert.equal(
+            shouldPlayOnFocusIn({ target: insideLink, relatedTarget: outsideLink }, cardEl),
+            true,
+        );
+        assert.equal(
+            shouldPlayOnFocusIn({ target: insideLink, relatedTarget: null }, cardEl),
+            true,
+        );
+
+        // Mouse click / touch tap focus (:focus-visible is false) does not re-trigger
+        assert.equal(
+            shouldPlayOnFocusIn({ target: clickedLink, relatedTarget: null }, cardEl),
+            false,
+        );
+
+        // Focus moving between two elements inside the same trigger container is ignored
+        assert.equal(
+            shouldPlayOnFocusIn({ target: insideLink, relatedTarget: siblingControl }, cardEl),
+            false,
+        );
     });
 });
