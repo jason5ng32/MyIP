@@ -132,7 +132,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Geri kalan her şey (isteğe bağlı API anahtarları, güvenlik ve istek sınırlama, günlükleme, Sentry, curl API alan adları) [Ortam Değişkenleri başvurusunda](https://docs.ipcheck.ing/developer/reference/environment-variables) belgelenmiştir.
+Geri kalan her şey (isteğe bağlı API anahtarları, güvenlik, günlükleme, Sentry, curl API alan adları) [Ortam Değişkenleri başvurusunda](https://docs.ipcheck.ing/developer/reference/environment-variables) belgelenmiştir.
 
 ## 📖 Belgeler
 

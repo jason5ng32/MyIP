@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Всё остальное — необязательные ключи API, безопасность и ограничение частоты запросов, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Всё остальное — необязательные ключи API, безопасность, логирование, Sentry, домены curl API — описано в [справочнике переменных окружения](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Документация
 

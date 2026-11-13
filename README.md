@@ -130,7 +130,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-Everything else — optional API keys, security & rate limiting, logging, Sentry, the curl API domains — is documented in the [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
+Everything else — optional API keys, security, logging, Sentry, the curl API domains — is documented in the [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables).
 
 ## 📖 Documentation
 

@@ -46,8 +46,6 @@
     "croner": "^11.0.0",
     "dagre": "^0.8.5",
     "express": "^5.3.0",
-    "express-rate-limit": "^8.7.4",
-    "express-slow-down": "^3.1.1",
     "firebase": "^13.2.0",
     "html-to-image": "^1.11.13",
     "http-proxy-middleware": "^4.2.1",

@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัยและการจำกัดอัตราคำขอ การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
+การตั้งค่าอื่นทั้งหมด เช่น API key เสริม ความปลอดภัย การเก็บ log, Sentry และโดเมนสำหรับ curl API มีอธิบายไว้ใน[เอกสารอ้างอิงตัวแปรสภาพแวดล้อม](https://docs.ipcheck.ing/developer/reference/environment-variables)
 
 ## 📖 เอกสาร
 

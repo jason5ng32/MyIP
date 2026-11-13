@@ -133,7 +133,7 @@ docker run -d -p 18966:18966 \
   jason5ng32/myip:latest
 ```
 
-बाकी सब कुछ — वैकल्पिक API कुंजियां, सुरक्षा और रेट लिमिटिंग, लॉगिंग, Sentry, curl API के डोमेन — [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables) में लिखा है.
+बाकी सब कुछ — वैकल्पिक API कुंजियां, सुरक्षा, लॉगिंग, Sentry, curl API के डोमेन — [Environment Variables reference](https://docs.ipcheck.ing/developer/reference/environment-variables) में लिखा है.
 
 ## 📖 दस्तावेज़
 
